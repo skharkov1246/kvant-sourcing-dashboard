@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 230,
-    "total_bytes": 104586696,
+    "total_bytes": 104596935,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 129,
@@ -5998,6 +5998,43 @@
       ]
     },
     {
+      "path": "gt/data/ship_stocklist_cross.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 55491,
+      "note": "Пересечение открытого сток-листа продавца с номерами заявки: сколько наших строк он закрывает и куда ask бьёт по нашим вилкам. Считает gt/tools/stocklist_cross.py. ЦЕН В НАБОРЕ НЕТ И БЫТЬ НЕ МОЖЕТ: репозиторий публичный, а сток-лист — коммерческий документ контрагента, выкладывать его целиком нельзя даже при открытой странице. Набор несёт только счёт и класс (ask выше потолка, внутри, ниже пола, вилки нет), это закреплено тестом. Отдельная цена приводится в перепроверке как довод по конкретной строке с названной страницей — это довод, а не перепечатка листа.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "cross_note",
+        "disagreements",
+        "method",
+        "no_band_reach",
+        "no_prices",
+        "sellers",
+        "source",
+        "updated",
+        "what_it_is_not",
+        "why_many_sellers"
+      ],
+      "main_collection": {
+        "key": "sellers",
+        "records": 7
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "f180be7",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_brief.py",
+        "gt/tools/stocklist_cross.py",
+        "tests/test_stocklist_cross.py"
+      ]
+    },
+    {
       "path": "gt/data/cummins_qsk60.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 54713,
@@ -6409,43 +6446,6 @@
       },
       "referenced_by": [
         "gidromet/build.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_stocklist_cross.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 48779,
-      "note": "Пересечение открытого сток-листа продавца с номерами заявки: сколько наших строк он закрывает и куда ask бьёт по нашим вилкам. Считает gt/tools/stocklist_cross.py. ЦЕН В НАБОРЕ НЕТ И БЫТЬ НЕ МОЖЕТ: репозиторий публичный, а сток-лист — коммерческий документ контрагента, выкладывать его целиком нельзя даже при открытой странице. Набор несёт только счёт и класс (ask выше потолка, внутри, ниже пола, вилки нет), это закреплено тестом. Отдельная цена приводится в перепроверке как довод по конкретной строке с названной страницей — это довод, а не перепечатка листа.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "cross_note",
-        "disagreements",
-        "method",
-        "no_band_reach",
-        "no_prices",
-        "sellers",
-        "source",
-        "updated",
-        "what_it_is_not",
-        "why_many_sellers"
-      ],
-      "main_collection": {
-        "key": "sellers",
-        "records": 7
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "42f6932",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_brief.py",
-        "gt/tools/stocklist_cross.py",
-        "tests/test_stocklist_cross.py"
       ]
     },
     {
@@ -8213,6 +8213,48 @@
       ]
     },
     {
+      "path": "gt/data/ship_seller_groups.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 17294,
+      "note": "Группы витрин, принадлежащих ОДНОМУ оператору, с уликой по каждой. Нужны, чтобы признак «два независимых продавца» считался по списку, а не на глаз по разным доменам: за ночь 17–18.09.2026 этот довод развалился шесть раз (Sonepar под пятью вывесками, оператор из Сямыня под пятью, индийский перепродавец под четырьмя). Группа записывается только при прямой улике на странице: общий объект в коде, общий складской номер, общая почта или телефон, посимвольно совпадающее описание. Заполняется руками по разбору, не производная от данных. Персональных данных нет, только публичные контакты компаний.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "groups",
+        "method",
+        "pools",
+        "source",
+        "updated",
+        "why",
+        "why_pools"
+      ],
+      "main_collection": {
+        "key": "groups",
+        "records": 11,
+        "record_keys": [
+          "affects",
+          "domains",
+          "evidence",
+          "group",
+          "kind"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "f180be7",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/seller_groups.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/stocklist_cross.py",
+        "tests/test_seller_groups.py"
+      ]
+    },
+    {
       "path": "library/data/symptoms.json",
       "subproject": "библиотека рынков",
       "bytes": 16461,
@@ -8561,46 +8603,6 @@
         "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_seller_groups.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 13767,
-      "note": "Группы витрин, принадлежащих ОДНОМУ оператору, с уликой по каждой. Нужны, чтобы признак «два независимых продавца» считался по списку, а не на глаз по разным доменам: за ночь 17–18.09.2026 этот довод развалился шесть раз (Sonepar под пятью вывесками, оператор из Сямыня под пятью, индийский перепродавец под четырьмя). Группа записывается только при прямой улике на странице: общий объект в коде, общий складской номер, общая почта или телефон, посимвольно совпадающее описание. Заполняется руками по разбору, не производная от данных. Персональных данных нет, только публичные контакты компаний.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "groups",
-        "method",
-        "source",
-        "updated",
-        "why"
-      ],
-      "main_collection": {
-        "key": "groups",
-        "records": 10,
-        "record_keys": [
-          "affects",
-          "domains",
-          "evidence",
-          "group",
-          "kind"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "1ffdfee",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/seller_groups.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/stocklist_cross.py",
-        "tests/test_seller_groups.py"
       ]
     },
     {
@@ -8992,7 +8994,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "1ffdfee",
+      "last_commit": "f180be7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
