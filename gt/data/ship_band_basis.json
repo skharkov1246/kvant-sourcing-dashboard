@@ -9,8 +9,8 @@
  "usd_on_transfer": 1243502.4,
  "share_not_a_found_price": 64.1,
  "closed_by_reverify": {
-  "records": 97,
-  "usd_exposure": 1474993.0,
+  "records": 100,
+  "usd_exposure": 1552848.0,
   "what_it_means": "Строки, где основанием было мнение или перенос по классу, а перепроверка нашла цену числом. Столько мнения уже заменено замером."
  },
  "by_basis": {
@@ -18,8 +18,8 @@
    "records": 518,
    "usd_exposure": 4704793.9,
    "what_it_means": "Основание прямо называет себя оценкой специалиста. Найденной цены за ней нет.",
-   "records_with_found_price": 63,
-   "usd_with_found_price": 487251.0
+   "records_with_found_price": 65,
+   "usd_with_found_price": 541451.0
   },
   "цена продавца: розница или дистрибьютор": {
    "records": 158,
@@ -32,8 +32,8 @@
    "records": 141,
    "usd_exposure": 1243502.4,
    "what_it_means": "Цена взята у похожего изделия или у класса изделий, а не у этой детали.",
-   "records_with_found_price": 34,
-   "usd_with_found_price": 987742.0
+   "records_with_found_price": 35,
+   "usd_with_found_price": 1011397.0
   },
   "цена вторичного рынка": {
    "records": 31,

@@ -64,6 +64,13 @@ def candidates(ask: list, rv: dict) -> list:
             continue
         if isinstance(x.get("price_low"), (int, float)) or quote_only(x):
             continue
+        # Строку, по которой добор цены УЖЕ прошёл и цены не нашёл, второй раз
+        # в задание не выдаём: отрицательный результат там измерен и записан
+        # (какие страницы закрыты, где номера нет в перечне), и повторять его
+        # значит тратить разведку на уже отвеченный вопрос. Пометку ставит
+        # gt/tools/rv_merge.py в режиме --update.
+        if x.get("price_hunt"):
+            continue
         out.append((expo(r), r, x))
     out.sort(key=lambda t: -t[0])
     return out
