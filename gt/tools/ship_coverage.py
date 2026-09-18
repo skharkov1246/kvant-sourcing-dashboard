@@ -219,14 +219,37 @@ def measure() -> dict:
     # поиском: цену из наших же вложений и вопрос заказчику.
     never = [r for r in ask if key(r.get("pn")) and key(r.get("pn")) not in rv and expo(r) > 0]
     asked, inside = asked_keys(), answered_keys()
+    # ОСТАТОК ПОД ПОИСК вычитает только то, что закрыто ПО-НАСТОЯЩЕМУ: строки с
+    # письменной ценой контрагента и строки, по которым вопрос заказчику уже
+    # стоит. Прежде вычитался ещё и «адрес цены», и это была та же структурная
+    # слепота, что у rv_pricehunt: строка, чей адрес указывает на файл без цены
+    # по нашей позиции, для задания была невидима, хотя работы по ней ровно
+    # столько же, сколько по любой неразобранной. Замер 18.09.2026: так
+    # прятались 178 строк.
     hunt = [r for r in never
-            if key(r.get("pn")) not in asked and key(r.get("pn")) not in inside]
+            if key(r.get("pn")) not in asked and key(r.get("pn")) not in offered]
     return {
         "quoted_never_reverified": {
             "rows": len(never),
             "usd": round(sum(map(expo, never)), 2),
             "of_them_price_in_our_attachments": sum(
                 1 for r in never if key(r.get("pn")) in inside),
+            # РАЗЛИЧЕНИЕ, КОТОРОЕ СТОИЛО ТРЁХ ОШИБОЧНЫХ ОТЧЁТОВ. «Адрес цены» —
+            # это файл, в котором есть хоть одна цена И есть наш номер. Ценой по
+            # НАШЕЙ строке это не является, и замер 18.09.2026 показал разницу:
+            # из 757 строк с адресом цена по строке нашлась у 51, а 371 строка
+            # указывала на Quotation p76057 — ответ поставщика, где 316 значений
+            # и все до одного $0.00, то есть цен нет вовсе. Ещё 990 попаданий
+            # приходились на suppliers_22566.xlsx — нашу собственную таблицу.
+            # Поэтому «цена лежит в наших вложениях» делится на две части:
+            # подтверждённую предложением и всего лишь адрес.
+            "of_them_price_confirmed_by_offer": sum(
+                1 for r in never if key(r.get("pn")) in offered),
+            "usd_price_confirmed_by_offer": round(sum(
+                expo(r) for r in never if key(r.get("pn")) in offered), 2),
+            "of_them_address_only": sum(
+                1 for r in never
+                if key(r.get("pn")) in inside and key(r.get("pn")) not in offered),
             "of_them_asked_customer": sum(1 for r in never if key(r.get("pn")) in asked),
             "left_to_search": len(hunt),
             "usd_left_to_search": round(sum(map(expo, hunt)), 2),
@@ -313,8 +336,11 @@ def main() -> None:
     n = m["quoted_never_reverified"]
     print(f"ВЫДАНО В КП, НЕ ПЕРЕПРОВЕРЯЛОСЬ НИ РАЗУ: {n['rows']} строк на "
           f"{n['usd']:,.0f} USD".replace(",", " "))
-    print(f"  {n['of_them_price_in_our_attachments']:>4} строк — цена лежит в наших же "
-          f"вложениях (открыть файл, а не искать)")
+    print(f"  {n.get('of_them_price_confirmed_by_offer', 0):>4} строк | "
+          f"{n.get('usd_price_confirmed_by_offer', 0):>11,.0f} USD | цену назвал контрагент "
+          f"письменно: брать из предложения, не искать".replace(",", " "))
+    print(f"  {n.get('of_them_address_only', 0):>4} строк — в приложенном файле наш номер есть, "
+          f"а цены по нашей строке в нём нет: адрес, а не цена")
     print(f"  {n['of_them_asked_customer']:>4} строк — вопрос заказчику уже поставлен")
     print(f"  {n['left_to_search']:>4} строк | {n['usd_left_to_search']:>11,.0f} USD | остаток "
           f"под поиск: задание печатает gt/tools/rv_brief.py --top N".replace(",", " "))

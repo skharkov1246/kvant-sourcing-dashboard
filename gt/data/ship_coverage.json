@@ -7,9 +7,12 @@
   "rows": 245,
   "usd": 209940.3,
   "of_them_price_in_our_attachments": 240,
+  "of_them_price_confirmed_by_offer": 62,
+  "usd_price_confirmed_by_offer": 48443.9,
+  "of_them_address_only": 178,
   "of_them_asked_customer": 9,
-  "left_to_search": 1,
-  "usd_left_to_search": 366.0,
+  "left_to_search": 174,
+  "usd_left_to_search": 152087.4,
   "what_it_means": "Строки с нашей ценой в предложении заказчику, до которых перепроверка не дошла ни разу. Это не «канал без цены» — это вообще неразобранное, и в счёт «канал назван, цены нет» они не попадали никогда. Остаток под поиск считается за вычетом строк, чья цена лежит в наших же вложениях, и строк, по которым вопрос заказчику уже поставлен: те закрываются не разведкой."
  },
  "channel_without_price": {

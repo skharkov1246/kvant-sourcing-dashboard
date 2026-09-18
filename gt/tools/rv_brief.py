@@ -34,6 +34,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SUMMARY = ROOT / "gt/data/ship_lukoil.json"
 REVERIFY = ROOT / "gt/data/ship_reverify.json"
 INSIDE = ROOT / "gt/data/ship_inside_quotes.json"
+PRICED = ROOT / "gt/data/ship_inside_priced.json"
 QUESTIONS = ROOT / "gt/data/ship_questions.json"
 
 
@@ -47,8 +48,18 @@ def closed_elsewhere() -> tuple[set, set]:
     цены, где четыре строки из двенадцати вернулись ответом «цена в присланном
     предложении, опись его давно разобрала».
     """
+    # ИСПРАВЛЕНО 18.09.2026, второй заход. Набор ship_inside_quotes даёт АДРЕС
+    # цены — файл, в котором есть хоть одна цена и есть наш номер, — а не цену по
+    # нашей строке. Вычитая адрес, задание прятало 178 строк, по которым работы
+    # ровно столько же, сколько по любой неразобранной: их адрес указывает на
+    # Quotation p76057, где 316 значений и все до одного $0.00, либо на нашу же
+    # рабочую таблицу. Вычитать можно только подтверждённую письменную цену —
+    # её хранит ship_inside_priced (собирает gt/tools/tkp_tables.py --keys-out).
     inside, asked = set(), set()
-    if INSIDE.exists():
+    if PRICED.exists():
+        inside = {key(r.get("pn"))
+                  for r in json.loads(PRICED.read_text(encoding="utf-8")).get("parts", [])}
+    elif INSIDE.exists():
         inside = {key(r.get("pn"))
                   for r in json.loads(INSIDE.read_text(encoding="utf-8")).get("rows", [])}
     if QUESTIONS.exists():
