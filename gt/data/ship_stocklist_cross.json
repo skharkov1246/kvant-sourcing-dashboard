@@ -1,0 +1,659 @@
+{
+ "updated": "2026-09-18",
+ "source": "Пересечение открытого сток-листа продавца hardtoget.parts с номерами заявки (gt/data/ship_lukoil.json). Считает gt/tools/stocklist_cross.py.",
+ "method": "Строка листа имеет вид «номер · описание · N pcs · цена». Точка в цене — разделитель тысяч (проверяется на самом листе: рядом стоят «1.200.00» и «20.00»). Пересчёт в доллары по gt/data/fx_rates.json. Сверка по нормализованному номеру.",
+ "no_prices": "ЦЕН ЗДЕСЬ НЕТ И БЫТЬ НЕ МОЖЕТ. Репозиторий публичный, а сток-лист — коммерческий документ контрагента: выкладывать его целиком нельзя, даже если страница открыта. Набор несёт только счёт и класс: ask выше потолка нашей вилки, внутри, ниже пола или вилки нет.",
+ "cross_note": "У части строк описание НАЧИНАЕТСЯ с другого номера — это КРОСС продавца на его собственный или на соседнее исполнение. Читать такую строку как цену НАШЕГО номера нельзя, поэтому она помечена полем desc_starts_with_other_pn и считается отдельно.",
+ "what_it_is_not": "Сток-лист — это ask ОДНОГО оператора (один продавец), а не рынок. У перепродавца внутри ask сидит неизмеренная премия за поставку, поэтому «ask выше потолка» означает «наша вилка ниже, чем просит этот продавец», а не «закупка дороже». Второй свидетель обязателен.",
+ "totals": {
+  "seller": "hardtoget.parts",
+  "listed_rows": 335,
+  "matched_pns": 78,
+  "matched_exposure": 326678.5,
+  "by_class": {
+   "ask выше потолка": {
+    "pns": 18,
+    "usd_exposure": 192470.5
+   },
+   "ask внутри вилки": {
+    "pns": 13,
+    "usd_exposure": 122032.0
+   },
+   "ask ниже пола": {
+    "pns": 4,
+    "usd_exposure": 12176.0
+   },
+   "вилки нет": {
+    "pns": 43,
+    "usd_exposure": 0.0
+   }
+  },
+  "desc_starts_with_other_pn": 10
+ },
+ "rows": [
+  {
+   "pn": "1056369-30",
+   "where": "ask выше потолка",
+   "usd_exposure": 68475.0,
+   "qty_request": 83,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "186280-600",
+   "where": "ask внутри вилки",
+   "usd_exposure": 29700.0,
+   "qty_request": 18,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "1060817-10",
+   "where": "ask выше потолка",
+   "usd_exposure": 26775.0,
+   "qty_request": 63,
+   "qty_listed": 200,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "70-30108-1",
+   "where": "ask внутри вилки",
+   "usd_exposure": 24500.0,
+   "qty_request": 10,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "199515-1",
+   "where": "ask выше потолка",
+   "usd_exposure": 23655.0,
+   "qty_request": 830,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "997396C1",
+   "where": "ask внутри вилки",
+   "usd_exposure": 16560.0,
+   "qty_request": 46,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1087491-3",
+   "where": "ask внутри вилки",
+   "usd_exposure": 15120.0,
+   "qty_request": 63,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "186212-100",
+   "where": "ask внутри вилки",
+   "usd_exposure": 11400.0,
+   "qty_request": 40,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1064728-1",
+   "where": "ask выше потолка",
+   "usd_exposure": 11070.0,
+   "qty_request": 18,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "903316C1",
+   "where": "ask ниже пола",
+   "usd_exposure": 9900.0,
+   "qty_request": 18,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1060817-40",
+   "where": "ask внутри вилки",
+   "usd_exposure": 9720.0,
+   "qty_request": 27,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1069873-1",
+   "where": "ask выше потолка",
+   "usd_exposure": 9180.0,
+   "qty_request": 36,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "190537-102",
+   "where": "ask внутри вилки",
+   "usd_exposure": 8500.0,
+   "qty_request": 5,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "80-30550-900",
+   "where": "ask выше потолка",
+   "usd_exposure": 7425.0,
+   "qty_request": 11,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "190015-12",
+   "where": "ask выше потолка",
+   "usd_exposure": 6900.0,
+   "qty_request": 10,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "304649-100",
+   "where": "ask выше потолка",
+   "usd_exposure": 5940.0,
+   "qty_request": 108,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "190817-14",
+   "where": "ask выше потолка",
+   "usd_exposure": 5625.0,
+   "qty_request": 5,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "186648-1",
+   "where": "ask выше потолка",
+   "usd_exposure": 4625.0,
+   "qty_request": 5,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1089034-3",
+   "where": "ask выше потолка",
+   "usd_exposure": 4252.5,
+   "qty_request": 27,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1106298-29",
+   "where": "ask выше потолка",
+   "usd_exposure": 4140.0,
+   "qty_request": 9,
+   "qty_listed": 9,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "1051931-67",
+   "where": "ask выше потолка",
+   "usd_exposure": 4100.0,
+   "qty_request": 20,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1017891",
+   "where": "ask внутри вилки",
+   "usd_exposure": 4050.0,
+   "qty_request": 108,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1053038-35",
+   "where": "ask выше потолка",
+   "usd_exposure": 4025.0,
+   "qty_request": 7,
+   "qty_listed": 7,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1046415-60",
+   "where": "ask выше потолка",
+   "usd_exposure": 2357.5,
+   "qty_request": 23,
+   "qty_listed": 50,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1064728-4",
+   "where": "ask выше потолка",
+   "usd_exposure": 2328.0,
+   "qty_request": 12,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "1051931-71",
+   "where": "ask выше потолка",
+   "usd_exposure": 1057.5,
+   "qty_request": 9,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "120765-1",
+   "where": "ask ниже пола",
+   "usd_exposure": 1000.0,
+   "qty_request": 4,
+   "qty_listed": 4,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "70-30815-1",
+   "where": "ask ниже пола",
+   "usd_exposure": 820.0,
+   "qty_request": 4,
+   "qty_listed": 4,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1017892",
+   "where": "ask внутри вилки",
+   "usd_exposure": 741.0,
+   "qty_request": 19,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "903732C1",
+   "where": "ask внутри вилки",
+   "usd_exposure": 608.0,
+   "qty_request": 38,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "970564C1",
+   "where": "ask выше потолка",
+   "usd_exposure": 540.0,
+   "qty_request": 8,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1017890",
+   "where": "ask внутри вилки",
+   "usd_exposure": 527.0,
+   "qty_request": 17,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1007799",
+   "where": "ask ниже пола",
+   "usd_exposure": 456.0,
+   "qty_request": 19,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "136845-1",
+   "where": "ask внутри вилки",
+   "usd_exposure": 360.0,
+   "qty_request": 18,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1024941",
+   "where": "ask внутри вилки",
+   "usd_exposure": 246.0,
+   "qty_request": 6,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1022447",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 3,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1034347-1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "131230-6",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1089241-28",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1034549-21",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1051931-69",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "1105336-1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 3,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1078325-10",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "998882C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1034549-43",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "950232C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 4,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "120712-11",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "993359C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 3,
+   "qty_listed": 50,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1023031-1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 30,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "120029-1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "2027098-12",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "120029-8",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "120029-5",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1064721-14",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "186276-1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 5,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "967664C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "190583-1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "199543-2",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 5,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "903375C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 4,
+   "qty_listed": 2,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "903537C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 4,
+   "qty_listed": 50,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "955518C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "969582C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "993672C1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1023031-3",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 30,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1078325-17",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 2,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "116091-21",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "124907-25",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 4,
+   "qty_listed": 4,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "124907-4",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 3,
+   "qty_listed": 3,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1053038-19",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 2,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1119277-304",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 3,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": true
+  },
+  {
+   "pn": "70-31237-1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 2,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1042018-3400",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 6,
+   "qty_listed": 5,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1017902",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 2,
+   "qty_listed": 100,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "186273-1",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 4,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1023518-201",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 8,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1046485",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1046489",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  },
+  {
+   "pn": "1046491",
+   "where": "вилки нет",
+   "usd_exposure": 0.0,
+   "qty_request": 1,
+   "qty_listed": 10,
+   "desc_starts_with_other_pn": false
+  }
+ ]
+}

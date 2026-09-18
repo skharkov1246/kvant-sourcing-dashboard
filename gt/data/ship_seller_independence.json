@@ -4,12 +4,12 @@
  "method": "Из текста строки вынимаются домены, каждый сводится к своей группе. Строка попадает в замер, если названы ДВЕ и более витрины одной группы. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией — строка, где мы сами написали «это одна компания», попадала бы в дефект наравне со строкой, где две витрины выданы за рынок.",
  "why": "«Два независимых продавца» — главный довод, которым закрывается строка: одна цена может быть наценкой одного перепродавца, две совпадающие цены разных компаний — уже рынок. За ночь этот довод развалился шесть раз: витрины оказывались одним оператором под разными вывесками. Поэтому признак независимости считается по этому списку, а не на глаз по разным доменам.",
  "totals": {
-  "groups_known": 5,
-  "domains_known": 21,
-  "rows_checked": 75,
-  "rows_citing_one_group_twice": 14,
-  "usd_on_those_rows": 617185.0,
-  "rows_marked_as_one_operator": 14,
+  "groups_known": 6,
+  "domains_known": 25,
+  "rows_checked": 97,
+  "rows_citing_one_group_twice": 21,
+  "usd_on_those_rows": 867110.0,
+  "rows_marked_as_one_operator": 21,
   "rows_not_marked": 0,
   "usd_not_marked": 0.0
  },
@@ -37,6 +37,31 @@
     "Sonepar (платформа Net1)": [
      "codale.com",
      "needco.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1056369-30",
+   "usd": 68475.0,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1019431-1600",
+   "usd": 68000.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА, риск в сторону занижения",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts"
     ]
    },
    "marked": true
@@ -144,6 +169,32 @@
    "marked": true
   },
   {
+   "pn": "1060817-10",
+   "usd": 26775.0,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "70-30108-1",
+   "usd": 24500.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts",
+     "zip-solutions.com"
+    ]
+   },
+   "marked": true
+  },
+  {
    "pn": "1794-IF2XOF2I",
    "usd": 23750.0,
    "verdict": "НЕ ПОДТВЕРЖДЕНА: вилка не накрывает ни один из двух рынков",
@@ -154,6 +205,31 @@
      "irby.com",
      "needco.com",
      "northcoast.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "199515-1",
+   "usd": 23655.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "DESC200",
+   "usd": 23400.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "cambia.cn",
+     "camvect.com",
+     "topbrandsplc.com"
     ]
    },
    "marked": true
@@ -199,6 +275,18 @@
      "irby.com",
      "needco.com",
      "northcoast.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1087491-3",
+   "usd": 15120.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА: один продавец назвал четыре цены на одно изделие",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hardtoget.parts",
+     "turbine.parts"
     ]
    },
    "marked": true

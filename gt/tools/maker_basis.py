@@ -35,6 +35,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DB = ROOT / "gt/data/pn_db.json"
 SUMMARY = ROOT / "gt/data/ship_lukoil.json"
+REVERIFY = ROOT / "gt/data/ship_reverify.json"
 OUT = ROOT / "gt/data/ship_maker_basis.json"
 
 # Классы основания, от сильного к слабому. Порядок важен: строка получает
@@ -67,7 +68,29 @@ def load(p: Path):
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
 
 
-def basis_of(row: dict) -> str:
+def checked_by_reverify() -> dict[str, str]:
+    """Номера, у которых изготовитель вскрыт ПЕРЕПРОВЕРКОЙ по каталогу.
+
+    Берётся из gt/data/ship_reverify.json, а не переписывается руками: иначе два
+    набора разойдутся, и «исправленная» разметка начнёт жить своей жизнью. Строка
+    считается закрытой, если поле real_maker заполнено и НЕ говорит «не вскрыт».
+    """
+    if not REVERIFY.exists():
+        return {}
+    out = {}
+    for r in (json.loads(REVERIFY.read_text(encoding="utf-8")).get("rows") or []):
+        mk = str(r.get("real_maker") or "").strip()
+        if not mk or re.match(r"^\s*(не вскрыт|НЕ ВСКРЫТ)", mk):
+            continue
+        out[key(r.get("pn"))] = mk
+    return out
+
+
+def basis_of(row: dict, checked: dict[str, str] | None = None) -> str:
+    # Сильнее любого кода основания — вскрытый каталогом изготовитель: это
+    # ФАКТ со страницы, а не наша оценка. Проверяется первым.
+    if checked and key(row.get("pn")) in checked:
+        return "каталог изготовителя (перепроверка)"
     text = f"{row.get('ev') or ''} {row.get('mk') or ''}"
     for name, pat, _ in BASIS:
         if re.search(pat, text, re.I):
@@ -87,25 +110,54 @@ def measure() -> dict:
     lk = (load(SUMMARY) or {}).get("rows") or []
     band = {key(r.get("pn")): r for r in lk}
 
+    checked = checked_by_reverify()
     named = [r for r in rows if str(r.get("mk") or "").strip()]
-    by = collections.Counter(basis_of(r) for r in named)
+    by = collections.Counter(basis_of(r, checked) for r in named)
     usd = collections.Counter()
     hit = collections.Counter()
     for r in named:
-        b = basis_of(r)
+        b = basis_of(r, checked)
         row = band.get(key(r.get("pn")))
         if row is None:
             continue
         hit[b] += 1
         usd[b] += expo(row)
     classes = []
-    for name, _, why in BASIS + [("основание не записано", "", "поле основания пустое")]:
+    head = [("каталог изготовителя (перепроверка)", "",
+             "изготовитель вскрыт по каталогу при перепроверке строки — это факт со страницы, "
+             "а не наша оценка; счёт берётся из gt/data/ship_reverify.json и растёт сам по ходу "
+             "перепроверки")]
+    for name, _, why in head + BASIS + [("основание не записано", "", "поле основания пустое")]:
         if not by.get(name) and not hit.get(name):
             continue
         classes.append({"basis": name, "rows_in_db": by.get(name, 0),
                         "rows_in_request": hit.get(name, 0),
                         "usd_in_request": round(usd.get(name, 0.0), 2), "why": why})
     weak = next((c for c in classes if c["basis"] == "догадка по классу"), {})
+    # ДВА ЧИСЛА, И ИХ НЕЛЬЗЯ ПОДМЕНЯТЬ ОДНО ДРУГИМ. Первое — сколько денег стоит
+    # на догадке в самой разметке, без учёта того, что перепроверка часть строк
+    # уже закрыла. Второе — сколько осталось РАБОТЫ после зачёта перепроверки.
+    # 18.09.2026 в отчёт ушло первое (2 124 537 USD, 23 % экспозиции), и оно
+    # завышало открытую работу впятеро: перепроверка к тому часу закрыла
+    # каталогом 52 строки. Поэтому оба считаются и печатаются раздельно.
+    db_rows = db_usd = 0
+    both_rows = both_usd = 0.0, 0.0
+    both_rows = 0
+    both_usd = 0.0
+    for r in named:
+        if basis_of(r, None) != "догадка по классу":
+            continue
+        row = band.get(key(r.get("pn")))
+        if row is None:
+            continue
+        db_rows += 1
+        db_usd += expo(row)
+        # Пересечение: догадка в разметке И уже закрыто перепроверкой. Только
+        # ЭТО можно называть словом «из них» — класс «закрыто перепроверкой»
+        # подмножеством догадок не является, там есть строки с другим основанием.
+        if key(r.get("pn")) in checked:
+            both_rows += 1
+            both_usd += expo(row)
     return {
         "db_rows": len(rows),
         "maker_named": len(named),
@@ -113,6 +165,16 @@ def measure() -> dict:
         "request_exposure": round(sum(map(expo, lk)), 2),
         "weak_rows_in_request": weak.get("rows_in_request", 0),
         "weak_usd_in_request": weak.get("usd_in_request", 0.0),
+        "weak_by_db_basis_rows": db_rows,
+        "weak_by_db_basis_usd": round(db_usd, 2),
+        "weak_closed_by_reverify_rows": both_rows,
+        "weak_closed_by_reverify_usd": round(both_usd, 2),
+        "closed_by_reverify_rows": next(
+            (c["rows_in_request"] for c in classes
+             if c["basis"] == "каталог изготовителя (перепроверка)"), 0),
+        "closed_by_reverify_usd": next(
+            (c["usd_in_request"] for c in classes
+             if c["basis"] == "каталог изготовителя (перепроверка)"), 0.0),
         "classes": classes,
     }
 
@@ -131,8 +193,14 @@ def main() -> int:
               f"{c['rows_in_request']:>4} | {c['usd_in_request']:>12,.0f} USD".replace(",", " "))
     share = (100 * m["weak_usd_in_request"] / m["request_exposure"]
              if m["request_exposure"] else 0)
-    print(f"догадка по классу держит {m['weak_usd_in_request']:,.0f} USD экспозиции заявки "
-          f"({share:.1f} %)".replace(",", " "))
+    print(f"догадка по классу в самой разметке: {m['weak_by_db_basis_rows']} строк на "
+          f"{m['weak_by_db_basis_usd']:,.0f} USD".replace(",", " "))
+    print(f"из них перепроверка уже закрыла каталогом {m['weak_closed_by_reverify_rows']} строк "
+          f"на {m['weak_closed_by_reverify_usd']:,.0f} USD; ОСТАЛОСЬ РАБОТЫ "
+          f"{m['weak_usd_in_request']:,.0f} USD ({share:.1f} % экспозиции)".replace(",", " "))
+    print(f"всего закрыто каталогом при перепроверке: {m['closed_by_reverify_rows']} строк на "
+          f"{m['closed_by_reverify_usd']:,.0f} USD — это НЕ подмножество догадок, там есть "
+          f"строки с другим основанием".replace(",", " "))
     if a.write:
         OUT.write_text(json.dumps({
             "updated": "2026-09-18",

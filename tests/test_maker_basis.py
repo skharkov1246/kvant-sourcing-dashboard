@@ -60,6 +60,28 @@ def test_счёт_по_классам_не_расходится_с_итогом(
     assert abs(weak[0]["usd_in_request"] - t["weak_usd_in_request"]) < 1.0
 
 
+def test_два_числа_догадки_считаются_раздельно():
+    """Догадка в разметке и ОСТАТОК работы после зачёта перепроверки — разные числа.
+
+    Оплачено моей же ошибкой 18.09.2026: в отчёт ушло первое (2 124 537 USD,
+    23 % экспозиции), а открытой работы к тому часу оставалось впятеро меньше —
+    перепроверка уже закрыла каталогом 19 из этих строк. Подменять одно число
+    другим нельзя, поэтому считаются оба, и «из них» относится только к
+    пересечению.
+    """
+    t = doc()["totals"]
+    for k in ("weak_by_db_basis_rows", "weak_by_db_basis_usd",
+              "weak_closed_by_reverify_rows", "weak_closed_by_reverify_usd",
+              "closed_by_reverify_rows", "closed_by_reverify_usd"):
+        assert k in t, f"нет ключа {k}: два числа снова слились в одно"
+    assert abs(t["weak_by_db_basis_usd"] - t["weak_closed_by_reverify_usd"]
+               - t["weak_usd_in_request"]) < 1.0, (
+        "остаток работы должен быть ровно разницей: догадка в разметке минус закрытое "
+        "перепроверкой")
+    assert t["weak_closed_by_reverify_rows"] <= t["closed_by_reverify_rows"], (
+        "пересечение не может быть больше всего закрытого перепроверкой")
+
+
 def test_у_каждого_класса_сказано_как_его_читать():
     for c in doc()["classes"]:
         assert len((c.get("why") or "").strip()) > 20, f'{c["basis"]}: не сказано, как читать'
