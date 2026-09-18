@@ -1,0 +1,3366 @@
+{
+ "updated": "2026-09-18",
+ "source": "Открытые перечни запасных частей, снятые целиком и сверенные с номерами заявки. Считает gt/tools/lists_fold.py, по одной машине за прогон, с слиянием по машине.",
+ "what_it_gives": "Опознание: дословное наименование изделия по номеру, адрес источника и число НЕЗАВИСИМЫХ держателей, подтвердивших номер.",
+ "what_it_does_not_give": "Цену. Перечни такого рода цену не печатают — вместо неё стоит «запросить». Поэтому ни одна строка отсюда не становится ценовым вердиктом. И признак наличия здесь не остаток: «in stock» означает «у нас это бывает», а не подтверждённое число на наш объём; в сумму закупки не идёт. Замеры по разным машинам НЕ СКЛАДЫВАЮТСЯ: один номер может стоять в перечнях по нескольким машинам.",
+ "machines": {
+  "Solar": {
+   "machine": "Solar",
+   "lists": [
+    {
+     "url": "https://immiturbines.com/parts/",
+     "title": "Parts – IMMI Turbines (полный перечень склада, 40 страниц ?parts_page=1..40)",
+     "rows_total": 19964,
+     "currency_note": "Цен на листе нет вовсе. Столбец действий у каждой строки — «Quote for part <номер>», числовых значений в таблице ни одного (поиск по образцу «число.две цифры + валюта» дал нуль совпадений на всех 40 страницах). Разделитель проверять не на чем.",
+     "what_it_is": "Складской перечень ремонтного предприятия IMMI Turbines (Конро, штат Техас): 19 964 позиции, состояние — новые, восстановленные, бывшие в употреблении, излишки и воспроизведённые по образцу. Колонки: номер детали, наименование, кнопка запроса цены."
+    },
+    {
+     "url": "https://heriss.com/ps/wp-content/uploads/2025/04/SOLAR-PART-LIST.pdf",
+     "title": "SOLAR PART LIST — Heriss Corporation (PDF, 547 страниц)",
+     "rows_total": 27269,
+     "currency_note": "Цен нет. В PDF две колонки: PART NO и DESCRIPTION. Слово EUR встречается 16 раз, и все 16 — внутри наименований изделий («BOX,EURO T.B.», «CIRC. BRKR. EURO 10A», «CORD EUROPEAN 6A/250»), то есть это европейское исполнение изделия, а не валюта. Знака доллара и слова price в файле нет ни разу.",
+     "what_it_is": "Номенклатурный каталог поставщика Heriss Corporation (Канада) по газовым турбинам Solar всех семейств. Выложен открытой ссылкой со страницы heriss.com/ps/solar/ («CLICK HERE to view our Solar Parts List»). Это перечень того, что предприятие поставляет, а не подтверждённый остаток."
+    },
+    {
+     "url": "https://heriss.com/ps/wp-content/uploads/2025/05/SolarAvailableStock.pdf",
+     "title": "Solar Available Stock — Heriss Corporation (PDF, 82 страницы, фотоперечень)",
+     "rows_total": 319,
+     "currency_note": "Цен нет. Файл — фотографии складских позиций с подписями вида «PART NO: 186217-200 ASSEMBLY, PUMP & MOTOR, LUBEOIL». Ни одного вхождения EUR, USD, знака доллара или слова price на 82 страницах.",
+     "what_it_is": "Фотографический перечень фактического наличия на складе Heriss Corporation: 319 подписей с номерами деталей. В отличие от каталога SOLAR PART LIST, здесь заявлено именно наличие, но без количеств."
+    },
+    {
+     "url": "https://www.southeastoverseas.com/solar1.html",
+     "title": "Solar Turbine Parts & Spare Parts — Southeast Overseas, Inc. (страницы solar1..solar4.html)",
+     "rows_total": 547,
+     "currency_note": "Цен нет. На всех четырёх страницах нет ни одной числовой записи цены и ни одного слова price, EUR, USD (проверено поиском по образцу). Перечень состоит только из пар «номер — наименование».",
+     "what_it_is": "Перечень торговца запасными частями Southeast Overseas, Inc. (Сарасота, Флорида), разложенный на четыре страницы по алфавиту номеров. Сам продавец оговаривает, что это «partial listing of the more popular parts that we have sourced in the past» — то есть перечень ранее поставленного, а не остаток на складе."
+    },
+    {
+     "url": "https://severenergo.com/en/solar-spare-parts/",
+     "title": "Solar spare parts — SeverEnergoProject (сводный каталог с признаком наличия)",
+     "rows_total": 142,
+     "currency_note": "Цен нет. В каждой строке вместо цены кнопка «Request price»; числовых значений цены на странице ноль. Признак наличия есть и принимает два значения — «in stock» и «check availability».",
+     "what_it_is": "Каталог поставщика ООО «СеверЭнергоПроект» (Санкт-Петербург) по запасным частям Solar с фильтрами по турбине (Mars 100, Taurus 60, Titan 130) и по виду регламента. Единственный из найденных перечней, где рядом с номером стоит признак наличия."
+    },
+    {
+     "url": "https://severenergo.com/en/maintenance-parts-taurus-60/",
+     "title": "Maintenance parts kits for Solar Taurus 60 — SeverEnergoProject",
+     "rows_total": 24,
+     "currency_note": "Цен нет: таблица состоит из колонок «Part», «Part number», «Qty per service», «Availability». Числовых значений цены на странице ноль.",
+     "what_it_is": "Покомплектные ведомости ЗИП на регламент 4 000 и 8 000 часов у того же поставщика «СеверЭнергоПроект». Дают норму расхода на один регламент и признак наличия по каждой позиции."
+    },
+    {
+     "url": "https://severenergo.com/en/maintenance-parts-mars-100/",
+     "title": "Maintenance parts kits for Solar Mars 100 — SeverEnergoProject",
+     "rows_total": 32,
+     "currency_note": "Цен нет: таблица состоит из колонок «Part», «Part number», «Qty per service», «Availability». Числовых значений цены на странице ноль.",
+     "what_it_is": "Покомплектные ведомости ЗИП на регламент 4 000 и 8 000 часов у того же поставщика «СеверЭнергоПроект». Дают норму расхода на один регламент и признак наличия по каждой позиции."
+    },
+    {
+     "url": "https://severenergo.com/en/maintenance-parts-titan-130/",
+     "title": "Maintenance parts kits for Solar Titan 130 — SeverEnergoProject",
+     "rows_total": 19,
+     "currency_note": "Цен нет: таблица состоит из колонок «Part», «Part number», «Qty per service», «Availability». Числовых значений цены на странице ноль.",
+     "what_it_is": "Покомплектные ведомости ЗИП на регламент 4 000 и 8 000 часов у того же поставщика «СеверЭнергоПроект». Дают норму расхода на один регламент и признак наличия по каждой позиции."
+    },
+    {
+     "url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+     "title": "Parts Lookup — Gas Turbine Applications (GTA Turbines)",
+     "rows_total": 1677,
+     "currency_note": "Цен нет. Две колонки — номер и наименование; слов price, EUR, USD и числовых записей цены на странице нет. Предприятие прямо оговаривает: «All part numbers and descriptions are listed for informational purposes only».",
+     "what_it_is": "Открытый каталог номеров ремонтного предприятия Gas Turbine Applications, специализирующегося на капитальном ремонте и испытаниях турбин Solar. Наличие не указано; оговорено, что количество ограничено и часть позиций возможна только восстановленными."
+    },
+    {
+     "url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182999003/",
+     "title": "Solar Turbines Parts — 747 Items (Salvex, лот излишков)",
+     "rows_total": 746,
+     "currency_note": "Цены по позициям нет. На лот целиком указана сводная величина «Original Wholesale Value: $ 2 110 825» за «1 Lot» — это оценка всего лота, делить её на позиции нельзя. Разделителем тысяч служит запятая, дробной части нет.",
+     "what_it_is": "Позиционная ведомость лота излишков на площадке Salvex: номер, семейство машины, наименование. Лот помечен «No longer available», то есть перечень читается как справочный, а не как предложение."
+    }
+   ],
+   "pns_matched": 207,
+   "pns_confirmed_by_two_or_more": 108,
+   "pns_that_were_not_found": 85,
+   "usd_exposure_matched": 597437.5,
+   "usd_exposure_that_was_not_found": 189658.0,
+   "by_source": {
+    "immiturbines.com": 180,
+    "heriss.com": 101,
+    "southeastoverseas.com": 19,
+    "severenergo.com": 35,
+    "gtaturbines.com": 33,
+    "salvex.com": 1
+   },
+   "not_found_in_lists": 290,
+   "notes": "Не открылось: ethosenergygroup.com/solar-turbines-surplus-parts/ — соединение сброшено (код 000, Connection reset by peer); antoni-intl.com по https — просроченный сертификат сервера (код 000), по http страница открылась, но оказалась карточкой одного изделия, а не перечнем; turbineresourcesintl.com — имя не разрешается в DNS (код 000); gasturbinepartsforsale.com — соединение не устанавливается (код 000); peri-parts.com/top-selling-brands/gas-and-oil-industry/solar-turbines — отказ 403; southeastoverseas.com/solar5..solar8.html — 404, у перечня ровно четыре страницы. Второй лот Salvex (aucid 183026815, «Solar Turbine Spare Parts for Mars 100 ... (331 Units)») открылся кодом 200, но позиционная ведомость на странице не выводится (доступна после входа), поэтому в перечни не включён. Ни один из семи снятых перечней не содержит цен: это проверено поиском по образцу «число с двумя знаками после разделителя рядом с обозначением валюты» и поиском слов price, EUR, USD по каждому файлу. Поэтому поле price_quote пустое везде — вилки цен по этим источникам построить нельзя, источники закрывают наименование, изготовителя и (у двух из них) наличие. Сверка велась по номеру, приведённому к латинским буквам и цифрам в верхнем регистре. Проверка на ложные совпадения по коротким номерам: из 497 номеров заявки лишь один совпавший имеет запись короче семи знаков — это Turbo-K, и он совпал как название изделия, а не как число, поэтому случайных числовых совпадений в выборке нет.",
+   "items": [
+    {
+     "pn": "903316C1",
+     "name_in_ask": "ЗАПАЛЬНАЯ СВЕЧА Солар Taurus 60S 903316C1",
+     "qty": 18,
+     "usd_exposure": 9900.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "IGNITOR PLUG",
+      "SPARK-PLUG ,",
+      "SPARK PLUG",
+      "Plug, Spark"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 1 pcs",
+     "independent_sources": 5
+    },
+    {
+     "pn": "903268C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 908, ВИТОН  СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 903268C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "O-RING",
+      "O-RING, SAE 908",
+      "0-RING,SAE 908,VITON",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 5
+    },
+    {
+     "pn": "903315C1",
+     "name_in_ask": "ПРОКЛАДКА, 0,77 ВНУТР. ДИАМЕТР, МЕТАЛЛИЧЕСКАЯ, SPARK  СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 903315C1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET",
+      "GASKET-SPARK PLUG",
+      "GAS KIT SPARK PLUG",
+      "GASKET, 0.77 ID, METALLIC, SPARK PLUG",
+      "GASKET, SPARK PLUG"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 2 pcs",
+     "independent_sources": 5
+    },
+    {
+     "pn": "1087491-3",
+     "name_in_ask": "ФИЛЬТРУЮЩИЙ ЭЛЕМЕНТ, ВОЗДУХ, ГАЗОВОЕ ТОПЛИВО, ЦИЛИНДР Солар Taurus 60S 1087491-3",
+     "qty": 63,
+     "usd_exposure": 15120.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "FILTER ELEMENT",
+      "ELEMENT, FILTER. FS911-1",
+      "ELEMENT, FILTER, INSTRUMENT AIR",
+      "Filter"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 1 pcs",
+     "independent_sources": 4
+    },
+    {
+     "pn": "173942-1",
+     "name_in_ask": "ПРОКЛАДКА,3.32 ВНУТР. ДИАМЕТР,3.68 НАРУЖ. ДИАМЕТР,0.049 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 173942-1",
+     "qty": 17,
+     "usd_exposure": 391.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET, TORCH",
+      "GASKET TORCH NON ASB",
+      "GASKET, 3.32 ID, 3.68 OD, 0.049",
+      "Gasket, Torch"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 1 pcs",
+     "independent_sources": 4
+    },
+    {
+     "pn": "136845-1",
+     "name_in_ask": "ПРОКЛАДКА, 1,85 X 0,62 ДЮЙМА, 0,032 Солар Taurus 60S 136845-1",
+     "qty": 18,
+     "usd_exposure": 360.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET, THERMOCOUPLE",
+      "GASKET THERMOCOUPLE",
+      "GASKET, THERMOCOUPLE, T5",
+      "Gasket, T5"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 3 pcs",
+     "independent_sources": 4
+    },
+    {
+     "pn": "912642C1",
+     "name_in_ask": "Дренаж подшипника 2/3 и маслоотвод и всас масляного насоса Солар Taurus 60S 912642C1",
+     "qty": 14,
+     "usd_exposure": 343.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING",
+      "O-RING, VITON, SAE 228",
+      "0-RING,SAE 228,VITON",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "southeastoverseas.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 2 pcs",
+     "independent_sources": 4
+    },
+    {
+     "pn": "124907-4",
+     "name_in_ask": "Прокладка - провода датчика вибрации 1-го подшипника Солар Taurus 60S 124907-4",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GROMMET, SEALING",
+      "GROMMET,  WIRE  INSTRUMENT  2  HOLE",
+      "GROMMET, 0.965 OD",
+      "GROMMET"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 4
+    },
+    {
+     "pn": "903270C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 916, ВИТОН Солар Taurus 60S 903270C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "O-RING",
+      "O-RING 1.171X.116 VI",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 4
+    },
+    {
+     "pn": "903424C1",
+     "name_in_ask": "Угловой фитинг 1-го подшипника Солар Taurus 60S 903424C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "ELBOW",
+      "ELBOW UNION CONDUIT",
+      "UNION 90 MALE/FEMALE",
+      "CONDUIT ELBOW/UNION"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 4
+    },
+    {
+     "pn": "908700C2",
+     "name_in_ask": "ЛАМПА НАКАЛИВАНИЯ, ПРОЗРАЧНАЯ, 30 В 908700C2",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "BULB",
+      "BULB 30V 6W BAYONET",
+      "BULB, BAYONET",
+      "BULB, LIGHT"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 4
+    },
+    {
+     "pn": "917345C1",
+     "name_in_ask": "КОНТРОВАЯ ПРОВОЛОКА, 0,032 ДЮЙМА, 302/304 Солар Taurus 60S 917345C1",
+     "qty": 9,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "LOCKWIRE",
+      "WIRE SAFETY .032DIA",
+      "FA-WIRE",
+      "WIRE ,SAFETY,0.032 IN,302"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 1 pcs",
+     "independent_sources": 4
+    },
+    {
+     "pn": "70-30108-1",
+     "name_in_ask": "ПНЕВМОПРИВОД Солар Taurus 60S 70-30108-1",
+     "qty": 10,
+     "usd_exposure": 24500.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "ACTUATOR, PNEUMATIC TRIP",
+      "TRIP, PNEUMATIC",
+      "TRIP PNEUMATIC"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "186212-100",
+     "name_in_ask": "КОМПЛЕКТ ЭЛЕМЕНТА Солар Taurus 60S 186212-100",
+     "qty": 40,
+     "usd_exposure": 11400.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "KIT, FILTER ELEMENT",
+      "ELEMENT KIT FILTER",
+      "ELEMENT, FILTER, SERVO OIL"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 1 pcs",
+     "independent_sources": 3
+    },
+    {
+     "pn": "180431-1",
+     "name_in_ask": "ПРОКЛАДКА, 4,56 НАРУЖ. ДИАМЕТР, 4,84 ВНУТР. ДИАМЕТР, 0,049 Солар Taurus 60S 180431-1",
+     "qty": 151,
+     "usd_exposure": 7323.5,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET, SOLONOX INJECTOR",
+      "GASKET, INJECTOR",
+      "GASKET, FUEL INJECTOR"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 3 pcs",
+     "independent_sources": 3
+    },
+    {
+     "pn": "964587C1",
+     "name_in_ask": "УПЛОТНЕНИЕ, ШНУР, 0,139 ДЮЙМА, ВИТОН СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 964587C1",
+     "qty": 109,
+     "usd_exposure": 3706.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING",
+      "O-RING .139DIA. BULK",
+      "0-RING,BULK,VITON"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 3
+    },
+    {
+     "pn": "908579C1",
+     "name_in_ask": "ДИОД, ВЫПРЯМИТЕЛЬ Солар Taurus 70MD 908579C1",
+     "qty": 14,
+     "usd_exposure": 2730.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "DIODE"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "southeastoverseas.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "1064728-4",
+     "name_in_ask": "КОМПЛЕКТ, ФИЛЬТРУЮЩИЙ ЭЛЕМЕНТ, СМАЗОЧНОЕ МАСЛО Солар Taurus 60S 1064728-4",
+     "qty": 12,
+     "usd_exposure": 2328.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "KIT, ELEMENT, FILTER",
+      "ELEMENT, FILTER, MAIN LUBE OIL",
+      "Element, Filter"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock (турбина по листу: Taurus 60; регламент: 8,000-hour service)",
+     "independent_sources": 3
+    },
+    {
+     "pn": "120765-1",
+     "name_in_ask": "КОМПЛЕКТ ЭЛЕМЕНТА Солар Taurus 60S 120765-1",
+     "qty": 4,
+     "usd_exposure": 1000.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "ELEMENT, FILTER",
+      "KIT,FLUID FILTER:SOLAR TAURUS 60 TURB",
+      "ELEMENT KIT"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "1017899",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 6.0, RF, CL150, 304 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017899",
+     "qty": 9,
+     "usd_exposure": 832.5,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET",
+      "GASKET, METALLIC, SPIRAL WOUND",
+      "GASKET,SPIRAL,6. 0,CL150,R"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 3
+    },
+    {
+     "pn": "918018C1",
+     "name_in_ask": "Болт, 1/2-13 X 1,50 Солар Taurus 70 918018C1",
+     "qty": 32,
+     "usd_exposure": 656.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "BOLT",
+      "BOLT,HEX HD (.50-13X",
+      "Bolt, Hex Head, .50-13 X 1.50 Grade B6 (410 SS)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "1017895",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 3.0, RF, CL150, 304 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017895",
+     "qty": 12,
+     "usd_exposure": 654.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET",
+      "WINDING MATERIAL, GRAPHITE FILLER, LOW CARBON STEEL OUTER RING, API 601 &",
+      "GASKET,SPIRAL,3. 0,CL150,R"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 3
+    },
+    {
+     "pn": "903732C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 225, ВИТОН, 1,859 ВНУТР. ДИАМЕТР Солар Taurus 60S 903732C1",
+     "qty": 38,
+     "usd_exposure": 608.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING",
+      "0-RING,SAE 225,VITON",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 2 pcs",
+     "independent_sources": 3
+    },
+    {
+     "pn": "1017893",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 2.0, RF, CL150, 304 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017893",
+     "qty": 11,
+     "usd_exposure": 456.5,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET, FLEXITALLIC",
+      "GASKET, METALLIC, SPIRAL WOUND",
+      "GASKET,SPIRAL,2. 0,CL150,R"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 3
+    },
+    {
+     "pn": "915244C1",
+     "name_in_ask": "УПЛОТНЕНИЕ, КЛЕЙКОЕ Солар Taurus 70MD, 0,25 ДЮЙМА 915244C1",
+     "qty": 19,
+     "usd_exposure": 437.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "PTFE GASKET - 1/4 FT",
+      "SEALANT-GORE TEX",
+      "GORE-TEX �"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "120022-7",
+     "name_in_ask": "БОЛТ, ШЕСТИГРАННЫЙ, 0,375-16 X 1,25 ДЮЙМА, B7 Солар Taurus 60S 120022-7",
+     "qty": 24,
+     "usd_exposure": 282.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "BOLT",
+      "BOLT HEX .375-16X1.2",
+      "FS-BOLT HEX. .375-6X1.25"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "908221C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 60S 908221C1",
+     "qty": 6,
+     "usd_exposure": 120.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING",
+      "O-RING, VITON, SAE 173",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "southeastoverseas.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "903509C1",
+     "name_in_ask": "Уплотнительное кольцо маслоснабжения подшипников 2/3 Солар Taurus 70 903509C1",
+     "qty": 4,
+     "usd_exposure": 98.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING",
+      "O-RING, SAE 219, 1.3125 ID, VITON",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 2 pcs",
+     "independent_sources": 3
+    },
+    {
+     "pn": "1022447",
+     "name_in_ask": "Манжетное уплотнение, стартерСолар Taurus 60S 1022447",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "SEAL LIP",
+      "SEAL,LIP"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 3
+    },
+    {
+     "pn": "120029-1",
+     "name_in_ask": "КЛАПАН, ОБРАТНЫЙ, 0,38 ДЮЙМА Солар Taurus 60S 120029-1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "VALVE, CHECK",
+      "VALVE,CHECK",
+      "(наименование в подписи к фотографии на стр. 73; отдельной колонки наименования в файле нет)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 3
+    },
+    {
+     "pn": "120712-5",
+     "name_in_ask": "КЛАПАН Солар Taurus 70, ПЕРЕПУСКНОЙ, 1,5 ДЮЙМА, 20 PSI 120712-5",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "VALVE, RELIEF 1.5''",
+      "VALVE,RELIEF",
+      "VALVE, RELIEF"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "salvex.com"
+     ],
+     "stock_claim": "лот целиком; модель по листу: PACKAGE",
+     "independent_sources": 3
+    },
+    {
+     "pn": "124907-7",
+     "name_in_ask": "ПРОКЛАДКА УПЛОТНИТЕЛЬНАЯ Солар Taurus 60S 124907-7",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GROMMET",
+      "GROMMET,BRG & SEAL",
+      "(наименование в подписи к фотографии на стр. 9; отдельной колонки наименования в файле нет)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 3
+    },
+    {
+     "pn": "172514-2",
+     "name_in_ask": "ПРОКЛАДКА, 2,50 X 2,50 ДЮЙМА,062 Солар Taurus 60S 172514-2",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET",
+      "GASKET, 2.5X2.5X0.062 IN",
+      "Gasket, Manifold"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "on request; норма на регламент 1 pcs",
+     "independent_sources": 3
+    },
+    {
+     "pn": "186273-1",
+     "name_in_ask": "РЕГУЛЯТОР ДАВЛЕНИЯ Солар Taurus 60S 186273-1",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE",
+      "REGULATOR, PRESSURE PCV952",
+      "(наименование в подписи к фотографии на стр. 72; отдельной колонки наименования в файле нет)",
+      "VALVE, PRESSURE CONTROL"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 3
+    },
+    {
+     "pn": "186276-1",
+     "name_in_ask": "КЛАПАН ПЕРЕПУСКНОЙ Солар Taurus 70, 0,25 ДЮЙМА, 125 PSIG 186276-1",
+     "qty": 5,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE,",
+      "RELIEF VALVE",
+      "(наименование в подписи к фотографии на стр. 73; отдельной колонки наименования в файле нет)",
+      "VALVE, RELIEF"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 3
+    },
+    {
+     "pn": "190016-10",
+     "name_in_ask": "КЛАПАН ЭЛЕКТРОМАГНИТНЫЙ Солар Taurus 60S 190016-10",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SOLENOID VALVE",
+      "(наименование в подписи к фотографии на стр. 73; отдельной колонки наименования в файле нет)",
+      "VALVE, SOLENOID"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "southeastoverseas.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 3
+    },
+    {
+     "pn": "903289C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 158, ВИТОН Солар Taurus 60S 903289C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING",
+      "(наименование в подписи к фотографии на стр. 5; отдельной колонки наименования в файле нет)",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "gtaturbines.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 3
+    },
+    {
+     "pn": "903560C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 117, ВИТОН Солар Taurus 60S 903560C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING",
+      "O-RING .799X.103 VIT",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "953160C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 70MD, SAE 235, ВИТОН 953160C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "O-RING",
+      "TYPE SATURN 20, O-RING DWG NO. SGS-8916-2.0, ITEM 5,",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "997396C1",
+     "name_in_ask": "РЕМОНТНЫЙ КОМПЛЕКТ Солар Taurus 60S, НЕМЕТАЛЛИЧЕСКИЕ ИЗДЕЛИЯ 997396C1",
+     "qty": 46,
+     "usd_exposure": 16560.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "REPAIR KIT, SOLENOID VALVE",
+      "KIT, REPAIR, VALVE, SOLENOID"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock (турбина по листу: Taurus 60; регламент: 8,000-hour service)",
+     "independent_sources": 2
+    },
+    {
+     "pn": "1064728-1",
+     "name_in_ask": "КОМПЛЕКТ, ФИЛЬТРУЮЩИЙ ЭЛЕМЕНТ, СМАЗОЧНОЕ МАСЛО 1064728-1",
+     "qty": 18,
+     "usd_exposure": 11070.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "ELEMENT, KIT",
+      "Filter, Lube Oil"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "70-30093-1",
+     "name_in_ask": "ЛЕНТА, ПОРОЛОН Солар Taurus 70 70-30093-1",
+     "qty": 392,
+     "usd_exposure": 10388.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "TAPE, NEOPRENE - 50 FT",
+      "TAPE NEOPRENE .13\" X"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1060817-40",
+     "name_in_ask": "КОМПЛЕКТ, ФИЛЬТРУЮЩИЙ ЭЛЕМЕНТ, ГАЗОВОЕ ТОПЛИВО Сименс SGT-400  1060817-40",
+     "qty": 27,
+     "usd_exposure": 9720.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "KIT, FILTER ELEMENT",
+      "ELEMENT, FILTER, GAS FUEL, MAIN INLET"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock (турбина по листу: Taurus 60; регламент: 8,000-hour service, 4,000-hour service)",
+     "independent_sources": 2
+    },
+    {
+     "pn": "190185-203",
+     "name_in_ask": "РЕГУЛЯТОР ДАВЛЕНИЯ И ТЕМПЕРАТУРЫ Солар Taurus 60S 190185-203",
+     "qty": 4,
+     "usd_exposure": 7800.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "REGULATOR, PRESSURE/TEMP",
+      "PRESSURE AND TEMPERATURE OF DUPLEX FILTER LUBE OIL"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "190015-12",
+     "name_in_ask": "КЛАПАН, СОЛЕНОИДНЫЙ, 3-ХОДОВОЙ, 1000 PSI СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 190015-12",
+     "qty": 10,
+     "usd_exposure": 6900.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SOLENOID VALVE",
+      "VALVE, SOLENOID. L340-1"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "304649-100",
+     "name_in_ask": "ПРОКЛАДКА, 2,82 ВНУТР. ДИАМЕТР, 5,63 НАРУЖ. ДИАМЕТР, 0,078 Солар Taurus 70 304649-100",
+     "qty": 108,
+     "usd_exposure": 5940.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET - REPLACES P/N'S 191294-100 AND 303043-1",
+      "GASKET, 2.82 ID, 5.63 OD, 0.078"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 2 pcs",
+     "independent_sources": 2
+    },
+    {
+     "pn": "186648-1",
+     "name_in_ask": "КЛАПАН ШАРОВОЙ В СБОРЕ Солар Taurus 60S 186648-1",
+     "qty": 5,
+     "usd_exposure": 4625.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "VALVE, BALL",
+      "VALVE,BALL,AIR OPERA"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1089034-3",
+     "name_in_ask": "ФИЛЬТРУЮЩИЙ ЭЛЕМЕНТ, ВОЗДУХ, ЦИЛИНДР, ЯЧЕЙКА Сименс SGT-400 1089034-3",
+     "qty": 27,
+     "usd_exposure": 4252.5,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Air filter in a fuel system",
+      "ELEMENT, BARRIER, CELLULOSE"
+     ],
+     "sources": [
+      "heriss.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 1 pcs",
+     "independent_sources": 2
+    },
+    {
+     "pn": "1051931-67",
+     "name_in_ask": "КЛЕММНАЯ БАЗА,ПРУЖИНА,-20-+70 C  СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1051931-67",
+     "qty": 20,
+     "usd_exposure": 4100.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "BASE TERMINAL",
+      "BASE, TERMINAL, COMPRESSION"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1017891",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 1,25, CL150, RF 1017891",
+     "qty": 108,
+     "usd_exposure": 4050.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET, METALLIC",
+      "GASKET, SPIRAL, 1.25, CL150, RF"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock (турбина по листу: Titan 130; регламент: 8,000-hour service, 4,000-hour service)",
+     "independent_sources": 2
+    },
+    {
+     "pn": "1046415-60",
+     "name_in_ask": "БАТАРЕЯ, 3,0 В, ЛИТИЕВАЯ Солар Taurus 70 , 1756-L61 1046415-60",
+     "qty": 23,
+     "usd_exposure": 2357.5,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "BATTERY PACK",
+      "BATTERY, 3V, PROCESSOR MODULE"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 1 pcs",
+     "independent_sources": 2
+    },
+    {
+     "pn": "903246C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 70MD, SAE 227, ВИТОН 903246C1",
+     "qty": 64,
+     "usd_exposure": 1344.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "952876C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 378, ВИТОН СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 952876C1",
+     "qty": 8,
+     "usd_exposure": 1280.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING",
+      "O-RING, VITON (SAE 3"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1051931-71",
+     "name_in_ask": "БАЗА, ОБЩАЯ, ПРУЖИНА, -20-+70 C СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1051931-71",
+     "qty": 9,
+     "usd_exposure": 1057.5,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "BASE TERMINAL",
+      "BASE, TERMINAL, COMPRESSION"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "80-30549-100",
+     "name_in_ask": "ПРОТИВОЗАДИРНЫЙ ГЕРМЕТИК Солар Taurus 70, 8 УНЦИЙ, НА ОСНОВЕ НИКЕЛЯ 80-30549-100",
+     "qty": 14,
+     "usd_exposure": 1015.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "LUBRICANT, HI-TEMP, 10 OZ",
+      "LUBRICANT,HIGH TEMP."
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "70-30815-1",
+     "name_in_ask": "МАГНИТ, БЕСКОНТАКТНЫЙ ДАТЧИК СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 70-30815-1",
+     "qty": 4,
+     "usd_exposure": 820.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "PROXIMITY SWITCH MAGNET.",
+      "MAGNET, PROXIMITY SWITCH"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1046415-30",
+     "name_in_ask": "КОННЕКТОР СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1046415-30",
+     "qty": 25,
+     "usd_exposure": 787.5,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "PLUG, TERMINATOR, CONTROL NET, 75",
+      "TERMINATING RESISTOR"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1017892",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 1.5, RF, CL150, 304 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017892",
+     "qty": 19,
+     "usd_exposure": 741.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET",
+      "GASKET,SPIRAL,1.5,CL150,R"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 2
+    },
+    {
+     "pn": "915243C1",
+     "name_in_ask": "УПЛОТНЕНИЕ, КЛЕЙКОЕ, 0,125 ДЮЙМА Солар Taurus 60S 915243C1",
+     "qty": 24,
+     "usd_exposure": 600.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GORE TEX SEALANT, SOLD BT THE INCH",
+      "SEALANT-GORE TEX"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "173101-2",
+     "name_in_ask": "БОЛТ, ШЕСТИГРАННЫЙ, 0,50-13 X 1,75 ДЮЙМА СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 173101-2",
+     "qty": 59,
+     "usd_exposure": 472.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "BOLT, HEX",
+      "BOLT,HEX HEAD 1/2-13"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1007799",
+     "name_in_ask": "ПРОКЛАДКА, 0.344 ВНУТР. ДИАМЕТР, 0.625 НАРУЖ. ДИАМЕТР СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1007799",
+     "qty": 19,
+     "usd_exposure": 456.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET, METALLIC",
+      "GASKET, 0.344 ID, 0.625 OD"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock (турбина по листу: Titan 130; регламент: 8,000-hour service, 4,000-hour service)",
+     "independent_sources": 2
+    },
+    {
+     "pn": "903556C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 166, ВИТОН Солар Taurus 60S 903556C1",
+     "qty": 7,
+     "usd_exposure": 402.5,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "112056-1",
+     "name_in_ask": "Уплотнительное кольцо подачи и слива масла главного насоса Солар Taurus 70 112056-1",
+     "qty": 8,
+     "usd_exposure": 388.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING",
+      "(наименование в подписи к фотографии на стр. 37; отдельной колонки наименования в файле нет)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 2
+    },
+    {
+     "pn": "1017908",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 4.0, RF, CL300, 304 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017908",
+     "qty": 7,
+     "usd_exposure": 350.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET",
+      "GASKET,SPIRAL,4.0,CL300,R"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 2 pcs",
+     "independent_sources": 2
+    },
+    {
+     "pn": "952248C1",
+     "name_in_ask": "УПЛОТНЕНИЕ Солар Taurus 60S, РЕЗЬБОВОЕ, 0,375 ВНУТР. ДИАМЕТР, 0,75 НАРУЖ. ДИАМЕТР 952248C1",
+     "qty": 10,
+     "usd_exposure": 215.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "SEAL",
+      "SEAL (THREAD SEAL)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "903249C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 237, ВИТОН  СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 903249C1",
+     "qty": 7,
+     "usd_exposure": 168.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "O-RING",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "960592C1",
+     "name_in_ask": "ДИОД, 1000 В СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 960592C1",
+     "qty": 4,
+     "usd_exposure": 130.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "DIODE",
+      "DIODE 1N4007"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "969677C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 60S, SAE 206, ВИТОН 969677C1",
+     "qty": 5,
+     "usd_exposure": 87.5,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "O-RING",
+      "SEAL,O-RING(SAE 206)",
+      "(наименование в подписи к фотографии на стр. 7; отдельной колонки наименования в файле нет)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 2
+    },
+    {
+     "pn": "964686C1",
+     "name_in_ask": "ГРОВЕРНАЯ ШАЙБА, РАЗРЕЗНАЯ, 0,50 ДЮЙМА, 316 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 964686C1",
+     "qty": 5,
+     "usd_exposure": 22.5,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "LOCKWASHER 316SST",
+      "LOCK WASHER, 1/2"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1017894",
+     "name_in_ask": "ПРОКЛАДКА Солар Taurus 70, СПИРАЛЬНАЯ, 2,5, RF, CL150, 304 1017894",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET, SPIRAL",
+      "GASKET, SPIRAL, 150#, 2-1/2\""
+     ],
+     "sources": [
+      "immiturbines.com",
+      "southeastoverseas.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1023031-1",
+     "name_in_ask": "БЕСКОНТАКТНЫЙ ДАТЧИК СВДИГА, 3300XL, ОСЕВОЙ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1023031-1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "PROBE PROXIMITY",
+      "PROBE, PROXIMITY"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1023518-201",
+     "name_in_ask": "КЛАПАН БЫСТРОДЕЙСТВУЮЩИЙ ВЫПУСКНОЙ Солар Taurus 60S",
+     "qty": 8,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE",
+      "VALVE, QUICK EXHAUST. L341-1"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1034549-43",
+     "name_in_ask": "МОДУЛЬ, ВИБРАЦИОННЫЙ, ГАЛЬВАНИЧЕСКАЯ РАЗВЯЗКА СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1034549-43",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "ISOLATOR, GALVONIC",
+      "ISOLATOR ZZ2154I"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1034549-80",
+     "name_in_ask": "МОДУЛЬ, ВИБРАЦИОННЫЙ, ВВ/ВЫВ, BENTLY-NEVADA 1701 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1034549-80",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "ACCELEROMETER",
+      "MODULE,DUAL PROXIMITOR"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1046415-57",
+     "name_in_ask": "ИСТОЧНИК ПИТАНИЯ Солар Taurus 70, 24 В ПОСТ. ТОКА 1046415-57",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "POWER SUPPLY",
+      "POWER SUPPLY PS2010"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1053929-6",
+     "name_in_ask": "ПЕРЕКЛЮЧАТЕЛЬ Солар Taurus 70, ПЕРЕПАД ДАВЛЕНИЯ, 6 PSIG, ДВУХПОЛЮСНЫЙ ДВУХПОЗИЦИОННЫЙ,  ВОЗДУХ, СТЕКЛОВОЛОКНО 1053929-6",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SWITCH, DIFF",
+      "Switch, DP, PSIG, DPDT, Air, GF"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "120029-5",
+     "name_in_ask": "КЛАПАН, ОБРАТНЫЙ, 0,50 ДЮЙМА, 3000 PSIG Солар Taurus 60S 120029-5",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE, CHECK, 0.75 IN",
+      "VALVE , CHECK"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "120373-1",
+     "name_in_ask": "Прокладка 1-го подшипника Солар Taurus 60S 120373-1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET",
+      "SEAL WASHER, CONDUIT",
+      "(наименование в подписи к фотографии на стр. 27; отдельной колонки наименования в файле нет)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "stock_claim": "заявлено наличие на складе (фотоперечень «Available Stock»), количество не указано",
+     "independent_sources": 2
+    },
+    {
+     "pn": "120649-18",
+     "name_in_ask": "Вибрационный датчик вспомогательного редуктора Солар Taurus 70 120649-18",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VIBRATION, PICKUP STK",
+      "TRANSDUCER TV350-1"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "120848-4",
+     "name_in_ask": "СЕТЧАТЫЙ ФИЛЬТР, Y-ОБРАЗНЫЙ, 0,75 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 120848-4",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "STRAINER",
+      "STRAINER,3/4\"NPT 40M"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "124907-20",
+     "name_in_ask": "Прокладка вибрационной системы, вибрация СТ 4,5 Солар Taurus 70 124907-20",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GROMMET",
+      "GROMMET, INST., 6 HO"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "130161-1",
+     "name_in_ask": "Прокладка для смотрового люка крышки вала Солар Taurus 70MD 130161-1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET, COVER ACCESS"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "172567-1",
+     "name_in_ask": "ПРОКЛАДКА Солар Taurus 70, 5,62 X 5,62 ДЮЙМА,.030 172567-1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET, PUMP",
+      "GASKET, OIL PUMP"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "186273-36",
+     "name_in_ask": "РЕГУЛЯТОР ДАВЛЕНИЯ Солар Taurus 60S 186273-36",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "REGULATOR, PRESSURE, POPPET, 0.25 IN",
+      "REGULATOR, PRESSURE PCV930-1"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "903223C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 015, ВИТОН Солар Taurus 60S 903223C1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "O-RING",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "903235C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 70MD, SAE 114, ВИТОН 903235C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "903537C1",
+     "name_in_ask": "Фасонная деталь, колено Солар Taurus 70 903537C1",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "CONDUIT ELBOW.",
+      "ELBOW, CONDUIT-1.00N"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "908060C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 70MD, SAE 280, ВИТОН 908060C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING",
+      "O'Ring"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "gtaturbines.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "908539C1",
+     "name_in_ask": "ТРАНСФОРМАТОР ТОКА Солар Taurus 60S 908539C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "TRANSFORMER",
+      "TRANSFORMER, 3-WIRE"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "909106C1",
+     "name_in_ask": "ПОДШИПНИК, ЦИЛИНДРИЧЕСКИЙ РОЛИКОВЫЙ 909106C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "BEARING, ROLLER 40 MM BORE",
+      "ROLLER BEARING 40MM"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "950781C1",
+     "name_in_ask": "Уплотнительное кольцо для крышки вала Солар Taurus 70MD 950781C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING",
+      "SEAL,O-RING"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "950895C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 70MD, SAE 279, ВИТОН 950895C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SEAL",
+      "0-RING,SAE 279,VITON"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "severenergo.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Mars 100; регламент: Engine replacement)",
+     "independent_sources": 2
+    },
+    {
+     "pn": "952504C1",
+     "name_in_ask": "Уплотнительное кольцо главного масляного насоса Солар Taurus 70 952504C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING",
+      "O RING"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "964905C1",
+     "name_in_ask": "БЛОК, МОНТАЖНЫЙ, БАРЬЕРНАЯ СИСТЕМА СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 964905C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "BARRIER",
+      "BARRIER,CENTER"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "967664C1",
+     "name_in_ask": "ПЕРЕПУСКНОЙ КЛАПАН Солар Taurus 70MD, 0,375 ДЮЙМА, 400 PSI 967664C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE, RELIEF",
+      "VALVE, RELIEF. VR952"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "967692C1",
+     "name_in_ask": "УПЛОТНЕНИЕ, МЕТАЛЛИЧЕСКОЕ, 303 НЕРЖ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 967692C1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "SEAL, METALLIC",
+      "SEAL,METALLIC 3/8\" S"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "967924C1",
+     "name_in_ask": "ПРОКЛАДКА Солар Taurus 60S, НА ВСЮ ПОВЕРХНОСТЬ, 6,0, ГИЛОН 967924C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET",
+      "GASKET 6\" 150# FULL"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "967952C1",
+     "name_in_ask": "ШЛАНГ Солар Taurus 60S, 0,25 ДЮЙМА 967952C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "HOSE, METAL FLEX",
+      "HOSE,METAL 1/4X.350X"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "990905C1",
+     "name_in_ask": "ТУМБЛЕР, 10 А, 250 В, ДВУХПОЛЮСНЫЙ ОДНОПОЗИЦИОННЫЙ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 990905C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SWITCH, HIGH RATE FLOAT",
+      "SWITCH,ROCKER,15 A,250 V,DPDT"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "991707C1",
+     "name_in_ask": "ИНДИКАТОР, СВЕТОВОЙ, ЗЕЛЕНЫЙ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 991707C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "A/C ON LED GREEN",
+      "LED, GREEN (AC-ON)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "991708C1",
+     "name_in_ask": "ИНДИКАТОР, СВЕТОВОЙ, ЯНТАРНЫЙ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 991708C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "LED AMBER HIGH RATE",
+      "LED, AMBER (HIGH-RAT"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "991709C1",
+     "name_in_ask": "ИНДИКАТОР, СВЕТОВОЙ, КРАСНЫЙ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 991709C1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "LED RED ALARM",
+      "LED, RED (ALARM)"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "FT20027",
+     "name_in_ask": "ИНСТРУМЕНТ Солар Taurus 60S, ДЕРЖАТЕЛЬ ЗУБЧАТОЙ ШЕСТЕРНИ FT20027",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SPLINE WRENCH, PINION",
+      "SPLINE WRENCH-PINION"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "FT20029",
+     "name_in_ask": "ПУАНСОН Солар Taurus 60S, ВЫПРЕССОВКА/ЗАПРЕССОВКА ЗУБЧАТОЙ ШЕСТЕРНИ FT20029",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "STAKING PUNCH",
+      "STAKING PUNCH AND UN"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "FT61012-100",
+     "name_in_ask": "ИНСТРУМЕНТ, УСИЛИТЕЛЬ КРУТЯЩЕГО МОМЕНТА СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) FT61012-100",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "TORQUE MULTIPLIER",
+      "TORQUE MULTIPLIER WR"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "FT61016",
+     "name_in_ask": "ЦЕПНОЙ ТРУБНЫЙ КЛЮЧ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) FT61016",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "WRENCH CHAIN"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "FT61090",
+     "name_in_ask": "ЛЕНТОЧНЫЙ ГАЕЧНЫЙ КЛЮЧ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) FT61090",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "STRAP WRENCH"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "FT67026",
+     "name_in_ask": "ИНСТРУМЕНТ, КЛЕММЫ, ПРОВОД СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) FT67026",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "KIT",
+      "ELECT TERMINAL KIT L"
+     ],
+     "sources": [
+      "immiturbines.com",
+      "heriss.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "1794-IRT8",
+     "name_in_ask": "Блок ввода/вывода Flex 8 вводов термопар/терм. Сопротивл быстр. Солар Taurus 60S 1794-IRT8",
+     "qty": 40,
+     "usd_exposure": 76000.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "MODULE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "Turbo-K",
+     "name_in_ask": "Чистящее средство для турбин, 25 л Солар Taurus 60S Turbo-K",
+     "qty": 90,
+     "usd_exposure": 72000.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "SOLVENT, GAS PATH CLEANING, TURBO-K"
+     ],
+     "sources": [
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock (турбина по листу: Titan 130, Taurus 60; регламент: 8,000-hour service, 4,000-hour service)",
+     "independent_sources": 1
+    },
+    {
+     "pn": "1056369-30",
+     "name_in_ask": "КОМПЛЕКТ, ЭЛЕМЕНТ, ГАЗОВОЕ ТОПЛИВО СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1056369-30",
+     "qty": 83,
+     "usd_exposure": 68475.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "KIT, ELEMENT, GAS FUEL, COALESCER"
+     ],
+     "sources": [
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 1 pcs",
+     "independent_sources": 1
+    },
+    {
+     "pn": "1794-IE8",
+     "name_in_ask": "Блок ввода/вывода Flex 8 аналоговых вводов Солар Taurus 60S 1794-IE8",
+     "qty": 58,
+     "usd_exposure": 33640.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "MODULE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1043614-500",
+     "name_in_ask": "КЛАПАН РЕГУЛИРУЮЩИЙ Солар Taurus 60S 1043614-500",
+     "qty": 8,
+     "usd_exposure": 30800.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "LIQUID SPLITTER VALVE, SST."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "301315-13",
+     "name_in_ask": "ПАКЕТ ДИСКОВ В СБОРЕ Солар Taurus 60S 301315-13",
+     "qty": 4,
+     "usd_exposure": 17000.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "DISC PACK"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1063325-1",
+     "name_in_ask": "ГИДРАВЛИЧЕСКИЙ НАСОС Солар Taurus 60S 1063325-1",
+     "qty": 4,
+     "usd_exposure": 16600.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "PUMP, MAIN LUBEOIL"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1794-OB16P",
+     "name_in_ask": "Блок дискретных выводов Солар Taurus 60S 1794-OB16P",
+     "qty": 25,
+     "usd_exposure": 15625.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "MODULE DISCRETE OUTPUT"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2112736-1",
+     "name_in_ask": "КОМПЛЕКТ,ЭЛЕМЕНТ,ГОФРИРОВАННЫЙ,ЖИДКОЕ ТОПЛИВО Солар Taurus 60S 2112736-1",
+     "qty": 36,
+     "usd_exposure": 14220.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "ELEMENT, FLTR, LF, PLEATED, CYL"
+     ],
+     "sources": [
+      "severenergo.com"
+     ],
+     "stock_claim": "on request; норма на регламент 1 pcs",
+     "independent_sources": 1
+    },
+    {
+     "pn": "170180-01-00",
+     "name_in_ask": "BENTLY NEVADA Блок внешнего преобразователя безконтактный Солар Taurus 70 170180-01-00",
+     "qty": 24,
+     "usd_exposure": 10200.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "EXTERNAL I/O MODULE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1069873-1",
+     "name_in_ask": "КОМПЛЕКТ, ФИЛЬТРУЮЩИЙ ЭЛЕМЕНТ, ФИЛЬТР, ЖИДКОЕ ТОПЛИВО, Солар Taurus 60S10 1069873-1",
+     "qty": 36,
+     "usd_exposure": 9180.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "FILTER ELEMENT KIT"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "190537-102",
+     "name_in_ask": "КЛАПАН ШАРОВОЙ В СБОРЕ Солар Taurus 60S 190537-102",
+     "qty": 5,
+     "usd_exposure": 8500.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "VALVE, BALL, PNEUMATIC, 0.025 IN"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "190817-14",
+     "name_in_ask": "ПРИВОД, ДАТЧИК, ВИБРАЦИОННЫЙ, 3300XL СОЛАР Taurus 70 и Taurus 70MD  (унифицированнные) 190817-14",
+     "qty": 5,
+     "usd_exposure": 5625.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "PROXIMITOR ZV350K"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "MVI56-MCM",
+     "name_in_ask": "Интерфейсная карта MODBUS Солар Taurus 60S MVI56-MCM",
+     "qty": 7,
+     "usd_exposure": 5250.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "CONTROL LOGIX COMMUNICATION MODULE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1072904",
+     "name_in_ask": "УПЛОТНЕНИЕ, МЕТАЛЛИЧЕСКОЕ, 303 НЕРЖ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1072904",
+     "qty": 84,
+     "usd_exposure": 4410.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "SEAL, METALLIC"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1053038-35",
+     "name_in_ask": "ИСКРОБЕЗОПАСНЫЙ БАРЬЕР Солар Taurus 60S 1053038-35",
+     "qty": 7,
+     "usd_exposure": 4025.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "ISOLATOR, TC ZS2073-0"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1043265-1",
+     "name_in_ask": "ДЕРЖАТЕЛЬ, ПРЕДОХРАНИТЕЛЬ, 600 В СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1043265-1",
+     "qty": 76,
+     "usd_exposure": 3040.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "HOLDER, FUSE."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1071411-1",
+     "name_in_ask": "РЕЛЕ, ТАЙМЕР, РЕГУЛИРУЕМОЕ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1071411-1",
+     "qty": 12,
+     "usd_exposure": 2760.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "RELAY, TIMER, MALFUNCTION"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1756-PB75",
+     "name_in_ask": "Блок питания шасси контроллера Солар Taurus 60S 1756-PB75",
+     "qty": 7,
+     "usd_exposure": 2520.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "POWER SUPPLY"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "KFD2-SR2-Ex2.W",
+     "name_in_ask": "Барьер искробезопасности Солар Taurus 60S KFD2-SR2-Ex2.W",
+     "qty": 7,
+     "usd_exposure": 2100.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "BARRIER, ISOLATED TRANSFORMER"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1043265-3",
+     "name_in_ask": "ПРЕДОХРАНИТЕЛЬ, 2,0 А, 600 В СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1043265-3",
+     "qty": 41,
+     "usd_exposure": 2091.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "FUSE, 2 AMP",
+      "FUSE, 2 AMP."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1043265-7",
+     "name_in_ask": "ПРЕДОХРАНИТЕЛЬ, 20 А, 600 В СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1043265-7",
+     "qty": 34,
+     "usd_exposure": 1819.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "FUSE, 20 AMP",
+      "FUSE, 20 AMP, CLASS CC."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1008726",
+     "name_in_ask": "ПРОКЛАДКА, 0,938 ВНУТР. ДИАМЕТР, 1,25 НАРУЖ. ДИАМЕТР, 0,0485 Солар Taurus 70 1008726",
+     "qty": 108,
+     "usd_exposure": 1566.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET, METALLIC"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1043265-5",
+     "name_in_ask": "ПРЕДОХРАНИТЕЛЬ, 10 А, 600 В СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1043265-5",
+     "qty": 57,
+     "usd_exposure": 1282.5,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "FUSE, 10 AMP",
+      "FUSE, 10 AMP."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1017905",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 2.0, CL300, RF, 304 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017905",
+     "qty": 21,
+     "usd_exposure": 1207.5,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "GASKET, SPIRAL WOUND"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1756-ENBT",
+     "name_in_ask": "Интерфейсная карта EtherNet Солар Taurus 60S 1756-ENBT",
+     "qty": 7,
+     "usd_exposure": 980.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "MODULE COMMUNICATION INTERFACE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "KFD2-EB2",
+     "name_in_ask": "БЛОК РАЗВЯЗКИ, ФИДЕР ПИТАНИЯ Солар Taurus 70MD KFD2-EB2",
+     "qty": 6,
+     "usd_exposure": 720.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "MODBUS - 24VDC"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1017904",
+     "name_in_ask": "ПРОКЛАДКА Солар Taurus 70MD, СПИРАЛЬНАЯ, 1,5, CL300, RF, 304 1017904",
+     "qty": 15,
+     "usd_exposure": 600.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET, SPIRAL, 1.5, CL300, RF"
+     ],
+     "sources": [
+      "severenergo.com"
+     ],
+     "stock_claim": "in stock; норма на регламент 3 pcs",
+     "independent_sources": 1
+    },
+    {
+     "pn": "1020105",
+     "name_in_ask": "УПЛОТНЕНИЕ, КЛЕЙКОЕ, 0,375 ДЮЙМА Солар Taurus 70 1020105",
+     "qty": 21,
+     "usd_exposure": 556.5,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "970564C1",
+     "name_in_ask": "ПРОКЛАДКА, ВИТОН, СОЕДИНЕНИЕ ТРУБ 6,0 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 970564C1",
+     "qty": 8,
+     "usd_exposure": 540.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1017890",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 1.0, RF, CL150, 304 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017890",
+     "qty": 17,
+     "usd_exposure": 527.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET, SPIRAL WOUND"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1043265-4",
+     "name_in_ask": "ПРЕДОХРАНИТЕЛЬ, 5,0 А, 600 В СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1043265-4",
+     "qty": 18,
+     "usd_exposure": 504.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "FUSE, 5 AMP",
+      "FUSE, 5 AMP."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "962694C1",
+     "name_in_ask": "ПРОКЛАДКА, ВИТОН, 3,0 ТРУБНОЕ СОЕДИНЕНИЕ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 962694C1",
+     "qty": 10,
+     "usd_exposure": 390.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET-FLEX CPLG,3.0"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1016573",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 340, ВИТОН СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1016573",
+     "qty": 7,
+     "usd_exposure": 332.5,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "190826-1",
+     "name_in_ask": "ПРОКЛАДКА,4.38 ВНУТР. ДИАМЕТР,5.62 НАРУЖ. ДИАМЕТР,0.020 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 190826-1",
+     "qty": 7,
+     "usd_exposure": 308.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1024941",
+     "name_in_ask": "ЛАМПА, ФЛУОРЕСЦЕНТНАЯ, БЕЛАЯ, 15 ВТ  СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1024941",
+     "qty": 6,
+     "usd_exposure": 246.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "BULB"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1017876",
+     "name_in_ask": "ПРОКЛАДКА, СПИРАЛЬНАЯ, 2.0, CL300, RF СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017876",
+     "qty": 5,
+     "usd_exposure": 240.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET, SPIRAL"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "969017C1",
+     "name_in_ask": "ПРОКЛАДКА Солар Taurus 70, СПИРАЛЬНАЯ, 1,0, CL600, RF, CGI 69017C1",
+     "qty": 5,
+     "usd_exposure": 212.5,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GASKET, SPIRAL,600#"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1017509",
+     "name_in_ask": "ЛАМПА, СВЕТОДИОДНАЯ, БЕЛАЯ, 28 В ПОСТ. ТОКА, 28 В  СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017509",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "LAMP"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1017510",
+     "name_in_ask": "ИНДИКАТОР, СВЕТОВОЙ, ЗЕЛЕНЫЙ  СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1017510",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "LAMP"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1046490",
+     "name_in_ask": "ШЛАНГ В СБОРЕ, 1,50 ДЮЙМА X 37 ДЮЙМОВ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1046490",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "HOSE ASSEMBLY"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1046492",
+     "name_in_ask": "ШЛАНГ В СБОРЕ, 2,0 ДЮЙМА X 35 ДЮЙМОВ Солар Taurus 60S 1046492",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "HOSE ASSEMBLY"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1068334",
+     "name_in_ask": "БОЛТ Солар Taurus 70MD 1068334",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "KEYBOARD"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "124907-25",
+     "name_in_ask": "ПРОКЛАДКА УПЛОТНИТЕЛЬНАЯ Солар Taurus 60S 124907-25",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GROMMET"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1024780-122",
+     "name_in_ask": "КЛАПАН В СБОРЕ Солар Taurus 70, PRESS CNTL, ТЕМП. 1024780-122",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "VALVE, PRESSURE & TEMP REG"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1027484-101",
+     "name_in_ask": "КЛАПАН, СОЛЕНОИДНЫЙ, 2-ХОДОВОЙ, 500 PSI СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1027484-101",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1034347-1",
+     "name_in_ask": "АКСЕЛЕРОМЕТР, 25 МВ/Г Солар Taurus 60S 1034347-1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "SENSOR, ACCELLEROMETER"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1034549-21",
+     "name_in_ask": "МОДУЛЬ, ВИБРАЦИОННЫЙ, СЕЙСМИЧЕСКИЙ, BENTLY-NEVADA 1701 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1034549-21",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "MODULE, VIBRATION"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1034549-81",
+     "name_in_ask": "МОДУЛЬ, ВИБРАЦИОННЫЙ, СКОРОСТНОЙ, BENTLY-NEVADA 1701 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1034549-81",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "MODULE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1042018-202",
+     "name_in_ask": "КЛАПАН РЕГУЛИРУЮЩИЙ Солар Taurus 60S 1042018-202",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "VALVE ASSY."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1043265-9",
+     "name_in_ask": "ПРЕДОХРАНИТЕЛЬ, 30 А, 600 В СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1043265-9",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "FUSE, 30 AMP."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1052168-23",
+     "name_in_ask": "ПЕРЕДАТЧИК, ДАВЛЕНИЕ Солар Taurus 70MD, 800 PSI 1052168-23",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "TRANSMITTER, PRESSURE."
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1053038-19",
+     "name_in_ask": "РАЗЪЕДИНИТЕЛЬ, МОДУЛЬ ПОДАЧИ ПИТАНИЯ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1053038-19",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "MODULE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1053038-26",
+     "name_in_ask": "ИСКРОБЕЗОПАСНЫЙ БАРЬЕР Солар Taurus 60S 1053038-26",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "ISOLATOR"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1053928-3",
+     "name_in_ask": "РЕЛЕ ДАВЛЕНИЯ Солар Taurus 60S 1053928-3",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "SWITCH, PRESSURE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1063390-1",
+     "name_in_ask": "НАСОС, СМАЗОЧНОЕ МАСЛО, 120 ГАЛ/МИН, 25 PSI СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1063390-1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "PUMP, LUBE OIL"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "116091-21",
+     "name_in_ask": "УКАЗАТЕЛЬ УРОВНЯ ЖИДКОСТИ Солар Taurus 60S 116091-21",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "GUAGE, LIQUID LEVEL"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "120045-13",
+     "name_in_ask": "КЛАПАН, ПЕРЕПУСКНОЙ, 0,5 ДЮЙМА Солар Taurus 60S 120045-13",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE, RELIEF,"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "124907-19",
+     "name_in_ask": "Прокладка вибрационной системы, подшипники № 2,3 Солар Taurus 70 1124907-19",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "GROMMET"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "172523-2",
+     "name_in_ask": "ПРОКЛАДКА X 2,71 ДЮЙМА,.062, BLUE-GARD Солар Taurus 60S 172523-2",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "GASKET"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "190583-1",
+     "name_in_ask": "КЛАПАН, ПЕРЕПУСКНОЙ Солар Taurus 60S, 0,875 ДЮЙМА, 3000 PSIG 190583-1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "RELIEF VALVE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "190584-1",
+     "name_in_ask": "КЛАПАН Солар Taurus 60S, ПЕРЕПАД ДАВЛЕНИЯ 190584-1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "PRESS. SWITCH"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "190584-2",
+     "name_in_ask": "КЛАПАН, ПЕРЕПАД ДАВЛЕНИЯ Солар Taurus 60S 190584-2",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE, DELTA P"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "190619-2",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 60S, SAE 228, ВИТОН 190619-2",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "O-RING"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "301315-14",
+     "name_in_ask": "НАБОР, БОЛТ Солар Taurus 60S, 16, ШАЙБЫ, ГАЙКИ 301315-14",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "DISC PACK ASSY SET"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "701417C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 117, 4079, KALREZ Солар Taurus 60S 701417C1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "907563C2",
+     "name_in_ask": "ШЛАНГ Солар Taurus 60S В СБОРЕ, 0,5 ДЮЙМА X 25 ДЮЙМОВ 907563C2",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "HOSE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "950232C1",
+     "name_in_ask": "Резиновая прокладка Солар Taurus 60S 950232C1",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "GASKET"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "950944C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО, SAE 132, ВИТОН СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 950944C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "955518C1",
+     "name_in_ask": "Уплотнительное кольцо дренажного клапана подшипника 1 Солар Taurus 70 955518C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "O-RING"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "993359C1",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 70MD 993359C1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "O-RING"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "993672C1",
+     "name_in_ask": "КОМПЛЕКТ,РЕМОНТ,КЛАПАН ПЕРЕПАДА ДАВЛЕНИЯ Солар Taurus 60S 993672C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "KIT, SEAL, VALVE DIFF PRESSURE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "995648C1",
+     "name_in_ask": "ПРОВОЛОКА, ПРЕДОХРАНИТЕЛЬНАЯ, 0,032 ДЮЙМА, 302/304 СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 995648C1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "LOCKWIRE. 304SS, .032"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "996510C1",
+     "name_in_ask": "КОМПЛЕКТ ПРИНАДЛЕЖНОСТЕЙ, СРЕЗНОЙ БОЛТ Солар Taurus 60S 996510C1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "KIT, SHEAR BOLT"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "FT20025",
+     "name_in_ask": "АДАПТЕР Солар Taurus 60S, КЛЮЧ, ДИНАМОМЕТРИЧЕСКИЙ, МАГНИТНЫЙ FT20025",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "TOOL ADAPTER"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "FT20026-100",
+     "name_in_ask": "АДАПТЕР Солар Taurus 60S, КЛЮЧ, ДИНАМОМЕТРИЧЕСКИЙ, ЗУБЧАТЫЙ FT20026-100",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "TORQUE WRENCH ADAPTER -"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "FT20032-100",
+     "name_in_ask": "АДАПТЕР Солар Taurus 60S, КЛЮЧ, ДИНАМОМЕТРИЧЕСКИЙ, МУФТОВЫЙ FT20032-100",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "TORQUE ADAPTER"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "FT61014-101",
+     "name_in_ask": "ИНСТРУМЕНТ, ДИНАМОМЕТРИЧЕСКИЙ КЛЮЧ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) FT61014-101",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "TORQUE WRENCH"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "FT67006-100",
+     "name_in_ask": "ИНСТРУМЕНТ, ИЗМЕРИТЕЛЬНЫЙ, УНИВЕРСАЛЬНЫЙ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) FT67006-100",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "DIAL INDICATOR/FLEXIBLE CONNECTION & MAGNETIC BASE"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "FT67032-100",
+     "name_in_ask": "ИНСТРУМЕНТ, ТРУБКА, ПОЛЕВОЙ РЕМОНТ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) FT67032-100",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "TOOL TUBE FIELD REPAIR"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "FT67073-100",
+     "name_in_ask": "КОМПЛЕКТ, ТРУБНЫЕ ФИТИНГИ, СТАНДАРТНЫЕ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) FT67073-100",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "FITTING KIT"
+     ],
+     "sources": [
+      "immiturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1060367-600",
+     "name_in_ask": "ЗАРЯДНОЕ УСТРОЙСТВО Солар Taurus 70 1060367-600",
+     "qty": 6,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "CHARGER, BATTERY"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "903375C1",
+     "name_in_ask": "Штуцер Солар Taurus 70 903375C1",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "CONDUIT UNION-EXP PR"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "969582C1",
+     "name_in_ask": "3-дюймовая прокладка для гибкого соединения труб. Дренаж смазочного масла из подшипников 2/3. Солар Taurus 70 969582C1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "COUPLING 3.0"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "120712-11",
+     "name_in_ask": "ПЕРЕПУСКНОЙ КЛАПАН Солар Taurus 70MD, 1,5 ДЮЙМА PSI 120712-11",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "DIFFERENTIAL PRESS TRANSMITTER"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "945061C1",
+     "name_in_ask": "ШЛАНГ В СБОРЕ Солар Taurus 70, 0,75 ДЮЙМА X 58 ДЮЙМОВ 945061C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "HOSE, METAL FLEX"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1060152",
+     "name_in_ask": "СТРОБОСКОП С СИГНАЛОМ, КРАСНЫЙ Солар Taurus 60S 1060152",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "LIGHT, STROBE, W/HORN,  RED AH398"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "903536C1",
+     "name_in_ask": "Соединительная трубка Солар Taurus 70 903536C1",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "NIPPLE-CLOSE 1.0DIA"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "960363C1",
+     "name_in_ask": "Ниппель 1-го подшипника Солар Taurus 60S 960363C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "NIPPLE-PIPE .50NPT H"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1023031-3",
+     "name_in_ask": "БЕСКОНТАКТНЫЙ ДАТЧИК СВДИГА, 3300XL, ОСЕВОЙ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1023031-3",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "PROBE, PROXIMITY (AXIAL)"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "131230-6",
+     "name_in_ask": "ДЕТЕКТОР, ТЕМПЕРАТУРНЫЙ, СОПРОТИВЛЕНИЕ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 131230-6",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SENSOR, TEMPERATURE. RT389"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1060151",
+     "name_in_ask": "СТРОБОСКОП, КРАСНЫЙ Солар Taurus 60S  1060151",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "STROBE,RED"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1064851-1",
+     "name_in_ask": "ПЕРЕКЛЮЧАТЕЛЬ Солар Taurus 70MD, КНОПКА, 3PST, ЧЕРНЫЙ 1064851-1",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SWITCH,PUSHBUTTON,3PST,BLACK"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1064851-2",
+     "name_in_ask": "ПЕРЕКЛЮЧАТЕЛЬ Солар Taurus 70MD, 3-ПОЗИЦИОННЫЙ 1064851-2",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "SWITCH,SELECTOR,3-POSITION"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1064829-4",
+     "name_in_ask": "ДАТЧИК, УРОВЕНЬ, ЕМКОСТЬ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1064829-4",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE , RELIEF VR952"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1085271-1004",
+     "name_in_ask": "КАССЕТА, ЧРП Солар Taurus 70MD 1085271-1004",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "VECTOR CONTROL CASSETTE"
+     ],
+     "sources": [
+      "heriss.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1084352-4030",
+     "name_in_ask": "МОНИТОР МУЛЬТИСТАНЦИИ PMS Солар Taurus 60S 1084352-4030",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "KIT, MONITOR, 17IN., RACK MOUNT"
+     ],
+     "sources": [
+      "severenergo.com"
+     ],
+     "stock_claim": "check availability (турбина по листу: Taurus 60; регламент: не указан)",
+     "independent_sources": 1
+    },
+    {
+     "pn": "301314-18",
+     "name_in_ask": "ВТУЛКА Солар Taurus 60S, ВНУТРЕННЯЯ, БЕЗ ГОЛОВКИ 301314-18",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Bushing"
+     ],
+     "sources": [
+      "gtaturbines.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "302161-40",
+     "name_in_ask": "НАБОР СРЕЗНЫХ БОЛТОВ Солар Taurus 60S 302161-40",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "Bolt, Shear, Set"
+     ],
+     "sources": [
+      "gtaturbines.com"
+     ],
+     "independent_sources": 1
+    }
+   ]
+  }
+ }
+}

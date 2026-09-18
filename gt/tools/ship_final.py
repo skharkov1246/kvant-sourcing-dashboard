@@ -151,6 +151,7 @@ def build() -> str:
     sl = load("ship_stocklist_cross.json") or {}
     dc = load("ship_demand_collisions.json") or {}
     bb = load("ship_band_basis.json") or {}
+    pl = load("ship_parts_lists.json") or {}
 
     band = {}
     for r in lk:
@@ -349,6 +350,33 @@ def build() -> str:
         a("<p>Что с этим делать: до подтверждения заказчиком количество по этим строкам в "
           "обязательства не берётся. Вопрос ему поставлен и стоит в перечне вопросов первым "
           "по деньгам. Считает gt/tools/demand_collisions.py.</p>")
+        a("</div>")
+
+    # --------------------------- опознание оптом по открытым перечням ЗИП
+    mach = (pl.get("machines") or {})
+    if mach:
+        a("<div class='box'>")
+        a("<b>Опознание оптом: открытые перечни запасных частей</b>")
+        tot_pns = sum(m["pns_matched"] for m in mach.values())
+        tot_lost = sum(m["pns_that_were_not_found"] for m in mach.values())
+        lost_usd = sum(m["usd_exposure_that_was_not_found"] for m in mach.values())
+        a(f"<p>Номер, по которому продавец ничего не находит, читается как «детали не "
+          f"существует». Но такие номера ходят списками. Снятые целиком открытые перечни "
+          f"запасных частей закрыли <span class='k'>{ru(tot_pns)}</span> номеров заявки, из них "
+          f"<span class='k'>{ru(tot_lost)}</span> строк на "
+          f"<span class='k'>{ru(lost_usd)} долларов</span> до этого числились как «номер не "
+          f"найден» — теперь у них есть дословное наименование изделия и адрес источника.</p>")
+        for name, m in mach.items():
+            src = ", ".join(f"{h} — {ru(n)}" for h, n in
+                            sorted(m["by_source"].items(), key=lambda x: -x[1])[:6])
+            a(f"<p><b>{E(name)}</b>: перечней {ru(len(m['lists']))}, закрыто "
+              f"{ru(m['pns_matched'])} номеров, из них подтверждены двумя и более НЕЗАВИСИМЫМИ "
+              f"держателями {ru(m['pns_confirmed_by_two_or_more'])}. Источники: {E(src)}. Не "
+              f"нашлись в перечнях {ru(m.get('not_found_in_lists'))} номеров.</p>")
+        a("<p class='dim'>Чего эти перечни НЕ дают: цены — её там нет вовсе, вместо неё стоит "
+          "«запросить». И признак наличия в них не остаток: «in stock» означает «у нас это "
+          "бывает», а не подтверждённое число на наш объём, поэтому в сумму закупки он не "
+          "идёт. Считает gt/tools/lists_fold.py, набор gt/data/ship_parts_lists.json.</p>")
         a("</div>")
 
     # --------------------------------------------------------------- сорсеру
