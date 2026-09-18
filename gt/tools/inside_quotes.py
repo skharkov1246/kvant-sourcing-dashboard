@@ -146,8 +146,17 @@ def measure() -> dict:
     rv = {key(r.get("pn")): r
           for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
 
+    # ОТБОР ФАЙЛА. Условие «priced > 0» означает «в файле есть хотя бы одно
+    # значение, опознанное как цена». С 18.09.2026 opис считает priced СТРОГО —
+    # только цены из колонки «цена» по заголовку, — а прежде в него шли и
+    # догадки правила «последнее число строки», которое брало номера позиций и
+    # количество. Поэтому здесь берётся файл, где есть либо строгая цена, либо
+    # догадка: адресная часть документа от этого не зависит (номер заявки НАЙДЕН
+    # в присланном файле — это отдельное утверждение), но читатель обязан видеть
+    # разницу, и она печатается по каждому файлу отдельными числами.
     files = [i for s in idx["scopes"].values() for i in (s.get("inventory") or [])
-             if i.get("pns") and (i.get("priced") or 0) > 0
+             if i.get("pns")
+             and ((i.get("priced") or 0) > 0 or (i.get("price_guesses") or 0) > 0)
              and i.get("direction") in PRICED_DIRECTIONS]
 
     where: dict[str, list] = {}
@@ -179,8 +188,10 @@ def measure() -> dict:
             "we_already_have_price": has_price,
             "found_in": [{"deal": f.get("origin"), "file": f.get("file_name"),
                           "rows": f.get("rows"), "rows_with_price": f.get("priced"),
+                          "rows_with_price_guess": f.get("price_guesses"),
                           "direction": f.get("direction")}
-                         for f in sorted(got, key=lambda f: -(f.get("priced") or 0))[:4]],
+                         for f in sorted(got, key=lambda f: -((f.get("priced") or 0)
+                                                              + (f.get("price_guesses") or 0)))[:4]],
         }
         hits.append(item)
         if not has_price:
