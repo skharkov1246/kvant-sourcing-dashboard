@@ -531,6 +531,29 @@ def diagnose(rows: list, ours: dict, supp: dict | None = None,
         k = set(other)
         print(f"  {name}: {len(k)} артикулов · пересечение с заявкой: "
               f"{len(want & k)}")
+    # ГЛАВНЫЙ АГРЕГАТ ДЛЯ ЗАЩИТЫ: что письменные предложения поставщиков делают
+    # с НАШИМИ вилками по всей заявке, а не по сорока перепроверенным строкам.
+    # Печатаются только счётчики строк — сумм и цен в журнале быть не может
+    # (правило 17 CLAUDE.md), а вывод «наши вилки систематически низки» виден
+    # именно счётом.
+    if supp:
+        band = Counter()
+        for r in rows:
+            sp, _ = lookup(supp, r.get("pn"))
+            if not sp or sp.get("usd") is None:
+                continue
+            lo, hi = r.get("usd_lo"), r.get("usd_hi")
+            if lo in (None, "") or hi in (None, ""):
+                band["вилки по строке нет"] += 1
+                continue
+            offer = float(sp["usd"])
+            band["предложение выше потолка вилки" if offer > float(hi)
+                 else "предложение ниже пола вилки" if offer < float(lo)
+                 else "предложение внутри вилки"] += 1
+        if band:
+            print(f"  строк заявки с КП поставщика: {sum(band.values())}")
+            for k, v in band.most_common():
+                print(f"    {k}: {v}")
     if not want or not got:
         return
     # по началу номера: заказчик мог приписать суффикс учётной системы

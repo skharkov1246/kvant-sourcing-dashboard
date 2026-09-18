@@ -98,3 +98,33 @@ def test_строка_без_предложения_попадает_в_табл
     html = so.reverify_section(rows, {})
     assert "CC-3" in html
     assert "в файлах сделки этой строки нет" in html
+
+
+def test_агрегат_по_вилкам_печатает_только_счётчики(capsys):
+    """Журнал прогона публичный: в нём могут быть счётчики строк, но не цены.
+
+    Этот агрегат — главное число для защиты: он показывает, что письменные
+    предложения поставщиков делают с НАШИМИ вилками по всей заявке, а не по
+    сорока перепроверенным строкам. Поэтому он обязан быть и обязан быть без цен.
+    """
+    rows = [
+        {"pn": "AA-1", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+        {"pn": "BB-2", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+        {"pn": "CC-3", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+        {"pn": "DD-4", "usd_lo": None, "usd_hi": None, "qty": 1},
+    ]
+    def offer(usd):
+        return {"usd": usd, "raw_price": str(usd), "currency": "USD", "origin": "СП-166 1",
+                "field": "Offer from supplier", "file": "q.pdf", "row": "1", "sheet": "",
+                "rule": "", "direction": "входящее", "line": ""}
+    supp = {"AA1": offer(99.0), "BB2": offer(15.0), "CC3": offer(1.0), "DD4": offer(7.0)}
+    so.diagnose(rows, {}, supp, {})
+    out = capsys.readouterr().out
+    assert "строк заявки с КП поставщика: 4" in out
+    assert "предложение выше потолка вилки: 1" in out
+    assert "предложение внутри вилки: 1" in out
+    assert "предложение ниже пола вилки: 1" in out
+    assert "вилки по строке нет: 1" in out
+    # ни одной цены в журнале
+    for price in ("99", "15.0", "1.0", "7.0"):
+        assert price not in out.split("строк заявки с КП поставщика")[1]
