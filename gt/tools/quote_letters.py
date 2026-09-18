@@ -370,6 +370,7 @@ def build() -> dict:
                                     "наружу от нашего имени агент сам не станет."),
         "rows_to_maker": sum(len(v) for v in to_maker.values()),
         "usd_to_maker": round(sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
+        "usd_to_maker": round(sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
         "what_maker_letter_asks": ("Изготовителю задаётся не цена, а расшифровка внутреннего "
                                   "обозначения в коммерческий номер: по SP1xxxxx, CT9xxxx, "
                                   "RM13xxx и чертёжным позициям в открытом доступе нет ни "
