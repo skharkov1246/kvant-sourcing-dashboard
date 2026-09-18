@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 228,
-    "total_bytes": 102578127,
+    "datasets": 229,
+    "total_bytes": 102583104,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 128,
-      "публикуемо": 38
+      "публикуемо": 39
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 51,
+      "ГТУ-библиотека": 52,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -211,6 +211,7 @@
       },
       "referenced_by": [
         "gt/build.py",
+        "gt/tools/maker_basis.py",
         "library/load_crossrefs.py",
         "library/load_equipment.py",
         "pnw/tools/build_master.py",
@@ -218,8 +219,7 @@
         "scripts/build_dict.py",
         "scripts/build_node_map.py",
         "scripts/library_units_check.py",
-        "tests/test_core.py",
-        "tests/test_dict.py"
+        "tests/test_core.py"
       ]
     },
     {
@@ -289,12 +289,12 @@
         "gt/tools/collisions.py",
         "gt/tools/confidence_audit.py",
         "gt/tools/english_source.py",
+        "gt/tools/maker_basis.py",
         "gt/tools/rfq_en.py",
         "gt/tools/seller_groups.py",
         "gt/tools/ship_brand.py",
         "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_export.py"
+        "gt/tools/ship_decisions.py"
       ]
     },
     {
@@ -5071,7 +5071,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 75959,
+      "bytes": 76930,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5103,6 +5103,7 @@
         "gt/data/ship_energoseti.json",
         "gt/data/ship_english_source.json",
         "gt/data/ship_lukoil.json",
+        "gt/data/ship_maker_basis.json",
         "gt/data/ship_offer_stats.json",
         "gt/data/ship_questions.json",
         "gt/data/ship_recheck.json",
@@ -5114,12 +5115,11 @@
         "gt/data/ship_sweep.json",
         "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
         "gt/docs/ЗАПРОС-ЦЕН-АНГЛИЙСКИЙ.pdf",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf"
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "106c38c",
+      "last_commit": "f93b3e7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9557,6 +9557,46 @@
       },
       "referenced_by": [
         "zip/tools/aggregate_prices.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_maker_basis.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 4006,
+      "note": "Замер: на чём стоит «изготовитель» в gt/data/pn_db.json — на документе (таможенная декларация, открытый стандарт) или на догадке по классу изделия. Считает gt/tools/maker_basis.py. Поводом стали два опровержения 18.09.2026: масляному фильтру Fleetguard были приписаны четыре фильтровых дома «по типу», а наконечнику свечи Jenbacher — авиационный поставщик зажигания «типично»; оба раза изготовитель был выведен из класса, а не из документа. Содержит только счётчики и экспозицию по нашим же вилкам: ни цен контрагентов, ни персональных данных.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "classes",
+        "method",
+        "source",
+        "totals",
+        "updated",
+        "why"
+      ],
+      "main_collection": {
+        "key": "classes",
+        "records": 8,
+        "record_keys": [
+          "basis",
+          "rows_in_db",
+          "rows_in_request",
+          "usd_in_request",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "f93b3e7",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/maker_basis.py",
+        "gt/tools/ship_brief.py",
+        "tests/test_maker_basis.py"
       ]
     },
     {
