@@ -128,6 +128,39 @@ def our_prices(tkp_path: Path, rates: dict) -> dict:
     return prices_by_direction(tkp_path, rates)[0]
 
 
+DOUBLE_PN = re.compile(r"^(\d{6,7})-(\d{6,7})$")
+
+
+def keys_of(pn) -> list[str]:
+    """Ключи, под которыми строку стоит искать в файлах сделки.
+
+    Замер 18.09.2026: в пяти строках Jenbacher в поле артикула стоят ДВА номера
+    через дефис — старый и новый (404492-1214569, 334976-433894 и ещё три,
+    вместе 589 633 USD экспозиции). Составного номера не существует нигде, и
+    сопоставление по нему целиком не находило ничего, хотя в приложенных файлах
+    вполне может стоять один из двух номеров по отдельности.
+
+    Поэтому кроме полного ключа пробуем каждую половину. Порядок значим:
+    сперва полный, потом ВТОРОЙ номер (он действующий — по 334976-433894
+    установлено, что 433894 заменил 389588), потом первый.
+    """
+    raw = str(pn or "").strip()
+    out = [norm_key(raw)]
+    m = DOUBLE_PN.match(raw)
+    if m:
+        out.append(norm_key(m.group(2)))
+        out.append(norm_key(m.group(1)))
+    return [k for k in out if k]
+
+
+def lookup(d: dict, pn):
+    """Цена по строке заявки с учётом двойных номеров. Возвращает (цена, ключ)."""
+    for k in keys_of(pn):
+        if k in d:
+            return d[k], k
+    return None, ""
+
+
 def price_side(ours: dict, unk: dict) -> dict:
     """Левая часть документа: цена из файла сделки, с указанием поля.
 
@@ -185,8 +218,8 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
     supp = supp or {}
     joined = []
     for r in rows:
-        o = ours.get(norm_key(r["pn"]))
-        sp0 = supp.get(norm_key(r["pn"]))
+        o, okey = lookup(ours, r["pn"])
+        sp0, spkey = lookup(supp, r["pn"])
         # Строку берём, если есть ХОТЬ ОДНА цена из файлов сделки — наша или
         # присланная поставщиком. Прежде требовалась именно наша, и прогон по
         # «НВН» выдал пустой документ при 167 артикулах заявки, покрытых
@@ -194,6 +227,9 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
         # контрагента по этой самой заявке.
         if not o and not sp0:
             continue
+        # если нашлось по половине двойного номера — это надо видеть в документе
+        halfkey = next((k for k in (okey, spkey)
+                        if k and k != norm_key(r["pn"])), "")
         if not o:
             o = {"usd": None, "raw_price": "", "currency": "",
                  "direction": "", "field": "", "file": "", "origin": "",
@@ -216,6 +252,7 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
         room = (o["usd"] - mk) if (mk is not None and o["usd"] is not None) else None
         joined.append({"r": r, "o": o, "mk": mk, "web": web, "offer": offer,
                        "sp": sp, "src": src, "qty": qty, "room": room,
+                       "halfkey": halfkey,
                        "room_total": (room * qty) if room is not None else None})
 
     withours = [j for j in joined if j["o"]["usd"] is not None]
@@ -271,7 +308,10 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
     ]
 
     cols = [
-        ("Артикул", 9, lambda j: f'<span class="pn">{E(j["r"]["pn"])}</span>'),
+        ("Артикул", 9, lambda j: (f'<span class="pn">{E(j["r"]["pn"])}</span>'
+                                  + (f'<br><span class="bad">найдено по '
+                                     f'{E(j["halfkey"])}</span>'
+                                     if j.get("halfkey") else ""))),
         ("Наименование", 18, lambda j: E((j["r"].get("name") or "")[:120])),
         ("Кол-во", 4, lambda j: ru(j["qty"])),
         ("Выставлено, USD/шт", 7,
@@ -362,7 +402,13 @@ def diagnose(rows: list, ours: dict, supp: dict | None = None,
     CLAUDE.md), а номенклатурные номера в репозитории и так открыты.
     """
     want = {norm_key(r["pn"]) for r in rows if r.get("pn")}
+    # у двойных номеров считаем и половины, иначе покрытие занижается
+    want_any = {k for r in rows if r.get("pn") for k in keys_of(r["pn"])}
     got = set(ours)
+    if want_any != want:
+        print(f"  строк с двойным номером: "
+              f"{sum(1 for r in rows if DOUBLE_PN.match(str(r.get('pn') or '')))}"
+              f" · пересечение с учётом половин: {len(want_any & got)}")
     print(f"  артикулов в заявке: {len(want)} · извлечено из файлов: {len(got)} "
           f"· пересечение точное: {len(want & got)}")
     # ПОКРЫТИЕ ПО КП ПОСТАВЩИКОВ измеряется отдельно, и это не мелочь: прогон по
