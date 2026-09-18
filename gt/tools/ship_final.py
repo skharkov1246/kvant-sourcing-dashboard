@@ -181,6 +181,7 @@ def build() -> str:
     cov = load("ship_coverage.json") or {}
     und = load("ship_underpriced.json") or {}
     ovr = load("ship_overpriced.json") or {}
+    mrg = load("ship_margin.json") or {}
     # Номера, по которым предложение поставщика уже лежит в нашем вложении.
     # Без них строка без цены уходила в «не берём» как «цены нет ни у кого».
     in_house = {key(r.get("pn")) for r in (inq.get("rows") or [])}
@@ -384,6 +385,40 @@ def build() -> str:
       f"<span class='k'>{ru(len(lk) - len(priced_rows))}</span> строк оценки нет вовсе, и в эту "
       f"сумму они не входят: следовательно {ru(total_expo)} — это нижняя граница объёма заявки, "
       f"а не весь её объём.</p>")
+    if mrg:
+        c, b = mrg["countable"], mrg["bias_warning"]
+        a("<p class='k'>Объём продаж и объём закупки — прямым ответом.</p>")
+        a(f"<p><b>Объём продаж: {ru(mrg['sales_usd'])} долларов США</b> по "
+          f"{ru(mrg['sales_rows'])} строкам, где наша цена названа. <b>Объём закупки по заявке "
+          f"назвать нельзя</b>, и это не пробел отчёта, а состояние дел: сложить закупку можно "
+          f"только по <b>{ru(c['rows'])}</b> строкам — {ru(c['share_of_sales'])} % объёма "
+          f"продаж. По остальным закупочная цена либо не найдена вовсе "
+          f"({ru(mrg['by_grade']['закупочной цены нет']['share_of_sales'])} % объёма), либо найдена в "
+          f"виде, за который никто не продаст: запрос брокера, витрина одного оператора под "
+          f"двумя доменами, цена без подтверждённого покрытия количества.</p>")
+        a("<table><thead><tr><th>годность закупочной цены</th><th class='n'>строк</th>"
+          "<th class='n'>продажи, USD</th><th class='n'>закупка, USD</th>"
+          "<th class='n'>доля продаж</th><th>что это значит</th></tr></thead><tbody>")
+        for name, v in mrg["by_grade"].items():
+            if not v["rows"]:
+                continue
+            a(f"<tr><td class='k'>{E(name)}</td><td class='n'>{ru(v['rows'])}</td>"
+              f"<td class='n'>{ru(v['sales_usd'])}</td>"
+              f"<td class='n'>{ru(v['purchase_usd']) if v['purchase_usd'] else '—'}</td>"
+              f"<td class='n'>{ru(v['share_of_sales'])} %</td>"
+              f"<td>{E(v['what_it_means'])}</td></tr>")
+        a("</tbody></table>")
+        w = b.get("largest_single_row") or {}
+        a(f"<p class='dim'><b>Оговорка, без которой числа из этой таблицы вредны.</b> Сальдо "
+          f"счётной доли — {ru(c['margin_usd'])} USD ({ru(c['margin_pct'])} %) — НЕ является "
+          f"маржой сделки. Выборка смещена по построению: полное покрытие объёма подтверждается "
+          f"там, где мы специально спрашивали продавца, а спрашивали по дорогим и спорным "
+          f"строкам. Из {ru(c['rows'])} строк продажа выше закупки в "
+          f"{ru(b['rows_sales_above_purchase'])}, ниже в {ru(b['rows_sales_below_purchase'])}, а "
+          f"всё сальдо делает одна строка — {E(w.get('pn'))}: продажа {ru(w.get('sales_usd'))} "
+          f"против закупки {ru(w.get('purchase_usd'))}. Говорит эта таблица одно: закупочная "
+          f"сторона заявки не измерена, и это главная незакрытая работа, а не итог по "
+          f"марже.</p>")
     a(f"<p>Поштучно разобрано <span class='k'>{ru(len(rvs))}</span> строк, что покрывает "
       f"<span class='k'>{ru(done_expo)} долларов США</span> "
       f"({pct(100 * done_expo / total_expo if total_expo else 0)} % оценённой части "
