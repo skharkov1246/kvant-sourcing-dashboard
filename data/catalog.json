@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 244,
-    "total_bytes": 109767781,
+    "datasets": 245,
+    "total_bytes": 109777067,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 135,
-      "публикуемо": 47
+      "публикуемо": 48
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 67,
+      "ГТУ-библиотека": 68,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -5102,7 +5102,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 92977,
+      "bytes": 94285,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5143,14 +5143,14 @@
         "gt/data/ship_lukoil.json",
         "gt/data/ship_maker_basis.json",
         "gt/data/ship_offer_stats.json",
+        "gt/data/ship_overpriced.json",
         "gt/data/ship_parts_lists.json",
         "gt/data/ship_price_substitutions.json",
-        "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json"
+        "gt/data/ship_questions.json"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "a56baa0",
+      "last_commit": "e158699",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9615,6 +9615,57 @@
       },
       "referenced_by": [
         "gpu/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_overpriced.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 7978,
+      "note": "Проверка наоборот к заниженным строкам: где наш ПОЛ кратно выше найденной цены. Риск здесь не в деньгах, а в сделке — закупщик заказчика сверяет позиции с рынком выборочно, и одна позиция дороже рынка на порядок ставит под сомнение всё предложение (разбор выкладки по ЛУКОЙЛу это уже показал). Замер вышел небольшим: 7 строк на 18 506 USD при пороге трёхкратного превышения. Порог назван числом намеренно — наценка на логистику, растаможку и гарантию нормальна и измеряется разами, поэтому обвинением служит только кратность, и её можно оспорить. Разряды те же, что у заниженных: одна цена одного брокера рынком не является ни в ту сторону, ни в другую. Считает gt/tools/ship_overpriced.py, читает отчёт gt/tools/ship_final.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "our_exposure_usd",
+        "rows",
+        "rows_total",
+        "skipped",
+        "source",
+        "threshold_times",
+        "tiers",
+        "updated",
+        "what_it_is",
+        "what_it_is_not"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 7,
+        "record_keys": [
+          "found_kind",
+          "found_unit",
+          "name",
+          "our_exposure",
+          "our_hi",
+          "our_lo",
+          "pn",
+          "qty",
+          "sheet",
+          "source",
+          "tier",
+          "times",
+          "why_tier"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "e158699",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_overpriced.py"
       ]
     },
     {
