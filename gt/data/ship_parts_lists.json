@@ -10541,6 +10541,2219 @@
      "independent_sources": 1
     }
    ]
+  },
+  "Буровое оборудование (лист НВН)": {
+   "machine": "Буровое оборудование (лист НВН)",
+   "lists": [
+    {
+     "url": "https://www.scribd.com/document/895476948/Drillmec-Spare-Parts-Price-List-2015-Euro",
+     "title": "DRILLMEC SPARE PARTS PRICE LIST 2015 — прейскурант завода Drillmec S.p.A. (284 страницы)",
+     "rows_total": 14745,
+     "currency_note": "Цены есть и они заводские. Шапка листа: «P/N Description Unit price - €». Разделитель проверен на самом листе: точка отделяет тысячи, запятая — центы. Доказательства с одной и той же страницы: «01810411 Safety plate 6,00» и «01810412 Safety plate 4,00» (предохранительная пластина за 6 и 4 евро) против «01170411 POWER PACK 35.100,00» (силовая установка за 35 100 евро) и «01810109 CASING MAKE UP 43.350,00». Читать «35.100,00» как 35,1 евро или «6,00» как 600 евро нельзя. Цены 2015 года и указаны за единицу без НДС и доставки.",
+     "what_it_is": "Официальный прейскурант запасных частей Drillmec S.p.A. (Podenzano, Италия) на 2015 год: 14 745 строк вида «номер — наименование — цена за единицу в евро». Выложен третьим лицом на Scribd. Это цена изготовителя, а не подтверждённое наличие: остатков и сроков в документе нет."
+    },
+    {
+     "url": "https://drillingbase.com/supply-drillmec-12t1600-mud-pump-parts-2026/",
+     "title": "Supply Drillmec 12T1600 Mud Pump Parts 2026 — DrillingBase.com",
+     "rows_total": 536,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перепечатка заводской ведомости бурового насоса Drillmec 12T1600 у торговца буровым оборудованием DrillingBase (Китай). Колонки: позиция — номер — количество — наименование. Та же ведомость выложена на willwaytech.com (aid=2214) и yppetro.com; тексты строк совпадают дословно."
+    },
+    {
+     "url": "https://willwaytech.com/?m=home&c=View&a=index&aid=2214&lang=en",
+     "title": "Drillmec 12T1600 Triplex Mud Pump Parts List Manual — Shandong Willway Petroleum",
+     "rows_total": 688,
+     "currency_note": "Цен нет. Колонок цены и валюты на странице нет; поиск по образцу «валюта + число» дал нуль совпадений.",
+     "what_it_is": "Полное руководство по запасным частям бурового насоса Drillmec 12T1600, разложенное по сборочным группам (клапанная коробка, охлаждение втулок, шестерня и вал, коленчатый вал, смазка и т.д.). Выложено китайским поставщиком Shandong Willway Petroleum в разделе «Inventory». Страница найдена сплошным перебором адресов вида ?aid=N, по названию поиск её не отдаёт."
+    },
+    {
+     "url": "https://www.yppetro.com/Drillmec-12T1600-Triplex-Mud-Pump-Parts-List-Manual-id42906906.html",
+     "title": "Drillmec 12T1600 Triplex Mud Pump Parts List Manual — Hebei Yingpai Import Export Trading",
+     "rows_total": 536,
+     "currency_note": "Цен нет: строки состоят из позиции, номера, количества и наименования.",
+     "what_it_is": "Третья перепечатка той же заводской ведомости 12T1600, у другого китайского торговца. Ценность — независимое подтверждение написания номеров."
+    },
+    {
+     "url": "https://drillingbase.com/supply-drillmec-7ts600-triplex-mud-pump-spare-parts-2026/",
+     "title": "Supply Drillmec 7TS600 Triplex Mud Pump Spare Parts 2026 — DrillingBase.com",
+     "rows_total": 782,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Заводская ведомость ЗИП бурового насоса Drillmec 7TS600 с раскрытием ремкомплектов RI… по подпозициям («9.C RI40390738-03 1 Spring»). Подтверждает правило: RI<узел>-NN — запасная позиция NN этого узла."
+    },
+    {
+     "url": "https://drillingbase.com/varco-tesco-top-drive-spare-parts/",
+     "title": "VARCO TESCO TOP DRIVE SPARE PARTS — DrillingBase.com",
+     "rows_total": 388,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Двуязычная (русская и английская) ведомость ЗИП верхних приводов Varco и Tesco, разбитая на лоты — по виду это перечень из тендерной документации российского бурового подрядчика. Колонки: номер строки, наименование по-русски, изготовитель, наименование по-английски, номер, количество."
+    },
+    {
+     "url": "https://drillingbase.com/tianyi-top-drive-system-parts/",
+     "title": "Tianyi Top Drive System Parts — DrillingBase.com",
+     "rows_total": 106,
+     "currency_note": "Цен нет. Единственное срабатывание поиска на валюту — слово «ЛОТ» рядом с числами в сводной строке; колонки цены в перечне нет, есть колонка количества.",
+     "what_it_is": "Такой же двуязычный лотовый перечень ЗИП верхнего привода; покрывает позиции Tesco, которых нет в предыдущем."
+    },
+    {
+     "url": "https://drillingbase.com/tesco-tds-parts-2602/",
+     "title": "TESCO TDS Parts 2602 — DrillingBase.com",
+     "rows_total": 307,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Номенклатурный перечень запасных частей верхних приводов Tesco: номер и наименование с размерами."
+    },
+    {
+     "url": "https://drillingbase.com/varco-tds-parts-0606/",
+     "title": "VARCO TDS Parts 0606 — DrillingBase.com",
+     "rows_total": 2639,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Крупный номенклатурный перечень запасных частей верхних приводов Varco TDS (2 639 строк «номер — наименование»)."
+    },
+    {
+     "url": "https://drillingbase.com/varco-tds-8sa-parts-0708/",
+     "title": "VARCO TDS 8SA Parts 0708 — DrillingBase.com",
+     "rows_total": 125,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Ведомость ЗИП верхнего привода Varco TDS-8SA с количествами на комплект: «поз. — наименование — номер — ед. — кол-во»."
+    },
+    {
+     "url": "https://drillingbase.com/varco-top-drive-system-tds-spare-parts-list-1622/",
+     "title": "VARCO Top Drive System TDS Spare Parts List 1622 — DrillingBase.com",
+     "rows_total": 279,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень ЗИП верхнего привода Varco TDS с расшифровкой фильтроэлементов и их тонкости фильтрации."
+    },
+    {
+     "url": "https://drillingbase.com/nov-varco-parts-2302/",
+     "title": "NOV VARCO Parts 2302 — DrillingBase.com",
+     "rows_total": 247,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Нумерованный перечень запасных частей National Oilwell Varco с наименованием и указанием подразделения-поставщика."
+    },
+    {
+     "url": "https://drillingbase.com/nov-st-80st-80c-iron-rougllneck-parts-list/",
+     "title": "NOV ST-80/ST-80C Iron Roughneck Parts List — DrillingBase.com",
+     "rows_total": 336,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Ведомость ЗИП автоматического бурового ключа NOV ST-80/ST-80C — машина листа НВН «Ключ трубный гидравлический ST-80»."
+    },
+    {
+     "url": "https://drillingbase.com/supply-nov-12p160-triplex-mud-pump-parts-2026/",
+     "title": "Supply NOV 12-P-160 Triplex Mud Pump Parts 2026 — DrillingBase.com",
+     "rows_total": 657,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Заводская ведомость бурового насоса National Oilwell 12-P-160 с номерами позиций сборочных чертежей; позиция 150 в ней — та же, что записана у нас в строке заявки «PL 1292000 п. 150»."
+    },
+    {
+     "url": "https://drillingbase.com/nov-varco-tds-10sa-parts/",
+     "title": "NOV VARCO TDS-10SA Parts — DrillingBase.com",
+     "rows_total": 247,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Двуязычный перечень ЗИП верхнего привода TDS-10SA, включая покупные модули WAGO."
+    },
+    {
+     "url": "https://drillingbase.com/drillingbase-drilling-rig-parts-2201/",
+     "title": "Drillingbase Drilling Rig Parts 2201 — DrillingBase.com",
+     "rows_total": 2008,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Двуязычный перечень ЗИП буровой установки на 2 008 позиций со ссылками на руководства по эксплуатации (D231000499-MAN-001, V4154-Z-MC-001) — по виду перечень из тендерной документации. Закрывает номера лебёдки NOV."
+    },
+    {
+     "url": "https://drillingbase.com/drillingbase-drilling-rig-parts-2905/",
+     "title": "Drillingbase Drilling Rig Parts 2905 — DrillingBase.com",
+     "rows_total": 1363,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень ЗИП буровой установки с уплотнениями и прокладками устьевого оборудования."
+    },
+    {
+     "url": "https://drillingbase.com/drilling-equipment-parts-list-2/",
+     "title": "Drilling Equipment Parts List 2 — DrillingBase.com",
+     "rows_total": 902,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Складской перечень бурового оборудования: наименование в формате «вид, изготовитель, номер, описание»."
+    },
+    {
+     "url": "https://drillingbase.com/drilling-equipment-parts-list-42/",
+     "title": "Drilling Equipment Parts List 42 — DrillingBase.com",
+     "rows_total": 839,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "То же по другой букве перечня."
+    },
+    {
+     "url": "https://drillingbase.com/drilling-equipment-parts-list-53/",
+     "title": "Drilling Equipment Parts List 53 — DrillingBase.com",
+     "rows_total": 527,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "То же; содержит уплотнительные кольца системы крышки клапана P-Quip с указанием номера позиции на чертеже."
+    },
+    {
+     "url": "https://drillingbase.com/koomey-accumulator-parts-list-9/",
+     "title": "Koomey Accumulator Parts List 9 — DrillingBase.com",
+     "rows_total": 1129,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень ЗИП гидравлической станции управления превенторами Koomey на 1 129 позиций."
+    },
+    {
+     "url": "https://drillingbase.com/cost-estimation-list-of-spares-of-koomey-unit-type80-model-t20150-3s/",
+     "title": "Cost Estimation List of Spares of Koomey Unit Type80 Model T20150-3S — DrillingBase.com",
+     "rows_total": 110,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Смета на ЗИП станции управления превенторами Koomey T20150-3S. Несмотря на слово «cost» в заголовке, колонка цены на выложенной странице пустая."
+    },
+    {
+     "url": "https://drillingbase.com/mi-swaco-parts-list/",
+     "title": "MI SWACO Parts List — DrillingBase.com",
+     "rows_total": 39,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Короткая ведомость ЗИП оборудования очистки бурового раствора MI SWACO: изготовитель, наименование, номер, количество."
+    },
+    {
+     "url": "https://drillingbase.com/mi-swaco-fvs-518-centrifugal-spare-parts/",
+     "title": "MI SWACO FVS 518 Centrifugal Spare Parts — DrillingBase.com",
+     "rows_total": 139,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Номенклатурный перечень запасных частей центрифуги MI SWACO 518 — машина листа НВН «Центрифуга 518 VSB»."
+    },
+    {
+     "url": "https://drillingbase.com/soild-control-equipment-parts-list/",
+     "title": "Solid Control Equipment Parts List — DrillingBase.com",
+     "rows_total": 193,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень ЗИП оборудования очистки бурового раствора."
+    },
+    {
+     "url": "https://drillingbase.com/hh-zj40-rig-spare-parts/",
+     "title": "HH ZJ40 RIG SPARE PARTS — DrillingBase.com",
+     "rows_total": 113,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Двуязычный перечень ЗИП буровой установки ZJ40, в том числе центробежных насосов Mission/Supreme."
+    },
+    {
+     "url": "https://drillingbase.com/hsb-centrifugal-pump-parts-list/",
+     "title": "HSB Centrifugal Pump Parts List — DrillingBase.com",
+     "rows_total": 221,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Ведомость ЗИП центробежного насоса с размерами уплотнений."
+    },
+    {
+     "url": "https://drillingbase.com/gardner-denver-2500q-standard-fluid-end-parts-list/",
+     "title": "Gardner Denver 2250/2500Q Standard Fluid End Parts List — DrillingBase.com",
+     "rows_total": 703,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Заводская ведомость гидравлической части насоса Gardner Denver 2500Q (наследие Dowell/Schlumberger): «поз. — наименование — кол-во — номер»."
+    },
+    {
+     "url": "https://drillingbase.com/demco-gate-valve-parts-list-1/",
+     "title": "DEMCO Gate Valve Parts List 1 — DrillingBase.com",
+     "rows_total": 610,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Ведомость запасных частей шиберных задвижек DEMCO с базовыми номерами сборок."
+    },
+    {
+     "url": "https://drillingbase.com/shaffer-gate-valve-type-b/",
+     "title": "Shaffer Gate Valve Type B — DrillingBase.com",
+     "rows_total": 36,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Ведомость запасных частей шиберной задвижки Shaffer типа B: одна строка — одна деталь, по колонке на типоразмер."
+    },
+    {
+     "url": "https://drillingbase.com/md-totco-parts/",
+     "title": "M/D Totco Parts — DrillingBase.com",
+     "rows_total": 105,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень запасных частей контрольно-измерительных средств M/D Totco."
+    },
+    {
+     "url": "https://drillingbase.com/parker-d1vwee-parts-list/",
+     "title": "Parker D1VW EE Parts List — DrillingBase.com",
+     "rows_total": 129,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень моделей и запасных частей гидравлики Parker; поршневые насосы серии PV перечислены только обозначением модели, без наименования."
+    },
+    {
+     "url": "https://drillingbase.com/drilling-rig-parts-list-290/",
+     "title": "Drilling Rig Parts List 290 — DrillingBase.com",
+     "rows_total": 514,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень ЗИП буровой установки с электротехникой ABB: номер, наименование платы, изготовитель, количество."
+    },
+    {
+     "url": "https://drillingbase.com/drillingbase-drilling-rig-parts-list-1550/",
+     "title": "Drillingbase Drilling Rig Parts List 1550 — DrillingBase.com",
+     "rows_total": 339,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень ЗИП буровой установки, электротехника ABB по парам «номер — обозначение изделия»."
+    },
+    {
+     "url": "https://drillingbase.com/supply-oilfield-parts-1306/",
+     "title": "Supply Oilfield Parts 1306 — DrillingBase.com",
+     "rows_total": 1128,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Складской перечень нефтепромысловых запасных частей с электротехникой ABB."
+    },
+    {
+     "url": "https://drillingbase.com/drillingbase-drilling-rig-electrical-parts-list-2/",
+     "title": "Drillingbase Drilling Rig Electrical Parts List 2 — DrillingBase.com",
+     "rows_total": 1267,
+     "currency_note": "Цен нет. На странице колонок цены и валюты нет вовсе: поиск по образцу «валюта + число» и «число + валюта» дал нуль совпадений. Разделитель разрядов проверять не на чем.",
+     "what_it_is": "Перечень электротехнических запасных частей буровой установки (силовые модули, преобразователи)."
+    },
+    {
+     "url": "https://drillingbase.com/ge-electric-parts-1904/",
+     "title": "GE Electric Parts 1904 — DrillingBase.com",
+     "rows_total": 2302,
+     "currency_note": "Цен по нашей позиции нет. На странице есть ровно одна запись с ценой и она о другом изделии: «General Electric ge0512h 922b angle plugs $10perlot». По контактору MCRA040AT цены нет.",
+     "what_it_is": "Складской перечень электротехники General Electric."
+    },
+    {
+     "url": "https://drillingbase.com/supply-drilling-rig-spare-parts-3101/",
+     "title": "Supply Drilling Rig Spare Parts 3101 — DrillingBase.com",
+     "rows_total": 2396,
+     "currency_note": "Цен по нашей позиции нет. На странице есть четыре записи с ценой, и все четыре — по контроллерам Allen-Bradley: «AB 1784-CF64，plcc $102», «1756-OB32A，plcc $293», «1756-IC16A，plcc $511», «1756-PA72/C，plcc $1,397.00». По блоку ABB 1SBN010010R1010 цены нет.",
+     "what_it_is": "Сводный перечень запасных частей буровой установки на 2 396 позиций."
+    },
+    {
+     "url": "http://www.drillingsolutionsltd.com/drawwork-critical-parts.html",
+     "title": "DRAWWORK CRITICAL PARTS — Drilling Solutions Limited",
+     "rows_total": 64,
+     "currency_note": "Цен нет. Колонки листа: SL # | Qty | Unit | P/N # | Maker | Description. Колонки цены нет, валютных записей ноль.",
+     "what_it_is": "Ведомость критических запасных частей буровой лебёдки у ремонтного предприятия Drilling Solutions Limited: по каждой строке номер, изготовитель и наименование, отдельным разделом — шкаф управления лебёдкой. Закрывает номера лебёдки NOV SSGD-500."
+    },
+    {
+     "url": "http://www.drillingsolutionsltd.com/kdc-rig28-electrical-parts-list.html",
+     "title": "KDC Rig 28 Electrical Parts List — Drilling Solutions Limited",
+     "rows_total": 107,
+     "currency_note": "Цен нет: колонки — наименование, обозначение, количество, единица.",
+     "what_it_is": "Ведомость электротехнических запасных частей буровой установки KDC Rig 28, включая светосигнальную арматуру Schneider ZBV."
+    },
+    {
+     "url": "http://www.drillingsolutionsltd.com/abb-2cds21200.html",
+     "title": "ABB 2CDS… modular circuit breakers — Drilling Solutions Limited",
+     "rows_total": 109,
+     "currency_note": "Цен нет: строки состоят из заказного номера и обозначения изделия.",
+     "what_it_is": "Складской перечень модульных автоматических выключателей ABB серии S200: заказной номер 2CDS… и обозначение (S201-C2, S202-K20 и т. д.)."
+    },
+    {
+     "url": "http://www.drillingsolutionsltd.com/abb-3a.html",
+     "title": "ABB 3A… parts — Drilling Solutions Limited",
+     "rows_total": 297,
+     "currency_note": "Цен нет: одна колонка — «ABB» и заказной номер.",
+     "what_it_is": "Складской перечень изделий ABB с номерами серий 3AUA/3AXD/3AUC."
+    },
+    {
+     "url": "http://www.drillingsolutionsltd.com/electronics-instock-list.html",
+     "title": "Electronics In Stock List — Drilling Solutions Limited",
+     "rows_total": 5871,
+     "currency_note": "Цен нет: перечень состоит только из обозначений и количеств.",
+     "what_it_is": "Складской перечень электроники ремонтного предприятия: обозначение изделия и количество на складе. Это заявленное наличие без цены и срока."
+    },
+    {
+     "url": "http://www.drillingsolutionsltd.com/16784.html",
+     "title": "General Electric contactors and relays list — Drilling Solutions Limited",
+     "rows_total": 2178,
+     "currency_note": "Цен нет: одна колонка обозначений.",
+     "what_it_is": "Номенклатурный перечень контакторов и реле General Electric (обозначения MCR…, MARN…)."
+    },
+    {
+     "url": "https://willwaytech.com/?m=home&c=View&a=index&aid=2453&lang=en",
+     "title": "BOP control unit spare parts list — Shandong Willway Petroleum",
+     "rows_total": 304,
+     "currency_note": "Цен нет: колонки — номер строки, номер, наименование, количество.",
+     "what_it_is": "Ведомость ЗИП станции управления превенторами у китайского поставщика Willway. Найдена сплошным перебором адресов ?aid=N."
+    },
+    {
+     "url": "https://willwaytech.com/?m=home&c=View&a=index&aid=2258&lang=en",
+     "title": "INGERSOLL RAND FA5A winch parts list — Shandong Willway Petroleum",
+     "rows_total": 111,
+     "currency_note": "Цены заявлены колонкой, но их нет. Шапка листа буквально: «LINE PART NUMBER DESCRIPTION Unit price» — колонка Unit price есть, но пустая во всех 111 строках, ни одного числа и ни одного знака валюты.",
+     "what_it_is": "Ведомость запасных частей пневматической лебёдки Ingersoll Rand FA5A — ровно та машина, что стоит в листе НВН. Перепечатка с сайта Drilling Solutions (в тексте сохранена подпись «Posted on December 18, 2024 by Drilling Solutions»)."
+    },
+    {
+     "url": "https://willwaytech.com/?m=home&c=View&a=index&aid=2361&lang=en",
+     "title": "Well control equipment parts list — Shandong Willway Petroleum",
+     "rows_total": 203,
+     "currency_note": "Цен нет: колонки — номер строки, наименование по API, номер, типоразмер, количество.",
+     "what_it_is": "Ведомость ЗИП противовыбросового оборудования: задвижки типа DB 3-1/8\" 5 000 psi, шиберы и сёдла с обозначениями по API 6A."
+    },
+    {
+     "url": "https://willwaytech.com/?m=home&c=View&a=index&aid=2302&lang=en",
+     "title": "Decanter centrifuge 518 parts list — Shandong Willway Petroleum",
+     "rows_total": 27,
+     "currency_note": "Цен нет: колонки — номер строки, наименование, номер, описание, единица, количество, модель.",
+     "what_it_is": "Ведомость ЗИП центрифуги 518 (в строках стоит признак модели «518HV»), включая крепёж скребков."
+    },
+    {
+     "url": "https://willwaytech.com/?m=home&c=View&a=index&aid=2679&lang=en",
+     "title": "Wellhead equipment parts list — Shandong Willway Petroleum",
+     "rows_total": 34,
+     "currency_note": "Цен нет: колонки — наименование, изготовитель, номер, количество.",
+     "what_it_is": "Перечень запасных частей устьевого оборудования, в том числе подвесок НКТ VetcoGray."
+    },
+    {
+     "url": "https://www.tdsparts.com/novvarco-top-drive-spare-parts-list-product/",
+     "title": "NOV(VARCO) Top Drive Spare Parts LIST — VS (tdsparts.com)",
+     "rows_total": 359,
+     "currency_note": "Цен нет. Вместо цены на странице стоит «Price and delivery: Contact us for a quotation»; числовых записей цены ноль.",
+     "what_it_is": "Номенклатурный перечень запасных частей верхних приводов у китайского поставщика VS: номер и наименование. Часть строк — крепёж Tesco с полной резьбовой характеристикой, часть — только номер без наименования."
+    },
+    {
+     "url": "https://www.tdsparts.com/top-drive-partsvalvecontrolvalvechecktds9sa-valve%EF%BC%8Cvalvebody%EF%BC%8Ccartridgevalve-product/",
+     "title": "Top drive parts — valve, control valve, check valve — VS (tdsparts.com)",
+     "rows_total": 353,
+     "currency_note": "Цен нет: у изделия стоит «Contact us for a quotation», числовых записей цены на странице ноль.",
+     "what_it_is": "Перечень номеров клапанов верхних приводов у того же поставщика. Наименования даны не ко всем номерам."
+    },
+    {
+     "url": "https://www.tdsparts.com/hydraulic-cylinder-assembly-pn-125594-3019592-110703-110704-of-varco-top-drive-tds-11sa-for-counterbalance-and-ibop-actuator-and-link-tilting-product/",
+     "title": "Hydraulic cylinder assembly for Varco top drive — VS (tdsparts.com)",
+     "rows_total": 267,
+     "currency_note": "Цен нет: «Contact us for a quotation», числовых записей цены ноль.",
+     "what_it_is": "Перечень гидроцилиндров и сопутствующих узлов верхних приводов Varco с наименованиями."
+    },
+    {
+     "url": "https://www.scribd.com/document/652033831/cameron-d-dl-annular-bop-catalog",
+     "title": "Cameron D and DL Annular BOP — Replacement Parts Catalog TC1001-04 (© 2004 Cooper Cameron)",
+     "rows_total": 226,
+     "currency_note": "Цен нет. Таблицы устроены как «поз. — наименование — кол-во и номер по каждому типоразмеру и рабочему давлению»; колонки цены нет, валютных записей ноль.",
+     "what_it_is": "Заводской каталог запасных частей универсальных (кольцевых) превенторов Cameron типа D и DL. Наши позиции стоят в колонке 18-3/4\" 5 000 psi. Каталог прямо оговаривает: номера даны для типовой сборки, по конкретному изделию их надо сверять — это предупреждение изготовителя, а не наша оговорка."
+    },
+    {
+     "url": "https://gkunicom.ru/upload/iblock/bcd/h5rsj0x7jahajfkretn26gsyj5wq7xhn.pdf",
+     "title": "Marflex b.v. Installation and maintenance manual (516 страниц, раздел 7 «Advised spare parts»)",
+     "rows_total": 139,
+     "currency_note": "Цен на детали нет. Слово EUR встречается в документе семь раз и все семь — в общих условиях поставки (неустойка «EUR 25,000», ступени вознаграждения при взыскании «on the first EUR 3,000 15%»). В самих ведомостях ЗИП колонок цены нет: там номер, наименование и потребность на группу насосов.",
+     "what_it_is": "Заводское руководство Marflex b.v. по монтажу и обслуживанию грузовых насосов. Раздел 7 — ведомости рекомендованного ЗИП по типоразмерам головных частей (MDP-B, MDP-G и т.д.): «Part number — Description — Qty», а в шапке — номера комплектов ЗИП (900430, 900431 …) на 1-6, 7-12 и 13-24 насоса. Тот же текст независимо подтверждается копией руководства на Scribd (документ 691978244)."
+    },
+    {
+     "url": "http://www.drillingsolutionsltd.com/ge-iec-controls-and-power-electronics.html",
+     "title": "GE IEC Controls and Power Electronics — Drilling Solutions Limited",
+     "rows_total": 8821,
+     "currency_note": "Цен нет: строка состоит из каталожного обозначения и номера изделия, колонки цены нет, валютных записей ноль.",
+     "what_it_is": "Номенклатурный каталог аппаратов управления и силовой электроники General Electric серии 077: пара «каталожное обозначение — номер изделия». Наименований в перечне нет."
+    }
+   ],
+   "pns_matched": 129,
+   "pns_confirmed_by_two_or_more": 0,
+   "pns_that_were_not_found": 71,
+   "usd_exposure_matched": 92235.0,
+   "usd_exposure_that_was_not_found": 56576.5,
+   "by_source": {
+    "willwaytech.com": 6,
+    "scribd.com": 32,
+    "drillingbase.com": 57,
+    "drillingsolutionsltd.com": 21,
+    "tdsparts.com": 5,
+    "gkunicom.ru": 8
+   },
+   "not_found_in_lists": 290,
+   "notes": "ПОРЯДОК. Сначала карты сайтов, потом сплошной перебор адресов, поиск по названию — в последнюю очередь. Снято целиком: drillingbase.com (3 923 адреса из карты сайта), tdsparts.com (3 255), willwaytech.com (сплошной перебор ?aid=1..3600, 3 204 живых страницы), yppetro.com (2 025), drillingsolutionsltd.com (8 856 из 10 758 адресов карты сайта на момент сборки отчёта). Две самые ценные находки взяты именно перебором, а не поиском: заводское руководство по ЗИП Drillmec 12T1600 на willwaytech.com (?aid=2214) и ведомость Ingersoll Rand FA5A (?aid=2258) — по названию поисковая выдача их не отдаёт. НЕ ОТКРЫЛОСЬ. globalpartsservice.com — соединение сброшено (curl 35), 0 байт, ни одной страницы. pdfcoffee.com/cr191117e-spare-parts-pdf-free.html — 403, отдана страница проверки браузера. boptech.cn (собственный сайт Drilltech Manufacturing, Цанчжоу) — имя не разрешается (DNS), 0 байт: это единственный вероятный держатель ряда 60118154xx, и он недоступен. drilltech.goldsupplier.com/168099-BOP-Spare-Parts/ — соединение не установилось (000), при этом корень drilltech.goldsupplier.com открылся (200). web.archive.org: запрос к индексу CDX по boptech.cn оборвался по таймауту 30 с. Карты сайта отсутствуют (404) у amasenergy.com, nordanmarine.com, bigblueoceanmarine.com, spares-for-pumps.com, vespion.com. drillingsolutionsltd.com по HTTPS не отвечает вовсе (000) — снят только по HTTP; при контрольной перевыборке три страницы (abb-3a.html, abb-2cds21200.html, electronics-instock-list.html) ответили 500, данные по ним взяты из копии, снятой в этом же прогоне. ЦЕНЫ. Цена есть ровно у одного источника из 55 — заводского прейскуранта Drillmec 2015 года, и он закрывает 27 номеров листа. Разделитель разрядов на этом листе проверен до чтения цен: «01810411 Safety plate 6,00» против «01170411 POWER PACK 35.100,00» — точка отделяет тысячи, запятая центы. У остальных 54 перечней цен нет; там, где поиск валюты срабатывал, это оказывались чужие строки (Allen-Bradley на supply-drilling-rig-spare-parts-3101, угловые разъёмы на ge-electric-parts-1904) или условия договора (пункты о неустойке в руководстве Marflex), и в цитату они не взяты. У ведомости Ingersoll Rand FA5A колонка «Unit price» объявлена в шапке, но пуста во всех строках. ОСТАТКИ. Подтверждённого остатка не даёт ни один перечень: числа в колонках — это потребность на комплект или норма расхода, а не склад, поэтому поле остатка пустое везде. ОГОВОРКИ ПО ОТДЕЛЬНЫМ СТРОКАМ. 508895000-1 — в ведомости Gardner Denver стоит базовый номер 508895000 без суффикса «-1»; 21887 и 125233 — в перечнях NOV записаны как 21887+71 и 125233+30; 820238, 5008023, PV.140.R1.K1.T1.N.MMC, 1SBN010010R1010, 750-341, MARN440AT, MCRC022AT, 077LDNV0, 077MT24S22RB и номера ABB 3A… стоят в перечнях без наименования — там в поле наименования дана строка перечня дословно, как она есть. R76380-1 в перечне Willway подписан как подвеска НКТ 5 1/2, а в заявке — 3-1/2; номер совпадает дословно, размер — нет, цитата приведена как есть. Кириллическая «п» в «п403152» и «п410505» (MarFlex) снята как наша запись «поз.»: в заводском руководстве Marflex это 403152 BALL BEARING и 410505 CYLINDRICAL ROLLER BEARING, оба из ведомости ЗИП головной части MDPD-100 — то есть номера были не бессмысленными, а просто с нашим префиксом. ОТБРОШЕНО КАК ЛОЖНОЕ. 21858, 26821, 27994, 62158, 61920, «Northstar» — совпадения нашлись только в чужих каталогах (Rockwell, Caterpillar, Eaton, подшипники ZWZ, энкодеры Danaher), к машинам листа отношения не имеющих; в зачёт не взяты. ЧТО ОСТАЛОСЬ ПУСТЫМ. Полностью не закрыты Bornemann MPC 320-10 (11 номеров ряда s240…/s245…: открытых ведомостей по многофазным насосам MPC нет, у продавцов запчастей Bornemann выложены только винтовые насосы серий E/W/V/U/T), Schlumberger CPS-763 (20 из 21 номера ряда 1002…/1013…/5…000), Drilltech Cangzhou (ряд 60118154xx и 909…), новые номера Cameron France 2603840-01…2603845-01 (в заводском каталоге 2004 года их нет — это более поздняя номенклатура), Drillmec RI40391667-xx, RI40392575-xx, RI50641820/21-01 и RI5085SH00-130…132 (в прейскуранте 2015 года ряд RI5085SH00 обрывается на -14).",
+   "items": [
+    {
+     "pn": "0000385",
+     "name_in_ask": "Ремкомплект 15 галлонов 3KSI LT 0000385",
+     "qty": 7,
+     "usd_exposure": 6125.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "15 0000385 Repair kit for cylinder accumulator 15 gallon for air defense control station 14"
+     ],
+     "sources": [
+      "willwaytech.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "049089-04",
+     "name_in_ask": "Подсборка Cameron 049089-04",
+     "qty": 4,
+     "usd_exposure": 5600.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "11 Actuator Screw 4 049089-04 4 049089-02"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "61120009",
+     "name_in_ask": "Подшипник Drillmec 61120009",
+     "qty": 8,
+     "usd_exposure": 5400.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Bearing"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "Н20613-21А",
+     "name_in_ask": "Втулка вала Н20613-21А 2500 Supreme",
+     "qty": 12,
+     "usd_exposure": 3540.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "63 Втулка вала Sleeve, shaft Н20613-21А 4 pcs"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "9610249",
+     "name_in_ask": "Скребок стандартный торцевой 9610249",
+     "qty": 8,
+     "usd_exposure": 3400.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "SWACO 96-10-249"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "01917713",
+     "name_in_ask": "Уплотнение крышки клап.Drillmec 01917713",
+     "qty": 54,
+     "usd_exposure": 3240.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "Gasket"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "64610805",
+     "name_in_ask": "Модуль энкодера АВВ RTAC-01 64610805",
+     "qty": 6,
+     "usd_exposure": 3045.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "22 64610805 Encoder Adapter RTAC-01 ABB 3"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "23444-01-72",
+     "name_in_ask": "Уплотнение 23444-01-72 2500 Supreme",
+     "qty": 12,
+     "usd_exposure": 3000.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "Seal, Shaft Sleeve O ring 51.5X2.65 23444-01-72 HSB-23444-01-72"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1676",
+     "name_in_ask": "Плашка трубного зажима Tesco №1676",
+     "qty": 16,
+     "usd_exposure": 2920.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "286 Плашка (ф127мм) 1/2″ х 1-1/4″ х 5-7/8″ № 1676 ВСП Теско TONG DIES,1/2X1-1/4X5-7/8 1676 40"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "019811534",
+     "name_in_ask": "Сухарь Drillmec 019811534",
+     "qty": 32,
+     "usd_exposure": 2880.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Liner"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1292103",
+     "name_in_ask": "Прокладка NOV 1292103 PL 1292000 п. 150",
+     "qty": 60,
+     "usd_exposure": 2850.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "150 15 1292103 SHIM, CROSSHEAD LINER"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "RI4011FO00-11",
+     "name_in_ask": "Уплотнение Drillmec RI4011FO00-11",
+     "qty": 12,
+     "usd_exposure": 2760.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "Mechanical Seal Kit"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "01910575",
+     "name_in_ask": "Поршень 6 1/4\" Drillmec 01910575",
+     "qty": 18,
+     "usd_exposure": 2745.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "5 01910575 3 6-1/4″ piston"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "01912278",
+     "name_in_ask": "Поршень Drillmec 6.1/4\" 01912278",
+     "qty": 18,
+     "usd_exposure": 2745.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "1 01912278 3 6-1/4″ piston"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "3AXD50000006072",
+     "name_in_ask": "Контроллер ABB 3AXD50000006072",
+     "qty": 5,
+     "usd_exposure": 2700.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "ABB 3AXD50000006072"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "RI40390738-03",
+     "name_in_ask": "Пружина клапана Drillmec RI40390738-03",
+     "qty": 54,
+     "usd_exposure": 2565.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "Spring"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "077MT24S22RB",
+     "name_in_ask": "Джойстик GE 077MT24S22RB",
+     "qty": 4,
+     "usd_exposure": 2200.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "077MT24S22RB 181003"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50982040",
+     "name_in_ask": "Картридж Drillmec 50982040",
+     "qty": 9,
+     "usd_exposure": 2160.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "DESSICANT"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "RI40110462-01",
+     "name_in_ask": "Набивка RI40110462-01",
+     "qty": 12,
+     "usd_exposure": 1740.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "Pump packing"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50981230",
+     "name_in_ask": "Элемент фильтрующий Drillmec 50981230",
+     "qty": 10,
+     "usd_exposure": 1700.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Cartridge"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "RI40390738-04",
+     "name_in_ask": "Уплотнение клапана DrillmecRI40390738-04",
+     "qty": 54,
+     "usd_exposure": 1620.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "Gasket"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "0022",
+     "name_in_ask": "Клапан распределительный 1/4''NPT, 0022",
+     "qty": 6,
+     "usd_exposure": 1620.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "325 Клапан регулирующий1/4″NPT,в комплекте с реверсив.обр.клапаном №0022 Теско Valve,Control,1/4″ NPT,c/w Rev Flow Free Chk 0022 8"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "16002300",
+     "name_in_ask": "Кольцо упл. P-Quip 16002300",
+     "qty": 30,
+     "usd_exposure": 1575.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "O-RING SMALL, ITEM 7 , FOR 16000002, VALVE COVER SYSTEM 16002300 P-QUIP LTD"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "22002000",
+     "name_in_ask": "Кольцо упл. P-Quip 22002000",
+     "qty": 30,
+     "usd_exposure": 1575.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "O-RING LARGE, ITEM 6 , FOR 16000002, VALVE COVER SYSTEM 22002000 P-QUIP LTD"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "30175768-1",
+     "name_in_ask": "Фильтроэлемент 30175768-1",
+     "qty": 4,
+     "usd_exposure": 1360.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "515 30175768-1 Element, element, filter 25 micron for TDS gearbox lube oil, stock spare"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "9070",
+     "name_in_ask": "Плашка Tesco №9070 14,92х3,175х2,54см",
+     "qty": 8,
+     "usd_exposure": 1360.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "287 Плашка (ф89мм) 1″ х 1-1/4″ х 5-7/8″ №9070 ВСП Теско TONG DIES,1X1-1/4X5-7/8 9070 20"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "21887+71",
+     "name_in_ask": "Фильтр NOV21887+71 T4690-D1110-H0001 Н06",
+     "qty": 4,
+     "usd_exposure": 1160.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "463 21887+71 Filter, Breather Active heav compansator National OilWell Varco"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "7032B262",
+     "name_in_ask": "Фильтр 7032B262",
+     "qty": 4,
+     "usd_exposure": 1140.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "14 | 1 | pcs | 7032B262 | NOV | FILTER LOW PRESSURE"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "21887",
+     "name_in_ask": "Фильтр NOV 21887 T4690-D1110-H0001 п H06",
+     "qty": 4,
+     "usd_exposure": 1080.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "463 21887+71 Filter, Breather Active heav compansator National OilWell Varco"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "7030B085",
+     "name_in_ask": "Фильтроэлемент 7030B085",
+     "qty": 8,
+     "usd_exposure": 1020.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "12 | 1 | pcs | 7030B085 | NOV | ELEMENT"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "52104187",
+     "name_in_ask": "Кольцо Drillmec 52104187",
+     "qty": 18,
+     "usd_exposure": 1017.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-ring"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "01917460",
+     "name_in_ask": "Уплотнение втулки Drillmec 01917460",
+     "qty": 18,
+     "usd_exposure": 900.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "6.1/4\" liner gasket"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "55109-08-C",
+     "name_in_ask": "Винт NOV 55109-08-C",
+     "qty": 40,
+     "usd_exposure": 900.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "2 BOLT, UPPER DIE ST866210-19-D 55109-08-C"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50981066",
+     "name_in_ask": "Картридж фильтра Drillmec 50981066",
+     "qty": 4,
+     "usd_exposure": 880.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Filter cartridge"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50981153",
+     "name_in_ask": "Элемент фильтрующий Drillmec 50981153",
+     "qty": 4,
+     "usd_exposure": 880.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Filter cartridge"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "RI01170473-06",
+     "name_in_ask": "Картридж фильтра Drillmec RI01170473-06",
+     "qty": 4,
+     "usd_exposure": 880.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "OIL FILTER CARTRIDGE"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "82749",
+     "name_in_ask": "Элемент фильтра Varco 82749",
+     "qty": 4,
+     "usd_exposure": 880.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "83 82749 Element, Filter, Hyd Varco"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1045",
+     "name_in_ask": "Болт фиксатора плашки Tesco №1045",
+     "qty": 16,
+     "usd_exposure": 864.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "1045 Screw,Cap,Skt Hd,1/2″-13UNCx1″"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "25BC333",
+     "name_in_ask": "Кольцо Gardner Denver 25BC333",
+     "qty": 9,
+     "usd_exposure": 832.5,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "2 O-ring 3 25BC333"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "30111013-1",
+     "name_in_ask": "Фильтроэлемент NOV 60 мкм 30111013-1",
+     "qty": 4,
+     "usd_exposure": 800.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "30111013-1 Element, Filter, 60 Microns"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "39360",
+     "name_in_ask": "Кран 3/4\" 39360 T4690-D1110-H0001 п H08",
+     "qty": 4,
+     "usd_exposure": 800.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "32 Шаровый клапан Ball valve P/N 39360 / User manual spare part list V4154-Z-MC-001 03.11.09г. BALL VALVE 3/4″ BSP P/N 39360"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "16401-2",
+     "name_in_ask": "Сухарь СВП NOV №16401-2",
+     "qty": 20,
+     "usd_exposure": 780.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "117 Плашка 1/2″x1-1/4″x5″ №16401-2 Варко Die, tong, 1/2″x1-1/4″x5″ 16401-2 40"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "7032B263",
+     "name_in_ask": "Элемент 7032B263",
+     "qty": 4,
+     "usd_exposure": 760.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "483 Элемент фильтрующий низкого давления запасной Replacement Low Pressure Filter Element Руководство по эксплуатации D231000499-MAN-001 p/n 7032B263"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "01912219",
+     "name_in_ask": "Прокладка 6 1/4\" 01912219",
+     "qty": 18,
+     "usd_exposure": 738.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "4 01912219 3 6-1/4″ piston rubber kit"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "84-01-452",
+     "name_in_ask": "Винт крепления скребка 84-01-452",
+     "qty": 24,
+     "usd_exposure": 636.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "12 High Strength Bolts 84-01-452 SHCS, SS M6 x 12 mm ea 20 518HV"
+     ],
+     "sources": [
+      "willwaytech.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "96-10-319",
+     "name_in_ask": "Втулка разгрузочная MI SWACO 96-10-319",
+     "qty": 4,
+     "usd_exposure": 520.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "36 M-I SWACO Relief bushing 96-10-319 16"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "SKM195GB066D",
+     "name_in_ask": "Транзистор SEMIKRON SKM195GB066D",
+     "qty": 4,
+     "usd_exposure": 460.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "200A/600V/IGBT/2U SKM195GB066D SEMIKRON"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "699343-04",
+     "name_in_ask": "Винт Cameron 699343-04",
+     "qty": 4,
+     "usd_exposure": 450.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "12 Actuator Screw Bushing 4 699343-04 4 699343-02"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "750-430",
+     "name_in_ask": "Модуль Wago 750-430",
+     "qty": 5,
+     "usd_exposure": 442.5,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "209 8 CH DIGITAL INPUT MODULE (SINKING) 24 V , МОДУЛЬ WAGO 750-430 EA 1"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50604-08-C",
+     "name_in_ask": "Винт 50604-08-C",
+     "qty": 8,
+     "usd_exposure": 312.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "6 BOLT, KEY UPPER DIE NA 50604-08-C"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "6464",
+     "name_in_ask": "Болт Tesco 6464 5/8''-11UNCx2-1/2''",
+     "qty": 20,
+     "usd_exposure": 220.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "6464 Screw,Cap,Skt Hd,58″-11UNCx2-12″,Dr Hd,(3 Hole)"
+     ],
+     "sources": [
+      "tdsparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "6925",
+     "name_in_ask": "Винт с шестигранной головкой 6925",
+     "qty": 4,
+     "usd_exposure": 196.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "6925 Screw,Cap,Hex Hd,12″-13UNCx2-12″,Gr8,Pld,Dr Hd"
+     ],
+     "sources": [
+      "tdsparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1SBN010010R1010",
+     "name_in_ask": "Блок ABB CA5-10 1SBN010010R1010",
+     "qty": 5,
+     "usd_exposure": 90.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "1SBN010010R1010"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "ZBV B1",
+     "name_in_ask": "Блок светосигнальный ZBV B1 24 V",
+     "qty": 4,
+     "usd_exposure": 86.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "INDICATION LIGHT ZBV-B1, 24VDC/AC, WHITE 6 EA"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "ZBV B3",
+     "name_in_ask": "Блок светосигнальный ZBV B3 24 V",
+     "qty": 4,
+     "usd_exposure": 86.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "INDICATION LIGHT ZBV-B3, 24VDC/AC, GREEN 6 EA"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "01917714",
+     "name_in_ask": "Модуль всасывания 01917714",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "SUCTION MODULE"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "01991064",
+     "name_in_ask": "Штифт Drillmec 01991064",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Pin"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "40391667",
+     "name_in_ask": "Клапан Drillmec 40391667",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "VALVE"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50550137",
+     "name_in_ask": "Манометр Drillmec 50550137",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Manometer"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50971258",
+     "name_in_ask": "Фильтр Drillmec 50971258",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Filter"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50981155",
+     "name_in_ask": "Картридж масл. фильтра Drillmec 50981155",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "CARTRIDGE"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50982044",
+     "name_in_ask": "Картридж фильтра Drillmec 50982044",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "OIL FILTER CARTRIDGE"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "50982045",
+     "name_in_ask": "Картридж фильтра Drillmec 50982045",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "OIL FILTER CARTRIDGE"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "52090174",
+     "name_in_ask": "Маслосъемник 52090174",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Oil retainer"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "521061200",
+     "name_in_ask": "Кольцо 521061200",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-ring"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "521061500",
+     "name_in_ask": "Кольцо 521061500",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "O-ring"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "RI01170495-09",
+     "name_in_ask": "Фильтр Drillmec RI01170495-09 возд",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "AIR FILTER"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "RI4039HY00-23",
+     "name_in_ask": "Диафрагма RI4039HY00-23",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "Diaphragm (Nitrile Hydrogenated - HNBR)"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "125233",
+     "name_in_ask": "Рычаг промежуточный штроп 125233",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "125233+30 LEVER,CRANK,LINK TILT(PH100)"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "30125801",
+     "name_in_ask": "Гидроцилиндр 30125801",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "30125801 Cylinder Assembly, Lift"
+     ],
+     "sources": [
+      "tdsparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "30160379",
+     "name_in_ask": "Шпонка 30160379",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "9 Key, upper die ST80 ST8 41271480 30160379"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "30176000-1",
+     "name_in_ask": "Индикатор 30177365(16), 30176000-1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "53 Indicator, Vacuum 30176000-1 EA 1"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "7018B507",
+     "name_in_ask": "Элемент сцепления NOV 7018B507",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "41 | 1 | pcs | 7018B507 | NOV | COUPLING SPIDER"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "7020B081",
+     "name_in_ask": "Насос гидросистемы NOV 7020B081",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "9 | 1 | pcs | 7020B081 | Brown & Sharpe pumps | PUMP, HYDRAULIC AXIAL PISTON"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "7030B102",
+     "name_in_ask": "Фильтр 7030B102",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "1 | 1 | pcs | 7030B102 | NOV | FILTER, HIGH PRESSURE"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "7026B147",
+     "name_in_ask": "Клапан регулирующий NOV 7026B147",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "484 Клапан регулировки обратного давления Back Pressure Regulator Руководство по эксплуатации D231000499-MAN-001 p/n 7026B147"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "0000378",
+     "name_in_ask": "Набор NOV 0000378",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "66 19-10-046 11 GALLON BLADDER FOR UPPER LOADING ACCUMULATOR (BAG & VALVE ASSY) 001-0160, 1000-3463,00-00378 50"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "222573-001",
+     "name_in_ask": "Уровнемер MD Totco 222573-001",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "MD TOTCO Ultrasonic Mud Tank Level Sensor 222573-001"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "PV.140.R1.K1.T1.N.MMC",
+     "name_in_ask": "Насос PV.140.R1.K1.T1.N.MMC / 142309",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "PV140R1K1T1NMMC"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2021",
+     "name_in_ask": "Корпус предохранительный клапан 2021",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "276 Копус вставного предохранит. клапана, двусторонн.,#8 SAE №2021 Теско BODY, CARTRIDGE, 2 WAY, #8 SAE 2021 1"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "820238",
+     "name_in_ask": "Корпус внешнего трубного захвата 820238",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "820238"
+     ],
+     "sources": [
+      "tdsparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "5008023",
+     "name_in_ask": "Клапан Tesco Т-17А 750-3000 psi 5008023",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "5008023"
+     ],
+     "sources": [
+      "tdsparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "5632121",
+     "name_in_ask": "Клапан баттерфляй 300 PSI арт.5632121",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "39 M-I SWACO Butterfly valve with 300 PSI notch 5632121 2"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "9610396",
+     "name_in_ask": "Протектор крышки корпуса 9610396",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "38 M-I SWACO Drum cover protection plate 96-10-396 2"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "049416-09",
+     "name_in_ask": "Кольцо Cameron 049416-09",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "14 Lock Segment Retaining Ring 1 049416-09 1 049416-06"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "049742-16",
+     "name_in_ask": "Набор уплотнений Cameron 049742-16",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "18-3/4” 5000 049742-16 2010006-04"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "614350-13",
+     "name_in_ask": "Головка нар. цилиндра Cameron 614350-13",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "13 Outer Cylinder Lock Segment 3 614350-13 3 614350-06"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "140171-03-01-04",
+     "name_in_ask": "Прокладка плоск. Cameron 140171-03-01-04",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "27 Gasket, GASKET 5.351 X 4.852 X 0.060 316 140171-03-01-04 10 EA"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "J017263",
+     "name_in_ask": "Корпус задвижки DEMCO 4 5000 PSI",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Assembly Base Number 4 in. Full Port J017263"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "717904",
+     "name_in_ask": "Шибер 717904",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "179 GATE, FM, 3­5M, T­DB VLV, STD, H2S, LT, API 6A, PS 717904 5,000 psi Type DB Gate Valve 3-1/8″ 2 pcs"
+     ],
+     "sources": [
+      "willwaytech.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "717909",
+     "name_in_ask": "Пластина 717909",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "6. Grease plate 2 717174 717128 718444 718445 717909 718443"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "719448",
+     "name_in_ask": "Седло 719448",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "2. Seat Assy. 2 719357 718292 718297 719355 719448 719336"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "151361",
+     "name_in_ask": "Узел 151361",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "ELEMENT,SHAFFER,151361,18-5M SXF SBOP,NITRILE,"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "27240",
+     "name_in_ask": "Комплект обслуживания клапана 27240",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "57 27240 KIT,SERVICE,K5C2 VALVE"
+     ],
+     "sources": [
+      "willwaytech.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "К5С2-Х (K5C2-EXLP)",
+     "name_in_ask": "Клапан MDH56287 К5С2-Х (K5C2-EXLP)",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "39 K5C2-X VALVE"
+     ],
+     "sources": [
+      "willwaytech.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "27277",
+     "name_in_ask": "Пластина фрикционная 27277 в комплекте",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "KIT,IR,27277,DISC-BRAKE 02-AIR HOIST SYSTEMS 27277"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "508895000-1",
+     "name_in_ask": "Плунжер насоса 508895000-1",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "18 Plunger – 16” Long (Standard) 3 508895000"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1950-10-2F",
+     "name_in_ask": "Сигнализатор давления Dwyer 1950-10-2F",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "SWITCH-PRESSURE,DWYER INSTRUMENTS,1950-10-2F,F/EMD-79 PURGE PRESSURE"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "R76380-1",
+     "name_in_ask": "ПОДВЕСКА НКТ, SMB-041, 18-5/8 X 3-1/2,   3-1/2 С РЕЗЬБОВЫМ СОЕДИНЕНИМ TENARIS BLUE, С ВЕРХНЕЙ ПРИСОЕДИТЕНИТЕЛЬНОЙ РЕЗЬБОЙ MCA 4.909-6, НИЖНЯЯ   3.725-6 MCA BOX THD ДЛЯ НИПЕЛЯ, С РЕЗБОЙ 3\"   ДЛЯ ПРОБКИ BPV, ГОРИЗОНТАЛЬНЫЙ ВЫПУСК A/F.",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "Vetco Gray Tubing hanger 5 1/2 Vetcogray R76380-1 1"
+     ],
+     "sources": [
+      "willwaytech.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "п403152",
+     "name_in_ask": "Подшипник MarFlex 900081 п403152",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "403152 BALL BEARING"
+     ],
+     "sources": [
+      "gkunicom.ru"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "п410505",
+     "name_in_ask": "Подшипник MarFlex 900081 п410505",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "410505 CYLINDRICAL ROLLER BEARING"
+     ],
+     "sources": [
+      "gkunicom.ru"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "668106",
+     "name_in_ask": "Прокладка MarFlex 668106",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "668106 GASKET"
+     ],
+     "sources": [
+      "gkunicom.ru"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "679068",
+     "name_in_ask": "Кольцо MarFlex 679068",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "679068 WEAR RING"
+     ],
+     "sources": [
+      "gkunicom.ru"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "679463",
+     "name_in_ask": "Уплотнение MarFlex 679463",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "679463 SINGLE CARGO SEAL"
+     ],
+     "sources": [
+      "gkunicom.ru"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "679464",
+     "name_in_ask": "Уплотнение MarFlex 679464",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "679464 DOUBLE CARGO SEAL"
+     ],
+     "sources": [
+      "gkunicom.ru"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "682042",
+     "name_in_ask": "Вал MarFlex 682042",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "682042 PUMP SHAFT"
+     ],
+     "sources": [
+      "gkunicom.ru"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "682043",
+     "name_in_ask": "Втулка MarFlex 682043",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "682043 CERAMIC SLEEVE"
+     ],
+     "sources": [
+      "gkunicom.ru"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "11084101",
+     "name_in_ask": "Клапан 7K-9027924",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "SOLENOID CONTROL MODULE , PVEH, ATEX, FOR CONTROL VALVE 11084101 DANFOSS"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "MCRА040AT",
+     "name_in_ask": "Миниконтактор General Electric MCRА040AT",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "GE GENERAL ELECTRIC MCRA040AT CONTACTOR 120V COIL"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "ZBV B4",
+     "name_in_ask": "Блок светосигнальный ZBV B4 24 V",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "INDICATION LIGHT ZBV-B4, 24VDC/AC, RED 6 EA"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2963912",
+     "name_in_ask": "Реле PSR-SCP-24UC/ESAM4/8X1/1X2 2963912",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "13 | 1 | 2963912 (PSR-SCP-24UC/ESAM4/8X1/1X2 | RELAY, SAFETY, 8N0/1NC PSR-SCP"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "3AUA0000061236",
+     "name_in_ask": "Плата ABB APOW-11C 3AUA0000061236",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "76 3AUA0000061236 POWER CARD APOW-11C ABB 2"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "64606859",
+     "name_in_ask": "Модуль адаптера ABB PROFIBUS RPBA-01",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "21 64606859 Profibus Adapter RPBA-01 ABB 2"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "68295459",
+     "name_in_ask": "Плата AOFC-02",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "66 68295459 FILTERING BOARD AOFC-02 ABB 1"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "68685826",
+     "name_in_ask": "Плата управления АВВ AINT-14C, 68685826",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "63 68685826 AINT AINT-14C ABB 4"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "68909058",
+     "name_in_ask": "Плата ABB ATMB-01C 68909058",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "79 68909058 MEASUREMENT BOARD ATMB-01C ABB 1"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "64606964",
+     "name_in_ask": "Модуль оптовол. связи АВВ RDCO-03 DDCS",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "64606964 RDCO-03C-KIT"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "64669982",
+     "name_in_ask": "Блок развет.оптики ABB APBU-44C 64669982",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "64669982 PPCS BRANCH & DA APBU-44C"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "68262747",
+     "name_in_ask": "Набор АВВ NRED-61 68262747",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "68262747 NRED-61 Module / ABB"
+     ],
+     "sources": [
+      "drillingbase.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2CDS251001R0024",
+     "name_in_ask": "Выключатель ABB 2CDS251001R0024",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "2CDS251001R0024 S201-C2"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2CDS251001R0064",
+     "name_in_ask": "Выключатель АВВ S201-C6 2CDS251001R0064",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "2CDS251001R0064 S201-C6"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2CDS251001R0204",
+     "name_in_ask": "Выключатель ABB S201 2CDS251001R0204",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "2CDS251001R0204 S201-C20"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2CDS252001R0204",
+     "name_in_ask": "Выключатель ABB S202 2CDS252001R0204",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "2CDS252001R0204 S202-C20"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2CDS252001R0487",
+     "name_in_ask": "Выключатель ABB S202 арт.2CDS252001R0487",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "2CDS252001R0487 S202-K20"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "3AUA0000040000",
+     "name_in_ask": "Комплект карт для ПК ABB 3AUA0000040000",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "ABB 3AUA0000040000"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "750-341",
+     "name_in_ask": "Каплер Ethernet Wago 750-341",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "750-341"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "MARN440AT",
+     "name_in_ask": "Блок-контакт General Electric MARN440AT",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "MARN440AT"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "MCRC022AT",
+     "name_in_ask": "Реле-контактор General Electric MCRC022",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "MCRC022AT*"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "077LDNV0",
+     "name_in_ask": "Цоколь лампы GE 077LDNV0 под BA9S",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "077LDNV0 181300"
+     ],
+     "sources": [
+      "drillingsolutionsltd.com"
+     ],
+     "independent_sources": 1
+    }
+   ]
   }
  }
 }
