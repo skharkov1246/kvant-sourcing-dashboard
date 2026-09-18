@@ -132,6 +132,30 @@ def maker_key(t) -> str:
     return re.sub(r"[^a-z0-9а-яё]", "", t.lower())
 
 
+def maker_forms() -> dict[str, dict]:
+    """Изготовители, у которых почты нет, но есть форма обращения.
+
+    Форма — не «адреса нет», а другой способ отправки: текст тот же, вставляется
+    в поле формы. Замер 18.09.2026: так закрываются 90 строк на 604 083 USD, и
+    среди них ABB (39 строк) и Rockwell (342 600 USD) — то есть отнести форму к
+    безадресному остатку значило бы спрятать шестьсот тысяч в графу «работа не
+    определена».
+
+    Саму форму заполняет человек: отправка чего-либо наружу от нашего имени —
+    не то, что агент делает сам.
+    """
+    if not MAKER_CONTACTS.exists():
+        return {}
+    out = {}
+    for r in json.loads(MAKER_CONTACTS.read_text(encoding="utf-8")).get("rows") or []:
+        if MAIL.findall(str(r.get("email") or "")):
+            continue
+        if not str(r.get("form_url") or "").strip():
+            continue
+        out[maker_key(r.get("maker"))] = r
+    return out
+
+
 def maker_contacts() -> dict[str, dict]:
     """Адреса служб запчастей изготовителей — только с прочитанной страницы.
 
@@ -233,15 +257,38 @@ def build() -> dict:
     # Строки без адреса продавца: если у изготовителя адрес известен и прочитан,
     # письмо идёт ему — с другим вопросом (см. maker_body).
     mc = maker_contacts()
+    forms = maker_forms()
     to_maker: dict[str, list] = collections.defaultdict(list)
+    to_form: dict[str, list] = collections.defaultdict(list)
     still_without = []
     for it in without:
-        rec = mc.get(maker_key(it.get("maker")))
+        k = maker_key(it.get("maker"))
+        rec = mc.get(k)
         if rec:
             to_maker[rec["email"]].append(dict(it, _maker_rec=rec))
-        else:
-            still_without.append(it)
+            continue
+        frec = forms.get(k)
+        if frec:
+            to_form[str(frec.get("form_url"))].append(dict(it, _maker_rec=frec))
+            continue
+        still_without.append(it)
     without = still_without
+    form_tasks = []
+    for url, items in sorted(to_form.items(),
+                             key=lambda kv: -sum(x["our_exposure"] for x in kv[1])):
+        items.sort(key=lambda x: -x["our_exposure"])
+        rec = items[0]["_maker_rec"]
+        clean = [{k2: v for k2, v in it.items() if k2 != "_maker_rec"} for it in items]
+        form_tasks.append({
+            "maker": rec.get("maker"),
+            "form_url": url,
+            "phone": rec.get("phone"),
+            "rows": len(clean),
+            "our_exposure": round(sum(x["our_exposure"] for x in clean), 2),
+            "pns": [x["pn"] for x in clean],
+            "read_on": rec.get("read_on"),
+            "text": maker_body(str(rec.get("maker")), clean),
+        })
     groups: dict[str, list] = collections.defaultdict(list)
     for it in with_mail:
         groups[it["mail"]].append(it)
@@ -297,17 +344,30 @@ def build() -> dict:
         # len(with_mail) + len(without) уже ПОСЛЕ того, как часть строк ушла в
         # письма изготовителям, и целое молча теряло эти строки: 267 + 50 + 205
         # против объявленных 472. Тест на сходимость это и поймал.
-        "rows_total": len(with_mail) + sum(len(v) for v in to_maker.values()) + len(without),
+        "rows_total": (len(with_mail) + sum(len(v) for v in to_maker.values())
+                       + sum(len(v) for v in to_form.values()) + len(without)),
         "usd_total": round(sum(x["our_exposure"] for x in with_mail + without)
-                           + sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
+                           + sum(x["our_exposure"] for v in to_maker.values() for x in v)
+                           + sum(x["our_exposure"] for v in to_form.values() for x in v), 2),
         "rows_with_address": len(with_mail),
         "usd_with_address": round(sum(x["our_exposure"] for x in with_mail), 2),
         "rows_without_address": len(without),
         "usd_without_address": round(sum(x["our_exposure"] for x in without), 2),
-        "how_rows_split": ("rows_total = rows_with_address + rows_to_maker + "
-                           "rows_without_address. Три разных письма и три разных вопроса: "
-                           "продавцу — цена и наличие, изготовителю — расшифровка номера и "
-                           "авторизованный канал, а по третьей части писать пока некому."),
+        "how_rows_split": ("rows_total = rows_with_address + rows_to_maker + rows_to_form + "
+                           "rows_without_address. Четыре пути: письмо продавцу (цена и "
+                           "наличие), письмо изготовителю (расшифровка номера и "
+                           "авторизованный канал), обращение через форму изготовителя — тем "
+                           "же текстом, но вставляет его человек, — и остаток, по которому "
+                           "адресата нет вовсе."),
+        "rows_to_form": sum(len(v) for v in to_form.values()),
+        "usd_to_form": round(sum(x["our_exposure"] for v in to_form.values() for x in v), 2),
+        "form_tasks": form_tasks,
+        "why_form_is_not_nothing": ("Форма — не «адреса нет», а другой способ отправки. Среди "
+                                    "таких изготовителей ABB (39 строк) и Rockwell "
+                                    "(342 600 USD): отнести форму к безадресному остатку "
+                                    "значило бы спрятать шестьсот тысяч в графу «работа не "
+                                    "определена». Отправляет человек: посылать что-либо "
+                                    "наружу от нашего имени агент сам не станет."),
         "rows_to_maker": sum(len(v) for v in to_maker.values()),
         "usd_to_maker": round(sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
         "what_maker_letter_asks": ("Изготовителю задаётся не цена, а расшифровка внутреннего "
@@ -366,6 +426,17 @@ def doc(d: dict) -> str:
             a(f"<p class='warn'><b>{E(L['warning'])}</b></p>")
         a(f"<p><b>Тема:</b> {E(L['subject'])}</p>")
         a(f"<pre>{E(L['body'])}</pre>")
+    if d.get("form_tasks"):
+        a(f"<h2>Через форму обращения: {ru(d['rows_to_form'])} строк на "
+          f"{ru(d['usd_to_form'])} долларов США</h2>")
+        a(f"<p>{E(d['why_form_is_not_nothing'])}</p>")
+        for i, t in enumerate(d["form_tasks"], 1):
+            a(f"<p class='k'>{i}. {E(t['maker'])} — {ru(t['rows'])} позиц., "
+              f"{ru(t['our_exposure'])} USD нашей экспозиции</p>")
+            a(f"<p>Форма: {E(t['form_url'])}"
+              + (f"<br>Телефон: {E(t['phone'])}" if t.get("phone") else "") + "</p>")
+            a(f"<pre>{E(t['text'])}</pre>")
+
     a("<h2>Что делать с этим документом</h2>")
     a("<p><b>1. Отправлять сверху вниз.</b> Порядок — по нашей экспозиции. Первые десять "
       "адресатов закрывают большую часть суммы, и каждый из них несёт по нескольку "
