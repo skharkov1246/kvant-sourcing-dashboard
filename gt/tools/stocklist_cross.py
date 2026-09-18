@@ -38,9 +38,24 @@ ROOT = Path(__file__).resolve().parents[2]
 SUMMARY = ROOT / "gt/data/ship_lukoil.json"
 FX = ROOT / "gt/data/fx_rates.json"
 OUT = ROOT / "gt/data/ship_stocklist_cross.json"
-# Строка листа: «<номер> <описание> <N>pcs <цена>EURO ea». Точка в цене —
+GROUPS = ROOT / "gt/data/ship_seller_groups.json"
+# Строка листа: «<номер> <описание> <N><единица> <цена>EURO ea». Точка в цене —
 # разделитель тысяч: на том же листе рядом стоят «1.200.00EURO» и «20.00EURO».
-LINE = re.compile(r"^(\S+)\s+(.*?)\s+(\d+)\s*pcs\s+([\d.,]+)\s*(EURO|EUR|USD|\$)", re.I)
+#
+# ЕДИНИЦА СЧЁТА НА ЛИСТЕ НЕ ОДНА, и это стоило замера. Правило искало только
+# «pcs» и молча теряло 37 ценовых строк из 372 — каждую десятую, причём самые
+# дорогие: «pce» (32 строки), «set» (3), «st» (1), плюс строка, где пробел
+# перед числом отсутствует вовсе («Sgl Elem10pcs»). Потерянными оказались, в
+# частности, НАШИ номера: 186232-3000 за 11 000 EUR, 1034549-20 за 5 000 EUR,
+# 190583-1 за 200 EUR. Замер «совпало 78 номеров» был занижен, и занижен
+# именно в дорогой части листа, где цена одной строки решает вердикт.
+#
+# Пробел перед числом необязателен, единица — закрытый список, а «1set (12)»
+# несёт фасовку в скобках: она сохраняется отдельным полем, и цена за штуку из
+# неё НЕ выводится, пока не сказано, за что просят — за комплект или за штуку.
+LINE = re.compile(
+    r"^(\S+)\s+(.*?)\s*(\d+)\s*(pcs|pce|pieces|stk|st|sets|set)\b\s*(?:\((\d+)\)\s*)?"
+    r"([\d.,]+)\s*(EURO|EUR|USD|\$)\s*(per\s+set|set|ea|each)?", re.I)
 
 
 def key(x) -> str:
@@ -60,11 +75,20 @@ def parse(page: str) -> list[dict]:
         m = LINE.match(line.strip())
         if not m:
             continue
-        pn, desc, qty, price, cur = m.groups()
+        pn, desc, qty, unit, pack, price, cur, per = m.groups()
         cur = cur.upper().replace("$", "USD")
         cur = "EUR" if cur == "EURO" else cur        # на листе пишут и EUR, и EURO
-        out.append({"pn": pn, "desc": desc.strip(), "qty_listed": int(qty),
-                    "price": money(price), "currency": cur})
+        unit = unit.lower()
+        row = {"pn": pn, "desc": desc.strip(), "qty_listed": int(qty),
+               "price": money(price), "currency": cur, "unit": unit}
+        # «1set (12) 226.200.00EURO set» — цена за КОМПЛЕКТ из 12 штук. Делить её
+        # на фасовку здесь нельзя: это был бы вывод, а не цитата, и делать его
+        # надо там, где рядом стоит наше количество.
+        if pack:
+            row["pack"] = int(pack)
+        if unit.startswith("set") or (per or "").lower().replace(" ", "") in ("perset", "set"):
+            row["price_per"] = "комплект"
+        out.append(row)
     return out
 
 
@@ -84,7 +108,25 @@ def expo(r: dict) -> float:
     return (float(lo) + float(hi)) / 2 * float(r.get("qty") or 0)
 
 
+def stub_price(rows: list[dict]) -> tuple[float | None, int]:
+    """Цена, которая повторяется в листе слишком часто, чтобы быть ценой детали.
+
+    Оплачено замером 18.09.2026: в листе крупнейшего продавца ровно «450.00USD»
+    стоит 957 раз из 13 256 строк, а у 1 000 позиций из 1 000 верхний ценовой
+    уровень имеет sku = null и цену 0.00 — это шаблон магазина, а не свойство
+    изделия. Класс «ask внутри вилки», посчитанный по такой цифре, ничего не
+    измеряет. Порог: одна и та же цена у 1 % строк листа и не менее двадцати раз.
+    """
+    if not rows:
+        return None, 0
+    c = collections.Counter(round(float(r["price"]), 2) for r in rows)
+    price, n = c.most_common(1)[0]
+    floor = max(20, len(rows) // 100)
+    return (price, n) if n >= floor else (None, 0)
+
+
 def cross(rows: list[dict], seller: str) -> dict:
+    stub, stub_n = stub_price(rows)
     lk = json.loads(SUMMARY.read_text(encoding="utf-8"))["rows"]
     band = {key(r.get("pn")): r for r in lk}
     by_pn: dict[str, list[dict]] = collections.defaultdict(list)
@@ -115,9 +157,11 @@ def cross(rows: list[dict], seller: str) -> dict:
         e = expo(b)
         cls[where] += 1
         usd[where] += e
+        on_stub = stub is not None and any(round(float(x["price"]), 2) == stub for x in rs)
         items.append({"pn": b.get("pn"), "where": where, "usd_exposure": round(e, 2),
                       "qty_request": b.get("qty"), "qty_listed": max(x["qty_listed"] for x in rs),
-                      "desc_starts_with_other_pn": other})
+                      "desc_starts_with_other_pn": other,
+                      "price_is_list_stub": on_stub})
     items.sort(key=lambda x: -x["usd_exposure"])
     return {
         "seller": seller,
@@ -126,7 +170,140 @@ def cross(rows: list[dict], seller: str) -> dict:
         "matched_exposure": round(sum(usd.values()), 2),
         "by_class": {k: {"pns": cls[k], "usd_exposure": round(usd[k], 2)} for k in cls},
         "desc_starts_with_other_pn": note_cross,
+        "stub_price_repeats": stub_n,
+        "pns_on_stub_price": sum(1 for x in items if x["price_is_list_stub"]),
         "rows": items,
+    }
+
+
+def witness_of(seller: str) -> str:
+    """Кто СВИДЕТЕЛЬ по этому домену: группа владения или общий складской пул.
+
+    Пул отличается от группы: юрлица разные, а склад один (видно по совпадающим
+    до единицы остаткам и пометкам secondary/external). Для довода «два
+    независимых продавца» это то же самое, что одна группа, поэтому свидетель
+    сводится и по группам, и по пулам.
+    """
+    g = group_of(seller)
+    if not GROUPS.exists():
+        return g
+    d = json.loads(GROUPS.read_text(encoding="utf-8"))
+    dom = seller.lower().strip()
+    for pl in (d.get("pools") or []):
+        for x in (pl.get("domains") or []):
+            if dom == str(x).lower() or dom.endswith("." + str(x).lower()):
+                return pl.get("pool") or g
+    return g
+
+
+def group_of(seller: str) -> str:
+    """К какой группе витрин одного оператора принадлежит домен.
+
+    Без этого два листа одной группы в замере расхождений читались бы как два
+    независимых свидетеля — та самая ошибка, из-за которой за ночь развалился
+    довод «два независимых продавца» по двадцати одной строке.
+    """
+    if not GROUPS.exists():
+        return ""
+    d = json.loads(GROUPS.read_text(encoding="utf-8"))
+    dom = seller.lower().strip()
+    for g in (d.get("groups") or []):
+        for x in (g.get("domains") or []):
+            if dom == str(x).lower() or dom.endswith("." + str(x).lower()):
+                return g.get("group") or ""
+    return ""
+
+
+def no_band_reach(sellers: dict) -> dict:
+    """Номера БЕЗ нашей вилки, у которых появился хоть какой-то ориентир.
+
+    У 785 строк заявки из 1 642 вилки нет вовсе, и в экспозицию они не входят —
+    то есть их не видно ни в одной сумме. Открытые листы часть из них называют,
+    и это первый ориентир по таким строкам.
+
+    ЧЕГО ЗДЕСЬ НЕТ И ПОЧЕМУ. Вилка по этим номерам НЕ ставится из этих же листов.
+    Поставить её из листа, против которого потом считается класс, — значит
+    получить «ask внутри вилки» по построению: эталон стал бы производным от
+    правила. Лист годится как повод запросить цену у второго ТИПА свидетеля
+    (изготовитель, авторизованный канал), и только его ответ может стать вилкой.
+    """
+    seen: dict[str, set[str]] = collections.defaultdict(set)
+    qty: dict[str, float] = {}
+    for name, sl in sellers.items():
+        who = sl.get("group") or name          # лист группы — один свидетель
+        for r in (sl.get("rows") or []):
+            if (r.get("where") or "") != "вилки нет":
+                continue
+            pn = str(r.get("pn") or "")
+            if not pn:
+                continue
+            seen[pn].add(who)
+            qty[pn] = float(r.get("qty_request") or 0)
+    two = {pn for pn, w in seen.items() if len(w) > 1}
+    return {
+        "pns_without_band_on_lists": len(seen),
+        "pns_without_band_on_two_independent_lists": len(two),
+        "qty_without_band_on_lists": round(sum(qty.values()), 0),
+        "why_no_band_set_from_here": "Вилка из этих листов НЕ ставится: иначе класс "
+                                     "«ask внутри вилки» получился бы по построению. "
+                                     "Лист — повод запросить цену у изготовителя или "
+                                     "авторизованного канала, и вилкой может стать только "
+                                     "его ответ.",
+        "on_two_independent": sorted(two)[:60],
+    }
+
+
+def load_out() -> dict:
+    """Прежний набор, приведённый к многопродавцовому виду.
+
+    Инструмент писал ОДНОГО продавца в корень файла, и второй прогон затирал
+    первого. С шестью листами это потеряло бы пять замеров — та же ошибка, что
+    уже была со счётчиками по охватам, поэтому здесь сразу слияние по продавцу.
+    Старая однопродавцовая форма читается и переносится в sellers по имени
+    продавца из её же поля source.
+    """
+    if not OUT.exists():
+        return {"sellers": {}}
+    d = json.loads(OUT.read_text(encoding="utf-8"))
+    if "sellers" in d:
+        return d
+    old = d.get("totals") or {}
+    name = old.get("seller")
+    if not name:                       # имя продавца сохранялось только в прозе
+        m = re.search(r"сток-листа продавца (\S+)", str(d.get("source") or ""))
+        name = m.group(1) if m else "неизвестный продавец"
+    return {"sellers": {name: {"totals": old, "rows": d.get("rows") or []}}}
+
+
+def disagreements(sellers: dict) -> dict:
+    """Номера, по которым листы РАСХОДЯТСЯ в классе.
+
+    Это и есть главная цифра набора: пока лист один, «ask выше потолка» читается
+    как свойство рынка. Когда листов несколько, видно, что у части номеров класс
+    зависит от того, чей лист взять, — и тогда вывод по строке держится не на
+    измерении, а на выборе продавца.
+    """
+    where: dict[str, dict[str, str]] = collections.defaultdict(dict)
+    expo_of: dict[str, float] = {}
+    for name, s in sellers.items():
+        name = s.get("group") or name          # лист группы — один свидетель, не два
+        for r in (s.get("rows") or []):
+            pn = str(r.get("pn") or "")
+            if not pn:
+                continue
+            where[pn][name] = r.get("where") or ""
+            expo_of[pn] = float(r.get("usd_exposure") or 0)
+    shared = {pn: w for pn, w in where.items() if len(w) > 1}
+    split = {pn: w for pn, w in shared.items() if len(set(w.values())) > 1}
+    agree_usd = sum(expo_of[pn] for pn in shared if pn not in split)
+    return {
+        "pns_on_more_than_one_list": len(shared),
+        "pns_with_conflicting_class": len(split),
+        "usd_in_conflict": round(sum(expo_of[pn] for pn in split), 2),
+        "usd_in_agreement": round(agree_usd, 2),
+        "conflicting": sorted(
+            ({"pn": pn, "usd_exposure": expo_of[pn], "by_seller": w} for pn, w in split.items()),
+            key=lambda x: -x["usd_exposure"])[:40],
     }
 
 
@@ -158,11 +335,23 @@ def main() -> int:
               .replace(",", " "))
     print(f"  у {m['desc_starts_with_other_pn']} строк описание начинается с ДРУГОГО номера — "
           f"это кросс продавца, читать его как наш номер нельзя")
+    if m["stub_price_repeats"]:
+        print(f"  ЦЕНА-ЗАГЛУШКА: одна и та же цифра повторяется в листе "
+              f"{m['stub_price_repeats']} раз, и на ней стоит {m['pns_on_stub_price']} наших "
+              f"номеров — их класс ничего не измеряет")
     if a.write:
+        prev = load_out()
+        sellers = prev.get("sellers") or {}
+        sellers[a.seller] = {"totals": {k: v for k, v in m.items() if k != "rows"},
+                             "group": witness_of(a.seller),
+                             "rows": m["rows"]}
+        dis = disagreements(sellers)
+        nob = no_band_reach(sellers)
         OUT.write_text(json.dumps({
             "updated": "2026-09-18",
-            "source": f"Пересечение открытого сток-листа продавца {a.seller} с номерами заявки "
-                      f"(gt/data/ship_lukoil.json). Считает gt/tools/stocklist_cross.py.",
+            "source": "Пересечение открытых сток-листов продавцов с номерами заявки "
+                      "(gt/data/ship_lukoil.json). Считает gt/tools/stocklist_cross.py, "
+                      "по одному листу за прогон, с слиянием по продавцу.",
             "method": "Строка листа имеет вид «номер · описание · N pcs · цена». Точка в цене — "
                       "разделитель тысяч (проверяется на самом листе: рядом стоят «1.200.00» и "
                       "«20.00»). Пересчёт в доллары по gt/data/fx_rates.json. Сверка по "
@@ -179,10 +368,22 @@ def main() -> int:
                               "внутри ask сидит неизмеренная премия за поставку, поэтому «ask "
                               "выше потолка» означает «наша вилка ниже, чем просит этот "
                               "продавец», а не «закупка дороже». Второй свидетель обязателен.",
-            "totals": {k: v for k, v in m.items() if k != "rows"},
-            "rows": m["rows"],
+            "why_many_sellers": "Замеры живут ПО ПРОДАВЦАМ и не складываются: один "
+                                "номер стоит в нескольких листах, и сумма по всем листам "
+                                "посчитала бы его столько раз, сколько продавцов его "
+                                "держат. Складывать можно только внутри одного листа.",
+            "sellers": sellers,
+            "disagreements": dis,
+            "no_band_reach": nob,
         }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        print(f"замер записан в {OUT.relative_to(ROOT)}")
+        print(f"замер записан в {OUT.relative_to(ROOT)}: продавцов {len(sellers)}, "
+              f"номеров больше чем на одном листе {dis['pns_on_more_than_one_list']}, "
+              f"из них класс расходится у {dis['pns_with_conflicting_class']} "
+              f"на {dis['usd_in_conflict']:,.0f} USD".replace(",", " "))
+        print(f"  номеров БЕЗ нашей вилки листы называют {nob['pns_without_band_on_lists']}, "
+              f"из них на двух независимых листах "
+              f"{nob['pns_without_band_on_two_independent_lists']}; вилку из этих листов "
+              f"не ставим — стала бы тавтологией")
     return 0
 
 

@@ -4,14 +4,14 @@
  "method": "Из текста строки вынимаются домены, каждый сводится к своей группе. Строка попадает в замер, если названы ДВЕ и более витрины одной группы. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией — строка, где мы сами написали «это одна компания», попадала бы в дефект наравне со строкой, где две витрины выданы за рынок.",
  "why": "«Два независимых продавца» — главный довод, которым закрывается строка: одна цена может быть наценкой одного перепродавца, две совпадающие цены разных компаний — уже рынок. За ночь этот довод развалился шесть раз: витрины оказывались одним оператором под разными вывесками. Поэтому признак независимости считается по этому списку, а не на глаз по разным доменам.",
  "totals": {
-  "groups_known": 6,
-  "domains_known": 25,
-  "rows_checked": 97,
-  "rows_citing_one_group_twice": 21,
-  "usd_on_those_rows": 867110.0,
-  "rows_marked_as_one_operator": 21,
-  "rows_not_marked": 0,
-  "usd_not_marked": 0.0
+  "groups_known": 11,
+  "domains_known": 43,
+  "rows_checked": 141,
+  "rows_citing_one_group_twice": 33,
+  "usd_on_those_rows": 964541.0,
+  "rows_marked_as_one_operator": 31,
+  "rows_not_marked": 2,
+  "usd_not_marked": 12580.0
  },
  "rows": [
   {
@@ -69,7 +69,7 @@
   {
    "pn": "1794-IRT8XT",
    "usd": 64200.0,
-   "verdict": "ЗАНИЖЕНА",
+   "verdict": "ВЕРНА",
    "groups": {
     "Sonepar (платформа Net1)": [
      "codale.com",
@@ -287,6 +287,165 @@
     "Hard-To-Find / turbine.parts": [
      "hardtoget.parts",
      "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "186212-100",
+   "usd": 11400.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1064728-1",
+   "usd": 11070.0,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts",
+     "zip-solutions.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "MW03627",
+   "usd": 10680.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
+     "impexron-gmbh.de",
+     "impexron.de",
+     "onrion.com",
+     "ontrium.com",
+     "usaron.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "CT4010J/1",
+   "usd": 10600.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
+     "impexron.de",
+     "onrion.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "PLC-RSC-24DC/21-21/ATEX, 2980461",
+   "usd": 9906.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarine.com",
+     "aeliyamarinetech.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1060817-40",
+   "usd": 9720.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts",
+     "zip-solutions.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1069873-1",
+   "usd": 9180.0,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "KOP160j7MWVPN22",
+   "usd": 7250.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "onrion.com",
+     "ontrium.com",
+     "usaron.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "1794-OW8",
+   "usd": 5330.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "codale.com",
+     "needco.com",
+     "stateelectric.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "630870",
+   "usd": 4600.0,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Иркутский оператор (iroil / gkunicom)": [
+     "gkunicom.ru",
+     "iroil.ru"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1089034-3",
+   "usd": 4252.5,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "700-FSM3UU23-EX",
+   "usd": 3442.5,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "Rexel USA / Platt Electric Supply": [
+     "platt.com",
+     "rexelapps.com",
+     "rexelusa.com"
     ]
    },
    "marked": true

@@ -101,7 +101,53 @@ def top_gap(rows: list, rv: list, top: int = 60) -> tuple[int, float, float]:
     whole = sum(e for e, _ in live) or 1.0
     covered = sum(e for e, r in live if k(r.get("pn")) in done)
     rest = [(e, r) for e, r in live[:top] if k(r.get("pn")) not in done]
-    return len(rest), sum(e for e, _ in rest), covered / whole * 100
+    # Доля считается от ЭКСПОЗИЦИИ, а экспозиция есть только у строк с вилкой.
+    # Поэтому вместе с процентом возвращается, по скольким строкам он посчитан:
+    # без этого «79,3 % экспозиции» читается как «79 % заявки проверено», хотя у
+    # 785 строк из 1 642 оценки нет вовсе и в экспозицию они не входят.
+    return (len(rest), sum(e for e, _ in rest), covered / whole * 100,
+            sum(1 for r in rows if expo(r) > 0), len(rows))
+
+
+def metrology(rows: list, rv: list) -> dict:
+    """Строки, где изготовитель мёртв и утверждение типа в РФ истекло.
+
+    Считается по данным, а не вписывается: признак — упоминание ГРСИ в поле
+    жизненного цикла строки перепроверки. Это не сорсинговая развилка, а вопрос
+    допуска средства измерений на объекте, и решать его владельцу с заказчиком:
+    закупка «тем же номером» проблему не снимает.
+    """
+    import re as _re
+
+    def k(pn) -> str:
+        return _re.sub(r"[^A-Z0-9]", "", str(pn or "").split("(")[0].upper())
+
+    hit = [r for r in rv if "ГРСИ" in str(r.get("lifecycle") or "")]
+    if not hit:
+        return {}
+    band = {}
+    for r in rows:
+        band.setdefault(k(r.get("pn")), r)
+    usd = qty = 0.0
+    for r in hit:
+        b = band.get(k(r.get("pn")))
+        if b is not None:
+            usd += expo(b)
+            qty += float(b.get("qty") or 0)
+    makers = sorted({str(r.get("maker_short") or "").strip() for r in hit} - {""})
+    return {"rows": len(hit), "usd": usd, "qty": qty, "makers": makers}
+
+
+def next_frontier(rows: list, rv: list) -> tuple[int, float]:
+    """Сколько оценённых строк заявки ещё не разобрано и сколько это денег."""
+    import re as _re
+
+    def k(pn) -> str:
+        return _re.sub(r"[^A-Z0-9]", "", str(pn or "").split("(")[0].upper())
+
+    done = {k(r.get("pn")) for r in rv}
+    rest = [r for r in rows if expo(r) > 0 and k(r.get("pn")) not in done]
+    return len(rest), sum(map(expo, rest))
 
 
 def offer_scope(st: dict, prefer: str = "Энергосети") -> tuple[str, dict]:
@@ -245,6 +291,17 @@ def build() -> str:
           f"не подтверждено, запрашивать по ним цену бессмысленно: по болту камеры сгорания "
           f"подтверждение количества стоит дороже любой цены, какую по нему можно найти</td>"
           f"</tr>")
+    met = metrology(rows, rv)
+    if met:
+        a("<tr><td><b>Решение по допуску средств измерений</b> (термопарный блок)</td>"
+          f"<td class='n'>{ru(met['usd'])} USD<br>{ru(met['rows'])} строк, "
+          f"{ru(met['qty'])} штук</td><td>запрос заказчику</td>"
+          "<td>изготовитель ликвидирован 14.03.2024, а российское утверждение типа по этой "
+          "серии действовало по 25.02.2025 и истекло; межповерочный интервал два года. "
+          "Новая поставка «тем же номером» законного утверждения типа в РФ не имеет, и это "
+          "вопрос допуска на объекте, а не цены. Решать вам с заказчиком: либо поверяемый "
+          "аналог с действующим утверждением, либо письменное согласие на позицию без "
+          f"него. Изготовитель по документу: {E(', '.join(met['makers']) or '—')}</td></tr>")
     tail = ((ch.get("measure") or {}).get("tail") or {})
     a("<tr><td><b>Решение по остатку заявки вне карты каналов</b></td>"
       f"<td class='n'>{ru(tail.get('usd'))} USD<br>{ru(tail.get('rows'))} строк</td>"
@@ -255,10 +312,23 @@ def build() -> str:
     a("</table>")
 
     a("<h2>Что я делаю дальше без вас</h2><ol>")
-    gap_rows, gap_usd, cov_pct = top_gap(rows, rv)
-    a(f"<li>Добираю строки из топ-60, про которые не знаем ничего: осталось {ru(gap_rows)} строк "
-      f"на {ru(gap_usd)} USD. По всей заявке перепроверкой закрыто {cov_pct:.1f} % "
-      f"экспозиции.</li>")
+    gap_rows, gap_usd, cov_pct, priced_rows, all_rows = top_gap(rows, rv)
+    # Когда топ-60 закрыт целиком, «осталось 0 строк» — не работа, а отчёт. Тогда
+    # в листе должно стоять, ГДЕ следующий рубеж, иначе пункт «что я делаю дальше»
+    # не говорит ничего.
+    if gap_rows:
+        head = (f"Добираю строки из топ-60, про которые не знаем ничего: осталось "
+                f"{ru(gap_rows)} строк на {ru(gap_usd)} USD.")
+    else:
+        left_rows, left_usd = next_frontier(rows, rv)
+        head = (f"Топ-60 по деньгам разобран целиком. Следующий рубеж — остальные "
+                f"{ru(left_rows)} оценённых строк на {ru(left_usd)} USD, беру их "
+                f"кластерами по изготовителю и по каналу.")
+    a(f"<li>{head} Перепроверкой закрыто {cov_pct:.1f} % экспозиции — и вот чего "
+      f"эта доля НЕ значит: экспозиция есть только у {ru(priced_rows)} строк заявки из "
+      f"{ru(all_rows)}, у остальных {ru(all_rows - priced_rows)} вилки нет вовсе и в знаменатель "
+      f"они не входят. То есть это доля проверенного от ОЦЕНЁННОЙ части заявки, а не от "
+      f"заявки.</li>")
     a("<li>Веду перепроверку крупных строк с проверкой на опровержение — без неё не устояло "
       f"{ru(fell)} выводов, и это цена отсутствия такой проверки раньше.</li>")
     a("<li>Держу прогон выгрузки на охвате «Энергосети»: он даёт цены поставщиков по нашим "

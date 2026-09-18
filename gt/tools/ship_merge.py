@@ -30,6 +30,7 @@ RECHECK = ROOT / "gt/data/ship_recheck.json"
 BLOCKED = ROOT / "gt/data/ship_blocked.json"
 FX = ROOT / "gt/data/fx_rates.json"
 SELLERS = ROOT / "gt/data/ship_sellers.json"
+SUBSTITUTIONS = ROOT / "gt/data/ship_price_substitutions.json"
 DST = ROOT / "gt/data/ship_lukoil.json"
 
 # наши базы контактов: путь -> ключ коллекции (None = файл сам массив)
@@ -528,6 +529,34 @@ def main() -> int:
             except (TypeError, ValueError):
                 pack = 1.0
             rec["unit_price_usd"] = round(usd / pack, 4)
+
+    # ПОДСТАВЛЕННЫЕ ЦЕНЫ СНИМАЮТСЯ. gt/data/ship_price_substitutions.json называет
+    # поимённо номера, у которых в поле цены стоит не цена, а нижняя граница
+    # витринной вилки НА КЛАСС изделий, делённая на фасовку. Такое значение
+    # выглядит как цена и считается как цена, не будучи ею. Набор существовал с
+    # 18.09.2026, но ни на один счёт не влиял: он описывал ошибку, а сводка
+    # продолжала её содержать. Теперь значение обнуляется здесь, а причина
+    # переносится в пояснение строки, чтобы её было видно и в выгрузке.
+    subs = {}
+    if SUBSTITUTIONS.exists():
+        for it in json.loads(SUBSTITUTIONS.read_text(encoding="utf-8")).get("items", []):
+            subs[key(it.get("pn"))] = it
+    dropped = 0
+    for rec in out:
+        it = subs.get(key(rec.get("pn")))
+        if not it:
+            continue
+        why = str(it.get("how_it_was_made") or "").strip()
+        rec["price"] = None
+        rec["price_usd"] = None
+        rec["unit_price_usd"] = None
+        rec["note"] = (str(rec.get("note") or "").rstrip() +
+                       " ЦЕНА СНЯТА 18.09.2026: в поле стояла не цена этой детали, а "
+                       + (why or "подстановка по классу изделий") +
+                       ". Такое значение выглядит как цена и считается как цена, не "
+                       "будучи ею, поэтому в счёт не идёт. Поимённо названо в "
+                       "gt/data/ship_price_substitutions.json.").strip()
+        dropped += 1
 
     for rec in out:
         rec["stock_grade"] = stock_grade(rec)

@@ -32,6 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PRICES = ROOT / "gt/data/rfq_prices.json"
 SHIP = ROOT / "gt/data/ship_lukoil.json"
+REVERIFY = ROOT / "gt/data/ship_reverify.json"
 OUT = ROOT / "gt/data/ship_confidence.json"
 
 # Закрытый список: что в проверке означает «цены по этой строке на самом деле
@@ -55,6 +56,48 @@ def exposure(row: dict) -> float:
     if lo in (None, "") or hi in (None, ""):
         return 0.0
     return (float(lo) + float(hi)) / 2 * float(row.get("qty") or 0)
+
+
+def worked_off(items: list[dict]) -> dict:
+    """Сколько из необеспеченного уже разобрала перепроверка.
+
+    Сам по себе счёт необеспеченных строк — обвинение нашей прежней работе, и
+    без второй цифры он читается как «у нас треть денег висит в воздухе». Это
+    неправда: по большей части этих строк перепроверка уже прошла и либо нашла
+    цену заново, либо записала отказ с доказательством. Открытой остаётся та
+    часть, которой перепроверка не касалась вовсе, — и вот она и есть работа.
+
+    Считается по номеру заявки, а не по тексту: строка либо есть в наборе
+    перепроверки, либо нет.
+    """
+    rv = {}
+    if REVERIFY.exists():
+        for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]:
+            rv[re.sub(r"[^A-Z0-9]", "", str(r.get("pn") or "").split("(")[0].upper())] = r
+
+    def k(pn):
+        return re.sub(r"[^A-Z0-9]", "", str(pn or "").split("(")[0].upper())
+
+    def isnum(x):
+        return isinstance(x, (int, float)) and not isinstance(x, bool)
+
+    seen = [i for i in items if k(i["pn"]) in rv]
+    priced = [i for i in seen if isnum((rv.get(k(i["pn"])) or {}).get("price_low"))]
+    left = [i for i in items if k(i["pn"]) not in rv]
+    e = lambda L: round(sum(i.get("exposure") or 0 for i in L), 2)  # noqa: E731
+    return {
+        "rows_reverified": len(seen),
+        "exposure_reverified": e(seen),
+        "rows_price_found_again": len(priced),
+        "exposure_price_found_again": e(priced),
+        "rows_still_open": len(left),
+        "exposure_still_open": e(left),
+        "what_it_means": ("Необеспеченная уверенность — это обвинение нашей прежней "
+                          "работе, и одним числом его читать нельзя. Строки, по которым "
+                          "перепроверка прошла, уже не висят в воздухе: у них либо найдена "
+                          "цена заново, либо записан отказ с доказательством. Открытая "
+                          "работа — только та часть, которой перепроверка не касалась."),
+    }
 
 
 def measure() -> dict:
@@ -115,6 +158,7 @@ def measure() -> dict:
             "share_pct": round(hit / tot * 100, 1) if tot else 0.0,
         },
         "classes": classes,
+        "worked_off": worked_off(items),
         "items": items,
         "found": found_prices(),
     }
@@ -191,6 +235,12 @@ def report(m: dict) -> str:
         out.append(f"  {v:16} {c['rows']:4} строк {ru(c['exposure']):>12} USD — {c['means']}")
     out.append("  самые дорогие: " + " · ".join(
         f"{x['pn']} ({ru(x['exposure'])} USD, {x['verdict']})" for x in m["items"][:5]))
+    w = m["worked_off"]
+    out.append(f"ИЗ НИХ перепроверка уже прошла по {w['rows_reverified']} строкам на "
+               f"{ru(w['exposure_reverified'])} USD, цену нашла заново по "
+               f"{w['rows_price_found_again']} на {ru(w['exposure_price_found_again'])} USD")
+    out.append(f"ОТКРЫТОЙ РАБОТЫ осталось: {w['rows_still_open']} строк на "
+               f"{ru(w['exposure_still_open'])} USD")
     f = m["found"]
     out.append(f"строк, где наша же проверка нашла цену: {f['rows']} · экспозиция по вилкам "
                f"{ru(f['exposure_band'])} → по найденным ценам {ru(f['exposure_checked'])} USD")

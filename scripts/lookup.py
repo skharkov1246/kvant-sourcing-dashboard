@@ -20,13 +20,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 INDEX = ROOT / "data" / "index.json"
 _norm_pn = re.compile(r"[^A-Z0-9]")
+# Те же кириллические двойники, что и в scripts/build_index.py: ключ запроса
+# обязан строиться ровно тем же правилом, иначе поиск снова разойдётся с
+# индексом. Смысл правки — в build_index.py, там она и объяснена.
+HOMOGLYPHS = str.maketrans({
+    "А": "A", "В": "B", "Е": "E", "К": "K", "М": "M", "Н": "H", "О": "O",
+    "Р": "P", "С": "C", "Т": "T", "У": "Y", "Х": "X",
+    "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "у": "y", "х": "x",
+})
 
 
 def keys_for(value: str) -> list[str]:
     """Одно и то же значение ищем и как парт-номер, и как текст.
     Для цифровых номеров обе нормализации совпадают — дубликат убираем."""
     out, seen = [], set()
-    for k in (_norm_pn.sub("", value.upper()), re.sub(r"\s+", " ", value.strip()).casefold()):
+    for k in (_norm_pn.sub("", value.translate(HOMOGLYPHS).upper()),
+              re.sub(r"\s+", " ", value.strip()).casefold()):
         if k and k not in seen:
             seen.add(k)
             out.append(k)

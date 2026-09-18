@@ -1,0 +1,67 @@
+{
+ "updated": "2026-09-18",
+ "source": "Классификация поля основания у записей разведки цен gt/data/rfq_prices.json, взвешенная деньгами по gt/data/ship_lukoil.json. Считает gt/tools/band_basis.py.",
+ "why": "Итоговая сумма заявки читается как замер, но замер она только на части строк. Эта доля и считается здесь, чтобы она стояла рядом с суммой.",
+ "what_it_is_not": "Это НЕ упрёк разведке. Экспертная вилка нормальна как рабочая оценка на этапе подготовки; недопустимо выдавать её за найденную цену.",
+ "records": 857,
+ "usd_exposure": 9277357.8,
+ "usd_on_opinion": 4704793.9,
+ "usd_on_transfer": 1243502.4,
+ "share_not_a_found_price": 64.1,
+ "closed_by_reverify": {
+  "records": 104,
+  "usd_exposure": 1543928.0,
+  "what_it_means": "Строки, где основанием было мнение или перенос по классу, а перепроверка нашла цену числом. Столько мнения уже заменено замером."
+ },
+ "by_basis": {
+  "мнение: экспертная вилка": {
+   "records": 518,
+   "usd_exposure": 4704793.9,
+   "what_it_means": "Основание прямо называет себя оценкой специалиста. Найденной цены за ней нет.",
+   "records_with_found_price": 66,
+   "usd_with_found_price": 514623.5
+  },
+  "цена продавца: розница или дистрибьютор": {
+   "records": 158,
+   "usd_exposure": 3047140.0,
+   "what_it_means": "За вилкой стоит цена с карточки продавца или дистрибьютора.",
+   "records_with_found_price": 84,
+   "usd_with_found_price": 2348923.25
+  },
+  "перенос по аналогу или классу": {
+   "records": 141,
+   "usd_exposure": 1243502.4,
+   "what_it_means": "Цена взята у похожего изделия или у класса изделий, а не у этой детали.",
+   "records_with_found_price": 38,
+   "usd_with_found_price": 1029304.5
+  },
+  "цена вторичного рынка": {
+   "records": 31,
+   "usd_exposure": 238728.5,
+   "what_it_means": "За вилкой стоит цена торговой площадки или брокерского перечня.",
+   "records_with_found_price": 14,
+   "usd_with_found_price": 81814.5
+  },
+  "основание записано, но не отнесено к классу": {
+   "records": 9,
+   "usd_exposure": 43193.0,
+   "what_it_means": "",
+   "records_with_found_price": 3,
+   "usd_with_found_price": 15048.0
+  }
+ },
+ "by_confidence": {
+  "A": {
+   "records": 143,
+   "usd_exposure": 3323428.75
+  },
+  "B": {
+   "records": 162,
+   "usd_exposure": 1134887.25
+  },
+  "C": {
+   "records": 552,
+   "usd_exposure": 4819041.8
+  }
+ }
+}

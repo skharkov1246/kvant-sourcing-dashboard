@@ -1,6 +1,6 @@
 {
   "note": "Производители: ключ nkey(name) и все написания, найденные в базах. Разные написания одной компании собраны под одним ключом — это и есть то, чего сегодня нет ни в одном подпроекте.",
-  "count": 292,
+  "count": 304,
   "records": [
     {
       "oem_key": "skf",
@@ -157,6 +157,33 @@
         }
       ],
       "n_spellings": 6
+    },
+    {
+      "oem_key": "inniojenbacher",
+      "name": "INNIO Jenbacher",
+      "spellings": [
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "gt/data/pn_db.json:rows[].oem"
+        },
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "gpu/data/models.json:oems[].name"
+        },
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "gpu/data/machines.json:machines[].oem"
+        },
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 5
     },
     {
       "oem_key": "atlascopco",
@@ -360,29 +387,6 @@
         },
         {
           "spelling": "Grundfos Hungary Manufacturing Ltd",
-          "where": "pnw/data/item_master.json:items[].maker"
-        }
-      ],
-      "n_spellings": 4
-    },
-    {
-      "oem_key": "inniojenbacher",
-      "name": "INNIO Jenbacher",
-      "spellings": [
-        {
-          "spelling": "INNIO Jenbacher",
-          "where": "gt/data/pn_db.json:rows[].mk"
-        },
-        {
-          "spelling": "INNIO Jenbacher",
-          "where": "gpu/data/models.json:oems[].name"
-        },
-        {
-          "spelling": "INNIO Jenbacher",
-          "where": "gpu/data/machines.json:machines[].oem"
-        },
-        {
-          "spelling": "INNIO Jenbacher",
           "where": "pnw/data/item_master.json:items[].maker"
         }
       ],
@@ -606,6 +610,44 @@
         {
           "spelling": "Deutz",
           "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 3
+    },
+    {
+      "oem_key": "marflex",
+      "name": "MarFlex",
+      "spellings": [
+        {
+          "spelling": "MarFlex",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Marflex",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "MarFlex",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 3
+    },
+    {
+      "oem_key": "phoenixcontact",
+      "name": "Phoenix Contact",
+      "spellings": [
+        {
+          "spelling": "Phoenix Contact",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "PHOENIX CONTACT",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "PHOENIX CONTACT",
+          "where": "pnw/data/item_master.json:items[].maker"
         }
       ],
       "n_spellings": 3
@@ -1676,21 +1718,6 @@
       "n_spellings": 2
     },
     {
-      "oem_key": "faudi",
-      "name": "Faudi",
-      "spellings": [
-        {
-          "spelling": "Faudi",
-          "where": "gt/data/pn_db.json:rows[].mk"
-        },
-        {
-          "spelling": "Faudi",
-          "where": "pnw/data/item_master.json:items[].maker"
-        }
-      ],
-      "n_spellings": 2
-    },
-    {
       "oem_key": "federalsignal",
       "name": "Federal Signal",
       "spellings": [
@@ -2276,21 +2303,6 @@
       "n_spellings": 2
     },
     {
-      "oem_key": "marflex",
-      "name": "MarFlex",
-      "spellings": [
-        {
-          "spelling": "MarFlex",
-          "where": "gt/data/pn_db.json:rows[].mk"
-        },
-        {
-          "spelling": "MarFlex",
-          "where": "pnw/data/item_master.json:items[].maker"
-        }
-      ],
-      "n_spellings": 2
-    },
-    {
       "oem_key": "mcmastercarr",
       "name": "McMaster-Carr",
       "spellings": [
@@ -2765,21 +2777,6 @@
         },
         {
           "spelling": "Pepperl+Fuchs / RSD",
-          "where": "pnw/data/item_master.json:items[].maker"
-        }
-      ],
-      "n_spellings": 2
-    },
-    {
-      "oem_key": "phoenixcontact",
-      "name": "PHOENIX CONTACT",
-      "spellings": [
-        {
-          "spelling": "PHOENIX CONTACT",
-          "where": "gt/data/pn_db.json:rows[].mk"
-        },
-        {
-          "spelling": "PHOENIX CONTACT",
           "where": "pnw/data/item_master.json:items[].maker"
         }
       ],
@@ -3862,6 +3859,17 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "aaf",
+      "name": "AAF",
+      "spellings": [
+        {
+          "spelling": "AAF",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "abbsiemensomronпотипу",
       "name": "ABB/Siemens/OMRON (по типу)",
       "spellings": [
@@ -3878,6 +3886,17 @@
       "spellings": [
         {
           "spelling": "ABB (силовой модуль Infineon FS450R17KE3)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "allenbradleyrockwellautomation",
+      "name": "Allen-Bradley (Rockwell Automation)",
+      "spellings": [
+        {
+          "spelling": "Allen-Bradley (Rockwell Automation)",
           "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
@@ -3917,6 +3936,17 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "comatrelecoturckc9series",
+      "name": "Comat Releco / TURCK (C9 series)",
+      "spellings": [
+        {
+          "spelling": "Comat Releco / TURCK (C9 series)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "denso",
       "name": "DENSO",
       "spellings": [
@@ -3934,6 +3964,17 @@
         {
           "spelling": "Det-Tronics (Emerson)",
           "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "faudi",
+      "name": "Faudi",
+      "spellings": [
+        {
+          "spelling": "Faudi",
+          "where": "pnw/data/item_master.json:items[].maker"
         }
       ],
       "n_spellings": 1
@@ -3967,6 +4008,17 @@
         {
           "spelling": "Guascor (Siemens Energy)",
           "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "hdiinstruments",
+      "name": "HDI Instruments",
+      "spellings": [
+        {
+          "spelling": "HDI Instruments",
+          "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
       "n_spellings": 1
@@ -4022,6 +4074,17 @@
         {
           "spelling": "Jichai (Jinan Diesel, CNPC)",
           "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "mannhummelmannlc15001x",
+      "name": "Mann & Hummel (MANN LC 15 001 x)",
+      "spellings": [
+        {
+          "spelling": "Mann & Hummel (MANN LC 15 001 x)",
+          "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
       "n_spellings": 1
@@ -4131,6 +4194,50 @@
       "spellings": [
         {
           "spelling": "RENK",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "renkwerkhannover",
+      "name": "RENK AG (Werk Hannover)",
+      "spellings": [
+        {
+          "spelling": "RENK AG (Werk Hannover)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "rochestersensorsранееrochestergaugesamph",
+      "name": "Rochester Sensors (ранее Rochester Gauges, Amphenol)",
+      "spellings": [
+        {
+          "spelling": "Rochester Sensors (ранее Rochester Gauges, Amphenol)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "saiaburgess",
+      "name": "Saia-Burgess",
+      "spellings": [
+        {
+          "spelling": "Saia-Burgess",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "schrackteconnectivityназванвпозициизаказ",
+      "name": "SCHRACK / TE Connectivity (назван в позиции заказчика)",
+      "spellings": [
+        {
+          "spelling": "SCHRACK / TE Connectivity (назван в позиции заказчика)",
           "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
@@ -4258,12 +4365,45 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "teconnectivityschrackpotterbrumfield",
+      "name": "TE Connectivity (SCHRACK / Potter & Brumfield)",
+      "spellings": [
+        {
+          "spelling": "TE Connectivity (SCHRACK / Potter & Brumfield)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "universalthermosensorsuk",
+      "name": "Universal Thermosensors Ltd (UK)",
+      "spellings": [
+        {
+          "spelling": "Universal Thermosensors Ltd (UK)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "vikingparkerпотипу",
       "name": "Viking/Parker (по типу)",
       "spellings": [
         {
           "spelling": "Viking/Parker (по типу)",
           "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "weidmller",
+      "name": "Weidmüller",
+      "spellings": [
+        {
+          "spelling": "Weidmüller",
+          "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
       "n_spellings": 1

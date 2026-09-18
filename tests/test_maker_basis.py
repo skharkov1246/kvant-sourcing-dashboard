@@ -142,3 +142,40 @@ def test_замер_считает_ровно_строки_с_коротким_�
     rows = json.loads(src.read_text(encoding="utf-8"))["rows"]
     want = sum(1 for r in rows if str(r.get("maker_short") or "").strip())
     assert len(checked_by_reverify()) == want
+
+
+def test_нулевое_пересечение_не_выдаётся_за_измерение():
+    """После применения изготовителей пересечение «догадка И закрыто» = 0 всегда.
+
+    Оплачено строкой в справке, которая печатала «перепроверка уже закрыла
+    каталогом 0 строк на 0 USD. Значит ОТКРЫТОЙ РАБОТЫ осталось <то же число>».
+    Читается как «ничего не закрыли», а на деле закрытое уже вычтено: инструмент
+    apply_makers заменяет догадку настоящим именем и ставит основание
+    «П0 — каталог изготовителя», после чего строка перестаёт быть догадкой.
+    Ноль, выведенный из правила, а не из данных, — это правило 1 CLAUDE.md.
+
+    Здесь закреплено, что замер САМ отличает два случая и сообщает об этом
+    флагом, а документ выбирает формулировку по флагу, а не по числу.
+    """
+    import sys
+    sys.path.insert(0, str(ROOT / "gt/tools"))
+    import maker_basis
+
+    m = maker_basis.measure()
+    assert "weak_closed_tautological" in m, "замер обязан сообщать, тавтологичен ли ноль"
+    if m["weak_closed_by_reverify_rows"] == 0 and m["closed_by_reverify_rows"] > 0:
+        assert m["weak_closed_tautological"], (
+            "строки закрыты каталогом, а пересечение с догадками нулевое — это "
+            "структурный ноль, и замер обязан это сказать")
+    if m["weak_closed_by_reverify_rows"] > 0:
+        assert not m["weak_closed_tautological"]
+
+
+def test_справка_не_печатает_закрыла_ноль_строк():
+    """Формулировку выбирает флаг замера, а не человек."""
+    src = (ROOT / "gt/docs/СПРАВКА-НА-ЗАЩИТУ-ЛУКОЙЛ.html")
+    if not src.exists():
+        pytest.skip("справки нет")
+    t = src.read_text(encoding="utf-8")
+    assert "уже закрыла каталогом: 0 строк на 0 USD" not in t
+    assert "закрыла каталогом: 0 строк" not in t

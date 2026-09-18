@@ -112,7 +112,7 @@ COLS = [
     ("Наименование", 22, lambda r: E((r.get("name") or "")[:150])),
     ("Кол-во", 5, lambda r: f'{ru(r.get("qty"))} {E(r.get("unit") or "шт")}'),
     ("Наличие", 7, lambda r: E(GRADE_RU.get(r.get("stock_grade", ""), ""))),
-    ("Остаток", 8, lambda r: E(r.get("stock_qty") or "")),
+    ("Остаток", 8, lambda r: E(str(r.get("stock_qty") or ""))),
     ("Срок", 10, lambda r: E(r.get("lead_time") or "")),
     ("Цена, USD/шт", 6, lambda r: (f'{unit_usd(r):,.2f}'.replace(",", " ")
                                    if unit_usd(r) is not None else "")),
