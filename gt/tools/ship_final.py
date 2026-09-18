@@ -150,6 +150,7 @@ def build() -> str:
     jb = load("ship_jenbacher_prices.json") or {}
     sl = load("ship_stocklist_cross.json") or {}
     dc = load("ship_demand_collisions.json") or {}
+    bb = load("ship_band_basis.json") or {}
 
     band = {}
     for r in lk:
@@ -241,6 +242,21 @@ def build() -> str:
           f"потому что счёт ведётся по нашим границам. Это не оценка рынка: это цены, "
           f"найденные по конкретным строкам, и границы по ним надо ПОСТАВИТЬ — отдельным "
           f"действием и с записанным основанием.</p>")
+    if bb:
+        cl = bb.get("closed_by_reverify") or {}
+        a(f"<p>На чём эта оценка держится. У каждой записи нашей разведки цен записано "
+          f"основание, и записано оно честно: у части строк это цена с карточки продавца, у "
+          f"части — прямая пометка «экспертная вилка». По деньгам расклад такой: "
+          f"<span class='k'>{ru(bb.get('usd_on_opinion'))} долларов</span> стоят на мнении "
+          f"специалиста и <span class='k'>{ru(bb.get('usd_on_transfer'))} долларов</span> — на "
+          f"переносе цены с похожего изделия или с класса изделий. Вместе это "
+          f"<span class='k'>{bb.get('share_not_a_found_price')} процента</span> денег заявки, "
+          f"за которыми НЕ стоит найденная цена этой детали. Перепроверка уже заменила "
+          f"замером {ru(cl.get('records'))} таких строк на "
+          f"<span class='k'>{ru(cl.get('usd_exposure'))} долларов</span>.</p>")
+        a("<p class='dim'>Экспертная вилка — нормальная рабочая оценка на этапе подготовки, и "
+          "замер её не порицает. Недопустимо другое: выдавать её за найденную цену. Считает "
+          "gt/tools/band_basis.py, набор gt/data/ship_band_basis.json.</p>")
     a("</div>")
 
     a("<table><colgroup><col style='width:30mm'><col style='width:16mm'><col style='width:26mm'>"
