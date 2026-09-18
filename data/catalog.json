@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 252,
-    "total_bytes": 112531080,
+    "total_bytes": 112531201,
     "by_sensitivity": {
       "конфиденциально": 65,
       "внутреннее": 138,
@@ -6187,6 +6187,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/rv_brief.py",
         "gt/tools/ship_coverage.py",
         "tests/test_ship_coverage.py"
       ]
@@ -10112,7 +10113,7 @@
     {
       "path": "gt/data/ship_coverage.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 5001,
+      "bytes": 5122,
       "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
       "format": "json",
       "shape": "объект",
@@ -10137,7 +10138,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "35b2b65",
+      "last_commit": "6fca00f",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
