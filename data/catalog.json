@@ -442,9 +442,9 @@
         "gt/tools/maker_basis.py",
         "gt/tools/rv_brief.py",
         "gt/tools/rv_merge.py",
+        "gt/tools/rv_pricehunt.py",
         "gt/tools/seller_groups.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_coverage.py"
+        "gt/tools/ship_brief.py"
       ]
     },
     {
@@ -2002,6 +2002,7 @@
       "referenced_by": [
         "gt/tools/collisions.py",
         "gt/tools/questions_doc.py",
+        "gt/tools/rv_pricehunt.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
         "gt/tools/ship_final.py",
@@ -3184,6 +3185,7 @@
       "referenced_by": [
         "gt/tools/collisions.py",
         "gt/tools/questions_doc.py",
+        "gt/tools/rv_pricehunt.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
         "gt/tools/ship_final.py",
