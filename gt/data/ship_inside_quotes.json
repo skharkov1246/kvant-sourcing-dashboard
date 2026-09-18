@@ -5,8 +5,8 @@
  "quote_files_scanned": 779,
  "rows_of_request_found": 1014,
  "usd_found": 6702447.3,
- "rows_without_our_price": 837,
- "usd_without_our_price": 3678954.8,
+ "rows_without_our_price": 839,
+ "usd_without_our_price": 3747792.3,
  "min_key_length": 6,
  "found_only_after_folding": 6,
  "folding_note": "Совпадения, найденные только после приведения кириллических букв-двойников к латинице. В заявке номера со смешанным алфавитом, и по такому написанию сверка не находит ничего. Приведение делается ТОЛЬКО когда вся кириллица в обозначении — двойники: иначе русское обозначение калечится в правдоподобный набор знаков и даёт ложное совпадение.",
@@ -227,6 +227,36 @@
    ]
   },
   {
+   "pn": "4351035",
+   "name": "Колпачек свечи зажигания 4351035",
+   "qty": 773,
+   "usd_exposure": 38650.0,
+   "we_already_have_price": false,
+   "found_in": [
+    {
+     "deal": "СП-166 41280",
+     "file": "Inquiry     polina （Cummins）260826.xlsx",
+     "rows": 66,
+     "rows_with_price": 59,
+     "direction": "входящее"
+    },
+    {
+     "deal": "СП-166 41276",
+     "file": "Cummins new request-3.xlsx",
+     "rows": 61,
+     "rows_with_price": 53,
+     "direction": "входящее"
+    },
+    {
+     "deal": "СП-166 41292",
+     "file": "Cummins new request.xlsx",
+     "rows": 60,
+     "rows_with_price": 47,
+     "direction": "входящее"
+    }
+   ]
+  },
+  {
    "pn": "1046415-79",
    "name": "БЛОК УПРАВЛЕНИЯ ГЕНЕРАТОРА Солар Taurus 60S 1046415-79",
    "qty": 4,
@@ -402,6 +432,36 @@
      "file": "QT 127 SGT-400 minor parts (4).pdf",
      "rows": 1091,
      "rows_with_price": 357,
+     "direction": "входящее"
+    }
+   ]
+  },
+  {
+   "pn": "1075721",
+   "name": "ЛЕНТА, ГУБКА, 50 ФУТОВ СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1075721",
+   "qty": 345,
+   "usd_exposure": 30187.5,
+   "we_already_have_price": false,
+   "found_in": [
+    {
+     "deal": "сделка 22566",
+     "file": "Запрос ТКП-общий ЭС.XLSX",
+     "rows": 1564,
+     "rows_with_price": 1431,
+     "direction": "заявка"
+    },
+    {
+     "deal": "сделка 22566",
+     "file": "Запрос ТКП-общий ЭС.XLSX",
+     "rows": 1564,
+     "rows_with_price": 1431,
+     "direction": "заявка"
+    },
+    {
+     "deal": "СП-166 41034",
+     "file": "Quotation p76057.pdf",
+     "rows": 1157,
+     "rows_with_price": 475,
      "direction": "входящее"
     }
    ]
