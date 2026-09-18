@@ -186,6 +186,18 @@ def main() -> int:
     if not SRC.exists():
         print("замера нет — сначала gt/tools/ship_underpriced.py", file=sys.stderr)
         return 1
+    # НАБОР СТАРШЕ СВОЕГО ИСТОЧНИКА — ДОКУМЕНТ ВРЁТ МОЛЧА. Поймано на себе
+    # 18.09.2026: приняли восемнадцать строк разведки, пересобрали ДОКУМЕНТ и
+    # получили прежние числа, потому что пересчитать НАБОР забыли. Документ
+    # выглядел свежим (дата сборки сегодняшняя), а решение владельцу предлагал
+    # по вчерашнему замеру: 76 строк на 994 962 USD вместо 88 на 987 879.
+    # Поэтому сборка отказывается идти, пока набор не пересчитан.
+    rv = ROOT / "gt/data/ship_reverify.json"
+    if rv.exists() and rv.stat().st_mtime > SRC.stat().st_mtime:
+        print("набор ship_underpriced.json СТАРШЕ ship_reverify.json: сначала прогони "
+              "gt/tools/ship_underpriced.py, иначе документ соберётся на прежних числах",
+              file=sys.stderr)
+        return 1
     doc = build()
     OUT.mkdir(parents=True, exist_ok=True)
     hp, pp = OUT / f"{NAME}.html", OUT / f"{NAME}.pdf"
