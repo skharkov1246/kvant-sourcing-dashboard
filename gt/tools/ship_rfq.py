@@ -102,6 +102,10 @@ QUESTIONS_RU = [
 ]
 
 
+# Наименование в письме НЕ обрезается. Обрезка на 90 знаках уносила как раз
+# конец строки, где стоят размер, исполнение и давление, — то есть ровно то, по
+# чему продавец подбирает деталь. Правила репозитория обрезку в выгрузках
+# запрещают, и письмо здесь не исключение.
 def body_en(name: str, lines: list[tuple[dict, dict]]) -> str:
     tbl = []
     for i, (r, sl) in enumerate(lines, 1):
@@ -109,14 +113,14 @@ def body_en(name: str, lines: list[tuple[dict, dict]]) -> str:
         if r.get("man"):
             bits.append(f"brand {r['man']}")
         if r.get("name"):
-            bits.append(str(r["name"])[:90])
+            bits.append(str(r["name"]))
         s = "; ".join(bits)
         if sl.get("url"):
             s += f"\n   your listing: {sl['url']}"
         seen = price_seen(r)
         if seen:
             s += f"\n   price we see on the listing: {seen}"
-        if (r.get("stock_qty") or "").strip():
+        if str(r.get("stock_qty") or "").strip():
             s += f"\n   stock shown: {r['stock_qty']}"
         tbl.append(s)
     q = "\n".join(f"  {i}) {t}" for i, t in enumerate(QUESTIONS_EN, 1))
@@ -142,14 +146,14 @@ def body_ru(name: str, lines: list[tuple[dict, dict]]) -> str:
         if r.get("man"):
             bits.append(f"бренд {r['man']}")
         if r.get("name"):
-            bits.append(str(r["name"])[:90])
+            bits.append(str(r["name"]))
         s = "; ".join(bits)
         if sl.get("url"):
             s += f"\n   ваша карточка: {sl['url']}"
         seen = price_seen(r)
         if seen:
             s += f"\n   цена на карточке: {seen}"
-        if (r.get("stock_qty") or "").strip():
+        if str(r.get("stock_qty") or "").strip():
             s += f"\n   показанный остаток: {r['stock_qty']}"
         tbl.append(s)
     q = "\n".join(f"  {i}) {t}" for i, t in enumerate(QUESTIONS_RU, 1))
