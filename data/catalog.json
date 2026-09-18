@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 224,
-    "total_bytes": 101879471,
+    "total_bytes": 101880832,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 127,
@@ -984,9 +984,9 @@
         "records": 3
       },
       "last_change": "2026-09-18",
-      "last_author": "github-actions[bot]",
-      "last_commit": "90e4335",
-      "updated_by": "бот (workflow)",
+      "last_author": "Claude",
+      "last_commit": "602f57c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5101,7 +5101,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 67940,
+      "bytes": 69301,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5132,6 +5132,7 @@
         "gt/data/ship_energoseti.json",
         "gt/data/ship_english_source.json",
         "gt/data/ship_lukoil.json",
+        "gt/data/ship_offer_stats.json",
         "gt/data/ship_questions.json",
         "gt/data/ship_recheck.json",
         "gt/data/ship_reverify.json",
@@ -5144,12 +5145,11 @@
         "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
         "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
         "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
-        "gt/tools/ship_offer.py",
-        "library/data/symptoms.json"
+        "gt/tools/ship_offer.py"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "4e3d24e",
+      "last_commit": "4ef743b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
