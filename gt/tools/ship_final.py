@@ -1221,6 +1221,18 @@ def main() -> int:
          f"--print-to-pdf={pp}", hp.as_uri()],
         check=True, capture_output=True)
     print(f"{pp.name}: {pp.stat().st_size / 1e6:.1f} МБ")
+    # ПРОВЕРКА ВЁРСТКИ ЗДЕСЬ, А НЕ ОТДЕЛЬНОЙ КОМАНДОЙ. 18.09.2026 документ был
+    # собран и запушен с полупустой последней страницей на 236 знаков:
+    # scripts/pdf_check.py существует, но запускать его надо помнить, а помнить я
+    # забыл. Дефект создаётся здесь — здесь ему и место быть пойманным.
+    chk = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/pdf_check.py"), str(pp)],
+        capture_output=True, text=True)
+    if "ПРОБЛЕМЫ" in chk.stdout or chk.returncode != 0:
+        print(chk.stdout.strip(), file=sys.stderr)
+        print("документ собран, но проверку вёрстки НЕ ПРОШЁЛ — так его не отдавайте",
+              file=sys.stderr)
+        return 1
     return 0
 
 
