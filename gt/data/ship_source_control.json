@@ -20,7 +20,7 @@
    "control_real": {
     "pn": "1794-IB16",
     "http": 200,
-    "bytes": 46859,
+    "bytes": 46858,
     "echoes_number": true,
     "says_about_stock": [
      "out of stock"
@@ -76,16 +76,20 @@
     "money_on_page": []
    },
    "control_real": {
-    "pn": "1794-IB16",
-    "http": 404,
-    "bytes": 2936688,
-    "echoes_number": false,
+    "pn": "3axd50000260324",
+    "http": 200,
+    "bytes": 2966396,
+    "echoes_number": true,
     "says_about_stock": [
      "in stock",
      "no results",
      "request a quote"
     ],
-    "money_on_page": []
+    "money_on_page": [
+     "$188.47",
+     "$188.47",
+     "$188.47"
+    ]
    },
    "passes": true,
    "what_it_means": "На выдуманный номер отвечает не так, как на настоящий, — значит его «не найдено» и «нет в наличии» можно принимать как сведение."
@@ -95,7 +99,7 @@
    "control_fake": {
     "pn": "99999999",
     "http": 404,
-    "bytes": 472586,
+    "bytes": 472597,
     "echoes_number": false,
     "says_about_stock": [
      "in stock",
