@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 240,
-    "total_bytes": 108871562,
+    "datasets": 242,
+    "total_bytes": 109390693,
     "by_sensitivity": {
       "конфиденциально": 62,
-      "внутреннее": 133,
-      "публикуемо": 45
+      "внутреннее": 134,
+      "публикуемо": 46
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 63,
+      "ГТУ-библиотека": 65,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -225,7 +225,7 @@
     {
       "path": "gt/data/ship_lukoil.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 6122672,
+      "bytes": 6124288,
       "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
       "format": "json",
       "shape": "объект",
@@ -278,7 +278,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "d37c0af",
+      "last_commit": "0ff0a22",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -292,9 +292,9 @@
         "gt/tools/demand_collisions.py",
         "gt/tools/english_source.py",
         "gt/tools/homoglyphs.py",
+        "gt/tools/inside_quotes.py",
         "gt/tools/jenbacher_fold.py",
-        "gt/tools/lists_fold.py",
-        "gt/tools/lists_rfq.py"
+        "gt/tools/lists_fold.py"
       ]
     },
     {
@@ -390,7 +390,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 4601442,
+      "bytes": 4585182,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -428,7 +428,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "b30f7fd",
+      "last_commit": "0ff0a22",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -438,13 +438,13 @@
         "gt/tools/apply_makers.py",
         "gt/tools/band_basis.py",
         "gt/tools/confidence_audit.py",
+        "gt/tools/inside_quotes.py",
         "gt/tools/jenbacher_fold.py",
         "gt/tools/lists_rfq.py",
         "gt/tools/maker_basis.py",
         "gt/tools/rv_brief.py",
         "gt/tools/rv_merge.py",
-        "gt/tools/rv_pricehunt.py",
-        "gt/tools/seller_groups.py"
+        "gt/tools/rv_pricehunt.py"
       ]
     },
     {
@@ -1054,9 +1054,11 @@
       "referenced_by": [
         ".github/workflows/bitrix-tkp.yml",
         "gt/tools/bitrix_tkp.py",
+        "gt/tools/inside_quotes.py",
         "gt/tools/sale_side.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_inventory.py",
+        "gt/tools/system_coverage.py",
         "scripts/merge_tkp_index.py",
         "tests/test_merge_tkp_index.py"
       ]
@@ -1174,7 +1176,7 @@
     {
       "path": "gt/data/ship_energoseti.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 894304,
+      "bytes": 895919,
       "note": "Проверка наличия у продавцов по непроверенному остатку ТКП ЛУКОЙЛ/«Энергосети»: 505 артикулов с нашей ценовой вилкой, по которым ранее не было проверки наличия. Список собран из gt/data/rfq_demand.json (лист «Энергосети») за вычетом проверенных в gt/data/rfq_prices.json:checks. По каждой строке — вердикт (склад / под заказ / артикул живой без склада / только OEM / не найден), продавец со ссылкой на карточку товара, страна, тип предложения (оригинал OEM / изготовитель узла / аналог), наличие, остаток, срок отгрузки, цена за единицу продажи, размер упаковки, покрытие заявленного объёма. Собрано агентами по витринам продавцов 11.09.2026; котировками не является. Отчёт — gt/tools/ship_report.py → gt/docs/НАЛИЧИЕ-ТКП-ЭНЕРГОСЕТИ.pdf.",
       "format": "json",
       "shape": "объект",
@@ -1215,9 +1217,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "9a3905b",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "0ff0a22",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1228,7 +1230,8 @@
         "gt/tools/ship_report.py",
         "library/load_crossrefs.py",
         "library/load_parts.py",
-        "library/load_suppliers.py"
+        "library/load_suppliers.py",
+        "tests/test_pack_division.py"
       ]
     },
     {
@@ -1698,6 +1701,52 @@
         ]
       },
       "referenced_by": []
+    },
+    {
+      "path": "gt/data/ship_inside_quotes.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 526359,
+      "note": "Цены, которые уже лежат у нас: номера заявки ЛУКОЙЛ во ВХОДЯЩИХ предложениях поставщиков. Опись вложений сделок помнит, какие артикулы стоят в каждом присланном предложении и сколько в нём строк с ценой. Сверка по 779 таким файлам нашла 1 008 номеров заявки на 6 675 650 USD, из них по 835 строкам на 3 678 955 USD нашей цены до сих пор нет — то есть разведка искала в интернете то, что лежало в почте. Среди них две самые дорогие строки всей заявки. Это АДРЕС, а не цена: номер стоит в файле, где есть строки с ценой, стоит ли цена против него — покажет открытый файл. Самих цен набор не хранит: репозиторий публичный. Сверка по нормализованному номеру от шести знаков, чисто числовые ряды короче семи знаков отброшены — ложное совпадение здесь дороже пропуска. Считает gt/tools/inside_quotes.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "caveat",
+        "min_key_length",
+        "quote_files_scanned",
+        "rows",
+        "rows_of_request_found",
+        "rows_without_our_price",
+        "source",
+        "updated",
+        "usd_found",
+        "usd_without_our_price",
+        "what_it_gives"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 835,
+        "record_keys": [
+          "found_in",
+          "name",
+          "pn",
+          "qty",
+          "usd_exposure",
+          "we_already_have_price"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "0ff0a22",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/inside_quotes.py",
+        "gt/tools/ship_final.py",
+        "tests/test_inside_quotes.py"
+      ]
     },
     {
       "path": "zip/data/bearing_sites_ru.json",
@@ -3873,7 +3922,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "9183a42",
+      "last_commit": "0ff0a22",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5034,46 +5083,9 @@
       "referenced_by": []
     },
     {
-      "path": "ove/data/alternative.json",
-      "subproject": "ОВЭ-75",
-      "bytes": 89065,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "legal",
-        "matrix",
-        "risks",
-        "summary",
-        "updated",
-        "wording"
-      ],
-      "main_collection": {
-        "key": "legal",
-        "records": 27,
-        "record_keys": [
-          "favors",
-          "quote",
-          "reading",
-          "where"
-        ]
-      },
-      "last_change": "2026-08-31",
-      "last_author": "github-actions[bot]",
-      "last_commit": "11f2331",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "ove/build.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 87617,
+      "bytes": 90148,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5108,6 +5120,7 @@
         "gt/data/ship_energoseti.json",
         "gt/data/ship_english_source.json",
         "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_quotes.json",
         "gt/data/ship_jenbacher_prices.json",
         "gt/data/ship_lists_rfq.json",
         "gt/data/ship_lukoil.json",
@@ -5116,12 +5129,11 @@
         "gt/data/ship_parts_lists.json",
         "gt/data/ship_price_substitutions.json",
         "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_reverify.json"
+        "gt/data/ship_recheck.json"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "aab32a6",
+      "last_commit": "0ff0a22",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5130,6 +5142,43 @@
       "referenced_by": [
         "scripts/build_catalog.py",
         "tests/test_catalog_guard.py"
+      ]
+    },
+    {
+      "path": "ove/data/alternative.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 89065,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "legal",
+        "matrix",
+        "risks",
+        "summary",
+        "updated",
+        "wording"
+      ],
+      "main_collection": {
+        "key": "legal",
+        "records": 27,
+        "record_keys": [
+          "favors",
+          "quote",
+          "reading",
+          "where"
+        ]
+      },
+      "last_change": "2026-08-31",
+      "last_author": "github-actions[bot]",
+      "last_commit": "11f2331",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
       ]
     },
     {
@@ -8953,11 +9002,11 @@
         "gt/public/faults.html",
         "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
+        "gt/tools/system_coverage.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_chain_page.py",
         "tests/test_dict.py",
-        "tests/test_faults_slices.py",
-        "tests/test_r1700_dossier.py"
+        "tests/test_faults_slices.py"
       ]
     },
     {
@@ -9904,7 +9953,7 @@
     {
       "path": "gt/data/ship_coverage.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 3564,
+      "bytes": 3563,
       "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
       "format": "json",
       "shape": "объект",
@@ -9927,7 +9976,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "b30f7fd",
+      "last_commit": "0ff0a22",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9937,6 +9986,56 @@
         "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
         "tests/test_ship_coverage.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_system_coverage.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 3271,
+      "note": "Сколько системы мы на самом деле прочитали. Ответ на задачу «собрать всё, что есть в системе» долей, а не словами: из 1 565 записей описи вложений сделок прочитано 952, ещё 274 скачивать не требовалось, а 339 НЕ СКАЧАНЫ вовсе. Причину называет сама система дословно: «Диск не отдал ссылку (нет скоупа disk или файла нет)» — это права доступа у ключа подключения, а не отказ сети и не наша недоработка в разборе. Из непрочитанного 283 записи — входящие предложения поставщиков, то есть ровно цены. Оценка «сколько там цен» помечена как экстраполяция и в заголовок не идёт. Считает gt/tools/system_coverage.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "by_scope",
+        "downloaded",
+        "downloaded_unparsed",
+        "downloaded_with_prices",
+        "estimate_caveat",
+        "estimate_lost_priced_files",
+        "next_step",
+        "not_downloaded",
+        "not_downloaded_by_direction",
+        "not_downloaded_by_field",
+        "not_needed",
+        "question",
+        "records_total",
+        "rows_parsed",
+        "rows_with_price",
+        "share_priced_among_downloaded_pct",
+        "source",
+        "updated",
+        "what_it_means",
+        "why_not_downloaded"
+      ],
+      "main_collection": {
+        "key": "not_downloaded_by_field",
+        "records": 4,
+        "record_keys": [
+          "field_name",
+          "records"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "0ff0a22",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_final.py",
+        "gt/tools/system_coverage.py"
       ]
     },
     {
@@ -9999,7 +10098,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "9183a42",
+      "last_commit": "0ff0a22",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
