@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 247,
-    "total_bytes": 111459573,
+    "datasets": 248,
+    "total_bytes": 111552719,
     "by_sensitivity": {
       "конфиденциально": 63,
-      "внутреннее": 136,
+      "внутреннее": 137,
       "публикуемо": 48
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 70,
+      "ГТУ-библиотека": 71,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -1538,6 +1538,62 @@
       ]
     },
     {
+      "path": "gt/data/ship_inside_quotes.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 595764,
+      "note": "Цены, которые уже лежат у нас: номера заявки ЛУКОЙЛ во ВХОДЯЩИХ предложениях поставщиков. Опись вложений сделок помнит, какие артикулы стоят в каждом присланном предложении и сколько в нём строк с ценой. Сверка по 779 таким файлам нашла 1 008 номеров заявки на 6 675 650 USD, из них по 835 строкам на 3 678 955 USD нашей цены до сих пор нет — то есть разведка искала в интернете то, что лежало в почте. Среди них две самые дорогие строки всей заявки. Это АДРЕС, а не цена: номер стоит в файле, где есть строки с ценой, стоит ли цена против него — покажет открытый файл. Самих цен набор не хранит: репозиторий публичный. Сверка по нормализованному номеру от шести знаков, чисто числовые ряды короче семи знаков отброшены — ложное совпадение здесь дороже пропуска. Считает gt/tools/inside_quotes.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "caveat",
+        "folding_note",
+        "found_only_after_folding",
+        "min_key_length",
+        "negative_control",
+        "quote_files_scanned",
+        "rows",
+        "rows_of_request_found",
+        "rows_without_our_price",
+        "source",
+        "updated",
+        "usd_found",
+        "usd_without_our_price",
+        "what_it_gives"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 839,
+        "record_keys": [
+          "found_in",
+          "name",
+          "pn",
+          "qty",
+          "usd_exposure",
+          "we_already_have_price"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "f1b9bc6",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/inside_quotes.py",
+        "gt/tools/inside_quotes_doc.py",
+        "gt/tools/lists_rfq.py",
+        "gt/tools/rv_brief.py",
+        "gt/tools/rv_pricehunt.py",
+        "gt/tools/ship_coverage.py",
+        "gt/tools/ship_final.py",
+        "tests/test_inside_quotes.py",
+        "tests/test_report_numbers.py",
+        "tests/test_ship_coverage.py"
+      ]
+    },
+    {
       "path": "gt/data/rfq_demand.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 558136,
@@ -1703,62 +1759,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_inside_quotes.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 530100,
-      "note": "Цены, которые уже лежат у нас: номера заявки ЛУКОЙЛ во ВХОДЯЩИХ предложениях поставщиков. Опись вложений сделок помнит, какие артикулы стоят в каждом присланном предложении и сколько в нём строк с ценой. Сверка по 779 таким файлам нашла 1 008 номеров заявки на 6 675 650 USD, из них по 835 строкам на 3 678 955 USD нашей цены до сих пор нет — то есть разведка искала в интернете то, что лежало в почте. Среди них две самые дорогие строки всей заявки. Это АДРЕС, а не цена: номер стоит в файле, где есть строки с ценой, стоит ли цена против него — покажет открытый файл. Самих цен набор не хранит: репозиторий публичный. Сверка по нормализованному номеру от шести знаков, чисто числовые ряды короче семи знаков отброшены — ложное совпадение здесь дороже пропуска. Считает gt/tools/inside_quotes.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "caveat",
-        "folding_note",
-        "found_only_after_folding",
-        "min_key_length",
-        "negative_control",
-        "quote_files_scanned",
-        "rows",
-        "rows_of_request_found",
-        "rows_without_our_price",
-        "source",
-        "updated",
-        "usd_found",
-        "usd_without_our_price",
-        "what_it_gives"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 839,
-        "record_keys": [
-          "found_in",
-          "name",
-          "pn",
-          "qty",
-          "usd_exposure",
-          "we_already_have_price"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "ec59704",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/inside_quotes.py",
-        "gt/tools/inside_quotes_doc.py",
-        "gt/tools/lists_rfq.py",
-        "gt/tools/rv_brief.py",
-        "gt/tools/rv_pricehunt.py",
-        "gt/tools/ship_coverage.py",
-        "gt/tools/ship_final.py",
-        "tests/test_inside_quotes.py",
-        "tests/test_report_numbers.py",
-        "tests/test_ship_coverage.py"
-      ]
     },
     {
       "path": "zip/data/bearing_sites_ru.json",
@@ -5049,7 +5049,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 97771,
+      "bytes": 99295,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5097,7 +5097,7 @@
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "dd2357a",
+      "last_commit": "ff86321",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8243,6 +8243,44 @@
       ]
     },
     {
+      "path": "gt/data/ship_volume_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 25958,
+      "note": "Письма на ПОДТВЕРЖДЕНИЕ ОБЪЁМА по заявке ЛУКОЙЛ: строки, где цена и канал есть, а остаток продавец числом не назвал. Между ступенями «есть цена и адрес» и «отгружаема» стоит ровно это условие, и таких строк 108 на 1 186 490 USD — им до отгружаемости один ответ, а не разведка. Адрес есть у 30 строк на 299 605 USD: 20 писем. По 78 строкам на 886 885 USD адреса нет, и это названная числом работа — найти адрес, а не сочинить получателя. В письме четыре вопроса и только они: остаток числом на сегодня, срок под весь объём, цена за весь объём, срок действия цены и базис поставки. Ни нашей вилки, ни суммы, ни имени заказчика в письме нет — объём закупки это наша переговорная позиция. Адресат, уже опубликовавший нашу заявку (см. gt/data/ship_leak.json), в наборе помечен. Считает gt/tools/volume_letters.py, он же собирает gt/docs/ПИСЬМА-НА-ПОДТВЕРЖДЕНИЕ-ОБЪЁМА-ЛУКОЙЛ.pdf.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "letters",
+        "rows_no_address_list",
+        "rows_total",
+        "rows_with_address",
+        "rows_without_address",
+        "source",
+        "updated",
+        "usd_total",
+        "usd_with_address",
+        "usd_without_address",
+        "what_is_not_in_the_letter",
+        "what_it_is",
+        "what_to_do_without_address"
+      ],
+      "main_collection": {
+        "key": "rows_no_address_list",
+        "records": 78
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "ff86321",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/volume_letters.py"
+      ]
+    },
+    {
       "path": "gpu/data/subsuppliers.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 25012,
@@ -10260,7 +10298,8 @@
       },
       "referenced_by": [
         "gt/tools/ship_final.py",
-        "gt/tools/ship_leak.py"
+        "gt/tools/ship_leak.py",
+        "gt/tools/volume_letters.py"
       ]
     },
     {
