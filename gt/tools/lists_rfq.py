@@ -32,6 +32,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ASK = ROOT / "gt/data/ship_lukoil.json"
 REVERIFY = ROOT / "gt/data/ship_reverify.json"
 LISTS = ROOT / "gt/data/ship_parts_lists.json"
+INSIDE = ROOT / "gt/data/ship_inside_quotes.json"
 OUT = ROOT / "gt/docs"
 PACK = ROOT / "gt/data/ship_lists_rfq.json"
 CHROME = ["/opt/pw-browsers/chromium/chrome-linux/chrome",
@@ -92,7 +93,24 @@ def key(x) -> str:
     return re.sub(r"[^A-Z0-9]", "", str(x or "").split("(")[0].upper())
 
 
+def already_quoted() -> set:
+    """Номера, по которым предложение от КАКОГО-ТО поставщика уже получено.
+
+    Письмо по такому номеру не бесполезно — второе предложение есть конкуренция,
+    — но оно и не разведка: цена по строке у нас уже будет. Замер 18.09.2026:
+    749 позиций из 1 007 в этих письмах именно такие, то есть три четверти
+    пакета уходит за ВТОРЫМ предложением, а не за первым. Без этого счёта
+    исполнитель разошлёт все семнадцать писем с одинаковым ожиданием и удивится
+    ответам.
+    """
+    if not INSIDE.exists():
+        return set()
+    return {key(r.get("pn"))
+            for r in json.loads(INSIDE.read_text(encoding="utf-8")).get("rows", [])}
+
+
 def build(min_rows: int) -> dict:
+    quoted = already_quoted()
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
     by_pn = {key(r.get("pn")): r for r in ask}
     done = {key(r.get("pn")) for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
@@ -138,12 +156,23 @@ def build(min_rows: int) -> dict:
                 "перечне означает наличие детали, и хотим понимать, о чём идёт речь, до "
                 "обсуждения цены. Если часть позиций вы не поставляете — напишите прямо, это "
                 "полезнее общего ответа.\n\nС уважением,\n______________________\n")
+        pns = [str(r.get("pn")) for r, _ in items]
+        n_quoted = sum(1 for x in pns if key(x) in quoted)
         letters.append({"host": host, "rows": len(items), "subject":
                         f"Запрос предложения: {len(items)} позиций из вашего перечня",
-                        "pns": [str(r.get("pn")) for r, _ in items],
+                        "pns": pns,
+                        "already_quoted": n_quoted,
+                        "is_discovery": n_quoted * 2 < len(pns),
                         "body": head + "\n\n" + tail, "body_head": head, "body_tail": tail})
     return {"letters": letters, "skipped": skipped,
-            "rows_covered": sum(x["rows"] for x in letters)}
+            "rows_covered": sum(x["rows"] for x in letters),
+            "rows_already_quoted": sum(x["already_quoted"] for x in letters),
+            "what_already_quoted_means": (
+                "Позиции, по которым предложение от какого-то поставщика уже получено и "
+                "лежит во вложении сделки. Письмо по ним не бесполезно — второе "
+                "предложение есть конкуренция, — но это запрос за ВТОРЫМ предложением, а "
+                "не разведка. Письма, где таких позиций меньше половины, помечены как "
+                "разведочные: с них отдача выше, и рассылать надо с них.")}
 
 
 def render(pack: dict) -> str:
@@ -162,6 +191,21 @@ def render(pack: dict) -> str:
       "ответ.</p>")
     a("<p class='dim'>Имени заказчика в письмах нет: конечного покупателя продавцу до сделки "
       "не называют.</p>")
+    if pack.get("rows_already_quoted") is not None:
+        disc = [x for x in pack["letters"] if x.get("is_discovery")]
+        a(f"<p><b>С каких писем начинать.</b> По "
+          f"{ru(pack['rows_already_quoted'])} позициям из {ru(pack['rows_covered'])} "
+          f"предложение от какого-то поставщика У НАС УЖЕ ЕСТЬ — оно лежит во вложении "
+          f"сделки (см. «ГДЕ-ЦЕНА-УЖЕ-ЕСТЬ-ЛУКОЙЛ.pdf»). Такое письмо не бесполезно: второе "
+          f"предложение есть конкуренция. Но это запрос за ВТОРЫМ предложением, а не "
+          f"разведка, и ждать от него надо другого.</p>")
+        a(f"<p>Разведочными — там, где отвеченных позиций меньше половины, — оказались "
+          f"{ru(len(disc))} писем из {ru(len(pack['letters']))}: "
+          + ", ".join(f"<b>{E(x['host'])}</b> ({ru(x['rows'])} позиций, отвечено "
+                      f"{ru(x['already_quoted'])})" for x in
+                      sorted(disc, key=lambda x: -x["rows"]))
+          + ". С них отдача выше, и рассылать надо с них.</p>")
+        a(f"<p class='dim'>{E(pack['what_already_quoted_means'])}</p>")
     big = max((x["rows"] for x in pack["letters"]), default=0)
     a(f"<p><b>Решение владельца до отправки.</b> Эти письма отличаются от обычного запроса "
       f"поставщику не по форме, а по объёму: в самом крупном перечислено {ru(big)} наших "
