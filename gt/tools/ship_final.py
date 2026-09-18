@@ -295,6 +295,63 @@ def build() -> str:
       f"уполномоченного продавца.</td></tr>")
     a("</table>")
 
+    # Сумма «цена × количество» по группе «берём» СОСРЕДОТОЧЕНА на нескольких
+    # строках, и одна из них — брокерская. Пока это не названо, число читается
+    # как план закупки. Правило отбора простое и проверяемое: если найденная
+    # цена выше ПОТОЛКА нашей же оценки больше чем втрое, строка в защищаемую
+    # сумму не идёт — либо неверна оценка, либо цена не та.
+    conc = []
+    for x in rows:
+        if x["group"] != "берём":
+            continue
+        lo = x["rv"].get("price_low")
+        q = float(x["b"].get("qty") or 0)
+        hi = x["b"].get("usd_hi")
+        if not isinstance(lo, (int, float)) or not q:
+            continue
+        over = (float(lo) / float(hi)) if hi not in (None, "") and float(hi) else None
+        conc.append({"pn": x["rv"].get("pn"), "sum": float(lo) * q, "price": float(lo),
+                     "qty": q, "over": over, "kind": str(x["rv"].get("price_kind") or "")})
+    conc.sort(key=lambda z: -z["sum"])
+    if conc:
+        s_all = sum(z["sum"] for z in conc)
+        wild = [z for z in conc if z["over"] and z["over"] > 3]
+        s_ok = s_all - sum(z["sum"] for z in wild)
+        top = conc[0]
+        a("<div class='warn'>")
+        a("<b>Сумма по группе «забираем» держится на нескольких строках — проверьте их первыми"
+          "</b>")
+        # Проценты печатаются знаком, а не словом: при подстановке числа
+        # согласование по-русски ломается («24 процентов», «83 штук»).
+        head = (f"<p>Из {ru(s_all)} долларов на верхние пять строк приходится "
+                f"<span class='k'>{100 * sum(z['sum'] for z in conc[:5]) / s_all:.0f} %</span>, "
+                f"а на одну строку {E(top['pn'])} — "
+                f"<span class='k'>{100 * top['sum'] / s_all:.0f} %</span>: {ru(top['sum'])} "
+                f"долларов, по {ru(top['price'])} за штуку при количестве {ru(top['qty'])}.")
+        if top.get("over"):
+            head += (f" Цена по ней взята с перечня посредника по труднодоставаемым позициям и "
+                     f"превышает потолок нашей собственной оценки в {top['over']:.0f} раз.")
+        a(head + "</p>")
+        if wild:
+            a(f"<p>Строк, где найденная цена выше потолка нашей оценки БОЛЬШЕ ЧЕМ ВТРОЕ, — "
+              f"<span class='k'>{ru(len(wild))}</span> на {ru(sum(z['sum'] for z in wild))} "
+              f"долларов. По каждой из них верно одно из двух: либо наша оценка занижена в "
+              f"разы, либо найденная цена относится не к тому изделию или не к той фасовке. "
+              f"Пока это не разобрано, защищать такую строку нельзя. Сумма БЕЗ них — "
+              f"<span class='k'>{ru(s_ok)} долларов</span>, и вот её можно нести на "
+              f"защиту.</p>")
+            a("<table><colgroup><col style='width:30mm'><col style='width:22mm'>"
+              "<col style='width:18mm'><col style='width:20mm'><col></colgroup>")
+            a("<thead><tr><th>номер</th><th class='n'>цена × количество</th>"
+              "<th class='n'>цена за штуку</th><th class='n'>во сколько раз выше потолка</th>"
+              "<th>откуда цена</th></tr></thead><tbody>")
+            for z in sorted(wild, key=lambda y: -y["sum"]):
+                a(f"<tr><td class='pn'>{E(z['pn'])}</td><td class='n'>{ru(z['sum'])}</td>"
+                  f"<td class='n'>{ru(z['price'])}</td>"
+                  f"<td class='n'>{z['over']:.0f}</td><td>{E(z['kind'])}</td></tr>")
+            a("</tbody></table>")
+        a("</div>")
+
     # «Не забираем» — группа самая крупная по деньгам, и её читают как «рынок не
     # дал». На деле большая часть этих строк ждёт не рынка, а ОТВЕТА ЗАКАЗЧИКА:
     # по ним уже стоит вопрос, либо номер попал в замер повторов, либо в нём
