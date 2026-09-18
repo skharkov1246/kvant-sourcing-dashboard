@@ -37,6 +37,7 @@ from ship_coverage import quote_only  # noqa: E402
 ASK = ROOT / "gt/data/ship_lukoil.json"
 RV = ROOT / "gt/data/ship_reverify.json"
 QUESTIONS = ROOT / "gt/data/ship_questions.json"
+INSIDE = ROOT / "gt/data/ship_inside_quotes.json"
 
 
 def key(pn) -> str:
@@ -95,6 +96,34 @@ def asked_keys() -> set:
     return out
 
 
+def in_house_keys() -> set:
+    """Номера, по которым предложение поставщика уже лежит в нашем вложении.
+
+    Посылать по ним разведку в открытый доступ — тратить проход на вопрос, на
+    который у нас уже есть ответ. Замер 18.09.2026: из двадцати оставшихся к
+    добору строк двенадцать были именно такими, то есть три пятых остатка.
+    """
+    if not INSIDE.exists():
+        return set()
+    return {key(r.get("pn"))
+            for r in json.loads(INSIDE.read_text(encoding="utf-8")).get("rows", [])}
+
+
+def select(sel: list) -> tuple[list, list, list]:
+    """Делит отобранное на три части: к добору, ждущие заказчика, уже отвеченные.
+
+    Отсев вынесен сюда из печати, чтобы его можно было проверить: пока он жил
+    внутри вывода, тест мог подтвердить только то, что отсеивать есть что, а не
+    то, что отсев работает.
+    """
+    asked, house = asked_keys(), in_house_keys()
+    blocked = [t for t in sel if key(t[1].get("pn")) in asked]
+    rest = [t for t in sel if key(t[1].get("pn")) not in asked]
+    inh = [t for t in rest if key(t[1].get("pn")) in house]
+    left = [t for t in rest if key(t[1].get("pn")) not in house]
+    return left, blocked, inh
+
+
 def brief(n: int, e: float, r: dict, x: dict) -> str:
     def f(src: dict, name: str) -> str:
         return str(src.get(name) or "").strip()
@@ -138,12 +167,14 @@ def main() -> None:
     print(f"ВСЕГО строк «канал есть, цены нет, канал не квотируемый»: {len(sel)} "
           f"на {sum(t[0] for t in sel):,.0f} USD".replace(",", " "), file=sys.stderr)
     if not a.all:
-        asked = asked_keys()
-        blocked = [t for t in sel if key(t[1].get("pn")) in asked]
-        sel = [t for t in sel if key(t[1].get("pn")) not in asked]
+        sel, blocked, inh = select(sel)
         print(f"  из них отсеяно как ждущие ответа заказчика: {len(blocked)} на "
               f"{sum(t[0] for t in blocked):,.0f} USD — пока заказчик не ответил, "
               f"продавец вернёт вопрос, а не цену".replace(",", " "), file=sys.stderr)
+        print(f"  и отсеяно как уже отвеченные: {len(inh)} на "
+              f"{sum(t[0] for t in inh):,.0f} USD — предложение поставщика лежит в нашем "
+              f"вложении, искать в открытом доступе нечего".replace(",", " "),
+              file=sys.stderr)
         print(f"  остаётся к добору цены: {len(sel)} на "
               f"{sum(t[0] for t in sel):,.0f} USD".replace(",", " "), file=sys.stderr)
 

@@ -85,3 +85,22 @@ def test_уже_доборанная_строка_второй_раз_не_вы�
     ph, rows, rvx = load()
     for _e, r, x in ph.candidates(rows, rvx):
         assert not x.get("price_hunt"), r.get("pn")
+
+
+def test_строка_с_ответом_в_нашем_вложении_в_разведку_не_идёт():
+    """Посылать в интернет за ценой, которая лежит в почте, — терять проход.
+
+    Замер 18.09.2026: из двадцати оставшихся к добору строк двенадцать на
+    24 040 USD были именно такими — три пятых остатка. После отсева к веб-разведке
+    осталось восемь строк на 13 342 USD, то есть этот фронт практически исчерпан.
+    """
+    ph, rows, rvx = load()
+    house = ph.in_house_keys()
+    if not house:
+        pytest.skip("замера вложений нет")
+    left, blocked, inh = ph.select(ph.candidates(rows, rvx))
+    assert inh, "отсев не проверяется: ни одна строка под него не попала"
+    for _e, r, _x in left:
+        assert ph.key(r.get("pn")) not in house, r.get("pn")
+    # части складываются в целое: ни одна строка не посчитана дважды и не выпала
+    assert len(left) + len(blocked) + len(inh) == len(ph.candidates(rows, rvx))
