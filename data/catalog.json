@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 230,
-    "total_bytes": 102689819,
+    "total_bytes": 102783214,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 128,
@@ -1001,6 +1001,62 @@
       ]
     },
     {
+      "path": "gt/data/ship_reverify.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 1112003,
+      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 97,
+        "record_keys": [
+          "band_verdict",
+          "blocker",
+          "channel",
+          "contacts",
+          "lead_time",
+          "lifecycle",
+          "note",
+          "pn",
+          "price_authorized",
+          "price_high",
+          "price_kind",
+          "price_low",
+          "price_source",
+          "real_maker",
+          "real_pn",
+          "recommended",
+          "skeptics",
+          "stock",
+          "volume_note",
+          "what_it_is"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "a010c11",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/maker_basis.py",
+        "gt/tools/seller_groups.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "gt/tools/ship_offer.py",
+        "gt/tools/ship_reverify.py",
+        "tests/test_ship_reverify_consistency.py"
+      ]
+    },
+    {
       "path": "zip/data/positions.json",
       "subproject": "база ЗИП",
       "bytes": 1064958,
@@ -1057,61 +1113,6 @@
         "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/customs/glbs_pull.mjs"
-      ]
-    },
-    {
-      "path": "gt/data/ship_reverify.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 1020128,
-      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 87,
-        "record_keys": [
-          "band_verdict",
-          "blocker",
-          "channel",
-          "contacts",
-          "lead_time",
-          "lifecycle",
-          "note",
-          "pn",
-          "price_authorized",
-          "price_high",
-          "price_kind",
-          "price_low",
-          "price_source",
-          "real_maker",
-          "real_pn",
-          "recommended",
-          "skeptics",
-          "stock",
-          "volume_note",
-          "what_it_is"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "92cdb4b",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/seller_groups.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_offer.py",
-        "gt/tools/ship_reverify.py",
-        "tests/test_ship_reverify_consistency.py"
       ]
     },
     {
@@ -9288,6 +9289,46 @@
       ]
     },
     {
+      "path": "gt/data/ship_seller_independence.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 7430,
+      "note": "Замер признака независимости по строкам перепроверки: где названы две витрины одной группы и сколько на этих строках экспозиции. Считает gt/tools/seller_groups.py --write из gt/data/ship_seller_groups.json и gt/data/ship_reverify.json. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией. Цен и коммерческих данных контрагентов не содержит — только артикулы, домены и экспозицию по нашим же вилкам.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "totals",
+        "updated",
+        "why"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 21,
+        "record_keys": [
+          "groups",
+          "marked",
+          "pn",
+          "usd",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "a010c11",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/seller_groups.py",
+        "gt/tools/ship_brief.py",
+        "tests/test_seller_groups.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_seller_groups.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 7213,
@@ -9368,46 +9409,6 @@
       ]
     },
     {
-      "path": "gt/data/ship_seller_independence.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 6608,
-      "note": "Замер признака независимости по строкам перепроверки: где названы две витрины одной группы и сколько на этих строках экспозиции. Считает gt/tools/seller_groups.py --write из gt/data/ship_seller_groups.json и gt/data/ship_reverify.json. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией. Цен и коммерческих данных контрагентов не содержит — только артикулы, домены и экспозицию по нашим же вилкам.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "rows",
-        "source",
-        "totals",
-        "updated",
-        "why"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 18,
-        "record_keys": [
-          "groups",
-          "marked",
-          "pn",
-          "usd",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "92cdb4b",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/seller_groups.py",
-        "gt/tools/ship_brief.py",
-        "tests/test_seller_groups.py"
-      ]
-    },
-    {
       "path": "gt/data/pn_guide.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 5965,
@@ -9439,6 +9440,39 @@
         "gpu/build.py",
         "gt/build.py",
         "library/load_crossrefs.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_maker_basis.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 4704,
+      "note": "Замер: на чём стоит «изготовитель» в gt/data/pn_db.json — на документе (таможенная декларация, открытый стандарт) или на догадке по классу изделия. Считает gt/tools/maker_basis.py. Поводом стали два опровержения 18.09.2026: масляному фильтру Fleetguard были приписаны четыре фильтровых дома «по типу», а наконечнику свечи Jenbacher — авиационный поставщик зажигания «типично»; оба раза изготовитель был выведен из класса, а не из документа. Содержит только счётчики и экспозицию по нашим же вилкам: ни цен контрагентов, ни персональных данных.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "classes",
+        "method",
+        "source",
+        "totals",
+        "updated",
+        "why"
+      ],
+      "main_collection": {
+        "key": "totals",
+        "records": 12
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "a010c11",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/maker_basis.py",
+        "gt/tools/ship_brief.py",
+        "tests/test_maker_basis.py"
       ]
     },
     {
@@ -9600,46 +9634,6 @@
       },
       "referenced_by": [
         "zip/tools/aggregate_prices.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_maker_basis.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 4006,
-      "note": "Замер: на чём стоит «изготовитель» в gt/data/pn_db.json — на документе (таможенная декларация, открытый стандарт) или на догадке по классу изделия. Считает gt/tools/maker_basis.py. Поводом стали два опровержения 18.09.2026: масляному фильтру Fleetguard были приписаны четыре фильтровых дома «по типу», а наконечнику свечи Jenbacher — авиационный поставщик зажигания «типично»; оба раза изготовитель был выведен из класса, а не из документа. Содержит только счётчики и экспозицию по нашим же вилкам: ни цен контрагентов, ни персональных данных.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "classes",
-        "method",
-        "source",
-        "totals",
-        "updated",
-        "why"
-      ],
-      "main_collection": {
-        "key": "classes",
-        "records": 8,
-        "record_keys": [
-          "basis",
-          "rows_in_db",
-          "rows_in_request",
-          "usd_in_request",
-          "why"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "skharkov1246",
-      "last_commit": "9fa62f6",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/maker_basis.py",
-        "gt/tools/ship_brief.py",
-        "tests/test_maker_basis.py"
       ]
     },
     {
