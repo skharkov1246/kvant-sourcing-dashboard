@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 243,
-    "total_bytes": 109592969,
+    "total_bytes": 109662337,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 134,
@@ -390,7 +390,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 4719645,
+      "bytes": 4787715,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -428,7 +428,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "d9250f4",
+      "last_commit": "e645087",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5105,7 +5105,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 91305,
+      "bytes": 91525,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5153,7 +5153,7 @@
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "d9250f4",
+      "last_commit": "e645087",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9702,6 +9702,56 @@
       ]
     },
     {
+      "path": "gt/data/ship_rejudge_rate.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 5419,
+      "note": "Сколько наших отказов не выдерживает пересуда — главное число о доверии к отчёту. Замер 18.09.2026 по 152 пересуженным строкам делит результат на ЧЕТЫРЕ разных события, и складывать их нельзя: отказ сменился ценовым вердиктом (19 строк, 12,5 %, 347 504 USD — это опровержение и стоит денег); один вид отказа сменился другим (15 строк, 9,9 % — вывод тот же, уточнилось основание); вердикт остался тем же, а ЦИФРА появилась (30 строк, 19,7 % — вилки по строке в заявке нет, сравнивать не с чем, но число для запроса есть); не изменилось ничего (88 строк). Без четвёртой категории пересуд выглядел бесплодным там, где он дал больше всего. Прежний вердикт читается из пояснения строки, куда его записывает gt/tools/rv_merge.py в режиме --update, а не из памяти. Считает gt/tools/rejudge_rate.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "moves",
+        "overturned",
+        "overturned_pct",
+        "overturned_usd",
+        "price_gained_pct",
+        "price_gained_same_verdict",
+        "reclassified",
+        "reclassified_pct",
+        "rejudged",
+        "rows",
+        "source",
+        "unchanged",
+        "updated",
+        "what_counts_as_overturned",
+        "what_price_gained_means",
+        "why"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 19,
+        "record_keys": [
+          "now",
+          "pn",
+          "price_found",
+          "usd_exposure",
+          "was"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "e645087",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/rejudge_rate.py",
+        "gt/tools/ship_final.py",
+        "tests/test_rejudge_rate.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_maker_basis.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 4732,
@@ -9822,52 +9872,6 @@
         "gt/tools/source_control.py",
         "tests/test_dataset_has_reader.py",
         "tests/test_source_control.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_rejudge_rate.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 4341,
-      "note": "Сколько наших отказов не выдерживает пересуда — главное число о доверии к отчёту. Отказ «цены нет ни у кого» читается как измерение, но является им только если пересуд по нынешнему стандарту его подтверждает. Замер 18.09.2026: пересужено 128 строк, отказ сменился ценовым вердиктом у 19 (14,8 %) на 347 504 USD, ещё 14 строк (10,9 %) сменили один вид отказа другим — вывод тот же, уточнилось основание, опровержением это не считается. Складывать их в одну долю значит приукрашивать работу пересуда вдвое. Прежний вердикт читается из пояснения строки, куда его записывает gt/tools/rv_merge.py в режиме --update, а не из памяти. Считает gt/tools/rejudge_rate.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "moves",
-        "overturned",
-        "overturned_pct",
-        "overturned_usd",
-        "reclassified",
-        "reclassified_pct",
-        "rejudged",
-        "rows",
-        "source",
-        "unchanged",
-        "updated",
-        "what_counts_as_overturned",
-        "why"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 19,
-        "record_keys": [
-          "now",
-          "pn",
-          "usd_exposure",
-          "was"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "d9250f4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/rejudge_rate.py",
-        "gt/tools/ship_final.py",
-        "tests/test_rejudge_rate.py"
       ]
     },
     {
@@ -10046,7 +10050,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "d9250f4",
+      "last_commit": "e645087",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
