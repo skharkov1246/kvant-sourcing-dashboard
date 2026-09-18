@@ -157,10 +157,44 @@ def main() -> None:
     ap.add_argument("--sheet", default="")
     ap.add_argument("--all", action="store_true",
                     help="не отсеивать строки, по которым уже стоит вопрос заказчику")
+    ap.add_argument("--rejudge", action="store_true",
+                    help="строки с отрицательным вердиктом, вынесенным ДО введения "
+                         "контролей источника: их стоит пересудить по нынешнему стандарту")
     a = ap.parse_args()
 
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
     rv = {key(r["pn"]): r for r in json.loads(RV.read_text(encoding="utf-8"))["rows"]}
+    if a.rejudge:
+        # Стандарт доказательства рос по ходу работы: контроль выдуманным номером,
+        # запрет на выдачу поисковой машины и на круговой источник появились уже
+        # после того, как часть строк получила отрицательный вердикт. Последняя
+        # волна нашла три таких строки, по которым цена на самом деле открыта, —
+        # значит остальные надо пересудить, а не считать закрытыми.
+        from verdicts import vkey
+        neg = {"НЕЧЕМ ПРОВЕРИТЬ", "НЕ ПОДТВЕРЖДЕНА"}
+        house = in_house_keys()
+        asked = asked_keys()
+        out = []
+        for r in ask:
+            k = key(r.get("pn"))
+            x = rv.get(k)
+            if not x or x.get("price_hunt") or vkey(x) not in neg:
+                continue
+            if k in house or k in asked:
+                continue
+            out.append((expo(r), r, x))
+        out.sort(key=lambda t: -t[0])
+        print(f"НА ПЕРЕСУД: {len(out)} строк на {sum(t[0] for t in out):,.0f} USD — "
+              f"отрицательный вердикт вынесен до введения контролей источника"
+              .replace(",", " "), file=sys.stderr)
+        take = out[a.skip:a.skip + a.top]
+        print(f"СТРОКИ ЗАЯВКИ ({len(take)}). Всё ниже напечатано из данных инструментом "
+              f"gt/tools/rv_pricehunt.py --rejudge и НЕ переписано руками.\n")
+        for i, (e, r, x) in enumerate(take, start=a.skip + 1):
+            print(brief(i, e, r, x))
+            print()
+        return
+
     sel = candidates(ask, rv)
     if a.sheet:
         sel = [t for t in sel if str(t[1].get("sheet") or "") == a.sheet]
