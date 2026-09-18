@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 233,
-    "total_bytes": 106197454,
+    "datasets": 234,
+    "total_bytes": 106314926,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 131,
-      "публикуемо": 40
+      "публикуемо": 41
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 56,
+      "ГТУ-библиотека": 57,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -285,6 +285,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/band_basis.py",
         "gt/tools/channels.py",
         "gt/tools/collisions.py",
         "gt/tools/confidence_audit.py",
@@ -293,8 +294,7 @@
         "gt/tools/homoglyphs.py",
         "gt/tools/jenbacher_fold.py",
         "gt/tools/maker_basis.py",
-        "gt/tools/rfq_en.py",
-        "gt/tools/rv_merge.py"
+        "gt/tools/rfq_en.py"
       ]
     },
     {
@@ -528,7 +528,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 2970958,
+      "bytes": 3084611,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -539,7 +539,7 @@
       ],
       "main_collection": {
         "key": "rows",
-        "records": 284,
+        "records": 296,
         "record_keys": [
           "band_verdict",
           "blocker",
@@ -566,7 +566,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "3ba6633",
+      "last_commit": "e2326ca",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -574,6 +574,7 @@
       },
       "referenced_by": [
         "gt/tools/apply_makers.py",
+        "gt/tools/band_basis.py",
         "gt/tools/jenbacher_fold.py",
         "gt/tools/maker_basis.py",
         "gt/tools/rv_merge.py",
@@ -581,8 +582,7 @@
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
         "gt/tools/ship_final.py",
-        "gt/tools/ship_offer.py",
-        "gt/tools/ship_reverify.py"
+        "gt/tools/ship_offer.py"
       ]
     },
     {
@@ -1267,6 +1267,7 @@
       },
       "referenced_by": [
         "gpu/tools/build_demand.py",
+        "gt/tools/band_basis.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/confidence_audit.py",
@@ -4875,6 +4876,7 @@
       },
       "referenced_by": [
         "gpu/tools/build_demand.py",
+        "gt/tools/band_basis.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/confidence_audit.py",
@@ -4882,8 +4884,7 @@
         "gt/tools/ship_final.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_priced.py",
-        "gt/tools/ship_report.py",
-        "library/load_parts.py"
+        "gt/tools/ship_report.py"
       ]
     },
     {
@@ -5047,6 +5048,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 81931,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_jenbacher_prices.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_maker_basis.json",
+        "gt/data/ship_offer_stats.json",
+        "gt/data/ship_questions.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_reverify.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_seller_groups.json",
+        "gt/data/ship_seller_independence.json",
+        "gt/data/ship_sellers.json"
+      ],
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "e2326ca",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/bom.json",
       "subproject": "база ЗИП",
       "bytes": 81322,
@@ -5082,68 +5145,6 @@
         "zip/tools/import_bom.py",
         "zip/tools/perf_classes.py",
         "zip/tools/pilot_order.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 81175,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_maker_basis.json",
-        "gt/data/ship_offer_stats.json",
-        "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_reverify.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_seller_groups.json",
-        "gt/data/ship_seller_independence.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_stocklist_cross.json"
-      ],
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "23c897d",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -9804,6 +9805,45 @@
       },
       "referenced_by": [
         "library/landed.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_band_basis.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 3063,
+      "note": "На чём держится наша оценка заявки ЛУКОЙЛ: доля денег по основанию ценовой вилки. Классифицирует поле основания записей gt/data/rfq_prices.json и взвешивает классы деньгами, а не числом строк. Отдельно считает, сколько мнения уже заменено найденной ценой при перепроверке. НЕ упрёк разведке: экспертная вилка нормальна как рабочая оценка, недопустимо выдавать её за найденную цену. Считает gt/tools/band_basis.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "by_basis",
+        "by_confidence",
+        "closed_by_reverify",
+        "records",
+        "share_not_a_found_price",
+        "source",
+        "updated",
+        "usd_exposure",
+        "usd_on_opinion",
+        "usd_on_transfer",
+        "what_it_is_not",
+        "why"
+      ],
+      "main_collection": {
+        "key": "by_basis",
+        "records": 5
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "e2326ca",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/band_basis.py",
+        "gt/tools/ship_final.py",
+        "tests/test_band_basis.py"
       ]
     },
     {
