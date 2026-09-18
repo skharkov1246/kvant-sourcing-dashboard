@@ -579,10 +579,44 @@ def diagnose(rows: list, ours: dict, supp: dict | None = None,
           + ", ".join(sorted(want)[:12]))
 
 
+def band_stats(rows: list, supp: dict) -> dict:
+    """Счётчики «что КП поставщиков делают с нашими вилками». БЕЗ цен и номеров.
+
+    Это единственная часть сравнения, которую можно держать в публичном
+    репозитории: сколько строк заявки закрыто письменным предложением
+    контрагента и в какую сторону оно расходится с нашей вилкой. Сама цена и
+    даже привязка «этот артикул дороже потолка» — коммерческие данные
+    контрагента и остаются в артефакте прогона.
+    """
+    above = inside = below = noband = 0
+    for r in rows:
+        sp, _ = lookup(supp, r.get("pn"))
+        if not sp or sp.get("usd") is None:
+            continue
+        lo, hi = r.get("usd_lo"), r.get("usd_hi")
+        if lo in (None, "") or hi in (None, ""):
+            noband += 1
+            continue
+        offer = float(sp["usd"])
+        if offer > float(hi):
+            above += 1
+        elif offer < float(lo):
+            below += 1
+        else:
+            inside += 1
+    return {"rows_with_offer": above + inside + below + noband,
+            "above_ceiling": above, "inside_band": inside,
+            "below_floor": below, "no_band": noband,
+            "request_rows": len(rows)}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tkp", required=True, help="полная выгрузка bitrix_tkp.py")
     ap.add_argument("--out", required=True, help="куда положить PDF (ВНЕ репозитория)")
+    ap.add_argument("--stats-out", help="куда записать счётчики по вилкам (без цен, "
+                                        "можно в репозиторий)")
+    ap.add_argument("--scope", default="", help="охват прогона — попадёт в счётчики")
     a = ap.parse_args()
 
     out = Path(a.out).resolve()
@@ -628,6 +662,21 @@ def main() -> int:
     matched = sum(1 for r in rows if norm_key(r["pn"]) in ours)
     print(f"сошлось со заявкой: {matched} позиций")
     diagnose(rows, ours, supp, unk)
+    if a.stats_out:
+        st = band_stats(rows, supp)
+        st["scope"] = a.scope
+        st["source"] = ("Счётчики по всей заявке: что письменные предложения поставщиков из "
+                        "вложений сделок делают с НАШИМИ вилками. Ни цен, ни привязки цены к "
+                        "артикулу здесь нет и быть не может — это коммерческие данные "
+                        "контрагентов, они остаются в артефакте прогона.")
+        st["method"] = ("Предложение сравнивается с вилкой строки заявки (usd_lo, usd_hi в "
+                        "gt/data/ship_lukoil.json). Выше потолка — наша оценка занижена, ниже "
+                        "пола — завышена, внутри — верна. Считает gt/tools/ship_offer.py.")
+        Path(a.stats_out).write_text(
+            json.dumps(st, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"счётчики по вилкам записаны в {a.stats_out}: "
+              f"строк с КП {st['rows_with_offer']}, выше потолка {st['above_ceiling']}, "
+              f"внутри {st['inside_band']}, ниже пола {st['below_floor']}")
     print(f"{out} — {out.stat().st_size / 1e6:.1f} МБ (вне репозитория, не коммитится)")
     return 0
 

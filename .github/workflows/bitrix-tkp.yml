@@ -117,8 +117,13 @@ jobs:
           # одноимённых файла в разных артефактах не отличить друг от друга.
           SCOPE="${{ inputs.deal }}"
           [ -n "$SCOPE" ] || SCOPE="${{ inputs.keyword }}"
+          # --stats-out пишет ТОЛЬКО счётчики «что КП поставщиков делают с нашими
+          # вилками»: ни цен, ни привязки цены к артикулу. Это единственная часть
+          # сравнения, которую можно держать в публичном репозитории, и главное
+          # число для защиты — ответ на «наши вилки вообще низкие или высокие».
           python gt/tools/ship_offer.py --tkp out/tkp_full.json \
-            --out "${{ runner.temp }}/pdf/ЗАПАС-НА-СНИЖЕНИЕ-$SCOPE.pdf"
+            --out "${{ runner.temp }}/pdf/ЗАПАС-НА-СНИЖЕНИЕ-$SCOPE.pdf" \
+            --stats-out gt/data/ship_offer_stats.json --scope "$SCOPE"
 
       - name: Выгрузка документа артефактом
         if: always() && inputs.dry_run != true
@@ -139,6 +144,15 @@ jobs:
             echo "::error::в описи найдены цены — коммит отменён"
             exit 1
           fi
+          # Счётчики по вилкам — тоже в репозиторий, и в них тем более не должно
+          # быть ни цен, ни номенклатурных номеров: только счёт строк.
+          if [ -f gt/data/ship_offer_stats.json ]; then
+            if grep -qE '"(price|usd|pn)"[[:space:]]*:' gt/data/ship_offer_stats.json; then
+              echo "::error::в счётчиках по вилкам найдены цены или артикулы — коммит отменён"
+              exit 1
+            fi
+            echo "✓ в счётчиках по вилкам только счёт строк"
+          fi
           echo "✓ цен в описи нет"
 
       - name: Коммит описи без цен
@@ -155,15 +169,22 @@ jobs:
           # описи ключ `scopes`, и каждый охват свой. Поэтому на каждой попытке
           # берём свежую ветку и вливаем в неё СВОЙ охват, не касаясь чужих.
           cp gt/data/bitrix_tkp_index.json "$RUNNER_TEMP/mine.json"
+          # Счётчики по вилкам тоже уносим из-под reset --hard, иначе они
+          # потеряются вместе с рабочим деревом.
+          [ -f gt/data/ship_offer_stats.json ] \
+            && cp gt/data/ship_offer_stats.json "$RUNNER_TEMP/stats.json"
           for i in 1 2 3 4; do
             git fetch origin "$GITHUB_REF_NAME"
             git reset --hard "origin/$GITHUB_REF_NAME"
             python scripts/merge_tkp_index.py \
               --mine "$RUNNER_TEMP/mine.json" \
               --into gt/data/bitrix_tkp_index.json || exit 1
+            [ -f "$RUNNER_TEMP/stats.json" ] \
+              && cp "$RUNNER_TEMP/stats.json" gt/data/ship_offer_stats.json \
+              && git add gt/data/ship_offer_stats.json
             git add gt/data/bitrix_tkp_index.json
             git diff --cached --quiet && { echo "опись не изменилась"; exit 0; }
-            git commit -m "Опись входящих КП из Bitrix (без цен)"
+            git commit -m "Опись входящих КП из Bitrix и счётчики по вилкам (без цен)"
             git push && exit 0
             echo "push отбит, беру свежую ветку и вливаю снова (попытка $i)"
             sleep $((i * 3))
