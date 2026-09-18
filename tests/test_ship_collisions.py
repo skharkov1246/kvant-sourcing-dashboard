@@ -107,3 +107,39 @@ def test_количество_в_сводке_равно_сумме_детале
                 bad.append(f"{item['pn']}: сводка {item['qty_in_summary']}, детали {s}")
     assert not bad, ("количество в сводке не равно сумме по деталям — значит сводка собрана "
                      f"не по номеру, и вывод о сложении неверен: {bad[:5]}")
+
+
+def test_вопросы_дозаписываются_идемпотентно():
+    """Повторный прогон не должен плодить дубликаты вопросов.
+
+    Первая версия плодила: метка «__БЕЗ_АРТИКУЛА__» кириллическая, и
+    нормализация ключа обнуляла её, поэтому вопрос добавлялся заново каждым
+    прогоном. Сверка идёт двумя ключами — нормализованным номером и сырым
+    именем.
+    """
+    m = collisions.measure()
+    fresh, skip = collisions.to_questions(m)
+    assert not fresh, f"эти вопросы ещё не в наборе: {[x['pn'] for x in fresh]}"
+    assert len(skip) == m["totals"]["defect_articles"], (
+        f"вопросов по находкам {len(skip)}, а находок {m['totals']['defect_articles']}")
+
+
+def test_у_дозаписанного_вопроса_есть_и_вопрос_и_основание():
+    import json as _json
+    doc = _json.loads((ROOT / "gt/data/ship_questions.json").read_text(encoding="utf-8"))
+    mine = [q for q in doc["questions"] if q.get("source") == "gt/tools/collisions.py"]
+    assert mine, "дозаписанных вопросов нет вовсе"
+    for q in mine:
+        assert (q.get("ask") or "").strip(), f"{q['pn']}: вопрос пустой"
+        assert (q.get("known") or "").strip(), f"{q['pn']}: нет того, что уже установлено"
+        assert "арифметика" in (q.get("cost") or ""), (
+            f"{q['pn']}: не сказано, что количество в сводке сложено по разным изделиям")
+
+
+def test_строки_без_артикула_спрашиваются_одним_вопросом():
+    """Прочерк в колонке артикула — не повод спрашивать «уточните номер N раз»."""
+    import json as _json
+    doc = _json.loads((ROOT / "gt/data/ship_questions.json").read_text(encoding="utf-8"))
+    labels = [q for q in doc["questions"] if q["pn"] == collisions.NO_PN]
+    assert len(labels) == 1, f"вопросов про строки без артикула {len(labels)}, должен быть один"
+    assert "прочерк" in labels[0]["ask"]
