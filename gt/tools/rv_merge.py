@@ -58,6 +58,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pnkey import key as _key  # noqa: E402
 OUT = ROOT / "gt/data/ship_reverify.json"
 ASK = ROOT / "gt/data/ship_lukoil.json"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -96,7 +98,8 @@ NO_SKEPTIC = {
 
 
 def key(x) -> str:
-    return re.sub(r"[^A-Z0-9]", "", str(x or "").split("(")[0].upper())
+    """Ключ сведения номера — один на все инструменты, см. gt/tools/pnkey.py."""
+    return _key(x)
 
 
 # Поля, которые добор цены ПЕРЕПИСЫВАЕТ: всё торговое. Опознания здесь нет
@@ -259,11 +262,44 @@ def merge(paths: list[Path], dry: bool = False, update: bool = False) -> dict:
             "total": len(out["rows"]) + grown}
 
 
+def mark_hunted(paths: list[Path]) -> tuple[int, int]:
+    """Отмечает: по этим строкам ЦЕНА УЖЕ ИСКАЛАСЬ. Ничего больше не меняет.
+
+    Нужен потому, что признак price_hunt ставился только в режиме --update, а
+    строка, разобранная С НУЛЯ, приходит новой — и выходила без него. Замер
+    18.09.2026: 88 строк «выдано в КП, не перепроверялось ни разу» разобрали
+    задания, где поиск цены обязателен по условию, а отчёт после приёма снова
+    позвал искать по ним цену: «надо найти — 58 строк». Отметка ставится
+    отдельной командой и только по списку номеров из файла разведки, чтобы её
+    можно было проверить и повторить, а не вписывать руками.
+    """
+    out = json.loads(OUT.read_text(encoding="utf-8"))
+    by = {key(r.get("pn")): r for r in out["rows"]}
+    seen, done = set(), 0
+    for p in paths:
+        d = json.loads(p.read_text(encoding="utf-8"))
+        for r in (d["rows"] if isinstance(d, dict) else d):
+            k = key(r.get("pn"))
+            if not k or k in seen:
+                continue
+            seen.add(k)
+            row = by.get(k)
+            if row is not None and not row.get("price_hunt"):
+                row["price_hunt"] = True
+                done += 1
+    OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    return done, len(seen)
+
+
 def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     if not args:
         print(__doc__.strip().splitlines()[-1], file=sys.stderr)
         return 1
+    if "--mark-hunted" in sys.argv:
+        done, seen = mark_hunted([Path(a) for a in args])
+        print(f"отмечено «цена уже искалась»: {done} строк из {seen} номеров в файлах")
+        return 0
     upd = "--update" in sys.argv
     r = merge([Path(a) for a in args], dry="--dry-run" in sys.argv, update=upd)
     what = "обновлено строк" if upd else "принято строк"

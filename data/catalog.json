@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 253,
-    "total_bytes": 114072919,
+    "datasets": 256,
+    "total_bytes": 115328274,
     "by_sensitivity": {
-      "конфиденциально": 65,
-      "внутреннее": 139,
+      "внутреннее": 140,
+      "конфиденциально": 67,
       "публикуемо": 49
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 76,
+      "ГТУ-библиотека": 79,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -25,6 +25,66 @@
     }
   },
   "datasets": [
+    {
+      "path": "gt/data/ship_reverify.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 9383779,
+      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 887,
+        "record_keys": [
+          "band_verdict",
+          "blocker",
+          "channel",
+          "contacts",
+          "lead_time",
+          "lifecycle",
+          "maker_short",
+          "note",
+          "pn",
+          "price_authorized",
+          "price_high",
+          "price_kind",
+          "price_low",
+          "price_source",
+          "real_maker",
+          "real_pn",
+          "recommended",
+          "skeptics",
+          "stock",
+          "volume_note",
+          "what_it_is"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "1000768",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/apply_makers.py",
+        "gt/tools/band_basis.py",
+        "gt/tools/confidence_audit.py",
+        "gt/tools/inside_quotes.py",
+        "gt/tools/jenbacher_fold.py",
+        "gt/tools/lists_rfq.py",
+        "gt/tools/maker_basis.py",
+        "gt/tools/quote_letters.py",
+        "gt/tools/rejudge_rate.py",
+        "gt/tools/rv_brief.py"
+      ]
+    },
     {
       "path": "zip/customs/out/customs_8207_2023-01-01_2023-12-31.json",
       "subproject": "база ЗИП · таможня",
@@ -83,66 +143,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_reverify.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 8571225,
-      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 799,
-        "record_keys": [
-          "band_verdict",
-          "blocker",
-          "channel",
-          "contacts",
-          "lead_time",
-          "lifecycle",
-          "maker_short",
-          "note",
-          "pn",
-          "price_authorized",
-          "price_high",
-          "price_kind",
-          "price_low",
-          "price_source",
-          "real_maker",
-          "real_pn",
-          "recommended",
-          "skeptics",
-          "stock",
-          "volume_note",
-          "what_it_is"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "39c36ef",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/apply_makers.py",
-        "gt/tools/band_basis.py",
-        "gt/tools/confidence_audit.py",
-        "gt/tools/inside_quotes.py",
-        "gt/tools/jenbacher_fold.py",
-        "gt/tools/lists_rfq.py",
-        "gt/tools/maker_basis.py",
-        "gt/tools/quote_letters.py",
-        "gt/tools/rejudge_rate.py",
-        "gt/tools/rv_brief.py"
-      ]
     },
     {
       "path": "gt/data/pn_db.json",
@@ -1427,6 +1427,43 @@
       "referenced_by": []
     },
     {
+      "path": "data/chat_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 722628,
+      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assessment",
+        "days",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "assessment",
+        "records": 15
+      },
+      "last_change": "2026-09-18",
+      "last_author": "github-actions[bot]",
+      "last_commit": "768a0fc",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/gate.yml",
+        ".github/workflows/scan.yml",
+        "chat_scan.py",
+        "gpu/tools/bitrix_gpu.py",
+        "reps.py",
+        "scripts/budget_snapshot.py",
+        "scripts/preflight.py",
+        "zip/tools/r1700_bitrix.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_parts_lists.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 675160,
@@ -1458,43 +1495,6 @@
         "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
         "tests/test_lists_fold.py"
-      ]
-    },
-    {
-      "path": "data/chat_snapshot.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 643426,
-      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "assessment",
-        "days",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "assessment",
-        "records": 15
-      },
-      "last_change": "2026-09-17",
-      "last_author": "github-actions[bot]",
-      "last_commit": "7d54019",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "оценки и данные сотрудников"
-        ]
-      },
-      "referenced_by": [
-        ".github/workflows/gate.yml",
-        ".github/workflows/scan.yml",
-        "chat_scan.py",
-        "gpu/tools/bitrix_gpu.py",
-        "reps.py",
-        "scripts/budget_snapshot.py",
-        "scripts/preflight.py",
-        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -2356,8 +2356,8 @@
     {
       "path": "gt/data/ship_quote_letters.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 277659,
-      "note": "Третий пакет писем по заявке ЛУКОЙЛ: ЗАПРОС ЦЕНЫ И НАЛИЧИЯ по строкам, где адресат известен из разбора, а спрашивать никто не начал. Замер 18.09.2026 вскрыл дыру между двумя правильными условиями: ship_rfq берёт строки с НАЙДЕННЫМ складом, volume_letters — строки с ценой без остатка числом, и строки, где известен только адрес, не подходили ни туда, ни туда. Таких 545 на 8 660 827 USD — больше, чем в двух других пакетах вместе. Строки делятся на ПЯТЬ путей, и сумма частей сходится с целым (на это есть тест): письмо продавцу, письмо изготовителю, обращение через форму изготовителя, обращение к продавцу без почты по прочитанной странице или телефону, и остаток без адресата вовсе. Пятый путь добавлен 18.09.2026: у 48 строк почты не было, но у 25 разбор прочитал страницу и ещё у 6 — телефон, и пока они считались безадресными, документ называл работой «найти адрес» уже найденный адрес; безадресный остаток после этого 15 строк на 129 491 USD. Почта по домену не додумывается. Пять вопросов в письме: цена за штуку и за объём, остаток числом, срок под наше количество, срок действия цены, базис поставки; отказ «нет» назван полноценным ответом. Ни нашей вилки, ни суммы, ни имени заказчика в письме нет. Адресат, уже опубликовавший нашу заявку (gt/data/ship_leak.json), помечен. Тест следит, что один номер не получает двух писем из разных пакетов. Считает gt/tools/quote_letters.py, он же собирает gt/docs/ЗАПРОС-ЦЕНЫ-И-НАЛИЧИЯ-ЛУКОЙЛ.pdf.",
+      "bytes": 285101,
+      "note": "Третий пакет писем по заявке ЛУКОЙЛ: ЗАПРОС ЦЕНЫ И НАЛИЧИЯ по строкам, где адресат известен из разбора, а спрашивать никто не начал. Замер 18.09.2026 вскрыл дыру между двумя правильными условиями: ship_rfq берёт строки с НАЙДЕННЫМ складом, volume_letters — строки с ценой без остатка числом, и строки, где известен только адрес, не подходили ни туда, ни туда. Таких 558 на 8 666 171 USD — больше, чем в двух других пакетах вместе. Строки делятся на ПЯТЬ путей, и сумма частей сходится с целым (на это есть тест): письмо продавцу, письмо изготовителю, обращение через форму изготовителя, обращение к продавцу без почты по прочитанной странице или телефону, и остаток без адресата вовсе. Пятый путь добавлен 18.09.2026: у 48 строк почты не было, но у 25 разбор прочитал страницу и ещё у 6 — телефон, и пока они считались безадресными, документ называл работой «найти адрес» уже найденный адрес; безадресный остаток после этого — одна строка на 84 USD: адресата нашли по всем пятнадцати прежним безадресным, часть адресов родовые, и это сказано в самой строке. Почта по домену не додумывается. Пять вопросов в письме: цена за штуку и за объём, остаток числом, срок под наше количество, срок действия цены, базис поставки; отказ «нет» назван полноценным ответом. Ни нашей вилки, ни суммы, ни имени заказчика в письме нет. Адресат, уже опубликовавший нашу заявку (gt/data/ship_leak.json), помечен. Тест следит, что один номер не получает двух писем из разных пакетов. Считает gt/tools/quote_letters.py, он же собирает gt/docs/ЗАПРОС-ЦЕНЫ-И-НАЛИЧИЯ-ЛУКОЙЛ.pdf.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -2389,7 +2389,7 @@
       ],
       "main_collection": {
         "key": "letters",
-        "records": 134,
+        "records": 138,
         "record_keys": [
           "body",
           "kind",
@@ -2403,7 +2403,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "39c36ef",
+      "last_commit": "1000768",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3578,6 +3578,112 @@
       ]
     },
     {
+      "path": "gt/data/solar_catalog_match.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 168722,
+      "note": "Номера заявки ЛУКОЙЛ, существование которых подтверждено каталогом САМОГО изготовителя (магазин Solar Turbines), с каталожным написанием и адресом карточки. Замер 18.09.2026: в карте сайта магазина 72 491 товарный адрес, из 1 642 строк заявки номер подтверждён у 380, а из 497 строк с изготовителем Solar — у 380 из 497, то есть у трёх четвертей. Ключевое: в каталоге номер записан БЕЗ РАЗДЕЛИТЕЛЕЙ — «1013121-1» лежит по адресу «10131211», — и поиск нашим написанием не находил ничего; так у 231 строки из 380 годами стоял вердикт «номер не подтверждается открытыми источниками», хотя номер лежит в каталоге изготовителя. Чего здесь НЕТ: ни цены, ни остатка, ни срока — в карте сайта их нет, а карточка отдаёт цену только после входа в магазин (вход — решение владельца). Отдельным списком 117 строк с изготовителем Solar, номера которых в каталоге НЕТ: это внутреннее чертёжное обозначение, сборка, которую изготовитель отдельно не продаёт, либо ошибка переноса — закрывается вопросом заказчику, а не поиском. Пишет gt/tools/solar_catalog.py по скачанным вне репозитория картам сайта; руками не заполнять.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "ask_rows",
+        "catalog_addresses",
+        "matched",
+        "matched_not_reverified",
+        "matched_usd",
+        "rows",
+        "solar_matched",
+        "solar_missing",
+        "solar_missing_rows",
+        "solar_rows",
+        "source",
+        "spelling_differs",
+        "updated",
+        "what_it_is",
+        "what_it_is_not",
+        "what_missing_means",
+        "why_spelling_matters"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 381,
+        "record_keys": [
+          "catalog_pn",
+          "pn",
+          "qty",
+          "reverified",
+          "sheet",
+          "url",
+          "what_it_proves"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "1000768",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_decisions.py",
+        "gt/tools/solar_catalog.py",
+        "tests/test_solar_catalog.py"
+      ]
+    },
+    {
+      "path": "gt/data/seller_index.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 168719,
+      "note": "Строки заявки ЛУКОЙЛ, по которым у торговца ЕСТЬ карточка ПО САМОМУ НОМЕРУ, с адресом этой карточки. Собран не поиском, а чтением карт сайтов, которые продавцы публикуют сами: замер 18.09.2026 — 394 328 адресов у трёх доменов, совпало 401 строка заявки, и у 220 из них адреса продавца у нас до этого не было вовсе. Зачем так: веб-поиск расходуем и в этом окружении ненадёжен (лимит запросов кончается, машины отдают капчу, 403 или выдачу не по запросу), а карта сайта отвечает на вопрос «есть ли карточка по номеру» разом по всей заявке и бесплатно. Совпадением считается АДРЕС, ЗАКАНЧИВАЮЩИЙСЯ нашим номером: у продавца он выглядит как /product/solar-turbines-1013121-1/, то есть перед номером стоит имя изготовителя или магазина, и первая редакция инструмента, сверявшая отрезок целиком, не нашла ни одной строки при 396 тысячах адресов. Все 401 совпадение проверены на то, что адрес действительно заканчивается номером; ключ короче пяти знаков номером не считается. Что это ДОКАЗЫВАЕТ: адрес по самой детали, а не по классу. Чего НЕ доказывает: ни цены, ни остатка, ни срока — за ними надо открыть карточку, это отдельный разбор. Список доменов лежит рядом (gt/data/seller_sitemaps.json), чтобы его можно было оспорить. Пишет gt/tools/seller_index.py; руками не заполнять.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "addresses_indexed",
+        "ask_rows_matched",
+        "hosts",
+        "keys_indexed",
+        "letters",
+        "min_key_length",
+        "of_them_had_no_address_before",
+        "rows",
+        "source",
+        "updated",
+        "verification",
+        "what_it_does_not_prove",
+        "what_it_proves",
+        "why_min_key",
+        "why_not_search",
+        "why_one_letter"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 401,
+        "record_keys": [
+          "cards",
+          "had_contacts",
+          "had_price",
+          "pn",
+          "qty",
+          "sheet"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "35679d8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/seller_index.py",
+        "gt/tools/ship_decisions.py",
+        "tests/test_seller_index.py"
+      ]
+    },
+    {
       "path": "ove/data/bi_lot4.json",
       "subproject": "ОВЭ-75",
       "bytes": 168033,
@@ -4441,6 +4547,53 @@
       ]
     },
     {
+      "path": "gt/data/ship_stock_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 124722,
+      "note": "Готовые письма на подтверждение остатка по заявке ЛУКОЙЛ, по одному на адресата: кому, о чём, сколько позиций, наша экспозиция по ним и текст письма. Пишет gt/tools/stock_letters.py --write; руками не заполнять. Наша вилка, наша сумма и имя заказчика в тексты писем не идут — в наборе они есть только в служебных полях, для нас. Отдельным полем помечены письма, где адрес выловлен из описания канала, а не из контактов по детали: такой адрес может быть родовым, и получателя надо проверить перед отправкой.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "letters",
+        "letters_withheld_for_leak",
+        "rows_disputed",
+        "rows_total",
+        "rows_with_address",
+        "rows_without_address",
+        "source",
+        "updated",
+        "usd_with_address",
+        "usd_without_address",
+        "what_is_not_in_the_letter",
+        "why_these_rows"
+      ],
+      "main_collection": {
+        "key": "letters",
+        "records": 79,
+        "record_keys": [
+          "address_check",
+          "body",
+          "our_exposure",
+          "pns",
+          "rows",
+          "rows_disputed",
+          "subject",
+          "to"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "1000768",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/stock_letters.py"
+      ]
+    },
+    {
       "path": "zip/data/r1700_recon/tenders.json",
       "subproject": "база ЗИП",
       "bytes": 123506,
@@ -4527,6 +4680,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 118501,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/maker_contacts.json",
+        "gt/data/pn_db.json",
+        "gt/data/seller_index.json",
+        "gt/data/seller_sitemaps.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_priced.json",
+        "gt/data/ship_inside_quotes.json",
+        "gt/data/ship_jenbacher_prices.json",
+        "gt/data/ship_leak.json",
+        "gt/data/ship_lists_rfq.json",
+        "gt/data/ship_lukoil.json"
+      ],
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "d6ff0f6",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/r1700_recon/spec.json",
       "subproject": "база ЗИП",
       "bytes": 116414,
@@ -4564,115 +4779,6 @@
         "markers": []
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_stock_letters.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 114235,
-      "note": "Готовые письма на подтверждение остатка по заявке ЛУКОЙЛ, по одному на адресата: кому, о чём, сколько позиций, наша экспозиция по ним и текст письма. Пишет gt/tools/stock_letters.py --write; руками не заполнять. Наша вилка, наша сумма и имя заказчика в тексты писем не идут — в наборе они есть только в служебных полях, для нас. Отдельным полем помечены письма, где адрес выловлен из описания канала, а не из контактов по детали: такой адрес может быть родовым, и получателя надо проверить перед отправкой.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "letters",
-        "letters_withheld_for_leak",
-        "rows_disputed",
-        "rows_total",
-        "rows_with_address",
-        "rows_without_address",
-        "source",
-        "updated",
-        "usd_with_address",
-        "usd_without_address",
-        "what_is_not_in_the_letter",
-        "why_these_rows"
-      ],
-      "main_collection": {
-        "key": "letters",
-        "records": 72,
-        "record_keys": [
-          "address_check",
-          "body",
-          "our_exposure",
-          "pns",
-          "rows",
-          "rows_disputed",
-          "subject",
-          "to"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "04b9fe5",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/stock_letters.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 113175,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/maker_contacts.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_inside_priced.json",
-        "gt/data/ship_inside_quotes.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_leak.json",
-        "gt/data/ship_lists_rfq.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_maker_basis.json",
-        "gt/data/ship_margin.json"
-      ],
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "04b9fe5",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
-      ]
     },
     {
       "path": "gt/data/site_profiles.json",
@@ -8103,8 +8209,8 @@
         "records": 83
       },
       "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "04b9fe5",
+      "last_author": "skharkov1246",
+      "last_commit": "893e0f8",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -10082,7 +10188,7 @@
     {
       "path": "gt/data/ship_coverage.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 6196,
+      "bytes": 6191,
       "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
       "format": "json",
       "shape": "объект",
@@ -10108,7 +10214,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "04b9fe5",
+      "last_commit": "1000768",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -10408,8 +10514,8 @@
         ]
       },
       "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "02418c8",
+      "last_author": "skharkov1246",
+      "last_commit": "893e0f8",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -10801,6 +10907,47 @@
         "gt/tools/homoglyphs.py",
         "gt/tools/ship_final.py",
         "tests/test_homoglyphs.py"
+      ]
+    },
+    {
+      "path": "gt/data/seller_sitemaps.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 2908,
+      "note": "Продавцы, чью КАРТУ САЙТА читает gt/tools/seller_index.py, чтобы узнать, есть ли у них карточка по нашему номеру. Читается только карта сайта — продавец публикует её сам для того, чтобы его карточки находили; страницы товаров пачками не выкачиваются. У каждого домена сказано, откуда он взялся и что о нём известно, включая то, что turbine.parts, hardtoget.parts и zip-solutions.com — один оператор и считаются одним свидетелем. Заполняется руками осознанно: домен, попавший сюда по ошибке, даёт ложные «адреса по детали».",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "hosts",
+        "updated",
+        "what_it_is",
+        "why_visible"
+      ],
+      "main_collection": {
+        "key": "hosts",
+        "records": 3,
+        "record_keys": [
+          "host",
+          "mail",
+          "mail_note",
+          "mail_read_on",
+          "phone",
+          "same_operator_as",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "a7c08a1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/seller_index.py"
       ]
     },
     {
