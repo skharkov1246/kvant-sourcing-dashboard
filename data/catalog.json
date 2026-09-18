@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 230,
-    "total_bytes": 104970756,
+    "datasets": 231,
+    "total_bytes": 104983687,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 129,
-      "публикуемо": 39
+      "публикуемо": 40
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 53,
+      "ГТУ-библиотека": 54,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -5076,7 +5076,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 77970,
+      "bytes": 79612,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5107,6 +5107,7 @@
         "gt/data/ship_decoded.json",
         "gt/data/ship_energoseti.json",
         "gt/data/ship_english_source.json",
+        "gt/data/ship_jenbacher_prices.json",
         "gt/data/ship_lukoil.json",
         "gt/data/ship_maker_basis.json",
         "gt/data/ship_offer_stats.json",
@@ -5119,12 +5120,11 @@
         "gt/data/ship_sellers.json",
         "gt/data/ship_stocklist_cross.json",
         "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОС-ЦЕН-АНГЛИЙСКИЙ.pdf"
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv"
       ],
       "last_change": "2026-09-18",
-      "last_author": "skharkov1246",
-      "last_commit": "d02f5a1",
+      "last_author": "Claude",
+      "last_commit": "107d815",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8884,6 +8884,46 @@
       "referenced_by": [
         "gpu/build.py"
       ]
+    },
+    {
+      "path": "gt/data/ship_jenbacher_prices.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 11289,
+      "note": "Прайс канала parts-systems.de («Jenbacher Center») по блоку Jenbacher/INNIO заявки ЛУКОЙЛ: 31 позиция блока закрыта ценой своим номером и 4 — номером-преемника, одна (436392) не закрыта ничем. По каждой строке заголовок карточки, номер витрины, цена НЕТТО в евро («Preise exkl. MwSt. zzgl. Versandkosten»), фасовка там, где продаётся комплект, и оговорки по спорным позициям. ЗДЕСЬ ЕСТЬ ЦЕНЫ КОНТРАГЕНТА, и это сознательно: распоряжение владельца 18.09.2026 «клади в репозиторий всё». Владелец предупреждён, что репозиторий публичный и что выложенное не убрать. Чем НЕ является: прайсовой оценкой, а не подтверждённой закупкой — на всех карточках стоит «Sofort verfügbar», но числа остатка нет ни на одной, поэтому покрытие количества не подтверждено; и это ОДИН продавец, то есть один свидетель. Пересчёт в доллары по gt/data/fx_rates.json, курс справочный на 13.09.2026. Класс относительно нашей вилки считается из gt/data/ship_lukoil.json и в файле не хранится.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "brand_note",
+        "method",
+        "netto",
+        "not_found",
+        "rejected_matches",
+        "rows",
+        "search_note",
+        "source",
+        "updated",
+        "what_it_is_not",
+        "why_prices_here"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 35,
+        "record_keys": [
+          "card",
+          "eur_net",
+          "pn",
+          "sku"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "107d815",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "ove/data/bi_release.json",
