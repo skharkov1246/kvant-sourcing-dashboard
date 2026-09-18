@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 252,
-    "total_bytes": 112531201,
+    "total_bytes": 112545260,
     "by_sensitivity": {
       "конфиденциально": 65,
       "внутреннее": 138,
@@ -1029,7 +1029,7 @@
     {
       "path": "gt/data/bitrix_tkp_index.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 1256039,
+      "bytes": 1265369,
       "note": "Опись вложений по сделке из Bitrix24 БЕЗ ЦЕН: какие файлы приложены к сделке и к привязанным записям СП-166, чем каждый разобран, сколько строк дал и по каким артикулам в нём нашлась цена. Цены намеренно исключены — репозиторий публичный, а цены заказчику это коммерческие данные (правило 5 CLAUDE.md, SECURITY.md). Полная выгрузка с ценами уезжает артефактом прогона и в репозиторий не попадает; воркфлоу отдельным шагом проверяет, что в описи нет пар «price: число», и отменяет коммит, если нашёл. Зачем нужно: владелец выставил заказчику ТВЁРДЫЕ цены и защищает именно их, а в товарных строках сделки их нет — они лежат в приложенных ТКП, прайсах и входящих КП. Разведочные вилки из gt/data/rfq_prices.json этими ценами НЕ являются: в основаниях там дословно «дистрибьюторы», «аналог», «экспертная вилка». Собирается gt/tools/bitrix_tkp.py, запуск руками через Actions. ЗАМЕР ХОЛОСТОГО ПРОГОНА 17.09.2026, по нему инструмент и правился: 137 сделок по слову «ЛУКОЙЛ», 475 привязанных запросов поставщикам, 1998 файлов. Имя файла есть только у 12 из 1998 — Bitrix в файловом объекте crm.item.list его не отдаёт, поэтому формат узнаётся по заголовку отдачи и по магическим байтам. Направление читается по имени поля и делится на четыре группы, а не на две: «наша цена» (Result, ТКП и Economics of the project — там выставленные заказчику цены), «входящее» (Offer from supplier(s), КП поставщика), «наш запрос» (Offer from us, Request file) и «заявка» (Техническая спецификация). До этой правки 1509 файлов из 1998 уходили в «неизвестно», потому что направление читалось только по восьми зашитым кодам СП-166, а у сделки 25 своих файловых полей.",
       "format": "json",
       "shape": "объект",
@@ -1045,7 +1045,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "github-actions[bot]",
-      "last_commit": "b6186f2",
+      "last_commit": "a9b95e2",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -5907,6 +5907,46 @@
       ]
     },
     {
+      "path": "gt/data/ship_inside_priced.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 62587,
+      "note": "Номера заявки ЛУКОЙЛ, по которым цену закупки назвал сам контрагент в приложенном к сделке предложении: единица × количество = итог в той же строке. Хранит ФАКТ и ПРОИСХОЖДЕНИЕ без чисел — номер, файл, сделку, направление и опознана ли валюта. Самих цен здесь нет: это коммерческие данные контрагента, они остаются в выгрузке вне репозитория. Нужен лестнице покрытия (gt/tools/ship_coverage.py): без него 195 позиций с подтверждённой ценой в неё не попадали, и ступень «есть цена и адрес» показывала 43,7 % денег вместо 67,9 %. Пишет gt/tools/tkp_tables.py --keys-out; руками не заполнять.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "parts",
+        "source",
+        "updated",
+        "what_it_gives"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 210,
+        "record_keys": [
+          "currency_known",
+          "direction",
+          "file",
+          "key",
+          "origin",
+          "pn",
+          "rule"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "9418714",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/rv_brief.py",
+        "gt/tools/ship_coverage.py",
+        "tests/test_ship_coverage.py"
+      ]
+    },
+    {
       "path": "zip/customs/out/customs_848120_2025-01-01_2026-03-31.json",
       "subproject": "база ЗИП · таможня",
       "bytes": 61233,
@@ -6150,46 +6190,6 @@
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py",
         "tests/test_dataset_has_reader.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_inside_priced.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 58238,
-      "note": "Номера заявки ЛУКОЙЛ, по которым цену закупки назвал сам контрагент в приложенном к сделке предложении: единица × количество = итог в той же строке. Хранит ФАКТ и ПРОИСХОЖДЕНИЕ без чисел — номер, файл, сделку, направление и опознана ли валюта. Самих цен здесь нет: это коммерческие данные контрагента, они остаются в выгрузке вне репозитория. Нужен лестнице покрытия (gt/tools/ship_coverage.py): без него 195 позиций с подтверждённой ценой в неё не попадали, и ступень «есть цена и адрес» показывала 43,7 % денег вместо 67,9 %. Пишет gt/tools/tkp_tables.py --keys-out; руками не заполнять.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "parts",
-        "source",
-        "updated",
-        "what_it_gives"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 195,
-        "record_keys": [
-          "currency_known",
-          "direction",
-          "file",
-          "key",
-          "origin",
-          "pn",
-          "rule"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "35b2b65",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/rv_brief.py",
-        "gt/tools/ship_coverage.py",
-        "tests/test_ship_coverage.py"
       ]
     },
     {
@@ -10138,7 +10138,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "6fca00f",
+      "last_commit": "9418714",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -10387,6 +10387,40 @@
       ]
     },
     {
+      "path": "gt/data/ship_offer_stats.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 4012,
+      "note": "Счётчики «что письменные предложения поставщиков делают с НАШИМИ вилками» по всей заявке ЛУКОЙЛ: сколько строк с КП контрагента попадают выше потолка вилки (наша оценка занижена), внутри неё (подтверждена), ниже пола (завышена) и у скольких вилки нет вовсе. Пишет прогон «Bitrix входящие КП по сделке» через gt/tools/ship_offer.py --stats-out; руками не заполнять. Ни одной цены и ни одной привязки цены к артикулу здесь нет и быть не может: предложения контрагентов — их коммерческие данные, они остаются в артефакте прогона, а в репозиторий идёт только счёт строк. Это и есть ответ на главный вопрос защиты — наши вилки систематически низкие или высокие — полученный счётом по всему пересечению, а не выборкой из сорока перепроверенных строк.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "scopes",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "scopes",
+        "records": 3
+      },
+      "last_change": "2026-09-18",
+      "last_author": "github-actions[bot]",
+      "last_commit": "a9b95e2",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/bitrix-tkp.yml",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_underpriced.py",
+        "tests/test_offer_stats_scopes.py"
+      ]
+    },
+    {
       "path": "ove/data/questions_answers.json",
       "subproject": "ОВЭ-75",
       "bytes": 3935,
@@ -10422,40 +10456,6 @@
         "ove/tools/build_disc.py",
         "ove/tools/build_docx.py",
         "ove/tools/build_questions.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_offer_stats.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 3632,
-      "note": "Счётчики «что письменные предложения поставщиков делают с НАШИМИ вилками» по всей заявке ЛУКОЙЛ: сколько строк с КП контрагента попадают выше потолка вилки (наша оценка занижена), внутри неё (подтверждена), ниже пола (завышена) и у скольких вилки нет вовсе. Пишет прогон «Bitrix входящие КП по сделке» через gt/tools/ship_offer.py --stats-out; руками не заполнять. Ни одной цены и ни одной привязки цены к артикулу здесь нет и быть не может: предложения контрагентов — их коммерческие данные, они остаются в артефакте прогона, а в репозиторий идёт только счёт строк. Это и есть ответ на главный вопрос защиты — наши вилки систематически низкие или высокие — полученный счётом по всему пересечению, а не выборкой из сорока перепроверенных строк.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "scopes",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "scopes",
-        "records": 3
-      },
-      "last_change": "2026-09-18",
-      "last_author": "github-actions[bot]",
-      "last_commit": "b6186f2",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        ".github/workflows/bitrix-tkp.yml",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_underpriced.py",
-        "tests/test_offer_stats_scopes.py"
       ]
     },
     {
