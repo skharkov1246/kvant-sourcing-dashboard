@@ -332,15 +332,15 @@
    "verdict": "ВЕРНА. Цена именно этого артикула в обычном",
    "verdict_rests_on_price": true,
    "groups": {
-    "Оператор из Сямыня (camvect / cambia)": [
-     "camvect.com",
-     "plcdcspro.com",
-     "topbrandsplc.com"
-    ],
     "Sonepar (платформа Net1)": [
      "codale.com",
      "needco.com",
      "northcoast.com"
+    ],
+    "Оператор из Сямыня (camvect / cambia)": [
+     "camvect.com",
+     "plcdcspro.com",
+     "topbrandsplc.com"
     ]
    },
    "marked": true
@@ -767,8 +767,8 @@
   {
    "pn": "MR-C",
    "usd": 936.0,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА — годной цены не получено. Единственная прочитанная цифра 70,99 USD снята как заглушка витрины",
-   "verdict_rests_on_price": false,
+   "verdict": "ВЕРНА — цена авторизованного дистрибьютора 31,18 USD за штуку лежит внутри вилки 18-60 USD, ближе к её середине. Оговорка: цена витринная, без нашей скидки и без доставки.",
+   "verdict_rests_on_price": true,
    "groups": {
     "Aeliya Marine Tech (Индия)": [
      "aeliyamarine.com",

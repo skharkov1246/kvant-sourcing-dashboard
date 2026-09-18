@@ -6,23 +6,23 @@
  "quoted_never_reverified": {
   "rows": 307,
   "usd": 238500.55,
-  "of_them_price_in_our_attachments": 303,
+  "of_them_price_in_our_attachments": 240,
   "of_them_asked_customer": 9,
-  "left_to_search": 1,
-  "usd_left_to_search": 8.75,
+  "left_to_search": 63,
+  "usd_left_to_search": 28926.25,
   "what_it_means": "Строки с нашей ценой в предложении заказчику, до которых перепроверка не дошла ни разу. Это не «канал без цены» — это вообще неразобранное, и в счёт «канал назван, цены нет» они не попадали никогда. Остаток под поиск считается за вычетом строк, чья цена лежит в наших же вложениях, и строк, по которым вопрос заказчику уже поставлен: те закрываются не разведкой."
  },
  "channel_without_price": {
-  "rows": 312,
-  "usd": 4986649.0,
-  "of_them_quote_only": 106,
-  "usd_quote_only": 3257900.5,
-  "of_them_quote_only_already_answered": 48,
-  "usd_quote_only_already_answered": 2750988.5,
+  "rows": 308,
+  "usd": 4983428.0,
+  "of_them_quote_only": 142,
+  "usd_quote_only": 3316042.0,
+  "of_them_quote_only_already_answered": 45,
+  "usd_quote_only_already_answered": 1260988.5,
   "of_them_waiting_customer": 21,
   "usd_waiting_customer": 458011.0,
-  "of_them_open_to_search": 185,
-  "usd_open_to_search": 1270737.5,
+  "of_them_open_to_search": 145,
+  "usd_open_to_search": 1209375.0,
   "what_it_means": "Строки, где канал назван, а цены нет. Это НЕ значит, что мы не дошли: у части таких каналов цены нет в принципе — продавец работает только по запросу и прейскуранта не публикует. Счёт квотируемых ведётся по прямым словам разбора и намеренно занижен: лишняя строка здесь приукрасила бы работу."
  },
  "ladder": {
@@ -39,15 +39,15 @@
    "share_usd": 97.2
   },
   "есть цена и адрес": {
-   "rows": 345,
-   "usd": 4034710.25,
-   "share_rows": 21.0,
+   "rows": 349,
+   "usd": 4037931.25,
+   "share_rows": 21.3,
    "share_usd": 43.5
   },
   "отгружаема": {
-   "rows": 236,
-   "usd": 2848220.25,
-   "share_rows": 14.4,
+   "rows": 239,
+   "usd": 2850636.25,
+   "share_rows": 14.6,
    "share_usd": 30.7
   }
  },
@@ -69,9 +69,9 @@
    "share_usd": 67.6
   },
   "цена найдена": {
-   "rows": 345,
-   "usd": 4034710.25,
-   "share_rows": 21.0,
+   "rows": 349,
+   "usd": 4037931.25,
+   "share_rows": 21.3,
    "share_usd": 43.5
   },
   "канал назван": {
@@ -81,10 +81,10 @@
    "share_usd": 97.2
   },
   "остаток числом": {
-   "rows": 299,
-   "usd": 5288614.25,
-   "share_rows": 18.2,
-   "share_usd": 57.0
+   "rows": 295,
+   "usd": 5278994.25,
+   "share_rows": 18.0,
+   "share_usd": 56.9
   }
  }
 }
