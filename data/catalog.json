@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 253,
-    "total_bytes": 114072522,
+    "total_bytes": 114072919,
     "by_sensitivity": {
       "конфиденциально": 65,
       "внутреннее": 139,
@@ -10375,6 +10375,55 @@
       ]
     },
     {
+      "path": "gt/data/ship_leak.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 4206,
+      "note": "Строки заявки ЛУКОЙЛ, опубликованные третьими лицами в открытом доступе ДОСЛОВНО — с номерами и количествами до штуки. Найдено разведкой 18.09.2026 попутно: две страницы китайских поставщиков, у одной перечень на 437 строк в том же порядке, у другой строки на РУССКОМ вместе с нашими позиционными пометками вида «п H06». Кто выложил и на каком этапе — не установлено, и обвинения в наборе нет: заказчик мог опубликовать спецификацию сам, наш запрос мог уйти дальше по цепочке, третья сторона могла получить тот же запрос. Улика происхождения: тот же перечень лежит у Leda Greenpower с подписью запроса «RS 2YR OPS & MAINTENANCE», то есть похож на копию документа Siemens, а не на наш запрос — это версия, не доказательство. Бьёт дважды: конфиденциальность запроса и подмена свидетеля — такая страница выглядит независимым подтверждением номера, а является отражением нашего же текста, поэтому оба домена внесены в список круговых источников приёмника разведки. Считает gt/tools/ship_leak.py, читает отчёт gt/tools/ship_final.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows_cited_total",
+        "source",
+        "sources",
+        "updated",
+        "what_it_is",
+        "what_to_do",
+        "what_we_do_not_know",
+        "why_it_matters_twice"
+      ],
+      "main_collection": {
+        "key": "sources",
+        "records": 2,
+        "record_keys": [
+          "holder",
+          "language",
+          "quoted_rows",
+          "quoted_verbatim",
+          "rows_matched_in_our_summary",
+          "same_list_elsewhere",
+          "second_independent_seller",
+          "url",
+          "usd_on_matched",
+          "what_is_published"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "02418c8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/quote_letters.py",
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_leak.py",
+        "gt/tools/volume_letters.py",
+        "tests/test_ship_reverify_consistency.py"
+      ]
+    },
+    {
       "path": "gt/data/methodology.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 4194,
@@ -10511,54 +10560,6 @@
         "ove/tools/build_disc.py",
         "ove/tools/build_docx.py",
         "ove/tools/build_questions.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_leak.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 3809,
-      "note": "Строки заявки ЛУКОЙЛ, опубликованные третьими лицами в открытом доступе ДОСЛОВНО — с номерами и количествами до штуки. Найдено разведкой 18.09.2026 попутно: две страницы китайских поставщиков, у одной перечень на 437 строк в том же порядке, у другой строки на РУССКОМ вместе с нашими позиционными пометками вида «п H06». Кто выложил и на каком этапе — не установлено, и обвинения в наборе нет: заказчик мог опубликовать спецификацию сам, наш запрос мог уйти дальше по цепочке, третья сторона могла получить тот же запрос. Улика происхождения: тот же перечень лежит у Leda Greenpower с подписью запроса «RS 2YR OPS & MAINTENANCE», то есть похож на копию документа Siemens, а не на наш запрос — это версия, не доказательство. Бьёт дважды: конфиденциальность запроса и подмена свидетеля — такая страница выглядит независимым подтверждением номера, а является отражением нашего же текста, поэтому оба домена внесены в список круговых источников приёмника разведки. Считает gt/tools/ship_leak.py, читает отчёт gt/tools/ship_final.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows_cited_total",
-        "source",
-        "sources",
-        "updated",
-        "what_it_is",
-        "what_to_do",
-        "what_we_do_not_know",
-        "why_it_matters_twice"
-      ],
-      "main_collection": {
-        "key": "sources",
-        "records": 2,
-        "record_keys": [
-          "holder",
-          "language",
-          "quoted_rows",
-          "quoted_verbatim",
-          "rows_matched_in_our_summary",
-          "same_list_elsewhere",
-          "second_independent_seller",
-          "url",
-          "usd_on_matched",
-          "what_is_published"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "39c36ef",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/quote_letters.py",
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_leak.py",
-        "gt/tools/volume_letters.py"
       ]
     },
     {
