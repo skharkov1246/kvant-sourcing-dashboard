@@ -143,6 +143,23 @@ def check(r: dict, ask: dict, have: set[str], update: bool = False) -> str:
     if vkey(r) in PRICED:
         if not isinstance(lo, (int, float)):
             return "вердикт по цене без числовой цены"
+        # ВЕРДИКТ О СЕРЕДИНЕ ВИЛКИ — НЕ ВЕРДИКТ О ВИЛКЕ. Добавлено 18.09.2026:
+        # разведка нашла 0,53 USD за штуку при вилке 0,5–3,0 и записала
+        # «ЗАВЫШЕНА», потому что по СЕРЕДИНЕ строка стоит 9 USD, а по находке
+        # 2,64. Оба числа верны, но это разные утверждения, и в сводке
+        # «завышена» читается как «вилку надо опускать». Раньше это ловил тест
+        # гейта — то есть после того, как строка уже легла в набор; ловить надо
+        # на приёме. Границы вилку задевают — вердикт остаётся любым.
+        b = ask.get(k) or {}
+        blo, bhi = b.get("usd_lo"), b.get("usd_hi")
+        if (vkey(r) in ("ЗАНИЖЕНА", "ЗАВЫШЕНА")
+                and blo not in (None, "") and bhi not in (None, "")):
+            hi2 = r.get("price_high") if isinstance(r.get("price_high"), (int, float)) else lo
+            if float(blo) <= float(lo) and float(hi2) <= float(bhi):
+                return (f"вердикт «{vkey(r)}» при цене {lo}–{hi2} ВНУТРИ вилки "
+                        f"{blo}–{bhi}: вилка отвечает на «верны ли её границы», а не на "
+                        f"«верна ли её середина». Ставь ВЕРНА и скажи про середину "
+                        f"оговоркой в тексте вердикта")
         src = str(r.get("price_source") or "")
         if not DOMAIN.search(src) and "ССЫЛКА НЕ СОХРАНЕНА" not in src:
             return "вердикт по цене без названной страницы"
@@ -199,7 +216,9 @@ def apply_update(old: dict, new: dict) -> None:
 
 def merge(paths: list[Path], dry: bool = False, update: bool = False) -> dict:
     out = json.loads(OUT.read_text(encoding="utf-8"))
-    ask = {key(r.get("pn")) for r in json.loads(ASK.read_text(encoding="utf-8"))["rows"]}
+    # Словарь, а не множество: приёмнику нужна ВИЛКА строки, чтобы поймать
+    # вердикт, вынесенный о середине вилки вместо самой вилки (см. check).
+    ask = {key(r.get("pn")): r for r in json.loads(ASK.read_text(encoding="utf-8"))["rows"]}
     have = {key(r.get("pn")) for r in out["rows"]}
     by_key = {key(r.get("pn")): r for r in out["rows"]}
     took, left = [], []
