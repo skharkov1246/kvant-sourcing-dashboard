@@ -45,6 +45,7 @@ ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "gt/data/rfq_demand.json"
 MERGED = ROOT / "gt/data/ship_lukoil.json"
 OUT = ROOT / "gt/data/ship_collisions.json"
+QUEST = ROOT / "gt/data/ship_questions.json"
 
 # Противоположные исполнения: если в наименованиях одного номера встретились оба
 # слова пары, это либо описка, либо номер честно стоит в двух позициях. Решает
@@ -185,13 +186,93 @@ def report(m: dict) -> str:
     return "\n".join(out)
 
 
+NO_PN = "__БЕЗ_АРТИКУЛА__"
+
+
+def key(pn: str) -> str:
+    return re.sub(r"[^A-Z0-9]", "", str(pn or "").upper())
+
+
+def to_questions(m: dict) -> tuple[list[dict], list[str]]:
+    """Вопросы заказчику по находкам и список уже заданных.
+
+    Вопрос механический, поэтому его и генерируем: «под этим номером в заявке
+    идут такие-то разные детали, назовите артикул каждой». Руками писать
+    тридцать четыре одинаковых вопроса — работа без содержания.
+    """
+    doc = json.loads(QUEST.read_text(encoding="utf-8"))
+    asked = [key(q.get("pn")) for q in doc["questions"]]
+    # Метка «без артикула» кириллическая, и key() её обнуляет — поэтому вторым
+    # ключом держим сырое имя: иначе повторный прогон добавит вопрос заново.
+    raw = {str(q.get("pn") or "") for q in doc["questions"]}
+    fresh, skip = [], []
+    for cls in (CLS_DIFF, CLS_OPP):
+        for item in m["classes"][cls]["items"]:
+            k = key(item["pn"])
+            # Артикула нет вовсе: в колонке стоит прочерк, и под ним несколько
+            # разных уплотнений. Спрашивать «уточните номер такой-то» здесь
+            # нечего — нужен один вопрос про всю группу, ниже.
+            if not k:
+                k = NO_PN
+                item = {**item, "pn": NO_PN}
+            if item["pn"] in raw or (k and any(k in a for a in asked)):
+                skip.append(item["pn"])
+                continue
+            asked.append(k)
+            raw.add(item["pn"])
+            parts = "; ".join(f"«{p['name']}» — {int(p['qty'])} шт"
+                              for p in item["parts"])
+            if item["pn"] == NO_PN:
+                ask = (f"В {len(item['parts'])} строках заявки колонка артикула пустая — стоит "
+                       f"прочерк: {parts}. По ним нужен номер, чертёж или типоразмер с посадочными "
+                       f"размерами: уплотнение подбирается по размеру, а не по наименованию.")
+            elif cls == CLS_OPP:
+                ask = (f"Под номером {item['pn']} в заявке идут противоположные исполнения: "
+                       f"{parts}. Это один и тот же артикул, применённый в двух позициях, или "
+                       f"в одной из строк номер указан по ошибке? Если артикул один — подтвердите "
+                       f"это письмом, мы посчитаем строку одной позицией.")
+            else:
+                ask = (f"Под номером {item['pn']} в заявке идут разные изделия: {parts}. "
+                       f"Назовите артикул каждого отдельно — либо пришлите шильдик или страницу "
+                       f"каталога. Одним номером эти позиции заказать нельзя.")
+            fresh.append({
+                "pn": item["pn"],
+                "qty": item["qty_in_summary"],
+                "unit": "шт",
+                "kind": ("противоположные исполнения под одним номером" if cls == CLS_OPP
+                         else "один номер против разных деталей"),
+                "ask": ask,
+                "known": (f"Замер по сырым строкам заявки: {parts}. Основание класса — "
+                          f"{item.get('reason')}. Узлы: {', '.join(item.get('units') or [])}."),
+                "cost": (f"В нашей сводке строка собрана по номеру, поэтому количества сложились: "
+                         f"{int(item['qty_in_summary'])} шт и экспозиция "
+                         f"{item['exposure']:,} USD".replace(",", " ") +
+                         " — это арифметика по разным изделиям, а не оценка одной позиции. "
+                         "Ценой такую строку защищать нельзя, пока она не разложена."),
+                "source": "gt/tools/collisions.py",
+            })
+    return fresh, skip
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--questions", action="store_true",
+                    help="дописать вопросы заказчику по находкам (идемпотентно)")
     a = ap.parse_args()
     m = measure()
     print(report(m))
+    if a.questions:
+        fresh, skip = to_questions(m)
+        doc = json.loads(QUEST.read_text(encoding="utf-8"))
+        doc["questions"].extend(fresh)
+        doc["updated"] = m["updated"]
+        QUEST.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n",
+                         encoding="utf-8")
+        print(f"вопросов добавлено {len(fresh)}, уже были заданы {len(skip)}: "
+              f"{', '.join(skip) or '—'}")
+        return 0
     if a.write:
         OUT.write_text(json.dumps(m, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         print(f"записано в {OUT.relative_to(ROOT)}")
