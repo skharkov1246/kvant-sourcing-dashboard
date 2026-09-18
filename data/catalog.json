@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 221,
-    "total_bytes": 101166802,
+    "total_bytes": 101171958,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 123,
@@ -983,10 +983,10 @@
         "key": "scopes",
         "records": 3
       },
-      "last_change": "2026-09-17",
-      "last_author": "github-actions[bot]",
-      "last_commit": "45c6fc6",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "f2494b9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2050,7 +2050,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 315189,
+      "bytes": 320345,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -2061,7 +2061,7 @@
       ],
       "main_collection": {
         "key": "rows",
-        "records": 30,
+        "records": 32,
         "record_keys": [
           "band_verdict",
           "blocker",
@@ -2085,9 +2085,9 @@
           "what_it_is"
         ]
       },
-      "last_change": "2026-09-17",
+      "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "67b4cd3",
+      "last_commit": "b7d6214",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5426,9 +5426,9 @@
         "library/load_parts.py",
         "library/load_suppliers.py"
       ],
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "d6742a5",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "f2494b9",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7693,9 +7693,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "a75bd10",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "f2494b9",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7964,9 +7964,9 @@
         "key": "rows",
         "records": 27
       },
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "ee6417e",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "f2494b9",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
