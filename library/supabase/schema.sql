@@ -181,3 +181,16 @@ create index if not exists lib_files_status on lib_files (status);
 create index if not exists lib_files_sha    on lib_files (sha256);
 
 alter table lib_files enable row level security;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 10. Ключи внешних систем. Токен приложения Битрикса обновляется при каждом
+--     продлении, поэтому хранить его в секретах GitHub нельзя — их не переписать
+--     из прогона. Лежит здесь; читает только индексатор по той же строке
+--     подключения, что и остальная библиотека.
+create table if not exists lib_secrets (
+  name       text primary key,
+  value      text not null,
+  note       text,
+  updated_at timestamptz default now()
+);
+alter table lib_secrets enable row level security;
