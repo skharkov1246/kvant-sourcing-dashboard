@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 236,
-    "total_bytes": 108040963,
+    "datasets": 237,
+    "total_bytes": 108296094,
     "by_sensitivity": {
       "конфиденциально": 62,
-      "внутреннее": 132,
+      "внутреннее": 133,
       "публикуемо": 42
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 59,
+      "ГТУ-библиотека": 60,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -125,7 +125,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "2c5aa60",
+      "last_commit": "c20d23c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -294,7 +294,7 @@
         "gt/tools/homoglyphs.py",
         "gt/tools/jenbacher_fold.py",
         "gt/tools/lists_fold.py",
-        "gt/tools/maker_basis.py"
+        "gt/tools/lists_rfq.py"
       ]
     },
     {
@@ -428,7 +428,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "2ba5cd9",
+      "last_commit": "c20d23c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -438,13 +438,13 @@
         "gt/tools/apply_makers.py",
         "gt/tools/band_basis.py",
         "gt/tools/jenbacher_fold.py",
+        "gt/tools/lists_rfq.py",
         "gt/tools/maker_basis.py",
         "gt/tools/rv_brief.py",
         "gt/tools/rv_merge.py",
         "gt/tools/seller_groups.py",
         "gt/tools/ship_brief.py",
-        "gt/tools/ship_coverage.py",
-        "gt/tools/ship_decisions.py"
+        "gt/tools/ship_coverage.py"
       ]
     },
     {
@@ -1823,6 +1823,7 @@
       },
       "referenced_by": [
         "gt/tools/lists_fold.py",
+        "gt/tools/lists_rfq.py",
         "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
         "tests/test_lists_fold.py"
@@ -2411,6 +2412,46 @@
       },
       "referenced_by": [
         "zip/tools/build_telsmith_page.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_lists_rfq.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 254262,
+      "note": "Письма держателям открытых перечней запасных частей по строкам заявки ЛУКОЙЛ, где изделие опознано перечнем, а канал закупки не назван: 13 писем на 820 позиций. Адрес здесь ПО ДЕТАЛИ (наш номер напечатан у держателя в перечне дословно), но наличие детали и её происхождение перечнем не подтверждаются — письмо спрашивает об этом первым пунктом. Хранилища документов (Интернет-архив, площадки публикации) исключены явно: они не продавцы. Собирает gt/tools/lists_rfq.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "letters",
+        "rows_covered",
+        "skipped",
+        "source",
+        "updated",
+        "what_this_address_is"
+      ],
+      "main_collection": {
+        "key": "letters",
+        "records": 13,
+        "record_keys": [
+          "body",
+          "body_head",
+          "body_tail",
+          "host",
+          "pns",
+          "rows",
+          "subject"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/lists_rfq.py"
       ]
     },
     {
@@ -3414,7 +3455,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "2ba5cd9",
+      "last_commit": "c20d23c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5024,6 +5065,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 84359,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_jenbacher_prices.json",
+        "gt/data/ship_lists_rfq.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_maker_basis.json",
+        "gt/data/ship_offer_stats.json",
+        "gt/data/ship_parts_lists.json",
+        "gt/data/ship_questions.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_reverify.json",
+        "gt/data/ship_rfq_letters.json"
+      ],
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "c20d23c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/cat_stock_2026-09.json",
       "subproject": "база ЗИП",
       "bytes": 84053,
@@ -5084,68 +5187,6 @@
         "library/load_parts.py",
         "zip/tools/cat_stock.py",
         "zip/tools/cat_stock_table.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 83490,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_maker_basis.json",
-        "gt/data/ship_offer_stats.json",
-        "gt/data/ship_parts_lists.json",
-        "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_reverify.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_seller_groups.json"
-      ],
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "2c5aa60",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -9875,7 +9916,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "2ba5cd9",
+      "last_commit": "c20d23c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9989,10 +10030,10 @@
         "key": "steps",
         "records": 5
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "c20d23c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
