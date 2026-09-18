@@ -4,14 +4,14 @@
  "method": "Из текста строки вынимаются домены, каждый сводится к своей группе. Строка попадает в замер, если названы ДВЕ и более витрины одной группы. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией — строка, где мы сами написали «это одна компания», попадала бы в дефект наравне со строкой, где две витрины выданы за рынок.",
  "why": "«Два независимых продавца» — главный довод, которым закрывается строка: одна цена может быть наценкой одного перепродавца, две совпадающие цены разных компаний — уже рынок. За ночь этот довод развалился шесть раз: витрины оказывались одним оператором под разными вывесками. Поэтому признак независимости считается по этому списку, а не на глаз по разным доменам.",
  "totals": {
-  "groups_known": 7,
-  "domains_known": 32,
-  "rows_checked": 110,
-  "rows_citing_one_group_twice": 27,
-  "usd_on_those_rows": 924292.5,
-  "rows_marked_as_one_operator": 27,
-  "rows_not_marked": 0,
-  "usd_not_marked": 0.0
+  "groups_known": 10,
+  "domains_known": 40,
+  "rows_checked": 141,
+  "rows_citing_one_group_twice": 33,
+  "usd_on_those_rows": 964541.0,
+  "rows_marked_as_one_operator": 31,
+  "rows_not_marked": 2,
+  "usd_not_marked": 12580.0
  },
  "rows": [
   {
@@ -348,6 +348,32 @@
    "marked": true
   },
   {
+   "pn": "PLC-RSC-24DC/21-21/ATEX, 2980461",
+   "usd": 9906.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarine.com",
+     "aeliyamarinetech.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1060817-40",
+   "usd": 9720.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts",
+     "zip-solutions.com"
+    ]
+   },
+   "marked": true
+  },
+  {
    "pn": "1069873-1",
    "usd": 9180.0,
    "verdict": "ЗАНИЖЕНА",
@@ -361,6 +387,44 @@
    "marked": true
   },
   {
+   "pn": "KOP160j7MWVPN22",
+   "usd": 7250.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "onrion.com",
+     "ontrium.com",
+     "usaron.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "1794-OW8",
+   "usd": 5330.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "codale.com",
+     "needco.com",
+     "stateelectric.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "630870",
+   "usd": 4600.0,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Иркутский оператор (iroil / gkunicom)": [
+     "gkunicom.ru",
+     "iroil.ru"
+    ]
+   },
+   "marked": true
+  },
+  {
    "pn": "1089034-3",
    "usd": 4252.5,
    "verdict": "ЗАНИЖЕНА",
@@ -369,6 +433,19 @@
      "hard-to-find.parts",
      "hardtoget.parts",
      "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "700-FSM3UU23-EX",
+   "usd": 3442.5,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "Rexel USA / Platt Electric Supply": [
+     "platt.com",
+     "rexelapps.com",
+     "rexelusa.com"
     ]
    },
    "marked": true

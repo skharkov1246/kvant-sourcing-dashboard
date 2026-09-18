@@ -38,6 +38,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SUMMARY = ROOT / "gt/data/ship_lukoil.json"
 FX = ROOT / "gt/data/fx_rates.json"
 OUT = ROOT / "gt/data/ship_stocklist_cross.json"
+GROUPS = ROOT / "gt/data/ship_seller_groups.json"
 # Строка листа: «<номер> <описание> <N>pcs <цена>EURO ea». Точка в цене —
 # разделитель тысяч: на том же листе рядом стоят «1.200.00EURO» и «20.00EURO».
 LINE = re.compile(r"^(\S+)\s+(.*?)\s+(\d+)\s*pcs\s+([\d.,]+)\s*(EURO|EUR|USD|\$)", re.I)
@@ -130,6 +131,78 @@ def cross(rows: list[dict], seller: str) -> dict:
     }
 
 
+def group_of(seller: str) -> str:
+    """К какой группе витрин одного оператора принадлежит домен.
+
+    Без этого два листа одной группы в замере расхождений читались бы как два
+    независимых свидетеля — та самая ошибка, из-за которой за ночь развалился
+    довод «два независимых продавца» по двадцати одной строке.
+    """
+    if not GROUPS.exists():
+        return ""
+    d = json.loads(GROUPS.read_text(encoding="utf-8"))
+    dom = seller.lower().strip()
+    for g in (d.get("groups") or []):
+        for x in (g.get("domains") or []):
+            if dom == str(x).lower() or dom.endswith("." + str(x).lower()):
+                return g.get("group") or ""
+    return ""
+
+
+def load_out() -> dict:
+    """Прежний набор, приведённый к многопродавцовому виду.
+
+    Инструмент писал ОДНОГО продавца в корень файла, и второй прогон затирал
+    первого. С шестью листами это потеряло бы пять замеров — та же ошибка, что
+    уже была со счётчиками по охватам, поэтому здесь сразу слияние по продавцу.
+    Старая однопродавцовая форма читается и переносится в sellers по имени
+    продавца из её же поля source.
+    """
+    if not OUT.exists():
+        return {"sellers": {}}
+    d = json.loads(OUT.read_text(encoding="utf-8"))
+    if "sellers" in d:
+        return d
+    old = d.get("totals") or {}
+    name = old.get("seller")
+    if not name:                       # имя продавца сохранялось только в прозе
+        m = re.search(r"сток-листа продавца (\S+)", str(d.get("source") or ""))
+        name = m.group(1) if m else "неизвестный продавец"
+    return {"sellers": {name: {"totals": old, "rows": d.get("rows") or []}}}
+
+
+def disagreements(sellers: dict) -> dict:
+    """Номера, по которым листы РАСХОДЯТСЯ в классе.
+
+    Это и есть главная цифра набора: пока лист один, «ask выше потолка» читается
+    как свойство рынка. Когда листов несколько, видно, что у части номеров класс
+    зависит от того, чей лист взять, — и тогда вывод по строке держится не на
+    измерении, а на выборе продавца.
+    """
+    where: dict[str, dict[str, str]] = collections.defaultdict(dict)
+    expo_of: dict[str, float] = {}
+    for name, s in sellers.items():
+        name = s.get("group") or name          # лист группы — один свидетель, не два
+        for r in (s.get("rows") or []):
+            pn = str(r.get("pn") or "")
+            if not pn:
+                continue
+            where[pn][name] = r.get("where") or ""
+            expo_of[pn] = float(r.get("usd_exposure") or 0)
+    shared = {pn: w for pn, w in where.items() if len(w) > 1}
+    split = {pn: w for pn, w in shared.items() if len(set(w.values())) > 1}
+    agree_usd = sum(expo_of[pn] for pn in shared if pn not in split)
+    return {
+        "pns_on_more_than_one_list": len(shared),
+        "pns_with_conflicting_class": len(split),
+        "usd_in_conflict": round(sum(expo_of[pn] for pn in split), 2),
+        "usd_in_agreement": round(agree_usd, 2),
+        "conflicting": sorted(
+            ({"pn": pn, "usd_exposure": expo_of[pn], "by_seller": w} for pn, w in split.items()),
+            key=lambda x: -x["usd_exposure"])[:40],
+    }
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("page", help="сохранённая страница сток-листа (ВНЕ репозитория)")
@@ -159,10 +232,17 @@ def main() -> int:
     print(f"  у {m['desc_starts_with_other_pn']} строк описание начинается с ДРУГОГО номера — "
           f"это кросс продавца, читать его как наш номер нельзя")
     if a.write:
+        prev = load_out()
+        sellers = prev.get("sellers") or {}
+        sellers[a.seller] = {"totals": {k: v for k, v in m.items() if k != "rows"},
+                             "group": group_of(a.seller),
+                             "rows": m["rows"]}
+        dis = disagreements(sellers)
         OUT.write_text(json.dumps({
             "updated": "2026-09-18",
-            "source": f"Пересечение открытого сток-листа продавца {a.seller} с номерами заявки "
-                      f"(gt/data/ship_lukoil.json). Считает gt/tools/stocklist_cross.py.",
+            "source": "Пересечение открытых сток-листов продавцов с номерами заявки "
+                      "(gt/data/ship_lukoil.json). Считает gt/tools/stocklist_cross.py, "
+                      "по одному листу за прогон, с слиянием по продавцу.",
             "method": "Строка листа имеет вид «номер · описание · N pcs · цена». Точка в цене — "
                       "разделитель тысяч (проверяется на самом листе: рядом стоят «1.200.00» и "
                       "«20.00»). Пересчёт в доллары по gt/data/fx_rates.json. Сверка по "
@@ -179,10 +259,17 @@ def main() -> int:
                               "внутри ask сидит неизмеренная премия за поставку, поэтому «ask "
                               "выше потолка» означает «наша вилка ниже, чем просит этот "
                               "продавец», а не «закупка дороже». Второй свидетель обязателен.",
-            "totals": {k: v for k, v in m.items() if k != "rows"},
-            "rows": m["rows"],
+            "why_many_sellers": "Замеры живут ПО ПРОДАВЦАМ и не складываются: один "
+                                "номер стоит в нескольких листах, и сумма по всем листам "
+                                "посчитала бы его столько раз, сколько продавцов его "
+                                "держат. Складывать можно только внутри одного листа.",
+            "sellers": sellers,
+            "disagreements": dis,
         }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        print(f"замер записан в {OUT.relative_to(ROOT)}")
+        print(f"замер записан в {OUT.relative_to(ROOT)}: продавцов {len(sellers)}, "
+              f"номеров больше чем на одном листе {dis['pns_on_more_than_one_list']}, "
+              f"из них класс расходится у {dis['pns_with_conflicting_class']} "
+              f"на {dis['usd_in_conflict']:,.0f} USD".replace(",", " "))
     return 0
 
 

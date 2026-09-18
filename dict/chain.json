@@ -1,7 +1,7 @@
 {
   "note": "Ребро, а не карточка: уровень субпоставщика — свойство пути, а не компании. Одна и та же компания бывает первым уровнем для одного владельца конструкции и вторым, если между ними стоит пакаджер, поэтому уровень не хранится, а считается обходом. Записи вида routing_note — не компании, а указания к закупке из поля mk базы PN: «закупка по спецификации», «любой дистрибьютор». Для сорсера это ответ не хуже имени завода, поэтому они сохранены отдельным видом.",
-  "count": 305,
-  "makers": 268,
+  "count": 311,
+  "makers": 274,
   "routing_notes": 37,
   "records": [
     {
@@ -272,7 +272,7 @@
       "sources": [
         "gt/data/pn_db.json"
       ],
-      "n": 35,
+      "n": 34,
       "from_is_bucket": true
     },
     {
@@ -502,47 +502,6 @@
       "from_is_bucket": false
     },
     {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
-      "to": "Pall/Donaldson/Parker/PECOFacet (по типу)",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "SGT-400"
-      ],
-      "proof": [
-        "П4: сегмент фильтров"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 15,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Прочие",
-      "from_key": "прочие",
-      "to": "ABB/Siemens/OMRON (по типу)",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "Реле",
-        "ПРИВОД ЭЛЕКТРОГИДРАВЛИЧЕСКИЙ, SIEMENS SKC62, 2800 N, 40мм, AC 24 В, DC 0..10 В 4",
-        "САУ, КИП, электрика",
-        "Реле-контактор"
-      ],
-      "proof": [
-        "П4: электрика"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 15,
-      "from_is_bucket": true
-    },
-    {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
       "to": "Versa Products",
@@ -565,6 +524,28 @@
       ],
       "n": 14,
       "from_is_bucket": false
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "ABB/Siemens/OMRON (по типу)",
+      "to_key": "",
+      "kind": "routing_note",
+      "relation": "makes_for",
+      "scope": [
+        "Реле",
+        "ПРИВОД ЭЛЕКТРОГИДРАВЛИЧЕСКИЙ, SIEMENS SKC62, 2800 N, 40мм, AC 24 В, DC 0..10 В 4",
+        "САУ, КИП, электрика",
+        "Реле-контактор"
+      ],
+      "proof": [
+        "П4: электрика"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 14,
+      "from_is_bucket": true
     },
     {
       "from": "Прочие",
@@ -625,6 +606,25 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
+      "to": "Pall/Donaldson/Parker/PECOFacet (по типу)",
+      "to_key": "",
+      "kind": "routing_note",
+      "relation": "makes_for",
+      "scope": [
+        "SGT-400"
+      ],
+      "proof": [
+        "П4: сегмент фильтров"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 13,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
       "to": "Rockwell Automation (Allen-Bradley)",
       "to_key": "rockwellautomationallenbradley",
       "kind": "maker",
@@ -636,29 +636,6 @@
       ],
       "proof": [
         "П2"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 12,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Solar Turbines",
-      "from_key": "solarturbines",
-      "to": "ABB/Siemens/OMRON (по типу)",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "Taurus 60S",
-        "Taurus 70 и Taurus 70MD (унифицированнные)",
-        "Шкаф управления PMS МЛСПК",
-        "Taurus 70MD",
-        "Taurus 60S, Taurus 70"
-      ],
-      "proof": [
-        "П4: электрика"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -833,6 +810,26 @@
       "from_is_bucket": false
     },
     {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "MarFlex",
+      "to_key": "marflex",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Насос MarFlex MDPC-200"
+      ],
+      "proof": [
+        "П2 — производитель назван в позиции заказчика",
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 10,
+      "from_is_bucket": true
+    },
+    {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
       "to": "Siemens S.R.O.",
@@ -976,25 +973,6 @@
       "from_is_bucket": false
     },
     {
-      "from": "Прочие",
-      "from_key": "прочие",
-      "to": "MarFlex",
-      "to_key": "marflex",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Насос MarFlex MDPC-200"
-      ],
-      "proof": [
-        "П2 — производитель назван в позиции заказчика"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 9,
-      "from_is_bucket": true
-    },
-    {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
       "to": "Versa Products (OE Solar по соленоидам) — серия V/VSG",
@@ -1051,6 +1029,28 @@
       ],
       "proof": [
         "П4: сегмент подшипников"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 7,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "ABB/Siemens/OMRON (по типу)",
+      "to_key": "",
+      "kind": "routing_note",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 60S",
+        "Taurus 70 и Taurus 70MD (унифицированнные)",
+        "Taurus 70MD",
+        "Taurus 60S, Taurus 70"
+      ],
+      "proof": [
+        "П4: электрика"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -1858,26 +1858,6 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
-      "to": "EnerSys/Saft (тип.)",
-      "to_key": "enersyssaftтип",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Прочее / требует разметки",
-        "САУ, КИП, электрика"
-      ],
-      "proof": [
-        "П4: батареи"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 3,
-      "from_is_bucket": true
-    },
-    {
-      "from": "Прочие",
-      "from_key": "прочие",
       "to": "Jenbacher / INNIO",
       "to_key": "jenbacherinnio",
       "kind": "maker",
@@ -2032,6 +2012,25 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
+      "to": "AAF",
+      "to_key": "aaf",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "SGT-400"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
       "to": "Druck (Baker Hughes)",
       "to_key": "druckbakerhughes",
       "kind": "maker",
@@ -2141,6 +2140,26 @@
       ],
       "proof": [
         "П3 — горячий тракт, реверс-канал"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "Allen-Bradley (Rockwell Automation)",
+      "to_key": "allenbradleyrockwellautomation",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Шкаф управления PMS МЛСПК",
+        "Taurus 70MD"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -2439,6 +2458,27 @@
     {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
+      "to": "Phoenix Contact",
+      "to_key": "phoenixcontact",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 70MD",
+        "Solar (SEPOC)"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026",
+        "П1"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
       "to": "Rochester Gauges",
       "to_key": "rochestergauges",
       "kind": "maker",
@@ -2622,6 +2662,26 @@
       ],
       "proof": [
         "П2 — производитель назван в документе заказчика"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "EnerSys/Saft (тип.)",
+      "to_key": "enersyssaftтип",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Прочее / требует разметки",
+        "САУ, КИП, электрика"
+      ],
+      "proof": [
+        "П4: батареи"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -2964,6 +3024,25 @@
       ],
       "proof": [
         "П4"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "INNIO Jenbacher",
+      "from_key": "inniojenbacher",
+      "to": "SCHRACK / TE Connectivity (назван в позиции заказчика)",
+      "to_key": "schrackteconnectivityназванвпозициизаказ",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "ГПУ Jenbacher серии 6"
+      ],
+      "proof": [
+        "П1 — назван в позиции заказчика; владелец номера INNIO Jenbacher по открытому каталогу"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -4171,25 +4250,6 @@
     {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
-      "to": "PHOENIX CONTACT",
-      "to_key": "phoenixcontact",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Solar (SEPOC)"
-      ],
-      "proof": [
-        "П1"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 1,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Solar Turbines",
-      "from_key": "solarturbines",
       "to": "ProSoft Technology",
       "to_key": "prosofttechnology",
       "kind": "maker",
@@ -4275,6 +4335,25 @@
       ],
       "proof": [
         "П1"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "Saia-Burgess",
+      "to_key": "saiaburgess",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 60S, Taurus 70"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -4484,6 +4563,25 @@
       ],
       "proof": [
         "П4: сегмент термопар"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "TE Connectivity (SCHRACK / Potter & Brumfield)",
+      "to_key": "teconnectivityschrackpotterbrumfield",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 60S, Taurus 70"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -5760,6 +5858,25 @@
       ],
       "proof": [
         "П2 — производитель назван в позиции заказчика"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "HDI Instruments",
+      "to_key": "hdiinstruments",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "САУ, КИП, электрика"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
