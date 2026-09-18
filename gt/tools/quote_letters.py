@@ -122,10 +122,14 @@ def leak_domains() -> dict[str, str]:
 def maker_key(t) -> str:
     """Ключ изготовителя: только буквы и цифры, регистр снят.
 
-    «Drillmec S.p.A.» и «Drillmec» должны сойтись, а «Drillmec S.p.A. / Oleobi
-    S.r.l.» — нет: это два изготовителя, и адрес у них разный.
+    Пояснение в СКОБКАХ снимается: «Fleetguard (Cummins Filtration)» и
+    «Fleetguard» — один изготовитель, и без этого три строки Fleetguard не
+    нашли своего адреса, хотя он был найден. А вот «A / B» остаётся как есть:
+    «Drillmec S.p.A. / Oleobi S.r.l.» — ДВА изготовителя, и адрес у них разный,
+    склеивать их значило бы отправить письмо не туда.
     """
-    return re.sub(r"[^a-z0-9а-яё]", "", str(t or "").lower())
+    t = re.sub(r"\s*\([^)]*\)", " ", str(t or ""))
+    return re.sub(r"[^a-z0-9а-яё]", "", t.lower())
 
 
 def maker_contacts() -> dict[str, dict]:
@@ -144,6 +148,13 @@ def maker_contacts() -> dict[str, dict]:
             continue
         mails = MAIL.findall(str(r.get("email") or ""))
         if not mails:
+            continue
+        # Низкая уверенность письма не порождает. Адрес с такой пометкой —
+        # обычно общая приёмная или канал ПО КЛАССУ изделий: по свече
+        # промышленного газового двигателя разведка нашла автомобильный
+        # послепродажный канал изготовителя. Такая запись остаётся знанием в
+        # наборе, но письмо по ней не собирается.
+        if str(r.get("confidence") or "").strip().lower() == "низкая":
             continue
         out[maker_key(r.get("maker"))] = dict(r, email=mails[0])
     return out
@@ -282,12 +293,21 @@ def build() -> dict:
                          "Строки, где есть только адрес, не подходили ни туда, ни туда — и "
                          "оказались самым большим классом.",
         "what_is_not_in_the_letter": "Ни нашей вилки, ни суммы, ни имени заказчика.",
-        "rows_total": len(with_mail) + len(without),
-        "usd_total": round(sum(x["our_exposure"] for x in with_mail + without), 2),
+        # Итог считается как сумма ТРЁХ частей. Прежняя редакция брала
+        # len(with_mail) + len(without) уже ПОСЛЕ того, как часть строк ушла в
+        # письма изготовителям, и целое молча теряло эти строки: 267 + 50 + 205
+        # против объявленных 472. Тест на сходимость это и поймал.
+        "rows_total": len(with_mail) + sum(len(v) for v in to_maker.values()) + len(without),
+        "usd_total": round(sum(x["our_exposure"] for x in with_mail + without)
+                           + sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
         "rows_with_address": len(with_mail),
         "usd_with_address": round(sum(x["our_exposure"] for x in with_mail), 2),
         "rows_without_address": len(without),
         "usd_without_address": round(sum(x["our_exposure"] for x in without), 2),
+        "how_rows_split": ("rows_total = rows_with_address + rows_to_maker + "
+                           "rows_without_address. Три разных письма и три разных вопроса: "
+                           "продавцу — цена и наличие, изготовителю — расшифровка номера и "
+                           "авторизованный канал, а по третьей части писать пока некому."),
         "rows_to_maker": sum(len(v) for v in to_maker.values()),
         "usd_to_maker": round(sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
         "what_maker_letter_asks": ("Изготовителю задаётся не цена, а расшифровка внутреннего "

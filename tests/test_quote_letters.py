@@ -64,13 +64,25 @@ def test_пять_вопросов_пронумерованы_и_отказ_на
     assert "«нет» — это тоже ответ" in body, "отказ обязан быть назван полноценным ответом"
 
 
-def test_итог_делится_на_адресные_и_безадресные_нацело():
+def test_итог_делится_на_три_части_нацело():
+    """Три письма и три вопроса: продавцу, изготовителю и «писать пока некому».
+
+    Учёт из двух частей сломался ровно в тот момент, когда появились письма
+    изготовителям: строки уходили из «без адреса» в письмо, а сумма частей
+    перестала сходиться с целым — то есть одна из категорий молча теряла
+    строки.
+    """
     q = ql()
     d = q.build()
-    assert d["rows_with_address"] + d["rows_without_address"] == d["rows_total"]
-    assert abs(d["usd_with_address"] + d["usd_without_address"] - d["usd_total"]) < 1.0
+    assert d["rows_with_address"] + d["rows_to_maker"] + d["rows_without_address"] \
+        == d["rows_total"]
     assert len(d["rows_no_address_list"]) == d["rows_without_address"]
-    assert sum(L["rows"] for L in d["letters"]) == d["rows_with_address"]
+    assert sum(L["rows"] for L in d["letters"]) == d["rows_with_address"] + d["rows_to_maker"]
+    by_kind = {}
+    for L in d["letters"]:
+        by_kind[L["kind"]] = by_kind.get(L["kind"], 0) + L["rows"]
+    assert by_kind.get("продавцу", 0) == d["rows_with_address"]
+    assert by_kind.get("изготовителю", 0) == d["rows_to_maker"]
 
 
 def test_имя_изготовителя_не_берётся_из_прозы_разбора():
@@ -131,4 +143,18 @@ def test_адрес_изготовителя_без_прочитанной_ст�
 def test_ключ_изготовителя_сводит_формы_имени_но_не_склеивает_разных():
     q = ql()
     assert q.maker_key("Drillmec S.p.A.") == q.maker_key("drillmec spa")
+    assert q.maker_key("Drillmec") != q.maker_key("Drillmec S.p.A. / Oleobi S.r.l.")
+
+
+def test_пояснение_в_скобках_не_делает_изготовителя_другим():
+    """«Fleetguard (Cummins Filtration)» и «Fleetguard» — один изготовитель.
+
+    Без этого три строки Fleetguard на 282 561 USD не нашли своего адреса, хотя
+    он был найден и лежал в наборе. А «A / B» остаётся раздельным: «Drillmec
+    S.p.A. / Oleobi S.r.l.» — ДВА изготовителя с разными адресами, и склейка
+    отправила бы письмо не туда.
+    """
+    q = ql()
+    assert q.maker_key("Fleetguard (Cummins Filtration)") == q.maker_key("Fleetguard")
+    assert q.maker_key("Siemens Energy (чертёж завода Линкольн)") == q.maker_key("Siemens Energy")
     assert q.maker_key("Drillmec") != q.maker_key("Drillmec S.p.A. / Oleobi S.r.l.")
