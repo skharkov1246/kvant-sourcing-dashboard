@@ -706,6 +706,81 @@ def guess_stats(tkp_path: Path) -> dict:
                               "количество.")}
 
 
+INSIDE = ROOT / "gt/data/ship_inside_quotes.json"
+
+
+def inside_claim_split(rows: list, tkp_path: Path, supp: dict) -> dict:
+    """Проверка НАШЕГО ЖЕ утверждения «цена лежит в приложенном файле».
+
+    Набор gt/data/ship_inside_quotes.json отвечает на вопрос «где искать»: он
+    сводит номер строки заявки с файлом, в котором есть хоть одна цена по
+    колонке. Это АДРЕС, а не цена, и разница измерима. Список номеров файла в
+    описи (`pns` в gt/tools/bitrix_tkp.py) строится из ВСЕХ размеченных строк,
+    включая догадку «последнее число строки», поэтому номер попадает в адрес и
+    тогда, когда цены по нему нет вовсе.
+
+    Замер 18.09.2026, охват «Энергосети»: по файловому признаку адрес есть у
+    265 строк заявки (44 квотируемых на 1 202 538 USD и 221 непроверенная), а
+    цена по колонке сошлась у 104. Разница — не потеря данных, а разница между
+    «в файле есть цены и есть наш номер» и «у нашей строки есть цена».
+
+    Счёт делит утверждение на четыре честно разные части:
+      цена сошлась          — по строке есть значение из колонки «цена»;
+      значение есть, догадка — строка в файле размечена, но число взято правилом
+                              «последнее число строки»: ценой оно не является;
+      строки в файле нет     — номер в размеченных строках выгрузки не встретился:
+                              адрес был файловый, а не строчный;
+      файл вне этой выгрузки — адрес указывает на файл другого охвата, здесь он
+                              не измеряется и в счёт провала не идёт.
+
+    Печатаются счётчики строк. Ни цен, ни привязки цены к номеру (правило 17).
+    """
+    if not INSIDE.exists():
+        return {}
+    doc = json.loads(tkp_path.read_text())
+    dump_files = {str(f.get("file_name") or "") for f in doc.get("files", [])}
+    dump_files.discard("")
+    guessed: set[str] = set()
+    for f in doc.get("files", []):
+        if (f.get("direction") or "неизвестно").strip() in DIR_SKIP:
+            continue
+        for p in f.get("prices", []):
+            if not price_graded(p):
+                guessed.add(norm_key(p["pn"]))
+    addr = {}
+    for r in json.loads(INSIDE.read_text(encoding="utf-8")).get("rows", []):
+        k = norm_key(str(r.get("pn") or "").split("(")[0])
+        if k:
+            addr[k] = [str(x.get("file") or "") for x in (r.get("found_in") or [])]
+    out = Counter()
+    for r in rows:
+        ks = keys_of(r.get("pn"))
+        files = next((addr[k] for k in ks if k in addr), None)
+        if files is None:
+            continue
+        sp, _ = lookup(supp, r.get("pn"))
+        if sp and sp.get("usd") is not None:
+            out["цена сошлась"] += 1
+        elif any(k in guessed for k in ks):
+            out["значение есть, но это догадка, а не цена"] += 1
+        elif any(f in dump_files for f in files):
+            out["файл в выгрузке есть, размеченной строки по номеру нет"] += 1
+        else:
+            out["адрес указывает на файл вне этой выгрузки"] += 1
+    return {"rows_with_address": sum(out.values()),
+            "price_joined": out["цена сошлась"],
+            "value_is_guess": out["значение есть, но это догадка, а не цена"],
+            "row_absent_in_parsed_file": out[
+                "файл в выгрузке есть, размеченной строки по номеру нет"],
+            "address_outside_this_dump": out[
+                "адрес указывает на файл вне этой выгрузки"],
+            "what_it_means": ("Адрес «цена лежит в нашем вложении» — файловый признак, и "
+                              "он НЕ равен цене по строке. В деньги имеет право идти "
+                              "только price_joined. Остальное — работа: догадка требует "
+                              "открыть файл глазами, отсутствие размеченной строки "
+                              "означает, что разбор эту строку не взял.")}
+
+
 def band_stats(rows: list, supp: dict) -> dict:
     """Счётчики «что КП поставщиков делают с нашими вилками». БЕЗ цен и номеров.
 
@@ -796,6 +871,8 @@ def main() -> int:
         # «222 заниженные строки» до тридцати одной выглядит потерей данных, а
         # не исправлением измерения.
         st["price_grades"] = guess_stats(tkp)
+        # Проверка утверждения «цена лежит в нашем вложении»: адрес это или цена.
+        st["inside_claim"] = inside_claim_split(rows, tkp, supp)
         # Счётчики живут ПО ОХВАТАМ, как и опись. Один файл на прогон уже трижды
         # уносил чужую работу: прогон по «НВН» перезаписывал цифры по
         # «Энергосети», хотя это разные заявки и складывать их нельзя.
@@ -813,6 +890,13 @@ def main() -> int:
         }
         Path(a.stats_out).write_text(
             json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        ic = st.get("inside_claim") or {}
+        if ic:
+            print(f"  «цена лежит в нашем вложении»: адрес есть у {ic['rows_with_address']} "
+                  f"строк · цена сошлась {ic['price_joined']} · значение догадка "
+                  f"{ic['value_is_guess']} · строки в разобранном файле нет "
+                  f"{ic['row_absent_in_parsed_file']} · файл вне этой выгрузки "
+                  f"{ic['address_outside_this_dump']}")
         print(f"счётчики по вилкам записаны в {a.stats_out}, охват «{a.scope}»: "
               f"строк с КП {st['rows_with_offer']}, выше потолка {st['above_ceiling']}, "
               f"внутри {st['inside_band']}, ниже пола {st['below_floor']}")
