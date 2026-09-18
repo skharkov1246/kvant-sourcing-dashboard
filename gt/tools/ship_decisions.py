@@ -33,6 +33,12 @@ h1 { font-size: 16pt; margin: 0 0 1mm; }
 h2 { font-size: 11pt; margin: 4mm 0 2mm; border-bottom: 1.3pt solid #111; padding-bottom: 0.8mm; }
 p { margin: 0 0 2mm; line-height: 1.4; }
 .dim { color: #666; }
+/* Подпись не должна оставаться одна на странице. 18.09.2026 добавленные строки
+   вытеснили её на третью страницу, и pdf_check честно поймал «полупустую
+   страницу»: 176 знаков на лист. Запрет разрыва ПЕРЕД подписью держит её с
+   последним абзацем — это тот же приём, что «.subj» в пакетах писем, только с
+   другой стороны блока. */
+.foot { page-break-before: avoid; break-before: avoid-page; }
 .lead { font-size: 9.2pt; }
 table { width: 100%; border-collapse: collapse; margin-bottom: 2.5mm; table-layout: fixed; }
 th { background: #111; color: #fff; text-align: left; padding: 1.2mm 1.5mm; font-size: 7.8pt; }
@@ -261,13 +267,17 @@ def build() -> str:
         a("<tr class='big'><td>номер подтверждён каталогом изготовителя и карточками "
           "торговцев — без поиска, по картам их сайтов</td>"
           f"<td class='n'>{ru(sc.get('matched'))} + {ru(si.get('ask_rows_matched'))}</td>"
-          f"<td class='dim'>Просмотрено {ru(sc.get('catalog_addresses'))} адресов каталога "
-          f"изготовителя и {ru(si.get('addresses_indexed'))} адресов карт торговцев. "
-          f"У {ru(si.get('of_them_had_no_address_before'))} строк адреса продавца у нас до "
-          f"этого не было вовсе — это готовый адресат по самой детали. Цены ни один "
-          f"указатель не даёт: за ней надо открыть карточку. Отдельно "
-          f"{ru(sc.get('solar_missing'))} строк, которых в каталоге изготовителя нет вовсе — "
-          f"они закрываются вопросом заказчику, а не поиском</td></tr>")
+          f"<td class='dim'>Просмотрено {ru(sc.get('catalog_addresses'))} и "
+          f"{ru(si.get('addresses_indexed'))} адресов. У "
+          f"{ru(si.get('of_them_had_no_address_before'))} строк адреса продавца не было вовсе "
+          f"— теперь есть, по самой детали. Цены указатели не дают. Ещё "
+          f"{ru(sc.get('solar_missing'))} строк в каталоге изготовителя отсутствуют: это "
+          f"вопрос заказчику</td></tr>")
+    for L in (si.get("letters") or []):
+        a(f"<tr><td>письмо одному оператору закрывает сразу</td>"
+          f"<td class='n'>{ru(L.get('rows'))}</td>"
+          f"<td class='dim'>позиций, {ru(L.get('qty_total'))} штук; карточки его же, адрес "
+          f"прочитан на его странице. Текст готов — gt/data/seller_index.json</td></tr>")
     gw = ((load("ship_coverage.json") or {}).get("channel_without_price") or {})
     if gw.get("of_them_hunted_dry") is not None:
         a(f"<tr class='big'><td>строк, по которым добор цены прошёл и цены в открытом "
@@ -377,7 +387,7 @@ def build() -> str:
     a("<li>Держу прогон выгрузки на охвате «Энергосети»: он даёт цены поставщиков по нашим "
       "номерам. Охват именем заказчика не работает — проверено, пересечение ноль.</li>")
     a("</ol>")
-    a("<p class='dim'>Собирает gt/tools/ship_decisions.py из наборов ship_lukoil, "
+    a("<p class='dim foot'>Собирает gt/tools/ship_decisions.py из наборов ship_lukoil, "
       "ship_channels, ship_collisions, ship_confidence, ship_offer_stats, ship_reverify, "
       "ship_questions, ship_english_source.</p>")
     return "".join(h)

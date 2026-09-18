@@ -185,6 +185,35 @@ def measure(idx: dict, seen: Counter, ask: list, rv: dict, domains: list[dict]) 
             "had_price": isinstance(x.get("price_low"), (int, float)),
         })
     new_addr = [r for r in rows if not r["had_contacts"]]
+    # ПИСЬМО НА ОПЕРАТОРА, А НЕ НА СТРОКУ. Замер 18.09.2026: все 401 совпадение
+    # пришлись на одного оператора с двумя каталогами, и 302 из них — строки без
+    # найденной цены. Это один запрос на 302 позиции, а не 302 разбора.
+    by_mail: dict[str, list] = {}
+    mails = {str(d.get("host")): d for d in domains if d.get("mail")}
+    for r in rows:
+        if r["had_price"]:
+            continue          # цена уже найдена — спрашивать нечего
+        for c in r["cards"]:
+            d = mails.get(c["host"])
+            if d:
+                by_mail.setdefault(str(d["mail"]), []).append(r)
+                break
+    letters = []
+    for mail, items in sorted(by_mail.items(), key=lambda kv: -len(kv[1])):
+        host = next(d for d in domains if d.get("mail") == mail)
+        also = [str(x) for x in (host.get("same_operator_as") or [])
+                if any(c["host"] == x for it in items for c in it["cards"])]
+        letters.append({
+            "to": mail,
+            "address_read_on": host.get("mail_read_on"),
+            "address_note": host.get("mail_note"),
+            "phone": host.get("phone"),
+            "rows": len(items),
+            "qty_total": sum(float(i.get("qty") or 0) for i in items),
+            "pns": [i["pn"] for i in items],
+            "subject": f"Запрос цены и наличия по {len(items)} позиц. из вашего каталога",
+            "body": letter(host, items, also),
+        })
     return {
         "updated": date.today().isoformat(),
         "source": "Карты сайтов продавцов из gt/data/seller_sitemaps.json (robots.txt → "
@@ -208,8 +237,42 @@ def measure(idx: dict, seen: Counter, ask: list, rv: dict, domains: list[dict]) 
         "min_key_length": MIN_KEY,
         "why_min_key": "Ключ короче четырёх знаков номером не считается: «10», «A1» и «SET» "
                        "дали бы ложные совпадения с половиной заявки.",
+        "letters": letters,
+        "why_one_letter": "Все совпадения пришлись на одного оператора с двумя каталогами, "
+                          "поэтому это один запрос на все его позиции, а не отдельный разбор "
+                          "по каждой строке. Спрашиваются только те строки, по которым цены у "
+                          "нас ещё нет. Наших цифр, вилок и имени заказчика в письме нет.",
         "rows": sorted(rows, key=lambda z: str(z["pn"])),
     }
+
+
+def letter(host: dict, items: list[dict], also: list[str]) -> str:
+    """Одно письмо оператору на все его позиции. Наших цифр в нём нет.
+
+    Почему одно, а не по строке: карточки нашлись у ОДНОГО оператора (у него два
+    каталога на разных доменах), и 302 позиции закрываются одним запросом. Пять
+    вопросов — те же, что в gt/tools/quote_letters.py: письмо с шестым вопросом
+    превращается в переписку.
+    """
+    lines = ["Добрый день!", "",
+             "У вас в каталоге есть карточки по позициям ниже — мы их нашли по вашим же "
+             "страницам. Просим по каждой позиции дать:", "",
+             "1) цену за штуку и цену за всё указанное количество;",
+             "2) остаток на складе ЧИСЛОМ на сегодня;",
+             "3) срок поставки под указанное количество целиком;",
+             "4) срок действия цены;",
+             "5) базис поставки (Инкотермс).", ""]
+    if also:
+        lines += [f"Часть позиций у вас выставлена и на {', '.join(also)} — если это один и "
+                  f"тот же склад, достаточно одного ответа.", ""]
+    lines += ["Позиции:"]
+    for i, it in enumerate(items, 1):
+        q = f" — {it['qty']} шт" if it.get("qty") else ""
+        lines.append(f"{i}. {it['pn']}{q}")
+    lines += ["", "Если позиции нет в наличии, достаточно одного слова «нет» — это тоже "
+                  "ответ. Если у позиции есть действующая замена, просим назвать её номер.",
+              "", "С уважением,", "КВАНТ"]
+    return "\n".join(lines)
 
 
 def main() -> int:

@@ -6,12 +6,26 @@
   {
    "host": "turbine.parts",
    "why": "Торговец обсолетом по газовым турбинам. Разведка 18.09.2026 нашла у него карточки по точным номерам заявки (1043265-7, 301315-18, 1059701-8, 1008378-2/-3/-4), которых не было ни у кого другого. Цен не печатает: вместо цены форма запроса.",
-   "same_operator_as": ["hardtoget.parts", "zip-solutions.com"]
+   "same_operator_as": [
+    "hardtoget.parts",
+    "zip-solutions.com"
+   ],
+   "mail": "hello@turbine.parts",
+   "mail_read_on": "https://turbine.parts/contacts/ , 18.09.2026",
+   "mail_note": "На странице напечатано «hello [at] turbine.parts» — обфускация, а не другой адрес.",
+   "phone": "+31 43 569 0171"
   },
   {
    "host": "hardtoget.parts",
    "why": "Тот же оператор, что turbine.parts, но отдельный каталог со своими адресами и складским перечнем (253 страницы, читан 18.09.2026). Считать одним свидетелем с turbine.parts.",
-   "same_operator_as": ["turbine.parts", "zip-solutions.com"]
+   "same_operator_as": [
+    "turbine.parts",
+    "zip-solutions.com"
+   ],
+   "mail": "info@hardtoget.parts",
+   "mail_read_on": "https://hardtoget.parts/contacts/ , 18.09.2026",
+   "mail_note": "На странице адрес напечатан с пробелами («info @ hardtoget.parts») — это защита от сборщиков почты, а не другой адрес. Местная часть и домен напечатаны оба, поэтому это ЧТЕНИЕ, а не догадка по домену.",
+   "phone": "+7 495 1081005"
   },
   {
    "host": "kpr-rm.com",

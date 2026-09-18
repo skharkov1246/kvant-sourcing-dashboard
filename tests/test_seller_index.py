@@ -101,3 +101,37 @@ def test_набор_репозитория_согласован_и_без_цен
         for c in r["cards"]:
             assert set(c) == {"host", "url"}
             assert c["url"].startswith("http")
+
+
+def test_письмо_оператору_не_несёт_нашей_информации():
+    """Наружу не уходят ни вилка, ни экспозиция, ни имя заказчика.
+
+    То же правило, что в остальных пакетах писем: продавцу возвращается только
+    его собственная номенклатура и наш вопрос.
+    """
+    p = ROOT / "gt/data/seller_index.json"
+    if not p.exists():
+        pytest.skip("набора нет")
+    d = json.loads(p.read_text(encoding="utf-8"))
+    assert d["letters"], "письмо не собралось — спросить-то надо"
+    for L in d["letters"]:
+        body = L["body"]
+        for bad in ("ЛУКОЙЛ", "лукойл", "Энергосети", "энергосети", "НВН",
+                    "вилка", "экспозиц", "наша цена", "USD", "долл"):
+            assert bad not in body, (L["to"], bad)
+        for q in ("остаток на складе ЧИСЛОМ", "цену за штуку", "срок действия цены",
+                  "базис поставки"):
+            assert q in body
+        assert L["rows"] == len(L["pns"])
+        assert "@" in L["to"] and L.get("address_read_on"), "адрес без прочитанной страницы"
+
+
+def test_письмо_не_спрашивает_то_что_уже_известно():
+    """Строка с найденной ценой в письмо не идёт: по ней спрашивать нечего."""
+    p = ROOT / "gt/data/seller_index.json"
+    if not p.exists():
+        pytest.skip("набора нет")
+    d = json.loads(p.read_text(encoding="utf-8"))
+    priced = {r["pn"] for r in d["rows"] if r["had_price"]}
+    asked = {pn for L in d["letters"] for pn in L["pns"]}
+    assert not (priced & asked), sorted(priced & asked)[:5]
