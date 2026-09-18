@@ -35,6 +35,7 @@ ASK = ROOT / "gt/data/ship_lukoil.json"
 REVERIFY = ROOT / "gt/data/ship_reverify.json"
 LISTS = ROOT / "gt/data/ship_parts_lists.json"
 QUESTIONS = ROOT / "gt/data/ship_questions.json"
+INSIDE = ROOT / "gt/data/ship_inside_quotes.json"
 OUT = ROOT / "gt/data/ship_coverage.json"
 
 
@@ -87,6 +88,21 @@ def asked_keys() -> set:
     return out
 
 
+def answered_keys() -> set:
+    """Номера, по которым присланное предложение у нас УЖЕ есть.
+
+    Нужны, чтобы не выдавать за непреодолимое то, что уже преодолено. «Канал
+    квотируемый» значит, что продавец не публикует прайс, — но если мы у него
+    спросили и он ответил, цена не отсутствует, она лежит во вложении сделки.
+    Замер 18.09.2026: так обстоит дело у 48 из 65 квотируемых строк, и это
+    85 % денег этого разряда, включая две самые дорогие строки всей заявки.
+    """
+    if not INSIDE.exists():
+        return set()
+    return {key(r.get("pn"))
+            for r in json.loads(INSIDE.read_text(encoding="utf-8")).get("rows", [])}
+
+
 def measure() -> dict:
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
     rv = {key(r.get("pn")): r for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
@@ -98,6 +114,9 @@ def measure() -> dict:
 
     # ПРИЗНАКИ независимы: канал бывает назван там, где цены нет, и наоборот.
     asked = asked_keys()
+    answered = answered_keys()
+    gap_answered = 0
+    gap_answered_usd = 0.0
     gap_wait = gap_open = 0
     gap_wait_usd = gap_open_usd = 0.0
     gap_rows = gap_quote = 0
@@ -143,6 +162,9 @@ def measure() -> dict:
             if x and quote_only(x):
                 gap_quote += 1
                 gap_quote_usd += e
+                if k in answered:
+                    gap_answered += 1
+                    gap_answered_usd += e
             elif k in asked:
                 gap_wait += 1
                 gap_wait_usd += e
@@ -167,6 +189,8 @@ def measure() -> dict:
             "usd": round(gap_usd, 2),
             "of_them_quote_only": gap_quote,
             "usd_quote_only": round(gap_quote_usd, 2),
+            "of_them_quote_only_already_answered": gap_answered,
+            "usd_quote_only_already_answered": round(gap_answered_usd, 2),
             "of_them_waiting_customer": gap_wait,
             "usd_waiting_customer": round(gap_wait_usd, 2),
             "of_them_open_to_search": gap_open,
@@ -210,7 +234,11 @@ def main() -> None:
     g = m["channel_without_price"]
     print(f"КАНАЛ ЕСТЬ, ЦЕНЫ НЕТ: {g['rows']} строк на {g['usd']:,.0f} USD".replace(",", " "))
     print(f"  {g['of_them_quote_only']:>4} строк | {g['usd_quote_only']:>11,.0f} USD | канал "
-          f"квотируемый: цены он не публикует в принципе, закрывается письмом"
+          f"квотируемый: прейскуранта он не публикует в принципе"
+          .replace(",", " "))
+    print(f"      из них {g['of_them_quote_only_already_answered']} строк на "
+          f"{g['usd_quote_only_already_answered']:,.0f} USD продавец УЖЕ ОТВЕТИЛ — его "
+          f"предложение лежит во вложении сделки, писать заново не нужно"
           .replace(",", " "))
     print(f"  {g['of_them_waiting_customer']:>4} строк | "
           f"{g['usd_waiting_customer']:>11,.0f} USD | ждёт ответа заказчика: пока не назван "

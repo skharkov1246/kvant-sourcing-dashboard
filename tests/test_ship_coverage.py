@@ -123,3 +123,22 @@ def test_ждущие_ответа_заказчика_это_не_наша_не�
     if "of_them_waiting_customer" not in g:
         pytest.skip("замер старой сборки")
     assert g["of_them_waiting_customer"] > 0
+
+
+def test_квотируемый_канал_не_значит_что_цены_нет():
+    """Продавец не публикует прейскурант — но мог ответить нам письмом.
+
+    Замер 18.09.2026: из 65 строк с квотируемым каналом у 48 на 2 750 988 USD
+    предложение поставщика УЖЕ лежит во вложении сделки — это 85 % денег
+    разряда, включая две самые дорогие строки всей заявки. Без этого разбиения
+    отчёт утверждал, что по ним «цену даёт письмо», и отправлял исполнителя
+    писать туда, откуда ответ давно получен.
+    """
+    g = doc().get("channel_without_price") or {}
+    if "of_them_quote_only_already_answered" not in g:
+        pytest.skip("замер старой сборки")
+    assert g["of_them_quote_only_already_answered"] <= g["of_them_quote_only"]
+    assert g["usd_quote_only_already_answered"] <= g["usd_quote_only"] + 1.0
+    assert g["of_them_quote_only_already_answered"] > 0, (
+        "ни одна квотируемая строка не отмечена как уже отвеченная — "
+        "проверь, что gt/data/ship_inside_quotes.json собран")
