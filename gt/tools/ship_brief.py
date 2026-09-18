@@ -792,6 +792,59 @@ def build() -> str:
           "цена с витрины стоит рядом справочно.</p></div>")
         a("</div>")
 
+    si = load("ship_seller_independence.json") or {}
+    sg = load("ship_seller_groups.json") or {}
+    if (si.get("totals") or {}).get("rows_citing_one_group_twice"):
+        t = si["totals"]
+        a("<div class='sec'><h2>«Два независимых продавца» — довод, который развалился шесть "
+          "раз</h2>")
+        a(f"<p class='lead'>Этим доводом закрывается строка: одна цена может быть наценкой "
+          f"перепродавца, две совпадающие цены РАЗНЫХ компаний — уже рынок. За ночь он "
+          f"развалился шесть раз: витрины с разными доменами оказывались одним оператором. "
+          f"Известных групп — {ru(t['groups_known'])}, доменов в них {ru(t['domains_known'])}. "
+          f"Строк перепроверки, где названы две витрины ОДНОЙ группы: "
+          f"<b>{ru(t['rows_citing_one_group_twice'])}</b> на "
+          f"<b>{ru(t['usd_on_those_rows'])} USD</b> — это деньги, за которыми стоит один "
+          f"продавец, а выглядит как рынок.</p>")
+        a(f"<div class='warn'><p><b>Замер отделён от правила, иначе он был бы тавтологией.</b> "
+          f"Отдельно считается, сказано ли в самой строке, что это один оператор: сейчас "
+          f"оговорено {ru(t['rows_marked_as_one_operator'])} строк из "
+          f"{ru(t['rows_citing_one_group_twice'])}, не оговорено "
+          f"{ru(t['rows_not_marked'])}. Без этого деления строка, где мы сами написали «это одна "
+          f"компания», попадала бы в дефект наравне со строкой, где две витрины выданы за "
+          f"рынок.</p></div>")
+        a("<table class='t'><colgroup><col style='width:52mm'><col style='width:26mm'>"
+          "<col></colgroup>")
+        a("<thead><tr><th>группа</th><th>что за витрины</th><th>чем доказано и что задевает</th>"
+          "</tr></thead><tbody>")
+        for g in (sg.get("groups") or []):
+            a(f"<tr><td><b>{E(g['group'])}</b><br><span class='dim'>{E(g.get('kind'))}</span></td>"
+              f"<td class='dim'>{E(', '.join(g.get('domains') or []))}</td>"
+              f"<td>{E(g.get('evidence'))} <b>{E(g.get('affects'))}</b></td></tr>")
+        a("</tbody></table>")
+        a("<h3>Строки, где это уже сыграло</h3>")
+        a("<table class='t'><colgroup><col style='width:30mm'><col style='width:22mm'>"
+          "<col style='width:34mm'><col></colgroup>")
+        a("<thead><tr><th>артикул</th><th class='n'>экспозиция</th><th>вердикт</th>"
+          "<th>группа и витрины</th></tr></thead><tbody>")
+        # ВНИМАНИЕ: имя `h` здесь занято — это сам список HTML (a = h.append).
+        # Переиспользование его под строку таблицы обнулило документ до 24 байт.
+        for si_row in (si.get("rows") or [])[:14]:
+            gs = "; ".join(f"{g}: {', '.join(d)}"
+                           for g, d in (si_row.get("groups") or {}).items())
+            a(f"<tr><td class='pn'>{E(si_row['pn'])}</td>"
+              f"<td class='n'>{ru(si_row['usd'])}</td>"
+              f"<td>{E(si_row.get('verdict'))}</td><td class='dim'>{E(gs)}</td></tr>")
+        a("</tbody></table>")
+        a("<div class='do'><b>Предложение</b><p>Признак независимости проверять по списку групп, "
+          "а не на глаз по разным доменам: список лежит в gt/data/ship_seller_groups.json, счёт "
+          "по нему делает gt/tools/seller_groups.py. Группа записывается только при ПРЯМОЙ улике "
+          "на странице — общий объект в коде, общий складской номер, общая почта или телефон, "
+          "посимвольно совпадающее описание; похожесть дизайна или соседство в выдаче уликой не "
+          "считаются. И практический вывод для защиты: по строкам из таблицы выше цену нельзя "
+          "называть рыночной — она одна, и её держит один продавец.</p></div>")
+        a("</div>")
+
     en = load("ship_english_source.json") or {}
     if en.get("rows"):
         et = en["totals"]
@@ -907,7 +960,16 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     hp = OUT / "СПРАВКА-НА-ЗАЩИТУ-ЛУКОЙЛ.html"
     pp = OUT / "СПРАВКА-НА-ЗАЩИТУ-ЛУКОЙЛ.pdf"
-    hp.write_text(build(), encoding="utf-8")
+    doc = build()
+    # СТРАЖ ПУСТОГО ДОКУМЕНТА. Переиспользование имени `h` (это сам список HTML)
+    # под переменную цикла обнулило справку до 24 байт, и наружу ушёл бы
+    # одностраничный PDF с одним словом. Проверка PDF поймала это лишь как
+    # «полупустая страница 1» — поэтому порог стоит здесь, до записи файла.
+    if len(doc) < 20_000 or doc.count("<h2>") < 5:
+        print(f"справка вышла пустой ({len(doc)} байт, разделов "
+              f"{doc.count('<h2>')}) — файл не перезаписан", file=sys.stderr)
+        return 1
+    hp.write_text(doc, encoding="utf-8")
     exe = next((c for c in CHROME if Path(c).exists()), None)
     if not exe:
         print("Chromium не найден — PDF не собран", file=sys.stderr)

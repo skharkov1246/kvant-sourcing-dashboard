@@ -1,0 +1,207 @@
+{
+ "updated": "2026-09-18",
+ "source": "Замер признака «два независимых продавца» по строкам перепроверки заявки ЛУКОЙЛ. Группы витрин — gt/data/ship_seller_groups.json.",
+ "method": "Из текста строки вынимаются домены, каждый сводится к своей группе. Строка попадает в замер, если названы ДВЕ и более витрины одной группы. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией — строка, где мы сами написали «это одна компания», попадала бы в дефект наравне со строкой, где две витрины выданы за рынок.",
+ "why": "«Два независимых продавца» — главный довод, которым закрывается строка: одна цена может быть наценкой одного перепродавца, две совпадающие цены разных компаний — уже рынок. За ночь этот довод развалился шесть раз: витрины оказывались одним оператором под разными вывесками. Поэтому признак независимости считается по этому списку, а не на глаз по разным доменам.",
+ "totals": {
+  "groups_known": 5,
+  "domains_known": 21,
+  "rows_checked": 75,
+  "rows_citing_one_group_twice": 14,
+  "usd_on_those_rows": 617185.0,
+  "rows_marked_as_one_operator": 14,
+  "rows_not_marked": 0,
+  "usd_not_marked": 0.0
+ },
+ "rows": [
+  {
+   "pn": "68569591",
+   "usd": 112010.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "cambia.cn",
+     "camvect.com",
+     "newgenplc.com",
+     "plcdcspro.com",
+     "topbrandsplc.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-IRT8",
+   "usd": 76000.0,
+   "verdict": "ЗАНИЖЕНА ТОЛЬКО ПРОТИВ АВТОРИЗОВАННОГО КАНАЛА",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "codale.com",
+     "needco.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-IRT8XT",
+   "usd": 64200.0,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "codale.com",
+     "needco.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "4025166",
+   "usd": 60550.0,
+   "verdict": "ЗАНИЖЕНА ДЛЯ ОРИГИНАЛА",
+   "groups": {
+    "Modern Group": [
+     "modernequipmentparts.com",
+     "shop.moderngroup.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "EQ3005PCNW",
+   "usd": 43050.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarine.com",
+     "aeliyamarine.net",
+     "aeliyamarinetech.com",
+     "auto2mation.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "4351035",
+   "usd": 38650.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "FPS Technologies / FastPartsSource": [
+     "fpstechnologies.in",
+     "surplusstock.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1701/06",
+   "usd": 38000.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "cambia.cn",
+     "camvect.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-IE8",
+   "usd": 33640.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "1sourcedist.com",
+     "codale.com",
+     "irby.com",
+     "needco.com",
+     "northcoast.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "6181X-12A2SWX1DC",
+   "usd": 30800.0,
+   "verdict": "ЗАНИЖЕНА",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "1sourcedist.com",
+     "irby.com",
+     "revereelectric.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "4011553",
+   "usd": 30800.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Modern Group": [
+     "moderngroup.com",
+     "shop.moderngroup.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-IF2XOF2I",
+   "usd": 23750.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА: вилка не накрывает ни один из двух рынков",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "1sourcedist.com",
+     "codale.com",
+     "irby.com",
+     "needco.com",
+     "northcoast.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "6181P-15A2MW71DC ser.F",
+   "usd": 22600.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "1sourcedist.com",
+     "codale.com",
+     "irby.com",
+     "needco.com",
+     "northcoast.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "MVI56E-MCMXT",
+   "usd": 21600.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "cambia.cn",
+     "camvect.com",
+     "newgenplc.com",
+     "plcdcspro.com",
+     "topbrandsplc.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-OB8EP",
+   "usd": 21535.0,
+   "verdict": "ВЕРНА",
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "1sourcedist.com",
+     "codale.com",
+     "irby.com",
+     "needco.com",
+     "northcoast.com"
+    ]
+   },
+   "marked": true
+  }
+ ]
+}
