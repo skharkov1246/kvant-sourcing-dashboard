@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 234,
-    "total_bytes": 106314926,
+    "datasets": 235,
+    "total_bytes": 106649414,
     "by_sensitivity": {
       "конфиденциально": 62,
-      "внутреннее": 131,
+      "внутреннее": 132,
       "публикуемо": 41
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 57,
+      "ГТУ-библиотека": 58,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -87,7 +87,7 @@
     {
       "path": "gt/data/pn_db.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 7429088,
+      "bytes": 7430282,
       "note": "База номенклатуры (part numbers) ГТУ. Дублируется в gt/public/wizard/data.js и pnw/public/data.js — при правке обновлять все три или собирать из одного источника.",
       "format": "json",
       "shape": "объект",
@@ -125,7 +125,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "4d4c86b",
+      "last_commit": "2c5aa60",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -293,8 +293,8 @@
         "gt/tools/english_source.py",
         "gt/tools/homoglyphs.py",
         "gt/tools/jenbacher_fold.py",
-        "gt/tools/maker_basis.py",
-        "gt/tools/rfq_en.py"
+        "gt/tools/lists_fold.py",
+        "gt/tools/maker_basis.py"
       ]
     },
     {
@@ -476,6 +476,66 @@
       ]
     },
     {
+      "path": "gt/data/ship_reverify.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 3304915,
+      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 310,
+        "record_keys": [
+          "band_verdict",
+          "blocker",
+          "channel",
+          "contacts",
+          "lead_time",
+          "lifecycle",
+          "maker_short",
+          "note",
+          "pn",
+          "price_authorized",
+          "price_high",
+          "price_kind",
+          "price_low",
+          "price_source",
+          "real_maker",
+          "real_pn",
+          "recommended",
+          "skeptics",
+          "stock",
+          "volume_note",
+          "what_it_is"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "2c5aa60",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/apply_makers.py",
+        "gt/tools/band_basis.py",
+        "gt/tools/jenbacher_fold.py",
+        "gt/tools/maker_basis.py",
+        "gt/tools/rv_merge.py",
+        "gt/tools/seller_groups.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_offer.py"
+      ]
+    },
+    {
       "path": "zip/data/odm_suppliers.json",
       "subproject": "база ЗИП",
       "bytes": 3292954,
@@ -523,66 +583,6 @@
         "zip/tools/build_r1700.py",
         "zip/tools/cat_stock.py",
         "zip/tools/r1700_dossier.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_reverify.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 3084611,
-      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 296,
-        "record_keys": [
-          "band_verdict",
-          "blocker",
-          "channel",
-          "contacts",
-          "lead_time",
-          "lifecycle",
-          "maker_short",
-          "note",
-          "pn",
-          "price_authorized",
-          "price_high",
-          "price_kind",
-          "price_low",
-          "price_source",
-          "real_maker",
-          "real_pn",
-          "recommended",
-          "skeptics",
-          "stock",
-          "volume_note",
-          "what_it_is"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "e2326ca",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/apply_makers.py",
-        "gt/tools/band_basis.py",
-        "gt/tools/jenbacher_fold.py",
-        "gt/tools/maker_basis.py",
-        "gt/tools/rv_merge.py",
-        "gt/tools/seller_groups.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_offer.py"
       ]
     },
     {
@@ -3565,6 +3565,50 @@
       ]
     },
     {
+      "path": "gt/data/ship_questions.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 152506,
+      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 54 позиции. Часть ведётся руками (вывод инженера по разбору проверок), часть дописывает gt/tools/collisions.py --questions по замеру gt/data/ship_collisions.json — 32 вопроса о номерах, под которыми в заявке идут РАЗНЫЕ детали: такой вопрос механический, и писать его руками тридцать два раза нечего. У дописанных стоит поле source. Дозапись идемпотентна: повторный прогон не плодит дубликаты, уже заданные номера он называет. Прежний состав, ведомый руками — 22 позиции на 5 208 штук: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "questions",
+        "rule",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "questions",
+        "records": 81,
+        "record_keys": [
+          "ask",
+          "cost",
+          "kind",
+          "known",
+          "pn",
+          "qty",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "2c5aa60",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/collisions.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_questions.py",
+        "tests/test_ship_collisions.py"
+      ]
+    },
+    {
       "path": "ove/data/deliverables.json",
       "subproject": "ОВЭ-75",
       "bytes": 152249,
@@ -3651,50 +3695,6 @@
         "markers": []
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_questions.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 148155,
-      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 54 позиции. Часть ведётся руками (вывод инженера по разбору проверок), часть дописывает gt/tools/collisions.py --questions по замеру gt/data/ship_collisions.json — 32 вопроса о номерах, под которыми в заявке идут РАЗНЫЕ детали: такой вопрос механический, и писать его руками тридцать два раза нечего. У дописанных стоит поле source. Дозапись идемпотентна: повторный прогон не плодит дубликаты, уже заданные номера он называет. Прежний состав, ведомый руками — 22 позиции на 5 208 штук: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "questions",
-        "rule",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "questions",
-        "records": 78,
-        "record_keys": [
-          "ask",
-          "cost",
-          "kind",
-          "known",
-          "pn",
-          "qty",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "3ba6633",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/collisions.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_questions.py",
-        "tests/test_ship_collisions.py"
-      ]
     },
     {
       "path": "zip/customs/out/customs_841181_2023-01-01_2026-03-31.json",
@@ -4448,6 +4448,38 @@
       ]
     },
     {
+      "path": "gt/data/ship_parts_lists.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 107777,
+      "note": "Открытые перечни запасных частей, снятые целиком и сверенные с номерами заявки ЛУКОЙЛ. Даёт ОПОЗНАНИЕ: дословное наименование изделия по номеру, адрес источника и число независимых держателей, подтвердивших номер (два перечня одного владельца — один свидетель). НЕ даёт цены: в таких перечнях её нет вовсе, вместо неё стоит «запросить». Признак наличия здесь не подтверждённый остаток. Замеры по разным машинам не складываются. Считает gt/tools/lists_fold.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "machines",
+        "source",
+        "updated",
+        "what_it_does_not_give",
+        "what_it_gives"
+      ],
+      "main_collection": {
+        "key": "machines",
+        "records": 1
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "2c5aa60",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/lists_fold.py",
+        "gt/tools/ship_final.py",
+        "tests/test_lists_fold.py"
+      ]
+    },
+    {
       "path": "gt/data/ms6001b.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 106907,
@@ -5050,7 +5082,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 81931,
+      "bytes": 82792,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5088,17 +5120,17 @@
         "gt/data/ship_lukoil.json",
         "gt/data/ship_maker_basis.json",
         "gt/data/ship_offer_stats.json",
+        "gt/data/ship_parts_lists.json",
         "gt/data/ship_questions.json",
         "gt/data/ship_recheck.json",
         "gt/data/ship_reverify.json",
         "gt/data/ship_rfq_letters.json",
         "gt/data/ship_seller_groups.json",
-        "gt/data/ship_seller_independence.json",
-        "gt/data/ship_sellers.json"
+        "gt/data/ship_seller_independence.json"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "e2326ca",
+      "last_commit": "2c5aa60",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8094,7 +8126,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "4d4c86b",
+      "last_commit": "2c5aa60",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9810,7 +9842,7 @@
     {
       "path": "gt/data/ship_band_basis.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 3063,
+      "bytes": 3064,
       "note": "На чём держится наша оценка заявки ЛУКОЙЛ: доля денег по основанию ценовой вилки. Классифицирует поле основания записей gt/data/rfq_prices.json и взвешивает классы деньгами, а не числом строк. Отдельно считает, сколько мнения уже заменено найденной ценой при перепроверке. НЕ упрёк разведке: экспертная вилка нормальна как рабочая оценка, недопустимо выдавать её за найденную цену. Считает gt/tools/band_basis.py.",
       "format": "json",
       "shape": "объект",
@@ -9834,7 +9866,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "e2326ca",
+      "last_commit": "2c5aa60",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
