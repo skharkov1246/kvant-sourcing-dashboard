@@ -44,8 +44,38 @@ PRICED_DIRECTIONS = ("входящее", "заявка", "неизвестно")
 MIN_LEN = 6
 
 
+# Кириллические буквы, неотличимые на вид от латинских. Свод нужен потому, что
+# в заявке 26 номеров написаны со смешанным алфавитом, и по такому написанию
+# сверка не находит ничего: «180В4131» с кириллической «В» и «180B4131» с
+# латинской — для машины два разных номера.
+HOMOGLYPHS = {
+    "А": "A", "В": "B", "Е": "E", "К": "K", "М": "M", "Н": "H", "О": "O",
+    "Р": "P", "С": "C", "Т": "T", "У": "Y", "Х": "X",
+    "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "у": "y", "х": "x",
+}
+CYR = re.compile("[А-Яа-яЁё]")
+
+
 def key(x) -> str:
     return re.sub(r"[^A-Z0-9]", "", str(x or "").split("(")[0].upper())
+
+
+def key_folded(x) -> str:
+    """Тот же ключ, но с приведением кириллических двойников к латинице.
+
+    Приведение делается ТОЛЬКО если ВСЯ кириллица в обозначении — двойники.
+    Иначе русское обозначение калечится в правдоподобный набор знаков и даёт
+    ложное совпадение: «ПЦ-102 10х38 6А» превращается в «10210X386A» и находит
+    в корпусе случайную строку. Проверено 18.09.2026 — именно этот номер и
+    всплыл единственным ложным при попытке приводить буквы без оговорки.
+    """
+    s = str(x or "")
+    cyr = [c for c in s if CYR.match(c)]
+    if not cyr or not all(c in HOMOGLYPHS for c in cyr):
+        return ""
+    folded = "".join(HOMOGLYPHS.get(c, c) for c in s)
+    out = key(folded)
+    return out if out != key(s) else ""
 
 
 def usable(k: str) -> bool:
@@ -123,14 +153,20 @@ def measure() -> dict:
     where: dict[str, list] = {}
     for f in files:
         for pn in f["pns"]:
-            k = key(pn)
-            if usable(k):
-                where.setdefault(k, []).append(f)
+            for k in (key(pn), key_folded(pn)):
+                if k and usable(k):
+                    where.setdefault(k, []).append(f)
 
     hits, hits_nopric = [], []
+    folded_hits = 0
     for r in ask:
         k = key(r.get("pn"))
         got = where.get(k)
+        if not got:
+            kf = key_folded(r.get("pn"))
+            got = where.get(kf) if kf else None
+            if got:
+                folded_hits += 1
         if not got:
             continue
         x = rv.get(k) or {}
@@ -168,6 +204,13 @@ def measure() -> dict:
         "rows_without_our_price": len(hits_nopric),
         "usd_without_our_price": round(sum(h["usd_exposure"] for h in hits_nopric), 2),
         "min_key_length": MIN_LEN,
+        "found_only_after_folding": folded_hits,
+        "folding_note": (
+            "Совпадения, найденные только после приведения кириллических букв-двойников к "
+            "латинице. В заявке номера со смешанным алфавитом, и по такому написанию "
+            "сверка не находит ничего. Приведение делается ТОЛЬКО когда вся кириллица в "
+            "обозначении — двойники: иначе русское обозначение калечится в правдоподобный "
+            "набор знаков и даёт ложное совпадение."),
         "negative_control": control(real_keys, corpus),
         "caveat": ("Сверка по нормализованному номеру длиной от шести знаков; чисто "
                    "числовые ряды короче семи знаков отброшены — они совпадают со "
