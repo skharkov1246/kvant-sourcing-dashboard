@@ -102,8 +102,13 @@ def fetch(domains: list[dict], into: Path) -> dict[str, list[Path]]:
         if get(f"https://{host}/robots.txt", rob):
             txt = rob.read_text(encoding="utf-8", errors="replace")
             maps = [m.group(1) for m in re.finditer(r"(?im)^\s*sitemap:\s*(\S+)", txt)]
+        # Часть продавцов карту публикует, но в robots.txt её не объявляет. Такой
+        # адрес НЕ угадывается инструментом: он записан в реестре руками после
+        # того, как человек его проверил, и рядом сказано, что по нему нашлось.
+        # Иначе «адреса не угадываются» превратилось бы в перебор путей.
+        maps += [str(u) for u in (d.get("sitemaps") or [])]
         if not maps:
-            print(f"{host}: карт сайта в robots.txt нет", file=sys.stderr)
+            print(f"{host}: карт сайта нет ни в robots.txt, ни в реестре", file=sys.stderr)
             continue
         files: list[Path] = []
         for url in maps:
@@ -112,10 +117,14 @@ def fetch(domains: list[dict], into: Path) -> dict[str, list[Path]]:
                 continue
             body = f.read_text(encoding="utf-8", errors="replace")
             if "<sitemapindex" in body:
+                # ВНУТРИ sitemapindex КАЖДЫЙ адрес — карта, по определению формата.
+                # Прежняя редакция отбирала только адреса, кончающиеся на .xml, и
+                # теряла целого продавца: у него дети называются
+                # «xmlsitemap.php?type=products&page=1». Заодно снимаем
+                # XML-экранирование: «&amp;» в адресе — это «&», иначе запрос
+                # уходит не туда.
                 for m in LOC.finditer(body):
-                    u = m.group(1)
-                    if not IS_SITEMAP.search(u):
-                        continue
+                    u = m.group(1).replace("&amp;", "&")
                     g = into / f"{safe(host)}__{safe(u)}"
                     if get(u, g):
                         files.append(g)
@@ -132,8 +141,16 @@ def segments(url: str) -> list[str]:
     return parts[-2:] if len(parts) > 1 else parts
 
 
+# Расширение файла приклеивается к номеру и убивает совпадение: у продавца
+# адрес выглядит как «caterpillar-gasket-8h9840.aspx», и хвост «8H9840ASPX»
+# нашему номеру «8H9840» не равен. Замер 18.09.2026: домен с 93 628 адресами
+# давал ноль совпадений ровно по этой причине.
+EXT = re.compile(r"\.(aspx|html?|php|shtml|jsp)$", re.I)
+
+
 def tails(part: str) -> list[str]:
     """Ключи всех хвостов отрезка по разделителям, от самого длинного к короткому."""
+    part = EXT.sub("", part)
     tok = [t for t in SPLIT.split(part) if t]
     out = []
     for i in range(len(tok)):
@@ -153,8 +170,10 @@ def index(files_by_host: dict[str, list[Path]]) -> tuple[dict, Counter]:
                 body = f.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
+            if "<sitemapindex" in body:
+                continue          # это карта карт, товарных адресов в ней нет
             for m in LOC.finditer(body):
-                url = m.group(1)
+                url = m.group(1).replace("&amp;", "&")
                 if IS_SITEMAP.search(url):
                     continue
                 seen[host] += 1
