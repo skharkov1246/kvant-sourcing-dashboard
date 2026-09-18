@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 246,
-    "total_bytes": 109784376,
+    "datasets": 247,
+    "total_bytes": 111455111,
     "by_sensitivity": {
       "конфиденциально": 63,
-      "внутреннее": 135,
+      "внутреннее": 136,
       "публикуемо": 48
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 69,
+      "ГТУ-библиотека": 70,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -142,6 +142,66 @@
         "scripts/build_dict.py",
         "scripts/build_node_map.py",
         "scripts/library_units_check.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_reverify.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 6426013,
+      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 657,
+        "record_keys": [
+          "band_verdict",
+          "blocker",
+          "channel",
+          "contacts",
+          "lead_time",
+          "lifecycle",
+          "maker_short",
+          "note",
+          "pn",
+          "price_authorized",
+          "price_high",
+          "price_kind",
+          "price_low",
+          "price_source",
+          "real_maker",
+          "real_pn",
+          "recommended",
+          "skeptics",
+          "stock",
+          "volume_note",
+          "what_it_is"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "dd2357a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/apply_makers.py",
+        "gt/tools/band_basis.py",
+        "gt/tools/confidence_audit.py",
+        "gt/tools/inside_quotes.py",
+        "gt/tools/jenbacher_fold.py",
+        "gt/tools/lists_rfq.py",
+        "gt/tools/maker_basis.py",
+        "gt/tools/rejudge_rate.py",
+        "gt/tools/rv_brief.py",
+        "gt/tools/rv_merge.py"
       ]
     },
     {
@@ -386,66 +446,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_reverify.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 4788812,
-      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 489,
-        "record_keys": [
-          "band_verdict",
-          "blocker",
-          "channel",
-          "contacts",
-          "lead_time",
-          "lifecycle",
-          "maker_short",
-          "note",
-          "pn",
-          "price_authorized",
-          "price_high",
-          "price_kind",
-          "price_low",
-          "price_source",
-          "real_maker",
-          "real_pn",
-          "recommended",
-          "skeptics",
-          "stock",
-          "volume_note",
-          "what_it_is"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "a56baa0",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/apply_makers.py",
-        "gt/tools/band_basis.py",
-        "gt/tools/confidence_audit.py",
-        "gt/tools/inside_quotes.py",
-        "gt/tools/jenbacher_fold.py",
-        "gt/tools/lists_rfq.py",
-        "gt/tools/maker_basis.py",
-        "gt/tools/rejudge_rate.py",
-        "gt/tools/rv_brief.py",
-        "gt/tools/rv_merge.py"
-      ]
     },
     {
       "path": "pnw/data/item_master.json",
@@ -3912,7 +3912,7 @@
     {
       "path": "gt/data/ship_confidence.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 143151,
+      "bytes": 143152,
       "note": "Замер «где уверенность не обеспечена собственной проверкой»: строки gt/data/rfq_prices.json с уверенностью A или B, у которых проверка ТОГО ЖЕ номера в том же файле записала дефект — 144 строки на 3 027 747 USD, то есть 32,6 % экспозиции заявки. Четыре класса считаются раздельно, потому что цена ошибки у них разная: ссылка ведёт на другой артикул (32 строки, 1 005 366 USD — худший класс, число чужое, но выглядит настоящим), мёртвая ссылка или антибот (71 строка, 998 210 — цены не видел никто), цена расходится с записанной (26 строк, 727 780 — число неверно, уровень может быть верен), по адресу не продавец (15 строк, 296 391 — число не является предложением). Вердикт «подтверждено» дефектом НЕ считается, даже если в примечании упомянут отказ второстепенного источника; уверенность C в отбор не идёт — она сама говорит «это оценка». Находка родилась из одной строки проверки на опровержение: у 1701/05 стоит уверенность A, её основание ссылается на страницу поиска по ДРУГОМУ номеру, а проверка того же файла говорит «мёртвая ссылка, цену не увидел ни одну». Считает и сверяет gt/tools/confidence_audit.py (--check), границы находки держит tests/test_confidence_audit.py. ВТОРОЙ ЗАМЕР В ТОМ ЖЕ НАБОРЕ (ключ found) и он важнее первого: строки, где НАША СОБСТВЕННАЯ проверка уже нашла цену (поля real_lo/real_hi блока checks), и где эта цена относительно нашей вилки. 90 строк: экспозиция по вилкам 1 712 999 USD против 2 551 494 по найденным ценам. Внутрь вилки попадают 63 строки, и там сумма почти не меняется (1 219 467 → 1 202 196); ломается хвост — 19 строк выходят за потолок и выходят сильно: 455 872 → 1 337 112 USD, в 2,9 раза. Ниже пола 8 строк (37 660 → 12 186). Направление системное: там, где реальная цена нашлась, она обычно ВЫШЕ нашей оценки. Ноль в real_lo/real_hi значит «страница открылась, цены на ней нет» и в замер не идёт. Читать не как закупку: найденные цены — карточки продавцов, а не подтверждённые офферы с остатком.",
       "format": "json",
       "shape": "объект",
@@ -3943,7 +3943,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "ec59704",
+      "last_commit": "dd2357a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4692,6 +4692,60 @@
       ]
     },
     {
+      "path": "gt/data/ship_underpriced.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 104601,
+      "note": "Строки заявки ЛУКОЙЛ, где найденная закупочная цена ВЫШЕ потолка нашей вилки — то есть мы продаём ниже закупки. Цены заказчику твёрдые, торг идёт от них вниз, поэтому такая строка теряет деньги с первого дня. 74 строки, наша экспозиция по ним 989 412 USD. Главное число набора — наша экспозиция, а НЕ разрыв: разрыв «найденная цена минус наш потолок × количество» даёт 2 782 352 USD, и половину приносят две строки — брокерский запрос на половину объёма и витрина одного московского перекупщика с двумя доменами. Правило владельца это запрещает, поэтому три разряда, и складывать их нельзя: «в сумму идёт» (покрытие полное, цена не брокерская, свидетель не один) — 5 строк; «покрытие не подтверждено» — 55; «цена не закупочная» — 14. Считает gt/tools/ship_underpriced.py, документ собирает gt/tools/underpriced_doc.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "headline",
+        "our_exposure_usd",
+        "rows",
+        "skipped",
+        "source",
+        "tiers",
+        "updated",
+        "what_it_is",
+        "what_it_is_not"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 76,
+        "record_keys": [
+          "channel",
+          "covers_qty",
+          "found_kind",
+          "found_unit",
+          "gap_total",
+          "gap_unit",
+          "name",
+          "our_exposure",
+          "our_hi",
+          "our_lo",
+          "pn",
+          "qty",
+          "sheet",
+          "source",
+          "tier",
+          "why_tier"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "dd2357a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_underpriced.py",
+        "gt/tools/underpriced_doc.py"
+      ]
+    },
+    {
       "path": "zip/data/r1700_recon/dealers.json",
       "subproject": "база ЗИП",
       "bytes": 104457,
@@ -4832,60 +4886,6 @@
         "markers": []
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_underpriced.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 102014,
-      "note": "Строки заявки ЛУКОЙЛ, где найденная закупочная цена ВЫШЕ потолка нашей вилки — то есть мы продаём ниже закупки. Цены заказчику твёрдые, торг идёт от них вниз, поэтому такая строка теряет деньги с первого дня. 74 строки, наша экспозиция по ним 989 412 USD. Главное число набора — наша экспозиция, а НЕ разрыв: разрыв «найденная цена минус наш потолок × количество» даёт 2 782 352 USD, и половину приносят две строки — брокерский запрос на половину объёма и витрина одного московского перекупщика с двумя доменами. Правило владельца это запрещает, поэтому три разряда, и складывать их нельзя: «в сумму идёт» (покрытие полное, цена не брокерская, свидетель не один) — 5 строк; «покрытие не подтверждено» — 55; «цена не закупочная» — 14. Считает gt/tools/ship_underpriced.py, документ собирает gt/tools/underpriced_doc.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "headline",
-        "our_exposure_usd",
-        "rows",
-        "skipped",
-        "source",
-        "tiers",
-        "updated",
-        "what_it_is",
-        "what_it_is_not"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 74,
-        "record_keys": [
-          "channel",
-          "covers_qty",
-          "found_kind",
-          "found_unit",
-          "gap_total",
-          "gap_unit",
-          "name",
-          "our_exposure",
-          "our_hi",
-          "our_lo",
-          "pn",
-          "qty",
-          "sheet",
-          "source",
-          "tier",
-          "why_tier"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "a56baa0",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_underpriced.py",
-        "gt/tools/underpriced_doc.py"
-      ]
     },
     {
       "path": "zip/data/perf_test_requests.json",
@@ -5046,6 +5046,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 97771,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_quotes.json",
+        "gt/data/ship_jenbacher_prices.json",
+        "gt/data/ship_leak.json",
+        "gt/data/ship_lists_rfq.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_maker_basis.json",
+        "gt/data/ship_margin.json",
+        "gt/data/ship_offer_stats.json",
+        "gt/data/ship_overpriced.json",
+        "gt/data/ship_parts_lists.json"
+      ],
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "dd2357a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/r1700_recon/prices.json",
       "subproject": "база ЗИП",
       "bytes": 97257,
@@ -5097,68 +5159,6 @@
         "gt/tools/ship_merge.py",
         "gt/tools/ship_priced.py",
         "gt/tools/ship_report.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 95951,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_inside_quotes.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_lists_rfq.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_maker_basis.json",
-        "gt/data/ship_margin.json",
-        "gt/data/ship_offer_stats.json",
-        "gt/data/ship_overpriced.json",
-        "gt/data/ship_parts_lists.json",
-        "gt/data/ship_price_substitutions.json"
-      ],
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "f2c7b0d",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -7486,6 +7486,48 @@
       "referenced_by": []
     },
     {
+      "path": "gt/data/ship_seller_independence.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 34505,
+      "note": "Замер признака независимости по строкам перепроверки: где названы две витрины одной группы и сколько на этих строках экспозиции. Считает gt/tools/seller_groups.py --write из gt/data/ship_seller_groups.json и gt/data/ship_reverify.json. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией. Цен и коммерческих данных контрагентов не содержит — только артикулы, домены и экспозицию по нашим же вилкам.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "totals",
+        "updated",
+        "why"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 64,
+        "record_keys": [
+          "groups",
+          "marked",
+          "pn",
+          "usd",
+          "verdict",
+          "verdict_rests_on_price"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "dd2357a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/seller_groups.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_underpriced.py",
+        "tests/test_seller_groups.py"
+      ]
+    },
+    {
       "path": "ove/data/bi_register.json",
       "subproject": "ОВЭ-75",
       "bytes": 33887,
@@ -9282,47 +9324,6 @@
       ]
     },
     {
-      "path": "gt/data/ship_seller_independence.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 10479,
-      "note": "Замер признака независимости по строкам перепроверки: где названы две витрины одной группы и сколько на этих строках экспозиции. Считает gt/tools/seller_groups.py --write из gt/data/ship_seller_groups.json и gt/data/ship_reverify.json. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией. Цен и коммерческих данных контрагентов не содержит — только артикулы, домены и экспозицию по нашим же вилкам.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "rows",
-        "source",
-        "totals",
-        "updated",
-        "why"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 33,
-        "record_keys": [
-          "groups",
-          "marked",
-          "pn",
-          "usd",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "f180be7",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/seller_groups.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_underpriced.py",
-        "tests/test_seller_groups.py"
-      ]
-    },
-    {
       "path": "gpu/data/lot_review.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 10216,
@@ -9546,6 +9547,57 @@
       ]
     },
     {
+      "path": "gt/data/ship_overpriced.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 8905,
+      "note": "Проверка наоборот к заниженным строкам: где наш ПОЛ кратно выше найденной цены. Риск здесь не в деньгах, а в сделке — закупщик заказчика сверяет позиции с рынком выборочно, и одна позиция дороже рынка на порядок ставит под сомнение всё предложение (разбор выкладки по ЛУКОЙЛу это уже показал). Замер вышел небольшим: 7 строк на 18 506 USD при пороге трёхкратного превышения. Порог назван числом намеренно — наценка на логистику, растаможку и гарантию нормальна и измеряется разами, поэтому обвинением служит только кратность, и её можно оспорить. Разряды те же, что у заниженных: одна цена одного брокера рынком не является ни в ту сторону, ни в другую. Считает gt/tools/ship_overpriced.py, читает отчёт gt/tools/ship_final.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "our_exposure_usd",
+        "rows",
+        "rows_total",
+        "skipped",
+        "source",
+        "threshold_times",
+        "tiers",
+        "updated",
+        "what_it_is",
+        "what_it_is_not"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 8,
+        "record_keys": [
+          "found_kind",
+          "found_unit",
+          "name",
+          "our_exposure",
+          "our_hi",
+          "our_lo",
+          "pn",
+          "qty",
+          "sheet",
+          "source",
+          "tier",
+          "times",
+          "why_tier"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "dd2357a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_overpriced.py"
+      ]
+    },
+    {
       "path": "gpu/data/stock.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 8308,
@@ -9615,57 +9667,6 @@
       },
       "referenced_by": [
         "gpu/build.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_overpriced.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 7978,
-      "note": "Проверка наоборот к заниженным строкам: где наш ПОЛ кратно выше найденной цены. Риск здесь не в деньгах, а в сделке — закупщик заказчика сверяет позиции с рынком выборочно, и одна позиция дороже рынка на порядок ставит под сомнение всё предложение (разбор выкладки по ЛУКОЙЛу это уже показал). Замер вышел небольшим: 7 строк на 18 506 USD при пороге трёхкратного превышения. Порог назван числом намеренно — наценка на логистику, растаможку и гарантию нормальна и измеряется разами, поэтому обвинением служит только кратность, и её можно оспорить. Разряды те же, что у заниженных: одна цена одного брокера рынком не является ни в ту сторону, ни в другую. Считает gt/tools/ship_overpriced.py, читает отчёт gt/tools/ship_final.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "our_exposure_usd",
-        "rows",
-        "rows_total",
-        "skipped",
-        "source",
-        "threshold_times",
-        "tiers",
-        "updated",
-        "what_it_is",
-        "what_it_is_not"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 7,
-        "record_keys": [
-          "found_kind",
-          "found_unit",
-          "name",
-          "our_exposure",
-          "our_hi",
-          "our_lo",
-          "pn",
-          "qty",
-          "sheet",
-          "source",
-          "tier",
-          "times",
-          "why_tier"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "e158699",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_overpriced.py"
       ]
     },
     {
@@ -9777,6 +9778,50 @@
       ]
     },
     {
+      "path": "gt/data/ship_margin.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 6388,
+      "note": "Прямой ответ на вопрос руководства «какой объём продаж и какой объём закупки» по заявке ЛУКОЙЛ. Объём продаж 9 277 410 USD по 857 строкам с нашей ценой. Объём закупки по заявке НЕ назван и назван быть не может: сложить его можно лишь по 13 строкам — 0,4 % объёма продаж. Остальное разложено по годности закупочной цены: покрытие объёма не подтверждено (30,2 % объёма), цена не закупочная — запрос брокера или один оператор под двумя доменами (12,4 %), цена стоит в сводке, но перепроверка её не смотрела (2,5 %), закупочной цены нет вовсе (54,5 %). Сальдо счётной доли (−17 908 USD) маржой сделки НЕ является: выборка смещена по построению — полное покрытие подтверждается там, где мы специально спрашивали, а спрашивали по дорогим и спорным строкам; из 13 строк продажа выше закупки в семи, ниже в шести, и всё сальдо делает одна строка. Оговорка лежит в самом наборе полем bias_warning. Считает gt/tools/ship_margin.py, читает отчёт gt/tools/ship_final.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "bias_warning",
+        "by_grade",
+        "countable",
+        "countable_rows",
+        "sales_rows",
+        "sales_usd",
+        "source",
+        "updated",
+        "what_it_is_not"
+      ],
+      "main_collection": {
+        "key": "countable_rows",
+        "records": 19,
+        "record_keys": [
+          "delta_usd",
+          "pn",
+          "purchase_usd",
+          "qty",
+          "sales_usd"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "dd2357a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "выручка и маржа сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_margin.py"
+      ]
+    },
+    {
       "path": "gt/data/pn_guide.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 5965,
@@ -9808,50 +9853,6 @@
         "gpu/build.py",
         "gt/build.py",
         "library/load_crossrefs.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_margin.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 5643,
-      "note": "Прямой ответ на вопрос руководства «какой объём продаж и какой объём закупки» по заявке ЛУКОЙЛ. Объём продаж 9 277 410 USD по 857 строкам с нашей ценой. Объём закупки по заявке НЕ назван и назван быть не может: сложить его можно лишь по 13 строкам — 0,4 % объёма продаж. Остальное разложено по годности закупочной цены: покрытие объёма не подтверждено (30,2 % объёма), цена не закупочная — запрос брокера или один оператор под двумя доменами (12,4 %), цена стоит в сводке, но перепроверка её не смотрела (2,5 %), закупочной цены нет вовсе (54,5 %). Сальдо счётной доли (−17 908 USD) маржой сделки НЕ является: выборка смещена по построению — полное покрытие подтверждается там, где мы специально спрашивали, а спрашивали по дорогим и спорным строкам; из 13 строк продажа выше закупки в семи, ниже в шести, и всё сальдо делает одна строка. Оговорка лежит в самом наборе полем bias_warning. Считает gt/tools/ship_margin.py, читает отчёт gt/tools/ship_final.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "bias_warning",
-        "by_grade",
-        "countable",
-        "countable_rows",
-        "sales_rows",
-        "sales_usd",
-        "source",
-        "updated",
-        "what_it_is_not"
-      ],
-      "main_collection": {
-        "key": "countable_rows",
-        "records": 13,
-        "record_keys": [
-          "delta_usd",
-          "pn",
-          "purchase_usd",
-          "qty",
-          "sales_usd"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "f2c7b0d",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "выручка и маржа сделок"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_margin.py"
       ]
     },
     {
@@ -9907,7 +9908,7 @@
     {
       "path": "gt/data/ship_maker_basis.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 4732,
+      "bytes": 4733,
       "note": "Замер: на чём стоит «изготовитель» в gt/data/pn_db.json — на документе (таможенная декларация, открытый стандарт) или на догадке по классу изделия. Считает gt/tools/maker_basis.py. Поводом стали два опровержения 18.09.2026: масляному фильтру Fleetguard были приписаны четыре фильтровых дома «по типу», а наконечнику свечи Jenbacher — авиационный поставщик зажигания «типично»; оба раза изготовитель был выведен из класса, а не из документа. Содержит только счётчики и экспозицию по нашим же вилкам: ни цен контрагентов, ни персональных данных.",
       "format": "json",
       "shape": "объект",
@@ -9925,7 +9926,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "7ae7a35",
+      "last_commit": "dd2357a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -10030,7 +10031,7 @@
     {
       "path": "gt/data/ship_coverage.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 4538,
+      "bytes": 4532,
       "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
       "format": "json",
       "shape": "объект",
@@ -10054,7 +10055,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "a56baa0",
+      "last_commit": "dd2357a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -10217,6 +10218,51 @@
       ]
     },
     {
+      "path": "gt/data/ship_leak.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 3432,
+      "note": "Строки заявки ЛУКОЙЛ, опубликованные третьими лицами в открытом доступе ДОСЛОВНО — с номерами и количествами до штуки. Найдено разведкой 18.09.2026 попутно: две страницы китайских поставщиков, у одной перечень на 437 строк в том же порядке, у другой строки на РУССКОМ вместе с нашими позиционными пометками вида «п H06». Кто выложил и на каком этапе — не установлено, и обвинения в наборе нет: заказчик мог опубликовать спецификацию сам, наш запрос мог уйти дальше по цепочке, третья сторона могла получить тот же запрос. Улика происхождения: тот же перечень лежит у Leda Greenpower с подписью запроса «RS 2YR OPS & MAINTENANCE», то есть похож на копию документа Siemens, а не на наш запрос — это версия, не доказательство. Бьёт дважды: конфиденциальность запроса и подмена свидетеля — такая страница выглядит независимым подтверждением номера, а является отражением нашего же текста, поэтому оба домена внесены в список круговых источников приёмника разведки. Считает gt/tools/ship_leak.py, читает отчёт gt/tools/ship_final.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows_cited_total",
+        "source",
+        "sources",
+        "updated",
+        "what_it_is",
+        "what_to_do",
+        "what_we_do_not_know",
+        "why_it_matters_twice"
+      ],
+      "main_collection": {
+        "key": "sources",
+        "records": 2,
+        "record_keys": [
+          "holder",
+          "language",
+          "quoted_rows",
+          "quoted_verbatim",
+          "rows_matched_in_our_summary",
+          "same_list_elsewhere",
+          "url",
+          "usd_on_matched",
+          "what_is_published"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "dd2357a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_leak.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_system_coverage.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 3271,
@@ -10302,7 +10348,7 @@
     {
       "path": "gt/data/ship_band_basis.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 3066,
+      "bytes": 3067,
       "note": "На чём держится наша оценка заявки ЛУКОЙЛ: доля денег по основанию ценовой вилки. Классифицирует поле основания записей gt/data/rfq_prices.json и взвешивает классы деньгами, а не числом строк. Отдельно считает, сколько мнения уже заменено найденной ценой при перепроверке. НЕ упрёк разведке: экспертная вилка нормальна как рабочая оценка, недопустимо выдавать её за найденную цену. Считает gt/tools/band_basis.py.",
       "format": "json",
       "shape": "объект",
@@ -10326,7 +10372,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "ec59704",
+      "last_commit": "dd2357a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
