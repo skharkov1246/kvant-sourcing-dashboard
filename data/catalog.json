@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 248,
-    "total_bytes": 111552719,
+    "total_bytes": 111553581,
     "by_sensitivity": {
       "конфиденциально": 63,
       "внутреннее": 137,
@@ -8212,6 +8212,45 @@
       ]
     },
     {
+      "path": "gt/data/ship_volume_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 26820,
+      "note": "Письма на ПОДТВЕРЖДЕНИЕ ОБЪЁМА по заявке ЛУКОЙЛ: строки, где цена и канал есть, а остаток продавец числом не назвал. Между ступенями «есть цена и адрес» и «отгружаема» стоит ровно это условие, и таких строк 108 на 1 186 490 USD — им до отгружаемости один ответ, а не разведка. Адрес есть у 30 строк на 299 605 USD: 20 писем. По 78 строкам на 886 885 USD адреса нет, и это названная числом работа — найти адрес, а не сочинить получателя. В письме четыре вопроса и только они: остаток числом на сегодня, срок под весь объём, цена за весь объём, срок действия цены и базис поставки. Ни нашей вилки, ни суммы, ни имени заказчика в письме нет — объём закупки это наша переговорная позиция. Адресат, уже опубликовавший нашу заявку (см. gt/data/ship_leak.json), в наборе помечен. Считает gt/tools/volume_letters.py, он же собирает gt/docs/ПИСЬМА-НА-ПОДТВЕРЖДЕНИЕ-ОБЪЁМА-ЛУКОЙЛ.pdf.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "checked_and_empty",
+        "letters",
+        "rows_no_address_list",
+        "rows_total",
+        "rows_with_address",
+        "rows_without_address",
+        "source",
+        "updated",
+        "usd_total",
+        "usd_with_address",
+        "usd_without_address",
+        "what_is_not_in_the_letter",
+        "what_it_is",
+        "what_to_do_without_address"
+      ],
+      "main_collection": {
+        "key": "rows_no_address_list",
+        "records": 78
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "f409887",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/volume_letters.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_decoded.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 26268,
@@ -8240,44 +8279,6 @@
       "referenced_by": [
         "gt/tools/ship_brand.py",
         "gt/tools/ship_brief.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_volume_letters.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 25958,
-      "note": "Письма на ПОДТВЕРЖДЕНИЕ ОБЪЁМА по заявке ЛУКОЙЛ: строки, где цена и канал есть, а остаток продавец числом не назвал. Между ступенями «есть цена и адрес» и «отгружаема» стоит ровно это условие, и таких строк 108 на 1 186 490 USD — им до отгружаемости один ответ, а не разведка. Адрес есть у 30 строк на 299 605 USD: 20 писем. По 78 строкам на 886 885 USD адреса нет, и это названная числом работа — найти адрес, а не сочинить получателя. В письме четыре вопроса и только они: остаток числом на сегодня, срок под весь объём, цена за весь объём, срок действия цены и базис поставки. Ни нашей вилки, ни суммы, ни имени заказчика в письме нет — объём закупки это наша переговорная позиция. Адресат, уже опубликовавший нашу заявку (см. gt/data/ship_leak.json), в наборе помечен. Считает gt/tools/volume_letters.py, он же собирает gt/docs/ПИСЬМА-НА-ПОДТВЕРЖДЕНИЕ-ОБЪЁМА-ЛУКОЙЛ.pdf.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "letters",
-        "rows_no_address_list",
-        "rows_total",
-        "rows_with_address",
-        "rows_without_address",
-        "source",
-        "updated",
-        "usd_total",
-        "usd_with_address",
-        "usd_without_address",
-        "what_is_not_in_the_letter",
-        "what_it_is",
-        "what_to_do_without_address"
-      ],
-      "main_collection": {
-        "key": "rows_no_address_list",
-        "records": 78
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "ff86321",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/volume_letters.py"
       ]
     },
     {
