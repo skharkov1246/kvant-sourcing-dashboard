@@ -76,8 +76,11 @@ li { margin-bottom: 1.8mm; line-height: 1.42; }
 .warn { border-left: 2.4pt solid #111; padding-left: 3.5mm; margin: 0 0 3.5mm; }
 .do { background: #f2f2f2; padding: 2.4mm 3mm; margin: 0 0 3mm;
   /* Блок предложения не должен рваться: его хвост уезжал
-     на отдельную страницу и проверка PDF считала её полупустой. */
-  page-break-inside: avoid; }
+     на отдельную страницу и проверка PDF считала её полупустой.
+     И он не должен ОТКРЫВАТЬ страницу в одиночку: после того как таблица
+     вопросов выросла с 58 строк до 73, перенос сдвинулся, и блок из трёх
+     строк остался на странице один — 217 символов, снова полупустая. */
+  page-break-inside: avoid; page-break-before: avoid; }
 .do b { display: block; margin-bottom: 1mm; }
 """
 
@@ -398,7 +401,7 @@ def build() -> str:
               f"<td class='n'>{ru(b.get('usd'))}</td>"
               f"<td class='n'>{ru(b.get('no_estimate'))}</td>"
               f"<td>{E(b.get('state'))}</td>"
-              f"<td>{E((b.get('channel') or '').split(';')[0][:150])}</td></tr>")
+              f"<td>{E((b.get('channel') or '').split(';')[0])}</td></tr>")
         a("</tbody></table>")
         open_usd = sum(b.get("usd") or 0 for b in chb if (b.get("state") or "").startswith("прайс открыт"))
         reg_usd = sum(b.get("usd") or 0 for b in chb if b.get("state") == "по регистрации")
@@ -561,11 +564,17 @@ def build() -> str:
           "<col style='width:10mm'><col style='width:20mm'><col></colgroup>")
         a("<thead><tr><th>артикул</th><th>изготовитель</th><th>увер.</th>"
           "<th class='n'>экспозиция</th><th>что записала проверка</th></tr></thead><tbody>")
-        for x in cf["items"][:16]:
+        shown = cf["items"][:16]
+        for x in shown:
             a(f"<tr><td class='pn'>{E(x['pn'])}</td><td>{E(x.get('man'))}</td>"
               f"<td>{E(x['conf'])}</td><td class='n'>{ru(x['exposure'])}</td>"
-              f"<td>{E(x['verdict'])}: {E((x.get('note') or '')[:150])}</td></tr>")
+              f"<td>{E(x['verdict'])}: {E(x.get('note') or '')}</td></tr>")
         a("</tbody></table>")
+        if len(cf["items"]) > len(shown):
+            # Молчаливая обрезка читается как «это всё». Сколько строк не
+            # показано — говорим числом, а не умолчанием.
+            a(f"<p class='dim'>Показаны {ru(len(shown))} строк из {ru(len(cf['items']))}; "
+              f"остальные — в наборе gt/data/ship_confidence_audit.json.</p>")
         a("<div class='do'><b>Предложение</b><p>Уверенность у этих строк снизить до C, пока "
           "страница не открыта заново. Это не потеря: буква «A» на строке, где проверка "
           "записала мёртвую ссылку, хуже честной «C» — на защите её оспорят одним щелчком по "
@@ -694,19 +703,28 @@ def build() -> str:
       f"{ru(sum(float(x.get('qty') or 0) for x in qs))} штук. Это не наша "
       f"недоработка: без ревизии, шильдика, исполнения или единицы измерения "
       f"цена отличается кратно, и любая цифра была бы выдумкой.</p>")
+    # Предложение стоит ПЕРЕД таблицей, а не после неё. Таблица длинная и её
+    # хвост ложится к границе страницы: блок из трёх строк оставался на
+    # странице один (217 символов), и проверка PDF считала её полупустой.
+    # Свойство page-break-before: avoid этого не решает — Chromium его для
+    # блоков не соблюдает. Заодно читать предложение перед списком удобнее.
+    a("<div class='do'><b>Предложение</b><p>Отправить эти вопросы одним письмом "
+      "до защиты, а на самой защите показать их списком: это переводит "
+      "незакрытые строки из «мы не нашли» в «ждём исходные от вас». Разница в "
+      "том, чья это зона ответственности.</p></div>")
     a("<table class='t'><colgroup><col style='width:34mm'><col style='width:30mm'>"
       "<col style='width:14mm'><col></colgroup>")
     a("<thead><tr><th>артикул</th><th>что не сходится</th><th class='n'>кол-во</th>"
       "<th>что спросить</th></tr></thead><tbody>")
     for x in sorted(qs, key=lambda q: -float(q.get("qty") or 0)):
+        # Обрезки тут нет и быть не может: вопрос заказчику уходит в письмо
+        # дословно, а обрезанный на 300 символах вопрос теряет как раз то, чем
+        # он отличается от общего места. Правило репозитория про PDF прямо
+        # запрещает обрезку вида x[:150].
         a(f"<tr><td class='pn'>{E(x.get('pn'))}</td><td>{E(x.get('kind'))}</td>"
           f"<td class='n'>{ru(x.get('qty'))}</td>"
-          f"<td>{E((x.get('ask') or '')[:300])}</td></tr>")
+          f"<td>{E(x.get('ask') or '')}</td></tr>")
     a("</tbody></table>")
-    a("<div class='do'><b>Предложение</b><p>Отправить эти вопросы одним письмом "
-      "до защиты, а на самой защите показать их списком: это переводит "
-      "незакрытые строки из «мы не нашли» в «ждём исходные от вас». Разница в "
-      "том, чья это зона ответственности.</p></div>")
     a("</div>")
 
     if dec:

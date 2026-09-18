@@ -1718,21 +1718,6 @@
       "n_spellings": 2
     },
     {
-      "oem_key": "faudi",
-      "name": "Faudi",
-      "spellings": [
-        {
-          "spelling": "Faudi",
-          "where": "gt/data/pn_db.json:rows[].mk"
-        },
-        {
-          "spelling": "Faudi",
-          "where": "pnw/data/item_master.json:items[].maker"
-        }
-      ],
-      "n_spellings": 2
-    },
-    {
       "oem_key": "federalsignal",
       "name": "Federal Signal",
       "spellings": [
@@ -3979,6 +3964,17 @@
         {
           "spelling": "Det-Tronics (Emerson)",
           "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "faudi",
+      "name": "Faudi",
+      "spellings": [
+        {
+          "spelling": "Faudi",
+          "where": "pnw/data/item_master.json:items[].maker"
         }
       ],
       "n_spellings": 1

@@ -149,6 +149,7 @@ def build() -> str:
     st = load("ship_offer_stats.json") or {}
     jb = load("ship_jenbacher_prices.json") or {}
     sl = load("ship_stocklist_cross.json") or {}
+    dc = load("ship_demand_collisions.json") or {}
 
     band = {}
     for r in lk:
@@ -275,6 +276,46 @@ def build() -> str:
           f"{ru(rvo.get('no_offer'))} строкам предложения в файлах сделки нет. Источник — "
           f"входящие предложения поставщиков из системы Битрикс, счёт ведёт "
           f"gt/tools/ship_offer.py.</p>")
+        a("</div>")
+
+    # ------------------------------ один номер на нескольких строках заявки
+    if dc:
+        share = (100 * dc["usd_on_repeats"] / dc["usd_exposure_all_rows"]
+                 if dc.get("usd_exposure_all_rows") else 0)
+        a("<div class='warn'>")
+        a("<b>Объём заявки подтверждён не весь: каждый пятый доллар стоит на повторе "
+          "номера</b>")
+        a(f"<p>В листе заявки {ru(dc['pns_more_than_once'])} номеров из "
+          f"{ru(dc['distinct_pns'])} стоят более чем на одной строке, и на вторые и "
+          f"последующие вхождения приходится {ru(dc['qty_in_repeats'])} штук. Сводка "
+          f"складывает такие строки в одну позицию, поэтому её количество — сумма, а не "
+          f"замер. В деньгах это {money(dc['usd_on_repeats'])} USD расчётной оценки при "
+          f"{money(dc['usd_exposure_all_rows'])} USD по всей заявке, то есть "
+          f"{share:.0f} процентов.</p>")
+        a(f"<p>Случая два, и путать их нельзя. У {ru(dc['same_category']['pns'])} номеров "
+          f"(на {money(dc['same_category']['usd_on_repeats'])} USD) категория изделия одна: "
+          f"скорее всего, одна позиция расписана несколькими строками, и складывать "
+          f"количество правильно. У {ru(dc['diff_category']['pns'])} номеров (на "
+          f"{money(dc['diff_category']['usd_on_repeats'])} USD) категории РАЗНЫЕ — значит "
+          f"номер изделие не опознаёт, и недостоверны и количество, и цена.</p>")
+        diff = [x for x in dc["items"] if not x["one_category"]][:6]
+        if diff:
+            a("<table><colgroup><col style='width:26mm'><col style='width:22mm'><col>"
+              "</colgroup>")
+            a("<thead><tr><th>номер</th><th class='n'>количество по строкам</th>"
+              "<th>чем называется в заявке</th></tr></thead><tbody>")
+            for x in diff:
+                a(f"<tr><td class='pn'>{E(x['pn'])}</td>"
+                  f"<td class='n'>{E(' + '.join(str(q) for q in x['qty_by_row']))}</td>"
+                  f"<td>{E(' · '.join(x['names']))}</td></tr>")
+            a("</tbody></table>")
+            if len(diff) < dc["diff_category"]["pns"]:
+                a(f"<p class='dim'>Показаны {ru(len(diff))} номеров из "
+                  f"{ru(dc['diff_category']['pns'])}; остальные — в наборе "
+                  f"gt/data/ship_demand_collisions.json.</p>")
+        a("<p>Что с этим делать: до подтверждения заказчиком количество по этим строкам в "
+          "обязательства не берётся. Вопрос ему поставлен и стоит в перечне вопросов первым "
+          "по деньгам. Считает gt/tools/demand_collisions.py.</p>")
         a("</div>")
 
     # --------------------------------------------------------------- сорсеру

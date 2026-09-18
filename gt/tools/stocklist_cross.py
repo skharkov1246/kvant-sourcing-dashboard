@@ -39,9 +39,23 @@ SUMMARY = ROOT / "gt/data/ship_lukoil.json"
 FX = ROOT / "gt/data/fx_rates.json"
 OUT = ROOT / "gt/data/ship_stocklist_cross.json"
 GROUPS = ROOT / "gt/data/ship_seller_groups.json"
-# Строка листа: «<номер> <описание> <N>pcs <цена>EURO ea». Точка в цене —
+# Строка листа: «<номер> <описание> <N><единица> <цена>EURO ea». Точка в цене —
 # разделитель тысяч: на том же листе рядом стоят «1.200.00EURO» и «20.00EURO».
-LINE = re.compile(r"^(\S+)\s+(.*?)\s+(\d+)\s*pcs\s+([\d.,]+)\s*(EURO|EUR|USD|\$)", re.I)
+#
+# ЕДИНИЦА СЧЁТА НА ЛИСТЕ НЕ ОДНА, и это стоило замера. Правило искало только
+# «pcs» и молча теряло 37 ценовых строк из 372 — каждую десятую, причём самые
+# дорогие: «pce» (32 строки), «set» (3), «st» (1), плюс строка, где пробел
+# перед числом отсутствует вовсе («Sgl Elem10pcs»). Потерянными оказались, в
+# частности, НАШИ номера: 186232-3000 за 11 000 EUR, 1034549-20 за 5 000 EUR,
+# 190583-1 за 200 EUR. Замер «совпало 78 номеров» был занижен, и занижен
+# именно в дорогой части листа, где цена одной строки решает вердикт.
+#
+# Пробел перед числом необязателен, единица — закрытый список, а «1set (12)»
+# несёт фасовку в скобках: она сохраняется отдельным полем, и цена за штуку из
+# неё НЕ выводится, пока не сказано, за что просят — за комплект или за штуку.
+LINE = re.compile(
+    r"^(\S+)\s+(.*?)\s*(\d+)\s*(pcs|pce|pieces|stk|st|sets|set)\b\s*(?:\((\d+)\)\s*)?"
+    r"([\d.,]+)\s*(EURO|EUR|USD|\$)\s*(per\s+set|set|ea|each)?", re.I)
 
 
 def key(x) -> str:
@@ -61,11 +75,20 @@ def parse(page: str) -> list[dict]:
         m = LINE.match(line.strip())
         if not m:
             continue
-        pn, desc, qty, price, cur = m.groups()
+        pn, desc, qty, unit, pack, price, cur, per = m.groups()
         cur = cur.upper().replace("$", "USD")
         cur = "EUR" if cur == "EURO" else cur        # на листе пишут и EUR, и EURO
-        out.append({"pn": pn, "desc": desc.strip(), "qty_listed": int(qty),
-                    "price": money(price), "currency": cur})
+        unit = unit.lower()
+        row = {"pn": pn, "desc": desc.strip(), "qty_listed": int(qty),
+               "price": money(price), "currency": cur, "unit": unit}
+        # «1set (12) 226.200.00EURO set» — цена за КОМПЛЕКТ из 12 штук. Делить её
+        # на фасовку здесь нельзя: это был бы вывод, а не цитата, и делать его
+        # надо там, где рядом стоит наше количество.
+        if pack:
+            row["pack"] = int(pack)
+        if unit.startswith("set") or (per or "").lower().replace(" ", "") in ("perset", "set"):
+            row["price_per"] = "комплект"
+        out.append(row)
     return out
 
 
