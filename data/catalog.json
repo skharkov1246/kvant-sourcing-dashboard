@@ -1748,6 +1748,7 @@
         "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
         "tests/test_inside_quotes.py",
+        "tests/test_report_numbers.py",
         "tests/test_ship_coverage.py"
       ]
     },
@@ -2138,7 +2139,9 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/lists_rfq.py"
+        "gt/tools/lists_rfq.py",
+        "gt/tools/ship_final.py",
+        "tests/test_report_numbers.py"
       ]
     },
     {
