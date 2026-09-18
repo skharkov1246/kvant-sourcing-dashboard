@@ -6,10 +6,10 @@
  "totals": {
   "groups_known": 5,
   "domains_known": 21,
-  "rows_checked": 75,
-  "rows_citing_one_group_twice": 14,
-  "usd_on_those_rows": 617185.0,
-  "rows_marked_as_one_operator": 14,
+  "rows_checked": 81,
+  "rows_citing_one_group_twice": 15,
+  "usd_on_those_rows": 640585.0,
+  "rows_marked_as_one_operator": 15,
   "rows_not_marked": 0,
   "usd_not_marked": 0.0
  },
@@ -154,6 +154,19 @@
      "irby.com",
      "needco.com",
      "northcoast.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "DESC200",
+   "usd": 23400.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "cambia.cn",
+     "camvect.com",
+     "topbrandsplc.com"
     ]
    },
    "marked": true

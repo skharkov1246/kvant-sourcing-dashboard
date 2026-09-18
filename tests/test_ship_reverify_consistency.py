@@ -155,8 +155,9 @@ def test_строка_говорит_о_том_же_предмете_что_за
     assert not bad, f"разбор не о том предмете, что заявка: {bad}"
 
 
-DOMAIN = re.compile(r"[a-z0-9][a-z0-9-]*\.(com|net|org|ru|de|co\.uk|cz|pl|in|cn|eu|at|io|uk|store)\b",
-                    re.I)
+DOMAIN = re.compile(
+    r"[a-z0-9][a-z0-9-]*\.(com|net|org|ru|de|co\.uk|cz|pl|in|cn|eu|at|io|uk|store|parts|nl|es|kz|tr)\b",
+    re.I)
 NO_LINK = "ССЫЛКА НЕ СОХРАНЕНА"
 
 
