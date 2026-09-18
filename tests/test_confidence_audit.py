@@ -84,3 +84,39 @@ def test_расшифровка_класса_не_обещает_большег�
     """«Цена расходится» не значит «цены нет»: уровень может быть верным."""
     assert "уровень может быть верен" in ca.DEFECTS["price_differs"]
     assert "не видел" in ca.DEFECTS["dead_link"]
+
+
+def test_найденные_цены_сверяются_с_замером():
+    d = doc()
+    f = ca.found_prices()
+    assert d["found"]["rows"] == f["rows"]
+    assert d["found"]["groups"] == f["groups"]
+
+
+def test_цена_ноль_не_считается_найденной():
+    """«Страница открылась, цены на ней нет» — это не найденная цена."""
+    for x in doc()["found"]["items"]:
+        assert x["checked_price"] > 0, f"{x['pn']}: в замер попал ноль"
+
+
+def test_строка_отнесена_к_вилке_правильно():
+    """Края вилки — её часть: ровно пол и ровно потолок это «внутри»."""
+    for x in doc()["found"]["items"]:
+        if x["where"] == "выше потолка вилки":
+            assert x["checked_price"] > x["band_hi"], x["pn"]
+        elif x["where"] == "ниже пола вилки":
+            assert x["checked_price"] < x["band_lo"], x["pn"]
+        else:
+            assert x["band_lo"] <= x["checked_price"] <= x["band_hi"], x["pn"]
+
+
+def test_экспозиция_по_найденной_цене_считается_от_количества():
+    for x in doc()["found"]["items"]:
+        assert abs(x["exposure_checked"] - x["checked_price"] * x["qty"]) <= 1, x["pn"]
+
+
+def test_группы_складываются_в_итог():
+    f = doc()["found"]
+    assert sum(g["rows"] for g in f["groups"].values()) == f["rows"]
+    assert sum(g["exposure_band"] for g in f["groups"].values()) == f["exposure_band"]
+    assert sum(g["exposure_checked"] for g in f["groups"].values()) == f["exposure_checked"]

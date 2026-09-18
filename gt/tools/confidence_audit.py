@@ -116,6 +116,69 @@ def measure() -> dict:
         },
         "classes": classes,
         "items": items,
+        "found": found_prices(),
+    }
+
+
+def found_prices() -> dict:
+    """Строки, где НАША СОБСТВЕННАЯ проверка уже нашла цену, и где она против вилки.
+
+    Это самый сильный замер из доступных без обращения к вложениям сделок: он
+    целиком на данных репозитория. Блок `checks` набора цен хранит `real_lo` и
+    `real_hi` — то, что проверяющий увидел на странице. Сравнив это с вилкой той
+    же строки, получаем ответ на вопрос защиты «наши вилки высокие или низкие»
+    по девяноста строкам, без единой догадки.
+
+    Ноль в `real_lo` и `real_hi` означает «страница открылась, цены на ней нет» —
+    такие строки в замер не идут.
+    """
+    doc = json.loads(PRICES.read_text(encoding="utf-8"))
+    ship = {key(r["pn"]): r for r in json.loads(SHIP.read_text(encoding="utf-8"))["rows"]}
+    checks: dict[str, dict] = {}
+    for c in doc.get("checks") or []:
+        checks.setdefault(key(c.get("pn")), c)
+
+    items = []
+    for p in doc.get("prices") or []:
+        c = checks.get(key(p.get("pn")))
+        if not c:
+            continue
+        try:
+            lo, hi = float(c.get("real_lo")), float(c.get("real_hi"))
+        except (TypeError, ValueError):
+            continue
+        if lo <= 0 and hi <= 0:
+            continue
+        row = ship.get(key(p.get("pn")))
+        if not row or row.get("usd_lo") in (None, ""):
+            continue
+        blo, bhi = float(row["usd_lo"]), float(row["usd_hi"])
+        qty = float(row.get("qty") or 0)
+        real = (lo + hi) / 2
+        where = ("выше потолка вилки" if real > bhi
+                 else "ниже пола вилки" if real < blo else "внутри вилки")
+        items.append({
+            "pn": p.get("pn"), "man": (row.get("man") or "").strip(),
+            "verdict": (c.get("verdict") or ""), "qty": int(qty),
+            "band_lo": int(blo), "band_hi": int(bhi),
+            "checked_price": round(real, 2), "where": where,
+            "exposure_band": int(round((blo + bhi) / 2 * qty)),
+            "exposure_checked": int(round(real * qty)),
+            "seller": (c.get("seller") or "").strip(),
+        })
+    items.sort(key=lambda x: -abs(x["exposure_checked"] - x["exposure_band"]))
+    groups = {}
+    for w in ("выше потолка вилки", "внутри вилки", "ниже пола вилки"):
+        g = [x for x in items if x["where"] == w]
+        groups[w] = {"rows": len(g),
+                     "exposure_band": sum(x["exposure_band"] for x in g),
+                     "exposure_checked": sum(x["exposure_checked"] for x in g)}
+    return {
+        "rows": len(items),
+        "exposure_band": sum(x["exposure_band"] for x in items),
+        "exposure_checked": sum(x["exposure_checked"] for x in items),
+        "groups": groups,
+        "items": items,
     }
 
 
@@ -128,6 +191,12 @@ def report(m: dict) -> str:
         out.append(f"  {v:16} {c['rows']:4} строк {ru(c['exposure']):>12} USD — {c['means']}")
     out.append("  самые дорогие: " + " · ".join(
         f"{x['pn']} ({ru(x['exposure'])} USD, {x['verdict']})" for x in m["items"][:5]))
+    f = m["found"]
+    out.append(f"строк, где наша же проверка нашла цену: {f['rows']} · экспозиция по вилкам "
+               f"{ru(f['exposure_band'])} → по найденным ценам {ru(f['exposure_checked'])} USD")
+    for w, g in f["groups"].items():
+        out.append(f"  {w:20} {g['rows']:4} строк {ru(g['exposure_band']):>12} → "
+                   f"{ru(g['exposure_checked']):>12} USD")
     return "\n".join(out)
 
 
@@ -147,7 +216,10 @@ def main() -> int:
             print("набора нет — соберите: --write", file=sys.stderr)
             return 1
         old = json.loads(OUT.read_text(encoding="utf-8"))
-        if old.get("totals") != m["totals"] or old.get("classes") != m["classes"]:
+        same_found = ((old.get("found") or {}).get("groups") == m["found"]["groups"]
+                      and (old.get("found") or {}).get("rows") == m["found"]["rows"])
+        if (old.get("totals") != m["totals"] or old.get("classes") != m["classes"]
+                or not same_found):
             print(f"набор устарел: в наборе {old.get('totals')}, замер {m['totals']}",
                   file=sys.stderr)
             return 1
