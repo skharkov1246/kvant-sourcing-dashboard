@@ -1,7 +1,7 @@
 {
   "note": "Ребро, а не карточка: уровень субпоставщика — свойство пути, а не компании. Одна и та же компания бывает первым уровнем для одного владельца конструкции и вторым, если между ними стоит пакаджер, поэтому уровень не хранится, а считается обходом. Записи вида routing_note — не компании, а указания к закупке из поля mk базы PN: «закупка по спецификации», «любой дистрибьютор». Для сорсера это ответ не хуже имени завода, поэтому они сохранены отдельным видом.",
-  "count": 311,
-  "makers": 274,
+  "count": 313,
+  "makers": 276,
   "routing_notes": 37,
   "records": [
     {
@@ -148,7 +148,6 @@
       "kind": "routing_note",
       "relation": "makes_for",
       "scope": [
-        "3AH, 3AK, 3AE, 3AX1103-2E DC 110B",
         "Блок подачи жидкого топлива для ГТУ SGT-400",
         "Шкаф управления PMS МЛСК Ф-1",
         "Шкафа генератора газотурбинных установок SIEMENS SGT400 МЛСКФ-1",
@@ -162,7 +161,7 @@
       "sources": [
         "gt/data/pn_db.json"
       ],
-      "n": 41,
+      "n": 39,
       "from_is_bucket": false
     },
     {
@@ -1735,6 +1734,27 @@
       "from_is_bucket": false
     },
     {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "Siemens",
+      "to_key": "siemens",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "3AH, 3AK, 3AE, 3AX1103-2E DC 110B",
+        "Блок подачи жидкого топлива для ГТУ SGT-400",
+        "SKC62/F"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 3,
+      "from_is_bucket": false
+    },
+    {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
       "to": "Bently Nevada / Wilcoxon (тип.)",
@@ -2770,25 +2790,6 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
-      "to": "Weidmuller",
-      "to_key": "weidmuller",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Прочее / требует разметки"
-      ],
-      "proof": [
-        "П2 — заказной код Weidmuller"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 2,
-      "from_is_bucket": true
-    },
-    {
-      "from": "Прочие",
-      "from_key": "прочие",
       "to": "Westwood Auburn (Beckett)",
       "to_key": "westwoodauburnbeckett",
       "kind": "maker",
@@ -3366,25 +3367,6 @@
       ],
       "proof": [
         "П2"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 1,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
-      "to": "Siemens",
-      "to_key": "siemens",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "SKC62/F"
-      ],
-      "proof": [
-        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -4278,6 +4260,25 @@
       ],
       "proof": [
         "П1"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "Rochester Sensors (ранее Rochester Gauges, Amphenol)",
+      "to_key": "rochestersensorsранееrochestergaugesamph",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 60S"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -6048,6 +6049,44 @@
       ],
       "proof": [
         "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Weidmüller",
+      "to_key": "weidmller",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Прочее / требует разметки"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Weidmuller",
+      "to_key": "weidmuller",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Прочее / требует разметки"
+      ],
+      "proof": [
+        "П2 — заказной код Weidmuller"
       ],
       "sources": [
         "gt/data/pn_db.json"

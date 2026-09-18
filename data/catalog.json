@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 230,
-    "total_bytes": 104596935,
+    "total_bytes": 104970756,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 129,
@@ -87,7 +87,7 @@
     {
       "path": "gt/data/pn_db.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 7424925,
+      "bytes": 7425037,
       "note": "База номенклатуры (part numbers) ГТУ. Дублируется в gt/public/wizard/data.js и pnw/public/data.js — при правке обновлять все три или собирать из одного источника.",
       "format": "json",
       "shape": "объект",
@@ -812,44 +812,9 @@
       ]
     },
     {
-      "path": "gt/data/dossiers.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 1619895,
-      "note": "Досье поставщиков ГТУ: 1359 записей, 731 e-mail, 992 телефона. Персональные и контактные данные.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "dossiers",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "dossiers",
-        "records": 1359
-      },
-      "last_change": "2026-08-31",
-      "last_author": "github-actions[bot]",
-      "last_commit": "11f2331",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "gt/build.py",
-        "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py",
-        "library/load_suppliers.py",
-        "scripts/build_chain_coverage.py"
-      ]
-    },
-    {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 1578255,
+      "bytes": 1951964,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -860,7 +825,7 @@
       ],
       "main_collection": {
         "key": "rows",
-        "records": 141,
+        "records": 158,
         "record_keys": [
           "band_verdict",
           "blocker",
@@ -904,6 +869,41 @@
         "tests/test_maker_basis.py",
         "tests/test_ship_decisions.py",
         "tests/test_ship_reverify_consistency.py"
+      ]
+    },
+    {
+      "path": "gt/data/dossiers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 1619895,
+      "note": "Досье поставщиков ГТУ: 1359 записей, 731 e-mail, 992 телефона. Персональные и контактные данные.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "dossiers",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "dossiers",
+        "records": 1359
+      },
+      "last_change": "2026-08-31",
+      "last_author": "github-actions[bot]",
+      "last_commit": "11f2331",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {

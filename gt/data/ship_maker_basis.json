@@ -15,15 +15,15 @@
   "weak_closed_by_reverify_rows": 0,
   "weak_closed_by_reverify_usd": 0.0,
   "weak_closed_tautological": true,
-  "closed_by_reverify_rows": 83,
-  "closed_by_reverify_usd": 5379250.75
+  "closed_by_reverify_rows": 86,
+  "closed_by_reverify_usd": 5388000.75
  },
  "classes": [
   {
    "basis": "каталог изготовителя (перепроверка)",
-   "rows_in_db": 83,
-   "rows_in_request": 83,
-   "usd_in_request": 5379250.75,
+   "rows_in_db": 86,
+   "rows_in_request": 86,
+   "usd_in_request": 5388000.75,
    "why": "изготовитель вскрыт по каталогу при перепроверке строки — это факт со страницы, а не наша оценка; счёт берётся из gt/data/ship_reverify.json и растёт сам по ходу перепроверки"
   },
   {
@@ -35,9 +35,9 @@
   },
   {
    "basis": "заказной код",
-   "rows_in_db": 145,
-   "rows_in_request": 95,
-   "usd_in_request": 208512.0,
+   "rows_in_db": 142,
+   "rows_in_request": 92,
+   "usd_in_request": 199762.0,
    "why": "номер сам по себе является кодом изготовителя: проверять нечего"
   },
   {
