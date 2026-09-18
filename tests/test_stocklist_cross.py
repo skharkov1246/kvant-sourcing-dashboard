@@ -66,7 +66,8 @@ def test_в_наборе_нет_ни_одной_цены():
         assert bad not in text, f"в набор попала цена контрагента ({bad})"
     for r in all_rows():
         assert set(r) <= {"pn", "where", "usd_exposure", "qty_request", "qty_listed",
-                          "desc_starts_with_other_pn"}, f'{r["pn"]}: лишнее поле в строке'
+                          "desc_starts_with_other_pn", "price_is_list_stub"}, (
+            f'{r["pn"]}: лишнее поле в строке')
 
 
 def test_разделитель_тысяч_читается_как_на_листе():

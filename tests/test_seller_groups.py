@@ -79,3 +79,39 @@ def test_в_методе_сказано_почему_замер_не_тавто�
         pytest.skip("замера нет")
     d = json.loads(MEASURE.read_text(encoding="utf-8"))
     assert "тавтолог" in (d.get("method") or "").lower()
+
+
+def test_пул_наличия_не_смешан_с_группой_владения():
+    """Пул — разные фирмы с ОДНИМ складом, группа — одни люди под разными вывесками.
+
+    Оплачено 18.09.2026: пул plc-mall ↔ automation-base сначала записали группой,
+    и домен automation-base оказался сразу в двух группах — поиск группы по
+    домену стал неоднозначным, а он решает, считать двух продавцов одним
+    свидетелем или нет. Пулы живут отдельным разделом, и набор обязан объяснять
+    разницу.
+    """
+    import json as _json
+    d = _json.loads(GROUPS.read_text(encoding="utf-8"))
+    pools = d.get("pools") or []
+    if not pools:
+        pytest.skip("пулов в наборе нет")
+    assert (d.get("why_pools") or "").strip(), "набор обязан объяснять, чем пул отличается от группы"
+    gdom = {x.lower() for g in d["groups"] for x in (g.get("domains") or [])}
+    for pl in pools:
+        assert pl.get("pool"), "у пула должно быть имя в поле pool, а не в поле group"
+        assert (pl.get("evidence") or "").strip(), f"{pl.get('pool')}: пул без улики"
+        assert len(pl.get("domains") or []) > 1, f"{pl.get('pool')}: пул из одного домена"
+    # и свидетель по домену пула сводится к пулу, а не к группе владения
+    import sys
+    sys.path.insert(0, str(ROOT / "gt/tools"))
+    import stocklist_cross as sc
+    for pl in pools:
+        for dom in pl["domains"]:
+            w = sc.witness_of(dom)
+            assert w, f"{dom}: свидетель не определён"
+            if dom.lower() in gdom:
+                # домен есть и в группе владения — свидетелем должен стать пул,
+                # потому что общий склад сильнее общей вывески
+                assert w == pl["pool"], (
+                    f"{dom}: свидетелем назван «{w}», а должен быть пул «{pl['pool']}»: "
+                    "общий остаток нельзя считать дважды")

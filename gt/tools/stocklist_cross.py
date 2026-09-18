@@ -85,7 +85,25 @@ def expo(r: dict) -> float:
     return (float(lo) + float(hi)) / 2 * float(r.get("qty") or 0)
 
 
+def stub_price(rows: list[dict]) -> tuple[float | None, int]:
+    """Цена, которая повторяется в листе слишком часто, чтобы быть ценой детали.
+
+    Оплачено замером 18.09.2026: в листе крупнейшего продавца ровно «450.00USD»
+    стоит 957 раз из 13 256 строк, а у 1 000 позиций из 1 000 верхний ценовой
+    уровень имеет sku = null и цену 0.00 — это шаблон магазина, а не свойство
+    изделия. Класс «ask внутри вилки», посчитанный по такой цифре, ничего не
+    измеряет. Порог: одна и та же цена у 1 % строк листа и не менее двадцати раз.
+    """
+    if not rows:
+        return None, 0
+    c = collections.Counter(round(float(r["price"]), 2) for r in rows)
+    price, n = c.most_common(1)[0]
+    floor = max(20, len(rows) // 100)
+    return (price, n) if n >= floor else (None, 0)
+
+
 def cross(rows: list[dict], seller: str) -> dict:
+    stub, stub_n = stub_price(rows)
     lk = json.loads(SUMMARY.read_text(encoding="utf-8"))["rows"]
     band = {key(r.get("pn")): r for r in lk}
     by_pn: dict[str, list[dict]] = collections.defaultdict(list)
@@ -116,9 +134,11 @@ def cross(rows: list[dict], seller: str) -> dict:
         e = expo(b)
         cls[where] += 1
         usd[where] += e
+        on_stub = stub is not None and any(round(float(x["price"]), 2) == stub for x in rs)
         items.append({"pn": b.get("pn"), "where": where, "usd_exposure": round(e, 2),
                       "qty_request": b.get("qty"), "qty_listed": max(x["qty_listed"] for x in rs),
-                      "desc_starts_with_other_pn": other})
+                      "desc_starts_with_other_pn": other,
+                      "price_is_list_stub": on_stub})
     items.sort(key=lambda x: -x["usd_exposure"])
     return {
         "seller": seller,
@@ -127,8 +147,30 @@ def cross(rows: list[dict], seller: str) -> dict:
         "matched_exposure": round(sum(usd.values()), 2),
         "by_class": {k: {"pns": cls[k], "usd_exposure": round(usd[k], 2)} for k in cls},
         "desc_starts_with_other_pn": note_cross,
+        "stub_price_repeats": stub_n,
+        "pns_on_stub_price": sum(1 for x in items if x["price_is_list_stub"]),
         "rows": items,
     }
+
+
+def witness_of(seller: str) -> str:
+    """Кто СВИДЕТЕЛЬ по этому домену: группа владения или общий складской пул.
+
+    Пул отличается от группы: юрлица разные, а склад один (видно по совпадающим
+    до единицы остаткам и пометкам secondary/external). Для довода «два
+    независимых продавца» это то же самое, что одна группа, поэтому свидетель
+    сводится и по группам, и по пулам.
+    """
+    g = group_of(seller)
+    if not GROUPS.exists():
+        return g
+    d = json.loads(GROUPS.read_text(encoding="utf-8"))
+    dom = seller.lower().strip()
+    for pl in (d.get("pools") or []):
+        for x in (pl.get("domains") or []):
+            if dom == str(x).lower() or dom.endswith("." + str(x).lower()):
+                return pl.get("pool") or g
+    return g
 
 
 def group_of(seller: str) -> str:
@@ -270,11 +312,15 @@ def main() -> int:
               .replace(",", " "))
     print(f"  у {m['desc_starts_with_other_pn']} строк описание начинается с ДРУГОГО номера — "
           f"это кросс продавца, читать его как наш номер нельзя")
+    if m["stub_price_repeats"]:
+        print(f"  ЦЕНА-ЗАГЛУШКА: одна и та же цифра повторяется в листе "
+              f"{m['stub_price_repeats']} раз, и на ней стоит {m['pns_on_stub_price']} наших "
+              f"номеров — их класс ничего не измеряет")
     if a.write:
         prev = load_out()
         sellers = prev.get("sellers") or {}
         sellers[a.seller] = {"totals": {k: v for k, v in m.items() if k != "rows"},
-                             "group": group_of(a.seller),
+                             "group": witness_of(a.seller),
                              "rows": m["rows"]}
         dis = disagreements(sellers)
         nob = no_band_reach(sellers)
