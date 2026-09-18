@@ -64,8 +64,8 @@ def test_пять_вопросов_пронумерованы_и_отказ_на
     assert "«нет» — это тоже ответ" in body, "отказ обязан быть назван полноценным ответом"
 
 
-def test_итог_делится_на_четыре_части_нацело():
-    """Четыре пути: продавцу, изготовителю, через форму и «адресата нет вовсе».
+def test_итог_делится_на_пять_частей_нацело():
+    """Пять путей: продавцу, изготовителю, через форму, каналом продавца, никак.
 
     Учёт ломался дважды подряд, и оба раза на добавлении пути: сначала письма
     изготовителям, потом обращения через форму. Каждый раз строки уходили из
@@ -76,7 +76,8 @@ def test_итог_делится_на_четыре_части_нацело():
     q = ql()
     d = q.build()
     assert (d["rows_with_address"] + d["rows_to_maker"] + d["rows_to_form"]
-            + d["rows_without_address"]) == d["rows_total"]
+            + d["rows_to_seller_channel"] + d["rows_without_address"]) == d["rows_total"]
+    assert len(d["seller_tasks"]) == d["rows_to_seller_channel"]
     assert sum(t["rows"] for t in d["form_tasks"]) == d["rows_to_form"]
     assert len(d["rows_no_address_list"]) == d["rows_without_address"]
     assert sum(L["rows"] for L in d["letters"]) == d["rows_with_address"] + d["rows_to_maker"]
@@ -160,3 +161,61 @@ def test_пояснение_в_скобках_не_делает_изготови
     assert q.maker_key("Fleetguard (Cummins Filtration)") == q.maker_key("Fleetguard")
     assert q.maker_key("Siemens Energy (чертёж завода Линкольн)") == q.maker_key("Siemens Energy")
     assert q.maker_key("Drillmec") != q.maker_key("Drillmec S.p.A. / Oleobi S.r.l.")
+
+
+def test_продавец_без_почты_это_не_отсутствие_адреса(tmp_path, monkeypatch):
+    """Прочитанная страница или телефон — канал, а не пустая графа.
+
+    Добавлено 18.09.2026. Замер: у 48 строк почты продавца нет, но у 25 разбор
+    прочитал страницу и ещё у 6 — телефон, всего на 122 494 USD. Пока они
+    считались безадресными, документ называл работой «найти адрес» — при том
+    что адрес был найден и записан. Корпус придуман; обе формы записи взяты с
+    живых строк: телефон дистрибьютора и карточка товара у торговца.
+    """
+    q = ql()
+    ask = {"rows": [{"pn": "ZZ-4100", "qty": 3, "usd_lo": 10, "usd_hi": 20, "unit": "шт"},
+                    {"pn": "ZZ-4200", "qty": 5, "usd_lo": 10, "usd_hi": 20, "unit": "шт"},
+                    {"pn": "ZZ-4300", "qty": 7, "usd_lo": 10, "usd_hi": 20, "unit": "шт"}]}
+    rv = {"rows": [
+        {"pn": "ZZ-4100", "channel": "торговец класса",
+         "contacts": "Придуманный поставщик: +1-000-555-0100, склада не называет"},
+        {"pn": "ZZ-4200", "channel": "витрина",
+         "contacts": "карточка по номеру https://example-shop.test/p/ZZ-4200"},
+        {"pn": "ZZ-4300", "channel": "класс изделий",
+         "contacts": "адреса нет ни по детали, ни по классу"}]}
+    a, r = tmp_path / "ask.json", tmp_path / "rv.json"
+    a.write_text(json.dumps(ask, ensure_ascii=False), encoding="utf-8")
+    r.write_text(json.dumps(rv, ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(q, "ASK", a)
+    monkeypatch.setattr(q, "RV", r)
+    monkeypatch.setattr(q, "OTHER_SETS", ())
+    with_mail, without = q.candidates()
+    assert not with_mail, "почты в корпусе нет ни у кого"
+    by = {x["pn"]: x for x in without}
+    assert by["ZZ-4100"]["seller_tel"] == "+1-000-555-0100"
+    assert by["ZZ-4200"]["seller_url"] == "https://example-shop.test/p/ZZ-4200"
+    assert not by["ZZ-4300"]["seller_url"] and not by["ZZ-4300"]["seller_tel"], (
+        "по этой строке спрашивать действительно некуда — она обязана остаться "
+        "в безадресном остатке")
+
+
+def test_почта_по_домену_не_додумывается(tmp_path, monkeypatch):
+    """Из страницы продавца адрес почты не выводится.
+
+    Иначе письмо уйдёт на sales@ придуманного домена, и продавец либо не
+    получит его, либо получит чужой. Правило то же, что в пакете писем об
+    остатке: домен не додумывается.
+    """
+    q = ql()
+    ask = {"rows": [{"pn": "ZZ-4400", "qty": 2, "usd_lo": 10, "usd_hi": 20, "unit": "шт"}]}
+    rv = {"rows": [{"pn": "ZZ-4400", "channel": "витрина",
+                    "contacts": "https://example-shop.test/p/ZZ-4400"}]}
+    a, r = tmp_path / "ask.json", tmp_path / "rv.json"
+    a.write_text(json.dumps(ask, ensure_ascii=False), encoding="utf-8")
+    r.write_text(json.dumps(rv, ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(q, "ASK", a)
+    monkeypatch.setattr(q, "RV", r)
+    monkeypatch.setattr(q, "OTHER_SETS", ())
+    with_mail, without = q.candidates()
+    assert not with_mail
+    assert without[0]["mail"] == ""
