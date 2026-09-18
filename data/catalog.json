@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 242,
-    "total_bytes": 109472695,
+    "total_bytes": 109474124,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 134,
@@ -225,7 +225,7 @@
     {
       "path": "gt/data/ship_lukoil.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 6124288,
+      "bytes": 6125717,
       "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
       "format": "json",
       "shape": "объект",
@@ -278,7 +278,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "0ff0a22",
+      "last_commit": "5926192",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -10275,7 +10275,10 @@
         "level": "публикуемо",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "gt/tools/ship_merge.py",
+        "tests/test_price_substitutions.py"
+      ]
     },
     {
       "path": "zip/customs/out/_summary.json",
