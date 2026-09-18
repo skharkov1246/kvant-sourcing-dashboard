@@ -33,6 +33,29 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SUMMARY = ROOT / "gt/data/ship_lukoil.json"
 REVERIFY = ROOT / "gt/data/ship_reverify.json"
+INSIDE = ROOT / "gt/data/ship_inside_quotes.json"
+QUESTIONS = ROOT / "gt/data/ship_questions.json"
+
+
+def closed_elsewhere() -> tuple[set, set]:
+    """Номера, которые закрываются НЕ поиском: наше вложение и вопрос заказчику.
+
+    Добавлено 18.09.2026. Из 475 неразобранных строк по 303 цена лежит в
+    предложении, которое нам уже прислали, а по девяти вопрос заказчику
+    поставлен. Отправлять разведку искать такую цену в открытом доступе — значит
+    списать её труд в ноль: тот же урок уже был получен на задании по добору
+    цены, где четыре строки из двенадцати вернулись ответом «цена в присланном
+    предложении, опись его давно разобрала».
+    """
+    inside, asked = set(), set()
+    if INSIDE.exists():
+        inside = {key(r.get("pn"))
+                  for r in json.loads(INSIDE.read_text(encoding="utf-8")).get("rows", [])}
+    if QUESTIONS.exists():
+        q = json.loads(QUESTIONS.read_text(encoding="utf-8"))
+        asked = {key(r.get("pn")) for r in (q.get("rows") or q.get("questions") or [])
+                 if isinstance(r, dict) and r.get("pn")}
+    return inside, asked
 
 
 def key(x) -> str:
@@ -99,10 +122,21 @@ def main() -> int:
         # по ним уже поставлен. Сколько их — печатается числом, чтобы отсев не
         # был молчаливым.
         keyless = [r for r in rows if not key(r.get("pn")) and expo(r) > 0]
+        inside, asked = closed_elsewhere()
         sel = [r for r in rows
                if key(r.get("pn")) and key(r.get("pn")) not in done and expo(r) > 0
+               and key(r.get("pn")) not in inside and key(r.get("pn")) not in asked
                and str(r.get("man") or "").startswith(a.maker)
                and (not a.sheet or r.get("sheet") == a.sheet)]
+        off = [r for r in rows
+               if key(r.get("pn")) and key(r.get("pn")) not in done and expo(r) > 0
+               and (key(r.get("pn")) in inside or key(r.get("pn")) in asked)]
+        if off:
+            print(f"ОТСЕЯНО КАК ЗАКРЫТОЕ НЕ ПОИСКОМ: {len(off)} строк на "
+                  f"{sum(map(expo, off)):,.0f} USD — по ним цена лежит в присланном нам "
+                  f"предложении либо вопрос заказчику уже поставлен. Искать их в открытом "
+                  f"доступе значит списать труд разведки в ноль.".replace(",", " "),
+                  file=sys.stderr)
         sel.sort(key=expo, reverse=True)
         sel = sel[:a.top or 20]
         if keyless:

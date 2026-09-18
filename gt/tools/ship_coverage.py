@@ -183,7 +183,34 @@ def measure() -> dict:
                     if stock:
                         ladder["отгружаема"][0] += 1
                         ladder["отгружаема"][1] += e
+    # СТРОКИ, КОТОРЫЕ МЫ ВЫДАЛИ В КП И НИ РАЗУ НЕ ПЕРЕПРОВЕРЯЛИ.
+    # Замер появился 18.09.2026 после прямой проверки собственного утверждения
+    # «веб-разведка исчерпана». Утверждение было верно ТОЛЬКО внутри набора
+    # перепроверки: rv_pricehunt отбирает строки условием «строка уже есть в
+    # перепроверке», поэтому строки, до которых перепроверка не дошла, были для
+    # него невидимы структурно. А владелец просил перепроверить ВСЕ строки, что
+    # мы выдали в КП. Мера считается отдельно и вычитает то, что закрывается не
+    # поиском: цену из наших же вложений и вопрос заказчику.
+    never = [r for r in ask if key(r.get("pn")) and key(r.get("pn")) not in rv and expo(r) > 0]
+    asked, inside = asked_keys(), answered_keys()
+    hunt = [r for r in never
+            if key(r.get("pn")) not in asked and key(r.get("pn")) not in inside]
     return {
+        "quoted_never_reverified": {
+            "rows": len(never),
+            "usd": round(sum(map(expo, never)), 2),
+            "of_them_price_in_our_attachments": sum(
+                1 for r in never if key(r.get("pn")) in inside),
+            "of_them_asked_customer": sum(1 for r in never if key(r.get("pn")) in asked),
+            "left_to_search": len(hunt),
+            "usd_left_to_search": round(sum(map(expo, hunt)), 2),
+            "what_it_means": ("Строки с нашей ценой в предложении заказчику, до которых "
+                              "перепроверка не дошла ни разу. Это не «канал без цены» — это "
+                              "вообще неразобранное, и в счёт «канал назван, цены нет» они не "
+                              "попадали никогда. Остаток под поиск считается за вычетом строк, "
+                              "чья цена лежит в наших же вложениях, и строк, по которым "
+                              "вопрос заказчику уже поставлен: те закрываются не разведкой."),
+        },
         "channel_without_price": {
             "rows": gap_rows,
             "usd": round(gap_usd, 2),
@@ -246,6 +273,14 @@ def main() -> None:
     print(f"  {g['of_them_open_to_search']:>4} строк | {g['usd_open_to_search']:>11,.0f} USD | "
           f"НАША работа: цена публикуется, её надо найти — задание печатает "
           f"gt/tools/rv_pricehunt.py".replace(",", " "))
+    n = m["quoted_never_reverified"]
+    print(f"ВЫДАНО В КП, НЕ ПЕРЕПРОВЕРЯЛОСЬ НИ РАЗУ: {n['rows']} строк на "
+          f"{n['usd']:,.0f} USD".replace(",", " "))
+    print(f"  {n['of_them_price_in_our_attachments']:>4} строк — цена лежит в наших же "
+          f"вложениях (открыть файл, а не искать)")
+    print(f"  {n['of_them_asked_customer']:>4} строк — вопрос заказчику уже поставлен")
+    print(f"  {n['left_to_search']:>4} строк | {n['usd_left_to_search']:>11,.0f} USD | остаток "
+          f"под поиск: задание печатает gt/tools/rv_brief.py --top N".replace(",", " "))
     print(f"  из строк БЕЗ нашей оценки опознано {m['rows_without_band_identified']} — "
           f"они не видны ни в одном денежном счёте")
     if a.write:

@@ -949,26 +949,37 @@ def name_from(cd: str) -> str:
     return m.group(1).strip() if m else ""
 
 
-def disk_url(bx: BitrixClient, fid: str) -> str:
-    """Ссылка на файл Диска по его id.
+def disk_url(bx: BitrixClient, fid: str) -> tuple[str, str]:
+    """Ссылка на файл Диска по его id и ПРИЧИНА, если ссылки нет.
 
     Нужна там, где прямой ссылки нет или она без токена: вложения комментариев
     таймлайна и дел. retries=1 намеренно — нехватка прав и «нет такого файла»
     неустранимы, и повторять их шесть раз с растущей паузой значит подвесить
     прогон, как это и случилось в первый раз.
     """
+    seen: list[str] = []
     for method, key in (("disk.file.get", "DOWNLOAD_URL"),
                         ("disk.attachedObject.get", "DOWNLOAD_URL")):
         try:
             r = bx.call(method, {"id": fid}, retries=1) or {}
-        except Exception:
+        except Exception as e:                                   # noqa: BLE001
+            # Причину НЕ глотаем. Прежняя версия писала по всем неудачам одно и
+            # то же — «нет скоупа disk или файла нет», две гипотезы в одной
+            # строке. Зонд 18.09.2026 показал, что обе неверны: право disk
+            # выдано, Диск отвечает, а по нашим файлам приходит ACCESS_DENIED —
+            # то есть у сотрудника, чьим вебхуком мы ходим, нет прав на эти
+            # вложения. Неизмеренная причина стоила названного не тем действия
+            # владельца в отчёте.
+            m = re.search(r":\s*([A-Z_]{3,40})", str(e))
+            seen.append(f"{method.split('.')[1]}: {m.group(1) if m else type(e).__name__}")
             continue
         if isinstance(r, dict):
             u = r.get(key) or (r.get("result") or {}).get(key) if isinstance(
                 r.get("result"), dict) else r.get(key)
             if u:
-                return u
-    return ""
+                return u, ""
+            seen.append(f"{method.split('.')[1]}: ответил без ссылки")
+    return "", "; ".join(seen)
 
 
 def write_index(path: str, scope: str, payload: dict) -> None:
@@ -1021,10 +1032,10 @@ def take(bx: BitrixClient, c: dict):
     if c.get("via") == "ссылка" and c.get("url"):
         return fetch(c["url"])
     if c.get("file_id"):
-        u = disk_url(bx, c["file_id"])
+        u, why = disk_url(bx, c["file_id"])
         if u:
             return fetch(u)
-        return None, "Диск не отдал ссылку (нет скоупа disk или файла нет)", ""
+        return None, f"Диск ссылку не отдал ({why or 'причина не записана'})", ""
     if c.get("url"):
         return fetch(c["url"])
     return None, "ни ссылки, ни id", ""

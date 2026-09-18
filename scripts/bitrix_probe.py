@@ -51,38 +51,62 @@ MAGIC = ((b"%PDF", "pdf"), (b"PK\x03\x04", "zip/xlsx/docx"), (b"\xd0\xcf\x11\xe0
 
 
 #: итог зонда — отдельной чистой функцией, чтобы вывод нельзя было разогнать
-#: с измерением: ровно один разбор случая, и он под тестом
+#: с измерением: ровно один разбор случая, и он под тестом. Прогон 18.09.2026
+#: показал, зачем это нужно: первая редакция считала обходом само НАЛИЧИЕ
+#: http-ссылки в файловом объекте и объявила обход возможным, хотя ссылка
+#: отдала text/html — страницу входа. Наличие ссылки и отдача байтов — разные
+#: измерения, и решает второе.
 VERDICTS = {
     "нет права": (
         "Право disk вебхуку НЕ выдано. Это и есть причина по всем непрочитанным файлам,",
         "а не отсутствие файлов: иначе неудача не была бы поголовной. Действие владельца —",
         "портал → Разработчикам → вебхук → отметить «disk» → сохранить. Мой код менять не",
         "нужно: путь disk.file.get уже написан и на файлах с правом работает."),
+    "доступ закрыт учётной записи": (
+        "Право disk ЕСТЬ, Диск отвечает, но по нашим файлам возвращает «доступ запрещён».",
+        "Значит не хватает не права вебхука, а прав его СОТРУДНИКА на эти файлы: вложения",
+        "писем лежат на личном диске того, кто письмо получил, и посторонний их не видит.",
+        "Учётка вебхука при этом не администратор. Действие владельца — либо сделать эту",
+        "учётку администратором, либо выдать ей доступ к диску сотрудников, чьи письма",
+        "разбираются. Правка кода не поможет: отказ приходит от прав, а не от метода."),
     "право есть, путь мой": (
         "Право есть и ссылку Диск отдаёт. Значит виноват не доступ, а мой путь до байтов,",
         "и правка за мной: раздел 3 показывает, каким методом и по какому идентификатору",
         "файл берётся."),
     "обход без диска": (
-        "Диск недоступен, но у файлового объекта есть http-ссылка — раздел 4 говорит,",
-        "отдаёт она файл или страницу входа. Если файл, обход Диска возможен без прав."),
+        "Диск байтов не даёт, зато ссылка из файлового объекта отдала НЕ страницу, а файл.",
+        "Обход Диска возможен без новых прав — качать по этой ссылке."),
+    "ссылка ведёт на страницу входа": (
+        "Ссылка в файловом объекте есть, но отдаёт text/html — страницу входа, а не файл.",
+        "Обхода нет: серверный клиент сессии не имеет. Остаётся доступ к Диску."),
     "тупик": (
-        "Ни Диск, ни ссылки в объекте байтов не дают. Дальше — только право disk.",),
+        "Ни Диск, ни ссылки в объекте байтов не дают. Дальше — только доступ к Диску.",),
     "не измерено": (
         "Права не прочитались, и ссылку никто не отдал: зонд ничего не измерил.",
         "Это отказ измерения, а не ответ — перезапустить."),
 }
 
 
-def verdict(rights: list[str], gave_url: int, url_keys: int) -> str:
-    """Какой из пяти случаев мы наблюдали. Порядок разбора — от дешёвого действия."""
-    if rights and "disk" not in rights:
+def verdict(rights: list[str], gave_url: int, url_keys: int, *,
+            denied: int = 0, url_file: int = 0) -> str:
+    """Какой из случаев мы наблюдали. Порядок разбора — от дешёвого действия.
+
+    denied   — сколько наших файлов Диск закрыл отказом доступа;
+    url_keys — сколько http-ссылок нашлось в файловых объектах;
+    url_file — по скольким из них пришли байты ФАЙЛА, а не страница.
+    """
+    if not rights:
+        return "не измерено"
+    if "disk" not in rights:
         return "нет права"
     if gave_url:
         return "право есть, путь мой"
-    if url_keys:
+    if url_file:
         return "обход без диска"
-    if not rights:
-        return "не измерено"
+    if denied:
+        return "доступ закрыт учётной записи"
+    if url_keys:
+        return "ссылка ведёт на страницу входа"
     return "тупик"
 
 
@@ -124,12 +148,12 @@ def shape(o: dict) -> tuple:
     return tuple(sorted(str(k) for k in o.keys()))
 
 
-def sniff(url: str) -> str:
+def sniff(url: str) -> tuple[str, bool]:
     """Что лежит по ссылке: файл или страница входа. Печатается только вид и объём."""
     try:
         r = requests.get(url, timeout=25, stream=True)
     except Exception as e:                                   # noqa: BLE001 — зонд
-        return f"сеть: {type(e).__name__}"
+        return f"сеть: {type(e).__name__}", False
     try:
         chunk = next(r.iter_content(4096), b"") or b""
     except Exception:                                        # noqa: BLE001 — зонд
@@ -138,7 +162,10 @@ def sniff(url: str) -> str:
     kind = next((n for sig, n in MAGIC if chunk.startswith(sig)), "неопознанное начало")
     ct = str(r.headers.get("content-type") or "")[:40]
     size = str(r.headers.get("content-length") or "?")
-    return f"HTTP {r.status_code} · {ct} · {size} б · начало: {kind}"
+    # файлом считаем только опознанный бинарный формат: html и json — это ответ
+    # портала о том, что нас не пустили, а не вложение
+    is_file = kind not in ("html", "json", "неопознанное начало")
+    return f"HTTP {r.status_code} · {ct} · {size} б · начало: {kind}", is_file
 
 
 def main() -> int:
@@ -177,13 +204,17 @@ def main() -> int:
     pick = rows[::step][:SAMPLE]
     per_method: dict[str, Counter] = {}
     gave_url = 0
+    denied = 0
     for it in pick:
         fid = str(it["file_id"])
         for m in ("disk.file.get", "disk.attachedObject.get"):
             res, err = safe(c, m, {"id": fid})
             cnt = per_method.setdefault(m, Counter())
             if err:
-                cnt[code_of(err)] += 1
+                c_err = code_of(err)
+                cnt[c_err] += 1
+                if c_err == "ACCESS_DENIED":
+                    denied += 1
             elif isinstance(res, dict) and res.get("DOWNLOAD_URL"):
                 cnt["отдал ссылку"] += 1
                 gave_url += 1
@@ -208,6 +239,7 @@ def main() -> int:
     shapes: Counter = Counter()
     url_keys: Counter = Counter()
     probed = 0
+    url_file = 0
     for aid in acts:
         res, err = safe(c, "crm.activity.get", {"id": aid})
         if err or not isinstance(res, dict):
@@ -229,14 +261,17 @@ def main() -> int:
                     url_keys[k] += 1
                     if probed < 3:                    # по одной пробе на ключ, не больше трёх
                         probed += 1
-                        print(f"  проба ключа {k}: {sniff(v)}")
+                        told, ok = sniff(v)
+                        url_file += int(ok)
+                        print(f"  проба ключа {k}: {told}")
     print("формы файлового объекта (имена ключей, значения не печатаются):")
     for k, n in shapes.most_common(8):
         print(f"      {n:3d} × {k}")
     print("ключи с http-ссылкой:", dict(url_keys) or "ни одного")
 
     head("5. ИТОГ")
-    case = verdict(rights, gave_url, sum(url_keys.values()))
+    print(f"отказов доступа по нашим файлам: {denied} · ссылок отдало файл: {url_file}")
+    case = verdict(rights, gave_url, sum(url_keys.values()), denied=denied, url_file=url_file)
     print(f"случай: {case}")
     for line in VERDICTS[case]:
         print(line)
