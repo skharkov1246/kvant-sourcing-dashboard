@@ -174,3 +174,22 @@ def test_нечитаемый_файл_роняет_код_возврата_а_�
     assert r["bad_files"], "нечитаемый файл обязан попасть в отдельный набор"
     assert not r["left"], "он не должен маскироваться под отказ по строке"
     assert r["bad_files"][0][0] == "broken.json"
+
+
+def test_обновление_переносит_покрытие_количества(tmp_path, monkeypatch):
+    """covers_qty решает, входит ли строка в сумму закупки, — и должен доехать.
+
+    До 18.09.2026 поля не было в TRADE, и режим --update его терял: шесть
+    проходов по спорному остатку определили покрытие по пятидесяти строкам, а в
+    набор оно не попало. Правило владельца прямое: если covers_qty не full,
+    строка в сумму закупки не идёт, — значит потеря поля тихо завышает закупку.
+    """
+    import rv_merge as rm
+    assert "covers_qty" in rm.TRADE
+    old = {"pn": "ZZ-4242", "band_verdict": "ВЕРНА", "note": "было",
+           "covers_qty": "3 шт из 13", "stock": "3 шт"}
+    new = {"pn": "ZZ-4242", "band_verdict": "ВЕРНА", "note": "стало",
+           "covers_qty": "full", "stock": "20 шт"}
+    rm.apply_update(old, new)
+    assert old["covers_qty"] == "full"
+    assert old["stock"] == "20 шт"

@@ -102,9 +102,14 @@ def key(x) -> str:
 # Поля, которые добор цены ПЕРЕПИСЫВАЕТ: всё торговое. Опознания здесь нет
 # намеренно — что это за изделие и кто изготовитель, установил первый проход, и
 # второй, искавший одну цифру, права затирать это не имеет.
+# covers_qty ДОБАВЛЕНО 18.09.2026: без него режим --update терял ровно то поле,
+# по которому строка входит или не входит в сумму закупки. Правило владельца из
+# разбора выкладки по ЛУКОЙЛу: «Не умножай цену одного лота на всё количество;
+# если covers_qty не full — строка в сумму не идёт». Шесть проходов по спорному
+# остатку определили покрытие по пятидесяти строкам, и оно уходило в ноль.
 TRADE = ("price_low", "price_high", "price_note", "price_source", "price_kind",
-         "price_authorized", "stock", "lead_time", "volume_note", "recommended",
-         "blocker", "band_verdict", "channel", "contacts")
+         "price_authorized", "stock", "covers_qty", "lead_time", "volume_note",
+         "recommended", "blocker", "band_verdict", "channel", "contacts")
 # Поля опознания: заполняются, только если у прежней строки они пусты.
 IDENT = ("what_it_is", "real_maker", "real_pn", "lifecycle", "maker_short")
 
