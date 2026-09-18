@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 251,
-    "total_bytes": 112471333,
+    "datasets": 252,
+    "total_bytes": 112531080,
     "by_sensitivity": {
       "конфиденциально": 65,
-      "внутреннее": 137,
+      "внутреннее": 138,
       "публикуемо": 49
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 74,
+      "ГТУ-библиотека": 75,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -4729,7 +4729,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 106970,
+      "bytes": 108015,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4765,6 +4765,7 @@
         "gt/data/ship_energoseti.json",
         "gt/data/ship_english_source.json",
         "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_priced.json",
         "gt/data/ship_inside_quotes.json",
         "gt/data/ship_jenbacher_prices.json",
         "gt/data/ship_leak.json",
@@ -4772,12 +4773,11 @@
         "gt/data/ship_lukoil.json",
         "gt/data/ship_maker_basis.json",
         "gt/data/ship_margin.json",
-        "gt/data/ship_offer_stats.json",
-        "gt/data/ship_overpriced.json"
+        "gt/data/ship_offer_stats.json"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "23a2cc7",
+      "last_commit": "35b2b65",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6150,6 +6150,45 @@
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py",
         "tests/test_dataset_has_reader.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_inside_priced.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 58238,
+      "note": "Номера заявки ЛУКОЙЛ, по которым цену закупки назвал сам контрагент в приложенном к сделке предложении: единица × количество = итог в той же строке. Хранит ФАКТ и ПРОИСХОЖДЕНИЕ без чисел — номер, файл, сделку, направление и опознана ли валюта. Самих цен здесь нет: это коммерческие данные контрагента, они остаются в выгрузке вне репозитория. Нужен лестнице покрытия (gt/tools/ship_coverage.py): без него 195 позиций с подтверждённой ценой в неё не попадали, и ступень «есть цена и адрес» показывала 43,7 % денег вместо 67,9 %. Пишет gt/tools/tkp_tables.py --keys-out; руками не заполнять.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "parts",
+        "source",
+        "updated",
+        "what_it_gives"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 195,
+        "record_keys": [
+          "currency_known",
+          "direction",
+          "file",
+          "key",
+          "origin",
+          "pn",
+          "rule"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "35b2b65",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_coverage.py",
+        "tests/test_ship_coverage.py"
       ]
     },
     {
@@ -10071,6 +10110,47 @@
       ]
     },
     {
+      "path": "gt/data/ship_coverage.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 5001,
+      "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "caveat",
+        "channel_without_price",
+        "ladder",
+        "price_from_offer",
+        "quoted_never_reverified",
+        "rows_total",
+        "rows_without_band",
+        "rows_without_band_identified",
+        "source",
+        "steps",
+        "updated",
+        "usd_total",
+        "why_steps"
+      ],
+      "main_collection": {
+        "key": "channel_without_price",
+        "records": 11
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "35b2b65",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_coverage.py",
+        "gt/tools/ship_final.py",
+        "tests/test_report_numbers.py",
+        "tests/test_ship_coverage.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_maker_basis.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 4733,
@@ -10191,46 +10271,6 @@
         "gt/tools/source_control.py",
         "tests/test_dataset_has_reader.py",
         "tests/test_source_control.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_coverage.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 4537,
-      "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "caveat",
-        "channel_without_price",
-        "ladder",
-        "quoted_never_reverified",
-        "rows_total",
-        "rows_without_band",
-        "rows_without_band_identified",
-        "source",
-        "steps",
-        "updated",
-        "usd_total",
-        "why_steps"
-      ],
-      "main_collection": {
-        "key": "channel_without_price",
-        "records": 11
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "8b43d94",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_coverage.py",
-        "gt/tools/ship_final.py",
-        "tests/test_report_numbers.py",
-        "tests/test_ship_coverage.py"
       ]
     },
     {
