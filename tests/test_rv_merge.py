@@ -113,3 +113,40 @@ def test_пустой_список_скептиков_заполняется_ч�
 def test_пол_выше_потолка_отсекается(tmp_path, monkeypatch):
     r = merge(tmp_path, monkeypatch, [dict(good(), price_low=99.0, price_high=1.0)])
     assert not r["took"] and "пол выше" in r["left"][0][2]
+
+
+def test_наш_собственный_репозиторий_ценой_не_является(tmp_path, monkeypatch):
+    """Круговой источник: подтверждение самим собой.
+
+    Репозиторий публичный, и наши перепроверки проиндексированы: 18.09.2026
+    поиск по «15508.2 реле Siemens» первой строкой возвращал наш собственный
+    PR #305. Следующий проход принял бы вывод прошлого прохода за независимое
+    подтверждение, и ошибка стала бы неопровержимой.
+    """
+    bad = dict(good(), band_verdict="ВЕРНА — цена совпала",
+               price_source="взято из github.com/skharkov1246/kvant-sourcing-dashboard")
+    r = merge(tmp_path, monkeypatch, [bad])
+    assert not r["took"]
+    assert "круговой" in r["left"][0][2]
+
+
+def test_выдача_поисковой_машины_ценой_не_является(tmp_path, monkeypatch):
+    """Сводка поиска выдумала цену «7 709 руб., 18 шт» по номеру, которого у
+    названного магазина нет вовсе: его собственный интерфейс вернул ноль при
+    рабочем положительном контроле по соседнему номеру."""
+    bad = dict(good(), band_verdict="ЗАНИЖЕНА — нашлась цена дороже",
+               price_source="https://www.google.com/search?q=3420932 — цена 7709 руб")
+    r = merge(tmp_path, monkeypatch, [bad])
+    assert not r["took"]
+    assert "поисковой машины" in r["left"][0][2]
+
+
+def test_англицизм_чистится_на_входе(tmp_path, monkeypatch):
+    """Замена стоит на входе, а не разовой правкой набора: слово возвращается
+    с каждой новой пачкой разведки."""
+    row = dict(good(), note="Взято из заводского прайс-листа, цитата: «price list 2026»")
+    r = merge(tmp_path, monkeypatch, [row])
+    assert r["took"], r["left"]
+    got = r["took"][0]["note"]
+    assert "прейскуранта" in got
+    assert "«price list 2026»" in got
