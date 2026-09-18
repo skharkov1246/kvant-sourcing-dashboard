@@ -26,6 +26,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from verdicts import PRICED, vkey  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[2]
 GROUPS = ROOT / "gt/data/ship_seller_groups.json"
 REVERIFY = ROOT / "gt/data/ship_reverify.json"
@@ -34,7 +37,12 @@ SUMMARY = ROOT / "gt/data/ship_lukoil.json"
 # Домен в прозе: пишем ссылки без схемы, поэтому ищем именно «имя.зона».
 DOMAIN = re.compile(r"\b((?:[a-z0-9][a-z0-9-]*\.)+(?:com|net|org|ru|de|cz|pl|in|cn|eu|at|io|uk|store|parts))\b",
                     re.I)
-FIELDS = ("price_source", "channel", "contacts", "stock", "note")
+# Поля, в которых ищется оговорка. skeptics добавлены 18.09.2026: по строке
+# 120554 оговорка стояла и в channel, и отдельным возражением («а два домена
+# Modern — не два свидетеля?»), а мера объявила строку неоговорённой, потому
+# что до возражений не доходила. Обвинение своей же честной строки стоит
+# дороже пропуска: в следующий раз оговорку писать перестанут.
+FIELDS = ("price_source", "channel", "contacts", "stock", "note", "skeptics")
 
 
 def key(pn) -> str:
@@ -86,13 +94,27 @@ MARKED = re.compile(
     r"|обе\s+компании\s+группы|той\s+же\s+групп|одной\s+платформе|под\s+пятью\s+вывесками"
     r"|под\s+четырьмя\s+вывесками|независимым\s+источником\s+не|нельзя\s+складывать"
     r"|одно\s+лицо|один\s+оператор|одного\s+владельца|тот\s+же\s+владелец"
-    r"|она\s+же\s+одно\s+лицо|вывесками",
+    r"|она\s+же\s+одно\s+лицо|вывесками"
+    # именительный падеж: «тот же оператор, что …», «это один свидетель, а не два»
+    r"|тот\s+же\s+оператор|та\s+же\s+компания|один\s+свидетель|не\s+два\s+свидетел"
+    r"|не\s+двумя\s+свидетел|одним\s+свидетел|вторым\s+свидетелем\s+считаться\s+не",
     re.I)
 
 
 def marked(row: dict) -> bool:
-    """Сказано ли в самой строке, что это один оператор."""
-    return bool(MARKED.search(" ".join(str(row.get(f) or "") for f in FIELDS)))
+    """Сказано ли в самой строке, что это один оператор.
+
+    skeptics — список словарей, поэтому склеиваем его целиком: оговорка часто
+    живёт именно возражением к своему же выводу, а не в поле канала.
+    """
+    parts = []
+    for f in FIELDS:
+        v = row.get(f)
+        if isinstance(v, (list, tuple)):
+            parts += [str(x) for x in v]
+        else:
+            parts.append(str(v or ""))
+    return bool(MARKED.search(" ".join(parts)))
 
 
 def expo(r: dict) -> float:
@@ -125,6 +147,12 @@ def measure() -> dict:
         usd += e
         item = {"pn": r.get("pn"), "usd": round(e, 2),
                 "verdict": (r.get("band_verdict") or "").split("(")[0].strip(),
+                # Вердикт по цене — единственный случай, когда «два продавца»
+                # что-то держат. Если цены нет, строка и не утверждает, что
+                # подтверждена, поэтому неоговорённые домены там — небрежность
+                # записи, а не искажение вывода. Счёт ведём отдельно, чтобы
+                # «работа» не раздувалась строками, где работать не над чем.
+                "verdict_rests_on_price": vkey(r) in PRICED,
                 "groups": many, "marked": marked(r)}
         hits.append(item)
         if not item["marked"]:
@@ -141,6 +169,13 @@ def measure() -> dict:
         "rows_marked_as_one_operator": len(hits) - len(unmarked),
         "rows_not_marked": len(unmarked),
         "usd_not_marked": round(unmarked_usd, 2),
+        "rows_not_marked_with_price": sum(1 for x in unmarked if x["verdict_rests_on_price"]),
+        "usd_not_marked_with_price": round(
+            sum(x["usd"] for x in unmarked if x["verdict_rests_on_price"]), 2),
+        "what_not_marked_means": ("Строка называет две витрины одной группы и не говорит, что "
+                                  "это один оператор. Искажает вывод только там, где вердикт "
+                                  "вынесен ПО ЦЕНЕ: без цены строка и не утверждает, что "
+                                  "подтверждена двумя источниками. Поэтому счёт двойной."),
         "rows": hits,
         "not_marked": unmarked,
     }

@@ -618,10 +618,25 @@ def price_rows(rows: list, hdr: dict) -> list[dict]:
                 price = nums[-1]
                 rule = "последнее число строки (заголовок не опознан)"
         if pn and price:
+            # ГРАДУС ЦЕНЫ. Замер 18.09.2026 по выгрузке «Энергосети»: из 6 619
+            # значений только 317 взяты из колонки «цена» по заголовку, а 6 302 —
+            # правилом «последнее число строки». И это правило берёт не цену: в
+            # Quotation p76057.pdf оно вытащило НОМЕРА ПОЗИЦИЙ (94, 101, 104,
+            # 105, 107 — подряд, 187 пар из 474 идут с шагом ровно 1), а в
+            # файлах-заявках — количество. Счётчики по вилкам, построенные на
+            # этом, дали 222 «заниженные» строки вместо 31.
+            #
+            # Значение НЕ выбрасывается: иногда оно и есть цена, а решает
+            # открытый файл. Но ценой оно не называется, и всякий, кто считает
+            # деньги, обязан взять только градус «цена по колонке».
+            graded = rule.startswith("колонка")
             out.append({
                 "pn": pn, "price": price, "sheet": sheet, "row": i,
                 "currency": (CUR_RE.search(joined) or [""])[0] if CUR_RE.search(joined) else "",
                 "raw": joined[:400], "class_rule": rule,
+                "is_price": graded,
+                "price_grade": ("цена по колонке" if graded
+                                else "догадка: последнее число строки, ценой не является"),
             })
     return out
 
@@ -949,26 +964,37 @@ def name_from(cd: str) -> str:
     return m.group(1).strip() if m else ""
 
 
-def disk_url(bx: BitrixClient, fid: str) -> str:
-    """Ссылка на файл Диска по его id.
+def disk_url(bx: BitrixClient, fid: str) -> tuple[str, str]:
+    """Ссылка на файл Диска по его id и ПРИЧИНА, если ссылки нет.
 
     Нужна там, где прямой ссылки нет или она без токена: вложения комментариев
     таймлайна и дел. retries=1 намеренно — нехватка прав и «нет такого файла»
     неустранимы, и повторять их шесть раз с растущей паузой значит подвесить
     прогон, как это и случилось в первый раз.
     """
+    seen: list[str] = []
     for method, key in (("disk.file.get", "DOWNLOAD_URL"),
                         ("disk.attachedObject.get", "DOWNLOAD_URL")):
         try:
             r = bx.call(method, {"id": fid}, retries=1) or {}
-        except Exception:
+        except Exception as e:                                   # noqa: BLE001
+            # Причину НЕ глотаем. Прежняя версия писала по всем неудачам одно и
+            # то же — «нет скоупа disk или файла нет», две гипотезы в одной
+            # строке. Зонд 18.09.2026 показал, что обе неверны: право disk
+            # выдано, Диск отвечает, а по нашим файлам приходит ACCESS_DENIED —
+            # то есть у сотрудника, чьим вебхуком мы ходим, нет прав на эти
+            # вложения. Неизмеренная причина стоила названного не тем действия
+            # владельца в отчёте.
+            m = re.search(r":\s*([A-Z_]{3,40})", str(e))
+            seen.append(f"{method.split('.')[1]}: {m.group(1) if m else type(e).__name__}")
             continue
         if isinstance(r, dict):
             u = r.get(key) or (r.get("result") or {}).get(key) if isinstance(
                 r.get("result"), dict) else r.get(key)
             if u:
-                return u
-    return ""
+                return u, ""
+            seen.append(f"{method.split('.')[1]}: ответил без ссылки")
+    return "", "; ".join(seen)
 
 
 def write_index(path: str, scope: str, payload: dict) -> None:
@@ -1021,10 +1047,10 @@ def take(bx: BitrixClient, c: dict):
     if c.get("via") == "ссылка" and c.get("url"):
         return fetch(c["url"])
     if c.get("file_id"):
-        u = disk_url(bx, c["file_id"])
+        u, why = disk_url(bx, c["file_id"])
         if u:
             return fetch(u)
-        return None, "Диск не отдал ссылку (нет скоупа disk или файла нет)", ""
+        return None, f"Диск ссылку не отдал ({why or 'причина не записана'})", ""
     if c.get("url"):
         return fetch(c["url"])
     return None, "ни ссылки, ни id", ""
@@ -1180,7 +1206,8 @@ def main() -> int:
         rec["download"] = how
         rec["size"] = len(body) if body else 0
         if not body:
-            index.append(dict(rec, rows=0, priced=0, parse_path="", status="не скачан"))
+            index.append(dict(rec, rows=0, priced=0, price_guesses=0, parse_path="",
+                              status="не скачан"))
             if n % 10 == 0 or n == len(todo):
                 say(f"  [{n}/{min(len(todo), a.max_files)}] скачано {n_dl}, "
                     f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
@@ -1219,7 +1246,9 @@ def main() -> int:
             status = "не разобрался"
         full.append(dict(rec, parse_path=how_parsed, header=hdr, status=status, prices=pr))
         index.append(dict(rec, parse_path=how_parsed, status=status, rows=len(rows),
-                          priced=len(pr), pns=sorted({p["pn"] for p in pr})[:400]))
+                          priced=sum(1 for p in pr if p.get("is_price")),
+                          price_guesses=sum(1 for p in pr if not p.get("is_price")),
+                          pns=sorted({p["pn"] for p in pr})[:400]))
         if n % 10 == 0 or n == min(len(todo), a.max_files):
             say(f"  [{n}/{min(len(todo), a.max_files)}] скачано {n_dl}, "
                 f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
@@ -1241,7 +1270,9 @@ def main() -> int:
                "download": "не требуется", "size": len(b["text"])}
         full.append(dict(rec, parse_path="текст", header=hdr, status="разобран", prices=pr))
         index.append(dict(rec, parse_path="текст", status="разобран", rows=len(rows),
-                          priced=len(pr), pns=sorted({x["pn"] for x in pr})[:400]))
+                          priced=sum(1 for x in pr if x.get("is_price")),
+                          price_guesses=sum(1 for x in pr if not x.get("is_price")),
+                          pns=sorted({x["pn"] for x in pr})[:400]))
         n_price += len(pr)
     if bodies:
         say(f"тел писем просмотрено: {len(bodies)}, с ценами: {n_mail}")

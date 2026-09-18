@@ -38,9 +38,40 @@ REVERIFY = ROOT / "gt/data/ship_reverify.json"
 OUT = ROOT / "gt/data/ship_inside_quotes.json"
 
 # Направления, где может стоять цена поставщика. «Наш запрос» исключён: там
-# наши ориентиры, а не предложение. «Заявка» включена по замеру 17.09.2026 —
-# ответ заказчику возвращают в том же шаблоне, и цены оказываются там.
-PRICED_DIRECTIONS = ("входящее", "заявка", "неизвестно")
+# наши ориентиры, а не предложение.
+#
+# «ЗАЯВКА» ТЕПЕРЬ ВКЛЮЧЕНА УСЛОВНО, и это исправление от 18.09.2026. Прежде она
+# включалась безусловно, по замеру 17.09: поставщик возвращает заполненным тот
+# же шаблон, и цены оказываются в файле, помеченном как заявка. Явление
+# настоящее, но обосновывающий замер стоял на нестрогом счёте цен, а он брал
+# номера позиций и количество. Итог: крупнейший файл списка — «Перечень
+# запчастей SGT-400 — для запроса ТКП.xlsx», направление «заявка», поле
+# «Техническая спецификация», priced 382 из одних догадок, — держал в документе
+# 2 000 588 USD, хотя это наш собственный перечень к запросу, а не предложение.
+#
+# Правило: файл-заявка попадает в список ТОЛЬКО если в нём есть строгая цена
+# (колонка «цена» по заголовку) — то есть шаблон действительно заполнен
+# продавцом. Для «входящего» и «неизвестного» строгость не требуется: входящее
+# предложение остаётся предложением, даже если наш разбор не опознал колонку.
+OFFER_DIRECTIONS = ("входящее", "неизвестно")
+TEMPLATE_DIRECTION = "заявка"
+PRICED_DIRECTIONS = (*OFFER_DIRECTIONS, TEMPLATE_DIRECTION)
+
+
+def file_may_hold_price(f: dict) -> bool:
+    """Может ли в этом файле стоять цена поставщика."""
+    d = f.get("direction")
+    if d in OFFER_DIRECTIONS:
+        return (f.get("priced") or 0) > 0 or (f.get("price_guesses") or 0) > 0
+    if d == TEMPLATE_DIRECTION:
+        # Строгость требуется, а значит требуется и ЗНАНИЕ о строгости. У
+        # записей описи, снятых до 18.09.2026, поля price_guesses нет вовсе —
+        # их priced посчитан прежним, нестрогим правилом, и отличить в нём цену
+        # от номера позиции нельзя. Такая запись в список не идёт: значение без
+        # названного происхождения ценой не считается. Признак исчезнет сам,
+        # когда прогон «Bitrix входящие КП» пересоберёт опись.
+        return "price_guesses" in f and (f.get("priced") or 0) > 0
+    return False
 MIN_LEN = 6
 
 
@@ -146,9 +177,20 @@ def measure() -> dict:
     rv = {key(r.get("pn")): r
           for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
 
+    # ОТБОР ФАЙЛА. Условие «priced > 0» означает «в файле есть хотя бы одно
+    # значение, опознанное как цена». С 18.09.2026 opис считает priced СТРОГО —
+    # только цены из колонки «цена» по заголовку, — а прежде в него шли и
+    # догадки правила «последнее число строки», которое брало номера позиций и
+    # количество. Поэтому здесь берётся файл, где есть либо строгая цена, либо
+    # догадка: адресная часть документа от этого не зависит (номер заявки НАЙДЕН
+    # в присланном файле — это отдельное утверждение), но читатель обязан видеть
+    # разницу, и она печатается по каждому файлу отдельными числами.
     files = [i for s in idx["scopes"].values() for i in (s.get("inventory") or [])
-             if i.get("pns") and (i.get("priced") or 0) > 0
-             and i.get("direction") in PRICED_DIRECTIONS]
+             if i.get("pns") and file_may_hold_price(i)]
+    dropped = [i for s in idx["scopes"].values() for i in (s.get("inventory") or [])
+               if i.get("pns") and not file_may_hold_price(i)
+               and i.get("direction") == TEMPLATE_DIRECTION]
+    stale = [i for i in dropped if "price_guesses" not in i and (i.get("priced") or 0) > 0]
 
     where: dict[str, list] = {}
     for f in files:
@@ -179,8 +221,10 @@ def measure() -> dict:
             "we_already_have_price": has_price,
             "found_in": [{"deal": f.get("origin"), "file": f.get("file_name"),
                           "rows": f.get("rows"), "rows_with_price": f.get("priced"),
+                          "rows_with_price_guess": f.get("price_guesses"),
                           "direction": f.get("direction")}
-                         for f in sorted(got, key=lambda f: -(f.get("priced") or 0))[:4]],
+                         for f in sorted(got, key=lambda f: -((f.get("priced") or 0)
+                                                              + (f.get("price_guesses") or 0)))[:4]],
         }
         hits.append(item)
         if not has_price:
@@ -199,6 +243,25 @@ def measure() -> dict:
                           "строк и сколько с ценой. Самих цен здесь нет и не будет — "
                           "репозиторий публичный."),
         "quote_files_scanned": len(files),
+        "template_files_excluded": {
+            "count": len(dropped),
+            "of_them_counted_by_old_loose_rule": len(stale),
+            "names": [str(i.get("file_name"))[:80] for i in
+                      sorted(dropped, key=lambda z: -(z.get("priced") or 0))[:10]],
+            "why": ("Файл с направлением «заявка» — это спецификация или перечень к запросу, "
+                    "и цены поставщика в нём быть не может. Прежде такие файлы включались "
+                    "безусловно (замер 17.09.2026: поставщик иногда возвращает заполненным "
+                    "тот же шаблон), но обосновывающий замер стоял на нестрогом счёте цен, а "
+                    "он брал номера позиций и количество. Крупнейший такой файл — «Перечень "
+                    "запчастей SGT-400 — для запроса ТКП.xlsx», priced 382 из одних догадок, "
+                    "— держал в документе 2 000 588 USD. Теперь файл-заявка попадает в "
+                    "список только с ЦЕНОЙ ПО КОЛОНКЕ, то есть действительно заполненным "
+                    "продавцом."),
+            "will_self_correct": ("Записи описи, снятые до разделения цен по градусу, поля "
+                                  "price_guesses не несут, и строгость их priced неизвестна — "
+                                  "такие в список не идут. Признак исчезнет сам, когда прогон "
+                                  "«Bitrix входящие КП» пересоберёт опись."),
+        },
         "rows_of_request_found": len(hits),
         "usd_found": round(sum(h["usd_exposure"] for h in hits), 2),
         "rows_without_our_price": len(hits_nopric),

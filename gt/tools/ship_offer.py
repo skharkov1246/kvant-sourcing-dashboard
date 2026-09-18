@@ -84,6 +84,18 @@ DIR_SUPPLIER = {"входящее"}       # КП поставщика, Offer fro
 DIR_SKIP = {"наш запрос", "заявка"}   # наши исходящие и требования заказчика
 
 
+def price_graded(p: dict) -> bool:
+    """Значение взято из колонки «цена», а не догадкой «последнее число строки».
+
+    Поле is_price ставит gt/tools/bitrix_tkp.py. Для выгрузок, снятых до
+    18.09.2026, поля нет — тогда смотрим на правило прямо, иначе старая
+    выгрузка молча вернула бы прежние завышенные счётчики.
+    """
+    if "is_price" in p:
+        return bool(p["is_price"])
+    return str(p.get("class_rule") or "").startswith("колонка")
+
+
 def prices_by_direction(tkp_path: Path, rates: dict) -> tuple[dict, dict, dict]:
     """Три словаря «артикул → цена»: наша выставленная, КП поставщика, неопознанное.
 
@@ -106,6 +118,15 @@ def prices_by_direction(tkp_path: Path, rates: dict) -> tuple[dict, dict, dict]:
             continue
         bucket = ours if d in DIR_OURS else supp if d in DIR_SUPPLIER else unk
         for p in f.get("prices", []):
+            # ЦЕНОЙ СЧИТАЕТСЯ ТОЛЬКО ЗНАЧЕНИЕ ИЗ КОЛОНКИ «ЦЕНА».
+            # Замер 18.09.2026: из 6 619 значений выгрузки «Энергосети» по
+            # колонке взято 317, остальные — правилом «последнее число строки».
+            # Это правило брало номера позиций (в Quotation p76057.pdf: 94, 101,
+            # 104, 105, 107 подряд) и количество из файлов-заявок. Счётчики по
+            # вилкам на этом основании насчитали 222 заниженные строки вместо
+            # 31 — то есть сообщали о деньгах там, где читали нумерацию.
+            if not price_graded(p):
+                continue
             usd = to_usd(p.get("price"), p.get("currency"), rates)
             if usd is None:
                 continue
@@ -663,6 +684,28 @@ def diagnose(rows: list, ours: dict, supp: dict | None = None,
           + ", ".join(sorted(want)[:12]))
 
 
+def guess_stats(tkp_path: Path) -> dict:
+    """Сколько значений отброшено как догадка — числом, а не молча.
+
+    Молчаливый отсев здесь опаснее всего: он превращает «мы этого не измерили»
+    в «этого нет», а именно на догадках стоял прежний счёт.
+    """
+    doc = json.loads(tkp_path.read_text())
+    graded = guesses = 0
+    for f in doc.get("files", []):
+        for p in f.get("prices", []):
+            if price_graded(p):
+                graded += 1
+            else:
+                guesses += 1
+    return {"values_total": graded + guesses, "prices_by_column": graded,
+            "guesses_last_number_in_row": guesses,
+            "what_it_means": ("Ценой считается только значение из колонки «цена» по "
+                              "заголовку. Догадка «последнее число строки» не отброшена из "
+                              "выгрузки, но в счёт денег не идёт: она брала номера позиций и "
+                              "количество.")}
+
+
 def band_stats(rows: list, supp: dict) -> dict:
     """Счётчики «что КП поставщиков делают с нашими вилками». БЕЗ цен и номеров.
 
@@ -749,6 +792,10 @@ def main() -> int:
     if a.stats_out:
         st = band_stats(rows, supp)
         st["reverified"] = reverify_stats(rows, supp)
+        # Отсев догадок печатается числом рядом со счётчиками: иначе падение
+        # «222 заниженные строки» до тридцати одной выглядит потерей данных, а
+        # не исправлением измерения.
+        st["price_grades"] = guess_stats(tkp)
         # Счётчики живут ПО ОХВАТАМ, как и опись. Один файл на прогон уже трижды
         # уносил чужую работу: прогон по «НВН» перезаписывал цифры по
         # «Энергосети», хотя это разные заявки и складывать их нельзя.
