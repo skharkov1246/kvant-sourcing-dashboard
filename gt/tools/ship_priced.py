@@ -115,9 +115,13 @@ li { margin-bottom: 1.4mm; line-height: 1.38; }
 .warn { border-left: 2.4pt solid #111; padding-left: 3mm; margin-bottom: 3mm; }
 """
 
+# Обрезки в колонках нет: правила репозитория про выгрузки её запрещают, а
+# таблица здесь и так течёт по страницам. Поле остатка приходит и числом, и
+# строкой («12 pcs»), поэтому приводится к строке явно — срез по int роняет
+# сборку целиком, и она падала именно так.
 COLS = [
     ("Артикул", 9, lambda r: f'<span class="pn">{E(r["pn"])}</span>'),
-    ("Наименование", 18, lambda r: E((r.get("name") or "")[:130])),
+    ("Наименование", 18, lambda r: E(r.get("name") or "")),
     ("Кол-во", 4, lambda r: f'{ru(r.get("qty"))}'),
     ("Разведка, USD/шт", 7,
      lambda r: f'{ru(r.get("usd_lo"))} – {ru(r.get("usd_hi"))}'),
@@ -129,8 +133,8 @@ COLS = [
     ("Ошибка разведки, USD", 6,
      lambda r: (f'<span class="up">{ru(shortfall(r))}</span>' if shortfall(r) else "")),
     ("Наличие", 5, lambda r: E(GRADE_RU.get(r.get("stock_grade", "нет"), ""))),
-    ("Остаток", 6, lambda r: E((r.get("stock_qty") or "")[:60])),
-    ("Продавец", 13, lambda r: E(((r.get("sellers") or [{}])[0].get("seller") or "")[:60])),
+    ("Остаток", 6, lambda r: E(str(r.get("stock_qty") or ""))),
+    ("Продавец", 13, lambda r: E((r.get("sellers") or [{}])[0].get("seller") or "")),
 ]
 
 
