@@ -164,7 +164,8 @@ def index(files_by_host: dict[str, list[Path]]) -> tuple[dict, Counter]:
     return idx, seen
 
 
-def measure(idx: dict, seen: Counter, ask: list, rv: dict, domains: list[dict]) -> dict:
+def measure(idx: dict, seen: Counter, ask: list, rv: dict, domains: list[dict],
+            verification: dict | None = None) -> dict:
     rows, hosts_hit = [], Counter()
     for r in ask:
         k = key(r.get("pn"))
@@ -185,6 +186,7 @@ def measure(idx: dict, seen: Counter, ask: list, rv: dict, domains: list[dict]) 
             "had_price": isinstance(x.get("price_low"), (int, float)),
         })
     new_addr = [r for r in rows if not r["had_contacts"]]
+    verification = verification or {}
     # ПИСЬМО НА ОПЕРАТОРА, А НЕ НА СТРОКУ. Замер 18.09.2026: все 401 совпадение
     # пришлись на одного оператора с двумя каталогами, и 302 из них — строки без
     # найденной цены. Это один запрос на 302 позиции, а не 302 разбора.
@@ -238,11 +240,50 @@ def measure(idx: dict, seen: Counter, ask: list, rv: dict, domains: list[dict]) 
         "why_min_key": "Ключ короче четырёх знаков номером не считается: «10», «A1» и «SET» "
                        "дали бы ложные совпадения с половиной заявки.",
         "letters": letters,
+        "verification": verification,
         "why_one_letter": "Все совпадения пришлись на одного оператора с двумя каталогами, "
                           "поэтому это один запрос на все его позиции, а не отдельный разбор "
                           "по каждой строке. Спрашиваются только те строки, по которым цены у "
                           "нас ещё нет. Наших цифр, вилок и имени заказчика в письме нет.",
         "rows": sorted(rows, key=lambda z: str(z["pn"])),
+    }
+
+
+def verify(rows: list[dict], into: Path, take: int = 3) -> dict:
+    """Открывает несколько найденных карточек и проверяет, что номер на них ЕСТЬ.
+
+    Совпадение адреса — довод сильный, но не последний: адрес мог бы
+    генерироваться под любой запрос. Поэтому вместе с образцом проверяется
+    ВЫДУМАННЫЙ адрес того же вида: если витрина отдаёт карточку и на него, её
+    адресам верить нельзя и указатель надо выбросить. Образец берётся из начала,
+    середины и конца списка, а не первые подряд.
+    """
+    if not rows:
+        return {}
+    pick = [rows[0], rows[len(rows) // 2], rows[-1]][:take]
+    checked = []
+    for r in pick:
+        url = r["cards"][0]["url"]
+        f = into / ("verify_" + re.sub(r"\W+", "_", url)[-60:] + ".html")
+        ok = get(url, f)
+        flat = re.sub(r"[^A-Za-z0-9]", "",
+                      f.read_text(encoding="utf-8", errors="replace")).upper() if ok else ""
+        checked.append({"pn": r["pn"], "url": url,
+                        "number_on_page": bool(flat) and key(r["pn"]) in flat})
+    # Контроль: адрес того же вида с заведомо несуществующим номером.
+    host = pick[0]["cards"][0]["url"].rsplit("/product/", 1)[0]
+    fake = f"{host}/product/solar-turbines-9999999-77/"
+    f = into / "verify_fake.html"
+    ok = get(fake, f)
+    flat = re.sub(r"[^A-Za-z0-9]", "",
+                  f.read_text(encoding="utf-8", errors="replace")).upper() if ok else ""
+    return {
+        "checked_cards": checked,
+        "invented_address": fake,
+        "invented_address_returns_that_number": bool(flat) and "999999977" in flat,
+        "what_it_means": "Номер обязан быть НА СТРАНИЦЕ, а выдуманный адрес того же вида не "
+                         "должен отдавать карточку с этим номером. Если отдаёт — витрина "
+                         "генерирует страницы под любой запрос, и указателю верить нельзя.",
     }
 
 
@@ -280,6 +321,9 @@ def main() -> int:
     ap.add_argument("--dir", required=True, help="папка для карт сайтов (ВНЕ репозитория)")
     ap.add_argument("--fetch", action="store_true")
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--verify", action="store_true",
+                    help="открыть образец найденных карточек и проверить, что номер на них "
+                         "есть, плюс контроль выдуманным адресом")
     a = ap.parse_args()
 
     domains = json.loads(SELLERS.read_text(encoding="utf-8"))["hosts"]
@@ -298,7 +342,23 @@ def main() -> int:
     idx, seen = index(files)
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
     rv = {key(r["pn"]): r for r in json.loads(RV.read_text(encoding="utf-8"))["rows"]}
+    # Сначала замер, потом проверка образца по его же строкам: так проверяется
+    # ровно то, что попадёт в набор, а не заново собранный список.
     m = measure(idx, seen, ask, rv, domains)
+    if a.verify:
+        v = verify(m["rows"], into)
+        m = measure(idx, seen, ask, rv, domains, v)
+        bad = [c for c in v.get("checked_cards", []) if not c["number_on_page"]]
+        if bad or v.get("invented_address_returns_that_number"):
+            print("ПРОВЕРКА ОБРАЗЦА НЕ ПРОЙДЕНА — набор не записан:", file=sys.stderr)
+            for c in bad:
+                print(f"  номера нет на странице: {c['pn']} → {c['url']}", file=sys.stderr)
+            if v.get("invented_address_returns_that_number"):
+                print(f"  выдуманный адрес отдаёт карточку: {v['invented_address']}",
+                      file=sys.stderr)
+            return 1
+        print(f"проверка образца пройдена: {len(v['checked_cards'])} карточки, "
+              f"номер на странице у всех; выдуманный адрес карточки не отдаёт")
     print(f"адресов в картах: {m['addresses_indexed']}; ключей: {m['keys_indexed']}")
     print(f"строк заявки с карточкой по номеру: {m['ask_rows_matched']}")
     print(f"  из них адреса продавца у нас до этого НЕ было: "

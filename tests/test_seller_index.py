@@ -135,3 +135,24 @@ def test_письмо_не_спрашивает_то_что_уже_извест�
     priced = {r["pn"] for r in d["rows"] if r["had_price"]}
     asked = {pn for L in d["letters"] for pn in L["pns"]}
     assert not (priced & asked), sorted(priced & asked)[:5]
+
+
+def test_проверка_образца_записана_и_пройдена():
+    """Совпадение адреса — не последний довод: номер обязан быть НА странице.
+
+    И рядом обязателен контроль выдуманным адресом того же вида: если витрина
+    отдаёт карточку и на него, её адреса ничего не значат и указатель надо
+    выбросить целиком. Замер 18.09.2026: три карточки из начала, середины и
+    конца списка — номер на странице у всех; выдуманный адрес карточки не
+    отдаёт.
+    """
+    p = ROOT / "gt/data/seller_index.json"
+    if not p.exists():
+        pytest.skip("набора нет")
+    v = (json.loads(p.read_text(encoding="utf-8")) or {}).get("verification") or {}
+    if not v:
+        pytest.skip("набор собран без проверки образца")
+    assert v["checked_cards"], "образец пуст — проверка ничего не значит"
+    for c in v["checked_cards"]:
+        assert c["number_on_page"], c
+    assert v["invented_address_returns_that_number"] is False
