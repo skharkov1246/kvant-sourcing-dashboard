@@ -453,6 +453,19 @@ def reverify_section(rows: list, supp: dict) -> str:
                     "offer": offer, "sp": sp,
                     "what": verdict_vs_offer(r.get("usd_lo"), r.get("usd_hi"), offer)})
     out.sort(key=lambda z: (z["offer"] is None, -(z["offer"] or 0) * z["qty"]))
+    # Агрегат в журнал прогона: сколько перепроверенных строк закрыто письменным
+    # предложением контрагента и что оно делает с вилкой. Только счётчики —
+    # журнал публичный (правило 17 CLAUDE.md).
+    kinds = Counter()
+    for z in out:
+        w = z["what"]
+        kinds["занижение подтверждено" if w.startswith("ЗАНИЖЕНИЕ")
+              else "завышение подтверждено" if w.startswith("ЗАВЫШЕНИЕ")
+              else "вилка верна" if w.startswith("вилка верна")
+              else "предложения нет"] += 1
+    print(f"  перепроверенных строк: {len(out)} · КП поставщика нашлось по {hits}")
+    for k, v in kinds.most_common():
+        print(f"    {k}: {v}")
     head = (f'<div class="sec"><h2>Перепроверенные строки против КП поставщиков — '
             f'{len(out)} строк, предложение нашлось по {hits}</h2>'
             '<p class="lead">По этим строкам решение принимается на защите. '
