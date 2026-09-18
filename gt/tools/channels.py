@@ -129,6 +129,35 @@ def oem_shift(rows: list[dict]) -> dict:
     return shift
 
 
+def tail(rows: list[dict]) -> dict:
+    """Остаток вне карты: он должен быть назван, а не спрятан.
+
+    Если не показать остаток числом, карта читается как «это вся заявка».
+    """
+    out: dict[str, dict] = {}
+    for row in rows:
+        if brand_of(row) != UNMAPPED:
+            continue
+        man = (row.get("man") or "—").strip() or "—"
+        cell = out.setdefault(man, {"rows": 0, "usd": 0.0, "no_estimate": 0})
+        cell["rows"] += 1
+        e = exposure(row)
+        cell["usd"] += e or 0
+        if e is None:
+            cell["no_estimate"] += 1
+    for cell in out.values():
+        cell["usd"] = int(round(cell["usd"]))
+    top = sorted(out.items(), key=lambda kv: -kv[1]["usd"])[:10]
+    return {
+        "rows": sum(c["rows"] for c in out.values()),
+        "usd": sum(c["usd"] for c in out.values()),
+        "makers": len(out),
+        "no_estimate": sum(c["no_estimate"] for c in out.values()),
+        "biggest_maker_usd": top[0][1]["usd"] if top else 0,
+        "top": [{"man": k, **v} for k, v in top],
+    }
+
+
 def totals(rows: list[dict], m: dict) -> dict:
     tot = int(round(sum(exposure(r) or 0 for r in rows)))
     mapped = sum(v["usd"] for k, v in m.items() if k != UNMAPPED)
@@ -140,6 +169,7 @@ def totals(rows: list[dict], m: dict) -> dict:
         "exposure_mapped": mapped,
         "share_pct": round(mapped / tot * 100, 1) if tot else 0.0,
         "brands_in_request": len({(r.get("man") or "—").strip() for r in rows}),
+        "tail": tail(rows),
     }
 
 
