@@ -1,7 +1,7 @@
 {
   "note": "Ребро, а не карточка: уровень субпоставщика — свойство пути, а не компании. Одна и та же компания бывает первым уровнем для одного владельца конструкции и вторым, если между ними стоит пакаджер, поэтому уровень не хранится, а считается обходом. Записи вида routing_note — не компании, а указания к закупке из поля mk базы PN: «закупка по спецификации», «любой дистрибьютор». Для сорсера это ответ не хуже имени завода, поэтому они сохранены отдельным видом.",
-  "count": 306,
-  "makers": 269,
+  "count": 305,
+  "makers": 268,
   "routing_notes": 37,
   "records": [
     {
@@ -313,7 +313,7 @@
       "sources": [
         "gt/data/pn_db.json"
       ],
-      "n": 31,
+      "n": 30,
       "from_is_bucket": false
     },
     {
@@ -1326,6 +1326,25 @@
       "from_is_bucket": false
     },
     {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "Universal Thermosensors Ltd (UK)",
+      "to_key": "universalthermosensorsuk",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "SGT-400"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 5,
+      "from_is_bucket": false
+    },
+    {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
       "to": "Крепёжный завод по спецификации (размер из описания, IH-стандарты Solar)",
@@ -2102,44 +2121,6 @@
       ],
       "proof": [
         "П2 — заказной код Siemens DI (полная форма)"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 2,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
-      "to": "TC Ltd / Thermo Electric (тип.)",
-      "to_key": "tcthermoelectricтип",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "SGT-400"
-      ],
-      "proof": [
-        "П4: сегмент термопар"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 2,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
-      "to": "Universal Thermosensors Ltd (UK)",
-      "to_key": "universalthermosensorsuk",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "SGT-400"
-      ],
-      "proof": [
-        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"

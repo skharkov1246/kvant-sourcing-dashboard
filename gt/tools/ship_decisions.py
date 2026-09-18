@@ -104,6 +104,35 @@ def top_gap(rows: list, rv: list, top: int = 60) -> tuple[int, float, float]:
     return len(rest), sum(e for e, _ in rest), covered / whole * 100
 
 
+def metrology(rows: list, rv: list) -> dict:
+    """Строки, где изготовитель мёртв и утверждение типа в РФ истекло.
+
+    Считается по данным, а не вписывается: признак — упоминание ГРСИ в поле
+    жизненного цикла строки перепроверки. Это не сорсинговая развилка, а вопрос
+    допуска средства измерений на объекте, и решать его владельцу с заказчиком:
+    закупка «тем же номером» проблему не снимает.
+    """
+    import re as _re
+
+    def k(pn) -> str:
+        return _re.sub(r"[^A-Z0-9]", "", str(pn or "").split("(")[0].upper())
+
+    hit = [r for r in rv if "ГРСИ" in str(r.get("lifecycle") or "")]
+    if not hit:
+        return {}
+    band = {}
+    for r in rows:
+        band.setdefault(k(r.get("pn")), r)
+    usd = qty = 0.0
+    for r in hit:
+        b = band.get(k(r.get("pn")))
+        if b is not None:
+            usd += expo(b)
+            qty += float(b.get("qty") or 0)
+    makers = sorted({str(r.get("maker_short") or "").strip() for r in hit} - {""})
+    return {"rows": len(hit), "usd": usd, "qty": qty, "makers": makers}
+
+
 def offer_scope(st: dict, prefer: str = "Энергосети") -> tuple[str, dict]:
     """Счётчики КП по одному охвату: охваты — разные заявки и не складываются.
 
@@ -245,6 +274,17 @@ def build() -> str:
           f"не подтверждено, запрашивать по ним цену бессмысленно: по болту камеры сгорания "
           f"подтверждение количества стоит дороже любой цены, какую по нему можно найти</td>"
           f"</tr>")
+    met = metrology(rows, rv)
+    if met:
+        a("<tr><td><b>Решение по допуску средств измерений</b> (термопарный блок)</td>"
+          f"<td class='n'>{ru(met['usd'])} USD<br>{ru(met['rows'])} строк, "
+          f"{ru(met['qty'])} штук</td><td>запрос заказчику</td>"
+          "<td>изготовитель ликвидирован 14.03.2024, а российское утверждение типа по этой "
+          "серии действовало по 25.02.2025 и истекло; межповерочный интервал два года. "
+          "Новая поставка «тем же номером» законного утверждения типа в РФ не имеет, и это "
+          "вопрос допуска на объекте, а не цены. Решать вам с заказчиком: либо поверяемый "
+          "аналог с действующим утверждением, либо письменное согласие на позицию без "
+          f"него. Изготовитель по документу: {E(', '.join(met['makers']) or '—')}</td></tr>")
     tail = ((ch.get("measure") or {}).get("tail") or {})
     a("<tr><td><b>Решение по остатку заявки вне карты каналов</b></td>"
       f"<td class='n'>{ru(tail.get('usd'))} USD<br>{ru(tail.get('rows'))} строк</td>"
