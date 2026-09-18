@@ -338,9 +338,17 @@ def build() -> str:
               + ". Здесь нужен не канал, а решение: считать по классу с оговоркой или "
                 "выносить приложением.</p>")
         sol = shift.get("Solar Turbines") or {}
+        # Числа по кластеру Solar считаются, а не пишутся руками: собственная
+        # номенклатура — из карты каналов, весь кластер — она плюс то, что из
+        # него ушло компонентным изготовителям.
+        sol_own = next((b for b in chb if b["brand"] == "Solar Turbines"),
+                       {"rows": 0, "usd": 0, "no_estimate": 0})
+        sol_all_rows = sol_own["rows"] + (sol.get("rows") or 0)
+        sol_all_usd = sol_own["usd"] + (sol.get("usd") or 0)
         if sol:
             a("<div class='warn'><p><b>Поправка к прежней формулировке про Solar.</b> "
-              f"Под шильдиком Solar в заявке 497 строк на 2 396 349 USD, но "
+              f"Под шильдиком Solar в заявке {ru(sol_all_rows)} строк на "
+              f"{ru(sol_all_usd)} USD, но "
               f"{ru(sol.get('rows'))} строки из них на {ru(sol.get('usd'))} USD — "
               f"чужие компоненты ("
               + ", ".join(f"{E(k)} {v['rows']}" for k, v in
@@ -349,8 +357,9 @@ def build() -> str:
               + "). Магазин Solar их не закрывает и не должен: у Allen-Bradley и "
                 "Pepperl+Fuchs цена уже открыта у их продавцов, и под их собственным "
                 "номером она в разы ниже, чем под номером Solar. Регистрация в магазине "
-                "Solar закрывает его собственную номенклатуру — 413 строк на "
-                "1 002 915 USD, из которых у 268 оценки нет вовсе.</p></div>")
+                f"Solar закрывает его собственную номенклатуру — {ru(sol_own['rows'])} "
+                f"строк на {ru(sol_own['usd'])} USD, из которых у "
+                f"{ru(sol_own['no_estimate'])} оценки нет вовсе.</p></div>")
         a("<h3>Что установлено по каждому каналу</h3>")
         for b in sorted(chb, key=lambda x: -(x.get("usd") or 0)):
             a(f"<p><b>{E(b['brand'])}</b> — {E(b.get('state'))}. "
