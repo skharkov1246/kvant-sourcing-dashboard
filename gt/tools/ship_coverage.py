@@ -52,6 +52,21 @@ def num(x) -> bool:
     return isinstance(x, (int, float)) and not isinstance(x, bool) and x > 0
 
 
+# Признаки того, что канал по строке КВОТИРУЕМЫЙ: продавец есть, а цены он не
+# публикует в принципе. Список закрытый и намеренно узкий: он обвиняет строку в
+# том, что цены нет не по нашей вине, и такое утверждение должно опираться на
+# прямые слова разбора, а не на догадку. Лишняя строка здесь приукрашивает
+# работу, поэтому пропуск тут дешевле ложного срабатывания.
+QUOTE_ONLY = ("только по запросу", "только «под запрос»", "под запрос", "по запросу",
+              "квотируемый", "цену не публикует", "цены не публикует", "request a quote",
+              "get latest price", "цена по запросу", "без публичной цены", "цены нет вовсе")
+
+
+def quote_only(r: dict) -> bool:
+    text = " ".join(str(r.get(f) or "") for f in ("channel", "price_kind", "blocker")).lower()
+    return any(m in text for m in QUOTE_ONLY)
+
+
 def measure() -> dict:
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
     rv = {key(r.get("pn")): r for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
@@ -62,6 +77,8 @@ def measure() -> dict:
                 listed.setdefault(key(it.get("pn")), it)
 
     # ПРИЗНАКИ независимы: канал бывает назван там, где цены нет, и наоборот.
+    gap_rows = gap_quote = 0
+    gap_usd = gap_quote_usd = 0.0
     steps = ["опознано", "изготовитель назван", "цена найдена", "канал назван",
              "остаток числом"]
     got = {s: [0, 0.0] for s in steps}
@@ -97,6 +114,12 @@ def measure() -> dict:
         # Без этого «канал назван» выходит больше, чем «цена найдена», и набор
         # читается как лестница, не будучи ею: канал у нас записан и там, где
         # цены нет вовсе.
+        if channel and not price:
+            gap_rows += 1
+            gap_usd += e
+            if x and quote_only(x):
+                gap_quote += 1
+                gap_quote_usd += e
         if named:
             ladder["опознана"][0] += 1
             ladder["опознана"][1] += e
@@ -110,6 +133,17 @@ def measure() -> dict:
                         ladder["отгружаема"][0] += 1
                         ladder["отгружаема"][1] += e
     return {
+        "channel_without_price": {
+            "rows": gap_rows,
+            "usd": round(gap_usd, 2),
+            "of_them_quote_only": gap_quote,
+            "usd_quote_only": round(gap_quote_usd, 2),
+            "what_it_means": ("Строки, где канал назван, а цены нет. Это НЕ значит, что мы не "
+                              "дошли: у части таких каналов цены нет в принципе — продавец "
+                              "работает только по запросу и прайса не публикует. Счёт "
+                              "квотируемых ведётся по прямым словам разбора и намеренно занижен: "
+                              "лишняя строка здесь приукрасила бы работу."),
+        },
         "ladder": {k: {"rows": v[0], "usd": round(v[1], 2),
                        "share_rows": round(100 * v[0] / total_rows, 1),
                        "share_usd": round(100 * v[1] / total_usd, 1) if total_usd else 0.0}
@@ -140,6 +174,10 @@ def main() -> None:
     for s, v in m["steps"].items():
         print(f"  {s:<20} {v['rows']:>5} строк ({v['share_rows']:>4} %) | "
               f"{v['usd']:>11,.0f} USD ({v['share_usd']:>4} % денег)".replace(",", " "))
+    g = m["channel_without_price"]
+    print(f"КАНАЛ ЕСТЬ, ЦЕНЫ НЕТ: {g['rows']} строк на {g['usd']:,.0f} USD; из них у "
+          f"{g['of_them_quote_only']} канал квотируемый — цены он не публикует в принципе "
+          f"({g['usd_quote_only']:,.0f} USD)".replace(",", " "))
     print(f"  из строк БЕЗ нашей оценки опознано {m['rows_without_band_identified']} — "
           f"они не видны ни в одном денежном счёте")
     if a.write:

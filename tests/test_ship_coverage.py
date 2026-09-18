@@ -66,3 +66,23 @@ def test_признак_не_меньше_соответствующей_сту�
     assert d["ladder"]["есть цена и адрес"]["rows"] <= d["steps"]["цена найдена"]["rows"]
     assert d["ladder"]["есть кому написать"]["rows"] <= d["steps"]["канал назван"]["rows"]
     assert d["ladder"]["отгружаема"]["rows"] <= d["steps"]["остаток числом"]["rows"]
+
+
+def test_квотируемых_не_больше_чем_строк_без_цены():
+    """Счёт квотируемых каналов — подмножество разрыва, и он намеренно занижен."""
+    g = doc()["channel_without_price"]
+    assert g["of_them_quote_only"] <= g["rows"]
+    assert g["usd_quote_only"] <= g["usd"] + 1.0
+    assert "не значит" in g["what_it_means"].lower(), (
+        "набор обязан сказать, что отсутствие цены при наличии канала — не всегда наша "
+        "недоработка")
+
+
+def test_признак_квотируемого_канала_не_срабатывает_на_пустоте():
+    import ship_coverage as sc
+
+    assert not sc.quote_only({})
+    assert not sc.quote_only({"channel": "склад, цена на карточке", "price_kind": "розница"})
+    assert sc.quote_only({"channel": "продавец есть, но цена только по запросу"})
+    assert sc.quote_only({"price_kind": "прайса нет, Request a Quote"})
+
