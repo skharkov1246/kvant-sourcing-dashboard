@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 247,
-    "total_bytes": 111456327,
+    "total_bytes": 111459573,
     "by_sensitivity": {
       "конфиденциально": 63,
       "внутреннее": 136,
@@ -4605,49 +4605,9 @@
       ]
     },
     {
-      "path": "gt/data/ms6001b.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 106907,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "companies",
-        "facts",
-        "model",
-        "stock",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "facts",
-        "records": 95,
-        "record_keys": [
-          "claim",
-          "cross",
-          "source"
-        ]
-      },
-      "last_change": "2026-08-31",
-      "last_author": "github-actions[bot]",
-      "last_commit": "11f2331",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "участники внешнеэкономических сделок"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/build_ms6001b.py",
-        "gt/tools/drop_ru.py",
-        "library/load_suppliers.py"
-      ]
-    },
-    {
       "path": "gt/data/ship_underpriced.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 105815,
+      "bytes": 107807,
       "note": "Строки заявки ЛУКОЙЛ, где найденная закупочная цена ВЫШЕ потолка нашей вилки — то есть мы продаём ниже закупки. Цены заказчику твёрдые, торг идёт от них вниз, поэтому такая строка теряет деньги с первого дня. 74 строки, наша экспозиция по ним 989 412 USD. Главное число набора — наша экспозиция, а НЕ разрыв: разрыв «найденная цена минус наш потолок × количество» даёт 2 782 352 USD, и половину приносят две строки — брокерский запрос на половину объёма и витрина одного московского перекупщика с двумя доменами. Правило владельца это запрещает, поэтому три разряда, и складывать их нельзя: «в сумму идёт» (покрытие полное, цена не брокерская, свидетель не один) — 5 строк; «покрытие не подтверждено» — 55; «цена не закупочная» — 14. Считает gt/tools/ship_underpriced.py, документ собирает gt/tools/underpriced_doc.py.",
       "format": "json",
       "shape": "объект",
@@ -4687,7 +4647,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "9e1d4d9",
+      "last_commit": "07432e5",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4697,6 +4657,46 @@
         "gt/tools/ship_final.py",
         "gt/tools/ship_underpriced.py",
         "gt/tools/underpriced_doc.py"
+      ]
+    },
+    {
+      "path": "gt/data/ms6001b.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 106907,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "facts",
+        "model",
+        "stock",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "facts",
+        "records": 95,
+        "record_keys": [
+          "claim",
+          "cross",
+          "source"
+        ]
+      },
+      "last_change": "2026-08-31",
+      "last_author": "github-actions[bot]",
+      "last_commit": "11f2331",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_ms6001b.py",
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -10545,6 +10545,40 @@
       ]
     },
     {
+      "path": "gt/data/ship_offer_stats.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 2820,
+      "note": "Счётчики «что письменные предложения поставщиков делают с НАШИМИ вилками» по всей заявке ЛУКОЙЛ: сколько строк с КП контрагента попадают выше потолка вилки (наша оценка занижена), внутри неё (подтверждена), ниже пола (завышена) и у скольких вилки нет вовсе. Пишет прогон «Bitrix входящие КП по сделке» через gt/tools/ship_offer.py --stats-out; руками не заполнять. Ни одной цены и ни одной привязки цены к артикулу здесь нет и быть не может: предложения контрагентов — их коммерческие данные, они остаются в артефакте прогона, а в репозиторий идёт только счёт строк. Это и есть ответ на главный вопрос защиты — наши вилки систематически низкие или высокие — полученный счётом по всему пересечению, а не выборкой из сорока перепроверенных строк.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "scopes",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "scopes",
+        "records": 2
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "07432e5",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/bitrix-tkp.yml",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_underpriced.py",
+        "tests/test_offer_stats_scopes.py"
+      ]
+    },
+    {
       "path": "zip/customs/out/_summary.json",
       "subproject": "база ЗИП · таможня",
       "bytes": 2297,
@@ -10596,40 +10630,6 @@
       "referenced_by": [
         "ove/build.py",
         "ove/tools/build_rfq_pdf.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_offer_stats.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 1566,
-      "note": "Счётчики «что письменные предложения поставщиков делают с НАШИМИ вилками» по всей заявке ЛУКОЙЛ: сколько строк с КП контрагента попадают выше потолка вилки (наша оценка занижена), внутри неё (подтверждена), ниже пола (завышена) и у скольких вилки нет вовсе. Пишет прогон «Bitrix входящие КП по сделке» через gt/tools/ship_offer.py --stats-out; руками не заполнять. Ни одной цены и ни одной привязки цены к артикулу здесь нет и быть не может: предложения контрагентов — их коммерческие данные, они остаются в артефакте прогона, а в репозиторий идёт только счёт строк. Это и есть ответ на главный вопрос защиты — наши вилки систематически низкие или высокие — полученный счётом по всему пересечению, а не выборкой из сорока перепроверенных строк.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "scopes",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "scopes",
-        "records": 2
-      },
-      "last_change": "2026-09-18",
-      "last_author": "github-actions[bot]",
-      "last_commit": "b4d8704",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        ".github/workflows/bitrix-tkp.yml",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_underpriced.py",
-        "tests/test_offer_stats_scopes.py"
       ]
     },
     {
