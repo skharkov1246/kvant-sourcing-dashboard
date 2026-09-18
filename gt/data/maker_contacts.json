@@ -3,7 +3,7 @@
  "source": "Адреса служб запчастей изготовителей, прочитанные на их же страницах. Собирает разведка, принимает gt/tools/mc_merge.py.",
  "what_it_is": "Точка обращения за ценой и сроком там, где адреса продавца нет.",
  "rule": "Почта принимается только с полем read_on — адресом страницы, где она напечатана, и только если домен почты связан со страницей либо назван дистрибьютор. Адрес вида «parts@домен» без прочитанной страницы — догадка: письмо уходит в никуда, а строка считается закрытой.",
- "rows_with_email": 11,
+ "rows_with_email": 15,
  "rows_form_only": 10,
  "rows": [
   {
@@ -147,6 +147,34 @@
    "found_on": "2026-09-18"
   },
   {
+   "maker": "GTA Turbines",
+   "legal_name": "Gas Turbine Applications (P.O. Box 369, 19550 Highway 78, Calera, Oklahoma 74730, США)",
+   "email": "parts@gtaturbines.com",
+   "email_kind": "служба запчастей",
+   "form_url": "https://gtaturbines.com/gta-turbine-contact-us.php",
+   "phone": "580-924-1647",
+   "via_distributor": "Gas Turbine Applications — независимый ремонтник и поставщик по Solar, не изготовитель",
+   "distributor_quote": "We specialize in the overhaul, repair and testing of Solar® brand turbines and the part numbers listed in our catalogue primarily reference these turbines’ components.",
+   "read_on": "https://gtaturbines.com/gta-turbine-parts-lookup.php",
+   "note": "Единственное из трёх направлений, где нашлась ИМЕННО запчастевая адресная почта, а не общая. На странице каталога напечатано: «Please call or contact parts@gtaturbines.com for inquiries relating to availability». Адрес прочитан в исходном коде страницы без маскировки. На странице контактов напечатан второй, общий адрес info@gtaturbines.com и телефон 580-924-1647. Специализация по Solar подтверждена дословной цитатой (см. distributor_quote). ОГРАНИЧЕНИЕ, важное для заголовка: наших артикулов в их каталоге НЕТ. В выгруженной странице каталога 395 номеров; поиск по 1019431-1600, 1075721, 2112736-1 и 1034347-1 дал ноль совпадений, в том числе по базовым номерам без суффикса. То есть это адрес по классу «запчасти Solar», а не адрес по нашей детали — запрос отправлять можно, но покрытие наших 83 строк не подтверждено. Сами они оговариваются: «All part numbers and descriptions are listed for informational purposes only. Parts and quantities may be limited, subject to availability. Certain parts may only be available as refurbished or equivalent components from alternative manufacturers» — то есть часть позиций только восстановленные или аналоги, не новый оригинал. Отдельной формы запроса ТКП на сайте нет, обращение — письмом или звонком.",
+   "confidence": "средняя",
+   "found_on": "2026-09-18"
+  },
+  {
+   "maker": "HardToGet.Parts",
+   "legal_name": "HardToGet.Parts (он же Hard-To-Find.Parts; BC Leto, 29 Vernadsky av., Moscow)",
+   "email": "info@hardtoget.parts",
+   "email_kind": "общая почта",
+   "form_url": "https://hardtoget.parts/contacts/",
+   "phone": "+7 495 1081005",
+   "via_distributor": "HardToGet.Parts — перекупщик, не изготовитель",
+   "distributor_quote": "Hard-To-Find Equipment & Spare Parts | Genuine | Obsolete | Discontinued | OEM Certified | Highly Experienced Non-OEM Manufacturers",
+   "read_on": "https://hardtoget.parts/contacts/",
+   "note": "Почта прочитана на странице контактов, но напечатана с антиспам-маскировкой: и в тексте, и внутри самой ссылки стоит «mailto:info @ hardtoget.parts» — с пробелами вокруг «@». Пробелы убраны механически, доменная и локальная части взяты со страницы как есть, ничего не достроено по образцу. У второго домена того же оператора адрес другой: на https://hard-to-find.parts/contacts/ напечатано «info @ hard-to-find.parts» при том же телефоне +7 495 1081005 и том же почтовом адресе «BC Leto 29 Vernadsky av. Moscow» — то есть два домена, две разные почты, один оператор. Наличие НАШИХ номеров проверено по их каталогу, а не по классу: поиск в магазине вернул карточку «Solar Turbines 1019431-1600 / Valve» — это ровно наш артикул — и «Solar Turbines 1075721 / Tape», тоже наш. На карточке https://hardtoget.parts/product/solar-turbines-1019431-1600/ напечатано: Part Number 1019431-1600, Manufacturer Caterpillar, Brand/Series Solar Turbines, описание «Valve, Control, Liquid Fuel», хлебные крошки «Brands » Caterpillar » Solar Turbines » 1019431-1600». Поэтому Solar и не виден в их линейкарте: он лежит под брендом Caterpillar. ЦЕНЫ на карточке НЕТ — только телефон и форма «Send your question»; утверждение, что у них номера Solar напечатаны с ценой, на прочитанных страницах не подтвердилось. Наличие и срок тоже не напечатаны. Годится как канал запроса по нашим артикулам, но это склад-перекупщик: подтверждение остатка и цену надо получать письмом.",
+   "confidence": "средняя",
+   "found_on": "2026-09-18"
+  },
+  {
    "maker": "HEINZMANN",
    "legal_name": "Heinzmann GmbH & Co. KG, Am Haselbach 1, 79677 Schönau, Germany",
    "email": "info@heinzmann.de",
@@ -283,6 +311,34 @@
    "distributor_quote": null,
    "read_on": "https://www.emerson.com/en/corporate/contact-us",
    "note": "Марка перешла к Emerson: https://www.solahd.com/ отдаёт 301 на https://www.appleton.emerson.com/solahd. Свой сайт марки больше не обслуживает разделы — /contact-us, /support/, /sitemap.xml на solahd.com отдают 404 (пустой Apache). Страницы Appleton — приложение Salesforce, в отданном HTML ни почты, ни телефона не напечатано; https://www.appleton.emerson.com/en-us/contact-us, /solahd/support, /contact-us, /solahd/contact-us — все 404. Прочитанная почта — общая корпоративная: на странице Emerson напечатано «Please email our Global Response Center or call +1 888 889 9170» со ссылкой mailto:contactus@emerson.com; там же перечень «Contact Us by Business» с направлением Discrete Automation, куда входит марка, — ссылка на форму указана в поле form_url (страница формы тоже отдаётся как приложение, поля в HTML не напечатаны). Адресной почты службы запчастей SolaHD не нашёл: это общий вход Emerson, а не адрес по марке. Стоит добить через прайс-листы и авторизованных дистрибьюторов Emerson либо через форму.",
+   "confidence": "низкая",
+   "found_on": "2026-09-18"
+  },
+  {
+   "maker": "Solar",
+   "legal_name": "Solar Turbines Incorporated",
+   "email": "Shop@solarturbines.com",
+   "email_kind": "служба запчастей",
+   "form_url": "https://catsolar.my.salesforce-sites.com/contactus",
+   "phone": "1-800-810-7854 (США), 1-619-595-7400 (международный); общая справочная (+1) 619-544-5352",
+   "via_distributor": null,
+   "distributor_quote": null,
+   "read_on": "https://web.archive.org/web/20250603070901id_/https://www.solarturbines.com/content/mysolar/en_US/services/parts.html",
+   "note": "Адрес завода найден. Живой solarturbines.com в этой среде закрыт на кромке Akamai: www.solarturbines.com/ и solarturbines.com/en_US/parts.html отдали 403 «Access Denied» с ссылкой errors.edgesuite.net; www.cat.com/en_US/products/new/power-systems.html — тоже 403; parts.solarturbines.com, mysolar.cat.com, esolar/mysolar.solarturbines.com, solarturbines.cat.com, solar.cat.com, www.turbomach.com, www.solarturbines.eu, www.solarturbines.com.cn — соединение не установилось; solarturbines.de отдал заглушку Cloudflare «Just a moment...» и заводу не принадлежит. Поэтому страница запчастей прочитана в копии Internet Archive (снимок 03.06.2025) по указателю CDX. На ней напечатано: «Questions about Parts? Email: Shop@solarturbines.com», «Phone numbers: 1-800-810-7854 (U.S.) 1-619-595-7400 (International)». Тот же адрес и те же телефоны стоят на русской версии той же страницы (ru_RU/services/parts.html, снимок 03.06.2025) — адрес подтверждён дважды. Форма обращения проверена ЖИВОЙ сегодня: https://catsolar.my.salesforce-sites.com/contactus отдала 200, заголовок «Solar Turbines Contact Us», подпись «© 2026 Solar Turbines Incorporated», в списке «Inquiry Direction» есть отдельный пункт «Service Parts», есть поля «Package Serial Number» и «Attachment» — по ней заявку на 83 строки подать можно. ВАЖНАЯ ОГОВОРКА для нашего заказчика: в обязательном поле «Country» этой формы 194 страны, России среди них НЕТ (после Romania сразу Rwanda); Азербайджан, Казахстан и Узбекистан есть. Поле «Equipment Location» обязательное, с пояснением «The location of the package is required in order to assign the proper account manager». Продажа запчастей идёт через собственную сеть Solar, не через дилеров Caterpillar: на странице запчастей напечатано «To Register, please contact your Solar representative to have them request access to specific applications». Дилерский канал Caterpillar проверялся и адреса по запчастям Solar не дал: zeppelin-powersystems.com (мягкий 404, нашлась только zps.achim@zeppelin.com), toromontcat.com/contact-us (200, только infoqc@toromont.com и leads@toromont.com), finning.com и mantracgroup.com — 404; ни на одной из этих страниц Solar не упомянут, поэтому их почты в ответ не ставлю — это был бы родовой адрес вместо адреса по детали.",
+   "confidence": "высокая",
+   "found_on": "2026-09-18"
+  },
+  {
+   "maker": "TURBINE.PARTS / zip-solutions",
+   "legal_name": "TURBINE.PARTS (Stationsplein 8 K, 6221BT Maastricht, Нидерланды — по данным их же страницы контактов)",
+   "email": "hello@turbine.parts",
+   "email_kind": "общая почта",
+   "form_url": "https://turbine.parts/contacts/",
+   "phone": "+31 43 569 0171",
+   "via_distributor": "тот же оператор, что HardToGet.Parts / Hard-To-Find.Parts — не изготовитель и не независимый сервисник",
+   "distributor_quote": "Hard-To-Find Equipment & Spare Parts | Genuine | Obsolete | Discontinued | OEM Certified | Highly Experienced Non-OEM Manufacturers",
+   "read_on": "https://turbine.parts/contacts/",
+   "note": "Адрес прочитан, но направление «независимый сервисник по Solar» не подтвердилось — наоборот, опровергнуто. Почта на странице контактов напечатана с маскировкой «mailto:hello [at] turbine.parts», пробел и «[at]» сняты механически. Телефон +31 43 569 0171 и адрес в Маастрихте — свои, отличные от московских. НО это тот же оператор, что в направлении 1, и вот чем это показано. Первое: turbine.parts, hardtoget.parts, hard-to-find.parts и zip-solutions.com разрешаются в ОДИН адрес 77.222.62.121. Второе: zip-solutions.com (по https рукопожатие не проходит, прочитан по http, код 200) отдаёт прямо сайт Hard-To-Find.Parts — все ссылки на странице ведут на hard-to-find.parts, напечатаны московский телефон +7 495 1081005 и «info @ hard-to-find.parts»; то есть zip-solutions — это домен-псевдоним, а не отдельная компания, и своего адреса у него нет. Третье: у turbine.parts тот же движок и та же вёрстка, вплоть до подключения шрифтов с «subset=cyrillic» на якобы нидерландском сайте. Четвёртое и главное: каталог — тот же, с подменённой маркой. Поиск по 1019431 на turbine.parts вернул те же 22 позиции в том же порядке, что и на hardtoget.parts, но марка в названии переписана с «Solar Turbines 1019431-1600» на «Turbine.Parts 1019431-1600»; поиск по 1075721 — тот же «Tape». Поэтому Solar и отсутствует в их линейкарте (Champion Aerospace, Druck Ltd., GE Vernova, Kavlico, Meggitt Vibro-Meter, Pratt & Whitney, Turbine.Parts): позиции Solar продаются под собственной маркой. Практический вывод: наши 143 упоминания и «нидерландский сервисник» — ОДИН источник, а не два независимых подтверждения, и складывать их как разные каналы нельзя. Цены и наличия на карточках нет.",
    "confidence": "низкая",
    "found_on": "2026-09-18"
   },

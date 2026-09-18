@@ -327,6 +327,17 @@ def build() -> dict:
             "maker": rec.get("maker"),
             "address_read_on": rec.get("read_on"),
             "address_kind": rec.get("email_kind"),
+            # Что известно про канал — целиком из разбора адреса, без разбора
+            # прозы. Там живут ограничения, которые решают судьбу письма: у
+            # Solar в обязательном поле формы 194 страны, и России среди них
+            # нет. Сорсер обязан это видеть ДО отправки, а не после молчания.
+            # БЕЗ ОБРЕЗКИ. Первая редакция резала на 1200 знаках — и отрезала
+            # ровно решающее: у Solar в обязательном поле формы 194 страны, и
+            # России среди них нет. Правило репозитория запрещает обрезку
+            # текста вида x[:150] именно поэтому: обрезается всегда хвост, а
+            # оговорка живёт в хвосте.
+            "what_is_known_about_channel": str(rec.get("note") or ""),
+            "confidence": rec.get("confidence"),
             "body": maker_body(str(rec.get("maker")), clean),
         })
     return {
@@ -425,6 +436,10 @@ def doc(d: dict) -> str:
           f"{ru(L['our_exposure'])} USD нашей экспозиции</h2>")
         if L.get("warning"):
             a(f"<p class='warn'><b>{E(L['warning'])}</b></p>")
+        if L.get("what_is_known_about_channel"):
+            a(f"<p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, "
+              f"уверенность «{E(L.get('confidence'))}»): "
+              f"{E(L['what_is_known_about_channel'])}</p>")
         a(f"<p><b>Тема:</b> {E(L['subject'])}</p>")
         a(f"<pre>{E(L['body'])}</pre>")
     if d.get("form_tasks"):
