@@ -1,0 +1,55 @@
+name: Поставщики — замер сведения
+
+# Один ручной замер перед сведением шести реестров поставщиков. Ничего не меняет:
+# только читает выгрузку базы знаний в Supabase (kb_rfq и соседние) и печатает
+# числа. Битрикс не нужен, локальная base/kvant.db не нужна.
+#
+# Зачем. Поставщики агрегируются по ТЕКСТУ названия, хотя идентификатор компании
+# портала лежит в той же таблице. Перевод ключа зависит целиком от данных, а
+# правило 3 CLAUDE.md запрещает применять правило до замера. Здесь считаются
+# четыре числа, без которых перевод делать нельзя: карточки без идентификатора,
+# написаний на компанию, компаний на написание, и переживут ли перевод джойны
+# base/quote.py.
+#
+# В журнал выводятся ТОЛЬКО агрегаты: репозиторий публичный. Ни одного названия
+# компании, ни одной почты, ни одного номера сделки — запросы написаны так, что
+# вернуть содержимое строки они не могут (CLAUDE.md, правило 17).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supplier-merge-stats
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимости
+        run: pip install --quiet psycopg2-binary==2.9.10
+
+      - name: Проверка секрета
+        env:
+          S: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
+          case "$S" in
+            *pooler.supabase.com*) echo "строка подключения через pooler — годится" ;;
+            *) echo "::warning::строка не похожа на Session pooler; прямое подключение идёт по IPv6 и с раннера GitHub не соединится" ;;
+          esac
+
+      - name: Замер сведения поставщиков
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python scripts/supplier_merge_stats.py
