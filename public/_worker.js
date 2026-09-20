@@ -602,6 +602,89 @@ async function readLog(env, { prefix = LOG_PREFIX, limit = 300 } = {}) {
 }
 // END auditCore
 
+// ─────────────────────────────────────────────────────────────────────────────
+// РАЗДЕЛ «ПОСТАВЩИКИ». Снимок в KV, как у библиотеки: воркер портала в Supabase
+// не ходит вовсе и ключа базы не носит. Снимок кладёт отдельный публикатор,
+// читающий sup_entity и sup_identifier; данные в репозиторий не попадают
+// (решение владельца Р-1 от 20.09.2026).
+const SUPPLIERS_KEY = "suppliers:v1";
+const SUPPLIERS_MAX_BYTES = 8 * 1024 * 1024;
+
+function suppliersRoute(path) {
+  if (["/suppliers", "/suppliers/", "/suppliers.html"].includes(path)) return "page";
+  if (path === "/api/suppliers") return "api";
+  // Маршрута публикации здесь нет намеренно: снимок кладёт scripts/publish_suppliers.py
+  // прямо в KV через API Cloudflare — так же, как публикуется библиотека. Второй стек
+  // разбора и проверки тела запроса в воркере не нужен, а /admin/suppliers ниже
+  // попадает в «invalid» и отдаёт 404, а не страницу из ASSETS.
+  // Нормализация пути — та же защита, что у библиотеки: без неё ASSETS отдаёт
+  // страницу по альтернативному написанию мимо проверки права.
+  let decoded = path;
+  for (let i = 0; i < 8 && decoded.includes("%"); i++) {
+    try {
+      const next = decodeURIComponent(decoded);
+      if (next === decoded) break;
+      decoded = next;
+    } catch { break; }
+  }
+  decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
+  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$))/i
+    .test(decoded) ? "invalid" : null;
+}
+
+// ПОЛЯ, КОТОРЫЕ РЕЖУТСЯ ПРАВОМ. Режем на сервере, а не прячем стилями: скрытое
+// стилями лежит в отданном HTML и достаётся через «посмотреть код».
+//
+// Значение не удаляется, а заменяется на {закрыто: <право>} — страница тогда
+// показывает «нет доступа» вместо пустоты, и видно, чего именно не хватает.
+// Пустое поле и закрытое поле — разные вещи, путать их нельзя (тот же довод, что
+// у «наличия» в выгрузках владельцу).
+const SUPPLIERS_FIELDS = [
+  { right: "suppliers_pii", fields: ["contacts", "emails", "phones", "persons"] },
+  { right: "suppliers_fin", fields: ["terms", "payment", "limits", "contracts", "spend"] },
+];
+
+function suppliersCut(снимок, rights) {
+  const admin = !!rights.admin;
+  const есть = new Set(rights.rights || []);
+  const закрыть = SUPPLIERS_FIELDS
+    .filter((g) => !admin && !есть.has(g.right))
+    .flatMap((g) => g.fields.map((f) => [f, g.right]));
+  if (!закрыть.length) return снимок;
+  const карта = new Map(закрыть);
+  const пройти = (v) => {
+    if (Array.isArray(v)) return v.map(пройти);
+    if (!v || typeof v !== "object") return v;
+    const out = {};
+    for (const [k, значение] of Object.entries(v)) {
+      out[k] = карта.has(k) ? { закрыто: карта.get(k) } : пройти(значение);
+    }
+    return out;
+  };
+  return пройти(снимок);
+}
+
+async function readSuppliers(env) {
+  const kv = aclStore(env);
+  if (!kv) throw new Error("suppliers_unavailable");
+  const raw = await kv.get(SUPPLIERS_KEY);
+  // Снимка ещё нет — это не ошибка, а состояние «публикатор не отработал».
+  // Отдаём пустой, чтобы страница сказала «нет данных», а не 503.
+  if (raw == null) return { version: 1, published_at: null, entities: [] };
+  if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > SUPPLIERS_MAX_BYTES) {
+    throw new Error("suppliers_invalid");
+  }
+  const value = JSON.parse(raw);
+  if (value.version !== 1) throw new Error("suppliers_invalid");
+  return value;
+}
+
+function suppliersJson(value, status = 200) {
+  const headers = libraryHeaders();
+  headers.set("Content-Type", "application/json; charset=utf-8");
+  return new Response(JSON.stringify(value), { status, headers });
+}
+
 // Публикация библиотеки — закрытая копия проверенных материалов из Supabase.
 // Здесь нет ключей БД и нет содержимого CRM в репозитории. Импорт пишет только
 // library:*; документ прав и другие ключи общего KV не изменяются.
@@ -911,9 +994,16 @@ export default {
     if (archive === "invalid") return archiveJson({ error: "not_found" }, 404);
     const library = archive ? null : libraryRoute(url.pathname);
     if (library === "invalid") return libraryJson({ error: "not_found" }, 404);
+    const suppliers = archive || library ? null : suppliersRoute(url.pathname);
+    if (suppliers === "invalid") return suppliersJson({ error: "not_found" }, 404);
     let acl;
-    try { acl = await loadAcl(env, { strict: !!(library || archive) }); }
-    catch { return libraryJson({ error: "library_unavailable" }, 503); }
+    // strict — «нет документа прав, значит никого не пускаем». Для поставщиков это
+    // обязательно: раздел закрытый, и падать в роль по умолчанию ему нельзя.
+    try { acl = await loadAcl(env, { strict: !!(library || archive || suppliers) }); }
+    catch {
+      return suppliers ? suppliersJson({ error: "rights_unavailable" }, 503)
+                       : libraryJson({ error: "library_unavailable" }, 503);
+    }
     const rights = rightsFor(acl, who.email, env);
 
     // Private archive never enters the shared library, visit logs, or audit text.
@@ -967,6 +1057,35 @@ export default {
         headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
         return new Response(asset.body, { headers });
       } catch { return libraryJson({ error: "library_page_unavailable" }, 503); }
+    }
+
+    // РАЗДЕЛ «ПОСТАВЩИКИ». Вход — по тонкому праву suppliers, а не по сайту: сайт
+    // выдаётся целиком, а тут внутри одного раздела контакты и деньги отделены от
+    // списка (решение владельца Р-4). Отказ пишется в журнал, как у библиотеки, —
+    // иначе не видно, кому раздела не хватает.
+    if (suppliers) {
+      if (!rights.admin && !rights.rights.includes("suppliers")) {
+        ctx.waitUntil(audit(env, request, who, "suppliers", url.pathname, { denied: true }));
+        return suppliersJson({ error: "forbidden" }, 403);
+      }
+      if (request.method !== "GET") return suppliersJson({ error: "method_not_allowed" }, 405);
+      if (suppliers === "api") {
+        let snapshot;
+        try { snapshot = await readSuppliers(env); }
+        catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
+        // Резка — на сервере. Права отдаём рядом с данными, чтобы страница могла
+        // сказать «нет доступа», а не молча показать пустое место.
+        return suppliersJson({ ...suppliersCut(snapshot, rights), admin: rights.admin,
+          rights: rights.rights.filter((r) => r.startsWith("suppliers")) });
+      }
+      try {
+        const asset = await env.ASSETS.fetch(new Request(url.origin + "/suppliers.html", { headers: request.headers }));
+        if (!asset.ok) return suppliersJson({ error: "suppliers_page_unavailable" }, 503);
+        const headers = libraryHeaders(asset.headers);
+        headers.set("Content-Type", "text/html; charset=utf-8");
+        headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+        return new Response(asset.body, { headers });
+      } catch { return suppliersJson({ error: "suppliers_page_unavailable" }, 503); }
     }
 
     // /api/rights — права для гейтов остальных сайтов: они шлют сюда JWT вошедшего,
@@ -1529,6 +1648,13 @@ function portalPage(who, rights, env) {
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const mine = SITES.filter((s) => rights.sites.includes(s.id) || (s.id === "knowledge" && rights.admin));
+  // «Поставщики» — раздел портала за тонким правом, а не сайт: в SITES его нет
+  // намеренно, иначе он выдавался бы целиком, вместе с контактами и деньгами.
+  // Плашку поэтому собираем отдельно и кладём в группу ежедневных инструментов.
+  if (rights.admin || rights.rights.includes("suppliers")) {
+    mine.push({ id: "suppliers", group: "work", name: "Поставщики", href: "/suppliers",
+      note: "сведённый реестр компаний: один вечный номер на компанию, ИНН, домен, чем слито" });
+  }
   // разделы: плашка показывается, только если в ней человеку что-то доступно
   const sections = GROUPS.map((g) => {
     const own = mine.filter((s) => s.group === g.id);
