@@ -1,169 +1,144 @@
 #!/usr/bin/env python3
-"""Замер перед сведением поставщиков: во что обойдётся смена ключа. Только агрегаты.
+"""Шестой реестр поставщиков — Bitrix: сколько его и насколько он пересекается с нашими.
 
-ЗАЧЕМ. Сегодня поставщики агрегируются по ТЕКСТУ названия (base/suppliers.py,
-supplier TEXT PRIMARY KEY), хотя стабильный идентификатор компании портала лежит
-в той же таблице — rfq.supplier_id. Перевод ключа написать легко, а вот его
-последствия зависят целиком от данных, и правило 3 CLAUDE.md запрещает применять
-правило до замера. Этот скрипт отвечает на четыре вопроса, без которых перевод
-делать нельзя:
+ЗАЧЕМ. Пять реестров поставщиков лежат файлами в репозитории, и их пересечение уже
+измерено (scripts/supplier_registry_overlap.py). Шестой — компании, которым реально
+писали запросы, смарт-процесс 166 — живёт только в портале. Без него сведение
+неполно, а вечные номера выдавать нельзя: следующий прогон раздвоит сущности.
 
-  1. Сколько карточек с пустым supplier_id. Они схлопнутся в одну корзину, если
-     не задать обратный ход на нормализованное имя.
-  2. Сколько написаний названия приходится на один companyId. Это и есть выигрыш
-     от перевода: во столько раз сократится число «поставщиков».
-  3. Сколько написаний, наоборот, разделены между РАЗНЫМИ companyId. Опасный
-     случай: одно имя — две компании, и слияние по имени их бы склеило.
-  4. Насколько имена из соседних таблиц (цены, карточки документов) вообще
-     находятся в rfq. От этого зависит, разорвёт ли перевод джойны base/quote.py.
+ДВА ДОПУЩЕНИЯ ПЕРВОЙ ВЕРСИИ ОКАЗАЛИСЬ НЕВЕРНЫМИ, и обе ошибки нашёл прогон.
 
-ЧТО ПЕЧАТАЕТ. Только count, count(distinct) и распределения — ни одного названия
-компании, ни одной почты, ни одного номера сделки. Репозиторий публичный, журнал
-прогона в нём видит кто угодно (CLAUDE.md, правило 17). Запросы написаны так, что
-вернуть содержимое строки они не могут: наружу выходят исключительно числа.
+  1. Замер читал выгрузку kb_rfq в Supabase. Её там НЕТ: base/RUNBOOK.md описывает
+     заливку базы знаний в PostgreSQL как порядок действий, а не как свершившийся
+     факт, и прогон 20.09.2026 упал на «таблицы kb_rfq в базе нет». Теперь данные
+     берутся из портала напрямую.
 
-Читает выгрузку базы знаний в Supabase (kb_rfq, kb_suppliers, kb_brand_suppliers,
-kb_supplier_prices) — локальная base/kvant.db не нужна и в репозиторий не входит.
+  2. Замер спрашивал «сколько написаний названия приходится на один companyId».
+     Ответ всегда один: в rfq.supplier кладётся название, полученное ПО
+     companyId через crm.company.list (base/fetch_rfq.py — `comp.get(sup, "")`).
+     Разных написаний у одного идентификатора не бывает по построению. Осмысленный
+     вопрос обратный — сколько РАЗНЫХ companyId носят одинаковое название, то есть
+     сколько в портале задвоенных карточек компаний.
 
-    SUPABASE_DB_URL=... python scripts/supplier_merge_stats.py
+ЧТО СЧИТАЕТСЯ СЕЙЧАС:
+  • карточек запросов всего и сколько из них без ссылки на компанию — эти в
+    сведение по идентификатору не войдут вовсе;
+  • сколько разных компаний-поставщиков вообще запрашивали;
+  • сколько среди них задвоенных карточек: одно название, разные companyId;
+  • сколько компаний портала уже известны пяти файловым реестрам — по имени и по
+    домену почты. Это и есть искомое пересечение шестого реестра с остальными.
+
+ЧТО ПЕЧАТАЕТ. Только числа. Ни одного названия компании, ни адреса, ни номера
+карточки: репозиторий публичный, журнал прогона в нём читает кто угодно
+(CLAUDE.md, правило 17).
+
+    BITRIX_WEBHOOK_URL=... python scripts/supplier_merge_stats.py
     Actions → «Поставщики — замер сведения»
 """
 from __future__ import annotations
 
+import collections
 import os
 import sys
+from pathlib import Path
 
-# Нормализация названия для обратного хода: тот же смысл, что у норм-функций
-# library/load_suppliers.py:53 и pnw/tools/build_suppliers.py:38 — регистр вниз,
-# схлопнутые пробелы. Здесь она живёт в SQL, чтобы замер считался одним проходом.
-NORM = "lower(regexp_replace(btrim(coalesce(supplier, '')), '\\s+', ' ', 'g'))"
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "scripts"))
 
-ОБЩЕЕ = f"""
-select count(*)                                             as карточек,
-       count(*) filter (where coalesce(supplier, '') <> '') as с_названием,
-       count(*) filter (where coalesce(supplier_id, 0) > 0) as с_идентификатором,
-       count(*) filter (where coalesce(supplier_id, 0) = 0
-                          and coalesce(supplier, '') <> '') as имя_без_идентификатора,
-       count(*) filter (where coalesce(supplier_id, 0) = 0
-                          and coalesce(supplier, '') = '')  as ни_того_ни_другого,
-       count(distinct nullif(btrim(coalesce(supplier, '')), ''))        as разных_написаний,
-       count(distinct nullif(coalesce(supplier_id, 0), 0))              as разных_компаний,
-       count(distinct nullif({NORM}, ''))                               as разных_норм_имён
-from kb_rfq
-"""
-
-# Сколько написаний на одну компанию: распределение, а не список.
-НАПИСАНИЙ_НА_КОМПАНИЮ = f"""
-with по_компании as (
-  select supplier_id, count(distinct nullif({NORM}, '')) as n
-  from kb_rfq
-  where coalesce(supplier_id, 0) > 0
-  group by supplier_id
-)
-select case when n >= 4 then '4 и больше' else n::text end as написаний,
-       count(*) as компаний
-from по_компании group by 1 order by 1
-"""
-
-# Обратный, опасный случай: одно написание у разных компаний.
-КОМПАНИЙ_НА_НАПИСАНИЕ = f"""
-with по_имени as (
-  select {NORM} as имя, count(distinct supplier_id) as n
-  from kb_rfq
-  where coalesce(supplier_id, 0) > 0 and coalesce(supplier, '') <> ''
-  group by 1
-)
-select case when n >= 3 then '3 и больше' else n::text end as компаний_у_имени,
-       count(*) as написаний
-from по_имени group by 1 order by 1
-"""
-
-# Во что превратится число строк supplier_stats после перевода ключа.
-ЭФФЕКТ = f"""
-select (select count(distinct nullif(btrim(coalesce(supplier, '')), '')) from kb_rfq)
-         as строк_сейчас_по_тексту,
-       (select count(*) from (
-          select distinct case when coalesce(supplier_id, 0) > 0
-                               then 'id:' || supplier_id
-                               else 'nm:' || {NORM} end as ключ
-          from kb_rfq
-          where coalesce(supplier, '') <> '' or coalesce(supplier_id, 0) > 0
-        ) t) as строк_после_перевода
-"""
-
-# Джойны base/quote.py идут по тексту имени. Сколько имён соседних таблиц
-# вообще встречается в kb_rfq — столько джойн и переживёт перевод.
-СОСЕДИ = f"""
-with имена as (select distinct {NORM} as имя from kb_rfq where coalesce(supplier,'') <> '')
-select 'kb_brand_suppliers' as таблица,
-       count(distinct lower(regexp_replace(btrim(supplier), '\\s+', ' ', 'g'))) as имён,
-       count(distinct lower(regexp_replace(btrim(supplier), '\\s+', ' ', 'g')))
-         filter (where lower(regexp_replace(btrim(supplier), '\\s+', ' ', 'g'))
-                       in (select имя from имена))                              as нашлось_в_rfq
-from kb_brand_suppliers where coalesce(supplier, '') <> ''
-union all
-select 'kb_suppliers',
-       count(distinct lower(regexp_replace(btrim(supplier), '\\s+', ' ', 'g'))),
-       count(distinct lower(regexp_replace(btrim(supplier), '\\s+', ' ', 'g')))
-         filter (where lower(regexp_replace(btrim(supplier), '\\s+', ' ', 'g'))
-                       in (select имя from имена))
-from kb_suppliers where coalesce(supplier, '') <> ''
-"""
+SPA_RFQ = 166          # смарт-процесс «Запросы поставщикам»
+ПОЛЕ_ПОСТАВЩИКА = "ufCrm18Supplier"
 
 
-def таблица(cur, sql: str) -> tuple[list[str], list[tuple]]:
-    cur.execute(sql)
-    return [d[0] for d in cur.description], cur.fetchall()
-
-
-def печать(заголовок: str, cols: list[str], rows: list[tuple]) -> None:
-    print(f"\n{заголовок}")
-    ширина = [max(len(str(c)), *(len(str(r[i])) for r in rows)) if rows else len(str(c))
-              for i, c in enumerate(cols)]
-    print("  " + "  ".join(str(c).ljust(ширина[i]) for i, c in enumerate(cols)))
-    for r in rows:
-        print("  " + "  ".join(str(v).ljust(ширина[i]) for i, v in enumerate(r)))
+def crm_id(value) -> int:
+    """Идентификатор из значения crm-поля: «5288», «CO_9634» или список."""
+    if isinstance(value, list):
+        value = value[0] if value else None
+    if value in (None, "", 0, "0"):
+        return 0
+    s = str(value)
+    if "_" in s:
+        s = s.rsplit("_", 1)[1]
+    return int(s) if s.isdigit() else 0
 
 
 def main() -> int:
-    url = os.environ.get("SUPABASE_DB_URL", "")
+    url = os.environ.get("BITRIX_WEBHOOK_URL", "")
     if not url:
-        print("нет переменной SUPABASE_DB_URL", file=sys.stderr)
+        print("нет переменной BITRIX_WEBHOOK_URL", file=sys.stderr)
         return 2
-    import psycopg2
 
-    # Таймаут задаётся в строке подключения, а не через SET: SET внутри
-    # транзакции откатывается вместе с ней (CLAUDE.md, правило 9).
-    sep = "&" if "?" in url else "?"
-    conn = psycopg2.connect(f"{url}{sep}options=-c%20statement_timeout%3D120000",
-                            connect_timeout=20)
-    conn.autocommit = True
-    with conn.cursor() as cur:
-        cur.execute("select to_regclass('public.kb_rfq')")
-        if cur.fetchone()[0] is None:
-            print("таблицы kb_rfq в базе нет: сначала base/export_kb.py и base/load_kb.py",
-                  file=sys.stderr)
-            return 3
+    from bitrix_client import BitrixClient
+    from supplier_registry_overlap import norm_domain, norm_name, читать
 
-        печать("ЗАПРОСЫ ПОСТАВЩИКАМ: чем вообще опознаётся поставщик",
-               *таблица(cur, ОБЩЕЕ))
-        печать("НАПИСАНИЙ НАЗВАНИЯ НА ОДНУ КОМПАНИЮ (выигрыш от перевода ключа)",
-               *таблица(cur, НАПИСАНИЙ_НА_КОМПАНИЮ))
-        печать("КОМПАНИЙ НА ОДНО НАПИСАНИЕ (опасный случай: слияние по имени склеит разные)",
-               *таблица(cur, КОМПАНИЙ_НА_НАПИСАНИЕ))
-        печать("ЭФФЕКТ ПЕРЕВОДА: сколько строк станет в supplier_stats",
-               *таблица(cur, ЭФФЕКТ))
-        печать("СОСЕДНИЕ ТАБЛИЦЫ: сколько их имён находится в запросах (джойны quote.py)",
-               *таблица(cur, СОСЕДИ))
+    client = BitrixClient(url)
+    print("выгрузка карточек запросов (СП-166)…", flush=True)
+    карточки = client.list_items(SPA_RFQ, select=["id", ПОЛЕ_ПОСТАВЩИКА])
+    всего = len(карточки)
 
-    print("\nЧитать так:")
-    print("  • «имя_без_идентификатора» > 0 — обратный ход на имя обязателен, иначе")
-    print("    эти карточки схлопнутся в одну корзину;")
-    print("  • «написаний на компанию» 2 и больше — во столько раз сегодня расщеплена")
-    print("    статистика этих поставщиков;")
-    print("  • «компаний у имени» 2 и больше — эти имена сливать по тексту НЕЛЬЗЯ;")
-    print("  • разница «нашлось_в_rfq» и «имён» — джойны quote.py, которые перевод")
-    print("    разорвёт, если не завести таблицу соответствия написаний.")
+    ids = [crm_id(k.get(ПОЛЕ_ПОСТАВЩИКА)) for k in карточки]
+    без_ссылки = sum(1 for i in ids if not i)
+    компании = sorted({i for i in ids if i})
+    запросов_на_компанию = collections.Counter(i for i in ids if i)
+
+    print(f"карточек запросов:            {всего}")
+    print(f"  без ссылки на компанию:     {без_ссылки} "
+          f"({100 * без_ссылки / max(всего, 1):.1f} %) — в сведение по ID не войдут")
+    print(f"  разных компаний-поставщиков: {len(компании)}")
+    if запросов_на_компанию:
+        медиана = sorted(запросов_на_компанию.values())[len(запросов_на_компанию) // 2]
+        print(f"  запросов на компанию: медиана {медиана}, "
+              f"максимум {max(запросов_на_компанию.values())}")
+
+    print("\nчтение карточек компаний…", flush=True)
+    названия: dict[int, str] = {}
+    домены: dict[int, str] = {}
+    for i in range(0, len(компании), 50):
+        часть = компании[i:i + 50]
+        res = client.call("crm.company.list",
+                          {"filter": {"@ID": часть}, "select": ["ID", "TITLE", "EMAIL"]})
+        for c in (res or []):
+            cid = int(c["ID"])
+            названия[cid] = (c.get("TITLE") or "").strip()
+            почты = c.get("EMAIL") or []
+            адрес = (почты[0].get("VALUE") if почты and isinstance(почты[0], dict) else "") or ""
+            домены[cid] = norm_domain(адрес.split("@")[-1] if "@" in адрес else "")
+
+    с_названием = sum(1 for v in названия.values() if v)
+    с_доменом = sum(1 for v in домены.values() if v)
+    print(f"карточек компаний прочитано:  {len(названия)}")
+    print(f"  с названием:                {с_названием}")
+    print(f"  с опознаваемым доменом почты: {с_доменом}")
+
+    # Задвоенные карточки: одно название, разные companyId.
+    по_названию: dict[str, set[int]] = collections.defaultdict(set)
+    for cid, имя in названия.items():
+        n = norm_name(имя)
+        if n:
+            по_названию[n].add(cid)
+    задвоено = {n: v for n, v in по_названию.items() if len(v) > 1}
+    строк_в_задвоении = sum(len(v) for v in задвоено.values())
+    print(f"\nЗАДВОЕННЫЕ КАРТОЧКИ КОМПАНИЙ В ПОРТАЛЕ")
+    print(f"  названий, под которыми заведено больше одной компании: {len(задвоено)}")
+    print(f"  карточек в них:                                        {строк_в_задвоении}")
+    print("  это дубли самого портала: сведение обязано схлопнуть их по названию,")
+    print("  иначе статистика одного поставщика останется расщеплённой на две.")
+
+    # Пересечение с пятью файловыми реестрами.
+    наборы = читать()
+    файл_имена = {n for строки in наборы.values() for n, _ in строки if n}
+    файл_домены = {d for строки in наборы.values() for _, d in строки if d}
+    по_имени = sum(1 for n in по_названию if n in файл_имена)
+    по_домену = sum(1 for d in домены.values() if d and d in файл_домены)
+
+    print(f"\nПЕРЕСЕЧЕНИЕ С ПЯТЬЮ ФАЙЛОВЫМИ РЕЕСТРАМИ")
+    print(f"  файловых реестров прочитано: {len(наборы)}, имён в них {len(файл_имена)}")
+    print(f"  компаний портала, известных по имени:   {по_имени} из {len(по_названию)} "
+          f"({100 * по_имени / max(len(по_названию), 1):.1f} %)")
+    print(f"  компаний портала, известных по домену:  {по_домену} из {с_доменом}")
+    print(f"  НОВЫХ для реестров:                     {len(по_названию) - по_имени}")
+    print("\nЭто и есть прирост шестого реестра: столько поставщиков, которым мы")
+    print("реально писали, наши файловые справочники не знают вовсе.")
     return 0
 
 

@@ -1,8 +1,12 @@
 name: Поставщики — замер сведения
 
 # Один ручной замер перед сведением шести реестров поставщиков. Ничего не меняет:
-# только читает выгрузку базы знаний в Supabase (kb_rfq и соседние) и печатает
-# числа. Битрикс не нужен, локальная base/kvant.db не нужна.
+# только читает и печатает числа.
+#
+# Читает ПОРТАЛ напрямую, а не выгрузку в Supabase. Первая версия читала kb_rfq,
+# и прогон 20.09.2026 упал: «таблицы kb_rfq в базе нет». base/RUNBOOK.md описывает
+# заливку базы знаний в PostgreSQL как порядок действий, а не как факт, — я принял
+# намерение за состояние. Портал же содержит первоисточник.
 #
 # Зачем. Поставщики агрегируются по ТЕКСТУ названия, хотя идентификатор компании
 # портала лежит в той же таблице. Перевод ключа зависит целиком от данных, а
@@ -35,21 +39,18 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Установка зависимости
-        run: pip install --quiet psycopg2-binary==2.9.10
+      - name: Установка зависимостей
+        run: pip install --quiet requests
 
       - name: Проверка секрета
         env:
-          S: ${{ secrets.SUPABASE_DB_URL }}
+          S: ${{ secrets.BITRIX_WEBHOOK_URL }}
         run: |
           set -euo pipefail
-          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
-          case "$S" in
-            *pooler.supabase.com*) echo "строка подключения через pooler — годится" ;;
-            *) echo "::warning::строка не похожа на Session pooler; прямое подключение идёт по IPv6 и с раннера GitHub не соединится" ;;
-          esac
+          [ -n "${S:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          echo "секрет портала на месте"
 
       - name: Замер сведения поставщиков
         env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
         run: python scripts/supplier_merge_stats.py
