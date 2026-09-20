@@ -78,6 +78,26 @@ jobs:
           SUPPLIER_TEST_DB_URL="postgresql://postgres:ci@127.0.0.1:5432/suptest" \
             python -m pytest tests/test_supplier_write.py -q
 
+      # СХЕМА ПЕРЕД ЗАПИСЬЮ, И ТОЛЬКО ПЕРЕД НЕЙ. Найдено при подготовке первой
+      # записи 20.09.2026: suppliers_schema.sql применялся ИСКЛЮЧИТЕЛЬНО к
+      # одноразовой базе CI на шаге проверок выше, а к рабочей — никогда. То есть
+      # таблиц sup_entity в проде не существует, и запись упала бы на первой
+      # вставке. Транзакция откатила бы всё, ничего не сломав, но и не записав.
+      #
+      # Файл идемпотентен и теперь переживает отсутствие ролей Supabase, поэтому
+      # применять его перед записью безопасно и дешевле, чем полагаться на то,
+      # что кто-то прогнал общие миграции. В zip-db.yml он тоже добавлен — там он
+      # держится в актуальном состоянии вместе с остальными схемами.
+      - name: Схема поставщиков в рабочей базе
+        if: inputs.apply
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 \
+            -f library/supabase/suppliers_schema.sql
+
       - name: Сведение
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}

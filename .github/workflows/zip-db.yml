@@ -68,6 +68,7 @@ jobs:
           apply zip/supabase/seed_r1700.sql "досье машины R1700G (данные)"
           apply library/supabase/schema.sql "схема библиотеки рынков"
           apply library/supabase/schema_junk.sql "разметка текста документов"
+          apply library/supabase/suppliers_schema.sql "схема поставщиков"
           # ПОСЛЕДНИМ И ВСЕГДА. zip/supabase/migrations.sql выше заново выдаёт роли
           # anon полный доступ к таблицам ЗИП — так она написана. Ужесточение обязано
           # идти после неё, иначе каждый прогон миграций молча открывает базу обратно.
