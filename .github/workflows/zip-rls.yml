@@ -1,0 +1,100 @@
+name: ЗИП — ужесточение доступа
+
+# Снимает у роли anon права на таблицы базы ЗИП. Только вручную, с выбором ступени.
+#
+# ЗАЧЕМ ОТДЕЛЬНЫЙ ПРОГОН, А НЕ ШАГ В zip-db.yml. Тот применяет всю схему разом,
+# включая сид машины R1700G, который удаляет и перевставляет строки пяти таблиц.
+# Для снятия прав это лишний радиус поражения: здесь применяется ровно один файл.
+#
+# ЗАКРЕПЛЕНИЕ. Ступень 1 добавлена и в хвост zip-db.yml: zip/supabase/migrations.sql
+# при каждом прогоне ЗАНОВО выдаёт anon полный доступ, поэтому ужесточение обязано
+# идти после неё, иначе следующий ручной прогон миграций всё откроет обратно.
+#
+# СТУПЕНИ. Разделены по риску, подробности в шапках самих файлов:
+#   stage1 — 11 таблиц (mach_*, objects), которых браузер не запрашивает вовсе.
+#            Безопасно при любом ключе воркера.
+#   stage2 — 8 таблиц, нужных сайту. Безопасно, ТОЛЬКО если воркер ходит сервисной
+#            ролью: она обходит RLS, публикуемый ключ — нет. Владелец подтвердил
+#            20.09.2026, что SUPABASE_SERVICE_KEY задан в окружении Production,
+#            и сайт пересобран после этого (zip-deploy #125).
+#
+# ОТКАТ. Если что-то пошло не так: Actions → «ZIP base — apply DB migrations».
+# Он применит zip/supabase/migrations.sql, а она вернёт политики «всё разрешено
+# anon» в прежнем виде. Минута.
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Какую ступень применить"
+        type: choice
+        default: stage1
+        options: [stage1, stage2]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zip-db          # та же группа, что у миграций: одновременно с ними нельзя
+  cancel-in-progress: false
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Установка psql
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+
+      - name: Проверка секрета
+        env:
+          S: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
+          case "$S" in
+            *pooler.supabase.com*) echo "строка подключения через pooler — годится" ;;
+            *) echo "::warning::строка не похожа на Session pooler; прямое подключение идёт по IPv6 и с раннера GitHub не соединится" ;;
+          esac
+
+      - name: Права anon ДО применения
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          psql "$SUPABASE_DB_URL" -At -c "
+            select 'прав у anon и authenticated в public: ' || count(*)
+              from information_schema.role_table_grants
+             where table_schema='public' and grantee in ('anon','authenticated')"
+
+      - name: Применение ступени
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          STAGE: ${{ inputs.stage }}
+        run: |
+          set -euo pipefail
+          файл="zip/supabase/migrations_rls_${STAGE}.sql"
+          [ -f "$файл" ] || { echo "::error::нет файла $файл"; exit 1; }
+          echo "::group::$файл"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$файл"
+          echo "::endgroup::"
+          echo "— $STAGE применена"
+
+      - name: Права anon ПОСЛЕ применения
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          psql "$SUPABASE_DB_URL" -At -c "
+            select 'прав у anon и authenticated в public: ' || count(*)
+              from information_schema.role_table_grants
+             where table_schema='public' and grantee in ('anon','authenticated')"
+          psql "$SUPABASE_DB_URL" -At -c "
+            select 'из них на mach_* и objects: ' || count(*)
+              from information_schema.role_table_grants
+             where table_schema='public' and grantee in ('anon','authenticated')
+               and (table_name like 'mach\_%' or table_name='objects')"
