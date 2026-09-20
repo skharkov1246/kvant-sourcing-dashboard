@@ -56,6 +56,32 @@ select 'таблиц, ДОСТИЖИМЫХ для anon: ' || count(*) filter (
          where relkind in ('v', 'm') and invoker)
   from rel;
 
+-- КАКИЕ ИМЕННО таблицы остались достижимы. Число без имён operator'у бесполезно:
+-- прогон 20.09.2026 после двух ступеней показал «1», и что это за таблица — из
+-- журнала было не узнать. Имена таблиц схемы public — собственные константы кода,
+-- а не данные, и правило 17 их не запрещает: в нём про наименования позиций,
+-- номера сделок и почты. Ни одной строки таблиц отчёт по-прежнему не читает.
+with grant_ as (
+  select distinct table_name
+    from information_schema.role_table_grants
+   where table_schema = 'public' and grantee in ('anon', 'authenticated')
+), policy_ as (
+  select distinct tablename
+    from pg_policies
+   where schemaname = 'public'
+     and (roles @> array['anon']::name[]
+       or roles @> array['authenticated']::name[]
+       or roles @> array['public']::name[])
+)
+select coalesce(
+  'достижимы поимённо: ' || string_agg(c.relname, ', ' order by c.relname),
+  'достижимых таблиц нет')
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace and n.nspname = 'public'
+  join grant_ g on g.table_name = c.relname
+ where c.relkind in ('r', 'p')
+   and (not c.relrowsecurity or c.relname in (select tablename from policy_));
+
 -- Адресно по ступени 1: её одиннадцать таблиц браузер не запрашивает, после
 -- применения здесь обязан быть ноль.
 select 'из них грантов на mach_* и objects: ' || count(*)
