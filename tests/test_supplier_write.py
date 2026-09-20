@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import importlib.util
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -151,3 +152,32 @@ def test_неудача_откатывает_весь_прогон():
     assert _спросить(conn, "select count(*) from sup_entity")[0][0] == 0, (
         "сущности остались в базе, хотя очередь не записалась — отката не было")
     conn.close()
+
+
+def test_схема_не_требует_ролей_supabase():
+    """Файл схемы обязан применяться на ЧИСТОМ PostgreSQL, без ролей платформы.
+
+    anon, authenticated и service_role заводит Supabase. На раннере их нет, и
+    «revoke … from anon» роняет весь файл с «role "anon" does not exist». Прогон
+    20.09.2026 20:40 так и упал: локально я роли создал руками и потому ошибки не
+    увидел. Проверка статическая — читает сам файл: поднять базу без ролей в
+    гейте нельзя, а условие видно и так.
+    """
+    ddl = (ROOT / "library" / "supabase" / "suppliers_schema.sql").read_text(encoding="utf-8")
+    assert "sup_роли_которые_есть" in ddl, (
+        "схема снимает права у ролей, не проверив их наличие — упадёт на чистом PostgreSQL")
+    # Безусловных упоминаний ролей в самих revoke/grant остаться не должно.
+    #
+    # Ищем именно ОПЕРАТОР, а не подстроку: первая версия проверки искала «grant»
+    # и ловила слово grantee в проверочном select — то есть ругалась на строку,
+    # которая ничего не выдаёт и никого не лишает прав.
+    оператор = re.compile(r"\b(?:revoke|grant)\s+(?:all|select|insert|update|delete|usage)\b",
+                          re.I)
+    for строка in ddl.splitlines():
+        голая = строка.split("--")[0]
+        if not оператор.search(голая):
+            continue
+        for роль in ("anon", "authenticated", "service_role"):
+            assert роль not in голая, (
+                f"роль {роль} названа в операторе напрямую, а не через проверку наличия: "
+                f"{строка.strip()}")
