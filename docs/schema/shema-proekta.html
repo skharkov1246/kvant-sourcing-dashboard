@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>КВАНТ · что мы строим</title>
+<style>
+@page { size: A4 landscape; margin: 10mm 9mm; }
+body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 9.5pt; line-height: 1.4; color: #14181d; margin: 0; }
+h1 { font-size: 17pt; margin: 0 0 1mm; }
+.sub { color: #5a6673; font-size: 9.5pt; margin: 0 0 4mm; }
+h2 { font-size: 11.5pt; margin: 5mm 0 2.5mm; padding-bottom: 1mm; border-bottom: 1pt solid #2b3540; page-break-after: avoid; }
+p { margin: 0 0 2.5mm; }
+.sec { page-break-before: always; }
+
+/* цепочка */
+.chain { display: table; width: 100%; table-layout: fixed; border-spacing: 2mm 0; margin: 0 0 3mm; }
+.link { display: table-cell; width: 13.1%; border: 1pt solid #b9c2cc; border-radius: 2mm; padding: 2.5mm 2mm;
+        vertical-align: top; page-break-inside: avoid; }
+.link .no { font-size: 7.5pt; color: #6b7787; letter-spacing: .08em; }
+.link .nm { font-size: 11pt; font-weight: bold; margin: .8mm 0 1.5mm; line-height: 1.15; }
+.link .qty { font-family: "DejaVu Sans Mono", monospace; font-size: 12pt; margin: 0 0 1mm; }
+.link .what { font-size: 8pt; color: #3d4753; line-height: 1.3; }
+.ok   { background: #eaf6ee; border-color: #6ea882; }
+.part { background: #fdf6e7; border-color: #bf9f52; }
+.bad  { background: #fbeeee; border-color: #c07878; }
+.ok .qty { color: #276b42 } .part .qty { color: #8a6a13 } .bad .qty { color: #96302f }
+
+.arr { display: table-cell; width: 1.7%; vertical-align: middle; text-align: center;
+       font-size: 13pt; color: #7c8794; padding: 0; }
+.legend { font-size: 8.5pt; color: #4a5560; margin: 0 0 4mm; }
+.dot { display: inline-block; width: 3mm; height: 3mm; border-radius: 50%; vertical-align: -0.3mm; margin: 0 1mm 0 4mm; }
+.dot:first-child { margin-left: 0 }
+.g { background: #6ea882 } .y { background: #bf9f52 } .r { background: #c07878 }
+
+table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0 0 3mm; font-size: 9pt; }
+.t thead { display: table-header-group; }
+.t tr { page-break-inside: avoid; }
+.t th { background: #eef1f5; text-align: left; font-weight: bold; font-size: 8.5pt; }
+.t th, .t td { border: 0.6pt solid #c3ccd6; padding: 1.8mm 2mm; vertical-align: top;
+  word-wrap: break-word; overflow-wrap: anywhere; }
+.t td.n { text-align: right; font-family: "DejaVu Sans Mono", monospace; white-space: nowrap; }
+
+.cols { display: table; width: 100%; table-layout: fixed; border-spacing: 3mm 0; }
+.col { display: table-cell; width: 33.33%; vertical-align: top; }
+.card { border: 0.8pt solid #b9c2cc; border-radius: 2mm; padding: 3mm; page-break-inside: avoid; }
+.card h3 { font-size: 10pt; margin: 0 0 2mm; }
+.card ul { margin: 0; padding-left: 5mm; font-size: 8.7pt; line-height: 1.35 }
+.card li { margin-bottom: 1.3mm }
+.ask { border: 0.8pt solid #2b5e8f; background: #eef4fa; padding: 3mm 3.5mm; margin: 0 0 3mm; page-break-inside: avoid; }
+.foot { color: #5a6673; font-size: 8pt; margin-top: 4mm; border-top: 0.6pt solid #c3ccd6; padding-top: 1.5mm; }
+b.q { font-family: "DejaVu Sans Mono", monospace; }
+</style></head><body>
+
+<h1>Инженерный портал ремонта и сервиса динамического оборудования</h1>
+<p class="sub">Что строим, из чего это состоит и где мы сейчас. Состояние на 20 сентября 2026 года.</p>
+
+<h2>Одна цепочка, семь звеньев</h2>
+<p>Пользователь проходит её целиком, не выходя из портала: по шильдику опознаёт машину, по машине выходит на узлы,
+по признаку неисправности — на дефект, по дефекту — на ремонтное решение и перечень деталей, по детали — на изготовителя и исполнителя работ.
+Динамическое оборудование — вращающиеся и возвратно-поступательные машины: турбины, компрессоры, насосы, электрические машины, ГПУ, горно-шахтное.</p>
+
+<div class="chain">
+  <div class="link ok"><div class="no">ЗВЕНО 1</div><div class="nm">Машина</div><div class="qty">132</div>
+    <div class="what">машины с паспортом: 49 ГШО, 37 ГТУ, 14 ГПУ. 66 площадок с владельцем, 22 наследных имени</div></div>
+  <div class="arr">→</div>
+  <div class="link part"><div class="no">ЗВЕНО 2</div><div class="nm">Узел</div><div class="qty">126</div>
+    <div class="what">узлов двумя деревьями, ГТУ и ГПУ. У 21 % позиций каталога узел не определён</div></div>
+  <div class="arr">→</div>
+  <div class="link bad"><div class="no">ЗВЕНО 3</div><div class="nm">Признак</div><div class="qty">24</div>
+    <div class="what">вибрация, температура, падение напора, металл в масле. Заготовка по общей практике — не наши измерения</div></div>
+  <div class="arr">→</div>
+  <div class="link bad"><div class="no">ЗВЕНО 4</div><div class="nm">Дефект</div><div class="qty">16</div>
+    <div class="what">записей с последствием. С признаком связаны только текстом, ссылкой — нет</div></div>
+  <div class="arr">→</div>
+  <div class="link part"><div class="no">ЗВЕНО 5</div><div class="nm">Ремонтное решение</div><div class="qty">45</div>
+    <div class="what">34 операции, 6 покрытий, 5 пакетов модернизации. Сроков и стоимости нет</div></div>
+  <div class="arr">→</div>
+  <div class="link ok"><div class="no">ЗВЕНО 6</div><div class="nm">Запчасть</div><div class="qty">12 899</div>
+    <div class="what">деталей, 9 869 связей с машиной, 1 699 взаимозаменяемостей. Ведомость состава — на 1 машину из 77</div></div>
+  <div class="arr">→</div>
+  <div class="link part"><div class="no">ЗВЕНО 7</div><div class="nm">Исполнитель</div><div class="qty">9 997</div>
+    <div class="what">компаний в сведённом реестре, 4 726 связей с деталью, из них 433 с проверкой наличия</div></div>
+</div>
+<p class="legend"><span class="dot g"></span>звено работает<span class="dot y"></span>работает частично, пробел назван<span class="dot r"></span>заготовка, требует инженера</p>
+
+<h2>На чём это стоит</h2>
+<table class="t">
+<thead><tr><th style="width:22%">Опора</th><th style="width:16%">Объём</th><th style="width:62%">Зачем она и что с ней не так</th></tr></thead>
+<tbody>
+<tr><td><b>Спрос</b> — история запросов поставщикам из Bitrix</td><td class="n">1 450 000 строк</td>
+    <td>Не цель, а сырьё: из него достаются машины, узлы и детали, которые реально спрашивают. Тринадцать процентов запросов не привязаны к компании идентификатором — их можно свести только по тексту названия.</td></tr>
+<tr><td><b>Каталог деталей</b></td><td class="n">12 899 позиций</td>
+    <td>Соединяет машину с закупкой. У 21 % позиций не определён узел — то есть по ним нельзя ответить «что это за деталь в машине».</td></tr>
+<tr><td><b>Реестр компаний</b></td><td class="n">9 997 сущностей</td>
+    <td>Сведён вчера из шести разных списков в один. Одна компания — один вечный номер, сколько бы раз она ни встретилась. ИНН заполнен у 32 карточек из 8 298 — 0,4 %.</td></tr>
+<tr><td><b>Портал и права</b></td><td class="n">8 разделов</td>
+    <td>Единый вход по корпоративной почте. Права выдаются по разделам и по чувствительности данных: контакты и деньги отделены от списка и цен.</td></tr>
+</tbody></table>
+
+<div class="sec"></div>
+<h1>Как идёт работа</h1>
+<p class="sub">Почему не по порядку звеньев, что делается сейчас и что нужно решить.</p>
+
+<h2>Почему не звено за звеном</h2>
+<p><b>Пять звеньев из семи упираются в один и тот же объект</b> — опознанную компанию и опознанную деталь.
+Идти звено за звеном значит пять раз строить одно и то же опознание. Поэтому сначала строится общий стержень — реестры и связи, — а звенья навешиваются на него.
+Последовательность остаётся только внутри одной ветки: сведение реестров → выдача вечных номеров → публикация в портал. Разные ветки идут одновременно.</p>
+
+<table class="t">
+<thead><tr><th style="width:30%">Ветка</th><th style="width:22%">Состояние на сегодня</th><th style="width:48%">Зависит от</th></tr></thead>
+<tbody>
+<tr><td>Безопасность данных (закрытие базы от анонимного чтения)</td><td>Сделано</td><td>Ни от чего. Шла параллельно всему</td></tr>
+<tr><td>Сведение шести реестров компаний</td><td>Сделано, 9 432 номера выдано</td><td>Ни от чего</td></tr>
+<tr><td>Раздел «Поставщики» на портале</td><td>Сделано, влито сегодня</td><td>Ни от чего: данные подставляются готовым снимком</td></tr>
+<tr><td>Публикация реестра в портал</td><td>Готово к запуску</td><td>От сведения. Это и есть настоящая последовательность</td></tr>
+<tr><td>Спрос на компанию (кому писали, кто ответил, кто выиграл)</td><td>Следующая работа</td><td>От реестра компаний — он теперь есть</td></tr>
+<tr><td>Признак → дефект → ремонтное решение</td><td>Заготовка</td><td>От инженера сервиса, а не от кода</td></tr>
+</tbody></table>
+
+<h2>Сейчас в работе</h2>
+<div class="cols">
+  <div class="col"><div class="card"><h3>Закрыто за сутки</h3><ul>
+    <li>База ЗИП: таблиц, достижимых анонимно, — было 19, стало 1</li>
+    <li>Ключ базы удалён из кода сайта</li>
+    <li>Шесть реестров сведены: 12 098 строк → 9 997 компаний</li>
+    <li>Выдано 9 432 вечных номера</li>
+    <li>Раздел «Поставщики» на портале — влит</li>
+  </ul></div></div>
+  <div class="col"><div class="card"><h3>Ближайшее</h3><ul>
+    <li>Опубликовать реестр в портал (прогон готов)</li>
+    <li>Пристегнуть к компании спрос: запросов, ответов, выигранных лотов</li>
+    <li>Список компаний для ввода ИНН — по убыванию спроса</li>
+    <li>Ведомости состава: сейчас собраны на 1 машину из 77</li>
+  </ul></div></div>
+  <div class="col"><div class="card"><h3>Известные пробелы</h3><ul>
+    <li>ИНН: 32 из 8 298 карточек — 0,4 %</li>
+    <li>Признак и дефект связаны текстом, а не ссылкой</li>
+    <li>Сроков и стоимости ремонта нет</li>
+    <li>171 запись реестра склеена неверно — исправление отложено сознательно</li>
+    <li>У 21 % позиций каталога не определён узел</li>
+  </ul></div></div>
+</div>
+
+<h2>Что нужно от руководства</h2>
+<div class="ask"><b>1. Ввод ИНН.</b> Сведение сейчас идёт по идентификатору карточки, домену сайта и названию. ИНН — надёжнее всех трёх, но заполнен у 0,4 % компаний.
+Предложение: заводить не всем 8 298 подряд, а по убыванию спроса — сначала тем, кому пишут чаще всего. Список в нужном порядке готовится за один прогон.</div>
+<div class="ask"><b>2. Инженер сервиса на звенья «признак» и «дефект».</b> Двадцать четыре признака и шестнадцать дефектов сегодня — заготовка по общей отраслевой практике, а не наши измерения.
+Без человека, который подтвердит или перепишет их, эти два звена цепочки останутся декоративными: код здесь не поможет.</div>
+<div class="ask"><b>3. Ведомости состава машин.</b> Перечень деталей собран на одну машину из семидесяти семи. Пока их нет, переход «дефект → перечень деталей к закупке» работает только на одной машине.
+Это работа по документации, а не по коду.</div>
+
+<p class="foot">Все цифры — замеры по живым данным на 20.09.2026, не оценки. Где число получено выводом, а не измерением, это сказано прямо.</p>
+</body></html>
