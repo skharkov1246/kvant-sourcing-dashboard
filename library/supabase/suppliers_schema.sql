@@ -182,7 +182,8 @@ do $$
 begin
   alter table sup_review drop constraint if exists sup_review_kind_check;
   alter table sup_review add constraint sup_review_kind_check check (kind in (
-    'ambiguous_match', 'different_legal_form', 'currency_unknown', 'unit_unknown',
+    'ambiguous_match', 'different_legal_form', 'different_tax_number',
+    'currency_unknown', 'unit_unknown',
     'term_conflict', 'high_value', 'pn_suffix', 'entity_uncertain', 'low_conf_link',
     'override_conflict', 'sensitive_change'));
 end $$;
