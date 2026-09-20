@@ -10,7 +10,8 @@
 
 Две таблицы:
   supplier_stats  — строка на поставщика: запросы, ответы, молчание, отказы,
-                    выбор, сделки и победы, срок до движения по стадии;
+                    выбор, сделки и победы, срок до движения по стадии
+                    (это НЕ срок ответа поставщика — см. days_to_stage_move);
   brand_suppliers — строка на пару «марка + поставщик»: кто реально присылал
                     цены по этой марке. Это ответ на вопрос «кому писать по
                     Epiroc», с которого начинается сорсинг.
@@ -57,7 +58,12 @@ def run(db_path: str) -> dict:
         select_rate REAL,        -- доля ответов, дошедших до выбора
         deals      INTEGER,
         won_deals  INTEGER,      -- сделки с его участием, которые мы выиграли
-        days_med   REAL,         -- медиана дней до последнего движения по стадии
+        -- НЕ срок ответа поставщика: это медиана суток от заведения карточки
+        -- до последнего движения по стадии, а стадию двигает НАШ сотрудник.
+        -- Прежнее имя days_med читалось как «сколько дней отвечает поставщик»
+        -- и использовалось именно так. Честный срок первого ответа считается
+        -- по входящим активностям (activities.direction), и его здесь нет.
+        days_to_stage_move REAL,
         positions  INTEGER,      -- позиций из его оферт
         priced     INTEGER,      -- из них с ценой
         brands     TEXT,
@@ -118,14 +124,21 @@ def run(db_path: str) -> dict:
             except ValueError:
                 pass
 
-    # позиции и марки из документов поставщика: сколько цен он реально прислал
+    # Позиции и марки ИЗ ДОКУМЕНТОВ ПОСТАВЩИКА: сколько цен он реально прислал.
+    #
+    # Сторона документа обязательна в условии. Без неё поставщику зачитывалось
+    # содержимое нашего же исходящего файла: поле «Request file» помечено в
+    # file_cards стороной «заказчик» (SIDE_BY_FIELD в base/file_cards.py:44),
+    # и его позиции попадали в «возит эту марку» вместе с ответом поставщика.
+    # То есть доказательством работы с маркой служило то, что прислали ему мы.
     pos_by_sup: dict[str, list[int]] = defaultdict(lambda: [0, 0])
     brands_by_sup: dict[str, Counter] = defaultdict(Counter)
     pair: dict[tuple, dict] = defaultdict(lambda: {
         "n": 0, "priced": 0, "deals": set(), "won": set(), "p": defaultdict(list), "dates": []})
     sql2 = """SELECT c.supplier, p.manufacturer, p.price, p.currency, p.deal_id
               FROM positions p JOIN file_cards c ON c.fid = p.fid
-              WHERE c.supplier IS NOT NULL AND c.supplier<>''"""
+              WHERE c.supplier IS NOT NULL AND c.supplier<>''
+                AND c.side = 'поставщик'"""
     for sup, brand, price, cur, did in con.execute(sql2):
         sup = sup.strip()
         pos_by_sup[sup][0] += 1
