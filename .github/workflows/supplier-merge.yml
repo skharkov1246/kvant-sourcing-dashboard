@@ -56,6 +56,23 @@ jobs:
             echo "::error::запись запрошена, но нет секрета SUPABASE_DB_URL"; exit 1
           fi
 
+      # Проверки записи требуют настоящей базы, поэтому в гейте они пропускаются
+      # (он Postgres не поднимает). Здесь база есть — поднимаем свою, пустую, и
+      # гоняем их по-настоящему ПЕРЕД тем, как трогать рабочую. Пропущенная
+      # проверка — не пройденная проверка.
+      - name: Проверки записи на чистой базе
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
+          sudo pg_ctlcluster "$(pg_lsclusters -h | awk 'NR==1{print $1}')" main start
+          sudo -u postgres psql -q -c "alter user postgres password 'ci'"
+          sudo -u postgres psql -q -c "create database suptest"
+          sudo -u postgres psql -q -d suptest -v ON_ERROR_STOP=1 \
+            -f library/supabase/suppliers_schema.sql
+          pip install --quiet psycopg2-binary
+          SUPPLIER_TEST_DB_URL="postgresql://postgres:ci@127.0.0.1:5432/suptest" \
+            python -m pytest tests/test_supplier_write.py -q
+
       - name: Сведение
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}

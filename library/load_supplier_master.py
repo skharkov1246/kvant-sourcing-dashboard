@@ -53,8 +53,11 @@ from __future__ import annotations
 
 import argparse
 import collections
+import json
 import os
+import re
 import sys
+import time
 from pathlib import Path
 from typing import NamedTuple
 
@@ -113,6 +116,15 @@ def номер(seq: int, род: str = "S") -> str:
 
 class Сущность:
     __slots__ = ("имена", "домены", "ключи", "формы", "источники", "статус", "причина")
+
+    def статус_схемы(self) -> str:
+        """Статус сведения в словах схемы: sup_entity.resolution.
+
+        verified → resolved, всё прочее → candidate. Одиночка тоже candidate:
+        её никто не подтверждал, просто не с чем было сливать (ТЗ §5.3 —
+        автоматически статус не повышается).
+        """
+        return "resolved" if self.статус == "verified" else "candidate"
 
     def __init__(self):
         self.имена: set[str] = set()
@@ -447,13 +459,208 @@ def main() -> int:
               file=sys.stderr)
         return 3
 
-    if not os.environ.get("SUPABASE_DB_URL", ""):
+    url = os.environ.get("SUPABASE_DB_URL", "")
+    if not url:
         print("нет переменной SUPABASE_DB_URL", file=sys.stderr)
         return 2
-    print("\nЗАПИСЬ пока не реализована: сведение измерено, но в базу не пишется.")
-    print("Следующий шаг — вставка в sup_entity/sup_identifier/sup_number_registry")
-    print("одной транзакцией с run_id, по схеме library/supabase/suppliers_schema.sql.")
-    return 3
+    return записать(url, сущности, очередь, args.run_id or f"merge-{int(time.time())}")
+
+
+def норма(v: str) -> str:
+    """Ключ поиска признака: буквы и цифры, верхний регистр — как велит схема.
+
+    Одна функция и на запись, и на поиск. Разойдись они — второй прогон не нашёл
+    бы то, что вставил первый, и выдал бы той же компании второй номер.
+    """
+    return re.sub(r"[^0-9A-ZА-Я]", "", str(v or "").upper())
+
+
+def показать(e: Сущность) -> str:
+    """Имя для человека: самое длинное написание. НЕ ключ и не основание слияния.
+
+    Самое длинное, потому что короткое обычно и есть обрезок: «ABC» против
+    «ABC Industrial Group». Все написания остаются строками sup_identifier, ни
+    одно не перезаписывается.
+    """
+    return max(e.имена, key=len) if e.имена else sorted(e.ключи)[0]
+
+
+def признаки(e: Сущность) -> list[tuple[str, str, str, str]]:
+    """Признаки сущности строками sup_identifier: (kind, value, source, status).
+
+    Имя идёт видом alias и статусом stated, а не legal: правовую форму norm_name
+    вырезает, и утверждать по такой строке юридическое наименование нельзя.
+    Домен — verified только когда его подтвердили два источника; иначе stated.
+    """
+    out: list[tuple[str, str, str, str]] = []
+    for ключ in sorted(e.ключи):
+        реестр, _, значение = ключ.partition(":")
+        out.append(("bitrix", значение, реестр, "verified"))
+    # Правовая форма пишется признаком, а не только держится в памяти прогона.
+    # Без неё следующий прогон не узнает, что «ООО Ромашка» и «АО Ромашка» были
+    # РАЗВЕДЕНЫ намеренно, и опознает одну по алиасу другой — то есть склеит
+    # юрлица, которые правило сведения нарочно оставило врозь (ТЗ §1.12).
+    for f in sorted(e.формы):
+        out.append(("legal", f, "правовая форма из названия", "stated"))
+    с_доменом = sum(1 for r in e.источники if r.домен)
+    for d in sorted(e.домены):
+        out.append(("domain", d, "сведение реестров",
+                    "verified" if с_доменом >= 2 else "stated"))
+    for n in sorted(e.имена):
+        out.append(("alias", n, "сведение реестров", "stated"))
+    return out
+
+
+# Признаки, которые не могут принадлежать двум сущностям сразу. bitrix — это
+# идентификатор карточки портала, на него в схеме стоит уникальный индекс. domain
+# слабее по механике, но по смыслу тот же: две сущности с одним доменом означают,
+# что сведение их не слило, хотя должно было, — и вторую строку писать нельзя.
+#
+# alias и legal повторяться МОГУТ, и это не сбой: «ООО Ромашка» и «АО Ромашка» —
+# разные юрлица под одним написанием, и у каждого свой alias «ромашка». Первая
+# версия записи запрещала повтор всем видам подряд, и второе юрлицо оставалось
+# вовсе без алиаса: следующий прогон его не находил и выдавал НОВЫЙ номер.
+# Поймано на живом PostgreSQL 16 — номер, уходящий в договоры, раздвоился.
+ЕДИНОЛИЧНЫЕ = frozenset({"bitrix", "domain"})
+
+
+def опознать(мои: list[tuple[str, str, str, str]],
+             известные: dict[tuple[str, str], set[str]],
+             формы_базы: dict[str, set[str]],
+             мои_формы: set[str]) -> str | None:
+    """Найти сущность в базе по её признакам. None — не нашлась, нужен новый номер.
+
+    ПОРЯДОК ТОТ ЖЕ, ЧТО У СВЕДЕНИЯ, и по той же причине: сильный признак ищется
+    первым. Твёрдый ключ портала и домен опознают сами по себе — это
+    идентификаторы, а не строки. Имя опознаёт лишь тогда, когда правовая форма
+    не противоречит.
+
+    ЗАЧЕМ ПРОВЕРКА ФОРМЫ ЗДЕСЬ, РАЗ ОНА УЖЕ ЕСТЬ В СВЕДЕНИИ. Потому что без неё
+    запись отменяла сведение. Правило развело «ООО Ромашка» и «АО Ромашка» в две
+    сущности, а запись искала каждую по алиасу «ромашка», находила первую и
+    отдавала второй ЕЁ номер: четыре сущности, три номера. Поймано прогоном на
+    живом PostgreSQL 16 — сведение и запись обязаны запрещать одно и то же.
+    """
+    for kind, value, _, _ in мои:
+        if kind not in ЕДИНОЛИЧНЫЕ:
+            continue
+        for sid in sorted(известные.get((kind, норма(value)), ())):
+            return sid
+    # Под одним написанием в базе может лежать НЕСКОЛЬКО сущностей — именно
+    # потому, что правило развело юрлица. Перебираем всех и берём того, чья
+    # правовая форма не противоречит нашей; не подошёл никто — новый номер.
+    for kind, value, _, _ in мои:
+        if kind != "alias":
+            continue
+        for sid in sorted(известные.get((kind, норма(value)), ())):
+            чужие = формы_базы.get(sid, set())
+            if мои_формы and чужие and not (мои_формы & чужие):
+                continue                   # разные юрлица под одним написанием
+            return sid
+    return None
+
+
+def записать(url: str, сущности: list[Сущность], очередь: list[dict],
+             run_id: str) -> int:
+    """Одна транзакция: сущности, признаки, номера, очередь проверки.
+
+    НОМЕР НЕ ПЕРЕИЗДАЁТСЯ. Прежде чем выдать новый, сущность ищется по КАЖДОМУ
+    своему признаку в sup_identifier: нашёлся — берём тот же sup_id и лишь
+    добавляем признаки, которых не было. Поэтому второй прогон, увидевший у
+    компании появившийся сайт, номер не меняет (правило реестра, см. шапку
+    library/supabase/suppliers_schema.sql).
+
+    Признак ищется по value_norm, тем же ключом, каким пишется, — иначе поиск не
+    найдёт то, что сам же вставил.
+    """
+    import psycopg2
+    import psycopg2.extras
+
+    conn = psycopg2.connect(url, connect_timeout=20,
+                            options="-c statement_timeout=600000 -c lock_timeout=30000")
+    conn.autocommit = False
+    выдано_новых = опознано = признаков = 0
+    try:
+        with conn.cursor() as cur:
+            cur.execute("select coalesce(max(seq), 0) from sup_number_registry")
+            следующий = cur.fetchone()[0]
+
+            # Все признаки базы разом: по одному запросу на сущность вышло бы
+            # 2 819 обращений, а тут одна выборка и словарь в памяти.
+            cur.execute("select kind, value_norm, sup_id from sup_identifier "
+                        "where status <> 'rejected'")
+            известные: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
+            формы_базы: dict[str, set[str]] = collections.defaultdict(set)
+            for k, v, sid in cur.fetchall():
+                известные[(k, v)].add(sid)
+                if k == "legal":
+                    формы_базы[sid].add(v)
+
+            строки_сущностей = []
+            строки_признаков = []
+            строки_реестра = []
+            for e in сущности:
+                мои = признаки(e)
+                найден = опознать(мои, известные, формы_базы,
+                                  {норма(f) for f in e.формы})
+                if найден:
+                    sup_id = найден
+                    опознано += 1
+                else:
+                    следующий += 1
+                    sup_id = номер(следующий)
+                    выдано_новых += 1
+                    строки_сущностей.append((
+                        sup_id, "legal", показать(e), e.статус_схемы(), e.причина))
+                    строки_реестра.append((sup_id, следующий, run_id))
+                формы_базы[sup_id] |= {норма(f) for f in e.формы}
+                for kind, value, source, status in мои:
+                    n = норма(value)
+                    чужой = известные[(kind, n)] - {sup_id}
+                    if kind in ЕДИНОЛИЧНЫЕ and чужой:
+                        continue      # такой признак у другой сущности — не воруем
+                    известные[(kind, n)].add(sup_id)
+                    строки_признаков.append((sup_id, kind, value, n, source, status, run_id))
+
+            if строки_сущностей:
+                psycopg2.extras.execute_values(cur, """
+                    insert into sup_entity (id, kind, display_name, resolution, note)
+                    values %s on conflict (id) do nothing""",
+                    строки_сущностей, page_size=500)
+                psycopg2.extras.execute_values(cur, """
+                    insert into sup_number_registry (sup_id, seq, run_id)
+                    values %s on conflict (sup_id) do nothing""",
+                    строки_реестра, page_size=500)
+            if строки_признаков:
+                psycopg2.extras.execute_values(cur, """
+                    insert into sup_identifier
+                      (sup_id, kind, value, value_norm, source, status, run_id)
+                    values %s
+                    on conflict (sup_id, kind, value_norm) do nothing""",
+                    строки_признаков, page_size=1000)
+                признаков = len(строки_признаков)
+            if очередь:
+                psycopg2.extras.execute_values(cur, """
+                    insert into sup_review (kind, subject_kind, priority, payload, run_id)
+                    values %s""",
+                    [(q["kind"], "entity", 5, json.dumps(q, ensure_ascii=False), run_id)
+                     for q in очередь], page_size=500)
+        conn.commit()
+    except Exception as e:                      # noqa: BLE001
+        conn.rollback()
+        print(f"ЗАПИСЬ ОТМЕНЕНА, откат выполнен: {e}", file=sys.stderr)
+        return 4
+    finally:
+        conn.close()
+
+    print(f"\nЗАПИСАНО, ключ прогона {run_id}")
+    print(f"  сущностей опознано по признакам (номер прежний): {опознано}")
+    print(f"  выдано новых номеров:                           {выдано_новых}")
+    print(f"  строк признаков:                                {признаков}")
+    print(f"  строк в очередь проверки:                       {len(очередь)}")
+    print("\nОткат этого прогона: строки помечены run_id — удаляются по нему.")
+    print("Номера НЕ переиспользуются: освободившийся seq остаётся пропуском.")
+    return 0
 
 
 if __name__ == "__main__":

@@ -169,6 +169,24 @@ create table if not exists sup_review (
   outcome      text,
   run_id       text not null
 );
+-- ДОБАВЛЕНИЕ ВИДА В СПИСОК — отдельным alter, а не правкой create выше.
+-- «create table if not exists» существующую таблицу не меняет: у неё останется
+-- прежний check, и вставка нового вида упадёт на живой базе, пройдя все тесты
+-- на свежей. Поэтому список видов приводится к текущему явно, при каждом прогоне.
+--
+-- different_legal_form появился 20.09.2026 вместе с запретом сливать «ООО
+-- Ромашка» и «АО Ромашка»: norm_name правовую форму вырезает, после неё имена
+-- неотличимы, а юрлица разные. Складывать такие случаи в entity_uncertain можно,
+-- но тогда из очереди не видно, что именно проверять человеку.
+do $$
+begin
+  alter table sup_review drop constraint if exists sup_review_kind_check;
+  alter table sup_review add constraint sup_review_kind_check check (kind in (
+    'ambiguous_match', 'different_legal_form', 'currency_unknown', 'unit_unknown',
+    'term_conflict', 'high_value', 'pn_suffix', 'entity_uncertain', 'low_conf_link',
+    'override_conflict', 'sensitive_change'));
+end $$;
+
 create index if not exists sup_review_open on sup_review (priority, opened_at)
   where closed_at is null;
 create index if not exists sup_review_kind on sup_review (kind) where closed_at is null;
