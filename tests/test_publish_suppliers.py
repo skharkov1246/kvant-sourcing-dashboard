@@ -31,7 +31,7 @@ def сущность(sid, имя, причина="domain", номер_выдан
 
 def test_счётчики_считаются_а_не_пишутся_руками():
     снимок = собрать(КОРПУС, ПРИЗНАКИ, 7)
-    assert снимок["totals"] == {"entities": 3, "numbered": 2, "held": 7, "with_inn": 1}
+    assert снимок["totals"] == {"entities": 3, "numbered": 2, "review_open": 7, "with_inn": 1}
     assert снимок["version"] == 1
     assert снимок["published_at"].endswith("Z")
 

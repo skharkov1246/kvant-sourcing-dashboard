@@ -52,7 +52,7 @@ tr:last-child td{border-bottom:0}td{color:#c4cedb;max-width:300px;overflow-wrap:
 dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 22px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:18px 20px;margin:0 0 20px}
 dt{font-size:11px;color:var(--dim);margin:0 0 3px}dd{margin:0;font-size:14px;overflow-wrap:anywhere}
 .section-title{font-size:15px;font-weight:500;margin:22px 0 10px}
-.locked{color:var(--amber)}.none{color:var(--dim)}
+.locked{color:var(--amber)}.none{color:var(--dim)}.warn{color:var(--amber)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:760px){.wrap{padding:20px 17px 40px}.hero{display:block}.published{text-align:left;margin-top:16px}
 .search-row{display:block}.result-count{margin-top:10px}.search-box input{font-size:16px}dl{grid-template-columns:1fr}}
@@ -124,6 +124,15 @@ function дата(s) {
   return isFinite(t) ? new Date(t).toLocaleString("ru-RU", { dateStyle: "long", timeStyle: "short" }) : "неизвестно";
 }
 
+// Объект в данных — это обычно человек или контакт. Показываем имя, а не JSON:
+// сырой JSON на странице означает, что поле не описали, и читать его нельзя.
+function коротко(x) {
+  if (x == null) return "";
+  if (typeof x !== "object") return String(x);
+  var имя = x.name || x.title || x.value || x.email || x.phone;
+  return имя ? String(имя) : JSON.stringify(x);
+}
+
 function значение(v) {
   // Три разных состояния, и путать их нельзя: закрыто правом, пусто, есть значение.
   if (закрыто(v)) {
@@ -131,10 +140,16 @@ function значение(v) {
     return узел("span", "locked", "Нет доступа · " + имя);
   }
   if (v == null || v === "" || (Array.isArray(v) && !v.length)) return узел("span", "none", "Нет данных");
-  if (Array.isArray(v)) return узел("span", null, v.map(function (x) { return typeof x === "string" ? x : JSON.stringify(x); }).join(", "));
-  if (typeof v === "object") return узел("span", null, JSON.stringify(v));
+  if (Array.isArray(v)) return узел("span", null, v.map(коротко).join(", "));
+  if (typeof v === "object") return узел("span", null, коротко(v));
+  // Деньги и счётчики читаются глазами, а не парсером: 1 234 567, не 1234567.
+  if (typeof v === "number") return узел("span", null, число(v));
   return узел("span", null, v);
 }
+
+// Несколько доменов у одной записи — признак склеенных компаний. Оговорка
+// наверху говорит, сколько их всего; без пометки на строке её нельзя проверить.
+function склейка(v) { return typeof v === "string" && v.indexOf(", ") >= 0; }
 
 function строка(e) {
   var tr = document.createElement("tr");
@@ -145,7 +160,14 @@ function строка(e) {
   b.addEventListener("click", function () { открыть(e); });
   td.appendChild(b);
   tr.appendChild(td);
-  [e.inn, e.domain, (e.sources || []).join(", "), e.merged_by].forEach(function (v) {
+  var домен = значение(e.domain);
+  if (склейка(e.domain)) {
+    домен.className = "warn";
+    домен.title = "несколько доменов у одной записи — вероятно, склеены две компании";
+  }
+  tr.appendChild(узел("td")).appendChild(значение(e.inn));
+  tr.appendChild(узел("td")).appendChild(домен);
+  [(e.sources || []).join(", "), e.merged_by].forEach(function (v) {
     tr.appendChild(узел("td")).appendChild(значение(v));
   });
   return tr;
@@ -205,6 +227,10 @@ function открыть(e) {
   card.appendChild(back);
   card.appendChild(узел("h2", null, e.name || "без названия"));
   card.appendChild(узел("span", "num", e.number || "номер не выдан"));
+  if (склейка(e.domain)) {
+    card.appendChild(узел("p", "caveat", "У записи несколько доменов. Это признак того, что "
+      + "сведение склеило две разные компании: данные ниже могут относиться к обеим."));
+  }
 
   var основа = узел("dl");
   [["ИНН", "inn"], ["Домен", "domain"], ["Страна", "country"], ["Правовая форма", "legal_form"],
@@ -225,7 +251,7 @@ function открыть(e) {
 function сводка(d) {
   var t = d.totals || {};
   var поля = [["Компаний в реестре", t.entities], ["С вечным номером", t.numbered],
-              ["Ждут ИНН", t.held], ["С ИНН", t.with_inn]];
+              ["В очереди проверки", t.review_open], ["С ИНН", t.with_inn]];
   var box = $("totals");
   var видно = false;
   поля.forEach(function (п) {
