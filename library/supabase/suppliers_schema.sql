@@ -173,16 +173,27 @@ create index if not exists sup_review_open on sup_review (priority, opened_at)
   where closed_at is null;
 create index if not exists sup_review_kind on sup_review (kind) where closed_at is null;
 
--- 6. Реестр выданных номеров. Номер выдаётся ОДИН раз и закрепляется по
---    устойчивому ключу: при каждой пересборке сущность получает тот же номер,
---    освободившиеся не переиспользуются. Так же устроен pnw/data/kv_registry.json,
+-- 6. Реестр выданных номеров: одна строка на сущность, номер выдан навсегда.
+--    Освободившиеся не переиспользуются. Так же устроен pnw/data/kv_registry.json,
 --    и там это проверено — три пересборки, 13 164 из 13 164 сохранили номер.
+--
+--    ПОЧЕМУ ЗДЕСЬ НЕТ КОЛОНКИ «устойчивый ключ». Сначала она была, и это ломало
+--    главное свойство номера. Опознать поставщика можно по домену, по имени, по
+--    companyId — и набор признаков РАСТЁТ со временем: в первый прогон компания
+--    известна только именем, во второй у неё появляется сайт. Если ключ строки
+--    реестра складывать из признака, второй прогон не найдёт первую строку и
+--    выдаст ТОТ ЖЕ компании второй номер. Номер, который уходит в договоры,
+--    раздваиваться не может.
+--
+--    Поэтому опознание живёт в sup_identifier, где у сущности сколько угодно
+--    ключей (домен, ИНН, имя, алиас, companyId), а здесь — только «сущность →
+--    её номер». Новый признак добавляется строкой в sup_identifier и номера не
+--    трогает.
 create table if not exists sup_number_registry (
-  stable_key text primary key,       -- устойчивый ключ сущности
-  sup_id     text not null unique references sup_entity(id),
-  seq        int  not null unique,    -- шесть цифр номера
+  sup_id      text primary key references sup_entity(id) on delete restrict,
+  seq         int  not null unique,   -- шесть цифр номера
   assigned_at timestamptz not null default now(),
-  run_id     text not null
+  run_id      text not null
 );
 
 -- 7. Наше юридическое лицо. Список пока пуст: владелец сказал, что юрлиц
