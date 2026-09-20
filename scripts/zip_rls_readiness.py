@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+"""Готовность к ужесточению доступа к базе ЗИП: что сломается, а что нет.
+
+ЗАЧЕМ. В базе ЗИП тринадцать таблиц открыты роли anon на чтение, запись И
+удаление, а публикуемый ключ лежит в публичном репозитории. Ужесточение написано
+(zip/supabase/migrations_rls.sql), но целиком закомментировано и ни одним
+workflow не применяется: в самом файле сказано, что сайт писал в базу из браузера
+тем же ключом. С тех пор появился прокси воркера, и утверждение могло устареть.
+
+Этот скрипт отвечает механически, а не по памяти: он читает миграции и воркер и
+делит открытые таблицы на два разряда —
+
+  БЕЗ РИСКА   — таблица открыта anon, но браузер её не запрашивает вовсе:
+                в белом списке прокси её нет. Закрывать можно сразу.
+  ПОД ГЕЙТОМ  — таблица нужна браузеру через прокси. Переживёт ужесточение
+                только если воркер ходит сервисным ключом, а не публикуемым.
+
+Гейт один и он бинарный: задан ли в Cloudflare секрет SUPABASE_SERVICE_KEY.
+Воркер берёт `(env && env.SUPABASE_SERVICE_KEY) || SUPA_FALLBACK_KEY`, то есть
+без секрета он ходит публикуемым ключом — и ужесточение положит сайт. Из
+репозитория состояние секрета не видно; проверяется в панели Cloudflare.
+
+Ничего не меняет и никуда не подключается: чистый разбор файлов репозитория.
+
+    python scripts/zip_rls_readiness.py
+    python scripts/zip_rls_readiness.py --check    # для гейта: молча, кодом возврата
+"""
+from __future__ import annotations
+
+import argparse
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+МИГРАЦИИ = [ROOT / "zip/supabase/migrations.sql", ROOT / "gt/supabase/migrations.sql"]
+ВОРКЕР = ROOT / "zip/site/_worker.js"
+УЖЕСТОЧЕНИЕ = ROOT / "zip/supabase/migrations_rls.sql"
+
+# Замер 20.09.2026: столько таблиц открыто anon, хотя браузер их не запрашивает.
+# Порог сторожит рост, а не факт: одиннадцать уже открытых — известная задолженность,
+# а двенадцатая означала бы новую, заведённую без нужды.
+ЗАМЕР_БЕЗ_РИСКА = 11
+
+
+def открытые_anon() -> set[str]:
+    """Таблицы, которым применяемые миграции дают политику для роли anon.
+
+    Две формы: прямая `create policy … on <таблица> … to anon`, и цикл
+    `foreach t in array array[…]`, которым открыты девять таблиц mach_* сразу.
+    """
+    найдено: set[str] = set()
+    for путь in МИГРАЦИИ:
+        текст = путь.read_text(encoding="utf-8")
+        # прямая форма: create policy X on TABLE for all ... to anon
+        for m in re.finditer(
+                r"create\s+policy\s+\S+\s+on\s+([A-Za-z_][\w.]*)(.{0,400}?)(?=create\s+policy|\Z)",
+                текст, re.I | re.S):
+            if re.search(r"\bto\s+[^;]*\banon\b", m.group(2), re.I):
+                найдено.add(m.group(1).split(".")[-1])
+        # цикл по массиву имён: открывает все перечисленные таблицы
+        for m in re.finditer(r"array\[([^\]]+)\]", текст, re.I | re.S):
+            имена = re.findall(r"'([A-Za-z_]\w*)'", m.group(1))
+            хвост = текст[m.end():m.end() + 900]
+            if имена and re.search(r"\bto\s+[^;']*\banon\b", хвост, re.I):
+                найдено.update(имена)
+        # отдельный execute-блок на одну таблицу
+        for m in re.finditer(r"create\s+policy\s+\S+\s+on\s+([A-Za-z_]\w*)\s+for\s+all[^']*?"
+                             r"to\s+anon", текст, re.I | re.S):
+            найдено.add(m.group(1))
+    return найдено
+
+
+def нужны_браузеру() -> dict[str, list[str]]:
+    """Белый список прокси воркера: таблица → разрешённые методы."""
+    текст = ВОРКЕР.read_text(encoding="utf-8")
+    блок = re.search(r"const\s+ZIP_DB_METHODS\s*=\s*new\s+Map\(\[(.*?)\]\);", текст, re.S)
+    if not блок:
+        return {}
+    out: dict[str, list[str]] = {}
+    for m in re.finditer(r'\[\s*"(\w+)"\s*,\s*\[([^\]]*)\]', блок.group(1)):
+        out[m.group(1)] = re.findall(r'"(\w+)"', m.group(2))
+    return out
+
+
+def ключ_по_умолчанию() -> str | None:
+    """Чем ходит воркер, если секрет не задан. None — если запасного ключа нет."""
+    текст = ВОРКЕР.read_text(encoding="utf-8")
+    if not re.search(r"env\.SUPABASE_SERVICE_KEY\s*\)?\s*\|\|", текст):
+        return None
+    m = re.search(r"const\s+SUPA_FALLBACK_KEY\s*=\s*\"([^\"]{0,14})", текст)
+    return m.group(1) if m else "есть, но не опознан"
+
+
+def ужесточение_применяется() -> bool:
+    """Применяет ли хоть один workflow файл ужесточения."""
+    for путь in (ROOT / ".github/workflows").glob("*.yml"):
+        if "migrations_rls.sql" in путь.read_text(encoding="utf-8"):
+            return True
+    return False
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--check", action="store_true",
+                    help="молча; код 1, если появилась открытая anon таблица, "
+                         "которой браузер не пользуется")
+    args = ap.parse_args()
+
+    открыты = открытые_anon()
+    прокси = нужны_браузеру()
+    без_риска = sorted(открыты - set(прокси))
+    под_гейтом = sorted(открыты & set(прокси))
+    запасной = ключ_по_умолчанию()
+
+    if args.check:
+        # Гейт следит за ростом, а не за фактом: новая anon-таблица без нужды
+        # браузеру — новая утечка, и она не должна проезжать молча.
+        if len(без_риска) > ЗАМЕР_БЕЗ_РИСКА:
+            print(f"::error::открытых anon таблиц без нужды браузеру: {len(без_риска)} "
+                  f"(замер 20.09.2026 — {ЗАМЕР_БЕЗ_РИСКА}). Новая таблица открыта роли "
+                  f"anon без необходимости: закрой её или объясни в migrations.sql.")
+            return 1
+        return 0
+
+    print("ОТКРЫТО РОЛИ anon ПРИМЕНЯЕМЫМИ МИГРАЦИЯМИ")
+    print(f"  всего таблиц: {len(открыты)}")
+    print()
+    print(f"БЕЗ РИСКА — закрывать можно сразу, браузер их не запрашивает: {len(без_риска)}")
+    for t in без_риска:
+        print(f"    {t}")
+    print()
+    print(f"ПОД ГЕЙТОМ — нужны браузеру через прокси воркера: {len(под_гейтом)}")
+    for t in под_гейтом:
+        print(f"    {t:16} методы: {', '.join(прокси[t])}")
+    неизвестно = sorted(set(прокси) - открыты)
+    if неизвестно:
+        print(f"СОСТОЯНИЕ НЕИЗВЕСТНО — браузеру нужны, политик в репозитории нет: "
+              f"{len(неизвестно)}")
+        for t in неизвестно:
+            print(f"    {t:16} методы: {', '.join(прокси[t])}")
+        print("    DDL этих таблиц в репозитории отсутствует (zip/supabase/migrations.sql:6")
+        print("    называет их созданными ранее), поэтому чем они закрыты — не видно.")
+        print("    Проверяется запросом к pg_policies в самой базе.")
+        print()
+    print("ЕДИНСТВЕННЫЙ ГЕЙТ")
+    if запасной is None:
+        print("  запасного ключа в воркере нет — он ходит только сервисным.")
+        print("  Ужесточение безопасно для всех таблиц.")
+    else:
+        print(f"  zip/site/_worker.js берёт (env.SUPABASE_SERVICE_KEY || запасной ключ),")
+        print(f"  запасной начинается на «{запасной}…».")
+        print("  Задан ли секрет SUPABASE_SERVICE_KEY в Cloudflare — из репозитория")
+        print("  НЕ ВИДНО. Проверяется в панели проекта kvant-zip.")
+        print()
+        print("  секрет задан   → воркер ходит сервисной ролью, она обходит RLS,")
+        print("                   ужесточение не ломает ничего;")
+        print("  секрет не задан → воркер ходит публикуемым ключом, и ужесточение")
+        print("                   положит сайт ЗИП целиком.")
+    print()
+    print("КЛИЕНТ")
+    print("  zip/site/index.template.html берёт location.origin + \"/db\" и заглушку")
+    print("  вместо ключа — прямых обращений браузера к Supabase нет.")
+    print()
+    print("СОСТОЯНИЕ УЖЕСТОЧЕНИЯ")
+    print(f"  zip/supabase/migrations_rls.sql применяется workflow: "
+          f"{'да' if ужесточение_применяется() else 'НЕТ'}")
+    print()
+    print("ПОРЯДОК, КОТОРЫЙ НИЧЕГО НЕ ЛОМАЕТ")
+    print(f"  1. Закрыть {len(без_риска)} таблиц из разряда «без риска» — сегодня, без условий.")
+    print("  2. Задать SUPABASE_SERVICE_KEY в Cloudflare для проекта kvant-zip.")
+    print("  3. Убедиться, что сайт ЗИП работает (он уже пойдёт сервисным ключом).")
+    print(f"  4. Закрыть остальные {len(под_гейтом)} таблиц и убрать запасной ключ из кода.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
