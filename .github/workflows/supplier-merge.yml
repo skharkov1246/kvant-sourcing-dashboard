@@ -1,0 +1,72 @@
+name: Поставщики — сведение реестров
+
+# Сводит шесть реестров поставщиков в канонические сущности. ПО УМОЛЧАНИЮ ВХОЛОСТУЮ:
+# читает, считает, печатает — и ничего не пишет.
+#
+# ЗАЧЕМ ОТДЕЛЬНО ОТ «замера сведения». Тот отвечает на вопрос «сколько их и
+# насколько пересекаются» и в базу не смотрит вовсе. Этот применяет само правило
+# сведения и показывает, что получится: сколько сущностей, чем они опознаны, что
+# ушло человеку. Замер обосновывает правило, прогон его проверяет.
+#
+# ШЕСТОЙ РЕЕСТР ОБЯЗАТЕЛЕН ДЛЯ ЗАПИСИ. Номер KV-S-NNNNNN-C выдаётся навсегда.
+# Выдать его по пяти реестрам из шести значит раздвоить сущность на следующем
+# прогоне, когда придёт портал: код это проверяет и запись отменяет сам.
+#
+# В журнал идут ТОЛЬКО агрегаты: репозиторий публичный (CLAUDE.md, правило 17).
+# Ни одного названия компании, ни домена, ни идентификатора карточки.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать в базу (иначе вхолостую)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supplier-merge
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests
+
+      - name: Проверка секретов
+        env:
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          S: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL — без портала сведение неполно"; exit 1; }
+          echo "секрет портала на месте"
+          if [ "$APPLY" = "true" ] && [ -z "${S:-}" ]; then
+            echo "::error::запись запрошена, но нет секрета SUPABASE_DB_URL"; exit 1
+          fi
+
+      - name: Сведение
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          # Имя переменной — латиницей: кириллическое bash за имя не считает и
+          # пытается выполнить строку как команду (прогон zip-rls 20.09, код 127).
+          # И не «[ ... ] && args=...»: при APPLY=false тест вернёт ненулевой код,
+          # он станет кодом последней команды, и set -e уронит шаг до запуска.
+          args=()
+          if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          python library/load_supplier_master.py "${args[@]}"
