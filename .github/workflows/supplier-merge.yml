@@ -21,6 +21,10 @@ on:
         description: "Записать в базу (иначе вхолостую)"
         type: boolean
         default: false
+      rollback_run_id:
+        description: "Откатить прогон по ключу (например merge-1789942261). Задан — только откат, записи не будет"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -61,11 +65,27 @@ jobs:
             echo "::error::запись запрошена, но нет секрета SUPABASE_DB_URL"; exit 1
           fi
 
+      # ОТКАТ ИДЁТ ПЕРВЫМ И ОТМЕНЯЕТ ВСЁ ОСТАЛЬНОЕ. Задан ключ прогона — значит
+      # прогон зовут чинить, а не писать; смешивать откат с новой записью в одном
+      # запуске нельзя: непонятно, что откатывать, если упадёт вторая половина.
+      - name: Откат прогона по ключу
+        if: inputs.rollback_run_id != ''
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          RUN_ID: ${{ inputs.rollback_run_id }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          echo "откатываю прогон $RUN_ID"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -v run_id="'$RUN_ID'" \
+            -f library/supabase/rollback_run.sql
+
       # Проверки записи требуют настоящей базы, поэтому в гейте они пропускаются
       # (он Postgres не поднимает). Здесь база есть — поднимаем свою, пустую, и
       # гоняем их по-настоящему ПЕРЕД тем, как трогать рабочую. Пропущенная
       # проверка — не пройденная проверка.
       - name: Проверки записи на чистой базе
+        if: inputs.rollback_run_id == ''
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
@@ -89,7 +109,7 @@ jobs:
       # что кто-то прогнал общие миграции. В zip-db.yml он тоже добавлен — там он
       # держится в актуальном состоянии вместе с остальными схемами.
       - name: Схема поставщиков в рабочей базе
-        if: inputs.apply
+        if: inputs.apply && inputs.rollback_run_id == ''
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
@@ -99,6 +119,7 @@ jobs:
             -f library/supabase/suppliers_schema.sql
 
       - name: Сведение
+        if: inputs.rollback_run_id == ''
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
