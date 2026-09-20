@@ -33,8 +33,25 @@
 set statement_timeout = '5min';
 set lock_timeout      = '30s';
 
+-- РОЛИ SUPABASE МОГУТ ОТСУТСТВОВАТЬ. anon, authenticated и service_role заводит
+-- платформа; на чистом PostgreSQL их нет, и «revoke … from anon» роняет весь файл
+-- с «role "anon" does not exist». Прогон против прода этого не покажет никогда —
+-- там роли есть; зато проверить ужесточение где-либо ещё становится невозможно.
+-- За эту сессию я трижды создавал роли руками, чтобы прогнать этот файл локально,
+-- и трижды не замечал, что сам файл к такому не готов. Ту же ошибку в схеме
+-- поставщиков нашёл прогон 20.09.2026 20:40.
+--
+-- Роли здесь НЕ СОЗДАЮТСЯ: это дело платформы, а не миграции. Права снимаются
+-- только с тех, кто есть; нет роли — нечего у неё и снимать.
+create or replace function zip_роли_которые_есть(имена text[]) returns text as $$
+  select string_agg(quote_ident(r.rolname), ', ')
+    from pg_roles r where r.rolname = any (имена);
+$$ language sql stable;
+
 do $$
 declare n text;
+declare кому text := zip_роли_которые_есть(array['anon', 'authenticated']);
+declare служебная text := zip_роли_которые_есть(array['service_role']);
 begin
   foreach n in array array[
     'price_records',   -- цены: сайт читает и пишет
@@ -53,8 +70,13 @@ begin
     execute format('alter table public.%I enable row level security', n);
     execute format('alter table public.%I force  row level security', n);
     execute format('drop policy if exists %I on public.%I', n || '_all', n);
-    execute format('revoke all on table public.%I from anon, authenticated', n);
-    execute format('grant select, insert, update, delete on table public.%I to service_role', n);
+    if кому is not null then
+      execute format('revoke all on table public.%I from %s', n, кому);
+    end if;
+    if служебная is not null then
+      execute format('grant select, insert, update, delete on table public.%I to %s',
+                     n, служебная);
+    end if;
   end loop;
 end $$;
 
@@ -86,6 +108,8 @@ end $$;
 do $$
 declare v text;
 declare закрыто int := 0;
+declare кому text := zip_роли_которые_есть(array['anon', 'authenticated']);
+declare служебная text := zip_роли_которые_есть(array['service_role']);
 begin
   for v in
     select distinct u.view_name
@@ -101,8 +125,12 @@ begin
        -- сломать будущего читателя.
        and not coalesce('security_invoker=true' = any (c.reloptions), false)
   loop
-    execute format('revoke all on table public.%I from anon, authenticated', v);
-    execute format('grant select on table public.%I to service_role', v);
+    if кому is not null then
+      execute format('revoke all on table public.%I from %s', v, кому);
+    end if;
+    if служебная is not null then
+      execute format('grant select on table public.%I to %s', v, служебная);
+    end if;
     закрыто := закрыто + 1;
     raise notice 'представление % обходило RLS закрытой таблицы — права сняты', v;
   end loop;

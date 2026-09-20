@@ -257,12 +257,28 @@ where f.status <> 'superseded';
 --    воркером сервисным ключом, после проверки входа Cloudflare Access и права
 --    на раздел. Роль anon не получает ничего: в этой же базе тринадцать таблиц
 --    ЗИП исторически открыты ей на запись и удаление, и повторять это нельзя.
+-- РОЛИ SUPABASE МОГУТ ОТСУТСТВОВАТЬ, и файл обязан это переживать. anon,
+-- authenticated и service_role заводит платформа; на чистом PostgreSQL — том, на
+-- котором идут проверки записи, — их нет, и «revoke … from anon» роняет весь файл
+-- с «role "anon" does not exist». Прогон 20.09.2026 20:40 так и упал: локально я
+-- роли создал руками и поэтому ошибки не увидел, а прогон увидел.
+--
+-- Роли здесь НЕ СОЗДАЮТСЯ: заводить платформенные роли — не дело схемы данных, и
+-- в чужой базе это лишнее. Вместо этого снимаем права только с тех, кто есть, а
+-- отсутствие роли значит, что и снимать у неё нечего.
+create or replace function sup_роли_которые_есть(имена text[]) returns text as $$
+  select string_agg(quote_ident(r.rolname), ', ')
+    from pg_roles r where r.rolname = any (имена);
+$$ language sql stable;
+
 -- Схема берётся из search_path, а не прибита к public: в проде это public, а
 -- тест применяет файл в отдельной схеме одноразовой базы — иначе таблицы
 -- остались бы в public общей базы CI и мешали соседним тестам.
 do $$
 declare n text;
 declare сх text := current_schema();
+declare кому text := sup_роли_которые_есть(array['anon', 'authenticated']);
+declare служебная text := sup_роли_которые_есть(array['service_role']);
 begin
   foreach n in array array[
     'sup_entity', 'sup_identifier', 'sup_fact', 'sup_override',
@@ -271,24 +287,46 @@ begin
     execute format('comment on table %I.%I is %L', сх, n, 'suppliers_schema:v1');
     execute format('alter table %I.%I enable row level security', сх, n);
     execute format('alter table %I.%I force  row level security', сх, n);
-    execute format('revoke all on table %I.%I from public, anon, authenticated', сх, n);
-    execute format('grant select, insert, update, delete on table %I.%I to service_role',
-                   сх, n);
+    execute format('revoke all on table %I.%I from public', сх, n);
+    if кому is not null then
+      execute format('revoke all on table %I.%I from %s', сх, n, кому);
+    end if;
+    if служебная is not null then
+      execute format('grant select, insert, update, delete on table %I.%I to %s',
+                     сх, n, служебная);
+    end if;
   end loop;
 end $$;
 
-revoke all on sup_effective from public, anon, authenticated;
-grant select on sup_effective to service_role;
+do $$
+declare кому text := sup_роли_которые_есть(array['anon', 'authenticated']);
+declare служебная text := sup_роли_которые_есть(array['service_role']);
+begin
+  revoke all on sup_effective from public;
+  if кому is not null then
+    execute format('revoke all on sup_effective from %s', кому);
+  end if;
+  if служебная is not null then
+    execute format('grant select on sup_effective to %s', служебная);
+  end if;
+end $$;
 
 -- Последовательности: та же строгость, иначе anon может двигать счётчик.
 do $$
 declare s text;
+declare кому text := sup_роли_которые_есть(array['anon', 'authenticated']);
+declare служебная text := sup_роли_которые_есть(array['service_role']);
 begin
   for s in select sequence_name from information_schema.sequences
             where sequence_schema = 'public' and sequence_name like 'sup_%'
   loop
-    execute format('revoke all on sequence public.%I from public, anon, authenticated', s);
-    execute format('grant usage, select on sequence public.%I to service_role', s);
+    execute format('revoke all on sequence public.%I from public', s);
+    if кому is not null then
+      execute format('revoke all on sequence public.%I from %s', s, кому);
+    end if;
+    if служебная is not null then
+      execute format('grant usage, select on sequence public.%I to %s', s, служебная);
+    end if;
   end loop;
 end $$;
 
