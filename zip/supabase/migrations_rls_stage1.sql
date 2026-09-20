@@ -49,6 +49,36 @@ begin
   raise notice 'обработано таблиц: %', найдено;
 end $$;
 
+-- ПРЕДСТАВЛЕНИЯ НАД ЗАКРЫТЫМИ ТАБЛИЦАМИ. Обычное представление исполняется
+-- правами ВЛАДЕЛЬЦА и RLS таблиц под собой не применяет. Закрыть таблицу и
+-- оставить открытым представление над ней — значит не закрыть ничего: данные
+-- продолжают читаться, только через другое имя.
+--
+-- Нашёл это не разбор, а сам прогон: 20.09.2026 самопроверка ниже уперлась в
+-- mach_channels_ask — «select * from mach_channels», то есть ровно обход
+-- ужесточения, которое эта миграция и делает. Первая версия файла его не видела.
+--
+-- Ищем по ЗАВИСИМОСТИ, а не по имени: представление может называться как угодно,
+-- а читать закрытую таблицу. Имя ловит только то, что кто-то не забыл назвать
+-- правильно.
+do $$
+declare v text;
+declare закрыто int := 0;
+begin
+  for v in
+    select distinct u.view_name
+      from information_schema.view_table_usage u
+     where u.view_schema = 'public' and u.table_schema = 'public'
+       and (u.table_name like 'mach\_%' or u.table_name = 'objects')
+  loop
+    execute format('revoke all on table public.%I from anon, authenticated', v);
+    execute format('grant select on table public.%I to service_role', v);
+    закрыто := закрыто + 1;
+    raise notice 'представление % читало закрытую таблицу — права сняты', v;
+  end loop;
+  raise notice 'представлений закрыто: %', закрыто;
+end $$;
+
 -- Последовательности этих таблиц — той же строгости, иначе anon двигает счётчик.
 do $$
 declare s text;
