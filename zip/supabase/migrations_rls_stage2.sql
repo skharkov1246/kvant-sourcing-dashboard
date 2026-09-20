@@ -78,16 +78,19 @@ end $$;
 -- ступень 1 с кодом 3). Самопроверка здесь подтверждает лишь, что перечисленное
 -- закрыто. Новая таблица базы ЗИП, открытая anon, обнаружится только замером
 -- scripts/zip_rls_readiness.py, который сверяет политики с белым списком воркера.
+--
+-- Имена печатаем, а не считаем: «осталось 3 прав» может быть и одной таблицей
+-- с тремя грантами, и тремя таблицами — по такому сообщению непонятно, что чинить.
 do $$
-declare осталось int;
+declare забытые text;
 begin
-  select count(*) into осталось
+  select string_agg(distinct table_name, ', ' order by table_name) into забытые
   from information_schema.role_table_grants
   where table_schema = 'public'
     and grantee in ('anon', 'authenticated')
     and table_name in ('price_records', 'drawings', 'samples', 'gt_notes',
                        'positions', 'odm_suppliers', 'rfq_requests', 'change_log');
-  if осталось > 0 then
-    raise exception 'у anon/authenticated осталось % прав на таблицы ступени 2', осталось;
+  if забытые is not null then
+    raise exception 'у anon/authenticated остались права на таблицы ступени 2: %', забытые;
   end if;
 end $$;

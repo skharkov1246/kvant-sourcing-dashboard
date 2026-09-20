@@ -66,10 +66,7 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           set -euo pipefail
-          psql "$SUPABASE_DB_URL" -At -c "
-            select 'прав у anon и authenticated в public: ' || count(*)
-              from information_schema.role_table_grants
-             where table_schema='public' and grantee in ('anon','authenticated')"
+          psql "$SUPABASE_DB_URL" -f zip/supabase/rls_report.sql
 
       - name: Применение ступени
         env:
@@ -77,10 +74,13 @@ jobs:
           STAGE: ${{ inputs.stage }}
         run: |
           set -euo pipefail
-          файл="zip/supabase/migrations_rls_${STAGE}.sql"
-          [ -f "$файл" ] || { echo "::error::нет файла $файл"; exit 1; }
-          echo "::group::$файл"
-          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$файл"
+          # Имя переменной — только латиницей. Кириллическое имя bash за имя
+          # переменной не считает и пытается выполнить строку как команду:
+          # прогон 19:17 упал с «файл=zip/...: No such file or directory», код 127.
+          file="zip/supabase/migrations_rls_${STAGE}.sql"
+          [ -f "$file" ] || { echo "::error::нет файла $file"; exit 1; }
+          echo "::group::$file"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$file"
           echo "::endgroup::"
           echo "— $STAGE применена"
 
@@ -89,12 +89,4 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           set -euo pipefail
-          psql "$SUPABASE_DB_URL" -At -c "
-            select 'прав у anon и authenticated в public: ' || count(*)
-              from information_schema.role_table_grants
-             where table_schema='public' and grantee in ('anon','authenticated')"
-          psql "$SUPABASE_DB_URL" -At -c "
-            select 'из них на mach_* и objects: ' || count(*)
-              from information_schema.role_table_grants
-             where table_schema='public' and grantee in ('anon','authenticated')
-               and (table_name like 'mach\_%' or table_name='objects')"
+          psql "$SUPABASE_DB_URL" -f zip/supabase/rls_report.sql
