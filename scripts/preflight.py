@@ -25,6 +25,7 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 import time
@@ -94,6 +95,17 @@ def main() -> int:
     steps = [("ruff — ошибки кода", ruff_cmd, None)]
     if not a.quick:
         steps.append(("тесты ядра", [py, "-m", "pytest", "-q"], None))
+        # Тесты прав доступа на node. Гейт их гонял, а этот скрипт — нет, и это
+        # ровно та дыра, ради закрытия которой он написан: 20.09.2026 правка
+        # access/acl.js прошла зелёный preflight и упала бы на гейте. Если node
+        # в окружении нет, шаг честно говорит об этом, а не молчит.
+        if shutil.which("node"):
+            steps.append(("тесты прав доступа (node)",
+                          ["node", "--test", *sorted(
+                              str(x.relative_to(ROOT))
+                              for x in (ROOT / "access" / "test").glob("*.test.mjs"))], None))
+        else:
+            print("⚠ node не найден: тесты прав доступа пропущены, гейт их всё равно прогонит")
     steps += [
         ("каталог данных актуален", [py, "scripts/build_catalog.py", "--check"], None),
         ("поисковый указатель актуален", [py, "scripts/build_index.py", "--check"], None),
