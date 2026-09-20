@@ -105,3 +105,93 @@ def test_метрика_срока_названа_честно(tmp_path):
     assert "days_to_stage_move" in колонки
     assert "days_med" not in колонки, (
         "имя days_med читается как срок ответа поставщика, которым оно не является")
+
+
+# ─── разряды стадий: переименование в портале не должно пропадать молча ───
+
+СТАДИИ = [
+    # (стадия, ожидаемый разряд)
+    ("Request Sent", "silent"),
+    ("In Correspondance", "talking"),
+    ("Отказ в КП", "refused"),
+    ("КП получено", "selected"),
+    ("Не прошли по цене", "lost"),
+    ("Совершенно новая стадия из портала", "unknown"),
+]
+
+
+def база_стадий(tmp_path) -> str:
+    """По одной карточке на каждый разряд, у всех — один поставщик."""
+    путь = tmp_path / "kvant.db"
+    con = sqlite3.connect(путь)
+    con.executescript((ROOT / "base" / "schema.sql").read_text(encoding="utf-8"))
+    con.executescript("""
+      CREATE TABLE rfq (
+        id INTEGER PRIMARY KEY, deal_id INTEGER, title TEXT,
+        stage_id TEXT, stage TEXT, prev_stage_id TEXT,
+        supplier_id INTEGER, supplier TEXT, contact_id INTEGER,
+        company_id INTEGER, currency TEXT, amount REAL,
+        created TEXT, updated TEXT, moved TEXT, closed TEXT,
+        assigned_id INTEGER, sender_email TEXT, comment TEXT, chosen INTEGER,
+        files INTEGER);
+      CREATE TABLE file_cards (
+        sha1 TEXT PRIMARY KEY, fid TEXT, kind TEXT, side TEXT, field TEXT,
+        rfq_id INTEGER, supplier TEXT, deal_id INTEGER);
+    """)
+    con.execute("INSERT INTO deals (id, won, date_create) VALUES (?,?,?)", (600, 1, "2026-04-01"))
+    for i, (стадия, _) in enumerate(СТАДИИ, start=1):
+        con.execute("""INSERT INTO rfq (id, deal_id, stage, supplier_id, supplier,
+                                        created, moved, chosen, files)
+                       VALUES (?,?,?,?,?,?,?,?,?)""",
+                    (100 + i, 600, стадия, 9002, ПОСТАВЩИК,
+                     "2026-04-01", "2026-04-03", 0, 1))
+    con.commit()
+    con.close()
+    return str(путь)
+
+
+def test_разряд_не_выбрали_больше_не_проваливается(tmp_path):
+    """LOST был объявлен и не использовался: карточка уходила в никуда."""
+    db = база_стадий(tmp_path)
+    suppliers.run(db)
+    con = sqlite3.connect(db)
+    lost, = con.execute("SELECT lost FROM supplier_stats WHERE supplier = ?",
+                        (ПОСТАВЩИК,)).fetchone()
+    assert lost == 1, f"карточек «выбрали не его» {lost}, ожидалась одна"
+
+
+def test_переименованная_стадия_видна_числом(tmp_path):
+    """Стадия не из разрядов считается, а не исчезает молча."""
+    db = база_стадий(tmp_path)
+    итог = suppliers.run(db)
+    assert итог["unknown_stages"] == 1, (
+        f"неопознанных стадий {итог['unknown_stages']}, ожидалась одна")
+    assert итог["unknown_stage_rows"] == 1
+    con = sqlite3.connect(db)
+    unk, = con.execute("SELECT unknown_stage FROM supplier_stats WHERE supplier = ?",
+                       (ПОСТАВЩИК,)).fetchone()
+    assert unk == 1, "счётчик неопознанных стадий не доехал до таблицы"
+
+
+def test_известные_стадии_в_неопознанные_не_попадают(tmp_path):
+    """Сторож от обратной ошибки: разряды не должны ловить лишнего."""
+    путь = tmp_path / "ok.db"
+    con = sqlite3.connect(путь)
+    con.executescript((ROOT / "base" / "schema.sql").read_text(encoding="utf-8"))
+    con.executescript("""
+      CREATE TABLE rfq (id INTEGER PRIMARY KEY, deal_id INTEGER, stage TEXT,
+        supplier_id INTEGER, supplier TEXT, created TEXT, moved TEXT,
+        chosen INTEGER, files INTEGER);
+      CREATE TABLE file_cards (sha1 TEXT PRIMARY KEY, fid TEXT, kind TEXT,
+        side TEXT, field TEXT, rfq_id INTEGER, supplier TEXT, deal_id INTEGER);
+    """)
+    for i, стадия in enumerate(sorted(suppliers.ИЗВЕСТНЫЕ), start=1):
+        con.execute("""INSERT INTO rfq (id, deal_id, stage, supplier_id, supplier,
+                                        created, moved, chosen, files)
+                       VALUES (?,?,?,?,?,?,?,?,?)""",
+                    (i, None, стадия, 9003, ПОСТАВЩИК, "2026-04-01", "2026-04-02", 0, 0))
+    con.commit()
+    con.close()
+    итог = suppliers.run(str(путь))
+    assert итог["unknown_stages"] == 0, (
+        "стадия из объявленных разрядов попала в неопознанные")

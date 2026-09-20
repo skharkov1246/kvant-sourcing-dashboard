@@ -28,11 +28,21 @@ from pathlib import Path
 
 # Стадии запроса, разложенные по смыслу. Названия в портале смешанные —
 # английские от коробочного шаблона и русские, добавленные позже.
+#
+# ХРУПКОЕ МЕСТО, О КОТОРОМ НАДО ЗНАТЬ. Разряды опознаются по ОТОБРАЖАЕМОМУ имени
+# стадии, а в rfq.stage пишется именно оно (base/fetch_rfq.py:182), полученное из
+# портала в рантайме. Переименуют стадию в Битриксе — карточка перестанет
+# попадать в свой разряд, и заметить это будет нечем: она молча уйдёт в «прочие».
+# Правильное решение — опознавать по stageId, но коды воронок смарт-процесса
+# задаются в портале (вида DT166_16:UC_XXXXX) и из репозитория неизвестны.
+# Поэтому здесь сделано второе лучшее: неопознанная стадия СЧИТАЕТСЯ и попадает
+# в сводку прогона числом и списком имён. Молча не пропадает ничего.
 SILENT = ("Request Sent", "New Request", "Ответ не получен (в срок)")
 TALKING = ("In Correspondance", "Unread Messages", "Price at Work")
 GOT = ("Selected", "КП получено")
 REFUSED = ("Отказ в КП",)
 LOST = ("Not Selected", "Не подошло по технике", "Не прошли по цене")
+ИЗВЕСТНЫЕ = frozenset(SILENT + TALKING + GOT + REFUSED + LOST)
 
 
 def med(v: list[float]) -> float | None:
@@ -53,6 +63,7 @@ def run(db_path: str) -> dict:
         talking    INTEGER,      -- переписка идёт
         refused    INTEGER,      -- отказался считать
         selected   INTEGER,      -- его КП выбрали
+        lost       INTEGER,      -- ответил, но выбрали не его: по технике или цене
         chosen     INTEGER,      -- отмечен выбранным в карточке запроса
         answer_rate REAL,        -- доля запросов, где он вообще отозвался
         select_rate REAL,        -- доля ответов, дошедших до выбора
@@ -68,7 +79,8 @@ def run(db_path: str) -> dict:
         priced     INTEGER,      -- из них с ценой
         brands     TEXT,
         first_seen TEXT,
-        last_seen  TEXT
+        last_seen  TEXT,
+        unknown_stage INTEGER   -- карточек в стадии, которой нет ни в одном разряде
       );
       DROP TABLE IF EXISTS brand_suppliers;
       CREATE TABLE brand_suppliers (
@@ -83,8 +95,10 @@ def run(db_path: str) -> dict:
     deal_date = dict(con.execute("SELECT id, substr(date_create,1,10) FROM deals"))
 
     agg: dict[str, dict] = defaultdict(lambda: {
-        "req": 0, "ans": 0, "sil": 0, "moved": 0, "talk": 0, "ref": 0, "sel": 0, "ch": 0,
+        "req": 0, "ans": 0, "sil": 0, "moved": 0, "talk": 0, "ref": 0, "sel": 0,
+        "lost": 0, "ch": 0, "unk": 0,
         "deals": set(), "won": set(), "days": [], "dates": []})
+    неопознанные: dict[str, int] = {}     # стадия → сколько карточек в ней
     sql = """SELECT supplier, stage, files, chosen, deal_id,
                     substr(created,1,10), substr(moved,1,10)
              FROM rfq WHERE supplier IS NOT NULL AND supplier<>''"""
@@ -106,6 +120,14 @@ def run(db_path: str) -> dict:
             a["ref"] += 1
         elif stage in GOT:
             a["sel"] += 1
+        elif stage in LOST:
+            # Разряд был объявлен и не использовался: карточка «выбрали не его»
+            # проваливалась мимо всех счётчиков и становилась неотличима от
+            # карточки с переименованной стадией.
+            a["lost"] += 1
+        elif stage not in SILENT:
+            a["unk"] += 1
+            неопознанные[stage] = неопознанные.get(stage, 0) + 1
         if chosen:
             a["ch"] += 1
         if did:
@@ -164,14 +186,15 @@ def run(db_path: str) -> dict:
         n, ans, sil = a["req"], a["ans"], a["sil"]
         pos, priced = pos_by_sup.get(sup, [0, 0])
         rows.append((
-            sup, n, ans, a["moved"], sil, a["talk"], a["ref"], a["sel"], a["ch"],
+            sup, n, ans, a["moved"], sil, a["talk"], a["ref"], a["sel"], a["lost"], a["ch"],
             round(1 - sil / n, 3) if n else None,
             round(a["sel"] / ans, 3) if ans else None,
             len(a["deals"]), len(a["won"]), med(a["days"]), pos, priced,
             ", ".join(b for b, _ in brands_by_sup[sup].most_common(5)),
             min(a["dates"]) if a["dates"] else None,
-            max(a["dates"]) if a["dates"] else None))
-    con.executemany(f"INSERT OR REPLACE INTO supplier_stats VALUES ({','.join('?'*19)})", rows)
+            max(a["dates"]) if a["dates"] else None,
+            a["unk"]))
+    con.executemany(f"INSERT OR REPLACE INTO supplier_stats VALUES ({','.join('?'*21)})", rows)
 
     prows = []
     for (brand, sup), e in pair.items():
@@ -195,12 +218,26 @@ def run(db_path: str) -> dict:
                            WHERE requests>=10 AND answer_rate>=0.6"""),
         "deadweight": q("""SELECT count(*) FROM supplier_stats
                            WHERE requests>=10 AND answer_rate<0.3"""),
+        "unknown_stages": len(неопознанные),
+        "unknown_stage_rows": sum(неопознанные.values()),
     }
     print(f"поставщиков: {out['suppliers']}, запросов {out['requests']}, "
           f"без ответа {out['silent']} ({100*out['silent']/max(out['requests'],1):.0f}%)", flush=True)
     print(f"пар «марка + поставщик»: {out['pairs']}", flush=True)
     print(f"рабочие (≥10 запросов, отвечают чаще 60 %): {out['workhorses']}", flush=True)
     print(f"мёртвые (≥10 запросов, отвечают реже 30 %): {out['deadweight']}", flush=True)
+    # Неопознанная стадия — не мелочь: карточка выпадает из всех разрядов и
+    # портит и отзывчивость, и выбор. Имена стадий — настройка портала, не
+    # коммерческие данные, поэтому их видно: без них нечего чинить.
+    if неопознанные:
+        всего = sum(неопознанные.values())
+        print(f"::warning::стадий не в разрядах: {len(неопознанные)}, "
+              f"карточек в них {всего}. Обнови SILENT/TALKING/GOT/REFUSED/LOST "
+              f"в base/suppliers.py", flush=True)
+        for имя, n in sorted(неопознанные.items(), key=lambda kv: -kv[1]):
+            print(f"    {n:>6}  {имя}", flush=True)
+    else:
+        print("стадий не в разрядах: нет", flush=True)
     con.close()
     return out
 
