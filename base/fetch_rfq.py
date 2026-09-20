@@ -142,20 +142,28 @@ def run(db_path: str, out_path: str, from_raw: bool = False) -> dict:
     if from_raw and raw.exists():
         items = json.loads(raw.read_text(encoding="utf-8"))
         print(f"взято из сохранённой выгрузки: {len(items)} карточек", flush=True)
-    last = 0
-    t0 = time.time()
-    while not items:
-        r = call(sess, base, "crm.item.list", {
-            "entityTypeId": 166, "select": SELECT,
-            "filter": {">id": last}, "order": {"id": "asc"}, "start": -1})
-        batch = ((r or {}).get("result") or {}).get("items") or []
-        if not batch:
-            break
-        items += batch
-        last = int(batch[-1]["id"])
-        if len(items) % 2000 < len(batch):
-            print(f"  {len(items)} запросов · {len(items)/max(time.time()-t0,1):.0f}/с", flush=True)
-        time.sleep(0.25)
+    # Постраничная выгрузка курсором по id: портал отдаёт по 50 карточек за вызов,
+    # следующая страница берётся фильтром «>id последней». Условие цикла — True,
+    # а выход — по пустой странице. Прежнее «while not items» выходило после
+    # ПЕРВОЙ же страницы: items перестаёт быть пустым сразу после её добавления,
+    # и весь корпус запросов сводился к пятидесяти самым старым карточкам СП-166
+    # из двадцати с лишним тысяч. На этом стоят supplier_stats, brand_suppliers
+    # и все метрики поставщиков, поэтому ошибка обесценивала их целиком.
+    if not items:                       # пусто, только если не взято из .raw.json
+        last = 0
+        t0 = time.time()
+        while True:
+            r = call(sess, base, "crm.item.list", {
+                "entityTypeId": 166, "select": SELECT,
+                "filter": {">id": last}, "order": {"id": "asc"}, "start": -1})
+            batch = ((r or {}).get("result") or {}).get("items") or []
+            if not batch:
+                break
+            items += batch
+            last = int(batch[-1]["id"])
+            if len(items) % 2000 < len(batch):
+                print(f"  {len(items)} запросов · {len(items)/max(time.time()-t0,1):.0f}/с", flush=True)
+            time.sleep(0.25)
     print(f"выгружено запросов: {len(items)}", flush=True)
     if not from_raw:
         raw.write_text(json.dumps(items, ensure_ascii=False), encoding="utf-8")
