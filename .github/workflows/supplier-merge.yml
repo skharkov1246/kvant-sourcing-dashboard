@@ -41,7 +41,12 @@ jobs:
           cache: pip
 
       - name: Установка зависимостей
-        run: pip install --quiet requests
+        # pytest и psycopg2 нужны шагу проверок записи — он идёт до сведения.
+        # Прогон 21:02 упал на «No module named pytest»: я поставил только
+        # requests, потому что сам скрипт сведения больше ничего не просит, и
+        # забыл, что перед ним стоит шаг с тестами. Версия psycopg2 — та же, что
+        # в гейте, чтобы поведение не расходилось между прогонами.
+        run: pip install --quiet requests pytest psycopg2-binary==2.9.10
 
       - name: Проверка секретов
         env:
