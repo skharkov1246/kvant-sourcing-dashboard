@@ -379,7 +379,13 @@ alter table mach_channels add column if not exists ru  boolean;
 alter table mach_channels add column if not exists ask boolean;
 create index if not exists mach_channels_ask_ix on mach_channels (machine_key, ask);
 
-create or replace view mach_channels_ask as
+-- security_invoker обязателен. Без него представление исполняется правами
+-- ВЛАДЕЛЬЦА и RLS таблицы под собой не применяет: закрытая mach_channels
+-- продолжала бы читаться через этот вид. Проверено на PostgreSQL 16 — таблица
+-- «permission denied», вид отдаёт все строки. Три вида библиотеки заведены так
+-- с самого начала, этот был единственным исключением.
+drop view if exists mach_channels_ask;
+create view mach_channels_ask with (security_invoker = true) as
   select * from mach_channels where coalesce(ask, not coalesce(ru, false));
 
 -- ─────────────────────────────────────────────────────────────────────────────

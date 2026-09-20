@@ -68,13 +68,20 @@ begin
   for v in
     select distinct u.view_name
       from information_schema.view_table_usage u
+      join pg_class c on c.relname = u.view_name
+      join pg_namespace ns on ns.oid = c.relnamespace and ns.nspname = 'public'
      where u.view_schema = 'public' and u.table_schema = 'public'
        and (u.table_name like 'mach\_%' or u.table_name = 'objects')
+       -- Трогаем только те, что RLS ОБХОДЯТ. Вид с security_invoker исполняется
+       -- правами вызывающего: закрытую таблицу под собой он уже не отдаёт, и
+       -- снимать с него права не за что. Снять — ничего не выиграть в защите и
+       -- сломать будущего читателя.
+       and not coalesce('security_invoker=true' = any (c.reloptions), false)
   loop
     execute format('revoke all on table public.%I from anon, authenticated', v);
     execute format('grant select on table public.%I to service_role', v);
     закрыто := закрыто + 1;
-    raise notice 'представление % читало закрытую таблицу — права сняты', v;
+    raise notice 'представление % обходило RLS закрытой таблицы — права сняты', v;
   end loop;
   raise notice 'представлений закрыто: %', закрыто;
 end $$;
@@ -107,11 +114,16 @@ end $$;
 do $$
 declare забытые text;
 begin
-  select string_agg(distinct table_name, ', ' order by table_name) into забытые
-  from information_schema.role_table_grants
-  where table_schema = 'public'
-    and grantee in ('anon', 'authenticated')
-    and (table_name like 'mach\_%' or table_name = 'objects');
+  select string_agg(distinct g.table_name, ', ' order by g.table_name) into забытые
+  from information_schema.role_table_grants g
+  join pg_class c on c.relname = g.table_name
+  join pg_namespace ns on ns.oid = c.relnamespace and ns.nspname = 'public'
+  where g.table_schema = 'public'
+    and g.grantee in ('anon', 'authenticated')
+    and (g.table_name like 'mach\_%' or g.table_name = 'objects')
+    -- Вид с security_invoker закрытую таблицу под собой не отдаёт: RLS работает
+    -- по вызывающему. Он тут не нарушение, и ронять из-за него прогон незачем.
+    and not coalesce('security_invoker=true' = any (c.reloptions), false);
   if забытые is not null then
     raise exception 'у anon/authenticated остались права на таблицы ступени 1: %'
                     '. Впишите их в список выше и прогоните заново', забытые;
