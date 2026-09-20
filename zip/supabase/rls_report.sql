@@ -12,6 +12,12 @@
 -- правами владельца и RLS таблиц под собой обходит, поэтому грант на представление
 -- закрытую таблицу открывает обратно. Считать его вместе с таблицами нельзя —
 -- механика другая; не считать вовсе — значит врать, что закрыто всё.
+--
+-- НО НЕ ВСЯКОЕ ПРЕДСТАВЛЕНИЕ ОБХОДИТ RLS. Заведённое с security_invoker = true
+-- исполняется правами ВЫЗЫВАЮЩЕГО, и политики таблиц под ним работают как надо.
+-- Считать такие вместе с обходящими — повторить ту же ошибку, что и с грантами:
+-- напечатать пугающее число, которое ничего не измеряет. Из четырёх наших видов
+-- три заведены с security_invoker, обходил RLS ровно один (mach_channels_ask).
 
 \pset tuples_only on
 \pset format unaligned
@@ -29,7 +35,8 @@ with grant_ as (
        or roles @> array['authenticated']::name[]
        or roles @> array['public']::name[])
 ), rel as (
-  select c.relname, c.relkind, c.relrowsecurity
+  select c.relname, c.relkind, c.relrowsecurity,
+         coalesce('security_invoker=true' = any (c.reloptions), false) as invoker
     from pg_class c
     join pg_namespace n on n.oid = c.relnamespace and n.nspname = 'public'
     join grant_ g on g.table_name = c.relname
@@ -42,8 +49,11 @@ select 'таблиц, ДОСТИЖИМЫХ для anon: ' || count(*) filter (
          where relkind in ('r', 'p')
            and relrowsecurity and relname not in (select tablename from policy_))
     || E'\n' ||
-       'представлений с грантом anon (RLS не защищает): ' || count(*) filter (
-         where relkind in ('v', 'm'))
+       'представлений, ОБХОДЯЩИХ RLS (грант + права владельца): ' || count(*) filter (
+         where relkind in ('v', 'm') and not invoker)
+    || E'\n' ||
+       'представлений с грантом, но с security_invoker: ' || count(*) filter (
+         where relkind in ('v', 'm') and invoker)
   from rel;
 
 -- Адресно по ступени 1: её одиннадцать таблиц браузер не запрашивает, после

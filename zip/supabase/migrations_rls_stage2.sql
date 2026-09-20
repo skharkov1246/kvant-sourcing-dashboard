@@ -71,6 +71,44 @@ begin
   end if;
 end $$;
 
+-- ПРЕДСТАВЛЕНИЯ НАД ЗАКРЫТЫМИ ТАБЛИЦАМИ. Обычное представление исполняется
+-- правами ВЛАДЕЛЬЦА и RLS таблиц под собой не применяет. Закрыть таблицу и
+-- оставить открытым представление над ней — значит не закрыть ничего: данные
+-- продолжают читаться, только через другое имя.
+--
+-- Нашёл это не разбор, а сам прогон: 20.09.2026 самопроверка ниже уперлась в
+-- mach_channels_ask — «select * from mach_channels», то есть ровно обход
+-- ужесточения, которое эта миграция и делает. Первая версия файла его не видела.
+--
+-- Ищем по ЗАВИСИМОСТИ, а не по имени: представление может называться как угодно,
+-- а читать закрытую таблицу. Имя ловит только то, что кто-то не забыл назвать
+-- правильно.
+do $$
+declare v text;
+declare закрыто int := 0;
+begin
+  for v in
+    select distinct u.view_name
+      from information_schema.view_table_usage u
+      join pg_class c on c.relname = u.view_name
+      join pg_namespace ns on ns.oid = c.relnamespace and ns.nspname = 'public'
+     where u.view_schema = 'public' and u.table_schema = 'public'
+       and u.table_name in ('price_records', 'drawings', 'samples', 'gt_notes',
+                            'positions', 'odm_suppliers', 'rfq_requests', 'change_log')
+       -- Трогаем только те, что RLS ОБХОДЯТ. Вид с security_invoker исполняется
+       -- правами вызывающего: закрытую таблицу под собой он уже не отдаёт, и
+       -- снимать с него права не за что. Снять — ничего не выиграть в защите и
+       -- сломать будущего читателя.
+       and not coalesce('security_invoker=true' = any (c.reloptions), false)
+  loop
+    execute format('revoke all on table public.%I from anon, authenticated', v);
+    execute format('grant select on table public.%I to service_role', v);
+    закрыто := закрыто + 1;
+    raise notice 'представление % обходило RLS закрытой таблицы — права сняты', v;
+  end loop;
+  raise notice 'представлений закрыто: %', закрыто;
+end $$;
+
 -- ЧТО ЭТА ПРОВЕРКА ЛОВИТ, А ЧТО НЕТ. Она списочная, и поймать таблицу, которую
 -- добавили в базу, но забыли здесь, НЕ МОЖЕТ: у таблиц второй ступени нет общего
 -- шаблона имени, в отличие от mach_* первой ступени, где проверка идёт по образцу
