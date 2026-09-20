@@ -54,3 +54,15 @@ jobs:
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
         run: python scripts/supplier_merge_stats.py
+
+      # Распоряжение владельца 20.09.2026: компании проверять по ИНН или
+      # налоговому номеру, чего нет в Bitrix — завести. Сначала надо знать,
+      # скольких не хватает. Реквизиты (crm.requisite.list) в репозитории не
+      # читались ни разу, поэтому ни один прежний замер ИНН не видел.
+      #
+      # В журнал идут только счётчики: ИНН контрагентов — чувствительные данные
+      # (их помечает scripts/build_catalog.py), репозиторий публичный.
+      - name: Заполненность ИНН и налоговых номеров
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        run: python scripts/supplier_inn_coverage.py
