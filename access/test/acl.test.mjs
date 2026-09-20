@@ -234,7 +234,7 @@ test("разделение «Базы ЗИП» на ГШО и ГТУ не отн
     users: { "e@kvantpro.com": { role: "engineer", sites: ["zip"], tabs: [] },
              "g@kvantpro.com": { role: "guest", sites: ["gpu"], tabs: [] } },
   });
-  assert.equal(a.version, 2);
+  assert.equal(a.version, 3);
   assert.deepEqual(a.roles.engineer.sites, ["zip", "gt", "gpu"], "роль с ЗИП должна получить ГТУ");
   assert.deepEqual(a.roles.guest.sites, [], "пустой роли ничего не добавляем");
   assert.deepEqual(a.users["e@kvantpro.com"].sites, ["zip", "gt"]);
@@ -271,4 +271,99 @@ test("строгое чтение прав отказывает при отсу�
   const env = { ACL: kv() };
   await env.ACL.put(ACL_KEY, "{}");
   await assert.rejects(loadAcl(env, { strict: true }));
+});
+
+
+// ──────────────────────────────────────── тонкие права раздела «Поставщики»
+
+test("подъём до версии 3 выдаёт только право по умолчанию, а не все четыре", () => {
+  // Документ версии 2: разряда rights в нём не существовало вовсе. Отличить
+  // «не выдано» от «ещё не было поля» можно только по версии документа.
+  const a = normalizeAcl({
+    version: 2, defaultRole: "employee",
+    roles: { employee: { name: "Сотрудник", sites: ["dashboard"], tabs: ["sourcing"] } },
+    users: { "e@kvantpro.com": { role: "employee", sites: [], tabs: [] } },
+  });
+  assert.equal(a.version, 3);
+  assert.deepEqual(a.roles.employee.rights, ["suppliers"],
+    "миграция обязана выдать список и цены и НЕ выдавать контакты, финансы и правку");
+  assert.deepEqual(a.users["e@kvantpro.com"].rights, [],
+    "точечная добавка человеку при миграции не выдаётся: набор живёт в роли");
+});
+
+test("в документе версии 3 пустой массив прав понимается буквально", () => {
+  const a = normalizeAcl({
+    version: 3, defaultRole: "employee",
+    roles: { employee: { name: "Сотрудник", sites: ["dashboard"], tabs: [], rights: [] } },
+    users: {},
+  });
+  assert.deepEqual(a.roles.employee.rights, [],
+    "владелец мог снять право сознательно — возвращать его нельзя");
+});
+
+test("контакты и финансы не входят ни в одну роль по умолчанию", () => {
+  const d = defaultAcl();
+  for (const [id, r] of Object.entries(d.roles)) {
+    if (r.admin) continue;          // у админа набор полный, он их всё равно обходит
+    assert.ok(!r.rights.includes("suppliers_pii"), `роль ${id} получила контакты по умолчанию`);
+    assert.ok(!r.rights.includes("suppliers_fin"), `роль ${id} получила финансы по умолчанию`);
+    assert.ok(!r.rights.includes("suppliers_edit"), `роль ${id} получила правку по умолчанию`);
+  }
+  assert.deepEqual(d.roles.guest.rights, [], "гостю не выдаётся ничего, включая suppliers");
+});
+
+test("точечная добавка расширяет права роли, а не заменяет их", () => {
+  const acl = normalizeAcl({
+    version: 3, defaultRole: "employee",
+    roles: { employee: { name: "Сотрудник", sites: [], tabs: [], rights: ["suppliers"] } },
+    users: { "k@kvantpro.com": { role: "employee", sites: [], tabs: [], rights: ["suppliers_fin"] } },
+  });
+  assert.deepEqual(rightsFor(acl, "k@kvantpro.com", {}).rights, ["suppliers", "suppliers_fin"],
+    "порядок — как в справочнике RIGHT_IDS");
+  assert.deepEqual(rightsFor(acl, "other@kvantpro.com", {}).rights, ["suppliers"]);
+});
+
+test("админ видит полный набор тонких прав", () => {
+  const acl = normalizeAcl({
+    version: 3, defaultRole: "guest",
+    roles: { guest: { name: "Гость", sites: [], tabs: [], rights: [] },
+             boss: { name: "Босс", admin: true, sites: [], tabs: [], rights: [] } },
+    users: { "b@kvantpro.com": { role: "boss", sites: [], tabs: [], rights: [] } },
+  });
+  // Он их обходит на проверке всё равно; показывать урезанный набор — врать.
+  assert.deepEqual(rightsFor(acl, "b@kvantpro.com", {}).rights,
+    ["suppliers", "suppliers_pii", "suppliers_fin", "suppliers_edit"]);
+  assert.deepEqual(rightsFor(acl, "g@kvantpro.com", {}).rights, []);
+});
+
+test("выдуманное право в документе не проезжает", () => {
+  const a = normalizeAcl({
+    version: 3, roles: { r: { name: "Р", sites: [], tabs: [], rights: ["suppliers", "suppliers_root"] } },
+    users: {},
+  });
+  assert.deepEqual(a.roles.r.rights, ["suppliers"]);
+});
+
+
+test("панель не стирает тонкие права при сохранении роли", () => {
+  // Сервер на role_rights делает rights = pick(b.rights, RIGHT_IDS). Если панель
+  // поле не шлёт, pick получает undefined и права роли обнуляются — тихо, на
+  // любом клике по любой галочке. Так уже было написано в первой версии правки.
+  const w = fs.readFileSync(path.join(ROOT, "public/_worker.js"), "utf8");
+  const посылки = w.match(/post\('role_rights',[^\n]*/g) || [];
+  assert.ok(посылки.length >= 2, "отправители role_rights не найдены — тест устарел");
+  for (const p of посылки) {
+    assert.match(p, /rights:/, `отправитель role_rights без поля rights: ${p}`);
+  }
+  // то же для карточки человека
+  const люди = w.match(/post\('user_extra',[\s\S]{0,220}/g) || [];
+  assert.ok(люди.length >= 1);
+  for (const p of люди) assert.match(p, /rights:/, `user_extra без поля rights: ${p}`);
+});
+
+test("панель показывает и принимает все заведённые права", () => {
+  const w = fs.readFileSync(path.join(ROOT, "public/_worker.js"), "utf8");
+  assert.match(w, /rights: RIGHTS\.map/, "справочник прав не уходит в панель — галочек не будет");
+  assert.match(w, /boxes\(document\.getElementById\('drt'\)/, "права человека не заполняются");
+  assert.match(w, /u\.rights = pick\(b\.rights, RIGHT_IDS\)/, "сервер не принимает права человека");
 });
