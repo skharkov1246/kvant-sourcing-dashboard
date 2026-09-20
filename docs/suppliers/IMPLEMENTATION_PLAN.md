@@ -22,8 +22,13 @@
 
 ## Этап 1. Канонический Supplier Master (25–40 ч)
 
-1. Таблицы `sup_entity`, `sup_identifier`, `sup_fact`, `sup_override`, `sup_review`.
-   Защита по образцу `archive_*`: `FORCE RLS`, `REVOKE`, гранты только `service_role`.
+1. **Сделано.** Таблицы `sup_entity`, `sup_identifier`, `sup_fact`, `sup_override`,
+   `sup_review`, `sup_number_registry`, `our_entity` и представление
+   `sup_effective` — `library/supabase/suppliers_schema.sql`. Защита по образцу
+   `archive_*`: `FORCE RLS`, полный `REVOKE`, гранты только `service_role`.
+   Применена на чистой базе, идемпотентна, закрыта восемью тестами
+   (`tests/test_suppliers_schema_sql.py`). Автоматически ни одним workflow не
+   применяется: сведение делается только после замера.
 2. Выдача вечных номеров `KV-S-…` по алгоритму `pnw/tools/kv_number.py`, реестр
    по устойчивому ключу — номера не переиздаются.
 3. Сведение шести реестров: Bitrix `companyId` → `lib_suppliers` → `pnw` →
