@@ -165,16 +165,36 @@ jobs:
           fi
           [ -z "$files" ] && { echo "нет изменённых файлов"; exit 0; }
           # шаблоны: вебхук Bitrix с токеном, ключи Anthropic/AWS/GitHub, приватные ключи
-          pattern='bitrix24\.ru/rest/[0-9]+/[A-Za-z0-9]{10,}|sk-ant-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'
+          # и ключи Supabase обоих видов.
+          #
+          # ПОЧЕМУ SUPABASE ПОЯВИЛСЯ ТОЛЬКО СЕЙЧАС. До 20.09.2026 публикуемый ключ
+          # лежал прямо в zip/site/_worker.js как страховка на время перехода —
+          # шаблон уронил бы каждый PR, трогающий воркер, и его пришлось бы снять
+          # совсем. Страховка убрана, ключ из кода ушёл, шаблон можно включить.
+          #
+          # sb_secret_ — служебный ключ, обходит RLS: в репозитории ему не место
+          # никогда. sb_publishable_ ловится тоже: он не даёт прав сам по себе,
+          # но именно из него выросла эта история, и возвращаться ему некуда.
+          # Тесты передают 'sb_secret_FIXTURE' и 'sb_publishable_SYNTHETIC' —
+          # на длине они не ловятся, настоящие ключи длиннее двадцати символов.
+          pattern='bitrix24\.ru/rest/[0-9]+/[A-Za-z0-9]{10,}|sk-ant-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|sb_(secret|publishable)_[A-Za-z0-9_-]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'
+          # ЯВНАЯ ПОМЕТКА ВМЕСТО ИСКЛЮЧЕНИЯ ПУТЕЙ. Тестам нужны строки, похожие на
+          # ключи: 'sb_secret_SYNTHETIC_REPAIR_ONLY' и такие же в разборе настроек.
+          # Вывести из проверки каталог tests/ было бы проще и хуже: настоящий ключ,
+          # вставленный в тест, прошёл бы молча. Поэтому исключается не путь, а
+          # пометка в самом значении — её видно глазом в той же строке.
+          fake='SYNTHETIC|FIXTURE|EXAMPLE|PLACEHOLDER'
           hits=""
           for f in $files; do
             [ -f "$f" ] || continue
             case "$f" in *.png|*.jpg|*.pdf|*.zip|*.docx|*.xlsx|*.woff2|*.npz) continue;; esac
-            if grep -nEI "$pattern" "$f" >/dev/null 2>&1; then hits="$hits $f"; fi
+            found="$(grep -oEI "$pattern" "$f" 2>/dev/null | grep -vE "$fake" || true)"
+            if [ -n "$found" ]; then hits="$hits $f"; fi
           done
           if [ -n "$hits" ]; then
             echo "::error::возможные секреты в файлах:$hits"
             echo "Уберите значение из кода, положите его в GitHub Secrets и отзовите скомпрометированный ключ."
+            echo "Если это выдуманное значение для теста — впишите в него SYNTHETIC, FIXTURE, EXAMPLE или PLACEHOLDER."
             exit 1
           fi
           echo "✓ секретов не найдено"

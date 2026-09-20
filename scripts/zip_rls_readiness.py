@@ -82,21 +82,55 @@ def нужны_браузеру() -> dict[str, list[str]]:
     return out
 
 
+def без_комментариев(текст: str) -> str:
+    """Строчные комментарии вон. Разбор исходника обязан читать код, а не прозу.
+
+    Поймано на себе: в шапке воркера я написал пояснение «было
+    (env.SUPABASE_SERVICE_KEY) || КЛЮЧ», и разбор нашёл ЕГО раньше настоящей
+    строки — то есть отчитался о запасном ключе, которого в коде уже нет.
+    Комментарий, объясняющий удалённый код, выглядит для регулярки как код.
+    """
+    return re.sub(r"//[^\n]*", "", текст)
+
+
 def ключ_по_умолчанию() -> str | None:
-    """Чем ходит воркер, если секрет не задан. None — если запасного ключа нет."""
-    текст = ВОРКЕР.read_text(encoding="utf-8")
-    if not re.search(r"env\.SUPABASE_SERVICE_KEY\s*\)?\s*\|\|", текст):
+    """Чем ходит воркер, если секрет не задан. None — запасного ключа нет.
+
+    Разбирается правая часть «|| …» в строке выбора ключа, а не наличие самого
+    оператора. 20.09.2026 запасной ключ убрали, и выражение стало
+    «(env && env.SUPABASE_SERVICE_KEY) || ""» — оператор на месте, ключа нет.
+    Прежняя версия по одному оператору отвечала «есть, но не опознан», то есть
+    утверждала утечку, которой уже не было.
+    """
+    текст = без_комментариев(ВОРКЕР.read_text(encoding="utf-8"))
+    m = re.search(r"env\.SUPABASE_SERVICE_KEY\s*\)?\s*\|\|\s*([^;\n]+)", текст)
+    if not m:
         return None
-    m = re.search(r"const\s+SUPA_FALLBACK_KEY\s*=\s*\"([^\"]{0,14})", текст)
-    return m.group(1) if m else "есть, но не опознан"
+    правая = m.group(1).strip()
+    if правая in ('""', "''", '"";', "null", "undefined"):
+        return None
+    if правая.startswith("SUPA_FALLBACK_KEY"):
+        k = re.search(r"const\s+SUPA_FALLBACK_KEY\s*=\s*\"([^\"]{0,14})", текст)
+        return k.group(1) if k else "есть, но не опознан"
+    return "есть, но не опознан"
 
 
-def ужесточение_применяется() -> bool:
-    """Применяет ли хоть один workflow файл ужесточения."""
+def ужесточение_применяется() -> set[str]:
+    """Какие ступени ужесточения применяет хоть один workflow.
+
+    Раньше отвечало «да/нет» и искало migrations_rls.sql — файла с таким именем
+    не существует с тех пор, как ужесточение разнесли на ступени. Ответ «нет»
+    был верен буквально и неверен по сути: ступень 1 применяется прогоном
+    миграций на каждом запуске.
+    """
+    найдено: set[str] = set()
     for путь in (ROOT / ".github/workflows").glob("*.yml"):
-        if "migrations_rls.sql" in путь.read_text(encoding="utf-8"):
-            return True
-    return False
+        текст = путь.read_text(encoding="utf-8")
+        for m in re.finditer(r"migrations_rls_(\w+)\.sql", текст):
+            найдено.add(m.group(1))
+        if "migrations_rls_${STAGE}" in текст or "migrations_rls_${{ inputs.stage }}" in текст:
+            найдено.update({"stage1", "stage2"})
+    return найдено
 
 
 def main() -> int:
