@@ -41,6 +41,8 @@ import quotes  # noqa: E402  (цена из КП поставщика)
 # Список полей КП держим в одном месте со всеми замерами котировок: два списка
 # разошлись бы молча — разбирали бы одно, а считали другое.
 from quote_coverage import ПОЛЕ_ЗАПРОСА, ПОЛЯ_КП  # noqa: E402
+# Поле «поставщик» карточки запроса — то же, по которому считается отзывчивость.
+from supplier_responsiveness import ПОЛЕ_ПОСТАВЩИКА, crm_id  # noqa: E402
 from segments import SEGMENTS, classify, name_of  # noqa: E402
 
 # Секреты читаются лениво: без них модуль всё равно импортируется — иначе его
@@ -347,13 +349,20 @@ def collect_refs_rfq(days: int) -> list[dict]:
     поля = list(ПОЛЯ_КП)
     карточки = bx_all("crm.item.list", {"entityTypeId": SPA_RFQ,
                                         "filter": {">=createdTime": since},
-                                        "select": ["id"] + поля,
+                                        "select": ["id", ПОЛЕ_ПОСТАВЩИКА] + поля,
                                         "order": {"id": "ASC"}})
     print(f"карточек запросов за {days} дн.: {len(карточки)} · полей КП: {len(поля)}", flush=True)
 
     refs: list[dict] = []
     свои = 0
+    без_поставщика = 0
     for x in карточки:
+        # Компания-поставщик известна ПРЯМО ЗДЕСЬ, и связать цену с ней надо
+        # сейчас: отдельный проход позже означал бы второе сплошное чтение
+        # портала ради того, что уже держим в руках.
+        компания = crm_id(x.get(ПОЛЕ_ПОСТАВЩИКА))
+        if not компания:
+            без_поставщика += 1
         for f in поля:
             v = x.get(f)
             if not v:
@@ -361,11 +370,14 @@ def collect_refs_rfq(days: int) -> list[dict]:
             for fo in (v if isinstance(v, list) else [v]):
                 if isinstance(fo, dict) and fo.get("urlMachine"):
                     refs.append({"deal": str(x["id"]), "field": f,
-                                 "origin": "поле запроса", "fo": fo})
+                                 "origin": "поле запроса", "fo": fo,
+                                 "company": str(компания) if компания else None})
         if x.get(ПОЛЕ_ЗАПРОСА):
             свои += 1
     print(f"вложений КП от поставщиков: {len(refs)}"
           f" · карточек с нашим «Request file» (не берём): {свои}", flush=True)
+    print(f"карточек без указанного поставщика: {без_поставщика} из {len(карточки)}"
+          " — их цены лягут без привязки к компании", flush=True)
     return refs
 
 
@@ -500,6 +512,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         it["segment_rule"] = "строка" if own else ("файл" if rec["segment_id"] else None)
         it["deal_id"] = ref["deal"]
         it["source_file"] = fid
+        it["company"] = ref.get("company")
         ц = it.get("_цена")
         if ц and ц.get("currency") is None and вф:
             ц["currency"] = вф
@@ -623,8 +636,8 @@ def main() -> int:
                     psycopg2.extras.execute_values(cur, """
                         insert into lib_prices
                           (segment_id, item_name, part_number, price, currency, basis,
-                           qty, qty_unit, source_url, rfq_id, lead_days, source, feed,
-                           confidence, note, price_date)
+                           qty, qty_unit, source_url, rfq_id, rfq_company, lead_days,
+                           source, feed, confidence, note, price_date)
                         values %s""", buf_prices, page_size=500)
                 except psycopg2.Error as e:
                     # Построчного досыла здесь НЕТ намеренно: пакет цен падает
@@ -691,7 +704,8 @@ def main() -> int:
                                        pg(it.get("part_number"))[:120], ц["price"],
                                        ц["currency"], ц["basis"], it.get("qty"),
                                        pg(it.get("unit"))[:40], it["source_file"],
-                                       it["deal_id"], ц["lead_days"], "КП", FEED_КП,
+                                       it["deal_id"], it.get("company"),
+                                       ц["lead_days"], "КП", FEED_КП,
                                        ц["confidence"], pg(ц["note"])[:300] or None,
                                        None))
                     цен += 1

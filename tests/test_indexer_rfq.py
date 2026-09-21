@@ -70,3 +70,40 @@ def test_список_полей_общий_с_замерами():
     """Два списка разошлись бы молча: разбирали бы одно, а считали другое."""
     import quote_coverage as qc
     assert ix.ПОЛЯ_КП is qc.ПОЛЯ_КП and ix.ПОЛЕ_ЗАПРОСА == qc.ПОЛЕ_ЗАПРОСА
+
+
+def test_компания_поставщика_едет_вместе_с_файлом(monkeypatch):
+    """Цена без поставщика — просто число.
+
+    Компания известна в момент чтения карточки; отдельный проход за ней позже
+    стоил бы второго сплошного чтения портала.
+    """
+    карточки(monkeypatch, [{"id": 11, ix.ПОЛЕ_ПОСТАВЩИКА: 4242,
+                            ОФФЕР: [{"id": 1, "urlMachine": "https://x.test/1"}]}])
+    refs = ix.collect_refs_rfq(30)
+    assert refs[0]["company"] == "4242"
+
+
+def test_карточка_без_поставщика_не_придумывает_его(monkeypatch):
+    карточки(monkeypatch, [{"id": 12, ОФФЕР: [{"id": 2, "urlMachine": "https://x.test/2"}]}])
+    assert ix.collect_refs_rfq(30)[0]["company"] is None
+
+
+def test_поле_поставщика_общее_с_отзывчивостью():
+    """Разойдись эти два имени — цена и отзывчивость считались бы по разным
+    компаниям, и никто бы не заметил."""
+    import supplier_responsiveness as sr
+    assert ix.ПОЛЕ_ПОСТАВЩИКА == sr.ПОЛЕ_ПОСТАВЩИКА
+
+
+def test_поле_поставщика_запрашивается_у_портала(monkeypatch):
+    """Не попросишь в select — Bitrix его не отдаст, и связь потеряется молча."""
+    видели = {}
+
+    def подмена(method, params):
+        видели["select"] = params.get("select")
+        return []
+
+    monkeypatch.setattr(ix, "bx_all", подмена)
+    ix.collect_refs_rfq(30)
+    assert ix.ПОЛЕ_ПОСТАВЩИКА in видели["select"]

@@ -447,7 +447,15 @@ create index if not exists lib_prices_feed on lib_prices (feed);
 -- проход, и выдавать догадку за связь нельзя).
 alter table lib_prices add column if not exists lead_days int;
 alter table lib_prices add column if not exists rfq_id    text;
+-- Компания-поставщик из карточки запроса, как её знает Битрикс. Записывается
+-- в момент разбора: карточка в этот миг уже прочитана, а отдельный проход
+-- стоил бы второго сплошного чтения портала. В supplier_id не пишется —
+-- там внешний ключ на lib_suppliers, а ключ портала ведёт в sup_identifier
+-- нового реестра: сведение двух реестров это отдельная работа, и подменять
+-- один идентификатор другим нельзя.
+alter table lib_prices add column if not exists rfq_company text;
 create index if not exists lib_prices_rfq on lib_prices (rfq_id);
+create index if not exists lib_prices_rfqco on lib_prices (rfq_company);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
