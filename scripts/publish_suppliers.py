@@ -27,6 +27,15 @@ from urllib import error, parse, request
 
 PAGES_PROJECT = "kvant-sourcing-f122"
 KEY = "suppliers:v1"
+# ИМЯ ПРИВЯЗКИ KV И ПОРЯДОК ПОИСКА — ровно как у воркера портала:
+# aclStore(env) возвращает env.ACL || env.VISITS. Исторически привязана VISITS
+# (её завёл счётчик посещений), ACL задумана как правильное имя, но не заведена.
+# Публикатор, который ищет только ACL, не находит ничего и падает с
+# KV_BINDING_MISSING — так упал прогон 21.09.2026 08:53, собрав снимок целиком
+# и не записав его. Писать не туда, откуда читает воркер, ещё хуже: снимок
+# молча не доедет до страницы. Поэтому порядок один на обе стороны, и на это
+# стоит тест.
+ПРИВЯЗКИ = ("ACL", "VISITS")
 # Тот же предел, что у воркера (SUPPLIERS_MAX_BYTES): снимок, который воркер
 # откажется читать, публиковать незачем.
 MAX_BYTES = 8 * 1024 * 1024
@@ -244,7 +253,11 @@ class Cloudflare:
         try:
             namespaces = result["deployment_configs"]["production"]["kv_namespaces"]
             require(isinstance(namespaces, dict), "INVALID_KV_BINDING")
-            namespace = namespaces["ACL"]["namespace_id"]
+            имя = next((n for n in ПРИВЯЗКИ if n in namespaces), None)
+            if имя is None:
+                raise PublishError("KV_BINDING_MISSING")
+            namespace = namespaces[имя]["namespace_id"]
+            print(f"привязка KV: {имя}")
         except (KeyError, TypeError):
             raise PublishError("KV_BINDING_MISSING") from None
         require(isinstance(namespace, str) and bool(CF_ID.fullmatch(namespace)), "INVALID_KV_BINDING")

@@ -38,6 +38,8 @@ from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import docfilter  # noqa: E402  (после sys.path)
 import indexer  # noqa: E402
+import price_store  # noqa: E402  (запись цены — одна на все разборы)
+import quotes  # noqa: E402  (цена из распознанного текста)
 from segments import classify, name_of  # noqa: E402
 
 APPLY = os.environ.get("APPLY", "") not in ("", "0", "false")
@@ -187,13 +189,21 @@ def recognise(ref: dict) -> tuple[dict, list[dict]]:
 
     items = []
     rec["segment_id"] = classify(text)
+    # Валюта всего файла — запасной довод, когда строка своей не назвала.
+    вф = quotes.валюта_файла(text)
     for ln in lines[:2000]:
         own = classify(ln)
+        # Распознанный скан — тот же текст без таблицы, и цена опознаётся так же:
+        # арифметикой кол-во × цена = сумма (library/quotes.py). Без этого
+        # распознавание сканов КП теряло бы ровно то, ради чего затевается.
+        ц = quotes.подставить_валюту(quotes.цена_из_текста(ln), вф) \
+            if indexer.SOURCE == "rfq" else None
         items.append({"item_name": ln[:300], "part_number": docfilter.part_number_of(ln),
-                      "oem": "", "unit": "", "qty": None,
+                      "oem": "", "unit": "", "qty": ц["qty"] if ц else None,
                       "segment_id": own or rec["segment_id"],
                       "segment_rule": "строка" if own else ("файл" if rec["segment_id"] else None),
-                      "deal_id": ref["deal"], "source_file": fid})
+                      "deal_id": ref["deal"], "source_file": fid,
+                      "company": ref.get("company"), "_цена": ц})
     rec["rows_found"] = len(items)
     rec["status"] = "разобран по скану" if items else "пусто"
     return rec, items
@@ -221,7 +231,11 @@ def main() -> int:
         print("нечего распознавать")
         return 0
 
-    refs = indexer.collect_refs(DAYS)
+    # ИСТОЧНИК ТОТ ЖЕ ВХОД, ЧТО У РАЗБОРА. Распознавание ходило только по сделкам,
+    # и до сканов КП не добиралось вовсе — та же дыра, что была у индексатора:
+    # цена живёт только во вложениях карточек запросов.
+    refs = (indexer.collect_refs_rfq(DAYS) if indexer.SOURCE == "rfq"
+            else indexer.collect_refs(DAYS))
     mine = [r for r in refs
             if str(r["fo"].get("id") or r["fo"].get("ID")) in want
             and int(hashlib.sha1(str(r["fo"].get("id") or r["fo"].get("ID")).encode()).hexdigest(), 16)
@@ -238,16 +252,27 @@ def main() -> int:
     причины: Counter = Counter()
     segs: Counter = Counter()
     total_items = 0
+    цен = 0
     buf_files: list[tuple] = []
     buf_items: list[tuple] = []
+    buf_prices: list[tuple] = []
 
     def flush() -> None:
-        nonlocal buf_files, buf_items
-        if not APPLY or (not buf_files and not buf_items):
-            buf_files, buf_items = [], []
+        nonlocal buf_files, buf_items, buf_prices
+        if not APPLY or (not buf_files and not buf_items and not buf_prices):
+            buf_files, buf_items, buf_prices = [], [], []
             return
         c = indexer.connect()
         with c.cursor() as cur:
+            if buf_prices:
+                # Та же запись, что у обычного разбора: две вставки в одну
+                # таблицу расходятся молча (CLAUDE.md, правило 14).
+                try:
+                    price_store.записать(cur, buf_prices, psycopg2.extras.execute_values)
+                except psycopg2.Error as e:
+                    c.rollback()
+                    c.close()
+                    raise RuntimeError(f"{price_store.ПОДСКАЗКА}. Ошибка: {e}") from e
             if buf_items:
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_demand
@@ -266,7 +291,7 @@ def main() -> int:
                       processed_at = now()""", buf_files, page_size=500)
         c.commit()
         c.close()
-        buf_files, buf_items = [], []
+        buf_files, buf_items, buf_prices = [], [], []
 
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(recognise, mine), 1):
@@ -286,7 +311,11 @@ def main() -> int:
                 buf_items.append((it["segment_id"], it["deal_id"], indexer.pg(it["item_name"])[:500],
                                   "", indexer.pg(it["part_number"])[:120], None, "",
                                   "распознавание скана", it["source_file"], it["segment_rule"]))
-            if len(buf_files) >= 100 or len(buf_items) >= 3000:
+                ц = it.get("_цена")
+                if ц and indexer.SOURCE == "rfq":
+                    buf_prices.append(price_store.строка(it, ц, indexer.pg))
+                    цен += 1
+            if len(buf_files) >= 100 or len(buf_items) >= 3000 or len(buf_prices) >= 2000:
                 flush()
             if n % 50 == 0:
                 print(f"  распознано {n} из {len(mine)} · позиций {total_items}", flush=True)
@@ -294,6 +323,9 @@ def main() -> int:
 
     print("\n=== ИТОГ ЧАСТИ ===")
     print(f"файлов: {sum(stat.values())} · позиций из сканов: {total_items}")
+    if indexer.SOURCE == "rfq":
+        print(f"строк с ценой: {цен}"
+              + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
     print(f"по состоянию: {dict(stat.most_common())}")
     print(f"по формату:   {dict(kinds.most_common())}")
     if причины:

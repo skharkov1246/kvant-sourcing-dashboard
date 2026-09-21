@@ -52,7 +52,10 @@ jobs:
           cache: pip
 
       - name: Установка зависимостей
-        run: pip install --quiet -r requirements.txt ruff pytest psycopg2-binary==2.9.10
+        # pyyaml — для tests/test_workflow_deps.py: он читает прогоны как YAML.
+        # Не в requirements.txt: там то, без чего не работает сам портал,
+        # а это нужно только проверке.
+        run: pip install --quiet -r requirements.txt ruff pytest pyyaml psycopg2-binary==2.9.10
 
       - name: Ruff — ошибки кода
         run: ruff check .

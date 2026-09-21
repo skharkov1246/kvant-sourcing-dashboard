@@ -37,9 +37,13 @@ import requests
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
 import docfilter  # noqa: E402  (после sys.path)
+import quotes  # noqa: E402  (цена из КП поставщика)
+import price_store  # noqa: E402  (запись цены — одна на все разборы)
 # Список полей КП держим в одном месте со всеми замерами котировок: два списка
 # разошлись бы молча — разбирали бы одно, а считали другое.
 from quote_coverage import ПОЛЕ_ЗАПРОСА, ПОЛЯ_КП  # noqa: E402
+# Поле «поставщик» карточки запроса — то же, по которому считается отзывчивость.
+from supplier_responsiveness import ПОЛЕ_ПОСТАВЩИКА, crm_id  # noqa: E402
 from segments import SEGMENTS, classify, name_of  # noqa: E402
 
 # Секреты читаются лениво: без них модуль всё равно импортируется — иначе его
@@ -61,6 +65,14 @@ SPECGATE = os.environ.get("SPECGATE", "1") not in ("", "0", "false")
 # где цена вообще есть: на самой карточке сумма равна нулю у всех 21 865.
 SOURCE = os.environ.get("SOURCE", "deals").strip().lower()
 SPA_RFQ = 166
+# Подпись источника строки. Раньше здесь всегда стояла «спецификация сделки» —
+# и строки из КП поставщика ложились под чужим именем: спецификация говорит, что
+# заказчик просит, котировка — что поставщик предлагает и почём.
+ИСТОЧНИК_СТРОКИ = "котировка поставщика" if SOURCE == "rfq" else "спецификация сделки"
+# Поток цен, по которому переразбор снимает свои прежние строки. Имя и вся
+# запись живут в library/price_store.py — общем месте для обычного разбора и
+# распознавания сканов (CLAUDE.md, правило 14).
+FEED_КП = price_store.FEED
 PARSER_VERSION = 2
 
 # Колонки спецификации. Спецификации у всех заказчиков свои, но заголовки повторяются.
@@ -231,6 +243,13 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
     """Позиции из таблицы. Если заголовков нет — берём самую длинную текстовую
     ячейку строки как наименование: у большинства спецификаций это работает."""
     hi, cols = header_map(rows)
+    # Ценовые колонки ищутся в той же строке заголовков. У спецификаций заказчика
+    # их там нет, и разбор не меняется; у КП поставщика в них весь смысл файла
+    # (library/quotes.py).
+    цк = quotes.колонки_цены(rows[hi]) if hi >= 0 else {}
+    # Валюта почти всегда написана только в шапке («Цена за ед., EUR»), а в
+    # ячейках стоят голые числа.
+    вк = quotes.валюта_заголовка(rows[hi], цк) if цк else None
     out: list[dict] = []
     body = rows[hi + 1:] if hi >= 0 else rows
     for row in body:
@@ -272,6 +291,10 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
             # строк с пересчётом fts, отдельная задача.
             rec["part_number"] = docfilter.part_number_of(joined)
         rec["_row"] = joined[:600]
+        # Цена берётся только из названной колонки. Сумма строки ценой не
+        # становится: из неё цена выводится делением на количество, и такая
+        # строка помечена как выведенная (library/quotes.py).
+        rec["_цена"] = quotes.цена_строки(row, цк, rec.get("qty"), вк) if цк else None
         out.append(rec)
         if len(out) >= 3000:
             break
@@ -329,13 +352,20 @@ def collect_refs_rfq(days: int) -> list[dict]:
     поля = list(ПОЛЯ_КП)
     карточки = bx_all("crm.item.list", {"entityTypeId": SPA_RFQ,
                                         "filter": {">=createdTime": since},
-                                        "select": ["id"] + поля,
+                                        "select": ["id", ПОЛЕ_ПОСТАВЩИКА] + поля,
                                         "order": {"id": "ASC"}})
     print(f"карточек запросов за {days} дн.: {len(карточки)} · полей КП: {len(поля)}", flush=True)
 
     refs: list[dict] = []
     свои = 0
+    без_поставщика = 0
     for x in карточки:
+        # Компания-поставщик известна ПРЯМО ЗДЕСЬ, и связать цену с ней надо
+        # сейчас: отдельный проход позже означал бы второе сплошное чтение
+        # портала ради того, что уже держим в руках.
+        компания = crm_id(x.get(ПОЛЕ_ПОСТАВЩИКА))
+        if not компания:
+            без_поставщика += 1
         for f in поля:
             v = x.get(f)
             if not v:
@@ -343,11 +373,14 @@ def collect_refs_rfq(days: int) -> list[dict]:
             for fo in (v if isinstance(v, list) else [v]):
                 if isinstance(fo, dict) and fo.get("urlMachine"):
                     refs.append({"deal": str(x["id"]), "field": f,
-                                 "origin": "поле запроса", "fo": fo})
+                                 "origin": "поле запроса", "fo": fo,
+                                 "company": str(компания) if компания else None})
         if x.get(ПОЛЕ_ЗАПРОСА):
             свои += 1
     print(f"вложений КП от поставщиков: {len(refs)}"
           f" · карточек с нашим «Request file» (не берём): {свои}", flush=True)
+    print(f"карточек без указанного поставщика: {без_поставщика} из {len(карточки)}"
+          " — их цены лягут без привязки к компании", flush=True)
     return refs
 
 
@@ -453,8 +486,14 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
             rec["doc_class"], rec["class_rule"] = "документация", docfilter.RULE_VERSION
             return rec, []
         for ln in lines[:2000]:
+            # КП приходят PDF-ами, и таблицы в них нет: разбор по заголовкам
+            # мимо. Цена здесь опознаётся арифметикой — кол-во × цена = сумма,
+            # тройка чисел в самой строке (library/quotes.py). Замер 21.09.2026:
+            # без этого пробный разбор дал 139 позиций и НОЛЬ цен.
+            ц = quotes.цена_из_текста(ln) if SOURCE == "rfq" else None
             items.append({"item_name": ln[:300], "part_number": docfilter.part_number_of(ln),
-                          "oem": "", "unit": "", "qty": None, "_row": ln[:600]})
+                          "oem": "", "unit": "", "qty": ц["qty"] if ц else None,
+                          "_row": ln[:600], "_цена": ц})
 
     rec["chars"] = len(text)
     rec["rows_found"] = len(items)
@@ -468,6 +507,10 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
                          else "позиции не распознаны")
         return rec, []
     rec["status"] = "разобран"
+    # Валюта всего файла — последний довод, когда ни заголовок колонки, ни
+    # ячейка её не назвали. Берётся, только если в тексте ровно одна валюта:
+    # две («цена в евро, НДС в рублях») угадывать нельзя.
+    вф = quotes.валюта_файла(text)
     for it in items:
         # Сегмент СТРОКИ — по самой строке. Наследование от файла помечается
         # отдельно: пока оно молчаливо, segment_id нельзя использовать как эталон
@@ -478,6 +521,10 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         it["segment_rule"] = "строка" if own else ("файл" if rec["segment_id"] else None)
         it["deal_id"] = ref["deal"]
         it["source_file"] = fid
+        it["company"] = ref.get("company")
+        # Валюта файла вместо ненайденной; оговорка и уверенность правятся там же,
+        # чтобы в строке не стояли разом «не названа» и «взята по файлу».
+        quotes.подставить_валюту(it.get("_цена"), вф)
     return rec, items
 
 
@@ -550,12 +597,14 @@ def main() -> int:
     kinds: Counter = Counter()
     segs: Counter = Counter()
     total_items = 0
+    цен = 0
     buf_files: list[tuple] = []
     buf_items: list[tuple] = []
+    buf_prices: list[tuple] = []
 
     def flush() -> None:
-        nonlocal buf_files, buf_items
-        if not buf_files and not buf_items:
+        nonlocal buf_files, buf_items, buf_prices
+        if not buf_files and not buf_items and not buf_prices:
             return
         conn = connect()
         with conn.cursor() as cur:
@@ -582,6 +631,16 @@ def main() -> int:
                             bad += 1
                     print(f"  ⚠ пакет номенклатуры не прошёл ({type(e).__name__}); "
                           f"построчно записано {len(buf_items) - bad}, пропущено {bad}", flush=True)
+            if buf_prices:
+                try:
+                    price_store.записать(cur, buf_prices, psycopg2.extras.execute_values)
+                except psycopg2.Error as e:
+                    # Откатываем ВСЁ, включая учёт файлов: файлы, отмеченные
+                    # разобранными, при потерянных ценах — молчаливая потеря, а
+                    # упавший прогон повторяется.
+                    conn.rollback()
+                    conn.close()
+                    raise RuntimeError(f"{price_store.ПОДСКАЗКА}. Ошибка: {e}") from e
             if buf_files:
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_files
@@ -600,7 +659,7 @@ def main() -> int:
                       processed_at = now()""", buf_files, page_size=500)
         conn.commit()
         conn.close()
-        buf_files, buf_items = [], []
+        buf_files, buf_items, buf_prices = [], [], []
 
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(handle, mine), 1):
@@ -620,9 +679,13 @@ def main() -> int:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],
                                   it.get("qty"), pg(it.get("unit"))[:40],
-                                  "спецификация сделки", it["source_file"],
+                                  ИСТОЧНИК_СТРОКИ, it["source_file"],
                                   it.get("segment_rule")))
-            if len(buf_files) >= 200 or len(buf_items) >= 4000:
+                ц = it.get("_цена")
+                if ц and SOURCE == "rfq":
+                    buf_prices.append(price_store.строка(it, ц, pg))
+                    цен += 1
+            if len(buf_files) >= 200 or len(buf_items) >= 4000 or len(buf_prices) >= 2000:
                 flush()
             if n % 200 == 0:
                 print(f"  обработано {n} из {len(mine)} · позиций {total_items}", flush=True)
@@ -630,6 +693,9 @@ def main() -> int:
 
     print("\n=== ИТОГ ЧАСТИ ===")
     print(f"файлов: {sum(stat.values())} · позиций номенклатуры: {total_items}")
+    if SOURCE == "rfq":
+        print(f"строк с ценой: {цен}"
+              + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
     print(f"по состоянию: {dict(stat.most_common())}")
     print(f"по формату:   {dict(kinds.most_common())}")
     print("позиции по сегментам:")

@@ -388,3 +388,60 @@ begin
       открыто;
   end if;
 end $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 10. Цена из разобранного КП, привязанная к компании реестра.
+--
+-- ЗАЧЕМ ВИД, А НЕ КОЛОНКА. lib_prices.supplier_id — внешний ключ на lib_suppliers,
+-- старый справочник; ключ портала из карточки запроса ведёт в sup_identifier
+-- нового реестра. Это разные реестры, и записать одно в другое значит сломать
+-- целостность ради видимости связи. Вид соединяет их, ничего не дублируя и не
+-- устаревая: разбор пишет только rfq_company, связь считается на чтении.
+--
+-- ПОЧЕМУ ЧЕРЕЗ ПРОВЕРКУ НАЛИЧИЯ. Файл применяется и к одноразовой базе теста,
+-- где таблиц библиотеки нет вовсе; без проверки падал бы ВЕСЬ файл (та же мина,
+-- что с ролями anon — правило 20 CLAUDE.md).
+do $$
+begin
+  if to_regclass(current_schema() || '.lib_prices') is null
+     or to_regclass(current_schema() || '.sup_identifier') is null then
+    raise notice 'lib_prices или sup_identifier нет — вид sup_quote_price пропущен';
+    return;
+  end if;
+  execute $v$
+    create or replace view sup_quote_price with (security_invoker = true) as
+    select p.id,
+           p.rfq_id,
+           p.rfq_company,
+           i.sup_id,
+           -- Вечный бессмысленный номер и есть id сущности (KV-S-NNNNNN-C).
+           e.id                as supplier_number,
+           e.display_name      as supplier_name,
+           e.status            as supplier_status,
+           p.item_name,
+           p.part_number,
+           p.price,
+           p.currency,
+           p.qty,
+           p.qty_unit,
+           p.basis,
+           p.lead_days,
+           p.confidence,
+           p.note,
+           p.source_url,
+           p.created_at
+      from lib_prices p
+      -- Связь односторонняя и необязательная: цена без поставщика остаётся
+      -- видна. Скрыть её значило бы потерять цифру, которая есть.
+      left join sup_identifier i
+             on i.kind = 'bitrix'
+            and i.status <> 'rejected'
+            -- Соединяем по value_norm, а не по value: это объявленный ключ
+            -- поиска, и по нему же стоит уникальный частичный индекс
+            -- (kind='bitrix' and status<>'rejected'). У числового ключа портала
+            -- нормализованное значение совпадает с исходным.
+            and i.value_norm = p.rfq_company
+      left join sup_entity e on e.id = i.sup_id
+     where p.feed = 'разбор КП'
+  $v$;
+end $$;

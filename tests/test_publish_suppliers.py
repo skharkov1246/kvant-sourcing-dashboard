@@ -109,3 +109,61 @@ def test_пустая_история_в_снимок_не_кладётся():
     снимок = собрать(КОРПУС, ПРИЗНАКИ, 0, [("KV-S-000001-8", стат)])
     assert "rfq" not in снимок["entities"][0]
     assert снимок["totals"]["with_rfq"] == 0
+
+
+# ── привязка KV ──────────────────────────────────────────────────────────────
+def test_привязка_kv_ищется_как_у_воркера():
+    """Публикатор обязан искать привязку в том же порядке, что воркер портала.
+
+    Прогон 21.09.2026 08:53 собрал снимок целиком и упал на KV_BINDING_MISSING:
+    искал только ACL, а у проекта заведена VISITS. Ошибка в другую сторону тише
+    и хуже — снимок лёг бы туда, откуда страница не читает.
+    """
+    import pathlib
+    import re
+
+    from scripts import publish_suppliers as ps
+
+    корень = pathlib.Path(__file__).resolve().parents[1]
+    js = (корень / "public" / "_worker.js").read_text(encoding="utf-8")
+    # Читаем код, а не комментарии: пояснение выше по файлу называет обе привязки.
+    без_комментариев = re.sub(r"(?m)^\s*//.*$", "", js)
+    m = re.search(r"function aclStore\(env\)\s*\{[^}]*?env\.(\w+)\s*\|\|\s*env\.(\w+)",
+                  без_комментариев)
+    assert m, "в воркере не нашлась aclStore с порядком привязок"
+    assert ps.ПРИВЯЗКИ == (m.group(1), m.group(2))
+
+
+def test_привязка_берётся_первая_найденная():
+    from scripts import publish_suppliers as ps
+
+    class Заглушка(ps.Cloudflare):
+        def __init__(self, namespaces):
+            self._ns = namespaces
+
+        def envelope(self, method, path, body=None):
+            return {"result": {"deployment_configs": {"production":
+                    {"kv_namespaces": self._ns}}}}
+
+    acl = {"ACL": {"namespace_id": "a" * 32}, "VISITS": {"namespace_id": "b" * 32}}
+    assert Заглушка(acl).namespace() == "a" * 32
+    только_visits = {"VISITS": {"namespace_id": "b" * 32}}
+    assert Заглушка(только_visits).namespace() == "b" * 32
+
+
+def test_без_обеих_привязок_отказ():
+    import pytest
+
+    from scripts import publish_suppliers as ps
+
+    class Заглушка(ps.Cloudflare):
+        def __init__(self):
+            pass
+
+        def envelope(self, method, path, body=None):
+            return {"result": {"deployment_configs": {"production":
+                    {"kv_namespaces": {"OTHER": {"namespace_id": "c" * 32}}}}}}
+
+    with pytest.raises(ps.PublishError) as e:
+        Заглушка().namespace()
+    assert "KV_BINDING_MISSING" in str(e.value)

@@ -24,6 +24,7 @@
 """
 from __future__ import annotations
 
+import os
 import argparse
 import shutil
 import subprocess
@@ -95,6 +96,24 @@ def main() -> int:
     steps = [("ruff — ошибки кода", ruff_cmd, None)]
     if not a.quick:
         steps.append(("тесты ядра", [py, "-m", "pytest", "-q"], None))
+        # ТЕСТЫ СХЕМ БЕЗ БАЗЫ ПРОСТО ПРОПУСКАЮТСЯ — молча. У гейта база есть
+        # (services: postgres), и он их выполняет; у нас их не было ни разу,
+        # пока 21.09.2026 не понадобилось проверить вид поверх двух схем.
+        # Молчаливый пропуск — это «чисто» на том, что не проверялось.
+        if not os.environ.get("LIBRARY_SQL_TEST_DSN"):
+            print("⚠ LIBRARY_SQL_TEST_DSN не задан: тесты SQL-схем пропущены, "
+                  "гейт их прогонит. Поднять такую же базу локально:\n"
+                  "    /usr/lib/postgresql/16/bin/initdb -D /var/tmp/pgtest -A trust "
+                  "-U postgres\n"
+                  "    /usr/lib/postgresql/16/bin/pg_ctl -D /var/tmp/pgtest "
+                  "-o '-k /var/tmp -c listen_addresses=127.0.0.1' -l /var/tmp/pgtest/log "
+                  "start\n"
+                  "    psql -h 127.0.0.1 -U postgres -c \"alter user postgres password "
+                  "'synthetic-library-ci'\" -c 'create database library_sql_test'\n"
+                  "    export LIBRARY_SQL_TEST_DSN=postgresql://postgres:"
+                  "synthetic-library-ci@127.0.0.1:5432/library_sql_test\n"
+                  "  Строка подключения закреплена в тесте дословно — иначе он "
+                  "откажется работать (защита от прогона против прода).")
         # Тесты прав доступа на node. Гейт их гонял, а этот скрипт — нет, и это
         # ровно та дыра, ради закрытия которой он написан: 20.09.2026 правка
         # access/acl.js прошла зелёный preflight и упала бы на гейте. Если node
