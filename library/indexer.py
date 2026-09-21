@@ -117,16 +117,67 @@ def bx(method: str, params: dict) -> dict:
     return {}
 
 
+# Размер страницы REST Битрикса. Полное чтение кончается КОРОТКОЙ страницей;
+# если последняя страница полна, а «next» не пришёл — чтение оборвалось, и это
+# надо кричать, а не молчать.
+СТРАНИЦА = 50
+
+
 def bx_all(method: str, params: dict) -> list:
+    """Обход по смещению. Кричит, если похоже, что чтение оборвалось.
+
+    ОБРЫВ БЫЛ И БЫЛ НЕВИДИМ. 21.09.2026: этим способом СП-166 отдавал 7 750
+    карточек, а чтение по ключу (>id) — 21 865. Обрыв на смещении происходит без
+    ошибки: сервер просто перестаёт присылать «next». Поэтому здесь нет починки
+    самого обхода — для больших наборов есть bx_all_by_id, — но есть признак, по
+    которому обрыв виден в журнале.
+    """
     out, start = [], 0
     while True:
         j = bx(method, {**params, "start": start})
         res = j.get("result")
         items = res.get("items") if isinstance(res, dict) and "items" in res else res
-        out += items or []
+        items = items or []
+        out += items
         if "next" not in j:
+            if len(items) >= СТРАНИЦА:
+                print(f"::warning::{method}: чтение оборвалось на {len(out)} записях — "
+                      f"последняя страница полна ({len(items)}), а продолжения нет. "
+                      "Для больших наборов нужен обход по ключу (bx_all_by_id).",
+                      flush=True)
             return out
         start = j["next"]
+
+
+def bx_all_by_id(method: str, params: dict) -> list:
+    """Обход по ключу: filter[>id] = последний прочитанный.
+
+    Тот же способ, которым портал читают scripts/quote_coverage.py и
+    scripts/supplier_responsiveness.py (BitrixClient.list_items). На смещении
+    чтение СП-166 обрывалось на 7 750 из 21 865 записей — молча, без ошибки.
+    start=-1 отключает подсчёт общего числа: он и есть причина медленного и
+    ненадёжного обхода по смещению.
+    """
+    out: list = []
+    last = 0
+    исходный = dict(params.get("filter") or {})
+    while True:
+        f = dict(исходный)
+        f[">id"] = last
+        j = bx(method, {**params, "filter": f, "order": {"id": "ASC"}, "start": -1})
+        res = j.get("result")
+        items = (res.get("items") if isinstance(res, dict) and "items" in res else res) or []
+        if not items:
+            return out
+        out += items
+        try:
+            last = int(items[-1]["id"])
+        except (KeyError, TypeError, ValueError):
+            print(f"::warning::{method}: в записи нет числового id — обход по ключу "
+                  f"невозможен, прочитано {len(out)}", flush=True)
+            return out
+        if len(items) < СТРАНИЦА:
+            return out
 
 
 def sniff(b: bytes) -> str:
@@ -360,9 +411,11 @@ def collect_refs_rfq(days: int) -> list[dict]:
     # scripts/supplier_responsiveness.py, а окно применяем у себя. Карточку без
     # даты окно НЕ отбрасывает: недоказанное «старая» дешевле потерянной цены.
     поля = list(ПОЛЯ_КП)
-    карточки = bx_all("crm.item.list", {"entityTypeId": SPA_RFQ,
-                                        "select": ["id", "createdTime", ПОЛЕ_ПОСТАВЩИКА] + поля,
-                                        "order": {"id": "ASC"}})
+    # Обход по ключу, а не по смещению: на смещении приходило 7 750 карточек
+    # вместо 21 865, и без единой ошибки (замер 21.09.2026).
+    карточки = bx_all_by_id("crm.item.list",
+                            {"entityTypeId": SPA_RFQ,
+                             "select": ["id", "createdTime", ПОЛЕ_ПОСТАВЩИКА] + поля})
     всего = len(карточки)
     без_даты = 0
     if days and days > 0:
