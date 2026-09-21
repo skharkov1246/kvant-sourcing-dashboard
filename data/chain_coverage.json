@@ -1,7 +1,7 @@
 {
-  "updated": "2026-09-18",
+  "updated": "2026-09-21",
   "note": "Заполняемость цепочки портала: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Считается scripts/build_chain_coverage.py по фактическим файлам РЕПОЗИТОРИЯ.",
-  "scope": "ЧТО СЧИТАЕТСЯ. Только файлы репозитория: gt/data, gpu/data, zip/data, pnw/data, dict/. Инженерная библиотека живёт в закрытой Supabase (таблицы lib_*), и этот счётчик её НЕ ВИДИТ — ключа базы в сборке нет. Поэтому ноль в клетке означает «нет в файлах репозитория», а не «нет нигде»: часть звеньев закрыта именно в библиотеке. Её состояние ведётся отдельно — таблица звеньев в CLAUDE.md и scripts/library_report.py, которому нужен SUPABASE_DB_URL.",
+  "scope": "ЧТО СЧИТАЕТСЯ. Только файлы репозитория: gt/data, gpu/data, zip/data, pnw/data, dict/. Инженерная библиотека живёт в закрытой Supabase (таблицы lib_*), и этот счётчик её НЕ ВИДИТ — ключа базы в сборке нет. Поэтому ноль в клетке означает «нет в файлах репозитория», а не «нет нигде»: часть звеньев закрыта именно в библиотеке. Её состояние ведётся отдельно — таблица звеньев в CLAUDE.md и scripts/library_report.py, которому нужен SUPABASE_DB_URL. ЧЕРНОВИК: число со знаком ~ — строки, которые собраны, но проверку скептиком не проходили. Они не засчитываются в заполненные клетки: заполненной клетка становится по проверенным данным, а не по собранным.",
   "goal": "Инженерный портал ремонта и сервиса динамического оборудования (CLAUDE.md).",
   "priority_rule": "Пустое звено важнее улучшения заполненного.",
   "links": [
@@ -48,79 +48,6 @@
   ],
   "segments": [
     {
-      "segment": "pumps",
-      "title": "Насосы",
-      "cells": [
-        {
-          "link": "machine",
-          "title": "Машина",
-          "what": "модель опознаётся и описана",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "node",
-          "title": "Узел",
-          "what": "состав машины разобран по узлам",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "symptom",
-          "title": "Признак",
-          "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "defect",
-          "title": "Дефект",
-          "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "repair",
-          "title": "Ремонтное решение",
-          "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "part",
-          "title": "Запчасть",
-          "what": "номенклатура с номерами, готовая к запросу",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "maker",
-          "title": "Изготовитель",
-          "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "contractor",
-          "title": "Исполнитель",
-          "what": "кому отдать работы по ремонту",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        }
-      ],
-      "filled": 0,
-      "of": 8,
-      "pct": 0
-    },
-    {
       "segment": "instrum",
       "title": "КИПиА",
       "cells": [
@@ -129,6 +56,7 @@
           "title": "Машина",
           "what": "модель опознаётся и описана",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         },
@@ -137,6 +65,7 @@
           "title": "Узел",
           "what": "состав машины разобран по узлам",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         },
@@ -145,22 +74,29 @@
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
           "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 11,
+          "sources": [
+            "dict/symptom.json"
+          ],
+          "state": "черновик"
         },
         {
           "link": "defect",
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 6,
+          "sources": [
+            "zip/data/diagnostics_recon.json"
+          ],
+          "state": "черновик"
         },
         {
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         },
@@ -169,6 +105,7 @@
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         },
@@ -176,22 +113,119 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 107,
+          "draft": 0,
+          "sources": [
+            "zip/data/dirs_recon.json",
+            "zip/data/subsupplier_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "contractor",
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         }
       ],
-      "filled": 0,
+      "filled": 1,
       "of": 8,
-      "pct": 0
+      "pct": 12
+    },
+    {
+      "segment": "pumps",
+      "title": "Насосы",
+      "cells": [
+        {
+          "link": "machine",
+          "title": "Машина",
+          "what": "модель опознаётся и описана",
+          "n": 0,
+          "draft": 0,
+          "sources": [],
+          "state": "пусто"
+        },
+        {
+          "link": "node",
+          "title": "Узел",
+          "what": "состав машины разобран по узлам",
+          "n": 0,
+          "draft": 0,
+          "sources": [],
+          "state": "пусто"
+        },
+        {
+          "link": "symptom",
+          "title": "Признак",
+          "what": "по чему видно, что машина нездорова",
+          "n": 0,
+          "draft": 26,
+          "sources": [
+            "dict/symptom.json"
+          ],
+          "state": "черновик"
+        },
+        {
+          "link": "defect",
+          "title": "Дефект",
+          "what": "каталог дефектов: что ломается и почему",
+          "n": 0,
+          "draft": 149,
+          "sources": [
+            "zip/data/diagnostics_recon.json"
+          ],
+          "state": "черновик"
+        },
+        {
+          "link": "repair",
+          "title": "Ремонтное решение",
+          "what": "чем восстанавливают, границы применимости",
+          "n": 13,
+          "draft": 25,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "part",
+          "title": "Запчасть",
+          "what": "номенклатура с номерами, готовая к запросу",
+          "n": 0,
+          "draft": 0,
+          "sources": [],
+          "state": "пусто"
+        },
+        {
+          "link": "maker",
+          "title": "Изготовитель",
+          "what": "кто делает деталь, помимо владельца конструкции",
+          "n": 93,
+          "draft": 0,
+          "sources": [
+            "zip/data/dirs_recon.json",
+            "zip/data/subsupplier_recon.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "contractor",
+          "title": "Исполнитель",
+          "what": "кому отдать работы по ремонту",
+          "n": 0,
+          "draft": 20,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "черновик"
+        }
+      ],
+      "filled": 2,
+      "of": 8,
+      "pct": 25
     },
     {
       "segment": "electro",
@@ -202,6 +236,7 @@
           "title": "Машина",
           "what": "модель опознаётся и описана",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         },
@@ -210,6 +245,7 @@
           "title": "Узел",
           "what": "состав машины разобран по узлам",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         },
@@ -218,30 +254,40 @@
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
           "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 17,
+          "sources": [
+            "dict/symptom.json"
+          ],
+          "state": "черновик"
         },
         {
           "link": "defect",
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 21,
+          "sources": [
+            "zip/data/diagnostics_recon.json"
+          ],
+          "state": "черновик"
         },
         {
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 13,
+          "draft": 25,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "part",
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         },
@@ -249,22 +295,29 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 80,
+          "draft": 0,
+          "sources": [
+            "zip/data/dirs_recon.json",
+            "zip/data/subsupplier_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "contractor",
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 9,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "черновик"
         }
       ],
-      "filled": 0,
+      "filled": 2,
       "of": 8,
-      "pct": 0
+      "pct": 25
     },
     {
       "segment": "recip",
@@ -275,6 +328,7 @@
           "title": "Машина",
           "what": "модель опознаётся и описана",
           "n": 35,
+          "draft": 0,
           "sources": [
             "zip/data/recip_recon.json"
           ],
@@ -285,6 +339,7 @@
           "title": "Узел",
           "what": "состав машины разобран по узлам",
           "n": 16,
+          "draft": 0,
           "sources": [
             "zip/data/recip_recon.json"
           ],
@@ -295,24 +350,32 @@
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
           "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 27,
+          "sources": [
+            "dict/symptom.json"
+          ],
+          "state": "черновик"
         },
         {
           "link": "defect",
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 138,
+          "sources": [
+            "zip/data/diagnostics_recon.json"
+          ],
+          "state": "черновик"
         },
         {
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 23,
+          "n": 36,
+          "draft": 25,
           "sources": [
-            "zip/data/recip_recon.json"
+            "zip/data/recip_recon.json",
+            "zip/data/repair_recon.json"
           ],
           "state": "есть"
         },
@@ -321,6 +384,7 @@
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
           "n": 173,
+          "draft": 0,
           "sources": [
             "zip/data/recip_recon.json"
           ],
@@ -330,9 +394,11 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 179,
+          "n": 216,
+          "draft": 0,
           "sources": [
-            "zip/data/recip_recon.json"
+            "zip/data/recip_recon.json",
+            "zip/data/oem_atlas.json"
           ],
           "state": "есть"
         },
@@ -341,8 +407,11 @@
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 24,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "черновик"
         }
       ],
       "filled": 5,
@@ -358,6 +427,7 @@
           "title": "Машина",
           "what": "модель опознаётся и описана",
           "n": 14,
+          "draft": 0,
           "sources": [
             "gpu/data/machines.json"
           ],
@@ -368,6 +438,7 @@
           "title": "Узел",
           "what": "состав машины разобран по узлам",
           "n": 14,
+          "draft": 0,
           "sources": [
             "gpu/data/parts.json"
           ],
@@ -378,8 +449,10 @@
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
           "n": 28,
+          "draft": 26,
           "sources": [
-            "gpu/data/faults.json"
+            "gpu/data/faults.json",
+            "dict/symptom.json"
           ],
           "state": "есть"
         },
@@ -388,8 +461,10 @@
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 28,
+          "draft": 96,
           "sources": [
-            "gpu/data/faults.json"
+            "gpu/data/faults.json",
+            "zip/data/diagnostics_recon.json"
           ],
           "state": "есть"
         },
@@ -397,9 +472,11 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 28,
+          "n": 41,
+          "draft": 25,
           "sources": [
-            "gpu/data/faults.json"
+            "gpu/data/faults.json",
+            "zip/data/repair_recon.json"
           ],
           "state": "есть"
         },
@@ -408,6 +485,7 @@
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
           "n": 565,
+          "draft": 0,
           "sources": [
             "gpu/data/demand.json",
             "gpu/data/motortech_cross.json",
@@ -419,10 +497,13 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 75,
+          "n": 149,
+          "draft": 0,
           "sources": [
             "gpu/data/suppliers.json",
-            "gpu/data/subsuppliers.json"
+            "gpu/data/subsuppliers.json",
+            "zip/data/oem_atlas.json",
+            "zip/data/subsupplier_recon.json"
           ],
           "state": "есть"
         },
@@ -431,6 +512,7 @@
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 0,
+          "draft": 0,
           "sources": [],
           "state": "пусто"
         }
@@ -448,6 +530,7 @@
           "title": "Машина",
           "what": "модель опознаётся и описана",
           "n": 107,
+          "draft": 0,
           "sources": [
             "gt/data/models.json",
             "dict/machine.json"
@@ -459,6 +542,7 @@
           "title": "Узел",
           "what": "состав машины разобран по узлам",
           "n": 8,
+          "draft": 0,
           "sources": [
             "gt/data/parts.json"
           ],
@@ -469,8 +553,10 @@
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
           "n": 65,
+          "draft": 26,
           "sources": [
-            "gt/data/faults.json"
+            "gt/data/faults.json",
+            "dict/symptom.json"
           ],
           "state": "есть"
         },
@@ -479,8 +565,10 @@
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 65,
+          "draft": 135,
           "sources": [
-            "gt/data/faults.json"
+            "gt/data/faults.json",
+            "zip/data/diagnostics_recon.json"
           ],
           "state": "есть"
         },
@@ -488,9 +576,11 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 65,
+          "n": 78,
+          "draft": 25,
           "sources": [
-            "gt/data/faults.json"
+            "gt/data/faults.json",
+            "zip/data/repair_recon.json"
           ],
           "state": "есть"
         },
@@ -499,6 +589,7 @@
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
           "n": 12934,
+          "draft": 0,
           "sources": [
             "gt/data/pn_db.json",
             "gt/data/pn_catalog.json",
@@ -510,7 +601,8 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1635,
+          "n": 1708,
+          "draft": 0,
           "sources": [
             "gt/data/suppliers.json",
             "gt/data/heavy_suppliers.json",
@@ -519,7 +611,9 @@
             "gt/data/sgt400_checklist.json",
             "gt/data/dossiers.json",
             "gt/data/site_profiles.json",
-            "gt/data/bitrix_supplier_sites.json"
+            "gt/data/bitrix_supplier_sites.json",
+            "zip/data/oem_atlas.json",
+            "zip/data/subsupplier_recon.json"
           ],
           "state": "есть"
         },
@@ -528,9 +622,11 @@
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 23,
+          "draft": 24,
           "sources": [
             "gt/data/suppliers.json",
-            "gt/data/heavy_suppliers.json"
+            "gt/data/heavy_suppliers.json",
+            "zip/data/repair_recon.json"
           ],
           "state": "есть"
         }
@@ -548,6 +644,7 @@
           "title": "Машина",
           "what": "модель опознаётся и описана",
           "n": 78,
+          "draft": 0,
           "sources": [
             "zip/data/telsmith_3858.json",
             "zip/data/machines.json",
@@ -560,6 +657,7 @@
           "title": "Узел",
           "what": "состав машины разобран по узлам",
           "n": 34,
+          "draft": 0,
           "sources": [
             "zip/data/telsmith_3858.json",
             "zip/data/r1700.json"
@@ -571,8 +669,10 @@
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
           "n": 55,
+          "draft": 26,
           "sources": [
-            "zip/data/r1700.json"
+            "zip/data/r1700.json",
+            "dict/symptom.json"
           ],
           "state": "есть"
         },
@@ -581,8 +681,10 @@
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 55,
+          "draft": 96,
           "sources": [
-            "zip/data/r1700.json"
+            "zip/data/r1700.json",
+            "zip/data/diagnostics_recon.json"
           ],
           "state": "есть"
         },
@@ -590,10 +692,12 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 62,
+          "n": 75,
+          "draft": 25,
           "sources": [
             "zip/data/material_strategy.json",
-            "zip/data/r1700.json"
+            "zip/data/r1700.json",
+            "zip/data/repair_recon.json"
           ],
           "state": "есть"
         },
@@ -602,6 +706,7 @@
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
           "n": 1874,
+          "draft": 0,
           "sources": [
             "zip/data/positions.json",
             "zip/data/telsmith_3858.json",
@@ -613,12 +718,15 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1345,
+          "n": 1394,
+          "draft": 0,
           "sources": [
             "zip/data/odm_suppliers.json",
             "zip/data/telsmith_suppliers.json",
             "zip/data/supplier_crm.json",
-            "zip/data/r1700.json"
+            "zip/data/r1700.json",
+            "zip/data/oem_atlas.json",
+            "zip/data/subsupplier_recon.json"
           ],
           "state": "есть"
         },
@@ -627,6 +735,7 @@
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 21,
+          "draft": 0,
           "sources": [
             "zip/data/r1700.json"
           ],
@@ -650,7 +759,10 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 28,
+    "cells_filled": 33,
+    "cells_draft_only": 11,
+    "cells_with_draft": 24,
+    "draft_rows": 1027,
     "cells_total": 56,
     "links_not_started": 0
   }
