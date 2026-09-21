@@ -61,6 +61,26 @@ select currency, count(*),
  group by currency having count(*) >= 20 order by 2 desc
 """
 
+# ХВОСТ РАСПРЕДЕЛЕНИЯ — ЧТОБЫ ВЫБРОС БЫЛ ЧИСЛОМ, А НЕ ВПЕЧАТЛЕНИЕМ. Замер
+# 21.09.2026 по 46 файлам: медиана USD 2 758, максимум 21 236 712. Одна такая
+# строка ни о чём не говорит — это может быть и настоящая цена крупного узла, и
+# число, где разделитель разрядов принят за часть числа. Вопрос решается долей:
+# если верхний процент — единицы строк, это жизнь; если сотни, это разбор.
+#
+# Порог отсечения здесь НЕ ставится. Скрипт меряет, а не чинит: правило сначала
+# меряют, потом применяют (CLAUDE.md, правило 3).
+ХВОСТ = """
+select currency,
+       count(*)                                        as всего,
+       percentile_disc(0.99) within group (order by price) as p99,
+       count(*) filter (where price >= 100000)          as от_ста_тысяч,
+       count(*) filter (where price >= 1000000)         as от_миллиона,
+       max(price)                                       as максимум
+  from lib_prices
+ where feed = %s and price is not null and currency is not null
+ group by currency having count(*) >= 20 order by 2 desc
+"""
+
 ПРИГОДНЫЕ = """
 select count(*) from lib_prices
  where feed = %s and price > 0 and currency is not null and rfq_company is not null
@@ -119,6 +139,15 @@ def main() -> int:
                 for вал, n, med, lo, hi in строки:
                     print(f"    {вал:5s} n={n:<7d} медиана {med:>12,.2f}"
                           f"   от {lo:,.2f} до {hi:,.2f}")
+            cur.execute(ХВОСТ, (FEED,))
+            хвост = cur.fetchall()
+            if хвост:
+                print("\nверхний хвост (99-й процентиль и штуки выше порогов —")
+                print("выброс должен быть числом, а не впечатлением):")
+                for вал, n, p99, сто, млн, максимум in хвост:
+                    print(f"    {вал:5s} p99 {p99:>14,.2f} · от 100 тыс. "
+                          f"{доля(сто, n):>14s} · от 1 млн {доля(млн, n):>12s}"
+                          f" · максимум {максимум:,.2f}")
     finally:
         conn.close()
     return 0
