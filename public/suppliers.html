@@ -29,6 +29,18 @@ h1{font-size:clamp(26px,3vw,35px);line-height:1.2;letter-spacing:-.02em;margin:8
 .total span{color:var(--dim);font-size:13px}
 .caveat{border:1px solid #524733;background:#1d1c19;border-radius:9px;padding:15px 18px;margin:0 0 24px;color:#d3cbbb;font-size:13px}
 .caveat strong{color:var(--amber);font-weight:500}
+.innq{border:1px solid #524733;background:#1d1c19;border-radius:9px;padding:15px 18px;margin:0 0 24px}
+.innq h2{margin:0 0 6px;font-size:16px;color:var(--amber);font-weight:500}
+.innq-why{margin:0 0 14px;color:#d3cbbb;font-size:13px;line-height:1.5}
+.innq-row{border-top:1px solid #33302a;padding:9px 0;display:grid;
+          grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:baseline}
+.innq-row:first-child{border-top:0}
+.innq-name{color:#e8e2d6;font-size:13px;word-break:break-word}
+.innq-reason{color:#9c9384;font-size:12px;display:block;margin-top:2px}
+.innq-cards{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.innq-cards a{color:#8fb8ff;text-decoration:none;font-size:12px;border:1px solid #2f3b52;
+              border-radius:5px;padding:1px 7px;white-space:nowrap}
+.innq-cards a:hover{background:#1a2740}
 .search-row{display:flex;gap:16px;align-items:center;border-top:1px solid var(--line);padding-top:19px;flex-wrap:wrap}
 .search-box{position:relative;max-width:650px;flex:1;min-width:220px}
 .search-box input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:9px;color:var(--ink);padding:12px 15px;min-height:48px;appearance:none}
@@ -74,6 +86,11 @@ dt{font-size:11px;color:var(--dim);margin:0 0 3px}dd{margin:0;font-size:14px;ove
   </header>
   <div class="totals" id="totals" hidden></div>
   <p class="caveat" id="caveat" hidden></p>
+  <section class="innq" id="innq" hidden>
+    <h2 id="innq-head"></h2>
+    <p class="innq-why" id="innq-why"></p>
+    <div id="innq-list"></div>
+  </section>
   <main id="main">
     <div class="status" id="status"><h2>Загружаем реестр</h2><p>Секунду.</p></div>
     <div id="list" hidden>
@@ -120,6 +137,16 @@ function пара(dl, подпись, v) {
 }
 function закрыто(v) { return v !== null && typeof v === "object" && !Array.isArray(v) && typeof v["закрыто"] === "string"; }
 function число(n) { return typeof n === "number" ? n.toLocaleString("ru-RU") : "—"; }
+// Заголовок читает владелец, и «2 компаний» в нём — брак. 11–14 идут по форме
+// «компаний», хотя оканчиваются на 1–4: это исключение, а не общее правило.
+function склонение(n, одна, две, много) {
+  if (typeof n !== "number") return много;
+  var a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return много;
+  if (b === 1) return одна;
+  if (b >= 2 && b <= 4) return две;
+  return много;
+}
 function дата(s) {
   if (!s) return "неизвестно";
   var t = Date.parse(s);
@@ -297,7 +324,8 @@ function открыть(e) {
 function сводка(d) {
   var t = d.totals || {};
   var поля = [["Компаний в реестре", t.entities], ["С вечным номером", t.numbered],
-              ["В очереди проверки", t.review_open], ["С ИНН", t.with_inn]];
+              ["В очереди проверки", t.review_open], ["С ИНН", t.with_inn],
+              ["Карточек ждут ИНН", t.inn_cards]];
   var box = $("totals");
   var видно = false;
   поля.forEach(function (п) {
@@ -310,6 +338,48 @@ function сводка(d) {
   });
   box.hidden = !видно;
   if (d.caveat) { текст($("caveat"), d.caveat).hidden = false; }
+  очередь_инн(d);
+}
+
+// Тот же адрес карточки компании, что в остальных страницах портала.
+var BXLINK = "https://kvantpro.bitrix24.ru/crm/company/details/";
+
+// ОЧЕРЕДЬ НА ИНН — СПИСОК РАБОТЫ. Показывать её числом бессмысленно: чтобы снять
+// спор, надо открыть конкретные карточки, поэтому каждая идёт ссылкой. Раздел
+// прячется целиком, когда очереди нет: пустой список читался бы как «проверено
+// и пусто», а это разные вещи.
+function очередь_инн(d) {
+  var очередь = Array.isArray(d.inn_queue) ? d.inn_queue : [];
+  if (!очередь.length) return;
+  var t = d.totals || {};
+  текст($("innq-head"), "Ждут ИНН: " + число(t.inn_entities) + " "
+        + склонение(t.inn_entities, "компания", "компании", "компаний") + ", "
+        + число(t.inn_cards) + " "
+        + склонение(t.inn_cards, "карточку", "карточки", "карточек") + " заполнить");
+  текст($("innq-why"),
+        "Этим компаниям не выдан вечный номер: опознать их доменом и именем нельзя, "
+        + "решает налоговый номер. Заполнять нужно только эти карточки — остальным "
+        + "компаниям реестра ИНН для сведения не требуется. Проставится номер — "
+        + "следующий прогон сведения запишет их сам.");
+  var box = $("innq-list");
+  очередь.forEach(function (строка) {
+    var row = узел("div", "innq-row");
+    var left = узел("div", null);
+    left.appendChild(узел("span", "innq-name", (строка.names || []).join(" · ")));
+    if (строка.reason) left.appendChild(узел("span", "innq-reason", строка.reason));
+    row.appendChild(left);
+    var cards = узел("div", "innq-cards");
+    (строка.cards || []).forEach(function (id) {
+      var a = узел("a", null, "№ " + id);
+      a.href = BXLINK + encodeURIComponent(id) + "/";
+      a.target = "_blank";
+      a.rel = "noopener";
+      cards.appendChild(a);
+    });
+    row.appendChild(cards);
+    box.appendChild(row);
+  });
+  $("innq").hidden = false;
 }
 
 function ошибка(h, p) {
