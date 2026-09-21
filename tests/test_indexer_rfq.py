@@ -233,3 +233,30 @@ def test_пустая_страница_кончает_чтение_только_
     страницы = [{"result": {"items": [{"id": 1}]}}, {"result": {"items": []}}]
     monkeypatch.setattr(ix, "bx", lambda m, p: страницы.pop(0))
     assert len(ix.bx_all_by_id("crm.item.list", {})) == 1
+
+
+def test_частота_запросов_под_лимитом_портала():
+    """Умолчание клиента — ~3 запроса в секунду, Битрикс держит около двух.
+
+    Одному прогону это сходило с рук за счёт повторов, но разбор идёт частями,
+    и двенадцать частей давали 36 запросов в секунду: прогон 21.09.2026 10:43
+    упал всеми двенадцатью разом на HTTP 429.
+    """
+    import inspect
+
+    assert "min_interval=0.5" in inspect.getsource(ix.клиент)
+
+
+def test_ночной_разбор_котировок_идёт_одной_частью():
+    """Каждая часть вычитывает ВЕСЬ список карточек, чтобы выбрать свою долю
+    файлов: 21 865 карточек — 438 запросов на обход, двенадцать частей — 5 256."""
+    import pathlib
+
+    import yaml
+
+    корень = pathlib.Path(__file__).resolve().parents[1]
+    прогон = yaml.safe_load(
+        (корень / ".github" / "workflows" / "suppliers-quotes.yml").read_text(encoding="utf-8"))
+    работа = прогон["jobs"]["quotes"]
+    assert работа["strategy"]["matrix"]["shard"] == [0]
+    assert работа["steps"][-1]["env"]["SHARDS"] == "1"
