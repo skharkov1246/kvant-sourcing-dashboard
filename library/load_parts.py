@@ -83,6 +83,17 @@ def load(path: str, key: str = "rows"):
     return d if isinstance(d, list) else (d.get(key) or [])
 
 
+def узел_позиции(p: dict) -> str | None:
+    """Узел позиции каталога по её описанию — тем же правилом, что и для
+    номенклатуры ГТУ (library/equipment.py), а не своим.
+
+    Сюда сведены все пути сборки позиции: каталог ЗИП, строки обходов, позиции
+    заявок, карточки OEM. Правило, поставленное в одном из них, оставило бы
+    остальные без узла — ровно так узел и пропал у 3 463 позиций живой базы."""
+    return eq.unit_of(" ".join(str(p.get(f) or "") for f in
+                               ("name", "category", "model", "target_equipment")))
+
+
 def число(v):
     """Цена из проверки наличия приходит строкой, пустой строкой и числом."""
     if isinstance(v, (int, float)):
@@ -263,9 +274,16 @@ def main() -> int:
              r.get("price_exw_usd") or r.get("line_exw_usd"), "USD",
              "склад поставщика, EXW", FEED_ЗАПИСИ, conf="med")
 
+    # Узел добирается одним проходом по ВСЕМ путям сборки: см. узел_позиции.
+    for p_ in parts.values():
+        p_["unit_id"] = узел_позиции(p_)
+    с_узлом = sum(1 for p_ in parts.values() if p_["unit_id"])
+
     print("=== запчасти ===")
     print(f"  позиций в каталоге:{len(positions):>8}")
     print(f"  добавлено из заявок на закупку:{из_заявок:>6}")
+    print(f"  узел определён у: {с_узлом:>9}  "
+          f"({с_узлом * 100 // max(len(parts), 1)} %)")
     print(f"  различных деталей: {len(parts):>8}" +
           (f"   (столкновений ключа: {столкновения})" if столкновения else ""))
     заполнено = Counter()
@@ -327,10 +345,14 @@ def main() -> int:
     conn.autocommit = False
     with conn.cursor() as cur:
         indexer.ensure_segments(cur)
+        # Узел ставится только существующий: справочник узлов грузит другой
+        # загрузчик, и на пустой базе ссылка уронила бы вставку по внешнему ключу.
+        cur.execute("select id from lib_units")
+        узлы = {r[0] for r in cur.fetchall()}
         psycopg2.extras.execute_values(cur, """
             insert into lib_parts (id, catalog_no, name, oem, model, category, segment_id,
                                    hs_code, material, applications, target_equipment, aliases,
-                                   qty_quarter, status, source)
+                                   qty_quarter, status, unit_id, unit_rule, source)
             values %s
             on conflict (id) do update set
               name = excluded.name, oem = excluded.oem, model = excluded.model,
@@ -338,10 +360,18 @@ def main() -> int:
               hs_code = excluded.hs_code, material = excluded.material,
               applications = excluded.applications, target_equipment = excluded.target_equipment,
               aliases = excluded.aliases, qty_quarter = excluded.qty_quarter,
-              status = excluded.status, updated_at = now()""",
+              status = excluded.status,
+              -- Узел НЕ перетирается: у номенклатуры ГТУ он мог прийти из
+              -- разметки инженеров, а здесь выведен из описания. Заполняем
+              -- только пустое (правило: обвиняй осторожно, защищай щедро).
+              unit_id = coalesce(lib_parts.unit_id, excluded.unit_id),
+              unit_rule = coalesce(lib_parts.unit_rule, excluded.unit_rule),
+              updated_at = now()""",
             [(p["id"], p["catalog_no"], p["name"], p["oem"], p["model"], p["category"],
               p["segment_id"], p["hs_code"], p["material"], p["applications"],
-              p["target_equipment"], p["aliases"], p["qty_quarter"], p["status"], "каталог ЗИП")
+              p["target_equipment"], p["aliases"], p["qty_quarter"], p["status"],
+              p["unit_id"] if p["unit_id"] in узлы else None,
+              "описание позиции" if p["unit_id"] in узлы else None, "каталог ЗИП")
              for p in parts.values()], page_size=500)
 
         cur.execute("select id from lib_parts")
