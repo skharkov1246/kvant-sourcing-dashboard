@@ -514,3 +514,34 @@ def test_every_chain_link_started_somewhere():
         "звено пусто во всех направлениях: " + \
         ", ".join(x["title"] for x in cov["empty_everywhere"])
     assert cov["summary"]["links_not_started"] == 0
+
+
+def test_standards_check_names_both_sides():
+    """Сверка со стандартом называет обе стороны и не прячет ошибку скептика.
+
+    Скептики разведки по диагностике работали без доступа к текстам стандартов.
+    Сверка нужна именно затем, чтобы поправка скептика не стала второй ошибкой
+    поверх первой, — поэтому каждая позиция обязана нести и то, что было в
+    каталоге, и то, что стоит в стандарте, и ссылку на таблицу или пункт."""
+    d = json.loads((ROOT / "zip" / "data" / "standards_check.json").read_text(encoding="utf-8"))
+    assert d["checks"], "сверка пуста"
+    VERDICTS = {"скептик прав", "скептик ошибся", "подтверждено с дополнением"}
+    for c in d["checks"]:
+        assert c["verdict"] in VERDICTS, f"неизвестный вердикт сверки: {c['verdict']}"
+        for field in ("standard", "clause", "topic", "in_recon", "in_standard", "consequence"):
+            assert str(c.get(field) or "").strip(), f"{c['topic']}: пустое поле {field}"
+        # Стандарт, по которому сверялись, обязан лежать в списке выгруженных:
+        # иначе «сверено» означает «вспомнил», а это ровно то, что сверка лечит.
+        base = c["standard"].split(":")[0].strip()
+        assert any(base in t for t in d["available_texts"]), \
+            f"{c['standard']}: сверка есть, а текста в available_texts нет"
+
+    # Сверка, в которой скептик всегда прав, — не сверка, а пересказ. Ошибка
+    # скептика найдена и обязана остаться видимой.
+    assert any(c["verdict"] == "скептик ошибся" for c in d["checks"])
+
+    # Несверенное перечислено поимённо и с указанием, на что влияет: без этого
+    # «не сверено» читается как «неважно».
+    assert d["not_verified"]
+    for x in d["not_verified"]:
+        assert str(x.get("why") or "").strip() and str(x.get("affects") or "").strip()
