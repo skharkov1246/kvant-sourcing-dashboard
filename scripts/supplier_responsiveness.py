@@ -30,6 +30,7 @@ import json
 import os
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,6 +61,44 @@ def доля(часть: int, целое: int) -> str:
     return f"{часть}/{целое}" + (f" ({100 * часть / целое:.0f} %)" if целое else "")
 
 
+# СОРОК ПРОЦЕНТОВ ЗАПРОСОВ БЕЗ ИСХОДА — замер 20.09.2026. Карточка стоит в стадии
+# «Отправлен»: ни ответа, ни отказа, ни отметки «не ответил в срок». Это состояние
+# ведения, и пока оно такое, любая доля ответа занижена на неизвестную величину.
+# Разбор по возрасту отвечает, что это: свежие запросы, по которым ответа ещё ждут,
+# или брошенные карточки. Разница определяет, кому это чинить.
+БЕЗ_ИСХОДА = {"sent", "other"}
+ВОЗРАСТ = ((7, "меньше недели"), (30, "1–4 недели"), (90, "1–3 месяца"),
+           (365, "3–12 месяцев"), (10 ** 6, "больше года"))
+
+
+def возраст_дней(создана: str, сейчас: float) -> int | None:
+    """Дней с создания карточки. Дата приходит ISO с часовым поясом или пустой."""
+    if not создана:
+        return None
+    try:
+        t = datetime.fromisoformat(str(создана).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return max(int((сейчас - t.timestamp()) / 86400), 0)
+
+
+def без_исхода_по_возрасту(карточки: list[dict]) -> collections.Counter:
+    сейчас = time.time()
+    out: collections.Counter[str] = collections.Counter()
+    for k in карточки:
+        if classify_stage(str(k.get("stageId") or "")) not in БЕЗ_ИСХОДА:
+            continue
+        д = возраст_дней(k.get("createdTime"), сейчас)
+        if д is None:
+            out["дата создания пуста"] += 1
+            continue
+        for предел, имя in ВОЗРАСТ:
+            if д < предел:
+                out[имя] += 1
+                break
+    return out
+
+
 def разложить(карточки: list[dict]) -> dict[int, collections.Counter]:
     по_компании: dict[int, collections.Counter] = collections.defaultdict(collections.Counter)
     for k in карточки:
@@ -69,7 +108,9 @@ def разложить(карточки: list[dict]) -> dict[int, collections.Co
     return по_компании
 
 
-def сводка(по_компании: dict[int, collections.Counter], *, будет_запись: bool = False) -> None:
+def сводка(по_компании: dict[int, collections.Counter], *, будет_запись: bool = False,
+           возрасты: collections.Counter | None = None) -> None:
+    возрасты = возрасты or collections.Counter()
     без_компании = по_компании.get(0, collections.Counter())
     компании = {cid: c for cid, c in по_компании.items() if cid}
 
@@ -127,6 +168,18 @@ def сводка(по_компании: dict[int, collections.Counter], *, бу�
         print(f"  не ответили ни разу:          {доля(sum(1 for d in доли if d == 0), len(доли))}")
         print(f"  ответили всегда:              {доля(sum(1 for d in доли if d == 1), len(доли))}")
     print()
+    if возрасты:
+        всего_без = sum(возрасты.values())
+        print("ЗАПРОСЫ БЕЗ ЗАФИКСИРОВАННОГО ИСХОДА — ПО ВОЗРАСТУ")
+        print(f"  всего таких карточек: {всего_без}")
+        for _, имя in ВОЗРАСТ:
+            if возрасты.get(имя):
+                print(f"    {имя:18} {доля(возрасты[имя], всего_без)}")
+        if возрасты.get("дата создания пуста"):
+            print(f"    {'дата пуста':18} {возрасты['дата создания пуста']}")
+        print("    Свежие — это ожидание; старые — брошенные карточки, и это")
+        print("    чинится ведением, а не кодом. Разница в том, кому чинить.")
+        print()
     if not будет_запись:
         print("Замер, записи не было. Хранение метрики строится после него, а не до.")
 
@@ -243,9 +296,10 @@ def main() -> int:
 
     print("выгрузка карточек запросов (СП-166)…", flush=True)
     карточки = BitrixClient(url).list_items(
-        SPA_RFQ, select=["id", "stageId", ПОЛЕ_ПОСТАВЩИКА])
+        SPA_RFQ, select=["id", "stageId", "createdTime", ПОЛЕ_ПОСТАВЩИКА])
     по_компании = разложить(карточки)
-    сводка(по_компании, будет_запись=args.apply)
+    сводка(по_компании, будет_запись=args.apply,
+           возрасты=без_исхода_по_возрасту(карточки))
     if not args.apply:
         return 0
     dsn = os.environ.get("SUPABASE_DB_URL", "")
