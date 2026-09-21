@@ -76,6 +76,15 @@ def собрать(cur) -> dict:
         "кон_позиций": q(cur, "select count(*) from lib_exposure where not have_price"),
         "кон_сумма": q(cur, "select round(sum(usd_exposure)) from lib_exposure where not have_price"),
         "кон_адрес": q(cur, "select count(*) from lib_exposure where not have_price and deal is not null"),
+        # Сколько денег стоит за позициями, по которым ВООБЩЕ не известно, кому
+        # писать. Это другая работа, чем «достать цену из файла», и смешивать их
+        # в одну очередь нельзя.
+        "кон_без_исп": q(cur, """select count(*) from lib_exposure e
+             where not e.have_price and not exists (select 1 from lib_part_suppliers s
+                                                     where s.part_id = e.part_id)"""),
+        "кон_без_исп_usd": q(cur, """select round(sum(e.usd_exposure)) from lib_exposure e
+             where not e.have_price and not exists (select 1 from lib_part_suppliers s
+                                                     where s.part_id = e.part_id)"""),
         "кон_топ10": q(cur, """select round(sum(usd_exposure)) from (
              select usd_exposure from lib_exposure where not have_price
               order by usd_exposure desc nulls last limit 10) t"""),
@@ -187,10 +196,11 @@ def html_doc(d: dict) -> str:
          f"выведен узел; ценовой ориентир по группе и по узлу — доллар за килограмм",
          "было 0"),
         ("Деньги на кону", n(d["кон_сумма"]) + " $", f"{n(d['кон_позиций'])} позиций "
-         f"заявки, по которым у нас НЕТ цены; у {n(d['кон_адрес'])} из них известен "
-         f"адрес, где цена уже лежит — сделка и файл. На десять крупнейших приходится "
-         f"{n(d['кон_топ10'])} $: очередь работ начинается с них, а не с первой строки "
-         f"заявки", "было 0"),
+         f"заявки, по которым у нас НЕТ цены; у {n(d['кон_адрес'])} известен адрес, где "
+         f"цена уже лежит — сделка и файл. На десять крупнейших приходится "
+         f"{n(d['кон_топ10'])} $. Позиций, по которым не известно и кому писать: "
+         f"{n(d['кон_без_исп'])} на {n(d['кон_без_исп_usd'])} $ — это другая работа, "
+         f"поиск исполнителя, и она отделена от «достать цену из файла»", "было 0"),
         ("Содержание", n(d["расход_машин"]) + " машин", f"{n(d['расход_строк'])} строк "
          f"расхода с интервалом замены в моточасах и ценой; оценка годового содержания "
          f"{n(d['расход_год'])} $ на эти машины — РАСЧЁТ по типовым интервалам, не наши счета",
