@@ -377,3 +377,36 @@ def test_распознавание_сканов_пишет_цену():
 
     assert "quotes.цена_из_текста" in inspect.getsource(ocr.recognise)
     assert "price_store.строка" in inspect.getsource(ocr.main)
+
+
+def test_бренд_и_производитель_доезжают_до_строки_цены():
+    """Цена без ответа «к чему это» сравнима только сама с собой.
+
+    oem — изготовитель из строки файла (разборщик находил его и раньше, но в
+    цену не писал). rfq_brands — бренды с карточки запроса, ключами.
+    """
+    from library import price_store
+
+    поз = {"item_name": "Подшипник", "part_number": "NU220", "oem": "SKF",
+           "qty": 10, "unit": "шт", "source_file": "f1", "deal_id": "11",
+           "company": "4242", "brands": "11,12"}
+    ц = {"price": 1200.5, "currency": "EUR", "basis": None, "lead_days": 42,
+         "confidence": "med", "note": None}
+    по_имени = dict(zip(price_store.КОЛОНКИ,
+                        price_store.строка(поз, ц, lambda v: str(v or ""))))
+    assert по_имени["oem"] == "SKF"
+    assert по_имени["rfq_brands"] == "11,12"
+    assert по_имени["price"] == 1200.5          # соседние поля не сдвинулись
+    assert по_имени["lead_days"] == 42
+
+
+def test_машина_отдельной_колонкой_не_хранится():
+    """Связь «деталь → машина» уже есть в lib_part_models, ключ — part_number.
+
+    Вторая копия этой связи разошлась бы с первой, а part_number заполнен у
+    96 % строк цены — этого достаточно, чтобы смотреть цену в разрезе машины.
+    """
+    from library import price_store
+
+    assert "model" not in price_store.КОЛОНКИ
+    assert "part_number" in price_store.КОЛОНКИ
