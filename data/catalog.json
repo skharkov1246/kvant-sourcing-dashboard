@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 269,
-    "total_bytes": 122064629,
+    "total_bytes": 122147479,
     "by_sensitivity": {
       "внутреннее": 147,
       "конфиденциально": 69,
@@ -876,7 +876,7 @@
     {
       "path": "zip/data/diagnostics_recon.json",
       "subproject": "база ЗИП",
-      "bytes": 1957107,
+      "bytes": 1957106,
       "note": "Разведка по диагностике и дефектам динамического оборудования: пять углов (вибродиагностика, невибрационные методы, турбомашины, насосы, поршневые), 225 численных норм с источником и 233 карточки дефектов «признак → причина → метод → последствие → ремонтопригодность → запчасти». У каждого угла был собственный скептик с заданием опровергать по умолчанию; вердикт стоит у каждой строки. Из 225 норм подтверждена 71, поправлено 118, забраковано 11, признано непроверяемыми 25. Каталог дефектов проверен точечно — 9 строк из 233, остальные несут вердикт «скептик не сослался» и ждут отдельного прохода проверки. ВАЖНО: полные тексты ISO 10816-3, ISO 13373-9, ISO 13379-1 и ISO 17359 выгрузить не удалось (403/404), поэтому численные значения из них перед рабочим применением обязаны быть сверены с официальным текстом. Собрано zip/tools/extract_diagnostics.py из журнала разведки.",
       "format": "json",
       "shape": "объект",
@@ -894,7 +894,7 @@
       },
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "3cc5ffa",
+      "last_commit": "c01e33d",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1318,8 +1318,8 @@
         "records": 12
       },
       "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "916d752",
+      "last_author": "skharkov1246",
+      "last_commit": "a92b52c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1393,6 +1393,43 @@
         "library/load_parts.py",
         "library/load_suppliers.py",
         "tests/test_pack_division.py"
+      ]
+    },
+    {
+      "path": "data/chat_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 884681,
+      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assessment",
+        "days",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "assessment",
+        "records": 15
+      },
+      "last_change": "2026-09-21",
+      "last_author": "github-actions[bot]",
+      "last_commit": "7cd787d",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/gate.yml",
+        ".github/workflows/scan.yml",
+        "chat_scan.py",
+        "gpu/tools/bitrix_gpu.py",
+        "reps.py",
+        "scripts/budget_snapshot.py",
+        "scripts/preflight.py",
+        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -1488,43 +1525,6 @@
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py"
-      ]
-    },
-    {
-      "path": "data/chat_snapshot.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 801830,
-      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "assessment",
-        "days",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "assessment",
-        "records": 15
-      },
-      "last_change": "2026-09-19",
-      "last_author": "github-actions[bot]",
-      "last_commit": "d420c68",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "оценки и данные сотрудников"
-        ]
-      },
-      "referenced_by": [
-        ".github/workflows/gate.yml",
-        ".github/workflows/scan.yml",
-        "chat_scan.py",
-        "gpu/tools/bitrix_gpu.py",
-        "reps.py",
-        "scripts/budget_snapshot.py",
-        "scripts/preflight.py",
-        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -3586,8 +3586,8 @@
         ]
       },
       "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "3cc5ffa",
+      "last_author": "skharkov1246",
+      "last_commit": "a92b52c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4401,8 +4401,8 @@
         "gt/data/ship_inside_quotes.json"
       ],
       "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "3cc5ffa",
+      "last_author": "skharkov1246",
+      "last_commit": "a92b52c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9050,8 +9050,8 @@
         ]
       },
       "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "916d752",
+      "last_author": "skharkov1246",
+      "last_commit": "a92b52c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
