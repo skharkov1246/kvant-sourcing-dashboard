@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 269,
-    "total_bytes": 122147479,
+    "total_bytes": 123140222,
     "by_sensitivity": {
       "внутреннее": 147,
       "конфиденциально": 69,
@@ -651,6 +651,43 @@
       ]
     },
     {
+      "path": "zip/data/diagnostics_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 2949622,
+      "note": "Разведка по диагностике и дефектам динамического оборудования: восемь углов — вибродиагностика, невибрационные методы, турбомашины, насосы, поршневые компрессоры и три угла КИПиА (датчики и первичные преобразователи, регулирующая арматура с приводами и позиционерами, защиты с анализаторами и вторичными приборами). 368 численных норм с источником и 340 карточек дефектов «признак → причина → метод → последствие → ремонтопригодность → запчасти» по 27 узлам. У каждого угла был собственный скептик; вердикт стоит у каждой строки. Каталог дефектов прошёл отдельный прогон проверки 21.09.2026 (12 скептиков, 232 карточки): подтверждено 64, поправлено 129, забраковано 7, непроверяемо 32. Карточки КИПиА проверку ещё проходят. ВАЖНО: полные тексты ISO 10816-3, ISO 13373-9, ISO 13379-1 и ISO 17359 выгрузить не удалось (403/404) — что удалось сверить, записано в zip/data/standards_check.json. Собирается zip/tools/extract_diagnostics.py, принимает несколько журналов и переносит вердикты прошлой проверки при пересборке.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angles",
+        "caveat",
+        "generated",
+        "method",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "stats",
+        "records": 10
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "36bcf48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
+        "scripts/build_symptom_index.py",
+        "tests/test_dict.py",
+        "zip/tools/apply_verdicts.py",
+        "zip/tools/build_diag_page.py",
+        "zip/tools/extract_diagnostics.py"
+      ]
+    },
+    {
       "path": "zip/customs/out/customs_8412.json",
       "subproject": "база ЗИП · таможня",
       "bytes": 2873827,
@@ -871,43 +908,6 @@
         "scripts/build_chain_page.py",
         "tests/test_dict.py",
         "zip/tools/build_recip_page.py"
-      ]
-    },
-    {
-      "path": "zip/data/diagnostics_recon.json",
-      "subproject": "база ЗИП",
-      "bytes": 1957106,
-      "note": "Разведка по диагностике и дефектам динамического оборудования: пять углов (вибродиагностика, невибрационные методы, турбомашины, насосы, поршневые), 225 численных норм с источником и 233 карточки дефектов «признак → причина → метод → последствие → ремонтопригодность → запчасти». У каждого угла был собственный скептик с заданием опровергать по умолчанию; вердикт стоит у каждой строки. Из 225 норм подтверждена 71, поправлено 118, забраковано 11, признано непроверяемыми 25. Каталог дефектов проверен точечно — 9 строк из 233, остальные несут вердикт «скептик не сослался» и ждут отдельного прохода проверки. ВАЖНО: полные тексты ISO 10816-3, ISO 13373-9, ISO 13379-1 и ISO 17359 выгрузить не удалось (403/404), поэтому численные значения из них перед рабочим применением обязаны быть сверены с официальным текстом. Собрано zip/tools/extract_diagnostics.py из журнала разведки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "angles",
-        "caveat",
-        "generated",
-        "method",
-        "stats",
-        "subject"
-      ],
-      "main_collection": {
-        "key": "stats",
-        "records": 10
-      },
-      "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "c01e33d",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "scripts/build_chain_page.py",
-        "scripts/build_symptom_index.py",
-        "tests/test_dict.py",
-        "zip/tools/apply_verdicts.py",
-        "zip/tools/build_diag_page.py",
-        "zip/tools/extract_diagnostics.py"
       ]
     },
     {
@@ -4354,7 +4354,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 145836,
+      "bytes": 146061,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4401,8 +4401,8 @@
         "gt/data/ship_inside_quotes.json"
       ],
       "last_change": "2026-09-21",
-      "last_author": "skharkov1246",
-      "last_commit": "a92b52c",
+      "last_author": "Claude",
+      "last_commit": "36bcf48",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9024,7 +9024,7 @@
     {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 24508,
+      "bytes": 24510,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -9050,8 +9050,8 @@
         ]
       },
       "last_change": "2026-09-21",
-      "last_author": "skharkov1246",
-      "last_commit": "a92b52c",
+      "last_author": "Claude",
+      "last_commit": "36bcf48",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
