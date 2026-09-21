@@ -81,7 +81,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <header>
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
     <div><b>ГШО · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
-    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="bom">Разработка</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button data-t="docs">Разделы</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button><a href="./orders/pilot-order-1.pdf" target="_blank" class="exp" style="text-decoration:none;background:#1a7f37;color:#fff;border-color:#1a7f37" title="Пилотный заказ №1 — PDF для закупок">📄 Заказ №1 (PDF)</a><a href="./telsmith.html" class="exp" style="text-decoration:none" title="Реестр разведки по щековой дробилке Telsmith 3858">⛏ Telsmith 3858</a><a href="./search.html" class="exp" style="text-decoration:none" title="Поиск детали по любому номеру">🔎 Поиск по номеру</a></div>
+    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="bom">Разработка</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button data-t="docs">Разделы</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button><a href="./orders/pilot-order-1.pdf" target="_blank" class="exp" style="text-decoration:none;background:#1a7f37;color:#fff;border-color:#1a7f37" title="Пилотный заказ №1 — PDF для закупок">📄 Заказ №1 (PDF)</a><a href="./telsmith.html" class="exp" style="text-decoration:none" title="Реестр разведки по щековой дробилке Telsmith 3858">⛏ Telsmith 3858</a><a href="./r1700.html" class="exp" style="text-decoration:none" title="Досье машины Caterpillar R1700G: запчасти, документация, дилеры, неоригинал, торги">🚜 CAT R1700G</a><a href="./search.html" class="exp" style="text-decoration:none" title="Поиск детали по любому номеру">🔎 Поиск по номеру</a></div>
   </div>
   <div class="bar" id="ctrls">
     <input id="q" type="text" placeholder="поиск: каталог, наименование, модель, OEM…">
@@ -145,12 +145,29 @@ const SAMPC={"заказан":"#8957e5","в пути":"#1f6feb","на склад
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1800);}
 function esc(s){return (s??"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");}
 function locBadge(s){s=s||"не начато";const c=LOCC[s]||"#8a97a6";return `<span class="loc" style="background:${c}">${esc(s)}</span>`;}
-async function fetchAll(table){let all=[],from=0,sz=1000;while(true){const {data,error}=await sb.from(table).select("*").range(from,from+sz-1);if(error||!data||!data.length)break;all=all.concat(data);if(data.length<sz)break;from+=sz;}return all;}
+// ПРИЧИНА ОТКАЗА ЗАПОМИНАЕТСЯ, А НЕ ВЫБРАСЫВАЕТСЯ. Раньше ошибка базы молча
+// превращалась в пустой список, страница уходила на офлайн-копию, и понять
+// «почему» было нельзя ни со страницы, ни из журнала: 401 (не тот ключ), 403
+// (закрыто политикой) и обрыв сети выглядели одинаково. Владельцу оставалось
+// спрашивать, а мне — гадать. Текст ошибки Supabase ключа не содержит.
+let ПРИЧИНА="";
+// ПРИЧИНА ОБЯЗАНА БЫТЬ ОДНОЙ СТРОКОЙ. Отказ приходит не только коротким кодом:
+// прокси перед базой отвечает целой HTML-страницей ошибки, и она уезжала в
+// плашку заголовка целиком — проверено рендером, 404 от сервера дал в плашку
+// весь документ. Разметку textContent не исполняет, но вёрстку это ломает.
+function коротко(s){s=(s||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
+  return s.length>120?s.slice(0,117)+"…":s;}
+async function fetchAll(table){let all=[],from=0,sz=1000;while(true){const {data,error}=await sb.from(table).select("*").range(from,from+sz-1);if(error){if(!ПРИЧИНА)ПРИЧИНА=коротко((error.code?error.code+" ":"")+(error.message||"отказ базы"));break;}if(!data||!data.length)break;all=all.concat(data);if(data.length<sz)break;from+=sz;}return all;}
 function fromSeed(){POS=SEED.map(s=>Object.assign({},s.pos,{id:s.pos.pp}));ODM={};PRICES={};DRAW={};SAMPLES={};SEED.forEach(s=>{ODM[s.pos.pp]=(s.odm||[]).map(o=>Object.assign({},o));PRICES[s.pos.pp]=(s.prices||[]).map(o=>Object.assign({},o));SAMPLES[s.pos.pp]=(s.samples||[]).map(o=>Object.assign({},o));});}
 async function load(){
   let ok=false;
+  // РАЗНЫЕ ОТКАЗЫ РАЗЛИЧАЮТСЯ. «Нет связи с БД» — сильное утверждение, и врать им
+  // нельзя: пустая таблица при исправной базе связью не является, а плашка про
+  // связь в этом случае была бы просто неправдой.
+  if(!sb)ПРИЧИНА="библиотека supabase-js не загрузилась";
   if(sb){try{
     const p=await fetchAll("positions");
+    if(!p.length&&!ПРИЧИНА)ПРИЧИНА="база ответила, но в positions ноль строк";
     if(p.length){
       const o=await fetchAll("odm_suppliers");POS=p;ODM={};o.forEach(r=>{(ODM[r.position_id]=ODM[r.position_id]||[]).push(r);});
       PRICES={};try{(await fetchAll("price_records")).forEach(r=>{(PRICES[r.position_id]=PRICES[r.position_id]||[]).push(r);});}catch(e){}
@@ -167,8 +184,18 @@ async function load(){
   const oems=[...new Set(POS.map(d=>d.oem))].filter(Boolean).sort();
   $("foem").innerHTML='<option value="">Все OEM</option>'+oems.map(c=>`<option>${esc(c)}</option>`).join("");
   $("floc").innerHTML='<option value="">Локализация: все</option>'+LOC.map(c=>`<option>${esc(c)}</option>`).join("");
-  $("mode").textContent=LIVE?"● онлайн — правки сохраняются":"● офлайн-копия (нет связи с БД)";
+  $("mode").textContent=LIVE?"● онлайн — правки сохраняются"
+    :"● офлайн-копия ("+(ПРИЧИНА||"причина не определилась")+")";
   $("mode").style.color=LIVE?"#1a7f37":"#9a6700";
+  // БАННЕР ОБЯЗАН СОГЛАСОВЫВАТЬСЯ С ПЛАШКОЙ. Он статичен в разметке и обещает
+  // «правки сохраняются для всей команды» всегда — в офлайне это неправда, и
+  // рядом с красной плашкой читается как противоречие. Правка в офлайне НЕ
+  // сохраняется, это же говорит toast при попытке.
+  if(!LIVE){const b=$("banner");if(b){b.innerHTML=b.innerHTML
+    .replace("<b>ГШО · рабочая база</b>","<b>ГШО · офлайн-копия</b>")
+    .replace("Правки сохраняются для всей команды.",
+             "<b>Правки НЕ сохраняются:</b> страница читает копию, вшитую в неё при сборке.");
+    b.style.background="#fff4e5";}}
   render();
 }
 // патч in-memory записи (чтобы после правки и повторного открытия карточки данные были свежими)
@@ -228,7 +255,19 @@ function render(){
   $("grid").innerHTML=h+"</tbody></table>";
   $("cnt").textContent=a.length+" / "+POS.length;
 }
-function buildDetail(d){const odm=ODM[d.id]||[];return masterBox(d)+sheetBox(d)+materialBox(d)+infoBox(d)+bitrixBox(d)+priceBox(d)+sampleBox(d)+drawBox(d)+odmCards(d,odm);}
+function buildDetail(d){const odm=ODM[d.id]||[];return dossierBox(d)+masterBox(d)+sheetBox(d)+materialBox(d)+infoBox(d)+bitrixBox(d)+priceBox(d)+sampleBox(d)+drawBox(d)+odmCards(d,odm);}
+// Досье машины: позиция, применимая к машине с собранным досье, должна вести на него.
+// Без этой ссылки досье живёт отдельной страницей, а сорсер работает в «Позициях».
+const DOSSIERS=[{re:/R1700/i,key:"R1700G",title:"Caterpillar R1700G — ПДМ подземных работ",url:"./r1700.html"}];
+function dossierBox(d){
+  const s=(d.model||"")+" "+(d.applications||"")+" "+(d.name||"");
+  const m=DOSSIERS.find(x=>x.re.test(s));if(!m)return"";
+  const pn=encodeURIComponent(d.catalog_no||"");
+  return `<div class="mbx" style="background:#f0f7ff;border-color:#bcd8f5"><div class="mbx-t">🚜 Досье машины: ${esc(m.title)}</div>
+    <div style="font-size:12px">Документация, полный перечень запчастей с аналогами, дилеры, заводы неоригинала,
+    поставщики РФ, цены и площадки торгов — <a href="${m.url}" target="_blank" rel="noopener"><b>открыть досье</b></a>${pn?` ·
+    <a href="${m.url}#pn=${pn}" target="_blank" rel="noopener">найти в досье ${esc(d.catalog_no)}</a>`:""}</div></div>`;
+}
 function sheetBox(d){
   const m=d.sheet_meta;if(!m)return"";
   const rows=[];

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Признаки и дефекты — ГТУ и ГПУ</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --border:rgba(11,11,11,.10); --s1:#2a78d6; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+  --chip:#eef2f7; --acc:#8a4b00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 80px}
+header{border-bottom:2px solid var(--acc);padding:20px 0 12px;margin-bottom:14px}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:16px;margin:28px 0 6px}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);margin:16px 0 8px}
+.mut{color:var(--mut)} .small{font-size:12.5px}
+a{color:var(--s1);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--acc);border-radius:8px;padding:12px 16px;margin:12px 0}
+.box.crit{border-left-color:var(--crit)} .box.good{border-left-color:var(--good)} .box.info{border-left-color:var(--s1)}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.tile b{font-size:20px;font-variant-numeric:tabular-nums;display:block}
+.tile span{font-size:12px;color:var(--ink2)}
+.btn{cursor:pointer;font-size:12.5px;border:1px solid var(--border);border-radius:7px;padding:5px 10px;background:var(--surface);color:var(--ink);text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--s1)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.tblwrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:6px 9px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);white-space:nowrap;position:sticky;top:0;background:var(--page)}
+tr.soon td{background:#fff7e6}
+.pn{font-family:ui-monospace,Menlo,monospace;background:var(--chip);border-radius:5px;padding:1px 6px;font-size:12px;white-space:nowrap}
+.pri{display:inline-block;font-weight:800;border-radius:5px;padding:1px 7px;font-size:12px;color:#fff}
+.pri1{background:#0a7d0a} .pri2{background:#b8770f} .pri3{background:#7a7873}
+.tag{display:inline-block;font-size:10.5px;border-radius:4px;padding:1px 6px;margin:1px 3px 1px 0;background:var(--chip);color:var(--ink2);white-space:nowrap}
+.bx{display:inline-block;font-size:10.5px;border-radius:4px;padding:1px 6px;font-weight:700;white-space:nowrap}
+.bx-never{background:#e6f2df;color:#2c5e14} .bx-won{background:#d9f2d9;color:#0a5c0a}
+.bx-price{background:#fdeecd;color:#7a5200} .bx-active{background:#dbe9fb;color:#124a86}
+.bx-sent{background:#e8e6e1;color:#4a4842} .bx-unread{background:#ffe0b3;color:#8a4b00}
+.bx-no_reply{background:#f6dcdc;color:#8c1f1f} .bx-refused{background:#f0d5f0;color:#6b1f6b}
+.bar{display:flex;height:22px;border-radius:6px;overflow:hidden;border:1px solid var(--border);margin:6px 0}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-bottom:10px}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.f{cursor:pointer;font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 9px;background:var(--surface);color:var(--ink2)}
+.f.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700}
+ol.play{padding-left:18px} ol.play li{margin:9px 0}
+@media(max-width:780px){th{position:static}}
+
+.vd{display:inline-block;font-size:10.5px;border-radius:4px;padding:1px 6px;font-weight:700;white-space:nowrap}
+.vd-ok{background:#d9f2d9;color:#0a5c0a} .vd-no{background:#f6dcdc;color:#8c1f1f}
+.vd-wr{background:#fdeecd;color:#7a5200} .vd-un{background:#e8e6e1;color:#4a4842}
+td.sym b{display:block;margin-bottom:2px}
+td.rep .pn{margin:1px 3px 1px 0;display:inline-block}
+.src{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>От признака к дефекту, ремонту и номерам — ГТУ и ГПУ</h1>
+  <div class="mut small">Звено «признак → дефект» портала: что видно эксплуатанту, что мерить, что вероятно
+  сломалось, чем подтвердить, что делать и какие номера заказывать. Сборка: __BUILT__</div>
+  <div class="small" style="margin-top:6px"><a href="./" style="font-weight:700">← ГТУ-библиотека</a></div>
+</header>
+
+<div class="box info small">
+  <b>Как читать вердикт.</b> «Подтверждён» — строка дословно есть в скачанном документе изготовителя
+  или стандарте. «Не проверялся» — общая инженерная практика по этому классу машин, а не наш
+  документ. «Сомнителен» — источник не открылся, код ответа записан в примечании. Граница не
+  косметическая: в счётчик заполняемости цепочки идут только подтверждённые строки.
+</div>
+
+<div class="k" id="tiles"></div>
+
+<div class="nav">
+  <button class="btn" data-seg="gtu">ГТУ — газотурбинные</button>
+  <button class="btn" data-seg="gpu">ГПУ — газопоршневые</button>
+</div>
+
+<div class="box small" id="gaps"></div>
+
+<div class="filters" id="fnode"></div>
+<div class="filters" id="fver"></div>
+<div class="filters" id="ffuel"></div>
+<div class="nav">
+  <input id="q" class="btn" style="min-width:320px;cursor:text"
+         placeholder="поиск: признак, дефект, узел, машина, номер, код…">
+  <span class="mut small" id="cnt"></span>
+  <button class="btn" id="csv">Выгрузить CSV</button>
+</div>
+
+<div class="tblwrap">
+<table id="t"><thead><tr>
+  <th style="width:15%">Признак</th><th style="width:9%">Узел</th><th style="width:10%">Машина</th>
+  <th style="width:15%">Что меряют</th><th style="width:15%">Вероятный дефект</th>
+  <th style="width:13%">Чем подтвердить</th><th style="width:17%">Ремонт и номера</th>
+  <th style="width:6%">Пров.</th>
+</tr></thead><tbody></tbody></table>
+</div>
+</div>
+
+<script>
+const D = __FAULTS_JSON__;
+let seg = "gtu", node = "", ver = "", fuel = "";
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const VD = {"подтверждён":"vd-ok","не проверялся":"vd-un","сомнителен":"vd-wr","снят":"vd-no"};
+
+function rows() {
+  const q = $("q").value.toLowerCase();
+  return (D[seg].rows || []).filter(x =>
+    (!node || x.node === node) && (!ver || x.verdict === ver) && (!fuel || x.fuel === fuel) &&
+    (!q || [x.symptom, x.defect, x.node, x.machine, x.measure, x.repair, x.codes, (x.parts || []).join(" ")]
+      .join(" ").toLowerCase().includes(q)));
+}
+
+function chips(box, vals, cur, set) {
+  $(box).innerHTML = "";
+  if (!vals.length) return;
+  [["", "все"]].concat(vals.map(v => [v, v])).forEach(([v, label]) => {
+    const b = document.createElement("button");
+    b.className = "f" + (v === cur ? " on" : "");
+    b.textContent = label;
+    b.onclick = () => { set(v); draw(); };
+    $(box).appendChild(b);
+  });
+}
+
+function draw() {
+  const d = D[seg], st = d.stats || {}, all = d.rows || [];
+  const ok = all.filter(x => x.verdict === "подтверждён").length;
+  const pn = new Set(all.flatMap(x => x.parts || [])).size;
+  $("tiles").innerHTML = [
+    [all.length, "связок"], [ok, "подтверждено документом"],
+    [new Set(all.map(x => x.node)).size, "узлов закрыто"],
+    [pn, "наших номеров"],
+    [all.filter(x => x.codes).length, "строк с кодами"],
+  ].map(([n, t]) => `<div class="tile"><b>${n}</b><span>${esc(t)}</span></div>`).join("");
+  $("gaps").innerHTML = "<b>Чего в срезе нет и почему.</b> " + esc(d.gaps || "—");
+  chips("fnode", [...new Set(all.map(x => x.node).filter(Boolean))].sort(), node, v => node = v);
+  chips("fver", [...new Set(all.map(x => x.verdict).filter(Boolean))].sort(), ver, v => ver = v);
+  chips("ffuel", [...new Set(all.map(x => x.fuel).filter(Boolean))].sort(), fuel, v => fuel = v);
+  const r = rows();
+  $("t").tBodies[0].innerHTML = r.map(x => `<tr>
+    <td class="sym"><b>${esc(x.symptom)}</b></td>
+    <td class="mut">${esc(x.node)}</td>
+    <td class="mut">${esc(x.machine)}${x.fuel && x.fuel !== "любой" ? `<div class="tag">${esc(x.fuel)}</div>` : ""}</td>
+    <td class="mut">${esc(x.measure)}</td>
+    <td>${esc(x.defect)}${x.codes ? `<div class="mut">коды: ${esc(x.codes)}</div>` : ""}</td>
+    <td class="mut">${esc(x.confirm)}</td>
+    <td class="rep">${esc(x.repair)}<div>${(x.parts || []).map(p => `<span class="pn">${esc(p)}</span>`).join("")}</div></td>
+    <td><span class="vd ${VD[x.verdict] || "vd-un"}">${esc(x.verdict)}</span>
+        ${x.url ? `<div class="src"><a href="${esc(x.url)}" target="_blank" rel="noopener">ист.</a></div>` : ""}</td>
+  </tr>`).join("");
+  $("cnt").textContent = `${r.length} из ${all.length}`;
+}
+
+document.querySelectorAll("button[data-seg]").forEach(b => b.onclick = () => {
+  seg = b.dataset.seg; node = ver = fuel = "";
+  document.querySelectorAll("button[data-seg]").forEach(x => x.style.fontWeight = "");
+  b.style.fontWeight = "800";
+  draw();
+});
+$("q").oninput = draw;
+$("csv").onclick = () => {
+  const cols = ["symptom", "node", "machine", "fuel", "measure", "defect", "confirm", "repair", "codes", "verdict", "confidence", "url"];
+  const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+  const body = rows().map(x => cols.map(c => q(c === "repair"
+    ? x.repair + " | " + (x.parts || []).join(" ") : x[c])).join(";"));
+  const b = new Blob(["\ufeff" + [cols.join(";")].concat(body).join("\n")], {type: "text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(b);
+  a.download = seg + "_faults.csv";
+  a.click();
+};
+document.querySelector('button[data-seg="gtu"]').style.fontWeight = "800";
+draw();
+</script>
+</body>
+</html>

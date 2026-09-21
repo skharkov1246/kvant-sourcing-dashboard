@@ -12,7 +12,7 @@ import json
 import re
 import subprocess
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -51,25 +51,37 @@ def ru(n: float, digits: int = 0) -> str:
 
 
 def unit_price(r: dict):
-    """Цена продавца, приведённая к штуке."""
-    p = r.get("price")
-    if p in (None, ""):
-        return None
-    try:
-        p = float(p)
-    except (TypeError, ValueError):
-        return None
-    pack = r.get("pack_qty") or 1
-    try:
-        pack = float(pack) or 1.0
-    except (TypeError, ValueError):
-        pack = 1.0
-    return p / pack
+    """Цена продавца за штуку, В ДОЛЛАРАХ.
+
+    Берётся готовое unit_price_usd из датасета: пересчёт делает ship_merge.py по
+    gt/data/fx_rates.json. Считать по сырому price нельзя — цены сняты в девяти
+    валютах, и сложение как есть завышало закупку на 44 % (207 480 против 144 445):
+    12 642 CZK шли в сумму как 12 642 USD, 7 422 RUB — как 7 422 USD.
+    """
+    u = r.get("unit_price_usd")
+    return None if u in (None, "") else float(u)
 
 
 def line_value(r: dict) -> float:
+    """Стоимость строки по цене продавца.
+
+    Считается ТОЛЬКО когда продавец подтвердил весь заявленный объём. Цена одного
+    лота, размноженная на сотни штук, — не закупка, а выдумка: разбор показал, что
+    так набегал миллион долларов из воздуха, в том числе на штучных лотах eBay.
+    """
+    if r.get("covers_qty") != "full":
+        return 0.0
     u = unit_price(r)
     return 0.0 if u is None else u * float(r.get("qty") or 0)
+
+
+def sort_value(r: dict) -> float:
+    """Для сортировки строк годится и неподтверждённая цена — но не для сумм."""
+    u = unit_price(r)
+    if u is None:
+        mid = budget_mid(r)
+        u = mid if mid else 0.0
+    return u * float(r.get("qty") or 0)
 
 
 def budget_mid(r: dict):
@@ -132,7 +144,12 @@ li { margin-bottom: 1.5mm; line-height: 1.35; }
 """
 
 
-def one_addressee(sl: dict) -> str:
+GRADE_RU = {"твёрдый": "твёрдый", "частичный": "объём не закрыт",
+            "условный": "условно («если есть»)", "устаревший": "август, не перепроверено",
+            "нет": ""}
+
+
+def one_addressee(sl: dict, with_lead: bool = True) -> str:
     bits = [f'<b>{E(sl["seller"])}</b>']
     if sl.get("country"):
         bits.append(E(sl["country"]))
@@ -142,7 +159,7 @@ def one_addressee(sl: dict) -> str:
         bits.append(E(ph))
     if not (sl.get("emails") or sl.get("phones")):
         bits.append(f'<span class="dim">{E(sl.get("site") or "контакт не собран")}</span>')
-    if sl.get("lead_time"):
+    if with_lead and sl.get("lead_time"):
         bits.append(f'<span class="dim">{E(sl["lead_time"])}</span>')
     return " · ".join(bits)
 
@@ -190,13 +207,14 @@ def rows_table(rows: list[dict], cols: list, with_addr: bool = False) -> str:
 LINE_COLS = [
     ("Артикул", 10, lambda r: f'<span class="pn">{E(r["pn"])}</span>'),
     ("Бренд заявки", 7, lambda r: E(r["man"])),
-    ("Наименование", 19, lambda r: E(r["name"])),
+    ("Наименование", 15, lambda r: E(r["name"])),
     ("Кол-во", 5, lambda r: f'{r.get("qty", 0)} {E(r.get("unit"))}'),
     ("Продавец", 15, lambda r: (E(r.get("seller")) or "—") + (
         f'<br><span class="dim">{KIND_RU.get(r.get("kind"), "")}</span>'
         if KIND_RU.get(r.get("kind")) else "")),
     ("Стр.", 4, lambda r: E(r.get("seller_country"))),
-    ("Нал.", 4, lambda r: STOCK_RU.get(r.get("in_stock"), "н/д")),
+    ("Наличие", 8, lambda r: GRADE_RU.get(r.get("stock_grade"), "")
+     or STOCK_RU.get(r.get("in_stock"), "н/д")),
     ("Срок отгрузки", 13, lambda r: E(r.get("lead_time")) or "—"),
     ("Цена", 9, money_cell),
     ("Объём", 5, lambda r: COVERS_RU.get(r.get("covers_qty"), "н/д")),
@@ -216,7 +234,7 @@ def supplier_map(rows: list[dict]) -> str:
     cards = []
     for key in sorted(groups, key=lambda k: (-len(groups[k]), -sum(line_value(r) for r in groups[k]))):
         g = groups[key]
-        g.sort(key=lambda r: -line_value(r))
+        g.sort(key=lambda r: -sort_value(r))
         name = max((r.get("seller") or "" for r in g), key=len)
         countries = sorted({r.get("seller_country") for r in g if r.get("seller_country")})
         val = sum(line_value(r) for r in g)
@@ -260,7 +278,7 @@ def clusters(rows: list[dict]) -> str:
         if len(c["pns"]) < 12:
             c["pns"].append(r["pn"])
         for sl in (r.get("sellers") or []) + (r.get("cluster_sellers") or []):
-            if sl.get("emails") or sl.get("phones"):
+            if (sl.get("emails") or sl.get("phones")) and sl.get("is_company", True):
                 a = c["addr"].setdefault(sl["seller_key"], dict(sl, n=0))
                 a["n"] += 1
     if not cl:
@@ -272,7 +290,7 @@ def clusters(rows: list[dict]) -> str:
     bodies = []
     for name, c in sorted(cl.items(), key=lambda t: (-t[1]["lines"], t[0])):
         top = sorted(c["addr"].values(), key=lambda x: -x["n"])[:5]
-        who = " ⁄ ".join(one_addressee(a) for a in top) or \
+        who = " ⁄ ".join(one_addressee(a, with_lead=False) for a in top) or \
             '<span class="dim">адресата с контактом нет</span>'
         bodies.append(
             f'<tbody class="p"><tr class="d">'
@@ -327,7 +345,7 @@ def directory(rows: list[dict]) -> str:
 
 def makers_table(rows: list[dict]) -> str:
     g = [r for r in rows if (r.get("real_maker") or "").strip()]
-    g.sort(key=lambda r: (-line_value(r), r["pn"]))
+    g.sort(key=lambda r: (-sort_value(r), r["pn"]))
     if not g:
         return '<p class="dim">Изготовителей не установлено.</p>'
     cols = [
@@ -408,20 +426,49 @@ def build_html(doc: dict, lines_only: bool = False) -> str:
     kpi = (f'<table class="k"><thead><tr><th>Вердикт</th>{kpi_head}<th>Всего</th></tr></thead>'
            f'<tbody>{"".join(kpi_rows)}</tbody></table>')
 
+    grade = defaultdict(list)
+    for r in rows:
+        if r.get("stock_grade", "нет") != "нет":
+            grade[r["stock_grade"]].append(r)
+    firm_val = sum(line_value(r) for r in grade["твёрдый"])
+    own_contact = sum(1 for r in rows
+                      if any(sl.get("emails") or sl.get("phones")
+                             for sl in r.get("sellers") or []))
+    cl_contact = sum(1 for r in rows
+                     if not any(sl.get("emails") or sl.get("phones")
+                                for sl in r.get("sellers") or [])
+                     and any(sl.get("emails") or sl.get("phones")
+                             for sl in r.get("cluster_sellers") or []))
+
     totals = f"""
 <table class="k"><tbody>
 <tr><td class="l">Позиций в заявке</td><td class="big">{len(rows)}</td>
-<td class="dim">{" · ".join(f"{s} — {len(by_sheet[s])}" for s in sheets)}</td></tr>
-<tr><td class="l">Продавцов с живым складом</td><td class="big">{len(sellers)}</td>
-<td class="dim">по ним разложена карта закупки в разделе 2</td></tr>
-<tr><td class="l">Закупка по складским строкам</td><td class="big">{ru(stock_val)} USD</td>
-<td class="dim">по ценам карточек, на заявленные количества; цены есть не у всех строк</td></tr>
+<td class="dim">{" · ".join(f"{s} — {len(by_sheet[s])}" for s in sheets)}; проверены все</td></tr>
+<tr><td class="l">Твёрдое наличие</td><td class="big">{len(grade["твёрдый"])}</td>
+<td class="dim">продавец назвал остаток и подтвердил ВЕСЬ заявленный объём.
+Только эти строки можно ставить в план отгрузки</td></tr>
+<tr><td class="l">Наличие есть, объём не закрыт</td><td class="big">{len(grade["частичный"])}</td>
+<td class="dim">деталь у продавца есть, но не в нашем количестве: нужен добор у второго
+и третьего</td></tr>
+<tr><td class="l">Условное «отгрузим, если есть»</td><td class="big">{len(grade["условный"])}</td>
+<td class="dim">формулировка витрины без числа остатка. Наличием не является</td></tr>
+<tr><td class="l">Наличие из августовской проверки</td><td class="big">{len(grade["устаревший"])}</td>
+<td class="dim">в этой сессии ссылки не перепроверялись; в том прогоне треть ссылок
+оказалась мёртвой — требует переподтверждения</td></tr>
+<tr><td class="l">Закупка по твёрдым строкам</td><td class="big">{ru(firm_val)} USD</td>
+<td class="dim">считается ТОЛЬКО там, где подтверждён весь объём. Цена одного лота,
+размноженная на сотни штук, в сумму не идёт. Цены сняты в шести валютах и приведены
+к доллару по справочному курсу на 13 Sep 2026 — это не курс сделки: банк даст свой,
+и к оплате он сдвинется</td></tr>
+<tr><td class="l">Контакт по самой детали</td><td class="big">{own_contact}</td>
+<td class="dim">нашли продавца именно этой позиции и знаем, куда ему писать.
+Ещё {cl_contact} строк закрыты родовым адресом кластера — это не то же самое</td></tr>
 <tr><td class="l">Вскрыто изготовителей узлов</td><td class="big">{len(makers)}</td>
-<td class="dim">имя реального изготовителя под шильдой OEM — раздел 3</td></tr>
+<td class="dim">имя реального изготовителя под шильдой OEM — раздел 4</td></tr>
 <tr><td class="l">Закрывается стандартом или подбором</td><td class="big">{len(subs)}</td>
-<td class="dim">крепёж, РТИ, прокладки, клеммы, предохранители — раздел 4</td></tr>
+<td class="dim">крепёж, РТИ, прокладки, клеммы, предохранители — раздел 5</td></tr>
 <tr><td class="l">Строк с ценой вне нашей вилки в 2,5+ раза</td><td class="big">{len(gaps)}</td>
-<td class="dim">из них завышено в ТКП — {len(over)}; раздел 5</td></tr>
+<td class="dim">из них завышено в ТКП — {len(over)}; раздел 6</td></tr>
 </tbody></table>"""
 
     todo = """
@@ -457,6 +504,15 @@ def build_html(doc: dict, lines_only: bool = False) -> str:
 {len(rows)} уникальных каталожных номеров. Сведены три поколения проверки: ранняя 08.2026,
 проверка 505 строк «Энергосетей» и сплошная проверка остатка 09.2026. Позднейшая проверка
 перекрывает раннюю; строки без проверки помечены явно, а не выданы за отсутствие товара.</p>
+<p><b>Курс.</b> Продавцы называют цену в своей валюте: в выкладке их шесть.
+Все долларовые суммы получены пересчётом по справочному курсу на 13 Sep 2026
+(gt/data/fx_rates.json), поэтому несут двойную оговорку: курс не сделки и не на день
+оплаты. В валюте продавца цена лежит рядом, колонки price и currency.</p>
+<p><b>Чем «наличие» не является.</b> Вердикт «на складе» стоит у {len(stock)} строк, но
+это четыре разные вещи, и смешивать их нельзя: твёрдое наличие с подтверждённым объёмом,
+наличие без покрытия нашего количества, формулировка «отгрузим, если есть» и записи
+августовской проверки, не перепроверенные в этой сессии. В деньги и в план отгрузки
+имеет право идти только первое — см. таблицу выше.</p>
 <p><b>Что считать фактом.</b> Наличие, срок и цена сняты с карточек товара у продавцов.
 Страница поисковой выдачи доказательством не считалась. <b>Ни одна строка не является
 котировкой</b> — это витрины продавцов, а не ответы на наш запрос. Часть площадок (Radwell,
@@ -469,9 +525,14 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
         "<h1>Закупка по заявке ЛУКОЙЛ: у кого что брать</h1>",
         f'<p class="lead dim">Листы «Энергосети» и «НВН» · обновлено {E(doc.get("updated"))}</p>',
         totals, origin,
-        "<h3>Покрытие по вердиктам</h3>", kpi,
         "</div>",
-        '<div class="sec"><h2>1. Что делать</h2>' + todo + "</div>",
+        # таблица вердиктов живёт на странице «что делать»: отдельным разделом
+        # она занимала целый разворот шестью строками
+        '<div class="sec"><h2>1. Что делать</h2>' + todo
+        + "<h3>Покрытие по вердиктам</h3>"
+        '<p class="lead">Вердикт отвечает на вопрос «нашли ли мы канал», а не «можно ли '
+        'отгружать»: твёрдость наличия внутри «на складе» разобрана на первой странице.</p>'
+        + kpi + "</div>",
         f'<div class="sec"><h2>2. Кластеры заявки: кому писать — {len(cl_names)}</h2>'
         '<p class="lead">Кластер — лист, бренд заявки и класс номенклатуры. По неопознанному '
         'чертёжному номеру продавца нет, но круг компаний по такому классу известен из соседних '
@@ -531,6 +592,25 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
             '<p class="lead">Приложение к документу «Закупка по заявке ЛУКОЙЛ: у кого что '
             'брать». Сводка, кластеры с контактами, справочник адресатов, изготовители узлов '
             'и расхождения цен — там; здесь только строки.</p>',
+            # Титульная страница на 350 страниц таблиц обязана объяснить, как их
+            # читать. До 18.09.2026 она содержала 287 знаков и не говорила ни
+            # слова о колонках — проверка вёрстки справедливо считала её
+            # полупустой, и по существу была права: читатель открывал таблицу без
+            # ключа к ней.
+            '<p class="lead"><b>Как читать эти таблицы.</b> Разделы идут от отгружаемого к '
+            'неопознанному, внутри каждого — по убыванию стоимости строки. «Наличие» здесь '
+            'не одно состояние, а четыре, и складывать их нельзя: подтверждённый остаток на '
+            'весь объём; наличие без покрытия количества; «отгрузим, если есть»; запись '
+            'прошлой проверки, сегодня не перепроверенная.</p>',
+            '<p class="lead"><b>Чего в этих цифрах нет.</b> Цена с карточки действует на тот '
+            'остаток, который продавец подтвердил, а не на весь наш объём: строка, где '
+            'покрытие количества не полное, в сумму закупки не идёт. Подтверждённой суммы '
+            'закупки не существует ни по одной строке, пока не пришло письмо с остатком, '
+            'названным числом.</p>',
+            '<p class="lead dim">Продавец в строке — это адрес ПО ДЕТАЛИ: наш номер '
+            'напечатан у него дословно. «Этот продавец работает по такому классу изделий» и '
+            '«у него есть эта деталь» — разные утверждения, и здесь стоит только '
+            'второе.</p>',
             "</div>",
         ]
 
@@ -542,7 +622,7 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
             vr = [r for r in srows if r["verdict"] == v]
             if not vr:
                 continue
-            vr.sort(key=lambda r: -line_value(r))
+            vr.sort(key=lambda r: -sort_value(r))
             if first:  # заголовок листа живёт на той же странице, что и первая таблица
                 num = "" if lines_only else f"{n}. "
                 head = (f'<h2>{num}Построчно: лист «{E(sheet)}» — {len(srows)} позиций</h2>'
@@ -553,11 +633,19 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
                 first = False
             else:
                 head = f'<h2>«{E(sheet)}» · {E(VERDICT_RU[v])} — {len(vr)}</h2>'
+                if v == "in_stock":
+                    g = Counter(r.get("stock_grade", "") for r in vr)
+                    head += ('<p class="lead">Из них твёрдых (объём подтверждён) — '
+                             f'{g["твёрдый"]}, объём не закрыт — {g["частичный"]}, '
+                             f'условных — {g["условный"]}, из августовской проверки — '
+                             f'{g["устаревший"]}.</p>')
             parts.append(f'<div class="sec">{head}' + rows_table(vr, LINE_COLS, with_addr=True) + "</div>")
 
     if not lines_only:
         parts.append(
-            '<div class="sec"><h2>Построчные таблицы — в приложении</h2>'
+            # без page-break: отдельной страницей эта отсылка в три строки
+            # занимала целый лист
+            '<div><h2>Построчные таблицы — в приложении</h2>'
             f'<p class="lead">Все {len(rows)} позиций обоих листов с продавцом, наличием, '
             'сроком, ценой и адресатами лежат в отдельном файле '
             '«ЗАКУПКА-ЛУКОЙЛ-ПОСТРОЧНО.pdf» — он вынесен, чтобы этот документ открывался '
