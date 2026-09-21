@@ -22,15 +22,13 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sqlite3
 from pathlib import Path
 
-NORM = re.compile(r"[^0-9A-ZА-Я]")
-
-
-def key_of(pn: str) -> str:
-    return NORM.sub("", (pn or "").upper())
+# Правило ключа — одно на все модули base/, см. base/pnkey.py: оно сводит
+# кириллические буквы-двойники, иначе поиск по «917427С1» не найдёт запись,
+# сохранённую каталогом под «917427C1».
+from pn_norm import key_of
 
 
 def find_items(con: sqlite3.Connection, query: str, limit: int) -> list[sqlite3.Row]:

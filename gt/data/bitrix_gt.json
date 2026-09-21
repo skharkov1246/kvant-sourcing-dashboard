@@ -1,15 +1,25 @@
 {
- "updated": "2026-09-17",
+ "updated": "2026-09-21",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "23472",
+   "title": "375-671 Штифт пружинный на ГТД Centaur-40 Казань",
+   "models": [
+    "Centaur 40"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-09-18",
+   "rfqs": []
+  },
   {
    "id": "23374",
    "title": "Л-ЭС (бн)/02/ поставка масляного радиатора Solar",
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": "C10:NEW",
+   "stage": "C10:UC_T3SAJ0",
    "created": "2026-09-17",
    "rfqs": []
   },
@@ -19,7 +29,7 @@
    "models": [
     "Mars 100"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:9",
    "created": "2026-09-09",
    "rfqs": []
   },
@@ -29,9 +39,43 @@
    "models": [
     "ГТУ (модель уточнить)"
    ],
-   "stage": "C4:NEW",
+   "stage": "C4:PREPARATION",
    "created": "2026-09-08",
-   "rfqs": []
+   "rfqs": [
+    {
+     "id": "45336",
+     "title": "RFQ_ Spare Parts for Dresser",
+     "created": "2026-09-18",
+     "supplier": "Greenray Turbine Solutions Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Ksenia Odegova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "45338",
+     "title": "RFQ_Spare Parts for Dresser",
+     "created": "2026-09-18",
+     "supplier": "Sulzer Turbo Services Venlo B.V.",
+     "stage": "Request Sent",
+     "sourcer": "Ksenia Odegova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "45344",
+     "title": "RFQ_Spare Parts for Dresser",
+     "created": "2026-09-18",
+     "supplier": "Turbine Services Limited",
+     "stage": "Request Sent",
+     "sourcer": "Ksenia Odegova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "22946",
@@ -101,7 +145,7 @@
      "title": "WTT Паша форсунки titan 130",
      "created": "2026-08-18",
      "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
-     "stage": "In Correspondance",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Titan 130"
@@ -685,7 +729,7 @@
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": "C10:UC_WWSUR7",
+   "stage": "C10:UC_QACY8S",
    "created": "2026-06-02",
    "rfqs": [
     {
@@ -2564,7 +2608,7 @@
     {
      "id": "25422",
      "title": "Фильтры Siemens в EU Automation (UAE)",
-     "created": "2025-12-16",
+     "created": "2025-12-15",
      "supplier": "EU Automation (UAE)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2654,7 +2698,7 @@
     {
      "id": "26030",
      "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
-     "created": "2026-01-09",
+     "created": "2026-01-08",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -2906,7 +2950,7 @@
     {
      "id": "24010",
      "title": "Pepple+Fuchs в Kempston Controls LLC",
-     "created": "2025-11-19",
+     "created": "2025-11-18",
      "supplier": "Kempston Controls LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2917,7 +2961,7 @@
     {
      "id": "24012",
      "title": "Pepple+Fuchs в Gahangan",
-     "created": "2025-11-19",
+     "created": "2025-11-18",
      "supplier": "Gahangan",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -4071,6 +4115,17 @@
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Mars 100"
+     ]
+    },
+    {
+     "id": "45194",
+     "title": "bowzon 8 позиций марс 100",
+     "created": "2026-09-17",
+     "supplier": "Bowzon Turbine",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
      ]
     }
    ]
@@ -5678,7 +5733,7 @@
     {
      "id": "10108",
      "title": "Requests #10108",
-     "created": "2024-12-18",
+     "created": "2024-12-17",
      "supplier": "RTP power",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -8924,6 +8979,10 @@
      "n": 1
     },
     {
+     "name": "Bowzon Turbine",
+     "n": 1
+    },
+    {
      "name": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
      "n": 1
     },
@@ -9180,6 +9239,18 @@
     {
      "name": "Shanxi Runsheng Import and Export Co., Ltd",
      "n": 2
+    },
+    {
+     "name": "Greenray Turbine Solutions Ltd",
+     "n": 1
+    },
+    {
+     "name": "Sulzer Turbo Services Venlo B.V.",
+     "n": 1
+    },
+    {
+     "name": "Turbine Services Limited",
+     "n": 1
     },
     {
      "name": "Camfil - UAE",

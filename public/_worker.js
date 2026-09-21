@@ -24,10 +24,17 @@ const DEBOUNCE_MS = 15 * 60;               // не триггерить пере
 
 // BEGIN aclCore
 const ACL_KEY = "acl:v1";
-// Версия документа прав. 2 — «База ЗИП» разделена на две плитки: ГШО и ГТУ-библиотека.
-// Разделение не должно молча отнимать доступ, поэтому при подъёме версии тем, у кого
-// был ЗИП, добавляется ГТУ (справочник и раньше лежал внутри того же сайта).
-const ACL_VERSION = 2;
+// Версия документа прав.
+//   2 — «База ЗИП» разделена на две плитки: ГШО и ГТУ-библиотека. Разделение не
+//       должно молча отнимать доступ, поэтому при подъёме версии тем, у кого был
+//       ЗИП, добавляется ГТУ (справочник и раньше лежал внутри того же сайта).
+//   3 — появился разряд rights: тонкие права раздела «Поставщики». Роли, заведённые
+//       до него, поля не имеют вовсе, и отличить «не выдано» от «ещё не существовало»
+//       по самому полю нельзя — только по версии. Поэтому при подъёме со 2 на 3
+//       ролям выдаётся набор по умолчанию (один suppliers), а контакты, финансы и
+//       правка не выдаются НИКОМУ: молча раздать их при миграции значит открыть то,
+//       чего никто не открывал.
+const ACL_VERSION = 3;
 
 // Разделы портала. Спецпроекты ведёт один департамент, поэтому стоят под общей плашкой
 // (распоряжение владельца от 07.09.2026).
@@ -73,6 +80,28 @@ const TABS = [
   { id: "cohorts", name: "Когорты", pay: ["COMPANY"] },
   { id: "advisor", name: "Советы знатока", pay: ["ADVISOR"] },
 ];
+// ТОНКИЕ ПРАВА РАЗДЕЛА «ПОСТАВЩИКИ». Третья ось рядом с сайтами и вкладками, и
+// заводится она потому, что ни одна из двух не подходит: сайт — всё или ничего,
+// вкладка — про дашборд. А тут внутри одного раздела надо отделить контакты и
+// деньги от списка и цен.
+//
+// def: true — право входит в роли по умолчанию. У троих оно false, и это
+// главное в матрице: сегодня роли owner, head и employee получают ВСЁ, то есть
+// прав фактически нет. Контакты и финансы выдаются поимённо (docs/suppliers/
+// PERMISSION_MATRIX.md, решение владельца Р-4 от 20.09.2026).
+const RIGHTS = [
+  { id: "suppliers", def: true, name: "Поставщики: список и цены",
+    note: "карточка, котировки, наличие, история запросов, таблица спецификации" },
+  { id: "suppliers_pii", def: false, name: "Поставщики: контакты",
+    note: "ФИО, должность, почта, телефон, каналы связи. Выдаётся поимённо" },
+  { id: "suppliers_fin", def: false, name: "Поставщики: договоры и деньги",
+    note: "условия оплаты, отсрочка, лимиты, суммы закупок. Выдаётся поимённо" },
+  { id: "suppliers_edit", def: false, name: "Поставщики: правка",
+    note: "слияние и разделение сущностей, решения в очереди проверки" },
+];
+const RIGHT_IDS = RIGHTS.map((r) => r.id);
+const DEFAULT_RIGHTS = RIGHTS.filter((r) => r.def).map((r) => r.id);
+
 const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR"];
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
@@ -83,16 +112,26 @@ function defaultAcl() {
     version: ACL_VERSION,
     defaultRole: "employee",
     roles: {
-      owner: { name: "Владелец", admin: true, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
-      head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
-      employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
+      // Владелец — единственная роль с полным набором тонких прав: у неё admin,
+      // а admin обходит проверку всё равно, и притворяться иначе незачем.
+      owner: { name: "Владелец", admin: true, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
+        rights: RIGHT_IDS.slice() },
+      head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
+        rights: DEFAULT_RIGHTS.slice() },
+      employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
+        rights: DEFAULT_RIGHTS.slice() },
       sourcing: { name: "Сорсинг", admin: false,
-        sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"] },
+        sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"],
+        rights: DEFAULT_RIGHTS.slice() },
       kam: { name: "КАМ", admin: false,
-        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "reps", "cohorts"] },
+        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "reps", "cohorts"],
+        rights: DEFAULT_RIGHTS.slice() },
       engineer: { name: "Инженер", admin: false,
-        sites: ["zip", "gt", "gpu", "knowledge", "ove", "gidromet", "gok"], tabs: [] },
-      guest: { name: "Гость", admin: false, sites: [], tabs: [] },
+        sites: ["zip", "gt", "gpu", "knowledge", "ove", "gidromet", "gok"], tabs: [],
+        rights: DEFAULT_RIGHTS.slice() },
+      // Гостю не выдаётся ничего, и suppliers тоже: роль заведена как «вошёл, но
+      // не видит». Выдать ей право по умолчанию значит отменить её смысл.
+      guest: { name: "Гость", admin: false, sites: [], tabs: [], rights: [] },
     },
     users: {},
   };
@@ -117,7 +156,19 @@ function migrateTabs(list) {
 function normalizeAcl(raw) {
   const d = defaultAcl();
   if (!raw || typeof raw !== "object") return d;
-  const old = Number(raw.version || 1) < 2;
+  const было = Number(raw.version || 1);
+  const old = было < 2;
+  // Разряда rights до версии 3 не существовало, и пустой массив у роли со старой
+  // версии означает «поля не было», а не «право отняли». Различить это можно
+  // только по версии документа: при подъёме выдаём набор по умолчанию, а
+  // контакты, финансы и правку — никому. Начиная с версии 3 пустой массив
+  // понимается буквально: не выдано.
+  const доRights = было < 3;
+  const rights = (list) => {
+    if (доRights && list === undefined) return DEFAULT_RIGHTS.slice();
+    const ok = new Set((Array.isArray(list) ? list : []).filter((x) => RIGHT_IDS.includes(x)));
+    return RIGHT_IDS.filter((x) => ok.has(x));
+  };
   const sites = (list) => {
     const ok = (Array.isArray(list) ? list : []).filter((x) => SITE_IDS.includes(x));
     if (old && ok.includes("zip") && !ok.includes("gt")) ok.push("gt");
@@ -131,6 +182,7 @@ function normalizeAcl(raw) {
       admin: !!r.admin,
       sites: sites(r.sites),
       tabs: migrateTabs(r.tabs),
+      rights: rights(r.rights),
     };
   }
   const defaultRole = roles[raw.defaultRole] ? raw.defaultRole : d.defaultRole;
@@ -141,6 +193,9 @@ function normalizeAcl(raw) {
       role: roles[u.role] ? u.role : defaultRole,
       sites: sites(u.sites),
       tabs: migrateTabs(u.tabs),
+      // Точечные добавки человеку — только то, что выдали явно. Набора по
+      // умолчанию тут нет: он живёт в роли, а добавка её дополняет.
+      rights: rights(Array.isArray(u.rights) ? u.rights : []),
       note: String(u.note || "").slice(0, 200),
       first: String(u.first || ""),
       last: String(u.last || ""),
@@ -184,21 +239,27 @@ function rightsFor(acl, email, env) {
     .split(/[,\s]+/).map(normEmail).filter(Boolean);
   if (hard.includes(em)) {
     return { email: em, role: "owner", roleName: "Владелец", admin: true,
-             sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() };
+             sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(), rights: RIGHT_IDS.slice() };
   }
   const u = acl.users[em];
   const roleId = (u && u.role) || acl.defaultRole;
-  const role = acl.roles[roleId] || acl.roles[acl.defaultRole] || { name: roleId, admin: false, sites: [], tabs: [] };
+  const role = acl.roles[roleId] || acl.roles[acl.defaultRole]
+    || { name: roleId, admin: false, sites: [], tabs: [], rights: [] };
   const sites = new Set(role.sites);
   const tabs = new Set(role.tabs);
+  const rights = new Set(role.rights || []);
   if (u) {
     for (const s of u.sites) sites.add(s);
     for (const t of u.tabs) tabs.add(t);
+    for (const r of (u.rights || [])) rights.add(r);
   }
   return {
     email: em, role: roleId, roleName: role.name, admin: !!role.admin,
     sites: SITE_IDS.filter((x) => sites.has(x)),
     tabs: TAB_IDS.filter((x) => tabs.has(x)),
+    // Админу — все тонкие права: он их всё равно обходит, и показывать ему
+    // урезанный набор значит врать о том, что он видит.
+    rights: role.admin ? RIGHT_IDS.slice() : RIGHT_IDS.filter((x) => rights.has(x)),
   };
 }
 
@@ -541,6 +602,89 @@ async function readLog(env, { prefix = LOG_PREFIX, limit = 300 } = {}) {
 }
 // END auditCore
 
+// ─────────────────────────────────────────────────────────────────────────────
+// РАЗДЕЛ «ПОСТАВЩИКИ». Снимок в KV, как у библиотеки: воркер портала в Supabase
+// не ходит вовсе и ключа базы не носит. Снимок кладёт отдельный публикатор,
+// читающий sup_entity и sup_identifier; данные в репозиторий не попадают
+// (решение владельца Р-1 от 20.09.2026).
+const SUPPLIERS_KEY = "suppliers:v1";
+const SUPPLIERS_MAX_BYTES = 8 * 1024 * 1024;
+
+function suppliersRoute(path) {
+  if (["/suppliers", "/suppliers/", "/suppliers.html"].includes(path)) return "page";
+  if (path === "/api/suppliers") return "api";
+  // Маршрута публикации здесь нет намеренно: снимок кладёт scripts/publish_suppliers.py
+  // прямо в KV через API Cloudflare — так же, как публикуется библиотека. Второй стек
+  // разбора и проверки тела запроса в воркере не нужен, а /admin/suppliers ниже
+  // попадает в «invalid» и отдаёт 404, а не страницу из ASSETS.
+  // Нормализация пути — та же защита, что у библиотеки: без неё ASSETS отдаёт
+  // страницу по альтернативному написанию мимо проверки права.
+  let decoded = path;
+  for (let i = 0; i < 8 && decoded.includes("%"); i++) {
+    try {
+      const next = decodeURIComponent(decoded);
+      if (next === decoded) break;
+      decoded = next;
+    } catch { break; }
+  }
+  decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
+  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$))/i
+    .test(decoded) ? "invalid" : null;
+}
+
+// ПОЛЯ, КОТОРЫЕ РЕЖУТСЯ ПРАВОМ. Режем на сервере, а не прячем стилями: скрытое
+// стилями лежит в отданном HTML и достаётся через «посмотреть код».
+//
+// Значение не удаляется, а заменяется на {закрыто: <право>} — страница тогда
+// показывает «нет доступа» вместо пустоты, и видно, чего именно не хватает.
+// Пустое поле и закрытое поле — разные вещи, путать их нельзя (тот же довод, что
+// у «наличия» в выгрузках владельцу).
+const SUPPLIERS_FIELDS = [
+  { right: "suppliers_pii", fields: ["contacts", "emails", "phones", "persons"] },
+  { right: "suppliers_fin", fields: ["terms", "payment", "limits", "contracts", "spend"] },
+];
+
+function suppliersCut(снимок, rights) {
+  const admin = !!rights.admin;
+  const есть = new Set(rights.rights || []);
+  const закрыть = SUPPLIERS_FIELDS
+    .filter((g) => !admin && !есть.has(g.right))
+    .flatMap((g) => g.fields.map((f) => [f, g.right]));
+  if (!закрыть.length) return снимок;
+  const карта = new Map(закрыть);
+  const пройти = (v) => {
+    if (Array.isArray(v)) return v.map(пройти);
+    if (!v || typeof v !== "object") return v;
+    const out = {};
+    for (const [k, значение] of Object.entries(v)) {
+      out[k] = карта.has(k) ? { закрыто: карта.get(k) } : пройти(значение);
+    }
+    return out;
+  };
+  return пройти(снимок);
+}
+
+async function readSuppliers(env) {
+  const kv = aclStore(env);
+  if (!kv) throw new Error("suppliers_unavailable");
+  const raw = await kv.get(SUPPLIERS_KEY);
+  // Снимка ещё нет — это не ошибка, а состояние «публикатор не отработал».
+  // Отдаём пустой, чтобы страница сказала «нет данных», а не 503.
+  if (raw == null) return { version: 1, published_at: null, entities: [] };
+  if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > SUPPLIERS_MAX_BYTES) {
+    throw new Error("suppliers_invalid");
+  }
+  const value = JSON.parse(raw);
+  if (value.version !== 1) throw new Error("suppliers_invalid");
+  return value;
+}
+
+function suppliersJson(value, status = 200) {
+  const headers = libraryHeaders();
+  headers.set("Content-Type", "application/json; charset=utf-8");
+  return new Response(JSON.stringify(value), { status, headers });
+}
+
 // Публикация библиотеки — закрытая копия проверенных материалов из Supabase.
 // Здесь нет ключей БД и нет содержимого CRM в репозитории. Импорт пишет только
 // library:*; документ прав и другие ключи общего KV не изменяются.
@@ -850,9 +994,16 @@ export default {
     if (archive === "invalid") return archiveJson({ error: "not_found" }, 404);
     const library = archive ? null : libraryRoute(url.pathname);
     if (library === "invalid") return libraryJson({ error: "not_found" }, 404);
+    const suppliers = archive || library ? null : suppliersRoute(url.pathname);
+    if (suppliers === "invalid") return suppliersJson({ error: "not_found" }, 404);
     let acl;
-    try { acl = await loadAcl(env, { strict: !!(library || archive) }); }
-    catch { return libraryJson({ error: "library_unavailable" }, 503); }
+    // strict — «нет документа прав, значит никого не пускаем». Для поставщиков это
+    // обязательно: раздел закрытый, и падать в роль по умолчанию ему нельзя.
+    try { acl = await loadAcl(env, { strict: !!(library || archive || suppliers) }); }
+    catch {
+      return suppliers ? suppliersJson({ error: "rights_unavailable" }, 503)
+                       : libraryJson({ error: "library_unavailable" }, 503);
+    }
     const rights = rightsFor(acl, who.email, env);
 
     // Private archive never enters the shared library, visit logs, or audit text.
@@ -908,6 +1059,35 @@ export default {
       } catch { return libraryJson({ error: "library_page_unavailable" }, 503); }
     }
 
+    // РАЗДЕЛ «ПОСТАВЩИКИ». Вход — по тонкому праву suppliers, а не по сайту: сайт
+    // выдаётся целиком, а тут внутри одного раздела контакты и деньги отделены от
+    // списка (решение владельца Р-4). Отказ пишется в журнал, как у библиотеки, —
+    // иначе не видно, кому раздела не хватает.
+    if (suppliers) {
+      if (!rights.admin && !rights.rights.includes("suppliers")) {
+        ctx.waitUntil(audit(env, request, who, "suppliers", url.pathname, { denied: true }));
+        return suppliersJson({ error: "forbidden" }, 403);
+      }
+      if (request.method !== "GET") return suppliersJson({ error: "method_not_allowed" }, 405);
+      if (suppliers === "api") {
+        let snapshot;
+        try { snapshot = await readSuppliers(env); }
+        catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
+        // Резка — на сервере. Права отдаём рядом с данными, чтобы страница могла
+        // сказать «нет доступа», а не молча показать пустое место.
+        return suppliersJson({ ...suppliersCut(snapshot, rights), admin: rights.admin,
+          rights: rights.rights.filter((r) => r.startsWith("suppliers")) });
+      }
+      try {
+        const asset = await env.ASSETS.fetch(new Request(url.origin + "/suppliers.html", { headers: request.headers }));
+        if (!asset.ok) return suppliersJson({ error: "suppliers_page_unavailable" }, 503);
+        const headers = libraryHeaders(asset.headers);
+        headers.set("Content-Type", "text/html; charset=utf-8");
+        headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+        return new Response(asset.body, { headers });
+      } catch { return suppliersJson({ error: "suppliers_page_unavailable" }, 503); }
+    }
+
     // /api/rights — права для гейтов остальных сайтов: они шлют сюда JWT вошедшего,
     // мы его проверяем тем же помощником и отвечаем набором прав. Общих секретов не нужно.
     if (url.pathname === "/api/rights") {
@@ -919,7 +1099,8 @@ export default {
         const denied = !rights.sites.includes(site);
         ctx.waitUntil(audit(env, request, who, site, at, { denied, firstEver }));
       }
-      return new Response(JSON.stringify({ email: rights.email, sites: rights.sites, tabs: rights.tabs, admin: rights.admin }),
+      return new Response(JSON.stringify({ email: rights.email, sites: rights.sites, tabs: rights.tabs,
+                                     rights: rights.rights, admin: rights.admin }),
         { headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
     }
 
@@ -1051,12 +1232,13 @@ function adminPage(acl, me, env, seen, notify) {
   // строки людей
   const rows = users.map(([em, u]) => {
     const r = rightsFor(acl, em, env);
-    const extra = (u.sites.length + u.tabs.length);
+    const extra = (u.sites.length + u.tabs.length + (u.rights || []).length);
     return `<tr data-email="${ESC(em)}" data-search="${ESC(em + " " + (acl.roles[u.role] || {}).name + " " + (u.note || ""))}">
       <td class="em"><b>${ESC(em)}</b>${u.note ? `<div class="note">${ESC(u.note)}</div>` : ""}</td>
       <td><select class="role" data-email="${ESC(em)}">${opt(u.role)}</select></td>
       <td class="ct"><span class="pill${r.sites.length ? " on" : ""}">${r.sites.length} из ${SITE_IDS.length}</span></td>
       <td class="ct"><span class="pill${r.tabs.length ? " on" : ""}">${r.tabs.length} из ${TAB_IDS.length}</span></td>
+      <td class="ct"><span class="pill${r.rights.length ? " on" : ""}">${r.rights.length} из ${RIGHT_IDS.length}</span></td>
       <td class="dim">${extra ? `+${extra} лично` : "—"}</td>
       <td class="dim">${u.last ? ESC(fmt(u.last)) : '<span style="color:#8b97a8">ни разу</span>'}</td>
       <td class="ct"><button class="lnk" data-open="${ESC(em)}">настроить</button></td>
@@ -1080,6 +1262,8 @@ function adminPage(acl, me, env, seen, notify) {
         <span class="dim">${users.filter(([, u]) => u.role === id).length} чел.</span></div>
       <div class="grp"><div class="gt">Сайты</div>${siteChk(r.sites)}</div>
       <div class="grp"><div class="gt">Вкладки дашборда</div><div class="chks">${chk(r.tabs, TABS, "tab")}</div></div>
+      <div class="grp"><div class="gt">Раздел «Поставщики»</div><div class="chks">${chk(r.rights || [], RIGHTS, "right")}</div>
+        <div class="note">Контакты, договоры и правка не выдаются роли — только человеку поимённо.</div></div>
     </div>`;
   }).join("");
 
@@ -1146,7 +1330,7 @@ ${noStore ? `<div class="card warn"><b>Учёт входов не ведётся
     <button class="go" id="newgo">Завести</button>
   </div>
   <table>
-    <thead><tr><th>Сотрудник</th><th>Роль</th><th class="ct">Сайты</th><th class="ct">Вкладки</th>
+    <thead><tr><th>Сотрудник</th><th>Роль</th><th class="ct">Сайты</th><th class="ct">Вкладки</th><th class="ct">Поставщики</th>
       <th class="hide">Лично</th><th class="hide">Последний вход</th><th class="ct"></th></tr></thead>
     <tbody id="tb">${rows || '<tr><td colspan="7" class="dim" style="padding:16px">Пока никто не входил. Человек появится здесь после первого входа на портал.</td></tr>'}</tbody>
   </table>
@@ -1179,6 +1363,8 @@ ${noStore ? `<div class="card warn"><b>Учёт входов не ведётся
   <h3 id="dt"></h3><div class="dim" id="dr"></div>
   <div class="grp"><div class="gt">Дополнительно к роли — сайты</div><div class="chks" id="ds"></div></div>
   <div class="grp"><div class="gt">Дополнительно к роли — вкладки</div><div class="chks" id="dtb"></div></div>
+  <div class="grp"><div class="gt">Дополнительно к роли — раздел «Поставщики»</div><div class="chks" id="drt"></div>
+    <div class="note">Контакты и деньги выдаются здесь, поимённо: в роли их нет ни у кого.</div></div>
   <div class="grp"><div class="gt">Заметка</div><input type="text" id="dn" style="width:100%" maxlength="200" placeholder="например: подрядчик, до конца проекта"></div>
   <div class="row"><button class="go" id="dsave">Сохранить</button><button class="go gh" id="dcancel">Отмена</button>
     <button class="go gh" id="ddrop" style="margin-left:auto;color:#ff8f8f">Снять с учёта</button></div>
@@ -1187,6 +1373,7 @@ ${noStore ? `<div class="card warn"><b>Учёт входов не ведётся
 
   const data = JSON.stringify({ sites: SITES.map((s) => ({ id: s.id, name: s.name })),
                                 tabs: TABS.map((t) => ({ id: t.id, name: t.name })),
+                                rights: RIGHTS.map((r) => ({ id: r.id, name: r.name })),
                                 users: acl.users, roles: acl.roles }).replace(/</g, "\\u003c");
 
   const script = `
@@ -1215,7 +1402,7 @@ document.getElementById('defrole').addEventListener('change', e => post('default
 document.querySelectorAll('.role input[type=checkbox]').forEach(cb => cb.addEventListener('change', () => {
   const card = cb.closest('.role'), role = card.dataset.role;
   const val = k => [...card.querySelectorAll('input[data-kind='+k+']:checked')].map(x=>x.value);
-  post('role_rights', {role, sites: val('site'), tabs: val('tab')});
+  post('role_rights', {role, sites: val('site'), tabs: val('tab'), rights: val('right')});
 }));
 // ключ телеграм-бота
 document.getElementById('tgsave').addEventListener('click', async () => {
@@ -1231,7 +1418,7 @@ document.querySelectorAll('.role .all').forEach(b => b.addEventListener('click',
   const on = ![...box].every(x => x.checked);
   box.forEach(x => { x.checked = on; });
   const val = k => [...card.querySelectorAll('input[data-kind='+k+']:checked')].map(x=>x.value);
-  post('role_rights', {role: card.dataset.role, sites: val('site'), tabs: val('tab')});
+  post('role_rights', {role: card.dataset.role, sites: val('site'), tabs: val('tab'), rights: val('right')});
 }));
 // поиск
 document.getElementById('q').addEventListener('input', e => {
@@ -1253,6 +1440,7 @@ document.getElementById('tb').addEventListener('click', e => {
   document.getElementById('dr').textContent = 'Роль: ' + ((D.roles[u.role]||{}).name || u.role) + ' — её права уже действуют. Ниже отмечается то, что даётся сверх роли, лично этому человеку.';
   boxes(document.getElementById('ds'), D.sites, u.sites||[]);
   boxes(document.getElementById('dtb'), D.tabs, u.tabs||[]);
+  boxes(document.getElementById('drt'), D.rights, u.rights||[]);
   document.getElementById('dn').value = u.note || '';
   dlg.showModal();
 });
@@ -1270,7 +1458,8 @@ document.getElementById('ddrop').addEventListener('click', async () => {
 });
 document.getElementById('dsave').addEventListener('click', async () => {
   const pick = id => [...document.getElementById(id).querySelectorAll('input:checked')].map(x=>x.value);
-  await post('user_extra', {email: cur, sites: pick('ds'), tabs: pick('dtb'), note: document.getElementById('dn').value});
+  await post('user_extra', {email: cur, sites: pick('ds'), tabs: pick('dtb'), rights: pick('drt'),
+                            note: document.getElementById('dn').value});
   dlg.close(); setTimeout(()=>location.reload(), 400);
 });`;
 
@@ -1331,11 +1520,13 @@ async function adminApi(request, env, acl) {
     const u = row(em);
     u.sites = pick(b.sites, SITE_IDS);
     u.tabs = pick(b.tabs, TAB_IDS);
+    u.rights = pick(b.rights, RIGHT_IDS);
     u.note = String(b.note || "").slice(0, 200);
   } else if (b.op === "role_rights") {
     if (!acl.roles[b.role]) return json({ ok: false, error: "no_role" }, 400);
     acl.roles[b.role].sites = pick(b.sites, SITE_IDS);
     acl.roles[b.role].tabs = pick(b.tabs, TAB_IDS);
+    acl.roles[b.role].rights = pick(b.rights, RIGHT_IDS);
   } else if (b.op === "default_role") {
     if (!acl.roles[b.role]) return json({ ok: false, error: "no_role" }, 400);
     acl.defaultRole = b.role;
@@ -1457,6 +1648,13 @@ function portalPage(who, rights, env) {
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const mine = SITES.filter((s) => rights.sites.includes(s.id) || (s.id === "knowledge" && rights.admin));
+  // «Поставщики» — раздел портала за тонким правом, а не сайт: в SITES его нет
+  // намеренно, иначе он выдавался бы целиком, вместе с контактами и деньгами.
+  // Плашку поэтому собираем отдельно и кладём в группу ежедневных инструментов.
+  if (rights.admin || rights.rights.includes("suppliers")) {
+    mine.push({ id: "suppliers", group: "work", name: "Поставщики", href: "/suppliers",
+      note: "сведённый реестр компаний: один вечный номер на компанию, ИНН, домен, чем слито" });
+  }
   // разделы: плашка показывается, только если в ней человеку что-то доступно
   const sections = GROUPS.map((g) => {
     const own = mine.filter((s) => s.group === g.id);

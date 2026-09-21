@@ -185,10 +185,15 @@ def test_решение_владельца_о_каналах_доезжает_д
     assert '"ru", "ask"' in src, "флаги решения владельца не пишутся в mach_channels"
     ddl = (ROOT / "zip" / "supabase" / "migrations.sql").read_text(encoding="utf-8")
     assert "add column if not exists ask boolean" in ddl
-    assert "create or replace view mach_channels_ask" in ddl
+    assert "create view mach_channels_ask" in ddl
     # представление не должно пропускать российские компании
-    view = ddl.split("create or replace view mach_channels_ask")[1]
+    view = ddl.split("create view mach_channels_ask")[1]
     assert "coalesce(ask, not coalesce(ru, false))" in view
+    # …и не должно быть дырой в ужесточении доступа: без security_invoker вид
+    # исполняется правами владельца и RLS таблицы под собой не применяет, то есть
+    # закрытая mach_channels продолжает читаться через него. Проверено на
+    # PostgreSQL 16: таблица «permission denied», вид отдаёт все строки.
+    assert "security_invoker = true" in view.split(";")[0]
     # числовые спутники объявлены
     assert "add column if not exists price_num numeric" in ddl
     assert "add column if not exists price_usd_num numeric" in ddl
