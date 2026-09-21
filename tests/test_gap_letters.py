@@ -210,7 +210,7 @@ def test_unbranded_rows_keep_the_maker_the_customer_named(monkeypatch):
     monkeypatch.setattr(gl, "already_written", lambda: set())
     d = gl.measure()
     assert d["unbranded_rows"] == 1
-    assert d["unbranded_makers_named_by_customer"] == ["НетТакогоВКниге"]
+    assert [m["maker"] for m in d["unbranded_by_maker"]] == ["НетТакогоВКниге"]
 
 
 def test_live_letters_name_their_attribution_path():

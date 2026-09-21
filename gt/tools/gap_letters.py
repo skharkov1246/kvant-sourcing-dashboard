@@ -58,6 +58,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pnkey import key  # noqa: E402
+from budget_join import found_price_usd, fx_table  # noqa: E402
 
 ASK = ROOT / "gt/data/ship_lukoil.json"
 RV = ROOT / "gt/data/ship_reverify.json"
@@ -129,8 +130,16 @@ def already_written() -> set[str]:
 
 
 def gap_rows() -> tuple[list[dict], int]:
-    """Строки заявки, где нет ни найденной цены, ни вилки. Считается по репозиторию."""
+    """Строки заявки, где нет ни найденной цены, ни вилки. Считается по репозиторию.
+
+    Найденная цена берётся ДВУМЯ источниками — так же, как в gt/tools/budget_join.py:
+    перепроверкой и полем price самой сводки заявки со своей валютой. Первый
+    прогон читал только первый источник, и 101 строка попадала сюда напрасно:
+    цена по ним записана, продавец назван, а у 63 покрытие количества full.
+    Письмо «назовите цену» по такой строке — потерянное письмо.
+    """
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
+    fx = fx_table()
     rv = {}
     for r in json.loads(RV.read_text(encoding="utf-8"))["rows"]:
         rv.setdefault(key(r.get("pn")), r)
@@ -139,8 +148,7 @@ def gap_rows() -> tuple[list[dict], int]:
         k = key(r.get("pn"))
         if not k:
             continue
-        x = rv.get(k) or {}
-        found = x.get("price_low") if isinstance(x.get("price_low"), (int, float)) else None
+        found, _src = found_price_usd(r, rv.get(k) or {}, fx)
         if found is None and r.get("usd_lo") in (None, "") and r.get("usd_hi") in (None, ""):
             out.append(r)
     return out, len(ask)
@@ -397,8 +405,14 @@ def measure() -> dict:
                          "на турбинных листах оно неверно. Поэтому столбец берётся только "
                          "там, где шаблон молчит, и источник записан по каждому письму.",
         "unbranded_rows": len(unbranded),
-        "unbranded_makers_named_by_customer": sorted({
-            x["man"] for x in unbranded if x.get("man")}),
+        "unbranded_by_maker": sorted(
+            [{"maker": m,
+              "rows": sum(1 for x in unbranded if x.get("man") == m),
+              "qty": round(sum(float(x.get("qty") or 0) for x in unbranded
+                               if x.get("man") == m), 2)}
+             for m in {x["man"] for x in unbranded if x.get("man")}],
+            key=lambda z: (-z["rows"], z["maker"])),
+        "unbranded_rows_without_a_named_maker": sum(1 for x in unbranded if not x.get("man")),
         "what_unbranded_means": "Ни наш шаблон номера, ни наша книга адресов эту строку не "
                                 "закрыли. Изготовитель у большинства из них заказчиком "
                                 "НАЗВАН — не хватает прочитанной страницы его контактов. "
@@ -458,11 +472,22 @@ def build(d: dict) -> str:
             + f"<br><b>Тема:</b> {E(L['subject'])}</p>")
         add(f"<pre>{E(L['body'])}</pre>")
     add("<h2>Что осталось работой, а не письмом</h2>")
-    add(f"<p>{E(d['what_unbranded_means'])} Строк — {ru(d['unbranded_rows'])}. "
-        f"Изготовителей, которых заказчик назвал, а страницы их контактов мы не читали — "
-        f"{ru(len(d['unbranded_makers_named_by_customer']))}. Каждый прочитанный адрес "
-        f"превращает свои строки в письмо тем же прогоном.</p>")
-    add(f"<p class='dim'>{E(', '.join(d['unbranded_makers_named_by_customer'])[:2600])}</p>")
+    # За заголовком идёт КОРОТКАЯ строка, а не абзац: запрет разрыва после
+    # заголовка тянет за собой следующий блок целиком, и многострочный абзац
+    # в остаток страницы не влезает — замер дал полупустую страницу дважды.
+    add(f"<p><b>{ru(d['unbranded_rows'])} строк, {ru(len(d['unbranded_by_maker']))} "
+        f"изготовителей.</b></p>")
+    add(f"<p>{E(d['what_unbranded_means'])} Каждый прочитанный адрес превращает свои "
+        f"строки в письмо тем же прогоном — порядок работы задан числом строк.</p>")
+    add("<table><thead><tr><th>изготовитель по файлу заказчика</th><th class='n'>строк</th>"
+        "<th class='n'>штук</th></tr></thead><tbody>")
+    for m in d["unbranded_by_maker"]:
+        add(f"<tr><td>{E(m['maker'])}</td><td class='n'>{ru(m['rows'])}</td>"
+            f"<td class='n'>{ru(m['qty'])}</td></tr>")
+    add("</tbody></table>")
+    if d.get("unbranded_rows_without_a_named_maker"):
+        add(f"<p class='dim'>Ещё у {ru(d['unbranded_rows_without_a_named_maker'])} строк "
+            f"изготовитель не назван и заказчиком: по ним нужен вопрос ему.</p>")
     return "".join(a)
 
 

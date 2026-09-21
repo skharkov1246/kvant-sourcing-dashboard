@@ -96,6 +96,47 @@ def money(n) -> str:
     return f"{float(n or 0):,.2f}".replace(",", " ").replace(".", ",")
 
 
+def fx_table() -> dict[str, float]:
+    """Курсы «единиц валюты за один USD». USD добавляем сами: в файле его нет."""
+    d = json.loads(FX.read_text(encoding="utf-8"))
+    src = d.get("rates") if isinstance(d.get("rates"), dict) else d
+    out = {"USD": 1.0}
+    for k, v in src.items():
+        if isinstance(v, (int, float)) and v:
+            out[str(k).upper()] = float(v)
+    out.setdefault("RUR", out.get("RUB", 0) or 1.0)
+    return out
+
+
+def to_usd(price, cur, fx: dict[str, float]):
+    """Цена в USD. Нет курса — возвращаем None, а не «примерно»: это разные вещи."""
+    if not isinstance(price, (int, float)) or not price:
+        return None
+    r = fx.get(str(cur or "USD").strip().upper())
+    return float(price) / r if r else None
+
+
+def found_price_usd(ask_row: dict, rv_row: dict, fx: dict[str, float]):
+    """НАЙДЕННАЯ цена строки в USD, из двух источников.
+
+    Перепроверка идёт первой: её цена перечитана на странице продавца сейчас.
+    Второй источник — поле price самой сводки заявки: цена, прочитанная у
+    продавца при первом обходе, со своей валютой. Замер 21.09.2026 показал,
+    чего стоило её игнорировать: 101 строка числилась в разряде «у нас нет
+    ничего», хотя цена по ней записана и продавец назван, а у 63 из них
+    покрытие количества стоит full. Курсы всех встретившихся валют (GBP, KRW,
+    EUR, MXN, RUB, CZK) в gt/data/fx_rates.json есть; если курса нет, строка
+    не получает цену вовсе — «примерно» здесь хуже, чем ничего.
+    """
+    lo = rv_row.get("price_low")
+    if isinstance(lo, (int, float)) and lo:
+        return float(lo), "перепроверка"
+    u = to_usd(ask_row.get("price"), ask_row.get("currency"), fx)
+    if u is not None:
+        return u, "обход заявки"
+    return None, ""
+
+
 def rub_per_usd() -> float:
     d = json.loads(FX.read_text(encoding="utf-8"))
     src = d.get("rates") if isinstance(d.get("rates"), dict) else d
@@ -158,6 +199,7 @@ def read_budget(path: Path) -> tuple[list[dict], dict]:
 
 
 def join(rows: list[dict], rub: float) -> list[dict]:
+    fx = fx_table()
     ask, rv = {}, {}
     for r in json.loads(ASK.read_text(encoding="utf-8"))["rows"]:
         ask.setdefault(key(r.get("pn")), r)
@@ -168,7 +210,7 @@ def join(rows: list[dict], rub: float) -> list[dict]:
         a = ask.get(b["k"]) or {}
         x = rv.get(b["k"]) or {}
         lo, hi = a.get("usd_lo"), a.get("usd_hi")
-        found = x.get("price_low") if isinstance(x.get("price_low"), (int, float)) else None
+        found, found_src = found_price_usd(a, x, fx)
         bud_usd = b["rub"] / rub
         # Разряд готовности НАШЕЙ стороны: на чём мы вообще стоим по этой строке.
         if found is not None:
@@ -186,8 +228,9 @@ def join(rows: list[dict], rub: float) -> list[dict]:
         else:
             fit = "не определено"
         out.append({**b, "budget_usd": bud_usd, "budget_sum_usd": b["sum_rub"] / rub,
-                    "our_lo": lo, "our_hi": hi, "found": found,
-                    "covers_qty": x.get("covers_qty"), "verdict": vkey(x) if x else "",
+                    "our_lo": lo, "our_hi": hi, "found": found, "found_src": found_src,
+                    "seller": str(a.get("seller") or "")[:80],
+                    "covers_qty": x.get("covers_qty") or a.get("covers_qty"), "verdict": vkey(x) if x else "",
                     "grade": grade, "fit": fit, "in_ask": bool(a),
                     "qty_ours": a.get("qty"), "channel": str(x.get("channel") or "")[:300],
                     "contacts": str(x.get("contacts") or "")[:300]})
@@ -218,6 +261,15 @@ def counters(j: list[dict], rub: float, meta: dict, src: Path) -> dict:
         "rows_joined_to_ask": sum(1 for r in j if r["in_ask"]),
         "budget_total_usd": usd(j),
         "budget_by_our_readiness": grades,
+        "found_price_by_source": {
+            src: sum(1 for r in j if r["grade"] == "цена найдена" and r.get("found_src") == src)
+            for src in ("перепроверка", "обход заявки")
+        },
+        "why_two_price_sources": "Цена перепроверки перечитана на странице продавца сейчас; "
+                                 "цена обхода заявки прочитана при первом проходе и записана "
+                                 "со своей валютой. Игнорирование второго источника держало "
+                                 "101 строку в разряде «у нас нет ничего», хотя цена по ним "
+                                 "записана и продавец назван.",
         "rows_budget_below_found_price": len(loss),
         "shortfall_usd_if_whole_volume": round(short, 2),
         "of_them_seller_confirmed_volume": len(covered),
