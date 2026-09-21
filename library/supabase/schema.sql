@@ -540,6 +540,13 @@ create table if not exists lib_customs (
   source       text,                       -- файл выгрузки: без него выборку не повторить
   created_at   timestamptz default now()
 );
+-- Узел выводится из описания товара в декларации тем же правилом, что и для
+-- каталога, но доверие к нему ниже: описание пишет декларант, а не инженер, и
+-- сверить его не с чем — ручной разметки деклараций у нас нет. Поэтому узел
+-- здесь отвечает на вопрос «кто возит детали ротора», а не служит разметкой.
+alter table lib_customs add column if not exists unit_id text
+  references lib_units(id) on delete set null;
+create index if not exists lib_customs_unit  on lib_customs (unit_id);
 create index if not exists lib_customs_hs4   on lib_customs (hs4);
 create index if not exists lib_customs_pn    on lib_customs (part_number);
 create index if not exists lib_customs_exp   on lib_customs (exporter);
@@ -564,6 +571,22 @@ select hs4,
   from lib_customs
  where hs4 is not null and usd_kg is not null
  group by hs4
+having count(*) >= 20;
+
+-- Тот же ориентир, но по узлу машины, а не по товарной группе: «сколько стоит
+-- килограмм деталей ротора» — вопрос инженера, а «8431» — вопрос таможни.
+-- Порог тот же: меньше двадцати поставок — не ориентир, а шум.
+drop view if exists lib_customs_bench_unit;
+create or replace view lib_customs_bench_unit
+  with (security_invoker = true) as
+select unit_id,
+       count(*)                                                as поставок,
+       count(distinct exporter)                                as экспортёров,
+       round(percentile_cont(0.50) within group (order by usd_kg)::numeric, 2) as медиана,
+       round(percentile_cont(0.75) within group (order by usd_kg)::numeric, 2) as p75
+  from lib_customs
+ where unit_id is not null and usd_kg is not null
+ group by unit_id
 having count(*) >= 20;
 
 -- ─────────────────────────────────────────────────────────────────────────────

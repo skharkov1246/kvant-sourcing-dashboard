@@ -149,6 +149,10 @@ def разобрать(сырые: list[dict]) -> tuple[dict[str, dict], dict[st
             "net_kg": число(r.get("net_kg")), "usd_kg": число(r.get("usd_kg")),
             "value_usd": число(r.get("val")) or число(r.get("custval")),
             "descr": чисто(r.get("desc"), 1000), "match": "strong" if строгое else "weak",
+            # Узел по описанию товара: «кто возит детали ротора» — вопрос
+            # инженера, «8431» — вопрос таможни. Доверие ниже, чем к разметке
+            # каталога: описание пишет декларант, и сверить его не с чем.
+            "unit_id": eq.unit_of(чисто(r.get("desc"), 1000) or ""),
             "source": f"{FEED}: {r.get('_файл')}",
         }
         компания(r.get("exporter"), "экспортёр", чисто(r.get("dispatch"), 8), группа)
@@ -239,6 +243,10 @@ def main() -> int:
           f"(по партномеру {виды['strong']}, по группе и описанию {виды['weak']})")
     print(f"  с ценой за килограмм: {sum(1 for d in декларации.values() if d['usd_kg'])}")
     print(f"  с условиями поставки: {sum(1 for d in декларации.values() if d['incoterms'])}")
+    с_узлом = sum(1 for d in декларации.values() if d["unit_id"])
+    print(f"  узел выведен из описания: {с_узлом} "
+          f"({с_узлом * 100 // max(len(декларации), 1)} %) — подсказка, а не разметка: "
+          f"ручной сверки деклараций у нас нет")
     print("\n=== компании ===")
     for вид, n in Counter(z["kind"] for z in компании.values()).most_common():
         print(f"  {вид:16}{n:>6}")
@@ -280,19 +288,25 @@ def main() -> int:
     conn = psycopg2.connect(url, connect_timeout=20,
                             options="-c statement_timeout=900000")
     with conn.cursor() as cur:
+        # Узел ставится только существующий: висячая ссылка уронила бы вставку
+        # по внешнему ключу на сорока тысячах строк.
+        cur.execute("select id from lib_units")
+        узлы = {r[0] for r in cur.fetchall()}
         psycopg2.extras.execute_values(cur, """
             insert into lib_customs (id, decl_date, hs10, hs4, part_number, brand,
                                      exporter, importer, importer_inn, origin, dispatch,
                                      incoterms, currency, net_kg, usd_kg, value_usd,
-                                     descr, match, source)
+                                     descr, match, unit_id, source)
             values %s
             on conflict (id) do update set
               usd_kg = excluded.usd_kg, value_usd = excluded.value_usd,
-              match = excluded.match, source = excluded.source""",
+              match = excluded.match, unit_id = excluded.unit_id,
+              source = excluded.source""",
             [(d["id"], d["decl_date"], d["hs10"], d["hs4"], d["part_number"], d["brand"],
               d["exporter"], d["importer"], d["importer_inn"], d["origin"], d["dispatch"],
               d["incoterms"], d["currency"], d["net_kg"], d["usd_kg"], d["value_usd"],
-              d["descr"], d["match"], d["source"]) for d in декларации.values()],
+              d["descr"], d["match"], d["unit_id"] if d["unit_id"] in узлы else None,
+              d["source"]) for d in декларации.values()],
             page_size=1000)
         conn.commit()
 
@@ -323,8 +337,6 @@ def main() -> int:
         # Позиции каталога из подтверждённых поставок. Пишутся ДО цен: цена
         # ссылается на деталь, и обратный порядок оставил бы её висеть.
         if детали:
-            cur.execute("select id from lib_units")
-            узлы = {r[0] for r in cur.fetchall()}
             psycopg2.extras.execute_values(cur, """
                 insert into lib_parts (id, catalog_no, name, oem, hs_code, unit_id, source)
                 values %s
