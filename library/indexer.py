@@ -38,6 +38,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
 import docfilter  # noqa: E402  (после sys.path)
 import quotes  # noqa: E402  (цена из КП поставщика)
+import price_store  # noqa: E402  (запись цены — одна на все разборы)
 # Список полей КП держим в одном месте со всеми замерами котировок: два списка
 # разошлись бы молча — разбирали бы одно, а считали другое.
 from quote_coverage import ПОЛЕ_ЗАПРОСА, ПОЛЯ_КП  # noqa: E402
@@ -68,8 +69,10 @@ SPA_RFQ = 166
 # и строки из КП поставщика ложились под чужим именем: спецификация говорит, что
 # заказчик просит, котировка — что поставщик предлагает и почём.
 ИСТОЧНИК_СТРОКИ = "котировка поставщика" if SOURCE == "rfq" else "спецификация сделки"
-# Поток цен, по которому переразбор снимает свои прежние строки.
-FEED_КП = "разбор КП"
+# Поток цен, по которому переразбор снимает свои прежние строки. Имя и вся
+# запись живут в library/price_store.py — общем месте для обычного разбора и
+# распознавания сканов (CLAUDE.md, правило 14).
+FEED_КП = price_store.FEED
 PARSER_VERSION = 2
 
 # Колонки спецификации. Спецификации у всех заказчиков свои, но заголовки повторяются.
@@ -629,37 +632,15 @@ def main() -> int:
                     print(f"  ⚠ пакет номенклатуры не прошёл ({type(e).__name__}); "
                           f"построчно записано {len(buf_items) - bad}, пропущено {bad}", flush=True)
             if buf_prices:
-                # Идемпотентность по файлу: переразбор того же КП снимает свои
-                # прежние строки и кладёт новые. Естественного ключа у цены нет
-                # (одна позиция законно имеет и цену, и сумму), поэтому ключ —
-                # файл, из которого она пришла.
-                файлы = sorted({r[8] for r in buf_prices})
                 try:
-                    cur.execute(
-                        "delete from lib_prices where feed = %s and source_url = any(%s)",
-                        (FEED_КП, файлы))
-                    psycopg2.extras.execute_values(cur, """
-                        insert into lib_prices
-                          (segment_id, item_name, part_number, price, currency, basis,
-                           qty, qty_unit, source_url, rfq_id, rfq_company, lead_days,
-                           source, feed, confidence, note, price_date)
-                        values %s""", buf_prices, page_size=500)
+                    price_store.записать(cur, buf_prices, psycopg2.extras.execute_values)
                 except psycopg2.Error as e:
-                    # Построчного досыла здесь НЕТ намеренно: пакет цен падает
-                    # целиком только по одной причине — в базе нет колонок
-                    # lead_days и rfq_id (прогон «ZIP base — apply DB migrations»
-                    # не прогоняли после правки library/supabase/schema.sql).
-                    # Тогда не пройдёт и построчная вставка, а файлы при этом уже
-                    # были бы отмечены разобранными — и цены пропали бы молча.
-                    # Поэтому откатываем всё, включая учёт файлов: пусть прогон
-                    # упадёт и повторится, чем потеряет цену.
+                    # Откатываем ВСЁ, включая учёт файлов: файлы, отмеченные
+                    # разобранными, при потерянных ценах — молчаливая потеря, а
+                    # упавший прогон повторяется.
                     conn.rollback()
                     conn.close()
-                    raise RuntimeError(
-                        "запись цен не прошла — вероятно, в lib_prices нет колонок "
-                        "lead_days и rfq_id: примените library/supabase/schema.sql "
-                        f"прогоном «ZIP base — apply DB migrations». Ошибка: {e}"
-                    ) from e
+                    raise RuntimeError(f"{price_store.ПОДСКАЗКА}. Ошибка: {e}") from e
             if buf_files:
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_files
@@ -702,17 +683,7 @@ def main() -> int:
                                   it.get("segment_rule")))
                 ц = it.get("_цена")
                 if ц and SOURCE == "rfq":
-                    # supplier_id здесь не ставится: карточку запроса связывает
-                    # с компанией отдельный проход по реестру. rfq_id хранит
-                    # карточку, чтобы связь была восстановима.
-                    buf_prices.append((it["segment_id"], pg(it["item_name"])[:500],
-                                       pg(it.get("part_number"))[:120], ц["price"],
-                                       ц["currency"], ц["basis"], it.get("qty"),
-                                       pg(it.get("unit"))[:40], it["source_file"],
-                                       it["deal_id"], it.get("company"),
-                                       ц["lead_days"], "КП", FEED_КП,
-                                       ц["confidence"], pg(ц["note"])[:300] or None,
-                                       None))
+                    buf_prices.append(price_store.строка(it, ц, pg))
                     цен += 1
             if len(buf_files) >= 200 or len(buf_items) >= 4000 or len(buf_prices) >= 2000:
                 flush()

@@ -202,43 +202,61 @@ def test_колонки_вставки_цен_есть_в_схеме():
     import pathlib
     import re
 
-    корень = pathlib.Path(__file__).resolve().parents[1]
-    код = (корень / "library" / "indexer.py").read_text(encoding="utf-8")
-    m = re.search(r"insert into lib_prices\s*\n\s*\(([^)]*)\)", код)
-    assert m, "вставка в lib_prices не найдена"
-    колонки = [c.strip() for c in m.group(1).replace("\n", " ").split(",") if c.strip()]
+    from library import price_store
 
+    корень = pathlib.Path(__file__).resolve().parents[1]
     sql = (корень / "library" / "supabase" / "schema.sql").read_text(encoding="utf-8")
     тело = re.search(r"create table if not exists lib_prices \((.*?)\n\);", sql, re.S).group(1)
     известные = {re.match(r"\s*([a-z_]+)", ln).group(1)
                  for ln in тело.splitlines() if re.match(r"\s*[a-z_]+\s", ln)}
-    известные |= set(re.findall(r"alter table lib_prices add column if not exists\s+(\w+)", sql))
+    известные |= set(re.findall(
+        r"alter table lib_prices add column if not exists\s+(\w+)", sql))
 
-    неизвестные = [c for c in колонки if c not in известные]
-    assert not неизвестные, f"в схеме lib_prices нет колонок: {неизвестные}"
+    нет = [c for c in price_store.КОЛОНКИ if c not in известные]
+    assert not нет, f"в схеме lib_prices нет колонок: {нет}"
 
 
-def test_число_колонок_совпадает_с_кортежем():
-    """Колонок в insert и полей в кортеже должно быть поровну: расхождение —
-    сдвиг значений, цена уедет в срок поставки."""
-    import ast
+def test_кортеж_строки_совпадает_с_колонками():
+    """Расхождение — сдвиг значений: цена уехала бы в срок поставки."""
+    from library import price_store
+
+    поз = {"segment_id": "gtu", "item_name": "Подшипник", "part_number": "NU220",
+           "qty": 10, "unit": "шт", "source_file": "f1", "deal_id": "11",
+           "company": "4242"}
+    ц = {"price": 1200.5, "currency": "EUR", "basis": None, "lead_days": 42,
+         "confidence": "med", "note": None}
+    кортеж = price_store.строка(поз, ц, lambda v: str(v or ""))
+    assert len(кортеж) == len(price_store.КОЛОНКИ)
+    по_имени = dict(zip(price_store.КОЛОНКИ, кортеж))
+    assert по_имени["price"] == 1200.5
+    assert по_имени["lead_days"] == 42
+    assert по_имени["rfq_company"] == "4242"
+    assert по_имени["rfq_id"] == "11"
+    assert по_имени["source_url"] == "f1"
+    assert по_имени["feed"] == price_store.FEED
+    assert по_имени["source"] == price_store.ИСТОЧНИК
+
+
+def test_запись_цен_одна_на_все_разборы():
+    """Обычный разбор и распознавание сканов обязаны писать одним кодом.
+
+    Две вставки в одну таблицу расходятся молча: колонка, добавленная в одну,
+    роняет вторую на каждой строке (CLAUDE.md, правило 14). Проверяем, что
+    своей вставки в lib_prices нет ни у одного из разборов.
+    """
     import pathlib
     import re
 
     корень = pathlib.Path(__file__).resolve().parents[1]
-    код = (корень / "library" / "indexer.py").read_text(encoding="utf-8")
-    колонок = len(re.search(r"insert into lib_prices\s*\n\s*\(([^)]*)\)", код)
-                  .group(1).replace("\n", " ").split(","))
+    for имя in ("indexer.py", "ocr.py", "reparse.py"):
+        файл = корень / "library" / имя
+        if not файл.exists():
+            continue
+        код = файл.read_text(encoding="utf-8")
+        без_комментариев = re.sub(r"(?m)^\s*#.*$", "", код)
+        assert "insert into lib_prices" not in без_комментариев, (
+            f"{имя} пишет в lib_prices сам — должен звать price_store.записать")
 
-    дерево = ast.parse(код)
-    длины = [len(n.args[0].elts)
-             for n in ast.walk(дерево)
-             if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
-             and n.func.attr == "append" and isinstance(n.func.value, ast.Name)
-             and n.func.value.id == "buf_prices" and n.args
-             and isinstance(n.args[0], ast.Tuple)]
-    assert длины, "не нашлось наполнения buf_prices кортежем"
-    assert all(d == колонок for d in длины), f"колонок {колонок}, в кортеже {длины}"
 
 
 # ── цена из текстовой строки (PDF без таблицы) ───────────────────────────────
@@ -335,3 +353,27 @@ def test_текстовая_цена_только_у_котировок():
 ])
 def test_допуск_привязан_к_количеству(строка, берём, почему):
     assert (q.цена_из_текста(строка) is not None) is берём, почему
+
+
+def test_распознавание_сканов_берёт_тот_же_источник():
+    """OCR ходил только по сделкам и до сканов КП не добирался вовсе.
+
+    Это та же дыра, что была у индексатора: цена живёт только во вложениях
+    карточек запросов, а четверть этих вложений — сканы без текстового слоя.
+    """
+    import inspect
+
+    import ocr
+
+    исходник = inspect.getsource(ocr.main)
+    assert "collect_refs_rfq" in исходник
+    assert 'indexer.SOURCE == "rfq"' in исходник
+
+
+def test_распознавание_сканов_пишет_цену():
+    import inspect
+
+    import ocr
+
+    assert "quotes.цена_из_текста" in inspect.getsource(ocr.recognise)
+    assert "price_store.строка" in inspect.getsource(ocr.main)
