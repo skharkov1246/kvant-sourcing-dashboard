@@ -4422,7 +4422,7 @@
       ],
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "7fe5543",
+      "last_commit": "f9c9462",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5047,9 +5047,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-09-21",
       "last_author": "skharkov1246",
-      "last_commit": "8f4b482",
+      "last_commit": "01588a2",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -6753,7 +6753,8 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/build_consumption.py",
-        "gpu/tools/build_targets.py"
+        "gpu/tools/build_targets.py",
+        "library/load_consumption.py"
       ]
     },
     {
@@ -7426,10 +7427,10 @@
           "qty"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-21",
+      "last_author": "skharkov1246",
+      "last_commit": "2521076",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -9675,9 +9676,9 @@
           "title"
         ]
       },
-      "last_change": "2026-08-06",
-      "last_author": "Claude",
-      "last_commit": "d6897e3",
+      "last_change": "2026-09-21",
+      "last_author": "skharkov1246",
+      "last_commit": "2521076",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
