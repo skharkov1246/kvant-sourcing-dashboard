@@ -22,7 +22,9 @@ _spec.loader.exec_module(ix)
 
 
 def карточки(monkeypatch, items):
-    monkeypatch.setattr(ix, "bx_all", lambda *a, **k: items)
+    """Подмена чтения портала. Карточки читаются обходом ПО КЛЮЧУ (bx_all_by_id):
+    на смещении СП-166 отдавал 7 750 записей вместо 21 865 — молча."""
+    monkeypatch.setattr(ix, "bx_all_by_id", lambda *a, **k: items)
 
 
 def test_берутся_только_файлы_поставщика(monkeypatch):
@@ -104,9 +106,47 @@ def test_поле_поставщика_запрашивается_у_порта�
         видели["select"] = params.get("select")
         return []
 
-    monkeypatch.setattr(ix, "bx_all", подмена)
+    monkeypatch.setattr(ix, "bx_all_by_id", подмена)
     ix.collect_refs_rfq(30)
     assert ix.ПОЛЕ_ПОСТАВЩИКА in видели["select"]
+
+
+def test_карточки_читаются_обходом_по_ключу(monkeypatch):
+    """Обход по смещению обрывался без ошибки: 7 750 из 21 865."""
+    import inspect
+
+    assert "bx_all_by_id" in inspect.getsource(ix.collect_refs_rfq)
+
+
+def test_обход_по_ключу_идёт_за_последний_id(monkeypatch):
+    """Ключ следующей страницы — id последней записи предыдущей."""
+    страницы = [
+        [{"id": i} for i in range(1, ix.СТРАНИЦА + 1)],
+        [{"id": ix.СТРАНИЦА + 1}],
+    ]
+    спрошено = []
+
+    def подмена(method, params):
+        спрошено.append(params["filter"][">id"])
+        return {"result": {"items": страницы[len(спрошено) - 1]}}
+
+    monkeypatch.setattr(ix, "bx", подмена)
+    из_портала = ix.bx_all_by_id("crm.item.list", {"entityTypeId": 166})
+    assert спрошено == [0, ix.СТРАНИЦА]
+    assert len(из_портала) == ix.СТРАНИЦА + 1
+
+
+def test_обрыв_на_смещении_не_молчит(monkeypatch, capsys):
+    """Полная последняя страница без продолжения — признак обрыва, а не конца."""
+    monkeypatch.setattr(ix, "bx", lambda m, p: {"result": [{"id": i} for i in range(ix.СТРАНИЦА)]})
+    ix.bx_all("crm.deal.list", {})
+    assert "оборвалось" in capsys.readouterr().out
+
+
+def test_короткая_последняя_страница_молчит(monkeypatch, capsys):
+    monkeypatch.setattr(ix, "bx", lambda m, p: {"result": [{"id": 1}]})
+    ix.bx_all("crm.deal.list", {})
+    assert "оборвалось" not in capsys.readouterr().out
 
 
 def test_фильтр_даты_не_уходит_на_портал(monkeypatch):
@@ -122,7 +162,7 @@ def test_фильтр_даты_не_уходит_на_портал(monkeypatch):
         видели["params"] = params
         return []
 
-    monkeypatch.setattr(ix, "bx_all", подмена)
+    monkeypatch.setattr(ix, "bx_all_by_id", подмена)
     ix.collect_refs_rfq(7300)
     assert "filter" not in видели["params"], "фильтр по дате снова ушёл на портал"
     assert "createdTime" in видели["params"]["select"]
