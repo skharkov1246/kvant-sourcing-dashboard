@@ -37,6 +37,7 @@ def build(
     since: dict[str, str],
     deal_stage_names: dict[str, str],
     category_names: dict[str, str],
+    user_depts: dict[str, str] | None = None,
 ) -> dict:
     weeks = period.weeks
     n_weeks = len(weeks)
@@ -210,7 +211,73 @@ def build(
 
     avg_suppliers = _round(mean(rfq_by_deal[d] for d in covered)) if covered else 0
 
+    # ---- КТО ЗАВОДИТ ЗАПРОСЫ
+    # Раньше в дашборде было одно число «вне блока A», и считалось оно по
+    # ОТВЕТСТВЕННОМУ. Но грузит очередь не тот, на кого карточку записали, а тот,
+    # кто её завёл: запрос может создать инженер или КАМ и тут же назначить
+    # сорсера ответственным. Поэтому здесь разбор по createdBy, с подразделением.
+    depts = user_depts or {}
+    made: dict[str, dict] = {}
+    for r in rfqs:
+        uid = str(r.get("createdBy") or "")
+        rec = made.setdefault(uid, {"n": 0, "tkp": 0, "toSourcing": 0})
+        rec["n"] += 1
+        if deal_state(r.get("parentId2")) == "tkp":
+            rec["tkp"] += 1
+        if str(r.get("assignedById")) in dept_a_ids:
+            rec["toSourcing"] += 1
+
+    by_creator: list[dict] = []
+    n_sourcing = n_outside = n_auto = 0
+    handoff = 0
+    by_dept_cnt: Counter = Counter()
+    for uid, rec in made.items():
+        auto = uid in ("", "0", "None")
+        in_src = (not auto) and uid in dept_a_ids
+        dept = "автоматизация портала" if auto else (depts.get(uid) or "подразделение не указано")
+        if auto:
+            n_auto += rec["n"]
+        elif in_src:
+            n_sourcing += rec["n"]
+        else:
+            n_outside += rec["n"]
+            handoff += rec["toSourcing"]
+        by_dept_cnt[dept] += rec["n"]
+        by_creator.append({
+            "uid": uid,
+            "name": "автоматизация портала" if auto else names.get(uid, f"user#{uid}"),
+            "dept": dept,
+            "src": bool(in_src),
+            "auto": bool(auto),
+            "n": rec["n"],
+            "pct": _pct(rec["n"], total),
+            "tkpPct": _pct(rec["tkp"], rec["n"]),
+            "toSourcingPct": _pct(rec["toSourcing"], rec["n"]),
+        })
+    by_creator.sort(key=lambda x: x["n"], reverse=True)
+    dept_max = max(by_dept_cnt.values(), default=1)
+    by_dept = [{"dept": d, "n": n, "pct": _pct(n, total), "w": round(n / dept_max * 100)}
+               for d, n in by_dept_cnt.most_common()]
+
     return {
+        "origin": {
+            "byCreator": by_creator,
+            "outsideCreators": [c for c in by_creator if not c["src"] and not c["auto"]],
+            "byDept": by_dept,
+            "summary": {
+                "total": total,
+                "sourcing": n_sourcing,
+                "outside": n_outside,
+                "auto": n_auto,
+                "sourcingPct": _pct(n_sourcing, total),
+                "outsidePct": _pct(n_outside, total),
+                "autoPct": _pct(n_auto, total),
+                "handoff": handoff,
+                "handoffPct": _pct(handoff, n_outside),
+                "people": len([c for c in by_creator if not c["auto"]]),
+                "outsidePeople": len([c for c in by_creator if not c["src"] and not c["auto"]]),
+            },
+        },
         "period": {
             "label": period.label,
             "start": period.start.isoformat(),

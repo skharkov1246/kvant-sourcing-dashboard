@@ -10,7 +10,7 @@
 План Б — календарный план текущего проекта: с 2029 г. сразу 7,5 млн т/год при содержании
 золота 0,42 г/т и меди 0,205 %.
 """
-import importlib.util, os, itertools
+import importlib.util, os
 _d = os.path.dirname(os.path.abspath(__file__))
 def load(n):
     s = importlib.util.spec_from_file_location(n, os.path.join(_d, n + '.py'))

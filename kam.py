@@ -11,7 +11,6 @@ import datetime as dt
 import re
 from collections import defaultdict
 
-import config
 from bitrix_client import BitrixClient
 
 YEAR_START = "2026-01-01T00:00:00"

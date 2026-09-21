@@ -12,7 +12,9 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import time
 import json
+import os
 import sys
 import webbrowser
 from collections import Counter, defaultdict
@@ -26,12 +28,13 @@ import insights as insights_mod
 import kam as kam_mod
 import contracts as contracts_mod
 import metrics as metrics_mod
+import people as people_mod
 import period as period_mod
 import reps as reps_mod
 from bitrix_client import BitrixClient
 
-RFQ_SELECT = ["id", "assignedById", "stageId", "createdTime", "movedTime", "parentId2", "categoryId",
-              "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact"]
+RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
+              "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact"]
 
 SUPPLIER_CRM_FIELDS = ("ufCrm18Supplier", "ufCrm18SupplContact")
 
@@ -193,6 +196,47 @@ def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict]
     return {"rows": rows, "totals": tot, "byCard": {c: v for c, v in by_card.items()}}
 
 
+class DataGateError(RuntimeError):
+    """Выгрузка не прошла проверку достаточности — собирать дашборд нельзя."""
+
+
+def _sanity_gates(p, rfqs, period_deals, dept_a_ids, sourcers_a, *, skip: bool = False) -> None:
+    """Проверка, что данные из Bitrix пришли, а не «пустой, но валидный» ответ.
+
+    Разбор падений: при частичной выгрузке пайплайн собирал корректный HTML с нулями
+    во всех KPI и деплоил его в прод. Здесь прогон останавливается ДО генерации, поэтому
+    на сайте остаётся предыдущая рабочая версия.
+
+    Пороги масштабируются длиной периода и переопределяются переменными окружения
+    SOURCING_MIN_RFQ / SOURCING_MIN_DEALS / SOURCING_MIN_SOURCERS; отключение — --allow-empty.
+    """
+    if skip:
+        print("  ⚠ проверки достаточности отключены (--allow-empty или --max-deals)")
+        return
+    scale = min(1.0, max(p.days, 1) / 30.0)          # для коротких периодов пороги ниже
+    min_rfq = max(1, int(int(os.getenv("SOURCING_MIN_RFQ") or 20) * scale))
+    min_deals = max(1, int(int(os.getenv("SOURCING_MIN_DEALS") or 20) * scale))
+    min_sourcers = max(1, int(int(os.getenv("SOURCING_MIN_SOURCERS") or 3) * scale))
+
+    problems = []
+    if not dept_a_ids:
+        problems.append(f"отдел {config.DEPT_SOURCING_ID} не вернул ни одного сотрудника")
+    if len(rfqs) < min_rfq:
+        problems.append(f"RFQ {len(rfqs)} < порога {min_rfq}")
+    if len(period_deals) < min_deals:
+        problems.append(f"сделок периода {len(period_deals)} < порога {min_deals}")
+    if len(sourcers_a) < min_sourcers:
+        problems.append(f"сорсеров с активностью {len(sourcers_a)} < порога {min_sourcers}")
+    if problems:
+        raise DataGateError(
+            "данные Bitrix не прошли проверку достаточности:\n    - " + "\n    - ".join(problems)
+            + "\n  Дашборд НЕ собран, прежняя версия на сайте не тронута."
+            + "\n  Если период действительно пустой — запустите с --allow-empty."
+        )
+    print(f"  ✓ проверка данных пройдена: RFQ {len(rfqs)}, сделок {len(period_deals)}, "
+          f"сорсеров {len(sourcers_a)}, отдел {len(dept_a_ids)} чел.")
+
+
 def run(args) -> int:
     settings = config.Settings.load()
     as_of = dt.date.fromisoformat(args.as_of) if args.as_of else None
@@ -240,7 +284,11 @@ def run(args) -> int:
     m = metrics_mod.build(
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
+        client.user_dept_names(),
     )
+
+    _sanity_gates(p, rfqs, period_deals, dept_a_ids, m.get("sourcersA") or [],
+                  skip=bool(args.allow_empty or args.max_deals))
 
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
@@ -342,18 +390,28 @@ def run(args) -> int:
     ins = insights_mod.generate(m, settings, use_llm=use_llm)
     print(f"  источник: {ins.get('_source')}")
 
-    company_data = kam_data = eng_data = prod_data = reps_data = None
-    deals_ytd = orders_ytd = deal_owner = deal_sale = None
+    company_data = kam_data = eng_data = prod_data = reps_data = people_data = None
+    deals_ytd = orders_ytd = orders_all = deal_owner = deal_sale = None
     # --- общий пул сделок/заказов YTD (нужен Пульсу + отраслевым вкладкам) ---
     try:
         print("• Общий пул сделок/заказов (YTD)…")
+        _t = time.time()
         ys = "2026-01-01T00:00:00"
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
-            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID"])
-        orders_ytd = client.list_items(172, filter={">=createdTime": ys},
-            select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
+            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID",
+                    "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID", "MOVED_TIME", "LAST_ACTIVITY_TIME"]
+                   + people_mod.DEAL_FIELDS)
+        # заказы СП-172 тянем ОДИН раз с 2025 и со сроком клиенту: тот же список нужен
+        # и вкладкам ролей (просрочка), и «Коммерсантам». Раньше каждая вкладка ходила
+        # за ними отдельно — три выгрузки одного и того же на каждую сборку.
+        orders_all = client.list_items(172, filter={">=createdTime": "2025-01-01T00:00:00"},
+            select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2",
+                    "assignedById", people_mod.DL_CUSTOMER])
         # заказы СП-172: исключаем проигранные (…:FAIL) — это не контрактная выручка
-        orders_ytd = [o for o in orders_ytd if not str(o.get("stageId", "")).endswith(":FAIL")]
+        orders_ytd = [o for o in orders_all
+                      if not str(o.get("stageId", "")).endswith(":FAIL")
+                      and str(o.get("createdTime", ""))[:4] >= "2026"]
+        print(f"  заказов СП-172 с 2025: {len(orders_all)}, из них непроигранных в 2026: {len(orders_ytd)}")
         # курсы → база € (для продаж сделок)
         _cur = client.call("crm.currency.list", {}) or []
         _rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in _cur}
@@ -376,6 +434,7 @@ def run(args) -> int:
         _cnames = client.companies_by_ids(_comp_ids)
         deal_group = {str(d["ID"]): kam_mod.client_dir(_cnames.get(str(d.get("COMPANY_ID")), "")) for d in deals_ytd}
         print(f"  клиентских направлений КАМ: {len(set(deal_group.values()))}")
+        print(f"  общий пул собран за {time.time() - _t:.0f} с")
     except Exception as e:
         deal_group = None
         print(f"  ⚠ общий пул не получен — Пульс/КАМ/Инж/Продукт пропущены: {type(e).__name__}: {e}")
@@ -415,6 +474,35 @@ def run(args) -> int:
             except Exception as e:
                 print(f"  ⚠ {label} пропущена: {type(e).__name__}: {e}")
 
+    try:
+        print("• Коммерсанты: состав из Bitrix, загрузка КАМов и продукт-оунеров…")
+        # открытые сделки ЭТОГО года уже есть в общем пуле — доливаем только те,
+        # что заведены раньше и до сих пор открыты (иначе выгружаем 2 700 карточек дважды)
+        if deals_ytd is None:                      # общий пул не собрался — тянем всё сами
+            deals_open = None
+        else:
+            open_ytd = [d for d in deals_ytd if (d.get("STAGE_SEMANTIC_ID") or "").upper() == "P"]
+            older = client.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "P", "<DATE_CREATE": ys},
+                                           select=people_mod.DEAL_SELECT)
+            deals_open = open_ytd + older
+            print(f"  открытых сделок: {len(deals_open)} (в этом году {len(open_ytd)}, раньше {len(older)})")
+        _t = time.time()
+        people_data = people_mod.compute(client, as_of=p.end, open_deals=deals_open, created=deals_ytd,
+                                         orders=orders_all)
+        print(f"  посчитано за {time.time() - _t:.0f} с")
+        _st = people_data["staff"]; _rc = people_data["recon"]
+        print(f"  ✓ действующих {_st['active']}, уволенных {_st['fired']}; открытых сделок {_rc['openTotal']}: "
+              f"за КАМами {_rc['kam']}, за продукт-оунерами {_rc['prod']}, ни за кем {_rc['none']}, "
+              f"на уволенных {_rc['orphan']}")
+        # гигиена ведения — в журнал прогона: по нему видно динамику день ко дню, не открывая
+        # сайт. Только агрегаты и собственные подписи кода (правило публичного репозитория).
+        _bad = [h for h in people_data.get("hygiene", []) if not h["ok"]]
+        _pc = lambda h: f"{h['val']}%" if h["unit"] == "%" else str(h["val"])
+        print(f"  гигиена Bitrix: не в норме {len(_bad)} из {len(people_data.get('hygiene', []))}"
+              + ("; " + " · ".join(f"{h['lbl']} — {_pc(h)}" for h in _bad) if _bad else ""))
+    except Exception as e:
+        print(f"  ⚠ вкладки «КАМы»/«Продукт-оунеры» пропущены: {type(e).__name__}: {e}")
+
     contracts_data = None
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
@@ -425,7 +513,8 @@ def run(args) -> int:
 
     try:
         print("• Коммерсанты (персональные дашборды + контрольные точки)…")
-        reps_data = reps_mod.compute(client, realize_date=realize_date, as_of=p.end)
+        reps_data = reps_mod.compute(client, realize_date=realize_date, as_of=p.end, created=deals_ytd,
+                                     orders_src=orders_all)
         print(f"  ✓ коммерсантов: {len(reps_data['reps'])}")
     except Exception as e:
         print(f"  ⚠ вкладка «Коммерсанты» пропущена: {type(e).__name__}: {e}")
@@ -445,7 +534,7 @@ def run(args) -> int:
     html_path = out_dir / f"dashboard_{slug}.html"
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
                     company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
-                    contracts=contracts_data, reps=reps_data, advisor=advisor_data)
+                    contracts=contracts_data, reps=reps_data, advisor=advisor_data, people=people_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:
@@ -478,11 +567,18 @@ def main() -> int:
     ap.add_argument("--open", action="store_true", help="открыть дашборд в браузере")
     ap.add_argument("--max-deals", type=int, default=None, help="ограничить число RFQ (для теста)")
     ap.add_argument("--as-of", help="переопределить «сегодня» (YYYY-MM-DD), для воспроизводимости")
+    ap.add_argument("--allow-empty", action="store_true",
+                    help="не останавливаться, если данных из Bitrix мало (период действительно пустой)")
     args = ap.parse_args()
     try:
         return run(args)
     except SystemExit:
         raise
+    except DataGateError as e:
+        # код 2 = «данные не прошли проверку»: отличается от краха кода (1),
+        # чтобы CI мог показать понятную причину и не деплоить.
+        print(f"✗ {e}", file=sys.stderr)
+        return 2
     except Exception as e:
         print(f"✗ Ошибка: {type(e).__name__}: {e}", file=sys.stderr)
         return 1

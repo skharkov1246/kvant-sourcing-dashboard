@@ -15,7 +15,6 @@
 """
 import json
 import re
-import statistics
 from pathlib import Path
 from datetime import date
 

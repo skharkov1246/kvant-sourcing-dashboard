@@ -1,0 +1,22 @@
+# Конфигурация инструментов проверки. Сам пакет не собирается — репозиторий
+# запускается скриптами (main.py и build.py подпроектов).
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+exclude = [".venv", "reports", "ove/tools/bidocs", "*/public"]
+
+[tool.ruff.lint]
+# Блокирующий набор в CI — только настоящие ошибки: синтаксис, неопределённые
+# имена, сравнения-ловушки. Стилевые правила остаются информационными, чтобы
+# гейт не требовал разовой правки 100+ мест.
+select = ["E9", "F63", "F7", "F82", "F821", "F811", "F401"]
+ignore = ["E501", "E702", "E701", "E731", "E741"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F401"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+pythonpath = ["."]

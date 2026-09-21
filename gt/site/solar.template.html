@@ -114,12 +114,34 @@ details.facts summary{cursor:pointer;color:var(--s1);font-size:13px}
 <details class="facts"><summary>Фактура раскрутки с источниками (__N_FACTS__)</summary><div id="facts"></div></details>
 </div>
 
+<!-- Общие правки: перенос старых заметок, общая база и подпись автора. См. gt/site/notes.js и index.template.html -->
+<script src="./notes.js"></script>
 <script>
 const F = __SOLAR_JSON__;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let M; try{ M = JSON.parse(localStorage.getItem('gt_solar_v1')) || {}; }catch(e){ M={}; }
 M.st=M.st||{}; M.note=M.note||{};
-const save=()=>{ try{ localStorage.setItem('gt_solar_v1', JSON.stringify(M)); }catch(e){} };
+const save=()=>{ try{ localStorage.setItem('gt_solar_v1', JSON.stringify(M)); }catch(e){}
+ if(window.KVN) KVN.syncStore('solar', M, ['st','note']); };   // отправит только изменившееся
+
+/* Общая база правок: отметки и заметки видны коллегам и переживают смену браузера.
+   Локальное важнее для скорости, серверное — чтобы видели остальные. Разбор — в
+   gt/site/notes.js, образец — notesBoot() в index.template.html. */
+function notesBoot(){
+ if(!window.KVN) return;
+ KVN.me();
+ KVN.seedStore('solar', M, ['st','note']);   // снимок ДО подтягивания
+ KVN.load('solar').then(()=>KVN.migrate()).then(()=>{
+  KVN.rows().forEach(r=>{
+   if(r.scope!=='solar' || r.removed || !r.text) return;
+   if(r.kind==='note' && !M.note[r.key]) M.note[r.key] = r.text;
+   if(r.kind==='st' && !M.st[r.key]) M.st[r.key] = r.text;
+  });
+  KVN.seedStore('solar', M, ['st','note']);  // и ПОСЛЕ — иначе первая же правка отправит всё обратно
+  render();
+ });
+}
+notesBoot();
 const ST=[['sent','📨 отправлено'],['rep','💬 ответил'],['kp','📄 КП'],['no','❌ отказ']];
 const TIERS={
  indep_proven_maker:['★ Независимые с опытом на Solar и собственным производством','Первая волна запросов: доказанный опыт именно на машинах Solar плюс своё производство/ремонт компонентов.'],
@@ -152,7 +174,7 @@ function coRow(c){
    ${c.evidence?`<div class="ev">Доказательство: ${esc(c.evidence).replace(/(https?:\/\/\S+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}</div>`:''}</div>
   <div><div class="stbar">${ST.map(([v,n])=>`<button class="st${st===v?' on-'+v:''}" data-st="${v}">${n}</button>`).join('')}
    <button class="st" data-st="note">✏</button></div>
-   ${note?`<div class="snote">${esc(note)}</div>`:''}</div>
+   ${note?`<div class="snote">${esc(note)}${(()=>{const s=window.KVN&&KVN.get('note',[k]);return s&&s.author?`<div class="mut" style="font-size:11px;margin-top:3px">${esc(KVN.signature(s, note))}</div>`:'';})()}</div>`:''}</div>
  </div>`;
 }
 function render(){

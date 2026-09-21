@@ -1,0 +1,15 @@
+# Обновления зависимостей приходят пул-реквестами и проходят гейт,
+# а не прилетают внезапно во время ночной пересборки.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: monthly }
+    open-pull-requests-limit: 3
+    commit-message: { prefix: "ci" }
+
+  - package-ecosystem: pip
+    directory: "/"
+    schedule: { interval: monthly }
+    open-pull-requests-limit: 3
+    commit-message: { prefix: "deps" }

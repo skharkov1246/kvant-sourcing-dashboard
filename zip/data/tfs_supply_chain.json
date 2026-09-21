@@ -1,0 +1,207 @@
+{
+  "target": {
+    "name": "TFS Turbine Field Solutions S.A. de C.V.",
+    "rfc": "TTF150331J50",
+    "city": "Веракрус, Мексика",
+    "address": "Framboyanes 3303, Col. Industrial Bruno Pagliai, Veracruz 91697",
+    "why": "Владелец первого в мире независимого испытательного стенда Siemens SGT-400 (плюс второй стенд под Solar Taurus/Centaur). 200+ специалистов, AS9100D + ISO 9001/14001/45001/37001.",
+    "site": "tfscorp.com.mx",
+    "email": "comercial@tfscorp.com.mx",
+    "phone": "+52 229 989 3793"
+  },
+  "totals": {
+    "panjiva_suppliers": "205 поставщиков / 854 записи (профиль 60746074); второй профиль — 208 / 958",
+    "panjiva_customers": "75 покупателей / 390 записей (профиль 62749451)",
+    "volza_imports": "232 отгрузки от 13 поставщиков (Мексика, США, Китай)",
+    "volza_exports": "636 отгрузок 11 покупателям (Колумбия, США, Дания)",
+    "note": "Публичные тиры отдают лишь единичные записи. Полные списки — за подпиской."
+  },
+  "methodology_warning": "ВАЖНО при чтении трейд-баз: и Panjiva, и ImportKey показывают рядом с профилем блоки «похожие компании» и карточки связанных фирм с ОБЩИМ счётчиком отгрузок компании, а не с объёмом парной связки. Число 471 — это собственный счётчик TFS, оно повторяется на страницах разных фирм и НЕ означает 471 поставку от конкретного поставщика. Достоверны только парные счётчики в таблице поставщиков (единицы-десятки) и товарные описания в самих записях отгрузок.",
+  "suppliers": [
+    {
+      "company": "Liburdi Turbine Services Inc.",
+      "country": "Канада (Dundas, Онтарио)",
+      "hs": "8411999900",
+      "shipments": "2 записи в таблице поставщиков TFS; плюс встречные отгрузки TFS→Liburdi",
+      "ships": "Части ГТУ: сегменты сопловых аппаратов, лопатки. Авиа в Мехико (CIF $10 784, 12,3 кг, 08.2025) и обратно из Мехико ($2 280, 17 кг, 07.2025)",
+      "segment": 1,
+      "confidence": "высокая",
+      "confirm": "Panjiva sample bill of lading в ОБЕ стороны (профили 60746074 и 62749451) + таблица поставщиков ImportKey. Двусторонний поток = маршрутизация ремонта горячей части.",
+      "site": "liburdi.com",
+      "email": "info@liburdi.com",
+      "phone": "+1 905 689 0734",
+      "block": "C"
+    },
+    {
+      "company": "WBS Trading & Manufacturing Pte. Ltd.",
+      "country": "Сингапур (отгрузка из Китая)",
+      "hs": "8411999900",
+      "shipments": "5 записей (05.2026–03.2026)",
+      "ships": "КУПОЛ КАМЕРЫ СГОРАНИЯ (cupula), опорные детали ГТУ, кольца дисков 1-й и 2-й ступени, уплотнительные пластины 1-й ступени",
+      "segment": 1,
+      "confidence": "средне-высокая",
+      "confirm": "ImportKey — товарные описания отгрузок в адрес TFS. Профиля в Panjiva нет (там связка не подтверждается).",
+      "site": "wbs.com.sg",
+      "email": "sales@wbs.com.sg",
+      "phone": "+65 6863 1978",
+      "block": "A"
+    },
+    {
+      "company": "Turbine Engineering Services Ltd",
+      "country": "Великобритания (Першор, Вустершир)",
+      "hs": "8411999900",
+      "shipments": "5 записей в таблице поставщиков TFS",
+      "ships": "Детали ГТУ; в записях фигурируют происхождения UK / Нидерланды / Швейцария",
+      "segment": 1,
+      "confidence": "средняя",
+      "confirm": "Таблица поставщиков ImportKey. Companies House: рег. № 07671788, действующая с 16.06.2011, SIC 74909, директор Johann Sebastian Kemili. Компания малая (2–10 чел.). Сайт turbineengineeringservices.co.uk на момент проверки не отвечает (503/ошибка TLS), торговых записей в Panjiva нет.",
+      "site": "turbineengineeringservices.co.uk (не отвечает)",
+      "email": "не найдено",
+      "phone": "01386 555630 (из бизнес-справочников, независимо не подтверждён)",
+      "address": "Units 10–13 Aintree Road, Keytec 7 Business Park, Pershore, Worcestershire WR10 2JN",
+      "block": "G"
+    },
+    {
+      "company": "Heinzmann UK Limited",
+      "country": "Великобритания",
+      "hs": "не указан",
+      "shipments": "1 запись",
+      "ships": "Системы зажигания / свечи розжига камеры сгорания",
+      "segment": 1,
+      "confidence": "средняя",
+      "confirm": "Таблица поставщиков ImportKey (единичная поставка).",
+      "site": "heinzmann-re.com",
+      "email": "sales@heinzmann-re.com",
+      "phone": "+44 1206 799556",
+      "block": "B"
+    },
+    {
+      "company": "Sifco Applied Surface Concepts LLC",
+      "country": "США (Independence, Огайо)",
+      "hs": "не указан",
+      "shipments": "в тройке крупнейших поставщиков TFS по сводке Volza",
+      "ships": "Селективное гальванопокрытие (brush plating) — восстановление корпусов турбин, шеек подшипников, деталей горячей части",
+      "segment": 3,
+      "confidence": "средняя",
+      "confirm": "Volza — сводка профиля TFS из поисковой выдачи (сама страница закрыта WAF).",
+      "site": "sifcoasc.com",
+      "email": "не найдено",
+      "phone": "не найдено",
+      "block": "E"
+    },
+    {
+      "company": "ITS — Industrial Turbine Services GmbH",
+      "country": "Австрия (Лаакирхен) + офис в Германии",
+      "hs": "8411999900, 9032899900",
+      "shipments": "3 записи (мексиканское направление; покупатели — другие мексиканские фирмы, не TFS)",
+      "ships": "Сканеры и датчики пламени ГТУ, детали ГТУ, SCADA/АСУ (TMOS, FLAME SCANNER, MACH7)",
+      "segment": 1,
+      "confidence": "подтверждена компания, связь с TFS НЕ подтверждена",
+      "confirm": "ImportKey — импорт в Мексику по HS деталей ГТУ, но получатели иные (Proveedores Industriales, Strom, Dervsa). Контакты с сайта компании.",
+      "site": "turbineservices.at",
+      "email": "contact@turbineservices.de",
+      "phone": "+49 201 43728-0",
+      "block": "B"
+    },
+    {
+      "company": "Finework (Hunan) New Energy Technology Co. Ltd",
+      "country": "Китай",
+      "hs": "не подтверждён",
+      "shipments": "упомянута в блоке связей ImportKey",
+      "ships": "Заявлялся суперсплавный крепёж / компоненты форсунок",
+      "segment": 1,
+      "confidence": "НИЗКАЯ — вероятно ложный след",
+      "confirm": "Проверка Panjiva (профиль 71125343): 132 отгрузки в США, заказчики уровня LM Wind Power — это ВЕТРОЭНЕРГЕТИКА, не ГТУ. Связь с TFS и с горячей частью SGT-400 не подтверждается.",
+      "site": "fineworkchina.com",
+      "email": "sales@fineworkchina.com",
+      "phone": "+86 731 8873 8080"
+    },
+    {
+      "company": "Suzhou Escott Machinery Equipment / Wuhan Rayvanbo / Henan Sante Furnace / Shandong Luzhong Machine Tool",
+      "country": "Китай",
+      "hs": "8428909999, 8426110100, 8514190300, 846150",
+      "shipments": "1 / 16 / 1 / — записей",
+      "ships": "Подъёмно-транспортное оборудование, краны, промышленные печи, отрезные станки — цеховое оснащение, НЕ горячая часть",
+      "segment": 0,
+      "confidence": "высокая (но нерелевантно нашей номенклатуре)",
+      "confirm": "ImportKey / Panjiva.",
+      "site": "",
+      "email": "",
+      "phone": ""
+    }
+  ],
+  "customers": [
+    {
+      "company": "TFS Turbine Field Solutions Colombia (NIT 901438430)",
+      "country": "Колумбия",
+      "hs": "4009220501, 8205599999, 8204119900",
+      "note": "Аффилиат. Шланги с фитингами, специнструмент для обслуживания роторов ГТУ, оснастка для сборки/разборки дисков"
+    },
+    {
+      "company": "Gas Turbine Products LLC",
+      "country": "не установлена",
+      "hs": "8411820100",
+      "note": "151 отгрузка от TFS. Юрлицо найти не удалось — ни регистрации, ни сайта; возможно, торговое имя в декларации. НЕ путать с World Wide Gas Turbine Products Inc. (Нью-Йорк) — совпадение не подтверждено"
+    },
+    {
+      "company": "Oleoducto Central S.A. (Ocensa)",
+      "country": "Колумбия",
+      "hs": "8411820100",
+      "note": "Трубопроводный оператор — конечный эксплуатант"
+    },
+    {
+      "company": "PTTEP International Ltd",
+      "country": "Таиланд",
+      "note": "Нефтегазовый оператор — конечный эксплуатант"
+    },
+    {
+      "company": "POSCO International Corporation",
+      "country": "Ю. Корея",
+      "hs": "3926.40",
+      "note": "Веракрус → Хьюстон; через них — мьянманское направление"
+    }
+  ],
+  "leads": [
+    {
+      "company": "DURAG Group / HEGWEIN",
+      "country": "Германия",
+      "segment": 1,
+      "ships": "Запальники и системы розжига камер сгорания ГТУ (HEGWEIN M22D), горелки, контроль пламени",
+      "why": "Профильный изготовитель систем розжига камер сгорания промышленных ГТУ; патент ignition generator for gas turbines. Связка с TFS по отгрузкам не пробита.",
+      "site": "durag.com",
+      "email": "info@durag.com",
+      "phone": "+49 40 554218-0",
+      "block": "B"
+    },
+    {
+      "company": "Sonkit (Shanghai)",
+      "country": "Китай",
+      "segment": 1,
+      "ships": "Металлические уплотнения C-ring камеры сгорания и горячего тракта, уплотнительные кольца",
+      "why": "Профильный изготовитель металлических уплотнений для ГТУ. Связка с TFS по отгрузкам не пробита.",
+      "site": "sonkit.com",
+      "email": "sales@sonkit.com",
+      "phone": "+86 21 5439 9299",
+      "block": "D"
+    },
+    {
+      "company": "Gas Turbine Services A/S",
+      "country": "Дания (Эсбьерг) + площадка Линкольн, UK",
+      "why": "Volza показывает Данию среди трёх основных направлений экспорта TFS. GTS A/S — крупнейший независимый сервис по линейке Siemens (Lincoln) SGT / Ruston, то есть ровно наш завод-изготовитель SGT-400. Прямая запись отгрузки TFS↔GTS не пробита — это гипотеза, требующая проверки.",
+      "site": "gasturbineservices.com",
+      "email": "gts@gasturbineservices.com",
+      "phone": "+45 7546 8030 (Дания), +44 1522 842700 (Линкольн)",
+      "address": "Murervej 2-6, 6710 Esbjerg V, Дания / New Horizons, Teal Park, Lincoln LN6 3AD",
+      "block": "G"
+    }
+  ],
+  "sources": [
+    "panjiva.com/Tfs-Turbine-Field-Solutions-SA-De-Cv/60746074 и /62749451, /87468378, /111144976, /111211479",
+    "importkey.com/countries/mexico/{tfs-turbine-field-solutions-sa-de-cv, turbine-engineering-services-ltd, wbs-trading-manufacturing-pte-ltd, liburdi-turbine-services-inc, gas-turbine-products-llc, its-industrial-turbine-services}",
+    "volza.com/company-profile/tfs-turbine-field-solutions-s.a.-de-c.v.-10966339 (страница под WAF, использована сводка из поисковой выдачи)",
+    "find-and-update.company-information.service.gov.uk/company/07671788 (Companies House)",
+    "mexico-now.com — первый в мире стенд SGT-400 у TFS"
+  ],
+  "method": "Только публично отдаваемые страницы. Без регистрации, без обхода Cloudflare-челленджей и paywall, без использования чужих учётных данных и встроенных в страницы токенов. Volza/ImportYeti/Trademo/TradeAtlas/Veritrade закрыты WAF — с них взяты только сниппеты поисковой выдачи.",
+  "pulled": "2026-08-06"
+}

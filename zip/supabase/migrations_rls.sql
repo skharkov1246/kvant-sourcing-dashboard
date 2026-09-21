@@ -1,0 +1,50 @@
+-- ЗАГОТОВКА, НЕ ПРИМЕНЕНА. Ужесточение доступа к базе ЗИП (Supabase).
+--
+-- Проблема: публикуемый ключ Supabase лежит в zip/site/index.template.html и в
+-- собранной странице, а политики RLS в migrations.sql разрешают роли anon всё
+-- (`for all ... using (true) with check (true)`). Значит любой, кто открыл сайт
+-- или прочитал исходники, может читать, менять и удалять записи и файлы напрямую
+-- через API Supabase, минуя интерфейс.
+--
+-- Почему не применено автоматически: сайт ЗИП пишет в базу из браузера тем же
+-- ключом anon (insert/update/delete в zip/site/index.template.html). Простой
+-- запрет записи сломает рабочий функционал. Нужен выбор владельца.
+--
+-- ВАРИАНТ A (быстрый, ничего не ломает): оставить запись, запретить удаление.
+--   Полностью совместим с сайтом, если удаление не используется в рабочем сценарии;
+--   если используется — удаление перестанет работать в интерфейсе.
+--
+-- ВАРИАНТ B (правильный): anon только читает; запись идёт через Edge Function
+--   с сервисным ключом, вызываемую из Pages Function за Basic Auth. Требует
+--   переписать вызовы записи на сайте.
+--
+-- Применение (после выбора): раскомментировать нужный блок и запустить
+--   .github/workflows/zip-db.yml (workflow_dispatch, секрет SUPABASE_DB_URL).
+-- Проверка после применения: открыть сайт, добавить и отредактировать запись.
+
+-- ---------------------------------------------------------------- ВАРИАНТ A
+-- drop policy if exists price_all on price_records;
+-- create policy price_rw on price_records for select to anon, authenticated using (true);
+-- create policy price_ins on price_records for insert to anon, authenticated with check (true);
+-- create policy price_upd on price_records for update to anon, authenticated using (true) with check (true);
+-- -- удаление — только для аутентифицированных
+-- create policy price_del on price_records for delete to authenticated using (true);
+--
+-- drop policy if exists draw_all on drawings;
+-- create policy draw_sel on drawings for select to anon, authenticated using (true);
+-- create policy draw_ins on drawings for insert to anon, authenticated with check (true);
+-- create policy draw_upd on drawings for update to anon, authenticated using (true) with check (true);
+-- create policy draw_del on drawings for delete to authenticated using (true);
+--
+-- drop policy if exists drawings_delete on storage.objects;
+-- create policy drawings_delete on storage.objects for delete to authenticated using (bucket_id = 'drawings');
+-- drop policy if exists samples_delete on storage.objects;
+-- create policy samples_delete on storage.objects for delete to authenticated using (bucket_id = 'samples');
+
+-- ---------------------------------------------------------------- ВАРИАНТ B
+-- drop policy if exists price_all on price_records;
+-- create policy price_read_only on price_records for select to anon using (true);
+-- create policy price_write_srv on price_records for all to service_role using (true) with check (true);
+-- drop policy if exists draw_all on drawings;
+-- create policy draw_read_only on drawings for select to anon using (true);
+-- create policy draw_write_srv on drawings for all to service_role using (true) with check (true);

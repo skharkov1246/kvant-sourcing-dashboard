@@ -164,6 +164,8 @@ button:focus-visible,select:focus-visible,input:focus-visible,.b-head:focus-visi
 
 </div>
 
+<!-- Общие правки: перенос старых заметок, общая база и подпись автора. См. gt/site/index.template.html -->
+<script src="./notes.js"></script>
 <script>
 const BATCHES = __BATCHES_JSON__;
 const STOCK = __STOCK_JSON__;
@@ -174,8 +176,32 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 let M;
 try{ M = JSON.parse(localStorage.getItem('gt_rfq_v1')) || {}; }catch(e){ M = {}; }
 M.st = M.st||{}; M.note = M.note||{};
-const save = () => { try{ localStorage.setItem('gt_rfq_v1', JSON.stringify(M)); }catch(e){} };
+const save = () => {
+ try{ localStorage.setItem('gt_rfq_v1', JSON.stringify(M)); }catch(e){}
+ if(window.KVN) KVN.syncStore('rfq', M, ['st','note']);   // отправит только изменившееся
+};
 const bkey = (bi,s) => bi+'|'+s;
+
+/* Общая база правок: подтягиваем отметки и заметки коллег и старые локальные.
+   Локальное важнее для скорости, серверное — чтобы видели коллеги. Снимок
+   seedStore обязателен ДО и ПОСЛЕ: иначе первая же правка отправит в базу
+   заново всё, что там уже лежит. Образец — notesBoot() в index.template.html. */
+function notesBoot(){
+ if(!window.KVN) return;
+ KVN.me();
+ KVN.seedStore('rfq', M, ['st','note']);
+ KVN.load('rfq').then(()=>KVN.migrate()).then(()=>{
+  KVN.rows().forEach(r=>{
+   if(r.scope!=='rfq' || r.removed || !r.text) return;
+   if(r.kind==='note' && !M.note[r.key]) M.note[r.key] = r.text;
+   if(r.kind==='st' && !M.st[r.key]) M.st[r.key] = r.text;
+  });
+  KVN.seedStore('rfq', M, ['st','note']);
+  save();
+  render();
+ });
+}
+notesBoot();
 
 const ST = [['sent','📨 отправлено'],['rep','💬 ответил'],['kp','📄 КП'],['no','❌ отказ']];
 
@@ -266,7 +292,7 @@ function card(b, bi){
     ${s.hook?`<div class="hook">✍ ${esc(s.hook)}</div>`:''}</div>
    <div><span class="pbadge ${pcls(s.p)}" title="${esc(s.why)}">${s.p}%</span></div>
    <div class="contact">${contacts||'<span class="mut">контакт через сайт</span>'}
-    ${note?`<div class="snote">${esc(note)}</div>`:''}</div>
+    ${note?`<div class="snote">${esc(note)}${(()=>{const s=window.KVN&&KVN.get('note',[k]);return s&&s.author?`<div class="mut" style="font-size:11px;margin-top:3px">${esc(KVN.signature(s, note))}</div>`:'';})()}</div>`:''}</div>
    <div><div class="stbar">${ST.map(([v,n])=>`<button class="st${st===v?' on-'+v:''}" data-st="${v}">${n}</button>`).join('')}
     <button class="st" data-st="note">✏</button></div></div>
   </div>`;
