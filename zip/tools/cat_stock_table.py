@@ -86,7 +86,8 @@ def main() -> int:
              f'</div>')
 
     H.append(f'<div class="box"><b>Машина.</b> {e(mach["verdict"])}. {e(mach["basis"])}<br>'
-             f'<b style="color:#c62828">Чего не хватает:</b> {e(mach["unknown"])}.</div>')
+             f'<b style="color:#c62828">Чего не хватает:</b> {e(mach["unknown"])}<br>'
+             f'<b>Исправление.</b> {e(mach.get("correction", ""))}</div>')
     H.append('<div class="box warn"><b>Что понять до рассылки</b><ol>'
              + "".join(f"<li>{e(f)}</li>" for f in d["findings"]) + "</ol></div>")
 
@@ -167,6 +168,41 @@ def main() -> int:
              f'на две штуки. Поэтому торг по крышкам и фитингам бюджет не меняет, а решение заказчика '
              f'«оригинал или восстановленное» по цилиндрам и КПП меняет его на '
              f'{round(100 - 100 * b["heavy_used"] / gen)} %.</div>')
+
+    a = d["asap"]
+    H.append('<h2>Забрать ASAP: кто физически ближе к Красноярску</h2>')
+    H.append(f'<div class="box warn"><b>Подтверждённого наличия по нашим 29 номерам — '
+             f'{a["verified_by_part"]}.</b> {e(a["note"])}</div>')
+    H.append('<h2 style="background:#1a7f37">Красноярск и рядом · плечо 1–3 суток</h2>')
+    H.append('<table><tr><th style="width:4%">КРСК</th><th style="width:24%">Компания</th>'
+             '<th style="width:10%">Кто</th><th style="width:13%">Состояние наличия</th>'
+             '<th>Что заявляет о складе</th></tr>')
+    for r_ in a["near"]:
+        mark = tag("да", "#1a7f37") if r_["krsk"] else '<span class="mut">рядом</span>'
+        color = {"склад заявлен": "#1a7f37", "под заказ": "#b26a00", "не склад": "#5a6672"}[r_["state"]]
+        H.append(f'<tr><td>{mark}</td><td><b>{e(r_["org"])}</b></td><td>{e(r_["kind"])}</td>'
+                 f'<td>{tag(r_["state"], color)}</td><td class="mut">{e(r_["stock"])}</td></tr>')
+    H.append('</table>')
+
+    H.append('<h2 style="background:#0b3d91">Зарубеж · склад заявлен</h2>')
+    H.append('<div class="mut">Ближайший по сроку — Казахстан: Borusan Cat, заказ через parts.cat.com '
+             'круглосуточно, плечо до Красноярска 7–14 суток. Из КНР и ЮАР быстрее двух недель не выходит.</div>')
+    H.append('<table><tr><th style="width:5%">Страна</th><th style="width:26%">Компания</th>'
+             '<th style="width:10%">Кто</th><th>Что заявляет о складе</th></tr>')
+    for r_ in a["foreign"]:
+        H.append(f'<tr><td class="pn">{e(r_["country"])}</td><td><b>{e(r_["org"])}</b></td>'
+                 f'<td>{e(r_["kind"])}</td><td class="mut">{e(r_["stock"])}</td></tr>')
+    H.append('</table>')
+
+    H.append('<h2 style="background:#c62828">Восстановление цилиндров и КПП · вместо покупки нового</h2>')
+    H.append('<div class="mut">79 % бюджета — цилиндры и КПП. Если заказчик согласен на восстановление, '
+             'это минус 47 % к смете, и делать это есть кому в сутках езды от площадки.</div>')
+    H.append('<table><tr><th style="width:30%">Кто</th><th>Где и что может</th></tr>')
+    for r_ in a["repair"]:
+        H.append(f'<tr><td><b>{e(r_["org"])}</b></td><td>{e(r_["stock"])}</td></tr>')
+    H.append('<tr><td><b>Borusan Cat Kazakhstan — Центр восстановления компонентов</b></td>'
+             '<td>цех восстановления, стендовые испытания по спецификации завода Caterpillar</td></tr>')
+    H.append('</table>')
 
     H.append('<h2>Что здесь подтверждено: площадки, с которых товар реально уезжал</h2>')
     H.append('<div class="mut">Наличие по нашим 29 номерам не подтверждено нигде — остатки складов закрыты, '
