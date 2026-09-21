@@ -78,3 +78,12 @@ jobs:
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
         run: python scripts/supplier_responsiveness.py
+
+      # КОТИРОВКА КАК ДОКУМЕНТ — замер под этап 3. Прежде чем строить хранение
+      # котировки (валюта, базис цены, единица, наличие тремя осями), надо знать,
+      # из чего его наполнять: сколько карточек несут сумму, в каких валютах и у
+      # скольких приложено КП именно ОТ ПОСТАВЩИКА, а не наш собственный запрос.
+      - name: Что известно о цене в карточках
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        run: python scripts/quote_coverage.py
