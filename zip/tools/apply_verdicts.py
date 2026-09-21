@@ -118,15 +118,25 @@ def apply(results):
                 rec["verdict"] = dict(body)
             bound[field] += 1
 
-    DIAG.write_text(json.dumps(diag, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    REPAIR.write_text(json.dumps(rep, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-
     def tally(items):
         c = {}
         for it in items:
             v = it["verdict"]["verdict"]
             c[v] = c.get(v, 0) + 1
         return dict(sorted(c.items(), key=lambda kv: -kv[1]))
+
+    # Сводка в наборе обязана пересчитываться вместе с записями. Иначе страница
+    # берёт stats.by_verdict и показывает состояние ДО проверки: так на портале
+    # висело «скептик не сослался: 224», когда непроверенной оставалась одна
+    # карточка. Запись поправлена, а витрина продолжала врать.
+    diag["stats"]["by_verdict"] = tally(
+        [x for a in diag["angles"] for x in a["findings"] + a["defects"]])
+    rep["stats"]["by_verdict"] = tally(
+        [x for a in rep["tech_angles"] for x in a["technologies"]]
+        + [x for a in rep["contractor_angles"] for x in a["contractors"]])
+
+    DIAG.write_text(json.dumps(diag, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    REPAIR.write_text(json.dumps(rep, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
     alld = [d for a in diag["angles"] for d in a["defects"]]
     allc = [c for a in rep["contractor_angles"] for c in a["contractors"]]
