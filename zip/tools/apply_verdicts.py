@@ -51,11 +51,23 @@ def apply(results):
     diag = json.loads(DIAG.read_text(encoding="utf-8"))
     rep = json.loads(REPAIR.read_text(encoding="utf-8"))
 
-    # индекс дефектов: (узел, дефект) → запись
-    dindex = {}
+    # Индекс дефектов строится по ДВУМ написаниям узла, и это не перестраховка.
+    # Скептик читает dict/symptom.json, где узел уже сведён к каноническому
+    # («Подшипник качения»), а в наборе разведки лежит исходное свободное
+    # название («Подшипник качения электродвигателя»). Первый прогон привязал
+    # 43 вердикта из 232 ровно поэтому. Ключом служит и канонический узел, и
+    # исходный, и — последним средством — одно название дефекта: оно в каталоге
+    # уникально, а узел у одной строки ровно один.
+    sym = json.loads((ROOT.parent / "dict" / "symptom.json").read_text(encoding="utf-8"))
+    canon = {}
+    for row in sym.get("defect_rows", []):
+        canon.setdefault((norm(row.get("node")), norm(row.get("defect"))),
+                         norm(row.get("node_raw")))
+    dindex, dfallback = {}, {}
     for a in diag["angles"]:
         for d in a["defects"]:
             dindex.setdefault((norm(d["node"]), norm(d["defect"])), []).append(d)
+            dfallback.setdefault(norm(d["defect"]), []).append(d)
     # индекс исполнителей: имя → запись
     cindex = {}
     for a in rep["contractor_angles"]:
@@ -84,7 +96,18 @@ def apply(results):
                 hit = cindex.get(norm(v["ref_name"]))
                 field = "contractors"
             else:
-                hit = dindex.get((norm(v.get("ref_node")), norm(v.get("ref_defect"))))
+                nd, df = norm(v.get("ref_node")), norm(v.get("ref_defect"))
+                hit = dindex.get((nd, df))
+                if not hit:
+                    raw = canon.get((nd, df))
+                    if raw:
+                        hit = dindex.get((raw, df))
+                if not hit:
+                    # Одно название дефекта: годится, только если оно в каталоге
+                    # единственное. Два совпадения — отказ: вердикт на чужой
+                    # карточке хуже отсутствующего.
+                    cand = dfallback.get(df)
+                    hit = cand if cand and len(cand) == 1 else None
                 field = "defects"
             if not hit:
                 unbound.append({"scope": scope, "key": key, "why": "ссылка не нашлась",

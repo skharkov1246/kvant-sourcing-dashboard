@@ -19,6 +19,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parent.parent
 DICT = ROOT / "dict"
 
@@ -476,8 +478,13 @@ def test_recon_batch_verdicts_are_explicit():
     assert len(tech) >= 40 and len(cont) >= 50
     for x in tech + cont:
         assert x["verdict"]["verdict"] in ALLOWED
-    # Исполнители скептика не получили — все до одного.
-    assert all(c["verdict"]["verdict"] == "угол без скептика" for c in cont)
+    # Исполнители проверены прогоном 21.09.2026: у каждой карточки вердикт из
+    # закрытого словаря, и «угол без скептика» среди них больше не встречается.
+    # Проверка, в которой все карточки хороши, — не проверка: забракованные
+    # обязаны остаться видимыми.
+    assert all(c["verdict"]["verdict"] != "угол без скептика" for c in cont), \
+        "карточка исполнителя осталась без проверки — перенесите вердикты прогона"
+    assert any(c["verdict"]["verdict"] == "опровергнуто" for c in cont)
     # Проверенные утверждения угла не выбрасываются: потерянная проверка хуже
     # отсутствующей, потому что о ней никто не узнает.
     claims = [v for a in rep["tech_angles"] if a["skeptic"]
@@ -545,3 +552,30 @@ def test_standards_check_names_both_sides():
     assert d["not_verified"]
     for x in d["not_verified"]:
         assert str(x.get("why") or "").strip() and str(x.get("affects") or "").strip()
+
+
+def test_verdicts_applied_report_is_complete():
+    """Отчёт переноса вердиктов сходится и не прячет непривязанное.
+
+    Вердикт на чужой карточке хуже отсутствующего: он выдаёт непроверенное за
+    проверенное. Поэтому перенос идёт по точной ссылке, а всё, что не легло,
+    обязано лежать списком — с причиной, а не числом."""
+    p = ROOT / "zip" / "data" / "verdicts_applied.json"
+    if not p.exists():
+        pytest.skip("прогон проверки ещё не переносился")
+    r = json.loads(p.read_text(encoding="utf-8"))
+    assert len(r["unbound"]) == r["unbound_count"]
+    for u in r["unbound"]:
+        assert str(u.get("why") or "").strip(), "непривязанный вердикт без причины"
+
+    # Ограничения проверки заявлены самими скептиками и сохранены дословно:
+    # не названное вслух ограничение — худшая из ошибок, о нём никто не узнает.
+    assert r["overall"], "ни один скептик не заявил, чем и насколько проверял"
+    for o in r["overall"]:
+        assert str(o.get("overall") or "").strip()
+
+    # Привязано ровно столько, сколько карточек в наборах, — ни больше.
+    diag = json.loads((ROOT / "zip" / "data" / "diagnostics_recon.json").read_text(encoding="utf-8"))
+    defects = sum(len(a["defects"]) for a in diag["angles"])
+    assert r["bound"]["defects"] <= defects
+    assert sum(r["by_verdict_defects"].values()) == defects
