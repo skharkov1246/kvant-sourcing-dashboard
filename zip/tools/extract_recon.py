@@ -138,6 +138,46 @@ def claim_tally(angles):
     return dict(sorted(c.items(), key=lambda kv: -kv[1]))
 
 
+def carry_verdicts(out_path, key_fields, items):
+    """Сохранить вердикты, проставленные ПОЗЖЕ отдельным прогоном проверки.
+
+    Разбор владеет содержанием карточки, но не её вердиктом: вердикт ставит
+    скептик, приходящий после, и кладёт zip/tools/apply_verdicts.py. Без этого
+    переноса любая пересборка набора стирала проверку — так 21.09.2026 сборка
+    сайта молча вернула 55 карточек исполнителей в черновик, и счётчик цепочки
+    упал с 42 клеток до 39. Ключ — те же поля, по которым вердикт и привязывался.
+    """
+    if not out_path.exists():
+        return 0
+    try:
+        old_data = json.loads(out_path.read_text(encoding="utf-8"))
+    except Exception:
+        return 0
+    seen = {}
+
+    def walk(node):
+        if isinstance(node, dict):
+            if all(f in node for f in key_fields) and isinstance(node.get("verdict"), dict):
+                v = node["verdict"]
+                if v.get("verdict") not in (NOT_CHECKED, NO_SKEPTIC):
+                    key = tuple(str(node[f]).strip().lower() for f in key_fields)
+                    seen[key] = dict(v)
+            for x in node.values():
+                walk(x)
+        elif isinstance(node, list):
+            for x in node:
+                walk(x)
+
+    walk(old_data)
+    moved = 0
+    for it in items:
+        key = tuple(str(it.get(f, "")).strip().lower() for f in key_fields)
+        if key in seen:
+            it["verdict"] = dict(seen[key])
+            moved += 1
+    return moved
+
+
 def tally(items):
     c = {}
     for it in items:
@@ -163,6 +203,10 @@ def build_dirs(res):
             "gaps": list(r.get("gaps") or []), "dead_ends": list(r.get("dead_ends") or []),
             "skeptic": None,
         })
+    allitems = [x for a in angles for x in a["findings"] + a["companies"]]
+    kept = carry_verdicts(D / "dirs_recon.json", ("name",), allitems)
+    if kept:
+        print(f"  repair_recon.json: перенесено вердиктов прошлой проверки: {kept}")
     by_seg, by_kind = {}, {}
     for a in angles:
         by_seg[a["segment_title"]] = by_seg.get(a["segment_title"], 0) + len(a["findings"])
@@ -227,6 +271,10 @@ def build_repair(res):
 
     alltech = [t for a in tech_angles for t in a["technologies"]]
     allcont = [c for a in cont_angles for c in a["contractors"]]
+    kept = (carry_verdicts(D / "repair_recon.json", ("name",), allcont)
+            + carry_verdicts(D / "repair_recon.json", ("name",), alltech))
+    if kept:
+        print(f"  repair_recon.json: перенесено вердиктов прошлой проверки: {kept}")
     own = [c for c in allcont if str(c.get("own_production") or "").strip()
            and not re.match(r"^\s*(нет|не\b|не подтвержд)", str(c["own_production"]), re.I)]
     return {
@@ -292,6 +340,9 @@ def build_subs(res):
 
     allchains = [c for s in segs for c in s["chains"]]
     allrules = [r for s in segs for r in s["rules"]]
+    kept = carry_verdicts(D / "subsupplier_recon.json", ("oem", "format"), allrules)
+    if kept:
+        print(f"  subsupplier_recon.json: перенесено вердиктов прошлой проверки: {kept}")
     direct = [c for c in allchains if re.match(r"^\s*да", str(c.get("buyable_direct") or ""), re.I)]
     return {
         "generated": date.today().isoformat(),
