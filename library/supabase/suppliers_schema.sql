@@ -231,7 +231,13 @@ create table if not exists our_entity (
 --    а исходное остаётся читаемым. Следующий импорт корректировку не трогает;
 --    при противоречии пишется строка в sup_review, и до разбора эффективным
 --    остаётся подтверждённое человеком.
-create or replace view sup_effective with (security_invoker = true) as
+-- Уронить перед созданием — по той же причине, что у sup_quote_price ниже:
+-- «create or replace view» отказывается менять состав колонок в середине,
+-- и делает это ТОЛЬКО там, где вид уже стоит, то есть на живой базе.
+-- Гранты этот же файл выдаёт заново ниже (revoke/grant по sup_effective),
+-- поэтому drop их не уносит.
+drop view if exists sup_effective;
+create view sup_effective with (security_invoker = true) as
 select f.subject_kind,
        f.subject_id,
        f.field,
@@ -408,8 +414,18 @@ begin
     raise notice 'lib_prices или sup_identifier нет — вид sup_quote_price пропущен';
     return;
   end if;
+  -- СНАЧАЛА УРОНИТЬ, ПОТОМ СОЗДАТЬ. «create or replace view» разрешает лишь
+  -- ДОПИСАТЬ колонки в конец: изменить состав в середине он отказывается —
+  -- «cannot change name of view column "price" to "oem"». На чистой базе этого
+  -- не видно никогда, потому что вида ещё нет, — зелены и preflight, и гейт,
+  -- а падает ровно живая база, где вид уже стоит. Проверено 21.09.2026
+  -- прогоном «схема main, поверх неё новая»: psql вернул 3, вид остался
+  -- прежним. Тот же приём уже применён к lib_demand_catalog в schema_junk.sql.
+  --
+  -- Грантов на виде нет (только владельца), поэтому drop ничего не уносит.
+  execute $v$ drop view if exists sup_quote_price $v$;
   execute $v$
-    create or replace view sup_quote_price with (security_invoker = true) as
+    create view sup_quote_price with (security_invoker = true) as
     select p.id,
            p.rfq_id,
            p.rfq_company,
