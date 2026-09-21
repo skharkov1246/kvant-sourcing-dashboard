@@ -201,16 +201,17 @@ def test_вид_связывает_цену_кп_с_компанией_реес�
             # ради которой тест написан.
             cur.execute("""
                 insert into lib_prices (item_name, price, currency, qty, rfq_id,
-                                        rfq_company, lead_days, source, feed, confidence)
+                                        rfq_company, lead_days, source, feed, confidence,
+                                        oem, rfq_brands)
                 values ('Подшипник',  1200.50, 'EUR', 10, '11', '4242', 42,
-                        'КП', 'разбор КП', 'med'),
+                        'КП', 'разбор КП', 'med', 'Придуманный завод', '7,8'),
                        ('Уплотнение',  850.00, 'EUR',  4, '12', null,  null,
-                        'КП', 'разбор КП', 'low'),
+                        'КП', 'разбор КП', 'low', null, null),
                        ('Чужая цена',      99, 'RUB',  1, null, null,  null,
-                        'прайс', 'каталог ODM', 'med')""")
+                        'прайс', 'каталог ODM', 'med', null, null)""")
 
-            cur.execute("select item_name, supplier_number, supplier_name, lead_days "
-                        "from sup_quote_price order by item_name")
+            cur.execute("select item_name, supplier_number, supplier_name, lead_days, "
+                        "oem, rfq_brands from sup_quote_price order by item_name")
             строки = cur.fetchall()
 
             # Только котировки: цена из каталога сюда не попадает.
@@ -222,6 +223,13 @@ def test_вид_связывает_цену_кп_с_компанией_реес�
             # Цена без поставщика НЕ теряется: скрыть её значило бы потерять
             # цифру, которая есть.
             assert строки[1][1] is None and строки[1][2] is None
+            # Изготовитель и бренд доезжают до вида. Без них вопрос «что этот
+            # поставщик котирует и по чьему оборудованию» требовал бы второго
+            # запроса прямо в lib_prices — то есть вид отвечал бы на половину.
+            assert строки[0][4] == "Придуманный завод"
+            assert строки[0][5] == "7,8"
+            # Отсутствие не выдумывается: у второй строки их нет.
+            assert строки[1][4] is None and строки[1][5] is None
     finally:
         with conn.cursor() as cur:
             cur.execute(f"drop schema if exists {ИМЯ_ЦЕНЫ} cascade")
