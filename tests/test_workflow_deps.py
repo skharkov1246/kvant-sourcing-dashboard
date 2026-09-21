@@ -19,6 +19,7 @@ import re
 import sys
 
 import pytest
+import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github" / "workflows"
@@ -88,14 +89,37 @@ def сторонние(путь: pathlib.Path, видели: set[pathlib.Path] |
     return out
 
 
+def _команды(узел) -> str:
+    """Весь текст `run:` внутри job, включая шаги внутри вложенных структур."""
+    куски: list[str] = []
+    if isinstance(узел, dict):
+        for ключ, значение in узел.items():
+            if ключ == "run" and isinstance(значение, str):
+                куски.append(значение)
+            else:
+                куски.append(_команды(значение))
+    elif isinstance(узел, list):
+        куски.extend(_команды(x) for x in узел)
+    return "\n".join(k for k in куски if k)
+
+
 def джобы():
-    """(файл прогона, имя job, текст всех его команд) — по одному на job."""
+    """(файл: job, текст его команд) — ПО КАЖДОЙ работе отдельно.
+
+    Раньше текст брался файлом целиком, пока в каждом прогоне была одна работа.
+    Вторая работа в suppliers-quotes.yml (замер цен) это сломала бы молча:
+    объединённый текст видит «pip install requests …» соседней работы и считает
+    зависимость поставленной, хотя у самой работы её нет. Ровно этот класс ошибки
+    тест и создавался ловить, поэтому делим по работам, а не по файлам.
+    """
     for файл in sorted(WORKFLOWS.glob("*.yml")):
-        текст = файл.read_text(encoding="utf-8")
-        # Грубое, но достаточное деление: у наших прогонов по одному job в файле.
-        # Если появится второй, тест увидит объединённый текст и станет мягче,
-        # а не соврёт в другую сторону.
-        yield файл.name, текст
+        данные = yaml.safe_load(файл.read_text(encoding="utf-8")) or {}
+        работы = данные.get("jobs") or {}
+        if not работы:                       # не наш формат — не молчим, а смотрим целиком
+            yield файл.name, файл.read_text(encoding="utf-8")
+            continue
+        for имя, тело in работы.items():
+            yield f"{файл.name}: {имя}", _команды(тело)
 
 
 @pytest.mark.parametrize("имя,текст", list(джобы()))
@@ -117,3 +141,19 @@ def test_прогон_ставит_то_что_импортирует(имя, т
             assert пакет in ставит or модуль in ставит, (
                 f"{имя}: запускает {относительный}, которому нужен «{пакет}», "
                 f"а pip install его не ставит")
+
+
+def test_имена_работ_только_латиницей():
+    """GitHub принимает в id работы только [A-Za-z_][A-Za-z0-9_-]*.
+
+    Кириллическое имя не даёт понятной ошибки — прогон просто не запускается.
+    То же правило, что для имён переменных в bash (CLAUDE.md, стиль работы):
+    комментарии и названия по-русски, идентификаторы латиницей.
+    """
+    плохие = []
+    for путь in sorted(ROOT.glob(".github/workflows/*.yml")):
+        данные = yaml.safe_load(путь.read_text(encoding="utf-8")) or {}
+        for job in (данные or {}).get("jobs", {}):
+            if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]*", str(job)):
+                плохие.append(f"{путь.name}: {job}")
+    assert not плохие, "нелатинские id работ: " + ", ".join(плохие)

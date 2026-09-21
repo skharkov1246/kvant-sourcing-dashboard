@@ -80,3 +80,28 @@ jobs:
           DAYS: "7300"
           LIMIT: ${{ inputs.limit || '0' }}
         run: python library/indexer.py
+
+  # Замер идёт ОТДЕЛЬНОЙ работой после всех частей: каждая часть знает только
+  # свою долю, а важен итог по базе. Без него прогон отчитывался бы числом
+  # разобранных файлов — а он затевался ради цены, и мерить его надо ценой.
+  # Имя работы латиницей: GitHub принимает в id работы только
+  # [A-Za-z_][A-Za-z0-9_-]* (CLAUDE.md, стиль работы — то же правило, что для
+  # имён переменных в bash).
+  measure:
+    name: Замер цен по базе
+    needs: quotes
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: pip install --quiet psycopg2-binary
+      - name: Что дал разбор в ценах
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python scripts/quote_price_coverage.py
