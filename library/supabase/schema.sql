@@ -440,6 +440,14 @@ alter table lib_prices add column if not exists year     int;
 alter table lib_prices add column if not exists exporter text;
 create index if not exists lib_prices_part on lib_prices (part_id);
 create index if not exists lib_prices_feed on lib_prices (feed);
+-- Цена из разобранного КП поставщика (feed = 'разбор КП'). Срок поставки и
+-- карточка запроса — часть самой котировки: цена без срока не решение о закупке,
+-- а карточка связывает цену с поставщиком, когда реестр до неё дойдёт
+-- (supplier_id разбор не ставит: сопоставление карточки с компанией — отдельный
+-- проход, и выдавать догадку за связь нельзя).
+alter table lib_prices add column if not exists lead_days int;
+alter table lib_prices add column if not exists rfq_id    text;
+create index if not exists lib_prices_rfq on lib_prices (rfq_id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
