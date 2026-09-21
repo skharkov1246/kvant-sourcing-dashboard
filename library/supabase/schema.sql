@@ -596,6 +596,52 @@ select unit_id,
  group by unit_id
 having count(*) >= 20;
 
+-- Расход и стоимость обслуживания: что на машине меняют, как часто и почём.
+-- Звено «ремонтное решение» знало ЧТО делают, но не знало НИ КОГДА, НИ ПОЧЁМ:
+-- 81 операция из 89 без интервала. Здесь и то, и другое — по узлу и по машине.
+--
+-- ЭТО РАСЧЁТ, А НЕ НАШИ СЧЕТА: источник собран по типовым интервалам ТО
+-- изготовителей и нашим ценовым вилкам при 8 000 часов работы в год. Допущение
+-- по часам хранится в строке (hours_year), источник назван расчётом. Смешать
+-- оценку с фактом здесь дешевле всего, а разделить потом — дороже всего.
+--
+-- Цена за единицу и цена за год — разные колонки: годовая получается умножением
+-- на расход (у головки блока восемь штук в год), и подстановка одной вместо
+-- другой завысила бы позицию в восемь раз.
+create table if not exists lib_consumption (
+  id          text primary key,             -- хеш «машина + позиция»: прогон идемпотентен
+  model_id    text references lib_models(id) on delete set null,
+  model_raw   text,                          -- как машина названа в источнике
+  unit_id     text references lib_units(id) on delete set null,
+  name        text not null,
+  qty_year    numeric,                       -- сколько штук в год
+  usd_unit    numeric,                       -- цена за единицу
+  usd_year    numeric,                       -- стоимость в год
+  interval_h  numeric,                       -- интервал замены, моточасы
+  hours_year  numeric,                       -- допущение о наработке, при котором считано
+  note        text,
+  source      text,
+  created_at  timestamptz default now()
+);
+create index if not exists lib_consumption_model on lib_consumption (model_id);
+create index if not exists lib_consumption_unit  on lib_consumption (unit_id);
+
+-- Годовая стоимость содержания по машине: чем она набирается и что в ней главное.
+-- Отвечает на вопрос, который задают первым, когда выбирают между ремонтом и
+-- заменой, и который до сих пор не отвечался вовсе.
+drop view if exists lib_maintenance_cost;
+create or replace view lib_maintenance_cost
+  with (security_invoker = true) as
+select coalesce(m.name, c.model_raw)         as машина,
+       c.model_id                              as ключ_машины,
+       count(*)                                as позиций,
+       round(sum(c.usd_year)::numeric, 0)      as usd_в_год,
+       round(min(c.interval_h)::numeric, 0)    as самый_частый_интервал_ч,
+       max(c.hours_year)                       as при_наработке_ч
+  from lib_consumption c
+  left join lib_models m on m.id = c.model_id
+ group by coalesce(m.name, c.model_raw), c.model_id;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
 --    типовые отказы, взаимозаменяемость. То, без чего нельзя грамотно
@@ -683,6 +729,7 @@ alter table lib_symptom_ops    enable row level security;
 alter table lib_symptom_defects enable row level security;
 alter table lib_defect_ops     enable row level security;
 alter table lib_customs        enable row level security;
+alter table lib_consumption    enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч
