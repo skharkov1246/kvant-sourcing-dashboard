@@ -1,0 +1,47 @@
+"""Проверка наличия и карточка продавца ходят парой.
+
+Сплошной обход — единственный источник, где сказано не «кто делает», а «у кого
+сейчас есть». Ребро ставится на карточку компании, поэтому файл обхода обязан
+быть заведён В ОБОИХ загрузчиках: в load_parts (наличие и цена) и в
+load_suppliers (карточка продавца). Заводя его только в первом, получаешь
+проверки наличия без исполнителя — их некуда привязать, и в выборке «у кого
+есть» они просто не видны. Тест держит эту пару.
+"""
+from __future__ import annotations
+
+import importlib.util
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def load(name: str):
+    spec = importlib.util.spec_from_file_location(
+        f"kvant_{name}", ROOT / "library" / f"{name}.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+lp = load("load_parts")
+ls = load("load_suppliers")
+
+
+def test_каждый_файл_обхода_заведён_и_в_продавцах():
+    источники = {str(s[0]) for s in ls.SOURCES}
+    нет = [путь for путь, _ in lp.SWEEPS if путь not in источники]
+    assert not нет, (
+        "файл проверки наличия не заведён в load_suppliers — продавцы из него "
+        f"карточек не получат, и наличие повиснет без исполнителя: {нет}")
+
+
+def test_файлы_обходов_существуют():
+    """Опечатка в пути не падает, а молча даёт ноль строк: загрузчик читает
+    отсутствующий файл как пустой список. Поэтому путь проверяется здесь."""
+    нет = [путь for путь, _ in lp.SWEEPS if not (ROOT / путь).exists()]
+    assert not нет, f"файла обхода нет в репозитории: {нет}"
+
+
+def test_у_каждого_обхода_названо_происхождение():
+    for путь, откуда in lp.SWEEPS:
+        assert откуда and len(откуда) > 8, f"{путь}: источник цены не назван"
