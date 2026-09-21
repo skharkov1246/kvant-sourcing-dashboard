@@ -66,3 +66,28 @@ def test_сводка_не_печатает_ни_одного_идентифик
     sr.сводка(по)
     напечатано = capsys.readouterr().out
     assert "987654" not in напечатано
+
+
+def test_статистика_хранит_числитель_и_знаменатель_а_не_долю():
+    """Доля не пишется в базу числом: «50 %» из двух и из сорока лягут одинаково."""
+    c = collections.Counter({"sent": 4, "dialog": 2, "selected": 1, "no_answer": 1, "new": 3})
+    st = sr.статистика(c)
+    assert st == {"sent": 8, "answered": 3, "quoted": 1, "silent": 1,
+                  "no_outcome": 4, "cards": 11}
+    assert not any(isinstance(v, float) for v in st.values()), "долей в факте быть не должно"
+
+
+def test_исход_не_зафиксирован_считается_отдельно():
+    """Карточка стоит в «Отправлен»: ни ответа, ни отказа, ни «не ответил в срок»."""
+    st = sr.статистика(collections.Counter({"sent": 5}))
+    assert st["sent"] == 5
+    assert st["answered"] == st["silent"] == 0
+    assert st["no_outcome"] == 5
+
+
+def test_слагаемые_сходятся_с_отправленным():
+    for c in (collections.Counter({"sent": 3, "selected": 2, "no_answer": 1}),
+              collections.Counter({"dialog": 7, "refused": 2}),
+              collections.Counter({"new": 4})):
+        st = sr.статистика(c)
+        assert st["answered"] + st["silent"] + st["no_outcome"] == st["sent"]

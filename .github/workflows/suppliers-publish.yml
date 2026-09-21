@@ -19,6 +19,10 @@ on:
         description: "Записать снимок в KV (иначе вхолостую)"
         type: boolean
         default: false
+      refresh_rfq:
+        description: "Пересчитать отзывчивость поставщиков перед снимком (читает Bitrix, пишет sup_fact)"
+        type: boolean
+        default: false
   # После сведения снимок устаревает. Расписание не ставим: сведение запускается
   # руками, и публиковать по часам нечего — это была бы запись ради записи.
 
@@ -50,7 +54,9 @@ jobs:
           S: ${{ secrets.SUPABASE_DB_URL }}
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
           APPLY: ${{ inputs.apply }}
+          RFQ: ${{ inputs.refresh_rfq }}
         run: |
           set -euo pipefail
           # Имена переменных — латиницей: кириллическое bash за имя не считает
@@ -62,11 +68,26 @@ jobs:
             [ -n "${A:-}" ] || { echo "::error::запись запрошена, но нет CLOUDFLARE_ACCOUNT_ID"; exit 1; }
             echo "секреты Cloudflare на месте"
           fi
+          if [ "$RFQ" = "true" ] && [ -z "${B:-}" ]; then
+            echo "::error::пересчёт отзывчивости запрошен, но нет BITRIX_WEBHOOK_URL"; exit 1
+          fi
 
       - name: Проверки сборки снимка
         # Сборка снимка — чистая функция, и проверяется до обращения к базе.
         # Пропущенная проверка — не пройденная проверка.
         run: python -m pytest tests/test_publish_suppliers.py -q
+
+      # ОТЗЫВЧИВОСТЬ СЧИТАЕТСЯ ПЕРЕД СНИМКОМ, А НЕ ПОСЛЕ. Снимок свеж настолько,
+      # насколько свежи факты под ним: опубликовать вчерашнюю отзывчивость и
+      # назвать это сегодняшним снимком — тот же обман, что цифра без оговорки.
+      # Шаг отдельный и по умолчанию выключен: он читает портал целиком (около
+      # пяти минут) и пишет в sup_fact.
+      - name: Пересчёт отзывчивости поставщиков
+        if: inputs.refresh_rfq
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python scripts/supplier_responsiveness.py --apply
 
       - name: Снимок
         env:

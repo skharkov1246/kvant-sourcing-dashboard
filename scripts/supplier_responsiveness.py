@@ -20,12 +20,16 @@
 карточки (правило 17, репозиторий публичный).
 
     BITRIX_WEBHOOK_URL=… python scripts/supplier_responsiveness.py
+    BITRIX_WEBHOOK_URL=… SUPABASE_DB_URL=… python scripts/supplier_responsiveness.py --apply
 """
 from __future__ import annotations
 
+import argparse
 import collections
+import json
 import os
 import sys
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,7 +69,7 @@ def разложить(карточки: list[dict]) -> dict[int, collections.Co
     return по_компании
 
 
-def сводка(по_компании: dict[int, collections.Counter]) -> None:
+def сводка(по_компании: dict[int, collections.Counter], *, будет_запись: bool = False) -> None:
     без_компании = по_компании.get(0, collections.Counter())
     компании = {cid: c for cid, c in по_компании.items() if cid}
 
@@ -123,10 +127,114 @@ def сводка(по_компании: dict[int, collections.Counter]) -> None:
         print(f"  не ответили ни разу:          {доля(sum(1 for d in доли if d == 0), len(доли))}")
         print(f"  ответили всегда:              {доля(sum(1 for d in доли if d == 1), len(доли))}")
     print()
-    print("Замер, записи не было. Хранение метрики строится после него, а не до.")
+    if not будет_запись:
+        print("Замер, записи не было. Хранение метрики строится после него, а не до.")
+
+
+# ── ЗАПИСЬ В sup_fact ────────────────────────────────────────────────────────
+# ДОЛЯ НЕ ПИШЕТСЯ ЧИСЛОМ. Хранятся числитель и знаменатель; долю считает тот, кто
+# показывает. Иначе «50 %» из двух запросов и из сорока лягут в базу одинаково, и
+# восстановить разницу будет неоткуда.
+МЕТОД = "rfq_stats_by_stage"
+МЕТОД_ВЕРСИЯ = "1"
+ПОЛЕ = "rfq_stats"
+
+# Гейт приёмки: если по твёрдому ключу портала не нашлось почти ничего, значит
+# сведение и замер разошлись, и писать такое в базу нельзя.
+МИН_СОПОСТАВЛЕНО = 0.5
+
+
+def статистика(c: collections.Counter) -> dict:
+    """Счётчики одной компании в том виде, в каком они лягут в sup_fact."""
+    отправлено = sum(v for b, v in c.items() if b not in НЕ_ОТПРАВЛЕН)
+    return {
+        "sent": отправлено,
+        "answered": sum(v for b, v in c.items() if b in ОТВЕТИЛ),
+        "quoted": sum(v for b, v in c.items() if b in ДАЛ_КП),
+        "silent": sum(v for b, v in c.items() if b in МОЛЧАЛ),
+        # Ни ответа, ни отказа, ни отметки «не ответил в срок»: карточка стоит.
+        # Это состояние ведения, и прятать его в знаменателе нельзя.
+        "no_outcome": отправлено - sum(v for b, v in c.items()
+                                       if b in ОТВЕТИЛ or b in МОЛЧАЛ),
+        "cards": sum(c.values()),
+    }
+
+
+def записать(dsn: str, по_компании: dict[int, collections.Counter], run_id: str) -> int:
+    """Одной транзакцией: новые факты, прежние — в superseded."""
+    import psycopg2
+    import psycopg2.extras
+
+    conn = psycopg2.connect(dsn, connect_timeout=20,
+                            options="-c statement_timeout=300000 -c lock_timeout=15000")
+    conn.autocommit = False
+    try:
+        with conn.cursor() as cur:
+            cur.execute("select value, sup_id from sup_identifier "
+                        "where kind = 'bitrix' and status <> 'rejected'")
+            по_ключу = {}
+            for значение, sup_id in cur.fetchall():
+                if str(значение).isdigit():
+                    по_ключу[int(значение)] = sup_id
+
+            строки = []
+            сопоставлено = 0
+            for cid, c in по_компании.items():
+                if not cid:
+                    continue
+                sup_id = по_ключу.get(cid)
+                if not sup_id:
+                    continue
+                st = статистика(c)
+                if not st["sent"]:
+                    continue
+                сопоставлено += 1
+                строки.append((
+                    "entity", sup_id, ПОЛЕ, json.dumps(st, ensure_ascii=False),
+                    "stated", "bitrix", МЕТОД, МЕТОД_ВЕРСИЯ, run_id))
+
+            компаний = sum(1 for cid, c in по_компании.items()
+                           if cid and sum(v for b, v in c.items() if b not in НЕ_ОТПРАВЛЕН))
+            доля_сопоставленных = сопоставлено / max(компаний, 1)
+            print(f"сопоставлено с реестром по ключу портала: "
+                  f"{доля(сопоставлено, компаний)}")
+            if доля_сопоставленных < МИН_СОПОСТАВЛЕНО:
+                raise RuntimeError(
+                    f"гейт не сошёлся: сопоставлено {100 * доля_сопоставленных:.0f} %, "
+                    f"нужно от {100 * МИН_СОПОСТАВЛЕНО:.0f} % — замер и реестр разошлись")
+
+            psycopg2.extras.execute_values(cur, """
+                insert into sup_fact
+                  (subject_kind, subject_id, field, value, status, source_type,
+                   method, method_ver, run_id)
+                values %s""",
+                строки,
+                template="(%s, %s, %s, %s::jsonb, %s, %s, %s, %s, %s)", page_size=500)
+
+            # Прежние факты того же поля — в superseded, а не удалять: история
+            # отзывчивости и есть то, ради чего метрику заводят.
+            cur.execute("""update sup_fact set status = 'superseded'
+                            where field = %s and run_id <> %s and status <> 'superseded'""",
+                        (ПОЛЕ, run_id))
+            устарело = cur.rowcount
+        conn.commit()
+    except Exception as e:                      # noqa: BLE001
+        conn.rollback()
+        print(f"ЗАПИСЬ ОТМЕНЕНА, откат выполнен: {e}", file=sys.stderr)
+        return 4
+    finally:
+        conn.close()
+    print(f"\nЗАПИСАНО, ключ прогона {run_id}: фактов {len(строки)}, "
+          f"прежних помечено superseded {устарело}")
+    return 0
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Отзывчивость поставщиков")
+    parser.add_argument("--apply", action="store_true",
+                        help="записать факты в sup_fact (иначе только замер)")
+    args = parser.parse_args()
+
     url = os.environ.get("BITRIX_WEBHOOK_URL", "")
     if not url:
         print("нет переменной BITRIX_WEBHOOK_URL", file=sys.stderr)
@@ -136,8 +244,15 @@ def main() -> int:
     print("выгрузка карточек запросов (СП-166)…", flush=True)
     карточки = BitrixClient(url).list_items(
         SPA_RFQ, select=["id", "stageId", ПОЛЕ_ПОСТАВЩИКА])
-    сводка(разложить(карточки))
-    return 0
+    по_компании = разложить(карточки)
+    сводка(по_компании, будет_запись=args.apply)
+    if not args.apply:
+        return 0
+    dsn = os.environ.get("SUPABASE_DB_URL", "")
+    if not dsn:
+        print("запись запрошена, но нет SUPABASE_DB_URL", file=sys.stderr)
+        return 2
+    return записать(dsn, по_компании, f"rfq-{int(time.time())}")
 
 
 if __name__ == "__main__":
