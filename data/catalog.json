@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 258,
-    "total_bytes": 115504555,
+    "total_bytes": 115505321,
     "by_sensitivity": {
       "внутреннее": 140,
       "конфиденциально": 68,
@@ -4560,7 +4560,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 125489,
+      "bytes": 126435,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4608,7 +4608,7 @@
       ],
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "fa75daf",
+      "last_commit": "dee43e4",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7340,55 +7340,6 @@
       ]
     },
     {
-      "path": "gt/data/gap_letters.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 44098,
-      "note": "Готовые письма изготовителям по самому дорогому разряду заявки ЛУКОЙЛ — строкам, где нет ни найденной цены, ни экспертной вилки. Замер 21.09.2026: таких строк 681 из 1 642, и по сведению с файлом потребности заказчика (gt/data/budget_join_stats.json) на 439 из них, которые есть в его файле с ценой, лежит 20 367 578 USD бюджета. Главное, что показал прогон: письмо по 445 из этих строк УЖЕ собрано в других пакетах (ship_lists_rfq — 368, письмо одному оператору из seller_index — 217, ship_quote_letters — 6, с пересечениями) и ждёт отправки; новых писем 21 на 111 позиций. Адресат определяется тремя путями, и источник записан по каждому письму. Первый — НАШ шаблон номера из ship_channels.json (Solar 24 позиции, Siemens 17, Pepperl+Fuchs 3, ABB 2); он первый потому, что на турбинных листах столбец «Производитель» заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Второй — столбец заказчика, сведённый с maker_contacts.json (Schlumberger 16, Drillmec 13, Mi Swaco 6, WAGO 2, Finder 1); отказ от него стоил бы пяти писем. Третий и самый слабый — почта изготовителя, записанная нашей же прежней разведкой в наборах репозитория (Wandfluh, HARTING, Transcyko, SCANCON, WIKA, BEKA, Industrie technik, MarFlex, Phoenix Contact, MURR Elektronik, EuroSwitch, Adalet — 27 позиций); такая запись помечена «страница контактов сейчас не перечитывалась» и уверенностью не выше средней. Домен признаётся принадлежащим изготовителю по ЗАКРЫТОМУ правилу — целая метка второго уровня, а не вхождение: проверка на вхождение отправила бы письма чужим компаниям, и это измерено («Argo Hytos» находится в cargocaresolutions.com, «Versa» в universal-thermosensors.co.uk, «NATIONAL Oilwell Varco» в platinum-international.store, «General Monitors» в general-gauges.com, «Johnson Controls» в johnsonturbine.com). Дистрибьютор тем же правилом отсеивается: «drilltechuae» ≠ «Drilltech». Осталось 117 строк, у большинства изготовитель заказчиком назван, но его страницу контактов мы не читали — каждый прочитанный адрес превращает свои строки в письмо тем же прогоном. Ещё 8 строк Danfoss без адреса. В письмах нет ни цены, ни бюджета заказчика, ни его имени. Отправляет письма человек. Читает лист решений gt/tools/ship_decisions.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "ask_rows",
-        "brands_without_address",
-        "gap_rows",
-        "letters",
-        "of_them_already_in_a_letter",
-        "positions_in_letters",
-        "rows_by_attribution_path",
-        "rows_in_letters",
-        "rows_without_address",
-        "source",
-        "unbranded_makers_named_by_customer",
-        "unbranded_rows",
-        "unbranded_sample",
-        "updated",
-        "what_it_is",
-        "what_it_is_not",
-        "what_unbranded_means",
-        "why_pattern_comes_first",
-        "why_two_paths"
-      ],
-      "main_collection": {
-        "key": "unbranded_makers_named_by_customer",
-        "records": 77
-      },
-      "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "fa75daf",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/gap_letters.py",
-        "gt/tools/ship_decisions.py",
-        "tests/test_gap_letters.py"
-      ]
-    },
-    {
       "path": "gpu/data/suppliers.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 43463,
@@ -7445,6 +7396,61 @@
         "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py"
+      ]
+    },
+    {
+      "path": "gt/data/gap_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 43313,
+      "note": "Готовые письма изготовителям по самому дорогому разряду заявки ЛУКОЙЛ — строкам, где нет ни найденной цены, ни экспертной вилки. Замер 21.09.2026: таких строк 580 из 1 642. Найденная цена считается двумя источниками, как в budget_join (перепроверка и поле price сводки заявки со своей валютой); первый прогон читал только первый источник, и 101 строка попадала сюда напрасно — цена по ним записана, продавец назван, а у 63 покрытие количества full, так что письмо «назовите цену» по такой строке было бы потерянным. Письмо по 372 из 580 строк УЖЕ собрано в других пакетах (ship_lists_rfq, письмо одному оператору из seller_index, ship_quote_letters) и ждёт отправки; новых писем 19 на 98 позиций. Адресат определяется тремя путями, источник записан по каждому письму. Первый — НАШ шаблон номера из ship_channels.json; он первый потому, что на турбинных листах столбец «Производитель» заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Второй — столбец заказчика, сведённый с maker_contacts.json (Schlumberger 16 позиций, Drillmec, Mi Swaco, WAGO, Finder); отказ от него стоил бы пяти писем. Третий и самый слабый — почта изготовителя, записанная нашей же прежней разведкой в наборах репозитория (Wandfluh, HARTING, Transcyko, SCANCON, WIKA, BEKA, Industrie technik, MarFlex, Phoenix Contact, MURR Elektronik, EuroSwitch, Adalet); такая запись помечена «страница контактов сейчас не перечитывалась» и уверенностью не выше средней. Домен признаётся принадлежащим изготовителю по ЗАКРЫТОМУ правилу — целая метка второго уровня, а не вхождение: проверка на вхождение отправила бы письма чужим компаниям, и это измерено («Argo Hytos» находится в cargocaresolutions.com, «Versa» в universal-thermosensors.co.uk, «NATIONAL Oilwell Varco» в platinum-international.store, «General Monitors» в general-gauges.com, «Johnson Controls» в johnsonturbine.com). Дистрибьютор тем же правилом отсеивается: «drilltechuae» ≠ «Drilltech». Осталось 104 строки, изготовители названы заказчиком и перечислены в наборе числом строк — каждый прочитанный адрес превращает свои строки в письмо тем же прогоном. В письмах нет ни цены, ни бюджета заказчика, ни его имени. Отправляет письма человек. Читает лист решений gt/tools/ship_decisions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "ask_rows",
+        "brands_without_address",
+        "gap_rows",
+        "letters",
+        "of_them_already_in_a_letter",
+        "positions_in_letters",
+        "rows_by_attribution_path",
+        "rows_in_letters",
+        "rows_without_address",
+        "source",
+        "unbranded_by_maker",
+        "unbranded_rows",
+        "unbranded_rows_without_a_named_maker",
+        "unbranded_sample",
+        "updated",
+        "what_it_is",
+        "what_it_is_not",
+        "what_unbranded_means",
+        "why_pattern_comes_first",
+        "why_two_paths"
+      ],
+      "main_collection": {
+        "key": "unbranded_by_maker",
+        "records": 68,
+        "record_keys": [
+          "maker",
+          "qty",
+          "rows"
+        ]
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "dee43e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/gap_letters.py",
+        "gt/tools/ship_decisions.py",
+        "tests/test_gap_letters.py"
       ]
     },
     {
@@ -11020,6 +11026,50 @@
       ]
     },
     {
+      "path": "gt/data/budget_join_stats.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 2888,
+      "note": "Агрегаты сведения БЮДЖЕТА ЗАКАЗЧИКА с нашей закупкой, построчно посчитанного gt/tools/budget_join.py. Замер 21.09.2026 по файлу потребности от 26.08: 1 479 строк с ценой, 7 678 662 098 руб = 91 027 865 USD, и все 1 479 сошлись с нашей сводкой заявки по каталожному номеру. Разложение по тому, на чём стоит НАША сторона: найденная цена — 513 строк на 43 146 664 USD, только экспертная вилка — 596 на 29 510 423, ничего — 370 на 18 370 778. Найденная цена берётся ДВУМЯ источниками: перепроверкой (перечитана на странице продавца сейчас) и полем price самой сводки заявки со своей валютой. Второй источник сначала игнорировался, и это держало 101 строку в разряде «у нас нет ничего», хотя цена по ним записана и продавец назван, а у 63 покрытие количества full; первая выкладка владельцу поэтому назвала 439 строк и 20 367 578 USD вместо 370 и 18 370 778. Курса нет — строка цены не получает вовсе: «примерно» здесь хуже, чем ничего. Строк, где бюджет заказчика НИЖЕ найденной цены закупки, 74; если брать весь объём по найденной цене, не хватает 642 834 USD, но продавец подтвердил количество лишь у 17 из них, поэтому это верхняя граница. Маржа по строкам с вилкой НЕ считается: вилка это мнение. Здесь только агрегаты — построчная таблица бюджета остаётся вне репозитория вместе с самим файлом заказчика, инструмент отказывается писать её внутрь дерева git. Читает лист решений gt/tools/ship_decisions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "budget_by_our_readiness",
+        "budget_total_usd",
+        "found_price_by_source",
+        "of_them_seller_confirmed_volume",
+        "qty_mismatch_rows",
+        "rate_rub_per_usd",
+        "rows_budget_below_found_price",
+        "rows_joined_to_ask",
+        "rows_with_price",
+        "sheets",
+        "shortfall_usd_if_whole_volume",
+        "source",
+        "updated",
+        "what_it_is",
+        "what_shortfall_means",
+        "why_no_margin_here",
+        "why_qty_mismatch",
+        "why_two_price_sources"
+      ],
+      "main_collection": {
+        "key": "budget_by_our_readiness",
+        "records": 3
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "dee43e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/budget_join.py",
+        "gt/tools/ship_decisions.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_price_substitutions.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 2828,
@@ -11089,48 +11139,6 @@
         "tests/test_demand_collisions.py",
         "zip/customs/glbs_pull.mjs",
         "zip/tools/cat_stock.py"
-      ]
-    },
-    {
-      "path": "gt/data/budget_join_stats.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 2283,
-      "note": "Агрегаты сведения БЮДЖЕТА ЗАКАЗЧИКА с нашей закупкой, построчно посчитанного gt/tools/budget_join.py. Замер 21.09.2026 по файлу потребности от 26.08: 1 479 строк с ценой, 7 678 662 098 руб = 91 027 865 USD, и все 1 479 сошлись с нашей сводкой заявки по каталожному номеру. Разложение по тому, на чём стоит НАША сторона: найденная цена — 404 строки на 40 511 497 USD, только экспертная вилка — 636 на 30 148 790, ничего — 439 на 20 367 578. Строк, где бюджет заказчика НИЖЕ найденной цены закупки, 65; если брать весь объём по найденной цене, не хватает 531 462 USD, но продавец подтвердил количество лишь у 7 из них, поэтому это верхняя граница. Маржа по строкам с вилкой НЕ считается: вилка это мнение. Здесь только агрегаты — построчная таблица бюджета остаётся вне репозитория вместе с самим файлом заказчика, инструмент отказывается писать её внутрь дерева git. Читает лист решений gt/tools/ship_decisions.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "budget_by_our_readiness",
-        "budget_total_usd",
-        "of_them_seller_confirmed_volume",
-        "qty_mismatch_rows",
-        "rate_rub_per_usd",
-        "rows_budget_below_found_price",
-        "rows_joined_to_ask",
-        "rows_with_price",
-        "sheets",
-        "shortfall_usd_if_whole_volume",
-        "source",
-        "updated",
-        "what_it_is",
-        "what_shortfall_means",
-        "why_no_margin_here",
-        "why_qty_mismatch"
-      ],
-      "main_collection": {
-        "key": "budget_by_our_readiness",
-        "records": 3
-      },
-      "last_change": "2026-09-21",
-      "last_author": "skharkov1246",
-      "last_commit": "53efa70",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/budget_join.py",
-        "gt/tools/ship_decisions.py"
       ]
     },
     {
