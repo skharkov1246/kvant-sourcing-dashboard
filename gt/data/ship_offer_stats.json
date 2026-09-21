@@ -1,0 +1,81 @@
+{
+ "updated": "2026-09-18",
+ "source": "Счётчики по заявке: что письменные предложения поставщиков из вложений сделок делают с НАШИМИ вилками. Ни цен, ни привязки цены к артикулу здесь нет и быть не может — это коммерческие данные контрагентов, они остаются в артефакте прогона.",
+ "method": "Предложение сравнивается с вилкой строки заявки (usd_lo, usd_hi в gt/data/ship_lukoil.json). Выше потолка — наша оценка занижена, ниже пола — завышена, внутри — верна. Считает gt/tools/ship_offer.py. Охваты не складываются: это разные заявки.",
+ "scopes": {
+  "Энергосети": {
+   "rows_with_offer": 104,
+   "above_ceiling": 33,
+   "inside_band": 31,
+   "below_floor": 15,
+   "no_band": 25,
+   "request_rows": 1642,
+   "reverified": {
+    "rows": 657,
+    "with_offer": 54,
+    "overstated_confirmed": 12,
+    "understated_confirmed": 17,
+    "band_right": 25,
+    "no_offer": 603
+   },
+   "price_grades": {
+    "values_total": 6619,
+    "prices_by_column": 317,
+    "guesses_last_number_in_row": 6302,
+    "what_it_means": "Ценой считается только значение из колонки «цена» по заголовку. Догадка «последнее число строки» не отброшена из выгрузки, но в счёт денег не идёт: она брала номера позиций и количество."
+   }
+  },
+  "НВН": {
+   "rows_with_offer": 21,
+   "above_ceiling": 1,
+   "inside_band": 4,
+   "below_floor": 4,
+   "no_band": 12,
+   "request_rows": 1642,
+   "reverified": {
+    "rows": 719,
+    "with_offer": 9,
+    "overstated_confirmed": 4,
+    "understated_confirmed": 1,
+    "band_right": 4,
+    "no_offer": 710
+   },
+   "price_grades": {
+    "values_total": 4725,
+    "prices_by_column": 76,
+    "guesses_last_number_in_row": 4649,
+    "what_it_means": "Ценой считается только значение из колонки «цена» по заголовку. Догадка «последнее число строки» не отброшена из выгрузки, но в счёт денег не идёт: она брала номера позиций и количество."
+   },
+   "inside_claim": {
+    "rows_with_address": 757,
+    "price_joined": 6,
+    "value_is_guess": 109,
+    "row_absent_in_parsed_file": 5,
+    "address_outside_this_dump": 637,
+    "what_it_means": "Адрес «цена лежит в нашем вложении» — файловый признак, и он НЕ равен цене по строке. В деньги имеет право идти только price_joined. Остальное — работа: догадка требует открыть файл глазами, отсутствие размеченной строки означает, что разбор эту строку не взял."
+   }
+  },
+  "ЛУКОЙЛ": {
+   "rows_with_offer": 0,
+   "above_ceiling": 0,
+   "inside_band": 0,
+   "below_floor": 0,
+   "no_band": 0,
+   "request_rows": 1642,
+   "reverified": {
+    "rows": 657,
+    "with_offer": 0,
+    "overstated_confirmed": 0,
+    "understated_confirmed": 0,
+    "band_right": 0,
+    "no_offer": 657
+   },
+   "price_grades": {
+    "values_total": 15573,
+    "prices_by_column": 839,
+    "guesses_last_number_in_row": 14734,
+    "what_it_means": "Ценой считается только значение из колонки «цена» по заголовку. Догадка «последнее число строки» не отброшена из выгрузки, но в счёт денег не идёт: она брала номера позиций и количество."
+   }
+  }
+ }
+}

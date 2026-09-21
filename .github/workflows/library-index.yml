@@ -1,0 +1,157 @@
+name: Библиотека — разбор вложений Битрикса
+
+# Сплошной разбор файлов, привязанных к сделкам: номенклатура из спецификаций
+# ложится в Supabase (lib_demand), состояние каждого файла — в lib_files.
+#
+# Вход «reparse» переключает прогон на переразбор уже разобранных файлов новым
+# разборщиком: правки #233 действуют только на новые файлы, а накопленные 9 920
+# файлов xlsx/docx разбирались кодом, терявшим таблицы .docx целиком. Старые
+# строки не удаляются, а помечаются — откат по ключу прогона.
+#
+# Вход «defects» переключает прогон на извлечение дефектов из текстов ТЗ
+# (library/harvest_defects.py): ворота спецификации выбрасывают тендерные
+# документы целиком, а в них написано, что прогорает, трескается и вибрирует.
+# Спрос при этом не трогается — пишется только lib_defects.
+#
+# Вход «source» = rfq переключает источник на карточки запросов поставщикам
+# (СП-166) и берёт только файлы СО СТОРОНЫ ПОСТАВЩИКА. Замер 21.09.2026: в
+# lib_files не было ни одного такого файла — разбор до СП-166 никогда не доходил,
+# а там 5 231 вложение, и это единственное место, где цена вообще есть (на самой
+# карточке сумма равна нулю у всех 21 865). Наш «Request file» не берётся:
+# разобрать его как котировку значит объявить прокотированным свой же запрос.
+#
+# Вход «ocr» переключает прогон на распознавание сканов (library/ocr.py): файлы
+# без текстового слоя скачиваются заново и читаются tesseract. Потоков там
+# меньше — распознавание упирается в процессор, а не в сеть. Без входа «apply»
+# распознавание идёт вхолостую и ничего не пишет.
+# Возобновляемо: повторный запуск пропускает уже разобранное.
+#
+# Только ручной запуск. Работа делится на 12 частей, идущих параллельно; каждая
+# часть берёт свою долю файлов по остатку от деления хеша.
+#
+# ПОЧЕМУ 12, А НЕ 20. Session pooler Supabase допускает 15 одновременных клиентов
+# (FATAL: EMAXCONNSESSION, pool_size 15). При двадцати частях пять падали на
+# подключении. Соединение к тому же больше не удерживается на весь прогон —
+# открывается на время записи и закрывается, — а при занятом пуле часть ждёт
+# и пробует снова, чтобы не потерять уже разобранное.
+#
+# В репозиторий и в артефакты сборки НИЧЕГО не пишется: репозиторий публичный,
+# а артефакты открытого репозитория может скачать кто угодно. Данные идут прямо
+# в базу, в журнал прогона — только агрегаты.
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Откуда брать вложения"
+        type: choice
+        options: ["deals", "rfq"]
+        default: "deals"
+      days:
+        description: "За сколько последних дней брать сделки (или карточки запросов)"
+        default: "365"
+      limit:
+        description: "Ограничение файлов на часть (0 — без ограничения)"
+        default: "0"
+      workers:
+        description: "Потоков скачивания в каждой части"
+        default: "12"
+      ocr:
+        description: "Распознавать сканы (tesseract) вместо обычного разбора"
+        type: boolean
+        default: false
+      apply:
+        description: "Писать результат распознавания в базу (для ocr)"
+        type: boolean
+        default: false
+      reparse:
+        description: "Переразобрать уже разобранные файлы новым разборщиком"
+        type: boolean
+        default: false
+      defects:
+        description: "Извлечь дефекты из текстов ТЗ (не трогает спрос)"
+        type: boolean
+        default: false
+      kinds:
+        description: "Форматы для переразбора"
+        default: "xlsx/docx"
+      retry_failed:
+        description: "Повторить файлы со статусом «не скачался» (сетевая осечка, а не свойство файла)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # ОБЩАЯ ОЧЕРЕДЬ ЧТЕНИЯ ПОРТАЛА. Все прогоны, которые читают Bitrix, стоят в
+  # одной группе и идут по очереди. 21.09.2026 в 08:38 публикация снимка и разбор
+  # вложений запустились одновременно: двенадцать частей разбора плюс сплошное
+  # чтение карточек дали HTTP 429, и портал перестал отвечать обоим. Очередь
+  # дороже по времени, но дешевле, чем упавший прогон и потерянные минуты.
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary
+
+      - name: Установка распознавания (только для ocr)
+        if: inputs.ocr
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-rus poppler-utils
+          tesseract --version | head -1
+
+      - name: Проверка секретов
+        env:
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          S: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — Settings → Secrets → Actions. Брать строку «Session pooler» (порт 5432, хост pooler.supabase.com): прямое подключение работает по IPv6, а раннеры GitHub — по IPv4."; exit 1; }
+          case "$S" in
+            *pooler.supabase.com*) echo "строка подключения через pooler — годится" ;;
+            *) echo "::warning::строка не похожа на Session pooler; прямое подключение к db.<ref>.supabase.co идёт по IPv6 и с раннера GitHub не соединится" ;;
+          esac
+          echo "секреты на месте"
+
+      - name: Разбор части ${{ matrix.shard }}
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SHARDS: "12"
+          SHARD: ${{ matrix.shard }}
+          WORKERS: ${{ inputs.workers }}
+          DAYS: ${{ inputs.days }}
+          LIMIT: ${{ inputs.limit }}
+          SOURCE: ${{ inputs.source }}
+          RETRY_FAILED: ${{ inputs.retry_failed && '1' || '' }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.ocr }}" = "true" ]; then
+            WORKERS=4 python library/ocr.py
+          elif [ "${{ inputs.defects }}" = "true" ]; then
+            python library/harvest_defects.py
+          elif [ "${{ inputs.reparse }}" = "true" ]; then
+            KINDS="${{ inputs.kinds }}" python library/reparse.py
+          else
+            python library/indexer.py
+          fi

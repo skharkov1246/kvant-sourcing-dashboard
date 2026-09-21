@@ -51,6 +51,22 @@ on:
         description: "pull: доп. regex для weak-матчинга (прицельный запрос)"
         default: ""
         type: string
+      recipient:
+        description: "pull: фильтр API по имени получателя (подстрока, напр. ГАМБИТ)"
+        default: ""
+        type: string
+      sender:
+        description: "pull: фильтр API по имени отправителя (подстрока)"
+        default: ""
+        type: string
+      producer:
+        description: "pull: фильтр API по изготовителю (подстрока)"
+        default: ""
+        type: string
+      trademark:
+        description: "pull: фильтр API по товарному знаку (подстрока)"
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -110,6 +126,10 @@ jobs:
           GLBS_PERIOD_FINISH: ${{ inputs.period_finish }}
           GLBS_EXTRA_PN: ${{ inputs.extra_pn }}
           GLBS_EXTRA_RE: ${{ inputs.extra_re }}
+          GLBS_RECIPIENT: ${{ inputs.recipient }}
+          GLBS_SENDER: ${{ inputs.sender }}
+          GLBS_PRODUCER: ${{ inputs.producer }}
+          GLBS_TRADEMARK: ${{ inputs.trademark }}
         run: |
           echo "::add-mask::${GLBS_API_KEY:-}"
           if [ -z "${GLBS_API_KEY:-}" ]; then

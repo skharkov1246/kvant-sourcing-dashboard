@@ -208,3 +208,153 @@ def test_неполные_данные_не_гасят_страницу(tmp_path
     html = out.read_text(encoding="utf-8")
     assert "window.__RENDER_OK__=1" in html          # базовый слой на месте
     assert "if(M[_k]==null) M[_k]=_d" in html        # нормализация данных на месте
+
+
+# ------------------------------------------------------------------ поисковый индекс
+def _index():
+    import json
+    p = ROOT / "data" / "index.json"
+    assert p.exists(), "нет data/index.json — соберите: python scripts/build_index.py"
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
+def test_индекс_не_содержит_персональных_и_ценовых_полей():
+    """Индекс лежит рядом с данными и не должен становиться отдельной выгрузкой."""
+    idx = _index()
+    banned = {"email", "phone", "inn", "price", "val", "custval", "margin", "revenue"}
+    assert banned <= set(idx["excluded_fields"]), "список исключений сузился"
+    # ни одно проиндексированное поле не должно быть из запрещённых
+    assert not (set(idx["indexed_fields"]) & banned)
+
+
+def test_в_индексе_нет_значений_похожих_на_адреса_и_телефоны():
+    """Парт-номера бывают из 10–12 цифр, поэтому «похоже на телефон» проверяем
+    только вне групп pn и hs и только при телефонном оформлении номера."""
+    import re
+    idx = _index()
+    mail = re.compile(r"[^@\s]+@[^@\s]+\.[a-z]{2,}")
+    phone = re.compile(r"^(\+|8|7)[\d\s()-]{10,}$")
+    bad = []
+    for group, values in idx["index"].items():
+        for key in values:
+            if mail.search(key):
+                bad.append(f"{group}: адрес {key}")
+            elif group not in ("pn", "hs") and phone.match(key):
+                bad.append(f"{group}: телефон {key}")
+            if len(bad) > 5:
+                break
+    assert not bad, f"в индекс попали контакты: {bad[:5]}"
+
+
+def test_каждая_ссылка_индекса_ведёт_в_существующий_набор():
+    idx = _index()
+    n = len(idx["files"])
+    for group, values in idx["index"].items():
+        for key, postings in list(values.items())[:200]:
+            for fi, ri in postings:
+                assert 0 <= fi < n, f"{group}:{key} ссылается на набор {fi}, а их {n}"
+                assert ri >= 0
+
+
+def test_поиск_по_индексу_находит_известный_парт_номер():
+    """4380132 — свеча зажигания Cummins, встречается в базе PN и в ценах."""
+    idx = _index()
+    postings = idx["index"]["pn"].get("4380132")
+    assert postings, "известный парт-номер пропал из индекса"
+    paths = {idx["files"][fi]["path"] for fi, _ in postings}
+    assert "gt/data/pn_db.json" in paths
+
+
+def test_индекс_ссылается_только_на_источники_а_не_на_сборочные_копии():
+    idx = _index()
+    copies = [f["path"] for f in idx["files"] if "/public/" in f["path"]]
+    assert not copies, f"в индексе сборочные копии: {copies[:3]}"
+
+
+# ------------------------------------------------------------------ упаковка записей
+def test_упаковка_повторяющихся_записей_сохраняет_содержимое():
+    """Имена полей в JSON повторяются в каждой записи — на живых данных это сотни
+    килобайт. Упаковка обязана быть обратимой без потерь."""
+    import json
+
+    import dashboard
+    rows = [{"id": i, "subj": f"Запрос {i}", "st": "sent"} for i in range(25)]
+    packed = dashboard._pack_records(rows)
+    assert packed["_p"] == 1 and packed["f"] == ["id", "subj", "st"]
+    back = [dict(zip(packed["f"], r)) for r in packed["r"]]
+    assert back == rows
+    assert len(json.dumps(packed, ensure_ascii=False)) < len(json.dumps(rows, ensure_ascii=False))
+
+
+def test_короткий_список_и_разнородный_не_пакуются():
+    import dashboard
+    short = [{"a": 1}] * 5
+    assert dashboard._pack_records(short) is short
+    mixed = [{"a": 1}] * 30 + [7]
+    assert dashboard._pack_records(mixed) is mixed
+
+
+def test_упаковка_не_портит_исходные_метрики():
+    """Тот же словарь метрик уходит в отчёт reports/ — мутировать его нельзя."""
+    import dashboard
+    src = {"sourcersA": [{"id": "1", "details": [{"a": i} for i in range(30)]}]}
+    out = dashboard._pack_metrics(src)
+    assert isinstance(src["sourcersA"][0]["details"], list)          # исходник цел
+    assert out["sourcersA"][0]["details"]["_p"] == 1                 # копия упакована
+
+
+# ── кто заводит запросы ──────────────────────────────────────────────────────
+# Разбор нужен владельцу, чтобы видеть, кто грузит очередь запросов помимо
+# отдела поиска поставщиков. Считается по автору карточки, а не по ответственному.
+
+def _origin():
+    from tests import fixture
+    return fixture.build_metrics()["origin"]
+
+
+def test_происхождение_запросов_разложено_без_потерь():
+    o = _origin()
+    s = o["summary"]
+    assert s["sourcing"] + s["outside"] + s["auto"] == s["total"], (
+        "сумма по источникам разошлась с общим числом запросов")
+    assert sum(d["n"] for d in o["byDept"]) == s["total"], (
+        "сумма по подразделениям разошлась с общим числом запросов")
+
+
+def test_автор_вне_отдела_попадает_в_список_с_подразделением():
+    o = _origin()
+    out = o["outsideCreators"]
+    assert out, "в синтетике есть авторы из смежных отделов, список не должен быть пуст"
+    for c in out:
+        assert not c["src"] and not c["auto"], "в список вне отдела попал сорсер или автоматика"
+        assert c["dept"], f"у автора {c['name']} не указано подразделение"
+        assert c["n"] > 0
+
+
+def test_карточки_без_автора_считаются_автоматикой_а_не_человеком():
+    o = _origin()
+    auto = [c for c in o["byCreator"] if c["auto"]]
+    assert auto, "карточки без автора должны выделяться отдельно"
+    assert o["summary"]["auto"] == sum(c["n"] for c in auto)
+    assert o["summary"]["people"] == len([c for c in o["byCreator"] if not c["auto"]])
+
+
+def test_передача_сорсингу_считается_только_от_заведённых_вне_отдела():
+    o = _origin()
+    s = o["summary"]
+    assert s["handoff"] <= s["outside"], (
+        "передано сорсингу не может превышать число заведённых вне отдела")
+
+
+def test_разбор_не_падает_без_карты_подразделений():
+    """Карта подразделений необязательна: при её отсутствии разбор остаётся,
+    а подразделение помечается как неуказанное."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"])
+    o = m["origin"]
+    assert o["summary"]["total"] == m["kpi"]["total"]
+    assert any(c["dept"] == "подразделение не указано" for c in o["byCreator"])

@@ -1,0 +1,1292 @@
+"""Synthetic records and mocked transports only; no credentials or live data."""
+from contextlib import contextmanager
+import copy
+import importlib.util
+import json
+import re
+from pathlib import Path
+import sys
+
+import pytest
+
+SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+sys.path.insert(0, str(SCRIPTS))
+spec = importlib.util.spec_from_file_location("publisher_v2", SCRIPTS / "publish_library_v2.py")
+p = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(p)
+
+SEGMENTS = [{"id": "s1", "name": "Synthetic equipment", "note": "Test only"},
+            {"id": "s2", "name": "Synthetic other", "note": ""}]
+NOW = "2026-01-01T00:00:00Z"
+
+
+def row(n, segment="s1", managed=True):
+    identity = f"synthetic:{n:06d}"
+    sources = {"kind": p.KINDS[n % 4], "typedfields": {"part_number": f"PN-{n}/A.1"},
+               "references": [{"url": "https://example.test/source", "locator": "Sheet 1"}]}
+    if managed:
+        sources.update(importer_id=identity, publication_approved=True)
+    return {"id": identity, "segment_id": segment, "title": f"Synthetic item {n}", "topic": "QA",
+            "body": "Synthetic full evidence Ω supplier μ\n" + str(n), "sources": sources,
+            "confidence": "med", "updated_at": NOW, "extra_original": {"keep": True}}
+
+
+class CF:
+    def __init__(self, legacy=None):
+        self.values, self.puts, self.reads = {}, [], []
+        self.failure = None
+        if legacy is not None:
+            self.values[p.v1.CURRENT_KEY] = p.encode({"version": 1, "revision": "legacy-r1",
+                "published_at": NOW, "segments": SEGMENTS, "articles": legacy})
+
+    def namespace(self): return "a" * 32
+    def draft_keys(self, namespace): return sorted(k for k in self.values if k.startswith(p.v1.DRAFT_PREFIX))
+    def get(self, namespace, key):
+        self.reads.append(key)
+        return self.values.get(key)
+    def put(self, namespace, key, raw):
+        if self.failure and self.failure(key): raise p.v1.PublishError("SYNTHETIC_WRITE_FAILURE")
+        self.puts.append(key)
+        self.values[key] = raw
+    def verify(self, namespace, key, raw):
+        if self.failure and self.failure("verify:" + key): raise p.v1.PublishError("KV_READBACK_NOT_CONFIRMED")
+        assert self.values.get(key) == raw
+    def preserve(self, namespace, key, raw):
+        old = self.values.get(key)
+        p.v1.require(old is None or old == raw, "HISTORY_REVISION_CONFLICT")
+        if old is None: self.put(namespace, key, raw)
+        self.verify(namespace, key, raw)
+
+
+class DB:
+    def __init__(self, rows):
+        self.rows = rows
+        self.inserts, self.iterated = [], 0
+    def read_segments(self):
+        return copy.deepcopy(SEGMENTS)
+    @contextmanager
+    def stream(self):
+        def source():
+            for r in sorted(self.rows, key=lambda x: x["id"]):
+                self.iterated += 1
+                yield copy.deepcopy(r)
+        yield copy.deepcopy(SEGMENTS), source()
+    def insert_drafts(self, rows):
+        self.inserts.extend(copy.deepcopy(rows))
+        for r in rows:
+            if not any(old["id"] == r["id"] for old in self.rows): self.rows.append(copy.deepcopy(r))
+
+
+def manifest(cf):
+    pointer = p.v1.decode(cf.values[p.CURRENT])
+    store = p.Store(cf, cf.namespace())
+    return store, store.get(pointer["manifest"])
+
+
+def materialized(cf):
+    store, doc = manifest(cf)
+    records = list(p.entries(store, doc["directory"], "directory"))
+    return {r["id"]: p.stored_article(store, r) for r in records}
+
+
+def test_lossless_195_migration_retains_unrelated_and_exact_legacy_history():
+    old = [row(i, managed=i != 194) for i in range(195)]
+    old[194]["sources"] = [{"verbatim": "Do not drop original array"}]
+    old[194]["updated_at"] = "2026-01-01T03:00:00+03:00"
+    cf = CF(old)
+    original_raw = cf.values[p.v1.CURRENT_KEY]
+    result = p.run(DB(old[:194]), cf, NOW)
+    assert result["articles"] == 195
+    assert materialized(cf) == {r["id"]: r for r in old}
+    assert cf.values[p.v1.CURRENT_KEY] == original_raw
+    assert cf.values["library:history:legacy-r1"] == original_raw
+    assert p.v1.CURRENT_KEY not in cf.puts
+    assert len(cf.values[p.CURRENT]) < 1024
+    assert cf.puts[-1] == p.CURRENT
+    _, doc = manifest(cf)
+    assert doc["counts_by_confidence"] == {"med": 195}
+    assert doc["segments"][0]["counts_by_confidence"] == {"med": 195}
+
+
+def test_real_scale_beyond_5000_is_sharded_and_memory_fetch_is_not_whole_document():
+    rows = [row(i, "s1" if i % 2 else "s2") for i in range(5101)]
+    cf, db = CF(), DB(rows)
+    result = p.run(db, cf, NOW)
+    store, doc = manifest(cf)
+    assert result["articles"] == db.iterated == 5101
+    assert len(cf.values[p.CURRENT]) < 1024
+    assert len(list(p.entries(store, doc["directory"], "directory"))) == 5101
+    assert max(len(raw) for key, raw in cf.values.items() if key.startswith(p.PREFIX)) <= p.MAX_VALUE_BYTES
+    assert doc["segments"][0]["article_count"] + doc["segments"][1]["article_count"] == 5101
+    bodies = [p.v1.decode(raw) for key, raw in cf.values.items() if key.startswith(p.PREFIX)
+              and p.v1.decode(raw).get("type") == "articles"]
+    assert len(bodies) == 103  # 50 records per body block, not 5101 HTTP values.
+    assert sum(len(b["items"]) for b in bodies) == 5101
+
+
+def test_noop_and_new_revisions_preserve_old_reachable_bodies():
+    cf, db = CF(), DB([row(1), row(2)])
+    p.run(db, cf, NOW)
+    old_pointer = cf.values[p.CURRENT]
+    old_revision = p.v1.decode(old_pointer)["revision"]
+    writes = len(cf.puts)
+    assert p.run(db, cf, NOW)["changed"] is False
+    assert len(cf.puts) == writes
+    db.rows[0]["body"] += " new observation"
+    assert p.run(db, cf, NOW)["changed"] is True
+    assert cf.values["library:v2:revision:" + old_revision] == old_pointer
+    old_store = p.Store(cf, cf.namespace())
+    old_manifest = old_store.get(p.v1.decode(old_pointer)["manifest"])
+    old_entry = next(p.entries(old_store, old_manifest["directory"], "directory"))
+    assert p.stored_article(old_store, old_entry)["body"] == row(1)["body"]
+
+
+def test_unmanaged_collision_fails_without_current_or_legacy_mutation():
+    cf = CF([row(1, managed=False)])
+    old = dict(cf.values)
+    with pytest.raises(p.v1.PublishError, match="MANAGED_ID_CONFLICT"):
+        p.run(DB([row(1)]), cf, NOW)
+    assert cf.values == old
+
+
+def test_retained_legacy_optional_omissions_remain_exact_and_confidence_bins_literal():
+    old = {k: v for k, v in row(1, managed=False).items() if k in ("id", "segment_id", "title", "body")}
+    cf = CF([old])
+    incoming = [row(2), row(3, "s2")]
+    incoming[0]["confidence"] = "low"
+    incoming[0]["sources"]["review_status"] = "historical_reference_unverified"
+    incoming[1]["confidence"] = "high"
+    p.run(DB(incoming), cf, NOW)
+    assert materialized(cf)[old["id"]] == old
+    store, doc = manifest(cf)
+    assert doc["counts_by_confidence"] == {"high": 1, "low": 1, "med": 1}
+    first = doc["segments"][0]
+    assert first["counts_by_confidence"] == {"low": 1, "med": 1}
+    catalog = list(p.entries(store, first["indexes"]["price"]["catalog"], "catalog"))
+    assert catalog[0]["sources"]["review_status"] == "historical_reference_unverified"
+
+
+@pytest.mark.parametrize("field", ["missing", "hash", "count"])
+def test_previous_shard_corruption_prevents_promotion(field):
+    cf = CF()
+    p.run(DB([row(1)]), cf, NOW)
+    previous = cf.values[p.CURRENT]
+    store, doc = manifest(cf)
+    key = p.PREFIX + doc["directory"]["sha256"]
+    if field == "missing": del cf.values[key]
+    elif field == "hash": cf.values[key] = b"{}"
+    else:
+        node = p.v1.decode(cf.values[key])
+        node["items"] = []
+        bad = store.put(node)
+        doc["directory"] = {**doc["directory"], **bad}
+        pointer = p.v1.decode(previous)
+        pointer["manifest"] = store.put(doc)
+        cf.values[p.CURRENT] = p.encode(pointer)
+        previous = cf.values[p.CURRENT]
+    with pytest.raises(p.v1.PublishError): p.run(DB([]), cf, NOW)
+    assert cf.values[p.CURRENT] == previous
+
+
+def test_midwrite_or_readback_failure_never_promotes():
+    for prefix in (p.PREFIX, "verify:" + p.PREFIX):
+        cf = CF([row(1)])
+        cf.failure = lambda key: key.startswith(prefix)
+        with pytest.raises(p.v1.PublishError): p.run(DB([row(2)]), cf, NOW)
+        assert p.CURRENT not in cf.values
+        assert p.v1.CURRENT_KEY not in cf.puts
+
+
+def test_draft_status_after_db_reread_and_verified_v2_current_only():
+    cf, db = CF(), DB([])
+    draft = row(8)
+    draft["id"] = "draft:12345678-1234-1234-1234-123456789012"
+    draft.pop("extra_original")
+    draft["sources"].pop("importer_id")
+    draft["sources"].pop("publication_approved")
+    key = p.v1.DRAFT_PREFIX + draft["id"]
+    cf.values[key] = p.encode({"version": 1, "status": "pending", "created_at": NOW, "article": draft})
+    result = p.run(db, cf, NOW)
+    assert result["drafts_published"] == 1
+    assert cf.puts.index(p.CURRENT) < cf.puts.index(key)
+    assert p.v1.decode(cf.values[key])["article"] == draft
+    assert p.v1.decode(cf.values[key])["status"] == "published"
+    actual = materialized(cf)[draft["id"]]
+    assert actual["sources"]["origin"] == "portal-owner-draft"
+
+
+def test_draft_db_mismatch_does_not_publish_any_pointer_or_draft():
+    class Missing(DB):
+        def insert_drafts(self, rows): pass
+    cf = CF()
+    draft = row(9)
+    key = p.v1.DRAFT_PREFIX + draft["id"]
+    cf.values[key] = p.encode({"version": 1, "status": "pending", "created_at": NOW, "article": draft})
+    original = cf.values[key]
+    with pytest.raises(p.v1.PublishError, match="DATABASE_READBACK_MISMATCH"):
+        p.run(Missing([]), cf, NOW)
+    assert cf.values[key] == original
+    assert p.CURRENT not in cf.values
+
+
+def test_summary_explicitly_truncates_metadata_but_full_record_and_search_preserve_it():
+    value = row(1)
+    value["sources"]["typedfields"] = {"long": "not-lost-" * 4000}
+    short = p.summary(value)
+    assert short["sources_truncated"] is True
+    assert len(p.encode(short["sources"])) <= p.SUMMARY_SOURCES_BYTES
+    assert "not-lost-" * 4000 in p.search_text(value)
+    cf = CF()
+    p.run(DB([value]), cf, NOW)
+    assert materialized(cf)[value["id"]] == value
+
+
+def test_source_or_article_limits_fail_without_current_not_silent_trim(monkeypatch):
+    monkeypatch.setattr(p, "MAX_ARTICLES", 2)
+    cf = CF()
+    with pytest.raises(p.v1.PublishError, match="ARTICLE_LIMIT"):
+        p.run(DB([row(i) for i in range(3)]), cf, NOW)
+    assert p.CURRENT not in cf.values
+
+
+def test_only_fixed_v2_keys_and_namespace_allowed():
+    cf = p.Cloudflare("a" * 32, "synthetic-token", opener=object())
+    for key in (p.CURRENT, p.PREFIX + "0" * 64, "library:v2:revision:synthetic-1"):
+        assert "%3A" in cf.value_path("b" * 32, key)
+    for key in ("acl:v1", p.PREFIX + "../", "library:v2:revision:../secret"):
+        with pytest.raises(p.v1.PublishError): cf.value_path("b" * 32, key)
+
+
+def test_safe_failure_output_never_raw_values(monkeypatch, capsys):
+    def failure(*a, **k): raise RuntimeError("synthetic-token PRIVATE body")
+    monkeypatch.setattr(p, "Database", failure)
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: CF())
+    assert p.main({}) == 1
+    assert json.loads(capsys.readouterr().out) == {"ok": False, "error": "PUBLISH_FAILED"}
+
+
+def readback_client(values):
+    cf = object.__new__(p.Cloudflare)
+    sequence = iter(values)
+    reads, sleeps, writes = [], [], []
+    def get(namespace, key):
+        reads.append((namespace, key))
+        return next(sequence)
+    cf.get = get
+    cf.sleep = sleeps.append
+    cf.put = lambda namespace, key, raw: writes.append((namespace, key, raw))
+    return cf, reads, sleeps, writes
+
+
+@pytest.mark.parametrize("key,kind", [(p.PREFIX + "a" * 64, "cas_blob"), (p.CURRENT, "current_v2"),
+    ("library:v2:revision:synthetic", "revision_v2"), (p.v1.CURRENT_KEY, "current_v1"),
+    ("library:history:synthetic", "history_v1"), (p.v1.DRAFT_PREFIX + "synthetic", "draft"),
+    ("PRIVATE-unrecognized-key", "other")])
+def test_readback_failure_has_only_fingerprints_and_keeps_exact_six_attempts(key, kind):
+    expected, wrong = b'PRIVATE expected body', b'PRIVATE wrong body'
+    values = [None, wrong, b'', wrong, None, wrong]
+    cf, reads, sleeps, writes = readback_client(values)
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.verify("PRIVATE-namespace", key, expected)
+    failure = caught.value
+    assert str(failure) == "KV_READBACK_NOT_CONFIRMED"
+    assert failure.proof == {"key_kind": kind, "expected": p.value_fingerprint(expected),
+        "attempts": [{"attempt": i + 1, **p.value_fingerprint(value)} for i, value in enumerate(values)],
+        "write_context": {"outcome": "not_observed", "elapsed_ms": None}}
+    assert len(reads) == 6 and sleeps == [2, 5, 15, 30, 30] and sum(sleeps) == 82 and writes == []
+    serialized = json.dumps(failure.proof)
+    assert all(value not in serialized for value in ("PRIVATE", "namespace", key))
+
+
+def test_readback_success_requires_equal_bytes_not_equivalent_json():
+    expected = b'{"value":1}'
+    cf, reads, sleeps, writes = readback_client([b'{ "value": 1 }', expected])
+    cf.verify("synthetic", p.CURRENT, expected)
+    assert len(reads) == 2 and sleeps == [2] and writes == []
+
+
+def test_preserve_does_not_repeat_put_or_overwrite_after_failed_readback():
+    cf, reads, sleeps, writes = readback_client([None] * 7)
+    with pytest.raises(p.KVReadbackError):
+        cf.preserve("synthetic", p.PREFIX + "a" * 64, b'PRIVATE bytes')
+    assert len(reads) == 7 and len(writes) == 1 and sum(sleeps) == 82
+    cf, _, sleeps, writes = readback_client([b'other bytes'])
+    with pytest.raises(p.v1.PublishError, match="HISTORY_REVISION_CONFLICT"):
+        cf.preserve("synthetic", p.PREFIX + "a" * 64, b'PRIVATE bytes')
+    assert writes == sleeps == []
+
+
+def test_uncertain_put_uses_diagnostic_verify_without_another_put():
+    cf, reads, sleeps, _ = readback_client([None] * 6)
+    calls = []
+    cf.value_path = lambda namespace, key: "/synthetic"
+    def envelope(method, path, raw):
+        calls.append(method)
+        raise p.v1.PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+    cf.envelope = envelope
+    with pytest.raises(p.KVReadbackError):
+        p.v1.Cloudflare.put(cf, "synthetic", p.CURRENT, b'PRIVATE expected')
+    assert calls == ["PUT"] and len(reads) == 6 and sum(sleeps) == 82
+
+
+def test_readback_exception_proof_cannot_smuggle_unknown_fields_or_raw_values():
+    fingerprint = p.value_fingerprint(b'synthetic')
+    attempts = [{"attempt": i + 1, **fingerprint} for i in range(6)]
+    for expected in ({**fingerprint, "raw": "PRIVATE"}, {**fingerprint, "sha256": "PRIVATE"},
+                     {**fingerprint, "presence": "PRIVATE"}):
+        with pytest.raises(p.v1.PublishError, match="INVALID_READBACK_PROOF"):
+            p.KVReadbackError("cas_blob", expected, attempts)
+    with pytest.raises(p.v1.PublishError, match="INVALID_READBACK_KIND"):
+        p.KVReadbackError("PRIVATE", fingerprint, attempts)
+
+
+@pytest.mark.parametrize("outcome", ["acknowledged", "transport_uncertain"])
+def test_exact_put_context_is_timed_once_and_reported_without_retry(outcome, monkeypatch):
+    cf, reads, sleeps, _ = readback_client([None] * 6)
+    del cf.put  # Exercise the real diagnostic override, not the fixture stub.
+    cf.value_path = lambda namespace, key: "/synthetic"
+    clock = iter([100.0, 130.25])
+    monkeypatch.setattr(p.time, "monotonic", lambda: next(clock))
+    calls = []
+    def envelope(method, path, raw):
+        calls.append((method, raw))
+        if outcome == "transport_uncertain":
+            raise p.v1.PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+        return {"success": True}
+    cf.envelope = envelope
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.put("PRIVATE namespace", p.CURRENT, b'PRIVATE content')
+        cf.verify("PRIVATE namespace", p.CURRENT, b'PRIVATE content')
+    context = {"outcome": outcome, "elapsed_ms": 30250}
+    if outcome == "transport_uncertain":
+        context.update(reason=None, http_status=None)
+    assert caught.value.proof["write_context"] == context
+    assert calls == [("PUT", b'PRIVATE content')]
+    assert len(reads) == 6 and sum(sleeps) == 82
+    assert "PRIVATE" not in json.dumps(caught.value.proof)
+
+
+@pytest.mark.parametrize("different", ["namespace", "key", "expected"])
+def test_write_context_never_moves_to_a_different_verification(different, monkeypatch):
+    cf, _, _, _ = readback_client([None] * 6)
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    cf.envelope = lambda *args: {"success": True}
+    monkeypatch.setattr(p.time, "monotonic", lambda: 100.0)
+    cf.put("namespace-one", p.CURRENT, b'one')
+    values = {"namespace": "namespace-one", "key": p.CURRENT, "expected": b'one'}
+    values[different] = b'two' if different == "expected" else "different"
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.verify(values["namespace"], values["key"], values["expected"])
+    assert caught.value.proof["write_context"] == {"outcome": "not_observed", "elapsed_ms": None}
+
+
+def test_a_later_failed_put_clears_previous_context_and_preserves_access_error(monkeypatch):
+    cf, _, _, _ = readback_client([None] * 6)
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    cf.envelope = lambda *args: {"success": True}
+    monkeypatch.setattr(p.time, "monotonic", lambda: 1.0)
+    cf.put("synthetic", p.CURRENT, b'one')
+    failure = p.v1.PublishError("CLOUDFLARE_KV_ACCESS_DENIED")
+    def denied(*args): raise failure
+    cf.envelope = denied
+    with pytest.raises(p.v1.PublishError) as caught:
+        cf.put("synthetic", p.CURRENT, b'one')
+    assert caught.value is failure
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.verify("synthetic", p.CURRENT, b'one')
+    assert caught.value.proof["write_context"]["outcome"] == "not_observed"
+
+
+@pytest.mark.parametrize("duration,expected", [(999999, p.MAX_WRITE_ELAPSED_MS), (-1, 0)])
+def test_write_duration_is_bounded(duration, expected, monkeypatch):
+    cf, _, _, _ = readback_client([])
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    cf.envelope = lambda *args: {"success": True}
+    clock = iter([100.0, 100.0 + duration])
+    monkeypatch.setattr(p.time, "monotonic", lambda: next(clock))
+    cf.put("synthetic", p.CURRENT, b'one')
+    assert cf.write_context("synthetic", p.CURRENT, p.value_fingerprint(b'one'))["elapsed_ms"] == expected
+
+
+@pytest.mark.parametrize("context", [{"outcome": "PRIVATE", "elapsed_ms": 1},
+    {"outcome": "acknowledged", "elapsed_ms": True}, {"outcome": "transport_uncertain", "elapsed_ms": -1},
+    {"outcome": "acknowledged", "elapsed_ms": 300001}, {"outcome": "not_observed", "elapsed_ms": 1},
+    {"outcome": "acknowledged", "elapsed_ms": 1, "raw_key": "PRIVATE"}])
+def test_readback_write_context_has_a_closed_safe_shape(context):
+    fingerprint = p.value_fingerprint(b'synthetic')
+    attempts = [{"attempt": i + 1, **fingerprint} for i in range(6)]
+    with pytest.raises(p.v1.PublishError, match="INVALID_WRITE_CONTEXT"):
+        p.KVReadbackError("cas_blob", fingerprint, attempts, context)
+
+
+def published_audit_fixture():
+    cf = CF()
+    p.run(DB([row(1), row(3)]), cf, NOW)
+    cf.puts.clear()
+    cf.reads.clear()
+    return cf
+
+
+def test_audit_current_v2_reads_only_pointer_manifest_pointer_and_never_writes():
+    cf = published_audit_fixture()
+    before = dict(cf.values)
+    pointer = p.v1.decode(cf.values[p.CURRENT])
+    result = p.audit_current(cf)
+    assert result == {"ok": True, "version": 2, "present": True, "articles": 2,
+                      "segments": 2, "scope": "pointer_and_manifest_only"}
+    assert cf.reads == [p.CURRENT, p.PREFIX + pointer["manifest"]["sha256"], p.CURRENT]
+    assert cf.values == before and cf.puts == []
+
+
+def test_audit_v2_corruption_never_falls_back_to_valid_legacy():
+    cf = published_audit_fixture()
+    legacy = CF([row(7)])
+    cf.values[p.v1.CURRENT_KEY] = legacy.values[p.v1.CURRENT_KEY]
+    pointer = p.v1.decode(cf.values[p.CURRENT])
+    cf.values[p.PREFIX + pointer["manifest"]["sha256"]] = b'PRIVATE corrupted value'
+    with pytest.raises(p.v1.PublishError, match="BLOB_INTEGRITY_FAILED"):
+        p.audit_current(cf)
+    assert p.v1.CURRENT_KEY not in cf.reads and cf.puts == []
+
+
+@pytest.mark.parametrize("mutation,error", [
+    (lambda manifest: manifest.update(revision="synthetic-wrong-revision"), "REVISION_MISMATCH"),
+    (lambda manifest: manifest.update(article_count=True), "INVALID_MANIFEST_COUNTS"),
+    (lambda manifest: manifest.update(article_count=3), "INVALID_MANIFEST_COUNTS"),
+    (lambda manifest: manifest["segments"].append(copy.deepcopy(manifest["segments"][0])), "DUPLICATE_SEGMENT_ID")])
+def test_audit_rejects_validly_hashed_but_inconsistent_manifest(mutation, error):
+    cf = published_audit_fixture()
+    pointer = p.v1.decode(cf.values[p.CURRENT])
+    manifest = p.v1.decode(cf.values[p.PREFIX + pointer["manifest"]["sha256"]])
+    mutation(manifest)
+    raw = p.encode(manifest)
+    reference = {"sha256": p.digest(raw), "bytes": len(raw)}
+    cf.values[p.PREFIX + reference["sha256"]] = raw
+    cf.values[p.CURRENT] = p.encode({**pointer, "manifest": reference})
+    with pytest.raises(p.v1.PublishError, match=error):
+        p.audit_current(cf)
+    assert cf.puts == []
+
+
+def test_audit_rejects_changed_current_and_legacy_to_v2_race():
+    cf = published_audit_fixture()
+    original_get = cf.get
+    count = 0
+    def changed_get(namespace, key):
+        nonlocal count
+        if key == p.CURRENT:
+            count += 1
+            if count == 2: return b'changed'
+        return original_get(namespace, key)
+    cf.get = changed_get
+    with pytest.raises(p.v1.PublishError, match="CURRENT_LIBRARY_CHANGED"):
+        p.audit_current(cf)
+    cf = CF([row(3)])
+    original_get, count = cf.get, 0
+    def appeared_get(namespace, key):
+        nonlocal count
+        if key == p.CURRENT:
+            count += 1
+            if count == 2: return b'new-v2-pointer'
+        return original_get(namespace, key)
+    cf.get = appeared_get
+    with pytest.raises(p.v1.PublishError, match="CURRENT_LIBRARY_CHANGED"):
+        p.audit_current(cf)
+    assert cf.puts == []
+
+
+@pytest.mark.parametrize("legacy", [None, [row(3)]])
+def test_audit_legacy_or_empty_state_is_explicit_and_readonly(legacy):
+    cf = CF(legacy)
+    before = dict(cf.values)
+    result = p.audit_current(cf)
+    assert result["version"] == (1 if legacy is not None else None)
+    assert result["present"] is (legacy is not None)
+    assert result["articles"] == (1 if legacy else 0)
+    assert result["scope"] == "pointer_and_manifest_only"
+    assert cf.reads == [p.CURRENT, p.v1.CURRENT_KEY, p.v1.CURRENT_KEY, p.CURRENT]
+    assert cf.values == before and cf.puts == []
+
+
+def test_main_audit_mode_never_constructs_database_or_calls_run(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    def forbidden(*args, **kwargs): pytest.fail("Audit must not open DB or publish")
+    monkeypatch.setattr(p, "Database", forbidden)
+    monkeypatch.setattr(p, "run", forbidden)
+    assert p.main({"LIBRARY_PUBLISH_MODE": "audit"}) == 0
+    output = capsys.readouterr()
+    result = json.loads(output.out)
+    assert result["mode"] == "audit" and result["articles"] == 2 and result["scope"] == "pointer_and_manifest_only"
+    assert output.err == "" and cf.puts == []
+
+
+def test_main_default_has_one_stderr_audit_then_one_final_stdout_failure(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    failing_cf, _, _, _ = readback_client([None] * 6)
+    with pytest.raises(p.KVReadbackError) as caught:
+        failing_cf.verify("PRIVATE-namespace", p.PREFIX + "a" * 64, b'PRIVATE expected card')
+    failure = caught.value
+    order = []
+    original_audit = p.audit_current
+    def audit(cf):
+        order.append("audit")
+        return original_audit(cf)
+    def database(*args):
+        order.append("database")
+        return object()
+    def publish(*args):
+        order.append("publish")
+        raise failure
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    monkeypatch.setattr(p, "audit_current", audit)
+    monkeypatch.setattr(p, "Database", database)
+    monkeypatch.setattr(p, "run", publish)
+    assert p.main({}) == 1
+    output = capsys.readouterr()
+    assert len(output.err.splitlines()) == len(output.out.splitlines()) == 1
+    assert json.loads(output.err) == {"event": "prepublish_audit", "audit": original_audit(cf)}
+    assert json.loads(output.out) == {"ok": False, "error": "KV_READBACK_NOT_CONFIRMED", "readback": failure.proof}
+    assert "PRIVATE" not in output.err + output.out and order == ["audit", "database", "publish"]
+
+
+@pytest.mark.parametrize("mode", ["", "other", "AUDIT", "audit\nPRIVATE"])
+def test_unknown_mode_fails_before_any_external_client(mode, monkeypatch, capsys):
+    def forbidden(*args): pytest.fail("Unknown mode must not construct any client")
+    monkeypatch.setattr(p, "Cloudflare", forbidden)
+    monkeypatch.setattr(p, "Database", forbidden)
+    assert p.main({"LIBRARY_PUBLISH_MODE": mode}) == 1
+    output = capsys.readouterr()
+    assert json.loads(output.out) == {"ok": False, "error": "INVALID_PUBLISH_MODE"}
+    assert output.err == ""
+
+
+@pytest.mark.parametrize("actual", [None, b'wrong', b'known synthetic blob'])
+def test_known_blob_audit_is_a_single_read_without_changing_current(actual):
+    expected = b'known synthetic blob'
+    ref = {"sha256": p.digest(expected), "bytes": len(expected)}
+    cf = published_audit_fixture()
+    if actual is not None:
+        cf.values[p.PREFIX + ref["sha256"]] = actual
+    before = dict(cf.values)
+    result = p.audit_blob(cf, ref)
+    assert result == {"expected": p.value_fingerprint(expected), "observed": p.value_fingerprint(actual),
+                      "match": actual == expected}
+    assert cf.reads == [p.PREFIX + ref["sha256"]] and cf.values == before and cf.puts == []
+
+
+@pytest.mark.parametrize("arguments", [
+    {"LIBRARY_AUDIT_BLOB_SHA256": "a" * 64}, {"LIBRARY_AUDIT_BLOB_BYTES": "1"},
+    {"LIBRARY_AUDIT_BLOB_SHA256": "", "LIBRARY_AUDIT_BLOB_BYTES": ""},
+    {"LIBRARY_AUDIT_BLOB_SHA256": "A" * 64, "LIBRARY_AUDIT_BLOB_BYTES": "1"},
+    {"LIBRARY_AUDIT_BLOB_SHA256": "PRIVATE", "LIBRARY_AUDIT_BLOB_BYTES": "1"},
+    *[{"LIBRARY_AUDIT_BLOB_SHA256": "a" * 64, "LIBRARY_AUDIT_BLOB_BYTES": n}
+      for n in ("0", "-1", "01", "+1", "1.0", "1\n", "4194305", 1, True)]])
+def test_invalid_known_blob_argument_pair_fails_before_external_clients(arguments, monkeypatch, capsys):
+    def forbidden(*args): pytest.fail("Invalid blob arguments must not construct any client")
+    monkeypatch.setattr(p, "Cloudflare", forbidden)
+    monkeypatch.setattr(p, "Database", forbidden)
+    assert p.main({"LIBRARY_PUBLISH_MODE": "audit", **arguments}) == 1
+    output = capsys.readouterr()
+    assert json.loads(output.out) == {"ok": False, "error": "INVALID_BLOB_AUDIT_ARGUMENTS"}
+    assert output.err == ""
+    assert p.blob_audit_spec({}) is None
+
+
+def test_main_known_blob_audit_mode_has_no_database_and_missing_is_not_failure(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    def forbidden(*args): pytest.fail("Readonly audit must not instantiate DB or publish")
+    monkeypatch.setattr(p, "Database", forbidden)
+    monkeypatch.setattr(p, "run", forbidden)
+    arguments = {"LIBRARY_PUBLISH_MODE": "audit", "LIBRARY_AUDIT_BLOB_SHA256": "a" * 64,
+                 "LIBRARY_AUDIT_BLOB_BYTES": "4194304"}
+    assert p.main(arguments) == 0
+    output = capsys.readouterr()
+    result = json.loads(output.out)
+    assert result["ok"] is True and result["articles"] == 2 and result["blob_audit"]["match"] is False
+    assert result["blob_audit"]["observed"]["presence"] == "missing"
+    assert output.err == "" and cf.puts == []
+
+
+def test_main_publishes_after_independent_missing_blob_diagnostic_in_correct_order(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    calls = []
+    original_get = cf.get
+    def get(namespace, key):
+        calls.append(key)
+        return original_get(namespace, key)
+    cf.get = get
+    def database(*args):
+        assert calls[-1] == p.PREFIX + "a" * 64
+        calls.append("database")
+        return object()
+    monkeypatch.setattr(p, "Database", database)
+    monkeypatch.setattr(p, "run", lambda *args: {"ok": True, "synthetic": True})
+    assert p.main({"LIBRARY_AUDIT_BLOB_SHA256": "a" * 64, "LIBRARY_AUDIT_BLOB_BYTES": "1"}) == 0
+    output = capsys.readouterr()
+    events = [json.loads(line) for line in output.err.splitlines()]
+    assert [event["event"] for event in events] == ["prepublish_audit", "blob_audit"]
+    assert events[1]["audit"]["match"] is False and json.loads(output.out)["ok"] is True
+    assert calls[-1] == "database" and cf.puts == []
+
+
+def test_optional_blob_get_error_preserves_safe_code(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    original_get = cf.get
+    def get(namespace, key):
+        if key == p.PREFIX + "a" * 64:
+            raise p.v1.PublishError("CLOUDFLARE_KV_ACCESS_DENIED")
+        return original_get(namespace, key)
+    cf.get = get
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    def forbidden(*args): pytest.fail("Failed GET must not be ignored as a missing blob")
+    monkeypatch.setattr(p, "Database", forbidden)
+    assert p.main({"LIBRARY_AUDIT_BLOB_SHA256": "a" * 64, "LIBRARY_AUDIT_BLOB_BYTES": "1"}) == 1
+    output = capsys.readouterr()
+    assert json.loads(output.out) == {"ok": False, "error": "CLOUDFLARE_KV_ACCESS_DENIED"}
+
+
+@pytest.mark.parametrize("uncertain", [False, True])
+def test_real_http_wrapper_keeps_30_second_timeout_one_put_and_six_gets(uncertain):
+    calls, sleeps = [], []
+    class Response:
+        status = 200
+        raw = b'{"success":true}'
+        headers = {"Content-Length": str(len(raw))}
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def read(self, size): return self.raw
+    class Opener:
+        def open(self, request, timeout):
+            calls.append((request.method, timeout))
+            if request.method == "PUT":
+                if uncertain:
+                    raise TimeoutError("PRIVATE transport error")
+                return Response()
+            raise p.v1.error.HTTPError(request.full_url, 404, "PRIVATE missing response", {}, None)
+    cf = p.Cloudflare("a" * 32, "synthetic-token", opener=Opener(), sleep=sleeps.append)
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.put("b" * 32, p.CURRENT, b'synthetic expected')
+        cf.verify("b" * 32, p.CURRENT, b'synthetic expected')
+    assert calls == [("PUT", 30)] + [("GET", 30)] * 6
+    assert sleeps == [2, 5, 15, 30, 30]
+    assert caught.value.proof["write_context"]["outcome"] == ("transport_uncertain" if uncertain else "acknowledged")
+    assert "PRIVATE" not in json.dumps(caught.value.proof)
+
+
+def private_transport_failure(request, case):
+    import io
+    if type(case) is int:
+        return p.v1.error.HTTPError(request.full_url, case, "PRIVATE HTTP reason",
+            {"X-Private": "PRIVATE header"}, io.BytesIO(b'PRIVATE HTTP error body'))
+    if case == "timeout":
+        return TimeoutError("PRIVATE timeout address")
+    if case == "url_timeout":
+        return p.v1.error.URLError(TimeoutError("PRIVATE wrapped timeout"))
+    if case == "url_error":
+        return p.v1.error.URLError("PRIVATE network host credential")
+    if case == "os_error":
+        return OSError("PRIVATE connection reset")
+    if case == "incomplete":
+        return p.v1.http.client.IncompleteRead(b'PRIVATE partial HTTP body', 100)
+    raise AssertionError("Unknown synthetic case")
+
+
+@pytest.mark.parametrize("case,reason,status", [(429, "http_error", 429), (500, "http_error", 500),
+    (502, "http_error", 502), (503, "http_error", 503), (504, "http_error", 504),
+    ("timeout", "timeout", None), ("url_timeout", "timeout", None),
+    ("url_error", "network_error", None), ("os_error", "network_error", None),
+    ("incomplete", "incomplete_http", None)])
+def test_uncertain_put_keeps_safe_transport_reason_without_body_or_retry(case, reason, status, monkeypatch, capsys):
+    calls, sleeps = [], []
+    class Opener:
+        def open(self, request, timeout):
+            calls.append((request.method, timeout))
+            if request.method == "PUT":
+                raise private_transport_failure(request, case)
+            raise private_transport_failure(request, 404)
+    cf = p.Cloudflare("a" * 32, "synthetic-token", opener=Opener(), sleep=sleeps.append)
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.put("b" * 32, p.PREFIX + "a" * 64, b'PRIVATE expected material')
+    failure = caught.value
+    context = failure.proof["write_context"]
+    assert context["outcome"] == "transport_uncertain"
+    assert context["reason"] == reason and context["http_status"] == status
+    assert type(context["elapsed_ms"]) is int and 0 <= context["elapsed_ms"] <= p.MAX_WRITE_ELAPSED_MS
+    assert calls == [("PUT", 30)] + [("GET", 30)] * 6 and sleeps == [2, 5, 15, 30, 30]
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: CF())
+    monkeypatch.setattr(p, "Database", lambda *args: object())
+    def fail(*args): raise failure
+    monkeypatch.setattr(p, "run", fail)
+    assert p.main({}) == 1
+    output = capsys.readouterr()
+    assert json.loads(output.out)["readback"]["write_context"] == context
+    assert all(private not in output.out + output.err for private in
+               ("PRIVATE", "synthetic-token", "X-Private", "api.cloudflare.com", "a" * 32, "b" * 32))
+
+
+@pytest.mark.parametrize("case,reason,status", [(429, "http_error", 429), (500, "http_error", 500),
+    ("timeout", "timeout", None), ("url_error", "network_error", None),
+    ("incomplete", "incomplete_http", None)])
+def test_get_only_transport_failure_has_no_put_context_and_retains_retries(case, reason, status):
+    calls, sleeps = [], []
+    class Opener:
+        def open(self, request, timeout):
+            calls.append((request.method, timeout))
+            raise private_transport_failure(request, case)
+    cf = p.Cloudflare("a" * 32, "synthetic-token", opener=Opener(), sleep=sleeps.append)
+    with pytest.raises(p.v1.PublishError) as caught:
+        cf.verify("b" * 32, p.CURRENT, b'expected')
+    assert str(caught.value) == "CLOUDFLARE_RETRIES_EXHAUSTED"
+    assert not isinstance(caught.value, p.KVReadbackError)
+    assert caught.value.transport_reason == reason and caught.value.transport_http_status == status
+    assert calls == [("GET", 30)] * 3 and sleeps == [2, 5]
+    assert cf.write_context("b" * 32, p.CURRENT, p.value_fingerprint(b'expected')) == {
+        "outcome": "not_observed", "elapsed_ms": None}
+
+
+def test_transport_reason_is_not_copied_from_another_put_or_retained_after_ack(monkeypatch):
+    cf, _, _, _ = readback_client([b'one'] + [None] * 6)
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    monkeypatch.setattr(p.time, "monotonic", lambda: 100.0)
+    failure = p.v1.PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+    failure.transport_reason, failure.transport_http_status = "http_error", 429
+    def uncertain(*args): raise failure
+    cf.envelope = uncertain
+    cf.put("synthetic", p.CURRENT, b'one')
+    assert cf.write_context("synthetic", p.CURRENT, p.value_fingerprint(b'one'))["http_status"] == 429
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.verify("other-namespace", p.CURRENT, b'one')
+    assert caught.value.proof["write_context"] == {"outcome": "not_observed", "elapsed_ms": None}
+    cf.envelope = lambda *args: {"success": True}
+    cf.put("synthetic", p.CURRENT, b'one')
+    assert cf.write_context("synthetic", p.CURRENT, p.value_fingerprint(b'one')) == {
+        "outcome": "acknowledged", "elapsed_ms": 0}
+
+
+@pytest.mark.parametrize("reason,status", [("PRIVATE", 500), ("http_error", 403),
+    ("http_error", True), ("http_error", "500"), (["timeout"], None)])
+def test_untrusted_transport_detail_attributes_are_discarded(reason, status):
+    cf, _, _, _ = readback_client([None] * 6)
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    failure = p.v1.PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+    failure.transport_reason, failure.transport_http_status = reason, status
+    def uncertain(*args): raise failure
+    cf.envelope = uncertain
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.put("synthetic", p.CURRENT, b'one')
+    context = caught.value.proof["write_context"]
+    assert context["reason"] is context["http_status"] is None
+    assert "PRIVATE" not in json.dumps(context)
+
+
+@pytest.mark.parametrize("context", [
+    {"outcome": "acknowledged", "elapsed_ms": 1, "reason": "timeout", "http_status": None},
+    {"outcome": "not_observed", "elapsed_ms": None, "reason": None, "http_status": None},
+    {"outcome": "transport_uncertain", "elapsed_ms": 1, "reason": "PRIVATE", "http_status": None},
+    {"outcome": "transport_uncertain", "elapsed_ms": 1, "reason": "timeout", "http_status": 500},
+    {"outcome": "transport_uncertain", "elapsed_ms": 1, "reason": "http_error", "http_status": 404}])
+def test_safe_transport_reason_and_status_cannot_be_added_to_wrong_outcome(context):
+    fingerprint = p.value_fingerprint(b'synthetic')
+    attempts = [{"attempt": i + 1, **fingerprint} for i in range(6)]
+    with pytest.raises(p.v1.PublishError, match="INVALID_WRITE_CONTEXT"):
+        p.KVReadbackError("cas_blob", fingerprint, attempts, context)
+
+
+def test_source_bundle_has_named_server_cursor_and_readonly_transaction():
+    source = (SCRIPTS / "publish_library_v2.py").read_text()
+    assert 'name="private_library_v2"' in source
+    assert '"articles_fetch", cursor.fetchmany, 50' in source
+    assert "LIMIT 250001" in p.ORDERED_SQL
+    assert "COLLATE \"C\"" in p.ORDERED_SQL
+
+
+def test_actual_database_session_uses_readonly_snapshot_and_50_row_fetches():
+    records = []
+    for n in range(102):
+        r = row(n)
+        records.append(tuple(r[k] for k in ("segment_id", "title", "topic", "body", "sources", "confidence", "updated_at")))
+    class Cursor:
+        def __init__(self, named): self.named, self.offset, self.calls = named, 0, []
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def close(self): pass
+        def execute(self, sql, params=None): self.calls.append((sql, params))
+        def fetchmany(self, size):
+            if not self.named: return [(x["id"], x["name"], x["note"]) for x in SEGMENTS]
+            if self.named == "private_library_relations":
+                assert size == 50
+                return []
+            assert size == 50
+            result = records[self.offset:self.offset + size]; self.offset += len(result)
+            return result
+    class Connection:
+        def __init__(self): self.cursors, self.session, self.rollbacks, self.closed = [], None, 0, False
+        def set_session(self, **kwargs): self.session = kwargs
+        def cursor(self, name=None):
+            cursor = Cursor(name); self.cursors.append(cursor); return cursor
+        def rollback(self): self.rollbacks += 1
+        def close(self): self.closed = True
+    connection = Connection()
+    class Driver:
+        @staticmethod
+        def parse_dsn(dsn): return {"host": f"db.{p.v1.PROJECT_REF}.supabase.co", "user": "postgres", "password": "synthetic"}
+        @staticmethod
+        def connect(**kwargs):
+            assert kwargs["sslmode"] == "require" and kwargs["connect_timeout"] == 10
+            assert "default_transaction_read_only=on" in kwargs["options"]
+            return connection
+    db = p.Database("synthetic", driver=Driver)
+    with db.stream() as (segments, stream):
+        assert segments == SEGMENTS
+        assert len(list(stream)) == 102
+    assert connection.session == {"readonly": True, "autocommit": False, "isolation_level": "REPEATABLE READ"}
+    assert connection.cursors[1].named == "private_library_relations"
+    assert connection.cursors[1].calls == [(p.RELATIONS_SQL, (p.v1.MANAGER, p.MAX_RELATION_EDGES + 1,
+                                                          p.v1.MANAGER, p.MAX_RELATION_EDGES + 1))]
+    assert connection.cursors[2].named == "private_library_v2"
+    assert connection.cursors[2].itersize == 50
+    assert connection.cursors[2].calls == [(p.ORDERED_SQL, (p.v1.MANAGER,))]
+    assert connection.rollbacks == 1 and connection.closed
+
+
+class SyntheticDriverFailure(Exception):
+    pgcode = "57014"
+
+
+def diagnostic_database(failing_stage=None, failure=None, fail_cleanup=False):
+    """Driver-operation fixture; external consumer failures remain outside it."""
+    failure = failure or SyntheticDriverFailure("PRIVATE DSN=password BODY SQL text")
+    events = []
+    failed = False
+    def operation(stage):
+        nonlocal failed
+        events.append(stage)
+        if stage == failing_stage:
+            failed = True
+            raise failure
+        if stage == "close" and fail_cleanup and failed:
+            raise RuntimeError("PRIVATE cleanup credential")
+    class Cursor:
+        def __init__(self, name):
+            self.kind = {None: "segments", "private_library_relations": "relations",
+                         "private_library_v2": "articles"}[name]
+            self.offset = 0
+        def execute(self, sql, params=None):
+            operation(self.kind + "_execute")
+        def fetchmany(self, size):
+            operation(self.kind + "_fetch")
+            if self.offset:
+                return []
+            self.offset += 1
+            if self.kind == "segments":
+                return [(r["id"], r["name"], r["note"]) for r in SEGMENTS]
+            if self.kind == "relations":
+                return []
+            r = row(3)
+            return [tuple(r[k] for k in ("segment_id", "title", "topic", "body", "sources", "confidence", "updated_at"))]
+        def close(self):
+            operation("close")
+    class Connection:
+        def cursor(self, name=None): return Cursor(name)
+        def rollback(self): operation("close")
+        def close(self): operation("close")
+    def connect():
+        operation("connect")
+        return Connection()
+    db = object.__new__(p.Database)
+    db.connect = connect
+    return db, events
+
+
+@pytest.mark.parametrize("stage", sorted(p.DATABASE_STAGES))
+def test_driver_failure_has_only_allowlisted_stage_and_sqlstate(stage, monkeypatch, capsys):
+    db, events = diagnostic_database(stage)
+    with pytest.raises(p.DatabaseReadError) as caught:
+        with db.stream() as (_, rows):
+            list(rows)
+    failure = caught.value
+    assert str(failure) == "DATABASE_READ_FAILED"
+    assert failure.stage == stage and failure.sqlstate == "57014"
+    monkeypatch.setattr(p, "Database", lambda *args: db)
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: CF())
+    def fail(*args, **kwargs): raise failure
+    monkeypatch.setattr(p, "run", fail)
+    assert p.main({}) == 1
+    output = capsys.readouterr().out
+    assert json.loads(output) == {"ok": False, "error": "DATABASE_READ_FAILED", "stage": stage, "sqlstate": "57014"}
+    assert all(private not in output for private in ("PRIVATE", "password", "BODY", "SQL text"))
+    assert stage in events
+
+
+@pytest.mark.parametrize("code,expected", [("42601", "42601"), ("42501", "42501"), ("55P03", "55P03"),
+    ("08006", "08006"), ("PRIVATE body", None), ("ZZ999", None), (None, None)])
+def test_sqlstate_filter_does_not_accept_arbitrary_exception_fields(code, expected):
+    failure = RuntimeError("PRIVATE connection")
+    failure.sqlstate = code
+    diagnostic = p.DatabaseReadError("relations_execute", failure)
+    assert diagnostic.sqlstate == expected
+    assert p.DatabaseReadError("PRIVATE custom stage", failure).stage is None
+    assert p.DatabaseReadError([], failure).stage is None
+
+
+def test_segment_preflight_does_not_open_relation_or_article_cursors():
+    db, events = diagnostic_database()
+    assert db.read_segments() == SEGMENTS
+    assert [event for event in events if event != "close"] == ["connect", "segments_execute", "segments_fetch"]
+    assert events.count("close") == 3
+
+
+@pytest.mark.parametrize("consumer_failure", [p.v1.PublishError("KV_READBACK_NOT_CONFIRMED"),
+    RuntimeError("PRIVATE consumer body")])
+def test_stream_never_relabels_consumer_or_kv_failure_as_database_read(consumer_failure):
+    db, _ = diagnostic_database()
+    with pytest.raises(type(consumer_failure)) as caught:
+        with db.stream():
+            raise consumer_failure
+    assert caught.value is consumer_failure
+
+
+def test_cleanup_preserves_initial_database_failure_and_always_closes_connection():
+    original = SyntheticDriverFailure("PRIVATE query")
+    db, events = diagnostic_database("articles_fetch", original, fail_cleanup=True)
+    with pytest.raises(p.DatabaseReadError) as caught:
+        with db.stream() as (_, rows):
+            list(rows)
+    assert caught.value.stage == "articles_fetch"
+    assert caught.value.sqlstate == "57014"
+    assert events.count("close") >= 4
+
+
+def test_session_setup_error_keeps_primary_sqlstate_if_connection_close_also_fails():
+    events = []
+    class Connection:
+        def set_session(self, **kwargs):
+            events.append(kwargs)
+            raise SyntheticDriverFailure("PRIVATE setup DSN")
+        def close(self):
+            events.append("close")
+            raise RuntimeError("PRIVATE cleanup")
+    class Driver:
+        @staticmethod
+        def connect(**kwargs): return Connection()
+    db = object.__new__(p.Database)
+    db.driver, db.parameters = Driver, {}
+    with pytest.raises(p.DatabaseReadError) as caught:
+        db.read_segments()
+    assert caught.value.stage == "connect"
+    assert caught.value.sqlstate == "57014"
+    assert events == [{"readonly": True, "autocommit": False, "isolation_level": "REPEATABLE READ"}, "close"]
+
+
+def test_run_uses_segment_only_preflight_then_one_complete_relation_snapshot():
+    class CountedDB(RelatedDB):
+        def __init__(self):
+            super().__init__([row(1), row(3)], [relation_projection()])
+            self.segment_reads, self.full_streams = 0, 0
+        def read_segments(self):
+            self.segment_reads += 1
+            return super().read_segments()
+        @contextmanager
+        def stream(self):
+            self.full_streams += 1
+            with super().stream() as result:
+                yield result
+    db = CountedDB()
+    result = p.run(db, CF(), NOW)
+    assert result["ok"] and db.segment_reads == db.full_streams == 1
+
+
+def test_draft_unmanaged_collision_rejected_before_database_insert():
+    old = row(1, managed=False)
+    cf, db = CF([old]), DB([])
+    draft = row(1)
+    key = p.v1.DRAFT_PREFIX + draft["id"]
+    cf.values[key] = p.encode({"version": 1, "status": "pending", "created_at": NOW, "article": draft})
+    with pytest.raises(p.v1.PublishError, match="MANAGED_ID_CONFLICT"):
+        p.run(db, cf, NOW)
+    assert db.inserts == []
+    assert p.CURRENT not in cf.values
+
+
+def relation_projection(**changes):
+    values = {"supplier_db_id": 1, "supplier_id": row(1)["id"],
+              "name": "Synthetic candidate", "edge": {"article_id": row(3)["id"], "position_id": 7,
+              "part_number": "T-007", "source_pointer": "/6"},
+              "target_db_id": 3, "target_id": row(3)["id"],
+              "part_number": "T-007", "evidence": [{"sha256": "a" * 64, "url": "https://example.test/source",
+              "json_pointer": "/6", "repository_path": "zip/data/positions.json"}]}
+    values.update(changes)
+    return tuple(values.values())
+
+
+class RelatedDB(DB):
+    def __init__(self, rows, projection):
+        super().__init__(rows)
+        self.projection = projection
+    @contextmanager
+    def stream(self):
+        with super().stream() as (segments, incoming):
+            relations, metrics = p.supplier_relations(self.projection)
+            yield segments, p.SourceRows(incoming, relations, metrics)
+
+
+@pytest.mark.parametrize("database_ids", [(1, 3), ("1", "3"),
+    ("10000000-0000-0000-0000-000000000001", "20000000-0000-0000-0000-000000000001")])
+def test_exact_candidate_join_preserves_canonical_sources_and_old_snapshot_bytes(database_ids):
+    supplier, component = row(1), row(3)
+    supplier["sources"]["candidate_position_links"] = [relation_projection()[3]]
+    component["sources"]["component_fields"] = {"part_number": "T-007"}
+    original = p.encode([supplier, component])
+    cf = CF([supplier, component])
+    old = cf.values[p.v1.CURRENT_KEY]
+    db = RelatedDB([supplier, component], [relation_projection(
+        supplier_db_id=database_ids[0], target_db_id=database_ids[1])])
+    result = p.run(db, cf, NOW)
+    actual = materialized(cf)
+    assert p.encode(db.rows) == original
+    assert cf.values[p.v1.CURRENT_KEY] == cf.values["library:history:legacy-r1"] == old
+    assert actual[supplier["id"]] == supplier
+    projected = copy.deepcopy(actual[component["id"]])
+    relations = projected["sources"].pop("library_relations")
+    assert projected == component
+    assert relations["producer"] == "publisher-v2"
+    assert relations["candidate_suppliers"][0] == {"article_id": supplier["id"], "name": "Synthetic candidate",
+        "relation_type": "historical_supplier_candidate", "position_id": 7, "part_number": "T-007",
+        "json_pointer": "/6", "source_sha256": "a" * 64, "source_url": "https://example.test/source"}
+    assert result["supplier_relations"] == {"edges": 1, "linked": 1, "missing_target": 0, "missing_evidence": 0, "duplicate_edges": 0}
+    assert p.summary(actual[component["id"]])["sources"]["library_relations"] == relations
+    previous = dict(cf.values)
+    assert p.run(db, cf, NOW)["changed"] is False
+    assert all(cf.values[k] == value for k, value in previous.items())
+
+
+def test_missing_target_or_exact_evidence_never_creates_a_guessed_link():
+    index, metrics = p.supplier_relations([
+        relation_projection(target_db_id=None, target_id=None, part_number=None),
+        relation_projection(evidence=[{"sha256": "a" * 64, "json_pointer": "/wrong"}])])
+    assert index == {}
+    assert metrics == {"edges": 2, "linked": 0, "missing_target": 1, "missing_evidence": 1, "duplicate_edges": 0}
+    # Missing supplier/target in the actual emitted stream cannot be published,
+    # even if a buggy projection claims the target exists.
+    for records in ([row(1)], [row(3)]):
+        cf = CF()
+        with pytest.raises(p.v1.PublishError, match="RELATION_TARGET_NOT_PUBLISHED"):
+            p.run(RelatedDB(records, [relation_projection()]), cf, NOW)
+        assert p.CURRENT not in cf.values
+
+
+@pytest.mark.parametrize("changes,error", [
+    ({"supplier_db_id": "synthetic:000001"}, "INVALID_RELATION_DATABASE_ID"),
+    ({"target_id": "synthetic:other"}, "INVALID_RELATION_TARGET"),
+    ({"part_number": "T-008"}, "RELATION_PART_NUMBER_MISMATCH"),
+    ({"evidence": [{"sha256": "a" * 64, "url": "javascript:bad", "json_pointer": "/6", "repository_path": "zip/data/positions.json"}]}, "INVALID_RELATION_SOURCE_URL")])
+def test_unsafe_or_inconsistent_candidate_projection_fails(changes, error):
+    with pytest.raises(p.v1.PublishError, match=error):
+        p.supplier_relations([relation_projection(**changes)])
+
+
+@pytest.mark.parametrize("field", ["supplier_db_id", "target_db_id"])
+@pytest.mark.parametrize("different_id", [4, "4", "30000000-0000-0000-0000-000000000001"])
+def test_relation_stable_id_collision_does_not_collapse_database_rows(field, different_id):
+    with pytest.raises(p.v1.PublishError, match="RELATION_ID_COLLISION"):
+        p.supplier_relations([relation_projection(), relation_projection(**{field: different_id})])
+
+
+def test_internal_database_identity_canonicalization_is_typed_and_never_a_public_id():
+    assert p.database_identity(1) == p.database_identity("1") == ("bigint", 1)
+    assert p.database_identity(9223372036854775807) == p.database_identity("9223372036854775807")
+    value = p.uuid.UUID("abcdefab-cdef-abcd-efab-cdefabcdefab")
+    assert p.database_identity(value) == p.database_identity(str(value).upper()) == ("uuid", str(value))
+    assert p.database_identity(1) != p.database_identity("00000000-0000-0000-0000-000000000001")
+    with pytest.raises(p.v1.PublishError, match="RELATION_ID_COLLISION"):
+        p.supplier_relations([relation_projection(), relation_projection(
+            supplier_db_id="00000000-0000-0000-0000-000000000001")])
+    index, metrics = p.supplier_relations([relation_projection(),
+        relation_projection(supplier_db_id="1", target_db_id="3")])
+    assert metrics["linked"] == metrics["duplicate_edges"] == 1
+    assert set(index) == {row(3)["id"]}
+    assert index[row(3)["id"]][0]["article_id"] == row(1)["id"]
+    uuid_projection = relation_projection(supplier_db_id=value, target_db_id=str(value).replace("abcdefab-", "12345678-", 1))
+    canonical_projection = relation_projection(supplier_db_id=str(value).upper(), target_db_id=uuid_projection[4])
+    _, metrics = p.supplier_relations([uuid_projection, canonical_projection])
+    assert metrics["linked"] == metrics["duplicate_edges"] == 1
+
+
+@pytest.mark.parametrize("invalid", [None, True, False, 0, -1, 9223372036854775808,
+    1.0, [], {}, "", "0", "-1", "+1", "01", " 1", "1 ", "1.0", "١", "１",
+    "9223372036854775808", "00000000000000000000000000000001", "synthetic:000001"])
+def test_invalid_database_identity_fails_before_current_pointer_write(invalid):
+    with pytest.raises(p.v1.PublishError, match="INVALID_RELATION_DATABASE_ID"):
+        p.database_identity(invalid)
+    cf = CF()
+    with pytest.raises(p.v1.PublishError, match="INVALID_RELATION_DATABASE_ID"):
+        p.run(RelatedDB([row(1), row(3)], [relation_projection(supplier_db_id=invalid)]), cf, NOW)
+    assert p.CURRENT not in cf.values
+    if invalid is not None:
+        with pytest.raises(p.v1.PublishError, match="INVALID_RELATION_DATABASE_ID"):
+            p.run(RelatedDB([row(1), row(3)], [relation_projection(target_db_id=invalid)]), cf, NOW)
+        assert p.CURRENT not in cf.values
+
+
+@pytest.mark.parametrize("limit,error", [("MAX_RELATION_EDGES", "RELATION_EDGE_LIMIT"),
+    ("MAX_COMPONENT_RELATIONS", "COMPONENT_RELATION_LIMIT"), ("MAX_RELATION_BYTES", "RELATION_BYTE_LIMIT")])
+def test_relation_bounds_fail_without_truncation_or_pointer_update(monkeypatch, limit, error):
+    monkeypatch.setattr(p, limit, 0)
+    cf = CF()
+    with pytest.raises(p.v1.PublishError, match=error):
+        p.run(RelatedDB([row(1), row(3)], [relation_projection()]), cf, NOW)
+    assert p.CURRENT not in cf.values
+
+
+def test_relations_never_replace_a_source_owned_field_or_promote_brand_to_supplier():
+    component = row(3)
+    component["sources"]["library_relations"] = {"original": "keep"}
+    before = p.encode(component)
+    cf = CF()
+    with pytest.raises(p.v1.PublishError, match="DERIVED_RELATION_FIELD_CONFLICT"):
+        p.run(RelatedDB([row(1), component], [relation_projection()]), cf, NOW)
+    assert p.encode(component) == before
+    assert p.CURRENT not in cf.values
+    assert "'component'" in p.RELATIONS_SQL and "'supplier'" in p.RELATIONS_SQL
+    assert "LEFT JOIN component_ids t ON t.importer_id=e.link->>'article_id'" in p.RELATIONS_SQL
+    assert "component_ids AS MATERIALIZED" in p.RELATIONS_SQL
+    assert "sources->>'importer_id' AS importer_id" in p.RELATIONS_SQL
+    assert "body" not in p.RELATIONS_SQL
+    assert p.RELATIONS_SQL.count("publication_approved") == 2
+
+
+def test_display_family_dictionary_and_russian_search_remain_in_sync_without_source_rewrite():
+    html = (SCRIPTS.parent / "public" / "library.html").read_text()
+    labels = json.loads(re.search(r"const COMPONENT_FAMILIES=(\{[^\n]+\});", html).group(1))
+    assert labels == p.COMPONENT_FAMILIES
+    qualified = json.loads(re.search(r"const OEM_COMPONENT_FAMILIES=(\{[^\n]+\});", html).group(1))
+    assert qualified == p.OEM_COMPONENT_FAMILIES
+    for name in ("PENTAIR_ACCESSORY_FAMILIES", "PENTAIR_DESCRIPTION_LABELS", "VALVE_FLOW_LABELS"):
+        literal = re.search(r"const " + name + r"=([^\n]+);", html).group(1)
+        assert json.loads(literal) == getattr(p, name)
+    for family, query in (("spherical_roller", "сферический роликовый подшипник"),
+                          ("electric_motor", "электродвигатель")):
+        component = row(3)
+        component["sources"]["component_fields"] = {"part_number": "T-007", "family": family}
+        before = p.encode(component)
+        cf = CF()
+        p.run(DB([component]), cf, NOW)
+        store, doc = manifest(cf)
+        root = doc["segments"][0]["indexes"]["component"]["search"]
+        indexed = list(p.entries(store, root, "search"))
+        assert query in indexed[0]["text"]
+        assert p.encode(materialized(cf)[component["id"]]) == before
+
+
+def test_relation_evidence_rejects_same_pointer_in_a_different_source_file():
+    evidence = [{"sha256": "a" * 64, "url": "https://example.test/source", "json_pointer": "/6",
+                 "repository_path": "zip/data/odm_suppliers.json"}]
+    index, metrics = p.supplier_relations([relation_projection(evidence=evidence)])
+    assert index == {} and metrics["missing_evidence"] == 1
+    assert "'json_pointers' ? (e.link->>'source_pointer')" in p.RELATIONS_SQL
+    assert "r->>'repository_path'='zip/data/positions.json'" in p.RELATIONS_SQL
+
+
+def test_every_relation_edge_is_accounted_for_including_exact_duplicate_observations():
+    projection = [relation_projection(), relation_projection(),
+                  relation_projection(target_db_id=None, target_id=None), relation_projection(evidence=[])]
+    before = p.encode([[str(x) for x in r] for r in projection])
+    index, metrics = p.supplier_relations(projection)
+    assert metrics == {"edges": 4, "linked": 1, "missing_target": 1, "missing_evidence": 1, "duplicate_edges": 1}
+    assert metrics["edges"] == sum(metrics[key] for key in ("linked", "missing_target", "missing_evidence", "duplicate_edges"))
+    assert len(index[row(3)["id"]]) == 1
+    assert p.encode([[str(x) for x in r] for r in projection]) == before
+
+
+def test_explicit_tool_family_is_oem_qualified_never_inferred_from_order_code():
+    fields = {"oem": "Dormer Pramet", "family": "R200", "part_number": "SYNTHETIC-007_"}
+    assert p.known_component_family(fields) == "Твердосплавное центровочное сверло"
+    assert p.known_component_family({**fields, "family": "R7131"}) == "Твердосплавное ступенчатое сверло"
+    assert p.known_component_family({**fields, "family": "R6011"}) == "Твердосплавное сверло для засверливания"
+    assert p.known_component_family({**fields, "oem": "Different OEM"}) == ""
+    assert p.known_component_family({"oem": "Dormer Pramet", "part_number": "R200-SYNTHETIC"}) == ""
+    component = row(3)
+    component["sources"]["component_fields"] = fields
+    component["segment_id"] = "welding"
+    before = p.encode(component)
+    assert "центровочное сверло" in p.search_text(component)
+    assert p.component_type_label(p.summary(component)["sources"], "welding") == p.component_type_label(component["sources"], "welding")
+    assert p.encode(component) == before
+
+
+def test_accessory_flag_prevents_filter_housing_family_from_becoming_product_type():
+    source = {"component_fields": {"oem": "Pentair", "family": "PENTEK SLIM LINE FILTER HOUSINGS",
+                                    "part_number": "SYNTHETIC-007", "is_accessory": True}}
+    assert p.component_type_label(source, "water") == "Принадлежность системы фильтрации"
+    source["component_fields"]["is_accessory"] = None
+    assert p.component_type_label(source, "water") == ""
+
+
+def test_water_types_require_explicit_scope_flags_and_common_description():
+    source = {"component_fields": {"oem": "Pentair", "family": "PENTEK ST SERIES STAINLESS STEEL FILTER HOUSINGS", "is_accessory": True},
+              "typedfields": {"specification": {"catalogue_fields_as_printed": {"DESCRIPTION": "ST Gasket , BUNA-N"}}}}
+    assert p.component_type_label(source, "water") == "Прокладка ST · ST Gasket , BUNA-N"
+    assert p.component_type_label(source, "pumps") == ""
+    source["component_fields"]["family"] = "Unknown family"
+    assert p.component_type_label(source, "water") == ""
+    source["component_fields"].update(family="PENTEK SLIM LINE FILTER HOUSINGS", is_accessory=False)
+    assert p.component_type_label(source, "water") == "Корпус фильтра"
+    source["component_fields"].update(family="PENTEK QUICK-CHANGE FILTRATION SYSTEMS")
+    assert p.component_type_label(source, "water") == ""
+    source["typedfields"]["specification"]["catalogue_fields_as_printed"]["CARTRIDGE COLOR"] = "White"
+    assert p.component_type_label(source, "water") == "Сменный картридж фильтра"
+    source["component_fields"].update(family="Pentek water filtration")
+    source["typedfields"]["specification"]["catalogue_fields_as_printed"] = {"DESCRIPTION": "Thin Film Membrane"}
+    assert p.component_type_label(source, "water") == "Тонкоплёночная мембрана"
+    source["component_fields"].update(family="PENTEK SLIM LINE FILTER HOUSINGS", is_accessory=True)
+    source["typedfields"]["specification"]["catalogue_fields_as_printed"] = {}
+    source["original_record"] = {"catalogue_observations": [{"description": "Viton"}, {"description": "Silicone"}]}
+    assert p.component_type_label(source, "water") == "Принадлежность системы фильтрации"
+
+
+def test_equipment_types_do_not_copy_engineering_parameters_or_guess_missing_families():
+    cases = [({"oem": "Danfoss", "family": "XB51L-1 SB"}, "heat", "Паяный пластинчатый теплообменник"),
+             ({"oem": "Tsurumi", "family": "KTZ"}, "pumps", "Погружной дренажный насос"),
+             ({"oem": "Swagelok", "family": "40GX"}, "valves", "Шаровой кран"),
+             ({"oem": "Grundfos", "part_number": "SYNTHETIC"}, "pumps", "")]
+    for fields, segment, expected in cases:
+        source = {"component_fields": fields, "typedfields": {"specification": {"pressure": None, "orifice_mm": None}}}
+        before = p.encode(source)
+        assert p.component_type_label(source, segment) == expected
+        assert p.encode(source) == before
+    source = {"component_fields": {"oem": "Swagelok"}, "typedfields": {"specification": {"flow_pattern": "three_way_switching"}}}
+    assert p.component_type_label(source, "valves") == "Арматура: трёхходовая переключающая"
+    source["typedfields"]["specification"]["valve_type"] = "ball"
+    assert p.component_type_label(source, "valves") == "Шаровой кран"
+
+
+def test_russian_display_label_search_accepts_yo_and_e_without_rewriting_full_source():
+    component = row(3)
+    component["sources"]["component_fields"] = {"family": "hydraulic_gear_pump", "part_number": "SYNTHETIC"}
+    before = p.encode(component)
+    search = p.search_text(component)
+    assert "шестерённый гидравлический насос" in search
+    assert "шестеренный гидравлический насос" in search
+    assert search.count(component["body"].lower()) == 1
+    assert p.encode(component) == before
+
+
+def test_filter_cartridge_label_does_not_invent_a_water_treatment_application():
+    source = {"component_fields": {"oem": "Pentair", "family": "PENTEK ELPC ELECTROPLATING CARBON CARTRIDGES", "is_accessory": False}}
+    assert p.component_type_label(source, "water") == "Фильтрующий картридж"
+
+
+if __name__ == "__main__":
+    # Synthetic cross-runtime fixture over stdout only, consumed by Node tests.
+    count = int(sys.argv[1]) if len(sys.argv) > 1 else 195
+    cf = CF([row(i, managed=i != 194) for i in range(min(count, 195))])
+    p.run(DB([row(i) for i in range(count) if i != 194]), cf, NOW)
+    print(json.dumps({k: v.decode() for k, v in cf.values.items()}, ensure_ascii=False))

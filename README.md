@@ -65,6 +65,8 @@ SOURCING_MODEL=claude-opus-4-8
 python -m pytest -q                          # тесты ядра
 ruff check .                                 # ошибки кода
 python scripts/build_catalog.py --check      # каталог данных актуален
+python scripts/build_index.py --check        # поисковый индекс актуален
+python scripts/lookup.py 4380132             # где лежит парт-номер
 python scripts/validate_dashboard.py public/index.html   # собранный дашборд годен к деплою
 ```
 
@@ -86,6 +88,8 @@ main.py            CLI-оркестратор + проверка достато�
 tests/             фикстура синтетических данных Bitrix и тесты ядра
 scripts/validate_dashboard.py   проверка собранного HTML перед деплоем
 scripts/build_catalog.py        каталог данных → data/catalog.json
+scripts/build_index.py          поисковый индекс → data/index.json
+scripts/lookup.py               поиск значения по индексу
 ```
 
 ## Этап 2 (не входит в v1)

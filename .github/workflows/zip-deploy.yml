@@ -47,21 +47,11 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          BASIC_AUTH_PASS: ${{ secrets.BASIC_AUTH_PASS }}
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
           npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-zip \
             --production-branch=main 2>/dev/null || true
-          # пароль гейта берём из GitHub-секрета (в репозитории пароля нет).
-          # Пусто — гейт остаётся выключенным, сайт открыт как раньше.
-          if [ -n "${BASIC_AUTH_PASS:-}" ]; then
-            printf '%s' "$BASIC_AUTH_PASS" \
-              | npx --yes wrangler@${WRANGLER_VERSION} pages secret put BASIC_AUTH_PASS --project-name=kvant-zip \
-              || echo "не удалось задать секрет в CI — задайте BASIC_AUTH_PASS в Cloudflare Pages → Settings"
-          else
-            echo "GitHub-секрет BASIC_AUTH_PASS пуст — сайт базы ЗИП остаётся открытым"
-          fi
           # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
           # Автоповтор: Cloudflare изредка отдаёт транзиентную «Failed to publish your Function.
           # Unknown internal error» — повторяем до 3 раз.
@@ -75,3 +65,20 @@ jobs:
             echo "⚠ деплой упал (попытка $i/3) — повтор через 20с…"; sleep 20
           done
           [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }
+
+      - name: Проверка, что сайт видит базу
+        # ЗАЧЕМ ШАГ. Сайт закрыт Cloudflare Access, и снаружи его состояние не
+        # читается: и «/», и «/db/*» отдают 302 на страницу входа. 21.09.2026
+        # ключ Supabase на проекте протух, сайт молча показал «офлайн-копия (нет
+        # связи с БД)», и увидеть это мог только владелец глазами. Теперь это
+        # видит прогон: переменная должна быть в Production, лежать в свежей
+        # выкладке и читать базу.
+        #
+        # Шаг НЕ валит деплой: выкладка уже состоялась, и красить её задним
+        # числом незачем — сайт с офлайн-копией лучше отсутствующего. Отказ
+        # виден предупреждением в сводке прогона.
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python scripts/zip_db_check.py

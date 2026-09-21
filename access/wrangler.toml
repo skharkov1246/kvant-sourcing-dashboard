@@ -1,0 +1,31 @@
+# Конфиг ТЕСТОВОГО контура доступов (отдельный проект Cloudflare Pages).
+# Прод-проект kvant-sourcing-f122 здесь НЕ упоминается намеренно: выкатка контура
+# не должна иметь ни одной строки, способной задеть живой сайт.
+#
+# Развернуть контур в облаке (когда владелец даст добро):
+#   1) npx wrangler pages project create kvant-sourcing-test --production-branch=main
+#   2) npx wrangler kv namespace create ACL_TEST        → id подставить ниже
+#   3) секреты проекта:
+#        npx wrangler pages secret put SIGN_KEY        --project-name=kvant-sourcing-test
+#        npx wrangler pages secret put BASIC_AUTH_PASS --project-name=kvant-sourcing-test
+#        npx wrangler pages secret put RESEND_API_KEY  --project-name=kvant-sourcing-test  # если нужна живая почта
+#   4) собрать статику дашборда в ./dist, положить туда access/_worker.js и access/gate.js,
+#      затем: npx wrangler pages deploy dist --project-name=kvant-sourcing-test
+#
+# До этого весь контур гоняется локально: node access/devserver.mjs
+
+name = "kvant-sourcing-test"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-01-01"
+
+[vars]
+CONTOUR = "test"                 # включает пометку «тестовый контур» и ящик писем
+OWNER_EMAIL = "skharkov@gmail.com"
+BASIC_AUTH_USER = "kvant"
+MAIL_PROVIDER = "log"            # "resend" — когда подключим живую почту
+MAIL_FROM = "dashboard@kvant.local"
+TEST_OUTBOX_OPEN = "1"           # ящик писем контура открыт без входа (ТОЛЬКО для теста)
+
+[[kv_namespaces]]
+binding = "ACL"
+id = "PODSTAVIT_ID_NAMESPACE"    # из шага 2

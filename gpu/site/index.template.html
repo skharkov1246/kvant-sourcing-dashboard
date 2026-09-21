@@ -161,6 +161,34 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div id="fx-out"></div>
 </section>
 
+<section id="t-cover">
+  <h2>Заполняемость базы</h2>
+  <p id="cv-intro"></p>
+  <div class="box info" id="cv-method"></div>
+  <div class="k" id="cv-tiles"></div>
+  <h3>Показатели</h3>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Что считаем</th><th class="num">Есть</th><th class="num">Всего</th><th class="num">%</th>
+    <th>Состояние</th><th>Где дыра и что делать</th>
+  </tr></thead><tbody id="cv-metrics"></tbody></table></div>
+  <h3>Системы двигателя: сколько слоёв закрыто</h3>
+  <p class="mut">Слои: потребность в натуре, семейства аналогов, изготовители узлов, допущенные поставщики.
+  Система считается закрытой, когда собраны все четыре — иначе запрос упирается в отсутствующий слой.</p>
+  <div class="tblwrap"><table class="sortable" id="cv-systab"><thead><tr>
+    <th data-k="name">Система</th><th data-k="demand" class="num">Потребность</th>
+    <th data-k="analogs" class="num">Аналоги</th><th data-k="subsuppliers" class="num">Изготовители</th>
+    <th data-k="suppliers" class="num">Поставщики</th><th data-k="layers" class="num">Слоёв</th>
+    <th data-k="status">Состояние</th>
+  </tr></thead><tbody id="cv-systems"></tbody></table></div>
+  <h3>Машины: разобран ли состав</h3>
+  <p class="mut">Список применяемости — это разобранный каталог изготовителя: по нему видно, какая деталь
+  к какой машине подходит. Там, где его нет, номенклатура собирается по отдельным позициям.</p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Изготовитель</th><th>Машина</th><th class="num">Узлов разобрано</th>
+    <th class="num">Паспорт</th><th>Список применяемости</th>
+  </tr></thead><tbody id="cv-machines"></tbody></table></div>
+</section>
+
 <section id="t-strategy">
   <h2 id="st-title"></h2>
   <div class="box info" id="st-thesis"></div>
@@ -308,6 +336,110 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <p id="pl-intro"></p>
   <div class="card"><h4>Порядок применения</h4><ol id="pl-how"></ol></div>
   <div id="pl-lists"></div>
+</section>
+
+<section id="t-overhaul">
+  <h2>Капитальный ремонт</h2>
+  <p class="mut" id="oh-src"></p>
+  <div class="k" id="oh-tiles"></div>
+  <div class="box info" id="oh-machine"></div>
+  <div class="box warn" id="oh-caveat"></div>
+
+  <h3>Объём работ по этапам</h3>
+  <p class="mut">Где этап называется заменой узла, там деньги уходят в ЗИП, а не в труд. Это главное соотношение такого договора.</p>
+  <div class="tblwrap"><table class="sortable"><thead><tr>
+    <th>№</th><th>Тип</th><th>Место</th><th>Чей счёт</th><th>ЗИП</th><th>Содержание</th>
+  </tr></thead><tbody id="oh-stages"></tbody></table></div>
+
+  <h3>Ведомость ЗИП на один двигатель</h3>
+  <div class="tblwrap"><table class="sortable"><thead><tr>
+    <th>Система</th><th>Позиция</th><th>Номер</th><th>Количество</th><th>Строка тендера</th>
+  </tr></thead><tbody id="oh-bom"></tbody></table></div>
+
+  <h3>Та же ведомость с ценой собственного импорта</h3>
+  <p class="mut" id="oh-zp-intro"></p>
+  <div class="k" id="oh-zp-tiles"></div>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Достоверность цены</th><th class="num">Строк</th><th class="num">Сумма, ₽</th><th class="num">Доля ЗИП</th>
+  </tr></thead><tbody id="oh-zp-conf"></tbody></table></div>
+  <div class="tblwrap"><table class="sortable"><thead><tr>
+    <th>Система</th><th>Позиция</th><th>Номер</th><th class="num">Кол-во</th>
+    <th class="num">$ за ед.</th><th class="num">₽ за ед. с ввозом</th><th class="num">Сумма, ₽</th>
+    <th>База</th><th>Достоверность</th>
+  </tr></thead><tbody id="oh-zp"></tbody></table></div>
+
+  <h3>Трудоёмкость</h3>
+  <p class="mut" id="oh-labor-note"></p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Этап</th><th>Ед.</th><th>Количество</th><th>На чём основано</th>
+  </tr></thead><tbody id="oh-labor"></tbody></table></div>
+
+  <h3>Заводские величины</h3>
+  <p class="mut" id="oh-fd-intro"></p>
+  <div class="tblwrap"><table><thead><tr><th>Величина</th><th>Значение</th></tr></thead><tbody id="oh-fd"></tbody></table></div>
+
+  <h3>Ставки, подтверждённые прайсами</h3>
+  <div class="tblwrap"><table><thead><tr><th>Что</th><th>Ставка, ₽</th><th>Достоверность</th></tr></thead><tbody id="oh-rates"></tbody></table></div>
+
+  <h3>База цены: ЗИП считается по импорту</h3>
+  <div class="box warn" id="oh-pb-head"></div>
+  <p id="oh-pb-why"></p>
+  <div class="tblwrap"><table><thead><tr><th>Составляющая ввоза</th><th>Значение</th></tr></thead><tbody id="oh-pb"></tbody></table></div>
+  <div class="box info" id="oh-pb-corr"></div>
+
+  <h3>Цены, которые удалось подтвердить</h3>
+  <div class="box warn" id="oh-transparency"></div>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Позиция</th><th>Оригинал</th><th>Аналог или восстановленное</th><th>Источник</th>
+  </tr></thead><tbody id="oh-anchors"></tbody></table></div>
+
+  <h3>Логистика: как двигатель едет на площадку</h3>
+  <p class="mut" id="oh-lg-intro"></p>
+  <div class="card"><ul id="oh-lg"></ul></div>
+  <div class="tblwrap"><table><thead><tr><th>Ремонтная площадка</th><th>Вывоз и возврат, ₽</th></tr></thead><tbody id="oh-lg-routes"></tbody></table></div>
+  <div class="tblwrap"><table><thead><tr><th>Ставка</th><th>Значение</th><th>Достоверность</th></tr></thead><tbody id="oh-lg-rates"></tbody></table></div>
+  <div class="box info" id="oh-lg-concl"></div>
+
+  <h3>Проверка сверху: ремонт против замены двигателя</h3>
+  <p class="mut" id="oh-mc-intro"></p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Что сравниваем</th><th class="num">$</th><th>Чем подтверждена</th><th>Источник</th>
+  </tr></thead><tbody id="oh-mc"></tbody></table></div>
+  <div class="box warn" id="oh-mc-verdict"></div>
+  <div class="box info" id="oh-mc-lever"></div>
+
+  <h3>Запрос цен: что спрашивать</h3>
+  <p id="oh-rfq-why"></p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>№</th><th>Позиция</th><th>Номера</th><th>На 1 дв.</th><th>На 2 дв.</th><th>Что спросить кроме цены</th>
+  </tr></thead><tbody id="oh-rfq"></tbody></table></div>
+  <div class="chips" id="oh-letter-pick"></div>
+  <div id="oh-letter"></div>
+
+  <h3>Кому отправлять</h3>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Компания</th><th>Страна</th><th>Почему этот адрес</th><th>История в Bitrix</th>
+  </tr></thead><tbody id="oh-addr"></tbody></table></div>
+
+  <h3>Сверка с иностранным рынком: ставки, нормы времени, мануалы</h3>
+  <p class="mut" id="oh-lb-intro"></p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Чья ставка нормо-часа</th><th class="num">$ в час</th><th>Пояснение</th>
+  </tr></thead><tbody id="oh-lb-rates"></tbody></table></div>
+  <div class="box info" id="oh-lb-hours"></div>
+  <div class="tblwrap"><table><thead><tr><th>Что считаем</th><th>Доллары</th></tr></thead><tbody id="oh-lb-rec"></tbody></table></div>
+  <div class="box warn" id="oh-lb-verdict"></div>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Документ Cummins</th><th>Бюллетень</th><th>Доступ</th>
+  </tr></thead><tbody id="oh-lb-man"></tbody></table></div>
+
+  <h3>Риски и чем они снимаются</h3>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Риск</th><th>Чем оборачивается</th><th>Что делать</th>
+  </tr></thead><tbody id="oh-risks"></tbody></table></div>
+
+  <h3>Вопросы заказчику</h3>
+  <div class="card"><ul id="oh-quest"></ul></div>
 </section>
 
 <section id="t-demand">
@@ -537,6 +669,7 @@ const CONSUM   = __CONSUMPTION_JSON__;
 const MARKET   = __MARKET_JSON__;
 const COMPET   = __COMPETITORS_JSON__;
 const STOCK    = __STOCK_JSON__;
+const COVERAGE = __COVERAGE_JSON__;
 const STRATEGY = __STRATEGY_JSON__;
 const TARGETS  = __TARGETS_JSON__;
 const CONSUM_B = __CONSUMABLES_JSON__;
@@ -544,6 +677,7 @@ const MACHINES = __MACHINES_JSON__;
 const RFQPACK  = __RFQPACK_JSON__;
 const GLOSSARY = __GLOSSARY_JSON__;
 const ACLASS   = __ACLASS_JSON__;
+const OVERHAUL = __OVERHAUL_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -553,16 +687,18 @@ const num = n => (n == null || n === "") ? "—" : Number(n).toLocaleString("ru-
 const usd = n => (n == null || n === "") ? "—" : "$" + Number(n).toLocaleString("ru-RU");
 $("#built").textContent = BUILT_AT; $("#built2").textContent = BUILT_AT;
 
-/* ── навигация: пять корневых разделов, в каждом — до четырёх подразделов ─ */
+/* ── навигация: пять корневых разделов, в каждом — до пяти подразделов ── */
 const NAV = [
   ["Обзор", [
-    ["t-over", "Общие сведения"], ["t-play", "Порядок ведения заявки"], ["t-strategy", "Развитие направления"]]],
+    ["t-over", "Общие сведения"], ["t-cover", "Заполняемость базы"],
+    ["t-play", "Порядок ведения заявки"], ["t-strategy", "Развитие направления"]]],
   ["Подбор", [
     ["t-find", "Поиск по номеру"], ["t-analogs", "Аналоги и замены"],
     ["t-pn", "Строение обозначений"], ["t-gloss", "Словарь терминов"]]],
   ["Оборудование", [
     ["t-models", "Модельный ряд"], ["t-mach", "Состав по узлам"],
-    ["t-parts", "Ведомости ЗИП"], ["t-cons", "Расходные материалы"]]],
+    ["t-parts", "Ведомости ЗИП"], ["t-cons", "Расходные материалы"],
+    ["t-overhaul", "Капитальный ремонт"]]],
   ["Поставщики", [
     ["t-sup", "Реестр поставщиков"], ["t-subs", "Изготовители узлов"],
     ["t-chan", "Каналы поставки и ввоз"], ["t-bx", "Ранее направленные запросы"]]],
@@ -1745,6 +1881,165 @@ function fillSelect(sel, values, allLabel) {
     <pre id="tpl-${i}">${esc(t.text)}</pre>
     <button class="btn" data-tpl="${i}">скопировать</button>
   </div>`).join("");
+  /* ── заполняемость базы ─────────────────────────────────────────────── */
+  const cvCls = st => st === "закрыто" ? "ok" : (st === "частично" ? "warn" : "bad");
+  $("#cv-intro").textContent = COVERAGE.intro;
+  $("#cv-method").textContent = COVERAGE.method;
+  const C = COVERAGE.context;
+  $("#cv-tiles").innerHTML = [
+    [C.machines, "машин в базе"], [C.systems, "систем двигателя"],
+    [C.suppliers, "поставщиков"], [C.demand_rows, "позиций текущей заявки"],
+    [C.analog_classes, "классов аналогов"], [C.cross_records, "записей кросс-каталогов"],
+    [C.cross_oem_pns, "номеров изготовителей в кроссах"],
+    [C.fleet_objects + " / " + C.fleet_catalogue_total, "объектов парка собрано из каталога"],
+  ].map(([v, t]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(t)}</span></div>`).join("");
+  $("#cv-metrics").innerHTML = COVERAGE.metrics.map(m => `<tr>
+    <td><b>${esc(m.title)}</b></td><td class="num">${num(m.done)}</td><td class="num">${num(m.total)}</td>
+    <td class="num"><b>${m.pct} %</b></td><td><span class="pill ${cvCls(m.status)}">${esc(m.status)}</span></td>
+    <td class="mut">${esc(m.gap)}<div class="note">${esc(m.next)}</div></td></tr>`).join("");
+  $("#cv-systems").innerHTML = COVERAGE.systems.map(s => `<tr>
+    <td>${esc(s.name)}</td><td class="num">${num(s.demand)}</td><td class="num">${num(s.analogs)}</td>
+    <td class="num">${num(s.subsuppliers)}</td><td class="num">${num(s.suppliers)}</td>
+    <td class="num"><b>${s.layers}/4</b></td>
+    <td><span class="pill ${cvCls(s.status)}">${esc(s.status)}</span></td></tr>`).join("");
+  $("#cv-machines").innerHTML = COVERAGE.machines.map(m => `<tr>
+    <td>${esc(m.oem)}</td><td><b>${esc(m.model)}</b></td><td class="num">${num(m.units)}</td>
+    <td class="num">${m.passport ? "есть" : "—"}</td>
+    <td><span class="pill ${m.partlist ? "ok" : "bad"}">${m.partlist ? "разобран" : "нет"}</span></td></tr>`).join("");
+
+  /* ── капитальный ремонт ─────────────────────────────────────────────── */
+  const OHS = OVERHAUL.stage_stats || {};
+  $("#oh-src").textContent = OVERHAUL.source;
+  $("#oh-tiles").innerHTML = [
+    [OHS["всего"], "этапов объёма работ"],
+    [OHS["с заменой ЗИП"], "из них замена узла"],
+    [(OVERHAUL.bom || []).length, "позиций в ведомости ЗИП"],
+    [num((OVERHAUL.labor_model || {}).total_nh), "нормо-часов на двигатель"],
+    [(OVERHAUL.price_anchors || []).length, "цен подтверждено ссылкой"],
+    [((OVERHAUL.rfq || {}).addressees || []).length, "адресатов запроса"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+  const M = OVERHAUL.machine || {};
+  $("#oh-machine").innerHTML = `<b>${esc(M.model || "")}.</b> ${esc(M.rating || "")}. ${esc(M.config || "")}.
+    Топливная система: ${esc(M.fuel_system || "")}. Масса ${esc(M.mass_kg || "")}. Ресурс до капремонта ${esc(M.tbo_h || "")}.
+    <ul style="margin:6px 0 0">${(M.facts || []).map(f => `<li>${esc(f.fact)}${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">источник</a>` : ""}</li>`).join("")}</ul>`;
+  $("#oh-caveat").innerHTML = `<b>Чего здесь нет.</b> ${esc(OVERHAUL.caveat || "")}`;
+
+  $("#oh-stages").innerHTML = (OVERHAUL.stages || []).map(s => `<tr>
+    <td class="num">${esc(s.n)}</td><td>${esc(s.kind)}</td><td>${esc(s.place)}</td>
+    <td>${s.owner === "заказчик" ? '<span class="pill ok">заказчик</span>' : "подрядчик"}</td>
+    <td>${s.zip ? '<span class="pill">нужен</span>' : ""}</td>
+    <td>${esc(s.text)}</td></tr>`).join("");
+
+  $("#oh-bom").innerHTML = (OVERHAUL.bom || []).map(b => `<tr>
+    <td>${esc(b.system)}</td><td>${esc(b.name)}</td>
+    <td>${b.pn ? `<span class="tag">${esc(b.pn)}</span>` : ""}</td>
+    <td class="num">${esc(b.qty)} ${esc(b.unit)}</td>
+    <td class="mut">${esc(b.tender_line || "")}</td></tr>`).join("");
+
+  const ZP = OVERHAUL.zip_priced || {};
+  $("#oh-zp-intro").textContent = ZP.intro || "";
+  $("#oh-zp-tiles").innerHTML = (ZP.totals || []).map(t =>
+    `<div class="tile"><b>${num(t.value)}</b><span>${esc(t.what)}</span></div>`).join("");
+  const zpTot = (ZP.totals || []).length ? ZP.totals[0].value : 0;
+  $("#oh-zp-conf").innerHTML = (ZP.confidence || []).map(c => `<tr>
+    <td>${esc(c.conf)}</td><td class="num">${num(c.lines)}</td><td class="num">${num(c.rub)}</td>
+    <td class="num">${zpTot ? (c.rub / zpTot * 100).toFixed(1) + " %" : "—"}</td></tr>`).join("");
+  $("#oh-zp").innerHTML = (ZP.lines || []).map(l => `<tr>
+    <td class="mut">${esc(l.system || "")}</td><td>${esc(l.name)}</td>
+    <td>${l.pn ? `<span class="tag">${esc(l.pn)}</span>` : ""}</td>
+    <td class="num">${esc(l.qty)} ${esc(l.unit || "")}</td>
+    <td class="num">${l.usd != null ? "$ " + num(l.usd) : "—"}</td>
+    <td class="num">${l.price != null ? num(l.price) : "—"}</td>
+    <td class="num">${l.price != null && l.qty != null ? num(l.qty * l.price) : "—"}</td>
+    <td class="mut">${esc(l.basis || "")}</td>
+    <td class="mut">${esc(l.confidence || "")}</td></tr>`).join("");
+
+  const LM = OVERHAUL.labor_model || {};
+  $("#oh-labor-note").textContent = LM.intro || "";
+  $("#oh-labor").innerHTML = (LM.lines || []).map(l => `<tr>
+    <td>${esc(l.stage)}</td><td>${esc(l.unit)}</td><td class="num">${num(l.qty)}</td>
+    <td class="mut">${esc(l.basis || "")}</td></tr>`).join("");
+
+  const FD = OVERHAUL.factory_data || {};
+  $("#oh-fd-intro").textContent = FD.intro || "";
+  $("#oh-fd").innerHTML = (FD.rows || []).map(r => `<tr><td>${esc(r.what)}</td><td><b>${esc(r.value)}</b></td></tr>`).join("");
+  $("#oh-rates").innerHTML = ((OVERHAUL.labor_model || {}).rates || []).map(r => `<tr>
+    <td>${esc(r.what)}</td><td class="num">${num(r.rub)}</td><td class="mut">${esc(r.conf)}</td></tr>`).join("");
+  const PB = OVERHAUL.price_basis || {};
+  $("#oh-pb-head").innerHTML = `<b>${esc(PB.headline || "")}</b>`;
+  $("#oh-pb-why").textContent = PB.why || "";
+  $("#oh-pb").innerHTML = (PB.stack || []).map(r => `<tr><td>${esc(r.what)}</td><td><b>${esc(r.value)}</b></td></tr>`).join("");
+  $("#oh-pb-corr").innerHTML = PB.correction ? `<b>Поправка.</b> ${esc(PB.correction)}` : "";
+  $("#oh-transparency").innerHTML = `<b>Почему цен мало.</b> ${esc(OVERHAUL.price_transparency || "")}`;
+  const usdTxt = v => v == null ? "—" : "$ " + num(v);
+  $("#oh-anchors").innerHTML = (OVERHAUL.price_anchors || []).map(a => `<tr>
+    <td>${esc(a.what)}${a.note ? `<div class="mut">${esc(a.note)}</div>` : ""}</td>
+    <td class="num">${a.oem_usd != null ? usdTxt(a.oem_usd) : (a.rub_per_usd ? num(a.rub_per_usd) + " ₽/$" : "—")}</td>
+    <td class="num">${a.aftermarket_usd != null ? usdTxt(a.aftermarket_usd)
+       : a.reman_usd != null ? usdTxt(a.reman_usd)
+       : a.rub_per_km_lo ? num(a.rub_per_km_lo) + "–" + num(a.rub_per_km_hi) + " ₽/км" : "—"}</td>
+    <td>${a.source ? `<a href="${esc(a.source)}" target="_blank" rel="noopener">страница</a>` : ""}</td></tr>`).join("");
+
+  const LG = OVERHAUL.logistics || {};
+  $("#oh-lg-intro").textContent = LG.intro || "";
+  $("#oh-lg").innerHTML = (LG.facts || []).map(f => `<li>${esc(f.fact)}${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">источник</a>` : ""}</li>`).join("");
+  $("#oh-lg-routes").innerHTML = (LG.routes || []).map(r => `<tr><td>${esc(r.to)}</td><td class="num">${num(r.rub)}</td></tr>`).join("");
+  $("#oh-lg-rates").innerHTML = (LG.rates || []).map(r => `<tr><td>${esc(r.what)}</td>
+    <td class="num">${r.rub_per_km ? num(r.rub_per_km) + " ₽/км" : r.rub_per_day ? num(r.rub_per_day) + " ₽/сутки" : r.rub ? num(r.rub) + " ₽" : esc(r.pct || "")}</td>
+    <td class="mut">${esc(r.conf)}</td></tr>`).join("");
+  $("#oh-lg-concl").innerHTML = `<b>Вывод.</b> ${esc(LG.conclusion || "")}`;
+
+  const MC = OVERHAUL.market_check || {};
+  $("#oh-mc-intro").textContent = MC.intro || "";
+  $("#oh-mc-intro").textContent = [MC.intro, MC.currency_note].filter(Boolean).join(" ");
+  $("#oh-mc").innerHTML = (MC.rows || []).map(r => {
+    const ours = /^НАШ/.test(r.what || "");
+    const link = (r.source || "").match(/https?:\/\/\S+/);
+    return `<tr${ours ? ' style="font-weight:600"' : ""}>
+      <td>${esc(r.what)}</td><td class="num">$ ${num(r.usd)}</td>
+      <td class="mut">${esc(r.basis || "")}</td>
+      <td>${link ? `<a href="${esc(link[0])}" target="_blank" rel="noopener">страница</a>` : esc(r.source || "")}</td></tr>`;
+  }).join("");
+  $("#oh-mc-lever").innerHTML = MC.lever ? `<b>Рычаг.</b> ${esc(MC.lever)}` : "";
+  $("#oh-mc-verdict").innerHTML = `<b>Вывод.</b> ${esc(MC.verdict || "")}`
+    + (MC.correction ? `<div class="mut" style="margin-top:6px"><b>Отменённый вывод.</b> ${esc(MC.correction)}</div>` : "");
+
+  const RQ = OVERHAUL.rfq || {};
+  $("#oh-rfq-why").textContent = RQ.why || "";
+  $("#oh-rfq").innerHTML = (RQ.items || []).map(i => `<tr>
+    <td class="num">${esc(i.n)}</td><td>${esc(i.name)}</td>
+    <td>${i.pn ? `<span class="tag">${esc(i.pn)}</span>` : ""}</td>
+    <td class="num">${esc(i.qty_1)}</td><td class="num">${esc(i.qty_2)}</td>
+    <td class="mut">${esc(i.ask || "")}</td></tr>`).join("");
+  $("#oh-letter-pick").innerHTML = [["letter_ru", "текст запроса по-русски"], ["letter_en", "по-английски"]]
+    .map(([k, n]) => `<button class="pill" data-oh="${k}">${esc(n)}</button>`).join("");
+  $("#oh-letter-pick").querySelectorAll("button[data-oh]").forEach(b => b.onclick = () => {
+    $("#oh-letter").innerHTML = `<div class="card"><p>${esc(RQ[b.dataset.oh] || "")}</p></div>`;
+  });
+  $("#oh-addr").innerHTML = (RQ.addressees || []).map(a => `<tr>
+    <td><b>${esc(a.name)}</b></td><td>${esc(a.country)}</td><td>${esc(a.why)}</td>
+    <td>${a.bitrix === "доходили до сделки" ? `<span class="pill ok">${esc(a.bitrix)}</span>` : esc(a.bitrix || "")}</td></tr>`).join("");
+  const LB = OVERHAUL.labor_benchmark || {};
+  $("#oh-lb-intro").textContent = LB.intro || "";
+  $("#oh-lb-rates").innerHTML = (LB.rates || []).map(x => `<tr${/Наша/.test(x.what || "") ? ' style="font-weight:600"' : ""}>
+    <td>${esc(x.what)}</td><td class="num">$ ${num(x.usd_per_hour)}</td><td class="mut">${esc(x.note || "")}</td></tr>`).join("");
+  const LH = LB.hours || {};
+  $("#oh-lb-hours").innerHTML = LH.ours
+    ? `<b>Нормо-часы.</b> В нашей смете ${num(LH.ours)} ч, оценка снизу вверх — ${esc(LH.bottom_up || "")}.
+       <div class="mut" style="margin-top:6px">${esc(LH.method || "")}</div>
+       <div style="margin-top:6px">${esc(LH.verdict || "")}</div>` : "";
+  const LR = LB.reconciliation || {};
+  $("#oh-lb-rec").innerHTML = (LR.rows || []).map(x => `<tr${/^НАШ/.test(x.what || "") ? ' style="font-weight:600"' : ""}>
+    <td>${esc(x.what)}</td><td>${esc(x.usd)}</td></tr>`).join("");
+  $("#oh-lb-verdict").innerHTML = LR.verdict ? `<b>Вывод сверки.</b> ${esc(LR.verdict)}` : "";
+  $("#oh-lb-man").innerHTML = (LB.manuals || []).map(m => `<tr>
+    <td>${esc(m.what)}</td><td><span class="tag">${esc(m.bulletin)}</span></td>
+    <td class="mut">${esc(m.access || "")}</td></tr>`).join("");
+  $("#oh-risks").innerHTML = (OVERHAUL.risks || []).map(r => `<tr>
+    <td><b>${esc(r.risk)}</b></td><td>${esc(r.impact)}</td><td class="mut">${esc(r.mitigation)}</td></tr>`).join("");
+  $("#oh-quest").innerHTML = (OVERHAUL.open_questions || []).map(q => `<li>${esc(q)}</li>`).join("");
+
   $("#pb-tpl").querySelectorAll("button[data-tpl]").forEach(b => b.onclick = () => {
     const txt = PLAYBOOK.templates[+b.dataset.tpl].text;
     if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => { b.textContent = "скопировано ✓"; setTimeout(() => b.textContent = "скопировать", 1500); });

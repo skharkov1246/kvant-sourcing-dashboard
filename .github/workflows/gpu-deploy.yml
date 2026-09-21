@@ -61,21 +61,11 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          BASIC_AUTH_PASS: ${{ secrets.BASIC_AUTH_PASS }}
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
           npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-gpu \
             --production-branch=main 2>/dev/null || true
-          # пароль гейта берём из GitHub-секрета и кладём в секрет Pages
-          # (в репозитории пароля нет). Если пуст — деплой не падает, но гейт вернёт 503.
-          if [ -n "${BASIC_AUTH_PASS:-}" ]; then
-            printf '%s' "$BASIC_AUTH_PASS" \
-              | npx --yes wrangler@${WRANGLER_VERSION} pages secret put BASIC_AUTH_PASS --project-name=kvant-gpu \
-              || echo "⚠ не удалось задать секрет в CI — задайте BASIC_AUTH_PASS в Cloudflare Pages → Settings"
-          else
-            echo "⚠ GitHub-секрет BASIC_AUTH_PASS пуст — гейт закрыт (503), пока не зададите пароль"
-          fi
           # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
           # Автоповтор: Cloudflare изредка отдаёт транзиентную ошибку публикации Function.
           ok=0

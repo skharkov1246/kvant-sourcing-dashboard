@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ansaldo Energia и семейство V-машин</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --border:rgba(11,11,11,.10); --s1:#2a78d6; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+  --chip:#eef2f7; --ans:#a3242c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 80px}
+header{border-bottom:2px solid var(--ans);padding:20px 0 12px;margin-bottom:14px}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.mut{color:var(--mut)} .small{font-size:12.5px}
+a{color:var(--s1);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--ans);border-radius:8px;padding:12px 16px;margin:12px 0}
+.box.good{border-left-color:var(--good)} .box.crit{border-left-color:var(--crit)} .box.warn{border-left-color:var(--warn)}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.tile b{font-size:21px;font-variant-numeric:tabular-nums;display:block}
+.tile span{font-size:12px;color:var(--ink2)}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink2);margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:8px 0;max-width:100%}
+table{border-collapse:collapse;width:100%;margin:0;font-size:13px}
+th,td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:600}
+tbody tr:hover{background:#fff}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:10px 0}
+.f-field{display:flex;flex-direction:column;gap:3px;min-width:0;max-width:100%}
+.f-field label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+select,input[type=search]{padding:6px 9px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:13.5px;color:var(--ink);max-width:100%}
+.count{font-size:12.5px;color:var(--ink2);margin-left:auto;align-self:center}
+.badge{font-size:10.5px;border-radius:4px;padding:1px 6px;margin-left:5px;white-space:nowrap;background:var(--chip);color:#3d566e}
+.b-hi{background:#d9f2d9;color:#0a5c0a} .b-mid{background:#fdeecd;color:#7a5200} .b-lo{background:#f6dcdc;color:#8c1f1f}
+.cn{font-weight:650}
+.src{font-size:11px;color:var(--mut);word-break:break-all}
+.ls{margin:10px 0 14px;padding-left:22px}
+.navbar{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:10px 0 6px}
+.navbar label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;flex:1 1 210px;min-width:0}
+.navbar select{font:14px/1.3 inherit;padding:7px 9px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--ink);max-width:100%}
+.navbar button{font:13px inherit;padding:8px 13px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--ink2);cursor:pointer}
+.navbar button:hover{border-color:var(--ans);color:var(--ans)}
+.jump{display:inline-block;font:12.5px inherit;padding:5px 11px;margin:3px 5px 3px 0;border:1px solid var(--ans);border-radius:14px;background:#fff;color:var(--ans);cursor:pointer}
+.jump:hover{background:var(--ans);color:#fff}
+.chip{display:inline-block;font-size:12px;padding:3px 9px;margin:3px 4px 3px 0;border-radius:12px;background:var(--chip,#eef2f7);color:var(--ink2)}
+.mcard2{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--ans);border-radius:10px;padding:14px 16px;margin:12px 0}
+.mcard2 h3{margin:0 0 4px;font-size:17px}
+.mcard2 .al{color:var(--mut);font-size:13px;margin-bottom:8px}
+.mspec{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:8px 0}
+.mspec div{font-size:12.5px}.mspec b{display:block;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.ls li{margin:6px 0;line-height:1.55}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:14px 0 4px;border-bottom:1px solid var(--border)}
+.tab{cursor:pointer;border:1px solid var(--border);border-bottom:none;border-radius:7px 7px 0 0;padding:7px 13px;background:var(--page);font-size:13px;color:var(--ink2)}
+.tab.on{background:var(--surface);color:var(--ink);font-weight:650;box-shadow:inset 0 2px 0 var(--ans)}
+.pane{display:none} .pane.on{display:block}
+@media(max-width:820px){table{font-size:12px} th,td{padding:5px 4px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <h1>Ansaldo Energia и семейство V-машин: что за машины, из чего состоят, кто делает детали</h1>
+ <div class="mut small">__N_CO__ компаний · __N_MODELS__ моделей у 6 производителей · __N_TYPES__ типов узлов · __N_SRC__ источников · данные на __UPDATED__ · <a href="./">библиотека ГТУ</a> · <a href="./v643a">разбор V64.3A</a> · <a href="./f4000">разбор SGT5-4000F</a></div>
+</header>
+
+<div class="k" id="kpi"></div>
+<div class="box good" id="verdict"></div>
+
+<div class="tabs" id="tabs"></div>
+<div id="panes"></div>
+</div>
+
+<script>
+const D = __ANSALDO_JSON__;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const acc = a => a==='высокая' ? '<span class="badge b-hi">доступен</span>' : a==='средняя' ? '<span class="badge b-mid">через посредника</span>' : a==='низкая' ? '<span class="badge b-lo">закрыт</span>' : '';
+
+document.getElementById('kpi').innerHTML = D.kpi.map(x=>`<div class="tile"><b>${esc(x.v)}</b><span>${esc(x.t)}</span></div>`).join('');
+document.getElementById('verdict').innerHTML = '<b>Вывод.</b> ' + D.verdict;
+
+const T = (cols, rows) => `<div class="tw"><table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+
+const PANES = [
+ ['Навигатор', () => `<div class="navbar">
+   <label>Производитель (OEM)<select id="fOem"></select></label>
+   <label>Модель<select id="fMod"></select></label>
+   <label>Узел / тип оборудования<select id="fTyp"></select></label>
+   <button id="fReset">Сбросить</button>
+  </div><div id="navOut"></div>`
+  + D.nav_how.map(t=>`<div class="box">${t}</div>`).join('')],
+ ['Действия', () => T(['№','Действие','Кому','Зачем','Срок','Риск'],
+    D.actions.map(x=>[esc(x.n), `<span class="cn">${esc(x.what)}</span>`, esc(x.who), esc(x.why), esc(x.when), esc(x.risk||'')]))
+    + D.action_notes.map(t=>`<div class="box warn">${t}</div>`).join('')],
+ ['Машины', () => T(['Модель','Прежнее имя','Класс','Мощность','КПД ПЦ','КПД ПГУ','Об/мин','Ступени','Камера сгорания','Парк'],
+    D.models.map(m=>[`<span class="cn">${esc(m.name)}</span>`, esc(m.legacy), esc(m.cls), esc(m.power), esc(m.eff), esc(m.cc_eff), esc(m.rpm), esc(m.stages), esc(m.combustor), m.fleet||'']))
+    + '<h2>Соответствие имён</h2>' + T(['Siemens','Ansaldo','Китай','РФ / лицензия','Комментарий'],
+    D.naming.map(x=>[esc(x.s), `<span class="cn">${esc(x.a)}</span>`, esc(x.cn||''), esc(x.ru||''), x.note||'']))
+    + D.model_notes.map(t=>`<div class="box">${t}</div>`).join('')],
+ ['Наследие Alstom', () => D.ge_split.map(t=>`<div class="box crit">${t}</div>`).join('')
+    + '<h2>Машины</h2>' + T(['Модель','Конструкция','Показатели','Парк','Интервалы'],
+      D.alstom_gt.map(x=>[`<span class="cn">${esc(x.m)}</span>`, x.sp, x.p, x.f, x.i]))
+    + '<h2>Апгрейд-пакеты</h2>' + T(['Пакет','База','Интервал','M-режим','XL-режим / итог','Что физически меняется'],
+      D.alstom_upg.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.b), x.iv, x.m, x.x, x.c]))
+    + '<h2>Горячий тракт GT13E2: что меняется при продлении 36 → 48 kEOH</h2>' + T(['Деталь','Что с ней','Механизм отказа'],
+      D.gt13e2_parts.map(x=>[`<span class="cn">${esc(x.d)}</span>`, x.w, x.f]))
+    + '<h2>Парк Alstom в РФ и СНГ</h2>' + T(['Станция','Владелец','ГТУ','Мощность','Ввод','Что известно'],
+      D.alstom_fleet_ru.map(x=>[`<span class="cn">${esc(x.p)}</span>`, esc(x.o), x.g, x.w, esc(x.y), x.n]))
+    + '<h2>Независимый аутмаркет по Alstom</h2>' + T(['Компания','Страна','Что умеет','Референсы','Контакт','Доступ'],
+      D.alstom_market.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.c), x.w, x.r, esc(x.k), x.a]))
+    + '<h2>Alstom Owners Group — вход в живое сообщество</h2>' + D.aog.map(t=>`<div class="box">${t}</div>`).join('')],
+ ['Горячий тракт', () => T(['Узел','EN-термин для RFQ','Кол-во на машину','Ресурс / интервал','Комментарий'],
+    D.parts.map(x=>[`<span class="cn">${esc(x.ru)}</span>`, esc(x.en), esc(x.qty||''), esc(x.life||''), x.note||'']))
+    + D.parts_notes.map(t=>`<div class="box">${t}</div>`).join('')
+    + (D.prices.length ? '<h2>Цены и сроки</h2>' + T(['Позиция','Цена / срок','Основание','Источник'],
+        D.prices.map(x=>[esc(x.item), `<span class="cn">${esc(x.val)}</span>`, x.basis||'', `<span class="src">${esc(x.src||'')}</span>`])) : '')],
+ ['Партномера и шифровки', () => D.pn_intro.map(t=>`<div class="box crit">${t}</div>`).join('')
+    + '<h2>Форматы номеров по школам</h2>' + T(['Формат','Машины','Что это и как читается','Реальные образцы'],
+      D.pn_formats.map(x=>[`<span class="cn">${esc(x.f)}</span>`, esc(x.m), x.w, `<span class="src">${x.ex}</span>`]))
+    + '<h2>Позиционные коды — язык, на котором машину понимает поставщик</h2>' + T(['Код','Немецкий оригинал','Что это','Диапазон'],
+      D.pos_codes.map(x=>[`<span class="cn">${esc(x.c)}</span>`, esc(x.de), esc(x.ru), x.r]))
+    + `<div class="box warn">${D.pos_note}</div>`
+    + '<h2>Глоссарий RU / EN / DE / IT — для попадания в терминологию поставщика</h2>' + T(['Русский','English','Deutsch','Italiano'],
+      D.glossary.map(x=>[`<span class="cn">${esc(x.ru)}</span>`, esc(x.en), esc(x.de), esc(x.it)]))
+    + D.pn_gaps.map(t=>`<div class="box">${t}</div>`).join('')],
+ ['Керамика и горелки', () => D.cer_spec.map(t=>`<div class="box crit">${t}</div>`).join('')
+    + '<h2>Патентная карта: что можно копировать, а что нет</h2>' + T(['Патент','Дата','Что защищает','Статус'],
+      D.cer_patents.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.d), x.w, x.s]))
+    + '<h2>Температуры</h2>' + T(['Зона','Температура','Источник'],
+      D.cer_temp.map(x=>[esc(x.z), `<span class="cn">${esc(x.t)}</span>`, `<span class="src">${esc(x.s)}</span>`]))
+    + '<h2>Количества</h2>' + D.cer_count.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Научные работы — где лежит физика</h2>' + T(['Работа','Авторы','Что даёт'],
+      D.cer_papers.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.a), x.w]))
+    + '<h2>Кто делает и заявляет</h2>' + T(['Компания','Страна','Что заявляет','Контакт','Оговорка'],
+      D.cer_makers.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.c), x.w, esc(x.k), x.x]))],
+ ['Ведомости из тендеров', () => '<h2>Подтверждённые количества и номера</h2>' + T(['Машина','Позиция','Количество','Основание'],
+      D.bom_qty.map(x=>[`<span class="cn">${esc(x.m)}</span>`, esc(x.i), `<span class="cn">${x.q}</span>`, x.p]))
+    + `<div class="box warn">${D.bom_fmt}</div>`
+    + '<h2>Состав комплекта и логика лотов</h2>' + D.bom_kit.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Требования заказчиков — что придётся закрыть</h2>' + T(['Что','Требование'],
+      D.bom_req.map(x=>[`<span class="cn">${esc(x.t)}</span>`, x.r]))],
+ ['Апгрейды и ремонт', () => '<h2>Матрица апгрейдов</h2>' + T(['Пакет','Модель','Применимость','Когда ставится','Прирост ГТУ','Прирост ПГУ','XL-режим','Интервал','Что входит'],
+      D.upg_matrix.map(x=>[`<span class="cn">${esc(x.p)}</span>`, x.m, esc(x.ap), x.wh, `<span class="cn">${esc(x.gt)}</span>`, esc(x.cc), esc(x.xl), esc(x.iv), x.c]))
+    + D.upg_notes.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Свежие внедрения</h2>' + T(['Год','Объект','Что сделано'],
+      D.upg_refs.map(x=>[esc(x.y), `<span class="cn">${esc(x.o)}</span>`, x.w]))
+    + '<h2>Ремонтные технологии: 5 стадий</h2>' + T(['Стадия','Операции'],
+      D.repair_stages.map(x=>[`<span class="cn">${esc(x.s)}</span>`, x.w]))
+    + D.repair_notes.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Типы инспекций и длительность</h2>' + T(['Тип','Длительность','Объём'],
+      D.insp_types.map(x=>[`<span class="cn">${esc(x.t)}</span>`, `<span class="cn">${x.d}</span>`, x.w]))
+    + '<h2>Ремонтные центры</h2>' + T(['Центр','Адрес','Что делает'],
+      D.repair_centres.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.a), x.w]))],
+ ['Литьё и поковки', () => '<h2>Кто реально льёт крупные лопатки (перо от 300 мм)</h2>' + T(['#','Компания','Габарит','Что умеет','Доступ'],
+      D.cast_rank.map(x=>[esc(x.r), `<span class="cn">${esc(x.n)}</span>`, x.g, x.w, esc(x.a)]))
+    + D.cast_notes.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Поковка-заготовка диска ротора</h2>' + T(['Компания','Страна','Возможности','Контакт'],
+      D.forge_disc.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.c), x.w, esc(x.k)]))
+    + '<h2>Хиртовый венец — где обрывается открытый рынок</h2>' + D.hirth.map(t=>`<div class="box warn">${t}</div>`).join('')],
+ ['КВОУ и фильтры', () => D.kvou_geom.map(t=>`<div class="box crit">${t}</div>`).join('')
+    + '<h2>Реальные размеры</h2>' + T(['Обозначение','Верхний Ø','Нижний Ø','Высота','Площадь и параметры'],
+      D.kvou_sizes.map(x=>[`<span class="cn">${esc(x.pn)}</span>`, esc(x.up), esc(x.lo), esc(x.h), esc(x.s)]))
+    + '<h2>Экономика замены — чем обосновывать заказчику</h2>' + D.kvou_econ.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Кто изготавливает</h2>' + T(['Компания','Страна','Что делает','Контакт','Доступ'],
+      D.kvou_makers.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.c), x.w, esc(x.k), esc(x.a)]))],
+ ['Парк РФ и наш след', () => T(['Станция','Владелец','Модель','Блоков','Ввод','Что известно'],
+    D.fleet_ru.map(x=>[`<span class="cn">${esc(x.plant)}</span>`, esc(x.owner||''), esc(x.model||''), esc(x.units||''), esc(x.year||''), x.note||'']))
+    + D.fleet_notes.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Наши запросы (Bitrix)</h2>' + T(['Сделка','Дата','Что запрашивали','Кого спрашивали','Итог'],
+        D.trace.deals.map(x=>[esc(x.id), esc(x.date), x.what, x.who, x.res]))
+    + '<h2>Ввоз в РФ (таможня, HS 8411)</h2>' + T(['Дата','Отправитель','Получатель','Что','Нетто, кг','Отправление'],
+        D.trace.customs.map(x=>[esc(x.date), `<span class="cn">${esc(x.ex)}</span>`, esc(x.im), esc(x.what), esc(x.kg||''), esc(x.co||'')]))
+    + D.trace.notes.map(t=>`<div class="box good">${t}</div>`).join('')],
+ ['Субпоставщики', () => D.subs.map(g => `<h2>${esc(g.title)}</h2>${g.intro?`<div class="mut small">${g.intro}</div>`:''}` + T(['Компания','Страна','Что делает для Ansaldo','Доказательство','Контакт','Доступ'],
+    g.rows.map(x=>[`<span class="cn">${esc(x.name)}</span>`, esc(x.country||''), x.what||'', x.proof||'',
+      `${esc(x.site||'')}${x.email?'<br>'+esc(x.email):''}`, acc(x.access)]))).join('')],
+ ['Сеть Ansaldo', () => T(['Структура','Страна','Роль','Контакт','Комментарий'],
+    D.network.map(x=>[`<span class="cn">${esc(x.name)}</span>`, esc(x.country||''), x.role||'', esc(x.contact||''), x.note||'']))],
+ ['Аутмаркет', () => D.aftermarket.map(g => `<h2>${esc(g.title)}</h2>${g.intro?`<div class="mut small">${g.intro}</div>`:''}` + T(['Компания','Страна','Что умеет','Доказательство','Контакт','Доступ'],
+    g.rows.map(x=>[`<span class="cn">${esc(x.name)}</span>`, esc(x.country||''), x.what||'', x.proof||'',
+      esc(x.email||x.site||''), acc(x.access)]))).join('')],
+ ['Сервис в РФ', () => T(['Компания','Город','ИНН','Что умеет по V-серии','Референсы','Масштаб','Реальность'],
+    D.ru_service.map(x=>[`<span class="cn">${esc(x.n)}</span>${x.w?`<br><span class="src">${esc(x.w)}</span>`:''}${x.k?`<br><span class="mut small">${esc(x.k)}</span>`:''}`,
+      esc(x.c), esc(x.inn||''), x.cap||'', x.ref||'', x.sc||'', esc(x.r)]))
+    + D.ru_closed.map(g=>`<h2>${esc(g.t)}</h2>` + '<ul class="ls">' + g.items.map(t=>`<li>${t}</li>`).join('') + '</ul>').join('')
+    + `<div class="box good"><b>Вывод.</b> ${D.ru_verdict}</div>`],
+ ['Генераторы', () => `<div class="box warn">${D.gen_code}</div>`
+    + '<h2>Типоряд</h2>' + T(['Серия','Происхождение','Мощность','Напряжение','Охлаждение','Типоразмеры и референс'],
+      D.gen_types.map(x=>[`<span class="cn">${esc(x.s)}</span>`, esc(x.o), esc(x.p), esc(x.u), esc(x.cool), x.x]))
+    + '<h2>Какой генератор идёт с какой ГТУ</h2>' + T(['ГТУ','ISO','Комбинированный цикл','H₂','Генератор','Основание'],
+      D.gen_pairs.map(x=>[`<span class="cn">${esc(x.gt)}</span>`, esc(x.iso), esc(x.cc), esc(x.h2), x.g, `<span class="src">${esc(x.src)}</span>`]))
+    + '<h2>Комплектация: кто делает узлы</h2>' + T(['Узел','Поставщик','Что именно','Примечание'],
+      D.gen_parts.map(x=>[`<span class="cn">${esc(x.u)}</span>`, esc(x.who), x.what, x.note]))
+    + '<h2>Кто ремонтирует</h2>' + T(['Компания','База','Что делает','Доступность'],
+      D.gen_repair.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.c), x.what, x.a]))
+    + '<h2>Объём инспекции без выемки ротора</h2>' + T(['Уровень / метод','Что входит'],
+      D.gen_inspect.map(x=>[`<span class="cn">${esc(x.lvl)}</span>`, x.what]))
+    + '<h2>Наши площадки</h2>' + T(['Объект','Состав'], D.gen_sites.map(x=>[`<span class="cn">${esc(x.o)}</span>`, x.w]))
+    + D.gen_deal.map(t=>`<div class="box warn">${t}</div>`).join('')],
+ ['АСУ ТП и арматура', () => D.controls.map(g=>`<h2>${esc(g.g)}</h2>` + T(['Позиция','Кто','Что это','Где у нас','Доступность'],
+      g.rows.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.who), x.what, x.ru, esc(x.av)]))).join('')
+    + D.controls_notes.map(t=>`<div class="box">${t}</div>`).join('')],
+ ['Право и ограничения', () => T(['Юрисдикция','Инструмент','Охват 8411','Дата введения','Что это значит'],
+      D.legal_map.map(x=>[`<span class="cn">${esc(x.j)}</span>`, esc(x.a), x.s, x.w, x.x]))
+    + D.legal_notes.map(t=>`<div class="box crit">${t}</div>`).join('')],
+ ['Логистика и таможня', () => '<h2>Коды ТН ВЭД и ставки</h2>' + T(['Код','Наименование','Пошлина','НДС','Примечание'],
+      D.customs_codes.map(x=>[`<span class="cn">${esc(x.c)}</span>`, esc(x.n), `<span class="cn">${esc(x.d)}</span>`, esc(x.v), x.x]))
+    + '<h2>Где переклассифицируют</h2>' + D.customs_risk.map(t=>`<div class="box warn">${t}</div>`).join('')
+    + '<h2>Торговые соглашения ЕАЭС — что даёт по 8411</h2>' + T(['Партнёр','Тип','В силе с','Что по 8411','Сертификат'],
+      D.trade_prefs.map(x=>[`<span class="cn">${esc(x.p)}</span>`, esc(x.t), esc(x.in), x.r, esc(x.s)]))
+    + '<h2>Маршруты и сроки</h2>' + T(['Маршрут','Сервис','Транзит','Частота / примечание'],
+      D.routes.map(x=>[`<span class="cn">${esc(x.f)}</span>`, esc(x.s), `<span class="cn">${esc(x.t)}</span>`, esc(x.q)]))
+    + '<h2>Стоимость: надбавки за негабарит (тариф FESCO FBSS, 08.2026)</h2>' + T(['Позиция','Ставка'],
+      D.oog_costs.map(x=>[esc(x.i), `<span class="cn">${esc(x.v)}</span>`]))
+    + '<h2>Габариты, упаковка, консервация</h2>' + D.pack_rules.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Логисты и брокеры</h2>' + T(['Компания','Что делает','Контакт'],
+      D.log_cos.map(x=>[`<span class="cn">${esc(x.n)}</span>`, x.w, esc(x.k)]))
+    + '<h2>Порядок действий</h2><ol class="ls">' + D.log_steps.map(t=>`<li>${t}</li>`).join('') + '</ol>'],
+ ['Как писать RFQ', () => D.rfq.rules.map(t=>`<div class="box warn">${t}</div>`).join('') + (D.rfq.template?`<div class="box">${D.rfq.template}</div>`:'')],
+ ['Источники', () => T(['№','Что подтверждает','Ссылка'],
+    D.sources.map((s,i)=>[String(i+1), esc(s.what), `<a href="${esc(s.url)}" rel="noreferrer noopener" target="_blank"><span class="src">${esc(s.url)}</span></a>`]))],
+];
+
+document.getElementById('tabs').innerHTML = PANES.map((p,i)=>`<button class="tab${i?'':' on'}" data-i="${i}">${esc(p[0])}</button>`).join('');
+document.getElementById('panes').innerHTML = PANES.map((p,i)=>`<div class="pane${i?'':' on'}" id="p${i}">${i?'':p[1]()}</div>`).join('');
+function showPane(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on', j===i));
+  document.querySelectorAll('.pane').forEach((p,j)=>{
+    if(j===i && !p.dataset.built && j) { p.innerHTML = PANES[j][1](); p.dataset.built='1'; }
+    p.classList.toggle('on', j===i);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('tabs').addEventListener('click', ev => {
+  const b = ev.target.closest('.tab'); if(!b) return;
+  showPane(+b.dataset.i);
+});
+const goTab = title => { const i = PANES.findIndex(p=>p[0]===title); if(i>=0) showPane(i); };
+
+/* --- навигатор: связанные выпадающие списки --- */
+const MODELS = D.nav_oem.flatMap(o => o.models.map(m => ({...m, oem:o.o, co:o.co, role:o.role})));
+const TYPES = D.nav_types;
+const typeOf = t => TYPES.find(x=>x.t===t) || {w:[]};
+const fill = (el, items, cur, all) => {
+  el.innerHTML = `<option value="">${all}</option>` + items.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('');
+};
+const sel = {oem:'', mod:'', typ:''};
+function navRender(){
+  const eOem=document.getElementById('fOem'), eMod=document.getElementById('fMod'), eTyp=document.getElementById('fTyp');
+  if(!eOem) return;
+  let pool = MODELS;
+  if(sel.oem) pool = pool.filter(m=>m.oem===sel.oem);
+  if(sel.typ) pool = pool.filter(m=>m.ty.includes(sel.typ));
+  if(sel.mod && !pool.some(m=>m.m===sel.mod)) sel.mod='';
+  const oems = D.nav_oem.map(o=>o.o).filter(o => !sel.typ || MODELS.some(m=>m.oem===o && m.ty.includes(sel.typ)));
+  const typs = TYPES.map(t=>t.t).filter(t => pool.some(m=>m.ty.includes(t)));
+  fill(eOem, oems, sel.oem, '— все производители —');
+  fill(eMod, pool.map(m=>m.m), sel.mod, `— все модели (${pool.length}) —`);
+  fill(eTyp, typs, sel.typ, '— все узлы —');
+
+  const out = document.getElementById('navOut');
+  const jumps = list => [...new Set(list)].map(t=>`<button class="jump" data-t="${esc(t)}">${esc(t)} →</button>`).join('');
+  const one = MODELS.find(m=>m.m===sel.mod);
+  if(one){
+    const shown = sel.typ ? [sel.typ] : one.ty;
+    out.innerHTML = `<div class="mcard2">
+      <h3>${esc(one.m)}</h3>
+      <div class="al">${esc(one.oem)} · ${esc(one.co)}${one.al&&one.al!=='—'?' · также известна как '+esc(one.al):''}</div>
+      <div class="mspec">
+        <div><b>Класс</b>${esc(one.cl)}</div><div><b>Мощность и КПД</b>${esc(one.p)}</div>
+        <div><b>Камера сгорания</b>${esc(one.cmb)}</div><div><b>Проточная часть</b>${esc(one.st)}</div>
+      </div>
+      <div><b>Узлы на этой машине (${one.ty.length}):</b><br>${one.ty.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>
+      <div style="margin-top:10px"><b>Где читать${sel.typ?' по узлу «'+esc(sel.typ)+'»':''}:</b><br>${jumps(shown.flatMap(t=>typeOf(t).w))}</div>
+    </div>
+    <div class="box warn"><b>Ловушки этой машины.</b> ${one.tr}</div>
+    <h2>Узлы модели ${esc(one.m)}</h2>` + T(['Узел','Код / обозначение','EN-термин для RFQ','Где читать'],
+      shown.map(t=>{const x=typeOf(t); return [`<span class="cn">${esc(t)}</span>`, esc(x.c||''), esc(x.en||''), jumps(x.w)];}));
+  } else {
+    out.innerHTML = `<h2>Модели${sel.oem?' — '+esc(sel.oem):''}${sel.typ?', где есть узел «'+esc(sel.typ)+'»':''} (${pool.length})</h2>`
+      + T(['Производитель','Модель','Другие имена','Класс','Мощность','Узлов','Где читать'],
+        pool.map(m=>[esc(m.oem), `<span class="cn">${esc(m.m)}</span>`, esc(m.al), esc(m.cl), esc(m.p), String(m.ty.length),
+          jumps((sel.typ?[sel.typ]:m.ty).flatMap(t=>typeOf(t).w))]))
+      + '<h2>Узлы и типы оборудования</h2>' + T(['Узел','Код / обозначение','EN-термин для RFQ','На каких моделях','Где читать'],
+        TYPES.filter(x=>!sel.typ||x.t===sel.typ).map(x=>{
+          const ms = pool.filter(m=>m.ty.includes(x.t)).map(m=>m.m);
+          return [`<span class="cn">${esc(x.t)}</span>`, esc(x.c), esc(x.en),
+            ms.length?ms.map(v=>`<span class="chip">${esc(v)}</span>`).join(''):'<span class="mut">—</span>', jumps(x.w)];
+        }).filter(r=>r[3].indexOf('—')<0||sel.typ));
+  }
+}
+document.getElementById('panes').addEventListener('change', ev => {
+  if(ev.target.id==='fOem'){ sel.oem=ev.target.value; sel.mod=''; }
+  else if(ev.target.id==='fMod') sel.mod=ev.target.value;
+  else if(ev.target.id==='fTyp') sel.typ=ev.target.value;
+  else return;
+  navRender();
+});
+document.getElementById('panes').addEventListener('click', ev => {
+  const j = ev.target.closest('.jump');
+  if(j){ goTab(j.dataset.t); return; }
+  if(ev.target.id==='fReset'){ sel.oem=sel.mod=sel.typ=''; navRender(); }
+});
+navRender();
+</script>
+</body>
+</html>
