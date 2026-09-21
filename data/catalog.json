@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 261,
-    "total_bytes": 115572367,
+    "datasets": 262,
+    "total_bytes": 115618613,
     "by_sensitivity": {
       "внутреннее": 141,
-      "конфиденциально": 68,
+      "конфиденциально": 69,
       "публикуемо": 52
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 81,
+      "ГТУ-библиотека": 82,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -64,10 +64,10 @@
           "what_it_is"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "7fe2791a",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -183,9 +183,9 @@
           "vf"
         ]
       },
-      "last_change": "2026-08-27",
-      "last_author": "skharkov1246",
-      "last_commit": "5aa78f38",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "c20d23c3",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -336,9 +336,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "d16688b4",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "59261928",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -627,9 +627,9 @@
           "pn_norm"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "5908e91b",
+      "last_commit": "51e0bc51",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1046,10 +1046,10 @@
         "key": "scopes",
         "records": 4
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "github-actions[bot]",
+      "last_commit": "a9b95e23",
+      "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -1223,9 +1223,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "9a3905b6",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "0ff0a228",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1267,9 +1267,9 @@
           "usd_lo"
         ]
       },
-      "last_change": "2026-08-08",
-      "last_author": "Claude",
-      "last_commit": "f1149d10",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "d7d8f564",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1351,9 +1351,9 @@
         "key": "assessment",
         "records": 15
       },
-      "last_change": "2026-09-12",
+      "last_change": "2026-09-19",
       "last_author": "github-actions[bot]",
-      "last_commit": "e455ab2b",
+      "last_commit": "d420c68c",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1487,10 +1487,10 @@
         "key": "machines",
         "records": 6
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "96fd5c78",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -1797,9 +1797,9 @@
           "site"
         ]
       },
-      "last_change": "2026-09-12",
+      "last_change": "2026-09-13",
       "last_author": "skharkov1246",
-      "last_commit": "9a3905b6",
+      "last_commit": "b965eeac",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1955,10 +1955,10 @@
           "we_already_have_price"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "156c1a09",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2116,10 +2116,10 @@
           "subject"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "de01225b",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2302,10 +2302,10 @@
           "to"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "d37c0af7",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2411,10 +2411,10 @@
           "warning"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "7fe2791a",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -2640,10 +2640,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "3f6b4d4e",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2745,9 +2745,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-10",
+      "last_change": "2026-09-21",
       "last_author": "github-actions[bot]",
-      "last_commit": "c494c320",
+      "last_commit": "f8481f92",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -2872,10 +2872,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "eb1008ff",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2920,10 +2920,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "3f6b4d4e",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3061,10 +3061,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "9b708397",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3108,10 +3108,10 @@
           "unit"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "9fa62f67",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3285,9 +3285,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "3b643031",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3325,10 +3325,10 @@
           "unit"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "96fd5c78",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3467,10 +3467,10 @@
           "sheet"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "ec54e55f",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -3587,10 +3587,10 @@
         "key": "totals",
         "records": 6
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "22079bd9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3681,10 +3681,10 @@
           "what_it_proves"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "4a662957",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3805,10 +3805,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "9b708397",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -3850,9 +3850,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "3b643031",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3905,10 +3905,10 @@
           "zip"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "1debb49d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4028,10 +4028,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "9b708397",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4129,10 +4129,10 @@
           "what_it_means"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "8b43d94d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4177,9 +4177,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "3b643031",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4313,10 +4313,10 @@
           "usd_on_repeats"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "4d4c86b4",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4368,6 +4368,68 @@
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/r1700_dossier.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 133868,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/budget_join_stats.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/gap_letters.json",
+        "gt/data/maker_contacts.json",
+        "gt/data/ms5001_vankor.json",
+        "gt/data/pn_db.json",
+        "gt/data/seller_index.json",
+        "gt/data/seller_sitemaps.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_priced.json",
+        "gt/data/ship_inside_quotes.json",
+        "gt/data/ship_jenbacher_prices.json"
+      ],
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "112c5c9b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -4435,9 +4497,9 @@
           "where"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "3b643031",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4447,68 +4509,6 @@
         "ove/build.py",
         "ove/tools/build_paket.py",
         "ove/tools/build_release.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 131512,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/budget_join_stats.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/gap_letters.json",
-        "gt/data/maker_contacts.json",
-        "gt/data/pn_db.json",
-        "gt/data/seller_index.json",
-        "gt/data/seller_sitemaps.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_inside_priced.json",
-        "gt/data/ship_inside_quotes.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_leak.json"
-      ],
-      "last_change": "2026-09-13",
-      "last_author": "Claude",
-      "last_commit": "73333bff",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -4655,10 +4655,10 @@
           "to"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "4a662957",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4695,9 +4695,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "3b643031",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4746,10 +4746,10 @@
           "why_tier"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "7fe2791a",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4838,9 +4838,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "3b643031",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5141,9 +5141,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "3b643031",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -5240,10 +5240,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "9b708397",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5353,10 +5353,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "b965eeac",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5442,10 +5442,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "9b708397",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6103,10 +6103,10 @@
           "rule"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "94187145",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6241,10 +6241,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "51e0bc51",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -6426,10 +6426,10 @@
         "key": "sellers",
         "records": 7
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "4d4c86b4",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6541,10 +6541,10 @@
           "via_distributor"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "369cbb37",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -7093,10 +7093,10 @@
           "rows"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-21",
+      "last_author": "skharkov1246",
+      "last_commit": "3a06e755",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -7394,6 +7394,49 @@
         "ove/tools/calc_ove.py",
         "ove/tools/check_tkp.py",
         "ove/tools/equip2ifc.py"
+      ]
+    },
+    {
+      "path": "gt/data/ms5001_vankor.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 43791,
+      "note": "Ведомость запасных частей ГТУ GE MS5001 (исполнение MS5001PA) на инспекцию ТО-70000 — сделка «Юнипро / Ванкор», ГТЭС-200: 198 строк, 175 каталожных номеров Nuovo Pignone, узел определён у 137 строк. Первая ведомость состава по тяжёлой ГТУ; ни один из этих номеров в базе до сих пор не встречался. Источник — технико-коммерческое предложение КВАНТ заказчику (исх. №99-77 от 08.06.2026, Rev. 1), сам файл в репозиторий не кладётся. Перенесена только техническая часть: номер позиции, каталожный номер, наименование, количество, узел. Цены, заказчик-плательщик, условия сделки и контактное лицо сюда НЕ перенесены — это коммерческие и персональные данные (CLAUDE.md, правило 5); их загрузка в закрытую базу идёт отдельно, library/load_tkp_prices.py, из исходного файла по пути TKP_XLSX. Добавлен раздел channel: сверка 175 номеров и слов MS5001/MS5002 с 42 311 таможенными записями. Ни один номер в описаниях деклараций не встречается — второй цены оттуда не взять; зато по Frame 5 есть 55 деклараций 2023–2025 и 10 экспортёров, из них Nuovo Pignone International S.r.l. в 35 записях, и ровно одна запись именно по MS5001PA (RTP POWER SE, Китай через Турцию, 01.05.2024). Экспортёр — не поставщик и не наличие, это точка, с которой начинается поиск исполнителя. Нумерация перечня доходит до 234, предложено 198: 36 номеров позиций в документе отсутствуют — разрыв в самом предложении, а не в разборе.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "catalog",
+        "channel",
+        "completeness",
+        "machine",
+        "source",
+        "stats",
+        "warnings"
+      ],
+      "main_collection": {
+        "key": "catalog",
+        "records": 198,
+        "record_keys": [
+          "block",
+          "name",
+          "node",
+          "pn",
+          "poz",
+          "qty"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "library/load_crossrefs.py",
+        "library/load_tkp_prices.py"
       ]
     },
     {
@@ -7867,9 +7910,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "5908e91b",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7904,10 +7947,10 @@
           "verdict_rests_on_price"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "8b43d94d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -8160,9 +8203,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "3b643031",
+      "last_commit": "9b708397",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8192,9 +8235,9 @@
           "site"
         ]
       },
-      "last_change": "2026-08-18",
-      "last_author": "skharkov1246",
-      "last_commit": "a51e7009",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "d37c0af7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8281,10 +8324,10 @@
         "key": "rows_no_address_list",
         "records": 83
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "893e0f8c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -8404,10 +8447,10 @@
           "usd"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "d7d8f564",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -8666,10 +8709,10 @@
         "key": "rows",
         "records": 32
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "22079bd9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -8749,10 +8792,10 @@
           "kind"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "369cbb37",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -8790,9 +8833,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-12",
+      "last_change": "2026-09-21",
       "last_author": "skharkov1246",
-      "last_commit": "c520c54a",
+      "last_commit": "eea5d52d",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8866,9 +8909,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "5908e91b",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "2c5aa603",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8960,9 +9003,11 @@
         "gpu/build.py",
         "gt/build.py",
         "library/equipment.py",
+        "library/load_crossrefs.py",
         "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py"
+        "scripts/build_dict.py",
+        "tests/test_library_crossrefs.py"
       ]
     },
     {
@@ -9066,10 +9111,10 @@
           "unit"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-21",
+      "last_author": "skharkov1246",
+      "last_commit": "eea5d52d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -9586,9 +9631,9 @@
           "suppliers"
         ]
       },
-      "last_change": "2026-09-10",
+      "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "37dfb12a",
+      "last_commit": "f872f9c4",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9610,7 +9655,7 @@
     {
       "path": "gt/data/models.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 11790,
+      "bytes": 11889,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -9640,9 +9685,11 @@
         "gpu/build.py",
         "gt/build.py",
         "library/equipment.py",
+        "library/load_crossrefs.py",
         "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py"
+        "scripts/build_dict.py",
+        "tests/test_library_crossrefs.py"
       ]
     },
     {
@@ -9706,10 +9753,10 @@
           "sku"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "107d8152",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10061,10 +10108,10 @@
           "why_tier"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "8b43d94d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10198,10 +10245,10 @@
           "unit"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-21",
+      "last_author": "skharkov1246",
+      "last_commit": "eea5d52d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10318,10 +10365,10 @@
           "sales_usd"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "8b43d94d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -10361,10 +10408,10 @@
           "why"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "ec54e55f",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -10403,10 +10450,10 @@
         "key": "channel_without_price",
         "records": 13
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "7fe2791a",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10489,10 +10536,10 @@
           "was"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "8b43d94d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10522,10 +10569,10 @@
         "key": "totals",
         "records": 13
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "dd2357a7",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10611,10 +10658,10 @@
           "what_it_means"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "d9250f48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10648,10 +10695,10 @@
           "unit"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-21",
+      "last_author": "skharkov1246",
+      "last_commit": "eea5d52d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10739,10 +10786,10 @@
           "what_is_published"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "893e0f8c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10839,10 +10886,10 @@
         "key": "scopes",
         "records": 3
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "github-actions[bot]",
+      "last_commit": "a9b95e23",
+      "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10931,10 +10978,10 @@
           "records"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "0ff0a228",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10965,10 +11012,10 @@
         "key": "fx",
         "records": 4
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "9b134954",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -11002,10 +11049,10 @@
         "key": "by_basis",
         "records": 5
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "8b43d94d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -11042,10 +11089,10 @@
         "key": "unparsed_deals",
         "records": 18
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "aab32a61",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -11121,10 +11168,10 @@
           "usd_exposure"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "23c897df",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -11166,10 +11213,10 @@
         "key": "budget_by_our_readiness",
         "records": 3
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-21",
+      "last_author": "skharkov1246",
+      "last_commit": "616dcc31",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -11204,10 +11251,10 @@
           "why_not_a_price"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "95957b01",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -11293,10 +11340,10 @@
         "key": "rates",
         "records": 33
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "0472a781",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -11330,10 +11377,10 @@
         "key": "counters",
         "records": 8
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "38d907bb",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
