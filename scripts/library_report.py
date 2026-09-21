@@ -124,27 +124,32 @@ def собрать(cur) -> dict:
 
 
 CSS = """
-@page { size: A4; margin: 12mm 10mm; }
-body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.8pt; color: #111; }
-h1 { font-size: 17pt; margin: 0 0 2mm; }
-/* Заголовок не остаётся один в конце страницы, а короткий раздел не рвётся:
-   иначе на последнюю страницу уезжают две строки, и проверка PDF справедливо
-   считает её полупустой. */
-h2 { font-size: 11pt; margin: 4.5mm 0 1.5mm; border-bottom: 1.5px solid #111;
-     padding-bottom: 0.8mm; page-break-after: avoid; }
+/* Стиль «ведомость на белой бумаге» (.claude/skills/tkp-vedomost): Times New Roman,
+   чёрный текст, тонкие чёрные линии, обычное начертание. Прежняя вёрстка отчёта шла
+   рубленым шрифтом с серыми плашками и жирными числами — это признаки документа,
+   собранного машиной, а владельцу уходит документ, а не выгрузка. */
+@page { size: A4; margin: 16mm 14mm; }
+* { box-sizing: border-box; }
+body { font-family: "Times New Roman", "Liberation Serif", "FreeSerif", serif;
+       font-size: 10.5pt; line-height: 1.25; color: #000; background: #fff; margin: 0; }
+p { margin: 0 0 2.2mm; text-align: justify; }
+h1 { font-size: 13pt; font-weight: normal; text-align: center; text-transform: uppercase;
+     letter-spacing: 0.6px; margin: 0 0 1.5mm; }
+/* Заголовок не остаётся один в конце страницы, а короткий раздел не рвётся: иначе на
+   последнюю страницу уезжают две строки, и проверка PDF справедливо считает её пустой. */
+h2 { font-size: 11pt; font-weight: normal; margin: 4.5mm 0 1.5mm; page-break-after: avoid; }
 section { page-break-inside: avoid; }
-.sub { color: #555; font-size: 8.5pt; margin-bottom: 4mm; }
-table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 3mm; }
+.sub { text-align: center; margin: 0 0 4mm; font-size: 9.5pt; }
+table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 1.5mm 0 3mm;
+          font-size: 9.5pt; line-height: 1.22; }
 .t thead { display: table-header-group; }
 .t tr { page-break-inside: avoid; }
-.t th { background: #f0f0f0; text-align: left; padding: 1.2mm 1.6mm; font-size: 8pt;
-        border: 0.4px solid #bbb; }
-.t td { padding: 1.2mm 1.6mm; border: 0.4px solid #ddd; vertical-align: top;
-        word-wrap: break-word; overflow-wrap: anywhere; }
-td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-td.big { font-size: 11pt; font-weight: bold; text-align: right; }
-.q { background: #fafafa; }
-.was { color: #888; }
+.t th, .t td { border: 0.5pt solid #000; padding: 1.2mm 1.6mm; vertical-align: top;
+               text-align: left; font-weight: normal; overflow-wrap: anywhere; }
+.t th { text-align: center; }
+td.num, td.big { text-align: right; white-space: nowrap;
+                 font-variant-numeric: tabular-nums; }
+small { font-size: 9pt; }
 """
 
 
@@ -216,9 +221,9 @@ def html_doc(d: dict) -> str:
          "помеченная расчётом"),
     ]
     строки = "".join(
-        f"<tr><td><b>{E(з)}</b></td><td class='big'>{E(v)}</td><td>{E(c)}</td>"
-        f"<td class='was'>{E(w)}</td></tr>" for з, v, c, w in цепочка)
-    воп = "".join(f"<tr class='q'><td>{E(a)}</td><td>{E(b)}</td></tr>" for a, b in вопросы)
+        f"<tr><td>{E(з)}</td><td class='big'>{E(v)}</td><td>{E(c)}</td>"
+        f"<td>{E(w)}</td></tr>" for з, v, c, w in цепочка)
+    воп = "".join(f"<tr><td>{E(a)}</td><td>{E(b)}</td></tr>" for a, b in вопросы)
     маш = "".join(f"<tr><td>{E(m)}</td><td class='num'>{n(k)}</td></tr>"
                   for m, k in d["топ_машин"])
     узл = "".join(f"<tr><td>{E(u)}</td><td>{E(c)}</td><td class='num'>{n(k)}</td></tr>"
@@ -265,7 +270,7 @@ def html_doc(d: dict) -> str:
 <th style="width:30%">строк</th></tr></thead><tbody>
 <tr><td>Спрос из спецификаций сделок (lib_demand){' — по прогону в живой базе' if 'спрос' in PROD else ''}</td><td class="num">{n(d['спрос'])}</td></tr>
 <tr><td>Разобранных вложений Битрикса (lib_files){' — по прогону в живой базе' if 'файлы' in PROD else ''}</td><td class="num">{n(d['файлы'])}</td></tr>
-<tr class="q"><td><b>Строк спроса, опознанных по каталогу</b> — сведены по артикулу с известной
+<tr><td>Строк спроса, опознанных по каталогу — сведены по артикулу с известной
     деталью, на {n(d['сделок_опознано'])} сделках</td>
     <td class="num">{n(d['спрос_опознан'])}</td></tr>
 </tbody></table></section>

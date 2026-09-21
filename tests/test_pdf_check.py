@@ -56,3 +56,22 @@ def test_rule_is_documented():
     doc = (ROOT / "docs/ПРАВИЛА-PDF.md").read_text(encoding="utf-8")
     assert "последнюю" in doc.lower() or "последней" in doc.lower()
     assert re.search(r"counts\[:-1\]", SRC)
+
+
+def пустой_документ(counts, threshold=400):
+    """Та же строка правила из исходника: документ целиком короче одной страницы."""
+    line = next(x for x in SRC.splitlines() if x.strip().startswith("if sum(counts) <"))
+    ns = {"counts": counts, "a": type("A", (), {"min_chars": threshold})()}
+    return eval(line.strip()[3:-1], ns)  # noqa: S307
+
+
+def test_одностраничный_пустой_документ_ловится():
+    """Исключение последней страницы сделало одностраничный PDF неуязвимым:
+    93 символа проходили как «чисто». Документ целиком короче одной страницы —
+    это не кривой разрыв, а несобранный документ."""
+    assert пустой_документ([93]) is True
+    assert пустой_документ([3000]) is False
+
+
+def test_короткий_хвост_многостраничного_документа_пустым_не_считается():
+    assert пустой_документ([3000, 3000, 250]) is False
