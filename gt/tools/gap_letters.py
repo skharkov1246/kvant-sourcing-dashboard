@@ -222,7 +222,23 @@ def owns_domain(maker: str, domain: str) -> bool:
         label = labels[-2]
         if label in known and len(labels) >= 3:
             label = labels[-3]
-    return bool(_norm(maker)) and _norm(label) == _norm(maker)
+    lab = _norm(label)
+    if not lab:
+        return False
+    # Сравнение идёт с ПЕРВЫМИ k словами имени, а не только с именем целиком.
+    # Заказчик пишет изготовителя с правовой формой — «Drilltech Manufacturing
+    # Co., Ltd» при домене drilltech.cn, — и сверка целой строкой теряла пять
+    # строк заявки даром. Ложные совпадения при этом остаются отвергнутыми, и
+    # это проверено на всех восьми измеренных случаях: «general-gauges» ≠
+    # «General», «johnsonturbine» ≠ «Johnson», «cargocaresolutions» ≠ «Argo»,
+    # «universalthermosensors» ≠ «Versa», «platinuminternational» ≠ «National».
+    # Метка обязана СОВПАСТЬ с началом имени целиком, а не содержать его.
+    words = [w for w in re.split(r"[^A-Za-zА-Яа-я0-9]+", str(maker or "")) if w]
+    for k in range(1, len(words) + 1):
+        pref = _norm("".join(words[:k]))
+        if len(pref) >= 3 and pref == lab:
+            return True
+    return False
 
 
 @lru_cache(maxsize=None)
