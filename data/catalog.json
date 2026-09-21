@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 258,
-    "total_bytes": 115483253,
+    "total_bytes": 115504555,
     "by_sensitivity": {
       "внутреннее": 140,
       "конфиденциально": 68,
@@ -901,6 +901,7 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/gap_letters.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
         "scripts/build_chain_coverage.py",
@@ -1169,6 +1170,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/gap_letters.py",
         "gt/tools/ship_merge.py",
         "library/load_crossrefs.py",
         "library/load_parts.py",
@@ -1325,6 +1327,7 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/gap_letters.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
@@ -1802,6 +1805,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/gap_letters.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
         "scripts/supplier_registry_overlap.py",
@@ -4262,12 +4266,12 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/gap_letters.py",
         "gt/tools/ship_merge.py",
         "library/load_parts.py",
         "library/load_suppliers.py",
         "ove/build.py",
-        "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py"
+        "ove/tools/bitrix_ove.py"
       ]
     },
     {
@@ -4554,56 +4558,9 @@
       ]
     },
     {
-      "path": "gt/data/ship_stock_letters.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 124722,
-      "note": "Готовые письма на подтверждение остатка по заявке ЛУКОЙЛ, по одному на адресата: кому, о чём, сколько позиций, наша экспозиция по ним и текст письма. Пишет gt/tools/stock_letters.py --write; руками не заполнять. Наша вилка, наша сумма и имя заказчика в тексты писем не идут — в наборе они есть только в служебных полях, для нас. Отдельным полем помечены письма, где адрес выловлен из описания канала, а не из контактов по детали: такой адрес может быть родовым, и получателя надо проверить перед отправкой.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "letters",
-        "letters_withheld_for_leak",
-        "rows_disputed",
-        "rows_total",
-        "rows_with_address",
-        "rows_without_address",
-        "source",
-        "updated",
-        "usd_with_address",
-        "usd_without_address",
-        "what_is_not_in_the_letter",
-        "why_these_rows"
-      ],
-      "main_collection": {
-        "key": "letters",
-        "records": 79,
-        "record_keys": [
-          "address_check",
-          "body",
-          "our_exposure",
-          "pns",
-          "rows",
-          "rows_disputed",
-          "subject",
-          "to"
-        ]
-      },
-      "last_change": "2026-09-19",
-      "last_author": "skharkov1246",
-      "last_commit": "4a66295",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/stock_letters.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 124502,
+      "bytes": 125489,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4651,7 +4608,7 @@
       ],
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "900bae6",
+      "last_commit": "fa75daf",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4660,6 +4617,53 @@
       "referenced_by": [
         "scripts/build_catalog.py",
         "tests/test_catalog_guard.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_stock_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 124722,
+      "note": "Готовые письма на подтверждение остатка по заявке ЛУКОЙЛ, по одному на адресата: кому, о чём, сколько позиций, наша экспозиция по ним и текст письма. Пишет gt/tools/stock_letters.py --write; руками не заполнять. Наша вилка, наша сумма и имя заказчика в тексты писем не идут — в наборе они есть только в служебных полях, для нас. Отдельным полем помечены письма, где адрес выловлен из описания канала, а не из контактов по детали: такой адрес может быть родовым, и получателя надо проверить перед отправкой.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "letters",
+        "letters_withheld_for_leak",
+        "rows_disputed",
+        "rows_total",
+        "rows_with_address",
+        "rows_without_address",
+        "source",
+        "updated",
+        "usd_with_address",
+        "usd_without_address",
+        "what_is_not_in_the_letter",
+        "why_these_rows"
+      ],
+      "main_collection": {
+        "key": "letters",
+        "records": 79,
+        "record_keys": [
+          "address_check",
+          "body",
+          "our_exposure",
+          "pns",
+          "rows",
+          "rows_disputed",
+          "subject",
+          "to"
+        ]
+      },
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "4a66295",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/stock_letters.py"
       ]
     },
     {
@@ -5335,6 +5339,7 @@
       "referenced_by": [
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/gap_letters.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py"
       ]
@@ -6353,6 +6358,7 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/gap_letters.py",
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py",
@@ -7334,6 +7340,55 @@
       ]
     },
     {
+      "path": "gt/data/gap_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 44098,
+      "note": "Готовые письма изготовителям по самому дорогому разряду заявки ЛУКОЙЛ — строкам, где нет ни найденной цены, ни экспертной вилки. Замер 21.09.2026: таких строк 681 из 1 642, и по сведению с файлом потребности заказчика (gt/data/budget_join_stats.json) на 439 из них, которые есть в его файле с ценой, лежит 20 367 578 USD бюджета. Главное, что показал прогон: письмо по 445 из этих строк УЖЕ собрано в других пакетах (ship_lists_rfq — 368, письмо одному оператору из seller_index — 217, ship_quote_letters — 6, с пересечениями) и ждёт отправки; новых писем 21 на 111 позиций. Адресат определяется тремя путями, и источник записан по каждому письму. Первый — НАШ шаблон номера из ship_channels.json (Solar 24 позиции, Siemens 17, Pepperl+Fuchs 3, ABB 2); он первый потому, что на турбинных листах столбец «Производитель» заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Второй — столбец заказчика, сведённый с maker_contacts.json (Schlumberger 16, Drillmec 13, Mi Swaco 6, WAGO 2, Finder 1); отказ от него стоил бы пяти писем. Третий и самый слабый — почта изготовителя, записанная нашей же прежней разведкой в наборах репозитория (Wandfluh, HARTING, Transcyko, SCANCON, WIKA, BEKA, Industrie technik, MarFlex, Phoenix Contact, MURR Elektronik, EuroSwitch, Adalet — 27 позиций); такая запись помечена «страница контактов сейчас не перечитывалась» и уверенностью не выше средней. Домен признаётся принадлежащим изготовителю по ЗАКРЫТОМУ правилу — целая метка второго уровня, а не вхождение: проверка на вхождение отправила бы письма чужим компаниям, и это измерено («Argo Hytos» находится в cargocaresolutions.com, «Versa» в universal-thermosensors.co.uk, «NATIONAL Oilwell Varco» в platinum-international.store, «General Monitors» в general-gauges.com, «Johnson Controls» в johnsonturbine.com). Дистрибьютор тем же правилом отсеивается: «drilltechuae» ≠ «Drilltech». Осталось 117 строк, у большинства изготовитель заказчиком назван, но его страницу контактов мы не читали — каждый прочитанный адрес превращает свои строки в письмо тем же прогоном. Ещё 8 строк Danfoss без адреса. В письмах нет ни цены, ни бюджета заказчика, ни его имени. Отправляет письма человек. Читает лист решений gt/tools/ship_decisions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "ask_rows",
+        "brands_without_address",
+        "gap_rows",
+        "letters",
+        "of_them_already_in_a_letter",
+        "positions_in_letters",
+        "rows_by_attribution_path",
+        "rows_in_letters",
+        "rows_without_address",
+        "source",
+        "unbranded_makers_named_by_customer",
+        "unbranded_rows",
+        "unbranded_sample",
+        "updated",
+        "what_it_is",
+        "what_it_is_not",
+        "what_unbranded_means",
+        "why_pattern_comes_first",
+        "why_two_paths"
+      ],
+      "main_collection": {
+        "key": "unbranded_makers_named_by_customer",
+        "records": 77
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "fa75daf",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/gap_letters.py",
+        "gt/tools/ship_decisions.py",
+        "tests/test_gap_letters.py"
+      ]
+    },
+    {
       "path": "gpu/data/suppliers.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 43463,
@@ -7384,12 +7439,12 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/gap_letters.py",
         "gt/tools/ship_merge.py",
         "library/load_parts.py",
         "library/load_suppliers.py",
         "ove/build.py",
-        "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py"
+        "ove/tools/bitrix_ove.py"
       ]
     },
     {
@@ -8015,12 +8070,12 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/gap_letters.py",
         "gt/tools/ship_merge.py",
         "library/load_parts.py",
         "library/load_suppliers.py",
         "ove/build.py",
-        "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py"
+        "ove/tools/bitrix_ove.py"
       ]
     },
     {
@@ -8657,55 +8712,6 @@
         "library/load_suppliers.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
-      ]
-    },
-    {
-      "path": "gt/data/gap_letters.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 23783,
-      "note": "Готовые письма изготовителям по самому дорогому разряду заявки ЛУКОЙЛ — строкам, где нет ни найденной цены, ни экспертной вилки. Замер 21.09.2026: таких строк 681 из 1 642, и по сведению с файлом потребности заказчика (gt/data/budget_join_stats.json) на 439 из них, которые есть в его файле с ценой, лежит 20 367 578 USD бюджета. Главное, что показал прогон: письмо по 445 из этих строк УЖЕ собрано в других пакетах (ship_lists_rfq — 368, письмо одному оператору из seller_index — 217, ship_quote_letters — 6, с пересечениями) и ждёт отправки; новых писем 9 на 84 позиции. Адресат определяется двумя путями, и источник записан по каждому письму: НАШ шаблон номера из ship_channels.json (Solar 24, Siemens 17, Pepperl+Fuchs 3, ABB 2) и, только там, где шаблон молчит, столбец «Производитель» заказчика, сведённый с maker_contacts.json (Schlumberger 16, Drillmec 13, Mi Swaco 6, WAGO 2, Finder 1). Шаблон идёт первым, потому что на турбинных листах столбец заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Отказ от второго пути стоил бы пяти писем: у 38 строк из 182 «неопознанных» изготовитель заказчиком назван И адрес его страницы контактов у нас прочитан. Осталось 144 строки: изготовитель назван у большинства, но его страницу контактов мы не читали — это 89 изготовителей, и каждый прочитанный адрес превращает свои строки в письмо тем же прогоном. Ещё 8 строк Danfoss без адреса. В письмах нет ни цены, ни бюджета заказчика, ни его имени. Отправляет письма человек. Читает лист решений gt/tools/ship_decisions.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "ask_rows",
-        "brands_without_address",
-        "gap_rows",
-        "letters",
-        "of_them_already_in_a_letter",
-        "positions_in_letters",
-        "rows_by_attribution_path",
-        "rows_in_letters",
-        "rows_without_address",
-        "source",
-        "unbranded_makers_named_by_customer",
-        "unbranded_rows",
-        "unbranded_sample",
-        "updated",
-        "what_it_is",
-        "what_it_is_not",
-        "what_unbranded_means",
-        "why_pattern_comes_first",
-        "why_two_paths"
-      ],
-      "main_collection": {
-        "key": "unbranded_makers_named_by_customer",
-        "records": 89
-      },
-      "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "900bae6",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/gap_letters.py",
-        "gt/tools/ship_decisions.py",
-        "tests/test_gap_letters.py"
       ]
     },
     {
