@@ -1048,6 +1048,7 @@
         "scripts/build_chain_page.py",
         "scripts/build_symptom_index.py",
         "tests/test_dict.py",
+        "zip/tools/apply_verdicts.py",
         "zip/tools/build_diag_page.py",
         "zip/tools/extract_diagnostics.py"
       ]
@@ -1557,6 +1558,7 @@
         "scripts/build_chain_coverage.py",
         "scripts/build_chain_page.py",
         "tests/test_dict.py",
+        "zip/tools/apply_verdicts.py",
         "zip/tools/build_recon_pages.py",
         "zip/tools/extract_recon.py"
       ]
