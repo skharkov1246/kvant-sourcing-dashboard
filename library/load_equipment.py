@@ -40,6 +40,7 @@ from collections import Counter, defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import equipment as eq  # noqa: E402  (после sys.path)
+from load_parts import наши_номера  # noqa: E402  (реестр номеров — один на всех)
 from segments import classify  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -366,6 +367,11 @@ def main() -> int:
         print(f"    {k:28}{num(n)}")
     сузлом = sum(1 for p in parts.values() if p["unit_id"])
     print(f"  с определённым узлом:{num(сузлом)}   {сузлом / len(parts) * 100:.1f}%")
+    # Наш внутренний номер: сорсер и склад говорят номерами KV, а в библиотеке
+    # их не было вовсе — поиск по «KV-000753-4» не находил ничего.
+    наши, _ = наши_номера()
+    с_kv = sum(1 for p in parts.values() if наши.get(p["id"]))
+    print(f"  с нашим номером KV:{num(с_kv)}   (в реестре выдано {len(наши)})")
     правило = Counter(p["unit_rule"] or "—" for p in parts.values())
     print(f"  чем определён узел: {dict(правило.most_common())}")
     print("  топ узлов:")
@@ -449,7 +455,7 @@ def main() -> int:
 
         psycopg2.extras.execute_values(cur, """
             insert into lib_parts (id, catalog_no, name, oem, model, category, segment_id,
-                                   unit_id, unit_rule, pn_pattern, qty_demand, source)
+                                   unit_id, unit_rule, pn_pattern, qty_demand, kv_no, source)
             values %s
             on conflict (id) do update set
               oem        = coalesce(lib_parts.oem, excluded.oem),
@@ -460,6 +466,9 @@ def main() -> int:
               unit_rule  = coalesce(lib_parts.unit_rule, excluded.unit_rule),
               pn_pattern = coalesce(lib_parts.pn_pattern, excluded.pn_pattern),
               qty_demand = coalesce(lib_parts.qty_demand, excluded.qty_demand),
+              -- Наш внутренний номер: реестр — источник истины, поэтому здесь
+              -- он перекрывает прежнее значение, а не наоборот.
+              kv_no      = coalesce(excluded.kv_no, lib_parts.kv_no),
               -- position, а не like: в execute_values знак процента служебный,
               -- и даже в комментарии он ломает разбор запроса целиком.
               source     = case when position(excluded.source in lib_parts.source) > 0
@@ -468,7 +477,8 @@ def main() -> int:
               updated_at = now()""",
             [(p["id"], p["catalog_no"], p["name"], p["oem"], p["model"], p["category"],
               p["segment_id"], p["unit_id"], p["unit_rule"], p["pn_pattern"],
-              p["qty_demand"], p["source"]) for p in parts.values()], page_size=500)
+              p["qty_demand"], наши.get(p["id"]), p["source"])
+             for p in parts.values()], page_size=500)
 
         psycopg2.extras.execute_values(cur, """
             insert into lib_fleet (id, site, owner, model_id, model_raw, units, year,

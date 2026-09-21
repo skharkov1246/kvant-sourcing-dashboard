@@ -84,6 +84,13 @@ create index if not exists lib_parts_seg  on lib_parts (segment_id);
 create index if not exists lib_parts_oem  on lib_parts (oem);
 create index if not exists lib_parts_equip on lib_parts (target_equipment);
 
+-- Наш внутренний номер. Сорсер и склад говорят номерами KV, а в библиотеке
+-- их не было вовсе: поиск по «KV-000753-4» не находил ничего, хотя номер выдан
+-- и закреплён за деталью навсегда (pnw/data/kv_registry.json — номера не
+-- переиздаются и не переиспользуются).
+alter table lib_parts add column if not exists kv_no text;
+create index if not exists lib_parts_kv on lib_parts (kv_no);
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 2в. Машина и узел — первые два звена цепочки портала (CLAUDE.md, «Куда мы
 --     идём»). До сих пор их не было вовсе: деталь знала машину строкой
@@ -501,6 +508,140 @@ create index if not exists lib_prices_oem on lib_prices (oem);
 create index if not exists lib_prices_rfq on lib_prices (rfq_id);
 create index if not exists lib_prices_rfqco on lib_prices (rfq_company);
 
+-- ВНИМАНИЕ: источник — платная подписка (glbs.io), условия которой, как правило,
+-- запрещают перепубликацию. Таблица и представление ниже живут только в закрытой
+-- базе; на страницы портала числа из деклараций не выносятся.
+--
+-- Реестр таможенных декларации: кто фактически вёз такую номенклатуру, из какой
+-- страны, под какой маркой, на каких условиях и по какой цене за килограмм. Это
+-- не мнение и не оценка, а совершённые сделки — единственный наш источник,
+-- который отвечает на вопрос «кто это уже возит», а не «кого мы нашли».
+--
+-- match хранит надёжность сопоставления словом источника, а не сводится к
+-- «да/нет»: strong — декларация нашлась по партномеру (таких 80 из 42 314),
+-- weak — только по коду ТН ВЭД и описанию. Между ними две разные дальнейшие
+-- работы, и связь «деталь → поставка» ставится только по strong.
+--
+-- Импортёр лежит здесь с ИНН, но в lib_suppliers не идёт: он покупатель, а не
+-- исполнитель, и смешать их значит сломать единственный вопрос, на который
+-- справочник исполнителей отвечает.
+create table if not exists lib_customs (
+  id           text primary key,           -- хеш содержимого строки: прогон идемпотентен
+  decl_date    text,
+  hs10         text,
+  hs4          text,                       -- товарная группа, по ней считается ориентир
+  part_number  text,                       -- только для strong
+  brand        text,
+  exporter     text,
+  importer     text,
+  importer_inn text,
+  origin       text,
+  dispatch     text,
+  incoterms    text,
+  currency     text,
+  net_kg       numeric,
+  usd_kg       numeric,
+  value_usd    numeric,
+  descr        text,
+  match        text,                       -- strong | weak
+  source       text,                       -- файл выгрузки: без него выборку не повторить
+  created_at   timestamptz default now()
+);
+-- Узел выводится из описания товара в декларации тем же правилом, что и для
+-- каталога, но доверие к нему ниже: описание пишет декларант, а не инженер, и
+-- сверить его не с чем — ручной разметки деклараций у нас нет. Поэтому узел
+-- здесь отвечает на вопрос «кто возит детали ротора», а не служит разметкой.
+alter table lib_customs add column if not exists unit_id text
+  references lib_units(id) on delete set null;
+create index if not exists lib_customs_unit  on lib_customs (unit_id);
+create index if not exists lib_customs_hs4   on lib_customs (hs4);
+create index if not exists lib_customs_pn    on lib_customs (part_number);
+create index if not exists lib_customs_exp   on lib_customs (exporter);
+create index if not exists lib_customs_brand on lib_customs (brand);
+
+-- Ценовой ориентир по товарной группе, а НЕ цена детали: в одной группе лежат и
+-- коронка, и корпус, и расходник. Отвечает «двадцать долларов за килограмм для
+-- этой группы — дорого или дёшево», и только на это. Меньше двадцати строк в
+-- группе — медиана шум, поэтому такие группы отброшены прямо в представлении.
+-- Сносится перед созданием: на живой базе «create or replace» падает, если
+-- у вида поменялось имя колонки (tests/test_schema_views_droppable.py).
+drop view if exists lib_customs_bench;
+create or replace view lib_customs_bench
+  with (security_invoker = true) as
+select hs4,
+       count(*)                                                as поставок,
+       round(percentile_cont(0.25) within group (order by usd_kg)::numeric, 2) as p25,
+       round(percentile_cont(0.50) within group (order by usd_kg)::numeric, 2) as медиана,
+       round(percentile_cont(0.75) within group (order by usd_kg)::numeric, 2) as p75,
+       min(decl_date)                                          as с_даты,
+       max(decl_date)                                          as по_дату
+  from lib_customs
+ where hs4 is not null and usd_kg is not null
+ group by hs4
+having count(*) >= 20;
+
+-- Тот же ориентир, но по узлу машины, а не по товарной группе: «сколько стоит
+-- килограмм деталей ротора» — вопрос инженера, а «8431» — вопрос таможни.
+-- Порог тот же: меньше двадцати поставок — не ориентир, а шум.
+drop view if exists lib_customs_bench_unit;
+create or replace view lib_customs_bench_unit
+  with (security_invoker = true) as
+select unit_id,
+       count(*)                                                as поставок,
+       count(distinct exporter)                                as экспортёров,
+       round(percentile_cont(0.50) within group (order by usd_kg)::numeric, 2) as медиана,
+       round(percentile_cont(0.75) within group (order by usd_kg)::numeric, 2) as p75
+  from lib_customs
+ where unit_id is not null and usd_kg is not null
+ group by unit_id
+having count(*) >= 20;
+
+-- Расход и стоимость обслуживания: что на машине меняют, как часто и почём.
+-- Звено «ремонтное решение» знало ЧТО делают, но не знало НИ КОГДА, НИ ПОЧЁМ:
+-- 81 операция из 89 без интервала. Здесь и то, и другое — по узлу и по машине.
+--
+-- ЭТО РАСЧЁТ, А НЕ НАШИ СЧЕТА: источник собран по типовым интервалам ТО
+-- изготовителей и нашим ценовым вилкам при 8 000 часов работы в год. Допущение
+-- по часам хранится в строке (hours_year), источник назван расчётом. Смешать
+-- оценку с фактом здесь дешевле всего, а разделить потом — дороже всего.
+--
+-- Цена за единицу и цена за год — разные колонки: годовая получается умножением
+-- на расход (у головки блока восемь штук в год), и подстановка одной вместо
+-- другой завысила бы позицию в восемь раз.
+create table if not exists lib_consumption (
+  id          text primary key,             -- хеш «машина + позиция»: прогон идемпотентен
+  model_id    text references lib_models(id) on delete set null,
+  model_raw   text,                          -- как машина названа в источнике
+  unit_id     text references lib_units(id) on delete set null,
+  name        text not null,
+  qty_year    numeric,                       -- сколько штук в год
+  usd_unit    numeric,                       -- цена за единицу
+  usd_year    numeric,                       -- стоимость в год
+  interval_h  numeric,                       -- интервал замены, моточасы
+  hours_year  numeric,                       -- допущение о наработке, при котором считано
+  note        text,
+  source      text,
+  created_at  timestamptz default now()
+);
+create index if not exists lib_consumption_model on lib_consumption (model_id);
+create index if not exists lib_consumption_unit  on lib_consumption (unit_id);
+
+-- Годовая стоимость содержания по машине: чем она набирается и что в ней главное.
+-- Отвечает на вопрос, который задают первым, когда выбирают между ремонтом и
+-- заменой, и который до сих пор не отвечался вовсе.
+drop view if exists lib_maintenance_cost;
+create or replace view lib_maintenance_cost
+  with (security_invoker = true) as
+select coalesce(m.name, c.model_raw)         as машина,
+       c.model_id                              as ключ_машины,
+       count(*)                                as позиций,
+       round(sum(c.usd_year)::numeric, 0)      as usd_в_год,
+       round(min(c.interval_h)::numeric, 0)    as самый_частый_интервал_ч,
+       max(c.hours_year)                       as при_наработке_ч
+  from lib_consumption c
+  left join lib_models m on m.id = c.model_id
+ group by coalesce(m.name, c.model_raw), c.model_id;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
 --    типовые отказы, взаимозаменяемость. То, без чего нельзя грамотно
@@ -587,6 +728,8 @@ alter table lib_pn_patterns    enable row level security;
 alter table lib_symptom_ops    enable row level security;
 alter table lib_symptom_defects enable row level security;
 alter table lib_defect_ops     enable row level security;
+alter table lib_customs        enable row level security;
+alter table lib_consumption    enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч
