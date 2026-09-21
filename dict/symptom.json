@@ -1433,7 +1433,7 @@
    "parts": "Смазка требуемого класса NLGI и вязкости, дозирующий лубрикатор, пресс-маслёнки, манжетные уплотнения",
    "source": "ISO 29821:2018 (пороги в дБ); ASTM D7690 (типы частиц)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1449,7 +1449,7 @@
    "parts": "Дренажные пробки, смазка, манжеты; при повреждении — подшипник в сборе",
    "source": "Standard for Infrared Inspection of Electrical Systems & Rotating Equipment, Infraspection Institute, разделы 12–13; ISO 29821:2018",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1465,7 +1465,7 @@
    "parts": "Подшипник качения, манжетные или лабиринтные уплотнения, смазка; при повреждении посадки — ремонтная втулка или наплавка шейки",
    "source": "ASTM D7690 (усталостные сферы как ранний признак); ISO 29821:2018",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1481,7 +1481,7 @@
    "parts": "Фильтроэлемент с бета-рейтингом под целевой код (для роликового подшипника β7(c)=1000), сапун с влаго- и пылепоглотителем, уплотнения вала, масло",
    "source": "Fluid Life / Hy-Pro, таблица целевых кодов ISO 4406; Machinery Lubrication по расшифровке кремния",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1497,7 +1497,7 @@
    "parts": "Подшипник, уплотнения вала, осушающий сапун, элементы маслоохладителя, масло",
    "source": "ASTM D4378-13 Table 5 (предел 200 мг/кг); Cantley, ASLE Transactions 20(3) (потеря 32–48 % ресурса)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1513,7 +1513,7 @@
    "parts": "Заземляющее кольцо вала (shaft grounding ring), изолированный или гибридный керамический подшипник на неприводной стороне, выходной фильтр dV/dt или синусный фильтр, экранированный кабель двигателя",
    "source": "AEGIS (Electro Static Technology), материалы по напряжению вала и подшипниковым токам",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1529,7 +1529,7 @@
    "parts": "Баббит (оловянный или свинцовый), вкладыш в сборе, уплотнительные кольца, масло требуемой ISO VG",
    "source": "ASTM D4378-13 Table 4 (Sn и Pb — подшипники скольжения); Torontech, Guide to Wear Metal Analysis (Cu:Sn 20:1)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1545,7 +1545,7 @@
    "parts": "Вкладыш с новой баббитовой заливкой, маслонасос аварийного контура, датчики температуры вкладыша, масло",
    "source": "ASTM D4378-13 Table 3 и Table 4; Infraspection Institute, раздел 13.6 (предел 149 °C для баббита)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1561,7 +1561,7 @@
    "parts": "Вкладыш, баббит, элементы системы отвода воздуха, масло",
    "source": "ISO 22096:2007 (кавитация как выявляемое состояние); ASTM D4378-13 Table 5 Continued (D3427)",
    "confidence": "low",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1577,7 +1577,7 @@
    "parts": "Зубчатое колесо и шестерня комплектом, подшипники редуктора, уплотнения, масло целевой чистоты 17/16/13",
    "source": "ASTM D7690; Fluid Life / Hy-Pro (целевой код для промышленного редуктора)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1593,7 +1593,7 @@
    "parts": "Зубчатая пара, масло с EP-присадками требуемого класса и ISO VG, подшипники, уплотнения",
    "source": "ASTM D7690 (severe sliding wear); ASTM D4378-13 Table 5 (присадки ±25 %)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1609,7 +1609,7 @@
    "parts": "Бронзовый червячный венец, червяк (при износе), подшипники, манжеты, редукторное масло",
    "source": "Torontech, Guide to Wear Metal Analysis (Cu:Sn 20:1); ASTM D4378-13 Table 4",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "опровергнуто"
   },
   {
    "angle": "common/other_methods",
@@ -1625,7 +1625,7 @@
    "parts": "Масло требуемого класса, фильтроэлементы, элементы установки очистки (адсорбционные картриджи), при закоксовывании — форсунки и дроссели",
    "source": "ASTM D4378-13, Table 5 и Table 6, графа Warning Limits",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1641,7 +1641,7 @@
    "parts": "Адсорбционные и целлюлозные фильтроэлементы установки удаления лака, сервоклапаны, уплотнения, масло",
    "source": "ASTM D7843; шкала интерпретации по Turbomachinery International",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1657,7 +1657,7 @@
    "parts": "Масло требуемого класса, промывочная жидкость, фильтроэлементы, цветная маркировка и выделенный раздаточный инвентарь",
    "source": "ASTM D4378-13, Table 5 (вязкость ±5 %, присадки ±25 %, D1401); ASTM D7155",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/other_methods",
@@ -1673,7 +1673,7 @@
    "parts": "Уплотнения всасывающей линии маслонасоса, успокоительные перегородки бака, сетки, масло",
    "source": "ASTM D4378-13, Table 3 и Table 5 Continued (D892, D3427)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/other_methods",
@@ -1689,7 +1689,7 @@
    "parts": "Трубный пучок или отдельные трубки, заглушки трубок, прокладки крышек, уплотнения, масло",
    "source": "ASTM D4378-13, Table 4 (Na, K, B — присадки охлаждающей воды) и Table 5; ASTM E690",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1705,7 +1705,7 @@
    "parts": "Щелевые уплотнения корпуса и колеса (wear rings) в ремонтном размере, крепёж, прокладки; при выработке — рабочее колесо",
    "source": "API Standard 610, Table 6 (минимальные диаметральные зазоры, +0,125 мм при t>260 °C или склонности к схватыванию)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1721,7 +1721,7 @@
    "parts": "Рабочее колесо, щелевые уплотнения, торцовое уплотнение, подшипники; по всасывающему тракту — фильтр, арматура",
    "source": "Xylem, white paper Cavitation; ANSI/HI 14.6 (NPSH3 как падение напора на 3 %); ISO 22096:2007",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1737,7 +1737,7 @@
    "parts": "Рабочее колесо, подшипники, торцовое уплотнение; по системе — линия минимального расхода с регулирующим клапаном, частотный преобразователь",
    "source": "Modern Pumping Today; Michael Smith Engineers; Xylem, white paper Cavitation (различение по месту эрозии)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "common/other_methods",
@@ -1753,7 +1753,7 @@
    "parts": "Рабочее колесо, корпус (улитка), щелевые уплотнения, торцовое уплотнение; по системе — байпасная линия минимального расхода",
    "source": "Modern Pumping Today; Xylem, white paper Cavitation",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "common/other_methods",
@@ -1769,7 +1769,7 @@
    "parts": "Фильтроэлемент или сетка приёмного фильтра, прокладки, манометры и мановакуумметры",
    "source": "Общая практика диагностики насосов; Crane Engineering, What is Pump Cavitation",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "common/other_methods",
@@ -1785,7 +1785,7 @@
    "parts": "Ротор в сборе либо стержни и короткозамыкающие кольца, подшипники, устройство плавного пуска или частотный преобразователь для снижения пусковых напряжений",
    "source": "Классическая методика MCSA (Thomson, Fenger); отраслевые шкалы тяжести по дБ",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "опровергнуто"
   },
   {
    "angle": "common/other_methods",
@@ -1801,7 +1801,7 @@
    "parts": "Подшипники, регулировочные прокладки под лапы, полумуфты и упругие элементы муфты; при задевании — статор или двигатель целиком",
    "source": "Классическая методика MCSA; ISO 18434-2:2019 (интерпретация термограмм)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1817,7 +1817,7 @@
    "parts": "Крыльчатка и кожух вентилятора, подшипники; при повреждении обмотки — обмоточный провод, изоляционные материалы, пропиточный лак (перемотка)",
    "source": "Standard for Infrared Inspection…, Infraspection Institute, разделы 10.1 и 12.1; ISO 18434-2:2019",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1833,7 +1833,7 @@
    "parts": "Кабельные наконечники, болты и шайбы, контактная паста, контакторы и клеммные колодки; при повреждении — участок кабеля",
    "source": "Standard for Infrared Inspection…, Infraspection Institute, раздел 10.1, критерии NETA MTS",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/other_methods",
@@ -1849,7 +1849,7 @@
    "parts": "Упругие элементы муфты (втулки, пальцы, диски, зубчатые обоймы), регулировочные прокладки под лапы, подшипники, торцовое уплотнение",
    "source": "ISO 18434-2:2019 (расцентровка как механизм, порождающий тепловую аномалию); Standard for Infrared Inspection…, раздел 12",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1865,7 +1865,7 @@
    "parts": "Картридж торцового уплотнения, кольца пары трения (карбид кремния, карбид вольфрама, углеграфит), эластомеры (NBR, FKM, FFKM, EPDM) по температуре и среде, элементы затворной системы по плану API 682, подшипники",
    "source": "ASTM D4378-13 Table 5 (вода в масле); Infraspection Institute, раздел 13.6 (предельные температуры эластомеров: NBR 100 °C, силикон и фторкаучук 180 °C)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1881,7 +1881,7 @@
    "parts": "Химические реагенты для промывки, прокладки крышек и разборных пластинчатых аппаратов, пластины (при повреждении), трубки и заглушки",
    "source": "ISO 18434-1:2008 (область распространения включает связанные с машинами теплообменники)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/other_methods",
@@ -1897,7 +1897,7 @@
    "parts": "Заглушки трубок, отдельные трубки, трубный пучок в сборе, прокладки крышек и трубной решётки",
    "source": "ASTM E690; ASME BPVC Section XI, IWA-4713 (глушение расширением)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1913,7 +1913,7 @@
    "parts": "Вал ротора, шпонки, подшипники, торцовое уплотнение, полумуфта, балансировочные грузы",
    "source": "ASME BPVC Section VIII Div. 1, Mandatory Appendix 6 (нормы отбраковки); ASTM E709, E1444, E165, E1417",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1929,7 +1929,7 @@
    "parts": "Корпус (улитка) или крышка, прокладки разъёма, крепёж, щелевые уплотнения корпуса",
    "source": "ASTM E446, ASTM E186, ASTM E280 (уровень отбраковки устанавливается соглашением покупателя и поставщика); ASTM E165",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/other_methods",
@@ -1945,7 +1945,7 @@
    "parts": "Сварочные материалы (электроды, проволока, защитный газ) под марку основного металла, шлифовальный инструмент; при замене — участок трубы, фланец, прокладки",
    "source": "ASME BPVC Section VIII Div. 1, Mandatory Appendix 6; ASME BPVC Section V",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1961,7 +1961,7 @@
    "parts": "Ремкомплект арматуры (седло, затвор, шток, сальниковая набивка, прокладки) либо арматура целиком",
    "source": "ISO 29821:2018 (утечки как выявляемое состояние); материалы SDT Ultrasound и UE Systems по течеисканию",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1977,7 +1977,7 @@
    "parts": "Ремкомплект конденсатоотводчика (седло, клапан, поплавок, термоэлемент), прокладки, либо отводчик в сборе",
    "source": "ISO 29821:2018; практика течеискания UE Systems (Ultraprobe), SDT Ultrasound",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -1993,7 +1993,7 @@
    "parts": "Шланги, быстроразъёмные муфты, уплотнительные кольца, фитинги, ФУМ-лента и герметики, участки трубопровода",
    "source": "ISO 29821:2018; материалы UE Systems и SDT Ultrasound по течеисканию сжатого воздуха",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -2009,7 +2009,7 @@
    "parts": "Опорные и проходные изоляторы, изоляционные материалы, нагреватели шкафа и осушители, уплотнения дверей",
    "source": "ISO 29821:2018 (частичные разряды в распределительных устройствах как область применения)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -2025,7 +2025,7 @@
    "parts": "Приводные ремни комплектом, шкивы, натяжное устройство, подшипники натяжного ролика",
    "source": "ISO 18434-2:2019 (интерпретация термограмм механического оборудования); Standard for Infrared Inspection…, раздел 12",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -2041,7 +2041,7 @@
    "parts": "Фильтроэлементы с бета-рейтингом β5(c)=1000 для сервоклапанов, сервоклапан или ремкомплект золотниковой пары, адсорбционные элементы установки удаления лака, уплотнения, рабочая жидкость",
    "source": "Fluid Life / Hy-Pro (целевые коды для сервоклапанов); ASTM D7843; ASTM D4378-13",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -2057,7 +2057,7 @@
    "parts": "Ремкомплект насоса (шестерни, пластины, втулки, боковые компенсирующие пластины) или насос в сборе, всасывающий фильтр, напорный фильтроэлемент с требуемым бета-рейтингом, уплотнения вала",
    "source": "Fluid Life / Hy-Pro (целевые коды по типам насосов: шестерённый 20/18/15, аксиально-поршневой регулируемый 18/16/13); ASTM D5185",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -2073,7 +2073,7 @@
    "parts": "Фильтроэлемент требуемого бета-рейтинга под целевой код узла, уплотнения корпуса фильтра, индикатор перепада давления, перепускной клапан",
    "source": "Fluid Life / Hy-Pro (подбор бета-рейтинга под целевой код); ASTM D4378-13 Table 5 (реакция на ухудшение чистоты)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/other_methods",
@@ -2089,7 +2089,7 @@
    "parts": "Влагопоглощающий сапун с силикагелем и фильтром частиц, уплотнения люков, комплект быстроразъёмных портов отбора проб, осушающая установка для восстановления масла",
    "source": "ASTM D4378-13 п. 5.1.2.3 и Table 3; Machinery Lubrication по расшифровке кремния",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2105,7 +2105,7 @@
    "parts": "Балансировочные грузы и крепёж; рабочее колесо или его лопатки; при вторичном повреждении — подшипники и уплотнения.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Unbalance: 1×, фазовый сдвиг 0° через муфту)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2121,7 +2121,7 @@
    "parts": "Вал ротора; после правки — обязательная перебалансировка; сопутствующе — уплотнения и подшипники.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Bent shaft: 1× particularly at low speed; can cancel with unbalance)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "common/vibro",
@@ -2137,7 +2137,7 @@
    "parts": "Вал или ротор в сборе — длинноцикловая позиция закупки, требует раннего размещения заказа.",
    "source": "ISO 20816-3:2022, п. 6.7 (propagation of a crack in a rotor introduces a progressive change at multiples of rotational frequency)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2169,7 +2169,7 @@
    "parts": "Упругие элементы муфты (пакеты пластин, звёздочка, втулки), крепёж муфты, регулировочные подкладки (шимсы) из нержавеющей стали; при вторичном повреждении — вкладыши и уплотнения.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 и Прил. C, Табл. C.1 (Alignment: 2×, elongated or flattened orbit, temperature trends in opposite directions)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2201,7 +2201,7 @@
    "parts": "Калиброванные подкладки (шимсы) из нержавеющей стали, крепёж лап.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Soft foot: 1×, plus 2× supply frequency; soft foot test)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2217,7 +2217,7 @@
    "parts": "Подливочные составы, анкерные системы, регулировочные клинья и подкладки; работы строительной специализации.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Tilted foundation: ODS usually at 1×, rocking motion; Need civil engineer to resolve issue)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2233,7 +2233,7 @@
    "parts": "Опоры и подвески трубопровода, компенсаторы (сильфонные, линзовые), прокладки фланцев, крепёж.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Piping strain: 1×, directional, wave clipping in time waveform; flanges should match without jacking)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2249,7 +2249,7 @@
    "parts": "Прокладки разъёма, крепёж корпуса; при обработке — ремонтные вкладыши и уплотнения под новые размеры.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Casing distortion: 1×, sometimes 2×, 180° phase shift from end to end)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2265,7 +2265,7 @@
    "parts": "Элементы усиления (раскосы, косынки, дополнительные опоры), демпферы, динамические гасители; при отстройке трубопровода — дополнительные опоры и хомуты.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Resonance: high vibration at a particular frequency; change speed, stiffen machine or add mass) и п. B.2.4, B.2.6",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2281,7 +2281,7 @@
    "parts": "Комплект вкладышей (полувкладышей) подшипника либо колодки сегментного подшипника; баббит для перезаливки; регулировочные прокладки.",
    "source": "ISO 13373-3:2015, Прил. C, Табл. C.1 (Clearance increase)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2297,7 +2297,7 @@
    "parts": "Вкладыши/полувкладыши с баббитовой заливкой; баббит марок на оловянной основе; термопреобразователи сопротивления для контроля температуры баббита.",
    "source": "ISO 13373-3:2015, Прил. C, Табл. C.1 (Loss of babbitt: can lead to catastrophic failure of the bearing)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2313,7 +2313,7 @@
    "parts": "Масло требуемой марки, фильтроэлементы, маслоочистительное оборудование, уплотнения подшипника (маслоотбойные кольца, лабиринты).",
    "source": "ISO 13373-3:2015, Прил. C, Табл. C.1 (Oil carbonization: 1× saw-tooth like behaviour over several weeks, cyclic, repeatable)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2329,7 +2329,7 @@
    "parts": "Вкладыши с правильным натягом, регулировочные прокладки, крепёж крышки подшипника; при разбитом гнезде — ремонт или замена корпуса.",
    "source": "ISO 13373-3:2015, Прил. C, Табл. C.1 (Bearing loose in housing)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2345,7 +2345,7 @@
    "parts": "Вкладыши, регулировочные прокладки, крепёж; иногда — расточка корпуса.",
    "source": "ISO 13373-3:2015, Прил. C, Табл. C.1 (Cocked bearing: clearance is uneven across the bearing; can result in rubbing)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2361,7 +2361,7 @@
    "parts": "Вкладыши или комплект колодок сегментного подшипника; маркировка и приспособления для контроля ориентации при сборке.",
    "source": "ISO 13373-3:2015, Прил. C, Табл. C.1 (Bearing installed backwards)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2377,7 +2377,7 @@
    "parts": "Вкладыши изменённой геометрии или сегментный подшипник в сборе; масло другой вязкости; маслоохладитель.",
    "source": "ISO 13373-3:2015, Прил. C, п. C.4.4 (oil whirl — self-excited vibration at a frequency less than 0,5×)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "опровергнуто"
   },
   {
    "angle": "common/vibro",
@@ -2393,7 +2393,7 @@
    "parts": "Сегментные (tilting-pad) подшипники как радикальное решение; вкладыши изменённой геометрии; уплотнения после повреждения.",
    "source": "ISO 13373-3:2015, Прил. C, п. C.4.4 и Рис. C.7 (typical oil whip spectrum, 1× locked at first resonance speed)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2409,7 +2409,7 @@
    "parts": "Лабиринтные уплотнения, сотовые уплотнения, маслоотбойные кольца, уплотнительные сегменты; при повреждении — вал или его наплавка с последующей обработкой.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Rubbing: clipping in time waveform, rotating vectors, can produce backward whirl) и Прил. C, п. C.4.4",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2425,7 +2425,7 @@
    "parts": "Смазка требуемой марки и класса NLGI; дозаторы и автоматические лубрикаторы; при повреждении — подшипник в сборе.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 0 (Lubrication defect: increase in friction forces in the high frequency region, mostly 8 kHz octave band; severity High)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2441,7 +2441,7 @@
    "parts": "Уплотнения подшипникового узла (манжеты, лабиринтные кольца, маслоотражатели), фильтроэлементы, смазка; при износе — подшипник.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 0 (Contamination: foreign material, 8 kHz octave band; severity High)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2457,7 +2457,7 @@
    "parts": "Подшипник качения; восстановление шейки вала либо втулка; фиксирующие элементы (закрепительные втулки, гайки, стопорные шайбы).",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 0 (Slip of inner race: random friction forces modulated by 1× RPM and harmonics; severity High)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2473,7 +2473,7 @@
    "parts": "Подшипник качения; при необходимости — самоустанавливающийся тип подшипника; регулировочные элементы узла.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 0 (Misalignment of inner and outer race: 2× RPM, increase in axial direction)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2489,7 +2489,7 @@
    "parts": "Подшипник качения с требуемой группой радиального зазора (C3, C4) и классом точности; монтажный инструмент (индукционный нагреватель).",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 0 (Insufficient clearance and overexpansion of the rolling elements: 2× BSF; severity High)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2505,7 +2505,7 @@
    "parts": "Подшипник качения; ремонт или замена корпуса подшипника; ремонтные втулки, полимерные восстановительные составы.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 0 (Poorly shaped (or looseness) of the bearing housing)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2521,7 +2521,7 @@
    "parts": "Подшипник подходящего типоразмера; пружины предварительного натяга, дистанционные кольца.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 0 (Dynamic instability: shocks at 1× RPM and harmonics, BPFO and FTF; usually caused by inadequate loading)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2537,7 +2537,7 @@
    "parts": "Подшипник качения по обозначению изготовителя (с указанием группы зазора и класса точности); при замене — новая смазка и уплотнения.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 1 (Slight wear on outer race: appearance of 1× BPFO modulation in friction forces spectrum)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2553,7 +2553,7 @@
    "parts": "Подшипник качения по обозначению изготовителя.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 1 (Slight wear on inner race: appearance of 1× RPM modulation in friction forces; severity Medium)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2569,7 +2569,7 @@
    "parts": "Подшипник качения; смазка; уплотнения узла.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 2 (Spallings or cavities on outer race: shocks, modulation at 1× BPFO and harmonics)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2585,7 +2585,7 @@
    "parts": "Подшипник качения; при подозрении на дефект изготовления — рекламация поставщику и смена источника поставки.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 2 (Spallings or cavities on inner race: modulation at 1× BPFI and harmonics, modulation at 1× RPM)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2601,7 +2601,7 @@
    "parts": "Подшипник качения; рассмотреть исполнение с сепаратором из другого материала (латунный, стальной штампованный, полиамидный) под фактические условия.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 2 (Worn-out cage: modulation of friction forces at FTF; precursor to a broken cage)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2617,7 +2617,7 @@
    "parts": "Подшипник качения; при повторении — пересмотр типа сепаратора и условий нагружения.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 3 (Broken cage: shocks at FTF and/or harmonics)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2633,7 +2633,7 @@
    "parts": "Подшипник качения; индукционный нагреватель для монтажа; калибры для контроля посадочных размеров вала.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 3 (Cracked inner race: often occurs rapidly on start-up because of too much heat)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2649,7 +2649,7 @@
    "parts": "Подшипник качения; анализ смазки и уплотнений для устранения первопричины.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 3 (Damaged rolling elements: shocks at 2× BSF, modulation at FTF; incipient failure can accelerate)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2665,7 +2665,7 @@
    "parts": "Подшипник качения; транспортная тара с виброизоляцией; приспособления монтажа (нагреватель, монтажные втулки).",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 3 (Brinelling: often caused by transport, storage, idling too long (ambient vibration))",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2681,7 +2681,7 @@
    "parts": "Подшипник в изолированном исполнении (керамическое покрытие колец) или гибридный с керамическими телами качения; заземляющее кольцо или щётка на вал; экранированный кабель и правильное заземление привода.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 3 (Fluting: shocks at regular intervals and very high harmonics; generally due to electro-static discharge inside bearing)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2697,7 +2697,7 @@
    "parts": "Подшипник качения; вероятна необходимость восстановления шейки вала и посадочного места корпуса; уплотнения, смазка.",
    "source": "ISO 13373-3:2015, Прил. D, Табл. D.1, тип 4 (signal becomes completely random with level increase more than 20 dB (i.e. 10 times); Must replace bearing)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2713,7 +2713,7 @@
    "parts": "Ротор в сборе или комплект стержней и короткозамыкающих колец; после ремонта — обязательная динамическая балансировка ротора.",
    "source": "ISO 13373-9:2017, Прил. A, Табл. A.1 (Cracked or broken rotor bars)",
    "confidence": "high",
-   "verdict": "непроверяемо"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2729,7 +2729,7 @@
    "parts": "Регулировочные подкладки, крепёж; при повреждении — упорный подшипник или упорные полукольца.",
    "source": "ISO 13373-9:2017, Прил. A, Табл. A.1 (Rotor running off magnetic centre: high axial 1×, 2× or 3× with much lower radial vibration)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2745,7 +2745,7 @@
    "parts": "Пазовые клинья, изоляционные распорки, пропиточный лак или компаунд; при перемотке — обмоточный провод и комплект изоляции.",
    "source": "ISO 13373-9:2017, Прил. A, Табл. A.1 (Loose stator coils (synchronous motors): (number of stator coils) × 1× rotational speed with 1× sidebands)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2761,7 +2761,7 @@
    "parts": "Вал двигателя; шкивы и ремни правильного типоразмера; после ремонта — балансировка ротора.",
    "source": "ISO 13373-9:2017, Прил. A, Табл. A.1 (Bent shaft extension)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2777,7 +2777,7 @@
    "parts": "Подшипники; ремонт или замена пакета статора; крепёж и стяжные шпильки статора; регулировочные подкладки для восстановления соосности.",
    "source": "ISO 13373-9:2017, п. 3.3–3.9 (определения частот); отраслевая сводка CBM Connect по картинам дефектов электродвигателей",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2793,7 +2793,7 @@
    "parts": "Зубчатая пара (шестерня и колесо) — заменяются, как правило, комплектом; подшипники редуктора; масло требуемого класса и его фильтрация.",
    "source": "ISO 20816-9:2020, п. 1 (оценка состояния зубьев выносится за область применения, требуются специальные методики); отраслевая практика диагностики зубчатых передач",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2809,7 +2809,7 @@
    "parts": "Зубчатая пара; подшипники редуктора; уплотнения; масло.",
    "source": "Отраслевая практика диагностики (сводки Power-MI, CBM Connect); ISO 13373-2:2016, п. 4.2.4 (envelope: defective tooth entering mesh excites high-frequency resonances)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2825,7 +2825,7 @@
    "parts": "Рабочее колесо, щелевые уплотнения (кольца), уплотнение вала; при изменении режима — дроссельная арматура, ЧРП, изменение всасывающей обвязки.",
    "source": "ISO 10816-7:2009, п. 4.3 (изменение вибрации требует выяснения причины: дисбаланс, КАВИТАЦИЯ, повреждение...) и п. 3.2.1 (полоса до 2,5× лопастной частоты)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2841,7 +2841,7 @@
    "parts": "Рабочее колесо (при подрезке — обязательная перебалансировка), направляющий аппарат, щелевые уплотнения; элементы усиления обвязки.",
    "source": "ISO 10816-7:2009, Табл. A.1 (фильтрованные значения на f_n и f_n·z_i: ≤2 мм/с Кат. I, ≤3 мм/с Кат. II в предпочтительном диапазоне)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2857,7 +2857,7 @@
    "parts": "Рабочее колесо или его лопасти, лопатки направляющего аппарата, болтовые соединения крышки турбины, уплотнения вала.",
    "source": "ISO 20816-5:2018, п. 5.4.2 (rotor-stator interaction effects with high-frequency components, typically 70 Hz to 500 Hz, due to pressure pulsations in the vaneless space)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2873,7 +2873,7 @@
    "parts": "Рабочее колесо, болты соединения вала, лопатки направляющего аппарата, крышка турбины, лабиринтные и валовые уплотнения с крепежом; система подачи воздуха.",
    "source": "ISO 20816-5:2018, п. 5.4.2 (draft tube excitations generate broad-band frequency components; necessary to analyse the whole unfiltered signal)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2889,7 +2889,7 @@
    "parts": "Опоры и хомуты малых отводов, косынки усиления, замена участка отвода на исполнение с большей толщиной стенки и лучшей геометрией сварного узла.",
    "source": "ISO 20816-8:2018, Прил. E, Табл. E.3 и Табл. 1, Примечание 4",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2905,7 +2905,7 @@
    "parts": "Анкерные болты и гайки, эпоксидные подкладки (epoxy chocks) или безусадочная подливка, регулировочные подкладки.",
    "source": "ISO 20816-8:2018, Табл. 3 и п. 5.3.2 (значения справедливы только для жёстких фундаментов; конструкция не должна работать в резонансе)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "common/vibro",
@@ -2921,7 +2921,7 @@
    "parts": "Пробки и дренажные элементы вала и муфты; при повторении — доработка конструкции дренажа.",
    "source": "ISO 13373-3:2015, Прил. C, п. C.4.4 (trapped fluid in hollow shafts or couplings ... at a frequency between 0,6× to 0,95×)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2937,7 +2937,7 @@
    "parts": "Регулировочные подкладки, крепёж; при повреждении — вкладыши подшипников.",
    "source": "ISO 13373-3:2015, Прил. C, Табл. C.1 (Alignment: shaft can ride at an unusual attitude angle or eccentricity; can result in unloading bearing and instability)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "common/vibro",
@@ -2953,7 +2953,7 @@
    "parts": "Подшипник качения; восстановительные материалы для посадок; при разбитом корпусе — ремонтная втулка или новый корпус.",
    "source": "ISO 13373-3:2015, Прил. B, Табл. B.1 (Bearing clearance: 1×, with small harmonics, directional; repair or replace bearing) и п. B.2.5",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -2969,7 +2969,7 @@
    "parts": "Рабочее колесо; передние и задние щелевые кольца; при глубоком разрушении — корпус/улитка или бронедиск; торцевое уплотнение в сборе; подшипники.",
    "source": "Xylem White Paper «Pump cavitation and how to avoid it» (июнь 2017); Pumps & Systems «Back to Basics, Part 3»; Holland Applied Technologies",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -2985,7 +2985,7 @@
    "parts": "Рабочее колесо; всасывающая крышка/патрубок; щелевые кольца; торцевое уплотнение; подшипники. Системно — клапан/линия минимального расхода, рециркуляционная шайба.",
    "source": "WaterWorld «How to Avoid Damage from Internal Suction Recirculation»; Pumps & Systems «Back to Basics, Part 3»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "pumps/defects",
@@ -3001,7 +3001,7 @@
    "parts": "Рабочее колесо; улитка/бронедиск; при разрушении языка — корпус или сменная вставка; торцевое уплотнение; подшипники.",
    "source": "Pumps & Systems «Back to Basics, Part 3»; Holland Applied Technologies",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3017,7 +3017,7 @@
    "parts": "Рабочее колесо (с корректным наружным диаметром); улитка/корпус или сменная вставка языка; торцевое уплотнение.",
    "source": "W. Marscher, TAMU Turbomachinery Laboratory (2018), разд. Gap A / Gap B; API 610 11-е изд.; Holland Applied Technologies",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3033,7 +3033,7 @@
    "parts": "Прокладки и уплотнения фланцев всасывающей линии; торцевое уплотнение или сальниковая набивка; при разрушении — рабочее колесо. Системно — воздухоотводчик, вихрегаситель в приёмном колодце.",
    "source": "Xylem White Paper «Pump cavitation and how to avoid it» (2017); Holland Applied Technologies; Michael Smith Engineers",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3049,7 +3049,7 @@
    "parts": "Элементы всасывающего трубопровода (переход, колено, прямая вставка, спрямляющие рёбра); рабочее колесо при разрушении.",
    "source": "Xylem White Paper «Pump cavitation and how to avoid it» (2017); Michael Smith Engineers",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3065,7 +3065,7 @@
    "parts": "Рабочее колесо; бронедиски (передний/задний, frame plate liner); улитка или её футеровка; горловина/throatbush; защитная втулка вала; щелевые кольца.",
    "source": "Pumpfocus «Corrosion and erosion in pumps»; ASTM G75; спецификация AGES-SP-05-001, кл. 3.66–3.67",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3081,7 +3081,7 @@
    "parts": "Колесо; горловина (throatbush); бронедиск со стороны привода (frame plate liner); футеровка улитки; кольцо экспеллера (expeller ring); защитная втулка вала; фонарное кольцо и набивка сальника.",
    "source": "Weir/Warman и GIW — отраслевые рекомендации; ASTM A532 кл. III тип A; сводки поставщиков шламовых насосов",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3097,7 +3097,7 @@
    "parts": "Горловина (throatbush); при исчерпании регулировки — колесо; прокладки регулировочного узла.",
    "source": "Отраслевые руководства по шламовым насосам (Nexa, Longteng); HYSIC",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "pumps/defects",
@@ -3113,7 +3113,7 @@
    "parts": "Корпус/улитка; рабочее колесо; вал или защитная втулка; крепёж (замена на стойкий класс); прокладки.",
    "source": "Pumpfocus «Corrosion and erosion in pumps», разд. 4.2",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3129,7 +3129,7 @@
    "parts": "Корпус; колесо; вал; при повторяемости — переход на дуплексную или супердуплексную сталь.",
    "source": "Pumpfocus «Corrosion and erosion in pumps»; исследования влияния концентрации хлоридов на питтинг и КРН аустенитных сталей",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3145,7 +3145,7 @@
    "parts": "Прокладки; щелевые кольца; крепёж; при разрушении посадки — корпус или крышка.",
    "source": "Pumpfocus «Corrosion and erosion in pumps»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3161,7 +3161,7 @@
    "parts": "Крепёж; щелевые кольца; защитная втулка вала; при необходимости — протекторы.",
    "source": "Pumpfocus «Corrosion and erosion in pumps», разд. 4.2",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3177,7 +3177,7 @@
    "parts": "Рабочее колесо; улитка; щелевые кольца; сменные вставки в зоне языка.",
    "source": "Pumpfocus «Corrosion and erosion in pumps», разд. 4.2",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3193,7 +3193,7 @@
    "parts": "Вал; колесо; корпус. При повторении — переход на материал, стойкий к КРН (дуплекс, сплавы на никелевой основе).",
    "source": "Pumpfocus «Corrosion and erosion in pumps»; данные по влиянию хлоридов на КРН аустенитных сталей",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3209,7 +3209,7 @@
    "parts": "Передние и задние щелевые кольца (корпусные и на колесе); межступенчатые втулки; при разбитых посадках — колесо и корпус.",
    "source": "API 610, таблица 6; Pumps & Systems «The Power of Wear Rings, Part Two»; W. Marscher, TAMU (2018)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3225,7 +3225,7 @@
    "parts": "Комплект щелевых колец (с корректной разностью твёрдости); при разбитии — колесо, корпус/крышка; вал при задире или обрыве.",
    "source": "API 610; Carver Pump «API 610 Pump Wear Rings»; спецификация AGES-SP-05-001, кл. 6.7.2",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3241,7 +3241,7 @@
    "parts": "Рабочее колесо (при невозможности балансировки); балансировочные грузы; подшипники и торцевое уплотнение как вторично повреждённые; полумуфта.",
    "source": "API 610; ISO 1940-1 / ISO 21940-11; Pumps & Systems «Following Industry Standard Guidelines for Balancing Centrifugal Pumps»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3257,7 +3257,7 @@
    "parts": "Упругие элементы муфты или муфта в сборе; прокладки (шимы) под лапы; подшипники и торцевое уплотнение как вторично повреждённые; при повреждении — вал и полумуфта.",
    "source": "PRÜFTECHNIK/LUDECA «A Practical Guide to Shaft Alignment» (2002); Power-MI «Misalignment»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3273,7 +3273,7 @@
    "parts": "Шимы (в том числе клиновые); анкерные болты; прокладки фланцев; компенсаторы или опоры трубопровода.",
    "source": "PRÜFTECHNIK/LUDECA «A Practical Guide to Shaft Alignment» (2002); API 610, таблица 5; спецификация AGES-SP-05-001",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3289,7 +3289,7 @@
    "parts": "Вал; защитная втулка вала; торцевое уплотнение; подшипники; щелевые кольца.",
    "source": "SealFAQs «Failure Analysis of Faces» (широкое пятно контакта как признак биения); спецификация AGES-SP-05-001, кл. 6.6.15–6.6.18",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3305,7 +3305,7 @@
    "parts": "Вал; колесо; торцевое уплотнение; подшипники; нередко корпус и крышка.",
    "source": "Reliabilityweb «Torsional Fatigue Failure»; исследования усталостных изломов валов центробежных насосов; API 610",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3321,7 +3321,7 @@
    "parts": "Вал; шпонка; полумуфта; при разрушении — колесо и подшипники.",
    "source": "Reliabilityweb «Torsional Fatigue Failure»; API RP 684; спецификация AGES-SP-05-001, кл. 6.9.2",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3337,7 +3337,7 @@
    "parts": "Гайка колеса и стопор; шпонка; защитная втулка вала; подшипники; крепёж и шимы; при разбитых посадках — вал, колесо, корпус подшипников.",
    "source": "Power-MI «Looseness»; Fluke «Mechanical Looseness»; Vibromera",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3353,7 +3353,7 @@
    "parts": "Подшипники; защитная втулка вала; колесо; при разбитой посадке — вал.",
    "source": "ISO 15243:2017 (фреттинг-коррозия, подгруппа коррозии); SKF «Bearing damage classification»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3369,7 +3369,7 @@
    "parts": "Щелевые кольца (восстановление жёсткости Ломакина — самый дешёвый рычаг); элементы усиления опор; подшипники; при перепроектировании — вал большего диаметра или иное колесо.",
    "source": "W. Marscher, TAMU Turbomachinery Laboratory (2018); API 610; ANSI/HI 9.6.8",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3385,7 +3385,7 @@
    "parts": "Торцевое уплотнение в сборе (картридж); вторичные уплотнения (эластомеры); защитная втулка вала при повреждении; элементы плана промывки (шайба, фильтр, сепаратор).",
    "source": "Vulcan Seals «Mechanical Seal Troubleshooting»; API 682, 4-е изд.; SealFAQs",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3401,7 +3401,7 @@
    "parts": "Торцевое уплотнение; теплообменник и шайба плана промывки (Plan 21/23); циклонный сепаратор (Plan 31); при переходе на двойное уплотнение — бачок барьерной жидкости (Plan 52/53).",
    "source": "API 682, 4-е изд.; EagleBurgmann «API 682 4th edition Application guide»; Vulcan Seals",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3417,7 +3417,7 @@
    "parts": "Торцевое уплотнение (пара трения — оба кольца); при повторяемости — переход на карбид кремния; элементы плана промывки.",
    "source": "SealFAQs «Failure Analysis of Faces»; Vulcan Seals",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3433,7 +3433,7 @@
    "parts": "Углеродное кольцо или уплотнение в сборе; при повторяемости — переход на непропитанный или иначе пропитанный сорт углерода либо на твёрдую пару.",
    "source": "SealFAQs «Failure Analysis of Faces»",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3449,7 +3449,7 @@
    "parts": "Торцевое уплотнение; элементы плана промывки — теплообменник, дроссельная шайба, паровая завеса (Plan 62), фильтр.",
    "source": "SealFAQs «Failure Analysis of Faces»; Vulcan Seals; API 682, 4-е изд.",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3465,7 +3465,7 @@
    "parts": "Торцевое уплотнение (предпочтительно пара «твёрдое-твёрдое» для загрязнённых сред); фильтр или циклонный сепаратор в линии промывки (Plan 31/32); защитная втулка вала.",
    "source": "Vulcan Seals «Mechanical Seal Troubleshooting»; SealFAQs",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3481,7 +3481,7 @@
    "parts": "Комплект эластомеров (замена марки: NBR/HNBR, FKM, FFKM, EPDM — по среде); уплотнение в сборе при повреждении сильфона.",
    "source": "Vulcan Seals «Mechanical Seal Troubleshooting»; API 682, 4-е изд.",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3513,7 +3513,7 @@
    "parts": "Торцевое уплотнение в сборе; при повторяемости — переход на конструкцию с многовитковыми пружинами вне продукта или с металлическим сильфоном; система водоподготовки охлаждающей воды.",
    "source": "Отраслевые руководства по обслуживанию (HYSIC); Vulcan Seals",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3529,7 +3529,7 @@
    "parts": "Защитная втулка вала; неподвижное седло; шпонки/штифты фиксации; торцевое уплотнение в сборе.",
    "source": "Vulcan Seals «Mechanical Seal Troubleshooting»",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3545,7 +3545,7 @@
    "parts": "Подшипники (комплектом, оба узла); масло и уплотнения подшипникового узла; при разбитых посадках — вал и корпус подшипников.",
    "source": "ISO 15243:2017; SKF «Bearing damage classification»; API 610; ISO 281",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3561,7 +3561,7 @@
    "parts": "Подшипники; масло правильной вязкости; фильтр/сапун подшипникового узла; уплотнения подшипникового узла.",
    "source": "ISO 15243:2017; SKF «Bearing damage classification»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3577,7 +3577,7 @@
    "parts": "Подшипники; уплотнения подшипникового узла (лабиринтные или магнитные вместо контактных); сапун с осушителем; масло и фильтр.",
    "source": "ISO 15243:2017; SKF «Bearing damage classification»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3593,7 +3593,7 @@
    "parts": "Подшипники (возможно — иного типа или с предварительным натягом); масло иной вязкости.",
    "source": "ISO 15243:2017; SKF «Bearing damage classification»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3609,7 +3609,7 @@
    "parts": "Подшипники; уплотнения подшипникового узла; сапун с осушителем; масло с ингибитором коррозии.",
    "source": "ISO 15243:2017; SKF «Bearing damage classification»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3625,7 +3625,7 @@
    "parts": "Подшипники; при транспортировке — транспортные фиксаторы ротора.",
    "source": "ISO 15243:2017; SKF «Bearing damage classification»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3641,7 +3641,7 @@
    "parts": "Подшипники; заземляющее токосъёмное кольцо на валу; изолированный подшипник или изолирующая втулка; экранированный кабель и фильтр на выходе преобразователя.",
    "source": "ISO 15243:2017; SKF «Bearing damage classification», транскрипт R32",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3657,7 +3657,7 @@
    "parts": "Подшипники; монтажный инструмент (гидравлические и индукционные нагреватели, оправки под нужное кольцо); уплотнения подшипникового узла.",
    "source": "ISO 15243:2017; SKF «Bearing damage classification»",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3673,7 +3673,7 @@
    "parts": "Масло; уплотнения подшипникового узла; сапун с осушителем; маслоотбойное кольцо; маслоуказатель постоянного уровня; подшипники при повреждении.",
    "source": "API 610; спецификация AGES-SP-05-001, кл. 6.10.2.4; SKF",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3689,7 +3689,7 @@
    "parts": "Клапан и шайба линии минимального расхода; при перепроектировании — колесо меньшего диаметра или частотный привод; вторично — колесо, уплотнение, подшипники.",
    "source": "Pumps & Systems «Stable Versus Thermal Minimum Continuous Flow»; W. Marscher, TAMU (2018); API 610",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3705,7 +3705,7 @@
    "parts": "Дроссельная шайба или регулирующий клапан; колесо большего/меньшего диаметра при перепроектировании; вторично — колесо, подшипники, уплотнение.",
    "source": "API 610 / ISO 13709 (POR 80–110%, AOR 70–120% BEP); спецификация AGES-SP-05-001, кл. 6.1.12",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3721,7 +3721,7 @@
    "parts": "Упорный подшипник; задние щелевые кольца; разгрузочный барабан/диск и его втулка; колесо при засорении отверстий.",
    "source": "API 610; спецификация AGES-SP-05-001, кл. 6.10.1.2",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "pumps/defects",
@@ -3737,7 +3737,7 @@
    "parts": "Обратный клапан с демпфером или медленного закрытия; гаситель гидроудара (гидроаккумулятор, воздушный колпак); предохранительный клапан; опоры и крепления трубопровода; прокладки; при разрушении — корпус и патрубки насоса.",
    "source": "AFT/Datacor «Instantaneous Waterhammer Equation — Joukowsky Equation»; исследования хлопка обратных клапанов (EPJ Web of Conferences)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3753,7 +3753,7 @@
    "parts": "Обратный клапан или его затвор и седло; гайка колеса со стопором; шпонка; вал и колесо при разрушении.",
    "source": "Отраслевая практика; API 610 (требования по частоте срабатывания защиты и допустимому разгону, кл. 6.1.x); материалы по хлопку обратных клапанов",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3769,7 +3769,7 @@
    "parts": "Рабочее колесо; бронедиски и футеровка улитки; при задире — вал и защитная втулка; торцевое уплотнение; подшипники; всасывающая сетка/фильтр и грохот.",
    "source": "WaterWorld «Pump Maintenance Know-How»; отраслевые руководства по диагностике повреждений колёс",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "pumps/defects",
@@ -3785,7 +3785,7 @@
    "parts": "Всасывающая сетка/фильтр; при повторяемости — колесо иного типа (вихревое, одноканальное, с режущей кромкой); торцевое уплотнение при сухом ходе.",
    "source": "Ecologix «Wastewater Plant Troubleshooting Guide: Pumps»; WaterWorld; отраслевые руководства по шламовым насосам",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "pumps/defects",
@@ -3801,7 +3801,7 @@
    "parts": "Торцевое уплотнение; при перегреве — колесо, щелевые кольца, вал, подшипники; приёмный клапан; датчик уровня и защита по сухому ходу.",
    "source": "Vulcan Seals «Mechanical Seal Troubleshooting»; отраслевые руководства по эксплуатации шламовых насосов (HYSIC)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -3817,7 +3817,7 @@
    "parts": "Комплект пластин (дисков) клапана, пружины, седло, ограничитель подъёма (guard), прокладки клапанной крышки, шпильки и гайки крепления; при массовом отказе — клапан в сборе (cartridge)",
    "source": "API 618 (требования к клапанам и температуре нагнетания); каталоги и сервисные материалы изготовителей клапанов (Hoerbiger, Cook Compression, CPI)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -3833,7 +3833,7 @@
    "parts": "Комплект пружин клапана (строго по каталожному номеру и жёсткости), пластины, прокладки; для сернистых сред — материал по NACE MR0175/ISO 15156",
    "source": "Методика анализа PV-диаграмм; каталоги изготовителей клапанов; NACE MR0175/ISO 15156 по материалам",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -3849,7 +3849,7 @@
    "parts": "Комплект пластин и пружин, прокладки клапанных крышек, фильтроэлементы всасывающего фильтра, дозаторы и обратные клапаны лубрикатора (при пересмотре нормы подачи), цилиндровое масло другой марки",
    "source": "Практика цилиндровой смазки и обслуживания клапанов (Cook Compression, CPI); норма подачи масла как отраслевое правило",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -3865,7 +3865,7 @@
    "parts": "Седло клапана, ограничитель подъёма, пластины, пружины; при исчерпании ремонтного размера — клапан в сборе",
    "source": "Каталоги и ремонтные инструкции изготовителей клапанов; API 618 в части условий работы клапанов",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -3881,7 +3881,7 @@
    "parts": "Ремкомплект клапана (пластины, пружины, прокладки), при необходимости седло; прокладки и шпильки клапанной крышки",
    "source": "API 618 (предел температуры нагнетания); методика анализа PV-диаграмм",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -3897,7 +3897,7 @@
    "parts": "Ремкомплект всасывающего клапана, прокладки, фильтроэлемент всасывающего фильтра",
    "source": "Методика анализа PV-диаграмм; практика сервиса клапанов",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -3913,7 +3913,7 @@
    "parts": "Прокладки клапанных крышек и клапанов, шпильки и гайки, прижимные стаканы (valve hold-down), сам клапан правильного исполнения",
    "source": "Ремонтные инструкции изготовителей цилиндров и клапанов; практика расследования ранних отказов",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -3929,7 +3929,7 @@
    "parts": "Пластины и пружины иной жёсткости, клапаны в сборе другого исполнения; по проекту — переделка демпфера, дроссельная шайба (orifice) на патрубке демпфера",
    "source": "API 618 (подходы к контролю пульсаций), API 688, Energy Institute Guidelines; практика анализа повторных отказов клапанов",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -3945,7 +3945,7 @@
    "parts": "Комплект поршневых колец (чугун, бронза, PTFE/PEEK-композит — строго по спецификации цилиндра), направляющие кольца, прокладки крышек цилиндра, при необходимости поршень",
    "source": "Практика ревизии цилиндро-поршневой группы; методика различения по PV-диаграммам обеих полостей",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -3961,7 +3961,7 @@
    "parts": "Комплект поршневых колец, поршень или его ремонт, гильза цилиндра (при задирах), цилиндровое масло с более высокой термостойкостью, дозаторы лубрикатора",
    "source": "Практика цилиндровой смазки и ревизии ЦПГ (Cook Compression, CPI)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -3977,7 +3977,7 @@
    "parts": "Направляющие (опорные) кольца — rider bands, поршневые кольца, при контакте — гильза цилиндра и поршень; датчик и модуль контроля положения штока",
    "source": "API 670 (контроль положения штока); практика ревизии ЦПГ; уставки — по расчёту допустимого износа",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -3993,7 +3993,7 @@
    "parts": "Гильза цилиндра (или расточка под ремонтный размер), комплект поршневых и направляющих колец, поршень, прокладки крышек; элементы лубрикатора при устранении причины",
    "source": "Практика ревизии цилиндров поршневых компрессоров; анализ масла на металлы износа",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4009,7 +4009,7 @@
    "parts": "Гильза цилиндра, поршневые и направляющие кольца ремонтного размера, прокладки",
    "source": "Формуляры изготовителей цилиндров; практика дефектации; предельные значения — только по документации изготовителя",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4025,7 +4025,7 @@
    "parts": "Гильза, поршневые и направляющие кольца, сальниковые кольца, детали клапанов из коррозионностойких материалов по NACE MR0175/ISO 15156; средства консервации",
    "source": "NACE MR0175/ISO 15156 (материалы для сернистых сред); практика поддержания перегрева над точкой росы (правило ≥11 °C) и температуры рубашки (≥ +6 °C к температуре газа)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4041,7 +4041,7 @@
    "parts": "Шток в сборе (новый или восстановленный с напылением), комплект сальниковых колец, чашки (cups) сальника, уплотнительные кольца чашек",
    "source": "Спецификации изготовителей штоков и сальников (Cook Compression, CPI, Hoerbiger); требования к шероховатости Ra 0,2–0,4 мкм и твёрдости покрытия",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4057,7 +4057,7 @@
    "parts": "Шток (замена или повторное напыление), комплект сальниковых колец, чашки сальника, прокладки",
    "source": "Практика восстановления штоков напылением; спецификации изготовителей покрытий",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4073,7 +4073,7 @@
    "parts": "Шток, гайка штока, стопорные элементы, комплект сальниковых колец; материалы по NACE MR0175/ISO 15156 для сернистых сред",
    "source": "NACE MR0175/ISO 15156; практика неразрушающего контроля штоков при ревизии; требование реверса нагрузки (API 618)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4089,7 +4089,7 @@
    "parts": "Шток, комплект сальниковых колец, чашки сальника, регулировочные прокладки опор цилиндра, опоры и подвески трубопроводов (устранение нагрузки от обвязки)",
    "source": "Руководства изготовителей (типовой предел биения 0,05–0,13 мм TIR); практика монтажа поршневых компрессоров",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4105,7 +4105,7 @@
    "parts": "Комплект сальниковых колец (уплотняющие, разрезные, замыкающие — по схеме набора), чашки сальника, уплотнительные кольца чашек, пружины колец, прокладки, трубки смазки и охлаждения сальника",
    "source": "API 618 (требования к сальникам, фонарям и системам вентиляции); спецификации изготовителей сальников",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4121,7 +4121,7 @@
    "parts": "Комплект сальниковых колец, чашки с каналами охлаждения, трубки и штуцеры системы охлаждения сальника, дозатор и обратный клапан лубрикатора, термопара",
    "source": "Спецификации изготовителей сальников; API 618 в части систем охлаждения и смазки сальника",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "recip/defects",
@@ -4137,7 +4137,7 @@
    "parts": "Регулятор и ротаметр продувки, обратные клапаны, огнепреградитель, трубная обвязка вентиляции, газоанализатор, уплотнения фонаря; при несоответствии — фонарь нужного типа исполнения",
    "source": "API 618 (типы промежуточных фонарей и требования к вентиляции и продувке для токсичных и горючих сред)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "recip/defects",
@@ -4153,7 +4153,7 @@
    "parts": "Комплект маслосъёмных колец, корпус (чашки) маслосъёмника, дренажные трубки, сапун картера",
    "source": "Спецификации изготовителей сальников и маслосъёмников; API 618 в части исполнения фонарей",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4169,7 +4169,7 @@
    "parts": "Гайка штока, стопорные элементы, шток, поршень; контрольный инструмент — гидравлический натяжитель или индикатор удлинения",
    "source": "Руководства изготовителей по сборке поршневой группы; практика расследования обрывов штоков",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4185,7 +4185,7 @@
    "parts": "Гайка и стопор соединения шток–крейцкопф, шток, крейцкопф, прокладки крышек цилиндра",
    "source": "Руководства изготовителей (регулировка зазоров в мёртвых точках); практика ревизии",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4201,7 +4201,7 @@
    "parts": "Комплект вкладышей коренных и шатунных подшипников, шатунные болты (как правило, только одноразовые), масляный фильтр, маслонасос, коленвал при задире шеек",
    "source": "Общемашиностроительная практика для баббитовых подшипников (зазор ≈0,0015 мм/мм диаметра шейки); формуляр изготовителя рамы имеет приоритет",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4217,7 +4217,7 @@
    "parts": "Башмаки крейцкопфа, регулировочные прокладки башмаков, крепёж башмаков, крейцкопф в сборе при повреждении корпуса",
    "source": "Руководства изготовителей рам (предельные зазоры — только по формуляру); практика ревизии механизма движения",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4233,7 +4233,7 @@
    "parts": "Втулка верхней головки шатуна, палец крейцкопфа, крейцкопф, шатун; по режиму — иной поршень, вставки мёртвого объёма (clearance pockets)",
    "source": "API 618 и руководства изготовителей (требование реверса нагрузки на пальце крейцкопфа, ориентир ≥15° угла поворота вала)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4249,7 +4249,7 @@
    "parts": "Шатун, крейцкопф, коленвал, вкладыши, шатунные болты; по фундаменту — анкерные болты, эпоксидная подливка, регулировочные подкладки (chocks)",
    "source": "Практика контроля прогиба щёк коленвала; предельные значения — только по формуляру изготовителя, единой нормы не найдено",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4265,7 +4265,7 @@
    "parts": "Анкерные болты с термокомпенсацией, гайки и шайбы, эпоксидная подливка, регулировочные подкладки (chocks), виброизолирующие элементы",
    "source": "ISO 20816-8:2018 (оценка вибрации системы, границы зон по вторичному источнику); практика фундаментов поршневых машин",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "опровергнуто"
   },
   {
    "angle": "recip/defects",
@@ -4281,7 +4281,7 @@
    "parts": "Лубрикатор (насос), дозаторы-делители (divider blocks), обратные клапаны, трубки высокого давления и фитинги, индикаторы потока, реле контроля подачи, фильтр и подогреватель масла",
    "source": "Практика цилиндровой смазки (Cook Compression, CPI); базовая норма подачи 1 пинта/сут на 1 млн фут² протёртой поверхности",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4297,7 +4297,7 @@
    "parts": "Дозаторы лубрикатора нужной производительности, обратные клапаны, цилиндровое масло подходящей вязкости и термостойкости, фильтры-коалесцеры на линии нагнетания",
    "source": "Практика цилиндровой смазки; отраслевая норма подачи как база для расчёта",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4313,7 +4313,7 @@
    "parts": "Фильтроэлементы, маслонасос (основной и предпусковой), перепускной и редукционный клапаны, масляный холодильник, реле и датчики давления, подогреватель масла",
    "source": "Практика эксплуатации маслосистем поршневых компрессоров; API 618 в части систем смазки",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4329,7 +4329,7 @@
    "parts": "Комплект сальниковых и маслосъёмных колец (устранение причины), фильтроэлементы, масло, масляный холодильник, сапун и система вентиляции картера",
    "source": "Практика анализа масел; API 618 в части фонарей и вентиляции; ISO 4406 для класса чистоты",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4345,7 +4345,7 @@
    "parts": "Клапаны в сборе, поршень, шток, крышка цилиндра, прокладки; по системе — сепараторы, уровнемеры и отсечная арматура, дренажные ловушки, подогреватель газа на всасе",
    "source": "API 618 (требования к сепарации на всасе); GPSA Engineering Data Book (перегрев над точкой росы ≥11 °C); методика анализа PV-диаграмм",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4361,7 +4361,7 @@
    "parts": "Всасывающие фильтры и фильтроэлементы, пусковые сетчатые фильтры, комплекты клапанов, поршневые и направляющие кольца, шток",
    "source": "Практика пуско-наладки поршневых компрессоров; требования к всасывающей фильтрации в API 618",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4377,7 +4377,7 @@
    "parts": "По результату: фильтроэлементы всасывания, трубные пучки межступенчатых холодильников, арматура; при постоянном изменении режима — иной поршень или вставки мёртвого объёма",
    "source": "GPSA Engineering Data Book (типовое отношение давлений 2,5–4 на ступень); API 618 (предельная температура нагнетания)",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "опровергнуто"
   },
   {
    "angle": "recip/defects",
@@ -4393,7 +4393,7 @@
    "parts": "Трубный пучок или трубки холодильника, прокладки крышек, аноды, водяная арматура, фильтры воды, химия для промывки",
    "source": "Практика эксплуатации межступенчатого оборудования; API 618 в части систем охлаждения",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4409,7 +4409,7 @@
    "parts": "Термостатический клапан контура, насос, теплообменник контура, датчики температуры, химия для промывки рубашек, прокладки",
    "source": "API 618 и отраслевая практика (правило: вода на входе в рубашку теплее газа на всасе не менее чем на 6 °C/10 °F)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "опровергнуто"
   },
   {
    "angle": "recip/defects",
@@ -4425,7 +4425,7 @@
    "parts": "Разгрузочное устройство в сборе, отжимные лапки, пружины и уплотнения привода, управляющая арматура (соленоиды), пневмоцилиндр кармана мёртвого объёма, уплотнения кармана",
    "source": "API 618 (системы регулирования производительности); практика диагностики по PV-диаграммам",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4441,7 +4441,7 @@
    "parts": "Опоры, хомуты, упоры и демпфирующие элементы, косынки раскрепления малых отводов, дроссельные шайбы (orifice) на патрубках демпферов, при проектном решении — новые пульсационные демпферы",
    "source": "API 618 (Design Approach 1/2/3), API 688, Energy Institute Guidelines for the Avoidance of Vibration Induced Fatigue Failure in Process Pipework; ISO 20816-8 как рамка оценки",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "recip/defects",
@@ -4457,7 +4457,7 @@
    "parts": "Внутренние устройства демпфера (перегородки, choke tube), прокладки и крепёж люков, дроссельные шайбы, при неремонтопригодности — демпфер в сборе по акустическому расчёту",
    "source": "API 618 (пульсационные демпферы и подходы к расчёту), API 688",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "recip/defects",
@@ -4473,7 +4473,7 @@
    "parts": "Датчики положения штока (проксиметры) и модули, термопары и термопреобразователи нагнетания и клапанных крышек, датчики вибрации, датчики динамического давления, кабельные сборки, барьеры",
    "source": "API 670 (Machinery Protection Systems), 5-е изд. — в том числе контроль положения штока; API 618 в части приборного обеспечения",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4489,7 +4489,7 @@
    "parts": "Фильтроэлементы КВОУ (классификация по ISO 16890 / ISO 29461-1), концентраты для онлайн- и оффлайн-промывки, форсунки системы промывки, датчики перепада давления, уплотнения фильтровальных кассет.",
    "source": "Практика эксплуатации ГТУ; методика приведения параметров — ISO 2314",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4505,7 +4505,7 @@
    "parts": "Рабочие и направляющие лопатки ступеней 0–5, комплекты фильтров более высокого класса, эрозионностойкие покрытия лопаток (TiN, CrN), уплотнения тракта КВОУ.",
    "source": "Практика ремонта ГТУ; классы фильтрации — ISO 29461-1",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4521,7 +4521,7 @@
    "parts": "Сопловые сегменты и диафрагмы первых ступеней, рабочие лопатки, эрозионностойкие покрытия (борирование, хромирование, плазменные покрытия).",
    "source": "Практика ремонта паровых турбин; методики контроля — ISO 3058 (визуальный контроль)",
    "confidence": "medium",
-   "verdict": "опровергнуто"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4537,7 +4537,7 @@
    "parts": "Антипомпажный клапан и позиционер, быстродействующие датчики давления, лопатки и приводы входного направляющего аппарата, упорные колодки, элементы муфты.",
    "source": "Wikipedia, Compressor stall (раздел Surge); практика наладки антипомпажной защиты",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "turbo/defects",
@@ -4553,7 +4553,7 @@
    "parts": "Приводы и лопатки входного направляющего аппарата, надбандажные уплотнения (восстановление зазора), датчики динамического давления.",
    "source": "Wikipedia, Compressor stall",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4585,7 +4585,7 @@
    "parts": "Картриджи DGS, вторичные уплотнения (кольца круглого сечения), фильтры-коалесцеры уплотняющего газа, подогреватели газа, барьерные уплотнения (separation seals), датчики расхода сброса.",
    "source": "API 692, Dry Gas Sealing Systems for Axial, Centrifugal and Rotary Screw Compressors",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4601,7 +4601,7 @@
    "parts": "Рабочие и направляющие лопатки, бандажные и демпферные элементы, замковые вставки, крепёж, проволочные связи.",
    "source": "Практика ремонта; методы контроля — ISO 3452-1, ISO 15548",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4617,7 +4617,7 @@
    "parts": "Лопатки 1-й и 2-й ступеней турбины, сегменты соплового аппарата, надбандажные вставки (shrouds), уплотнения охлаждающего тракта.",
    "source": "Wikipedia, Turbine blade (Fatigue, Cracking); программы ремонта изготовителей",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "turbo/defects",
@@ -4633,7 +4633,7 @@
    "parts": "Лопатки под повторное нанесение покрытия, порошки диоксида циркония, стабилизированного оксидом иттрия (7–8 % Y2O3), материалы связующего слоя типа MCrAlY.",
    "source": "Wikipedia, Turbine blade (Thermal barrier coatings); практика ремонта",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4649,7 +4649,7 @@
    "parts": "Лопатки, диски, роторы. Критерии выбраковки — обычно 1 % остаточной деформации или исчерпание 100 000-часовой длительной прочности.",
    "source": "Wikipedia, Creep (deformation); параметр Ларсона–Миллера",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4665,7 +4665,7 @@
    "parts": "Лопатки с защитными покрытиями (диффузионный алюминид, платино-алюминидное, MCrAlY), фильтры и сепараторы КВОУ, оборудование топливоподготовки и промывки топлива.",
    "source": "Wikipedia, High-temperature corrosion (Type I sulfate corrosion)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4681,7 +4681,7 @@
    "parts": "Лопатки, хвостовики, покрытия стойкие к коррозии II типа (составы с повышенным содержанием хрома), система очистки топлива от серы.",
    "source": "Wikipedia, High-temperature corrosion (Type II sulfate corrosion)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4697,7 +4697,7 @@
    "parts": "Топливные форсунки, жаровые трубы (liners), переходные патрубки (transition pieces), термопары выхлопа, сопловые сегменты первой ступени, уплотнения камеры.",
    "source": "Практика эксплуатации ГТУ",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "turbo/defects",
@@ -4713,7 +4713,7 @@
    "parts": "Лопатки, фильтры охлаждающего воздуха, воздухоохладители отборного воздуха, трубопроводы и уплотнения тракта охлаждения.",
    "source": "Практика ремонта ГТУ",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4729,7 +4729,7 @@
    "parts": "Лопатки, элементы и сетки КВОУ, антиобледенительная система, крепёж тракта.",
    "source": "Практика ремонта; карты допустимых повреждений изготовителей",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "turbo/defects",
@@ -4745,7 +4745,7 @@
    "parts": "Вкладыши (цилиндрические, лимонные, с карманом давления), сегментные колодки (tilting pad), баббит по ASTM B23, термопары, уплотнения масляной камеры, маслофильтры, маслоохладители.",
    "source": "Практика ремонта; контроль масла — ASTM D5185, ASTM D4378",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4777,7 +4777,7 @@
    "parts": "Сегментные вкладыши, демпферные опоры со сжимаемой масляной плёнкой (squeeze film damper); в тяжёлых случаях — переработка опор или ротора.",
    "source": "Классическая теория роторной динамики; API RP 684",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4793,7 +4793,7 @@
    "parts": "Лабиринтные обоймы, истираемые вставки, вкладыши подшипников, уплотнительные гребни; при повреждении шеек — ремонт ротора.",
    "source": "Практика вибродиагностики; ISO 13373-3",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4809,7 +4809,7 @@
    "parts": "Оборудование валоповорота (редуктор, муфта, привод, система блокировок); в генераторах — ремонт обмотки возбуждения; при эффекте Мортона — замена типа вкладыша.",
    "source": "Эффекты Ньюкирка и Мортона, классика роторной динамики; практика вибродиагностики",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4825,7 +4825,7 @@
    "parts": "Ротор целиком; в редких случаях — вварка нового участка вала у специализированного изготовителя с полным комплексом контроля.",
    "source": "Практика вибродиагностики турбоагрегатов; методы контроля — ISO 16810, ISO 9934-1",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4841,7 +4841,7 @@
    "parts": "Упорные колодки (Kingsbury, Michell), выравнивающие рычаги, регулировочные прокладки, уплотнение разгрузочного поршня, термопары колодок.",
    "source": "API 670; практика ремонта компрессоров и турбин",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "turbo/defects",
@@ -4857,7 +4857,7 @@
    "parts": "Золотники и втулки сервомоторов, штоки и сёдла регулирующих клапанов, датчики положения и позиционеры, фильтроэлементы (β-рейтинг по ISO 16889), маслоочистители и адсорбционные фильтры для удаления лака, уплотнения.",
    "source": "ASTM D7843; ASTM D4378; практика наладки систем регулирования",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4873,7 +4873,7 @@
    "parts": "Форсунки (подбирать комплектом в один расходный класс), распределительные и дозирующие клапаны, коалесцирующие фильтры топливного газа, подогреватели газа, датчики динамического давления, термопары.",
    "source": "Практика эксплуатации ГТУ",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   },
   {
    "angle": "turbo/defects",
@@ -4889,7 +4889,7 @@
    "parts": "Успокоители закрутки (swirl brakes), сотовые и ячеистые уплотнения (honeycomb), сегментные вкладыши, демпферные опоры.",
    "source": "API RP 684; классические работы по аэродинамическому возбуждению роторов",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4937,7 +4937,7 @@
    "parts": "Секции и катушки обмотки (form-wound coils) либо провод для всыпной обмотки, пазовые клинья и прокладки, изоляционные материалы класса F/H, бандажные материалы лобовых частей, пропиточный компаунд для вакуум-нагнетательной пропитки (VPI).",
    "source": "IEEE Std 522; IEC 60034-15; практика ремонта электрических машин",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4953,7 +4953,7 @@
    "parts": "Стержни и короткозамыкающие кольца беличьей клетки (для медной сварной клетки), ротор в сборе (для литой алюминиевой), подшипники, пазовые клинья ротора.",
    "source": "Thomson W.T., Fenger M. Current signature analysis to detect induction motor faults. IEEE Industry Applications Magazine, 2001",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "turbo/defects",
@@ -4969,7 +4969,7 @@
    "parts": "Подшипниковые щиты, ремонтные втулки посадочных мест, подшипники, регулировочные прокладки под лапы, фундаментные болты и анкеры.",
    "source": "Cameron J.R., Thomson W.T., Dow A.B., IEE Proceedings B, 1986; API 541",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -4985,7 +4985,7 @@
    "parts": "Ротор (правка вала, проточка сердечника), подшипники, шейки вала под восстановление, балансировочные грузы.",
    "source": "Cameron J.R., Thomson W.T., Dow A.B., IEE Proceedings B, 1986",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5001,7 +5001,7 @@
    "parts": "Подшипники с изолирующим покрытием наружного кольца (оксид алюминия, толщина порядка 100–300 мкм; проверка изоляции обычно испытательным напряжением не ниже 1000 В постоянного тока — уточнять по каталогу изготовителя), гибридные подшипники с керамическими телами качения (нитрид кремния), кольца заземления вала (щёточные и микроволоконные), синфазные дроссели, фильтры dU/dt и синусные фильтры, экранированный симметричный кабель с круговой заделкой экрана.",
    "source": "IEC TS 60034-25; Wikipedia, Shaft voltage",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5017,7 +5017,7 @@
    "parts": "Изолированный подшипник (как правило, со стороны, противоположной приводу) и одновременно кольцо заземления вала со стороны привода; синфазный дроссель, фильтры, изолирующие муфты.",
    "source": "IEC TS 60034-25, AC electrical machines used in power drive systems",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "подтверждено"
   },
   {
    "angle": "turbo/defects",
@@ -5033,7 +5033,7 @@
    "parts": "Нажимные пальцы и кольца, стяжные шпильки с изолирующими втулками, пазовые клинья, материалы для восстановления межлистовой изоляции, сегменты активной стали при локальной перешихтовке.",
    "source": "Методика ELCID; IEEE Std 56 (испытание сердечника кольцевым потоком)",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5049,7 +5049,7 @@
    "parts": "Пазовые клинья и подклиновые прокладки, в том числе волнистые упругие прокладки (ripple springs); боковые распорки; бандажные шнуры и клинья лобовых частей; полупроводящие и градиентные ленты; пропиточные составы.",
    "source": "IEC 60034-27-1, IEC 60034-27-2, IEEE Std 1434-2014",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5065,7 +5065,7 @@
    "parts": "Подогреватели обмоток и их термостаты, фильтры системы вентиляции, уплотнения корпуса и вводов, материалы для промывки и повторной пропитки, влагостойкие лаки.",
    "source": "IEEE Std 43-2013, табл. 1, 3, 5",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5081,7 +5081,7 @@
    "parts": "Датчики температуры, вентиляторы и воздухоохладители, фильтры, уплотнения; при перемотке — изоляционные материалы класса F или H.",
    "source": "IEC 60034-1, табл. 6; IEC 60085; правило Монтзингера",
    "confidence": "high",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5097,7 +5097,7 @@
    "parts": "Наконечники, шины, крепёж, контактные пружинные элементы, кабельные муфты, аппараты коммутации.",
    "source": "NEMA MG 1; IEC 60034-1; ISO 18434-1",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5113,7 +5113,7 @@
    "parts": "Бандажные кольца и шнуры, конформные распорки и клинья, компаунды и пропиточные составы, материалы для восстановления паяных соединений.",
    "source": "IEC 60034-27-2 (сопутствующий контроль); практика ремонта турбогенераторов",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5129,7 +5129,7 @@
    "parts": "Подшипники требуемого класса точности и радиального зазора (для электродвигателей типовой выбор — зазор C3), смазка требуемой консистенции и температурного класса, уплотнения и крышки подшипниковых узлов, втулки закрепительные.",
    "source": "ISO 20816-3; практика вибродиагностики",
    "confidence": "high",
-   "verdict": "опровергнуто"
+   "verdict": "частично"
   },
   {
    "angle": "turbo/defects",
@@ -5145,7 +5145,7 @@
    "parts": "Катушки обмотки возбуждения, витковая и пазовая изоляция, клинья ротора, контактные кольца и щёточный аппарат, бандажные кольца.",
    "source": "Практика диагностики турбогенераторов; метод RSO",
    "confidence": "medium",
-   "verdict": "скептик не сослался"
+   "verdict": "непроверяемо"
   }
  ]
 }

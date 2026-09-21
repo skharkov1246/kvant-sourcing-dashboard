@@ -55,6 +55,8 @@ def build():
     rec = json.loads((D / "diagnostics_recon.json").read_text(encoding="utf-8"))
     sym = json.loads((DICT / "symptom.json").read_text(encoding="utf-8"))
     std = json.loads((D / "standards_check.json").read_text(encoding="utf-8"))
+    vp = D / "verdicts_applied.json"
+    applied = json.loads(vp.read_text(encoding="utf-8")) if vp.exists() else None
     st, cov = rec["stats"], sym["coverage"]
 
     # ── данные для клиента: только то, что рисуется
@@ -82,6 +84,32 @@ def build():
 <div><b>{st['findings']}</b><span>норм и цифр с источником</span></div>
 <div><b>{vb.get('опровергнуто', 0)}</b><span>забраковано скептиком</span></div>
 </div>"""
+
+    ver = ""
+    if applied:
+        bv = applied["by_verdict_defects"]
+        lim = "".join(f'<tr><td class="mut">{e(o["scope"])} · {e(o["key"])}</td>'
+                      f'<td class="n">{o.get("checked") or "—"}</td><td>{e(o["overall"])}</td></tr>'
+                      for o in applied["overall"])
+        miss = "".join(f'<tr><td class="mut">{e(m["scope"])} · {e(m["key"])}</td>'
+                       f'<td>{e(m["text"])}</td></tr>' for m in applied["missing"])
+        ver = f"""<div class="card" style="border-left:4px solid var(--ok,#0ca30c)">
+<b>Проверка черновика проведена: {applied['bound']['defects']} карточек дефектов
+и {applied['bound']['contractors']} исполнителей</b>
+<div class="txt">Подтверждено {bv.get('подтверждено', 0)}, поправлено
+{bv.get('частично', 0)}, забраковано {bv.get('опровергнуто', 0)}, признано
+непроверяемыми {bv.get('непроверяемо', 0)}. Вердиктов, не нашедших свою карточку,
+— {applied['unbound_count']}.</div>
+<div class="txt">{e(applied['note'])}</div></div>
+<h3>Чем и насколько проверяли: сказано самими скептиками</h3>
+<div class="mut">Ограничение проверки, не названное вслух, — худшая из ошибок:
+о нём никто не узнает. Ниже — дословно, что каждый скептик смог проверить и что нет.</div>
+<div class="wrap"><table><thead><tr><th style="width:15%">Угол</th>
+<th style="width:7%">Карточек</th><th>Чем проверял и что осталось</th></tr></thead>
+<tbody>{lim}</tbody></table></div>
+<h3>Чего в каталоге не хватает, по мнению проверявших: {len(applied['missing'])}</h3>
+<div class="wrap"><table><thead><tr><th style="width:15%">Угол</th>
+<th>Чего нет</th></tr></thead><tbody>{miss}</tbody></table></div>"""
 
     warn = f"""<div class="card"><b>Что тут проверено, а что нет</b>
 <div class="txt">{e(rec['caveat'])}</div>
@@ -207,6 +235,9 @@ def build():
          ("f", "Нормы и цифры", tab_num),
          ("b", "Забраковано", tab_bad),
          ("v", "Сверка со стандартом", tab_std),
+         ("p", "Проверка черновика", f"<h2>Проверка черновика</h2>{ver}"
+          if ver else "<h2>Проверка черновика</h2><div class=\"card\">Прогон "
+                      "проверки ещё не переносился.</div>"),
          ("g", "Чего нет", tab_gap)]
     tabs = "".join(f'<button data-s="{sid}"{" class=on" if i == 0 else ""}>{e(t)}</button>'
                    for i, (sid, t, _) in enumerate(S))

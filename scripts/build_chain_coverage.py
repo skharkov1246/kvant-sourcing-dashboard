@@ -378,10 +378,17 @@ def counts() -> dict:
         import re as _re
         for a in rp["contractor_angles"]:
             good = [c for c in a["contractors"]
-                    if not _re.search(r"НЕ исполнитель", str(c.get("kind") or ""), _re.I)]
+                    if not _re.search(r"НЕ исполнитель", str(c.get("kind") or ""), _re.I)
+                    and c["verdict"]["verdict"] not in REJECTED]
+            # Вердикт решает, знание это или черновик, — то же правило, что везде.
+            # До проверки 21.09 все карточки шли черновиком, потому что скептика
+            # на них не хватило; теперь у каждой есть вердикт, и считать их
+            # черновиком огулом значило бы прятать проделанную проверку.
+            ok = [c for c in good if c["verdict"]["verdict"] in CHECKED]
             for seg in CONTR_SEG.get(a["key"], []):
-                put(seg, "contractor", 0, "zip/data/repair_recon.json")
-                put(seg, "contractor", len(good), "zip/data/repair_recon.json", draft=True)
+                put(seg, "contractor", len(ok), "zip/data/repair_recon.json")
+                put(seg, "contractor", len(good) - len(ok),
+                    "zip/data/repair_recon.json", draft=True)
 
     # ── изготовители: уникальные компании по каждому направлению.
     # Атлас разведки лежит одним файлом на все направления, поэтому подмешивается

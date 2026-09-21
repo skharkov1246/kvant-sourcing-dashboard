@@ -277,8 +277,12 @@ def test_в_звено_цепочки_идёт_только_подтверждё
     cells = {c["link"]: c["n"] for c in gsho["cells"]}
     dossier = json.loads((ROOT / "zip" / "data" / "r1700.json").read_text(encoding="utf-8"))
     ok = {x["symptom"] for x in dossier.get("faults", []) if x["verdict"] == "подтверждён"}
-    assert cells["symptom"] == len(ok), "в клетку «признак» попало больше, чем подтверждено"
-    assert cells["symptom"] < len(dossier.get("faults", [])), "подтверждено не может быть всё"
+    low, high = _symptom_bounds(ROOT, ok)
+    got = cells["symptom"]
+    assert low <= got <= high, (
+        f"клетка «признак» = {got}, а подтверждено от {low} до {high} — "
+        "в звено попало непроверенное")
+    assert len(ok) < len(dossier.get("faults", [])), "подтверждено не может быть всё"
 
 
 def test_дубль_по_домену_сводится_а_справочник_не_адресат():
@@ -380,3 +384,26 @@ def test_адрес_из_архива_помечен():
     assert by["Только архив"]["contact_archived"] is True
     assert "архивного снимка" in by["Только архив"]["contact_src"]
     assert stat["адрес из архивного снимка"] == 1
+
+
+def _symptom_bounds(ROOT, confirmed_rows):
+    """Границы для клетки «признак»: снизу — вклад своего среза, сверху — он же
+    плюс ПОДТВЕРЖДЁННЫЕ строки общего каталога дефектов.
+
+    Клетка перестала быть одноисточниковой 21.09.2026: к срезу направления
+    добавился dict/symptom.json, и равенство «клетка == подтверждённое среза»
+    стало ложным при верном счётчике. Вилка сохраняет то, ради чего тест писался:
+    верхняя граница считается ТОЛЬКО по подтверждённым строкам, поэтому любая
+    непроверенная строка, просочившаяся в клетку, выведет её за границу.
+    """
+    import json as _json
+    low = len(confirmed_rows)
+    p = ROOT / "dict" / "symptom.json"
+    if not p.exists():
+        return low, low
+    sym = _json.loads(p.read_text(encoding="utf-8"))
+    ok_idx = {i for i, r in enumerate(sym.get("defect_rows", []))
+              if r.get("verdict") == "подтверждено"}
+    keys = {rec["key"] for rec in sym.get("records", [])
+            if any(i in ok_idx for i in rec.get("defects", []))}
+    return low, low + len(keys)

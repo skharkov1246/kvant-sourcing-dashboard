@@ -100,9 +100,12 @@ def test_в_звено_цепочки_идёт_только_подтверждё
             continue
         rows = _slice(name).get("rows") or []
         ok = {x["symptom"] for x in rows if x["verdict"] == "подтверждён"}
-        assert by_seg[name]["symptom"] == len(ok), (
-            f"{name}: в клетку «признак» попало не то, что подтверждено")
-        assert by_seg[name]["symptom"] < len(rows), f"{name}: подтверждено не может быть всё"
+        low, high = _symptom_bounds(ROOT, ok)
+        got = by_seg[name]["symptom"]
+        assert low <= got <= high, (
+            f"{name}: клетка «признак» = {got}, а подтверждено от {low} до {high} — "
+            "в звено попало непроверенное")
+        assert len(ok) < len(rows), f"{name}: подтверждено не может быть всё"
 
 
 def test_исполнитель_не_считается_по_свободному_тексту():
@@ -149,3 +152,26 @@ def test_исполнитель_не_считается_по_свободном�
     ]
     assert all(is_contractor(o) for o in yes), [o["org"] for o in yes if not is_contractor(o)]
     assert not any(is_contractor(o) for o in no), [o["org"] for o in no if is_contractor(o)]
+
+
+def _symptom_bounds(ROOT, confirmed_rows):
+    """Границы для клетки «признак»: снизу — вклад своего среза, сверху — он же
+    плюс ПОДТВЕРЖДЁННЫЕ строки общего каталога дефектов.
+
+    Клетка перестала быть одноисточниковой 21.09.2026: к срезу направления
+    добавился dict/symptom.json, и равенство «клетка == подтверждённое среза»
+    стало ложным при верном счётчике. Вилка сохраняет то, ради чего тест писался:
+    верхняя граница считается ТОЛЬКО по подтверждённым строкам, поэтому любая
+    непроверенная строка, просочившаяся в клетку, выведет её за границу.
+    """
+    import json as _json
+    low = len(confirmed_rows)
+    p = ROOT / "dict" / "symptom.json"
+    if not p.exists():
+        return low, low
+    sym = _json.loads(p.read_text(encoding="utf-8"))
+    ok_idx = {i for i, r in enumerate(sym.get("defect_rows", []))
+              if r.get("verdict") == "подтверждено"}
+    keys = {rec["key"] for rec in sym.get("records", [])
+            if any(i in ok_idx for i in rec.get("defects", []))}
+    return low, low + len(keys)
