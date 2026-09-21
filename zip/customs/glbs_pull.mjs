@@ -9,6 +9,20 @@
 //   search — бесплатно, цены/веса скрыты (участники, объёмы, даты, описания);
 //   save   — показывает цены/веса, СПИСЫВАЕТ лимит (реальные цены).
 //
+// Проверено 16.09.2026 прямыми запросами:
+//   • за один запрос API отдаёт не более 10 000 деклараций, иначе 409
+//     «Найдено поставок больше лимита». Широкий HS за год уже не проходит —
+//     сужай период или ставь прицельный фильтр (ниже);
+//   • search на демо-ключе маскирует участников («ООО "ГА*****"») и открывает
+//     только своё окно данных, save на том же ключе показывает имена и ИНН.
+//     Окно данных ключа — в ответе: meta.dates_available; режим — meta.status.mode
+//     (demo | full). Демо-ключ игнорирует запрошенный период и отдаёт своё окно:
+//     проверяй search.dates в ответе, а не то, что просил;
+//   • поля прицельного поиска (остальные имена API отклоняет с 400
+//     «поле … не существует»): hs_code, direction, recipient_name, sender_name,
+//     producer, trademark. Совпадение подстрочное и регистронезависимое
+//     (trademark=G-PUMP ловит и WURDIG-PUMPENTECHNIK — отсеивай на клиенте).
+//
 // env:
 //   GLBS_API_KEY   (обяз.)
 //   GLBS_METHOD    search|save (по умолч. search)
@@ -43,6 +57,8 @@ if (!hsList.length) {
   hsList = Object.entries(cnt).sort((a, b) => b[1] - a[1]).map(([h]) => h);
 }
 hsList = hsList.slice(0, MAX_HS);
+// прицельный запрос без HS: фильтр по участнику сам по себе достаточно узкий
+if (hasTarget && !(process.env.GLBS_HS || '').trim()) hsList = [''];
 
 // наши каталожные номера как строгие токены: обязательно с цифрой (иначе
 // англ.слова из алиасов типа ENGINE/MINING/PRODUCTS дают ложные совпадения),
@@ -72,6 +88,15 @@ const OEM_RE = EXTRA_RE
 
 // поля ответа
 const FIELDS = (process.env.GLBS_FIELDS || '').split(',').map(s => s.trim()).filter(Boolean);
+// прицельный поиск: имя получателя/отправителя, изготовитель, товарный знак.
+// Любой из них резко сужает выборку и снимает упор в лимит 10 000.
+const TARGET = {
+  recipient_name: process.env.GLBS_RECIPIENT || '',
+  sender_name: process.env.GLBS_SENDER || '',
+  producer: process.env.GLBS_PRODUCER || '',
+  trademark: process.env.GLBS_TRADEMARK || '',
+};
+const hasTarget = Object.values(TARGET).some(Boolean);
 function buildUrl(hs) {
   const p = new URLSearchParams();
   p.set('api-key', KEY);
@@ -81,7 +106,8 @@ function buildUrl(hs) {
   p.set('period_finish', P2);
   p.set('format', 'json');
   p.set('search[direction]', 'ИМ');
-  p.set('search[hs_code][0]', hs + '*');
+  if (hs) p.set('search[hs_code][0]', hs + '*');
+  for (const [k, v] of Object.entries(TARGET)) if (v) p.set(`search[${k}]`, v);
   FIELDS.forEach((f, i) => p.set(`fields_view[${i}]`, f));
   return `https://glbs.io/api/supplies-search/?${p.toString()}`;
 }
@@ -171,8 +197,8 @@ for (const hs of hsList) {
       else if (OEM_RE.test(hayRaw(rec))) weak.push(compact(rec, 'weak'));
     }
     const matched = strong.concat(weak).slice(0, MAX_MATCH);
-    writeFileSync(`${OUT}/customs_${hs}_${P1}_${P2}.json`, JSON.stringify({
-      hs, method: METHOD, country: COUNTRY, period: [P1, P2],
+    writeFileSync(`${OUT}/customs_${hs || 'all'}_${P1}_${P2}.json`, JSON.stringify({
+      hs: hs || 'all', target: hasTarget ? TARGET : undefined, method: METHOD, country: COUNTRY, period: [P1, P2],
       total_records: recs.length, strong: strong.length, weak: weak.length,
       fields: sampleKeys, meta: cleanMeta(json.meta), skeleton: recs.length ? undefined : skel,
       matched,

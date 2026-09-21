@@ -65,7 +65,15 @@ jobs:
           }
           apply gt/supabase/migrations.sql  "правки инженеров ГТУ"
           apply zip/supabase/migrations.sql "схема базы ЗИП"
+          apply zip/supabase/seed_r1700.sql "досье машины R1700G (данные)"
           apply library/supabase/schema.sql "схема библиотеки рынков"
           apply library/supabase/schema_junk.sql "разметка текста документов"
+          apply library/supabase/suppliers_schema.sql "схема поставщиков"
+          # ПОСЛЕДНИМ И ВСЕГДА. zip/supabase/migrations.sql выше заново выдаёт роли
+          # anon полный доступ к таблицам ЗИП — так она написана. Ужесточение обязано
+          # идти после неё, иначе каждый прогон миграций молча открывает базу обратно.
+          # Здесь только ступень 1 (таблицы, которых браузер не запрашивает вовсе);
+          # ступень 2 применяется отдельно, прогоном «ЗИП — ужесточение доступа».
+          apply zip/supabase/migrations_rls_stage1.sql "ужесточение доступа, ступень 1"
           [ "$rc" = 0 ] && echo "✓ миграции применены" || echo "✗ часть миграций не применилась"
           exit "$rc"

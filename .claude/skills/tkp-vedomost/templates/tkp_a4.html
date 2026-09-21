@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>ТКП № ___</title>
+<style>
+  /* Стиль «ведомость на белой бумаге». Times New Roman, чёрный текст, тонкие линии, без выделений. */
+  @page { size: A4; margin: 20mm 15mm 20mm 20mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Times New Roman", "Liberation Serif", "FreeSerif", serif; font-size: 11pt; line-height: 1.28; color: #000; background: #fff; margin: 0; }
+  p { margin: 0 0 2.2mm; text-align: justify; }
+  h1 { font-size: 13pt; font-weight: normal; text-align: center; text-transform: uppercase; letter-spacing: 0.6px; margin: 5mm 0 1.5mm; }
+  h2 { font-size: 11pt; font-weight: normal; margin: 5mm 0 2mm; page-break-after: avoid; }
+  h3 { font-size: 11pt; font-weight: normal; font-style: italic; margin: 3.5mm 0 1.5mm; page-break-after: avoid; }
+  .sub { text-align: center; margin: 0 0 4mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3.5mm; font-size: 9.5pt; line-height: 1.22; }
+  th, td { border: 0.5pt solid #000; padding: 1.2mm 1.6mm; vertical-align: top; text-align: left; font-weight: normal; overflow-wrap: anywhere; }
+  th { text-align: center; }
+  .num { white-space: nowrap; text-align: right; }
+  .center { text-align: center; } .right { text-align: right; }
+  table.comm { table-layout: fixed; } table.comm th.num { white-space: normal; }   /* ширины задавать в th первой строки */
+  table.plain, table.plain td, table.plain th { border: none; padding: 0.6mm 0; }
+  table.spec td:first-child { width: 28%; }
+  pre { font-family: "Liberation Mono", "DejaVu Sans Mono", monospace; font-size: 8.4pt; line-height: 1.28; white-space: pre-wrap; border: 0.5pt solid #000; padding: 2mm 2.5mm; margin: 1.5mm 0 3.5mm; }
+  small { font-size: 9pt; }
+  .sign { margin-top: 10mm; } .sign td { border: none; padding: 1mm 0; }
+  .nb { page-break-inside: avoid; } .pb { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<table class="plain"><tr>
+<td style="width:55%">Отправитель<br>[организационно-правовая форма, ИНН/КПП, ОГРН, юр. адрес, тел., e-mail]</td>
+<td class="right" style="width:45%">Исх. № ___ от __.__.____<br>Кому: [полное наименование заказчика, объект]</td>
+</tr></table>
+
+<h1>Технико-коммерческое предложение № ___</h1>
+<div class="sub">на поставку [наименование, количество] для [объект]</div>
+
+<h2>1. Предмет предложения</h2>
+<p>Настоящим предлагаем к поставке […]. Предложение построено по принципу: оригинальное изделие изготовителя по чертежу заказчика — при наличии у изготовителя законной возможности поставки; при её отсутствии — изделие, максимально приближенное к оригиналу по конструкции, материалам, присоединительным размерам, испытаниям и сертификации, с документальным подтверждением каждого параметра.</p>
+
+<h2>2. Коммерческие условия</h2>
+<table class="comm">
+<tr><th style="width:7%">Вари-ант</th><th style="width:37%">Исполнение</th><th style="width:8%">Кол-во</th><th class="num" style="width:12%">Цена за ед. без НДС, руб.</th><th class="num" style="width:12%">Сумма без НДС, руб.</th><th class="num" style="width:12%">Сумма с НДС 22 %, руб.</th><th style="width:12%">Срок поставки</th></tr>
+<tr><td class="center">1</td><td>Оригинал […] — при письменном подтверждении изготовителем экспортной возможности; цена справочная.</td><td class="center">…</td><td class="num">…</td><td class="num">…</td><td class="num">…</td><td>…</td></tr>
+<tr><td class="center">2</td><td>Изделие, максимально приближенное к оригиналу (рекомендуется): […]</td><td class="center">…</td><td class="num">…</td><td class="num">…</td><td class="num">…</td><td>…</td></tr>
+</table>
+<p><small>Цены указаны в рублях Российской Федерации на условиях DDP […] (Инкотермс 2020) и включают […], а также НДС 22 %. Срок действия предложения — 30 календарных дней.</small></p>
+
+<h2>3. Соответствие техническому заданию</h2>
+<table class="comm">
+<tr><th style="width:19%">Требование ТЗ</th><th style="width:26%">Значение по ТЗ</th><th style="width:40%">Предлагаемое исполнение</th><th style="width:15%">Заключение</th></tr>
+<tr><td>…</td><td>…</td><td>…</td><td>соответствует</td></tr>
+</table>
+
+<h2>4. Условия поставки, оплаты и приёмки</h2>
+<table class="spec">
+<tr><td>Базис поставки</td><td>…</td></tr>
+<tr><td>Оплата</td><td>…</td></tr>
+<tr><td>Сроки</td><td>…</td></tr>
+<tr><td>Приёмка</td><td>…</td></tr>
+<tr><td>Гарантия</td><td>…</td></tr>
+</table>
+
+<table class="plain sign"><tr><td style="width:50%">Отправитель<br><br>____________________ / [должность, ФИО]</td><td class="right" style="width:50%">__.__.____<br><br>М.П.</td></tr></table>
+
+</body>
+</html>

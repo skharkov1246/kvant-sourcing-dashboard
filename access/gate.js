@@ -26,17 +26,19 @@
 export const TABS = [
   { id: "sourcing",  title: "Сорсинг",           pay: ["DATA", "INSIGHTS"] },
   { id: "company",   title: "Пульс компании",    pay: ["COMPANY"],   share: "cohorts" },
-  { id: "kam",       title: "КАМы",              pay: ["KAM"] },
   { id: "eng",       title: "Инжиниринг",        pay: ["ENG"] },
-  { id: "prod",      title: "Продукт-оунеры",    pay: ["PRODUCT"] },
-  { id: "reps",      title: "Коммерсанты",       pay: ["REPS"] },
+  // КАМы и продукт-оунеры живут подменю внутри «Коммерсантов» — у ролей один
+  // начальник, и разрез читается в одном месте. Поэтому вкладка просит и состав
+  // ролей, и направления по клиентам, и продуктовые линии.
+  { id: "reps",      title: "Коммерсанты",       pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"],
+    note: "внутри обе роли: КАМы и продукт-оунеры — выдача открывает оба разреза" },
   { id: "contracts", title: "Реализация",        pay: ["CONTRACTS"], share: "suppliers" },
   { id: "suppliers", title: "Поставщики",        pay: ["CONTRACTS"], share: "contracts" },
   { id: "cohorts",   title: "Когорты",           pay: ["COMPANY"],   share: "company" },
   { id: "advisor",   title: "Советы знатока",    pay: ["ADVISOR"] },
 ];
 export const TAB_IDS = TABS.map((t) => t.id);
-const ALL_PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "ADVISOR"];
+const ALL_PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR"];
 const TITLE = Object.fromEntries(TABS.map((t) => [t.id, t.title]));
 
 const SESSION_DAYS = 30;       // срок сессионной куки

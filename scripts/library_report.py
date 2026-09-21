@@ -65,6 +65,34 @@ def собрать(cur) -> dict:
         "файлы": q(cur, "select count(*) from lib_files"),
         "контакты": q(cur, "select count(*) from lib_suppliers where contact_email is not null"),
         "признаки": q(cur, "select count(*) from lib_symptoms"),
+        "признак_дефект": q(cur, "select count(*) from lib_symptom_defects"),
+        "наш_номер": q(cur, "select count(*) from lib_parts where kv_no is not null"),
+        "декларации": q(cur, "select count(*) from lib_customs"),
+        "экспортёры": q(cur, "select count(distinct exporter) from lib_customs where exporter is not null"),
+        "декл_узел": q(cur, "select count(*) from lib_customs where unit_id is not null"),
+        "расход_строк": q(cur, "select count(*) from lib_consumption"),
+        "расход_машин": q(cur, "select count(distinct coalesce(model_id, model_raw)) from lib_consumption"),
+        "расход_год": q(cur, "select round(sum(usd_year)) from lib_consumption"),
+        "кон_позиций": q(cur, "select count(*) from lib_exposure where not have_price"),
+        "кон_сумма": q(cur, "select round(sum(usd_exposure)) from lib_exposure where not have_price"),
+        "кон_адрес": q(cur, "select count(*) from lib_exposure where not have_price and deal is not null"),
+        # Сколько денег стоит за позициями, по которым ВООБЩЕ не известно, кому
+        # писать. Это другая работа, чем «достать цену из файла», и смешивать их
+        # в одну очередь нельзя.
+        "кон_без_исп": q(cur, """select count(*) from lib_exposure e
+             where not e.have_price and not exists (select 1 from lib_part_suppliers s
+                                                     where s.part_id = e.part_id)"""),
+        "кон_без_исп_usd": q(cur, """select round(sum(e.usd_exposure)) from lib_exposure e
+             where not e.have_price and not exists (select 1 from lib_part_suppliers s
+                                                     where s.part_id = e.part_id)"""),
+        "кон_топ10": q(cur, """select round(sum(usd_exposure)) from (
+             select usd_exposure from lib_exposure where not have_price
+              order by usd_exposure desc nulls last limit 10) t"""),
+        "признак_метод": q(cur, "select count(*) from lib_symptom_ops"),
+        "дефект_ремонт": q(cur, "select count(*) from lib_defect_ops"),
+        "дефект_решение": q(cur, """select count(*) from lib_defects d
+             where d.fix is not null or exists
+               (select 1 from lib_defect_ops o where o.defect_id = d.id)"""),
         "замены": q(cur, "select count(*) from lib_part_alt"),
         "замены_детали": q(cur, "select count(distinct part_id) from lib_part_alt"),
         "ведомость": q(cur, "select count(*) from lib_bom"),
@@ -105,27 +133,32 @@ def собрать(cur) -> dict:
 
 
 CSS = """
-@page { size: A4; margin: 12mm 10mm; }
-body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.8pt; color: #111; }
-h1 { font-size: 17pt; margin: 0 0 2mm; }
-/* Заголовок не остаётся один в конце страницы, а короткий раздел не рвётся:
-   иначе на последнюю страницу уезжают две строки, и проверка PDF справедливо
-   считает её полупустой. */
-h2 { font-size: 11pt; margin: 4.5mm 0 1.5mm; border-bottom: 1.5px solid #111;
-     padding-bottom: 0.8mm; page-break-after: avoid; }
+/* Стиль «ведомость на белой бумаге» (.claude/skills/tkp-vedomost): Times New Roman,
+   чёрный текст, тонкие чёрные линии, обычное начертание. Прежняя вёрстка отчёта шла
+   рубленым шрифтом с серыми плашками и жирными числами — это признаки документа,
+   собранного машиной, а владельцу уходит документ, а не выгрузка. */
+@page { size: A4; margin: 16mm 14mm; }
+* { box-sizing: border-box; }
+body { font-family: "Times New Roman", "Liberation Serif", "FreeSerif", serif;
+       font-size: 10.5pt; line-height: 1.25; color: #000; background: #fff; margin: 0; }
+p { margin: 0 0 2.2mm; text-align: justify; }
+h1 { font-size: 13pt; font-weight: normal; text-align: center; text-transform: uppercase;
+     letter-spacing: 0.6px; margin: 0 0 1.5mm; }
+/* Заголовок не остаётся один в конце страницы, а короткий раздел не рвётся: иначе на
+   последнюю страницу уезжают две строки, и проверка PDF справедливо считает её пустой. */
+h2 { font-size: 11pt; font-weight: normal; margin: 4.5mm 0 1.5mm; page-break-after: avoid; }
 section { page-break-inside: avoid; }
-.sub { color: #555; font-size: 8.5pt; margin-bottom: 4mm; }
-table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 3mm; }
+.sub { text-align: center; margin: 0 0 4mm; font-size: 9.5pt; }
+table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 1.5mm 0 3mm;
+          font-size: 9.5pt; line-height: 1.22; }
 .t thead { display: table-header-group; }
 .t tr { page-break-inside: avoid; }
-.t th { background: #f0f0f0; text-align: left; padding: 1.2mm 1.6mm; font-size: 8pt;
-        border: 0.4px solid #bbb; }
-.t td { padding: 1.2mm 1.6mm; border: 0.4px solid #ddd; vertical-align: top;
-        word-wrap: break-word; overflow-wrap: anywhere; }
-td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-td.big { font-size: 11pt; font-weight: bold; text-align: right; }
-.q { background: #fafafa; }
-.was { color: #888; }
+.t th, .t td { border: 0.5pt solid #000; padding: 1.2mm 1.6mm; vertical-align: top;
+               text-align: left; font-weight: normal; overflow-wrap: anywhere; }
+.t th { text-align: center; }
+td.num, td.big { text-align: right; white-space: nowrap;
+                 font-variant-numeric: tabular-nums; }
+small { font-size: 9pt; }
 """
 
 
@@ -135,15 +168,22 @@ def html_doc(d: dict) -> str:
          "(SGT-400 = Cyclone): в каталогах aftermarket ищут по нему", "было 0"),
         ("Узел", n(d["узлы"]) + " узлов", f"{n(d['системы'])} систем + компоненты, "
          "критичность A/B/C", "было 0"),
-        ("Признак", n(d["признаки"]) + " признаков", "узел, что меряют, вероятный дефект, "
-         "чем подтвердить — заготовка по общей практике, нужна проверка инженером", "было 0"),
+        ("Признак", n(d["признаки"]) + " признаков", f"у каждого назван узел, что меряют и "
+         f"чем подтвердить: {n(d['признак_метод'])} связей с методом и "
+         f"{n(d['признак_дефект'])} с дефектом — заготовка по общей практике, "
+         "нужна проверка инженером", "было 0"),
         ("Диагностика", n(d["операции"]) + " операций", "уровни инспекций со сроками, "
          "методы неразрушающего контроля", "было 0"),
-        ("Дефект", n(d["дефекты"]) + " записей", "последствие и ремонтное решение вместе", "было 0"),
+        ("Дефект", n(d["дефекты"]) + " записей", f"причина и последствие раздельно; "
+         f"у {n(d['дефект_решение'])} есть ремонтное решение, из них {n(d['дефект_ремонт'])} "
+         f"ссылкой на операцию, а не текстом", "было 0"),
         ("Запчасть", n(d["детали"]) + " деталей", f"узел определён у {n(d['детали_с_узлом'])}; "
          f"{n(d['ребра_машина'])} связей с машиной; {n(d['замены'])} связей "
          f"взаимозаменяемости на {n(d['замены_детали'])} деталей; {n(d['ведомость'])} строк "
          f"ведомости состава", "было 752"),
+        ("Наш номер", n(d["наш_номер"]) + " позиций", "внутренний номер KV проставлен: "
+         "сорсер и склад говорят номерами KV, и теперь по ним находится деталь, "
+         "машина и поставщик", "было 0"),
         ("Цена", n(d["цены"]) + " цен", f"на {n(d['цены_детали'])} деталей, "
          f"{n(d['цены_ссылки'])} со ссылкой на источник; поток происхождения у каждой",
          "было 0"),
@@ -151,6 +191,20 @@ def html_doc(d: dict) -> str:
          f"с деталью, из них {n(d['наличие'])} с проверкой наличия ({n(d['в_наличии'])} в наличии); "
          f"{n(d['контакты'])} с контактом", "было 0"),
         ("Парк", n(d["парк"]) + " площадок", "какая машина где стоит и чья", "было 0"),
+        ("Поставки", n(d["декларации"]) + " деклараций", f"кто фактически вёз такое "
+         f"оборудование: {n(d['экспортёры'])} экспортёров, у {n(d['декл_узел'])} поставок "
+         f"выведен узел; ценовой ориентир по группе и по узлу — доллар за килограмм",
+         "было 0"),
+        ("Деньги на кону", n(d["кон_сумма"]) + " $", f"{n(d['кон_позиций'])} позиций "
+         f"заявки, по которым у нас НЕТ цены; у {n(d['кон_адрес'])} известен адрес, где "
+         f"цена уже лежит — сделка и файл. На десять крупнейших приходится "
+         f"{n(d['кон_топ10'])} $. Позиций, по которым не известно и кому писать: "
+         f"{n(d['кон_без_исп'])} на {n(d['кон_без_исп_usd'])} $ — это другая работа, "
+         f"поиск исполнителя, и она отделена от «достать цену из файла»", "было 0"),
+        ("Содержание", n(d["расход_машин"]) + " машин", f"{n(d['расход_строк'])} строк "
+         f"расхода с интервалом замены в моточасах и ценой; оценка годового содержания "
+         f"{n(d['расход_год'])} $ на эти машины — РАСЧЁТ по типовым интервалам, не наши счета",
+         "было 0"),
     ]
     вопросы = [
         ("Что ставится на SGT-400 и кто это делает",
@@ -158,18 +212,28 @@ def html_doc(d: dict) -> str:
         ("У кого сейчас есть эта позиция и за сколько",
          f"{n(d['наличие'])} проверок наличия с ценой и сроком на ребре «деталь → продавец»"),
         ("Чем этот узел выходит из строя и что делают",
-         "дефект хранится вместе с ремонтным решением"),
+         "признак → дефект → ремонтное решение одним запросом: «металл в масле» → "
+         "«износ и проворот вкладыша» → «замена вкладышей подшипников скольжения»"),
         ("Как проверяют узел перед ремонтом",
          "методы контроля отдельными строками — ищется по «вихретоковый», а не по абзацу"),
         ("Кто чинит генератор и где",
          "ремонтные центры с адресом и объёмом работ, связаны с базой компаний"),
         ("Что чинить у этого заказчика",
          "парк: площадка → машина → узлы → детали"),
+        ("Кто уже возит такую деталь и почём",
+         "таможенные декларации: экспортёр, страна, условия поставки и цена за "
+         "килограмм; ориентир по товарной группе и по узлу"),
+        ("С чего начинать работу сегодня",
+         "очередь по деньгам: позиции без цены по убыванию суммы, с адресом файла, "
+         "где цена уже лежит, и с тем, что о детали уже известно"),
+        ("Сколько стоит содержать эту машину в год",
+         "расход по узлам с интервалом замены — оценка по типовым интервалам ТО, "
+         "помеченная расчётом"),
     ]
     строки = "".join(
-        f"<tr><td><b>{E(з)}</b></td><td class='big'>{E(v)}</td><td>{E(c)}</td>"
-        f"<td class='was'>{E(w)}</td></tr>" for з, v, c, w in цепочка)
-    воп = "".join(f"<tr class='q'><td>{E(a)}</td><td>{E(b)}</td></tr>" for a, b in вопросы)
+        f"<tr><td>{E(з)}</td><td class='big'>{E(v)}</td><td>{E(c)}</td>"
+        f"<td>{E(w)}</td></tr>" for з, v, c, w in цепочка)
+    воп = "".join(f"<tr><td>{E(a)}</td><td>{E(b)}</td></tr>" for a, b in вопросы)
     маш = "".join(f"<tr><td>{E(m)}</td><td class='num'>{n(k)}</td></tr>"
                   for m, k in d["топ_машин"])
     узл = "".join(f"<tr><td>{E(u)}</td><td>{E(c)}</td><td class='num'>{n(k)}</td></tr>"
@@ -216,7 +280,7 @@ def html_doc(d: dict) -> str:
 <th style="width:30%">строк</th></tr></thead><tbody>
 <tr><td>Спрос из спецификаций сделок (lib_demand){' — по прогону в живой базе' if 'спрос' in PROD else ''}</td><td class="num">{n(d['спрос'])}</td></tr>
 <tr><td>Разобранных вложений Битрикса (lib_files){' — по прогону в живой базе' if 'файлы' in PROD else ''}</td><td class="num">{n(d['файлы'])}</td></tr>
-<tr class="q"><td><b>Строк спроса, опознанных по каталогу</b> — сведены по артикулу с известной
+<tr><td>Строк спроса, опознанных по каталогу — сведены по артикулу с известной
     деталью, на {n(d['сделок_опознано'])} сделках</td>
     <td class="num">{n(d['спрос_опознан'])}</td></tr>
 </tbody></table></section>
@@ -229,7 +293,12 @@ def main() -> int:
         print("нет PGDSN / SUPABASE_DB_URL", file=sys.stderr)
         return 2
     import psycopg2
+    # autocommit обязателен, хотя отчёт только читает: «одно» глотает ошибку
+    # запроса и отдаёт ноль, а без autocommit первая же ошибка (например, ещё не
+    # применённая миграция со связями) обрывает транзакцию, и ВСЕ следующие
+    # запросы тоже отдают ноль. Отчёт показал бы пустую базу вместо своих чисел.
     conn = psycopg2.connect(DSN, connect_timeout=20)
+    conn.autocommit = True
     with conn.cursor() as cur:
         d = собрать(cur)
     conn.close()

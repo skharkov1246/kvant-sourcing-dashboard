@@ -173,8 +173,13 @@ export async function archiveApi(request, env, route) {
   try {
     requireValue(["search", "status", "unit"].includes(route), "not_found", 404);
     const payload = archiveQuery(new URL(request.url), route);
-    const key = env?.SUPABASE_SERVICE_KEY;
-    requireValue(typeof key === "string" && (/^sb_secret_[A-Za-z0-9_-]{8,}$/.test(key) || /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(key)), "archive_not_configured");
+    const configuredKey = env?.SUPABASE_SERVICE_KEY;
+    requireValue(configuredKey !== undefined && configuredKey !== null, "archive_key_missing");
+    requireValue(typeof configuredKey === "string", "archive_key_invalid");
+    // Strip only accidental surrounding whitespace; never rewrite key contents.
+    const key = configuredKey.trim();
+    requireValue(key.length > 0, "archive_key_missing");
+    requireValue(/^sb_secret_[A-Za-z0-9_-]{8,}$/.test(key) || /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(key), "archive_key_invalid");
     const headers = { apikey: key, "Content-Type": "application/json", Accept: "application/json" };
     if (!key.startsWith("sb_secret_")) headers.Authorization = "Bearer " + key;
     const controller = new AbortController();
@@ -187,6 +192,7 @@ export async function archiveApi(request, env, route) {
       });
       if (response.status !== 200) {
         try { await response.body?.cancel(); } catch {}
+        if (response.status === 401 || response.status === 403) throw new ArchiveFailure("archive_key_rejected");
         if (response.status === 400) throw new ArchiveFailure("invalid_archive_query", 400);
         throw new ArchiveFailure(response.status === 409 ? "archive_not_ready" : "archive_unavailable", response.status === 409 ? 409 : 503);
       }

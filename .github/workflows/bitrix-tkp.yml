@@ -1,0 +1,198 @@
+name: Bitrix входящие КП по сделке
+
+# Адресный обход: сделка → запросы поставщикам → таймлайн → дела → чат, и только
+# потом файлы, по одному. Никаких массовых выгрузок (распоряжение владельца
+# 17.09.2026): они бесполезны и жгут ресурс.
+#
+# ТРИ ДЕФЕКТА ПЕРВОЙ ВЕРСИИ, из-за которых прогон на 28 минутах унёс всё:
+#   артефакт выгружался без if: always() — при убитом шаге не выгружался вовсе;
+#   страж цен стоял ПЕРЕД артефактом и в случае срабатывания убивал его вместе
+#     с результатом;
+#   у шага не было своего таймаута, поэтому его резал таймаут задания, и
+#     последующие шаги не выполнялись.
+# Здесь: артефакт первым и всегда, у шага свой таймаут меньше задания, страж
+# стоит после артефакта и валит только коммит.
+on:
+  workflow_dispatch:
+    inputs:
+      deal:
+        description: id одной сделки (точнее и быстрее ключевого слова)
+        required: false
+      keyword:
+        description: подстрока в названии сделки, если id неизвестен
+        default: ЛУКОЙЛ
+        required: false
+      dry_run:
+        description: холостой прогон — показать найденные файлы, ничего не качая
+        type: boolean
+        default: true
+      all_files:
+        description: качать и наши исходящие запросы тоже
+        type: boolean
+        default: false
+      max_files:
+        description: предел числа файлов
+        # Замер холостого прогона 17.09.2026: к разбору 1219 файлов (наша цена
+        # 157, входящее 581, неопознанное 481). Прежние 400 отрезали бы две
+        # трети — и не хвост, а середину: 400 покрывают «нашу цену», входящие и
+        # только треть неопознанного.
+        default: "900"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bitrix-tkp
+  cancel-in-progress: false
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: pip install --quiet -r requirements.txt openpyxl xlrd pypdf
+
+      # Распознавание. Замер боевого прогона 17.09.2026 по «Энергосети»: из 93
+      # файлов 24 картинки и 3 скана без текстового слоя — 29 % файлов, и цены в
+      # них есть, просто не текстом. Без tesseract инструмент честно пишет
+      # «распознавание недоступно», но файлы остаются непрочитанными.
+      - name: Установка распознавания
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-rus poppler-utils
+          pip install --quiet pytesseract pillow pdf2image
+          tesseract --version | head -1
+
+      - name: Выгрузка входящих КП
+        id: extract
+        timeout-minutes: 100         # меньше таймаута задания: последующие шаги успеют
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          PYTHONUNBUFFERED: "1"      # прогресс виден по ходу, а не блоками
+        run: |
+          set -euo pipefail
+          [ -n "${BITRIX_WEBHOOK_URL:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          mkdir -p out
+          ARGS=""
+          if [ -n "${{ inputs.deal }}" ]; then ARGS="--deal ${{ inputs.deal }}"
+          else ARGS="--keyword ${{ inputs.keyword }}"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          if [ "${{ inputs.all_files }}" = "true" ]; then ARGS="$ARGS --all-files"; fi
+          python gt/tools/bitrix_tkp.py $ARGS \
+            --max-files "${{ inputs.max_files }}" \
+            --out-full out/tkp_full.json \
+            --out-index gt/data/bitrix_tkp_index.json
+
+      # ПЕРВЫМ и ВСЕГДА: даже если шаг выше убит таймаутом, частичный результат
+      # уже записан по ходу и должен уехать владельцу.
+      - name: Выгрузка результата артефактом
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tkp-full
+          path: |
+            out/tkp_full.json
+            gt/data/bitrix_tkp_index.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      # Документ собирается ЗДЕСЬ, а не в сессии агента: у агента нет секрета
+      # вебхука, а артефакт он скачать не может. Иначе цены остаются в раннере
+      # и до владельца не доходят вовсе.
+      - name: Свод выставленных цен с рынком (PDF)
+        if: always() && inputs.dry_run != true
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          test -s out/tkp_full.json || { echo "выгрузки нет — документ собирать нечем"; exit 0; }
+          # Имя несёт охват: по одному заказчику прогонов несколько, и два
+          # одноимённых файла в разных артефактах не отличить друг от друга.
+          SCOPE="${{ inputs.deal }}"
+          [ -n "$SCOPE" ] || SCOPE="${{ inputs.keyword }}"
+          # --stats-out пишет ТОЛЬКО счётчики «что КП поставщиков делают с нашими
+          # вилками»: ни цен, ни привязки цены к артикулу. Это единственная часть
+          # сравнения, которую можно держать в публичном репозитории, и главное
+          # число для защиты — ответ на «наши вилки вообще низкие или высокие».
+          python gt/tools/ship_offer.py --tkp out/tkp_full.json \
+            --out "${{ runner.temp }}/pdf/ЗАПАС-НА-СНИЖЕНИЕ-$SCOPE.pdf" \
+            --stats-out gt/data/ship_offer_stats.json --scope "$SCOPE"
+
+      - name: Выгрузка документа артефактом
+        if: always() && inputs.dry_run != true
+        uses: actions/upload-artifact@v4
+        with:
+          name: tkp-pdf
+          path: ${{ runner.temp }}/pdf/*.pdf
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Проверка, что в описи нет цен
+        if: always()
+        id: guard
+        run: |
+          set -euo pipefail
+          test -f gt/data/bitrix_tkp_index.json || { echo "описи нет — нечего коммитить"; exit 0; }
+          if grep -qE '"price"[[:space:]]*:[[:space:]]*[0-9]' gt/data/bitrix_tkp_index.json; then
+            echo "::error::в описи найдены цены — коммит отменён"
+            exit 1
+          fi
+          # Счётчики по вилкам — тоже в репозиторий, и в них тем более не должно
+          # быть ни цен, ни номенклатурных номеров: только счёт строк по охватам.
+          if [ -f gt/data/ship_offer_stats.json ]; then
+            if grep -qE '"(price|usd|pn)"[[:space:]]*:' gt/data/ship_offer_stats.json; then
+              echo "::error::в счётчиках по вилкам найдены цены или артикулы — коммит отменён"
+              exit 1
+            fi
+            echo "✓ в счётчиках по вилкам только счёт строк"
+          fi
+          echo "✓ цен в описи нет"
+
+      - name: Коммит описи без цен
+        if: success() && steps.guard.outcome == 'success'
+        run: |
+          set -euo pipefail
+          test -f gt/data/bitrix_tkp_index.json || exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Прогон длится минуты, и за это время в ветку ложатся чужие коммиты
+          # в ТОТ ЖЕ файл описи. Перебазирование тут не работает — конфликт, и
+          # `git pull --rebase` падает; так прогон 17.09.2026 дважды потерял
+          # готовую опись. Слияние у этого файла не текстовое, а по смыслу: у
+          # описи ключ `scopes`, и каждый охват свой. Поэтому на каждой попытке
+          # берём свежую ветку и вливаем в неё СВОЙ охват, не касаясь чужих.
+          cp gt/data/bitrix_tkp_index.json "$RUNNER_TEMP/mine.json"
+          # Счётчики по вилкам тоже уносим из-под reset --hard, иначе они
+          # потеряются вместе с рабочим деревом.
+          [ -f gt/data/ship_offer_stats.json ] \
+            && cp gt/data/ship_offer_stats.json "$RUNNER_TEMP/stats.json"
+          for i in 1 2 3 4; do
+            git fetch origin "$GITHUB_REF_NAME"
+            git reset --hard "origin/$GITHUB_REF_NAME"
+            python scripts/merge_tkp_index.py \
+              --mine "$RUNNER_TEMP/mine.json" \
+              --into gt/data/bitrix_tkp_index.json || exit 1
+            # Слияние, а не запись поверх: счётчики живут по охватам, и прогон
+            # по одному листу не имеет права стереть цифры по другому — они
+            # стоят в листе решений владельцу.
+            [ -f "$RUNNER_TEMP/stats.json" ] \
+              && python scripts/merge_offer_stats.py \
+                   --mine "$RUNNER_TEMP/stats.json" \
+                   --into gt/data/ship_offer_stats.json \
+              && git add gt/data/ship_offer_stats.json
+            git add gt/data/bitrix_tkp_index.json
+            git diff --cached --quiet && { echo "опись не изменилась"; exit 0; }
+            git commit -m "Опись входящих КП из Bitrix и счётчики по вилкам (без цен)"
+            git push && exit 0
+            echo "push отбит, беру свежую ветку и вливаю снова (попытка $i)"
+            sleep $((i * 3))
+          done
+          echo "::error::опись не удалось запушить за четыре попытки"
+          exit 1

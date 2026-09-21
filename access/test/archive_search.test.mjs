@@ -82,7 +82,7 @@ test('one fixed read RPC uses only server key, strips all client headers, return
 test('modern key has no Bearer; legacy JWT key retains Bearer; missing/invalid key has no fallback',async()=>{
   await withFetch(()=>response(statusResult()),async(calls)=>{
     const env=envFor();env.SUPABASE_SERVICE_KEY='legacy.synthetic.jwt';assert.equal((await call(env,'/api/library/archive/status')).status,200);assert.equal(calls[0][1].headers.Authorization,'Bearer legacy.synthetic.jwt');
-    for(const key of [undefined,'','anon-key','sb_publishable_fixture','sb_secret_']){const other=envFor();other.SUPABASE_SERVICE_KEY=key;const r=await call(other,'/api/library/archive/status');assert.equal(r.status,503);assert.equal((await r.json()).error,'archive_not_configured');}assert.equal(calls.length,1);
+    for(const key of [undefined,'','anon-key','sb_publishable_fixture','sb_secret_']){const other=envFor();other.SUPABASE_SERVICE_KEY=key;const r=await call(other,'/api/library/archive/status');assert.equal(r.status,503);assert.equal((await r.json()).error,key===undefined||key===''?'archive_key_missing':'archive_key_invalid');}assert.equal(calls.length,1);
   });
 });
 

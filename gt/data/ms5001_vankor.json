@@ -1,0 +1,1813 @@
+{
+ "machine": {
+  "name": "GE MS5001",
+  "legacy": "Frame 5 (1 вал)",
+  "oem": "Nuovo Pignone S.p.A. (GE Vernova); номера частей по каталогу Nuovo Pignone",
+  "site": "ГТЭС-200; сделка проходит как «Юнипро / Ванкор»",
+  "scope": "ТО-70000 — перечень запасных частей на инспекцию 70 000 часов",
+  "site_note": "Владелец и эксплуатант площадки по документу не восстанавливаются: заказчик ТКП — ПАО «Юнипро», объект назван ГТЭС-200. Связь площадки с владельцем в lib_fleet не заводится, пока не подтверждена.",
+  "execution": "MS5001PA",
+  "note": "Ведомость вешается на каталожную машину «GE MS5001» из gt/data/models.json (ключ gems5001). Отдельная машина под исполнение PA не заводится: иначе у одной турбины окажется две карточки и ведомость не найдётся по шильдику. Исполнение хранится полем execution и в scheme строк состава."
+ },
+ "source": {
+  "kind": "технико-коммерческое предложение КВАНТ заказчику",
+  "ref": "исх. №99-77 от 08.06.2026, Rev. 1",
+  "sheet": "ТО-70000",
+  "note": "В репозиторий перенесена только техническая часть: номер позиции, каталожный номер, наименование, количество. Цены, заказчик-плательщик, условия сделки и контактное лицо — коммерческие и персональные данные, в публичный репозиторий не кладутся (CLAUDE.md, правило 5). Загрузка цен в закрытую базу — library/load_tkp_prices.py, читает исходный файл по пути из TKP_XLSX, сам файл здесь не хранится.",
+  "fields": "pn — каталожный номер Nuovo Pignone; имя поля именно pn, а не eid: по FIELD_GROUPS в scripts/build_index.py индексируется pn, и под другим именем номера в поиск не попадут."
+ },
+ "completeness": {
+  "positions_quoted": 198,
+  "numbering_max": 234,
+  "positions_missing": 36,
+  "missing_ranges": [
+   "11–14",
+   "22–26",
+   "28–31",
+   "33–35",
+   "61",
+   "70",
+   "72–73",
+   "77",
+   "133",
+   "181",
+   "199",
+   "207–208",
+   "210",
+   "212",
+   "215",
+   "220",
+   "224",
+   "226",
+   "229–232"
+  ],
+  "note": "Нумерация исходного перечня доходит до 234, предложено 198 строк. 36 номеров в предложении отсутствуют — это не ошибка разбора, а разрывы в самом документе. Что за ними стояло, по этому файлу не восстанавливается."
+ },
+ "warnings": [
+  "Каталожные номера повторяются: 18 номеров встречаются в 41 строке. Перечень собран по сборкам, один крепёж попадает в несколько из них — при закупке строки надо сводить по номеру, иначе один и тот же номер пойдёт несколькими мелкими партиями.",
+  "SMO37790 стоит в трёх строках (№10 «комплект опорных подшипников №1 и №2» — 2 шт, №122 и №176 «JOURNAL BEARING» — по 1 шт), итого 4 шт одного номера, и по двум разным ценам. Требует сверки с машиной: сколько опорных подшипников на ТО-70000 действительно меняется.",
+  "У позиций «комплект» (сопловые аппараты, рабочие лопатки, шрауд-блоки) количество указано в штуках, состав комплекта не расписан."
+ ],
+ "catalog": [
+  {
+   "poz": "1",
+   "pn": "SMO0411370",
+   "name": "Fuel Nozzles PEK/ ТОПЛИВНАЯ ФОРСУНКА (УЛУЧШЕННАЯ)",
+   "qty": 10,
+   "node": "hot.fuel-injectors",
+   "block": "капитальные части"
+  },
+  {
+   "poz": "2",
+   "pn": "SMO0391475",
+   "name": "CAP & LINER PEK/ ЖАРОВЫЕ ТРУБЫ (УЛУЧШЕННЫЕ)",
+   "qty": 10,
+   "node": "hot.combustion-liner",
+   "block": "капитальные части"
+  },
+  {
+   "poz": "3",
+   "pn": "SMO0683504",
+   "name": "Transition Piece PEK/ ПЕРЕХОДНОЙ ЭЛЕМЕНТ (УЛУЧШЕННЫЙ)",
+   "qty": 10,
+   "node": "hot.transition-piece",
+   "block": "капитальные части"
+  },
+  {
+   "poz": "4",
+   "pn": "SMO1734909",
+   "name": "Сопловой аппарат 1-й ступени (улучшенные)",
+   "qty": 1,
+   "node": "turbine.nozzle-guide-vanes",
+   "block": "капитальные части"
+  },
+  {
+   "poz": "5",
+   "pn": "SMO1173900",
+   "name": "Комплект рабочих лопаток 1-й ступени (улучшенные)",
+   "qty": 1,
+   "node": null,
+   "block": "капитальные части"
+  },
+  {
+   "poz": "6",
+   "pn": "SMO0620031",
+   "name": "1st stage shroud /К-Т ШРАУД-БЛОКОВ 1 СТУП.",
+   "qty": 1,
+   "node": "turbine.shroud",
+   "block": "капитальные части"
+  },
+  {
+   "poz": "7",
+   "pn": "SMO1734722",
+   "name": "2nd stage nozzle / СОПЛОВОЙ АППАРАТ 2 СТ.",
+   "qty": 1,
+   "node": "turbine.nozzle-guide-vanes",
+   "block": "капитальные части"
+  },
+  {
+   "poz": "8",
+   "pn": "SMO1188600",
+   "name": "2nd stage bucket /К-Т РАБ. ЛОПАТОК 2 СТ.",
+   "qty": 1,
+   "node": null,
+   "block": "капитальные части"
+  },
+  {
+   "poz": "9",
+   "pn": "SMO0620032",
+   "name": "2nd stage shroud / К-Т ШРАУД-БЛОКОВ 2 СТУП.",
+   "qty": 1,
+   "node": "turbine.shroud",
+   "block": "капитальные части"
+  },
+  {
+   "poz": "10",
+   "pn": "SMO37790",
+   "name": "Комплект опорных подшипников ГТУ (№1 и №2)",
+   "qty": 2,
+   "node": "rotor",
+   "block": "капитальные части"
+  },
+  {
+   "poz": "15",
+   "pn": "RTO65880",
+   "name": "THERMOCOUPLE",
+   "qty": 4,
+   "node": "controls.exhaust-thermocouples",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "16",
+   "pn": "RTO326450210B",
+   "name": "THERMOCOUPLE",
+   "qty": 2,
+   "node": "controls.exhaust-thermocouples",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "17",
+   "pn": "RTO326450310B",
+   "name": "THERMOCOUPLE",
+   "qty": 2,
+   "node": "controls.exhaust-thermocouples",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "18",
+   "pn": "RTO326520010B",
+   "name": "THERMOCOUPLE",
+   "qty": 2,
+   "node": "controls.exhaust-thermocouples",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "19",
+   "pn": "RTO95490",
+   "name": "THERMOCOUPLE",
+   "qty": 4,
+   "node": "controls.exhaust-thermocouples",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "20",
+   "pn": "RTO77740",
+   "name": "TEMPERATURE RESISTANCE",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "21",
+   "pn": "MAM000125",
+   "name": "SEALANT",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "27",
+   "pn": "RTO95490",
+   "name": "THERMOCOUPLE",
+   "qty": 2,
+   "node": "controls.exhaust-thermocouples",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "32",
+   "pn": "SMR67407",
+   "name": "SPARK PLUG TUBE",
+   "qty": 2,
+   "node": "hot.igniter",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "36",
+   "pn": "GQF19044",
+   "name": "SCREW 3/4-10UNCX1 3/4",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "37",
+   "pn": "SMQ20980",
+   "name": "STRIP",
+   "qty": 58,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "38",
+   "pn": "KFZ326250004",
+   "name": "GASKET",
+   "qty": 4,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "39",
+   "pn": "SMR50235",
+   "name": "SECURITY PLATE",
+   "qty": 16,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "40",
+   "pn": "GTG19050",
+   "name": "SCREW 3/4-10UNCX2",
+   "qty": 10,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "41",
+   "pn": "GFY38203",
+   "name": "SCREW 1 1/2-8UNX8",
+   "qty": 5,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "42",
+   "pn": "FGN47538",
+   "name": "NUT 1 1/2-8UNC",
+   "qty": 6,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "43",
+   "pn": "RPQ38360",
+   "name": "STUD-BOLT 1 1/2",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "44",
+   "pn": "RPQ47788",
+   "name": "STUD BOLT",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "45",
+   "pn": "SMP24556",
+   "name": "HALF RING",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "46",
+   "pn": "RPQ38361",
+   "name": "STUD-BOLT 1 1/28UN-2A",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "47",
+   "pn": "RFR330950000",
+   "name": "HELI-COIL 1/2-13UNCX1,5",
+   "qty": 8,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "48",
+   "pn": "RFR330030000",
+   "name": "HELI-COIL 3/4-10UNCX1",
+   "qty": 4,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "49",
+   "pn": "SMR53809",
+   "name": "SEALING PLATE",
+   "qty": 27,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "50",
+   "pn": "RPQ35552",
+   "name": "STUD BOLT 1-8UNC-2A",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "51",
+   "pn": "RPP02988",
+   "name": "PIN",
+   "qty": 4,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "52",
+   "pn": "GTG25063",
+   "name": "SCREW 1-8UNCX2 1/2",
+   "qty": 12,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "53",
+   "pn": "GTG25095",
+   "name": "SCREW 1-8UNCX3 3/4",
+   "qty": 16,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "54",
+   "pn": "FGC53625",
+   "name": "NUT 1-8UNC",
+   "qty": 24,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "55",
+   "pn": "SMR50008",
+   "name": "SAFETY PLATE",
+   "qty": 10,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "56",
+   "pn": "GQF12025",
+   "name": "SCREW 1/2-13UNCX1",
+   "qty": 10,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "57",
+   "pn": "KFZ294560004",
+   "name": "GASKET",
+   "qty": 2,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "58",
+   "pn": "KFZ294570004",
+   "name": "GASKET",
+   "qty": 2,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "59",
+   "pn": "HEH06019",
+   "name": "SCREW 1/4-20UNCX3/4",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "60",
+   "pn": "FLC019007016",
+   "name": "WASHER D.19/7X1.6",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "62",
+   "pn": "KFZ00050",
+   "name": "STRIP PACKING",
+   "qty": 11,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "63",
+   "pn": "KFZ00050",
+   "name": "STRIP PACKING",
+   "qty": 11,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "64",
+   "pn": "RVR20549",
+   "name": "SCREW",
+   "qty": 10,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "65",
+   "pn": "SMR64787",
+   "name": "LOCK PLATE",
+   "qty": 10,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "66",
+   "pn": "RVR20180",
+   "name": "SCREW",
+   "qty": 10,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "67",
+   "pn": "SMR44648",
+   "name": "SEAL END",
+   "qty": 10,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "68",
+   "pn": "FFF14619",
+   "name": "NUT 3/4-10UNC",
+   "qty": 20,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "69",
+   "pn": "SMR50011",
+   "name": "SAFETY PLATE",
+   "qty": 20,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "71",
+   "pn": "GTG19076",
+   "name": "SCREW 3/4-10UNCX3",
+   "qty": 6,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "74",
+   "pn": "GTG15076",
+   "name": "SCREW 5/8-11UNCX3",
+   "qty": 12,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "75",
+   "pn": "GTG15076",
+   "name": "SCREW 5/8-11UNCX3",
+   "qty": 42,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "76",
+   "pn": "FFE14615",
+   "name": "NUT 5/8-11UNC",
+   "qty": 12,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "78",
+   "pn": "FGC53615",
+   "name": "NUT 5/8-11UNC",
+   "qty": 42,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "79",
+   "pn": "FGC53619",
+   "name": "NUT 3/4-10UNC",
+   "qty": 6,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "80",
+   "pn": "SMP20938",
+   "name": "RETAINING RING",
+   "qty": 30,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "81",
+   "pn": "RFR330060000",
+   "name": "HELI-COIL 5/8-11UNC X1",
+   "qty": 80,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "82",
+   "pn": "RPQ47535",
+   "name": "SEAL PIN",
+   "qty": 36,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "83",
+   "pn": "SMU45785",
+   "name": "KEY",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "84",
+   "pn": "SMU45786",
+   "name": "KEY",
+   "qty": 34,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "85",
+   "pn": "RPQ01843",
+   "name": "DOWEL PIN",
+   "qty": 30,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "86",
+   "pn": "SMU45788",
+   "name": "KEY",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "87",
+   "pn": "SMU45789",
+   "name": "KEY",
+   "qty": 28,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "88",
+   "pn": "SMO1513600",
+   "name": "OIL DEFLECTOR FOR BEARING #1",
+   "qty": 1,
+   "node": "rotor",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "89",
+   "pn": "SMS23188",
+   "name": "SEAL OIL 2/2",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "90",
+   "pn": "RPP02259",
+   "name": "LOCK PIN",
+   "qty": 1,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "91",
+   "pn": "FJV06031",
+   "name": "PIN 1/4X1 1/4",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "92",
+   "pn": "FGD34625",
+   "name": "NUT 1-8UNC",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "93",
+   "pn": "FLC063027040",
+   "name": "WASHER D.63/27X4",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "94",
+   "pn": "GFU06019",
+   "name": "SCREW 1/4-20UNCX3/4",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "95",
+   "pn": "SMQ33902",
+   "name": "PIN",
+   "qty": 1,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "96",
+   "pn": "FJV06063",
+   "name": "PIN 1/4X2 1/2",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "97",
+   "pn": "GFU06044",
+   "name": "SCREW 1/4-20UNCX1 3/4",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "98",
+   "pn": "SMP56006",
+   "name": "AIR SEAL",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "99",
+   "pn": "SMO44774",
+   "name": "OIL SEAL RING",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "100",
+   "pn": "RFR331010000",
+   "name": "HELI-COIL 3/8-16UNCX2DA",
+   "qty": 10,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "101",
+   "pn": "RFR331040000",
+   "name": "HELI-COIL 3/8-16UNCX1,5D",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "102",
+   "pn": "RFR331030000",
+   "name": "HELI-COIL 1/4-20UNCX2DA",
+   "qty": 5,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "103",
+   "pn": "RPQ02578",
+   "name": "DOWEL PIN",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "104",
+   "pn": "RPP38364",
+   "name": "SPECIAL TIE ROD",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "105",
+   "pn": "GFU19063",
+   "name": "SCREW 3/4-10UNCX2 1/2",
+   "qty": 5,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "106",
+   "pn": "GFS31101",
+   "name": "SCREW 1 1/4-8UNX4",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "107",
+   "pn": "GFU25139",
+   "name": "SCREW 1-8UNCX5 1/2",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "108",
+   "pn": "GFU25114",
+   "name": "SCREW 1-8UNCX4 1/2",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "109",
+   "pn": "GFS31127",
+   "name": "SCREW 1 1/4-8UNX5",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "110",
+   "pn": "FGN16531",
+   "name": "NUT1 1/4-8UNC",
+   "qty": 4,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "111",
+   "pn": "GTG31190",
+   "name": "SCREW 1 1/4-8UNX7 1/2",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "112",
+   "pn": "SMR50017",
+   "name": "SAFETY PLATE",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "113",
+   "pn": "GQF19127",
+   "name": "SCREW 3/4-10UNCX5",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "114",
+   "pn": "RVO21186",
+   "name": "SPECIAL SCREW",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "115",
+   "pn": "FJK09050",
+   "name": "PIN 3/8X2",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "116",
+   "pn": "HEK12057",
+   "name": "SCREW 1/2-13UNCX2 1/4",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "117",
+   "pn": "GRA25095",
+   "name": "SCREW 1-8UNCX3 3/4",
+   "qty": 6,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "118",
+   "pn": "GRA15038",
+   "name": "SCREW 5/8-11UNCX1 1/2",
+   "qty": 3,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "119",
+   "pn": "SMR50010",
+   "name": "SAFETY PLATE",
+   "qty": 3,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "120",
+   "pn": "RPQ02659",
+   "name": "DOWEL PIN",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "121",
+   "pn": "RFR330000000",
+   "name": "HELI-COIL 1-8UNCX2DA",
+   "qty": 3,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "122",
+   "pn": "SMO37790",
+   "name": "JOURNAL BEARING",
+   "qty": 1,
+   "node": "rotor.journal-bearings",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "123",
+   "pn": "RFR330950000",
+   "name": "HELI-COIL 1/2-13UNCX1,5",
+   "qty": 3,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "124",
+   "pn": "FGC53619",
+   "name": "NUT 3/4-10UNC",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "125",
+   "pn": "SMR50011",
+   "name": "SAFETY PLATE",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "126",
+   "pn": "GTG19088",
+   "name": "SCREW 3/4-10UNCX3 1/2",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "127",
+   "pn": "FGJ31619",
+   "name": "NUT 3/4-10UNC",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "128",
+   "pn": "RPQ32597",
+   "name": "STUD-BOLT",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "129",
+   "pn": "FFF066190450",
+   "name": "NUT 3/4-10UNC",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "130",
+   "pn": "RPQ32509",
+   "name": "STUD-BOLT",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "131",
+   "pn": "GTG19069",
+   "name": "SCREW 3/4-10UNCX2 3/4",
+   "qty": 17,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "132",
+   "pn": "RPQ02261",
+   "name": "PIN",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "134",
+   "pn": "RPQ38513",
+   "name": "STUD BOLT",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "135",
+   "pn": "GRW12019",
+   "name": "SCREW 1/2-20UNFX3/4",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "136",
+   "pn": "GTG31292",
+   "name": "SCREW 1 1/4-8UNX11 1/2",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "137",
+   "pn": "GTG31133",
+   "name": "SCREW 1 1/4-8UNX5 1/4",
+   "qty": 20,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "138",
+   "pn": "GFY31088",
+   "name": "SCREW 1 1/4-8UNX3 1/2",
+   "qty": 32,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "139",
+   "pn": "FFF14531",
+   "name": "NUT 1 1/4-8UNC",
+   "qty": 3,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "140",
+   "pn": "RPQ02804",
+   "name": "DOWEL PIN",
+   "qty": 4,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "141",
+   "pn": "RFR331180000",
+   "name": "HELI-COIL 1 1/4-8UN X1",
+   "qty": 7,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "142",
+   "pn": "GFY31127",
+   "name": "SCREW 1 1/4-8UNX5",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "143",
+   "pn": "GTG19063",
+   "name": "SCREW 3/4-10UNCX2 1/2",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "144",
+   "pn": "RFR330950000",
+   "name": "HELI-COIL 1/2-13UNCX1,5",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "145",
+   "pn": "HEH12076",
+   "name": "SCREW 1/2-13UNCX3",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "146",
+   "pn": "RPQ02646",
+   "name": "DOWEL PIN",
+   "qty": 4,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "147",
+   "pn": "RFR330030000",
+   "name": "HELI-COIL 3/4-10UNCX1",
+   "qty": 4,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "148",
+   "pn": "RFR331060000",
+   "name": "HELI-COIL 1/2-13UNC X2",
+   "qty": 4,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "149",
+   "pn": "RPQ21079",
+   "name": "DOWEL PIN",
+   "qty": 8,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "150",
+   "pn": "HEH09044",
+   "name": "SCREW_3/8-16UNC 1 3/4",
+   "qty": 36,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "151",
+   "pn": "RPQ35660",
+   "name": "STUD-BOLT",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "152",
+   "pn": "RDQ01327",
+   "name": "SELF-LOCKING NUT 1-8UNC",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "153",
+   "pn": "HEK06012",
+   "name": "SCREW 1/4-20UNCX1/2",
+   "qty": 64,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "154",
+   "pn": "RMO19605",
+   "name": "SPRING CUP",
+   "qty": 64,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "155",
+   "pn": "RPQ47510",
+   "name": "DOWEL PIN",
+   "qty": 32,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "156",
+   "pn": "GQF09012",
+   "name": "SCREW 3/8-16UNCX1/2",
+   "qty": 30,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "157",
+   "pn": "FNP03105",
+   "name": "WASHER D.10.5",
+   "qty": 30,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "158",
+   "pn": "SMP21483",
+   "name": "SHIM",
+   "qty": 138,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "159",
+   "pn": "HEH09031",
+   "name": "SCREW 3/8-16UNCX1 1/4",
+   "qty": 32,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "160",
+   "pn": "FLA025007016",
+   "name": "WASHER D.25/7X1.6",
+   "qty": 64,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "161",
+   "pn": "SMT5954716",
+   "name": "WASHER, THRUST",
+   "qty": 64,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "162",
+   "pn": "RPQ06298",
+   "name": "SPECIAL PIN",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "163",
+   "pn": "SMO1513400",
+   "name": "OIL DEFLECTOR",
+   "qty": 1,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "164",
+   "pn": "HRQ060190003",
+   "name": "SCREW 1/4-20UNCX3/4",
+   "qty": 1,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "165",
+   "pn": "RPQ02188",
+   "name": "DOWEL PIN",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "166",
+   "pn": "GTG19057",
+   "name": "SCREW 3/4-10UNCX2 1/4",
+   "qty": 10,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "167",
+   "pn": "GTG19057",
+   "name": "SCREW 3/4-10UNCX2 1/4",
+   "qty": 24,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "168",
+   "pn": "RFR330000000",
+   "name": "HELI-COIL 1-8UNCX2DA",
+   "qty": 4,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "169",
+   "pn": "HEH25139",
+   "name": "SCREW 1-8UNCX5 1/2",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "170",
+   "pn": "RPP02651",
+   "name": "PIN",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "171",
+   "pn": "GTG12076",
+   "name": "SCREW 1/2-13UNCX3",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "172",
+   "pn": "FPD06040",
+   "name": "PIN 6X40",
+   "qty": 1,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "173",
+   "pn": "HQA090880453",
+   "name": "SCREW 3/8-16UNCX3 1/2",
+   "qty": 1,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "174",
+   "pn": "HQA091010453",
+   "name": "SCREW 3/8-16UNCX4",
+   "qty": 3,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "175",
+   "pn": "HEH06025",
+   "name": "SCREW 1/4-20UNCX1",
+   "qty": 4,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "176",
+   "pn": "SMO37790",
+   "name": "JOURNAL BEARING",
+   "qty": 1,
+   "node": "rotor.journal-bearings",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "177",
+   "pn": "RFR330950000",
+   "name": "HELI-COIL 1/2-13UNCX1,5",
+   "qty": 1,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "178",
+   "pn": "RPQ02646",
+   "name": "DOWEL PIN",
+   "qty": 8,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "179",
+   "pn": "RFR330030000",
+   "name": "HELI-COIL 3/4-10UNCX1",
+   "qty": 24,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "180",
+   "pn": "RFR330060000",
+   "name": "HELI-COIL 5/8-11UNC X1",
+   "qty": 8,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "182",
+   "pn": "RCO36183",
+   "name": "UNLOAD THRUST BEARING",
+   "qty": 1,
+   "node": "rotor.thrust-bearing",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "183",
+   "pn": "RCO36182",
+   "name": "LOAD THRUST BEARING",
+   "qty": 1,
+   "node": "rotor.thrust-bearing",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "184",
+   "pn": "SMP22533",
+   "name": "SHIM",
+   "qty": 1,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "185",
+   "pn": "SMP22534",
+   "name": "SHIM",
+   "qty": 1,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "186",
+   "pn": "GRA19063",
+   "name": "SCREW 3/4-10UNCX2 1/2",
+   "qty": 9,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "187",
+   "pn": "GFU19127",
+   "name": "SCREW 3/4-10UNCX5",
+   "qty": 2,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "188",
+   "pn": "HEH25069",
+   "name": "SCREW 1-8UNCX2 3/4",
+   "qty": 14,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "189",
+   "pn": "RPQ02659",
+   "name": "DOWEL PIN",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "190",
+   "pn": "RPQ02662",
+   "name": "DOWEL PIN",
+   "qty": 2,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "191",
+   "pn": "GRA19120",
+   "name": "SCREW 3/4-10UNCX4 3/4",
+   "qty": 8,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "192",
+   "pn": "RPQ02218",
+   "name": "DOWEL PIN",
+   "qty": 3,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "193",
+   "pn": "RPQ06294",
+   "name": "DOWEL PIN",
+   "qty": 3,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "194",
+   "pn": "GFY38152",
+   "name": "SCREW 1 1/2-8UNX6",
+   "qty": 26,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "195",
+   "pn": "GTG25063",
+   "name": "SCREW 1-8UNCX2 1/2",
+   "qty": 8,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "196",
+   "pn": "GTG19088",
+   "name": "SCREW 3/4-10UNCX3 1/2",
+   "qty": 15,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "197",
+   "pn": "KFZ217550794",
+   "name": "GASKET",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "198",
+   "pn": "KCX027921920",
+   "name": "GASKET 8-150",
+   "qty": 2,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "200",
+   "pn": "KFZ269830844",
+   "name": "SPIROMETAL GASKET",
+   "qty": 18,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "201",
+   "pn": "KFZ269830844",
+   "name": "SPIROMETAL GASKET",
+   "qty": 3,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "202",
+   "pn": "KFZ269880844",
+   "name": "GASKET 3-600",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "203",
+   "pn": "KFZ269880844",
+   "name": "GASKET 3-600",
+   "qty": 3,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "204",
+   "pn": "KFZ269880844",
+   "name": "GASKET 3-600",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "205",
+   "pn": "SMP64612",
+   "name": "LOCKING PLATE",
+   "qty": 16,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "206",
+   "pn": "GQF15038",
+   "name": "SCREW 5/8-11UNCX1 1/2",
+   "qty": 32,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "209",
+   "pn": "FLC025010016",
+   "name": "WASHER D.25,5/10,3X1,6",
+   "qty": 30,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "211",
+   "pn": "FLA057013040",
+   "name": "WASHER D.57/13X4",
+   "qty": 23,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "213",
+   "pn": "FNP031300450",
+   "name": "WASHER D.13",
+   "qty": 23,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "214",
+   "pn": "KFZ303740684",
+   "name": "GASKET",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "216",
+   "pn": "FLC057016040",
+   "name": "WASHER D.57/16X4",
+   "qty": 17,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "217",
+   "pn": "KFZ190660684",
+   "name": "GASKET",
+   "qty": 56,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "218",
+   "pn": "KFZ238920684",
+   "name": "GASKET",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "219",
+   "pn": "KFZ238920684",
+   "name": "GASKET",
+   "qty": 1,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "221",
+   "pn": "RRP41490",
+   "name": "WASHER D.I.16",
+   "qty": 21,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "222",
+   "pn": "KFZ303950604",
+   "name": "GASKET",
+   "qty": 2,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "223",
+   "pn": "FNC011500450",
+   "name": "WASHER D.15",
+   "qty": 31,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "225",
+   "pn": "RRP41491",
+   "name": "WASHER D.16",
+   "qty": 10,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "227",
+   "pn": "SMR56146",
+   "name": "SEAL SEGMENT",
+   "qty": 28,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "228",
+   "pn": "KFZ237280044",
+   "name": "GASKET (SPLIT IN 4 SEGMENT)",
+   "qty": 2,
+   "node": "seals",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "233",
+   "pn": "FLC031014025",
+   "name": "WASHER D.31/14X2.5",
+   "qty": 19,
+   "node": "fasteners",
+   "block": "вспомогательные запчасти"
+  },
+  {
+   "poz": "234",
+   "pn": "MAN002262",
+   "name": "FIBER CERAMIC TAPE",
+   "qty": 1,
+   "node": null,
+   "block": "вспомогательные запчасти"
+  }
+ ],
+ "stats": {
+  "positions": 198,
+  "part_numbers": 175,
+  "repeated_part_numbers": 18,
+  "with_node": 137,
+  "nodes": [
+   "controls.exhaust-thermocouples",
+   "fasteners",
+   "hot.combustion-liner",
+   "hot.fuel-injectors",
+   "hot.igniter",
+   "hot.transition-piece",
+   "rotor",
+   "rotor.journal-bearings",
+   "rotor.thrust-bearing",
+   "seals",
+   "turbine.nozzle-guide-vanes",
+   "turbine.shroud"
+  ]
+ },
+ "channel": {
+  "measured": "2026-09-13",
+  "method": "Поиск 175 каталожных номеров предложения и слов MS5001/MS5002 по 42 311 таможенным записям zip/customs/out/ (подписка glbs.io, 2023-01 — 2026-03).",
+  "part_numbers_found": 0,
+  "part_numbers_total": 175,
+  "part_numbers_note": "Ни один из 175 номеров в таможенных описаниях не встречается: в графе описания пишут машину, а не номер части. Значит второй цены на эти номера из таможни не получить — коэффициент предложения по ней не проверяется.",
+  "records_frame5": 55,
+  "period": [
+   "2023-01-14",
+   "2025-01-20"
+  ],
+  "hs": "8411990019",
+  "transit": {
+   "LT": 31,
+   "LV": 13,
+   "CN": 5,
+   "TR": 1,
+   "IT": 1,
+   "MV": 1,
+   "не указано": 3
+  },
+  "exact_machine": {
+   "records": 1,
+   "date": "2024-05-01",
+   "exporter": "RTP POWER SE",
+   "origin": "CN",
+   "dispatch": "TR",
+   "currency": "TRY",
+   "qty": "40",
+   "desc": "ЧАСТИ ДЛЯ ГАЗОТУРБИННОЙ УСТАНОВКИ MS5001PA МОЩНОСТЬ 25 МВТ (25000КВТ)",
+   "note": "Единственная запись именно по MS5001PA за три года. Не цена и не наличие — доказательство того, что канал на эту машину существует и работает через Турцию."
+  },
+  "exporters": [
+   {
+    "name": "NUOVO PIGNONE INTERNATIONAL S.R.L",
+    "records": 35,
+    "first": "2023-03-20",
+    "last": "2024-12-06",
+    "origin": [
+     "IT"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "ITAI S.P.A",
+    "records": 3,
+    "first": "2023-04-12",
+    "last": "2025-01-20",
+    "origin": [
+     "IT"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "TADDEI BRUNO & С OFFICINE MECCANICHE S.R.L",
+    "records": 3,
+    "first": "2023-08-10",
+    "last": "2023-11-14",
+    "origin": [
+     "IT"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "LANZHOU LANSHI GROUP CO. LTD",
+    "records": 3,
+    "first": "2023-09-03",
+    "last": "2024-06-28",
+    "origin": [
+     "CN"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "STEEL WORK MANUFACTURING SRL",
+    "records": 3,
+    "first": "2023-09-14",
+    "last": "2024-03-11",
+    "origin": [
+     "IT"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "HA**** EURA******* EN**** Co., Ltd",
+    "records": 3,
+    "first": "2024-03-05",
+    "last": "2024-03-23",
+    "origin": [
+     "CN"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "LANZHOU LS GROUP CO. LTD",
+    "records": 2,
+    "first": "2023-12-11",
+    "last": "2023-12-11",
+    "origin": [
+     "CN"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "ASFO S.P.A",
+    "records": 1,
+    "first": "2023-01-14",
+    "last": "2023-01-14",
+    "origin": [
+     "IT"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "TESI SRL",
+    "records": 1,
+    "first": "2023-06-15",
+    "last": "2023-06-15",
+    "origin": [
+     "IT"
+    ],
+    "machine": [
+     "MS5002"
+    ]
+   },
+   {
+    "name": "RTP POWER SE",
+    "records": 1,
+    "first": "2024-05-01",
+    "last": "2024-05-01",
+    "origin": [
+     "CN"
+    ],
+    "machine": [
+     "MS5001"
+    ]
+   }
+  ],
+  "note": "Экспортёр в декларации — не поставщик нам и не подтверждение наличия. Это ответ на вопрос «кто вообще возит части Frame 5 в РФ»: с него начинается поиск исполнителя, а не заканчивается. Импортёры в таможенном наборе обезличены, цены замаскированы — денег отсюда не взять."
+ }
+}

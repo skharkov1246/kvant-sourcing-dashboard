@@ -147,3 +147,92 @@ def test_схема_применяется_на_чистой_базе():
             for роль in созданные_роли:
                 cur.execute(f"drop role if exists {роль}")
         conn.close()
+
+
+ИМЯ_ЦЕНЫ = "quote_price_smoke"
+
+
+def test_вид_связывает_цену_кп_с_компанией_реестра():
+    """sup_quote_price соединяет два реестра, не подменяя один другим.
+
+    Цена из разобранного КП несёт ключ портала (lib_prices.rfq_company), а
+    реестр опознаёт компанию по sup_identifier. Записать одно в supplier_id
+    нельзя — там внешний ключ на старый справочник lib_suppliers. Вид считает
+    связь на чтении, и проверять его надо на живой базе: имена колонок
+    («number» вместо «id») и ключ соединения («value» вместо «value_norm»)
+    молча дали бы пустую связь — обе ошибки поймались именно так.
+    """
+    import psycopg2
+    from psycopg2.extensions import parse_dsn
+
+    assert parse_dsn(DSN)["dbname"] == "library_sql_test"
+    файлы = ("schema.sql", "schema_junk.sql", "suppliers_schema.sql")
+
+    созданные: list[str] = []
+    conn = psycopg2.connect(DSN)
+    conn.autocommit = True
+    try:
+        with conn.cursor() as cur:
+            for роль in ("anon", "authenticated"):
+                cur.execute("select 1 from pg_roles where rolname = %s", (роль,))
+                if not cur.fetchone():
+                    cur.execute(f"create role {роль} nologin")
+                    созданные.append(роль)
+            cur.execute(f"drop schema if exists {ИМЯ_ЦЕНЫ} cascade")
+            cur.execute(f"create schema {ИМЯ_ЦЕНЫ}")
+            cur.execute(f"set search_path to {ИМЯ_ЦЕНЫ}")
+            for имя in файлы:
+                for оператор in операторы(
+                        (ROOT / "library" / "supabase" / имя).read_text(encoding="utf-8")):
+                    cur.execute(оператор)
+
+            cur.execute("""
+                insert into sup_entity (id, kind, display_name, status)
+                values ('KV-S-000123-7', 'legal', 'Придуманный поставщик', 'active')""")
+            cur.execute("""
+                insert into sup_identifier (sup_id, kind, value, value_norm, source,
+                                            status, run_id)
+                values ('KV-S-000123-7', 'bitrix', 'ID 4242', '4242', 'bitrix',
+                        'stated', 'проба')""")
+            # value и value_norm НАМЕРЕННО разные: норма — буквы и цифры в
+            # верхнем регистре (library/load_supplier_master.py, норма()).
+            # Совпади они в пробе, тест не отличил бы соединение по value от
+            # соединения по value_norm — а разница между ними и есть та ошибка,
+            # ради которой тест написан.
+            cur.execute("""
+                insert into lib_prices (item_name, price, currency, qty, rfq_id,
+                                        rfq_company, lead_days, source, feed, confidence,
+                                        oem, rfq_brands)
+                values ('Подшипник',  1200.50, 'EUR', 10, '11', '4242', 42,
+                        'КП', 'разбор КП', 'med', 'Придуманный завод', '7,8'),
+                       ('Уплотнение',  850.00, 'EUR',  4, '12', null,  null,
+                        'КП', 'разбор КП', 'low', null, null),
+                       ('Чужая цена',      99, 'RUB',  1, null, null,  null,
+                        'прайс', 'каталог ODM', 'med', null, null)""")
+
+            cur.execute("select item_name, supplier_number, supplier_name, lead_days, "
+                        "oem, rfq_brands from sup_quote_price order by item_name")
+            строки = cur.fetchall()
+
+            # Только котировки: цена из каталога сюда не попадает.
+            assert [с[0] for с in строки] == ["Подшипник", "Уплотнение"]
+            # Связь нашлась.
+            assert строки[0][1] == "KV-S-000123-7"
+            assert строки[0][2] == "Придуманный поставщик"
+            assert строки[0][3] == 42
+            # Цена без поставщика НЕ теряется: скрыть её значило бы потерять
+            # цифру, которая есть.
+            assert строки[1][1] is None and строки[1][2] is None
+            # Изготовитель и бренд доезжают до вида. Без них вопрос «что этот
+            # поставщик котирует и по чьему оборудованию» требовал бы второго
+            # запроса прямо в lib_prices — то есть вид отвечал бы на половину.
+            assert строки[0][4] == "Придуманный завод"
+            assert строки[0][5] == "7,8"
+            # Отсутствие не выдумывается: у второй строки их нет.
+            assert строки[1][4] is None and строки[1][5] is None
+    finally:
+        with conn.cursor() as cur:
+            cur.execute(f"drop schema if exists {ИМЯ_ЦЕНЫ} cascade")
+            for роль in созданные:
+                cur.execute(f"drop role if exists {роль}")
+        conn.close()

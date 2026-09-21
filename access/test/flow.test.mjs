@@ -132,9 +132,9 @@ test("полный цикл: заявка → письмо владельцу �
 test("отзыв доступа действует немедленно, сессия перестаёт работать", async () => {
   reset();
   await req("/access/request", { method: "POST",
-    form: { email: "sidorov@kvant.ru", tabs: ["kam"] } });
+    form: { email: "sidorov@kvant.ru", tabs: ["reps"] } });
   const review = pathOf(linkOf((await outbox("skharkov@gmail.com")).at(-1), "/access/review"));
-  await req(review, { method: "POST", form: { action: "approve", tabs: ["kam"], days: "0" } });
+  await req(review, { method: "POST", form: { action: "approve", tabs: ["reps"], days: "0" } });
   const enter = pathOf(linkOf((await outbox("sidorov@kvant.ru")).at(-1), "/access/enter"));
   await req(enter, { who: "sid" });
   assert.ok((await req("/", { who: "sid" })).text.includes("MOCK-DIR"));

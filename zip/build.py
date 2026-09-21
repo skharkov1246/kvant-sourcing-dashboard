@@ -160,8 +160,9 @@ def build():
 
     # страницы-разведки: собираются из тех же данных zip/data, но своим сборщиком.
     # Каждая — самодостаточный HTML рядом с индексом; падение одной не роняет деплой.
-    for mod in ("build_telsmith_page", "build_audit_page", "build_recip_page", "build_diag_page",
-                "build_oem_page", "build_recon_pages"):
+    for mod in ("build_telsmith_page", "build_audit_page", "build_recip_page",
+                "build_diag_page", "build_oem_page", "build_recon_pages",
+                "build_r1700"):
         try:
             subprocess.run([sys.executable, str(ROOT / "tools" / f"{mod}.py")], check=True)
         except Exception as ex:
@@ -203,6 +204,8 @@ def build():
                  "ПЕРФОРАТОРЫ-СОРСИНГ.html": "drifters-sourcing.html",
                  "perf_sourcing.csv": "drifters-sourcing.csv",
                  "ТЕЛСМИТ-СОРСИНГ.pdf": "telsmith-sourcing.pdf",
+                 "R1700-СОРСИНГ.pdf": "r1700-sourcing.pdf",
+                 "R1700-СОРСИНГ.html": "r1700-sourcing.html",
                  "ТЕЛСМИТ-СОРСИНГ.html": "telsmith-sourcing.html",
                  "telsmith_need.csv": "telsmith-need.csv"}
         for f in orders.iterdir():
