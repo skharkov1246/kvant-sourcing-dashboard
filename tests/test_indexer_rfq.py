@@ -107,3 +107,53 @@ def test_поле_поставщика_запрашивается_у_порта�
     monkeypatch.setattr(ix, "bx_all", подмена)
     ix.collect_refs_rfq(30)
     assert ix.ПОЛЕ_ПОСТАВЩИКА in видели["select"]
+
+
+def test_фильтр_даты_не_уходит_на_портал(monkeypatch):
+    """Серверный «>=createdTime» съедал две трети карточек.
+
+    Замер 21.09.2026: с фильтром за 7 300 дней приходило 7 150 карточек, а
+    замеры котировок, читающие ту же сущность без фильтра, видят 21 865.
+    Двадцатилетнее окно отсечь ничего не может — отсекал фильтр.
+    """
+    видели = {}
+
+    def подмена(method, params):
+        видели["params"] = params
+        return []
+
+    monkeypatch.setattr(ix, "bx_all", подмена)
+    ix.collect_refs_rfq(7300)
+    assert "filter" not in видели["params"], "фильтр по дате снова ушёл на портал"
+    assert "createdTime" in видели["params"]["select"]
+
+
+def test_окно_считается_у_себя(monkeypatch):
+    """Свежая карточка проходит, древняя — нет."""
+    from datetime import datetime, timedelta, timezone
+
+    сейчас = datetime.now(timezone.utc)
+    свежая = (сейчас - timedelta(days=5)).strftime("%Y-%m-%dT00:00:00+03:00")
+    древняя = (сейчас - timedelta(days=900)).strftime("%Y-%m-%dT00:00:00+03:00")
+    карточки(monkeypatch, [
+        {"id": 1, "createdTime": свежая, ОФФЕР: [{"id": 1, "urlMachine": "https://x.test/1"}]},
+        {"id": 2, "createdTime": древняя, ОФФЕР: [{"id": 2, "urlMachine": "https://x.test/2"}]},
+    ])
+    assert [r["deal"] for r in ix.collect_refs_rfq(30)] == ["1"]
+
+
+def test_карточка_без_даты_не_теряется(monkeypatch):
+    """Недоказанное «старая» дешевле потерянной цены."""
+    карточки(monkeypatch, [
+        {"id": 3, ОФФЕР: [{"id": 3, "urlMachine": "https://x.test/3"}]},
+        {"id": 4, "createdTime": "", ОФФЕР: [{"id": 4, "urlMachine": "https://x.test/4"}]},
+    ])
+    assert [r["deal"] for r in ix.collect_refs_rfq(30)] == ["3", "4"]
+
+
+def test_окно_ноль_берёт_всё(monkeypatch):
+    карточки(monkeypatch, [
+        {"id": 5, "createdTime": "2009-01-01T00:00:00+03:00",
+         ОФФЕР: [{"id": 5, "urlMachine": "https://x.test/5"}]},
+    ])
+    assert len(ix.collect_refs_rfq(0)) == 1
