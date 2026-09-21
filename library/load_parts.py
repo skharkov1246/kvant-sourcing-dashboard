@@ -83,6 +83,34 @@ def load(path: str, key: str = "rows"):
     return d if isinstance(d, list) else (d.get(key) or [])
 
 
+KV_REGISTRY = "pnw/data/kv_registry.json"
+
+
+def наши_номера() -> tuple[dict[str, str], dict[str, str]]:
+    """Наш внутренний номер по ключу детали: «gt:730000004» → KV-000753-4.
+
+    Реестр хранит устойчивый ключ детали, а не её место в файле: номера не
+    переиздаются и не переиспользуются, поэтому пересборка каталога даёт ту же
+    пару. Ключи двух видов: «gt:<партномер>» сводится к ключу детали напрямую,
+    «zip:<id позиции>» — через pos_id, потому что у позиции ЗИП ключ детали
+    считается от каталожного номера, а не от её номера в файле."""
+    полный = os.path.join(ROOT, KV_REGISTRY)
+    if not os.path.exists(полный):
+        return {}, {}
+    d = json.load(open(полный, encoding="utf-8")).get("assigned") or {}
+    по_детали: dict[str, str] = {}
+    по_позиции: dict[str, str] = {}
+    for ключ, номер in d.items():
+        вид, _, сырой = str(ключ).partition(":")
+        if вид == "zip":
+            по_позиции[сырой] = номер
+        else:
+            k = part_key(сырой, "")
+            if k:
+                по_детали[k] = номер
+    return по_детали, по_позиции
+
+
 def узел_позиции(p: dict) -> str | None:
     """Узел позиции каталога по её описанию — тем же правилом, что и для
     номенклатуры ГТУ (library/equipment.py), а не своим.
@@ -275,15 +303,21 @@ def main() -> int:
              "склад поставщика, EXW", FEED_ЗАПИСИ, conf="med")
 
     # Узел добирается одним проходом по ВСЕМ путям сборки: см. узел_позиции.
+    kv_по_детали, kv_по_позиции = наши_номера()
     for p_ in parts.values():
         p_["unit_id"] = узел_позиции(p_)
+        p_["kv_no"] = (kv_по_позиции.get(str(p_.get("pos_id")))
+                       or kv_по_детали.get(p_["id"]))
     с_узлом = sum(1 for p_ in parts.values() if p_["unit_id"])
+    с_kv = sum(1 for p_ in parts.values() if p_["kv_no"])
 
     print("=== запчасти ===")
     print(f"  позиций в каталоге:{len(positions):>8}")
     print(f"  добавлено из заявок на закупку:{из_заявок:>6}")
     print(f"  узел определён у: {с_узлом:>9}  "
           f"({с_узлом * 100 // max(len(parts), 1)} %)")
+    print(f"  с нашим номером KV:{с_kv:>8}  "
+          f"(в реестре выдано {len(kv_по_детали) + len(kv_по_позиции)})")
     print(f"  различных деталей: {len(parts):>8}" +
           (f"   (столкновений ключа: {столкновения})" if столкновения else ""))
     заполнено = Counter()
@@ -352,7 +386,7 @@ def main() -> int:
         psycopg2.extras.execute_values(cur, """
             insert into lib_parts (id, catalog_no, name, oem, model, category, segment_id,
                                    hs_code, material, applications, target_equipment, aliases,
-                                   qty_quarter, status, unit_id, unit_rule, source)
+                                   qty_quarter, status, unit_id, unit_rule, kv_no, source)
             values %s
             on conflict (id) do update set
               name = excluded.name, oem = excluded.oem, model = excluded.model,
@@ -366,12 +400,14 @@ def main() -> int:
               -- только пустое (правило: обвиняй осторожно, защищай щедро).
               unit_id = coalesce(lib_parts.unit_id, excluded.unit_id),
               unit_rule = coalesce(lib_parts.unit_rule, excluded.unit_rule),
+              kv_no = coalesce(excluded.kv_no, lib_parts.kv_no),
               updated_at = now()""",
             [(p["id"], p["catalog_no"], p["name"], p["oem"], p["model"], p["category"],
               p["segment_id"], p["hs_code"], p["material"], p["applications"],
               p["target_equipment"], p["aliases"], p["qty_quarter"], p["status"],
               p["unit_id"] if p["unit_id"] in узлы else None,
-              "описание позиции" if p["unit_id"] in узлы else None, "каталог ЗИП")
+              "описание позиции" if p["unit_id"] in узлы else None,
+              p["kv_no"], "каталог ЗИП")
              for p in parts.values()], page_size=500)
 
         cur.execute("select id from lib_parts")

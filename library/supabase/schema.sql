@@ -84,6 +84,13 @@ create index if not exists lib_parts_seg  on lib_parts (segment_id);
 create index if not exists lib_parts_oem  on lib_parts (oem);
 create index if not exists lib_parts_equip on lib_parts (target_equipment);
 
+-- Наш внутренний номер. Сорсер и склад говорят номерами KV, а в библиотеке
+-- их не было вовсе: поиск по «KV-000753-4» не находил ничего, хотя номер выдан
+-- и закреплён за деталью навсегда (pnw/data/kv_registry.json — номера не
+-- переиздаются и не переиспользуются).
+alter table lib_parts add column if not exists kv_no text;
+create index if not exists lib_parts_kv on lib_parts (kv_no);
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 2в. Машина и узел — первые два звена цепочки портала (CLAUDE.md, «Куда мы
 --     идём»). До сих пор их не было вовсе: деталь знала машину строкой
