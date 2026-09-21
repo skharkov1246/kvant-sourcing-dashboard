@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 258,
-    "total_bytes": 115470603,
+    "total_bytes": 115483253,
     "by_sensitivity": {
       "внутреннее": 140,
       "конфиденциально": 68,
@@ -4603,7 +4603,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 123801,
+      "bytes": 124502,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4651,7 +4651,7 @@
       ],
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "64e2594",
+      "last_commit": "900bae6",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8660,6 +8660,55 @@
       ]
     },
     {
+      "path": "gt/data/gap_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 23783,
+      "note": "Готовые письма изготовителям по самому дорогому разряду заявки ЛУКОЙЛ — строкам, где нет ни найденной цены, ни экспертной вилки. Замер 21.09.2026: таких строк 681 из 1 642, и по сведению с файлом потребности заказчика (gt/data/budget_join_stats.json) на 439 из них, которые есть в его файле с ценой, лежит 20 367 578 USD бюджета. Главное, что показал прогон: письмо по 445 из этих строк УЖЕ собрано в других пакетах (ship_lists_rfq — 368, письмо одному оператору из seller_index — 217, ship_quote_letters — 6, с пересечениями) и ждёт отправки; новых писем 9 на 84 позиции. Адресат определяется двумя путями, и источник записан по каждому письму: НАШ шаблон номера из ship_channels.json (Solar 24, Siemens 17, Pepperl+Fuchs 3, ABB 2) и, только там, где шаблон молчит, столбец «Производитель» заказчика, сведённый с maker_contacts.json (Schlumberger 16, Drillmec 13, Mi Swaco 6, WAGO 2, Finder 1). Шаблон идёт первым, потому что на турбинных листах столбец заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Отказ от второго пути стоил бы пяти писем: у 38 строк из 182 «неопознанных» изготовитель заказчиком назван И адрес его страницы контактов у нас прочитан. Осталось 144 строки: изготовитель назван у большинства, но его страницу контактов мы не читали — это 89 изготовителей, и каждый прочитанный адрес превращает свои строки в письмо тем же прогоном. Ещё 8 строк Danfoss без адреса. В письмах нет ни цены, ни бюджета заказчика, ни его имени. Отправляет письма человек. Читает лист решений gt/tools/ship_decisions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "ask_rows",
+        "brands_without_address",
+        "gap_rows",
+        "letters",
+        "of_them_already_in_a_letter",
+        "positions_in_letters",
+        "rows_by_attribution_path",
+        "rows_in_letters",
+        "rows_without_address",
+        "source",
+        "unbranded_makers_named_by_customer",
+        "unbranded_rows",
+        "unbranded_sample",
+        "updated",
+        "what_it_is",
+        "what_it_is_not",
+        "what_unbranded_means",
+        "why_pattern_comes_first",
+        "why_two_paths"
+      ],
+      "main_collection": {
+        "key": "unbranded_makers_named_by_customer",
+        "records": 89
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "900bae6",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/gap_letters.py",
+        "gt/tools/ship_decisions.py",
+        "tests/test_gap_letters.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_seller_groups.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 22118,
@@ -9504,52 +9553,6 @@
         "scripts/build_chain_coverage.py",
         "scripts/build_chain_page.py",
         "tests/test_dict.py"
-      ]
-    },
-    {
-      "path": "gt/data/gap_letters.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 11834,
-      "note": "Готовые письма изготовителям по самому дорогому разряду заявки ЛУКОЙЛ — строкам, где нет ни найденной цены, ни экспертной вилки. Замер 21.09.2026: таких строк 681 из 1 642, и по сведению с файлом потребности заказчика (gt/data/budget_join_stats.json) на 439 из них, которые есть в его файле с ценой, лежит 20 367 578 USD бюджета. Главное, что показал прогон: письмо по 445 из этих строк УЖЕ собрано в других пакетах (ship_lists_rfq — 368, письмо одному оператору из seller_index — 217, ship_quote_letters — 6, с пересечениями) и ждёт отправки; новых писем всего 4 на 46 позиций (Solar 24, Siemens 17, Pepperl+Fuchs 3, ABB 2). Ещё 182 строки бренда не получили: это атрибуция номера к изготовителю, отдельная работа, а не отказ рынка; 8 строк Danfoss остались без адреса, прочитанного на странице контактов. Бренд определяется НАШИМИ шаблонами номеров из ship_channels.json, а не столбцом «Производитель» заказчика: тот врёт — под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. В письмах нет ни цены, ни бюджета заказчика, ни его имени. Отправляет письма человек. Читает лист решений gt/tools/ship_decisions.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "ask_rows",
-        "brands_without_address",
-        "gap_rows",
-        "letters",
-        "of_them_already_in_a_letter",
-        "positions_in_letters",
-        "rows_in_letters",
-        "rows_without_address",
-        "source",
-        "unbranded_rows",
-        "unbranded_sample",
-        "updated",
-        "what_it_is",
-        "what_it_is_not",
-        "what_unbranded_means",
-        "why_not_customers_column"
-      ],
-      "main_collection": {
-        "key": "unbranded_sample",
-        "records": 40
-      },
-      "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "64e2594",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/gap_letters.py",
-        "gt/tools/ship_decisions.py",
-        "tests/test_gap_letters.py"
       ]
     },
     {
