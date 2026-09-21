@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 256,
-    "total_bytes": 115372130,
+    "datasets": 257,
+    "total_bytes": 115375967,
     "by_sensitivity": {
       "внутреннее": 140,
       "конфиденциально": 67,
-      "публикуемо": 49
+      "публикуемо": 50
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 79,
+      "ГТУ-библиотека": 80,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -64,9 +64,9 @@
           "what_it_is"
         ]
       },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "b2a816a",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "7fe2791",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -75,14 +75,14 @@
       "referenced_by": [
         "gt/tools/apply_makers.py",
         "gt/tools/band_basis.py",
+        "gt/tools/budget_join.py",
         "gt/tools/confidence_audit.py",
         "gt/tools/inside_quotes.py",
         "gt/tools/jenbacher_fold.py",
         "gt/tools/lists_rfq.py",
         "gt/tools/maker_basis.py",
         "gt/tools/quote_letters.py",
-        "gt/tools/rejudge_rate.py",
-        "gt/tools/rv_brief.py"
+        "gt/tools/rejudge_rate.py"
       ]
     },
     {
@@ -346,6 +346,7 @@
       },
       "referenced_by": [
         "gt/tools/band_basis.py",
+        "gt/tools/budget_join.py",
         "gt/tools/channels.py",
         "gt/tools/collisions.py",
         "gt/tools/confidence_audit.py",
@@ -353,8 +354,7 @@
         "gt/tools/english_source.py",
         "gt/tools/homoglyphs.py",
         "gt/tools/inside_found.py",
-        "gt/tools/inside_quotes.py",
-        "gt/tools/jenbacher_fold.py"
+        "gt/tools/inside_quotes.py"
       ]
     },
     {
@@ -2401,9 +2401,9 @@
           "warning"
         ]
       },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "b2a816a",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "7fe2791",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4672,9 +4672,9 @@
           "why_tier"
         ]
       },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "b2a816a",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "7fe2791",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4685,6 +4685,68 @@
         "gt/tools/ship_underpriced.py",
         "gt/tools/underpriced_doc.py",
         "tests/test_report_numbers.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 121868,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/budget_join_stats.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/maker_contacts.json",
+        "gt/data/pn_db.json",
+        "gt/data/seller_index.json",
+        "gt/data/seller_sitemaps.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_priced.json",
+        "gt/data/ship_inside_quotes.json",
+        "gt/data/ship_jenbacher_prices.json",
+        "gt/data/ship_leak.json",
+        "gt/data/ship_lists_rfq.json"
+      ],
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "d92923a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -4733,68 +4795,6 @@
       "referenced_by": [
         "zip/tools/perf_classes.py",
         "zip/tools/perf_table.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 120314,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/maker_contacts.json",
-        "gt/data/pn_db.json",
-        "gt/data/seller_index.json",
-        "gt/data/seller_sitemaps.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_inside_priced.json",
-        "gt/data/ship_inside_quotes.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_leak.json",
-        "gt/data/ship_lists_rfq.json",
-        "gt/data/ship_lukoil.json"
-      ],
-      "last_change": "2026-09-19",
-      "last_author": "skharkov1246",
-      "last_commit": "ec54e55",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -10254,9 +10254,9 @@
         "key": "channel_without_price",
         "records": 13
       },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "b2a816a",
+      "last_change": "2026-09-19",
+      "last_author": "skharkov1246",
+      "last_commit": "7fe2791",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -11024,6 +11024,48 @@
       ]
     },
     {
+      "path": "gt/data/budget_join_stats.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 2283,
+      "note": "Агрегаты сведения БЮДЖЕТА ЗАКАЗЧИКА с нашей закупкой, построчно посчитанного gt/tools/budget_join.py. Замер 21.09.2026 по файлу потребности от 26.08: 1 479 строк с ценой, 7 678 662 098 руб = 91 027 865 USD, и все 1 479 сошлись с нашей сводкой заявки по каталожному номеру. Разложение по тому, на чём стоит НАША сторона: найденная цена — 404 строки на 40 511 497 USD, только экспертная вилка — 636 на 30 148 790, ничего — 439 на 20 367 578. Строк, где бюджет заказчика НИЖЕ найденной цены закупки, 65; если брать весь объём по найденной цене, не хватает 531 462 USD, но продавец подтвердил количество лишь у 7 из них, поэтому это верхняя граница. Маржа по строкам с вилкой НЕ считается: вилка это мнение. Здесь только агрегаты — построчная таблица бюджета остаётся вне репозитория вместе с самим файлом заказчика, инструмент отказывается писать её внутрь дерева git. Читает лист решений gt/tools/ship_decisions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "budget_by_our_readiness",
+        "budget_total_usd",
+        "of_them_seller_confirmed_volume",
+        "qty_mismatch_rows",
+        "rate_rub_per_usd",
+        "rows_budget_below_found_price",
+        "rows_joined_to_ask",
+        "rows_with_price",
+        "sheets",
+        "shortfall_usd_if_whole_volume",
+        "source",
+        "updated",
+        "what_it_is",
+        "what_shortfall_means",
+        "why_no_margin_here",
+        "why_qty_mismatch"
+      ],
+      "main_collection": {
+        "key": "budget_by_our_readiness",
+        "records": 3
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "d92923a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/budget_join.py",
+        "gt/tools/ship_decisions.py"
+      ]
+    },
+    {
       "path": "ove/data/rfq_files.json",
       "subproject": "ОВЭ-75",
       "bytes": 1909,
@@ -11074,6 +11116,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/budget_join.py",
         "gt/tools/inside_found.py",
         "gt/tools/jenbacher_fold.py",
         "gt/tools/pricelist_fold.py",
@@ -11082,8 +11125,7 @@
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_offer.py",
-        "gt/tools/ship_priced.py",
-        "gt/tools/stocklist_cross.py"
+        "gt/tools/ship_priced.py"
       ]
     },
     {
