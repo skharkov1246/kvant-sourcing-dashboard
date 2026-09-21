@@ -483,8 +483,14 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
             rec["doc_class"], rec["class_rule"] = "документация", docfilter.RULE_VERSION
             return rec, []
         for ln in lines[:2000]:
+            # КП приходят PDF-ами, и таблицы в них нет: разбор по заголовкам
+            # мимо. Цена здесь опознаётся арифметикой — кол-во × цена = сумма,
+            # тройка чисел в самой строке (library/quotes.py). Замер 21.09.2026:
+            # без этого пробный разбор дал 139 позиций и НОЛЬ цен.
+            ц = quotes.цена_из_текста(ln) if SOURCE == "rfq" else None
             items.append({"item_name": ln[:300], "part_number": docfilter.part_number_of(ln),
-                          "oem": "", "unit": "", "qty": None, "_row": ln[:600]})
+                          "oem": "", "unit": "", "qty": ц["qty"] if ц else None,
+                          "_row": ln[:600], "_цена": ц})
 
     rec["chars"] = len(text)
     rec["rows_found"] = len(items)
@@ -513,10 +519,9 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         it["deal_id"] = ref["deal"]
         it["source_file"] = fid
         it["company"] = ref.get("company")
-        ц = it.get("_цена")
-        if ц and ц.get("currency") is None and вф:
-            ц["currency"] = вф
-            ц["note"] = "; ".join(x for x in (ц.get("note"), "валюта взята по файлу") if x)
+        # Валюта файла вместо ненайденной; оговорка и уверенность правятся там же,
+        # чтобы в строке не стояли разом «не названа» и «взята по файлу».
+        quotes.подставить_валюту(it.get("_цена"), вф)
     return rec, items
 
 
