@@ -34,8 +34,10 @@ import psycopg2
 import psycopg2.extras
 import requests
 
+_КОРЕНЬ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
+sys.path.insert(0, os.path.join(_КОРЕНЬ, "scripts"))
+sys.path.insert(0, _КОРЕНЬ)          # bitrix_client лежит в корне
 import docfilter  # noqa: E402  (после sys.path)
 import quotes  # noqa: E402  (цена из КП поставщика)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
@@ -106,15 +108,37 @@ def connect(attempts: int = 12):
     raise last
 
 
+# ОДИН КЛИЕНТ НА ВЕСЬ ПОРТАЛ. Прежний bx() делал четыре МГНОВЕННЫХ повтора без
+# пауз и после них возвращал пустой словарь. Обход принимал пустоту за конец
+# данных и завершался как успешный: чтение СП-166 обрывалось то на 7 150, то на
+# 7 750, то на 8 250 записях из 21 865 — каждый раз на другом месте, всегда
+# «успешно». Четыре повтора подряд без паузы против ограничения частоты
+# бесполезны: все четыре укладываются в доли секунды.
+#
+# bitrix_client.BitrixClient делает это правильно и давно: пауза между запросами,
+# экспоненциальная выдержка с джиттером, разбор 429 и 5xx, отдельный список
+# повторяемых кодов ошибок Битрикса — и ГРОМКИЙ отказ, когда попытки кончились.
+# Держать вторую реализацию того же чтения незачем: сегодня они разошлись молча,
+# и это стоило целого расследования.
+_КЛИЕНТ = None
+
+
+def клиент():
+    """Ленивая сборка: без секрета модуль всё равно должен импортироваться."""
+    global _КЛИЕНТ
+    if _КЛИЕНТ is None:
+        from bitrix_client import BitrixClient
+        _КЛИЕНТ = BitrixClient(BASE)
+    return _КЛИЕНТ
+
+
 def bx(method: str, params: dict) -> dict:
-    for _ in range(4):
-        try:
-            r = requests.post(f"{BASE}/{method}.json", json=params, timeout=90)
-            r.raise_for_status()
-            return r.json()
-        except Exception:
-            continue
-    return {}
+    """Полный конверт ответа ({result, next, total}). Исчерпав повторы — падает.
+
+    Падение здесь намеренно: неполное чтение, выданное за полное, дороже
+    упавшего прогона. Прогон повторяется, потерянные записи — нет.
+    """
+    return клиент().call_envelope(method, params)
 
 
 # Размер страницы REST Битрикса. Полное чтение кончается КОРОТКОЙ страницей;

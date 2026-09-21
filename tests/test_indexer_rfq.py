@@ -197,3 +197,39 @@ def test_окно_ноль_берёт_всё(monkeypatch):
          ОФФЕР: [{"id": 5, "urlMachine": "https://x.test/5"}]},
     ])
     assert len(ix.collect_refs_rfq(0)) == 1
+
+
+# ── чтение портала не имеет права молчать ────────────────────────────────────
+def test_чтение_портала_идёт_общим_клиентом():
+    """Прежний bx() делал четыре МГНОВЕННЫХ повтора и возвращал пустой словарь.
+
+    Обход принимал пустоту за конец данных и завершался как успешный: чтение
+    СП-166 обрывалось то на 7 150, то на 7 750, то на 8 250 записях из 21 865 —
+    каждый раз в другом месте, всегда «успешно». Четыре повтора подряд без паузы
+    против ограничения частоты бесполезны.
+    """
+    import inspect
+
+    исходник = inspect.getsource(ix.bx)
+    assert "call_envelope" in исходник, "bx должен звать общий клиент"
+    assert "requests.post" not in исходник, "своя реализация запроса вернулась"
+
+
+def test_исчерпанные_повторы_роняют_прогон(monkeypatch):
+    """Неполное чтение, выданное за полное, дороже упавшего прогона."""
+    from bitrix_client import BitrixError
+
+    class Падающий:
+        def call_envelope(self, method, params):
+            raise BitrixError(f"{method}: не удалось выполнить за 6 попыток")
+
+    monkeypatch.setattr(ix, "_КЛИЕНТ", Падающий())
+    with pytest.raises(BitrixError):
+        ix.bx_all_by_id("crm.item.list", {"entityTypeId": 166})
+
+
+def test_пустая_страница_кончает_чтение_только_без_ошибки(monkeypatch):
+    """Пустой ответ — законный конец ТОЛЬКО когда он пришёл без ошибки."""
+    страницы = [{"result": {"items": [{"id": 1}]}}, {"result": {"items": []}}]
+    monkeypatch.setattr(ix, "bx", lambda m, p: страницы.pop(0))
+    assert len(ix.bx_all_by_id("crm.item.list", {})) == 1
