@@ -24,6 +24,7 @@
 
     python base/kb_catalog.py --db base/kvant.db
 """
+
 from __future__ import annotations
 
 import argparse
@@ -32,6 +33,9 @@ import sqlite3
 import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
+
+# Правило ключа артикула — одно на все модули base/, см. base/pnkey.py.
+from pn_norm import key_of as pn_key
 
 MIN_LEN = 4          # артикулы короче четырёх знаков — почти всегда номер строки
 # В формах КП заказчика рядом с кодом строки стоит не наименование, а условие
@@ -51,12 +55,14 @@ FORM_ROW = re.compile(
     r"(уведомлени|пояснени\w* внеплан|обоснован|комментарий к|причин\w* разрыв|"
     r"риск несени|график выполнени|notification|for rating|for evaluation|"
     r"внеплановост|закрыт\w* процедур|превышени\w* (?:сроков|стоимости))", re.I)
-NORM = re.compile(r"[^0-9A-ZА-Я]")
-
-
 def key_of(pn: str) -> str | None:
-    """Сравнимый вид артикула: без пробелов, дефисов и регистра."""
-    k = NORM.sub("", (pn or "").upper())
+    """Сравнимый вид артикула плюс отсев слишком коротких.
+
+    Само правило ключа — в base/pnkey.py, один экземпляр на все модули: оно
+    сводит кириллические буквы-двойники к латинице, иначе «917427С1» и
+    «917427C1» живут как два разных изделия.
+    """
+    k = pn_key(pn)
     if len(k) < MIN_LEN or k.isdigit() and len(k) < 6:
         return None
     return k

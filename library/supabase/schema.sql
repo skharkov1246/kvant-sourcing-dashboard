@@ -301,6 +301,31 @@ create table if not exists lib_symptom_ops (
 );
 create index if not exists lib_symptom_ops_proc on lib_symptom_ops (procedure_id);
 
+-- Признак → дефект и дефект → ремонтное решение. До этих двух таблиц середина
+-- цепочки связывалась текстом: у признака в поле defect было написано
+-- «износ или проворот вкладыша», а в справочнике дефектов лежала запись с таким
+-- именем — и перейти по ней было нельзя, потому что связи не было. Обе таблицы
+-- многие-ко-многим сознательно: один признак даёт несколько дефектов (рост
+-- вибрации 1× — и дисбаланс, и износ вкладыша), и один дефект лечится
+-- несколькими операциями (прогар жаровой трубы — купонный ремонт И покрытие).
+create table if not exists lib_symptom_defects (
+  symptom_id text not null references lib_symptoms(id) on delete cascade,
+  defect_id  text not null references lib_defects(id)  on delete cascade,
+  source     text,
+  created_at timestamptz default now(),
+  primary key (symptom_id, defect_id)
+);
+create index if not exists lib_symptom_defects_defect on lib_symptom_defects (defect_id);
+
+create table if not exists lib_defect_ops (
+  defect_id    text not null references lib_defects(id)    on delete cascade,
+  procedure_id text not null references lib_procedures(id) on delete cascade,
+  source       text,
+  created_at   timestamptz default now(),
+  primary key (defect_id, procedure_id)
+);
+create index if not exists lib_defect_ops_proc on lib_defect_ops (procedure_id);
+
 create index if not exists lib_defects_unit on lib_defects (unit_id);
 create index if not exists lib_defects_pn   on lib_defects (part_number);
 
@@ -440,6 +465,41 @@ alter table lib_prices add column if not exists year     int;
 alter table lib_prices add column if not exists exporter text;
 create index if not exists lib_prices_part on lib_prices (part_id);
 create index if not exists lib_prices_feed on lib_prices (feed);
+-- Цена из разобранного КП поставщика (feed = 'разбор КП'). Срок поставки и
+-- карточка запроса — часть самой котировки: цена без срока не решение о закупке,
+-- а карточка связывает цену с поставщиком, когда реестр до неё дойдёт
+-- (supplier_id разбор не ставит: сопоставление карточки с компанией — отдельный
+-- проход, и выдавать догадку за связь нельзя).
+alter table lib_prices add column if not exists lead_days int;
+alter table lib_prices add column if not exists rfq_id    text;
+-- Компания-поставщик из карточки запроса, как её знает Битрикс. Записывается
+-- в момент разбора: карточка в этот миг уже прочитана, а отдельный проход
+-- стоил бы второго сплошного чтения портала. В supplier_id не пишется —
+-- там внешний ключ на lib_suppliers, а ключ портала ведёт в sup_identifier
+-- нового реестра: сведение двух реестров это отдельная работа, и подменять
+-- один идентификатор другим нельзя.
+alter table lib_prices add column if not exists rfq_company text;
+-- РАЗРЕЗ ПО БРЕНДУ И МАШИНЕ. Цена без ответа на вопрос «к чему это» сравнима
+-- только сама с собой: подшипник за 1 200 евро дорог или дёшев в зависимости от
+-- того, в какой машине он стоит и чей он.
+--
+-- oem — производитель ИЗ СТРОКИ ФАЙЛА. Разборщик его находил и раньше (колонка
+-- «производитель», «изготовитель», «бренд», «марка», «OEM»), но в строку цены не
+-- писал: он уходил только в спрос.
+--
+-- rfq_brands — бренды С КАРТОЧКИ запроса (ufCrm18Brands), ключами, как и
+-- rfq_company. Поле многозначное, поэтому храним список через запятую. Имена не
+-- разрешаем здесь по той же причине, что и у поставщика: сопоставление ключа со
+-- справочником — отдельный проход, а догадка вместо связи хуже пустоты.
+--
+-- Машина отдельной колонкой НЕ хранится намеренно: связь «деталь → машина» уже
+-- есть в lib_part_models (9 869 связей), и ключ к ней — part_number, который
+-- заполнен у 96 % строк цены. Вторая копия этой связи разошлась бы с первой.
+alter table lib_prices add column if not exists oem        text;
+alter table lib_prices add column if not exists rfq_brands text;
+create index if not exists lib_prices_oem on lib_prices (oem);
+create index if not exists lib_prices_rfq on lib_prices (rfq_id);
+create index if not exists lib_prices_rfqco on lib_prices (rfq_company);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
@@ -525,6 +585,8 @@ alter table lib_bom            enable row level security;
 alter table lib_symptoms       enable row level security;
 alter table lib_pn_patterns    enable row level security;
 alter table lib_symptom_ops    enable row level security;
+alter table lib_symptom_defects enable row level security;
+alter table lib_defect_ops     enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

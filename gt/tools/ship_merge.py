@@ -7,6 +7,7 @@
   gt/data/ship_energoseti.json — проверка 505 строк «Энергосетей» 09.2026
   gt/data/ship_sweep.json      — сплошная проверка остатка 863 строк 09.2026
   gt/data/ship_recheck.json    — перепроверка 62 строк августовского наличия по ссылкам
+  gt/data/ship_blocked.json    — поиск 31 строки, чьи ссылки отдают 403, на отдающих витринах
 
 Позднейшая проверка перекрывает раннюю. Строки заявки без проверки попадают в
 датасет с вердиктом not_checked — так видно реальное покрытие, а не подогнанное.
@@ -26,7 +27,10 @@ PRICES = ROOT / "gt/data/rfq_prices.json"
 SHIP = ROOT / "gt/data/ship_energoseti.json"
 SWEEP = ROOT / "gt/data/ship_sweep.json"
 RECHECK = ROOT / "gt/data/ship_recheck.json"
+BLOCKED = ROOT / "gt/data/ship_blocked.json"
+FX = ROOT / "gt/data/fx_rates.json"
 SELLERS = ROOT / "gt/data/ship_sellers.json"
+SUBSTITUTIONS = ROOT / "gt/data/ship_price_substitutions.json"
 DST = ROOT / "gt/data/ship_lukoil.json"
 
 # наши базы контактов: путь -> ключ коллекции (None = файл сам массив)
@@ -43,6 +47,42 @@ ORG_TAIL = re.compile(
     r"Co\.?|Corp\.?|AG|Limited|Company|Pvt\.?|ООО|АО|ЗАО)\b\.?", re.I)
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]{2,}")
 PHONE = re.compile(r"\+\d[\d\-\s()]{7,}\d")
+
+
+def fx_rates() -> dict:
+    """Курсы к доллару на дату выгрузки. Без них суммы врут кратно."""
+    if not FX.exists():
+        return {"USD": 1.0}
+    return json.loads(FX.read_text()).get("rates", {"USD": 1.0})
+
+
+RATES = fx_rates()
+
+
+def to_usd(price, currency: str):
+    """Цена в долларах. None, если валюта неизвестна — молча считать её долларом нельзя.
+
+    Разбор 13.09.2026: unit_price не смотрел на валюту вовсе, и в сумму закупки
+    попадали 12 642 CZK как 12 642 USD, 7 422 RUB как 7 422 USD. По 35 твёрдым
+    строкам из 85 цена была не в долларах — итог завышался примерно на треть.
+    """
+    if price in (None, ""):
+        return None
+    try:
+        p = float(price)
+    except (TypeError, ValueError):
+        return None
+    if p <= 0:
+        # НОЛЬ И ОТРИЦАТЕЛЬНОЕ — НЕ ЦЕНА. На брокерских витринах «$0.00» и «1,00»
+        # это заглушка карточки-заявки, а не предложение. Разбор 17.09.2026: таких
+        # строк 176, и все они попадали в «рынок ниже нашей оценки», раздувая его
+        # с 58 до 234 строк. Отсутствие цены честнее нуля.
+        return None
+    cur = (s(currency) or "USD").upper()
+    rate = RATES.get(cur)
+    if not rate:
+        return None
+    return p / rate
 
 
 def clean_name(name: str) -> str:
@@ -200,6 +240,7 @@ def blank(pn: str) -> dict:
         "lead_time": "", "price": None, "currency": "USD", "pack_qty": 1,
         "covers_qty": "unknown", "real_maker": "", "real_pn": "", "substitute": "",
         "note": "", "checked_by": "", "sellers": [],
+        "price_usd": None, "unit_price_usd": None,
     }
 
 
@@ -419,6 +460,7 @@ def main() -> int:
         (SHIP, "rows", "проверка 505 строк 09.2026"),
         (SWEEP, "rows", "сплошная проверка остатка 09.2026"),
         (RECHECK, "rows", "перепроверка ссылок 09.2026"),
+        (BLOCKED, "rows", "обход ботозащиты 09.2026"),
     ):
         rows = prices_doc["checks"] if path == PRICES else load_rows(path, coll)
         for raw in rows:
@@ -462,6 +504,60 @@ def main() -> int:
                 sl["emails"], sl["phones"] = [], []
                 sl["site"] = sl["url"]
 
+    # цена в долларах — ОДИН раз здесь, чтобы ни один потребитель датасета
+    # не складывал кроны с рублями. Курс — gt/data/fx_rates.json с датой.
+    no_rate, zero_price = [], 0
+    for rec in out:
+        usd = to_usd(rec.get("price"), rec.get("currency"))
+        rec["price_usd"] = round(usd, 4) if usd is not None else None
+        if usd is None:
+            rec["unit_price_usd"] = None
+            if rec.get("price") not in (None, ""):
+                # две разные причины, и путать их нельзя: заглушка витрины и
+                # валюта без курса лечатся по-разному
+                try:
+                    is_zero = float(rec["price"]) <= 0
+                except (TypeError, ValueError):
+                    is_zero = False
+                if is_zero:
+                    zero_price += 1
+                else:
+                    no_rate.append(rec["currency"])
+        else:
+            try:
+                pack = float(rec.get("pack_qty") or 1) or 1.0
+            except (TypeError, ValueError):
+                pack = 1.0
+            rec["unit_price_usd"] = round(usd / pack, 4)
+
+    # ПОДСТАВЛЕННЫЕ ЦЕНЫ СНИМАЮТСЯ. gt/data/ship_price_substitutions.json называет
+    # поимённо номера, у которых в поле цены стоит не цена, а нижняя граница
+    # витринной вилки НА КЛАСС изделий, делённая на фасовку. Такое значение
+    # выглядит как цена и считается как цена, не будучи ею. Набор существовал с
+    # 18.09.2026, но ни на один счёт не влиял: он описывал ошибку, а сводка
+    # продолжала её содержать. Теперь значение обнуляется здесь, а причина
+    # переносится в пояснение строки, чтобы её было видно и в выгрузке.
+    subs = {}
+    if SUBSTITUTIONS.exists():
+        for it in json.loads(SUBSTITUTIONS.read_text(encoding="utf-8")).get("items", []):
+            subs[key(it.get("pn"))] = it
+    dropped = 0
+    for rec in out:
+        it = subs.get(key(rec.get("pn")))
+        if not it:
+            continue
+        why = str(it.get("how_it_was_made") or "").strip()
+        rec["price"] = None
+        rec["price_usd"] = None
+        rec["unit_price_usd"] = None
+        rec["note"] = (str(rec.get("note") or "").rstrip() +
+                       " ЦЕНА СНЯТА 18.09.2026: в поле стояла не цена этой детали, а "
+                       + (why or "подстановка по классу изделий") +
+                       ". Такое значение выглядит как цена и считается как цена, не "
+                       "будучи ею, поэтому в счёт не идёт. Поимённо названо в "
+                       "gt/data/ship_price_substitutions.json.").strip()
+        dropped += 1
+
     for rec in out:
         rec["stock_grade"] = stock_grade(rec)
     attach_clusters(out)
@@ -470,10 +566,15 @@ def main() -> int:
     DST.write_text(json.dumps({
         "updated": date.today().isoformat(),
         "source": "Заявка ЛУКОЙЛ (листы «Энергосети» и «НВН»): наличие у продавцов по всей номенклатуре",
-        "method": "gt/tools/ship_merge.py сводит gt/data/rfq_demand.json с тремя поколениями "
-                  "проверок: rfq_prices.json:checks (08.2026), ship_energoseti.json (505 строк) "
-                  "и ship_sweep.json (остаток 863). Поздняя проверка перекрывает раннюю; "
-                  "строки без проверки помечены not_checked.",
+        "method": "gt/tools/ship_merge.py сводит gt/data/rfq_demand.json с пятью поколениями "
+                  "проверок: rfq_prices.json:checks (08.2026), ship_energoseti.json (505 строк), "
+                  "ship_sweep.json (остаток 863), ship_recheck.json (62 строки августовского "
+                  "наличия) и ship_blocked.json (31 строка из-под ботозащиты). Поздняя проверка "
+                  "перекрывает раннюю; строки без проверки помечены not_checked.",
+        "fx": "price_usd и unit_price_usd пересчитаны по gt/data/fx_rates.json. Считать надо "
+              "по ним: цены сняты в девяти валютах, и сложение price как есть завышало сумму "
+              "закупки примерно на треть. Курс справочный на дату выгрузки, не курс сделки — "
+              "любая сумма из него несёт оговорку.",
         "rows": out,
     }, ensure_ascii=False, indent=1))
 
@@ -493,6 +594,19 @@ def main() -> int:
     print(f"  контакт ПО САМОЙ ДЕТАЛИ: {own} ({round(100 * own / len(out))}%)")
     print(f"  плюс родовой адрес кластера: {any_c - own}; без адресата {len(out) - any_c}")
     print(f"  компаний-адресатов после сведения написаний: {len(comps)}")
+    firm_usd = sum((r["unit_price_usd"] or 0) * (r.get("qty") or 0) for r in out
+                   if r["stock_grade"] == "твёрдый" and r.get("covers_qty") == "full")
+    cur = Counter(r["currency"] for r in out
+                  if r["stock_grade"] == "твёрдый" and r.get("covers_qty") == "full"
+                  and r.get("price"))
+    print(f"  закупка по твёрдым строкам: {firm_usd:,.0f} USD "
+          f"(валют в них {len(cur)}: {', '.join(f'{k}×{v}' for k, v in cur.most_common())})")
+    if zero_price:
+        print(f"  заглушек вместо цены (ноль на витрине): {zero_price} строк — "
+              "в сравнение и в сумму не идут")
+    if no_rate:
+        print(f"  ВНИМАНИЕ: цена без известного курса у {len(no_rate)} строк: "
+              f"{', '.join(sorted(set(no_rate)))} — в сумму не вошли")
     for sheet in sorted({r["sheet"] for r in out}):
         n = [r for r in out if r["sheet"] == sheet]
         print(f"  {sheet}: {len(n)} позиций, твёрдый склад "

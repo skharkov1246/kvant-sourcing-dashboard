@@ -39,7 +39,26 @@ create table if not exists lib_row_junk (
 create index if not exists lib_row_junk_run    on lib_row_junk (run_id);
 create index if not exists lib_row_junk_active on lib_row_junk (demand_id) where revoked_at is null;
 alter table lib_row_junk enable row level security;
-revoke all on lib_row_junk from anon, authenticated;
+-- РОЛИ SUPABASE МОГУТ ОТСУТСТВОВАТЬ. anon и authenticated заводит платформа; на
+-- чистом PostgreSQL их нет, и «revoke … from anon» роняет файл с «role "anon"
+-- does not exist». Против прода это не проявляется — там роли есть, — зато
+-- применить схему где-либо ещё становится нельзя. Ту же ошибку 20.09.2026 нашёл
+-- прогон в схеме поставщиков, и она же лежала в ступенях ужесточения ЗИП.
+--
+-- Роли не создаются: это дело платформы, а не схемы. Снимаем права только с тех,
+-- кто есть; нет роли — нечего у неё и снимать.
+create or replace function lib_роли_которые_есть(имена text[]) returns text as $$
+  select string_agg(quote_ident(r.rolname), ', ')
+    from pg_roles r where r.rolname = any (имена);
+$$ language sql stable;
+
+do $$
+declare кому text := lib_роли_которые_есть(array['anon', 'authenticated']);
+begin
+  if кому is not null then
+    execute format('revoke all on lib_row_junk from %s', кому);
+  end if;
+end $$;
 
 -- Журнал прогонов разметки. Только агрегаты — таблицу можно показывать целиком.
 create table if not exists lib_mark_runs (
@@ -56,7 +75,13 @@ create table if not exists lib_mark_runs (
   reverted_at   timestamptz, reverted_reason text, note text
 );
 alter table lib_mark_runs enable row level security;
-revoke all on lib_mark_runs from anon, authenticated;
+do $$
+declare кому text := lib_роли_которые_есть(array['anon', 'authenticated']);
+begin
+  if кому is not null then
+    execute format('revoke all on lib_mark_runs from %s', кому);
+  end if;
+end $$;
 
 -- Обратимость наследования сегмента. reclassify.py сейчас не оставляет следа,
 -- каким правилом проставлен segment_id, и откатить неудачное наследование нечем.
@@ -91,7 +116,13 @@ create view lib_demand_live with (security_invoker = true) as
   select d.* from lib_demand d
    where not exists (select 1 from lib_row_junk j
                       where j.demand_id = d.id and j.revoked_at is null);
-revoke all on lib_demand_live from anon, authenticated;
+do $$
+declare кому text := lib_роли_которые_есть(array['anon', 'authenticated']);
+begin
+  if кому is not null then
+    execute format('revoke all on lib_demand_live from %s', кому);
+  end if;
+end $$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Задним числом: каким путём разобраны уже лежащие файлы. Нужно, чтобы расслоить

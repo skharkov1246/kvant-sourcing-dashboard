@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-13",
+  "updated": "2026-09-18",
   "note": "Заполняемость цепочки портала: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Считается scripts/build_chain_coverage.py по фактическим файлам РЕПОЗИТОРИЯ.",
   "scope": "ЧТО СЧИТАЕТСЯ. Только файлы репозитория: gt/data, gpu/data, zip/data, pnw/data, dict/. Инженерная библиотека живёт в закрытой Supabase (таблицы lib_*), и этот счётчик её НЕ ВИДИТ — ключа базы в сборке нет. Поэтому ноль в клетке означает «нет в файлах репозитория», а не «нет нигде»: часть звеньев закрыта именно в библиотеке. Её состояние ведётся отдельно — таблица звеньев в CLAUDE.md и scripts/library_report.py, которому нужен SUPABASE_DB_URL.",
   "goal": "Инженерный портал ремонта и сервиса динамического оборудования (CLAUDE.md).",
@@ -267,181 +267,6 @@
       "pct": 0
     },
     {
-      "segment": "gtu",
-      "title": "ГТУ — газотурбинные",
-      "cells": [
-        {
-          "link": "machine",
-          "title": "Машина",
-          "what": "модель опознаётся и описана",
-          "n": 107,
-          "sources": [
-            "gt/data/models.json",
-            "dict/machine.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "node",
-          "title": "Узел",
-          "what": "состав машины разобран по узлам",
-          "n": 8,
-          "sources": [
-            "gt/data/parts.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "symptom",
-          "title": "Признак",
-          "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "defect",
-          "title": "Дефект",
-          "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "repair",
-          "title": "Ремонтное решение",
-          "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "part",
-          "title": "Запчасть",
-          "what": "номенклатура с номерами, готовая к запросу",
-          "n": 12934,
-          "sources": [
-            "gt/data/pn_db.json",
-            "gt/data/pn_catalog.json",
-            "pnw/data/numbers.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "maker",
-          "title": "Изготовитель",
-          "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1635,
-          "sources": [
-            "gt/data/suppliers.json",
-            "gt/data/heavy_suppliers.json",
-            "gt/data/research_suppliers.json",
-            "gt/data/tfs_subsuppliers.json",
-            "gt/data/sgt400_checklist.json",
-            "gt/data/dossiers.json",
-            "gt/data/site_profiles.json",
-            "gt/data/bitrix_supplier_sites.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "contractor",
-          "title": "Исполнитель",
-          "what": "кому отдать работы по ремонту",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        }
-      ],
-      "filled": 4,
-      "of": 8,
-      "pct": 50
-    },
-    {
-      "segment": "gpu",
-      "title": "ГПУ — газопоршневые",
-      "cells": [
-        {
-          "link": "machine",
-          "title": "Машина",
-          "what": "модель опознаётся и описана",
-          "n": 14,
-          "sources": [
-            "gpu/data/machines.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "node",
-          "title": "Узел",
-          "what": "состав машины разобран по узлам",
-          "n": 14,
-          "sources": [
-            "gpu/data/parts.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "symptom",
-          "title": "Признак",
-          "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "defect",
-          "title": "Дефект",
-          "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "repair",
-          "title": "Ремонтное решение",
-          "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "part",
-          "title": "Запчасть",
-          "what": "номенклатура с номерами, готовая к запросу",
-          "n": 565,
-          "sources": [
-            "gpu/data/demand.json",
-            "gpu/data/motortech_cross.json",
-            "gpu/data/analogs.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "maker",
-          "title": "Изготовитель",
-          "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 75,
-          "sources": [
-            "gpu/data/suppliers.json",
-            "gpu/data/subsuppliers.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "contractor",
-          "title": "Исполнитель",
-          "what": "кому отдать работы по ремонту",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        }
-      ],
-      "filled": 4,
-      "of": 8,
-      "pct": 50
-    },
-    {
       "segment": "recip",
       "title": "Поршневые компрессоры",
       "cells": [
@@ -525,6 +350,196 @@
       "pct": 62
     },
     {
+      "segment": "gpu",
+      "title": "ГПУ — газопоршневые",
+      "cells": [
+        {
+          "link": "machine",
+          "title": "Машина",
+          "what": "модель опознаётся и описана",
+          "n": 14,
+          "sources": [
+            "gpu/data/machines.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "node",
+          "title": "Узел",
+          "what": "состав машины разобран по узлам",
+          "n": 14,
+          "sources": [
+            "gpu/data/parts.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "symptom",
+          "title": "Признак",
+          "what": "по чему видно, что машина нездорова",
+          "n": 28,
+          "sources": [
+            "gpu/data/faults.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "defect",
+          "title": "Дефект",
+          "what": "каталог дефектов: что ломается и почему",
+          "n": 28,
+          "sources": [
+            "gpu/data/faults.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "repair",
+          "title": "Ремонтное решение",
+          "what": "чем восстанавливают, границы применимости",
+          "n": 28,
+          "sources": [
+            "gpu/data/faults.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "part",
+          "title": "Запчасть",
+          "what": "номенклатура с номерами, готовая к запросу",
+          "n": 565,
+          "sources": [
+            "gpu/data/demand.json",
+            "gpu/data/motortech_cross.json",
+            "gpu/data/analogs.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "maker",
+          "title": "Изготовитель",
+          "what": "кто делает деталь, помимо владельца конструкции",
+          "n": 75,
+          "sources": [
+            "gpu/data/suppliers.json",
+            "gpu/data/subsuppliers.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "contractor",
+          "title": "Исполнитель",
+          "what": "кому отдать работы по ремонту",
+          "n": 0,
+          "sources": [],
+          "state": "пусто"
+        }
+      ],
+      "filled": 7,
+      "of": 8,
+      "pct": 88
+    },
+    {
+      "segment": "gtu",
+      "title": "ГТУ — газотурбинные",
+      "cells": [
+        {
+          "link": "machine",
+          "title": "Машина",
+          "what": "модель опознаётся и описана",
+          "n": 107,
+          "sources": [
+            "gt/data/models.json",
+            "dict/machine.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "node",
+          "title": "Узел",
+          "what": "состав машины разобран по узлам",
+          "n": 8,
+          "sources": [
+            "gt/data/parts.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "symptom",
+          "title": "Признак",
+          "what": "по чему видно, что машина нездорова",
+          "n": 65,
+          "sources": [
+            "gt/data/faults.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "defect",
+          "title": "Дефект",
+          "what": "каталог дефектов: что ломается и почему",
+          "n": 65,
+          "sources": [
+            "gt/data/faults.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "repair",
+          "title": "Ремонтное решение",
+          "what": "чем восстанавливают, границы применимости",
+          "n": 65,
+          "sources": [
+            "gt/data/faults.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "part",
+          "title": "Запчасть",
+          "what": "номенклатура с номерами, готовая к запросу",
+          "n": 12934,
+          "sources": [
+            "gt/data/pn_db.json",
+            "gt/data/pn_catalog.json",
+            "pnw/data/numbers.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "maker",
+          "title": "Изготовитель",
+          "what": "кто делает деталь, помимо владельца конструкции",
+          "n": 1635,
+          "sources": [
+            "gt/data/suppliers.json",
+            "gt/data/heavy_suppliers.json",
+            "gt/data/research_suppliers.json",
+            "gt/data/tfs_subsuppliers.json",
+            "gt/data/sgt400_checklist.json",
+            "gt/data/dossiers.json",
+            "gt/data/site_profiles.json",
+            "gt/data/bitrix_supplier_sites.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "contractor",
+          "title": "Исполнитель",
+          "what": "кому отдать работы по ремонту",
+          "n": 23,
+          "sources": [
+            "gt/data/suppliers.json",
+            "gt/data/heavy_suppliers.json"
+          ],
+          "state": "есть"
+        }
+      ],
+      "filled": 8,
+      "of": 8,
+      "pct": 100
+    },
+    {
       "segment": "gsho",
       "title": "ГШО — горно-шахтное",
       "cells": [
@@ -544,7 +559,7 @@
           "link": "node",
           "title": "Узел",
           "what": "состав машины разобран по узлам",
-          "n": 31,
+          "n": 34,
           "sources": [
             "zip/data/telsmith_3858.json",
             "zip/data/r1700.json"
@@ -555,25 +570,30 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 55,
+          "sources": [
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "defect",
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 55,
+          "sources": [
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 7,
+          "n": 62,
           "sources": [
-            "zip/data/material_strategy.json"
+            "zip/data/material_strategy.json",
+            "zip/data/r1700.json"
           ],
           "state": "есть"
         },
@@ -593,7 +613,7 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1279,
+          "n": 1345,
           "sources": [
             "zip/data/odm_suppliers.json",
             "zip/data/telsmith_suppliers.json",
@@ -606,34 +626,23 @@
           "link": "contractor",
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
-          "n": 40,
+          "n": 21,
           "sources": [
             "zip/data/r1700.json"
           ],
           "state": "есть"
         }
       ],
-      "filled": 6,
+      "filled": 8,
       "of": 8,
-      "pct": 75
+      "pct": 100
     }
   ],
-  "empty_everywhere": [
-    {
-      "link": "symptom",
-      "title": "Признак",
-      "what": "по чему видно, что машина нездорова"
-    },
-    {
-      "link": "defect",
-      "title": "Дефект",
-      "what": "каталог дефектов: что ломается и почему"
-    }
-  ],
+  "empty_everywhere": [],
   "common": {
-    "chain_edges": 285,
-    "chain_makers": 247,
-    "oem_keys": 277,
+    "chain_edges": 311,
+    "chain_makers": 274,
+    "oem_keys": 304,
     "machines_total": 208,
     "machines_foreign_segment": 52,
     "machines_foreign_note": "Машины, найденные внутри базы ГТУ, но относящиеся к направлению, которого у нас нет: буровое и нефтепромысловое оборудование — насосы, превенторы, цементировочные агрегаты, верхние приводы. Кандидат в новое направление портала."
@@ -641,8 +650,8 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 19,
+    "cells_filled": 28,
     "cells_total": 56,
-    "links_not_started": 2
+    "links_not_started": 0
   }
 }

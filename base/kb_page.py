@@ -22,6 +22,11 @@ import sqlite3
 from datetime import date
 from pathlib import Path
 
+# Правило ключа артикула — одно на все модули base/, см. base/pnkey.py.
+# JS_FOLD — тот же алгоритм для браузера: ключ на странице обязан совпадать
+# с ключом в базе, иначе поиск по кириллическому написанию ничего не найдёт.
+from pn_norm import JS_FOLD
+
 CSS = Path(__file__).resolve().parent.parent / "templates" / "report.css"
 TOP = 8000          # столько строк вшивается в страницу: дальше поиск тормозит
 
@@ -50,6 +55,7 @@ def build(db_path: str, top: int) -> str:
             for r in rows]
     css = CSS.read_text(encoding="utf-8")
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    js_fold = JS_FOLD
     return f"""<!doctype html><html lang="ru"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Справочник оборудования</title>
@@ -102,10 +108,13 @@ function draw(list){{
   }}).join('');
   cnt.textContent=`найдено ${{list.length}}` + (list.length>300?', показаны первые 300':'');
 }}
-function find(){{
-  const s=q.value.trim().toUpperCase().replace(/[^0-9A-ZА-Я]/g,'');
+// Ключ поиска считается тем же правилом, что и ключ в базе (base/pnkey.py):
+// кириллические буквы-двойники сводятся к латинице. Без этого запрос
+// «917427С1» с кириллической С не находил запись, сохранённую как «917427C1».
+{js_fold}function find(){{
+  const s=pnKey(q.value.trim());
   if(!s) return draw(D);
-  draw(D.filter(r=>(r[0]+r[1]+r[2]).toUpperCase().replace(/[^0-9A-ZА-Я]/g,'').includes(s)));
+  draw(D.filter(r=>pnKey(r[0]+r[1]+r[2]).includes(s)));
 }}
 q.addEventListener('input',find); draw(D);
 </script></html>"""
