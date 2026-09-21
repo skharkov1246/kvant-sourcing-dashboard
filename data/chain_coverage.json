@@ -73,23 +73,23 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "draft": 11,
+          "n": 21,
+          "draft": 10,
           "sources": [
             "dict/symptom.json"
           ],
-          "state": "черновик"
+          "state": "есть"
         },
         {
           "link": "defect",
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "draft": 5,
+          "n": 32,
+          "draft": 80,
           "sources": [
             "zip/data/diagnostics_recon.json"
           ],
-          "state": "черновик"
+          "state": "есть"
         },
         {
           "link": "repair",
@@ -131,9 +131,9 @@
           "state": "пусто"
         }
       ],
-      "filled": 1,
+      "filled": 3,
       "of": 8,
-      "pct": 12
+      "pct": 38
     },
     {
       "segment": "pumps",
@@ -161,7 +161,7 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 23,
+          "n": 24,
           "draft": 3,
           "sources": [
             "dict/symptom.json"
@@ -173,7 +173,7 @@
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 59,
-          "draft": 87,
+          "draft": 86,
           "sources": [
             "zip/data/diagnostics_recon.json"
           ],
@@ -254,7 +254,7 @@
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
           "n": 11,
-          "draft": 6,
+          "draft": 7,
           "sources": [
             "dict/symptom.json"
           ],
@@ -265,7 +265,7 @@
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 5,
-          "draft": 16,
+          "draft": 17,
           "sources": [
             "zip/data/diagnostics_recon.json"
           ],
@@ -349,7 +349,7 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 50,
+          "n": 51,
           "draft": 4,
           "sources": [
             "gpu/data/faults.json",
@@ -453,7 +453,7 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 87,
+          "n": 88,
           "draft": 4,
           "sources": [
             "gt/data/faults.json",
@@ -569,7 +569,7 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 77,
+          "n": 78,
           "draft": 4,
           "sources": [
             "zip/data/r1700.json",
@@ -677,7 +677,7 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 22,
+          "n": 23,
           "draft": 5,
           "sources": [
             "dict/symptom.json"
@@ -759,10 +759,10 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 42,
-    "cells_draft_only": 2,
+    "cells_filled": 44,
+    "cells_draft_only": 0,
     "cells_with_draft": 24,
-    "draft_rows": 694,
+    "draft_rows": 769,
     "cells_total": 56,
     "links_not_started": 0
   }

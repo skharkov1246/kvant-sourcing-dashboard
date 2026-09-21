@@ -574,8 +574,55 @@ def test_verdicts_applied_report_is_complete():
     for o in r["overall"]:
         assert str(o.get("overall") or "").strip()
 
-    # Привязано ровно столько, сколько карточек в наборах, — ни больше.
+    # Привязано не больше, чем карточек в наборе. Точного равенства тут быть не
+    # может: отчёт — запись КОНКРЕТНОГО прогона, а каталог с тех пор растёт
+    # новыми направлениями. Инвариант, который держать обязательно, — ниже:
+    # вердикт есть у каждой карточки и он из закрытого словаря.
     diag = json.loads((ROOT / "zip" / "data" / "diagnostics_recon.json").read_text(encoding="utf-8"))
-    defects = sum(len(a["defects"]) for a in diag["angles"])
-    assert r["bound"]["defects"] <= defects
-    assert sum(r["by_verdict_defects"].values()) == defects
+    alld = [x for a in diag["angles"] for x in a["defects"]]
+    assert r["bound"]["defects"] <= len(alld)
+    ALLOWED = {"подтверждено", "частично", "опровергнуто", "непроверяемо",
+               "скептик не сослался", "угол без скептика"}
+    assert all(x["verdict"]["verdict"] in ALLOWED for x in alld)
+    # Сводка набора обязана сходиться с его же записями: расхождение означает,
+    # что витрина показывает состояние до проверки — так уже было.
+    tally = {}
+    for x in [y for a in diag["angles"] for y in a["findings"] + a["defects"]]:
+        v = x["verdict"]["verdict"]
+        tally[v] = tally.get(v, 0) + 1
+    assert diag["stats"]["by_verdict"] == tally, \
+        "stats.by_verdict разошлась с записями — пересоберите набор"
+
+
+def test_apply_verdicts_never_binds_by_name_alone():
+    """Привязка вердикта обязана требовать совпадения узла.
+
+    Уникальности названия дефекта мало. Скептик, получивший в группу
+    канонический узел «КИП, САУ, защиты», вернул по нему ссылки на карточки
+    поршневой машины; привязка по одному названию послушно посадила
+    «Крутильно-усталостный излом вала» на функцию безопасности и следом
+    перезаписала «опровергнуто» у карточки про предел температуры нагнетания
+    по API 618 — то есть стёрла найденную ошибку. Такой запасной привязки
+    в коде быть не должно."""
+    src = (ROOT / "zip" / "tools" / "apply_verdicts.py").read_text(encoding="utf-8")
+    assert "dfallback" not in src, \
+        "вернулась привязка по одному названию дефекта — вердикт сядет на чужую карточку"
+
+    # Найденная ошибка не отменяется вердиктом, который её просто не нашёл.
+    assert "REJECTED_KEEP" in src, "снята защита вердикта «опровергнуто» от понижения"
+
+    p = ROOT / "zip" / "data" / "verdicts_applied.json"
+    if not p.exists():
+        pytest.skip("прогон проверки ещё не переносился")
+    r = json.loads(p.read_text(encoding="utf-8"))
+    # Карточек с вердиктом не может быть больше, чем карточек в наборе.
+    diag = json.loads((ROOT / "zip" / "data" / "diagnostics_recon.json").read_text(encoding="utf-8"))
+    alld = [x for a in diag["angles"] for x in a["defects"]]
+    assert r["bound"]["defects"] <= len(alld), \
+        "карточек с вердиктом больше, чем карточек — привязка считает события, а не записи"
+    # Перекрытие прогонов не ошибка, но обязано быть видно с обеими сторонами.
+    for x in r.get("rebound", []):
+        assert x["was"] and x["now"] and x["kept"], "перекрытие без обеих сторон"
+        if x["was"] == "опровергнуто":
+            assert x["kept"] == "опровергнуто", \
+                f"найденная ошибка понижена до «{x['kept']}»: {x['ref'][:60]}"

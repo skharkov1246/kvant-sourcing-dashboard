@@ -6,7 +6,7 @@
 читалось бы как «проверено, всё хорошо», а это было бы ложью. Поэтому
 «скептик не сослался» и «угол без скептика» — разные значения.
 
-Запуск:  python zip/tools/extract_diagnostics.py <каталог-журнала>
+Запуск:  python zip/tools/extract_diagnostics.py <каталог-журнала> [<ещё-каталог> …]
 """
 import json
 import re
@@ -23,6 +23,9 @@ TITLES = {
     "turbo/defects": "Турбомашины: дефекты ГТУ, ПТУ, турбокомпрессоров, электрических машин",
     "pumps/defects": "Насосы: дефекты, зазоры, кавитация, торцевые уплотнения",
     "recip/defects": "Поршневые компрессоры: дефекты клапанов, колец, штока, PV-диаграмма",
+    "instrum/sensors": "КИПиА: датчики и первичные преобразователи",
+    "instrum/valves": "КИПиА: регулирующая арматура, приводы, позиционеры",
+    "instrum/safety": "КИПиА: защиты, анализаторы, вторичные приборы",
 }
 
 # «Утв. 12», «12.», «Утверждение 12»
@@ -90,12 +93,48 @@ def attach(angle, verdicts):
     return orphans
 
 
-def main(src):
-    src = Path(src)
-    rows = [json.loads(l) for l in (src / "journal.jsonl").read_text().splitlines() if l.strip()]
-    results = [r["result"] for r in rows if r.get("type") == "result"]
+def carried(out_path):
+    """Вердикты, проставленные ПОЗЖЕ отдельным прогоном проверки.
+
+    Разбор владеет содержанием карточки, но не её вердиктом: вердикт ставит
+    скептик, приходящий после, и кладёт zip/tools/apply_verdicts.py. Без этого
+    переноса пересборка набора стирала проверку — на соседнем наборе это уже
+    случилось и уронило счётчик цепочки с 42 клеток до 39.
+    """
+    if not out_path.exists():
+        return {}
+    try:
+        old = json.loads(out_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    keep = {}
+    for a in old.get("angles", []):
+        for d in a.get("defects", []):
+            v = d.get("verdict") or {}
+            if v.get("verdict") not in ("скептик не сослался", "угол без скептика", None):
+                keep[(str(d.get("node", "")).strip().lower(),
+                      str(d.get("defect", "")).strip().lower())] = dict(v)
+    return keep
+
+
+def main(*srcs):
+    """Журналов может быть НЕСКОЛЬКО: направления добираются по одному, и
+    каждое приходит своим прогоном. Углы сливаются по ключу scope/angle."""
+    srcs = [Path(x) for x in srcs if x] or [Path(".")]
+    results = []
+    for src in srcs:
+        j = src / "journal.jsonl"
+        if not j.exists():
+            print(f"журнал недоступен, пропущен: {src}")
+            continue
+        rows = [json.loads(l) for l in j.read_text().splitlines() if l.strip()]
+        results += [r["result"] for r in rows if r.get("type") == "result"]
+    if not results:
+        print("ни одного журнала — файл не трогаем")
+        return
     recon = {f"{r['scope']}/{r['angle']}": r for r in results if "findings" in r}
     skept = {f"{r['scope']}/{r['angle']}": r for r in results if "verdicts" in r}
+    keep = carried(OUT)
 
     angles = []
     for key in sorted(recon, key=lambda k: (k.split("/")[0], k)):
@@ -122,6 +161,11 @@ def main(src):
             for d in a["defects"]:
                 d["verdict"] = {"verdict": "угол без скептика", "why": "", "correction": ""}
             a["skeptic"] = None
+        for d in a["defects"]:
+            k = (str(d.get("node", "")).strip().lower(),
+                 str(d.get("defect", "")).strip().lower())
+            if k in keep:
+                d["verdict"] = dict(keep[k])
         angles.append(a)
 
     by_verdict, by_node, by_conf = {}, {}, {}
@@ -176,4 +220,4 @@ def main(src):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else ".")
+    main(*(sys.argv[1:] or ["."]))

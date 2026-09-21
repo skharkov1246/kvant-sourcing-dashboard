@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 269,
-    "total_bytes": 122064629,
+    "total_bytes": 123492253,
     "by_sensitivity": {
       "внутреннее": 147,
       "конфиденциально": 69,
@@ -586,6 +586,43 @@
       ]
     },
     {
+      "path": "zip/data/diagnostics_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 3234358,
+      "note": "Разведка по диагностике и дефектам динамического оборудования: восемь углов — вибродиагностика, невибрационные методы, турбомашины, насосы, поршневые компрессоры и три угла КИПиА (датчики и первичные преобразователи, регулирующая арматура с приводами и позиционерами, защиты с анализаторами и вторичными приборами). 368 численных норм с источником и 340 карточек дефектов «признак → причина → метод → последствие → ремонтопригодность → запчасти» по 27 узлам. У каждого угла был собственный скептик; вердикт стоит у каждой строки. Каталог дефектов прошёл отдельный прогон проверки 21.09.2026 (12 скептиков, 232 карточки): подтверждено 64, поправлено 129, забраковано 7, непроверяемо 32. Карточки КИПиА проверку ещё проходят. ВАЖНО: полные тексты ISO 10816-3, ISO 13373-9, ISO 13379-1 и ISO 17359 выгрузить не удалось (403/404) — что удалось сверить, записано в zip/data/standards_check.json. Собирается zip/tools/extract_diagnostics.py, принимает несколько журналов и переносит вердикты прошлой проверки при пересборке.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angles",
+        "caveat",
+        "generated",
+        "method",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "stats",
+        "records": 10
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "25346f8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
+        "scripts/build_symptom_index.py",
+        "tests/test_dict.py",
+        "zip/tools/apply_verdicts.py",
+        "zip/tools/build_diag_page.py",
+        "zip/tools/extract_diagnostics.py"
+      ]
+    },
+    {
       "path": "zip/data/r1700.json",
       "subproject": "база ЗИП",
       "bytes": 2956228,
@@ -871,43 +908,6 @@
         "scripts/build_chain_page.py",
         "tests/test_dict.py",
         "zip/tools/build_recip_page.py"
-      ]
-    },
-    {
-      "path": "zip/data/diagnostics_recon.json",
-      "subproject": "база ЗИП",
-      "bytes": 1957107,
-      "note": "Разведка по диагностике и дефектам динамического оборудования: пять углов (вибродиагностика, невибрационные методы, турбомашины, насосы, поршневые), 225 численных норм с источником и 233 карточки дефектов «признак → причина → метод → последствие → ремонтопригодность → запчасти». У каждого угла был собственный скептик с заданием опровергать по умолчанию; вердикт стоит у каждой строки. Из 225 норм подтверждена 71, поправлено 118, забраковано 11, признано непроверяемыми 25. Каталог дефектов проверен точечно — 9 строк из 233, остальные несут вердикт «скептик не сослался» и ждут отдельного прохода проверки. ВАЖНО: полные тексты ISO 10816-3, ISO 13373-9, ISO 13379-1 и ISO 17359 выгрузить не удалось (403/404), поэтому численные значения из них перед рабочим применением обязаны быть сверены с официальным текстом. Собрано zip/tools/extract_diagnostics.py из журнала разведки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "angles",
-        "caveat",
-        "generated",
-        "method",
-        "stats",
-        "subject"
-      ],
-      "main_collection": {
-        "key": "stats",
-        "records": 10
-      },
-      "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "3cc5ffa",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "scripts/build_chain_page.py",
-        "scripts/build_symptom_index.py",
-        "tests/test_dict.py",
-        "zip/tools/apply_verdicts.py",
-        "zip/tools/build_diag_page.py",
-        "zip/tools/extract_diagnostics.py"
       ]
     },
     {
@@ -1318,8 +1318,8 @@
         "records": 12
       },
       "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "916d752",
+      "last_author": "skharkov1246",
+      "last_commit": "a92b52c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1393,6 +1393,43 @@
         "library/load_parts.py",
         "library/load_suppliers.py",
         "tests/test_pack_division.py"
+      ]
+    },
+    {
+      "path": "data/chat_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 884681,
+      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assessment",
+        "days",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "assessment",
+        "records": 15
+      },
+      "last_change": "2026-09-21",
+      "last_author": "github-actions[bot]",
+      "last_commit": "7cd787d",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/gate.yml",
+        ".github/workflows/scan.yml",
+        "chat_scan.py",
+        "gpu/tools/bitrix_gpu.py",
+        "reps.py",
+        "scripts/budget_snapshot.py",
+        "scripts/preflight.py",
+        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -1488,43 +1525,6 @@
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py"
-      ]
-    },
-    {
-      "path": "data/chat_snapshot.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 801830,
-      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "assessment",
-        "days",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "assessment",
-        "records": 15
-      },
-      "last_change": "2026-09-19",
-      "last_author": "github-actions[bot]",
-      "last_commit": "d420c68",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "оценки и данные сотрудников"
-        ]
-      },
-      "referenced_by": [
-        ".github/workflows/gate.yml",
-        ".github/workflows/scan.yml",
-        "chat_scan.py",
-        "gpu/tools/bitrix_gpu.py",
-        "reps.py",
-        "scripts/budget_snapshot.py",
-        "scripts/preflight.py",
-        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -2867,6 +2867,50 @@
       ]
     },
     {
+      "path": "zip/data/verdicts_applied.json",
+      "subproject": "база ЗИП",
+      "bytes": 246601,
+      "note": "Отчёт переноса вердиктов проверки черновика в наборы разведки (прогон 21.09.2026, 12 скептиков). Привязано 232 вердикта по дефектам и 55 по исполнителям, непривязанных нет. Итог по дефектам: подтверждено 64, поправлено 129, забраковано 7, непроверяемо 32, одна карточка осталась без проверки. По исполнителям: подтверждено 27, поправлено 25, забраковано 3. Хранит также дословные заявления скептиков о том, чем и насколько они проверяли (12 записей) и 135 названных пробелов каталога. Производный файл: пишется zip/tools/apply_verdicts.py из журнала прогона, руками не заполнять. Привязка идёт по ТОЧНОЙ ссылке на узел и название дефекта (для исполнителя — на название компании): вердикт на чужой карточке выдаёт непроверенное за проверенное, поэтому непривязанное остаётся списком unbound с причиной, а не растворяется.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "bound",
+        "by_verdict_contractors",
+        "by_verdict_defects",
+        "missing",
+        "note",
+        "overall",
+        "rebound",
+        "rebound_count",
+        "source",
+        "unbound",
+        "unbound_count",
+        "verdicts_applied"
+      ],
+      "main_collection": {
+        "key": "missing",
+        "records": 193,
+        "record_keys": [
+          "key",
+          "scope",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "25346f8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "tests/test_dict.py",
+        "zip/tools/apply_verdicts.py",
+        "zip/tools/build_diag_page.py"
+      ]
+    },
+    {
       "path": "data/budget_snapshot.json",
       "subproject": "дашборд сорсеров",
       "bytes": 244926,
@@ -3556,47 +3600,6 @@
         "gt/tools/ship_final.py",
         "gt/tools/ship_questions.py",
         "tests/test_ship_collisions.py"
-      ]
-    },
-    {
-      "path": "zip/data/verdicts_applied.json",
-      "subproject": "база ЗИП",
-      "bytes": 179291,
-      "note": "Отчёт переноса вердиктов проверки черновика в наборы разведки (прогон 21.09.2026, 12 скептиков). Привязано 232 вердикта по дефектам и 55 по исполнителям, непривязанных нет. Итог по дефектам: подтверждено 64, поправлено 129, забраковано 7, непроверяемо 32, одна карточка осталась без проверки. По исполнителям: подтверждено 27, поправлено 25, забраковано 3. Хранит также дословные заявления скептиков о том, чем и насколько они проверяли (12 записей) и 135 названных пробелов каталога. Производный файл: пишется zip/tools/apply_verdicts.py из журнала прогона, руками не заполнять. Привязка идёт по ТОЧНОЙ ссылке на узел и название дефекта (для исполнителя — на название компании): вердикт на чужой карточке выдаёт непроверенное за проверенное, поэтому непривязанное остаётся списком unbound с причиной, а не растворяется.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "bound",
-        "by_verdict_contractors",
-        "by_verdict_defects",
-        "missing",
-        "note",
-        "overall",
-        "source",
-        "unbound",
-        "unbound_count"
-      ],
-      "main_collection": {
-        "key": "missing",
-        "records": 135,
-        "record_keys": [
-          "key",
-          "scope",
-          "text"
-        ]
-      },
-      "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "3cc5ffa",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "tests/test_dict.py",
-        "zip/tools/apply_verdicts.py",
-        "zip/tools/build_diag_page.py"
       ]
     },
     {
@@ -4354,7 +4357,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 145836,
+      "bytes": 146061,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4402,7 +4405,7 @@
       ],
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "3cc5ffa",
+      "last_commit": "36bcf48",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9024,7 +9027,7 @@
     {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 24508,
+      "bytes": 24495,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -9051,7 +9054,7 @@
       },
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "916d752",
+      "last_commit": "25346f8",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",

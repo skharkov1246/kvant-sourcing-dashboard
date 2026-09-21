@@ -319,6 +319,7 @@ def counts() -> dict:
         # дефекты подшипника качения к датчику давления отношения не имеют, и
         # раздача им общего блока была бы добивкой числа.
         SCOPE_SEG = {"turbo": ["gtu"], "pumps": ["pumps"], "recip": ["recip"],
+                     "instrum": ["instrum"],
                      "common": ["gtu", "gpu", "gsho", "recip", "pumps"]}
         NODE_SEG = {"Электрическая машина и питание": "electro",
                     "КИП, САУ, защиты": "instrum"}
