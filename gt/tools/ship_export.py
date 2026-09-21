@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import date
@@ -18,6 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 DATA = ROOT / "gt/data/ship_lukoil.json"
+REVERIFY = ROOT / "gt/data/ship_reverify.json"
 CSV_OUT = ROOT / "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv"
 MD_OUT = ROOT / "gt/docs/ЗАКУПКА-ЛУКОЙЛ-МЕТОД.md"
 
@@ -25,23 +27,45 @@ COLS = [
     "pn", "sheet", "cluster", "man", "model", "name", "cat", "qty", "unit",
     "verdict", "stock_grade", "in_stock", "stock_qty", "lead_time", "covers_qty",
     "seller", "seller_country", "seller_url", "seller_kind",
-    "price", "currency", "pack_qty", "unit_price",
+    "price", "currency", "pack_qty", "price_usd", "unit_price",
     "line_value_full_volume", "in_firm_total",
     "our_usd_lo", "our_usd_hi", "our_conf", "price_gap",
     "real_maker", "real_pn", "substitute", "checked_by", "note",
+    # Результат перепроверки — то, ради чего сорсер и открывает эту таблицу:
+    # наш вердикт по строке, найденная цена и у кого её брать. Без этих колонок
+    # выгрузка показывала только состояние ДО разбора, и работу приходилось
+    # переносить глазами из отчёта.
+    "rv_verdict", "rv_price_usd", "rv_maker", "rv_channel", "rv_blocker", "rv_next_step",
     "addressee_1", "addressee_2", "addressee_3", "addressee_4",
 ]
 
 
+def rv_index() -> dict:
+    """Разбор перепроверки по нормализованному номеру.
+
+    Номер в перепроверке может нести пояснение в скобках — в ключ оно не идёт,
+    иначе строка не найдётся по своему же номеру.
+    """
+    if not REVERIFY.exists():
+        return {}
+    import re as _re
+    out = {}
+    for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]:
+        k = _re.sub(r"[^A-Z0-9]", "", str(r.get("pn") or "").split("(")[0].upper())
+        if k:
+            out.setdefault(k, r)
+    return out
+
+
 def unit_price(r: dict):
-    p = r.get("price")
-    if p in (None, ""):
-        return None
-    try:
-        pack = float(r.get("pack_qty") or 1) or 1.0
-        return float(p) / pack
-    except (TypeError, ValueError):
-        return None
+    """Цена за штуку В ДОЛЛАРАХ — из unit_price_usd, посчитанного ship_merge.py.
+
+    Сырой price складывать нельзя: он в девяти валютах. Это ломало не только сумму
+    закупки, но и price_gap — рублёвая цена 32 566 RUB против вилки 45–165 USD
+    давала «завышено в 197 раз», хотя на деле это 386 USD и завышение в 2,3 раза.
+    """
+    u = r.get("unit_price_usd")
+    return None if u in (None, "") else float(u)
 
 
 def line_value(r: dict) -> float:
@@ -85,8 +109,10 @@ def addressee(sl: dict) -> str:
     ])
 
 
-def row_out(r: dict) -> dict:
+def row_out(r: dict, rv_by_pn: dict | None = None) -> dict:
     u = unit_price(r)
+    key = re.sub(r"[^A-Z0-9]", "", str(r.get("pn") or "").upper())
+    rv = (rv_by_pn or {}).get(key)
     # свои адресаты идут первыми, кластерные — добором, основание помечено в самой строке
     addrs = (r.get("sellers") or []) + (r.get("cluster_sellers") or [])
     out = {
@@ -98,6 +124,7 @@ def row_out(r: dict) -> dict:
         "covers_qty": r["covers_qty"], "seller": r["seller"],
         "seller_country": r["seller_country"], "seller_url": r["seller_url"],
         "seller_kind": r["kind"], "price": r["price"], "currency": r["currency"],
+        "price_usd": r.get("price_usd") or "",
         "pack_qty": r["pack_qty"],
         "unit_price": round(u, 4) if u is not None else "",
         "line_value_full_volume": round(line_value(r), 2) or "",
@@ -107,6 +134,13 @@ def row_out(r: dict) -> dict:
         "real_maker": r.get("real_maker", ""), "real_pn": r.get("real_pn", ""),
         "substitute": r.get("substitute", ""), "checked_by": r.get("checked_by", ""),
         "note": r.get("note", ""),
+        "rv_verdict": (rv.get("band_verdict") or "") if rv else "",
+        "rv_price_usd": rv.get("price_low") if rv and isinstance(
+            rv.get("price_low"), (int, float)) else "",
+        "rv_maker": (rv.get("maker_short") or "") if rv else "",
+        "rv_channel": (rv.get("channel") or "") if rv else "",
+        "rv_blocker": (rv.get("blocker") or "") if rv else "",
+        "rv_next_step": (rv.get("recommended") or "") if rv else "",
     }
     for i in range(4):
         out[f"addressee_{i + 1}"] = addressee(addrs[i]) if i < len(addrs) else ""
@@ -158,7 +192,8 @@ METHOD = """# Закупка по заявке ЛУКОЙЛ: метод и гр�
 ## Формулы
 
 ```
-unit_price             = price / pack_qty
+price_usd              = price, пересчитанная в доллары по gt/data/fx_rates.json
+unit_price             = price_usd / pack_qty   — В ДОЛЛАРАХ, не в валюте продавца
 line_value_full_volume = unit_price * qty   ТОЛЬКО если covers_qty == "full", иначе 0
 in_firm_total          = да, если при этом stock_grade == "твёрдый"
 price_gap              = отношение середины нашей вилки к unit_price, если оно >= 2.5
@@ -234,12 +269,13 @@ def main() -> int:
     doc = json.loads(DATA.read_text())
     rows = doc["rows"]
 
+    rvx = rv_index()
     CSV_OUT.parent.mkdir(parents=True, exist_ok=True)
     with CSV_OUT.open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLS, extrasaction="ignore")
         w.writeheader()
         for r in rows:
-            w.writerow(row_out(r))
+            w.writerow(row_out(r, rvx))
     print(f"CSV: {CSV_OUT.name} {CSV_OUT.stat().st_size / 1e6:.1f} МБ, строк {len(rows)}")
 
     by_sheet = defaultdict(list)
@@ -266,7 +302,8 @@ def main() -> int:
         f"| Твёрдое наличие | {len(firm)} | verdict=in_stock, не conditional, "
         "не из августа, covers_qty=full |",
         f"| Закупка по твёрдым строкам | {firm_val:,.0f} USD | сумма unit_price*qty "
-        "по этим строкам |".replace(",", " "),
+        "по этим строкам; цены шести валют приведены к доллару по справочному курсу "
+        "на 13 Sep 2026, см. gt/data/fx_rates.json |".replace(",", " "),
         f"| Подтверждённый объём, любой вердикт | {full_val:,.0f} USD | вся колонка "
         "line_value_full_volume |".replace(",", " "),
         f"| Наличие без покрытия объёма | {grades['частичный']} | деталь есть, "

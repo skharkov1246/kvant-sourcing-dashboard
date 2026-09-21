@@ -25,6 +25,8 @@ PREV_START = "2025-01-01"
 TKP_PROB_CAP = 60          # потолок вероятности для «ТКП выдано+», %
 TKP_PROB_MULT = 3.0        # множитель базовой конверсии для ТКП+
 COVERAGE_NORM = 3.0        # здоровое покрытие: пайплайн ≥ 3 мес среднего факта
+TTW_MIN = 5                # меньше выигранных в воронке — медиану по ней не считаем
+TTW_FALLBACK = 120         # если побед нет вообще: типичный срок сделки, дн
 SILENT_MIN_EUR = 10_000    # «замолчавший клиент» — если выручка-2025 была ощутимой
 
 
@@ -75,11 +77,37 @@ def compute(client, *, as_of: dt.date | None = None,
     p_base = max(3, min(p_base, 50))
     p_tkp = min(TKP_PROB_CAP, round(p_base * TKP_PROB_MULT))
 
-    # ---- 1 · прогноз: взвешенный открытый пайплайн по месяцам планового закрытия
+    # ---- 1 · прогноз: взвешенный открытый пайплайн по месяцам ожидаемого закрытия
+    #
+    # Плановой даты в этом портале нет. CLOSEDATE проставляется автоматически: замер
+    # 17.09.2026 — поле заполнено у всех 2 695 открытых сделок, у 2 624 прошедшей датой,
+    # и лишь у 71 (2,6 %) дата сегодняшняя или будущая. Прогноз по месяцам строился на
+    # этих двух процентах, остальные 98 % пайплайна уходили в строку «без плановой даты».
+    # Поэтому месяц закрытия берётся двумя источниками:
+    #   1) дата из карточки, если она в будущем, — это план, ему верим;
+    #   2) иначе оценка: дата создания + медианный срок «создана → вошла в реализацию»
+    #      по этой же воронке (воронки с числом побед меньше TTW_MIN берут общую
+    #      медиану), но не раньше текущего месяца.
+    # Оценка считается по победам ЭТОГО года, то есть по сделкам, успевшим закрыться, —
+    # длинные в медиану не попали, и срок скорее занижен. Поэтому каждый месяц несёт
+    # разбивку «план / оценка», а в заголовок идёт только общий взвешенный пайплайн:
+    # выдать экстраполяцию за план — это ровно та ошибка, что стоила доверия к выкладке.
+    cur_m = today.strftime("%Y-%m")
+    ttw_pairs: dict[str, list[int]] = defaultdict(list)
+    for d in deals:
+        rd, cr = str(realize_date.get(str(d["ID"]), ""))[:10], str(d.get("DATE_CREATE") or "")[:10]
+        if len(rd) == 10 and len(cr) == 10 and rd >= cr:
+            ttw_pairs[str(d.get("CATEGORY_ID") or "0")].append(
+                (dt.date.fromisoformat(rd) - dt.date.fromisoformat(cr)).days)
+    ttw_all = _median_days([x for v in ttw_pairs.values() for x in v]) or TTW_FALLBACK
+    ttw_by_cat = {c: (_median_days(v) or ttw_all) for c, v in ttw_pairs.items() if len(v) >= TTW_MIN}
+
     open_deals = [d for d in deals if cls_of(d) == "early"]
-    by_close: dict[str, dict] = defaultdict(lambda: {"raw": 0.0, "wgt": 0.0, "n": 0})
+    by_close: dict[str, dict] = defaultdict(lambda: {"raw": 0.0, "wgt": 0.0, "n": 0,
+                                                     "plan": 0, "est": 0})
     no_date = {"raw": 0.0, "wgt": 0.0, "n": 0}
     raw_sum = wgt_sum = 0.0
+    plan_n = est_n = 0
     for d in open_deals:
         amt = deal_sale.get(str(d["ID"]), 0.0)
         tkp = deal_reached_tkp(d.get("STAGE_ID", ""), (d.get("STAGE_SEMANTIC_ID") or "").upper(),
@@ -87,14 +115,26 @@ def compute(client, *, as_of: dt.date | None = None,
         prob = (p_tkp if tkp else p_base) / 100.0
         raw_sum += amt; wgt_sum += amt * prob
         cd = str(d.get("CLOSEDATE") or "")[:7]
-        bucket = by_close[cd] if cd and cd >= today.strftime("%Y-%m") else no_date
-        bucket["raw"] += amt; bucket["wgt"] += amt * prob; bucket["n"] += 1
+        cr = str(d.get("DATE_CREATE") or "")[:10]
+        if cd >= cur_m and len(cd) == 7:
+            key, src = cd, "plan"
+        elif len(cr) == 10:
+            days = ttw_by_cat.get(str(d.get("CATEGORY_ID") or "0"), ttw_all)
+            key = max((dt.date.fromisoformat(cr) + dt.timedelta(days=days)).strftime("%Y-%m"), cur_m)
+            src = "est"
+        else:
+            no_date["raw"] += amt; no_date["wgt"] += amt * prob; no_date["n"] += 1
+            continue
+        b = by_close[key]
+        b["raw"] += amt; b["wgt"] += amt * prob; b["n"] += 1; b[src] += 1
+        plan_n += (src == "plan"); est_n += (src == "est")
     MLBL = {1: "янв", 2: "фев", 3: "мар", 4: "апр", 5: "май", 6: "июн",
             7: "июл", 8: "авг", 9: "сен", 10: "окт", 11: "ноя", 12: "дек"}
     def _mlbl(ym):
         y, m = ym.split("-"); return f"{MLBL[int(m)]} '{y[2:]}"
     fc_months = [{"m": k, "label": _mlbl(k), "n": v["n"], "raw": round(v["raw"]),
-                  "rawLbl": _money(v["raw"]), "wgt": round(v["wgt"]), "wgtLbl": _money(v["wgt"])}
+                  "rawLbl": _money(v["raw"]), "wgt": round(v["wgt"]), "wgtLbl": _money(v["wgt"]),
+                  "plan": v["plan"], "est": v["est"]}
                  for k, v in sorted(by_close.items())][:8]
 
     # средний месячный факт реализации-2026 (по месяцу перевода в реализацию)
@@ -259,7 +299,8 @@ def compute(client, *, as_of: dt.date | None = None,
         ],
         "forecast": {"pBase": p_base, "pTkp": p_tkp, "openN": len(open_deals),
                      "rawLbl": _money(raw_sum), "wgtLbl": _money(wgt_sum),
-                     "byMonth": fc_months,
+                     "byMonth": fc_months, "planN": plan_n, "estN": est_n,
+                     "ttwMed": ttw_all, "ttwCats": len(ttw_by_cat),
                      "noDate": {"n": no_date["n"], "rawLbl": _money(no_date["raw"]), "wgtLbl": _money(no_date["wgt"])},
                      "avgRealLbl": _money(avg_real) if avg_real else None, "coverage": coverage},
         "velocity": velocity,

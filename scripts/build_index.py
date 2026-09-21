@@ -70,6 +70,18 @@ MIN_LEN, MAX_LEN = 3, 64
 MAX_POSTINGS = 200          # значение в 200+ записях бесполезно как поисковый ключ
 _norm_pn = re.compile(r"[^A-Z0-9]")
 _ws = re.compile(r"\s+")
+# Кириллические буквы, начертание которых совпадает с латинскими. В заявке
+# такие стоят внутри латинских обозначений: «1794-IВ10XOB6XT» с кириллической
+# «В». Ключ «оставить только A–Z и 0–9» их просто ВЫБРАСЫВАЛ, и номер получал
+# ключ «179410XOB6XT», тогда как верное латинское написание давало
+# «1794IB10XOB6XT». Номер лежал в индексе, а найти его было нельзя — девять
+# таких номеров на 23 370 USD, замер gt/tools/homoglyphs.py. Сводим двойники
+# к латинице ДО отсева символов, и оба написания сходятся в один ключ.
+HOMOGLYPHS = str.maketrans({
+    "А": "A", "В": "B", "Е": "E", "К": "K", "М": "M", "Н": "H", "О": "O",
+    "Р": "P", "С": "C", "Т": "T", "У": "Y", "Х": "X",
+    "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "у": "y", "х": "x",
+})
 
 
 def normalize(value: str, group: str) -> str | None:
@@ -79,7 +91,7 @@ def normalize(value: str, group: str) -> str | None:
     if not s:
         return None
     if group in ("pn", "hs"):
-        s = _norm_pn.sub("", s.upper())
+        s = _norm_pn.sub("", s.translate(HOMOGLYPHS).upper())
     else:
         s = _ws.sub(" ", s).casefold()
     return s if MIN_LEN <= len(s) <= MAX_LEN else None

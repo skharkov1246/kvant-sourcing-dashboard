@@ -16,10 +16,17 @@
 
 // BEGIN aclCore
 const ACL_KEY = "acl:v1";
-// Версия документа прав. 2 — «База ЗИП» разделена на две плитки: ГШО и ГТУ-библиотека.
-// Разделение не должно молча отнимать доступ, поэтому при подъёме версии тем, у кого
-// был ЗИП, добавляется ГТУ (справочник и раньше лежал внутри того же сайта).
-const ACL_VERSION = 2;
+// Версия документа прав.
+//   2 — «База ЗИП» разделена на две плитки: ГШО и ГТУ-библиотека. Разделение не
+//       должно молча отнимать доступ, поэтому при подъёме версии тем, у кого был
+//       ЗИП, добавляется ГТУ (справочник и раньше лежал внутри того же сайта).
+//   3 — появился разряд rights: тонкие права раздела «Поставщики». Роли, заведённые
+//       до него, поля не имеют вовсе, и отличить «не выдано» от «ещё не существовало»
+//       по самому полю нельзя — только по версии. Поэтому при подъёме со 2 на 3
+//       ролям выдаётся набор по умолчанию (один suppliers), а контакты, финансы и
+//       правка не выдаются НИКОМУ: молча раздать их при миграции значит открыть то,
+//       чего никто не открывал.
+const ACL_VERSION = 3;
 
 // Разделы портала. Спецпроекты ведёт один департамент, поэтому стоят под общей плашкой
 // (распоряжение владельца от 07.09.2026).
@@ -55,16 +62,39 @@ const SITES = [
 const TABS = [
   { id: "sourcing", name: "Сорсинг", pay: ["DATA", "INSIGHTS"] },
   { id: "company", name: "Пульс компании", pay: ["COMPANY"] },
-  { id: "kam", name: "КАМы", pay: ["KAM"] },
+  // КАМы и продукт-оунеры — не отдельные вкладки, а подменю внутри «Коммерсантов»
+  // (у ролей один начальник). Поэтому «Коммерсанты» читают и состав ролей (PEOPLE),
+  // и направления по клиентам (KAM), и продуктовые линии (PRODUCT).
   { id: "eng", name: "Инжиниринг", pay: ["ENG"] },
-  { id: "prod", name: "Продукт-оунеры", pay: ["PRODUCT"] },
-  { id: "reps", name: "Коммерсанты", pay: ["REPS"] },
+  { id: "reps", name: "Коммерсанты", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"] },
   { id: "contracts", name: "Реализация", pay: ["CONTRACTS"] },
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
   { id: "cohorts", name: "Когорты", pay: ["COMPANY"] },
   { id: "advisor", name: "Советы знатока", pay: ["ADVISOR"] },
 ];
-const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "ADVISOR"];
+// ТОНКИЕ ПРАВА РАЗДЕЛА «ПОСТАВЩИКИ». Третья ось рядом с сайтами и вкладками, и
+// заводится она потому, что ни одна из двух не подходит: сайт — всё или ничего,
+// вкладка — про дашборд. А тут внутри одного раздела надо отделить контакты и
+// деньги от списка и цен.
+//
+// def: true — право входит в роли по умолчанию. У троих оно false, и это
+// главное в матрице: сегодня роли owner, head и employee получают ВСЁ, то есть
+// прав фактически нет. Контакты и финансы выдаются поимённо (docs/suppliers/
+// PERMISSION_MATRIX.md, решение владельца Р-4 от 20.09.2026).
+const RIGHTS = [
+  { id: "suppliers", def: true, name: "Поставщики: список и цены",
+    note: "карточка, котировки, наличие, история запросов, таблица спецификации" },
+  { id: "suppliers_pii", def: false, name: "Поставщики: контакты",
+    note: "ФИО, должность, почта, телефон, каналы связи. Выдаётся поимённо" },
+  { id: "suppliers_fin", def: false, name: "Поставщики: договоры и деньги",
+    note: "условия оплаты, отсрочка, лимиты, суммы закупок. Выдаётся поимённо" },
+  { id: "suppliers_edit", def: false, name: "Поставщики: правка",
+    note: "слияние и разделение сущностей, решения в очереди проверки" },
+];
+const RIGHT_IDS = RIGHTS.map((r) => r.id);
+const DEFAULT_RIGHTS = RIGHTS.filter((r) => r.def).map((r) => r.id);
+
+const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR"];
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
 
@@ -74,16 +104,26 @@ function defaultAcl() {
     version: ACL_VERSION,
     defaultRole: "employee",
     roles: {
-      owner: { name: "Владелец", admin: true, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
-      head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
-      employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
+      // Владелец — единственная роль с полным набором тонких прав: у неё admin,
+      // а admin обходит проверку всё равно, и притворяться иначе незачем.
+      owner: { name: "Владелец", admin: true, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
+        rights: RIGHT_IDS.slice() },
+      head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
+        rights: DEFAULT_RIGHTS.slice() },
+      employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
+        rights: DEFAULT_RIGHTS.slice() },
       sourcing: { name: "Сорсинг", admin: false,
-        sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"] },
+        sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"],
+        rights: DEFAULT_RIGHTS.slice() },
       kam: { name: "КАМ", admin: false,
-        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "kam", "reps", "cohorts"] },
+        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "reps", "cohorts"],
+        rights: DEFAULT_RIGHTS.slice() },
       engineer: { name: "Инженер", admin: false,
-        sites: ["zip", "gt", "gpu", "knowledge", "ove", "gidromet", "gok"], tabs: [] },
-      guest: { name: "Гость", admin: false, sites: [], tabs: [] },
+        sites: ["zip", "gt", "gpu", "knowledge", "ove", "gidromet", "gok"], tabs: [],
+        rights: DEFAULT_RIGHTS.slice() },
+      // Гостю не выдаётся ничего, и suppliers тоже: роль заведена как «вошёл, но
+      // не видит». Выдать ей право по умолчанию значит отменить её смысл.
+      guest: { name: "Гость", admin: false, sites: [], tabs: [], rights: [] },
     },
     users: {},
   };
@@ -91,11 +131,36 @@ function defaultAcl() {
 
 function normEmail(s) { return String(s || "").trim().toLowerCase(); }
 
+// Вкладки «КАМы» и «Продукт-оунеры» стали подменю внутри «Коммерсантов». Без этой
+// миграции у того, кому выдали только их, после обновления не осталось бы ни одной
+// вкладки — то есть человек потерял бы доступ к дашборду целиком.
+const TAB_MOVED = { kam: "reps", prod: "reps" };
+function migrateTabs(list) {
+  const out = new Set();
+  for (const x of Array.isArray(list) ? list : []) {
+    const id = TAB_MOVED[x] || x;
+    if (TAB_IDS.includes(id)) out.add(id);
+  }
+  return TAB_IDS.filter((x) => out.has(x));
+}
+
 // Разбор документа из хранилища: чинит недостающее, чтобы панель не падала на старых данных.
 function normalizeAcl(raw) {
   const d = defaultAcl();
   if (!raw || typeof raw !== "object") return d;
-  const old = Number(raw.version || 1) < 2;
+  const было = Number(raw.version || 1);
+  const old = было < 2;
+  // Разряда rights до версии 3 не существовало, и пустой массив у роли со старой
+  // версии означает «поля не было», а не «право отняли». Различить это можно
+  // только по версии документа: при подъёме выдаём набор по умолчанию, а
+  // контакты, финансы и правку — никому. Начиная с версии 3 пустой массив
+  // понимается буквально: не выдано.
+  const доRights = было < 3;
+  const rights = (list) => {
+    if (доRights && list === undefined) return DEFAULT_RIGHTS.slice();
+    const ok = new Set((Array.isArray(list) ? list : []).filter((x) => RIGHT_IDS.includes(x)));
+    return RIGHT_IDS.filter((x) => ok.has(x));
+  };
   const sites = (list) => {
     const ok = (Array.isArray(list) ? list : []).filter((x) => SITE_IDS.includes(x));
     if (old && ok.includes("zip") && !ok.includes("gt")) ok.push("gt");
@@ -108,7 +173,8 @@ function normalizeAcl(raw) {
       name: String(r.name || id),
       admin: !!r.admin,
       sites: sites(r.sites),
-      tabs: (Array.isArray(r.tabs) ? r.tabs : []).filter((x) => TAB_IDS.includes(x)),
+      tabs: migrateTabs(r.tabs),
+      rights: rights(r.rights),
     };
   }
   const defaultRole = roles[raw.defaultRole] ? raw.defaultRole : d.defaultRole;
@@ -118,7 +184,10 @@ function normalizeAcl(raw) {
     users[normEmail(em)] = {
       role: roles[u.role] ? u.role : defaultRole,
       sites: sites(u.sites),
-      tabs: (Array.isArray(u.tabs) ? u.tabs : []).filter((x) => TAB_IDS.includes(x)),
+      tabs: migrateTabs(u.tabs),
+      // Точечные добавки человеку — только то, что выдали явно. Набора по
+      // умолчанию тут нет: он живёт в роли, а добавка её дополняет.
+      rights: rights(Array.isArray(u.rights) ? u.rights : []),
       note: String(u.note || "").slice(0, 200),
       first: String(u.first || ""),
       last: String(u.last || ""),
@@ -162,21 +231,27 @@ function rightsFor(acl, email, env) {
     .split(/[,\s]+/).map(normEmail).filter(Boolean);
   if (hard.includes(em)) {
     return { email: em, role: "owner", roleName: "Владелец", admin: true,
-             sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() };
+             sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(), rights: RIGHT_IDS.slice() };
   }
   const u = acl.users[em];
   const roleId = (u && u.role) || acl.defaultRole;
-  const role = acl.roles[roleId] || acl.roles[acl.defaultRole] || { name: roleId, admin: false, sites: [], tabs: [] };
+  const role = acl.roles[roleId] || acl.roles[acl.defaultRole]
+    || { name: roleId, admin: false, sites: [], tabs: [], rights: [] };
   const sites = new Set(role.sites);
   const tabs = new Set(role.tabs);
+  const rights = new Set(role.rights || []);
   if (u) {
     for (const s of u.sites) sites.add(s);
     for (const t of u.tabs) tabs.add(t);
+    for (const r of (u.rights || [])) rights.add(r);
   }
   return {
     email: em, role: roleId, roleName: role.name, admin: !!role.admin,
     sites: SITE_IDS.filter((x) => sites.has(x)),
     tabs: TAB_IDS.filter((x) => tabs.has(x)),
+    // Админу — все тонкие права: он их всё равно обходит, и показывать ему
+    // урезанный набор значит врать о том, что он видит.
+    rights: role.admin ? RIGHT_IDS.slice() : RIGHT_IDS.filter((x) => rights.has(x)),
   };
 }
 
