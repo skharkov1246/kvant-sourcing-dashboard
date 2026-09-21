@@ -642,6 +642,56 @@ select coalesce(m.name, c.model_raw)         as машина,
   left join lib_models m on m.id = c.model_id
  group by coalesce(m.name, c.model_raw), c.model_id;
 
+-- Очередь работ по деньгам: где у нас нет цены, а сумма по позиции большая.
+-- Список работ сорсера шёл по порядку строк заявки, а не по деньгам; здесь он
+-- отсортирован суммой. 757 позиций на 2,17 млн долларов, и ни по одной цены нет.
+--
+-- ЦЕН ЗДЕСЬ НЕТ — ЕСТЬ АДРЕС: сделка, имя файла, сколько в нём строк и сколько с
+-- ценой. По адресу цену достаёт library/quotes.py. Источник считан с
+-- отрицательным контролем: выдуманные номера (перестановка цифр внутри
+-- настоящего) дали 0,0 % совпадений против 60,4 % у настоящих, и это записано
+-- в source каждой строки — иначе через месяц не отличить измеренное от
+-- правдоподобного.
+create table if not exists lib_exposure (
+  id               text primary key,          -- нормализованный номер позиции
+  part_id          text references lib_parts(id) on delete set null,
+  part_number      text not null,
+  name             text,
+  qty              numeric,
+  usd_exposure     numeric,                   -- сколько денег стоит за позицией
+  have_price       boolean default false,
+  deal             text,                      -- адрес: в какой сделке искать
+  file             text,                      -- и в каком файле
+  file_rows        int,
+  file_rows_priced int,                       -- сколько строк файла с ценой
+  addresses        int,                       -- сколько всего адресов у позиции
+  source           text,
+  created_at       timestamptz default now(),
+  updated_at       timestamptz default now()
+);
+create index if not exists lib_exposure_usd  on lib_exposure (usd_exposure desc);
+create index if not exists lib_exposure_part on lib_exposure (part_id);
+
+-- Очередь работ: позиции без цены по убыванию суммы, с адресом и с тем, что о
+-- детали уже известно. Сорсер начинает сверху, а не с первой строки заявки.
+drop view if exists lib_work_queue;
+create or replace view lib_work_queue
+  with (security_invoker = true) as
+select e.part_number,
+       e.name,
+       e.qty,
+       round(e.usd_exposure::numeric, 0)      as usd,
+       e.deal                                  as где_искать,
+       e.file                                  as файл,
+       e.file_rows_priced                      as строк_с_ценой_в_файле,
+       p.unit_id                               as узел,
+       p.kv_no                                 as наш_номер,
+       (select count(*) from lib_part_suppliers s where s.part_id = p.id) as исполнителей
+  from lib_exposure e
+  left join lib_parts p on p.id = e.part_id
+ where not e.have_price
+ order by e.usd_exposure desc nulls last;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
 --    типовые отказы, взаимозаменяемость. То, без чего нельзя грамотно
@@ -730,6 +780,7 @@ alter table lib_symptom_defects enable row level security;
 alter table lib_defect_ops     enable row level security;
 alter table lib_customs        enable row level security;
 alter table lib_consumption    enable row level security;
+alter table lib_exposure       enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

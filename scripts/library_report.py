@@ -73,6 +73,12 @@ def собрать(cur) -> dict:
         "расход_строк": q(cur, "select count(*) from lib_consumption"),
         "расход_машин": q(cur, "select count(distinct coalesce(model_id, model_raw)) from lib_consumption"),
         "расход_год": q(cur, "select round(sum(usd_year)) from lib_consumption"),
+        "кон_позиций": q(cur, "select count(*) from lib_exposure where not have_price"),
+        "кон_сумма": q(cur, "select round(sum(usd_exposure)) from lib_exposure where not have_price"),
+        "кон_адрес": q(cur, "select count(*) from lib_exposure where not have_price and deal is not null"),
+        "кон_топ10": q(cur, """select round(sum(usd_exposure)) from (
+             select usd_exposure from lib_exposure where not have_price
+              order by usd_exposure desc nulls last limit 10) t"""),
         "признак_метод": q(cur, "select count(*) from lib_symptom_ops"),
         "дефект_ремонт": q(cur, "select count(*) from lib_defect_ops"),
         "дефект_решение": q(cur, """select count(*) from lib_defects d
@@ -175,6 +181,11 @@ def html_doc(d: dict) -> str:
          f"оборудование: {n(d['экспортёры'])} экспортёров, у {n(d['декл_узел'])} поставок "
          f"выведен узел; ценовой ориентир по группе и по узлу — доллар за килограмм",
          "было 0"),
+        ("Деньги на кону", n(d["кон_сумма"]) + " $", f"{n(d['кон_позиций'])} позиций "
+         f"заявки, по которым у нас НЕТ цены; у {n(d['кон_адрес'])} из них известен "
+         f"адрес, где цена уже лежит — сделка и файл. На десять крупнейших приходится "
+         f"{n(d['кон_топ10'])} $: очередь работ начинается с них, а не с первой строки "
+         f"заявки", "было 0"),
         ("Содержание", n(d["расход_машин"]) + " машин", f"{n(d['расход_строк'])} строк "
          f"расхода с интервалом замены в моточасах и ценой; оценка годового содержания "
          f"{n(d['расход_год'])} $ на эти машины — РАСЧЁТ по типовым интервалам, не наши счета",
@@ -197,6 +208,9 @@ def html_doc(d: dict) -> str:
         ("Кто уже возит такую деталь и почём",
          "таможенные декларации: экспортёр, страна, условия поставки и цена за "
          "килограмм; ориентир по товарной группе и по узлу"),
+        ("С чего начинать работу сегодня",
+         "очередь по деньгам: позиции без цены по убыванию суммы, с адресом файла, "
+         "где цена уже лежит, и с тем, что о детали уже известно"),
         ("Сколько стоит содержать эту машину в год",
          "расход по узлам с интервалом замены — оценка по типовым интервалам ТО, "
          "помеченная расчётом"),
