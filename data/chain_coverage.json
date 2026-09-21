@@ -183,8 +183,8 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 13,
-          "draft": 25,
+          "n": 3,
+          "draft": 35,
           "sources": [
             "zip/data/repair_recon.json"
           ],
@@ -275,8 +275,8 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 13,
-          "draft": 25,
+          "n": 3,
+          "draft": 35,
           "sources": [
             "zip/data/repair_recon.json"
           ],
@@ -327,7 +327,7 @@
           "link": "machine",
           "title": "Машина",
           "what": "модель опознаётся и описана",
-          "n": 35,
+          "n": 21,
           "draft": 0,
           "sources": [
             "zip/data/recip_recon.json"
@@ -338,7 +338,7 @@
           "link": "node",
           "title": "Узел",
           "what": "состав машины разобран по узлам",
-          "n": 16,
+          "n": 9,
           "draft": 0,
           "sources": [
             "zip/data/recip_recon.json"
@@ -371,8 +371,8 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 36,
-          "draft": 25,
+          "n": 5,
+          "draft": 35,
           "sources": [
             "zip/data/recip_recon.json",
             "zip/data/repair_recon.json"
@@ -383,7 +383,7 @@
           "link": "part",
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
-          "n": 173,
+          "n": 124,
           "draft": 0,
           "sources": [
             "zip/data/recip_recon.json"
@@ -472,8 +472,8 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 41,
-          "draft": 25,
+          "n": 31,
+          "draft": 35,
           "sources": [
             "gpu/data/faults.json",
             "zip/data/repair_recon.json"
@@ -576,8 +576,8 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 78,
-          "draft": 25,
+          "n": 68,
+          "draft": 35,
           "sources": [
             "gt/data/faults.json",
             "zip/data/repair_recon.json"
@@ -692,8 +692,8 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 75,
-          "draft": 25,
+          "n": 65,
+          "draft": 35,
           "sources": [
             "zip/data/material_strategy.json",
             "zip/data/r1700.json",
@@ -762,7 +762,7 @@
     "cells_filled": 33,
     "cells_draft_only": 11,
     "cells_with_draft": 24,
-    "draft_rows": 1027,
+    "draft_rows": 1087,
     "cells_total": 56,
     "links_not_started": 0
   }

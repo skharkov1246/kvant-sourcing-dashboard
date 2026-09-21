@@ -37,6 +37,15 @@ LINKS = [
     ("contractor", "Исполнитель", "кому отдать работы по ремонту"),
 ]
 
+# Что считается ЗНАНИЕМ в клетке цепочки. Единственное значение — и константа
+# ОДНА на весь счётчик: 12.09.2026 это же правило жило двумя локальными
+# наборами в разных блоках функции, разошлось (в одном «частично» считалось
+# знанием, в другом нет) и дало по ГПУ 34 против 28 подтверждённых. Строка,
+# которую скептик поправил, — это строка с ошибкой, найденной и исправленной,
+# а не проверенное знание: она идёт в черновик.
+CHECKED = frozenset({"подтверждено"})
+REJECTED = frozenset({"опровергнуто"})  # забракованное скептиком не данные, а урок
+
 SEGMENTS = [
     ("gtu", "ГТУ — газотурбинные"),
     ("gpu", "ГПУ — газопоршневые"),
@@ -281,9 +290,9 @@ def counts() -> dict:
     # не идут: неподтверждённое не заполняет клетку.
     rc = load("zip/data/recip_recon.json", {})
     if rc:
-        OK = {"подтверждено", "частично"}
         ang = {a["key"]: a for a in rc.get("angles", [])}
-        checked = lambda a: [f for f in ang.get(a, {}).get("findings", []) if f.get("verdict") in OK]
+        checked = lambda a: [f for f in ang.get(a, {}).get("findings", [])
+                             if f.get("verdict") in CHECKED]
         put("recip", "machine", len(checked("machine")), "zip/data/recip_recon.json")
         put("recip", "node", len(checked("bom")), "zip/data/recip_recon.json")
         put("recip", "part", sum(len(checked(a)) for a in ("valves", "rings", "metal")),
@@ -313,15 +322,12 @@ def counts() -> dict:
                      "common": ["gtu", "gpu", "gsho", "recip", "pumps"]}
         NODE_SEG = {"Электрическая машина и питание": "electro",
                     "КИП, САУ, защиты": "instrum"}
-        # «Частично» — НЕ знание. Вердикты этого источника: «скептик не сослался»
-        # (224), «частично» (5), «непроверяемо» (1), «опровергнуто» (3) — то есть
-        # подтверждённого нет вовсе, и в клетку отсюда не идёт ничего: всё в
-        # черновик. Иначе счётчик считает общую практику знанием, что правило
-        # проекта запрещает прямо, а тест
+        # Вердикты этого источника: «скептик не сослался» (224), «частично» (5),
+        # «непроверяемо» (1), «опровергнуто» (3) — подтверждённого нет вовсе,
+        # поэтому отсюда в клетку не идёт ничего, всё в черновик. Правило общее,
+        # см. CHECKED наверху файла; тест
         # tests/test_faults_slices.py::test_в_звено_цепочки_идёт_только_подтверждённое
         # ловит числом: по ГПУ клетка «признак» давала 34 против 28 подтверждённых.
-        CHECKED = set()
-        REJECTED = {"опровергнуто"}  # забракованное скептиком не данные, а урок
         rows = sym["defect_rows"]
         # признак → множество индексов дефектов
         sym_of = {}
@@ -355,11 +361,11 @@ def counts() -> dict:
     # все направления, КРОМЕ КИПиА: датчик давления не наплавляют.
     rp = load("zip/data/repair_recon.json", {})
     if rp.get("tech_angles"):
-        CHECKED = {"подтверждено", "частично"}
+        # Тот же CHECKED, что и у диагностики: правило одно на счётчик.
         tech = [t for a in rp["tech_angles"] for t in a["technologies"]]
         ok = [t for t in tech if t["verdict"]["verdict"] in CHECKED]
         draft = [t for t in tech if t["verdict"]["verdict"] not in CHECKED
-                 and t["verdict"]["verdict"] != "опровергнуто"]
+                 and t["verdict"]["verdict"] not in REJECTED]
         for seg in ("gtu", "gpu", "gsho", "recip", "pumps", "electro"):
             put(seg, "repair", len(ok), "zip/data/repair_recon.json")
             put(seg, "repair", len(draft), "zip/data/repair_recon.json", draft=True)

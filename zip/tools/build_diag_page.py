@@ -54,6 +54,7 @@ VCLASS = {"подтверждено": "ok", "частично": "wr", "опро�
 def build():
     rec = json.loads((D / "diagnostics_recon.json").read_text(encoding="utf-8"))
     sym = json.loads((DICT / "symptom.json").read_text(encoding="utf-8"))
+    std = json.loads((D / "standards_check.json").read_text(encoding="utf-8"))
     st, cov = rec["stats"], sym["coverage"]
 
     # ── данные для клиента: только то, что рисуется
@@ -84,6 +85,11 @@ def build():
 
     warn = f"""<div class="card"><b>Что тут проверено, а что нет</b>
 <div class="txt">{e(rec['caveat'])}</div>
+<div class="txt"><b>Сверка проведена по {len(std['checks'])} позициям</b> — вкладка
+«Сверка со стандартом». Из них {sum(1 for c in std['checks'] if c['verdict'] == 'скептик прав')}
+подтвердили поправку скептика,
+{sum(1 for c in std['checks'] if c['verdict'] == 'скептик ошибся')} показали, что ошибся
+уже он сам. Ещё {len(std['not_verified'])} документов выгрузить не удалось.</div>
 <div class="txt">Из {st['findings']} численных норм скептик подтвердил
 {vb.get('подтверждено', 0)}, поправил {vb.get('частично', 0)}, забраковал
 {vb.get('опровергнуто', 0)}, признал непроверяемыми {vb.get('непроверяемо', 0)}.
@@ -169,10 +175,38 @@ def build():
 {''.join(f'<tr><td class="mut">{e(t)}</td><td>{e(x)}</td></tr>' for t, x in dead)}
 </tbody></table></div>"""
 
+    # ── вкладка: сверка с полным текстом стандарта
+    SV = {"скептик прав": "ok", "подтверждено с дополнением": "ok", "скептик ошибся": "no"}
+    chk = "".join(
+        f'<div class="dfc"><div class="hd">'
+        f'<span class="tag {SV.get(c["verdict"], "wr")}">{e(c["verdict"])}</span>'
+        f'<span class="tag">{e(c["standard"])}</span>'
+        f'<span class="mut">{e(c["clause"])}</span></div>'
+        f'<h4>{e(c["topic"])}</h4><dl>'
+        + (f'<dt>Заменяет</dt><dd>{e(c["supersedes"])}</dd>' if c.get("supersedes") else "")
+        + f'<dt>Что было в разведке</dt><dd>{e(c["in_recon"])}</dd>'
+        f'<dt>Что в тексте стандарта</dt><dd>{e(c["in_standard"])}</dd>'
+        f'<dt>Что делать</dt><dd>{e(c["consequence"])}</dd></dl></div>'
+        for c in std["checks"])
+    nv = "".join(f'<tr><td><b>{e(x["standard"])}</b></td><td>{e(x["why"])}</td>'
+                 f'<td>{e(x["affects"])}</td></tr>' for x in std["not_verified"])
+    tab_std = f"""<h2>Сверено с полным текстом стандарта</h2>
+<div class="txt">{e(std['note'])}</div>
+<div class="card"><b>Метод</b><div class="txt">{e(std['method'])}</div>
+<div class="txt">Выгружено и доступно для сверки: {e(', '.join(std['available_texts']))}.</div></div>
+{chk}
+<h3>Чем сверить не удалось: {len(std['not_verified'])} документов</h3>
+<div class="mut">Значения из этих стандартов в каталоге остаются на памяти скептика.
+Пока текст не получен, цифра из них — гипотеза, а не норма.</div>
+<div class="wrap"><table><thead><tr><th style="width:22%">Стандарт</th>
+<th style="width:26%">Почему не сверен</th><th style="width:52%">На что влияет</th>
+</tr></thead><tbody>{nv}</tbody></table></div>"""
+
     S = [("s", "Признак → дефект", tab_sym),
          ("c", "Каталог по узлам", tab_cat),
          ("f", "Нормы и цифры", tab_num),
          ("b", "Забраковано", tab_bad),
+         ("v", "Сверка со стандартом", tab_std),
          ("g", "Чего нет", tab_gap)]
     tabs = "".join(f'<button data-s="{sid}"{" class=on" if i == 0 else ""}>{e(t)}</button>'
                    for i, (sid, t, _) in enumerate(S))
