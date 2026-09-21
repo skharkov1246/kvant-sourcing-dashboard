@@ -574,8 +574,21 @@ def test_verdicts_applied_report_is_complete():
     for o in r["overall"]:
         assert str(o.get("overall") or "").strip()
 
-    # Привязано ровно столько, сколько карточек в наборах, — ни больше.
+    # Привязано не больше, чем карточек в наборе. Точного равенства тут быть не
+    # может: отчёт — запись КОНКРЕТНОГО прогона, а каталог с тех пор растёт
+    # новыми направлениями. Инвариант, который держать обязательно, — ниже:
+    # вердикт есть у каждой карточки и он из закрытого словаря.
     diag = json.loads((ROOT / "zip" / "data" / "diagnostics_recon.json").read_text(encoding="utf-8"))
-    defects = sum(len(a["defects"]) for a in diag["angles"])
-    assert r["bound"]["defects"] <= defects
-    assert sum(r["by_verdict_defects"].values()) == defects
+    alld = [x for a in diag["angles"] for x in a["defects"]]
+    assert r["bound"]["defects"] <= len(alld)
+    ALLOWED = {"подтверждено", "частично", "опровергнуто", "непроверяемо",
+               "скептик не сослался", "угол без скептика"}
+    assert all(x["verdict"]["verdict"] in ALLOWED for x in alld)
+    # Сводка набора обязана сходиться с его же записями: расхождение означает,
+    # что витрина показывает состояние до проверки — так уже было.
+    tally = {}
+    for x in [y for a in diag["angles"] for y in a["findings"] + a["defects"]]:
+        v = x["verdict"]["verdict"]
+        tally[v] = tally.get(v, 0) + 1
+    assert diag["stats"]["by_verdict"] == tally, \
+        "stats.by_verdict разошлась с записями — пересоберите набор"
