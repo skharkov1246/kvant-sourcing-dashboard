@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 261,
-    "total_bytes": 115549149,
+    "datasets": 262,
+    "total_bytes": 115595395,
     "by_sensitivity": {
       "внутреннее": 141,
-      "конфиденциально": 68,
+      "конфиденциально": 69,
       "публикуемо": 52
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 81,
+      "ГТУ-библиотека": 82,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -338,7 +338,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "skharkov1246",
-      "last_commit": "9a3905b6",
+      "last_commit": "ed3d7ebb",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1350,9 +1350,9 @@
         "key": "assessment",
         "records": 15
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-09-12",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f8",
+      "last_commit": "e455ab2b",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4403,6 +4403,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 132570,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/budget_join_stats.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/gap_letters.json",
+        "gt/data/maker_contacts.json",
+        "gt/data/ms5001_vankor.json",
+        "gt/data/pn_db.json",
+        "gt/data/seller_index.json",
+        "gt/data/seller_sitemaps.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_priced.json",
+        "gt/data/ship_inside_quotes.json",
+        "gt/data/ship_jenbacher_prices.json"
+      ],
+      "last_change": "2026-09-13",
+      "last_author": "Claude",
+      "last_commit": "72b1e8c2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/r1700_recon/docs.json",
       "subproject": "база ЗИП",
       "bytes": 132374,
@@ -4446,68 +4508,6 @@
         "ove/build.py",
         "ove/tools/build_paket.py",
         "ove/tools/build_release.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 130214,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/budget_join_stats.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/gap_letters.json",
-        "gt/data/maker_contacts.json",
-        "gt/data/pn_db.json",
-        "gt/data/seller_index.json",
-        "gt/data/seller_sitemaps.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_inside_priced.json",
-        "gt/data/ship_inside_quotes.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_leak.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "960af9bc",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -7395,6 +7395,49 @@
       ]
     },
     {
+      "path": "gt/data/ms5001_vankor.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 43791,
+      "note": "Ведомость запасных частей ГТУ GE MS5001 (исполнение MS5001PA) на инспекцию ТО-70000 — сделка «Юнипро / Ванкор», ГТЭС-200: 198 строк, 175 каталожных номеров Nuovo Pignone, узел определён у 137 строк. Первая ведомость состава по тяжёлой ГТУ; ни один из этих номеров в базе до сих пор не встречался. Источник — технико-коммерческое предложение КВАНТ заказчику (исх. №99-77 от 08.06.2026, Rev. 1), сам файл в репозиторий не кладётся. Перенесена только техническая часть: номер позиции, каталожный номер, наименование, количество, узел. Цены, заказчик-плательщик, условия сделки и контактное лицо сюда НЕ перенесены — это коммерческие и персональные данные (CLAUDE.md, правило 5); их загрузка в закрытую базу идёт отдельно, library/load_tkp_prices.py, из исходного файла по пути TKP_XLSX. Добавлен раздел channel: сверка 175 номеров и слов MS5001/MS5002 с 42 311 таможенными записями. Ни один номер в описаниях деклараций не встречается — второй цены оттуда не взять; зато по Frame 5 есть 55 деклараций 2023–2025 и 10 экспортёров, из них Nuovo Pignone International S.r.l. в 35 записях, и ровно одна запись именно по MS5001PA (RTP POWER SE, Китай через Турцию, 01.05.2024). Экспортёр — не поставщик и не наличие, это точка, с которой начинается поиск исполнителя. Нумерация перечня доходит до 234, предложено 198: 36 номеров позиций в документе отсутствуют — разрыв в самом предложении, а не в разборе.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "catalog",
+        "channel",
+        "completeness",
+        "machine",
+        "source",
+        "stats",
+        "warnings"
+      ],
+      "main_collection": {
+        "key": "catalog",
+        "records": 198,
+        "record_keys": [
+          "block",
+          "name",
+          "node",
+          "pn",
+          "poz",
+          "qty"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "Claude",
+      "last_commit": "72b1e8c2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "library/load_crossrefs.py",
+        "library/load_tkp_prices.py"
+      ]
+    },
+    {
       "path": "gpu/data/suppliers.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 43463,
@@ -8789,8 +8832,8 @@
         ]
       },
       "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "960af9bc",
+      "last_author": "skharkov1246",
+      "last_commit": "c520c54a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8958,9 +9001,11 @@
         "gpu/build.py",
         "gt/build.py",
         "library/equipment.py",
+        "library/load_crossrefs.py",
         "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py"
+        "scripts/build_dict.py",
+        "tests/test_library_crossrefs.py"
       ]
     },
     {
@@ -9064,10 +9109,10 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "960af9bc",
-      "updated_by": "человек/агент",
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -9608,7 +9653,7 @@
     {
       "path": "gt/data/models.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 11790,
+      "bytes": 11889,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -9626,9 +9671,9 @@
           "title"
         ]
       },
-      "last_change": "2026-08-06",
+      "last_change": "2026-09-13",
       "last_author": "Claude",
-      "last_commit": "d6897e3e",
+      "last_commit": "db517f53",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9638,9 +9683,11 @@
         "gpu/build.py",
         "gt/build.py",
         "library/equipment.py",
+        "library/load_crossrefs.py",
         "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py"
+        "scripts/build_dict.py",
+        "tests/test_library_crossrefs.py"
       ]
     },
     {
@@ -10196,10 +10243,10 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "960af9bc",
-      "updated_by": "человек/агент",
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -10646,10 +10693,10 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "a6843da7",
-      "updated_by": "человек/агент",
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
