@@ -27,7 +27,6 @@
 """
 from __future__ import annotations
 
-import hashlib
 import os
 import sys
 from collections import Counter
@@ -111,11 +110,13 @@ def main() -> int:
         if корзины[k]:
             print(f"    {k:12}{num(корзины[k])} файлов")
 
-    refs = indexer.collect_refs(DAYS)
+    # Часть перечисляет ТОЛЬКО свою долю сделок: иначе двенадцать частей делают
+    # один и тот же обход портала одновременно и получают HTTP 429 (21.09.2026 —
+    # все двенадцать частей умерли на этом). Разбиение уже сделано по сделкам,
+    # поэтому отбор по хешу файла больше не нужен: файл принадлежит одной сделке.
+    refs = indexer.collect_refs(DAYS, SHARD, SHARDS)
     mine = [r for r in refs
-            if str(r["fo"].get("id") or r["fo"].get("ID")) in было
-            and int(hashlib.sha1(str(r["fo"].get("id") or r["fo"].get("ID")).encode()).hexdigest(), 16)
-            % SHARDS == SHARD]
+            if str(r["fo"].get("id") or r["fo"].get("ID")) in было]
     if LIMIT:
         mine = mine[:LIMIT]
     print(f"\nк переразбору в этой части: {len(mine)}\n", flush=True)
