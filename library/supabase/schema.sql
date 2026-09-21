@@ -549,6 +549,9 @@ create index if not exists lib_customs_brand on lib_customs (brand);
 -- коронка, и корпус, и расходник. Отвечает «двадцать долларов за килограмм для
 -- этой группы — дорого или дёшево», и только на это. Меньше двадцати строк в
 -- группе — медиана шум, поэтому такие группы отброшены прямо в представлении.
+-- Сносится перед созданием: на живой базе «create or replace» падает, если
+-- у вида поменялось имя колонки (tests/test_schema_views_droppable.py).
+drop view if exists lib_customs_bench;
 create or replace view lib_customs_bench
   with (security_invoker = true) as
 select hs4,
