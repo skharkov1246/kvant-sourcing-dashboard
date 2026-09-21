@@ -221,3 +221,65 @@ def test_live_letters_name_their_attribution_path():
     ok = {"наш шаблон номера", "столбец «Производитель» заказчика"}
     for L in d["letters"]:
         assert L.get("brand_source") in ok
+
+
+# --- третий путь: почта из наших же наборов, с закрытым правилом домена ---
+
+@pytest.mark.parametrize("maker,domain", [
+    # Измеренные ложные совпадения проверки «имя входит в домен». Каждое из них
+    # отправило бы письмо ЧУЖОЙ компании.
+    ("Argo Hytos", "cargocaresolutions.com"),
+    ("Versa", "universal-thermosensors.co.uk"),
+    ("NATIONAL OILWELL VARCO", "platinum-international.store"),
+    ("General Monitors", "general-gauges.com"),
+    ("Johnson Controls", "johnsonturbine.com"),
+    ("Power-Genex", "powergaskets.com"),
+    ("ROTA", "rotatingmachinery.com"),
+    ("Extreme Pro", "extreme-bolt.com"),
+    # Дистрибьютор — не изготовитель: письмо изготовителю адресуется изготовителю.
+    ("Drilltech", "drilltechuae.com"),
+])
+def test_domain_does_not_belong_to_maker(maker, domain):
+    assert gl.owns_domain(maker, domain) is False
+
+
+@pytest.mark.parametrize("maker,domain", [
+    ("HARTING", "harting.com"),
+    ("Phoenix Contact", "phoenixcontact.com"),
+    ("MURR Elektronik", "murrelektronik.de"),
+    ("EuroSwitch", "euroswitch.it"),
+    ("BEKA", "beka.co.uk"),
+    ("Wandfluh", "wandfluh.com"),
+    ("SCANCON", "scancon.dk"),
+    ("Industrie technik", "industrietechnik.it"),
+])
+def test_domain_belongs_to_maker(maker, domain):
+    assert gl.owns_domain(maker, domain) is True
+
+
+def test_domain_rule_survives_broken_input():
+    for bad in ("", None, ".", "co.uk", "localhost"):
+        assert gl.owns_domain("BEKA", bad) is False
+
+
+def test_own_address_says_it_was_not_re_read():
+    """Адрес из нашей записи — слабее прочитанного сейчас, и это должно быть видно."""
+    a = gl.own_address("HARTING")
+    if not a:
+        pytest.skip("в наборах нет записи по этому изготовителю")
+    assert a["confidence"] != "высокая"
+    assert "не перечитывалась" in a["read_on"] and a["read_on"].startswith("gt/data/")
+
+
+def test_own_address_prefers_a_shared_mailbox():
+    """Общий ящик переживёт увольнение сотрудника, личный — нет."""
+    a = gl.own_address("HARTING")
+    if not a:
+        pytest.skip("в наборах нет записи по этому изготовителю")
+    assert a["email"].split("@")[0].lower() in (
+        "info", "sales", "support", "contact", "enquiries", "webenquiries", "order",
+        "northamericainquiry")
+
+
+def test_own_address_is_empty_for_a_made_up_maker():
+    assert gl.own_address("ВымышленМаш Нетакого") == {}

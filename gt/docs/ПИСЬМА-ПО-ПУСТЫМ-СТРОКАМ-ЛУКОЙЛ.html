@@ -19,8 +19,12 @@ td.n, th.n { text-align: right; white-space: nowrap; }
    Вместе держим не письмо, а заголовок с его началом — это .subj. */
 pre { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.4pt; white-space: pre-wrap;
       line-height: 1.42; margin: 0 0 4mm; page-break-inside: auto; orphans: 3; widows: 3; }
-.subj { page-break-after: avoid; margin-bottom: 1.5mm; }
-</style><h1>Письма изготовителям по строкам, где у нас нет ничего</h1><p class='dim'>Собрано 2026-09-21 инструментом gt/tools/gap_letters.py. Отправляет письма человек: ни одно не уходит само.</p><div class='box'><p><b>Разряд:</b> 681 строк заявки из 1 642 — ни найденной цены, ни вилки. Письмо уже собрано в другом пакете по 445 из них.</p><p><b>Готово писем: 9</b> — 84 позиций по 84 строкам. Без адреса осталось 8 строк, бренд не опознан у 144.</p><p class='dim'>На турбинных листах столбец «Производитель» заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Поэтому первым идёт наш шаблон номера, а столбец — только там, где шаблон молчит. Шаблон номера — наше измерение, столбец заказчика — его слово, и на турбинных листах оно неверно. Поэтому столбец берётся только там, где шаблон молчит, и источник записан по каждому письму.</p><p class='dim'><b>Чего в письмах нет.</b> В письме нет ни цены, ни бюджета заказчика, ни его имени: бюджет — его коммерческая тайна, а имя конечного заказчика изготовитель употребит, чтобы отправить нас в свой региональный канал. Отправляет письма человек.</p></div><h2>Что куда уходит</h2><table><thead><tr><th>бренд</th><th class='n'>позиц.</th><th class='n'>штук</th><th>адресат</th><th>чем опознан</th><th>откуда адрес</th></tr></thead><tbody><tr><td>Solar Turbines</td><td class='n'>24</td><td class='n'>71</td><td>Shop@solarturbines.com</td><td class='dim'>наш шаблон номера</td><td class='dim'>https://web.archive.org/web/20250603070901id_/https://www.solarturbines.com/cont</td></tr><tr><td>Siemens Energy</td><td class='n'>17</td><td class='n'>47</td><td>support@siemens-energy.com</td><td class='dim'>наш шаблон номера</td><td class='dim'>https://www.siemens-energy.com/global/en/home/contact.html</td></tr><tr><td>Schlumberger Company</td><td class='n'>16</td><td class='n'>24</td><td>https://www.slb.com/contact-us/speak-with-sales</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.slb.com/contact-us</td></tr><tr><td>Drillmec S.p.A.</td><td class='n'>13</td><td class='n'>24</td><td>https://www.drillmec.com/en/contacts</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.drillmec.com/en/contacts</td></tr><tr><td>Mi Swaco</td><td class='n'>6</td><td class='n'>8</td><td>https://www.slb.com/contact-us/speak-with-sales</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.slb.com/contact-us</td></tr><tr><td>Pepperl+Fuchs</td><td class='n'>3</td><td class='n'>6</td><td>sales@us.pepperl-fuchs.com</td><td class='dim'>наш шаблон номера</td><td class='dim'>https://www.pepperl-fuchs.com/en/contact-us-gp25882</td></tr><tr><td>ABB</td><td class='n'>2</td><td class='n'>4</td><td>https://www.abb.com/global/en/contact-centers/form</td><td class='dim'>наш шаблон номера</td><td class='dim'>https://www.abb.com/global/en/areas/motion/services/operations-and-maintenance/s</td></tr><tr><td>WAGO</td><td class='n'>2</td><td class='n'>3</td><td>order.us@wago.com</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.wago.com/us/order-and-delivery-status</td></tr><tr><td>Finder</td><td class='n'>1</td><td class='n'>1</td><td>https://www.findernet.com/en/worldwide/support/contact-us/</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.findernet.com/en/worldwide/support/contact-us/</td></tr><tr><td>Danfoss</td><td class='n'>8</td><td class='n'>20</td><td>адреса нет</td><td class='dim'>наш шаблон номера</td><td class='dim'>адреса изготовителя, прочитанного на его странице контактов, у нас нет; догадка вида «parts@домен» письма не порождает</td></tr></tbody></table><h2>Solar Turbines — 24 позиц.</h2><p class='subj'><b>Кому:</b> Shop@solarturbines.com · тел. 1-800-810-7854 (США), 1-619-595-7400 (международный); общая справочная (+1) 619-544-5352<br><b>Тема:</b> Запрос цены и срока по запасным частям Solar Turbines: 24 позиц.</p><pre>Добрый день!
+/* Заголовок письма держится со строкой «Кому/Тема», и на этом цепочка
+   обрывается: если тянуть за собой ещё и начало тела, группа не влезает в
+   остаток страницы и уезжает целиком — замер дал полупустую страницу на 358
+   символов при 21 письме. */
+.subj { margin-bottom: 1.5mm; }
+</style><h1>Письма изготовителям по строкам, где у нас нет ничего</h1><p class='dim'>Собрано 2026-09-21 инструментом gt/tools/gap_letters.py. Отправляет письма человек: ни одно не уходит само.</p><div class='box'><p><b>Разряд:</b> 681 строк заявки из 1 642 — ни найденной цены, ни вилки. Письмо уже собрано в другом пакете по 445 из них.</p><p><b>Готово писем: 21</b> — 111 позиций по 111 строкам. Без адреса осталось 8 строк, бренд не опознан у 117.</p><p class='dim'>На турбинных листах столбец «Производитель» заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Поэтому первым идёт наш шаблон номера, а столбец — только там, где шаблон молчит. Шаблон номера — наше измерение, столбец заказчика — его слово, и на турбинных листах оно неверно. Поэтому столбец берётся только там, где шаблон молчит, и источник записан по каждому письму.</p><p class='dim'><b>Чего в письмах нет.</b> В письме нет ни цены, ни бюджета заказчика, ни его имени: бюджет — его коммерческая тайна, а имя конечного заказчика изготовитель употребит, чтобы отправить нас в свой региональный канал. Отправляет письма человек.</p></div><h2>Что куда уходит</h2><table><thead><tr><th>бренд</th><th class='n'>позиц.</th><th class='n'>штук</th><th>адресат</th><th>чем опознан</th><th>откуда адрес</th></tr></thead><tbody><tr><td>Solar Turbines</td><td class='n'>24</td><td class='n'>71</td><td>Shop@solarturbines.com</td><td class='dim'>наш шаблон номера</td><td class='dim'>https://web.archive.org/web/20250603070901id_/https://www.solarturbines.com/cont</td></tr><tr><td>Siemens Energy</td><td class='n'>17</td><td class='n'>47</td><td>support@siemens-energy.com</td><td class='dim'>наш шаблон номера</td><td class='dim'>https://www.siemens-energy.com/global/en/home/contact.html</td></tr><tr><td>Schlumberger Company</td><td class='n'>16</td><td class='n'>24</td><td>https://www.slb.com/contact-us/speak-with-sales</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.slb.com/contact-us</td></tr><tr><td>Drillmec S.p.A.</td><td class='n'>13</td><td class='n'>24</td><td>https://www.drillmec.com/en/contacts</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.drillmec.com/en/contacts</td></tr><tr><td>Mi Swaco</td><td class='n'>6</td><td class='n'>8</td><td>https://www.slb.com/contact-us/speak-with-sales</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.slb.com/contact-us</td></tr><tr><td>Wandfluh</td><td class='n'>5</td><td class='n'>14</td><td>sales@wandfluh.com</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>HARTING</td><td class='n'>4</td><td class='n'>8</td><td>northamericainquiry@harting.com</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>Pepperl+Fuchs</td><td class='n'>3</td><td class='n'>6</td><td>sales@us.pepperl-fuchs.com</td><td class='dim'>наш шаблон номера</td><td class='dim'>https://www.pepperl-fuchs.com/en/contact-us-gp25882</td></tr><tr><td>Transcyko</td><td class='n'>3</td><td class='n'>6</td><td>evachen@transcyko.com</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>SCANCON</td><td class='n'>3</td><td class='n'>5</td><td>sales-hq@scancon.dk</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>WIKA</td><td class='n'>2</td><td class='n'>3</td><td>info@wika.de</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/research_suppliers.json — запись прежней разведки, страница контактов се</td></tr><tr><td>BEKA</td><td class='n'>2</td><td class='n'>4</td><td>webenquiries@beka.co.uk</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_sellers.json — запись прежней разведки, страница контактов сейчас н</td></tr><tr><td>Industrie technik</td><td class='n'>2</td><td class='n'>3</td><td>info@industrietechnik.it</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>ABB</td><td class='n'>2</td><td class='n'>4</td><td>https://www.abb.com/global/en/contact-centers/form</td><td class='dim'>наш шаблон номера</td><td class='dim'>https://www.abb.com/global/en/areas/motion/services/operations-and-maintenance/s</td></tr><tr><td>MarFlex</td><td class='n'>2</td><td class='n'>2</td><td>info@marflex.com</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>WAGO</td><td class='n'>2</td><td class='n'>3</td><td>order.us@wago.com</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.wago.com/us/order-and-delivery-status</td></tr><tr><td>Phoenix Contact</td><td class='n'>1</td><td class='n'>1</td><td>info@phoenixcontact.com</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>MURR Elektronik</td><td class='n'>1</td><td class='n'>1</td><td>info@murrelektronik.de</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>Finder</td><td class='n'>1</td><td class='n'>1</td><td>https://www.findernet.com/en/worldwide/support/contact-us/</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>https://www.findernet.com/en/worldwide/support/contact-us/</td></tr><tr><td>EuroSwitch</td><td class='n'>1</td><td class='n'>1</td><td>info@euroswitch.it</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>Adalet</td><td class='n'>1</td><td class='n'>3</td><td>info@adalet.com</td><td class='dim'>столбец «Производитель» заказчика</td><td class='dim'>gt/data/ship_lukoil.json — запись прежней разведки, страница контактов сейчас не</td></tr><tr><td>Danfoss</td><td class='n'>8</td><td class='n'>20</td><td>адреса нет</td><td class='dim'>наш шаблон номера</td><td class='dim'>адреса изготовителя, прочитанного на его странице контактов, у нас нет; догадка вида «parts@домен» письма не порождает</td></tr></tbody></table><h2>Solar Turbines — 24 позиц.</h2><p class='subj'><b>Кому:</b> Shop@solarturbines.com · тел. 1-800-810-7854 (США), 1-619-595-7400 (международный); общая справочная (+1) 619-544-5352<br><b>Тема:</b> Запрос цены и срока по запасным частям Solar Turbines: 24 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Solar Turbines.
 Просим по позициям ниже:
@@ -156,6 +160,39 @@ pre { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.4pt; white-spa
 6. MD3K08030-28 — 2 ШТ
 
 С уважением,
+КВАНТ</pre><h2>Wandfluh — 5 позиц.</h2><p class='subj'><b>Кому:</b> sales@wandfluh.com<br><b>Тема:</b> Запрос цены и срока по запасным частям Wandfluh: 5 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей Wandfluh.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 5. Перечень:
+1. AEXd2206 — 3 ШТ
+2. AEXd22060b/L15 + MKY45/18x60-G24/L15 — 2 ШТ
+3. AExd22060b-G24/L 15#1 — 3 ШТ
+4. AExd22061a-G24/L 15#1 — 3 ШТ
+5. BDBFA06-P-100-G24/L15 — 3 ШТ
+
+С уважением,
+КВАНТ</pre><h2>HARTING — 4 позиц.</h2><p class='subj'><b>Кому:</b> northamericainquiry@harting.com<br><b>Тема:</b> Запрос цены и срока по запасным частям HARTING: 4 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей HARTING.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 4. Перечень:
+1. 09140033001 — 2 ШТ
+2. 09320006108 — 2 ШТ
+3. 9140033101 — 2 ШТ
+4. 9320006208 — 2 ШТ
+
+С уважением,
 КВАНТ</pre><h2>Pepperl+Fuchs — 3 позиц.</h2><p class='subj'><b>Кому:</b> sales@us.pepperl-fuchs.com · тел. +1 330 425-3555<br><b>Тема:</b> Запрос цены и срока по запасным частям Pepperl+Fuchs: 3 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Pepperl+Fuchs.
@@ -169,6 +206,78 @@ pre { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.4pt; white-spa
 1. NJ40-FP-SN-P1 — 2 ШТ
 2. NJ5-18GK-SN-10M — 2 ШТ
 3. PMR.R2.P.10K — 2 ШТ
+
+С уважением,
+КВАНТ</pre><h2>Transcyko — 3 позиц.</h2><p class='subj'><b>Кому:</b> evachen@transcyko.com<br><b>Тема:</b> Запрос цены и срока по запасным частям Transcyko: 3 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей Transcyko.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 3. Перечень:
+1. 609-11 — 2 ШТ
+2. 611-43 — 2 ШТ
+3. TC-TVXS08-611/09-473 — 2 ШТ
+
+С уважением,
+КВАНТ</pre><h2>SCANCON — 3 позиц.</h2><p class='subj'><b>Кому:</b> sales-hq@scancon.dk<br><b>Тема:</b> Запрос цены и срока по запасным частям SCANCON: 3 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей SCANCON.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 3. Перечень:
+1. 9006081 — 2 ШТ
+2. EXAGN-S101G-1213-A-AL-01-67-00-FZ-C-00 — 1 ШТ
+3. SAG-EIB1B-1213-B150-PRM — 2 ШТ
+
+С уважением,
+КВАНТ</pre><h2>WIKA — 2 позиц.</h2><p class='subj'><b>Кому:</b> info@wika.de<br><b>Тема:</b> Запрос цены и срока по запасным частям WIKA: 2 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей WIKA.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 2. Перечень:
+1. ATS-21127-0003-00 — 1 ШТ
+2. E-10-A-BBL-NB-ZGDXBA-12 — 2 ШТ
+
+С уважением,
+КВАНТ</pre><h2>BEKA — 2 позиц.</h2><p class='subj'><b>Кому:</b> webenquiries@beka.co.uk<br><b>Тема:</b> Запрос цены и срока по запасным частям BEKA: 2 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей BEKA.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 2. Перечень:
+1. BA327E-SS — 2 ШТ
+2. BA337E-SS — 2 ШТ
+
+С уважением,
+КВАНТ</pre><h2>Industrie technik — 2 позиц.</h2><p class='subj'><b>Кому:</b> info@industrietechnik.it<br><b>Тема:</b> Запрос цены и срока по запасным частям Industrie technik: 2 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей Industrie technik.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 2. Перечень:
+1. DBET 26/2 — 1 ШТ
+2. DBET-26/2 — 2 ШТ
 
 С уважением,
 КВАНТ</pre><h2>ABB — 2 позиц.</h2><p class='subj'><b>Кому:</b> https://www.abb.com/global/en/contact-centers/form<br><b>Тема:</b> Запрос цены и срока по запасным частям ABB: 2 позиц.</p><pre>Добрый день!
@@ -185,6 +294,20 @@ pre { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.4pt; white-spa
 2. LWR1601-6E — 1 ШТ
 
 С уважением,
+КВАНТ</pre><h2>MarFlex — 2 позиц.</h2><p class='subj'><b>Кому:</b> info@marflex.com<br><b>Тема:</b> Запрос цены и срока по запасным частям MarFlex: 2 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей MarFlex.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 2. Перечень:
+1. 679254 — 1 ШТ
+2. MarFlex MDPD 100 — 1 ШТ
+
+С уважением,
 КВАНТ</pre><h2>WAGO — 2 позиц.</h2><p class='subj'><b>Кому:</b> order.us@wago.com · тел. (262) 255-6222<br><b>Тема:</b> Запрос цены и срока по запасным частям WAGO: 2 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей WAGO.
@@ -197,6 +320,32 @@ pre { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.4pt; white-spa
 Позиций: 2. Перечень:
 1. 750-920 — 2 ШТ
 2. 759-302/000-923 — 1 К-Т
+
+С уважением,
+КВАНТ</pre><h2>Phoenix Contact — 1 позиц.</h2><p class='subj'><b>Кому:</b> info@phoenixcontact.com<br><b>Тема:</b> Запрос цены и срока по запасным частям Phoenix Contact: 1 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей Phoenix Contact.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 1. Перечень:
+1. 2891152 — 1 ШТ
+
+С уважением,
+КВАНТ</pre><h2>MURR Elektronik — 1 позиц.</h2><p class='subj'><b>Кому:</b> info@murrelektronik.de<br><b>Тема:</b> Запрос цены и срока по запасным частям MURR Elektronik: 1 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей MURR Elektronik.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 1. Перечень:
+1. MCS20-115-230/24 — 1 ШТ
 
 С уважением,
 КВАНТ</pre><h2>Finder — 1 позиц.</h2><p class='subj'><b>Кому:</b> https://www.findernet.com/en/worldwide/support/contact-us/ · тел. 011 9346 211<br><b>Тема:</b> Запрос цены и срока по запасным частям Finder: 1 позиц.</p><pre>Добрый день!
@@ -212,4 +361,30 @@ pre { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.4pt; white-spa
 1. 55.32.9.024.0040 — 1 ШТ
 
 С уважением,
-КВАНТ</pre><h2>Что осталось работой, а не письмом</h2><p>Ни наш шаблон номера, ни наша книга адресов эту строку не закрыли. Изготовитель у большинства из них заказчиком НАЗВАН — не хватает прочитанной страницы его контактов. Это отдельная работа (читать контакты названных изготовителей), а не отказ рынка. Строк — 144. Изготовителей, которых заказчик назвал, а страницы их контактов мы не читали — 89. Каждый прочитанный адрес превращает свои строки в письмо тем же прогоном.</p><p class='dim'>ADDA, ATOS, AUTEK, AVTRON, Acer, Adalet, Aphe, Argo Hytos, BALUFF, BARKSDALE, BEI Sensors, BEKA, BUVECO, Bartec, Blohm + Voss Oil Tools GmbH, Bosch, CAMERON, CELLA, Cameron Romania SRL, Cavotec, DBI-Sala, Drilltech Manufacturing Co., Ltd, Drilltech Manufacturing Co., Ltd,Cangzhou, Dwyer, EBMPAPST, EuroSwitch, Expro, Extreme Pro, FMC Technologies, Flotect, GE DRUCK, GESSMANN, General Electric, General Monitors, HARTING, HAWE, Hewlett Packard, Hydac, Industrie technik, Ingersoll Rand, Johnson Controls, Kingston, LITEON, Liebherr, Litemax, MURR Elektronik, Magnetrol, MarFlex, Meson AB, Murphy, NATIONAL OILWELL VARCO, Northstar, Omega, PALL EUROPE LIMITED, POWER CHOKES, PR Electronics, Philips, Phoenix Contact, Pizzato Elettrica, Positek RIPS, Power-Genex, ROTA, ROTA ENGINEERING, Rittal, SCANCON, SOR, SPOHN + BURKHARDT, Sanyo Denki, Schneider Electric, Seagate, Sixnet, Steute Schaltgerate, T3 Energy Services, Tesco Corporation, TopON, Transcyko, VALCO, Versa, VetcoGray, Vimo elettronica, W.E. ANDERSON, WEG, WIKA, Wandfluh, Weidmuller, Yodalex, Young Lin, АО &quot;Лаборатория Электроники&quot;, Италия,  Pompetravaini</p>
+КВАНТ</pre><h2>EuroSwitch — 1 позиц.</h2><p class='subj'><b>Кому:</b> info@euroswitch.it<br><b>Тема:</b> Запрос цены и срока по запасным частям EuroSwitch: 1 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей EuroSwitch.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 1. Перечень:
+1. ES-4Z22 — 1 ШТ
+
+С уважением,
+КВАНТ</pre><h2>Adalet — 1 позиц.</h2><p class='subj'><b>Кому:</b> info@adalet.com<br><b>Тема:</b> Запрос цены и срока по запасным частям Adalet: 1 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей Adalet.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята с производства;
+3) если обозначение внутреннее (чертёжное), назвать соответствующий коммерческий номер изделия и его изготовителя — по внутреннему обозначению цену получить невозможно ни у одного продавца.
+
+Позиций: 1. Перечень:
+1. XLR-GH — 3 ШТ
+
+С уважением,
+КВАНТ</pre><h2>Что осталось работой, а не письмом</h2><p>Ни наш шаблон номера, ни наша книга адресов эту строку не закрыли. Изготовитель у большинства из них заказчиком НАЗВАН — не хватает прочитанной страницы его контактов. Это отдельная работа (читать контакты названных изготовителей), а не отказ рынка. Строк — 117. Изготовителей, которых заказчик назвал, а страницы их контактов мы не читали — 77. Каждый прочитанный адрес превращает свои строки в письмо тем же прогоном.</p><p class='dim'>ADDA, ATOS, AUTEK, AVTRON, Acer, Aphe, Argo Hytos, BALUFF, BARKSDALE, BEI Sensors, BUVECO, Bartec, Blohm + Voss Oil Tools GmbH, Bosch, CAMERON, CELLA, Cameron Romania SRL, Cavotec, DBI-Sala, Drilltech Manufacturing Co., Ltd, Drilltech Manufacturing Co., Ltd,Cangzhou, Dwyer, EBMPAPST, Expro, Extreme Pro, FMC Technologies, Flotect, GE DRUCK, GESSMANN, General Electric, General Monitors, HAWE, Hewlett Packard, Hydac, Ingersoll Rand, Johnson Controls, Kingston, LITEON, Liebherr, Litemax, Magnetrol, Meson AB, Murphy, NATIONAL OILWELL VARCO, Northstar, Omega, PALL EUROPE LIMITED, POWER CHOKES, PR Electronics, Philips, Pizzato Elettrica, Positek RIPS, Power-Genex, ROTA, ROTA ENGINEERING, Rittal, SOR, SPOHN + BURKHARDT, Sanyo Denki, Schneider Electric, Seagate, Sixnet, Steute Schaltgerate, T3 Energy Services, Tesco Corporation, TopON, VALCO, Versa, VetcoGray, Vimo elettronica, W.E. ANDERSON, WEG, Weidmuller, Yodalex, Young Lin, АО &quot;Лаборатория Электроники&quot;, Италия,  Pompetravaini</p>

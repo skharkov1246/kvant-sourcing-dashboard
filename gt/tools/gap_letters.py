@@ -52,6 +52,7 @@ import subprocess
 import sys
 from collections import defaultdict
 from datetime import date
+from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -64,6 +65,11 @@ CHANNELS = ROOT / "gt/data/ship_channels.json"
 MAKER_CONTACTS = ROOT / "gt/data/maker_contacts.json"
 OTHER_SETS = ("ship_quote_letters.json", "ship_rfq_letters.json",
               "ship_volume_letters.json", "ship_lists_rfq.json", "seller_index.json")
+# Наборы, в которых почта изготовителя могла быть записана прежней разведкой.
+OWN_SETS = ("ship_lukoil.json", "ship_sellers.json", "ship_reverify.json",
+            "ship_sweep.json", "research_suppliers.json", "rfq_suppliers.json",
+            "dossiers.json", "bitrix_supplier_sites.json")
+MAIL = re.compile(r"[\w.+-]+@([\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,})")
 OUT = ROOT / "gt/data/gap_letters.json"
 DOCS = ROOT / "gt/docs"
 NAME = "ПИСЬМА-ПО-ПУСТЫМ-СТРОКАМ-ЛУКОЙЛ"
@@ -92,7 +98,11 @@ td.n, th.n { text-align: right; white-space: nowrap; }
    Вместе держим не письмо, а заголовок с его началом — это .subj. */
 pre { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.4pt; white-space: pre-wrap;
       line-height: 1.42; margin: 0 0 4mm; page-break-inside: auto; orphans: 3; widows: 3; }
-.subj { page-break-after: avoid; margin-bottom: 1.5mm; }
+/* Заголовок письма держится со строкой «Кому/Тема», и на этом цепочка
+   обрывается: если тянуть за собой ещё и начало тела, группа не влезает в
+   остаток страницы и уезжает целиком — замер дал полупустую страницу на 358
+   символов при 21 письме. */
+.subj { margin-bottom: 1.5mm; }
 """
 
 
@@ -181,6 +191,69 @@ def contacts() -> list[dict]:
     return json.loads(MAKER_CONTACTS.read_text(encoding="utf-8"))["rows"]
 
 
+def owns_domain(maker: str, domain: str) -> bool:
+    """Принадлежит ли домен САМОМУ изготовителю. Правило закрытое, не «входит в».
+
+    Замер 21.09.2026 показал, чего стоит проверка на вхождение: «Argo Hytos»
+    нашлась в cargocaresolutions.com, «Versa» — в universal-thermosensors.co.uk,
+    «NATIONAL Oilwell Varco» — в platinum-international.store, «General
+    Monitors» — в general-gauges.com, «Johnson Controls» — в johnsonturbine.com.
+    Пять писем ушли бы чужим компаниям. Поэтому сравнивается ЦЕЛАЯ метка
+    второго уровня: «phoenixcontact» = «Phoenix Contact», а «general-gauges» ≠
+    «General Monitors». Дистрибьютор тоже отсеивается: «drilltechuae» ≠
+    «Drilltech» — и это правильно, письмо изготовителю адресуется изготовителю.
+    """
+    labels = [x for x in str(domain or "").lower().split(".") if x]
+    if not labels:
+        return False
+    # Метка второго уровня: у «beka.co.uk» это «beka», а не «co». Составные
+    # окончания вида co.uk снимаются, но только если под ними что-то есть.
+    known = {"co", "com", "net", "org", "gov", "ac", "edu"}
+    label = labels[0]
+    if len(labels) >= 2:
+        label = labels[-2]
+        if label in known and len(labels) >= 3:
+            label = labels[-3]
+    return bool(_norm(maker)) and _norm(label) == _norm(maker)
+
+
+@lru_cache(maxsize=None)
+def _own_sets() -> tuple[tuple[str, str], ...]:
+    """Тексты наборов читаются один раз: иначе обход идёт по файлам на каждую строку."""
+    out = []
+    for name in OWN_SETS:
+        p = ROOT / "gt/data" / name
+        if p.exists():
+            out.append((name, p.read_text(encoding="utf-8", errors="replace")))
+    return tuple(out)
+
+
+@lru_cache(maxsize=None)
+def own_address(maker: str) -> dict:
+    """Почта изготовителя, записанная НАШЕЙ прежней разведкой в наборах репозитория.
+
+    Третий путь, и самый слабый: адрес не прочитан сейчас на странице контактов,
+    а взят из нашей же записи. Поэтому набор пишет, из какого файла он взят, и
+    уверенность ставит среднюю — с оговоркой в самом поле.
+    """
+    best = {}
+    for name, txt in _own_sets():
+        for m in MAIL.finditer(txt):
+            if owns_domain(maker, m.group(1)):
+                cand = m.group(0)
+                # Общий адрес предпочтительнее личного: письмо переживёт
+                # увольнение сотрудника.
+                cur = best.get("email", "")
+                pref = cand.split("@")[0].lower() in ("info", "sales", "support", "contact",
+                                                      "enquiries", "webenquiries", "order")
+                if not cur or (pref and cur.split("@")[0].lower() not in ("info", "sales")):
+                    best = {"maker": maker, "email": cand, "form_url": "", "phone": "",
+                            "read_on": f"gt/data/{name} — запись прежней разведки, "
+                                       f"страница контактов сейчас не перечитывалась",
+                            "confidence": "средняя"}
+    return best
+
+
 def address_for(brand: str, rows: list[dict]) -> dict:
     """Адрес изготовителя. Не достраивается: только прочитанный на его странице.
 
@@ -257,6 +330,8 @@ def measure() -> dict:
             src.setdefault(b, "наш шаблон номера")
         else:
             b = maker_of(r, cs)
+            if not b and item["man"] and own_address(item["man"]).get("email"):
+                b = item["man"]
             if b:
                 src.setdefault(b, "столбец «Производитель» заказчика")
         if b:
@@ -273,7 +348,8 @@ def measure() -> dict:
             a = agg.setdefault(it["pn"], {**it, "qty": 0.0})
             a["qty"] = float(a["qty"] or 0) + float(it["qty"] or 0)
         uniq = sorted(agg.values(), key=lambda z: str(z["pn"]))
-        addr = address_for(b, cs)
+        addr = address_for(b, cs) or (own_address(b) if src.get(b) ==
+                                      "столбец «Производитель» заказчика" else {})
         rec = {
             "brand": b,
             "brand_source": src.get(b, "наш шаблон номера"),
