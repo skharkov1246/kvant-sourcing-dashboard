@@ -87,3 +87,18 @@ jobs:
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
         run: python scripts/quote_coverage.py
+
+      # СКОЛЬКО КОТИРОВОК УЖЕ РАЗОБРАНО. Читает базу, а не портал: lib_files
+      # хранит и поле, из которого взят файл, и статус разбора, и число
+      # найденных позиций. Лишний проход по порталу тут не нужен.
+      #
+      # Шаг не обязателен: без секрета базы он честно говорит об этом и не
+      # роняет прогон — остальные замеры портальные и от базы не зависят.
+      - name: Сколько котировок уже разобрано
+        continue-on-error: true
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          pip install --quiet psycopg2-binary==2.9.10
+          python scripts/quote_parse_coverage.py
