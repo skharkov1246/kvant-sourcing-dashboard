@@ -148,6 +148,17 @@ def main() -> int:
 
     conn = psycopg2.connect(url, connect_timeout=20, options="-c statement_timeout=300000")
     with conn.cursor() as cur:
+        # Сколько позиций очереди уже закрыто ценой из КП. Считается ДО записи:
+        # это ответ на вопрос «сколько работы сделано», и он обязан считаться по
+        # базе, а не по флагу источника, который с 18.09 не менялся.
+        cur.execute("""
+            select count(*) from lib_exposure e
+             where exists (select 1 from lib_prices p
+                            where p.part_id = e.part_id and p.feed = 'разбор КП'
+                              and p.price is not null)""")
+        закрыто = cur.fetchone()[0]
+        if закрыто:
+            print(f"  уже закрыто ценой из КП: {закрыто} позиций прошлой очереди")
         cur.execute("select id from lib_parts")
         каталог = {r[0] for r in cur.fetchall()}
         psycopg2.extras.execute_values(cur, """
