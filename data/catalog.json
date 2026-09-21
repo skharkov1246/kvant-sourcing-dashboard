@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 258,
-    "total_bytes": 115505321,
+    "total_bytes": 115511257,
     "by_sensitivity": {
       "внутреннее": 140,
       "конфиденциально": 68,
@@ -4509,58 +4509,9 @@
       ]
     },
     {
-      "path": "gt/data/sgt4000f.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 127021,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "companies",
-        "facts",
-        "model",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "companies",
-        "records": 80,
-        "record_keys": [
-          "ask",
-          "comp",
-          "comps",
-          "country",
-          "email",
-          "evidence",
-          "name",
-          "rank",
-          "relation",
-          "site",
-          "tier",
-          "what"
-        ]
-      },
-      "last_change": "2026-08-31",
-      "last_author": "github-actions[bot]",
-      "last_commit": "11f2331",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "участники внешнеэкономических сделок"
-        ]
-      },
-      "referenced_by": [
-        "gt/public/ansaldo.html",
-        "gt/tools/build_f4000.py",
-        "gt/tools/drop_ru.py",
-        "library/load_suppliers.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 126435,
+      "bytes": 127295,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4608,7 +4559,7 @@
       ],
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "dee43e4",
+      "last_commit": "d6e8ec3",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4617,6 +4568,55 @@
       "referenced_by": [
         "scripts/build_catalog.py",
         "tests/test_catalog_guard.py"
+      ]
+    },
+    {
+      "path": "gt/data/sgt4000f.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 127021,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "facts",
+        "model",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "companies",
+        "records": 80,
+        "record_keys": [
+          "ask",
+          "comp",
+          "comps",
+          "country",
+          "email",
+          "evidence",
+          "name",
+          "rank",
+          "relation",
+          "site",
+          "tier",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-31",
+      "last_author": "github-actions[bot]",
+      "last_commit": "11f2331",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/public/ansaldo.html",
+        "gt/tools/build_f4000.py",
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -7054,6 +7054,61 @@
       ]
     },
     {
+      "path": "gt/data/gap_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 48389,
+      "note": "Готовые письма изготовителям по самому дорогому разряду заявки ЛУКОЙЛ — строкам, где нет ни найденной цены, ни экспертной вилки. Замер 21.09.2026: таких строк 580 из 1 642. Найденная цена считается двумя источниками, как в budget_join (перепроверка и поле price сводки заявки со своей валютой); первый прогон читал только первый источник, и 101 строка попадала сюда напрасно — цена по ним записана, продавец назван, а у 63 покрытие количества full, так что письмо «назовите цену» по такой строке было бы потерянным. Письмо по 372 из 580 строк УЖЕ собрано в других пакетах (ship_lists_rfq, письмо одному оператору из seller_index, ship_quote_letters) и ждёт отправки; новых писем 22 на 105 позиций. Адресат определяется тремя путями, источник записан по каждому письму. Первый — НАШ шаблон номера из ship_channels.json; он первый потому, что на турбинных листах столбец «Производитель» заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Второй — столбец заказчика, сведённый с maker_contacts.json (Schlumberger 16 позиций, Drillmec, Mi Swaco, WAGO, Finder); отказ от него стоил бы пяти писем. Третий и самый слабый — почта изготовителя, записанная нашей же прежней разведкой в наборах репозитория (Wandfluh, HARTING, Transcyko, SCANCON, WIKA, BEKA, Industrie technik, MarFlex, Phoenix Contact, MURR Elektronik, EuroSwitch, Adalet); такая запись помечена «страница контактов сейчас не перечитывалась» и уверенностью не выше средней. Домен признаётся принадлежащим изготовителю по ЗАКРЫТОМУ правилу — целая метка второго уровня, а не вхождение: проверка на вхождение отправила бы письма чужим компаниям, и это измерено («Argo Hytos» находится в cargocaresolutions.com, «Versa» в universal-thermosensors.co.uk, «NATIONAL Oilwell Varco» в platinum-international.store, «General Monitors» в general-gauges.com, «Johnson Controls» в johnsonturbine.com). Дистрибьютор тем же правилом отсеивается: «drilltechuae» ≠ «Drilltech». Сравнение идёт с первыми k словами имени, а не со строкой целиком: заказчик пишет изготовителя с правовой формой («Drilltech Manufacturing Co., Ltd» при домене drilltech.cn, «Blohm + Voss Oil Tools GmbH» при blohmvoss.com), и сверка целой строкой теряла семь строк заявки даром, при этом все восемь измеренных ложных совпадений остаются отвергнутыми. Бренд на поддомене материнской компании («cameron.slb.com») правилом НЕ признаётся: поддомен заводит кто угодно, и такие случаи закрываются чтением страницы контактов. Осталось 97 строк, изготовители названы заказчиком и перечислены в наборе числом строк — каждый прочитанный адрес превращает свои строки в письмо тем же прогоном. В письмах нет ни цены, ни бюджета заказчика, ни его имени. Отправляет письма человек. Читает лист решений gt/tools/ship_decisions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "ask_rows",
+        "brands_without_address",
+        "gap_rows",
+        "letters",
+        "of_them_already_in_a_letter",
+        "positions_in_letters",
+        "rows_by_attribution_path",
+        "rows_in_letters",
+        "rows_without_address",
+        "source",
+        "unbranded_by_maker",
+        "unbranded_rows",
+        "unbranded_rows_without_a_named_maker",
+        "unbranded_sample",
+        "updated",
+        "what_it_is",
+        "what_it_is_not",
+        "what_unbranded_means",
+        "why_pattern_comes_first",
+        "why_two_paths"
+      ],
+      "main_collection": {
+        "key": "unbranded_by_maker",
+        "records": 65,
+        "record_keys": [
+          "maker",
+          "qty",
+          "rows"
+        ]
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "d6e8ec3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/gap_letters.py",
+        "gt/tools/ship_decisions.py",
+        "tests/test_gap_letters.py"
+      ]
+    },
+    {
       "path": "gidromet/data/project.json",
       "subproject": "гидрометаллургия",
       "bytes": 48385,
@@ -7396,61 +7451,6 @@
         "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py"
-      ]
-    },
-    {
-      "path": "gt/data/gap_letters.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 43313,
-      "note": "Готовые письма изготовителям по самому дорогому разряду заявки ЛУКОЙЛ — строкам, где нет ни найденной цены, ни экспертной вилки. Замер 21.09.2026: таких строк 580 из 1 642. Найденная цена считается двумя источниками, как в budget_join (перепроверка и поле price сводки заявки со своей валютой); первый прогон читал только первый источник, и 101 строка попадала сюда напрасно — цена по ним записана, продавец назван, а у 63 покрытие количества full, так что письмо «назовите цену» по такой строке было бы потерянным. Письмо по 372 из 580 строк УЖЕ собрано в других пакетах (ship_lists_rfq, письмо одному оператору из seller_index, ship_quote_letters) и ждёт отправки; новых писем 19 на 98 позиций. Адресат определяется тремя путями, источник записан по каждому письму. Первый — НАШ шаблон номера из ship_channels.json; он первый потому, что на турбинных листах столбец «Производитель» заказчика врёт: под «Солар» у него лежат блок Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан MOOG MOD-885-005. Второй — столбец заказчика, сведённый с maker_contacts.json (Schlumberger 16 позиций, Drillmec, Mi Swaco, WAGO, Finder); отказ от него стоил бы пяти писем. Третий и самый слабый — почта изготовителя, записанная нашей же прежней разведкой в наборах репозитория (Wandfluh, HARTING, Transcyko, SCANCON, WIKA, BEKA, Industrie technik, MarFlex, Phoenix Contact, MURR Elektronik, EuroSwitch, Adalet); такая запись помечена «страница контактов сейчас не перечитывалась» и уверенностью не выше средней. Домен признаётся принадлежащим изготовителю по ЗАКРЫТОМУ правилу — целая метка второго уровня, а не вхождение: проверка на вхождение отправила бы письма чужим компаниям, и это измерено («Argo Hytos» находится в cargocaresolutions.com, «Versa» в universal-thermosensors.co.uk, «NATIONAL Oilwell Varco» в platinum-international.store, «General Monitors» в general-gauges.com, «Johnson Controls» в johnsonturbine.com). Дистрибьютор тем же правилом отсеивается: «drilltechuae» ≠ «Drilltech». Осталось 104 строки, изготовители названы заказчиком и перечислены в наборе числом строк — каждый прочитанный адрес превращает свои строки в письмо тем же прогоном. В письмах нет ни цены, ни бюджета заказчика, ни его имени. Отправляет письма человек. Читает лист решений gt/tools/ship_decisions.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "ask_rows",
-        "brands_without_address",
-        "gap_rows",
-        "letters",
-        "of_them_already_in_a_letter",
-        "positions_in_letters",
-        "rows_by_attribution_path",
-        "rows_in_letters",
-        "rows_without_address",
-        "source",
-        "unbranded_by_maker",
-        "unbranded_rows",
-        "unbranded_rows_without_a_named_maker",
-        "unbranded_sample",
-        "updated",
-        "what_it_is",
-        "what_it_is_not",
-        "what_unbranded_means",
-        "why_pattern_comes_first",
-        "why_two_paths"
-      ],
-      "main_collection": {
-        "key": "unbranded_by_maker",
-        "records": 68,
-        "record_keys": [
-          "maker",
-          "qty",
-          "rows"
-        ]
-      },
-      "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "dee43e4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/gap_letters.py",
-        "gt/tools/ship_decisions.py",
-        "tests/test_gap_letters.py"
       ]
     },
     {
@@ -11057,8 +11057,8 @@
         "records": 3
       },
       "last_change": "2026-09-21",
-      "last_author": "Claude",
-      "last_commit": "dee43e4",
+      "last_author": "skharkov1246",
+      "last_commit": "616dcc3",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",

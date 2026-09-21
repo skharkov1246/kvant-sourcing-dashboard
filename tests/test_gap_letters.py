@@ -238,6 +238,8 @@ def test_live_letters_name_their_attribution_path():
     ("Extreme Pro", "extreme-bolt.com"),
     # Дистрибьютор — не изготовитель: письмо изготовителю адресуется изготовителю.
     ("Drilltech", "drilltechuae.com"),
+    # Слово имени должно совпасть с меткой ЦЕЛИКОМ, а не начать её.
+    ("Drilltech Manufacturing Co., Ltd", "drilltechnology.com"),
 ])
 def test_domain_does_not_belong_to_maker(maker, domain):
     assert gl.owns_domain(maker, domain) is False
@@ -252,9 +254,24 @@ def test_domain_does_not_belong_to_maker(maker, domain):
     ("Wandfluh", "wandfluh.com"),
     ("SCANCON", "scancon.dk"),
     ("Industrie technik", "industrietechnik.it"),
+    # Правовая форма в написании заказчика не должна мешать: сверка идёт с
+    # первыми k словами имени. Без этого пять строк заявки теряются даром.
+    ("Drilltech Manufacturing Co., Ltd", "drilltech.cn"),
+    ("Blohm + Voss Oil Tools GmbH", "blohmvoss.com"),
 ])
+
 def test_domain_belongs_to_maker(maker, domain):
     assert gl.owns_domain(maker, domain) is True
+def test_brand_on_a_parent_company_subdomain_is_not_matched():
+    """Осознанная потеря в пользу осторожности.
+
+    «cameron.slb.com» — это действительно Cameron внутри SLB, но правило
+    смотрит только на регистрируемую метку («slb»), и поэтому такой адрес не
+    признаётся. Принять поддомен значило бы принять и «cameron.любой-склад.com»
+    — поддомен заводит кто угодно. Такие случаи закрываются чтением страницы
+    контактов, а не правилом.
+    """
+    assert gl.owns_domain("Cameron France, S.A.S.", "cameron.slb.com") is False
 
 
 def test_domain_rule_survives_broken_input():
