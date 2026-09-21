@@ -17,9 +17,10 @@ from __future__ import annotations
 FEED = "разбор КП"
 ИСТОЧНИК = "КП"
 
-КОЛОНКИ = ("segment_id", "item_name", "part_number", "price", "currency", "basis",
-           "qty", "qty_unit", "source_url", "rfq_id", "rfq_company", "lead_days",
-           "source", "feed", "confidence", "note", "price_date")
+КОЛОНКИ = ("segment_id", "item_name", "part_number", "oem", "price", "currency",
+           "basis", "qty", "qty_unit", "source_url", "rfq_id", "rfq_company",
+           "rfq_brands", "lead_days", "source", "feed", "confidence", "note",
+           "price_date")
 
 ВСТАВКА = f"""
 insert into lib_prices
@@ -37,9 +38,11 @@ _ФАЙЛ = КОЛОНКИ.index("source_url")
 def строка(поз: dict, ц: dict, обрезать) -> tuple:
     """Позиция плюс её ценовая часть → кортеж ровно под КОЛОНКИ."""
     return (поз.get("segment_id"), обрезать(поз.get("item_name"))[:500],
-            обрезать(поз.get("part_number"))[:120], ц["price"], ц["currency"],
-            ц["basis"], поз.get("qty"), обрезать(поз.get("unit"))[:40],
-            поз["source_file"], поз.get("deal_id"), поз.get("company"),
+            обрезать(поз.get("part_number"))[:120],
+            обрезать(поз.get("oem"))[:200] or None,
+            ц["price"], ц["currency"], ц["basis"], поз.get("qty"),
+            обрезать(поз.get("unit"))[:40], поз["source_file"], поз.get("deal_id"),
+            поз.get("company"), обрезать(поз.get("brands"))[:200] or None,
             ц["lead_days"], ИСТОЧНИК, FEED, ц["confidence"],
             обрезать(ц.get("note"))[:300] or None, None)
 

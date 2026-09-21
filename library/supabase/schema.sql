@@ -454,6 +454,25 @@ alter table lib_prices add column if not exists rfq_id    text;
 -- нового реестра: сведение двух реестров это отдельная работа, и подменять
 -- один идентификатор другим нельзя.
 alter table lib_prices add column if not exists rfq_company text;
+-- РАЗРЕЗ ПО БРЕНДУ И МАШИНЕ. Цена без ответа на вопрос «к чему это» сравнима
+-- только сама с собой: подшипник за 1 200 евро дорог или дёшев в зависимости от
+-- того, в какой машине он стоит и чей он.
+--
+-- oem — производитель ИЗ СТРОКИ ФАЙЛА. Разборщик его находил и раньше (колонка
+-- «производитель», «изготовитель», «бренд», «марка», «OEM»), но в строку цены не
+-- писал: он уходил только в спрос.
+--
+-- rfq_brands — бренды С КАРТОЧКИ запроса (ufCrm18Brands), ключами, как и
+-- rfq_company. Поле многозначное, поэтому храним список через запятую. Имена не
+-- разрешаем здесь по той же причине, что и у поставщика: сопоставление ключа со
+-- справочником — отдельный проход, а догадка вместо связи хуже пустоты.
+--
+-- Машина отдельной колонкой НЕ хранится намеренно: связь «деталь → машина» уже
+-- есть в lib_part_models (9 869 связей), и ключ к ней — part_number, который
+-- заполнен у 96 % строк цены. Вторая копия этой связи разошлась бы с первой.
+alter table lib_prices add column if not exists oem        text;
+alter table lib_prices add column if not exists rfq_brands text;
+create index if not exists lib_prices_oem on lib_prices (oem);
 create index if not exists lib_prices_rfq on lib_prices (rfq_id);
 create index if not exists lib_prices_rfqco on lib_prices (rfq_company);
 
