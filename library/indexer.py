@@ -35,7 +35,11 @@ import psycopg2.extras
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
 import docfilter  # noqa: E402  (после sys.path)
+# Список полей КП держим в одном месте со всеми замерами котировок: два списка
+# разошлись бы молча — разбирали бы одно, а считали другое.
+from quote_coverage import ПОЛЕ_ЗАПРОСА, ПОЛЯ_КП  # noqa: E402
 from segments import SEGMENTS, classify, name_of  # noqa: E402
 
 # Секреты читаются лениво: без них модуль всё равно импортируется — иначе его
@@ -51,6 +55,12 @@ RETRY_FAILED = os.environ.get("RETRY_FAILED", "") not in ("", "0", "false")
 # Ворота спецификации можно выключить без выката кода — на случай, если правило
 # начнёт отбрасывать нужное. Выключение видно в журнале прогона.
 SPECGATE = os.environ.get("SPECGATE", "1") not in ("", "0", "false")
+# Откуда брать вложения: сделки (как было) или карточки запросов поставщикам.
+# Замер 21.09.2026: в lib_files не было НИ ОДНОГО файла из полей КП — разбор до
+# СП-166 никогда не доходил, а там 5 231 файл с ценами, и это единственное место,
+# где цена вообще есть: на самой карточке сумма равна нулю у всех 21 865.
+SOURCE = os.environ.get("SOURCE", "deals").strip().lower()
+SPA_RFQ = 166
 PARSER_VERSION = 2
 
 # Колонки спецификации. Спецификации у всех заказчиков свои, но заголовки повторяются.
@@ -304,6 +314,43 @@ def collect_refs(days: int) -> list[dict]:
     return refs
 
 
+def collect_refs_rfq(days: int) -> list[dict]:
+    """Ссылки на вложения карточек запросов поставщикам (СП-166).
+
+    БЕРЁМ ТОЛЬКО ФАЙЛЫ СО СТОРОНЫ ПОСТАВЩИКА. «Request file» — то, что отправили
+    мы; разобрать его как котировку значит объявить прокотированным собственный
+    запрос. Список полей — общий с замерами (scripts/quote_coverage.py).
+
+    Механика та же, что у сделок: crm.item.list отдаёт у файловых полей
+    urlMachine — REST-ссылку с одноразовым токеном. Разница только в том, какую
+    сущность спрашиваем и какие поля берём.
+    """
+    since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00+03:00")
+    поля = list(ПОЛЯ_КП)
+    карточки = bx_all("crm.item.list", {"entityTypeId": SPA_RFQ,
+                                        "filter": {">=createdTime": since},
+                                        "select": ["id"] + поля,
+                                        "order": {"id": "ASC"}})
+    print(f"карточек запросов за {days} дн.: {len(карточки)} · полей КП: {len(поля)}", flush=True)
+
+    refs: list[dict] = []
+    свои = 0
+    for x in карточки:
+        for f in поля:
+            v = x.get(f)
+            if not v:
+                continue
+            for fo in (v if isinstance(v, list) else [v]):
+                if isinstance(fo, dict) and fo.get("urlMachine"):
+                    refs.append({"deal": str(x["id"]), "field": f,
+                                 "origin": "поле запроса", "fo": fo})
+        if x.get(ПОЛЕ_ЗАПРОСА):
+            свои += 1
+    print(f"вложений КП от поставщиков: {len(refs)}"
+          f" · карточек с нашим «Request file» (не берём): {свои}", flush=True)
+    return refs
+
+
 def is_login_page(b: bytes) -> bool:
     """Портал отдаёт страницу входа с кодом 200 — по коду ответа её не отличить.
     Отличаем по содержимому, иначе HTML формы логина уходит в разбор как файл."""
@@ -483,7 +530,12 @@ def main() -> int:
     print(f"уже разобрано ранее: {len(done)}"
           + (" (файлы со статусом «не скачался» пойдут заново)" if RETRY_FAILED else ""), flush=True)
 
-    refs = collect_refs(DAYS)
+    if SOURCE not in ("deals", "rfq"):
+        print(f"неизвестный SOURCE={SOURCE!r}: допустимо deals или rfq", file=sys.stderr)
+        return 2
+    print(f"источник вложений: {'карточки запросов (СП-166)' if SOURCE == 'rfq' else 'сделки'}",
+          flush=True)
+    refs = collect_refs_rfq(DAYS) if SOURCE == "rfq" else collect_refs(DAYS)
     mine = [r for r in refs
             if int(hashlib.sha1(str(r["fo"].get("id") or r["fo"].get("ID")).encode()).hexdigest(), 16) % SHARDS == SHARD
             and str(r["fo"].get("id") or r["fo"].get("ID")) not in done]
