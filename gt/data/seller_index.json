@@ -1,0 +1,7418 @@
+{
+ "updated": "2026-09-18",
+ "source": "Карты сайтов продавцов из gt/data/seller_sitemaps.json (robots.txt → sitemap). Считает gt/tools/seller_index.py.",
+ "what_it_proves": "У продавца ЕСТЬ карточка по этому номеру, и вот её адрес: это адрес по самой детали, а не по классу изделия.",
+ "what_it_does_not_prove": "Ни цены, ни остатка, ни срока. За ними надо открыть карточку — это отдельная работа и отдельный разбор.",
+ "why_not_search": "Веб-поиск расходуем и в этом окружении ненадёжен: лимит запросов кончается, машины отдают капчу, 403 или выдачу не по запросу. Карту сайта продавец публикует сам, и она отвечает на вопрос «есть ли карточка по номеру» разом по всей заявке.",
+ "hosts": [
+  {
+   "host": "turbine.parts",
+   "why": "Торговец обсолетом по газовым турбинам. Разведка 18.09.2026 нашла у него карточки по точным номерам заявки (1043265-7, 301315-18, 1059701-8, 1008378-2/-3/-4), которых не было ни у кого другого. Цен не печатает: вместо цены форма запроса.",
+   "addresses_seen": 106266,
+   "ask_rows_matched": 394
+  },
+  {
+   "host": "hardtoget.parts",
+   "why": "Тот же оператор, что turbine.parts, но отдельный каталог со своими адресами и складским перечнем (253 страницы, читан 18.09.2026). Считать одним свидетелем с turbine.parts.",
+   "addresses_seen": 287545,
+   "ask_rows_matched": 401
+  },
+  {
+   "host": "kpr-rm.com",
+   "why": "Единственная найденная витрина, которая ПЕЧАТАЕТ цены на запчасти Solar Turbines (примеры от 12 до 120 000 USD, корзина живая). Контроль выдуманным номером пройден: по несуществующему номеру отдаёт «No products were found».",
+   "addresses_seen": 505,
+   "ask_rows_matched": 0
+  },
+  {
+   "host": "dieselpartsdirect.com",
+   "why": "Дилер запчастей дизельных двигателей, печатает цены. Разведка 18.09.2026 сняла у него цену по номеру 3408345 (69,49 USD за genuine-исполнение) и прошла контроль выдуманным номером: 3408399 → «No products were found».",
+   "addresses_seen": 17866,
+   "ask_rows_matched": 7
+  },
+  {
+   "host": "shop.moderngroup.com",
+   "why": "Дилерская витрина, печатает цены (schema.org с priceCurrency и availability). Разведка сняла у него 298,75 USD по номеру 3408346 и 1 513,18 USD по 3644455; контроль выдуманным номером пройден (3644499 → 404). ОГОВОРКА: у него встречаются карточки под чужим брендом на тот же номер, и цена там в разы выше — читать вместе с брендом карточки.",
+   "addresses_seen": 1050176,
+   "ask_rows_matched": 2
+  },
+  {
+   "host": "agkits.com",
+   "why": "Витрина запчастей, печатает цены; разведка 18.09.2026 сняла у неё 2,70 USD по номеру 3087911 и прошла контроль выдуманным номером (404 и на карточку, и на поиск).",
+   "addresses_seen": 93628,
+   "ask_rows_matched": 4
+  },
+  {
+   "host": "turbotech.in",
+   "why": "Витрина турбокомпрессоров и запчастей, печатает цены в рупиях; контроль выдуманным номером пройден (3160Z99Q → 0 результатов при живом соседе 3160404).",
+   "addresses_seen": 29943,
+   "ask_rows_matched": 4
+  },
+  {
+   "host": "controlparts.com",
+   "why": "Витрина промышленной автоматики, печатает цены и наличие; разведка сняла 26,40 USD по номеру 3RT2926-1ER00 и прошла контроль («0 results found» на выдуманный номер).",
+   "addresses_seen": 8015,
+   "ask_rows_matched": 1
+  }
+ ],
+ "addresses_indexed": 1593944,
+ "keys_indexed": 4409238,
+ "ask_rows_matched": 418,
+ "of_them_had_no_address_before": 224,
+ "min_key_length": 5,
+ "why_min_key": "Ключ короче четырёх знаков номером не считается: «10», «A1» и «SET» дали бы ложные совпадения с половиной заявки.",
+ "letters": [
+  {
+   "to": "info@hardtoget.parts",
+   "address_read_on": "https://hardtoget.parts/contacts/ , 18.09.2026",
+   "address_note": "На странице адрес напечатан с пробелами («info @ hardtoget.parts») — это защита от сборщиков почты, а не другой адрес. Местная часть и домен напечатаны оба, поэтому это ЧТЕНИЕ, а не догадка по домену.",
+   "phone": "+7 495 1081005",
+   "rows": 302,
+   "qty_total": 2687.0,
+   "pns": [
+    "1950-10-2F",
+    "500-139",
+    "1013121-1",
+    "1014214-21",
+    "1052168-23",
+    "1064829-4",
+    "1071327-1",
+    "1078325-1",
+    "1078325-17",
+    "1078695-50",
+    "120649-18",
+    "170180-01-00",
+    "FT67006-100",
+    "199543-2",
+    "219691-101",
+    "FT20048-202",
+    "FT20198-100",
+    "FT21609-108",
+    "FT27701-100",
+    "FT27802",
+    "FT28198-101",
+    "FT61012-100",
+    "FT61014-101",
+    "FT61016",
+    "FT61045-100",
+    "FT61090",
+    "1024780-122",
+    "1024780-3P541",
+    "1027484-101",
+    "1042018-202",
+    "1043614-500",
+    "1045095-201",
+    "1059701-10",
+    "1059701-8",
+    "1062257-1",
+    "1062883-200",
+    "1066290-2",
+    "1088209-1000",
+    "1088209-1400",
+    "120045-13",
+    "120712-5",
+    "1602894-11",
+    "1602894-7",
+    "1799637-100",
+    "1799637-101",
+    "186232-2400",
+    "186648-700",
+    "190015-10",
+    "190016-10",
+    "190016-9",
+    "190392-3",
+    "190537-302",
+    "2018739-202",
+    "2018740-202",
+    "604532C1",
+    "64/60082032/1",
+    "997697C1",
+    "999007C1",
+    "1068334",
+    "120022-7",
+    "136210-38",
+    "173101-2",
+    "301315-14",
+    "302161-40",
+    "700582C1",
+    "918018C1",
+    "964686C1",
+    "996510C1",
+    "FT21008-101",
+    "80-30549-100",
+    "1060045-60",
+    "1060045-83",
+    "1110429-1700",
+    "1110429-2700",
+    "186648-3",
+    "FT20027",
+    "FT20029",
+    "FT20030-102",
+    "FT20032-100",
+    "FT20060-101",
+    "FT20870-100",
+    "FT28001-103",
+    "FT28515-102",
+    "FT28877-101",
+    "1063321-100",
+    "1063325-1",
+    "1063390-1",
+    "1067366-100",
+    "602386C1",
+    "903424C1",
+    "909106C1",
+    "912642C1",
+    "960363C1",
+    "1008364-1",
+    "1008364-2",
+    "1008364-3",
+    "1008364-4",
+    "1008364-5",
+    "1008378-1",
+    "1008378-2",
+    "1008378-3",
+    "1008378-4",
+    "1008378-5",
+    "1008726",
+    "1010135",
+    "1010446",
+    "1015230",
+    "1015231",
+    "1016515",
+    "1016573",
+    "1017876",
+    "1017879",
+    "1017893",
+    "1017894",
+    "1017895",
+    "1017899",
+    "1017901",
+    "1017904",
+    "1017908",
+    "1019197",
+    "1020105",
+    "1062952-1",
+    "1062952-2",
+    "1062952-3",
+    "1062952-4",
+    "1062952-5",
+    "1067628-1",
+    "1072904",
+    "1088912",
+    "1110655-1",
+    "1112225-1",
+    "1112227-1",
+    "1112764-1",
+    "1112766-1",
+    "112056-1",
+    "120373-1",
+    "124907-19",
+    "124907-20",
+    "1283807-900",
+    "130161-1",
+    "172514-2",
+    "172523-2",
+    "172567-1",
+    "173942-1",
+    "180431-1",
+    "190619-2",
+    "190826-1",
+    "301390-1",
+    "372903-1",
+    "600257C1",
+    "601662C1",
+    "602811C1",
+    "603006C1",
+    "701417C1",
+    "903223C1",
+    "903235C1",
+    "903246C1",
+    "903249C1",
+    "903268C1",
+    "903270C1",
+    "903289C1",
+    "903315C1",
+    "903509C1",
+    "903556C1",
+    "903560C1",
+    "908060C1",
+    "908221C1",
+    "915243C1",
+    "915244C1",
+    "950781C1",
+    "950895C1",
+    "950944C1",
+    "952248C1",
+    "952504C1",
+    "953160C1",
+    "962694C1",
+    "964587C1",
+    "967692C1",
+    "967924C1",
+    "969017C1",
+    "969582C1",
+    "969677C1",
+    "SP027886",
+    "1020225",
+    "1037762-20",
+    "1038428-3",
+    "1046415-30",
+    "1053400",
+    "1054813-2",
+    "1055666",
+    "1060151",
+    "1060152",
+    "1060367-500",
+    "1060367-600",
+    "1064405-1",
+    "1066738-2",
+    "1066738-4",
+    "1071146-2",
+    "1075721",
+    "1081051",
+    "1084352-4030",
+    "1085271-1004",
+    "1087576-100",
+    "1100611-3",
+    "1102783",
+    "1110429-100",
+    "186273-36",
+    "190185-203",
+    "233958-1",
+    "301314-18",
+    "301315-13",
+    "301315-18",
+    "70-30093-1",
+    "908539C1",
+    "908579C1",
+    "917345C1",
+    "960592C1",
+    "990905C1",
+    "999214C1",
+    "2112736-1",
+    "602994C1",
+    "996504B1",
+    "FT20300-103",
+    "FT28222-302",
+    "FT51010-104",
+    "FT61127-100",
+    "FT61148-100",
+    "FT67022-201",
+    "FT67073-100",
+    "FT20025",
+    "FT20026-100",
+    "FT28410",
+    "1054986-2",
+    "120848-4",
+    "190187-300",
+    "1046490",
+    "1046492",
+    "1059715",
+    "1065110",
+    "1065748",
+    "1093866",
+    "907563C2",
+    "945061C1",
+    "967952C1",
+    "999215C1",
+    "FT21204",
+    "FT21205-101",
+    "FT28301-103",
+    "FT67032-100",
+    "1017509",
+    "1017510",
+    "1031741-4",
+    "1034549-80",
+    "1034549-81",
+    "1043265-1",
+    "1043265-3",
+    "1043265-4",
+    "1043265-7",
+    "1043265-9",
+    "1046415-57",
+    "1046415-79",
+    "1053038-26",
+    "1053928-3",
+    "1053929-6",
+    "1060367-2",
+    "1064851-1",
+    "1064851-2",
+    "1064851-4",
+    "1071411-1",
+    "1071411-3",
+    "1076251-1",
+    "1087360",
+    "1087370",
+    "1088442-4",
+    "1106298-1",
+    "1286570-1",
+    "1577354-2401",
+    "1654366",
+    "1756-ENBT",
+    "190377-1806",
+    "301315-702",
+    "5SY6202-7",
+    "600375C1",
+    "603857C1",
+    "903536C1",
+    "908700C2",
+    "964905C1",
+    "991707C1",
+    "991708C1",
+    "991709C1",
+    "995648C1",
+    "997812C1",
+    "998964C1",
+    "998965C1",
+    "998966C1",
+    "998967C1",
+    "999979C1",
+    "999980C1",
+    "FT21041-101",
+    "FT61200-101",
+    "FT67026",
+    "KFD2-SR2-Ex2.W"
+   ],
+   "subject": "Запрос цены и наличия по 302 позиц. из вашего каталога",
+   "body": "Добрый день!\n\nУ вас в каталоге есть карточки по позициям ниже — мы их нашли по вашим же страницам. Просим по каждой позиции дать:\n\n1) цену за штуку и цену за всё указанное количество;\n2) остаток на складе ЧИСЛОМ на сегодня;\n3) срок поставки под указанное количество целиком;\n4) срок действия цены;\n5) базис поставки (Инкотермс).\n\nЧасть позиций у вас выставлена и на turbine.parts — если это один и тот же склад, достаточно одного ответа.\n\nПозиции:\n1. 1950-10-2F — 1 шт\n2. 500-139 — 1 шт\n3. 1013121-1 — 1 шт\n4. 1014214-21 — 5 шт\n5. 1052168-23 — 2 шт\n6. 1064829-4 — 1 шт\n7. 1071327-1 — 2 шт\n8. 1078325-1 — 2 шт\n9. 1078325-17 — 2 шт\n10. 1078695-50 — 1 шт\n11. 120649-18 — 2 шт\n12. 170180-01-00 — 24 шт\n13. FT67006-100 — 1 шт\n14. 199543-2 — 5 шт\n15. 219691-101 — 2 шт\n16. FT20048-202 — 1 шт\n17. FT20198-100 — 1 шт\n18. FT21609-108 — 1 шт\n19. FT27701-100 — 1 шт\n20. FT27802 — 1 шт\n21. FT28198-101 — 1 шт\n22. FT61012-100 — 1 шт\n23. FT61014-101 — 1 шт\n24. FT61016 — 1 шт\n25. FT61045-100 — 1 шт\n26. FT61090 — 1 шт\n27. 1024780-122 — 1 шт\n28. 1024780-3P541 — 1 шт\n29. 1027484-101 — 2 шт\n30. 1042018-202 — 4 шт\n31. 1043614-500 — 8 шт\n32. 1045095-201 — 4 шт\n33. 1059701-10 — 8 шт\n34. 1059701-8 — 4 шт\n35. 1062257-1 — 4 шт\n36. 1062883-200 — 10 шт\n37. 1066290-2 — 4 шт\n38. 1088209-1000 — 6 шт\n39. 1088209-1400 — 4 шт\n40. 120045-13 — 1 шт\n41. 120712-5 — 1 шт\n42. 1602894-11 — 1 шт\n43. 1602894-7 — 1 шт\n44. 1799637-100 — 1 шт\n45. 1799637-101 — 1 шт\n46. 186232-2400 — 6 шт\n47. 186648-700 — 4 шт\n48. 190015-10 — 8 шт\n49. 190016-10 — 4 шт\n50. 190016-9 — 4 шт\n51. 190392-3 — 13 шт\n52. 190537-302 — 8 шт\n53. 2018739-202 — 4 шт\n54. 2018740-202 — 3 шт\n55. 604532C1 — 1 шт\n56. 64/60082032/1 — 4 шт\n57. 997697C1 — 1 шт\n58. 999007C1 — 1 шт\n59. 1068334 — 3 шт\n60. 120022-7 — 24 шт\n61. 136210-38 — 16 шт\n62. 173101-2 — 59 шт\n63. 301315-14 — 1 шт\n64. 302161-40 — 3 шт\n65. 700582C1 — 1 шт\n66. 918018C1 — 32 шт\n67. 964686C1 — 5 шт\n68. 996510C1 — 3 шт\n69. FT21008-101 — 1 шт\n70. 80-30549-100 — 14 шт\n71. 1060045-60 — 1 шт\n72. 1060045-83 — 1 шт\n73. 1110429-1700 — 1 шт\n74. 1110429-2700 — 1 шт\n75. 186648-3 — 1 шт\n76. FT20027 — 1 шт\n77. FT20029 — 1 шт\n78. FT20030-102 — 1 шт\n79. FT20032-100 — 1 шт\n80. FT20060-101 — 1 шт\n81. FT20870-100 — 1 шт\n82. FT28001-103 — 1 шт\n83. FT28515-102 — 1 шт\n84. FT28877-101 — 1 шт\n85. 1063321-100 — 1 шт\n86. 1063325-1 — 4 шт\n87. 1063390-1 — 1 шт\n88. 1067366-100 — 1 шт\n89. 602386C1 — 1 шт\n90. 903424C1 — 1 шт\n91. 909106C1 — 1 шт\n92. 912642C1 — 14 шт\n93. 960363C1 — 1 шт\n94. 1008364-1 — 16 шт\n95. 1008364-2 — 8 шт\n96. 1008364-3 — 8 шт\n97. 1008364-4 — 8 шт\n98. 1008364-5 — 8 шт\n99. 1008378-1 — 16 шт\n100. 1008378-2 — 8 шт\n101. 1008378-3 — 8 шт\n102. 1008378-4 — 8 шт\n103. 1008378-5 — 8 шт\n104. 1008726 — 108 шт\n105. 1010135 — 1 шт\n106. 1010446 — 14 шт\n107. 1015230 — 2 шт\n108. 1015231 — 3 шт\n109. 1016515 — 1 шт\n110. 1016573 — 7 шт\n111. 1017876 — 5 шт\n112. 1017879 — 5 шт\n113. 1017893 — 11 шт\n114. 1017894 — 1 шт\n115. 1017895 — 12 шт\n116. 1017899 — 9 шт\n117. 1017901 — 47 шт\n118. 1017904 — 15 шт\n119. 1017908 — 7 шт\n120. 1019197 — 1 шт\n121. 1020105 — 21 шт\n122. 1062952-1 — 16 шт\n123. 1062952-2 — 16 шт\n124. 1062952-3 — 8 шт\n125. 1062952-4 — 4 шт\n126. 1062952-5 — 2 шт\n127. 1067628-1 — 2 шт\n128. 1072904 — 84 шт\n129. 1088912 — 4 шт\n130. 1110655-1 — 1 шт\n131. 1112225-1 — 3 шт\n132. 1112227-1 — 2 шт\n133. 1112764-1 — 3 шт\n134. 1112766-1 — 3 шт\n135. 112056-1 — 8 шт\n136. 120373-1 — 1 шт\n137. 124907-19 — 4 шт\n138. 124907-20 — 4 шт\n139. 1283807-900 — 2 шт\n140. 130161-1 — 2 шт\n141. 172514-2 — 3 шт\n142. 172523-2 — 2 шт\n143. 172567-1 — 3 шт\n144. 173942-1 — 17 шт\n145. 180431-1 — 151 шт\n146. 190619-2 — 1 шт\n147. 190826-1 — 7 шт\n148. 301390-1 — 1 шт\n149. 372903-1 — 1 шт\n150. 600257C1 — 1 шт\n151. 601662C1 — 1 шт\n152. 602811C1 — 6 шт\n153. 603006C1 — 8 шт\n154. 701417C1 — 3 шт\n155. 903223C1 — 3 шт\n156. 903235C1 — 2 шт\n157. 903246C1 — 64 шт\n158. 903249C1 — 7 шт\n159. 903268C1 — 1 шт\n160. 903270C1 — 1 шт\n161. 903289C1 — 2 шт\n162. 903315C1 — 3 шт\n163. 903509C1 — 4 шт\n164. 903556C1 — 7 шт\n165. 903560C1 — 2 шт\n166. 908060C1 — 2 шт\n167. 908221C1 — 6 шт\n168. 915243C1 — 24 шт\n169. 915244C1 — 19 шт\n170. 950781C1 — 1 шт\n171. 950895C1 — 2 шт\n172. 950944C1 — 2 шт\n173. 952248C1 — 10 шт\n174. 952504C1 — 1 шт\n175. 953160C1 — 1 шт\n176. 962694C1 — 10 шт\n177. 964587C1 — 109 шт\n178. 967692C1 — 3 шт\n179. 967924C1 — 2 шт\n180. 969017C1 — 5 шт\n181. 969582C1 — 2 шт\n182. 969677C1 — 5 шт\n183. SP027886 — 18 шт\n184. 1020225 — 32 шт\n185. 1037762-20 — 1 шт\n186. 1038428-3 — 7 шт\n187. 1046415-30 — 25 шт\n188. 1053400 — 1 шт\n189. 1054813-2 — 1 шт\n190. 1055666 — 2 шт\n191. 1060151 — 1 шт\n192. 1060152 — 1 шт\n193. 1060367-500 — 4 шт\n194. 1060367-600 — 6 шт\n195. 1064405-1 — 4 шт\n196. 1066738-2 — 1 шт\n197. 1066738-4 — 1 шт\n198. 1071146-2 — 1 шт\n199. 1075721 — 345 шт\n200. 1081051 — 1 шт\n201. 1084352-4030 — 1 шт\n202. 1085271-1004 — 1 шт\n203. 1087576-100 — 1 шт\n204. 1100611-3 — 1 шт\n205. 1102783 — 3 шт\n206. 1110429-100 — 1 шт\n207. 186273-36 — 4 шт\n208. 190185-203 — 4 шт\n209. 233958-1 — 1 шт\n210. 301314-18 — 2 шт\n211. 301315-13 — 4 шт\n212. 301315-18 — 16 шт\n213. 70-30093-1 — 392 шт\n214. 908539C1 — 1 шт\n215. 908579C1 — 14 шт\n216. 917345C1 — 9 шт\n217. 960592C1 — 4 шт\n218. 990905C1 — 1 шт\n219. 999214C1 — 1 шт\n220. 2112736-1 — 36 шт\n221. 602994C1 — 1 шт\n222. 996504B1 — 1 шт\n223. FT20300-103 — 1 шт\n224. FT28222-302 — 1 шт\n225. FT51010-104 — 1 шт\n226. FT61127-100 — 1 шт\n227. FT61148-100 — 1 шт\n228. FT67022-201 — 1 шт\n229. FT67073-100 — 2 шт\n230. FT20025 — 1 шт\n231. FT20026-100 — 1 шт\n232. FT28410 — 1 шт\n233. 1054986-2 — 1 шт\n234. 120848-4 — 3 шт\n235. 190187-300 — 1 шт\n236. 1046490 — 1 шт\n237. 1046492 — 1 шт\n238. 1059715 — 2 шт\n239. 1065110 — 1 шт\n240. 1065748 — 1 шт\n241. 1093866 — 1 шт\n242. 907563C2 — 1 шт\n243. 945061C1 — 1 шт\n244. 967952C1 — 1 шт\n245. 999215C1 — 1 шт\n246. FT21204 — 1 шт\n247. FT21205-101 — 1 шт\n248. FT28301-103 — 1 шт\n249. FT67032-100 — 1 шт\n250. 1017509 — 2 шт\n251. 1017510 — 1 шт\n252. 1031741-4 — 1 шт\n253. 1034549-80 — 1 шт\n254. 1034549-81 — 1 шт\n255. 1043265-1 — 76 шт\n256. 1043265-3 — 41 шт\n257. 1043265-4 — 18 шт\n258. 1043265-7 — 34 шт\n259. 1043265-9 — 3 шт\n260. 1046415-57 — 1 шт\n261. 1046415-79 — 4 шт\n262. 1053038-26 — 2 шт\n263. 1053928-3 — 2 шт\n264. 1053929-6 — 1 шт\n265. 1060367-2 — 1 шт\n266. 1064851-1 — 2 шт\n267. 1064851-2 — 1 шт\n268. 1064851-4 — 2 шт\n269. 1071411-1 — 12 шт\n270. 1071411-3 — 2 шт\n271. 1076251-1 — 1 шт\n272. 1087360 — 1 шт\n273. 1087370 — 1 шт\n274. 1088442-4 — 1 шт\n275. 1106298-1 — 2 шт\n276. 1286570-1 — 1 шт\n277. 1577354-2401 — 1 шт\n278. 1654366 — 4 шт\n279. 1756-ENBT — 7 шт\n280. 190377-1806 — 1 шт\n281. 301315-702 — 1 шт\n282. 5SY6202-7 — 1 шт\n283. 600375C1 — 1 шт\n284. 603857C1 — 9 шт\n285. 903536C1 — 4 шт\n286. 908700C2 — 2 шт\n287. 964905C1 — 1 шт\n288. 991707C1 — 2 шт\n289. 991708C1 — 2 шт\n290. 991709C1 — 3 шт\n291. 995648C1 — 3 шт\n292. 997812C1 — 1 шт\n293. 998964C1 — 1 шт\n294. 998965C1 — 1 шт\n295. 998966C1 — 1 шт\n296. 998967C1 — 1 шт\n297. 999979C1 — 1 шт\n298. 999980C1 — 1 шт\n299. FT21041-101 — 1 шт\n300. FT61200-101 — 1 шт\n301. FT67026 — 1 шт\n302. KFD2-SR2-Ex2.W — 7 шт\n\nЕсли позиции нет в наличии, достаточно одного слова «нет» — это тоже ответ. Если у позиции есть действующая замена, просим назвать её номер.\n\nС уважением,\nКВАНТ"
+  }
+ ],
+ "verification": {
+  "checked_cards": [
+   {
+    "pn": "100606",
+    "url": "https://www.agkits.com/Perkins-Engine-Rebuild-Kits-1006-06.aspx",
+    "number_on_page": true
+   },
+   {
+    "pn": "1794-IRT8",
+    "url": "https://hardtoget.parts/product/solar-turbines-1794-irt8/",
+    "number_on_page": true
+   },
+   {
+    "pn": "WF2076",
+    "url": "https://www.dieselpartsdirect.com/wf2076",
+    "number_on_page": true
+   }
+  ],
+  "invented_address": "https://www.agkits.com/Perkins-Engine-Rebuild-Kits-1006-06.aspx/product/solar-turbines-9999999-77/",
+  "invented_address_returns_that_number": false,
+  "what_it_means": "Номер обязан быть НА СТРАНИЦЕ, а выдуманный адрес того же вида не должен отдавать карточку с этим номером. Если отдаёт — витрина генерирует страницы под любой запрос, и указателю верить нельзя."
+ },
+ "why_one_letter": "Все совпадения пришлись на одного оператора с двумя каталогами, поэтому это один запрос на все его позиции, а не отдельный разбор по каждой строке. Спрашиваются только те строки, по которым цены у нас ещё нет. Наших цифр, вилок и имени заказчика в письме нет.",
+ "rows": [
+  {
+   "pn": "100606",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "agkits.com",
+     "url": "https://www.agkits.com/Perkins-Engine-Rebuild-Kits-1006-06.aspx"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1007799",
+   "qty": 19,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1007799/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1007799/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1008364-1",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008364-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008364-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008364-2",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008364-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008364-2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008364-3",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008364-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008364-3/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008364-4",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008364-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008364-4/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008364-5",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008364-5/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008364-5/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008378-1",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008378-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008378-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008378-2",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008378-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008378-2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008378-3",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008378-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008378-3/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008378-4",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008378-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008378-4/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008378-5",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008378-5/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008378-5/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1008726",
+   "qty": 108,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1008726/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1008726/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1010135",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1010135/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1010135/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1010446",
+   "qty": 14,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1010446/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1010446/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1013121-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1013121-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1013121-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1014214-21",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1014214-21/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1014214-21/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1015230",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1015230/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1015230/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1015231",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1015231/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1015231/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1016515",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1016515/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1016515/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1016573",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1016573/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1016573/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1017509",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017509/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017509/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1017510",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017510/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017510/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1017876",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017876/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017876/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1017879",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017879/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017879/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1017890",
+   "qty": 17,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017890/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017890/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1017891",
+   "qty": 108,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017891/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017891/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1017892",
+   "qty": 19,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017892/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017892/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1017893",
+   "qty": 11,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017893/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017893/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1017894",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017894/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017894/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1017895",
+   "qty": 12,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017895/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017895/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1017899",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017899/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017899/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1017901",
+   "qty": 47,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017901/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017901/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1017902",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017902/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017902/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1017904",
+   "qty": 15,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017904/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017904/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1017905",
+   "qty": 21,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017905/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017905/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1017908",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1017908/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1017908/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1019197",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1019197/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1019197/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1019431-1600",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1019431-1600/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1019431-1600/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1020105",
+   "qty": 21,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1020105/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1020105/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1020225",
+   "qty": 32,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1020225/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1020225/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1022447",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1022447/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1022447/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1023031-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1023031-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1023031-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1023031-3",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1023031-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1023031-3/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1023518-201",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1023518-201/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1023518-201/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1024780-122",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1024780-122/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1024780-122/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1024780-3P541",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1024780-3p541/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1024780-3p541/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1024941",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1024941/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1024941/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1027484-101",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1027484-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1027484-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1031741-4",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1031741-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1031741-4/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1034347-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1034347-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1034347-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1034549-21",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1034549-21/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1034549-21/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1034549-43",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1034549-43/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1034549-43/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1034549-80",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1034549-80/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1034549-80/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1034549-81",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1034549-81/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1034549-81/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1037762-20",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1037762-20/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1037762-20/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1038428-3",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1038428-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1038428-3/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1042018-202",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1042018-202/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1042018-202/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1042018-3400",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1042018-3400/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1042018-3400/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1043265-1",
+   "qty": 76,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1043265-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1043265-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1043265-3",
+   "qty": 41,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1043265-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1043265-3/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1043265-4",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1043265-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1043265-4/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1043265-5",
+   "qty": 57,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1043265-5/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1043265-5/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1043265-7",
+   "qty": 34,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1043265-7/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1043265-7/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1043265-9",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1043265-9/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1043265-9/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1043614-500",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1043614-500/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1043614-500/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1045095-201",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1045095-201/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1045095-201/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1046415-30",
+   "qty": 25,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1046415-30/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046415-30/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1046415-57",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1046415-57/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046415-57/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1046415-60",
+   "qty": 23,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1046415-60/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046415-60/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1046415-79",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1046415-79/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046415-79/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1046485",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1046485/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046485/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1046489",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1046489/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046489/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1046490",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1046490/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046490/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1046491",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/elteco-1046491/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046491/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1046492",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1046492/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1046492/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1051931-67",
+   "qty": 20,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1051931-67/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1051931-67/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1051931-69",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1051931-69/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1051931-69/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1051931-71",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1051931-71/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1051931-71/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1052168-23",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1052168-23/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1052168-23/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1053038-19",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1053038-19/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1053038-19/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1053038-26",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1053038-26/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1053038-26/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1053038-28",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1053038-28/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1053038-28/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": true
+  },
+  {
+   "pn": "1053038-35",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1053038-35/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1053038-35/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1053400",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1053400/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1053400/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1053928-3",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1053928-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1053928-3/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1053929-6",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1053929-6/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1053929-6/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1054813-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1054813-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1054813-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1054986-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1054986-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1054986-2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1055666",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1055666/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1055666/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1056369-30",
+   "qty": 83,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1056369-30/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1056369-30/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1059701-10",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1059701-10/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1059701-10/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1059701-8",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1059701-8/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1059701-8/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1059715",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1059715/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1059715/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1060045-60",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060045-60/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060045-60/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1060045-83",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060045-83/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060045-83/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1060150",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060150/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060150/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1060151",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060151/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060151/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1060152",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060152/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060152/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1060367-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060367-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060367-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1060367-500",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060367-500/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060367-500/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1060367-600",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060367-600/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060367-600/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1060817-10",
+   "qty": 63,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060817-10/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060817-10/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1060817-40",
+   "qty": 27,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1060817-40/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1060817-40/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1062000",
+   "qty": 190,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1062000/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1062000/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1062257-1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1062257-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1062257-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1062883-200",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1062883-200/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1062883-200/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1062952-1",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1062952-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1062952-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1062952-2",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1062952-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1062952-2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1062952-3",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1062952-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1062952-3/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1062952-4",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1062952-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1062952-4/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1062952-5",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1062952-5/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1062952-5/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1063321-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1063321-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1063325-1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1063325-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1063325-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1063390-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1063390-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1063390-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1064405-1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1064405-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1064405-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1064721-14",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1064721-14/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1064721-14/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1064728-1",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1064728-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1064728-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1064728-4",
+   "qty": 12,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1064728-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1064728-4/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1064829-4",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1064829-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1064829-4/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1064851-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1064851-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1064851-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1064851-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1064851-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1064851-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1064851-4",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1064851-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1064851-4/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1065110",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1065110/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1065110/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1065717-300",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1065717-300/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1065717-300/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1065748",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1065748/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1065748/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1066290-2",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1066290-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1066290-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1066738-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1066738-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1066738-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1066738-4",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1066738-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1066738-4/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1067366-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1067366-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1067366-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1067628-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1067628-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1067628-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1068334",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1068334/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1068334/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1069873-1",
+   "qty": 36,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1069873-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1069873-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1071146-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1071146-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1071146-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1071327-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1071327-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1071327-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1071411-1",
+   "qty": 12,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1071411-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1071411-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1071411-3",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1071411-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1071411-3/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1072904",
+   "qty": 84,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1072904/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1072904/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1075721",
+   "qty": 345,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1075721/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1075721/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1076251-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1076251-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1076251-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1078325-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1078325-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1078325-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1078325-17",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1078325-17/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1078325-17/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1078695-50",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1078695-50/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1078695-50/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1081051",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1081051/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1081051/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1084352-4030",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1084352-4030/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1084352-4030/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1085271-1004",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1085271-1004/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1085271-1004/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1087360",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1087360/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1087360/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1087370",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1087370/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1087370/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1087491-3",
+   "qty": 63,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1087491-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1087491-3/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1087576-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1087576-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1087576-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1088209-1000",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1088209-1000/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1088209-1000/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1088209-1400",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1088209-1400/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1088209-1400/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1088442-4",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1088442-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1088442-4/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1088912",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1088912/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1088912/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1089034-3",
+   "qty": 27,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1089034-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1089034-3/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1089241-28",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1089241-28/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1089241-28/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": true
+  },
+  {
+   "pn": "1093866",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1093866/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1093866/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1100611-3",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1100611-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1100611-3/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1102783",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1102783/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1102783/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1105336-1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1105336-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1105336-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1106120-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1106120-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1106120-2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1106298-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1106298-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1106298-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1106298-29",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1106298-29/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1106298-29/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1110429-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1110429-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1110429-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1110429-1700",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1110429-1700/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1110429-1700/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1110429-2700",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1110429-2700/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1110429-2700/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1110655-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1110655-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1110655-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1112225-1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1112225-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1112225-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1112227-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1112227-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1112227-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1112764-1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1112764-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1112764-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1112766-1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1112766-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1112766-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "112056-1",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-112056-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-112056-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "116091-21",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-116091-21/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-116091-21/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "120022-7",
+   "qty": 24,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120022-7/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120022-7/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "120029-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120029-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120029-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "120029-5",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "agkits.com",
+     "url": "https://www.agkits.com/caterpillar-bearing-cup-case-hardened-1200295.aspx"
+    },
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120029-5/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120029-5/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "120029-8",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120029-8/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120029-8/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "120045-13",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120045-13/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120045-13/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "120373-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120373-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120373-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "120554",
+   "qty": 110,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "shop.moderngroup.com",
+     "url": "https://shop.moderngroup.com/900-1902-07-bushing-f-2-7-16-chipper-sheave-m-250-120554/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "120649-18",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120649-18/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120649-18/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "120712-11",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120712-11/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120712-11/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "120712-5",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120712-5/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120712-5/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "120765-1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120765-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120765-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "120848-4",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-120848-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-120848-4/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "124907-19",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-124907-19/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-124907-19/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "124907-20",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-124907-20/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-124907-20/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "124907-25",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-12490725/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-124907-25/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "124907-4",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-124907-4/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-124907-4/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "124907-7",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-124907-7/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-124907-7/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1283807-900",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1283807-900/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1283807-900/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1286570-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1286570-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1286570-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "130161-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-130161-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-130161-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "131230-6",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-131230-6/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-131230-6/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "136210-38",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-136210-38/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-136210-38/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "136845-1",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-136845-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-136845-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1577354-2401",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1577354-2401/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1577354-2401/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1602894-11",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1602894-11/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1602894-11/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1602894-7",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1602894-7/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1602894-7/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1654366",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1654366/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1654366/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "170180-01-00",
+   "qty": 24,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-170180-01-00/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-170180-01-00/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "172514-2",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-172514-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-172514-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "172523-2",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-172523-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-172523-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "172567-1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-172567-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-172567-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "173101-2",
+   "qty": 59,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-173101-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-173101-2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "173942-1",
+   "qty": 17,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-173942-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-173942-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1756-ENBT",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1756-enbt/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1756-enbt/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1756-PB75",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1756-pb75/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1756-pb75/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1794-IE8",
+   "qty": 58,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1794-ie8/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1794-ie8/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1794-IRT8",
+   "qty": 40,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1794-irt8/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1794-irt8/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": true
+  },
+  {
+   "pn": "1794-OB16P",
+   "qty": 25,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1794-ob16p/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1794-ob16p/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "1799637-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1799637-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1799637-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "1799637-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1799637-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1799637-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "180431-1",
+   "qty": 151,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-180431-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-180431-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "186212-100",
+   "qty": 40,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186212-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186212-100/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "186232-2400",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186232-2400/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186232-2400/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "186232-3000",
+   "qty": 15,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186232-3000/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186232-3000/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "186273-1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186273-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186273-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "186273-36",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186273-36/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186273-36/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "186276-1",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186276-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186276-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "186280-600",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186280-600/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186280-600/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "186648-1",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186648-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186648-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "186648-3",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186648-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186648-3/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "186648-700",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-186648-700/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-186648-700/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "190015-10",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190015-10/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190015-10/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "190015-12",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190015-12/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190015-12/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "190016-10",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190016-10/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190016-10/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "190016-9",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190016-9/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190016-9/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "190185-203",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190185-203/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190185-203/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "190187-300",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190187-300/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190187-300/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "190377-1806",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190377-1806/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190377-1806/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "190392-3",
+   "qty": 13,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190392-3/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190392-3/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "190537-102",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190537-102/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190537-102/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "190537-302",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190537-302/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190537-302/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "190583-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190583-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190583-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "190584-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190584-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190584-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "190584-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190584-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190584-2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "190619-2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190619-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190619-2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "190817-14",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190817-14/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190817-14/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "190826-1",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-190826-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-190826-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "1950-10-2F",
+   "qty": 1,
+   "sheet": "НВН",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-1950-10-2f/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-1950-10-2f/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "199515-1",
+   "qty": 830,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-199515-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-199515-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "199543-2",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-199543-2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-199543-2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "2018739-202",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-2018739-202/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-2018739-202/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "2018740-202",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-2018740-202/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-2018740-202/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "2027098-12",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-2027098-12/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-2027098-12/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "2112736-1",
+   "qty": 36,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-2112736-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-2112736-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "219691-101",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-219691-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-219691-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "231400",
+   "qty": 138,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/klinger-231400/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "233958-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-233958-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-233958-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "301314-18",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-301314-18/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-301314-18/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "301315-13",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-301315-13/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-301315-13/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "301315-14",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-301315-14/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-301315-14/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "301315-18",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-301315-18/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-301315-18/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "301315-702",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-301315-702/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-301315-702/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "301390-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-301390-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-301390-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "302161-40",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-302161-40/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-302161-40/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "304649-100",
+   "qty": 108,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-304649-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-304649-100/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "3087911",
+   "qty": 373,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "agkits.com",
+     "url": "https://www.agkits.com/cummins-seal-o-ring-3087911.aspx"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "3160404",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "turbotech.in",
+     "url": "https://turbotech.in/product-tag/3160404/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "3408345",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/3408345"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "372903-1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-372903-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-372903-1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "3RT2926-1ER00",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "controlparts.com",
+     "url": "https://controlparts.com/products/3rt2926-1er00"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "4067146",
+   "qty": 773,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "agkits.com",
+     "url": "https://www.agkits.com/cummins-ignition-coil-gasket-4067146.aspx"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "4088833",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "turbotech.in",
+     "url": "https://turbotech.in/product-tag/4088833/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "420004",
+   "qty": 5,
+   "sheet": "НВН",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/unison-420004/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "4326595",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "turbotech.in",
+     "url": "https://turbotech.in/product-tag/4326595/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "4327239",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "turbotech.in",
+     "url": "https://turbotech.in/product-tag/4327239/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "4384138",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/4384138"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "500-139",
+   "qty": 1,
+   "sheet": "НВН",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/ge-500-139/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "5594377",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/5594377"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "5SY6202-7",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/ge-5sy6-202-7/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "600187C1",
+   "qty": 85,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-600187c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-600187c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "600257C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-600257c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-600257c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "600375C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-600375c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-600375c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "601662C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-601662c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-601662c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "602386C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-602386c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-602386c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "602811C1",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-602811c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-602811c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "602994C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-602994c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-602994c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "603006C1",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-603006c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-603006c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "603857C1",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-603857c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-603857c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "604014C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-604014c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-604014c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "604532C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-604532c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-604532c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "64/60082032/1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/aviation-parts-64600820321/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "70-30093-1",
+   "qty": 392,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-70-30093-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-70-30093-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "70-30108-1",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-70-30108-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-70-30108-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "70-30815-1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-70-30815-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-70-30815-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "70-31237-1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-70-31237-1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-70-31237-1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "700582C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-700582c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-700582c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "701417C1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-701417c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-701417c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "80-30549-100",
+   "qty": 14,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-80-30549-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-80-30549-100/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "80-30550-900",
+   "qty": 11,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-80-30550-900/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-80-30550-900/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "800306",
+   "qty": 1,
+   "sheet": "НВН",
+   "cards": [
+    {
+     "host": "shop.moderngroup.com",
+     "url": "https://shop.moderngroup.com/800130-big-joe-oem-replaced-by-800306/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903223C1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903223c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903223c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903235C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903235c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903235c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903246C1",
+   "qty": 64,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903246c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903246c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "903249C1",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903249c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903249c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903268C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903268c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903268c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903270C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903270c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903270c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903289C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903289c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903289c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903315C1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903315c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903315c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903316C1",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903316c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903316c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "903375C1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903375c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903375c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "903424C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903424c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903424c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903509C1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903509c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903509c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "903536C1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903536c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903536c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903537C1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903537c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903537c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "903556C1",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903556c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903556c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "903560C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903560c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903560c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "903732C1",
+   "qty": 38,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-903732c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-903732c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "907563C2",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-907563c2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-907563c2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "908060C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-908060c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-908060c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "908221C1",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-908221c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-908221c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "908539C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-908539c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-908539c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "908579C1",
+   "qty": 14,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-908579c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-908579c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "908700C2",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-908700c2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-908700c2/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "909106C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-909106c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-909106c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "912642C1",
+   "qty": 14,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-912642c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-912642c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "915243C1",
+   "qty": 24,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-915243c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-915243c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "915244C1",
+   "qty": 19,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-915244c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-915244c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "917345C1",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-917345c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-917345c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "917427С1",
+   "qty": 27,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-917427c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-917427c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "918018C1",
+   "qty": 32,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-918018c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-918018c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "945061C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-945061c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-945061c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "950232C1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-950232c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-950232c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "950781C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-950781c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-950781c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "950895C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-950895c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-950895c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "950944C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-950944c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-950944c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "952248C1",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-952248c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-952248c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "952504C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-952504c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-952504c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "952876C1",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-952876c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-952876c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "953160C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-953160c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-953160c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "955518C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-955518c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-955518c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "960363C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-960363c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-960363c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "960592C1",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-960592c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-960592c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "962694C1",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-962694c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-962694c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "964587C1",
+   "qty": 109,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-964587c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-964587c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "964686C1",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-964686c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-964686c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "964905C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-964905c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-964905c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "967664C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-967664c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-967664c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "967692C1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-967692c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-967692c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "967924C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-967924c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-967924c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "967952C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-967952c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-967952c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "969017C1",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-969017c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-969017c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "969582C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-969582c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-969582c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "969677C1",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-969677c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-969677c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "970564C1",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-970564c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-970564c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "990905C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-990905c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-990905c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "991707C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-991707c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-991707c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "991708C1",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-991708c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-991708c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "991709C1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-991709c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-991709c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "993359C1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-993359c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-993359c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "993672C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-993672c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-993672c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "995648C1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-995648c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-995648c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "996504B1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-996504b1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-996504b1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "996510C1",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-996510c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-996510c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "997396C1",
+   "qty": 46,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-997396c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-997396c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "997697C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-997697c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-997697c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "997812C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-997812c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-997812c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "998882C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-998882c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-998882c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "998964C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-998964c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-998964c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "998965C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-998965c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-998965c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "998966C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-998966c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-998966c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "998967C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-998967c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-998967c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "999007C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-999007c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-999007c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "999214C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-999214c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-999214c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "999215C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-999215c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-999215c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "999340C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-999340c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-999340c1/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "999979C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-999979c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-999979c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "999980C1",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-999980c1/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-999980c1/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "CC2602M",
+   "qty": 76,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-cc2602-m/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-cc2602-m/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "FS1000",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/fs1000"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "FT20025",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20025/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20025/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20026-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20026-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20026-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20027",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20027/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20027/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20029",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20029/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20029/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20030-102",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20030-102/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20030-102/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20032-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20032-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20032-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20048-202",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20048-202/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20048-202/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20060-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20060-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20060-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20198-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20198-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20198-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20300-103",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20300-103/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20300-103/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT20870-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft20870-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft20870-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT21008-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft21008-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft21008-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT21041-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft21041-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft21041-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT21204",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft21204/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft21204/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT21205-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft21205-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft21205-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT21609-108",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft21609-108/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft21609-108/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT27701-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft27701-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft27701-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT27802",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft27802/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft27802/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT28001-103",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft28001-103/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft28001-103/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT28198-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft28198-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft28198-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT28222-302",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft28222-302/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft28222-302/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT28301-103",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft28301-103/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft28301-103/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT28410",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft28410/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft28410/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT28515-102",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft28515-102/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft28515-102/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT28877-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft28877-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft28877-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT51010-104",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft51010-104/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft51010-104/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT61012-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft61012-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft61012-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT61014-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft61014-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft61014-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT61016",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft61016/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft61016/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT61045-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft61045-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft61045-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT61090",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft61090/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft61090/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT61127-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft61127-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft61127-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT61148-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft61148-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft61148-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT61200-101",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft61200-101/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft61200-101/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT67006-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft67006-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft67006-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT67022-201",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft67022-201/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft67022-201/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT67026",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft67026/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft67026/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT67032-100",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft67032-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft67032-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "FT67073-100",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-ft67073-100/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-ft67073-100/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "KFD2-EB2",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-kfd2-eb2/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-kfd2-eb2/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "KFD2-SR2-Ex2.W",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-kfd2-sr2-ex2-w/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-kfd2-sr2-ex2-w/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "LF9050",
+   "qty": 483,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/lf9050"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "MVI56-MCM",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/solar-turbines-mvi56-mcm/"
+    },
+    {
+     "host": "turbine.parts",
+     "url": "https://turbine.parts/product/turbine-parts-mvi56-mcm/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "SP027886",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "hardtoget.parts",
+     "url": "https://hardtoget.parts/product/turbine-parts-sp027886/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": false
+  },
+  {
+   "pn": "WF2075",
+   "qty": 56,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/wf2075"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "WF2076",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/wf2076"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  }
+ ]
+}

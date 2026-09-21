@@ -130,6 +130,23 @@ BY_SEGMENT_SQL = """
 select coalesce(d.segment_id, '—') as sid, count(*) as n
 from {src} d group by 1 order by 2 desc"""
 
+# Глубина сегмента: одной доли спроса мало, чтобы решить, куда идти следующей
+# разведкой. 238 тысяч строк по насосам могут оказаться тремя сделками с одним
+# изготовителем — и тогда это не рынок, а один клиент. Поэтому рядом с долей
+# считаются разные номера, разные изготовители, сделки и файлы-источники.
+#
+# Только счётчики: count и count(distinct). Наименований позиций, номеров
+# сделок и почт в журнале прогона быть не должно — репозиторий публичный,
+# правило записано в CLAUDE.md.
+SEGMENT_DEPTH_SQL = """
+select coalesce(d.segment_id, '—')                        as sid,
+       count(*)                                           as позиций,
+       count(distinct nullif(btrim(d.part_number), ''))   as номеров,
+       count(distinct nullif(btrim(d.oem), ''))           as изготовителей,
+       count(distinct nullif(btrim(d.deal_id), ''))       as сделок,
+       count(distinct nullif(btrim(d.source_file), ''))   as файлов
+from {src} d group by 1 order by 2 desc"""
+
 # Разметка: сколько помечено, сколько снято, какими прогонами.
 JUNK_SQL = """
 select rule,
@@ -227,6 +244,18 @@ def main() -> int:
             for sid, n in rows(cur, BY_SEGMENT_SQL.format(src=src)):
                 nm = name_of(None if sid == "—" else sid)
                 print(f"  {nm:34}{num(n)}{n / total * 100:>8.1f}%")
+
+            # Доля спроса сама по себе не говорит, стоит ли идти в направление:
+            # крупная доля из одной сделки — это один клиент, а не рынок.
+            block("глубина сегмента — сколько за долей стоит на самом деле")
+            print(f"  {'сегмент':30}{'позиций':>11}{'номеров':>10}{'изготов.':>10}"
+                  f"{'сделок':>9}{'файлов':>9}{'номеров/сделку':>16}")
+            for sid, поз, номеров, изг, сделок, файлов in rows(
+                    cur, SEGMENT_DEPTH_SQL.format(src=src)):
+                nm = name_of(None if sid == "—" else sid)
+                на_сделку = f"{номеров / сделок:.0f}" if сделок else "—"
+                print(f"  {nm:30}{num(поз, 11)}{num(номеров, 10)}{num(изг, 10)}"
+                      f"{num(сделок, 9)}{num(файлов, 9)}{на_сделку:>16}")
 
         if present.get("lib_files"):
             block("вложения Битрикса")

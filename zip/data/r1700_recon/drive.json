@@ -1,0 +1,1924 @@
+{
+ "slice": "drive",
+ "rows": [
+  {
+   "pn": "180-3568",
+   "name_ru": "Гидротрансформатор с повышающей передачей, аррангемент (в сборе)",
+   "name_en": "TORQUE CONVERTER & UPDRIVE AR",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G — арр. ГТР силовой передачи; включает 180-0323 TORQUE CONVERTER & UPDRIVE GP",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar SIS",
+     "pn": "180-3568",
+     "kind": "оригинал",
+     "note": "привязка к R1700G — раздел POWER TRAIN каталога SEBP3045: https://spare.avspart.com/caterpillar/sebp3045/ctl00002201/"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://aftermarket.express/caterpillar/1803568",
+   "confidence": "med",
+   "verdict": "подтверждён",
+   "note": "проверено вручную 12.09.2026: гидротрансформатор, Cat Reman 10R-5519, в описании — R1700G | ПРОВЕРКА 13.09.2026 (привод): наименование TORQUE CONVERTER & UPDRIVE AR подтверждено карточкой aftermarket.express (теги Power train / Converters / Drives, масса 518,9 кг) и индексом POWER TRAIN каталога SEBP3045 (R1700G 8XZ00001-UP), где 180-0323 значится входящим в 180-3568. ОГОВОРКА: пара Reman 10R-5519 = 180-3568 подтверждается только одним продавцом (bullpowertrain.com); в parts.cat.com номера 10R-5519 нет, при заказе Reman требовать подтверждение дилера."
+  },
+  {
+   "pn": "180-0323",
+   "name_ru": "Гидротрансформатор с повышающей передачей, группа",
+   "name_en": "TORQUE CONVERTER & UPDRIVE GP",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G — входит в 180-3568; внутри собственно ГТР 1T-1872 TORQUE CONVERTER GP",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar SIS",
+     "pn": "180-0323",
+     "kind": "оригинал",
+     "note": "раздел POWER TRAIN SEBP3045: https://spare.avspart.com/caterpillar/sebp3045/ctl00002201/"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://aftermarket.express/caterpillar/1800323",
+   "confidence": "med",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): вхождение 180-0323 → 180-3568 и 1T-1872 → 180-0323 подтверждено страницей индекса POWER TRAIN SEBP3045 (R1700G 8XZ00001-UP)."
+  },
+  {
+   "pn": "1T-1872",
+   "name_ru": "Гидротрансформатор (собственно ГТР, сердце узла)",
+   "name_en": "TORQUE CONVERTER GP",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G — входит в 180-0323 / 180-3568",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "1T-1872",
+     "kind": "новый неоригинал",
+     "note": "$12,082 — https://aftermarket.express/caterpillar/1t1872"
+    }
+   ],
+   "price_usd": "12082",
+   "source": "https://aftermarket.express/caterpillar/1t1872",
+   "confidence": "med",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): вхождение в 180-0323 / 180-3568 подтверждено индексом POWER TRAIN SEBP3045. Цена $12 082 повторно не подтверждалась — котировку брать заново."
+  },
+  {
+   "pn": "212-0092",
+   "name_ru": "Гидротрансформатор с повышающей передачей, аррангемент — НЕ R1700G (AD30)",
+   "name_en": "TORQUE CONVERTER & UPDRIVE AR",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "Cat AD30 Underground Articulated Truck (двигатель C15). НЕ R1700G — деталь чужая",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://aftermarket.express/caterpillar/2120092",
+   "confidence": "low",
+   "verdict": "снят",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): СНЯТО: по AVSpare 212-0092 — TORQUE CONVERTER & UPDRIVE AR (не GP) для Cat AD30 (подземный шарнирный самосвал, двигатель C15), к R1700G отношения не имеет. Было: «Cat LHD семейства R1700G — вариант группы ГТР; конкретный серийный диапазон не подтверждён» и наименование «TORQUE CONVERTER & UPDRIVE GP». Строка оставлена как след ошибки: в закупку не берём."
+  },
+  {
+   "pn": "210-3137",
+   "name_ru": "Гидротрансформатор, базовая группа — НЕ R1700G (AD30)",
+   "name_en": "TORQUE CONVERTER GP-BASIC",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "Cat AD30 Underground Articulated Truck (C15). НЕ R1700G — деталь чужая",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://spare.avspart.com/caterpillar/torque/2103137/",
+   "confidence": "low",
+   "verdict": "снят",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): СНЯТО: 210-3137 TORQUE CONVERTER GP относится к Cat AD30 (подземный шарнирный самосвал, двигатель C15). Совпадение в поиске по слову «torque converter» выдачей за применимость не является. Было: «Cat LHD; выходит в выдаче по ГТР R1700G, применимость косвенная». Строка оставлена как след ошибки."
+  },
+  {
+   "pn": "163-2017",
+   "name_ru": "Силовая передача, аррангемент (весь привод машины)",
+   "name_en": "POWER TRAIN AR",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G (8XZ) — верхний арр. силовой передачи, в него входит 164-4239 CONVERSION AR-TRANSMISSION",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://aftermarket.express/caterpillar/1632017",
+   "confidence": "med",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): 163-2017 POWER TRAIN AR подтверждён как верхний арр. силовой передачи R1700G LOAD HAUL DUMP 8XZ00001-UP (индекс POWER TRAIN каталога SEBP3045)."
+  },
+  {
+   "pn": "164-4239",
+   "name_ru": "Комплект переоборудования КПП (конверсия трансмиссии)",
+   "name_en": "CONVERSION AR-TRANSMISSION",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G, машины 8XZ0231–00258; входит в 163-2017 POWER TRAIN AR",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://aftermarket.express/caterpillar/1644239",
+   "confidence": "med",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): 164-4239 CONVERSION AR-TRANSMISSION подтверждён: входит в 163-2017 POWER TRAIN AR, серийный диапазон машин 8XZ00231-00258 (SEBP3045). Диапазон узкий — перед заказом сверить PIN."
+  },
+  {
+   "pn": "3Q-6243",
+   "name_ru": "Клапан управления коробкой передач (блок управления КПП)",
+   "name_en": "VALVE GP-TRANSMISSION CONTROL",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G, КПП S/N KSR1-UP (SBR-машины с двигателем C11); в него входит 109-9538",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "3Q-6243",
+     "kind": "новый неоригинал",
+     "note": "$13,104, склад Tennessee — https://aftermarket.express/caterpillar/3q6243"
+    }
+   ],
+   "price_usd": "13104",
+   "source": "https://spare.avspart.com/caterpillar/sebp3612/sebp3612059/",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён заголовком страницы SEBP3612 (S/N KSR1-UP, R1700G): 109-9538 входит в 3Q-6243 VALVE GP-TRANSMISSION CONTROL. Дополнительно: 3Q-6243 сам входит в 3Q-6242 CONTROL GP-TRANSMISSION HYD и применяется не только на R1700G, но и на R1600/R1600G/R1600H/R1700 II — то есть это семейный узел, а не уникальный. Цена $13 104 подтверждена на aftermarket.supply (новый неоригинал, 62 кг)."
+  },
+  {
+   "pn": "109-9538",
+   "name_ru": "Клапан-селектор с регулятором давления КПП (модулирующий)",
+   "name_en": "VALVE GP-SELECTOR & PRESS CONT",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G, КПП S/N KSR1-UP; входит в 3Q-6243 VALVE GP-TRANSMISSION CONTROL",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "109-9538",
+     "kind": "новый неоригинал",
+     "note": "$2,340 — https://aftermarket.express/caterpillar/1099538"
+    }
+   ],
+   "price_usd": "2340",
+   "source": "https://spare.avspart.com/caterpillar/sebp3612/sebp3612059/",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён заголовком страницы каталога SEBP3612: «109-9538 VALVE GP-SELECTOR & PRESS CONT S/N KSR1-UP PART OF 3Q-6243 VALVE GP-TRANSMISSION CONTROL R1700G» (исполнение TYPE 1)."
+  },
+  {
+   "pn": "183-2460",
+   "name_ru": "Клапан-селектор с регулятором давления КПП (раннее исполнение)",
+   "name_en": "VALVE GP-SELECTOR & PRESS CONT",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G (8XZ); в него входит 1U-2226",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://spare.avspart.com/caterpillar/sebp3045/sebp3045069/",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён заголовком страницы SEBP3045: «1U2226 VALVE GP-SELECTOR & PRESS CONT This is part of 1832460 VALVE GP-SELECTOR & PRESS CONT R1700G» — ранняя машина 8XZ."
+  },
+  {
+   "pn": "1U-2226",
+   "name_ru": "Клапан-селектор с регулятором давления КПП (узел)",
+   "name_en": "VALVE GP-SELECTOR & PRESS CONT",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G (8XZ) — входит в 183-2460",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "1U-2226",
+     "kind": "новый неоригинал",
+     "note": "$300.08 (OEM $601.49), склад Kentucky — https://aftermarket.express/caterpillar/1u2226"
+    }
+   ],
+   "price_usd": "300",
+   "source": "https://spare.avspart.com/caterpillar/sebp3045/sebp3045069/",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): наименование VALVE GP-SELECTOR & PRESS CONT подтверждено карточкой parts.cat.com; вхождение в 183-2460 — страницей SEBP3045 по R1700G."
+  },
+  {
+   "pn": "284-9077",
+   "name_ru": "Раздаточная передача с корпусом (передача от ГТР на мосты)",
+   "name_en": "GEAR & CASE GP-TRANSFER",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G, S/N KSR1-UP (SBR, двигатель C11)",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://avspare.com/caterpillar/sebp3612/sebp3612053/",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): 284-9077 GEAR & CASE GP-TRANSFER подтверждён для R1700G LOAD HAUL DUMP SBR00001-UP (двигатель C11); S/N узла KSR1-UP. Это собственный номер R1700G — на R1300G II раздаточная другая (172-6145 / 346-2513)."
+  },
+  {
+   "pn": "138-1509",
+   "name_ru": "Экологический слив масла силовой передачи (пробка-кран для отбора/слива)",
+   "name_en": "DRAIN GP-ECOLOGY (POWER TRAIN OIL)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G, S/N KSR1-UP — входит в 284-9077 GEAR & CASE GP-TRANSFER; тот же номер в ГТР R1300G Series II (257-5937)",
+   "qty": "1",
+   "interval": "при каждой замене масла",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "138-1509",
+     "kind": "новый неоригинал",
+     "note": "$223.86 — https://aftermarket.express/caterpillar/1381509"
+    }
+   ],
+   "price_usd": "224",
+   "source": "https://avspare.com/caterpillar/sebp3612/sebp3612053/",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён с двух сторон: заголовок страницы SEBP3612 «138-1509 DRAIN GP-ECOLOGY -POWER TRAIN OIL S/N KSR1-UP PART OF 284-9077 GEAR & CASE GP-TRANSFER R1700G»; и SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM — поз. 11 в группе 257-5937 (R1300G II), в составе 7M-8485 SEAL-O-RING, 138-1510 PLUG, 192-1023 DRAIN AS, 077-3241 SEAL-O-RING. parts.cat.com: Power Train Oil Drain. Редкий случай действительно общей для семейства детали."
+  },
+  {
+   "pn": "8E-1217",
+   "name_ru": "Насос шестерённый односекционный (контур не установлен)",
+   "name_en": "PUMP GP-GEAR (ONE SECTION)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G — насос ГТР/КПП ТОЛЬКО по внутреннему перечню КВАНТ (KV-000500-9); parts.cat.com называет 8E-1217 односекционным шестерённым насосом без указания контура, CTP/Costex продаёт его в разделе Hydraulic Pumps. В каталогах R1300G Series II и на найденных страницах SEBP3045/SEBP3612 номер не встречается — контур не установлен",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "8E-1217",
+     "kind": "новый неоригинал",
+     "note": "$496.06 (OEM $2106.55), склад Florida — https://aftermarket.express/caterpillar/8e1217"
+    },
+    {
+     "brand": "CTP (Costex Tractor Parts)",
+     "pn": "8E1217",
+     "kind": "аналог",
+     "note": "CTP продаёт под номером Cat, листинг Amazon B00WP05YB8"
+    },
+    {
+     "brand": "HeavyDutyPros",
+     "pn": "8E1217",
+     "kind": "неоригинал",
+     "note": "позиционируется как Caterpillar Transmission Pump — https://www.heavydutypros.com/caterpillar-transmission-pump-8e1217.aspx"
+    }
+   ],
+   "price_usd": "496",
+   "source": "https://aftermarket.express/caterpillar/8e1217",
+   "confidence": "med",
+   "verdict": "сомнителен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): СОМНИТЕЛЬНО по функции. parts.cat.com называет 8E-1217 односекционным шестерённым насосом (one section gear pump), CTP/Costex продаёт его в разделе Hydraulic Pumps. Название «насос масляный гидротрансформатора / КПП» опирается только на внутренний перечень КВАНТ и на маркетинговый ярлык перепродавца HeavyDutyPros («Caterpillar Transmission Pump») — в каталоге Cat такого назначения нет. Ни в SEBP3608-05 (R1300G II), ни в найденных страницах SEBP3045/SEBP3612 номер не встречается: в КПП R1300G II насос 117-1653 в сборке 132-6120. Сравните: Cat отдельно называет насосы охлаждения тормозов (напр. 124-7720 PUMP GP-GEAR -FRONT BRAKE COOLING, HOIST) — то есть контур надо называть точно. До сверки по дереву POWER TRAIN R1700G в закупку не ставить как насос КПП. Цена на aftermarket.express на 13.09.2026 — $375,22 (в строке стояло $496,06)."
+  },
+  {
+   "pn": "169-4621",
+   "name_ru": "Насос шестерённый 132,48 см³/об (контур не подтверждён)",
+   "name_en": "PUMP GP-GEAR",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G — позиция из перечня КВАНТ и из запроса по R1700G на Supply.Parts; у Cat теги Power train / Pumps / Gears",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "169-4621",
+     "kind": "новый неоригинал",
+     "note": "$3,572 — https://aftermarket.express/caterpillar/1694621"
+    }
+   ],
+   "price_usd": "3572",
+   "source": "https://aftermarket.express/caterpillar/1694621",
+   "confidence": "med",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование. Было: «Насос шестерённый (контур силовой передачи)». По parts.cat.com 169-4621 — шестерённый насос рабочим объёмом 132,48 см³/об; контур («силовая передача») в каталоге не указан. Привязка к R1700G держится на заявке Supply.Parts #84240 («Caterpillar R1700G 169-4621 PUMP GROUP - GEAR») и на перечне КВАНТ — это спрос, а не каталог. Контур уточнить по дереву POWER TRAIN / HYDRAULIC R1700G."
+  },
+  {
+   "pn": "1R-0719",
+   "name_ru": "Фильтр масла КПП / гидросистемы (стандартная эффективность)",
+   "name_en": "FILTER AS-TRANSMISSION / HYDRAULIC OIL",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G — фильтр гидравлики/трансмиссии стандартной эффективности, типоразмер 4 x 9; в кроссах продавцов прямо перечислены R1600, R1600G, R1600H, R1700 II, R1700G, R2900, R2900G, R3000H. Позиция установки на машине (гидравлика или трансмиссия) по каталогу R1700G не сверена",
+   "qty": "1",
+   "interval": "500 ч (по ТО Cat)",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "343-4464",
+     "kind": "трансмиссионный фильтр того же типоразмера 4 x 9",
+     "note": "по таблице Cat PEHJ0069-03 «Transmission Filters»: 4 x 9 — рекомендуется 343-4464, заменяет 1R-0773 и 132-8875. Прямой строки «1R-0719 → 343-4464» в таблице НЕТ; это апгрейд по типоразмеру, а не официальная замена"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "1R-0773",
+     "kind": "advanced efficiency, тот же типоразмер 4 x 9",
+     "note": "строка 4 x 9 таблицы PEHJ0069-03: Standard 1R-0719 / Advanced 1R-0773 / UHE 132-8875 / Fire Resistant 4T-3131"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "132-8875",
+     "kind": "UHE (ultra high efficiency), 4 x 9",
+     "note": "там же; Cat предупреждает: в приводе UHE не всегда предпочтителен (байпас на вязком холодном масле)"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "4T-3131",
+     "kind": "огнестойкое исполнение, 4 x 9",
+     "note": "там же, колонка Fire Resistant"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://caterpillar.scene7.com/is/content/Caterpillar/C10467212",
+   "confidence": "med",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён: 1R-0719 — фильтр гидравлики/трансмиссии стандартной эффективности, типоразмер 4 x 9; в кроссе продавцов прямо перечислены R1600, R1600G, R1600H, R1700 II, R1700G, R2900, R2900G, R3000H. ИСПРАВЛЕНЫ пояснения к альтернативам (см. alts): по таблице Cat PEHJ0069-03 (а не SEBU9208) в строке 4 x 9 стоят 1R-0719 (Standard) / 1R-0773 (Advanced) / 132-8875 (UHE) / 4T-3131 (Fire Resistant) — этот перечень из строки верен; но трансмиссионный фильтр 343-4464 в той же таблице заявлен как замена 1R-0773 и 132-8875, а не 1R-0719. Интервал 500 ч по SEBU не проверен — брать из ТО по своему серийнику."
+  },
+  {
+   "pn": "134-2252",
+   "name_ru": "Датчик температуры масла гидротрансформатора",
+   "name_en": "SENSOR GP-TEMPERATURE (TORQUE CONVERTER OIL)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G — датчик температуры ГТР/гидробака по перечню КВАНТ (KV-000424-2, СКК 173335); в R1300G Series II — поз. 2 в группе 264-3245 SENSOR GP-TEMPERATURE (TORQUE CONVERTER OIL), а не в группе ГТР 257-5937",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "134-2252",
+     "kind": "новый неоригинал",
+     "note": "$112.64 (OEM $269.59), склад Texas — https://aftermarket.express/caterpillar/1342252"
+    }
+   ],
+   "price_usd": "113",
+   "source": "https://aftermarket.express/caterpillar/1342252",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНА привязка внутри R1300G II. Было: «тот же номер в ГТР R1300G Series II». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM 134-2252 стоит не в группе ГТР 257-5937, а поз. 2 в группе 264-3245 SENSOR GP-TEMPERATURE -TORQUE CONVERTER OIL (S/N RSL1-UP, входит в 257-5977 ELECTRICAL AR, ALSO AN ATTACHMENT); в самой группе ГТР 257-5937 датчик температуры — 118-7226 (поз. 10). ОГОВОРКА: 134-2252 — массовый датчик температуры Cat (3208, 3304, 3306, 3406B, 3408, C15, C18, 3508/3512/3516 и т.д.), к R1700G не уникален, назначение «масло ГТР» на R1700G взято из перечня КВАНТ."
+  },
+  {
+   "pn": "221-3411",
+   "name_ru": "Датчик давления масла трансмиссии",
+   "name_en": "SENSOR GP-PRESSURE (TRANSMISSION OIL)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G — из перечня КВАНТ по R1700G; в каталоге R1300G Series II — SENSOR GP-PRESSURE (TRANSMISSION OIL) в группе 283-0872",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://aftermarket.express/caterpillar/2213411",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён: parts.cat.com — Pressure Sensor (высокого давления); в перечне применимости прямо указаны AD30, AD45B, AD55, AD55B, R1300G II, R1700G, R2900G, R3000H. Группа R1300G II 283-0872 SENSOR GP-PRESSURE -TRANSMISSION OIL подтверждена по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM (221-3411 — поз. 1)."
+  },
+  {
+   "pn": "468-8211",
+   "name_ru": "Мост в сборе: колесо, бортовой редуктор и тормоз (арр.)",
+   "name_en": "WHEEL AR-FINAL DRIVE & BRAKE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G Load Haul Dump, S/N XBR00001-UP (двигатель C11); включает 468-8208 WHEEL AR-FINAL & BRAKE",
+   "qty": "2–4 (по числу бортов)",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Finning (дилер Cat, Канада)",
+     "pn": "4688211-EXC",
+     "kind": "обменный/восстановленный",
+     "note": "обменная позиция дилера — https://www.finning.com/en_CA/parts/ExchangePart/final-drive-brake-4688211-exc-1.html"
+    },
+    {
+     "brand": "китайский завод (Alibaba)",
+     "pn": "468-8211",
+     "kind": "аналог",
+     "note": "продаётся под номером Cat как Wheel Assembly для R1700G"
+    },
+    {
+     "brand": "Caterpillar / AVSpare",
+     "pn": "468-8211",
+     "kind": "оригинал",
+     "note": "наименование WHEEL AR-FINAL DRIVE & BRAKE — https://avspare.com/caterpillar/wheel/4688211/"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://www.alibaba.com/product-detail/468-8211-Engineering-Machinery-Parts-468_1601495450608.html",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "проверено вручную 12.09.2026: WHEEL AR-FINAL DRIVE & BRAKE, применимость R1700G Load Haul Dump | ПРОВЕРКА 13.09.2026 (привод): повторно подтверждён и уточнён серийный префикс: 468-8211 WHEEL AR-FINAL DRIVE & BRAKE — R1700G Load Haul Dump XBR00001-UP, двигатель C11 (AVSpare). Включает 468-8208. Обменная позиция дилера Finning (4688211-EXC) проверена по ссылке в alts."
+  },
+  {
+   "pn": "468-8208",
+   "name_ru": "Бортовой редуктор с тормозом в сборе (подгруппа моста)",
+   "name_en": "WHEEL AR-FINAL & BRAKE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — входит в 468-8211; предлагается восстановленным с гарантией 6 мес / 2000 ч, в т.ч. по обмену",
+   "qty": "2–4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "дилер Cat (восстановление)",
+     "pn": "468-8208",
+     "kind": "ремонт/обмен",
+     "note": "гарантия 6 месяцев или 2000 ч на детали и работы, продажа по обмену"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://aftermarket.express/caterpillar/4688208",
+   "confidence": "med",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): 468-8208 WHEEL AR-FINAL & BRAKE подтверждён как входящий в 468-8211, применимость R1700G. Восстановление с гарантией 6 мес / 2000 ч и продажа по обмену — предложение продавца, не гарантия Cat; условия подтверждать письмом."
+  },
+  {
+   "pn": "186-9940",
+   "name_ru": "Датчик (выключатель) давления в тормозной системе",
+   "name_en": "SWITCH GP-BRAKE PRESSURE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — входит в 203-2866 WARNING GP-BRAKE PRESSURE (RESIDUAL), навесное оборудование",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://spare.avspart.com/caterpillar/sebp3045/sebp3045025/",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён заголовком страницы SEBP3045: «186-9940 SWITCH GP-BRAKE PRESSURE This is part of 203-2866 WARNING GP-BRAKE PRESSURE (RESIDUAL) AN ATTACHMENT R1700G»."
+  },
+  {
+   "pn": "203-2866",
+   "name_ru": "Группа сигнализации остаточного давления в тормозах",
+   "name_en": "WARNING GP-BRAKE PRESSURE (RESIDUAL)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — навесное оборудование; включает 186-9940 SWITCH GP-BRAKE PRESSURE",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://spare.avspart.com/caterpillar/sebp3045/sebp3045025/",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён тем же заголовком SEBP3045: 203-2866 WARNING GP-BRAKE PRESSURE (RESIDUAL), навесное оборудование R1700G, включает 186-9940."
+  },
+  {
+   "pn": "260-9632",
+   "name_ru": "Клапан управления тормозами (настройка 43,1 ± 3,5 бар / 625 ± 50 psi)",
+   "name_en": "VALVE GP-BRAKE CONTROL",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000562-9, СКК 294660); parts.cat.com: Valve Group-Brake Control, настройка давления тормозов 43,1 ± 3,5 бар (625 ± 50 psi). В каталогах R1700G не сверено",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "260-9632",
+     "kind": "новый неоригинал",
+     "note": "$1,033 (OEM $1068.88), склад Tennessee — https://aftermarket.express/caterpillar/2609632"
+    }
+   ],
+   "price_usd": "1033",
+   "source": "https://aftermarket.express/caterpillar/2609632",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование. Было «VALVE GP-BRAKE / Клапан тормозной (управление рабочим тормозом)». По parts.cat.com — Valve Group-Brake CONTROL, с настройкой давления тормозов 43,1 ± 3,5 бар (625 ± 50 psi). Настройка важна: клапан с другой настройкой внешне тот же. Применимость к R1700G — по перечню КВАНТ, в каталоге не сверена."
+  },
+  {
+   "pn": "186-8817",
+   "name_ru": "Клапан аварийного отпуска тормоза (узел)",
+   "name_en": "VALVE AS (BRAKE RELEASE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000561-1, СКК 175657) записан как «клапан тормозной системы»; по SEBP3608-05 186-8817 — VALVE AS (BRAKE RELEASE): поз. 4 в 157-2876 VALVE GP-SEQUENCE -BRAKE RELEASE и поз. 1 в 184-6240 LINES GP-PILOT -IMPLEMENT VALVE, то есть контур аварийного отпуска тормоза",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "186-8817",
+     "kind": "новый неоригинал",
+     "note": "$492.94 — https://aftermarket.express/caterpillar/1868817"
+    }
+   ],
+   "price_usd": "493",
+   "source": "https://aftermarket.express/caterpillar/1868817",
+   "confidence": "med",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование: было «VALVE AS (BRAKE SYSTEM) / Клапан тормозной системы (узел)». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM 186-8817 — VALVE AS (BRAKE RELEASE): поз. 4 в группе 157-2876 VALVE GP-SEQUENCE -BRAKE RELEASE и поз. 1 в 184-6240 LINES GP-PILOT -IMPLEMENT VALVE. Это клапан аварийного ОТПУСКА тормоза (для буксировки), а не клапан рабочего тормоза — путать нельзя. Привязка к R1700G — только перечень КВАНТ."
+  },
+  {
+   "pn": "188-7496",
+   "name_ru": "Основание (база) педали тормоза, левая сторона",
+   "name_en": "BASE GP-LH (FOOT BRAKE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000560-3, СКК 293525); у Cat теги Braking / Pedals. Cat: Left Hand Side Foot Brake Base",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "188-7496",
+     "kind": "новый неоригинал",
+     "note": "$793.07 — https://aftermarket.express/caterpillar/1887496"
+    }
+   ],
+   "price_usd": "793",
+   "source": "https://aftermarket.express/caterpillar/1887496",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНА СТОРОНА. Было: «Педаль тормоза правая (группа педали) / PEDAL GP (RH)». По parts.cat.com 188-7496 — Left Hand Side Foot Brake Base, то есть ОСНОВАНИЕ (база) педали ЛЕВОЙ стороны, а не педаль правой. Парный номер 188-7497 — правая сторона. Это прямой риск поставки не той детали: стороны в исходной строке были перепутаны."
+  },
+  {
+   "pn": "188-7497",
+   "name_ru": "Основание (база) педали тормоза, правая сторона",
+   "name_en": "BASE GP-RH (BRAKE PEDAL)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000559-5, СКК 293526); у Cat теги Braking / Pedals. Cat: Right Hand Side Pedal Brake Base Control",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://aftermarket.express/caterpillar/1887497",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНА СТОРОНА. Было: «Педаль тормоза левая / основание педали». По parts.cat.com 188-7497 — Right Hand Side Pedal Brake Base Control, то есть основание педали ПРАВОЙ стороны. Наименование name_en (BASE GP-RH) в исходной строке было верным, а русское — противоречило ему; противоречие внутри строки и есть признак ошибки."
+  },
+  {
+   "pn": "105-6117",
+   "name_ru": "Концевой выключатель педали тормоза, нормально замкнутый",
+   "name_en": "SWITCH AS-LIMIT (NORMALLY CLOSED) — PEDAL BRAKE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000510-8, СКК 775543); parts.cat.com: Pedal Brake Limit Switch; по SEBP3608-05 — поз. 2 в группе 151-5594 BASE GP-PEDAL -SERVICE BRAKE, нормально замкнутый. Применимость продавцами заявлена для R1600/R1600G/R1600H/R1700G/R2900/R2900G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "105-6117",
+     "kind": "новый неоригинал",
+     "note": "$5.92 (OEM $30.8), склад Texas — https://aftermarket.express/caterpillar/1056117"
+    }
+   ],
+   "price_usd": "5.92",
+   "source": "https://aftermarket.express/caterpillar/1056117",
+   "confidence": "med",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование по двум источникам: parts.cat.com — Pedal Brake Limit Switch; SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM — поз. 2 в группе 151-5594 BASE GP-PEDAL -SERVICE BRAKE, наименование SWITCH AS-LIMIT (NORMALLY CLOSED). Нормально ЗАМКНУТЫЙ — отличие от 105-6118. Применимость подтверждена продавцом для R1600, R1600G, R1600H, R1700G, R2900, R2900G. Цена: $5,92 — проверить, не относится ли к другому исполнению (OEM $30,8)."
+  },
+  {
+   "pn": "105-6118",
+   "name_ru": "Концевой выключатель нейтрализатора КПП (по нажатию педали тормоза), нормально разомкнутый",
+   "name_en": "SWITCH AS-LIMIT (NORMALLY OPEN) — TRANSMISSION NEUTRALIZER",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — в перечне КВАНТ записан как «выключатель тормозной педали» (KV-000511-6, СКК 775544); по parts.cat.com и по SEBP3608-05 это Transmission Neutralizer Limit Switch, нормально разомкнутый, поз. 3 в группе 151-5594 BASE GP-PEDAL -SERVICE BRAKE",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "105-6118",
+     "kind": "новый неоригинал",
+     "note": "$17.48 (OEM $30.8), склад Florida — https://aftermarket.express/caterpillar/1056118"
+    }
+   ],
+   "price_usd": "17.48",
+   "source": "https://aftermarket.express/caterpillar/1056118",
+   "confidence": "med",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО НАЗНАЧЕНИЕ. Было: «Выключатель тормозной педали (второй контур)». Второго контура тут нет: по parts.cat.com 105-6118 — Transmission Neutralizer Limit Switch, по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM — поз. 3 в группе 151-5594 BASE GP-PEDAL -SERVICE BRAKE, SWITCH AS-LIMIT (NORMALLY OPEN). Это выключатель нейтрализатора КПП (сбрасывает передачу при нажатии тормоза), нормально РАЗОМКНУТЫЙ, пара к нормально замкнутому 105-6117."
+  },
+  {
+   "pn": "186-9083",
+   "name_ru": "Клапан-соленоид управления вторичным (аварийным) тормозом",
+   "name_en": "SOLENOID VALVE — SECONDARY BRAKE CONTROL",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000543-9, СКК 200521); parts.cat.com: Secondary Brake Control Solenoid Valve — управление вторичным (аварийным) тормозом, не рабочим",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "186-9083",
+     "kind": "новый неоригинал",
+     "note": "$317.56 — https://aftermarket.express/caterpillar/1869083"
+    }
+   ],
+   "price_usd": "318",
+   "source": "https://aftermarket.express/caterpillar/1869083",
+   "confidence": "med",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование. Было: «Катушка (соленоид) клапана тормозной системы / SOLENOID AS (BRAKE SYSTEM)». По parts.cat.com 186-9083 — Secondary Brake Control Solenoid Valve: это клапан-соленоид управления ВТОРИЧНЫМ (аварийным) тормозом, а не катушка клапана рабочего тормоза. Применимость к R1700G — по перечню КВАНТ."
+  },
+  {
+   "pn": "421-9097",
+   "name_ru": "Датчик давления масла тормозов M12 x 9/16-18 (3625 psi)",
+   "name_en": "SENSOR AS-PRESSURE (BRAKE OIL, M12 X 9/16 IN)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000430-9, СКК 780170); parts.cat.com: M12 x 9/16\" Brake Oil Pressure Sensor, линии тормозов и гидроаккумулятор, 3625 psi (25,0 МПа), резьба 9/16-18",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "421-9097",
+     "kind": "новый неоригинал",
+     "note": "$872.84 — https://aftermarket.express/caterpillar/4219097"
+    }
+   ],
+   "price_usd": "873",
+   "source": "https://aftermarket.express/caterpillar/4219097",
+   "confidence": "med",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование. Было: «Датчик давления тормозной системы / SENSOR-PRESSURE (BRAKE)». По parts.cat.com 421-9097 — M12 x 9/16\" Brake Oil Pressure Sensor, применяется в линиях тормозов и гидроаккумуляторе, давление 3625 psi (25,0 МПа), 30,0 x 79,5 мм; наименование Cat — SENSOR AS-PRESSURE. Резьба 9/16-18: при подборе аналога размер резьбы обязателен, иначе датчик не встанет."
+  },
+  {
+   "pn": "361-8400",
+   "name_ru": "Датчик давления масла стояночного тормоза M12 x 1/4 (на манифольде клапана управления тормозами)",
+   "name_en": "SENSOR-PRESSURE (PARKING BRAKE OIL, M12 X 1/4 IN)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000433-3, СКК 594997); parts.cat.com подтверждает применимость AD30, AD45B, AD55, AD55B, R1300G, R1600G, R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "361-8400",
+     "kind": "новый неоригинал",
+     "note": "$856.59 (OEM $865.16), склад Tennessee — https://aftermarket.express/caterpillar/3618400"
+    }
+   ],
+   "price_usd": "857",
+   "source": "https://aftermarket.express/caterpillar/3618400",
+   "confidence": "med",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование и подтверждена применимость. По parts.cat.com 361-8400 — M12 x 1/4\" Parking Brake Oil Pressure Sensor на манифольде клапана управления тормозами; в перечне применимости прямо указаны AD30, AD45B, AD55, AD55B, R1300G, R1600G и R1700G. Было просто «датчик давления тормозной системы (второе исполнение)» — это не второе исполнение 421-9097, а другой датчик: другая резьба (1/4\" против 9/16\") и другое место установки."
+  },
+  {
+   "pn": "459-2599",
+   "name_ru": "Выключатель давления на клапане подзарядки тормозного гидроаккумулятора",
+   "name_en": "SWITCH AS-PRESSURE (BRAKE ACCUMULATOR CHARGING VALVE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — по перечню КВАНТ (KV-000429-1, СКК 743700); parts.cat.com: Brake Accumulator Charging Valve Pressure Switch, наименование Cat SWITCH AS-PRESSURE, альт. номер T167100",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "459-2599",
+     "kind": "новый неоригинал",
+     "note": "$187.31, склад Montana — https://aftermarket.express/caterpillar/4592599"
+    }
+   ],
+   "price_usd": "187",
+   "source": "https://aftermarket.express/caterpillar/4592599",
+   "confidence": "med",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование: по parts.cat.com 459-2599 — Brake Accumulator CHARGING VALVE Pressure Switch, наименование Cat SWITCH AS-PRESSURE; альт. номер T167100. Было «датчик (выключатель) давления тормозного гидроаккумулятора» — он контролирует давление именно на клапане подзарядки гидроаккумулятора. Применимость R1700G подтверждают продавцы; в каталоге не сверена."
+  },
+  {
+   "pn": "3E-7692",
+   "name_ru": "Датчик-выключатель давления масла (назначение на R1700G не подтверждено)",
+   "name_en": "SWITCH AS-PRESSURE (OIL)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — назначение «давление в промывке тормозов» взято ТОЛЬКО из перечня КВАНТ (KV-000427-5, СКК 780499); в открытых источниках 3E-7692 — универсальный датчик-выключатель давления масла Cat (двигатели 3116/3126/3176/C11/C15, самосвалы 725-740, погрузчики 953C/963B/963C, тракторы D5M/D6M), привязка к контуру охлаждения тормозов R1700G не подтверждена. Сам факт мокрых тормозов с масляным охлаждением на всех четырёх бортах R1700G — верен",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "3E-7692",
+     "kind": "новый неоригинал",
+     "note": "$112.79 (OEM $121.76), склад Tennessee — https://aftermarket.express/caterpillar/3e7692"
+    }
+   ],
+   "price_usd": "113",
+   "source": "https://aftermarket.express/caterpillar/3e7692",
+   "confidence": "med",
+   "verdict": "сомнителен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): СОМНИТЕЛЬНО по назначению. 3E-7692 — массовый датчик-выключатель давления масла Cat: в перечнях применимости продавцов идут двигатели 3116, 3126, 3176, 3196, 3056, 3406, C11, C15, самосвалы 725/730/735/740, погрузчики 953C/963B/963C, тракторы D5M/D6M; agkits называет его Oil Pressure Sensor Switch Assembly. Ни одного источника, где он назван датчиком давления промывки (охлаждения) тормозов R1700G, найти не удалось — назначение и наименование «PRESSURE SENSOR (BRAKE COOLING FLOW)» взяты из перечня КВАНТ. Сам номер и цена реальны; под вопросом привязка к контуру охлаждения тормозов. Уверенность снижена с high до med."
+  },
+  {
+   "pn": "370-2574",
+   "name_ru": "Кнопка (выключатель) стояночного тормоза",
+   "name_en": "SWITCH AS (PARKING BRAKE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G — кнопка стояночного тормоза по перечню КВАНТ (KV-000485-3, СКК 640528); стояночный тормоз пружинный, отпуск гидравликой",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "370-2574",
+     "kind": "новый неоригинал",
+     "note": "$642.36 — https://aftermarket.express/caterpillar/3702574"
+    }
+   ],
+   "price_usd": "642",
+   "source": "https://aftermarket.express/caterpillar/3702574",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён: parts.cat.com — Parking Brake Switch (кнопка включения/выключения стояночного тормоза). Применимость к R1700G — по перечню КВАНТ; в каталоге не сверена."
+  },
+  {
+   "pn": "291-4532",
+   "name_ru": "Трубопроводы охладителя масла мостов (обвязка теплообменника)",
+   "name_en": "LINES GROUP-AXLE OIL COOLER",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G LOAD HAUL DUMP, S/N SBR00001-UP (двигатель C11) — раздел COOLING SYSTEM каталога SEBP3612",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://777parts.net/caterpillar/R1700G/m1050/SEBP36120074.html",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён заголовком страницы 777parts/SEBP3612: «2914532 LINES GROUP-AXLE OIL COOLER — LOAD, HAUL, DUMP Caterpillar R1700G — R1700G LOAD HAUL DUMP SBR00001-UP (MACHINE) COOLING SYSTEM». Машина SBR, двигатель C11 — как и заявлено."
+  },
+  {
+   "pn": "183-7663",
+   "name_ru": "Трубопроводы охладителя масла мостов (ранняя серия)",
+   "name_en": "LINES GROUP-AXLE OIL COOLER",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700G LOAD HAUL DUMP, S/N 8XZ00001-UP — раздел COOLING SYSTEM каталога SEBP3045",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://777parts.net/caterpillar/R1700G/m1050/SEBP30450092.html",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён заголовком страницы 777parts/SEBP3045: «1837663 LINES GROUP-AXLE OIL COOLER — LOAD, HAUL, DUMP Caterpillar R1700G — R1700 G LOAD HAUL DUMP 8XZ00001-UP (MACHINE) COOLING SYSTEM». Ранняя машина 8XZ — как и заявлено; с 291-4532 (SBR) не взаимозаменяем без сверки PIN."
+  },
+  {
+   "pn": "117-7799",
+   "name_ru": "Ремкомплект уплотнений тормозного клапана педали",
+   "name_en": "SEAL KIT — BRAKE PEDAL VALVE REPAIR",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (подземный погрузчик, новое поколение) — раздел REPAIR & REBUILD KITS каталога Rig Out; проверить по своему серийнику для R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "117-7799",
+     "kind": "новый неоригинал",
+     "note": "$39.28 (OEM $42.34), склад Tennessee — https://aftermarket.express/caterpillar/1177799"
+    }
+   ],
+   "price_usd": "39",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по первоисточнику Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34, раздел REPAIR & REBUILD KITS → BRAKE PEDAL VALVE, дословно: «117-7799 Brake Pedal valve repair seal kit». parts.cat.com: Hydraulic Brake Valve Seal Kit. Оговорка о сверке серийника для R1700G сохраняется: каталог составлен на R1700 нового поколения (C13)."
+  },
+  {
+   "pn": "166-0321",
+   "name_ru": "Ремкомплект уплотнений блока клапанов стояночного тормоза",
+   "name_en": "SEAL KIT — CONTROL VALVE GROUP FOR PARKING BRAKE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (новое поколение) — раздел SEAL KITS каталога Rig Out",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "166-0321",
+     "kind": "новый неоригинал",
+     "note": "$10.91 (OEM $26.32), склад Tennessee — https://aftermarket.express/caterpillar/1660321"
+    }
+   ],
+   "price_usd": "11",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён дословно по Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34, раздел SEAL KITS: «166-0321 Seal Kit: Control Valve Group for Parking Brake»."
+  },
+  {
+   "pn": "360-0518",
+   "name_ru": "Ремкомплект уплотнений предохранительного клапана тормозного гидроаккумулятора",
+   "name_en": "SEAL KIT — BRAKE ACCUMULATOR RELIEF VALVE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (новое поколение) — раздел SEAL KITS каталога Rig Out; второе исполнение — 484-2690",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "484-2690",
+     "kind": "альтернативное исполнение",
+     "note": "в том же каталоге указан вторым номером для того же клапана"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён дословно по Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34, раздел SEAL KITS: «360-0518 Seal Kit: Brake Accumulator Relief Valve». ОГОВОРКА: 484-2690 в каталоге стоит отдельной строкой с тем же описанием — какое из двух «второе исполнение», каталог не говорит; это наш вывод, а не текст Cat."
+  },
+  {
+   "pn": "484-2690",
+   "name_ru": "Ремкомплект уплотнений предохранительного клапана тормозного гидроаккумулятора (исп. 2)",
+   "name_en": "SEAL KIT — BRAKE ACCUMULATOR RELIEF VALVE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (новое поколение) — раздел SEAL KITS каталога Rig Out",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён дословно по Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34, раздел SEAL KITS: «484-2690 Seal Kit: Brake Accumulator Relief Valve» — отдельной строкой рядом с 360-0518."
+  },
+  {
+   "pn": "170-0493",
+   "name_ru": "Комплект уплотнений поршня гидроаккумулятора 6 дюймов (стандартное уплотнение)",
+   "name_en": "PISTON KIT — 6\" ACCUMULATOR, STANDARD SEAL",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (новое поколение) — раздел ACCUMULATOR SEAL KITS каталога Rig Out; конкретный гидроаккумулятор каталогом не назван. В R1300G Series II тот же номер — KIT-SEAL (HYDRAULIC ACCUMULATOR) в группе 361-8627 ACCUMULATOR GP-RIDE CONTROL",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "450-9200",
+     "kind": "исполнение с усиленным уплотнением",
+     "note": "6\" Piston Kit with Extreme Seal — для тяжёлых условий"
+    },
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "170-0493",
+     "kind": "новый неоригинал",
+     "note": "$238.14 — https://aftermarket.express/caterpillar/1700493"
+    }
+   ],
+   "price_usd": "238",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование и убрана недоказанная привязка. По Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34, раздел ACCUMULATOR SEAL KITS, дословно: «170-0493 PISTON KIT — 6” Seal Kit with Standard Seal» (то есть комплект уплотнений поршня, а не «ремкомплект поршня»); слова про «тормозные и рулевые гидроаккумуляторы 6\"» в каталоге нет — это был домысел. Встречный факт: в SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM 170-0493 стоит как KIT-SEAL (HYDRAULIC ACCUMULATOR) в группе 361-8627 ACCUMULATOR GP-RIDE CONTROL (гидроаккумулятор системы стабилизации), то есть номер общий для 6-дюймовых гидроаккумуляторов, а не тормозной."
+  },
+  {
+   "pn": "450-9200",
+   "name_ru": "Ремкомплект поршня гидроаккумулятора 6 дюймов (уплотнение Extreme)",
+   "name_en": "PISTON KIT — 6\" ACCUMULATOR, EXTREME SEAL",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (новое поколение) — ACCUMULATOR SEAL KITS каталога Rig Out",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "450-9200",
+     "kind": "новый неоригинал",
+     "note": "$763.08 (OEM $819.13), склад Indiana — https://aftermarket.express/caterpillar/4509200"
+    }
+   ],
+   "price_usd": "763",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён дословно по Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34, раздел ACCUMULATOR SEAL KITS: «450-9200 6” Piston Kit with Extreme Seal»."
+  },
+  {
+   "pn": "204-0156",
+   "name_ru": "Ремкомплект шестерённого насоса контура охлаждения мостов",
+   "name_en": "KIT-SEAL / PUMP REPAIR KIT — AXLE COOLING GEAR PUMP",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (новое поколение) — HYDRAULIC PUMP KITS каталога Rig Out: «used in gear pumps of axle cooling»",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён дословно по Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34: «204-0156 Kit is for servicing a failed pump or rebuild/refurbish a worn pump. Used in gear pumps of axle cooling» — то есть именно шестерённые насосы контура охлаждения мостов."
+  },
+  {
+   "pn": "467-1797",
+   "name_ru": "Система аварийного отпуска тормозов (арр., для буксировки)",
+   "name_en": "BRAKE AR-RELEASE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (новое поколение) — RECOVERY HOOK (TOW) каталога Rig Out; исполнение для США — 467-1818; описание в SEBU9952",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "467-1818",
+     "kind": "исполнение (US)",
+     "note": "BRAKE AR-RELEASE (US) — тот же узел для североамериканского рынка"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён дословно по Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34, раздел RECOVERY HOOK (TOW): «467-1797 BRAKE AR-RELEASE SEBU9952» и рядом «467-1818 BRAKE AR-RELEASE (US)». Оба номера и ссылка на SEBU9952 в каталоге есть."
+  },
+  {
+   "pn": "227-6783",
+   "name_ru": "Ремкомплект пальцев педального узла (тормоз/газ)",
+   "name_en": "PEDAL PIN REPAIR KIT",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1700 (новое поколение) — BRAKE PEDAL VALVE каталога Rig Out; в том же разделе 300-4868 KIT-ROLLER PIN и 276-3239 по педали газа",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "300-4868",
+     "kind": "смежный ремкомплект",
+     "note": "Kit-Roller Pin педального узла"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://www.empire-cat.com/sites/default/files/products/documents/CM20240423-25f2b-5b690.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён дословно по Cat R1700 Underground Loader Rig Out Catalog, s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34, раздел BRAKE PEDAL VALVE: «227-6783 Pedal Pin Repair Kit», в той же таблице «300-4868 Kit-Roller Pin» и «276-3239 Throttle Pedal Repair Kit» — всё как в строке."
+  },
+  {
+   "pn": "257-5949",
+   "name_ru": "Коробка передач в сборе (арр.)",
+   "name_en": "TRANSMISSION AR",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, S/N КПП C3T1-UP, машина RSL1-UP; входит в 257-5975 POWER TRAIN AR — родня R1700G; на R1700G НЕ переносится (у R1700G своя КПП S/N KSR и свой ГТР 180-3568)",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по первоисточнику SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «257-5949 TRANSMISSION AR, S/N: C3T1-UP, PART OF 257-5975 POWER TRAIN AR». Состав: 132-6120 PUMP & MTG GP-TRANSMISSION, 253-0252 OUTPUT GP-TRANSMISSION, 253-0254 PLANETARY GP-TRANSMISSION, 253-0255 CONTROL GP-TRANSMISSION HYD, 257-5937 TORQUE CONVERTER & HOUSING GP, 270-0610 LINES GP-TRANSMISSION OIL, 263-9223 COVER GP-SHIPPING. Вывод строки «на R1700G НЕ переносится» подтверждаю: у R1700G другая КПП (S/N KSR) и другой ГТР (180-3568)."
+  },
+  {
+   "pn": "257-5937",
+   "name_ru": "Гидротрансформатор с корпусом (группа)",
+   "name_en": "TORQUE CONVERTER & HOUSING GP",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, группа S/N C3T1-UP (внутри ГТР 116-3825 S/N 4AT1-UP); входит в 257-5949 TRANSMISSION AR — родня R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "116-3825",
+     "kind": "входящий узел",
+     "note": "собственно TORQUE CONVERTER GP внутри 257-5937"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕН серийный диапазон. Было: «ГТР S/N 4AT1-UP». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM у самой группы 257-5937 стоит «S/N: C3T1-UP, PART OF 257-5949 TRANSMISSION AR», а 4AT1-UP — это S/N входящего в неё 116-3825 TORQUE CONVERTER GP (поз. 16). Смешение серийников КПП и ГТР — та же ошибка, что и на титуле каталога. Состав группы (поз. 3 4S-8598, 10 118-7226, 11 138-1509, 12 148-1928, 13 193-2550, 14 240-8259, 16 116-3825, 21 202-8933) сверен полностью и совпал."
+  },
+  {
+   "pn": "116-3825",
+   "name_ru": "Гидротрансформатор (узел внутри корпуса)",
+   "name_en": "TORQUE CONVERTER GP",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — поз. 16 в группе 257-5937; родня R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "116-3825",
+     "kind": "новый неоригинал",
+     "note": "$3,353 — https://aftermarket.express/caterpillar/1163825"
+    }
+   ],
+   "price_usd": "3353",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «116-3825 TORQUE CONVERTER GP, S/N: 4AT1-UP, PART OF 257-5937 TORQUE CONVERTER & HOUSING GP», поз. 16 — ровно как в строке."
+  },
+  {
+   "pn": "253-0254",
+   "name_ru": "Планетарный редуктор коробки передач (фрикционные пакеты, поршни, пружины)",
+   "name_en": "PLANETARY GP-TRANSMISSION",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, КПП C3T1-UP — планетарная часть Power Shift; родня R1700G, номер для R1700G другой",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «253-0254 PLANETARY GP-TRANSMISSION, S/N: C3T1-UP, PART OF 257-5949 TRANSMISSION AR», в составе более 100 позиций (диски, поршни, пружины, кольцевая шестерня 6Y-7881 на 86 зубьев). Номер для R1700G действительно другой — переносить нельзя."
+  },
+  {
+   "pn": "253-0255",
+   "name_ru": "Блок гидравлического управления КПП",
+   "name_en": "CONTROL GP-TRANSMISSION HYD",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, КПП C3T1-UP — родня R1700G (у R1700G аналогичную роль играет 3Q-6242 CONTROL GP-TRANSMISSION HYD, внутри которого 3Q-6243)",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «253-0255 CONTROL GP-TRANSMISSION HYD, S/N: C3T1-UP, PART OF 257-5949 TRANSMISSION AR». Уточнение: внутрь входит 244-3114 VALVE GP-MODULATING (24 В) с катушкой 323-9531 — это ходовой отказной элемент. Сопоставление с R1700G уточняю: роль 253-0255 у R1700G играет 3Q-6242 CONTROL GP-TRANSMISSION HYD, а 3Q-6243 — клапанная группа внутри него."
+  },
+  {
+   "pn": "132-6120",
+   "name_ru": "Насос масляный КПП с креплением",
+   "name_en": "PUMP & MTG GP-TRANSMISSION",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — родня R1700G; внутри насос 117-1653",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "132-6120",
+     "kind": "новый неоригинал",
+     "note": "$1,945, склад Tennessee — https://aftermarket.express/caterpillar/1326120"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "117-1653",
+     "kind": "входящий насос",
+     "note": "PUMP GP-TRANSMISSION внутри 132-6120"
+    }
+   ],
+   "price_usd": "1945",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «132-6120 PUMP & MTG GP-TRANSMISSION, S/N: C3T1-UP, PART OF 257-5949 TRANSMISSION AR»; внутри поз. 1 — 117-1653 PUMP GP-TRANSMISSION, далее болты 8T-5035 (5 шт), 8T-4195, уплотнение 9M-5024."
+  },
+  {
+   "pn": "117-1653",
+   "name_ru": "Насос масляный КПП (узел)",
+   "name_en": "PUMP GP-TRANSMISSION",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — входит в 132-6120; родня R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "117-1653",
+     "kind": "новый неоригинал",
+     "note": "$715.96 (OEM $1944.71), склад Florida — https://aftermarket.express/caterpillar/1171653"
+    }
+   ],
+   "price_usd": "716",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «117-1653 PUMP GP-TRANSMISSION, S/N: C3T1-UP, PART OF 132-6120». Состав: 117-1654 MANIFOLD AS, 122-6660 BODY AS-OIL PUMP, 8P-1812 COVER AS-OIL PUMP, шестерни 9G-7411 / 9G-7412 (по 17 зубьев)."
+  },
+  {
+   "pn": "202-8933",
+   "name_ru": "Предохранительный клапан контура управления КПП",
+   "name_en": "VALVE GP-RELIEF (TRANSMISSION HYDRAULIC CONTROL)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — поз. 21 в группе 257-5937; родня R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "202-8933",
+     "kind": "новый неоригинал",
+     "note": "$792.46 — https://aftermarket.express/caterpillar/2028933"
+    }
+   ],
+   "price_usd": "792",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 21 в группе 257-5937, наименование «VALVE GP-RELIEF -TRANSMISSION HYDRAULIC CONTROL», S/N C3T1-UP — номер позиции и наименование совпали."
+  },
+  {
+   "pn": "148-1928",
+   "name_ru": "Предохранительный клапан на входе гидротрансформатора",
+   "name_en": "VALVE-RELIEF (TORQUE CONVERTER INLET)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — поз. 12 в группе 257-5937 ГТР; родня R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "148-1928",
+     "kind": "новый неоригинал",
+     "note": "$34.37 (OEM $134.43), склад Florida — https://aftermarket.express/caterpillar/1481928"
+    }
+   ],
+   "price_usd": "34",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 12 в группе 257-5937, «148-1928 VALVE-RELIEF (TORQUE CONVERTER INLET)», 1 шт — совпало дословно."
+  },
+  {
+   "pn": "4S-8598",
+   "name_ru": "Сетка-фильтр на всасывании масла КПП",
+   "name_en": "SCREEN-SUCTION (TRANSMISSION)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — поз. 3 в группе 257-5937; родня R1700G. Меняется при ремонте КПП/ГТР",
+   "qty": "1",
+   "interval": "при ремонте КПП",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "4S-8598",
+     "kind": "новый неоригинал",
+     "note": "$13.02 (OEM $16.16), склад Florida — https://aftermarket.express/caterpillar/4s8598"
+    }
+   ],
+   "price_usd": "13",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 3 в группе 257-5937, «4S-8598 SCREEN-SUCTION (TRANSMISSION)», 1 шт; числится и в разделе MAINTENANCE PARTS каталога — то есть это действительно расходник ремонта КПП/ГТР."
+  },
+  {
+   "pn": "240-8259",
+   "name_ru": "Магнитная сетка (магнитный фильтр) КПП — сигнал металла в масле",
+   "name_en": "SCREEN GP-MAGNETIC (TRANSMISSION)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — поз. 14 в группе 257-5937, внутри 3 шт магнита 8M-7160; родня R1700G. Диагностический признак: металл на магнитах",
+   "qty": "1",
+   "interval": "осмотр при каждой замене масла КПП",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 14 в группе 257-5937, «240-8259 SCREEN GP-MAGNETIC (TRANSMISSION)», внутри «8M-7160 3 MAGNET» — три магнита, ровно как в строке. Также числится в MAINTENANCE PARTS."
+  },
+  {
+   "pn": "266-9678",
+   "name_ru": "Фильтр масла КПП (группа с корпусом)",
+   "name_en": "FILTER GP-OIL (TRANSMISSION)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, S/N C3T1-UP — входит в 270-0610 LINES GP-TRANSMISSION OIL; родня R1700G. Элемент внутри — 1G-8878 FILTER-OIL (ADVANCED EFFICIENCY) (TRANSMISSION), поз. 3",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "266-9678",
+     "kind": "новый неоригинал",
+     "note": "$356.49, склад Wisconsin — https://aftermarket.express/caterpillar/2669678"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "1G-8878",
+     "kind": "фильтрующий элемент внутри группы",
+     "note": "поз. 3 группы 266-9678 по SEBP3608-05: FILTER-OIL (ADVANCED EFFICIENCY) (TRANSMISSION)"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "341-6643",
+     "kind": "трансмиссионная замена элемента",
+     "note": "таблица Cat PEHJ0069-03 «Transmission Filters», строка Spin on: 341-6643 заменяет 1G-8878 и 102-2828"
+    }
+   ],
+   "price_usd": "356",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО. Было: «родня R1700G (на R1700G элемент 1R-0719)». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM 266-9678 FILTER GP-OIL -TRANSMISSION, S/N C3T1-UP, входит в 270-0610 LINES GP-TRANSMISSION OIL (а не напрямую в 257-5949), и фильтрующий элемент внутри неё — 1G-8878 FILTER-OIL (ADVANCED EFFICIENCY) (TRANSMISSION), поз. 3, а не 1R-0719. По таблице Cat PEHJ0069-03 замена 1G-8878 в трансмиссии — spin-on 341-6643. 1R-0719 (типоразмер 4 x 9) к этой группе отношения не имеет."
+  },
+  {
+   "pn": "118-7226",
+   "name_ru": "Датчик температуры масла гидротрансформатора (исполнение R1300G II)",
+   "name_en": "SENSOR GP-TEMPERATURE (TORQUE CONVERTER OIL)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — поз. 10 в группе 257-5937; родня R1700G (на R1700G — 134-2252)",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "118-7226",
+     "kind": "новый неоригинал",
+     "note": "$126.72 (OEM $269.58), склад Florida — https://aftermarket.express/caterpillar/1187226"
+    }
+   ],
+   "price_usd": "127",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 10 в группе 257-5937, «118-7226 SENSOR GP-TEMPERATURE (TORQUE CONVERTER OIL)». Сопоставление с R1700G уточнено в строке 134-2252: там датчик стоит в отдельной группе 264-3245, а не в группе ГТР."
+  },
+  {
+   "pn": "193-2550",
+   "name_ru": "Датчик частоты вращения на выходе ГТР (магнитный)",
+   "name_en": "SENSOR GP-SPEED (MAGNETIC, HIGH OUTPUT) — TORQUE CONVERTER OUTLET",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — поз. 13 в группе 257-5937; родня R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "193-2550",
+     "kind": "новый неоригинал",
+     "note": "$66.90 (OEM $190.52), склад Tennessee — https://aftermarket.express/caterpillar/1932550"
+    }
+   ],
+   "price_usd": "67",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «193-2550 SENSOR GP-SPEED -MAGNETIC, HIGH OUTPUT, S/N: C3T1-UP, PART OF 253-0252 OUTPUT GP-TRANSMISSION, 257-5937 TORQUE CONVERTER & HOUSING GP»; в группе ГТР это поз. 13 с пометкой «(TORQUE CONVERTER OUTLET)». То есть датчик применяется в двух группах, не только в 257-5937."
+  },
+  {
+   "pn": "276-3873",
+   "name_ru": "Охладитель масла трансмиссии",
+   "name_en": "COOLER GP-TRANSMISSION OIL",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, S/N RSL1-UP — родня R1700G; на R1700G масло мостов идёт через 291-4532 / 183-7663",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «276-3873 COOLER GP-TRANSMISSION OIL, S/N: RSL1-UP, PART OF 257-5973 INSTALLATION AR-ENGINE». Внутри 276-3872 COOLER AS с сердцевиной 125-2871 CORE AS-POWER TRAIN OIL COOLER и краном 6V-7238 VALVE-SHUTOFF (TRANSMISSION OIL) — при ремонте чаще нужна сердцевина, а не весь охладитель."
+  },
+  {
+   "pn": "172-6145",
+   "name_ru": "Раздаточная передача с корпусом",
+   "name_en": "GEAR & CASE GP-TRANSFER",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, S/N RSL1-1574, входит в 233-7727 AXLE & XFR CASE AR-OSCILLATING — родня R1700G (на R1700G 284-9077); с S/N RSL1575-UP — 346-2513",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "172-6145",
+     "kind": "новый неоригинал",
+     "note": "$21,052 — https://aftermarket.express/caterpillar/1726145"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "346-2513",
+     "kind": "позднее исполнение",
+     "note": "GEAR & CASE GP-TRANSFER, тот же каталог"
+    }
+   ],
+   "price_usd": "21052",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «172-6145 GEAR & CASE GP-TRANSFER, S/N: RSL1-1574, PART OF 233-7727 AXLE & XFR CASE AR-OSCILLATING»; в том же арр. для S/N RSL1575-UP стоит 346-2513 GEAR & CASE GP-TRANSFER — «позднее исполнение» из alts подтверждено, и уточнён рубеж серийников (1574 / 1575)."
+  },
+  {
+   "pn": "9G-5127",
+   "name_ru": "Сапун (дыхательный клапан) раздаточной передачи",
+   "name_en": "BREATHER (TRANSFER GEAR)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II — в группе OUTPUT GP-TRANSMISSION; родня R1700G. Расходник обслуживания",
+   "qty": "1",
+   "interval": "проверка при ТО",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 19 в группе 253-0252 OUTPUT GP-TRANSMISSION, «9G-5127 BREATHER (TRANSFER GEAR)», 1 шт; числится в MAINTENANCE PARTS — расходник обслуживания, как и заявлено."
+  },
+  {
+   "pn": "169-5643",
+   "name_ru": "Тормоз рабочий и стояночный в сборе (мокрый, масляного охлаждения)",
+   "name_en": "BRAKE GP-SERVICE & PARKING",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-1554; входит в 177-7591 AXLE AR-FIXED и 230-6395 AXLE AR-OSCILLATING. Родня R1700G (на R1700G тормоз в составе 468-8211)",
+   "qty": "2 на мост",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "351-1103",
+     "kind": "позднее исполнение",
+     "note": "BRAKE GP-SERVICE & PARKING для S/N RSL1555-UP: добавлены 325-3780 SEAL и 325-3781 RING-BACKUP, пружина 293-3609 вместо 9C-9844"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM полностью: «169-5643 BRAKE GP-SERVICE & PARKING, S/N: RSL1-1554, PART OF 177-7591 AXLE AR-FIXED, 230-6395 AXLE AR-OSCILLATING», по 2 шт на мост. Проверен и alt: в позднем 351-1103 (RSL1555-UP) действительно добавлены 325-3780 SEAL (поз. 11) и 325-3781 RING-BACKUP (поз. 8), а пружина 9C-9844 (3 шт, поз. 15) заменена на 293-3609 — всё сошлось дословно."
+  },
+  {
+   "pn": "351-1103",
+   "name_ru": "Тормоз рабочий и стояночный в сборе (позднее исполнение)",
+   "name_en": "BRAKE GP-SERVICE & PARKING",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1555-UP — родня R1700G",
+   "qty": "2 на мост",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «351-1103 BRAKE GP-SERVICE & PARKING, S/N: RSL1555-UP, PART OF 177-7591 AXLE AR-FIXED, 230-6395 AXLE AR-OSCILLATING», по 2 шт на мост. Отличия от 169-5643 перечислены в примечании к 169-5643."
+  },
+  {
+   "pn": "334-1034",
+   "name_ru": "Диск фрикционный тормоза, наружный диаметр 403 мм, 18 зубьев",
+   "name_en": "DISC-FRICTION (BRAKE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II — поз. 8/6 в тормозах 169-5643 и 351-1103, по 1 шт на тормоз. Родня R1700G; расходник ремонта тормоза",
+   "qty": "1 на тормоз",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "334-1034",
+     "kind": "новый неоригинал",
+     "note": "$73.38 (OEM $429.22), склад Florida — https://aftermarket.express/caterpillar/3341034"
+    },
+    {
+     "brand": "CTP (Costex) / ITR / USCO",
+     "pn": "334-1034",
+     "kind": "аналог",
+     "note": "фрикционные диски Cat выпускаются неоригинальными производителями под номером Cat; Costex держит отдельную линейку friction discs"
+    }
+   ],
+   "price_usd": "73",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 8 в 169-5643 и поз. 6 в 351-1103, по 1 шт — ровно как в строке. Добавляю размер из parts.cat.com: фрикционный диск наружным диаметром 403 мм, 18 зубьев шлица — без этих двух цифр аналог не подобрать. ОГОВОРКА: в перечнях применимости продавцов указаны R1300G и R1300G II, R1700G НЕ указан; «родня R1700G» остаётся гипотезой."
+  },
+  {
+   "pn": "3Q-6528",
+   "name_ru": "Уплотнение тормоза (кольцо поршня тормоза)",
+   "name_en": "SEAL-BRAKE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II — поз. 7 в тормозах 169-5643 / 351-1103; родня R1700G. Обязательная замена при переборке тормоза",
+   "qty": "1 на тормоз",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "3Q-6528",
+     "kind": "новый неоригинал",
+     "note": "$17.09 (OEM $40.36), склад Florida — https://aftermarket.express/caterpillar/3q6528"
+    }
+   ],
+   "price_usd": "17",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 7 «3Q-6528 SEAL-BRAKE», 1 шт, в обоих исполнениях тормоза (169-5643 и 351-1103)."
+  },
+  {
+   "pn": "228-0415",
+   "name_ru": "Уплотнение в сборе (поршневая пара тормоза)",
+   "name_en": "SEAL AS (BRAKE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II — поз. 5 в тормозах 169-5643 / 351-1103; родня R1700G. В раннем исполнении дополнительно 228-0418",
+   "qty": "1 на тормоз",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "228-0415",
+     "kind": "новый неоригинал",
+     "note": "$24.60 (OEM $272.36), склад Florida — https://aftermarket.express/caterpillar/2280415"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "228-0418",
+     "kind": "парное уплотнение",
+     "note": "только в исполнении 169-5643 (RSL1-1554)"
+    }
+   ],
+   "price_usd": "25",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 5 «228-0415 SEAL AS», 1 шт, в обоих тормозах; 228-0418 SEAL AS — поз. 6 только в 169-5643 (RSL1-1554), в 351-1103 её нет. Уточнение из alts подтверждено."
+  },
+  {
+   "pn": "8R-4568",
+   "name_ru": "Поршень тормоза",
+   "name_en": "PISTON (BRAKE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II — поз. 13 в тормозах 169-5643 / 351-1103; родня R1700G",
+   "qty": "1 на тормоз",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "8R-4568",
+     "kind": "новый неоригинал",
+     "note": "$135.38 (OEM $523.74), склад Florida — https://aftermarket.express/caterpillar/8r4568"
+    }
+   ],
+   "price_usd": "135",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 13 «8R-4568 PISTON», 1 шт, в обоих исполнениях тормоза."
+  },
+  {
+   "pn": "186-8938",
+   "name_ru": "Поршень тормоза (второй, в паре с адаптером 186-8937)",
+   "name_en": "PISTON (BRAKE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II — поз. 2 в тормозах 169-5643 / 351-1103; родня R1700G",
+   "qty": "1 на тормоз",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "186-8938",
+     "kind": "новый неоригинал",
+     "note": "$958.23 — https://aftermarket.express/caterpillar/1868938"
+    }
+   ],
+   "price_usd": "958",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: поз. 2 «186-8938 PISTON», 1 шт; поз. 1 — 186-8937 ADAPTER, то есть пара из строки верна. Оба исполнения тормоза."
+  },
+  {
+   "pn": "9D-6093",
+   "name_ru": "Пружина тормоза (возвратная, пакет 14 шт)",
+   "name_en": "SPRING (BRAKE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II — поз. 16 в тормозах 169-5643 / 351-1103, 14 шт на тормоз; родня R1700G",
+   "qty": "14 на тормоз",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "9D-6093",
+     "kind": "новый неоригинал",
+     "note": "$8.94 (OEM $17.4), склад Texas — https://aftermarket.express/caterpillar/9d6093"
+    }
+   ],
+   "price_usd": "8.94",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО наименование: в SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM поз. 16 названа просто «SPRING» (14 шт), без слова OUTER; «SPRING-OUTER» в каталоге нет. Количество 14 на тормоз подтверждено в обоих исполнениях. Рядом поз. 15 — 3 шт пружин 9C-9844 (RSL1-1554) или 293-3609 (RSL1555-UP): при переборке нужны обе позиции, не только 9D-6093."
+  },
+  {
+   "pn": "281-7888",
+   "name_ru": "Система аварийного отпуска тормозов (арр., R1300G II)",
+   "name_en": "BRAKE RELEASE AR",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP, навесное; включает 155-9905 CYLINDER GP-BRAKE RELEASE, 244-3625 HOOK GP, 281-4865 LINES GP-BRAKE. Родня R1700G (там 467-1797)",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "155-9905",
+     "kind": "входящий узел",
+     "note": "CYLINDER GP-BRAKE RELEASE, гидроцилиндр отпуска"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «281-7888 BRAKE RELEASE AR, S/N: RSL1-UP, AN ATTACHMENT», состав — 155-9905 CYLINDER GP-BRAKE RELEASE, 244-3625 HOOK GP-BRAKE RELEASE, 281-4865 LINES GP-BRAKE: совпало дословно. Дополнение: рядом есть 281-7889 BRAKE RELEASE AR -RECOVERY BAR (155-9905 + 281-4865, без крюка) — второе исполнение навесного. Цилиндр 155-9905: диаметр 76 мм (2.99 дюйма)."
+  },
+  {
+   "pn": "177-7622",
+   "name_ru": "Мост неподвижный (жёсткий) в сборе — главная передача, дифференциал, борта",
+   "name_en": "AXLE GP-FIXED *R (REMFG AVAILABLE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — входит в 177-7591 AXLE AR-FIXED (та, в свою очередь, в 233-6760 AXLE AR-FIXED -COMPLETE); доступна REMFG. Родня R1700G (на R1700G мост в сборе 468-8211)",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО вхождение. Было: «входит в 177-7591 / 233-6760 AXLE AR-FIXED». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM 177-7622 AXLE GP-FIXED*R входит только в 177-7591 AXLE AR-FIXED; 233-6760 AXLE AR-FIXED -COMPLETE — это уже дед (177-7591 входит в 233-6760, а 233-6760 — в 257-5975 POWER TRAIN AR). Полезное: пометка *R означает, что доступна восстановленная (REMFG) деталь. Внутри моста — 168-5064 DIFFERENTIAL & BEVEL GEAR GP -FIXED (поз. 32), полуоси 1C-7412 (2 шт), картеры 186-9817 (LH) и 168-9842 (RH)."
+  },
+  {
+   "pn": "230-6394",
+   "name_ru": "Мост качающийся (балансирный) в сборе",
+   "name_en": "AXLE GP-OSCILLATING *R (REMFG AVAILABLE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — входит в 230-6395 AXLE AR-OSCILLATING (та — в 233-7255 AXLE AR-OSCILLATING -COMPLETE); доступна REMFG. Родня R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО вхождение. Было: «входит в 230-6395 / 233-7255 AXLE AR-OSCILLATING». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM 230-6394 AXLE GP-OSCILLATING*R входит только в 230-6395 AXLE AR-OSCILLATING; 233-7255 AXLE AR-OSCILLATING -COMPLETE — дед (230-6395 + 154-1426 LINES GP-SERVICE BRAKE), и он входит в 233-7727 AXLE & XFR CASE AR-OSCILLATING. Внутри моста — 168-5065 DIFFERENTIAL & BEVEL GEAR GP (поз. 48). Пометка *R: доступна REMFG."
+  },
+  {
+   "pn": "168-5065",
+   "name_ru": "Дифференциал с главной конической парой, качающийся мост",
+   "name_en": "DIFFERENTIAL & BEVEL GEAR GP",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — главная передача КАЧАЮЩЕГОСЯ моста, входит в 230-6394 AXLE GP-OSCILLATING; родня R1700G. Парная группа жёсткого моста — 168-5064",
+   "qty": "1 на мост",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "128-0745",
+     "kind": "дифференциал внутри группы",
+     "note": "поз. 5 по SEBP3608-05: DIFFERENTIAL GP-NOSPIN (самоблокирующийся), внутри 8R-9833 DIFFERENTIAL GP-NOSPIN и 8R-9440 CASE AS-DIFFERENTIAL"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "171-2159",
+     "kind": "коническая пара внутри группы",
+     "note": "поз. 7, 1 шт; тот же номер и в 168-5064 (жёсткий мост)"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "168-5066",
+     "kind": "картер ведущей шестерни",
+     "note": "поз. 6 HOUSING-PINION — у жёсткого моста другой (9C-9194)"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО. Было: «главная передача моста» с альтернативой 355-3167 «дифференциал отдельно». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM 168-5065 — главная передача КАЧАЮЩЕГОСЯ моста (PART OF 230-6394 AXLE GP-OSCILLATING), и дифференциал внутри неё — 128-0745 DIFFERENTIAL GP-NOSPIN (поз. 5), самоблокирующийся; 355-3167 DIFFERENTIAL GP к 168-5065 НЕ относится — он стоит в 168-5064 DIFFERENTIAL & BEVEL GEAR GP -FIXED (жёсткий мост). Это разные мосты: заказ 355-3167 «в качающийся мост» — поставка не той детали. Общее у обеих групп — коническая пара 171-2159."
+  },
+  {
+   "pn": "355-3167",
+   "name_ru": "Дифференциал жёсткого моста (узел, обычный — не NoSPIN)",
+   "name_en": "DIFFERENTIAL GP",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — дифференциал ЖЁСТКОГО моста, входит в 168-5064 DIFFERENTIAL & BEVEL GEAR GP -FIXED; в качающемся мосту (168-5065) вместо него 128-0745 NOSPIN. Родня R1700G",
+   "qty": "1 на мост",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "355-3167",
+     "kind": "новый неоригинал",
+     "note": "$4,947 — https://aftermarket.express/caterpillar/3553167"
+    }
+   ],
+   "price_usd": "4947",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО вхождение: по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM «355-3167 DIFFERENTIAL GP, S/N: RSL1-UP, PART OF 168-5064 DIFFERENTIAL & BEVEL GEAR GP» — то есть это дифференциал ЖЁСТКОГО моста. Было просто «R1300G Series II — родня R1700G», из чего в строке 168-5065 сделали неверный вывод. Состав: 5V-1274 SPIDER, 8R-1703 PINION-DIFFERENTIAL BEVEL (10 зубьев, 4 шт), 8R-1704 GEAR-DIFFERENTIAL BEVEL (16 зубьев, 2 шт), 8R-9440 CASE AS-DIFFERENTIAL."
+  },
+  {
+   "pn": "171-2159",
+   "name_ru": "Коническая шестерня моста (главная пара)",
+   "name_en": "GEAR GP-BEVEL (AXLE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — входит и в 168-5064 (жёсткий мост), и в 168-5065 (качающийся), по 1 шт; родня R1700G",
+   "qty": "1 на мост",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «171-2159 GEAR GP-BEVEL -AXLE, S/N: RSL1-UP, PART OF 168-5064, 168-5065 DIFFERENTIAL & BEVEL GEAR GP», по 1 шт — то есть коническая пара одна и та же на жёстком и качающемся мосту. Это и есть настоящая общая для моста позиция."
+  },
+  {
+   "pn": "216-0223",
+   "name_ru": "Колесо с бортовым планетарным редуктором (борт в сборе)",
+   "name_en": "WHEEL & FINAL DRIVE GP *R (REMFG AVAILABLE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — 2 шт на мост, входит в 177-7591 AXLE AR-FIXED и 230-6395 AXLE AR-OSCILLATING (не в 233-6760 / 233-7255 — те уровнем выше); доступна REMFG. Родня R1700G (на R1700G 468-8208 / 468-8211)",
+   "qty": "2 на мост",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "216-0223",
+     "kind": "новый неоригинал",
+     "note": "$15,470 — https://aftermarket.express/caterpillar/2160223"
+    }
+   ],
+   "price_usd": "15470",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО вхождение. Было: «входит в 233-6760 AXLE AR-FIXED / 233-7255 AXLE AR-OSCILLATING». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM «216-0223 WHEEL & FINAL DRIVE GP *R, S/N: RSL1-UP, PART OF 177-7591 AXLE AR-FIXED, 230-6395 AXLE AR-OSCILLATING» — по 2 шт в каждом; 233-6760 и 233-7255 стоят на уровень выше. Количество 2 на мост подтверждено. Пометка *R: доступна REMFG; внутри поз. 1 — магнитная пробка 5P-4484 PLUG-MAGNETIC (FINAL DRIVE OIL DRAIN)."
+  },
+  {
+   "pn": "281-2273",
+   "name_ru": "Вал карданный (в сборе)",
+   "name_en": "SHAFT GP-DRIVE",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — карданный вал силовой передачи, 1 шт, входит в 257-5975 POWER TRAIN AR; родня R1700G",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО количество. Было «1–2». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM «281-2273 SHAFT GP-DRIVE, S/N: RSL1-UP, PART OF 257-5975 POWER TRAIN AR» — 1 шт на машину. В составе: 201-0450 UNIVERSAL JOINT GP (1 шт) и 263-9230 SLIP JOINT GP (1 шт), 2 шт 2V-7153 SPIDER & BEARING AS, вилки 4U-6482 и 186-9007 (2 шт), приводы 186-8999 (передний) и 186-9000 (задний)."
+  },
+  {
+   "pn": "201-0450",
+   "name_ru": "Карданный шарнир, группа (внутри 2 крестовины 2V-7153)",
+   "name_en": "UNIVERSAL JOINT GP",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — 1 шт в 281-2273 SHAFT GP-DRIVE; это ГРУППА, внутри 2 шт крестовин 2V-7153. Родня R1700G. Расходник: люфт в шарнире — типовой дефект ПДМ",
+   "qty": "1 на вал (внутри 2 шт крестовин 2V-7153)",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "201-0450",
+     "kind": "новый неоригинал",
+     "note": "$927.96 (OEM $3998.68), склад Florida — https://aftermarket.express/caterpillar/2010450"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "2V-7153",
+     "kind": "крестовина отдельно",
+     "note": "SPIDER & BEARING AS, 2 шт внутри 201-0450 по SEBP3608-05; тот же номер в 263-9230 SLIP JOINT GP"
+    }
+   ],
+   "price_usd": "928",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕНО количество. Было «2 на вал». По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM «201-0450 UNIVERSAL JOINT GP, S/N: RSL1-UP, PART OF 281-2273 SHAFT GP-DRIVE» — 1 шт на вал; это ГРУППА, внутри которой 2 шт крестовин 2V-7153 SPIDER & BEARING AS, а также 2U-6747 SEAL, 3B-8489 FITTING-GREASE, 270-4045 VALVE-VENT (GREASE). Если нужны именно крестовины — заказывают 2V-7153, а не два 201-0450 (разница в цене кратная: группа $927,96 против пары крестовин)."
+  },
+  {
+   "pn": "5P-4484",
+   "name_ru": "Пробка магнитная сливная (мост, дифференциал, бортовой редуктор)",
+   "name_en": "PLUG-MAGNETIC",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II — 3 шт в дифференциале, 2 шт в картере моста, 1 шт в бортовом редукторе, 1 шт в раздаточной передаче. Родня R1700G. Диагностика: металл на пробке",
+   "qty": "6–7 на машину",
+   "interval": "осмотр при каждой замене масла",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "5P-4484",
+     "kind": "новый неоригинал",
+     "note": "$18.21 (OEM $60.52), склад Florida — https://aftermarket.express/caterpillar/5p4484"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM по каждой позиции: 3 шт в 168-5064 PLUG-MAGNETIC (DIFFERENTIAL), 2 шт в 168-5065 PLUG-MAGNETIC (AXLE OIL DRAIN), 1 шт в 172-6145 PLUG-MAGNETIC (TRANSFER CASE), 1 шт в 346-2513 PLUG-MAGNETIC (AXLE HOUSING), 1 шт в 216-0223 PLUG-MAGNETIC (FINAL DRIVE OIL DRAIN). Количество 6-7 на машину и роль диагностического признака (металл на пробке) подтверждаются."
+  },
+  {
+   "pn": "4H-6112",
+   "name_ru": "Сапун (дыхательный клапан) моста",
+   "name_en": "BREATHER (AXLE)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II — в группах LINES GP-AXLE VENT (158-4562 качающийся, 158-4564 жёсткий мост). Родня R1700G",
+   "qty": "2",
+   "interval": "проверка/замена при ТО",
+   "alts": [
+    {
+     "brand": "Aftermarket.Express",
+     "pn": "4H-6112",
+     "kind": "новый неоригинал",
+     "note": "$9.12 (OEM $15.55), склад Texas — https://aftermarket.express/caterpillar/4h6112"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): подтверждён по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: по 1 шт BREATHER (AXLE) в 158-4562 LINES GP-AXLE VENT -OSCILLATING и в 158-4564 LINES GP-AXLE VENT -FIXED, итого 2 на машину — как в строке. Тот же номер стоит и в 257-4382 PUMP GP-LUBRICATION -HYDRAULIC как BREATHER (LUBRICANT TANK): при заказе указывать, куда."
+  },
+  {
+   "pn": "241-9841",
+   "name_ru": "Защитный кожух карданного вала (задняя рама)",
+   "name_en": "GUARD GP-DRIVE SHAFT (REAR FRAME)",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1501-UP — входит в 257-5976 CHASSIS AR; родня R1700G. Смежные: 241-9851 (шарнир сочленения) и 276-3275 (у КПП), тот же диапазон",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "241-9851",
+     "kind": "смежный кожух",
+     "note": "GUARD GP-DRIVE SHAFT-HITCH, зона центрального шарнира"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "276-3275",
+     "kind": "смежный кожух",
+     "note": "GUARD GP-DRIVE SHAFT (TRANSMISSION)"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "исправлен",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ИСПРАВЛЕН серийный диапазон и вхождение. По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «241-9841 GUARD GP-DRIVE SHAFT -REAR FRAME, S/N: RSL1501-UP, PART OF 257-5976 CHASSIS AR» — не RSL1-UP, а с RSL1501; внутри сам щиток 241-9840 GUARD. Смежные подтверждены: 241-9851 GUARD GP-DRIVE SHAFT -HITCH (внутри 241-9850) и 276-3275 GUARD GP-DRIVE SHAFT -TRANSMISSION, оба тоже S/N RSL1501-UP, оба в 257-5976 CHASSIS AR."
+  },
+  {
+   "pn": "3Q-6242",
+   "name_ru": "Блок гидравлического управления КПП (вся группа управления)",
+   "name_en": "CONTROL GP-TRANSMISSION HYD",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1700G, а также R1600, R1600G, R1600H, R1700 II — группа гидроуправления КПП, внутри неё клапанная группа 3Q-6243 VALVE GP-TRANSMISSION CONTROL (в ней 109-9538). Прямой аналог 253-0255 у R1300G Series II",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "3Q-6243",
+     "kind": "входящая клапанная группа",
+     "note": "VALVE GP-TRANSMISSION CONTROL, S/N KSR1-UP; внутри 109-9538 VALVE GP-SELECTOR & PRESS CONT"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://spare.avspart.com/caterpillar/sebp3612/sebp3612059/",
+   "confidence": "med",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ДОБАВЛЕНО проверяющим: закрывает дыру в срезе — у R1700G был номер клапанной группы (3Q-6243), но не было номера группы гидроуправления КПП, в которую она входит. Подтверждено: 3Q-6243 числится частью 3Q-6242 CONTROL GP-TRANSMISSION HYD, применимость 3Q-6242 — R1600 / R1600G / R1600H / R1700 II / R1700G. ОГОВОРКА: серийный диапазон КПП для 3Q-6242 не получен, уверенность med."
+  },
+  {
+   "pn": "168-5064",
+   "name_ru": "Дифференциал с главной конической парой, жёсткий мост",
+   "name_en": "DIFFERENTIAL & BEVEL GEAR GP-FIXED",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — главная передача ЖЁСТКОГО моста, входит в 177-7622 AXLE GP-FIXED (поз. 32); парная группа качающегося моста — 168-5065. Родня R1700G (на R1700G мост в сборе 468-8211)",
+   "qty": "1 на жёсткий мост",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "355-3167",
+     "kind": "дифференциал внутри группы",
+     "note": "поз. 9 DIFFERENTIAL GP, 1 шт — обычный, без блокировки"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "171-2159",
+     "kind": "коническая пара внутри группы",
+     "note": "поз. 7, 1 шт; та же, что в 168-5065"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "9C-9194",
+     "kind": "картер ведущей шестерни",
+     "note": "поз. 6 HOUSING-PINION; у качающегося моста другой — 168-5066"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "226-2684",
+     "kind": "пакет регулировочных шайб",
+     "note": "SHIM PACK (INCLUDES 11-SHIMS), нужен при регулировке пятна контакта"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ДОБАВЛЕНО проверяющим: в срезе был только 168-5065 (качающийся мост), из-за чего 355-3167 ошибочно привязали к нему. По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «168-5064 DIFFERENTIAL & BEVEL GEAR GP -FIXED, S/N: RSL1-UP, PART OF 177-7622 AXLE GP-FIXED», состав сверен построчно (поз. 3 — 3 шт магнитных пробок 5P-4484, поз. 7 — 171-2159, поз. 9 — 355-3167)."
+  },
+  {
+   "pn": "128-0745",
+   "name_ru": "Дифференциал самоблокирующийся NoSPIN (качающийся мост)",
+   "name_en": "DIFFERENTIAL GP-NOSPIN",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — дифференциал КАЧАЮЩЕГОСЯ моста, поз. 5 в группе 168-5065; внутри 8R-9833 DIFFERENTIAL GP-NOSPIN и 8R-9440 CASE AS-DIFFERENTIAL. Родня R1700G",
+   "qty": "1 на качающийся мост",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "8R-9833",
+     "kind": "собственно NoSPIN внутри группы",
+     "note": "DIFFERENTIAL GP-NOSPIN, S/N RSL1-UP, PART OF 128-0745; внутри 8R-9830 GEAR-SIDE (35 зубьев, 2 шт), 8R-9832 BLOCK-SPACER"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "8R-9440",
+     "kind": "корпус дифференциала",
+     "note": "CASE AS-DIFFERENTIAL — тот же номер, что и в обычном 355-3167"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ДОБАВЛЕНО проверяющим: ключевое различие мостов, которого в срезе не было. Качающийся мост идёт с самоблокирующимся дифференциалом NoSPIN (128-0745), жёсткий — с обычным (355-3167). Подтверждено по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «128-0745 DIFFERENTIAL GP-NOSPIN, S/N: RSL1-UP, PART OF 168-5065 DIFFERENTIAL & BEVEL GEAR GP». Путаница этих двух номеров — поставка дифференциала не того типа в мост."
+  },
+  {
+   "pn": "244-3114",
+   "name_ru": "Модулирующий клапан КПП, 24 В (с катушкой)",
+   "name_en": "VALVE GP-MODULATING (24-VOLT)",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, КПП S/N C3T1-UP — входит в 253-0255 CONTROL GP-TRANSMISSION HYD; родня R1700G (у R1700G аналогичную роль играют клапаны внутри 3Q-6243)",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "323-9531",
+     "kind": "катушка отдельно",
+     "note": "поз. 5 COIL AS (24-VOLT) — при отказе по электрике меняется катушка, а не весь клапан"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "214-7568",
+     "kind": "уплотнение",
+     "note": "поз. 4 SEAL-O-RING, обязательно при снятии катушки"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ДОБАВЛЕНО проверяющим: в срезе был блок управления КПП целиком (253-0255), но не было его отказного элемента. По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «244-3114 VALVE GP-MODULATING, S/N: C3T1-UP, 24-VOLT, PART OF 253-0255 CONTROL GP-TRANSMISSION HYD». Признак дефекта — рывки и затянутое включение передачи; катушка 323-9531 заказывается отдельно и стоит несравнимо дешевле блока."
+  },
+  {
+   "pn": "263-9230",
+   "name_ru": "Шлицевое (телескопическое) соединение карданного вала",
+   "name_en": "SLIP JOINT GP",
+   "node": "08 Мосты/карданы/тормоза",
+   "applic": "R1300G Series II, S/N RSL1-UP — входит в 281-2273 SHAFT GP-DRIVE (1 шт), рядом с 201-0450 UNIVERSAL JOINT GP; родня R1700G",
+   "qty": "1 на вал",
+   "interval": "смазка по ТО",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "2V-7153",
+     "kind": "крестовина внутри узла",
+     "note": "SPIDER & BEARING AS, 2 шт — тот же номер, что и в 201-0450"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "270-4045",
+     "kind": "клапан выпуска смазки",
+     "note": "VALVE-VENT (GREASE) — при набивке шлица без него срывает уплотнение"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "2U-6747",
+     "kind": "уплотнение шлица",
+     "note": "SEAL, поз. 4"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ДОБАВЛЕНО проверяющим: в срезе был вал (281-2273) и шарнир (201-0450), но не было шлицевого соединения — а износ шлица на сочленённой ПДМ типовой дефект и отдельный заказной номер. По SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM: «263-9230 SLIP JOINT GP, S/N: RSL1-UP, PART OF 281-2273 SHAFT GP-DRIVE», в составе вала обозначено как FY (не показано на рисунке) — по картинке его не найти, только по перечню."
+  },
+  {
+   "pn": "1G-8878",
+   "name_ru": "Элемент фильтра масла КПП (advanced efficiency)",
+   "name_en": "FILTER-OIL (ADVANCED EFFICIENCY) — TRANSMISSION",
+   "node": "07 Трансмиссия/гидротрансформатор",
+   "applic": "R1300G Series II, КПП S/N C3T1-UP — поз. 3 внутри группы 266-9678 FILTER GP-OIL -TRANSMISSION; родня R1700G. Это сменный элемент, который реально покупают на ТО, а не группа с корпусом",
+   "qty": "1",
+   "interval": "по ТО замены масла КПП",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "341-6643",
+     "kind": "трансмиссионная замена (spin-on)",
+     "note": "таблица Cat PEHJ0069-03 «Transmission Filters», строка Spin on: 341-6643 заменяет 1G-8878 и 102-2828"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "8C-3446",
+     "kind": "смежное в той же группе",
+     "note": "VALVE-FLUID SAMPLING (TRANSMISSION OIL), поз. 7 — кран отбора пробы масла, ставится при переходе на S·O·S"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "ПРОВЕРКА 13.09.2026 (привод): ДОБАВЛЕНО проверяющим: в срезе стояла группа 266-9678 с неверной подписью «на R1700G элемент 1R-0719». Настоящий элемент внутри группы — 1G-8878, подтверждено по SEBP3608-05 (R1300G Series II, RSL1-Up / C6E1-Up / C3T1-Up / 4AT1-Up, C6.6) — PDF дилера mcdowellequipment.com, стр. по разделам POWER TRAIN / BRAKING SYSTEM (поз. 3 группы 266-9678, «FILTER-OIL (ADVANCED EFFICIENCY) (TRANSMISSION)»), и по таблице Cat PEHJ0069-03, где 1G-8878 стоит в строке Spin on и заменяется трансмиссионным 341-6643. 1R-0719 — другой типоразмер (4 x 9) и другая позиция."
+  }
+ ],
+ "notes": "Источники по надёжности: (1) каталог Cat SEBP3608-05 R1300G Series II — полное дерево силовой передачи с номерами и количествами, PDF выложен дилером (mcdowellequipment.com); (2) Cat R1700 Rig Out Catalog (empire-cat.com) — ремкомплекты именно по R1700; (3) страницы каталогов SEBP3612 (SBR/C11) и SEBP3045 (8XZ) на avspare/777parts — заголовки этих страниц содержат номер, наименование, серийный диапазон и модель, по ним взяты собственные номера R1700G; (4) aftermarket.express — открытая страница на каждый номер: наименование Cat, цена неоригинала и цена OEM, теги системы (Power train / Braking). Цены price_usd — неоригинал с aftermarket.express (США, сентябрь 2026), цена OEM вынесена в alts. Ключевые собственные номера R1700G: ГТР 180-3568 / 180-0323 / 1T-1872; силовая передача 163-2017 с конверсией КПП 164-4239; управление КПП 3Q-6243 (внутри 109-9538), ранее 183-2460 (внутри 1U-2226); раздаточная 284-9077; мост с бортовым редуктором и тормозом 468-8211 (внутри 468-8208); тормоза — мокрые, масляного охлаждения на всех четырёх бортах, стояночный пружинный с гидроотпуском. Номера серийных префиксов: машина SBR / 8XZ / XBR, КПП KSR. || ПРОВЕРКА 13.09.2026 (направление «трансмиссия, мосты, тормоза»). Проверены все 82 строки среза. Источники проверки — первоисточники, скачанные целиком, а не выдача поиска: (1) каталог Cat SEBP3608-05 «R1300G Series II Load Haul Dump, RSL1-Up (Machine), C6E1-Up (Engine), C3T1-Up (Transmission), 4AT1-Up (Torque Converter), Powered By C6.6 Engine», 797 страниц — по нему построчно сверены все 37 строк R1300G Series II (номер позиции, наименование, количество, серийный диапазон, вхождение в группу); (2) Cat R1700 Underground Loader Rig Out Catalog (s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34), 32 страницы — по нему дословно сверены все 9 ремкомплектных строк; (3) Cat «Hydraulic & Power Train Filters» PEHJ0069-03 — по нему исправлены альтернативы фильтров; (4) заголовки страниц каталогов R1700G SEBP3045 (машина 8XZ00001-UP) и SEBP3612 (машина SBR00001-UP, C11) — они содержат номер, наименование, серийный диапазон и модель, этим подтверждены собственные номера R1700G; (5) карточки parts.cat.com — по ним выправлены наименования датчиков, выключателей, клапанов и педальных оснований. Итог: подтверждено 54 строки, исправлено 24, признано сомнительными 2, снято 2; добавлено 6 строк (3Q-6242, 168-5064, 128-0745, 244-3114, 263-9230, 1G-8878). Снятые строки не удалены: 212-0092 и 210-3137 — узлы Cat AD30 (подземный шарнирный самосвал, двигатель C15), к R1700G отношения не имеют; оставлены со вердиктом «снят» и confidence low как след ошибки. Главные исправления, которые стоили бы поставки не той детали: перепутаны стороны педальных оснований 188-7496 (левая) и 188-7497 (правая); 105-6118 — не второй контур тормозной педали, а выключатель нейтрализатора КПП; 186-8817 — клапан аварийного ОТПУСКА тормоза, а не рабочего; 186-9083 — соленоид вторичного тормоза; 355-3167 принадлежит жёсткому мосту (168-5064), а в качающемся (168-5065) стоит самоблокирующийся 128-0745; 201-0450 — 1 шт на вал (группа), а не 2; у 266-9678 элемент 1G-8878, а не 1R-0719; у 257-5937 серийный диапазон C3T1-UP, а 4AT1-UP — у входящего 116-3825.",
+ "gaps": "1) Поэлементного дерева POWER TRAIN именно для R1700G получить не удалось: 777parts.net и 777parts.com закрыты Cloudflare, avspare.com/spare.avspart.com на наш IP отвечают 'Not find' (через WebFetch — 502), parts.cat.com — Akamai 403, web.archive.org и r.jina.ai заблокированы политикой egress. Поэтому внутренности КПП R1700G (фрикционные и стальные диски, поршни, пружины пакетов, соленоиды, модулирующий клапан по отдельности) и внутренности мостов R1700G (полуоси, подшипники, сальники, крышки, планетарные редукторы бортов подетально) НЕ собраны. Собраны только номера групп/арр. верхнего уровня. 2) Строки с applic 'R1300G Series II' — это родня, а не R1700G: у R1300G II двигатель C6.6, КПП C3T, ГТР 4AT, у R1700G — C11 и КПП KSR. Переносить эти номера на R1700G без сверки по серийнику НЕЛЬЗЯ; они даны как структура узла (что вообще входит в тормоз, мост, ГТР) и как готовый перечень для машин R1300G в парке. 3) Ремкомплекты из Rig Out Catalog относятся к R1700 нового поколения (C13); для R1700G совпадение вероятно по клапанам и гидроаккумуляторам, но не проверено. 4) Интервалы замены по трансмиссии и тормозам почти везде пусты: SEBU по ТО R1700G (SEBU7851/аналог) не открыт. 5) Аналоги: реальных кросс-номеров сторонних брендов на детали привода Cat в открытом доступе почти нет — CTP/Costex, ITR, USCO, Berco продают под номером Cat (подтверждено на 8E-1217 у CTP), поэтому в alts стоит тот же номер с указанием бренда и источника. Кросс подшипников на SKF/FAG/Timken/NSK/Koyo/ЕПК не сделан: подетальные номера подшипников мостов R1700G (а не R1300G) не получены, а кроссить номер Cat 0xx-xxxx на подшипник без чертежа и размеров — угадывание. 6) Цены — розница США на неоригинал; российских цен и наличия нет, поставщики РФ по этому срезу не проработаны. 7) ПОСЛЕ ПРОВЕРКИ 13.09.2026. Поэлементное дерево POWER TRAIN именно для R1700G получить по-прежнему не удалось: avspare.com и spare.avspart.com отвечают 502/503, 777parts.net — 403, parts.cat.com — 503 при прямом обращении. Все собственные номера R1700G (180-3568 / 180-0323 / 1T-1872, 163-2017 / 164-4239, 3Q-6243 / 109-9538, 183-2460 / 1U-2226, 284-9077 / 138-1509, 468-8211 / 468-8208, 291-4532, 183-7663, 186-9940 / 203-2866) подтверждены только заголовками страниц каталогов SEBP3045 и SEBP3612, попавшими в поисковый индекс, — этого хватает на «номер, наименование, модель, серийный диапазон», но НЕ на состав групп и количества. Поэтому внутренности КПП KSR и мостов R1700G подетально так и не собраны. 8) Серийные префиксы R1700G по подтверждённым страницам расходятся: 8XZ00001-UP (SEBP3045), SBR00001-UP (SEBP3612, C11) и XBR00001-UP (у 468-8211, C11). Перед любым заказом по приводу нужен PIN конкретной машины: у 8XZ и SBR/XBR отличаются и раздаточная, и обвязка охладителя мостов, и клапан управления КПП. 9) Позиции, чья привязка к R1700G держится ТОЛЬКО на внутреннем перечне КВАНТ (в каталогах не сверены): 8E-1217, 169-4621, 260-9632, 186-8817, 188-7496, 188-7497, 105-6117, 105-6118, 186-9083, 421-9097, 459-2599, 3E-7692, 370-2574, 134-2252. Для 8E-1217 и 3E-7692 не подтверждён даже контур — они помечены «сомнителен». Это следующая работа по звену «запчасть»: сверить их по дереву R1700G, а не по перечню спроса. 10) Цены в price_usd за сутки уже разошлись с источником (8E-1217: было $496,06, на 13.09.2026 — $375,22). Цены из среза в выгрузки владельцу без перезапроса не ставить. 11) Reman: пара 10R-5519 = 180-3568 держится на одном продавце (bullpowertrain.com), в parts.cat.com номера нет; отдельной строкой в срез не вносил — сначала подтверждение дилера."
+}

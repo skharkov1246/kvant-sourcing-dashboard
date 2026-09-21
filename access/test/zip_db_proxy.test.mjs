@@ -27,9 +27,16 @@ test.after(() => { globalThis.fetch = realFetch; });
 
 const req = (url, init) => new Request(url, init);
 
+// Во всех проверках ниже секрет задан: без него прокси отвечает 503 и до самой
+// проверки дело не дойдёт. Раньше на его месте стоял пустой {} — воркер тогда
+// молча брал запасной публикуемый ключ из кода. Ключ убран 20.09.2026, и пустое
+// окружение теперь значит ровно то, что значит: настройка не завершена.
+const ENV = { SUPABASE_SERVICE_KEY: "sb_secret_FIXTURE" };
+const БЕЗ_КЛЮЧА = {};
+
 test("путь и строка запроса переносятся в Supabase без /db", async () => {
   stub();
-  await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/price_records?select=*&limit=5"), {});
+  await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/price_records?select=*&limit=5"), ENV);
   assert.equal(seen.length, 1);
   assert.equal(seen[0].url, SUPA_ORIGIN + "/rest/v1/price_records?select=*&limit=5");
 });
@@ -47,10 +54,26 @@ test("ключ ставит воркер: секрет Cloudflare сильнее
   assert.equal(h.get("Authorization"), "Bearer secret-from-cloudflare");
 });
 
-test("пока секрета нет — прежний публикуемый ключ, сайт не ломается", async () => {
+test("нет секрета — отказ 503, а не поход публикуемым ключом", async () => {
+  // До 20.09.2026 воркер в этом случае ходил запасным публикуемым ключом,
+  // лежавшим прямо в коде. Секрет задан, обе ступени ужесточения применены,
+  // страховать нечего — а ключ в публичном репозитории остался бы.
+  //
+  // Отказ именно громкий: прежнее «секрет || ключ» без ключа дало бы undefined,
+  // и Supabase вернул бы невнятную ошибку авторизации. Пропавший секрет — это
+  // поломка настройки, и сказать о ней надо прямо.
   stub();
-  await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/drawings"), {});
-  assert.match(seen[0].init.headers.get("apikey"), /^sb_publishable_/);
+  const out = await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/drawings"), БЕЗ_КЛЮЧА);
+  assert.equal(out.status, 503);
+  assert.match((await out.json()).error, /SUPABASE_SERVICE_KEY/);
+  assert.equal(seen.length, 0, "без ключа запрос в базу уходить не должен");
+});
+
+test("запасного ключа в коде воркера нет", () => {
+  const s = fs.readFileSync(path.join(ROOT, "zip/site/_worker.js"), "utf8");
+  const код = s.replace(/\/\/[^\n]*/g, "");     // пояснения про удалённый ключ не в счёт
+  assert.ok(!/sb_publishable_[A-Za-z0-9_-]/.test(код), "публикуемый ключ вернулся в воркер");
+  assert.ok(!/SUPA_FALLBACK_KEY/.test(код), "запасной ключ вернулся в воркер");
 });
 
 test("куки Access и служебные заголовки Cloudflare в базу не уходят", async () => {
@@ -64,7 +87,7 @@ test("куки Access и служебные заголовки Cloudflare в б�
         "X-Forwarded-For": "203.0.113.7",
       },
     }),
-    {},
+    ENV,
   );
   const h = seen[0].init.headers;
   for (const name of ["cookie", "cf-access-jwt-assertion", "cf-connecting-ip", "x-forwarded-for"]) {
@@ -74,14 +97,14 @@ test("куки Access и служебные заголовки Cloudflare в б�
 
 test("тело передаётся только там, где оно есть", async () => {
   stub();
-  await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/price_records"), {});
+  await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/price_records"), ENV);
   assert.equal(seen[0].init.body, undefined);
   assert.equal(seen[0].init.method, "GET");
 
   stub();
   await proxyDb(
     req("https://kvant-zip.pages.dev/db/rest/v1/price_records", { method: "POST", body: '{"pn":"1"}' }),
-    {},
+    ENV,
   );
   assert.equal(seen[0].init.method, "POST");
   assert.notEqual(seen[0].init.body, undefined);
@@ -89,14 +112,14 @@ test("тело передаётся только там, где оно есть"
 
 test("ответ базы не кэшируется и не проносит set-cookie", async () => {
   stub();
-  const out = await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/price_records"), {});
+  const out = await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/price_records"), ENV);
   assert.equal(out.headers.get("Cache-Control"), "no-store");
   assert.equal(out.headers.get("set-cookie"), null);
 });
 
 test("код ответа базы доходит до браузера как есть", async () => {
   stub(401, '{"message":"Invalid API key"}');
-  const out = await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/price_records"), {});
+  const out = await proxyDb(req("https://kvant-zip.pages.dev/db/rest/v1/price_records"), ENV);
   assert.equal(out.status, 401);
 });
 
@@ -124,7 +147,7 @@ test('only exact existing table/method pairs reach Supabase', async () => {
   const allowed={positions:['GET','HEAD','PATCH'],odm_suppliers:['GET','HEAD','PATCH'],price_records:['GET','HEAD','POST','PATCH','DELETE'],drawings:['GET','HEAD','POST','PATCH','DELETE'],samples:['GET','HEAD','POST','PATCH','DELETE'],rfq_requests:['POST'],change_log:['GET','HEAD'],gt_notes:['GET','HEAD','POST','PATCH']};
   for(const [table,methods] of Object.entries(allowed))for(const method of ['GET','HEAD','POST','PUT','PATCH','DELETE','OPTIONS']){
     stub();const init={method};if(!['GET','HEAD'].includes(method))init.body='{}';
-    const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table,init),{}, {email:'person@example.test'});
+    const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table,init),ENV, {email:'person@example.test'});
     assert.equal(r.status,methods.includes(method)?200:405,table+' '+method);assert.equal(seen.length,methods.includes(method)?1:0);
   }
 });
@@ -139,14 +162,14 @@ test('private archive, all RPC, auth, functions and unknown paths perform zero f
 
 test('encoding, slash and suffix variants never select an unlisted upstream resource', async () => {
   const paths=['/db/rest/v1/%61rchive_text_units','/db/rest/v1/%2561rchive_text_units','/db/rest/v1/ARCHIVE_TEXT_UNITS','/db//rest/v1/positions','/db/rest/v1/positions/','/db/rest/v1/positions;archive_text_units','/db/rest/v1/positions%2farchive_text_units','/db/storage/v1/object/%63rm-archive/a','/db/storage/v1/object/drawings/../crm-archive/a','/db/storage/v1/object/drawings/%2e%2e/crm-archive/a','/db/storage/v1/object/drawings/%252e%252e%252fcrm-archive/a','/db/storage/v1/object/drawings/folder%2f..%2f..%2fcrm-archive/a','/db/storage/v1/object/drawings/a%5c..%5cb','/db/storage/v1/object/drawings/a%00b','/db/storage/v1/object/drawings/%zz'];
-  for(const path of paths){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev'+path,{method:'POST',body:'file'}),{});assert.equal(r.status,403,path);assert.equal(seen.length,0);}
+  for(const path of paths){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev'+path,{method:'POST',body:'file'}),ENV);assert.equal(r.status,403,path);assert.equal(seen.length,0);}
 });
 
 test('PostgREST joins, computed fields, duplicate parameters and schema headers cannot escape scope', async () => {
   const queries=['select=*,archive_text_units(*)','select=x:archive_object_versions(*)','select=archive_search_status','select=id','select=*&select=archive_text_units(*)','select=*%26select%3Darchive_text_units(*)','archive_text_units.text=not.is.null','or=(archive_text_units.text.eq.A)','columns=archive_text_units','on_conflict=private_column','_method=DELETE','id=in.(1,2)','order=archive_text_units(id)','scope=eq.A%00B'];
-  for(const query of queries){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/positions?'+query),{});assert.equal(r.status,403,query);assert.equal(seen.length,0);}
-  for(const header of ['Accept-Profile','Content-Profile']){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/positions',{headers:{[header]:'storage'}}),{});assert.equal(r.status,403);assert.equal(seen.length,0);}
-  stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/gt_notes?scope=eq.Mars%20100&removed=is.false&select=*&order=at.asc'),{});assert.equal(r.status,200);assert.equal(seen.length,1);
+  for(const query of queries){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/positions?'+query),ENV);assert.equal(r.status,403,query);assert.equal(seen.length,0);}
+  for(const header of ['Accept-Profile','Content-Profile']){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/positions',{headers:{[header]:'storage'}}),ENV);assert.equal(r.status,403);assert.equal(seen.length,0);}
+  stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/gt_notes?scope=eq.Mars%20100&removed=is.false&select=*&order=at.asc'),ENV);assert.equal(r.status,200);assert.equal(seen.length,1);
 });
 
 test('headers only carry the service request, without schema, identity or method override', async () => {
@@ -159,52 +182,52 @@ test('headers only carry the service request, without schema, identity or method
 test('ordering and filters cannot execute arbitrary computed fields', async () => {
   for(const table of ['positions','odm_suppliers','price_records','drawings','samples','change_log','gt_notes']){
     for(const query of ['order=synthetic_computed_function.asc','order=at.asc,synthetic_computed_function.asc']){
-      stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?select=*&'+query),{});
+      stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?select=*&'+query),ENV);
       assert.equal(r.status,403,table+' '+query);assert.equal(seen.length,0);
     }
     if(table!=='gt_notes')for(const query of ['scope=eq.anything','removed=is.false']){
-      stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?'+query),{});
+      stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?'+query),ENV);
       assert.equal(r.status,403,table+' '+query);assert.equal(seen.length,0);
     }
   }
   for(const table of ['change_log','gt_notes'])for(const order of ['at.asc','at.desc']){
-    stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?select=*&order='+order),{})).status,200);assert.equal(seen.length,1);
+    stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?select=*&order='+order),ENV)).status,200);assert.equal(seen.length,1);
   }
   for(const table of ['change_log','gt_notes']){
-    stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?id=eq.1'),{})).status,403);assert.equal(seen.length,0);
+    stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?id=eq.1'),ENV)).status,403);assert.equal(seen.length,0);
   }
   for(const table of ['positions','odm_suppliers','price_records','drawings','samples']){
-    stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?id=eq.1',{method:'PATCH',body:'{}'}),{})).status,200);assert.equal(seen.length,1);
+    stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/'+table+'?id=eq.1',{method:'PATCH',body:'{}'}),ENV)).status,200);assert.equal(seen.length,1);
   }
-  stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/positions?order=at.asc'),{})).status,403);assert.equal(seen.length,0);
+  stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/positions?order=at.asc'),ENV)).status,403);assert.equal(seen.length,0);
 });
 
 test('existing upload, signed URL, download and deletion stay within the two buckets', async () => {
   for(const bucket of ['drawings','samples']){
     const path='/db/storage/v1/object/'+bucket+'/42/%D1%87%D0%B5%D1%80%D1%82%D0%B5%D0%B6.pdf';
-    stub();const upload=await proxyDb(req('https://kvant-zip.pages.dev'+path,{method:'POST',body:'BINARY FIXTURE',headers:{'Content-Type':'application/pdf','X-Upsert':'false'}}),{});assert.equal(upload.status,200);assert.equal(seen.length,1);assert.equal(seen[0].init.headers.get('Content-Type'),'application/pdf');
+    stub();const upload=await proxyDb(req('https://kvant-zip.pages.dev'+path,{method:'POST',body:'BINARY FIXTURE',headers:{'Content-Type':'application/pdf','X-Upsert':'false'}}),ENV);assert.equal(upload.status,200);assert.equal(seen.length,1);assert.equal(seen[0].init.headers.get('Content-Type'),'application/pdf');
     const signed='/db/storage/v1/object/sign/'+bucket+'/42/a.pdf';
-    stub();const sign=await proxyDb(req('https://kvant-zip.pages.dev'+signed,{method:'POST',body:JSON.stringify({expiresIn:120})}),{});assert.equal(sign.status,200);assert.deepEqual(JSON.parse(seen[0].init.body),{expiresIn:120});
-    stub();const download=await proxyDb(req('https://kvant-zip.pages.dev'+signed+'?token=SYNTHETIC_TOKEN'),{});assert.equal(download.status,200);assert.equal(seen.length,1);
-    stub();const remove=await proxyDb(req('https://kvant-zip.pages.dev/db/storage/v1/object/'+bucket,{method:'DELETE',body:JSON.stringify({prefixes:['42/a.pdf']})}),{});assert.equal(remove.status,200);assert.deepEqual(JSON.parse(seen[0].init.body),{prefixes:['42/a.pdf']});
+    stub();const sign=await proxyDb(req('https://kvant-zip.pages.dev'+signed,{method:'POST',body:JSON.stringify({expiresIn:120})}),ENV);assert.equal(sign.status,200);assert.deepEqual(JSON.parse(seen[0].init.body),{expiresIn:120});
+    stub();const download=await proxyDb(req('https://kvant-zip.pages.dev'+signed+'?token=SYNTHETIC_TOKEN'),ENV);assert.equal(download.status,200);assert.equal(seen.length,1);
+    stub();const remove=await proxyDb(req('https://kvant-zip.pages.dev/db/storage/v1/object/'+bucket,{method:'DELETE',body:JSON.stringify({prefixes:['42/a.pdf']})}),ENV);assert.equal(remove.status,200);assert.deepEqual(JSON.parse(seen[0].init.body),{prefixes:['42/a.pdf']});
   }
 });
 
 test('Storage JSON cannot choose another bucket, copy destination, traversal or arbitrary command', async () => {
   const badSign=[{expiresIn:120,bucketId:'crm-archive'},{expiresIn:120,sourceBucket:'crm-archive'},{expiresIn:120,destinationBucket:'samples'},{expiresIn:120,path:'../crm-archive/a'},{expiresIn:0},{expiresIn:3601},{expiresIn:'120'},[],null];
   const badDelete=[{prefixes:['42/a.pdf'],bucketId:'crm-archive'},{prefixes:['../crm-archive/a']},{prefixes:['a/%2e%2e/b']},{prefixes:['a\\b']},{prefixes:['']},{prefixes:[]},{prefixes:'42/a.pdf'},null];
-  for(const [path,method,values] of [['/db/storage/v1/object/sign/drawings/a.pdf','POST',badSign],['/db/storage/v1/object/samples','DELETE',badDelete]])for(const body of values){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev'+path,{method,body:JSON.stringify(body)}),{});assert.equal(r.status,400);assert.equal(seen.length,0);}
-  for(const path of ['/db/storage/v1/object/sign/drawings/a.pdf?bucketId=crm-archive','/db/storage/v1/object/drawings/a.pdf?token=whatever']){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev'+path,{method:'POST',body:'{"expiresIn":120}'}),{});assert.equal(r.status,403);assert.equal(seen.length,0);}
+  for(const [path,method,values] of [['/db/storage/v1/object/sign/drawings/a.pdf','POST',badSign],['/db/storage/v1/object/samples','DELETE',badDelete]])for(const body of values){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev'+path,{method,body:JSON.stringify(body)}),ENV);assert.equal(r.status,400);assert.equal(seen.length,0);}
+  for(const path of ['/db/storage/v1/object/sign/drawings/a.pdf?bucketId=crm-archive','/db/storage/v1/object/drawings/a.pdf?token=whatever']){stub();const r=await proxyDb(req('https://kvant-zip.pages.dev'+path,{method:'POST',body:'{"expiresIn":120}'}),ENV);assert.equal(r.status,403);assert.equal(seen.length,0);}
 });
 
 test('Storage control body is byte bounded even without Content-Length', async () => {
-  for(const declared of [undefined,'65537']){stub();const headers=declared?{'Content-Length':declared}:{};const r=await proxyDb(req('https://kvant-zip.pages.dev/db/storage/v1/object/sign/drawings/a.pdf',{method:'POST',headers,body:JSON.stringify({padding:'a'.repeat(65536)})}),{});assert.equal(r.status,400);assert.equal(seen.length,0);}
+  for(const declared of [undefined,'65537']){stub();const headers=declared?{'Content-Length':declared}:{};const r=await proxyDb(req('https://kvant-zip.pages.dev/db/storage/v1/object/sign/drawings/a.pdf',{method:'POST',headers,body:JSON.stringify({padding:'a'.repeat(65536)})}),ENV);assert.equal(r.status,400);assert.equal(seen.length,0);}
 });
 
 test('gt_notes still stamps actual author and refuses delete', async () => {
-  stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/gt_notes',{method:'POST',body:JSON.stringify({author:'forged@example.test',text:'note',scope:'Mars 100',at:'2000-01-01'})}),{}, {email:'real@example.test'});
+  stub();const r=await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/gt_notes',{method:'POST',body:JSON.stringify({author:'forged@example.test',text:'note',scope:'Mars 100',at:'2000-01-01'})}),ENV, {email:'real@example.test'});
   assert.equal(r.status,200);const body=JSON.parse(seen[0].init.body);assert.equal(body.author,'real@example.test');assert.notEqual(body.at,'2000-01-01');
-  stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/gt_notes',{method:'DELETE'}),{})).status,405);assert.equal(seen.length,0);
+  stub();assert.equal((await proxyDb(req('https://kvant-zip.pages.dev/db/rest/v1/gt_notes',{method:'DELETE'}),ENV)).status,405);assert.equal(seen.length,0);
 });
 
 test('anonymous requests cannot reach the proxy or an asset', async () => {

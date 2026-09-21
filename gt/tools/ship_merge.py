@@ -6,6 +6,8 @@
   gt/data/rfq_prices.json      — наши ценовые вилки и ранняя проверка 08.2026 (checks)
   gt/data/ship_energoseti.json — проверка 505 строк «Энергосетей» 09.2026
   gt/data/ship_sweep.json      — сплошная проверка остатка 863 строк 09.2026
+  gt/data/ship_recheck.json    — перепроверка 62 строк августовского наличия по ссылкам
+  gt/data/ship_blocked.json    — поиск 31 строки, чьи ссылки отдают 403, на отдающих витринах
 
 Позднейшая проверка перекрывает раннюю. Строки заявки без проверки попадают в
 датасет с вердиктом not_checked — так видно реальное покрытие, а не подогнанное.
@@ -15,6 +17,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from collections import Counter
 from datetime import date
 from pathlib import Path
 
@@ -23,7 +26,11 @@ DEMAND = ROOT / "gt/data/rfq_demand.json"
 PRICES = ROOT / "gt/data/rfq_prices.json"
 SHIP = ROOT / "gt/data/ship_energoseti.json"
 SWEEP = ROOT / "gt/data/ship_sweep.json"
+RECHECK = ROOT / "gt/data/ship_recheck.json"
+BLOCKED = ROOT / "gt/data/ship_blocked.json"
+FX = ROOT / "gt/data/fx_rates.json"
 SELLERS = ROOT / "gt/data/ship_sellers.json"
+SUBSTITUTIONS = ROOT / "gt/data/ship_price_substitutions.json"
 DST = ROOT / "gt/data/ship_lukoil.json"
 
 # наши базы контактов: путь -> ключ коллекции (None = файл сам массив)
@@ -40,6 +47,42 @@ ORG_TAIL = re.compile(
     r"Co\.?|Corp\.?|AG|Limited|Company|Pvt\.?|ООО|АО|ЗАО)\b\.?", re.I)
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]{2,}")
 PHONE = re.compile(r"\+\d[\d\-\s()]{7,}\d")
+
+
+def fx_rates() -> dict:
+    """Курсы к доллару на дату выгрузки. Без них суммы врут кратно."""
+    if not FX.exists():
+        return {"USD": 1.0}
+    return json.loads(FX.read_text()).get("rates", {"USD": 1.0})
+
+
+RATES = fx_rates()
+
+
+def to_usd(price, currency: str):
+    """Цена в долларах. None, если валюта неизвестна — молча считать её долларом нельзя.
+
+    Разбор 13.09.2026: unit_price не смотрел на валюту вовсе, и в сумму закупки
+    попадали 12 642 CZK как 12 642 USD, 7 422 RUB как 7 422 USD. По 35 твёрдым
+    строкам из 85 цена была не в долларах — итог завышался примерно на треть.
+    """
+    if price in (None, ""):
+        return None
+    try:
+        p = float(price)
+    except (TypeError, ValueError):
+        return None
+    if p <= 0:
+        # НОЛЬ И ОТРИЦАТЕЛЬНОЕ — НЕ ЦЕНА. На брокерских витринах «$0.00» и «1,00»
+        # это заглушка карточки-заявки, а не предложение. Разбор 17.09.2026: таких
+        # строк 176, и все они попадали в «рынок ниже нашей оценки», раздувая его
+        # с 58 до 234 строк. Отсутствие цены честнее нуля.
+        return None
+    cur = (s(currency) or "USD").upper()
+    rate = RATES.get(cur)
+    if not rate:
+        return None
+    return p / rate
 
 
 def clean_name(name: str) -> str:
@@ -61,7 +104,49 @@ def clean_name(name: str) -> str:
 def key(name: str) -> str:
     """Имя компании без орг-формы, регистра и пунктуации — для сопоставления."""
     n = ORG_TAIL.sub("", clean_name(name))
-    return re.sub(r"[^0-9a-zа-я ]", "", n.lower()).strip()
+    return re.sub(r"[^0-9a-zа-я ]", " ", n.lower()).strip()
+
+
+# описание вместо названия: писать туда некуда, в адресаты такое пускать нельзя
+NOT_A_COMPANY = re.compile(
+    r"^(любой|любые|разные|прочие|независимые|официальные|авторизованные|"
+    r"дистрибьютор|дистрибьюторы|поставщик|поставщики|продавцы|изготовители)\b"
+    r"|\b(прямой запрос|найдено мной|подтверждение вместо|замена источника|"
+    r"также|несколько продавцов|и её дистрибьюторы|арт\.)\b", re.I)
+# маркетплейсы и крупные сети — односложные имена, которые безопасно схлопывать
+SINGLE_WORD_OK = {"ebay", "amazon", "radwell", "newark", "mouser", "grainger",
+                  "zoro", "alibaba", "aliexpress", "farnell", "digikey"}
+
+
+def is_company(name: str) -> bool:
+    """Отличает компанию от описания класса поставщиков."""
+    n = clean_name(name)
+    if not n or len(n) < 2 or len(n) > 70:
+        return False
+    return not NOT_A_COMPANY.search(n)
+
+
+def canon_keys(keys) -> dict:
+    """Сводит написания одной компании: «Solar Turbines PartStore» → «Solar Turbines».
+
+    Правило: короткий ключ поглощает длинный, если тот начинается с него целыми
+    словами. Односложные поглощают только из списка известных площадок — иначе
+    «Siemens» съел бы «Siemens Energy», а это разные адресаты.
+    """
+    uniq = sorted({k for k in keys if k}, key=lambda k: (len(k.split()), len(k)))
+    canon = {}
+    for k in uniq:
+        base = canon.get(k, k)
+        for other in uniq:
+            if other == k or other in canon:
+                continue
+            words = base.split()
+            if len(words) < 2 and base not in SINGLE_WORD_OK:
+                continue
+            if other.startswith(base + " "):
+                canon[other] = base
+        canon.setdefault(k, base)
+    return canon
 
 
 def contact_index() -> dict:
@@ -112,6 +197,13 @@ def contact_index() -> dict:
             raw = s(r.get("seller_key"))
             if raw and raw not in idx:
                 idx[raw] = idx.get(key(r.get("seller")), {})
+
+    # дубль-индекс без пробелов: «ТЕК-ЭЛ» даёт ключ «тек эл», а в справочнике
+    # лежит слитное «текэл» — иначе уже собранный контакт теряется
+    for k, v in list(idx.items()):
+        flat = k.replace(" ", "")
+        if flat and flat != k and flat not in idx:
+            idx[flat] = v
     return idx
 
 VERDICTS = ("in_stock", "available_lead", "pn_found_no_stock", "oem_only",
@@ -148,6 +240,7 @@ def blank(pn: str) -> dict:
         "lead_time": "", "price": None, "currency": "USD", "pack_qty": 1,
         "covers_qty": "unknown", "real_maker": "", "real_pn": "", "substitute": "",
         "note": "", "checked_by": "", "sellers": [],
+        "price_usd": None, "unit_price_usd": None,
     }
 
 
@@ -169,7 +262,8 @@ def sellers_list(raw: dict) -> list:
         seen.add(k)
         out.append({"seller": clean_name(name) or name, "seller_key": k, "url": s(url),
                     "country": s(country), "price": num(price), "lead_time": s(lead),
-                    "note": s(note)})
+                    "note": s(note), "basis": "по этой детали",
+                    "is_company": is_company(name)})
 
     push(raw.get("seller"), raw.get("seller_url"), raw.get("seller_country"),
          raw.get("price"), raw.get("lead_time"))
@@ -244,6 +338,8 @@ def attach_clusters(rows: list) -> None:
             for sl in r.get("sellers") or []:
                 if not (sl.get("emails") or sl.get("phones")):
                     continue  # в подсказку идут только те, кому есть куда написать
+                if not is_company(sl["seller"]):
+                    continue  # «любой дистрибьютор уплотнений» — не адресат
                 c = pool.setdefault(sl["seller_key"], dict(sl, lines=0))
                 c["lines"] += 1
 
@@ -256,12 +352,77 @@ def attach_clusters(rows: list) -> None:
                 if c["seller_key"] in seen:
                     continue
                 seen.add(c["seller_key"])
-                picked.append({k: v for k, v in c.items() if k != "lines"})
+                # цена, срок и ссылка относятся к ЧУЖОЙ детали — по этой строке
+                # они не действуют, поэтому в подсказку кластера не переносятся
+                picked.append({
+                    "seller": c["seller"], "seller_key": c["seller_key"],
+                    "country": c.get("country", ""), "site": c.get("site", ""),
+                    "emails": c.get("emails", []), "phones": c.get("phones", []),
+                    "basis": "кластер",
+                })
                 if len(picked) >= 4:
                     break
             if len(picked) >= 4:
                 break
         r["cluster_sellers"] = picked
+
+
+def unify_sellers(rows: list) -> dict:
+    """Сводит написания одной компании к каноническому и убирает дубли внутри строки.
+
+    До этого «Solar Turbines», «Solar Turbines PartStore» и «Solar Turbines shop»
+    считались тремя адресатами, и число компаний в карте закупки было завышено.
+    """
+    names: dict[str, str] = {}
+    for r in rows:
+        for sl in r.get("sellers") or []:
+            k = sl["seller_key"]
+            # каноническим показываем самое короткое написание: оно ближе к названию
+            if k not in names or len(sl["seller"]) < len(names[k]):
+                names[k] = sl["seller"]
+
+    canon = canon_keys(names)
+    aliases: dict[str, list] = {}
+    for raw, ck in canon.items():
+        aliases.setdefault(ck, []).append(raw)
+
+    for r in rows:
+        seen, merged = set(), []
+        for sl in r.get("sellers") or []:
+            ck = canon.get(sl["seller_key"], sl["seller_key"])
+            if ck in seen:
+                continue
+            seen.add(ck)
+            sl["seller_key"] = ck
+            sl["seller"] = names.get(ck, sl["seller"])
+            # флаг считаем по каноническому имени: описание могло прийти из
+            # длинного написания, которое мы только что схлопнули
+            sl["is_company"] = is_company(sl["seller"])
+            merged.append(sl)
+        r["sellers"] = merged
+    return aliases
+
+
+def stock_grade(r: dict) -> str:
+    """Насколько наличие твёрдое.
+
+    Разбор показал, что «225 на складе» смешивало три разные вещи: подтверждённый
+    остаток на весь объём, наличие без числа остатка и формулировку «отгрузим,
+    если есть». В деньги и в план отгрузки имеет право идти только первое.
+    """
+    if r["verdict"] != "in_stock":
+        return "нет"
+    if r["in_stock"] == "conditional":
+        return "условный"
+    if r["checked_by"] == "проверка 08.2026":
+        return "устаревший"          # август, ссылки с тех пор не перепроверялись
+    if r["covers_qty"] == "full":
+        # «в наличии» без числа остатка закрывает ровно одну штуку: на две и больше
+        # это уже обещание, а не подтверждение
+        if (r["stock_qty"] or "").strip() or int(r.get("qty") or 0) <= 1:
+            return "твёрдый"
+        return "частичный"
+    return "частичный"
 
 
 def load_rows(path: Path, key: str) -> list:
@@ -298,6 +459,8 @@ def main() -> int:
         (PRICES, "checks", "проверка 08.2026"),
         (SHIP, "rows", "проверка 505 строк 09.2026"),
         (SWEEP, "rows", "сплошная проверка остатка 09.2026"),
+        (RECHECK, "rows", "перепроверка ссылок 09.2026"),
+        (BLOCKED, "rows", "обход ботозащиты 09.2026"),
     ):
         rows = prices_doc["checks"] if path == PRICES else load_rows(path, coll)
         for raw in rows:
@@ -315,11 +478,23 @@ def main() -> int:
         rec.update({k: v for k, v in (checks.get(pn) or blank(pn)).items() if k != "pn"})
         out.append(rec)
 
+    aliases = unify_sellers(out)
+
     # контакты — на продавца, а не на позицию: один справочник на всю выкладку
     contacts = contact_index()
+
+    def find_contact(k):
+        """Ищем и по каноническому ключу, и по всем исходным написаниям."""
+        cands = [k, *aliases.get(k, [])]
+        for cand in cands + [c.replace(" ", "") for c in cands]:
+            c = contacts.get(cand)
+            if c and (c.get("emails") or c.get("phones")):
+                return c
+        return None
+
     for rec in out:
         for sl in rec.get("sellers") or []:
-            c = contacts.get(sl["seller_key"])
+            c = find_contact(sl["seller_key"])
             if c:
                 sl["emails"] = c["emails"][:3]
                 sl["phones"] = c["phones"][:2]
@@ -329,16 +504,77 @@ def main() -> int:
                 sl["emails"], sl["phones"] = [], []
                 sl["site"] = sl["url"]
 
+    # цена в долларах — ОДИН раз здесь, чтобы ни один потребитель датасета
+    # не складывал кроны с рублями. Курс — gt/data/fx_rates.json с датой.
+    no_rate, zero_price = [], 0
+    for rec in out:
+        usd = to_usd(rec.get("price"), rec.get("currency"))
+        rec["price_usd"] = round(usd, 4) if usd is not None else None
+        if usd is None:
+            rec["unit_price_usd"] = None
+            if rec.get("price") not in (None, ""):
+                # две разные причины, и путать их нельзя: заглушка витрины и
+                # валюта без курса лечатся по-разному
+                try:
+                    is_zero = float(rec["price"]) <= 0
+                except (TypeError, ValueError):
+                    is_zero = False
+                if is_zero:
+                    zero_price += 1
+                else:
+                    no_rate.append(rec["currency"])
+        else:
+            try:
+                pack = float(rec.get("pack_qty") or 1) or 1.0
+            except (TypeError, ValueError):
+                pack = 1.0
+            rec["unit_price_usd"] = round(usd / pack, 4)
+
+    # ПОДСТАВЛЕННЫЕ ЦЕНЫ СНИМАЮТСЯ. gt/data/ship_price_substitutions.json называет
+    # поимённо номера, у которых в поле цены стоит не цена, а нижняя граница
+    # витринной вилки НА КЛАСС изделий, делённая на фасовку. Такое значение
+    # выглядит как цена и считается как цена, не будучи ею. Набор существовал с
+    # 18.09.2026, но ни на один счёт не влиял: он описывал ошибку, а сводка
+    # продолжала её содержать. Теперь значение обнуляется здесь, а причина
+    # переносится в пояснение строки, чтобы её было видно и в выгрузке.
+    subs = {}
+    if SUBSTITUTIONS.exists():
+        for it in json.loads(SUBSTITUTIONS.read_text(encoding="utf-8")).get("items", []):
+            subs[key(it.get("pn"))] = it
+    dropped = 0
+    for rec in out:
+        it = subs.get(key(rec.get("pn")))
+        if not it:
+            continue
+        why = str(it.get("how_it_was_made") or "").strip()
+        rec["price"] = None
+        rec["price_usd"] = None
+        rec["unit_price_usd"] = None
+        rec["note"] = (str(rec.get("note") or "").rstrip() +
+                       " ЦЕНА СНЯТА 18.09.2026: в поле стояла не цена этой детали, а "
+                       + (why or "подстановка по классу изделий") +
+                       ". Такое значение выглядит как цена и считается как цена, не "
+                       "будучи ею, поэтому в счёт не идёт. Поимённо названо в "
+                       "gt/data/ship_price_substitutions.json.").strip()
+        dropped += 1
+
+    for rec in out:
+        rec["stock_grade"] = stock_grade(rec)
     attach_clusters(out)
 
     out.sort(key=lambda r: (r["sheet"], r["cat"], r["pn"]))
     DST.write_text(json.dumps({
         "updated": date.today().isoformat(),
         "source": "Заявка ЛУКОЙЛ (листы «Энергосети» и «НВН»): наличие у продавцов по всей номенклатуре",
-        "method": "gt/tools/ship_merge.py сводит gt/data/rfq_demand.json с тремя поколениями "
-                  "проверок: rfq_prices.json:checks (08.2026), ship_energoseti.json (505 строк) "
-                  "и ship_sweep.json (остаток 863). Поздняя проверка перекрывает раннюю; "
-                  "строки без проверки помечены not_checked.",
+        "method": "gt/tools/ship_merge.py сводит gt/data/rfq_demand.json с пятью поколениями "
+                  "проверок: rfq_prices.json:checks (08.2026), ship_energoseti.json (505 строк), "
+                  "ship_sweep.json (остаток 863), ship_recheck.json (62 строки августовского "
+                  "наличия) и ship_blocked.json (31 строка из-под ботозащиты). Поздняя проверка "
+                  "перекрывает раннюю; строки без проверки помечены not_checked.",
+        "fx": "price_usd и unit_price_usd пересчитаны по gt/data/fx_rates.json. Считать надо "
+              "по ним: цены сняты в девяти валютах, и сложение price как есть завышало сумму "
+              "закупки примерно на треть. Курс справочный на дату выгрузки, не курс сделки — "
+              "любая сумма из него несёт оговорку.",
         "rows": out,
     }, ensure_ascii=False, indent=1))
 
@@ -350,16 +586,31 @@ def main() -> int:
     own = sum(1 for r in out if any(sl.get("emails") or sl.get("phones")
                                     for sl in r.get("sellers") or []))
     any_c = sum(1 for r in out if contacted(r))
-    three = sum(1 for r in out if len(contacted(r)) >= 3)
+    grades = Counter(r["stock_grade"] for r in out if r["stock_grade"] != "нет")
+    comps = {sl["seller_key"] for r in out for sl in r.get("sellers") or []}
     print(f"позиций {len(out)}, проверено {checked}, без проверки {len(out) - checked}")
-    print(f"  контакт по самой строке: {own}")
-    print(f"  контакт по строке или её кластеру: {any_c} ({round(100 * any_c / len(out))}%)")
-    print(f"  три и больше адресатов с контактом: {three}")
-    print(f"  БЕЗ единого адресата: {len(out) - any_c}")
+    print(f"  наличие: твёрдое {grades['твёрдый']}, частичное {grades['частичный']}, "
+          f"условное {grades['условный']}, устаревшее {grades['устаревший']}")
+    print(f"  контакт ПО САМОЙ ДЕТАЛИ: {own} ({round(100 * own / len(out))}%)")
+    print(f"  плюс родовой адрес кластера: {any_c - own}; без адресата {len(out) - any_c}")
+    print(f"  компаний-адресатов после сведения написаний: {len(comps)}")
+    firm_usd = sum((r["unit_price_usd"] or 0) * (r.get("qty") or 0) for r in out
+                   if r["stock_grade"] == "твёрдый" and r.get("covers_qty") == "full")
+    cur = Counter(r["currency"] for r in out
+                  if r["stock_grade"] == "твёрдый" and r.get("covers_qty") == "full"
+                  and r.get("price"))
+    print(f"  закупка по твёрдым строкам: {firm_usd:,.0f} USD "
+          f"(валют в них {len(cur)}: {', '.join(f'{k}×{v}' for k, v in cur.most_common())})")
+    if zero_price:
+        print(f"  заглушек вместо цены (ноль на витрине): {zero_price} строк — "
+              "в сравнение и в сумму не идут")
+    if no_rate:
+        print(f"  ВНИМАНИЕ: цена без известного курса у {len(no_rate)} строк: "
+              f"{', '.join(sorted(set(no_rate)))} — в сумму не вошли")
     for sheet in sorted({r["sheet"] for r in out}):
         n = [r for r in out if r["sheet"] == sheet]
-        st = sum(1 for r in n if r["verdict"] == "in_stock")
-        print(f"  {sheet}: {len(n)} позиций, на складе {st}")
+        print(f"  {sheet}: {len(n)} позиций, твёрдый склад "
+              f"{sum(1 for r in n if r['stock_grade'] == 'твёрдый')}")
     return 0
 
 

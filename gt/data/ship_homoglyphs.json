@@ -1,0 +1,83 @@
+{
+ "updated": "2026-09-18",
+ "source": "Разбор поля артикула сводки заявки. Считает gt/tools/homoglyphs.py.",
+ "what_it_is": "Номера, в которых кириллическая буква стоит на месте латинской и неотличима от неё на вид. По такому номеру поиск не находит ничего — ни у продавца, ни в нашем индексе.",
+ "what_we_did": "Ключ поиска в scripts/build_index.py и scripts/lookup.py теперь сводит двойники к латинице ДО отсева символов, поэтому номер находится и в том, и в другом написании. Само поле артикула в данных НЕ правится: там записано то, что прислал заказчик.",
+ "rows_checked": 1642,
+ "pns_with_homoglyphs": 9,
+ "usd_exposure": 23370.0,
+ "items": [
+  {
+   "pn": "1794-IВ10XOB6XT",
+   "pn_latin": "1794-IB10XOB6XT",
+   "letters": "В",
+   "name": "Блок ввода/вывода Flex 16 дискретных 10ввод/6вывод Солар Taurus 70MD 1794-IВ10XOB6XT",
+   "qty": 9,
+   "usd_exposure": 9000.0
+  },
+  {
+   "pn": "PEDROLLO HF 50В",
+   "pn_latin": "PEDROLLO HF 50B",
+   "letters": "В",
+   "name": "Двигатель - Насос циркуляционный ОЖ",
+   "qty": 21,
+   "usd_exposure": 6615.0
+  },
+  {
+   "pn": "У808750D9J",
+   "pn_latin": "Y808750D9J",
+   "letters": "У",
+   "name": "Прокладка 750(-3/-4) / 730(-1/-2) x 0,8 (9J) TFE/P",
+   "qty": 9,
+   "usd_exposure": 3015.0
+  },
+  {
+   "pn": "p/n Solar: 962308С1",
+   "pn_latin": "p/n Solar: 962308C1",
+   "letters": "С",
+   "name": "Частотомер 45-55HZ, WESCHLER INSTRUMRNTS Солар Taurus 60S p/n Solar: 962308С1",
+   "qty": 4,
+   "usd_exposure": 2900.0
+  },
+  {
+   "pn": "KFD2-СR-Ex1 30.300",
+   "pn_latin": "KFD2-CR-Ex1 30.300",
+   "letters": "С",
+   "name": "Барьер искробезопасности Солар Taurus 70 KFD2-СR-Ex1 30.300",
+   "qty": 6,
+   "usd_exposure": 960.0
+  },
+  {
+   "pn": "RI01170В00-66",
+   "pn_latin": "RI01170B00-66",
+   "letters": "В",
+   "name": "Элемент фильтра Drillmec RI01170В00-66",
+   "qty": 4,
+   "usd_exposure": 880.0
+  },
+  {
+   "pn": "К5С2-Х (K5C2-EXLP)",
+   "pn_latin": "K5C2-X (K5C2-EXLP)",
+   "letters": "КСХ",
+   "name": "Клапан MDH56287 К5С2-Х (K5C2-EXLP)",
+   "qty": 1,
+   "usd_exposure": 0.0
+  },
+  {
+   "pn": "НК-5187-ASK-A",
+   "pn_latin": "HK-5187-ASK-A",
+   "letters": "КН",
+   "name": "Комплект для кап. ремонта НК-5187-ASK-A",
+   "qty": 3,
+   "usd_exposure": 0.0
+  },
+  {
+   "pn": "MCRА040AT",
+   "pn_latin": "MCRA040AT",
+   "letters": "А",
+   "name": "Миниконтактор General Electric MCRА040AT",
+   "qty": 2,
+   "usd_exposure": 0.0
+  }
+ ]
+}

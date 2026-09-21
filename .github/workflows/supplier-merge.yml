@@ -1,0 +1,140 @@
+name: Поставщики — сведение реестров
+
+# Сводит шесть реестров поставщиков в канонические сущности. ПО УМОЛЧАНИЮ ВХОЛОСТУЮ:
+# читает, считает, печатает — и ничего не пишет.
+#
+# ЗАЧЕМ ОТДЕЛЬНО ОТ «замера сведения». Тот отвечает на вопрос «сколько их и
+# насколько пересекаются» и в базу не смотрит вовсе. Этот применяет само правило
+# сведения и показывает, что получится: сколько сущностей, чем они опознаны, что
+# ушло человеку. Замер обосновывает правило, прогон его проверяет.
+#
+# ШЕСТОЙ РЕЕСТР ОБЯЗАТЕЛЕН ДЛЯ ЗАПИСИ. Номер KV-S-NNNNNN-C выдаётся навсегда.
+# Выдать его по пяти реестрам из шести значит раздвоить сущность на следующем
+# прогоне, когда придёт портал: код это проверяет и запись отменяет сам.
+#
+# В журнал идут ТОЛЬКО агрегаты: репозиторий публичный (CLAUDE.md, правило 17).
+# Ни одного названия компании, ни домена, ни идентификатора карточки.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать в базу (иначе вхолостую)"
+        type: boolean
+        default: false
+      rollback_run_id:
+        description: "Откатить прогон по ключу (например merge-1789942261). Задан — только откат, записи не будет"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  # ОБЩАЯ ОЧЕРЕДЬ ЧТЕНИЯ ПОРТАЛА. Все прогоны, которые читают Bitrix, стоят в
+  # одной группе и идут по очереди. 21.09.2026 в 08:38 публикация снимка и разбор
+  # вложений запустились одновременно: двенадцать частей разбора плюс сплошное
+  # чтение карточек дали HTTP 429, и портал перестал отвечать обоим. Очередь
+  # дороже по времени, но дешевле, чем упавший прогон и потерянные минуты.
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        # pytest и psycopg2 нужны шагу проверок записи — он идёт до сведения.
+        # Прогон 21:02 упал на «No module named pytest»: я поставил только
+        # requests, потому что сам скрипт сведения больше ничего не просит, и
+        # забыл, что перед ним стоит шаг с тестами. Версия psycopg2 — та же, что
+        # в гейте, чтобы поведение не расходилось между прогонами.
+        run: pip install --quiet requests pytest psycopg2-binary==2.9.10
+
+      - name: Проверка секретов
+        env:
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          S: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL — без портала сведение неполно"; exit 1; }
+          echo "секрет портала на месте"
+          if [ "$APPLY" = "true" ] && [ -z "${S:-}" ]; then
+            echo "::error::запись запрошена, но нет секрета SUPABASE_DB_URL"; exit 1
+          fi
+
+      # ОТКАТ ИДЁТ ПЕРВЫМ И ОТМЕНЯЕТ ВСЁ ОСТАЛЬНОЕ. Задан ключ прогона — значит
+      # прогон зовут чинить, а не писать; смешивать откат с новой записью в одном
+      # запуске нельзя: непонятно, что откатывать, если упадёт вторая половина.
+      - name: Откат прогона по ключу
+        if: inputs.rollback_run_id != ''
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          RUN_ID: ${{ inputs.rollback_run_id }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          echo "откатываю прогон $RUN_ID"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -v run_id="'$RUN_ID'" \
+            -f library/supabase/rollback_run.sql
+
+      # Проверки записи требуют настоящей базы, поэтому в гейте они пропускаются
+      # (он Postgres не поднимает). Здесь база есть — поднимаем свою, пустую, и
+      # гоняем их по-настоящему ПЕРЕД тем, как трогать рабочую. Пропущенная
+      # проверка — не пройденная проверка.
+      - name: Проверки записи на чистой базе
+        if: inputs.rollback_run_id == ''
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
+          sudo pg_ctlcluster "$(pg_lsclusters -h | awk 'NR==1{print $1}')" main start
+          sudo -u postgres psql -q -c "alter user postgres password 'ci'"
+          sudo -u postgres psql -q -c "create database suptest"
+          sudo -u postgres psql -q -d suptest -v ON_ERROR_STOP=1 \
+            -f library/supabase/suppliers_schema.sql
+          pip install --quiet psycopg2-binary
+          SUPPLIER_TEST_DB_URL="postgresql://postgres:ci@127.0.0.1:5432/suptest" \
+            python -m pytest tests/test_supplier_write.py -q
+
+      # СХЕМА ПЕРЕД ЗАПИСЬЮ, И ТОЛЬКО ПЕРЕД НЕЙ. Найдено при подготовке первой
+      # записи 20.09.2026: suppliers_schema.sql применялся ИСКЛЮЧИТЕЛЬНО к
+      # одноразовой базе CI на шаге проверок выше, а к рабочей — никогда. То есть
+      # таблиц sup_entity в проде не существует, и запись упала бы на первой
+      # вставке. Транзакция откатила бы всё, ничего не сломав, но и не записав.
+      #
+      # Файл идемпотентен и теперь переживает отсутствие ролей Supabase, поэтому
+      # применять его перед записью безопасно и дешевле, чем полагаться на то,
+      # что кто-то прогнал общие миграции. В zip-db.yml он тоже добавлен — там он
+      # держится в актуальном состоянии вместе с остальными схемами.
+      - name: Схема поставщиков в рабочей базе
+        if: inputs.apply && inputs.rollback_run_id == ''
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 \
+            -f library/supabase/suppliers_schema.sql
+
+      - name: Сведение
+        if: inputs.rollback_run_id == ''
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          # Имя переменной — латиницей: кириллическое bash за имя не считает и
+          # пытается выполнить строку как команду (прогон zip-rls 20.09, код 127).
+          # И не «[ ... ] && args=...»: при APPLY=false тест вернёт ненулевой код,
+          # он станет кодом последней команды, и set -e уронит шаг до запуска.
+          args=()
+          if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          python library/load_supplier_master.py "${args[@]}"

@@ -1,0 +1,115 @@
+name: Поставщики — снимок реестра в KV
+
+# Кладёт снимок сведённого реестра в KV Cloudflare (ключ suppliers:v1), откуда
+# его читает раздел /suppliers на портале.
+#
+# ЗАЧЕМ СНИМОК, А НЕ ЗАПРОС В БАЗУ. Воркер портала в Supabase не ходит и ключа
+# базы не носит — так же устроена библиотека. Плата за это — вот этот прогон,
+# зато у страницы нет ни одного пути к базе.
+#
+# ПО УМОЛЧАНИЮ ВХОЛОСТУЮ: читает базу, собирает снимок, печатает счётчики и
+# размер — и в KV ничего не пишет. Запись включается галкой.
+#
+# В журнал идут ТОЛЬКО агрегаты: репозиторий публичный (CLAUDE.md, правило 17).
+# Ни названий компаний, ни доменов, ни ИНН.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать снимок в KV (иначе вхолостую)"
+        type: boolean
+        default: false
+      refresh_rfq:
+        description: "Пересчитать отзывчивость поставщиков перед снимком (читает Bitrix, пишет sup_fact)"
+        type: boolean
+        default: false
+  # После сведения снимок устаревает. Расписание не ставим: сведение запускается
+  # руками, и публиковать по часам нечего — это была бы запись ради записи.
+
+permissions:
+  contents: read
+
+concurrency:
+  # ОБЩАЯ ОЧЕРЕДЬ ЧТЕНИЯ ПОРТАЛА. Все прогоны, которые читают Bitrix, стоят в
+  # одной группе и идут по очереди. 21.09.2026 в 08:38 публикация снимка и разбор
+  # вложений запустились одновременно: двенадцать частей разбора плюс сплошное
+  # чтение карточек дали HTTP 429, и портал перестал отвечать обоим. Очередь
+  # дороже по времени, но дешевле, чем упавший прогон и потерянные минуты.
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        # Версия psycopg2 — та же, что в гейте и в сведении, чтобы поведение не
+        # расходилось между прогонами.
+        #
+        # requests нужен шагу пересчёта отзывчивости: он читает портал через
+        # bitrix_client. Прогон 21.09.2026 08:13 упал на «No module named
+        # requests» — ставился набор под сам снимок, а добавленный шаг читает
+        # другой источник. Добавляя шаг, проверяй список зависимостей: это уже
+        # второй такой случай (первый — pytest в сведении).
+        run: pip install --quiet requests pytest psycopg2-binary==2.9.10
+
+      - name: Проверка секретов
+        env:
+          S: ${{ secrets.SUPABASE_DB_URL }}
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          APPLY: ${{ inputs.apply }}
+          RFQ: ${{ inputs.refresh_rfq }}
+        run: |
+          set -euo pipefail
+          # Имена переменных — латиницей: кириллическое bash за имя не считает
+          # и пытается выполнить строку как команду (CLAUDE.md, стиль работы).
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — читать нечего"; exit 1; }
+          echo "секрет базы на месте"
+          if [ "$APPLY" = "true" ]; then
+            [ -n "${T:-}" ] || { echo "::error::запись запрошена, но нет CLOUDFLARE_API_TOKEN"; exit 1; }
+            [ -n "${A:-}" ] || { echo "::error::запись запрошена, но нет CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+            echo "секреты Cloudflare на месте"
+          fi
+          if [ "$RFQ" = "true" ] && [ -z "${B:-}" ]; then
+            echo "::error::пересчёт отзывчивости запрошен, но нет BITRIX_WEBHOOK_URL"; exit 1
+          fi
+
+      - name: Проверки сборки снимка
+        # Сборка снимка — чистая функция, и проверяется до обращения к базе.
+        # Пропущенная проверка — не пройденная проверка.
+        run: python -m pytest tests/test_publish_suppliers.py -q
+
+      # ОТЗЫВЧИВОСТЬ СЧИТАЕТСЯ ПЕРЕД СНИМКОМ, А НЕ ПОСЛЕ. Снимок свеж настолько,
+      # насколько свежи факты под ним: опубликовать вчерашнюю отзывчивость и
+      # назвать это сегодняшним снимком — тот же обман, что цифра без оговорки.
+      # Шаг отдельный и по умолчанию выключен: он читает портал целиком (около
+      # пяти минут) и пишет в sup_fact.
+      - name: Пересчёт отзывчивости поставщиков
+        if: inputs.refresh_rfq
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python scripts/supplier_responsiveness.py --apply
+
+      - name: Снимок
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          # Не «[ ... ] && args=...»: при APPLY=false тест вернёт ненулевой код,
+          # он станет кодом последней команды, и set -e уронит шаг до запуска.
+          args=()
+          if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          python scripts/publish_suppliers.py "${args[@]}"
