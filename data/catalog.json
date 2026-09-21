@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 269,
-    "total_bytes": 121929723,
+    "total_bytes": 122064629,
     "by_sensitivity": {
       "внутреннее": 147,
       "конфиденциально": 69,
@@ -1299,6 +1299,42 @@
       ]
     },
     {
+      "path": "zip/data/repair_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 903049,
+      "note": "Ремонтные решения и исполнители: 44 технологии восстановления (наплавка и напыление, механическая обработка с балансировкой, обратное проектирование) с границами применимости, рисками, требованиями к оборудованию, приёмкой и экономикой; 55 исполнителей в 33 городах России, у 52 заявлен собственный передел. Закрывает последние два звена цепочки портала — «ремонтное решение» и «исполнитель». Скептики проверили 96 утверждений по технологиям: подтверждено 21, поправлено 51, забраковано 15, непроверяемо 9; среди забракованного — сквозная ссылка на отменённый РД 03-615-03 вместо действующих ФНП (приказ Ростехнадзора № 519 от 11.12.2020). Карточки исполнителей проверку НЕ проходили: соответствующие углы упёрлись в лимит. Собрано zip/tools/extract_recon.py из журнала разведки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "contractor_angles",
+        "generated",
+        "method",
+        "stats",
+        "subject",
+        "tech_angles"
+      ],
+      "main_collection": {
+        "key": "stats",
+        "records": 12
+      },
+      "last_change": "2026-09-21",
+      "last_author": "Claude",
+      "last_commit": "916d752",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
+        "tests/test_dict.py",
+        "zip/tools/apply_verdicts.py",
+        "zip/tools/build_recon_pages.py",
+        "zip/tools/extract_recon.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_energoseti.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 895919,
@@ -1525,42 +1561,6 @@
         "scripts/supplier_registry_overlap.py",
         "tests/test_dict.py",
         "zip/tools/perf_classes.py"
-      ]
-    },
-    {
-      "path": "zip/data/repair_recon.json",
-      "subproject": "база ЗИП",
-      "bytes": 768121,
-      "note": "Ремонтные решения и исполнители: 44 технологии восстановления (наплавка и напыление, механическая обработка с балансировкой, обратное проектирование) с границами применимости, рисками, требованиями к оборудованию, приёмкой и экономикой; 55 исполнителей в 33 городах России, у 52 заявлен собственный передел. Закрывает последние два звена цепочки портала — «ремонтное решение» и «исполнитель». Скептики проверили 96 утверждений по технологиям: подтверждено 21, поправлено 51, забраковано 15, непроверяемо 9; среди забракованного — сквозная ссылка на отменённый РД 03-615-03 вместо действующих ФНП (приказ Ростехнадзора № 519 от 11.12.2020). Карточки исполнителей проверку НЕ проходили: соответствующие углы упёрлись в лимит. Собрано zip/tools/extract_recon.py из журнала разведки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "contractor_angles",
-        "generated",
-        "method",
-        "stats",
-        "subject",
-        "tech_angles"
-      ],
-      "main_collection": {
-        "key": "stats",
-        "records": 12
-      },
-      "last_change": "2026-09-21",
-      "last_author": "skharkov1246",
-      "last_commit": "33e9e95",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "scripts/build_chain_page.py",
-        "tests/test_dict.py",
-        "zip/tools/apply_verdicts.py",
-        "zip/tools/build_recon_pages.py",
-        "zip/tools/extract_recon.py"
       ]
     },
     {
@@ -9024,7 +9024,7 @@
     {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 24530,
+      "bytes": 24508,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -9051,7 +9051,7 @@
       },
       "last_change": "2026-09-21",
       "last_author": "Claude",
-      "last_commit": "3cc5ffa",
+      "last_commit": "916d752",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
