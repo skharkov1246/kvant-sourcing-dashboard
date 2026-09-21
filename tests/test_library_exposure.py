@@ -72,3 +72,19 @@ def test_сумма_не_выдумывается():
     «денег нет», а на деле их просто не посчитали."""
     z = le.разобрать({"rows": [строка("ПРИМЕР-3", None)]})[0]
     assert z["usd_exposure"] is None
+
+
+def test_поток_цены_в_схеме_и_в_коде_один_и_тот_же():
+    """Вид очереди закрывает позицию ценой с потоком «разбор КП», и то же имя
+    потока пишет library/price_store.py. Имя, разъехавшееся в двух местах, не
+    падает — очередь просто перестаёт сокращаться, и это не видно ничем:
+    пустой результат ошибкой не выглядит (та же мина, что стоила 9 рёбер
+    вместо 52 в загрузчике деклараций)."""
+    схема = (ROOT / "library/supabase/schema.sql").read_text(encoding="utf-8")
+    store = (ROOT / "library/price_store.py").read_text(encoding="utf-8")
+    поток = next(x.split("=", 1)[1].strip().strip('"') for x in store.splitlines()
+                 if x.startswith("FEED ="))
+    assert поток, "в price_store не нашлось имя потока"
+    assert f"pr.feed = '{поток}'" in схема, (
+        f"вид lib_work_queue закрывает позицию другим потоком, чем пишет "
+        f"price_store: ожидалось «{поток}»")

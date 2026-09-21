@@ -385,7 +385,7 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
     return out
 
 
-def collect_refs(days: int) -> list[dict]:
+def collect_refs(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
     """Ссылки на все вложения сделок за период.
 
     Берём их через crm.item.list (entityTypeId=2), а НЕ через crm.deal.list.
@@ -403,7 +403,17 @@ def collect_refs(days: int) -> list[dict]:
     deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
                                      "select": ["ID"], "order": {"ID": "ASC"}})
     ids = [int(d["ID"]) for d in deals]
-    print(f"сделок за {days} дн.: {len(ids)} · файловых полей: {len(ffields)}", flush=True)
+    # ЧАСТЬ БЕРЁТ СВОЮ ДОЛЮ СДЕЛОК, А НЕ ВСЕ. Двенадцать частей, каждая из которых
+    # перечисляет ВСЕ сделки и все их файловые поля, — это двенадцатикратная
+    # нагрузка на портал одним залпом: прогон 21.09.2026 умер во всех двенадцати
+    # частях с HTTP 429 ещё до первого файла. Деление по остатку — честное
+    # разбиение: файл принадлежит ровно одной сделке, значит попадает ровно в
+    # одну часть, и ни один файл не теряется и не читается дважды.
+    if shards > 1:
+        ids = ids[shard::shards]
+    print(f"сделок за {days} дн.: {len(ids)}"
+          + (f" (часть {shard + 1} из {shards})" if shards > 1 else "")
+          + f" · файловых полей: {len(ffields)}", flush=True)
 
     refs: list[dict] = []
     for i in range(0, len(ids), 50):

@@ -42,6 +42,9 @@ TABLES = [
     ("lib_symptoms", "признаки: по чему видно неисправность"),
     ("lib_procedures", "инспекции, контроль, ремонт, покрытия"),
     ("lib_defects", "дефекты с последствием и решением"),
+    ("lib_customs", "таможенные декларации: кто вёз, откуда и почём"),
+    ("lib_consumption", "расход и стоимость обслуживания машины"),
+    ("lib_exposure", "очередь работ по деньгам: где нет цены"),
     ("lib_symptom_ops", "ребро «признак → чем подтвердить»"),
     ("lib_symptom_defects", "ребро «признак → дефект»"),
     ("lib_defect_ops", "ребро «дефект → чем лечить»"),
@@ -275,6 +278,24 @@ def main() -> int:
                 mark = " · ОТКАЧЕН" if reverted else ""
                 print(f"  {run_id:26}{mode:12}строк{num(marked or 0, 12)}"
                       f"   файлов{num(files_marked or 0, 8)}{mark}")
+
+        if present.get("lib_exposure"):
+            block("очередь работ по деньгам")
+            строка = one(cur, """
+                select count(*), round(sum(usd_exposure)),
+                       count(*) filter (where not exists
+                         (select 1 from lib_part_suppliers s where s.part_id = e.part_id)),
+                       round(sum(usd_exposure) filter (where not exists
+                         (select 1 from lib_part_suppliers s where s.part_id = e.part_id))),
+                       count(*) filter (where deal is not null)
+                  from lib_exposure e where not e.have_price""")
+            подписи = ("позиций без нашей цены", "денег за ними, USD",
+                       "из них без известного исполнителя", "денег за ними, USD",
+                       "с адресом, где цена уже лежит")
+            for label, value in zip(подписи, строка):
+                print(f"  {label:36}{num(value)}")
+            print("  ПЕРВОЕ — работа с уже полученными файлами, ВТОРОЕ — разведка")
+            print("  поставщика. Это разные работы, и в одной очереди они мешают.")
 
         if present.get("lib_models") is not None:
             # Связи середины цепочки появились позже таблиц. Если миграция ещё
