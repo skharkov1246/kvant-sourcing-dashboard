@@ -12,7 +12,7 @@
 одной нормализации: регистр, ё/е, пробелы. Всё, что не легло точно, остаётся
 в файле списком unbound, а не исчезает.
 
-Запуск:  python zip/tools/apply_verdicts.py <каталог-журнала>
+Запуск:  python zip/tools/apply_verdicts.py <каталог-журнала> [<ещё-каталог> …]
          python zip/tools/apply_verdicts.py --check
 """
 import json
@@ -27,24 +27,32 @@ REPAIR = D / "repair_recon.json"
 REPORT = D / "verdicts_applied.json"
 
 ALLOWED = {"подтверждено", "частично", "опровергнуто", "непроверяемо"}
+REJECTED_KEEP = {"опровергнуто"}
 
 
 def norm(s: str) -> str:
     return re.sub(r"\s+", " ", str(s or "").lower().replace("ё", "е")).strip()
 
 
-def read_journal(src: Path):
-    p = src / "journal.jsonl"
-    if not p.exists():
-        return None
-    out = []
-    for line in p.read_text().splitlines():
-        if not line.strip():
+def read_journal(*srcs):
+    """Журналов может быть НЕСКОЛЬКО: проверка идёт по направлениям, каждое
+    своим прогоном. Отчёт обязан собирать их все — иначе следующий прогон
+    затрёт заявления скептиков предыдущего, а именно в них лежит, чего
+    проверка НЕ покрыла."""
+    out, any_found = [], False
+    for src in srcs:
+        p = Path(src) / "journal.jsonl"
+        if not p.exists():
+            print(f"журнал недоступен, пропущен: {src}")
             continue
-        rec = json.loads(line)
-        if rec.get("type") == "result" and isinstance(rec.get("result"), dict):
-            out.append(rec["result"])
-    return out
+        any_found = True
+        for line in p.read_text().splitlines():
+            if not line.strip():
+                continue
+            rec = json.loads(line)
+            if rec.get("type") == "result" and isinstance(rec.get("result"), dict):
+                out.append(rec["result"])
+    return out if any_found else None
 
 
 def apply(results):
@@ -56,25 +64,31 @@ def apply(results):
     # («Подшипник качения»), а в наборе разведки лежит исходное свободное
     # название («Подшипник качения электродвигателя»). Первый прогон привязал
     # 43 вердикта из 232 ровно поэтому. Ключом служит и канонический узел, и
-    # исходный, и — последним средством — одно название дефекта: оно в каталоге
-    # уникально, а узел у одной строки ровно один.
+    # исходный. Привязки по одному названию дефекта нет: см. комментарий ниже.
     sym = json.loads((ROOT.parent / "dict" / "symptom.json").read_text(encoding="utf-8"))
     canon = {}
     for row in sym.get("defect_rows", []):
         canon.setdefault((norm(row.get("node")), norm(row.get("defect"))),
                          norm(row.get("node_raw")))
-    dindex, dfallback = {}, {}
+    dindex = {}
     for a in diag["angles"]:
         for d in a["defects"]:
             dindex.setdefault((norm(d["node"]), norm(d["defect"])), []).append(d)
-            dfallback.setdefault(norm(d["defect"]), []).append(d)
     # индекс исполнителей: имя → запись
     cindex = {}
     for a in rep["contractor_angles"]:
         for c in a["contractors"]:
             cindex.setdefault(norm(c["name"]), []).append(c)
 
+    # Считаем ЗАПИСИ, а не события привязки: два прогона проверки могут
+    # перекрыться по узлу (так «КИП, САУ, защиты» попал и в общий прогон, и в
+    # прогон КИПиА), и тогда карточка получает вердикт дважды. Число событий
+    # выходило больше числа карточек — 342 против 340, и тест это поймал.
+    # Перекрытие само по себе не ошибка, но знать о нём надо: побеждает
+    # последний вердикт, и это должно быть видно, а не подразумеваться.
     bound = {"defects": 0, "contractors": 0}
+    touched = {"defects": set(), "contractors": set()}
+    rebound = []
     unbound, overall, missing = [], [], []
     for r in results:
         scope, key = r.get("scope"), r.get("key")
@@ -102,12 +116,16 @@ def apply(results):
                     raw = canon.get((nd, df))
                     if raw:
                         hit = dindex.get((raw, df))
-                if not hit:
-                    # Одно название дефекта: годится, только если оно в каталоге
-                    # единственное. Два совпадения — отказ: вердикт на чужой
-                    # карточке хуже отсутствующего.
-                    cand = dfallback.get(df)
-                    hit = cand if cand and len(cand) == 1 else None
+                # Привязки ТОЛЬКО по названию дефекта здесь НЕТ, и это
+                # выяснилось дорого. Уникальности названия мало: скептик,
+                # получивший в группу канонический узел «КИП, САУ, защиты»,
+                # вернул по нему ссылки на карточки поршневой машины, и
+                # запасной вариант послушно посадил «Крутильно-усталостный
+                # излом вала» на функцию безопасности, а следом перезаписал
+                # вердикт «опровергнуто» у карточки про предел температуры
+                # нагнетания по API 618 — то есть стёр найденную ошибку.
+                # Узел обязан совпасть: по каноническому написанию либо по
+                # исходному. Не совпал — вердикт идёт в unbound, где его видно.
                 field = "defects"
             if not hit:
                 unbound.append({"scope": scope, "key": key, "why": "ссылка не нашлась",
@@ -115,6 +133,23 @@ def apply(results):
                                 "verdict": verdict})
                 continue
             for rec in hit:
+                was = rec["verdict"]["verdict"]
+                if id(rec) in touched[field]:
+                    rebound.append({"scope": scope, "key": key,
+                                    "ref": v.get("ref_name") or
+                                           f'{v.get("ref_node")} | {v.get("ref_defect")}',
+                                    "was": was, "now": verdict,
+                                    "kept": was if was in REJECTED_KEEP
+                                            and verdict not in REJECTED_KEEP else verdict})
+                    # Найденная ошибка не отменяется вердиктом, который её просто
+                    # не нашёл. Прогоны перекрываются по узлу, и второй скептик
+                    # видит карточку в чужом для себя контексте: так «опровергнуто»
+                    # по пределу температуры нагнетания API 618 чуть не сменилось
+                    # на «частично». Понизить «опровергнуто» может только другое
+                    # «опровергнуто» — то есть новый разбор той же ошибки.
+                    if was in REJECTED_KEEP and verdict not in REJECTED_KEEP:
+                        continue
+                touched[field].add(id(rec))
                 rec["verdict"] = dict(body)
             bound[field] += 1
 
@@ -141,8 +176,11 @@ def apply(results):
     alld = [d for a in diag["angles"] for d in a["defects"]]
     allc = [c for a in rep["contractor_angles"] for c in a["contractors"]]
     report = {
-        "source": "прогон проверки черновика",
-        "bound": bound,
+        "source": "прогоны проверки черновика",
+        "bound": {k: len(v) for k, v in touched.items()},
+        "verdicts_applied": bound,
+        "rebound_count": len(rebound),
+        "rebound": rebound,
         "unbound_count": len(unbound),
         "unbound": unbound,
         "by_verdict_defects": tally(alld),
@@ -163,19 +201,23 @@ def main() -> int:
             print("verdicts_applied.json отсутствует — прогон проверки ещё не переносился")
             return 0
         r = json.loads(REPORT.read_text(encoding="utf-8"))
-        print(f"привязано: дефектов {r['bound']['defects']}, исполнителей "
-              f"{r['bound']['contractors']}; без адреса {r['unbound_count']}")
+        print(f"карточек с вердиктом: дефектов {r['bound']['defects']}, исполнителей "
+              f"{r['bound']['contractors']}; без адреса {r['unbound_count']}; "
+              f"перекрытий {r.get('rebound_count', 0)}")
         return 0
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not args:
-        print("укажи каталог журнала проверки")
+        print("укажи каталог журнала проверки (можно несколько)")
         return 1
-    results = read_journal(Path(args[0]))
+    results = read_journal(*args)
     if results is None:
         print("журнал недоступен — файлы не трогаем")
         return 1
     r = apply(results)
-    print(f"привязано: дефектов {r['bound']['defects']}, исполнителей {r['bound']['contractors']}")
+    print(f"карточек с вердиктом: дефектов {r['bound']['defects']}, "
+          f"исполнителей {r['bound']['contractors']}")
+    print(f"вердиктов применено: {r['verdicts_applied']['defects']} + "
+          f"{r['verdicts_applied']['contractors']}; перекрытий прогонов: {r['rebound_count']}")
     print(f"без адреса: {r['unbound_count']}")
     print("дефекты:", r["by_verdict_defects"])
     print("исполнители:", r["by_verdict_contractors"])

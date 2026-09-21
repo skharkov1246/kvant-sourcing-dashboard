@@ -73,23 +73,23 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "draft": 31,
+          "n": 21,
+          "draft": 10,
           "sources": [
             "dict/symptom.json"
           ],
-          "state": "черновик"
+          "state": "есть"
         },
         {
           "link": "defect",
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "draft": 112,
+          "n": 32,
+          "draft": 80,
           "sources": [
             "zip/data/diagnostics_recon.json"
           ],
-          "state": "черновик"
+          "state": "есть"
         },
         {
           "link": "repair",
@@ -131,9 +131,9 @@
           "state": "пусто"
         }
       ],
-      "filled": 1,
+      "filled": 3,
       "of": 8,
-      "pct": 12
+      "pct": 38
     },
     {
       "segment": "pumps",
@@ -173,7 +173,7 @@
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
           "n": 59,
-          "draft": 87,
+          "draft": 86,
           "sources": [
             "zip/data/diagnostics_recon.json"
           ],
@@ -759,10 +759,10 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 42,
-    "cells_draft_only": 2,
+    "cells_filled": 44,
+    "cells_draft_only": 0,
     "cells_with_draft": 24,
-    "draft_rows": 823,
+    "draft_rows": 769,
     "cells_total": 56,
     "links_not_started": 0
   }
