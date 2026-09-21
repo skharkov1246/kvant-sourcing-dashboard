@@ -132,3 +132,92 @@ def test_live_dataset_letters_have_a_read_address():
         assert to.get("email") or to.get("form_url")
         assert to.get("confidence") != "низкая"
         assert to.get("read_on")
+
+
+# --- второй путь атрибуции: столбец заказчика, сведённый с книгой адресов ---
+
+CONTACTS2 = CONTACTS + [
+    {"maker": "Придумбур", "email": "sales@pridumbur.example", "form_url": "None",
+     "phone": "", "read_on": "https://pridumbur.example/contacts", "confidence": "средняя"},
+    {"maker": "ПридумбурХД", "email": "other@pridumburhd.example", "form_url": "None",
+     "phone": "", "read_on": "https://pridumburhd.example/c", "confidence": "средняя"},
+]
+
+
+def test_maker_path_matches_longest_name_inside_customer_spelling():
+    """«Придумбур» ⊂ «Придумбур С.п.А. / Вымысел» — письмо идёт Придумбуру."""
+    row = {"pn": "ZZ-1", "man": "Придумбур С.п.А. / Вымысел ООО"}
+    assert gl.maker_of(row, CONTACTS2) == "Придумбур"
+
+
+def test_maker_path_does_not_match_in_reverse():
+    """Заказчик написал «Придумбур», а в книге есть «ПридумбурХД» — это не он."""
+    row = {"pn": "ZZ-1", "man": "Придумбур"}
+    assert gl.maker_of(row, CONTACTS2) == "Придумбур"
+
+
+def test_maker_path_refuses_low_confidence():
+    row = {"pn": "ZZ-1", "man": "Придуманная Автоматика"}
+    assert gl.maker_of(row, CONTACTS2) == ""
+
+
+def test_maker_path_needs_a_named_maker():
+    assert gl.maker_of({"pn": "ZZ-1", "man": ""}, CONTACTS2) == ""
+
+
+def test_pattern_path_wins_over_customer_column(monkeypatch):
+    """Номер нашего шаблона — наше измерение; столбец заказчика ему не перебивает."""
+    rows = [{"pn": "VT101-7", "qty": 1, "unit": "шт", "name": "к", "man": "Придумбур"}]
+    monkeypatch.setattr(gl, "gap_rows", lambda: (rows, 10))
+    monkeypatch.setattr(gl, "brands", lambda: BRANDS)
+    monkeypatch.setattr(gl, "contacts", lambda: CONTACTS2)
+    monkeypatch.setattr(gl, "already_written", lambda: set())
+    L = gl.measure()["letters"][0]
+    assert L["brand"] == "Вымышленные Турбины"
+    assert L["brand_source"] == "наш шаблон номера"
+
+
+def test_customer_column_used_only_when_pattern_is_silent(monkeypatch):
+    rows = [{"pn": "ZZ-1", "qty": 2, "unit": "шт", "name": "н", "man": "Придумбур С.п.А."}]
+    monkeypatch.setattr(gl, "gap_rows", lambda: (rows, 10))
+    monkeypatch.setattr(gl, "brands", lambda: BRANDS)
+    monkeypatch.setattr(gl, "contacts", lambda: CONTACTS2)
+    monkeypatch.setattr(gl, "already_written", lambda: set())
+    d = gl.measure()
+    assert d["unbranded_rows"] == 0
+    L = d["letters"][0]
+    assert L["brand"] == "Придумбур"
+    assert L["brand_source"] == "столбец «Производитель» заказчика"
+
+
+def test_attribution_paths_sum_to_rows_in_letters(monkeypatch):
+    rows = [{"pn": "VT101-7", "qty": 1, "unit": "шт", "name": "к", "man": ""},
+            {"pn": "ZZ-1", "qty": 1, "unit": "шт", "name": "н", "man": "Придумбур"}]
+    monkeypatch.setattr(gl, "gap_rows", lambda: (rows, 10))
+    monkeypatch.setattr(gl, "brands", lambda: BRANDS)
+    monkeypatch.setattr(gl, "contacts", lambda: CONTACTS2)
+    monkeypatch.setattr(gl, "already_written", lambda: set())
+    d = gl.measure()
+    assert sum(d["rows_by_attribution_path"].values()) == d["rows_in_letters"] == 2
+
+
+def test_unbranded_rows_keep_the_maker_the_customer_named(monkeypatch):
+    """Строка без адреса обязана сохранить, кого заказчик назвал: это следующая работа."""
+    rows = [{"pn": "ZZ-9", "qty": 1, "unit": "шт", "name": "н", "man": "НетТакогоВКниге"}]
+    monkeypatch.setattr(gl, "gap_rows", lambda: (rows, 10))
+    monkeypatch.setattr(gl, "brands", lambda: BRANDS)
+    monkeypatch.setattr(gl, "contacts", lambda: CONTACTS2)
+    monkeypatch.setattr(gl, "already_written", lambda: set())
+    d = gl.measure()
+    assert d["unbranded_rows"] == 1
+    assert d["unbranded_makers_named_by_customer"] == ["НетТакогоВКниге"]
+
+
+def test_live_letters_name_their_attribution_path():
+    p = ROOT / "gt/data/gap_letters.json"
+    if not p.exists():
+        pytest.skip("набор ещё не собран")
+    d = json.loads(p.read_text(encoding="utf-8"))
+    ok = {"наш шаблон номера", "столбец «Производитель» заказчика"}
+    for L in d["letters"]:
+        assert L.get("brand_source") in ok

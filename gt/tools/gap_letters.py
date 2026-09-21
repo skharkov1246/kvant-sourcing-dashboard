@@ -10,13 +10,23 @@
 файле с ценой, и на них лежит 20 367 578 USD бюджета — почти четверть всего
 бюджета заявки. По этим строкам мы не знаем ни цены, ни даже порядка.
 
-ПОЧЕМУ ГРУППИРОВКА ИДЁТ НЕ ПО СТОЛБЦУ ЗАКАЗЧИКА. В его файле столбец
-«Производитель» врёт, и это измерено: под «Солар» у него лежат блок Bently
-Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — сервоклапан
-MOOG MOD-885-005. Письмо, собранное по его столбцу, ушло бы изготовителю с
-чужими деталями в перечне, и отвечать на такое не станут. Бренд определяется
-НАШИМИ шаблонами номеров из gt/data/ship_channels.json — теми же, которыми
-считается разложение заявки по каналам.
+ЧЕМ ОПРЕДЕЛЯЕТСЯ АДРЕСАТ, И ПОЧЕМУ ДВУМЯ ПУТЯМИ. Сначала — НАШИ шаблоны
+номеров из gt/data/ship_channels.json, те же, которыми считается разложение
+заявки по каналам. Это главный путь, потому что на турбинных листах столбец
+«Производитель» заказчика ВРЁТ, и это измерено: под «Солар» у него лежат блок
+Bently Nevada 1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» —
+сервоклапан MOOG MOD-885-005; письмо по его столбцу ушло бы изготовителю с
+чужими деталями в перечне.
+
+Но там, где наш шаблон молчит, столбец заказчика — единственное, что есть, и
+на приборных листах он как раз называет настоящего изготовителя узла: Balluff
+BTL7-E500-…, WIKA, BEKA BA327E, GE Druck PTX. Замер 21.09.2026 показал цену
+отказа от этого пути: у 38 строк из 182 «неопознанных» изготовитель назван
+заказчиком И адрес его страницы контактов у нас уже прочитан — то есть пять
+писем терялись на пустом месте. Поэтому путь второй: столбец заказчика,
+сведённый с gt/data/maker_contacts.json. Откуда взялся адресат, набор пишет
+по каждому письму (brand_source), и счётчики этих двух путей раздельные —
+доверие к ним разное.
 
 ЧТО В ПИСЬМЕ ЕСТЬ И ЧЕГО В НЁМ НЕТ. Есть: каталожный номер и количество.
 НЕТ: ни цены, ни бюджета заказчика, ни его имени — бюджет это его коммерческая
@@ -131,13 +141,40 @@ def brands() -> list[dict]:
 
 
 def brand_of(row: dict, bs: list[dict]) -> str:
-    """Бренд по НАШИМ шаблонам номера и наименования, а не по столбцу заказчика."""
+    """Бренд по НАШИМ шаблонам номера и наименования. Главный путь атрибуции."""
     txt = " ".join(str(row.get(f) or "")
                    for f in ("pn", "name", "man", "model", "real_maker", "real_pn"))
     for b in bs:
         if re.search(b["pattern"], txt, re.I):
             return str(b["brand"])
     return ""
+
+
+def _norm(x) -> str:
+    return re.sub(r"[^a-zа-я0-9]+", "", str(x or "").lower())
+
+
+def maker_of(row: dict, cs: list[dict]) -> str:
+    """Изготовитель по столбцу заказчика, сведённый с нашей книгой адресов.
+
+    Второй путь, и только там, где первый молчит. Сведение идёт по самому
+    длинному имени из книги адресов, которое входит в написание заказчика:
+    «Drillmec» ⊂ «Drillmec S.p.A. / Oleobi S.r.l.». Обратное вхождение не
+    берём — «Solar» не должен ловиться на «SolaHD».
+    """
+    n = _norm(row.get("man"))
+    if not n:
+        return ""
+    best = ""
+    for c in cs:
+        m = _norm(c.get("maker"))
+        if not m or m not in n:
+            continue
+        if str(c.get("confidence") or "").strip() == "низкая":
+            continue
+        if len(m) > len(_norm(best)):
+            best = str(c.get("maker"))
+    return best
 
 
 def contacts() -> list[dict]:
@@ -205,16 +242,27 @@ def measure() -> dict:
     gap, ask_rows = gap_rows()
     bs, cs, done = brands(), contacts(), already_written()
     by: dict[str, list[dict]] = defaultdict(list)
+    src: dict[str, str] = {}
     unbranded, skipped_done = [], 0
     for r in gap:
         if key(r.get("pn")) in done:
             skipped_done += 1
             continue
-        b = brand_of(r, bs)
         item = {"pn": str(r.get("pn") or "").strip(), "qty": r.get("qty"),
                 "unit": str(r.get("unit") or "шт").strip() or "шт",
-                "name": str(r.get("name") or "")[:110], "sheet": r.get("sheet")}
-        (by[b] if b else unbranded).append(item)
+                "name": str(r.get("name") or "")[:110], "sheet": r.get("sheet"),
+                "man": str(r.get("man") or "").strip()}
+        b = brand_of(r, bs)
+        if b:
+            src.setdefault(b, "наш шаблон номера")
+        else:
+            b = maker_of(r, cs)
+            if b:
+                src.setdefault(b, "столбец «Производитель» заказчика")
+        if b:
+            by[b].append(item)
+        else:
+            unbranded.append(item)
 
     letters, no_address = [], []
     for b, items in sorted(by.items(), key=lambda x: -len(x[1])):
@@ -228,6 +276,7 @@ def measure() -> dict:
         addr = address_for(b, cs)
         rec = {
             "brand": b,
+            "brand_source": src.get(b, "наш шаблон номера"),
             "rows": len(items),
             "positions": len(uniq),
             "qty_total": round(sum(float(x["qty"] or 0) for x in uniq), 2),
@@ -264,15 +313,26 @@ def measure() -> dict:
         "positions_in_letters": sum(L["positions"] for L in letters),
         "brands_without_address": no_address,
         "rows_without_address": sum(x["rows"] for x in no_address),
+        "rows_by_attribution_path": {
+            p: sum(L["rows"] for L in letters if L.get("brand_source") == p)
+            for p in ("наш шаблон номера", "столбец «Производитель» заказчика")
+        },
+        "why_two_paths": "Шаблон номера — наше измерение, столбец заказчика — его слово, и "
+                         "на турбинных листах оно неверно. Поэтому столбец берётся только "
+                         "там, где шаблон молчит, и источник записан по каждому письму.",
         "unbranded_rows": len(unbranded),
-        "what_unbranded_means": "Бренд нашими шаблонами номера не опознан. Письмо по такой "
-                                "строке собирать некуда, и это отдельная работа — атрибуция "
-                                "номера к изготовителю, — а не отказ рынка.",
-        "why_not_customers_column": "Столбец «Производитель» в файле заказчика врёт: под "
-                                    "«Солар» у него лежат блок Bently Nevada 1701/25 и "
-                                    "датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — "
-                                    "сервоклапан MOOG MOD-885-005. Письмо по его столбцу "
-                                    "ушло бы изготовителю с чужими деталями в перечне.",
+        "unbranded_makers_named_by_customer": sorted({
+            x["man"] for x in unbranded if x.get("man")}),
+        "what_unbranded_means": "Ни наш шаблон номера, ни наша книга адресов эту строку не "
+                                "закрыли. Изготовитель у большинства из них заказчиком "
+                                "НАЗВАН — не хватает прочитанной страницы его контактов. "
+                                "Это отдельная работа (читать контакты названных "
+                                "изготовителей), а не отказ рынка.",
+        "why_pattern_comes_first": "На турбинных листах столбец «Производитель» заказчика "
+                                   "врёт: под «Солар» у него лежат блок Bently Nevada "
+                                   "1701/25 и датчик Det-Tronics EQ3005PCNR, под «SIEMENS» — "
+                                   "сервоклапан MOOG MOD-885-005. Поэтому первым идёт наш "
+                                   "шаблон номера, а столбец — только там, где шаблон молчит.",
         "unbranded_sample": [x["pn"] for x in unbranded[:40]],
     }
 
@@ -293,22 +353,24 @@ def build(d: dict) -> str:
         f"{ru(d['positions_in_letters'])} позиций по {ru(d['rows_in_letters'])} строкам. "
         f"Без адреса осталось {ru(d['rows_without_address'])} строк, бренд не опознан у "
         f"{ru(d['unbranded_rows'])}.</p>")
-    add(f"<p class='dim'>{E(d['why_not_customers_column'])}</p>")
+    add(f"<p class='dim'>{E(d['why_pattern_comes_first'])} {E(d['why_two_paths'])}</p>")
     add(f"<p class='dim'><b>Чего в письмах нет.</b> {E(d['what_it_is_not'])}</p>")
     add("</div>")
 
     add("<h2>Что куда уходит</h2>")
     add("<table><thead><tr><th>бренд</th><th class='n'>позиц.</th><th class='n'>штук</th>"
-        "<th>адресат</th><th>откуда адрес</th></tr></thead><tbody>")
+        "<th>адресат</th><th>чем опознан</th><th>откуда адрес</th></tr></thead><tbody>")
     for L in d["letters"]:
         to = L.get("to") or {}
         who = to.get("email") or to.get("form_url") or "—"
         add(f"<tr><td>{E(L['brand'])}</td><td class='n'>{ru(L['positions'])}</td>"
             f"<td class='n'>{ru(L['qty_total'])}</td><td>{E(who)}</td>"
-            f"<td class='dim'>{E(str(to.get('read_on') or '')[:90])}</td></tr>")
+            f"<td class='dim'>{E(L.get('brand_source'))}</td>"
+            f"<td class='dim'>{E(str(to.get('read_on') or '')[:80])}</td></tr>")
     for x in d["brands_without_address"]:
         add(f"<tr><td>{E(x['brand'])}</td><td class='n'>{ru(x['positions'])}</td>"
             f"<td class='n'>{ru(x['qty_total'])}</td><td>адреса нет</td>"
+            f"<td class='dim'>{E(x.get('brand_source'))}</td>"
             f"<td class='dim'>{E(x['why_no_letter'])}</td></tr>")
     add("</tbody></table>")
 
@@ -319,7 +381,12 @@ def build(d: dict) -> str:
             + (f" · тел. {E(to['phone'])}" if to.get("phone") else "")
             + f"<br><b>Тема:</b> {E(L['subject'])}</p>")
         add(f"<pre>{E(L['body'])}</pre>")
-    add(f"<p class='dim'>{E(d['what_unbranded_means'])}</p>")
+    add("<h2>Что осталось работой, а не письмом</h2>")
+    add(f"<p>{E(d['what_unbranded_means'])} Строк — {ru(d['unbranded_rows'])}. "
+        f"Изготовителей, которых заказчик назвал, а страницы их контактов мы не читали — "
+        f"{ru(len(d['unbranded_makers_named_by_customer']))}. Каждый прочитанный адрес "
+        f"превращает свои строки в письмо тем же прогоном.</p>")
+    add(f"<p class='dim'>{E(', '.join(d['unbranded_makers_named_by_customer'])[:2600])}</p>")
     return "".join(a)
 
 
