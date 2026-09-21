@@ -52,6 +52,14 @@ select sup_id, kind, value, source
  order by sup_id, kind, value
 """
 ОЧЕРЕДЬ_SQL = "select count(*) from sup_review where closed_at is null"
+# Отзывчивость: только действующий факт. Прежние прогоны лежат рядом со статусом
+# superseded — история метрики и есть то, ради чего её заводят, но в снимок идёт
+# один, текущий.
+ОТЗЫВЧИВОСТЬ_SQL = """
+select subject_id, value
+  from sup_fact
+ where subject_kind = 'entity' and field = 'rfq_stats' and status <> 'superseded'
+"""
 
 
 class PublishError(Exception):
@@ -65,8 +73,9 @@ def require(condition, code):
 
 # ── Сборка снимка ────────────────────────────────────────────────────────────
 
-def собрать(строки, признаки, открытых_в_очереди):
+def собрать(строки, признаки, открытых_в_очереди, отзывчивость=()):
     """Сущности + их признаки → снимок. Чистая функция: тестируется без базы."""
+    rfq = {sid: v for sid, v in отзывчивость}
     по_сущности = collections.defaultdict(lambda: collections.defaultdict(list))
     источники = collections.defaultdict(set)
     for sup_id, kind, value, source in признаки:
@@ -74,7 +83,7 @@ def собрать(строки, признаки, открытых_в_очер�
         источники[sup_id].add(source)
 
     сущности = []
-    с_инн = многодоменных = 0
+    с_инн = многодоменных = с_историей = измеримых = 0
     for sid, имя, страна, причина, статус, _resolution, номер_выдан in строки:
         мои = по_сущности.get(sid, {})
         домены = sorted(set(мои.get("domain", [])))
@@ -95,6 +104,15 @@ def собрать(строки, признаки, открытых_в_очер�
             "merged_by": причина,
             "status": статус,
         }
+        # Отзывчивость отдаётся числителем и знаменателем, а не долей: «50 %» из
+        # двух запросов и из сорока — разные утверждения, и страница обязана
+        # уметь их различить. Доля считается там, где показывается.
+        стат = rfq.get(sid)
+        if стат and стат.get("sent"):
+            запись["rfq"] = стат
+            с_историей += 1
+            if стат["sent"] >= 3:
+                измеримых += 1
         if not номер_выдан:
             запись["number"] = None
         сущности.append(запись)
@@ -110,6 +128,8 @@ def собрать(строки, признаки, открытых_в_очер�
             # Подпись «ждут ИНН» на этой цифре была бы враньём.
             "review_open": открытых_в_очереди,
             "with_inn": с_инн,
+            "with_rfq": с_историей,
+            "rfq_measurable": измеримых,
         },
         "entities": сущности,
     }
@@ -142,9 +162,11 @@ def читать_базу(dsn):
             признаки = cur.fetchall()
             cur.execute(ОЧЕРЕДЬ_SQL)
             очередь = cur.fetchone()[0]
+            cur.execute(ОТЗЫВЧИВОСТЬ_SQL)
+            отзывчивость = cur.fetchall()
     finally:
         conn.close()
-    return строки, признаки, очередь
+    return строки, признаки, очередь, отзывчивость
 
 
 # ── Cloudflare ───────────────────────────────────────────────────────────────
@@ -261,12 +283,14 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     try:
-        строки, признаки, очередь = читать_базу(os.environ.get("SUPABASE_DB_URL"))
-        снимок = собрать(строки, признаки, очередь)
+        строки, признаки, очередь, отзывчивость = читать_базу(os.environ.get("SUPABASE_DB_URL"))
+        снимок = собрать(строки, признаки, очередь, отзывчивость)
         raw = json.dumps(снимок, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         t = снимок["totals"]
         print(f"сущностей: {t['entities']}, с номером: {t['numbered']}, "
               f"с ИНН: {t['with_inn']}, открыто в очереди проверки: {t['review_open']}")
+        print(f"с историей запросов: {t['with_rfq']}, из них измеримых (3+): "
+              f"{t['rfq_measurable']}")
         print(f"признаков прочитано: {len(признаки)}, размер снимка: {len(raw)} Б "
               f"({len(raw) / 1024 / 1024:.2f} МиБ из {MAX_BYTES // 1024 // 1024})")
         if "caveat" in снимок:

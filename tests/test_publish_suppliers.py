@@ -31,7 +31,8 @@ def сущность(sid, имя, причина="domain", номер_выдан
 
 def test_счётчики_считаются_а_не_пишутся_руками():
     снимок = собрать(КОРПУС, ПРИЗНАКИ, 7)
-    assert снимок["totals"] == {"entities": 3, "numbered": 2, "review_open": 7, "with_inn": 1}
+    assert снимок["totals"] == {"entities": 3, "numbered": 2, "review_open": 7,
+                                "with_inn": 1, "with_rfq": 0, "rfq_measurable": 0}
     assert снимок["version"] == 1
     assert снимок["published_at"].endswith("Z")
 
@@ -78,3 +79,33 @@ def test_пустой_реестр_даёт_пустой_снимок_а_не_п
     assert снимок["entities"] == []
     assert снимок["totals"]["entities"] == 0
     assert "caveat" not in снимок
+
+
+# ── ОТЗЫВЧИВОСТЬ В СНИМКЕ ────────────────────────────────────────────────────
+
+
+def test_отзывчивость_попадает_в_снимок_числителем_и_знаменателем():
+    """Доля не передаётся: «50 %» из двух и из сорока — разные утверждения."""
+    стат = {"sent": 12, "answered": 6, "quoted": 2, "silent": 3, "no_outcome": 3, "cards": 15}
+    снимок = собрать(КОРПУС, ПРИЗНАКИ, 0, [("KV-S-000001-8", стат)])
+    первая = снимок["entities"][0]
+    assert первая["rfq"] == стат
+    assert not any(isinstance(v, float) for v in первая["rfq"].values())
+    assert снимок["totals"]["with_rfq"] == 1
+    assert снимок["totals"]["rfq_measurable"] == 1
+
+
+def test_меньше_трёх_запросов_историю_даёт_но_измеримой_не_считается():
+    """У 72,5 % компаний один запрос: там доля — один случай, а не свойство."""
+    стат = {"sent": 2, "answered": 1, "quoted": 0, "silent": 1, "no_outcome": 0, "cards": 2}
+    снимок = собрать(КОРПУС, ПРИЗНАКИ, 0, [("KV-S-000001-8", стат)])
+    assert снимок["totals"]["with_rfq"] == 1
+    assert снимок["totals"]["rfq_measurable"] == 0
+
+
+def test_пустая_история_в_снимок_не_кладётся():
+    """Ноль отправленных — это «не писали», а не «не отвечает»."""
+    стат = {"sent": 0, "answered": 0, "quoted": 0, "silent": 0, "no_outcome": 0, "cards": 1}
+    снимок = собрать(КОРПУС, ПРИЗНАКИ, 0, [("KV-S-000001-8", стат)])
+    assert "rfq" not in снимок["entities"][0]
+    assert снимок["totals"]["with_rfq"] == 0
