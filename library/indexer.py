@@ -34,8 +34,18 @@ import psycopg2
 import psycopg2.extras
 import requests
 
+_КОРЕНЬ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(_КОРЕНЬ, "scripts"))
+sys.path.insert(0, _КОРЕНЬ)          # bitrix_client лежит в корне
 import docfilter  # noqa: E402  (после sys.path)
+import quotes  # noqa: E402  (цена из КП поставщика)
+import price_store  # noqa: E402  (запись цены — одна на все разборы)
+# Список полей КП держим в одном месте со всеми замерами котировок: два списка
+# разошлись бы молча — разбирали бы одно, а считали другое.
+from quote_coverage import ПОЛЕ_ЗАПРОСА, ПОЛЯ_КП  # noqa: E402
+# Поле «поставщик» карточки запроса — то же, по которому считается отзывчивость.
+from supplier_responsiveness import ПОЛЕ_ПОСТАВЩИКА, crm_id  # noqa: E402
 from segments import SEGMENTS, classify, name_of  # noqa: E402
 
 # Секреты читаются лениво: без них модуль всё равно импортируется — иначе его
@@ -51,6 +61,25 @@ RETRY_FAILED = os.environ.get("RETRY_FAILED", "") not in ("", "0", "false")
 # Ворота спецификации можно выключить без выката кода — на случай, если правило
 # начнёт отбрасывать нужное. Выключение видно в журнале прогона.
 SPECGATE = os.environ.get("SPECGATE", "1") not in ("", "0", "false")
+# Откуда брать вложения: сделки (как было) или карточки запросов поставщикам.
+# Замер 21.09.2026: в lib_files не было НИ ОДНОГО файла из полей КП — разбор до
+# СП-166 никогда не доходил, а там 5 231 файл с ценами, и это единственное место,
+# где цена вообще есть: на самой карточке сумма равна нулю у всех 21 865.
+SOURCE = os.environ.get("SOURCE", "deals").strip().lower()
+SPA_RFQ = 166
+# Подпись источника строки. Раньше здесь всегда стояла «спецификация сделки» —
+# и строки из КП поставщика ложились под чужим именем: спецификация говорит, что
+# заказчик просит, котировка — что поставщик предлагает и почём.
+ИСТОЧНИК_СТРОКИ = "котировка поставщика" if SOURCE == "rfq" else "спецификация сделки"
+# БРЕНД С КАРТОЧКИ ЗАПРОСА. Цена сравнима только в разрезе «к чему это»: тот же
+# подшипник дорог или дёшев в зависимости от машины и изготовителя. Поле на
+# карточке есть давно — base/fetch_rfq.py его даже запрашивает, — но в таблицу
+# оно не попадало вовсе. Многозначное: у запроса бывает несколько брендов.
+ПОЛЕ_БРЕНДОВ = "ufCrm18Brands"
+# Поток цен, по которому переразбор снимает свои прежние строки. Имя и вся
+# запись живут в library/price_store.py — общем месте для обычного разбора и
+# распознавания сканов (CLAUDE.md, правило 14).
+FEED_КП = price_store.FEED
 PARSER_VERSION = 2
 
 # Колонки спецификации. Спецификации у всех заказчиков свои, но заголовки повторяются.
@@ -84,27 +113,104 @@ def connect(attempts: int = 12):
     raise last
 
 
+# ОДИН КЛИЕНТ НА ВЕСЬ ПОРТАЛ. Прежний bx() делал четыре МГНОВЕННЫХ повтора без
+# пауз и после них возвращал пустой словарь. Обход принимал пустоту за конец
+# данных и завершался как успешный: чтение СП-166 обрывалось то на 7 150, то на
+# 7 750, то на 8 250 записях из 21 865 — каждый раз на другом месте, всегда
+# «успешно». Четыре повтора подряд без паузы против ограничения частоты
+# бесполезны: все четыре укладываются в доли секунды.
+#
+# bitrix_client.BitrixClient делает это правильно и давно: пауза между запросами,
+# экспоненциальная выдержка с джиттером, разбор 429 и 5xx, отдельный список
+# повторяемых кодов ошибок Битрикса — и ГРОМКИЙ отказ, когда попытки кончились.
+# Держать вторую реализацию того же чтения незачем: сегодня они разошлись молча,
+# и это стоило целого расследования.
+_КЛИЕНТ = None
+
+
+def клиент():
+    """Ленивая сборка: без секрета модуль всё равно должен импортироваться."""
+    global _КЛИЕНТ
+    if _КЛИЕНТ is None:
+        from bitrix_client import BitrixClient
+        # ЧАСТОТА ПОД ЛИМИТ ПОРТАЛА. Умолчание клиента — ~3 запроса в секунду,
+        # а Битрикс держит около двух. Одному прогону это сходило с рук за счёт
+        # повторов, но разбор идёт частями, и каждая часть шлёт свои запросы:
+        # двенадцать частей давали 36 запросов в секунду и гарантированный 429.
+        _КЛИЕНТ = BitrixClient(BASE, min_interval=0.5)
+    return _КЛИЕНТ
+
+
 def bx(method: str, params: dict) -> dict:
-    for _ in range(4):
-        try:
-            r = requests.post(f"{BASE}/{method}.json", json=params, timeout=90)
-            r.raise_for_status()
-            return r.json()
-        except Exception:
-            continue
-    return {}
+    """Полный конверт ответа ({result, next, total}). Исчерпав повторы — падает.
+
+    Падение здесь намеренно: неполное чтение, выданное за полное, дороже
+    упавшего прогона. Прогон повторяется, потерянные записи — нет.
+    """
+    return клиент().call_envelope(method, params)
+
+
+# Размер страницы REST Битрикса. Полное чтение кончается КОРОТКОЙ страницей;
+# если последняя страница полна, а «next» не пришёл — чтение оборвалось, и это
+# надо кричать, а не молчать.
+СТРАНИЦА = 50
 
 
 def bx_all(method: str, params: dict) -> list:
+    """Обход по смещению. Кричит, если похоже, что чтение оборвалось.
+
+    ОБРЫВ БЫЛ И БЫЛ НЕВИДИМ. 21.09.2026: этим способом СП-166 отдавал 7 750
+    карточек, а чтение по ключу (>id) — 21 865. Обрыв на смещении происходит без
+    ошибки: сервер просто перестаёт присылать «next». Поэтому здесь нет починки
+    самого обхода — для больших наборов есть bx_all_by_id, — но есть признак, по
+    которому обрыв виден в журнале.
+    """
     out, start = [], 0
     while True:
         j = bx(method, {**params, "start": start})
         res = j.get("result")
         items = res.get("items") if isinstance(res, dict) and "items" in res else res
-        out += items or []
+        items = items or []
+        out += items
         if "next" not in j:
+            if len(items) >= СТРАНИЦА:
+                print(f"::warning::{method}: чтение оборвалось на {len(out)} записях — "
+                      f"последняя страница полна ({len(items)}), а продолжения нет. "
+                      "Для больших наборов нужен обход по ключу (bx_all_by_id).",
+                      flush=True)
             return out
         start = j["next"]
+
+
+def bx_all_by_id(method: str, params: dict) -> list:
+    """Обход по ключу: filter[>id] = последний прочитанный.
+
+    Тот же способ, которым портал читают scripts/quote_coverage.py и
+    scripts/supplier_responsiveness.py (BitrixClient.list_items). На смещении
+    чтение СП-166 обрывалось на 7 750 из 21 865 записей — молча, без ошибки.
+    start=-1 отключает подсчёт общего числа: он и есть причина медленного и
+    ненадёжного обхода по смещению.
+    """
+    out: list = []
+    last = 0
+    исходный = dict(params.get("filter") or {})
+    while True:
+        f = dict(исходный)
+        f[">id"] = last
+        j = bx(method, {**params, "filter": f, "order": {"id": "ASC"}, "start": -1})
+        res = j.get("result")
+        items = (res.get("items") if isinstance(res, dict) and "items" in res else res) or []
+        if not items:
+            return out
+        out += items
+        try:
+            last = int(items[-1]["id"])
+        except (KeyError, TypeError, ValueError):
+            print(f"::warning::{method}: в записи нет числового id — обход по ключу "
+                  f"невозможен, прочитано {len(out)}", flush=True)
+            return out
+        if len(items) < СТРАНИЦА:
+            return out
 
 
 def sniff(b: bytes) -> str:
@@ -221,6 +327,13 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
     """Позиции из таблицы. Если заголовков нет — берём самую длинную текстовую
     ячейку строки как наименование: у большинства спецификаций это работает."""
     hi, cols = header_map(rows)
+    # Ценовые колонки ищутся в той же строке заголовков. У спецификаций заказчика
+    # их там нет, и разбор не меняется; у КП поставщика в них весь смысл файла
+    # (library/quotes.py).
+    цк = quotes.колонки_цены(rows[hi]) if hi >= 0 else {}
+    # Валюта почти всегда написана только в шапке («Цена за ед., EUR»), а в
+    # ячейках стоят голые числа.
+    вк = quotes.валюта_заголовка(rows[hi], цк) if цк else None
     out: list[dict] = []
     body = rows[hi + 1:] if hi >= 0 else rows
     for row in body:
@@ -262,6 +375,10 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
             # строк с пересчётом fts, отдельная задача.
             rec["part_number"] = docfilter.part_number_of(joined)
         rec["_row"] = joined[:600]
+        # Цена берётся только из названной колонки. Сумма строки ценой не
+        # становится: из неё цена выводится делением на количество, и такая
+        # строка помечена как выведенная (library/quotes.py).
+        rec["_цена"] = quotes.цена_строки(row, цк, rec.get("qty"), вк) if цк else None
         out.append(rec)
         if len(out) >= 3000:
             break
@@ -301,6 +418,104 @@ def collect_refs(days: int) -> list[dict]:
                     if isinstance(fo, dict) and fo.get("urlMachine"):
                         refs.append({"deal": str(x["id"]), "field": f, "origin": "поле сделки", "fo": fo})
     print(f"вложений в полях сделок: {len(refs)}", flush=True)
+    return refs
+
+
+def ключи_брендов(v) -> str:
+    """Ключи брендов карточки списком через запятую.
+
+    Поле многозначное, и первый бренд в нём — не «главный», а просто первый:
+    берём все. Имена здесь НЕ разрешаем, как и у поставщика: сопоставление
+    ключа со справочником — отдельный проход, а догадка вместо связи хуже
+    пустоты.
+    """
+    значения = v if isinstance(v, list) else ([v] if v else [])
+    ключи: list[str] = []
+    for z in значения:
+        k = crm_id(z)
+        if k and str(k) not in ключи:
+            ключи.append(str(k))
+    return ",".join(ключи)
+
+
+def collect_refs_rfq(days: int) -> list[dict]:
+    """Ссылки на вложения карточек запросов поставщикам (СП-166).
+
+    БЕРЁМ ТОЛЬКО ФАЙЛЫ СО СТОРОНЫ ПОСТАВЩИКА. «Request file» — то, что отправили
+    мы; разобрать его как котировку значит объявить прокотированным собственный
+    запрос. Список полей — общий с замерами (scripts/quote_coverage.py).
+
+    Механика та же, что у сделок: crm.item.list отдаёт у файловых полей
+    urlMachine — REST-ссылку с одноразовым токеном. Разница только в том, какую
+    сущность спрашиваем и какие поля берём.
+    """
+    # ФИЛЬТР ПО ДАТЕ НА СТОРОНЕ ПОРТАЛА СЪЕДАЛ ДВЕ ТРЕТИ КАРТОЧЕК. Замер
+    # 21.09.2026: с «>=createdTime» за 7 300 дней (двадцать лет) приходило 7 150
+    # карточек, а замеры котировок, читающие ту же сущность БЕЗ фильтра, видят
+    # 21 865. Двадцатилетнее окно отсечь ничего не может — значит отсекал сам
+    # фильтр: у карточки либо нет createdTime, либо сравнение по нему у СП-166
+    # работает не так, как ожидается. Цена ошибки — две трети котировок молча
+    # мимо разбора.
+    #
+    # Поэтому читаем ВСЁ, как это делают scripts/quote_coverage.py и
+    # scripts/supplier_responsiveness.py, а окно применяем у себя. Карточку без
+    # даты окно НЕ отбрасывает: недоказанное «старая» дешевле потерянной цены.
+    поля = list(ПОЛЯ_КП)
+    # Обход по ключу, а не по смещению: на смещении приходило 7 750 карточек
+    # вместо 21 865, и без единой ошибки (замер 21.09.2026).
+    карточки = bx_all_by_id("crm.item.list",
+                            {"entityTypeId": SPA_RFQ,
+                             "select": ["id", "createdTime", ПОЛЕ_ПОСТАВЩИКА,
+                                        ПОЛЕ_БРЕНДОВ] + поля})
+    всего = len(карточки)
+    без_даты = 0
+    if days and days > 0:
+        порог = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+        в_окне = []
+        for x in карточки:
+            д = str(x.get("createdTime") or "")[:10]
+            if not д:
+                без_даты += 1
+                в_окне.append(x)
+            elif д >= порог:
+                в_окне.append(x)
+        карточки = в_окне
+    print(f"карточек запросов: всего {всего}, в окне {days} дн. — {len(карточки)}"
+          f" (без даты {без_даты}, взяты) · полей КП: {len(поля)}", flush=True)
+
+    refs: list[dict] = []
+    свои = 0
+    без_поставщика = 0
+    без_брендов = 0
+    for x in карточки:
+        # Компания-поставщик известна ПРЯМО ЗДЕСЬ, и связать цену с ней надо
+        # сейчас: отдельный проход позже означал бы второе сплошное чтение
+        # портала ради того, что уже держим в руках.
+        компания = crm_id(x.get(ПОЛЕ_ПОСТАВЩИКА))
+        if not компания:
+            без_поставщика += 1
+        бренды = ключи_брендов(x.get(ПОЛЕ_БРЕНДОВ))
+        if not бренды:
+            без_брендов += 1
+        for f in поля:
+            v = x.get(f)
+            if not v:
+                continue
+            for fo in (v if isinstance(v, list) else [v]):
+                if isinstance(fo, dict) and fo.get("urlMachine"):
+                    refs.append({"deal": str(x["id"]), "field": f,
+                                 "origin": "поле запроса", "fo": fo,
+                                 "company": str(компания) if компания else None,
+                                 "brands": бренды or None})
+        if x.get(ПОЛЕ_ЗАПРОСА):
+            свои += 1
+    print(f"вложений КП от поставщиков: {len(refs)}"
+          f" · карточек с нашим «Request file» (не берём): {свои}", flush=True)
+    print(f"карточек без указанного поставщика: {без_поставщика} из {len(карточки)}"
+          " — их цены лягут без привязки к компании", flush=True)
+    print(f"карточек без указанного бренда: {без_брендов} из {len(карточки)}"
+          " — по ним разрез «чей это» даст только то, что написано в файле",
+          flush=True)
     return refs
 
 
@@ -406,8 +621,14 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
             rec["doc_class"], rec["class_rule"] = "документация", docfilter.RULE_VERSION
             return rec, []
         for ln in lines[:2000]:
+            # КП приходят PDF-ами, и таблицы в них нет: разбор по заголовкам
+            # мимо. Цена здесь опознаётся арифметикой — кол-во × цена = сумма,
+            # тройка чисел в самой строке (library/quotes.py). Замер 21.09.2026:
+            # без этого пробный разбор дал 139 позиций и НОЛЬ цен.
+            ц = quotes.цена_из_текста(ln) if SOURCE == "rfq" else None
             items.append({"item_name": ln[:300], "part_number": docfilter.part_number_of(ln),
-                          "oem": "", "unit": "", "qty": None, "_row": ln[:600]})
+                          "oem": "", "unit": "", "qty": ц["qty"] if ц else None,
+                          "_row": ln[:600], "_цена": ц})
 
     rec["chars"] = len(text)
     rec["rows_found"] = len(items)
@@ -421,6 +642,10 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
                          else "позиции не распознаны")
         return rec, []
     rec["status"] = "разобран"
+    # Валюта всего файла — последний довод, когда ни заголовок колонки, ни
+    # ячейка её не назвали. Берётся, только если в тексте ровно одна валюта:
+    # две («цена в евро, НДС в рублях») угадывать нельзя.
+    вф = quotes.валюта_файла(text)
     for it in items:
         # Сегмент СТРОКИ — по самой строке. Наследование от файла помечается
         # отдельно: пока оно молчаливо, segment_id нельзя использовать как эталон
@@ -431,6 +656,11 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         it["segment_rule"] = "строка" if own else ("файл" if rec["segment_id"] else None)
         it["deal_id"] = ref["deal"]
         it["source_file"] = fid
+        it["company"] = ref.get("company")
+        it["brands"] = ref.get("brands")
+        # Валюта файла вместо ненайденной; оговорка и уверенность правятся там же,
+        # чтобы в строке не стояли разом «не названа» и «взята по файлу».
+        quotes.подставить_валюту(it.get("_цена"), вф)
     return rec, items
 
 
@@ -483,7 +713,12 @@ def main() -> int:
     print(f"уже разобрано ранее: {len(done)}"
           + (" (файлы со статусом «не скачался» пойдут заново)" if RETRY_FAILED else ""), flush=True)
 
-    refs = collect_refs(DAYS)
+    if SOURCE not in ("deals", "rfq"):
+        print(f"неизвестный SOURCE={SOURCE!r}: допустимо deals или rfq", file=sys.stderr)
+        return 2
+    print(f"источник вложений: {'карточки запросов (СП-166)' if SOURCE == 'rfq' else 'сделки'}",
+          flush=True)
+    refs = collect_refs_rfq(DAYS) if SOURCE == "rfq" else collect_refs(DAYS)
     mine = [r for r in refs
             if int(hashlib.sha1(str(r["fo"].get("id") or r["fo"].get("ID")).encode()).hexdigest(), 16) % SHARDS == SHARD
             and str(r["fo"].get("id") or r["fo"].get("ID")) not in done]
@@ -498,12 +733,14 @@ def main() -> int:
     kinds: Counter = Counter()
     segs: Counter = Counter()
     total_items = 0
+    цен = 0
     buf_files: list[tuple] = []
     buf_items: list[tuple] = []
+    buf_prices: list[tuple] = []
 
     def flush() -> None:
-        nonlocal buf_files, buf_items
-        if not buf_files and not buf_items:
+        nonlocal buf_files, buf_items, buf_prices
+        if not buf_files and not buf_items and not buf_prices:
             return
         conn = connect()
         with conn.cursor() as cur:
@@ -530,6 +767,16 @@ def main() -> int:
                             bad += 1
                     print(f"  ⚠ пакет номенклатуры не прошёл ({type(e).__name__}); "
                           f"построчно записано {len(buf_items) - bad}, пропущено {bad}", flush=True)
+            if buf_prices:
+                try:
+                    price_store.записать(cur, buf_prices, psycopg2.extras.execute_values)
+                except psycopg2.Error as e:
+                    # Откатываем ВСЁ, включая учёт файлов: файлы, отмеченные
+                    # разобранными, при потерянных ценах — молчаливая потеря, а
+                    # упавший прогон повторяется.
+                    conn.rollback()
+                    conn.close()
+                    raise RuntimeError(f"{price_store.ПОДСКАЗКА}. Ошибка: {e}") from e
             if buf_files:
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_files
@@ -548,7 +795,7 @@ def main() -> int:
                       processed_at = now()""", buf_files, page_size=500)
         conn.commit()
         conn.close()
-        buf_files, buf_items = [], []
+        buf_files, buf_items, buf_prices = [], [], []
 
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(handle, mine), 1):
@@ -568,9 +815,13 @@ def main() -> int:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],
                                   it.get("qty"), pg(it.get("unit"))[:40],
-                                  "спецификация сделки", it["source_file"],
+                                  ИСТОЧНИК_СТРОКИ, it["source_file"],
                                   it.get("segment_rule")))
-            if len(buf_files) >= 200 or len(buf_items) >= 4000:
+                ц = it.get("_цена")
+                if ц and SOURCE == "rfq":
+                    buf_prices.append(price_store.строка(it, ц, pg))
+                    цен += 1
+            if len(buf_files) >= 200 or len(buf_items) >= 4000 or len(buf_prices) >= 2000:
                 flush()
             if n % 200 == 0:
                 print(f"  обработано {n} из {len(mine)} · позиций {total_items}", flush=True)
@@ -578,6 +829,9 @@ def main() -> int:
 
     print("\n=== ИТОГ ЧАСТИ ===")
     print(f"файлов: {sum(stat.values())} · позиций номенклатуры: {total_items}")
+    if SOURCE == "rfq":
+        print(f"строк с ценой: {цен}"
+              + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
     print(f"по состоянию: {dict(stat.most_common())}")
     print(f"по формату:   {dict(kinds.most_common())}")
     print("позиции по сегментам:")

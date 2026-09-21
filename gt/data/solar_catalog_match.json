@@ -1,0 +1,4146 @@
+{
+ "updated": "2026-09-18",
+ "source": "Карта сайта магазина изготовителя Solar Turbines (robots.txt → sitemap). Считает gt/tools/solar_catalog.py.",
+ "what_it_is": "Номера заявки ЛУКОЙЛ, существование которых подтверждено каталогом самого изготовителя, с каталожным написанием и адресом карточки.",
+ "what_it_is_not": "Ни цены, ни остатка, ни срока: в карте сайта их нет, а карточка отдаёт цену только после входа в магазин. Вход — решение владельца.",
+ "catalog_addresses": 72491,
+ "ask_rows": 1642,
+ "matched": 381,
+ "matched_usd": 705509.0,
+ "matched_not_reverified": 211,
+ "spelling_differs": 232,
+ "why_spelling_matters": "В каталоге номер записан без разделителей: «1013121-1» лежит по адресу «10131211». Поиск нашим написанием не находит ничего — поэтому у части строк годами стоял вердикт «номер не подтверждается открытыми источниками», хотя номер лежит в каталоге изготовителя. Сверка идёт по ключу без разделителей.",
+ "solar_rows": 497,
+ "solar_matched": 381,
+ "solar_missing": 116,
+ "what_missing_means": "Номер с изготовителем Solar, которого в каталоге изготовителя НЕТ. Это внутреннее чертёжное обозначение, сборка, которую изготовитель отдельно не продаёт, либо ошибка переноса. Закрывается вопросом заказчику, а не поиском.",
+ "rows": [
+  {
+   "pn": "1007799",
+   "catalog_pn": "1007799",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1007799/01tUm00000DinvNIAR",
+   "qty": 19,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008364-1",
+   "catalog_pn": "10083641",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083641/01tUm00000Dg6BRIAZ",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008364-2",
+   "catalog_pn": "10083642",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083642/01tUm00000DjBgRIAV",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008364-3",
+   "catalog_pn": "10083643",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083643/01tUm00000DinvRIAR",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008364-4",
+   "catalog_pn": "10083644",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083644/01tUm00000Dj2CbIAJ",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008364-5",
+   "catalog_pn": "10083645",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083645/01tUm00000DjETfIAN",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008378-1",
+   "catalog_pn": "10083781",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083781/01tUm00000DinvSIAR",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008378-2",
+   "catalog_pn": "10083782",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083782/01tUm00000DiAQUIA3",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008378-3",
+   "catalog_pn": "10083783",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083783/01tUm00000DinvTIAR",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008378-4",
+   "catalog_pn": "10083784",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083784/01tUm00000Dg6BSIAZ",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008378-5",
+   "catalog_pn": "10083785",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10083785/01tUm00000DinvUIAR",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1008726",
+   "catalog_pn": "1008726",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1008726/01tUm00000Dj1JYIAZ",
+   "qty": 108,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1010135",
+   "catalog_pn": "1010135",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1010135/01tUm00000Dj4ydIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1010446",
+   "catalog_pn": "1010446",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1010446/01tUm00000DinvaIAB",
+   "qty": 14,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1013121-1",
+   "catalog_pn": "10131211",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10131211/01tUm00000Dj5JRIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1014214-21",
+   "catalog_pn": "101421421",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/101421421/01tUm00000DioH7IAJ",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1015230",
+   "catalog_pn": "1015230",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1015230/01tUm00000Dj52aIAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1015231",
+   "catalog_pn": "1015231",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1015231/01tUm00000Dj52bIAB",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1016515",
+   "catalog_pn": "1016515",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1016515/01tUm00000Dj4xUIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1016573",
+   "catalog_pn": "1016573",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1016573/01tUm00000DinwNIAR",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017509",
+   "catalog_pn": "1017509",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017509/01tUm00000DipXJIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017510",
+   "catalog_pn": "1017510",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017510/01tUm00000Dj3Q2IAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017876",
+   "catalog_pn": "1017876",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017876/01tUm00000Dj1lDIAR",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017879",
+   "catalog_pn": "1017879",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017879/01tUm00000DjEOHIA3",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017890",
+   "catalog_pn": "1017890",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017890/01tUm00000DjEOIIA3",
+   "qty": 17,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017891",
+   "catalog_pn": "1017891",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017891/01tUm00000DinwUIAR",
+   "qty": 108,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017892",
+   "catalog_pn": "1017892",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017892/01tUm00000Dj1ZFIAZ",
+   "qty": 19,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017893",
+   "catalog_pn": "1017893",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017893/01tUm00000DinwVIAR",
+   "qty": 11,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017894",
+   "catalog_pn": "1017894",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017894/01tUm00000DipWKIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017895",
+   "catalog_pn": "1017895",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017895/01tUm00000Dj1atIAB",
+   "qty": 12,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017899",
+   "catalog_pn": "1017899",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017899/01tUm00000DjBgcIAF",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017901",
+   "catalog_pn": "1017901",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017901/01tUm00000Dj1b3IAB",
+   "qty": 47,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017902",
+   "catalog_pn": "1017902",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017902/01tUm00000Dj1dLIAR",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017904",
+   "catalog_pn": "1017904",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017904/01tUm00000Dj1dMIAR",
+   "qty": 15,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017905",
+   "catalog_pn": "1017905",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017905/01tUm00000DinwWIAR",
+   "qty": 21,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1017908",
+   "catalog_pn": "1017908",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1017908/01tUm00000Dj1dPIAR",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1019197",
+   "catalog_pn": "1019197",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1019197/01tUm00000Dio7QIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1019431-1600",
+   "catalog_pn": "10194311600",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10194311600/01tUm00000Dj1gAIAR",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1020105",
+   "catalog_pn": "1020105",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1020105/01tUm00000Dj1JaIAJ",
+   "qty": 21,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1020225",
+   "catalog_pn": "1020225",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1020225/01tUm00000DipZHIAZ",
+   "qty": 32,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1022447",
+   "catalog_pn": "1022447",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1022447/01tUm00000DinwmIAB",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1023031-1",
+   "catalog_pn": "10230311",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10230311/01tUm00000Dj3SGIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1023031-3",
+   "catalog_pn": "10230313",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10230313/01tUm00000DjEQTIA3",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1023518-201",
+   "catalog_pn": "1023518201",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1023518201/01tUm00000Dj1lYIAR",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1024780-122",
+   "catalog_pn": "1024780122",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1024780122/01tUm00000Dj1isIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1024780-3P541",
+   "catalog_pn": "10247803p541",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10247803p541/01tUm00000DhZ9uIAF",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1024941",
+   "catalog_pn": "1024941",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1024941/01tUm00000DjBgvIAF",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1027484-101",
+   "catalog_pn": "1027484101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1027484101/01tUm00000Dj1lZIAR",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1031741-4",
+   "catalog_pn": "10317414",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10317414/01tUm00000Dj5q9IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1034347-1",
+   "catalog_pn": "10343471",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10343471/01tUm00000Dj0JiIAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1034549-21",
+   "catalog_pn": "103454921",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/103454921/01tUm00000DinrZIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1034549-43",
+   "catalog_pn": "103454943",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/103454943/01tUm00000Dj9GJIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1034549-80",
+   "catalog_pn": "103454980",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/103454980/01tUm00000DinrdIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1034549-81",
+   "catalog_pn": "103454981",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/103454981/01tUm00000DinreIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1037762-20",
+   "catalog_pn": "103776220",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/103776220/01tUm00000Dj68AIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1038428-3",
+   "catalog_pn": "10384283",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10384283/01tUm00000Dj1j8IAB",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1042018-202",
+   "catalog_pn": "1042018202",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1042018202/01tUm00000DioAeIAJ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1042018-3400",
+   "catalog_pn": "10420183400",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10420183400/01tUm00000Dio7yIAB",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1043265-1",
+   "catalog_pn": "10432651",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10432651/01tUm00000Dj5jhIAB",
+   "qty": 76,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1043265-3",
+   "catalog_pn": "10432653",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10432653/01tUm00000Dj5hcIAB",
+   "qty": 41,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1043265-4",
+   "catalog_pn": "10432654",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10432654/01tUm00000Dj5hdIAB",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1043265-5",
+   "catalog_pn": "10432655",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10432655/01tUm00000DjBd6IAF",
+   "qty": 57,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1043265-7",
+   "catalog_pn": "10432657",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10432657/01tUm00000Dj5heIAB",
+   "qty": 34,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1043265-9",
+   "catalog_pn": "10432659",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10432659/01tUm00000DinuXIAR",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1043614-500",
+   "catalog_pn": "1043614500",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1043614500/01tUm00000DiqMiIAJ",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1045095-201",
+   "catalog_pn": "1045095201",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1045095201/01tUm00000DjAwxIAF",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046415-30",
+   "catalog_pn": "104641530",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/104641530/01tUm00000DinuhIAB",
+   "qty": 25,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046415-57",
+   "catalog_pn": "104641557",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/104641557/01tUm00000Dj5gIIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046415-60",
+   "catalog_pn": "104641560",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/104641560/01tUm00000DhraoIAB",
+   "qty": 23,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046415-79",
+   "catalog_pn": "104641579",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/104641579/01tUm00000DifyLIAR",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046485",
+   "catalog_pn": "1046485",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1046485/01tUm00000Dj3VNIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046489",
+   "catalog_pn": "1046489",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1046489/01tUm00000Dj3VPIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046490",
+   "catalog_pn": "1046490",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1046490/01tUm00000DioHCIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046491",
+   "catalog_pn": "1046491",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1046491/01tUm00000Dj3VQIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1046492",
+   "catalog_pn": "1046492",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1046492/01tUm00000DinukIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1051931-67",
+   "catalog_pn": "105193167",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105193167/01tUm00000Dj9PFIAZ",
+   "qty": 20,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1051931-69",
+   "catalog_pn": "105193169",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105193169/01tUm00000DjBaUIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1051931-71",
+   "catalog_pn": "105193171",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105193171/01tUm00000Dinv4IAB",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1052168-23",
+   "catalog_pn": "105216823",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105216823/01tUm00000Dj54HIAR",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1053038-19",
+   "catalog_pn": "105303819",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105303819/01tUm00000DjESzIAN",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1053038-26",
+   "catalog_pn": "105303826",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105303826/01tUm00000Dj4eJIAR",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1053038-28",
+   "catalog_pn": "105303828",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105303828/01tUm00000DintbIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1053038-35",
+   "catalog_pn": "105303835",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105303835/01tUm00000DintcIAB",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1053400",
+   "catalog_pn": "1053400",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1053400/01tUm00000Dj0ivIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1053928-3",
+   "catalog_pn": "10539283",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10539283/01tUm00000Dj66cIAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1053929-6",
+   "catalog_pn": "10539296",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10539296/01tUm00000Dj5ulIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1054813-2",
+   "catalog_pn": "10548132",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10548132/01tUm00000Dj9MJIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1054986-2",
+   "catalog_pn": "10549862",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10549862/01tUm00000Dg0cvIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1055666",
+   "catalog_pn": "1055666",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1055666/01tUm00000DjBioIAF",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1056369-30",
+   "catalog_pn": "105636930",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105636930/01tUm00000Dinu6IAB",
+   "qty": 83,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1059701-10",
+   "catalog_pn": "105970110",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/105970110/01tUm00000DioHpIAJ",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1059701-8",
+   "catalog_pn": "10597018",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10597018/01tUm00000Dj2kcIAB",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1059715",
+   "catalog_pn": "1059715",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1059715/01tUm00000Dj3fqIAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1060045-60",
+   "catalog_pn": "106004560",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/106004560/01tUm00000Dj5sHIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1060045-83",
+   "catalog_pn": "106004583",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/106004583/01tUm00000DiqobIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1060150",
+   "catalog_pn": "1060150",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1060150/01tUm00000DjBYnIAN",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1060367-2",
+   "catalog_pn": "10603672",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10603672/01tUm00000DjBVKIA3",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1060367-500",
+   "catalog_pn": "1060367500",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1060367500/01tUm00000DjBFxIAN",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1060367-600",
+   "catalog_pn": "1060367600",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1060367600/01tUm00000DjBVVIA3",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1060817-10",
+   "catalog_pn": "106081710",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/106081710/01tUm00000DjET8IAN",
+   "qty": 63,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1060817-40",
+   "catalog_pn": "106081740",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/106081740/01tUm00000Dj6N2IAJ",
+   "qty": 27,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062000",
+   "catalog_pn": "1062000",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1062000/01tUm00000Dj1b5IAB",
+   "qty": 190,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062253-200",
+   "catalog_pn": "1062253200",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1062253200/01tUm00000DiokkIAB",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062257-2",
+   "catalog_pn": "10622572",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10622572/01tUm00000Dj1AKIAZ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062883-200",
+   "catalog_pn": "1062883200",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1062883200/01tUm00000DjEU6IAN",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062952-1",
+   "catalog_pn": "10629521",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10629521/01tUm00000DioIuIAJ",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062952-2",
+   "catalog_pn": "10629522",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10629522/01tUm00000DioIvIAJ",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062952-3",
+   "catalog_pn": "10629523",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10629523/01tUm00000DjEU7IAN",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062952-4",
+   "catalog_pn": "10629524",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10629524/01tUm00000DjBaEIAV",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1062952-5",
+   "catalog_pn": "10629525",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10629525/01tUm00000Dj4U9IAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1063321-100",
+   "catalog_pn": "1063321100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1063321100/01tUm00000DiqwzIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1063325-1",
+   "catalog_pn": "10633251",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10633251/01tUm00000Dj55xIAB",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1063390-1",
+   "catalog_pn": "10633901",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10633901/01tUm00000DioIyIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1064405-1",
+   "catalog_pn": "10644051",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10644051/01tUm00000DioOPIAZ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1064721-14",
+   "catalog_pn": "106472114",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/106472114/01tUm00000Dj7n0IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1064728-1",
+   "catalog_pn": "10647281",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10647281/01tUm00000DioOTIAZ",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1064728-4",
+   "catalog_pn": "10647284",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10647284/01tUm00000Dj6N3IAJ",
+   "qty": 12,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1064829-4",
+   "catalog_pn": "10648294",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10648294/01tUm00000DioOVIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1064851-1",
+   "catalog_pn": "10648511",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10648511/01tUm00000DjBboIAF",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1064851-2",
+   "catalog_pn": "10648512",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10648512/01tUm00000DjBVrIAN",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1064851-4",
+   "catalog_pn": "10648514",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10648514/01tUm00000DioOWIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1065110",
+   "catalog_pn": "1065110",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1065110/01tUm00000Dj3i0IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1065717-300",
+   "catalog_pn": "1065717300",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1065717300/01tUm00000Dj51cIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1065748",
+   "catalog_pn": "1065748",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1065748/01tUm00000Dj3i3IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1066290-2",
+   "catalog_pn": "10662902",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10662902/01tUm00000DjEMLIA3",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1066738-2",
+   "catalog_pn": "10667382",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10667382/01tUm00000DjBVtIAN",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1066738-4",
+   "catalog_pn": "10667384",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10667384/01tUm00000Dir91IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1067366-100",
+   "catalog_pn": "1067366100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1067366100/01tUm00000Dj4fhIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1067628-1",
+   "catalog_pn": "10676281",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10676281/01tUm00000DjBVsIAN",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1068334",
+   "catalog_pn": "1068334",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1068334/01tUm00000DioPPIAZ",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1069873-1",
+   "catalog_pn": "10698731",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10698731/01tUm00000Dj6N4IAJ",
+   "qty": 36,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1071146-2",
+   "catalog_pn": "10711462",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10711462/01tUm00000DjAuxIAF",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1071327-1",
+   "catalog_pn": "10713271",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10713271/01tUm00000Dj0M1IAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1071411-1",
+   "catalog_pn": "10714111",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10714111/01tUm00000Dio83IAB",
+   "qty": 12,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1071411-3",
+   "catalog_pn": "10714113",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10714113/01tUm00000Dj5l8IAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1072904",
+   "catalog_pn": "1072904",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1072904/01tUm00000DirJ6IAJ",
+   "qty": 84,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1075721",
+   "catalog_pn": "1075721",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1075721/01tUm00000DjBaiIAF",
+   "qty": 345,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1076251-1",
+   "catalog_pn": "10762511",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10762511/01tUm00000Dj5lBIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1078325-1",
+   "catalog_pn": "10783251",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10783251/01tUm00000DjBMKIA3",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1078325-17",
+   "catalog_pn": "107832517",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/107832517/01tUm00000Di3FoIAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1078695-50",
+   "catalog_pn": "107869550",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/107869550/01tUm00000DhweFIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1081051",
+   "catalog_pn": "1081051",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1081051/01tUm00000DirWXIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1084352-4030",
+   "catalog_pn": "10843524030",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10843524030/01tUm00000Dj7cwIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1085271-1004",
+   "catalog_pn": "10852711004",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10852711004/01tUm00000Dj5yeIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1087360",
+   "catalog_pn": "1087360",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1087360/01tUm00000Dj2ROIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1087370",
+   "catalog_pn": "1087370",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1087370/01tUm00000Dj1oVIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1087491-3",
+   "catalog_pn": "10874913",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10874913/01tUm00000Dj1ywIAB",
+   "qty": 63,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1087576-100",
+   "catalog_pn": "1087576100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1087576100/01tUm00000DjEhDIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1088209-1000",
+   "catalog_pn": "10882091000",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10882091000/01tUm00000DjDoeIAF",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1088209-1400",
+   "catalog_pn": "10882091400",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10882091400/01tUm00000Dj1HOIAZ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1088442-4",
+   "catalog_pn": "10884424",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10884424/01tUm00000Dj5hrIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1088912",
+   "catalog_pn": "1088912",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1088912/01tUm00000DjBiEIAV",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1089034-3",
+   "catalog_pn": "10890343",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/10890343/01tUm00000Dj6HxIAJ",
+   "qty": 27,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1089241-28",
+   "catalog_pn": "108924128",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/108924128/01tUm00000Dj6VNIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1093866",
+   "catalog_pn": "1093866",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1093866/01tUm00000Dj3frIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1100611-3",
+   "catalog_pn": "11006113",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11006113/01tUm00000Dj9vxIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1102783",
+   "catalog_pn": "1102783",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1102783/01tUm00000Dj6lHIAR",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1105336-1",
+   "catalog_pn": "11053361",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11053361/01tUm00000Dj7jbIAB",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1106298-1",
+   "catalog_pn": "11062981",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11062981/01tUm00000Dj7CIIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1106298-29",
+   "catalog_pn": "110629829",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/110629829/01tUm00000Dj1svIAB",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1110429-100",
+   "catalog_pn": "1110429100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1110429100/01tUm00000Dj6GhIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1110429-1700",
+   "catalog_pn": "11104291700",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11104291700/01tUm00000Dj7jFIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1110429-2700",
+   "catalog_pn": "11104292700",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11104292700/01tUm00000Dj7kJIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1110655-1",
+   "catalog_pn": "11106551",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11106551/01tUm00000DhhhdIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1112225-1",
+   "catalog_pn": "11122251",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11122251/01tUm00000Dj1ElIAJ",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1112227-1",
+   "catalog_pn": "11122271",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11122271/01tUm00000DjBPyIAN",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1112764-1",
+   "catalog_pn": "11127641",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11127641/01tUm00000DjBHZIA3",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1112766-1",
+   "catalog_pn": "11127661",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11127661/01tUm00000DjBHWIA3",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "112056-1",
+   "catalog_pn": "1120561",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1120561/01tUm00000Dj5FGIAZ",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "116091-21",
+   "catalog_pn": "11609121",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/11609121/01tUm00000DjBl8IAF",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120022-7",
+   "catalog_pn": "1200227",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1200227/01tUm00000Disa4IAB",
+   "qty": 24,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120029-1",
+   "catalog_pn": "1200291",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1200291/01tUm00000DjDrcIAF",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120029-5",
+   "catalog_pn": "1200295",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1200295/01tUm00000DioJ8IAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120029-8",
+   "catalog_pn": "1200298",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1200298/01tUm00000DjBbfIAF",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120045-13",
+   "catalog_pn": "12004513",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/12004513/01tUm00000DioJ9IAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120373-1",
+   "catalog_pn": "1203731",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1203731/01tUm00000Dj1XAIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120649-18",
+   "catalog_pn": "12064918",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/12064918/01tUm00000DioPZIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120712-11",
+   "catalog_pn": "12071211",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/12071211/01tUm00000Dj1WNIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120712-5",
+   "catalog_pn": "1207125",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1207125/01tUm00000Dit50IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120765-1",
+   "catalog_pn": "1207651",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1207651/01tUm00000Dj2TkIAJ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "120848-4",
+   "catalog_pn": "1208484",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1208484/01tUm00000DjE2VIAV",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "124907-19",
+   "catalog_pn": "12490719",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/12490719/01tUm00000DitNDIAZ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "124907-20",
+   "catalog_pn": "12490720",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/12490720/01tUm00000Dj2ihIAB",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "124907-25",
+   "catalog_pn": "12490725",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/12490725/01tUm00000Dj2jOIAR",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "124907-4",
+   "catalog_pn": "1249074",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1249074/01tUm00000DioQeIAJ",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "124907-7",
+   "catalog_pn": "1249077",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1249077/01tUm00000DjBiOIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1283807-900",
+   "catalog_pn": "1283807900",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1283807900/01tUm00000Dj1HBIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1286570-1",
+   "catalog_pn": "12865701",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/12865701/01tUm00000Dj2iPIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "130161-1",
+   "catalog_pn": "1301611",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1301611/01tUm00000DjEHsIAN",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "131230-6",
+   "catalog_pn": "1312306",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1312306/01tUm00000Dj5lRIAR",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "136210-38",
+   "catalog_pn": "13621038",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/13621038/01tUm00000Dj2k7IAB",
+   "qty": 16,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "136845-1",
+   "catalog_pn": "1368451",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1368451/01tUm00000Dj183IAB",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1577354-2401",
+   "catalog_pn": "15773542401",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/15773542401/01tUm00000DigrfIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1602894-11",
+   "catalog_pn": "160289411",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/160289411/01tUm00000DjJqOIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1602894-7",
+   "catalog_pn": "16028947",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/16028947/01tUm00000DjJ45IAF",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1654366",
+   "catalog_pn": "1654366",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1654366/01tUm00000Dh3Y8IAJ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "172514-2",
+   "catalog_pn": "1725142",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1725142/01tUm00000DiuSdIAJ",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "172523-2",
+   "catalog_pn": "1725232",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1725232/01tUm00000DiuSjIAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "172567-1",
+   "catalog_pn": "1725671",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1725671/01tUm00000Dj1C1IAJ",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "173101-2",
+   "catalog_pn": "1731012",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1731012/01tUm00000Dj9YiIAJ",
+   "qty": 59,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "173942-1",
+   "catalog_pn": "1739421",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1739421/01tUm00000Dj1dJIAR",
+   "qty": 17,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1799637-100",
+   "catalog_pn": "1799637100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1799637100/01tUm00000Dj0kfIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "1799637-101",
+   "catalog_pn": "1799637101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1799637101/01tUm00000DifmeIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "180431-1",
+   "catalog_pn": "1804311",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1804311/01tUm00000Dj1JcIAJ",
+   "qty": 151,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186212-100",
+   "catalog_pn": "186212100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/186212100/01tUm00000DjBZbIAN",
+   "qty": 40,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186232-2400",
+   "catalog_pn": "1862322400",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1862322400/01tUm00000Dj1j0IAB",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186232-3000",
+   "catalog_pn": "1862323000",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1862323000/01tUm00000Dj1j4IAB",
+   "qty": 15,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186273-1",
+   "catalog_pn": "1862731",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1862731/01tUm00000DjDysIAF",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186273-36",
+   "catalog_pn": "18627336",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/18627336/01tUm00000Dj1bXIAR",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186276-1",
+   "catalog_pn": "1862761",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1862761/01tUm00000DjDyvIAF",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186280-600",
+   "catalog_pn": "186280600",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/186280600/01tUm00000DioPmIAJ",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186648-1",
+   "catalog_pn": "1866481",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1866481/01tUm00000Dj1lSIAR",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186648-3",
+   "catalog_pn": "1866483",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1866483/01tUm00000DjBgkIAF",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "186648-700",
+   "catalog_pn": "186648700",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/186648700/01tUm00000Dj1AAIAZ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190015-10",
+   "catalog_pn": "19001510",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/19001510/01tUm00000DjBiPIAV",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190015-12",
+   "catalog_pn": "19001512",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/19001512/01tUm00000Dj987IAB",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190016-10",
+   "catalog_pn": "19001610",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/19001610/01tUm00000DjBQCIA3",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190016-9",
+   "catalog_pn": "1900169",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1900169/01tUm00000Dj1AGIAZ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190185-203",
+   "catalog_pn": "190185203",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/190185203/01tUm00000DiowWIAR",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190187-300",
+   "catalog_pn": "190187300",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/190187300/01tUm00000Dj9fuIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190377-1806",
+   "catalog_pn": "1903771806",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1903771806/01tUm00000DjJPtIAN",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190392-3",
+   "catalog_pn": "1903923",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1903923/01tUm00000DivnEIAR",
+   "qty": 13,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190537-102",
+   "catalog_pn": "190537102",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/190537102/01tUm00000Dj2FpIAJ",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190537-302",
+   "catalog_pn": "190537302",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/190537302/01tUm00000DivfeIAB",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190583-1",
+   "catalog_pn": "1905831",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1905831/01tUm00000Dj1WPIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190584-1",
+   "catalog_pn": "1905841",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1905841/01tUm00000DioUuIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190584-2",
+   "catalog_pn": "1905842",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1905842/01tUm00000Dj1XkIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190619-2",
+   "catalog_pn": "1906192",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1906192/01tUm00000Dj5JhIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190817-14",
+   "catalog_pn": "19081714",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/19081714/01tUm00000Dj0HeIAJ",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "190826-1",
+   "catalog_pn": "1908261",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1908261/01tUm00000DjDrvIAF",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "199515-1",
+   "catalog_pn": "1995151",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1995151/01tUm00000Dj1JeIAJ",
+   "qty": 830,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "199543-2",
+   "catalog_pn": "1995432",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/1995432/01tUm00000Dj5ibIAB",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "2018739-202",
+   "catalog_pn": "2018739202",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/2018739202/01tUm00000Dftm7IAB",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "2018740-202",
+   "catalog_pn": "2018740202",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/2018740202/01tUm00000DftmyIAB",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "2027098-12",
+   "catalog_pn": "202709812",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/202709812/01tUm00000DibF5IAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "2112736-1",
+   "catalog_pn": "21127361",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/21127361/01tUm00000Dib8QIAR",
+   "qty": 36,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "219691-101",
+   "catalog_pn": "219691101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/219691101/01tUm00000DiwShIAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "233958-1",
+   "catalog_pn": "2339581",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/2339581/01tUm00000DiwpNIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "301314-18",
+   "catalog_pn": "30131418",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/30131418/01tUm00000DioPDIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "301315-13",
+   "catalog_pn": "30131513",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/30131513/01tUm00000DioPFIAZ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "301315-14",
+   "catalog_pn": "30131514",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/30131514/01tUm00000DioPGIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "301315-702",
+   "catalog_pn": "301315702",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/301315702/01tUm00000DjBdKIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "301390-1",
+   "catalog_pn": "3013901",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/3013901/01tUm00000DioPHIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "302161-40",
+   "catalog_pn": "30216140",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/30216140/01tUm00000DjBRAIA3",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "304649-100",
+   "catalog_pn": "304649100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/304649100/01tUm00000DioPyIAJ",
+   "qty": 108,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "372903-1",
+   "catalog_pn": "3729031",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/3729031/01tUm00000Dj1H0IAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "600187C1",
+   "catalog_pn": "600187c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/600187c1/01tUm00000Dj1EuIAJ",
+   "qty": 85,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "600257C1",
+   "catalog_pn": "600257c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/600257c1/01tUm00000Dj6WhIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "600375C1",
+   "catalog_pn": "600375c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/600375c1/01tUm00000Dj7aXIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "601662C1",
+   "catalog_pn": "601662c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/601662c1/01tUm00000Dj1XNIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "602386C1",
+   "catalog_pn": "602386c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/602386c1/01tUm00000Dj9VMIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "602811C1",
+   "catalog_pn": "602811c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/602811c1/01tUm00000Dj1EvIAJ",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "602994C1",
+   "catalog_pn": "602994c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/602994c1/01tUm00000Dj3OXIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "603006C1",
+   "catalog_pn": "603006c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/603006c1/01tUm00000Dj1dDIAR",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "603857C1",
+   "catalog_pn": "603857c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/603857c1/01tUm00000DgrrbIAB",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "604014C1",
+   "catalog_pn": "604014c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/604014c1/01tUm00000Dj1qiIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "604532C1",
+   "catalog_pn": "604532c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/604532c1/01tUm00000DiahkIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "70-30093-1",
+   "catalog_pn": "70300931",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/70300931/01tUm00000Dj1HpIAJ",
+   "qty": 392,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "70-30108-1",
+   "catalog_pn": "70301081",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/70301081/01tUm00000Dj1KQIAZ",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "70-30815-1",
+   "catalog_pn": "70308151",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/70308151/01tUm00000Dio10IAB",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "70-31237-1",
+   "catalog_pn": "70312371",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/70312371/01tUm00000DixttIAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "700582C1",
+   "catalog_pn": "700582c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/700582c1/01tUm00000DjBZgIAN",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "701417C1",
+   "catalog_pn": "701417c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/701417c1/01tUm00000DjE8HIAV",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "80-30549-100",
+   "catalog_pn": "8030549100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/8030549100/01tUm00000Dj0SiIAJ",
+   "qty": 14,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "80-30550-900",
+   "catalog_pn": "8030550900",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/8030550900/01tUm00000DjDsMIAV",
+   "qty": 11,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903223C1",
+   "catalog_pn": "903223c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903223c1/01tUm00000Dj4UdIAJ",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903235C1",
+   "catalog_pn": "903235c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903235c1/01tUm00000Dj4ZaIAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903246C1",
+   "catalog_pn": "903246c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903246c1/01tUm00000Dj4ZhIAJ",
+   "qty": 64,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903249C1",
+   "catalog_pn": "903249c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903249c1/01tUm00000Dj4bKIAR",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903268C1",
+   "catalog_pn": "903268c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903268c1/01tUm00000Dj4caIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903270C1",
+   "catalog_pn": "903270c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903270c1/01tUm00000Dj4ccIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903289C1",
+   "catalog_pn": "903289c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903289c1/01tUm00000Dj4dZIAR",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903315C1",
+   "catalog_pn": "903315c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903315c1/01tUm00000DjDvqIAF",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903316C1",
+   "catalog_pn": "903316c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903316c1/01tUm00000Dj3nsIAB",
+   "qty": 18,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903375C1",
+   "catalog_pn": "903375c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903375c1/01tUm00000Dj53kIAB",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903424C1",
+   "catalog_pn": "903424c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903424c1/01tUm00000DjDzSIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903509C1",
+   "catalog_pn": "903509c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903509c1/01tUm00000Dio1UIAR",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903536C1",
+   "catalog_pn": "903536c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903536c1/01tUm00000DiyHdIAJ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903537C1",
+   "catalog_pn": "903537c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903537c1/01tUm00000Dj5GYIAZ",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903556C1",
+   "catalog_pn": "903556c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903556c1/01tUm00000Dj4erIAB",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903560C1",
+   "catalog_pn": "903560c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903560c1/01tUm00000Dj4IiIAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "903732C1",
+   "catalog_pn": "903732c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/903732c1/01tUm00000DjDzXIAV",
+   "qty": 38,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "907563C2",
+   "catalog_pn": "907563c2",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/907563c2/01tUm00000Dio1aIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "908060C1",
+   "catalog_pn": "908060c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/908060c1/01tUm00000Dj4gNIAR",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "908221C1",
+   "catalog_pn": "908221c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/908221c1/01tUm00000Dj4JrIAJ",
+   "qty": 6,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "908539C1",
+   "catalog_pn": "908539c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/908539c1/01tUm00000Dj5eZIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "908579C1",
+   "catalog_pn": "908579c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/908579c1/01tUm00000DiyDzIAJ",
+   "qty": 14,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "908700C2",
+   "catalog_pn": "908700c2",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/908700c2/01tUm00000Dj5dDIAR",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "909106C1",
+   "catalog_pn": "909106c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/909106c1/01tUm00000Dj16NIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "912642C1",
+   "catalog_pn": "912642c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/912642c1/01tUm00000Dj4LjIAJ",
+   "qty": 14,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "915243C1",
+   "catalog_pn": "915243c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/915243c1/01tUm00000DiyLfIAJ",
+   "qty": 24,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "915244C1",
+   "catalog_pn": "915244c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/915244c1/01tUm00000Dj1b7IAB",
+   "qty": 19,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "917345C1",
+   "catalog_pn": "917345c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/917345c1/01tUm00000DiyO9IAJ",
+   "qty": 9,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "917427С1",
+   "catalog_pn": "917427c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/917427c1/01tUm00000Dj0PoIAJ",
+   "qty": 27,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "918018C1",
+   "catalog_pn": "918018c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/918018c1/01tUm00000DiyR1IAJ",
+   "qty": 32,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "945061C1",
+   "catalog_pn": "945061c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/945061c1/01tUm00000Dj3Q8IAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "950232C1",
+   "catalog_pn": "950232c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/950232c1/01tUm00000Dio2TIAR",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "950781C1",
+   "catalog_pn": "950781c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/950781c1/01tUm00000DjE3QIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "950895C1",
+   "catalog_pn": "950895c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/950895c1/01tUm00000Dj4RBIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "950944C1",
+   "catalog_pn": "950944c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/950944c1/01tUm00000Dj4RCIAZ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "952248C1",
+   "catalog_pn": "952248c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/952248c1/01tUm00000Dj1dbIAB",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "952504C1",
+   "catalog_pn": "952504c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/952504c1/01tUm00000Dj4RFIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "952876C1",
+   "catalog_pn": "952876c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/952876c1/01tUm00000Dj4RtIAJ",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "953160C1",
+   "catalog_pn": "953160c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/953160c1/01tUm00000Dj4RuIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "955518C1",
+   "catalog_pn": "955518c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/955518c1/01tUm00000Dj4S0IAJ",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "960363C1",
+   "catalog_pn": "960363c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/960363c1/01tUm00000Dj1AxIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "960592C1",
+   "catalog_pn": "960592c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/960592c1/01tUm00000Dio2sIAB",
+   "qty": 4,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "962694C1",
+   "catalog_pn": "962694c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/962694c1/01tUm00000Dj1kjIAB",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "964587C1",
+   "catalog_pn": "964587c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/964587c1/01tUm00000DjBTVIA3",
+   "qty": 109,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "964686C1",
+   "catalog_pn": "964686c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/964686c1/01tUm00000Dj2rRIAR",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "964905C1",
+   "catalog_pn": "964905c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/964905c1/01tUm00000Diz2hIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "967664C1",
+   "catalog_pn": "967664c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/967664c1/01tUm00000DjDztIAF",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "967692C1",
+   "catalog_pn": "967692c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/967692c1/01tUm00000Dj1ZGIAZ",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "967924C1",
+   "catalog_pn": "967924c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/967924c1/01tUm00000DhKGgIAN",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "967952C1",
+   "catalog_pn": "967952c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/967952c1/01tUm00000Dj3FUIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "969017C1",
+   "catalog_pn": "969017c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/969017c1/01tUm00000Dj1g4IAB",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "969582C1",
+   "catalog_pn": "969582c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/969582c1/01tUm00000Dj2duIAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "969677C1",
+   "catalog_pn": "969677c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/969677c1/01tUm00000Dj4ZjIAJ",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "970564C1",
+   "catalog_pn": "970564c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/970564c1/01tUm00000Dj1JlIAJ",
+   "qty": 8,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "990905C1",
+   "catalog_pn": "990905c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/990905c1/01tUm00000Dj9mMIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "991707C1",
+   "catalog_pn": "991707c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/991707c1/01tUm00000Dj5fyIAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "991708C1",
+   "catalog_pn": "991708c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/991708c1/01tUm00000Dj5fzIAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "991709C1",
+   "catalog_pn": "991709c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/991709c1/01tUm00000Dj5g0IAB",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "993359C1",
+   "catalog_pn": "993359c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/993359c1/01tUm00000Dj4gSIAR",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "993672C1",
+   "catalog_pn": "993672c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/993672c1/01tUm00000Dj4QsIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "995648C1",
+   "catalog_pn": "995648c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/995648c1/01tUm00000DjAcpIAF",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "996504B1",
+   "catalog_pn": "996504b1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/996504b1/01tUm00000Dj3rlIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "996510C1",
+   "catalog_pn": "996510c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/996510c1/01tUm00000DioA9IAJ",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "997396C1",
+   "catalog_pn": "997396c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/997396c1/01tUm00000DioAHIAZ",
+   "qty": 46,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "997697C1",
+   "catalog_pn": "997697c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/997697c1/01tUm00000DgwWiIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "997812C1",
+   "catalog_pn": "997812c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/997812c1/01tUm00000DioBNIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "998882C1",
+   "catalog_pn": "998882c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/998882c1/01tUm00000Dj4ebIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "998964C1",
+   "catalog_pn": "998964c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/998964c1/01tUm00000DizaLIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "998965C1",
+   "catalog_pn": "998965c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/998965c1/01tUm00000Dj5dQIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "998966C1",
+   "catalog_pn": "998966c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/998966c1/01tUm00000Dj5eRIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "998967C1",
+   "catalog_pn": "998967c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/998967c1/01tUm00000DizaMIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "999007C1",
+   "catalog_pn": "999007c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/999007c1/01tUm00000Dj2g7IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "999214C1",
+   "catalog_pn": "999214c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/999214c1/01tUm00000DizbcIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "999215C1",
+   "catalog_pn": "999215c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/999215c1/01tUm00000DjHbHIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "999340C1",
+   "catalog_pn": "999340c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/999340c1/01tUm00000Dj6KgIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": true,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "999979C1",
+   "catalog_pn": "999979c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/999979c1/01tUm00000Dj5dSIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "999980C1",
+   "catalog_pn": "999980c1",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/999980c1/01tUm00000Dj5dTIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20025",
+   "catalog_pn": "ft20025",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20025/01tUm00000DjBbVIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20026-100",
+   "catalog_pn": "ft20026100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20026100/01tUm00000Dj1yFIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20027",
+   "catalog_pn": "ft20027",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20027/01tUm00000Diza4IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20029",
+   "catalog_pn": "ft20029",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20029/01tUm00000Diza5IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20030-102",
+   "catalog_pn": "ft20030102",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20030102/01tUm00000DijRnIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20032-100",
+   "catalog_pn": "ft20032100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20032100/01tUm00000DgBeCIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20048-202",
+   "catalog_pn": "ft20048202",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20048202/01tUm00000DiNUUIA3",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20060-101",
+   "catalog_pn": "ft20060101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20060101/01tUm00000Dii1hIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20198-100",
+   "catalog_pn": "ft20198100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20198100/01tUm00000DiNuKIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20300-103",
+   "catalog_pn": "ft20300103",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20300103/01tUm00000Dj9UsIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT20870-100",
+   "catalog_pn": "ft20870100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft20870100/01tUm00000DjDSJIA3",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT21008-101",
+   "catalog_pn": "ft21008101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft21008101/01tUm00000DjLGhIAN",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT21041-101",
+   "catalog_pn": "ft21041101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft21041101/01tUm00000Dj7fnIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT21204",
+   "catalog_pn": "ft21204",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft21204/01tUm00000Dizp9IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT21205-101",
+   "catalog_pn": "ft21205101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft21205101/01tUm00000DioD8IAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT21609-108",
+   "catalog_pn": "ft21609108",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft21609108/01tUm00000Dj04xIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT27701-100",
+   "catalog_pn": "ft27701100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft27701100/01tUm00000DhSjwIAF",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT27802",
+   "catalog_pn": "ft27802",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft27802/01tUm00000DizniIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT28001-103",
+   "catalog_pn": "ft28001103",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft28001103/01tUm00000DiioPIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT28198-101",
+   "catalog_pn": "ft28198101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft28198101/01tUm00000Dj9OZIAZ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT28222-302",
+   "catalog_pn": "ft28222302",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft28222302/01tUm00000DiekjIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT28301-103",
+   "catalog_pn": "ft28301103",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft28301103/01tUm00000DizqUIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT28410",
+   "catalog_pn": "ft28410",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft28410/01tUm00000DgBeDIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT28515-102",
+   "catalog_pn": "ft28515102",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft28515102/01tUm00000Dj1FbIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT28877-101",
+   "catalog_pn": "ft28877101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft28877101/01tUm00000Dj9b5IAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT51010-104",
+   "catalog_pn": "ft51010104",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft51010104/01tUm00000DjBMIIA3",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT61012-100",
+   "catalog_pn": "ft61012100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft61012100/01tUm00000Dio6qIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT61014-101",
+   "catalog_pn": "ft61014101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft61014101/01tUm00000DjBO7IAN",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT61016",
+   "catalog_pn": "ft61016",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft61016/01tUm00000Dio6rIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT61045-100",
+   "catalog_pn": "ft61045100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft61045100/01tUm00000DjBNCIA3",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT61090",
+   "catalog_pn": "ft61090",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft61090/01tUm00000Dj10VIAR",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT61127-100",
+   "catalog_pn": "ft61127100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft61127100/01tUm00000DijRjIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT61148-100",
+   "catalog_pn": "ft61148100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft61148100/01tUm00000Dj0OeIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT61200-101",
+   "catalog_pn": "ft61200101",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft61200101/01tUm00000Dj9RcIAJ",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT67006-100",
+   "catalog_pn": "ft67006100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft67006100/01tUm00000Dio6uIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT67022-201",
+   "catalog_pn": "ft67022201",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft67022201/01tUm00000DiN1CIAV",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT67026",
+   "catalog_pn": "ft67026",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft67026/01tUm00000Dio6vIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT67032-100",
+   "catalog_pn": "ft67032100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft67032100/01tUm00000Dio6wIAB",
+   "qty": 1,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  },
+  {
+   "pn": "FT67073-100",
+   "catalog_pn": "ft67073100",
+   "url": "https://shop.solarturbines.com/ShopSolar/product/ft67073100/01tUm00000Dio6yIAB",
+   "qty": 2,
+   "sheet": "Энергосети",
+   "reverified": false,
+   "what_it_proves": "номер есть в номенклатуре изготовителя, адрес карточки — по самой детали"
+  }
+ ],
+ "solar_missing_rows": [
+  {
+   "pn": "1035799-300",
+   "qty": 6,
+   "name": "КЛАПАН ПРОТИВООБЛЕДЕЛИТЕЛЬНОЙ СИСТЕМЫ Солар Taurus 70 1035799-300",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1042016-1000",
+   "qty": 6,
+   "name": "ПРИВОД РЕГ.НАПРАВЛЯЮЩЕГО АППАРАТА Солар Taurus 70 1042016-1000",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1042016-1500",
+   "qty": 6,
+   "name": "ПРИВОД ПЕРЕПУСКНОГО КЛАПАНА Солар Taurus 70 1042016-1500",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1057405-79411",
+   "qty": 1,
+   "name": "ПОГРУЖНОЙ НАГРЕВАТЕЛЬ Солар Taurus 60S 1057405-79411",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1060151",
+   "qty": 1,
+   "name": "СТРОБОСКОП, КРАСНЫЙ Солар Taurus 60S  1060151",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1060152",
+   "qty": 1,
+   "name": "СТРОБОСКОП С СИГНАЛОМ, КРАСНЫЙ Солар Taurus 60S 1060152",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1062257-1",
+   "qty": 4,
+   "name": "КЛАПАН ЭЛЕКТРОМАГНИТНЫЙ Солар Taurus 60S 1062257-1",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1078325-10",
+   "qty": 2,
+   "name": "ДЕТЕКТОР ГАЗА Солар Taurus 70MD, МЕТАН (CH4), LON 1078325-10",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1094726-10",
+   "qty": 4,
+   "name": "СИСТЕМА ГИДРОЗАТВОРА Солар Taurus 60S 1094726-10",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1094726-20X",
+   "qty": 3,
+   "name": "ГИДРОЗАТВОР Солар Taurus 70 1094726-20X",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1106120-2",
+   "qty": 1,
+   "name": "НАГРЕВАТЕЛЬ, СМАЗОЧНОЕ МАСЛО, 25 КВТ, 400 В ПЕРЕМ. ТОКА СОЛАР Taurus 70 и Taurus 70MD (унифицированнные) 1106120-2",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1119277-1104",
+   "qty": 1,
+   "name": "МУЛЬТИСТАНЦИЯ PMS Солар Taurus 60S 1119277-1104",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1119277-304",
+   "qty": 3,
+   "name": "МОНОБЛОК Солар Taurus 70MD 1119277-304",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1440-DYN02-01RJ",
+   "qty": 3,
+   "name": "2XM - ДИН ВВОД Солар Taurus 70MD 1440-DYN02-01RJ",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1606-XLDC92D",
+   "qty": 3,
+   "name": "Блок питания DC/DC Солар Taurus 70MD 1606-XLDC92D",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1701/05",
+   "qty": 30,
+   "name": "BENTLY NEVADA шасси Солар Taurus 70 1701/05",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1701/06",
+   "qty": 20,
+   "name": "BENTLY NEVADA шасси Солар Taurus 60S 1701/06",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1701/10",
+   "qty": 35,
+   "name": "BENTLY NEVADA блок питания Солар Taurus 60S 1701/10",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1701/15",
+   "qty": 98,
+   "name": "BENTLY NEVADA Блок контроля Солар Taurus 60S 1701/15",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1701/25",
+   "qty": 3,
+   "name": "BENTLY NEVADA Блок контроля Солар Taurus 70MD 1701/25",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "170180-01-00",
+   "qty": 24,
+   "name": "BENTLY NEVADA Блок внешнего преобразователя безконтактный Солар Taurus 70 170180-01-00",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "170180-01-05",
+   "qty": 145,
+   "name": "BENTLY NEVADA Блок внешнего преобразователя KEYPHASOR Солар Taurus 60S 170180-01-05",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "170190-01E",
+   "qty": 145,
+   "name": "BENTLY NEVADA Блок развязки Солар Taurus 60S 170190-01E",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-A7",
+   "qty": 8,
+   "name": "Шасси семи слотовое Солар Taurus 60S 1756-A7",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-A7XT",
+   "qty": 3,
+   "name": "Стоечное шасси (7 слотов) Солар Taurus 70MD 1756-A7XT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-CN2R",
+   "qty": 12,
+   "name": "Интерфейсная карта Солар Taurus 60S 1756-CN2R",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-CN2RXT",
+   "qty": 9,
+   "name": "Интерфейсная карта Солар Taurus 70MD 1756-CN2RXT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-CNBR/D",
+   "qty": 11,
+   "name": "Интерфейсная карта  Солар Taurus 70 1756-CNBR/D",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-ENBT",
+   "qty": 7,
+   "name": "Интерфейсная карта EtherNet Солар Taurus 60S 1756-ENBT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-L61 ControlLogix 5561",
+   "qty": 1,
+   "name": "Контроллер Солар 1756-L61 ControlLogix 5561",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-L63 ControlLogix 5563",
+   "qty": 7,
+   "name": "Контроллер Солар Taurus 60S 1756-L63 ControlLogix 5563",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-L73XT",
+   "qty": 3,
+   "name": "Микропроцессор контроллер Солар Taurus 70MD 1756-L73XT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-PB75",
+   "qty": 7,
+   "name": "Блок питания шасси контроллера Солар Taurus 60S 1756-PB75",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1756-PBXT",
+   "qty": 3,
+   "name": "Блок питания шасси RSLOGIX Солар Taurus 70MD 1756-PBXT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1786-CTK/B",
+   "qty": 1,
+   "name": "КОМПЛЕКТ ДЛЯ УСТАНОВКИ НАКОНЕЧНИКОВ BNC Солар Taurus 60S 1786-CTK/B",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-ACNR",
+   "qty": 3,
+   "name": "Control Net резервированный адаптер Солар Taurus 70MD 1794-ACNR",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-ACNR15",
+   "qty": 86,
+   "name": "Control Net резервированный адаптер Солар Taurus 60S 1794-ACNR15",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-ACNR15XT",
+   "qty": 42,
+   "name": "Control Net резервированный адаптер Солар Taurus 70MD 1794-ACNR15XT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IB10XOB6",
+   "qty": 25,
+   "name": "Блок ввода/вывода Flex 16 дискретных 10ввод/6вывод Солар Taurus 60S 1794-IB10XOB6",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IB16",
+   "qty": 66,
+   "name": "Блок ввода/вывода Flex 16 дискретных вводов Солар Taurus 60S 1794-IB16",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IB16XT",
+   "qty": 21,
+   "name": "Блок ввода/вывода Flex 16 дискретных вводов Солар Taurus 70MD 1794-IB16XT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IE8",
+   "qty": 58,
+   "name": "Блок ввода/вывода Flex 8 аналоговых вводов Солар Taurus 60S 1794-IE8",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IE8XT",
+   "qty": 39,
+   "name": "Блок ввода/вывода Flex 8 аналоговых вводов Солар Taurus 70MD 1794-IE8XT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IF2XOF2I",
+   "qty": 19,
+   "name": "Блок ввода/вывода Flex 4 аналоговых 2ввод/2вывод Солар Taurus 60S 1794-IF2XOF2I",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IF2XOF2IXT",
+   "qty": 9,
+   "name": "Блок ввода/вывода Flex 4 аналоговых 2ввода/2вывода быстрых Солар Taurus 70MD 1794-IF2XOF2IXT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IF4IXT",
+   "qty": 6,
+   "name": "4 аналоговых ввода быстрых Солар Taurus 70MD 1794-IF4IXT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IJ2",
+   "qty": 7,
+   "name": "Блок ввода/вывода Flex ввод 2 част. Вращ. Быстр. Солар Taurus 60S 1794-IJ2",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IJ2XT",
+   "qty": 3,
+   "name": "2 частотных ввода быстрых Солар Taurus 70MD 1794-IJ2XT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IRT8",
+   "qty": 40,
+   "name": "Блок ввода/вывода Flex 8 вводов термопар/терм. Сопротивл быстр. Солар Taurus 60S 1794-IRT8",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IRT8XT",
+   "qty": 24,
+   "name": "Блок ввода/вывода Flex 8 вводов термопар/терм. Сопротивл быстр. Солар Taurus 70MD 1794-IRT8XT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-IВ10XOB6XT",
+   "qty": 9,
+   "name": "Блок ввода/вывода Flex 16 дискретных 10ввод/6вывод Солар Taurus 70MD 1794-IВ10XOB6XT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-OB16P",
+   "qty": 25,
+   "name": "Блок дискретных выводов Солар Taurus 60S 1794-OB16P",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-OB16PXT",
+   "qty": 9,
+   "name": "Блок ввода/вывода Flex 16 дискретных выводов Солар Taurus 70MD 1794-OB16PXT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-OB8EP",
+   "qty": 59,
+   "name": "Блок ввода/вывода Flex 8 дискретных выводов Солар Taurus 60S 1794-OB8EP",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-OB8EPXT",
+   "qty": 24,
+   "name": "Блок ввода/вывода Flex 8 дискретных выводов Солар Taurus 70MD 1794-OB8EPXT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-OF4I",
+   "qty": 7,
+   "name": "Блок ввода/вывода Flex 4 аналоговых вывода Солар Taurus 60S 1794-OF4I",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-OF4IXT",
+   "qty": 6,
+   "name": "4 аналоговых вывода быстрых Солар Taurus 70MD 1794-OF4IXT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "1794-OW8",
+   "qty": 13,
+   "name": "Модуль релейного выхода 8 каналов Солар 1794-OW8",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "301315-18",
+   "qty": 16,
+   "name": "ВТУЛКА Солар Taurus 60S 301315-18",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "6181H-12FPXPHDC",
+   "qty": 9,
+   "name": "Барьер искробезопасности Солар Taurus 70 6181H-12FPXPHDC",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "6181P-15A2MW71DC ser.F",
+   "qty": 4,
+   "name": "Панель HMI (ЛСУ) Солар Taurus 60S 6181P-15A2MW71DC ser.F",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "6181P-15TPW7DC",
+   "qty": 3,
+   "name": "Панель HMI 1500P (ЛСУ) Солар Taurus 70 6181P-15TPW7DC",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "6181X-12A2SWX1DC",
+   "qty": 4,
+   "name": "Панель HMI (укрытие) Солар Taurus 60S 6181X-12A2SWX1DC",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "700-FSK3CU23-EX",
+   "qty": 3,
+   "name": "Реле времени  Солар Taurus 70MD 700-FSK3CU23-EX",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "700-FSM3UU23-EX",
+   "qty": 27,
+   "name": "Реле времени  Солар Taurus 70MD 700-FSM3UU23-EX",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "960463C1",
+   "qty": 1,
+   "name": "Уплотнительное кольцо для дополнительного дренажа 1-го подшипника Солар Taurus 70MD 960463C1",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "993360C",
+   "qty": 3,
+   "name": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 60S 993360C",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "Allen-Bradley 6181H-12FPXPHDC",
+   "qty": 3,
+   "name": "HMI панель в укрытии Солар Taurus 70MD Allen-Bradley 6181H-12FPXPHDC",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "Allen-Bradley 6181P-15A2MW71DC",
+   "qty": 3,
+   "name": "Дисплей встроенный в промышленный компьютер. (панель оператора на двери 1500P) Солар Taurus 70MD Allen-Bradley 6181P-15A2MW71DC",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "BN1701/15",
+   "qty": 12,
+   "name": "BENTLY NEVADA Блок контроля Солар Taurus 70MD BN1701/15",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "EQ3005PCNR",
+   "qty": 3,
+   "name": "DET-Tronix controller Солар Taurus 70MD EQ3005PCNR",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "EQ3005PCNW",
+   "qty": 7,
+   "name": "DET-Tronix controller Солар Taurus 60S EQ3005PCNW",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "EQ3700DW",
+   "qty": 14,
+   "name": "DET-Tronix блок ВВ/ВЫВ. 8 каналов пост.тока  Солар Taurus 60S EQ3700DW",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "EQ3730DR",
+   "qty": 9,
+   "name": "DET-Tronix блок ВВ/ВЫВ. 8 каналов пост.тока  Солар Taurus 70MD EQ3730DR",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "EQ3800",
+   "qty": 3,
+   "name": "DET-Tronix блок питания Солар Taurus 70 EQ3800",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "EQ3800NW",
+   "qty": 4,
+   "name": "DET-Tronix блок питания Солар Taurus 60S EQ3800NW",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "EQ3800PDM",
+   "qty": 3,
+   "name": "DET-Tronix блок питания Солар Taurus 70MD EQ3800PDM",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "H1SHPSM/32/MM-01",
+   "qty": 4,
+   "name": "Плата мультиплексора (основание) Солар Taurus 60S H1SHPSM/32/MM-01",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "HISHPSM/32/MM-01",
+   "qty": 6,
+   "name": "Плата мультиплексора (основание) Солар Taurus 70 HISHPSM/32/MM-01",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "Hi5501-PT-1R-10/100-100",
+   "qty": 4,
+   "name": "блок частоты 10-100hZ Солар Taurus 60S Hi5501-PT-1R-10/100-100",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "Hi5501-PT-1R-100/1k-100",
+   "qty": 4,
+   "name": "блок частоты 100-1khZ Солар Taurus 60S Hi5501-PT-1R-100/1k-100",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "HiDMux2700",
+   "qty": 10,
+   "name": "32 канала HART Мультиплексор  Pepperl+Fuchs-Elcon Солар Taurus 60S  HiDMux270",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KCD2-RR-Ex1",
+   "qty": 66,
+   "name": "БЛОК РАЗВЯЗКИ, ПОВТОРИТЕЛЬ, СОПРОТИВЛЕНИЕ. Солар Taurus 70MD KCD2-RR-Ex1",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KFD2-EB2",
+   "qty": 6,
+   "name": "БЛОК РАЗВЯЗКИ, ФИДЕР ПИТАНИЯ Солар Taurus 70MD KFD2-EB2",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KFD2-RR-Ex1",
+   "qty": 74,
+   "name": "Барьер искробезопасности Солар Taurus 60S KFD2-RR-Ex1",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KFD2-SR2-Ex2.W",
+   "qty": 7,
+   "name": "Барьер искробезопасности Солар Taurus 60S KFD2-SR2-Ex2.W",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KFD2-STC4-Ex1",
+   "qty": 8,
+   "name": "Барьер искрозащиты Солар Taurus 60S KFD2-STC4-Ex1",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KFD2-VR-Ex1.19",
+   "qty": 6,
+   "name": "Барьер искробезопасности Солар Taurus 70 KFD2-VR-Ex1.19",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KFD2-VR-Ex1.50m",
+   "qty": 60,
+   "name": "Барьер искробезопасности с гальванической развязкой Солар Taurus 60S KFD2-VR-Ex1.50m",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KFD2-VR2-Ex1.50M",
+   "qty": 36,
+   "name": "Барьер искробезопасности Солар Taurus 70MD KFD2-VR2-Ex1.50M",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KFD2-СR-Ex1 30.300",
+   "qty": 6,
+   "name": "Барьер искробезопасности Солар Taurus 70 KFD2-СR-Ex1 30.300",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KOP128j7BAVPN22",
+   "qty": 7,
+   "name": "Реле времени  Солар Taurus 60S KOP128j7BAVPN22",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KOP160j7MWVPN22",
+   "qty": 58,
+   "name": "Реле времени  Солар Taurus 60S KOP160j7MWVPN22",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "KT973",
+   "qty": 8,
+   "name": "Счетчик наработки/пусков двигателя Солар Taurus 60S KT973",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "M63-16-16-PM",
+   "qty": 3,
+   "name": "Блок питания Солар Taurus 70 M63-16-16-PM",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "MAGNETEK  M63-16-16-PM",
+   "qty": 3,
+   "name": "Блок питания Солар Taurus 70MD MAGNETEK  M63-16-16-PM",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "MTL5533",
+   "qty": 3,
+   "name": "БЛОК РАЗВЯЗКИ, ПОВТОРИТЕЛЬ НАПРЯЖЕНИЯ Солар Taurus 70MD MTL5533",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "MV-832",
+   "qty": 4,
+   "name": "Трансформатор фазовращатель Солар Taurus 60S MV-832",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "MVI56-MCM",
+   "qty": 7,
+   "name": "Интерфейсная карта MODBUS Солар Taurus 60S MVI56-MCM",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "MVI56E-MCMXT",
+   "qty": 6,
+   "name": "Интерфейсная карта MODBUS Солар Taurus 70MD MVI56E-MCMXT",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "PLC-RSC-24DC/21-21/ATEX, 2980461",
+   "qty": 156,
+   "name": "Реле двухконтактное Солар Taurus 70MD PLC-RSC-24DC/21-21/ATEX, 2980461",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "RTE24024",
+   "qty": 311,
+   "name": "Реле  Солар Taurus 60S RTE24024",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "STP 42-28-100",
+   "qty": 4,
+   "name": "Блок питания Солар Taurus 60S STP 42-28-100",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "Turbo-K",
+   "qty": 90,
+   "name": "Чистящее средство для турбин, 25 л Солар Taurus 60S Turbo-K",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "XBT-N401",
+   "qty": 3,
+   "name": "Компактный символьный дисплей 4x20 Солар Taurus 70MD XBT-N401",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 1020458-3",
+   "qty": 10,
+   "name": "ПЛАТА ИЗОТЕРМИЧЕСКАЯ ОПОРНАЯ Солар Taurus 60S p/n Solar: 1020458-3",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 1053834-6",
+   "qty": 4,
+   "name": "РЕЗЕРВНОЕ УСТРОЙСТВО ЗАЩИТЫ ПО ПРЕВЫШЕНИЮ ЧАСТОТЫ ВРАЩЕНИЯ. Солар Taurus 60S p/n Solar: 1053834-6",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 1053834-9",
+   "qty": 6,
+   "name": "РЕЗЕРВНОЕ УСТРОЙСТВО ЗАЩИТЫ ПО ПРЕВЫШЕНИЮ ЧАСТОТЫ ВРАЩЕНИЯ. Солар Taurus 70 p/n Solar: 1053834-9",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 127147-1",
+   "qty": 4,
+   "name": "Синхроноскоп, WESCHLER INSTRUMRNTS Солар Taurus 60S p/n Solar: 127147-1",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 186533-1",
+   "qty": 4,
+   "name": "Вольтметр 0-15кV, WESCHLER INSTRUMRNTS  Солар Taurus 60S p/n Solar: 186533-1",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 186583-2",
+   "qty": 4,
+   "name": "Амперметр возб. 0-20А, WESCHLER INSTRUMRNTS  Солар Taurus 60S p/n Solar: 186583-2",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 186584-3",
+   "qty": 4,
+   "name": "Амперметр 0-500А, WESCHLER INSTRUMRNTS  Солар Taurus 60S p/n Solar: 186584-3",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 186665-245",
+   "qty": 4,
+   "name": "Инд. мощности 6000кW, WESCHLER INSTRUMRNT Sp/n Solar: 186665-245",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 186891-10",
+   "qty": 4,
+   "name": "Вольтметр возб. 0-200V, WESCHLER INSTRUMRNTS Солар Taurus 60S p/n Solar: 186891-10",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 962308С1",
+   "qty": 4,
+   "name": "Частотомер 45-55HZ, WESCHLER INSTRUMRNTS Солар Taurus 60S p/n Solar: 962308С1",
+   "sheet": "Энергосети"
+  },
+  {
+   "pn": "p/n Solar: 962317C1",
+   "qty": 4,
+   "name": "Коэф. Мощности, WESCHLER INSTRUMRNTS Солар Taurus 60S p/n Solar: 962317C1",
+   "sheet": "Энергосети"
+  }
+ ]
+}

@@ -1,0 +1,81 @@
+{
+ "updated": "2026-09-18",
+ "source": "Опись вложений сделок Bitrix (gt/data/bitrix_tkp_index.json). Считает gt/tools/system_coverage.py.",
+ "question": "Сколько системы прочитано и что мешает прочитать остальное.",
+ "records_total": 1565,
+ "downloaded": 952,
+ "not_needed": 274,
+ "not_downloaded": 339,
+ "downloaded_with_prices": 533,
+ "downloaded_unparsed": 83,
+ "share_priced_among_downloaded_pct": 56.0,
+ "rows_parsed": 240844,
+ "rows_with_price": 44865,
+ "why_not_downloaded": [
+  {
+   "reason": "Диск не отдал ссылку (нет скоупа disk или файла нет)",
+   "records": 335
+  },
+  {
+   "reason": "HTTP 404",
+   "records": 4
+  }
+ ],
+ "not_downloaded_by_field": [
+  {
+   "field_name": "вложение дела",
+   "records": 327
+  },
+  {
+   "field_name": "вложение комментария",
+   "records": 8
+  },
+  {
+   "field_name": "Offer from supplier(s)",
+   "records": 2
+  },
+  {
+   "field_name": "Offer from supplier (Техническое поле.Заполняется автоматически)",
+   "records": 2
+  }
+ ],
+ "not_downloaded_by_direction": {
+  "входящее": 283,
+  "неизвестно": 44,
+  "наш запрос": 12
+ },
+ "by_scope": {
+  "слово «ЛУКОЙЛ»": {
+   "deals": 137,
+   "files_seen": 1998,
+   "records": 1081,
+   "downloaded": 674,
+   "not_downloaded": 226
+  },
+  "слово «Энергосети»": {
+   "deals": 6,
+   "files_seen": 93,
+   "records": 78,
+   "downloaded": 76,
+   "not_downloaded": 0
+  },
+  "слово «НВН»": {
+   "deals": 30,
+   "files_seen": 298,
+   "records": 389,
+   "downloaded": 185,
+   "not_downloaded": 113
+  },
+  "наши исходящие запросы (архив)": {
+   "deals": null,
+   "files_seen": 17,
+   "records": 17,
+   "downloaded": 17,
+   "not_downloaded": 0
+  }
+ },
+ "estimate_lost_priced_files": 190,
+ "estimate_caveat": "ЭТО ЭКСТРАПОЛЯЦИЯ, а не измерение: доля файлов с ценами среди прочитанных перенесена на непрочитанные. В заголовок такое число не идёт. Оно показывает порядок потери, а не саму потерю.",
+ "what_it_means": "Из 1565 записей описи прочитано 952, а 339 не скачались вовсе. Причину называет сама система, дословно: «Диск не отдал ссылку (нет скоупа disk или файла нет)». Это не отказ сети и не наша недоработка в разборе — это ПРАВА доступа у ключа подключения.",
+ "next_step": "Добавить ключу подключения к Bitrix право на чтение диска и повторить обход. Это одно действие владельца, после которого станут читаемы сотни вложений, причём почти все они — входящие предложения поставщиков, то есть именно цены. Никакой другой работы этот остаток не требует."
+}
