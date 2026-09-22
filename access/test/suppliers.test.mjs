@@ -307,3 +307,116 @@ test("плашка «Номенклатура» показывается по т
   const нет = await (await call(env, "/", GUEST)).text();
   assert.doesNotMatch(нет, /href="\/nomenclature"/);
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// СЧЁТЧИКИ. Точки числовых замеров: только агрегаты, никаких позиций и компаний.
+// Права здесь те же, что у номенклатуры, и проверяется это отдельно: соблазн
+// «агрегаты же, пусть смотрят все» стоил бы раздачи того, насколько плохо мы
+// закрываем спрос, шире, чем самой номенклатуры.
+const СЧЁТЧИКИ = {
+  version: 1,
+  metrics: {
+    "коды_и_цены": [
+      { run: "111", at: "2026-09-21T01:00:00Z",
+        nums: { asked: 100, with_kp: 10, other_feed: 2, no_price: 88, rows_asked: 400,
+                rows_with: 40, rows_without: 340, price_codes: 11, price_rows: 20,
+                price_asked: 10, price_in_catalog: 3, catalog: 50, catalog_priced: 3,
+                catalog_asked: 12, plausible: 95, no_digit: 2, shorter_than_four: 1,
+                longer_than_25: 2 } },
+      { run: "222", at: "2026-09-22T01:00:00Z", note: "выдуманная оговорка",
+        nums: { asked: 120, with_kp: 18, other_feed: 2, no_price: 100, rows_asked: 430,
+                rows_with: 60, rows_without: 330, price_codes: 19, price_rows: 31,
+                price_asked: 18, price_in_catalog: 4, catalog: 50, catalog_priced: 4,
+                catalog_asked: 14, plausible: 112, no_digit: 3, shorter_than_four: 2,
+                longer_than_25: 3 } },
+    ],
+  },
+};
+
+function envCounters(snapshot = СЧЁТЧИКИ) {
+  const env = envFor();
+  if (snapshot) env.ACL.box.set("counters:v1", JSON.stringify(snapshot));
+  return env;
+}
+
+test("счётчики закрыты без подписи Access", async () => {
+  const env = envCounters();
+  for (const path of ["/counters", "/counters/", "/counters.html", "/api/counters"]) {
+    const response = await call(env, path, null);
+    assert.equal(response.status, 403, path);
+  }
+  assert.deepEqual(env.assets, []);
+});
+
+test("счётчики открывает то же право suppliers", async () => {
+  const env = envCounters();
+  for (const path of ["/counters", "/api/counters"]) {
+    const deny = await call(env, path, GUEST);
+    assert.equal(deny.status, 403, path);
+    assert.equal((await deny.json()).error, "forbidden");
+    const allow = await call(env, path, READER);
+    assert.equal(allow.status, 200, path);
+  }
+  // Страница берётся своя, а не номенклатуры: один файл на два раздела уже
+  // однажды открывал раздел чужой вёрсткой.
+  assert.deepEqual(env.assets, ["/counters.html"]);
+});
+
+test("счётчики отдают все точки в порядке замера", async () => {
+  const env = envCounters();
+  const value = await (await call(env, "/api/counters", READER)).json();
+  const точки = value.metrics["коды_и_цены"];
+  assert.equal(точки.length, 2);
+  assert.equal(точки[0].run, "111");
+  assert.equal(точки[1].run, "222");
+  // Оговорка доезжает до страницы: без неё «цифра упала» читается как провал,
+  // а не как «замер сделан во время переразбора».
+  assert.equal(точки[1].note, "выдуманная оговорка");
+});
+
+test("снимка счётчиков ещё нет — это «нет данных», а не поломка", async () => {
+  const env = envFor();                      // counters:v1 не положен
+  const response = await call(env, "/api/counters", READER);
+  assert.equal(response.status, 200);
+  assert.deepEqual((await response.json()).metrics, {});
+});
+
+test("битый снимок счётчиков — 503, а не тихая пустота", async () => {
+  // Пустота на месте поломки — худший из ответов: страница скажет «пока пусто»,
+  // и никто не узнает, что публикатор пишет мусор.
+  for (const плохой of ['{"version":2,"metrics":{}}', "не json вовсе"]) {
+    const env = envFor();
+    env.ACL.box.set("counters:v1", плохой);
+    const response = await call(env, "/api/counters", READER);
+    assert.equal(response.status, 503, плохой.slice(0, 12));
+    assert.equal((await response.json()).error, "suppliers_unavailable");
+  }
+});
+
+test("альтернативное написание пути счётчиков не обходит проверку права", async () => {
+  const env = envCounters();
+  for (const path of ["/counters/all", "/api/counters/list", "/counters%2f",
+                      "/%63ounters", "/counters;x", "/api/counters;x"]) {
+    const response = await call(env, path, GUEST);
+    assert.equal(response.status, 404, path);
+    assert.equal((await response.json()).error, "not_found");
+  }
+  assert.deepEqual(env.assets, []);
+});
+
+test("менять счётчики запросом нельзя: только GET", async () => {
+  const env = envCounters();
+  for (const method of ["POST", "PUT", "DELETE"]) {
+    const response = await call(env, "/api/counters", OWNER, { method,
+      headers: { "Content-Type": "application/json" }, body: "{}" });
+    assert.equal(response.status, 405, method);
+  }
+});
+
+test("плашка «Счётчики» показывается по тому же праву", async () => {
+  const env = envCounters();
+  const есть = await (await call(env, "/", READER)).text();
+  assert.match(есть, /href="\/counters"/);
+  const нет = await (await call(env, "/", GUEST)).text();
+  assert.doesNotMatch(нет, /href="\/counters"/);
+});

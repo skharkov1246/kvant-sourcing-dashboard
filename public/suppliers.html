@@ -362,7 +362,7 @@ function по_сущности(снимок) {
 
   (снимок.positions || []).forEach(function (p) {
     (p.list || []).forEach(function (o) {
-      var ent = сущность_по_ключу[o.co];
+      var ent = сущность_по_ключу[o.c];
       if (!ent || !карта[ent]) return;
       var у = карта[ent];
       var строка = у.поkey[p.k];
@@ -372,10 +372,10 @@ function по_сущности(снимок) {
         у.list.push(строка);
       }
       строка.cnt += 1;
-      if (строка.price === null && o.price !== undefined) {
-        строка.price = o.price; строка.cur = o.cur || null;
+      if (строка.price === null && o.p !== undefined) {
+        строка.price = o.p; строка.cur = o.u || null;
       }
-      строка.date = строка.date || o.date || null;
+      строка.date = строка.date || o.d || null;
     });
   });
   Object.keys(карта).forEach(function (k) {

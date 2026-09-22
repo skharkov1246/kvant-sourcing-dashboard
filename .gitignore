@@ -14,6 +14,8 @@ public/*.html
 !public/suppliers.html
 # Оболочка раздела «Номенклатура» — по тому же основанию: котировки приходят из KV.
 !public/nomenclature.html
+# Оболочка раздела «Счётчики» — тоже без данных: точки замеров приходят из KV.
+!public/counters.html
 
 # крупный дамп Bitrix — в репозитории не нужен
 agent/corpus.json

@@ -12,56 +12,13 @@
 //   · компания, не сведённая с реестром, ведёт прямой ссылкой в Битрикс;
 //   · закрытое правом поле показывается как «нет доступа», а не как пустота.
 import fs from "node:fs";
-import vm from "node:vm";
 import test from "node:test";
 import assert from "node:assert/strict";
+// Мини-DOM вынесен в общий модуль: та же подделка понадобилась странице
+// счётчиков, а две расходящиеся подделки DOM не заметит никто.
+import { открыть } from "./minidom.mjs";
 
 const html = fs.readFileSync(new URL("../../public/nomenclature.html", import.meta.url), "utf8");
-const source = html.split("<script>")[1].split("</script>")[0];
-
-const разметка = html.split("<script>")[0];
-const идентификаторы = [];
-for (const m of разметка.matchAll(/<([a-z][a-z0-9]*)\b([^>]*)>/gi)) {
-  const id = m[2].match(/\bid="([^"]+)"/);
-  if (!id) continue;
-  идентификаторы.push({ id: id[1], tag: m[1], hidden: /\shidden(?:\s|>|$)/.test(m[2]) });
-}
-
-class Element {
-  constructor(tag) {
-    this.tagName = String(tag).toUpperCase();
-    this.children = [];
-    this.attrs = {};
-    this.events = {};
-    this.hidden = false;
-    this.value = "";
-    this._text = "";
-    this.className = "";
-  }
-  set textContent(v) { this._text = v == null ? "" : String(v); this.children = []; }
-  get textContent() { return this._text + this.children.map((c) => c.textContent).join(""); }
-  appendChild(node) {
-    // Настоящий DOM разворачивает DocumentFragment при вставке и опустошает его.
-    // Без этого список из трёх строк выглядел бы одним узлом.
-    if (node instanceof Fragment) { this.children.push(...node.children); node.children = []; return node; }
-    this.children.push(node);
-    return node;
-  }
-  setAttribute(k, v) { this.attrs[k] = String(v); }
-  getAttribute(k) { return this.attrs[k]; }
-  addEventListener(k, fn) { (this.events[k] ||= []).push(fn); }
-  async fire(k) { for (const fn of this.events[k] || []) await fn({ preventDefault() {} }); }
-  querySelectorAll(sel) {
-    const теги = sel.split(",").map((t) => t.trim().toUpperCase());
-    return потомки(this).filter((e) => теги.includes(e.tagName));
-  }
-  focus() {}
-  scrollIntoView() {}
-}
-class Fragment extends Element {
-  constructor() { super("#fragment"); }
-}
-function потомки(root) { return [root, ...root.children.flatMap(потомки)]; }
 
 const СНИМОК = {
   version: 1,
@@ -80,21 +37,31 @@ const СНИМОК = {
                  makes: "подшипники", verdict: null }],
       // Форма как у публикатора: имени компании в предложении НЕТ, пустые
       // ключи отсутствуют вовсе (а не лежат со значением null).
+      // КЛЮЧИ ПРЕДЛОЖЕНИЯ ОДНОБУКВЕННЫЕ — таблица в library/crossref.py
+      // (ПОЛЯ_ПРЕДЛОЖЕНИЯ). Снимок это провод, а не документ: имена ключей
+      // стоили 2,4 МиБ из 6,9, и их сокращение вернуло запас под условия.
+      //   c=компания e=сущность m=изготовитель из файла b=бренды p=цена u=валюта
+      //   q=количество n=единица s=базис l=срок поставки k=срок изготовления
+      //   y=оплата a=аванс t=сумма r=пометки источника f=карточка v=уверенность d=дата
+      //
+      // ТРИ СОСТОЯНИЯ УСЛОВИЙ, и все три обязаны выглядеть по-разному:
+      //   первое предложение — условия прочитаны («сссф», срок изготовления из файла);
+      //   второе — разбор проверил и не нашёл («нннн» = верифицированное отсутствие);
+      //   третье — пометок нет вовсе, то есть разбор до условий не дошёл.
       list: [
-        { co: "101", ent: "KV-S-000001-8", price: 100, cur: "EUR", qty: 4,
-          unit: "шт", basis: "EXW", lead: 30, brands: ["SKF"],
-          oem: "CHINA-BRG", date: "2026-09-01" },
-        { co: "777", price: 120, cur: "EUR", date: "2026-09-02" },
-        { co: "101", ent: "KV-S-000001-8",
-          price: { "закрыто": "suppliers_fin" }, cur: "EUR", date: "2026-09-03" },
-      ] },
-    { k: "sealkit12", n: "SEAL-KIT-12", name: "Комплект уплотнений", co: 1, offers: 1,
+        { c: "101", e: "KV-S-000001-8", p: 100, u: "EUR", q: 4,
+          n: "шт", s: "EXW", l: 30, k: 45, y: "LC, 30 на 70", a: 30, t: 400,
+          r: "сссф", b: ["SKF"], m: "CHINA-BRG", d: "2026-09-01" },
+        { c: "777", p: 120, u: "EUR", r: "нннн", d: "2026-09-02" },
+        { c: "101", e: "KV-S-000001-8",
+          p: { "закрыто": "suppliers_fin" }, u: "EUR", d: "2026-09-03" },
+      ] },    { k: "sealkit12", n: "SEAL-KIT-12", name: "Комплект уплотнений", co: 1, offers: 1,
       shown: 1, cmp: false, cat: false, oem_file: [], oem_cat: null, brands: [],
       // Спрос одной сделкой в одной единице: сумма законна. Выбора нет — это и
       // есть строка списка работы.
       demand: { deals: 1, rows: 2, qty: 10, units: 1 },
       alts: [], models: [], makers: [],
-      list: [{ co: "102", price: 50, date: "2026-09-01" }] },
+      list: [{ c: "102", p: 50, d: "2026-09-01" }] },
     // Позиция БЕЗ спроса: в список работы не идёт, и «не спрашивали» — не ноль.
     { k: "oring5", n: "O-RING-5", name: "Кольцо", co: 1, offers: 1, shown: 1,
       cmp: false, cat: false, oem_file: [], oem_cat: null, brands: [], alts: [],
@@ -110,37 +77,7 @@ const СНИМОК = {
 };
 
 async function открыть_страницу(снимок = СНИМОК, ответ = null) {
-  const карта = {};
-  for (const о of идентификаторы) {
-    const el = new Element(о.tag);
-    el.id = о.id;
-    el.hidden = о.hidden;
-    карта[о.id] = el;
-  }
-  const создано = [];
-  const doc = {
-    body: new Element("body"),
-    getElementById: (id) => карта[id] || null,
-    createElement: (tag) => { const e = new Element(tag); создано.push(e); return e; },
-    createDocumentFragment: () => new Fragment(),
-    createTextNode: (t) => Object.assign(new Element("#text"), { textContent: t }),
-  };
-  const обещания = [];
-  const context = {
-    document: doc, console, URL, encodeURIComponent,
-    fetch: (url) => {
-      const p = Promise.resolve(ответ || new Response(JSON.stringify(снимок),
-        { status: 200, headers: { "Content-Type": "application/json" } }));
-      обещания.push(p);
-      return p;
-    },
-  };
-  vm.createContext(context);
-  vm.runInContext(source, context);
-  // Скрипт читает снимок через fetch: даём микрозадачам дойти до отрисовки.
-  for (let i = 0; i < 20; i++) await Promise.resolve();
-  await new Promise((r) => setTimeout(r, 0));
-  return { карта, создано };
+  return открыть(html, { снимок, ответ });
 }
 
 test("страница рисует итоги и список", async () => {
@@ -278,4 +215,68 @@ test("отказ по праву объясняется, а не показыв�
   assert.equal(карта.status.hidden, false);
   assert.match(карта.status.textContent, /нет права suppliers/);
   assert.match(карта.status.textContent, /Доступы/);
+});
+
+// ── КОММЕРЧЕСКИЕ УСЛОВИЯ И ПРИЧИНА ИХ ОТСУТСТВИЯ ──────────────────────────
+// Владелец просил читать из каждого КП базис, оплату, срок производства и срок
+// поставки, а отсутствие помечать ВЕРИФИЦИРОВАННЫМ. Разбор это делает; здесь
+// проверяется, что закупщик видит разницу между «поставщик не назвал» (можно
+// спросить) и «наш разбор не дошёл» (чинить нам). Прочерк без причины путал их.
+
+test("условия предложения показаны, включая срок изготовления отдельно", async () => {
+  const { карта } = await открыть_страницу();
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  const t = карта.card.textContent;
+  assert.match(t, /EXW/, "базис не показан");
+  assert.match(t, /LC, 30 на 70/, "условия оплаты не показаны");
+  assert.match(t, /аванс 30/, "доля аванса не показана");
+  assert.match(t, /45/, "срок изготовления не показан");
+  // Заголовки колонок обязаны различать два срока: «Срок, дн.» на оба — это
+  // приглашение сравнить срок производства одного КП со сроком поставки другого.
+  assert.match(t, /Изготовл\., дн\./);
+  assert.match(t, /Поставка, дн\./);
+  assert.match(t, /Сумма/, "суммы строки нет — «цена × количество» не проверить");
+});
+
+test("«в КП не указано» и «разбор не дошёл» — разные надписи", async () => {
+  const { карта } = await открыть_страницу();
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  const t = карта.card.textContent;
+  // Второе предложение: пометки «нннн» — разбор проверил и условий не нашёл.
+  assert.match(t, /в КП не указано/,
+    "верифицированное отсутствие показано как обычный прочерк");
+  // Третье предложение: пометок нет вовсе — разбор до условий не дошёл.
+  assert.match(t, /разбор не дошёл/,
+    "наш недочёт разбора выглядит как молчание поставщика");
+});
+
+test("условие из общих условий КП подписано как таковое", async () => {
+  // Срок изготовления первого предложения помечен «ф» — взят из общих условий
+  // файла, а не из строки. К этой строке он мог и не относиться, и об этом надо
+  // сказать, иначе число выглядит как обещание по этой позиции.
+  const { карта } = await открыть_страницу();
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  assert.match(карта.card.textContent, /из общих условий КП/);
+});
+
+test("раздел машин не утверждает установку", async () => {
+  // Связь «деталь ↔ машина» получена разбором свободного текстового поля. Это
+  // «рядом с деталью написано имя машины», а не «применимость подтверждена» и не
+  // «деталь установлена». Раздел назывался «Где стоит» и утверждал установку,
+  // которой в данных нет ни одной строкой.
+  const { карта } = await открыть_страницу();
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  const t = карта.card.textContent;
+  assert.match(t, /Для каких машин запрашивали/);
+  assert.doesNotMatch(t, /Где стоит/, "заголовок снова утверждает установку");
+  assert.match(t, /Подтверждённой применимости и факта установки .* нет/s);
+});
+
+test("дата снимка видна, а её отсутствие названо", async () => {
+  const с_датой = await открыть_страницу({ ...СНИМОК, published_at: "2026-09-20T10:00:00Z" });
+  assert.match(с_датой.карта.published.textContent, /2026-09-20 10:00 UTC/);
+  // Без даты — не пустота, а прямая надпись: иначе вчерашний снимок выглядит
+  // как сегодняшний.
+  const без = await открыть_страницу();
+  assert.match(без.карта.published.textContent, /Дата сборки неизвестна/);
 });

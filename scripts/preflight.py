@@ -103,8 +103,11 @@ def main() -> int:
         if not os.environ.get("LIBRARY_SQL_TEST_DSN"):
             print("⚠ LIBRARY_SQL_TEST_DSN не задан: тесты SQL-схем пропущены, "
                   "гейт их прогонит. Поднять такую же базу локально:\n"
+                  # --locale=C.UTF-8 обязателен: в локали C функция lower() не
+                  # складывает кириллицу, ключ артикула считается иначе, чем на
+                  # живой базе, и замеры врут правдоподобно (CLAUDE.md, 21а).
                   "    /usr/lib/postgresql/16/bin/initdb -D /var/tmp/pgtest -A trust "
-                  "-U postgres\n"
+                  "-U postgres --locale=C.UTF-8 --encoding=UTF8\n"
                   "    /usr/lib/postgresql/16/bin/pg_ctl -D /var/tmp/pgtest "
                   "-o '-k /var/tmp -c listen_addresses=127.0.0.1' -l /var/tmp/pgtest/log "
                   "start\n"
@@ -113,7 +116,10 @@ def main() -> int:
                   "    export LIBRARY_SQL_TEST_DSN=postgresql://postgres:"
                   "synthetic-library-ci@127.0.0.1:5432/library_sql_test\n"
                   "  Строка подключения закреплена в тесте дословно — иначе он "
-                  "откажется работать (защита от прогона против прода).")
+                  "откажется работать (защита от прогона против прода).\n"
+                  "  Локаль C.UTF-8 обязательна: в локали C кириллица не "
+                  "складывается по регистру и ключи артикулов считаются иначе, "
+                  "чем на живой базе (CLAUDE.md, 21а).")
         # Тесты прав доступа на node. Гейт их гонял, а этот скрипт — нет, и это
         # ровно та дыра, ради закрытия которой он написан: 20.09.2026 правка
         # access/acl.js прошла зелёный preflight и упала бы на гейте. Если node
