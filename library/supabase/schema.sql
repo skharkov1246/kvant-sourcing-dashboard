@@ -909,3 +909,30 @@ alter table lib_files add column if not exists ocr_at    timestamptz;
 alter table lib_files add column if not exists ocr_chars int;
 create index if not exists lib_files_ocr on lib_files (ocr_at) where ocr_at is null;
 
+
+-- ЖУРНАЛ ЧИСЛОВЫХ ЗАМЕРОВ. Заведён 22.09.2026, потому что числовой истории
+-- прогонов в проекте не было вовсе. «Журнал прогона» из CLAUDE.md — это stdout
+-- задания Actions, и он живёт девяносто дней; `/admin/log` — журнал действий
+-- людей, цифрам там не место. Поэтому «динамику день ко дню» до сих дня
+-- приходилось сверять глазами по логам, а после их истечения — никак.
+--
+-- Таблица нарочно общая, а не «таблица про коды»: замеров у нас много
+-- (воронка разбора, охват спроса, гигиена Bitrix), и каждому своя таблица —
+-- это пять миграций вместо одной. Ключ — пара «замер + прогон»: повторный
+-- запуск того же прогона не плодит точки, а перезаписывает свою.
+--
+-- ТОЛЬКО АГРЕГАТЫ (CLAUDE.md, правило 17): счёт кодов, строк и файлов. Ни
+-- наименований позиций, ни номеров сделок, ни компаний — таблицу можно
+-- показывать целиком. Колонка названа nums, а не values: values в PostgreSQL
+-- — зарезервированное слово, и запрос к ней пришлось бы кавычить везде.
+create table if not exists lib_metric_runs (
+  metric      text not null,                 -- 'коды_и_цены', 'воронка_разбора', …
+  run_key     text not null,                 -- номер прогона Actions либо метка времени
+  measured_at timestamptz not null default now(),
+  nums        jsonb not null,                -- {имя: число} — только числа
+  note        text,                          -- оговорка к точке, если она есть
+  primary key (metric, run_key)
+);
+create index if not exists lib_metric_runs_time on lib_metric_runs (metric, measured_at desc);
+
+alter table lib_metric_runs enable row level security;

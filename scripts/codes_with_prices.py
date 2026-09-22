@@ -31,15 +31,35 @@
 (CLAUDE.md, правило 8): иначе соединение читает полтора миллиона строк на каждый
 из ста пятидесяти тысяч ключей.
 
-Ничего не пишет. В журнал — только агрегаты (правило 17).
+По умолчанию ничего не пишет. С WRITE=1 добавляет ОДНУ строку агрегатов в
+lib_metric_runs — журнал числовых замеров, из которого берётся динамика день ко
+дню. До 22.09.2026 такой истории не существовало: цифры печатались в лог прогона
+Actions и пропадали через девяносто дней, а сравнивать приходилось глазами.
+Точка ключуется прогоном, поэтому повторный запуск того же прогона не плодит
+точки, а перезаписывает свою.
+
+В журнал прогона и в таблицу — только агрегаты (правило 17): счёт кодов и строк.
 
     SUPABASE_DB_URL=… python scripts/codes_with_prices.py
+    SUPABASE_DB_URL=… WRITE=1 RUN_KEY=$GITHUB_RUN_ID python scripts/codes_with_prices.py
 """
 from __future__ import annotations
 
 import os
 
 FEED_КП = "разбор КП"
+
+# Имя замера в журнале. Оно же — ключ, по которому страница счётчика отбирает
+# свои точки, поэтому менять его нельзя, не переписав историю.
+ЗАМЕР = "коды_и_цены"
+
+ЗАПИСЬ = """
+insert into lib_metric_runs (metric, run_key, nums, note)
+     values (%s, %s, %s::jsonb, %s)
+on conflict (metric, run_key)
+  do update set nums = excluded.nums, note = excluded.note,
+                measured_at = now()
+"""
 
 ПОДГОТОВКА = """
 create temp table коды_спроса as
@@ -147,6 +167,28 @@ def доля(часть, целое) -> str:
     return f"{часть:>8d}" + (f"  {100 * часть / целое:5.1f} %" if целое else "")
 
 
+def ключ_прогона() -> str:
+    """Ключ точки. Прогон Actions, если мы в нём, иначе метка времени UTC.
+
+    Прогон нужен именно номером: по нему точка находится в логах, а повторный
+    запуск того же прогона перезаписывает свою строку вместо новой.
+    """
+    из_среды = (os.environ.get("RUN_KEY") or os.environ.get("GITHUB_RUN_ID") or "").strip()
+    if из_среды:
+        return из_среды
+    from datetime import datetime, timezone
+    return "вручную-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+def записать(cur, числа: dict, оговорка: str | None) -> None:
+    import json
+
+    ключ = ключ_прогона()
+    cur.execute(ЗАПИСЬ, (ЗАМЕР, ключ, json.dumps(числа, ensure_ascii=False), оговорка))
+    print(f"\n✓ точка истории записана: замер «{ЗАМЕР}», прогон {ключ},"
+          f" чисел {len(числа)}")
+
+
 def main() -> int:
     dsn = os.environ.get("SUPABASE_DB_URL", "").strip()
     if not dsn:
@@ -156,6 +198,10 @@ def main() -> int:
 
     conn = psycopg2.connect(dsn, connect_timeout=20,
                             options="-c statement_timeout=600000")
+    # Числа собираются по ходу печати, а не вторым проходом запросов: второй
+    # проход по полутора миллионам строк спроса дал бы ДРУГИЕ числа, если между
+    # проходами идёт разбор, и точка истории разошлась бы с напечатанной.
+    числа: dict[str, int] = {}
     try:
         with conn.cursor() as cur:
             print("=== КОДЫ С ЦЕНОЙ И БЕЗ ЦЕНЫ ===")
@@ -166,6 +212,8 @@ def main() -> int:
             cur.execute(ОБЪЁМ)
             кс, стрс, ккп, стркп, кц, кт = cur.fetchone()
             print("ОБЪЁМ:")
+            числа.update(asked=ч(кс), rows_asked=ч(стрс), price_codes=ч(ккп),
+                         price_rows=ч(стркп), price_codes_any=ч(кц), catalog=ч(кт))
             print(f"    кодов в спросе (что мы спрашивали)  {ч(кс):>8d}"
                   f"  · строк {ч(стрс)}")
             print(f"    кодов в ценах предложений           {ч(ккп):>8d}"
@@ -175,6 +223,8 @@ def main() -> int:
 
             cur.execute(СПРОС_С_ЦЕНОЙ)
             всего, с_кп, чужой, без, стр_с, стр_без = cur.fetchone()
+            числа.update(with_kp=ч(с_кп), other_feed=ч(чужой), no_price=ч(без),
+                         rows_with=ч(стр_с), rows_without=ч(стр_без))
             print("\nГЛАВНОЕ — КОДЫ, КОТОРЫЕ МЫ СПРАШИВАЛИ:")
             print(f"    всего кодов                         {ч(всего):>8d}")
             print(f"    с ценой ОТ ПОСТАВЩИКА (разбор КП)   {доля(с_кп, всего)}")
@@ -185,6 +235,8 @@ def main() -> int:
 
             cur.execute(ЦЕНЫ_ПРОТИВ_СПРОСА)
             кодов, спраш, не_спраш, в_кат = cur.fetchone()
+            числа.update(price_asked=ч(спраш), price_not_asked=ч(не_спраш),
+                         price_in_catalog=ч(в_кат))
             print("\nОБРАТНАЯ СТОРОНА — КОДЫ, ПО КОТОРЫМ ЦЕНА ЕСТЬ:")
             print(f"    всего кодов с ценой предложения     {ч(кодов):>8d}")
             print(f"    из них мы спрашивали                {доля(спраш, кодов)}")
@@ -193,6 +245,7 @@ def main() -> int:
 
             cur.execute(КАТАЛОГ)
             кат, кат_кп, кат_спрос = cur.fetchone()
+            числа.update(catalog_priced=ч(кат_кп), catalog_asked=ч(кат_спрос))
             print("\nКАТАЛОГ ДЕТАЛЕЙ:")
             print(f"    всего кодов                         {ч(кат):>8d}")
             print(f"    с ценой предложения                 {доля(кат_кп, кат)}")
@@ -205,7 +258,15 @@ def main() -> int:
             print(f"    правдоподобных (есть цифра, 4–25 знаков) {доля(прав, в)}")
             print(f"    без единой цифры                         {доля(без_ц, в)}")
             print(f"    короче четырёх знаков                    {доля(кор, в)}")
+            числа.update(plausible=ч(прав), no_digit=ч(без_ц),
+                         shorter_than_four=ч(кор), longer_than_25=ч(длин))
             print(f"    длиннее двадцати пяти знаков             {доля(длин, в)}")
+
+            if os.environ.get("WRITE", "").strip():
+                записать(cur, числа, os.environ.get("NOTE", "").strip() or None)
+                conn.commit()
+            else:
+                print("\nточка истории НЕ записана — для записи WRITE=1")
         return 0
     finally:
         conn.close()

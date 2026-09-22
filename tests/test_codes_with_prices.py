@@ -20,6 +20,10 @@
 4. РАЗРЯД, КОТОРЫЙ НЕ МОЖЕТ БЫТЬ НЕПУСТЫМ, — тавтология. Счётчик «без выбора и со
    спросом» однажды равнялся «без выбора» целиком.
 
+Отдельно проверяется ЗАПИСЬ ТОЧКИ ИСТОРИИ (lib_metric_runs): из неё берётся
+динамика день ко дню на странице счётчика, и у неё свои две цены ошибки —
+разошедшаяся с напечатанным цифра и утёкшее в публичную таблицу наименование.
+
 Корпус придуман (CLAUDE.md, правило 18), ответы посчитаны руками.
 """
 from __future__ import annotations
@@ -80,6 +84,11 @@ create view lib_demand_live as
 create table lib_prices (
   id bigserial primary key, feed text, part_number text, price numeric);
 create table lib_parts (id text primary key, catalog_no text);
+create table lib_metric_runs (
+  metric text not null, run_key text not null,
+  measured_at timestamptz not null default now(),
+  nums jsonb not null, note text,
+  primary key (metric, run_key));
 
 insert into lib_demand (id, deal_id, part_number) values
   (1, 'D1', 'AAA-111'), (2, 'D2', 'AAA 111'), (3, 'D1', 'BBB222'),
@@ -216,3 +225,151 @@ def test_оценка_правдоподобия_не_отбрасывает_с�
     assert кор == 1, "«xx» короче четырёх знаков"
     assert без_ц == 1, "«xx» без единой цифры"
     assert длин == 0
+
+
+# ── ТОЧКА ИСТОРИИ ──────────────────────────────────────────────────────────
+# Из этих строк рисуется динамика на странице счётчика, поэтому проверяется не
+# только «записалось», но и «записалось то же, что напечатано» и «ничего кроме
+# чисел» (CLAUDE.md, правило 17: таблицу можно показывать целиком).
+
+def точки(cur):
+    cur.execute("select run_key, nums, note from lib_metric_runs "
+                "where metric = 'коды_и_цены' order by run_key")
+    return cur.fetchall()
+
+
+# ПОЧЕМУ КОРПУС ЭТИХ ТЕСТОВ ЛЕЖИТ В public, А НЕ В ОТДЕЛЬНОЙ СХЕМЕ. Скрипты
+# проекта подключаются с options="-c statement_timeout=…", а этот параметр
+# ЗАМЕЩАЕТ options из строки подключения целиком — значит search_path через DSN
+# до скрипта не доходит ни в одном из них. Соглашение общее и правильное
+# (правило 9: таймаут задаётся подключением), поэтому подстраивается тест: он
+# поднимает корпус в public одноразовой базы CI и убирает за собой.
+ТАБЛИЦЫ_КОРПУСА = ("lib_row_junk", "lib_demand_live", "lib_demand", "lib_prices",
+                   "lib_parts", "lib_metric_runs")
+
+
+@pytest.fixture()
+def корпус_в_public():
+    import psycopg2
+    from psycopg2.extensions import parse_dsn
+
+    # Тот же предохранитель, что у теста паритета ключа: корпус создаётся в
+    # public, и ошибиться базой здесь стоило бы данных.
+    config = parse_dsn(DSN)
+    assert config["host"] in ("127.0.0.1", "localhost")
+    assert config["dbname"] == "library_sql_test"
+
+    conn = psycopg2.connect(DSN)
+    conn.autocommit = True
+    c = conn.cursor()
+
+    def снести():
+        c.execute("drop view if exists lib_demand_live cascade")
+        for имя in ТАБЛИЦЫ_КОРПУСА:
+            c.execute(f"drop table if exists {имя} cascade")
+        c.execute("drop function if exists lib_pn_key(text) cascade")
+
+    снести()
+    c.execute(КОРПУС)
+    yield c
+    снести()
+    c.close()
+    conn.close()
+
+
+def прогон(м, **среда):
+    """Гоняет скрипт целиком — от подключения до записи точки."""
+    import contextlib
+    import io
+    старое = dict(os.environ)
+    os.environ.update(SUPABASE_DB_URL=DSN, **среда)
+    os.environ.pop("GITHUB_RUN_ID", None)
+    try:
+        буфер = io.StringIO()
+        with contextlib.redirect_stdout(буфер):
+            код = м.main()
+        return код, буфер.getvalue()
+    finally:
+        os.environ.clear()
+        os.environ.update(старое)
+
+
+def test_точка_истории_не_пишется_без_разрешения(корпус_в_public):
+    """Замер по умолчанию ничего не меняет: WRITE — осознанное включение."""
+    м = скрипт()
+    код, вывод = прогон(м)
+    assert код == 0
+    assert точки(корпус_в_public) == [], "замер записал точку, хотя WRITE не задан"
+    assert "НЕ записана" in вывод
+
+
+def test_точка_истории_повторяет_напечатанные_числа(корпус_в_public):
+    """Цифра в истории обязана равняться напечатанной.
+
+    Соблазн посчитать историю вторым проходом запросов велик, а цена —
+    расхождение: между проходами идёт разбор, и точка разойдётся с выводом.
+    """
+    м = скрипт()
+    код, вывод = прогон(м, WRITE="1", RUN_KEY="прогон-теста")
+    assert код == 0
+    (ключ, числа, оговорка), = точки(корпус_в_public)
+    assert ключ == "прогон-теста"
+    assert оговорка is None
+    # Ровно те пять чисел, что напечатаны главным ответом.
+    assert числа["asked"] == 5
+    assert числа["with_kp"] == 1
+    assert числа["other_feed"] == 1
+    assert числа["no_price"] == 3
+    assert числа["plausible"] == 4
+    # И те, что напечатаны обратной стороной и каталогом.
+    assert числа["price_codes"] == 2
+    assert числа["price_asked"] == 1
+    assert числа["price_not_asked"] == 1
+    assert числа["catalog"] == 2
+    assert числа["catalog_priced"] == 1
+    # Напечатанное и записанное — одно и то же: ищем те же числа в выводе.
+    assert "         5" in вывод and "         3" in вывод
+
+
+def test_повторный_прогон_тем_же_ключом_не_плодит_точки(корпус_в_public):
+    """Иначе одна перезапущенная задача Actions рисует на графике ступеньку."""
+    м = скрипт()
+    прогон(м, WRITE="1", RUN_KEY="прогон-теста")
+    прогон(м, WRITE="1", RUN_KEY="прогон-теста", NOTE="со второго раза")
+    строки = точки(корпус_в_public)
+    assert len(строки) == 1, "перезапуск прогона добавил вторую точку"
+    assert строки[0][2] == "со второго раза", "перезапись не обновила оговорку"
+
+
+def test_в_истории_только_числа(корпус_в_public):
+    """Таблица публичная по назначению: наименованию позиции в ней места нет.
+
+    Проверяется не отсутствие конкретного слова, а ТИП каждого значения: строка
+    в nums — это уже утечка, чем бы она ни была.
+    """
+    м = скрипт()
+    прогон(м, WRITE="1", RUN_KEY="прогон-теста")
+    (_, числа, _), = точки(корпус_в_public)
+    assert числа, "точка пуста"
+    for имя, значение in числа.items():
+        assert isinstance(значение, int), f"{имя} = {значение!r} — не число"
+        assert имя.replace("_", "").isalnum() and имя.isascii(), имя
+
+
+def test_ключ_прогона_берётся_из_actions_а_иначе_из_времени():
+    """Номер прогона нужен, чтобы точку можно было найти в логах."""
+    м = скрипт()
+    старое = dict(os.environ)
+    try:
+        os.environ.pop("RUN_KEY", None)
+        os.environ["GITHUB_RUN_ID"] = "123456"
+        assert м.ключ_прогона() == "123456"
+        os.environ["RUN_KEY"] = "явный"
+        assert м.ключ_прогона() == "явный", "RUN_KEY должен перебивать прогон Actions"
+        os.environ.pop("RUN_KEY")
+        os.environ.pop("GITHUB_RUN_ID")
+        ключ = м.ключ_прогона()
+        assert ключ.startswith("вручную-") and ключ.endswith("Z"), ключ
+    finally:
+        os.environ.clear()
+        os.environ.update(старое)
