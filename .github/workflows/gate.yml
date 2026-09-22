@@ -55,7 +55,12 @@ jobs:
         # pyyaml — для tests/test_workflow_deps.py: он читает прогоны как YAML.
         # Не в requirements.txt: там то, без чего не работает сам портал,
         # а это нужно только проверке.
-        run: pip install --quiet -r requirements.txt ruff pytest pyyaml psycopg2-binary==2.9.10
+        # pypdf нужен тестам разбора PDF (tests/test_pdftable.py): разбор
+        # вложений читает им коммерческие предложения, и проверять цепочку от
+        # байтов до цены без него нечем. Остальные три workflow ставят его так же
+        # — отдельной строкой, а не через requirements.txt, потому что сборке
+        # дашборда он не нужен.
+        run: pip install --quiet -r requirements.txt ruff pytest pyyaml psycopg2-binary==2.9.10 pypdf
 
       - name: Ruff — ошибки кода
         run: ruff check .
