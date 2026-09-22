@@ -200,7 +200,24 @@ def bx_all(method: str, params: dict) -> list:
         start = j["next"]
 
 
-def bx_all_by_id(method: str, params: dict) -> list:
+def bx_max_id(method: str, params: dict) -> int:
+    """Наибольший идентификатор сущности. Один запрос.
+
+    Нужен, чтобы РАЗДЕЛИТЬ обход между частями. Без него часть не знает границ
+    своего диапазона и вынуждена читать всё.
+    """
+    j = bx(method, {**params, "select": ["id"], "order": {"id": "DESC"},
+                    "start": -1})
+    res = j.get("result")
+    items = (res.get("items") if isinstance(res, dict) and "items" in res else res) or []
+    try:
+        return int(items[0]["id"]) if items else 0
+    except (KeyError, TypeError, ValueError, IndexError):
+        return 0
+
+
+def bx_all_by_id(method: str, params: dict, с_id: int = 0,
+                 до_id: int | None = None) -> list:
     """Обход по ключу: filter[>id] = последний прочитанный.
 
     Тот же способ, которым портал читают scripts/quote_coverage.py и
@@ -208,10 +225,19 @@ def bx_all_by_id(method: str, params: dict) -> list:
     чтение СП-166 обрывалось на 7 750 из 21 865 записей — молча, без ошибки.
     start=-1 отключает подсчёт общего числа: он и есть причина медленного и
     ненадёжного обхода по смещению.
+
+    с_id и до_id ОГРАНИЧИВАЮТ ОБХОД ДИАПАЗОНОМ, и ради них всё и затевалось.
+    Обход по ключу читает страницы подряд, поэтому поделить его между частями
+    иначе нельзя: каждая часть читала бы всё целиком, и двенадцать частей давали
+    бы двенадцать полных обходов портала — HTTP 429, на котором 21.09.2026 умерли
+    все двенадцать. С диапазонами один полный обход РАСКЛАДЫВАЕТСЯ на части, а не
+    повторяется каждой.
     """
     out: list = []
-    last = 0
+    last = с_id
     исходный = dict(params.get("filter") or {})
+    if до_id is not None:
+        исходный["<=id"] = до_id
     while True:
         f = dict(исходный)
         f[">id"] = last
@@ -529,7 +555,26 @@ def без_повторов(refs: list[dict]) -> tuple[list[dict], int]:
     return out, дублей
 
 
-def collect_refs_rfq(days: int) -> list[dict]:
+def диапазон_части(макс: int, shard: int, shards: int) -> tuple[int, int | None]:
+    """Границы идентификаторов для своей части: (после, включительно по).
+
+    Диапазоны СМЕЖНЫЕ, а не по остатку от деления: обход идёт по возрастанию
+    ключа, и только смежный кусок можно прочитать, не трогая чужие страницы.
+
+    Плотность идентификаторов неравномерна — где-то пропуски, где-то густо, —
+    поэтому части выходят разного размера. Это допустимо: делится нагрузка на
+    портал, а она пропорциональна прочитанным страницам, а не ровности долей.
+    Сколько досталось каждой части, прогон печатает — ровность видно числом.
+    """
+    if shards <= 1 or макс <= 0:
+        return 0, None
+    шаг = макс // shards + 1
+    низ = shard * шаг
+    верх = макс if shard == shards - 1 else низ + шаг
+    return низ, верх
+
+
+def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
     """Ссылки на вложения карточек запросов поставщикам (СП-166).
 
     БЕРЁМ ТОЛЬКО ФАЙЛЫ СО СТОРОНЫ ПОСТАВЩИКА. «Request file» — то, что отправили
@@ -554,10 +599,18 @@ def collect_refs_rfq(days: int) -> list[dict]:
     поля = list(ПОЛЯ_КП)
     # Обход по ключу, а не по смещению: на смещении приходило 7 750 карточек
     # вместо 21 865, и без единой ошибки (замер 21.09.2026).
+    низ, верх = (0, None)
+    if shards > 1:
+        макс = bx_max_id("crm.item.list", {"entityTypeId": SPA_RFQ})
+        низ, верх = диапазон_части(макс, shard, shards)
+        print(f"часть {shard + 1} из {shards}: карточки с id от {низ + 1} "
+              f"до {верх if верх is not None else 'конца'} (всего до {макс})",
+              flush=True)
     карточки = bx_all_by_id("crm.item.list",
                             {"entityTypeId": SPA_RFQ,
                              "select": ["id", "createdTime", ПОЛЕ_ПОСТАВЩИКА,
-                                        ПОЛЕ_БРЕНДОВ] + поля})
+                                        ПОЛЕ_БРЕНДОВ] + поля},
+                            с_id=низ, до_id=верх)
     всего = len(карточки)
     без_даты = 0
     if days and days > 0:
