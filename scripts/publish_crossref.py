@@ -24,6 +24,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import importlib.util
 import json
 import os
@@ -88,8 +89,9 @@ def main(argv=None):
     try:
         (предложения, каталог, аналоги, машины, изготовители,
          спрос) = читать_базу(os.environ.get("SUPABASE_DB_URL"))
+        собран = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         снимок = crossref.собрать(предложения, каталог, аналоги, машины,
-                                  изготовители, спрос)
+                                  изготовители, спрос, собран=собран)
         raw = json.dumps(снимок, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         t = снимок["totals"]
         print(f"позиций: {t['positions']}, из них с выбором из двух компаний: "
