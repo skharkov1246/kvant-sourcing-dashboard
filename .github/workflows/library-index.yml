@@ -52,6 +52,14 @@ on:
       limit:
         description: "Ограничение файлов на часть (0 — без ограничения)"
         default: "0"
+      shards:
+        # СКОЛЬКО ЧАСТЕЙ. Распоряжение владельца, 22.09.2026: «никогда не бери
+        # сразу так много, всегда дели минимум на 10, а если большие — то и на 50
+        # частей». Меньше десяти здесь не бывает: список ниже начинается с 10.
+        description: "На сколько частей делить обход"
+        type: choice
+        options: ["10", "12", "25", "50"]
+        default: "12"
       workers:
         description: "Потоков скачивания в каждой части"
         default: "12"
@@ -105,7 +113,13 @@ jobs:
       fail-fast: false
       max-parallel: 12
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        # Матрица на 50 мест; лишние части сразу выходят, увидев, что их номер
+        # больше заданного числа частей. Так число частей остаётся входом прогона,
+        # а не правкой файла: матрицу GitHub задаёт до вычисления входов, и
+        # сделать её длину переменной без второго job нельзя.
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -138,11 +152,18 @@ jobs:
           esac
           echo "секреты на месте"
 
+      # Часть с номером больше заданного числа частей работы не имеет. Выходим до
+      # установки зависимостей и до любого обращения к порталу.
+      - name: Лишняя часть
+        if: matrix.shard >= fromJSON(inputs.shards)
+        run: echo "часть ${{ matrix.shard }} не нужна при ${{ inputs.shards }} частях"
+
       - name: Разбор части ${{ matrix.shard }}
+        if: matrix.shard < fromJSON(inputs.shards)
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SHARDS: "12"
+          SHARDS: ${{ inputs.shards }}
           SHARD: ${{ matrix.shard }}
           WORKERS: ${{ inputs.workers }}
           DAYS: ${{ inputs.days }}
