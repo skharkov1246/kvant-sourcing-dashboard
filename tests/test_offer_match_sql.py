@@ -87,7 +87,8 @@ $$;
 create table lib_demand (
   id bigserial primary key, deal_id text, item_name text, part_number text,
   qty numeric, source_file text);
-create table lib_files (file_id text primary key, deal_id text, origin text);
+create table lib_files (file_id text primary key, deal_id text, origin text,
+                        field text, field_title text, side text);
 create table lib_row_junk (
   demand_id bigint primary key, rule text, run_id text, revoked_at timestamptz);
 create view lib_demand_live as
@@ -98,10 +99,10 @@ create table lib_prices (
   id bigserial primary key, feed text, rfq_id text, item_name text,
   part_number text, price numeric);
 
-insert into lib_files (file_id, deal_id, origin) values
-  ('f-сделка', 'D1', 'поле сделки'),
-  ('f-сделка2', 'D2', 'поле сделки'),
-  ('f-запрос', 'R1', 'поле запроса');
+insert into lib_files (file_id, deal_id, origin, field_title, side) values
+  ('f-сделка',  'D1', 'поле сделки',  'Техническая спецификация', 'заказчик'),
+  ('f-сделка2', 'D2', 'поле сделки',  'Техническая спецификация', 'заказчик'),
+  ('f-запрос',  'R1', 'поле запроса', 'КП поставщика',            'поставщик');
 
 insert into lib_demand (id, deal_id, item_name, part_number, source_file) values
   (1, 'D1', 'Подшипник один',    'AAA-111', 'f-сделка'),
@@ -177,11 +178,11 @@ def test_разряды_со_стороны_предложения(cur):
     cur.execute(м.СО_СТОРОНЫ_КП)
     по = {r[0]: int(r[1]) for r in cur.fetchall()}
     # Четыре: цены 1, 4 (aaa111), 5 (bbb111), 6 (bbb222).
-    assert по["ключ совпал с нашей спецификацией"] == 4
+    assert по["ключ совпал с заявкой заказчика"] == 4
     assert по["артикула в строке нет"] == 1               # цена 2
     # Две: цена 3 (zzz999 — своя строка спроса есть, но это НЕ наша заявка) и
     # цена 7 (ccc111). Прежнее правило дало бы zzz999 «совпало в своей сделке».
-    assert по["артикул есть, в наших спецификациях нет"] == 2
+    assert по["артикул есть, в заявках заказчика нет"] == 2
     assert sum(по.values()) == 7
     assert "своей сделке" not in " ".join(по), "вернулся невычислимый разряд"
 

@@ -17,7 +17,16 @@ name: Спрос — сторона документа
 # В журнал — только агрегаты (правило 17). Коды и названия полей — это настройки
 # нашего же Битрикса, а не данные заказчиков.
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      backfill:
+        description: "Дозаполнить сторону у уже разобранных файлов (иначе только замер)"
+        type: boolean
+        default: false
+      apply:
+        description: "backfill: писать в базу (иначе холостой прогон)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -56,6 +65,18 @@ jobs:
 
       - name: Проверки правила стороны документа
         run: python -m pytest tests/test_doc_side.py -q
+
+      # ДОЗАПОЛНЕНИЕ. У файлов, разобранных до 22.09.2026, колонки стороны пусты,
+      # а именно на них стоят все замеры спроса. Без дозаполнения отбор «заявки
+      # заказчика» дал бы почти пустой результат, и это выглядело бы как «заявок
+      # мало», а не как «сторона не проставлена».
+      - name: Дозаполнить сторону у разобранных файлов
+        if: inputs.backfill
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+        run: python scripts/backfill_doc_side.py
 
       - name: Сторона документа у строк спроса
         env:

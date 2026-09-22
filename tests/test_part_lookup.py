@@ -49,7 +49,7 @@ def test_ключ_совпадает_с_определением_в_базе():
     отсев всего, кроме цифр и букв, обрезка до восьмидесяти знаков.
     """
     м = прибор()
-    схема = (ROOT / "library" / "supabase" / "schema_junk.sql").read_text()
+    схема = (ROOT / "library" / "supabase" / "schema.sql").read_text()
     тело = схема[схема.index("create or replace function lib_pn_key"):][:900]
     код = "\n".join(ln for ln in тело.splitlines() if not ln.lstrip().startswith("--"))
     assert "lower(" in код and "'ё', 'е'" in код
@@ -143,7 +143,7 @@ def test_идентификатор_детали_берётся_из_табли�
 
     Он считается по catalog_norm, когда тот заполнен. Вычислив id ключом, связи с
     машинами и поставщиками для такой детали потерялись бы МОЛЧА — это
-    неотличимо от «связей нет» (library/supabase/schema_junk.sql).
+    неотличимо от «связей нет» (library/supabase/schema.sql).
     """
     м = прибор()
     assert м.КАТАЛОГ.strip().startswith("select p.id"), "id обязан приходить из таблицы"
