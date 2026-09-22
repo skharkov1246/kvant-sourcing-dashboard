@@ -128,3 +128,16 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python scripts/cross_ref_coverage.py
+
+      # Снимок для страниц — сразу за замером и тем же прогоном: разбор менял
+      # данные, и оставить страницу на вчерашнем снимке значит показывать
+      # владельцу не то, что в базе. Отказ публикации прогон не валит: разбор
+      # уже сделан, и терять его из-за недоступного Cloudflare незачем.
+      - name: Снимок перекрёстной системы в KV
+        if: always()
+        continue-on-error: true
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: python scripts/publish_crossref.py --apply

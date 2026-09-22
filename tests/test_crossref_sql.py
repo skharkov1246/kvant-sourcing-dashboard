@@ -1,0 +1,188 @@
+"""Пять запросов публикатора выполняются на настоящем PostgreSQL и дают снимок.
+
+ЗАЧЕМ ОТДЕЛЬНО ОТ test_crossref_snapshot.py. Тот проверяет СБОРКУ: строки базы
+на входе, снимок на выходе, база не нужна. Сами запросы он не выполняет вовсе,
+и опечатка в имени колонки его не красит.
+
+Цена такой опечатки — молчаливая. Публикация снимка стоит в ночном прогоне
+шагом с continue-on-error: разбор к тому моменту уже сделан, и валить его
+из-за недоступного Cloudflare незачем. Значит, упавший запрос не уронит ничего,
+а страница останется на вчерашнем снимке и будет выглядеть работающей.
+
+Здесь проверяется вся цепочка целиком: запрос → строки → сборка → снимок →
+JSON. Ответы посчитаны руками, корпус придуман (CLAUDE.md, правило 18).
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+from pathlib import Path
+
+import pytest
+
+from library import crossref
+
+ROOT = Path(__file__).resolve().parents[1]
+DSN = os.environ.get("LIBRARY_SQL_TEST_DSN")
+pytestmark = pytest.mark.skipif(not DSN, reason="одноразовая база PostgreSQL не настроена")
+
+СХЕМА = "тест_запросов_перекрёстной_системы"
+
+# Колонки объявлены ровно теми, что читают запросы: лишние поля скрыли бы
+# опечатку в имени, а недостающие уронили бы тест не по делу.
+КОРПУС = """
+create table lib_models (id text primary key, name text not null);
+create table lib_parts (id text primary key, catalog_no text not null, name text not null,
+                        oem text, category text, target_equipment text, kv_no text);
+create table lib_part_models (part_id text references lib_parts(id),
+                              model_id text references lib_models(id),
+                              primary key (part_id, model_id));
+create table lib_part_alt (part_id text references lib_parts(id), alt_pn text not null,
+                           kind text not null, alt_maker text, confidence text,
+                           primary key (part_id, alt_pn, kind));
+create table lib_suppliers (id bigint generated always as identity primary key,
+                            name text not null, country text, kind text);
+create table lib_part_suppliers (part_id text references lib_parts(id),
+                                 supplier_id bigint references lib_suppliers(id),
+                                 makes text, verdict text, confidence text,
+                                 primary key (part_id, supplier_id));
+create table sup_entity (id text primary key, display_name text not null);
+create table sup_identifier (sup_id text references sup_entity(id), kind text not null,
+                             value text not null, value_norm text not null,
+                             status text not null default 'stated',
+                             primary key (sup_id, kind, value_norm));
+create table lib_prices (
+  id bigserial primary key, part_number text, item_name text, feed text,
+  rfq_company text, rfq_id text, oem text, rfq_brands text, price numeric,
+  currency text, qty numeric, qty_unit text, basis text, lead_days int,
+  confidence text, price_date date, created_at timestamptz default now());
+
+insert into lib_models values ('sgt400', 'SGT-400');
+-- Каталог пишет номер иначе, чем котировки: «6-205» против «6205». Ключ один.
+insert into lib_parts values ('6205', '6-205', 'Подшипник', 'SKF', 'подшипники',
+                             'ротор', 'KV-000753-4');
+insert into lib_part_models values ('6205', 'sgt400');
+insert into lib_part_alt values ('6205', '180205', 'номер изготовителя', 'ГПЗ', 'high');
+insert into lib_suppliers (name, country, kind) values ('Завод', 'Швеция', 'OEM');
+insert into lib_part_suppliers values ('6205', 1, 'подшипники', null, 'high');
+insert into sup_entity values ('KV-S-000001-1', 'Компания');
+insert into sup_identifier (sup_id, kind, value, value_norm)
+  values ('KV-S-000001-1', 'bitrix', '101', '101');
+insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, oem,
+                        rfq_brands, price, currency, qty, qty_unit, basis, lead_days,
+                        confidence, price_date) values
+  -- Поставщик назвал китайский бренд, каталог знает SKF, на карточке стоит SKF.
+  ('6205',   'Подшипник', 'разбор КП', '101', 'RFQ-1', 'CHINA-BRG', 'SKF',
+   100, 'EUR', 4, 'шт', 'EXW', 30, 'med', '2026-09-01'),
+  ('62-05',  'Подшипник', 'разбор КП', '102', 'RFQ-2', null, null,
+   120, 'EUR', null, null, null, null, 'low', '2026-09-02'),
+  -- Бренд с запятой в хвосте: элемент-пустышка отсеивается сборкой.
+  ('SEAL-1', 'Уплотнение', 'разбор КП', '101', 'RFQ-3', null, 'PARKER,',
+   50, 'USD', 1, 'шт', null, null, 'med', null),
+  -- Чужой поток: не должен попасть ни в один запрос.
+  ('6205',   'Подшипник', 'прайс',     '999', 'RFQ-9', 'FAG', 'FAG',
+   999, 'EUR', 1, 'шт', null, null, 'med', null);
+"""
+
+
+def функция_ключа() -> str:
+    текст = (ROOT / "library" / "supabase" / "schema_junk.sql").read_text(encoding="utf-8")
+    m = re.search(r"create or replace function lib_pn_key.*?\$\$;", текст, re.S | re.I)
+    assert m, "в миграции больше нет функции lib_pn_key"
+    return m.group(0)
+
+
+@pytest.fixture(scope="module")
+def наборы():
+    import psycopg2
+    conn = psycopg2.connect(DSN)
+    conn.autocommit = True
+    собрано = []
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f'drop schema if exists "{СХЕМА}" cascade')
+            cur.execute(f'create schema "{СХЕМА}"')
+            cur.execute(f'set search_path to "{СХЕМА}"')
+            cur.execute(функция_ключа())
+            cur.execute(КОРПУС)
+            for sql in (crossref.ПРЕДЛОЖЕНИЯ_SQL, crossref.КАТАЛОГ_SQL,
+                        crossref.АНАЛОГИ_SQL, crossref.МАШИНЫ_SQL,
+                        crossref.ИЗГОТОВИТЕЛИ_SQL):
+                cur.execute(sql, (crossref.FEED,))
+                собрано.append(cur.fetchall())
+        yield собрано
+    finally:
+        with conn.cursor() as cur:
+            cur.execute(f'drop schema if exists "{СХЕМА}" cascade')
+        conn.close()
+
+
+@pytest.fixture(scope="module")
+def снимок(наборы):
+    return crossref.собрать(*наборы)
+
+
+def test_каждый_запрос_вернул_ожидаемое_число_строк(наборы):
+    предложения, каталог, аналоги, машины, изготовители = наборы
+    # Три строки потока «разбор КП» с непустым артикулом; строка потока «прайс»
+    # не считается. Если запрос перестанет фильтровать по feed, здесь будет 4.
+    assert len(предложения) == 3
+    assert len(каталог) == 1
+    assert len(аналоги) == 1
+    assert len(машины) == 1
+    assert len(изготовители) == 1
+
+
+def test_снимок_собирается_из_живых_строк(снимок):
+    t = снимок["totals"]
+    assert t == {"positions": 2, "with_choice": 1, "comparable": 1, "in_catalog": 1,
+                 "companies": 2, "companies_resolved": 1, "offers": 3}
+
+
+def test_позиция_несёт_всё_обещанное_карточкой(снимок):
+    поз = {p["k"]: p for p in снимок["positions"]}
+    assert set(поз) == {"6205", "seal1"}
+    p = поз["6205"]
+    # Номер и наименование — каталожные, а не из котировки.
+    assert p["n"] == "6-205"
+    assert p["name"] == "Подшипник"
+    assert p["kv"] == "KV-000753-4"
+    assert p["unit"] == "ротор"
+    # Два написания артикула свелись к одной позиции с двумя компаниями.
+    assert p["co"] == 2 and p["offers"] == 2
+    # Три утверждения об изготовителе — три разных значения.
+    assert p["oem_cat"] == "SKF"
+    assert p["oem_file"] == ["CHINA-BRG"]
+    assert p["brands"] == ["SKF"]
+    assert [(a["pn"], a["kind"], a["maker"]) for a in p["alts"]] == [
+        ("180205", "номер изготовителя", "ГПЗ")]
+    assert p["models"] == ["SGT-400"]
+    assert [(m["name"], m["role"], m["country"]) for m in p["makers"]] == [
+        ("Завод", "OEM", "Швеция")]
+    # Позиция вне каталога: разделы пусты, и это отсутствие связи.
+    q = поз["seal1"]
+    assert q["cat"] is False
+    assert q["alts"] == [] and q["models"] == [] and q["makers"] == []
+    assert q["brands"] == ["PARKER"]        # «PARKER,» — один бренд, не два
+
+
+def test_поставщик_видит_свои_позиции(снимок):
+    комп = {c["co"]: c for c in снимок["companies"]}
+    assert set(комп) == {"101", "102"}
+    assert комп["101"]["ent"] == "KV-S-000001-1"
+    assert комп["101"]["parts"] == 2 and комп["101"]["brands"] == ["PARKER", "SKF"]
+    # 102 в реестре не найдена — карточка не откроется, и это видно.
+    assert комп["102"]["ent"] is None
+    assert комп["102"]["parts"] == 1
+
+
+def test_снимок_уходит_в_json_целиком(снимок):
+    """Decimal и date psycopg2 отдаёт объектами, json их не берёт.
+
+    Проверять надо после ЖИВОГО запроса: в сборочном тесте типы придуманы, а
+    здесь они настоящие — numeric приходит Decimal, price_date приходит date.
+    """
+    raw = json.dumps(снимок, ensure_ascii=False)
+    assert '"6-205"' in raw
+    assert json.loads(raw)["totals"]["positions"] == 2

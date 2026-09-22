@@ -350,11 +350,16 @@ class Cloudflare:
         require(isinstance(namespace, str) and bool(CF_ID.fullmatch(namespace)), "INVALID_KV_BINDING")
         return namespace
 
+    # ЗАКРЫТЫЙ СПИСОК КЛЮЧЕЙ — СВОЙСТВО КЛАССА, А НЕ МОДУЛЯ. Публикатор не должен
+    # иметь возможности переписать acl:v1 или library:v1 из-за опечатки. Список
+    # объявлен здесь, чтобы наследник (публикатор перекрёстной системы) задал
+    # СВОЙ единственный ключ, а не расширил этот: расширенный общий список
+    # означал бы, что каждый публикатор может писать чужой снимок.
+    КЛЮЧИ = (KEY,)
+
     def value_path(self, namespace, key):
         require(isinstance(namespace, str) and bool(CF_ID.fullmatch(namespace)), "INVALID_KV_BINDING")
-        # Ключ закрытым списком: публикатор поставщиков не должен иметь
-        # возможности переписать acl:v1 или library:v1 из-за опечатки.
-        require(key == KEY, "INVALID_KV_KEY")
+        require(key in self.КЛЮЧИ, "INVALID_KV_KEY")
         return f"/storage/kv/namespaces/{namespace}/values/{parse.quote(key, safe='')}"
 
     def get(self, namespace, key):
