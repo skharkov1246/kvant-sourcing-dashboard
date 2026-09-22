@@ -184,6 +184,17 @@ create or replace function lib_pn_key(t text) returns text
                                '[^0-9a-zа-я]', '', 'g'), 80)
   $$;
 
+-- ИНДЕКС ПО КЛЮЧУ КАТАЛОЖНОГО НОМЕРА. Заведён 22.09.2026 по замеру: у 82 деталей
+-- из 13 501 id не равен lib_pn_key(catalog_no) — id считается по catalog_norm,
+-- когда тот заполнен. Такая деталь из соединения по id выпадает МОЛЧА: связи
+-- нет, и это неотличимо от «детали в каталоге нет». Тридцать артикулов котировок
+-- попали именно в этот хвост, и все тридцать ведут к машине.
+--
+-- Без индекса соединение по выражению читает таблицу целиком на каждую строку:
+-- замер мостов на этом упал по statement_timeout. lib_pn_key объявлена immutable,
+-- поэтому индекс по выражению допустим.
+create index if not exists lib_parts_cat_key on lib_parts (lib_pn_key(catalog_no));
+
 drop view if exists lib_demand_catalog;
 create view lib_demand_catalog with (security_invoker = true) as
   select d.id, d.deal_id, d.item_name, d.part_number, d.qty, d.unit,
