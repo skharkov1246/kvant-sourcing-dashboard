@@ -42,37 +42,74 @@ create temporary table если_есть_ключи as
   select distinct lib_pn_key(part_number) as ключ
     from lib_prices
    where feed = %s and coalesce(btrim(part_number), '') <> ''
-     and lib_pn_key(part_number) <> ''
+     and lib_pn_key(part_number) <> '';
+create index on если_есть_ключи (ключ);
+"""
+
+# КЛЮЧИ КАТАЛОГА СЧИТАЮТСЯ ОДИН РАЗ, А НЕ НА КАЖДУЮ СТРОКУ.
+#
+# Первая редакция писала соединение прямо по выражению:
+#   join lib_parts p on exists (select 1 from unnest(p.aliases) al
+#                                where lib_pn_key(al) = к.ключ)
+# Подзапрос коррелирован с внешней таблицей и выполняется заново для каждого из
+# 9 578 артикулов, а внутри него — unnest по 13 312 деталям. Прогон 22.09.2026
+# упал на «canceling statement due to statement timeout» при пяти минутах.
+#
+# Это тот же промах, что описан в CLAUDE.md правилом 8, только в другом месте:
+# подзапрос со ссылкой на внешнюю строку считается построчно, а тот же набор,
+# собранный один раз и проиндексированный, — однажды. Соединение по
+# lib_pn_key(колонка) тоже не годится: индекса по выражению нет, и планировщик
+# читает таблицу целиком на каждую строку.
+#
+# Поэтому ключи каталога раскладываются во временные таблицы с готовым ключом и
+# индексом по нему, а мосты становятся обычными соединениями.
+ПОДГОТОВКА = """
+create temporary table мост_основной as
+  select id as part_id, id as ключ from lib_parts;
+create index on мост_основной (ключ);
+
+create temporary table мост_альтернатива as
+  select distinct a.part_id, lib_pn_key(a.alt_pn) as ключ
+    from lib_part_alt a where lib_pn_key(a.alt_pn) <> '';
+create index on мост_альтернатива (ключ);
+
+create temporary table мост_псевдоним as
+  select distinct p.id as part_id, lib_pn_key(al) as ключ
+    from lib_parts p, unnest(coalesce(p.aliases, '{}'::text[])) as al
+   where lib_pn_key(al) <> '';
+create index on мост_псевдоним (ключ);
+
+create temporary table мост_наш_номер as
+  select distinct id as part_id, lib_pn_key(kv_no) as ключ
+    from lib_parts where lib_pn_key(kv_no) <> '';
+create index on мост_наш_номер (ключ);
+
+create temporary table мост_сырое as
+  select distinct id as part_id, lib_pn_key(catalog_no) as ключ
+    from lib_parts where lib_pn_key(catalog_no) <> '';
+create index on мост_сырое (ключ);
+
+analyze мост_основной; analyze мост_альтернатива; analyze мост_псевдоним;
+analyze мост_наш_номер; analyze мост_сырое;
 """
 
 # Мосты. Каждый отдаёт (ключ, part_id) и считается на однозначность.
 МОСТЫ = {
-    "основной номер (как сейчас)": """
-        select к.ключ, p.id as part_id
-          from если_есть_ключи к join lib_parts p on p.id = к.ключ
-    """,
-    "альтернативный номер (lib_part_alt)": """
-        select к.ключ, a.part_id
-          from если_есть_ключи к
-          join lib_part_alt a on lib_pn_key(a.alt_pn) = к.ключ
-    """,
-    "псевдоним каталога (lib_parts.aliases)": """
-        select к.ключ, p.id as part_id
-          from если_есть_ключи к
-          join lib_parts p on exists (
-                 select 1 from unnest(coalesce(p.aliases, '{}'::text[])) as al
-                  where lib_pn_key(al) = к.ключ)
-    """,
-    "наш внутренний номер (kv_no)": """
-        select к.ключ, p.id as part_id
-          from если_есть_ключи к
-          join lib_parts p on lib_pn_key(p.kv_no) = к.ключ
-    """,
-    "каталожный номер сырым написанием": """
-        select к.ключ, p.id as part_id
-          from если_есть_ключи к
-          join lib_parts p on lib_pn_key(p.catalog_no) = к.ключ
-    """,
+    "основной номер (как сейчас)":
+        "select к.ключ, м.part_id from если_есть_ключи к"
+        " join мост_основной м on м.ключ = к.ключ",
+    "альтернативный номер (lib_part_alt)":
+        "select к.ключ, м.part_id from если_есть_ключи к"
+        " join мост_альтернатива м on м.ключ = к.ключ",
+    "псевдоним каталога (lib_parts.aliases)":
+        "select к.ключ, м.part_id from если_есть_ключи к"
+        " join мост_псевдоним м on м.ключ = к.ключ",
+    "наш внутренний номер (kv_no)":
+        "select к.ключ, м.part_id from если_есть_ключи к"
+        " join мост_наш_номер м on м.ключ = к.ключ",
+    "каталожный номер сырым написанием":
+        "select к.ключ, м.part_id from если_есть_ключи к"
+        " join мост_сырое м on м.ключ = к.ключ",
 }
 
 # Однозначность: сколько деталей приходится на артикул по этому мосту.
@@ -149,6 +186,7 @@ def main() -> int:
     try:
         with conn.cursor() as cur:
             cur.execute(БАЗА, (FEED,))
+            cur.execute(ПОДГОТОВКА)
             cur.execute("select count(*) from если_есть_ключи")
             артикулов = cur.fetchone()[0]
             if not артикулов:
