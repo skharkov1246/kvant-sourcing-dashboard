@@ -507,6 +507,76 @@ alter table lib_prices add column if not exists rfq_brands text;
 create index if not exists lib_prices_oem on lib_prices (oem);
 create index if not exists lib_prices_rfq on lib_prices (rfq_id);
 create index if not exists lib_prices_rfqco on lib_prices (rfq_company);
+-- ─────────────────────────────────────────────────────────────────────────────
+-- КОММЕРЧЕСКИЕ УСЛОВИЯ ПРЕДЛОЖЕНИЯ. Распоряжение владельца, 22.09.2026: «Очень
+-- важно всегда искать в каждом входящем офере сопоставление кодов, цены, цены за
+-- штуку, суммы, базис поставки (DDP, EXW), условия оплаты (LC, 30/70, 50/50 и
+-- подобное), срок производства, срок поставки. Если их нет, нужно перепроверять
+-- дважды и писать, что это не отсутствует, а верифицировано отсутствует».
+--
+-- СУММА ХРАНИТСЯ, А НЕ ТОЛЬКО УЧАСТВУЕТ В РАСЧЁТЕ. Прежде сумма строки читалась,
+-- но в базу не попадала: из неё выводилась цена делением на количество, и на этом
+-- след терялся. Проверить «цена × количество = сумма» задним числом было нечем, а
+-- это единственная самопроверка ценовой строки, какая у нас есть.
+alter table lib_prices add column if not exists total numeric(18,4);
+
+-- СРОК ПРОИЗВОДСТВА ОТДЕЛЬНО ОТ СРОКА ПОСТАВКИ. Прежде был один lead_days, и
+-- «срок изготовления 8 недель» с «поставка со склада» попадали в одно поле — что
+-- встретилось раньше. Для закупки это разные величины: первая говорит, когда
+-- деталь появится, вторая — когда доедет.
+alter table lib_prices add column if not exists make_days int;
+
+-- УСЛОВИЯ ОПЛАТЫ. pay_terms — нормализованная запись («30/70», «предоплата 100%
+-- T/T», «отсрочка 30 дн», «LC»). pay_advance_pct — доля аванса числом, когда она
+-- видна: именно она решает, сколько денег уходит до поставки, а из строки «30/70»
+-- это видно только после разбора.
+alter table lib_prices add column if not exists pay_terms       text;
+alter table lib_prices add column if not exists pay_advance_pct smallint;
+
+-- ОТКУДА ВЗЯТО КАЖДОЕ ПОЛЕ — И ЭТО НЕ СЛУЖЕБНАЯ МЕЛОЧЬ, А ТРЕБОВАНИЕ ВЛАДЕЛЬЦА.
+-- Пустое поле означало разом две несовместимые вещи: «в КП не указано» (факт о
+-- предложении — можно спросить поставщика) и «разбор не дошёл» (наш недочёт —
+-- спрашивать надо разборщик). Выводы и действия разные, поэтому источник пишется
+-- явно, значениями из library/offer_terms.py:
+--
+--   строка        — из колонки этой позиции;
+--   файл          — из общих условий КП под таблицей (относится ко всем строкам);
+--   нет           — ПРОВЕРЕНО ДВАЖДЫ: искали и в строке, и в тексте файла, не
+--                   написано. Это и есть «верифицировано отсутствует»;
+--   несколько     — в файле несколько разных значений, угадывать нельзя;
+--   не проверено  — смотреть было нечего (скан без текстового слоя).
+alter table lib_prices add column if not exists basis_src text;
+alter table lib_prices add column if not exists pay_src   text;
+alter table lib_prices add column if not exists lead_src  text;
+alter table lib_prices add column if not exists make_src  text;
+
+-- Проверка списком значений — ОТДЕЛЬНЫМ alter, а не внутри create table:
+-- «create table if not exists» существующую таблицу НЕ меняет (CLAUDE.md,
+-- правило 21), и на свежей базе всё было бы зелено, а на живой вставка падала.
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_basis_src_chk') then
+    alter table lib_prices add constraint lib_prices_basis_src_chk
+      check (basis_src is null or basis_src in ('строка','файл','нет','несколько','не проверено'));
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_pay_src_chk') then
+    alter table lib_prices add constraint lib_prices_pay_src_chk
+      check (pay_src is null or pay_src in ('строка','файл','нет','несколько','не проверено'));
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_lead_src_chk') then
+    alter table lib_prices add constraint lib_prices_lead_src_chk
+      check (lead_src is null or lead_src in ('строка','файл','нет','несколько','не проверено'));
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_make_src_chk') then
+    alter table lib_prices add constraint lib_prices_make_src_chk
+      check (make_src is null or make_src in ('строка','файл','нет','несколько','не проверено'));
+  end if;
+end $$;
+
+-- Под вопрос «по каким позициям условия верифицировано отсутствуют» — это прямой
+-- список того, что надо переспросить у поставщика.
+create index if not exists lib_prices_pay on lib_prices (pay_terms);
+create index if not exists lib_prices_src on lib_prices (basis_src, pay_src);
+
 
 -- ВНИМАНИЕ: источник — платная подписка (glbs.io), условия которой, как правило,
 -- запрещают перепубликацию. Таблица и представление ниже живут только в закрытой
