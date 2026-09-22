@@ -1,0 +1,64 @@
+name: Спрос — сторона документа
+
+# ЧТО ИЗ «НАШЕГО СПРОСА» НА САМОМ ДЕЛЕ НЕ СПРОС. Раскладка строк спроса по полю
+# карточки и по СТОРОНЕ документа: заявка заказчика, наше исходящее, предложение
+# поставщика, внутренний файл.
+#
+# ЗАЧЕМ ОТДЕЛЬНЫЙ ПРОГОН, А НЕ ЗАДАНИЕ В «Библиотека — сводка». Тот прогон
+# намеренно не ходит в Битрикс: все его задания работают с накопленной базой.
+# А здесь Битрикс нужен по существу — в lib_files хранится КОД поля, названия нет,
+# и без названия сторону документа не определить. Один вызов crm.item.fields на
+# тип сущности, читает, ничего не пишет.
+#
+# Поэтому и общая очередь чтения портала: прогон лёгкий, но параллельно с разбором
+# вложений он всё равно добавляет запросов, а 21.09.2026 именно одновременность
+# двух чтений дала HTTP 429 и убила оба.
+#
+# В журнал — только агрегаты (правило 17). Коды и названия полей — это настройки
+# нашего же Битрикса, а не данные заказчиков.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  sides:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet -r requirements.txt psycopg2-binary==2.9.10 pytest
+
+      - name: Проверка секретов
+        env:
+          S: ${{ secrets.SUPABASE_DB_URL }}
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
+          if [ -n "${B:-}" ]; then
+            echo "вебхук Битрикса есть — названия полей будут получены"
+          else
+            echo "::warning::нет BITRIX_WEBHOOK_URL: раскладки по сторонам не будет,"
+            echo "останется только раскладка по кодам полей"
+          fi
+
+      - name: Проверки правила стороны документа
+        run: python -m pytest tests/test_doc_side.py -q
+
+      - name: Сторона документа у строк спроса
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        run: python scripts/demand_sides.py
