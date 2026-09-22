@@ -577,6 +577,14 @@ end $$;
 create index if not exists lib_prices_pay on lib_prices (pay_terms);
 create index if not exists lib_prices_src on lib_prices (basis_src, pay_src);
 
+-- ИНДЕКС ПО КЛЮЧУ НОМЕРА ЦЕНЫ. Нужен виду lib_work_queue: он проверяет наличие
+-- цены по ключу, и без индекса по выражению проверка читает таблицу цен целиком на
+-- каждую позицию очереди. Частичный — только по потоку разбора КП: остальные
+-- потоки вид не спрашивает, и включать их значило бы платить за них записью.
+-- lib_pn_key объявлена immutable, поэтому индекс по выражению допустим.
+create index if not exists lib_prices_pn_key on lib_prices (lib_pn_key(part_number))
+  where feed = 'разбор КП';
+
 
 -- ВНИМАНИЕ: источник — платная подписка (glbs.io), условия которой, как правило,
 -- запрещают перепубликацию. Таблица и представление ниже живут только в закрытой
@@ -772,8 +780,26 @@ select e.part_number,
   from lib_exposure e
   left join lib_parts p on p.id = e.part_id
  where not e.have_price
+   -- ЖИВАЯ ПРОВЕРКА ЦЕНЫ — ПО КЛЮЧУ НОМЕРА, А НЕ ПО part_id. Прежняя форма
+   -- (pr.part_id = e.part_id) не срабатывала НИКОГДА, по двум причинам сразу:
+   --
+   --   1. поток «разбор КП» part_id не пишет вовсе (library/price_store.py
+   --      кладёт None: реестры деталей и котировок не сведены);
+   --   2. у позиции вне каталога e.part_id тоже NULL (library/load_exposure.py
+   --      ставит его только для ключей, найденных в каталоге), а NULL = NULL
+   --      истиной не бывает.
+   --
+   -- Из-за этого очередь работ вечно показывала уже прокотированные позиции, и
+   -- заметить это было нечем: пустая проверка выглядит как «цен ещё нет».
+   -- Ключ один и тот же: lib_exposure.id считается part_key(номер), а это та же
+   -- нормализация, что lib_pn_key. Соединение по ключу — как во всём остальном
+   -- коде (см. СЦЕПКУ в library/crossref.py).
+   --
+   -- have_price оставлен рядом намеренно: это снимок «цена была у нас на момент
+   -- выгрузки», факт из источника, а не живая проверка. Одно не заменяет другое.
    and not exists (select 1 from lib_prices pr
-                    where pr.part_id = e.part_id and pr.price is not null
+                    where lib_pn_key(pr.part_number) = e.id
+                      and pr.price is not null
                       and pr.feed = 'разбор КП')
  order by e.usd_exposure desc nulls last;
 
