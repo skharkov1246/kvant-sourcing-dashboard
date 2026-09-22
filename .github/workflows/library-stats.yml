@@ -28,6 +28,10 @@ name: Библиотека — сводка и переклассификаци�
 #   funnel         — где теряются предложения поставщиков: воронка разбора по
 #                    ФАЙЛАМ, с разрезом по коду разборщика, пути и шапке.
 #                    Ничего не меняет.
+#   part           — ВСЁ, ЧТО БАЗА ЗНАЕТ ОБ ОДНОМ АРТИКУЛЕ: каталог, семья по
+#                    основе номера, взаимозаменяемость, машины, поставщики, спрос
+#                    и цены с коммерческими условиями. Номер задаётся входом
+#                    «part». Ничего не меняет.
 #   calibration    — ПОЧЕМУ цена не прочитана: правило прогоняется заново по
 #                    уже сохранённым строкам предложений, и отказы раскладываются
 #                    по воротам. Заодно — цена денежного подавления в
@@ -47,7 +51,15 @@ on:
         default: stats
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
                   reclassify-apply, bridge, crossref, demand, funnel,
-                  calibration]
+                  calibration, part]
+      part:
+        description: "Артикул для поиска — только для part (например 6265ZZ)"
+        type: string
+        default: ""
+      part_detail:
+        description: "part: выводить названия компаний и цены построчно. ЖУРНАЛ ПУБЛИЧНЫЙ"
+        type: boolean
+        default: false
       run_id:
         description: "Ключ прогона разметки — только для mark-revert"
         default: ""
@@ -179,6 +191,16 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           LIMIT: "300000"
         run: python scripts/quote_price_calibration.py
+
+      - name: Всё об одном артикуле
+        if: inputs.job == 'part'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PN: ${{ inputs.part }}
+          # Названия компаний и цены построчно — только по явному включению:
+          # репозиторий публичный, журнал прогона виден всем (CLAUDE.md, 17).
+          ПОДРОБНО: ${{ inputs.part_detail && '1' || '' }}
+        run: python scripts/part_lookup.py
 
       - name: Сводка после
         if: inputs.job == 'reclassify-apply' || inputs.job == 'mark-apply' || inputs.job == 'mark-revert'
