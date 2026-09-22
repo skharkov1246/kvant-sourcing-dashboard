@@ -39,6 +39,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_КОРЕНЬ, "scripts"))
 sys.path.insert(0, _КОРЕНЬ)          # bitrix_client лежит в корне
 import docfilter  # noqa: E402  (после sys.path)
+import pdftable  # noqa: E402  (таблица из PDF по выравниванию)
 import quotes  # noqa: E402  (цена из КП поставщика)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
 # Список полей КП держим в одном месте со всеми замерами котировок: два списка
@@ -92,6 +93,12 @@ COLS = {
     "unit": ["ед.изм", "ед. изм", "единица", "unit", "ед-ца", "ед."],
 }
 NOISE_ROW = re.compile(r"^(итого|всего|подпись|примечан|№|n\s*п/п|приложение)", re.I)
+# «Unit» опознаёт колонку единицы измерения — и заодно ловит «Unit price», а это
+# колонка цены. Тогда в qty_unit уезжает цена, а сама единица теряется. В наших
+# данных КП больше всего китайских (CNY — 11 247 строк цены из 22 084), то есть
+# шапки чаще английские, и промах не редкий, а типовой. Отсев по слову рядом:
+# «unit» значит единицу, если в той же ячейке не сказано «price», «cost», «rate».
+ЕДИНИЦА_ЧУЖОЕ = ("price", "cost", "rate", "amount", "цена", "стоимост", "сумма")
 
 
 # Session pooler Supabase допускает лишь 15 одновременных клиентов (EMAXCONNSESSION).
@@ -308,6 +315,40 @@ def text_from_pdf(b: bytes) -> str:
         return ""
 
 
+def rows_from_pdf(b: bytes) -> list[list[str]]:
+    """Таблица из PDF: извлечение с сохранением выравнивания, затем колонки.
+
+    ЗАЧЕМ. Прежде PDF шёл единственным путём — построчно, как проза, и цена в нём
+    опознавалась арифметикой «кол-во × цена = сумма» (quotes.цена_из_текста).
+    Правило честное, но узкое: оно молчит без суммы в строке и не может
+    воспользоваться тем, что в самом файле НАПИСАНО, где цена, а где сумма — это
+    написано в шапке. extraction_mode="layout" сохраняет отступы, значит колонки
+    восстановимы (library/pdftable.py), а дальше работает та же машинерия шапки,
+    что у xlsx: цена за единицу против суммы, валюта из заголовка, срок, базис.
+
+    Пустой список — честный ответ «таблицы нет», и вызывающий идёт прежним путём.
+    Решает не этот код, а header_map: без опознанной шапки таблица отвергается.
+    """
+    try:
+        from pypdf import PdfReader
+        rd = PdfReader(io.BytesIO(b))
+        части = []
+        for pg in rd.pages[:60]:
+            try:
+                части.append(pg.extract_text(extraction_mode="layout") or "")
+            except Exception:
+                # Режим layout есть не во всех версиях pypdf и спотыкается на
+                # отдельных страницах. Страница без него — не причина терять файл.
+                return []
+        # Ступень допуска выбирают ворота шапки: см. pdftable.ДОПУСКИ. Разрез,
+        # не давший опознаваемой шапки, ниже отвергается целиком, поэтому
+        # перебор ступеней ничем не рискует.
+        return pdftable.строки_в_таблицу(
+            "\n".join(части), годится=lambda rows: header_map(rows)[0] >= 0)
+    except Exception:
+        return []
+
+
 def header_map(rows: list[list[str]]) -> tuple[int, dict[str, int]]:
     """Ищем строку заголовков: в ней должно найтись хотя бы два известных названия."""
     for i, row in enumerate(rows[:40]):
@@ -315,9 +356,12 @@ def header_map(rows: list[list[str]]) -> tuple[int, dict[str, int]]:
         found: dict[str, int] = {}
         for key, words in COLS.items():
             for j, c in enumerate(low):
-                if c and any(w in c for w in words):
-                    found.setdefault(key, j)
-                    break
+                if not c or not any(w in c for w in words):
+                    continue
+                if key == "unit" and any(w in c for w in ЕДИНИЦА_ЧУЖОЕ):
+                    continue          # «Unit price» — колонка цены, не единицы
+                found.setdefault(key, j)
+                break
         if "item_name" in found and len(found) >= 2:
             return i, found
     return -1, {}
@@ -628,7 +672,15 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         elif kind == "старый office":
             rows = rows_from_xls(b)
         elif kind == "pdf":
-            text = text_from_pdf(b)
+            # СНАЧАЛА ТАБЛИЦА, ПОТОМ ПРОЗА. Ворота те же, что у .docx: таблица
+            # берётся только при опознанной шапке, иначе ветка «самая длинная
+            # ячейка» превратит колонтитулы и подписи в номенклатуру. Не прошло —
+            # разбираем прежним текстовым путём, то есть хуже, чем было, не будет.
+            prows = rows_from_pdf(b)
+            if prows and header_map(prows)[0] >= 0:
+                rows = prows
+            else:
+                text = text_from_pdf(b)
     except Exception as e:
         rec["status"] = "формат не читаем"
         rec["reason"] = type(e).__name__
