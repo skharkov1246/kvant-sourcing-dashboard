@@ -28,6 +28,9 @@ name: Библиотека — сводка и переклассификаци�
 #   funnel         — где теряются предложения поставщиков: воронка разбора по
 #                    ФАЙЛАМ, с разрезом по коду разборщика, пути и шапке.
 #                    Ничего не меняет.
+#   codes          — СКОЛЬКО КОДОВ С ЦЕНОЙ И БЕЗ. Три ответа, а не один: коды,
+#                    которые мы спрашивали; коды, по которым цена есть; коды
+#                    каталога. Ничего не меняет.
 #   match          — ОТВЕЧАЕТ ЛИ ПРЕДЛОЖЕНИЕ НА НАШУ ЗАЯВКУ: сопоставление кодов
 #                    двумя встречными долями — со стороны предложения и со стороны
 #                    заявки. Вторая закупочная: по скольким нашим позициям пришла
@@ -55,7 +58,7 @@ on:
         default: stats
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
                   reclassify-apply, bridge, crossref, demand, funnel,
-                  calibration, part, match]
+                  calibration, part, match, codes]
       part:
         description: "Артикул для поиска — только для part (например 6265ZZ)"
         type: string
@@ -195,6 +198,12 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           LIMIT: "300000"
         run: python scripts/quote_price_calibration.py
+
+      - name: Сколько кодов с ценой и без
+        if: inputs.job == 'codes'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python scripts/codes_with_prices.py
 
       - name: Отвечает ли предложение на нашу заявку
         if: inputs.job == 'match'
