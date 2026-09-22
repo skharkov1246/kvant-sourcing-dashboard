@@ -103,6 +103,15 @@ jobs:
           PY
           python scripts/validate_dashboard.py smoke/index.html
 
+      # Файлы, на которые ссылаются тесты, должны быть в репозитории, а не только
+      # на диске разработчика. Этот шаг заведён 22.09.2026: страница
+      # public/nomenclature.html прошла зелёный preflight и упала здесь с
+      # «ENOENT» — `.gitignore` глушит `public/*.html`, исключения поимённые.
+      # Шаг стоит ДО остальных проверок: ошибка такого рода делает бессмысленным
+      # всё, что читает файлы из дерева.
+      - name: Файлы, читаемые тестами, под версией
+        run: python scripts/tracked_test_inputs.py
+
       - name: Каталог данных актуален
         run: python scripts/build_catalog.py --check
 
