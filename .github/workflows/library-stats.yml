@@ -26,8 +26,13 @@ name: Библиотека — сводка и переклассификаци�
 #                    концентрированно, и по чему мы на рынок не выходили вовсе.
 #                    Ничего не меняет.
 #   funnel         — где теряются предложения поставщиков: воронка разбора по
-#                    ФАЙЛАМ, с разрезом по тому, опознана ли шапка таблицы.
+#                    ФАЙЛАМ, с разрезом по коду разборщика, пути и шапке.
 #                    Ничего не меняет.
+#   calibration    — ПОЧЕМУ цена не прочитана: правило прогоняется заново по
+#                    уже сохранённым строкам предложений, и отказы раскладываются
+#                    по воротам. Заодно — цена денежного подавления в
+#                    распознавании артикула и сетка кандидатов на послабление,
+#                    каждый с проверкой на удержание. Ничего не меняет.
 #
 # В журнал прогона выводятся ТОЛЬКО агрегаты: репозиторий публичный, а в базе
 # лежат коммерческие данные заказчиков. Ни наименований позиций, ни номеров
@@ -41,7 +46,8 @@ on:
         type: choice
         default: stats
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
-                  reclassify-apply, bridge, crossref, demand, funnel]
+                  reclassify-apply, bridge, crossref, demand, funnel,
+                  calibration]
       run_id:
         description: "Ключ прогона разметки — только для mark-revert"
         default: ""
@@ -166,6 +172,13 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python scripts/quote_parse_funnel.py
+
+      - name: Почему цена не прочитана
+        if: inputs.job == 'calibration'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          LIMIT: "300000"
+        run: python scripts/quote_price_calibration.py
 
       - name: Сводка после
         if: inputs.job == 'reclassify-apply' || inputs.job == 'mark-apply' || inputs.job == 'mark-revert'
