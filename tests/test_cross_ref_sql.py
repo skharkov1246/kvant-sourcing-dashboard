@@ -49,9 +49,9 @@ def скрипт():
 
 
 def функция_ключа() -> str:
-    текст = (ROOT / "library" / "supabase" / "schema_junk.sql").read_text(encoding="utf-8")
+    текст = (ROOT / "library" / "supabase" / "schema.sql").read_text(encoding="utf-8")
     m = re.search(r"create or replace function lib_pn_key.*?\$\$;", текст, re.S | re.I)
-    assert m, "в миграции больше нет функции lib_pn_key"
+    assert m, "в schema.sql больше нет функции lib_pn_key"
     return m.group(0)
 
 
