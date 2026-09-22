@@ -22,6 +22,9 @@ name: Библиотека — сводка и переклассификаци�
 #                    самого каталога. Ничего не меняет.
 #   crossref       — чем наполнятся карточка товара и карточка поставщика.
 #                    Ничего не меняет.
+#   demand         — профиль спроса: что у нас спрашивают, насколько
+#                    концентрированно, и по чему мы на рынок не выходили вовсе.
+#                    Ничего не меняет.
 #
 # В журнал прогона выводятся ТОЛЬКО агрегаты: репозиторий публичный, а в базе
 # лежат коммерческие данные заказчиков. Ни наименований позиций, ни номеров
@@ -35,7 +38,7 @@ on:
         type: choice
         default: stats
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
-                  reclassify-apply, bridge, crossref]
+                  reclassify-apply, bridge, crossref, demand]
       run_id:
         description: "Ключ прогона разметки — только для mark-revert"
         default: ""
@@ -148,6 +151,12 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python scripts/cross_ref_coverage.py
+
+      - name: Профиль спроса
+        if: inputs.job == 'demand'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python scripts/demand_profile.py
 
       - name: Сводка после
         if: inputs.job == 'reclassify-apply' || inputs.job == 'mark-apply' || inputs.job == 'mark-revert'

@@ -55,6 +55,14 @@ create table sup_identifier (sup_id text references sup_entity(id), kind text no
 create table lib_demand (
   id bigserial primary key, deal_id text, item_name text not null,
   part_number text, qty numeric, unit text);
+-- ВИД, А НЕ ТАБЛИЦА: вес позиции обязан считаться по спросу без строк,
+-- помеченных как текст тендерного документа. Считать пункт договора спросом
+-- значит завысить вес тем, чего никто не спрашивал.
+create table lib_row_junk (demand_id bigint, revoked_at timestamptz);
+create view lib_demand_live as
+  select d.* from lib_demand d
+   where not exists (select 1 from lib_row_junk j
+                      where j.demand_id = d.id and j.revoked_at is null);
 create table lib_prices (
   id bigserial primary key, part_number text, item_name text, feed text,
   rfq_company text, rfq_id text, oem text, rfq_brands text, price numeric,
@@ -97,7 +105,12 @@ insert into lib_demand (deal_id, item_name, part_number, qty, unit) values
   ('D-3', 'Уплотнение', 'seal1',        3, 'шт'),
   ('D-4', 'Болт',       'BOLT-8',      50, 'шт'),
   ('D-5', 'Гайка',      'NUT-M8',     100, 'шт'),
-  ('D-6', 'Гайка',      'NUT-M8',     200, 'шт');
+  ('D-6', 'Гайка',      'NUT-M8',     200, 'шт'),
+  -- Текст тендерного документа под артикулом 6205: в вес позиции попасть не
+  -- должен. Без этой строки чтение таблицы вместо вида выглядело бы верным.
+  ('D-9', 'Пункт 5.2 Условия оплаты', '6205', 999, 'шт');
+insert into lib_row_junk (demand_id, revoked_at)
+  select id, null from lib_demand where item_name like 'Пункт 5.2%';
 
 insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, oem,
                         rfq_brands, price, currency, qty, qty_unit, basis, lead_days,
