@@ -611,9 +611,17 @@ async function readLog(env, { prefix = LOG_PREFIX, limit = 300 } = {}) {
 const SUPPLIERS_KEY = "suppliers:v1";
 const SUPPLIERS_MAX_BYTES = 8 * 1024 * 1024;
 
+// НОМЕНКЛАТУРА ЖИВЁТ ПОД ТЕМ ЖЕ ПРАВОМ. Карточка позиции показывает, кто на неё
+// давал предложение и по какой цене, — это те же коммерческие сведения, что и
+// реестр поставщиков, прочитанные с другой стороны. Отдельное право разделило бы
+// один секрет на два замка, и слабейший решал бы.
+const CROSSREF_KEY = "crossref:v1";
+
 function suppliersRoute(path) {
   if (["/suppliers", "/suppliers/", "/suppliers.html"].includes(path)) return "page";
   if (path === "/api/suppliers") return "api";
+  if (["/nomenclature", "/nomenclature/", "/nomenclature.html"].includes(path)) return "nomenclature";
+  if (path === "/api/crossref") return "crossref";
   // Маршрута публикации здесь нет намеренно: снимок кладёт scripts/publish_suppliers.py
   // прямо в KV через API Cloudflare — так же, как публикуется библиотека. Второй стек
   // разбора и проверки тела запроса в воркере не нужен, а /admin/suppliers ниже
@@ -629,7 +637,7 @@ function suppliersRoute(path) {
     } catch { break; }
   }
   decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
-  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$))/i
+  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$))/i
     .test(decoded) ? "invalid" : null;
 }
 
@@ -640,6 +648,18 @@ function suppliersRoute(path) {
 // показывает «нет доступа» вместо пустоты, и видно, чего именно не хватает.
 // Пустое поле и закрытое поле — разные вещи, путать их нельзя (тот же довод, что
 // у «наличия» в выгрузках владельцу).
+//
+// ЦЕНА ИЗ КП ЗДЕСЬ НЕ РЕЖЕТСЯ, И ЭТО РЕШЕНИЕ, А НЕ УПУЩЕНИЕ. suppliers_fin
+// закрывает НАШИ деньги: условия договора, лимиты, оплату, сумму закупок.
+// Цена, которую поставщик сам прислал в своём КП, — это его предложение нам, и
+// ради её сравнения раздел «Номенклатура» и существует. Закрой её этим правом —
+// и страница станет бесполезна для всех, у кого есть только suppliers, то есть
+// для сорсеров, которым она и адресована. Вход в раздел по-прежнему закрыт
+// правом suppliers целиком.
+//
+// Если владелец решит иначе, менять надо здесь: добавить "price" и "cur" в
+// группу suppliers_fin. Тогда карточка покажет «нет доступа» вместо числа —
+// пустоты не будет.
 const SUPPLIERS_FIELDS = [
   { right: "suppliers_pii", fields: ["contacts", "emails", "phones", "persons"] },
   { right: "suppliers_fin", fields: ["terms", "payment", "limits", "contracts", "spend"] },
@@ -672,6 +692,20 @@ async function readSuppliers(env) {
   // Снимка ещё нет — это не ошибка, а состояние «публикатор не отработал».
   // Отдаём пустой, чтобы страница сказала «нет данных», а не 503.
   if (raw == null) return { version: 1, published_at: null, entities: [] };
+  if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > SUPPLIERS_MAX_BYTES) {
+    throw new Error("suppliers_invalid");
+  }
+  const value = JSON.parse(raw);
+  if (value.version !== 1) throw new Error("suppliers_invalid");
+  return value;
+}
+
+async function readCrossref(env) {
+  const kv = aclStore(env);
+  if (!kv) throw new Error("suppliers_unavailable");
+  const raw = await kv.get(CROSSREF_KEY);
+  // Снимка ещё нет — это состояние «публикатор не отработал», а не ошибка.
+  if (raw == null) return { version: 1, positions: [], companies: [], totals: {} };
   if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > SUPPLIERS_MAX_BYTES) {
     throw new Error("suppliers_invalid");
   }
@@ -1070,6 +1104,25 @@ export default {
         return suppliersJson({ error: "forbidden" }, 403);
       }
       if (request.method !== "GET") return suppliersJson({ error: "method_not_allowed" }, 405);
+      if (suppliers === "crossref") {
+        let snapshot;
+        try { snapshot = await readCrossref(env); }
+        catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
+        // Резка та же, что у реестра: поля с контактами и деньгами закрываются
+        // правом на сервере, а не стилями на странице.
+        return suppliersJson({ ...suppliersCut(snapshot, rights), admin: rights.admin,
+          rights: rights.rights.filter((r) => r.startsWith("suppliers")) });
+      }
+      if (suppliers === "nomenclature") {
+        try {
+          const asset = await env.ASSETS.fetch(new Request(url.origin + "/nomenclature.html", { headers: request.headers }));
+          if (!asset.ok) return suppliersJson({ error: "suppliers_page_unavailable" }, 503);
+          const headers = libraryHeaders(asset.headers);
+          headers.set("Content-Type", "text/html; charset=utf-8");
+          headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+          return new Response(asset.body, { headers });
+        } catch { return suppliersJson({ error: "suppliers_page_unavailable" }, 503); }
+      }
       if (suppliers === "api") {
         let snapshot;
         try { snapshot = await readSuppliers(env); }
@@ -1655,6 +1708,13 @@ function portalPage(who, rights, env) {
   if (rights.admin || rights.rights.includes("suppliers")) {
     mine.push({ id: "suppliers", group: "work", name: "Поставщики", href: "/suppliers",
       note: "сведённый реестр компаний: один вечный номер на компанию, ИНН, домен, чем слито" });
+    // Обратная сторона той же связи. Отдельной плашкой, а не ссылкой внутри
+    // реестра: сорсер приходит с номером детали в руках чаще, чем с названием
+    // компании, и заставлять его начинать с компании значит разворачивать
+    // цепочку задом наперёд.
+    mine.push({ id: "nomenclature", group: "work", name: "Номенклатура",
+      href: "/nomenclature",
+      note: "по позиции — кто давал предложение и за сколько, чей это номер, чем закрыть" });
   }
   // разделы: плашка показывается, только если в ней человеку что-то доступно
   const sections = GROUPS.map((g) => {

@@ -197,3 +197,113 @@ test("плашка на портале показывается по праву,
   const владелец = await (await call(env, "/", OWNER)).text();
   assert.match(владелец, /href="\/suppliers"/);
 });
+
+// ─── Номенклатура: карточка товара под тем же правом ─────────────────────────
+// Раздел добавлен 22.09.2026 по ТЗ владельца. Он показывает по позиции, КТО
+// давал предложение и по какой цене, — те же коммерческие сведения, что и
+// реестр, прочитанные с другой стороны. Отдельного права у него нет намеренно:
+// два замка на один секрет решаются слабейшим.
+
+const CROSSREF = {
+  version: 1,
+  totals: { positions: 1, with_choice: 1, companies: 2, companies_resolved: 1 },
+  positions: [
+    { k: "6205", n: "6-205", name: "Подшипник учебный", co: 2, offers: 2, shown: 2,
+      cmp: true, oem_file: ["CHINA-BRG"], oem_cat: "SKF", brands: ["SKF"],
+      alts: [{ pn: "180205", kind: "номер изготовителя", maker: "ГПЗ" }],
+      models: ["SGT-400"], makers: [{ name: "Учебный завод", role: "OEM" }],
+      list: [
+        { co: "101", ent: "KV-S-000001-8", ent_name: "Учебный завод", price: 100,
+          cur: "EUR", lead: 30, rfq: "RFQ-1", terms: "предоплата 30 %" },
+        { co: "102", ent: null, ent_name: null, price: 120, cur: "EUR",
+          emails: ["nobody@example.test"] },
+      ] },
+  ],
+  companies: [
+    { co: "101", ent: "KV-S-000001-8", name: "Учебный завод", rows: 1, parts: 1,
+      brands: ["SKF"], list: [{ k: "6205", n: "6-205", cnt: 1, price: 100, cur: "EUR" }] },
+  ],
+};
+
+function envCross(snapshot = CROSSREF) {
+  const env = envFor();
+  if (snapshot) env.ACL.box.set("crossref:v1", JSON.stringify(snapshot));
+  return env;
+}
+
+test("номенклатура закрыта без подписи Access", async () => {
+  const env = envCross();
+  for (const path of ["/nomenclature", "/nomenclature/", "/nomenclature.html",
+                      "/api/crossref"]) {
+    const response = await call(env, path, null);
+    assert.equal(response.status, 403, path);
+    assert.doesNotMatch(await response.text(), /Подшипник учебный|UI SHELL/);
+  }
+  assert.deepEqual(env.assets, []);
+});
+
+test("номенклатуру открывает то же право suppliers", async () => {
+  const env = envCross();
+  for (const path of ["/nomenclature", "/api/crossref"]) {
+    const deny = await call(env, path, GUEST);
+    assert.equal(deny.status, 403, path);
+    assert.equal((await deny.json()).error, "forbidden");
+    const allow = await call(env, path, READER);
+    assert.equal(allow.status, 200, path);
+  }
+  // Страница берётся своя, а не suppliers.html: иначе раздел открывался бы
+  // чужой вёрсткой и молча показывал не те данные.
+  assert.deepEqual(env.assets, ["/nomenclature.html"]);
+});
+
+test("резка полей действует и в номенклатуре", async () => {
+  const env = envCross();
+  const body = await (await call(env, "/api/crossref", READER)).text();
+  for (const secret of ["nobody@example.test", "предоплата 30 %"]) {
+    assert.ok(!body.includes(secret), `в ответе осталось «${secret}»`);
+  }
+  const value = JSON.parse(body);
+  const предложения = value.positions[0].list;
+  assert.deepEqual(предложения[0].terms, { закрыто: "suppliers_fin" });
+  assert.deepEqual(предложения[1].emails, { закрыто: "suppliers_pii" });
+  // Цена и валюта — не закрытые поля: ради них раздел и существует.
+  assert.equal(предложения[0].price, 100);
+  assert.equal(предложения[0].cur, "EUR");
+});
+
+test("снимка номенклатуры ещё нет — это «нет данных», а не поломка", async () => {
+  const env = envFor();                      // crossref:v1 не положен
+  const response = await call(env, "/api/crossref", READER);
+  assert.equal(response.status, 200);
+  const value = await response.json();
+  assert.deepEqual(value.positions, []);
+  assert.deepEqual(value.companies, []);
+});
+
+test("альтернативное написание пути номенклатуры не обходит проверку права", async () => {
+  const env = envCross();
+  for (const path of ["/nomenclature/all", "/api/crossref/list", "/nomenclature%2f",
+                      "/%6eomenclature", "/nomenclature;x", "/api/crossref;x"]) {
+    const response = await call(env, path, GUEST);
+    assert.equal(response.status, 404, path);
+    assert.equal((await response.json()).error, "not_found");
+  }
+  assert.deepEqual(env.assets, []);
+});
+
+test("менять номенклатуру запросом нельзя: только GET", async () => {
+  const env = envCross();
+  for (const method of ["POST", "PUT", "DELETE"]) {
+    const response = await call(env, "/api/crossref", OWNER, { method,
+      headers: { "Content-Type": "application/json" }, body: "{}" });
+    assert.equal(response.status, 405, method);
+  }
+});
+
+test("плашка «Номенклатура» показывается по тому же праву", async () => {
+  const env = envCross();
+  const есть = await (await call(env, "/", READER)).text();
+  assert.match(есть, /href="\/nomenclature"/);
+  const нет = await (await call(env, "/", GUEST)).text();
+  assert.doesNotMatch(нет, /href="\/nomenclature"/);
+});

@@ -316,9 +316,114 @@ function открыть(e) {
    раздел("Договоры и деньги", [["Условия", "terms"], ["Оплата", "payment"], ["Лимиты", "limits"], ["Договоры", "contracts"], ["Закупки", "spend"]], e)]
     .forEach(function (ф) { if (ф) card.appendChild(ф); });
 
+  предложения_компании(card, e);
+
   $("list").hidden = true;
   card.hidden = false;
   card.scrollIntoView({ block: "start" });
+}
+
+// ─── ЧЕГО ОТ КОМПАНИИ ОЖИДАТЬ ────────────────────────────────────────────────
+// ТЗ владельца: «карточка поставщика, где будет список позиций и брендов, на
+// которые он выдавал предложение… мы понимаем по поставщику, от кого что
+// ожидать». Это та же связь, что на странице номенклатуры, прочитанная с другой
+// стороны, и берётся она из того же снимка: вторая сборка разошлась бы с первой.
+//
+// Снимок тянется ОДИН РАЗ и лениво — при первом открытии карточки. Грузить его
+// вместе со списком значило бы платить за него всем, кто до карточки не дошёл.
+var перекрёстный = null;         // null — не пробовали, false — не вышло
+
+function по_сущности(снимок) {
+  // У одной компании реестра бывает несколько ключей портала: сведение их
+  // объединило, а котировки лежат по каждому отдельно. Складываем, иначе
+  // карточка покажет часть работы компании и промолчит об остальной.
+  var карта = {};
+  (снимок.companies || []).forEach(function (c) {
+    if (!c.ent) return;
+    var у = карта[c.ent] || (карта[c.ent] = { parts: 0, rows: 0, brands: {}, list: [], keys: [] });
+    у.parts += c.parts || 0;
+    у.rows += c.rows || 0;
+    у.keys.push(c.co);
+    (c.brands || []).forEach(function (b) { у.brands[b] = 1; });
+    у.list = у.list.concat(c.list || []);
+  });
+  Object.keys(карта).forEach(function (k) {
+    карта[k].brands = Object.keys(карта[k].brands).sort();
+    карта[k].list.sort(function (a, b) { return (b.cnt || 0) - (a.cnt || 0); });
+  });
+  return карта;
+}
+
+function нарисовать_предложения(card, узел_секции, свод) {
+  узел_секции.textContent = "";
+  if (!свод) {
+    узел_секции.appendChild(узел("p", "field-note",
+      "Предложений от этой компании в разобранных КП нет. Это не значит, что она "
+      + "их не присылала: разобрана пока часть вложений."));
+    return;
+  }
+  var dl = узел("dl");
+  пара(dl, "Позиций, на которые давал", свод.parts);
+  пара(dl, "Строк в котировках", свод.rows);
+  пара(dl, "Брендов", свод.brands.length ? свод.brands : null);
+  узел_секции.appendChild(dl);
+
+  var tw = узел("div", "table-wrap");
+  var tb = document.createElement("table");
+  var th = document.createElement("thead");
+  var htr = document.createElement("tr");
+  ["Позиция", "Наименование", "Строк", "Цена", "Дата"].forEach(function (h) {
+    htr.appendChild(узел("th", null, h));
+  });
+  th.appendChild(htr); tb.appendChild(th);
+  var tbody = document.createElement("tbody");
+  свод.list.slice(0, 200).forEach(function (п) {
+    var tr = document.createElement("tr");
+    var td = узел("td", "num");
+    // Ссылка ведёт на страницу номенклатуры — обратная сторона той же связи.
+    var a = узел("a", null, п.n || п.k);
+    a.href = "/nomenclature";
+    td.appendChild(a);
+    tr.appendChild(td);
+    tr.appendChild(узел("td")).appendChild(значение(п.name));
+    tr.appendChild(узел("td", "num", число(п.cnt)));
+    // Цена без кода валюты несравнима — код печатается всегда.
+    tr.appendChild(узел("td", "num", закрыто(п.price) ? "нет доступа"
+      : (typeof п.price === "number"
+          ? п.price.toLocaleString("ru-RU", { maximumFractionDigits: 2 })
+            + (п.cur ? " " + п.cur : " (валюта не названа)")
+          : "—")));
+    tr.appendChild(узел("td")).appendChild(значение(п.date));
+    tbody.appendChild(tr);
+  });
+  tb.appendChild(tbody); tw.appendChild(tb); узел_секции.appendChild(tw);
+  if (свод.list.length > 200) {
+    узел_секции.appendChild(узел("p", "field-note", "Показаны 200 позиций из "
+      + число(свод.list.length) + ": остальные — на странице номенклатуры."));
+  }
+}
+
+function предложения_компании(card, e) {
+  card.appendChild(узел("h3", "section-title", "На что давал предложения"));
+  var секция = узел("div");
+  секция.appendChild(узел("p", "field-note", "Читаем котировки…"));
+  card.appendChild(секция);
+
+  var показать = function () {
+    if (перекрёстный === false) {
+      секция.textContent = "";
+      секция.appendChild(узел("p", "field-note",
+        "Снимок котировок не прочитался. Раздел «Номенклатура» покажет то же самое."));
+      return;
+    }
+    нарисовать_предложения(card, секция, по_сущности(перекрёстный)[e.number]);
+  };
+
+  if (перекрёстный) { показать(); return; }
+  fetch("/api/crossref", { headers: { Accept: "application/json" } })
+    .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(function (v) { перекрёстный = v; показать(); })
+    .catch(function () { перекрёстный = false; показать(); });
 }
 
 function сводка(d) {
