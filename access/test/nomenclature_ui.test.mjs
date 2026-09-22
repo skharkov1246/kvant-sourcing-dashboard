@@ -66,7 +66,7 @@ function потомки(root) { return [root, ...root.children.flatMap(пото�
 const СНИМОК = {
   version: 1,
   totals: { positions: 3, with_choice: 1, comparable: 1, in_catalog: 1,
-            companies: 3, companies_resolved: 1, no_choice_with_demand: 1 },
+            companies: 3, companies_resolved: 1, no_demand: 1 },
   positions: [
     { k: "6205", n: "6-205", name: "Подшипник учебный", co: 2, offers: 3, shown: 3,
       cmp: true, cat: true, oem_file: ["CHINA-BRG"], oem_cat: "SKF", brands: ["SKF"],
@@ -167,21 +167,26 @@ test("вес позиции показан, и количество не сум�
   assert.match(вторая, /· 10/);
   // oring5: спроса нет вовсе.
   assert.match(строки[2].textContent, /Не спрашивали/);
-  // Итог наверху называет размер списка работы.
-  assert.match(карта.totals.textContent, /спрашивали, а выбора нет/);
+  // Итог «нет в спросе» показывается только когда такие позиции есть: в корпусе
+  // это oring5. На живой базе их ноль, и клетка не занимает места.
+  assert.match(карта.totals.textContent, /нет в спросе/);
 });
 
-test("отбор «спрашивали, а выбора нет» — это список работы", async () => {
+test("отбор «одно предложение» — это список работы, и он один", async () => {
   const { карта } = await открыть_страницу();
   const кнопки = карта.tabs.querySelectorAll("button");
-  const нужная = кнопки.find((b) => b.textContent.includes("Спрашивали, а выбора нет"));
-  assert.ok(нужная, "отбора «спрашивали, а выбора нет» нет");
-  // В корпусе такая одна: sealkit12. У 6205 выбор из двух компаний, у oring5
-  // нет спроса.
-  assert.match(нужная.textContent, /· 1$/);
+  const нужная = кнопки.find((b) => b.textContent.includes("запросить второго"));
+  assert.ok(нужная, "отбора со списком работы нет");
+  // Отдельного отбора «спрашивали, а выбора нет» быть не должно: он совпадает
+  // с этим, и два отбора на одно множество читаются как два разных множества.
+  assert.equal(кнопки.filter((b) => b.textContent.includes("Спрашивали")).length, 0);
+  // В корпусе таких две: sealkit12 и oring5. У 6205 выбор из двух компаний.
+  assert.match(нужная.textContent, /· 2$/);
   await нужная.fire("click");
-  assert.equal(карта.rows.children.length, 1);
+  assert.equal(карта.rows.children.length, 2);
+  // Порядок по спросу: sealkit12 со спросом впереди oring5 без спроса.
   assert.match(карта.rows.children[0].textContent, /SEAL-KIT-12/);
+  assert.match(карта.rows.children[1].textContent, /O-RING-5/);
 });
 
 test("доля позиций без выбора стоит наверху, а не в сноске", async () => {
