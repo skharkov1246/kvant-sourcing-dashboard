@@ -66,11 +66,13 @@ function потомки(root) { return [root, ...root.children.flatMap(пото�
 const СНИМОК = {
   version: 1,
   totals: { positions: 3, with_choice: 1, comparable: 1, in_catalog: 1,
-            companies: 3, companies_resolved: 1 },
+            companies: 3, companies_resolved: 1, no_choice_with_demand: 1 },
   positions: [
     { k: "6205", n: "6-205", name: "Подшипник учебный", co: 2, offers: 3, shown: 3,
       cmp: true, cat: true, oem_file: ["CHINA-BRG"], oem_cat: "SKF", brands: ["SKF"],
       kv: "KV-000753-4",
+      // Спрос двумя сделками в РАЗНЫХ единицах: сумма по такой позиции не даётся.
+      demand: { deals: 2, rows: 3, qty: null, units: 2 },
       alts: [{ pn: "180205", kind: "номер изготовителя", maker: "ГПЗ" },
              { pn: "6205-2RS", kind: "аналог", maker: "FAG" }],
       models: ["SGT-400", "Taurus 70"],
@@ -88,8 +90,12 @@ const СНИМОК = {
       ] },
     { k: "sealkit12", n: "SEAL-KIT-12", name: "Комплект уплотнений", co: 1, offers: 1,
       shown: 1, cmp: false, cat: false, oem_file: [], oem_cat: null, brands: [],
+      // Спрос одной сделкой в одной единице: сумма законна. Выбора нет — это и
+      // есть строка списка работы.
+      demand: { deals: 1, rows: 2, qty: 10, units: 1 },
       alts: [], models: [], makers: [],
       list: [{ co: "102", price: 50, date: "2026-09-01" }] },
+    // Позиция БЕЗ спроса: в список работы не идёт, и «не спрашивали» — не ноль.
     { k: "oring5", n: "O-RING-5", name: "Кольцо", co: 1, offers: 1, shown: 1,
       cmp: false, cat: false, oem_file: [], oem_cat: null, brands: [], alts: [],
       models: [], makers: [], list: [] },
@@ -146,6 +152,36 @@ test("страница рисует итоги и список", async () => {
   // Три позиции — три строки.
   assert.equal(карта.rows.children.length, 3);
   assert.match(карта.count.textContent, /3 из 3/);
+});
+
+test("вес позиции показан, и количество не суммируется через единицы", async () => {
+  const { карта } = await открыть_страницу();
+  const строки = карта.rows.children;
+  // 6205: две сделки, две единицы — сумма не даётся, и об этом сказано словами.
+  const первая = строки[0].textContent;
+  assert.match(первая, /2 сделки/);
+  assert.match(первая, /единиц 2, сумма не дана/);
+  // sealkit12: одна сделка, одна единица — количество печатается.
+  const вторая = строки[1].textContent;
+  assert.match(вторая, /1 сделка/);
+  assert.match(вторая, /· 10/);
+  // oring5: спроса нет вовсе.
+  assert.match(строки[2].textContent, /Не спрашивали/);
+  // Итог наверху называет размер списка работы.
+  assert.match(карта.totals.textContent, /спрашивали, а выбора нет/);
+});
+
+test("отбор «спрашивали, а выбора нет» — это список работы", async () => {
+  const { карта } = await открыть_страницу();
+  const кнопки = карта.tabs.querySelectorAll("button");
+  const нужная = кнопки.find((b) => b.textContent.includes("Спрашивали, а выбора нет"));
+  assert.ok(нужная, "отбора «спрашивали, а выбора нет» нет");
+  // В корпусе такая одна: sealkit12. У 6205 выбор из двух компаний, у oring5
+  // нет спроса.
+  assert.match(нужная.textContent, /· 1$/);
+  await нужная.fire("click");
+  assert.equal(карта.rows.children.length, 1);
+  assert.match(карта.rows.children[0].textContent, /SEAL-KIT-12/);
 });
 
 test("доля позиций без выбора стоит наверху, а не в сноске", async () => {

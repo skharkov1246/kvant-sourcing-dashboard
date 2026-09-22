@@ -63,7 +63,7 @@ def читать_базу(dsn):
             наборы = []
             for sql in (crossref.ПРЕДЛОЖЕНИЯ_SQL, crossref.КАТАЛОГ_SQL,
                         crossref.АНАЛОГИ_SQL, crossref.МАШИНЫ_SQL,
-                        crossref.ИЗГОТОВИТЕЛИ_SQL):
+                        crossref.ИЗГОТОВИТЕЛИ_SQL, crossref.СПРОС_SQL):
                 cur.execute(sql, (crossref.FEED,))
                 наборы.append(cur.fetchall())
         return наборы
@@ -83,10 +83,10 @@ def main(argv=None):
         КЛЮЧИ = (KEY,)
 
     try:
-        предложения, каталог, аналоги, машины, изготовители = читать_базу(
-            os.environ.get("SUPABASE_DB_URL"))
+        (предложения, каталог, аналоги, машины, изготовители,
+         спрос) = читать_базу(os.environ.get("SUPABASE_DB_URL"))
         снимок = crossref.собрать(предложения, каталог, аналоги, машины,
-                                  изготовители)
+                                  изготовители, спрос)
         raw = json.dumps(снимок, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         t = снимок["totals"]
         print(f"позиций: {t['positions']}, из них с выбором из двух компаний: "
@@ -95,6 +95,8 @@ def main(argv=None):
               "машина и изготовитель")
         print(f"компаний: {t['companies']}, сведено с реестром: "
               f"{t['companies_resolved']} — у остальных карточка не откроется")
+        print(f"без выбора, но со спросом: {t.get('no_choice_with_demand', 0)}"
+              " — по ним и надо запрашивать вторых поставщиков")
         print(f"предложений всего: {t['offers']}; размер снимка: {len(raw)} Б "
               f"({len(raw) / 1024 / 1024:.2f} МиБ из {ps.MAX_BYTES // 1024 // 1024})")
 
