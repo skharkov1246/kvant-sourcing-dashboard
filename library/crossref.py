@@ -115,60 +115,75 @@ select lib_pn_key(p.part_number)      as ключ,
  order by lib_pn_key(p.part_number), p.created_at desc, p.id desc
 """
 
-# Каталожная часть карточки. Соединяется по тому же ключу, что и цена: позиция,
-# не нашедшаяся в каталоге, покажет предложения и не покажет ни аналогов, ни
-# машины — и скажет об этом словами, а не пустотой.
-КАТАЛОГ_SQL = """
+# СЦЕПКА «КЛЮЧ КОТИРОВКИ → ДЕТАЛЬ КАТАЛОГА» — ОДНА НА ВСЕ ЧЕТЫРЕ ЗАПРОСА.
+#
+# Соединять по lib_parts.id недостаточно: id считается по catalog_norm, когда тот
+# заполнен, и у 82 деталей из 13 501 он не равен lib_pn_key(catalog_no) (замер
+# 22.09.2026). Такая деталь из соединения по id выпадает МОЛЧА — связи нет, и это
+# неотличимо от «детали в каталоге нет». Тридцать артикулов котировок попали
+# именно в этот хвост, и все тридцать ведут к машине.
+#
+# Ступеней две, и порядок важен. Совпадение по id точное, поэтому оно первое.
+# Второй путь берётся ТОЛЬКО когда по id не нашлось ничего, и ТОЛЬКО когда он
+# однозначен: два каталожных номера, дающих один ключ, привязали бы котировку к
+# чужой детали, а на странице это было бы неотличимо от правды. Пустой раздел
+# честнее неверного.
+#
+# Текст один на все четыре запроса намеренно: разойдись ступени между ними — и
+# карточка показала бы аналоги одной детали, а машину другой.
+СЦЕПКА = """
 with ключи as (
   select distinct lib_pn_key(part_number) as ключ
     from lib_prices
    where feed = %s and coalesce(btrim(part_number), '') <> ''
      and lib_pn_key(part_number) <> ''
+), точно as (
+  select к.ключ, p.id as part_id
+    from ключи к join lib_parts p on p.id = к.ключ
+), хвостом as (
+  select ключ, min(part_id) as part_id
+    from (select к.ключ, p.id as part_id
+            from ключи к
+            join lib_parts p on lib_pn_key(p.catalog_no) = к.ключ
+           where not exists (select 1 from точно т where т.ключ = к.ключ)) x
+   group by ключ having count(distinct part_id) = 1
+), сцепка as (
+  select ключ, part_id from точно
+  union all
+  select ключ, part_id from хвостом
 )
-select p.id, p.catalog_no, p.name, p.oem, p.category, p.target_equipment, p.kv_no
-  from ключи к join lib_parts p on p.id = к.ключ
 """
 
-АНАЛОГИ_SQL = """
-with ключи as (
-  select distinct lib_pn_key(part_number) as ключ
-    from lib_prices
-   where feed = %s and coalesce(btrim(part_number), '') <> ''
-     and lib_pn_key(part_number) <> ''
-)
-select a.part_id, a.alt_pn, a.kind, a.alt_maker, a.confidence
-  from ключи к join lib_part_alt a on a.part_id = к.ключ
- order by a.part_id, a.kind, a.alt_pn
+# Каталожная часть карточки. Позиция, не нашедшаяся в каталоге, покажет
+# предложения и не покажет ни аналогов, ни машины — и скажет об этом словами, а
+# не пустотой.
+КАТАЛОГ_SQL = СЦЕПКА + """
+select с.ключ, p.catalog_no, p.name, p.oem, p.category, p.target_equipment, p.kv_no
+  from сцепка с join lib_parts p on p.id = с.part_id
 """
 
-МАШИНЫ_SQL = """
-with ключи as (
-  select distinct lib_pn_key(part_number) as ключ
-    from lib_prices
-   where feed = %s and coalesce(btrim(part_number), '') <> ''
-     and lib_pn_key(part_number) <> ''
-)
-select m.part_id, coalesce(mo.name, m.model_id) as машина
-  from ключи к
-  join lib_part_models m on m.part_id = к.ключ
+АНАЛОГИ_SQL = СЦЕПКА + """
+select с.ключ, a.alt_pn, a.kind, a.alt_maker, a.confidence
+  from сцепка с join lib_part_alt a on a.part_id = с.part_id
+ order by с.ключ, a.kind, a.alt_pn
+"""
+
+МАШИНЫ_SQL = СЦЕПКА + """
+select с.ключ, coalesce(mo.name, m.model_id) as машина
+  from сцепка с
+  join lib_part_models m on m.part_id = с.part_id
   left join lib_models mo on mo.id = m.model_id
- order by m.part_id, 2
+ order by с.ключ, 2
 """
 
 # КТО ЭТО ДЕЛАЕТ И В КАКОЙ РОЛИ. Ровно то, о чём ТЗ говорит «кто является ОЕМ,
 # ОДМ». Роль — слово реестра исполнителей, а не наша оценка.
-ИЗГОТОВИТЕЛИ_SQL = """
-with ключи as (
-  select distinct lib_pn_key(part_number) as ключ
-    from lib_prices
-   where feed = %s and coalesce(btrim(part_number), '') <> ''
-     and lib_pn_key(part_number) <> ''
-)
-select ps.part_id, s.name, s.kind, s.country, ps.makes, ps.verdict, ps.confidence
-  from ключи к
-  join lib_part_suppliers ps on ps.part_id = к.ключ
+ИЗГОТОВИТЕЛИ_SQL = СЦЕПКА + """
+select с.ключ, s.name, s.kind, s.country, ps.makes, ps.verdict, ps.confidence
+  from сцепка с
+  join lib_part_suppliers ps on ps.part_id = с.part_id
   join lib_suppliers s on s.id = ps.supplier_id
- order by ps.part_id, s.name
+ order by с.ключ, s.name
 """
 
 
@@ -209,6 +224,11 @@ def собрать(предложения, каталог=(), аналоги=(),
     for r in предложения:
         по_позиции[r[0]].append(r)
 
+    # ВСЕ ЧЕТЫРЕ НАБОРА РАСКЛАДЫВАЮТСЯ ПО КЛЮЧУ КОТИРОВКИ, А НЕ ПО id ДЕТАЛИ.
+    # У 30 позиций они не совпадают: id считается по catalog_norm, когда тот
+    # заполнен. Отдай один запрос id, а остальные ключ — и карточка получила бы
+    # найденную деталь при пустых разделах «чем закрыть» и «где стоит», причём
+    # ровно у тех позиций, ради которых вторая ступень сцепки и заведена.
     кат = {r[0]: r for r in каталог}
     альт = collections.defaultdict(list)
     for part_id, alt_pn, kind, maker, conf in аналоги:
