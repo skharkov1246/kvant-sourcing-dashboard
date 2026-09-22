@@ -76,26 +76,30 @@ const СНИМОК = {
       models: ["SGT-400", "Taurus 70"],
       makers: [{ name: "Учебный завод", role: "OEM", country: "Швеция",
                  makes: "подшипники", verdict: null }],
+      // Форма как у публикатора: имени компании в предложении НЕТ, пустые
+      // ключи отсутствуют вовсе (а не лежат со значением null).
       list: [
-        { co: "101", ent: "KV-S-000001-8", ent_name: "Учебный завод", price: 100,
-          cur: "EUR", qty: 4, unit: "шт", basis: "EXW", lead: 30, brands: ["SKF"],
+        { co: "101", ent: "KV-S-000001-8", price: 100, cur: "EUR", qty: 4,
+          unit: "шт", basis: "EXW", lead: 30, brands: ["SKF"],
           oem: "CHINA-BRG", date: "2026-09-01" },
-        { co: "777", ent: null, ent_name: null, price: 120, cur: "EUR",
-          qty: null, unit: null, basis: null, lead: null, brands: [], oem: null,
-          date: "2026-09-02" },
-        { co: "101", ent: "KV-S-000001-8", ent_name: "Учебный завод",
+        { co: "777", price: 120, cur: "EUR", date: "2026-09-02" },
+        { co: "101", ent: "KV-S-000001-8",
           price: { "закрыто": "suppliers_fin" }, cur: "EUR", date: "2026-09-03" },
       ] },
     { k: "sealkit12", n: "SEAL-KIT-12", name: "Комплект уплотнений", co: 1, offers: 1,
       shown: 1, cmp: false, cat: false, oem_file: [], oem_cat: null, brands: [],
       alts: [], models: [], makers: [],
-      list: [{ co: "102", ent: null, ent_name: null, price: 50, cur: null,
-               date: "2026-09-01" }] },
+      list: [{ co: "102", price: 50, date: "2026-09-01" }] },
     { k: "oring5", n: "O-RING-5", name: "Кольцо", co: 1, offers: 1, shown: 1,
       cmp: false, cat: false, oem_file: [], oem_cat: null, brands: [], alts: [],
       models: [], makers: [], list: [] },
   ],
-  companies: [],
+  // Имена компаний лежат здесь один раз — страница берёт их отсюда по ключу.
+  companies: [
+    { co: "101", ent: "KV-S-000001-8", name: "Учебный завод", rows: 2, parts: 1,
+      brands: ["SKF"] },
+    { co: "102", ent: null, name: null, rows: 1, parts: 1, brands: [] },
+  ],
   rights: ["suppliers"],
 };
 
@@ -183,6 +187,15 @@ test("цена не печатается без кода валюты", async ()
     await к2.rows.children[1].querySelectorAll("button")[0].fire("click");
     assert.match(к2.card.textContent, /50 \(валюта не названа\)/);
   });
+});
+
+test("имя компании берётся из companies, а не из каждого предложения", async () => {
+  const { карта } = await открыть_страницу();
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  const t = карта.card.textContent;
+  // В предложениях имени нет вовсе: если страница читает его оттуда, здесь будет
+  // пусто, и таблица предложений потеряет первую колонку.
+  assert.ok(t.includes("Учебный завод"), "имя компании не разрешилось из companies");
 });
 
 test("несведённая компания ведёт прямой ссылкой в Битрикс", async () => {
