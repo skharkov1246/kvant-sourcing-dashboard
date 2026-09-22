@@ -118,3 +118,13 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python scripts/quote_price_coverage.py
+
+      # Второй замер — тем же прогоном и по той же базе: цены меряются воронкой
+      # «сколько строк пригодно», а перекрёстная система — связями «позиция ↔
+      # поставщик». Это разные вопросы: миллион строк от одной компании даёт
+      # отличную воронку и пустую карточку товара.
+      - name: Чем наполнятся карточки товара и поставщика
+        if: always()
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python scripts/cross_ref_coverage.py
