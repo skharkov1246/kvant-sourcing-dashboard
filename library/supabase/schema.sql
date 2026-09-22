@@ -962,3 +962,38 @@ create table if not exists lib_metric_runs (
 create index if not exists lib_metric_runs_time on lib_metric_runs (metric, measured_at desc);
 
 alter table lib_metric_runs enable row level security;
+
+-- СТОРОНА ДОКУМЕНТА У ФАЙЛА. Заведено 22.09.2026 по замеру, который показал, что
+-- «поле сделки» — это не одна сторона, а четыре:
+--
+--   заказчик   607 284 строки спроса · 75 029 кодов — ЭТО И ЕСТЬ НАШ СПРОС (41,7 %)
+--   мы         350 179 строк · 45 102 кода — наши исходящие: «Offer from us»,
+--              «Processed file for supplier», «Result file»
+--   поставщик  432 016 строк · 69 361 код — предложения поставщиков, лежащие
+--              в поле СДЕЛКИ, а не в карточке запроса («Offer from supplier(s)»)
+--   внутренний  68 026 строк · 169 кодов — «Economics of the project»
+--   неизвестно     268 строк · 7 кодов — правило покрывает почти всё
+--
+-- То есть 58 % строк «нашего спроса» спросом не были: две трети этого — уже
+-- прокотированные позиции и наши же исходящие цены. Отбор по origin их не ловил:
+-- все они лежат в полях сделки.
+--
+-- ПОЧЕМУ НУЖНО ХРАНИТЬ НАЗВАНИЕ. В field лежит КОД поля (ufCrm_…), а сторона
+-- определяется по названию (library/doc_side.py). Названия даёт crm.item.fields —
+-- один вызов, но только при доступе к порталу, а запросы к базе идут без него.
+-- Поэтому название и вычисленная сторона хранятся рядом с файлом.
+alter table lib_files add column if not exists field_title text;
+alter table lib_files add column if not exists side text;
+
+-- Проверка вида — отдельным блоком: create table if not exists существующую
+-- таблицу не меняет, а add column ограничение не несёт (CLAUDE.md, правило 21).
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'lib_files_side_вид') then
+    alter table lib_files add constraint lib_files_side_вид
+      check (side is null or side in ('заказчик', 'мы', 'поставщик',
+                                      'внутренний', 'неизвестно'));
+  end if;
+end $$;
+
+create index if not exists lib_files_side on lib_files (side);

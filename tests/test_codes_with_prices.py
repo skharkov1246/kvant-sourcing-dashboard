@@ -81,7 +81,8 @@ $$;
 create table lib_demand (
   id bigserial primary key, deal_id text, item_name text, part_number text,
   source_file text);
-create table lib_files (file_id text primary key, deal_id text, origin text);
+create table lib_files (file_id text primary key, deal_id text, origin text,
+                        field text, field_title text, side text);
 create table lib_row_junk (
   demand_id bigint primary key, rule text, run_id text, revoked_at timestamptz);
 create view lib_demand_live as
@@ -103,8 +104,9 @@ create table lib_metric_runs (
 -- проходом, поэтому строка 8 — это ровно та строка, из-за которой замер до
 -- 22.09.2026 считал ZZZ999 «кодом, который мы спрашивали», а разряд «прайс шире
 -- запроса» получался нулевым по построению.
-insert into lib_files (file_id, deal_id, origin) values
-  ('f1', 'D1', 'поле сделки'), ('f2', 'D1', 'поле запроса');
+insert into lib_files (file_id, deal_id, origin, field_title, side) values
+  ('f1', 'D1', 'поле сделки',  'Техническая спецификация', 'заказчик'),
+  ('f2', 'D1', 'поле запроса', 'КП поставщика',            'поставщик');
 
 insert into lib_demand (id, deal_id, part_number, source_file) values
   (1, 'D1', 'AAA-111', 'f1'), (2, 'D2', 'AAA 111', 'f1'), (3, 'D1', 'BBB222', 'f1'),
@@ -451,12 +453,12 @@ def test_позиция_из_предложения_не_считается_на
     assert cur.fetchone()[0] == 1, "код из предложения не попал в свой разряд"
 
 
-def test_строка_без_файла_не_записывается_нашей(cur):
+def test_строка_без_файла_не_записывается_заявкой(cur):
     """Свалить её к нашим — вернуть ту же тавтологию через чёрный ход."""
     м = скрипт()
     подготовь(cur, м)
     cur.execute("select count(*) from коды_спроса where ключ = 'nnn666'")
-    assert cur.fetchone()[0] == 0, "строка без разрешимого файла записана нашей"
+    assert cur.fetchone()[0] == 0, "строка без разрешимого файла записана заявкой"
     cur.execute("select откуда from строки_спроса where ключ = 'nnn666'")
     assert cur.fetchone()[0] == "без файла"
 
@@ -469,7 +471,7 @@ def test_раскладка_по_происхождению_покрывает_�
     раскладка = {о: (int(с), int(к)) for о, с, к in cur.fetchall()}
     cur.execute("select count(*) from строки_спроса")
     assert sum(с for с, _ in раскладка.values()) == int(cur.fetchone()[0])
-    assert раскладка["наша"][0] == 6, "помеченная мусором строка попала в наши"
+    assert раскладка["заказчик"][0] == 6, "помеченная мусором строка попала в заявки"
     assert раскладка["поставщик"] == (1, 1)
     assert раскладка["без файла"] == (1, 1)
 
@@ -551,3 +553,77 @@ def test_закупочные_потоки_остаются_в_счёте(кор
     for ключ in ("bbb222", "ddd444"):
         корпус_в_public.execute("select count(*) from коды_цен_все where ключ = %s", (ключ,))
         assert корпус_в_public.fetchone()[0] == 1, f"закупочный поток потерян: {ключ}"
+
+
+# ── СТОРОНА ДОКУМЕНТА, А НЕ ПРОИСХОЖДЕНИЕ ФАЙЛА ───────────────────────────
+# Шестая ловушка, найденная 22.09.2026 замером по проду: «поле сделки» — это НЕ
+# одна сторона, а четыре. Заявки заказчика дают лишь 41,7 % строк; остальное —
+# наши исходящие документы (350 179 строк), предложения поставщиков, лежащие в
+# поле СДЕЛКИ (432 016), и наша экономика проекта (68 026).
+
+def test_наш_исходящий_документ_не_спрос(корпус_в_public):
+    """Строки нашего же ТКП не должны стоять в знаменателе «нам не дали цену»."""
+    м = скрипт()
+    корпус_в_public.execute("""
+        insert into lib_files (file_id, deal_id, origin, field_title, side)
+          values ('f-наше', 'D1', 'поле сделки', 'Offer from us', 'мы');
+        insert into lib_demand (id, deal_id, part_number, source_file)
+          values (20, 'D1', 'OUR-777', 'f-наше');""")
+    подготовь(корпус_в_public, м)
+    корпус_в_public.execute("select count(*) from коды_спроса where ключ = 'our777'")
+    assert корпус_в_public.fetchone()[0] == 0, \
+        "позиция из нашего исходящего ТКП посчитана спросом заказчика"
+
+
+def test_предложение_в_поле_сделки_тоже_не_спрос(корпус_в_public):
+    """«Offer from supplier(s)» лежит в поле СДЕЛКИ — отбор по origin его не ловил.
+
+    Именно эти два поля дали 427 623 строки, посчитанные нашим спросом.
+    """
+    м = скрипт()
+    корпус_в_public.execute("""
+        insert into lib_files (file_id, deal_id, origin, field_title, side)
+          values ('f-кп-в-сделке', 'D1', 'поле сделки',
+                  'Offer from supplier(s)', 'поставщик');
+        insert into lib_demand (id, deal_id, part_number, source_file)
+          values (21, 'D1', 'SUP-888', 'f-кп-в-сделке');""")
+    подготовь(корпус_в_public, м)
+    корпус_в_public.execute("select count(*) from коды_спроса where ключ = 'sup888'")
+    assert корпус_в_public.fetchone()[0] == 0, \
+        "предложение поставщика из поля сделки посчитано спросом"
+    # И попало в свой разряд: это «прайс шире запроса», а не потеря.
+    корпус_в_public.execute("select count(*) from коды_поставщика where ключ = 'sup888'")
+    assert корпус_в_public.fetchone()[0] == 1
+
+
+def test_наша_экономика_проекта_не_спрос(корпус_в_public):
+    м = скрипт()
+    корпус_в_public.execute("""
+        insert into lib_files (file_id, deal_id, origin, field_title, side)
+          values ('f-эконом', 'D1', 'поле сделки', 'Economics of the project',
+                  'внутренний');
+        insert into lib_demand (id, deal_id, part_number, source_file)
+          values (22, 'D1', 'ECO-999', 'f-эконом');""")
+    подготовь(корпус_в_public, м)
+    корпус_в_public.execute("select count(*) from коды_спроса where ключ = 'eco999'")
+    assert корпус_в_public.fetchone()[0] == 0
+
+
+def test_файл_без_проставленной_стороны_считается_отдельно(корпус_в_public):
+    """Разобран до правки: спросом не становится, но и не теряется из вида.
+
+    Свалить его к заявкам значило бы вернуть тавтологию через чёрный ход, а
+    промолчать — сделать неизмеримым объём работы дозаполнителя.
+    """
+    м = скрипт()
+    корпус_в_public.execute("""
+        insert into lib_files (file_id, deal_id, origin, field_title, side)
+          values ('f-старый', 'D1', 'поле сделки', null, null);
+        insert into lib_demand (id, deal_id, part_number, source_file)
+          values (23, 'D1', 'OLD-111', 'f-старый');""")
+    подготовь(корпус_в_public, м)
+    корпус_в_public.execute("select count(*) from коды_спроса where ключ = 'old111'")
+    assert корпус_в_public.fetchone()[0] == 0, "файл без стороны посчитан спросом"
+    корпус_в_public.execute(
+        "select откуда from строки_спроса where ключ = 'old111'")
+    assert корпус_в_public.fetchone()[0] == "сторона не проставлена"

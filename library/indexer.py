@@ -38,6 +38,7 @@ _КОРЕНЬ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_КОРЕНЬ, "scripts"))
 sys.path.insert(0, _КОРЕНЬ)          # bitrix_client лежит в корне
+import doc_side  # noqa: E402  (сторона документа по названию поля)
 import docfilter  # noqa: E402  (после sys.path)
 import offer_terms  # noqa: E402  (базис, оплата, сроки из КП)
 import pdftable  # noqa: E402  (таблица из PDF по выравниванию)
@@ -484,6 +485,12 @@ def collect_refs(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
     since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00+03:00")
     fields = ((bx("crm.item.fields", {"entityTypeId": 2}).get("result") or {}).get("fields") or {})
     ffields = [k for k, v in fields.items() if v.get("type") == "file"]
+    # НАЗВАНИЕ ПОЛЯ — РЯДОМ С КОДОМ. По названию определяется СТОРОНА документа
+    # (library/doc_side.py), а в базе названия нет: там только код. Без стороны
+    # «поле сделки» остаётся одной кучей, в которой заявка заказчика лежит вместе с
+    # нашим же исходящим ТКП и с предложениями поставщиков — замер 22.09.2026:
+    # настоящий спрос 41,7 % строк, остальное спросом не является.
+    названия = {k: (fields[k].get("title") or "") for k in ffields}
     deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
                                      "select": ["ID"], "order": {"ID": "ASC"}})
     ids = [int(d["ID"]) for d in deals]
@@ -510,7 +517,9 @@ def collect_refs(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
                     continue
                 for fo in (v if isinstance(v, list) else [v]):
                     if isinstance(fo, dict) and fo.get("urlMachine"):
-                        refs.append({"deal": str(x["id"]), "field": f, "origin": "поле сделки", "fo": fo})
+                        refs.append({"deal": str(x["id"]), "field": f,
+                                     "field_title": названия.get(f) or None,
+                                     "origin": "поле сделки", "fo": fo})
     print(f"вложений в полях сделок: {len(refs)}", flush=True)
     return refs
 
@@ -648,6 +657,10 @@ def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
             for fo in (v if isinstance(v, list) else [v]):
                 if isinstance(fo, dict) and fo.get("urlMachine"):
                     refs.append({"deal": str(x["id"]), "field": f,
+                                 # Название поля КП известно из константы: ПОЛЯ_КП
+                                 # держит код и название рядом. Отдельного вызова
+                                 # crm.item.fields здесь не нужно.
+                                 "field_title": ПОЛЯ_КП.get(f) or None,
                                  "origin": "поле запроса", "fo": fo,
                                  "company": str(компания) if компания else None,
                                  "brands": бренды or None})
@@ -731,7 +744,12 @@ def применить_условия(items: list[dict], весь_текст: st
 def handle(ref: dict) -> tuple[dict, list[dict]]:
     fo = ref["fo"]
     fid = str(fo.get("id") or fo.get("ID"))
+    название = ref.get("field_title")
     rec = {"file_id": fid, "deal_id": ref["deal"], "origin": ref["origin"], "field": ref["field"],
+           # СТОРОНА СЧИТАЕТСЯ ПРИ ЗАПИСИ, А НЕ ПРИ ЧТЕНИИ. Запросы к базе идут без
+           # доступа к порталу, а названия полей живут только там; посчитанная
+           # сторона — единственный способ отобрать заявки заказчика запросом.
+           "field_title": название, "side": doc_side.сторона(название),
            "kind": None, "size_bytes": None, "status": "не скачался", "reason": None,
            "chars": 0, "rows_found": 0, "segment_id": None, "sha256": None,
            "parse_path": None, "header_found": None, "doc_class": None,
@@ -984,12 +1002,14 @@ def main() -> int:
                 buf_files = list({r[0]: r for r in buf_files}.values())
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_files
-                      (file_id, deal_id, origin, field, kind, size_bytes, status, reason,
+                      (file_id, deal_id, origin, field, field_title, side,
+                       kind, size_bytes, status, reason,
                        chars, rows_found, segment_id, sha256,
                        parse_path, header_found, doc_class, class_rule,
                        text_lines, item_lines, parser_version)
                     values %s
                     on conflict (file_id) do update set
+                      field_title = excluded.field_title, side = excluded.side,
                       status = excluded.status, reason = excluded.reason, chars = excluded.chars,
                       rows_found = excluded.rows_found, segment_id = excluded.segment_id,
                       parse_path = excluded.parse_path, header_found = excluded.header_found,
@@ -1009,7 +1029,9 @@ def main() -> int:
             if rec["segment_id"]:
                 segs[rec["segment_id"]] += rec["rows_found"]
             total_items += rec["rows_found"]
-            buf_files.append((rec["file_id"], rec["deal_id"], rec["origin"], rec["field"], rec["kind"],
+            buf_files.append((rec["file_id"], rec["deal_id"], rec["origin"], rec["field"],
+                              pg(rec.get("field_title"))[:200] or None, rec.get("side"),
+                              rec["kind"],
                               rec["size_bytes"], rec["status"], pg(rec["reason"]), rec["chars"],
                               rec["rows_found"], rec["segment_id"], rec["sha256"],
                               rec["parse_path"], rec["header_found"], rec["doc_class"],
