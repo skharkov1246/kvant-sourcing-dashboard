@@ -148,6 +148,10 @@ var ПРАВА = { suppliers_pii: "контакты", suppliers_fin: "догов
 var BXLINK = "https://kvantpro.bitrix24.ru/crm/company/details/";
 var ШАГ = 200;
 var данные = null, отфильтровано = [], показано = 0, отбор = "все";
+// Имя компании по ключу портала. В снимке оно лежит ОДИН раз, в companies:
+// повторённое в каждом из 18 тысяч предложений, оно занимало бы сотни килобайт
+// и расходилось бы с реестром при первом же переименовании.
+var имя_компании = {};
 var $ = function (id) { return document.getElementById(id); };
 
 function текст(el, v) { el.textContent = v == null ? "" : String(v); return el; }
@@ -398,8 +402,9 @@ function открыть(p) {
   (p.list || []).forEach(function (o) {
     var tr = document.createElement("tr");
     var td = узел("td");
-    if (o.ent_name) {
-      var a = узел("a", null, o.ent_name);
+    var имя = o.co ? имя_компании[o.co] : null;
+    if (имя) {
+      var a = узел("a", null, имя);
       a.href = "/suppliers";
       td.appendChild(a);
     } else if (o.co) {
@@ -454,6 +459,7 @@ function итог(значение_, подпись) {
 }
 
 function показать() {
+  (данные.companies || []).forEach(function (c) { if (c.name) имя_компании[c.co] = c.name; });
   var t = данные.totals || {};
   var box = $("totals");
   box.textContent = "";
