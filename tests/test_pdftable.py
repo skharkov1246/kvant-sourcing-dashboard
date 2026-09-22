@@ -33,9 +33,11 @@ pypdf умеет extract_text(extraction_mode="layout") — отступы со�
 """
 from __future__ import annotations
 
-import io
+import importlib.util
 import sys
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "library"))
@@ -43,6 +45,16 @@ sys.path.insert(0, str(ROOT / "library"))
 import indexer  # noqa: E402
 import pdftable  # noqa: E402
 import quotes  # noqa: E402
+
+# ЗАЧЕМ ЯВНЫЙ ПРОПУСК. Без pypdf rows_from_pdf возвращает пустой список — это
+# правильное поведение разбора (файл не теряется, идёт текстовым путём), но тест
+# от него падает тремя непонятными утверждениями вместо одного внятного пропуска.
+# Так и вышло на гейте: локально pypdf стоял, в гейте — нет, и причина «шапка не
+# опознана» отправляла искать ошибку в разметке колонок. Теперь pypdf стоит и в
+# гейте, а пропуск остаётся страховкой: он говорит, ЧЕГО не хватает.
+нужен_pypdf = pytest.mark.skipif(
+    importlib.util.find_spec("pypdf") is None,
+    reason="pypdf не установлен: цепочку от байтов до цены проверить нечем")
 
 
 def мини_pdf(строки: list[str], кегль: int = 9) -> bytes:
@@ -108,6 +120,7 @@ def _разобрать():
     return rows, hi, cols
 
 
+@нужен_pypdf
 def test_шапка_опознана_и_колонки_цены_найдены():
     """Ловушки 1 и 2: шапка должна найтись, и цена — своей колонкой."""
     rows, hi, cols = _разобрать()
@@ -123,6 +136,7 @@ def test_шапка_опознана_и_колонки_цены_найдены()
     assert cols.get("unit") == 4, "колонкой единицы должна быть Unit, а не Unit Price"
 
 
+@нужен_pypdf
 def test_цена_читается_из_колонки_а_не_выводится_делением():
     """Главное, ради чего табличный путь и заведён."""
     rows, hi, cols = _разобрать()
@@ -148,6 +162,7 @@ def test_цена_читается_из_колонки_а_не_выводитс�
         assert ц["lead_days"] == срок
 
 
+@нужен_pypdf
 def test_проза_не_становится_позицией_из_обрывков():
     """Ловушка 3: строка условий идёт одной ячейкой, а не тремя обрывками."""
     rows, _hi, _cols = _разобрать()
@@ -187,6 +202,7 @@ def test_без_выравнивания_таблицы_нет():
     assert pdftable.строки_в_таблицу("одна строка и всё") == []
 
 
+@нужен_pypdf
 def test_битый_pdf_не_роняет_разбор():
     """Не PDF, обрезанный PDF, пустые байты — пустой список, а не исключение."""
     assert indexer.rows_from_pdf(b"") == []
