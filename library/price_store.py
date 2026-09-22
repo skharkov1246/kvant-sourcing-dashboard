@@ -20,7 +20,15 @@ FEED = "разбор КП"
 КОЛОНКИ = ("segment_id", "item_name", "part_number", "oem", "price", "currency",
            "basis", "qty", "qty_unit", "source_url", "rfq_id", "rfq_company",
            "rfq_brands", "lead_days", "source", "feed", "confidence", "note",
-           "price_date")
+           "price_date",
+           # Коммерческие условия предложения — распоряжение владельца 22.09.2026.
+           # Сумма хранится, а не только участвует в расчёте цены: «цена ×
+           # количество = сумма» — единственная самопроверка ценовой строки.
+           "total", "make_days", "pay_terms", "pay_advance_pct",
+           # Откуда взято каждое условие. «нет» значит «искали в строке и в тексте
+           # файла, не написано» — то есть верифицированное отсутствие, а не
+           # пустота от того, что разбор не дошёл (library/offer_terms.py).
+           "basis_src", "pay_src", "lead_src", "make_src")
 
 ВСТАВКА = f"""
 insert into lib_prices
@@ -36,15 +44,30 @@ _ФАЙЛ = КОЛОНКИ.index("source_url")
 
 
 def строка(поз: dict, ц: dict, обрезать) -> tuple:
-    """Позиция плюс её ценовая часть → кортеж ровно под КОЛОНКИ."""
+    """Позиция плюс её ценовая часть → кортеж ровно под КОЛОНКИ.
+
+    БАЗИС И СРОК БЕРУТСЯ ИЗ СВОДА, А НЕ ИЗ ЦЕНОВОЙ ЧАСТИ. Свод (offer_terms.свести)
+    знает и колонку позиции, и общие условия КП, и то, что поле проверено дважды и
+    отсутствует. Ценовая часть знает только свою строку, поэтому её базис и срок —
+    лишь одно из слагаемых свода. Свода нет (старый вызов, разбор без условий) —
+    работают значения ценовой части, и поведение остаётся прежним.
+    """
+    свод = поз.get("_условия") or {}
+    базис = свод.get("basis", ц.get("basis")) if свод else ц.get("basis")
+    срок = свод.get("lead_days", ц.get("lead_days")) if свод else ц.get("lead_days")
     return (поз.get("segment_id"), обрезать(поз.get("item_name"))[:500],
             обрезать(поз.get("part_number"))[:120],
             обрезать(поз.get("oem"))[:200] or None,
-            ц["price"], ц["currency"], ц["basis"], поз.get("qty"),
+            ц["price"], ц["currency"], базис, поз.get("qty"),
             обрезать(поз.get("unit"))[:40], поз["source_file"], поз.get("deal_id"),
             поз.get("company"), обрезать(поз.get("brands"))[:200] or None,
-            ц["lead_days"], ИСТОЧНИК, FEED, ц["confidence"],
-            обрезать(ц.get("note"))[:300] or None, None)
+            срок, ИСТОЧНИК, FEED, ц["confidence"],
+            обрезать(ц.get("note"))[:300] or None, None,
+            ц.get("total"), свод.get("make_days"),
+            обрезать(свод.get("pay_terms"))[:120] or None,
+            свод.get("pay_advance_pct"),
+            свод.get("basis_src"), свод.get("pay_terms_src"),
+            свод.get("lead_days_src"), свод.get("make_days_src"))
 
 
 def записать(cur, буфер: list[tuple], execute_values) -> None:
@@ -68,7 +91,9 @@ def записать(cur, буфер: list[tuple], execute_values) -> None:
 # подсказку читают в момент падения ночного прогона, и устаревшая подсказка
 # отправляет чинить не то: до 21.09.2026 она называла три колонки из пяти.
 ДОБАВЛЕННЫЕ_МИГРАЦИЕЙ = ("feed", "lead_days", "rfq_id", "rfq_company",
-                         "oem", "rfq_brands")
+                         "oem", "rfq_brands", "total", "make_days", "pay_terms",
+                         "pay_advance_pct", "basis_src", "pay_src", "lead_src",
+                         "make_src")
 
 ПОДСКАЗКА = ("запись цен не прошла — вероятно, в lib_prices нет колонок "
              + ", ".join(ДОБАВЛЕННЫЕ_МИГРАЦИЕЙ)

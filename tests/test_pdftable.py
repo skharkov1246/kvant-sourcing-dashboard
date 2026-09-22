@@ -228,3 +228,136 @@ def test_чужой_срок_не_становится_сроком_постав
     # И если в шапке оба, берётся именно срок поставки.
     assert quotes.колонки_цены(["№", "Цена", "Сумма", "Срок оплаты",
                                 "Срок поставки"]).get("lead") == 4
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ЦЕПОЧКА ЦЕЛИКОМ: БАЙТЫ PDF → ЦЕНА С КОММЕРЧЕСКИМИ УСЛОВИЯМИ
+#
+# Распоряжение владельца, 22.09.2026: «Очень важно всегда искать в каждом входящем
+# офере сопоставление кодов, цены, цены за штуку, суммы, базис поставки, условия
+# оплаты, срок производства, срок поставки. Если их нет, нужно перепроверять дважды
+# и писать, что это не отсутствует, а верифицировано отсутствует».
+#
+# Здесь проверяется, что всё это доезжает до строки, которая ложится в базу, — а не
+# только что отдельные разборщики умеют каждый своё.
+
+КП_С_УСЛОВИЯМИ = [
+    "                    QUOTATION No. 114 dated 18.09.2026",
+    "",
+    " No  Description               Part No      Qty  Unit  Unit Price, USD   Amount, USD",
+    " 1   Roller bearing            22315 EK       4  pcs           312,50      1 250,00",
+    " 2   Mechanical seal           TRZ-4471/2    10  pcs            85,00        850,00",
+    " 3   Spacer ring               6205-2RS       2  pcs            47,25         94,50",
+    " 4   Rotor shaft assembly      NM-125/07      1  pcs        12 400,00     12 400,00",
+    "",
+    " Terms of delivery: DAP Moscow.",
+    " Payment terms: 30/70 - 30% in advance, 70% against documents.",
+    " Production time 8 weeks.",
+]
+
+
+@нужен_pypdf
+def test_цепочка_целиком_условия_из_блока_под_таблицей():
+    """Владелец: «бывает, что в конце предложения вообще цифра».
+
+    Базис, оплата и срок производства написаны ОДИН РАЗ под таблицей, колонок для
+    них в таблице нет. Прежде такое КП давало цену без единого условия — при том,
+    что в файле всё написано.
+    """
+    from library import offer_terms, price_store
+
+    rows = indexer.rows_from_pdf(мини_pdf(КП_С_УСЛОВИЯМИ))
+    hi, cols = indexer.header_map(rows)
+    assert hi >= 0
+    цк = quotes.колонки_цены(rows[hi])
+    вк = quotes.валюта_заголовка(rows[hi], цк)
+
+    # Позиции с ценой — как их собирает разбор.
+    позиции = []
+    for r in rows[hi + 1:]:
+        q = quotes.число_из(r[cols["qty"]])
+        ц = quotes.цена_строки(r, цк, q, вк)
+        if ц is None:
+            continue
+        позиции.append({"item_name": r[cols["item_name"]],
+                        "part_number": r[cols["part_number"]], "qty": q,
+                        "unit": r[cols.get("unit", 0)], "source_file": "F-1",
+                        "_цена": ц, "_из_строки": offer_terms.из_строки(r, цк)})
+    assert len(позиции) == 4
+
+    # Полный текст файла — тот же, что собирает табличный путь.
+    весь = "\n".join(" ".join(c for c in r if c) for r in rows)
+    indexer.применить_условия(позиции, весь)
+
+    for поз in позиции:
+        св = поз["_условия"]
+        # Из блока под таблицей: базис, оплата с долей аванса, срок производства.
+        assert (св["basis"], св["basis_src"]) == ("DAP", offer_terms.ФАЙЛ)
+        assert св["pay_terms"] == "30/70 против документов"
+        assert св["pay_terms_src"] == offer_terms.ФАЙЛ
+        assert св["pay_advance_pct"] == 30
+        assert (св["make_days"], св["make_days_src"]) == (56, offer_terms.ФАЙЛ)
+        # Срока ПОСТАВКИ в этом КП нет ни в колонке, ни в тексте. Искали дважды —
+        # значит это верифицированное отсутствие, а не наш недочёт.
+        assert (св["lead_days"], св["lead_days_src"]) == (None, offer_terms.НЕТ)
+
+    # И всё это доезжает до строки, которая ложится в базу.
+    поз = позиции[0]
+    кортеж = price_store.строка(поз, поз["_цена"], lambda x: (x or ""))
+    по = dict(zip(price_store.КОЛОНКИ, кортеж))
+    assert по["price"] == 312.50
+    assert по["total"] == 1250.00          # сумма хранится, а не только считается
+    assert по["currency"] == "USD"
+    assert по["part_number"] == "22315 EK"
+    assert по["basis"] == "DAP" and по["basis_src"] == offer_terms.ФАЙЛ
+    assert по["pay_terms"] == "30/70 против документов" and по["pay_advance_pct"] == 30
+    assert по["make_days"] == 56 and по["make_src"] == offer_terms.ФАЙЛ
+    assert по["lead_days"] is None and по["lead_src"] == offer_terms.НЕТ
+    # Самопроверка ценовой строки: цена × количество = сумма. Именно ради неё
+    # сумма и хранится — задним числом её проверить было нечем.
+    assert abs(по["price"] * по["qty"] - по["total"]) < 0.01
+
+
+@нужен_pypdf
+def test_колонка_позиции_главнее_общих_условий_файла():
+    """Своя колонка — про эту позицию, общие условия — про все сразу."""
+    from library import offer_terms
+
+    кп = list(КП_С_УСЛОВИЯМИ)
+    кп[2] = (" No  Description               Part No      Qty  Unit  "
+             "Unit Price, USD   Amount, USD   Delivery")
+    кп[3] = (" 1   Roller bearing            22315 EK       4  pcs           "
+             "312,50      1 250,00   2 weeks")
+    кп[4] = (" 2   Mechanical seal           TRZ-4471/2    10  pcs            "
+             "85,00        850,00   in stock")
+    кп[5] = (" 3   Spacer ring               6205-2RS       2  pcs            "
+             "47,25         94,50   4 weeks")
+    кп[6] = (" 4   Rotor shaft assembly      NM-125/07      1  pcs        "
+             "12 400,00     12 400,00   6 weeks")
+    rows = indexer.rows_from_pdf(мини_pdf(кп))
+    hi, cols = indexer.header_map(rows)
+    цк = quotes.колонки_цены(rows[hi])
+    assert "lead" in цк, "колонка Delivery должна опознаться как срок поставки"
+
+    позиции = [{"source_file": "F-1", "_из_строки": offer_terms.из_строки(r, цк)}
+               for r in rows[hi + 1:hi + 5]]
+    весь = "\n".join(" ".join(c for c in r if c) for r in rows)
+    indexer.применить_условия(позиции, весь)
+    сроки = [(p["_условия"]["lead_days"], p["_условия"]["lead_days_src"])
+             for p in позиции]
+    # Сроки из своих колонок: 2 недели, склад, 4 недели, 6 недель.
+    assert сроки == [(14, offer_terms.СТРОКА), (0, offer_terms.СТРОКА),
+                     (28, offer_terms.СТРОКА), (42, offer_terms.СТРОКА)]
+    # А базис и оплата по-прежнему из блока под таблицей — колонок для них нет.
+    assert позиции[0]["_условия"]["basis_src"] == offer_terms.ФАЙЛ
+
+
+@нужен_pypdf
+def test_без_текстового_слоя_условия_не_проверены_а_не_отсутствуют():
+    """Скан — наш недочёт, а не факт о предложении: вопрос к разборщику."""
+    from library import offer_terms
+    позиции = [{"source_file": "F-1"}]
+    indexer.применить_условия(позиции, "")
+    св = позиции[0]["_условия"]
+    for поле in offer_terms.ПОЛЯ:
+        assert св[поле + "_src"] == offer_terms.НЕ_ПРОВЕРЕНО, поле

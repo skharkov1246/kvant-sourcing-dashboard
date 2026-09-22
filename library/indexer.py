@@ -39,6 +39,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_КОРЕНЬ, "scripts"))
 sys.path.insert(0, _КОРЕНЬ)          # bitrix_client лежит в корне
 import docfilter  # noqa: E402  (после sys.path)
+import offer_terms  # noqa: E402  (базис, оплата, сроки из КП)
 import pdftable  # noqa: E402  (таблица из PDF по выравниванию)
 import quotes  # noqa: E402  (цена из КП поставщика)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
@@ -423,6 +424,9 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
         # становится: из неё цена выводится делением на количество, и такая
         # строка помечена как выведенная (library/quotes.py).
         rec["_цена"] = quotes.цена_строки(row, цк, rec.get("qty"), вк) if цк else None
+        # Условия из СВОИХ колонок этой позиции: базис, оплата, срок изготовления,
+        # срок поставки. Они главнее общих условий файла — они про эту позицию.
+        rec["_из_строки"] = offer_terms.из_строки(row, цк) if цк else None
         out.append(rec)
         if len(out) >= 3000:
             break
@@ -639,6 +643,28 @@ def download(fo: dict) -> bytes | None:
     return None
 
 
+def применить_условия(items: list[dict], весь_текст: str) -> None:
+    """Свод коммерческих условий по каждой позиции КП: значение и ОТКУДА оно.
+
+    ОТДЕЛЬНОЙ ФУНКЦИЕЙ, ЧТОБЫ ЕЁ МОЖНО БЫЛО ПРОВЕРИТЬ. Внутри handle() этот шаг
+    стоит за скачиванием файла, и тест на него пришлось бы писать через подмену
+    сети — то есть проверять копию логики вместо самой логики.
+
+    ОБЩИЕ УСЛОВИЯ РАЗБИРАЮТСЯ ОДИН РАЗ НА ФАЙЛ. Блок условий под таблицей один, а
+    позиций в КП бывают сотни.
+
+    Пустое поле без источника означало разом «в КП не указано» (факт о
+    предложении — можно спросить поставщика) и «разбор не дошёл» (наш недочёт —
+    спрашивать надо разборщик). Это разные выводы и разные действия, поэтому
+    источник пишется явно (library/offer_terms.py).
+    """
+    общие = offer_terms.условия_файла(весь_текст or "")
+    был_текст = bool((весь_текст or "").strip())
+    for it in items:
+        it["_условия"] = offer_terms.свести(it.get("_из_строки") or {},
+                                            общие, был_текст)
+
+
 def handle(ref: dict) -> tuple[dict, list[dict]]:
     fo = ref["fo"]
     fid = str(fo.get("id") or fo.get("ID"))
@@ -687,9 +713,16 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         return rec, []
 
     items: list[dict] = []
+    # ПОЛНЫЙ ТЕКСТ ФАЙЛА — ОТДЕЛЬНО ОТ text. text у табличного пути склеен из
+    # строк-позиций, а блок условий («Условия поставки: DAP Москва. Оплата 30/70»)
+    # стоит ПОД таблицей и в позиции не попадает. Искать в text общие условия
+    # значит не находить их никогда — при том, что в файле они написаны, и это
+    # обычная форма КП (владелец: «бывает, что в конце предложения вообще цифра»).
+    весь_текст = ""
     if rows:
         items = items_from_rows(rows)
         text = " ".join(r.get("_row", "") for r in items)[:200000]
+        весь_текст = "\n".join(" ".join(c for c in r if c) for r in rows)[:400000]
         rec["parse_path"] = "таблица"
         rec["header_found"] = header_map(rows)[0] >= 0
     elif text:
@@ -710,6 +743,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
             prose_n += bool(pr and not sp)
         rec["parse_path"], rec["header_found"] = "текст", False
         rec["text_lines"], rec["item_lines"] = len(lines), spec_n
+        весь_текст = text[:400000]
         verdict = docfilter.file_verdict(len(lines), spec_n, prose_n)
         if verdict == "документация" and SPECGATE:
             rec["chars"] = len(text)
@@ -759,6 +793,8 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         # Валюта файла вместо ненайденной; оговорка и уверенность правятся там же,
         # чтобы в строке не стояли разом «не названа» и «взята по файлу».
         quotes.подставить_валюту(it.get("_цена"), вф)
+    if SOURCE == "rfq":
+        применить_условия(items, весь_текст)
     return rec, items
 
 
