@@ -132,7 +132,8 @@ dt{font-size:11px;color:var(--dim);margin:0 0 3px}dd{margin:0;font-size:14px;ove
         <table>
           <caption class="sr-only">Номенклатурные позиции</caption>
           <thead><tr><th scope="col">Номер</th><th scope="col">Наименование</th>
-            <th scope="col">Предлагали</th><th scope="col">Изготовитель</th>
+            <th scope="col">Спрашивали</th><th scope="col">Предлагали</th>
+            <th scope="col">Изготовитель</th>
             <th scope="col">Машина</th><th scope="col">Чем закрыть</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
@@ -197,6 +198,26 @@ function плитка(подпись, v, источник, пусто) {
   return box;
 }
 
+// Вес позиции словами. «Не спрашивали» и «спрашивали ноль раз» — разные вещи:
+// первое означает, что в спросе позиции нет вовсе.
+function вес(d) {
+  if (!d || !d.deals) return узел("span", "none", "Не спрашивали");
+  var el = узел("span", "rfq");
+  el.appendChild(узел("b", null, число(d.deals)));
+  el.appendChild(document.createTextNode(" "
+    + склонение(d.deals, "сделка", "сделки", "сделок")));
+  // Количество печатается ТОЛЬКО в одной единице: «10 штук» и «5 килограммов» в
+  // сумме не дают «15» ничего — то же правило, что у валют.
+  if (typeof d.qty === "number") {
+    el.appendChild(узел("span", "thin", " · " + число(d.qty)));
+  } else if (d.units > 1) {
+    el.appendChild(узел("span", "thin", " · единиц " + число(d.units) + ", сумма не дана"));
+  }
+  el.title = "сделок " + d.deals + ", строк спроса " + d.rows
+    + (d.units > 1 ? ", единиц измерения " + d.units + " — количество не суммируется" : "");
+  return el;
+}
+
 function метки(список, класс) {
   var frag = document.createDocumentFragment();
   (список || []).forEach(function (t) { frag.appendChild(узел("span", класс || "pill", t)); });
@@ -210,7 +231,13 @@ var ОТБОРЫ = [
   ["выбор", "Есть выбор: 2+ компании", function (p) { return p.co >= 2; }],
   ["сравнимые", "Сравнимы по цене", function (p) { return p.cmp; }],
   ["каталог", "Есть в каталоге", function (p) { return p.cat; }],
-  ["без", "Одно предложение", function (p) { return p.co <= 1; }]
+  ["без", "Одно предложение", function (p) { return p.co <= 1; }],
+  // ЭТО И ЕСТЬ СПИСОК РАБОТЫ. Позиция, о которой нас спрашивали, а предложение
+  // одно, — прямой повод запросить второго поставщика. Порядок по спросу уже
+  // задан сборкой, поэтому отбор сразу показывает, с чего начинать.
+  ["работа", "Спрашивали, а выбора нет", function (p) {
+    return p.co <= 1 && p.demand && p.demand.deals;
+  }]
 ];
 
 function строка(p) {
@@ -222,6 +249,11 @@ function строка(p) {
   td.appendChild(b);
   tr.appendChild(td);
   tr.appendChild(узел("td", null, p.name || "—"));
+  // СКОЛЬКО РАЗ СПРАШИВАЛИ НАС. По этому числу и выстроен порядок: рассылать
+  // запросы вторым поставщикам надо от самых спрашиваемых, а не по алфавиту.
+  var спрос = узел("td");
+  спрос.appendChild(вес(p.demand));
+  tr.appendChild(спрос);
   var предл = узел("td");
   var сколько = узел("span", p.co >= 2 ? "choice" : "single",
     число(p.co) + " " + склонение(p.co, "компания", "компании", "компаний"));
@@ -316,6 +348,10 @@ function открыть(p) {
   card.appendChild(back);
   card.appendChild(узел("h2", null, p.n || p.k));
   card.appendChild(узел("span", "num", p.name || "наименование не знаем"));
+  var шапка = узел("p", "field-note");
+  шапка.appendChild(document.createTextNode("Спрашивали: "));
+  шапка.appendChild(вес(p.demand));
+  card.appendChild(шапка);
 
   // ЧЕТЫРЕ УТВЕРЖДЕНИЯ ОБ ИЗГОТОВИТЕЛЕ — ЧЕТЫРЬМЯ ПЛИТКАМИ. Каждое подписано
   // тем, кто его сделал: разница между «так сказал поставщик» и «так в нашем
@@ -468,6 +504,9 @@ function показать() {
   box.appendChild(итог(t.comparable, "сравнимы по цене"));
   box.appendChild(итог(t.companies, "компаний предлагали"));
   box.appendChild(итог(t.in_catalog, "нашлись в каталоге"));
+  if (typeof t.no_choice_with_demand === "number") {
+    box.appendChild(итог(t.no_choice_with_demand, "спрашивали, а выбора нет"));
+  }
 
   // ОГОВОРКА СТОИТ НАВЕРХУ, А НЕ В СНОСКЕ. Доля позиций с одним предложением —
   // главное ограничение этой страницы, и узнать о нём надо до чтения таблицы.

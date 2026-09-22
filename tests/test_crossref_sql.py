@@ -52,6 +52,9 @@ create table sup_identifier (sup_id text references sup_entity(id), kind text no
                              value text not null, value_norm text not null,
                              status text not null default 'stated',
                              primary key (sup_id, kind, value_norm));
+create table lib_demand (
+  id bigserial primary key, deal_id text, item_name text not null,
+  part_number text, qty numeric, unit text);
 create table lib_prices (
   id bigserial primary key, part_number text, item_name text, feed text,
   rfq_company text, rfq_id text, oem text, rfq_brands text, price numeric,
@@ -79,6 +82,23 @@ insert into lib_part_suppliers values ('6205', 1, 'подшипники', null, 
 insert into sup_entity values ('KV-S-000001-1', 'Компания');
 insert into sup_identifier (sup_id, kind, value, value_norm)
   values ('KV-S-000001-1', 'bitrix', '101', '101');
+-- СПРОС. Веса подобраны так, чтобы ПОРЯДОК позиций без выбора был проверяем:
+-- nutm8 — две сделки, seal1 — одна сделка две строки, bolt8 — одна сделка одна
+-- строка. Будь у всех одинаковый вес, порядок нельзя было бы отличить от
+-- случайного, и его снятие прошло бы мимо тестов.
+--
+-- 6205 спрашивали две сделки; у одной штуки, у другой килограммы — сумму по
+-- такой позиции давать нельзя.
+insert into lib_demand (deal_id, item_name, part_number, qty, unit) values
+  ('D-1', 'Подшипник',  '6205',        10, 'шт'),
+  ('D-1', 'Подшипник',  '62-05',        2, 'шт'),
+  ('D-2', 'Подшипник',  '6205',         5, 'кг'),
+  ('D-3', 'Уплотнение', 'SEAL-1',       7, 'шт'),
+  ('D-3', 'Уплотнение', 'seal1',        3, 'шт'),
+  ('D-4', 'Болт',       'BOLT-8',      50, 'шт'),
+  ('D-5', 'Гайка',      'NUT-M8',     100, 'шт'),
+  ('D-6', 'Гайка',      'NUT-M8',     200, 'шт');
+
 insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, oem,
                         rfq_brands, price, currency, qty, qty_unit, basis, lead_days,
                         confidence, price_date) values
@@ -124,7 +144,7 @@ def наборы():
             cur.execute(КОРПУС)
             for sql in (crossref.ПРЕДЛОЖЕНИЯ_SQL, crossref.КАТАЛОГ_SQL,
                         crossref.АНАЛОГИ_SQL, crossref.МАШИНЫ_SQL,
-                        crossref.ИЗГОТОВИТЕЛИ_SQL):
+                        crossref.ИЗГОТОВИТЕЛИ_SQL, crossref.СПРОС_SQL):
                 cur.execute(sql, (crossref.FEED,))
                 собрано.append(cur.fetchall())
         yield собрано
@@ -140,7 +160,7 @@ def снимок(наборы):
 
 
 def test_каждый_запрос_вернул_ожидаемое_число_строк(наборы):
-    предложения, каталог, аналоги, машины, изготовители = наборы
+    предложения, каталог, аналоги, машины, изготовители, спрос = наборы
     # Пять строк потока «разбор КП» с непустым артикулом; строка потока «прайс»
     # не считается. Если запрос перестанет фильтровать по feed, здесь будет 6.
     assert len(предложения) == 5
@@ -155,7 +175,10 @@ def test_каждый_запрос_вернул_ожидаемое_число_с
 def test_снимок_собирается_из_живых_строк(снимок):
     t = снимок["totals"]
     assert t == {"positions": 4, "with_choice": 1, "comparable": 1, "in_catalog": 2,
-                 "companies": 2, "companies_resolved": 1, "offers": 5}
+                 "companies": 2, "companies_resolved": 1, "offers": 5,
+                 # Без выбора и со спросом: seal1, bolt8, nutm8. 6205 имеет
+                 # выбор из двух компаний и в список работы не идёт.
+                 "no_choice_with_demand": 3}
 
 
 def test_позиция_несёт_всё_обещанное_карточкой(снимок):
@@ -183,6 +206,56 @@ def test_позиция_несёт_всё_обещанное_карточкой(
     assert q["cat"] is False
     assert q["alts"] == [] and q["models"] == [] and q["makers"] == []
     assert q["brands"] == ["PARKER"]        # «PARKER,» — один бренд, не два
+
+
+def test_вес_позиции_считается_спросом_а_не_нашими_запросами(снимок):
+    """Значимость позиции — сколько раз спрашивали НАС, а не сколько мы рынок.
+
+    Восемь процентов позиций имеют выбор из двух поставщиков; по остальным
+    придётся рассылать запросы вторым поставщикам, и порядок должны задавать
+    деньги. Число карточек запроса для этого не годится: мы спрашивали по одному
+    разу и о позиции из тридцати спецификаций, и о позиции из одной.
+
+    Количество суммируется ТОЛЬКО в одной единице: «10 штук» и «5 килограммов» в
+    сумме не дают «15» ничего — то же правило, по которому цены не складываются
+    через валюты.
+    """
+    поз = {p["k"]: p for p in снимок["positions"]}
+
+    # 6205: две сделки, три строки спроса, ДВЕ единицы — суммы нет.
+    d = поз["6205"]["demand"]
+    assert d["deals"] == 2
+    assert d["rows"] == 3
+    assert d["units"] == 2
+    assert d["qty"] is None, "сумма выдана при двух разных единицах"
+
+    # seal1: одна сделка, две строки, одна единица — сумма законна.
+    d = поз["seal1"]["demand"]
+    assert d["deals"] == 1 and d["rows"] == 2 and d["units"] == 1
+    assert d["qty"] == 10.0
+
+    # bolt8: одна сделка, одна строка — самый малый вес из трёх.
+    assert поз["bolt8"]["demand"]["deals"] == 1
+    assert поз["bolt8"]["demand"]["rows"] == 1
+
+    # Позиции без выбора, о которых нас спрашивали, — это список работы.
+    # Их три: seal1, bolt8, nutm8. 6205 выбор имеет и в список не идёт.
+    assert снимок["totals"]["no_choice_with_demand"] == 3
+
+
+def test_позиции_без_выбора_идут_по_спросу(снимок):
+    """Порядок внутри «без выбора» задаёт спрос, а не алфавит.
+
+    Рассылать запросы вторым поставщикам придётся по порядку, и позиция из двух
+    спецификаций важнее позиции из одной. Без этой проверки снятие спроса из
+    сортировки прошло бы незаметно: страница выглядела бы так же.
+    """
+    порядок = [p["k"] for p in снимок["positions"]]
+    # 6205 первая: у неё выбор из двух компаний.
+    assert порядок[0] == "6205"
+    # Дальше по спросу: nutm8 (две сделки), seal1 (одна сделка, две строки),
+    # bolt8 (одна сделка, одна строка).
+    assert порядок[1:] == ["nutm8", "seal1", "bolt8"]
 
 
 def test_вторая_ступень_сцепки_берётся_и_только_однозначная(снимок):
