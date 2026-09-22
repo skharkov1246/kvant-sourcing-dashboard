@@ -12,56 +12,13 @@
 //   · компания, не сведённая с реестром, ведёт прямой ссылкой в Битрикс;
 //   · закрытое правом поле показывается как «нет доступа», а не как пустота.
 import fs from "node:fs";
-import vm from "node:vm";
 import test from "node:test";
 import assert from "node:assert/strict";
+// Мини-DOM вынесен в общий модуль: та же подделка понадобилась странице
+// счётчиков, а две расходящиеся подделки DOM не заметит никто.
+import { открыть } from "./minidom.mjs";
 
 const html = fs.readFileSync(new URL("../../public/nomenclature.html", import.meta.url), "utf8");
-const source = html.split("<script>")[1].split("</script>")[0];
-
-const разметка = html.split("<script>")[0];
-const идентификаторы = [];
-for (const m of разметка.matchAll(/<([a-z][a-z0-9]*)\b([^>]*)>/gi)) {
-  const id = m[2].match(/\bid="([^"]+)"/);
-  if (!id) continue;
-  идентификаторы.push({ id: id[1], tag: m[1], hidden: /\shidden(?:\s|>|$)/.test(m[2]) });
-}
-
-class Element {
-  constructor(tag) {
-    this.tagName = String(tag).toUpperCase();
-    this.children = [];
-    this.attrs = {};
-    this.events = {};
-    this.hidden = false;
-    this.value = "";
-    this._text = "";
-    this.className = "";
-  }
-  set textContent(v) { this._text = v == null ? "" : String(v); this.children = []; }
-  get textContent() { return this._text + this.children.map((c) => c.textContent).join(""); }
-  appendChild(node) {
-    // Настоящий DOM разворачивает DocumentFragment при вставке и опустошает его.
-    // Без этого список из трёх строк выглядел бы одним узлом.
-    if (node instanceof Fragment) { this.children.push(...node.children); node.children = []; return node; }
-    this.children.push(node);
-    return node;
-  }
-  setAttribute(k, v) { this.attrs[k] = String(v); }
-  getAttribute(k) { return this.attrs[k]; }
-  addEventListener(k, fn) { (this.events[k] ||= []).push(fn); }
-  async fire(k) { for (const fn of this.events[k] || []) await fn({ preventDefault() {} }); }
-  querySelectorAll(sel) {
-    const теги = sel.split(",").map((t) => t.trim().toUpperCase());
-    return потомки(this).filter((e) => теги.includes(e.tagName));
-  }
-  focus() {}
-  scrollIntoView() {}
-}
-class Fragment extends Element {
-  constructor() { super("#fragment"); }
-}
-function потомки(root) { return [root, ...root.children.flatMap(потомки)]; }
 
 const СНИМОК = {
   version: 1,
@@ -110,37 +67,7 @@ const СНИМОК = {
 };
 
 async function открыть_страницу(снимок = СНИМОК, ответ = null) {
-  const карта = {};
-  for (const о of идентификаторы) {
-    const el = new Element(о.tag);
-    el.id = о.id;
-    el.hidden = о.hidden;
-    карта[о.id] = el;
-  }
-  const создано = [];
-  const doc = {
-    body: new Element("body"),
-    getElementById: (id) => карта[id] || null,
-    createElement: (tag) => { const e = new Element(tag); создано.push(e); return e; },
-    createDocumentFragment: () => new Fragment(),
-    createTextNode: (t) => Object.assign(new Element("#text"), { textContent: t }),
-  };
-  const обещания = [];
-  const context = {
-    document: doc, console, URL, encodeURIComponent,
-    fetch: (url) => {
-      const p = Promise.resolve(ответ || new Response(JSON.stringify(снимок),
-        { status: 200, headers: { "Content-Type": "application/json" } }));
-      обещания.push(p);
-      return p;
-    },
-  };
-  vm.createContext(context);
-  vm.runInContext(source, context);
-  // Скрипт читает снимок через fetch: даём микрозадачам дойти до отрисовки.
-  for (let i = 0; i < 20; i++) await Promise.resolve();
-  await new Promise((r) => setTimeout(r, 0));
-  return { карта, создано };
+  return открыть(html, { снимок, ответ });
 }
 
 test("страница рисует итоги и список", async () => {

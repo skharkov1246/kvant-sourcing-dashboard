@@ -617,11 +617,23 @@ const SUPPLIERS_MAX_BYTES = 8 * 1024 * 1024;
 // один секрет на два замка, и слабейший решал бы.
 const CROSSREF_KEY = "crossref:v1";
 
+// СЧЁТЧИКИ — ТОТ ЖЕ ЗАМОК, ХОТЯ СОДЕРЖИМОЕ БЕДНЕЕ. В counters:v1 лежат одни
+// агрегаты: сколько кодов мы спрашивали и по скольким пришла цена. Ни позиций,
+// ни компаний, ни сумм. Но «по девяноста трём процентам спроса цены нет» — это
+// про нашу работу с рынком, и раздавать её шире, чем номенклатуру, незачем;
+// заводить же под неё отдельное право значило бы разделить один секрет на два
+// замка, и слабейший решал бы. Свой предел размера — история замеров это сотни
+// точек по десятку чисел, мегабайт здесь означал бы ошибку публикатора.
+const COUNTERS_KEY = "counters:v1";
+const COUNTERS_MAX_BYTES = 1024 * 1024;
+
 function suppliersRoute(path) {
   if (["/suppliers", "/suppliers/", "/suppliers.html"].includes(path)) return "page";
   if (path === "/api/suppliers") return "api";
   if (["/nomenclature", "/nomenclature/", "/nomenclature.html"].includes(path)) return "nomenclature";
   if (path === "/api/crossref") return "crossref";
+  if (["/counters", "/counters/", "/counters.html"].includes(path)) return "counters";
+  if (path === "/api/counters") return "countersApi";
   // Маршрута публикации здесь нет намеренно: снимок кладёт scripts/publish_suppliers.py
   // прямо в KV через API Cloudflare — так же, как публикуется библиотека. Второй стек
   // разбора и проверки тела запроса в воркере не нужен, а /admin/suppliers ниже
@@ -637,7 +649,7 @@ function suppliersRoute(path) {
     } catch { break; }
   }
   decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
-  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$))/i
+  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$))/i
     .test(decoded) ? "invalid" : null;
 }
 
@@ -707,6 +719,20 @@ async function readCrossref(env) {
   // Снимка ещё нет — это состояние «публикатор не отработал», а не ошибка.
   if (raw == null) return { version: 1, positions: [], companies: [], totals: {} };
   if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > SUPPLIERS_MAX_BYTES) {
+    throw new Error("suppliers_invalid");
+  }
+  const value = JSON.parse(raw);
+  if (value.version !== 1) throw new Error("suppliers_invalid");
+  return value;
+}
+
+async function readCounters(env) {
+  const kv = aclStore(env);
+  if (!kv) throw new Error("suppliers_unavailable");
+  const raw = await kv.get(COUNTERS_KEY);
+  // Снимка ещё нет — состояние «публикатор не отработал», а не ошибка.
+  if (raw == null) return { version: 1, metrics: {} };
+  if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > COUNTERS_MAX_BYTES) {
     throw new Error("suppliers_invalid");
   }
   const value = JSON.parse(raw);
@@ -1113,9 +1139,20 @@ export default {
         return suppliersJson({ ...suppliersCut(snapshot, rights), admin: rights.admin,
           rights: rights.rights.filter((r) => r.startsWith("suppliers")) });
       }
-      if (suppliers === "nomenclature") {
+      // СЧЁТЧИКИ РЕЗКОЙ НЕ ТРОГАЮТСЯ. suppliersCut закрывает поля с контактами и
+      // деньгами, а здесь нет ни того, ни другого: только счёт кодов и строк.
+      // Пропускать агрегаты через резку значило бы сделать вид, что в них есть
+      // что закрывать, и завести поле {закрыто: …} там, где его нечем заполнить.
+      if (suppliers === "countersApi") {
+        let snapshot;
+        try { snapshot = await readCounters(env); }
+        catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
+        return suppliersJson({ ...snapshot, admin: rights.admin });
+      }
+      if (suppliers === "counters" || suppliers === "nomenclature") {
+        const файл = suppliers === "counters" ? "/counters.html" : "/nomenclature.html";
         try {
-          const asset = await env.ASSETS.fetch(new Request(url.origin + "/nomenclature.html", { headers: request.headers }));
+          const asset = await env.ASSETS.fetch(new Request(url.origin + файл, { headers: request.headers }));
           if (!asset.ok) return suppliersJson({ error: "suppliers_page_unavailable" }, 503);
           const headers = libraryHeaders(asset.headers);
           headers.set("Content-Type", "text/html; charset=utf-8");
@@ -1712,6 +1749,9 @@ function portalPage(who, rights, env) {
     // реестра: сорсер приходит с номером детали в руках чаще, чем с названием
     // компании, и заставлять его начинать с компании значит разворачивать
     // цепочку задом наперёд.
+    mine.push({ id: "counters", group: "work", name: "Счётчики",
+      href: "/counters",
+      note: "сколько кодов мы вывели на рынок и по скольким лежит цена поставщика; динамика по замерам" });
     mine.push({ id: "nomenclature", group: "work", name: "Номенклатура",
       href: "/nomenclature",
       note: "по позиции — кто давал предложение и за сколько, чей это номер, чем закрыть" });
