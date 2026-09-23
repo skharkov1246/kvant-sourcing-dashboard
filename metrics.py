@@ -140,6 +140,10 @@ def build(
             "buckets": buckets,
             "closed": closed,
             "kp": buckets["selected"],
+            # файл КП поставщика в карточке: предложение пришло. Стоит рядом со
+            # стадией «КП получено», потому что разрыв между ними и есть то,
+            # что лежит неразобранным лично у этого сорсера.
+            "quotes": sum(1 for r in items if r.get("_hasQuote")),
             "refusedCol": buckets["refused"] + buckets["other"],
             "noAnswer": buckets["no_answer"],
             "avgDays": _round(mean(durs)) if durs else 0,

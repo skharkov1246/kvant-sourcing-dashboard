@@ -644,3 +644,16 @@ def test_список_служебных_записей_переопределя
         else:
             os.environ["SERVICE_ACCOUNT_IDS"] = prev
         importlib.reload(config_mod)
+
+
+def test_у_сорсера_видно_файлы_кп_и_стадию_отдельно():
+    """Пришедшее предложение и принятое в работу — разные величины и у
+    человека тоже: разрыв показывает, что лежит неразобранным лично у него."""
+    from tests import fixture
+    m = fixture.build_metrics()
+    A = m["sourcersA"]
+    assert A, "в синтетике есть сорсеры с нагрузкой"
+    for s in A:
+        assert "quotes" in s, f"у {s['n']} нет счёта файлов КП"
+        assert 0 <= s["quotes"] <= s["c"]
+    assert sum(s["quotes"] for s in A) > 0, "в синтетике есть карточки с файлом КП"

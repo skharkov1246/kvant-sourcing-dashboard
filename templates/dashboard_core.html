@@ -506,13 +506,13 @@
 <div class="secttl"><b>2</b> · Конверсия по стадиям</div>
 <section class="card">
   <h2><span class="tag a">БЛОК A</span> Структура запросов по стадиям + результат</h2>
-  <div class="note">Цветная полоса — все запросы сорсера по стадиям. Закрытые раскладываются на <span class="q">КП/выбран</span> + <span style="color:var(--a2)">отказ</span> + <span class="nrc">молчание</span>. «Ср. срок» — дней от создания до смены стадии у закрытых.</div>
+  <div class="note">Цветная полоса — все запросы сорсера по стадиям. Закрытые раскладываются на <span class="q">КП/выбран</span> + <span style="color:var(--a2)">отказ</span> + <span class="nrc">молчание</span>. «Ср. срок» — дней от создания до смены стадии у закрытых. «Файл КП» — карточки, куда поставщик приложил предложение; «✓ КП» — стадия «КП получено». Разрыв между ними — предложения, которые пришли, но в работу не приняты.</div>
   <div class="legendrow">
     <span><i class="sw snew"></i>Новый</span><span><i class="sw ssent"></i>Отправлен</span><span><i class="sw sdlg"></i>Переписка/цена</span>
     <span><i class="sw ssel"></i>КП/выбран</span><span><i class="sw sref"></i>Отказ</span><span><i class="sw snr"></i>Молчание</span><span><i class="sw soth"></i>Прочее</span>
   </div>
   <table>
-    <thead><tr><th>Сорсер</th><th style="width:200px">Стадии (доля от всех)</th><th class="r">Закрыто</th><th class="r">✓ КП</th><th class="r">↩ Отказ</th><th class="r">✕ Молчание</th><th class="r">Ср. срок</th></tr></thead>
+    <thead><tr><th>Сорсер</th><th style="width:200px">Стадии (доля от всех)</th><th class="r">Закрыто</th><th class="r">Файл КП</th><th class="r">✓ КП</th><th class="r">↩ Отказ</th><th class="r">✕ Молчание</th><th class="r">Ср. срок</th></tr></thead>
     <tbody id="tbConv"></tbody>
     <tfoot id="tfConv"></tfoot>
   </table>
@@ -722,9 +722,11 @@ document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=
  const pc=v=>r.closed?` <small class="dimv">${Math.round(v/r.closed*100)}%</small>`:'';
  const cell=(v,clz)=> v>0?`<span class="${clz}">${v}</span>${pc(v)}`:`<span class="dimv">0</span>`;
  const out=b.sent+b.dialog+b.selected+b.refused+b.no_answer+b.other;
- return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td><td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
-const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,ref:0,nr:0});
-document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td></td><td class="r num">${tot.closed} / ${tot.c}</td><td class="r num q">${tot.kp}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r"></td></tr>`;
+ return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td>`
+ + `<td class="num r ${(r.quotes||0)>r.kp?'':'dimv'}" title="Карточек с файлом КП от поставщика: ${r.quotes||0}${(r.quotes||0)>r.kp?`, из них не переведено в «КП получено» ${(r.quotes||0)-r.kp}`:''}">${r.quotes||0}</td>`
+ + `<td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
+const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,q:t.q+(r.quotes||0),ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,q:0,ref:0,nr:0});
+document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td></td><td class="r num">${tot.closed} / ${tot.c}</td><td class="r num">${tot.q}</td><td class="r num q">${tot.kp}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r"></td></tr>`;
 
 // ---- отправлено vs создано (+ фейк)
 if (M.send && M.send.rows){
