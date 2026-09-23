@@ -439,16 +439,71 @@ def rows_from_docx(b: bytes) -> list[list[str]]:
     return out
 
 
-def text_from_pdf(b: bytes) -> str:
+#: Сколько страниц PDF читаем. Потолок стоял прибитым в двух местах сразу; теперь
+#: он один и задаётся входом прогона: спецификация на сто позиций бывает длиннее
+#: шестидесяти страниц, и обрыв на шестидесятой — это молчаливая потеря.
+СТРАНИЦ_PDF = int(os.environ.get("PDF_PAGES", "60") or 60)
+
+#: Сколько знаков на странице считать текстовым слоем. Страница скана даёт ноль
+#: или единицы знаков (номер листа, штамп), страница с текстом — сотни.
+ЗНАКОВ_НА_СТРАНИЦЕ = 40
+
+
+def страницы_pdf(b: bytes, *, layout: bool = False) -> tuple[list[str], int, int]:
+    """Текст постранично. Возвращает (страницы, всего страниц, сколько не прочлось).
+
+    ОДНА СТРАНИЦА НЕ УНОСИТ ФАЙЛ. Прежде сбой режима layout на любой странице
+    возвращал пустой список за ВЕСЬ файл, и уже прочитанные страницы
+    выбрасывались: шестидесятистраничная спецификация теряла всё из-за одной
+    битой страницы. Теперь непрочитанная страница даёт пустую строку и считается
+    отдельно, а прочие остаются.
+
+    ПОСТРАНИЧНЫЙ СЧЁТ НУЖЕН НЕ ТОЛЬКО ДЛЯ ЭТОГО. По нему виден СМЕШАННЫЙ PDF —
+    часть страниц текстовые, часть сканы. Такой файл сейчас теряется молча: одна
+    текстовая страница даёт chars > 0, файл получает «разобран», и отбор
+    распознавания (library/ocr.py) его не берёт НИКОГДА, а сканы в нём — это
+    позиции и цены, которых никто не увидит.
+    """
     try:
         from pypdf import PdfReader
         rd = PdfReader(io.BytesIO(b))
-        parts = []
-        for pg in rd.pages[:60]:
-            parts.append(pg.extract_text() or "")
-        return "\n".join(parts)
-    except Exception:
-        return ""
+    except Exception:                                                   # noqa: BLE001
+        return [], 0, 0
+    всего = len(rd.pages)
+    страницы: list[str] = []
+    потеряно = 0
+    for pg in rd.pages[:СТРАНИЦ_PDF]:
+        try:
+            if layout:
+                страницы.append(pg.extract_text(extraction_mode="layout") or "")
+            else:
+                страницы.append(pg.extract_text() or "")
+        except Exception:                                               # noqa: BLE001
+            # Режим layout есть не во всех версиях pypdf и спотыкается на отдельных
+            # страницах. Страница без него — не причина терять файл.
+            страницы.append("")
+            потеряно += 1
+    return страницы, всего, потеряно
+
+
+def счёт_страниц(страницы: list[str]) -> tuple[int, int]:
+    """Сколько страниц с текстовым слоем и сколько без него."""
+    с_текстом = sum(1 for s in страницы if len(s.strip()) >= ЗНАКОВ_НА_СТРАНИЦЕ)
+    return с_текстом, len(страницы) - с_текстом
+
+
+def text_from_pdf(b: bytes, rec: dict | None = None) -> str:
+    """Текст PDF. Попутно записывает постраничный счёт, если дана запись файла."""
+    страницы, всего, потеряно = страницы_pdf(b)
+    if rec is not None and всего:
+        с_текстом, без_текста = счёт_страниц(страницы)
+        rec["pdf_pages"] = всего
+        rec["pdf_pages_text"] = с_текстом
+        rec["pdf_pages_lost"] = потеряно
+        # СМЕШАННЫЙ PDF НАЗЫВАЕТСЯ ЗДЕСЬ, иначе его не отличить от текстового.
+        if с_текстом and без_текста:
+            rec["pdf_mixed"] = True
+    return "\n".join(страницы)
 
 
 def rows_from_pdf(b: bytes) -> list[list[str]]:
@@ -465,23 +520,21 @@ def rows_from_pdf(b: bytes) -> list[list[str]]:
     Пустой список — честный ответ «таблицы нет», и вызывающий идёт прежним путём.
     Решает не этот код, а header_map: без опознанной шапки таблица отвергается.
     """
+    страницы, всего, потеряно = страницы_pdf(b, layout=True)
+    if not страницы:
+        return []
+    if потеряно and потеряно < len(страницы):
+        # Часть страниц потеряна, но остальные читаются: прежде такой файл
+        # возвращал ноль строк целиком.
+        print(f"::warning::PDF: {потеряно} страниц из {len(страницы)} не дали "
+              f"выравнивания, таблица собрана по остальным", flush=True)
     try:
-        from pypdf import PdfReader
-        rd = PdfReader(io.BytesIO(b))
-        части = []
-        for pg in rd.pages[:60]:
-            try:
-                части.append(pg.extract_text(extraction_mode="layout") or "")
-            except Exception:
-                # Режим layout есть не во всех версиях pypdf и спотыкается на
-                # отдельных страницах. Страница без него — не причина терять файл.
-                return []
         # Ступень допуска выбирают ворота шапки: см. pdftable.ДОПУСКИ. Разрез,
         # не давший опознаваемой шапки, ниже отвергается целиком, поэтому
         # перебор ступеней ничем не рискует.
         return pdftable.строки_в_таблицу(
-            "\n".join(части), годится=lambda rows: header_map(rows)[0] >= 0)
-    except Exception:
+            "\n".join(страницы), годится=lambda rows: header_map(rows)[0] >= 0)
+    except Exception:                                                   # noqa: BLE001
         return []
 
 
@@ -1205,7 +1258,7 @@ def _читать(b: bytes, п: str, rec: dict | None = None) -> tuple[list[list
         строки, текст = таблица_или_текст(rows_from_docx(b), lambda: text_from_docx(b), rec)
         return строки, текст, ""
     if п == "pdf":
-        строки, текст = таблица_или_текст(rows_from_pdf(b), lambda: text_from_pdf(b), rec)
+        строки, текст = таблица_или_текст(rows_from_pdf(b), lambda: text_from_pdf(b, rec), rec)
         return строки, текст, ""
     if п == "ole2_разобрать":
         # OLE2 — это и .xls, и .doc, и .msg. Книга пробуется первой: она дешевле
@@ -1294,6 +1347,8 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            "chars": 0, "rows_found": 0, "segment_id": None, "sha256": None,
            "parse_path": None, "header_found": None, "header_miss": None,
            "header_words": None, "header_grid": None, "subkind": None,
+           "pdf_pages": None, "pdf_pages_text": None, "pdf_pages_lost": None,
+           "pdf_mixed": None,
            "doc_class": None,
            "class_rule": None, "text_lines": None, "item_lines": None}
     b = download(fo)

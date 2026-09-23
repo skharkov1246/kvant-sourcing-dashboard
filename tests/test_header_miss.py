@@ -73,10 +73,13 @@ def test_причина_пишется_и_тогда_когда_таблицу_�
     """
     # Таблица есть, но во всей ней узнаётся только наименование — шапки нет.
     таблица = [["Наименование оборудования", ""], ["Насос ЦНС-38", ""]]
+    # Вид определяется по байтам, а не подменой sniff: разбор зовёт `подвид`.
+    # Прежняя редакция подменяла sniff, и после переноса ветвления на подвид
+    # проверка стала проверять не то — при сохранном поведении разбора.
     monkeypatch.setattr(indexer, "download", lambda fo: b"%PDF-1.4 " + b"x" * 300)
-    monkeypatch.setattr(indexer, "sniff", lambda b: "pdf")
     monkeypatch.setattr(indexer, "rows_from_pdf", lambda b: таблица)
-    monkeypatch.setattr(indexer, "text_from_pdf", lambda b: "Насос ЦНС-38 две штуки")
+    monkeypatch.setattr(indexer, "text_from_pdf",
+                        lambda b, rec=None: "Насос ЦНС-38 две штуки")
     rec, _ = indexer.handle({"fo": {"id": "1"}, "deal": "1", "origin": "поле запроса",
                              "field": "UF_TEST", "field_title": None})
     assert rec["parse_path"] == "текст", "проверяем именно отвергнутую таблицу"
@@ -86,9 +89,9 @@ def test_причина_пишется_и_тогда_когда_таблицу_�
 def test_таблица_без_строк_причину_не_выдумывает(monkeypatch):
     """Читатель не дал таблицы вовсе — это не «шапки нет», и путать их нельзя."""
     monkeypatch.setattr(indexer, "download", lambda fo: b"%PDF-1.4 " + b"x" * 300)
-    monkeypatch.setattr(indexer, "sniff", lambda b: "pdf")
     monkeypatch.setattr(indexer, "rows_from_pdf", lambda b: [])
-    monkeypatch.setattr(indexer, "text_from_pdf", lambda b: "Насос ЦНС-38 две штуки")
+    monkeypatch.setattr(indexer, "text_from_pdf",
+                        lambda b, rec=None: "Насос ЦНС-38 две штуки")
     rec, _ = indexer.handle({"fo": {"id": "2"}, "deal": "1", "origin": "поле запроса",
                              "field": "UF_TEST", "field_title": None})
     assert rec["header_miss"] is None
