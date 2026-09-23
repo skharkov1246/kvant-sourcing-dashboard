@@ -126,3 +126,23 @@ def test_выгрузка_1с_читается_стратегией_а_не_па
          '</Table></Worksheet></Workbook>').encode()
     строки, текст, отказ = читать(b)
     assert строки and строки[1][0] == "Насос ЦНС-38", (строки, отказ)
+
+
+def test_причина_читателя_не_затирается_дежурной(monkeypatch):
+    """Замер 23.09.2026: 150 docx и 57 xlsx значились «без текстового слоя».
+
+    Для офисного документа это бессмыслица: читатель называл настоящую причину,
+    а общий код в конце разбора стирал её дежурной фразой — и чинить было нечего.
+    """
+    монтаж = b"PK\x03\x04" + b"[Content_Types].xml xl/workbook.xml" + b"\x00" * 300
+    monkeypatch.setattr(indexer, "download", lambda fo, rec=None: монтаж)
+
+    def падает(_b):
+        raise ValueError("книга битая")
+
+    monkeypatch.setattr(indexer, "rows_from_xlsx", падает)
+    rec, items = indexer.handle({"fo": {"id": "1"}, "deal": "1", "origin": "поле запроса",
+                                 "field": "UF_TEST", "field_title": None})
+    assert items == []
+    assert rec["reason"] != "нет текстового слоя", "причина читателя затёрта дежурной"
+    assert "книга не открылась" in rec["reason"] or "архив" in rec["reason"], rec["reason"]
