@@ -112,21 +112,33 @@ def test_потери_разложены_и_по_точному_формату()
     assert "filter (where coalesce(rows_found, 0) = 0)" in q
 
 
+def _обе_записи(rec: dict):
+    """Обе записи lib_files — вставка разбора и UPDATE переразбора — как их
+    строит код: (имя, запрос, значения по колонкам). Поведение, а не написание."""
+    from library import indexer
+    import library.reparse as r
+    колонки = indexer.КОЛОНКИ_ВСТАВКИ
+    запрос, _ = indexer.вставка_файлов(колонки)
+    yield "вставка разбора", запрос, dict(zip(колонки, indexer.кортеж_файла(rec, колонки)))
+    колонки = r.КОЛОНКИ_ЗАПИСИ
+    yield ("UPDATE переразбора", r.правка_файла(колонки),
+           dict(zip(колонки, r.значения_правки(rec, колонки))))
+
+
+def _запись(**значения) -> dict:
+    rec = {к: None for к in ("kind", "size_bytes", "reason", "segment_id", "sha256",
+                             "parse_path", "header_found", "doc_class", "class_rule",
+                             "text_lines", "item_lines")}
+    rec.update(file_id="5", deal_id="11", origin="поле сделки", field="ufCrm_1633502831",
+               status="разобран", chars=10, rows_found=0, **значения)
+    return rec
+
+
 def test_подвид_доезжает_до_базы_обеими_записями():
     """Правило 14: колонка, добавленная в одну запись, роняет вторую."""
-    for путь, начало, конец in (
-        ("library/indexer.py", "insert into lib_files", "processed_at = now()"),
-        ("library/reparse.py", "update lib_files set", "where file_id = %s"),
-    ):
-        часть = запрос_из(путь, начало, конец)
-        assert "subkind" in часть, f"{путь}: подвид не пишется"
-
-
-def запрос_из(путь: str, начало: str, конец: str) -> str:
-    текст = re.sub(r"(?<!\w)#[^\n]*", "",
-                   (ПУТЬ.parent.parent / путь).read_text(encoding="utf-8"))
-    i = текст.index(начало)
-    return текст[i:текст.index(конец, i) + len(конец)]
+    for имя, запрос, значения in _обе_записи(_запись(subkind="csv")):
+        assert re.search(r"(?<!\w)subkind(?!\w)", запрос), f"{имя}: подвид не пишется"
+        assert значения["subkind"] == "csv", f"{имя}: подвид без значения"
 
 
 def test_замер_переживает_отсутствие_новой_колонки():
@@ -159,13 +171,12 @@ def test_папки_документов_печатаются_рядом_со_с
 
 
 def test_папка_доезжает_до_базы_обеими_записями():
-    for путь, начало, конец in (
-        ("library/indexer.py", "insert into lib_files", "processed_at = now()"),
-        ("library/reparse.py", "update lib_files set", "where file_id = %s"),
-    ):
-        часть = запрос_из(путь, начало, конец)
+    rec = _запись(doc_kind="запрос заказчика нам", doc_kind_conf=1.0,
+                  doc_kind_why="поле: код поля (сделка)")
+    for имя, запрос, значения in _обе_записи(rec):
         for колонка in ("doc_kind", "doc_kind_conf", "doc_kind_why"):
-            assert колонка in часть, f"{путь}: {колонка} не пишется"
+            assert re.search(rf"(?<!\w){колонка}(?!\w)", запрос), f"{имя}: {колонка} не пишется"
+            assert значения[колонка] == rec[колонка], f"{имя}: {колонка} без значения"
 
 
 def test_читатели_каскада_печатаются_под_проверкой_колонки():

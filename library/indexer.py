@@ -308,7 +308,8 @@ def наши_компании() -> dict[str, str]:
     Любой сбой — пустой словарь и ОДНО предупреждение: без списка сверка папки с
     содержимым идёт без признаков автора (doc_kind: автор не определён), а
     папку всё равно ставит система. Ронять из-за этого разбор нельзя, молчать —
-    тоже. В журнал — только число (правило 17): названия живут в памяти и в
+    тоже. Записанная наша компания файла при сбое не стирается: обе записи
+    lib_files пишут её через coalesce (НЕ_ЗАТИРАТЬ_ПУСТЫМ). В журнал — только число (правило 17): названия живут в памяти и в
     закрытой базе, не в журнале публичного репозитория."""
     global _НАШИ, _НАШИ_ИМЕНА
     with _НАШИ_ЗАМОК:
@@ -2203,28 +2204,139 @@ def ensure_segments(cur) -> None:
     )
 
 
-#: Колонки, которые пакетная вставка в lib_files называет по имени, — ровно список
-#: из самой вставки (tests/test_folder_wiring.py сверяет их). Схема живёт в файле,
-#: а применяется отдельным прогоном; вставка с колонкой, которой в базе нет,
-#: падает на ПЕРВОМ сбросе буфера, когда двести файлов уже скачаны и разобраны.
-#: Проверка до обхода портала делает то же падение дешёвым и понятным.
-КОЛОНКИ_ВСТАВКИ = (
+# ─────────────────────────────────────────────────────────────────────────────
+# ЗАПИСЬ В lib_files — ПО КОЛОНКАМ, КОТОРЫЕ ЕСТЬ В БАЗЕ.
+#
+# Схема живёт в файле, а применяется отдельным ручным прогоном («ZIP base — apply
+# DB migrations», zip-db.yml, только workflow_dispatch). Ночной разбор котировок
+# (suppliers-quotes.yml, cron) запускает этот файл сам. Первая проверка колонок
+# останавливала разбор на ЛЮБОЙ недостающей колонке — и от мержа до ручной
+# миграции ночной прогон краснел бы каждую ночь, не разобрав ни одного КП (разбор
+# 23.09.2026, проверено на чистом PostgreSQL: «нет колонок: our_company», код 2).
+# Поэтому колонки двух сортов:
+#
+#   ОБЯЗАТЕЛЬНЫЕ — те, что вставка писала до 23.09.2026: они в базе давно, и без
+#     них запись файла теряет смысл. Нет хоть одной — остановка ДО обхода портала;
+#   СВЕДЕНИЯ — добавленные 23.09.2026 (причина «шапки нет», счётчики страниц PDF,
+#     подвид, папка, путь чтения, наша компания). Нет — ОДНО предупреждение с их
+#     именами, и запись идёт без них: сведение, которого база пока не держит,
+#     не повод терять разбор.
+#
+# Список колонок, места значений и обновление при конфликте строятся из ОДНОГО
+# списка (вставка_файлов), значения — из одного места (строка_файла): колонка без
+# значения и значение без колонки невозможны по устройству, а не по дисциплине.
+КОЛОНКИ_ОБЯЗАТЕЛЬНЫЕ = (
     "file_id", "deal_id", "origin", "field", "field_title", "side",
     "kind", "size_bytes", "status", "reason",
     "chars", "rows_found", "segment_id", "sha256",
-    "parse_path", "header_found", "header_miss", "doc_class", "class_rule",
-    "text_lines", "item_lines", "parser_version",
-    "pdf_pages", "pdf_pages_text", "pdf_pages_lost", "pdf_mixed", "subkind",
+    "parse_path", "header_found", "doc_class", "class_rule",
+    "text_lines", "item_lines", "parser_version")
+КОЛОНКИ_СВЕДЕНИЙ = (
+    "header_miss", "pdf_pages", "pdf_pages_text", "pdf_pages_lost", "pdf_mixed", "subkind",
     "doc_kind", "doc_kind_conf", "doc_kind_why", "read_chain", "our_company")
+#: Все колонки вставки разбора по порядку. file_id — первым: по нему буфер
+#: отсеивает повторы (r[0]).
+КОЛОНКИ_ВСТАВКИ = КОЛОНКИ_ОБЯЗАТЕЛЬНЫЕ + КОЛОНКИ_СВЕДЕНИЙ
+#: При конфликте не переписываются: ключ и происхождение вложения.
+НЕ_ОБНОВЛЯТЬ = frozenset({"file_id", "deal_id", "origin", "field", "kind", "size_bytes",
+                          "sha256"})
+#: Пустое новое значение не затирает записанное. our_company приходит пустым у
+#: КАЖДОЙ карточки прогона, если список наших компаний не прочитался
+#: (наши_компании: сбой — пустой словарь и одно предупреждение), и безусловная
+#: запись стёрла бы известную компанию. Переразбор при этом ещё и поднимает
+#: версию разборщика — файл больше не попадёт в кандидаты, и стёртое не
+#: вернётся (разбор 23.09.2026). Обе записи — вставка разбора и UPDATE
+#: переразбора — берут этот список отсюда.
+НЕ_ЗАТИРАТЬ_ПУСТЫМ = frozenset({"our_company"})
+#: Только та lib_files, в которую пойдёт запись: схемы пути поиска. Колонка
+#: одноимённой таблицы из другой схемы (тестовой, копии) иначе сошла бы за свою,
+#: и вставка упала бы на первом сбросе буфера — ровно то, от чего проверка стоит.
 КОЛОНКИ_БАЗЫ = """
 select column_name from information_schema.columns
- where table_name = 'lib_files' and column_name = any(%s)"""
+ where table_name = 'lib_files' and table_schema = any(current_schemas(false))
+   and column_name = any(%s)"""
 
 
-def нет_колонок(cur) -> list[str]:
-    """Колонки вставки, которых в базе нет (пусто — всё на месте)."""
-    cur.execute(КОЛОНКИ_БАЗЫ, (list(КОЛОНКИ_ВСТАВКИ),))
-    return sorted(set(КОЛОНКИ_ВСТАВКИ) - {r[0] for r in cur.fetchall()})
+def колонки_базы(cur, нужные) -> set[str]:
+    """Какие из нужных колонок lib_files есть в базе. Один запрос на прогон."""
+    cur.execute(КОЛОНКИ_БАЗЫ, (list(нужные),))
+    return {r[0] for r in cur.fetchall()}
+
+
+def колонки_записи(есть: set[str], обязательные=КОЛОНКИ_ОБЯЗАТЕЛЬНЫЕ,
+                   сведения=КОЛОНКИ_СВЕДЕНИЙ) -> tuple[tuple[str, ...], list[str], list[str]]:
+    """Колонки для записи (в порядке списков) и чего нет: обязательных, сведений."""
+    нет_обязательных = [к for к in обязательные if к not in есть]
+    нет_сведений = [к for к in сведения if к not in есть]
+    return (tuple(к for к in (*обязательные, *сведения) if к in есть),
+            нет_обязательных, нет_сведений)
+
+
+def проверить_колонки(cur) -> tuple[str, ...] | None:
+    """Колонки, которыми разбор пишет lib_files; None — писать нельзя вовсе.
+
+    Нет обязательной — сообщение и None (разбор останавливается ДО обхода
+    портала). Нет сведений — одно предупреждение с их именами (только имена
+    колонок, собственные строки кода — правило 17), и разбор идёт без них."""
+    колонки, нет_обязательных, нет_сведений = колонки_записи(колонки_базы(cur, КОЛОНКИ_ВСТАВКИ))
+    if нет_обязательных:
+        print(f"в lib_files нет обязательных колонок: {', '.join(нет_обязательных)}. Схема "
+              "в файле ушла вперёд базы — примените миграции прогоном «ZIP base — apply DB "
+              "migrations» и повторите. Разбор остановлен ДО обхода портала.", file=sys.stderr)
+        return None
+    if нет_сведений:
+        print(f"::warning::в lib_files нет колонок {', '.join(нет_сведений)}: разбор пишет "
+              "без них, остальное как обычно. Примените миграции прогоном «ZIP base — apply "
+              "DB migrations», и следующий разбор запишет их тоже.", flush=True)
+    return колонки
+
+
+def строка_файла(rec: dict) -> dict:
+    """Значения записи файла по колонкам lib_files (ровно КОЛОНКИ_ВСТАВКИ).
+
+    Одна на обе записи — вставку разбора и UPDATE переразбора (правило 14: две
+    записи в одну таблицу правятся вместе; значения из одного места разойтись не
+    могут). Обрезки — по размерам, которые держит база."""
+    return {
+        "file_id": rec["file_id"], "deal_id": rec["deal_id"], "origin": rec["origin"],
+        "field": rec["field"], "field_title": pg(rec.get("field_title"))[:200] or None,
+        "side": rec.get("side"), "kind": rec["kind"], "size_bytes": rec["size_bytes"],
+        "status": rec["status"], "reason": pg(rec["reason"]), "chars": rec["chars"],
+        "rows_found": rec["rows_found"], "segment_id": rec["segment_id"],
+        "sha256": rec["sha256"], "parse_path": rec["parse_path"],
+        "header_found": rec["header_found"], "doc_class": rec["doc_class"],
+        "class_rule": rec["class_rule"], "text_lines": rec["text_lines"],
+        "item_lines": rec["item_lines"], "parser_version": PARSER_VERSION,
+        "header_miss": rec.get("header_miss"), "pdf_pages": rec.get("pdf_pages"),
+        "pdf_pages_text": rec.get("pdf_pages_text"),
+        "pdf_pages_lost": rec.get("pdf_pages_lost"), "pdf_mixed": rec.get("pdf_mixed"),
+        "subkind": rec.get("subkind"), "doc_kind": rec.get("doc_kind"),
+        "doc_kind_conf": rec.get("doc_kind_conf"),
+        "doc_kind_why": pg(rec.get("doc_kind_why"))[:ДЛИНА_ПОЧЕМУ] or None,
+        "read_chain": pg(rec.get("read_chain"))[:200] or None,
+        "our_company": pg(rec.get("our_company"))[:200] or None,
+    }
+
+
+def кортеж_файла(rec: dict, колонки: tuple[str, ...]) -> tuple:
+    """Значения записи ровно по колонкам, которые есть в базе, в их порядке."""
+    строка = строка_файла(rec)
+    return tuple(строка[к] for к in колонки)
+
+
+def вставка_файлов(колонки: tuple[str, ...]) -> tuple[str, str]:
+    """Пакетная вставка в lib_files по колонкам записи: (запрос, шаблон строки).
+
+    Шаблон строки передаётся в execute_values явно: мест под значения ровно
+    столько, сколько колонок, и кортеж другой длины падает на первой строке, а
+    не пишет значения не в те колонки."""
+    обновить = [(f"{к} = coalesce(excluded.{к}, lib_files.{к})" if к in НЕ_ЗАТИРАТЬ_ПУСТЫМ
+                 else f"{к} = excluded.{к}")
+                for к in колонки if к not in НЕ_ОБНОВЛЯТЬ]
+    обновить.append("processed_at = now()")
+    запрос = ("insert into lib_files\n  (" + ", ".join(колонки) + ")\nvalues %s\n"
+              "on conflict (file_id) do update set\n  " + ",\n  ".join(обновить))
+    return запрос, "(" + ", ".join(["%s"] * len(колонки)) + ")"
 
 
 def main() -> int:
@@ -2236,11 +2348,8 @@ def main() -> int:
         print(f"часть {SHARD + 1} из {SHARDS}", flush=True)
     conn = connect()
     with conn.cursor() as cur:
-        нет = нет_колонок(cur)
-        if нет:
-            print(f"в lib_files нет колонок: {', '.join(нет)}. Схема в файле ушла вперёд "
-                  "базы — примените миграции прогоном «ZIP base — apply DB migrations» и "
-                  "повторите. Разбор остановлен ДО обхода портала.", file=sys.stderr)
+        колонки = проверить_колонки(cur)
+        if колонки is None:
             conn.close()
             return 2
         ensure_segments(cur)
@@ -2345,33 +2454,9 @@ def main() -> int:
                 # уникален» принадлежит самой вставке. Берём последнюю запись:
                 # если файл почему-то разобран дважды, свежий разбор вернее.
                 buf_files = list({r[0]: r for r in buf_files}.values())
-                psycopg2.extras.execute_values(cur, """
-                    insert into lib_files
-                      (file_id, deal_id, origin, field, field_title, side,
-                       kind, size_bytes, status, reason,
-                       chars, rows_found, segment_id, sha256,
-                       parse_path, header_found, header_miss, doc_class, class_rule,
-                       text_lines, item_lines, parser_version,
-                       pdf_pages, pdf_pages_text, pdf_pages_lost, pdf_mixed, subkind,
-                       doc_kind, doc_kind_conf, doc_kind_why, read_chain, our_company)
-                    values %s
-                    on conflict (file_id) do update set
-                      field_title = excluded.field_title, side = excluded.side,
-                      status = excluded.status, reason = excluded.reason, chars = excluded.chars,
-                      rows_found = excluded.rows_found, segment_id = excluded.segment_id,
-                      parse_path = excluded.parse_path, header_found = excluded.header_found,
-                      header_miss = excluded.header_miss,
-                      pdf_pages = excluded.pdf_pages,
-                      pdf_pages_text = excluded.pdf_pages_text,
-                      pdf_pages_lost = excluded.pdf_pages_lost,
-                      pdf_mixed = excluded.pdf_mixed, subkind = excluded.subkind,
-                      doc_kind = excluded.doc_kind, doc_kind_conf = excluded.doc_kind_conf,
-                      doc_kind_why = excluded.doc_kind_why,
-                      read_chain = excluded.read_chain, our_company = excluded.our_company,
-                      doc_class = excluded.doc_class, class_rule = excluded.class_rule,
-                      text_lines = excluded.text_lines, item_lines = excluded.item_lines,
-                      parser_version = excluded.parser_version,
-                      processed_at = now()""", buf_files, page_size=500)
+                запрос, шаблон = вставка_файлов(колонки)
+                psycopg2.extras.execute_values(cur, запрос, buf_files, template=шаблон,
+                                               page_size=500)
         conn.commit()
         conn.close()
         buf_files, buf_items, buf_prices = [], [], []
@@ -2386,21 +2471,7 @@ def main() -> int:
             if rec["segment_id"]:
                 segs[rec["segment_id"]] += rec["rows_found"]
             total_items += rec["rows_found"]
-            buf_files.append((rec["file_id"], rec["deal_id"], rec["origin"], rec["field"],
-                              pg(rec.get("field_title"))[:200] or None, rec.get("side"),
-                              rec["kind"],
-                              rec["size_bytes"], rec["status"], pg(rec["reason"]), rec["chars"],
-                              rec["rows_found"], rec["segment_id"], rec["sha256"],
-                              rec["parse_path"], rec["header_found"],
-                              rec.get("header_miss"), rec["doc_class"],
-                              rec["class_rule"], rec["text_lines"], rec["item_lines"],
-                              PARSER_VERSION, rec.get("pdf_pages"),
-                              rec.get("pdf_pages_text"), rec.get("pdf_pages_lost"),
-                              rec.get("pdf_mixed"), rec.get("subkind"),
-                              rec.get("doc_kind"), rec.get("doc_kind_conf"),
-                              pg(rec.get("doc_kind_why"))[:300] or None,
-                              pg(rec.get("read_chain"))[:200] or None,
-                              pg(rec.get("our_company"))[:200] or None))
+            buf_files.append(кортеж_файла(rec, колонки))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],

@@ -13,7 +13,14 @@
    запрошенное, и до правки счётчик нашего «Request file» был нулём всегда.
    Подделка портала здесь ЧЕСТНАЯ — отдаёт только выбранные поля; прежняя
    отдавала всё, и потому ошибку не ловила.
-5. КОЛОНКА our_company доезжает обеими записями (правило 14).
+5. КОЛОНКА our_company доезжает обеими записями (правило 14) и пустым значением
+   не затирает записанное: сбой чтения наших компаний даёт пусто у каждой
+   карточки прогона.
+6. НЕТ КОЛОНКИ-СВЕДЕНИЯ — РАЗБОР ИДЁТ БЕЗ НЕЁ. Миграцию применяют руками, а
+   ночной разбор котировок идёт по расписанию: остановка на колонке our_company
+   красила бы его каждую ночь до миграции. Останавливает только обязательная
+   колонка. Проверяется поведением — подделкой базы и сгенерированным запросом,
+   а не написанием кода.
 
 Корпус придуман (правило 18): компании, изделия, номера вымышлены.
 """
@@ -284,46 +291,243 @@ def _код(путь: str) -> str:
     return (ROOT / путь).read_text(encoding="utf-8")
 
 
-def test_вставка_называет_ровно_колонки_проверки():
-    """Проверка колонок до обхода портала перечисляет ровно то, что пишет вставка."""
-    m = re.search(r"insert into lib_files\s*\(([^)]*)\)", _код("library/indexer.py"))
-    в_запросе = tuple(к.strip() for к in m.group(1).split(",") if к.strip())
-    assert в_запросе == ix.КОЛОНКИ_ВСТАВКИ
-    assert "our_company" in ix.КОЛОНКИ_ВСТАВКИ
-    assert "our_company = excluded.our_company" in _код("library/indexer.py")
+@pytest.fixture
+def запись(monkeypatch):
+    """Запись файла такой, какой её отдаёт handle() (файл не скачался)."""
+    monkeypatch.setattr(ix, "download", lambda fo, rec=None: None)
+    rec, _ = ix.handle(_ссылка(ОФФЕР, "Offer from supplier", our_company="ООО «Кордален»"))
+    return rec
 
 
-def test_кортеж_вставки_несёт_нашу_компанию():
-    дерево = ast.parse(_код("library/indexer.py"))
-    for у in ast.walk(дерево):
-        if (isinstance(у, ast.Call) and isinstance(у.func, ast.Attribute)
-                and у.func.attr == "append" and isinstance(у.func.value, ast.Name)
-                and у.func.value.id == "buf_files"):
-            последнее = ast.unparse(у.args[0].elts[-1])
-            assert "our_company" in последнее, последнее
-            return
-    raise AssertionError("buf_files.append не найден")
+def _колонки_вставки(запрос: str) -> tuple[str, ...]:
+    m = re.search(r"insert into lib_files\s*\(([^)]*)\)", запрос)
+    return tuple(к.strip() for к in m.group(1).split(",") if к.strip())
 
 
-def test_проверка_колонок_находит_недостающие():
-    class Курсор:
-        def execute(self, sql, params):
-            self.params = params
-
-        def fetchall(self):
-            return [(к,) for к in self.params[0] if к != "our_company"]
-
-    assert ix.нет_колонок(Курсор()) == ["our_company"]
+def _обновляемые(запрос: str) -> set[str]:
+    return set(re.findall(r"(\w+) = (?:excluded\.|coalesce\(excluded\.)", запрос))
 
 
-def test_переразбор_пишет_нашу_компанию():
+def _есть(запрос: str, колонка: str) -> bool:
+    return re.search(rf"(?<!\w){колонка}(?!\w)", запрос) is not None
+
+
+def test_значения_записи_ровно_по_колонкам_вставки(запись):
+    """Значения берутся из одного места на все колонки: колонка без значения и
+    значение без колонки невозможны по устройству."""
+    assert tuple(ix.строка_файла(запись)) == ix.КОЛОНКИ_ВСТАВКИ
+    assert ix.КОЛОНКИ_ВСТАВКИ[0] == "file_id", "буфер отсеивает повторы по r[0]"
+    assert set(ix.КОЛОНКИ_ОБЯЗАТЕЛЬНЫЕ).isdisjoint(ix.КОЛОНКИ_СВЕДЕНИЙ)
+    assert "our_company" in ix.КОЛОНКИ_СВЕДЕНИЙ
+
+
+def test_вставка_по_всем_колонкам_несёт_нашу_компанию_и_не_затирает_её(запись):
+    запрос, шаблон = ix.вставка_файлов(ix.КОЛОНКИ_ВСТАВКИ)
+    assert _колонки_вставки(запрос) == ix.КОЛОНКИ_ВСТАВКИ
+    строка = ix.кортеж_файла(запись, ix.КОЛОНКИ_ВСТАВКИ)
+    assert шаблон.count("%s") == len(строка) == len(ix.КОЛОНКИ_ВСТАВКИ)
+    assert строка[ix.КОЛОНКИ_ВСТАВКИ.index("our_company")] == "ООО «Кордален»"
+    # Пустая наша компания (сбой чтения списка) записанную не стирает.
+    assert "our_company = coalesce(excluded.our_company, lib_files.our_company)" in запрос
+    # Ключ и происхождение вложения при конфликте не переписываются, остальное — да.
+    assert _обновляемые(запрос) == set(ix.КОЛОНКИ_ВСТАВКИ) - ix.НЕ_ОБНОВЛЯТЬ
+    assert запрос.rstrip().endswith("processed_at = now()")
+
+
+@pytest.mark.parametrize("нет", [("our_company",), ("read_chain", "our_company"),
+                                 ix.КОЛОНКИ_СВЕДЕНИЙ])
+def test_без_колонок_сведений_вставка_их_не_называет(запись, нет):
+    """База отстала от схемы: запрос строится только из того, что в ней есть, —
+    и мест под значения ровно столько, сколько значений в кортеже."""
+    колонки, нет_обяз, нет_свед = ix.колонки_записи(set(ix.КОЛОНКИ_ВСТАВКИ) - set(нет))
+    assert нет_обяз == [] and нет_свед == [к for к in ix.КОЛОНКИ_СВЕДЕНИЙ if к in нет]
+    запрос, шаблон = ix.вставка_файлов(колонки)
+    for к in нет:
+        assert not _есть(запрос, к), к
+    assert _колонки_вставки(запрос) == колонки
+    assert шаблон.count("%s") == len(ix.кортеж_файла(запись, колонки)) == len(колонки)
+    assert len(колонки) == len(ix.КОЛОНКИ_ВСТАВКИ) - len(нет)
+
+
+class _База:
+    """Подделка базы: знает, какие колонки lib_files в ней есть."""
+
+    def __init__(self, есть):
+        self.есть, self.запросы = set(есть), []
+
+    def execute(self, sql, params=None):
+        self.запросы.append((sql, params))
+        self._последний = (sql, params)
+
+    def fetchall(self):
+        sql, params = self._последний
+        if "information_schema.columns" in sql:
+            return [(к,) for к in params[0] if к in self.есть]
+        if "from lib_files f" in sql:                   # кандидаты переразбора
+            return list(self.кандидаты)
+        return []
+
+    кандидаты: tuple = ()
+
+    def fetchone(self):
+        return (1,)
+
+    def cursor(self):
+        return self
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+    def commit(self):
+        pass
+
+    def rollback(self):
+        pass
+
+    def close(self):
+        pass
+
+
+def test_нет_сведения_одно_предупреждение_и_разбор_идёт(capsys):
+    база = _База(set(ix.КОЛОНКИ_ВСТАВКИ) - {"our_company", "read_chain"})
+    колонки = ix.проверить_колонки(база)
+    assert колонки == tuple(к for к in ix.КОЛОНКИ_ВСТАВКИ if к not in ("our_company", "read_chain"))
+    out, err = capsys.readouterr()
+    assert out.count("::warning::") == 1 and err == ""
+    assert "our_company" in out and "read_chain" in out
+    # Запрос колонок — один на прогон, по всему списку вставки.
+    assert len(база.запросы) == 1 and set(база.запросы[0][1][0]) == set(ix.КОЛОНКИ_ВСТАВКИ)
+
+
+def test_нет_обязательной_разбор_останавливается(capsys):
+    assert ix.проверить_колонки(_База(set(ix.КОЛОНКИ_ВСТАВКИ) - {"status"})) is None
+    out, err = capsys.readouterr()
+    assert "status" in err and "::warning::" not in out
+
+
+def test_все_колонки_на_месте_без_предупреждений(capsys):
+    assert ix.проверить_колонки(_База(ix.КОЛОНКИ_ВСТАВКИ)) == ix.КОЛОНКИ_ВСТАВКИ
+    assert capsys.readouterr() == ("", "")
+
+
+def _прогон(monkeypatch, есть, запись_файла):
+    """main() разбора целиком: подделки базы и портала, запись перехватывается."""
+    monkeypatch.setenv("BITRIX_WEBHOOK_URL", "https://portal.example.test/rest/1/x")
+    monkeypatch.setenv("SUPABASE_DB_URL", "postgresql://example.test/db")
+    monkeypatch.setattr(ix, "connect", lambda *a, **k: _База(есть))
+    обход = []
+
+    def ссылки(*a, **k):
+        обход.append(a)
+        return [_ссылка(ОФФЕР, "Offer from supplier")]
+
+    monkeypatch.setattr(ix, "collect_refs", ссылки)
+    monkeypatch.setattr(ix, "collect_refs_rfq", ссылки)
+    monkeypatch.setattr(ix, "handle", lambda ref: (dict(запись_файла), []))
+    вставки = []
+
+    def execute_values(cur, sql, rows, template=None, page_size=100):
+        if "lib_files" in sql:
+            вставки.append((sql, list(rows), template))
+
+    monkeypatch.setattr(ix.psycopg2.extras, "execute_values", execute_values)
+    return ix.main(), обход, вставки
+
+
+def test_ночной_разбор_без_колонки_our_company_пишет_остальное(monkeypatch, capsys, запись):
+    """Прежде: «нет колонок: our_company» и код 2 каждую ночь до ручной миграции."""
+    код, обход, вставки = _прогон(monkeypatch, set(ix.КОЛОНКИ_ВСТАВКИ) - {"our_company"},
+                                  запись)
+    assert код == 0 and обход, "разбор остановился"
+    (sql, строки, шаблон), = вставки
+    assert not _есть(sql, "our_company")
+    assert all(len(r) == шаблон.count("%s") == len(_колонки_вставки(sql)) for r in строки)
+    assert строки[0][0] == запись["file_id"]
+    assert capsys.readouterr().out.count("::warning::") == 1
+
+
+def test_без_обязательной_колонки_портал_не_обходится(monkeypatch, capsys, запись):
+    код, обход, вставки = _прогон(monkeypatch, set(ix.КОЛОНКИ_ВСТАВКИ) - {"status"}, запись)
+    assert код == 2 and обход == [] and вставки == []
+
+
+def test_переразбор_пишет_нашу_компанию_не_затирая_пустым(запись):
     import library.reparse as r
-    assert "our_company" in r.КОЛОНКИ_ЗАПИСИ
-    код = _код("library/reparse.py")
-    i = код.index("update lib_files set")
-    правка = код[i:код.index("where file_id = %s", i)]
-    assert "our_company = %s" in правка
-    assert 'rec.get("our_company")' in код[i:i + 2500]
+    колонки = r.КОЛОНКИ_ЗАПИСИ
+    sql = r.правка_файла(колонки)
+    значения = r.значения_правки(запись, колонки)
+    assert "our_company = coalesce(%s, our_company)" in sql
+    assert sql.count("%s") == len(значения) == len(колонки) + 1
+    assert значения[колонки.index("our_company")] == "ООО «Кордален»"
+    assert значения[-1] == запись["file_id"] and sql.rstrip().endswith("where file_id = %s")
+
+
+def test_переразбор_без_колонки_сведения_её_не_называет(запись):
+    import library.reparse as r
+    колонки, нет_обяз, нет_свед = r.indexer.колонки_записи(
+        set(r.КОЛОНКИ_ЗАПИСИ) - {"our_company"}, r.ОБЯЗАТЕЛЬНЫЕ_ЗАПИСИ, r.СВЕДЕНИЯ_ЗАПИСИ)
+    assert (нет_обяз, нет_свед) == ([], ["our_company"])
+    sql = r.правка_файла(колонки)
+    assert not _есть(sql, "our_company")
+    assert sql.count("%s") == len(r.значения_правки(запись, колонки)) == len(колонки) + 1
+
+
+def _переразбор(monkeypatch, есть, запись_в_базу: bool, запись_файла=None):
+    """main() переразбора целиком на подделке базы. С запись_файла в базе есть
+    один кандидат, и переразбор доходит до UPDATE; все базы прогона — в списке."""
+    import library.reparse as r
+    monkeypatch.setenv("BITRIX_WEBHOOK_URL", "https://portal.example.test/rest/1/x")
+    monkeypatch.setenv("SUPABASE_DB_URL", "postgresql://example.test/db")
+    monkeypatch.setattr(r, "APPLY", запись_в_базу)
+    базы = []
+
+    def база(*a, **k):
+        б = _База(есть)
+        if запись_файла is not None:
+            б.кандидаты = ((запись_файла["file_id"], "прочее", 0),)
+        базы.append(б)
+        return б
+
+    monkeypatch.setattr(r.indexer, "connect", база)
+    monkeypatch.setattr(r.indexer, "collect_refs", lambda *a, **k: [_ссылка(ОФФЕР, "x")])
+    monkeypatch.setattr(r.indexer, "collect_refs_rfq", lambda *a, **k: [_ссылка(ОФФЕР, "x")])
+    monkeypatch.setattr(r.indexer, "handle", lambda ref: (dict(запись_файла or {}), []))
+    код = r.main()
+    правки = [(sql, p) for б in базы for sql, p in б.запросы if "update lib_files" in sql]
+    return код, правки
+
+
+@pytest.mark.parametrize("запись_в_базу", [True, False])
+def test_переразбор_без_сведения_не_останавливается(monkeypatch, capsys, запись_в_базу):
+    """Нет our_company — запись идёт без неё (кандидатов нет — «нечего»), код 0."""
+    import library.reparse as r
+    код, _ = _переразбор(monkeypatch, set(r.КОЛОНКИ_ЗАПИСИ) - {"our_company"}, запись_в_базу)
+    out = capsys.readouterr().out
+    assert код == 0 and "нечего переразбирать" in out and out.count("::warning::") == 1
+
+
+def test_переразбор_без_сведения_пишет_файл_без_неё(monkeypatch, capsys, запись):
+    """С кандидатом: UPDATE доходит до базы и не называет недостающую колонку."""
+    import library.reparse as r
+    код, правки = _переразбор(monkeypatch, set(r.КОЛОНКИ_ЗАПИСИ) - {"our_company"}, True,
+                              запись)
+    assert код == 0
+    (sql, значения), = правки
+    assert not _есть(sql, "our_company") and _есть(sql, "doc_kind")
+    assert sql.count("%s") == len(значения) and значения[-1] == запись["file_id"]
+    assert "записано файлов: 1" in capsys.readouterr().out
+
+
+def test_переразбор_без_обязательной_останавливает_только_запись(monkeypatch, capsys):
+    """Холостой прогон не останавливается никогда: он ничего не пишет."""
+    import library.reparse as r
+    есть = set(r.КОЛОНКИ_ЗАПИСИ) - {"status"}
+    assert _переразбор(monkeypatch, есть, True)[0] == 2
+    assert "status" in capsys.readouterr().err
+    assert _переразбор(monkeypatch, есть, False)[0] == 0
 
 
 def test_схема_добавляет_колонку_нашей_компании():

@@ -372,37 +372,38 @@ def test_длинный_текст_сохраняет_шапку_и_подпис
 
 # ───────────────────────────── 7. запись и прогон ─────────────────────────────
 
-def _колонки_вставки() -> int:
-    код = (ROOT / "library" / "indexer.py").read_text(encoding="utf-8")
-    m = re.search(r"insert into lib_files\s*\(([^)]*)\)", код)
-    return len([к for к in m.group(1).split(",") if к.strip()])
+def _запись_файла(monkeypatch) -> dict:
+    """Запись такой, какой её отдаёт handle() (файл не скачался): все ключи на месте."""
+    monkeypatch.setattr(indexer, "download", lambda fo, rec=None: None)
+    rec, _ = indexer.handle({"fo": {"id": "5"}, "deal": "11", "origin": "поле запроса",
+                             "field": "ufCrm18_1731179998", "field_title": "Offer from supplier"})
+    rec["read_chain"] = "xlsx → таблица"
+    return rec
 
 
-def test_вставка_файла_колонок_столько_же_сколько_значений():
-    """Новая колонка в списке без значения в кортеже роняет запись всего буфера."""
-    дерево = ast.parse((ROOT / "library" / "indexer.py").read_text(encoding="utf-8"))
-    длины = [len(у.args[0].elts) for у in ast.walk(дерево)
-             if isinstance(у, ast.Call) and isinstance(у.func, ast.Attribute)
-             and у.func.attr == "append" and isinstance(у.func.value, ast.Name)
-             and у.func.value.id == "buf_files" and у.args and isinstance(у.args[0], ast.Tuple)]
-    assert длины == [_колонки_вставки()], (длины, _колонки_вставки())
-    assert "read_chain = excluded.read_chain" in (ROOT / "library" / "indexer.py").read_text()
+def test_вставка_файла_колонок_столько_же_сколько_значений(monkeypatch):
+    """Новая колонка в списке без значения в кортеже роняет запись всего буфера.
+
+    Проверяется поведением: сгенерированный запрос, его шаблон строки и кортеж
+    значений — по одному списку колонок, и путь чтения в нём есть."""
+    rec = _запись_файла(monkeypatch)
+    колонки = indexer.КОЛОНКИ_ВСТАВКИ
+    запрос, шаблон = indexer.вставка_файлов(колонки)
+    строка = indexer.кортеж_файла(rec, колонки)
+    assert шаблон.count("%s") == len(строка) == len(колонки)
+    assert "read_chain = excluded.read_chain" in запрос
+    assert строка[колонки.index("read_chain")] == "xlsx → таблица"
 
 
-def test_переразбор_пишет_путь_чтения_и_подстановки_сходятся():
-    import tests.test_reparse_wiring as w
-    код = (ROOT / "library" / "reparse.py").read_text(encoding="utf-8")
-    assert '"read_chain"' in код, "колонка не проверяется до записи"
-    дерево = ast.parse(код)
-    for у in ast.walk(дерево):
-        if (isinstance(у, ast.Call) and isinstance(у.func, ast.Attribute)
-                and у.func.attr == "execute" and len(у.args) == 2
-                and isinstance(у.args[0], ast.Constant) and "update lib_files" in у.args[0].value):
-            sql = w.без_комментариев(у.args[0].value)
-            assert "read_chain = %s" in sql
-            assert sql.count("%s") == len(у.args[1].elts)
-            return
-    raise AssertionError("update lib_files в переразборе не найден")
+def test_переразбор_пишет_путь_чтения_и_подстановки_сходятся(monkeypatch):
+    import library.reparse as r
+    assert "read_chain" in r.КОЛОНКИ_ЗАПИСИ, "колонка не проверяется до записи"
+    rec = _запись_файла(monkeypatch)
+    sql = r.правка_файла(r.КОЛОНКИ_ЗАПИСИ)
+    значения = r.значения_правки(rec, r.КОЛОНКИ_ЗАПИСИ)
+    assert "read_chain = %s" in sql
+    assert sql.count("%s") == len(значения)
+    assert значения[r.КОЛОНКИ_ЗАПИСИ.index("read_chain")] == "xlsx → таблица"
 
 
 def test_схема_добавляет_колонку_пути_чтения():
