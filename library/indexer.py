@@ -827,6 +827,13 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
                 if drows and header_map(drows)[0] >= 0:
                     rows = drows
                 else:
+                    # ПОЧЕМУ ТАБЛИЦУ ОТВЕРГЛИ — здесь, а не в ветке `if rows`.
+                    # Файл уходит в текстовый путь, и там строк таблицы уже нет:
+                    # без этой записи причина теряется у того самого пласта, где
+                    # её больше всего (воронка 23.09.2026: 3 474 файла ушли в
+                    # «текст, шапки нет», это 334 535 позиций почти без цены).
+                    if drows:
+                        rec["header_miss"] = почему_нет_шапки(drows)
                     text = text_from_docx(b)
         elif kind == "старый office":
             rows = rows_from_xls(b)
@@ -839,6 +846,8 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
             if prows and header_map(prows)[0] >= 0:
                 rows = prows
             else:
+                if prows:
+                    rec["header_miss"] = почему_нет_шапки(prows)
                 text = text_from_pdf(b)
     except Exception as e:
         rec["status"] = "формат не читаем"

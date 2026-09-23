@@ -61,3 +61,34 @@ def test_разбор_причин_идёт_тем_же_правилом_что_
     assert hi == 0 and cols == indexer.колонки_строки(ШАПКА)
     # Узнанная шапка не может дать причину «шапки нет» — иначе они разошлись.
     assert indexer.почему_нет_шапки([ШАПКА]) == "шапка узнаётся — расходится с пометкой"
+
+
+def test_причина_пишется_и_тогда_когда_таблицу_отвергли(monkeypatch):
+    """PDF с таблицей без шапки уходит в ТЕКСТОВЫЙ путь, и строк таблицы там уже нет.
+
+    Воронка 23.09.2026: 3 474 файла стоят в клетке «текст, шапка НЕ найдена» —
+    334 535 позиций при 6 578 строках цены. Это и есть отвергнутые таблицы. Если
+    причину писать только в ветке `if rows`, самый крупный пласт останется без
+    разбора причин: до неё эти файлы не доходят.
+    """
+    # Таблица есть, но во всей ней узнаётся только наименование — шапки нет.
+    таблица = [["Наименование оборудования", ""], ["Насос ЦНС-38", ""]]
+    monkeypatch.setattr(indexer, "download", lambda fo: b"%PDF-1.4 " + b"x" * 300)
+    monkeypatch.setattr(indexer, "sniff", lambda b: "pdf")
+    monkeypatch.setattr(indexer, "rows_from_pdf", lambda b: таблица)
+    monkeypatch.setattr(indexer, "text_from_pdf", lambda b: "Насос ЦНС-38 две штуки")
+    rec, _ = indexer.handle({"fo": {"id": "1"}, "deal": "1", "origin": "поле запроса",
+                             "field": "UF_TEST", "field_title": None})
+    assert rec["parse_path"] == "текст", "проверяем именно отвергнутую таблицу"
+    assert rec["header_miss"] == "наименование узнали, второй колонки — нет", rec["header_miss"]
+
+
+def test_таблица_без_строк_причину_не_выдумывает(monkeypatch):
+    """Читатель не дал таблицы вовсе — это не «шапки нет», и путать их нельзя."""
+    monkeypatch.setattr(indexer, "download", lambda fo: b"%PDF-1.4 " + b"x" * 300)
+    monkeypatch.setattr(indexer, "sniff", lambda b: "pdf")
+    monkeypatch.setattr(indexer, "rows_from_pdf", lambda b: [])
+    monkeypatch.setattr(indexer, "text_from_pdf", lambda b: "Насос ЦНС-38 две штуки")
+    rec, _ = indexer.handle({"fo": {"id": "2"}, "deal": "1", "origin": "поле запроса",
+                             "field": "UF_TEST", "field_title": None})
+    assert rec["header_miss"] is None
