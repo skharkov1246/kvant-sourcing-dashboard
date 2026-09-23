@@ -322,8 +322,19 @@ def recognise(ref: dict) -> tuple[dict, list[dict]]:
                 text, причина2 = ocr_image(p, PSM_RETRY)
                 причина = "" if text.strip() else f"{причина}; повтор: {причина2}"
         else:
-            rec["status"] = "формат не читаем"
-            rec["reason"] = f"распознавать нечего: {kind}"
+            # РАСПОЗНАВАНИЕ НЕ ИМЕЕТ ПРАВА ПОРТИТЬ ЧУЖОЙ РЕЗУЛЬТАТ. Сюда попадают
+            # файлы, у которых вид в базе был пуст: отбор берёт их как возможные
+            # сканы, а на деле это книга или архив. Прежде такой файл получал
+            # «формат не читаем» — то есть распознавание ЗАТИРАЛО статус, который
+            # поставил разбор, и делало вид, будто файл нечитаем в принципе.
+            # Замер 23.09.2026: 1 022 файла xlsx/docx с причиной «распознавать
+            # нечего», плюс 245 в «прочем» и 129 в архивах.
+            #
+            # Теперь распознавание записывает только то, что узнало САМО — вид
+            # файла, — и оставляет статус разбору. Вид не пустой, значит в отбор
+            # сканов файл больше не попадёт, и лишняя закачка не повторится.
+            rec["status"] = None
+            rec["reason"] = None
             return rec, []
 
     rec["chars"] = len(text)
@@ -477,9 +488,20 @@ def main() -> int:
                                            segment_id, reason, ocr_at, ocr_chars, parser_version)
                     values %s
                     on conflict (file_id) do update set
-                      status = excluded.status, kind = excluded.kind, chars = excluded.chars,
-                      rows_found = excluded.rows_found, segment_id = excluded.segment_id,
-                      reason = excluded.reason,
+                      -- ПУСТОЙ СТАТУС ОЗНАЧАЕТ «НЕ МОЁ ДЕЛО»: файл оказался не
+                      -- сканом, и статус, поставленный разбором, сохраняется.
+                      -- Прежде распознавание писало сюда «формат не читаем» и
+                      -- затирало чужой результат: 1 022 файла xlsx/docx.
+                      status = coalesce(excluded.status, lib_files.status),
+                      kind = excluded.kind,
+                      chars = case when excluded.status is null then lib_files.chars
+                                   else excluded.chars end,
+                      rows_found = case when excluded.status is null
+                                        then lib_files.rows_found
+                                        else excluded.rows_found end,
+                      segment_id = coalesce(excluded.segment_id, lib_files.segment_id),
+                      reason = case when excluded.status is null then lib_files.reason
+                                    else excluded.reason end,
                       -- НЕ now(), А ТО, ЧТО ПРИСЛАЛИ. Пустая отметка означает отказ
                       -- окружения: прежнее значение сохраняется, и файл остаётся в
                       -- очереди распознавания.
@@ -492,7 +514,7 @@ def main() -> int:
 
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(recognise, mine), 1):
-            stat[rec["status"]] += 1
+            stat[rec["status"] or "не скан: статус оставлен разбору"] += 1
             if rec["kind"]:
                 kinds[rec["kind"]] += 1
             if rec["status"] in ("пусто", "формат не читаем"):
