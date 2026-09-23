@@ -566,6 +566,10 @@
       <h2>Кандидаты в служебные записи</h2>
       <div class="note">Учётная запись, не числящаяся ни в одном подразделении и при этом заводящая карточки потоком. Список не применяется сам: живого сотрудника без подразделения выключать из статистики нельзя, поэтому запись вносится в <span class="mono">SERVICE_ACCOUNT_IDS</span> только вручную.</div>
       <div id="originCand"></div>
+      <details style="margin-top:10px"><summary class="dimv" style="cursor:pointer">Все авторы карточек за период</summary>
+        <div class="note">Признак «без подразделения» не ловит служебную запись, числящуюся в отделе. Полный список — чтобы такую запись было видно глазами.</div>
+        <div id="originAll"></div>
+      </details>
     </section>
   </div>
 </div>
@@ -815,6 +819,20 @@ document.getElementById('originDept').innerHTML=(ORG.byDept||[]).map(d=>
     + '</tbody></table>'
     + `<div class="note">Порог — ${og.candidateFloor||0} карточек за период. Подтверждённые записи внести строкой: <span class="mono">SERVICE_ACCOUNT_IDS=${_cd.map(c=>c.uid).join(',')}</span></div>`
   : '<span class="dimv">учётных записей без подразделения с потоком запросов не нашлось</span>';}
+
+// Полный список авторов — на случай, когда служебная запись числится в
+// подразделении и потому в кандидаты не попадает: признак «без подразделения»
+// её не ловит, а глазами владельца она видна сразу.
+{const _all=(ORG.byCreator||[]).filter(c=>!c.auto);
+ const _el=document.getElementById('originAll');
+ if(_el) _el.innerHTML=_all.length
+  ? '<table class="tb"><thead><tr><th>Автор карточек</th><th>Подразделение</th><th class="r">Запросов</th><th class="r">Доля</th><th class="r">Дошло до ТКП</th></tr></thead><tbody>'
+    + _all.map(c=>`<tr><td><div class="who">${_esc(c.name)}</div><div class="dimv mono">#${_esc(c.uid)}</div></td>`
+      + `<td class="${c.src?'':'dimv'}">${_esc(c.dept)}</td>`
+      + `<td class="num r">${c.n}</td><td class="num r dimv">${c.pct}%</td>`
+      + `<td class="num r dimv">${c.tkpPct}%</td></tr>`).join('')
+    + '</tbody></table>'
+  : '<span class="dimv">нет данных</span>';}
 
 // ---- coverage KPIs
 document.getElementById('kpisCov').innerHTML=[
