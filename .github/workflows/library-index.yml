@@ -163,10 +163,16 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y -qq antiword catdoc p7zip-full
+          # unrar и bsdtar — не лишние. В Ubuntu 24.04 p7zip-full стал пустым
+          # переходником на 7zip 23.01 (сборка dfsg) БЕЗ кодека RAR: сжатый RAR даёт
+          # «Unsupported Method», читается только несжатый. Нашёл агент архивов
+          # 23.09.2026 на живой сборке. Хватит любого из двух, оба надёжнее.
+          sudo apt-get install -y -qq antiword catdoc p7zip-full unrar libarchive-tools
           echo "antiword: $(command -v antiword || echo нет)"
           echo "catdoc:   $(command -v catdoc || echo нет)"
           echo "7z:       $(command -v 7z || echo нет)"
+          echo "unrar:    $(command -v unrar || echo нет)"
+          echo "bsdtar:   $(command -v bsdtar || echo нет)"
 
       - name: Установка распознавания (только для ocr)
         if: inputs.ocr
