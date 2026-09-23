@@ -159,6 +159,18 @@ def таблица_причин(итог, всего: int) -> list[str]:
     return out
 
 
+# Код ошибки портала — ЗАГЛАВНЫЕ БУКВЫ И ПОДЧЁРКИВАНИЯ, и только они. BitrixError
+# несёт строку вида «disk.file.get: ERROR_NOT_FOUND описание», а описание может
+# нести идентификатор файла. В журнал уходит код, описание — нет (правило 17).
+КОД_ОШИБКИ = re.compile(r"[A-Z][A-Z0-9_]{2,59}")
+
+
+def код_ошибки(e: Exception) -> str:
+    """Код отказа портала, годный для журнала. Нет кода — имя исключения."""
+    найдено = КОД_ОШИБКИ.search(str(e))
+    return найдено.group(0) if найдено else type(e).__name__
+
+
 def скачать(file_id: str) -> tuple[bytes | None, str]:
     """Скачать и НАЗВАТЬ причину неудачи.
 
@@ -173,7 +185,7 @@ def скачать(file_id: str) -> tuple[bytes | None, str]:
     try:
         ответ = indexer.bx("disk.file.get", {"id": file_id})
     except Exception as e:
-        return None, f"портал не ответил ({type(e).__name__})"
+        return None, f"портал отказал: {код_ошибки(e)}"
     if not isinstance(ответ, dict):
         return None, "портал ответил не словарём"
     if ответ.get("error"):
