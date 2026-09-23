@@ -420,6 +420,41 @@ def header_map(rows: list[list[str]]) -> tuple[int, dict[str, int]]:
     return -1, {}
 
 
+#: Слово-кандидат из шапки: буквы одного алфавита, от шести знаков. Порог длины и
+#: порог «от трёх разных файлов» в отчёте — условия правила 17 (публичный журнал).
+СЛОВО_ШАПКИ = re.compile(r"[А-Яа-яЁё]{6,}|[A-Za-z]{6,}")
+
+
+def слова_шапки_без_имени(rows: list[list[str]]) -> set[str]:
+    """Слова из той строки шапки, где колонки узнались, А НАИМЕНОВАНИЕ — НЕТ.
+
+    ЗАЧЕМ ИМЕННО ТАК. Разбор причин 23.09.2026 показал: 47 файлов из 53 без шапки
+    спотыкаются на наименовании, а не на прочих колонках. Значит нужен не общий
+    частотный список слов документа, а слова ИЗ ТОЙ САМОЙ строки, где количество
+    или цена уже узнаны: это и есть пропущенные названия колонки наименования.
+
+    Берётся лучшая строка — та, где узнано больше всего колонок. Возвращаются
+    слова её НЕузнанных ячеек: узнанные и без того в COLS.
+    """
+    лучшая: list[str] = []
+    лучших_колонок = 0
+    for row in rows[:ШАПКА_В_ПЕРВЫХ]:
+        found = колонки_строки(row)
+        if "item_name" in found or len(found) < 1:
+            continue
+        if len(found) > лучших_колонок:
+            лучшая, лучших_колонок = row, len(found)
+    if not лучшая:
+        return set()
+    занятые = set(колонки_строки(лучшая).values())
+    слова: set[str] = set()
+    for j, c in enumerate(лучшая):
+        if j in занятые or not c:
+            continue
+        слова.update(w.lower() for w in СЛОВО_ШАПКИ.findall(c))
+    return слова
+
+
 def почему_нет_шапки(rows: list[list[str]]) -> str:
     """ПОЧЕМУ шапка не узнана — словами, годными для починки.
 
@@ -804,6 +839,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            "kind": None, "size_bytes": None, "status": "не скачался", "reason": None,
            "chars": 0, "rows_found": 0, "segment_id": None, "sha256": None,
            "parse_path": None, "header_found": None, "header_miss": None,
+           "header_words": None,
            "doc_class": None,
            "class_rule": None, "text_lines": None, "item_lines": None}
     b = download(fo)
@@ -834,6 +870,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
                     # «текст, шапки нет», это 334 535 позиций почти без цены).
                     if drows:
                         rec["header_miss"] = почему_нет_шапки(drows)
+                        rec["header_words"] = слова_шапки_без_имени(drows)
                     text = text_from_docx(b)
         elif kind == "старый office":
             rows = rows_from_xls(b)
@@ -848,6 +885,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
             else:
                 if prows:
                     rec["header_miss"] = почему_нет_шапки(prows)
+                    rec["header_words"] = слова_шапки_без_имени(prows)
                 text = text_from_pdf(b)
     except Exception as e:
         rec["status"] = "формат не читаем"
@@ -871,6 +909,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         # базе у сотен файлов и не говорит, какую из четырёх правок делать.
         if not rec["header_found"]:
             rec["header_miss"] = почему_нет_шапки(rows)
+            rec["header_words"] = слова_шапки_без_имени(rows)
     elif text:
         # ВОРОТА СПЕЦИФИКАЦИИ. До 12.09.2026 здесь любая строка длиннее восьми
         # знаков становилась позицией номенклатуры, и в спрос лёг текст извещений

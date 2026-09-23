@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import os
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
@@ -192,6 +192,7 @@ def main() -> int:
     пути: Counter = Counter()
     цены_по_пути: Counter = Counter()
     почему_шапки: Counter = Counter()
+    слова_шапки: dict[str, set] = defaultdict(set)
     было_строк = стало_строк = 0
     лучше = хуже = так_же = 0
     записано_файлов = 0
@@ -261,6 +262,8 @@ def main() -> int:
             цены_по_пути[клетка] += с_ценой
             if rec.get("header_miss"):
                 почему_шапки[rec["header_miss"]] += 1
+                for слово in rec.get("header_words") or ():
+                    слова_шапки[слово].add(fid)
             # Цена — тот признак, по которому эту правку и надо судить.
             б = цен_было_по_файлу.get(fid, 0)
             цен_было += б
@@ -301,6 +304,18 @@ def main() -> int:
         всего_без_шапки = sum(почему_шапки.values())
         for причина, n in почему_шапки.most_common():
             print(f"    {n:>5d}  {100 * n / всего_без_шапки:5.1f} %  {причина}")
+
+        # СЛОВА — ОТ ТРЁХ РАЗНЫХ ФАЙЛОВ И ОТ ШЕСТИ БУКВ (правило 17). Заголовок
+        # таблицы — устройство документа, а не его содержимое, а слово, стоящее в
+        # шапке у трёх разных поставщиков, названием компании быть не может.
+        часто = sorted(((len(f), w) for w, f in слова_шапки.items() if len(f) >= 3),
+                       reverse=True)
+        print("\nСЛОВА ИЗ ШАПКИ, КОТОРЫХ ПРАВИЛО НЕ ЗНАЕТ (от 3 разных файлов):")
+        if часто:
+            for n, слово in часто[:40]:
+                print(f"    {n:>4d} файлов  {слово}")
+        else:
+            print("    ни одного — значит наименование не написано словом вовсе")
 
     print("\nКАКИМ ПУТЁМ ПОШЛИ ФАЙЛЫ (ради табличного пути всё и делалось):")
     for (путь, шапка), n in пути.most_common():
