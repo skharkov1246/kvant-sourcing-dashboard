@@ -364,7 +364,7 @@ def таблица_скана(rec: dict, ref: dict, строки: list[list[str]
     сплошной строке. Ворота шапки пройдены у вызывающего; ворота спецификации
     таблице не нужны — у обычного разбора табличный путь их тоже не проходит.
     """
-    items = indexer.items_from_rows(строки)
+    items = indexer.items_from_rows(строки, шире=False)
     rec["segment_id"] = classify(text) if text else None
     вф = quotes.валюта_файла(text)
     fid = rec["file_id"]
@@ -442,7 +442,9 @@ def recognise(ref: dict) -> tuple[dict, list[dict]]:
         rec["status"] = "пусто"
         rec["reason"] = причина or "распознавание не дало текста"
         return rec, []
-    if строки and indexer.header_map(строки)[0] >= 0:
+    # Таблица скана — как таблица PDF: ослабленное правило шапки к ней не
+    # применяется (его мерили только на офисных файлах, PDF от него теряет цены).
+    if строки and indexer.header_map(строки, шире=False)[0] >= 0:
         return rec, таблица_скана(rec, ref, строки, text)
 
     # Те же ворота, что и в обычном разборе: правило одно на оба места вызова.

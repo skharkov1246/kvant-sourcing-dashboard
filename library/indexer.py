@@ -676,7 +676,7 @@ def колонки_строки(row: list[str]) -> dict[str, int]:
 #: На смешанной выборке всех форматов тот же вход давал строк цены 3 474 → 5 716,
 #: плюс 64,5 % (прогон 35844131867). Значит прирост шёл от офисных файлов, а
 #: общий выключатель складывал прибыль одних с убытком других в одно число.
-ШИРЕ_ПРИМЕНИМО = frozenset({"xlsx", "docx", "csv", "txt", "xml", "spreadsheetml"})
+ШИРЕ_ПРИМЕНИМО = frozenset({"xlsx", "ods", "docx", "csv", "txt", "xml", "spreadsheetml"})
 
 
 def header_map(rows: list[list[str]], *, шире: bool | None = None) -> tuple[int, dict[str, int]]:
@@ -942,10 +942,17 @@ def почему_нет_шапки(rows: list[list[str]]) -> str:
     return "ни одного известного слова колонки"
 
 
-def items_from_rows(rows: list[list[str]]) -> list[dict]:
+def items_from_rows(rows: list[list[str]], *, шире: bool | None = None) -> list[dict]:
     """Позиции из таблицы. Если заголовков нет — берём самую длинную текстовую
-    ячейку строки как наименование: у большинства спецификаций это работает."""
-    hi, cols = header_map(rows)
+    ячейку строки как наименование: у большинства спецификаций это работает.
+
+    шире — применять ли ослабленное правило шапки К ЭТОМУ ФАЙЛУ (ослаблять(вид)).
+    Без него разбор брал общий выключатель, и решение «PDF — строго», принятое
+    в воротах шапки, здесь не действовало: холостой прогон 23.09.2026 с
+    ослаблением дал таблицам PDF 6 263 строки цены против 8 802 (хуже у 381
+    файла), тогда как книгам Excel ослабление прибавило 3 200.
+    """
+    hi, cols = header_map(rows, шире=шире)
     # Ценовые колонки ищутся в той же строке заголовков. У спецификаций заказчика
     # их там нет, и разбор не меняется; у КП поставщика в них весь смысл файла
     # (library/quotes.py).
@@ -1856,7 +1863,7 @@ def листы_книги(rows: list[list[str]]) -> list[list[list[str]]]:
     return [rows]
 
 
-def позиции_по_листам(rows: list[list[str]]) -> list[dict]:
+def позиции_по_листам(rows: list[list[str]], шире: bool | None = None) -> list[dict]:
     """Позиции книги — КАЖДЫЙ ЛИСТ СО СВОЕЙ ШАПКОЙ.
 
     items_from_rows ищет шапку в первых сорока строках всего списка и применяет
@@ -1867,10 +1874,10 @@ def позиции_по_листам(rows: list[list[str]]) -> list[dict]:
     """
     листы = листы_книги(rows)
     if len(листы) == 1:
-        return items_from_rows(листы[0])
+        return items_from_rows(листы[0], шире=шире)
     items: list[dict] = []
     for тело in листы:
-        items += items_from_rows(тело)
+        items += items_from_rows(тело, шире=шире)
         if len(items) >= 3000:
             break
     return items[:3000]
@@ -1953,7 +1960,8 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
     весь_текст = ""
     текст_читателя = text if rows else ""
     if rows:
-        items = позиции_по_листам(rows)
+        шире_файла = ослаблять(rec.get("subkind") or п)
+        items = позиции_по_листам(rows, шире_файла)
         text = " ".join(r.get("_row", "") for r in items)[:200000]
         весь_текст = "\n".join(" ".join(c for c in r if c) for r in rows)[:400000]
         if текст_читателя:
@@ -1961,7 +1969,8 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
             # тело письма к спецификации, надписи в фигурах книги.
             весь_текст = (весь_текст + "\n" + текст_читателя)[:400000]
         rec["parse_path"] = "таблица"
-        rec["header_found"] = any(header_map(тело)[0] >= 0 for тело in листы_книги(rows))
+        rec["header_found"] = any(header_map(тело, шире=шире_файла)[0] >= 0
+                                  for тело in листы_книги(rows))
         # ПОЧЕМУ шапки нет — рядом с тем, что её нет. Иначе «шапки нет» стоит в
         # базе у сотен файлов и не говорит, какую из четырёх правок делать.
         if not rec["header_found"]:

@@ -70,3 +70,32 @@ def test_сборка_таблицы_pdf_тоже_идёт_строгим_пра
     assert len(ворота) == 1, f"ворот шапки больше одних: {ворота}"
     assert 'шире=ослаблять("pdf")' in ворота[0], \
         f"ворота PDF не спрашивают правило по виду: {ворота[0]!r}"
+
+
+def test_разбор_позиций_тоже_берёт_правило_по_виду(monkeypatch):
+    """Ворота шапки решали «PDF — строго», а разбор позиций брал общий выключатель
+    и применял к PDF ослабленное правило. Холостой прогон 23.09.2026 с ослаблением:
+    таблицам PDF 6 263 строки цены против 8 802, хуже у 381 файла."""
+    monkeypatch.setattr(indexer, "ШАПКА_ШИРЕ", True)
+    таблица = [["Equipment", "Qty"], ["Pump CNS-38", "2"]]
+    assert indexer.header_map(таблица, шире=True)[0] == 0
+    assert indexer.header_map(таблица, шире=False)[0] == -1
+    # Разбор позиций со строгим правилом шапки не видит — как и ворота для PDF.
+    строго = indexer.items_from_rows(таблица, шире=False)
+    широко = indexer.items_from_rows(таблица, шире=True)
+    assert all(it["item_name"] != "Equipment" for it in широко), "шапка стала позицией"
+    assert any(it["item_name"] == "Equipment" for it in строго) or len(строго) != len(широко)
+
+
+def test_handle_передаёт_вид_файла_в_разбор_позиций():
+    """Связь проверяется по коду вызова: разбор позиций в handle получает правило
+    по виду, а не общий выключатель."""
+    import tests.test_reparse_wiring as w
+    код = w.без_комментариев((Path(__file__).resolve().parents[1] / "library" / "indexer.py")
+                             .read_text(encoding="utf-8"))
+    assert re.search(r"шире_файла = ослаблять\(", код)
+    assert "позиции_по_листам(rows, шире_файла)" in код
+
+
+def test_книга_ods_ослабляется_как_xlsx():
+    assert "ods" in indexer.ШИРЕ_ПРИМЕНИМО
