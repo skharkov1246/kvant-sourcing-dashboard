@@ -14,10 +14,17 @@ import stages as stages_mod
 
 DEPT_A = {"76", "77", "78", "79"}          # «Отдел поиска поставщиков»
 DEPT_B = {"90", "91"}
+SERVICE_BOT = "900"                        # служебная запись воронки пресейла
+SOURCER_FIELD = "UF_CRM_1779187335"         # поле сделки «Сорсер» — как в портале
+HEAD_FIELD = "UF_CRM_1776169420"            # поле сделки «Head of sourcing departement»
+DEAL_SOURCER_FIELDS = ((SOURCER_FIELD, "сорсер сделки"),
+                       (HEAD_FIELD, "руководитель сорсинга (сорсер в сделке не указан)"))
+SERVICE_IDS = {SERVICE_BOT}
 NAMES = {"76": "Иванов И.", "77": "Петрова А.", "78": "Сидоров С.", "79": "Кузнецов К.",
-         "90": "Орлов О.", "91": "Волкова В."}
+         "90": "Орлов О.", "91": "Волкова В.", SERVICE_BOT: "Робот пресейла"}
 # подразделения нужны разбору «кто заводит запросы»: одного признака
 # «в отделе поиска поставщиков или нет» мало, важно какое именно подразделение
+# служебная запись намеренно не числится ни в одном подразделении — как в портале
 USER_DEPTS = {"76": "Отдел поиска поставщиков", "77": "Отдел поиска поставщиков",
               "78": "Отдел поиска поставщиков", "79": "Отдел поиска поставщиков",
               "90": "Инжиниринг", "91": "Коммерческий отдел"}
@@ -47,25 +54,58 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
         moved = created + dt.timedelta(days=rnd.randint(0, 20))
         # заводит запрос не всегда ответственный: часть создают смежные
         # подразделения, часть — автоматика портала (createdBy пустой)
-        if i % 9 == 0:
-            creator = ""
+        # часть карточек заводит и записывает на себя робот пресейла: живого
+        # исполнителя у них видно только по владельцу родительской сделки
+        # робот и двигал карточку сам — человеческого следа нет вовсе
+        mover = updater = last = SERVICE_BOT
+        if i % 11 == 3:
+            creator = assignee = SERVICE_BOT
+            # часть роботных карточек потом трогает живой сорсер: у них след есть.
+            # Карточка i == 3 намеренно не в их числе: у неё нет ни родительской
+            # сделки, ни человеческого следа — на ней проверяется, что такая
+            # карточка остаётся нераспознанной, а не приписывается кому-то
+            if i == 3:
+                pass
+            elif i % 33 == 3:
+                mover = rnd.choice(sorted(DEPT_A))
+            elif i % 33 == 14:
+                updater = rnd.choice(sorted(DEPT_A))
+            elif i % 33 == 25:
+                last = rnd.choice(sorted(DEPT_A))
+        elif i % 13 == 5:
+            # робот стоит ТОЛЬКО ответственным: карточку завёл человек, а ведёт
+            # её служебная запись. Разбор по автору такую карточку не видит
+            creator, assignee = rnd.choice(sorted(DEPT_A)), SERVICE_BOT
+        elif i % 9 == 0:
+            creator, assignee = "", rnd.choice(users)
         elif i % 5 == 0:
-            creator = rnd.choice(sorted(DEPT_B))
+            creator, assignee = rnd.choice(sorted(DEPT_B)), rnd.choice(users)
         else:
-            creator = rnd.choice(sorted(DEPT_A))
+            creator, assignee = rnd.choice(sorted(DEPT_A)), rnd.choice(users)
+        if assignee != SERVICE_BOT:
+            mover = updater = last = assignee      # обычную карточку ведёт её ответственный
         rfqs.append({
             "id": 1000 + i,
-            "assignedById": int(rnd.choice(users)),
+            "assignedById": int(assignee),
             "createdBy": creator,
+            # следы живого человека на карточке робота
+            "movedBy": mover,
+            "updatedBy": updater,
+            "lastActivityBy": last,
             "stageId": rnd.choice(stage_ids),
             "createdTime": created.isoformat() + "T10:00:00+03:00",
             "movedTime": moved.isoformat() + "T10:00:00+03:00",
-            "parentId2": 500 + (i % n_deals),
+            # у первой роботной карточки сделки нет — исполнителя восстановить не из чего
+            "parentId2": None if i == 3 else 500 + (i % n_deals),
             "categoryId": 24,
             "title": f"Запрос №{i}",
             "companyId": 300 + (i % 40),
             "ufCrm18Supplier": [f"CO_{300 + (i % 40)}"],
             "_supplier": f"ООО Поставщик-{i % 40}",
+            # файл КП со стороны поставщика: по нему считается «получено КП».
+            # Признак ставит выгрузка (main._has_quote_file), поэтому здесь он
+            # задаётся готовым — как приходит в metrics.build
+            "_hasQuote": i % 3 != 2,
         })
 
     deal_stages = ["C24:NEW", "C24:PREPARATION", "C24:WON", "C24:LOSE", "C0:WON"]
@@ -82,15 +122,34 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
             "COMPANY_ID": str(300 + (j % 40)),
             "OPPORTUNITY": str(rnd.randint(10_000, 5_000_000)),
             "CURRENCY_ID": "RUB",
+            # сорсер, записанный в сделке: по нему карточка робота уходит
+            # инициатору. Заполнен у половины сделок — вторая половина
+            # проверяет, что цепочка идёт дальше, а не останавливается
+            SOURCER_FIELD: sorted(DEPT_A)[j % len(DEPT_A)] if j % 2 == 0 else "",
         }
         deal_index[did] = d
         period_deals.append(d)
 
+    # входящие письма поставщиков: из них считается счётчик полученных КП.
+    # Часть писем без вложения (цена в теле) и часть приходит парами на одну
+    # карточку — чтобы в тестах расходились «писем с вложением» и «карточек».
+    inbound = []
+    for i in range(n_rfq // 2):
+        got = p.start + dt.timedelta(days=rnd.randint(0, span))
+        cid = str(1000 + (i % n_rfq))
+        inbound.append({"cid": cid, "dt": got.isoformat() + "T12:00:00+03:00",
+                        "file": i % 4 != 0})
+        if i % 9 == 0:
+            inbound.append({"cid": cid, "dt": got.isoformat() + "T15:00:00+03:00",
+                            "file": True})
+
     return {
         "period": p, "rfqs": rfqs, "deal_index": deal_index, "period_deals": period_deals,
+        "inbound_mail": inbound,
         "dept_a_ids": set(DEPT_A), "names": dict(NAMES),
         "since": {u: "2025-01-01" for u in users},
         "user_depts": dict(USER_DEPTS),
+        "service_ids": set(SERVICE_IDS),
         "deal_stage_names": {s: s.split(":")[-1].title() for s in deal_stages},
         "category_names": {"0": "Продажи", "24": "Сорсинг", "7": "Сервис"},
     }
@@ -102,7 +161,9 @@ def build_metrics(**kw) -> dict:
     d = make_dataset(**kw)
     return metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
                              d["dept_a_ids"], d["names"], d["since"],
-                             d["deal_stage_names"], d["category_names"], d["user_depts"])
+                             d["deal_stage_names"], d["category_names"], d["user_depts"],
+                             d.get("service_ids"), d.get("inbound_mail"),
+                             DEAL_SOURCER_FIELDS)
 
 
 # ------------------------------------------------------------------ коммерсанты

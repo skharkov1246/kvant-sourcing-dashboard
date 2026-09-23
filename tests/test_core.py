@@ -358,3 +358,566 @@ def test_разбор_не_падает_без_карты_подразделен
     o = m["origin"]
     assert o["summary"]["total"] == m["kpi"]["total"]
     assert any(c["dept"] == "подразделение не указано" for c in o["byCreator"])
+
+
+# ── служебные записи (воронка пресейла) ──────────────────────────────────────
+# Карточки заводит робот от имени служебной учётной записи. Если считать
+# исполнителем её, работа сорсера, запустившего кампанию, исчезает из его
+# статистики. Исполнитель восстанавливается цепочкой: ответственный карточки →
+# владелец родительской сделки → автор карточки.
+
+def _build(service_ids, sourcer_fields=None):
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    return metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                             d["dept_a_ids"], d["names"], d["since"],
+                             d["deal_stage_names"], d["category_names"], d["user_depts"],
+                             service_ids, None,
+                             fixture.DEAL_SOURCER_FIELDS if sourcer_fields is None else sourcer_fields)
+
+
+def test_служебная_запись_не_числится_исполнителем():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    for s in m["sourcersA"]:
+        assert s["id"] not in fixture.SERVICE_IDS, (
+            "служебная запись попала в список сорсеров как исполнитель")
+
+
+def test_карточки_робота_засчитаны_живому_сотруднику():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    s = m["origin"]["summary"]
+    assert s["viaService"] > 0, "в синтетике есть карточки служебной записи"
+    assert s["serviceResolved"] > 0, "ни одна карточка робота не отнесена к человеку"
+    assert s["serviceResolved"] <= s["viaService"]
+    to = m["origin"]["resolvedTo"]
+    assert sum(c["n"] for c in to) == s["serviceResolved"]
+    assert all(c["uid"] not in fixture.SERVICE_IDS for c in to)
+
+
+def test_цепочка_восстановления_объяснена_и_сходится():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    o = m["origin"]
+    how = {x["how"]: x["n"] for x in o["resolvedHow"]}
+    assert sum(how.values()) == o["summary"]["viaService"], (
+        "разбор «чем определён исполнитель» не сходится с числом карточек робота")
+    assert how.get("владелец сделки"), (
+        "у карточек робота исполнитель должен восстанавливаться по родительской сделке")
+    assert "ответственный" not in how, (
+        "ответственным у карточки робота записан он сам — этот путь невозможен")
+
+
+def test_нагрузка_сорсеров_растёт_после_учёта_служебной_записи():
+    from tests import fixture
+    before = _build(None)
+    after = _build(fixture.SERVICE_IDS)
+    a_before = sum(s["c"] for s in before["sourcersA"])
+    a_after = sum(s["c"] for s in after["sourcersA"])
+    assert a_after > a_before, (
+        "после учёта служебной записи карточки робота должны вернуться сорсерам")
+    assert before["kpi"]["total"] == after["kpi"]["total"], (
+        "общее число запросов от разбора зависеть не должно")
+
+
+def test_пустой_список_служебных_записей_ничего_не_меняет():
+    """Сначала мерим, потом применяем: пока список пуст, поведение прежнее —
+    исполнителем остаётся ответственный карточки."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"], d["user_depts"], None)
+    assert m["origin"]["summary"]["viaService"] == 0
+    assert m["origin"]["summary"]["serviceConfigured"] == 0
+    assert all(r["_owner"] == str(r["assignedById"]) for r in d["rfqs"]), (
+        "при пустом списке исполнитель обязан совпадать с ответственным карточки")
+
+
+def test_кандидаты_показываются_но_не_применяются():
+    """Запись без подразделения с потоком карточек предлагается владельцу,
+    но из статистики не выключается сама."""
+    from tests import fixture
+    m = _build(None)
+    o = m["origin"]
+    cand = {c["uid"] for c in o["serviceCandidates"]}
+    assert fixture.SERVICE_BOT in cand, (
+        "робот без подразделения с потоком карточек должен попасть в кандидаты")
+    assert o["summary"]["candidates"] == len(o["serviceCandidates"])
+    assert o["summary"]["candidateFloor"] >= 10
+    # кандидат остаётся обычным автором: его карточки никуда не переехали
+    assert o["summary"]["viaService"] == 0
+    assert any(c["uid"] == fixture.SERVICE_BOT and not c["auto"]
+               for c in o["byCreator"]), "кандидат должен остаться в разборе как автор"
+
+
+def test_нераспознанная_карточка_робота_не_приписывается_никому():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    o = m["origin"]
+    how = {x["how"]: x["n"] for x in o["resolvedHow"]}
+    assert how.get("не определён", 0) >= 1, (
+        "карточка робота без родительской сделки должна оставаться нераспознанной"
+    )
+    assert o["summary"]["serviceResolved"] + how.get("не определён", 0) == o["summary"]["viaService"]
+
+
+def test_разрез_по_подразделению_исполнителя_сходится():
+    """«Чья это работа» считается по исполнителю, а не по автору карточки,
+    и обязан раскладывать все запросы периода без потерь."""
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    o = m["origin"]
+    assert sum(d["n"] for d in o["byOwnerDept"]) == o["summary"]["total"]
+    assert all(d["dept"] != "служебная запись (робот пресейла)" for d in o["byOwnerDept"]), (
+        "служебная запись не может быть подразделением-исполнителем")
+
+
+def test_карточки_робота_переезжают_в_подразделение_исполнителя():
+    from tests import fixture
+    before = {d["dept"]: d["n"] for d in _build(None)["origin"]["byOwnerDept"]}
+    after = {d["dept"]: d["n"] for d in _build(fixture.SERVICE_IDS)["origin"]["byOwnerDept"]}
+    assert before.get("подразделение не указано", 0) > after.get("подразделение не указано", 0), (
+        "до учёта служебной записи её карточки висели на записи без подразделения")
+    assert after.get("Отдел поиска поставщиков", 0) > before.get("Отдел поиска поставщиков", 0), (
+        "после учёта часть карточек робота должна вернуться отделу поиска поставщиков")
+
+
+# ── полученные КП по неделям ─────────────────────────────────────────────────
+# Источник — файл КП со стороны поставщика в карточке, а не входящее письмо:
+# замер прогона 23.09.2026 показал ноль входящих писем на карточках СП-166.
+# Неделя берётся по последнему движению карточки, другой даты в выдаче нет.
+
+def test_кп_считаются_по_файлу_поставщика_а_не_по_письму():
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = fixture.build_metrics()
+    ждём = sum(1 for r in d["rfqs"]
+               if r.get("_hasQuote")
+               and d["period"].week_index(period_mod.parse_dt(r.get("movedTime") or "")) is not None)
+    assert ждём > 0, "в синтетике есть карточки с файлом КП"
+    assert sum(w["kp"] for w in m["weekly"]) == ждём
+
+
+def test_кп_принято_в_работу_считается_по_стадии_и_неделе_перевода():
+    """Другой факт, чем наличие файла: карточку перевели в «КП получено»."""
+    import stages as st
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = fixture.build_metrics()
+    ждём = sum(1 for r in d["rfqs"]
+               if st.classify_stage(r.get("stageId", "")) == "selected"
+               and d["period"].week_index(period_mod.parse_dt(r.get("movedTime") or "")) is not None)
+    assert ждём > 0, "в синтетике есть карточки в стадии «КП получено»"
+    assert sum(w["kpa"] for w in m["weekly"]) == ждём
+
+
+def test_письма_остаются_контрольным_числом_а_не_источником_кп():
+    """Входящие письма считаются отдельной величиной и в столбец КП не идут:
+    ноль писем не должен обнулять график, у которого источник другой."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"], d["user_depts"],
+                          d.get("service_ids"), None)
+    assert all(w["inb"] == 0 for w in m["weekly"])
+    assert sum(w["kp"] for w in m["weekly"]) > 0, (
+        "без писем столбец полученных КП обязан остаться: он считается по файлам"
+    )
+    с_письмами = fixture.build_metrics()["weekly"]
+    assert sum(w["inb"] for w in с_письмами) > 0
+    assert [w["kp"] for w in с_письмами] == [w["kp"] for w in m["weekly"]], (
+        "письма на счёт полученных КП влиять не должны")
+
+
+def test_горизонт_недельного_ряда_покрывает_семь_недель():
+    """График показывает последние семь недель — значит ряд обязан быть не короче."""
+    from tests import fixture
+    assert len(fixture.build_metrics()["weekly"]) >= 7
+
+
+def test_файл_кп_отличается_от_нашего_исходящего_запроса():
+    """«Request file» — наш запрос, и за полученное КП он не считается."""
+    import config as config_mod
+    import main as main_mod
+    наш = "ufCrm18_1727423346"
+    assert наш not in config_mod.RFQ_QUOTE_FIELDS
+    поле_кп = "ufCrm18_1700698211875"
+    assert main_mod._has_quote_file({поле_кп: [{"id": 1}]}) is True
+    assert main_mod._has_quote_file({поле_кп: {"id": 1}}) is True
+    assert main_mod._has_quote_file({наш: [{"id": 1}]}) is False
+    for пусто in ([], "", None, [None]):
+        assert main_mod._has_quote_file({поле_кп: пусто}) is False, пусто
+
+
+# ── разбор писем карточек: исходящие и входящие из одной выгрузки ────────────
+# Выгрузка сведена в один проход crm.activity.list без фильтра DIRECTION.
+# Разбор на нашей стороне, поэтому он и проверяется: ошибка здесь тихо обнулила
+# бы и таблицу «отправлено vs создано», и счётчик полученных КП.
+
+def _acts():
+    """Придуманная выгрузка писем в том виде, в каком её отдаёт _mail_activities."""
+    def m(cid, d, dt_, file=False):
+        return {"cid": cid, "dir": d, "subj": "тема", "to": "s@example.org",
+                "body": "текст", "file": file, "dt": dt_[:16].replace("T", " "), "dtx": dt_}
+    return [
+        m("1000", "2", "2026-05-04T10:00:00+03:00"),          # отправлен запрос
+        m("1000", "2", "2026-05-06T10:00:00+03:00"),          # напоминание
+        m("1000", "1", "2026-05-07T09:00:00+03:00", True),    # КП с вложением
+        m("1001", "1", "2026-05-07T11:00:00+03:00"),          # ответ без вложения
+        m("1002", "2", "2026-05-08T10:00:00+03:00"),
+    ]
+
+
+def test_входящие_отбираются_по_направлению_а_не_по_вложению():
+    import main as main_mod
+    inb = main_mod._inbound_mail(_acts())
+    assert len(inb) == 2, "входящих в выгрузке ровно два"
+    assert {a["cid"] for a in inb} == {"1000", "1001"}
+    assert sum(1 for a in inb if a["file"]) == 1
+    assert all(set(a) == {"cid", "dt", "file"} for a in inb)
+
+
+def test_отправлено_считается_только_по_исходящим():
+    import main as main_mod
+    rfqs = [{"id": 1000, "_owner": "76", "stageId": "DT166_24:PREPARATION"},
+            {"id": 1001, "_owner": "76", "stageId": "DT166_24:PREPARATION"},
+            {"id": 1003, "_owner": "76", "stageId": "DT166_24:NEW"}]
+    res = main_mod._send_stats(_acts(), rfqs, [{"id": "76", "n": "Иванов И."}], {"76"})
+    row = res["rows"][0]
+    assert row["total"] == 3
+    assert row["sent"] == 1, "исходящие есть только у карточки 1000"
+    assert row["nosend"] == 2
+    assert row["fake"] == 1, "карточка 1001 вышла из «Новый» без единого письма"
+    assert row["fuPct"] == 100, "по карточке 1000 было повторное письмо"
+    # входящие письма в переписку сорсера не попадают
+    assert all(e["dtx"] < "2026-05-07" for e in res["byCard"]["1000"])
+    assert "1001" not in res["byCard"], (
+        "карточка с одним входящим письмом исходящей переписки не имеет")
+
+
+def test_служебная_запись_с_подразделением_помечается():
+    """Живого сотрудника, попавшего в список по ошибке, надо увидеть, а не
+    молча вычесть из его же статистики."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    depts = dict(d["user_depts"])
+    depts[fixture.SERVICE_BOT] = "Инжиниринг"        # как будто запись — человек
+    m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"], depts,
+                          fixture.SERVICE_IDS, d["inbound_mail"])
+    sv = m["origin"]["service"]
+    assert sv and sv[0]["looksHuman"] is True and sv[0]["dept"] == "Инжиниринг"
+    # без подразделения пометки быть не должно
+    clean = fixture.build_metrics()["origin"]["service"]
+    assert clean and clean[0]["looksHuman"] is False
+
+
+def test_список_служебных_записей_переопределяется_окружением():
+    """Состав меняется: значение в коде — только умолчание, решает окружение."""
+    import importlib
+    import os
+    import config as config_mod
+    prev = os.environ.get("SERVICE_ACCOUNT_IDS")
+    try:
+        os.environ["SERVICE_ACCOUNT_IDS"] = "7, 8 ,7"
+        assert importlib.reload(config_mod).SERVICE_ACCOUNT_IDS == {"7", "8"}
+        os.environ["SERVICE_ACCOUNT_IDS"] = "off"    # разбор отключается словом
+        assert importlib.reload(config_mod).SERVICE_ACCOUNT_IDS == set()
+        # Actions подставляет пустую строку для незаданной переменной — это
+        # «переменной нет», а не «выключено»: умолчание кода должно устоять
+        os.environ["SERVICE_ACCOUNT_IDS"] = ""
+        cfg = importlib.reload(config_mod)
+        ожидание = {u.strip() for u in cfg.SERVICE_ACCOUNT_DEFAULT.split(",") if u.strip()}
+        assert cfg.SERVICE_ACCOUNT_IDS == ожидание
+        del os.environ["SERVICE_ACCOUNT_IDS"]        # без переменной — то же самое
+        cfg = importlib.reload(config_mod)
+        assert cfg.SERVICE_ACCOUNT_IDS == ожидание
+        assert len(ожидание) >= 1
+    finally:
+        if prev is None:
+            os.environ.pop("SERVICE_ACCOUNT_IDS", None)
+        else:
+            os.environ["SERVICE_ACCOUNT_IDS"] = prev
+        importlib.reload(config_mod)
+
+
+def test_у_сорсера_видно_файлы_кп_и_стадию_отдельно():
+    """Пришедшее предложение и принятое в работу — разные величины и у
+    человека тоже: разрыв показывает, что лежит неразобранным лично у него."""
+    from tests import fixture
+    m = fixture.build_metrics()
+    A = m["sourcersA"]
+    assert A, "в синтетике есть сорсеры с нагрузкой"
+    for s in A:
+        assert "quotes" in s, f"у {s['n']} нет счёта файлов КП"
+        assert 0 <= s["quotes"] <= s["c"]
+    assert sum(s["quotes"] for s in A) > 0, "в синтетике есть карточки с файлом КП"
+
+
+# ── служебная запись как ОТВЕТСТВЕННЫЙ, а не только автор ───────────────────
+# Разбор, смотревший лишь на автора карточки, показывал ноль там, где робот
+# создаёт карточки от имени владельца воронки и лишь ставится ответственным.
+
+def test_служебная_запись_видна_в_роли_ответственного():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    o = m["origin"]
+    s = o["summary"]
+    assert s["viaServiceAssigned"] > 0, "робот стоит ответственным на части карточек"
+    assert s["viaServiceMade"] > 0, "и часть карточек он завёл сам"
+    assert s["viaService"] >= max(s["viaServiceMade"], s["viaServiceAssigned"])
+    строка = [c for c in o["service"] if c["uid"] == fixture.SERVICE_BOT]
+    assert строка and строка[0]["made"] > 0 and строка[0]["assigned"] > 0
+
+
+def test_карточки_где_робот_только_ответственный_уходят_живому_сотруднику():
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = _build(fixture.SERVICE_IDS)
+    только_ответственный = [r for r in d["rfqs"]
+                            if str(r["assignedById"]) == fixture.SERVICE_BOT
+                            and r["createdBy"] != fixture.SERVICE_BOT]
+    assert только_ответственный, "в синтетике есть такие карточки"
+    # ни одна из них не осталась на служебной записи: цепочка увела их дальше
+    свои = {str(r["id"]) for r in только_ответственный}
+    for s in m["sourcersA"]:
+        assert s["id"] != fixture.SERVICE_BOT
+    разошлись = {d["id"] for s in m["sourcersA"] for d in s["details"]} & свои
+    assert разошлись, "карточки робота должны появиться в нагрузке живых сорсеров"
+    assert sum(c["n"] for c in m["origin"]["resolvedTo"]) == m["origin"]["summary"]["serviceResolved"]
+
+
+def test_список_ответственных_показывает_все_записи_как_есть():
+    """До всякой цепочки: служебная запись обязана быть видна поимённо."""
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    ba = m["origin"]["byAssignee"]
+    assert sum(c["n"] for c in ba) == m["origin"]["summary"]["total"], (
+        "разбор по ответственному должен покрывать все карточки периода")
+    робот = [c for c in ba if c["uid"] == fixture.SERVICE_BOT]
+    assert робот and робот[0]["svc"] is True and робот[0]["n"] > 0
+
+
+def test_кандидатом_становится_запись_и_по_роли_ответственного():
+    """Запись, которая карточек не заводит, а лишь стоит ответственной,
+    прежний отбор не замечал вовсе."""
+    from tests import fixture
+    o = _build(None)["origin"]
+    кандидат = [c for c in o["serviceCandidates"] if c["uid"] == fixture.SERVICE_BOT]
+    assert кандидат, "робот без подразделения обязан попасть в кандидаты"
+    assert кандидат[0]["assigned"] > 0 and кандидат[0]["made"] > 0
+    assert кандидат[0]["n"] == max(кандидат[0]["assigned"], кандидат[0]["made"])
+
+
+# ── порядок звеньев: кто трогал карточку важнее владельца сделки ─────────────
+# Замер 23.09.2026 по 138 карточкам робота: movedBy ведёт в отдел у 12 %,
+# владелец сделки — у 10 %, но это чаще КАМ. Заслуга сорсера уходила к нему.
+
+def test_карточку_робота_забирает_тот_кто_её_трогал_а_не_владелец_сделки():
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    сорсер, кам = "78", "90"
+    карточка = {"id": 9001, "assignedById": fixture.SERVICE_BOT,
+                "createdBy": fixture.SERVICE_BOT, "movedBy": сорсер,
+                "updatedBy": fixture.SERVICE_BOT, "lastActivityBy": fixture.SERVICE_BOT,
+                "stageId": "DT166_24:NEW", "createdTime": "2026-06-01T10:00:00+03:00",
+                "movedTime": "2026-06-02T10:00:00+03:00", "parentId2": 777,
+                "categoryId": 24, "title": "Запрос робота", "_supplier": "—"}
+    index = dict(d["deal_index"])
+    index["777"] = {"ID": "777", "ASSIGNED_BY_ID": кам, "CATEGORY_ID": "0",
+                    "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"}
+    m = metrics_mod.build(d["period"], [карточка], index, d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"], d["user_depts"],
+                          fixture.SERVICE_IDS)
+    assert карточка["_owner"] == сорсер, "карточка обязана уйти тому, кто её двигал"
+    assert карточка["_ownerBy"] == "двигал стадию"
+    assert [c["how"] for c in m["origin"]["resolvedHow"]] == ["двигал стадию"]
+
+
+def test_владелец_сделки_остаётся_но_последним_из_людей():
+    """Следа человека на карточке нет — тогда владелец сделки, как догадка."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    кам = "90"
+    карточка = {"id": 9002, "assignedById": fixture.SERVICE_BOT,
+                "createdBy": fixture.SERVICE_BOT, "movedBy": fixture.SERVICE_BOT,
+                "updatedBy": "", "lastActivityBy": None,
+                "stageId": "DT166_24:NEW", "createdTime": "2026-06-01T10:00:00+03:00",
+                "movedTime": "2026-06-02T10:00:00+03:00", "parentId2": 778,
+                "categoryId": 24, "title": "Запрос робота", "_supplier": "—"}
+    index = {"778": {"ID": "778", "ASSIGNED_BY_ID": кам, "CATEGORY_ID": "0",
+                     "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"}}
+    metrics_mod.build(d["period"], [карточка], index, d["period_deals"],
+                      d["dept_a_ids"], d["names"], d["since"],
+                      d["deal_stage_names"], d["category_names"], d["user_depts"],
+                      fixture.SERVICE_IDS)
+    assert карточка["_owner"] == кам
+    assert карточка["_ownerBy"] == "владелец сделки"
+
+
+def test_карточка_которую_робот_вёл_один_остаётся_нераспознанной():
+    """88 % карточек робота таковы. Приписать их кому-то по догадке нельзя."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    карточка = {"id": 9003, "assignedById": fixture.SERVICE_BOT,
+                "createdBy": fixture.SERVICE_BOT, "movedBy": fixture.SERVICE_BOT,
+                "updatedBy": fixture.SERVICE_BOT, "lastActivityBy": fixture.SERVICE_BOT,
+                "stageId": "DT166_24:NEW", "createdTime": "2026-06-01T10:00:00+03:00",
+                "movedTime": "2026-06-02T10:00:00+03:00", "parentId2": None,
+                "categoryId": 24, "title": "Запрос робота", "_supplier": "—"}
+    metrics_mod.build(d["period"], [карточка], {}, d["period_deals"],
+                      d["dept_a_ids"], d["names"], d["since"],
+                      d["deal_stage_names"], d["category_names"], d["user_depts"],
+                      fixture.SERVICE_IDS)
+    assert карточка["_owner"] == ""
+    assert карточка["_ownerBy"] == "не определён"
+
+
+def test_у_обычной_карточки_цепочка_не_выполняется_вовсе():
+    """Правка не должна менять судьбу карточек с живым ответственным."""
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = _build(fixture.SERVICE_IDS)
+    живые = [r for r in d["rfqs"] if str(r["assignedById"]) != fixture.SERVICE_BOT]
+    assert живые
+    m2 = _build(fixture.SERVICE_IDS)
+    for r in m2["origin"]["byAssignee"]:
+        if not r["svc"] and r["uid"]:
+            assert r["n"] > 0
+    how = {x["how"] for x in m["origin"]["resolvedHow"]}
+    assert "ответственный" not in how, (
+        "разбор служебных карточек не может опереться на ответственного — он служебный")
+
+
+# ── сорсер сделки — первое звено для карточки робота ─────────────────────────
+# Замер 23.09.2026 (зонд v46): поле сделки «сорсер» ведёт в отдел поиска
+# поставщиков у 408 из 409 карточек робота с родительской сделкой. Кто двигал
+# карточку — 13 %, владелец сделки — 26 %, и это чаще КАМ.
+
+def _карточка_робота(fixture, **kw):
+    base = {"id": 9100, "assignedById": fixture.SERVICE_BOT, "createdBy": fixture.SERVICE_BOT,
+            "movedBy": fixture.SERVICE_BOT, "updatedBy": fixture.SERVICE_BOT,
+            "lastActivityBy": fixture.SERVICE_BOT, "stageId": "DT166_24:NEW",
+            "createdTime": "2026-06-01T10:00:00+03:00", "movedTime": "2026-06-02T10:00:00+03:00",
+            "parentId2": 880, "categoryId": 24, "title": "Запрос робота", "_supplier": "—"}
+    base.update(kw)
+    return base
+
+
+def _одна(fixture, карточка, сделка):
+    import metrics as metrics_mod
+    d = fixture.make_dataset()
+    return metrics_mod.build(d["period"], [карточка], {"880": сделка}, d["period_deals"],
+                             d["dept_a_ids"], d["names"], d["since"],
+                             d["deal_stage_names"], d["category_names"], d["user_depts"],
+                             fixture.SERVICE_IDS, None, fixture.DEAL_SOURCER_FIELDS)
+
+
+def test_карточку_робота_получает_сорсер_сделки_а_не_кам():
+    from tests import fixture
+    сорсер, кам = "77", "90"
+    к = _карточка_робота(fixture, movedBy=кам)          # двигал КАМ — это не инициатор
+    m = _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": кам, fixture.SOURCER_FIELD: сорсер,
+                          "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == (сорсер, "сорсер сделки")
+    assert [s["id"] for s in m["sourcersA"]] == [сорсер], "запрос обязан лечь в статистику сорсера"
+    assert m["kpi"]["deptA"] == 1 and m["kpi"]["outside"] == 0, (
+        "карточка робота с сорсером в сделке больше не числится вне отдела")
+
+
+def test_сорсер_сделки_служебной_записью_не_бывает():
+    """Если в поле сделки стоит сам робот — звено пропускается, а не засчитывает ему."""
+    from tests import fixture
+    сорсер = "76"
+    к = _карточка_робота(fixture, movedBy=сорсер)
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90", fixture.SOURCER_FIELD: fixture.SERVICE_BOT,
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == (сорсер, "двигал стадию")
+
+
+def test_поле_сорсера_списком_берёт_первого_живого():
+    """Поле «сотрудник» бывает множественным — портал отдаёт его списком."""
+    from tests import fixture
+    к = _карточка_робота(fixture)
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90",
+                      fixture.SOURCER_FIELD: ["0", fixture.SERVICE_BOT, "79"],
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == ("79", "сорсер сделки")
+
+
+def test_живой_ответственный_сильнее_поля_сорсера():
+    """Карточку, которую ведёт человек, цепочка не трогает — даже если в сделке
+    записан другой сорсер: правка меняет судьбу только карточек робота."""
+    from tests import fixture
+    к = _карточка_робота(fixture, assignedById="91")
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90", fixture.SOURCER_FIELD: "77",
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == ("91", "ответственный")
+
+
+def test_на_синтетике_карточки_робота_уходят_сорсерам_сделки():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    how = {x["how"]: x["n"] for x in m["origin"]["resolvedHow"]}
+    assert how.get("сорсер сделки", 0) > 0
+    без_поля = _build(fixture.SERVICE_IDS, sourcer_fields=())
+    assert m["kpi"]["deptA"] > без_поля["kpi"]["deptA"], (
+        "с полем сорсера сделки больше запросов обязано лечь в статистику отдела")
+
+
+def test_служебная_запись_узнаётся_и_по_имени():
+    """Нового робота с именем «Служебный…» разбор обязан подхватить сам."""
+    import config as config_mod
+    names = {"234": "Аккаунт №2 Служебный", "9": "Ботов Иван", "10": "Тест 3 Бот",
+             "11": "Сервисова Анна", "12": "Технический Аккаунт"}
+    got = config_mod.service_accounts(names)
+    assert {"234", "10", "12"} <= got
+    assert "9" not in got and "11" not in got, "фамилия, похожая на слово, — не робот"
+    assert config_mod.SERVICE_ACCOUNT_IDS <= got, "заданные номерами входят всегда"
+    assert "2" not in config_mod.SERVICE_ACCOUNT_IDS, (
+        "«Аккаунт №2» — имя, а не номер: пользователь 2 к воронке отношения не имеет")
+
+
+def test_сорсер_сделки_сильнее_руководителя_сорсинга():
+    """PR #400 ставил поле руководителя первым: отдел запросы получил, но внутри
+    отдела они легли на руководителя, а не на сорсера. Закреплено здесь."""
+    from tests import fixture
+    сорсер, руководитель = "78", "76"
+    к = _карточка_робота(fixture)
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90",
+                      fixture.SOURCER_FIELD: сорсер, fixture.HEAD_FIELD: руководитель,
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == (сорсер, "сорсер сделки")
+
+
+def test_без_сорсера_запрос_уходит_руководителю_с_отдельной_подписью():
+    """Запасное звено держит запрос в своём отделе, но подписано так, чтобы
+    его не приняли за работу руководителя руками."""
+    from tests import fixture
+    руководитель = "76"
+    к = _карточка_робота(fixture)
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90",
+                      fixture.SOURCER_FIELD: "", fixture.HEAD_FIELD: руководитель,
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert к["_owner"] == руководитель
+    assert к["_ownerBy"].startswith("руководитель сорсинга")
+
+
+def test_поле_сорсера_в_конфигурации_стоит_первым():
+    """Порядок задан в конфигурации, и именно он попадает в прод."""
+    import config as config_mod
+    коды = [f for f, _ in config_mod.DEAL_SOURCER_FIELDS]
+    assert коды[0] == "UF_CRM_1779187335", "первым обязан стоять «Сорсер», а не руководитель"
+    assert "UF_CRM_1776169420" in коды[1:]

@@ -34,9 +34,48 @@ import reps as reps_mod
 from bitrix_client import BitrixClient
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
-              "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact"]
+              # следы живого человека на карточке робота: кто двигал стадию,
+              # кто менял, кто последним отметился в таймлайне
+              "movedBy", "updatedBy", "lastActivityBy",
+              "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact",
+              # файлы КП со стороны поставщика: по ним считается «получено КП».
+              # Маска "*" файловых полей не возвращает — только поимённо.
+              *config.RFQ_QUOTE_FIELDS]
 
 SUPPLIER_CRM_FIELDS = ("ufCrm18Supplier", "ufCrm18SupplContact")
+
+
+def _deal_field_labels(client: BitrixClient, codes) -> dict[str, str]:
+    """Подписи пользовательских полей сделки — чтобы в журнале стояло «Сорсер»,
+    а не код поля. Подпись поля — настройка портала, а не персональные данные."""
+    try:
+        fields = client.call("crm.deal.fields") or {}
+    except Exception:                                        # noqa: BLE001
+        return {}
+    out = {}
+    for code in codes:
+        meta = fields.get(code) or {}
+        out[code] = str(meta.get("formLabel") or meta.get("listLabel") or meta.get("title") or "")
+    return out
+
+
+def _has_quote_file(item: dict) -> bool:
+    """Есть ли в карточке файл КП со стороны поставщика.
+
+    Поле приходит списком, словарём или пустым, а у пустого встречается и
+    строка, и пустой список — поэтому проверяется истинность значения, а не
+    его тип. Наш исходящий «Request file» в этот список не входит: считать его
+    за полученное КП значит объявить прокотированным то, что мы сами и
+    отправили.
+    """
+    for f in config.RFQ_QUOTE_FIELDS:
+        v = item.get(f)
+        if isinstance(v, list):
+            if any(v):
+                return True
+        elif v:
+            return True
+    return False
 
 
 def _crm_ref_ids(val):
@@ -137,28 +176,33 @@ def _has_attachment(a: dict) -> bool:
     return False
 
 
-def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict],
-                dept_a_ids: set[str], start_iso: str, end_iso: str) -> dict:
-    """Реально отправлено vs создано: по факту исходящего CRM-письма на карточке RFQ.
-    Дополнительно собирает по каждой карточке письма (тема · получатель · превью · вложение)
-    для хронологического списка в дровере сорсера.
-    Возвращает {"rows": [...], "totals": {...}, "byCard": {card_id: [emails...]}}."""
-    counts: Counter = Counter()  # card_id -> кол-во исходящих писем
-    by_card: dict[str, list[dict]] = defaultdict(list)
+def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list[dict]:
+    """Все CRM-письма карточек СП-166 за окно, одним проходом.
+
+    Раньше исходящие тянулись отдельным запросом. Входящие нужны для счётчика
+    полученных КП, и второй такой же проход удвоил бы и время выгрузки, и шанс
+    упереться в лимит портала: DIRECTION убран из фильтра, разбор — на нашей
+    стороне.
+
+    Тело письма усекается сразу при выгрузке: за окно приходят десятки тысяч
+    писем, и держать их сырыми в памяти незачем — в дровер идёт превью, а в
+    счётчик КП только дата, карточка и признак вложения.
+    """
+    out: list[dict] = []
     last = 0
     while True:
         ch = client.call("crm.activity.list", {
             "filter": {"OWNER_TYPE_ID": config.SPA_ENTITY_TYPE_ID, "PROVIDER_ID": "CRM_EMAIL",
-                       "DIRECTION": 2, ">=CREATED": start_iso, "<=CREATED": end_iso, ">ID": last},
-            "select": ["ID", "OWNER_ID", "SUBJECT", "DESCRIPTION", "SETTINGS",
+                       ">=CREATED": start_iso, "<=CREATED": end_iso, ">ID": last},
+            "select": ["ID", "OWNER_ID", "DIRECTION", "SUBJECT", "DESCRIPTION", "SETTINGS",
                        "FILES", "STORAGE_ELEMENT_IDS", "CREATED"],
             "order": {"ID": "ASC"}, "start": -1}) or []
         if not ch:
             break
         for a in ch:
-            cid = str(a.get("OWNER_ID"))
-            counts[cid] += 1
-            by_card[cid].append({
+            out.append({
+                "cid": str(a.get("OWNER_ID")),
+                "dir": str(a.get("DIRECTION") or ""),
                 "subj": (a.get("SUBJECT") or "").strip(),
                 "to": _email_to(a.get("SETTINGS")),
                 "body": _email_preview(a.get("DESCRIPTION")),
@@ -169,13 +213,37 @@ def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict]
         last = int(ch[-1]["ID"])
         if len(ch) < 50:
             break
+    return out
+
+
+def _inbound_mail(acts: list[dict]) -> list[dict]:
+    """Входящие письма поставщиков в виде, который понимает metrics.build."""
+    return [{"cid": a["cid"], "dt": a["dtx"], "file": a["file"]}
+            for a in acts if a["dir"] == "1"]
+
+
+def _send_stats(acts: list[dict], rfqs: list[dict], sourcer_rows: list[dict],
+                dept_a_ids: set[str]) -> dict:
+    """Реально отправлено vs создано: по факту исходящего CRM-письма на карточке RFQ.
+    Дополнительно собирает по каждой карточке письма (тема · получатель · превью · вложение)
+    для хронологического списка в дровере сорсера.
+    Возвращает {"rows": [...], "totals": {...}, "byCard": {card_id: [emails...]}}."""
+    counts: Counter = Counter()  # card_id -> кол-во исходящих писем
+    by_card: dict[str, list[dict]] = defaultdict(list)
+    for a in acts:
+        if a["dir"] != "2":
+            continue
+        counts[a["cid"]] += 1
+        by_card[a["cid"]].append({k: a[k] for k in ("subj", "to", "body", "file", "dt", "dtx")})
     # письма каждой карточки — по времени, новые сверху
     for cid in by_card:
         by_card[cid].sort(key=lambda e: e["dtx"], reverse=True)
 
     by_user: dict[str, list[dict]] = defaultdict(list)
     for r in rfqs:
-        u = str(r.get("assignedById"))
+        # исполнитель уже разрешён в metrics.build (цепочка «ответственный →
+        # владелец сделки → автор»), карточки робота засчитаны живому сорсеру
+        u = r.get("_owner") or str(r.get("assignedById"))
         if u in dept_a_ids:
             by_user[u].append(r)
 
@@ -265,11 +333,32 @@ def run(args) -> int:
         select=RFQ_SELECT,
         max_items=args.max_deals,
     )
-    print(f"  RFQ: {len(rfqs)}  |  блок A (отдел 172): {sum(1 for r in rfqs if str(r.get('assignedById')) in dept_a_ids)}")
+    print(f"  RFQ: {len(rfqs)}  |  блок A по ответственному (отдел 172): "
+          f"{sum(1 for r in rfqs if str(r.get('assignedById')) in dept_a_ids)}")
+
+    # Служебные записи: заданные номерами плюс названные служебными по имени.
+    # Номера и имена служебных записей — не персональные данные: это роботы.
+    service_ids = config.service_accounts(names)
+    if service_ids:
+        print("  служебные записи: " + ", ".join(
+            f"#{u} {names.get(u, '')}".strip() for u in sorted(service_ids, key=int)))
+    else:
+        print("  служебные записи: разбор отключён (SERVICE_ACCOUNT_IDS=off)")
 
     parent_ids = {str(r.get("parentId2")) for r in rfqs if r.get("parentId2")}
     print(f"• Родительские сделки (parentId2): {len(parent_ids)} → выгрузка стадий…")
-    deal_index = client.deals_by_ids(parent_ids)
+    # ASSIGNED_BY_ID и поля сорсера нужны цепочке «кому засчитать запрос». До
+    # 23.09.2026 сделки выгружались без ответственного, и звено «владелец
+    # сделки» в проде не срабатывало ни разу — это не было видно, потому что
+    # до служебных записей цепочка до него не доходила.
+    deal_index = client.deals_by_ids(parent_ids, select=[
+        "ID", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "ASSIGNED_BY_ID",
+        *(f for f, _ in config.DEAL_SOURCER_FIELDS)])
+    _sourcer_labels = _deal_field_labels(client, [f for f, _ in config.DEAL_SOURCER_FIELDS])
+    for _f, _ in config.DEAL_SOURCER_FIELDS:
+        _filled = sum(1 for d in deal_index.values() if d.get(_f) not in (None, "", 0, "0", []))
+        print(f"  поле сорсера сделки {_f} «{_sourcer_labels.get(_f, '?')}»: "
+              f"заполнено у {_filled} из {len(deal_index)} сделок")
 
     print("• Сделки периода (все воронки) для покрытия…")
     period_deals = client.deals_in_period(p.start_iso, p.end_iso, select=[
@@ -280,18 +369,52 @@ def run(args) -> int:
     print("• Поставщики по RFQ (компании/контакты)…")
     _attach_suppliers(client, rfqs)
 
+    for r in rfqs:
+        r["_hasQuote"] = _has_quote_file(r)
+    print(f"  карточек с файлом КП поставщика: {sum(1 for r in rfqs if r['_hasQuote'])}")
+
+    print("• Письма карточек СП-166 (исходящие и входящие)…")
+    _acts = _mail_activities(client, p.start_iso, p.end_iso)
+    _inb = _inbound_mail(_acts)
+    print(f"  писем: {len(_acts)}, из них входящих: {len(_inb)}"
+          + ("  (ответы поставщиков приходят файлами в карточку, не письмами)"
+             if not _inb else ""))
+
     print("• Расчёт метрик…")
     m = metrics_mod.build(
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
         client.user_dept_names(),
+        service_ids,
+        _inb,
+        config.DEAL_SOURCER_FIELDS,
     )
+    _o = m["origin"]["summary"]
+    # Раскладка авторства — в журнал каждым прогоном: по ней видно день ко дню,
+    # кто грузит очередь запросов. Только агрегаты, без имён (CLAUDE.md, 17).
+    print(f"  авторов карточек: {_o['people']} чел.; отдел поиска поставщиков "
+          f"{_o['sourcing']} ({_o['sourcingPct']} %), вне отдела {_o['outside']} "
+          f"({_o['outsidePct']} %), без автора {_o['auto']} ({_o['autoPct']} %)")
+    if not _o["viaService"] and _o["serviceConfigured"]:
+        print(f"  служебных записей задано {_o['serviceConfigured']}, "
+              f"но карточек за период они не заводили")
+    if _o["viaService"]:
+        print(f"  служебные записи: {_o['viaService']} карточек ({_o['viaServicePct']} %) — "
+              f"завели {_o['viaServiceMade']}, записаны ответственным по {_o['viaServiceAssigned']}; "
+              f"исполнитель восстановлен у {_o['serviceResolved']} ({_o['serviceResolvedPct']} %)")
+        # чем именно определён исполнитель — без этой строки ошибка PR #400
+        # (карточки легли на руководителя, а не на сорсера) не была бы видна
+        print("    чем определён: " + "; ".join(
+            f"{x['how']} {x['n']}" for x in m["origin"].get("resolvedHow") or []))
+    if _o["candidates"]:
+        print(f"  кандидатов в служебные записи: {_o['candidates']} "
+              f"(порог {_o['candidateFloor']} карточек) — см. вкладку «Кто заводит запросы»")
 
     _sanity_gates(p, rfqs, period_deals, dept_a_ids, m.get("sourcersA") or [],
                   skip=bool(args.allow_empty or args.max_deals))
 
     print("• Отправлено vs создано (письма)…")
-    m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
+    m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
 
     # обогащаем детали каждого сорсера письмами (тема · получатель · превью · вложение)
     _by_card = m["send"].pop("byCard", {})
