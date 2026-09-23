@@ -38,14 +38,52 @@ def build(
     deal_stage_names: dict[str, str],
     category_names: dict[str, str],
     user_depts: dict[str, str] | None = None,
+    service_ids: set[str] | None = None,
+    inbound_mail: list[dict] | None = None,
 ) -> dict:
     weeks = period.weeks
     n_weeks = len(weeks)
 
+    # ---- КОМУ ЗАСЧИТАТЬ ЗАПРОС
+    # В портале работает воронка пресейла: карточки заводит робот от имени
+    # служебной учётной записи. Если считать исполнителем того, кто записан в
+    # карточке, работа сорсера, запустившего кампанию, исчезает из его статистики
+    # и оседает на роботе — а вместе с ней и возможность мерить людей.
+    #
+    # Инициатор восстанавливается цепочкой: ответственный карточки → владелец
+    # родительской сделки → автор карточки. Первый, кто не служебный, и есть
+    # исполнитель. Родительская сделка здесь ключевая: её ведёт живой сорсер,
+    # и именно в его очередь встаёт запрос, кем бы он ни был заведён.
+    #
+    # Пока список служебных записей пуст, цепочка возвращает ответственного —
+    # то есть ровно прежнее поведение. Разница видна в разделе «Кто заводит
+    # запросы» до того, как список заполнен: сначала мерим, потом применяем.
+    service = set(service_ids or ())
+
+    def owner_of(r: dict) -> tuple[str, str]:
+        """(идентификатор исполнителя, чем определён)."""
+        a = str(r.get("assignedById") or "")
+        if a and a not in service:
+            return a, "ответственный"
+        d = deal_index.get(str(r.get("parentId2"))) if r.get("parentId2") else None
+        o = str((d or {}).get("ASSIGNED_BY_ID") or "")
+        if o and o not in service:
+            return o, "владелец сделки"
+        c = str(r.get("createdBy") or "")
+        if c and c not in service:
+            return c, "автор карточки"
+        return "", "не определён"
+
+    # Исполнитель считается один раз и кладётся в саму запись: дальше по модулю
+    # он нужен в семи местах, и расхождение между ними уже однажды дало разные
+    # цифры нагрузки на одних и тех же людей.
+    for r in rfqs:
+        r["_owner"], r["_ownerBy"] = owner_of(r)
+
     # ---- индексация RFQ
     by_user: dict[str, list[dict]] = defaultdict(list)
     for r in rfqs:
-        by_user[str(r.get("assignedById"))].append(r)
+        by_user[r["_owner"]].append(r)
 
     def deal_state(parent_id) -> str:
         """early | tkp | lost  — состояние родительской сделки RFQ."""
@@ -115,7 +153,7 @@ def build(
     # ---- разнообразие поставщиков (блок A): топ запрошенных + общий охват
     sup_a = Counter()
     for r in rfqs:
-        if str(r.get("assignedById")) in dept_a_ids:
+        if r["_owner"] in dept_a_ids:
             sup_a[r.get("_supplier") or "—"] += 1
     named = Counter({s: n for s, n in sup_a.items() if s not in ("—", "", None)})
     _topn = named.most_common(12)
@@ -128,20 +166,41 @@ def build(
         "unknown": sup_a.get("—", 0),
     }
 
+    # ---- входящие КП по неделям
+    # Считаем факт получения, а не ответ на конкретный запрос: КП кладётся в ту
+    # неделю, когда оно пришло, и ни к какому запросу не привязывается. За КП
+    # принимается входящее письмо поставщика с вложением — это верхняя оценка
+    # (одно предложение может прийти двумя письмами) и одновременно нижняя
+    # (цена в теле письма без файла сюда не попадает). Поэтому рядом с числом
+    # идут оба контрольных значения: всего входящих и сколько карточек их
+    # получило. Одно число вместо трёх тут врало бы.
+    kp_file = [0] * n_weeks
+    kp_all = [0] * n_weeks
+    kp_cards: list[set[str]] = [set() for _ in range(n_weeks)]
+    for a_ in (inbound_mail or []):
+        wi = period.week_index(parse_dt(a_.get("dt") or ""))
+        if wi is None:
+            continue
+        kp_all[wi] += 1
+        if a_.get("file"):
+            kp_file[wi] += 1
+            kp_cards[wi].add(str(a_.get("cid") or ""))
+
     # ---- недельная динамика A vs B
     weekly = []
     for i, w in enumerate(weeks):
         a = b = 0
         for r in rfqs:
             if period.week_index(parse_dt(r.get("createdTime", ""))) == i:
-                if str(r.get("assignedById")) in dept_a_ids:
+                if r["_owner"] in dept_a_ids:
                     a += 1
                 else:
                     b += 1
-        weekly.append({"w": w.label, "d": w.days, "A": a, "B": b})
+        weekly.append({"w": w.label, "d": w.days, "A": a, "B": b,
+                       "kp": kp_file[i], "inb": kp_all[i], "kpc": len(kp_cards[i])})
 
     total = len(rfqs)
-    a_total = sum(1 for r in rfqs if str(r.get("assignedById")) in dept_a_ids)
+    a_total = sum(1 for r in rfqs if r["_owner"] in dept_a_ids)
     open_all = sum(1 for r in rfqs if classify_stage(r.get("stageId", "")) not in CLOSED)
     closed_all = total - open_all
 
@@ -218,23 +277,42 @@ def build(
     # сорсера ответственным. Поэтому здесь разбор по createdBy, с подразделением.
     depts = user_depts or {}
     made: dict[str, dict] = {}
+    # разбор карточек, заведённых служебными записями: кому они в итоге засчитаны
+    via_service = 0
+    service_resolved = 0
+    by_service: Counter = Counter()
+    resolved_to: Counter = Counter()
+    how: Counter = Counter()
     for r in rfqs:
         uid = str(r.get("createdBy") or "")
         rec = made.setdefault(uid, {"n": 0, "tkp": 0, "toSourcing": 0})
         rec["n"] += 1
         if deal_state(r.get("parentId2")) == "tkp":
             rec["tkp"] += 1
-        if str(r.get("assignedById")) in dept_a_ids:
+        owner, by_what = r["_owner"], r["_ownerBy"]
+        if owner in dept_a_ids:
             rec["toSourcing"] += 1
+        if uid in service:
+            via_service += 1
+            by_service[uid] += 1
+            how[by_what] += 1
+            if owner:
+                service_resolved += 1
+                resolved_to[owner] += 1
 
     by_creator: list[dict] = []
     n_sourcing = n_outside = n_auto = 0
     handoff = 0
     by_dept_cnt: Counter = Counter()
     for uid, rec in made.items():
-        auto = uid in ("", "0", "None")
+        auto = uid in ("", "0", "None") or uid in service
         in_src = (not auto) and uid in dept_a_ids
-        dept = "автоматизация портала" if auto else (depts.get(uid) or "подразделение не указано")
+        if uid in service:
+            dept = "служебная запись (робот пресейла)"
+        elif auto:
+            dept = "автоматизация портала"
+        else:
+            dept = depts.get(uid) or "подразделение не указано"
         if auto:
             n_auto += rec["n"]
         elif in_src:
@@ -243,9 +321,15 @@ def build(
             n_outside += rec["n"]
             handoff += rec["toSourcing"]
         by_dept_cnt[dept] += rec["n"]
+        if uid in service:
+            who = names.get(uid) or f"служебная запись #{uid}"
+        elif auto:
+            who = "автоматизация портала"
+        else:
+            who = names.get(uid, f"user#{uid}")
         by_creator.append({
             "uid": uid,
-            "name": "автоматизация портала" if auto else names.get(uid, f"user#{uid}"),
+            "name": who,
             "dept": dept,
             "src": bool(in_src),
             "auto": bool(auto),
@@ -259,11 +343,47 @@ def build(
     by_dept = [{"dept": d, "n": n, "pct": _pct(n, total), "w": round(n / dept_max * 100)}
                for d, n in by_dept_cnt.most_common()]
 
+    # Кандидаты в служебные записи. Служебную запись от человека отличает то, что
+    # она не числится ни в одном подразделении и при этом заводит много карточек:
+    # живой сотрудник без подразделения — это непорядок в справочнике, а не поток
+    # в тысячу запросов. Список не применяется сам: он показывается владельцу,
+    # чтобы тот внёс подтверждённые записи в SERVICE_ACCOUNT_IDS. Автоматически
+    # выключать людей из статистики нельзя — цена ошибки здесь выше цены ожидания.
+    cand_floor = max(10, round(total * 0.02))
+    candidates = [c for c in by_creator
+                  if not c["auto"] and c["uid"] not in service
+                  and c["dept"] == "подразделение не указано" and c["n"] >= cand_floor]
+
+    # Разрез по подразделению ИСПОЛНИТЕЛЯ, а не автора карточки. Первый отвечает
+    # на вопрос «чья это работа», второй — «кто её завёл». Для карточек робота
+    # они расходятся: завела служебная запись, работает по ним живой отдел.
+    owner_dept_cnt: Counter = Counter()
+    for r in rfqs:
+        u = r["_owner"]
+        owner_dept_cnt[(depts.get(u) or "подразделение не указано") if u
+                       else "исполнитель не определён"] += 1
+    odept_max = max(owner_dept_cnt.values(), default=1)
+    by_owner_dept = [{"dept": d, "n": n, "pct": _pct(n, total),
+                      "w": round(n / odept_max * 100)}
+                     for d, n in owner_dept_cnt.most_common()]
+
+    service_list = [{"uid": u, "name": names.get(u) or f"служебная запись #{u}", "n": n,
+                     "pct": _pct(n, total)} for u, n in by_service.most_common()]
+    resolved_list = [{"uid": u, "name": names.get(u, f"user#{u}"), "n": n,
+                      "dept": depts.get(u) or "подразделение не указано",
+                      "src": u in dept_a_ids} for u, n in resolved_to.most_common(30)]
+
     return {
         "origin": {
             "byCreator": by_creator,
             "outsideCreators": [c for c in by_creator if not c["src"] and not c["auto"]],
             "byDept": by_dept,
+            "byOwnerDept": by_owner_dept,
+            "service": service_list,
+            "serviceCandidates": candidates,
+            "resolvedTo": resolved_list,
+            "resolvedHow": [{"how": k, "n": v, "pct": _pct(v, via_service)}
+                            for k, v in how.most_common()],
             "summary": {
                 "total": total,
                 "sourcing": n_sourcing,
@@ -276,6 +396,14 @@ def build(
                 "handoffPct": _pct(handoff, n_outside),
                 "people": len([c for c in by_creator if not c["auto"]]),
                 "outsidePeople": len([c for c in by_creator if not c["src"] and not c["auto"]]),
+                "viaService": via_service,
+                "viaServicePct": _pct(via_service, total),
+                "serviceResolved": service_resolved,
+                "serviceResolvedPct": _pct(service_resolved, via_service),
+                "serviceAccounts": len(service_list),
+                "serviceConfigured": len(service),
+                "candidates": len(candidates),
+                "candidateFloor": cand_floor,
             },
         },
         "period": {
@@ -288,7 +416,7 @@ def build(
             "total": total,
             "deptA": a_total,
             "outside": total - a_total,
-            "respCount": len({str(r.get("assignedById")) for r in rfqs}),
+            "respCount": len({r["_owner"] for r in rfqs if r["_owner"]}),
             "openCount": open_all,
             "inWorkPct": _pct(open_all, total),
             "closedCountA": closed_a,

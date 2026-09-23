@@ -137,28 +137,33 @@ def _has_attachment(a: dict) -> bool:
     return False
 
 
-def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict],
-                dept_a_ids: set[str], start_iso: str, end_iso: str) -> dict:
-    """Реально отправлено vs создано: по факту исходящего CRM-письма на карточке RFQ.
-    Дополнительно собирает по каждой карточке письма (тема · получатель · превью · вложение)
-    для хронологического списка в дровере сорсера.
-    Возвращает {"rows": [...], "totals": {...}, "byCard": {card_id: [emails...]}}."""
-    counts: Counter = Counter()  # card_id -> кол-во исходящих писем
-    by_card: dict[str, list[dict]] = defaultdict(list)
+def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list[dict]:
+    """Все CRM-письма карточек СП-166 за окно, одним проходом.
+
+    Раньше исходящие тянулись отдельным запросом. Входящие нужны для счётчика
+    полученных КП, и второй такой же проход удвоил бы и время выгрузки, и шанс
+    упереться в лимит портала: DIRECTION убран из фильтра, разбор — на нашей
+    стороне.
+
+    Тело письма усекается сразу при выгрузке: за окно приходят десятки тысяч
+    писем, и держать их сырыми в памяти незачем — в дровер идёт превью, а в
+    счётчик КП только дата, карточка и признак вложения.
+    """
+    out: list[dict] = []
     last = 0
     while True:
         ch = client.call("crm.activity.list", {
             "filter": {"OWNER_TYPE_ID": config.SPA_ENTITY_TYPE_ID, "PROVIDER_ID": "CRM_EMAIL",
-                       "DIRECTION": 2, ">=CREATED": start_iso, "<=CREATED": end_iso, ">ID": last},
-            "select": ["ID", "OWNER_ID", "SUBJECT", "DESCRIPTION", "SETTINGS",
+                       ">=CREATED": start_iso, "<=CREATED": end_iso, ">ID": last},
+            "select": ["ID", "OWNER_ID", "DIRECTION", "SUBJECT", "DESCRIPTION", "SETTINGS",
                        "FILES", "STORAGE_ELEMENT_IDS", "CREATED"],
             "order": {"ID": "ASC"}, "start": -1}) or []
         if not ch:
             break
         for a in ch:
-            cid = str(a.get("OWNER_ID"))
-            counts[cid] += 1
-            by_card[cid].append({
+            out.append({
+                "cid": str(a.get("OWNER_ID")),
+                "dir": str(a.get("DIRECTION") or ""),
                 "subj": (a.get("SUBJECT") or "").strip(),
                 "to": _email_to(a.get("SETTINGS")),
                 "body": _email_preview(a.get("DESCRIPTION")),
@@ -169,13 +174,37 @@ def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict]
         last = int(ch[-1]["ID"])
         if len(ch) < 50:
             break
+    return out
+
+
+def _inbound_mail(acts: list[dict]) -> list[dict]:
+    """Входящие письма поставщиков в виде, который понимает metrics.build."""
+    return [{"cid": a["cid"], "dt": a["dtx"], "file": a["file"]}
+            for a in acts if a["dir"] == "1"]
+
+
+def _send_stats(acts: list[dict], rfqs: list[dict], sourcer_rows: list[dict],
+                dept_a_ids: set[str]) -> dict:
+    """Реально отправлено vs создано: по факту исходящего CRM-письма на карточке RFQ.
+    Дополнительно собирает по каждой карточке письма (тема · получатель · превью · вложение)
+    для хронологического списка в дровере сорсера.
+    Возвращает {"rows": [...], "totals": {...}, "byCard": {card_id: [emails...]}}."""
+    counts: Counter = Counter()  # card_id -> кол-во исходящих писем
+    by_card: dict[str, list[dict]] = defaultdict(list)
+    for a in acts:
+        if a["dir"] != "2":
+            continue
+        counts[a["cid"]] += 1
+        by_card[a["cid"]].append({k: a[k] for k in ("subj", "to", "body", "file", "dt", "dtx")})
     # письма каждой карточки — по времени, новые сверху
     for cid in by_card:
         by_card[cid].sort(key=lambda e: e["dtx"], reverse=True)
 
     by_user: dict[str, list[dict]] = defaultdict(list)
     for r in rfqs:
-        u = str(r.get("assignedById"))
+        # исполнитель уже разрешён в metrics.build (цепочка «ответственный →
+        # владелец сделки → автор»), карточки робота засчитаны живому сорсеру
+        u = r.get("_owner") or str(r.get("assignedById"))
         if u in dept_a_ids:
             by_user[u].append(r)
 
@@ -265,7 +294,8 @@ def run(args) -> int:
         select=RFQ_SELECT,
         max_items=args.max_deals,
     )
-    print(f"  RFQ: {len(rfqs)}  |  блок A (отдел 172): {sum(1 for r in rfqs if str(r.get('assignedById')) in dept_a_ids)}")
+    print(f"  RFQ: {len(rfqs)}  |  блок A по ответственному (отдел 172): "
+          f"{sum(1 for r in rfqs if str(r.get('assignedById')) in dept_a_ids)}")
 
     parent_ids = {str(r.get("parentId2")) for r in rfqs if r.get("parentId2")}
     print(f"• Родительские сделки (parentId2): {len(parent_ids)} → выгрузка стадий…")
@@ -280,18 +310,32 @@ def run(args) -> int:
     print("• Поставщики по RFQ (компании/контакты)…")
     _attach_suppliers(client, rfqs)
 
+    print("• Письма карточек СП-166 (исходящие и входящие)…")
+    _acts = _mail_activities(client, p.start_iso, p.end_iso)
+    _inb = _inbound_mail(_acts)
+    print(f"  писем: {len(_acts)}, из них входящих: {len(_inb)}")
+
     print("• Расчёт метрик…")
     m = metrics_mod.build(
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
         client.user_dept_names(),
+        config.SERVICE_ACCOUNT_IDS,
+        _inb,
     )
+    _o = m["origin"]["summary"]
+    if _o["viaService"]:
+        print(f"  служебные записи: {_o['viaService']} карточек ({_o['viaServicePct']} %), "
+              f"исполнитель восстановлен у {_o['serviceResolved']} ({_o['serviceResolvedPct']} %)")
+    if _o["candidates"]:
+        print(f"  кандидатов в служебные записи: {_o['candidates']} "
+              f"(порог {_o['candidateFloor']} карточек) — см. вкладку «Кто заводит запросы»")
 
     _sanity_gates(p, rfqs, period_deals, dept_a_ids, m.get("sourcersA") or [],
                   skip=bool(args.allow_empty or args.max_deals))
 
     print("• Отправлено vs создано (письма)…")
-    m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
+    m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
 
     # обогащаем детали каждого сорсера письмами (тема · получатель · превью · вложение)
     _by_card = m["send"].pop("byCard", {})

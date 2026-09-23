@@ -124,6 +124,12 @@ jobs:
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Идентификаторы служебных учётных записей портала через запятую
+          # (Settings → Secrets and variables → Actions → Variables). Их карточки
+          # засчитываются живому сорсеру, а не роботу. Пока переменная пуста,
+          # счёт идёт по ответственному; кандидатов дашборд предлагает сам —
+          # вкладка «Кто заводит запросы».
+          SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
         run: |
           set -euo pipefail
           # инсайты по правилам: ключ Claude (ANTHROPIC_API_KEY) не задан.
