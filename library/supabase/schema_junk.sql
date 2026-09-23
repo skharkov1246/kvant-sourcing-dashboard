@@ -99,6 +99,59 @@ alter table lib_files add column if not exists class_at       timestamptz;
 alter table lib_files add column if not exists text_lines     int;
 alter table lib_files add column if not exists item_lines     int;
 alter table lib_files add column if not exists parser_version smallint;
+-- ПОЧЕМУ ШАПКА НЕ УЗНАНА. Без этой колонки «header_found = false» стоит у 4 194
+-- файлов и не говорит, какую из пяти правок делать: замер 23.09.2026 показал, что
+-- за одной пометкой стоят пять разных бед (наименование неизвестно, вторая колонка
+-- не узнана, шапка глубже сорока строк, читатель отдал один столбец, ни одного
+-- известного слова). Причина живёт один прогон, если её не сохранить (правило 16).
+-- Колонка nullable и без default — правка каталога, таблица не переписывается.
+alter table lib_files add column if not exists header_miss    text;
+-- ПОСТРАНИЧНЫЙ СЧЁТ PDF. Смешанный документ — часть страниц текстовые, часть
+-- сканы — до 23.09.2026 терялся молча: одна текстовая страница даёт chars > 0,
+-- файл получает «разобран», и отбор распознавания не берёт его НИКОГДА. Сканы
+-- внутри такого файла это позиции и цены, которых никто не видел. Колонки
+-- nullable и без default — правка каталога, таблица не переписывается.
+alter table lib_files add column if not exists pdf_pages       int;
+alter table lib_files add column if not exists pdf_pages_text  int;
+alter table lib_files add column if not exists pdf_pages_lost  int;
+alter table lib_files add column if not exists pdf_mixed       boolean;
+-- Частичный индекс: отбор распознавания спрашивает именно смешанные, и их мало.
+create index if not exists lib_files_pdf_mixed on lib_files (file_id)
+  where pdf_mixed is true;
+-- ТОЧНЫЙ ФОРМАТ ФАЙЛА. Крупный вид говорит «прочее» у csv, txt, rtf, html, xml и
+-- двоичного мусора разом — по нему нельзя понять, какая стратегия чтения
+-- сработала и какую чинить. Замер 23.09.2026: «прочее» 410 файлов, все 410 без
+-- позиций, и что это за файлы, база не знает.
+alter table lib_files add column if not exists subkind         text;
+-- ПАПКА ДОКУМЕНТА. Требование владельца 23.09.2026: различать предложения
+-- поставщиков нам, запросы заказчиков нам и наши исходящие предложения — и
+-- складывать раздельно. Первая редакция ставила папку по содержимому; с того же
+-- дня (замечание владельца «при чём тут КВАНТ, в системе запросов уже есть вся
+-- информация») папку ставит СИСТЕМА — сущность карточки и код поля
+-- (library/doc_folder.py), а содержимое (library/doc_kind.py) только сверяет.
+-- doc_kind_conf говорит, откуда папка: 1.0 — код поля, 0.8/0.6 — название поля,
+-- 0.0 — папки нет, в том числе у поля, опознанного кодом.
+-- doc_kind_why хранит, откуда папка и что сказало содержимое; расхождение
+-- начинается словом «расхождение:» (правило 16: сохраняй, почему получилось
+-- значение). Строки, записанные до правки, остаются папкой по содержимому,
+-- пока их не перепишет разбор или переразбор.
+alter table lib_files add column if not exists doc_kind        text;
+alter table lib_files add column if not exists doc_kind_conf   real;
+alter table lib_files add column if not exists doc_kind_why    text;
+create index if not exists lib_files_doc_kind on lib_files (doc_kind);
+-- ПУТЬ ЧТЕНИЯ: какой читатель каскада взял файл и что с текстом сделали
+-- («read_pdf:pdftotext → починка: cp1251», «read_mail:msg → частей 3, прочитано 2»).
+-- Без него следующая потеря снова неизмерима: видно, ЧТО файл не прочитан, и не
+-- видно, КТО его читал (правило 16). Только имена читателей и счётчики — ни имён
+-- файлов, ни содержимого (правило 17: колонка доезжает до сводок).
+alter table lib_files add column if not exists read_chain      text;
+-- НАША КОМПАНИЯ КАРТОЧКИ: название нашего юрлица, от которого заведена сделка или
+-- карточка запроса поставщику (mycompanyId, по списку компаний с флагом «моя
+-- компания»). Запросы уходят от разных наших компаний, и «мы» — это не одно имя.
+-- Пусто — поле карточки не заполнено или компания не из списка; никогда не
+-- «КВАНТ по умолчанию». Колонка nullable и без default — правка каталога,
+-- таблица не переписывается.
+alter table lib_files add column if not exists our_company     text;
 create index if not exists lib_files_class on lib_files (doc_class);
 
 do $$ begin

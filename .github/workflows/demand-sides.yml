@@ -1,4 +1,4 @@
-name: Спрос — сторона документа
+name: Разведка разбора (сторона документа, шапка таблицы)
 
 # ЧТО ИЗ «НАШЕГО СПРОСА» НА САМОМ ДЕЛЕ НЕ СПРОС. Раскладка строк спроса по полю
 # карточки и по СТОРОНЕ документа: заявка заказчика, наше исходящее, предложение
@@ -27,6 +27,13 @@ on:
         description: "backfill: писать в базу (иначе холостой прогон)"
         type: boolean
         default: false
+      headers:
+        description: "Разведка: почему шапка таблицы не узнана (перечитывает выборку файлов)"
+        type: boolean
+        default: false
+      limit:
+        description: "headers: сколько файлов перечитать"
+        default: "200"
 
 permissions:
   contents: read
@@ -47,7 +54,13 @@ jobs:
           cache: pip
 
       - name: Установка зависимостей
+        # openpyxl и xlrd нужны РАЗВЕДКЕ ШАПКИ: она перечитывает файлы теми же
+        # `indexer.rows_from_*`, что и разбор, а те подтягивают библиотеку внутри
+        # функции. Прогон 35837112523 упал на ModuleNotFoundError через тринадцать
+        # секунд после того, как напечатал главный ответ, — разбивка уже была в
+        # журнале, а выборка не перечиталась. Список тот же, что в library-index.
         run: pip install --quiet -r requirements.txt psycopg2-binary==2.9.10 pytest
+             openpyxl xlrd pypdf
 
       - name: Проверка секретов
         env:
@@ -78,7 +91,20 @@ jobs:
           APPLY: ${{ inputs.apply && '1' || '' }}
         run: python scripts/backfill_doc_side.py
 
+      # РАЗВЕДКА ШАПКИ. Живёт здесь, а не отдельным прогоном: ей нужен тот же
+      # портал и та же очередь чтения. Воронка 22.09.2026 назвала этот резерв
+      # главным — 720 файлов с восстановленной таблицей дают цену в 0,8 % случаев
+      # против 71,5 % там, где шапка нашлась.
+      - name: Почему шапка таблицы не узнана
+        if: inputs.headers
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          LIMIT: ${{ inputs.limit }}
+        run: python scripts/header_recon.py
+
       - name: Сторона документа у строк спроса
+        if: ${{ !inputs.headers }}
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}

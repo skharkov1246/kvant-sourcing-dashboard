@@ -28,15 +28,20 @@ lib_demand с источником «распознавание скана».
 from __future__ import annotations
 
 import os
+import struct
 import subprocess
+from datetime import datetime, timezone
 import sys
 import tempfile
+import threading
+import time
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import docfilter  # noqa: E402  (после sys.path)
 import indexer  # noqa: E402
+import ocr_table  # noqa: E402  (таблица скана по координатам слов — под каскадом)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
 import quotes  # noqa: E402  (цена из распознанного текста)
 from segments import classify, name_of  # noqa: E402
@@ -44,7 +49,24 @@ from segments import classify, name_of  # noqa: E402
 APPLY = os.environ.get("APPLY", "") not in ("", "0", "false")
 SHARDS = int(os.environ.get("SHARDS", "1"))
 SHARD = int(os.environ.get("SHARD", "0"))
-WORKERS = int(os.environ.get("WORKERS", "4"))       # tesseract упирается в процессор
+# ПОТОКОВ НЕ БОЛЬШЕ, ЧЕМ ЯДЕР, СКОЛЬКО БЫ НИ ПОПРОСИЛИ.
+#
+# ПОПРАВКА 23.09.2026: число потоков НЕ БЫЛО причиной таймаутов, как здесь
+# утверждалось. Шаг прогона `library-index.yml` вызывает распознавание строкой
+# `WORKERS=4 python library/ocr.py` — четвёрка прибита в самом шаге и перекрывает
+# `WORKERS` из окружения задания. Значит и прогон 35790672035 с его 69 % таймаутов
+# шёл на четырёх потоках, а не на двенадцати: вход `workers` до распознавания
+# никогда не доходил. Повторный холостой прогон 35833770032 это и показал — журнал
+# части молчит об обрезке (просили 4, ядер 4, обрезать нечего), а таймаутов
+# 8 файлов из 10. Причина в другом и ищется отдельно.
+#
+# Предел тем не менее ОСТАЁТСЯ, но как страховка, а не как починка: он держит
+# второго вызывающего, который прибитой четвёрки не унаследует и передаст
+# `workers` целиком. Распознавание упирается в процессор, и потоки сверх числа
+# ядер дают не скорость, а таймауты. Предел стоит ЗДЕСЬ, а не в прогоне: про
+# процессорную природу распознавания знает этот модуль, а не вызывающий.
+ЗАПРОШЕНО = int(os.environ.get("WORKERS", "4"))
+WORKERS = max(1, min(ЗАПРОШЕНО, os.cpu_count() or 2))
 LIMIT = int(os.environ.get("LIMIT", "0"))
 DAYS = int(os.environ.get("DAYS", "400"))
 PAGES = int(os.environ.get("PAGES", "12"))          # страниц PDF на файл
@@ -60,17 +82,160 @@ PSM_MAIN = os.environ.get("OCR_PSM", "6")
 PSM_RETRY = os.environ.get("OCR_PSM_RETRY", "3")
 TIMEOUT = int(os.environ.get("OCR_TIMEOUT", "120"))
 
+# ПОТОКИ ВНУТРИ TESSERACT, А НЕ ТОЛЬКО СНАРУЖИ. Замер 23.09.2026 на четырёх ядрах,
+# tesseract 5.3.4, выдуманный шумный лист 3024×4032 (12,2 Мпкс):
+#
+#     1 процесс, потоки OpenMP по умолчанию        1,2 с
+#     1 процесс, OMP_THREAD_LIMIT=1                1,2 с
+#     4 процесса разом, потоки по умолчанию      400,1 с — ни один не дочитал
+#     4 процесса разом, OMP_THREAD_LIMIT=1         1,2 с на все четыре
+#
+# Причина видна в /proc: у каждого процесса ЧЕТЫРЕ потока — tesseract собран с
+# OpenMP и сам берёт все ядра. Четыре процесса по четыре потока на четырёх ядрах
+# дают шестнадцать потоков, которые крутятся на барьерах OpenMP вместо работы;
+# машина при этом загружена целиком, а полезной работы нет.
+#
+# Поэтому потоки делятся: снаружи WORKERS процессов, внутри каждого — своя доля ядер.
+# Произведение держится около числа ядер, а не в четыре раза выше.
+#
+# РАЗМЕР КАРТИНКИ НИ ПРИ ЧЁМ, и это стоит записать, чтобы не чинить не то: тот же
+# лист в 3,0 и 5,4 Мпкс читается за те же 1,3–1,4 с, а чистая вёрстка на 139 Мпкс —
+# за 16,6 с. Уменьшать картинки перед распознаванием незачем.
+ЯДЕР = os.cpu_count() or 2
+OMP = os.environ.get("OCR_OMP") or str(max(1, ЯДЕР // max(1, WORKERS)))
+СРЕДА = {**os.environ, "OMP_THREAD_LIMIT": OMP}
+
+# ЗАМЕР: сколько секунд ушло на картинку и какого она размера. Нужен, чтобы
+# следующий прогон отвечал «почему таймаут» цифрами по живым файлам, а не
+# рассуждением. В журнал уходят только агрегаты (CLAUDE.md, правило 17):
+# число файлов, доля таймаутов и медиана секунд по разрядам мегапикселей.
+ЗАМЕРЫ: list[tuple[float, float, bool]] = []   # (мпкс, секунды, таймаут)
+ЗАМОК = threading.Lock()
+
+
+def пикселей(path: str) -> float:
+    """Мегапиксели из заголовка файла. Без сторонних библиотек: PNG и JPEG.
+
+    Возвращает 0.0, если размер не прочитался, — разряд «неизвестно» честнее
+    выдуманного числа."""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(2)
+            if head == b"\x89P":
+                f.seek(16)
+                w, h = struct.unpack(">II", f.read(8))
+                return w * h / 1e6
+            if head == b"\xff\xd8":
+                f.seek(2)
+                while True:
+                    m = f.read(2)
+                    if len(m) < 2 or m[0] != 0xFF:
+                        return 0.0
+                    if 0xC0 <= m[1] <= 0xCF and m[1] not in (0xC4, 0xC8, 0xCC):
+                        f.read(3)
+                        h, w = struct.unpack(">HH", f.read(4))
+                        return w * h / 1e6
+                    (длина,) = struct.unpack(">H", f.read(2))
+                    f.seek(длина - 2, 1)
+    except Exception:
+        return 0.0
+    return 0.0
+
+
+РАЗРЯДЫ = ((2.0, "до 2 Мпкс"), (6.0, "2–6"), (12.0, "6–12"),
+           (24.0, "12–24"), (float("inf"), "больше 24"))
+
+
+def таблица_времени() -> list[str]:
+    """Строки отчёта: разряд размера × файлов × таймаутов × медиана секунд."""
+    if not ЗАМЕРЫ:
+        return []
+    по_разрядам: dict[str, list[tuple[float, bool]]] = {}
+    for мпкс, сек, таймаут in ЗАМЕРЫ:
+        имя = "размер не прочитан" if мпкс <= 0 else next(
+            n for предел, n in РАЗРЯДЫ if мпкс < предел)
+        по_разрядам.setdefault(имя, []).append((сек, таймаут))
+    out = ["время распознавания по размеру картинки:",
+           f"    {'разряд':<20}{'вызовов':>9}{'таймаутов':>11}{'медиана с':>11}"]
+    порядок = ["размер не прочитан"] + [n for _, n in РАЗРЯДЫ]
+    for имя in порядок:
+        если = по_разрядам.get(имя)
+        if not если:
+            continue
+        секунды = sorted(с for с, _ in если)
+        медиана = секунды[len(секунды) // 2]
+        таймаутов = sum(1 for _, t in если if t)
+        out.append(f"    {имя:<20}{len(если):>9}{таймаутов:>11}{медиана:>11.1f}")
+    return out
+
 # Кандидаты: текста нет, значит разбор не дал ничего. Форматы, в которых
 # распознавать нечего, отсекаются ЗДЕСЬ, а не в обработчике: в первой части
 # прогона 118 файлов из 400 оказались xlsx/docx, архивами и экзотикой —
 # скачались, дошли до tesseract и вернули «формат не читаем». Это треть
 # впустую потраченного времени части.
+#: Причины, по которым файл НЕ ВИНОВАТ: это отказ окружения прогона, а не свойство
+#: файла. Такой файл обязан остаться в очереди распознавания — иначе один
+#: неудачный прогон выбрасывает его навсегда.
+#:
+#: 23.09.2026 так и вышло: отметка ocr_at ставилась в общем `on conflict do
+#: update` независимо от исхода, а распознавание в те дни падало по таймауту на
+#: 69 % файлов из-за потоков внутри tesseract. Потоки починены, но 3 666 картинок
+#: остались с проставленной отметкой и в очередь больше не попадают. Сбросить её
+#: нечем: кода, который это делает, в репозитории нет.
+ПРИЧИНЫ_ОКРУЖЕНИЯ = (
+    "tesseract не установлен",
+    "сбой запуска",
+    "таймаут распознавания",
+    "таймаут разворота PDF в картинки",
+    "pdftoppm не установлен",
+)
+
+
+def виновато_окружение(причина: str | None) -> bool:
+    """Отказ окружения, а не свойство файла: отметку ставить нельзя."""
+    return bool(причина) and any(причина.startswith(п) for п in ПРИЧИНЫ_ОКРУЖЕНИЯ)
+
+
 CANDIDATES = """
 select file_id from lib_files
  where ocr_at is null
-   and (status = 'пусто' or kind = 'изображение')
+   and (status = 'пусто' or kind = 'изображение'
+        -- СМЕШАННЫЙ PDF: часть страниц текстовые, часть сканы. Берётся, только
+        -- если разбор текстовых страниц не дал позиций (условие ниже):
+        -- «текст без спецификации», где спецификация — в сканах.
+        or pdf_mixed is true
+        -- СКАНЫ ВНУТРИ ДОКУМЕНТА, АРХИВА ИЛИ ПИСЬМА. По виду это не скан, и
+        -- прежний отбор не брал такой файл никогда; каскад разбора помечает его
+        -- причиной, начало которой — indexer.КАРТИНКИ_ВНУТРИ.
+        or reason like '{КАРТИНКИ}%')
    and status <> 'не скачался'
-   and coalesce(kind, '') in ('изображение', 'pdf', '')"""
+   -- ФАЙЛ С ПОЗИЦИЯМИ РАСПОЗНАВАНИЕ НЕ БЕРЁТ. Смешанный PDF с разобранными
+   -- текстовыми страницами сюда не входит, пока нет постраничного слияния:
+   -- распознавание пишет файл целиком, а читает первые PAGES страниц из
+   -- шестидесяти, которые читает разбор, — и снимает все цены файла.
+   and coalesce(rows_found, 0) = 0
+   and (coalesce(kind, '') in ('изображение', 'pdf', '')
+        or reason like '{КАРТИНКИ}%')""".replace("{КАРТИНКИ}", indexer.КАРТИНКИ_ВНУТРИ)
+
+
+#: Повтор файлов, на которых распознавание отказало ПО ВИНЕ ОКРУЖЕНИЯ. Отдельным
+#: входом, а не всегда: обычный отбор смотрит на пустую отметку, и файл с
+#: проставленной отметкой в него не попадает никогда.
+#:
+#: ЗАЧЕМ ЭТО НУЖНО. 23.09.2026 распознавание падало по таймауту на 69 % файлов
+#: из-за потоков внутри tesseract. Потоки починены, отметка больше не ставится за
+#: отказ окружения — но 3 666 картинок УЖЕ помечены прежними прогонами, и обычный
+#: отбор их не берёт. Этим входом их можно и померить холостым прогоном, и
+#: перечитать записью.
+ПОВТОР = os.environ.get("OCR_RETRY", "") not in ("", "0", "false")
+
+ПОВТОР_ОТКАЗАВШИХ = """
+select file_id from lib_files
+ where status <> 'не скачался'
+   and coalesce(kind, '') in ('изображение', 'pdf', '')
+   and coalesce(rows_found, 0) = 0
+   and (ocr_at is null
+        or exists (select 1 from unnest(%s::text[]) p where reason like p || '%%'))"""
 
 
 def num(v, w=12):
@@ -85,47 +250,151 @@ def ocr_image(path: str, psm: str = PSM_MAIN) -> tuple[str, str]:
     пустых файла из 400 не говорили ничего: то ли текста нет, то ли tesseract
     не уложился в таймаут. Статус не должен врать (CLAUDE.md, правило 15),
     поэтому причина возвращается отдельно и доезжает до lib_files.reason."""
+    мпкс, начало = пикселей(path), time.monotonic()
     try:
         r = subprocess.run(["tesseract", path, "stdout", "-l", LANG, "--psm", psm],
-                           capture_output=True, timeout=TIMEOUT)
+                           capture_output=True, timeout=TIMEOUT, env=СРЕДА)
     except subprocess.TimeoutExpired:
+        with ЗАМОК:
+            ЗАМЕРЫ.append((мпкс, time.monotonic() - начало, True))
         return "", "таймаут распознавания"
     except FileNotFoundError:
         return "", "tesseract не установлен"
     except Exception as e:
         return "", f"сбой запуска: {type(e).__name__}"
+    with ЗАМОК:
+        ЗАМЕРЫ.append((мпкс, time.monotonic() - начало, False))
     текст = r.stdout.decode("utf-8", "ignore")
     if r.returncode != 0:
         return текст, f"tesseract вернул код {r.returncode}"
     return текст, ("текста не найдено" if not текст.strip() else "")
 
 
+def распознать_картинку(path: str) -> tuple[list[list[str]], str, str]:
+    """Картинка → (строки таблицы, текст, почему пусто).
+
+    ПОД КАСКАДОМ — ТАБЛИЦА ПО КООРДИНАТАМ СЛОВ (library/ocr_table.py). Сплошной
+    текст tesseract склеивает колонки строки через пробел, и цена отделяется от
+    количества только арифметикой «кол-во × цена = сумма»: строка без суммы
+    теряет цену. Разрез по координатам ставит каждое число под свой заголовок.
+    Строки возвращаются БЕЗ ворот шапки: таблица скана продолжается на следующих
+    страницах без заголовка, и ворота ставит вызывающий — по всем страницам сразу.
+
+    Без каскада — прежний путь: блочный режим, при пустоте повтор другим.
+    """
+    if indexer.КАСКАД:
+        rows, text, _сводка = ocr_table.распознать_таблицу(path, env=СРЕДА)
+        # Сводка при успехе — служебная (уверенность, поворот), а не отказ:
+        # пусто или нет, решает сам текст.
+        if rows or text.strip():
+            return rows, text, ""
+    text, причина = ocr_image(path, PSM_MAIN)
+    if not text.strip() and "таймаут" not in причина:
+        # Вторая попытка другим режимом сегментации: на фотографии листа блочный
+        # режим иногда молчит. После таймаута не повторяем — не уложится и она.
+        text, причина2 = ocr_image(path, PSM_RETRY)
+        причина = "" if text.strip() else f"{причина}; повтор: {причина2}"
+    return [], text, причина
+
+
 def ocr_pdf(blob: bytes, tmp: str) -> tuple[str, str]:
     """PDF без текстового слоя: разворачиваем страницы в картинки и читаем их."""
+    _строки, текст, причина = ocr_pdf_подробно(blob, tmp)
+    return текст, причина
+
+
+def ocr_pdf_подробно(blob: bytes, tmp: str) -> tuple[list[list[str]], str, str]:
+    """То же, что ocr_pdf, плюс строки таблицы всех страниц подряд (под каскадом)."""
     src = os.path.join(tmp, "in.pdf")
     with open(src, "wb") as f:
         f.write(blob)
     try:
         subprocess.run(["pdftoppm", "-r", str(DPI), "-png", "-l", str(PAGES), src,
                         os.path.join(tmp, "p")], capture_output=True, timeout=TIMEOUT * 2)
+    # ТРИ ЗНАЧЕНИЯ НА ЛЮБОМ ВЫХОДЕ. Здесь стояло два: вызывающий распаковывает
+    # три, и первый же таймаут разворота ронял пул, а с ним весь прогон части.
     except subprocess.TimeoutExpired:
-        return "", "таймаут разворота PDF в картинки"
+        return [], "", "таймаут разворота PDF в картинки"
+    except FileNotFoundError:
+        return [], "", "pdftoppm не установлен"
     except Exception as e:
-        return "", f"сбой pdftoppm: {type(e).__name__}"
+        return [], "", f"сбой pdftoppm: {type(e).__name__}"
     страницы = [n for n in sorted(os.listdir(tmp))
                 if n.startswith("p") and n.endswith(".png")]
     if not страницы:
-        return "", "pdftoppm не дал ни одной страницы"
-    parts, причины = [], []
+        return [], "", "pdftoppm не дал ни одной страницы"
+    parts, причины, строки = [], [], []
     for name in страницы:
-        текст, причина = ocr_image(os.path.join(tmp, name))
+        if indexer.КАСКАД:
+            с, текст, причина = распознать_картинку(os.path.join(tmp, name))
+            строки += с
+        else:
+            текст, причина = ocr_image(os.path.join(tmp, name))
         parts.append(текст)
         if причина:
             причины.append(причина)
     итог = "\n".join(parts)
-    if итог.strip():
-        return итог, ""
-    return почему_пусто(причины, len(страницы))
+    if итог.strip() or строки:
+        return строки, итог, ""
+    return [], *почему_пусто(причины, len(страницы))
+
+
+def распознать_сканы(сканы: list[tuple[str, bytes]], tmp: str,
+                     ) -> tuple[list[list[str]], str, str]:
+    """Сканы из документа, архива или письма: каждый — своим путём, итог подряд."""
+    строки: list[list[str]] = []
+    тексты: list[str] = []
+    причины: list[str] = []
+    for i, (вид, байты) in enumerate(сканы):
+        каталог = os.path.join(tmp, f"s{i}")
+        os.makedirs(каталог, exist_ok=True)
+        if вид == "pdf":
+            с, т, п = ocr_pdf_подробно(байты, каталог)
+        else:
+            путь = os.path.join(каталог, "img")
+            with open(путь, "wb") as f:
+                f.write(байты)
+            с, т, п = распознать_картинку(путь)
+        строки += с
+        if т.strip():
+            тексты.append(т)
+        if п:
+            причины.append(п)
+    текст = "\n".join(тексты)
+    if текст.strip() or строки:
+        return строки, текст, ""
+    return [], *почему_пусто(причины, len(сканы))
+
+
+def таблица_скана(rec: dict, ref: dict, строки: list[list[str]], text: str) -> list[dict]:
+    """Позиции из таблицы скана — тем же разбором строк, что и у файла с таблицей.
+
+    Цена берётся из своей колонки (indexer.items_from_rows), а не арифметикой по
+    сплошной строке. Ворота шапки пройдены у вызывающего; ворота спецификации
+    таблице не нужны — у обычного разбора табличный путь их тоже не проходит.
+    """
+    items = indexer.items_from_rows(строки, шире=False)
+    rec["segment_id"] = classify(text) if text else None
+    вф = quotes.валюта_файла(text)
+    fid = rec["file_id"]
+    for it in items:
+        own = classify(it.get("_row", ""))
+        it["segment_id"] = own or rec["segment_id"]
+        it["segment_rule"] = "строка" if own else ("файл" if rec["segment_id"] else None)
+        it["deal_id"] = ref["deal"]
+        it["source_file"] = fid
+        it["company"] = ref.get("company")
+        if indexer.SOURCE == "rfq":
+            quotes.подставить_валюту(it.get("_цена"), вф)
+        else:
+            it["_цена"] = None          # цены пишутся только из карточек запросов
+    rec["rows_found"] = len(items)
+    rec["status"] = "разобран по скану" if items else "пусто"
+    if not items:
+        rec["reason"] = "таблица скана без позиций"
+    if indexer.SOURCE == "rfq" and items:
+        indexer.применить_условия(items, text)
+    return items
 
 
 def почему_пусто(причины: list[str], страниц: int) -> tuple[str, str]:
@@ -148,30 +417,44 @@ def recognise(ref: dict) -> tuple[dict, list[dict]]:
         return rec, []
     kind = indexer.sniff(blob)
     rec["kind"] = kind
+    строки: list[list[str]] = []
     with tempfile.TemporaryDirectory() as tmp:
         if kind == "pdf":
-            text, причина = ocr_pdf(blob, tmp)
+            строки, text, причина = ocr_pdf_подробно(blob, tmp)
         elif kind == "изображение":
             p = os.path.join(tmp, "img")
             with open(p, "wb") as f:
                 f.write(blob)
-            text, причина = ocr_image(p, PSM_MAIN)
-            if not text.strip() and "таймаут" not in причина:
-                # Вторая попытка другим режимом сегментации: на фотографии
-                # листа блочный режим иногда молчит. После таймаута не
-                # повторяем — вторая попытка тоже не уложится.
-                text, причина2 = ocr_image(p, PSM_RETRY)
-                причина = "" if text.strip() else f"{причина}; повтор: {причина2}"
+            строки, text, причина = распознать_картинку(p)
+        elif сканы := indexer.картинки_файла(blob):
+            # Сканы внутри документа, архива или письма (indexer.картинки_файла):
+            # каскад разбора пометил файл причиной «картинки внутри:».
+            строки, text, причина = распознать_сканы(сканы, tmp)
         else:
-            rec["status"] = "формат не читаем"
-            rec["reason"] = f"распознавать нечего: {kind}"
+            # РАСПОЗНАВАНИЕ НЕ ИМЕЕТ ПРАВА ПОРТИТЬ ЧУЖОЙ РЕЗУЛЬТАТ. Сюда попадают
+            # файлы, у которых вид в базе был пуст: отбор берёт их как возможные
+            # сканы, а на деле это книга или архив. Прежде такой файл получал
+            # «формат не читаем» — то есть распознавание ЗАТИРАЛО статус, который
+            # поставил разбор, и делало вид, будто файл нечитаем в принципе.
+            # Замер 23.09.2026: 1 022 файла xlsx/docx с причиной «распознавать
+            # нечего», плюс 245 в «прочем» и 129 в архивах.
+            #
+            # Теперь распознавание записывает только то, что узнало САМО — вид
+            # файла, — и оставляет статус разбору. Вид не пустой, значит в отбор
+            # сканов файл больше не попадёт, и лишняя закачка не повторится.
+            rec["status"] = None
+            rec["reason"] = None
             return rec, []
 
     rec["chars"] = len(text)
-    if not text.strip():
+    if not text.strip() and not строки:
         rec["status"] = "пусто"
         rec["reason"] = причина or "распознавание не дало текста"
         return rec, []
+    # Таблица скана — как таблица PDF: ослабленное правило шапки к ней не
+    # применяется (его мерили только на офисных файлах, PDF от него теряет цены).
+    if строки and indexer.header_map(строки, шире=False)[0] >= 0:
+        return rec, таблица_скана(rec, ref, строки, text)
 
     # Те же ворота, что и в обычном разборе: правило одно на оба места вызова.
     lines = [ln.strip() for ln in text.splitlines()
@@ -231,10 +514,19 @@ def main() -> int:
 
     conn = indexer.connect()
     with conn.cursor() as cur:
-        cur.execute(CANDIDATES)
+        cur.execute(ПОВТОР_ОТКАЗАВШИХ if ПОВТОР else CANDIDATES,
+                    (list(ПРИЧИНЫ_ОКРУЖЕНИЯ),) if ПОВТОР else None)
         want = {r[0] for r in cur.fetchall()}
     conn.close()
     print(f"кандидатов на распознавание: {len(want)}", flush=True)
+    # ЧИСЛО ПОТОКОВ НАЗЫВАЕТСЯ ВСЕГДА, а не только когда обрезано. Обрезка в
+    # прогоне не срабатывает (шаг прибивает WORKERS=4, ядер тоже 4), и молчание
+    # читалось как «потоков двенадцать», хотя их четыре. Строка в журнале
+    # закрывает этот вопрос без чтения кода прогона.
+    print(f"потоков распознавания: {WORKERS} (просили {ЗАПРОШЕНО}, ядер"
+          f" {os.cpu_count()})"
+          + (", обрезано: распознавание процессорное" if WORKERS < ЗАПРОШЕНО else ""),
+          flush=True)
     if not want:
         print("нечего распознавать")
         return 0
@@ -309,9 +601,27 @@ def main() -> int:
                                            segment_id, reason, ocr_at, ocr_chars, parser_version)
                     values %s
                     on conflict (file_id) do update set
-                      status = excluded.status, kind = excluded.kind, chars = excluded.chars,
-                      rows_found = excluded.rows_found, segment_id = excluded.segment_id,
-                      reason = excluded.reason, ocr_at = now(), ocr_chars = excluded.ocr_chars,
+                      -- ПУСТОЙ СТАТУС ОЗНАЧАЕТ «НЕ МОЁ ДЕЛО»: файл оказался не
+                      -- сканом, и статус, поставленный разбором, сохраняется.
+                      -- Прежде распознавание писало сюда «формат не читаем» и
+                      -- затирало чужой результат: 1 022 файла xlsx/docx.
+                      status = coalesce(excluded.status, lib_files.status),
+                      -- Файл, который не скачался, вида не знает: пустое значение
+                      -- затёрло бы известный вид, и файл выпал бы из отборов по виду.
+                      kind = coalesce(excluded.kind, lib_files.kind),
+                      chars = case when excluded.status is null then lib_files.chars
+                                   else excluded.chars end,
+                      rows_found = case when excluded.status is null
+                                        then lib_files.rows_found
+                                        else excluded.rows_found end,
+                      segment_id = coalesce(excluded.segment_id, lib_files.segment_id),
+                      reason = case when excluded.status is null then lib_files.reason
+                                    else excluded.reason end,
+                      -- НЕ now(), А ТО, ЧТО ПРИСЛАЛИ. Пустая отметка означает отказ
+                      -- окружения: прежнее значение сохраняется, и файл остаётся в
+                      -- очереди распознавания.
+                      ocr_at = coalesce(excluded.ocr_at, lib_files.ocr_at),
+                      ocr_chars = excluded.ocr_chars,
                       processed_at = now()""", buf_files, page_size=500)
         c.commit()
         c.close()
@@ -319,7 +629,7 @@ def main() -> int:
 
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(recognise, mine), 1):
-            stat[rec["status"]] += 1
+            stat[rec["status"] or "не скан: статус оставлен разбору"] += 1
             if rec["kind"]:
                 kinds[rec["kind"]] += 1
             if rec["status"] in ("пусто", "формат не читаем"):
@@ -327,9 +637,17 @@ def main() -> int:
             total_items += rec["rows_found"]
             for it in items:
                 segs[it["segment_id"] or "—"] += 1
+            # ОТМЕТКА СТАВИТСЯ ТОЛЬКО ЗА НАСТОЯЩУЮ ПОПЫТКУ. При отказе окружения
+            # (нет tesseract, таймаут) отметка не ставится, и файл остаётся в
+            # очереди: иначе один неудачный прогон выбрасывает его навсегда.
+            # Не скачался — распознавания не было вовсе: отметка его закрыла бы
+            # навсегда, хотя повтор закачки (RETRY_FAILED) вернёт файл в очередь.
+            отметка = (None if rec["status"] == "не скачался"
+                       or виновато_окружение(rec.get("reason"))
+                       else datetime.now(timezone.utc))
             buf_files.append((rec["file_id"], rec["deal_id"], rec["status"], rec["kind"],
                               rec["chars"], rec["rows_found"], rec["segment_id"],
-                              indexer.pg(rec["reason"]), None, rec["chars"],
+                              indexer.pg(rec["reason"]), отметка, rec["chars"],
                               indexer.PARSER_VERSION))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], indexer.pg(it["item_name"])[:500],
@@ -347,6 +665,8 @@ def main() -> int:
 
     print("\n=== ИТОГ ЧАСТИ ===")
     print(f"файлов: {sum(stat.values())} · позиций из сканов: {total_items}")
+    for строка in таблица_времени():
+        print(строка)
     if indexer.SOURCE == "rfq":
         print(f"строк с ценой: {цен}"
               + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
