@@ -143,6 +143,41 @@ def тройка_сходится(таблица: list[list[str]]) -> bool:
     return False
 
 
+def прочитать(читатель, b) -> list[list[str]]:
+    """Читатель, который вернёт пусто вместо исключения.
+
+    Разведка перечитывает чужие файлы, и падение на одном из трёхсот стоит всей
+    выборки. Причина потери считается отдельно, а не глотается."""
+    try:
+        return читатель(b) or []
+    except Exception:
+        return []
+
+
+def прочитать_текст(читатель, b) -> str:
+    """То же, но для читателей, отдающих строку, а не таблицу."""
+    try:
+        return читатель(b) or ""
+    except Exception:
+        return ""
+
+
+def по_виду(b: bytes, вид: str, итог) -> list[list[str]]:
+    """Тот же порядок читателей, что у разбора (indexer.обработать)."""
+    if вид == "pdf":
+        текст = прочитать_текст(indexer.text_from_pdf, b)
+        return pdftable.строки_в_таблицу(текст) if текст else []
+    if вид == "старый office":
+        return прочитать(indexer.rows_from_xls, b)
+    # xlsx/docx и всё прочее: сначала книга, потом таблица Word.
+    таблица = прочитать(indexer.rows_from_xlsx, b)
+    if not таблица:
+        таблица = прочитать(indexer.rows_from_docx, b)
+    if not таблица:
+        итог["читатель не дал таблицы"] += 1
+    return таблица
+
+
 def main() -> int:
     for имя in ("SUPABASE_DB_URL", "BITRIX_WEBHOOK_URL"):
         if not os.environ.get(имя, "").strip():
@@ -187,14 +222,15 @@ def main() -> int:
         # Читатели — ровно те, что у разбора: свой означал бы, что разведка меряет
         # не то, что делает разборщик. Для PDF шапку НЕ навязываем: rows_from_pdf
         # отвергает разрез без узнанной шапки, а нам нужен именно разрез без неё.
-        if вид == "pdf":
-            текст = indexer.text_from_pdf(b)
-            таблица = pdftable.строки_в_таблицу(текст) if текст else []
-        elif вид == "xlsx/docx":
-            таблица = indexer.rows_from_xlsx(b) or indexer.rows_from_docx(b) or []
-        else:
-            таблица = (indexer.rows_from_xlsx(b) or indexer.rows_from_docx(b)
-                       or pdftable.строки_в_таблицу(indexer.text_from_pdf(b) or "") or [])
+        #
+        # ЧИТАТЕЛЬ ЗОВЁТСЯ ЧЕРЕЗ ОБЁРТКУ, потому что openpyxl на .docx не
+        # возвращает пусто, а БРОСАЕТ OSError «File contains no valid workbook
+        # part»: выражение «xlsx or docx» до второго читателя не доходит вовсе.
+        # Прогон 35837557194 на этом и умер — на первом же .docx, после того как
+        # разбивку уже напечатал. У разбора (indexer, ветка «xlsx/docx») эта
+        # попытка обёрнута в try; разведка обязана повторять разбор, а не
+        # придумывать свой порядок.
+        таблица = по_виду(b, вид, итог)
         if not таблица or max((len(r) for r in таблица), default=0) < 2:
             итог["таблица не восстановилась при перечитывании"] += 1
             continue
