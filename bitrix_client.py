@@ -7,8 +7,11 @@
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import random
+import re
 import sys
 import threading
 import time
@@ -19,6 +22,41 @@ import requests
 
 class BitrixError(RuntimeError):
     pass
+
+
+class BitrixNetworkError(requests.RequestException):
+    """Сетевой сбой вызова без адреса вебхука в тексте.
+
+    Наследует RequestException, чтобы прежние `except requests.RequestException`
+    ловили его как раньше."""
+
+
+# Путь вебхука — это токен доступа ко всему CRM. Текст сетевого исключения
+# requests его цитирует («Max retries exceeded with url: /rest/<id>/<токен>/…»),
+# а журнал Actions публичен; GitHub прячет только строку секрета целиком, а не
+# её части. Поэтому ни одно сообщение клиента не несёт пути, и main.py пропускает
+# текст любой ошибки через ту же чистку. Найдено проверкой PR #402, 23.09.2026.
+_ПУТЬ_ВЕБХУКА = re.compile(r"/rest/[^\s'\")]+")
+
+
+def без_вебхука(text: Any) -> str:
+    """Текст без пути вебхука: /rest/<id>/<токен>/… → /rest/***."""
+    return _ПУТЬ_ВЕБХУКА.sub("/rest/***", str(text))
+
+
+class _Снимок:
+    """Ответ портала, прочитанный из снимка: ровно те поля, что читает клиент."""
+    status_code = 200
+
+    def __init__(self, data: Any):
+        self._data = data
+
+    def json(self) -> Any:
+        return self._data
+
+    @property
+    def text(self) -> str:
+        return json.dumps(self._data, ensure_ascii=False)
 
 
 #: Коды ошибок Bitrix, которые лечатся повтором (транзиентные).
@@ -53,6 +91,55 @@ class BitrixClient:
         self._uf: dict[str, dict] | None = None
         self._departments: list[dict] | None = None
         self._user_depts: dict[str, str] | None = None
+        # Снимок портала для живой сверки (.github/workflows/live-check.yml):
+        # сборка прода записывает ответы, сборка правки читает их же, и обе
+        # считаются на одних данных. Без снимка вторая сборка шла минутами позже,
+        # и карточка, переназначенная за это время, выглядела сдвигом от правки.
+        # Промах (правка спросила то, чего прод не спрашивал) идёт в портал живьём
+        # и считается: по счётчику видно, была ли сверка точной.
+        self.snapshot_dir = os.getenv("BITRIX_SNAPSHOT_DIR") or ""
+        self.snapshot_mode = (os.getenv("BITRIX_SNAPSHOT_MODE") or "").strip().lower()
+        self.snapshot_saved = self.snapshot_hits = self.snapshot_misses = 0
+
+    def snapshot_stats(self) -> dict:
+        return {"mode": self.snapshot_mode if self.snapshot_dir else "",
+                "saved": self.snapshot_saved, "hits": self.snapshot_hits,
+                "misses": self.snapshot_misses}
+
+    def _post(self, method: str, payload: dict):
+        """Один HTTP-вызов метода — единственное место, где клиент ходит в сеть.
+        Здесь снимок и здесь же сетевая ошибка теряет адрес вебхука."""
+        key = ""
+        if self.snapshot_dir and self.snapshot_mode in ("record", "replay"):
+            raw = json.dumps([method, payload], sort_keys=True, ensure_ascii=False, default=str)
+            key = os.path.join(self.snapshot_dir, hashlib.sha256(raw.encode("utf-8")).hexdigest() + ".json")
+            if self.snapshot_mode == "replay":
+                try:
+                    with open(key, encoding="utf-8") as fh:
+                        data = json.load(fh)
+                    self.snapshot_hits += 1
+                    return _Снимок(data)
+                except FileNotFoundError:
+                    self.snapshot_misses += 1
+        self._throttle()
+        try:
+            r = self._session.post(self.base + method + ".json", json=payload, timeout=self.timeout)
+        except requests.RequestException as e:
+            raise BitrixNetworkError(f"{method}: сеть: {e.__class__.__name__}") from None
+        if key and self.snapshot_mode == "record" and r.status_code == 200:
+            try:
+                data = r.json()
+            except ValueError:
+                data = None
+            # пишется только годный ответ: сбой портала в снимке повторился бы
+            # в сборке правки и выглядел бы её ошибкой
+            if isinstance(data, (dict, list)) and not (isinstance(data, dict) and data.get("error")):
+                os.makedirs(self.snapshot_dir, exist_ok=True)
+                with open(key + ".tmp", "w", encoding="utf-8") as fh:
+                    json.dump(data, fh, ensure_ascii=False)
+                os.replace(key + ".tmp", key)
+                self.snapshot_saved += 1
+        return r
 
     # ----------------------------------------------------------------- low level
     def call_envelope(self, method: str, params: dict | None = None, *, retries: int | None = None) -> dict:
@@ -63,16 +150,14 @@ class BitrixClient:
         с джиттером (0.5 → 32 с), суммарный бюджет ожидания ~60 с.
         """
         retries = self.retries if retries is None else retries
-        url = self.base + method + ".json"
         payload = params or {}
         last_err: Exception | None = None
         for attempt in range(retries):
-            self._throttle()
             try:
-                r = self._session.post(url, json=payload, timeout=self.timeout)
+                r = self._post(method, payload)
             except requests.RequestException as e:                      # сеть/таймаут
                 last_err = e
-                self._backoff(attempt, method, f"сеть: {e.__class__.__name__}")
+                self._backoff(attempt, method, без_вебхука(e).removeprefix(f"{method}: "))
                 continue
             if r.status_code == 429 or r.status_code >= 500:
                 last_err = BitrixError(f"{method}: HTTP {r.status_code}")
@@ -93,7 +178,7 @@ class BitrixClient:
                     continue
                 raise BitrixError(f"{method}: {err} {desc}")            # неустранимая ошибка
             return data if isinstance(data, dict) else {"result": data}
-        raise BitrixError(f"{method}: не удалось выполнить за {retries} попыток ({last_err})")
+        raise BitrixError(f"{method}: не удалось выполнить за {retries} попыток ({без_вебхука(last_err)})")
 
     def call(self, method: str, params: dict | None = None, *, retries: int | None = None) -> Any:
         data = self.call_envelope(method, params, retries=retries)
@@ -122,9 +207,7 @@ class BitrixClient:
         start = 0
         while True:
             params["start"] = start
-            url = self.base + method + ".json"
-            self._throttle()
-            data = self._session.post(url, json=params, timeout=self.timeout).json()
+            data = self._post(method, params).json()
             if data.get("error"):
                 raise BitrixError(f"{method}: {data['error']} {data.get('error_description','')}")
             chunk = data.get("result") or []
@@ -173,14 +256,9 @@ class BitrixClient:
     def count(self, method: str, filter: dict | None = None) -> int:
         """Общее число записей list-метода: читает поле total из ответа.
         (call() возвращает только result-массив без total, поэтому считаем отдельным сырым запросом.)"""
-        self._throttle()
         for attempt in range(4):
             try:
-                data = self._session.post(
-                    self.base + method + ".json",
-                    json={"filter": filter or {}, "select": ["ID"], "start": 0},
-                    timeout=self.timeout,
-                ).json()
+                data = self._post(method, {"filter": filter or {}, "select": ["ID"], "start": 0}).json()
             except requests.RequestException:
                 time.sleep(0.5 * (attempt + 1)); continue
             if isinstance(data, dict) and data.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
@@ -240,10 +318,8 @@ class BitrixClient:
         fails = 0
         while True:
             params["start"] = start
-            self._throttle()
             try:
-                data = self._session.post(self.base + "crm.stagehistory.list.json",
-                                          json=params, timeout=self.timeout).json()
+                data = self._post("crm.stagehistory.list", params).json()
             except requests.RequestException:
                 fails += 1
                 if fails > 3:

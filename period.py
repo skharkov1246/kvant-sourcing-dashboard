@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import os
 import re
 from dataclasses import dataclass
 
@@ -13,6 +14,22 @@ from config import DEFAULT_PERIOD_ANCHOR, PERIOD_FLOOR
 
 FLOOR = dt.date.fromisoformat(PERIOD_FLOOR)
 ANCHOR = dt.date.fromisoformat(DEFAULT_PERIOD_ANCHOR)
+
+
+def now(tz: dt.tzinfo | None = None) -> dt.datetime:
+    """Текущий момент. KVANT_NOW (ISO с часовым поясом) замораживает его.
+
+    Нужно живой сверке (.github/workflows/live-check.yml): сборки прода и правки
+    идут одна за другой с разницей в минуты, и срок «сколько дней на стадии»,
+    посчитанный до разных «сейчас», расходился бы сам по себе — это выглядело бы
+    эффектом правки. В обычной сборке переменная не задана, и это datetime.now."""
+    v = (os.getenv("KVANT_NOW") or "").strip()
+    if not v:
+        return dt.datetime.now(tz)
+    t = dt.datetime.fromisoformat(v)
+    if t.tzinfo is None:
+        t = t.replace(tzinfo=dt.timezone.utc)
+    return t.astimezone(tz) if tz else t.astimezone().replace(tzinfo=None)
 
 
 @dataclass
