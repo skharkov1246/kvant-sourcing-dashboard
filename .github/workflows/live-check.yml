@@ -109,6 +109,9 @@ jobs:
           echo "BASE_SHA=$base" >> "$GITHUB_ENV"
           asof="$(date -u -d yesterday +%F)"
           echo "ASOF=$asof" >> "$GITHUB_ENV"
+          # «сейчас» одно на обе сборки: сроки «дней на стадии» иначе
+          # расходились бы на минуты между прогонами (period.now)
+          echo "KVANT_NOW=$(date -u +%Y-%m-%dT%H:%M:%S+00:00)" >> "$GITHUB_ENV"
           echo "PERIOD=2026-05-01:$asof" >> "$GITHUB_ENV"
           echo "прод: ${base:0:12} · правка: $(git rev-parse --short=12 HEAD)"
           echo "окно сверки: 2026-05-01 → $asof (вчера включительно — набор карточек заморожен)"

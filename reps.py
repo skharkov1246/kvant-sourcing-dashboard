@@ -26,6 +26,7 @@ import re
 from collections import Counter, defaultdict
 
 import people as people_mod
+import period as period_mod
 from bitrix_client import BitrixClient
 
 YEAR_START = "2026-01-01T00:00:00"   # работаем только в этом году
@@ -92,7 +93,7 @@ def _react_stats(client, rep_ids, *, as_of=None, deal_owner=None, deal_stage=Non
             return dt.datetime.fromisoformat(str(s)[:19])
         except Exception:
             return None
-    now = dt.datetime.now(); cut = now - dt.timedelta(days=REACT_DAYS)
+    now = period_mod.now(); cut = now - dt.timedelta(days=REACT_DAYS)
     try:
         rec = client.call("im.recent.get", {}) or []
     except Exception:

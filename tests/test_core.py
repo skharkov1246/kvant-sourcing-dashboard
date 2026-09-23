@@ -987,3 +987,14 @@ def test_main_чистит_текст_любой_ошибки(monkeypatch, capsy
     assert main_mod.main() == 1
     err = capsys.readouterr().err
     assert "ВЫДУМАННЫЙТОКЕН42" not in err and "/rest/***" in err
+
+
+def test_момент_времени_замораживается_для_сверки(monkeypatch):
+    """Две сборки живой сверки идут с разницей в минуты; «сейчас» у них одно."""
+    monkeypatch.setenv("KVANT_NOW", "2026-03-04T10:20:30+00:00")
+    msk = dt.timezone(dt.timedelta(hours=3))
+    assert period_mod.now(msk).isoformat() == "2026-03-04T13:20:30+03:00"
+    assert period_mod.now(dt.timezone.utc) == dt.datetime(2026, 3, 4, 10, 20, 30, tzinfo=dt.timezone.utc)
+    assert period_mod.now().tzinfo is None
+    monkeypatch.delenv("KVANT_NOW")
+    assert abs((period_mod.now(dt.timezone.utc) - dt.datetime.now(dt.timezone.utc)).total_seconds()) < 5
