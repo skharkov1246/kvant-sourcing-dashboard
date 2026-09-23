@@ -175,7 +175,9 @@ def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict]
 
     by_user: dict[str, list[dict]] = defaultdict(list)
     for r in rfqs:
-        u = str(r.get("assignedById"))
+        # исполнитель уже разрешён в metrics.build (цепочка «ответственный →
+        # владелец сделки → автор»), карточки робота засчитаны живому сорсеру
+        u = r.get("_owner") or str(r.get("assignedById"))
         if u in dept_a_ids:
             by_user[u].append(r)
 
@@ -265,7 +267,8 @@ def run(args) -> int:
         select=RFQ_SELECT,
         max_items=args.max_deals,
     )
-    print(f"  RFQ: {len(rfqs)}  |  блок A (отдел 172): {sum(1 for r in rfqs if str(r.get('assignedById')) in dept_a_ids)}")
+    print(f"  RFQ: {len(rfqs)}  |  блок A по ответственному (отдел 172): "
+          f"{sum(1 for r in rfqs if str(r.get('assignedById')) in dept_a_ids)}")
 
     parent_ids = {str(r.get("parentId2")) for r in rfqs if r.get("parentId2")}
     print(f"• Родительские сделки (parentId2): {len(parent_ids)} → выгрузка стадий…")
@@ -285,7 +288,15 @@ def run(args) -> int:
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
         client.user_dept_names(),
+        config.SERVICE_ACCOUNT_IDS,
     )
+    _o = m["origin"]["summary"]
+    if _o["viaService"]:
+        print(f"  служебные записи: {_o['viaService']} карточек ({_o['viaServicePct']} %), "
+              f"исполнитель восстановлен у {_o['serviceResolved']} ({_o['serviceResolvedPct']} %)")
+    if _o["candidates"]:
+        print(f"  кандидатов в служебные записи: {_o['candidates']} "
+              f"(порог {_o['candidateFloor']} карточек) — см. вкладку «Кто заводит запросы»")
 
     _sanity_gates(p, rfqs, period_deals, dept_a_ids, m.get("sourcersA") or [],
                   skip=bool(args.allow_empty or args.max_deals))

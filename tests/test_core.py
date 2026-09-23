@@ -358,3 +358,107 @@ def test_разбор_не_падает_без_карты_подразделен
     o = m["origin"]
     assert o["summary"]["total"] == m["kpi"]["total"]
     assert any(c["dept"] == "подразделение не указано" for c in o["byCreator"])
+
+
+# ── служебные записи (воронка пресейла) ──────────────────────────────────────
+# Карточки заводит робот от имени служебной учётной записи. Если считать
+# исполнителем её, работа сорсера, запустившего кампанию, исчезает из его
+# статистики. Исполнитель восстанавливается цепочкой: ответственный карточки →
+# владелец родительской сделки → автор карточки.
+
+def _build(service_ids):
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    return metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                             d["dept_a_ids"], d["names"], d["since"],
+                             d["deal_stage_names"], d["category_names"], d["user_depts"],
+                             service_ids)
+
+
+def test_служебная_запись_не_числится_исполнителем():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    for s in m["sourcersA"]:
+        assert s["id"] not in fixture.SERVICE_IDS, (
+            "служебная запись попала в список сорсеров как исполнитель")
+
+
+def test_карточки_робота_засчитаны_живому_сотруднику():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    s = m["origin"]["summary"]
+    assert s["viaService"] > 0, "в синтетике есть карточки служебной записи"
+    assert s["serviceResolved"] > 0, "ни одна карточка робота не отнесена к человеку"
+    assert s["serviceResolved"] <= s["viaService"]
+    to = m["origin"]["resolvedTo"]
+    assert sum(c["n"] for c in to) == s["serviceResolved"]
+    assert all(c["uid"] not in fixture.SERVICE_IDS for c in to)
+
+
+def test_цепочка_восстановления_объяснена_и_сходится():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    o = m["origin"]
+    how = {x["how"]: x["n"] for x in o["resolvedHow"]}
+    assert sum(how.values()) == o["summary"]["viaService"], (
+        "разбор «чем определён исполнитель» не сходится с числом карточек робота")
+    assert how.get("владелец сделки"), (
+        "у карточек робота исполнитель должен восстанавливаться по родительской сделке")
+    assert "ответственный" not in how, (
+        "ответственным у карточки робота записан он сам — этот путь невозможен")
+
+
+def test_нагрузка_сорсеров_растёт_после_учёта_служебной_записи():
+    from tests import fixture
+    before = _build(None)
+    after = _build(fixture.SERVICE_IDS)
+    a_before = sum(s["c"] for s in before["sourcersA"])
+    a_after = sum(s["c"] for s in after["sourcersA"])
+    assert a_after > a_before, (
+        "после учёта служебной записи карточки робота должны вернуться сорсерам")
+    assert before["kpi"]["total"] == after["kpi"]["total"], (
+        "общее число запросов от разбора зависеть не должно")
+
+
+def test_пустой_список_служебных_записей_ничего_не_меняет():
+    """Сначала мерим, потом применяем: пока список пуст, поведение прежнее —
+    исполнителем остаётся ответственный карточки."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"], d["user_depts"], None)
+    assert m["origin"]["summary"]["viaService"] == 0
+    assert m["origin"]["summary"]["serviceConfigured"] == 0
+    assert all(r["_owner"] == str(r["assignedById"]) for r in d["rfqs"]), (
+        "при пустом списке исполнитель обязан совпадать с ответственным карточки")
+
+
+def test_кандидаты_показываются_но_не_применяются():
+    """Запись без подразделения с потоком карточек предлагается владельцу,
+    но из статистики не выключается сама."""
+    from tests import fixture
+    m = _build(None)
+    o = m["origin"]
+    cand = {c["uid"] for c in o["serviceCandidates"]}
+    assert fixture.SERVICE_BOT in cand, (
+        "робот без подразделения с потоком карточек должен попасть в кандидаты")
+    assert o["summary"]["candidates"] == len(o["serviceCandidates"])
+    assert o["summary"]["candidateFloor"] >= 10
+    # кандидат остаётся обычным автором: его карточки никуда не переехали
+    assert o["summary"]["viaService"] == 0
+    assert any(c["uid"] == fixture.SERVICE_BOT and not c["auto"]
+               for c in o["byCreator"]), "кандидат должен остаться в разборе как автор"
+
+
+def test_нераспознанная_карточка_робота_не_приписывается_никому():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    o = m["origin"]
+    how = {x["how"]: x["n"] for x in o["resolvedHow"]}
+    assert how.get("не определён", 0) >= 1, (
+        "карточка робота без родительской сделки должна оставаться нераспознанной"
+    )
+    assert o["summary"]["serviceResolved"] + how.get("не определён", 0) == o["summary"]["viaService"]

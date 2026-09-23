@@ -536,7 +536,7 @@
 </div>
 
 <div class="secttl"><b>4</b> · Кто заводит запросы</div>
-<div class="kpis" id="kpisOrigin" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px"></div>
+<div class="kpis" id="kpisOrigin" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px"></div>
 <div class="grid">
   <div>
     <section class="card">
@@ -550,6 +550,22 @@
       <h2>Откуда приходят запросы</h2>
       <div class="note">Подразделение автора карточки. «Автоматизация портала» — карточки без автора: их создал робот, а не человек.</div>
       <div class="barlist" id="originDept"></div>
+    </section>
+  </div>
+</div>
+<div class="grid">
+  <div>
+    <section class="card">
+      <h2>Служебные записи: кому засчитаны их карточки</h2>
+      <div class="note">Воронка пресейла заводит запросы от имени служебной учётной записи. Исполнителем считается не она, а первый живой сотрудник в цепочке: <b>ответственный карточки → владелец родительской сделки → автор карточки</b>. Список служебных записей задаёт владелец переменной <span class="mono">SERVICE_ACCOUNT_IDS</span>; пока он пуст, запросы считаются по ответственному — как было до этого раздела.</div>
+      <div id="originService"></div>
+    </section>
+  </div>
+  <div>
+    <section class="card">
+      <h2>Кандидаты в служебные записи</h2>
+      <div class="note">Учётная запись, не числящаяся ни в одном подразделении и при этом заводящая карточки потоком. Список не применяется сам: живого сотрудника без подразделения выключать из статистики нельзя, поэтому запись вносится в <span class="mono">SERVICE_ACCOUNT_IDS</span> только вручную.</div>
+      <div id="originCand"></div>
     </section>
   </div>
 </div>
@@ -638,7 +654,7 @@ const M = window.__DATA__ || {}, INS = window.__INSIGHTS__ || {};
 // Защита от неполной выгрузки: недостающие блоки заменяем пустыми. Раньше одно
 // отсутствующее поле (например weekly) роняло весь скрипт и гасило все 9 вкладок.
 for(const [_k,_d] of [['kpi',{}],['sourcersA',[]],['weekly',[]],['coverage',{}],['chain',[]],
-                      ['origin',{summary:{},byDept:[],outsideCreators:[],byCreator:[]}],
+                      ['origin',{summary:{},byDept:[],outsideCreators:[],byCreator:[],service:[],serviceCandidates:[],resolvedTo:[],resolvedHow:[]}],
                       ['catList',[]],['supplierMix',null],['send',{}],['period',{label:'—'}]]){
   if(M[_k]==null) M[_k]=_d;
 }
@@ -740,13 +756,17 @@ document.getElementById('catList').innerHTML=cats.map(c=>`<div class="blrow"><di
 // ---- кто заводит запросы
 // Считаем по автору карточки, а не по ответственному: очередь грузит тот, кто
 // завёл запрос, даже если ответственным тут же назначили сорсера.
-const ORG = M.origin && M.origin.summary ? M.origin : {summary:{},byDept:[],outsideCreators:[]};
+const ORG = M.origin && M.origin.summary ? M.origin : {summary:{},byDept:[],outsideCreators:[],service:[],serviceCandidates:[],resolvedTo:[],resolvedHow:[]};
 const og = ORG.summary;
 document.getElementById('kpisOrigin').innerHTML=[
  ['','Завёл сорсинг',og.sourcing||0,(og.sourcingPct||0)+'% всех запросов','',''],
  ['warn','Завели другие',og.outside||0,(og.outsidePct||0)+'% · людей: '+(og.outsidePeople||0),'warn',''],
  ['amber','Создала автоматика',og.auto||0,(og.autoPct||0)+'% · без автора','amber',''],
  ['','Передано сорсингу',og.handoff||0,'из заведённых вне отдела · '+(og.handoffPct||0)+'%','',''],
+ [(og.viaService&&og.serviceResolvedPct<100)?'warn':'','Через служебные записи',og.viaService||0,
+  og.viaService?('исполнитель восстановлен у '+(og.serviceResolved||0)+' · '+(og.serviceResolvedPct||0)+'%')
+               :(og.serviceConfigured?'записи заданы, карточек нет':'список записей не заполнен'),
+  (og.viaService&&og.serviceResolvedPct<100)?'warn':'',''],
 ].map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
 
 document.getElementById('originDept').innerHTML=(ORG.byDept||[]).map(d=>
@@ -763,6 +783,38 @@ document.getElementById('originDept').innerHTML=(ORG.byDept||[]).map(d=>
       + `<td class="num r ${c.tkpPct>=50?'q':(c.tkpPct>=30?'dimv':'nrc')}">${c.tkpPct}%</td></tr>`).join('')
     + `</tbody></table>`
   : '<span class="dimv">все запросы периода завёл отдел поиска поставщиков либо автоматика</span>';}
+
+// ---- служебные записи: сколько карточек прошло через них и кому засчитано
+{const _sv=ORG.service||[], _how=ORG.resolvedHow||[], _to=ORG.resolvedTo||[];
+ let h='';
+ if(!_sv.length){
+   h = og.serviceConfigured
+     ? '<span class="dimv">служебные записи заданы, но карточек за период они не заводили</span>'
+     : '<span class="dimv">список <span class="mono">SERVICE_ACCOUNT_IDS</span> пуст — запросы считаются по ответственному. Пока он пуст, работа робота пресейла остаётся на роботе, а не на сорсере, который кампанию запустил.</span>';
+ } else {
+   h = '<table class="tb"><thead><tr><th>Служебная запись</th><th class="r">Карточек</th><th class="r">Доля</th></tr></thead><tbody>'
+     + _sv.map(c=>`<tr><td><div class="who">${_esc(c.name)}</div></td><td class="num r">${c.n}</td><td class="num r dimv">${c.pct}%</td></tr>`).join('')
+     + '</tbody></table>';
+   if(_how.length) h += '<div class="note">Чем определён исполнитель: '
+     + _how.map(x=>`${_esc(x.how)} — ${x.n} (${x.pct}%)`).join(' · ') + '</div>';
+   h += _to.length
+     ? '<table class="tb" style="margin-top:8px"><thead><tr><th>Кому засчитано</th><th>Подразделение</th><th class="r">Карточек</th></tr></thead><tbody>'
+       + _to.map(c=>`<tr><td><div class="who">${_esc(c.name)}</div></td>`
+         + `<td class="${c.src?'':'dimv'}">${_esc(c.dept)}</td><td class="num r">${c.n}</td></tr>`).join('')
+       + '</tbody></table>'
+     : '<div class="note">ни одну карточку служебных записей не удалось отнести к живому сотруднику: у них нет ни ответственного-человека, ни родительской сделки</div>';
+ }
+ document.getElementById('originService').innerHTML=h;}
+
+{const _cd=ORG.serviceCandidates||[];
+ document.getElementById('originCand').innerHTML=_cd.length
+  ? '<table class="tb"><thead><tr><th>Учётная запись</th><th class="r">Карточек</th><th class="r">Доля</th><th class="r">Дошло до ТКП</th></tr></thead><tbody>'
+    + _cd.map(c=>`<tr><td><div class="who">${_esc(c.name)}</div><div class="dimv mono">#${_esc(c.uid)}</div></td>`
+      + `<td class="num r">${c.n}</td><td class="num r dimv">${c.pct}%</td>`
+      + `<td class="num r dimv">${c.tkpPct}%</td></tr>`).join('')
+    + '</tbody></table>'
+    + `<div class="note">Порог — ${og.candidateFloor||0} карточек за период. Подтверждённые записи внести строкой: <span class="mono">SERVICE_ACCOUNT_IDS=${_cd.map(c=>c.uid).join(',')}</span></div>`
+  : '<span class="dimv">учётных записей без подразделения с потоком запросов не нашлось</span>';}
 
 // ---- coverage KPIs
 document.getElementById('kpisCov').innerHTML=[
