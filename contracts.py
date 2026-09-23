@@ -21,6 +21,7 @@ import pathlib
 import re
 from collections import defaultdict
 
+import period as period_mod
 from bitrix_client import BitrixClient
 
 _SYM = {"EUR": "€", "USD": "$", "CNY": "¥", "RUB": "₽", "INR": "₹", "GBP": "£", "AED": "AED ", "JPY": "¥"}
@@ -171,7 +172,7 @@ def _parse_econ_money(raw, rate) -> float:
 
 def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     today = as_of or dt.date.today()
-    now_iso = dt.datetime.now(_MSK).isoformat()
+    now_iso = period_mod.now(_MSK).isoformat()
     curlist = client.call("crm.currency.list", {}) or []
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
     def eur(o, cu): return float(o or 0) * rate.get(cu, 1.0)

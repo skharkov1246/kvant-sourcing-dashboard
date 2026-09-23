@@ -153,7 +153,9 @@
       "бот-файлы не изменены",
       "поиск секретов"
     ],
-    "pre_deploy_validation": "scripts/validate_dashboard.py — деплой не выполняется, если дашборд пустой или сломан"
+    "pre_deploy_validation": "scripts/validate_dashboard.py — деплой не выполняется, если дашборд пустой или сломан",
+    "live_check_workflow": ".github/workflows/live-check.yml",
+    "live_check": "scripts/live_check.py — правка расчёта против прода на одном снимке портала; мерж правки расчёта только при зелёной сверке и с заявкой «ожидается:» в описании PR"
   },
   "do_not_touch_without_owner": [
     ".github/workflows/ — расписания и деплой",
