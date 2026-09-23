@@ -45,7 +45,15 @@ def одно(cur, sql, default=0):
 
 def собрать(cur) -> dict:
     q = одно
+    # СПРОС — ЖИВЫЕ СТРОКИ. В lib_demand лежат и строки с действующей пометкой:
+    # текст документа, принятый за позицию, и прежняя редакция файла, заменённая
+    # переразбором, — их счёт завышал спрос, а переразобранный файл давал его
+    # дважды. До миграции разметки вида ещё нет — тогда таблица, и подпись это
+    # говорит. Наличие спрашивается у базы: «одно» глотает ошибку и отдало бы
+    # ноль вместо числа.
+    живые = bool(q(cur, "select to_regclass('lib_demand_live') is not null", False))
     d = {
+        "спрос_живой": живые,
         "машины": q(cur, "select count(*) from lib_models"),
         "наследные": q(cur, "select count(*) from lib_models where legacy is not null"),
         "узлы": q(cur, "select count(*) from lib_units"),
@@ -61,7 +69,8 @@ def собрать(cur) -> dict:
         "операции": q(cur, "select count(*) from lib_procedures"),
         "дефекты": q(cur, "select count(*) from lib_defects"),
         "парк": q(cur, "select count(*) from lib_fleet"),
-        "спрос": q(cur, "select count(*) from lib_demand"),
+        "спрос": q(cur, "select count(*) from "
+                   + ("lib_demand_live" if живые else "lib_demand")),
         "файлы": q(cur, "select count(*) from lib_files"),
         "контакты": q(cur, "select count(*) from lib_suppliers where contact_email is not null"),
         "признаки": q(cur, "select count(*) from lib_symptoms"),
@@ -278,7 +287,7 @@ def html_doc(d: dict) -> str:
 <section><h2>Сырьё</h2>
 <table class="t"><thead><tr><th style="width:70%">источник</th>
 <th style="width:30%">строк</th></tr></thead><tbody>
-<tr><td>Спрос из спецификаций сделок (lib_demand){' — по прогону в живой базе' if 'спрос' in PROD else ''}</td><td class="num">{n(d['спрос'])}</td></tr>
+<tr><td>Спрос из спецификаций сделок ({'lib_demand_live — без помеченного текста документов и заменённых редакций' if d.get('спрос_живой') else 'lib_demand — все строки, разметка ещё не применена'}){' — по прогону в живой базе' if 'спрос' in PROD else ''}</td><td class="num">{n(d['спрос'])}</td></tr>
 <tr><td>Разобранных вложений Битрикса (lib_files){' — по прогону в живой базе' if 'файлы' in PROD else ''}</td><td class="num">{n(d['файлы'])}</td></tr>
 <tr><td>Строк спроса, опознанных по каталогу — сведены по артикулу с известной
     деталью, на {n(d['сделок_опознано'])} сделках</td>

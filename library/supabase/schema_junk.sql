@@ -242,6 +242,21 @@ create index concurrently if not exists lib_demand_src on lib_demand (source_fil
 -- поэтому индекс по выражению допустим.
 create index if not exists lib_parts_cat_key on lib_parts (lib_pn_key(catalog_no));
 
+-- ТОЛЬКО ЖИВЫЕ СТРОКИ. До 23.09.2026 вид читал lib_demand целиком, и в него
+-- попадали строки с действующей пометкой: текст документа, принятый за позицию
+-- (mark_prose), и прежняя редакция файла, заменённая переразбором (reparse.RULE).
+-- Счётчики «спрос опознан» и «сделок опознано» (scripts/library_report.py,
+-- scripts/library_stats.py) были завышены, а строки каждого переразобранного
+-- файла считались дважды — старая редакция и новая.
+--
+-- ФИЛЬТР ЗДЕСЬ ЖЕ, А НЕ «from lib_demand_live». Выше тот вид пересоздаётся
+-- через «drop view if exists lib_demand_live» без cascade: зависимый от него
+-- вид этот оператор уронил бы на живой базе, где оба уже стоят, — а на чистой
+-- базе, где зависимости ещё нет, ошибка не видна никогда. Условие то же, что у
+-- lib_demand_live. NOT EXISTS в WHERE вида планировщик превращает в анти-
+-- соединение (один проход по lib_row_junk), а не в подзапрос на каждую строку:
+-- правило 8 CLAUDE.md о подзапросе внутри CASE, здесь проверено планом
+-- (tests/test_demand_catalog_sql.py).
 drop view if exists lib_demand_catalog;
 create view lib_demand_catalog with (security_invoker = true) as
   select d.id, d.deal_id, d.item_name, d.part_number, d.qty, d.unit,
@@ -249,7 +264,16 @@ create view lib_demand_catalog with (security_invoker = true) as
          p.id as part_id, p.name as part_name, p.oem, p.unit_id, p.model
     from lib_demand d
     join lib_parts p on p.id = lib_pn_key(d.part_number)
-   where coalesce(btrim(d.part_number), '') <> '';
+   where coalesce(btrim(d.part_number), '') <> ''
+     and not exists (select 1 from lib_row_junk j
+                      where j.demand_id = d.id and j.revoked_at is null);
+do $$
+declare кому text := lib_роли_которые_есть(array['anon', 'authenticated']);
+begin
+  if кому is not null then
+    execute format('revoke all on lib_demand_catalog from %s', кому);
+  end if;
+end $$;
 
 -- Индекс по тому же выражению: без него соединение полутора миллионов строк с
 -- каталогом — последовательный проход с пересчётом функции на каждой строке.

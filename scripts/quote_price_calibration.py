@@ -56,9 +56,13 @@ LIMIT = int(os.environ.get("LIMIT", "200000"))
 # id — выборка не случайная, но и не отсортированная по качеству; для разложения
 # отказов по воротам этого достаточно, а случайная выборка на полутора миллионах
 # строк стоит полного прохода.
+#
+# ТОЛЬКО ЖИВЫЕ СТРОКИ ({спрос} — lib_demand_live, пока вид есть). Помеченные —
+# текст документа, принятый за позицию, и прежняя редакция файла, заменённая
+# переразбором: первые раздували отказ ворот, вторые считали строку дважды.
 СТРОКИ = """
 select coalesce(f.parse_path, '(не указан)'), d.item_name
-  from lib_demand d
+  from {спрос} d
   join lib_files f on f.file_id = d.source_file
  where f.origin = %s and coalesce(d.item_name, '') <> ''
  order by d.id
@@ -215,9 +219,14 @@ def main() -> int:
     всего = 0
 
     try:
+        # Наличие вида спрашивается у базы: до миграции разметки его ещё нет.
+        with conn.cursor() as c:
+            c.execute("select to_regclass('lib_demand_live') is not null")
+            спрос = "lib_demand_live" if c.fetchone()[0] else "lib_demand"
+        print(f"строки спроса: {спрос}", flush=True)
         with conn.cursor(name="калибровка") as cur:
             cur.itersize = 5000
-            cur.execute(СТРОКИ, (ПРЕДЛОЖЕНИЕ, LIMIT))
+            cur.execute(СТРОКИ.format(спрос=спрос), (ПРЕДЛОЖЕНИЕ, LIMIT))
             for путь, строка in cur:
                 всего += 1
                 по_пути[путь] = по_пути.get(путь, 0) + 1
