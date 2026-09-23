@@ -387,22 +387,73 @@ def rows_from_pdf(b: bytes) -> list[list[str]]:
         return []
 
 
+#: Сколько первых строк просматриваем в поисках шапки.
+ШАПКА_В_ПЕРВЫХ = 40
+
+
+def колонки_строки(row: list[str]) -> dict[str, int]:
+    """Какие известные колонки узнаются в ОДНОЙ строке. Отдельной функцией, чтобы
+    разбор и разбор причин пользовались ОДНИМ правилом.
+
+    Разведка шапки 23.09.2026 писала свой перебор колонок и потому мерила не то,
+    что делает разборщик. Правило должно жить в одном месте.
+    """
+    low = [c.lower() for c in row]
+    found: dict[str, int] = {}
+    for key, words in COLS.items():
+        for j, c in enumerate(low):
+            if not c or not any(w in c for w in words):
+                continue
+            if key == "unit" and any(w in c for w in ЕДИНИЦА_ЧУЖОЕ):
+                continue              # «Unit price» — колонка цены, не единицы
+            found.setdefault(key, j)
+            break
+    return found
+
+
 def header_map(rows: list[list[str]]) -> tuple[int, dict[str, int]]:
     """Ищем строку заголовков: в ней должно найтись хотя бы два известных названия."""
-    for i, row in enumerate(rows[:40]):
-        low = [c.lower() for c in row]
-        found: dict[str, int] = {}
-        for key, words in COLS.items():
-            for j, c in enumerate(low):
-                if not c or not any(w in c for w in words):
-                    continue
-                if key == "unit" and any(w in c for w in ЕДИНИЦА_ЧУЖОЕ):
-                    continue          # «Unit price» — колонка цены, не единицы
-                found.setdefault(key, j)
-                break
+    for i, row in enumerate(rows[:ШАПКА_В_ПЕРВЫХ]):
+        found = колонки_строки(row)
         if "item_name" in found and len(found) >= 2:
             return i, found
     return -1, {}
+
+
+def почему_нет_шапки(rows: list[list[str]]) -> str:
+    """ПОЧЕМУ шапка не узнана — словами, годными для починки.
+
+    «Шапки нет» само по себе чинить нельзя: за ним стоят четыре разные правки —
+    расширить просмотр вглубь файла, добавить слово в COLS, ослабить требование
+    двух колонок, починить читателя. Возвращаемая строка их различает и пишется
+    в `lib_files.header_miss`, то есть накапливается по всей базе, а не живёт
+    один прогон (правило 16: сохраняй, почему получилось значение).
+    """
+    if not rows:
+        return "читатель не дал строк"
+    if max(len(r) for r in rows) <= 1:
+        return "таблица в один столбец — колонок нет вообще"
+    # Та же проверка, но по ВСЕМУ файлу: отличает «шапки нет» от «шапка ниже».
+    for i, row in enumerate(rows):
+        found = колонки_строки(row)
+        if "item_name" in found and len(found) >= 2:
+            return (f"шапка есть на строке {i + 1} — глубже, чем смотрим"
+                    if i >= ШАПКА_В_ПЕРВЫХ else "шапка узнаётся — расходится с пометкой")
+    # Шапки нет нигде. Что именно не сошлось в лучшей из строк?
+    есть_наименование = ложь_колонок = 0
+    for row in rows:
+        found = колонки_строки(row)
+        if "item_name" in found:
+            есть_наименование = max(есть_наименование, len(found))
+        else:
+            ложь_колонок = max(ложь_колонок, len(found))
+    if есть_наименование:
+        return "наименование узнали, второй колонки — нет"
+    if ложь_колонок >= 2:
+        return "колонки узнали, а наименования среди них нет"
+    if ложь_колонок == 1:
+        return "узнали одну колонку, и та не наименование"
+    return "ни одного известного слова колонки"
 
 
 def items_from_rows(rows: list[list[str]]) -> list[dict]:
@@ -752,7 +803,8 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            "field_title": название, "side": doc_side.сторона(название),
            "kind": None, "size_bytes": None, "status": "не скачался", "reason": None,
            "chars": 0, "rows_found": 0, "segment_id": None, "sha256": None,
-           "parse_path": None, "header_found": None, "doc_class": None,
+           "parse_path": None, "header_found": None, "header_miss": None,
+           "doc_class": None,
            "class_rule": None, "text_lines": None, "item_lines": None}
     b = download(fo)
     if not b:
@@ -806,6 +858,10 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         весь_текст = "\n".join(" ".join(c for c in r if c) for r in rows)[:400000]
         rec["parse_path"] = "таблица"
         rec["header_found"] = header_map(rows)[0] >= 0
+        # ПОЧЕМУ шапки нет — рядом с тем, что её нет. Иначе «шапки нет» стоит в
+        # базе у сотен файлов и не говорит, какую из четырёх правок делать.
+        if not rec["header_found"]:
+            rec["header_miss"] = почему_нет_шапки(rows)
     elif text:
         # ВОРОТА СПЕЦИФИКАЦИИ. До 12.09.2026 здесь любая строка длиннее восьми
         # знаков становилась позицией номенклатуры, и в спрос лёг текст извещений
