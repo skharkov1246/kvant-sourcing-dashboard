@@ -39,6 +39,7 @@ def build(
     category_names: dict[str, str],
     user_depts: dict[str, str] | None = None,
     service_ids: set[str] | None = None,
+    inbound_mail: list[dict] | None = None,
 ) -> dict:
     weeks = period.weeks
     n_weeks = len(weeks)
@@ -165,6 +166,26 @@ def build(
         "unknown": sup_a.get("—", 0),
     }
 
+    # ---- входящие КП по неделям
+    # Считаем факт получения, а не ответ на конкретный запрос: КП кладётся в ту
+    # неделю, когда оно пришло, и ни к какому запросу не привязывается. За КП
+    # принимается входящее письмо поставщика с вложением — это верхняя оценка
+    # (одно предложение может прийти двумя письмами) и одновременно нижняя
+    # (цена в теле письма без файла сюда не попадает). Поэтому рядом с числом
+    # идут оба контрольных значения: всего входящих и сколько карточек их
+    # получило. Одно число вместо трёх тут врало бы.
+    kp_file = [0] * n_weeks
+    kp_all = [0] * n_weeks
+    kp_cards: list[set[str]] = [set() for _ in range(n_weeks)]
+    for a_ in (inbound_mail or []):
+        wi = period.week_index(parse_dt(a_.get("dt") or ""))
+        if wi is None:
+            continue
+        kp_all[wi] += 1
+        if a_.get("file"):
+            kp_file[wi] += 1
+            kp_cards[wi].add(str(a_.get("cid") or ""))
+
     # ---- недельная динамика A vs B
     weekly = []
     for i, w in enumerate(weeks):
@@ -175,7 +196,8 @@ def build(
                     a += 1
                 else:
                     b += 1
-        weekly.append({"w": w.label, "d": w.days, "A": a, "B": b})
+        weekly.append({"w": w.label, "d": w.days, "A": a, "B": b,
+                       "kp": kp_file[i], "inb": kp_all[i], "kpc": len(kp_cards[i])})
 
     total = len(rfqs)
     a_total = sum(1 for r in rfqs if r["_owner"] in dept_a_ids)

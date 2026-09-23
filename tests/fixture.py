@@ -94,8 +94,22 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
         deal_index[did] = d
         period_deals.append(d)
 
+    # входящие письма поставщиков: из них считается счётчик полученных КП.
+    # Часть писем без вложения (цена в теле) и часть приходит парами на одну
+    # карточку — чтобы в тестах расходились «писем с вложением» и «карточек».
+    inbound = []
+    for i in range(n_rfq // 2):
+        got = p.start + dt.timedelta(days=rnd.randint(0, span))
+        cid = str(1000 + (i % n_rfq))
+        inbound.append({"cid": cid, "dt": got.isoformat() + "T12:00:00+03:00",
+                        "file": i % 4 != 0})
+        if i % 9 == 0:
+            inbound.append({"cid": cid, "dt": got.isoformat() + "T15:00:00+03:00",
+                            "file": True})
+
     return {
         "period": p, "rfqs": rfqs, "deal_index": deal_index, "period_deals": period_deals,
+        "inbound_mail": inbound,
         "dept_a_ids": set(DEPT_A), "names": dict(NAMES),
         "since": {u: "2025-01-01" for u in users},
         "user_depts": dict(USER_DEPTS),
@@ -112,7 +126,7 @@ def build_metrics(**kw) -> dict:
     return metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
                              d["dept_a_ids"], d["names"], d["since"],
                              d["deal_stage_names"], d["category_names"], d["user_depts"],
-                             d.get("service_ids"))
+                             d.get("service_ids"), d.get("inbound_mail"))
 
 
 # ------------------------------------------------------------------ коммерсанты

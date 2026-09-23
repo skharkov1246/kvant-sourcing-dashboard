@@ -105,8 +105,9 @@
   .wkbars{display:flex;gap:4px;align-items:flex-end;height:100%;width:100%;justify-content:center}
   .wkbar{flex:1 1 0;max-width:26px;min-width:4px;border-radius:5px 5px 0 0;position:relative;display:flex;justify-content:center;transition:height .9s cubic-bezier(.2,.7,.2,1)}
   .wkbar.a{background:linear-gradient(180deg,var(--a2),var(--a))}.wkbar.b{background:linear-gradient(180deg,var(--b2),var(--b))}
+  .wkbar.k{background:linear-gradient(180deg,var(--ok),#1c7a52)}
   .wkbar span{position:absolute;top:-16px;font-family:var(--mono);font-size:10.5px;font-weight:600;line-height:1}
-  .wkbar.a span{color:var(--a2)}.wkbar.b span{color:var(--b2)}
+  .wkbar.a span{color:var(--a2)}.wkbar.b span{color:var(--b2)}.wkbar.k span{color:var(--ok)}
   .wklbl{font-size:10.5px;color:var(--mut);text-align:center;font-family:var(--mono);white-space:nowrap}
   .wklbl b{display:block;color:var(--ink);font-family:'IBM Plex Sans';font-weight:600;font-size:12px}
   .gnums{display:flex;flex-direction:column;gap:1px;margin-top:4px;font-family:var(--mono);font-size:10px;line-height:1.3}
@@ -476,10 +477,10 @@
 <div class="grid">
   <div>
     <section class="card">
-      <h2>Динамика по неделям <span class="subtotal">A vs B</span></h2>
-      <div class="note">Карточки RFQ по дате создания, по неделям (Пн–Вс) — <b>последние 4 недели</b>. Отдел Гринёва (A) против «вне отдела» (B).</div>
+      <h2>Динамика по неделям <span class="subtotal">запросы и КП</span></h2>
+      <div class="note">Карточки RFQ по дате создания, по неделям (Пн–Вс) — <b>последние 7 недель</b>. Отдел Гринёва (A) против «вне отдела» (B). Третий столбец — <b>полученные КП</b>: входящие письма поставщиков с вложением, посчитанные по неделе получения и ни к какому запросу не привязанные. Число приблизительное с двух сторон: одно предложение может прийти двумя письмами, а цена в теле письма без файла сюда не попадёт — обе контрольные величины в подсказке к столбцу.</div>
       <div class="wkchart" id="wkchart"></div>
-      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span></div>
+      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>Получено КП</span></div>
     </section>
     <section class="card">
       <h2><span class="tag a">БЛОК A</span> Нагрузка по сорсерам <span class="subtotal">итого <b id="loadTotal"></b></span></h2>
@@ -689,9 +690,13 @@ const kpis=[
 document.getElementById('kpis').innerHTML=kpis.map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
 
 // ---- weekly chart
-const weekTot=M.weekly.slice(-4);   // блок 1: показываем последние 4 недели, чтобы не уплотнять график
-const wkMax=Math.max(1,...weekTot.flatMap(w=>[w.A,w.B]));
-document.getElementById('wkchart').innerHTML=weekTot.map(w=>`<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}"><span>${w.B}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}</div></div>`).join('');
+// блок 1: семь недель — горизонт шире, чем прежние четыре; столбцы резиновые,
+// поэтому график от этого не уплотняется сверх меры
+const weekTot=M.weekly.slice(-7);
+const wkMax=Math.max(1,...weekTot.flatMap(w=>[w.A,w.B,w.kp||0]));
+document.getElementById('wkchart').innerHTML=weekTot.map(w=>{
+ const kp=w.kp||0, kpTip=`Получено КП за неделю: ${kp} (письма поставщиков с вложением).\nВсего входящих писем: ${w.inb||0}. Карточек, получивших КП: ${w.kpc||0}.`;
+ return `<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}" title="Запросы отдела: ${w.A}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}" title="Запросы вне отдела: ${w.B}"><span>${w.B}</span></div><div class="wkbar k" data-h="${kp/wkMax*100}" title="${kpTip}"><span>${kp}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}</div></div>`;}).join('');
 
 // ---- block A load
 document.getElementById('loadTotal').textContent=A.reduce((s,r)=>s+r.c,0);
@@ -1085,7 +1090,7 @@ function openUncovered(rows,subLbl){
 // ---- методика «как считается»: реестр + бейджи «?» + дровер
 const METH={
   's.kpi':{t:'Сводные показатели сорсинга',what:'Верхняя панель вкладки «Сорсинг».',src:'crm.item.list — СП-166 «Запросы поставщикам» (entityTypeId 166, cat 24) + crm.deal.list.',filt:'createdTime в окне периода; пол — 01.01.2026.',formula:'Всего RFQ = блок A (отдел сорсинга, dept 172) + блок B (остальные ответственные). % в работе = open÷всего. % КП = SELECTED÷закрытых. % до ТКП = доля RFQ, чья сделка-родитель достигла «ТКП выдано+».'},
-  's.load':{t:'Нагрузка и недельная динамика',what:'Сколько запросов ведёт каждый сорсер и как идёт поток по неделям.',src:'crm.item.list (СП-166), группировка по assignedById.',formula:'Нагрузка = число RFQ на сорсера; темп/день = RFQ ÷ число дней периода. Недели Пн–Вс; A = отдел сорсинга (dept 172), B = остальные.'},
+  's.load':{t:'Нагрузка и недельная динамика',what:'Сколько запросов ведёт каждый сорсер и как идёт поток по неделям.',src:'crm.item.list (СП-166), группировка по assignedById.',formula:'Нагрузка = число RFQ на сорсера; темп/день = RFQ ÷ число дней периода. Недели Пн–Вс, показываются последние 7; A = отдел сорсинга (dept 172), B = остальные. Получено КП = входящие письма поставщиков с вложением на карточках СП-166 за неделю получения, без привязки к конкретному запросу.'},
   's.conv':{t:'Конверсия по стадиям',what:'Куда дошли запросы каждого сорсера.',src:'stageId СП-166 → 7 бакетов.',formula:'open = NEW+SENT+DIALOG; closed = SELECTED+REFUSED+NO_ANSWER+OTHER. КП = SELECTED; Отказ = REFUSED+OTHER; Молчание = NO_ANSWER. Ср. срок = среднее (movedTime − createdTime) по закрытым, дней.'},
   's.tkp':{t:'Цепочка «запрос → сделка»',what:'Доля запросов, чья клиентская сделка дошла до коммерческого предложения и далее.',src:'parentId2 RFQ → crm.deal.list (стадия сделки).',formula:'RFQ засчитан, если у сделки-родителя STAGE_SEMANTIC_ID = S (выиграна) либо стадия из набора «ТКП выдано+».',note:'Эвристика по именам стадий; набор сверяется с воронками — возможна небольшая погрешность.'},
   's.cov':{t:'Покрытие сделок сорсингом',what:'Подключён ли сорсинг там, где запрос РЕАЛЬНО ожидается. «Покрытие» = доля таких сделок с ≥1 запросом поставщику.',src:'crm.deal.list (созданные в окне) ↔ обратная связь parentId2 из СП-166.',formula:'Знаменатель — только сделки, где запрос ОЖИДАЕТСЯ: живые (статус ≠ проиграно/отказ/отмена) И уже оценённые (сумма > 0), кроме сделок-RFQ самого сорсинга и тестовых. Покрытие = из них с ≥1 запросом ÷ все такие. «Без запроса» — настоящие пропуски (клик — список).',note:'НЕ считаются пропуском (запрос не требуется на этом этапе): €0 — ещё не оценили; бюджетные оценки (БО) — заложить бюджет, реальный заказ придёт отдельной сделкой; «экономически неинтересно/отмена/ошибка» — отказались; RFQ-сделки сорсинга. Поэтому покрытие реальных сделок ≈ 98%, а не «70%».'},

@@ -483,3 +483,45 @@ def test_карточки_робота_переезжают_в_подразде�
         "до учёта служебной записи её карточки висели на записи без подразделения")
     assert after.get("Отдел поиска поставщиков", 0) > before.get("Отдел поиска поставщиков", 0), (
         "после учёта часть карточек робота должна вернуться отделу поиска поставщиков")
+
+
+# ── полученные КП по неделям ─────────────────────────────────────────────────
+# Счётчик получения, а не ответа на конкретный запрос: письмо кладётся в неделю,
+# когда пришло. За КП принимается входящее письмо поставщика с вложением.
+
+def test_кп_раскладываются_по_неделям_получения():
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = fixture.build_metrics()
+    wk = m["weekly"]
+    assert all({"kp", "inb", "kpc"} <= set(w) for w in wk), (
+        "в недельном ряду должны быть все три величины по КП")
+    inside = [a for a in d["inbound_mail"]
+              if d["period"].week_index(__import__("period").parse_dt(a["dt"])) is not None]
+    assert sum(w["inb"] for w in wk) == len(inside), (
+        "сумма входящих писем по неделям разошлась с выгрузкой")
+    assert sum(w["kp"] for w in wk) == sum(1 for a in inside if a["file"])
+
+
+def test_кп_не_больше_входящих_и_карточек_не_больше_писем():
+    from tests import fixture
+    for w in fixture.build_metrics()["weekly"]:
+        assert w["kp"] <= w["inb"], "писем с вложением не может быть больше всех входящих"
+        assert w["kpc"] <= w["kp"], "карточек с КП не может быть больше писем с вложением"
+
+
+def test_без_выгрузки_писем_ряд_остаётся_и_обнуляется():
+    """Отсутствие писем не должно ронять график: ряд обязан остаться на месте."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"], d["user_depts"])
+    assert all(w["kp"] == 0 and w["inb"] == 0 and w["kpc"] == 0 for w in m["weekly"])
+
+
+def test_горизонт_недельного_ряда_покрывает_семь_недель():
+    """График показывает последние семь недель — значит ряд обязан быть не короче."""
+    from tests import fixture
+    assert len(fixture.build_metrics()["weekly"]) >= 7

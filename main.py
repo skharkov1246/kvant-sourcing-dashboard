@@ -137,38 +137,60 @@ def _has_attachment(a: dict) -> bool:
     return False
 
 
-def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict],
-                dept_a_ids: set[str], start_iso: str, end_iso: str) -> dict:
+def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list[dict]:
+    """Все CRM-письма карточек СП-166 за окно, одним проходом.
+
+    Раньше исходящие тянулись отдельным запросом. Входящие нужны для счётчика
+    полученных КП, и второй такой же проход удвоил бы и время выгрузки, и шанс
+    упереться в лимит портала: DIRECTION убран из фильтра, разбор — на нашей
+    стороне.
+    """
+    out: list[dict] = []
+    last = 0
+    while True:
+        ch = client.call("crm.activity.list", {
+            "filter": {"OWNER_TYPE_ID": config.SPA_ENTITY_TYPE_ID, "PROVIDER_ID": "CRM_EMAIL",
+                       ">=CREATED": start_iso, "<=CREATED": end_iso, ">ID": last},
+            "select": ["ID", "OWNER_ID", "DIRECTION", "SUBJECT", "DESCRIPTION", "SETTINGS",
+                       "FILES", "STORAGE_ELEMENT_IDS", "CREATED"],
+            "order": {"ID": "ASC"}, "start": -1}) or []
+        if not ch:
+            break
+        out.extend(ch)
+        last = int(ch[-1]["ID"])
+        if len(ch) < 50:
+            break
+    return out
+
+
+def _inbound_mail(acts: list[dict]) -> list[dict]:
+    """Входящие письма поставщиков в виде, который понимает metrics.build."""
+    return [{"cid": str(a.get("OWNER_ID")), "dt": a.get("CREATED") or "",
+             "file": _has_attachment(a)}
+            for a in acts if str(a.get("DIRECTION")) == "1"]
+
+
+def _send_stats(acts: list[dict], rfqs: list[dict], sourcer_rows: list[dict],
+                dept_a_ids: set[str]) -> dict:
     """Реально отправлено vs создано: по факту исходящего CRM-письма на карточке RFQ.
     Дополнительно собирает по каждой карточке письма (тема · получатель · превью · вложение)
     для хронологического списка в дровере сорсера.
     Возвращает {"rows": [...], "totals": {...}, "byCard": {card_id: [emails...]}}."""
     counts: Counter = Counter()  # card_id -> кол-во исходящих писем
     by_card: dict[str, list[dict]] = defaultdict(list)
-    last = 0
-    while True:
-        ch = client.call("crm.activity.list", {
-            "filter": {"OWNER_TYPE_ID": config.SPA_ENTITY_TYPE_ID, "PROVIDER_ID": "CRM_EMAIL",
-                       "DIRECTION": 2, ">=CREATED": start_iso, "<=CREATED": end_iso, ">ID": last},
-            "select": ["ID", "OWNER_ID", "SUBJECT", "DESCRIPTION", "SETTINGS",
-                       "FILES", "STORAGE_ELEMENT_IDS", "CREATED"],
-            "order": {"ID": "ASC"}, "start": -1}) or []
-        if not ch:
-            break
-        for a in ch:
-            cid = str(a.get("OWNER_ID"))
-            counts[cid] += 1
-            by_card[cid].append({
-                "subj": (a.get("SUBJECT") or "").strip(),
-                "to": _email_to(a.get("SETTINGS")),
-                "body": _email_preview(a.get("DESCRIPTION")),
-                "file": _has_attachment(a),
-                "dt": (a.get("CREATED") or "")[:16].replace("T", " "),
-                "dtx": a.get("CREATED") or "",
-            })
-        last = int(ch[-1]["ID"])
-        if len(ch) < 50:
-            break
+    for a in acts:
+        if str(a.get("DIRECTION")) != "2":
+            continue
+        cid = str(a.get("OWNER_ID"))
+        counts[cid] += 1
+        by_card[cid].append({
+            "subj": (a.get("SUBJECT") or "").strip(),
+            "to": _email_to(a.get("SETTINGS")),
+            "body": _email_preview(a.get("DESCRIPTION")),
+            "file": _has_attachment(a),
+            "dt": (a.get("CREATED") or "")[:16].replace("T", " "),
+            "dtx": a.get("CREATED") or "",
+        })
     # письма каждой карточки — по времени, новые сверху
     for cid in by_card:
         by_card[cid].sort(key=lambda e: e["dtx"], reverse=True)
@@ -283,12 +305,18 @@ def run(args) -> int:
     print("• Поставщики по RFQ (компании/контакты)…")
     _attach_suppliers(client, rfqs)
 
+    print("• Письма карточек СП-166 (исходящие и входящие)…")
+    _acts = _mail_activities(client, p.start_iso, p.end_iso)
+    _inb = _inbound_mail(_acts)
+    print(f"  писем: {len(_acts)}, из них входящих: {len(_inb)}")
+
     print("• Расчёт метрик…")
     m = metrics_mod.build(
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
         client.user_dept_names(),
         config.SERVICE_ACCOUNT_IDS,
+        _inb,
     )
     _o = m["origin"]["summary"]
     if _o["viaService"]:
@@ -302,7 +330,7 @@ def run(args) -> int:
                   skip=bool(args.allow_empty or args.max_deals))
 
     print("• Отправлено vs создано (письма)…")
-    m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
+    m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
 
     # обогащаем детали каждого сорсера письмами (тема · получатель · превью · вложение)
     _by_card = m["send"].pop("byCard", {})
