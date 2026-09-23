@@ -92,6 +92,10 @@ on:
         description: "Повторить файлы со статусом «не скачался» (сетевая осечка, а не свойство файла)"
         type: boolean
         default: false
+      header_relax:
+        description: "Ослабленное правило шапки: английские слова, цена в зачёт колонок, одного наименования хватит, просмотр 200 строк"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -171,6 +175,7 @@ jobs:
           SOURCE: ${{ inputs.source }}
           RETRY_FAILED: ${{ inputs.retry_failed && '1' || '' }}
           APPLY: ${{ inputs.apply && '1' || '' }}
+          HEADER_RELAX: ${{ inputs.header_relax && '1' || '' }}
         run: |
           set -euo pipefail
           if [ "${{ inputs.ocr }}" = "true" ]; then
