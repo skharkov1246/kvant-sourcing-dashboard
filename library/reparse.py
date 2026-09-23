@@ -107,7 +107,8 @@ select count(*) from pg_indexes
                   "header_found", "header_miss", "doc_class", "class_rule",
                   "text_lines", "item_lines", "parser_version", "reason",
                   "pdf_pages", "pdf_pages_text", "pdf_pages_lost", "pdf_mixed",
-                  "subkind", "doc_kind", "doc_kind_conf", "doc_kind_why", "read_chain")
+                  "subkind", "doc_kind", "doc_kind_conf", "doc_kind_why", "read_chain",
+                  "our_company")
 COLUMN_CHECK = """
 select column_name from information_schema.columns
  where table_name = 'lib_files' and column_name = any(%s)"""
@@ -256,6 +257,12 @@ def main() -> int:
     ступени: Counter = Counter()
     папки: Counter = Counter()
     цены_по_папке: Counter = Counter()
+    # ПАПКУ СТАВИТ СИСТЕМА (сущность и код поля, library/doc_folder.py), а
+    # содержимое её только сверяет. Обе раскладки печатаются рядом: расхождение
+    # «поле говорит одно, содержимое — другое» и есть то, ради чего сверка идёт.
+    папки_системы: Counter = Counter()
+    цены_по_папке_системы: Counter = Counter()
+    расхождения: Counter = Counter()
     пропущено_хуже = 0
     слова_шапки: dict[str, set] = defaultdict(set)
     сетка: Counter = Counter()
@@ -305,7 +312,8 @@ def main() -> int:
                            header_miss = %s, pdf_pages = %s, pdf_pages_text = %s,
                            pdf_pages_lost = %s, pdf_mixed = %s, subkind = %s,
                            doc_kind = %s, doc_kind_conf = %s, doc_kind_why = %s,
-                           read_chain = %s, doc_class = %s, class_rule = %s, text_lines = %s, item_lines = %s,
+                           read_chain = %s, our_company = %s,
+                           doc_class = %s, class_rule = %s, text_lines = %s, item_lines = %s,
                            parser_version = %s, reason = %s, processed_at = now()
                      where file_id = %s""",
                     (rec["status"], rec["rows_found"], rec["chars"], rec["segment_id"],
@@ -315,6 +323,7 @@ def main() -> int:
                      rec.get("doc_kind"), rec.get("doc_kind_conf"),
                      indexer.pg(rec.get("doc_kind_why"))[:300] or None,
                      indexer.pg(rec.get("read_chain"))[:200] or None,
+                     indexer.pg(rec.get("our_company"))[:200] or None,
                      rec["doc_class"], rec["class_rule"],
                      rec["text_lines"], rec["item_lines"], indexer.PARSER_VERSION,
                      indexer.pg(rec["reason"]), rec["file_id"]))
@@ -345,8 +354,13 @@ def main() -> int:
             цены_по_читателю[читатель] += с_ценой
             for ступень in ("libreoffice", "починка", "модель"):
                 ступени[ступень] += any(ш.startswith(ступень) for ш in путь)
-            папки[rec.get("doc_kind") or "(не записана)"] += 1
-            цены_по_папке[rec.get("doc_kind") or "(не записана)"] += с_ценой
+            по_содержимому = rec.get("папка_содержимого") or "(не сверялась)"
+            папки[по_содержимому] += 1
+            цены_по_папке[по_содержимому] += с_ценой
+            папки_системы[rec.get("doc_kind") or "(не записана)"] += 1
+            цены_по_папке_системы[rec.get("doc_kind") or "(не записана)"] += с_ценой
+            if rec.get("расхождение"):
+                расхождения[(rec.get("doc_kind"), по_содержимому)] += 1
             if not items:
                 пустые[(rec.get("subkind") or rec.get("kind") or "?",
                         (rec.get("reason") or rec.get("status") or "?")[:60])] += 1
@@ -412,6 +426,14 @@ def main() -> int:
     print("\nПАПКИ ДОКУМЕНТОВ (по содержимому · файлов · цен):")
     for папка, n in папки.most_common():
         print(f"    {папка[:34]:34s} {n:>6d} {цены_по_папке[папка]:>7d}")
+    # Ключи — собственные константы кода (названия папок), только счётчики.
+    print("\nПАПКИ ПО ДАННЫМ СИСТЕМЫ (сущность и код поля · файлов · цен):")
+    for папка, n in папки_системы.most_common():
+        print(f"    {папка[:34]:34s} {n:>6d} {цены_по_папке_системы[папка]:>7d}")
+    print(f"\nРАСХОЖДЕНИЙ С СОДЕРЖИМЫМ: {sum(расхождения.values())}"
+          " (папка осталась системной, подробности — в doc_kind_why)")
+    for (поле, содержимое), n in расхождения.most_common():
+        print(f"    поле → {str(поле)[:30]:30s} содержимое → {содержимое[:30]:30s} {n:>6d}")
 
     if почему_шапки:
         # РАЗБОР ПРИЧИН ИДЁТ ТЕМ ЖЕ ПРОХОДОМ, ЧТО И ПЕРЕРАЗБОР. Отдельная разведка

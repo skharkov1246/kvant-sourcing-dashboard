@@ -24,6 +24,7 @@ import os
 import random
 import re
 import sys
+import threading
 import time
 import zipfile
 from collections import Counter
@@ -39,7 +40,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_КОРЕНЬ, "scripts"))
 sys.path.insert(0, _КОРЕНЬ)          # bitrix_client лежит в корне
 import doc_side  # noqa: E402  (сторона документа по названию поля)
-import doc_kind  # noqa: E402  (папка документа по содержимому)
+import doc_kind  # noqa: E402  (сверка папки с содержимым)
+import doc_folder  # noqa: E402  (папка документа по данным системы)
 import docfilter  # noqa: E402  (после sys.path)
 import offer_terms  # noqa: E402  (базис, оплата, сроки из КП)
 import pdftable  # noqa: E402  (таблица из PDF по выравниванию)
@@ -287,6 +289,69 @@ def bx_all_by_id(method: str, params: dict, с_id: int = 0,
             return out
         if len(items) < СТРАНИЦА:
             return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# НАШИ КОМПАНИИ — ИЗ БИТРИКСА, А НЕ ИЗ КОДА. Замечание владельца 23.09.2026:
+# «Мы отправляем запросы от разных компаний». Список наших юрлиц держит сам
+# портал (компании с флагом «моя компания»), и карточка знает, от какой из них
+# она заведена (mycompanyId). Имён в коде нет: репозиторий публичный, а список
+# меняется без выката.
+_НАШИ: dict[str, str] | None = None
+_НАШИ_ИМЕНА: tuple[str, ...] = ()
+_НАШИ_ЗАМОК = threading.Lock()
+
+
+def наши_компании() -> dict[str, str]:
+    """Наши юрлица: id компании → название. Один запрос на процесс.
+
+    Любой сбой — пустой словарь и ОДНО предупреждение: без списка сверка папки с
+    содержимым идёт без признаков автора (doc_kind: автор не определён), а
+    папку всё равно ставит система. Ронять из-за этого разбор нельзя, молчать —
+    тоже. В журнал — только число (правило 17): названия живут в памяти и в
+    закрытой базе, не в журнале публичного репозитория."""
+    global _НАШИ, _НАШИ_ИМЕНА
+    with _НАШИ_ЗАМОК:
+        if _НАШИ is not None:
+            return _НАШИ
+        наши: dict[str, str] = {}
+        сбой = False
+        try:
+            if not BASE:
+                raise RuntimeError("нет BITRIX_WEBHOOK_URL")
+            for r in bx_all("crm.company.list", {"filter": {"IS_MY_COMPANY": "Y"},
+                                                 "select": ["ID", "TITLE"],
+                                                 "order": {"ID": "ASC"}}):
+                if isinstance(r, dict) and r.get("ID"):
+                    наши[str(r["ID"])] = str(r.get("TITLE") or "").strip()
+        except Exception as e:                                          # noqa: BLE001
+            наши, сбой = {}, True
+            print(f"::warning::наши компании (IS_MY_COMPANY=Y) не прочитаны "
+                  f"({type(e).__name__}): сверка папок с содержимым пойдёт без "
+                  "признаков автора, папку по-прежнему ставит система", flush=True)
+        _НАШИ = наши
+        _НАШИ_ИМЕНА = doc_kind.с_транслитом(наши.values())
+        if not сбой:
+            print(("" if наши else "::warning::")
+                  + f"наших компаний (IS_MY_COMPANY=Y): {len(наши)} · имён для сверки с "
+                  f"содержимым: {len(_НАШИ_ИМЕНА)}", flush=True)
+        return наши
+
+
+def наши_имена() -> tuple[str, ...]:
+    """Имена наших компаний для сверки с содержимым: названия плюс латиница."""
+    наши_компании()
+    return _НАШИ_ИМЕНА
+
+
+def наша_компания(значение) -> str | None:
+    """Название нашей компании по mycompanyId карточки; не наша или пусто — None.
+
+    Никогда не «КВАНТ по умолчанию»: недоказанное «наше» хуже пустого."""
+    ключ = crm_id(значение)
+    if not ключ:
+        return None
+    return наши_компании().get(str(ключ)) or None
 
 
 #: Подписи форматов, которые узнаются по первым байтам. Имени у вложения портала
@@ -1044,10 +1109,17 @@ def collect_refs(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
           + f" · файловых полей: {len(ffields)}", flush=True)
 
     refs: list[dict] = []
+    # НАША КОМПАНИЯ СДЕЛКИ — тем же запросом, что и файлы (mycompanyId в select):
+    # ни одного лишнего обращения к порталу.
+    сделок = с_нашей = чужих_id = 0
     for i in range(0, len(ids), 50):
         j = bx("crm.item.list", {"entityTypeId": 2, "filter": {"@id": ids[i:i + 50]},
-                                 "select": ["id"] + ffields, "start": 0})
+                                 "select": ["id", "mycompanyId"] + ffields, "start": 0})
         for x in (j.get("result") or {}).get("items") or []:
+            сделок += 1
+            наша = наша_компания(x.get("mycompanyId"))
+            с_нашей += bool(наша)
+            чужих_id += bool(crm_id(x.get("mycompanyId")) and not наша)
             for f in ffields:
                 v = x.get(f)
                 if not v:
@@ -1056,8 +1128,11 @@ def collect_refs(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
                     if isinstance(fo, dict) and fo.get("urlMachine"):
                         refs.append({"deal": str(x["id"]), "field": f,
                                      "field_title": названия.get(f) or None,
-                                     "origin": "поле сделки", "fo": fo})
+                                     "origin": "поле сделки", "fo": fo,
+                                     "our_company": наша})
     print(f"вложений в полях сделок: {len(refs)}", flush=True)
+    print(f"сделок с нашей компанией (mycompanyId): {с_нашей} из {сделок}"
+          f" · mycompanyId вне списка наших: {чужих_id}", flush=True)
     return refs
 
 
@@ -1152,10 +1227,15 @@ def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
         print(f"часть {shard + 1} из {shards}: карточки с id от {низ + 1} "
               f"до {верх if верх is not None else 'конца'} (всего до {макс})",
               flush=True)
+    # ПОЛЕ НАШЕГО ЗАПРОСА И НАША КОМПАНИЯ — В ТОМ ЖЕ SELECT. Битрикс отдаёт только
+    # то, что попросили: до 23.09.2026 «Request file» в select не было, и счётчик
+    # «карточек с нашим «Request file»» печатал ноль на живом портале всегда.
+    # Файлы этого поля по-прежнему НЕ разбираются (разбор нашего запроса меняет
+    # замеры спроса и требует отдельного замера) — только считаются.
     карточки = bx_all_by_id("crm.item.list",
                             {"entityTypeId": SPA_RFQ,
-                             "select": ["id", "createdTime", ПОЛЕ_ПОСТАВЩИКА,
-                                        ПОЛЕ_БРЕНДОВ] + поля},
+                             "select": ["id", "createdTime", "mycompanyId", ПОЛЕ_ПОСТАВЩИКА,
+                                        ПОЛЕ_БРЕНДОВ, ПОЛЕ_ЗАПРОСА] + поля},
                             с_id=низ, до_id=верх)
     всего = len(карточки)
     без_даты = 0
@@ -1175,8 +1255,10 @@ def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
 
     refs: list[dict] = []
     свои = 0
+    свои_и_кп = 0
     без_поставщика = 0
     без_брендов = 0
+    с_нашей = чужих_id = 0
     for x in карточки:
         # Компания-поставщик известна ПРЯМО ЗДЕСЬ, и связать цену с ней надо
         # сейчас: отдельный проход позже означал бы второе сплошное чтение
@@ -1187,6 +1269,13 @@ def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
         бренды = ключи_брендов(x.get(ПОЛЕ_БРЕНДОВ))
         if not бренды:
             без_брендов += 1
+        # От какой НАШЕЙ компании заведена карточка — из системы, не из текста.
+        наша = наша_компания(x.get("mycompanyId"))
+        с_нашей += bool(наша)
+        чужих_id += bool(crm_id(x.get("mycompanyId")) and not наша)
+        запрос = x.get(ПОЛЕ_ЗАПРОСА) or []
+        ид_запроса = {str(fo.get("id")) for fo in (запрос if isinstance(запрос, list) else [запрос])
+                      if isinstance(fo, dict) and fo.get("id")}
         for f in поля:
             v = x.get(f)
             if not v:
@@ -1200,7 +1289,11 @@ def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
                                  "field_title": ПОЛЯ_КП.get(f) or None,
                                  "origin": "поле запроса", "fo": fo,
                                  "company": str(компания) if компания else None,
-                                 "brands": бренды or None})
+                                 "brands": бренды or None,
+                                 "our_company": наша})
+                    # Один файл и в поле КП, и в нашем «Request file» — чья это
+                    # цена, система не говорит. Пока только считаем.
+                    свои_и_кп += str(fo.get("id")) in ид_запроса
         if x.get(ПОЛЕ_ЗАПРОСА):
             свои += 1
     # ОДИН ФАЙЛ — ОДНА ССЫЛКА. Вложение висит на карточке, но одно и то же
@@ -1217,7 +1310,10 @@ def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
     refs, дублей = без_повторов(refs)
     print(f"вложений КП от поставщиков: {len(refs)}"
           f" · повторов одного файла отброшено: {дублей}"
-          f" · карточек с нашим «Request file» (не берём): {свои}", flush=True)
+          f" · карточек с нашим «Request file» (не берём): {свои}"
+          f" · файлов и в поле КП, и в «Request file»: {свои_и_кп}", flush=True)
+    print(f"карточек с нашей компанией (mycompanyId): {с_нашей} из {len(карточки)}"
+          f" · mycompanyId вне списка наших: {чужих_id}", flush=True)
     print(f"карточек без указанного поставщика: {без_поставщика} из {len(карточки)}"
           " — их цены лягут без привязки к компании", flush=True)
     print(f"карточек без указанного бренда: {без_брендов} из {len(карточки)}"
@@ -1860,31 +1956,75 @@ def позиции_по_листам(rows: list[list[str]]) -> list[dict]:
     return items[:3000]
 
 
-#: Сколько текста видит классификатор папки: голова и хвост. Папку решают бланк,
+#: Сколько текста видит сверка с содержимым: голова и хвост. Автора решают бланк,
 #: адресат и подпись — они в начале и в конце; середина длинной спецификации
 #: ничего не добавляет, а стоит почти секунду на 400 тысячах знаков.
 ПАПКА_ГОЛОВА, ПАПКА_ХВОСТ = 60000, 20000
+#: Столько знаков держит lib_files.doc_kind_why (обе записи обрезают до него).
+ДЛИНА_ПОЧЕМУ = 300
+
+
+def папка_системы(rec: dict) -> None:
+    """Папка по данным системы (library/doc_folder.py): сущность и код поля.
+
+    Требование владельца 23.09.2026: папку документа решает система запросов,
+    где «вся избыточная информация» уже есть, а не имя компании в тексте.
+    Уверенность говорит, откуда папка: 1.0 — код поля, ниже — название поля.
+    Ставится ДО закачки: файл, который не скачался или не прочитался, тоже
+    получает папку — ей содержимое не нужно."""
+    п, ув, почему = doc_folder.определить(rec.get("origin"), rec.get("field"),
+                                          rec.get("field_title"))
+    rec["doc_kind"], rec["doc_kind_conf"], rec["doc_kind_why"] = п, ув, f"поле: {почему}"
 
 
 def определить_папку(rec: dict, текст: str, строки: list[list[str]]) -> None:
-    """Папка документа, уверенность и почему (library/doc_kind.py) — в запись.
+    """Папку ставит система; содержимое (library/doc_kind.py) — только сверка.
 
-    Требование владельца 23.09.2026: различать предложения поставщиков нам,
-    запросы заказчиков нам и наши исходящие — и складывать раздельно. Сторона
-    поля карточки — подсказка классификатору, а не ответ: поле «КП поставщика»
-    бывает заполнено нашим же ТКП.
+    Классификатор содержимого получает имена ВСЕХ наших компаний (наши_имена) и
+    НЕ получает сторону поля: сверка, в которую подмешан ответ системы, свою
+    независимость теряет (правило 1: эталон не может быть производным от
+    правила). Уверенная папка по содержимому, отличная от папки системы, —
+    РАСХОЖДЕНИЕ: папка остаётся системной, а в doc_kind_why пишется
+    «расхождение: поле → X, содержимое → Y 0.83» и признаки (только их подписи,
+    ни слова из документа — правило 17). Если система папки не знает («не
+    определено»), содержимое её не назначает: его вердикт остаётся подсказкой.
 
-    Сбой классификатора файл не теряет: папка остаётся пустой, разбор идёт дальше.
-    """
+    Сбой классификатора файл не теряет и папку системы не трогает.
+    В запись уходят и счётчики для журнала прогона: папка_содержимого,
+    ув_содержимого, расхождение — в базу они не пишутся."""
+    if rec.get("doc_kind") is None:
+        папка_системы(rec)
+    система, почему_системы = rec["doc_kind"], rec.get("doc_kind_why") or ""
+    rec["расхождение"] = False
     т = текст or ""
     if len(т) > ПАПКА_ГОЛОВА + ПАПКА_ХВОСТ:
         т = т[:ПАПКА_ГОЛОВА] + "\n" + т[-ПАПКА_ХВОСТ:]
+    # Сколько знаков остаётся «почему» содержимого при самой длинной приставке
+    # (расхождение с самой длинной папкой): классификатор сам сократит списки
+    # признаков, и ось автора не срежется хвостом записи.
+    приставка = (f"расхождение: поле → {система}, содержимое → "
+                 f"{'#' * max(map(len, doc_kind.ПАПКИ))} 0.00 | {почему_системы} | ")
     try:
-        папка, ув, почему = doc_kind.вид_документа(т, строки[:3000], rec.get("side"))
+        папка, ув, почему = doc_kind.вид_документа(
+            т, (строки or [])[:3000], None, наши=наши_имена(),
+            длина_почему=max(60, ДЛИНА_ПОЧЕМУ - len(приставка)))
     except Exception as e:                                              # noqa: BLE001
-        rec["doc_kind_why"] = f"сбой классификатора ({type(e).__name__})"
+        rec["doc_kind_why"] = (f"{почему_системы} | сверка с содержимым: "
+                               f"сбой классификатора ({type(e).__name__})")[:ДЛИНА_ПОЧЕМУ]
         return
-    rec["doc_kind"], rec["doc_kind_conf"], rec["doc_kind_why"] = папка, round(ув, 3), почему
+    rec["папка_содержимого"], rec["ув_содержимого"] = папка, round(ув, 3)
+    уверенно = папка != doc_kind.НЕ_ОПРЕДЕЛЕНО and ув >= doc_kind.ПОРОГ
+    if уверенно and папка == система:
+        итог = f"{почему_системы} | содержимое согласно {ув:.2f}"
+    elif уверенно and система == doc_folder.НЕ_ОПРЕДЕЛЕНО:
+        итог = f"{почему_системы} | подсказка содержимого → {папка} {ув:.2f}: {почему}"
+    elif уверенно:
+        rec["расхождение"] = True
+        итог = (f"расхождение: поле → {система}, содержимое → {папка} {ув:.2f}"
+                f" | {почему_системы} | {почему}")
+    else:
+        итог = f"{почему_системы} | содержимое: {почему}"
+    rec["doc_kind_why"] = итог[:ДЛИНА_ПОЧЕМУ]
 
 
 def handle(ref: dict) -> tuple[dict, list[dict]]:
@@ -1892,6 +2032,8 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
     fid = str(fo.get("id") or fo.get("ID"))
     название = ref.get("field_title")
     rec = {"file_id": fid, "deal_id": ref["deal"], "origin": ref["origin"], "field": ref["field"],
+           # НАША КОМПАНИЯ — из карточки (mycompanyId), не из текста документа.
+           "our_company": ref.get("our_company"),
            # СТОРОНА СЧИТАЕТСЯ ПРИ ЗАПИСИ, А НЕ ПРИ ЧТЕНИИ. Запросы к базе идут без
            # доступа к порталу, а названия полей живут только там; посчитанная
            # сторона — единственный способ отобрать заявки заказчика запросом.
@@ -1904,6 +2046,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            "pdf_mixed": None, "doc_kind": None, "doc_kind_conf": None, "doc_kind_why": None,
            "read_chain": None, "doc_class": None,
            "class_rule": None, "text_lines": None, "item_lines": None}
+    папка_системы(rec)
     b = download(fo, rec)
     if not b:
         return rec, []
@@ -2060,6 +2203,30 @@ def ensure_segments(cur) -> None:
     )
 
 
+#: Колонки, которые пакетная вставка в lib_files называет по имени, — ровно список
+#: из самой вставки (tests/test_folder_wiring.py сверяет их). Схема живёт в файле,
+#: а применяется отдельным прогоном; вставка с колонкой, которой в базе нет,
+#: падает на ПЕРВОМ сбросе буфера, когда двести файлов уже скачаны и разобраны.
+#: Проверка до обхода портала делает то же падение дешёвым и понятным.
+КОЛОНКИ_ВСТАВКИ = (
+    "file_id", "deal_id", "origin", "field", "field_title", "side",
+    "kind", "size_bytes", "status", "reason",
+    "chars", "rows_found", "segment_id", "sha256",
+    "parse_path", "header_found", "header_miss", "doc_class", "class_rule",
+    "text_lines", "item_lines", "parser_version",
+    "pdf_pages", "pdf_pages_text", "pdf_pages_lost", "pdf_mixed", "subkind",
+    "doc_kind", "doc_kind_conf", "doc_kind_why", "read_chain", "our_company")
+КОЛОНКИ_БАЗЫ = """
+select column_name from information_schema.columns
+ where table_name = 'lib_files' and column_name = any(%s)"""
+
+
+def нет_колонок(cur) -> list[str]:
+    """Колонки вставки, которых в базе нет (пусто — всё на месте)."""
+    cur.execute(КОЛОНКИ_БАЗЫ, (list(КОЛОНКИ_ВСТАВКИ),))
+    return sorted(set(КОЛОНКИ_ВСТАВКИ) - {r[0] for r in cur.fetchall()})
+
+
 def main() -> int:
     for var in ("BITRIX_WEBHOOK_URL", "SUPABASE_DB_URL"):
         if not os.environ.get(var):
@@ -2069,6 +2236,13 @@ def main() -> int:
         print(f"часть {SHARD + 1} из {SHARDS}", flush=True)
     conn = connect()
     with conn.cursor() as cur:
+        нет = нет_колонок(cur)
+        if нет:
+            print(f"в lib_files нет колонок: {', '.join(нет)}. Схема в файле ушла вперёд "
+                  "базы — примените миграции прогоном «ZIP base — apply DB migrations» и "
+                  "повторите. Разбор остановлен ДО обхода портала.", file=sys.stderr)
+            conn.close()
+            return 2
         ensure_segments(cur)
         conn.commit()
         # Повторная попытка для не скачавшихся: «не скачался» — сетевая осечка,
@@ -2114,6 +2288,10 @@ def main() -> int:
     stat: Counter = Counter()
     kinds: Counter = Counter()
     segs: Counter = Counter()
+    # Папки по данным системы и расхождения с содержимым — только счётчики,
+    # ключи — названия папок из кода (правило 17).
+    папки_системы: Counter = Counter()
+    расхождений = 0
     total_items = 0
     цен = 0
     buf_files: list[tuple] = []
@@ -2175,7 +2353,7 @@ def main() -> int:
                        parse_path, header_found, header_miss, doc_class, class_rule,
                        text_lines, item_lines, parser_version,
                        pdf_pages, pdf_pages_text, pdf_pages_lost, pdf_mixed, subkind,
-                       doc_kind, doc_kind_conf, doc_kind_why, read_chain)
+                       doc_kind, doc_kind_conf, doc_kind_why, read_chain, our_company)
                     values %s
                     on conflict (file_id) do update set
                       field_title = excluded.field_title, side = excluded.side,
@@ -2189,7 +2367,7 @@ def main() -> int:
                       pdf_mixed = excluded.pdf_mixed, subkind = excluded.subkind,
                       doc_kind = excluded.doc_kind, doc_kind_conf = excluded.doc_kind_conf,
                       doc_kind_why = excluded.doc_kind_why,
-                      read_chain = excluded.read_chain,
+                      read_chain = excluded.read_chain, our_company = excluded.our_company,
                       doc_class = excluded.doc_class, class_rule = excluded.class_rule,
                       text_lines = excluded.text_lines, item_lines = excluded.item_lines,
                       parser_version = excluded.parser_version,
@@ -2201,6 +2379,8 @@ def main() -> int:
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(handle, mine), 1):
             stat[rec["status"]] += 1
+            папки_системы[rec.get("doc_kind") or "(не записана)"] += 1
+            расхождений += bool(rec.get("расхождение"))
             if rec["kind"]:
                 kinds[rec["kind"]] += 1
             if rec["segment_id"]:
@@ -2219,7 +2399,8 @@ def main() -> int:
                               rec.get("pdf_mixed"), rec.get("subkind"),
                               rec.get("doc_kind"), rec.get("doc_kind_conf"),
                               pg(rec.get("doc_kind_why"))[:300] or None,
-                              pg(rec.get("read_chain"))[:200] or None))
+                              pg(rec.get("read_chain"))[:200] or None,
+                              pg(rec.get("our_company"))[:200] or None))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],
@@ -2243,6 +2424,8 @@ def main() -> int:
               + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
     print(f"по состоянию: {dict(stat.most_common())}")
     print(f"по формату:   {dict(kinds.most_common())}")
+    print(f"папки по данным системы: {dict(папки_системы.most_common())}"
+          f" · расхождений с содержимым: {расхождений}")
     print("позиции по сегментам:")
     for sid, n in segs.most_common():
         print(f"    {name_of(sid):32s} {n:>8d}")
