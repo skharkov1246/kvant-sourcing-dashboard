@@ -96,6 +96,10 @@ on:
         description: "Распознавание: повторить файлы, где отказало окружение (таймаут, нет tesseract)"
         type: boolean
         default: false
+      reparse_failed:
+        description: "Переразбор: взять и файлы, не давшие ни одной позиции (пусто, формат не читаем, текст без спецификации)"
+        type: boolean
+        default: false
       specgate:
         description: "Ворота спецификации: отсекать документацию от номенклатуры (выключать только для замера)"
         type: boolean
@@ -209,6 +213,7 @@ jobs:
           OCR_RETRY: ${{ inputs.ocr_retry && '1' || '' }}
           PDF_ONE_PASS: ${{ inputs.pdf_one_pass && '1' || '' }}
           SPECGATE: ${{ inputs.specgate && '1' || '0' }}
+          REPARSE_FAILED: ${{ inputs.reparse_failed && '1' || '' }}
         run: |
           set -euo pipefail
           if [ "${{ inputs.ocr }}" = "true" ]; then
