@@ -40,8 +40,15 @@ scripts/codes_with_prices.py, чтобы числа двух замеров не
 
 БЕЗ ВРЕМЕННЫХ ТАБЛИЦ. База в режиме только чтения (23.09.2026), а в нём
 «create temp table» запрещён — так упадёт и codes_with_prices.py. Здесь только
-выборки. statement_timeout и work_mem — в строке подключения (правило 9):
-группировка по сотням тысяч ключей в памяти, а не на диске, которого нет.
+выборки. statement_timeout и work_mem — в строке подключения (правило 9).
+
+ПО ЧАСТЯМ, А НЕ ОДНИМ ЗАПРОСОМ. Первый прогон 23.09.2026 упал на «No space left
+on device»: группировка по всем ключам разом не влезла в память, база стала
+сбрасывать её во временный файл параллельного процесса — а диска нет. Теперь
+ключи делятся по хешу на PARTS непересекающихся частей (по умолчанию 16), каждая
+часть — отдельный проход в памяти одного процесса (параллельные процессы
+выключены: у них общий временный файл). Счёт по частям складывается без
+потерь: код попадает ровно в одну часть, и в одну и ту же в обоих запросах.
 
 В журнал — только агрегаты (правило 17): счёт кодов и строк по дням.
 
@@ -91,6 +98,7 @@ with файлы as (
     left join lib_files f    on f.file_id = d.source_file
     left join файлы ф        on ф.source_file = d.source_file
    where length(lib_pn_key(d.part_number)) >= 2
+     and (hashtext(lib_pn_key(d.part_number)) & 2147483647) %% %(частей)s = %(часть)s
 ), по_ключу as (
   select ключ,
          min(день::text || '|' || путь)                                       as все,
@@ -150,13 +158,16 @@ with файлы as (
    where p.feed = %(feed)s
      and (length(lib_pn_key(p.part_number)) >= 2 or length(coalesce(p.part_id, '')) >= 2)
 ), цена_по_ключу as (
-  select ключ, min(день::text || '|' || путь) as первая from цены group by ключ
+  select ключ, min(день::text || '|' || путь) as первая from цены
+   where (hashtext(ключ) & 2147483647) %% %(частей)s = %(часть)s
+   group by ключ
 ), спрос as (
   select lib_pn_key(d.part_number) as ключ,
          min((d.created_at at time zone %(пояс)s)::date) as первый
     from lib_demand_live d
     join lib_files f on f.file_id = d.source_file and f.side = 'заказчик'
    where length(lib_pn_key(d.part_number)) >= 2
+     and (hashtext(lib_pn_key(d.part_number)) & 2147483647) %% %(частей)s = %(часть)s
    group by 1
 )
 select 'цена' as группа, split_part(первая, '|', 1)::date as день,
@@ -196,6 +207,19 @@ select measured_at, nums, note from lib_metric_runs
 
 def ч(x) -> int:
     return int(x or 0)
+
+
+def по_частям(cur, sql: str, параметры: dict, частей: int) -> list[tuple]:
+    """Выполнить запрос по каждой части ключей и сложить строки подряд.
+
+    Строки частей не сливаются здесь: свести() и разбор цен суммируют счёт
+    сами, а код попадает ровно в одну часть — двойного счёта нет.
+    """
+    out: list[tuple] = []
+    for часть in range(частей):
+        cur.execute(sql, {**параметры, "частей": частей, "часть": часть})
+        out.extend(cur.fetchall())
+    return out
 
 
 def окно(дней: int, сегодня: date) -> list[date]:
@@ -273,8 +297,10 @@ def main() -> int:
     начало = дни[0]
     с = datetime.combine(начало, datetime.min.time(), tzinfo=ZoneInfo(ПОЯС)).astimezone(timezone.utc)
 
+    частей = max(1, int(os.environ.get("PARTS", "16") or 16))
     conn = psycopg2.connect(dsn, connect_timeout=20,
-                            options="-c statement_timeout=1500000 -c work_mem=256MB")
+                            options="-c statement_timeout=1500000 -c work_mem=128MB"
+                                    " -c max_parallel_workers_per_gather=0")
     данные: dict = {"сегодня": сегодня.isoformat(), "начало": начало.isoformat(), "пояс": ПОЯС}
     try:
         with conn.cursor() as cur:
@@ -283,22 +309,21 @@ def main() -> int:
             print(f"=== ДИНАМИКА КОДОВ: с {начало} по {сегодня} ({ПОЯС}) ===")
             print("Код — ключ номера: регистр, дефисы и пробелы сняты.")
 
-            cur.execute(СПРОС, {"пояс": ПОЯС})
-            спрос = свести(cur.fetchall(), начало, дни)
+            спрос = свести(по_частям(cur, СПРОС, {"пояс": ПОЯС}, частей), начало, дни)
             данные["спрос"] = спрос
             for г in ГРУППЫ:
                 печать_группы({"все": "все коды из разобранных файлов",
                                "заказчик": "коды, которые спрашивал заказчик",
                                "поставщик": "коды из предложений поставщиков"}[г], спрос[г])
 
-            cur.execute(ЦЕНЫ, {"пояс": ПОЯС, "feed": FEED_КП})
+            строки_цен = по_частям(cur, ЦЕНЫ, {"пояс": ПОЯС, "feed": FEED_КП}, частей)
             цены: dict = {"было": 0, "по_дням": {д.isoformat(): {"новый файл": 0, "переразбор": 0}
                                                  for д in дни},
                           "закрыто_было": 0, "закрыто_по_дням": {д.isoformat(): 0 for д in дни},
                           "спрос_всего": 0}
-            for группа, день, путь, n in cur.fetchall():
+            for группа, день, путь, n in строки_цен:
                 if группа == "спрос_всего":
-                    цены["спрос_всего"] = ч(n)
+                    цены["спрос_всего"] += ч(n)
                     continue
                 if день is None:
                     continue
