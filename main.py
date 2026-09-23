@@ -361,7 +361,8 @@ def run(args) -> int:
         print(f"  служебных записей задано {_o['serviceConfigured']}, "
               f"но карточек за период они не заводили")
     if _o["viaService"]:
-        print(f"  служебные записи: {_o['viaService']} карточек ({_o['viaServicePct']} %), "
+        print(f"  служебные записи: {_o['viaService']} карточек ({_o['viaServicePct']} %) — "
+              f"завели {_o['viaServiceMade']}, записаны ответственным по {_o['viaServiceAssigned']}; "
               f"исполнитель восстановлен у {_o['serviceResolved']} ({_o['serviceResolvedPct']} %)")
     if _o["candidates"]:
         print(f"  кандидатов в служебные записи: {_o['candidates']} "
