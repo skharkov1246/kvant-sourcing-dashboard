@@ -46,8 +46,13 @@ from bitrix_client import BitrixClient  # noqa: E402
 SPA = config.SPA_ENTITY_TYPE_ID
 CATEGORY = config.SPA_CATEGORY_ID
 DEPT = config.DEPT_SOURCING_ID
-SAMPLE = int(os.getenv("PROBE_SAMPLE") or 600)      # карточек в выборке
+SAMPLE = int(os.getenv("PROBE_SAMPLE") or 1500)     # карточек в выборке
 DEEP = int(os.getenv("PROBE_DEEP") or 40)           # карточек для дел и комментариев
+# ОКНО ОБЯЗАТЕЛЬНО. Выгрузка идёт по возрастанию идентификатора, поэтому предел
+# без фильтра даёт САМЫЕ СТАРЫЕ карточки воронки, а не свежие. Прогон v45 без
+# окна так и вышел: 95 % вне отдела против 28 % в отчётном окне — выводы по
+# долям были недействительны целиком.
+WINDOW = os.getenv("PROBE_FROM") or config.DEFAULT_PERIOD_ANCHOR
 
 BASE_FIELDS = ["id", "assignedById", "createdBy", "updatedBy", "movedBy",
                "stageId", "createdTime", "movedTime", "parentId2"]
@@ -93,10 +98,11 @@ def поля_смарт_процесса(c: BitrixClient) -> dict[str, dict]:
 
 def выборка(c: BitrixClient, поля_сотрудников: list[str]) -> list[dict]:
     заголовок("2. ВЫБОРКА КАРТОЧЕК")
-    select = BASE_FIELDS + поля_сотрудников
-    items = c.list_items(SPA, filter={"categoryId": CATEGORY},
+    select = BASE_FIELDS + [f for f in поля_сотрудников if f not in BASE_FIELDS]
+    items = c.list_items(SPA, filter={"categoryId": CATEGORY,
+                                      ">=createdTime": f"{WINDOW}T00:00:00+03:00"},
                          select=select, max_items=SAMPLE)
-    print(f"  карточек в выборке: {len(items)} (свежие, лимит {SAMPLE})")
+    print(f"  карточек создано с {WINDOW}: {len(items)} (предел выборки {SAMPLE})")
     пусто = [f for f in select if not any(i.get(f) for i in items)]
     if пусто:
         print("  поля, пустые у ВСЕЙ выборки: " + ", ".join(пусто))
@@ -118,6 +124,12 @@ def след(items: list[dict], поле: str, dept: set[str]) -> tuple[int, int
     return есть, в_отделе, иначе
 
 
+# Порядок значим: он же станет порядком звеньев восстановления, если замер
+# покажет, что след годится. Сначала тот, кто работал руками, потом тот, кого
+# записали.
+СЛЕДЫ = ["assignedById", "movedBy", "lastActivityBy", "updatedBy", "createdBy", "observers"]
+
+
 def следы_карточки(items: list[dict], dept: set[str], поля_сотрудников: list[str]) -> None:
     заголовок("3. СЛЕДЫ В САМОЙ КАРТОЧКЕ")
     n = len(items)
@@ -125,7 +137,7 @@ def следы_карточки(items: list[dict], dept: set[str], поля_со
     print(f"  сейчас числится вне отдела поиска поставщиков: {доля(len(вне), n)}")
     print()
     print(f"  {'поле':22} {'заполнено':>18} {'в отделе':>18} {'≠ ответственного':>20}")
-    for поле in ["assignedById", "createdBy", "updatedBy", "movedBy", *поля_сотрудников]:
+    for поле in СЛЕДЫ:
         есть, в_отделе, иначе = след(items, поле, dept)
         print(f"  {поле:22} {доля(есть, n):>18} {доля(в_отделе, n):>18} {доля(иначе, n):>20}")
 
@@ -133,14 +145,35 @@ def следы_карточки(items: list[dict], dept: set[str], поля_со
     print("  Это и есть искомое: сколько таких карточек можно вернуть сорсеру.")
     m = len(вне)
     print(f"  {'поле':22} {'заполнено':>18} {'указывает в отдел':>20}")
-    for поле in ["createdBy", "updatedBy", "movedBy", *поля_сотрудников]:
+    for поле in [f for f in СЛЕДЫ if f != "assignedById"]:
         есть, в_отделе, _ = след(вне, поле, dept)
         print(f"  {поле:22} {доля(есть, m):>18} {доля(в_отделе, m):>20}")
-    покрыто = sum(
-        1 for i in вне
-        if any(str(i.get(f) or "") in dept for f in ["movedBy", "updatedBy", "createdBy", *поля_сотрудников])
-    )
+    покрыто = sum(1 for i in вне
+                  if any(str(i.get(f) or "") in dept
+                         for f in СЛЕДЫ if f != "assignedById"))
     print(f"  хотя бы один след ведёт в отдел: {доля(покрыто, m)}")
+    print("  Это потолок: больше карточек нынешними данными сорсеру не вернуть.")
+
+
+def чьи_карточки_вне_отдела(items: list[dict], dept: set[str], depts: dict[str, str]) -> None:
+    """Главный диагностический разрез: в каких подразделениях сидят те, на кого
+    записаны карточки вне отдела. Если это КАМы — заслуга сорсера уходит к ним."""
+    заголовок("5а. КАРТОЧКИ ВНЕ ОТДЕЛА: В КАКИХ ПОДРАЗДЕЛЕНИЯХ ОТВЕТСТВЕННЫЕ")
+    вне = [i for i in items if str(i.get("assignedById") or "") not in dept]
+    по_отделам: Counter = Counter()
+    по_людям: Counter = Counter()
+    for i in вне:
+        u = str(i.get("assignedById") or "")
+        по_отделам[depts.get(u) or "подразделение не указано"] += 1
+        по_людям[u] += 1
+    print(f"  карточек вне отдела: {len(вне)}; учётных записей на них: {len(по_людям)}")
+    for d, n_ in по_отделам.most_common(10):
+        print(f"    {доля(n_, len(вне)):>20}  {d}")
+    без_отдела = [(u, n_) for u, n_ in по_людям.most_common() if not depts.get(u)]
+    if без_отдела:
+        print("  записи БЕЗ подразделения (кандидаты в служебные), id и карточек:")
+        for u, n_ in без_отдела[:8]:
+            print(f"    #{u:6} {n_}")
 
 
 def кто_стоит_ответственным(items: list[dict], dept: set[str], depts: dict[str, str]) -> None:
@@ -217,15 +250,30 @@ def таймлайн(c: BitrixClient, items: list[dict], dept: set[str]) -> None
     else:
         print("  дел у пробы нет")
 
+    # Комментарии проверяются по НЕСКОЛЬКИМ карточкам: у одной их может не быть
+    # просто потому, что никто не писал, и ноль по ней ничего не доказывает.
     for тип in (f"dynamic_{SPA}", str(SPA), "dynamic"):
-        try:
-            res = c.call("crm.timeline.comment.list", {
-                "filter": {"ENTITY_ID": int(проба[0]["id"]), "ENTITY_TYPE": тип}}) or []
-            print(f"  crm.timeline.comment.list, ENTITY_TYPE={тип!r}: записей {len(res)}")
-            if res:
+        всего = 0
+        авторы_к: Counter = Counter()
+        ошибка = ""
+        for i in проба[:10]:
+            try:
+                res = c.call("crm.timeline.comment.list", {
+                    "filter": {"ENTITY_ID": int(i["id"]), "ENTITY_TYPE": тип}}) or []
+            except Exception as e:                           # noqa: BLE001
+                ошибка = e.__class__.__name__
                 break
-        except Exception as e:                               # noqa: BLE001
-            print(f"  crm.timeline.comment.list, ENTITY_TYPE={тип!r}: {e.__class__.__name__}")
+            всего += len(res)
+            for r in res:
+                авторы_к[str(r.get("AUTHOR_ID") or "")] += 1
+        if ошибка:
+            print(f"  комментарии, ENTITY_TYPE={тип!r}: {ошибка}")
+            continue
+        в_отделе = sum(n for u, n in авторы_к.items() if u in dept)
+        print(f"  комментарии, ENTITY_TYPE={тип!r}: записей {всего} по 10 карточкам, "
+              f"авторов в отделе {доля(в_отделе, всего)}")
+        if всего:
+            break
 
 
 def история_стадий(c: BitrixClient, items: list[dict]) -> None:
@@ -279,6 +327,7 @@ def main() -> int:
         return 1
 
     следы_карточки(items, dept, поля_сотрудников)
+    чьи_карточки_вне_отдела(items, dept, depts_map)
     кто_стоит_ответственным(items, dept, depts_map)
     родительская_сделка(c, items, dept)
     таймлайн(c, items, dept)
