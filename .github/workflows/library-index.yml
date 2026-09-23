@@ -108,6 +108,10 @@ on:
         description: "PDF читать один раз: текст брать из тех же страниц, что и таблицу"
         type: boolean
         default: false
+      cascade:
+        description: "Каскад чтения: свой читатель по формату → починка текста → LibreOffice (сначала холостым прогоном)"
+        type: boolean
+        default: false
       header_relax:
         description: "Ослабленное правило шапки: английские слова, цена в зачёт колонок, одного наименования хватит, просмотр 200 строк"
         type: boolean
@@ -148,7 +152,7 @@ jobs:
           cache: pip
 
       - name: Установка зависимостей
-        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
 
       # ЧИТАТЕЛИ ФОРМАТОВ, КОТОРЫХ НЕТ В PYTHON. Ставятся для разбора и переразбора,
       # но не для распознавания: тому нужен только tesseract.
@@ -167,12 +171,30 @@ jobs:
           # переходником на 7zip 23.01 (сборка dfsg) БЕЗ кодека RAR: сжатый RAR даёт
           # «Unsupported Method», читается только несжатый. Нашёл агент архивов
           # 23.09.2026 на живой сборке. Хватит любого из двух, оба надёжнее.
-          sudo apt-get install -y -qq antiword catdoc p7zip-full unrar libarchive-tools
+          # poppler-utils и qpdf — для library/read_pdf.py: pdftotext читает
+          # постранично и держит колонки, qpdf снимает пустой пароль и чинит
+          # таблицу ссылок. Без них остаётся один pypdf, и каскад это назовёт.
+          sudo apt-get install -y -qq antiword catdoc p7zip-full unrar libarchive-tools \
+            poppler-utils qpdf
           echo "antiword: $(command -v antiword || echo нет)"
           echo "catdoc:   $(command -v catdoc || echo нет)"
           echo "7z:       $(command -v 7z || echo нет)"
           echo "unrar:    $(command -v unrar || echo нет)"
           echo "bsdtar:   $(command -v bsdtar || echo нет)"
+          echo "pdftotext: $(command -v pdftotext || echo нет)"
+          echo "qpdf:     $(command -v qpdf || echo нет)"
+
+      # LIBREOFFICE — ПОСЛЕДНИЙ РУБЕЖ КАСКАДА (library/convert_office.py): офисный
+      # файл, который не прочитал ни один свой читатель. Ставится только под
+      # каскад: пакет тяжёлый (около минуты на часть), а без каскада его никто
+      # не зовёт.
+      - name: Установка LibreOffice (для каскада чтения)
+        if: ${{ !inputs.ocr && inputs.cascade }}
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq --no-install-recommends \
+            libreoffice-calc-nogui libreoffice-writer-nogui
+          echo "soffice:  $(command -v soffice || echo нет)"
 
       - name: Установка распознавания (только для ocr)
         if: inputs.ocr
@@ -218,6 +240,7 @@ jobs:
           HEADER_RELAX: ${{ inputs.header_relax && '1' || '' }}
           OCR_RETRY: ${{ inputs.ocr_retry && '1' || '' }}
           PDF_ONE_PASS: ${{ inputs.pdf_one_pass && '1' || '' }}
+          CASCADE: ${{ inputs.cascade && '1' || '' }}
           SPECGATE: ${{ inputs.specgate && '1' || '0' }}
           REPARSE_FAILED: ${{ inputs.reparse_failed && '1' || '' }}
         run: |

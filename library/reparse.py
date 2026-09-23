@@ -107,7 +107,7 @@ select count(*) from pg_indexes
                   "header_found", "header_miss", "doc_class", "class_rule",
                   "text_lines", "item_lines", "parser_version", "reason",
                   "pdf_pages", "pdf_pages_text", "pdf_pages_lost", "pdf_mixed",
-                  "subkind", "doc_kind", "doc_kind_conf", "doc_kind_why")
+                  "subkind", "doc_kind", "doc_kind_conf", "doc_kind_why", "read_chain")
 COLUMN_CHECK = """
 select column_name from information_schema.columns
  where table_name = 'lib_files' and column_name = any(%s)"""
@@ -248,6 +248,14 @@ def main() -> int:
     цены_по_пути: Counter = Counter()
     почему_шапки: Counter = Counter()
     пустые: Counter = Counter()
+    # КТО ПРОЧИТАЛ И КУДА ЛЁГ ДОКУМЕНТ. Каскад судится по тому, какой читатель
+    # дал цены, а папка — по тому, сколько файлов она забрала из «не определено».
+    # Ключи — имена читателей и папок, собственные строки кода (правило 17).
+    читатели: Counter = Counter()
+    цены_по_читателю: Counter = Counter()
+    ступени: Counter = Counter()
+    папки: Counter = Counter()
+    цены_по_папке: Counter = Counter()
     пропущено_хуже = 0
     слова_шапки: dict[str, set] = defaultdict(set)
     сетка: Counter = Counter()
@@ -297,7 +305,7 @@ def main() -> int:
                            header_miss = %s, pdf_pages = %s, pdf_pages_text = %s,
                            pdf_pages_lost = %s, pdf_mixed = %s, subkind = %s,
                            doc_kind = %s, doc_kind_conf = %s, doc_kind_why = %s,
-                           doc_class = %s, class_rule = %s, text_lines = %s, item_lines = %s,
+                           read_chain = %s, doc_class = %s, class_rule = %s, text_lines = %s, item_lines = %s,
                            parser_version = %s, reason = %s, processed_at = now()
                      where file_id = %s""",
                     (rec["status"], rec["rows_found"], rec["chars"], rec["segment_id"],
@@ -306,6 +314,7 @@ def main() -> int:
                      rec.get("pdf_pages_lost"), rec.get("pdf_mixed"), rec.get("subkind"),
                      rec.get("doc_kind"), rec.get("doc_kind_conf"),
                      indexer.pg(rec.get("doc_kind_why"))[:300] or None,
+                     indexer.pg(rec.get("read_chain"))[:200] or None,
                      rec["doc_class"], rec["class_rule"],
                      rec["text_lines"], rec["item_lines"], indexer.PARSER_VERSION,
                      indexer.pg(rec["reason"]), rec["file_id"]))
@@ -330,6 +339,14 @@ def main() -> int:
             # из 480 перечитанных офисных и прочих файлов 228 так и остались без
             # позиций, а итог говорил только «пусто 228». Какой читатель их закроет,
             # по такому итогу не понять.
+            путь = (rec.get("read_chain") or "(прежняя таблица)").split(" → ")
+            читатель = (путь[0], "позиции есть" if items else "без позиций")
+            читатели[читатель] += 1
+            цены_по_читателю[читатель] += с_ценой
+            for ступень in ("libreoffice", "починка", "модель"):
+                ступени[ступень] += any(ш.startswith(ступень) for ш in путь)
+            папки[rec.get("doc_kind") or "(не записана)"] += 1
+            цены_по_папке[rec.get("doc_kind") or "(не записана)"] += с_ценой
             if not items:
                 пустые[(rec.get("subkind") or rec.get("kind") or "?",
                         (rec.get("reason") or rec.get("status") or "?")[:60])] += 1
@@ -384,6 +401,17 @@ def main() -> int:
         print("\nПОЧЕМУ ФАЙЛ ОСТАЛСЯ БЕЗ ПОЗИЦИЙ (формат · причина · файлов):")
         for (формат, причина), n in пустые.most_common(25):
             print(f"    {формат[:14]:14s} {причина:60s} {n:>5d}")
+
+    print("\nКТО ПРОЧИТАЛ ФАЙЛ (первый читатель пути · итог · файлов · цен):")
+    for (читатель, итог), n in sorted(читатели.items(), key=lambda x: -x[1]):
+        print(f"    {читатель[:28]:28s} {итог:13s} {n:>6d} {цены_по_читателю[(читатель, итог)]:>7d}")
+    if any(ступени.values()):
+        print("  дорогие ступени каскада (файлов): " + " · ".join(
+            f"{к} {v}" for к, v in ступени.items()))
+
+    print("\nПАПКИ ДОКУМЕНТОВ (по содержимому · файлов · цен):")
+    for папка, n in папки.most_common():
+        print(f"    {папка[:34]:34s} {n:>6d} {цены_по_папке[папка]:>7d}")
 
     if почему_шапки:
         # РАЗБОР ПРИЧИН ИДЁТ ТЕМ ЖЕ ПРОХОДОМ, ЧТО И ПЕРЕРАЗБОР. Отдельная разведка

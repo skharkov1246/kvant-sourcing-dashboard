@@ -39,11 +39,20 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_КОРЕНЬ, "scripts"))
 sys.path.insert(0, _КОРЕНЬ)          # bitrix_client лежит в корне
 import doc_side  # noqa: E402  (сторона документа по названию поля)
+import doc_kind  # noqa: E402  (папка документа по содержимому)
 import docfilter  # noqa: E402  (после sys.path)
 import offer_terms  # noqa: E402  (базис, оплата, сроки из КП)
 import pdftable  # noqa: E402  (таблица из PDF по выравниванию)
 import quotes  # noqa: E402  (цена из КП поставщика)
 import readers  # noqa: E402  (читатели форматов без своей ветки разбора)
+import convert_office  # noqa: E402  (LibreOffice — последний рубеж офисных файлов)
+import read_archive  # noqa: E402  (архивы любого вида, вложенные тоже)
+import read_llm  # noqa: E402  (чтение моделью — только по LLM_READ=1)
+import read_mail  # noqa: E402  (письма .msg и .eml с вложениями)
+import read_pdf  # noqa: E402  (PDF постранично, с починкой кодировки)
+import read_sheet  # noqa: E402  (книги: xlsx, xls, xlsb, ods, SpreadsheetML)
+import read_word  # noqa: E402  (Word, OpenDocument, RTF, HTML под видом .doc)
+import text_quality  # noqa: E402  (оценка и починка извлечённого текста)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
 # Список полей КП держим в одном месте со всеми замерами котировок: два списка
 # разошлись бы молча — разбирали бы одно, а считали другое.
@@ -76,6 +85,12 @@ RETRY_FAILED = os.environ.get("RETRY_FAILED", "") not in ("", "0", "false")
 # (повтор, ослабление, один проход) пустое значение = «выключено» безопасно, у
 # защиты — наоборот. Выключается только явным нулём или словом.
 SPECGATE = os.environ.get("SPECGATE", "1").strip().lower() not in ("0", "false", "no")
+
+#: КАСКАД ЧТЕНИЯ (читать_каскадом) вместо прежней таблицы стратегий (_читать).
+#: Выключен по умолчанию: правило сначала меряют, потом применяют (CLAUDE.md,
+#: правило 3). Включается входом прогона cascade; переразбор с
+#: APPLY_ONLY_BETTER не запишет файл, у которого цен стало меньше.
+КАСКАД = os.environ.get("CASCADE", "").strip().lower() in ("1", "true", "yes")
 # Откуда брать вложения: сделки (как было) или карточки запросов поставщикам.
 # Замер 21.09.2026: в lib_files не было НИ ОДНОГО файла из полей КП — разбор до
 # СП-166 никогда не доходил, а там 5 231 файл с ценами, и это единственное место,
@@ -396,8 +411,15 @@ def rows_from_xlsx(b: bytes) -> list[list[str]]:
 
 
 def rows_from_xls(b: bytes) -> list[list[str]]:
+    # ДВЕ ЗАЩИТЫ, найденные агентом книг 23.09.2026. Первая: xlrd зацикливается
+    # на битой цепочке секторов OLE2 и выбирает память до гибели процесса — а с
+    # ним всей части прогона (порча нескольких байт в .xls на 7 КБ — 1,8 ГБ за
+    # 22 с). Вторая: xlrd печатает предупреждения в stdout вместе с именем листа
+    # («КП поставщика»), то есть в публичный журнал прогона (правило 17).
+    if not read_sheet.ole2_цепи_целы(b):
+        raise ValueError("OLE2: цепочка секторов испорчена")
     import xlrd
-    wb = xlrd.open_workbook(file_contents=b)
+    wb = xlrd.open_workbook(file_contents=b, logfile=io.StringIO(), verbosity=0)
     out: list[list[str]] = []
     for ws in wb.sheets():
         for i in range(ws.nrows):
@@ -1366,7 +1388,10 @@ def читать(b: bytes, п: str, rec: dict | None = None) -> tuple[list[list[
     распознавание его не отбирают. Проверка на это есть, и первая же её редакция
     нашла дефект: PDF без текстового слоя молчал.
     """
-    строки, текст, отказ = _читать(b, п, rec)
+    if КАСКАД:
+        строки, текст, отказ = читать_каскадом(b, п, rec)
+    else:
+        строки, текст, отказ = _читать(b, п, rec)
     if not строки and not текст and not отказ:
         отказ = ПУСТО_ПОЧЕМУ.get(п, f"{п}: читатель не дал ни строк, ни текста")
     return строки, текст, отказ
@@ -1491,6 +1516,373 @@ def читать_архив(b: bytes, rec: dict | None = None) -> tuple[list[lis
     return [], склейка, "" if склейка else f"в архиве {len(участники)} файлов без текста"
 
 
+#: Сколько уровней вложенности читает каскад: письмо → архив → книга — это три.
+ГЛУБИНА_КАСКАДА = 3
+
+#: Подвиды, которым LibreOffice — последний рубеж, когда свой читатель не дал
+#: ничего. Архив сюда не входит: конвертер отказывает ему сразу, но только после
+#: того, как свой распаковщик уже сказал, что внутри.
+ДЛЯ_КОНВЕРТЕРА = frozenset({"ole2_разобрать", "xlsx", "docx", "ods", "odt", "rtf",
+                            "xml", "spreadsheetml", "html", "неизвестно"})
+
+КАРТИНКИ = frozenset({"png", "jpeg", "tiff", "gif", "bmp", "webp"})
+АРХИВЫ = frozenset({"zip", "rar", "7z", "gzip"})
+
+#: Отказы, после которых каскад не пробует ничего дальше: книга опознана, но без
+#: пароля не читается никем, а битый OLE2 — то, на чём зацикливаются чужие разборы.
+ОКОНЧАТЕЛЬНО = ("книга зашифрована", "OLE2 испорчен")
+
+#: Начало причины у файла, который не PDF и не картинка, но несёт сканы внутри:
+#: документ Word из фотографий страниц, архив сканов, письмо со снимком КП.
+#: Отбор распознавания (library/ocr.py) берёт файлы по этому началу строки —
+#: иначе такой файл лёг бы «пустым» навсегда: по виду он не скан.
+КАРТИНКИ_ВНУТРИ = "картинки внутри:"
+МАКС_СКАНОВ_ФАЙЛА = 40
+
+
+def картинки_файла(b: bytes, глубина: int = 0) -> list[tuple[str, bytes]]:
+    """Что внутри файла читает распознавание: [(«картинка» | «pdf», байты)].
+
+    PDF берётся только из архива и письма: собственный PDF файла распознавание
+    и так читает целиком, а PDF-вложение, не давшее текста каскаду, — это скан.
+    """
+    п = уточнить_подвид(b, подвид(b))
+    if п in КАРТИНКИ:
+        return [("картинка", b)]
+    if глубина and п == "pdf":
+        return [("pdf", b)]
+    if глубина >= ГЛУБИНА_КАСКАДА:
+        return []
+    if п in ("docx", "odt", "rtf", "html", "ole2_разобрать"):
+        return [("картинка", к) for _, к in read_word.прочитать_документ(b).get("images") or []
+                ][:МАКС_СКАНОВ_ФАЙЛА]
+    if п in АРХИВЫ:
+        части = read_archive.распаковать(b, глубина=2)[0]
+    elif п in ("msg", "eml"):
+        части = read_mail.прочитать_письмо(b)["attachments"]
+    else:
+        return []
+    сканы: list[tuple[str, bytes]] = []
+    for _, содержимое in части:
+        if содержимое:
+            сканы += картинки_файла(содержимое, глубина + 1)
+        if len(сканы) >= МАКС_СКАНОВ_ФАЙЛА:
+            break
+    return сканы[:МАКС_СКАНОВ_ФАЙЛА]
+
+
+def уточнить_подвид(b: bytes, п: str) -> str:
+    """Подвиды, которые различает только каскад.
+
+    В подвид() их нет намеренно: прежняя таблица стратегий не знает, что делать
+    с «msg» и «eml», и при выключенном каскаде письмо ушло бы в «формат не
+    опознан» вместо нынешнего чтения текстом. Письмо Outlook — такой же OLE2,
+    как .xls; OpenDocument — такой же PK-контейнер, как архив.
+    """
+    if п == "ole2_разобрать" and read_mail.это_письмо_outlook(b):
+        return "msg"
+    if п in ("txt", "неизвестно") and read_mail.это_письмо_eml(b):
+        return "eml"
+    if п == "zip" and b"mimetype" in b[:120]:
+        голова = b[:400]
+        if b"opendocument.spreadsheet" in голова:
+            return "ods"
+        if b"opendocument.text" in голова:
+            return "odt"
+    return п
+
+
+def _лучше(строки: list[list[str]]) -> tuple[bool, int]:
+    """Ключ выбора таблицы среди участников архива или вложений письма.
+
+    Опознанная шапка важнее числа строк: справочник на тысячу строк без шапки
+    уступает спецификации на двадцать строк с ней.
+    """
+    return (bool(строки) and header_map(строки)[0] >= 0, len(строки))
+
+
+def _из_многих(части: list[tuple[str, bytes]], глубина: int,
+               путь: list[str]) -> tuple[list[list[str]], list[str], int]:
+    """Прочитать участников архива или вложения письма: лучшая таблица и все тексты."""
+    лучшие: list[list[str]] = []
+    тексты: list[str] = []
+    прочитано = 0
+    for _имя, содержимое in части:
+        if not содержимое:
+            continue
+        try:
+            с, т, _ = читать_каскадом(содержимое, подвид(содержимое), None, глубина + 1)
+        except Exception:                                               # noqa: BLE001, S112
+            continue                                    # битый участник — не весь архив
+        прочитано += bool(с or т)
+        if _лучше(с) > _лучше(лучшие):
+            лучшие = с
+        if т:
+            тексты.append(т)
+    путь.append(f"частей {len(части)}, прочитано {прочитано}")
+    return лучшие, тексты, прочитано
+
+
+def _слово(р: dict, rec: dict | None, п: str, путь: list[str]) -> tuple:
+    """Итог read_word: таблица через ворота шапки, иначе текст."""
+    путь.append(f"read_word:{р.get('format') or '?'}")
+    строки, текст = таблица_или_текст(р["rows"], lambda: р["text"], rec, п)
+    if р.get("images") and not (строки or текст.strip()):
+        путь.append(f"картинок {len(р['images'])}")
+    return строки, текст, "" if (строки or текст.strip()) else р["reason"]
+
+
+def _родной(b: bytes, п: str, rec: dict | None, глубина: int,
+            путь: list[str]) -> tuple[list[list[str]], str, str]:
+    """Свой читатель по точному формату. Ни один не бросает — каждый называет отказ."""
+    if п == "pdf":
+        # ТАБЛИЦА — ПРЕЖНИМ ПУТЁМ (pypdf с выравниванием), ПРОЗА — read_pdf.
+        # Сборка таблицы (library/pdftable.py) настроена на раскладку pypdf.
+        # pdftotext -layout ставит между колонками одиночные пробелы там, где
+        # pypdf ставит несколько: на придуманном КП шапка слиплась в одну ячейку,
+        # цена взялась из колонки «№», а количество склеилось в семизначное
+        # число (замер 23.09.2026, прогон каскада по корпусу). Ворота шапки такую
+        # таблицу пропустили — значит решать её судьбу им нельзя.
+        страницы, всего, потеряно = страницы_pdf(b, layout=True)
+        записать_счёт(rec, страницы, всего, потеряно)
+        строки = таблица_из_страниц(страницы)
+        if строки and header_map(строки, шире=ослаблять("pdf"))[0] >= 0:
+            путь.append("pypdf:таблица")
+            return строки, "", ""
+        таблица_или_текст(строки, str, rec, "pdf")      # причина отказа шапки — в запись
+        # Прозу, счёт страниц и сканы даёт read_pdf: pdftotext, снятие пустого
+        # пароля qpdf, починка кодировки по страницам, страницы-сканы отдельно.
+        р = read_pdf.прочитать_pdf(b, layout=False)
+        read_pdf.в_запись(р, rec)
+        путь.append(f"read_pdf:{р.get('method') or '—'}")
+        if р["reason"] and р["text"].strip():
+            путь.append(f"неполно: {р['reason'][:80]}")
+        текст = "\n".join(р["text"].split("\f"))
+        if not текст.strip() and страницы and any(с.strip() for с in страницы):
+            текст = плоский(страницы)                   # read_pdf не смог, pypdf смог
+        return [], текст, "" if текст.strip() else р["reason"]
+    if п in ("xlsx", "ods"):
+        строки, текст, причина = read_sheet.прочитать_книгу(b)
+        путь.append("read_sheet")
+        if строки or текст:
+            return строки, текст, ""
+        if п == "xlsx":
+            # PK-контейнер, который не открылся книгой: чаще всего это архив,
+            # которому подписи xl/ достались от вложенной внутрь книги.
+            с, т, о = _родной(b, "zip", None, глубина, путь)
+            if с or т:
+                return с, т, ""
+        return [], "", причина
+    if п == "ole2_разобрать":
+        # Книга первой: она дешевле и встречается чаще. Отказ read_sheet на .doc
+        # ничего не значит — дальше документ.
+        строки, текст, причина = read_sheet.прочитать_книгу(b)
+        if строки:
+            путь.append("read_sheet")
+            return строки, текст, ""
+        if причина.startswith(ОКОНЧАТЕЛЬНО):
+            # Книга опознана, но не читается ничем: документом Word её пробовать
+            # незачем, а битый OLE2 — ровно то, на чём зацикливаются чужие разборы.
+            путь.append("read_sheet")
+            return [], "", причина
+        с, т, о = _слово(read_word.прочитать_документ(b), rec, "docx", путь)
+        if с or т:
+            return с, т, ""
+        т, почему = readers.text_from_doc(b)
+        if т:
+            путь.append("antiword")
+            return [], т, ""
+        return [], "", "; ".join(x for x in (о, почему) if x) or причина
+    if п in ("msg", "eml"):
+        р = read_mail.прочитать_письмо(b)
+        путь.append(f"read_mail:{р.get('формат') or п}")
+        тело = р["text"]
+        лучшие: list[list[str]] = []
+        тексты: list[str] = []
+        if р["attachments"] and глубина < ГЛУБИНА_КАСКАДА:
+            лучшие, тексты, _ = _из_многих(р["attachments"], глубина, путь)
+        # Тело письма идёт вместе с таблицей вложения: в нём условия поставки и
+        # то, кто кому пишет, — по нему определяется папка документа.
+        текст = "\n\n".join(x for x in [тело, *тексты] if x.strip())[:400000]
+        if лучшие or текст:
+            return лучшие, текст, ""
+        return [], "", р["reason"] or "письмо без текста и вложений"
+    if п in АРХИВЫ:
+        if глубина >= ГЛУБИНА_КАСКАДА:
+            return [], "", "архив глубже предела вложенности"
+        части, причина = read_archive.распаковать(b, глубина=2)
+        путь.append(f"read_archive:{п}")
+        if причина:
+            путь.append(причина[:80])
+        if not части:
+            return [], "", причина or "архив пуст"
+        лучшие, тексты, _ = _из_многих(части, глубина, путь)
+        if лучшие:
+            return лучшие, "", ""
+        склейка = "\n".join(тексты)[:400000]
+        return [], склейка, "" if склейка else (причина or f"в архиве {len(части)} файлов без текста")
+    if п == "rtf":
+        # Свой разбор, а не read_word: тот отдаёт RTF только текстом, а таблица
+        # КП в RTF — это строки \cell…\row, и ячейки режутся табуляцией.
+        путь.append("readers:rtf")
+        строки, текст = таблица_или_текст(readers.rows_from_rtf(b),
+                                          lambda: readers.text_from_rtf(b), rec, п)
+        return строки, текст, "" if (строки or текст) else "RTF без текста"
+    if п in ("docx", "odt", "html"):
+        с, т, о = _слово(read_word.прочитать_документ(b), rec, п, путь)
+        if с or т:
+            return с, т, ""
+        if п == "html":
+            т = readers.text_from_html(b)
+        return [], т, "" if т else о
+    if п in ("xml", "spreadsheetml"):
+        строки, текст, причина = read_sheet.прочитать_книгу(b)
+        if строки:
+            путь.append("read_sheet")
+            return строки, текст, ""
+        строки = readers.rows_from_spreadsheetml(b)
+        if строки:
+            return строки, "", ""
+        с, т, о = _слово(read_word.прочитать_документ(b), rec, "docx", путь)
+        if с or т:
+            return с, т, ""
+        т = readers.text_from_html(b)
+        return [], т, "" if т else (о or причина)
+    if п in ("csv", "txt"):
+        путь.append(f"readers:{п}")
+        строки, текст = таблица_или_текст(readers.rows_from_text(b),
+                                          lambda: readers.декод(b[:400000]), rec, п)
+        return строки, текст, ""
+    if п in КАРТИНКИ:
+        путь.append("скан")
+        return [], "", "скан: читается распознаванием"
+    путь.append("не опознан")
+    return [], "", "формат не опознан"
+
+
+def читать_каскадом(b: bytes, п: str, rec: dict | None = None,
+                    глубина: int = 0) -> tuple[list[list[str]], str, str]:
+    """КАСКАД ЧТЕНИЯ: свой читатель → починка текста → LibreOffice → модель.
+
+    ЗАЧЕМ. Прежняя таблица стратегий (_читать) давала каждому формату ОДНОГО
+    читателя, и его отказ был отказом файла. Замер 23.09.2026: 9 527 файлов из
+    31 869 (29,9 %) без единой позиции. Каскад идёт от дешёвого к дорогому и
+    останавливается на первом, кто дал строки или текст:
+
+      1. свой читатель по точному формату (read_pdf, read_sheet, read_word,
+         read_mail, read_archive, readers) — без внешних программ, кроме
+         poppler и распаковщиков;
+      2. починка извлечённого текста (text_quality): кракозябры cp1251/koi8,
+         разрядка, символьные шрифты PDF — только если оценка строго выросла;
+      3. LibreOffice (convert_office) — только офисным файлам и только если
+         своё не дало ничего: это секунды на файл против миллисекунд;
+      4. модель (read_llm) — только при LLM_READ=1: деньги и секрет решает
+         владелец.
+
+    Сканы читает распознавание отдельным проходом (library/ocr.py); здесь их
+    важно НАЗВАТЬ, чтобы файл не лёг «пустым» навсегда.
+
+    ПУТЬ ЧТЕНИЯ ЗАПИСЫВАЕТСЯ (rec["read_chain"], правило 16): без него следующая
+    ошибка снова неизмерима — не видно, какой читатель взял файл.
+    """
+    п = уточнить_подвид(b, п)
+    if rec is not None:
+        rec["subkind"] = п
+    путь: list[str] = []
+    строки, текст, отказ = _родной(b, п, rec, глубина, путь)
+    if отказ.startswith(ОКОНЧАТЕЛЬНО):
+        if rec is not None:
+            rec["read_chain"] = " → ".join(путь)[:200] or None
+        return [], "", отказ
+    if not строки and not текст.strip() and п in ДЛЯ_КОНВЕРТЕРА \
+            and convert_office.найти_soffice():
+        с, почему = convert_office.в_csv(b)
+        т = "" if с else convert_office.в_текст(b)[0]
+        if с or т:
+            путь.append("libreoffice")
+            строки, текст = таблица_или_текст(с, lambda: т, rec, п) if с else ([], т)
+            отказ = ""
+        elif почему:
+            отказ = f"{отказ}; {почему}" if отказ else почему
+    if текст.strip():
+        починенный, что = text_quality.починить(текст)
+        if что:
+            текст = починенный
+            путь.append(f"починка: {что}"[:60])
+    if not строки and not текст.strip() and read_llm.включено():
+        с, т, почему = read_llm.прочитать_моделью(b, п)
+        if с or т:
+            путь.append("модель")
+            строки, текст, отказ = с, т, ""
+        elif почему:
+            отказ = f"{отказ}; {почему}" if отказ else почему
+    if (глубина == 0 and not строки and not текст.strip()
+            and п not in КАРТИНКИ and п != "pdf"):
+        сканы = картинки_файла(b)
+        if сканы:
+            # Причина меняется на ту, по которой файл заберёт распознавание:
+            # прежняя («документ без текста») верна, но ничего не чинит.
+            путь.append(f"сканов {len(сканы)}")
+            отказ = f"{КАРТИНКИ_ВНУТРИ} {len(сканы)} — читаются распознаванием"
+    if rec is not None:
+        rec["read_chain"] = " → ".join(путь)[:200] or None
+    return строки, текст, отказ
+
+
+def листы_книги(rows: list[list[str]]) -> list[list[list[str]]]:
+    """Строки по листам, если их разметил read_sheet (и каскад включён); иначе одним куском."""
+    if КАСКАД and rows and read_sheet.это_метка(rows[0]):
+        return [тело for _, тело in read_sheet.по_листам(rows) if тело]
+    return [rows]
+
+
+def позиции_по_листам(rows: list[list[str]]) -> list[dict]:
+    """Позиции книги — КАЖДЫЙ ЛИСТ СО СВОЕЙ ШАПКОЙ.
+
+    items_from_rows ищет шапку в первых сорока строках всего списка и применяет
+    её ко всему ниже. Книга «сопроводительное письмо на первом листе, прайс на
+    втором» шапки не находит вовсе, а книга из двух прайсов с разными колонками
+    разбирает второй колонками первого (нашёл агент книг 23.09.2026). Предел в
+    три тысячи позиций — на книгу, как и прежде.
+    """
+    листы = листы_книги(rows)
+    if len(листы) == 1:
+        return items_from_rows(листы[0])
+    items: list[dict] = []
+    for тело in листы:
+        items += items_from_rows(тело)
+        if len(items) >= 3000:
+            break
+    return items[:3000]
+
+
+#: Сколько текста видит классификатор папки: голова и хвост. Папку решают бланк,
+#: адресат и подпись — они в начале и в конце; середина длинной спецификации
+#: ничего не добавляет, а стоит почти секунду на 400 тысячах знаков.
+ПАПКА_ГОЛОВА, ПАПКА_ХВОСТ = 60000, 20000
+
+
+def определить_папку(rec: dict, текст: str, строки: list[list[str]]) -> None:
+    """Папка документа, уверенность и почему (library/doc_kind.py) — в запись.
+
+    Требование владельца 23.09.2026: различать предложения поставщиков нам,
+    запросы заказчиков нам и наши исходящие — и складывать раздельно. Сторона
+    поля карточки — подсказка классификатору, а не ответ: поле «КП поставщика»
+    бывает заполнено нашим же ТКП.
+
+    Сбой классификатора файл не теряет: папка остаётся пустой, разбор идёт дальше.
+    """
+    т = текст or ""
+    if len(т) > ПАПКА_ГОЛОВА + ПАПКА_ХВОСТ:
+        т = т[:ПАПКА_ГОЛОВА] + "\n" + т[-ПАПКА_ХВОСТ:]
+    try:
+        папка, ув, почему = doc_kind.вид_документа(т, строки[:3000], rec.get("side"))
+    except Exception as e:                                              # noqa: BLE001
+        rec["doc_kind_why"] = f"сбой классификатора ({type(e).__name__})"
+        return
+    rec["doc_kind"], rec["doc_kind_conf"], rec["doc_kind_why"] = папка, round(ув, 3), почему
+
+
 def handle(ref: dict) -> tuple[dict, list[dict]]:
     fo = ref["fo"]
     fid = str(fo.get("id") or fo.get("ID"))
@@ -1506,7 +1898,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            "header_words": None, "header_grid": None, "subkind": None,
            "pdf_pages": None, "pdf_pages_text": None, "pdf_pages_lost": None,
            "pdf_mixed": None, "doc_kind": None, "doc_kind_conf": None, "doc_kind_why": None,
-           "doc_class": None,
+           "read_chain": None, "doc_class": None,
            "class_rule": None, "text_lines": None, "item_lines": None}
     b = download(fo, rec)
     if not b:
@@ -1530,6 +1922,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         rec["status"] = "формат не читаем"
         rec["reason"] = type(e).__name__
         return rec, []
+    определить_папку(rec, text, rows)
 
     items: list[dict] = []
     # ПОЛНЫЙ ТЕКСТ ФАЙЛА — ОТДЕЛЬНО ОТ text. text у табличного пути склеен из
@@ -1538,12 +1931,17 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
     # значит не находить их никогда — при том, что в файле они написаны, и это
     # обычная форма КП (владелец: «бывает, что в конце предложения вообще цифра»).
     весь_текст = ""
+    текст_читателя = text if rows else ""
     if rows:
-        items = items_from_rows(rows)
+        items = позиции_по_листам(rows)
         text = " ".join(r.get("_row", "") for r in items)[:200000]
         весь_текст = "\n".join(" ".join(c for c in r if c) for r in rows)[:400000]
+        if текст_читателя:
+            # Каскад отдаёт текст ВМЕСТЕ с таблицей там, где он несёт условия:
+            # тело письма к спецификации, надписи в фигурах книги.
+            весь_текст = (весь_текст + "\n" + текст_читателя)[:400000]
         rec["parse_path"] = "таблица"
-        rec["header_found"] = header_map(rows)[0] >= 0
+        rec["header_found"] = any(header_map(тело)[0] >= 0 for тело in листы_книги(rows))
         # ПОЧЕМУ шапки нет — рядом с тем, что её нет. Иначе «шапки нет» стоит в
         # базе у сотен файлов и не говорит, какую из четырёх правок делать.
         if not rec["header_found"]:
@@ -1773,7 +2171,7 @@ def main() -> int:
                        parse_path, header_found, header_miss, doc_class, class_rule,
                        text_lines, item_lines, parser_version,
                        pdf_pages, pdf_pages_text, pdf_pages_lost, pdf_mixed, subkind,
-                       doc_kind, doc_kind_conf, doc_kind_why)
+                       doc_kind, doc_kind_conf, doc_kind_why, read_chain)
                     values %s
                     on conflict (file_id) do update set
                       field_title = excluded.field_title, side = excluded.side,
@@ -1787,6 +2185,7 @@ def main() -> int:
                       pdf_mixed = excluded.pdf_mixed, subkind = excluded.subkind,
                       doc_kind = excluded.doc_kind, doc_kind_conf = excluded.doc_kind_conf,
                       doc_kind_why = excluded.doc_kind_why,
+                      read_chain = excluded.read_chain,
                       doc_class = excluded.doc_class, class_rule = excluded.class_rule,
                       text_lines = excluded.text_lines, item_lines = excluded.item_lines,
                       parser_version = excluded.parser_version,
@@ -1815,7 +2214,8 @@ def main() -> int:
                               rec.get("pdf_pages_text"), rec.get("pdf_pages_lost"),
                               rec.get("pdf_mixed"), rec.get("subkind"),
                               rec.get("doc_kind"), rec.get("doc_kind_conf"),
-                              pg(rec.get("doc_kind_why"))[:300] or None))
+                              pg(rec.get("doc_kind_why"))[:300] or None,
+                              pg(rec.get("read_chain"))[:200] or None))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],

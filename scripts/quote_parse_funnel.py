@@ -163,6 +163,21 @@ select coalesce(doc_kind, '(ещё не разложен)')                     
  group by 1, 2 order by 3 desc limit 40
 """
 
+# КТО ЧИТАЛ ФАЙЛ. Первый шаг пути каскада — имя читателя (read_pdf:pdftotext,
+# read_word:docx, read_mail:msg). Потеря, собранная у одного читателя, чинится в
+# одном месте; та же потеря, размазанная по виду файла, не чинится нигде.
+ПО_ЧИТАТЕЛЯМ = """
+select split_part(read_chain, ' → ', 1)                             as читатель,
+       count(*)::bigint                                             as файлов,
+       count(*) filter (where coalesce(rows_found, 0) = 0)::bigint  as без_позиций,
+       count(*) filter (where read_chain like '%libreoffice%')::bigint as libreoffice,
+       count(*) filter (where read_chain like '%починка%')::bigint     as починка,
+       count(*) filter (where read_chain like '%сканов%')::bigint      as ждут_распознавания
+  from lib_files
+ where read_chain is not null
+ group by 1 order by 2 desc limit 30
+"""
+
 ПОТЕРИ_ПО_ВИДУ = """
 select coalesce(kind, '(вид не определён)')                        as вид,
        count(*)::bigint                                            as файлов,
@@ -397,6 +412,20 @@ def main() -> int:
                     print("\nПАПКИ ДОКУМЕНТОВ: пока не с чем — папка пишется новыми разборами.")
             else:
                 print("\nПАПКИ ДОКУМЕНТОВ: колонки doc_kind в базе ещё нет — примените миграции.")
+
+            if "read_chain" in колонки:
+                cur.execute(ПО_ЧИТАТЕЛЯМ)
+                строки = cur.fetchall()
+                if строки:
+                    print("\nКТО ЧИТАЛ ФАЙЛ (каскад · файлов · без позиций · LibreOffice · починка"
+                          " · ждут распознавания):")
+                    for читатель, ф, без, lo, поч, скан in строки:
+                        print(f"    {(читатель or '?')[:28]:28s} {ц(ф):>8d} {ц(без):>8d}"
+                              f" {ц(lo):>6d} {ц(поч):>6d} {ц(скан):>6d}")
+                else:
+                    print("\nКТО ЧИТАЛ ФАЙЛ: пока не с чем — путь пишется разборами с каскадом.")
+            else:
+                print("\nКТО ЧИТАЛ ФАЙЛ: колонки read_chain в базе ещё нет — примените миграции.")
 
             cur.execute(ПРИЧИНЫ_ОТКАЗА)
             причины = cur.fetchall()

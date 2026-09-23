@@ -167,6 +167,12 @@ def _включено() -> bool:
     return os.environ.get("LLM_READ", "").strip() == "1"
 
 
+def включено() -> bool:
+    """Разрешено ли чтение моделью (LLM_READ=1). Каскад indexer спрашивает до
+    вызова, чтобы отказ «выключено» не затирал причину своего читателя."""
+    return _включено()
+
+
 def _число(имя: str, умолчание: float) -> float:
     try:
         return float(os.environ.get(имя, "").strip() or умолчание)
@@ -328,8 +334,16 @@ def _создать_клиента():
     """Настоящий клиент Anthropic. В проверках подменяется.
 
     Свои повторы SDK выключены (max_retries=0): повтор делает _вызвать, иначе
-    попытки перемножаются, а журнал не видит, сколько их было."""
-    import anthropic
+    попытки перемножаются, а журнал не видит, сколько их было.
+
+    Импорт под try — необязательный намеренно: пакет нужен только при LLM_READ=1,
+    а модуль импортирует каждый разбор (indexer), и прогон без пакета не должен
+    падать на импорте (tests/test_workflow_deps.py считает такой импорт
+    необязательным)."""
+    try:
+        import anthropic
+    except ImportError:
+        raise _Отказ("нет пакета", "нет пакета anthropic: добавить в pip install прогона") from None
     return anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"].strip(), max_retries=0,
                                timeout=_число("LLM_READ_TIMEOUT", 600.0))
 
@@ -342,6 +356,8 @@ def _клиент():
         if _КЛИЕНТ is None:
             try:
                 _КЛИЕНТ = _создать_клиента()
+            except _Отказ:
+                raise
             except ImportError:
                 raise _Отказ("нет пакета", "нет пакета anthropic: добавить в pip install прогона") from None
             except Exception as e:                                          # noqa: BLE001

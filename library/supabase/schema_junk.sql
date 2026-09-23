@@ -111,6 +111,13 @@ alter table lib_files add column if not exists header_miss    text;
 -- файл получает «разобран», и отбор распознавания не берёт его НИКОГДА. Сканы
 -- внутри такого файла это позиции и цены, которых никто не видел. Колонки
 -- nullable и без default — правка каталога, таблица не переписывается.
+alter table lib_files add column if not exists pdf_pages       int;
+alter table lib_files add column if not exists pdf_pages_text  int;
+alter table lib_files add column if not exists pdf_pages_lost  int;
+alter table lib_files add column if not exists pdf_mixed       boolean;
+-- Частичный индекс: отбор распознавания спрашивает именно смешанные, и их мало.
+create index if not exists lib_files_pdf_mixed on lib_files (file_id)
+  where pdf_mixed is true;
 -- ТОЧНЫЙ ФОРМАТ ФАЙЛА. Крупный вид говорит «прочее» у csv, txt, rtf, html, xml и
 -- двоичного мусора разом — по нему нельзя понять, какая стратегия чтения
 -- сработала и какую чинить. Замер 23.09.2026: «прочее» 410 файлов, все 410 без
@@ -126,13 +133,12 @@ alter table lib_files add column if not exists doc_kind        text;
 alter table lib_files add column if not exists doc_kind_conf   real;
 alter table lib_files add column if not exists doc_kind_why    text;
 create index if not exists lib_files_doc_kind on lib_files (doc_kind);
-alter table lib_files add column if not exists pdf_pages       int;
-alter table lib_files add column if not exists pdf_pages_text  int;
-alter table lib_files add column if not exists pdf_pages_lost  int;
-alter table lib_files add column if not exists pdf_mixed       boolean;
--- Частичный индекс: отбор распознавания спрашивает именно смешанные, и их мало.
-create index if not exists lib_files_pdf_mixed on lib_files (file_id)
-  where pdf_mixed is true;
+-- ПУТЬ ЧТЕНИЯ: какой читатель каскада взял файл и что с текстом сделали
+-- («read_pdf:pdftotext → починка: cp1251», «read_mail:msg → частей 3, прочитано 2»).
+-- Без него следующая потеря снова неизмерима: видно, ЧТО файл не прочитан, и не
+-- видно, КТО его читал (правило 16). Только имена читателей и счётчики — ни имён
+-- файлов, ни содержимого (правило 17: колонка доезжает до сводок).
+alter table lib_files add column if not exists read_chain      text;
 create index if not exists lib_files_class on lib_files (doc_class);
 
 do $$ begin
