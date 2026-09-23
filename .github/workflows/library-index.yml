@@ -96,6 +96,12 @@ on:
         description: "Распознавание: повторить файлы, где отказало окружение (таймаут, нет tesseract)"
         type: boolean
         default: false
+      ocr_revert:
+        # ОТКАТ ЗАПИСИ РАСПОЗНАВАНИЯ по ключу прогона (журнал lib_ocr_writes).
+        # Ключ печатает сам прогон: «откат: OCR_REVERT=ocr-…». Ключ без хвоста
+        # «-pN» снимает все части прогона. Портал не читается, работает одна часть.
+        description: "Распознавание: откатить запись прогона с этим ключом (ocr-…)"
+        default: ""
       reparse_failed:
         description: "Переразбор: взять и файлы, не давшие ни одной позиции (пусто, формат не читаем, текст без спецификации)"
         type: boolean
@@ -243,9 +249,19 @@ jobs:
           CASCADE: ${{ inputs.cascade && '1' || '' }}
           SPECGATE: ${{ inputs.specgate && '1' || '0' }}
           REPARSE_FAILED: ${{ inputs.reparse_failed && '1' || '' }}
+          REVERT_KEY: ${{ inputs.ocr_revert }}
         run: |
           set -euo pipefail
-          if [ "${{ inputs.ocr }}" = "true" ]; then
+          if [ -n "${REVERT_KEY:-}" ]; then
+            # Откат — одна транзакция, и делать его должна ОДНА часть: две части
+            # разом откатывали бы одни и те же записи параллельно. Ключ идёт через
+            # окружение, а не подстановкой в текст команды.
+            if [ "${{ matrix.shard }}" = "0" ]; then
+              OCR_REVERT="$REVERT_KEY" python library/ocr.py
+            else
+              echo "откат делает часть 0"
+            fi
+          elif [ "${{ inputs.ocr }}" = "true" ]; then
             # Потоки НЕ прибиваем здесь: `library/ocr.py` сам обрежет запрос по
             # числу ядер. Прибитая четвёрка перекрывала вход `workers` и врала о
             # том, на скольких потоках шёл прогон, — 23.09.2026 я на этом построил

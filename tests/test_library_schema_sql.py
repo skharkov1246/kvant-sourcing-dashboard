@@ -230,6 +230,23 @@ def test_вид_связывает_цену_кп_с_компанией_реес�
             assert строки[0][5] == "7,8"
             # Отсутствие не выдумывается: у второй строки их нет.
             assert строки[1][4] is None and строки[1][5] is None
+
+            # ЦЕНА СО СКАНА — В ВИДЕ, И ОТЛИЧИМА. Поток тот же («разбор КП»),
+            # источник другой; выведенная повтором или откатом распознавания
+            # цена (поток «разбор КП: выведено») в вид не попадает.
+            cur.execute("""
+                insert into lib_prices (item_name, price, currency, rfq_company, source,
+                                        feed, confidence)
+                values ('Скан: подшипник', 1190, 'EUR', '4242', 'распознавание скана',
+                        'разбор КП', 'med'),
+                       ('Скан: выведенный', 1180, 'EUR', '4242', 'распознавание скана',
+                        'разбор КП: выведено', 'med')""")
+            cur.execute("select item_name, source, supplier_number from sup_quote_price "
+                        "order by item_name")
+            assert cur.fetchall() == [("Подшипник", "КП", "KV-S-000123-7"),
+                                      ("Скан: подшипник", "распознавание скана",
+                                       "KV-S-000123-7"),
+                                      ("Уплотнение", "КП", None)]
     finally:
         with conn.cursor() as cur:
             cur.execute(f"drop schema if exists {ИМЯ_ЦЕНЫ} cascade")

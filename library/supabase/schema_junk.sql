@@ -83,6 +83,52 @@ begin
   end if;
 end $$;
 
+-- ЖУРНАЛ ЗАПИСЕЙ РАСПОЗНАВАНИЯ (library/ocr.py) — по строке на файл и прогон.
+--
+-- ЗАЧЕМ. Распознавание смешанного PDF ДОБАВЛЯЕТ строки и цены страниц-сканов к
+-- разбору текстовых страниц, а повтор распознавания заменяет только своё. Чтобы
+-- и повтор, и откат трогали ровно своё, запись помнит ключи того, что вставила
+-- (demand_ids, price_ids) и что заменила (replaced_*), и поля файла до записи
+-- (prev_file). Ничего не удаляется: заменённые строки помечены в lib_row_junk с
+-- тем же run_id, заменённые цены переведены в поток «разбор КП: выведено».
+-- Пометка у строки одна (ключ — demand_id), поэтому чужая пометка заменённой
+-- строки («проза») переписывается, а прежняя хранится в replaced_marks.
+-- Откат: OCR_REVERT=<run_id> python library/ocr.py.
+--
+-- Только ключи, числа и собственные строки кода — ни наименований, ни текста
+-- распознавания (правило 17).
+create table if not exists lib_ocr_writes (
+  run_id              text        not null,   -- ключ прогона: ocr-<прогон>[-p<часть>]
+  file_id             text        not null,
+  mode                text        not null,   -- 'файл' | 'страницы'
+  pages               int[],                  -- распознанные страницы без текста (с 1)
+  demand_ids          bigint[]    not null default '{}',  -- вставленные строки lib_demand
+  price_ids           bigint[]    not null default '{}',  -- вставленные цены lib_prices
+  replaced_demand_ids bigint[]    not null default '{}',  -- свои прежние строки, помеченные
+  replaced_price_ids  bigint[]    not null default '{}',  -- свои прежние цены, выведенные
+  replaced_marks      jsonb,                  -- пометки lib_row_junk, переписанные заменой
+  prev_file           jsonb,                  -- поля lib_files до записи — для отката
+  note                text,                   -- почему столько: причина из кода
+  written_at          timestamptz not null default now(),
+  reverted_at         timestamptz,
+  primary key (run_id, file_id)
+);
+create index if not exists lib_ocr_writes_file on lib_ocr_writes (file_id);
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'lib_ocr_writes_mode_chk') then
+    alter table lib_ocr_writes add constraint lib_ocr_writes_mode_chk
+      check (mode in ('файл', 'страницы'));
+  end if;
+end $$;
+alter table lib_ocr_writes enable row level security;
+do $$
+declare кому text := lib_роли_которые_есть(array['anon', 'authenticated']);
+begin
+  if кому is not null then
+    execute format('revoke all on lib_ocr_writes from %s', кому);
+  end if;
+end $$;
+
 -- Обратимость наследования сегмента. reclassify.py сейчас не оставляет следа,
 -- каким правилом проставлен segment_id, и откатить неудачное наследование нечем.
 -- Колонки nullable и без default — правка каталога, таблица не переписывается.

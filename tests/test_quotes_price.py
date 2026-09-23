@@ -376,7 +376,10 @@ def test_распознавание_сканов_пишет_цену():
     import ocr
 
     assert "quotes.цена_из_текста" in inspect.getsource(ocr.recognise)
-    assert "price_store.строка" in inspect.getsource(ocr.main)
+    # Запись одного файла живёт в записать_файл: цена — через единственное место
+    # записи и с источником скана (сквозная проверка — tests/test_ocr_pages.py).
+    запись = inspect.getsource(ocr.записать_файл)
+    assert "price_store.строка" in запись and "ИСТОЧНИК_СКАНА" in запись
 
 
 def test_бренд_и_производитель_доезжают_до_строки_цены():
