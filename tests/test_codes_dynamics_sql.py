@@ -38,11 +38,12 @@ def скрипт():
 
 # КОРПУС. Окно — с 16.09 по 23.09.2026 (по Москве).
 #
-#   A (заказчик)  10.09: AAA-1, BBB-2                     → до окна
+#   Сторона берётся по происхождению файла: у A и B side пуст, как в живой базе.
+#   A (сделка)    10.09: AAA-1, BBB-2                     → до окна
 #   A переразобран 20.09: прежние строки помечены мусором; новые — «aaa 1»
 #                 (тот же код) и CCC-3 (добыт переразбором). BBB-2 не вернулся → ушёл 20.09
-#   B (поставщик) 18.09: CCC-3, DDD-4                     → новый файл
-#   C (заказчик)  21.09: EEE-5 из распознанного скана     → распознавание
+#   B (запрос)    18.09: CCC-3, DDD-4                     → новый файл
+#   C (сделка)    21.09: EEE-5 из распознанного скана     → распознавание
 #
 #   Цены КП: CCC-3 из B легла 18.09, B переразобран 22.09 — прежняя цена снята,
 #   новая легла 22.09 (оговорка 1: первый день цены сдвинут к переразбору);
@@ -52,7 +53,7 @@ def скрипт():
 create function lib_pn_key(t text) returns text language sql immutable as $$
   select left(regexp_replace(replace(lower(coalesce(t, '')), 'ё', 'е'),
                              '[^0-9a-zа-я]', '', 'g'), 80) $$;
-create table lib_files (file_id text primary key, side text);
+create table lib_files (file_id text primary key, side text, origin text);
 create table lib_demand (id bigint primary key, part_number text, source_file text,
                          source text, created_at timestamptz);
 create table lib_row_junk (demand_id bigint primary key, marked_at timestamptz,
@@ -65,7 +66,8 @@ create table lib_prices (id bigserial primary key, part_number text, part_id tex
 create table lib_metric_runs (metric text, run_key text, measured_at timestamptz, nums jsonb,
                               note text);
 
-insert into lib_files values ('A', 'заказчик'), ('B', 'поставщик'), ('C', 'заказчик');
+insert into lib_files values ('A', null, 'поле сделки'), ('B', null, 'поле запроса'),
+                             ('C', 'заказчик', 'поле сделки');
 insert into lib_demand values
   (1, 'AAA-1', 'A', 'спецификация сделки', '2026-09-10 10:00+03'),
   (2, 'BBB-2', 'A', 'спецификация сделки', '2026-09-10 10:00+03'),
