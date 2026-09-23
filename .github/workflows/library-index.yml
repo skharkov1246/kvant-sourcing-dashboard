@@ -96,6 +96,10 @@ on:
         description: "Распознавание: повторить файлы, где отказало окружение (таймаут, нет tesseract)"
         type: boolean
         default: false
+      pdf_one_pass:
+        description: "PDF читать один раз: текст брать из тех же страниц, что и таблицу"
+        type: boolean
+        default: false
       header_relax:
         description: "Ослабленное правило шапки: английские слова, цена в зачёт колонок, одного наименования хватит, просмотр 200 строк"
         type: boolean
@@ -181,6 +185,7 @@ jobs:
           APPLY: ${{ inputs.apply && '1' || '' }}
           HEADER_RELAX: ${{ inputs.header_relax && '1' || '' }}
           OCR_RETRY: ${{ inputs.ocr_retry && '1' || '' }}
+          PDF_ONE_PASS: ${{ inputs.pdf_one_pass && '1' || '' }}
         run: |
           set -euo pipefail
           if [ "${{ inputs.ocr }}" = "true" ]; then

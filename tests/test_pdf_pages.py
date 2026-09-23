@@ -166,3 +166,15 @@ def test_сжатие_layout_убирает_добивку_но_не_слова(
                 "Насос ЦНС-38              2      1500\n\n   \n"]
     плоско = indexer.плоский(страницы)
     assert плоско.splitlines() == ["Наименование Кол-во Цена", "Насос ЦНС-38 2 1500"]
+
+
+def test_один_проход_включается_входом_а_не_прибит_в_шаге():
+    """Шаг прогона не имеет права подменять значение входа: журнал соврёт о том,
+    на чём прогон шёл, и замер сравнит не то с не тем."""
+    import re
+    from pathlib import Path
+    yml = (Path(__file__).resolve().parent.parent
+           / ".github/workflows/library-index.yml").read_text(encoding="utf-8")
+    assert "pdf_one_pass:" in yml, "входа нет — замерить нечем"
+    assert re.search(r"PDF_ONE_PASS:\s*\$\{\{\s*inputs\.pdf_one_pass", yml)
+    assert not re.search(r"PDF_ONE_PASS=\S+\s+python", yml), "значение прибито в шаге"
