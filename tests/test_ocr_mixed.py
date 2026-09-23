@@ -303,3 +303,42 @@ def test_запись_распознавания_на_базе(cur, monkeypatch,
     assert cur.fetchone()[0] == 1 + 5 + 3
     cur.execute(ocr.CANDIDATES)
     assert sorted(r[0] for r in cur.fetchall()) == ["1", "2", "3", "4"]
+
+
+def test_без_колонки_pdf_mixed_отбор_не_падает(cur, monkeypatch, capsys):
+    """Живая база 23.09.2026 отстала от схемы: pdf_mixed нет, и отбор с ней падал
+    на первом запросе (прогон 35906312186) — распознавание не работало вовсе.
+    Без колонки постранично берётся любой разобранный PDF с позициями."""
+    import psycopg2
+    cur.execute("alter table lib_files drop column pdf_mixed")
+    cur.execute("""insert into lib_files (file_id, deal_id, status, kind, rows_found, reason)
+      values ('1', '1', 'разобран', 'pdf', 12, null),
+             ('2', '1', 'текст без спецификации', 'pdf', 0, null),
+             ('3', '1', 'пусто', 'pdf', 0, 'PDF без текстового слоя'),
+             ('4', '1', 'разобран', 'docx', 5, null)""")
+    cur.execute(ocr.отбор(есть_pdf_mixed=False))
+    assert sorted(cur.fetchall()) == [("1", ocr.ПОСТРАНИЧНО, 12), ("3", ocr.ЦЕЛИКОМ, 0)]
+
+    распознаны = []
+
+    def распознать(ref):
+        распознаны.append((ref["fo"]["id"], ref["режим"]))
+        return ({"file_id": ref["fo"]["id"], "deal_id": "1", "status": "пусто",
+                 "chars": 0, "rows_found": 0, "segment_id": None, "kind": "pdf",
+                 "reason": "страниц без текстового слоя не нашлось",
+                 "режим": ref["режим"], "страницы": []}, [])
+
+    monkeypatch.setenv("BITRIX_WEBHOOK_URL", "https://portal.example.test/rest/1/x")
+    monkeypatch.setenv("SUPABASE_DB_URL", "postgresql://unused.example.test/x")
+    monkeypatch.setattr(ocr, "APPLY", False)
+    monkeypatch.setattr(ocr, "ПОВТОР", False)
+    monkeypatch.setattr(ocr.indexer, "SOURCE", "rfq")
+    monkeypatch.setattr(ocr, "recognise", распознать)
+    monkeypatch.setattr(ocr.indexer, "collect_refs_rfq", lambda *a, **k: [
+        {"fo": {"id": ф}, "deal": "1"} for ф in ("1", "2", "3", "4")])
+    monkeypatch.setattr(ocr.indexer, "connect", lambda *a, **k: psycopg2.connect(
+        DSN, options=f"-c search_path={СХЕМА}"))
+    assert ocr.main() == 0
+    assert sorted(распознаны) == [("1", ocr.ПОСТРАНИЧНО), ("3", ocr.ЦЕЛИКОМ)]
+    вывод = capsys.readouterr().out
+    assert "нет колонки pdf_mixed" in вывод and "сканов не нашлось" in вывод
