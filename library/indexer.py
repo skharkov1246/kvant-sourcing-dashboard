@@ -1131,27 +1131,86 @@ def is_login_page(b: bytes) -> bool:
     return head.startswith(b"<!doctype htm") or head.startswith(b"<html")
 
 
-def download(fo: dict) -> bytes | None:
+#: Сколько раз повторять закачку одного адреса. Прежде попытка была ОДНА, и любая
+#: сетевая осечка давала «не скачался» навсегда: замер 23.09.2026 — 999 файлов с
+#: этим статусом и НИ ОДНОЙ причины, потому что ошибка глоталась целиком.
+ПОПЫТОК_ЗАКАЧКИ = int(os.environ.get("DOWNLOAD_RETRIES", "3") or 3)
+
+#: Коды ответа, которые лечатся повтором. Остальные повторять бессмысленно: 404
+#: не станет двухсотым, сколько его ни проси.
+ПОВТОРИМЫЕ_КОДЫ = frozenset({408, 425, 429, 500, 502, 503, 504})
+
+
+def скачать_адрес(u: str) -> tuple[bytes | None, str]:
+    """Одна ссылка с повторами. Возвращает (байты, причина неудачи).
+
+    ПРИЧИНА ВОЗВРАЩАЕТСЯ, А НЕ ГЛОТАЕТСЯ. По «не скачался» без причины чинить
+    нечего: не видно, протух ли токен, отказал портал, пришла ли вместо файла
+    страница входа. В журнал и в базу идут код ответа и имя класса исключения —
+    ни адресов, ни имён файлов (правило 17).
+    """
+    последняя = "не пробовали"
+    for попытка in range(ПОПЫТОК_ЗАКАЧКИ):
+        try:
+            r = requests.get(str(u), timeout=90)
+        except Exception as e:                                          # noqa: BLE001
+            последняя = f"сеть: {type(e).__name__}"
+        else:
+            if r.status_code == 200 and len(r.content) > 200 and not is_login_page(r.content):
+                return r.content, ""
+            if r.status_code == 200 and is_login_page(r.content):
+                # Токен протух: повтор по тому же адресу даст ту же страницу входа.
+                return None, "вместо файла страница входа"
+            if r.status_code == 200:
+                return None, f"тело {len(r.content)} байт — меньше порога"
+            последняя = f"код {r.status_code}"
+            if r.status_code not in ПОВТОРИМЫЕ_КОДЫ:
+                return None, последняя
+        if попытка + 1 < ПОПЫТОК_ЗАКАЧКИ:
+            time.sleep(2 ** попытка)
+    return None, последняя
+
+
+def download(fo: dict, rec: dict | None = None) -> bytes | None:
+    """Файл по любой из ссылок вложения. Причина неудачи кладётся в `rec`.
+
+    Порядок ссылок прежний: urlMachine с одноразовым токеном первой, disk.file.get
+    последним — он стоит запроса к порталу.
+    """
+    причины: list[str] = []
     for key in ("urlMachine", "downloadUrl", "url", "URL_MACHINE", "DOWNLOAD_URL"):
         u = fo.get(key)
-        if u:
-            try:
-                r = requests.get(str(u), timeout=90)
-                if r.status_code == 200 and len(r.content) > 200 and not is_login_page(r.content):
-                    return r.content
-            except Exception:
-                pass
+        if not u:
+            continue
+        тело, почему = скачать_адрес(str(u))
+        if тело:
+            return тело
+        причины.append(f"{key}: {почему}")
     fid = fo.get("id") or fo.get("ID")
     if fid:
         try:
             u = (bx("disk.file.get", {"id": fid}).get("result") or {}).get("DOWNLOAD_URL")
-            if u:
-                r = requests.get(u, timeout=90)
-                if r.status_code == 200 and len(r.content) > 200:
-                    return r.content
-        except Exception:
-            pass
+        except Exception as e:                                          # noqa: BLE001
+            причины.append(f"disk.file.get: {код_ошибки_портала(e)}")
+            u = None
+        if u:
+            тело, почему = скачать_адрес(u)
+            if тело:
+                return тело
+            причины.append(f"disk.file.get: {почему}")
+    if rec is not None:
+        rec["reason"] = "; ".join(причины)[:400] or "ссылок на файл нет вовсе"
     return None
+
+
+#: Код отказа портала: заглавные буквы и подчёркивания, и только они. Описание
+#: рядом с кодом может нести идентификатор файла — в журнал идёт код (правило 17).
+КОД_ПОРТАЛА = re.compile(r"[A-Z][A-Z0-9_]{2,59}")
+
+
+def код_ошибки_портала(e: Exception) -> str:
+    найдено = КОД_ПОРТАЛА.search(str(e))
+    return найдено.group(0) if найдено else type(e).__name__
 
 
 def применить_условия(items: list[dict], весь_текст: str) -> None:
@@ -1351,7 +1410,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            "pdf_mixed": None,
            "doc_class": None,
            "class_rule": None, "text_lines": None, "item_lines": None}
-    b = download(fo)
+    b = download(fo, rec)
     if not b:
         return rec, []
     rec["size_bytes"] = len(b)

@@ -76,7 +76,7 @@ def test_причина_пишется_и_тогда_когда_таблицу_�
     # Вид определяется по байтам, а не подменой sniff: разбор зовёт `подвид`.
     # Прежняя редакция подменяла sniff, и после переноса ветвления на подвид
     # проверка стала проверять не то — при сохранном поведении разбора.
-    monkeypatch.setattr(indexer, "download", lambda fo: b"%PDF-1.4 " + b"x" * 300)
+    monkeypatch.setattr(indexer, "download", lambda fo, rec=None: b"%PDF-1.4 " + b"x" * 300)
     monkeypatch.setattr(indexer, "rows_from_pdf", lambda b: таблица)
     monkeypatch.setattr(indexer, "text_from_pdf",
                         lambda b, rec=None: "Насос ЦНС-38 две штуки")
@@ -88,7 +88,7 @@ def test_причина_пишется_и_тогда_когда_таблицу_�
 
 def test_таблица_без_строк_причину_не_выдумывает(monkeypatch):
     """Читатель не дал таблицы вовсе — это не «шапки нет», и путать их нельзя."""
-    monkeypatch.setattr(indexer, "download", lambda fo: b"%PDF-1.4 " + b"x" * 300)
+    monkeypatch.setattr(indexer, "download", lambda fo, rec=None: b"%PDF-1.4 " + b"x" * 300)
     monkeypatch.setattr(indexer, "rows_from_pdf", lambda b: [])
     monkeypatch.setattr(indexer, "text_from_pdf",
                         lambda b, rec=None: "Насос ЦНС-38 две штуки")
