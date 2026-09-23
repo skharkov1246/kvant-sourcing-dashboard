@@ -352,6 +352,14 @@ def run(args) -> int:
         _inb,
     )
     _o = m["origin"]["summary"]
+    # Раскладка авторства — в журнал каждым прогоном: по ней видно день ко дню,
+    # кто грузит очередь запросов. Только агрегаты, без имён (CLAUDE.md, 17).
+    print(f"  авторов карточек: {_o['people']} чел.; отдел поиска поставщиков "
+          f"{_o['sourcing']} ({_o['sourcingPct']} %), вне отдела {_o['outside']} "
+          f"({_o['outsidePct']} %), без автора {_o['auto']} ({_o['autoPct']} %)")
+    if not _o["viaService"] and _o["serviceConfigured"]:
+        print(f"  служебных записей задано {_o['serviceConfigured']}, "
+              f"но карточек за период они не заводили")
     if _o["viaService"]:
         print(f"  служебные записи: {_o['viaService']} карточек ({_o['viaServicePct']} %), "
               f"исполнитель восстановлен у {_o['serviceResolved']} ({_o['serviceResolvedPct']} %)")
