@@ -248,9 +248,17 @@ def test_запись_распознавания_на_базе(cur, monkeypatch,
         cur.execute("select id, feed, source from lib_prices order by id")
         return ф, д, cur.fetchall()
 
-    # ── холостой прогон: таблица слияния, в базе ничего ──
+    # ── холостой прогон одного режима: берутся только смешанные с позициями ──
     до = снимок()
     monkeypatch.setattr(ocr, "APPLY", False)
+    monkeypatch.setattr(ocr, "ТОЛЬКО_РЕЖИМ", ocr.ПОСТРАНИЧНО)
+    assert ocr.main() == 0
+    assert распознаны == [("1", ocr.ПОСТРАНИЧНО)]
+    распознаны.clear()
+    monkeypatch.setattr(ocr, "ТОЛЬКО_РЕЖИМ", "")
+    capsys.readouterr()
+
+    # ── холостой прогон: таблица слияния, в базе ничего ──
     assert ocr.main() == 0
     вывод = capsys.readouterr().out
     assert до == снимок()

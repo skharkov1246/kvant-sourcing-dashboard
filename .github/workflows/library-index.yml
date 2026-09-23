@@ -96,6 +96,11 @@ on:
         description: "Распознавание: повторить файлы, где отказало окружение (таймаут, нет tesseract)"
         type: boolean
         default: false
+      ocr_mode:
+        description: "Распознавание: какой режим брать (страницы — слияние смешанных PDF с разбором)"
+        type: choice
+        options: ["все", "страницы", "файл"]
+        default: "все"
       ocr_revert:
         # ОТКАТ ЗАПИСИ РАСПОЗНАВАНИЯ по ключу прогона (журнал lib_ocr_writes).
         # Ключ печатает сам прогон: «откат: OCR_REVERT=ocr-…». Ключ без хвоста
@@ -250,6 +255,7 @@ jobs:
           SPECGATE: ${{ inputs.specgate && '1' || '0' }}
           REPARSE_FAILED: ${{ inputs.reparse_failed && '1' || '' }}
           REVERT_KEY: ${{ inputs.ocr_revert }}
+          OCR_MODE: ${{ inputs.ocr_mode != 'все' && inputs.ocr_mode || '' }}
         run: |
           set -euo pipefail
           if [ -n "${REVERT_KEY:-}" ]; then

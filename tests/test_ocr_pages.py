@@ -474,3 +474,7 @@ def test_откат_запускается_из_прогона_одной_час
     откат = команда.index('OCR_REVERT="$REVERT_KEY" python library/ocr.py')
     assert команда.rindex('if [ "${{ matrix.shard }}" = "0" ]', 0, откат) > 0
     assert "${{ inputs.ocr_revert }}" not in команда, "ключ подставлен в текст команды"
+    # Режим для замера: варианты входа — ровно режимы кода.
+    режимы = wf[True]["workflow_dispatch"]["inputs"]["ocr_mode"]["options"]
+    assert set(режимы) == {"все", ocr.ПОСТРАНИЧНО, ocr.ЦЕЛИКОМ}
+    assert "OCR_MODE" in шаг["env"]

@@ -261,6 +261,11 @@ select file_id,
 #: перечитать записью.
 ПОВТОР = os.environ.get("OCR_RETRY", "") not in ("", "0", "false")
 
+#: Только один режим — для замера (правило 3): «страницы» меряет слияние смешанных
+#: PDF отдельно от сканов целиком. Иначе выборка с LIMIT тонет в картинках, а
+#: смешанных файлов в ней может не оказаться вовсе.
+ТОЛЬКО_РЕЖИМ = os.environ.get("OCR_MODE", "").strip()
+
 ПОВТОР_ОТКАЗАВШИХ = """
 select file_id, '""" + ЦЕЛИКОМ + """', 0 from lib_files
  where status <> 'не скачался'
@@ -893,8 +898,13 @@ def main() -> int:
         print(f"часть {SHARD + 1} из {SHARDS}", flush=True)
     print(f"режим: {'ЗАПИСЬ В БАЗУ' if APPLY else 'холостой, без записи'}", flush=True)
 
+    if ТОЛЬКО_РЕЖИМ not in ("", ЦЕЛИКОМ, ПОСТРАНИЧНО):
+        print(f"OCR_MODE={ТОЛЬКО_РЕЖИМ!r}: ждём «{ЦЕЛИКОМ}», «{ПОСТРАНИЧНО}» или пусто",
+              file=sys.stderr)
+        return 2
     run_id = ключ_прогона()
-    print(f"ключ прогона: {run_id}", flush=True)
+    print(f"ключ прогона: {run_id}"
+          + (f" · только режим «{ТОЛЬКО_РЕЖИМ}»" if ТОЛЬКО_РЕЖИМ else ""), flush=True)
 
     conn = indexer.connect()
     with conn.cursor() as cur:
@@ -909,7 +919,8 @@ def main() -> int:
             return 2
         cur.execute(ПОВТОР_ОТКАЗАВШИХ if ПОВТОР else CANDIDATES,
                     (list(ПРИЧИНЫ_ОКРУЖЕНИЯ),) if ПОВТОР else None)
-        want = {r[0]: r[1] for r in cur.fetchall()}
+        want = {r[0]: r[1] for r in cur.fetchall()
+                if not ТОЛЬКО_РЕЖИМ or r[1] == ТОЛЬКО_РЕЖИМ}
         # ЧТО УЖЕ ЛЕЖИТ У СМЕШАННЫХ ФАЙЛОВ: строки и цены разбора (их запись не
         # трогает) и свои прежние строки и цены скана (их заменит повтор). Без
         # этого таблица холостого прогона говорит только «сколько добавится», но
