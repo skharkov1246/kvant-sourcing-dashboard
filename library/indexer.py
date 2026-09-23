@@ -1579,10 +1579,21 @@ def main() -> int:
         return 2
     print(f"источник вложений: {'карточки запросов (СП-166)' if SOURCE == 'rfq' else 'сделки'}",
           flush=True)
-    refs = collect_refs_rfq(DAYS) if SOURCE == "rfq" else collect_refs(DAYS)
+    # ЧАСТЬ ПРОСИТ У ОБХОДА СВОЮ ДОЛЮ, А НЕ ВЕСЬ ПОРТАЛ. Прежде обход вызывался
+    # БЕЗ номера части, и каждая из пятидесяти частей читала портал ЦЕЛИКОМ, а
+    # деление шло потом, по хешу файла: пятьдесят полных обходов вместо одного.
+    # Распознавание и переразбор передают часть в обход давно (ocr.py, reparse.py),
+    # разбор — нет, хотя оба обхода это умеют: сделки режутся по остатку от
+    # номера, карточки запросов — по диапазону идентификаторов.
+    #
+    # ДЕЛЕНИЕ ТЕПЕРЬ РОВНО ОДНО, и это не украшение. Два подряд — обход по частям
+    # и отбор по хешу файла — выбрасывают то, что попало в часть 3 по первому
+    # признаку и в часть 7 по второму: такой файл не берёт НИКТО (CLAUDE.md,
+    # правило дробления). Поэтому отбор по хешу снят вместе с добавлением части.
+    refs = (collect_refs_rfq(DAYS, SHARD, SHARDS) if SOURCE == "rfq"
+            else collect_refs(DAYS, SHARD, SHARDS))
     mine = [r for r in refs
-            if int(hashlib.sha1(str(r["fo"].get("id") or r["fo"].get("ID")).encode()).hexdigest(), 16) % SHARDS == SHARD
-            and str(r["fo"].get("id") or r["fo"].get("ID")) not in done]
+            if str(r["fo"].get("id") or r["fo"].get("ID")) not in done]
     if LIMIT:
         mine = mine[:LIMIT]
     print(f"к разбору в этой части: {len(mine)}\n", flush=True)
