@@ -96,6 +96,10 @@ on:
         description: "Распознавание: повторить файлы, где отказало окружение (таймаут, нет tesseract)"
         type: boolean
         default: false
+      specgate:
+        description: "Ворота спецификации: отсекать документацию от номенклатуры (выключать только для замера)"
+        type: boolean
+        default: true
       pdf_one_pass:
         description: "PDF читать один раз: текст брать из тех же страниц, что и таблицу"
         type: boolean
@@ -204,6 +208,7 @@ jobs:
           HEADER_RELAX: ${{ inputs.header_relax && '1' || '' }}
           OCR_RETRY: ${{ inputs.ocr_retry && '1' || '' }}
           PDF_ONE_PASS: ${{ inputs.pdf_one_pass && '1' || '' }}
+          SPECGATE: ${{ inputs.specgate && '1' || '0' }}
         run: |
           set -euo pipefail
           if [ "${{ inputs.ocr }}" = "true" ]; then
