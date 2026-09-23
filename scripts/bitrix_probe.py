@@ -1,282 +1,294 @@
-"""Зонд v44: дотянемся ли мы до 335 непрочитанных вложений — и что именно мешает.
+"""Зонд v45: чей это запрос на самом деле — кто дал роботу задачу его создать.
 
-Опись входящих КП (`gt/data/bitrix_tkp_index.json`) говорит по 335 файлам одно и то
-же: «Диск не отдал ссылку (нет скоупа disk или файла нет)». Это не измерение, а две
-гипотезы в одной строке, и выбор между ними меняет исполнителя: отсутствующее право —
-одна галочка владельца в портале, неверный идентификатор — правка кода у меня. Из 335
-файлов 323 — входящие предложения поставщиков, а по прочитанным входящим цена нашлась
-в 779 файлах из 1000, так что цена вопроса не нулевая.
+ЗАЧЕМ. Карточки запросов поставщикам заводит робот воронки пресейла. Считать
+исполнителем того, кто записан в карточке, нельзя: работа сорсера уходит из его
+статистики. Нынешнее восстановление берёт владельца РОДИТЕЛЬСКОЙ СДЕЛКИ, а её
+часто ведёт КАМ — и заслуга сорсера приписывается аккаунт-менеджеру. Это
+несправедливо и делает замер эффективности людей бессмысленным.
 
-Зонд отвечает на четыре вопроса по порядку:
-  1. есть ли у вебхука право `disk` (и админская ли учётка);
-  2. отвечает ли Диск вообще хоть на один вызов;
-  3. что именно возвращают `disk.file.get` и `disk.attachedObject.get` по нашим же
-     непрочитанным идентификаторам — выборка берётся из описи, а не набирается руками;
-  4. есть ли обходной путь без Диска: какие ключи вообще приходят в файловом объекте
-     дела и отдаёт ли хоть один из них байты файла, а не страницу входа.
+ВОПРОС ЗОНДА РОВНО ОДИН: какой след в Битриксе указывает на живого сорсера и
+насколько надёжно. Следов-кандидатов шесть, и зонд меряет каждый:
 
-ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ: названия прав, имена методов, коды ошибок, имена ключей,
-счётчики. Ни одного идентификатора файла, дела или сделки, ни имени файла, ни ссылки —
-ссылка несёт одноразовый токен, а журнал прогона публичный. Ничего не пишется.
+  1. `createdBy` карточки        — кто её создал (у робота это он сам);
+  2. `updatedBy` карточки        — кто менял последним;
+  3. `movedBy` карточки          — кто двигал по стадиям: так работает сорсер;
+  4. пользовательские поля СП-166 типа «сотрудник» — вдруг инициатор уже пишется;
+  5. родительская сделка: `MOVED_BY_ID` — кто перевёл сделку на стадию, с которой
+     робот и запускается, то есть кто нажал кнопку; плюс `CREATED_BY_ID`;
+  6. автор дел и комментариев карточки (`AUTHOR_ID`) — кто писал письмо руками.
 
-Прежние выпуски зонда: v19/v20 — состав СП-166, v43 — права на механические правки
-гигиены. Зонд разовый: каждый выпуск отвечает на вопрос своего дня.
+ГЛАВНЫЙ ЗАМЕР — НЕ ЗАПОЛНЕННОСТЬ, А ПОПАДАНИЕ В ОТДЕЛ. Поле, заполненное у ста
+процентов карточек, бесполезно, если показывает того же КАМа. Поэтому по каждому
+следу считается доля карточек, где он указывает на сотрудника отдела поиска
+поставщиков, и отдельно — по тем карточкам, которые СЕЙЧАС числятся вне отдела:
+именно их и надо вернуть сорсерам.
+
+НИЧЕГО НЕ ПИШЕТСЯ. Печатаются только агрегаты: коды и типы полей, имена методов,
+коды ошибок, счётчики и доли (CLAUDE.md, правило 17). Ни имён, ни почт, ни
+идентификаторов карточек и сделок. Идентификаторы учётных записей печатаются
+только для записей, не числящихся ни в одном подразделении, — это кандидаты в
+служебные, и без номера их не внести в SERVICE_ACCOUNT_IDS.
+
+Прежние выпуски: v19/v20 — состав СП-166, v43 — права на правки гигиены,
+v44 — доступ к вложениям. Зонд разовый: каждый выпуск отвечает на вопрос дня.
 """
 from __future__ import annotations
 
-import json
 import os
-import re
 import sys
 from collections import Counter
-from pathlib import Path
-
-import requests
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import config  # noqa: E402
 from bitrix_client import BitrixClient  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[1]
-INDEX = ROOT / "gt/data/bitrix_tkp_index.json"
-FAIL = "Диск не отдал ссылку"
-SAMPLE = int(os.getenv("PROBE_SAMPLE") or 12)
+SPA = config.SPA_ENTITY_TYPE_ID
+CATEGORY = config.SPA_CATEGORY_ID
+DEPT = config.DEPT_SOURCING_ID
+SAMPLE = int(os.getenv("PROBE_SAMPLE") or 600)      # карточек в выборке
+DEEP = int(os.getenv("PROBE_DEEP") or 40)           # карточек для дел и комментариев
 
-#: ключи файлового объекта, которые могли бы отдать байты без Диска
-URL_KEYS = ("urlMachine", "DOWNLOAD_URL", "downloadUrl", "urlDownload", "url", "URL")
-#: подписи начала файла — по ним видно, файл нам отдали или страницу входа
-MAGIC = ((b"%PDF", "pdf"), (b"PK\x03\x04", "zip/xlsx/docx"), (b"\xd0\xcf\x11\xe0", "старый office"),
-         (b"\x89PNG", "png"), (b"\xff\xd8\xff", "jpeg"), (b"<!DO", "html"), (b"<htm", "html"),
-         (b"<HTM", "html"), (b"{", "json"))
+BASE_FIELDS = ["id", "assignedById", "createdBy", "updatedBy", "movedBy",
+               "stageId", "createdTime", "movedTime", "parentId2"]
 
 
-#: итог зонда — отдельной чистой функцией, чтобы вывод нельзя было разогнать
-#: с измерением: ровно один разбор случая, и он под тестом. Прогон 18.09.2026
-#: показал, зачем это нужно: первая редакция считала обходом само НАЛИЧИЕ
-#: http-ссылки в файловом объекте и объявила обход возможным, хотя ссылка
-#: отдала text/html — страницу входа. Наличие ссылки и отдача байтов — разные
-#: измерения, и решает второе.
-VERDICTS = {
-    "нет права": (
-        "Право disk вебхуку НЕ выдано. Это и есть причина по всем непрочитанным файлам,",
-        "а не отсутствие файлов: иначе неудача не была бы поголовной. Действие владельца —",
-        "портал → Разработчикам → вебхук → отметить «disk» → сохранить. Мой код менять не",
-        "нужно: путь disk.file.get уже написан и на файлах с правом работает."),
-    "доступ закрыт учётной записи": (
-        "Право disk ЕСТЬ, Диск отвечает, но по нашим файлам возвращает «доступ запрещён».",
-        "Значит не хватает не права вебхука, а прав его СОТРУДНИКА на эти файлы: вложения",
-        "писем лежат на личном диске того, кто письмо получил, и посторонний их не видит.",
-        "Учётка вебхука при этом не администратор. Действие владельца — либо сделать эту",
-        "учётку администратором, либо выдать ей доступ к диску сотрудников, чьи письма",
-        "разбираются. Правка кода не поможет: отказ приходит от прав, а не от метода."),
-    "право есть, путь мой": (
-        "Право есть и ссылку Диск отдаёт. Значит виноват не доступ, а мой путь до байтов,",
-        "и правка за мной: раздел 3 показывает, каким методом и по какому идентификатору",
-        "файл берётся."),
-    "обход без диска": (
-        "Диск байтов не даёт, зато ссылка из файлового объекта отдала НЕ страницу, а файл.",
-        "Обход Диска возможен без новых прав — качать по этой ссылке."),
-    "ссылка ведёт на страницу входа": (
-        "Ссылка в файловом объекте есть, но отдаёт text/html — страницу входа, а не файл.",
-        "Обхода нет: серверный клиент сессии не имеет. Остаётся доступ к Диску."),
-    "тупик": (
-        "Ни Диск, ни ссылки в объекте байтов не дают. Дальше — только доступ к Диску.",),
-    "не измерено": (
-        "Права не прочитались, и ссылку никто не отдал: зонд ничего не измерил.",
-        "Это отказ измерения, а не ответ — перезапустить."),
-}
+def доля(part: int, whole: int) -> str:
+    return f"{part}/{whole} ({100 * part / whole:.0f} %)" if whole else f"{part}/0"
 
 
-def verdict(rights: list[str], gave_url: int, url_keys: int, *,
-            denied: int = 0, url_file: int = 0) -> str:
-    """Какой из случаев мы наблюдали. Порядок разбора — от дешёвого действия.
-
-    denied   — сколько наших файлов Диск закрыл отказом доступа;
-    url_keys — сколько http-ссылок нашлось в файловых объектах;
-    url_file — по скольким из них пришли байты ФАЙЛА, а не страница.
-    """
-    if not rights:
-        return "не измерено"
-    if "disk" not in rights:
-        return "нет права"
-    if gave_url:
-        return "право есть, путь мой"
-    if url_file:
-        return "обход без диска"
-    if denied:
-        return "доступ закрыт учётной записи"
-    if url_keys:
-        return "ссылка ведёт на страницу входа"
-    return "тупик"
+def заголовок(t: str) -> None:
+    print()
+    print(t)
+    print("-" * len(t), flush=True)
 
 
-def head(t: str) -> None:
-    print("\n" + "=" * 78 + f"\n{t}\n" + "=" * 78, flush=True)
-
-
-def safe(c: BitrixClient, method: str, params: dict | None = None):
-    """Вызов, который не роняет зонд. Возвращает (результат, краткая ошибка).
-
-    Текст ошибки клиента — «метод: КОД описание», без адреса и без токена (см.
-    bitrix_client.BitrixClient.call_envelope). Обрезаем до 120 знаков и всё равно
-    печатаем только в агрегате.
-    """
+def поля_смарт_процесса(c: BitrixClient) -> dict[str, dict]:
+    """Состав полей СП-166: код, тип, заголовок. Ищем поля типа «сотрудник»."""
+    заголовок("1. СОСТАВ ПОЛЕЙ СП-166")
     try:
-        return c.call(method, params or {}, retries=1), ""
-    except Exception as e:                                   # noqa: BLE001 — зонд
-        return None, f"{type(e).__name__}: {str(e)[:120]}"
+        res = c.call("crm.item.fields", {"entityTypeId": SPA}) or {}
+    except Exception as e:                                   # noqa: BLE001
+        print(f"  crm.item.fields не ответил: {e.__class__.__name__}")
+        return {}
+    fields = res.get("fields") or res
+    по_типу: Counter = Counter()
+    сотрудники: list[tuple[str, str]] = []
+    for code, meta in fields.items():
+        if not isinstance(meta, dict):
+            continue
+        t = str(meta.get("type") or "?")
+        по_типу[t] += 1
+        if t in ("user", "employee"):
+            сотрудники.append((code, str(meta.get("title") or "")))
+    print(f"  всего полей: {len(fields)}")
+    print("  по типам: " + ", ".join(f"{t} — {n}" for t, n in по_типу.most_common()))
+    print(f"  полей типа «сотрудник»: {len(сотрудники)}")
+    for code, title in сотрудники:
+        print(f"    {code:28} {title}")
+    if not сотрудники:
+        print("    ни одного — инициатор отдельным полем не хранится")
+    return {c_: m for c_, m in fields.items() if isinstance(m, dict)}
 
 
-def code_of(err: str) -> str:
-    """Код ошибки Bitrix из текста исключения: «метод: КОД описание» → КОД."""
-    m = re.search(r":\s*([A-Z_]{3,40})", err or "")
-    return m.group(1) if m else (err.split(":")[0] if err else "без ошибки")
+def выборка(c: BitrixClient, поля_сотрудников: list[str]) -> list[dict]:
+    заголовок("2. ВЫБОРКА КАРТОЧЕК")
+    select = BASE_FIELDS + поля_сотрудников
+    items = c.list_items(SPA, filter={"categoryId": CATEGORY},
+                         select=select, max_items=SAMPLE)
+    print(f"  карточек в выборке: {len(items)} (свежие, лимит {SAMPLE})")
+    пусто = [f for f in select if not any(i.get(f) for i in items)]
+    if пусто:
+        print("  поля, пустые у ВСЕЙ выборки: " + ", ".join(пусто))
+    return items
 
 
-def unread(doc: dict) -> list[dict]:
-    """Непрочитанные вложения из описи — те самые, на которых стоит гипотеза."""
-    out = []
-    for payload in (doc.get("scopes") or {}).values():
-        for it in payload.get("inventory") or []:
-            if FAIL in str(it.get("download") or "") and it.get("file_id"):
-                out.append(it)
-    return out
+def след(items: list[dict], поле: str, dept: set[str]) -> tuple[int, int, int]:
+    """(заполнено, указывает в отдел, отличается от ответственного)."""
+    есть = в_отделе = иначе = 0
+    for i in items:
+        v = str(i.get(поле) or "")
+        if not v or v in ("0", "None"):
+            continue
+        есть += 1
+        if v in dept:
+            в_отделе += 1
+        if v != str(i.get("assignedById") or ""):
+            иначе += 1
+    return есть, в_отделе, иначе
 
 
-def shape(o: dict) -> tuple:
-    """Форма файлового объекта: имена ключей. Значения не печатаются никогда."""
-    return tuple(sorted(str(k) for k in o.keys()))
+def следы_карточки(items: list[dict], dept: set[str], поля_сотрудников: list[str]) -> None:
+    заголовок("3. СЛЕДЫ В САМОЙ КАРТОЧКЕ")
+    n = len(items)
+    вне = [i for i in items if str(i.get("assignedById") or "") not in dept]
+    print(f"  сейчас числится вне отдела поиска поставщиков: {доля(len(вне), n)}")
+    print()
+    print(f"  {'поле':22} {'заполнено':>18} {'в отделе':>18} {'≠ ответственного':>20}")
+    for поле in ["assignedById", "createdBy", "updatedBy", "movedBy", *поля_сотрудников]:
+        есть, в_отделе, иначе = след(items, поле, dept)
+        print(f"  {поле:22} {доля(есть, n):>18} {доля(в_отделе, n):>18} {доля(иначе, n):>20}")
+
+    заголовок("4. ТО ЖЕ, НО ТОЛЬКО ПО КАРТОЧКАМ ВНЕ ОТДЕЛА")
+    print("  Это и есть искомое: сколько таких карточек можно вернуть сорсеру.")
+    m = len(вне)
+    print(f"  {'поле':22} {'заполнено':>18} {'указывает в отдел':>20}")
+    for поле in ["createdBy", "updatedBy", "movedBy", *поля_сотрудников]:
+        есть, в_отделе, _ = след(вне, поле, dept)
+        print(f"  {поле:22} {доля(есть, m):>18} {доля(в_отделе, m):>20}")
+    покрыто = sum(
+        1 for i in вне
+        if any(str(i.get(f) or "") in dept for f in ["movedBy", "updatedBy", "createdBy", *поля_сотрудников])
+    )
+    print(f"  хотя бы один след ведёт в отдел: {доля(покрыто, m)}")
 
 
-def sniff(url: str) -> tuple[str, bool]:
-    """Что лежит по ссылке: файл или страница входа. Печатается только вид и объём."""
+def кто_стоит_ответственным(items: list[dict], dept: set[str], depts: dict[str, str]) -> None:
+    заголовок("5. КТО СТОИТ ОТВЕТСТВЕННЫМ И КТО СОЗДАЁТ")
+    for роль in ("assignedById", "createdBy"):
+        cnt = Counter(str(i.get(роль) or "—") for i in items)
+        без_отдела = [(u, n) for u, n in cnt.most_common() if u not in ("—",) and not depts.get(u)]
+        в_отделе = sum(n for u, n in cnt.items() if u in dept)
+        print(f"  {роль}: учётных записей {len(cnt)}, из них в отделе "
+              f"{sum(1 for u in cnt if u in dept)}; карточек на отдел {доля(в_отделе, len(items))}")
+        if без_отдела:
+            print("    записи БЕЗ подразделения (кандидаты в служебные), id и карточек:")
+            for u, n in без_отдела[:8]:
+                print(f"      #{u:6} {n}")
+        else:
+            print("    записей без подразделения нет")
+
+
+def родительская_сделка(c: BitrixClient, items: list[dict], dept: set[str]) -> None:
+    заголовок("6. РОДИТЕЛЬСКАЯ СДЕЛКА: КТО ЕЁ ДВИГАЛ")
+    ids = sorted({str(i["parentId2"]) for i in items if i.get("parentId2")})[:400]
+    if not ids:
+        print("  у выборки нет родительских сделок")
+        return
+    поля = ["ID", "ASSIGNED_BY_ID", "CREATED_BY_ID", "MOVED_BY_ID", "MODIFY_BY_ID"]
     try:
-        r = requests.get(url, timeout=25, stream=True)
-    except Exception as e:                                   # noqa: BLE001 — зонд
-        return f"сеть: {type(e).__name__}", False
-    try:
-        chunk = next(r.iter_content(4096), b"") or b""
-    except Exception:                                        # noqa: BLE001 — зонд
-        chunk = b""
-    r.close()
-    kind = next((n for sig, n in MAGIC if chunk.startswith(sig)), "неопознанное начало")
-    ct = str(r.headers.get("content-type") or "")[:40]
-    size = str(r.headers.get("content-length") or "?")
-    # файлом считаем только опознанный бинарный формат: html и json — это ответ
-    # портала о том, что нас не пустили, а не вложение
-    is_file = kind not in ("html", "json", "неопознанное начало")
-    return f"HTTP {r.status_code} · {ct} · {size} б · начало: {kind}", is_file
+        сделки = c.deals_by_ids(ids, select=поля)
+    except Exception as e:                                   # noqa: BLE001
+        print(f"  выгрузка сделок не удалась: {e.__class__.__name__}")
+        return
+    print(f"  сделок получено: {len(сделки)} из {len(ids)} запрошенных")
+    n = len(сделки)
+    for поле in ("ASSIGNED_BY_ID", "CREATED_BY_ID", "MOVED_BY_ID", "MODIFY_BY_ID"):
+        есть = sum(1 for d in сделки.values() if str(d.get(поле) or "") not in ("", "0"))
+        в_отделе = sum(1 for d in сделки.values() if str(d.get(поле) or "") in dept)
+        print(f"  {поле:16} заполнено {доля(есть, n):>18}   в отделе {доля(в_отделе, n):>18}")
+
+    # по карточкам вне отдела: что говорит их сделка
+    вне = [i for i in items if str(i.get("assignedById") or "") not in dept and i.get("parentId2")]
+    if вне:
+        m = len(вне)
+        for поле in ("ASSIGNED_BY_ID", "MOVED_BY_ID", "CREATED_BY_ID"):
+            в_отделе = sum(1 for i in вне
+                           if str((сделки.get(str(i["parentId2"])) or {}).get(поле) or "") in dept)
+            print(f"  по карточкам вне отдела — сделка.{поле:14} ведёт в отдел {доля(в_отделе, m)}")
+
+
+def таймлайн(c: BitrixClient, items: list[dict], dept: set[str]) -> None:
+    заголовок("7. ТАЙМЛАЙН: ДЕЛА И КОММЕНТАРИИ")
+    проба = items[:DEEP]
+    print(f"  глубокая проба по {len(проба)} карточкам")
+
+    авторы: Counter = Counter()
+    писем = 0
+    for i in проба:
+        try:
+            acts = c.call("crm.activity.list", {
+                "filter": {"OWNER_TYPE_ID": SPA, "OWNER_ID": int(i["id"])},
+                "select": ["ID", "AUTHOR_ID", "RESPONSIBLE_ID", "DIRECTION", "PROVIDER_ID"],
+                "start": -1}) or []
+        except Exception as e:                               # noqa: BLE001
+            print(f"  crm.activity.list не ответил: {e.__class__.__name__}")
+            break
+        for a in acts:
+            писем += 1
+            авторы[str(a.get("AUTHOR_ID") or "")] += 1
+    if писем:
+        в_отделе = sum(n for u, n in авторы.items() if u in dept)
+        print(f"  дел найдено: {писем}; авторов различных: {len(авторы)}; "
+              f"дел, чей автор в отделе: {доля(в_отделе, писем)}")
+        без = [(u, n) for u, n in авторы.most_common(5)]
+        print("  топ авторов (id и сколько дел): "
+              + ", ".join(f"#{u}:{n}" for u, n in без))
+    else:
+        print("  дел у пробы нет")
+
+    for тип in (f"dynamic_{SPA}", str(SPA), "dynamic"):
+        try:
+            res = c.call("crm.timeline.comment.list", {
+                "filter": {"ENTITY_ID": int(проба[0]["id"]), "ENTITY_TYPE": тип}}) or []
+            print(f"  crm.timeline.comment.list, ENTITY_TYPE={тип!r}: записей {len(res)}")
+            if res:
+                break
+        except Exception as e:                               # noqa: BLE001
+            print(f"  crm.timeline.comment.list, ENTITY_TYPE={тип!r}: {e.__class__.__name__}")
+
+
+def история_стадий(c: BitrixClient, items: list[dict]) -> None:
+    заголовок("8. ИСТОРИЯ СТАДИЙ: ЕСТЬ ЛИ В НЕЙ ПОЛЬЗОВАТЕЛЬ")
+    попытки = [
+        ("crm.stagehistory.list", {"entityTypeId": SPA, "order": {"ID": "DESC"},
+                                   "filter": {}, "start": 0}),
+        ("crm.stagehistory.list", {"entityTypeId": "dynamic", "order": {"ID": "DESC"},
+                                   "filter": {}, "start": 0}),
+    ]
+    for метод, params in попытки:
+        try:
+            res = c.call(метод, params)
+        except Exception as e:                               # noqa: BLE001
+            print(f"  {метод} entityTypeId={params['entityTypeId']!r}: {e.__class__.__name__}")
+            continue
+        items_ = (res or {}).get("items") if isinstance(res, dict) else res
+        if not items_:
+            print(f"  {метод} entityTypeId={params['entityTypeId']!r}: пусто")
+            continue
+        ключи = sorted(items_[0].keys())
+        print(f"  {метод} entityTypeId={params['entityTypeId']!r}: записей {len(items_)}")
+        print("    ключи записи: " + ", ".join(ключи))
+        есть_юзер = [k for k in ключи if "BY" in k.upper() or "USER" in k.upper()]
+        print("    поля с пользователем: " + (", ".join(есть_юзер) or "нет"))
+        return
+    print("  история стадий для смарт-процесса недоступна — "
+          "значит «кто двигал» читается только из movedBy карточки")
 
 
 def main() -> int:
-    c = BitrixClient(os.environ["BITRIX_WEBHOOK_URL"])
+    url = (os.getenv("BITRIX_WEBHOOK_URL") or "").strip()
+    if not url:
+        print("нет BITRIX_WEBHOOK_URL", file=sys.stderr)
+        return 2
+    c = BitrixClient(url)
+    print("ЗОНД v45 · чей это запрос: кто дал роботу задачу его создать")
+    print(f"отдел поиска поставщиков: {DEPT}")
 
-    head("1. ПРАВА ВЕБХУКА: ЕСТЬ ЛИ СРЕДИ НИХ disk")
-    scope, err = safe(c, "scope")
-    rights = sorted(str(x).lower() for x in scope) if isinstance(scope, list) else []
-    print("выданные права:", ", ".join(rights) if rights else f"не получены ({err})")
-    print("право disk:", "ЕСТЬ" if "disk" in rights else "НЕТ" if rights else "не измерено")
-    prof, err = safe(c, "profile")
-    if isinstance(prof, dict):
-        print(f"учётка вебхука: администратор — {'да' if prof.get('ADMIN') else 'НЕТ'}")
-    else:
-        print(f"профиль не получен ({err})")
+    fields = поля_смарт_процесса(c)
+    поля_сотрудников = [k for k, m in fields.items()
+                        if str(m.get("type")) in ("user", "employee")][:6]
 
-    head("2. ОТВЕЧАЕТ ЛИ ДИСК ХОТЬ НА ЧТО-НИБУДЬ")
-    for m, p in (("disk.storage.getlist", {}), ("disk.folder.getchildren", {"id": 1})):
-        res, err = safe(c, m, p)
-        if err:
-            print(f"  {m:<28} ошибка {code_of(err)}")
-        elif isinstance(res, list):
-            print(f"  {m:<28} ответил, записей: {len(res)}")
-        else:
-            print(f"  {m:<28} ответил: {type(res).__name__}")
+    depts_map: dict[str, str] = c.user_dept_names()
+    dept = c.dept_member_ids(DEPT)
+    print(f"  сотрудников отдела (с дочерними): {len(dept)}")
 
-    head("3. ЧТО ОТВЕЧАЮТ МЕТОДЫ ДИСКА ПО НАШИМ ЖЕ НЕПРОЧИТАННЫМ ФАЙЛАМ")
-    if not INDEX.exists():
-        print("описи нет на диске — сравнивать не с чем")
+    items = выборка(c, поля_сотрудников)
+    if not items:
+        print("выборка пуста — дальше мерить нечего")
         return 1
-    doc = json.loads(INDEX.read_text(encoding="utf-8"))
-    rows = unread(doc)
-    print(f"непрочитанных вложений в описи: {len(rows)} · в выборку зонда: "
-          f"{min(SAMPLE, len(rows))} (шагом через весь список, не первые подряд)")
-    step = max(1, len(rows) // max(1, SAMPLE))
-    pick = rows[::step][:SAMPLE]
-    per_method: dict[str, Counter] = {}
-    gave_url = 0
-    denied = 0
-    for it in pick:
-        fid = str(it["file_id"])
-        for m in ("disk.file.get", "disk.attachedObject.get"):
-            res, err = safe(c, m, {"id": fid})
-            cnt = per_method.setdefault(m, Counter())
-            if err:
-                c_err = code_of(err)
-                cnt[c_err] += 1
-                if c_err == "ACCESS_DENIED":
-                    denied += 1
-            elif isinstance(res, dict) and res.get("DOWNLOAD_URL"):
-                cnt["отдал ссылку"] += 1
-                gave_url += 1
-            elif isinstance(res, dict):
-                cnt["ответил без ссылки: " + ",".join(shape(res)[:6])] += 1
-            else:
-                cnt[f"ответил {type(res).__name__}"] += 1
-    for m, cnt in per_method.items():
-        print(f"  {m}")
-        for k, n in cnt.most_common():
-            print(f"      {n:3d} × {k}")
-    print(f"ссылку на скачивание получили: {gave_url} из {len(pick) * 2} вызовов")
 
-    head("4. ЕСТЬ ЛИ ПУТЬ БЕЗ ДИСКА: ФОРМА ФАЙЛОВОГО ОБЪЕКТА У ДЕЛА")
-    acts = []
-    for it in pick:
-        m = re.match(r"дело (\d+)", str(it.get("origin") or ""))
-        if m:
-            acts.append(int(m.group(1)))
-    acts = sorted(set(acts))
-    print(f"дел в выборке: {len(acts)} (идентификаторы не печатаются)")
-    shapes: Counter = Counter()
-    url_keys: Counter = Counter()
-    probed = 0
-    url_file = 0
-    for aid in acts:
-        res, err = safe(c, "crm.activity.get", {"id": aid})
-        if err or not isinstance(res, dict):
-            shapes[f"дело не прочиталось: {code_of(err)}"] += 1
-            continue
-        files = res.get("FILES")
-        items = list(files.values()) if isinstance(files, dict) else (files or [])
-        if not items:
-            shapes["у дела нет FILES"] += 1
-            continue
-        for o in items:
-            if not isinstance(o, dict):
-                shapes[f"элемент FILES не словарь: {type(o).__name__}"] += 1
-                continue
-            shapes[" · ".join(shape(o))] += 1
-            for k in URL_KEYS:
-                v = o.get(k)
-                if isinstance(v, str) and v.startswith("http"):
-                    url_keys[k] += 1
-                    if probed < 3:                    # по одной пробе на ключ, не больше трёх
-                        probed += 1
-                        told, ok = sniff(v)
-                        url_file += int(ok)
-                        print(f"  проба ключа {k}: {told}")
-    print("формы файлового объекта (имена ключей, значения не печатаются):")
-    for k, n in shapes.most_common(8):
-        print(f"      {n:3d} × {k}")
-    print("ключи с http-ссылкой:", dict(url_keys) or "ни одного")
+    следы_карточки(items, dept, поля_сотрудников)
+    кто_стоит_ответственным(items, dept, depts_map)
+    родительская_сделка(c, items, dept)
+    таймлайн(c, items, dept)
+    история_стадий(c, items)
 
-    head("5. ИТОГ")
-    print(f"отказов доступа по нашим файлам: {denied} · ссылок отдало файл: {url_file}")
-    case = verdict(rights, gave_url, sum(url_keys.values()), denied=denied, url_file=url_file)
-    print(f"случай: {case}")
-    for line in VERDICTS[case]:
-        print(line)
-
-    print("\nГОТОВО")
+    заголовок("ИТОГ")
+    print("  Надёжным считается след, который заполнен почти всегда И указывает")
+    print("  в отдел у тех карточек, что сейчас числятся вне его. Именно такой")
+    print("  след и станет первым звеном восстановления исполнителя.")
+    print("  Замер, записи не было.")
     return 0
 
 
