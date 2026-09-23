@@ -161,6 +161,42 @@ def test_коммерсанты_берут_состав_и_атрибуцию_и
     assert "101" in {d["id"] for d in by_uid["1"]["deals"]}
 
 
+# Каскад people.responsible — прямо, на выдуманных сделках. Проверка 23.09.2026
+# переставила в нём владельца сделки выше полей, и весь набор тестов остался
+# зелёным: сквозной тест выше этого не различает. А владелец и КАМ — разные люди
+# у 1 601 сделки из 1 812 с заполненным полем «КАМ».
+_ЛЮДИ = {"21": {"active": True}, "22": {"active": True}, "23": {"active": False},
+         "24": {"active": True}, "25": {"active": True}, "26": {"active": False}}
+_РОЛИ = {"21": "kam", "22": "kam", "23": "kam", "24": "prod", "25": "sourcer", "26": "kam"}
+
+
+def _кто(**поля):
+    return people_mod.responsible(поля, _РОЛИ, _ЛЮДИ)
+
+
+def test_коммерсант_сделки_по_полю_а_не_по_владельцу():
+    assert _кто(**{people_mod.KAM_F: "21", "ASSIGNED_BY_ID": "22"}) == ("21", "kam", "поле")
+    assert _кто(**{people_mod.KAM_F: ["21"], "ASSIGNED_BY_ID": "22"}) == ("21", "kam", "поле")
+
+
+def test_поля_идут_по_порядку_кам_раньше_продукта():
+    assert _кто(**{people_mod.KAM_F: "21", people_mod.PROD_F: "24"}) == ("21", "kam", "поле")
+    assert _кто(**{people_mod.KAM_OLD: "22", people_mod.PROD_F: "24"}) == ("22", "kam", "поле")
+    assert _кто(**{people_mod.PROD_HEAD: "24"}) == ("24", "prod", "поле")
+
+
+def test_уволенный_в_поле_пропускается_до_следующего_звена():
+    assert _кто(**{people_mod.KAM_F: "23", people_mod.PROD_F: "24"}) == ("24", "prod", "поле")
+    assert _кто(**{people_mod.KAM_F: "23", "ASSIGNED_BY_ID": "22"}) == ("22", "kam", "ответственный")
+
+
+def test_владелец_засчитывается_только_действующим_коммерсантом():
+    assert _кто(ASSIGNED_BY_ID="22") == ("22", "kam", "ответственный")
+    assert _кто(ASSIGNED_BY_ID="25") == ("", "", "")      # сорсер — не коммерсант
+    assert _кто(ASSIGNED_BY_ID="26") == ("", "", "")      # уволенный КАМ
+    assert _кто() == ("", "", "")
+
+
 def test_коммерсант_с_единственной_сделкой_не_засоряет_вкладку():
     import reps as reps_mod
     r = reps_mod.compute(fixture.PeopleStub(), as_of=fixture.PEOPLE_TODAY, created=fixture.CREATED)
