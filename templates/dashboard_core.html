@@ -548,8 +548,11 @@
   <div>
     <section class="card">
       <h2>Откуда приходят запросы</h2>
-      <div class="note">Подразделение автора карточки. «Автоматизация портала» — карточки без автора: их создал робот, а не человек.</div>
+      <div class="note">Подразделение <b>автора</b> карточки — кто её завёл. «Автоматизация портала» — карточки без автора: их создал робот, а не человек.</div>
       <div class="barlist" id="originDept"></div>
+      <h2 style="margin-top:14px">Чья это работа</h2>
+      <div class="note">Подразделение <b>исполнителя</b>, восстановленного цепочкой. У карточек служебных записей два разреза расходятся: завела их автоматика, а отрабатывает живой отдел — в статистику он и должен попадать.</div>
+      <div class="barlist" id="originOwnerDept"></div>
     </section>
   </div>
 </div>
@@ -658,7 +661,7 @@ const M = window.__DATA__ || {}, INS = window.__INSIGHTS__ || {};
 // Защита от неполной выгрузки: недостающие блоки заменяем пустыми. Раньше одно
 // отсутствующее поле (например weekly) роняло весь скрипт и гасило все 9 вкладок.
 for(const [_k,_d] of [['kpi',{}],['sourcersA',[]],['weekly',[]],['coverage',{}],['chain',[]],
-                      ['origin',{summary:{},byDept:[],outsideCreators:[],byCreator:[],service:[],serviceCandidates:[],resolvedTo:[],resolvedHow:[]}],
+                      ['origin',{summary:{},byDept:[],outsideCreators:[],byCreator:[],byOwnerDept:[],service:[],serviceCandidates:[],resolvedTo:[],resolvedHow:[]}],
                       ['catList',[]],['supplierMix',null],['send',{}],['period',{label:'—'}]]){
   if(M[_k]==null) M[_k]=_d;
 }
@@ -760,7 +763,7 @@ document.getElementById('catList').innerHTML=cats.map(c=>`<div class="blrow"><di
 // ---- кто заводит запросы
 // Считаем по автору карточки, а не по ответственному: очередь грузит тот, кто
 // завёл запрос, даже если ответственным тут же назначили сорсера.
-const ORG = M.origin && M.origin.summary ? M.origin : {summary:{},byDept:[],outsideCreators:[],service:[],serviceCandidates:[],resolvedTo:[],resolvedHow:[]};
+const ORG = M.origin && M.origin.summary ? M.origin : {summary:{},byDept:[],outsideCreators:[],byOwnerDept:[],service:[],serviceCandidates:[],resolvedTo:[],resolvedHow:[]};
 const og = ORG.summary;
 document.getElementById('kpisOrigin').innerHTML=[
  ['','Завёл сорсинг',og.sourcing||0,(og.sourcingPct||0)+'% всех запросов','',''],
@@ -772,6 +775,12 @@ document.getElementById('kpisOrigin').innerHTML=[
                :(og.serviceConfigured?'записи заданы, карточек нет':'список записей не заполнен'),
   (og.viaService&&og.serviceResolvedPct<100)?'warn':'',''],
 ].map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
+
+{const _od=document.getElementById('originOwnerDept');
+ if(_od) _od.innerHTML=(ORG.byOwnerDept||[]).map(d=>
+  `<div class="blrow"><div class="blt"><span>${_esc(d.dept)}</span><b>${d.n} · ${d.pct}%</b></div>`+
+  `<div class="bltrack"><i style="width:0%" data-w="${d.w}"></i></div></div>`).join('')
+  || '<span class="dimv">нет данных</span>';}
 
 document.getElementById('originDept').innerHTML=(ORG.byDept||[]).map(d=>
  `<div class="blrow"><div class="blt"><span>${_esc(d.dept)}</span><b>${d.n} · ${d.pct}%</b></div>`+

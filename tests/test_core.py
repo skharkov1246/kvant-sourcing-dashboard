@@ -462,3 +462,24 @@ def test_нераспознанная_карточка_робота_не_при�
         "карточка робота без родительской сделки должна оставаться нераспознанной"
     )
     assert o["summary"]["serviceResolved"] + how.get("не определён", 0) == o["summary"]["viaService"]
+
+
+def test_разрез_по_подразделению_исполнителя_сходится():
+    """«Чья это работа» считается по исполнителю, а не по автору карточки,
+    и обязан раскладывать все запросы периода без потерь."""
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    o = m["origin"]
+    assert sum(d["n"] for d in o["byOwnerDept"]) == o["summary"]["total"]
+    assert all(d["dept"] != "служебная запись (робот пресейла)" for d in o["byOwnerDept"]), (
+        "служебная запись не может быть подразделением-исполнителем")
+
+
+def test_карточки_робота_переезжают_в_подразделение_исполнителя():
+    from tests import fixture
+    before = {d["dept"]: d["n"] for d in _build(None)["origin"]["byOwnerDept"]}
+    after = {d["dept"]: d["n"] for d in _build(fixture.SERVICE_IDS)["origin"]["byOwnerDept"]}
+    assert before.get("подразделение не указано", 0) > after.get("подразделение не указано", 0), (
+        "до учёта служебной записи её карточки висели на записи без подразделения")
+    assert after.get("Отдел поиска поставщиков", 0) > before.get("Отдел поиска поставщиков", 0), (
+        "после учёта часть карточек робота должна вернуться отделу поиска поставщиков")

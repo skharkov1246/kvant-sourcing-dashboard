@@ -332,6 +332,19 @@ def build(
                   if not c["auto"] and c["uid"] not in service
                   and c["dept"] == "подразделение не указано" and c["n"] >= cand_floor]
 
+    # Разрез по подразделению ИСПОЛНИТЕЛЯ, а не автора карточки. Первый отвечает
+    # на вопрос «чья это работа», второй — «кто её завёл». Для карточек робота
+    # они расходятся: завела служебная запись, работает по ним живой отдел.
+    owner_dept_cnt: Counter = Counter()
+    for r in rfqs:
+        u = r["_owner"]
+        owner_dept_cnt[(depts.get(u) or "подразделение не указано") if u
+                       else "исполнитель не определён"] += 1
+    odept_max = max(owner_dept_cnt.values(), default=1)
+    by_owner_dept = [{"dept": d, "n": n, "pct": _pct(n, total),
+                      "w": round(n / odept_max * 100)}
+                     for d, n in owner_dept_cnt.most_common()]
+
     service_list = [{"uid": u, "name": names.get(u) or f"служебная запись #{u}", "n": n,
                      "pct": _pct(n, total)} for u, n in by_service.most_common()]
     resolved_list = [{"uid": u, "name": names.get(u, f"user#{u}"), "n": n,
@@ -343,6 +356,7 @@ def build(
             "byCreator": by_creator,
             "outsideCreators": [c for c in by_creator if not c["src"] and not c["auto"]],
             "byDept": by_dept,
+            "byOwnerDept": by_owner_dept,
             "service": service_list,
             "serviceCandidates": candidates,
             "resolvedTo": resolved_list,
