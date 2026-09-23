@@ -34,9 +34,31 @@ import reps as reps_mod
 from bitrix_client import BitrixClient
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
-              "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact"]
+              "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact",
+              # файлы КП со стороны поставщика: по ним считается «получено КП».
+              # Маска "*" файловых полей не возвращает — только поимённо.
+              *config.RFQ_QUOTE_FIELDS]
 
 SUPPLIER_CRM_FIELDS = ("ufCrm18Supplier", "ufCrm18SupplContact")
+
+
+def _has_quote_file(item: dict) -> bool:
+    """Есть ли в карточке файл КП со стороны поставщика.
+
+    Поле приходит списком, словарём или пустым, а у пустого встречается и
+    строка, и пустой список — поэтому проверяется истинность значения, а не
+    его тип. Наш исходящий «Request file» в этот список не входит: считать его
+    за полученное КП значит объявить прокотированным то, что мы сами и
+    отправили.
+    """
+    for f in config.RFQ_QUOTE_FIELDS:
+        v = item.get(f)
+        if isinstance(v, list):
+            if any(v):
+                return True
+        elif v:
+            return True
+    return False
 
 
 def _crm_ref_ids(val):
@@ -310,10 +332,16 @@ def run(args) -> int:
     print("• Поставщики по RFQ (компании/контакты)…")
     _attach_suppliers(client, rfqs)
 
+    for r in rfqs:
+        r["_hasQuote"] = _has_quote_file(r)
+    print(f"  карточек с файлом КП поставщика: {sum(1 for r in rfqs if r['_hasQuote'])}")
+
     print("• Письма карточек СП-166 (исходящие и входящие)…")
     _acts = _mail_activities(client, p.start_iso, p.end_iso)
     _inb = _inbound_mail(_acts)
-    print(f"  писем: {len(_acts)}, из них входящих: {len(_inb)}")
+    print(f"  писем: {len(_acts)}, из них входящих: {len(_inb)}"
+          + ("  (ответы поставщиков приходят файлами в карточку, не письмами)"
+             if not _inb else ""))
 
     print("• Расчёт метрик…")
     m = metrics_mod.build(
