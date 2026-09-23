@@ -657,3 +657,58 @@ def test_у_сорсера_видно_файлы_кп_и_стадию_отдел
         assert "quotes" in s, f"у {s['n']} нет счёта файлов КП"
         assert 0 <= s["quotes"] <= s["c"]
     assert sum(s["quotes"] for s in A) > 0, "в синтетике есть карточки с файлом КП"
+
+
+# ── служебная запись как ОТВЕТСТВЕННЫЙ, а не только автор ───────────────────
+# Разбор, смотревший лишь на автора карточки, показывал ноль там, где робот
+# создаёт карточки от имени владельца воронки и лишь ставится ответственным.
+
+def test_служебная_запись_видна_в_роли_ответственного():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    o = m["origin"]
+    s = o["summary"]
+    assert s["viaServiceAssigned"] > 0, "робот стоит ответственным на части карточек"
+    assert s["viaServiceMade"] > 0, "и часть карточек он завёл сам"
+    assert s["viaService"] >= max(s["viaServiceMade"], s["viaServiceAssigned"])
+    строка = [c for c in o["service"] if c["uid"] == fixture.SERVICE_BOT]
+    assert строка and строка[0]["made"] > 0 and строка[0]["assigned"] > 0
+
+
+def test_карточки_где_робот_только_ответственный_уходят_живому_сотруднику():
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = _build(fixture.SERVICE_IDS)
+    только_ответственный = [r for r in d["rfqs"]
+                            if str(r["assignedById"]) == fixture.SERVICE_BOT
+                            and r["createdBy"] != fixture.SERVICE_BOT]
+    assert только_ответственный, "в синтетике есть такие карточки"
+    # ни одна из них не осталась на служебной записи: цепочка увела их дальше
+    свои = {str(r["id"]) for r in только_ответственный}
+    for s in m["sourcersA"]:
+        assert s["id"] != fixture.SERVICE_BOT
+    разошлись = {d["id"] for s in m["sourcersA"] for d in s["details"]} & свои
+    assert разошлись, "карточки робота должны появиться в нагрузке живых сорсеров"
+    assert sum(c["n"] for c in m["origin"]["resolvedTo"]) == m["origin"]["summary"]["serviceResolved"]
+
+
+def test_список_ответственных_показывает_все_записи_как_есть():
+    """До всякой цепочки: служебная запись обязана быть видна поимённо."""
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    ba = m["origin"]["byAssignee"]
+    assert sum(c["n"] for c in ba) == m["origin"]["summary"]["total"], (
+        "разбор по ответственному должен покрывать все карточки периода")
+    робот = [c for c in ba if c["uid"] == fixture.SERVICE_BOT]
+    assert робот and робот[0]["svc"] is True and робот[0]["n"] > 0
+
+
+def test_кандидатом_становится_запись_и_по_роли_ответственного():
+    """Запись, которая карточек не заводит, а лишь стоит ответственной,
+    прежний отбор не замечал вовсе."""
+    from tests import fixture
+    o = _build(None)["origin"]
+    кандидат = [c for c in o["serviceCandidates"] if c["uid"] == fixture.SERVICE_BOT]
+    assert кандидат, "робот без подразделения обязан попасть в кандидаты"
+    assert кандидат[0]["assigned"] > 0 and кандидат[0]["made"] > 0
+    assert кандидат[0]["n"] == max(кандидат[0]["assigned"], кандидат[0]["made"])

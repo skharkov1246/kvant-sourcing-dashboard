@@ -54,6 +54,10 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
         # исполнителя у них видно только по владельцу родительской сделки
         if i % 11 == 3:
             creator = assignee = SERVICE_BOT
+        elif i % 13 == 5:
+            # робот стоит ТОЛЬКО ответственным: карточку завёл человек, а ведёт
+            # её служебная запись. Разбор по автору такую карточку не видит
+            creator, assignee = rnd.choice(sorted(DEPT_A)), SERVICE_BOT
         elif i % 9 == 0:
             creator, assignee = "", rnd.choice(users)
         elif i % 5 == 0:
