@@ -106,6 +106,18 @@ alter table lib_files add column if not exists parser_version smallint;
 -- известного слова). Причина живёт один прогон, если её не сохранить (правило 16).
 -- Колонка nullable и без default — правка каталога, таблица не переписывается.
 alter table lib_files add column if not exists header_miss    text;
+-- ПОСТРАНИЧНЫЙ СЧЁТ PDF. Смешанный документ — часть страниц текстовые, часть
+-- сканы — до 23.09.2026 терялся молча: одна текстовая страница даёт chars > 0,
+-- файл получает «разобран», и отбор распознавания не берёт его НИКОГДА. Сканы
+-- внутри такого файла это позиции и цены, которых никто не видел. Колонки
+-- nullable и без default — правка каталога, таблица не переписывается.
+alter table lib_files add column if not exists pdf_pages       int;
+alter table lib_files add column if not exists pdf_pages_text  int;
+alter table lib_files add column if not exists pdf_pages_lost  int;
+alter table lib_files add column if not exists pdf_mixed       boolean;
+-- Частичный индекс: отбор распознавания спрашивает именно смешанные, и их мало.
+create index if not exists lib_files_pdf_mixed on lib_files (file_id)
+  where pdf_mixed is true;
 create index if not exists lib_files_class on lib_files (doc_class);
 
 do $$ begin

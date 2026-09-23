@@ -1593,7 +1593,8 @@ def main() -> int:
                        kind, size_bytes, status, reason,
                        chars, rows_found, segment_id, sha256,
                        parse_path, header_found, header_miss, doc_class, class_rule,
-                       text_lines, item_lines, parser_version)
+                       text_lines, item_lines, parser_version,
+                       pdf_pages, pdf_pages_text, pdf_pages_lost, pdf_mixed)
                     values %s
                     on conflict (file_id) do update set
                       field_title = excluded.field_title, side = excluded.side,
@@ -1601,6 +1602,10 @@ def main() -> int:
                       rows_found = excluded.rows_found, segment_id = excluded.segment_id,
                       parse_path = excluded.parse_path, header_found = excluded.header_found,
                       header_miss = excluded.header_miss,
+                      pdf_pages = excluded.pdf_pages,
+                      pdf_pages_text = excluded.pdf_pages_text,
+                      pdf_pages_lost = excluded.pdf_pages_lost,
+                      pdf_mixed = excluded.pdf_mixed,
                       doc_class = excluded.doc_class, class_rule = excluded.class_rule,
                       text_lines = excluded.text_lines, item_lines = excluded.item_lines,
                       parser_version = excluded.parser_version,
@@ -1625,7 +1630,9 @@ def main() -> int:
                               rec["parse_path"], rec["header_found"],
                               rec.get("header_miss"), rec["doc_class"],
                               rec["class_rule"], rec["text_lines"], rec["item_lines"],
-                              PARSER_VERSION))
+                              PARSER_VERSION, rec.get("pdf_pages"),
+                              rec.get("pdf_pages_text"), rec.get("pdf_pages_lost"),
+                              rec.get("pdf_mixed")))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],

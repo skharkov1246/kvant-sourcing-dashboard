@@ -30,6 +30,7 @@ from __future__ import annotations
 import os
 import struct
 import subprocess
+from datetime import datetime, timezone
 import sys
 import tempfile
 import threading
@@ -171,10 +172,37 @@ def таблица_времени() -> list[str]:
 # прогона 118 файлов из 400 оказались xlsx/docx, архивами и экзотикой —
 # скачались, дошли до tesseract и вернули «формат не читаем». Это треть
 # впустую потраченного времени части.
+#: Причины, по которым файл НЕ ВИНОВАТ: это отказ окружения прогона, а не свойство
+#: файла. Такой файл обязан остаться в очереди распознавания — иначе один
+#: неудачный прогон выбрасывает его навсегда.
+#:
+#: 23.09.2026 так и вышло: отметка ocr_at ставилась в общем `on conflict do
+#: update` независимо от исхода, а распознавание в те дни падало по таймауту на
+#: 69 % файлов из-за потоков внутри tesseract. Потоки починены, но 3 666 картинок
+#: остались с проставленной отметкой и в очередь больше не попадают. Сбросить её
+#: нечем: кода, который это делает, в репозитории нет.
+ПРИЧИНЫ_ОКРУЖЕНИЯ = (
+    "tesseract не установлен",
+    "сбой запуска",
+    "таймаут распознавания",
+    "таймаут разворота PDF в картинки",
+    "pdftoppm не установлен",
+)
+
+
+def виновато_окружение(причина: str | None) -> bool:
+    """Отказ окружения, а не свойство файла: отметку ставить нельзя."""
+    return bool(причина) and any(причина.startswith(п) for п in ПРИЧИНЫ_ОКРУЖЕНИЯ)
+
+
 CANDIDATES = """
 select file_id from lib_files
  where ocr_at is null
-   and (status = 'пусто' or kind = 'изображение')
+   and (status = 'пусто' or kind = 'изображение'
+        -- СМЕШАННЫЙ PDF: часть страниц текстовые, часть сканы. Такой файл имеет
+        -- статус «разобран» и chars > 0, поэтому прежний отбор не брал его
+        -- НИКОГДА — а сканы в нём это позиции и цены, которых никто не видел.
+        or pdf_mixed is true)
    and status <> 'не скачался'
    and coalesce(kind, '') in ('изображение', 'pdf', '')"""
 
@@ -430,7 +458,12 @@ def main() -> int:
                     on conflict (file_id) do update set
                       status = excluded.status, kind = excluded.kind, chars = excluded.chars,
                       rows_found = excluded.rows_found, segment_id = excluded.segment_id,
-                      reason = excluded.reason, ocr_at = now(), ocr_chars = excluded.ocr_chars,
+                      reason = excluded.reason,
+                      -- НЕ now(), А ТО, ЧТО ПРИСЛАЛИ. Пустая отметка означает отказ
+                      -- окружения: прежнее значение сохраняется, и файл остаётся в
+                      -- очереди распознавания.
+                      ocr_at = coalesce(excluded.ocr_at, lib_files.ocr_at),
+                      ocr_chars = excluded.ocr_chars,
                       processed_at = now()""", buf_files, page_size=500)
         c.commit()
         c.close()
@@ -446,9 +479,13 @@ def main() -> int:
             total_items += rec["rows_found"]
             for it in items:
                 segs[it["segment_id"] or "—"] += 1
+            # ОТМЕТКА СТАВИТСЯ ТОЛЬКО ЗА НАСТОЯЩУЮ ПОПЫТКУ. При отказе окружения
+            # (нет tesseract, таймаут) отметка не ставится, и файл остаётся в
+            # очереди: иначе один неудачный прогон выбрасывает его навсегда.
+            отметка = None if виновато_окружение(rec.get("reason")) else datetime.now(timezone.utc)
             buf_files.append((rec["file_id"], rec["deal_id"], rec["status"], rec["kind"],
                               rec["chars"], rec["rows_found"], rec["segment_id"],
-                              indexer.pg(rec["reason"]), None, rec["chars"],
+                              indexer.pg(rec["reason"]), отметка, rec["chars"],
                               indexer.PARSER_VERSION))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], indexer.pg(it["item_name"])[:500],
