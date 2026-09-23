@@ -15,6 +15,8 @@ import stages as stages_mod
 DEPT_A = {"76", "77", "78", "79"}          # «Отдел поиска поставщиков»
 DEPT_B = {"90", "91"}
 SERVICE_BOT = "900"                        # служебная запись воронки пресейла
+SOURCER_FIELD = "UF_CRM_1776169420"         # поле сделки «сорсер» — как в портале
+DEAL_SOURCER_FIELDS = (SOURCER_FIELD,)
 SERVICE_IDS = {SERVICE_BOT}
 NAMES = {"76": "Иванов И.", "77": "Петрова А.", "78": "Сидоров С.", "79": "Кузнецов К.",
          "90": "Орлов О.", "91": "Волкова В.", SERVICE_BOT: "Робот пресейла"}
@@ -52,8 +54,22 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
         # подразделения, часть — автоматика портала (createdBy пустой)
         # часть карточек заводит и записывает на себя робот пресейла: живого
         # исполнителя у них видно только по владельцу родительской сделки
+        # робот и двигал карточку сам — человеческого следа нет вовсе
+        mover = updater = last = SERVICE_BOT
         if i % 11 == 3:
             creator = assignee = SERVICE_BOT
+            # часть роботных карточек потом трогает живой сорсер: у них след есть.
+            # Карточка i == 3 намеренно не в их числе: у неё нет ни родительской
+            # сделки, ни человеческого следа — на ней проверяется, что такая
+            # карточка остаётся нераспознанной, а не приписывается кому-то
+            if i == 3:
+                pass
+            elif i % 33 == 3:
+                mover = rnd.choice(sorted(DEPT_A))
+            elif i % 33 == 14:
+                updater = rnd.choice(sorted(DEPT_A))
+            elif i % 33 == 25:
+                last = rnd.choice(sorted(DEPT_A))
         elif i % 13 == 5:
             # робот стоит ТОЛЬКО ответственным: карточку завёл человек, а ведёт
             # её служебная запись. Разбор по автору такую карточку не видит
@@ -64,10 +80,16 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
             creator, assignee = rnd.choice(sorted(DEPT_B)), rnd.choice(users)
         else:
             creator, assignee = rnd.choice(sorted(DEPT_A)), rnd.choice(users)
+        if assignee != SERVICE_BOT:
+            mover = updater = last = assignee      # обычную карточку ведёт её ответственный
         rfqs.append({
             "id": 1000 + i,
             "assignedById": int(assignee),
             "createdBy": creator,
+            # следы живого человека на карточке робота
+            "movedBy": mover,
+            "updatedBy": updater,
+            "lastActivityBy": last,
             "stageId": rnd.choice(stage_ids),
             "createdTime": created.isoformat() + "T10:00:00+03:00",
             "movedTime": moved.isoformat() + "T10:00:00+03:00",
@@ -98,6 +120,10 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
             "COMPANY_ID": str(300 + (j % 40)),
             "OPPORTUNITY": str(rnd.randint(10_000, 5_000_000)),
             "CURRENCY_ID": "RUB",
+            # сорсер, записанный в сделке: по нему карточка робота уходит
+            # инициатору. Заполнен у половины сделок — вторая половина
+            # проверяет, что цепочка идёт дальше, а не останавливается
+            SOURCER_FIELD: sorted(DEPT_A)[j % len(DEPT_A)] if j % 2 == 0 else "",
         }
         deal_index[did] = d
         period_deals.append(d)
@@ -134,7 +160,8 @@ def build_metrics(**kw) -> dict:
     return metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
                              d["dept_a_ids"], d["names"], d["since"],
                              d["deal_stage_names"], d["category_names"], d["user_depts"],
-                             d.get("service_ids"), d.get("inbound_mail"))
+                             d.get("service_ids"), d.get("inbound_mail"),
+                             DEAL_SOURCER_FIELDS)
 
 
 # ------------------------------------------------------------------ коммерсанты

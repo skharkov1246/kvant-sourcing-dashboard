@@ -34,12 +34,29 @@ import reps as reps_mod
 from bitrix_client import BitrixClient
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
+              # следы живого человека на карточке робота: кто двигал стадию,
+              # кто менял, кто последним отметился в таймлайне
+              "movedBy", "updatedBy", "lastActivityBy",
               "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact",
               # файлы КП со стороны поставщика: по ним считается «получено КП».
               # Маска "*" файловых полей не возвращает — только поимённо.
               *config.RFQ_QUOTE_FIELDS]
 
 SUPPLIER_CRM_FIELDS = ("ufCrm18Supplier", "ufCrm18SupplContact")
+
+
+def _deal_field_labels(client: BitrixClient, codes) -> dict[str, str]:
+    """Подписи пользовательских полей сделки — чтобы в журнале стояло «Сорсер»,
+    а не код поля. Подпись поля — настройка портала, а не персональные данные."""
+    try:
+        fields = client.call("crm.deal.fields") or {}
+    except Exception:                                        # noqa: BLE001
+        return {}
+    out = {}
+    for code in codes:
+        meta = fields.get(code) or {}
+        out[code] = str(meta.get("formLabel") or meta.get("listLabel") or meta.get("title") or "")
+    return out
 
 
 def _has_quote_file(item: dict) -> bool:
@@ -319,9 +336,29 @@ def run(args) -> int:
     print(f"  RFQ: {len(rfqs)}  |  блок A по ответственному (отдел 172): "
           f"{sum(1 for r in rfqs if str(r.get('assignedById')) in dept_a_ids)}")
 
+    # Служебные записи: заданные номерами плюс названные служебными по имени.
+    # Номера и имена служебных записей — не персональные данные: это роботы.
+    service_ids = config.service_accounts(names)
+    if service_ids:
+        print("  служебные записи: " + ", ".join(
+            f"#{u} {names.get(u, '')}".strip() for u in sorted(service_ids, key=int)))
+    else:
+        print("  служебные записи: разбор отключён (SERVICE_ACCOUNT_IDS=off)")
+
     parent_ids = {str(r.get("parentId2")) for r in rfqs if r.get("parentId2")}
     print(f"• Родительские сделки (parentId2): {len(parent_ids)} → выгрузка стадий…")
-    deal_index = client.deals_by_ids(parent_ids)
+    # ASSIGNED_BY_ID и поля сорсера нужны цепочке «кому засчитать запрос». До
+    # 23.09.2026 сделки выгружались без ответственного, и звено «владелец
+    # сделки» в проде не срабатывало ни разу — это не было видно, потому что
+    # до служебных записей цепочка до него не доходила.
+    deal_index = client.deals_by_ids(parent_ids, select=[
+        "ID", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "ASSIGNED_BY_ID",
+        *config.DEAL_SOURCER_FIELDS])
+    _sourcer_labels = _deal_field_labels(client, config.DEAL_SOURCER_FIELDS)
+    for _f in config.DEAL_SOURCER_FIELDS:
+        _filled = sum(1 for d in deal_index.values() if d.get(_f) not in (None, "", 0, "0", []))
+        print(f"  поле сорсера сделки {_f} «{_sourcer_labels.get(_f, '?')}»: "
+              f"заполнено у {_filled} из {len(deal_index)} сделок")
 
     print("• Сделки периода (все воронки) для покрытия…")
     period_deals = client.deals_in_period(p.start_iso, p.end_iso, select=[
@@ -348,8 +385,9 @@ def run(args) -> int:
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
         client.user_dept_names(),
-        config.SERVICE_ACCOUNT_IDS,
+        service_ids,
         _inb,
+        config.DEAL_SOURCER_FIELDS,
     )
     _o = m["origin"]["summary"]
     # Раскладка авторства — в журнал каждым прогоном: по ней видно день ко дню,
