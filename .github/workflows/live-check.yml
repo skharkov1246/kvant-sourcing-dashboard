@@ -8,17 +8,23 @@ name: Живая сверка метрик
 # двадцать сотрудников раньше, чем разработчик. Гейт этого поймать не мог: он
 # проверяет синтетику, а ошибка была в поведении правила на живых данных.
 #
-# Как. Оба варианта — main и правка — считаются `main.py --dry-run` на одном
-# замороженном окне (по вчерашний день включительно), друг за другом, и
-# сравниваются scripts/live_check.py. Правила сверки и заявка ожиданий описаны
-# там же. Мержить PR, затрагивающий расчёт, можно только при зелёной сверке.
+# Как. Прод — это основа PR (первый родитель проверочного слияния), а не
+# текущая верхушка main: иначе чужой PR, влитый пока этот ждал, выглядел бы его
+# сдвигом. Обе сборки — полный main.py --no-llm на одном замороженном окне.
+# Сборка прода пишет ответы портала в снимок, сборка правки читает их из
+# снимка: данные одни и те же, и расхождение — эффект правки, а не шум.
+# Сравнивает scripts/live_check.py, правила и заявка ожиданий описаны там же.
 #
-# Публичность. Журнал Actions открыт всем, поэтому вывод main.py пишется в файл
-# на раннере, а в журнал попадают только строки-агрегаты из белого списка.
-# Метрики в артефакты не выкладываются: артефакты публичного репозитория
-# скачивает кто угодно.
+# Публичность. Журнал Actions открыт всем. Вывод main.py пишется в файл на
+# раннере, в журнал попадают только строки-агрегаты из белого списка, а при
+# падении — только код выхода и класс ошибки. Токен вебхука маскируется
+# первым шагом: GitHub прячет строку секрета целиком, а сетевые исключения
+# цитируют её по частям. Метрики, снимок портала и данные вкладок в артефакты
+# не выкладываются: артефакты публичного репозитория скачивает кто угодно.
 on:
   pull_request:
+    # edited — чтобы правка заявки в описании PR перезапускала сверку
+    types: [opened, synchronize, reopened, edited]
     paths:
       - metrics.py
       - main.py
@@ -26,31 +32,57 @@ on:
       - stages.py
       - period.py
       - bitrix_client.py
+      - company.py
+      - kam.py
+      - people.py
+      - contracts.py
+      - reps.py
+      - advisor.py
+      - insights.py
       - scripts/live_check.py
       - .github/workflows/live-check.yml
   workflow_dispatch:
     inputs:
       expect:
-        description: "Заявка ожиданий, строки «ожидается: #76 -517» и т. п."
+        description: "Заявка ожиданий, строки «ожидается: …» (см. scripts/live_check.py)"
         default: ""
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
-  # ОБЩАЯ ОЧЕРЕДЬ ЧТЕНИЯ ПОРТАЛА — см. пояснение в suppliers-publish.yml.
-  group: bitrix-portal
-  cancel-in-progress: false
+  # Своя очередь на PR: новый пуш снимает устаревшую сверку того же PR.
+  # Общая очередь bitrix-portal здесь не годится: GitHub держит в группе одну
+  # ожидающую задачу, и автоматическая сверка молча снимала бы ждущие ручные
+  # прогоны библиотеки и поставщиков (и наоборот). Нагрузку на портал держит
+  # сам клиент (пауза между вызовами), а снимок вдвое её сокращает.
+  group: live-check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   live-check:
     name: live-check
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 90
     env:
       BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
       SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
+      # порядок обхода множеств одинаков в обеих сборках
+      PYTHONHASHSEED: "0"
+      BITRIX_SNAPSHOT_DIR: /tmp/portal-snapshot
     steps:
+      - name: Маска токена вебхука
+        run: |
+          set -euo pipefail
+          [ -n "${BITRIX_WEBHOOK_URL:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          url="${BITRIX_WEBHOOK_URL%/}"
+          token="${url##*/}"
+          restpath="/${url#*://*/}"
+          [ -n "$token" ] && echo "::add-mask::$token"
+          [ -n "$restpath" ] && echo "::add-mask::$restpath"
+          echo "токен вебхука замаскирован"
+
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -62,40 +94,81 @@ jobs:
       - name: Установка зависимостей
         run: pip install --quiet -r requirements.txt
 
-      - name: Проверка секрета и окно сверки
+      - name: Основа сравнения и окно
         run: |
           set -euo pipefail
-          [ -n "${BITRIX_WEBHOOK_URL:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          # Для PR проверяется слияние refs/pull/N/merge: его первый родитель —
+          # ровно тот main, на который легла правка. Для ручного запуска —
+          # общий предок с main (запуск на самом main сверяет его с собой:
+          # так меряется, что сверка на снимке даёт ноль расхождений).
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ] && git rev-parse -q --verify HEAD^2 >/dev/null; then
+            base="$(git rev-parse HEAD^1)"
+          else
+            base="$(git merge-base origin/main HEAD)"
+          fi
+          echo "BASE_SHA=$base" >> "$GITHUB_ENV"
           asof="$(date -u -d yesterday +%F)"
           echo "ASOF=$asof" >> "$GITHUB_ENV"
           echo "PERIOD=2026-05-01:$asof" >> "$GITHUB_ENV"
+          echo "прод: ${base:0:12} · правка: $(git rev-parse --short=12 HEAD)"
           echo "окно сверки: 2026-05-01 → $asof (вчера включительно — набор карточек заморожен)"
 
-      - name: Прод (main) на живых данных
+      - name: Прод на живых данных (запись снимка портала)
         run: |
-          set -euo pipefail
-          git worktree add /tmp/base origin/main
+          set -uo pipefail
+          git worktree add -q /tmp/base "$BASE_SHA"
+          mkdir -p /tmp/out-base
           cd /tmp/base
-          if ! python main.py --dry-run --no-llm --period "$PERIOD" --as-of "$ASOF" \
-               --out /tmp/out-base > /tmp/base.log 2>&1; then
-            echo "::error::расчёт main упал"; grep -E "Error|Traceback|File \"" /tmp/base.log | tail -20; exit 1
-          fi
+          extra=()
+          # прод старше выгрузки вкладок — сверяются только метрики
+          grep -q -- "--data-json" main.py && extra=(--data-json /tmp/out-base/modules.json)
+          BITRIX_SNAPSHOT_MODE=record python main.py --no-llm --period "$PERIOD" --as-of "$ASOF" \
+            --out /tmp/out-base "${extra[@]}" > /tmp/base.log 2>&1
+          rc=$?
+          python -c "import config; print(','.join(sorted(getattr(config, 'SERVICE_ACCOUNT_IDS', set()))))" \
+            > /tmp/service-base.txt 2>/dev/null || echo "" > /tmp/service-base.txt
           # в журнал — только агрегаты из белого списка (правило 17)
-          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки" \
+          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки|снимок портала:" \
             /tmp/base.log || true
-
-      - name: Правка на тех же данных
-        run: |
-          set -euo pipefail
-          if ! python main.py --dry-run --no-llm --no-summary --period "$PERIOD" --as-of "$ASOF" \
-               --out /tmp/out-head > /tmp/head.log 2>&1; then
-            echo "::error::расчёт правки упал"; grep -E "Error|Traceback|File \"" /tmp/head.log | tail -20; exit 1
+          if [ "$rc" -ne 0 ]; then
+            # Прод не собрался: правку всё равно проверяем саму по себе, а
+            # сравнение с продом сверка пометит невозможным. Текст ошибки в
+            # журнал не идёт — только её класс.
+            echo "::warning::расчёт прода не собрался (код $rc): $(grep -oE '✗ (Ошибка: [A-Za-z]+|данные Bitrix не прошли проверку достаточности)' /tmp/base.log | tail -1)"
+            rm -f /tmp/out-base/metrics_*.json /tmp/out-base/modules.json
           fi
-          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки" \
+          exit 0
+
+      - name: Правка на тех же данных (чтение снимка)
+        run: |
+          set -uo pipefail
+          python -c "import config; print(','.join(sorted(config.SERVICE_ACCOUNT_IDS)))" > /tmp/service-head.txt
+          BITRIX_SNAPSHOT_MODE=replay python main.py --no-llm --period "$PERIOD" --as-of "$ASOF" \
+            --out /tmp/out-head --data-json /tmp/out-head/modules.json > /tmp/head.log 2>&1
+          rc=$?
+          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки|снимок портала:" \
             /tmp/head.log || true
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::расчёт правки упал (код $rc): $(grep -oE '✗ (Ошибка: [A-Za-z]+|данные Bitrix не прошли проверку достаточности)' /tmp/head.log | tail -1)"
+            exit 1
+          fi
 
       - name: Сверка
         env:
-          PR_BODY: ${{ github.event.pull_request.body }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           EXPECT: ${{ inputs.expect }}
-        run: python scripts/live_check.py /tmp/out-base /tmp/out-head
+        run: |
+          set -euo pipefail
+          # Описание PR читается сейчас, а не из события: «Re-run» повторяет
+          # старое событие, и исправленная заявка иначе не была бы видна.
+          if [ -n "${PR_NUMBER:-}" ]; then
+            PR_BODY="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.body // ""')"
+            export PR_BODY
+          fi
+          SERVICE_BASE="$(cat /tmp/service-base.txt)" SERVICE_HEAD="$(cat /tmp/service-head.txt)" \
+            python scripts/live_check.py /tmp/out-base /tmp/out-head
+
+      - name: Уборка
+        if: always()
+        run: rm -rf /tmp/portal-snapshot /tmp/out-base /tmp/out-head /tmp/base /tmp/base.log /tmp/head.log

@@ -921,3 +921,69 @@ def test_поле_сорсера_в_конфигурации_стоит_перв
     коды = [f for f, _ in config_mod.DEAL_SOURCER_FIELDS]
     assert коды[0] == "UF_CRM_1779187335", "первым обязан стоять «Сорсер», а не руководитель"
     assert "UF_CRM_1776169420" in коды[1:]
+
+
+# ------------------------------------------------------------------ клиент: вебхук и снимок
+_ТОКЕН = "https://x.bitrix24.ru/rest/1/ВЫДУМАННЫЙТОКЕН42/"
+
+
+def test_сетевая_ошибка_не_несёт_токена_вебхука():
+    """Текст исключения requests цитирует путь вебхука, а это токен ко всему
+    CRM. Журнал Actions публичен: ни одно сообщение клиента не должно его нести."""
+    import bitrix_client as bc
+    import requests
+    сбой = requests.ConnectionError(
+        "HTTPSConnectionPool(host='x.bitrix24.ru', port=443): Max retries exceeded with url: "
+        "/rest/1/ВЫДУМАННЫЙТОКЕН42/crm.item.list.json (Caused by NewConnectionError)")
+    c = _client([сбой] * 2, retries=2)
+    with pytest.raises(bc.BitrixError) as e:
+        c.call("crm.item.list")
+    assert "ВЫДУМАННЫЙТОКЕН42" not in str(e.value) and "ConnectionError" in str(e.value)
+    c = _client([сбой])
+    with pytest.raises(requests.RequestException) as e:
+        c.list_paged("user.get")
+    assert "ВЫДУМАННЫЙТОКЕН42" not in str(e.value)
+    assert "ВЫДУМАННЫЙТОКЕН42" not in bc.без_вебхука(f"url: {_ТОКЕН}user.get")
+
+
+def test_снимок_портала_записывается_и_читается(tmp_path, monkeypatch):
+    """Сборка прода пишет ответы, сборка правки читает те же — без сети."""
+    import bitrix_client as bc
+    monkeypatch.setenv("BITRIX_SNAPSHOT_DIR", str(tmp_path))
+    monkeypatch.setenv("BITRIX_SNAPSHOT_MODE", "record")
+    запись = _client([_Resp(200, {"result": [1, 2]}),
+                      _Resp(200, {"error": "INTERNAL_SERVER_ERROR", "error_description": ""}),
+                      _Resp(200, {"result": [3]})])
+    assert запись.call("crm.deal.list", {"filter": {"ID": 1}}) == [1, 2]
+    assert запись.call("crm.deal.list", {"filter": {"ID": 2}}) == [3]
+    # сбой портала в снимок не попадает: повтор сохраняет только годный ответ
+    assert запись.snapshot_stats() == {"mode": "record", "saved": 2, "hits": 0, "misses": 0}
+
+    monkeypatch.setenv("BITRIX_SNAPSHOT_MODE", "replay")
+    чтение = _client([_Resp(200, {"result": ["живое"]})])
+    assert чтение.call("crm.deal.list", {"filter": {"ID": 2}}) == [3]
+    assert чтение.call("crm.deal.list", {"filter": {"ID": 1}}) == [1, 2]
+    assert чтение._session.calls == 0
+    # промах идёт в портал живьём и считается — по счётчику видно, точна ли сверка
+    assert чтение.call("crm.deal.list", {"filter": {"ID": 3}}) == ["живое"]
+    assert чтение.snapshot_stats() == {"mode": "replay", "saved": 0, "hits": 2, "misses": 1}
+    assert bc.BitrixClient("https://x/rest/1/t/").snapshot_stats()["mode"] == "replay"
+
+
+def test_без_снимка_клиент_ходит_в_сеть_как_раньше(monkeypatch):
+    monkeypatch.delenv("BITRIX_SNAPSHOT_DIR", raising=False)
+    c = _client([_Resp(200, {"result": [1]})])
+    assert c.call("m") == [1] and c._session.calls == 1
+    assert c.snapshot_stats()["mode"] == ""
+
+
+def test_main_чистит_текст_любой_ошибки(monkeypatch, capsys):
+    import main as main_mod
+
+    def падает(args):
+        raise ValueError(f"не удалось: {_ТОКЕН}crm.deal.list.json")
+    monkeypatch.setattr(main_mod, "run", падает)
+    monkeypatch.setattr(sys, "argv", ["main.py", "--dry-run"])
+    assert main_mod.main() == 1
+    err = capsys.readouterr().err
+    assert "ВЫДУМАННЫЙТОКЕН42" not in err and "/rest/***" in err

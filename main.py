@@ -31,7 +31,7 @@ import metrics as metrics_mod
 import people as people_mod
 import period as period_mod
 import reps as reps_mod
-from bitrix_client import BitrixClient
+from bitrix_client import BitrixClient, без_вебхука
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
               # следы живого человека на карточке робота: кто двигал стадию,
@@ -511,6 +511,7 @@ def run(args) -> int:
     if args.dry_run:
         if not args.no_summary:
             _print_summary(m)
+        _print_snapshot(client)
         return 0
 
     print(f"• Инсайты ({'Claude' if use_llm else 'правила'})…")
@@ -658,6 +659,19 @@ def run(args) -> int:
         except Exception as e:
             print(f"  ⚠ вкладка «Советы знатока» пропущена: {type(e).__name__}: {e}")
 
+    if args.data_json:
+        # Все вкладки одним файлом — для живой сверки (scripts/live_check.py):
+        # сравнить с продом можно только то, что записано. Файл остаётся на
+        # раннере, в журнал и в артефакты не попадает (в нём фамилии и суммы).
+        Path(args.data_json).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.data_json).write_text(json.dumps({
+            "company": company_data, "kam": kam_data, "eng": eng_data, "prod": prod_data,
+            "contracts": contracts_data, "reps": reps_data, "advisor": advisor_data,
+            "people": people_data, "_portal": client.snapshot_stats(),
+        }, ensure_ascii=False, default=str), encoding="utf-8")
+        print(f"  ✓ вкладки для сверки: {args.data_json}")
+    _print_snapshot(client)
+
     html_path = out_dir / f"dashboard_{slug}.html"
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
                     company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
@@ -667,6 +681,16 @@ def run(args) -> int:
     if args.open:
         webbrowser.open(html_path.resolve().as_uri())
     return 0
+
+
+def _print_snapshot(client) -> None:
+    """Счётчики снимка портала — только в прогоне сверки, где снимок включён."""
+    st = client.snapshot_stats()
+    if st["mode"] == "record":
+        print(f"  снимок портала: записано ответов {st['saved']}")
+    elif st["mode"] == "replay":
+        print(f"  снимок портала: из снимка {st['hits']}, мимо снимка {st['misses']} "
+              f"(живое чтение{'' if st['misses'] else ' не понадобилось'})")
 
 
 def _print_summary(m: dict) -> None:
@@ -696,6 +720,7 @@ def main() -> int:
     ap.add_argument("--open", action="store_true", help="открыть дашборд в браузере")
     ap.add_argument("--max-deals", type=int, default=None, help="ограничить число RFQ (для теста)")
     ap.add_argument("--as-of", help="переопределить «сегодня» (YYYY-MM-DD), для воспроизводимости")
+    ap.add_argument("--data-json", help="записать данные всех вкладок в JSON (для живой сверки)")
     ap.add_argument("--allow-empty", action="store_true",
                     help="не останавливаться, если данных из Bitrix мало (период действительно пустой)")
     args = ap.parse_args()
@@ -709,7 +734,8 @@ def main() -> int:
         print(f"✗ {e}", file=sys.stderr)
         return 2
     except Exception as e:
-        print(f"✗ Ошибка: {type(e).__name__}: {e}", file=sys.stderr)
+        # текст любой ошибки — без пути вебхука: журнал Actions публичен
+        print(f"✗ Ошибка: {type(e).__name__}: {без_вебхука(e)}", file=sys.stderr)
         return 1
 
 
