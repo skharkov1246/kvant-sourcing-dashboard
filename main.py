@@ -34,6 +34,9 @@ import reps as reps_mod
 from bitrix_client import BitrixClient
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
+              # следы живого человека на карточке робота: кто двигал стадию,
+              # кто менял, кто последним отметился в таймлайне
+              "movedBy", "updatedBy", "lastActivityBy",
               "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact",
               # файлы КП со стороны поставщика: по ним считается «получено КП».
               # Маска "*" файловых полей не возвращает — только поимённо.

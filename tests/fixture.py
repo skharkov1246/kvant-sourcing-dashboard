@@ -52,8 +52,22 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
         # подразделения, часть — автоматика портала (createdBy пустой)
         # часть карточек заводит и записывает на себя робот пресейла: живого
         # исполнителя у них видно только по владельцу родительской сделки
+        # робот и двигал карточку сам — человеческого следа нет вовсе
+        mover = updater = last = SERVICE_BOT
         if i % 11 == 3:
             creator = assignee = SERVICE_BOT
+            # часть роботных карточек потом трогает живой сорсер: у них след есть.
+            # Карточка i == 3 намеренно не в их числе: у неё нет ни родительской
+            # сделки, ни человеческого следа — на ней проверяется, что такая
+            # карточка остаётся нераспознанной, а не приписывается кому-то
+            if i == 3:
+                pass
+            elif i % 33 == 3:
+                mover = rnd.choice(sorted(DEPT_A))
+            elif i % 33 == 14:
+                updater = rnd.choice(sorted(DEPT_A))
+            elif i % 33 == 25:
+                last = rnd.choice(sorted(DEPT_A))
         elif i % 13 == 5:
             # робот стоит ТОЛЬКО ответственным: карточку завёл человек, а ведёт
             # её служебная запись. Разбор по автору такую карточку не видит
@@ -64,10 +78,16 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
             creator, assignee = rnd.choice(sorted(DEPT_B)), rnd.choice(users)
         else:
             creator, assignee = rnd.choice(sorted(DEPT_A)), rnd.choice(users)
+        if assignee != SERVICE_BOT:
+            mover = updater = last = assignee      # обычную карточку ведёт её ответственный
         rfqs.append({
             "id": 1000 + i,
             "assignedById": int(assignee),
             "createdBy": creator,
+            # следы живого человека на карточке робота
+            "movedBy": mover,
+            "updatedBy": updater,
+            "lastActivityBy": last,
             "stageId": rnd.choice(stage_ids),
             "createdTime": created.isoformat() + "T10:00:00+03:00",
             "movedTime": moved.isoformat() + "T10:00:00+03:00",

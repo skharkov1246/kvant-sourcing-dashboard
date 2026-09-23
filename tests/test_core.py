@@ -634,10 +634,12 @@ def test_список_служебных_записей_переопределя
         # «переменной нет», а не «выключено»: умолчание кода должно устоять
         os.environ["SERVICE_ACCOUNT_IDS"] = ""
         cfg = importlib.reload(config_mod)
-        assert cfg.SERVICE_ACCOUNT_IDS == {cfg.SERVICE_ACCOUNT_DEFAULT}
+        ожидание = {u.strip() for u in cfg.SERVICE_ACCOUNT_DEFAULT.split(",") if u.strip()}
+        assert cfg.SERVICE_ACCOUNT_IDS == ожидание
         del os.environ["SERVICE_ACCOUNT_IDS"]        # без переменной — то же самое
         cfg = importlib.reload(config_mod)
-        assert cfg.SERVICE_ACCOUNT_IDS == {cfg.SERVICE_ACCOUNT_DEFAULT}
+        assert cfg.SERVICE_ACCOUNT_IDS == ожидание
+        assert len(ожидание) >= 1
     finally:
         if prev is None:
             os.environ.pop("SERVICE_ACCOUNT_IDS", None)
@@ -712,3 +714,87 @@ def test_кандидатом_становится_запись_и_по_роли
     assert кандидат, "робот без подразделения обязан попасть в кандидаты"
     assert кандидат[0]["assigned"] > 0 and кандидат[0]["made"] > 0
     assert кандидат[0]["n"] == max(кандидат[0]["assigned"], кандидат[0]["made"])
+
+
+# ── порядок звеньев: кто трогал карточку важнее владельца сделки ─────────────
+# Замер 23.09.2026 по 138 карточкам робота: movedBy ведёт в отдел у 12 %,
+# владелец сделки — у 10 %, но это чаще КАМ. Заслуга сорсера уходила к нему.
+
+def test_карточку_робота_забирает_тот_кто_её_трогал_а_не_владелец_сделки():
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    сорсер, кам = "78", "90"
+    карточка = {"id": 9001, "assignedById": fixture.SERVICE_BOT,
+                "createdBy": fixture.SERVICE_BOT, "movedBy": сорсер,
+                "updatedBy": fixture.SERVICE_BOT, "lastActivityBy": fixture.SERVICE_BOT,
+                "stageId": "DT166_24:NEW", "createdTime": "2026-06-01T10:00:00+03:00",
+                "movedTime": "2026-06-02T10:00:00+03:00", "parentId2": 777,
+                "categoryId": 24, "title": "Запрос робота", "_supplier": "—"}
+    index = dict(d["deal_index"])
+    index["777"] = {"ID": "777", "ASSIGNED_BY_ID": кам, "CATEGORY_ID": "0",
+                    "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"}
+    m = metrics_mod.build(d["period"], [карточка], index, d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"], d["user_depts"],
+                          fixture.SERVICE_IDS)
+    assert карточка["_owner"] == сорсер, "карточка обязана уйти тому, кто её двигал"
+    assert карточка["_ownerBy"] == "двигал стадию"
+    assert [c["how"] for c in m["origin"]["resolvedHow"]] == ["двигал стадию"]
+
+
+def test_владелец_сделки_остаётся_но_последним_из_людей():
+    """Следа человека на карточке нет — тогда владелец сделки, как догадка."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    кам = "90"
+    карточка = {"id": 9002, "assignedById": fixture.SERVICE_BOT,
+                "createdBy": fixture.SERVICE_BOT, "movedBy": fixture.SERVICE_BOT,
+                "updatedBy": "", "lastActivityBy": None,
+                "stageId": "DT166_24:NEW", "createdTime": "2026-06-01T10:00:00+03:00",
+                "movedTime": "2026-06-02T10:00:00+03:00", "parentId2": 778,
+                "categoryId": 24, "title": "Запрос робота", "_supplier": "—"}
+    index = {"778": {"ID": "778", "ASSIGNED_BY_ID": кам, "CATEGORY_ID": "0",
+                     "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"}}
+    metrics_mod.build(d["period"], [карточка], index, d["period_deals"],
+                      d["dept_a_ids"], d["names"], d["since"],
+                      d["deal_stage_names"], d["category_names"], d["user_depts"],
+                      fixture.SERVICE_IDS)
+    assert карточка["_owner"] == кам
+    assert карточка["_ownerBy"] == "владелец сделки"
+
+
+def test_карточка_которую_робот_вёл_один_остаётся_нераспознанной():
+    """88 % карточек робота таковы. Приписать их кому-то по догадке нельзя."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    карточка = {"id": 9003, "assignedById": fixture.SERVICE_BOT,
+                "createdBy": fixture.SERVICE_BOT, "movedBy": fixture.SERVICE_BOT,
+                "updatedBy": fixture.SERVICE_BOT, "lastActivityBy": fixture.SERVICE_BOT,
+                "stageId": "DT166_24:NEW", "createdTime": "2026-06-01T10:00:00+03:00",
+                "movedTime": "2026-06-02T10:00:00+03:00", "parentId2": None,
+                "categoryId": 24, "title": "Запрос робота", "_supplier": "—"}
+    metrics_mod.build(d["period"], [карточка], {}, d["period_deals"],
+                      d["dept_a_ids"], d["names"], d["since"],
+                      d["deal_stage_names"], d["category_names"], d["user_depts"],
+                      fixture.SERVICE_IDS)
+    assert карточка["_owner"] == ""
+    assert карточка["_ownerBy"] == "не определён"
+
+
+def test_у_обычной_карточки_цепочка_не_выполняется_вовсе():
+    """Правка не должна менять судьбу карточек с живым ответственным."""
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = _build(fixture.SERVICE_IDS)
+    живые = [r for r in d["rfqs"] if str(r["assignedById"]) != fixture.SERVICE_BOT]
+    assert живые
+    m2 = _build(fixture.SERVICE_IDS)
+    for r in m2["origin"]["byAssignee"]:
+        if not r["svc"] and r["uid"]:
+            assert r["n"] > 0
+    how = {x["how"] for x in m["origin"]["resolvedHow"]}
+    assert "ответственный" not in how, (
+        "разбор служебных карточек не может опереться на ответственного — он служебный")
