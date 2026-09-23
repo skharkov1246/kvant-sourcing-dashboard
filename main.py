@@ -144,6 +144,10 @@ def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list
     полученных КП, и второй такой же проход удвоил бы и время выгрузки, и шанс
     упереться в лимит портала: DIRECTION убран из фильтра, разбор — на нашей
     стороне.
+
+    Тело письма усекается сразу при выгрузке: за окно приходят десятки тысяч
+    писем, и держать их сырыми в памяти незачем — в дровер идёт превью, а в
+    счётчик КП только дата, карточка и признак вложения.
     """
     out: list[dict] = []
     last = 0
@@ -156,7 +160,17 @@ def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list
             "order": {"ID": "ASC"}, "start": -1}) or []
         if not ch:
             break
-        out.extend(ch)
+        for a in ch:
+            out.append({
+                "cid": str(a.get("OWNER_ID")),
+                "dir": str(a.get("DIRECTION") or ""),
+                "subj": (a.get("SUBJECT") or "").strip(),
+                "to": _email_to(a.get("SETTINGS")),
+                "body": _email_preview(a.get("DESCRIPTION")),
+                "file": _has_attachment(a),
+                "dt": (a.get("CREATED") or "")[:16].replace("T", " "),
+                "dtx": a.get("CREATED") or "",
+            })
         last = int(ch[-1]["ID"])
         if len(ch) < 50:
             break
@@ -165,9 +179,8 @@ def _mail_activities(client: BitrixClient, start_iso: str, end_iso: str) -> list
 
 def _inbound_mail(acts: list[dict]) -> list[dict]:
     """Входящие письма поставщиков в виде, который понимает metrics.build."""
-    return [{"cid": str(a.get("OWNER_ID")), "dt": a.get("CREATED") or "",
-             "file": _has_attachment(a)}
-            for a in acts if str(a.get("DIRECTION")) == "1"]
+    return [{"cid": a["cid"], "dt": a["dtx"], "file": a["file"]}
+            for a in acts if a["dir"] == "1"]
 
 
 def _send_stats(acts: list[dict], rfqs: list[dict], sourcer_rows: list[dict],
@@ -179,18 +192,10 @@ def _send_stats(acts: list[dict], rfqs: list[dict], sourcer_rows: list[dict],
     counts: Counter = Counter()  # card_id -> кол-во исходящих писем
     by_card: dict[str, list[dict]] = defaultdict(list)
     for a in acts:
-        if str(a.get("DIRECTION")) != "2":
+        if a["dir"] != "2":
             continue
-        cid = str(a.get("OWNER_ID"))
-        counts[cid] += 1
-        by_card[cid].append({
-            "subj": (a.get("SUBJECT") or "").strip(),
-            "to": _email_to(a.get("SETTINGS")),
-            "body": _email_preview(a.get("DESCRIPTION")),
-            "file": _has_attachment(a),
-            "dt": (a.get("CREATED") or "")[:16].replace("T", " "),
-            "dtx": a.get("CREATED") or "",
-        })
+        counts[a["cid"]] += 1
+        by_card[a["cid"]].append({k: a[k] for k in ("subj", "to", "body", "file", "dt", "dtx")})
     # письма каждой карточки — по времени, новые сверху
     for cid in by_card:
         by_card[cid].sort(key=lambda e: e["dtx"], reverse=True)
