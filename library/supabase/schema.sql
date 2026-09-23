@@ -473,7 +473,7 @@ create table if not exists lib_prices (
   qty          numeric,
   qty_unit     text,
   price_date   date,
-  source       text,                         -- 'прайс' | 'КП' | 'таможня' | 'маркетплейс' | 'оценка'
+  source       text,                         -- 'прайс' | 'КП' | 'распознавание скана' | 'таможня' | 'маркетплейс' | 'оценка'
   source_url   text,
   confidence   text default 'med',
   note         text,

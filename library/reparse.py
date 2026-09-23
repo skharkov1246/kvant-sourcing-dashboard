@@ -142,13 +142,22 @@ def значения_правки(rec: dict, колонки: tuple[str, ...]) ->
 # потерей. Судить такую правку числом позиций — судить не по тому признаку.
 #
 # Смысл переразбора предложений — ЦЕНА. Её и надо сравнивать.
+#
+# ЦЕНЫ СО СКАНОВ СЮДА НЕ ВХОДЯТ. Их пишет распознавание страниц без текста
+# (library/ocr.py), переразбор их не читает и не снимает (price_store.СНЯТЬ).
+# Сосчитай их в «было» — и каждый смешанный PDF с распознанными сканами вышел бы
+# «хуже по цене» и не переписался бы никогда.
 ЦЕНЫ_БЫЛО = """
 select source_url, count(*)::bigint
   from lib_prices
- where feed = %s and source_url = any(%s)
+ where feed = %s and source is distinct from %s and source_url = any(%s)
  group by 1"""
 
-OLD_ROWS = "select id from lib_demand where source_file = %s"
+# СТРОКИ РАСПОЗНАВАНИЯ — НЕ СВОИ. У смешанного PDF строки страниц-сканов пишет
+# распознавание, и переразбор текстовых страниц их не заменяет: пометь он их
+# вместе со своими — следующий же переразбор стирал бы вклад сканов.
+OLD_ROWS = ("select id from lib_demand where source_file = %s"
+            " and source is distinct from %s")
 MARK = ("insert into lib_row_junk (demand_id, rule, run_id, marks) "
         "select unnest(%s::bigint[]), %s, %s, 'переразбор' "
         "on conflict (demand_id) do nothing")
@@ -208,7 +217,8 @@ def main() -> int:
         cur.execute(CANDIDATES, (НЕУДАВШИЕСЯ, list(СТАТУСЫ_НЕУДАЧИ),
                                  indexer.PARSER_VERSION, list(KINDS), ORIGIN))
         было = {r[0]: (r[1], r[2]) for r in cur.fetchall()}
-        cur.execute(ЦЕНЫ_БЫЛО, (price_store.FEED, sorted(было)))
+        cur.execute(ЦЕНЫ_БЫЛО, (price_store.FEED, price_store.ИСТОЧНИК_СКАНА,
+                                sorted(было)))
         цен_было_по_файлу = {r[0]: int(r[1]) for r in cur.fetchall()}
     conn.close()
     print(f"кандидатов на переразбор: {len(было)}"
@@ -310,7 +320,7 @@ def main() -> int:
         c = indexer.connect()
         try:
             with c.cursor() as cur:
-                cur.execute(OLD_ROWS, (rec["file_id"],))
+                cur.execute(OLD_ROWS, (rec["file_id"], price_store.ИСТОЧНИК_СКАНА))
                 старые = [r[0] for r in cur.fetchall()]
                 if старые:
                     cur.execute(MARK, (старые, RULE, run_id))
