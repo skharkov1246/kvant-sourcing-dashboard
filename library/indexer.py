@@ -1184,7 +1184,7 @@ def main() -> int:
                       (file_id, deal_id, origin, field, field_title, side,
                        kind, size_bytes, status, reason,
                        chars, rows_found, segment_id, sha256,
-                       parse_path, header_found, doc_class, class_rule,
+                       parse_path, header_found, header_miss, doc_class, class_rule,
                        text_lines, item_lines, parser_version)
                     values %s
                     on conflict (file_id) do update set
@@ -1192,6 +1192,7 @@ def main() -> int:
                       status = excluded.status, reason = excluded.reason, chars = excluded.chars,
                       rows_found = excluded.rows_found, segment_id = excluded.segment_id,
                       parse_path = excluded.parse_path, header_found = excluded.header_found,
+                      header_miss = excluded.header_miss,
                       doc_class = excluded.doc_class, class_rule = excluded.class_rule,
                       text_lines = excluded.text_lines, item_lines = excluded.item_lines,
                       parser_version = excluded.parser_version,
@@ -1213,7 +1214,8 @@ def main() -> int:
                               rec["kind"],
                               rec["size_bytes"], rec["status"], pg(rec["reason"]), rec["chars"],
                               rec["rows_found"], rec["segment_id"], rec["sha256"],
-                              rec["parse_path"], rec["header_found"], rec["doc_class"],
+                              rec["parse_path"], rec["header_found"],
+                              rec.get("header_miss"), rec["doc_class"],
                               rec["class_rule"], rec["text_lines"], rec["item_lines"],
                               PARSER_VERSION))
             for it in items:

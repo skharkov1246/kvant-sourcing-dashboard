@@ -99,6 +99,13 @@ alter table lib_files add column if not exists class_at       timestamptz;
 alter table lib_files add column if not exists text_lines     int;
 alter table lib_files add column if not exists item_lines     int;
 alter table lib_files add column if not exists parser_version smallint;
+-- ПОЧЕМУ ШАПКА НЕ УЗНАНА. Без этой колонки «header_found = false» стоит у 4 194
+-- файлов и не говорит, какую из пяти правок делать: замер 23.09.2026 показал, что
+-- за одной пометкой стоят пять разных бед (наименование неизвестно, вторая колонка
+-- не узнана, шапка глубже сорока строк, читатель отдал один столбец, ни одного
+-- известного слова). Причина живёт один прогон, если её не сохранить (правило 16).
+-- Колонка nullable и без default — правка каталога, таблица не переписывается.
+alter table lib_files add column if not exists header_miss    text;
 create index if not exists lib_files_class on lib_files (doc_class);
 
 do $$ begin

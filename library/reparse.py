@@ -237,11 +237,13 @@ def main() -> int:
                 cur.execute("""
                     update lib_files set status = %s, rows_found = %s, chars = %s,
                            segment_id = %s, parse_path = %s, header_found = %s,
+                           header_miss = %s,
                            doc_class = %s, class_rule = %s, text_lines = %s, item_lines = %s,
                            parser_version = %s, reason = %s, processed_at = now()
                      where file_id = %s""",
                     (rec["status"], rec["rows_found"], rec["chars"], rec["segment_id"],
-                     rec["parse_path"], rec["header_found"], rec["doc_class"], rec["class_rule"],
+                     rec["parse_path"], rec["header_found"], rec.get("header_miss"),
+                     rec["doc_class"], rec["class_rule"],
                      rec["text_lines"], rec["item_lines"], indexer.PARSER_VERSION,
                      indexer.pg(rec["reason"]), rec["file_id"]))
             c.commit()
