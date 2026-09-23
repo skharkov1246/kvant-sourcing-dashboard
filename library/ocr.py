@@ -248,7 +248,7 @@ select file_id,
          and coalesce(rows_found, 0) > 0))"""
 
 
-def отбор(есть_pdf_mixed: bool = True) -> str:
+def отбор(есть_pdf_mixed: bool = True, есть_pdf_pages: bool = True) -> str:
     """Запрос отбора под то, что есть в базе.
 
     БАЗА МОЖЕТ ОТСТАВАТЬ ОТ СХЕМЫ. Колонку pdf_mixed добавляет schema_junk.sql, а
@@ -258,12 +258,24 @@ def отбор(есть_pdf_mixed: bool = True) -> str:
     узнать, поэтому постранично берётся ЛЮБОЙ разобранный PDF с позициями, а
     страницы-сканы находит само распознавание (indexer.страницы_сканов); файл
     без сканов получает отметку и больше не берётся. Сканы целиком — как прежде.
+
+    КОЛОНКА ЕСТЬ — ЕЩЁ НЕ ЗНАЧИТ, ЧТО ЗАПОЛНЕНА. Миграцию применили в тот же
+    вечер, и pdf_mixed появилась пустой у всех прежних файлов: разбор, писавший
+    её, до базы не доходил. Отбор «pdf_mixed is true» не нашёл бы ни одного.
+    Разбор ставит pdf_mixed только смешанному, а pdf_pages — любому PDF, у
+    которого посчитал страницы; поэтому «страниц не считали» (pdf_pages пусто)
+    значит «неизвестно», и такой файл тоже идёт постранично. Не берётся только
+    посчитанный и не смешанный.
     """
+    if есть_pdf_mixed and есть_pdf_pages:
+        смешанный = "(pdf_mixed is true or pdf_pages is null)"
+    else:
+        смешанный = "true"
     return (_ОТБОР.replace("{КАРТИНКИ}", indexer.КАРТИНКИ_ВНУТРИ)
             .replace("{ПОСТРАНИЧНО}", ПОСТРАНИЧНО).replace("{ЦЕЛИКОМ}", ЦЕЛИКОМ)
             .replace("{СМЕШАННЫЙ_БЕЗ_ПОЗИЦИЙ}",
                      "pdf_mixed is true" if есть_pdf_mixed else "false")
-            .replace("{СМЕШАННЫЙ}", "pdf_mixed is true" if есть_pdf_mixed else "true"))
+            .replace("{СМЕШАННЫЙ}", смешанный))
 
 
 CANDIDATES = отбор()
@@ -936,12 +948,14 @@ def main() -> int:
                   file=sys.stderr)
             conn.close()
             return 2
-        есть_pdf_mixed = "pdf_mixed" in indexer.колонки_базы(cur, ("pdf_mixed",))
-        if not есть_pdf_mixed:
-            print("::warning::в lib_files нет колонки pdf_mixed (миграция schema_junk.sql "
-                  "не применена): смешанный PDF по базе не узнать, постранично берутся все "
-                  "разобранные PDF с позициями, сканы ищет само распознавание", flush=True)
-        cur.execute(ПОВТОР_ОТКАЗАВШИХ if ПОВТОР else отбор(есть_pdf_mixed),
+        есть = indexer.колонки_базы(cur, ("pdf_mixed", "pdf_pages"))
+        if len(есть) < 2:
+            print(f"::warning::в lib_files нет колонок {', '.join(sorted({'pdf_mixed', 'pdf_pages'} - есть))} "
+                  "(миграция schema_junk.sql не применена): смешанный PDF по базе не узнать, "
+                  "постранично берутся все разобранные PDF с позициями, сканы ищет само "
+                  "распознавание", flush=True)
+        cur.execute(ПОВТОР_ОТКАЗАВШИХ if ПОВТОР
+                    else отбор("pdf_mixed" in есть, "pdf_pages" in есть),
                     (list(ПРИЧИНЫ_ОКРУЖЕНИЯ),) if ПОВТОР else None)
         want = {r[0]: r[1] for r in cur.fetchall()
                 if not ТОЛЬКО_РЕЖИМ or r[1] == ТОЛЬКО_РЕЖИМ}

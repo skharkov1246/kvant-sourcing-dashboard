@@ -82,7 +82,7 @@ def cur():
     c.execute("""create table lib_files (file_id text primary key, deal_id text,
                    status text, kind text, chars int, rows_found int, segment_id text,
                    reason text, ocr_at timestamptz, ocr_chars int, parser_version smallint,
-                   processed_at timestamptz, pdf_mixed boolean)""")
+                   processed_at timestamptz, pdf_mixed boolean, pdf_pages int)""")
     c.execute("""create table lib_demand (id bigserial primary key, segment_id text,
                    deal_id text, item_name text, oem text, part_number text, qty numeric,
                    unit text, source text, source_file text, segment_rule text)""")
@@ -119,15 +119,20 @@ def test_отбор_смешанный_с_позициями_берёт_по_с�
       ('7', '1', 'не скачался', 'pdf', 0, null, null, null),
       ('8', '1', 'разобран', 'docx', 3, %s, null, null),
       ('9', '1', 'разобран', 'pdf', 12, null, true, now()),
-      ('10', '1', 'разобран', 'pdf', 12, null, null, null)""",
+      ('10', '1', 'разобран', 'pdf', 12, null, null, null),
+      ('11', '1', 'разобран', 'pdf', 7, null, null, null)""",
           f"{ocr.indexer.КАРТИНКИ_ВНУТРИ} 2 — читаются распознаванием",
           f"{ocr.indexer.КАРТИНКИ_ВНУТРИ} 1 — читаются распознаванием")
+    # Страницы посчитаны у 1 и 10; у 11 — нет (разобран до того, как колонку
+    # стали писать): смешан он или нет, по базе не знать.
+    cur.execute("update lib_files set pdf_pages = 3 where file_id in ('1', '10')")
     cur.execute(ocr.CANDIDATES)
     Ц, П = ocr.ЦЕЛИКОМ, ocr.ПОСТРАНИЧНО
     # 1 — смешанный с позициями: по страницам. 8 — сканы внутри документа с
-    # позициями: слить нечем, не берётся. 9 — уже распознан. 10 — не смешанный.
-    assert sorted(cur.fetchall()) == [("1", П, 12), ("2", Ц, 0), ("3", Ц, 0),
-                                      ("4", Ц, 0), ("5", Ц, 0)]
+    # позициями: слить нечем, не берётся. 9 — уже распознан. 10 — посчитан и не
+    # смешанный. 11 — неизвестно: по страницам, сканы найдёт распознавание.
+    assert sorted(cur.fetchall()) == [("1", П, 12), ("11", П, 7), ("2", Ц, 0),
+                                      ("3", Ц, 0), ("4", Ц, 0), ("5", Ц, 0)]
 
 
 def test_переразметка_не_снимает_пометку_замены(cur):
@@ -344,4 +349,4 @@ def test_без_колонки_pdf_mixed_отбор_не_падает(cur, monke
     assert ocr.main() == 0
     assert sorted(распознаны) == [("1", ocr.ПОСТРАНИЧНО), ("3", ocr.ЦЕЛИКОМ)]
     вывод = capsys.readouterr().out
-    assert "нет колонки pdf_mixed" in вывод and "сканов не нашлось" in вывод
+    assert "нет колонок pdf_mixed" in вывод and "сканов не нашлось" in вывод

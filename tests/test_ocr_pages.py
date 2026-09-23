@@ -219,7 +219,7 @@ def cur():
     c.execute("""create table lib_files (file_id text primary key, deal_id text,
                    status text, kind text, chars int, rows_found int, segment_id text,
                    reason text, ocr_at timestamptz, ocr_chars int, parser_version smallint,
-                   processed_at timestamptz, pdf_mixed boolean)""")
+                   processed_at timestamptz, pdf_mixed boolean, pdf_pages int)""")
     c.execute("""create table lib_demand (id bigint generated always as identity primary key,
                    segment_id text, deal_id text, item_name text not null, oem text,
                    part_number text, qty numeric, unit text, source text, source_file text,
