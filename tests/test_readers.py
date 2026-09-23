@@ -76,6 +76,24 @@ def test_rtf_разворачивает_кириллицу_и_снимает_р�
     assert "Насос ЦНС-38" in текст, текст
     assert "Задвижка" in текст, текст
     assert "fonttbl" not in текст and "\\f0" not in текст, "разметка просочилась"
+    # НАЗВАНИЯ ШРИФТОВ — главное. Прежняя редакция проверяла только слово
+    # «fonttbl», которое снимается и без вырезания группы, и пропустила утечку:
+    # в текст шли «Arial;», «Times New Roman;» — и становились «позициями».
+    assert "Arial" not in текст, f"таблица шрифтов утекла в текст: {текст!r}"
+
+
+def test_rtf_из_libreoffice_не_тащит_служебные_группы():
+    """Настоящий RTF из LibreOffice: шрифты, цвета, стили, генератор — вложенные
+    группы. Регулярка вложенность не считает; нашёл агент Word 23.09.2026."""
+    b = (rb"{\rtf1\ansi\ansicpg1251\deff0\deflang1049"
+         rb"{\fonttbl{\f0\froman\fprq2\fcharset204 Times New Roman;}"
+         rb"{\f1\froman\fprq2\fcharset2 Symbol;}{\f2\fswiss Arial;}}"
+         rb"{\colortbl;\red0\green0\blue0;}"
+         rb"{\stylesheet{\s0\snext0 Normal;}{\s1\sbasedon0 Heading 1;}}"
+         rb"{\*\generator LibreOffice/7.6;}"
+         rb"\f0\fs24 \'cd\'e0\'f1\'ee\'f1 \'d6\'cd\'d1-38\par}")
+    текст = readers.text_from_rtf(b)
+    assert текст == "Насос ЦНС-38", текст
 
 
 def test_html_снимает_скрипты_вместе_с_содержимым():

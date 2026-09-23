@@ -108,6 +108,44 @@ def rows_from_text(b: bytes) -> list[list[str]]:
     return out
 
 
+def вырезать_группы(текст: str, имена: tuple[str, ...]) -> str:
+    """Вырезать группы RTF вида {\имя ...} и {\*\имя ...} с любой вложенностью.
+
+    Регулярка вложенность не считает: группа шрифтов содержит по группе на
+    шрифт, а группа стилей — ещё глубже. Поэтому скобки считаются вручную.
+    Экранированные \{ и \} скобками не считаются.
+    """
+    out: list[str] = []
+    i, n = 0, len(текст)
+    while i < n:
+        if текст[i] == "{":
+            j = i + 1
+            if текст.startswith("\\*", j):
+                j += 2
+            if текст.startswith("\\", j):
+                m = re.match(r"[a-zA-Z]+", текст[j + 1:])
+                if m and m.group(0) in имена:
+                    уровень, k = 0, i
+                    while k < n:
+                        ch = текст[k]
+                        if ch == "\\":
+                            k += 2
+                            continue
+                        if ch == "{":
+                            уровень += 1
+                        elif ch == "}":
+                            уровень -= 1
+                            if уровень == 0:
+                                break
+                        k += 1
+                    out.append(" ")
+                    i = k + 1
+                    continue
+        out.append(текст[i])
+        i += 1
+    return "".join(out)
+
+
 def text_from_rtf(b: bytes) -> str:
     """RTF в простой текст: разворот кодов, снятие управляющих слов.
 
@@ -116,8 +154,15 @@ def text_from_rtf(b: bytes) -> str:
     строки. Группы со шрифтами и цветами выбрасываются целиком.
     """
     текст = b.decode("cp1251", errors="replace")
-    текст = re.sub(r"\{\\\*?\\(?:fonttbl|colortbl|stylesheet|info|pict)[^{}]*"
-                   r"(?:\{[^{}]*\}[^{}]*)*\}", " ", текст)
+    # СЛУЖЕБНЫЕ ГРУППЫ ВЫРЕЗАЮТСЯ ЦЕЛИКОМ, с любой вложенностью. Прежняя регулярка
+    # требовала ДВА обратных слэша перед именем группы — `{\\fonttbl` — и на
+    # настоящем `{\fonttbl` не срабатывала: в текст утекали «Times New Roman;
+    # Symbol; Arial; Normal;». Нашёл агент Word 23.09.2026 на RTF из LibreOffice.
+    текст = вырезать_группы(текст, ("fonttbl", "colortbl", "stylesheet", "info",
+                                    "pict", "listtable", "listoverridetable",
+                                    "rsidtbl", "generator", "themedata",
+                                    "colorschememapping", "latentstyles",
+                                    "datastore", "xmlnstbl", "mmathPr"))
     текст = re.sub(r"\\u(-?\d+)\s?\??", lambda m: chr(int(m.group(1)) % 65536), текст)
     текст = re.sub(r"\\'([0-9a-fA-F]{2})",
                    lambda m: bytes([int(m.group(1), 16)]).decode("cp1251", "replace"), текст)
