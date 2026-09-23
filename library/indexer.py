@@ -455,6 +455,78 @@ def слова_шапки_без_имени(rows: list[list[str]]) -> set[str]:
     return слова
 
 
+#: Слова колонок, встреченные ЗАМЕРОМ 23.09.2026 (прогон 35842239391, 290 файлов
+#: без шапки) и правилу неизвестные. Держатся ОТДЕЛЬНО от COLS, пока сетка не
+#: покажет, сколько файлов они возвращают и не ломают ли разбор: правило сначала
+#: меряют, потом применяют (CLAUDE.md, правило 3).
+СЛОВА_ЗАМЕРА = {
+    "item_name": ("equipment", "product", "goods", "nomenclature", "товары"),
+    "part_number": ("number", "article", "catalogue", "catalog", "designation"),
+    "oem": ("origin", "make"),
+}
+
+#: Насколько глубже смотреть в варианте «шапка ниже сорока строк». Замер: семь
+#: файлов из 290 держат шапку на 41-й и 64-й строках.
+ГЛУБОКО = 200
+
+
+def колонки_строки_шире(row: list[str]) -> dict[str, int]:
+    """Колонки строки со словами замера. Только для сетки, не для разбора."""
+    found = колонки_строки(row)
+    low = [c.lower() for c in row]
+    for key, words in СЛОВА_ЗАМЕРА.items():
+        if key in found:
+            continue
+        for j, c in enumerate(low):
+            if c and any(w in c for w in words):
+                found[key] = j
+                break
+    return found
+
+
+def сетка_шапки(rows: list[list[str]]) -> set[str]:
+    """КАКИЕ ОСЛАБЛЕНИЯ ПРАВИЛА НАШЛИ БЫ ШАПКУ В ЭТОМ ФАЙЛЕ.
+
+    Ослабление порога меряется таблицей, а не одним прогоном (CLAUDE.md,
+    правило 4): счётчики уже в памяти, и пересчёт четырёх вариантов за тот же
+    проход стоит миллисекунды, а отдельный прогон на каждый — четверть часа
+    портала.
+
+    Ничего не меняет: возвращает названия вариантов, при которых шапка нашлась
+    бы. Варианты складываются — «всё сразу» считается отдельной строкой, потому
+    что пересечения между ними есть и сумма долей ответа не даёт.
+    """
+    нашли: set[str] = set()
+    if not rows:
+        return нашли
+
+    def проходит(row, *, шире: bool, одной_хватит: bool, с_ценой: bool) -> bool:
+        found = колонки_строки_шире(row) if шире else колонки_строки(row)
+        if "item_name" not in found:
+            return False
+        n = len(found)
+        if с_ценой:
+            n += len(quotes.колонки_цены(row))
+        return n >= (1 if одной_хватит else 2)
+
+    варианты = (
+        ("цена считается колонкой", dict(шире=False, одной_хватит=False, с_ценой=True)),
+        ("одного наименования хватает", dict(шире=False, одной_хватит=True, с_ценой=False)),
+        ("слова замера в словаре", dict(шире=True, одной_хватит=False, с_ценой=False)),
+        ("всё сразу", dict(шире=True, одной_хватит=True, с_ценой=True)),
+    )
+    for имя, как in варианты:
+        if any(проходит(r, **как) for r in rows[:ШАПКА_В_ПЕРВЫХ]):
+            нашли.add(имя)
+    # Глубина считается на исходном правиле: иначе не видно её собственного вклада.
+    for row in rows[ШАПКА_В_ПЕРВЫХ:ГЛУБОКО]:
+        found = колонки_строки(row)
+        if "item_name" in found and len(found) >= 2:
+            нашли.add(f"смотреть {ГЛУБОКО} строк вместо {ШАПКА_В_ПЕРВЫХ}")
+            break
+    return нашли
+
+
 def почему_нет_шапки(rows: list[list[str]]) -> str:
     """ПОЧЕМУ шапка не узнана — словами, годными для починки.
 
@@ -839,7 +911,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            "kind": None, "size_bytes": None, "status": "не скачался", "reason": None,
            "chars": 0, "rows_found": 0, "segment_id": None, "sha256": None,
            "parse_path": None, "header_found": None, "header_miss": None,
-           "header_words": None,
+           "header_words": None, "header_grid": None,
            "doc_class": None,
            "class_rule": None, "text_lines": None, "item_lines": None}
     b = download(fo)
@@ -871,6 +943,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
                     if drows:
                         rec["header_miss"] = почему_нет_шапки(drows)
                         rec["header_words"] = слова_шапки_без_имени(drows)
+                        rec["header_grid"] = сетка_шапки(drows)
                     text = text_from_docx(b)
         elif kind == "старый office":
             rows = rows_from_xls(b)
@@ -886,6 +959,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
                 if prows:
                     rec["header_miss"] = почему_нет_шапки(prows)
                     rec["header_words"] = слова_шапки_без_имени(prows)
+                    rec["header_grid"] = сетка_шапки(prows)
                 text = text_from_pdf(b)
     except Exception as e:
         rec["status"] = "формат не читаем"
@@ -910,6 +984,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         if not rec["header_found"]:
             rec["header_miss"] = почему_нет_шапки(rows)
             rec["header_words"] = слова_шапки_без_имени(rows)
+            rec["header_grid"] = сетка_шапки(rows)
     elif text:
         # ВОРОТА СПЕЦИФИКАЦИИ. До 12.09.2026 здесь любая строка длиннее восьми
         # знаков становилась позицией номенклатуры, и в спрос лёг текст извещений
