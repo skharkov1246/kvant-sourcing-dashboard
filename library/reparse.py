@@ -82,6 +82,19 @@ INDEX_CHECK = """
 select count(*) from pg_indexes
  where tablename = 'lib_demand' and indexdef like '%%source_file%%'"""
 
+# КОЛОНКИ, КОТОРЫЕ ЗАПИСЬ НАЗЫВАЕТ ИМЕНЕМ. Схема живёт в файле, а применяется
+# отдельным прогоном, и файл может уйти вперёд базы. 23.09.2026 так и вышло:
+# колонка header_miss была добавлена в library/supabase/schema_junk.sql, миграцию
+# никто не применил, и запись упала на первом же файле с причиной — УЖЕ ЗАПИСАВ
+# часть файлов в каждой из пятидесяти частей. Проверка стоит ДО обхода портала:
+# упавший прогон дешевле половины записанного.
+КОЛОНКИ_ЗАПИСИ = ("status", "rows_found", "chars", "segment_id", "parse_path",
+                  "header_found", "header_miss", "doc_class", "class_rule",
+                  "text_lines", "item_lines", "parser_version", "reason")
+COLUMN_CHECK = """
+select column_name from information_schema.columns
+ where table_name = 'lib_files' and column_name = any(%s)"""
+
 # ЦЕНЫ ДО ПЕРЕРАЗБОРА, ПО ФАЙЛАМ. Без них решение о записи принимать нечем.
 #
 # Прогон сравнивал только ПОЗИЦИИ и называл «хуже» всякий файл, где их стало
@@ -129,6 +142,15 @@ def main() -> int:
             print("нет индекса lib_demand(source_file): выборка старых строк файла превратится "
                   "в проход по всей таблице. Примените миграцию перед переразбором.",
                   file=sys.stderr)
+            conn.close()
+            return 2
+        cur.execute(COLUMN_CHECK, (list(КОЛОНКИ_ЗАПИСИ),))
+        нет = sorted(set(КОЛОНКИ_ЗАПИСИ) - {r[0] for r in cur.fetchall()})
+        if нет:
+            print(f"в lib_files нет колонок: {', '.join(нет)}. Схема в файле ушла вперёд "
+                  "базы — примените миграции прогоном «ZIP base — apply DB migrations» "
+                  "и повторите. Прогон остановлен ДО записи, чтобы не оставить "
+                  "половину переразобранных файлов.", file=sys.stderr)
             conn.close()
             return 2
         cur.execute(CANDIDATES, (indexer.PARSER_VERSION, list(KINDS), ORIGIN))
