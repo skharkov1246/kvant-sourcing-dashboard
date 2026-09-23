@@ -116,6 +116,16 @@ alter table lib_files add column if not exists header_miss    text;
 -- сработала и какую чинить. Замер 23.09.2026: «прочее» 410 файлов, все 410 без
 -- позиций, и что это за файлы, база не знает.
 alter table lib_files add column if not exists subkind         text;
+-- ПАПКА ДОКУМЕНТА ПО СОДЕРЖИМОМУ. Требование владельца 23.09.2026: различать
+-- предложения поставщиков нам, запросы заказчиков нам и наши исходящие
+-- предложения — и складывать раздельно. Сторона по названию поля (side) это
+-- подсказка, а не ответ: поле «КП поставщика» бывает заполнено нашим же ТКП.
+-- doc_kind_why хранит, какие признаки сработали, — без этого ошибку классификатора
+-- не разобрать (правило 16: сохраняй, почему получилось значение).
+alter table lib_files add column if not exists doc_kind        text;
+alter table lib_files add column if not exists doc_kind_conf   real;
+alter table lib_files add column if not exists doc_kind_why    text;
+create index if not exists lib_files_doc_kind on lib_files (doc_kind);
 alter table lib_files add column if not exists pdf_pages       int;
 alter table lib_files add column if not exists pdf_pages_text  int;
 alter table lib_files add column if not exists pdf_pages_lost  int;

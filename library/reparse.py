@@ -107,7 +107,7 @@ select count(*) from pg_indexes
                   "header_found", "header_miss", "doc_class", "class_rule",
                   "text_lines", "item_lines", "parser_version", "reason",
                   "pdf_pages", "pdf_pages_text", "pdf_pages_lost", "pdf_mixed",
-                  "subkind")
+                  "subkind", "doc_kind", "doc_kind_conf", "doc_kind_why")
 COLUMN_CHECK = """
 select column_name from information_schema.columns
  where table_name = 'lib_files' and column_name = any(%s)"""
@@ -295,6 +295,7 @@ def main() -> int:
                            segment_id = %s, parse_path = %s, header_found = %s,
                            header_miss = %s, pdf_pages = %s, pdf_pages_text = %s,
                            pdf_pages_lost = %s, pdf_mixed = %s, subkind = %s,
+                           doc_kind = %s, doc_kind_conf = %s, doc_kind_why = %s,
                            doc_class = %s, class_rule = %s, text_lines = %s, item_lines = %s,
                            parser_version = %s, reason = %s, processed_at = now()
                      where file_id = %s""",
@@ -302,6 +303,8 @@ def main() -> int:
                      rec["parse_path"], rec["header_found"], rec.get("header_miss"),
                      rec.get("pdf_pages"), rec.get("pdf_pages_text"),
                      rec.get("pdf_pages_lost"), rec.get("pdf_mixed"), rec.get("subkind"),
+                     rec.get("doc_kind"), rec.get("doc_kind_conf"),
+                     indexer.pg(rec.get("doc_kind_why"))[:300] or None,
                      rec["doc_class"], rec["class_rule"],
                      rec["text_lines"], rec["item_lines"], indexer.PARSER_VERSION,
                      indexer.pg(rec["reason"]), rec["file_id"]))

@@ -1505,7 +1505,7 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            "parse_path": None, "header_found": None, "header_miss": None,
            "header_words": None, "header_grid": None, "subkind": None,
            "pdf_pages": None, "pdf_pages_text": None, "pdf_pages_lost": None,
-           "pdf_mixed": None,
+           "pdf_mixed": None, "doc_kind": None, "doc_kind_conf": None, "doc_kind_why": None,
            "doc_class": None,
            "class_rule": None, "text_lines": None, "item_lines": None}
     b = download(fo, rec)
@@ -1765,7 +1765,8 @@ def main() -> int:
                        chars, rows_found, segment_id, sha256,
                        parse_path, header_found, header_miss, doc_class, class_rule,
                        text_lines, item_lines, parser_version,
-                       pdf_pages, pdf_pages_text, pdf_pages_lost, pdf_mixed, subkind)
+                       pdf_pages, pdf_pages_text, pdf_pages_lost, pdf_mixed, subkind,
+                       doc_kind, doc_kind_conf, doc_kind_why)
                     values %s
                     on conflict (file_id) do update set
                       field_title = excluded.field_title, side = excluded.side,
@@ -1777,6 +1778,8 @@ def main() -> int:
                       pdf_pages_text = excluded.pdf_pages_text,
                       pdf_pages_lost = excluded.pdf_pages_lost,
                       pdf_mixed = excluded.pdf_mixed, subkind = excluded.subkind,
+                      doc_kind = excluded.doc_kind, doc_kind_conf = excluded.doc_kind_conf,
+                      doc_kind_why = excluded.doc_kind_why,
                       doc_class = excluded.doc_class, class_rule = excluded.class_rule,
                       text_lines = excluded.text_lines, item_lines = excluded.item_lines,
                       parser_version = excluded.parser_version,
@@ -1803,7 +1806,9 @@ def main() -> int:
                               rec["class_rule"], rec["text_lines"], rec["item_lines"],
                               PARSER_VERSION, rec.get("pdf_pages"),
                               rec.get("pdf_pages_text"), rec.get("pdf_pages_lost"),
-                              rec.get("pdf_mixed"), rec.get("subkind")))
+                              rec.get("pdf_mixed"), rec.get("subkind"),
+                              rec.get("doc_kind"), rec.get("doc_kind_conf"),
+                              pg(rec.get("doc_kind_why"))[:300] or None))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],
