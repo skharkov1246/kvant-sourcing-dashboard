@@ -1664,7 +1664,7 @@ def main() -> int:
                        chars, rows_found, segment_id, sha256,
                        parse_path, header_found, header_miss, doc_class, class_rule,
                        text_lines, item_lines, parser_version,
-                       pdf_pages, pdf_pages_text, pdf_pages_lost, pdf_mixed)
+                       pdf_pages, pdf_pages_text, pdf_pages_lost, pdf_mixed, subkind)
                     values %s
                     on conflict (file_id) do update set
                       field_title = excluded.field_title, side = excluded.side,
@@ -1675,7 +1675,7 @@ def main() -> int:
                       pdf_pages = excluded.pdf_pages,
                       pdf_pages_text = excluded.pdf_pages_text,
                       pdf_pages_lost = excluded.pdf_pages_lost,
-                      pdf_mixed = excluded.pdf_mixed,
+                      pdf_mixed = excluded.pdf_mixed, subkind = excluded.subkind,
                       doc_class = excluded.doc_class, class_rule = excluded.class_rule,
                       text_lines = excluded.text_lines, item_lines = excluded.item_lines,
                       parser_version = excluded.parser_version,
@@ -1702,7 +1702,7 @@ def main() -> int:
                               rec["class_rule"], rec["text_lines"], rec["item_lines"],
                               PARSER_VERSION, rec.get("pdf_pages"),
                               rec.get("pdf_pages_text"), rec.get("pdf_pages_lost"),
-                              rec.get("pdf_mixed")))
+                              rec.get("pdf_mixed"), rec.get("subkind")))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],

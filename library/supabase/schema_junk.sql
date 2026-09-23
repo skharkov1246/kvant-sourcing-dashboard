@@ -111,6 +111,11 @@ alter table lib_files add column if not exists header_miss    text;
 -- файл получает «разобран», и отбор распознавания не берёт его НИКОГДА. Сканы
 -- внутри такого файла это позиции и цены, которых никто не видел. Колонки
 -- nullable и без default — правка каталога, таблица не переписывается.
+-- ТОЧНЫЙ ФОРМАТ ФАЙЛА. Крупный вид говорит «прочее» у csv, txt, rtf, html, xml и
+-- двоичного мусора разом — по нему нельзя понять, какая стратегия чтения
+-- сработала и какую чинить. Замер 23.09.2026: «прочее» 410 файлов, все 410 без
+-- позиций, и что это за файлы, база не знает.
+alter table lib_files add column if not exists subkind         text;
 alter table lib_files add column if not exists pdf_pages       int;
 alter table lib_files add column if not exists pdf_pages_text  int;
 alter table lib_files add column if not exists pdf_pages_lost  int;

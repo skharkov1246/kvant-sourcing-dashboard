@@ -98,3 +98,32 @@ def test_индексы_печатаются_с_числом_обращений(
     assert "idx_scan" in q, "нет числа обращений"
     assert "indisunique" in q, "уникальный индекс снимать нельзя, а его не видно"
     assert "pg_relation_size" in q and "limit" in q.lower()
+
+
+def test_потери_разложены_и_по_точному_формату():
+    """«Прочее» — это csv, txt, rtf, html, xml и мусор разом: 410 файлов.
+
+    По крупному виду не видно, какая стратегия чтения окупилась, а какую чинить.
+    """
+    q = запрос("ПОТЕРИ_ПО_ПОДВИДУ")
+    assert "subkind" in q, "нет разреза по точному формату"
+    assert "coalesce(subkind, '(ещё не перечитан)')" in q, \
+        "старые записи без подвида растворятся в прочих"
+    assert "filter (where coalesce(rows_found, 0) = 0)" in q
+
+
+def test_подвид_доезжает_до_базы_обеими_записями():
+    """Правило 14: колонка, добавленная в одну запись, роняет вторую."""
+    for путь, начало, конец in (
+        ("library/indexer.py", "insert into lib_files", "processed_at = now()"),
+        ("library/reparse.py", "update lib_files set", "where file_id = %s"),
+    ):
+        часть = запрос_из(путь, начало, конец)
+        assert "subkind" in часть, f"{путь}: подвид не пишется"
+
+
+def запрос_из(путь: str, начало: str, конец: str) -> str:
+    текст = re.sub(r"(?<!\w)#[^\n]*", "",
+                   (ПУТЬ.parent.parent / путь).read_text(encoding="utf-8"))
+    i = текст.index(начало)
+    return текст[i:текст.index(конец, i) + len(конец)]
