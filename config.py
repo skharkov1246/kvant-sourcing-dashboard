@@ -41,6 +41,22 @@ _service_env = (os.getenv("SERVICE_ACCOUNT_IDS") or "").strip()
 _service_raw = "" if _service_env.lower() == SERVICE_ACCOUNT_OFF else (
     _service_env or SERVICE_ACCOUNT_DEFAULT)
 SERVICE_ACCOUNT_IDS = {u.strip() for u in _service_raw.split(",") if u.strip()}
+# ФАЙЛЫ КП СО СТОРОНЫ ПОСТАВЩИКА в карточке СП-166. Закрытый список: добавлять
+# поле сюда можно, только убедившись, что его кладёт поставщик, а не мы. «Request
+# file» — наш исходящий запрос, и считать его за полученное КП значит объявить
+# прокотированным то, что мы сами же и отправили.
+#
+# Почему КП считаются по файлам, а не по письмам: замер прогона 23.09.2026 —
+# 6 150 писем на карточках СП-166 за окно, из них входящих НОЛЬ. Ответы
+# поставщиков в карточку письмами не попадают вовсе, они лежат в этих полях.
+RFQ_QUOTE_FIELDS = {
+    "ufCrm18_1700698211875": "КП поставщика",
+    "ufCrm18_1703711961310": "Offer, old",
+    "ufCrm18_1703712059311": "Processed offer",
+    "ufCrm18_1703712074559": "Processed offer / archive",
+    "ufCrm18_1731179998": "Offer from supplier",
+}
+
 PERIOD_FLOOR = "2026-01-01"       # жёсткий пол по дате создания записей
 DEFAULT_PERIOD_ANCHOR = "2026-05-01"  # дефолтный старт отчётного окна
 

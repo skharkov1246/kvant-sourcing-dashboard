@@ -74,6 +74,10 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
             "companyId": 300 + (i % 40),
             "ufCrm18Supplier": [f"CO_{300 + (i % 40)}"],
             "_supplier": f"ООО Поставщик-{i % 40}",
+            # файл КП со стороны поставщика: по нему считается «получено КП».
+            # Признак ставит выгрузка (main._has_quote_file), поэтому здесь он
+            # задаётся готовым — как приходит в metrics.build
+            "_hasQuote": i % 3 != 2,
         })
 
     deal_stages = ["C24:NEW", "C24:PREPARATION", "C24:WON", "C24:LOSE", "C0:WON"]

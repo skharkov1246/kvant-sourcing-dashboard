@@ -486,45 +486,72 @@ def test_карточки_робота_переезжают_в_подразде�
 
 
 # ── полученные КП по неделям ─────────────────────────────────────────────────
-# Счётчик получения, а не ответа на конкретный запрос: письмо кладётся в неделю,
-# когда пришло. За КП принимается входящее письмо поставщика с вложением.
+# Источник — файл КП со стороны поставщика в карточке, а не входящее письмо:
+# замер прогона 23.09.2026 показал ноль входящих писем на карточках СП-166.
+# Неделя берётся по последнему движению карточки, другой даты в выдаче нет.
 
-def test_кп_раскладываются_по_неделям_получения():
+def test_кп_считаются_по_файлу_поставщика_а_не_по_письму():
     from tests import fixture
     d = fixture.make_dataset()
     m = fixture.build_metrics()
-    wk = m["weekly"]
-    assert all({"kp", "inb", "kpc"} <= set(w) for w in wk), (
-        "в недельном ряду должны быть все три величины по КП")
-    inside = [a for a in d["inbound_mail"]
-              if d["period"].week_index(__import__("period").parse_dt(a["dt"])) is not None]
-    assert sum(w["inb"] for w in wk) == len(inside), (
-        "сумма входящих писем по неделям разошлась с выгрузкой")
-    assert sum(w["kp"] for w in wk) == sum(1 for a in inside if a["file"])
+    ждём = sum(1 for r in d["rfqs"]
+               if r.get("_hasQuote")
+               and d["period"].week_index(period_mod.parse_dt(r.get("movedTime") or "")) is not None)
+    assert ждём > 0, "в синтетике есть карточки с файлом КП"
+    assert sum(w["kp"] for w in m["weekly"]) == ждём
 
 
-def test_кп_не_больше_входящих_и_карточек_не_больше_писем():
+def test_кп_принято_в_работу_считается_по_стадии_и_неделе_перевода():
+    """Другой факт, чем наличие файла: карточку перевели в «КП получено»."""
+    import stages as st
     from tests import fixture
-    for w in fixture.build_metrics()["weekly"]:
-        assert w["kp"] <= w["inb"], "писем с вложением не может быть больше всех входящих"
-        assert w["kpc"] <= w["kp"], "карточек с КП не может быть больше писем с вложением"
+    d = fixture.make_dataset()
+    m = fixture.build_metrics()
+    ждём = sum(1 for r in d["rfqs"]
+               if st.classify_stage(r.get("stageId", "")) == "selected"
+               and d["period"].week_index(period_mod.parse_dt(r.get("movedTime") or "")) is not None)
+    assert ждём > 0, "в синтетике есть карточки в стадии «КП получено»"
+    assert sum(w["kpa"] for w in m["weekly"]) == ждём
 
 
-def test_без_выгрузки_писем_ряд_остаётся_и_обнуляется():
-    """Отсутствие писем не должно ронять график: ряд обязан остаться на месте."""
+def test_письма_остаются_контрольным_числом_а_не_источником_кп():
+    """Входящие письма считаются отдельной величиной и в столбец КП не идут:
+    ноль писем не должен обнулять график, у которого источник другой."""
     import metrics as metrics_mod
     from tests import fixture
     d = fixture.make_dataset()
     m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
                           d["dept_a_ids"], d["names"], d["since"],
-                          d["deal_stage_names"], d["category_names"], d["user_depts"])
-    assert all(w["kp"] == 0 and w["inb"] == 0 and w["kpc"] == 0 for w in m["weekly"])
+                          d["deal_stage_names"], d["category_names"], d["user_depts"],
+                          d.get("service_ids"), None)
+    assert all(w["inb"] == 0 for w in m["weekly"])
+    assert sum(w["kp"] for w in m["weekly"]) > 0, (
+        "без писем столбец полученных КП обязан остаться: он считается по файлам"
+    )
+    с_письмами = fixture.build_metrics()["weekly"]
+    assert sum(w["inb"] for w in с_письмами) > 0
+    assert [w["kp"] for w in с_письмами] == [w["kp"] for w in m["weekly"]], (
+        "письма на счёт полученных КП влиять не должны")
 
 
 def test_горизонт_недельного_ряда_покрывает_семь_недель():
     """График показывает последние семь недель — значит ряд обязан быть не короче."""
     from tests import fixture
     assert len(fixture.build_metrics()["weekly"]) >= 7
+
+
+def test_файл_кп_отличается_от_нашего_исходящего_запроса():
+    """«Request file» — наш запрос, и за полученное КП он не считается."""
+    import config as config_mod
+    import main as main_mod
+    наш = "ufCrm18_1727423346"
+    assert наш not in config_mod.RFQ_QUOTE_FIELDS
+    поле_кп = "ufCrm18_1700698211875"
+    assert main_mod._has_quote_file({поле_кп: [{"id": 1}]}) is True
+    assert main_mod._has_quote_file({поле_кп: {"id": 1}}) is True
+    assert main_mod._has_quote_file({наш: [{"id": 1}]}) is False
+    for пусто in ([], "", None, [None]):
+        assert main_mod._has_quote_file({поле_кп: пусто}) is False, пусто
 
 
 # ── разбор писем карточек: исходящие и входящие из одной выгрузки ────────────
@@ -571,23 +598,6 @@ def test_отправлено_считается_только_по_исходя�
     assert all(e["dtx"] < "2026-05-07" for e in res["byCard"]["1000"])
     assert "1001" not in res["byCard"], (
         "карточка с одним входящим письмом исходящей переписки не имеет")
-
-
-def test_кп_принято_в_работу_считается_по_стадии_и_неделе_перевода():
-    """Четвёртый столбец — другой факт, чем письмо в ящике: карточку перевели
-    в «КП получено». Считается по текущей стадии и неделе перевода."""
-    import stages as st
-    from tests import fixture
-    d = fixture.make_dataset()
-    m = fixture.build_metrics()
-    ждём = 0
-    for r in d["rfqs"]:
-        if st.classify_stage(r.get("stageId", "")) != "selected":
-            continue
-        if d["period"].week_index(period_mod.parse_dt(r.get("movedTime", ""))) is not None:
-            ждём += 1
-    assert sum(w["kpa"] for w in m["weekly"]) == ждём
-    assert ждём > 0, "в синтетике есть карточки в стадии «КП получено»"
 
 
 def test_служебная_запись_с_подразделением_помечается():
