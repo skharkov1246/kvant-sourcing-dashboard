@@ -449,3 +449,18 @@ def test_без_каскада_книга_разбирается_как_преж
     monkeypatch.setattr(indexer, "КАСКАД", False)
     строки = [["№ лист 1 «Л»"], ["Наименование", "Кол-во", "Цена"], ["Насос ЦНС-38", "2", "1500"]]
     assert indexer.листы_книги(строки) == [строки]
+
+
+def test_каскад_пишет_свою_версию_разборщика(monkeypatch):
+    """Иначе переразбор с каскадом не возьмёт файлы, уже записанные версией 3,
+    и проверка «у скольких стало хуже» пройдёт мимо всех прочитанных файлов."""
+    import importlib
+    try:
+        monkeypatch.setenv("CASCADE", "1")
+        с_каскадом = importlib.reload(indexer).PARSER_VERSION
+        monkeypatch.setenv("CASCADE", "")
+        без = importlib.reload(indexer).PARSER_VERSION
+    finally:
+        monkeypatch.delenv("CASCADE", raising=False)
+        importlib.reload(indexer)
+    assert без == 3 and с_каскадом > без
