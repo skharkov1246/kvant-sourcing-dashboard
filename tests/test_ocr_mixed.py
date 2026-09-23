@@ -268,6 +268,9 @@ def test_запись_распознавания_на_базе(cur, monkeypatch,
     строка_сканов = next(s for s in таблица.splitlines() if "сканы распознаны" in s)
     assert строка_разбора.split()[-4:] == ["1", "—", "2", "1"]
     assert строка_сканов.split()[-4:] == ["1", "2", "5", "5"]
+    # Качество: у придуманных позиций артикула нет, количество есть у всех.
+    assert next(s for s in таблица.splitlines() if "строк с артикулом" in s).split()[-1] == "0"
+    assert next(s for s in таблица.splitlines() if "строк с количеством" in s).split()[-1] == "5"
 
     # ── запись ──
     распознаны.clear()
