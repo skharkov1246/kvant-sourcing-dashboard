@@ -107,3 +107,28 @@ def test_порог_частотного_списка_по_разным_файл
     assert m.СЛОВО.pattern.endswith("{6,}")
     assert m.СЛОВО.findall("цена") == []
     assert m.СЛОВО.findall("стоимость") == ["стоимость"]
+
+
+def test_прогон_разведки_ставит_читатели_таблиц():
+    """Разведка перечитывает файлы теми же indexer.rows_from_*, что и разбор.
+
+    Те подтягивают openpyxl и xlrd ВНУТРИ функции, поэтому нехватка библиотеки
+    не видна ни при импорте, ни при компиляции: прогон 35837112523 дошёл до
+    середины, напечатал главный ответ и упал на ModuleNotFoundError. Проверка
+    сверяет список с тем прогоном, где он заведомо полный.
+    """
+    import re
+    разведка = (ROOT / ".github" / "workflows" / "demand-sides.yml").read_text(encoding="utf-8")
+    разбор = (ROOT / ".github" / "workflows" / "library-index.yml").read_text(encoding="utf-8")
+
+    def ставит(текст: str) -> set[str]:
+        без_пояснений = "\n".join(s.split("#")[0] for s in текст.splitlines())
+        слова: set[str] = set()
+        for строка in re.findall(r"pip install[^\n]*(?:\n\s{2,}[^\n-][^\n]*)*", без_пояснений):
+            слова |= {w.split("==")[0] for w in строка.replace("\n", " ").split()}
+        return слова
+
+    нужны = {"openpyxl", "xlrd"} & ставит(разбор)
+    assert нужны == {"openpyxl", "xlrd"}, "образец сам их не ставит — сверять не с чем"
+    не_хватает = нужны - ставит(разведка)
+    assert not не_хватает, f"разведка не поставит {sorted(не_хватает)} и упадёт на середине"

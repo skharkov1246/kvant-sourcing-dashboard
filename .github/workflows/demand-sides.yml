@@ -54,7 +54,13 @@ jobs:
           cache: pip
 
       - name: Установка зависимостей
+        # openpyxl и xlrd нужны РАЗВЕДКЕ ШАПКИ: она перечитывает файлы теми же
+        # `indexer.rows_from_*`, что и разбор, а те подтягивают библиотеку внутри
+        # функции. Прогон 35837112523 упал на ModuleNotFoundError через тринадцать
+        # секунд после того, как напечатал главный ответ, — разбивка уже была в
+        # журнале, а выборка не перечиталась. Список тот же, что в library-index.
         run: pip install --quiet -r requirements.txt psycopg2-binary==2.9.10 pytest
+             openpyxl xlrd pypdf
 
       - name: Проверка секретов
         env:
