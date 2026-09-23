@@ -41,6 +41,7 @@ from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import docfilter  # noqa: E402  (после sys.path)
 import indexer  # noqa: E402
+import ocr_table  # noqa: E402  (таблица скана по координатам слов — под каскадом)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
 import quotes  # noqa: E402  (цена из распознанного текста)
 from segments import classify, name_of  # noqa: E402
@@ -202,9 +203,14 @@ select file_id from lib_files
         -- СМЕШАННЫЙ PDF: часть страниц текстовые, часть сканы. Такой файл имеет
         -- статус «разобран» и chars > 0, поэтому прежний отбор не брал его
         -- НИКОГДА — а сканы в нём это позиции и цены, которых никто не видел.
-        or pdf_mixed is true)
+        or pdf_mixed is true
+        -- СКАНЫ ВНУТРИ ДОКУМЕНТА, АРХИВА ИЛИ ПИСЬМА. По виду это не скан, и
+        -- прежний отбор не брал такой файл никогда; каскад разбора помечает его
+        -- причиной, начало которой — indexer.КАРТИНКИ_ВНУТРИ.
+        or reason like '{КАРТИНКИ}%')
    and status <> 'не скачался'
-   and coalesce(kind, '') in ('изображение', 'pdf', '')"""
+   and (coalesce(kind, '') in ('изображение', 'pdf', '')
+        or reason like '{КАРТИНКИ}%')""".replace("{КАРТИНКИ}", indexer.КАРТИНКИ_ВНУТРИ)
 
 
 #: Повтор файлов, на которых распознавание отказало ПО ВИНЕ ОКРУЖЕНИЯ. Отдельным
@@ -259,8 +265,41 @@ def ocr_image(path: str, psm: str = PSM_MAIN) -> tuple[str, str]:
     return текст, ("текста не найдено" if not текст.strip() else "")
 
 
+def распознать_картинку(path: str) -> tuple[list[list[str]], str, str]:
+    """Картинка → (строки таблицы, текст, почему пусто).
+
+    ПОД КАСКАДОМ — ТАБЛИЦА ПО КООРДИНАТАМ СЛОВ (library/ocr_table.py). Сплошной
+    текст tesseract склеивает колонки строки через пробел, и цена отделяется от
+    количества только арифметикой «кол-во × цена = сумма»: строка без суммы
+    теряет цену. Разрез по координатам ставит каждое число под свой заголовок.
+    Строки возвращаются БЕЗ ворот шапки: таблица скана продолжается на следующих
+    страницах без заголовка, и ворота ставит вызывающий — по всем страницам сразу.
+
+    Без каскада — прежний путь: блочный режим, при пустоте повтор другим.
+    """
+    if indexer.КАСКАД:
+        rows, text, _сводка = ocr_table.распознать_таблицу(path, env=СРЕДА)
+        # Сводка при успехе — служебная (уверенность, поворот), а не отказ:
+        # пусто или нет, решает сам текст.
+        if rows or text.strip():
+            return rows, text, ""
+    text, причина = ocr_image(path, PSM_MAIN)
+    if not text.strip() and "таймаут" not in причина:
+        # Вторая попытка другим режимом сегментации: на фотографии листа блочный
+        # режим иногда молчит. После таймаута не повторяем — не уложится и она.
+        text, причина2 = ocr_image(path, PSM_RETRY)
+        причина = "" if text.strip() else f"{причина}; повтор: {причина2}"
+    return [], text, причина
+
+
 def ocr_pdf(blob: bytes, tmp: str) -> tuple[str, str]:
     """PDF без текстового слоя: разворачиваем страницы в картинки и читаем их."""
+    _строки, текст, причина = ocr_pdf_подробно(blob, tmp)
+    return текст, причина
+
+
+def ocr_pdf_подробно(blob: bytes, tmp: str) -> tuple[list[list[str]], str, str]:
+    """То же, что ocr_pdf, плюс строки таблицы всех страниц подряд (под каскадом)."""
     src = os.path.join(tmp, "in.pdf")
     with open(src, "wb") as f:
         f.write(blob)
@@ -274,17 +313,79 @@ def ocr_pdf(blob: bytes, tmp: str) -> tuple[str, str]:
     страницы = [n for n in sorted(os.listdir(tmp))
                 if n.startswith("p") and n.endswith(".png")]
     if not страницы:
-        return "", "pdftoppm не дал ни одной страницы"
-    parts, причины = [], []
+        return [], "", "pdftoppm не дал ни одной страницы"
+    parts, причины, строки = [], [], []
     for name in страницы:
-        текст, причина = ocr_image(os.path.join(tmp, name))
+        if indexer.КАСКАД:
+            с, текст, причина = распознать_картинку(os.path.join(tmp, name))
+            строки += с
+        else:
+            текст, причина = ocr_image(os.path.join(tmp, name))
         parts.append(текст)
         if причина:
             причины.append(причина)
     итог = "\n".join(parts)
-    if итог.strip():
-        return итог, ""
-    return почему_пусто(причины, len(страницы))
+    if итог.strip() or строки:
+        return строки, итог, ""
+    return [], *почему_пусто(причины, len(страницы))
+
+
+def распознать_сканы(сканы: list[tuple[str, bytes]], tmp: str,
+                     ) -> tuple[list[list[str]], str, str]:
+    """Сканы из документа, архива или письма: каждый — своим путём, итог подряд."""
+    строки: list[list[str]] = []
+    тексты: list[str] = []
+    причины: list[str] = []
+    for i, (вид, байты) in enumerate(сканы):
+        каталог = os.path.join(tmp, f"s{i}")
+        os.makedirs(каталог, exist_ok=True)
+        if вид == "pdf":
+            с, т, п = ocr_pdf_подробно(байты, каталог)
+        else:
+            путь = os.path.join(каталог, "img")
+            with open(путь, "wb") as f:
+                f.write(байты)
+            с, т, п = распознать_картинку(путь)
+        строки += с
+        if т.strip():
+            тексты.append(т)
+        if п:
+            причины.append(п)
+    текст = "\n".join(тексты)
+    if текст.strip() or строки:
+        return строки, текст, ""
+    return [], *почему_пусто(причины, len(сканы))
+
+
+def таблица_скана(rec: dict, ref: dict, строки: list[list[str]], text: str) -> list[dict]:
+    """Позиции из таблицы скана — тем же разбором строк, что и у файла с таблицей.
+
+    Цена берётся из своей колонки (indexer.items_from_rows), а не арифметикой по
+    сплошной строке. Ворота шапки пройдены у вызывающего; ворота спецификации
+    таблице не нужны — у обычного разбора табличный путь их тоже не проходит.
+    """
+    items = indexer.items_from_rows(строки)
+    rec["segment_id"] = classify(text) if text else None
+    вф = quotes.валюта_файла(text)
+    fid = rec["file_id"]
+    for it in items:
+        own = classify(it.get("_row", ""))
+        it["segment_id"] = own or rec["segment_id"]
+        it["segment_rule"] = "строка" if own else ("файл" if rec["segment_id"] else None)
+        it["deal_id"] = ref["deal"]
+        it["source_file"] = fid
+        it["company"] = ref.get("company")
+        if indexer.SOURCE == "rfq":
+            quotes.подставить_валюту(it.get("_цена"), вф)
+        else:
+            it["_цена"] = None          # цены пишутся только из карточек запросов
+    rec["rows_found"] = len(items)
+    rec["status"] = "разобран по скану" if items else "пусто"
+    if not items:
+        rec["reason"] = "таблица скана без позиций"
+    if indexer.SOURCE == "rfq" and items:
+        indexer.применить_условия(items, text)
+    return items
 
 
 def почему_пусто(причины: list[str], страниц: int) -> tuple[str, str]:
@@ -307,20 +408,19 @@ def recognise(ref: dict) -> tuple[dict, list[dict]]:
         return rec, []
     kind = indexer.sniff(blob)
     rec["kind"] = kind
+    строки: list[list[str]] = []
     with tempfile.TemporaryDirectory() as tmp:
         if kind == "pdf":
-            text, причина = ocr_pdf(blob, tmp)
+            строки, text, причина = ocr_pdf_подробно(blob, tmp)
         elif kind == "изображение":
             p = os.path.join(tmp, "img")
             with open(p, "wb") as f:
                 f.write(blob)
-            text, причина = ocr_image(p, PSM_MAIN)
-            if not text.strip() and "таймаут" not in причина:
-                # Вторая попытка другим режимом сегментации: на фотографии
-                # листа блочный режим иногда молчит. После таймаута не
-                # повторяем — вторая попытка тоже не уложится.
-                text, причина2 = ocr_image(p, PSM_RETRY)
-                причина = "" if text.strip() else f"{причина}; повтор: {причина2}"
+            строки, text, причина = распознать_картинку(p)
+        elif сканы := indexer.картинки_файла(blob):
+            # Сканы внутри документа, архива или письма (indexer.картинки_файла):
+            # каскад разбора пометил файл причиной «картинки внутри:».
+            строки, text, причина = распознать_сканы(сканы, tmp)
         else:
             # РАСПОЗНАВАНИЕ НЕ ИМЕЕТ ПРАВА ПОРТИТЬ ЧУЖОЙ РЕЗУЛЬТАТ. Сюда попадают
             # файлы, у которых вид в базе был пуст: отбор берёт их как возможные
@@ -338,10 +438,12 @@ def recognise(ref: dict) -> tuple[dict, list[dict]]:
             return rec, []
 
     rec["chars"] = len(text)
-    if not text.strip():
+    if not text.strip() and not строки:
         rec["status"] = "пусто"
         rec["reason"] = причина or "распознавание не дало текста"
         return rec, []
+    if строки and indexer.header_map(строки)[0] >= 0:
+        return rec, таблица_скана(rec, ref, строки, text)
 
     # Те же ворота, что и в обычном разборе: правило одно на оба места вызова.
     lines = [ln.strip() for ln in text.splitlines()
