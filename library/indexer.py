@@ -258,18 +258,115 @@ def bx_all_by_id(method: str, params: dict, с_id: int = 0,
             return out
 
 
-def sniff(b: bytes) -> str:
+#: Подписи форматов, которые узнаются по первым байтам. Имени у вложения портала
+#: обычно нет, поэтому расширение не смотрится вовсе — только содержимое.
+ПОДПИСИ: tuple[tuple[bytes, str], ...] = (
+    (b"%PDF", "pdf"),
+    (b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1", "ole2"),      # xls, doc, msg, ppt
+    (b"\x89PNG", "png"),
+    (b"\xff\xd8\xff", "jpeg"),
+    (b"II*\x00", "tiff"), (b"MM\x00*", "tiff"),
+    (b"GIF87a", "gif"), (b"GIF89a", "gif"),
+    (b"BM", "bmp"),
+    (b"Rar!", "rar"),
+    (b"7z\xbc\xaf\x27\x1c", "7z"),
+    (b"\x1f\x8b", "gzip"),
+    (b"{\\rtf", "rtf"),
+)
+
+#: К какому крупному виду относится подвид. Крупный вид остаётся тем же, что был
+#: до 23.09.2026: по нему отбирают файлы переразбор (`KINDS`) и распознавание,
+#: и менять его значения — значит менять отбор во всех прогонах сразу.
+ВИД_ПО_ПОДВИДУ = {
+    "pdf": "pdf",
+    "xlsx": "xlsx/docx", "docx": "xlsx/docx",
+    "xls": "старый office", "doc": "старый office", "spreadsheetml": "старый office",
+    "png": "изображение", "jpeg": "изображение", "tiff": "изображение",
+    "gif": "изображение", "bmp": "изображение", "webp": "изображение",
+    "zip": "архив", "rar": "архив", "7z": "архив", "gzip": "архив",
+    "csv": "прочее", "txt": "прочее", "rtf": "прочее", "html": "прочее",
+    "xml": "прочее", "неизвестно": "прочее",
+}
+
+
+def подвид(b: bytes) -> str:
+    """ТОЧНЫЙ формат файла: от него зависит стратегия чтения.
+
+    Крупный вид («xlsx/docx», «старый office», «прочее») для выбора читателя
+    негоден: под одной вывеской лежат форматы, которые читаются по-разному и с
+    разной ценой. Замер 23.09.2026 показал три подмены:
+
+      • настоящий .zip-архив начинается с PK и опознавался как книга Excel —
+        openpyxl на нём падал, и файл ложился как «пусто»;
+      • .doc и .msg — такой же OLE2, как .xls, и уходили в xlrd, который на них
+        падает: статус «формат не читаем», ноль позиций;
+      • выгрузка 1С с расширением .xls — это XML Spreadsheet 2003, то есть текст,
+        а не OLE2 вовсе.
+
+    Различаются также TIFF, GIF, BMP (прежде опознавались только PNG и JPEG — а
+    распознавание берёт файлы по виду «изображение»), 7z, RTF, HTML, XML и
+    простой текст.
+    """
     if b[:2] == b"PK":
-        return "xlsx/docx"
-    if b[:4] == b"%PDF":
-        return "pdf"
-    if b[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+        return внутри_zip(b)
+    for подпись, имя in ПОДПИСИ:
+        if b.startswith(подпись):
+            return "ole2_разобрать" if имя == "ole2" else имя
+    if b[:4] == b"RIFF" and b[8:12] == b"WEBP":
+        return "webp"
+    return по_тексту(b)
+
+
+def внутри_zip(b: bytes) -> str:
+    """Что за PK-контейнер: книга, документ Word или просто архив.
+
+    Смотрим имена участников в голове файла, а не разжимаем: ZIP хранит каталог в
+    хвосте, но локальный заголовок первого участника стоит в начале, и OOXML
+    всегда кладёт туда `[Content_Types].xml` и папку `xl/` или `word/`.
+    """
+    голова = b[:8192]
+    if b"xl/" in голова or b"workbook.xml" in голова:
+        return "xlsx"
+    if b"word/" in голова or b"document.xml" in голова:
+        return "docx"
+    return "zip"
+
+
+def по_тексту(b: bytes) -> str:
+    """Текстовые форматы: их подпись — не байты, а то, что читается словами."""
+    голова = b[:4096]
+    for кодировка in ("utf-8", "cp1251"):
+        try:
+            текст = голова.decode(кодировка)
+        except UnicodeDecodeError:
+            continue
+        низ = текст.lstrip().lower()[:400]
+        if низ.startswith("<?xml") or "<workbook" in низ:
+            # XML Spreadsheet 2003: выгрузка 1С, расширение .xls, внутри текст.
+            return "spreadsheetml" if "spreadsheet" in низ or "<workbook" in низ else "xml"
+        if низ.startswith(("<!doctype html", "<html", "<head", "<body")):
+            return "html"
+        # CSV узнаётся по разделителю, повторяющемуся в первых строках одинаково.
+        строки = [s for s in текст.splitlines()[:5] if s.strip()]
+        for р in (";", "\t", ","):
+            счёт = [s.count(р) for s in строки]
+            if len(строки) >= 2 and счёт[0] >= 1 and len(set(счёт)) == 1:
+                return "csv"
+        return "txt"
+    return "неизвестно"
+
+
+def sniff(b: bytes) -> str:
+    """Крупный вид файла. Значения те же, что были: по ним идёт отбор в прогонах.
+
+    Подмены исправлены: PK-контейнер, который не книга и не документ Word, теперь
+    «архив», а не «xlsx/docx»; TIFF, GIF, BMP и WEBP — «изображение», а не
+    «прочее», и потому доходят до распознавания.
+    """
+    п = подвид(b)
+    if п == "ole2_разобрать":
         return "старый office"
-    if b[:4] in (b"\x89PNG",) or b[:3] == b"\xff\xd8\xff":
-        return "изображение"
-    if b[:4] == b"Rar!" or b[:2] == b"\x1f\x8b":
-        return "архив"
-    return "прочее"
+    return ВИД_ПО_ПОДВИДУ.get(п, "прочее")
 
 
 def rows_from_xlsx(b: bytes) -> list[list[str]]:
