@@ -94,7 +94,13 @@ select current_setting('transaction_read_only')          as только_чте�
        pg_size_pretty(pg_database_size(current_database())) as размер_базы,
        (select pg_size_pretty(sum(pg_total_relation_size(c.oid)))
           from pg_class c join pg_namespace n on n.oid = c.relnamespace
-         where n.nspname = 'public' and c.relkind = 'r')  as размер_таблиц
+         where n.nspname = 'public' and c.relkind = 'r')  as размер_таблиц,
+       -- ОТКУДА ЗАПРЕТ. «database» / «user» — поставлен ALTER DATABASE или
+       -- ALTER ROLE и сам не уйдёт; «configuration file» — настройкой сервера,
+       -- её платформа снимает сама, когда место появилось (23.09.2026: после
+       -- смены тарифа запись не вернулась, и различить это было нечем).
+       (select source from pg_settings
+         where name = 'default_transaction_read_only')    as источник_запрета
 """
 
 # ЧТО ЗАНИМАЕТ МЕСТО. База 23.09.2026 встала в режим только чтения на 1500 МБ, и
@@ -333,10 +339,11 @@ def main() -> int:
             # СОСТОЯНИЕ БАЗЫ — ПЕРВОЙ СТРОКОЙ. Если база не пишется, все прочие
             # цифры объясняются этим, и искать причину в коде незачем.
             cur.execute(СОСТОЯНИЕ_БАЗЫ)
-            чтение, реплика, размер, таблицы = cur.fetchone()
+            чтение, реплика, размер, таблицы, источник = cur.fetchone()
             пишется = "НЕТ — только чтение" if чтение == "on" else "да"
             print(f"\nСОСТОЯНИЕ БАЗЫ: запись {пишется} · реплика: {'да' if реплика else 'нет'}"
-                  f" · размер базы {размер} · таблицы public {таблицы}")
+                  f" · размер базы {размер} · таблицы public {таблицы}"
+                  + (f" · запрет задан: {источник}" if чтение == "on" else ""))
             if чтение == "on":
                 print("    Запись невозможна. У Supabase это чаще всего кончившийся диск:")
                 print("    проект переводится в режим только чтения, пока место не освободят")
