@@ -888,3 +888,36 @@ def test_служебная_запись_узнаётся_и_по_имени():
     assert config_mod.SERVICE_ACCOUNT_IDS <= got, "заданные номерами входят всегда"
     assert "2" not in config_mod.SERVICE_ACCOUNT_IDS, (
         "«Аккаунт №2» — имя, а не номер: пользователь 2 к воронке отношения не имеет")
+
+
+def test_сорсер_сделки_сильнее_руководителя_сорсинга():
+    """PR #400 ставил поле руководителя первым: отдел запросы получил, но внутри
+    отдела они легли на руководителя, а не на сорсера. Закреплено здесь."""
+    from tests import fixture
+    сорсер, руководитель = "78", "76"
+    к = _карточка_робота(fixture)
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90",
+                      fixture.SOURCER_FIELD: сорсер, fixture.HEAD_FIELD: руководитель,
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == (сорсер, "сорсер сделки")
+
+
+def test_без_сорсера_запрос_уходит_руководителю_с_отдельной_подписью():
+    """Запасное звено держит запрос в своём отделе, но подписано так, чтобы
+    его не приняли за работу руководителя руками."""
+    from tests import fixture
+    руководитель = "76"
+    к = _карточка_робота(fixture)
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90",
+                      fixture.SOURCER_FIELD: "", fixture.HEAD_FIELD: руководитель,
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert к["_owner"] == руководитель
+    assert к["_ownerBy"].startswith("руководитель сорсинга")
+
+
+def test_поле_сорсера_в_конфигурации_стоит_первым():
+    """Порядок задан в конфигурации, и именно он попадает в прод."""
+    import config as config_mod
+    коды = [f for f, _ in config_mod.DEAL_SOURCER_FIELDS]
+    assert коды[0] == "UF_CRM_1779187335", "первым обязан стоять «Сорсер», а не руководитель"
+    assert "UF_CRM_1776169420" in коды[1:]

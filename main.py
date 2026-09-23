@@ -353,9 +353,9 @@ def run(args) -> int:
     # до служебных записей цепочка до него не доходила.
     deal_index = client.deals_by_ids(parent_ids, select=[
         "ID", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "ASSIGNED_BY_ID",
-        *config.DEAL_SOURCER_FIELDS])
-    _sourcer_labels = _deal_field_labels(client, config.DEAL_SOURCER_FIELDS)
-    for _f in config.DEAL_SOURCER_FIELDS:
+        *(f for f, _ in config.DEAL_SOURCER_FIELDS)])
+    _sourcer_labels = _deal_field_labels(client, [f for f, _ in config.DEAL_SOURCER_FIELDS])
+    for _f, _ in config.DEAL_SOURCER_FIELDS:
         _filled = sum(1 for d in deal_index.values() if d.get(_f) not in (None, "", 0, "0", []))
         print(f"  поле сорсера сделки {_f} «{_sourcer_labels.get(_f, '?')}»: "
               f"заполнено у {_filled} из {len(deal_index)} сделок")
@@ -402,6 +402,10 @@ def run(args) -> int:
         print(f"  служебные записи: {_o['viaService']} карточек ({_o['viaServicePct']} %) — "
               f"завели {_o['viaServiceMade']}, записаны ответственным по {_o['viaServiceAssigned']}; "
               f"исполнитель восстановлен у {_o['serviceResolved']} ({_o['serviceResolvedPct']} %)")
+        # чем именно определён исполнитель — без этой строки ошибка PR #400
+        # (карточки легли на руководителя, а не на сорсера) не была бы видна
+        print("    чем определён: " + "; ".join(
+            f"{x['how']} {x['n']}" for x in m["origin"].get("resolvedHow") or []))
     if _o["candidates"]:
         print(f"  кандидатов в служебные записи: {_o['candidates']} "
               f"(порог {_o['candidateFloor']} карточек) — см. вкладку «Кто заводит запросы»")

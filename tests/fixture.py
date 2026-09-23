@@ -15,8 +15,10 @@ import stages as stages_mod
 DEPT_A = {"76", "77", "78", "79"}          # «Отдел поиска поставщиков»
 DEPT_B = {"90", "91"}
 SERVICE_BOT = "900"                        # служебная запись воронки пресейла
-SOURCER_FIELD = "UF_CRM_1776169420"         # поле сделки «сорсер» — как в портале
-DEAL_SOURCER_FIELDS = (SOURCER_FIELD,)
+SOURCER_FIELD = "UF_CRM_1779187335"         # поле сделки «Сорсер» — как в портале
+HEAD_FIELD = "UF_CRM_1776169420"            # поле сделки «Head of sourcing departement»
+DEAL_SOURCER_FIELDS = ((SOURCER_FIELD, "сорсер сделки"),
+                       (HEAD_FIELD, "руководитель сорсинга (сорсер в сделке не указан)"))
 SERVICE_IDS = {SERVICE_BOT}
 NAMES = {"76": "Иванов И.", "77": "Петрова А.", "78": "Сидоров С.", "79": "Кузнецов К.",
          "90": "Орлов О.", "91": "Волкова В.", SERVICE_BOT: "Робот пресейла"}
