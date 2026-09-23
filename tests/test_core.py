@@ -366,14 +366,15 @@ def test_разбор_не_падает_без_карты_подразделен
 # статистики. Исполнитель восстанавливается цепочкой: ответственный карточки →
 # владелец родительской сделки → автор карточки.
 
-def _build(service_ids):
+def _build(service_ids, sourcer_fields=None):
     import metrics as metrics_mod
     from tests import fixture
     d = fixture.make_dataset()
     return metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
                              d["dept_a_ids"], d["names"], d["since"],
                              d["deal_stage_names"], d["category_names"], d["user_depts"],
-                             service_ids)
+                             service_ids, None,
+                             fixture.DEAL_SOURCER_FIELDS if sourcer_fields is None else sourcer_fields)
 
 
 def test_служебная_запись_не_числится_исполнителем():
@@ -798,3 +799,92 @@ def test_у_обычной_карточки_цепочка_не_выполняе
     how = {x["how"] for x in m["origin"]["resolvedHow"]}
     assert "ответственный" not in how, (
         "разбор служебных карточек не может опереться на ответственного — он служебный")
+
+
+# ── сорсер сделки — первое звено для карточки робота ─────────────────────────
+# Замер 23.09.2026 (зонд v46): поле сделки «сорсер» ведёт в отдел поиска
+# поставщиков у 408 из 409 карточек робота с родительской сделкой. Кто двигал
+# карточку — 13 %, владелец сделки — 26 %, и это чаще КАМ.
+
+def _карточка_робота(fixture, **kw):
+    base = {"id": 9100, "assignedById": fixture.SERVICE_BOT, "createdBy": fixture.SERVICE_BOT,
+            "movedBy": fixture.SERVICE_BOT, "updatedBy": fixture.SERVICE_BOT,
+            "lastActivityBy": fixture.SERVICE_BOT, "stageId": "DT166_24:NEW",
+            "createdTime": "2026-06-01T10:00:00+03:00", "movedTime": "2026-06-02T10:00:00+03:00",
+            "parentId2": 880, "categoryId": 24, "title": "Запрос робота", "_supplier": "—"}
+    base.update(kw)
+    return base
+
+
+def _одна(fixture, карточка, сделка):
+    import metrics as metrics_mod
+    d = fixture.make_dataset()
+    return metrics_mod.build(d["period"], [карточка], {"880": сделка}, d["period_deals"],
+                             d["dept_a_ids"], d["names"], d["since"],
+                             d["deal_stage_names"], d["category_names"], d["user_depts"],
+                             fixture.SERVICE_IDS, None, fixture.DEAL_SOURCER_FIELDS)
+
+
+def test_карточку_робота_получает_сорсер_сделки_а_не_кам():
+    from tests import fixture
+    сорсер, кам = "77", "90"
+    к = _карточка_робота(fixture, movedBy=кам)          # двигал КАМ — это не инициатор
+    m = _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": кам, fixture.SOURCER_FIELD: сорсер,
+                          "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == (сорсер, "сорсер сделки")
+    assert [s["id"] for s in m["sourcersA"]] == [сорсер], "запрос обязан лечь в статистику сорсера"
+    assert m["kpi"]["deptA"] == 1 and m["kpi"]["outside"] == 0, (
+        "карточка робота с сорсером в сделке больше не числится вне отдела")
+
+
+def test_сорсер_сделки_служебной_записью_не_бывает():
+    """Если в поле сделки стоит сам робот — звено пропускается, а не засчитывает ему."""
+    from tests import fixture
+    сорсер = "76"
+    к = _карточка_робота(fixture, movedBy=сорсер)
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90", fixture.SOURCER_FIELD: fixture.SERVICE_BOT,
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == (сорсер, "двигал стадию")
+
+
+def test_поле_сорсера_списком_берёт_первого_живого():
+    """Поле «сотрудник» бывает множественным — портал отдаёт его списком."""
+    from tests import fixture
+    к = _карточка_робота(fixture)
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90",
+                      fixture.SOURCER_FIELD: ["0", fixture.SERVICE_BOT, "79"],
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == ("79", "сорсер сделки")
+
+
+def test_живой_ответственный_сильнее_поля_сорсера():
+    """Карточку, которую ведёт человек, цепочка не трогает — даже если в сделке
+    записан другой сорсер: правка меняет судьбу только карточек робота."""
+    from tests import fixture
+    к = _карточка_робота(fixture, assignedById="91")
+    _одна(fixture, к, {"ID": "880", "ASSIGNED_BY_ID": "90", fixture.SOURCER_FIELD: "77",
+                      "STAGE_ID": "C24:NEW", "STAGE_SEMANTIC_ID": "P"})
+    assert (к["_owner"], к["_ownerBy"]) == ("91", "ответственный")
+
+
+def test_на_синтетике_карточки_робота_уходят_сорсерам_сделки():
+    from tests import fixture
+    m = _build(fixture.SERVICE_IDS)
+    how = {x["how"]: x["n"] for x in m["origin"]["resolvedHow"]}
+    assert how.get("сорсер сделки", 0) > 0
+    без_поля = _build(fixture.SERVICE_IDS, sourcer_fields=())
+    assert m["kpi"]["deptA"] > без_поля["kpi"]["deptA"], (
+        "с полем сорсера сделки больше запросов обязано лечь в статистику отдела")
+
+
+def test_служебная_запись_узнаётся_и_по_имени():
+    """Нового робота с именем «Служебный…» разбор обязан подхватить сам."""
+    import config as config_mod
+    names = {"234": "Аккаунт №2 Служебный", "9": "Ботов Иван", "10": "Тест 3 Бот",
+             "11": "Сервисова Анна", "12": "Технический Аккаунт"}
+    got = config_mod.service_accounts(names)
+    assert {"234", "10", "12"} <= got
+    assert "9" not in got and "11" not in got, "фамилия, похожая на слово, — не робот"
+    assert config_mod.SERVICE_ACCOUNT_IDS <= got, "заданные номерами входят всегда"
+    assert "2" not in config_mod.SERVICE_ACCOUNT_IDS, (
+        "«Аккаунт №2» — имя, а не номер: пользователь 2 к воронке отношения не имеет")
