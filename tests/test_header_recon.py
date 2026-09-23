@@ -177,3 +177,51 @@ def test_любое_исключение_читателя_остаётся_вн�
     # И пустой ответ читателя — это пусто, а не None: вызывающий перебирает строки.
     assert recon.прочитать(lambda _b: None, b"") == []
     assert recon.прочитать_текст(lambda _b: None, b"") == ""
+
+
+def test_доля_причины_считается_от_выборки():
+    """Знаменатель — выборка, а не число прочитанных файлов.
+
+    Прогон 35838052594 напечатал «282  1566.7 %  файл не скачался»: в числителе
+    стояли все файлы выборки, в знаменателе — только прочитанные (18). Доля
+    больше ста процентов обесценивает и остальные строки таблицы: читатель
+    перестаёт верить числам, которые верны.
+    """
+    import collections
+    recon = модуль()
+    итог = collections.Counter({"файл не скачался: код 403": 282,
+                                "шапка ЕСТЬ, но слова правилу неизвестны": 12})
+    строки = recon.таблица_причин(итог, 300)
+    первая = next(s for s in строки if "не скачался" in s)
+    assert "94.0 %" in первая, первая
+    вторая = next(s for s in строки if "слова правилу" in s)
+    assert "4.0 %" in вторая, вторая
+    assert not any("%" in s and float(s.split("%")[0].split()[-1]) > 100 for s in строки[1:])
+
+
+def test_нескачанный_файл_называет_причину(monkeypatch):
+    """Одна строка «файл не скачался» на 282 файла не говорит, что чинить."""
+    recon = модуль()
+
+    class Ответ:
+        def __init__(self, код, тело=b"x" * 300):
+            self.status_code, self.content = код, тело
+
+    monkeypatch.setattr(recon.indexer, "bx", lambda *a, **k: {"error": "ACCESS_DENIED"})
+    b, почему = recon.скачать("1")
+    assert b is None and "ACCESS_DENIED" in почему
+
+    monkeypatch.setattr(recon.indexer, "bx", lambda *a, **k: {"result": {}})
+    b, почему = recon.скачать("2")
+    assert b is None and почему == "у файла нет адреса загрузки"
+
+    monkeypatch.setattr(recon.indexer, "bx",
+                        lambda *a, **k: {"result": {"DOWNLOAD_URL": "https://пример/1"}})
+    monkeypatch.setattr(recon.requests, "get", lambda *a, **k: Ответ(403))
+    b, почему = recon.скачать("3")
+    assert b is None and "403" in почему
+
+    monkeypatch.setattr(recon.requests, "get", lambda *a, **k: Ответ(200))
+    monkeypatch.setattr(recon.indexer, "is_login_page", lambda _b: False)
+    b, почему = recon.скачать("4")
+    assert b and почему == ""

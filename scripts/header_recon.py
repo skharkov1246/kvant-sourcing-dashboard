@@ -44,6 +44,8 @@ import collections
 import os
 import re
 import sys
+
+import requests
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -143,6 +145,55 @@ def тройка_сходится(таблица: list[list[str]]) -> bool:
     return False
 
 
+def таблица_причин(итог, всего: int) -> list[str]:
+    """Строки отчёта о причинах. ДОЛЯ — ОТ ВЫБОРКИ, А НЕ ОТ ПРОЧИТАННОГО.
+
+    Прежний знаменатель был «прочитано», а в числитель попадали и нескачанные:
+    282 из 300 при 18 прочитанных дали «1566,7 %». Такое число не просто неверно —
+    оно обесценивает всю таблицу, потому что читатель перестаёт верить и
+    остальным строкам.
+    """
+    out = ["ПРИЧИНЫ (доля — от выборки):"]
+    for причина, n in итог.most_common():
+        out.append(f"    {n:>5d}  {100 * n / max(всего, 1):5.1f} %  {причина}")
+    return out
+
+
+def скачать(file_id: str) -> tuple[bytes | None, str]:
+    """Скачать и НАЗВАТЬ причину неудачи.
+
+    `indexer.download` глотает исключения и отдаёт None: 282 файла из 300 в
+    прогоне 35838052594 свелись к одной строке «файл не скачался», по которой
+    чинить нечего. Здесь путь тот же (по id через disk.file.get — иного адреса
+    у разведки нет), но ответ портала называется.
+
+    В журнал уходят только код ответа и код ошибки портала (правило 17):
+    ни адресов, ни имён файлов.
+    """
+    try:
+        ответ = indexer.bx("disk.file.get", {"id": file_id})
+    except Exception as e:
+        return None, f"портал не ответил ({type(e).__name__})"
+    if not isinstance(ответ, dict):
+        return None, "портал ответил не словарём"
+    if ответ.get("error"):
+        return None, f"портал отказал: {ответ.get('error')}"
+    url = (ответ.get("result") or {}).get("DOWNLOAD_URL")
+    if not url:
+        return None, "у файла нет адреса загрузки"
+    try:
+        r = requests.get(url, timeout=90)
+    except Exception as e:
+        return None, f"загрузка сорвалась ({type(e).__name__})"
+    if r.status_code != 200:
+        return None, f"загрузка вернула код {r.status_code}"
+    if len(r.content) <= 200:
+        return None, "тело меньше 200 байт"
+    if indexer.is_login_page(r.content):
+        return None, "вместо файла страница входа"
+    return r.content, ""
+
+
 def прочитать(читатель, b) -> list[list[str]]:
     """Читатель, который вернёт пусто вместо исключения.
 
@@ -212,9 +263,9 @@ def main() -> int:
     слова_по_файлам: dict[str, set[str]] = collections.defaultdict(set)
     прочитано = 0
     for file_id, вид, _позиций in файлы:
-        b = indexer.download({"id": file_id})
+        b, почему = скачать(file_id)
         if not b:
-            итог["файл не скачался"] += 1
+            итог[f"файл не скачался: {почему}"] += 1
             continue
         прочитано += 1
         # ЧИТАТЕЛЬ ПО ВИДУ ФАЙЛА — ТОТ ЖЕ, ЧТО У РАЗБОРА. Свой читатель здесь
@@ -254,10 +305,8 @@ def main() -> int:
             итог["тройка «кол-во × цена = сумма» сходится — цену можно взять по форме"] += 1
 
     print(f"прочитано файлов: {прочитано} из {len(файлы)}\n")
-    print("ПРИЧИНЫ:")
-    for причина, n in итог.most_common():
-        доля = f"  {100 * n / max(прочитано, 1):5.1f} %" if прочитано else ""
-        print(f"    {n:>5d}{доля}  {причина}")
+    for строка in таблица_причин(итог, len(файлы)):
+        print(строка)
 
     частые = sorted(((len(ф), w) for w, ф in слова_по_файлам.items()
                      if len(ф) >= ПОРОГ_ФАЙЛОВ), reverse=True)
