@@ -101,16 +101,35 @@ select count(*) from pg_indexes
 # отдельным прогоном, и файл может уйти вперёд базы. 23.09.2026 так и вышло:
 # колонка header_miss была добавлена в library/supabase/schema_junk.sql, миграцию
 # никто не применил, и запись упала на первом же файле с причиной — УЖЕ ЗАПИСАВ
-# часть файлов в каждой из пятидесяти частей. Проверка стоит ДО обхода портала:
-# упавший прогон дешевле половины записанного.
-КОЛОНКИ_ЗАПИСИ = ("status", "rows_found", "chars", "segment_id", "parse_path",
-                  "header_found", "header_miss", "doc_class", "class_rule",
-                  "text_lines", "item_lines", "parser_version", "reason",
-                  "pdf_pages", "pdf_pages_text", "pdf_pages_lost", "pdf_mixed",
-                  "subkind", "doc_kind", "doc_kind_conf", "doc_kind_why", "read_chain")
-COLUMN_CHECK = """
-select column_name from information_schema.columns
- where table_name = 'lib_files' and column_name = any(%s)"""
+# часть файлов в каждой из пятидесяти частей. Проверка стоит ДО обхода портала.
+#
+# Сорта колонок — те же, что у разбора (indexer.КОЛОНКИ_ОБЯЗАТЕЛЬНЫЕ и
+# КОЛОНКИ_СВЕДЕНИЙ): нет обязательной — запись останавливается; нет сведения —
+# одно предупреждение, и UPDATE идёт без него. Остановка на сведении запрещала
+# бы переразбор цен из-за колонки, которая нужна лишь для разреза в замере.
+ОБЯЗАТЕЛЬНЫЕ_ЗАПИСИ = ("status", "rows_found", "chars", "segment_id", "parse_path",
+                       "header_found", "doc_class", "class_rule", "text_lines",
+                       "item_lines", "parser_version", "reason")
+СВЕДЕНИЯ_ЗАПИСИ = indexer.КОЛОНКИ_СВЕДЕНИЙ
+КОЛОНКИ_ЗАПИСИ = ОБЯЗАТЕЛЬНЫЕ_ЗАПИСИ + СВЕДЕНИЯ_ЗАПИСИ
+
+
+def правка_файла(колонки: tuple[str, ...]) -> str:
+    """UPDATE lib_files ровно по колонкам, которые есть в базе.
+
+    Значения — indexer.строка_файла, та же, что у вставки разбора (правило 14).
+    Колонки из indexer.НЕ_ЗАТИРАТЬ_ПУСТЫМ пустым значением не затираются: сбой
+    чтения наших компаний иначе стёр бы our_company у каждого файла прогона."""
+    сет = [(f"{к} = coalesce(%s, {к})" if к in indexer.НЕ_ЗАТИРАТЬ_ПУСТЫМ else f"{к} = %s")
+           for к in колонки]
+    return ("update lib_files set " + ", ".join(сет) + ", processed_at = now()\n"
+            " where file_id = %s")
+
+
+def значения_правки(rec: dict, колонки: tuple[str, ...]) -> tuple:
+    """Значения UPDATE в порядке колонок и ключ файла последним."""
+    return indexer.кортеж_файла(rec, колонки) + (rec["file_id"],)
+
 
 # ЦЕНЫ ДО ПЕРЕРАЗБОРА, ПО ФАЙЛАМ. Без них решение о записи принимать нечем.
 #
@@ -166,18 +185,24 @@ def main() -> int:
         # запретить ЗАМЕР из-за того, что мешает только записи. 23.09.2026 так и
         # вышло: база встала в режим только чтения, миграцию применить нельзя, и
         # моя же защита закрыла единственный оставшийся способ мерить.
-        cur.execute(COLUMN_CHECK, (list(КОЛОНКИ_ЗАПИСИ),))
-        нет = sorted(set(КОЛОНКИ_ЗАПИСИ) - {r[0] for r in cur.fetchall()})
-        if нет and APPLY:
-            print(f"в lib_files нет колонок: {', '.join(нет)}. Схема в файле ушла вперёд "
-                  "базы — примените миграции прогоном «ZIP base — apply DB migrations» "
-                  "и повторите. Прогон остановлен ДО записи, чтобы не оставить "
-                  "половину переразобранных файлов.", file=sys.stderr)
+        колонки, нет_обязательных, нет_сведений = indexer.колонки_записи(
+            indexer.колонки_базы(cur, КОЛОНКИ_ЗАПИСИ), ОБЯЗАТЕЛЬНЫЕ_ЗАПИСИ, СВЕДЕНИЯ_ЗАПИСИ)
+        if нет_обязательных and APPLY:
+            print(f"в lib_files нет обязательных колонок: {', '.join(нет_обязательных)}. "
+                  "Схема в файле ушла вперёд базы — примените миграции прогоном «ZIP base — "
+                  "apply DB migrations» и повторите. Прогон остановлен ДО записи, чтобы не "
+                  "оставить половину переразобранных файлов.", file=sys.stderr)
             conn.close()
             return 2
-        if нет:
-            print(f"::warning::в базе нет колонок {', '.join(нет)} — холостому прогону "
-                  f"они не нужны, но запись без миграции не пройдёт", flush=True)
+        if нет_сведений and APPLY:
+            print(f"::warning::в lib_files нет колонок {', '.join(нет_сведений)}: запись "
+                  "идёт без них, остальное как обычно. Примените миграции прогоном «ZIP "
+                  "base — apply DB migrations».", flush=True)
+        elif нет_обязательных or нет_сведений:
+            print(f"::warning::в базе нет колонок "
+                  f"{', '.join(нет_обязательных + нет_сведений)} — холостому прогону они не "
+                  "нужны" + (", но запись без миграции не пройдёт" if нет_обязательных
+                             else ", запись пойдёт без них"), flush=True)
         cur.execute(CANDIDATES, (НЕУДАВШИЕСЯ, list(СТАТУСЫ_НЕУДАЧИ),
                                  indexer.PARSER_VERSION, list(KINDS), ORIGIN))
         было = {r[0]: (r[1], r[2]) for r in cur.fetchall()}
@@ -260,6 +285,12 @@ def main() -> int:
     # читатель их теряет; холостой прогон каскада 23.09.2026 дал −652 строки цены
     # на первой же части, и виновника пришлось вычислять по косвенным признакам.
     цены_читателя: dict[str, list[int]] = defaultdict(lambda: [0, 0, 0, 0, 0])
+    # ПАПКУ СТАВИТ СИСТЕМА (сущность и код поля, library/doc_folder.py), а
+    # содержимое её только сверяет. Обе раскладки печатаются рядом: расхождение
+    # «поле говорит одно, содержимое — другое» и есть то, ради чего сверка идёт.
+    папки_системы: Counter = Counter()
+    цены_по_папке_системы: Counter = Counter()
+    расхождения: Counter = Counter()
     пропущено_хуже = 0
     слова_шапки: dict[str, set] = defaultdict(set)
     сетка: Counter = Counter()
@@ -303,25 +334,7 @@ def main() -> int:
                     if цены:
                         price_store.записать(cur, цены,
                                              psycopg2.extras.execute_values)
-                cur.execute("""
-                    update lib_files set status = %s, rows_found = %s, chars = %s,
-                           segment_id = %s, parse_path = %s, header_found = %s,
-                           header_miss = %s, pdf_pages = %s, pdf_pages_text = %s,
-                           pdf_pages_lost = %s, pdf_mixed = %s, subkind = %s,
-                           doc_kind = %s, doc_kind_conf = %s, doc_kind_why = %s,
-                           read_chain = %s, doc_class = %s, class_rule = %s, text_lines = %s, item_lines = %s,
-                           parser_version = %s, reason = %s, processed_at = now()
-                     where file_id = %s""",
-                    (rec["status"], rec["rows_found"], rec["chars"], rec["segment_id"],
-                     rec["parse_path"], rec["header_found"], rec.get("header_miss"),
-                     rec.get("pdf_pages"), rec.get("pdf_pages_text"),
-                     rec.get("pdf_pages_lost"), rec.get("pdf_mixed"), rec.get("subkind"),
-                     rec.get("doc_kind"), rec.get("doc_kind_conf"),
-                     indexer.pg(rec.get("doc_kind_why"))[:300] or None,
-                     indexer.pg(rec.get("read_chain"))[:200] or None,
-                     rec["doc_class"], rec["class_rule"],
-                     rec["text_lines"], rec["item_lines"], indexer.PARSER_VERSION,
-                     indexer.pg(rec["reason"]), rec["file_id"]))
+                cur.execute(правка_файла(колонки), значения_правки(rec, колонки))
             c.commit()
         finally:
             c.close()
@@ -349,8 +362,13 @@ def main() -> int:
             цены_по_читателю[читатель] += с_ценой
             for ступень in ("libreoffice", "починка", "модель"):
                 ступени[ступень] += any(ш.startswith(ступень) for ш in путь)
-            папки[rec.get("doc_kind") or "(не записана)"] += 1
-            цены_по_папке[rec.get("doc_kind") or "(не записана)"] += с_ценой
+            по_содержимому = rec.get("папка_содержимого") or "(не сверялась)"
+            папки[по_содержимому] += 1
+            цены_по_папке[по_содержимому] += с_ценой
+            папки_системы[rec.get("doc_kind") or "(не записана)"] += 1
+            цены_по_папке_системы[rec.get("doc_kind") or "(не записана)"] += с_ценой
+            if rec.get("расхождение"):
+                расхождения[(rec.get("doc_kind"), по_содержимому)] += 1
             if not items:
                 пустые[(rec.get("subkind") or rec.get("kind") or "?",
                         (rec.get("reason") or rec.get("status") or "?")[:60])] += 1
@@ -428,6 +446,14 @@ def main() -> int:
     print("\nПАПКИ ДОКУМЕНТОВ (по содержимому · файлов · цен):")
     for папка, n in папки.most_common():
         print(f"    {папка[:34]:34s} {n:>6d} {цены_по_папке[папка]:>7d}")
+    # Ключи — собственные константы кода (названия папок), только счётчики.
+    print("\nПАПКИ ПО ДАННЫМ СИСТЕМЫ (сущность и код поля · файлов · цен):")
+    for папка, n in папки_системы.most_common():
+        print(f"    {папка[:34]:34s} {n:>6d} {цены_по_папке_системы[папка]:>7d}")
+    print(f"\nРАСХОЖДЕНИЙ С СОДЕРЖИМЫМ: {sum(расхождения.values())}"
+          " (папка осталась системной, подробности — в doc_kind_why)")
+    for (поле, содержимое), n in расхождения.most_common():
+        print(f"    поле → {str(поле)[:30]:30s} содержимое → {содержимое[:30]:30s} {n:>6d}")
 
     if почему_шапки:
         # РАЗБОР ПРИЧИН ИДЁТ ТЕМ ЖЕ ПРОХОДОМ, ЧТО И ПЕРЕРАЗБОР. Отдельная разведка

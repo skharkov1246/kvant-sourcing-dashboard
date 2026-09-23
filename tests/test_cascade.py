@@ -352,29 +352,45 @@ def test_починка_текста_записывается_в_путь():
 
 # ───────────────────────────── 6. папка документа ─────────────────────────────
 
-def test_папка_пишется_в_запись():
-    rec: dict = {"side": None}
-    indexer.определить_папку(rec, "ООО «Техснаб-Пример». Кому: ООО «КВАНТ». Коммерческое "
-                                  "предложение. Предлагаем поставку: Насос ЦНС-38, 2 шт, цена "
-                                  "150 000 руб. Директор ООО «Техснаб-Пример»", [])
+@pytest.fixture
+def наши_из_битрикса(monkeypatch):
+    """Список наших компаний без портала: как будто Битрикс его уже отдал."""
+    monkeypatch.setattr(indexer, "_НАШИ", {"1": "ООО «КВАНТ»"})
+    monkeypatch.setattr(indexer, "_НАШИ_ИМЕНА",
+                        indexer.doc_kind.с_транслитом(["ООО «КВАНТ»"]))
+
+
+КП_СТРОКОЙ = ("ООО «Техснаб-Пример». Кому: ООО «КВАНТ». Коммерческое предложение. "
+              "Предлагаем поставку: Насос ЦНС-38, 2 шт, цена 150 000 руб. "
+              "Директор ООО «Техснаб-Пример»")
+
+
+def test_папка_пишется_в_запись(наши_из_битрикса):
+    """Папку ставит система; содержимое согласно — это видно в «почему»."""
+    rec: dict = {"origin": "поле запроса", "field": "ufCrm18_1731179998",
+                 "field_title": "Offer from supplier"}
+    indexer.определить_папку(rec, КП_СТРОКОЙ, [])
     assert rec["doc_kind"] == indexer.doc_kind.ПРЕДЛОЖЕНИЕ_ПОСТАВЩИКА, rec
-    assert 0 < rec["doc_kind_conf"] <= 1 and rec["doc_kind_why"]
+    assert rec["doc_kind_conf"] == 1.0 and "согласно" in rec["doc_kind_why"], rec
+    assert rec["папка_содержимого"] == rec["doc_kind"] and not rec["расхождение"]
 
 
 def test_сбой_классификатора_не_теряет_файл(monkeypatch):
     def сбой(*a, **k):
         raise ValueError("x")
     monkeypatch.setattr(indexer.doc_kind, "вид_документа", сбой)
-    rec: dict = {}
+    rec: dict = {"origin": "поле сделки", "field": "ufCrm_1633502831"}
     indexer.определить_папку(rec, "текст", [])
-    assert rec.get("doc_kind") is None and "сбой классификатора" in rec["doc_kind_why"]
+    # Папка системы на месте: сверка упала, решение системы — нет.
+    assert rec["doc_kind"] == indexer.doc_kind.ЗАПРОС_ЗАКАЗЧИКА
+    assert "сбой классификатора" in rec["doc_kind_why"]
 
 
 def test_длинный_текст_сохраняет_шапку_и_подпись(monkeypatch):
     """Классификатор видит голову и хвост: бланк и подпись — там."""
     видел = []
     monkeypatch.setattr(indexer.doc_kind, "вид_документа",
-                        lambda т, с, сторона: видел.append(т) or ("x", 0.5, "y"))
+                        lambda т, с, сторона, **k: видел.append(т) or ("x", 0.5, "y"))
     т = "БЛАНК-НАЧАЛО " + "середина " * 50000 + " ПОДПИСЬ-КОНЕЦ"
     indexer.определить_папку({}, т, [])
     assert видел[0].startswith("БЛАНК-НАЧАЛО") and видел[0].endswith("ПОДПИСЬ-КОНЕЦ")
@@ -383,37 +399,38 @@ def test_длинный_текст_сохраняет_шапку_и_подпис
 
 # ───────────────────────────── 7. запись и прогон ─────────────────────────────
 
-def _колонки_вставки() -> int:
-    код = (ROOT / "library" / "indexer.py").read_text(encoding="utf-8")
-    m = re.search(r"insert into lib_files\s*\(([^)]*)\)", код)
-    return len([к for к in m.group(1).split(",") if к.strip()])
+def _запись_файла(monkeypatch) -> dict:
+    """Запись такой, какой её отдаёт handle() (файл не скачался): все ключи на месте."""
+    monkeypatch.setattr(indexer, "download", lambda fo, rec=None: None)
+    rec, _ = indexer.handle({"fo": {"id": "5"}, "deal": "11", "origin": "поле запроса",
+                             "field": "ufCrm18_1731179998", "field_title": "Offer from supplier"})
+    rec["read_chain"] = "xlsx → таблица"
+    return rec
 
 
-def test_вставка_файла_колонок_столько_же_сколько_значений():
-    """Новая колонка в списке без значения в кортеже роняет запись всего буфера."""
-    дерево = ast.parse((ROOT / "library" / "indexer.py").read_text(encoding="utf-8"))
-    длины = [len(у.args[0].elts) for у in ast.walk(дерево)
-             if isinstance(у, ast.Call) and isinstance(у.func, ast.Attribute)
-             and у.func.attr == "append" and isinstance(у.func.value, ast.Name)
-             and у.func.value.id == "buf_files" and у.args and isinstance(у.args[0], ast.Tuple)]
-    assert длины == [_колонки_вставки()], (длины, _колонки_вставки())
-    assert "read_chain = excluded.read_chain" in (ROOT / "library" / "indexer.py").read_text()
+def test_вставка_файла_колонок_столько_же_сколько_значений(monkeypatch):
+    """Новая колонка в списке без значения в кортеже роняет запись всего буфера.
+
+    Проверяется поведением: сгенерированный запрос, его шаблон строки и кортеж
+    значений — по одному списку колонок, и путь чтения в нём есть."""
+    rec = _запись_файла(monkeypatch)
+    колонки = indexer.КОЛОНКИ_ВСТАВКИ
+    запрос, шаблон = indexer.вставка_файлов(колонки)
+    строка = indexer.кортеж_файла(rec, колонки)
+    assert шаблон.count("%s") == len(строка) == len(колонки)
+    assert "read_chain = excluded.read_chain" in запрос
+    assert строка[колонки.index("read_chain")] == "xlsx → таблица"
 
 
-def test_переразбор_пишет_путь_чтения_и_подстановки_сходятся():
-    import tests.test_reparse_wiring as w
-    код = (ROOT / "library" / "reparse.py").read_text(encoding="utf-8")
-    assert '"read_chain"' in код, "колонка не проверяется до записи"
-    дерево = ast.parse(код)
-    for у in ast.walk(дерево):
-        if (isinstance(у, ast.Call) and isinstance(у.func, ast.Attribute)
-                and у.func.attr == "execute" and len(у.args) == 2
-                and isinstance(у.args[0], ast.Constant) and "update lib_files" in у.args[0].value):
-            sql = w.без_комментариев(у.args[0].value)
-            assert "read_chain = %s" in sql
-            assert sql.count("%s") == len(у.args[1].elts)
-            return
-    raise AssertionError("update lib_files в переразборе не найден")
+def test_переразбор_пишет_путь_чтения_и_подстановки_сходятся(monkeypatch):
+    import library.reparse as r
+    assert "read_chain" in r.КОЛОНКИ_ЗАПИСИ, "колонка не проверяется до записи"
+    rec = _запись_файла(monkeypatch)
+    sql = r.правка_файла(r.КОЛОНКИ_ЗАПИСИ)
+    значения = r.значения_правки(rec, r.КОЛОНКИ_ЗАПИСИ)
+    assert "read_chain = %s" in sql
+    assert sql.count("%s") == len(значения)
+    assert значения[r.КОЛОНКИ_ЗАПИСИ.index("read_chain")] == "xlsx → таблица"
 
 
 def test_схема_добавляет_колонку_пути_чтения():
