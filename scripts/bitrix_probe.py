@@ -127,7 +127,10 @@ def след(items: list[dict], поле: str, dept: set[str]) -> tuple[int, int
 # Порядок значим: он же станет порядком звеньев восстановления, если замер
 # покажет, что след годится. Сначала тот, кто работал руками, потом тот, кого
 # записали.
-СЛЕДЫ = ["assignedById", "movedBy", "lastActivityBy", "updatedBy", "createdBy", "observers"]
+# observers убран: это СПИСОК, и `str([])` даёт «[]» — непустую строку. Прошлый
+# прогон зачёл его заполненным у всех 1500 карточек и «отличным от
+# ответственного» тоже у всех. Строка была недостоверна, в выводы не шла.
+СЛЕДЫ = ["assignedById", "movedBy", "lastActivityBy", "updatedBy", "createdBy"]
 
 
 def следы_карточки(items: list[dict], dept: set[str], поля_сотрудников: list[str]) -> None:
@@ -169,11 +172,9 @@ def чьи_карточки_вне_отдела(items: list[dict], dept: set[str
     print(f"  карточек вне отдела: {len(вне)}; учётных записей на них: {len(по_людям)}")
     for d, n_ in по_отделам.most_common(10):
         print(f"    {доля(n_, len(вне)):>20}  {d}")
-    без_отдела = [(u, n_) for u, n_ in по_людям.most_common() if not depts.get(u)]
-    if без_отдела:
-        print("  записи БЕЗ подразделения (кандидаты в служебные), id и карточек:")
-        for u, n_ in без_отдела[:8]:
-            print(f"    #{u:6} {n_}")
+    print("  учётные записи вне отдела поимённо (id · подразделение · карточек):")
+    for u, n_ in по_людям.most_common(15):
+        print(f"    #{u:6} {n_:5}  {depts.get(u) or 'подразделение не указано'}")
 
 
 def кто_стоит_ответственным(items: list[dict], dept: set[str], depts: dict[str, str]) -> None:
@@ -190,6 +191,40 @@ def кто_стоит_ответственным(items: list[dict], dept: set[st
                 print(f"      #{u:6} {n}")
         else:
             print("    записей без подразделения нет")
+
+
+def служебная_запись_за_всё_время(c: BitrixClient) -> None:
+    """Сколько карточек у заданных служебных записей БЕЗ ограничения по дате.
+
+    Прогон 23.09.2026 показал ноль за отчётное окно, и ноль был правдой ровно
+    про окно. «Карточек нет вовсе» и «карточек нет с мая» — разные утверждения,
+    и первое из второго не следует.
+    """
+    заголовок("6а. СЛУЖЕБНЫЕ ЗАПИСИ ЗА ВСЁ ВРЕМЯ ВОРОНКИ")
+    ids = sorted(config.SERVICE_ACCOUNT_IDS)
+    if not ids:
+        print("  список SERVICE_ACCOUNT_IDS пуст")
+        return
+    for uid in ids:
+        for роль in ("assignedById", "createdBy"):
+            try:
+                env = c.call_envelope("crm.item.list", {
+                    "entityTypeId": SPA,
+                    "filter": {"categoryId": CATEGORY, роль: int(uid)},
+                    "select": ["id"], "start": 0})
+                всего = env.get("total")
+            except Exception as e:                           # noqa: BLE001
+                print(f"  #{uid} {роль}: {e.__class__.__name__}")
+                continue
+            print(f"  #{uid} как {роль:14}: карточек за всё время — {всего}")
+        # и то же по всей воронке без ограничения категории
+        try:
+            env = c.call_envelope("crm.item.list", {
+                "entityTypeId": SPA, "filter": {"assignedById": int(uid)},
+                "select": ["id"], "start": 0})
+            print(f"  #{uid} ответственный во ВСЕХ категориях СП-166: {env.get('total')}")
+        except Exception as e:                               # noqa: BLE001
+            print(f"  #{uid} по всем категориям: {e.__class__.__name__}")
 
 
 def родительская_сделка(c: BitrixClient, items: list[dict], dept: set[str]) -> None:
@@ -329,6 +364,7 @@ def main() -> int:
     следы_карточки(items, dept, поля_сотрудников)
     чьи_карточки_вне_отдела(items, dept, depts_map)
     кто_стоит_ответственным(items, dept, depts_map)
+    служебная_запись_за_всё_время(c)
     родительская_сделка(c, items, dept)
     таймлайн(c, items, dept)
     история_стадий(c, items)
