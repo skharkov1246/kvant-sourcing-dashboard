@@ -186,6 +186,20 @@ def build(
             kp_file[wi] += 1
             kp_cards[wi].add(str(a_.get("cid") or ""))
 
+    # КП, принятые в работу: карточка переведена сорсером в стадию «КП получено».
+    # Это другой факт, чем письмо в ящике: разрыв между двумя столбцами и есть
+    # мера того, сколько предложений лежит неразобранными. Стадия берётся
+    # текущая, неделя — по movedTime, потому что истории переходов список
+    # смарт-процесса не отдаёт: карточка, ушедшая из «КП получено» дальше, из
+    # счёта выпадает. Для терминальной стадии это редкость, но не ноль.
+    kp_taken = [0] * n_weeks
+    for r in rfqs:
+        if classify_stage(r.get("stageId", "")) != "selected":
+            continue
+        wi = period.week_index(parse_dt(r.get("movedTime", "")))
+        if wi is not None:
+            kp_taken[wi] += 1
+
     # ---- недельная динамика A vs B
     weekly = []
     for i, w in enumerate(weeks):
@@ -197,7 +211,8 @@ def build(
                 else:
                     b += 1
         weekly.append({"w": w.label, "d": w.days, "A": a, "B": b,
-                       "kp": kp_file[i], "inb": kp_all[i], "kpc": len(kp_cards[i])})
+                       "kp": kp_file[i], "inb": kp_all[i], "kpc": len(kp_cards[i]),
+                       "kpa": kp_taken[i]})
 
     total = len(rfqs)
     a_total = sum(1 for r in rfqs if r["_owner"] in dept_a_ids)
@@ -367,8 +382,14 @@ def build(
                       "w": round(n / odept_max * 100)}
                      for d, n in owner_dept_cnt.most_common()]
 
+    # Запись, числящаяся в подразделении, на служебную не похожа: возможно, в
+    # список по ошибке внесли живого сотрудника и его работа исчезла из его же
+    # статистики. Молча это не лечится — помечаем и показываем владельцу.
     service_list = [{"uid": u, "name": names.get(u) or f"служебная запись #{u}", "n": n,
-                     "pct": _pct(n, total)} for u, n in by_service.most_common()]
+                     "pct": _pct(n, total),
+                     "dept": depts.get(u) or "",
+                     "looksHuman": bool(depts.get(u))}
+                    for u, n in by_service.most_common()]
     resolved_list = [{"uid": u, "name": names.get(u, f"user#{u}"), "n": n,
                       "dept": depts.get(u) or "подразделение не указано",
                       "src": u in dept_a_ids} for u, n in resolved_to.most_common(30)]

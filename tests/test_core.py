@@ -571,3 +571,66 @@ def test_отправлено_считается_только_по_исходя�
     assert all(e["dtx"] < "2026-05-07" for e in res["byCard"]["1000"])
     assert "1001" not in res["byCard"], (
         "карточка с одним входящим письмом исходящей переписки не имеет")
+
+
+def test_кп_принято_в_работу_считается_по_стадии_и_неделе_перевода():
+    """Четвёртый столбец — другой факт, чем письмо в ящике: карточку перевели
+    в «КП получено». Считается по текущей стадии и неделе перевода."""
+    import stages as st
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = fixture.build_metrics()
+    ждём = 0
+    for r in d["rfqs"]:
+        if st.classify_stage(r.get("stageId", "")) != "selected":
+            continue
+        if d["period"].week_index(period_mod.parse_dt(r.get("movedTime", ""))) is not None:
+            ждём += 1
+    assert sum(w["kpa"] for w in m["weekly"]) == ждём
+    assert ждём > 0, "в синтетике есть карточки в стадии «КП получено»"
+
+
+def test_служебная_запись_с_подразделением_помечается():
+    """Живого сотрудника, попавшего в список по ошибке, надо увидеть, а не
+    молча вычесть из его же статистики."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    depts = dict(d["user_depts"])
+    depts[fixture.SERVICE_BOT] = "Инжиниринг"        # как будто запись — человек
+    m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"], depts,
+                          fixture.SERVICE_IDS, d["inbound_mail"])
+    sv = m["origin"]["service"]
+    assert sv and sv[0]["looksHuman"] is True and sv[0]["dept"] == "Инжиниринг"
+    # без подразделения пометки быть не должно
+    clean = fixture.build_metrics()["origin"]["service"]
+    assert clean and clean[0]["looksHuman"] is False
+
+
+def test_список_служебных_записей_переопределяется_окружением():
+    """Состав меняется: значение в коде — только умолчание, решает окружение."""
+    import importlib
+    import os
+    import config as config_mod
+    prev = os.environ.get("SERVICE_ACCOUNT_IDS")
+    try:
+        os.environ["SERVICE_ACCOUNT_IDS"] = "7, 8 ,7"
+        assert importlib.reload(config_mod).SERVICE_ACCOUNT_IDS == {"7", "8"}
+        os.environ["SERVICE_ACCOUNT_IDS"] = "off"    # разбор отключается словом
+        assert importlib.reload(config_mod).SERVICE_ACCOUNT_IDS == set()
+        # Actions подставляет пустую строку для незаданной переменной — это
+        # «переменной нет», а не «выключено»: умолчание кода должно устоять
+        os.environ["SERVICE_ACCOUNT_IDS"] = ""
+        cfg = importlib.reload(config_mod)
+        assert cfg.SERVICE_ACCOUNT_IDS == {cfg.SERVICE_ACCOUNT_DEFAULT}
+        del os.environ["SERVICE_ACCOUNT_IDS"]        # без переменной — то же самое
+        cfg = importlib.reload(config_mod)
+        assert cfg.SERVICE_ACCOUNT_IDS == {cfg.SERVICE_ACCOUNT_DEFAULT}
+    finally:
+        if prev is None:
+            os.environ.pop("SERVICE_ACCOUNT_IDS", None)
+        else:
+            os.environ["SERVICE_ACCOUNT_IDS"] = prev
+        importlib.reload(config_mod)
