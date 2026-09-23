@@ -107,22 +107,29 @@ def test_до_миграции_разбор_пишет_обязательное(
     assert строка(cur, "status") == ("пусто",)
 
 
-def test_после_миграции_пустая_наша_компания_записанную_не_стирает(cur, запись, capsys):
+def test_после_миграции_пустая_наша_компания_записанную_не_стирает(cur, запись, capsys,
+                                                                     monkeypatch):
     for оператор in миграция_сведений():
         cur.execute(оператор)
     колонки = ix.проверить_колонки(cur)
     assert колонки == ix.КОЛОНКИ_ВСТАВКИ and "::warning::" not in capsys.readouterr().out
     записать(cur, колонки, запись(our_company="ООО «Кордален»", doc_kind="x"))
     # Сбой чтения наших компаний: our_company пусто у каждой карточки прогона.
+    monkeypatch.setattr(ix, "_НАШИ_СБОЙ", True)
     записать(cur, колонки, запись(status="пусто", doc_kind="y"))
     assert строка(cur, "our_company", "status", "doc_kind") == ("ООО «Кордален»", "пусто", "y")
     # Известная другая компания — заменяет.
     записать(cur, колонки, запись(our_company="Mirvelta Trading LLC"))
     assert строка(cur, "our_company") == ("Mirvelta Trading LLC",)
+    # Без сбоя пустое значение — факт: нашу компанию в карточке сняли.
+    monkeypatch.setattr(ix, "_НАШИ_СБОЙ", False)
+    записать(cur, колонки, запись(status="разобран"))
+    assert строка(cur, "our_company") == (None,)
 
 
-def test_переразбор_на_базе_до_и_после_миграции(cur, запись):
+def test_переразбор_на_базе_до_и_после_миграции(cur, запись, monkeypatch):
     import library.reparse as r
+    monkeypatch.setattr(r.indexer, "_НАШИ_СБОЙ", True)
     записать(cur, ix.КОЛОНКИ_ОБЯЗАТЕЛЬНЫЕ, запись())
     # До миграции: UPDATE по тем колонкам, что есть, проходит.
     колонки, нет_обяз, нет_свед = ix.колонки_записи(

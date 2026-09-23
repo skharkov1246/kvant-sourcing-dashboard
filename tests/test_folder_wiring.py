@@ -321,14 +321,19 @@ def test_значения_записи_ровно_по_колонкам_вста
     assert "our_company" in ix.КОЛОНКИ_СВЕДЕНИЙ
 
 
-def test_вставка_по_всем_колонкам_несёт_нашу_компанию_и_не_затирает_её(запись):
+def test_вставка_по_всем_колонкам_несёт_нашу_компанию_и_не_затирает_её(запись, monkeypatch):
+    monkeypatch.setattr(ix, "_НАШИ_СБОЙ", True)
     запрос, шаблон = ix.вставка_файлов(ix.КОЛОНКИ_ВСТАВКИ)
     assert _колонки_вставки(запрос) == ix.КОЛОНКИ_ВСТАВКИ
     строка = ix.кортеж_файла(запись, ix.КОЛОНКИ_ВСТАВКИ)
     assert шаблон.count("%s") == len(строка) == len(ix.КОЛОНКИ_ВСТАВКИ)
     assert строка[ix.КОЛОНКИ_ВСТАВКИ.index("our_company")] == "ООО «Кордален»"
-    # Пустая наша компания (сбой чтения списка) записанную не стирает.
+    # Пустая наша компания при сбое чтения списка записанную не стирает…
     assert "our_company = coalesce(excluded.our_company, lib_files.our_company)" in запрос
+    # …а без сбоя пустое значение — факт (компанию в карточке сняли), и оно пишется.
+    monkeypatch.setattr(ix, "_НАШИ_СБОЙ", False)
+    без_сбоя, _ = ix.вставка_файлов(ix.КОЛОНКИ_ВСТАВКИ)
+    assert "our_company = excluded.our_company" in без_сбоя and "coalesce" not in без_сбоя
     # Ключ и происхождение вложения при конфликте не переписываются, остальное — да.
     assert _обновляемые(запрос) == set(ix.КОЛОНКИ_ВСТАВКИ) - ix.НЕ_ОБНОВЛЯТЬ
     assert запрос.rstrip().endswith("processed_at = now()")
@@ -454,13 +459,16 @@ def test_без_обязательной_колонки_портал_не_обх
     assert код == 2 and обход == [] and вставки == []
 
 
-def test_переразбор_пишет_нашу_компанию_не_затирая_пустым(запись):
+def test_переразбор_пишет_нашу_компанию_не_затирая_пустым(запись, monkeypatch):
     import library.reparse as r
+    monkeypatch.setattr(r.indexer, "_НАШИ_СБОЙ", True)
     колонки = r.КОЛОНКИ_ЗАПИСИ
     sql = r.правка_файла(колонки)
     значения = r.значения_правки(запись, колонки)
     assert "our_company = coalesce(%s, our_company)" in sql
     assert sql.count("%s") == len(значения) == len(колонки) + 1
+    monkeypatch.setattr(r.indexer, "_НАШИ_СБОЙ", False)
+    assert "coalesce" not in r.правка_файла(колонки)
     assert значения[колонки.index("our_company")] == "ООО «Кордален»"
     assert значения[-1] == запись["file_id"] and sql.rstrip().endswith("where file_id = %s")
 
