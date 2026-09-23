@@ -197,7 +197,7 @@ def виновато_окружение(причина: str | None) -> bool:
 
 
 CANDIDATES = """
-select file_id from lib_files
+select file_id, status = any(%s), coalesce(rows_found, 0) from lib_files
  where ocr_at is null
    and (status = 'пусто' or kind = 'изображение'
         -- СМЕШАННЫЙ PDF: часть страниц текстовые, часть сканы. Такой файл имеет
@@ -207,10 +207,10 @@ select file_id from lib_files
         -- СКАНЫ ВНУТРИ ДОКУМЕНТА, АРХИВА ИЛИ ПИСЬМА. По виду это не скан, и
         -- прежний отбор не брал такой файл никогда; каскад разбора помечает его
         -- причиной, начало которой — indexer.КАРТИНКИ_ВНУТРИ.
-        or reason like '{КАРТИНКИ}%')
+        or reason like '{КАРТИНКИ}%%')
    and status <> 'не скачался'
    and (coalesce(kind, '') in ('изображение', 'pdf', '')
-        or reason like '{КАРТИНКИ}%')""".replace("{КАРТИНКИ}", indexer.КАРТИНКИ_ВНУТРИ)
+        or reason like '{КАРТИНКИ}%%')""".replace("{КАРТИНКИ}", indexer.КАРТИНКИ_ВНУТРИ)
 
 
 #: Повтор файлов, на которых распознавание отказало ПО ВИНЕ ОКРУЖЕНИЯ. Отдельным
@@ -225,12 +225,65 @@ select file_id from lib_files
 ПОВТОР = os.environ.get("OCR_RETRY", "") not in ("", "0", "false")
 
 ПОВТОР_ОТКАЗАВШИХ = """
-select file_id from lib_files
+select file_id, status = any(%s), coalesce(rows_found, 0) from lib_files
  where status <> 'не скачался'
    and coalesce(kind, '') in ('изображение', 'pdf', '')
    and coalesce(rows_found, 0) = 0
    and (ocr_at is null
         or exists (select 1 from unnest(%s::text[]) p where reason like p || '%%'))"""
+
+
+#: ФАЙЛ, У КОТОРОГО УЖЕ ЕСТЬ РЕЗУЛЬТАТ РАЗБОРА. В отбор он попадает смешанным PDF
+#: (pdf_mixed): текстовые страницы разобраны, сканы — нет. Распознавание
+#: разворачивает в картинки ВСЕ страницы, то есть читает файл целиком, а запись
+#: обращалась с таким файлом как с пустым: price_store снимал все цены файла,
+#: включая цены текстовых страниц, строки распознавания ложились поверх строк
+#: разбора дублями, а статус «разобран» затирался итогом распознавания — вплоть
+#: до «пусто» (найдено 23.09.2026, до первого распознавания смешанных файлов).
+#:
+#: Теперь распознанное ЗАМЕНЯЕТ разбор, только если он хуже: у предложений — при
+#: строго большем числе цен (тот же принцип, что APPLY_ONLY_BETTER у переразбора),
+#: у любого источника — если строк разбора не было вовсе. Иначе файл получает
+#: только отметку ocr_at, и разбор остаётся как был. У вложений сделок цены нет, а
+#: позиции распознанной прозы (каждая строка длиннее восьми знаков) числом с
+#: таблицей разбора не сравнимы — поэтому там строки разбора не заменяются.
+СТАТУСЫ_РАЗБОРА = ("разобран", "текст без спецификации")
+ЦЕНЫ_РАЗБОРА = """
+select source_url, count(*)::bigint
+  from lib_prices
+ where feed = %s and source_url = any(%s)
+ group by 1"""
+#: Строки разбора заменяемого файла ПОМЕЧАЮТСЯ, а не удаляются (правило 5), с
+#: ключом прогона (правило 6). Пометка ставится ДО вставки строк распознавания,
+#: и строки распознавания условием исключены — захватить их она не может.
+ПОМЕТИТЬ_РАЗБОР = """
+insert into lib_row_junk (demand_id, rule, run_id, marks)
+select id, %s, %s, 'распознавание' from lib_demand
+ where source_file = any(%s) and source is distinct from 'распознавание скана'
+on conflict (demand_id) do nothing"""
+ПРАВИЛО_ЗАМЕНЫ = "распознавание заменило разбор"
+ЗАМЕНЕНО = "есть разбор: распознанное заменило его"
+ОСТАВЛЕНО = "есть разбор: не хуже распознанного, оставлен"
+
+
+def решить_за_разбор(rec: dict, items: list[dict], цен_было: int,
+                     строк_было: int) -> tuple[dict, list[dict], str]:
+    """Распознанное у файла, который уже разобран: заменить разбор или оставить.
+
+    Возвращает запись для lib_files, позиции к записи и итог для счёта. Оставляя
+    разбор, запись получает пустой статус — тот же знак «не моё дело», по которому
+    запись lib_files сохраняет статус, строки, знаки и причину разбора. Отказ
+    окружения при этом не теряется: без него отметка ocr_at встала бы, и файл
+    выпал бы из очереди навсегда."""
+    цен_стало = sum(1 for it in items if it.get("_цена"))
+    лучше = (indexer.SOURCE == "rfq" and цен_стало > цен_было) or строк_было == 0
+    if items and лучше:
+        rec["_заменить"] = True
+        return rec, items, ЗАМЕНЕНО
+    отказ = rec.get("reason") if виновато_окружение(rec.get("reason")) else None
+    rec.update(status=None, reason=None, segment_id=None, rows_found=0,
+               _отказ_окружения=отказ)
+    return rec, [], ОСТАВЛЕНО
 
 
 def num(v, w=12):
@@ -306,10 +359,14 @@ def ocr_pdf_подробно(blob: bytes, tmp: str) -> tuple[list[list[str]], st
     try:
         subprocess.run(["pdftoppm", "-r", str(DPI), "-png", "-l", str(PAGES), src,
                         os.path.join(tmp, "p")], capture_output=True, timeout=TIMEOUT * 2)
+    # ТРИ ЗНАЧЕНИЯ НА ЛЮБОМ ВЫХОДЕ. Здесь стояло два: вызывающий распаковывает
+    # три, и первый же таймаут разворота ронял пул, а с ним весь прогон части.
     except subprocess.TimeoutExpired:
-        return "", "таймаут разворота PDF в картинки"
+        return [], "", "таймаут разворота PDF в картинки"
+    except FileNotFoundError:
+        return [], "", "pdftoppm не установлен"
     except Exception as e:
-        return "", f"сбой pdftoppm: {type(e).__name__}"
+        return [], "", f"сбой pdftoppm: {type(e).__name__}"
     страницы = [n for n in sorted(os.listdir(tmp))
                 if n.startswith("p") and n.endswith(".png")]
     if not страницы:
@@ -503,13 +560,25 @@ def main() -> int:
         print(f"часть {SHARD + 1} из {SHARDS}", flush=True)
     print(f"режим: {'ЗАПИСЬ В БАЗУ' if APPLY else 'холостой, без записи'}", flush=True)
 
+    run_id = "ocr-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    if SHARDS > 1:
+        run_id += f"-{SHARD + 1}of{SHARDS}"
     conn = indexer.connect()
     with conn.cursor() as cur:
         cur.execute(ПОВТОР_ОТКАЗАВШИХ if ПОВТОР else CANDIDATES,
-                    (list(ПРИЧИНЫ_ОКРУЖЕНИЯ),) if ПОВТОР else None)
-        want = {r[0] for r in cur.fetchall()}
+                    (list(СТАТУСЫ_РАЗБОРА), list(ПРИЧИНЫ_ОКРУЖЕНИЯ)) if ПОВТОР
+                    else (list(СТАТУСЫ_РАЗБОРА),))
+        строки_отбора = cur.fetchall()
+        want = {r[0] for r in строки_отбора}
+        с_разбором = {r[0]: int(r[2]) for r in строки_отбора if r[1]}
+        цен_разбора: dict[str, int] = {}
+        if с_разбором and indexer.SOURCE == "rfq":
+            cur.execute(ЦЕНЫ_РАЗБОРА, (price_store.FEED, sorted(с_разбором)))
+            цен_разбора = {r[0]: int(r[1]) for r in cur.fetchall()}
     conn.close()
-    print(f"кандидатов на распознавание: {len(want)}", flush=True)
+    print(f"кандидатов на распознавание: {len(want)}"
+          + (f", из них уже разобраны (смешанные PDF): {len(с_разбором)}"
+             if с_разбором else "") + f" · прогон {run_id}", flush=True)
     # ЧИСЛО ПОТОКОВ НАЗЫВАЕТСЯ ВСЕГДА, а не только когда обрезано. Обрезка в
     # прогоне не срабатывает (шаг прибивает WORKERS=4, ядер тоже 4), и молчание
     # читалось как «потоков двенадцать», хотя их четыре. Строка в журнале
@@ -563,11 +632,13 @@ def main() -> int:
     buf_files: list[tuple] = []
     buf_items: list[tuple] = []
     buf_prices: list[tuple] = []
+    buf_replace: list[str] = []
+    за_разбор: Counter = Counter()
 
     def flush() -> None:
-        nonlocal buf_files, buf_items, buf_prices
+        nonlocal buf_files, buf_items, buf_prices, buf_replace
         if not APPLY or (not buf_files and not buf_items and not buf_prices):
-            buf_files, buf_items, buf_prices = [], [], []
+            buf_files, buf_items, buf_prices, buf_replace = [], [], [], []
             return
         c = indexer.connect()
         with c.cursor() as cur:
@@ -580,6 +651,8 @@ def main() -> int:
                     c.rollback()
                     c.close()
                     raise RuntimeError(f"{price_store.ПОДСКАЗКА}. Ошибка: {e}") from e
+            if buf_replace:
+                cur.execute(ПОМЕТИТЬ_РАЗБОР, (ПРАВИЛО_ЗАМЕНЫ, run_id, buf_replace))
             if buf_items:
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_demand
@@ -614,11 +687,22 @@ def main() -> int:
                       processed_at = now()""", buf_files, page_size=500)
         c.commit()
         c.close()
-        buf_files, buf_items, buf_prices = [], [], []
+        buf_files, buf_items, buf_prices, buf_replace = [], [], [], []
 
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(recognise, mine), 1):
-            stat[rec["status"] or "не скан: статус оставлен разбору"] += 1
+            итог = None
+            if rec["file_id"] in с_разбором:
+                было = цен_разбора.get(rec["file_id"], 0)
+                rec, items, итог = решить_за_разбор(rec, items, было,
+                                                   с_разбором[rec["file_id"]])
+                за_разбор[итог] += 1
+                if rec.get("_заменить"):
+                    buf_replace.append(rec["file_id"])
+                    за_разбор["цен было у заменённых"] += было
+                    за_разбор["цен стало у заменённых"] += sum(
+                        1 for it in items if it.get("_цена"))
+            stat[итог or rec["status"] or "не скан: статус оставлен разбору"] += 1
             if rec["kind"]:
                 kinds[rec["kind"]] += 1
             if rec["status"] in ("пусто", "формат не читаем"):
@@ -629,7 +713,9 @@ def main() -> int:
             # ОТМЕТКА СТАВИТСЯ ТОЛЬКО ЗА НАСТОЯЩУЮ ПОПЫТКУ. При отказе окружения
             # (нет tesseract, таймаут) отметка не ставится, и файл остаётся в
             # очереди: иначе один неудачный прогон выбрасывает его навсегда.
-            отметка = None if виновато_окружение(rec.get("reason")) else datetime.now(timezone.utc)
+            отметка = (None if виновато_окружение(rec.get("_отказ_окружения")
+                                                 or rec.get("reason"))
+                       else datetime.now(timezone.utc))
             buf_files.append((rec["file_id"], rec["deal_id"], rec["status"], rec["kind"],
                               rec["chars"], rec["rows_found"], rec["segment_id"],
                               indexer.pg(rec["reason"]), отметка, rec["chars"],
@@ -656,6 +742,12 @@ def main() -> int:
         print(f"строк с ценой: {цен}"
               + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
     print(f"по состоянию: {dict(stat.most_common())}")
+    if за_разбор:
+        print(f"уже разобранные (смешанные PDF): заменено {за_разбор[ЗАМЕНЕНО]}"
+              f" · оставлено {за_разбор[ОСТАВЛЕНО]}"
+              + (f" · цен у заменённых {за_разбор['цен было у заменённых']} →"
+                 f" {за_разбор['цен стало у заменённых']}"
+                 if indexer.SOURCE == "rfq" else ""))
     print(f"по формату:   {dict(kinds.most_common())}")
     if причины:
         print("почему ничего не вышло (это и есть указание, что чинить):")
