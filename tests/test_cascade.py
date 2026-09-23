@@ -248,10 +248,26 @@ def test_pdf_таблица_берётся_прежним_путём_без_вт
     assert rec["pdf_pages"] == 1 and rec["read_chain"] == "pypdf:таблица"
 
 
-def test_pdf_без_таблицы_проза_и_счёт_страниц_из_read_pdf(monkeypatch):
-    """Постраничный счёт read_pdf обязан попасть в запись: по pdf_mixed
-    распознавание берёт смешанные файлы, иначе сканы внутри не прочтёт никто."""
-    monkeypatch.setattr(indexer, "страницы_pdf", lambda b, layout=False: (["Письмо без таблицы"], 2, 0))
+def test_pdf_проза_прежним_путём_pypdf(monkeypatch):
+    """Холостой переразбор 23.09.2026: проза через pdftotext разнесла ячейки по
+    строкам, и 50 PDF дали 3 цены вместо прежних. Проза снова из pypdf, а
+    read_pdf при живом тексте не зовётся вовсе."""
+    проза = "Насос ЦНС 38-176 2 шт 150000 300000 — предложение действительно 30 дней"
+    monkeypatch.setattr(indexer, "страницы_pdf", lambda b, layout=False: ([проза], 1, 0))
+
+    def нельзя(*a, **k):
+        raise AssertionError("read_pdf позван поверх живого текста pypdf")
+    monkeypatch.setattr(indexer.read_pdf, "прочитать_pdf", нельзя)
+    rec: dict = {}
+    строки, текст, _ = indexer.читать(b"%PDF-1.4 x", "pdf", rec)
+    assert строки == [] and "150000 300000" in текст
+    assert rec["read_chain"] == "pypdf:текст"
+
+
+def test_pdf_без_текста_pypdf_read_pdf_и_счёт_страниц(monkeypatch):
+    """pypdf ничего не дал (шифр, битый файл) — read_pdf, и его постраничный счёт
+    обязан попасть в запись: по pdf_mixed распознавание берёт смешанные файлы."""
+    monkeypatch.setattr(indexer, "страницы_pdf", lambda b, layout=False: ([], 2, 2))
     monkeypatch.setattr(indexer.read_pdf, "прочитать_pdf",
                         lambda b, layout=True: ответ_read_pdf("Уважаемые коллеги, КП во вложении"))
     rec: dict = {}
@@ -259,6 +275,17 @@ def test_pdf_без_таблицы_проза_и_счёт_страниц_из_re
     assert строки == [] and "КП во вложении" in текст
     assert rec["pdf_pages"] == 2 and rec["pdf_pages_text"] == 1 and rec["pdf_mixed"] is True
     assert "read_pdf:pdftotext" in rec["read_chain"]
+
+
+def test_pdf_мусор_pypdf_уступает_read_pdf(monkeypatch):
+    """Символьный шрифт: pypdf отдаёт знаки частной области, read_pdf — текст."""
+    мусор = "".join(chr(0xF000 + i % 200) for i in range(400))
+    monkeypatch.setattr(indexer, "страницы_pdf", lambda b, layout=False: ([мусор], 1, 0))
+    monkeypatch.setattr(indexer.read_pdf, "прочитать_pdf",
+                        lambda b, layout=True: ответ_read_pdf("Насос ЦНС 38-176, две штуки, цена договорная"))
+    rec: dict = {}
+    _, текст, _ = indexer.читать(b"%PDF-1.4 x", "pdf", rec)
+    assert "Насос ЦНС" in текст and rec["read_chain"].startswith("read_pdf")
 
 
 def test_таблица_из_раскладки_pdftotext_не_берётся(monkeypatch):
@@ -464,3 +491,12 @@ def test_каскад_пишет_свою_версию_разборщика(monk
         monkeypatch.delenv("CASCADE", raising=False)
         importlib.reload(indexer)
     assert без == 3 and с_каскадом > без
+
+
+def test_переразбор_сравнивает_цены_по_читателю():
+    """Итог «цен стало меньше» не говорит, какой читатель их теряет: первая часть
+    холостого прогона каскада дала −652 строки цены, и виновника (проза PDF через
+    pdftotext) пришлось вычислять косвенно."""
+    import tests.test_reparse_wiring as w
+    код = w.без_комментариев((ROOT / "library" / "reparse.py").read_text(encoding="utf-8"))
+    assert "цены_читателя[путь[0]]" in код and "ЦЕНЫ ПО ЧИТАТЕЛЮ" in код

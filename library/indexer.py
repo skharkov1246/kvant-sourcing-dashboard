@@ -1654,17 +1654,33 @@ def _родной(b: bytes, п: str, rec: dict | None, глубина: int,
             путь.append("pypdf:таблица")
             return строки, "", ""
         таблица_или_текст(строки, str, rec, "pdf")      # причина отказа шапки — в запись
-        # Прозу, счёт страниц и сканы даёт read_pdf: pdftotext, снятие пустого
-        # пароля qpdf, починка кодировки по страницам, страницы-сканы отдельно.
+        # ПРОЗА — ТОЖЕ ПРЕЖНИМ ПУТЁМ (pypdf без выравнивания). Холостой переразбор
+        # 23.09.2026 показал: pdftotext без выравнивания разносит ячейки строки
+        # таблицы по разным строкам, тройка «кол-во × цена = сумма» на одной строке
+        # не собирается, и 50 PDF дали 3 цены — у первой части прогона строк цены
+        # стало 427 вместо 1 079. pypdf строку держит.
+        текст = плоский(страницы) if ОДИН_ПРОХОД else text_from_pdf(b, rec)
+        if текст.strip() and text_quality.качество(текст)[0] >= text_quality.ПОРОГ_OCR:
+            путь.append("pypdf:текст")
+            return [], текст, ""
+        # pypdf не дал текста или дал мусор (шифр, битая таблица ссылок, символьный
+        # шрифт): тогда read_pdf — pdftotext, снятие пустого пароля qpdf, починка
+        # кодировки по страницам. Берётся, только если его текст не хуже.
         р = read_pdf.прочитать_pdf(b, layout=False)
+        свой = "\n".join(р["text"].split("\f"))
+        if свой.strip() and (not текст.strip() or text_quality.качество(свой)[0]
+                             > text_quality.качество(текст)[0]):
+            read_pdf.в_запись(р, rec)
+            путь.append(f"read_pdf:{р.get('method') or '—'}")
+            if р["reason"]:
+                путь.append(f"неполно: {р['reason'][:80]}")
+            return [], свой, ""
+        if текст.strip():
+            путь.append("pypdf:текст")
+            return [], текст, ""
         read_pdf.в_запись(р, rec)
         путь.append(f"read_pdf:{р.get('method') or '—'}")
-        if р["reason"] and р["text"].strip():
-            путь.append(f"неполно: {р['reason'][:80]}")
-        текст = "\n".join(р["text"].split("\f"))
-        if not текст.strip() and страницы and any(с.strip() for с in страницы):
-            текст = плоский(страницы)                   # read_pdf не смог, pypdf смог
-        return [], текст, "" if текст.strip() else р["reason"]
+        return [], "", р["reason"]
     if п in ("xlsx", "ods"):
         строки, текст, причина = read_sheet.прочитать_книгу(b)
         путь.append("read_sheet")
