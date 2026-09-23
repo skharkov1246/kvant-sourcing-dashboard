@@ -66,16 +66,23 @@ MIN_SHARE_DEAL = float(os.environ.get("MIN_SHARE_DEAL", "0.75"))
 # Помеченная проза приходит с признаком junk: правило словаря её смотрит,
 # правила наследования — нет.
 UNSEGMENTED = ("select d.id, d.item_name, d.oem, d.part_number, d.source_file, d.deal_id, "
-               "(j.demand_id is not null) as junk "
+               "(j.demand_id is not null) as junk, j.rule "
                "from lib_demand d "
                "left join lib_row_junk j on j.demand_id = d.id and j.revoked_at is null "
                "where d.segment_id is null")
 UNSEGMENTED_PLAIN = ("select d.id, d.item_name, d.oem, d.part_number, d.source_file, d.deal_id, "
-                     "false as junk from lib_demand d where d.segment_id is null")
+                     "false as junk, null as rule from lib_demand d where d.segment_id is null")
 
 # Снятие ошибочной пометки: строку узнал словарь, значит это номенклатура.
+#
+# СНИМАЕТСЯ ТОЛЬКО ПОМЕТКА «ЭТО ТЕКСТ, А НЕ ПОЗИЦИЯ». В lib_row_junk лежат и
+# пометки другого смысла: «строка заменена новым разбором того же файла».
+# Словарь такую строку узнаёт — она и есть номенклатура, только прежней
+# редакции, — и снятие пометки оживляло её дублем рядом с новой (перепроверка
+# 23.09.2026). Правило замены при переразборе — reparse.RULE.
+НЕ_СНИМАТЬ_СЛОВАРЁМ = ("переразбор v2",)
 UNMARK_SQL = ("update lib_row_junk set revoked_at = now(), revoked_by = 'словарь' "
-              "where demand_id = any(%s) and revoked_at is null")
+              "where demand_id = any(%s) and revoked_at is null and rule <> all(%s)")
 
 # Большинство по файлу и по сделке считаем одним запросом на группу, а не по
 # строке: строк — сотни тысяч, запрос на каждую превратил бы прогон в часы.
@@ -174,13 +181,13 @@ def main() -> int:
             chunk = cur.fetchmany(BATCH)
             if not chunk:
                 break
-            for rid, name, oem, pn, src, deal, junk in chunk:
+            for rid, name, oem, pn, src, deal, junk, правило in chunk:
                 seen += 1
                 sid = classify(" ".join(x for x in (name, oem, pn) if x))
                 fired = "словарь"
                 if sid:
                     rule["1 · словарь по наименованию, изготовителю и номеру"] += 1
-                    if junk:
+                    if junk and правило not in НЕ_СНИМАТЬ_СЛОВАРЁМ:
                         # Словарь узнал помеченную строку — значит пометка ошибочна.
                         unmark.append(rid)
                         unmarked += 1
@@ -206,7 +213,7 @@ def main() -> int:
                 with conn.cursor() as w:
                     write(w, batch)
                     if unmark:
-                        w.execute(UNMARK_SQL, (unmark,))
+                        w.execute(UNMARK_SQL, (unmark, list(НЕ_СНИМАТЬ_СЛОВАРЁМ)))
                 conn.commit()
                 unmark = []
             batch = []
