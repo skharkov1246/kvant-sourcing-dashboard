@@ -77,7 +77,11 @@ def test_причина_пишется_и_тогда_когда_таблицу_�
     # Прежняя редакция подменяла sniff, и после переноса ветвления на подвид
     # проверка стала проверять не то — при сохранном поведении разбора.
     monkeypatch.setattr(indexer, "download", lambda fo, rec=None: b"%PDF-1.4 " + b"x" * 300)
-    monkeypatch.setattr(indexer, "rows_from_pdf", lambda b: таблица)
+    # Подменяем то, что РАЗБОР ЗОВЁТ. Ветка PDF читает страницы один раз и
+    # собирает таблицу из них: подмена rows_from_pdf её не касается и проверяла
+    # бы не то (поймано перестановкой 23.09.2026 при сохранном поведении).
+    monkeypatch.setattr(indexer, "страницы_pdf", lambda b, layout=False: (["стр"], 1, 0))
+    monkeypatch.setattr(indexer, "таблица_из_страниц", lambda страницы: таблица)
     monkeypatch.setattr(indexer, "text_from_pdf",
                         lambda b, rec=None: "Насос ЦНС-38 две штуки")
     rec, _ = indexer.handle({"fo": {"id": "1"}, "deal": "1", "origin": "поле запроса",
@@ -89,7 +93,8 @@ def test_причина_пишется_и_тогда_когда_таблицу_�
 def test_таблица_без_строк_причину_не_выдумывает(monkeypatch):
     """Читатель не дал таблицы вовсе — это не «шапки нет», и путать их нельзя."""
     monkeypatch.setattr(indexer, "download", lambda fo, rec=None: b"%PDF-1.4 " + b"x" * 300)
-    monkeypatch.setattr(indexer, "rows_from_pdf", lambda b: [])
+    monkeypatch.setattr(indexer, "страницы_pdf", lambda b, layout=False: (["стр"], 1, 0))
+    monkeypatch.setattr(indexer, "таблица_из_страниц", lambda страницы: [])
     monkeypatch.setattr(indexer, "text_from_pdf",
                         lambda b, rec=None: "Насос ЦНС-38 две штуки")
     rec, _ = indexer.handle({"fo": {"id": "2"}, "deal": "1", "origin": "поле запроса",
