@@ -18,7 +18,7 @@ SERVICE_BOT = "900"                        # служебная запись в�
 SOURCER_FIELD = "UF_CRM_1779187335"         # поле сделки «Сорсер» — как в портале
 HEAD_FIELD = "UF_CRM_1776169420"            # поле сделки «Head of sourcing departement»
 DEAL_SOURCER_FIELDS = ((SOURCER_FIELD, "сорсер сделки"),
-                       (HEAD_FIELD, "руководитель сорсинга (сорсер в сделке не указан)"))
+                       (HEAD_FIELD, "сорсер в сделке не указан", False))
 SERVICE_IDS = {SERVICE_BOT}
 NAMES = {"76": "Иванов И.", "77": "Петрова А.", "78": "Сидоров С.", "79": "Кузнецов К.",
          "90": "Орлов О.", "91": "Волкова В.", SERVICE_BOT: "Робот пресейла"}

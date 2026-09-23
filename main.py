@@ -356,9 +356,9 @@ def run(args) -> int:
     # до служебных записей цепочка до него не доходила.
     deal_index = client.deals_by_ids(parent_ids, select=[
         "ID", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "ASSIGNED_BY_ID",
-        *(f for f, _ in config.DEAL_SOURCER_FIELDS)])
-    _sourcer_labels = _deal_field_labels(client, [f for f, _ in config.DEAL_SOURCER_FIELDS])
-    for _f, _ in config.DEAL_SOURCER_FIELDS:
+        *(f for f, *_ in config.DEAL_SOURCER_FIELDS)])
+    _sourcer_labels = _deal_field_labels(client, [f for f, *_ in config.DEAL_SOURCER_FIELDS])
+    for _f, *_ in config.DEAL_SOURCER_FIELDS:
         _filled = sum(1 for d in deal_index.values() if d.get(_f) not in (None, "", 0, "0", []))
         print(f"  поле сорсера сделки {_f} «{_sourcer_labels.get(_f, '?')}»: "
               f"заполнено у {_filled} из {len(deal_index)} сделок")

@@ -108,7 +108,7 @@ def main() -> int:
     raw_head = sum(1 for r in rfqs if str(r.get("assignedById")) == head)
     print(f"  из них в Битриксе ответственным записан руководитель: {доля(raw_head, len(rfqs))}")
 
-    sourcer_codes = [f for f, _ in config.DEAL_SOURCER_FIELDS]
+    sourcer_codes = [f for f, *_ in config.DEAL_SOURCER_FIELDS]
     parent_ids = {str(r.get("parentId2")) for r in rfqs if r.get("parentId2")}
     deal_index = c.deals_by_ids(parent_ids, select=[
         "ID", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "ASSIGNED_BY_ID", *sourcer_codes])
