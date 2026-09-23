@@ -174,7 +174,11 @@ jobs:
         run: |
           set -euo pipefail
           if [ "${{ inputs.ocr }}" = "true" ]; then
-            WORKERS=4 python library/ocr.py
+            # Потоки НЕ прибиваем здесь: `library/ocr.py` сам обрежет запрос по
+            # числу ядер. Прибитая четвёрка перекрывала вход `workers` и врала о
+            # том, на скольких потоках шёл прогон, — 23.09.2026 я на этом построил
+            # ложный диагноз таймаутов.
+            python library/ocr.py
           elif [ "${{ inputs.defects }}" = "true" ]; then
             python library/harvest_defects.py
           elif [ "${{ inputs.reparse }}" = "true" ]; then
