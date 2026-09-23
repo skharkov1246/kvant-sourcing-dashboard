@@ -142,6 +142,24 @@ jobs:
       - name: Установка зависимостей
         run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary
 
+      # ЧИТАТЕЛИ ФОРМАТОВ, КОТОРЫХ НЕТ В PYTHON. Ставятся для разбора и переразбора,
+      # но не для распознавания: тому нужен только tesseract.
+      #
+      # ЗАЧЕМ. Замер 23.09.2026: 375 файлов «старого office» упали в xlrd — это
+      # .doc и .msg, такой же контейнер OLE2, как .xls. Читатель .doc у нас
+      # внешний (library/readers.py), и без пакета он честно говорит «нет ни
+      # antiword, ни catdoc», то есть файл всё равно теряется. Плюс 169 архивов, в
+      # которых встречаются rar и 7z.
+      - name: Установка читателей форматов (для разбора)
+        if: ${{ !inputs.ocr }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq antiword catdoc p7zip-full
+          echo "antiword: $(command -v antiword || echo нет)"
+          echo "catdoc:   $(command -v catdoc || echo нет)"
+          echo "7z:       $(command -v 7z || echo нет)"
+
       - name: Установка распознавания (только для ocr)
         if: inputs.ocr
         run: |
