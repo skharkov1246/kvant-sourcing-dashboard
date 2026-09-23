@@ -88,6 +88,23 @@ select current_setting('transaction_read_only')          as только_чте�
          where n.nspname = 'public' and c.relkind = 'r')  as размер_таблиц
 """
 
+# ЧТО ЗАНИМАЕТ МЕСТО. База 23.09.2026 встала в режим только чтения на 1500 МБ, и
+# решение «чистить или расширять» принимает владелец — но принимать его нужно по
+# числам, а не на слух. Таблица и её индексы считаются раздельно: у lib_demand
+# столбец fts объявлен generated + GIN, и индекс там бывает крупнее данных.
+РАЗМЕРЫ_ТАБЛИЦ = """
+select c.relname                                                  as таблица,
+       pg_size_pretty(pg_total_relation_size(c.oid))              as всего,
+       pg_size_pretty(pg_relation_size(c.oid))                    as данные,
+       pg_size_pretty(pg_total_relation_size(c.oid) - pg_relation_size(c.oid)) as индексы,
+       coalesce(s.n_live_tup, 0)::bigint                          as строк
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  left join pg_stat_user_tables s on s.relid = c.oid
+ where n.nspname = 'public' and c.relkind = 'r'
+ order by pg_total_relation_size(c.oid) desc limit 12
+"""
+
 ПОТЕРИ_ПО_ВИДУ = """
 select coalesce(kind, '(вид не определён)')                        as вид,
        count(*)::bigint                                            as файлов,
@@ -250,6 +267,14 @@ def main() -> int:
                 print("    Запись невозможна. У Supabase это чаще всего кончившийся диск:")
                 print("    проект переводится в режим только чтения, пока место не освободят")
                 print("    или не расширят. Прогоны записи будут падать до этого.")
+
+            # РАЗМЕРЫ ТАБЛИЦ — РЯДОМ С СОСТОЯНИЕМ, а не в отдельном прогоне:
+            # «база не пишется» без «вот что занимает место» решения не даёт.
+            cur.execute(РАЗМЕРЫ_ТАБЛИЦ)
+            print("\nЧТО ЗАНИМАЕТ МЕСТО (таблица · всего · данные · индексы · строк):")
+            for таблица, всего_р, данные, индексы, строк in cur.fetchall():
+                print(f"    {таблица[:26]:26s} {всего_р:>9s} {данные:>9s}"
+                      f" {индексы:>9s} {ц(строк):>12d}")
 
             # ВЕДОМОСТЬ ПОТЕРЬ — ПЕРВОЙ, ПОТОМУ ЧТО ЭТО ЦЕЛЬ. Остальное — про
             # качество чтения, а это про то, прочитан файл вообще или нет.
