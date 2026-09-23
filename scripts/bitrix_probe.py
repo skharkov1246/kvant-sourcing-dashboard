@@ -177,6 +177,30 @@ def чьи_карточки_вне_отдела(items: list[dict], dept: set[str
         print(f"    #{u:6} {n_:5}  {depts.get(u) or 'подразделение не указано'}")
 
 
+def следы_у_крупных_записей(items: list[dict], dept: set[str], depts: dict[str, str]) -> None:
+    """По самым крупным учётным записям вне отдела — куда ведут их следы.
+
+    Это и решает, лечится ли случай. Если карточки записи двигает живой сорсер,
+    её можно объявить служебной и вернуть карточки ему. Если двигает она сама,
+    возвращать некому, и служебной объявлять бессмысленно.
+    """
+    заголовок("5б. КРУПНЕЙШИЕ ЗАПИСИ ВНЕ ОТДЕЛА: КУДА ВЕДУТ ИХ СЛЕДЫ")
+    по_людям: Counter = Counter()
+    for i in items:
+        u = str(i.get("assignedById") or "")
+        if u not in dept:
+            по_людям[u] += 1
+    for uid, n_ in по_людям.most_common(3):
+        свои = [i for i in items if str(i.get("assignedById") or "") == uid]
+        print(f"  #{uid} — {n_} карточек · {depts.get(uid) or 'подразделение не указано'}")
+        for поле in ("movedBy", "lastActivityBy", "updatedBy", "createdBy"):
+            есть, в_отделе, иначе = след(свои, поле, dept)
+            print(f"      {поле:16} заполнено {доля(есть, n_):>16}"
+                  f"   в отдел {доля(в_отделе, n_):>16}   ≠ ответственного {доля(иначе, n_):>16}")
+        сам = sum(1 for i in свои if str(i.get("movedBy") or "") == uid)
+        print(f"      карточек, где двигала себя сама: {доля(сам, n_)}")
+
+
 def кто_стоит_ответственным(items: list[dict], dept: set[str], depts: dict[str, str]) -> None:
     заголовок("5. КТО СТОИТ ОТВЕТСТВЕННЫМ И КТО СОЗДАЁТ")
     for роль in ("assignedById", "createdBy"):
@@ -363,6 +387,7 @@ def main() -> int:
 
     следы_карточки(items, dept, поля_сотрудников)
     чьи_карточки_вне_отдела(items, dept, depts_map)
+    следы_у_крупных_записей(items, dept, depts_map)
     кто_стоит_ответственным(items, dept, depts_map)
     служебная_запись_за_всё_время(c)
     родительская_сделка(c, items, dept)
