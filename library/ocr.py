@@ -28,9 +28,12 @@ lib_demand с источником «распознавание скана».
 from __future__ import annotations
 
 import os
+import struct
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 
@@ -77,6 +80,82 @@ PSM_MAIN = os.environ.get("OCR_PSM", "6")
 PSM_RETRY = os.environ.get("OCR_PSM_RETRY", "3")
 TIMEOUT = int(os.environ.get("OCR_TIMEOUT", "120"))
 
+# ПОТОКИ ВНУТРИ TESSERACT, А НЕ ТОЛЬКО СНАРУЖИ. Замер 23.09.2026 на этой машине
+# (4 ядра, tesseract 5.3.4, выдуманный шумный лист 3024×4032): один процесс читает
+# его за 1,2 с, а четыре таких же процесса разом не укладываются и в 400 с. Причина
+# видна в /proc: у каждого процесса ЧЕТЫРЕ потока — tesseract собран с OpenMP и сам
+# берёт все ядра. Четыре процесса по четыре потока на четырёх ядрах дают шестнадцать
+# потоков, которые крутятся на барьерах OpenMP вместо работы.
+#
+# Поэтому потоки делятся: снаружи WORKERS процессов, внутри каждого — своя доля ядер.
+# Произведение держится около числа ядер, а не в четыре раза выше.
+ЯДЕР = os.cpu_count() or 2
+OMP = os.environ.get("OCR_OMP") or str(max(1, ЯДЕР // max(1, WORKERS)))
+СРЕДА = {**os.environ, "OMP_THREAD_LIMIT": OMP}
+
+# ЗАМЕР: сколько секунд ушло на картинку и какого она размера. Нужен, чтобы
+# следующий прогон отвечал «почему таймаут» цифрами по живым файлам, а не
+# рассуждением. В журнал уходят только агрегаты (CLAUDE.md, правило 17):
+# число файлов, доля таймаутов и медиана секунд по разрядам мегапикселей.
+ЗАМЕРЫ: list[tuple[float, float, bool]] = []   # (мпкс, секунды, таймаут)
+ЗАМОК = threading.Lock()
+
+
+def пикселей(path: str) -> float:
+    """Мегапиксели из заголовка файла. Без сторонних библиотек: PNG и JPEG.
+
+    Возвращает 0.0, если размер не прочитался, — разряд «неизвестно» честнее
+    выдуманного числа."""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(2)
+            if head == b"\x89P":
+                f.seek(16)
+                w, h = struct.unpack(">II", f.read(8))
+                return w * h / 1e6
+            if head == b"\xff\xd8":
+                f.seek(2)
+                while True:
+                    m = f.read(2)
+                    if len(m) < 2 or m[0] != 0xFF:
+                        return 0.0
+                    if 0xC0 <= m[1] <= 0xCF and m[1] not in (0xC4, 0xC8, 0xCC):
+                        f.read(3)
+                        h, w = struct.unpack(">HH", f.read(4))
+                        return w * h / 1e6
+                    (длина,) = struct.unpack(">H", f.read(2))
+                    f.seek(длина - 2, 1)
+    except Exception:
+        return 0.0
+    return 0.0
+
+
+РАЗРЯДЫ = ((2.0, "до 2 Мпкс"), (6.0, "2–6"), (12.0, "6–12"),
+           (24.0, "12–24"), (float("inf"), "больше 24"))
+
+
+def таблица_времени() -> list[str]:
+    """Строки отчёта: разряд размера × файлов × таймаутов × медиана секунд."""
+    if not ЗАМЕРЫ:
+        return []
+    по_разрядам: dict[str, list[tuple[float, bool]]] = {}
+    for мпкс, сек, таймаут in ЗАМЕРЫ:
+        имя = "размер не прочитан" if мпкс <= 0 else next(
+            n for предел, n in РАЗРЯДЫ if мпкс < предел)
+        по_разрядам.setdefault(имя, []).append((сек, таймаут))
+    out = ["время распознавания по размеру картинки:",
+           f"    {'разряд':<20}{'вызовов':>9}{'таймаутов':>11}{'медиана с':>11}"]
+    порядок = ["размер не прочитан"] + [n for _, n in РАЗРЯДЫ]
+    for имя in порядок:
+        если = по_разрядам.get(имя)
+        if not если:
+            continue
+        секунды = sorted(с for с, _ in если)
+        медиана = секунды[len(секунды) // 2]
+        таймаутов = sum(1 for _, t in если if t)
+        out.append(f"    {имя:<20}{len(если):>9}{таймаутов:>11}{медиана:>11.1f}")
+    return out
+
 # Кандидаты: текста нет, значит разбор не дал ничего. Форматы, в которых
 # распознавать нечего, отсекаются ЗДЕСЬ, а не в обработчике: в первой части
 # прогона 118 файлов из 400 оказались xlsx/docx, архивами и экзотикой —
@@ -102,15 +181,20 @@ def ocr_image(path: str, psm: str = PSM_MAIN) -> tuple[str, str]:
     пустых файла из 400 не говорили ничего: то ли текста нет, то ли tesseract
     не уложился в таймаут. Статус не должен врать (CLAUDE.md, правило 15),
     поэтому причина возвращается отдельно и доезжает до lib_files.reason."""
+    мпкс, начало = пикселей(path), time.monotonic()
     try:
         r = subprocess.run(["tesseract", path, "stdout", "-l", LANG, "--psm", psm],
-                           capture_output=True, timeout=TIMEOUT)
+                           capture_output=True, timeout=TIMEOUT, env=СРЕДА)
     except subprocess.TimeoutExpired:
+        with ЗАМОК:
+            ЗАМЕРЫ.append((мпкс, time.monotonic() - начало, True))
         return "", "таймаут распознавания"
     except FileNotFoundError:
         return "", "tesseract не установлен"
     except Exception as e:
         return "", f"сбой запуска: {type(e).__name__}"
+    with ЗАМОК:
+        ЗАМЕРЫ.append((мпкс, time.monotonic() - начало, False))
     текст = r.stdout.decode("utf-8", "ignore")
     if r.returncode != 0:
         return текст, f"tesseract вернул код {r.returncode}"
@@ -372,6 +456,8 @@ def main() -> int:
 
     print("\n=== ИТОГ ЧАСТИ ===")
     print(f"файлов: {sum(stat.values())} · позиций из сканов: {total_items}")
+    for строка in таблица_времени():
+        print(строка)
     if indexer.SOURCE == "rfq":
         print(f"строк с ценой: {цен}"
               + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
