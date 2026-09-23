@@ -305,7 +305,7 @@ def _колонки_вставки(запрос: str) -> tuple[str, ...]:
 
 
 def _обновляемые(запрос: str) -> set[str]:
-    return set(re.findall(r"(\w+) = (?:excluded\.|coalesce\(excluded\.)", запрос))
+    return set(re.findall(r"(\w+) = (?:excluded\.|coalesce\((?:excluded|lib_files)\.)", запрос))
 
 
 def _есть(запрос: str, колонка: str) -> bool:
@@ -333,9 +333,14 @@ def test_вставка_по_всем_колонкам_несёт_нашу_ко�
     # …а без сбоя пустое значение — факт (компанию в карточке сняли), и оно пишется.
     monkeypatch.setattr(ix, "_НАШИ_СБОЙ", False)
     без_сбоя, _ = ix.вставка_файлов(ix.КОЛОНКИ_ВСТАВКИ)
-    assert "our_company = excluded.our_company" in без_сбоя and "coalesce" not in без_сбоя
+    assert "our_company = excluded.our_company" in без_сбоя
+    assert "coalesce(excluded." not in без_сбоя
+    # Сведения о файле: записанное остаётся, пустое дополняется повторной закачкой.
+    for к in ("kind", "size_bytes", "sha256"):
+        assert f"{к} = coalesce(lib_files.{к}, excluded.{к})" in без_сбоя, к
     # Ключ и происхождение вложения при конфликте не переписываются, остальное — да.
     assert _обновляемые(запрос) == set(ix.КОЛОНКИ_ВСТАВКИ) - ix.НЕ_ОБНОВЛЯТЬ
+    assert not {"file_id", "deal_id", "origin", "field"} & _обновляемые(запрос)
     assert запрос.rstrip().endswith("processed_at = now()")
 
 

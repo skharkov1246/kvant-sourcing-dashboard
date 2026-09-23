@@ -127,6 +127,23 @@ def test_после_миграции_пустая_наша_компания_за
     assert строка(cur, "our_company") == (None,)
 
 
+def test_повторная_закачка_дополняет_сведения_о_файле(cur, запись):
+    """Первый проход файл не скачал: kind, size_bytes и sha256 пусты. Повторная
+    закачка (RETRY_FAILED) обязана их заполнить, а следующий проход — не
+    переписать: file_id портала за одним и тем же содержимым."""
+    колонки = ix.КОЛОНКИ_ОБЯЗАТЕЛЬНЫЕ
+    записать(cur, колонки, запись())
+    assert строка(cur, "kind", "size_bytes", "sha256") == (None, None, None)
+    записать(cur, колонки, запись(status="разобран", kind="xlsx", size_bytes=4096,
+                                   sha256="a" * 64))
+    assert строка(cur, "kind", "size_bytes", "sha256", "status") == (
+        "xlsx", 4096, "a" * 64, "разобран")
+    записать(cur, колонки, запись(status="пусто", kind="pdf", size_bytes=1,
+                                   sha256="b" * 64))
+    assert строка(cur, "kind", "size_bytes", "sha256", "status") == (
+        "xlsx", 4096, "a" * 64, "пусто")
+
+
 def test_переразбор_на_базе_до_и_после_миграции(cur, запись, monkeypatch):
     import library.reparse as r
     monkeypatch.setattr(r.indexer, "_НАШИ_СБОЙ", True)
