@@ -60,3 +60,17 @@ def test_вход_прогона_есть_и_не_прибит():
     assert "reparse_failed:" in yml
     assert re.search(r"REPARSE_FAILED:\s*\$\{\{\s*inputs\.reparse_failed", yml)
     assert not re.search(r"REPARSE_FAILED=\S+\s+python", yml), "значение прибито в шаге"
+
+
+def test_итог_называет_почему_файл_остался_пустым():
+    """«пусто 228» не говорит, какой читатель закроет эти файлы.
+
+    Разбивка по формату и причине — единственный способ выбрать следующую правку
+    по числам, а не на глаз.
+    """
+    текст = код("library/reparse.py")
+    assert "ПОЧЕМУ ФАЙЛ ОСТАЛСЯ БЕЗ ПОЗИЦИЙ" in текст
+    assert re.search(r"if not items:\s*\n\s*пустые\[", текст), \
+        "пустые файлы не считаются"
+    assert 'rec.get("subkind")' in текст[текст.index("if not items:"):][:300], \
+        "разбивка без формата"
