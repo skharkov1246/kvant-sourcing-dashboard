@@ -337,11 +337,14 @@ def run(args) -> int:
           f"{sum(1 for r in rfqs if str(r.get('assignedById')) in dept_a_ids)}")
 
     # Служебные записи: заданные номерами плюс названные служебными по имени.
-    # Номера и имена служебных записей — не персональные данные: это роботы.
+    # В публичный журнал имя идёт ТОЛЬКО если оно само называет запись
+    # служебной. Запись, заданная номером, может носить личное имя сотрудника —
+    # с #400 по #402 так в журнал деплоя попадало имя человека (правило 17).
     service_ids = config.service_accounts(names)
     if service_ids:
         print("  служебные записи: " + ", ".join(
-            f"#{u} {names.get(u, '')}".strip() for u in sorted(service_ids, key=int)))
+            f"#{u} {names.get(u, '')}" if config.SERVICE_NAME_RE.search(names.get(u, ''))
+            else f"#{u} (задана номером)" for u in sorted(service_ids, key=int)))
     else:
         print("  служебные записи: разбор отключён (SERVICE_ACCOUNT_IDS=off)")
 
@@ -506,7 +509,8 @@ def run(args) -> int:
     print(f"  ✓ метрики: {metrics_path}")
 
     if args.dry_run:
-        _print_summary(m)
+        if not args.no_summary:
+            _print_summary(m)
         return 0
 
     print(f"• Инсайты ({'Claude' if use_llm else 'правила'})…")
@@ -687,6 +691,8 @@ def main() -> int:
     ap.add_argument("--out", default=str(config.BASE_DIR / "reports"), help="каталог отчётов")
     ap.add_argument("--no-llm", action="store_true", help="инсайты по правилам, без Claude")
     ap.add_argument("--dry-run", action="store_true", help="только метрики (JSON+сводка), без LLM и HTML")
+    ap.add_argument("--no-summary", action="store_true",
+                    help="не печатать сводку по сорсерам: в ней фамилии, а журнал Actions публичен")
     ap.add_argument("--open", action="store_true", help="открыть дашборд в браузере")
     ap.add_argument("--max-deals", type=int, default=None, help="ограничить число RFQ (для теста)")
     ap.add_argument("--as-of", help="переопределить «сегодня» (YYYY-MM-DD), для воспроизводимости")

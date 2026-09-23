@@ -1,0 +1,101 @@
+name: Живая сверка метрик
+
+# Правка расчёта против прода на одних и тех же данных портала — ДО мержа.
+#
+# Зачем. 23.09.2026 в прод трижды ушли данные, разошедшиеся с
+# действительностью (#396 пустой столбец КП, #397 неверный номер служебной
+# записи, #400 сотни запросов на руководителе отдела). Каждый раз их видели
+# двадцать сотрудников раньше, чем разработчик. Гейт этого поймать не мог: он
+# проверяет синтетику, а ошибка была в поведении правила на живых данных.
+#
+# Как. Оба варианта — main и правка — считаются `main.py --dry-run` на одном
+# замороженном окне (по вчерашний день включительно), друг за другом, и
+# сравниваются scripts/live_check.py. Правила сверки и заявка ожиданий описаны
+# там же. Мержить PR, затрагивающий расчёт, можно только при зелёной сверке.
+#
+# Публичность. Журнал Actions открыт всем, поэтому вывод main.py пишется в файл
+# на раннере, а в журнал попадают только строки-агрегаты из белого списка.
+# Метрики в артефакты не выкладываются: артефакты публичного репозитория
+# скачивает кто угодно.
+on:
+  pull_request:
+    paths:
+      - metrics.py
+      - main.py
+      - config.py
+      - stages.py
+      - period.py
+      - bitrix_client.py
+      - scripts/live_check.py
+      - .github/workflows/live-check.yml
+  workflow_dispatch:
+    inputs:
+      expect:
+        description: "Заявка ожиданий, строки «ожидается: #76 -517» и т. п."
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  # ОБЩАЯ ОЧЕРЕДЬ ЧТЕНИЯ ПОРТАЛА — см. пояснение в suppliers-publish.yml.
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  live-check:
+    name: live-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+      SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet -r requirements.txt
+
+      - name: Проверка секрета и окно сверки
+        run: |
+          set -euo pipefail
+          [ -n "${BITRIX_WEBHOOK_URL:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          asof="$(date -u -d yesterday +%F)"
+          echo "ASOF=$asof" >> "$GITHUB_ENV"
+          echo "PERIOD=2026-05-01:$asof" >> "$GITHUB_ENV"
+          echo "окно сверки: 2026-05-01 → $asof (вчера включительно — набор карточек заморожен)"
+
+      - name: Прод (main) на живых данных
+        run: |
+          set -euo pipefail
+          git worktree add /tmp/base origin/main
+          cd /tmp/base
+          if ! python main.py --dry-run --no-llm --period "$PERIOD" --as-of "$ASOF" \
+               --out /tmp/out-base > /tmp/base.log 2>&1; then
+            echo "::error::расчёт main упал"; grep -E "Error|Traceback|File \"" /tmp/base.log | tail -20; exit 1
+          fi
+          # в журнал — только агрегаты из белого списка (правило 17)
+          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки" \
+            /tmp/base.log || true
+
+      - name: Правка на тех же данных
+        run: |
+          set -euo pipefail
+          if ! python main.py --dry-run --no-llm --no-summary --period "$PERIOD" --as-of "$ASOF" \
+               --out /tmp/out-head > /tmp/head.log 2>&1; then
+            echo "::error::расчёт правки упал"; grep -E "Error|Traceback|File \"" /tmp/head.log | tail -20; exit 1
+          fi
+          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки" \
+            /tmp/head.log || true
+
+      - name: Сверка
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          EXPECT: ${{ inputs.expect }}
+        run: python scripts/live_check.py /tmp/out-base /tmp/out-head
