@@ -207,6 +207,26 @@ select file_id from lib_files
    and coalesce(kind, '') in ('изображение', 'pdf', '')"""
 
 
+#: Повтор файлов, на которых распознавание отказало ПО ВИНЕ ОКРУЖЕНИЯ. Отдельным
+#: входом, а не всегда: обычный отбор смотрит на пустую отметку, и файл с
+#: проставленной отметкой в него не попадает никогда.
+#:
+#: ЗАЧЕМ ЭТО НУЖНО. 23.09.2026 распознавание падало по таймауту на 69 % файлов
+#: из-за потоков внутри tesseract. Потоки починены, отметка больше не ставится за
+#: отказ окружения — но 3 666 картинок УЖЕ помечены прежними прогонами, и обычный
+#: отбор их не берёт. Этим входом их можно и померить холостым прогоном, и
+#: перечитать записью.
+ПОВТОР = os.environ.get("OCR_RETRY", "") not in ("", "0", "false")
+
+ПОВТОР_ОТКАЗАВШИХ = """
+select file_id from lib_files
+ where status <> 'не скачался'
+   and coalesce(kind, '') in ('изображение', 'pdf', '')
+   and coalesce(rows_found, 0) = 0
+   and (ocr_at is null
+        or exists (select 1 from unnest(%s::text[]) p where reason like p || '%%'))"""
+
+
 def num(v, w=12):
     return f"{v:,}".replace(",", " ").rjust(w)
 
@@ -370,7 +390,8 @@ def main() -> int:
 
     conn = indexer.connect()
     with conn.cursor() as cur:
-        cur.execute(CANDIDATES)
+        cur.execute(ПОВТОР_ОТКАЗАВШИХ if ПОВТОР else CANDIDATES,
+                    (list(ПРИЧИНЫ_ОКРУЖЕНИЯ),) if ПОВТОР else None)
         want = {r[0] for r in cur.fetchall()}
     conn.close()
     print(f"кандидатов на распознавание: {len(want)}", flush=True)
