@@ -1111,7 +1111,8 @@ def items_from_rows(rows: list[list[str]], *, шире: bool | None = None) -> l
     return out
 
 
-def collect_refs(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
+def collect_refs(days: int, shard: int = 0, shards: int = 1,
+                 границы: tuple[int, int | None] | None = None) -> list[dict]:
     """Ссылки на все вложения сделок за период.
 
     Берём их через crm.item.list (entityTypeId=2), а НЕ через crm.deal.list.
@@ -1140,7 +1141,17 @@ def collect_refs(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
     # кусок [низ+1; верх]: сделка лежит ровно в одном диапазоне, значит ни один
     # файл не теряется и не читается дважды.
     фильтр = {">=DATE_CREATE": since}
-    if shards > 1:
+    if shards > 1 and границы is not None:
+        # ГРАНИЦЫ ПРИШЛИ ИЗВНЕ — от переразбора, который знает, у каких сделок
+        # его файлы, и делит их поровну по ЧИСЛУ ФАЙЛОВ (reparse.границы_по_файлам).
+        # Разбиение по-прежнему одно и смежное: сделка лежит ровно в одной части.
+        низ, верх = границы
+        фильтр[">ID"] = низ
+        if верх is not None:
+            фильтр["<=ID"] = верх
+        print(f"часть {shard + 1} из {shards}: сделки с номером от {низ + 1} "
+              f"до {верх if верх is not None else 'конца'} (границы по файлам)", flush=True)
+    elif shards > 1:
         # crm.deal.list — старый метод: поле «ID» заглавными, и bx_max_id (он
         # для crm.item.list, «id») здесь молча вернул бы 0, а с нулём каждая
         # часть читала бы весь список — ровно то, от чего уходим.
