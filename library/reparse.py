@@ -218,6 +218,12 @@ def num(v, w=10):
 
 
 def main() -> int:
+    # ПИСЬМА ПЕРЕРАЗБОР ПОКА НЕ УМЕЕТ. Отбор здесь идёт по ORIGIN, а обход — по
+    # collect_refs: с SOURCE=mail оба молча взяли бы сделки. Лучше отказ вслух.
+    if indexer.SOURCE not in ("deals", "rfq"):
+        print(f"переразбор источника SOURCE={indexer.SOURCE!r} не поддержан: "
+              "только deals или rfq", file=sys.stderr)
+        return 2
     for var in ("BITRIX_WEBHOOK_URL", "SUPABASE_DB_URL"):
         if not os.environ.get(var):
             print(f"нет переменной {var}", file=sys.stderr)

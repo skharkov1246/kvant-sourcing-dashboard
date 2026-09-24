@@ -1,0 +1,211 @@
+name: Библиотека — вложения писем Битрикса
+
+# ТРЕТИЙ ИСТОЧНИК ФАЙЛОВ БИБЛИОТЕКИ — ПИСЬМА (дела CRM, TYPE_ID=4). Распоряжение
+# владельца 24.09.2026: собирать спрос и предложение со всех сторон, понемногу и
+# без спешки. Группы (library/mail_source.py):
+#   mail-deal     — письма сделок, оба направления (сторона сделки);
+#   mail-supplier — входящие письма компаний и контактов (ответы поставщиков);
+#   mail-lead     — входящие письма лидов (запросы заказчиков).
+#
+# ПАЧКАМИ ОТ ОТМЕТКИ. План читает из базы, где группа остановилась, и номера
+# следующих `limit` писем (лимит/50 запросов, одни номера). Части делят номера
+# ЭТОЙ пачки смежными кусками — деление одно (CLAUDE.md, правило дробления).
+# Отметку двигает ПОСЛЕДНИЙ job и только когда прошли ВСЕ части и задан apply:
+# упавшая часть отметку не двигает, следующий запуск перечитает ту же пачку, а
+# разобранные файлы отсеются по lib_files. Холостой прогон (apply выключен)
+# отметку не трогает и в базу не пишет ничего.
+#
+# ПОКА ТОЛЬКО РУЧНОЙ ЗАПУСК. Расписание — решение владельца (CLAUDE.md: правки
+# планировщика — с его согласия).
+#
+# СКОЛЬКО ЭТО СТОИТ ПОРТАЛУ (CLAUDE.md, «Битрикс не перегружать», пункт 5).
+# Пачка 2 000 писем: план 40 страниц номеров, части ещё 40 страниц писем с
+# вложениями, плюс по два запроса на новый файл (disk.file.get и закачка). При
+# вложениях у 50–70 % писем — около 3 000 файлов, 6 000 запросов: при 1,2/с —
+# полтора часа, при 0,3/с (лиды) — пять с половиной часов на весь прогон.
+#
+# В репозиторий и в артефакты не пишется ничего, в журнал — только агрегаты
+# (правило 17). Журнал каждой части кончается строкой «портал: запросов …».
+on:
+  workflow_dispatch:
+    inputs:
+      group:
+        description: "Группа писем"
+        type: choice
+        options: ["mail-deal", "mail-supplier", "mail-lead"]
+        default: "mail-deal"
+      limit:
+        description: "Писем в пачке на прогон (от отметки группы)"
+        default: "2000"
+      shards:
+        # Распоряжение владельца 22.09.2026: делить минимум на 10.
+        description: "На сколько частей делить пачку"
+        type: choice
+        options: ["10", "12", "25", "50"]
+        default: "10"
+      apply:
+        description: "Писать в базу и сдвинуть отметку (без него — холостой замер)"
+        type: boolean
+        default: false
+      bitrix_rps:
+        # Для mail-lead вход НЕ действует: там всегда 0.3 (см. шаг разбора).
+        description: "Запросов в секунду к порталу на ВЕСЬ прогон (кроме лидов — у них всегда 0.3)"
+        type: choice
+        options: ["0.8", "1.2", "1.5"]
+        default: "1.2"
+
+permissions:
+  contents: read
+
+concurrency:
+  # ЛИДЫ — НЕ БОЛЬШЕ ПЯТОЙ ЧАСТИ ПОРТАЛА (распоряжение владельца 24.09.2026).
+  # Прогон лидов идёт с BITRIX_RPS=0.3 и ВНЕ общей очереди bitrix-portal: писем
+  # лидов 789 тысяч, это недели медленной работы, и в общей очереди он держал
+  # бы за собой деплой дашборда и ежедневное пополнение. Своя группа
+  # bitrix-fifth — общая для всего, что идёт «на пятую часть» (0,3/с): такие
+  # прогоны идут по одному, и вместе с самым тяжёлым прогоном общей очереди
+  # (1,5/с) портал получает не больше 1,8/с при утечке ведра 2/с.
+  # Остальные группы писем — в общей очереди, как всякое чтение портала.
+  group: ${{ inputs.group == 'mail-lead' && 'bitrix-fifth' || 'bitrix-portal' }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      mail_from: ${{ steps.plan.outputs.mail_from }}
+      mail_to: ${{ steps.plan.outputs.mail_to }}
+      mail_count: ${{ steps.plan.outputs.mail_count }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+
+      - name: Проверка секретов
+        env:
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          S: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — Settings → Secrets → Actions, строка «Session pooler»"; exit 1; }
+          echo "секреты на месте"
+
+      - name: План пачки — отметка группы и номера писем
+        id: plan
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          MAIL_GROUP: ${{ inputs.group }}
+          MAIL_LIMIT: ${{ inputs.limit }}
+          # План читает портал одним процессом; у лидов — тот же потолок 0.3.
+          BITRIX_RPS: ${{ inputs.group == 'mail-lead' && '0.3' || inputs.bitrix_rps }}
+          BITRIX_PARALLEL: "1"
+        run: python library/mail_source.py план
+
+  index:
+    needs: plan
+    if: needs.plan.outputs.mail_count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      # 12 — предел базы (pooler Supabase держит 15 клиентов), как в
+      # library-index.yml. Портал защищён бюджетом: сколько бы частей ни шло,
+      # вместе они шлют BITRIX_RPS запросов в секунду.
+      max-parallel: 12
+      matrix:
+        # Матрица на 50 мест; лишние части сразу выходят (см. library-index.yml).
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
+    steps:
+      - name: Лишняя часть
+        if: matrix.shard >= fromJSON(inputs.shards)
+        run: echo "часть ${{ matrix.shard }} не нужна при ${{ inputs.shards }} частях"
+
+      - uses: actions/checkout@v5
+        if: matrix.shard < fromJSON(inputs.shards)
+      - uses: actions/setup-python@v6
+        if: matrix.shard < fromJSON(inputs.shards)
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        if: matrix.shard < fromJSON(inputs.shards)
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+
+      # Читатели форматов — те же, что у разбора в library-index.yml: во
+      # вложениях писем те же .doc, .msg, rar и 7z, что и в полях сделок.
+      - name: Установка читателей форматов
+        if: matrix.shard < fromJSON(inputs.shards)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq antiword catdoc p7zip-full unrar libarchive-tools \
+            poppler-utils qpdf
+
+      - name: Разбор части ${{ matrix.shard }}
+        if: matrix.shard < fromJSON(inputs.shards)
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SOURCE: mail
+          MAIL_GROUP: ${{ inputs.group }}
+          MAIL_FROM: ${{ needs.plan.outputs.mail_from }}
+          MAIL_TO: ${{ needs.plan.outputs.mail_to }}
+          SHARDS: ${{ inputs.shards }}
+          SHARD: ${{ matrix.shard }}
+          WORKERS: "4"
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          INPUT_RPS: ${{ inputs.bitrix_rps }}
+        run: |
+          set -euo pipefail
+          # ЛИДЫ — ПЯТАЯ ЧАСТЬ ПОРТАЛА, И ВХОД ЭТО НЕ ОТМЕНЯЕТ (распоряжение
+          # владельца 24.09.2026). Подмена входа — вслух, а не молча.
+          if [ "${{ inputs.group }}" = "mail-lead" ]; then
+            BITRIX_RPS=0.3
+            echo "группа mail-lead: бюджет портала прибит к 0.3/с (вход ${INPUT_RPS} не действует)"
+          else
+            BITRIX_RPS="${INPUT_RPS}"
+          fi
+          export BITRIX_RPS
+          # СКОЛЬКО ЧАСТЕЙ ЧИТАЮТ ПОРТАЛ РАЗОМ: min(частей, max-parallel). Число 12
+          # обязано совпадать со strategy.max-parallel выше.
+          MAX_PARALLEL=12
+          export BITRIX_PARALLEL=$(( SHARDS < MAX_PARALLEL ? SHARDS : MAX_PARALLEL ))
+          echo "бюджет портала: ${BITRIX_RPS}/с на прогон, частей разом ${BITRIX_PARALLEL}"
+          python library/indexer.py
+
+  # Только если ВСЕ части прошли (без if: always) и прогон с записью: упавшая
+  # часть отметку не двигает, и следующий запуск перечитает ту же пачку.
+  cursor:
+    needs: [plan, index]
+    if: inputs.apply && needs.plan.outputs.mail_count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+
+      - name: Отметка пачки
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          MAIL_GROUP: ${{ inputs.group }}
+          MAIL_FROM: ${{ needs.plan.outputs.mail_from }}
+          MAIL_TO: ${{ needs.plan.outputs.mail_to }}
+          MAIL_COUNT: ${{ needs.plan.outputs.mail_count }}
+        run: python library/mail_source.py отметка
