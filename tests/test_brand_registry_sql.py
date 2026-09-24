@@ -77,7 +77,11 @@ insert into lib_prices (feed, source, part_number, item_name, price, currency, r
 # Строки ключа написания: правовые формы, диакритика, двойники, кириллица.
 НАПИСАНИЯ = ["Wärtsilä Oyj", "SКF", "Grundfos A/S", "ООО «Ромашка»", "Kelton GmbH & Co",
              "S.p.A. Brisko", "Ёлка-Пром", "3M", "", "  ", "ABB Ltd.", "Çukurova Makina",
-             "ОАО Завод-1", "Hölle & Söhne KG"]
+             "ОАО Завод-1", "Hölle & Söhne KG",
+             # Граница правовой формы у соседа вне [0-9a-zа-я_]: украинская «і»,
+             # знак ударения, «½», турецкая «İ» — на «іао» 24.09.2026 разошлись
+             # база и код, и гейт засева отменил запись части.
+             "Хімпромао", "іао", "Київ ао", "Єco", "İstanbul co", "İao", "½co", "e\u0301co"]
 
 
 def подключить():
@@ -167,6 +171,26 @@ def test_ключ_написания_в_sql_тот_же_что_в_python(баз�
             c.execute("select lib_brand_key(%s)", (н,))
             assert c.fetchone()[0] == codes_sql.ключ_написания(н), н
     conn.close()
+
+
+def test_ключ_совпадает_на_всём_юникоде(база):
+    """Сосед правовой формы — каждый печатный знак до U+3000 и лигатуры.
+
+    Эталон — сама база: слово у \\m PostgreSQL определяет локаль, и совпадение
+    на придуманных написаниях его не доказывает. Один запрос, ~67 тыс. строк.
+    """
+    import unicodedata
+
+    знаки = [chr(i) for i in [*range(0x21, 0x3000), *range(0xFB00, 0xFB50)]
+             if unicodedata.category(chr(i))[0] not in "CZ"]
+    строки = [ш.format(з) for з in знаки
+              for ш in ("{}ао", "ао{}", "{}co", "co{}", "x {}sa", "{}_llc")]
+    conn = подключить()
+    with conn.cursor() as c:
+        c.execute("select s, lib_brand_key(s) from unnest(%s::text[]) s", (строки,))
+        разные = [(н, к) for н, к in c.fetchall() if к != codes_sql.ключ_написания(н)]
+    conn.close()
+    assert not разные, f"расхождений {len(разные)}, первое {разные[0]!r}"
 
 
 def test_константы_функции_взяты_из_codes_sql():

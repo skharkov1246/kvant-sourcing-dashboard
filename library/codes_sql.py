@@ -246,8 +246,13 @@ SPLIT_RE = r"\s*[,;/()\[\]]\s*|\s+(и|или|or)\s+"
 # выбросило бы. Защищать можно щедро (правило 7): ошибочная защита видна числом.
 WHITELIST = ["ge", "3m"]
 
-LEGAL_FORMS_KEY = (r"\m(ооо|оао|зао|пао|ао|llc|ltd|inc|gmbh|s\.p\.a|spa|co|corp|company|"
-                   r"limited|holding|group|a/s|ab|bv|nv|sas|sa|plc|pte|kg|ag|oy|oyj|srl|as)\M")
+# ГРАНИЦА СЛОВА ЗАДАНА ЯВНО, а не «\\m…\\M». У PostgreSQL слово по \\m — любая
+# буква или цифра ПО ЛОКАЛИ базы: украинская «і», знак ударения, «½» — и Python
+# повторить это не может. 24.09.2026 на «іао» ключ в базе и в коде разошёлся, и
+# гейт засева брендов (прогон 36038314033) отменил запись части. Явный класс
+# одинаков в обоих диалектах и от локали не зависит.
+LEGAL_FORMS_KEY = (r"(?<![0-9a-zа-я_])(ооо|оао|зао|пао|ао|llc|ltd|inc|gmbh|s\.p\.a|spa|co|corp|company|"
+                   r"limited|holding|group|a/s|ab|bv|nv|sas|sa|plc|pte|kg|ag|oy|oyj|srl|as)(?![0-9a-zа-я_])")
 LEGAL_FORMS_SHOW = (r"\m(ооо|оао|зао|пао|ао|ип|llc|ltd|inc|gmbh|s\.p\.a|spa|corp|plc|"
                     r"limited|ag|ab|a/s|bv|nv|sa|sas|co|kg|pte|oy|oyj|srl|as)\M\.?")
 DIACRITICS_FROM = "äöüåáàâãéèêëíìîïóòôõúùûñçøšžčřýłæœß"
@@ -1798,16 +1803,18 @@ def запросы(карта=(), из_реестра: bool = False) -> dict[str
 # слова, только буквы и цифры, 40 знаков, латинские двойники в смешанном ключе.
 # Нужен сборщику, чтобы перевести написания словаря в ключи запроса; расхождение
 # с SQL ловит tests/test_brands_sql.py на одних и тех же написаниях.
-# LEGAL_FORMS_KEY — «\\m(…)\\M» в диалекте PostgreSQL; в Python границы слова
-# заданы явно: у PostgreSQL слово — буквы, цифры и подчёркивание.
-assert LEGAL_FORMS_KEY.startswith(r"\m(") and LEGAL_FORMS_KEY.endswith(r")\M")
-_ФОРМЫ = re.compile(r"(?<![0-9a-zа-я_])" + LEGAL_FORMS_KEY[2:-2] + r"(?![0-9a-zа-я_])")
+# LEGAL_FORMS_KEY пишется одинаково в диалектах PostgreSQL и Python: граница
+# слова — явный класс, а не \\m…\\M по локали.
+_ФОРМЫ = re.compile(LEGAL_FORMS_KEY)
 _ДИАКРИТИКА = str.maketrans(DIACRITICS_FROM, DIACRITICS_TO)
 _ДВОЙНИКИ = str.maketrans(HOMO_FROM, HOMO_TO)
 
 
 def ключ_написания(s: str) -> str:
-    t = str(s or "").lower().replace("ё", "е").translate(_ДИАКРИТИКА)
+    # «İ» (U+0130) Python складывает в «i» с отдельной точкой сверху, PostgreSQL —
+    # в «i»: это единственное расхождение lower() на всём Юникоде (замер
+    # 24.09.2026, 139 тыс. знаков, база C.UTF-8).
+    t = str(s or "").replace("İ", "I").lower().replace("ё", "е").translate(_ДИАКРИТИКА)
     t = _ФОРМЫ.sub(" ", t)
     k = re.sub(r"[^0-9a-zа-я]", "", t)[:40]
     if re.search(r"[a-z]", k) and re.search(r"[а-я]", k):
