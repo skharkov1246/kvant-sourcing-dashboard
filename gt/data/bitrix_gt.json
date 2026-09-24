@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-21",
+ "updated": "2026-09-24",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
@@ -9,9 +9,43 @@
    "models": [
     "Centaur 40"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:4",
    "created": "2026-09-18",
-   "rfqs": []
+   "rfqs": [
+    {
+     "id": "46150",
+     "title": "IMMI штифт на Centaur",
+     "created": "2026-09-23",
+     "supplier": "IMMI Turbines",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "46154",
+     "title": "KTM (UAE) штифт на Centaur",
+     "created": "2026-09-23",
+     "supplier": "KTM Services FZE",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "46160",
+     "title": "AOGC (UK) штифт на Centaur",
+     "created": "2026-09-23",
+     "supplier": "AOGC",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    }
+   ]
   },
   {
    "id": "23374",
@@ -47,7 +81,7 @@
      "title": "RFQ_ Spare Parts for Dresser",
      "created": "2026-09-18",
      "supplier": "Greenray Turbine Solutions Ltd",
-     "stage": "Request Sent",
+     "stage": "Unread Messages",
      "sourcer": "Ksenia Odegova",
      "models": [
       "ГТУ (модель уточнить)"
@@ -58,7 +92,7 @@
      "title": "RFQ_Spare Parts for Dresser",
      "created": "2026-09-18",
      "supplier": "Sulzer Turbo Services Venlo B.V.",
-     "stage": "Request Sent",
+     "stage": "Unread Messages",
      "sourcer": "Ksenia Odegova",
      "models": [
       "ГТУ (модель уточнить)"
@@ -69,6 +103,50 @@
      "title": "RFQ_Spare Parts for Dresser",
      "created": "2026-09-18",
      "supplier": "Turbine Services Limited",
+     "stage": "Unread Messages",
+     "sourcer": "Ksenia Odegova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "46014",
+     "title": "RFQ_Spare Parts for Dresser",
+     "created": "2026-09-22",
+     "supplier": "Turbine Services & Solutions LLC",
+     "stage": "Request Sent",
+     "sourcer": "Ksenia Odegova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "46024",
+     "title": "RFQ_Spare Parts for Dresser",
+     "created": "2026-09-22",
+     "supplier": "TurbinePROs R.E.S.",
+     "stage": "Request Sent",
+     "sourcer": "Ksenia Odegova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "46026",
+     "title": "RFQ_Spare Parts for Dresser",
+     "created": "2026-09-22",
+     "supplier": "Energetic Machinery",
+     "stage": "Request Sent",
+     "sourcer": "Ksenia Odegova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "46028",
+     "title": "RFQ_Spare Parts for Dresser",
+     "created": "2026-09-22",
+     "supplier": "International Energy Resources",
      "stage": "Request Sent",
      "sourcer": "Ksenia Odegova",
      "models": [
@@ -192,6 +270,18 @@
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "GE 9F/9FA"
+     ]
+    },
+    {
+     "id": "45568",
+     "title": "MTS Andrea Frame 7 + 9FA",
+     "created": "2026-09-21",
+     "supplier": "Maximum Turbine Support",
+     "stage": "In Correspondance",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "GE 9F/9FA",
+      "GE Frame 7 (MS7001)"
      ]
     }
    ]
@@ -8042,6 +8132,18 @@
    "model": "Centaur 40",
    "suppliers": [
     {
+     "name": "IMMI Turbines",
+     "n": 1
+    },
+    {
+     "name": "KTM Services FZE",
+     "n": 1
+    },
+    {
+     "name": "AOGC",
+     "n": 1
+    },
+    {
      "name": "TURBINE.PARTS B.V.",
      "n": 1
     },
@@ -8124,6 +8226,10 @@
      "n": 1
     },
     {
+     "name": "Maximum Turbine Support",
+     "n": 1
+    },
+    {
      "name": "Turbine Services, Ltd.",
      "n": 1
     },
@@ -8158,6 +8264,15 @@
     },
     {
      "name": "[Dont trust] Zirve Energy",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "GE Frame 7 (MS7001)",
+   "suppliers": [
+    {
+     "name": "Maximum Turbine Support",
      "n": 1
     }
    ]
@@ -9250,6 +9365,22 @@
     },
     {
      "name": "Turbine Services Limited",
+     "n": 1
+    },
+    {
+     "name": "Turbine Services & Solutions LLC",
+     "n": 1
+    },
+    {
+     "name": "TurbinePROs R.E.S.",
+     "n": 1
+    },
+    {
+     "name": "Energetic Machinery",
+     "n": 1
+    },
+    {
+     "name": "International Energy Resources",
      "n": 1
     },
     {
