@@ -669,6 +669,8 @@ function suppliersRoute(path) {
   if (path === "/api/brands/pairs") return "brandsPairs";
   if (path === "/api/brands/codes") return "brandsCodes";
   if (path === "/api/brands/search") return "brandsSearch";
+  // Единый поиск стартовой страницы: код, бренд, поставщик, машина, узел.
+  if (path === "/api/portal/search") return "portalSearch";
   // Маршрута публикации здесь нет намеренно: снимок кладёт scripts/publish_suppliers.py
   // прямо в KV через API Cloudflare — так же, как публикуется библиотека. Второй стек
   // разбора и проверки тела запроса в воркере не нужен, а /admin/suppliers ниже
@@ -684,7 +686,7 @@ function suppliersRoute(path) {
     } catch { break; }
   }
   decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
-  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$)|brands(?:[/.;]|$)|api\/brands(?:[/.;]|$))/i
+  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$)|brands(?:[/.;]|$)|api\/brands(?:[/.;]|$)|api\/portal(?:[/.;]|$))/i
     .test(decoded) ? "invalid" : null;
 }
 
@@ -865,6 +867,90 @@ async function brandsSearch(url, env) {
       word_rows: typeof value.word_rows === "number" ? value.word_rows : 0,
       capped: value.capped === true,
     });
+  } catch {
+    return suppliersJson({ error: "search_unavailable" }, 503);
+  } finally { clearTimeout(timer); }
+}
+
+// ЕДИНЫЙ ПОИСК ПОРТАЛА (/api/portal/search?q=…) — шаг 1 «одной стартовой
+// страницы»: по одному слову строки пяти видов, каждая ведёт на уже
+// существующую страницу. Устроен как поиск по спросу выше: одна фиксированная
+// функция базы portal_search (library/supabase/portal_schema.sql) через
+// PostgREST сервисным ключом, за правом suppliers. Клиент задаёт только строку
+// поиска; предел на вид задан здесь. Ответ пропускается через белый список
+// полей и счётчиков — лишнее поле базы дальше воркера не идёт. Строка поиска в
+// журнал не пишется (журнал берёт только путь).
+const PORTAL_SEARCH_MAX_BYTES = 256 * 1024;
+const PORTAL_SEARCH_TIMEOUT_MS = 10000;
+const PORTAL_SEARCH_LIMIT = 8;
+// Порядок видов — порядок групп при равном ранге.
+const PORTAL_KINDS = ["код", "бренд", "поставщик", "машина", "узел"];
+const PORTAL_COUNTS = ["deals", "demand_rows", "offers", "suppliers", "catalog", "analogs",
+  "analog_of", "spellings", "rows", "codes", "parts", "fleet", "children"];
+
+function portalSearchRow(r) {
+  if (!r || typeof r !== "object" || !PORTAL_KINDS.includes(r.kind)) return null;
+  const s = (v, max) => (typeof v === "string" && v ? v.slice(0, max) : null);
+  const key = s(r.key, 160);
+  if (!key) return null;
+  const counts = {};
+  if (r.counts && typeof r.counts === "object" && !Array.isArray(r.counts)) {
+    for (const k of PORTAL_COUNTS) {
+      const v = r.counts[k];
+      if (typeof v === "number" && Number.isFinite(v) && v >= 0) counts[k] = v;
+    }
+    if (r.counts.capped === true) counts.capped = true;
+  }
+  const segment = s(r.segment, 40);
+  return {
+    kind: r.kind, key, title: s(r.title, 200) || key, subtitle: s(r.subtitle, 300),
+    brand: s(r.brand, 120), brand_key: s(r.brand_key, 120), brand_src: s(r.brand_src, 20),
+    segment: segment && /^[a-z0-9_-]+$/i.test(segment) ? segment : null,
+    counts, source: s(r.source, 80), rank: Number.isInteger(r.rank) ? r.rank : 3,
+  };
+}
+
+async function portalSearch(url, env, rights) {
+  const q = String(url.searchParams.get("q") || "").trim();
+  if ([...q].length < 2 || [...q].length > 80 || /[\u0000-\u001f\u007f]/.test(q)) {
+    return suppliersJson({ error: "invalid_query" }, 400);
+  }
+  const key = typeof env?.SUPABASE_SERVICE_KEY === "string" ? env.SUPABASE_SERVICE_KEY.trim() : "";
+  if (!key) return suppliersJson({ error: "search_key_missing" }, 503);
+  const headers = { apikey: key, "Content-Type": "application/json", Accept: "application/json" };
+  if (!key.startsWith("sb_secret_")) headers.Authorization = "Bearer " + key;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), PORTAL_SEARCH_TIMEOUT_MS);
+  try {
+    const response = await fetch(SUPABASE_ORIGIN + "/rest/v1/rpc/portal_search", {
+      method: "POST", redirect: "manual", signal: controller.signal, headers,
+      body: JSON.stringify({ q, lim: PORTAL_SEARCH_LIMIT }),
+    });
+    if (response.status !== 200) {
+      try { await response.body?.cancel(); } catch {}
+      // 404 PostgREST — функции в базе нет: схема портала ещё не применена.
+      return suppliersJson({ error: response.status === 404 ? "search_not_installed" : "search_unavailable" }, 503);
+    }
+    const declared = response.headers.get("Content-Length");
+    if (declared !== null && !(Number(declared) <= PORTAL_SEARCH_MAX_BYTES)) {
+      try { await response.body?.cancel(); } catch {}
+      return suppliersJson({ error: "search_unavailable" }, 503);
+    }
+    const raw = await response.text();
+    if (new TextEncoder().encode(raw).byteLength > PORTAL_SEARCH_MAX_BYTES) return suppliersJson({ error: "search_unavailable" }, 503);
+    const value = JSON.parse(raw);
+    if (!Array.isArray(value)) return suppliersJson({ error: "search_unavailable" }, 503);
+    // «усечено» — виды, до которых база не дошла за бюджет времени. Страница
+    // говорит об этом прямо: «не нашлось» и «не успели» — разные ответы.
+    const partial = [...new Set(value.filter((r) => r && r.kind === "усечено" && PORTAL_KINDS.includes(r.key))
+      .map((r) => r.key))];
+    const rows = value.slice(0, 400).map(portalSearchRow).filter(Boolean);
+    // Сортировка устойчивая: внутри вида и ранга остаётся порядок базы (вес
+    // свидетельств), а виды встают по лучшему рангу.
+    rows.sort((a, b) => a.rank - b.rank || PORTAL_KINDS.indexOf(a.kind) - PORTAL_KINDS.indexOf(b.kind));
+    return suppliersJson({ q, rows, partial,
+      // Машины и узлы ведут в библиотеку, а её право — отдельное (сайт knowledge).
+      library: !!(rights.admin || (rights.sites || []).includes("knowledge")) });
   } catch {
     return suppliersJson({ error: "search_unavailable" }, 503);
   } finally { clearTimeout(timer); }
@@ -1291,6 +1377,7 @@ export default {
         return suppliersJson({ ...snapshot, admin: rights.admin });
       }
       if (suppliers === "brandsSearch") return brandsSearch(url, env);
+      if (suppliers === "portalSearch") return portalSearch(url, env, rights);
       if (["brandsApi", "brandsLinks", "brandsPairs", "brandsCodes"].includes(suppliers)) {
         let key = BRANDS_KEY, empty = { version: 1, published_at: null, brands: [], suppliers: [], totals: {} };
         if (suppliers === "brandsLinks") { key = BRANDS_LINKS_KEY; empty = { version: 1, brands: [], suppliers: [], codes: [] }; }
@@ -1933,6 +2020,13 @@ function portalPage(who, rights, env) {
     return `<section><h2>${esc(g.name)}<span>${esc(g.note)}</span></h2><div class="grid">${tiles}</div></section>`;
   }).join("");
   const empty = `<div class="card">Доступ к разделам пока не выдан. Обратитесь к владельцу — он назначает права на странице «Доступы».</div>`;
+  // ЕДИНЫЙ ПОИСК — над плитками, тем, у кого есть право suppliers: отвечает он
+  // кодами, брендами и поставщиками, то есть сведениями этого права. Строку и
+  // выдачу рисует общий скрипт /portal_search.js — тот же, что даёт полоску
+  // поиска страницам раздела; здесь только место для него. Без скрипта (сбой,
+  // старый браузер) место пустое, а плитки работают как прежде.
+  const search = rights.admin || rights.rights.includes("suppliers")
+    ? `<div id="kvps" class="kvps-page"></div><script src="/portal_search.js" defer></script>` : "";
   const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark">
 <title>Портал КВАНТ</title>
@@ -1957,6 +2051,7 @@ section h2 span{font-size:12px;font-weight:400;letter-spacing:0;text-transform:n
 </style></head><body><div class="wrap">
 <div class="top"><div><div class="eyebrow">КВАНТ · единый вход</div><h1>Портал</h1></div>
 <div class="who">${esc(who.email)}${rights.admin ? '<a href="/admin">доступы</a>' : ""}<a href="https://${esc(team)}/cdn-cgi/access/logout">выйти</a></div></div>
+${search}
 ${mine.length ? sections : empty}
 ${rights.admin ? '<section><h2>Закрытый архив<span>доступ администратора</span></h2><div class="grid"><a class="tile" href="/library/archive"><div class="n">Поиск в архиве</div><div class="d">Исходные тексты, координаты фрагментов и исторические версии. Поиск по доступному индексу.</div></a></div></section>' : ''}
 <div class="note">Вход по корпоративной почте, сессия действует месяц. Права на разделы назначает владелец.</div>
