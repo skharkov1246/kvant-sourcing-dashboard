@@ -1,0 +1,42 @@
+name: Планировщик — выкладка Cloudflare Cron Worker
+
+# Планировщик (scheduler/) — отдельный Cloudflare Worker, и до 24.09.2026 его
+# выкладывали только руками (`cd scheduler && wrangler deploy`). Раскладка ночных
+# прогонов, утверждённая владельцем 24.09.2026, живёт в нём (worker.js, NIGHTLY), и
+# правка расписания без выкладки не действует. Прогон выкладывает планировщик при
+# каждом изменении scheduler/ в main и по кнопке.
+#
+# Секреты воркера (GH_DISPATCH_TOKEN, RESEND_API_KEY, BASIC_AUTH_PASS) выкладка
+# не трогает: `wrangler deploy` меняет код и расписание, а секреты хранятся отдельно.
+on:
+  push:
+    branches: [main]
+    paths: ["scheduler/**"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduler-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Выложить планировщик
+        working-directory: scheduler
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@3 deploy
+          echo "расписание планировщика:"
+          grep -A2 '^crons' wrangler.toml

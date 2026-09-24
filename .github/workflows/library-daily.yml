@@ -14,11 +14,17 @@ name: Библиотека — ежедневное пополнение
 #
 # ПОКА ТОЛЬКО РУЧНОЙ ЗАПУСК. Расписание — решение владельца (CLAUDE.md: правки
 # планировщика — с его согласия). Предложение: ежедневно в 02:40 UTC (05:40 МСК),
-# после ночного разбора котировок (01:40 UTC) и до утреннего деплоя (06:07 UTC).
+# после ночного разбора котировок (01:00 UTC) и до утреннего деплоя (06:07 UTC).
 #
 # В репозиторий и в артефакты не пишется ничего, в журнал — только агрегаты
 # (правило 17).
 on:
+  # Ежедневно в 02:00 UTC — repository_dispatch «library-daily» от Cloudflare-
+  # планировщика (scheduler/worker.js; расписание утвердил владелец 24.09.2026).
+  # У dispatch нет входов, поэтому распознавание включается и тогда, когда
+  # inputs.ocr пуст (см. условия шагов ниже).
+  repository_dispatch:
+    types: [library-daily]
   workflow_dispatch:
     inputs:
       ocr:
@@ -100,7 +106,7 @@ jobs:
         run: python library/indexer.py
 
       - name: Распознавание новых сканов — сделки
-        if: inputs.ocr
+        if: github.event_name == 'repository_dispatch' || inputs.ocr
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
@@ -109,7 +115,7 @@ jobs:
         run: python library/ocr.py
 
       - name: Распознавание новых сканов — карточки запросов
-        if: inputs.ocr
+        if: github.event_name == 'repository_dispatch' || inputs.ocr
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
