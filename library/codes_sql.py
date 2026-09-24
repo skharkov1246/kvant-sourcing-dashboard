@@ -38,7 +38,7 @@ import inspect
 import re
 from pathlib import Path
 
-from library import company_names, doc_folder, doc_side, equipment, quotes
+from library import company_names, doc_folder, doc_side, docfilter, equipment, quotes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -417,7 +417,7 @@ def brand_pipeline(judged_cols: str = "c.*, tj.brand_key, tj.brand_name") -> str
            end as reject
       from cells c
       left join text_judged tj on tj.cell = c.cell
-     where length(c.code) >= 2
+     where length(c.code) >= 2 and {docfilter.sql_код_годен("c.code")}
   ),
   clean as (
     select * from judged where reject is null
@@ -436,8 +436,16 @@ def part_ok(expr: str) -> str:
 
 # Ключ строки цены — part_number, а при пустом — part_id (scripts/codes_with_prices.py:
 # часть потоков пишет цену без номера, но с ключом детали).
+#
+# ПРАВДОПОДОБНЫЙ КОД (docfilter.sql_код_годен — тело lib_pn_plausible, двойника
+# docfilter.код_правдоподобен):
+# марка стали, размер с единицей и стандарт кодом не являются — «SS316» склеивал
+# в один код все позиции из этой стали (карточка номенклатуры, 24.09.2026). Номер,
+# отвергнутый правилом, считается пустым: остаётся part_id, если он есть.
+# Правило применяется при чтении, накопленные строки не переписываются.
 def price_code(a: str) -> str:
     return (f"case when length(lib_pn_key({a}.part_number)) >= 2 "
+            f"and {docfilter.sql_код_годен(a + '.part_number')} "
             f"then lib_pn_key({a}.part_number) else {a}.part_id end")
 
 
@@ -861,7 +869,7 @@ with
         left join files f on f.file_id = d.source_file
        where coalesce(btrim(d.part_number), '') <> ''
       offset 0) x
-     where length(x.code) >= 2 and {part_ok("x.code")}
+     where length(x.code) >= 2 and {docfilter.sql_код_годен("x.code")} and {part_ok("x.code")}
   ),
   demand_codes as materialized (
     select code, side, origin, side_by_col, count(*) as rows_n
@@ -886,7 +894,7 @@ with
   catalog_codes as materialized (
     select distinct z.code
       from (select lib_pn_key(catalog_no) as code from lib_parts) z
-     where length(z.code) >= 2 and {part_ok("z.code")}
+     where length(z.code) >= 2 and {docfilter.sql_код_годен("z.code")} and {part_ok("z.code")}
   ),
   -- Коды, чей бренд назван одним из трёх источников облака.
   brand_codes as materialized (
@@ -919,6 +927,11 @@ with
     union all
     select 0, 'проверка', 'lib_pn_key(''ВЫДУМ-101'') = ''выдум101''',
            (lib_pn_key('ВЫДУМ-101') = 'выдум101')::int, 'одинаково'
+    union all
+    select 0, 'проверка', 'правдоподобный код: марка SS316 не код, ВЫДУМ-101 — код',
+           (not {docfilter.sql_код_годен("'SS316'")}
+            and {docfilter.sql_код_годен("'ВЫДУМ-101'")})::int,
+           'одинаково'
     union all
     select 1, 'строки lib_demand (все стороны)',
            'строк lib_demand с кодом, сторона документа: ' || side,
@@ -1146,13 +1159,16 @@ def sub(text: str, old: str, new: str, label: str, count: int = 1) -> str:
 PRICE_LIMIT = int(quotes.ПРЕДЕЛ_ЦЕНЫ)
 # Допуск сверки «цена × количество = сумма» — тот же, что у разборщика.
 TOL_MIN, TOL_UNIT = quotes.ДОПУСК_МИН, quotes.ДОПУСК_НА_ЕДИНИЦУ
+# Предел количества — тот же, что у разборщика (indexer.количество_ячейки).
+QTY_MAX = int(quotes.МАКС_КОЛИЧЕСТВО)
 # Оговорки разборщика, по которым видно, откуда цена. Если формулировка в
 # quotes.py изменится, сборка упадёт здесь, а не выдаст запрос, считающий ноль.
 _QSRC = inspect.getsource(quotes)
 NOTE_FROM_TOTAL = "делением суммы"
 NOTE_CUR_FILE = "валюта взята по файлу"
 NOTE_TEXT = "опознана в тексте"
-for _p in (NOTE_FROM_TOTAL, NOTE_CUR_FILE, NOTE_TEXT):
+NOTE_QTY_BAD = quotes.КОЛ_НЕ_СОШЛОСЬ
+for _p in (NOTE_FROM_TOTAL, NOTE_CUR_FILE, NOTE_TEXT, NOTE_QTY_BAD):
     if _p not in _QSRC:
         raise RuntimeError(f"в library/quotes.py нет оговорки «{_p}» — сверить признаки строки цены")
 
@@ -1200,7 +1216,17 @@ PR_ALL = f"""\
                 when u.k in ({_in(UNIT_SET)}) then 'компл'
                 when u.k in ({_in(UNIT_M)}) then 'м'
                 else u.k end                                               as unit,
-           p.part_number, p.item_name, p.price, p.qty, p.qty_unit, p.basis,
+           p.part_number, p.item_name, p.price,
+           -- КОЛИЧЕСТВО, КОТОРОЕ НЕ ЧИТАЕТСЯ, В МОДУ/МИН/МАКС НЕ ИДЁТ: больше
+           -- quotes.МАКС_КОЛИЧЕСТВО или «количество × цена ≠ сумма» (склейка
+           -- ячеек до 24.09.2026 — «3 163 518 182,316»). Строка не выбрасывается:
+           -- цена её остаётся, сверка суммы ниже считается по записанному числу.
+           case when p.qty > 0 and p.qty <= {QTY_MAX}
+                     and not coalesce(p.price > 0 and u.total > 0
+                                      and abs(p.price * p.qty - u.total)
+                                          > greatest({TOL_MIN}, p.qty * {TOL_UNIT}), false)
+                then p.qty end                                             as qty,
+           p.qty_unit, p.basis,
            -- У потока «разбор КП» price_date не пишется, а created_at ставится
            -- заново при каждом переразборе (price_store снимает строки файла и
            -- пишет снова): это день записи в базу, а не дата КП.
@@ -1217,7 +1243,10 @@ PR_ALL = f"""\
            -- выведенная из суммы делением, сходится с ней по построению — её
            -- сверка ничего не доказывает, и в счёт она не идёт (правило 1).
            -- total читается через to_jsonb: без миграции колонки запрос не падает.
-           case when p.price > 0 and p.qty > 0 and u.total > 0
+           -- Количество, снятое разбором за несходство (quotes.КОЛ_НЕ_СОШЛОСЬ),
+           -- — та же несошедшаяся сумма, только записанная без количества.
+           case when coalesce(p.note like '%{NOTE_QTY_BAD}%', false) then false
+                when p.price > 0 and p.qty > 0 and u.total > 0
                      and not coalesce(p.note like '%{NOTE_FROM_TOTAL}%', false)
                 then abs(p.price * p.qty - u.total)
                      <= greatest({TOL_MIN}, p.qty * {TOL_UNIT}) end               as total_ok,

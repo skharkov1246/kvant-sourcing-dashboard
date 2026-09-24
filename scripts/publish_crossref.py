@@ -83,6 +83,8 @@ def читать_базу(dsn):
                         crossref.ИЗГОТОВИТЕЛИ_SQL, crossref.СПРОС_SQL):
                 cur.execute(company_names.имена_sql(sql, есть), (crossref.FEED,))
                 наборы.append(cur.fetchall())
+            # Имена брендов карточки запроса — из реестра, если он в базе есть.
+            наборы.append(crossref.имена_брендов(cur))
         return наборы
     finally:
         conn.close()
@@ -100,11 +102,15 @@ def main(argv=None):
         КЛЮЧИ = crossref.ВСЕ_КЛЮЧИ
 
     try:
-        (предложения, каталог, аналоги, машины, изготовители,
-         спрос) = читать_базу(os.environ.get("SUPABASE_DB_URL"))
+        наборы = читать_базу(os.environ.get("SUPABASE_DB_URL"))
+        (предложения, каталог, аналоги, машины, изготовители, спрос) = наборы[:6]
+        имена = наборы[6] if len(наборы) > 6 else {}
         собран = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         снимок = crossref.собрать(предложения, каталог, аналоги, машины,
-                                  изготовители, спрос, собран=собран)
+                                  изготовители, спрос, собран=собран,
+                                  имена_брендов=имена)
+        print(f"брендов карточки запроса с именем из реестра: {len(имена)}"
+              + ("" if имена else " — реестра нет, бренды остаются номерами"))
         сырые = {k: json.dumps(v, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
                  for k, v in crossref.разложить(снимок).items()}
         t = снимок["totals"]

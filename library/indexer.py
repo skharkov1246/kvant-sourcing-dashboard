@@ -168,6 +168,12 @@ NOISE_ROW = re.compile(r"^(итого|всего|подпись|примечан
 # шапки чаще английские, и промах не редкий, а типовой. Отсев по слову рядом:
 # «unit» значит единицу, если в той же ячейке не сказано «price», «cost», «rate».
 ЕДИНИЦА_ЧУЖОЕ = ("price", "cost", "rate", "amount", "цена", "стоимост", "сумма")
+# «Код» опознаёт колонку артикула — и заодно ловит «Код ТН ВЭД», «Код ОКПД2»,
+# «HS code»: это классификаторы товара, одинаковые у сотен разных позиций, и в
+# part_number они склеивали чужие позиции одним ключом. Закрытый список слов
+# классификаторов (правило 7): «Код товара», «Код изделия» остаются артикулом.
+КОД_ЧУЖОЙ = ("тн вэд", "тнвэд", "тн-вэд", "окпд", "оквэд", "окп", "окей", "океи",
+             "hs code", "hs-code", "hscode", "customs")
 
 
 # Session pooler Supabase допускает лишь 15 одновременных клиентов (EMAXCONNSESSION).
@@ -754,6 +760,8 @@ def колонки_строки(row: list[str]) -> dict[str, int]:
                 continue
             if key == "unit" and any(w in c for w in ЕДИНИЦА_ЧУЖОЕ):
                 continue              # «Unit price» — колонка цены, не единицы
+            if key == "part_number" and any(w in c for w in КОД_ЧУЖОЙ):
+                continue              # «Код ТН ВЭД» — классификатор, не артикул
             found.setdefault(key, j)
             break
     return found
@@ -1057,6 +1065,48 @@ def почему_нет_шапки(rows: list[list[str]]) -> str:
     return "ни одного известного слова колонки"
 
 
+def количество_ячейки(q: str) -> tuple[float | None, str | None]:
+    """Количество из ячейки и причина отказа, если число не читается.
+
+    Прежде бралось float(все цифры ячейки подряд): «3 163 518 182,316» склеивалось
+    в 3163518182.316, и карточка номенклатуры показывала это количеством
+    (24.09.2026). Теперь число читает quotes.число_из — тот же разбор разделителей
+    тысяч, что у цены, — а число больше quotes.МАКС_КОЛИЧЕСТВО отвергается: такого
+    количества в строке КП или спецификации не бывает, это склейка ячеек.
+    """
+    if not (q or "").strip():
+        return None, None
+    v = quotes.число_из(q)
+    if v is None or v <= 0:
+        return None, None
+    if v > quotes.МАКС_КОЛИЧЕСТВО:
+        return None, quotes.КОЛ_НЕ_ЧИТАЕТСЯ
+    return v, None
+
+
+def сверить_количество(rec: dict) -> None:
+    """Тройка «количество × цена = сумма»: не сошлась — количество не пишется.
+
+    Угадывать нельзя: при цене, равной сумме, соблазнительно поставить 1, но
+    неверной может быть любая из трёх ячеек. Поэтому количество снимается, а
+    строка цены получает оговорку quotes.КОЛ_НЕ_СОШЛОСЬ — по ней её считает
+    «строк_сумма_не_сошлась» страницы /brands (library/codes_sql.py). Цена,
+    выведенная из суммы делением, сходится с ней по построению и не сверяется.
+    Отказ по пределу (количество_ячейки) пишется в оговорку той же строкой.
+    """
+    ц = rec.get("_цена")
+    причина = rec.pop("_кол_во_отказ", None)
+    qty = rec.get("qty")
+    if ц and qty and ц.get("price") and ц.get("total") \
+            and quotes.ОГОВОРКА_ИЗ_СУММЫ not in (ц.get("note") or ""):
+        if abs(qty * ц["price"] - ц["total"]) > max(quotes.ДОПУСК_МИН,
+                                                  qty * quotes.ДОПУСК_НА_ЕДИНИЦУ):
+            rec["qty"] = None
+            причина = quotes.КОЛ_НЕ_СОШЛОСЬ
+    if ц and причина:
+        ц["note"] = "; ".join(x for x in (ц.get("note"), причина) if x)
+
+
 def items_from_rows(rows: list[list[str]], *, шире: bool | None = None) -> list[dict]:
     """Позиции из таблицы. Если заголовков нет — берём самую длинную текстовую
     ячейку строки как наименование: у большинства спецификаций это работает.
@@ -1090,13 +1140,16 @@ def items_from_rows(rows: list[list[str]], *, шире: bool | None = None) -> l
                 return row[j].strip() if 0 <= j < len(row) else ""
             rec["item_name"] = get("item_name")
             rec["part_number"] = get("part_number")
+            # Ячейка артикула, в которой стоит только марка, размер или стандарт
+            # («SS316», «19mm», «ГОСТ 8752-79»), артикула не несёт. Код тогда
+            # ищется в НАИМЕНОВАНИИ, а не во всей строке: в строке стоят
+            # количество, цена и сумма, и голое «25600» стало бы артикулом.
+            if not docfilter.код_правдоподобен(rec["part_number"]):
+                rec["part_number"] = docfilter.part_number_of(get("item_name"))
+                rec["_код_искали"] = True
             rec["oem"] = get("oem")
             rec["unit"] = get("unit")
-            q = get("qty").replace(",", ".")
-            try:
-                rec["qty"] = float(re.sub(r"[^\d.]", "", q)) if q else None
-            except Exception:
-                rec["qty"] = None
+            rec["qty"], rec["_кол_во_отказ"] = количество_ячейки(get("qty"))
         else:
             cand = max(row, key=lambda c: len(c)) if row else ""
             rec["item_name"] = cand
@@ -1107,7 +1160,7 @@ def items_from_rows(rows: list[list[str]], *, шире: bool | None = None) -> l
         name = (rec.get("item_name") or "").strip()
         if len(name) < 4 or name.isdigit():
             continue
-        if not rec.get("part_number"):
+        if not rec.pop("_код_искали", False) and not rec.get("part_number"):
             # Прежнее выражение искало по joined.upper() и принимало за артикул
             # дату 01.09.2026, номер закона 223-ФЗ и любое пятизначное число.
             # docfilter.part_number_of отбрасывает даты, номера пунктов, годы и
@@ -1120,6 +1173,7 @@ def items_from_rows(rows: list[list[str]], *, шире: bool | None = None) -> l
         # становится: из неё цена выводится делением на количество, и такая
         # строка помечена как выведенная (library/quotes.py).
         rec["_цена"] = quotes.цена_строки(row, цк, rec.get("qty"), вк) if цк else None
+        сверить_количество(rec)
         # Условия из СВОИХ колонок этой позиции: базис, оплата, срок изготовления,
         # срок поставки. Они главнее общих условий файла — они про эту позицию.
         rec["_из_строки"] = offer_terms.из_строки(row, цк) if цк else None
