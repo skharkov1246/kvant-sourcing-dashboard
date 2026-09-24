@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 269,
-    "total_bytes": 123671650,
+    "datasets": 276,
+    "total_bytes": 124225870,
     "by_sensitivity": {
-      "внутреннее": 147,
+      "внутреннее": 154,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 5,
+      "дашборд сорсеров": 12,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -1187,6 +1187,43 @@
       ]
     },
     {
+      "path": "data/chat_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 1150021,
+      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assessment",
+        "days",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "assessment",
+        "records": 15
+      },
+      "last_change": "2026-09-24",
+      "last_author": "github-actions[bot]",
+      "last_commit": "ea6afeb",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/gate.yml",
+        ".github/workflows/scan.yml",
+        "chat_scan.py",
+        "gpu/tools/bitrix_gpu.py",
+        "reps.py",
+        "scripts/budget_snapshot.py",
+        "scripts/preflight.py",
+        "zip/tools/r1700_bitrix.py"
+      ]
+    },
+    {
       "path": "zip/data/positions.json",
       "subproject": "база ЗИП",
       "bytes": 1064958,
@@ -1243,43 +1280,6 @@
         "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/customs/glbs_pull.mjs"
-      ]
-    },
-    {
-      "path": "data/chat_snapshot.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 1061228,
-      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "assessment",
-        "days",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "assessment",
-        "records": 15
-      },
-      "last_change": "2026-09-23",
-      "last_author": "github-actions[bot]",
-      "last_commit": "99c658b",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "оценки и данные сотрудников"
-        ]
-      },
-      "referenced_by": [
-        ".github/workflows/gate.yml",
-        ".github/workflows/scan.yml",
-        "chat_scan.py",
-        "gpu/tools/bitrix_gpu.py",
-        "reps.py",
-        "scripts/budget_snapshot.py",
-        "scripts/preflight.py",
-        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -4123,6 +4123,69 @@
       "referenced_by": []
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 155512,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/budget_join_stats.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/gap_letters.json",
+        "gt/data/maker_contacts.json",
+        "gt/data/ms5001_vankor.json",
+        "gt/data/pn_db.json",
+        "gt/data/seller_index.json",
+        "gt/data/seller_sitemaps.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json"
+      ],
+      "last_change": "2026-09-24",
+      "last_author": "Claude",
+      "last_commit": "c6146e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gpu/data/overhaul_qsk60.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 154146,
@@ -4358,69 +4421,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 146061,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "dict/symptom.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/budget_join_stats.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/gap_letters.json",
-        "gt/data/maker_contacts.json",
-        "gt/data/ms5001_vankor.json",
-        "gt/data/pn_db.json",
-        "gt/data/seller_index.json",
-        "gt/data/seller_sitemaps.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_inside_priced.json",
-        "gt/data/ship_inside_quotes.json"
-      ],
-      "last_change": "2026-09-22",
-      "last_author": "skharkov1246",
-      "last_commit": "3f9d40d",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
-      ]
     },
     {
       "path": "gt/data/ship_confidence.json",
@@ -5905,6 +5905,54 @@
       ]
     },
     {
+      "path": "data/brand_research/epiroc.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 78292,
+      "note": "Разведка бренда по открытым источникам (2026-09-24): Epiroc: проходческие Boomer, добычные Simba, ПДМ Scooptram, перфораторы COP. Машин и исполнений — 25, сервисных документов — 25, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 12, дилеров и сервисных компаний — 13, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 5 (поле corrections). 17 кодов — из буклетов перфораторов COP самого Epiroc (ремкомплекты и комплекты ТО), остальные — номера Epiroc у неофициальных поставщиков с пометкой доверия. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-24",
+      "last_author": "Claude",
+      "last_commit": "c6146e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gt/data/ship_recheck.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 74448,
@@ -5993,6 +6041,197 @@
       "referenced_by": [
         "gidromet/build.py"
       ]
+    },
+    {
+      "path": "data/brand_research/caterpillar.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 72671,
+      "note": "Разведка бренда по открытым источникам (2026-09-24): Caterpillar: газовые ГПУ G3500 и серия CG (двигатели MWM), горная техника 797F/793F/R1700/AD45, очистные комбайны. Машин и исполнений — 25, сервисных документов — 20, кодов запчастей — 38, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 9, дилеров и сервисных компаний — 14, пробелов (gaps) — 12; по замечаниям скептика поправлено записей — 7 (поле corrections). Часть кодов — номера Caterpillar в руководстве MOTORTECH и каталоге аналогов IPD; два кода без подтверждения вынесены в parts_rejected. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 38,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-24",
+      "last_author": "Claude",
+      "last_commit": "c6146e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/solarturbines.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 71911,
+      "note": "Разведка бренда по открытым источникам (2026-09-24): Solar Turbines: ГТУ Saturn, Centaur, Mercury, Taurus, Mars, Titan и компрессоры C-серии. Машин и исполнений — 22, сервисных документов — 21, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 11, дилеров и сервисных компаний — 12, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 7 (поле corrections). 27 кодов — из трёх открытых иллюстрированных каталогов деталей Solar (Saturn 20, Taurus 70, Centaur 50), остальные — из объявлений и запросов котировок с пометкой, кем заявлена применимость. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-24",
+      "last_author": "Claude",
+      "last_commit": "c6146e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/inniojenbacher.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 68857,
+      "note": "Разведка бренда по открытым источникам (2026-09-24): INNIO Jenbacher: газовые двигатели Type 3/4/6/9 (J320, J416, J420, J612–J624, J920). Машин и исполнений — 12, сервисных документов — 14, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 8, дилеров и сервисных компаний — 26, пробелов (gaps) — 12; по замечаниям скептика поправлено записей — 7 (поле corrections). Привязка кодов к моделям — в основном по карточкам продавцов аналогов (Weyeah, Zuhon, FridayParts), номера подтверждены также parts-systems.de; цены того же продавца — gt/data/ship_jenbacher_prices.json. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-24",
+      "last_author": "Claude",
+      "last_commit": "c6146e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/cummins.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 68564,
+      "note": "Разведка бренда по открытым источникам (2026-09-24): Cummins (газовые ГПУ lean-burn). Машин и исполнений — 24, сервисных документов — 12, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 13, дилеров и сервисных компаний — 12, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 7 (поле corrections). Коды двигателя взяты из открытых каталогов перепродавцов (каталоги Cummins QuickServe закрыты), у каждой такой строки это сказано. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-24",
+      "last_author": "Claude",
+      "last_commit": "c6146e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "pnw/data/part_suppliers.json",
@@ -6232,6 +6471,54 @@
         "gpu/build.py",
         "gpu/site/index.template.html"
       ]
+    },
+    {
+      "path": "data/brand_research/siemensenergy.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 63757,
+      "note": "Разведка бренда по открытым источникам (2026-09-24): Siemens Energy: промышленные ГТУ SGT-100…SGT-800 двух ветвей нумерации (Lincoln и Finspång). Машин и исполнений — 9, сервисных документов — 14, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 18, дилеров и сервисных компаний — 17, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 4 (поле corrections). Открытых каталогов деталей изготовителя нет: коды — из опубликованных заявок эксплуатантов и списков реверс-изготовителей, перед закупкой сверять с ведомостью ЗИП пакета. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-24",
+      "last_author": "Claude",
+      "last_commit": "c6146e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "zip/data/perf_class_packets.json",
@@ -8391,6 +8678,51 @@
         "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py"
+      ]
+    },
+    {
+      "path": "data/brand_research/queue.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 31924,
+      "note": "Очередь разведки брендов (обновлена 2026-09-24): 60 брендов из dict/oem.json, сделано — 6, в очереди — 54. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "groups",
+        "records",
+        "rule",
+        "schema",
+        "statuses",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "records",
+        "records": 60,
+        "record_keys": [
+          "atlas",
+          "dict_name",
+          "file",
+          "focus",
+          "group",
+          "n_spellings",
+          "name",
+          "oem_key",
+          "priority",
+          "researched_at",
+          "status"
+        ]
+      },
+      "last_change": "2026-09-24",
+      "last_author": "Claude",
+      "last_commit": "c6146e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/brand_research_check.py",
+        "tests/test_brand_research_check.py"
       ]
     },
     {
