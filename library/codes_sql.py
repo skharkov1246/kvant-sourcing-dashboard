@@ -93,6 +93,33 @@ def side_by_pattern() -> str:
     return "\n".join(lines)
 
 
+# СТОРОНА ПО ПРОИСХОЖДЕНИЮ — там, где его одного хватает. Карточка запроса —
+# всегда поставщик. Письма (library/mail_source.py, 24.09.2026) пишут колонку
+# side сами, и запасной путь нужен им лишь на случай, если колонки в базе нет:
+# письмо лида — заказчик, входящее письмо компании или контакта — поставщик.
+# Письма сделки здесь нет: у него два направления, и одно происхождение сторону
+# не называет.
+СТОРОНА_ПО_ПРОИСХОЖДЕНИЮ = {
+    "поле запроса": doc_side.ПОСТАВЩИК,
+    doc_folder.ПИСЬМО_ПОСТАВЩИКА: doc_side.ПОСТАВЩИК,
+    doc_folder.ПИСЬМО_ЛИДА: doc_side.ЗАКАЗЧИК,
+}
+
+# СДЕЛКИ ЗАКАЗЧИКА — файлы, у которых deal_id и есть номер сделки: поле сделки
+# и письмо сделки. Письмо лида спрос даёт, но номер у него лида («L123»), и в
+# счёт «сделок» он не идёт.
+ПРОИСХОЖДЕНИЯ_СДЕЛКИ = ("поле сделки", doc_folder.ПИСЬМО_СДЕЛКИ)
+
+
+def side_by_origin() -> str:
+    return "\n".join(f"                 when {q(o)} then {q(s)}"
+                     for o, s in СТОРОНА_ПО_ПРОИСХОЖДЕНИЮ.items())
+
+
+def origins_sql(origins) -> str:
+    return "(" + ", ".join(q(o) for o in origins) + ")"
+
+
 # НЕ materialized: планировщик сам строит хеш по lib_files (32 тыс. строк), а не
 # по спросу (1,2 млн). С «materialized» он хешировал большую сторону: 165 МБ
 # временных файлов на одном узле (проверка производительности, 23.09.2026).
@@ -121,7 +148,9 @@ FILES_CTE = f"""\
                 else 'не определена' end as side_from
       from (
         select y.file_id, y.origin, y.by_col,
-               case when y.origin = 'поле запроса' then 'поставщик' end as by_origin,
+               case y.origin
+{side_by_origin()}
+               end as by_origin,
                case regexp_replace(lower(coalesce(y.field, '')), '[^0-9a-z]', '', 'g')
 {side_by_code()}
                end as by_code,
@@ -652,7 +681,8 @@ with
            count(distinct c.row_id) filter (where c.src = 'спецификация')      as rows_customer,
            count(distinct c.row_id) filter (where c.row_id like 'p:%')         as rows_kp_price,
            count(distinct c.deal_id) filter (where c.src = 'спецификация'
-                                             and c.origin = 'поле сделки')     as deals_customer,
+                                             and c.origin in {origins_sql(ПРОИСХОЖДЕНИЯ_СДЕЛКИ)})
+                                                                               as deals_customer,
            count(distinct c.rfq_company) filter (where c.row_id like 'p:%')    as portal_companies_naming
       from clean c
       left join kp_codes  kp on kp.code = c.code

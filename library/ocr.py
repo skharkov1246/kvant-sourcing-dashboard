@@ -922,6 +922,12 @@ def журнал_есть(cur) -> bool:
 def main() -> int:
     if REVERT:
         return main_откат()
+    # Сканы писем распознавание пока не берёт: обход ниже знает только сделки и
+    # карточки запросов, и с SOURCE=mail молча прошёл бы по сделкам.
+    if indexer.SOURCE not in ("deals", "rfq"):
+        print(f"распознавание источника SOURCE={indexer.SOURCE!r} не поддержано: "
+              "только deals или rfq", file=sys.stderr)
+        return 2
     for var in ("BITRIX_WEBHOOK_URL", "SUPABASE_DB_URL"):
         if not os.environ.get(var):
             print(f"нет переменной {var}", file=sys.stderr)

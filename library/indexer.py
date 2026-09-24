@@ -100,6 +100,18 @@ SPECGATE = os.environ.get("SPECGATE", "1").strip().lower() not in ("0", "false",
 # где цена вообще есть: на самой карточке сумма равна нулю у всех 21 865.
 SOURCE = os.environ.get("SOURCE", "deals").strip().lower()
 SPA_RFQ = 166
+#: ПИСЬМА — ТРЕТИЙ ИСТОЧНИК (SOURCE=mail, library/mail_source.py, распоряжение
+#: владельца 24.09.2026: спрос и предложение со всех сторон, понемногу). Группа
+#: — закрытый список mail_source.ГРУППЫ; пачку номеров писем [MAIL_FROM+1;
+#: MAIL_TO] определяет план прогона, часть берёт из неё свой смежный кусок.
+#: Без MAIL_TO — пачка в MAIL_LIMIT писем от отметки в базе (ручной запуск).
+MAIL_GROUP = os.environ.get("MAIL_GROUP", "").strip()
+MAIL_LIMIT = int(os.environ.get("MAIL_LIMIT", "2000") or 2000)
+#: ПИСЬМА ПИШУТСЯ В БАЗУ ТОЛЬКО ПО APPLY. Источник новый, и правило сначала
+#: меряют, потом применяют (CLAUDE.md, правило 3): холостой прогон качает и
+#: разбирает файлы, печатает счётчики и не пишет ничего. У сделок и карточек
+#: запросов поведение прежнее — они пишут всегда.
+APPLY = os.environ.get("APPLY", "").strip().lower() in ("1", "true", "yes")
 #: ЕЖЕДНЕВНЫЙ ПРОХОД (library/increment.py): обход читает только сделки и
 #: карточки, созданные или изменённые после прошлого успешного прохода, —
 #: десятки запросов вместо тысяч. DAYS и деление на части при этом не
@@ -108,7 +120,13 @@ SPA_RFQ = 166
 # Подпись источника строки. Раньше здесь всегда стояла «спецификация сделки» —
 # и строки из КП поставщика ложились под чужим именем: спецификация говорит, что
 # заказчик просит, котировка — что поставщик предлагает и почём.
+# У писем подпись своя (письмо заказчика / письмо поставщика): строка спроса из
+# письма не спецификация сделки, и по подписи её можно отобрать или откатить.
 ИСТОЧНИК_СТРОКИ = "котировка поставщика" if SOURCE == "rfq" else "спецификация сделки"
+if SOURCE == "mail":
+    import mail_source  # noqa: E402  (группы писем и их обход)
+    ИСТОЧНИК_СТРОКИ = mail_source.ГРУППЫ.get(MAIL_GROUP, {}).get("источник_строки",
+                                                                 ИСТОЧНИК_СТРОКИ)
 # БРЕНД С КАРТОЧКИ ЗАПРОСА. Цена сравнима только в разрезе «к чему это»: тот же
 # подшипник дорог или дёшев в зависимости от машины и изготовителя. Поле на
 # карточке есть давно — base/fetch_rfq.py его даже запрашивает, — но в таблицу
@@ -1263,6 +1281,16 @@ def ключи_брендов(v) -> str:
     return ",".join(ключи)
 
 
+def ключ_ссылки(ref: dict) -> str:
+    """lib_files.file_id ссылки. Письма несут его явно («mail:<номер Диска>»):
+    номер файла Диска и номер вложения поля CRM — разные ряды чисел, и голый
+    номер Диска совпал бы с чужим file_id. У полей — id объекта вложения."""
+    if ref.get("file_id"):
+        return str(ref["file_id"])
+    fo = ref.get("fo") or {}
+    return str(fo.get("id") or fo.get("ID") or "")
+
+
 def без_повторов(refs: list[dict]) -> tuple[list[dict], int]:
     """Ссылки на вложения без повторов по id файла плюс число отброшенных.
 
@@ -1274,7 +1302,7 @@ def без_повторов(refs: list[dict]) -> tuple[list[dict], int]:
     out: list[dict] = []
     дублей = 0
     for r in refs:
-        fid = str((r.get("fo") or {}).get("id") or "")
+        fid = ключ_ссылки(r)
         if not fid:
             out.append(r)          # без id отсеять нельзя, пусть идёт как есть
             continue
@@ -2210,7 +2238,7 @@ def определить_папку(rec: dict, текст: str, строки: li
 
 def handle(ref: dict) -> tuple[dict, list[dict]]:
     fo = ref["fo"]
-    fid = str(fo.get("id") or fo.get("ID"))
+    fid = ключ_ссылки(ref)
     название = ref.get("field_title")
     rec = {"file_id": fid, "deal_id": ref["deal"], "origin": ref["origin"], "field": ref["field"],
            # НАША КОМПАНИЯ — из карточки (mycompanyId), не из текста документа.
@@ -2218,7 +2246,9 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
            # СТОРОНА СЧИТАЕТСЯ ПРИ ЗАПИСИ, А НЕ ПРИ ЧТЕНИИ. Запросы к базе идут без
            # доступа к порталу, а названия полей живут только там; посчитанная
            # сторона — единственный способ отобрать заявки заказчика запросом.
-           "field_title": название, "side": doc_side.сторона(название),
+           # У письма поля нет, и сторону говорит источник (группа и направление
+           # письма, mail_source.СТОРОНА), а не название.
+           "field_title": название, "side": ref.get("side") or doc_side.сторона(название),
            "kind": None, "size_bytes": None, "status": "не скачался", "reason": None,
            "chars": 0, "rows_found": 0, "segment_id": None, "sha256": None,
            "parse_path": None, "header_found": None, "header_miss": None,
@@ -2557,8 +2587,10 @@ def main() -> int:
         if колонки is None:
             conn.close()
             return 2
-        ensure_segments(cur)
-        conn.commit()
+        # Холостой прогон писем не пишет ничего, даже справочник сегментов.
+        if SOURCE != "mail" or APPLY:
+            ensure_segments(cur)
+            conn.commit()
         # Повторная попытка для не скачавшихся: «не скачался» — сетевая осечка,
         # а не свойство файла. «Пусто» и «формат не читаем» повторять незачем:
         # результат будет тот же, а прогон подорожает.
@@ -2569,11 +2601,20 @@ def main() -> int:
     print(f"уже разобрано ранее: {len(done)}"
           + (" (файлы со статусом «не скачался» пойдут заново)" if RETRY_FAILED else ""), flush=True)
 
-    if SOURCE not in ("deals", "rfq"):
-        print(f"неизвестный SOURCE={SOURCE!r}: допустимо deals или rfq", file=sys.stderr)
+    if SOURCE not in ("deals", "rfq", "mail"):
+        print(f"неизвестный SOURCE={SOURCE!r}: допустимо deals, rfq или mail", file=sys.stderr)
         return 2
-    print(f"источник вложений: {'карточки запросов (СП-166)' if SOURCE == 'rfq' else 'сделки'}",
+    if SOURCE == "mail" and MAIL_GROUP not in mail_source.ГРУППЫ:
+        print(f"неизвестная группа писем MAIL_GROUP={MAIL_GROUP!r}: допустимо "
+              + ", ".join(mail_source.ГРУППЫ), file=sys.stderr)
+        return 2
+    print("источник вложений: " + {"rfq": "карточки запросов (СП-166)",
+                                   "mail": f"письма, группа {MAIL_GROUP}"}.get(SOURCE, "сделки"),
           flush=True)
+    # Холостой прогон писем: читает портал и разбирает, но не пишет ничего.
+    запись = SOURCE != "mail" or APPLY
+    if not запись:
+        print("режим: холостой, без записи в базу (APPLY не задан)", flush=True)
     if not SPECGATE:
         print("::warning::ВОРОТА СПЕЦИФИКАЦИИ ВЫКЛЮЧЕНЫ: документация пойдёт в спрос "
               "строками прозы. Годится для замера, не для записи в базу.", flush=True)
@@ -2588,10 +2629,17 @@ def main() -> int:
     # и отбор по хешу файла — выбрасывают то, что попало в часть 3 по первому
     # признаку и в часть 7 по второму: такой файл не берёт НИКТО (CLAUDE.md,
     # правило дробления). Поэтому отбор по хешу снят вместе с добавлением части.
-    refs = (collect_refs_rfq(DAYS, SHARD, SHARDS) if SOURCE == "rfq"
-            else collect_refs(DAYS, SHARD, SHARDS))
-    mine = [r for r in refs
-            if str(r["fo"].get("id") or r["fo"].get("ID")) not in done]
+    if SOURCE == "mail":
+        refs = collect_refs_mail_part()
+    else:
+        refs = (collect_refs_rfq(DAYS, SHARD, SHARDS) if SOURCE == "rfq"
+                else collect_refs(DAYS, SHARD, SHARDS))
+    mine = [r for r in refs if ключ_ссылки(r) not in done]
+    if SOURCE == "mail":
+        # Отсев по lib_files ДО обращения к Диску: за разобранный файл портал
+        # не платит ни disk.file.get, ни закачки.
+        print(f"файлов писем: {len(refs)} · уже в lib_files: {len(refs) - len(mine)}"
+              f" · новых: {len(mine)}", flush=True)
     if LIMIT:
         mine = mine[:LIMIT]
     print(f"к разбору в этой части: {len(mine)}\n", flush=True)
@@ -2615,6 +2663,9 @@ def main() -> int:
     def flush() -> None:
         nonlocal buf_files, buf_items, buf_prices
         if not buf_files and not buf_items and not buf_prices:
+            return
+        if not запись:
+            buf_files, buf_items, buf_prices = [], [], []
             return
         conn = connect()
         with conn.cursor() as cur:
@@ -2705,8 +2756,39 @@ def main() -> int:
     print("позиции по сегментам:")
     for sid, n in segs.most_common():
         print(f"    {name_of(sid):32s} {n:>8d}")
-    print("\n✓ разбор части завершён")
+    print("\n✓ разбор части завершён" + ("" if запись else " (холостой: в базу не записано ничего)"))
     return 0
+
+
+def collect_refs_mail_part() -> list[dict]:
+    """Ссылки на вложения писем своей части пачки.
+
+    Пачку [MAIL_FROM+1; MAIL_TO] определил план прогона (mail_source.py план),
+    часть берёт из неё смежный кусок номеров — деление одно. Без MAIL_TO (ручной
+    запуск одним процессом) пачка — MAIL_LIMIT писем от отметки в базе; отметку
+    такой запуск не двигает: её двигает только шаг «отметка» прогона.
+    """
+    от_env, до_env = os.environ.get("MAIL_FROM", ""), os.environ.get("MAIL_TO", "")
+    if до_env.strip():
+        от, до = int(от_env or 0), int(до_env)
+        низ, верх = mail_source.границы_части(от, до, SHARD, SHARDS)
+        if SHARDS > 1:
+            print(f"часть {SHARD + 1} из {SHARDS}: письма с номером от {низ + 1} до {верх}"
+                  f" (пачка {от + 1}…{до})", flush=True)
+        if верх <= низ:
+            return []
+        refs, _ = mail_source.collect_refs_mail(MAIL_GROUP, низ, 0, до_id=верх)
+        return refs
+    if SHARD > 0:
+        print("без плана пачки (MAIL_TO) письма читает одна часть — часть "
+              f"{SHARD + 1} не нужна", flush=True)
+        return []
+    conn = connect()
+    with conn.cursor() as cur:
+        от = mail_source.прочитать_отметку(cur, MAIL_GROUP)
+    conn.close()
+    refs, _ = mail_source.collect_refs_mail(MAIL_GROUP, от, MAIL_LIMIT)
+    return refs
 
 
 if __name__ == "__main__":
