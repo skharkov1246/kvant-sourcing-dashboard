@@ -45,9 +45,13 @@ def test_оба_обхода_умеют_делиться():
     ind = код("library/indexer.py")
     assert "def collect_refs(days: int, shard: int = 0, shards: int = 1)" in ind
     assert "def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1)" in ind
-    # Сделки режутся по остатку, карточки запросов — по диапазону идентификаторов.
-    assert "ids = ids[shard::shards]" in ind, "обход сделок часть не ограничивает"
-    assert "диапазон_части" in ind, "обход карточек часть не ограничивает"
+    # И сделки, и карточки запросов режутся диапазоном идентификаторов на стороне
+    # портала (24.09.2026: деление сделок по остатку после полного списка
+    # давало HTTP 429 на самом crm.deal.list).
+    сделки = ind.split("def collect_refs(", 1)[1].split("\ndef ", 1)[0]
+    карточки = ind.split("def collect_refs_rfq(", 1)[1].split("\ndef ", 1)[0]
+    assert "диапазон_части(" in сделки, "обход сделок часть не ограничивает"
+    assert "диапазон_части(" in карточки, "обход карточек часть не ограничивает"
 
 
 def test_соседние_прогоны_делятся_так_же():
