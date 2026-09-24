@@ -1,0 +1,77 @@
+name: Библиотека — досчёт дат квотаций
+
+# ДАТА КВОТАЦИИ У УЖЕ ЗАПИСАННЫХ ЦЕН КП. Распоряжение владельца 24.09.2026:
+# «Важно иметь в виду месяц и год получения квотации, чтобы индексировать их на
+# инфляцию в конкретно выбранной стране». Разбор до этой правки price_date не
+# писал: ~34 тыс. строк цены КП без даты. Досчёт берёт дату создания карточки
+# запроса (СП-166) по rfq_id — без переразбора файлов; источник строки —
+# «карточка: создана» (library/quote_date.py). Дата документа придёт с общим
+# переразбором КП (часть 8.5 плана).
+#
+# ПОРЯДОК: сначала «ZIP base — apply DB migrations» (колонки price_date_src и
+# price_date_run), потом этот прогон вхолостую, потом с apply.
+#
+# НАГРУЗКА НА ПОРТАЛ — десятки запросов: номера карточек читаются пачками по 50
+# (crm.item.list, «@id», start=-1). Части идут подряд в одном процессе, поэтому
+# BITRIX_PARALLEL=1 (CLAUDE.md, «Битрикс не перегружать»).
+#
+# Только ручной запуск. В журнал — только агрегаты (правило 17).
+on:
+  workflow_dispatch:
+    inputs:
+      shards:
+        # Правило дробления: части — вход, а не число в файле. Упавшая часть
+        # уносит только свою долю, повтор берёт то, что осталось без даты.
+        description: "На сколько частей делить номера карточек"
+        type: choice
+        options: ["10", "25", "50"]
+        default: "10"
+      apply:
+        description: "Записать даты в базу (без галочки — вхолостую)"
+        type: boolean
+        default: false
+      rollback:
+        description: "Откатить досчёт с этим ключом (qd-…); портал не читается"
+        default: ""
+      bitrix_rps:
+        description: "Запросов в секунду к порталу (лимит портала — 2)"
+        type: choice
+        options: ["0.8", "1.2"]
+        default: "1.2"
+
+permissions:
+  contents: read
+
+concurrency:
+  # Общая очередь чтения портала. Ожидающий в группе ОДИН: новая постановка
+  # снимает ожидающую (CLAUDE.md, стиль работы).
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      BITRIX_RPS: ${{ inputs.bitrix_rps }}
+      BITRIX_PARALLEL: "1"
+      SHARDS: ${{ inputs.shards }}
+      SOURCE: rfq
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+
+      - name: Досчёт дат квотаций
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          ROLLBACK: ${{ inputs.rollback }}
+          RUN_ID: qd-${{ github.run_id }}
+        run: python library/quote_dates_backfill.py

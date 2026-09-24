@@ -1,0 +1,58 @@
+name: Библиотека — индексы цен по странам (МВФ)
+
+# ИНДЕКСЫ ПОТРЕБИТЕЛЬСКИХ ЦЕН ПО СТРАНЕ И МЕСЯЦУ → lib_cpi. Нужны, чтобы
+# привести цену квотации к выбранному месяцу по инфляции выбранной страны
+# (распоряжение владельца 24.09.2026; функции lib_cpi_factor и
+# lib_prices_indexed в library/supabase/schema.sql).
+#
+# Источник — МВФ, набор CPI, SDMX без ключа (library/load_cpi.py): все 190 стран
+# одним запросом, около секунды. Портал Битрикса не читается — в очередь
+# bitrix-portal прогон не встаёт.
+#
+# ПОРЯДОК: сначала «ZIP base — apply DB migrations» (таблица lib_cpi), потом
+# этот прогон вхолостую, потом с apply. Обновлять — раз в месяц: МВФ публикует
+# месяц с запаздыванием в один-два месяца. Расписание — решение владельца,
+# поэтому здесь только ручной запуск.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать индексы в базу (без галочки — вхолостую)"
+        type: boolean
+        default: false
+      countries:
+        description: "Страны ISO alpha-3 через запятую (пусто — все)"
+        default: ""
+      start:
+        description: "С какого месяца (ГГГГ-ММ)"
+        default: "2015-01"
+      rollback:
+        description: "Откатить загрузку с этим ключом (cpi-…)"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  cpi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests psycopg2-binary
+
+      - name: Загрузка индексов
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          COUNTRIES: ${{ inputs.countries }}
+          START: ${{ inputs.start }}
+          ROLLBACK: ${{ inputs.rollback }}
+          RUN_ID: cpi-${{ github.run_id }}
+        run: python library/load_cpi.py

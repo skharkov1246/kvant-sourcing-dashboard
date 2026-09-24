@@ -57,6 +57,7 @@ import docfilter  # noqa: E402  (после sys.path)
 import indexer  # noqa: E402
 import ocr_table  # noqa: E402  (таблица скана по координатам слов — под каскадом)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
+import quote_date  # noqa: E402  (дата квотации — тем же правилом, что у разбора)
 import quotes  # noqa: E402  (цена из распознанного текста)
 from segments import classify, name_of  # noqa: E402
 
@@ -500,6 +501,8 @@ def таблица_скана(rec: dict, ref: dict, строки: list[list[str]
         rec["reason"] = "таблица скана без позиций"
     if indexer.SOURCE == "rfq" and items:
         indexer.применить_условия(items, text)
+        # Дата квотации — тем же правилом, что у обычного разбора (правило 14).
+        quote_date.проставить(items, text, ref)
     return items
 
 
@@ -628,6 +631,7 @@ def recognise(ref: dict) -> tuple[dict, list[dict]]:
     # нём есть (CLAUDE.md, правило 14: две вставки в одну таблицу правятся вместе).
     if indexer.SOURCE == "rfq" and items:
         indexer.применить_условия(items, весь)
+        quote_date.проставить(items, весь, ref)
     return rec, items
 
 

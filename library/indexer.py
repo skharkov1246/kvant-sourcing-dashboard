@@ -56,6 +56,7 @@ import read_sheet  # noqa: E402  (книги: xlsx, xls, xlsb, ods, SpreadsheetM
 import read_word  # noqa: E402  (Word, OpenDocument, RTF, HTML под видом .doc)
 import text_quality  # noqa: E402  (оценка и починка извлечённого текста)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
+import quote_date  # noqa: E402  (дата квотации — одна на все разборы)
 # Список полей КП держим в одном месте со всеми замерами котировок: два списка
 # разошлись бы молча — разбирали бы одно, а считали другое.
 from quote_coverage import ПОЛЕ_ЗАПРОСА, ПОЛЯ_КП  # noqa: E402
@@ -1417,7 +1418,12 @@ def ссылки_карточек(карточки: list[dict], поля: list[s
                                  "origin": "поле запроса", "fo": fo,
                                  "company": str(компания) if компания else None,
                                  "brands": бренды or None,
-                                 "our_company": наша})
+                                 "our_company": наша,
+                                 # ДАТА СОЗДАНИЯ КАРТОЧКИ — запасная дата
+                                 # квотации, когда в самом КП её нет
+                                 # (library/quote_date.py). Уже в select:
+                                 # ни одного лишнего запроса к порталу.
+                                 "card_created": x.get("createdTime")})
                     # Один файл и в поле КП, и в нашем «Request file» — чья это
                     # цена, система не говорит. Пока только считаем.
                     свои_и_кп += str(fo.get("id")) in ид_запроса
@@ -2338,6 +2344,10 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
         quotes.подставить_валюту(it.get("_цена"), вф)
     if SOURCE == "rfq":
         применить_условия(items, весь_текст)
+        # ДАТА КВОТАЦИИ — С ИСТОЧНИКОМ. Распоряжение владельца 24.09.2026: месяц
+        # и год квотации нужны для индексации на инфляцию. Дата самого КП или
+        # письма, иначе дата создания карточки запроса; дата разбора — никогда.
+        quote_date.проставить(items, весь_текст or text, ref)
     return rec, items
 
 

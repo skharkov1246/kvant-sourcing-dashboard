@@ -606,6 +606,149 @@ create index if not exists lib_prices_src on lib_prices (basis_src, pay_src);
 create index if not exists lib_prices_pn_key on lib_prices (lib_pn_key(part_number))
   where feed = 'разбор КП';
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- ДАТА КВОТАЦИИ. Распоряжение владельца 24.09.2026: «Важно иметь в виду месяц и
+-- год получения квотации, чтобы индексировать их на инфляцию в конкретно
+-- выбранной стране». price_date у потока «разбор КП» до этого не писался вовсе,
+-- и карточка номенклатуры показывала вместо даты предложения дату разбора.
+--
+-- price_date      — дата квотации (день; для индексации берётся её месяц);
+-- price_date_src  — ОТКУДА она (правило 16), по убыванию надёжности:
+--     документ           — дата, названная в самом КП («КП № 15 от 12.03.2025»);
+--     письмо             — дата письма .eml/.msg, в котором пришло предложение;
+--     карточка: создана  — createdTime карточки запроса СП-166: нижняя граница,
+--                          предложение приходит позже запроса;
+--     нет                — искали в тексте и на карточке, не нашли.
+--   Даты загрузки файла среди источников нет: файловое поле CRM отдаёт только
+--   id, url и urlMachine (library/quote_date.py). Дата разбора — никогда.
+-- price_date_run  — ключ прогона ДОСЧЁТА (library/quote_dates_backfill.py):
+--   досчёт пишет только в пустую дату, и откат снимает ровно свои строки
+--   (правило 6). У записей разбора он пуст: их откат — переразбор файла.
+alter table lib_prices add column if not exists price_date_src text;
+alter table lib_prices add column if not exists price_date_run text;
+-- Проверка значений отдельным do-блоком: create table if not exists
+-- существующую таблицу не меняет (CLAUDE.md, правило 21).
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_price_date_src_chk') then
+    alter table lib_prices add constraint lib_prices_price_date_src_chk
+      check (price_date_src is null
+             or price_date_src in ('документ','письмо','карточка: создана','нет'));
+  end if;
+end $$;
+-- Под досчёт и откат: «строки КП без даты» и «строки этого прогона».
+create index if not exists lib_prices_nodate on lib_prices (rfq_id)
+  where feed = 'разбор КП' and price_date is null;
+create index if not exists lib_prices_date_run on lib_prices (price_date_run)
+  where price_date_run is not null;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- ИНДЕКСЫ ПОТРЕБИТЕЛЬСКИХ ЦЕН ПО СТРАНЕ И МЕСЯЦУ — для приведения цены квотации
+-- к выбранному месяцу по инфляции выбранной страны.
+--
+-- Источник — МВФ, набор CPI (api.imf.org, SDMX 2.1, без ключа): помесячные
+-- индексы по 190 странам, у стран Европы внутри — HICP Евростата
+-- (library/load_cpi.py). Это данные открытые, не коммерческие.
+--
+-- base — БАЗОВЫЙ ПЕРИОД ряда («2010A» = средний 2010 год = 100). У разных стран
+-- он разный (Россия 2010, Китай 2020, Италия и Турция 2025), а при пересмотре
+-- источник может сменить базу у всей страны. Делить индексы разных баз нельзя —
+-- поэтому lib_cpi_factor делит только внутри одной базы и иначе молчит (null).
+--
+-- currency — валюта страны (ISO 4217), если загрузчик её знает. Нужна не для
+-- пересчёта (его здесь НЕТ), а для оговорки: цена в евро, приведённая по
+-- инфляции России, — число без смысла, и страница обязана это сказать.
+--
+-- run_id и prev_* — откат загрузки (правила 5, 6): загрузчик меняет только
+-- новые и пересмотренные точки, а пересмотренная хранит прежнее значение.
+create table if not exists lib_cpi (
+  country     text not null,               -- ISO 3166-1 alpha-3: RUS, CHN, DEU
+  month       date not null,               -- первое число месяца
+  index_value numeric not null,            -- значение индекса, база — в base
+  base        text not null,               -- базовый период: '2010A'
+  source      text not null,               -- 'IMF CPI'
+  series      text,                        -- ключ ряда у источника
+  currency    text,                        -- валюта страны, ISO 4217
+  loaded_at   timestamptz not null default now(),
+  run_id      text,
+  prev_value  numeric,
+  prev_base   text,
+  prev_run    text,
+  primary key (country, month, source)
+);
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_country_chk') then
+    alter table lib_cpi add constraint lib_cpi_country_chk check (country ~ '^[A-Z]{3}$');
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_month_chk') then
+    alter table lib_cpi add constraint lib_cpi_month_chk
+      check (month = date_trunc('month', month)::date);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_value_chk') then
+    alter table lib_cpi add constraint lib_cpi_value_chk check (index_value > 0);
+  end if;
+end $$;
+create index if not exists lib_cpi_run on lib_cpi (run_id);
+alter table lib_cpi enable row level security;
+
+-- Во сколько раз выросли цены страны с месяца p_from до месяца p_to.
+-- Null, если нет индекса хотя бы за один из месяцев или базы разные: догадка
+-- вместо индекса хуже пустоты.
+create or replace function lib_cpi_factor(p_country text, p_from date, p_to date,
+                                          p_source text default 'IMF CPI')
+returns numeric language sql stable as $$
+  select t.index_value / f.index_value
+    from lib_cpi f
+    join lib_cpi t on t.country = f.country and t.source = f.source and t.base = f.base
+   where f.country = upper(p_country) and f.source = p_source
+     and f.month = date_trunc('month', p_from)::date
+     and t.month = date_trunc('month', p_to)::date
+$$;
+
+-- ЦЕНЫ КП, ПРИВЕДЁННЫЕ К МЕСЯЦУ p_to ПО ИНФЛЯЦИИ СТРАНЫ p_country.
+--   select * from lib_prices_indexed('2026-08-01', 'RUS') where currency = 'RUB';
+-- Оговорка note стоит у КАЖДОЙ строки: приведение — расчёт, а не цена
+-- поставщика (CLAUDE.md, «Числа в выгрузках владельцу»). Валюта НЕ
+-- пересчитывается: цена остаётся в своей валюте, меняется только уровень цен.
+-- Когда валюта цены не совпадает с валютой страны индекса, note говорит об этом
+-- прямо — такой пересчёт смысла не имеет.
+create or replace function lib_prices_indexed(p_to date, p_country text,
+                                              p_source text default 'IMF CPI')
+returns table (price_id bigint, rfq_id text, part_number text, price numeric,
+               currency text, price_date date, price_date_src text,
+               factor numeric, price_indexed numeric, note text)
+language sql stable as $$
+  select p.id, p.rfq_id, p.part_number, p.price, p.currency, p.price_date,
+         p.price_date_src, k.factor, round(p.price * k.factor, 4),
+         case
+           when p.price_date is null then 'нет даты квотации — не приведена'
+           when k.factor is null then 'нет индекса страны за месяц квотации или за целевой'
+           else 'приведено по инфляции ' || upper(p_country) || ' с '
+                || to_char(p.price_date, 'MM.YYYY') || ' на ' || to_char(p_to, 'MM.YYYY')
+                || '; валюта не пересчитана'
+                || case when c.currency is null then ', валюта страны индекса не известна'
+                        when c.currency is distinct from upper(p.currency)
+                        then ', валюта цены ' || coalesce(p.currency, '?')
+                             || ' не совпадает с валютой страны ' || c.currency
+                             || ' — приведение без смысла'
+                        else '' end
+                || case when p.price_date_src = 'карточка: создана'
+                        then '; месяц — по дате карточки запроса (нижняя граница)'
+                        else '' end
+         end
+    from lib_prices p
+    left join lateral (
+      select t.index_value / f.index_value as factor
+        from lib_cpi f
+        join lib_cpi t on t.country = f.country and t.source = f.source and t.base = f.base
+       where f.country = upper(p_country) and f.source = p_source
+         and f.month = date_trunc('month', p.price_date)::date
+         and t.month = date_trunc('month', p_to)::date) k on true
+    left join lateral (
+      select max(cc.currency) as currency from lib_cpi cc
+       where cc.country = upper(p_country) and cc.source = p_source) c on true
+   where p.feed = 'разбор КП'
+$$;
+
 
 -- ВНИМАНИЕ: источник — платная подписка (glbs.io), условия которой, как правило,
 -- запрещают перепубликацию. Таблица и представление ниже живут только в закрытой
