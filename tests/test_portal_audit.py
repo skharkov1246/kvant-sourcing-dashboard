@@ -414,6 +414,7 @@ def чистый():
     ("nomenclature", "n.worse_brand"): "нужен прошлый снимок (--prev-dir)",
     ("nomenclature", "n.worse_price"): "нужен прошлый снимок (--prev-dir)",
     ("nomenclature", "n.worse_co"): "нужен прошлый снимок (--prev-dir)",
+    ("nomenclature", "n.worse_qty"): "нужен прошлый снимок (--prev-dir)",
     ("library", "l.blob"): "считается только при сбое чтения блоба",
 }
 
@@ -437,7 +438,7 @@ def test_нормальные_значения_не_обвиняются(чис�
     assert not pa.мусор_бренда("SKF") and not pa.служебное("SKF")
     assert not pa.company_names.как_ключ("ООО Ромашка")
     for т, к in (("nomenclature", "n.k_class"), ("nomenclature", "n.n_class"),
-                 ("brands", "b.c_class"), ("suppliers", "s.name_key"), ("library", "l.oem_queue")):
+                 ("brands", "b.c_class"), ("suppliers", "s.name_key"), ("library", "l.oem_multi")):
         п, д = чистый[т].счета[к]
         assert п > 0 and д == 0, (т, к)
 
@@ -539,7 +540,8 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("suppliers", "s.name_domain", lambda о: сущ(о, 2).update(name="firm2.example")),
     ("suppliers", "s.name_from_contra", lambda о: сущ(о, 2).update(name="romashka", name_from="реестр")),
     ("suppliers", "s.name_junk", lambda о: сущ(о, 2).update(name="ООО")),
-    ("suppliers", "s.name_dup", lambda о: сущ(о, 2).update(name=ИМЕНА[3])),
+    # Тёзки с разными верными ИНН — разные юрлица; дубль — когда развести нечем.
+    ("suppliers", "s.name_dup", lambda о: сущ(о, 2).update(name=ИМЕНА[3], inn=None, domain=None)),
     ("suppliers", "s.name_from_vocab", lambda о: сущ(о, 2).update(name_from="sup_entity.display_name")),
     ("suppliers", "s.name_from_absent", lambda о: [e.pop("name_from", None) for e in о["suppliers:v1"]["entities"]]),
     ("suppliers", "s.inn_sum", lambda о: сущ(о, 2).update(inn=сущ(о, 2)["inn"][:-1] + str((int(сущ(о, 2)["inn"][-1]) + 1) % 10))),
@@ -550,7 +552,7 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("suppliers", "s.inn_many", lambda о: [сущ(о, i).update(inn=сущ(о, 1)["inn"]) for i in range(2, 6)]),
     ("suppliers", "s.domain_host", lambda о: сущ(о, 2).update(domain="https://Firm2.example/about")),
     ("suppliers", "s.domain_mail", lambda о: сущ(о, 2).update(domain="gmail.com")),
-    ("suppliers", "s.domain_dup", lambda о: сущ(о, 2).update(domain="firm3.example")),
+    ("suppliers", "s.domain_dup", lambda о: сущ(о, 2).update(domain="firm3.example", inn=None)),
     ("suppliers", "s.rfq_type", lambda о: сущ(о, 2)["rfq"].update(sent=-1)),
     ("suppliers", "s.rfq_sum", lambda о: сущ(о, 2)["rfq"].update(silent=5)),
     ("suppliers", "s.rfq_order", lambda о: сущ(о, 2)["rfq"].update(quoted=3)),
@@ -609,13 +611,15 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("nomenclature", "n.co_name_domain", lambda о: ком(о, 4).update(name="firm4.ru")),
     ("nomenclature", "n.co_ent_noname", lambda о: ком(о, 4).update(name=None)),
     ("nomenclature", "n.co_ent_missing", lambda о: ком(о, 4).update(ent=номер(500))),
-    ("nomenclature", "n.co_name_dup", lambda о: ком(о, 4).update(name=ИМЕНА[5])),
+    ("nomenclature", "n.co_name_dup", lambda о: (ком(о, 4).update(name=ИМЕНА[5]),
+                                                сущ(о, 4).update(inn=None, domain=None))),
     ("nomenclature", "n.co_counts", lambda о: ком(о, 4).update(parts=9)),
     ("nomenclature", "n.co_brand_digits", lambda о: ком(о, 4).update(brands=["340"])),
     ("nomenclature", "n.co_brand_case", lambda о: ком(о, 4).update(brands=["SKF", "Skf"])),
     ("nomenclature", "n.co_oem_len", lambda о: ком(о, 4).update(oem=[f"Марка{i}" for i in range(11)])),
     ("nomenclature", "n.k_fmt", lambda о: поз(о, 3).update(k="RX-7731")),
     ("nomenclature", "n.k_class", lambda о: поз(о, 3).update(k="ss316")),
+    ("nomenclature", "n.k_material", lambda о: поз(о, 3).update(k="ss31619mm")),
     ("nomenclature", "n.k_desc", lambda о: поз(о, 3).update(k="втулканаправляющаядлянасосатипаабв1")),
     ("nomenclature", "n.k_nodigit", lambda о: поз(о, 3).update(k="komplekt")),
     ("nomenclature", "n.k_short_num", lambda о: поз(о, 3).update(k="12")),
@@ -624,9 +628,9 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("nomenclature", "n.n_empty", lambda о: поз(о, 3).pop("n")),
     ("nomenclature", "n.n_class", lambda о: поз(о, 3).update(n="12.09.2026")),
     ("nomenclature", "n.n_words", lambda о: поз(о, 3).update(n="втулка направляющая для насоса")),
-    ("nomenclature", "n.n_key", lambda о: поз(о, 3).update(n="RX-7732")),
+    ("nomenclature", "n.n_key", lambda о: поз(о, 7).update(n="GS-8842-A")),     # вне каталога
     ("nomenclature", "n.name_empty", lambda о: поз(о, 3).pop("name")),
-    ("nomenclature", "n.name_glued", lambda о: поз(о, 3).update(name="Втулка 8 3200.0 шт 25600.0")),
+    ("nomenclature", "n.name_glued", lambda о: поз(о, 3).update(name="(19mm) SS316 8 3200 25600")),
     ("nomenclature", "n.name_is_code", lambda о: поз(о, 3).update(name="RX 7731")),
     ("nomenclature", "n.name_prose", lambda о: поз(о, 3).update(name="Неустойка за просрочку поставки начисляется")),
     ("nomenclature", "n.name_long", lambda о: поз(о, 3).update(name="Втулка " * 40)),
@@ -687,6 +691,11 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("nomenclature", "n.o_f", lambda о: подр(о, 0)["list"][0].update(f="bitrix:5001")),
     ("nomenclature", "n.mk", lambda о: подр(о, 0)["makers"][0].update(role="хозяин")),
     ("nomenclature", "n.mk_nocat", lambda о: подр(о, 7).update(makers=[{"name": "SKF", "role": "OEM"}])),
+    ("nomenclature", "n.mk_raw", lambda о: подр(о, 0)["makers"][0].update(verdict="pn_not_found")),
+    ("nomenclature", "n.mk_note", lambda о: подр(о, 0)["makers"][0].update(
+        makes="Разведка по каталогу изготовителя. Поставка через дистрибьютора, срок уточнить.")),
+    ("nomenclature", "n.o_card_label", lambda о: ком(о, 4).update(name=None, ent=None)),
+    ("nomenclature", "n.col_dead", lambda о: [поз(о, i).update(models=[]) for i in range(len(КОДЫ))]),
     ("nomenclature", "n.link_k", lambda о: указ(о, 0).__setitem__(0, "zz9999")),
     ("nomenclature", "n.brands_age", lambda о: о[brands.КЛЮЧ].update(published_at="2026-09-21T00:00:00Z")),
     # ── /brands
@@ -737,7 +746,6 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("brands", "b.models", lambda о: бр(о, "skf").update(models_n=0)),
     ("brands", "b.models_shared", lambda о: бр(о, "fag")["models"][0].update(id="m1")),
     ("brands", "b.units", lambda о: бр(о, "skf")["units"]["part"]["list"][0].update(crit="Z")),
-    ("brands", "b.units_undef", lambda о: бр(о, "skf")["units"]["part"].update(undefined=5)),
     ("brands", "b.parts_unit", lambda о: бр(о, "skf")["parts"].update(unit=11)),
     ("brands", "b.alts_trunc", lambda о: бр(о, "skf")["alts"].update(makers_n=30)),
     ("brands", "b.alts_maker", lambda о: бр(о, "skf")["alts"]["makers"].append(["4471", 1])),
@@ -765,13 +773,12 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("brands", "b.cov_table", lambda о: о[brands.КЛЮЧ]["coverage"]["universes"]["all"]["fields"][0].update(pct=99.0)),
     ("brands", "b.fields_src", lambda о: о[brands.КЛЮЧ]["fields"].pop(0)),
     ("brands", "b.dict", lambda о: о[brands.КЛЮЧ]["dict"].update(records=0)),
-    ("brands", "b.c_class", lambda о: указ(о, 0).__setitem__(1, "SS316")),
+    ("brands", "b.c_class", lambda о: указ(о, 0).__setitem__(0, "ss316")),
     ("brands", "b.c_rubbish", lambda о: указ(о, 0).__setitem__(1, "12.09.2026")),
     ("brands", "b.c_short", lambda о: указ(о, 0).__setitem__(0, "nu3")),
     ("brands", "b.c_fmt", lambda о: указ(о, 0).__setitem__(0, "part_4471")),
     ("brands", "b.c_words", lambda о: указ(о, 0).__setitem__(1, "подшипник NU 316 роликовый")),
     ("brands", "b.c_brandkey", lambda о: указ(о, 0).__setitem__(0, "skf")),
-    ("brands", "b.c_long", lambda о: указ(о, 0).__setitem__(0, "a1" * 14)),
     ("brands", "b.c_dup", lambda о: о[brands.КЛЮЧ_СВЯЗЕЙ]["codes"].append(list(указ(о, 0)))),
     ("brands", "b.c_written", lambda о: указ(о, 0).__setitem__(1, "NU 317")),
     ("brands", "b.c_part", lambda о: указ(о, 0).__setitem__(2, (указ(о, 0)[2] + 1) % 16)),
@@ -793,6 +800,7 @@ def _сдвинуть_дату(о, ключ_, дата):
                                        о[brands.КЛЮЧ_ПАР]["pairs"].append(
                                            [0, len(о[brands.КЛЮЧ_ПАР]["suppliers"]) - 1, 1, 0, 0, 0, 0, 1, 1, "USD 1", 0]))),
     ("brands", "b.k_name", lambda о: код_бр(о, 0).update(name="SS316")),
+    ("brands", "b.k_glued", lambda о: код_бр(о, 0).update(name="(19mm) SS316 8 3200.0 25600.0")),
     ("brands", "b.k_n", lambda о: код_бр(о, 0).update(n="NU-316")),
     ("brands", "b.k_asked", lambda о: код_бр(о, 0).update(deals=0)),
     ("brands", "b.k_bs", lambda о: код_бр(о, 0).update(bsk=["skf", "fag"])),
@@ -803,7 +811,8 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("brands", "b.o_unit", lambda о: код_бр(о, 0)["offers"][0].update(unit="(не указана)")),
     ("brands", "b.o_minmax", lambda о: код_бр(о, 0)["offers"][0].update(min=20.0)),
     ("brands", "b.o_spread", lambda о: код_бр(о, 0)["offers"][0].update(max=5000.0)),
-    ("brands", "b.o_suspect", lambda о: код_бр(о, 0)["offers"][0].update(min=2024.0, med=2024.0, max=2024.0, rows=1)),
+    # Цена-год — улика, только когда год совпал с датой КП (здесь 2026).
+    ("brands", "b.o_suspect", lambda о: код_бр(о, 0)["offers"][0].update(min=2026.0, med=2026.0, max=2026.0, rows=1)),
     ("brands", "b.o_null", lambda о: [o.update(min=None, med=None, max=None) for o in код_бр(о, 1)["offers"]]),
     ("brands", "b.o_tot_bad", lambda о: код_бр(о, 0)["offers"][0].update(tot_bad=1, tot_ok=1)),
     ("brands", "b.o_rows", lambda о: код_бр(о, 0)["offers"][0].update(low=5)),
@@ -888,7 +897,6 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("library", "l.oem_key", lambda о: поля(о, "bearings:c2").update(oem="schaefflergroup")),
     ("library", "l.oem_unknown", lambda о: поля(о, "bearings:c2").update(oem="не указан")),
     ("library", "l.oem_multi", lambda о: поля(о, "bearings:c2").update(oem="SKF/FAG")),
-    ("library", "l.oem_queue", lambda о: поля(о, "bearings:c2").update(oem="Timken")),
     ("library", "l.oem_instruction", lambda о: (о["_dict"]["records"].append(
         {"oem_key": "заказпоспецификации", "name": "Заказ по спецификации",
          "spellings": [{"spelling": "Заказ по спецификации", "where": "dict/oem.json:records"}]}),
@@ -930,7 +938,7 @@ def _сдвинуть_дату(о, ключ_, дата):
     # ── dict/oem.json
     ("dict", "d.count", lambda о: о["_dict"].update(count=3)),
     ("dict", "d.key", lambda о: о["_dict"]["records"][1].update(oem_key="skf")),
-    ("dict", "d.key_long", lambda о: о["_dict"]["records"][1].update(oem_key="fagподшипникикачениявсехтиповиразмеров")),
+    ("dict", "d.desc", lambda о: о["_dict"]["records"][1].update(name="Любой изготовитель подшипников по типу")),
     ("dict", "d.key_40", lambda о: о["_dict"]["records"][1].update(oem_key="f" * 40)),
     ("dict", "d.key_cyr", lambda о: о["_dict"]["records"][1].update(oem_key="fagпотипу")),
     ("dict", "d.instruction", lambda о: о["_dict"]["records"][1].update(oem_key="любойдистрибьютор")),
@@ -988,14 +996,15 @@ def test_каждая_проверка_ловит_свой_дефект():
     """Все коды проверок покрыты мутацией — список закрыт."""
     покрыто = {(т, к) for т, к, _ in МУТАЦИИ + МУТАЦИИ_БАЙТОВ} | {
         ("nomenclature", "n.worse_lost"), ("nomenclature", "n.worse_brand"),
-        ("nomenclature", "n.worse_price"), ("nomenclature", "n.worse_co"),
-    }                                   # четыре последние — test_прошлый_снимок_считает_ухудшения
+        ("nomenclature", "n.worse_price"), ("nomenclature", "n.worse_co"), ("nomenclature", "n.worse_qty"),
+    }                                   # пять последних — test_прошлый_снимок_считает_ухудшения
     все = set()
     for ид, словарь_ in (("suppliers", pa.ПРОВЕРКИ_ПОСТАВЩИКОВ), ("nomenclature", pa.ПРОВЕРКИ_НОМЕНКЛАТУРЫ),
                          ("brands", pa.ПРОВЕРКИ_БРЕНДОВ), ("counters", pa.ПРОВЕРКИ_СЧЁТЧИКОВ),
                          ("library", pa.ПРОВЕРКИ_БИБЛИОТЕКИ), ("dict", pa.ПРОВЕРКИ_СЛОВАРЯ)):
         все |= {(ид, к) for к in словарь_}
     assert все - покрыто == set()
+    assert покрыто - все == set(), "мутация на код, которого нет среди проверок"
 
 
 def _без_библиотеки(о, сырьё):
@@ -1029,11 +1038,12 @@ def test_прошлый_снимок_считает_ухудшения():
         поз(о, 0).pop("oem_cat")
         поз(о, 2)["e"] = [[r[0], r[1]] for r in поз(о, 2)["e"]]
         поз(о, 4).update(co=1)
+        подр(о, 6)["list"][0].pop("q")
         for часть in crossref.КЛЮЧИ_СПИСКА:
             о[часть]["positions"] = [p for p in о[часть]["positions"] if p["k"] != ключ(КОДЫ[11][0])]
 
     т = прогон(правка=хуже, прошлые=прошлое)["nomenclature"]
-    for код in ("n.worse_lost", "n.worse_brand", "n.worse_price", "n.worse_co"):
+    for код in ("n.worse_lost", "n.worse_brand", "n.worse_price", "n.worse_co", "n.worse_qty"):
         п, д = т.счета[код]
         assert п > 0 and д >= 1, код
     assert т.счета["n.worse_lost"][1] == 1
@@ -1155,7 +1165,7 @@ def test_словарь_репозитория_меряется():
     т = pa.ревизия_словаря(pa.читать_словарь())
     assert т.счета["d.count"] == [1, 0]
     assert т.счета["d.where"][1] == 0
-    assert т.счета["d.key_long"][1] > 0
+    assert т.счета["d.desc"][1] > 0
 
 
 def test_образец_не_называет_значение():
@@ -1180,3 +1190,253 @@ def test_упавшая_вкладка_не_роняет_остальные(tmp_
     вкладки = {t["id"]: t for t in сводка["tabs"]}
     assert вкладки["counters"]["failed"] == "TypeError"
     assert вкладки["brands"]["checks"] and "failed" not in вкладки["brands"]
+
+
+# ── Ложные тревоги, найденные скептиками 24.09.2026 ─────────────────────────
+#
+# Каждое значение ниже — нормальное, и ревизия обвиняла его до правки. Строки
+# придуманы по образцу настоящих форм (правило 18).
+
+def test_склейка_ячеек_одним_правилом():
+    for склейка in ("(19mm) SS316 8 3200.0 25600.0", "(19mm) SS316 8 3200 25600",
+                    "Втулка 8 3200.0 шт 25600.0", "Кольцо 4 125,50 502,00"):
+        assert pa.склейка_ячеек(склейка), склейка
+    for норма in ("Кабель ВВГнг-LS 3х2,5 0,66 кВ", "Кольцо 12.42 x 1.78 NBR", "Трансформатор ТМ 1 000",
+                  "Насос ЦНС 300 180", "Прокладка 4.27 ID / 4.70 OD", "Подшипник роликовый цилиндрический",
+                  "Кольцо ГОСТ 9833-73 020-025-30"):
+        assert not pa.склейка_ячеек(норма), норма
+
+
+def test_нормальные_имена_и_коды_не_обвиняются():
+    # Номер подшипника с пробелами — номер, а не наименование.
+    for код in ("NU 316 ECP", "6205 2RS C3", "NJ 2312 ECML C3", "QJ 318 N2MA C3"):
+        assert pa.слов_в_коде(код) < 2, код
+    assert pa.слов_в_коде("подшипник NU 316 роликовый") >= 2
+    # Стандарт с размером — номер детали по стандарту; голый стандарт — нет.
+    if pa.есть_правило_кода():
+        for код in ("ГОСТ 9833-73 020-025-30", "DIN 471 25", "GB 276 6205"):
+            assert pa.класс_написания(код) is None, код
+        assert pa.класс_написания("ГОСТ 8752-79") == "стандарт"
+    # Правовая форма и описание.
+    for имя in ("Bently Nevada, Llc", "Grundfos Holding A/S", "Shanghai Fleetguard Filter Co., Ltd.",
+                "Parker Hannifin Manufacturing France S.A.S.", "Ленинградский металлический завод",
+                "Siemens Energy Industrial Turbomachinery Limited", "Donaldson Middle East Filtration Systems L.L.C"):
+        assert not pa.похоже_на_описание(имя), имя
+        assert "," not in pa.без_формы(имя) and "/" not in pa.без_формы(имя), имя
+    for описание in ("Любой изготовитель подшипников по типу и размеру", "Emerson Rosemount (OE Solar по трансмиттерам)",
+                     "Типовые: EAO/ABB/Schneider"):
+        assert pa.похоже_на_описание(описание), описание
+    # Бренды строчными и с одной цифрой.
+    for имя in ("igus", "ifm"):
+        assert not pa.изготовитель_как_ключ(имя)
+    assert pa.изготовитель_как_ключ("supremevalvesltd")
+    # Базисы разборщика и знаки после них.
+    for базис in ("DDU", "DES", "DEQ", "DAP,", "FCA-Шанхай", "fob Шанхай"):
+        assert pa.базис_известен(базис), базис
+    assert not pa.базис_известен("доставка до склада покупателя")
+    # Ссылки: относительные открываются, file: и логин — нет.
+    for url in ("#раздел", "x.html", "/library#segment=bearings", "https://example.test/a"):
+        assert pa._безопасный_url(url), url
+    for url in ("file:///c:/a.pdf", "javascript:alert(1)", "https://user:pw@example.test/", "a b.html"):
+        assert not pa._безопасный_url(url), url
+    # Формула — не HTML, слово — не пустое поле.
+    for текст in ("Зазор 0,1<s<0,3 мм при t>80 °C", "p<p_max, t>60", "None of the seals was replaced",
+                  "перенос в null-позицию", "если a<b и c>d"):
+        assert not (pa.HTML_ТЕГ.search(текст) or pa.ПУСТОЕ_ПОЛЕ.search(текст)), текст
+    for текст in ("Срок: undefined", "<p>Текст</p>", "Цена | NaN |", '<a href="x">y</a>'):
+        assert pa.HTML_ТЕГ.search(текст) or pa.ПУСТОЕ_ПОЛЕ.search(текст), текст
+    # Единицы-синонимы и потолок цены по валюте.
+    assert pa.единица("шт.") == pa.единица("pcs") == pa.единица("ea") == "шт"
+    assert pa.потолок_цены("KZT") > 100 * pa.потолок_цены("USD")
+    # Марка вне правила кода и склейка свойств; подшипник — нет.
+    for ключ_ in ("316ss", "inox316", "a480", "nbr70", "inconel625"):
+        assert pa.класс_материала(ключ_) == "материал", ключ_
+    assert pa.класс_материала("1.4401", "1.4401") == "материал"
+    for ключ_ in ("6205", "nu316ecp", "kv4417b", "22220", "rx7731"):
+        assert pa.класс_материала(ключ_) is None, ключ_
+
+
+def test_нормальные_значения_на_корпусе_не_обвиняются():
+    """Те же формы, вписанные в снимки: ни одна проверка не краснеет."""
+    def правка(о):
+        сущ(о, 7).update(name='ООО "Ромашка Маш"')             # кавычки из TITLE Битрикса
+        пост(о, 0).update(name='ООО "Ромашка"')
+        бр(о, "fag").update(name="3M")                          # одна цифра — имя
+        поз(о, 3).update(n="NU 316 ECP", name="Трансформатор ТМ 1 000")
+        поз(о, 7).update(name="Насос ЦНС 300 180")
+        поз(о, 1)["demand"].update(deals=40, rows=45)           # ходовой 6205-2RS
+        поз(о, 9).update(oem_file=["SKF GmbH"])                  # форма у известного бренда
+        подр(о, 0)["list"][0].update(s="DDU", m="SKF GmbH")
+        подр(о, 1)["list"][0].update(s="FCA-Шанхай")
+        подр(о, 2)["list"][0].update(q=0.25, t=(10.0 + 2) * 0.25, n="т")   # сумма меньше цены при 0,25 т
+        подр(о, 0)["makers"][0].update(name="igus")
+        о["counters:v1"]["metrics"]["коды_и_цены"][-1]["note"] = "сделки 2026 года, № 2026-09"
+        код_бр(о, 0)["offers"][0].update(min=2000.0, med=2000.0, max=2000.0, rows=1, tot_ok=1)  # просто цена
+        поля(о, "bearings:c2").update(part_number="ГОСТ 9833-73 020-025-30")
+        ст(о, "bearings:k1").update(body="Зазор 0,1<s<0,3 мм при t>80 °C. См. [раздел](#узел) и [лист](x.html).")
+        поля(о, "bearings:c2").update(oem="Timken")             # нет в словаре, есть в /brands
+        поля(о, "bearings:p0").update(unit="pcs")
+        поля(о, "bearings:s1").update(name="SKF", role="maker")  # прямая поставка от изготовителя
+        о["_dict"]["records"].append({"oem_key": "bentlynevadallc", "name": "Bently Nevada, Llc", "spellings": []})
+        о["_dict"]["count"] = 3
+    т = прогон(правка)
+    дефекты = [(x.ид, к) for x in т.values() for к, (_, д) in x.счета.items() if д]
+    assert not дефекты, дефекты
+
+
+def test_ходовой_подшипник_не_слипшийся_спрос():
+    """6205 спрашивают в десятках сделок по праву: короткий ключ с цифрами — код."""
+    прежний = КОДЫ[1]
+    КОДЫ[1] = ("6205", "Подшипник шариковый радиальный")
+    try:
+        т = прогон(lambda о: поз(о, 1)["demand"].update(deals=40, rows=45))["nomenclature"]
+    finally:
+        КОДЫ[1] = прежний
+    assert т.счета["n.dem_glued"] == [len(КОДЫ), 0]
+
+
+def test_тёзки_с_разными_инн_не_дубль(чистый):
+    """Сведение нарочно держит тёзок раздельно — имя совпало, ИНН разные."""
+    т = прогон(lambda о: сущ(о, 2).update(name=ИМЕНА[3]))["suppliers"]
+    assert т.счета["s.name_dup"][1] == 0
+    т = прогон(lambda о: сущ(о, 2).update(domain="firm3.example"))["suppliers"]
+    assert т.счета["s.domain_dup"][1] == 0
+
+
+def test_бренд_вне_словаря_справочно():
+    """Бренд, которого нет ни в словаре, ни в /brands, — покрытие словаря, а не
+    дефект компонента: польза «(справочно)», а не проверка."""
+    т = прогон(lambda о: поля(о, "bearings:c2").update(oem="Kaydon"))["library"]
+    assert not [к for к, (_, д) in т.счета.items() if д]
+    assert т.доли["u.oem_queue"][0] == 1
+    т = прогон(lambda о: поля(о, "bearings:c2").update(oem="Timken"))["library"]
+    assert т.доли["u.oem_queue"][0] == 0
+
+
+def test_машина_у_связанных_брендов_не_дефект():
+    def правка(о):
+        бр(о, "fag")["models"][0].update(id="m1")
+        бр(о, "fag")["atlas"] = {"name": "FAG", "owner": "SKF"}
+    assert прогон(правка)["brands"].счета["b.models_shared"][1] == 0
+
+
+def test_без_правила_кода_проверки_класса_не_применяются(monkeypatch):
+    monkeypatch.setattr(pa, "КЛАСС_НЕ_КОДА", None)
+    т = прогон()
+    for вкладка, код in (("suppliers", "x.pn_class"), ("nomenclature", "n.k_class"), ("nomenclature", "n.n_class"),
+                         ("nomenclature", "n.alt_class"), ("brands", "b.c_class"), ("library", "l.pn_class")):
+        assert т[вкладка].счета[код][0] == 0, код
+    assert "u.k_plausible" not in т["nomenclature"].доли
+    assert "u.pos_plausible" not in т["suppliers"].доли
+
+
+def test_было_печатается_только_целым():
+    т = прогон()["dict"]
+    поток = io.StringIO()
+    pa.печать([т], {"tabs": [{"id": "dict", "checks": [{"id": "d.count", "bad": "1\n::error::x"},
+                                                        {"id": "d.key", "bad": 3}]}]}, поток)
+    вывод = поток.getvalue()
+    assert "::error::x" not in вывод and "  ?" in вывод
+
+
+def test_сводка_по_дефектным_штукам():
+    т = прогон(lambda о: [c.update(name=None) for c in о[crossref.КЛЮЧ]["companies"]])
+    поток = io.StringIO()
+    pa.печать(list(т.values()), None, поток)
+    assert "следующая вкладка для правки: nomenclature" in поток.getvalue()
+
+
+def test_журнал_всех_мутаций_только_агрегаты(tmp_path, capsys, monkeypatch):
+    """Все мутации разом: ни одно значение корпуса не уходит в журнал и итог."""
+    о = корпус()
+    for _, _, правка in МУТАЦИИ:
+        try:
+            правка(о)
+        except (KeyError, IndexError, TypeError, AttributeError, StopIteration, ValueError):
+            pass                                  # мутации конфликтуют — берём, что легло
+    о.pop("_drop_library", None)
+    папка = _папка(tmp_path, закодировать(о))
+    monkeypatch.setattr(pa, "читать_словарь", lambda: о["_dict"])
+    monkeypatch.delenv("AUDIT_APPLY", raising=False)
+    итог = tmp_path / "итог.json"
+    pa.main(["--from-dir", str(папка), "--out", str(итог)])
+    вывод = capsys.readouterr().out + итог.read_text(encoding="utf-8")
+    запретное = ЗАПРЕТНОЕ + ["supremevalves", "alfapumpindustries", "romashka", "Kaydon", "schaeffler",
+                             "tulipgroup", "Лютик", "Прочие", "Timken", "1138", "23008", "RX-7732", "SS316",
+                             "ss316", "pn_not_found", "javascript", "firm4.ru"]
+    for слово in запретное:
+        assert слово not in вывод, слово
+
+
+# ── Запись в KV: когда отказывать ────────────────────────────────────────────
+
+def _kv(monkeypatch, сырьё=None):
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", СЧЁТ)
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "synthetic-token")
+    транспорт = _Транспорт(dict(сырьё if сырьё is not None else закодировать(корпус())))
+    прежний_источник, прежняя_запись = pa.источник_kv, pa.записать_ревизию
+    monkeypatch.setattr(pa, "источник_kv", lambda: прежний_источник(opener=транспорт, sleep=lambda s: None))
+    monkeypatch.setattr(pa, "записать_ревизию", lambda raw, ps=None: прежняя_запись(raw, ps, opener=транспорт))
+    monkeypatch.setattr(pa, "читать_словарь", _словарь)
+    return транспорт
+
+
+def _записи(транспорт):
+    return [путь for метод, путь in транспорт.вызовы if метод != "GET"]
+
+
+def test_холостой_прогон_kv_ничего_не_пишет(monkeypatch, capsys):
+    транспорт = _kv(monkeypatch)
+    monkeypatch.delenv("AUDIT_APPLY", raising=False)
+    assert pa.main([]) == 0
+    assert _записи(транспорт) == []
+    assert "вхолостую" in capsys.readouterr().out
+
+
+def test_запись_kv_полного_прогона_только_своим_ключом(monkeypatch):
+    транспорт = _kv(monkeypatch)
+    monkeypatch.setenv("AUDIT_APPLY", "1")
+    assert pa.main([]) == 0
+    assert len(_записи(транспорт)) == 1 and _записи(транспорт)[0].endswith("/values/audit%3Av1")
+    сводка = json.loads(транспорт.значения[pa.КЛЮЧ_РЕВИЗИИ])
+    assert all("failed" not in t and "partial" not in t for t in сводка["tabs"])
+
+
+@pytest.mark.parametrize("случай", ["only", "prev", "упала", "без_правила", "неполная", "битый"])
+def test_запись_kv_отказывает(случай, monkeypatch, capsys, tmp_path):
+    сырьё = закодировать(корпус())
+    аргументы = []
+    if случай == "only":
+        аргументы = ["--only", "dict"]
+    elif случай == "prev":
+        аргументы = ["--prev-dir", str(_папка(tmp_path, сырьё))]
+    elif случай == "упала":
+        monkeypatch.setattr(pa, "ревизия_счётчиков", lambda *_a, **_k: (_ for _ in ()).throw(TypeError("сбой")))
+    elif случай == "без_правила":
+        monkeypatch.setattr(pa, "КЛАСС_НЕ_КОДА", None)
+    elif случай == "неполная":
+        monkeypatch.setattr(pa, "БЛОБОВ_БИБЛИОТЕКИ", 2)
+    elif случай == "битый":
+        сырьё[brands.КЛЮЧИ_КОРЗИН[0]] = b"{not json"
+    транспорт = _kv(monkeypatch, сырьё)
+    monkeypatch.setenv("AUDIT_APPLY", "1")
+    assert pa.main(аргументы) == 1
+    assert _записи(транспорт) == [], случай
+    assert "не пишется" in capsys.readouterr().out
+
+
+def test_чтение_библиотеки_закрытым_списком_и_без_put(monkeypatch):
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", СЧЁТ)
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "synthetic-token")
+    транспорт = _Транспорт(dict(закодировать(корпус())))
+    источник, модуль = pa.источник_kv(opener=транспорт, sleep=lambda s: None)
+    for ключ_ in ("library:draft:abc", "library:v1", "library:history:abc", "library:v2:revision:rev-1",
+                  pa.ПРЕФИКС_БЛОБА + "zz"):
+        with pytest.raises(Exception, match="INVALID_KV_KEY"):
+            источник.get(ключ_)
+    # PUT мимо put(): через envelope и call — тоже отказ, и в транспорт не уходит.
+    with pytest.raises(модуль.PublishError, match="AUDIT_READ_ONLY"):
+        источник.снимки.envelope("PUT", источник.снимки.value_path(NS, "suppliers:v1"), b"{}")
+    with pytest.raises(Exception, match="AUDIT_READ_ONLY"):
+        источник.библиотека.call("PUT", источник.библиотека.value_path(NS, pa.КЛЮЧ_БИБЛИОТЕКИ), b"{}")
+    assert all(метод == "GET" for метод, _ in транспорт.вызовы)

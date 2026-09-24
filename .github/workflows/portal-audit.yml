@@ -18,7 +18,9 @@ name: Ревизия вкладок портала — дефекты и пол�
 #
 # ПО УМОЛЧАНИЮ ВХОЛОСТУЮ: печатает таблицы и ничего не пишет. Галка apply
 # кладёт итог (только агрегаты) в KV-ключ audit:v1 — оттуда его сможет
-# показать вкладка «Счётчики».
+# показать вкладка «Счётчики». Запись отказывает, если итог неполный: упала
+# вкладка, обход библиотеки встал на пределе, ключ не разобрался как JSON,
+# задан only или нет правила кода — такой итог затёр бы полный.
 #
 # В журнал идут ТОЛЬКО агрегаты (CLAUDE.md, правило 17): коды проверок,
 # счётчики, доли и образцы с цифрами «9» и буквами «a»/«я». Артефактов нет.
@@ -36,6 +38,7 @@ on:
 
 permissions:
   contents: read
+  actions: read          # gh run list: не идёт ли публикатор KV
 
 concurrency:
   group: portal-audit
@@ -44,7 +47,9 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # До 20 минут ожидания публикаторов плюс 25 минут обхода библиотеки
+    # (3000 блобов × 0,5 с) и остальные ключи.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -68,6 +73,33 @@ jobs:
           [ -n "${T:-}" ] || { echo "::error::нет секрета CLOUDFLARE_API_TOKEN — снимки не прочитать"; exit 1; }
           [ -n "${A:-}" ] || { echo "::error::нет секрета CLOUDFLARE_ACCOUNT_ID"; exit 1; }
           echo "секреты Cloudflare на месте"
+
+      - name: Публикаторы KV не идут
+        # Токен Cloudflare у ревизии тот же, что у публикаторов, а предел API —
+        # 1200 запросов за 5 минут на токен. PUT публикатора, получивший 429,
+        # не повторяется (CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED) и роняет запись
+        # снимка. Своя группа concurrency этого не исключает — поэтому ревизия
+        # ждёт, пока идущие публикаторы KV закончат (до 20 минут), и не стартует,
+        # если они всё ещё идут. Сама ревизия держит 0,5 с между запросами —
+        # половину предела; публикатор, пошедший уже после старта, уложится
+        # в оставшуюся.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20); do
+            busy=0
+            for wf in library-publish.yml suppliers-publish.yml suppliers-quotes.yml counters-publish.yml; do
+              n=$(gh run list -R "$REPO" --workflow "$wf" --status in_progress --json databaseId --jq 'length')
+              busy=$((busy + n))
+            done
+            if [ "$busy" -eq 0 ]; then echo "публикаторы KV не идут"; exit 0; fi
+            echo "идут публикаторы KV: $busy — ждём минуту ($attempt из 20)"
+            sleep 60
+          done
+          echo "::error::публикаторы KV идут больше 20 минут — ревизия не стартует, чтобы не отнять у них предел API Cloudflare"
+          exit 1
 
       - name: Проверки ревизии на выдуманных снимках
         run: python -m pytest tests/test_portal_audit.py -q
