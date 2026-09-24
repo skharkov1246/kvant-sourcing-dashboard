@@ -57,13 +57,19 @@ def test_публикатор_поставщиков_пишет_только_с�
 
 def test_публикатор_перекрёстной_системы_пишет_только_свой_ключ(поставщики,
                                                                 перекрёстный):
+    from library import crossref
+
     class CloudflareCross(поставщики.Cloudflare):
-        КЛЮЧИ = (перекрёстный.KEY,)
+        КЛЮЧИ = crossref.ВСЕ_КЛЮЧИ
 
     cf = CloudflareCross(СЧЁТ, ТОКЕН)
-    assert quote(перекрёстный.KEY, safe="") in cf.value_path(ПРОСТРАНСТВО,
-                                                              перекрёстный.KEY)
-    for ключ in [*ЧУЖИЕ, поставщики.KEY]:
+    for свой in crossref.ВСЕ_КЛЮЧИ:
+        assert quote(свой, safe="") in cf.value_path(ПРОСТРАНСТВО, свой)
+    # Номер части за пределами закрытого списка — чужой ключ, а не новая часть.
+    за_краем = [f"crossref:list:{crossref.СПИСОК_ЧАСТЕЙ:02d}",
+                f"crossref:offers:{crossref.КОРЗИН:02d}", "crossref:offers:3",
+                "crossref:list:", "brands:codes:00"]
+    for ключ in [*ЧУЖИЕ, поставщики.KEY, *за_краем]:
         with pytest.raises(поставщики.PublishError) as отказ:
             cf.value_path(ПРОСТРАНСТВО, ключ)
         assert str(отказ.value) == "INVALID_KV_KEY"
@@ -71,8 +77,9 @@ def test_публикатор_перекрёстной_системы_пишет
 
 def test_списки_ключей_не_пересекаются(поставщики, перекрёстный):
     """Замена, а не расширение: пересечение означало бы общий доступ к снимкам."""
+    from library import crossref
     свои = set(поставщики.Cloudflare.КЛЮЧИ)
-    чужие = {перекрёстный.KEY}
+    чужие = set(crossref.ВСЕ_КЛЮЧИ)
     assert not (свои & чужие), "публикатор поставщиков дотягивается до crossref:v1"
     assert len(свои) == 1, "список ключей публикатора поставщиков перестал быть один"
 
@@ -84,5 +91,41 @@ def test_наследник_объявлен_заменой_списка(пер�
     то же самое. Без него скрипт мог бы расширять список, а тест — не заметить.
     """
     текст = (ROOT / "scripts" / "publish_crossref.py").read_text(encoding="utf-8")
-    assert "КЛЮЧИ = (KEY,)" in текст
+    assert "КЛЮЧИ = crossref.ВСЕ_КЛЮЧИ" in текст
     assert "КЛЮЧИ +" not in текст and "КЛЮЧИ = ps.Cloudflare.КЛЮЧИ" not in текст
+    assert перекрёстный.KEY == "crossref:v1", "имя заголовка сменилось — страницы его не найдут"
+
+
+def test_закрытый_список_тот_же_что_в_воркере():
+    """Числа частей и корзин в воркере и в сборщике — одни.
+
+    Разойдись они — страница попросит корзину, которую воркер не знает (400),
+    или воркер разрешит ключ, который никто не пишет.
+    """
+    import re
+    from library import crossref
+    воркер = (ROOT / "public" / "_worker.js").read_text(encoding="utf-8")
+    код = "\n".join(ln for ln in воркер.splitlines() if not ln.lstrip().startswith("//"))
+    lists = re.search(r"const CROSSREF_LISTS = (\d+);", код)
+    parts = re.search(r"const CROSSREF_PARTS = (\d+);", код)
+    assert lists and int(lists.group(1)) == crossref.СПИСОК_ЧАСТЕЙ
+    assert parts and int(parts.group(1)) == crossref.КОРЗИН
+    assert '"crossref:list:"' in код and '"crossref:offers:"' in код
+
+
+def test_вхолостую_раскладывает_все_ключи(перекрёстный, tmp_path, monkeypatch, capsys):
+    """Прогон без записи сохраняет все ключи файлами и печатает только агрегаты."""
+    import datetime as dt
+    строка = ("6205", "6-205", "Учебный подшипник", "101", "KV-S-000001-1", "Учебный завод",
+              None, "SKF", 10, "EUR", 1, "шт", None, None, None, None, None, None,
+              None, None, None, None, "RFQ-1", "med", dt.date(2026, 9, 1), None)
+    monkeypatch.setattr(перекрёстный, "читать_базу",
+                        lambda dsn: ([строка], [], [], [], [], []))
+    assert перекрёстный.main(["--out", str(tmp_path)]) == 0
+    from library import crossref
+    имена = {p.name for p in tmp_path.iterdir()}
+    assert имена == {k.replace(":", "_") + ".json" for k in crossref.ВСЕ_КЛЮЧИ}
+    журнал = capsys.readouterr().out
+    assert "заголовок crossref:v1" in журнал and "корзина, самая тяжёлая" in журнал
+    # Правило 17: в журнале ни наименований, ни имён компаний.
+    assert "Учебный подшипник" not in журнал and "Учебный завод" not in журнал
