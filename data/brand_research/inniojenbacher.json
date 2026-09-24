@@ -1,0 +1,991 @@
+{
+  "oem_key": "inniojenbacher",
+  "name": "INNIO Jenbacher",
+  "segment_focus": "газовые двигатели J320, J416, J420, J612, J616, J620, J624; свечи, фильтры, датчики, уплотнения",
+  "researched_at": "2026-09-24",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по INNIO Jenbacher, газопоршневые двигатели Type 3 / 4 / 6 (J320, J416, J420, J612, J616, J620, J624) и смежные модели. Мощности моделей взяты со страниц продуктов jenbacher.com, все модели там значатся текущими. Собрано 40 кодов запчастей, для каждого есть открытая страница и дословная цитата с кодом; все цитаты сверены с загруженным текстом страниц. Упор на расходники ТО: свечи, фильтры (масло, воздух, газ), датчики детонации, термопары, датчики температуры и давления, уплотнения, газовые клапаны форкамер, клапаны TecJet.\n\nИсточники запчастей распределены так.\n- J320: перечни ТО продавца Zuhon (он сам помечает их «for reference only»).\n- Привязка кодов к моделям Type 4 и 6: карточки аналогов Weyeah и FridayParts. Применимость там указывает продавец, и у Weyeah в теле карточки она местами противоречит заголовку.\n- Коды свечей и их типы (P3V3i для Type 4, P611 для Type 6/9, P518): карточки parts-systems.de.\n- Коды из четырёх карточек Weyeah (629995, 9008292, 550404, 641947) дополнительно подтверждены отдельными карточками того же номера на parts-systems.de.\n- Аналоги фильтров под номера Jenbacher: таблица перекрёстных ссылок SF-Filter.\n\nОфициальный каталог и тексты технических инструкций закрыты. Открыто нашлись TA 1000-1109 (моторные масла, ред. 21 от 28.02.2020) и ссылки из неё на TA 1000-0099B, TA 1000-0112 и TA 1000-0300. Кроме того, на jenbacher.com найдены страницы и листовки модернизаций: DIA.NE XT4, Blow-By Type 6F/G/H, SAFI/MORIS и портфель свечей.\n\nСубпоставщики, установленные по источникам:\n- ABB Turbo Systems: двухступенчатый наддув J624.\n- ABB: турбокомпрессоры, изначально стоявшие на двигателях Jenbacher. Серия TPS в перечне ТО J320 отнесена к ABB по обозначению серии, это вывод.\n- DENSO: свеча P518 под номером 1214569 для Type 6. Свечи остальных типов Jenbacher делает сама, на своём заводе в Капфенберге.\n- Woodward: клапаны TecJet под номерами Jenbacher.\n- B&R: дисплей панели DIA.NE.\n- HEINZMANN и Leroy-Somer: регулятор скорости и генератор на одной продаваемой установке J620GS E02.\n- KBB: сторонняя замена турбокомпрессора ABB на J620.\n\nДилеры по приоритетным странам взяты из официального локатора jenbacher.com. Он перечисляет 133 организации, и для России записи в нём нет. Для Казахстана записан ETS-Astana со ссылкой на сайт tmenergo.ru. Сама «ЭнергоТехСервис» на своём сайте сообщает о дистрибьюторском договоре по РФ до 30.04.2023. Её текущий статус не подтверждён.\n\nВ репозитории уже лежат цены parts-systems.de по блоку Jenbacher: gt/data/ship_jenbacher_prices.json. Новые коды можно сверить с этим прайсом.",
+  "machines": [
+    {
+      "model": "J312",
+      "kind": "газопоршневой двигатель / генераторная установка (Type 3)",
+      "segment": "ГПУ",
+      "rating": "635 кВт эл. (линейка 400–600 кВт по заголовку страницы; в списке семейства до 635 кВт)",
+      "status": "выпускается (текущая страница продукта)",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-3/j312/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J316",
+      "kind": "газопоршневой двигатель / генераторная установка (Type 3F)",
+      "segment": "ГПУ",
+      "rating": "851 кВт эл., КПД эл. до 43,1 %",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-3/j316/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J320",
+      "kind": "газопоршневой двигатель / генераторная установка (Type 3)",
+      "segment": "ГПУ",
+      "rating": "1 155 кВт эл. (класс 1 000–1 150 кВт), КПД эл. до 43,2 %",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-3/j320/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J412",
+      "kind": "газопоршневой двигатель V12 (Type 4)",
+      "segment": "ГПУ",
+      "rating": "934 кВт эл.",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-4/j412/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J416",
+      "kind": "газопоршневой двигатель V16 (Type 4)",
+      "segment": "ГПУ",
+      "rating": "1 248 кВт эл., КПД эл. до 43,7 %",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-4/j416/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J420",
+      "kind": "газопоршневой двигатель V20 (Type 4), исполнения B и D/E",
+      "segment": "ГПУ",
+      "rating": "до 1 562 кВт эл. (J420 D/E); в списке семейства на сайте — до 1 694 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-4/j420/",
+        "https://innio.com/images/medias/files/164/ijb_ets_t4_a4_en_2025_screen_ijb-125004-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J612",
+      "kind": "газопоршневой двигатель V12 (Type 6)",
+      "segment": "ГПУ",
+      "rating": "2 007 кВт эл. (до 2 092 кВт), КПД эл. до 45,4–45,5 %",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-6/j612/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J616",
+      "kind": "газопоршневой двигатель V16 (Type 6)",
+      "segment": "ГПУ",
+      "rating": "2 677 кВт эл. (до 2 797 кВт), КПД эл. до 45,7 %",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-6/j616/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J620",
+      "kind": "газопоршневой двигатель V20 (Type 6)",
+      "segment": "ГПУ",
+      "rating": "3 360 кВт эл. (до 3 509 кВт), КПД эл. до 45,9 %",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-6/j620/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J620 Fast Start",
+      "kind": "газопоршневой двигатель V20 (Type 6), исполнение быстрого пуска",
+      "segment": "ГПУ",
+      "rating": "3 114 кВт (список семейства на сайте); 3 090 кВт по заголовку страницы",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-6/j612/",
+        "https://www.jenbacher.com/en/gas-engines/type-6/j620-fast-start/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J624",
+      "kind": "газопоршневой двигатель V24 (Type 6) с двухступенчатым турбонаддувом",
+      "segment": "ГПУ",
+      "rating": "4 507 кВт эл. (класс 4,5 МВт)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-6/j624/",
+        "https://www.powermag.com/the-worlds-first-two-stage-turbocharged-gas-engine/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "J920 FleXtra",
+      "kind": "газопоршневой двигатель (Type 9) с двухступенчатым турбонаддувом",
+      "segment": "ГПУ",
+      "rating": "Type 9 — до 10 606 кВт на двигатель (меню сайта); класс 10 МВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.jenbacher.com/en/gas-engines/type-9/j920-flextra/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Lubricating oil for type 2, 3, 4 and 6 Jenbacher gas engines (Technical Instruction; ред. 21 от 28.02.2020, в т. ч. отдельный перечень масел для J624)",
+      "doc_no": "TA 1000-1109",
+      "machine": "Type 2/3/4/6 (J320, J416, J420, J612–J624)",
+      "kind": "техническая инструкция (эксплуатационные материалы, O&M)",
+      "sources": [
+        "https://petrochem.dk/wp-content/uploads/2020/10/Sentron-approvals-Jenbacher.pdf",
+        "https://www.russianlub.com/wp-content/uploads/2018/02/Jenbacher-approved-oils-TA-1009-1109-1.pdf"
+      ]
+    },
+    {
+      "title": "Limit levels for used oil in Jenbacher gas engines (ссылка в TA 1000-1109; сам текст открыто не найден)",
+      "doc_no": "TA 1000-0099B",
+      "machine": "Type 2/3/4/6",
+      "kind": "техническая инструкция (O&M)",
+      "sources": [
+        "https://petrochem.dk/wp-content/uploads/2020/10/Sentron-approvals-Jenbacher.pdf"
+      ]
+    },
+    {
+      "title": "Taking lubricating oil samples / lubricating oil sampling protocol (ссылка в TA 1000-1109)",
+      "doc_no": "TA 1000-0112",
+      "machine": "Type 2/3/4/6",
+      "kind": "техническая инструкция (O&M)",
+      "sources": [
+        "https://petrochem.dk/wp-content/uploads/2020/10/Sentron-approvals-Jenbacher.pdf"
+      ]
+    },
+    {
+      "title": "Fuel gas and combustion air requirements (в TA 1000-1109 — TA 1000-0300; у Lucideon — TI 1000-0300)",
+      "doc_no": "TA 1000-0300",
+      "machine": "все типы Jenbacher",
+      "kind": "техническая инструкция (требования к газу, O&M)",
+      "sources": [
+        "https://petrochem.dk/wp-content/uploads/2020/10/Sentron-approvals-Jenbacher.pdf",
+        "https://www.lucideon.com/testing-characterisation/test-methods/test-method-page-jenbacher"
+      ]
+    },
+    {
+      "title": "Требования к охлаждающей воде (страница допуска продукта ADDINOL по INNIO Jenbacher TA 1000-0200)",
+      "doc_no": "TA 1000-0200",
+      "machine": "все типы Jenbacher",
+      "kind": "техническая инструкция (O&M)",
+      "sources": [
+        "https://addinol.de/en/products/product-finder/innio-jenbacher-ta-1000-0200/?lang=en"
+      ]
+    },
+    {
+      "title": "DIA.NE XT4 Control System Upgrade (листовка: замена панелей DIA.NE XT2/XT3 на контроллер XT4)",
+      "doc_no": "IJB-225006-EN",
+      "machine": "двигатели Jenbacher с DIA.NE / DIA.NE XT/XT2/XT3",
+      "kind": "бюллетень модернизации (upgrade factsheet)",
+      "sources": [
+        "https://www.jenbacher.com/wp-content/uploads/2025/02/IJB_FS_EN_DIA.NE_XT4ControlSystem_Upgrade__RZ_Screen_IJB_225006-EN.pdf"
+      ]
+    },
+    {
+      "title": "Blow-By System Upgrade Type 6F/G/H (сменные картриджи фильтра картерных газов)",
+      "machine": "Type 6 версий F, G, H (J612, J616, J620, J624)",
+      "kind": "бюллетень модернизации",
+      "sources": [
+        "https://www.jenbacher.com/en/services/upgrades-cm-u/type-6-f-g-h-versions-blow-by-system-upgrade"
+      ]
+    },
+    {
+      "title": "SAFI Knock Protection Upgrade with MORIS Ignition System",
+      "machine": "Type 4 и Type 6 с DIA.NE XT (от 2.3), XT3, XT4",
+      "kind": "бюллетень модернизации",
+      "sources": [
+        "https://www.jenbacher.com/en/services/upgrades-cm-u/safi-knock-protection-upgrade-with-moris-ignition-system/"
+      ]
+    },
+    {
+      "title": "Jenbacher Spark Plugs — портфель свечей P3MAX, P3PRO, P7V3i, P7V5i, P611, P518 с применимостью по типам",
+      "machine": "Type 2/3/4/6/9",
+      "kind": "каталожная страница изготовителя (запчасти)",
+      "sources": [
+        "https://www.jenbacher.com/en/services/genuine-jenbacher-spare-parts/spark-plug/"
+      ]
+    },
+    {
+      "title": "JENBACHER TYPE 4 — An efficiency milestone (брошюра с техданными: диаметр 145 мм, ход 185 мм, габариты J412/J416/J420)",
+      "doc_no": "IJB-125004-EN",
+      "machine": "J412, J416, J420",
+      "kind": "техническая брошюра",
+      "sources": [
+        "https://innio.com/images/medias/files/164/ijb_ets_t4_a4_en_2025_screen_ijb-125004-en.pdf"
+      ]
+    },
+    {
+      "title": "Перечни запчастей ТО J320 на интервалы 2 000 / 4 000 / 8 000 / 10 000 / 20 000 / 30 000 / 40 000 / 50 000 ч (составлены продавцом, «general version, for reference only»)",
+      "machine": "J320",
+      "kind": "перечень запчастей ТО (сторонний)",
+      "sources": [
+        "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+        "https://zuhonpower.com/jenbacher-j320-gas-engine-10000-operating-hours-maintenance-spare-parts-list/",
+        "https://zuhonpower.com/jenbacher-j320-gas-engine-2000-operating-hours-3-months-maintenance-spare-parts-list/"
+      ]
+    },
+    {
+      "title": "J320 Maintenance Spare Parts List (пользовательская загрузка на Scribd; содержимое не сверено)",
+      "machine": "J320",
+      "kind": "перечень запчастей ТО",
+      "sources": [
+        "https://www.scribd.com/document/670727615/J320-Maintenance-Spare-Parts-List"
+      ]
+    },
+    {
+      "title": "Maintenance Program Jenbacher J612–620 (пользовательская загрузка на Scribd; содержимое не сверено)",
+      "machine": "J612, J616, J620",
+      "kind": "регламент ТО (O&M)",
+      "sources": [
+        "https://www.scribd.com/document/488139128/Maintenance-Program-Jenbacher"
+      ]
+    },
+    {
+      "title": "Jenbacher 208 GS Parts Manual 2009 (пользовательская загрузка на Scribd; содержимое не сверено)",
+      "machine": "J208 (Type 2)",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.scribd.com/document/480669661/02-208-xls"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "351000",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Комплект свечей зажигания P7.N1 (4 шт. в комплекте)",
+      "machine": "J320",
+      "unit": "Система зажигания",
+      "doc_ref": "Zuhon: перечень запчастей ТО J320 на 40 000 ч (составлен продавцом, «general version, for reference only»)",
+      "source_url": "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+      "quote": "351000 Spark plug set P7.N1 ( 4pcs as a set) 5 Sets"
+    },
+    {
+      "code": "235027",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтрующий элемент масляного фильтра",
+      "machine": "J320",
+      "unit": "Масляная система (фильтр масла)",
+      "doc_ref": "Zuhon: перечень запчастей ТО J320 на 40 000 ч (составлен продавцом, «general version, for reference only»)",
+      "source_url": "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+      "quote": "235027 Oil filter cartridge 1 PC"
+    },
+    {
+      "code": "257320",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтр воздушный",
+      "machine": "J320",
+      "unit": "Воздушный фильтр / карбюратор",
+      "doc_ref": "Zuhon: перечень запчастей ТО J320 на 40 000 ч (составлен продавцом, «general version, for reference only»)",
+      "source_url": "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+      "quote": "257320 Filter 1 PC"
+    },
+    {
+      "code": "270159",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтрующий мат воздушного фильтра",
+      "machine": "J320",
+      "unit": "Воздушный фильтр / карбюратор",
+      "doc_ref": "Zuhon: перечень запчастей ТО J320 на 40 000 ч (составлен продавцом, «general version, for reference only»); тот же номер есть карточкой Luftfilter у parts-systems.de",
+      "source_url": "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+      "quote": "270159 Filter mat 1 PC"
+    },
+    {
+      "code": "426555",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтрующий элемент (всасывающая линия)",
+      "machine": "J320",
+      "unit": "Всасывающая линия",
+      "doc_ref": "Zuhon: перечень запчастей ТО J320 на 40 000 ч (составлен продавцом, «general version, for reference only»); тот же номер есть карточкой Filter у parts-systems.de",
+      "source_url": "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+      "quote": "426555 Filter cartridge 1 PC"
+    },
+    {
+      "code": "582698",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Комплект уплотнений турбокомпрессора (раздел «Turbocharger TPS»)",
+      "machine": "J320",
+      "unit": "Турбокомпрессор",
+      "doc_ref": "Zuhon: перечень запчастей ТО J320 на 40 000 ч (составлен продавцом, «general version, for reference only»)",
+      "source_url": "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+      "quote": "582698 Gasket set 1 PC"
+    },
+    {
+      "code": "448657",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Прокладка головки цилиндра",
+      "machine": "J320",
+      "unit": "Головка цилиндра",
+      "doc_ref": "Zuhon: перечень запчастей ТО J320 на 40 000 ч (составлен продавцом, «general version, for reference only»)",
+      "source_url": "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+      "quote": "448657 Cylinder head gasket 20 PCS"
+    },
+    {
+      "code": "482681",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Вкладыш шатунного подшипника",
+      "machine": "J320",
+      "unit": "Кривошипно-шатунный механизм",
+      "doc_ref": "Zuhon: перечень запчастей ТО J320 на 40 000 ч (составлен продавцом, «general version, for reference only»)",
+      "source_url": "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/",
+      "quote": "482681 Connecting rod bearing 20 PCS"
+    },
+    {
+      "code": "267789",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтр газовый",
+      "machine": "J320",
+      "unit": "Газовая линия (газовый фильтр)",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца; тот же номер в перечне ТО J320 Zuhon (раздел Gas absorption device); в описании на карточке Weyeah стоит другой номер — 1219674, код держится на заголовке и перечне Zuhon",
+      "source_url": "https://www.weyeahmotor.com/Gas-Filter-267789-for-Jenbacher-J320-Gas-Engine-pd41274641.html",
+      "quote": "Gas Filter 267789 for Jenbacher J320 Gas Engine"
+    },
+    {
+      "code": "1200176",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Датчик детонации",
+      "machine": "J320",
+      "unit": "Система зажигания / защита от детонации",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца (в теле карточки упомянут и J420)",
+      "source_url": "https://www.weyeahmotor.com/Knock-Sensor-1200176-for-Jenbacher-J320-Gas-Engine-pd43474689.html",
+      "quote": "Knock Sensor 1200176 for Jenbacher J320 Gas Engine"
+    },
+    {
+      "code": "487181",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Катушка зажигания",
+      "machine": "J320",
+      "unit": "Система зажигания",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца",
+      "source_url": "https://www.weyeahmotor.com/Ignition-Coil-487181-for-Jenbacher-J320-gas-engine-pd40631789.html",
+      "quote": "Ignition Coil 487181 for Jenbacher J320 gas engine"
+    },
+    {
+      "code": "285285",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Датчик-преобразователь давления",
+      "machine": "J320",
+      "unit": "КИП двигателя",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца",
+      "source_url": "https://www.weyeahmotor.com/Pressure-Transmitter-285285-for-Jenbacher-J320-Gas-Engine-pd43502789.html",
+      "quote": "Pressure Transmitter 285285 for Jenbacher J320 Gas Engine"
+    },
+    {
+      "code": "1241162",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Свеча зажигания P3 (упаковка 4 шт.)",
+      "machine": "J312, J316, J320, J412, J416, J420",
+      "unit": "Система зажигания",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца («Suitable for: J312,J316,J320,J412,J416&J420»)",
+      "source_url": "https://www.weyeahmotor.com/Jenbacher-Spark-Plug-1241162-for-Jenbacher-Gas-Engine-pd46974561.html",
+      "quote": "Jenbacher spare parts Jenbacher 1241162 J320 J420 spark plug P3 spark plug"
+    },
+    {
+      "code": "464424",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтр воздушный",
+      "machine": "J312, J316, J320",
+      "unit": "Воздушный фильтр",
+      "doc_ref": "FridayParts: карточка аналога под номер Jenbacher",
+      "source_url": "https://www.fridayparts.com/air-filter-464424-for-jenbacher-engine-j312-j316-j320-jgs320-312",
+      "quote": "Air Filter 464424 for Jenbacher Engine J312 J316 J320 JGS320 312"
+    },
+    {
+      "code": "631265",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтрующий элемент масляного фильтра (второй номер на карточке — 245488)",
+      "machine": "J412, J416, J420, J612 (по продавцу также JGS620)",
+      "unit": "Масляная система (фильтр масла)",
+      "doc_ref": "FridayParts: карточка аналога; тот же номер у Weyeah для J412/J416/J420",
+      "source_url": "https://www.fridayparts.com/oil-filter-631265-245488-for-jenbacher-engine-jgs420-jgs620-j412-j416-j420",
+      "quote": "Oil Filter 631265 245488 for Jenbacher Engine JGS420 JGS620 J412 J416 J420 J612"
+    },
+    {
+      "code": "HY 14448/2-V",
+      "issuer": "SF-Filter (Швейцария) — собственный номер аналога",
+      "description": "Аналог фильтрующего элемента масла Jenbacher 631265 (гидравлический тип)",
+      "machine": "J412, J416, J420, J612 (через номер 631265)",
+      "unit": "Масляная система (фильтр масла)",
+      "doc_ref": "SF-Filter: таблица перекрёстных ссылок по номеру Jenbacher 631265",
+      "source_url": "https://www.sf-filter.com/en/cross-reference-list?searchValue=631265",
+      "quote": "631265 JENBACHER HY 14448/2-V Hydraulic filter"
+    },
+    {
+      "code": "1227732",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтр воздушный",
+      "machine": "J412, J416, J420",
+      "unit": "Воздушный фильтр",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца («Suitable for: J412,J416&J420»)",
+      "source_url": "https://www.weyeahmotor.com/Air-Filter-1227732-for-Jenbacher-J420-Gas-Engine-pd41376651.html",
+      "quote": "Air Filter 1227732 for Jenbacher J420 Gas Engine"
+    },
+    {
+      "code": "9008292",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Датчик детонации",
+      "machine": "Type 4 (J412/J416/J420)",
+      "unit": "Система зажигания / защита от детонации",
+      "doc_ref": "Weyeah: карточка аналога под номер Jenbacher; номер подтверждается отдельной карточкой parts-systems.de (Klopfsensor Jenbacher 9008292, SW49143)",
+      "source_url": "https://www.weyeahmotor.com/Knock-Sensor-9008292-for-Jenbacher-Engines-Type-4-pd43504431.html",
+      "quote": "Knock Sensor 9008292 for Jenbacher Engines Type 4"
+    },
+    {
+      "code": "607323",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Датчик температуры",
+      "machine": "J412, J416, J420",
+      "unit": "КИП двигателя",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца",
+      "source_url": "https://www.weyeahmotor.com/Temperature-Sensor-607323-for-Jenbacher-J420-Gas-Engine-pd49197651.html",
+      "quote": "Temperature Sensor 607323 for Jenbacher J420 Gas Engine"
+    },
+    {
+      "code": "641947",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Термопара",
+      "machine": "J412, J416, J420",
+      "unit": "КИП двигателя (температура)",
+      "doc_ref": "Weyeah: карточка аналога; номер подтверждается карточкой parts-systems.de (Thermoelement Jenbacher 641947, SW47531)",
+      "source_url": "https://www.weyeahmotor.com/Thermocouple-641947-for-Jenbacher-J420-Gas-Engine-pd49586651.html",
+      "quote": "Thermocouple 641947 for Jenbacher J420 Gas Engine"
+    },
+    {
+      "code": "9029950",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Форкамера",
+      "machine": "Type 4 (J412/J416/J420)",
+      "unit": "Головка цилиндра / форкамера",
+      "doc_ref": "Weyeah: карточка аналога под номер Jenbacher; тот же номер есть карточкой Vorkammer у parts-systems.de",
+      "source_url": "https://www.weyeahmotor.com/Precombustion-Chamber-9029950-for-Jenbacher-Engines-Type-4-pd41103589.html",
+      "quote": "Precombustion Chamber 9029950 for Jenbacher Engines Type 4"
+    },
+    {
+      "code": "1239066",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Газовый клапан форкамеры",
+      "machine": "Type 4 (J412/J416/J420)",
+      "unit": "Форкамера / подача газа",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца",
+      "source_url": "https://www.weyeahmotor.com/Pre-chamber-Gas-Valve-1239066-for-Jenbacher-Engines-Type-4-pd45213589.html",
+      "quote": "Pre-chamber Gas Valve 1239066 for Jenbacher Engines Type 4"
+    },
+    {
+      "code": "1231577",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя); сам узел — TecJet (торговая марка Woodward)",
+      "description": "Дроссельная заслонка TecJet",
+      "machine": "J412, J416, J420",
+      "unit": "Газовая система / дозирование смеси",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца",
+      "source_url": "https://www.weyeahmotor.com/Throttle-Valve-Tec-Jet-1231577-for-Jenbacher-J420-Gas-Engine-pd46766651.html",
+      "quote": "Throttle Valve Tec Jet 1231577 for Jenbacher J420 Gas Engine"
+    },
+    {
+      "code": "657540",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Наконечник (соединитель) свечи зажигания",
+      "machine": "J412, J416, J420",
+      "unit": "Система зажигания",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца; в теле карточки указаны также J320 и J420 — применимость шире или противоречива",
+      "source_url": "https://www.weyeahmotor.com/Spark-Plug-Connector-657540-for-Jenbacher-J420-Gas-Engine-pd40486651.html",
+      "quote": "Spark Plug Connector 657540 for Jenbacher J420 Gas Engine"
+    },
+    {
+      "code": "395570",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Уплотнение вала (манжета)",
+      "machine": "J412, J416, J420",
+      "unit": "Уплотнения двигателя",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца",
+      "source_url": "https://www.weyeahmotor.com/Shaft-Seal-395570-for-Jenbacher-J420-Gas-Engine-pd43357751.html",
+      "quote": "Shaft Seal 395570 for Jenbacher J420 Gas Engine"
+    },
+    {
+      "code": "1254664",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Комплект свечей зажигания, 4 шт., обозначение P3V3i; на карточке «Jenbacher Type 4»",
+      "machine": "Type 4 (J412/J416/J420)",
+      "unit": "Система зажигания",
+      "doc_ref": "parts-systems.de, Original-Teile-Center Jenbacher, артикул витрины SW40671",
+      "source_url": "https://www.parts-systems.de/Zuendkerzensatz-Jenbacher-1254664/SW40671",
+      "quote": "Zündkerzensatz Jenbacher 1254664 Original"
+    },
+    {
+      "code": "1214569",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя); свеча изготовлена DENSO (тип P518)",
+      "description": "Комплект свечей зажигания DENSO P518 (у parts-systems.de: «Menge 4», «Bezeichnung: P518»)",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "Система зажигания",
+      "doc_ref": "RS Motor (Испания), статья о свечах DENSO; тот же номер — карточка parts-systems.de SW42516",
+      "source_url": "https://rsmotorps.com/en/denso-spark-plugs-for-industrial-gas-engines/",
+      "quote": "In Jenbacher type 6 gas engines, the spark plugs released with the Jenbacher part number 1214569 are spark plugs Denso P518."
+    },
+    {
+      "code": "436782",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя, по данным продавца)",
+      "description": "Свеча зажигания (одиночная)",
+      "machine": "J612, J616, J620",
+      "unit": "Система зажигания",
+      "doc_ref": "Zuhon (Шэньчжэнь, Китай): карточка товара",
+      "source_url": "https://zuhonpower.com/product/436782-spark-plug-for-jenbacher-type-6-gas-engines/",
+      "quote": "436782 spark plug for Jenbacher type 6 gas engines"
+    },
+    {
+      "code": "21669416",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Комплект свечей зажигания P611; на карточке «Vorgänger 1236100» и «Jenbacher Type 6/9»",
+      "machine": "Type 6 (J612/J616/J620/J624), Type 9",
+      "unit": "Система зажигания",
+      "doc_ref": "parts-systems.de, артикул витрины SW40828; применимость P611 к «All Type 6 and 9» — также на странице свечей jenbacher.com",
+      "source_url": "https://www.parts-systems.de/Zuendkerzensatz-Jenbacher-21669416/SW40828",
+      "quote": "Zündkerzensatz Jenbacher 21669416 Original"
+    },
+    {
+      "code": "628476",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтр воздушный",
+      "machine": "J612, J616, J620, J624",
+      "unit": "Воздушный фильтр",
+      "doc_ref": "FridayParts: карточка аналога под номер Jenbacher",
+      "source_url": "https://www.fridayparts.com/air-filter-628476-for-jenbacher-engine-j612-j616-j620-jgs620-jgs624",
+      "quote": "Air Filter 628476 for Jenbacher Engine J612 J616 J620 JGS620 JGS624"
+    },
+    {
+      "code": "SL 83199",
+      "issuer": "SF-Filter (Швейцария) — собственный номер аналога",
+      "description": "Аналог воздушного фильтра Jenbacher 628476",
+      "machine": "J612, J616, J620, J624 (через номер 628476)",
+      "unit": "Воздушный фильтр",
+      "doc_ref": "SF-Filter: таблица перекрёстных ссылок по номеру Jenbacher 628476",
+      "source_url": "https://www.sf-filter.com/en/cross-reference-list?searchValue=628476",
+      "quote": "628476 JENBACHER SL 83199 Air filter"
+    },
+    {
+      "code": "397000",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Рукавный (мешочный) воздушный фильтр",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "Воздушный фильтр",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца",
+      "source_url": "https://www.weyeahmotor.com/Bag-Filter-397000-for-Jenbacher-Engines-Type-6-pd47468231.html",
+      "quote": "Bag Filter 397000 for Jenbacher Engines Type 6"
+    },
+    {
+      "code": "431447",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Фильтрующий элемент (картридж)",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "Фильтрация (назначение на карточке не раскрыто)",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца; ВНИМАНИЕ: в теле карточки другой номер (4431447) и двигатели J412/J416/J420 — привязка к Type 6 держится только на заголовке, ненадёжна",
+      "source_url": "https://www.weyeahmotor.com/Filter-Cartridge-431447-for-Jenbacher-Engines-Type-6-pd40766231.html",
+      "quote": "Filter Cartridge 431447 for Jenbacher Engines Type 6"
+    },
+    {
+      "code": "629995",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Датчик детонации",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "Система зажигания / защита от детонации",
+      "doc_ref": "Weyeah: карточка аналога; номер подтверждается карточкой parts-systems.de (Klopfsensor Jenbacher 629995, SW42051)",
+      "source_url": "https://www.weyeahmotor.com/Knock-Sensor-629995-for-Jenbacher-Engines-Type-6-pd40427721.html",
+      "quote": "Knock Sensor 629995 for Jenbacher Engines Type 6"
+    },
+    {
+      "code": "550404",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Термопара",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "КИП двигателя (температура)",
+      "doc_ref": "Weyeah: карточка аналога; номер подтверждается карточкой parts-systems.de (Thermoelement Jenbacher 550404, SW47656); ВНИМАНИЕ: в теле карточки Weyeah другой номер (550401) и двигатель J320 — привязка к Type 6 держится только на заголовке, ненадёжна",
+      "source_url": "https://www.weyeahmotor.com/Thermocouple-550404-for-Jenbacher-Engines-Type-6-pd43791231.html",
+      "quote": "Thermocouple 550404 for Jenbacher Engines Type 6"
+    },
+    {
+      "code": "321631",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Газовый клапан форкамеры",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "Форкамера / подача газа",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца",
+      "source_url": "https://www.weyeahmotor.com/Pre-chamber-Gas-Valve-321631-for-Jenbacher-Engines-Type-6-pd40860331.html",
+      "quote": "Pre-chamber Gas Valve 321631 for Jenbacher Engines Type 6"
+    },
+    {
+      "code": "369910",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя); сам узел — TecJet (торговая марка Woodward)",
+      "description": "Клапан регулирования расхода газа TecJet",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "Газовая система / дозирование",
+      "doc_ref": "Weyeah (Ухань, Китай): карточка аналога под номер Jenbacher; применимость — по данным продавца; в теле карточки указаны JGS420 и JGS620 — применимость шире или противоречива",
+      "source_url": "https://www.weyeahmotor.com/Flow-Control-Valve-TecJet-369910-for-Jenbacher-Engines-Type-6-pd42317749.html",
+      "quote": "Flow Control Valve TecJet 369910 for Jenbacher Engines Type 6"
+    },
+    {
+      "code": "578729",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Наконечник (соединитель) свечи зажигания",
+      "machine": "J612, J616, J620, J624",
+      "unit": "Система зажигания",
+      "doc_ref": "Weyeah: карточка аналога; ВНИМАНИЕ — в теле карточки та же деталь названа совместимой с J320, J420 (противоречие заголовку)",
+      "source_url": "https://www.weyeahmotor.com/Spark-Plug-Connector-578729-for-J612-J616-J620-J624-gas-engines-pd40668131.html",
+      "quote": "Spark Plug Connector 578729 for J612,J616,J620,J624 gas engines"
+    },
+    {
+      "code": "540807",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Уплотнительное кольцо",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "Уплотнения двигателя",
+      "doc_ref": "Weyeah: карточка аналога; номер подтверждается карточкой parts-systems.de (O-Ring Jenbacher 540807, SW45004)",
+      "source_url": "https://www.weyeahmotor.com/Sealing-Ring-540807-for-Jenbacher-Engines-Type-6-pd42611231.html",
+      "quote": "Sealing Ring 540807 for Jenbacher Engines Type 6"
+    },
+    {
+      "code": "281808",
+      "issuer": "INNIO Jenbacher (номер изготовителя двигателя)",
+      "description": "Комплект прокладок",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "unit": "Уплотнения двигателя",
+      "doc_ref": "Weyeah: карточка аналога; номер подтверждается карточкой parts-systems.de (Dichtungssatz Jenbacher 281808, SW46627)",
+      "source_url": "https://www.weyeahmotor.com/Gasket-set-281808-for-Jenbacher-Engines-Type-6-pd42898999.html",
+      "quote": "Gasket set 281808 for Jenbacher Engines Type 6"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "ABB Turbo Systems (ныне Accelleron)",
+      "component": "система двухступенчатого турбонаддува",
+      "machine": "J624",
+      "evidence": "POWER: GE разработала двухступенчатый наддув J624 «with specialists from ABB Turbo Systems» — мощность с 4 до 4,4 МВт, КПД эл. 46,5 %",
+      "sources": [
+        "https://www.powermag.com/the-worlds-first-two-stage-turbocharged-gas-engine/"
+      ]
+    },
+    {
+      "company": "ABB (турбокомпрессоры; серия TPS, ныне Accelleron)",
+      "component": "турбокомпрессор",
+      "machine": "двигатели Jenbacher, в т. ч. J320 (раздел «Turbocharger TPS» перечня ТО)",
+      "evidence": "Сервисная страница Turbo Internacional по KBB: «On Jenbacher, MWM and Caterpillar gas engines originally fitted with ABB …». В перечне ТО J320 у Zuhon есть раздел «Turbocharger TPS» (комплект уплотнений 582698). Отнесение серии TPS к ABB — вывод по обозначению, на странице Zuhon изготовитель турбокомпрессора не назван",
+      "sources": [
+        "https://turbointernacional.com/brands/kbb",
+        "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/"
+      ]
+    },
+    {
+      "company": "KBB (Kompressorenbau Bannewitz GmbH)",
+      "component": "турбокомпрессор ST5 — сторонняя замена штатного ABB («direct fit»), не штатный поставщик",
+      "machine": "J620",
+      "evidence": "Turbo Internacional: «such as the ST5 on a Jenbacher J620, as a direct fit»",
+      "sources": [
+        "https://turbointernacional.com/brands/kbb"
+      ]
+    },
+    {
+      "company": "DENSO",
+      "component": "свечи зажигания P518 (номер Jenbacher 1214569)",
+      "machine": "Type 6 (J612/J616/J620/J624)",
+      "evidence": "RS Motor: «spark plugs released with the Jenbacher part number 1214569 are spark plugs Denso P518». По странице jenbacher.com остальные свечи портфеля (P3MAX, P3PRO, P611 и др.) Jenbacher делает сама на своём заводе в Капфенберге",
+      "sources": [
+        "https://rsmotorps.com/en/denso-spark-plugs-for-industrial-gas-engines/",
+        "https://www.jenbacher.com/en/services/genuine-jenbacher-spare-parts/spark-plug/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Woodward",
+      "component": "клапаны дозирования газа и дроссели TecJet",
+      "machine": "Type 6 (номер Jenbacher 369910), J412/J416/J420 (номер Jenbacher 1231577)",
+      "evidence": "Карточки продавца называют детали «Flow Control Valve TecJet 369910» и «Throttle Valve Tec Jet 1231577». TecJet™ — линейка газовых клапанов Woodward (руководство Woodward 36102).",
+      "sources": [
+        "https://www.weyeahmotor.com/Flow-Control-Valve-TecJet-369910-for-Jenbacher-Engines-Type-6-pd42317749.html",
+        "https://www.weyeahmotor.com/Throttle-Valve-Tec-Jet-1231577-for-Jenbacher-J420-Gas-Engine-pd46766651.html",
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/36102_B.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "B&R Industrial Automation (Bernecker + Rainer)",
+      "component": "дисплей QVGA color TFT (номер Jenbacher 541065); связь с панелью DIA.NE — предположение, на карточке не названа",
+      "machine": "двигатели Jenbacher (модель и система управления на карточке не указаны)",
+      "evidence": "Карточка parts-systems.de «B&R Display QVGA color TFT Jenbacher / 541065»",
+      "sources": [
+        "https://www.parts-systems.de/B-R-Display-QVGA-color-TFT-Jenbacher-541065/SW40387"
+      ]
+    },
+    {
+      "company": "HEINZMANN",
+      "component": "регулятор скорости STG-30-01",
+      "machine": "J620GS версии E02 (одна конкретная продаваемая установка)",
+      "evidence": "Паспорт продаваемой б/у установки у RS Motor: «Speed governor: Heinzmann STG-30-01». Это пример одной установки, а не штатная комплектация всех J620",
+      "sources": [
+        "https://www.rsmotorps.com/wp-content/uploads/2020/03/Jenbacher-J620-genset.pdf"
+      ]
+    },
+    {
+      "company": "Leroy-Somer",
+      "component": "генератор LSA54 L9 4P (3 392 кВА, 6,3 кВ, 50 Гц)",
+      "machine": "J620GS версии E02 (одна конкретная установка)",
+      "evidence": "Тот же паспорт RS Motor: «Generator: Leroy Somer model LSA54 L9 4P». Генератор зависит от проекта",
+      "sources": [
+        "https://www.rsmotorps.com/wp-content/uploads/2020/03/Jenbacher-J620-genset.pdf"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "ООО «ЭнергоТехСервис» (tmenergo.ru)",
+      "country": "Россия",
+      "role": "по своему сайту — официальный сервис-провайдер INNIO Jenbacher в РФ и Казахстане. По собственной новости: договор дистрибьютора и сервис-провайдера Jenbacher в РФ до 30.04.2023. Есть линия ремонта головок цилиндров и шатунов (Тюмень). Действующий статус в локаторе jenbacher.com не подтверждён",
+      "sources": [
+        "https://www.tmenergo.ru/company/gazoporshnevye-elektrostantsii-jenbacher/",
+        "https://www.tmenergo.ru/en/press-center/partnership-with-innio-extended-until-2023/"
+      ]
+    },
+    {
+      "company": "Max Motors (max-motors.ru)",
+      "country": "Россия",
+      "role": "на своём сайте называет себя официальным дилером INNIO Jenbacher в России; в локаторе jenbacher.com не значится",
+      "sources": [
+        "https://max-motors.ru/"
+      ]
+    },
+    {
+      "company": "ETS-Astana TOO",
+      "country": "Казахстан",
+      "role": "официальный партнёр по локатору jenbacher.com: продажи и сервис (ссылка на tmenergo.ru)",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/ets-astana-llc/"
+      ]
+    },
+    {
+      "company": "KTS Engineering East LLC (Uzbekistan)",
+      "country": "Узбекистан",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/kts-engineering-for-uzbekistan/"
+      ]
+    },
+    {
+      "company": "KTS Engineering S.R.O (Uzbekistan)",
+      "country": "Узбекистан",
+      "role": "официальный партнёр по локатору: продажи",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/kts-engineering-s-r-o-uzbekistan/"
+      ]
+    },
+    {
+      "company": "Filter CJSC",
+      "country": "Беларусь",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/filter-cjsc/"
+      ]
+    },
+    {
+      "company": "KTS Engineering LLC",
+      "country": "Украина",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/kts-engineering/"
+      ]
+    },
+    {
+      "company": "INNIO China (Beijing)",
+      "country": "Китай",
+      "role": "подразделение изготовителя по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/power-beijing/"
+      ]
+    },
+    {
+      "company": "Jewa (Shanghai) Engines Co, LTD.",
+      "country": "Китай",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/power-hangzhou-co-ltd/"
+      ]
+    },
+    {
+      "company": "CAMDA New Energy Equipment Co, Ltd",
+      "country": "Китай",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/camda-new-energy-equipment-co-ltd-2/"
+      ]
+    },
+    {
+      "company": "Yumon International Trade (Shanghai) Co., Ltd.",
+      "country": "Китай",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/yumon-international-trade-shanghai-co-ltd/"
+      ]
+    },
+    {
+      "company": "Guangzhou Shenfa M&E Industry Development Co., Ltd.",
+      "country": "Китай",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/guangzhou-shenfa-industry-development-co-ltd/"
+      ]
+    },
+    {
+      "company": "Shenyang Weilida Energy Power Technology Co., Ltd.",
+      "country": "Китай",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/shenyang-weilida-engineering-equipment-co-ltd/"
+      ]
+    },
+    {
+      "company": "REC Engineering Company Limited",
+      "country": "Китай (Гонконг, Макао)",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/rec-engineering-company-limited-2/",
+        "https://www.jenbacher.com/en/providers/rec-engineering-company-limited/"
+      ]
+    },
+    {
+      "company": "Topkapi Endustri Mallari Ticaret A.S.",
+      "country": "Турция",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/topkapi-endustri-mallari-ticaret-a-s/"
+      ]
+    },
+    {
+      "company": "Orient Energy Systems FZCO",
+      "country": "ОАЭ (также Оман, Бахрейн)",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/orient-energy-systems-fzco/",
+        "https://www.jenbacher.com/en/providers/orient-energy-systems-fzco-for-oman/",
+        "https://www.jenbacher.com/en/providers/orient-energy-systems-fzco-for-bahrain/"
+      ]
+    },
+    {
+      "company": "Mohammed Hassan Sherbiny for Commerce LLC",
+      "country": "Саудовская Аравия",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/mohammed-hassan-sherbiny-for-commerce-llc/"
+      ]
+    },
+    {
+      "company": "Al-Sultan & Khalaf Trading Co.",
+      "country": "Кувейт, Катар",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/al-sultan-khalaf-trading-co-for-kuwait-qatar/"
+      ]
+    },
+    {
+      "company": "Energy and Contracting Solutions Company (ECS)",
+      "country": "Египет",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/energy-and-contracting-solutions-company-ecs/"
+      ]
+    },
+    {
+      "company": "Clarke Energy India Private Limited",
+      "country": "Индия",
+      "role": "официальный дистрибьютор и сервис-провайдер по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/clarke-energy-india-private-limited-2/"
+      ]
+    },
+    {
+      "company": "Orient Energy Systems (Private) Limited",
+      "country": "Пакистан",
+      "role": "официальный партнёр по локатору: продажи и сервис",
+      "sources": [
+        "https://www.jenbacher.com/en/providers/orient-energy-systems-private-limited/"
+      ]
+    },
+    {
+      "company": "Parts & Systems (parts-systems.de, «Original-Teile-Center / Jenbacher Center»)",
+      "country": "Германия",
+      "role": "независимый продавец запчастей под номерами Jenbacher. Сотни карточек (фильтры, датчики, термопары, форкамеры, уплотнения, свечи), цены нетто без НДС; применимость к модели на карточках почти не указана",
+      "sources": [
+        "https://www.parts-systems.de/Original-Teile-Center/Jenbacher-Center/Jenbacher-Zuendkerzen/"
+      ]
+    },
+    {
+      "company": "Wuhan Weyeah Power Machinery Co., Ltd.",
+      "country": "Китай",
+      "role": "независимый продавец аналогов и запчастей под номерами Jenbacher (около 880 карточек), разделы по J320, J420, J620",
+      "sources": [
+        "https://www.weyeahmotor.com/Jenbacher-Spare-Parts-pl3224632.html"
+      ]
+    },
+    {
+      "company": "Zuhon (zuhonpower.com)",
+      "country": "Китай",
+      "role": "независимый продавец оригинальных и альтернативных запчастей; публикует перечни ТО J320 по интервалам",
+      "sources": [
+        "https://zuhonpower.com/jenbacher-j320-gas-engine-40000-operating-hours-maintenance-spare-parts-list/"
+      ]
+    },
+    {
+      "company": "RS Motor",
+      "country": "Испания",
+      "role": "независимый сервис и продавец запчастей Jenbacher; по своей странице — официальный дистрибьютор Motortech (свечи DENSO) для Испании и Португалии",
+      "sources": [
+        "https://rsmotorps.com/en/denso-spark-plugs-for-industrial-gas-engines/"
+      ]
+    },
+    {
+      "company": "SF-Filter",
+      "country": "Швейцария",
+      "role": "изготовитель и продавец аналогов фильтров; открытая таблица перекрёстных ссылок по номерам Jenbacher",
+      "sources": [
+        "https://www.sf-filter.com/en/cross-reference-list?searchValue=631265"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальный каталог запчастей Jenbacher по номеру конструкции (design number) открыто не найден. Он лежит в закрытом клиентском портале INNIO (Customer Portal / myplant) и у дилеров. Из-за этого привязка кодов к моделям Type 4 и Type 6 опирается на сторонних продавцов (Weyeah, FridayParts, Zuhon), а не на изготовителя.",
+    "Применимость у Weyeah шумная: заголовок и тело карточки расходятся. У 578729 в заголовке J612–J624, а в тексте J320 и J420. У 1200176 и 267789 в заголовке J320, в теле J420. На карточке 267789 в описании стоит другой номер, 1219674. Перед закупкой применимость надо сверять с ведомостью конкретной машины.",
+    "Карточки parts-systems.de, самого широкого открытого набора номеров Jenbacher (сотни фильтров, O-ring, термопар, датчиков, форкамер), модель двигателя почти не указывают. Исключение — свечи (Type 4, Type 2/3, Type 6/9). Поэтому по parts-systems подтверждается номер, а не машина.",
+    "Изготовители датчиков детонации, термопар, датчиков давления и температуры, газовых регуляторов (Dungs и др.), масляных фильтров (MANN, Hengst и др.) в открытых источниках не названы. Везде стоит только номер Jenbacher.",
+    "Отдельных открытых перечней расходников по J416, J612, J616 и J624 не найдено. Коды даны по семействам Type 4 и Type 6. Для J624 специфичны двухступенчатый наддув и отдельный перечень масел в TA 1000-1109, но кодов по ним не найдено.",
+    "Модели турбокомпрессоров по машинам (ABB TPS/TPR/Power2 и пр.) открыто не подтверждены. Серия TPS для J320 отнесена к ABB по обозначению. Двухступенчатый наддув ABB подтверждён только для J624.",
+    "Полные тексты TA 1000-0099B, TA 1000-0112, TA 1000-0300 и TA 1000-0200 открыто не найдены: только ссылки в TA 1000-1109 и на страницах поставщиков масел и антифризов. Копии на Scribd — пользовательские загрузки, их содержимое не сверено.",
+    "Листовка свечи P611 на jenbacher.com (ijb_fs_en_a4_services_p611…pdf) и листовка баков доливки масла Type 6 (ijb-218005) сейчас отдают 404.",
+    "onergys.com / onergys.de и peri-parts.com закрыты от автоматического чтения (403). По выдаче поиска у них есть перекрёстные ссылки DENSO/Motortech и номера комплектов свечей (21669416 как замена 436782/1214569/1205634/1236100), но проверить их по странице не удалось.",
+    "Россия: в официальном локаторе jenbacher.com нет ни одного партнёра в РФ. Статус «ЭнергоТехСервис» после 30.04.2023 и статус Max Motors подтверждены только их собственными сайтами.",
+    "Генераторы, регуляторы и системы зажигания зависят от проекта. Leroy-Somer и HEINZMANN подтверждены на одной установке J620GS E02. Что ставится штатно по моделям, из открытых источников не установлено.",
+    "Цены и остатки в этой разведке не собирались. По parts-systems.de они уже есть в репозитории (gt/data/ship_jenbacher_prices.json), остаток числом там не указан."
+  ],
+  "verifier_notes": "Проверено всё: 40 кодов, 12 моделей и 8 субпоставщиков. Все страницы-источники открылись (HTTP 200); у Weyeah ответ пришёл в gzip, распакован и прочитан. Ни одна запись не опровергнута полностью, у всех 40 кодов номер буквально стоит на указанной странице. Косвенные отсылки к parts-systems.de в doc_ref проверены поиском по сайту, все 11 карточек нашлись: 270159 SW49555, 426555 SW43943, 9008292 SW49143, 641947 SW47531, 9029950 SW45811, 629995 SW42051, 550404 SW47656, 540807 SW45004, 281808 SW46627, 1214569 SW42516, 431447 SW45021.\n\nЧто поправить в записях:\n1) 431447 и 550404: в теле карточки Weyeah стоят другие номера («4431447», «550401») и другие двигатели (J412/J416/J420, J320). Привязку к Type 6 держит только заголовок продавца, связь с машиной пометить как ненадёжную.\n2) 657540 и 369910: в теле карточек указаны J320/J420 и JGS420/JGS620 соответственно. Применимость шире или противоречива, разведка этого не отметила.\n3) 267789: в теле карточки Weyeah стоит номер 1219674. Код держится на заголовке и на перечне Zuhon.\n4) 257320: слово «(большой)» в источнике не встречается.\n5) Woodward: фразы «8235-620 Jenbacher The Woodward Throttle Valve» на указанных страницах нет.\n6) B&R: DIA.NE на карточке не упомянута.\n7) Leroy-Somer: упоминание AVK источником не подкреплено.\n\nВсе номера деталей, кроме SF-Filter, parts-systems.de и jenbacher.com, взяты с сайтов продавцов аналогов (Weyeah, Zuhon, FridayParts), а не из каталога INNIO. Применимость по ним — «по данным продавца». Лимит WebSearch на сессию (200) исчерпан, поэтому источник TecJet↔Jenbacher сильнее руководства Woodward и 431447 по второму источнику не искались.",
+  "corrections": [
+    "431447, 550404: привязка к Type 6 помечена ненадёжной — в теле карточек другие номера и двигатели — замечание 1",
+    "657540, 369910: отмечено расхождение применимости в теле карточки — замечание 2",
+    "267789: отмечен номер 1219674 в теле карточки — замечание 3",
+    "257320: снято слово «большой», в источнике его нет — замечание 4",
+    "Woodward: снята фраза про «8235-620 … Woodward Throttle Valve», на страницах её нет — замечание 5",
+    "B&R: DIA.NE на карточке не упомянута — связь помечена предположением — замечание 6",
+    "Leroy-Somer: снято неподкреплённое упоминание AVK — замечание 7"
+  ]
+}

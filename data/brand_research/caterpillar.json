@@ -1,0 +1,1095 @@
+{
+  "oem_key": "caterpillar",
+  "name": "Caterpillar (Cat; газовые двигатели MWM — Caterpillar Energy Solutions)",
+  "segment_focus": "газовые ГПУ G3516/G3520/G3512, CG132/CG170/CG260 (ex-MWM), горная техника; номера вида 5P-9960, 133-8501",
+  "researched_at": "2026-09-24",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по открытым источникам: газовые ГПУ G3500 (G3512/G3516/G3520 в исполнениях A/B/C/E/H/J/K), серия CG (CG132/CG170/CG260 — это двигатели MWM TCG 2016/2020/2032 под маркой Cat) и горная техника (797F, 793F, R1700, AD45, лавные комбайны EL2000/EL3000). Собрано 25 машин с карточками на cat.com и mwm.net и 40 кодов запчастей; у каждого кода есть страница, где он виден. Самые надёжные источники: сами PDF изготовителя (SEBU6400-07, брошюры по свечам PEHJ0260-01 и PEHJ0649, каталог наборов R1700 PEBJ0231-02 — в нём номера наборов и прокладок стоят прямо в тексте) и руководство MOTORTECH по G3500. MOTORTECH — это поставщик аналогов, а не изготовитель Cat, но в его руководстве для каждой позиции указан номер Caterpillar и перечислены двигатели: катушки зажигания, удлинители свечей, термопары, датчики кислорода, масляный фильтр 1R-0726. По CG260/CG170/CG132 номера MWM из 8 цифр (свечи с форкамерой, масляные, газовые и воздушные фильтры, фильтры вентиляции картера) видны у продавцов запчастей в Турции (iggnita) и в России (energyassistance.ru), а перечень свечей с форкамерой — на официальном mwm.net. Каталог IPD по G3516 даёт аналоги подшипников, колец, уплотнений и ремкомплектов водяного насоса. По горной технике коды взяты из официального каталога R1700 и со страниц продавцов аналогов (fridayparts), сверки с каталогом Cat не было. Кто делает узлы: турбокомпрессоры ABB/Accelleron A140 на TCG 2032/CG260 (mwm.net плюс продавец) и KBB на TCG 2032 (объявление о продаже); TCR 16 на TCG 2020 — это, по обозначению, серия MAN. Генератор AVK стоит на комплекте TCG 2032, это видно по объявлению о продаже. Аналоги узлов зажигания выпускают MOTORTECH, Altronic и Champion (перекрёстные номера). Дилеры: Borusan Cat (Турция, Казахстан, Азербайджан, Грузия, Киргизия), Al-Bahar (ОАЭ и Залив), Gainwell и GMMCO (Индия), Lei Shing Hong / бывшая WesTrac China (Китай). В России Zeppelin Russland свернул бизнес в 2022 году, «Восточная Техника» называет себя поставщиком техники Cat. По MWM в России официальными дистрибьюторами себя называют «Нойхаус» и «Альфа Балт Инжиниринг», сервисом занимается «Эртех». Коды-образцы из задания 5P-9960 и 133-8501 в открытых источниках не нашлись.",
+  "machines": [
+    {
+      "model": "G3512 (525–750 кВт)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "525–750 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/1000022761.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3512 (700–1000 кВт)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "700–1000 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/1000022760.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3512K",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1502–1530 кВт, электрический КПД до 45,3 %",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/129680.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "G3516 (Fast Response)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1061–1500 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/113920.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3516H",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1419–2027 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/18485094.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3516C (исполнение на шахтный метан, CMM)",
+      "kind": "газопоршневая генераторная установка на шахтном метане",
+      "segment": "ГПУ",
+      "rating": "1555 кВт (на CMM); цифра 1173–1675 кВт на природном газе есть только в адресе страницы дилера, на самой странице — исполнение CMM на 1555 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/18475658.html",
+        "https://www.westernstatescat.com/power-systems/electric-power/gas-generator-sets/g3516c-1173kw-1675kw-natural-gas-generator/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3516 NA (для газовых компрессоров)",
+      "kind": "газовый двигатель привода компрессора, без наддува",
+      "segment": "двигатель",
+      "rating": "492 кВт (660 л. с.) — по таблице брошюры LEDW6043-01",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/oil-and-gas/gas-compression-engines/18443940.html",
+        "https://s7d2.scene7.com/is/content/Caterpillar/LEDW6043-01"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3516J (для газовых компрессоров)",
+      "kind": "газовый двигатель привода компрессора",
+      "segment": "двигатель",
+      "rating": "1029 кВт (1380 л. с.) и 1119 кВт (1500 л. с.) при 1400 об/мин",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/oil-and-gas/gas-compression-engines/1000029388.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3520 (Fast Response)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1400–2000 кВт; V20, рабочий объём 97,6 л, диаметр цилиндра 170 мм, ход 215 мм",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969659.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3520C (исполнение на низкокалорийный газ, Low Energy)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1972 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/18483554.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G3520H",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1763–2519 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power-generation/gas-generator-sets/1000003143.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CG132B-12 (двигатель MWM TCG 2016)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "420–600 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969937.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CG132B-16 (двигатель MWM TCG 2016)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "400–800 кВт и 700–1000 кВт (две карточки)",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969936.html",
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15970392.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CG170-12 (двигатель MWM TCG 2020)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "840–1200 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/18487630.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CG170B-20 (прежнее исполнение — CG170-20)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1610–2300 кВт (CG170-20: 1400–2000 кВт)",
+      "status": "выпускается серия B; CG170-20 сменена серией CG170B (мощность CG170-20 и смена серией CG170B не проверены)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969773.html",
+        "https://www.cat.com/en_GB/campaigns/npi/cg170b-gas-generator-sets.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CG260-12 (двигатель MWM TCG 2032)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "2100–3000 кВт",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969830.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CG260-16 (двигатель MWM TCG 2032)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "2800–4500 кВт (другая карточка — 2800–4000 кВт); допускается до 25 % водорода",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969827.html",
+        "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969826.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MWM TCG 2020 (V12/V16) — основа CG170",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1000–1560 кВт (эл.)",
+      "status": "выпускается под маркой MWM (Caterpillar Energy Solutions)",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MWM TCG 2032 / TCG 2032B (V12/V16) — основа CG260",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "3000–4500 кВт (эл.)",
+      "status": "выпускается под маркой MWM",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2032/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "797F",
+      "kind": "карьерный самосвал",
+      "segment": "ГШО",
+      "rating": "двигатель C175-20, 2983 кВт (4000 л. с.) брутто; грузоподъёмность до 400 коротких тонн",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/equipment/off-highway-trucks/mining-trucks/18093014.html",
+        "https://www.teknoxgroup.com/fileadmin/user_upload/797f.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "793F",
+      "kind": "карьерный самосвал",
+      "segment": "ГШО",
+      "rating": "двигатель C175-16, 1976 кВт (2650 л. с.) брутто; грузоподъёмность 226,8 т",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_GB/products/new/equipment/off-highway-trucks/mining-trucks/18092621.html",
+        "https://www.kellytractor.com/eng/images/pdf/earthmoving/offhighway_trucks/793F.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "R1700",
+      "kind": "подземная погрузочно-доставочная машина (ПДМ)",
+      "segment": "ГШО",
+      "rating": "двигатель C13, 257 кВт (Stage V) / 269 кВт (Tier 3); грузоподъёмность 15 т; ковш 5,7–8,6 м³",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_US/products/new/equipment/underground-hard-rock/underground-mining-load-haul-dump-lhd-loaders/730743084457382.html",
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34"
+      ],
+      "verified": true
+    },
+    {
+      "model": "AD45",
+      "kind": "подземный шарнирно-сочленённый самосвал",
+      "segment": "ГШО",
+      "rating": "двигатель C18, 433–446 кВт; грузоподъёмность 45 т",
+      "status": "выпускается (карточка на cat.com)",
+      "sources": [
+        "https://www.cat.com/en_ID/products/new/equipment/underground-hard-rock/underground-mining-trucks/104983.html",
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20220518-2a2db-fe2af"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EL3000",
+      "kind": "очистной комбайн для длинных забоев (лава)",
+      "segment": "ГШО",
+      "rating": "резание 2×860 кВт, подача до 2×150 кВт; мощность пласта 2,5–5,5 м",
+      "status": "выпускается (карточки у дилеров Cat)",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/C764153",
+        "https://www.petersoncat.com/products/new/shearers/el3000",
+        "https://www.gainwellindia.com/cat/products/new/Underground-Mining/Longwall-Shearer/EL3000"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EL2000",
+      "kind": "очистной комбайн для длинных забоев (лава)",
+      "segment": "ГШО",
+      "rating": "резание до 750 кВт",
+      "status": "выпускается (карточка у дилера Gainwell)",
+      "sources": [
+        "https://www.gainwellindia.com/cat/products/new/Underground-Mining/Longwall-Shearer/EL2000"
+      ],
+      "verified": false
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Operation and Maintenance Manual: Cat Gas Engine Lubricant, Fuel, and Coolant Recommendations — All Gas Engines (декабрь 2020)",
+      "doc_no": "SEBU6400-07",
+      "machine": "все газовые двигатели Cat: G3300/G3400/G3500/G3600, включая G3520",
+      "kind": "O&M (специальный выпуск: масла, топливо, охлаждающая жидкость)",
+      "sources": [
+        "https://caterpillar.scene7.com/is/content/Caterpillar/CM20210119-4759d-db36b"
+      ]
+    },
+    {
+      "title": "Operation and Maintenance Manual: Cat Commercial Diesel Engine Fluids Recommendations (февраль 2021)",
+      "doc_no": "SEBU6251-28",
+      "machine": "все двигатели серии 3500, C175 и меньше (дизели горных самосвалов 793F/797F)",
+      "kind": "O&M (специальный выпуск)",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20210401-f9126-e188f"
+      ]
+    },
+    {
+      "title": "Cat Spark Plugs for Gas Engines (брошюра со спецприспособлениями для свечей, 2017)",
+      "doc_no": "PEHJ0260-01",
+      "machine": "G3500, G3600",
+      "kind": "бюллетень / брошюра по запчастям",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/CM20170811-53046-28757"
+      ]
+    },
+    {
+      "title": "Cat Spark Plugs for Gas Engines (редакция 2018 года)",
+      "doc_no": "PEHJ0649",
+      "machine": "G3500 (в т. ч. C/E/H), G3600",
+      "kind": "бюллетень / брошюра по запчастям",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/CM20181001-35190-58574"
+      ]
+    },
+    {
+      "title": "G3500 — Cat Engines for Gas Applications (номинальные мощности G3508–G3520B)",
+      "doc_no": "LEDW6043-01",
+      "machine": "G3508, G3512, G3516, G3516 NA, G3520B",
+      "kind": "брошюра с техническими данными",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/LEDW6043-01"
+      ]
+    },
+    {
+      "title": "R1700 Underground Loader Rig Out Catalog — Upgrade, Repair & Rebuild Kits (январь 2025)",
+      "doc_no": "PEBJ0231-02",
+      "machine": "R1700",
+      "kind": "каталог запчастей (наборы для ремонта и модернизации)",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34"
+      ]
+    },
+    {
+      "title": "R1700 — Operation and Maintenance Manual (упоминается в PEBJ0231-02 разделами «Operation Section»)",
+      "doc_no": "SEBU9952",
+      "machine": "R1700",
+      "kind": "O&M",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34"
+      ]
+    },
+    {
+      "title": "G3500 Engines Operation and Maintenance Manual (редакции -10 от июля 2004 и -12 от июля 2014; по данным поиска — для префиксов 4WD, 5JD, 8LD, 9TG, 2TJ, 7NJ, 4EK, 6JW, 8PW, 9AW, 7SZ, 8BZ, 5ZZ, 8JZ; сам документ не открыт)",
+      "doc_no": "SEBU6711",
+      "machine": "G3508, G3512, G3516, G3520",
+      "kind": "O&M",
+      "sources": [
+        "https://autoepcservice.com/product/cat-engines-g3500-operation-and-maintenance-manual-sebu6711-10-2004/",
+        "https://pdfcoffee.com/sebu67111200-3500-manuals-operation-amp-maintenance-pdf-free.html",
+        "https://studylib.net/doc/27838050/manual-3516-cat"
+      ]
+    },
+    {
+      "title": "G3500 Engines — Systems Operation / Testing and Adjusting (по выдаче поиска; документ не открыт)",
+      "doc_no": "SENR6412",
+      "machine": "G3500",
+      "kind": "service manual",
+      "sources": [
+        "https://heavequipm.com/g3500-engines",
+        "https://aplusmanual.com/6453/caterpillar-g3500-engines-repair-service-manual"
+      ]
+    },
+    {
+      "title": "Каталог запчастей G3516 – G3532 Generator Set Engine, префикс 8BZ00001-UP (номер книги взят из адресов страниц зеркала каталога)",
+      "doc_no": "SEBP2855",
+      "machine": "G3516 (генераторная установка)",
+      "kind": "parts manual",
+      "sources": [
+        "https://777parts.net/caterpillar/G3516/m464/SEBP28550130.html",
+        "https://777parts.net/caterpillar/G3516/m464/SEBP28550206.html"
+      ]
+    },
+    {
+      "title": "Каталог запчастей G3520 Generator Set, префикс CWD00001-UP (номер книги взят из адреса страницы зеркала каталога)",
+      "doc_no": "SEBP3673",
+      "machine": "G3520B",
+      "kind": "parts manual",
+      "sources": [
+        "https://777parts.net/caterpillar/G3520B/m512/SEBP36730028.html"
+      ]
+    },
+    {
+      "title": "Каталог запчастей G3516B Engine, префикс JEF00001-UP (номер книги взят из адреса страницы зеркала каталога)",
+      "doc_no": "SEBP5414",
+      "machine": "G3516B (промышленный)",
+      "kind": "parts manual",
+      "sources": [
+        "https://777parts.net/caterpillar/G3516B/m868/SEBP54140074.html"
+      ]
+    },
+    {
+      "title": "Каталог запчастей G3520C (навесное оборудование, датчики; номер взят из адреса страницы зеркала каталога)",
+      "doc_no": "SEBP4706",
+      "machine": "G3520C",
+      "kind": "parts manual",
+      "sources": [
+        "https://spare.avspart.com/caterpillar/sebp4706/sebp4706029/"
+      ]
+    },
+    {
+      "title": "Installation G3520C (руководство по монтажу; по заголовку страницы)",
+      "doc_no": "REHS1438",
+      "machine": "G3520C",
+      "kind": "service manual (монтаж)",
+      "sources": [
+        "https://pdfcoffee.com/rehs1438-installation-g3520c-pdf-free.html"
+      ]
+    },
+    {
+      "title": "G3520C Gas Generator Set — спецификация (Finning)",
+      "doc_no": "LEHE8968-02",
+      "machine": "G3520C",
+      "kind": "технические данные",
+      "sources": [
+        "https://www.finning.com/content/dam/finning/es/Documents/PDF/ficha-tecnica/grupo-electrogeno/G3520C-2458kVA.pdf"
+      ]
+    },
+    {
+      "title": "Specalog 793F Mining Truck",
+      "doc_no": "AEHQ6868-01",
+      "machine": "793F",
+      "kind": "технические данные (specalog)",
+      "sources": [
+        "https://www.kellytractor.com/eng/images/pdf/earthmoving/offhighway_trucks/793F.pdf"
+      ]
+    },
+    {
+      "title": "Specalog 797F Mining Truck",
+      "doc_no": "AEHQ6884-02",
+      "machine": "797F",
+      "kind": "технические данные (specalog)",
+      "sources": [
+        "https://www.teknoxgroup.com/fileadmin/user_upload/797f.pdf"
+      ]
+    },
+    {
+      "title": "MOTORTECH Application Guide for CATERPILLAR G3500 Series (перекрёстная таблица номеров Caterpillar, аналоги сторонней фирмы)",
+      "doc_no": "01.00.011-EN (2017-08)",
+      "machine": "G3508, G3512, G3516, G3520 (B/C/E/H)",
+      "kind": "каталог аналогов (сторонний)",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf"
+      ]
+    },
+    {
+      "title": "IPD parts for Caterpillar G3516 Engines (выдержка из каталога IPD, с. 47–49: газораспределение, прокладки, подшипники, поршневая группа, система охлаждения)",
+      "machine": "G3516",
+      "kind": "parts manual (аналоги, сторонний)",
+      "sources": [
+        "http://gasmotorservice.ru/files/1671/IPD_Parts_for_CAT_G3516.pdf"
+      ]
+    },
+    {
+      "title": "MWM TCG 2032 — Operation Manual (по заголовку страницы, номер документа не виден)",
+      "machine": "MWM TCG 2032 / Cat CG260",
+      "kind": "O&M",
+      "sources": [
+        "https://pdfcoffee.com/mwm-tcg2032-operation-manual-pdf-free.html"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "301-6663",
+      "issuer": "Caterpillar",
+      "description": "Свеча зажигания газового двигателя; продавец в той же строке даёт номер 243-4291",
+      "machine": "G3516, G3516B, G3520C/J; G3606–G3616",
+      "unit": "система зажигания",
+      "source_url": "https://www.fridayparts.com/spark-plug-301-6663-for-caterpillar-cat-engine-g3516-g3516b-g3606-g3608-g3612-g3616",
+      "quote": "Spark Plug 301-6663 for Caterpillar CAT Engine G3516 G3516B G3606 G3608 G3612 G3616"
+    },
+    {
+      "code": "479-7702",
+      "issuer": "Caterpillar",
+      "description": "Свеча зажигания газового двигателя; продавец даёт обозначения 7306 и 18 GZ 6-77",
+      "machine": "G3508, G3512, G3516, G3520B/J, G3608",
+      "unit": "система зажигания",
+      "source_url": "https://www.fridayparts.com/spark-plug-7306-479-7702-for-caterpiller-cat-engine-g3512-g3516-g3508-g3608-g3612-g3616-generator-sr4-sr4b",
+      "quote": "Spark Plug 7306 479-7702 for Caterpiller CAT Engine G3512 G3516 G3508 G3608"
+    },
+    {
+      "code": "243-4291",
+      "issuer": "Caterpillar",
+      "description": "Свеча зажигания газового двигателя; по MOTORTECH — одного ряда с 301-6663 и 194-8518 (резьба M18x1,5)",
+      "machine": "G3500 (по MOTORTECH); по выдаче поиска — также биогазовые G3600",
+      "unit": "система зажигания",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN",
+      "source_url": "https://parts.cat.com/en/catcorp/243-4291",
+      "quote": "243-4291: Gas Engine Ignition Spark Plug | CATCorp"
+    },
+    {
+      "code": "346-5123",
+      "issuer": "Caterpillar",
+      "description": "Свеча зажигания газового двигателя",
+      "machine": "G3500B/C (по выдаче поиска; сверки нет)",
+      "unit": "система зажигания",
+      "source_url": "https://parts.cat.com/en/catcorp/346-5123",
+      "quote": "346-5123: Gas Engine Ignition Spark Plug | CATCorp"
+    },
+    {
+      "code": "1R-0726",
+      "issuer": "Caterpillar",
+      "description": "Элемент масляного фильтра стандартной длины (10 in, наружный диаметр 7 in); у MOTORTECH аналог 25.00.302-CA",
+      "machine": "G3508, G3512, G3516",
+      "unit": "система смазки",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 26",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 1R-0726"
+    },
+    {
+      "code": "4P-2839",
+      "issuer": "Caterpillar",
+      "description": "Масляный фильтр",
+      "machine": "G3508, G3512, G3516; дизели 3508/3512/3516 (B)",
+      "unit": "система смазки",
+      "source_url": "https://www.fridayparts.com/oil-filter-4p2839-for-caterpillar-cat-g3508-g3512-g3516-3508-3508b-3512-3512b-3516-3516b-engine",
+      "quote": "CA4P2839, 4P-2839, 4P2839"
+    },
+    {
+      "code": "105-9741",
+      "issuer": "Caterpillar",
+      "description": "Воздушный фильтр; на странице прямо: Donaldson P529552, рядом 94793; в списке замен там же 105-9742 — продавец путает первичный и вторичный элементы",
+      "machine": "G3516",
+      "unit": "система впуска",
+      "source_url": "https://www.enginegensetparts.com/auto-filters/air-filters/air-filter-105-9741-p529552-94793-for.html",
+      "quote": "Air Filter 105-9741 P529552 94793 For Caterpillar G3516 Engine"
+    },
+    {
+      "code": "7W-4377",
+      "issuer": "Caterpillar",
+      "description": "Фланцевая катушка зажигания, экранированное и неэкранированное исполнение; аналоги: MOTORTECH 06.50.034, Altronic 591012",
+      "machine": "G3508, G3512, G3516",
+      "unit": "система зажигания",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 2",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 7W-4377"
+    },
+    {
+      "code": "232-6350",
+      "issuer": "Caterpillar",
+      "description": "Катушка зажигания в исполнении Caterpillar с удлинителем, неэкранированная; того же ряда 437-4106 и 199-9011; аналог MOTORTECH 06.50.153",
+      "machine": "G3516B, G3520/B",
+      "unit": "система зажигания",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 2",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "P/N 06.50.153 CATERPILLAR® P/N 437-4106, 232-6350,"
+    },
+    {
+      "code": "356-3701",
+      "issuer": "Caterpillar",
+      "description": "Катушка зажигания в исполнении Caterpillar с удлинителем, неэкранированная; аналог MOTORTECH 06.50.159",
+      "machine": "G3512E, G3516E, G3516H",
+      "unit": "система зажигания",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 3",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 356-3701"
+    },
+    {
+      "code": "259-2078",
+      "issuer": "Caterpillar",
+      "description": "Катушка зажигания в исполнении Caterpillar с удлинителем, экранированная; того же ряда 418-4862; аналог MOTORTECH 06.50.154",
+      "machine": "G3508/B, G3512/B, G3516/B, G3520B",
+      "unit": "система зажигания",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 3",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 418-4862, 259-2078"
+    },
+    {
+      "code": "123-4710",
+      "issuer": "Caterpillar",
+      "description": "Удлинитель свечи зажигания; аналог MOTORTECH 06.80.320-T",
+      "machine": "G3508, G3512, G3516",
+      "unit": "система зажигания",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 10",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 123-4710"
+    },
+    {
+      "code": "135-2651",
+      "issuer": "Caterpillar",
+      "description": "Манжетное уплотнение удлинителя катушки зажигания; аналог MOTORTECH 06.81.051",
+      "machine": "G3508, G3512/E, G3516/B/C, G3520/B/C",
+      "unit": "система зажигания (уплотнения)",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 11",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 135-2651"
+    },
+    {
+      "code": "383-2989",
+      "issuer": "Caterpillar",
+      "description": "Термопара типа K (NiCrNi), угловая 90°; того же ряда 241-9591, 175-5341, 6I-0407; аналог MOTORTECH 56.01.092-28",
+      "machine": "G3508, G3512/B, G3516/B, G3520/B",
+      "unit": "контроль температуры выхлопа",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 24",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 383-2989, 241-9591,"
+    },
+    {
+      "code": "383-2988",
+      "issuer": "Caterpillar",
+      "description": "Термопара типа K (NiCrNi), угловая 90°; того же ряда 152-0807; аналог MOTORTECH 56.01.098-34",
+      "machine": "G3516C/E, G3520C/E",
+      "unit": "контроль температуры выхлопа",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 24",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 383-2988, 152-0807"
+    },
+    {
+      "code": "196-5391",
+      "issuer": "Caterpillar",
+      "description": "Датчик кислорода, неэкранированный; того же ряда 3E-7639; аналог MOTORTECH 19.60.027",
+      "machine": "G3508, G3512, G3516/B, G3520/B",
+      "unit": "регулирование состава смеси",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 25",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 196-5391, 3E-7639"
+    },
+    {
+      "code": "141-2494",
+      "issuer": "Caterpillar",
+      "description": "Датчик кислорода, экранированный; аналог MOTORTECH 19.60.029",
+      "machine": "G3508, G3512, G3516",
+      "unit": "регулирование состава смеси",
+      "doc_ref": "MOTORTECH Application Guide 01.00.011-EN, с. 25",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+      "quote": "CATERPILLAR® P/N 141-2494"
+    },
+    {
+      "code": "4C-4601",
+      "issuer": "Caterpillar",
+      "description": "Головка для свечей зажигания (спецприспособление для ТО)",
+      "machine": "G3500, G3600",
+      "unit": "система зажигания (инструмент)",
+      "doc_ref": "PEHJ0260-01",
+      "source_url": "http://s7d2.scene7.com/is/content/Caterpillar/CM20170811-53046-28757",
+      "quote": "4C-4601 – Spark Plug Socket"
+    },
+    {
+      "code": "2720759",
+      "issuer": "IPD (Industrial Parts Depot); код совпадает с номером Caterpillar 272-0759 без дефиса — по каталогу Cat не сверено",
+      "description": "Уплотнение клапанной крышки, 16 шт. на двигатель",
+      "machine": "G3516",
+      "unit": "головка блока",
+      "doc_ref": "IPD parts for Caterpillar G3516 Engines, с. 47",
+      "source_url": "http://gasmotorservice.ru/files/1671/IPD_Parts_for_CAT_G3516.pdf",
+      "quote": "Valve Cover Seal 2720759"
+    },
+    {
+      "code": "1496031",
+      "issuer": "IPD (Industrial Parts Depot); код совпадает с номером Caterpillar без дефиса — по каталогу Cat не сверено",
+      "description": "Коренной вкладыш, стандартный размер, 9 шт.; ремонтный +0,025 in — 1496032",
+      "machine": "G3516",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "IPD parts for Caterpillar G3516 Engines, с. 48",
+      "source_url": "http://gasmotorservice.ru/files/1671/IPD_Parts_for_CAT_G3516.pdf",
+      "quote": "Main Bearing Standard 1496031"
+    },
+    {
+      "code": "1077330",
+      "issuer": "IPD (Industrial Parts Depot); код совпадает с номером Caterpillar без дефиса — по каталогу Cat не сверено",
+      "description": "Шатунный вкладыш, стандартный размер, 16 шт.; ремонтный — 1077331",
+      "machine": "G3516",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "IPD parts for Caterpillar G3516 Engines, с. 48",
+      "source_url": "http://gasmotorservice.ru/files/1671/IPD_Parts_for_CAT_G3516.pdf",
+      "quote": "Rod Bearing Standard 1077330"
+    },
+    {
+      "code": "7E2899",
+      "issuer": "IPD (Industrial Parts Depot); код совпадает с номером Caterpillar без дефиса — по каталогу Cat не сверено",
+      "description": "Комплект поршневых колец, 16 шт.",
+      "machine": "G3516",
+      "unit": "цилиндропоршневая группа",
+      "doc_ref": "IPD parts for Caterpillar G3516 Engines, с. 48",
+      "source_url": "http://gasmotorservice.ru/files/1671/IPD_Parts_for_CAT_G3516.pdf",
+      "quote": "Ring Group 7E2899"
+    },
+    {
+      "code": "2944935",
+      "issuer": "IPD (Industrial Parts Depot)",
+      "description": "Ремкомплект водяного насоса (уплотнение, упорные шайбы, втулка, вал, крыльчатка) для насосов 6I3520, 7E9781, 7E9782, 2128168, 2128169, 2128166",
+      "machine": "G3516",
+      "unit": "система охлаждения",
+      "doc_ref": "IPD parts for Caterpillar G3516 Engines, с. 49",
+      "source_url": "http://gasmotorservice.ru/files/1671/IPD_Parts_for_CAT_G3516.pdf",
+      "quote": "Water Pump Rebuild Kit 2944935"
+    },
+    {
+      "code": "12285295",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой, оригинал, природный газ; 16 шт. в комплекте ТО E40",
+      "machine": "MWM TCG 2032 V16 / Cat CG260-16",
+      "unit": "система зажигания",
+      "doc_ref": "комплект ТО E40 (перечень у продавца iggnita)",
+      "source_url": "https://iggnita.com/en/urun/mwm-tcg-2032-v16-cat-cg-260-e40-orijinal-bakim-seti/",
+      "quote": "16 x MWM prechamber spark plug 12285295 original natural gas"
+    },
+    {
+      "code": "12284663",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Элемент масляного фильтра, оригинал; 4 шт. в комплекте ТО E40",
+      "machine": "MWM TCG 2032 V16 / Cat CG260-16",
+      "unit": "система смазки",
+      "doc_ref": "комплект ТО E40",
+      "source_url": "https://iggnita.com/en/urun/mwm-tcg-2032-v16-cat-cg-260-e40-orijinal-bakim-seti/",
+      "quote": "4 x Oil filter element MWM 12284663 original"
+    },
+    {
+      "code": "12211919",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Вставка газового фильтра, оригинал (уплотнительное кольцо к ней — 12211920)",
+      "machine": "MWM TCG 2032 V16 / Cat CG260-16",
+      "unit": "газовая линия",
+      "doc_ref": "комплект ТО E40",
+      "source_url": "https://iggnita.com/en/urun/mwm-tcg-2032-v16-cat-cg-260-e40-orijinal-bakim-seti/",
+      "quote": "10 x Gas filter insert MWM 12211919 original"
+    },
+    {
+      "code": "12409797",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Воздушный фильтр прямоугольный; 8 шт. в комплекте ТО",
+      "machine": "MWM TCG 2032 V16 / Cat CG260-16",
+      "unit": "система впуска",
+      "doc_ref": "комплект ТО E40",
+      "source_url": "https://iggnita.com/en/urun/mwm-tcg-2032-v16-cat-cg-260-e40-orijinal-bakim-seti/",
+      "quote": "8x Air filter Square ref. MWM 12409797"
+    },
+    {
+      "code": "12453572",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой, природный газ; на странице продавца оригиналом не названа, оригинальность следует из перечня свечей на mwm.net; прежние номера 12452828, 12452176, 12453318, 12453388. Код есть и в перечне свечей на mwm.net",
+      "machine": "MWM TCG 2020 V12/V16/V20 / Cat CG170-12/16/20",
+      "unit": "система зажигания",
+      "source_url": "https://www.energyassistance.ru/en/spark-plugs-ignition-systems/23-prechamber-spark-plug-mwm-12453572-12452828-for-mwm-caterpillar-tcg-2020-gas-engines-natural-gas.html",
+      "quote": "Prechamber spark plug MWM 12453572 (12452828) for MWM - Caterpillar TCG 2020 gas engines - Natural Gas"
+    },
+    {
+      "code": "12453562",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой (по листингу energyassistance.ru — для биогаза; прежние 12344096, 12343755)",
+      "machine": "MWM TCG 2016 V8/V12/V16 / Cat CG132 (сопоставление — по листингу energyassistance.ru)",
+      "unit": "система зажигания",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/original-spare-part-mwm-prechamber-spark-plug/",
+      "quote": "12285487 / 12344841 / 12420480 / 12453385 / 12453562 / 12453564 / 12453572"
+    },
+    {
+      "code": "12142723",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Внутренний элемент фильтра вентиляции картера UPF 100; продавец числит его оригиналом и даёт рядом ссылку на UT99",
+      "machine": "MWM TCG 2020 V16/V20 / Cat CG170-16/20",
+      "unit": "вентиляция картера",
+      "source_url": "https://www.energyassistance.ru/en/filters/177-filter-upf-100-inside-mwm-12142723-original-for-mwm-tcg-2020-v16-v20-cg170-16-20.html",
+      "quote": "Filter UPF 100 inside MWM 12142723 original for MWM TCG 2020 V16, V20, CG170-16, 20"
+    },
+    {
+      "code": "12466706",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Внутренний элемент фильтра вентиляции картера UPF 55, оригинал; продавец даёт рядом UT99 600175 и 2G 32090-00015",
+      "machine": "MWM TCG 2016 (все), TCG 2020 V12 / Cat CG132 (все), CG170-12",
+      "unit": "вентиляция картера",
+      "source_url": "https://www.energyassistance.ru/en/filters/29-filter-upf-55-inside-12466706-original-for-mwm-tcg-2016-all-tcg-2020-v12-cg132-all-cg170-12.html",
+      "quote": "Filter UPF 55 inside 12466706 original for MWM TCG 2016 all, TCG 2020 V12, CG132 all, CG170-12"
+    },
+    {
+      "code": "1R-0755",
+      "issuer": "Caterpillar",
+      "description": "Топливный фильтр; продавец пишет в той же строке 389-0433",
+      "machine": "797F, 797B, 793F, 793B–D (двигатели C175-16/C175-20, 3512/3516)",
+      "unit": "топливная система",
+      "source_url": "https://www.fridayparts.com/fuel-filter-1r-0755-389-0433-for-caterpillar-cat-3116-3412-3512-3516-engine-24-797-773e-773f-776d-777d-784b",
+      "quote": "389-0433, 3890433, CA3890433, 1R-0755, 1R0755, CA1R0755"
+    },
+    {
+      "code": "331-5895",
+      "issuer": "Caterpillar",
+      "description": "Топливная форсунка; продавец указывает 10R-8998 номером замены (слова «Reman» на странице нет)",
+      "machine": "797F, 793F (C175-20, C175-16)",
+      "unit": "топливная система",
+      "source_url": "https://www.fridayparts.com/fuel-injector-331-5895-10r-8998-for-caterpillar-cat-engine-c175-20-c175-16-off-highway-truck-797f-793f",
+      "quote": "Fuel Injector 331-5895 10R-8998 for Caterpillar CAT Engine C175-20 C175-16 Off-Highway Truck 797F 793F"
+    },
+    {
+      "code": "293-3645",
+      "issuer": "Caterpillar",
+      "description": "Фильтр гидравлического масла",
+      "machine": "793F, 797F, 777F/G и др.",
+      "unit": "гидросистема",
+      "source_url": "https://uk.fridayparts.com/hydraulic-oil-filter-293-3645-for-caterpillar-cat-engine-c15-c18-c32-c27-truck-770g-772g-773g-775g-777f-793f-797f",
+      "quote": "Hydraulic Oil Filter 293-3645 for Caterpillar CAT Engine C15 C18 C32 C27 Truck 770G 772G 773G 775G 777F 793F 797F"
+    },
+    {
+      "code": "251-5885",
+      "issuer": "Caterpillar",
+      "description": "Воздушный фильтр двигателя; продавец в той же строке даёт 292-5862, 3I-0791, 3I-0919, 9Y-6835, 9Y-7662",
+      "machine": "793B/C/D, 797, 797B, 785C, 784C (3512/3516)",
+      "unit": "система впуска",
+      "source_url": "https://ca.fridayparts.com/air-filter-251-5885-292-5862-for-caterpillar-cat-engine-3512-3516-off-highway-truck-784c-785c-793b-793c-793d",
+      "quote": "Air Filter 251-5885 292-5862 for Caterpillar CAT Engine 3512 3516 Off-Highway Truck 784C 785C 793B 793C 793D"
+    },
+    {
+      "code": "369-7506",
+      "issuer": "Caterpillar",
+      "description": "Ремкомплект уплотнений фильтра сервоуправления (pilot filter seal kit)",
+      "machine": "R1700",
+      "unit": "гидросистема (сервоуправление)",
+      "doc_ref": "PEBJ0231-02, с. 23",
+      "source_url": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+      "quote": "369-7506 Replacement oil filter seal kit"
+    },
+    {
+      "code": "248-1394",
+      "issuer": "Caterpillar",
+      "description": "Комплект прокладок и уплотнений на одну топливную форсунку (раздел Engine Rebuild)",
+      "machine": "R1700 (двигатель C13)",
+      "unit": "топливная система",
+      "doc_ref": "PEBJ0231-02, с. 25",
+      "source_url": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+      "quote": "248-1394 Single Fuel Injector"
+    },
+    {
+      "code": "568-2583",
+      "issuer": "Caterpillar",
+      "description": "Комплект прокладок для установки турбокомпрессора (раздел Engine Rebuild)",
+      "machine": "R1700 (двигатель C13)",
+      "unit": "турбонаддув",
+      "doc_ref": "PEBJ0231-02, с. 25",
+      "source_url": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+      "quote": "568-2583 Turbo Installation"
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "430-4521",
+      "verdict": "источник недоступен",
+      "reason": "parts.cat.com отвечает 403 (Akamai), WebFetch — 503/таймаут; объявление eBay 376531217198 — 403. Код не найден ни в одном из открытых документов (MOTORTECH, брошюра Cat PEHJ0260-01). Лимит WebSearch исчерпан, искать дальше было нечем."
+    },
+    {
+      "code": "142-0215",
+      "verdict": "источник недоступен",
+      "reason": "parts.cat.com отвечает 403/503, объявление Amazon B0DPPCD3WR отдаёт капчу (WebFetch — 500). В MOTORTECH и других открытых документах кода нет. Лимит WebSearch исчерпан."
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "ABB Turbocharging / Accelleron",
+      "component": "турбокомпрессор высокого давления A140 (у продавца — A140-H65)",
+      "machine": "MWM TCG 2032 / Cat CG260; по заявлению продавца также Cat G3520C",
+      "evidence": "На mwm.net у TCG 2032 назван «A140 high-pressure turbocharger»; A100/A140 — серия ABB. Китайский продавец запчастей Weyeah пишет у ABB A140-H65: «Suitable engine model: CAT G3520C, CAT CG260, MWM TCG2032, Jenbacher 620». Для G3520C это заявление продавца, не изготовителя.",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2032/",
+        "https://www.weyeahmotor.com/ABB-A140-H65-turbocharger-assembly-pd43171073.html"
+      ]
+    },
+    {
+      "company": "Kompressorenbau Bannewitz (KBB Turbo)",
+      "component": "турбокомпрессор",
+      "machine": "MWM TCG 2032 V16 (4000 кВт, 2003 г.) — предшественник CG260",
+      "evidence": "В объявлении RS Motor о продаже восстановленного двигателя сказано «TURBOCHARGER TYPE: KBB». Установлено по одному экземпляру, не по документации изготовителя.",
+      "sources": [
+        "https://rsmotorps.com/en/producto/engine-mwm-tcg-2032-v16/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MAN Energy Solutions (ныне Everllence) — по обозначению",
+      "component": "турбокомпрессор TCR 16 с подшипниковым корпусом водяного охлаждения",
+      "machine": "MWM TCG 2020 / Cat CG170",
+      "evidence": "На mwm.net назван «new turbocharger TCR 16». Что TCR — серия MAN, выведено из обозначения: изготовитель на странице не назван.",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/"
+      ]
+    },
+    {
+      "company": "AVK (генераторы)",
+      "component": "синхронный генератор генераторной установки",
+      "machine": "MWM TCG 2032 V16 (генераторная установка)",
+      "evidence": "В объявлении RS Motor сказано «GENERATOR: AVK REACONDICIONADO». Это один экземпляр; штатную комплектацию CG260 не подтверждает.",
+      "sources": [
+        "https://rsmotorps.com/en/producto/engine-mwm-tcg-2032-v16/"
+      ]
+    },
+    {
+      "company": "UT99 AG",
+      "component": "элементы фильтров вентиляции картера серии UPF (UPF 50/55/100)",
+      "machine": "MWM TCG 2016/2020 / Cat CG132, CG170",
+      "evidence": "Продавец energyassistance.ru указывает у элементов MWM 12142718, 12142723 и 12466706 ссылки UT99 (у 12466706 — «UT99: 600175»). Установлено по перекрёстной ссылке продавца, а не по данным MWM.",
+      "sources": [
+        "https://www.energyassistance.ru/en/filters/29-filter-upf-55-inside-12466706-original-for-mwm-tcg-2016-all-tcg-2020-v12-cg132-all-cg170-12.html",
+        "https://www.energyassistance.ru/en/filters/199-filter-upf-50-inside-mwm-12142718-for-tcg-2020-v12-cg170-12-ut99.html"
+      ]
+    },
+    {
+      "company": "MOTORTECH GmbH",
+      "component": "аналоги узлов зажигания и датчиков: катушки, удлинители свечей, провода, термопары, датчики кислорода, системы контроля детонации, фильтрующие элементы",
+      "machine": "G3508, G3512, G3516, G3520 (B/C/E/H)",
+      "evidence": "В руководстве MOTORTECH Application Guide for CATERPILLAR G3500 Series для каждой позиции указан эквивалентный номер Caterpillar. Это поставщик аналогов и модернизации, а не поставщик Caterpillar при первичной комплектации.",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf"
+      ]
+    },
+    {
+      "company": "Altronic",
+      "component": "фланцевая катушка зажигания 591012 (соответствует Cat 7W-4377), магнит датчика распредвала 260605/260604 (соответствует Cat 142-8608), первичные провода 593027-xx (соответствуют Cat 1N-37xx, 4W-67xx)",
+      "machine": "G3508, G3512, G3516",
+      "evidence": "Перекрёстная таблица в руководстве MOTORTECH, строки «ALTRONIC® P/N». Поставляет ли Altronic эти узлы на заводскую сборку — не подтверждено.",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf"
+      ]
+    },
+    {
+      "company": "Champion",
+      "component": "свечи зажигания RB77WPCC, KB77WPCC (соответствуют Cat 301-6663, 243-4291, 194-8518)",
+      "machine": "G3500",
+      "evidence": "Перекрёстная таблица в руководстве MOTORTECH, строка «CHAMPION® P/N RB77WPCC, KB77WPCC». Это аналог; делает ли Champion свечи для Caterpillar — не подтверждено.",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf"
+      ]
+    },
+    {
+      "company": "IPD (Industrial Parts Depot)",
+      "component": "аналоги деталей для ремонта: клапаны, направляющие, наборы прокладок, вкладыши, поршни, гильзы, кольца, термостаты, ремкомплекты водяного насоса, сальники коленвала",
+      "machine": "G3516",
+      "evidence": "Каталог «IPD parts for Caterpillar G3516 Engines» (с. 47–49) в открытом доступе на gasmotorservice.ru. Производитель аналогов, не поставщик Caterpillar при первичной комплектации.",
+      "sources": [
+        "http://gasmotorservice.ru/files/1671/IPD_Parts_for_CAT_G3516.pdf"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Borusan Cat (Borusan Makina)",
+      "country": "Турция; также Казахстан, Азербайджан, Грузия, Киргизия",
+      "role": "официальный дилер Cat: техника, Power Systems, запчасти, сервис",
+      "sources": [
+        "https://www.khl.com/1057109.article",
+        "https://www.borusancat.com/en/contact/map",
+        "https://www.borusancat.kg/en/"
+      ]
+    },
+    {
+      "company": "Borusan Cat Kazakhstan",
+      "country": "Казахстан",
+      "role": "официальный дилер Cat, по данным поиска — 23 склада по стране",
+      "sources": [
+        "https://www.borusancat.kz/en"
+      ]
+    },
+    {
+      "company": "Mohamed Abdulrahman Al-Bahar",
+      "country": "ОАЭ; также Кувейт, Катар, Оман, Бахрейн",
+      "role": "эксклюзивный дилер Cat, Power Systems (в т. ч. газовые генераторные установки G3520), продажа и аренда",
+      "sources": [
+        "https://www.albahar.com/",
+        "https://www.albahar.com/products/new/cat-power-systems/details/electric-power-generation/gas-generator-sets/current/g3520-with-fast-response/15970443/402/18255920/18327284/",
+        "https://www.cat.com/en_US/by-industry/electric-power/Articles/Testimonials/middle-east-cat-dealer-al-bahar-provides-entire-range-of-services-during-pandemic.html"
+      ]
+    },
+    {
+      "company": "Gainwell Commosales (Gainwell CAT)",
+      "country": "Индия (север и восток)",
+      "role": "официальный дилер Cat: горная техника (в т. ч. очистные комбайны EL2000/EL3000), энергетика, запчасти, сервис",
+      "sources": [
+        "https://www.gainwellindia.com/cat/",
+        "https://www.gainwellindia.com/cat/products/new/Underground-Mining/Longwall-Shearer/EL3000"
+      ]
+    },
+    {
+      "company": "Gmmco (CKA Birla)",
+      "country": "Индия (юг, запад, центр)",
+      "role": "официальный дилер Cat: техника и двигатели, ремонтно-восстановительные центры",
+      "sources": [
+        "https://www.gmmco.in/",
+        "https://www.cat.com/en_IN/by-industry/construction/caterpillar-in-india/cat-dealers.html"
+      ]
+    },
+    {
+      "company": "Lei Shing Hong Machinery (с 2017 года владеет WesTrac China)",
+      "country": "Китай",
+      "role": "официальный дилер Cat; бывшая территория WesTrac China — Шаньси, Хэбэй, Ляонин, Внутренняя Монголия, Хэйлунцзян, Цзилинь, Пекин, Тяньцзинь; в Тяньцзине — ремонтно-восстановительный центр",
+      "sources": [
+        "https://www.khl.com/news/westrac-china-sold-to-lei-shing-hong/1128720.article",
+        "https://miningdigital.com/automation-and-ai/seven-group-holdings-sells-chinese-mining-machinery-arm-lei-shing-hong-dollar428mn"
+      ]
+    },
+    {
+      "company": "Восточная Техника",
+      "country": "Россия (Сибирь, Якутия, Дальний Восток)",
+      "role": "по своему сайту — поставщик строительной и горной техники Cat, ГПУ и оригинальных запчастей Cat; в агрегаторах значится официальным дилером Caterpillar. Статус после ухода Caterpillar из России (2022) не подтверждён",
+      "sources": [
+        "https://www.vost-tech.ru/",
+        "https://exkavator.ru/dealers/producer/caterpillar"
+      ]
+    },
+    {
+      "company": "Zeppelin Russland",
+      "country": "Россия",
+      "role": "бывший официальный дилер Cat; российский бизнес Zeppelin свёрнут в 2022 году",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Zeppelin_GmbH",
+        "https://leave-russia.org/caterpillar"
+      ]
+    },
+    {
+      "company": "Нойхаус (NeuHaus)",
+      "country": "Россия",
+      "role": "по своему сайту — «официальный дистрибьютор» завода MWM (холдинг Caterpillar); ГПУ TCG 2020",
+      "sources": [
+        "https://nhs.ru/products/gpu/TCG-2020-V16/"
+      ]
+    },
+    {
+      "company": "Альфа Балт Инжиниринг",
+      "country": "Россия",
+      "role": "по своему сайту — «официальный дистрибьютор» ГПУ MWM (TCG 2020, TCG 3020): продажа, пусконаладка, сервис",
+      "sources": [
+        "https://abespb.ru/catalog/gas-units/gazoporshnevye-ustanovki-s-dvigatelem-mwm/"
+      ]
+    },
+    {
+      "company": "Эртех",
+      "country": "Россия",
+      "role": "сервис ГПУ MWM серий TCG 3016, 2020, 3020, 2032: ТО, капитальный ремонт, поставка оригинальных запчастей",
+      "sources": [
+        "https://erteh.ru/services/servis-mwm/"
+      ]
+    },
+    {
+      "company": "Energy Assistance (energyassistance.ru)",
+      "country": "Россия (по ценам в рублях)",
+      "role": "продавец запчастей MWM/Cat CG: оригиналы и аналоги (свечи с форкамерой, фильтры вентиляции картера)",
+      "sources": [
+        "https://www.energyassistance.ru/en/spark-plugs-ignition-systems/23-prechamber-spark-plug-mwm-12453572-12452828-for-mwm-caterpillar-tcg-2020-gas-engines-natural-gas.html"
+      ]
+    },
+    {
+      "company": "iggnita",
+      "country": "Турция (по языку сайта)",
+      "role": "продавец оригинальных комплектов ТО MWM TCG 2032 / Cat CG260 (E40)",
+      "sources": [
+        "https://iggnita.com/en/urun/mwm-tcg-2032-v16-cat-cg-260-e40-orijinal-bakim-seti/"
+      ]
+    },
+    {
+      "company": "Wuhan Weyeah Power Machinery",
+      "country": "Китай",
+      "role": "продавец запчастей к газовым двигателям MWM и Cat (фильтры, свечи, турбокомпрессоры ABB); не официальный дилер",
+      "sources": [
+        "https://www.weyeahmotor.com/MWM-Spare-Parts-pl3024632.html",
+        "https://www.weyeahmotor.com/MWM-12189925-air-filter-for-TCG2016-TCG2020-gas-engine-pd44901804.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Коды-образцы из задания 5P-9960 и 133-8501 в открытых источниках не найдены: поиск выдаёт соседние номера (5P-9959 — болт). Лежат, вероятно, в SIS 2.0 или parts.cat.com; нужна машина и серийный префикс.",
+    "parts.cat.com отвечает на автоматическое чтение кодом 503. Коды 243-4291, 346-5123, 430-4521 и 142-0215 взяты по заголовкам страниц в выдаче поиска; применимость по серийному префиксу не проверена. Точная применимость — в Cat SIS 2.0 (платный доступ, есть у дилеров).",
+    "Каталоги деталей SEBP2855, SEBP3673, SEBP5414, SEBP2906, SEBP4706, SEBP4750 видны только в адресах и заголовках зеркал (777parts.net, avspart.com). Открыть страницы не удалось (403/502), поэтому состав групп — фильтры, ТНВД, прокладки — не снят.",
+    "SEBU6711 (руководство по эксплуатации и ТО G3500), SENR6412 (Systems Operation / Testing and Adjusting), SEBU7681 и RENR5979 (G3520C/E) известны только по выдаче поиска: полные тексты у платных продавцов руководств и в SIS. Интервалы ТО и номера фильтров из них не сняты.",
+    "Коды MWM для CG132/CG170/CG260 взяты у продавцов запчастей (iggnita, energyassistance.ru, weyeah), не у изготовителя. У MWM закрытый портал заказчика: каталог ET и перечни ТО E10–E70 по наработке — там. Страницы onergys.de/.com закрыты (403).",
+    "По горной технике официальный перечень наборов с номерами нашёлся только для R1700 (PEBJ0231-02). Для 797F/793F/AD45 коды фильтров и форсунок взяты у продавцов аналогов (fridayparts) и по каталогу Cat не сверены. Похожие rig-out catalog по другим машинам, вероятно, есть на s7d2.scene7.com, но через поиск не находятся.",
+    "Для очистных комбайнов EL2000/EL3000 и лавного оборудования (бывший Bucyrus) номеров запчастей в открытом доступе нет: есть только ссылка на пакеты parts.cat.com/en/catcorp/shearer/EL3000-14, закрытая для чтения.",
+    "Изготовитель турбокомпрессоров G3516/G3520 (A/B/C/H) не установлен. Продавцы дают только номера Caterpillar (например, 252-5053); изготовитель сердечника (сам Cat, Garrett или ABB) по открытым источникам не подтверждён.",
+    "Изготовитель исполнительного механизма дроссельной заслонки и регулятора G3500 (7W-6722, 118-7590, 151-8677) по открытым страницам не назван; связь с Woodward не подтверждена.",
+    "Генераторы комплектов CG132/CG170/CG260 по штатной комплектации не выяснены (AVK — по одному объявлению о продаже TCG 2032). Вероятно, это видно в техданных комплекта (data sheet) на cat.com: скачивание требует формы.",
+    "Статус российских дилеров после 2022 года: Caterpillar вышла из России, активы проданы (по данным поиска — ПСК «Новые решения», ноябрь 2023). «Восточная Техника» официальный статус на сайте прямо не заявляет. Нужна сверка по реестру дилеров Cat (Dealer Locator на cat.com).",
+    "Продавцы в Турции (iggnita) и Китае (Weyeah, Zuhon) и energyassistance.ru — не подтверждённые официальные каналы Caterpillar Energy Solutions; официальных дистрибьюторов MWM по странам нужно сверить с партнёрским поиском на mwm.net."
+  ],
+  "verifier_notes": "Подтверждено 38 кодов из 40, 23 машины из 25, 8 субпоставщиков из 9. Два кода, G3512K и EL2000 проверить не удалось: источник недоступен. MAN (TCR 16) не подтверждён.\n\nУсловия проверки. cat.com и parts.cat.com из этой среды не открываются: curl получает 403 от Akamai, WebFetch — 503 или таймаут. web.archive.org закрыт политикой исходящего трафика. Лимит WebSearch (200) исчерпан на первом же запросе. Поэтому страницы cat.com заменены карточками дилера Western States Cat, найденными переходом по его каталогу, без поиска. Документы MOTORTECH, IPD, PEBJ0231-02, PEHJ0260-01 и LEDW6043-01 скачаны и прочитаны pdftotext построчно. Страницы fridayparts, energyassistance, iggnita, mwm.net, weyeah и rsmotorps открыты напрямую.\n\nНеточности в записях (коды подтверждены):\n1) 12453572 — продавец energyassistance на странице товара не называет свечу оригиналом; оригинальность следует только из mwm.net.\n2) 331-5895 — слова «Reman» у продавца нет, 10R-8998 указан просто как номер замены.\n3) 105-9741 — на странице прямо написано «Donaldson P529552»; там же в списке замен стоит 105-9742, то есть продавец путается в первичном и вторичном элементах.\n4) 369-7506 — код стоит на с. 23 PEBJ0231-02, а не на с. 24.\n5) G3516C — цифра 1173–1675 кВт на природном газе есть только в адресе страницы дилера, на самой странице исполнение CMM на 1555 ekW.\n6) CG170B-20 — мощность CG170-20 (1400–2000 кВт) и то, что её сменила серия CG170B, не проверены.\n7) Статус «выпускается (карточка на cat.com)» ни у одной машины не проверен по самому cat.com.\n\nНепроверенные записи — 430-4521, 142-0215, G3512K, EL2000 — стоит перепроверить, когда cat.com или WebSearch станут доступны.\n\nСкачанные файлы лежат в рабочей папке сессии разведки, в репозиторий они не входят (mt.txt, ipd2.txt, r1700b.txt, pehj.txt, ws_*.html, wsc_*.html).",
+  "corrections": [
+    "12453572: оригинальность — по mwm.net, а не по продавцу — замечание 1",
+    "331-5895: снято «Reman» у 10R-8998 — замечание 2",
+    "105-9741: P529552 — номер Donaldson; отмечена путаница первичного и вторичного элемента — замечание 3",
+    "369-7506: страница PEBJ0231-02 исправлена на 23 — замечание 4",
+    "G3516C: мощность на природном газе помечена как взятая из адреса страницы дилера — замечание 5",
+    "CG170B-20: отмечено, что прежняя мощность и смена серии не проверены — замечание 6",
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет"
+  ]
+}

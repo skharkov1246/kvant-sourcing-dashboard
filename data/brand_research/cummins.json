@@ -1,0 +1,1054 @@
+{
+  "oem_key": "cummins",
+  "name": "Cummins Inc. (Cummins Power Generation, газовые ГПУ lean-burn)",
+  "segment_focus": "газовые двигатели и генераторные установки QSK60G, QSV91, QSK19G, C-серия газовых ГПУ; расходники ТО",
+  "researched_at": "2026-09-24",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Газовый ряд Cummins lean-burn в нашем фокусе собран в четыре двигательные платформы. QSK60G: V16, 60,3 л, агрегаты от 995 до 1540 кВт·э, выпускается (брошюра 2025 г.). QSV91G: V18, 91,6 л, от 1540 до 2000 кВт·э; в модельном ряду 03/2021 он есть, в брошюре 2025 г. уже не упоминается. HSK78G: V12, 78 л, от 1600 до 2000 кВт·э, выпускается с 03/2019. QSK19G: I6, агрегаты 315 GFBA и 334 GFBA, лист 2002 г. Серия C25G объявлена на MEE 2020, модели и мощности не найдены. Номинальные данные и названия моделей взяты из открытых документов Cummins: бюллетень модельного ряда 5600281, спецификации S-1552, S-1463, S-1466e, NAS-6109-EN, D-6399g, брошюра QSK60G 2025 г. Открытым оказался каталог запчастей A029C810 (Issue 10) на агрегаты QSK60G с PowerCommand 3.3, но он генераторного уровня: воздухоочистители, газовый клапан, маслосистема и генератор Newage; детали самого двигателя в нём не приводятся. Поэтому двигательные коды взяты из открытых каталогов независимых российских продавцов (Интер-Трек, Цезарь-Нева) и частично подтверждены вторыми источниками: листовкой Hatraco/ERS, страницей кросс-номеров Techie, dieselengines.parts, turboturbos. Это каталоги перепродавцов, а не документ изготовителя. Цепочки замены номеров (5373898→4924504, 5544762→4380132, 5373046↔5634410) надо сверять в QuickServe. Записано 40 кодов, у каждого есть URL и дословная цитата. Основное — расходники ТО: воздушные AF25544/AF25545, масляные LF9050/LF16031, охлаждающий WF2075, свечи, катушки, датчики, термостат, турбокомпрессоры HX82. Установленные изготовители комплектующих: Holset/Cummins Turbo Technologies (HX82, HT60), Newage/Stamford (генераторы HC/CG/MV734), Fleetguard (фильтры), Woodward (привод PROACT на QSK19G), Altronic (катушки QSK19G), DEIF и ComAp (контроллеры), Arcusaflex (муфта QSV), Danfoss (датчик MBS2100). Официальные дистрибьюторы в приоритетных регионах: Cummins Middle East FZE (ОАЭ, в том числе Казахстан) и Cummins Turkey. В России Cummins приостановил деятельность 17.03.2022 (форма 10-K), здесь остались только независимые продавцы и ремонтники.",
+  "machines": [
+    {
+      "model": "QSK60G",
+      "kind": "газовый двигатель lean-burn, V16, 60,3 л, 159×190 мм, цикл Миллера, индивидуальная катушка на свече",
+      "segment": "ГПУ",
+      "rating": "агрегаты 995–1540 кВт·э (50 Гц) / 1000–1400 кВт·э (60 Гц); есть исполнения с двумя турбокомпрессорами",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://ghaddar.com/wp-content/uploads/2025/09/Cummins-Natural-Gas-QSK60-Engine-series.pdf",
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0057404.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "QSV91G",
+      "kind": "газовый двигатель lean-burn, V18, 91,6 л, 180×200 мм, индивидуальная катушка на свече",
+      "segment": "ГПУ",
+      "rating": "агрегаты 1540–2000 кВт·э",
+      "status": "в модельном ряду 03/2021; в брошюре 2025 г. не упомянут — вероятно снят или заменён HSK78G, не подтверждено",
+      "sources": [
+        "https://woodstockpower.com/wp-content/uploads/2018/09/Cummins-1540-C1540-N6C_QSV91G.pdf",
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HSK78G",
+      "kind": "газовый двигатель lean-burn, V12, 78 л, 190×230 мм",
+      "segment": "ГПУ",
+      "rating": "агрегаты 1600–2000 кВт·э; 2062 кВт·м при 1500 об/мин (C2000 N5CD)",
+      "status": "выпускается, продажи с 03/2019",
+      "sources": [
+        "https://www.cummins.com/sites/default/files/2019-08/Spec-Sheet-HSK78G-50Hz_2.pdf",
+        "https://www.cummins.com/sites/default/files/2019-08/c2000n5cd-datasheet-6399-mk.pdf",
+        "https://www.powertraininternationalweb.com/news/cummins-gas-gensets/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "QSK19G",
+      "kind": "газовый двигатель lean-burn, рядный 6-цилиндровый, 19 л; управление MCM700/SGM558, привод дросселя Woodward PROACT, катушки Altronic",
+      "segment": "ГПУ",
+      "rating": "агрегаты 315 кВт·э (50 Гц) / 334 кВт·э (60 Гц)",
+      "status": "лист 2002 г.; текущий выпуск не подтверждён",
+      "sources": [
+        "https://www.aaronequipment.com/equipmentattachments/46517003_cummins_qsk19g_spec_sheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C25G (серия)",
+      "kind": "газовые генераторные установки",
+      "segment": "ГПУ",
+      "rating": "не найдено (в брошюре QSK60G 2025 г. — только на графике КПД)",
+      "status": "объявлена на MEE 2020 (Дубай)",
+      "sources": [
+        "https://www.powertraininternationalweb.com/news/cummins-gas-gensets/",
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0057404.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C995N5C",
+      "kind": "газопоршневая генераторная установка (QSK60G)",
+      "segment": "ГПУ",
+      "rating": "995 кВт·э / 1244 кВА, 50 Гц, продолжительная мощность",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0057404.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1160N5C",
+      "kind": "газопоршневая генераторная установка (QSK60G), прежнее обозначение GQKA",
+      "segment": "ГПУ",
+      "rating": "1160 кВт·э / 1450 кВА, 50 Гц",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "http://www.soarpower.com/pdf/C1160N5C.QSK60_english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1200N5C",
+      "kind": "газопоршневая генераторная установка (QSK60G)",
+      "segment": "ГПУ",
+      "rating": "1200 кВт·э / 1500 кВА, 50 Гц",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1400N5C",
+      "kind": "газопоршневая генераторная установка (QSK60G)",
+      "segment": "ГПУ",
+      "rating": "1400 кВт·э / 1750 кВА, 50 Гц",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1540N5CC",
+      "kind": "газопоршневая генераторная установка (QSK60G)",
+      "segment": "ГПУ",
+      "rating": "1540 кВт·э / 1925 кВА, 50 Гц",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "https://ghaddar.com/wp-content/uploads/2025/09/Cummins-Natural-Gas-QSK60-Engine-series.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1000N6C",
+      "kind": "газопоршневая генераторная установка (QSK60G)",
+      "segment": "ГПУ",
+      "rating": "1000 кВт·э / 1250 кВА, 60 Гц, продолжительная мощность",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1100N6C",
+      "kind": "газопоршневая генераторная установка (QSK60G)",
+      "segment": "ГПУ",
+      "rating": "1100 кВт·э / 1375 кВА, 60 Гц",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1400N6C",
+      "kind": "газопоршневая генераторная установка (QSK60G), прежнее обозначение GQKA",
+      "segment": "ГПУ",
+      "rating": "1400 кВт·э / 1750 кВА, 60 Гц",
+      "status": "выпускается (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "http://www.soarpower.com/pdf/C1160N5C.QSK60_english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1000N6 / C1250N6 / C1350N6",
+      "kind": "газопоршневые генераторные установки (QSK60G), резервная мощность, EPA NSPS/MOH",
+      "segment": "ГПУ",
+      "rating": "1000 / 1250 / 1350 кВт·э, 60 Гц, резервная",
+      "status": "выпускаются (брошюра 2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0057404.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1540N5CB",
+      "kind": "газопоршневая генераторная установка (QSV91G), для газа с низким метановым числом",
+      "segment": "ГПУ",
+      "rating": "1540 кВт·э / 1925 кВА, 50 Гц (для 60 Гц — C1540N6CB, через редуктор)",
+      "status": "в ряду 03/2021; текущий статус не подтверждён",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "https://woodstockpower.com/wp-content/uploads/2018/09/Cummins-1540-C1540-N6C_QSV91G.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1750N5CB",
+      "kind": "газопоршневая генераторная установка (QSV91G)",
+      "segment": "ГПУ",
+      "rating": "1750 кВт·э / 2188 кВА, 50 Гц (для 60 Гц — C1750N6CB)",
+      "status": "в ряду 03/2021; текущий статус не подтверждён",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C2000N5CB",
+      "kind": "газопоршневая генераторная установка (QSV91G)",
+      "segment": "ГПУ",
+      "rating": "2000 кВт·э / 2500 кВА, 50 Гц (для 60 Гц — C2000N6CB)",
+      "status": "в ряду 03/2021; текущий статус не подтверждён",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C2000N5C",
+      "kind": "газопоршневая генераторная установка (QSV91G), прежнее обозначение GQNC; допускает низкокалорийный газ",
+      "segment": "ГПУ",
+      "rating": "2000 кВт·э / 2500 кВА, 50 Гц",
+      "status": "в ряду 03/2021; текущий статус не подтверждён",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "https://woodstockpower.com/wp-content/uploads/2018/09/Cummins-1540-C1540-N6C_QSV91G.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C2000N6C",
+      "kind": "газопоршневая генераторная установка (QSV91G), прежнее обозначение GQPC, генератор через редуктор",
+      "segment": "ГПУ",
+      "rating": "2000 кВт·э / 2500 кВА, 60 Гц",
+      "status": "в ряду 03/2021; текущий статус не подтверждён",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "https://cummins.screativa.com/uploads/shares/DATA_SHEETS/DATA_SHEET_GAS_NATURAL/C2000N6C.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1600N5CD",
+      "kind": "газопоршневая генераторная установка (HSK78G); допускает метан угольных шахт и газ с низким метановым числом",
+      "segment": "ГПУ",
+      "rating": "1600 кВт·э / 2000 кВА, 50 Гц (для 60 Гц — C1600N6CD)",
+      "status": "выпускается",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+        "https://www.cummins.com/sites/default/files/2019-08/Spec-Sheet-HSK78G-50Hz_2.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1800N5CD",
+      "kind": "газопоршневая генераторная установка (HSK78G)",
+      "segment": "ГПУ",
+      "rating": "1800 кВт·э / 2250 кВА, 50 Гц (для 60 Гц — C1800N6CD)",
+      "status": "выпускается",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C2000N5CD",
+      "kind": "газопоршневая генераторная установка (HSK78G)",
+      "segment": "ГПУ",
+      "rating": "2000 кВт·э, 50 Гц; электрический КПД 44,2 % по ISO 3046/1; минимальное метановое число 70",
+      "status": "выпускается",
+      "sources": [
+        "https://www.cummins.com/sites/default/files/2019-08/c2000n5cd-datasheet-6399-mk.pdf",
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C1550P5CD",
+      "kind": "генераторная установка на пропане (HSK78G)",
+      "segment": "ГПУ",
+      "rating": "1550 кВт·э / 1938 кВА, 50 Гц (для 60 Гц — C1550P6CD)",
+      "status": "в ряду 03/2021",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "315 GFBA / 334 GFBA",
+      "kind": "газопоршневые генераторные установки (QSK19G), генератор Newage",
+      "segment": "ГПУ",
+      "rating": "315 кВт·э (50 Гц, 1500 об/мин) / 334 кВт·э (60 Гц, 1800 об/мин)",
+      "status": "лист 2002 г.; вероятно сняты, не подтверждено",
+      "sources": [
+        "https://www.aaronequipment.com/equipmentattachments/46517003_cummins_qsk19g_spec_sheet.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Parts Manual Generator Set QSK60G Engine with PowerCommand 3.3 Control (C995 N5C … C1400 N6C, C1000/C1250/C1350 N6)",
+      "doc_no": "A029C810 (Issue 10, 5-2020)",
+      "machine": "QSK60G: C995N5C, C1160N5C, C1200N5C, C1400N5C, C1000N6C, C1100N6C, C1400N6C, C1000N6, C1250N6, C1350N6",
+      "kind": "parts manual (уровень агрегата, 128 с.)",
+      "sources": [
+        "https://www.wpowerproducts.com/wp-content/uploads/2020/11/Generator-Sets-with-QSK60-G-Engine-with-PowerCommand-3.3-Control-Parts-Manual-A029C810-I10-5-2020.pdf"
+      ]
+    },
+    {
+      "title": "QSV91G Parts Catalogue (печатный каталог, продаётся как деталь)",
+      "doc_no": "4021362",
+      "machine": "QSV91G",
+      "kind": "parts manual",
+      "sources": [
+        "https://shop.moderngroup.com/4021362-qsv91g-parts-catalogue/"
+      ]
+    },
+    {
+      "title": "Service Bulletin: Cummins Engine Oil and Oil Analysis Recommendations (раздел о масле для газовых QSK45G/QSK60G/QSV81G/QSV91G и QSK19G)",
+      "doc_no": "3810340 (04-DEC-2009)",
+      "machine": "QSK60G, QSV91G, QSK19G",
+      "kind": "бюллетень",
+      "sources": [
+        "https://www.plaisance-pratique.com/IMG/pdf/SBN_Oil_3810340__5jun13.pdf"
+      ]
+    },
+    {
+      "title": "Lean Burn Natural Gas Generators — International Model Range (50/60 Hz)",
+      "doc_no": "Bulletin 5600281, Rev. 3/21",
+      "machine": "QSK60G, QSV91G, HSK78G — все модели C…N5C/N6C/CD",
+      "kind": "каталог модельного ряда",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ]
+    },
+    {
+      "title": "Specification sheet — Natural gas generator set QSK60 series engine 995–1540 kW",
+      "doc_no": "S-1552 (4/18)",
+      "machine": "QSK60G: C995N5C, C1200N5C, C1400N5C, C1540N5CC, C1000N6C, C1100N6C",
+      "kind": "спецификация (spec sheet)",
+      "sources": [
+        "https://ghaddar.com/wp-content/uploads/2025/09/Cummins-Natural-Gas-QSK60-Engine-series.pdf"
+      ]
+    },
+    {
+      "title": "Specification sheet — Natural gas generator set QSK60 series engine 1160–1400 kW",
+      "doc_no": "S-1466e (11/09)",
+      "machine": "C1160N5C, C1400N6C (GQKA)",
+      "kind": "спецификация (spec sheet)",
+      "sources": [
+        "http://www.soarpower.com/pdf/C1160N5C.QSK60_english.pdf"
+      ]
+    },
+    {
+      "title": "Specification sheet — Natural gas generator set QSV91 series engine 1540–2000 kW",
+      "doc_no": "S-1463 (04/18)",
+      "machine": "QSV91G: C1540/C1750/C2000 N5CB, C2000N5C, 60 Гц N6CB/N6C",
+      "kind": "спецификация (spec sheet)",
+      "sources": [
+        "https://woodstockpower.com/wp-content/uploads/2018/09/Cummins-1540-C1540-N6C_QSV91G.pdf"
+      ]
+    },
+    {
+      "title": "Specification sheet — Natural gas generator set HSK78G series engine 1600–2000 kW",
+      "doc_no": "NAS-6109-EN (02/19)",
+      "machine": "HSK78G: C1600/C1800/C2000 N5CD и N6CD",
+      "kind": "спецификация (spec sheet)",
+      "sources": [
+        "https://www.cummins.com/sites/default/files/2019-08/Spec-Sheet-HSK78G-50Hz_2.pdf"
+      ]
+    },
+    {
+      "title": "Generator Set Data Sheet 2000 kW Continuous C2000 N5CD",
+      "doc_no": "D-6399g (Apr 2019)",
+      "machine": "C2000N5CD (HSK78G)",
+      "kind": "технический паспорт (data sheet)",
+      "sources": [
+        "https://www.cummins.com/sites/default/files/2019-08/c2000n5cd-datasheet-6399-mk.pdf"
+      ]
+    },
+    {
+      "title": "Gas Engine Powered Generating Sets 315 kWe 50 Hz / 331 kWe 60 Hz, QSK19G Series Engines",
+      "doc_no": "01/02 CPG QSK 19G/C",
+      "machine": "QSK19G: 315 GFBA, 334 GFBA",
+      "kind": "спецификация (spec sheet)",
+      "sources": [
+        "https://www.aaronequipment.com/equipmentattachments/46517003_cummins_qsk19g_spec_sheet.pdf"
+      ]
+    },
+    {
+      "title": "Proven power to drive your business — QSK60G Gas Generator Series",
+      "machine": "QSK60G (весь ряд 50/60 Гц)",
+      "kind": "брошюра (2025 г.)",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0057404.pdf"
+      ]
+    },
+    {
+      "title": "Cummins QSK60G QSV91 Engine Manual (3-2016) — найдено только название в открытом хранилище, содержание не проверено",
+      "doc_no": "908-0209",
+      "machine": "QSK60G, QSV91G",
+      "kind": "O&M (предположительно руководство по эксплуатации агрегата)",
+      "sources": [
+        "https://www.scribd.com/document/540424670/908-0209-Cummins-QSK60G-QSV91-Engine-Manual-3-2016"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "140-3813",
+      "issuer": "Cummins Power Generation",
+      "description": "Элемент воздушного фильтра первичный (Fleetguard AF25544), 4 шт. на агрегат",
+      "machine": "C995N5C, C1000N6C, C1100N6C, C1200N5C, C1400N5C (QSK60G)",
+      "unit": "впуск воздуха — воздухоочиститель Heavy Duty",
+      "doc_ref": "A029C810 Issue 10, Air Cleaner Heavy Duty, с. 11, поз. 3 (в PDF дефис набран знаком минус)",
+      "source_url": "https://www.wpowerproducts.com/wp-content/uploads/2020/11/Generator-Sets-with-QSK60-G-Engine-with-PowerCommand-3.3-Control-Parts-Manual-A029C810-I10-5-2020.pdf",
+      "quote": "140-3813 4 Element, Primary (AF25544)"
+    },
+    {
+      "code": "140-3814",
+      "issuer": "Cummins Power Generation",
+      "description": "Элемент воздушного фильтра предохранительный (Fleetguard AF25545), 4 шт. на агрегат",
+      "machine": "C995N5C, C1000N6C, C1100N6C, C1200N5C, C1400N5C (QSK60G)",
+      "unit": "впуск воздуха — воздухоочиститель Heavy Duty",
+      "doc_ref": "A029C810 Issue 10, Air Cleaner Heavy Duty, с. 11, поз. 4",
+      "source_url": "https://www.wpowerproducts.com/wp-content/uploads/2020/11/Generator-Sets-with-QSK60-G-Engine-with-PowerCommand-3.3-Control-Parts-Manual-A029C810-I10-5-2020.pdf",
+      "quote": "140-3814 4 Element, Safety (AF25545)"
+    },
+    {
+      "code": "AF25544",
+      "issuer": "Fleetguard",
+      "description": "Воздушный фильтр, первичный элемент",
+      "machine": "QSV91G, QSK60G (GQSK60)",
+      "unit": "впуск воздуха",
+      "doc_ref": "перечень ТО-30 000 QSK60 Gas у продавца; то же в A029C810 как AF25544",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "AF25544 Воздушный фильтр Cummins QSV91G / GQSK60 (оригинал)"
+    },
+    {
+      "code": "AF25545",
+      "issuer": "Fleetguard",
+      "description": "Воздушный фильтр, предохранительный элемент",
+      "machine": "QSV91G, QSK60G (GQSK60)",
+      "unit": "впуск воздуха",
+      "doc_ref": "перечень ТО-30 000 QSK60 Gas у продавца",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "AF25545 Воздушный фильтр Cummins QSV91G / GQSK60 (оригинал)"
+    },
+    {
+      "code": "LF9050",
+      "issuer": "Fleetguard",
+      "description": "Масляный фильтр",
+      "machine": "QSK60G (QSK60 Gas)",
+      "unit": "система смазки",
+      "doc_ref": "перечень ТО-30 000 QSK60 Gas у продавца",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "LF9050 масляный фильтр Cummins QSK60"
+    },
+    {
+      "code": "3101870",
+      "issuer": "Cummins",
+      "description": "Фильтр масляный (кросс Fleetguard LF9050)",
+      "machine": "GQSK60-G (QSK60G)",
+      "unit": "система смазки",
+      "doc_ref": "каталог продавца по модели gqsk60g",
+      "source_url": "http://intertrek.info/engines/cummins/gqsk60g",
+      "quote": "3101870 Фильтр масляный; ; Fleetguard; LF9050"
+    },
+    {
+      "code": "WF2075",
+      "issuer": "Fleetguard",
+      "description": "Фильтр охлаждающей жидкости",
+      "machine": "QSK60 (дизельный и газовый)",
+      "unit": "система охлаждения",
+      "doc_ref": "перечень ТО-30 000 QSK60 Gas у продавца",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "WF2075 фильтр охлаждающей жидкости Cummins QSK60 (дизель/газ)"
+    },
+    {
+      "code": "LF16031",
+      "issuer": "Fleetguard",
+      "description": "Масляный фильтр (картридж). У продавца Интер-Трек в строке марка «A/m USA» — неоригинал под номер OEM",
+      "machine": "QSV91G",
+      "unit": "система смазки",
+      "doc_ref": "каталог продавца по модели qsv91g",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91g",
+      "quote": "LF16031 Фильтр; FLEETGUARD Filter Replacement"
+    },
+    {
+      "code": "4010887",
+      "issuer": "Cummins",
+      "description": "Бумажный элемент центробежного (перепускного) масляного фильтра — ELEMENT,OIL BYPASS FILTER",
+      "machine": "QSV91",
+      "unit": "система смазки — центрифуга",
+      "doc_ref": "каталог продавца по модели qsv91",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91",
+      "quote": "4010887 Бумажная вставка фильтра центрифуги масла; ELEMENT,OIL BYPASS FILTER"
+    },
+    {
+      "code": "4011521",
+      "issuer": "Cummins",
+      "description": "Фильтрующий элемент сапуна — ELEMENT,BREATHER",
+      "machine": "QSV91; у продавца Цезарь-Нева также для GQSK60",
+      "unit": "вентиляция картера",
+      "doc_ref": "каталог продавца по модели qsv91",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91",
+      "quote": "4011521 Элемент системы вентиляции картера; ELEMENT,BREATHER"
+    },
+    {
+      "code": "4011553",
+      "issuer": "Cummins",
+      "description": "Фильтр макрочастиц газа (FILTER,PARTICULATE): по Цезарь-Нева — газовый фильтр 3\" DN80 (до 3 бар)",
+      "machine": "QSV91G, GQSK60",
+      "unit": "газовая рампа — фильтр газа",
+      "doc_ref": "каталог продавца по GQSK-60G",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "4011553 фильтр твердых частиц для Cummins QSV91G / GQSK60 (оригинал)"
+    },
+    {
+      "code": "AF25708M",
+      "issuer": "Fleetguard",
+      "description": "Воздушный фильтр (опция AC4077, исполнение большой мощности)",
+      "machine": "QSK19G, GQTA19-GS",
+      "unit": "впуск воздуха",
+      "doc_ref": "каталог продавца по модели qsk19g",
+      "source_url": "http://intertrek.info/engines/cummins/qsk19g",
+      "quote": "AF25708M Воздушный фильтр (опция АС4077, большая мощность)(AF25708M)"
+    },
+    {
+      "code": "3924758S",
+      "issuer": "Cummins (обозначение продавца, опция CN4001)",
+      "description": "Топливный (газовый) фильтр",
+      "machine": "QSK19G, GQTA19-GS",
+      "unit": "газовая система",
+      "doc_ref": "каталог продавца по модели qsk19g",
+      "source_url": "http://intertrek.info/engines/cummins/qsk19g",
+      "quote": "3924758S Топливный (ГАЗ) фильтр (CN4001); ; original"
+    },
+    {
+      "code": "4380132",
+      "issuer": "Cummins",
+      "description": "Свеча зажигания; по dieselengines.parts заменяет 5544762; кросс ERS 18.049-01 (заодно указаны 4390446 и 5544762)",
+      "machine": "QSK60G, агрегат C1540N5CC",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по qsk60g, стр. 2; подтверждение — листовка Hatraco/ERS",
+      "source_url": "http://intertrek.info/engines/cummins/qsk60g?page=2",
+      "quote": "4380132 Свеча зажигания Двигатели Сummins C1540N5CC"
+    },
+    {
+      "code": "18.049-01",
+      "issuer": "ERS (Австрия), распространяет Hatraco — аналог, не номер Cummins",
+      "description": "Свеча зажигания M18×1,5, длина резьбы 19 мм, момент 55±5 Н·м; кросс Cummins 4380132 / 4390446 / 5544762",
+      "machine": "QSK60 газовый 1,54 МВт",
+      "unit": "система зажигания",
+      "doc_ref": "листовка ERS/Hatraco 02-2025-V1.03",
+      "source_url": "https://www.hatraco.com/sites/default/files/downloads/Flyer-ERS-Cummins-QSK60-02-2025-V1.03.pdf",
+      "quote": "CROSS REF 18.049-01"
+    },
+    {
+      "code": "4924504",
+      "issuer": "Cummins",
+      "description": "Свеча зажигания; по dieselengines.parts заменяет 5373898",
+      "machine": "QSV91G, QSK60G",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по GQSK-60G",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "4924504 Свеча зажигания для двигателей Cummins QSV91G / QSK60G"
+    },
+    {
+      "code": "5373898",
+      "issuer": "Cummins",
+      "description": "Свеча зажигания (альтернативный номер 4302738; позднее заменена на 4924504)",
+      "machine": "QSV91G; у продавца также QSV81G, QSK19G, QSK45G, QSK60G, QSK38G, QSK50G",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по модели qsv91g",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91g",
+      "quote": "5373898 Свеча зажигания; PLUG,SPARK ; Cummins; 4302738"
+    },
+    {
+      "code": "0242356503",
+      "issuer": "Bosch",
+      "description": "Свеча зажигания газового двигателя Bosch 7305 Double Iridium (кросс Denso GI3-1/GI3-5, BERU 18GZ6-77-2)",
+      "machine": "QSV81G, QSV91G, QSK19G, QSK45G, QSK60G, QSK38G, QSK50G",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по модели qsv91g",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91g",
+      "quote": "0242356503 Свеча зажигания газового двигателя; Spark Plug 7305 Double Ir - MR3DII360 Platinum - GI3-1 / GI3-5, 18GZ6-77-2 ; Bosch"
+    },
+    {
+      "code": "2866879",
+      "issuer": "Cummins",
+      "description": "Свеча зажигания",
+      "machine": "QSK19G, GQTA19-GS",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по модели qsk19g; тот же номер в кросс-листе Techie",
+      "source_url": "http://intertrek.info/engines/cummins/qsk19g",
+      "quote": "2866879 Свеча зажигания; ; Cummins"
+    },
+    {
+      "code": "4924948",
+      "issuer": "Cummins",
+      "description": "Провод свечи зажигания с наконечником — WIRE,SPARK PLUG",
+      "machine": "QSK19G, GQTA19-GS",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по модели qsk19g",
+      "source_url": "http://intertrek.info/engines/cummins/qsk19g",
+      "quote": "4924948 свечной наконечник с проводом; WIRE,SPARK PLUG"
+    },
+    {
+      "code": "5634409",
+      "issuer": "Cummins",
+      "description": "Катушка зажигания — COIL,IGNITION",
+      "machine": "GQSK60G (QSK60G)",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по модели gqsk60g",
+      "source_url": "http://intertrek.info/engines/cummins/gqsk60g",
+      "quote": "5634409 катушка зажигания; COIL,IGNITION ; Cummins; 563440900"
+    },
+    {
+      "code": "5634407",
+      "issuer": "Cummins",
+      "description": "Катушка зажигания в сборе (альтернативный номер 4390431); аналог Techie TICS9145",
+      "machine": "GQSK60 Gas (QSK60G)",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по GQSK-60G; кросс в листе Techie",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "5634407 / 4390431 Катушка зажигания в сборе Cummins GQSK60 Gas"
+    },
+    {
+      "code": "5634410",
+      "issuer": "Cummins",
+      "description": "Катушка зажигания (альтернативный номер 5373046); аналог Techie TICS9914",
+      "machine": "QSV91G",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по qsv91g, стр. 2",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91g?page=1",
+      "quote": "5634410 Катушка зажигания 5373046/5634410"
+    },
+    {
+      "code": "4067146",
+      "issuer": "Cummins",
+      "description": "Прокладка катушки зажигания — Gasket - Ignition Coil. У продавца Интер-Трек в строке марка «A/m USA» — неоригинал под номер OEM",
+      "machine": "GQSK60-G (QSK60G)",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по модели gqsk60g",
+      "source_url": "http://intertrek.info/engines/cummins/gqsk60g",
+      "quote": "4067146 Прокладка катушки зажигания; Gasket - Ignition Coil"
+    },
+    {
+      "code": "5471748",
+      "issuer": "Cummins",
+      "description": "Уплотнение катушки, колпачок свечи — BOOT,SPARK PLUG",
+      "machine": "QSV91G; у продавца Цезарь-Нева — «Cummins QSK»",
+      "unit": "система зажигания",
+      "doc_ref": "каталог продавца по qsv91g, стр. 2",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91g?page=1",
+      "quote": "5471748 Уплотнение катушки (колпачек обод свечи зажигания)"
+    },
+    {
+      "code": "3072541",
+      "issuer": "Cummins",
+      "description": "Уплотнительное кольцо свечи зажигания — GASKET,SPARK PLUG (альтернативный номер 2886854)",
+      "machine": "QSV91",
+      "unit": "система зажигания / головка цилиндров",
+      "doc_ref": "каталог продавца по модели qsv91",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91",
+      "quote": "3072541 Уплотнительное кольцо свечи зажигания газопоршневого двигателя Cummins QSV91 3072541; GASKET,SPARK PLUG"
+    },
+    {
+      "code": "4924320",
+      "issuer": "Cummins",
+      "description": "Модуль управления зажиганием (у продавца Интер-Трек — для QSV91, заменяет 3608005)",
+      "machine": "QSK60G, QSV91",
+      "unit": "система зажигания — электроника",
+      "doc_ref": "каталог продавца по GQSK-60G",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "4924320 Модуль управления зажиганием Cummins QSK60G"
+    },
+    {
+      "code": "3607945",
+      "issuer": "Cummins",
+      "description": "Датчик детонации (альтернативный номер 2897654)",
+      "machine": "QSK60G",
+      "unit": "датчики и управление",
+      "doc_ref": "каталог продавца по GQSK-60G",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "3607945 / 2897654 Датчик детонации Cummins QSK60G (оригинал)"
+    },
+    {
+      "code": "3408503",
+      "issuer": "Cummins",
+      "description": "Датчик положения коленчатого вала — POSITION SENSOR. У продавца Интер-Трек в строке марка «A/m USA» — неоригинал под номер OEM",
+      "machine": "GQSK60-G (QSK60G)",
+      "unit": "датчики и управление",
+      "doc_ref": "каталог продавца по модели gqsk60g",
+      "source_url": "http://intertrek.info/engines/cummins/gqsk60g",
+      "quote": "3408503 Датчик положения коленчатого вала; POSITION SENSOR"
+    },
+    {
+      "code": "3644455",
+      "issuer": "Cummins",
+      "description": "Термопара выхлопных газов — SENSOR,TEMPERATURE",
+      "machine": "QSV91G",
+      "unit": "выпуск — контроль температуры",
+      "doc_ref": "каталог продавца по qsv91g, стр. 2",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91g?page=1",
+      "quote": "3644455 Датчик температуры выхлопных газов термпопара; SENSOR,TEMPERATURE"
+    },
+    {
+      "code": "3929935",
+      "issuer": "Cummins",
+      "description": "Датчик массового расхода газа (альтернативный номер 5482154)",
+      "machine": "QSV91G, QSK60G",
+      "unit": "газовая система — датчики",
+      "doc_ref": "каталог продавца по GQSK-60G; то же у Интер-Трек по qsv91g",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "3929935 5482154 датчик массового расхода газа для Cummins QSV91G/QSK60G"
+    },
+    {
+      "code": "3408558",
+      "issuer": "Cummins",
+      "description": "Датчик перепада давления на масляных фильтрах — SENSOR,PRESSURE (у Цезарь-Нева рядом стоит 5594388 и название «датчик давления масла» — замена не подтверждена; не путать с 5594386 — датчик давления топлива Danfoss MBS2100)",
+      "machine": "QSV91",
+      "unit": "система смазки — датчики",
+      "doc_ref": "каталог продавца по модели qsv91",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91",
+      "quote": "3408558 Датчик давления перепада масляных фильтров; SENSOR,PRESSURE"
+    },
+    {
+      "code": "4001675",
+      "issuer": "Cummins (у продавца указано Cummins DCEC)",
+      "description": "Датчик кислорода",
+      "machine": "QSK19G, GQTA19-GS",
+      "unit": "датчики и управление — состав смеси",
+      "doc_ref": "каталог продавца по модели qsk19g",
+      "source_url": "http://intertrek.info/engines/cummins/qsk19g",
+      "quote": "4001675 Датчик кислорода; ; Cummins DCEC"
+    },
+    {
+      "code": "3607879",
+      "issuer": "Cummins",
+      "description": "Регулятор расхода топлива (газа)",
+      "machine": "QSK60G",
+      "unit": "газовая система",
+      "doc_ref": "каталог продавца по GQSK-60G",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "3607879 Регулятор потока топлива Cummins QSK60G (оригинал)"
+    },
+    {
+      "code": "504-0262",
+      "issuer": "Cummins Power Generation",
+      "description": "Электромагнитный газовый клапан (с модулем VPS и комплектом фильтра VPS)",
+      "machine": "агрегаты QSK60G из каталога A029C810",
+      "unit": "газовая рампа агрегата",
+      "doc_ref": "A029C810 Issue 10, Gas Valve, с. 15/16/19",
+      "source_url": "https://www.wpowerproducts.com/wp-content/uploads/2020/11/Generator-Sets-with-QSK60-G-Engine-with-PowerCommand-3.3-Control-Parts-Manual-A029C810-I10-5-2020.pdf",
+      "quote": "504-0262 1 Valve, Solenoid (Includes VPS"
+    },
+    {
+      "code": "4014541",
+      "issuer": "Cummins",
+      "description": "Термостат",
+      "machine": "QSK60G (QSK60 Gas)",
+      "unit": "система охлаждения",
+      "doc_ref": "каталог продавца по GQSK-60G",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "4014541 термостат Cummins QSK60 Gas (оригинал)"
+    },
+    {
+      "code": "3649550",
+      "issuer": "Cummins",
+      "description": "Задний сальник коленвала — Seal - Oil - Flywheel Housing (альтернативный номер 4100625)",
+      "machine": "QSK60, QSK60G, QSV91G",
+      "unit": "кривошипно-шатунный механизм — уплотнения",
+      "doc_ref": "каталог продавца по GQSK-60G",
+      "source_url": "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/",
+      "quote": "3649550 / 4100625 сальник коленвала Cummins QSK60 / QSV91G (оригинал)"
+    },
+    {
+      "code": "4309261",
+      "issuer": "Cummins (турбокомпрессор Holset HX82)",
+      "description": "Турбокомпрессор HX82 DRY",
+      "machine": "QSV91G",
+      "unit": "турбонаддув",
+      "doc_ref": "каталог продавца по модели qsv91g",
+      "source_url": "http://intertrek.info/engines/cummins/qsv91g",
+      "quote": "4309261 Турбокомпрессор; TURBOCHARGER,HX82 DRY"
+    },
+    {
+      "code": "4042816",
+      "issuer": "Holset (Cummins Turbo Technologies)",
+      "description": "Турбокомпрессор HX82; номера OEM 4042817, 4042818, 4955289. На странице продавца дизельные и газовые QSK60 смешаны — применимость к газу сверить. На странице продаётся восстановленный (reman) турбокомпрессор, а не новая оригинальная деталь",
+      "machine": "QSK60, QSK60G",
+      "unit": "турбонаддув",
+      "doc_ref": "страница продавца турбокомпрессоров",
+      "source_url": "https://turboturbos.com/products/f4042816",
+      "quote": "HX82 Turbocharger Cummins Powergen CM850 QSK60 CM2150 MCRS CM500 4955289 4042816"
+    },
+    {
+      "code": "4391800",
+      "issuer": "Cummins (у продавца указано CCEC)",
+      "description": "Прокладка дроссельной заслонки — Throttle valve gasket",
+      "machine": "HSK78G",
+      "unit": "газовоздушный тракт — дроссель",
+      "doc_ref": "каталог продавца по модели hsk78g",
+      "source_url": "http://intertrek.info/engines/cummins/hsk78g",
+      "quote": "4391800 прокладка дроссельной заслонки; Throttle valve gasket ; CCEC"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Holset / Cummins Turbo Technologies",
+      "component": "турбокомпрессоры HX82 (QSV91G, QSK60G), HT60 (QSK19G)",
+      "machine": "QSV91G, QSK60G, QSK19G",
+      "evidence": "в каталогах продавцов: 4309261 «TURBOCHARGER,HX82 DRY» (QSV91G), 4089084 «TURBOCHARGER,HT60» (QSK19G); HX82 4042816 применяется на QSK60G (turboturbos). Holset принадлежит Cummins",
+      "sources": [
+        "http://intertrek.info/engines/cummins/qsv91g",
+        "http://intertrek.info/engines/cummins/qsk19g",
+        "https://turboturbos.com/products/f4042816"
+      ]
+    },
+    {
+      "company": "Newage (Stamford, Cummins Generator Technologies)",
+      "component": "синхронные генераторы HC734F/G/H, CG734F/G/H, MV734G/H; у HSK78G — P80",
+      "machine": "агрегаты QSK60G (A029C810); C2000N5CD (HSK78G); QSK19G 315/334 GFBA",
+      "evidence": "A029C810, печатная с. 65: детали генератора заказывать по шильдику Newage через дистрибьютора Newage, таблица 200-3070/3071/3100 → HC734/CG734/MV734; в D-6399g — только «HV P80T alternator», Newage там не назван; в листе QSK19G — генераторы Newage",
+      "sources": [
+        "https://www.wpowerproducts.com/wp-content/uploads/2020/11/Generator-Sets-with-QSK60-G-Engine-with-PowerCommand-3.3-Control-Parts-Manual-A029C810-I10-5-2020.pdf",
+        "https://www.cummins.com/sites/default/files/2019-08/c2000n5cd-datasheet-6399-mk.pdf",
+        "https://www.aaronequipment.com/equipmentattachments/46517003_cummins_qsk19g_spec_sheet.pdf"
+      ]
+    },
+    {
+      "company": "Fleetguard (Cummins Filtration)",
+      "component": "воздушные элементы AF25544/AF25545, масляные LF9050/LF16031, охлаждающий WF2075",
+      "machine": "QSK60G, QSV91G",
+      "evidence": "в A029C810 элементы воздухоочистителя 140-3813/140-3814 указаны с номерами AF25544/AF25545; в сервисном бюллетене 3810340 рекомендованы фильтры Fleetguard",
+      "sources": [
+        "https://www.wpowerproducts.com/wp-content/uploads/2020/11/Generator-Sets-with-QSK60-G-Engine-with-PowerCommand-3.3-Control-Parts-Manual-A029C810-I10-5-2020.pdf",
+        "https://www.plaisance-pratique.com/IMG/pdf/SBN_Oil_3810340__5jun13.pdf"
+      ]
+    },
+    {
+      "company": "Woodward",
+      "component": "привод дроссельной заслонки PROACT",
+      "machine": "QSK19G",
+      "evidence": "лист изготовителя QSK19G (01/02): «Woodward PROACT actuator to drive throttle valve»",
+      "sources": [
+        "https://www.aaronequipment.com/equipmentattachments/46517003_cummins_qsk19g_spec_sheet.pdf"
+      ]
+    },
+    {
+      "company": "Altronic",
+      "component": "индивидуальные катушки зажигания",
+      "machine": "QSK19G",
+      "evidence": "лист изготовителя QSK19G (01/02): «Ignition: Individual Altronic coils»",
+      "sources": [
+        "https://www.aaronequipment.com/equipmentattachments/46517003_cummins_qsk19g_spec_sheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "DEIF",
+      "component": "контроллеры генераторной установки (как альтернатива PowerCommand 3.3)",
+      "machine": "QSK60G (C995…C1540N5CC, 60 Гц), HSK78G (C…CD)",
+      "evidence": "бюллетень 5600281, графа «Available controls»: «PC3.3 / DEIF» и «DEIF / ComAp»",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ]
+    },
+    {
+      "company": "ComAp",
+      "component": "контроллеры генераторной установки",
+      "machine": "HSK78G (C1600/C1800/C2000 N5CD)",
+      "evidence": "бюллетень 5600281: «DEIF / ComAp» для моделей HSK78G",
+      "sources": [
+        "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf"
+      ]
+    },
+    {
+      "company": "Arcusaflex",
+      "component": "упругая муфта привода генератора AC 11 F2.21.184 (Cummins 0512-0381, для генератора P7)",
+      "machine": "QSV91G",
+      "evidence": "каталог продавца: «COUPLING DRIVE RUBBER EL (Arcusaflex AC 11 SN F2 21 184 SAE21” 0512-0381 QSV P7 F-G Core)»",
+      "sources": [
+        "http://intertrek.info/engines/cummins/qsv91g"
+      ]
+    },
+    {
+      "company": "Danfoss",
+      "component": "датчик давления MBS2100 (Cummins 5594386 → 3408549)",
+      "machine": "QSV91G, QSK60, QSK38, QSK19",
+      "evidence": "каталог продавца: «Pressure Sensor MBS2100 / 06063487 Danfoss 060G4459 / 060G4602»",
+      "sources": [
+        "http://intertrek.info/engines/cummins/qsv91g?page=1"
+      ]
+    },
+    {
+      "company": "Bosch",
+      "component": "свечи зажигания (прежние QSV91 4098162, 4090121 — марки Bosch; аналог 0242356503 / 7305); стартер (кросс 0001615002 к Cummins 3425355)",
+      "machine": "QSV91G, QSK60G, QSK19G",
+      "evidence": "в каталоге продавца марка в графе производителя — Bosch; номер стартера в формате Bosch. Что Bosch — штатный поставщик Cummins, прямо не подтверждено",
+      "sources": [
+        "http://intertrek.info/engines/cummins/qsv91",
+        "http://intertrek.info/engines/cummins/qsv91g?page=1"
+      ]
+    },
+    {
+      "company": "Chongqing Cummins Engine Co. (CCEC, совместное предприятие Cummins)",
+      "component": "двигатели K/QSK и детали: термостаты и помпы QSK19G, прокладка дросселя HSK78G; газовые двигатели 19–50 л",
+      "machine": "QSK19G, HSK78G",
+      "evidence": "в каталоге продавца у позиций QSK19G производитель указан как «Cummins CCEC» (3076489, 3098964), у 4391800 (HSK78G) — «CCEC»; газовый ряд 19–50 л, 343–1100 кВт — по выдержке поиска, сама страница CCEC не открылась",
+      "sources": [
+        "http://intertrek.info/engines/cummins/qsk19g",
+        "http://intertrek.info/engines/cummins/hsk78g",
+        "https://www.cummins-cq.com/details.aspx?id=08bd4e93-cc58-44a1-8def-727e424fed72"
+      ]
+    },
+    {
+      "company": "MAHLE",
+      "component": "упорные полукольца TW703S (Cummins 4023083), поршневые кольца 3410861",
+      "machine": "QSV91G, GQSK60-G",
+      "evidence": "каталог продавца: «THRUST WASHER SET (#TW703S) (CUMMINS ENGINE CO.) ; MAHLE; 4023083»; кольцо 3410861 марки Mahle. OEM или аналог — не установлено",
+      "sources": [
+        "http://intertrek.info/engines/cummins/qsv91g?page=1",
+        "http://intertrek.info/engines/cummins/gqsk60g"
+      ]
+    },
+    {
+      "company": "Valvoline",
+      "component": "моторное масло SAE 40 для газовых двигателей (GEO LA)",
+      "machine": "QSK45G, QSK60G, QSV81G, QSV91G",
+      "evidence": "сервисный бюллетень 3810340: «Use high quality SAE40 CNG engine oil, such as Valvoline GEO LA»",
+      "sources": [
+        "https://www.plaisance-pratique.com/IMG/pdf/SBN_Oil_3810340__5jun13.pdf"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Cummins Middle East FZE",
+      "country": "ОАЭ (Jebel Ali Free Zone)",
+      "role": "собственный дистрибьютор Cummins Inc.: дистрибуция, энергетика (Power Generation), двигатели, послепродажная поддержка; зона — страны Ближнего Востока, Пакистан, Афганистан, Египет, Казахстан",
+      "sources": [
+        "https://www.aeconline.ae/cummins-middle-east-fze/company.html"
+      ]
+    },
+    {
+      "company": "Cummins Turkey Motor Güç Sistemleri Satış Servis Ltd. Şti.",
+      "country": "Турция (Стамбул)",
+      "role": "собственный и единственный уполномоченный дистрибьютор Cummins Inc. в Турции: двигатели, генераторные установки, запчасти",
+      "sources": [
+        "https://imder.org.tr/cummins-turkey-motor-guc-sistemleri-satis-servis-ltd-sti/"
+      ]
+    },
+    {
+      "company": "SGS Power",
+      "country": "Турция (Тузла, Стамбул)",
+      "role": "уполномоченный дилер Cummins (морской и промышленный сектор), оригинальные запчасти Cummins и Cummins Onan",
+      "sources": [
+        "https://www.sgspower.com.tr/en/"
+      ]
+    },
+    {
+      "company": "Cummins Sales and Services Kazakhstan LLP",
+      "country": "Казахстан (Караганда, головной офис)",
+      "role": "отделение Cummins по продажам и сервису: ремонт, гарантия, восстановление двигателей и узлов. Страница Cummins нашему загрузчику отдала 403, данные — по выдержке поиска",
+      "sources": [
+        "https://www.cummins.com/en-na/locations/kazakhstan/karaganda/cummins-sales-and-services-kazakhstan-llp-hq"
+      ]
+    },
+    {
+      "company": "ООО «Техзапчасти Интер-Трек»",
+      "country": "Россия",
+      "role": "независимый продавец запчастей; открытый каталог по моделям QSK60G, GQSK60G, QSV91G, QSK19G, HSK78G. Официальный статус не заявлен",
+      "sources": [
+        "http://intertrek.info/engines/cummins/qsv91g",
+        "http://intertrek.info/engines/cummins/gqsk60g"
+      ]
+    },
+    {
+      "company": "Цезарь-Нева (Caesar-Neva)",
+      "country": "Россия",
+      "role": "независимый продавец запчастей на GQSK60-G и QSV91G, в том числе комплект ТО-30 000 (фильтры, свечи, катушки, датчики)",
+      "sources": [
+        "https://caesar-neva.ru/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-cummins-gqsk-60g/"
+      ]
+    },
+    {
+      "company": "Детройт-СТ",
+      "country": "Россия (Екатеринбург)",
+      "role": "независимый продавец запчастей и ремонт газовых Cummins QSK 23G/38G/50G/60G/78G: диагностика, текущий и капитальный ремонт, ремонт ГБЦ; оригинал и аналоги CCEC, PAI, IPD, KMP",
+      "sources": [
+        "https://detroit-st.ru/motors/cummins/cummins-qsk-23g-38g-50g-60g-78-gazovye/"
+      ]
+    },
+    {
+      "company": "ГрандМоторс",
+      "country": "Россия",
+      "role": "независимый сервис: диагностика, ТО и ремонт QSK60G (по выдержке поиска, текст страницы прочитан не полностью)",
+      "sources": [
+        "https://eng.grandmotors.ru/engines/cummins_qsk60g.php"
+      ]
+    },
+    {
+      "company": "Soar Power Group (斯奥动力集团)",
+      "country": "Китай",
+      "role": "поставщик газовых генераторных установок Cummins от 315 до 2000 кВт (по выдержке поиска); на сайте лежит спецификация Cummins S-1466e. Статус официального дистрибьютора не подтверждён",
+      "sources": [
+        "https://www.soarpower.com/apply/4",
+        "http://www.soarpower.com/pdf/C1160N5C.QSK60_english.pdf"
+      ]
+    },
+    {
+      "company": "Cummins India Ltd",
+      "country": "Индия",
+      "role": "дочерняя компания группы Cummins; двигатели HHP (завод Kothrud, Пуна), газовые генераторные установки lean-burn и на метане угольных пластов от 995 до 2000 кВт·э — по выдержкам поиска",
+      "sources": [
+        "https://www.cummins.com/en-na/en/in/generators/natural-gas-cbm",
+        "https://www.cummins.com/en-na/en/in/company/india-companies/cummins-india-limited"
+      ]
+    },
+    {
+      "company": "Techie (Shenzhen)",
+      "country": "Китай",
+      "role": "производитель и поставщик аналогов: свечи TISS98xx (кросс Cummins 5373898/4924504-ряд, 5504704), катушки TICS9145 (кросс 5634407, QSK60G), TICS9914 (кросс 5634410, QSV91)",
+      "sources": [
+        "https://www.techiepowerparts.com/application/cummins-gas-engine/"
+      ]
+    },
+    {
+      "company": "Hatraco (дистрибьютор свечей ERS)",
+      "country": "Нидерланды",
+      "role": "независимый поставщик аналогов для газовых двигателей: свеча ERS 18.049-01 для QSK60 1,54 МВт",
+      "sources": [
+        "https://www.hatraco.com/sites/default/files/downloads/Flyer-ERS-Cummins-QSK60-02-2025-V1.03.pdf"
+      ]
+    }
+  ],
+  "gaps": [
+    "Каталоги запчастей самого двигателя (Parts Catalog по ESN) QSK60G, QSV91G, HSK78G и QSK19G открыто не найдены: они в Cummins QuickServe Online (по подписке). Литература incal.cummins.com требует входа SAML. Двигательные коды в этом ответе взяты из каталогов перепродавцов, а не из документов изготовителя.",
+    "Номера руководств по эксплуатации и ремонту газовых двигателей не подтверждены. 4021314 и 4021315 (QSV81/91G), CU07-109 и CU07-110 (QSK60G) встретились только в выдержках поиска. 908-0209 найден лишь как название на scribd и pdfcoffee (pdfcoffee вернул 403), содержание не проверено.",
+    "Регламент ТО (интервалы замены свечей, фильтров, масла; зазор свечи) и уставки не собраны: они в O&M-руководствах, которые закрыты.",
+    "Цепочки замены номеров надо сверять в QuickServe: свечи 5373898 / 4302738 / 4924504 / 4098162 / 4010981 / 2866879 и 4380132 / 4390446 / 5544762; катушки 5373046 / 5634410 / 4327849 и 5634407 / 4390431. Источники расходятся, какой номер действует сейчас.",
+    "Каталог Интер-Трек по адресу qsk60g смешивает газовые и дизельные позиции (QSK60-G4/G8 — дизель, агрегат C2500D5A). Такие строки исключены. Страница HX82 4042816 тоже смешивает дизель и газ: применимость к QSK60G сверить.",
+    "Модели и мощности серии C25G не найдены. Страницы cummins.com/generators/* нашему загрузчику отдают 403. Модельный ряд и данные могут лежать на powersuite.cummins.com (нужен вход).",
+    "Статус QSV91G и QSK19G (выпускаются или сняты) прямо не подтверждён. В брошюре QSK60G 2025 г. на графике КПД есть только C25G, QSK60G и HSK78G.",
+    "Китайские источники (сайт CCEC cummins-cq.com, Soar Power, weyeahparts) давали 500/503 или обрыв соединения. Газовый ряд CCEC, производство HSK78G и перечень китайских дистрибьюторов известны только по выдержкам поиска.",
+    "Официального дистрибьютора Cummins в России нет: 17.03.2022 совет директоров приостановил деятельность в России; до этого там были собственный дистрибьютор и совместное предприятие с КАМАЗом (форма 10-K за 2022 г., https://www.sec.gov/Archives/edgar/data/26172/000002617223000005/cmi-20221231.htm). Найдены только независимые продавцы и ремонтники. Дистрибьюторы по Узбекистану, Беларуси и Индии (по газовым ГПУ) не установлены: локатор дистрибьюторов Cummins работает на JS.",
+    "Изготовители ряда узлов прямо не установлены: газовая рампа и VPS (504-0262, вероятно Dungs — не подтверждено), датчики детонации, модуль зажигания, картриджи подшипников генератора 800-30015 и 800-10475 (есть у Цезарь-Нева, чей номер — неясно), турбокомпрессор QSK60G по исполнениям (одна или две турбины).",
+    "В PDF A029C810 дефис в номерах набран знаком «минус» (U+2212); в кодах и цитатах он заменён на обычный дефис."
+  ],
+  "verifier_notes": "Все 40 кодов, 24 модели и 13 субпоставщиков сверены с первоисточниками. Страницы скачаны заново (curl + pdftotext), коды найдены поиском по тексту. Недоступен один источник — cummins-cq.com (HTTP 500); он был дополнительным, у записи CCEC есть другие подтверждения. Бюллетень 3810340 открылся со второй попытки.\n\nЧто исправить в записях:\n1) 4011553. Узел указан неверно. Цезарь-Нева прямо пишет: «Фильтр макрочастиц — газовый фильтр 3” DN80 (до 3 бар)». Это газовая рампа, а не смазка и не вентиляция картера.\n2) 3408558. Слово «заменён на 5594388» продавцом не подтверждено: Цезарь-Нева просто ставит номера рядом и называет изделие «датчик давления масла», а Интер-Трек — «датчик перепада на масляных фильтрах». Кроме того, у Интер-Трека есть похожий номер 5594386 — это датчик давления топлива Danfoss MBS2100. Номера 5594386 и 5594388 легко спутать, их надо развести.\n3) AF25545. Интер-Трек (qsv91) называет его «основной», но по A029C810 это Safety, то есть предохранительный. Верен каталог изготовителя.\n4) Newage. Генераторный раздел A029C810 — печатная с. 65, а не 64. D-6399g пишет только «HV P80T alternator» и Newage не называет.\n5) 18.049-01. «19 мм» — это длина резьбы (thread reach), а не размер резьбы. Резьба — M18x1,5.\n6) 4042816. На turboturbos продаётся восстановленный (reman) турбокомпрессор. Номер подтверждён, но это не предложение новой оригинальной детали.\n7) У 3408503, 4067146, LF16031 и AF25544/AF25545 в строках Интер-Трека стоит марка «A/m USA», то есть неоригинал под номер OEM. Сами номера принадлежат Cummins и Fleetguard, но у этого продавца — не оригинал.\n\nВсе побочные утверждения в описаниях тоже нашлись в источниках: цепочки замен свечей на dieselengines.parts (4380132 заменила 5544762, 4924504 заменила 5373898), кроссы Techie TICS9145 → 5634407 и TICS9914 → 5634410, номер 2866879 в кросс-листе Techie.\n\nСкачанные тексты лежат в рабочей папке сессии разведки, в репозиторий они не входят",
+  "corrections": [
+    "4011553: узел исправлен на газовую рампу (фильтр газа 3\" DN80), а не смазка и вентиляция картера — по замечанию скептика 1",
+    "3408558: снято неподтверждённое «заменён на 5594388», разведены номера 5594386 и 5594388 — замечание 2",
+    "18.049-01: 19 мм — длина резьбы, а не её размер (резьба M18×1,5) — замечание 5",
+    "4042816: отмечено, что продавец предлагает восстановленный агрегат — замечание 6",
+    "3408503, 4067146, LF16031: отмечена марка «A/m USA» у Интер-Трека — неоригинал под номер OEM — замечание 7",
+    "Newage: страница A029C810 исправлена на печатную 65; отмечено, что D-6399g Newage не называет — замечание 4",
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет"
+  ]
+}

@@ -1,0 +1,1196 @@
+{
+  "oem_key": "epiroc",
+  "name": "Epiroc",
+  "segment_focus": "подземные буровые установки Boomer, Simba, погрузчики Scooptram, перфораторы COP; расходники и износ",
+  "researched_at": "2026-09-24",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Проверена подземная линейка Epiroc: проходческие установки Boomer, установки для бурения глубоких скважин Simba, погрузчики Scooptram и перфораторы COP. Сайты epiroc.com и epirocgroup.com отвечают автоматическому запросу кодом 403, поэтому технические спецификации и буклеты прочитаны в полном тексте через CDN изготовителя epiroc.scene7.com. Это 10 спецификаций установок (серия 9869), спецификация ST1030 времён Atlas Copco (9851 2455 01i) и 2 буклета перфораторов COP (9865 0039 01 и 9865 0209 01). В буклетах COP изготовитель сам даёт номера ремкомплектов уплотнений и комплектов ТО, а также состав малого и большого комплекта ТО для COP 1838HD+. Отсюда 18 кодов с издателем «сам Epiroc». Остальные 22 кода — это номера Epiroc на сайтах неофициальных поставщиков (Турция: BK Drilling, DrifterParts, Delkom; Китай: FMRIBT), в том числе фильтры двигателя, гидравлики и трансмиссии для Boomer 282/S1D/E2 C/L2D/M2D и Scooptram ST1020. Применимость по машине там указана продавцом: перед запросом цены её нужно сверить с каталогом запчастей Epiroc. Субпоставщики узлов установлены по собственным спецификациям Epiroc: двигатели Deutz на Boomer и Simba, Cummins на Scooptram, мосты Dana/Spicer, Kessler и Okubo, трансмиссии Dana, Funk и Clark, электродвигатели ABB на ST14 SG, пожаротушение Ansul, компрессоры Atlas Copco. Фильтры установок текущего поколения (Boomer S2/M2/E2, Simba E7/M4/S7, Scooptram ST7/ST14 S) в открытых источниках не найдены. Официального дилера в России нет: Epiroc прекратила поставки 1 марта 2022 г.; найдены только независимые поставщики.",
+  "machines": [
+    {
+      "model": "Boomer S2",
+      "kind": "проходческая (забойная) буровая установка, 2 стрелы",
+      "segment": "ГШО",
+      "rating": "площадь забоя до 56 м²; Deutz TCD 3.6 85–90 кВт; перфораторы COP MD20 / 1638HD+ / 1838HD+ / 2238HD+",
+      "status": "выпускается (спецификация 9869 0090 01b, 2022-02)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0090_01b_Boomer_S2_technical_specification_englishpdf",
+        "https://www.epiroc.com/en-us/products/drill-rigs/face-drill-rigs/boomers2"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Boomer 282",
+      "kind": "проходческая буровая установка, 2 стрелы (стрелы BUT 28, податчики BMH 2800)",
+      "segment": "ГШО",
+      "rating": "площадь забоя до 45 м²; COP 1638HD+ / 1838HD+; Deutz D914 L04 / BF4L 914 / TCD3.6",
+      "status": "выпускается (спецификация 9869 0030 01a, 2020-07)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0030_01a_Boomer_282_technical_specification_englishpdf",
+        "https://www.epiroc.com/en-us/products/drill-rigs/face-drill-rigs/boomer-282",
+        "https://www.marespareparts.com/282boomer-atlascopco-epiroc"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Boomer M-series (M2)",
+      "kind": "проходческая буровая установка",
+      "segment": "ГШО",
+      "rating": "площадь забоя до 65 м²; Deutz TCD 2013 L04 / 4.1 L04 / 6.1 L06, 115–129 кВт; COP 1838 / 2238 / 3038 / MD20",
+      "status": "выпускается (спецификация 9869 0080 01f, 2022-02)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0080_01f_Boomer_M-series_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Boomer E1/E2-series",
+      "kind": "проходческая буровая установка для больших сечений",
+      "segment": "ГШО",
+      "rating": "сечение до 112 м²; Deutz TCD 2013 / 4.1 / 6.1; COP 1838 / 2238 / 3038 / 4038 / MD20",
+      "status": "выпускается (спецификация 9869 0063 01g, 2019-05)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0063_01g_Boomer_E1_E2-series_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Boomer S1D",
+      "kind": "проходческая буровая установка, 1 стрела",
+      "segment": "ГШО",
+      "rating": "прежнее поколение (D-серия)",
+      "status": "прежнее поколение, в эксплуатации; статус выпуска не подтверждён",
+      "sources": [
+        "https://hydraulicrockdrill.com/shop/seal-kit-65/",
+        "https://bkdrilling.com/spare-parts/epiroc/5112-0121-87-oil-filter"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Boomer L2D",
+      "kind": "проходческая буровая установка, 2 стрелы",
+      "segment": "ГШО",
+      "rating": "прежнее поколение (D-серия)",
+      "status": "прежнее поколение, в эксплуатации; статус выпуска не подтверждён",
+      "sources": [
+        "http://www.drifterparts.com/boomerl2d.html",
+        "https://bkdrilling.com/spare-parts/epiroc/5112-3230-27-fuel-filter"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Boomer M2D",
+      "kind": "проходческая буровая установка, 2 стрелы",
+      "segment": "ГШО",
+      "rating": "прежнее поколение (D-серия)",
+      "status": "прежнее поколение, в эксплуатации; статус выпуска не подтверждён",
+      "sources": [
+        "https://bkdrilling.com/spare-parts/epiroc/8231-1079-46-return-filter"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Boomer E2 C",
+      "kind": "проходческая буровая установка, 2 стрелы",
+      "segment": "ГШО",
+      "rating": "прежнее поколение (C-серия)",
+      "status": "прежнее поколение, в эксплуатации",
+      "sources": [
+        "https://bkdrilling.com/spare-parts/epiroc/5112-3230-27-fuel-filter"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Simba E7 (E7 C)",
+      "kind": "установка для бурения глубоких скважин (добычная)",
+      "segment": "ГШО",
+      "rating": "скважины 51–178 мм; Deutz 115–180 кВт; COP 1838+ / 1838+MUX / 2550UX+ / 3060MUX / 4050, пневмоударники COP 35/44/54/64",
+      "status": "выпускается (спецификация 9869 0081 01e, 2020-11)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0081_01e_simba_E7-series_technical_specification_englishpdf",
+        "https://www.epiroc.com/en-za/products/drill-rigs/production-drill-rigs/simba-e7"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Simba M4 (M4 C)",
+      "kind": "установка для бурения глубоких скважин (добычная)",
+      "segment": "ГШО",
+      "rating": "скважины 51–178 мм; Deutz TCD 2012/2013/4.1/6.1",
+      "status": "выпускается (спецификация 9869 0070 01f, 2022-01)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0070_01f_Simba_M4_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Simba S7 (S7 D)",
+      "kind": "компактная установка для бурения глубоких скважин",
+      "segment": "ГШО",
+      "rating": "COP 1838ME / 1838MUX / 1838+ / 1838MUX+; Deutz 55–72 кВт",
+      "status": "выпускается (спецификация 9869 0087 01e, 2023-05)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0087_01e_Simba_S7_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Scooptram ST7",
+      "kind": "подземный погрузчик (ПДМ), дизельный",
+      "segment": "ГШО",
+      "rating": "6,8 т; Cummins QSB6.7 144 кВт; трансмиссия Funk DF150; мосты Okubo Rock Tough 406",
+      "status": "выпускается (спецификация 9869 0107 01d, 2025-09)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf",
+        "https://www.epiroc.com/en-in/products/loaders-and-trucks/diesel-loaders/scooptram-st7"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Scooptram ST14 S",
+      "kind": "подземный погрузчик (ПДМ), дизельный",
+      "segment": "ГШО",
+      "rating": "14 т; Cummins QSM11 или X12, 250 кВт; Dana TE32; Kessler D106",
+      "status": "выпускается (спецификация 9869 0234 01b, 2025-04)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+        "https://www.epiroc.com/en-us/products/loaders-and-trucks/diesel-loaders/scooptram-st14"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Scooptram ST14 SG",
+      "kind": "подземный погрузчик (ПДМ), аккумуляторный",
+      "segment": "ГШО",
+      "rating": "14 т; электродвигатели ABB 200 кВт и 150 кВт; Dana ERTE32; Kessler D106",
+      "status": "выпускается (спецификация 9869 0237 01b, 2025-04)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0237+01b+Scooptram+14+SG+Technical+Specification_digitalpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Scooptram ST14 (прежняя версия)",
+      "kind": "подземный погрузчик (ПДМ), дизельный",
+      "segment": "ГШО",
+      "rating": "14 т; Cummins QSM11; Dana TE32; Kessler D106",
+      "status": "прежняя версия; Epiroc предлагает её восстановленной (Remanufactured)",
+      "sources": [
+        "https://epiroc.blog/hubfs/Remanufactured%20Scooptram%20ST14.pdf?hsLang=en"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Scooptram ST1030",
+      "kind": "подземный погрузчик (ПДМ), дизельный",
+      "segment": "ГШО",
+      "rating": "10 т; Cummins QSL9 C250 186 кВт; Funk DF250; Kessler D102",
+      "status": "спецификация Atlas Copco 9851 2455 01i; страница продукта есть на epiroc.com/en-us",
+      "sources": [
+        "https://dukraft.com/wp-content/uploads/2020/07/Technical-specification-ST1030.pdf",
+        "https://www.epiroc.com/en-us/products/loaders-and-trucks/diesel-loaders/scooptram-st1030"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Scooptram ST1020",
+      "kind": "подземный погрузчик (ПДМ), дизельный",
+      "segment": "ГШО",
+      "rating": "прежнее поколение",
+      "status": "прежнее поколение, в эксплуатации",
+      "sources": [
+        "https://bkdrilling.com/spare-parts/epiroc/5541-7621-00-oil-filter"
+      ],
+      "verified": true
+    },
+    {
+      "model": "COP 1838HD+",
+      "kind": "гидравлический перфоратор",
+      "segment": "ГШО",
+      "rating": "ударная мощность 18 кВт, подводимая 31 кВт, 60 Гц; шпуры 38–64 мм",
+      "status": "выпускается (буклет 9865 0039 01, 2018-05)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "COP 1638+",
+      "kind": "гидравлический перфоратор",
+      "segment": "ГШО",
+      "rating": "ударная мощность 16 кВт, 200 бар, 60 Гц",
+      "status": "выпускается (буклет 9865 0209 01, 2019-05)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "COP 1838+",
+      "kind": "гидравлический перфоратор",
+      "segment": "ГШО",
+      "rating": "ударная мощность 18 кВт, 230 бар, 60 Гц; шпуры и скважины 33–76 мм (серия)",
+      "status": "выпускается",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf",
+        "https://www.epiroc.com/en-ye/products/parts-and-services/rock-drills-and-rotation-units/rock-drills/cop-1838-plus"
+      ],
+      "verified": true
+    },
+    {
+      "model": "COP 2238+",
+      "kind": "гидравлический перфоратор",
+      "segment": "ГШО",
+      "rating": "ударная мощность 22 кВт, 250 бар, 73 Гц",
+      "status": "выпускается",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "COP 1838ME / COP 1838MUX",
+      "kind": "гидравлический перфоратор (установлен на Simba S7)",
+      "segment": "ГШО",
+      "rating": "класс 18 кВт",
+      "status": "по-прежнему указан в спецификации Simba S7 2023 г.",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0087_01e_Simba_S7_technical_specification_englishpdf",
+        "http://www.drifterparts.com/cop1838me.html",
+        "http://www.drifterparts.com/cop1838mux.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "COP MD20",
+      "kind": "гидравлический перфоратор (Boomer S2, M-series, E-series)",
+      "segment": "ГШО",
+      "rating": "характеристики в открытом виде не прочитаны",
+      "status": "выпускается",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0090_01b_Boomer_S2_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "COP 3038 / COP 4038",
+      "kind": "гидравлический перфоратор (Boomer M-series, E-series)",
+      "segment": "ГШО",
+      "rating": "характеристики в открытом виде не прочитаны",
+      "status": "выпускается",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0063_01g_Boomer_E1_E2-series_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "COP 2550UX+ / COP 3060MUX / COP 2560EX+",
+      "kind": "гидравлические перфораторы для бурения глубоких скважин (Simba)",
+      "segment": "ГШО",
+      "rating": "характеристики в открытом виде не прочитаны",
+      "status": "COP 2550UX+ и 3060MUX указаны в спецификациях Simba E7/M4",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0081_01e_simba_E7-series_technical_specification_englishpdf",
+        "http://www.drifterparts.com/cop2560explus.html"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Boomer S2 technical specification",
+      "doc_no": "9869 0090 01b",
+      "machine": "Boomer S2",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0090_01b_Boomer_S2_technical_specification_englishpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/tme/drilling-technical-specifications/boomer/9869_0090_01b_Boomer_S2_technical_specification_english.pdf"
+      ]
+    },
+    {
+      "title": "Boomer 282 technical specification",
+      "doc_no": "9869 0030 01a",
+      "machine": "Boomer 282",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0030_01a_Boomer_282_technical_specification_englishpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/tme/drilling-technical-specifications/boomer/9869_0030_01a_Boomer_282_technical_specification_english.pdf"
+      ]
+    },
+    {
+      "title": "Boomer M-series technical specification",
+      "doc_no": "9869 0080 01f",
+      "machine": "Boomer M-series",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0080_01f_Boomer_M-series_technical_specification_englishpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/tme/drilling-technical-specifications/boomer/9869_0080_01f_Boomer_M-series_technical_specification_english.pdf"
+      ]
+    },
+    {
+      "title": "Boomer E1/E2 series technical specification",
+      "doc_no": "9869 0063 01g",
+      "machine": "Boomer E1/E2",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0063_01g_Boomer_E1_E2-series_technical_specification_englishpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/tme/drilling-technical-specifications/boomer/9869_0063_01g_Boomer_E1_E2-series_technical_specification_english.pdf"
+      ]
+    },
+    {
+      "title": "Simba E7-series technical specification",
+      "doc_no": "9869 0081 01e",
+      "machine": "Simba E7",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0081_01e_simba_E7-series_technical_specification_englishpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/tme/drilling-technical-specifications/simba/9869_0081_01e_simba_E7-series_technical_specification_english.pdf"
+      ]
+    },
+    {
+      "title": "Simba M4 technical specification",
+      "doc_no": "9869 0070 01f",
+      "machine": "Simba M4",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0070_01f_Simba_M4_technical_specification_englishpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/tme/drilling-technical-specifications/simba/9869_0070_01f_Simba_M4_technical_specification_english.pdf"
+      ]
+    },
+    {
+      "title": "Simba S7 technical specification",
+      "doc_no": "9869 0087 01e",
+      "machine": "Simba S7",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0087_01e_Simba_S7_technical_specification_englishpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/tme/drilling-technical-specifications/simba/9869_0087_01e_Simba_S7_technical_specification_english.pdf"
+      ]
+    },
+    {
+      "title": "Scooptram ST7 technical specification",
+      "doc_no": "9869 0107 01d",
+      "machine": "Scooptram ST7",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/lhd/diesel-scooptram/st7/9869%200107%2001d%20Scooptram%20ST7%20technical%20specification_digital.pdf"
+      ]
+    },
+    {
+      "title": "Scooptram ST14 S technical specification",
+      "doc_no": "9869 0234 01b",
+      "machine": "Scooptram ST14 S",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/lhd/diesel-scooptram/scooptram-st14-s/9869%200234%2001b%20Scooptram%2014%20S%20Technical%20Specification_digital.pdf"
+      ]
+    },
+    {
+      "title": "Scooptram ST14 SG technical specification",
+      "doc_no": "9869 0237 01b",
+      "machine": "Scooptram ST14 SG",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0237+01b+Scooptram+14+SG+Technical+Specification_digitalpdf",
+        "https://www.epiroc.com/content/dam/epiroc/underground-mining-and-tunneling/lhd/electric-scooptram/scooptram-st14-sg/technical-specification/9869%200237%2001b%20Scooptram%2014%20SG%20Technical%20Specification_digital.pdf"
+      ]
+    },
+    {
+      "title": "Atlas Copco Underground loaders Technical specification Scooptram ST1030",
+      "doc_no": "9851 2455 01i",
+      "machine": "Scooptram ST1030",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://dukraft.com/wp-content/uploads/2020/07/Technical-specification-ST1030.pdf"
+      ]
+    },
+    {
+      "title": "COP 1838HD+ High speed rock drill brochure (разделы Service kits, состав Seal kit / Minor и Major Preventive Maintenance kit)",
+      "doc_no": "9865 0039 01",
+      "machine": "COP 1838HD+",
+      "kind": "буклет с перечнем сервисных комплектов",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+        "https://www.epiroc.com/content/dam/epiroc/parts-and-services/rock-drills-and-rotation-units/brochures/9865%200039%2001%20COP%201838HD+%20brochure.pdf"
+      ]
+    },
+    {
+      "title": "COP 1638+, COP 1838+, COP 2238+ series brochure (раздел Service kits, хвостовики)",
+      "doc_no": "9865 0209 01",
+      "machine": "COP 1638+ / 1838+ / 2238+",
+      "kind": "буклет с перечнем сервисных комплектов",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf",
+        "https://www.epiroc.com/content/dam/epiroc/parts-and-services/rock-drills-and-rotation-units/brochures/9865%200209%2001%20COP%201800+%20series%20brochure.pdf"
+      ]
+    },
+    {
+      "title": "Spare parts list COP 1838HD+ (входит в большой комплект ТО по буклету 9865 0039 01; копии «9853 6819 20h / 20b Spare Parts Catalog COP 1838HD+ Version F» на Scribd закрыты проверкой браузера, содержимое не прочитано)",
+      "doc_no": "9853 6819 20",
+      "machine": "COP 1838HD+",
+      "kind": "parts manual",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+        "https://www.scribd.com/document/373113762/9853-6819-20h-Spare-Parts-Catalog-COP-1838HD-Version-F",
+        "https://www.scribd.com/document/826759408/9853-6819-20b-Spare-Parts-Catalogue-COP-1838HD-Version-F"
+      ]
+    },
+    {
+      "title": "Overhaul instruction COP 1838HD+ (позиция малого комплекта ТО по буклету 9865 0039 01)",
+      "doc_no": "9853 1221 01",
+      "machine": "COP 1838HD+",
+      "kind": "service manual (инструкция по капремонту)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf"
+      ]
+    },
+    {
+      "title": "Maintenance Instructions COP 1838HD (Scribd, содержимое не прочитано)",
+      "doc_no": "9852 2462 01",
+      "machine": "COP 1838HD",
+      "kind": "service manual",
+      "sources": [
+        "https://www.scribd.com/document/381164062/9852-2462-01-Maintenance-Instructions-COP-1838HD"
+      ]
+    },
+    {
+      "title": "COP 1838HD+ VerF Maintenance Instructions (pdfcoffee, закрыт кодом 403, содержимое не прочитано)",
+      "machine": "COP 1838HD+",
+      "kind": "service manual",
+      "sources": [
+        "https://pdfcoffee.com/cop-1838hd-verf-maintenance-instructions-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Boomer 282 Maintenance (Scribd, содержимое не прочитано)",
+      "doc_no": "TIS0003768-002",
+      "machine": "Boomer 282",
+      "kind": "service manual",
+      "sources": [
+        "https://www.scribd.com/document/558255621/TIS0003768-002-en-US-Boomer-282-Maintenance"
+      ]
+    },
+    {
+      "title": "Scooptram ST14 Stage III A and Stage III B Service Manual (Spanish; Scribd, содержимое не прочитано)",
+      "machine": "Scooptram ST14",
+      "kind": "service manual",
+      "sources": [
+        "https://www.scribd.com/document/752789373/Servicio-ST14-Stage-III-A-and-Stage-III-B-Service-Manual"
+      ]
+    },
+    {
+      "title": "Spare Parts Catalog - Scooptram ST1030 (pdfcoffee, закрыт кодом 403)",
+      "machine": "Scooptram ST1030",
+      "kind": "parts manual",
+      "sources": [
+        "https://pdfcoffee.com/spare-parts-catalog-scooptram-st1030-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Scoop ST7 Spare Parts Catalogue (pdfcoffee, закрыт кодом 403)",
+      "machine": "Scooptram ST7",
+      "kind": "parts manual",
+      "sources": [
+        "https://pdfcoffee.com/scoop-st7-spare-parts-catalogue-pdf-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Epiroc Scooptram ST14 Spare Parts Catalog (платный каталог Machine Catalogic)",
+      "machine": "Scooptram ST14",
+      "kind": "parts manual",
+      "sources": [
+        "https://machinecatalogic.com/epiroc-scooptram-st14-spare-parts-catalog/"
+      ]
+    },
+    {
+      "title": "Epiroc Scooptram ST14 SG Fully Battery Electric Loader Owner's Manual",
+      "machine": "Scooptram ST14 SG",
+      "kind": "O&M",
+      "sources": [
+        "https://manuals.plus/epiroc/scooptram-st14-sg-fully-battery-electric-loader-manual"
+      ]
+    },
+    {
+      "title": "Certiq on Scooptram ST7, ST7LP, ST14, ST18",
+      "machine": "Scooptram ST7 / ST7LP / ST14 / ST18",
+      "kind": "бюллетень (телематика Certiq)",
+      "sources": [
+        "https://www.epiroc.com/content/dam/epiroc/parts-and-services/documents/telematics-documents/Certiq%20on%20Scooptram%20ST7%20ST7LP%20ST14%20ST18.pdf"
+      ]
+    },
+    {
+      "title": "Remanufactured Scooptram ST14 — Machine Details",
+      "machine": "Scooptram ST14",
+      "kind": "бюллетень (восстановленная машина)",
+      "sources": [
+        "https://epiroc.blog/hubfs/Remanufactured%20Scooptram%20ST14.pdf?hsLang=en"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "3115 9170 91",
+      "issuer": "Epiroc",
+      "description": "Seal kit — ремкомплект уплотнений перфоратора",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, уплотнения",
+      "doc_ref": "9865 0039 01, раздел Service kits",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Seal kit 3115 9170 91"
+    },
+    {
+      "code": "3115 9238 93",
+      "issuer": "Epiroc",
+      "description": "Minor preventive maintenance kit — малый комплект ТО",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор",
+      "doc_ref": "9865 0039 01, раздел Service kits",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Minor preventive maintenance kit 3115 9238 93"
+    },
+    {
+      "code": "3115 9238 94",
+      "issuer": "Epiroc",
+      "description": "Major preventive maintenance kit — большой комплект ТО (в перечне состава опечатка: 3116 9238 94)",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор",
+      "doc_ref": "9865 0039 01, раздел Service kits",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Major preventive maintenance kit 3115 9238 94"
+    },
+    {
+      "code": "3115 9170 90",
+      "issuer": "Epiroc",
+      "description": "O-ring set — набор уплотнительных колец (в составе Seal kit 3115 9170 91)",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, уплотнения",
+      "doc_ref": "9865 0039 01, состав Seal kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "O-ring set 3115 9170 90 1"
+    },
+    {
+      "code": "3115 3024 00",
+      "issuer": "Epiroc",
+      "description": "Wiper — грязесъёмник (в составе Seal kit)",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, уплотнения",
+      "doc_ref": "9865 0039 01, состав Seal kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Wiper 3115 3024 00 1"
+    },
+    {
+      "code": "0666 7190 01",
+      "issuer": "Epiroc (номер Epiroc на стандартную манжету)",
+      "description": "Radial lip seal — радиальная манжета (в составе Seal kit)",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, уплотнения",
+      "doc_ref": "9865 0039 01, состав Seal kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Radial lip seal 0666 7190 01 1"
+    },
+    {
+      "code": "3115 1926 02",
+      "issuer": "Epiroc",
+      "description": "Diaphragm — мембрана гидроаккумулятора (в составе малого комплекта ТО)",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, аккумулятор",
+      "doc_ref": "9865 0039 01, состав Minor Preventive Maintenance kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Diaphragm 3115 1926 02 1"
+    },
+    {
+      "code": "3115 1822 01",
+      "issuer": "Epiroc",
+      "description": "Diaphragm — мембрана гидроаккумулятора, 2 шт. в малом комплекте ТО",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, аккумулятор",
+      "doc_ref": "9865 0039 01, состав Minor Preventive Maintenance kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Diaphragm 3115 1822 01 2"
+    },
+    {
+      "code": "3115 3635 74",
+      "issuer": "Epiroc",
+      "description": "Piston — ударный поршень (в составе большого комплекта ТО)",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, ударный механизм",
+      "doc_ref": "9865 0039 01, состав Major Preventive Maintenance kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Piston 3115 3635 74 1"
+    },
+    {
+      "code": "3115 5045 01",
+      "issuer": "Epiroc",
+      "description": "Guide — передняя направляющая (в составе большого комплекта ТО)",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, передняя часть",
+      "doc_ref": "9865 0039 01, состав Major Preventive Maintenance kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Guide 3115 5045 01 1"
+    },
+    {
+      "code": "3115 2968 01",
+      "issuer": "Epiroc",
+      "description": "Rot.ch.bushing — втулка патрона вращения",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, механизм вращения",
+      "doc_ref": "9865 0039 01, состав Major Preventive Maintenance kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Rot.ch.bushing 3115 2968 01 1"
+    },
+    {
+      "code": "0516 1504 01",
+      "issuer": "Epiroc (номер Epiroc на стандартный подшипник)",
+      "description": "Needle bearing — игольчатый подшипник",
+      "machine": "COP 1838HD+",
+      "unit": "перфоратор, механизм вращения",
+      "doc_ref": "9865 0039 01, состав Minor Preventive Maintenance kit",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0039+01+COP+1838HD%2B+brochurepdf",
+      "quote": "Needle bearing 0516 1504 01 1"
+    },
+    {
+      "code": "3115 9170 92",
+      "issuer": "Epiroc",
+      "description": "Seal kit — ремкомплект уплотнений; COP 1838+ с направляющей диаметром 38 и 52",
+      "machine": "COP 1838+",
+      "unit": "перфоратор, уплотнения",
+      "doc_ref": "9865 0209 01, раздел Service kits",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf",
+      "quote": "Seal kit 3115 9170 95 3115 9170 92 3115 9170 92 3115 9170 96"
+    },
+    {
+      "code": "3115 9170 95",
+      "issuer": "Epiroc",
+      "description": "Seal kit — ремкомплект уплотнений",
+      "machine": "COP 1638+",
+      "unit": "перфоратор, уплотнения",
+      "doc_ref": "9865 0209 01, раздел Service kits",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf",
+      "quote": "Seal kit 3115 9170 95 3115 9170 92 3115 9170 92 3115 9170 96"
+    },
+    {
+      "code": "3115 9170 96",
+      "issuer": "Epiroc",
+      "description": "Seal kit — ремкомплект уплотнений",
+      "machine": "COP 2238+",
+      "unit": "перфоратор, уплотнения",
+      "doc_ref": "9865 0209 01, раздел Service kits",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf",
+      "quote": "Seal kit 3115 9170 95 3115 9170 92 3115 9170 92 3115 9170 96"
+    },
+    {
+      "code": "3115 9238 95",
+      "issuer": "Epiroc",
+      "description": "Minor Preventive Maintenance kit — малый комплект ТО; COP 1838+ с направляющей диаметром 38 и 52",
+      "machine": "COP 1838+",
+      "unit": "перфоратор",
+      "doc_ref": "9865 0209 01, раздел Service kits",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf",
+      "quote": "Minor Preventive Maintenance kit 3115 9241 92 3115 9238 95 3115 9238 95 3115 9241 94"
+    },
+    {
+      "code": "3115 9238 96",
+      "issuer": "Epiroc",
+      "description": "Major Preventive Maintenance kit — большой комплект ТО, COP 1838+ с направляющей диаметром 38 (для диаметра 52 — 3115 9238 97)",
+      "machine": "COP 1838+",
+      "unit": "перфоратор",
+      "doc_ref": "9865 0209 01, раздел Service kits",
+      "source_url": "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf",
+      "quote": "Major Preventive Maintenance kit 3115 9241 93 3115 9238 96 3115 9238 97 3115 9241 95"
+    },
+    {
+      "code": "3115 2615 91",
+      "issuer": "Epiroc (номер изготовителя на сайте неофициального поставщика DrifterParts)",
+      "description": "Return Accumulator — гидроаккумулятор слива",
+      "machine": "COP 1838HD",
+      "unit": "перфоратор, аккумулятор",
+      "doc_ref": "перечень запчастей COP1838 HD на drifterparts.com",
+      "source_url": "http://www.drifterparts.com/cop1838hd.html",
+      "quote": "Return Accumulator - 3115 2615 91"
+    },
+    {
+      "code": "3115 3451 81",
+      "issuer": "Epiroc (номер изготовителя на сайте неофициального поставщика DrifterParts)",
+      "description": "Accumulator — гидроаккумулятор",
+      "machine": "COP 1838ME",
+      "unit": "перфоратор, аккумулятор",
+      "doc_ref": "перечень запчастей COP1838 ME на drifterparts.com",
+      "source_url": "http://www.drifterparts.com/cop1838me.html",
+      "quote": "Accumulator - 3115 3451 81"
+    },
+    {
+      "code": "3115 9150 99",
+      "issuer": "Epiroc (номер OEM на сайте неофициального изготовителя-аналога Delkom)",
+      "description": "Seal Kit — ремкомплект уплотнений; продавец заявляет применимость к Boomer 282, L2D, M2C-SP, S1D, T1D и COP 1838HD, 1838HEX, 1840, 1840EX",
+      "machine": "COP 1838HD / COP 1840; Boomer 282, S1D, L2D",
+      "unit": "перфоратор, уплотнения",
+      "doc_ref": "карточка товара hydraulicrockdrill.com",
+      "source_url": "https://hydraulicrockdrill.com/shop/seal-kit-65/",
+      "quote": "The Seal Kit (OEM 3115 9150 99) is a durable alternative replacement designed to perform reliably on rock drills and drifter rigs"
+    },
+    {
+      "code": "5112 3007 59",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Oil filter — масляный фильтр двигателя",
+      "machine": "Boomer 282 / Rocket Boomer 282",
+      "unit": "двигатель (DIESEL ENGINE)",
+      "doc_ref": "BK Drilling, узел DIESEL ENGINE",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5112-3007-59-oil-filter",
+      "quote": "5112 3007 59 (also written 5112300759, 5112-3007-59, or 5112.3007.59) is a Epiroc oil filter spare part used in the DIESEL ENGINE assembly of the Epiroc 2014 jumbo 282. Verified compatible with 3 Epiroc machine models including Boomer 282, 2014 jumbo 282, Rocket Boomer 282."
+    },
+    {
+      "code": "5580 0041 28",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Fuel filter — топливный фильтр двигателя",
+      "machine": "Boomer 282; Boomer S1D",
+      "unit": "двигатель (DIESEL ENGINE)",
+      "doc_ref": "BK Drilling, узел DIESEL ENGINE",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5580-0041-28-fuel-filter",
+      "quote": "5580 0041 28 (also written 5580004128, 5580-0041-28, or 5580.0041.28) is a Epiroc fuel filter spare part used in the DIESEL ENGINE assembly of the Epiroc 2014 jumbo 282."
+    },
+    {
+      "code": "5112 3052 41",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Air filter — воздушный фильтр двигателя",
+      "machine": "Boomer 282; Boomer S1D",
+      "unit": "воздушный фильтр двигателя (AIR FILTER SET)",
+      "doc_ref": "BK Drilling, узел AIR FILTER SET",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5112-3052-41-air-filter",
+      "quote": "5112 3052 41 (also written 5112305241, 5112-3052-41, or 5112.3052.41) is a Epiroc air filter spare part used in the AIR FILTER SET assembly of the Epiroc 2014 jumbo 282."
+    },
+    {
+      "code": "5112 3024 98",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Filter — фильтр гидростатической трансмиссии шасси",
+      "machine": "Boomer 282",
+      "unit": "трансмиссия (HYDR.TRANSMISS.)",
+      "doc_ref": "BK Drilling, узел HYDR.TRANSMISS.",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5112-3024-98-filter",
+      "quote": "5112 3024 98 (also written 5112302498, 5112-3024-98, or 5112.3024.98) is a Epiroc filter spare part used in the HYDR.TRANSMISS. assembly of the Epiroc 2014 jumbo 282."
+    },
+    {
+      "code": "8231 0854 19",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Breather filter — сапун гидробака",
+      "machine": "Boomer 282, E2 C, L2D, M2D, S1D",
+      "unit": "гидробак (HYDR. RESERVOIR)",
+      "doc_ref": "BK Drilling, узел HYDR. RESERVOIR",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/8231-0854-19-breather-filter",
+      "quote": "8231 0854 19 (also written 8231085419, 8231-0854-19, or 8231.0854.19) is a Epiroc breather filter spare part used in the HYDR. RESERVOIR assembly of the Epiroc Boomer E2 C. Verified compatible with 7 Epiroc machine models including Boomer 282, 2014 jumbo 282, Rocket Boomer 282."
+    },
+    {
+      "code": "8234 0200 36",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Filter, compl. — фильтр гидробака в сборе",
+      "machine": "Boomer 282; Boomer S1D",
+      "unit": "гидробак (HYDR. RESERVOIR)",
+      "doc_ref": "BK Drilling, узел HYDR. RESERVOIR; узел HYDR. RESERVOIR на странице назван для FlexiROC T35, а не для Boomer 282",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/8234-0200-36-filter-compl",
+      "quote": "8234 0200 36 (also written 8234020036, 8234-0200-36, or 8234.0200.36) is a Epiroc filter, compl. spare part used in the HYDR. RESERVOIR assembly of the Epiroc FlexiROC T35. Verified compatible with 7 Epiroc machine models including Boomer 282, ROC D7-11, FlexiROC T35."
+    },
+    {
+      "code": "5112 3230 27",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Fuel filter — топливный фильтр",
+      "machine": "Boomer E2 C, L2D, M2D",
+      "unit": "топливная система (FUEL SYSTEM)",
+      "doc_ref": "BK Drilling, узел FUEL SYSTEM",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5112-3230-27-fuel-filter",
+      "quote": "5112 3230 27 (also written 5112323027, 5112-3230-27, or 5112.3230.27) is a Epiroc fuel filter spare part used in the FUEL SYSTEM assembly of the Epiroc Boomer E2 C."
+    },
+    {
+      "code": "8231 1079 46",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Return filter — сливной фильтр гидробака",
+      "machine": "Boomer E2 C, L2D, M2D",
+      "unit": "гидробак (HYDR.OIL TANK)",
+      "doc_ref": "BK Drilling, узел HYDR.OIL TANK",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/8231-1079-46-return-filter",
+      "quote": "8231 1079 46 (also written 8231107946, 8231-1079-46, or 8231.1079.46) is a Epiroc return filter spare part used in the HYDR.OIL TANK assembly of the Epiroc Boomer E2 C."
+    },
+    {
+      "code": "5112 2805 63",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Filter — фильтр гидростатической трансмиссии шасси",
+      "machine": "Boomer E2 C, L2D, M2D",
+      "unit": "трансмиссия (HYDR.TRANSMISS.)",
+      "doc_ref": "BK Drilling, узел HYDR.TRANSMISS.",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5112-2805-63-filter",
+      "quote": "5112 2805 63 (also written 5112280563, 5112-2805-63, or 5112.2805.63) is a Epiroc filter spare part used in the HYDR.TRANSMISS. assembly of the Epiroc Boomer E2 C."
+    },
+    {
+      "code": "1619 6220 00",
+      "issuer": "Epiroc (номер группы Atlas Copco в каталоге неофициального поставщика BK Drilling)",
+      "description": "Air filter — воздушный фильтр компрессора установки",
+      "machine": "Boomer E2 C, L2D, M2D",
+      "unit": "компрессор (COMPRESSOR)",
+      "doc_ref": "BK Drilling, узел COMPRESSOR",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/1619-6220-00-air-filter",
+      "quote": "1619 6220 00 (also written 1619622000, 1619-6220-00, or 1619.6220.00) is a Epiroc air filter spare part used in the COMPRESSOR assembly of the Epiroc Boomer E2 C."
+    },
+    {
+      "code": "5541 7621 00",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Oil filter — масляный фильтр двигателя",
+      "machine": "Scooptram ST1020",
+      "unit": "двигатель (ENGINE ASSY)",
+      "doc_ref": "BK Drilling, узел ENGINE ASSY",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5541-7621-00-oil-filter",
+      "quote": "5541 7621 00 (also written 5541762100, 5541-7621-00, or 5541.7621.00) is a Epiroc oil filter spare part used in the ENGINE ASSY assembly of the Epiroc ST1020."
+    },
+    {
+      "code": "5542 0280 00",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Fuel filter — топливный фильтр",
+      "machine": "Scooptram ST1020",
+      "unit": "топливная система (FUEL SYSTEM)",
+      "doc_ref": "BK Drilling, узел FUEL SYSTEM",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5542-0280-00-fuel-filter",
+      "quote": "5542 0280 00 (also written 5542028000, 5542-0280-00, or 5542.0280.00) is a Epiroc fuel filter spare part used in the FUEL SYSTEM assembly of the Epiroc ST1020."
+    },
+    {
+      "code": "5540 6494 00",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Filter — фильтр гидробака",
+      "machine": "Scooptram ST1020",
+      "unit": "гидробак (HYDR.OIL TANK)",
+      "doc_ref": "BK Drilling, узел HYDR.OIL TANK",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5540-6494-00-filter",
+      "quote": "5540 6494 00 (also written 5540649400, 5540-6494-00, or 5540.6494.00) is a Epiroc filter spare part used in the HYDR.OIL TANK assembly of the Epiroc ST1020."
+    },
+    {
+      "code": "5541 4895 00",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Filter — фильтр трансмиссии с гидротрансформатором (transverter)",
+      "machine": "Scooptram ST1020",
+      "unit": "трансмиссия (TRANSVERTER)",
+      "doc_ref": "BK Drilling, узел TRANSVERTER",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5541-4895-00-filter",
+      "quote": "5541 4895 00 (also written 5541489500, 5541-4895-00, or 5541.4895.00) is a Epiroc filter spare part used in the TRANSVERTER assembly of the Epiroc ST1020."
+    },
+    {
+      "code": "5536 1118 00",
+      "issuer": "Epiroc (номер изготовителя в каталоге неофициального поставщика BK Drilling)",
+      "description": "Filter — фильтр воздухозаборника двигателя",
+      "machine": "Scooptram ST1020",
+      "unit": "воздухозаборник (AIR INLET)",
+      "doc_ref": "BK Drilling, узел AIR INLET",
+      "source_url": "https://bkdrilling.com/spare-parts/epiroc/5536-1118-00-filter",
+      "quote": "5536 1118 00 (also written 5536111800, 5536-1118-00, or 5536.1118.00) is a Epiroc filter spare part used in the AIR INLET assembly of the Epiroc ST1020."
+    },
+    {
+      "code": "6060 0125 72",
+      "issuer": "Epiroc (номер изготовителя на сайте неофициального поставщика FMRIBT)",
+      "description": "Seal kit — ремкомплект уплотнений; узел на странице не указан",
+      "machine": "Scooptram ST14",
+      "unit": "не указан",
+      "doc_ref": "карточка товара mineralrockspare.com; доверие низкое: страница шаблонная (цена-заглушка, выдуманные остатки, lorem ipsum), второй источник не найден",
+      "source_url": "https://mineralrockspare.com/products/atlas-copco-seal-kit-6060012572-6060-0125-72",
+      "quote": "Atlas Copco SEAL KIT 6060012572/6060 0125 72 FOR Scooptram ST14"
+    },
+    {
+      "code": "5542 1138 00",
+      "issuer": "Epiroc (номер изготовителя на сайте неофициального поставщика FMRIBT)",
+      "description": "Sensor speed — датчик скорости",
+      "machine": "Scooptram ST14; Scooptram ST1030",
+      "unit": "электрооборудование / трансмиссия (по странице не указано)",
+      "doc_ref": "карточка товара mineralrockspare.com; доверие низкое: страница шаблонная (цена-заглушка, выдуманные остатки, lorem ipsum), второй источник не найден",
+      "source_url": "https://mineralrockspare.com/products/atlas-copco-epiroc-sensor-speed-5542113800-5542-1138-00",
+      "quote": "Atlas Copco Epiroc SENSOR SPEED 5542113800 / 5542 1138 00 FOR ST14，ST1030"
+    },
+    {
+      "code": "3176 0032 49",
+      "issuer": "Epiroc (номер изготовителя на сайте неофициального поставщика FMRIBT)",
+      "description": "Sensor — датчик (тип на странице не указан)",
+      "machine": "Scooptram ST14; Scooptram ST1030",
+      "unit": "не указан",
+      "doc_ref": "карточка товара mineralrockspare.com; доверие низкое: страница шаблонная (цена-заглушка, выдуманные остатки, lorem ipsum), второй источник не найден",
+      "source_url": "https://mineralrockspare.com/products/atlas-copco-epiroc-sensor-3176003249-3176-0032-49",
+      "quote": "Atlas Copco Epiroc SENSOR 3176003249 / 3176 0032 49 FOR ST14，ST1030"
+    },
+    {
+      "code": "9120 0993 03",
+      "issuer": "Epiroc (номер изготовителя на сайте неофициального поставщика FMRIBT)",
+      "description": "Seal kit — ремкомплект уплотнений; продавец заявляет применимость к Boltec, Boomer L2d/M1d/M2d, Simba H1257/L6c/M4c/M6c/S7d",
+      "machine": "Simba M4 C / M6 C / S7 D; Boomer L2D / M2D",
+      "unit": "гидроцилиндр (HYDR. CYLINDER) — по bkdrilling для Boomer M2D",
+      "doc_ref": "карточка товара mineralrockspare.com; второй источник — bkdrilling.com, узел HYDR. CYLINDER, Boomer M2D",
+      "source_url": "https://mineralrockspare.com/products/atlas-copco-epiroc-seal-kit-9120099303-9120-0993-03",
+      "quote": "Atlas Copco Epiroc SEAL KIT 9120099303/9120 0993 03 FOR Boltec 235 , Boltec 235h , Boltec Lc , Boltec Md , Boomer L2d , Boomer M1d , Boomer M2d , Simba H1257 , Simba L6c , Simba M4c , Simba M6c , Simba S7d"
+    },
+    {
+      "code": "9106 2192 16",
+      "issuer": "Epiroc (номер изготовителя на сайте неофициального поставщика FMRIBT)",
+      "description": "Sensor / linear — линейный датчик положения",
+      "machine": "Simba M4 C; Simba S7 D; Boomer XE3",
+      "unit": "система управления (RCS), датчики",
+      "doc_ref": "карточка товара mineralrockspare.com; доверие низкое: страница шаблонная (цена-заглушка, выдуманные остатки, lorem ipsum), второй источник не найден",
+      "source_url": "https://mineralrockspare.com/products/atlas-copco-epiroc-sensor-linear-9106219216-9106-2192-16",
+      "quote": "Atlas Copco Epiroc SENSOR / LINEAR 9106219216/9106 2192 16 FOR Boomer Xe3 , Roc D65 , Simba H1354 , Simba M4c , Simba S7d"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Deutz AG",
+      "component": "дизельные двигатели: TCD 3.6 (Boomer S2); TCD 2013 L04/L06, TCD 4.1, TCD 6.1 (Boomer M, Boomer E, Simba E7, Simba M4); TCD 2012 L06 (Simba E7/M4); D914 L04, BF4L 914, TCD3.6 (Boomer 282, Simba S7)",
+      "machine": "Boomer S2, 282, M-series, E-series; Simba E7, M4, S7",
+      "evidence": "технические спецификации Epiroc 9869 0090 01b, 9869 0030 01a, 9869 0080 01f, 9869 0063 01g, 9869 0081 01e, 9869 0070 01f, 9869 0087 01e: строки Deutz ... в разделе Carrier/Engine",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0090_01b_Boomer_S2_technical_specification_englishpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0081_01e_simba_E7-series_technical_specification_englishpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0030_01a_Boomer_282_technical_specification_englishpdf"
+      ]
+    },
+    {
+      "company": "Cummins",
+      "component": "дизельные двигатели: QSB6.7 144 кВт (ST7); QSM11 и X12, 250 кВт (ST14 S); QSM11 (ST14, восстановленный); QSL9 C250 186 кВт (ST1030)",
+      "machine": "Scooptram ST7, ST14 S, ST14, ST1030",
+      "evidence": "спецификации Epiroc 9869 0107 01d и 9869 0234 01b (Brand, Model — Cummins), лист Remanufactured Scooptram ST14, спецификация Atlas Copco 9851 2455 01i",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+        "https://epiroc.blog/hubfs/Remanufactured%20Scooptram%20ST14.pdf?hsLang=en",
+        "https://dukraft.com/wp-content/uploads/2020/07/Technical-specification-ST1030.pdf"
+      ]
+    },
+    {
+      "company": "Dana (в т. ч. Spicer)",
+      "component": "мосты: Dana 123 (Boomer 282), Dana 113 (Boomer M), Dana 114 (Boomer E), Dana Spicer 123/90 и 114/90 (Simba E7, M4, S7); трансмиссии Dana TE32 (ST14 S, ST14) и Dana ERTE32 (ST14 SG)",
+      "machine": "Boomer 282, M-series, E-series; Simba E7, M4, S7; Scooptram ST14 S, ST14 SG, ST14",
+      "evidence": "строки Axles / Transmission в спецификациях Epiroc 9869 0030 01a, 9869 0080 01f, 9869 0063 01g, 9869 0081 01e, 9869 0234 01b, 9869 0237 01b",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0237+01b+Scooptram+14+SG+Technical+Specification_digitalpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0081_01e_simba_E7-series_technical_specification_englishpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0030_01a_Boomer_282_technical_specification_englishpdf"
+      ]
+    },
+    {
+      "company": "Kessler",
+      "component": "мосты Kessler D106 (ST14 S, ST14 SG, ST14) и D102 (ST1030)",
+      "machine": "Scooptram ST14 S, ST14 SG, ST14, ST1030",
+      "evidence": "строки Axles, Brand/model — Kessler в спецификациях 9869 0234 01b и 9869 0237 01b; спецификация ST1030 (Kessler D 102); лист Remanufactured ST14",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+        "https://dukraft.com/wp-content/uploads/2020/07/Technical-specification-ST1030.pdf"
+      ]
+    },
+    {
+      "company": "John Deere (Funk)",
+      "component": "трансмиссии Funk DF150 (ST7) и Funk DF250 (ST1030)",
+      "machine": "Scooptram ST7, ST1030",
+      "evidence": "спецификация 9869 0107 01d (Transmission, Brand/model — Funk DF150); спецификация Atlas Copco ST1030 (Funk DF250)",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf",
+        "https://dukraft.com/wp-content/uploads/2020/07/Technical-specification-ST1030.pdf"
+      ]
+    },
+    {
+      "company": "Okubo",
+      "component": "мосты Okubo Rock Tough 406",
+      "machine": "Scooptram ST7",
+      "evidence": "спецификация 9869 0107 01d, Axles, Brand/model",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ABB",
+      "component": "тяговый электродвигатель и электродвигатель гидравлики, 200 кВт и 150 кВт",
+      "machine": "Scooptram ST14 SG",
+      "evidence": "спецификация 9869 0237 01b, раздел Motor, Brand/model — ABB",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0237+01b+Scooptram+14+SG+Technical+Specification_digitalpdf"
+      ]
+    },
+    {
+      "company": "Ansul",
+      "component": "система пожаротушения Ansul Foray (порошковая) с автоматическим пуском Checkfire 210; на ST1030 — двухбаллонная Ansul и Ansul Checkfire",
+      "machine": "Scooptram ST14 S, ST14 SG, ST1030",
+      "evidence": "опции в спецификациях 9869 0234 01b, 9869 0237 01b и в спецификации ST1030",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+        "https://dukraft.com/wp-content/uploads/2020/07/Technical-specification-ST1030.pdf"
+      ]
+    },
+    {
+      "company": "Atlas Copco",
+      "component": "компрессоры: электрический винтовой LE7 (Boomer 282); гидроприводные винтовые GA 5 и GA 30 (Boomer M); GAR 5 и GAR 30 (Boomer E)",
+      "machine": "Boomer 282, M-series, E-series",
+      "evidence": "строки Compressor в спецификациях 9869 0030 01a, 9869 0080 01f, 9869 0063 01g, 9869 0081 01e; на Boomer S2 (2022) компрессоры LE 10 и GAR 30 обозначены уже как Epiroc; в спецификациях Simba E7 и M4 компрессоры GAR 5 и GAR 30 обозначены как Epiroc — для Simba связь с Atlas Copco не подтверждена",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0080_01f_Boomer_M-series_technical_specification_englishpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0030_01a_Boomer_282_technical_specification_englishpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0063_01g_Boomer_E1_E2-series_technical_specification_englishpdf"
+      ]
+    },
+    {
+      "company": "Clark",
+      "component": "трансмиссия Clark 12 000",
+      "machine": "Boomer 282",
+      "evidence": "спецификация 9869 0030 01a, строка Transmission ... Clark 12 000",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0030_01a_Boomer_282_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Michelin",
+      "component": "шины 12.00xR20",
+      "machine": "Boomer 282",
+      "evidence": "спецификация 9869 0030 01a, строка Tyres ... Michelin 12.00xR20",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0030_01a_Boomer_282_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Wiggins",
+      "component": "система быстрой заправки масла двигателя, трансмиссии, гидравлики, радиатора и топлива",
+      "machine": "Scooptram ST14 S, ST7",
+      "evidence": "опции в спецификациях 9869 0234 01b и 9869 0107 01d",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Epiroc Makina A.Ş. (Epiroc Türkiye)",
+      "country": "Турция",
+      "role": "официальное подразделение Epiroc: продажа и сервис наземного и подземного бурового и проходческого оборудования, погрузочно-доставочной техники, гидронавесного оборудования и расходников; головной офис в Стамбуле (İçerenköy), площадки в Анкаре и Измире",
+      "sources": [
+        "https://www.mtrehber.com/listing/epiroc-turkiye/"
+      ]
+    },
+    {
+      "company": "Epiroc Central Asia LLP",
+      "country": "Казахстан",
+      "role": "дочерняя компания Epiroc в Центральной Азии; на epiroc.com/ru-kz есть страница офиса в Астане; из результатов поиска — офисы в Караганде и Алматы (прочитано только в выдаче поиска: epiroc.com отдаёт код 403)",
+      "sources": [
+        "https://www.epiroc.com/ru-kz/contact/epiroc-astana-office",
+        "https://app.tradeatlas.com/en/firms/epiroc-central-asia-llp/bd8b195aecc24721"
+      ]
+    },
+    {
+      "company": "Epiroc (офис в Рогуне)",
+      "country": "Таджикистан",
+      "role": "представительство Epiroc; на сайте Atlas Copco Казахстан значится дилером Atlas Copco Power Technique с формулировкой «Продажа спецоборудования и сервис», Рогун",
+      "sources": [
+        "https://www.atlascopco.com/ru-kz/construction-equipment/atlas-copco-pt-dealers/location-dealer-epiroc"
+      ]
+    },
+    {
+      "company": "Epiroc Nanjing Construction & Mining Equipment Ltd.",
+      "country": "Китай",
+      "role": "завод Epiroc в Нанкине: выпускает Scooptram ST3.5; в 2022 г. сюда перенесено производство наземных буровых установок из Японии (по результатам поиска)",
+      "sources": [
+        "https://panjiva.com/Epiroc-Nanjing-Construction-Min/46878157",
+        "https://www.epiroc.cn/en-cn/products/loaders-and-trucks/diesel-loaders/scooptram-st3-5"
+      ]
+    },
+    {
+      "company": "Epiroc Mining India Ltd.",
+      "country": "Индия",
+      "role": "дочерняя компания Epiroc: продажи и сервис, производство в Нашике; новый завод с центром НИОКР в Нашике (запуск ожидался в III квартале 2026 г.; по результатам поиска)",
+      "sources": [
+        "https://www.tofler.in/epiroc-mining-india-private-limited/company/U29309PN2017PTC171542",
+        "https://www.indiamart.com/epiroc-mining-india-ltd/aboutus.html",
+        "https://www.epirocgroup.com/en/media/corporate-press-releases/2024/20240604-epiroc-wins-large-mining-equipment-order-in-india"
+      ]
+    },
+    {
+      "company": "SZPFG Parts",
+      "country": "Китай (заявлена поставка в Россию и СНГ)",
+      "role": "независимый, не официальный поставщик: заявляет поставку оригинальных запчастей Epiroc и Atlas Copco по номеру для Boomer, Simba, Scooptram, Minetruck и перфораторов COP по России и СНГ; каталог на 200 000+ номеров",
+      "sources": [
+        "https://www.szpfg.com/en/epiroc/"
+      ]
+    },
+    {
+      "company": "ГК «Технокомплекс» (mining.tcgc.ru)",
+      "country": "Россия",
+      "role": "поставщик ГШО и запчастей к перфораторам; на сайте раздел Atlas Copco и технические спецификации Scooptram. Статус официального дилера Epiroc не подтверждён",
+      "sources": [
+        "https://mining.tcgc.ru/",
+        "https://mining.tcgc.ru/assets/files/PDM/Scooptram%20ST14.pdf"
+      ]
+    },
+    {
+      "company": "BK Drilling",
+      "country": "Турция",
+      "role": "независимый поставщик неоригинальных запчастей; каталог 104 000+ номеров Epiroc/Atlas Copco по 55 моделям с привязкой к узлу (Boomer 282, S1D, L2D, M2D, E2 C; ST1020; перфораторы COP)",
+      "sources": [
+        "https://bkdrilling.com/spare-parts/epiroc?page=273",
+        "https://bkdrilling.com/spare-parts/epiroc/5112-3007-59-oil-filter"
+      ]
+    },
+    {
+      "company": "Delkom (hydraulicrockdrill.com, delkomrockdrill.com)",
+      "country": "Турция",
+      "role": "изготовитель неоригинальных запчастей для перфораторов COP и установок Boomer; на сайте прямо написано, что официальным дилером брендов не является",
+      "sources": [
+        "https://hydraulicrockdrill.com/shop/seal-kit-65/",
+        "https://hydraulicrockdrill.com/product-tag/cop-1838hd/",
+        "https://delkomrockdrill.com/epiroc-boomer-machine/boomer-282/"
+      ]
+    },
+    {
+      "company": "DrifterParts.com",
+      "country": "Турция (Анкара)",
+      "role": "изготовитель неоригинальных запчастей перфораторов COP 1238–2560 и Boomer 281/282/L2D/S1D",
+      "sources": [
+        "http://www.drifterparts.com/cop1838hd.html",
+        "http://www.drifterparts.com/boomer282.html"
+      ]
+    },
+    {
+      "company": "Mare Spare Parts",
+      "country": "Турция (Стамбул)",
+      "role": "независимый поставщик запчастей для 282 Boomer, Rocket Boomer M2C, XL3 C",
+      "sources": [
+        "https://www.marespareparts.com/282boomer-atlascopco-epiroc"
+      ]
+    },
+    {
+      "company": "FMRIBT (mineralrockspare.com)",
+      "country": "Китай",
+      "role": "независимый поставщик и изготовитель запчастей для Boomer, Simba и Scooptram (уплотнения, датчики, клапаны, подшипники, фильтры) с указанием применимости по машине",
+      "sources": [
+        "https://mineralrockspare.com/collections/epiroc-boomer-machine",
+        "https://mineralrockspare.com/collections/underground-drill-rig-spare-parts"
+      ]
+    },
+    {
+      "company": "Hambition Mining",
+      "country": "Китай",
+      "role": "независимый поставщик запчастей для Scooptram ST14 S, ST7, ST1030 (трансмиссии, мосты, гидравлика); номера на странице не выведены",
+      "sources": [
+        "https://www.hambition.net/Atlas-Copco-Epiroc-Scooptram-ST14-S-Replacement-Parts-pd40810603.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Не найдены фильтры (двигатель, гидравлика, трансмиссия) для текущего поколения: Boomer S2/M2/E2 с Deutz TCD, Simba E7/M4/S7, Scooptram ST7/ST14 S. Каталог BK Drilling покрывает только прежнее поколение (Boomer 282, S1D, L2D, M2D, E2 C, ST1020). Номера, скорее всего, есть в каталогах запчастей Epiroc (серия 9853 …, портал клиентов Epiroc) и в каталогах изготовителей двигателей (Deutz, Cummins/Fleetguard) по моделям двигателей из спецификаций.",
+    "epiroc.com и epirocgroup.com отдают автоматическому запросу код 403. Спецификации и буклеты прочитаны через CDN изготовителя epiroc.scene7.com, а страницы продуктов и контактов Epiroc известны только по выдаче поиска.",
+    "Каталоги запчастей (parts manual) COP 1838HD+ (9853 6819 20), Boomer 282 (TIS0003768-002), Scooptram ST7 и ST1030 лежат на Scribd и pdfcoffee. Scribd закрыт проверкой браузера, pdfcoffee отдаёт 403, содержимое не прочитано. Полные перечни с позициями — у Epiroc Customer Center или на платных сайтах (Machine Catalogic).",
+    "Применимость в каталогах неофициальных поставщиков (BK Drilling, FMRIBT, Delkom) собрана продавцом и местами явно автоматическая: у BK Drilling встречается «Sandvik Boomer E2 C». Перед запросом цены код и применимость нужно сверить с каталогом запчастей Epiroc по заводскому номеру машины.",
+    "Россия: Epiroc прекратила поставки в Россию с 1 марта 2022 г. (промежуточный отчёт Epiroc за II квартал 2022 г. и leave-russia.org); официального дилера или сервисного центра нет. Найдены только независимые поставщики (SZPFG Parts, ГК «Технокомплекс»), их статус и происхождение запчастей не подтверждены.",
+    "ОАЭ: официальное подразделение Epiroc не проверено. Бюджет веб-поиска сессии исчерпан, а сайты Epiroc отдают 403. Данные по Казахстану, Китаю и Индии основаны на выдаче поиска и сторонних реестрах (tradeatlas, panjiva, tofler), а не на страницах Epiroc.",
+    "Не найдены субпоставщики гидравлики (насосы, распределители, гидромоторы вращения), электроники RCS и шасси Simba/Boomer. В открытых спецификациях Epiroc марки этих узлов не названы.",
+    "Характеристики COP MD20, COP 3038/4038, COP 2550UX+, COP 3060MUX и номера их сервисных комплектов не прочитаны. Буклеты этих перфораторов, вероятно, лежат на epiroc.scene7.com под другими именами, но без поиска имена файлов не восстановить.",
+    "Номер большого комплекта ТО COP 1838HD+ в перечне состава буклета 9865 0039 01 напечатан с опечаткой («3116 9238 94»); в таблице Service kits того же буклета — 3115 9238 94."
+  ],
+  "verifier_notes": "Файлы источников скачаны в рабочей папке сессии разведки, в репозиторий они не входят. Все PDF Epiroc на epiroc.scene7.com (две брошюры перфораторов, 11 спецификаций машин и лист восстановленного ST14) и спецификация ST1030 на dukraft прочитаны целиком через pdftotext; номера документов и даты совпали с записями. Итог: из 40 кодов все подтверждены; из 25 моделей все подтверждены; из субпоставщиков опровергнута одна часть записи Atlas Copco. Её я разделил на две строки: для Boomer 282, M и E связь подтверждена; для Simba E7 и M4 не подтверждена, потому что в их спецификациях компрессоры GAR 5 и GAR 30 обозначены как Epiroc. Ограничения проверки: 1) Страницы epiroc.com отдают 403 (Cloudflare) и через WebFetch, и через curl; web.archive.org закрыт политикой выхода. Ни одна ссылка на epiroc.com не прочитана, существование моделей подтверждено PDF-спецификациями Epiroc. 2) Лимит WebSearch исчерпан (200 из 200), поэтому коды FMRIBT (6060 0125 72, 5542 1138 00, 3176 0032 49, 9106 2192 16) вторым источником не сверены. Страницы mineralrockspare шаблонные: цена-заглушка $500, выдуманные остатки, lorem ipsum. Коды там есть, но доверие к источнику низкое; для библиотеки их лучше отметить как неофициальные непроверенные. Код 9120 0993 03 подтверждён ещё и на bkdrilling: узел HYDR. CYLINDER, Boomer M2D, этим можно заполнить пустой узел. 3) Шаблонный текст на страницах bkdrilling для ST1020 пишет «Sandvik ST1020» — ошибка генератора сайта, а не смена бренда. Для 8234 0200 36 узел HYDR. RESERVOIR на странице назван для FlexiROC T35, а не для Boomer 282. 4) Страница drifterparts cop1838hd с первого запроса отдала заглушку проверки бота, со второго с cookie — нормальный перечень. Для повторной проверки не считать заглушку отсутствием кода.",
+  "corrections": [
+    "Atlas Copco: Simba E7 и M4 убраны из применимости — в их спецификациях компрессоры обозначены как Epiroc",
+    "6060 0125 72, 5542 1138 00, 3176 0032 49, 9106 2192 16: помечены низким доверием — шаблонные страницы FMRIBT",
+    "9120 0993 03: узел заполнен по второму источнику (bkdrilling, HYDR. CYLINDER, Boomer M2D)",
+    "8234 0200 36: отмечено, что узел на странице назван для FlexiROC T35",
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет"
+  ]
+}
