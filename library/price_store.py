@@ -42,12 +42,53 @@ FEED_ВЫВЕДЕНО = "разбор КП: выведено"
            # Откуда взято каждое условие. «нет» значит «искали в строке и в тексте
            # файла, не написано» — то есть верифицированное отсутствие, а не
            # пустота от того, что разбор не дошёл (library/offer_terms.py).
-           "basis_src", "pay_src", "lead_src", "make_src")
+           "basis_src", "pay_src", "lead_src", "make_src",
+           # Откуда дата квотации (price_date): документ, письмо, карточка или
+           # «нет» — library/quote_date.py. Распоряжение владельца 24.09.2026.
+           "price_date_src")
 
-ВСТАВКА = f"""
+# НЕОБЯЗАТЕЛЬНЫЕ КОЛОНКИ — те, без которых запись цены не должна падать, если
+# миграция до живой базы ещё не дошла. Риск записан в плане
+# (docs/suppliers/IMPLEMENTATION_PLAN.md, «новые колонки lib_prices уронят ночной
+# разбор КП»): ночной разбор идёт по расписанию, а схему применяет отдельный
+# прогон. Без колонки источника дата квотации всё равно пишется в price_date,
+# а источник появится после миграции и досчёта (library/quote_dates_backfill.py).
+НЕОБЯЗАТЕЛЬНЫЕ = ("price_date_src",)
+
+
+def вставка(колонки=КОЛОНКИ) -> str:
+    return f"""
 insert into lib_prices
-  ({", ".join(КОЛОНКИ)})
+  ({", ".join(колонки)})
 values %s"""
+
+
+ВСТАВКА = вставка()
+
+# Колонки lib_prices, которые видит текущий путь поиска (search_path): тесты
+# держат свою таблицу в отдельной схеме, прод — в public.
+КОЛОНКИ_БАЗЫ = ("select column_name from information_schema.columns"
+                " where table_name = 'lib_prices'"
+                " and table_schema = any(current_schemas(false))")
+
+
+def под_базу(cur, буфер: list[tuple]) -> tuple[str, list[tuple]]:
+    """Запрос вставки и строки ровно под колонки, которые в базе есть.
+
+    Снимаются только НЕОБЯЗАТЕЛЬНЫЕ: нет обязательной колонки — вставка падает, и
+    это правильно (ПОДСКАЗКА называет, что применить). Пропуск печатается
+    предупреждением: молчаливая потеря источника даты хуже упавшего прогона.
+    """
+    cur.execute(КОЛОНКИ_БАЗЫ)
+    есть = {r[0] for r in cur.fetchall()}
+    нет = [к for к in НЕОБЯЗАТЕЛЬНЫЕ if к not in есть]
+    if not нет or not есть:
+        return ВСТАВКА, буфер
+    print(f"::warning::в lib_prices нет колонок {', '.join(нет)} — цены пишутся без "
+          "них; примените library/supabase/schema.sql", flush=True)
+    места = [i for i, к in enumerate(КОЛОНКИ) if к not in нет]
+    return (вставка(tuple(КОЛОНКИ[i] for i in места)),
+            [tuple(r[i] for i in места) for r in буфер])
 
 # Идемпотентность по файлу: переразбор того же КП снимает свои прежние строки.
 # Естественного ключа у цены нет (одна позиция законно имеет и цену, и сумму),
@@ -87,12 +128,17 @@ def строка(поз: dict, ц: dict, обрезать, источник: str
             обрезать(поз.get("unit"))[:40], поз["source_file"], поз.get("deal_id"),
             поз.get("company"), обрезать(поз.get("brands"))[:200] or None,
             срок, источник, FEED, ц["confidence"],
-            обрезать(ц.get("note"))[:300] or None, None,
+            обрезать(ц.get("note"))[:300] or None,
+            # ДАТА КВОТАЦИИ, А НЕ ДАТА РАЗБОРА. Пусто, если её не нашли ни в КП,
+            # ни на карточке (источник тогда «нет»); старый вызов без даты
+            # оставляет и источник пустым — «не проверено», а не «нет».
+            поз.get("price_date") or None,
             ц.get("total"), свод.get("make_days"),
             обрезать(свод.get("pay_terms"))[:120] or None,
             свод.get("pay_advance_pct"),
             свод.get("basis_src"), свод.get("pay_terms_src"),
-            свод.get("lead_days_src"), свод.get("make_days_src"))
+            свод.get("lead_days_src"), свод.get("make_days_src"),
+            поз.get("price_date_src"))
 
 
 def записать(cur, буфер: list[tuple], execute_values) -> None:
@@ -107,8 +153,9 @@ def записать(cur, буфер: list[tuple], execute_values) -> None:
     if not буфер:
         return
     файлы = sorted({r[_ФАЙЛ] for r in буфер})
+    запрос, строки = под_базу(cur, буфер)
     cur.execute(СНЯТЬ, (FEED, ИСТОЧНИК_СКАНА, файлы))
-    execute_values(cur, ВСТАВКА, буфер, page_size=500)
+    execute_values(cur, запрос, строки, page_size=500)
 
 
 _ИСТОЧНИК = КОЛОНКИ.index("source")
@@ -130,7 +177,8 @@ def записать_скан(cur, файл: str, буфер: list[tuple], execu
     выведены = [r[0] for r in cur.fetchall()]
     if not буфер:
         return [], выведены
-    новые = execute_values(cur, ВСТАВКА + " returning id", буфер, page_size=500,
+    запрос, строки = под_базу(cur, буфер)
+    новые = execute_values(cur, запрос + " returning id", строки, page_size=500,
                            fetch=True)
     return [r[0] for r in новые], выведены
 
@@ -142,7 +190,7 @@ def записать_скан(cur, файл: str, буфер: list[tuple], execu
 ДОБАВЛЕННЫЕ_МИГРАЦИЕЙ = ("feed", "lead_days", "rfq_id", "rfq_company",
                          "oem", "rfq_brands", "total", "make_days", "pay_terms",
                          "pay_advance_pct", "basis_src", "pay_src", "lead_src",
-                         "make_src")
+                         "make_src", "price_date_src")
 
 ПОДСКАЗКА = ("запись цен не прошла — вероятно, в lib_prices нет колонок "
              + ", ".join(ДОБАВЛЕННЫЕ_МИГРАЦИЕЙ)
