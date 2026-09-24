@@ -11,8 +11,10 @@
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "library"))
 КОД = (Path(__file__).resolve().parent.parent / "library/reparse.py").read_text(encoding="utf-8")
 
 
@@ -21,14 +23,33 @@ def код_без_пояснений() -> str:
     return re.sub(r"(?<!\w)#[^\n]*", "", КОД)
 
 
-def test_запись_защищена_условием_по_цене():
+def test_запись_защищена_условием_хуже():
     код = код_без_пояснений()
-    m = re.search(r"if APPLY and НЕ_ХУЖЕ and с_ценой < б:", код)
-    assert m, "нет условия «цен стало меньше — не писать»"
+    m = re.search(r"if APPLY and НЕ_ХУЖЕ and стало_хуже\(indexer\.SOURCE, б, с_ценой, старое, новое\):", код)
+    assert m, "нет условия «стало хуже — не писать»"
     # Ветка записи должна быть ИНАЧЕ, а не рядом: иначе файл запишется и так.
     хвост = код[m.end():m.end() + 400]
     assert re.search(r"elif APPLY:\s*\n\s*запиши\(", хвост), \
         "запись не в ветке elif — защита обходится"
+
+
+def test_предложения_судятся_по_цене():
+    import reparse
+    assert reparse.стало_хуже("rfq", 5, 4, 10, 20)       # цена ушла — хуже
+    assert not reparse.стало_хуже("rfq", 5, 5, 20, 10)   # позиций меньше, цена та же — не хуже
+
+
+def test_сделки_судятся_по_позициям():
+    """Цены вложений сделки в базу не пишутся, «было» у них ноль всегда.
+
+    Холостой переразбор сделок 24.09.2026: 2 813 файлов с потерей позиций и
+    ноль «хуже по цене» — защита по цене пропустила бы все.
+    """
+    import reparse
+    assert reparse.стало_хуже("deals", 0, 0, 30, 12)
+    assert reparse.стало_хуже("deals", 0, 7, 30, 29)      # цены нашлись, но спрос потерян
+    assert not reparse.стало_хуже("deals", 0, 0, 30, 30)
+    assert not reparse.стало_хуже("deals", 0, 0, 30, 45)
 
 
 def test_защита_включена_по_умолчанию():
