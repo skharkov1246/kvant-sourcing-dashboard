@@ -616,6 +616,18 @@ const SUPPLIERS_MAX_BYTES = 8 * 1024 * 1024;
 // реестр поставщиков, прочитанные с другой стороны. Отдельное право разделило бы
 // один секрет на два замка, и слабейший решал бы.
 const CROSSREF_KEY = "crossref:v1";
+// С 24.09.2026 снимок разложен (library/crossref.py, разложить): crossref:v1 —
+// заголовок, восемь частей списка crossref:list:NN и тридцать две корзины
+// подробностей crossref:offers:NN. Одним ключом он перестал помещаться в 8 МиБ.
+// Список ключей ЗАКРЫТЫЙ и тот же, что у публикатора: номер части из запроса
+// превращается в имя ключа только через него, и прочитать этим маршрутом чужой
+// ключ нельзя. Право то же — suppliers, резка та же.
+const CROSSREF_LISTS = 8;
+const CROSSREF_PARTS = 32;
+const CROSSREF_LIST_KEYS = Array.from({ length: CROSSREF_LISTS },
+  (_, i) => "crossref:list:" + String(i).padStart(2, "0"));
+const CROSSREF_PART_KEYS = Array.from({ length: CROSSREF_PARTS },
+  (_, i) => "crossref:offers:" + String(i).padStart(2, "0"));
 
 // СЧЁТЧИКИ — ТОТ ЖЕ ЗАМОК, ХОТЯ СОДЕРЖИМОЕ БЕДНЕЕ. В counters:v1 лежат одни
 // агрегаты: сколько кодов мы спрашивали и по скольким пришла цена. Ни позиций,
@@ -647,6 +659,8 @@ function suppliersRoute(path) {
   if (path === "/api/suppliers") return "api";
   if (["/nomenclature", "/nomenclature/", "/nomenclature.html"].includes(path)) return "nomenclature";
   if (path === "/api/crossref") return "crossref";
+  if (path === "/api/crossref/rows") return "crossrefRows";
+  if (path === "/api/crossref/offers") return "crossrefOffers";
   if (["/counters", "/counters/", "/counters.html"].includes(path)) return "counters";
   if (path === "/api/counters") return "countersApi";
   if (["/brands", "/brands/", "/brands.html"].includes(path)) return "brands";
@@ -733,12 +747,13 @@ async function readSuppliers(env) {
   return value;
 }
 
-async function readCrossref(env) {
+async function readCrossref(env, key = CROSSREF_KEY,
+  empty = { version: 1, positions: [], companies: [], totals: {} }) {
   const kv = aclStore(env);
   if (!kv) throw new Error("suppliers_unavailable");
-  const raw = await kv.get(CROSSREF_KEY);
+  const raw = await kv.get(key);
   // Снимка ещё нет — это состояние «публикатор не отработал», а не ошибка.
-  if (raw == null) return { version: 1, positions: [], companies: [], totals: {} };
+  if (raw == null) return empty;
   if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > SUPPLIERS_MAX_BYTES) {
     throw new Error("suppliers_invalid");
   }
@@ -774,6 +789,15 @@ async function readBrandsKey(env, key, empty) {
   const value = JSON.parse(raw);
   if (!value || value.version !== 1) throw new Error("suppliers_invalid");
   return value;
+}
+
+// Номер части номенклатуры — те же две цифры из закрытого диапазона, что у
+// корзин брендов: имя ключа KV из пользовательского ввода не строится.
+function crossrefPartKey(url, param, keys) {
+  const b = url.searchParams.get(param);
+  if (typeof b !== "string" || !/^[0-9]{2}$/.test(b)) return null;
+  const n = Number(b);
+  return n < keys.length ? keys[n] : null;
 }
 
 // Номер корзины — строго две цифры из закрытого диапазона. Иначе 400, и ключ
@@ -1236,9 +1260,20 @@ export default {
         return suppliersJson({ error: "forbidden" }, 403);
       }
       if (request.method !== "GET") return suppliersJson({ error: "method_not_allowed" }, 405);
-      if (suppliers === "crossref") {
+      if (suppliers === "crossref" || suppliers === "crossrefRows" || suppliers === "crossrefOffers") {
+        let key = CROSSREF_KEY, empty;
+        if (suppliers === "crossrefRows") {
+          key = crossrefPartKey(url, "l", CROSSREF_LIST_KEYS);
+          if (!key) return suppliersJson({ error: "invalid_part" }, 400);
+          empty = { version: 1, part: Number(url.searchParams.get("l")), positions: [] };
+        }
+        if (suppliers === "crossrefOffers") {
+          key = crossrefPartKey(url, "b", CROSSREF_PART_KEYS);
+          if (!key) return suppliersJson({ error: "invalid_part" }, 400);
+          empty = { version: 1, part: Number(url.searchParams.get("b")), positions: {} };
+        }
         let snapshot;
-        try { snapshot = await readCrossref(env); }
+        try { snapshot = await readCrossref(env, key, empty); }
         catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
         // Резка та же, что у реестра: поля с контактами и деньгами закрываются
         // правом на сервере, а не стилями на странице.

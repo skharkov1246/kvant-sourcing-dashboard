@@ -318,7 +318,7 @@ function строка(p) {
   var td = узел("td", "num");
   var b = узел("button", "row-link", p.n || p.k);
   b.type = "button";
-  b.addEventListener("click", function () { открыть(p); });
+  b.addEventListener("click", function () { return открыть(p); });
   td.appendChild(b);
   tr.appendChild(td);
   tr.appendChild(узел("td", null, p.name || "—"));
@@ -410,7 +410,63 @@ function подсветить_отбор() {
 
 // ─── Карточка товара ─────────────────────────────────────────────────────────
 
+// ПОДРОБНОСТИ ПОЗИЦИИ — В КОРЗИНЕ, А НЕ В СПИСКЕ (с 24.09.2026). Единый снимок
+// перестал помещаться в 8 МиБ: строка списка несёт номер, наименование, спрос,
+// изготовителя, аналоги и рёбра, а предложения и реестр исполнителей лежат в
+// корзине crossref:offers:NN, номер которой записан у строки (поле b). Корзина
+// читается при открытии карточки, одна, и запоминается: соседняя позиция из
+// той же корзины откроется без запроса.
+//
+// Прежний снимок (предложения прямо в строке, поля b нет) открывается как
+// раньше — новая страница выкатывается раньше, чем публикатор перепишет ключ.
+var корзины = {};
+
+function две_цифры(n) { return (n < 10 ? "0" : "") + n; }
+
+function корзина(b) {
+  if (!корзины[b]) {
+    // Запрос — внутри then: сбой сети до ответа становится отказом обещания, а не
+    // исключением в обработчике щелчка, и карточка говорит о нём словами.
+    корзины[b] = Promise.resolve()
+      .then(function () { return прочитать("/api/crossref/offers?b=" + две_цифры(b)); })
+      .catch(function (e) { delete корзины[b]; throw e; });
+  }
+  return корзины[b];
+}
+
 function открыть(p) {
+  if (p.list || typeof p.b !== "number") { нарисовать_карточку(p, null); return Promise.resolve(); }
+  var card = $("card");
+  card.textContent = "";
+  card.appendChild(узел("h2", null, p.n || p.k));
+  card.appendChild(узел("p", "field-note", "Читаем предложения…"));
+  $("list").hidden = true;
+  card.hidden = false;
+  return корзина(p.b).then(function (v) {
+    var подробно = (v && v.positions && v.positions[p.k]) || null;
+    var полная = {};
+    Object.keys(p).forEach(function (k) { полная[k] = p[k]; });
+    if (подробно) Object.keys(подробно).forEach(function (k) { полная[k] = подробно[k]; });
+    var примечание = null;
+    // Корзина другой сборки: запись новой сборки идёт или KV ещё не разнёс её по
+    // узлам. Показываем, но говорим вслух — предложения могут разойтись со счётом.
+    if (v && v.published_at && данные.published_at && v.published_at !== данные.published_at) {
+      примечание = "Предложения прочитаны из сборки " + String(v.published_at).slice(0, 16).replace("T", " ")
+        + " UTC, а список — из сборки " + String(данные.published_at).slice(0, 16).replace("T", " ")
+        + " UTC: снимок обновляется. Числа в списке и в таблице могут разойтись — откройте карточку позже.";
+    } else if (!подробно && p.offers) {
+      примечание = "Позиция насчитывает " + число(p.offers) + " "
+        + склонение(p.offers, "предложение", "предложения", "предложений")
+        + ", а в корзине подробностей её нет: снимок обновляется. Откройте карточку позже.";
+    }
+    нарисовать_карточку(полная, примечание);
+  }, function (e) {
+    нарисовать_карточку(p, "Предложения не прочитались (" + String(e.message || e)
+      + "). Строка списка показана без них; откройте карточку ещё раз.");
+  });
+}
+
+function нарисовать_карточку(p, примечание) {
   var card = $("card");
   card.textContent = "";
   var back = узел("button", "back", "← К списку");
@@ -509,6 +565,7 @@ function открыть(p) {
   card.appendChild(узел("h3", "section-title",
     "Кто давал предложение · " + число(p.co) + " "
     + склонение(p.co, "компания", "компании", "компаний")));
+  if (примечание) card.appendChild(узел("p", "gap", примечание));
   if (p.offers > p.shown) {
     card.appendChild(узел("p", "field-note", "Показаны " + число(p.shown)
       + " из " + число(p.offers) + " предложений: самые свежие."));
@@ -638,12 +695,38 @@ function сбой(заголовок, текст_) {
 
 $("search").addEventListener("input", function () { if (данные) искать(); });
 
-fetch("/api/crossref", { headers: { Accept: "application/json" } })
-  .then(function (r) {
+// СПИСОК — ЧАСТЯМИ (с 24.09.2026). Заголовок crossref:v1 говорит, сколько частей
+// (поле lists); части — подряд идущие куски одного отсортированного списка, и
+// склейка по номеру даёт исходный порядок «выбор, затем спрос». Часть чужой
+// сборки — отказ, а не смесь: номера компаний в рёбрах указывают в companies
+// заголовка, и смесь двух сборок приписала бы предложение не той компании.
+function прочитать(адрес) {
+  return fetch(адрес, { headers: { Accept: "application/json" } }).then(function (r) {
     if (r.status === 403) throw new Error("нет права suppliers");
     if (!r.ok) throw new Error("сервер ответил " + r.status);
     return r.json();
-  })
+  });
+}
+
+function со_списком(v) {
+  if (!v || typeof v.lists !== "number" || v.positions) return v;
+  var части = [];
+  for (var i = 0; i < v.lists; i++) части.push(прочитать("/api/crossref/rows?l=" + две_цифры(i)));
+  return Promise.all(части).then(function (ответы) {
+    var позиции = [];
+    ответы.forEach(function (ч) {
+      if (ч.published_at && v.published_at && ч.published_at !== v.published_at) {
+        throw new Error("снимок обновляется: часть списка другой сборки. Откройте страницу через минуту");
+      }
+      позиции = позиции.concat(ч.positions || []);
+    });
+    v.positions = позиции;
+    return v;
+  });
+}
+
+прочитать("/api/crossref")
+  .then(со_списком)
   .then(function (v) {
     данные = v;
     // Дата — до проверки на пустоту: если снимок пуст, знать, КОГДА он собран

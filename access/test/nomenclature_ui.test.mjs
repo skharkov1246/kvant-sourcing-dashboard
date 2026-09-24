@@ -317,3 +317,123 @@ test("подпись источника условия не слипается �
   assert.ok(годится,
     "подпись источника не объявлена блочной вне плитки: в ячейке таблицы слипнётся с числом");
 });
+
+// ── СНИМОК ПО ЧАСТЯМ (24.09.2026) ─────────────────────────────────────────
+// Единый crossref:v1 перестал помещаться в 8 МиБ (прогон 35986620488: 10,51 МиБ)
+// и разложен library/crossref.разложить: заголовок, части списка и корзины
+// подробностей. Здесь та же разметка в той же форме, что пишет публикатор:
+// строка списка без ПОДРОБНОСТЕЙ и с номером корзины b, подробности — в корзине.
+
+const ПОДРОБНОСТИ = ["list", "shown", "makers", "cat_name", "category", "unit"];
+const СБОРКА = "2026-09-24T03:00:00Z";
+
+function разложить(снимок, { частей = 2, сборка_части = СБОРКА, сборка_корзины = СБОРКА } = {}) {
+  const { positions, ...заголовок } = снимок;
+  const строки = [];
+  const корзины = {};
+  positions.forEach((p, i) => {
+    const b = 3 + (i % 2);                  // две корзины на три позиции: одна общая
+    const строка = { b };
+    const подробно = {};
+    for (const [k, v] of Object.entries(p)) (ПОДРОБНОСТИ.includes(k) ? подробно : строка)[k] = v;
+    строки.push(строка);
+    (корзины[b] ||= { version: 1, part: b, published_at: сборка_корзины, positions: {} })
+      .positions[p.k] = подробно;
+  });
+  const части = [];
+  const размер = Math.ceil(строки.length / частей);
+  for (let i = 0; i < частей; i++) {
+    части.push({ version: 1, part: i, published_at: сборка_части,
+                 positions: строки.slice(i * размер, (i + 1) * размер) });
+  }
+  return { заголовок: { ...заголовок, published_at: СБОРКА, lists: частей, parts: 32 }, части, корзины };
+}
+
+async function открыть_частями(опции = {}, { hash = "", сбой_корзины = false } = {}) {
+  const { заголовок, части, корзины } = разложить(СНИМОК, опции);
+  const запросы = [];
+  const маршруты = (url) => {
+    запросы.push(url);
+    if (url === "/api/crossref") return заголовок;
+    let m = url.match(/^\/api\/crossref\/rows\?l=(\d\d)$/);
+    if (m) return части[Number(m[1])];
+    m = url.match(/^\/api\/crossref\/offers\?b=(\d\d)$/);
+    if (m) {
+      if (сбой_корзины) throw new Error("сервер ответил 503");
+      return корзины[Number(m[1])] || { version: 1, part: Number(m[1]), positions: {} };
+    }
+    throw new Error("неожиданный адрес " + url);
+  };
+  const страница = await открыть(html, { маршруты, hash });
+  return { ...страница, запросы };
+}
+
+test("список склеивается из частей в исходном порядке", async () => {
+  const { карта, запросы } = await открыть_частями();
+  assert.equal(карта.status.hidden, true, "плашка загрузки осталась на экране");
+  assert.equal(карта.rows.children.length, 3);
+  assert.match(карта.rows.children[0].textContent, /6-205/);
+  assert.match(карта.rows.children[1].textContent, /SEAL-KIT-12/);
+  assert.match(карта.rows.children[2].textContent, /O-RING-5/);
+  assert.match(карта.count.textContent, /3 из 3/);
+  // Для списка корзины не нужны: ни одного запроса подробностей до открытия карточки.
+  assert.deepEqual(запросы, ["/api/crossref", "/api/crossref/rows?l=00", "/api/crossref/rows?l=01"]);
+  // Поиск по номеру аналога работает без корзины: аналоги лежат в строке.
+  карта.search.value = "180205";
+  await карта.search.fire("input");
+  assert.equal(карта.rows.children.length, 1);
+});
+
+test("карточка дочитывает свою корзину и показывает предложения и исполнителей", async () => {
+  const { карта, запросы } = await открыть_частями();
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  const t = карта.card.textContent;
+  assert.ok(запросы.includes("/api/crossref/offers?b=03"), "корзина позиции не запрошена");
+  assert.match(t, /100 EUR/);
+  assert.match(t, /Учебный завод/, "имя компании не разрешилось из companies заголовка");
+  assert.match(t, /Кто это делает и в какой роли/, "реестр исполнителей не приехал из корзины");
+  assert.match(t, /в КП не указано/);
+  assert.match(t, /180205 · ГПЗ/);
+  assert.doesNotMatch(t, /снимок обновляется|не прочитались/);
+});
+
+test("корзина читается один раз на все её позиции", async () => {
+  const { карта, запросы } = await открыть_частями();
+  // 6205 и O-RING-5 лежат в корзине 03.
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  await карта.rows.children[2].querySelectorAll("button")[0].fire("click");
+  assert.equal(запросы.filter((u) => u === "/api/crossref/offers?b=03").length, 1);
+});
+
+test("прямой адрес позиции открывает карточку с предложениями", async () => {
+  const { карта } = await открыть_частями({}, { hash: "#k=6205" });
+  for (let i = 0; i < 5; i++) await new Promise((r) => setTimeout(r, 0));
+  assert.equal(карта.card.hidden, false);
+  assert.match(карта.card.textContent, /100 EUR/);
+});
+
+test("часть списка другой сборки — отказ со словами, а не смесь", async () => {
+  const { карта } = await открыть_частями({ сборка_части: "2026-09-23T03:00:00Z" });
+  assert.equal(карта.status.hidden, false);
+  assert.match(карта.status.textContent, /снимок обновляется/);
+  assert.equal(карта.list.hidden, true);
+});
+
+test("корзина другой сборки показывается с оговоркой", async () => {
+  const { карта } = await открыть_частями({ сборка_корзины: "2026-09-23T03:00:00Z" });
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  const t = карта.card.textContent;
+  assert.match(t, /100 EUR/);
+  assert.match(t, /снимок обновляется/);
+  assert.match(t, /2026-09-23 03:00 UTC/);
+});
+
+test("корзина не прочиталась — карточка сказала об этом, а не показала пустоту", async () => {
+  const { карта } = await открыть_частями({}, { сбой_корзины: true });
+  await карта.rows.children[0].querySelectorAll("button")[0].fire("click");
+  const t = карта.card.textContent;
+  assert.equal(карта.card.hidden, false);
+  assert.match(t, /Предложения не прочитались/);
+  // Строка списка всё равно на экране: изготовитель по каталогу и спрос.
+  assert.match(t, /SKF/);
+});

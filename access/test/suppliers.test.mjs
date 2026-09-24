@@ -300,6 +300,117 @@ test("менять номенклатуру запросом нельзя: то�
   }
 });
 
+// ─── Номенклатура по частям (24.09.2026) ─────────────────────────────────────
+// Единый crossref:v1 перестал помещаться в 8 МиБ и разложен: заголовок, восемь
+// частей списка и тридцать две корзины подробностей. Части читаются своими
+// маршрутами — и каждый обязан держать то же право, ту же резку и тот же
+// закрытый список ключей, что заголовок.
+
+const CROSS_HEAD = { version: 1, published_at: "2026-09-24T00:00:00Z", lists: 8, parts: 32,
+  totals: { positions: 1 }, companies: [{ co: "101", ent: "KV-S-000001-8", name: "Учебный завод" }] };
+const CROSS_ROWS = { version: 1, part: 0, published_at: "2026-09-24T00:00:00Z",
+  positions: [{ k: "6205", n: "6-205", name: "Подшипник учебный", co: 1, offers: 1, b: 7,
+                e: [[0, 1, 100, "EUR", "2026-09-01"]] }] };
+const CROSS_PART = { version: 1, part: 7, published_at: "2026-09-24T00:00:00Z",
+  positions: { "6205": { shown: 1, list: [{ c: "101", p: 100, u: "EUR", terms: "предоплата 30 %",
+                                            emails: ["nobody@example.test"] }] } } };
+
+function envCrossParts() {
+  const env = envFor();
+  env.ACL.box.set("crossref:v1", JSON.stringify(CROSS_HEAD));
+  env.ACL.box.set("crossref:list:00", JSON.stringify(CROSS_ROWS));
+  env.ACL.box.set("crossref:offers:07", JSON.stringify(CROSS_PART));
+  return env;
+}
+const CROSS_PATHS = ["/api/crossref", "/api/crossref/rows?l=00", "/api/crossref/offers?b=07"];
+
+test("части номенклатуры закрыты без подписи Access и открываются правом suppliers", async () => {
+  const env = envCrossParts();
+  for (const path of CROSS_PATHS) {
+    const none = await call(env, path, null);
+    assert.equal(none.status, 403, path);
+    assert.doesNotMatch(await none.text(), /Подшипник учебный|Учебный завод|EUR/);
+    const deny = await call(env, path, GUEST);
+    assert.equal(deny.status, 403, path);
+    assert.equal((await deny.json()).error, "forbidden");
+    assert.equal((await call(env, path, READER)).status, 200, path);
+  }
+  assert.deepEqual(env.assets, []);
+});
+
+test("каждый маршрут номенклатуры отдаёт свой ключ", async () => {
+  const env = envCrossParts();
+  assert.equal((await (await call(env, "/api/crossref", READER)).json()).lists, 8);
+  assert.equal((await (await call(env, "/api/crossref/rows?l=00", READER)).json())
+    .positions[0].k, "6205");
+  const part = await (await call(env, "/api/crossref/offers?b=07", READER)).json();
+  assert.equal(part.part, 7);
+  assert.equal(part.positions["6205"].list[0].p, 100);
+});
+
+test("номер части номенклатуры — только две цифры из закрытого диапазона", async () => {
+  const env = envCrossParts();
+  // Ключи без ведущего нуля и за краем лежат в KV: прочитать их нельзя всё равно.
+  env.ACL.box.set("crossref:offers:7", JSON.stringify(CROSS_PART));
+  env.ACL.box.set("crossref:list:8", JSON.stringify(CROSS_ROWS));
+  for (const b of ["7", "32", "99", "xx", "-1", "../acl", "07x", "", "acl:v1"]) {
+    const r = await call(env, "/api/crossref/offers?b=" + encodeURIComponent(b), READER);
+    assert.equal(r.status, 400, "offers " + b);
+    assert.equal((await r.json()).error, "invalid_part");
+  }
+  for (const l of ["0", "08", "8", "32", "xx", "acl:v1"]) {
+    const r = await call(env, "/api/crossref/rows?l=" + encodeURIComponent(l), READER);
+    assert.equal(r.status, 400, "rows " + l);
+  }
+  assert.equal((await call(env, "/api/crossref/offers", READER)).status, 400);
+  assert.equal((await call(env, "/api/crossref/rows", READER)).status, 400);
+  // Номер корзины брендов в маршрут номенклатуры не превращается в ключ брендов.
+  env.ACL.box.set("brands:codes:03", JSON.stringify({ version: 1, codes: { секрет: 1 } }));
+  const чужой = await (await call(env, "/api/crossref/offers?b=03", READER)).json();
+  assert.deepEqual(чужой.positions, {});
+});
+
+test("резка полей действует и в корзинах номенклатуры", async () => {
+  const env = envCrossParts();
+  const body = await (await call(env, "/api/crossref/offers?b=07", READER)).text();
+  for (const secret of ["nobody@example.test", "предоплата 30 %"]) {
+    assert.ok(!body.includes(secret), `в ответе осталось «${secret}»`);
+  }
+  const o = JSON.parse(body).positions["6205"].list[0];
+  assert.deepEqual(o.terms, { закрыто: "suppliers_fin" });
+  assert.deepEqual(o.emails, { закрыто: "suppliers_pii" });
+  assert.equal(o.p, 100);
+});
+
+test("части номенклатуры ещё нет — пусто, а не поломка; битая — 503", async () => {
+  const env = envFor();
+  const rows = await call(env, "/api/crossref/rows?l=05", READER);
+  assert.equal(rows.status, 200);
+  assert.deepEqual((await rows.json()).positions, []);
+  const part = await call(env, "/api/crossref/offers?b=31", READER);
+  assert.equal(part.status, 200);
+  assert.deepEqual((await part.json()).positions, {});
+  for (const плохой of ['{"version":2}', "не json вовсе"]) {
+    const e2 = envFor();
+    e2.ACL.box.set("crossref:offers:31", плохой);
+    assert.equal((await call(e2, "/api/crossref/offers?b=31", READER)).status, 503, плохой);
+  }
+});
+
+test("части номенклатуры: альтернативное написание пути и запись закрыты", async () => {
+  const env = envCrossParts();
+  for (const path of ["/api/crossref/rows/00", "/api/crossref/offers/07", "/api/crossref/offers;x",
+                      "/api/crossref%2foffers?b=07", "/api/crossref/Offers?b=07"]) {
+    const response = await call(env, path, GUEST);
+    assert.equal(response.status, 404, path);
+  }
+  for (const method of ["POST", "PUT", "DELETE"]) {
+    const r = await call(env, "/api/crossref/offers?b=07", OWNER, { method,
+      headers: { "Content-Type": "application/json" }, body: "{}" });
+    assert.equal(r.status, 405, method);
+  }
+});
+
 test("плашка «Номенклатура» показывается по тому же праву", async () => {
   const env = envCross();
   const есть = await (await call(env, "/", READER)).text();

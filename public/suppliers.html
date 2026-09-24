@@ -59,7 +59,9 @@ tr:last-child td{border-bottom:0}td{color:#c4cedb;max-width:300px;overflow-wrap:
 .status.error{border-color:#594047}.status.error h2{color:var(--red)}
 .card{border-top:1px solid var(--line);margin-top:8px;padding-top:24px}
 .card h2{font-size:23px;font-weight:500;margin:0 0 4px;letter-spacing:-.01em;overflow-wrap:anywhere}
-.card .num{display:block;margin-bottom:18px}
+/* Только подпись-номер под заголовком карточки, а не ячейки таблицы: правило
+   «.card .num» делало блоками и td.num, и колонки «Строк · Цена · Дата» съезжали. */
+.card > .num{display:block;margin-bottom:18px}
 .back{border:0;background:transparent;color:var(--accent);padding:0;margin:0 0 16px;min-height:36px}
 dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 22px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:18px 20px;margin:0 0 20px}
 dt{font-size:11px;color:var(--dim);margin:0 0 3px}dd{margin:0;font-size:14px;overflow-wrap:anywhere}
@@ -361,7 +363,36 @@ function по_сущности(снимок) {
   var сущность_по_ключу = {};
   (снимок.companies || []).forEach(function (c) { if (c.ent) сущность_по_ключу[c.co] = c.ent; });
 
+  // РЁБРА — С 24.09.2026. Строка списка несёт поле e: [номер компании в
+  // companies, строк, цена, валюта, дата], посчитанное по ВСЕМ строкам
+  // котировок. Предложений в строке больше нет (они в корзинах), и собирать
+  // список позиций компании надо из рёбер. Прежний снимок — с предложениями в
+  // строке и без рёбер — читается старым путём ниже.
+  var компании = снимок.companies || [];
   (снимок.positions || []).forEach(function (p) {
+    if (!Array.isArray(p.e)) return;
+    p.e.forEach(function (r) {
+      var c = компании[r[0]];
+      var ent = c ? сущность_по_ключу[c.co] : null;
+      if (!ent || !карта[ent]) return;
+      var у = карта[ent];
+      var строка = у.поkey[p.k];
+      if (!строка) {
+        строка = у.поkey[p.k] = { k: p.k, n: p.n, name: p.name, cnt: 0,
+                                  price: null, cur: null, date: null };
+        у.list.push(строка);
+      }
+      // Одна сущность реестра бывает под несколькими ключами портала — строки
+      // складываются, цена и дата берутся первые попавшиеся, как и раньше.
+      строка.cnt += r[1] || 0;
+      if (строка.price === null && r[2] != null) {
+        строка.price = r[2]; строка.cur = r[3] || null;
+      }
+      строка.date = строка.date || r[4] || null;
+    });
+  });
+  (снимок.positions || []).forEach(function (p) {
+    if (Array.isArray(p.e)) return;
     (p.list || []).forEach(function (o) {
       var ent = сущность_по_ключу[o.c];
       if (!ent || !карта[ent]) return;
@@ -483,8 +514,31 @@ function предложения_компании(card, e) {
   };
 
   if (перекрёстный) { показать(); return; }
-  fetch("/api/crossref", { headers: { Accept: "application/json" } })
-    .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+  var прочитать = function (адрес) {
+    return fetch(адрес, { headers: { Accept: "application/json" } })
+      .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); });
+  };
+  // С 24.09.2026 снимок разложен: заголовок говорит, сколько частей списка
+  // (lists), и позиции с рёбрами читаются частями. Часть другой сборки — отказ:
+  // номера компаний в рёбрах указывают в companies своего заголовка.
+  прочитать("/api/crossref")
+    .then(function (v) {
+      if (!v || typeof v.lists !== "number" || v.positions) return v;
+      var части = [];
+      for (var i = 0; i < v.lists; i++) {
+        части.push(прочитать("/api/crossref/rows?l=" + (i < 10 ? "0" : "") + i));
+      }
+      return Promise.all(части).then(function (ответы) {
+        v.positions = [];
+        ответы.forEach(function (ч) {
+          if (ч.published_at && v.published_at && ч.published_at !== v.published_at) {
+            throw new Error("снимок обновляется");
+          }
+          v.positions = v.positions.concat(ч.positions || []);
+        });
+        return v;
+      });
+    })
     .then(function (v) { перекрёстный = v; показать(); })
     .catch(function () { перекрёстный = false; показать(); });
 }
