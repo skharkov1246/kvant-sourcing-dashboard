@@ -110,6 +110,12 @@ insert into lib_demand (deal_id, item_name, part_number, qty, unit) values
   ('D-4', 'Болт',       'BOLT-8',      50, 'шт'),
   ('D-5', 'Гайка',      'NUT-M8',     100, 'шт'),
   ('D-6', 'Гайка',      'NUT-M8',     200, 'шт'),
+  -- Склейка ячеек количества (до 24.09.2026): в сумму спроса не идёт.
+  ('D-6', 'Гайка',      'NUT-M8', 3163518182.316, 'шт'),
+  -- МАРКА СТАЛИ ВМЕСТО КОДА. Строки спроса, где «SS316» стоит номером, — это
+  -- разные позиции из одной стали; карточкой они стать не должны.
+  ('D-7', 'Труба (19mm) SS316', 'SS316',  8, 'шт'),
+  ('D-8', 'Фланец SS316',       'SS 316', 2, 'шт'),
   -- Текст тендерного документа под артикулом 6205: в вес позиции попасть не
   -- должен. Без этой строки чтение таблицы вместо вида выглядело бы верным.
   ('D-9', 'Пункт 5.2 Условия оплаты', '6205', 999, 'шт');
@@ -148,9 +154,15 @@ insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, oem,
    7, 'EUR', 100, 'шт', null, null,
    null, null, null, null, null, null, null, null, 'med', null),
   -- Артикул, у которого второй путь неоднозначен: связи быть не должно.
+  -- «Количество × цена ≠ сумма»: 500 × 1 не 999 — количество не читается.
   ('NUT-M8', 'Гайка',     'разбор КП', '101', 'RFQ-5', null, null,
    1, 'EUR', 500, 'шт', null, null,
-   null, null, null, null, null, null, null, null, 'med', null),
+   null, null, null, 999, null, null, null, null, 'med', null),
+  -- Карточка владельца 24.09.2026: марка стали кодом, склеенное количество.
+  -- Компания своя (103): уцелей строка — число компаний выросло бы до трёх.
+  ('SS316',  '(19mm) SS316 8 3200.0 25600.0', 'разбор КП', '103', 'RFQ-6', null, '1138',
+   316, 'USD', 3163518182.316, 'шт', null, null,
+   null, null, null, 316, null, null, null, null, 'med', null),
   -- Чужой поток: не должен попасть ни в один запрос.
   ('6205',   'Подшипник', 'прайс',     '999', 'RFQ-9', 'FAG', 'FAG',
    999, 'EUR', 1, 'шт', null, null,
@@ -159,10 +171,14 @@ insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, oem,
 
 
 def функция_ключа() -> str:
+    """lib_pn_key и lib_pn_plausible из миграции: запросы зовут обе."""
     текст = (ROOT / "library" / "supabase" / "schema.sql").read_text(encoding="utf-8")
-    m = re.search(r"create or replace function lib_pn_key.*?\$\$;", текст, re.S | re.I)
-    assert m, "в schema.sql больше нет функции lib_pn_key"
-    return m.group(0)
+    части = []
+    for имя in ("lib_pn_key", "lib_pn_plausible"):
+        m = re.search(rf"create or replace function {имя}\(.*?\$\$;", текст, re.S | re.I)
+        assert m, f"в schema.sql больше нет функции {имя}"
+        части.append(m.group(0))
+    return "\n".join(части)
 
 
 @pytest.fixture(scope="module")
@@ -408,3 +424,66 @@ def test_ключи_предложения_короткие_и_все_из_та�
             лишние = set(o) - разрешённые
             assert not лишние, f"в предложении ключи вне таблицы: {лишние}"
             assert all(len(k) == 1 for k in o), o
+
+
+def test_марка_стали_кодом_не_становится(наборы, снимок):
+    """«SS316» — марка нержавеющей стали, а не артикул (карточка 24.09.2026).
+
+    Правило судит при чтении (lib_pn_plausible): строка цены с таким номером в
+    снимок не едет, ключ не набирает спрос чужих позиций, строки базы целы."""
+    предложения, *_, спрос = наборы
+    assert all(r[0] != "ss316" for r in предложения)
+    assert all(r[0] != "ss316" for r in спрос)
+    assert "ss316" not in {p["k"] for p in снимок["positions"]}
+    assert "103" not in {c["co"] for c in снимок["companies"]}
+
+
+def test_количество_которое_не_читается_не_показывается(снимок):
+    """Сумма спроса без склеенной ячейки; предложение, где «кол-во × цена ≠
+    сумма», — без количества (на экране «Не знаем», а не мусор)."""
+    поз = {p["k"]: p for p in снимок["positions"]}
+    n = поз["nutm8"]
+    assert n["demand"]["qty"] == 300.0
+    assert n["demand"]["rows"] == 3            # строка не выброшена — только число
+    предложение = n["list"][0]
+    assert "q" not in предложение and предложение["t"] == 999.0
+    # Сошедшаяся тройка количество сохраняет: 4 × 100 = 400.
+    assert any(о.get("q") == 4.0 for о in поз["6205"]["list"])
+
+
+def test_бренд_карточки_берёт_имя_из_реестра():
+    """Номер элемента СП-176 → имя бренда; реестра нет — номера как были."""
+    import psycopg2
+    схема = СХЕМА + "_бренды"
+    conn = psycopg2.connect(DSN)
+    conn.autocommit = True
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f'drop schema if exists "{схема}" cascade')
+            cur.execute(f'create schema "{схема}"')
+            cur.execute(f'set search_path to "{схема}"')
+            # Реестра ещё нет: чтение не падает и имён не даёт.
+            assert crossref.имена_брендов(cur) == {}
+            cur.execute("""
+              create table lib_brands (brand_key text primary key, name text not null);
+              create table lib_brand_alias (spelling text, source text, sp176_id bigint,
+                                            brand_key text, status text);
+              create view lib_brand_sp176 as
+                select sp176_id, min(brand_key) as brand_key from lib_brand_alias
+                 where sp176_id is not null and status in ('разрешено', 'проверено')
+                   and brand_key is not null
+                 group by sp176_id having count(distinct brand_key) = 1;
+              insert into lib_brands values ('skf', 'SKF');
+              insert into lib_brand_alias values
+                ('SKF Group', 'СП-176', 1138, 'skf', 'разрешено'),
+                ('Учебная марка', 'СП-176', 340, null, 'в очереди');
+            """)
+            имена = crossref.имена_брендов(cur)
+    finally:
+        with conn.cursor() as cur:
+            cur.execute(f'drop schema if exists "{схема}" cascade')
+        conn.close()
+    # Разрешённый — каноническим именем реестра, неразрешённый — написанием
+    # справочника, неизвестный номер остаётся номером.
+    assert имена == {"1138": "SKF", "340": "Учебная марка"}
+    assert crossref._бренды("1138, 340,3448", имена) == ["3448", "SKF", "Учебная марка"]

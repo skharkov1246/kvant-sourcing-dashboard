@@ -54,6 +54,12 @@ name: Библиотека — сводка и переклассификаци�
 #                    по воротам. Заодно — цена денежного подавления в
 #                    распознавании артикула и сетка кандидатов на послабление,
 #                    каждый с проверкой на удержание. Ничего не меняет.
+#   code-rule      — ЧТО СНИМАЕТ ПРАВИЛО «ПРАВДОПОДОБНЫЙ КОД»: марки стали, размеры
+#                    и стандарты, стоявшие кодом, — по классам, в спросе, ценах и
+#                    номенклатуре; сколько строк цены осталось без кода (стало
+#                    хуже) и сколько вернёт переразбор; контроль по каталогу;
+#                    количества, которые не читаются. Только выборки. Ничего не
+#                    меняет.
 #
 # В журнал прогона выводятся ТОЛЬКО агрегаты: репозиторий публичный, а в базе
 # лежат коммерческие данные заказчиков. Ни наименований позиций, ни номеров
@@ -68,7 +74,7 @@ on:
         default: stats
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
                   reclassify-apply, bridge, crossref, demand, funnel,
-                  calibration, part, match, codes, sides, dynamics]
+                  calibration, part, match, codes, sides, dynamics, code-rule]
       part:
         description: "Артикул для поиска — только для part (например 6265ZZ)"
         type: string
@@ -241,6 +247,17 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python scripts/codes_dynamics.py
+
+      # Правило «правдоподобный код» (library/docfilter.py) действует при чтении
+      # на всю базу; замер говорит, сколько и чего оно сняло и у скольких стало
+      # хуже (CLAUDE.md, правила 0 и 3). Выражение берётся из кода, функция
+      # lib_pn_plausible в базе не нужна. Только выборки.
+      - name: Что снимает правило правдоподобного кода
+        if: inputs.job == 'code-rule'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PARTS: "16"
+        run: python scripts/code_rule_measure.py
 
       - name: Отвечает ли предложение на нашу заявку
         if: inputs.job == 'match'
