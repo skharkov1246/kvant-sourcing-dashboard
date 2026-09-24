@@ -543,3 +543,21 @@ def test_инн_опознаёт_сущность_в_базе_сразу():
 def test_инн_единоличен():
     assert "inn" in lm.ЕДИНОЛИЧНЫЕ and "vat" in lm.ЕДИНОЛИЧНЫЕ, (
         "иначе запись отдаст чужой ИНН второй сущности — так уже было с доменом")
+
+
+def test_новая_сущность_получает_имя_как_в_карточке_портала():
+    """display_name новой сущности — название из карточки, а не сжатый ключ.
+
+    До 24.09.2026 показать() брала самое длинное из norm_name-написаний, и на
+    странице стояло «supremevalves». Сводит по-прежнему norm_name."""
+    сущности, _ = lm.свести({"bitrix/companies": [
+        lm.Источник("bitrix/companies", "supremevalves", "supreme.test", "bitrix:1",
+                    сырое="Supreme Valves Ltd"),
+        lm.Источник("pnw", "supremevalves", "supreme.test"),
+    ]})
+    assert len(сущности) == 1
+    assert lm.показать(сущности[0]) == "Supreme Valves Ltd"
+    # Сырое название, похожее на ключ, не берётся; без сырого — как раньше.
+    сущности, _ = lm.свести({"pnw": [lm.Источник("pnw", "acmepumps", "acme.test",
+                                                 сырое="acmepumps")]})
+    assert lm.показать(сущности[0]) == "acmepumps"

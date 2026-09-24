@@ -41,7 +41,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from library import crossref  # noqa: E402
+from library import company_names, crossref  # noqa: E402
 
 KEY = crossref.КЛЮЧ
 # Код возврата для переполнения предела: прогон обязан покраснеть именно на нём, а
@@ -75,10 +75,13 @@ def читать_базу(dsn):
     try:
         with conn.cursor() as cur:
             наборы = []
+            # Вида имён может ещё не быть в рабочей базе — тогда на его месте
+            # пустая выборка, и имя компании остаётся display_name.
+            есть = company_names.вид_имён_есть(cur)
             for sql in (crossref.ПРЕДЛОЖЕНИЯ_SQL, crossref.КАТАЛОГ_SQL,
                         crossref.АНАЛОГИ_SQL, crossref.МАШИНЫ_SQL,
                         crossref.ИЗГОТОВИТЕЛИ_SQL, crossref.СПРОС_SQL):
-                cur.execute(sql, (crossref.FEED,))
+                cur.execute(company_names.имена_sql(sql, есть), (crossref.FEED,))
                 наборы.append(cur.fetchall())
         return наборы
     finally:

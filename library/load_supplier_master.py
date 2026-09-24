@@ -64,10 +64,14 @@ from typing import NamedTuple
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "pnw" / "tools"))
+sys.path.insert(0, str(ROOT))
 
 from supplier_registry_overlap import (  # noqa: E402
     РЕЕСТРЫ, norm_domain, norm_name, форма, читать,
 )
+
+# «Похоже на ключ» — одна функция на реестр (зеркало sup_имя_как_ключ в схеме).
+from library.company_names import как_ключ as _как_ключ  # noqa: E402
 
 # Контрольная цифра — та же функция, что у номеров деталей: два алгоритма Луна в
 # одном репозитории разошлись бы, и номер стал бы непроверяемым.
@@ -118,6 +122,11 @@ class Источник(NamedTuple):
     ключ: str = ""
     формы: frozenset[str] = frozenset()
     налоги: frozenset[tuple[str, str]] = frozenset()
+    # Название как написано в источнике (TITLE карточки портала) — ТОЛЬКО для
+    # показа. Сводит по-прежнему имя, то есть norm_name: сырое в сведении не
+    # участвует. Без него display_name новой сущности выходил сжатым ключом
+    # («supremevalves»), и страница показывала его вместо названия.
+    сырое: str = ""
 
 
 def номер(seq: int, род: str = "S") -> str:
@@ -407,6 +416,7 @@ def читать_битрикс(client, *, spa: int = 166,
                 ключ=f"bitrix:{c['ID']}",
                 формы=форма(сырое),
                 налоги=налоги.get(int(c["ID"]), frozenset()),
+                сырое=сырое,
             ))
     return строки
 
@@ -667,7 +677,17 @@ def показать(e: Сущность) -> str:
     Самое длинное, потому что короткое обычно и есть обрезок: «ABC» против
     «ABC Industrial Group». Все написания остаются строками sup_identifier, ни
     одно не перезаписывается.
+
+    Первым — название, как оно написано в карточке портала (Источник.сырое):
+    e.имена хранят norm_name, и до 24.09.2026 display_name новой сущности
+    выходил сжатым ключом. Сущности, записанные раньше, чинит не это место, а
+    library/company_names.py: запись здесь «on conflict do nothing» и прежний
+    display_name не трогает.
     """
+    сырые = sorted({r.сырое.strip() for r in e.источники
+                    if r.сырое and r.сырое.strip() and not _как_ключ(r.сырое)})
+    if сырые:
+        return max(сырые, key=len)
     return max(e.имена, key=len) if e.имена else sorted(e.ключи)[0]
 
 

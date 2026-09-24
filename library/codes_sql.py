@@ -38,7 +38,7 @@ import inspect
 import re
 from pathlib import Path
 
-from library import doc_folder, doc_side, equipment, quotes
+from library import company_names, doc_folder, doc_side, equipment, quotes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -802,7 +802,7 @@ with
 select row_number() over (order by a.codes desc, a.price_rows desc, a.supplier) as rank,
        count(*) over ()                                                    as suppliers_total,
        a.supplier,
-       coalesce(e.display_name, a.deferred_names, '(имени в базе нет)')  as name,
+       coalesce(nm.name, e.display_name, a.deferred_names, '(имени в базе нет)') as name,
        case when coalesce(sn.n, 1) > 1
             then e.display_name || ' · ' || coalesce(i.legal_forms, a.supplier)
             else e.display_name end                                        as name_unique,
@@ -818,6 +818,7 @@ select row_number() over (order by a.codes desc, a.price_rows desc, a.supplier) 
        a.portal_keys_n, a.portal_keys, a.currencies
   from agg a
   left join sup_entity e        on e.id = a.sup_id
+  left join sup_name_shown nm   on nm.sup_id = e.id
   left join ident i             on i.sup_id = a.sup_id
   left join same_name sn        on sn.display_name = e.display_name
   left join sup_brand_top sbt   on sbt.supplier = a.supplier
@@ -1264,14 +1265,18 @@ REVIEW_KEYS = """\
 # supplier_id → ключ портала с явной пометкой. У сущности без имён
 # load_supplier_master.показать() пишет в display_name ключ («bitrix:2002»): это
 # не имя, и за имя из реестра он не выдаётся.
+# Первым идёт общий выбор имени sup_name_shown (suppliers_schema.sql, блок 8а):
+# карточка Битрикса, реквизиты, написание, домен. Вида нет — на его месте пустая
+# выборка (запросы(имена=False)), и всё работает по-старому.
 KEYLIKE = r"e.display_name ~ '^[a-z_]+:\S+$'"
 SUP_NAME = f"""\
-coalesce(case when not {KEYLIKE} then e.display_name end,
+coalesce(nm.name, case when not {KEYLIKE} then e.display_name end,
                 {{a}}.deferred_txt, ls.name,
                 case when {{a}}.sup_group = '(не указан)' then '(поставщик на карточке не указан)'
                      else 'ключ ' || coalesce({{a}}.portal_keys, '?') || ' (имени в базе нет)' end)"""
 SUP_FROM = f"""\
-case when not {KEYLIKE} then 'реестр'
+case when nm.name is not null then 'реестр: ' || nm.name_source
+            when not {KEYLIKE} then 'реестр'
             when {{a}}.deferred_txt is not null then 'отложен до ИНН: имя из очереди проверки'
             when {{a}}.review_id is not null and {{a}}.sup_id is null
               then 'отложен до ИНН: у спорной записи несколько ключей портала, имя не выдаётся'
@@ -1545,6 +1550,7 @@ select (select n from parts)                                             as part
   join sup_info si             on si.sup_group = g.sup_group
   left join review_keys rk     on rk.review_id = si.review_id and rk.keys_n > 1
   left join sup_entity e       on e.id = si.sup_id
+  left join sup_name_shown nm  on nm.sup_id = e.id
   left join lib_suppliers ls   on ls.id = si.supplier_id
  order by g.code, g.cur, g.unit, g.price_min nulls last, g.sup_group
 ;
@@ -1737,6 +1743,7 @@ with
       left join brand_priced bp   on bp.brand_key = p.brand_key
       left join brand_asked ba    on ba.brand_key = p.brand_key
       left join sup_entity e      on e.id = si.sup_id
+      left join sup_name_shown nm on nm.sup_id = e.id
       left join lib_suppliers ls  on ls.id = si.supplier_id
   ),
   -- ОТБОРА НЕТ: снимку нужны все пары. В редакторской версии здесь стояли
@@ -1818,14 +1825,18 @@ def карта_sql(карта) -> str:
 КАРТА_РЕЕСТРА = "    select spelling_key, brand_key from lib_brand_map"
 
 
-def запросы(карта=(), из_реестра: bool = False) -> dict[str, str]:
+def запросы(карта=(), из_реестра: bool = False, имена: bool = False) -> dict[str, str]:
     """Тексты запросов с подставленной картой ключей.
 
     из_реестра — карта берётся из базы (вид lib_brand_map), иначе — строками
     values из словаря-файла. Реестра нет — сборщик зовёт без него, и запросы
-    работают по-старому."""
+    работают по-старому.
+
+    имена — вид sup_name_shown в базе есть (company_names.вид_имён_есть); нет —
+    на его месте пустая выборка, и имя поставщика берётся по-старому."""
     вставка = КАРТА_РЕЕСТРА if из_реестра else карта_sql(карта)
-    return {имя: sql.replace(МЕТКА_КАРТЫ, вставка) for имя, sql in ЗАПРОСЫ.items()}
+    return {имя: company_names.имена_sql(sql.replace(МЕТКА_КАРТЫ, вставка), имена)
+            for имя, sql in ЗАПРОСЫ.items()}
 
 
 # Ключ написания бренда в Python — ТОТ ЖЕ, что считает brand_pipeline (normed):

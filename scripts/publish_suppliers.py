@@ -23,7 +23,11 @@ import os
 import re
 import sys
 import time
+from pathlib import Path
 from urllib import error, parse, request
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from library import company_names  # noqa: E402
 
 PAGES_PROJECT = "kvant-sourcing-f122"
 KEY = "suppliers:v1"
@@ -46,13 +50,33 @@ READBACK_DELAYS = (0, 2, 5, 15, 30, 30)
 # нужны для сведения, а не для чтения: в снимке они только раздули бы объём.
 ПОКАЗЫВАЕМ = ("inn", "vat", "ogrn", "domain", "bitrix")
 
+# ИМЯ — ИЗ ВИДА sup_name_shown, а не display_name. display_name — ключ сведения
+# («supremevalves»), а не вывеска; владелец 24.09.2026: «наименование как
+# веб-сайт компании не работает». Выбор имени (карточка Битрикса → реквизиты →
+# написание → display_name, если не похож на ключ → домен) сделан ОДИН РАЗ, в
+# виде (suppliers_schema.sql, блок 8а), и его же читают /nomenclature и выгрузки
+# брендов. Пока схему с видом не применили, вид подменяется пустой выборкой
+# (company_names.имена_sql), и страница показывает display_name, как раньше.
 СУЩНОСТИ_SQL = """
-select e.id, e.display_name, e.country, e.note, e.status, e.resolution,
-       r.seq is not null as numbered
+select e.id, coalesce(nm.name, e.display_name), e.country, e.note, e.status,
+       e.resolution, r.seq is not null as numbered, nm.name_source
   from sup_entity e
   left join sup_number_registry r on r.sup_id = e.id
+  left join sup_name_shown nm on nm.sup_id = e.id
  where e.resolution <> 'merged'
  order by e.id
+"""
+# ИНН ИЗ СВЕЖИХ РЕКВИЗИТОВ (library/company_names.py). Сведение пишет ИНН в
+# sup_identifier только на своём прогоне; номер, заполненный в Битриксе после
+# него, до следующего сведения виден лишь здесь. Идёт признаком inn со своим
+# источником — два разных ИНН у записи покажутся оба, как и положено.
+ИНН_РЕКВИЗИТОВ_SQL = """
+select sup_id, 'inn', inn, 'реквизиты Битрикса'
+  from (select distinct on (sup_id) sup_id, inn
+          from sup_display_name
+         where source = 'bitrix:requisite' and rolled_back_at is null
+         order by sup_id, id desc) z
+ where inn is not null
 """
 ПРИЗНАКИ_SQL = """
 select sup_id, kind, value, source
@@ -122,6 +146,39 @@ def require(condition, code):
 
 # ── Сборка снимка ────────────────────────────────────────────────────────────
 
+def номер_карточки(ключ) -> str:
+    """Номер карточки компании портала из ключа очереди: «bitrix:123» → «123».
+
+    Сведение кладёт в payload ключи вида «bitrix:123» (load_supplier_master,
+    Сущность.ключи), а страница строит из них ссылку на карточку. С префиксом
+    ссылка вела в никуда: …/company/details/bitrix%3A123/. Всё, что после
+    префикса не число, — не карточка; ноль — тоже (crm_id() в base/fetch_rfq.py
+    так обозначает её отсутствие)."""
+    if ключ is None:
+        return ""
+    s = str(ключ).strip()
+    if s.startswith("bitrix:"):
+        s = s[len("bitrix:"):]
+    return s if s.isdigit() and int(s) > 0 else ""
+
+
+# КТО «ЖДЁТ ИНН» — критерий папки на странице. Владелец 24.09.2026: «убери всех
+# тех, кто нераспределённо дожидается ИНН, в отдельную папку».
+#
+# В папку идут:
+#   • отложенные сведением (inn_queue): их нет в sup_entity вовсе, номер не
+#     выдан, спор снимет только ИНН (load_supplier_master.спорная);
+#   • записи реестра без вечного номера (numbered = false): не распределены.
+#
+# В папку НЕ идут кандидаты сведения с номером — одиночки («один источник») и
+# «проверить нечем». Номер им выдан навсегда, ИНН для сведения им не нужен
+# (спорная() их не держит), и это большая часть реестра: убрать их значило бы
+# убрать со страницы почти всех поставщиков. Их неуверенность видна в колонке
+# «Чем слито», а не прячется.
+def ждёт_инн(номер_выдан) -> bool:
+    return not номер_выдан
+
+
 def чистые(значения, пусто=("",)):
     """Множество непустых строк из сырого списка payload.
 
@@ -154,7 +211,9 @@ def собрать(строки, признаки, открытых_в_очер�
 
     сущности = []
     с_инн = многодоменных = с_историей = измеримых = 0
-    for sid, имя, страна, причина, статус, _resolution, номер_выдан in строки:
+    # Хвост строки — источник имени (с 24.09.2026); прежняя форма строки без
+    # него тоже читается.
+    for sid, имя, страна, причина, статус, _resolution, номер_выдан, *хвост in строки:
         мои = по_сущности.get(sid, {})
         домены = sorted(set(мои.get("domain", [])))
         инн = sorted(set(мои.get("inn", [])))
@@ -174,6 +233,10 @@ def собрать(строки, признаки, открытых_в_очер�
             "merged_by": причина,
             "status": статус,
         }
+        if хвост and хвост[0]:
+            запись["name_from"] = хвост[0]
+        if ждёт_инн(номер_выдан):
+            запись["wait_inn"] = True
         # Отзывчивость отдаётся числителем и знаменателем, а не долей: «50 %» из
         # двух запросов и из сорока — разные утверждения, и страница обязана
         # уметь их различить. Доля считается там, где показывается.
@@ -193,6 +256,7 @@ def собрать(строки, признаки, открытых_в_очер�
         "totals": {
             "entities": len(сущности),
             "numbered": sum(1 for e in сущности if e["number"]),
+            "wait_inn": sum(1 for e in сущности if e.get("wait_inn")),
             # Имя счётчика — по тому, что он считает. В очереди проверки лежат не
             # только строки, ждущие ИНН: там же спорные слияния и всё прочее.
             # Подпись «ждут ИНН» на этой цифре была бы враньём.
@@ -214,7 +278,7 @@ def собрать(строки, признаки, открытых_в_очер�
         # отсутствие — так его и возвращает crm_id() в base/fetch_rfq.py
         # для None, "" и "0". Отправить человека открывать карточку 0
         # значит послать его в никуда.
-        ключи = sorted(чистые(строка.get("keys"), пусто=("", "0")))
+        ключи = sorted({номер_карточки(k) for k in (строка.get("keys") or [])} - {""})
         if not ключи:
             continue                      # без карточки заполнять нечего
         карточки.update(ключи)
@@ -250,10 +314,16 @@ def читать_базу(dsn):
     try:
         conn.set_session(readonly=True, autocommit=True)
         with conn.cursor() as cur:
-            cur.execute(СУЩНОСТИ_SQL)
+            есть = company_names.вид_имён_есть(cur)
+            print(f"имена для показа: {'вид ' + company_names.ВИД_ИМЁН if есть else 'вида нет — display_name'}")
+            cur.execute(company_names.имена_sql(СУЩНОСТИ_SQL, есть))
             строки = cur.fetchall()
             cur.execute(ПРИЗНАКИ_SQL, (list(ПОКАЗЫВАЕМ),))
             признаки = cur.fetchall()
+            cur.execute("select to_regclass('sup_display_name') is not null")
+            if cur.fetchone()[0]:
+                cur.execute(ИНН_РЕКВИЗИТОВ_SQL)
+                признаки = признаки + cur.fetchall()
             cur.execute(ОЧЕРЕДЬ_SQL)
             очередь = cur.fetchone()[0]
             cur.execute(ОТЗЫВЧИВОСТЬ_SQL)
@@ -401,7 +471,11 @@ def main(argv=None):
         # публичного репозитория не уходит (правило 17). Сам список едет в KV,
         # который читается страницей за Cloudflare Access.
         print(f"ждут ИНН: сущностей {t.get('inn_entities', 0)}, "
-              f"карточек к заполнению {t.get('inn_cards', 0)}")
+              f"карточек к заполнению {t.get('inn_cards', 0)}, "
+              f"записей реестра без номера {t['wait_inn']}")
+        по_источнику = collections.Counter(e.get("name_from") or "display_name"
+                                           for e in снимок["entities"])
+        print("имя взято: " + ", ".join(f"{k} {v}" for k, v in sorted(по_источнику.items())))
         print(f"признаков прочитано: {len(признаки)}, размер снимка: {len(raw)} Б "
               f"({len(raw) / 1024 / 1024:.2f} МиБ из {MAX_BYTES // 1024 // 1024})")
         if "caveat" in снимок:
