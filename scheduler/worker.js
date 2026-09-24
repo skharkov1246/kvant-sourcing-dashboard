@@ -1,5 +1,5 @@
 // Планировщик дашборда КВАНТ — отдельный Cloudflare Cron Worker (НЕ Pages).
-// По расписанию делает ЧЕТЫРЕ вещи (четвёртая — ночные прогоны Битрикса, NIGHTLY ниже):
+// По расписанию делает ЧЕТЫРЕ вещи (четвёртая — ночные прогоны Битрикса, делаЧаса ниже):
 //   1) каждые 6 часов (:07)     — пересборка дашборда (GitHub repository_dispatch), даже без визитов
 //      (реже 2ч — чтобы не жечь лимит минут Actions; свежесть при заходах держит Pages-воркер);
 //   2) каждые 2 часа (:37)      — проверка АЛЕРТОВ по свежим данным и письмо, если есть что сообщить;
@@ -19,31 +19,43 @@
 //   var    REPORT_FROM       — от кого (адрес на верифицированном в Resend домене)
 //   var    ALERT_MIN_EUR     — порог «крупной» сделки для алерта о застрявших (по умолчанию 100000)
 const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
-const REPORT_CRON = "5 21 * * *";   // 00:05 МСК — дневной отчёт о посетителях
 const ALERT_CRON = "37 */2 * * *";  // :37 чётных часов — проверка алертов (на ~30 мин позже пересборки)
+const HOURLY_CRON = "7 * * * *";    // каждый час в :07 — что запускать, решает ПО_ЧАСАМ ниже
 
-const SCAN_CRON = "0 21 * * *";     // 00:00 МСК — суточный скан чатов сделок (тяжёлый, раз в сутки)
-
-// НОЧНЫЕ ПРОГОНЫ, ЧИТАЮЩИЕ БИТРИКС — ЗДЕСЬ, А НЕ КРОНОМ GITHUB. Раскладка утверждена
+// ДВА РАСПИСАНИЯ ВМЕСТО СЕМИ. Бесплатный тариф Cloudflare Workers даёт не больше
+// пяти cron-расписаний на ВЕСЬ аккаунт (ошибка 10072, выкладка 24.09.2026), а
+// отдельной строкой на каждое дело их стало семь. Поэтому одно расписание
+// срабатывает каждый час, а что делать в этот час, решает таблица ниже.
+//
+// НОЧНЫЕ ПРОГОНЫ, ЧИТАЮЩИЕ БИТРИКС, — ЗДЕСЬ, А НЕ КРОНОМ GITHUB. Раскладка утверждена
 // владельцем 24.09.2026 (CLAUDE.md, «Битрикс не перегружать»): крон GitHub опаздывает
 // до пяти часов, и сбор котировок, поставленный на 01:40, шёл в 06:38 — внахлёст с
 // пересборкой 06:07. Здесь время точное, и прогоны идут друг за другом, а не разом.
-//   01:00 UTC — сбор котировок и снимки поставщиков (suppliers-quotes.yml)
-//   02:00 UTC — ежедневное пополнение сделок и запросов (library-daily.yml)
-//   03:00 UTC пн и чт — метки Битрикса для библиотеки ГТУ (gt-bitrix.yml)
-const NIGHTLY = {
-  "0 1 * * *": "supplier-quotes",
-  "0 2 * * *": "library-daily",
-  "0 3 * * 1,4": "gt-bitrix",
-};
+// Часы — UTC; минуты у всех :07.
+//   00, 06, 12, 18 — пересборка дашборда (rebuild)
+//   01 — сбор котировок и снимки поставщиков (suppliers-quotes.yml)
+//   02 — ежедневное пополнение сделок и запросов (library-daily.yml)
+//   03 по пн и чт — метки Битрикса для библиотеки ГТУ (gt-bitrix.yml)
+//   21 — скан чатов сделок (00:07 МСК) и дневной отчёт о посетителях
+function делаЧаса(date) {
+  const h = date.getUTCHours();
+  const wd = date.getUTCDay();           // 0 — воскресенье, 1 — понедельник, 4 — четверг
+  const дела = [];
+  if (h % 6 === 0) дела.push("rebuild");
+  if (h === 1) дела.push("supplier-quotes");
+  if (h === 2) дела.push("library-daily");
+  if (h === 3 && (wd === 1 || wd === 4)) дела.push("gt-bitrix");
+  if (h === 21) дела.push("scan", "report");
+  return дела;
+}
 
 export default {
   async scheduled(event, env, ctx) {
-    if (event.cron === REPORT_CRON) ctx.waitUntil(sendDailyReport(env));
-    else if (event.cron === ALERT_CRON) ctx.waitUntil(checkAlerts(env));
-    else if (event.cron === SCAN_CRON) ctx.waitUntil(triggerDispatch(env, "scan"));
-    else if (NIGHTLY[event.cron]) ctx.waitUntil(triggerDispatch(env, NIGHTLY[event.cron]));
-    else ctx.waitUntil(triggerDispatch(env, "rebuild"));
+    if (event.cron === ALERT_CRON) { ctx.waitUntil(checkAlerts(env)); return; }
+    const when = new Date(event.scheduledTime || Date.now());
+    for (const дело of делаЧаса(when)) {
+      ctx.waitUntil(дело === "report" ? sendDailyReport(env) : triggerDispatch(env, дело));
+    }
   },
 };
 

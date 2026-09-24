@@ -7,7 +7,7 @@ name: GT bitrix refresh
 # Лёгкий: один прогон ~2-3 мин + деплой; 2 раза в неделю — не жжёт лимит Actions.
 on:
   repository_dispatch:
-    types: [gt-bitrix]        # точный запуск: планировщик, пн и чт 03:00 UTC (раскладка 24.09.2026)
+    types: [gt-bitrix]        # точный запуск: планировщик, пн и чт 03:07 UTC (раскладка 24.09.2026)
   schedule:
     - cron: "17 3 * * 1,4"    # резерв: пн и чт 03:17 UTC; GitHub-крон может опаздывать
   workflow_dispatch: {}
@@ -22,7 +22,8 @@ concurrency:
 
 jobs:
   # РЕЗЕРВНЫЙ КРОН НЕ ДУБЛИРУЕТ ПЛАНИРОВЩИК. Если сегодня уже прошёл запуск от
-  # планировщика (repository_dispatch), резерв выходит сразу: второй полный проход
+  # планировщика (repository_dispatch) — успешный или ещё идущий, — резерв выходит
+  # сразу: второй полный проход
   # по порталу за сутки — это лишняя нагрузка на Битрикс (CLAUDE.md, «Битрикс не
   # перегружать»). Смотрим только историю своего прогона, без обращения к порталу.
   guard:
@@ -40,8 +41,8 @@ jobs:
           if [ "$EVENT" = "schedule" ]; then
             since=$(date -u -d '20 hours ago' +%Y-%m-%dT%H:%M:%SZ)
             n=$(curl -sS -H "Authorization: Bearer $GH_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/gt-bitrix.yml/runs?event=repository_dispatch&status=success&created=%3E%3D$since&per_page=1" \
-              | python3 -c "import sys,json; print(json.load(sys.stdin).get('total_count', 0))")
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/gt-bitrix.yml/runs?event=repository_dispatch&created=%3E%3D$since&per_page=20" \
+              | python3 -c "import sys,json; print(sum(1 for r in json.load(sys.stdin).get('workflow_runs', []) if r.get('conclusion') not in ('failure', 'cancelled', 'timed_out')))")
             [ "${n:-0}" -gt 0 ] && skip=true
           fi
           echo "skip=$skip" >> "$GITHUB_OUTPUT"

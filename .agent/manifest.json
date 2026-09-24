@@ -143,16 +143,16 @@
     {
       "what": "ночной разбор котировок (СП-166, сплошной обход)",
       "primary": "cron 40 1 в suppliers-quotes.yml",
-      "cadence": "раз в сутки, 01:00 UTC — Cloudflare-планировщик (repository_dispatch supplier-quotes); резервный cron GitHub 04:30 выходит сам, если планировщик уже отработал (раскладка владельца 24.09.2026)"
+      "cadence": "раз в сутки, 01:07 UTC — Cloudflare-планировщик (repository_dispatch supplier-quotes); резервный cron GitHub 04:30 выходит сам, если планировщик уже отработал (раскладка владельца 24.09.2026)"
     },
     {
       "what": "метки Bitrix библиотеки ГТУ",
-      "primary": "Cloudflare-планировщик, пн и чт 03:00 UTC (repository_dispatch gt-bitrix); резерв — cron 17 3 * * 1,4, выходит сам, если планировщик уже отработал",
+      "primary": "Cloudflare-планировщик, пн и чт 03:07 UTC (repository_dispatch gt-bitrix); резерв — cron 17 3 * * 1,4, выходит сам, если планировщик уже отработал",
       "cadence": "пн и чт; фактический старт 08:30–09:00 UTC"
     },
     {
       "what": "ежедневное пополнение библиотеки (новые и изменённые сделки и карточки)",
-      "primary": "Cloudflare-планировщик, ежедневно 02:00 UTC (repository_dispatch library-daily); утверждено владельцем 24.09.2026",
+      "primary": "Cloudflare-планировщик, ежедневно 02:07 UTC (repository_dispatch library-daily); утверждено владельцем 24.09.2026",
       "cadence": "раз в сутки"
     }
   ],
