@@ -16,7 +16,7 @@
 // САМООБНОВЛЕНИЕ: если данные старше 2 ч, воркер триггерит пересборку через
 // GitHub repository_dispatch (секрет GH_DISPATCH_TOKEN); без секрета просто выключено.
 import { libraryV2, libraryV2Segments } from "./library_v2.js";
-import { archiveRoute, archiveApi, archiveJson, archiveHeaders } from "./archive_search.js";
+import { archiveRoute, archiveApi, archiveJson, archiveHeaders, SUPABASE_ORIGIN } from "./archive_search.js";
 
 const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
 const FRESH_MS = 2 * 3600 * 1000;          // порог свежести — 2 часа
@@ -627,6 +627,21 @@ const CROSSREF_KEY = "crossref:v1";
 const COUNTERS_KEY = "counters:v1";
 const COUNTERS_MAX_BYTES = 1024 * 1024;
 
+// БРЕНДЫ И КОДЫ — ТОТ ЖЕ ЗАМОК suppliers. Карточка бренда и сводка «код · цена ·
+// бренд · поставщик» показывают, кто и почём давал предложение, — те же
+// коммерческие сведения, что номенклатура, прочитанные со стороны бренда.
+// Ключей несколько, потому что предел одного — 8 МиБ (library/brands.py):
+// сводка, указатель кодов, пары «бренд × поставщик» и шестнадцать корзин
+// подробностей кода. Список ЗАКРЫТЫЙ и тот
+// же, что у публикатора: номер корзины из запроса превращается в имя ключа
+// только через него, и прочитать через этот маршрут чужой ключ нельзя.
+const BRANDS_KEY = "brands:v1";
+const BRANDS_LINKS_KEY = "brands:links:v1";
+const BRANDS_PAIRS_KEY = "brands:pairs:v1";
+const BRANDS_PARTS = 16;
+const BRANDS_PART_KEYS = Array.from({ length: BRANDS_PARTS },
+  (_, i) => "brands:codes:" + String(i).padStart(2, "0"));
+
 function suppliersRoute(path) {
   if (["/suppliers", "/suppliers/", "/suppliers.html"].includes(path)) return "page";
   if (path === "/api/suppliers") return "api";
@@ -634,6 +649,12 @@ function suppliersRoute(path) {
   if (path === "/api/crossref") return "crossref";
   if (["/counters", "/counters/", "/counters.html"].includes(path)) return "counters";
   if (path === "/api/counters") return "countersApi";
+  if (["/brands", "/brands/", "/brands.html"].includes(path)) return "brands";
+  if (path === "/api/brands") return "brandsApi";
+  if (path === "/api/brands/links") return "brandsLinks";
+  if (path === "/api/brands/pairs") return "brandsPairs";
+  if (path === "/api/brands/codes") return "brandsCodes";
+  if (path === "/api/brands/search") return "brandsSearch";
   // Маршрута публикации здесь нет намеренно: снимок кладёт scripts/publish_suppliers.py
   // прямо в KV через API Cloudflare — так же, как публикуется библиотека. Второй стек
   // разбора и проверки тела запроса в воркере не нужен, а /admin/suppliers ниже
@@ -649,7 +670,7 @@ function suppliersRoute(path) {
     } catch { break; }
   }
   decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
-  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$))/i
+  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$)|brands(?:[/.;]|$)|api\/brands(?:[/.;]|$))/i
     .test(decoded) ? "invalid" : null;
 }
 
@@ -738,6 +759,91 @@ async function readCounters(env) {
   const value = JSON.parse(raw);
   if (value.version !== 1) throw new Error("suppliers_invalid");
   return value;
+}
+
+// Снимок бренда читается так же, как номенклатура: нет ключа — «публикатор не
+// отработал» (пусто, 200), битый или чужой версии — 503, а не тихая пустота.
+async function readBrandsKey(env, key, empty) {
+  const kv = aclStore(env);
+  if (!kv) throw new Error("suppliers_unavailable");
+  const raw = await kv.get(key);
+  if (raw == null) return empty;
+  if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > SUPPLIERS_MAX_BYTES) {
+    throw new Error("suppliers_invalid");
+  }
+  const value = JSON.parse(raw);
+  if (!value || value.version !== 1) throw new Error("suppliers_invalid");
+  return value;
+}
+
+// Номер корзины — строго две цифры из закрытого диапазона. Иначе 400, и ключ
+// не собирается вовсе: имя ключа KV из пользовательского ввода не строится.
+function brandsPartKey(url) {
+  const b = url.searchParams.get("b");
+  if (typeof b !== "string" || !/^[0-9]{2}$/.test(b)) return null;
+  const n = Number(b);
+  return n < BRANDS_PARTS ? BRANDS_PART_KEYS[n] : null;
+}
+
+// ЖИВОЙ ПОИСК ПО СПРОСУ (/api/brands/search?q=…). Снимок знает только коды с
+// ценой КП; «спрашивали ли у нас этот код или такую деталь вообще» — вопрос к
+// базе. Одна фиксированная функция lib_code_search (library/supabase/
+// schema_junk.sql) через PostgREST сервисным ключом — не общий прокси: ни имени
+// функции, ни параметров сверх строки поиска клиент не задаёт. Ответ — агрегаты
+// по коду, без номеров сделок; строка поиска в журнал не пишется (журнал берёт
+// только путь).
+const BRANDS_SEARCH_MAX_BYTES = 256 * 1024;
+const BRANDS_SEARCH_TIMEOUT_MS = 10000;
+
+function brandsSearchRow(r) {
+  if (!r || typeof r !== "object") return null;
+  const n = (v) => (typeof v === "number" && Number.isFinite(v) ? v : 0);
+  const s = (v, max) => (typeof v === "string" ? v.slice(0, max) : null);
+  const code = s(r.code, 120);
+  return code ? { code, written: s(r.written, 200), name: s(r.name, 200), rows: n(r.rows), deals: n(r.deals) } : null;
+}
+
+async function brandsSearch(url, env) {
+  const q = String(url.searchParams.get("q") || "").trim();
+  if ([...q].length < 2 || [...q].length > 80 || /[\u0000-\u001f\u007f]/.test(q)) {
+    return suppliersJson({ error: "invalid_query" }, 400);
+  }
+  const key = typeof env?.SUPABASE_SERVICE_KEY === "string" ? env.SUPABASE_SERVICE_KEY.trim() : "";
+  if (!key) return suppliersJson({ error: "search_key_missing" }, 503);
+  const headers = { apikey: key, "Content-Type": "application/json", Accept: "application/json" };
+  if (!key.startsWith("sb_secret_")) headers.Authorization = "Bearer " + key;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), BRANDS_SEARCH_TIMEOUT_MS);
+  try {
+    const response = await fetch(SUPABASE_ORIGIN + "/rest/v1/rpc/lib_code_search", {
+      method: "POST", redirect: "manual", signal: controller.signal, headers,
+      body: JSON.stringify({ q, lim: 20 }),
+    });
+    if (response.status !== 200) {
+      try { await response.body?.cancel(); } catch {}
+      return suppliersJson({ error: response.status === 404 ? "search_not_installed" : "search_unavailable" }, 503);
+    }
+    const declared = response.headers.get("Content-Length");
+    if (declared !== null && !(Number(declared) <= BRANDS_SEARCH_MAX_BYTES)) {
+      try { await response.body?.cancel(); } catch {}
+      return suppliersJson({ error: "search_unavailable" }, 503);
+    }
+    const raw = await response.text();
+    if (new TextEncoder().encode(raw).byteLength > BRANDS_SEARCH_MAX_BYTES) return suppliersJson({ error: "search_unavailable" }, 503);
+    const value = JSON.parse(raw);
+    if (!value || typeof value !== "object" || !Array.isArray(value.by_code) || !Array.isArray(value.by_words)) {
+      return suppliersJson({ error: "search_unavailable" }, 503);
+    }
+    return suppliersJson({
+      q, key: typeof value.key === "string" ? value.key.slice(0, 120) : null,
+      by_code: value.by_code.slice(0, 100).map(brandsSearchRow).filter(Boolean),
+      by_words: value.by_words.slice(0, 100).map(brandsSearchRow).filter(Boolean),
+      word_rows: typeof value.word_rows === "number" ? value.word_rows : 0,
+      capped: value.capped === true,
+    });
+  } catch {
+    return suppliersJson({ error: "search_unavailable" }, 503);
+  } finally { clearTimeout(timer); }
 }
 
 function suppliersJson(value, status = 200) {
@@ -1149,8 +1255,28 @@ export default {
         catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
         return suppliersJson({ ...snapshot, admin: rights.admin });
       }
-      if (suppliers === "counters" || suppliers === "nomenclature") {
-        const файл = suppliers === "counters" ? "/counters.html" : "/nomenclature.html";
+      if (suppliers === "brandsSearch") return brandsSearch(url, env);
+      if (["brandsApi", "brandsLinks", "brandsPairs", "brandsCodes"].includes(suppliers)) {
+        let key = BRANDS_KEY, empty = { version: 1, published_at: null, brands: [], suppliers: [], totals: {} };
+        if (suppliers === "brandsLinks") { key = BRANDS_LINKS_KEY; empty = { version: 1, brands: [], suppliers: [], codes: [] }; }
+        if (suppliers === "brandsPairs") { key = BRANDS_PAIRS_KEY; empty = { version: 1, brands: [], suppliers: [], pairs: [] }; }
+        if (suppliers === "brandsCodes") {
+          key = brandsPartKey(url);
+          if (!key) return suppliersJson({ error: "invalid_part" }, 400);
+          empty = { version: 1, part: Number(url.searchParams.get("b")), codes: {} };
+        }
+        let snapshot;
+        try { snapshot = await readBrandsKey(env, key, empty); }
+        catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
+        // Резка та же, что у реестра и номенклатуры: контакты и деньги — на
+        // сервере, по праву. Сборщик таких полей в снимок не кладёт, и резка здесь
+        // — страховка на случай, если положит.
+        return suppliersJson({ ...suppliersCut(snapshot, rights), admin: rights.admin,
+          rights: rights.rights.filter((r) => r.startsWith("suppliers")) });
+      }
+      if (suppliers === "counters" || suppliers === "nomenclature" || suppliers === "brands") {
+        const файл = suppliers === "counters" ? "/counters.html"
+          : suppliers === "brands" ? "/brands.html" : "/nomenclature.html";
         try {
           const asset = await env.ASSETS.fetch(new Request(url.origin + файл, { headers: request.headers }));
           if (!asset.ok) return suppliersJson({ error: "suppliers_page_unavailable" }, 503);
@@ -1755,6 +1881,13 @@ function portalPage(who, rights, env) {
     mine.push({ id: "nomenclature", group: "work", name: "Номенклатура",
       href: "/nomenclature",
       note: "по позиции — кто давал предложение и за сколько, чей это номер, чем закрыть" });
+    // Сводка для руководителя: сколько кодов в базе и чем они закрыты, облака
+    // брендов и поставщиков, переходы бренд → поставщики и коды → цены. Под тем
+    // же правом suppliers — отдельного «руководящего» права в матрице нет, а
+    // заводить его ради сводки значило бы разделить один секрет на два замка.
+    mine.push({ id: "brands", group: "work", name: "Бренды и коды",
+      href: "/brands",
+      note: "сколько кодов в базе и с какой ценой; бренды и поставщики облаком; бренд → поставщики → цены по коду" });
   }
   // разделы: плашка показывается, только если в ней человеку что-то доступно
   const sections = GROUPS.map((g) => {

@@ -104,7 +104,10 @@ export function разобрать(html) {
 }
 
 /** Прогоняет скрипт страницы на мини-DOM и возвращает карту узлов по id. */
-export async function открыть(html, { снимок = null, ответ = null } = {}) {
+// маршруты — для страниц, читающих несколько адресов (бренды: сводка, связи,
+// корзины кодов): функция «адрес → снимок». hash — адрес записи после «#», как
+// его видит страница при открытии по прямой ссылке.
+export async function открыть(html, { снимок = null, ответ = null, маршруты = null, hash = "" } = {}) {
   const vm = await import("node:vm");
   const source = html.split("<script>").slice(1).join("<script>").split("</script>")[0];
   const { карта } = разобрать(html);
@@ -118,8 +121,9 @@ export async function открыть(html, { снимок = null, ответ = n
   };
   const context = {
     document: doc, console, URL, encodeURIComponent, Math, JSON,
-    fetch: () => Promise.resolve(ответ || new Response(JSON.stringify(снимок),
+    fetch: (url) => Promise.resolve(ответ || new Response(JSON.stringify(маршруты ? маршруты(String(url)) : снимок),
       { status: 200, headers: { "Content-Type": "application/json" } })),
+    location: { hash, pathname: "/", search: "" },
   };
   vm.createContext(context);
   vm.runInContext(source, context);

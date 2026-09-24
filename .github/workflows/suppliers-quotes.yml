@@ -112,8 +112,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      # requests — для имён компаний и брендов из Битрикса в снимке брендов
+      # (scripts/publish_brands.py → bitrix_client.py).
       - name: Установка зависимостей
-        run: pip install --quiet psycopg2-binary
+        run: pip install --quiet psycopg2-binary requests
       - name: Что дал разбор в ценах
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
@@ -173,6 +175,38 @@ jobs:
           if [ "$rc" != 0 ]; then
             echo "::warning::публикация не состоялась (код $rc) — вероятно, недоступен"
             echo "Cloudflare. Разбор сохранён, прогон не валится."
+          fi
+
+      # КАРТОЧКИ БРЕНДОВ И СВОДКА «КОД · ЦЕНА · БРЕНД · ПОСТАВЩИК» (этап 8.1).
+      # Сразу за номенклатурой, в том же прогоне и по той же базе: иначе /brands и
+      # /nomenclature показали бы разные котировки. Имена компаний и брендов
+      # карточки — из Битрикса по номерам (владелец выгружать их не будет); сбой
+      # портала публикацию не срывает, имена остаются номерами. В журнал —
+      # только агрегаты: числа, размеры ключей, заполненность по полям.
+      # Разбор кода возврата тот же, что у номенклатуры: 2 — снимок не влез в
+      # предел и сам не пройдёт, прогон красится; иное — вероятно, сеть.
+      - name: Карточки брендов и сводка кодов в KV
+        if: always()
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set +e
+          python scripts/publish_brands.py --apply
+          rc=$?
+          set -e
+          if [ "$rc" = 2 ]; then
+            echo "::error::один из ключей снимка брендов не помещается в предел KV. Сам"
+            echo "он не пройдёт: страница «Бренды и коды» останется на вчерашнем снимке."
+            echo "Размеры ключей — в журнале шага выше; делить надо тот, что вырос"
+            echo "(library/brands.py: КОРЗИН, пары и указатель — отдельными ключами)."
+            exit 1
+          fi
+          if [ "$rc" != 0 ]; then
+            echo "::warning::публикация брендов не состоялась (код $rc) — вероятно, недоступен"
+            echo "Cloudflare или база. Разбор сохранён, прогон не валится."
           fi
 
       # ЗАМЕР КОДОВ И ЕГО ПУБЛИКАЦИЯ. Ночной разбор меняет ровно то, что этот

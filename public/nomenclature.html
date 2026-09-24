@@ -655,6 +655,16 @@ fetch("/api/crossref", { headers: { Accept: "application/json" } })
       return;
     }
     показать();
+    // ПРЯМОЙ АДРЕС ПОЗИЦИИ: /nomenclature#k=<ключ>. На него ссылаются карточки
+    // поставщика, бренда и кода; без него переход вёл бы к списку.
+    var h = typeof location !== "undefined" ? String(location.hash || "") : "";
+    var m = h.match(/^#k=(.+)$/);
+    if (m) {
+      var ключ = m[1];
+      try { ключ = decodeURIComponent(ключ); } catch (e) { /* как есть */ }
+      var п = данные.positions.filter(function (x) { return x.k === ключ; })[0];
+      if (п) открыть(п);
+    }
   })
   .catch(function (e) {
     сбой("Не открылось", String(e.message || e) + ". Если это «нет права suppliers», "
