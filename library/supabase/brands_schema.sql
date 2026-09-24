@@ -29,7 +29,9 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 1. Ключ написания. Порт library/codes_sql.ключ_написания: нижний регистр,
 --    ё → е, свёртка диакритики, снятие правовых форм по границе слова, только
---    буквы и цифры, 40 знаков, латинские двойники в смешанном ключе. Строки
+--    буквы и цифры, 40 знаков, латинские двойники в смешанном ключе. Граница
+--    правовой формы — явный класс [0-9a-zа-я_], а не \m…\M: у \m слово — любая
+--    буква по локали, и Python повторить это не может (24.09.2026, «іао»). Строки
 --    констант — дословно из codes_sql (DIACRITICS_*, LEGAL_FORMS_KEY, HOMO_*);
 --    расхождение ловит tests/test_brand_registry_sql.py.
 --    Работает верно только в базе с локалью UTF-8 (правило 21а): в локали C
@@ -42,7 +44,7 @@ create or replace function lib_brand_key(t text) returns text as $$
                    translate(replace(lower(coalesce(t, '')), 'ё', 'е'),
                              'äöüåáàâãéèêëíìîïóòôõúùûñçøšžčřýłæœß',
                              'aouaaaaaeeeeiiiioooouuuncoszcrylaos'),
-                   '\m(ооо|оао|зао|пао|ао|llc|ltd|inc|gmbh|s\.p\.a|spa|co|corp|company|limited|holding|group|a/s|ab|bv|nv|sas|sa|plc|pte|kg|ag|oy|oyj|srl|as)\M',
+                   '(?<![0-9a-zа-я_])(ооо|оао|зао|пао|ао|llc|ltd|inc|gmbh|s\.p\.a|spa|co|corp|company|limited|holding|group|a/s|ab|bv|nv|sas|sa|plc|pte|kg|ag|oy|oyj|srl|as)(?![0-9a-zа-я_])',
                    ' ', 'g'),
                  '[^0-9a-zа-я]', '', 'g'), 40) as k) x
 $$ language sql immutable parallel safe;
