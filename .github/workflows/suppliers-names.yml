@@ -1,0 +1,151 @@
+name: Поставщики — имена из карточек Битрикса
+
+# Берёт названия компаний реестра из портала: TITLE карточки и наименование с ИНН
+# из реквизитов (library/company_names.py). Пишет в sup_display_name; страница
+# /suppliers, /nomenclature и выгрузки брендов показывают имя через вид
+# sup_name_shown. Зачем: display_name реестра — сжатый ключ («supremevalves»), а
+# владелец 24.09.2026: «наименование как веб-сайт компании не работает».
+#
+# ПО УМОЛЧАНИЮ ВХОЛОСТУЮ: читает базу и портал, печатает счётчики — и ничего не
+# пишет. Запись включается галкой apply. Откат — ключом прогона.
+#
+# РАСПИСАНИЯ НЕТ: когда гонять, решает владелец. Только ручной запуск.
+#
+# В журнал идут ТОЛЬКО агрегаты: репозиторий публичный (CLAUDE.md, правило 17).
+# Ни названий компаний, ни ИНН, ни номеров карточек.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать имена в базу (иначе вхолостую)"
+        type: boolean
+        default: false
+      shards:
+        # Правило дробления (распоряжение владельца 22.09.2026): минимум десять
+        # частей. Список сущностей делится ОДИН раз — хешем номера сущности
+        # (company_names.часть), и каждая часть читает только свои карточки.
+        description: "На сколько частей делить список компаний"
+        type: choice
+        options: ["10", "12", "25", "50"]
+        default: "10"
+      rollback_run_id:
+        description: "Откатить прогон по ключу (например names-123456). Задан — только откат, чтения портала не будет"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  # ОДНА ПЯТАЯ ПОРТАЛА. Распоряжение владельца 24.09.2026: фоновые чтения вроде
+  # этого берут не больше пятой части ёмкости портала — 0,3 запроса в секунду из
+  # 1,5 умолчания bitrix_client (RPS_ПО_УМОЛЧАНИЮ). Поэтому прогон стоит НЕ в
+  # общей очереди bitrix-portal, а в своей группе bitrix-fifth, общей с разбором
+  # почты лидов: в пятой доле одновременно идёт один прогон, и два таких вместе
+  # не превышают её. Помни: в группе ждёт ОДИН прогон, следующая постановка
+  # снимает ожидающую (CLAUDE.md, стиль работы).
+  group: bitrix-fifth
+  cancel-in-progress: false
+
+jobs:
+  # ОТКАТ ИДЁТ ОТДЕЛЬНО И ОТМЕНЯЕТ ВСЁ ОСТАЛЬНОЕ. Смешивать откат с новой записью
+  # в одном запуске нельзя: непонятно, что откатывать, если упадёт вторая половина.
+  rollback:
+    if: inputs.rollback_run_id != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: pip install --quiet requests psycopg2-binary==2.9.10
+      - name: Откат прогона по ключу
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ROLLBACK_RUN_ID: ${{ inputs.rollback_run_id }}
+        run: |
+          set -euo pipefail
+          [ -n "${SUPABASE_DB_URL:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
+          # Ключ идёт через окружение, а не подстановкой в текст команды.
+          python library/company_names.py
+
+  # СХЕМА ПЕРЕД ЗАПИСЬЮ, И ТОЛЬКО ПЕРЕД НЕЙ — как в supplier-merge.yml. Файл
+  # идемпотентен и переживает отсутствие ролей Supabase (правило 20).
+  schema:
+    if: inputs.rollback_run_id == '' && inputs.apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Схема поставщиков в рабочей базе
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${SUPABASE_DB_URL:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 \
+            -f library/supabase/suppliers_schema.sql
+
+  names:
+    needs: schema
+    # Схема пропущена (холостой прогон) — части всё равно идут; схема упала — нет.
+    if: >-
+      always() && inputs.rollback_run_id == '' &&
+      (needs.schema.result == 'success' || needs.schema.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      # ЧАСТИ ИДУТ ПО ОДНОЙ. Пятая доля портала — это 0,3 запроса в секунду на
+      # весь прогон; при одной части разом она и достаётся ей целиком
+      # (BITRIX_PARALLEL=1). Упавшая часть уносит свою долю, а не весь прогон.
+      max-parallel: 1
+      matrix:
+        # Матрица на 50 мест; лишние части сразу выходят, как в library-index.yml:
+        # так число частей остаётся входом прогона, а не правкой файла.
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
+    steps:
+      - name: Лишняя часть
+        if: matrix.shard >= fromJSON(inputs.shards)
+        run: echo "часть ${{ matrix.shard }} не нужна при ${{ inputs.shards }} частях"
+
+      - uses: actions/checkout@v5
+        if: matrix.shard < fromJSON(inputs.shards)
+      - uses: actions/setup-python@v6
+        if: matrix.shard < fromJSON(inputs.shards)
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        if: matrix.shard < fromJSON(inputs.shards)
+        # requests — для bitrix_client, psycopg2 — для базы; версия та же, что в
+        # гейте и в сведении.
+        run: pip install --quiet requests psycopg2-binary==2.9.10
+
+      - name: Имена, часть ${{ matrix.shard }}
+        if: matrix.shard < fromJSON(inputs.shards)
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SHARDS: ${{ inputs.shards }}
+          SHARD: ${{ matrix.shard }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          # Один ключ прогона на все части: откат одной командой снимает всё.
+          RUN_ID: names-${{ github.run_id }}
+          # ОДНА ПЯТАЯ ПОРТАЛА (распоряжение владельца 24.09.2026). Прибито здесь,
+          # а не входом: поднять долю — решение владельца, а не галка запуска.
+          BITRIX_RPS: "0.3"
+          # Частей разом — одна (max-parallel: 1 выше), бюджет не делится.
+          BITRIX_PARALLEL: "1"
+        run: |
+          set -euo pipefail
+          [ -n "${BITRIX_WEBHOOK_URL:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          [ -n "${SUPABASE_DB_URL:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
+          echo "бюджет портала: ${BITRIX_RPS}/с на прогон, частей разом ${BITRIX_PARALLEL}"
+          python library/company_names.py

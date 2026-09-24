@@ -226,6 +226,46 @@ create table if not exists our_entity (
   note   text
 );
 
+-- 7а. Имя для показа из карточки компании портала (library/company_names.py).
+--
+--     ЗАЧЕМ. display_name — это norm_name от названия: «supremevalves»,
+--     «ethosenergybloomfieldwgpwindustrialturbineservices». Как ключ сведения он
+--     верен, как вывеска компании — нет: владелец 24.09.2026 — «наименование как
+--     веб-сайт компании не работает». Настоящее название лежит в Битриксе:
+--     TITLE карточки и наименование в реквизитах.
+--
+--     ПОЧЕМУ СПУТНИК, А НЕ ПЕРЕЗАПИСЬ display_name. Правило 5: пометка, а не
+--     удаление. Строка здесь только добавляется; откат прогона ставит
+--     rolled_back_at, и действующим снова становится прежнее имя — его строка
+--     никуда не делась, а previous_name хранит, что было до прогона.
+--
+--     ИНН ИЗ РЕКВИЗИТОВ ЖИВЁТ ЗДЕСЬ ЖЕ, а не строкой sup_identifier. Признак inn
+--     в sup_identifier опознаёт и запрещает слияния (load_supplier_master,
+--     ЕДИНОЛИЧНЫЕ), а проверка «такой ИНН уже у другой сущности — не воруем»
+--     живёт только в памяти прогона сведения. Второй писатель признаков в обход
+--     неё мог бы положить один ИНН двум сущностям. Сведение и так читает
+--     реквизиты на каждом прогоне и запишет номер само; здесь он — для показа и
+--     для замера «сколько очереди снимет следующий прогон».
+create table if not exists sup_display_name (
+  id             bigserial primary key,
+  sup_id         text not null references sup_entity(id) on delete cascade,
+  source         text not null check (source in ('bitrix:title', 'bitrix:requisite')),
+  name           text check (name is null or btrim(name) <> ''),
+  previous_name  text,            -- действующее имя этого источника ДО прогона
+  card_id        text,            -- карточка компании портала, откуда взято
+  full_name      text,            -- полное наименование из реквизитов
+  inn            text,
+  kpp            text,
+  ogrn           text,
+  run_id         text not null,   -- без ключа прогона откат невозможен (правило 6)
+  created_at     timestamptz not null default now(),
+  rolled_back_at timestamptz,     -- откат: пометка, а не удаление (правило 5)
+  check (name is not null or inn is not null)
+);
+create index if not exists sup_display_name_active
+  on sup_display_name (sup_id, source, id desc) where rolled_back_at is null;
+create index if not exists sup_display_name_run on sup_display_name (run_id);
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 8. Эффективное значение: подтверждённое человеком поверх импортированного,
 --    а исходное остаётся читаемым. Следующий импорт корректировку не трогает;
@@ -289,7 +329,7 @@ declare служебная text := sup_роли_которые_есть(array['s
 begin
   foreach n in array array[
     'sup_entity', 'sup_identifier', 'sup_fact', 'sup_override',
-    'sup_review', 'sup_number_registry', 'our_entity'
+    'sup_review', 'sup_number_registry', 'our_entity', 'sup_display_name'
   ] loop
     execute format('comment on table %I.%I is %L', сх, n, 'suppliers_schema:v1');
     execute format('alter table %I.%I enable row level security', сх, n);
@@ -315,6 +355,85 @@ begin
   end if;
   if служебная is not null then
     execute format('grant select on sup_effective to %s', служебная);
+  end if;
+end $$;
+
+-- 8а. ИМЯ ДЛЯ ПОКАЗА — ОДИН ВЫБОР НА ВСЕ СТРАНИЦЫ. /suppliers, /nomenclature и
+--     выгрузки брендов (library/codes_sql.py) берут имя компании отсюда, а не
+--     каждая своим coalesce: три разных выбора дали бы одной компании три
+--     разных имени на трёх страницах.
+--
+--     Порядок — от того, что видят люди, к тому, что осталось:
+--       1. TITLE карточки компании портала;
+--       2. наименование из её реквизитов (краткое, иначе полное);
+--       3. написание из признаков (trading, alias), если оно не похоже на ключ;
+--       4. display_name, если он не похож на ключ;
+--       5. домен сайта — лучше адреса, чем сжатой строки;
+--       6. ничего: name пуст, name_source = 'ключ реестра'. Пусто, а не ключ,
+--          чтобы читатель сам решил, чем подписать строку: у выгрузок брендов
+--          дальше идут имя из очереди проверки и старый справочник, у страницы —
+--          display_name. Отдай вид ключ — он встал бы впереди их всех.
+--
+--     «ПОХОЖЕ НА КЛЮЧ» — одна функция, её же зовёт Python (company_names.как_ключ,
+--     сверка на одном корпусе — tests/test_company_names_sql.py): ключ портала
+--     «bitrix:2002» и выход norm_name — строчные буквы и цифры без пробелов.
+create or replace function sup_имя_как_ключ(t text) returns boolean as $$
+  select t is null or btrim(t) = ''
+      or t ~ '^[a-z_]+:\S+$'
+      or t ~ '^[a-zа-яё0-9]+$'
+$$ language sql immutable;
+
+drop view if exists sup_name_shown;
+create view sup_name_shown with (security_invoker = true) as
+with active as (
+  -- Действующая строка источника — последняя не откаченная. Откат прогона
+  -- помечает его строки, и действующей снова становится прежняя.
+  select distinct on (sup_id, source) sup_id, source, name
+    from sup_display_name
+   where rolled_back_at is null
+   order by sup_id, source, id desc
+), written as (
+  select distinct on (i.sup_id) i.sup_id, i.value as name
+    from sup_identifier i
+   -- legal сюда не входит: в этом реестре он несёт правовую ФОРМУ («ооо»,
+   -- «gmbh & co kg» — load_supplier_master.признаки), а не наименование.
+   where i.status <> 'rejected' and i.kind in ('trading', 'alias')
+     and not sup_имя_как_ключ(i.value)
+   order by i.sup_id, (i.kind = 'trading') desc, length(i.value) desc, i.value
+), domain as (
+  select distinct on (i.sup_id) i.sup_id, i.value as name
+    from sup_identifier i
+   where i.status <> 'rejected' and i.kind = 'domain'
+   order by i.sup_id, (i.status = 'verified') desc, i.value
+)
+select e.id as sup_id,
+       coalesce(case when not sup_имя_как_ключ(t.name) then t.name end,
+                case when not sup_имя_как_ключ(r.name) then r.name end,
+                w.name,
+                case when not sup_имя_как_ключ(e.display_name) then e.display_name end,
+                d.name)                                             as name,
+       case when not sup_имя_как_ключ(t.name) then 'bitrix:title'
+            when not sup_имя_как_ключ(r.name) then 'bitrix:requisite'
+            when w.name is not null then 'написание'
+            when not sup_имя_как_ключ(e.display_name) then 'реестр'
+            when d.name is not null then 'домен'
+            else 'ключ реестра' end                                 as name_source
+  from sup_entity e
+  left join active t  on t.sup_id = e.id and t.source = 'bitrix:title'
+  left join active r  on r.sup_id = e.id and r.source = 'bitrix:requisite'
+  left join written w on w.sup_id = e.id
+  left join domain d  on d.sup_id = e.id;
+
+do $$
+declare кому text := sup_роли_которые_есть(array['anon', 'authenticated']);
+declare служебная text := sup_роли_которые_есть(array['service_role']);
+begin
+  revoke all on sup_name_shown from public;
+  if кому is not null then
+    execute format('revoke all on sup_name_shown from %s', кому);
+  end if;
+  if служебная is not null then
+    execute format('grant select on sup_name_shown to %s', служебная);
   end if;
 end $$;
 

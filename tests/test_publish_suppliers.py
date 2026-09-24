@@ -31,8 +31,10 @@ def сущность(sid, имя, причина="domain", номер_выдан
 
 def test_счётчики_считаются_а_не_пишутся_руками():
     снимок = собрать(КОРПУС, ПРИЗНАКИ, 7)
+    # wait_inn — записи без вечного номера: они уходят в папку «Ждут ИНН».
     assert снимок["totals"] == {"entities": 3, "numbered": 2, "review_open": 7,
-                                "with_inn": 1, "with_rfq": 0, "rfq_measurable": 0}
+                                "with_inn": 1, "with_rfq": 0, "rfq_measurable": 0,
+                                "wait_inn": 1}
     assert снимок["version"] == 1
     assert снимок["published_at"].endswith("Z")
 

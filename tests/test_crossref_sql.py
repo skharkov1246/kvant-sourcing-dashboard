@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-from library import crossref
+from library import company_names, crossref
 
 ROOT = Path(__file__).resolve().parents[1]
 DSN = os.environ.get("LIBRARY_SQL_TEST_DSN")
@@ -178,10 +178,13 @@ def наборы():
             cur.execute(f'set search_path to "{СХЕМА}"')
             cur.execute(функция_ключа())
             cur.execute(КОРПУС)
+            # Как у публикатора: вида имён в этом корпусе нет — на его месте
+            # пустая выборка, имя компании остаётся display_name.
+            есть = company_names.вид_имён_есть(cur)
             for sql in (crossref.ПРЕДЛОЖЕНИЯ_SQL, crossref.КАТАЛОГ_SQL,
                         crossref.АНАЛОГИ_SQL, crossref.МАШИНЫ_SQL,
                         crossref.ИЗГОТОВИТЕЛИ_SQL, crossref.СПРОС_SQL):
-                cur.execute(sql, (crossref.FEED,))
+                cur.execute(company_names.имена_sql(sql, есть), (crossref.FEED,))
                 собрано.append(cur.fetchall())
         yield собрано
     finally:

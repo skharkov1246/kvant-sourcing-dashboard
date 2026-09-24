@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-from library import brands, codes_sql
+from library import brands, codes_sql, company_names
 from tests.test_library_schema_sql import операторы
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -123,7 +123,8 @@ def наборы():
         c.execute("begin")
         c.execute(codes_sql.SETTINGS)
         коды = {}
-        for имя, sql in codes_sql.запросы(КАРТА).items():
+        # Вид имён есть (схема поставщиков применена) — как у публикатора.
+        for имя, sql in codes_sql.запросы(КАРТА, имена=company_names.вид_имён_есть(c)).items():
             c.execute(sql)
             колонки = [d[0] for d in c.description]
             коды[имя] = [dict(zip(колонки, r)) for r in c.fetchall()]

@@ -44,7 +44,7 @@ _spec.loader.exec_module(_helpers)
 операторы = _helpers.операторы
 
 ТАБЛИЦЫ = ("sup_entity", "sup_identifier", "sup_fact", "sup_override",
-           "sup_review", "sup_number_registry", "our_entity")
+           "sup_review", "sup_number_registry", "our_entity", "sup_display_name")
 
 
 def применить(cur, схема: str = ИМЯ) -> None:

@@ -43,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from library import brands, codes_sql  # noqa: E402
+from library import brands, codes_sql, company_names  # noqa: E402
 
 КОД_ПЕРЕПОЛНЕНИЯ = 2
 # Запас до предела: больше этой доли — предупреждение в журнал. Не отказ: снимок
@@ -113,7 +113,9 @@ def читать_базу(dsn, карта):
         with conn.cursor() as cur:
             cur.execute(codes_sql.SETTINGS)
             реестр = читать_реестр(cur)
-            for имя, sql in codes_sql.запросы(карта, из_реестра=реестр is not None).items():
+            имена = company_names.вид_имён_есть(cur)
+            for имя, sql in codes_sql.запросы(карта, из_реестра=реестр is not None,
+                                              имена=имена).items():
                 t = time.monotonic()
                 cur.execute(sql)
                 колонки = [d[0] for d in cur.description]

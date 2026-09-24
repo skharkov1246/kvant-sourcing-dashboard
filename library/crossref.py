@@ -139,7 +139,9 @@ select lib_pn_key(p.part_number)      as ключ,
        p.item_name                    as наименование,
        p.rfq_company                  as компания_ключ,
        e.id                           as сущность,
-       e.display_name                 as сущность_имя,
+       -- Имя — из общего выбора sup_name_shown (suppliers_schema.sql, блок 8а),
+       -- а не сжатый ключ display_name; без вида — display_name, как раньше.
+       coalesce(nm.name, e.display_name) as сущность_имя,
        p.oem                          as изготовитель_из_файла,
        p.rfq_brands                   as бренды_с_карточки,
        p.price, p.currency, p.qty, p.qty_unit, p.basis, p.lead_days,
@@ -160,6 +162,7 @@ select lib_pn_key(p.part_number)      as ключ,
          on i.kind = 'bitrix' and i.status <> 'rejected'
         and i.value_norm = p.rfq_company
   left join sup_entity e on e.id = i.sup_id
+  left join sup_name_shown nm on nm.sup_id = e.id
  where p.feed = %s
    and coalesce(btrim(p.part_number), '') <> ''
    and lib_pn_key(p.part_number) <> ''
