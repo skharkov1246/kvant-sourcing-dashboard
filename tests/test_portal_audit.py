@@ -100,6 +100,8 @@ def _поставщики():
         метки = МЕТКИ[i % 6]
         признаки.append((sid, "inn", инн10(f"77{i + 1:07d}"), метки[0]))
         признаки.append((sid, "domain", f"firm{i}.example", метки[-1]))
+        if i == 59:
+            признаки.append((sid, "domain", f"firm{i}-group.example", метки[-1]))
         if i < 10:
             отзывчивость.append((sid, {"sent": 4, "answered": 2, "quoted": 1, "silent": 1,
                                        "no_outcome": 1, "cards": 4}))
@@ -141,6 +143,9 @@ def _номенклатура():
             предл.append({"c": c["co"], "e": c["ent"], "p": цена, "u": "USD", "q": 10.0, "n": "шт",
                           "t": цена * 10, "d": ДАТА, "s": "DAP", "l": 30, "y": "30 % аванс, остальное по факту",
                           "a": 30.0, "r": "ссс?", "f": str(5001 + i), "v": 0.9, "b": ["SKF"], "m": "SKF"})
+            if i == 8:
+                del предл[-1]["q"]
+                предл[-1]["t"] = цена * 3
             рёбра.append([ci, 1, цена, "USD", ДАТА])
             c["rows"] += 1
             c["parts"] += 1
@@ -203,6 +208,7 @@ def _бренды(ents_по_ci):
          "spelled": 1, "sups": 1, "priced": 2, "asked": 2,
          "parts": {"n": 5, "unit": 5, "categories": 1},
          "models": [{"id": "m2", "name": "Турбина ТВ-8", "family": "ТВ"}], "models_n": 1, "fleet": 0},
+        {"k": "timken", "name": "Timken", "dict": False, "codes": {"any": 1, "plausible": 1}},
     ]
     kp = len(коды)
     плитки = {"all": 100, "customer": 60, "kp": kp, "buy": 20, "brand": 50, "supplier": 5,
@@ -260,7 +266,8 @@ def _счётчики():
                 "shorter_than_four": 40, "longer_than_25": 10}
 
     строки = [
-        ("коды_и_цены", "36000000001", "2026-09-23T01:30:00Z", числа(980, 290), None),
+        ("коды_и_цены", "36000000001", "2026-09-23T01:30:00Z", числа(980, 290),
+         "замер после правки правила правдоподобного кода"),
         ("коды_и_цены", "36000000002", "2026-09-24T01:30:00Z", числа(1000, 300), None),
         ("инкремент_сделки", "36000000003", "2026-09-23T02:00:00Z", {"начало": 1790000000, "после_id": 4900}, None),
         ("инкремент_сделки", "36000000004", "2026-09-24T02:00:00Z", {"начало": 1790086400, "после_id": 5000}, None),
@@ -308,7 +315,14 @@ def _библиотека():
                                   {"amount": f"12{j}.50", "currency": "USD", "price_date": "2026-08-01",
                                    "price_type": "Предложение поставщика", "direction": "input_estimate",
                                    "supplier": "ООО Ромашка", "part_number": "NU 316", "unit": "шт"}))
-        строки.append(_статья(f"lib:{seg}:k1", seg, "knowledge", "Опыт замены подшипника"))
+        знание = _статья(f"lib:{seg}:k1", seg, "knowledge", "Опыт замены подшипника")
+        знание["body"] = ("Опыт замены подшипника на насосе.\n\n| узел | деталь |\n|---|---|\n| опора | NU 316 |\n\n"
+                          "| размер | допуск | зазор |\n|---|---|---|\n| 80 | h6 | C3 |\n\n"
+                          "Подробнее: [каталог](https://example.test/catalog) и [раздел](/library#segment=bearings).")
+        знание["sources"]["references"][0]["locator"] = {"page": 3}
+        знание["sources"]["crm_links"] = [{"url": "https://example.test/crm/1", "title": "Сделка"}]
+        знание["sources"]["open_questions"] = []
+        строки.append(знание)
         связи[comp] = [{"article_id": f"lib:{seg}:s{j}", "relation_type": "historical_supplier_candidate",
                         "position_id": j + 1, "json_pointer": f"/items/{j}", "part_number": "NU 316",
                         "source_url": "https://example.test/list"} for j in range(2)]
@@ -396,20 +410,11 @@ def чистый():
 # причиной. Новая проверка, не попавшая ни сюда, ни в применение, — сигнал, что
 # корпус её не кормит и «ноль дефектов» по ней ничего не значит.
 НЕ_ПРИМЕНИМЫ = {
-    ("suppliers", "s.caveat"): "склеенных записей в корпусе нет, оговорки тоже",
-    ("nomenclature", "n.o_t_noq"): "суммы без количества в корпусе нет",
     ("nomenclature", "n.worse_lost"): "нужен прошлый снимок (--prev-dir)",
     ("nomenclature", "n.worse_brand"): "нужен прошлый снимок (--prev-dir)",
     ("nomenclature", "n.worse_price"): "нужен прошлый снимок (--prev-dir)",
     ("nomenclature", "n.worse_co"): "нужен прошлый снимок (--prev-dir)",
-    ("brands", "b.unmerged"): "все бренды корпуса словарные",
-    ("counters", "c.note"): "оговорок в корпусе нет",
     ("library", "l.blob"): "считается только при сбое чтения блоба",
-    ("library", "l.body_table"): "таблиц в текстах корпуса нет",
-    ("library", "l.body_links"): "ссылок в текстах корпуса нет",
-    ("library", "l.ref_locator"): "указателей места в корпусе нет",
-    ("library", "l.crm_url"): "ссылок CRM в корпусе нет",
-    ("library", "l.open_q"): "открытых вопросов у проверенных статей нет",
 }
 
 
@@ -574,7 +579,7 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("suppliers", "x.ent_null", lambda о: ком(о, 4).update(ent=None)),
     ("suppliers", "x.brand_digits", lambda о: ком(о, 4).update(brands=["1138"])),
     ("suppliers", "x.brand_junk", lambda о: ком(о, 4).update(oem=["аналог SKF"])),
-    ("suppliers", "x.link_n", lambda о: ком(о, 4).update(oem=["Timken"])),
+    ("suppliers", "x.link_n", lambda о: ком(о, 4).update(oem=["Kaydon"])),
     ("suppliers", "x.link_s", lambda о: о[brands.КЛЮЧ]["suppliers"].pop(0)),
     ("suppliers", "x.pn_class", lambda о: поз(о, 3).update(n="SS316")),
     ("suppliers", "x.pk_short", lambda о: поз(о, 3).update(k="31")),
@@ -647,7 +652,7 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("nomenclature", "n.oem_file_case", lambda о: поз(о, 3).update(oem_file=["FAG", "Fag"])),
     ("nomenclature", "n.brands_digits", lambda о: поз(о, 3).update(brands=["1138"])),
     ("nomenclature", "n.brands_case", lambda о: поз(о, 3).update(brands=["FAG", "fag"])),
-    ("nomenclature", "n.brands_unknown", lambda о: поз(о, 3).update(brands=["Timken"])),
+    ("nomenclature", "n.brands_unknown", lambda о: поз(о, 3).update(brands=["Kaydon"])),
     ("nomenclature", "n.alt_kind", lambda о: поз(о, 0)["alts"][0].update(kind="похожий")),
     ("nomenclature", "n.alt_self", lambda о: поз(о, 0)["alts"][0].update(pn="NU-316")),
     ("nomenclature", "n.alt_dup", lambda о: поз(о, 0)["alts"].append(dict(поз(о, 0)["alts"][0]))),
@@ -756,7 +761,7 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("brands", "b.s_codes_zero", lambda о: пост(о, 0).update(codes=0)),
     ("brands", "b.cb_all_noname", lambda о: о[brands.КЛЮЧ]["card_brands"][0].pop("name")),
     ("brands", "b.cb", lambda о: о[brands.КЛЮЧ]["card_brands"][0].update(name="1138")),
-    ("brands", "b.cb_link", lambda о: о[brands.КЛЮЧ]["card_brands"][0].update(k="timken")),
+    ("brands", "b.cb_link", lambda о: о[brands.КЛЮЧ]["card_brands"][0].update(k="kaydon")),
     ("brands", "b.cov_table", lambda о: о[brands.КЛЮЧ]["coverage"]["universes"]["all"]["fields"][0].update(pct=99.0)),
     ("brands", "b.fields_src", lambda о: о[brands.КЛЮЧ]["fields"].pop(0)),
     ("brands", "b.dict", lambda о: о[brands.КЛЮЧ]["dict"].update(records=0)),
@@ -1038,7 +1043,7 @@ def test_прошлый_снимок_считает_ухудшения():
 
 ЗАПРЕТНОЕ = ([имя for имя in ИМЕНА] + [n for n, _ in КОДЫ] + [ключ(n) for n, _ in КОДЫ]
              + [инн10(f"77{i + 1:07d}") for i in range(len(ИМЕНА))] + [f"firm{i}.example" for i in range(60)]
-             + ["Ромашка", "Тюльпан", "Подшипник", "SKF", "FAG"])
+             + ["Ромашка", "Тюльпан", "Подшипник", "SKF", "FAG", "Timken", "example"])
 
 
 def _папка(tmp_path, сырьё):
