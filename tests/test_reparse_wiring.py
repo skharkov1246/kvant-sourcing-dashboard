@@ -136,7 +136,7 @@ def test_обход_делится_на_части_у_обоих_источни�
     код = без_комментариев((ROOT / "library" / "reparse.py").read_text())
     assert "collect_refs_rfq(DAYS, SHARD, SHARDS)" in код, (
         "обход предложений не получает номер части — значит не делится")
-    assert "collect_refs(DAYS, SHARD, SHARDS)" in код
+    assert "collect_refs(DAYS, SHARD, SHARDS" in код   # у сделок — ещё и границы по файлам
     # И прежнего «работает только часть 1» больше нет.
     assert "if SHARD != 0:" not in код
 

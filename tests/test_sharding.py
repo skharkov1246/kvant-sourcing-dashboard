@@ -43,7 +43,7 @@ def test_делений_ровно_одно():
 def test_оба_обхода_умеют_делиться():
     """Правка держится на том, что обходы принимают часть и ограничивают себя."""
     ind = код("library/indexer.py")
-    assert "def collect_refs(days: int, shard: int = 0, shards: int = 1)" in ind
+    assert "def collect_refs(days: int, shard: int = 0, shards: int = 1" in ind
     assert "def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1)" in ind
     # И сделки, и карточки запросов режутся диапазоном идентификаторов на стороне
     # портала (24.09.2026: деление сделок по остатку после полного списка

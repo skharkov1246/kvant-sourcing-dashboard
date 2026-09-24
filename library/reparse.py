@@ -99,6 +99,39 @@ ORIGIN = "поле запроса" if indexer.SOURCE == "rfq" else "поле с�
 #: байтов, его лечит повтор закачки (RETRY_FAILED у разбора), а не другой читатель.
 СТАТУСЫ_НЕУДАЧИ = ("пусто", "формат не читаем", "текст без спецификации")
 
+# НОМЕРА СДЕЛОК ДЛЯ ГРАНИЦ ЧАСТЕЙ — по ВСЕМ файлам сделок этих форматов, а не
+# по кандидатам. Части стартуют не разом (по двенадцать), и записанный файл
+# выбывает из кандидатов: границы, посчитанные по кандидатам, у поздних частей
+# сдвинулись бы, и между частями легли бы пропуски. Этот набор записью не меняется.
+DEALS_OF_FILES = """
+select coalesce(nullif(regexp_replace(f.deal_id, '[^0-9]', '', 'g'), ''), '0')::bigint
+  from lib_files f
+ where f.kind = any(%s)
+   and f.origin = %s"""
+
+
+def границы_по_файлам(номера: list[int], shard: int, shards: int) -> tuple[int, int | None]:
+    """Смежный диапазон номеров сделок (после, включительно по) для своей части.
+
+    Делит ПОРОВНУ ПО ФАЙЛАМ, а не по номерам. Холостой переразбор сделок
+    24.09.2026 (прогон 35989447789) резал номера 1…23 590 равными отрезками: 34
+    части из 50 оказались пустыми (у старых сделок файлов в базе нет), а три
+    последние читали по 1 100 файлов по четыре часа при пределе задания 5 ч 50 мин.
+    Граница — номер сделки, поэтому сделка целиком в одной части: файлы сделки
+    не делятся и не теряются. Первая часть — с нуля, последняя — до конца.
+    """
+    if shards <= 1 or not номера:
+        return 0, None
+    н = sorted(номера)
+
+    def край(k: int) -> int:
+        return н[min(len(н) - 1, (k + 1) * len(н) // shards - 1)]
+
+    низ = 0 if shard == 0 else край(shard - 1)
+    верх = None if shard == shards - 1 else край(shard)
+    return низ, верх
+
+
 CANDIDATES = """
 select f.file_id, f.kind, coalesce(f.rows_found, 0)
   from lib_files f
@@ -237,6 +270,10 @@ def main() -> int:
         cur.execute(ЦЕНЫ_БЫЛО, (price_store.FEED, price_store.ИСТОЧНИК_СКАНА,
                                 sorted(было)))
         цен_было_по_файлу = {r[0]: int(r[1]) for r in cur.fetchall()}
+        номера_сделок: list[int] = []
+        if indexer.SOURCE != "rfq":
+            cur.execute(DEALS_OF_FILES, (list(KINDS), ORIGIN))
+            номера_сделок = [int(r[0]) for r in cur.fetchall()]
     conn.close()
     print(f"кандидатов на переразбор: {len(было)}"
           + (" (включая НЕУДАВШИЕСЯ: пусто, формат не читаем, текст без спецификации)"
@@ -269,7 +306,8 @@ def main() -> int:
     # идентификаторов карточек, и один полный обход раскладывается на части, а не
     # повторяется каждой. У сделок разбиение было и раньше — по списку ключей.
     refs = (indexer.collect_refs_rfq(DAYS, SHARD, SHARDS) if indexer.SOURCE == "rfq"
-            else indexer.collect_refs(DAYS, SHARD, SHARDS))
+            else indexer.collect_refs(DAYS, SHARD, SHARDS,
+                                      границы=границы_по_файлам(номера_сделок, SHARD, SHARDS)))
     mine = [r for r in refs
             if str(r["fo"].get("id") or r["fo"].get("ID")) in было]
     if LIMIT:
