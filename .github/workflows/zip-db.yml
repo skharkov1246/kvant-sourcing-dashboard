@@ -69,6 +69,7 @@ jobs:
           apply library/supabase/schema.sql "схема библиотеки рынков"
           apply library/supabase/schema_junk.sql "разметка текста документов"
           apply library/supabase/suppliers_schema.sql "схема поставщиков"
+          apply library/supabase/brands_schema.sql "реестр брендов (этап 8.2)"
           # ПОСЛЕДНИМ И ВСЕГДА. zip/supabase/migrations.sql выше заново выдаёт роли
           # anon полный доступ к таблицам ЗИП — так она написана. Ужесточение обязано
           # идти после неё, иначе каждый прогон миграций молча открывает базу обратно.

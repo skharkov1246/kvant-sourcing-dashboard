@@ -1,0 +1,202 @@
+name: Библиотека — реестр брендов
+
+# РЕЕСТР БРЕНДОВ В БАЗЕ: этап 8.2 плана (docs/suppliers/IMPLEMENTATION_PLAN.md).
+# Таблицы lib_brands и lib_brand_alias (library/supabase/brands_schema.sql),
+# засев и замер — library/load_brands.py, правила — library/brand_registry.py.
+#
+# СТУПЕНИ ПО ОЧЕРЕДИ, КАЖДАЯ ЧАСТЯМИ (правило дробления, CLAUDE.md):
+#   1. реестр     — dict/oem.json, zip/data/oem_atlas.json, OEM_ALIAS и
+#                   справочник марок портала СП-176. Часть читает из портала
+#                   только свой диапазон номеров элементов: 2 449 марок — это
+#                   около 50 страниц на весь прогон плюс по одному запросу на
+#                   часть за наибольшим номером, то есть меньше сотни запросов;
+#   2. написания  — компании-изготовители и написания из данных (lib_prices.oem,
+#                   lib_demand.oem, lib_parts.oem) разрешаются по реестру базы,
+#                   неразрешённые встают в очередь. Портал не читается;
+#   3. замер      — доля строк цены по трём разрезам и спроса с разрешённым
+#                   брендом, по словарю-файлу и по реестру рядом. Одна часть.
+#
+# БЕЗ ГАЛОЧКИ «apply» — ВХОЛОСТУЮ: ступени считают и печатают, база не
+# меняется (ступень 2 разрешает тогда по уже записанному реестру или по
+# словарю-файлу). С галочкой — сначала применяется схема, запись идёт с ключом
+# прогона brands-<номер прогона> в каждой строке и отменяется сама при
+# непройденном гейте. Откат — вход «rollback» с этим ключом: остальные ступени
+# тогда не идут.
+#
+# В ЖУРНАЛ — ТОЛЬКО АГРЕГАТЫ (правило 17). В артефакты ничего не пишется:
+# артефакты открытого репозитория может скачать кто угодно.
+#
+# Только ручной запуск: расписание — решение владельца.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать реестр в базу (без галочки — вхолостую)"
+        type: boolean
+        default: false
+      shards:
+        description: "На сколько частей делить каждую ступень"
+        type: choice
+        options: ["10", "12", "25", "50"]
+        default: "10"
+      bitrix_rps:
+        # БЮДЖЕТ ПОРТАЛА НА ВЕСЬ ПРОГОН, а не на часть (CLAUDE.md, «Битрикс не
+        # перегружать»). Прогон лёгкий, но идёт в той же очереди, что и тяжёлые.
+        description: "Запросов в секунду к порталу на ВЕСЬ прогон (лимит портала — 2)"
+        type: choice
+        options: ["0.8", "1.2", "1.5"]
+        default: "1.2"
+      rollback:
+        description: "Откатить запись прогона с этим ключом (brands-…); остальное не идёт"
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  # ОБЩАЯ ОЧЕРЕДЬ ЧТЕНИЯ ПОРТАЛА: ступень 1 читает справочник марок. В группе
+  # ждёт ОДИН прогон — вторую постановку, пока этот ждёт, не делать.
+  group: bitrix-portal
+  cancel-in-progress: false
+
+env:
+  RUN_ID: brands-${{ github.run_id }}
+
+jobs:
+  rollback:
+    if: inputs.rollback != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: pip install --quiet requests psycopg2-binary
+      - name: Откат прогона по ключу
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ROLLBACK: ${{ inputs.rollback }}
+        run: python library/load_brands.py
+
+  schema:
+    if: inputs.rollback == '' && inputs.apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Схема реестра брендов в рабочей базе
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${SUPABASE_DB_URL:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
+          if ! command -v psql >/dev/null; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          fi
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f library/supabase/brands_schema.sql
+
+  registry:
+    needs: schema
+    if: always() && inputs.rollback == '' && (needs.schema.result == 'success' || needs.schema.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      # 12 — предел базы (pooler Supabase держит 15 клиентов), не портала:
+      # портал защищён бюджетом BITRIX_RPS на весь прогон.
+      max-parallel: 12
+      matrix:
+        # Матрица на 50 мест; лишние части выходят сразу — число частей остаётся
+        # входом прогона, а не правкой файла.
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
+    steps:
+      - name: Лишняя часть
+        if: matrix.shard >= fromJSON(inputs.shards)
+        run: echo "часть ${{ matrix.shard }} не нужна при ${{ inputs.shards }} частях"
+      - uses: actions/checkout@v5
+        if: matrix.shard < fromJSON(inputs.shards)
+      - uses: actions/setup-python@v6
+        if: matrix.shard < fromJSON(inputs.shards)
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        if: matrix.shard < fromJSON(inputs.shards)
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+      - name: Реестр, часть ${{ matrix.shard }}
+        if: matrix.shard < fromJSON(inputs.shards)
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          STAGE: реестр
+          SHARDS: ${{ inputs.shards }}
+          SHARD: ${{ matrix.shard }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          BITRIX_RPS: ${{ inputs.bitrix_rps }}
+        run: |
+          set -euo pipefail
+          # BITRIX_PARALLEL = min(частей, max-parallel): столько частей читают
+          # портал одновременно и делят бюджет BITRIX_RPS.
+          export BITRIX_PARALLEL=$(( SHARDS < 12 ? SHARDS : 12 ))
+          python library/load_brands.py
+
+  spellings:
+    needs: registry
+    if: always() && inputs.rollback == '' && needs.registry.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 12
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
+    steps:
+      - name: Лишняя часть
+        if: matrix.shard >= fromJSON(inputs.shards)
+        run: echo "часть ${{ matrix.shard }} не нужна при ${{ inputs.shards }} частях"
+      - uses: actions/checkout@v5
+        if: matrix.shard < fromJSON(inputs.shards)
+      - uses: actions/setup-python@v6
+        if: matrix.shard < fromJSON(inputs.shards)
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        if: matrix.shard < fromJSON(inputs.shards)
+        run: pip install --quiet requests psycopg2-binary
+      - name: Написания, часть ${{ matrix.shard }}
+        if: matrix.shard < fromJSON(inputs.shards)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          STAGE: написания
+          SHARDS: ${{ inputs.shards }}
+          SHARD: ${{ matrix.shard }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+        run: python library/load_brands.py
+
+  measure:
+    needs: spellings
+    if: always() && inputs.rollback == '' && needs.spellings.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: pip install --quiet requests psycopg2-binary
+      - name: Замер доли строк с разрешённым брендом
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          STAGE: замер
+          APPLY: ${{ inputs.apply && '1' || '' }}
+        run: python library/load_brands.py
