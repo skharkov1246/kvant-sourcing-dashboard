@@ -139,6 +139,21 @@
       "primary": "repository_dispatch scan",
       "backup": "cron 0 21 в scan.yml",
       "cadence": "раз в сутки"
+    },
+    {
+      "what": "ночной разбор котировок (СП-166, сплошной обход)",
+      "primary": "cron 40 1 в suppliers-quotes.yml",
+      "cadence": "раз в сутки; cron GitHub опаздывает до 5 ч (23.09.2026 старт в 06:38 вместо 01:40 — на деплое 06:07)"
+    },
+    {
+      "what": "метки Bitrix библиотеки ГТУ",
+      "primary": "cron 17 3 * * 1,4 в gt-bitrix.yml",
+      "cadence": "пн и чт; фактический старт 08:30–09:00 UTC"
+    },
+    {
+      "what": "ежедневное пополнение библиотеки (новые и изменённые сделки и карточки)",
+      "primary": "ручной запуск library-daily.yml; расписание — решение владельца (предложено 02:40 UTC через scheduler/)",
+      "cadence": "раз в сутки"
     }
   ],
   "guardrails": {
@@ -155,7 +170,8 @@
     ],
     "pre_deploy_validation": "scripts/validate_dashboard.py — деплой не выполняется, если дашборд пустой или сломан",
     "live_check_workflow": ".github/workflows/live-check.yml",
-    "live_check": "scripts/live_check.py — правка расчёта против прода на одном снимке портала; мерж правки расчёта только при зелёной сверке и с заявкой «ожидается:» в описании PR"
+    "live_check": "scripts/live_check.py — правка расчёта против прода на одном снимке портала; мерж правки расчёта только при зелёной сверке и с заявкой «ожидается:» в описании PR",
+    "bitrix_budget": "Битрикс не перегружать (CLAUDE.md): частота из общего бюджета bitrix_client.интервал_портала = BITRIX_PARALLEL / BITRIX_RPS; лимиты портала пережидаются бюджетом BITRIX_WAIT_BUDGET; часть прогона читает свой диапазон, а не весь портал; в конце прогона строка «портал: запросов …» в журнале"
   },
   "do_not_touch_without_owner": [
     ".github/workflows/ — расписания и деплой",
