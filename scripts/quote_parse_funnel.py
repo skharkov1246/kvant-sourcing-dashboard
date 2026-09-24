@@ -103,6 +103,25 @@ select current_setting('transaction_read_only')          as только_чте�
          where name = 'default_transaction_read_only')    as источник_запрета
 """
 
+# РЕСУРСЫ БАЗЫ. 24.09.2026 владелец поднял вычислительный тариф Supabase, и
+# «насколько это помогло» надо мерить, а не угадывать. Размер вычислителя виден
+# по настройкам, которые платформа выставляет под него (память, число
+# соединений, фоновые процессы), а скорость — замером чтения на своей таблице.
+# Только числа: имён и содержимого строк здесь нет (правило 17).
+РЕСУРСЫ = """
+select name, setting, coalesce(unit, '')
+  from pg_settings
+ where name in ('max_connections', 'shared_buffers', 'effective_cache_size',
+                'work_mem', 'maintenance_work_mem', 'max_worker_processes',
+                'max_parallel_workers', 'max_parallel_workers_per_gather')
+ order by name
+"""
+СОЕДИНЕНИЙ = "select count(*) from pg_stat_activity"
+ЗАМЕР_ЧТЕНИЯ = "select count(*) from lib_demand"
+ЗАМЕР_КЛЮЧЕЙ = """
+select count(distinct lib_pn_key(part_number)) from lib_demand where id % 10 = 0
+"""
+
 # ЧТО ЗАНИМАЕТ МЕСТО. База 23.09.2026 встала в режим только чтения на 1500 МБ, и
 # решение «чистить или расширять» принимает владелец — но принимать его нужно по
 # числам, а не на слух. Таблица и её индексы считаются раздельно: у lib_demand
@@ -306,6 +325,35 @@ def ц(x) -> int:
     return int(x or 0)
 
 
+
+def замер_ресурсов(cur) -> None:
+    """Настройки вычислителя и два замера скорости: чтение таблицы и ключи кодов."""
+    import time
+    cur.execute(РЕСУРСЫ)
+    настройки = cur.fetchall()
+    cur.execute(СОЕДИНЕНИЙ)
+    занято = cur.fetchone()[0]
+    print("\nРЕСУРСЫ БАЗЫ (настройки, выставленные под вычислитель):")
+    for имя, значение, ед in настройки:
+        if ед == "8kB":
+            print(f"    {имя:34s} {int(значение) * 8 // 1024:>8d} MB")
+        elif ед == "kB":
+            print(f"    {имя:34s} {int(значение) // 1024:>8d} MB")
+        else:
+            print(f"    {имя:34s} {значение:>8s} {ед}")
+    print(f"    {'соединений занято сейчас':34s} {занято:>8d}")
+    cur.execute("select pg_relation_size('lib_demand')")
+    байт = cur.fetchone()[0]
+    for подпись, sql in (("чтение lib_demand целиком", ЗАМЕР_ЧТЕНИЯ),
+                         ("ключи кодов, каждая 10-я строка", ЗАМЕР_КЛЮЧЕЙ)):
+        t = time.monotonic()
+        cur.execute(sql)
+        n = cur.fetchone()[0]
+        с = time.monotonic() - t
+        скорость = f" · {байт / 1048576 / с:,.0f} МБ/с".replace(",", " ") if sql is ЗАМЕР_ЧТЕНИЯ and с else ""
+        print(f"    {подпись:34s} {с:8.1f} с · строк {ц(n)}{скорость}")
+
+
 def main() -> int:
     dsn = os.environ.get("SUPABASE_DB_URL", "").strip()
     if not dsn:
@@ -348,6 +396,8 @@ def main() -> int:
                 print("    Запись невозможна. У Supabase это чаще всего кончившийся диск:")
                 print("    проект переводится в режим только чтения, пока место не освободят")
                 print("    или не расширят. Прогоны записи будут падать до этого.")
+
+            замер_ресурсов(cur)
 
             # РАЗМЕРЫ ТАБЛИЦ — РЯДОМ С СОСТОЯНИЕМ, а не в отдельном прогоне:
             # «база не пишется» без «вот что занимает место» решения не даёт.

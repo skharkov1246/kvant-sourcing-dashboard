@@ -68,13 +68,26 @@ def test_последняя_часть_забирает_хвост():
     assert indexer.диапазон_части(21865, 5, 12)[1] is not None
 
 
-def test_обход_принимает_границы_диапазона():
-    """Границы обязаны доезжать до самого запроса, а не оставаться в расчёте."""
+def test_обход_принимает_границы_диапазона(monkeypatch):
+    """Границы обязаны доезжать до самого запроса, а не оставаться в расчёте.
+
+    Проверяется то, что уходит в портал, а не написание строки в исходнике:
+    перестановка кода при том же поведении проверку не роняет."""
     import inspect
     подпись = inspect.signature(indexer.bx_all_by_id).parameters
     assert "с_id" in подпись and "до_id" in подпись
-    исходник = inspect.getsource(indexer.bx_all_by_id)
-    код = "\n".join(ln for ln in исходник.splitlines()
-                    if not ln.lstrip().startswith("#"))
-    assert 'исходный["<=id"] = до_id' in код, "верхняя граница не уходит в фильтр"
-    assert "last = с_id" in код, "нижняя граница не задаёт начало обхода"
+    фильтры = []
+
+    def bx(method, params):
+        фильтры.append(dict(params["filter"]))
+        return {"result": {"items": []}}
+
+    monkeypatch.setattr(indexer, "bx", bx)
+    indexer.bx_all_by_id("crm.item.list", {"entityTypeId": 166}, с_id=40, до_id=80)
+    assert фильтры == [{">id": 40, "<=id": 80}], "границы не ушли в фильтр портала"
+    # старый метод: ключ заглавными, нижняя граница может прийти и в фильтре
+    фильтры.clear()
+    monkeypatch.setattr(indexer, "bx", lambda m, p: (фильтры.append(dict(p["filter"])),
+                                                     {"result": []})[1])
+    indexer.bx_all_by_id("crm.deal.list", {"filter": {">ID": 7, "<=ID": 9}}, ключ="ID")
+    assert фильтры == [{">ID": 7, "<=ID": 9}]

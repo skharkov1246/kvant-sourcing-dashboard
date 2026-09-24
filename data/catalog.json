@@ -1794,6 +1794,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/brands.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_chain_page.py",
         "tests/test_dict.py",
@@ -8719,6 +8720,7 @@
         "gt/tools/gap_letters.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
+        "library/brands.py",
         "tests/test_ship_channels.py"
       ]
     },
@@ -9822,6 +9824,7 @@
         "gt/tools/gap_letters.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
+        "library/brands.py",
         "tests/test_ship_channels.py"
       ]
     },

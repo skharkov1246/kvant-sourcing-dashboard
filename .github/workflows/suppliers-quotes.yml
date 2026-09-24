@@ -21,8 +21,15 @@ name: Поставщики — разбор котировок (сам по но
 # В репозиторий и артефакты не пишется ничего, в журнал — только агрегаты
 # (CLAUDE.md, правило 17).
 on:
+  # Точный запуск — repository_dispatch «supplier-quotes» от Cloudflare-планировщика
+  # в 01:00 UTC (scheduler/worker.js, раскладка владельца 24.09.2026). Крон GitHub
+  # опаздывал до пяти часов и попадал на пересборку 06:07; он оставлен резервом на
+  # 04:30: если планировщик за последние 20 ч уже отработал, страж (job guard)
+  # выходит сразу; если нет — снимок всё равно обновится до утренней пересборки.
+  repository_dispatch:
+    types: [supplier-quotes]
   schedule:
-    - cron: "40 1 * * *"          # 01:40 UTC — 04:40 МСК, портал свободен
+    - cron: "30 4 * * *"          # резерв: 04:30 UTC
   workflow_dispatch:
     inputs:
       limit:
@@ -31,6 +38,7 @@ on:
 
 permissions:
   contents: read
+  actions: read              # страж резервного крона читает историю своего прогона
 
 concurrency:
   # ОБЩАЯ ОЧЕРЕДЬ ЧТЕНИЯ ПОРТАЛА — см. пояснение в suppliers-publish.yml.
@@ -38,7 +46,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # РЕЗЕРВНЫЙ КРОН НЕ ДУБЛИРУЕТ ПЛАНИРОВЩИК. Если сегодня уже прошёл запуск от
+  # планировщика (repository_dispatch), резерв выходит сразу: второй полный проход
+  # по порталу за сутки — это лишняя нагрузка на Битрикс (CLAUDE.md, «Битрикс не
+  # перегружать»). Смотрим только историю своего прогона, без обращения к порталу.
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          skip=false
+          if [ "$EVENT" = "schedule" ]; then
+            since=$(date -u -d '20 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+            n=$(curl -sS -H "Authorization: Bearer $GH_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/suppliers-quotes.yml/runs?event=repository_dispatch&status=success&created=%3E%3D$since&per_page=1" \
+              | python3 -c "import sys,json; print(json.load(sys.stdin).get('total_count', 0))")
+            [ "${n:-0}" -gt 0 ] && skip=true
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+          echo "резервный запуск пропускается: $skip (событие $EVENT)"
+
   quotes:
+    needs: guard
+    if: needs.guard.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 350
     # ОДНА ЧАСТЬ, А НЕ ДВЕНАДЦАТЬ. Каждая часть вычитывает ВЕСЬ список карточек
@@ -52,7 +88,9 @@ jobs:
     # части «успешно» разбирали каждая свой огрызок списка.
     #
     # Одна часть читает список один раз и качает файлы своими WORKERS потоками —
-    # скачивание идёт прямыми ссылками, лимит REST на него не распространяется.
+    # скачивание по urlMachine — это REST-метод crm.controller.item.getFile того же
+    # вебхука, поэтому закачки идут через общий бюджет портала (bitrix_client,
+    # CLAUDE.md «Битрикс не перегружать»), а не в обход него.
     # Ночью торопиться некуда; когда понадобится быстрее, делить надо не файлы
     # по хешу, а карточки по диапазону id, чтобы обход списка не повторялся.
     strategy:
@@ -103,7 +141,7 @@ jobs:
   measure:
     name: Замер цен по базе
     needs: quotes
-    if: always()
+    if: always() && needs.quotes.result != 'skipped'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -112,8 +150,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      # requests — для имён компаний и брендов из Битрикса в снимке брендов
+      # (scripts/publish_brands.py → bitrix_client.py).
       - name: Установка зависимостей
-        run: pip install --quiet psycopg2-binary
+        run: pip install --quiet psycopg2-binary requests
       - name: Что дал разбор в ценах
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
@@ -173,6 +213,38 @@ jobs:
           if [ "$rc" != 0 ]; then
             echo "::warning::публикация не состоялась (код $rc) — вероятно, недоступен"
             echo "Cloudflare. Разбор сохранён, прогон не валится."
+          fi
+
+      # КАРТОЧКИ БРЕНДОВ И СВОДКА «КОД · ЦЕНА · БРЕНД · ПОСТАВЩИК» (этап 8.1).
+      # Сразу за номенклатурой, в том же прогоне и по той же базе: иначе /brands и
+      # /nomenclature показали бы разные котировки. Имена компаний и брендов
+      # карточки — из Битрикса по номерам (владелец выгружать их не будет); сбой
+      # портала публикацию не срывает, имена остаются номерами. В журнал —
+      # только агрегаты: числа, размеры ключей, заполненность по полям.
+      # Разбор кода возврата тот же, что у номенклатуры: 2 — снимок не влез в
+      # предел и сам не пройдёт, прогон красится; иное — вероятно, сеть.
+      - name: Карточки брендов и сводка кодов в KV
+        if: always()
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set +e
+          python scripts/publish_brands.py --apply
+          rc=$?
+          set -e
+          if [ "$rc" = 2 ]; then
+            echo "::error::один из ключей снимка брендов не помещается в предел KV. Сам"
+            echo "он не пройдёт: страница «Бренды и коды» останется на вчерашнем снимке."
+            echo "Размеры ключей — в журнале шага выше; делить надо тот, что вырос"
+            echo "(library/brands.py: КОРЗИН, пары и указатель — отдельными ключами)."
+            exit 1
+          fi
+          if [ "$rc" != 0 ]; then
+            echo "::warning::публикация брендов не состоялась (код $rc) — вероятно, недоступен"
+            echo "Cloudflare или база. Разбор сохранён, прогон не валится."
           fi
 
       # ЗАМЕР КОДОВ И ЕГО ПУБЛИКАЦИЯ. Ночной разбор меняет ровно то, что этот

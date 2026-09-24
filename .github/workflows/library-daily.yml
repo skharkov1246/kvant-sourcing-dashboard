@@ -1,0 +1,131 @@
+name: Библиотека — ежедневное пополнение
+
+# ТОЛЬКО НОВОЕ И ИЗМЕНЁННОЕ ЗА СУТКИ. Распоряжение владельца 24.09.2026:
+# «каждый новый запрос, новый спрос и предложение — ежедневно». Прогон читает
+# сделки и карточки запросов, созданные или изменённые после прошлого УСПЕШНОГО
+# прохода (library/increment.py), и отдаёт их новые вложения в разбор, цены и
+# распознавание. Нагрузка на портал — десятки запросов на обход плюс по одному
+# на новый файл, а не тысячи, как у сплошного обхода (CLAUDE.md, «Битрикс не
+# перегружать»).
+#
+# ОТМЕТКА ДВИГАЕТСЯ ПОСЛЕДНИМ ШАГОМ. Упадёт любой шаг — отметка остаётся
+# прежней, и следующий запуск перечитает то же окно; уже разобранные файлы
+# отсеются по lib_files, повторной записи не будет.
+#
+# ПОКА ТОЛЬКО РУЧНОЙ ЗАПУСК. Расписание — решение владельца (CLAUDE.md: правки
+# планировщика — с его согласия). Предложение: ежедневно в 02:40 UTC (05:40 МСК),
+# после ночного разбора котировок (01:00 UTC) и до утреннего деплоя (06:07 UTC).
+#
+# В репозиторий и в артефакты не пишется ничего, в журнал — только агрегаты
+# (правило 17).
+on:
+  # Ежедневно в 02:00 UTC — repository_dispatch «library-daily» от Cloudflare-
+  # планировщика (scheduler/worker.js; расписание утвердил владелец 24.09.2026).
+  # У dispatch нет входов, поэтому распознавание включается и тогда, когда
+  # inputs.ocr пуст (см. условия шагов ниже).
+  repository_dispatch:
+    types: [library-daily]
+  workflow_dispatch:
+    inputs:
+      ocr:
+        description: "Распознавать новые сканы (tesseract)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  # Общая очередь чтения портала. Помни: ожидающий в группе ОДИН, новая
+  # постановка снимает ожидающую (CLAUDE.md, стиль работы).
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      # Прогон один и читает портал одним процессом за раз: бюджет целиком его,
+      # но с запасом — рядом может идти деплой дашборда.
+      BITRIX_RPS: "1.0"
+      BITRIX_PARALLEL: "1"
+      SHARDS: "1"
+      SHARD: "0"
+      INCREMENT: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+
+      - name: Установка читателей форматов и распознавания
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq antiword catdoc p7zip-full unrar libarchive-tools \
+            poppler-utils qpdf tesseract-ocr tesseract-ocr-rus
+
+      - name: Проверка секретов
+        env:
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          S: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL"; exit 1; }
+          echo "секреты на месте"
+
+      - name: Начало прохода — время и наибольшие номера
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          python library/increment.py начало
+          python library/increment.py окно
+
+      - name: Разбор — новые вложения сделок (спрос)
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SOURCE: deals
+          WORKERS: "4"
+        run: python library/indexer.py
+
+      - name: Разбор — новые КП в карточках запросов (предложение и цены)
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SOURCE: rfq
+          WORKERS: "4"
+        run: python library/indexer.py
+
+      - name: Распознавание новых сканов — сделки
+        if: github.event_name == 'repository_dispatch' || inputs.ocr
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SOURCE: deals
+          APPLY: "1"
+        run: python library/ocr.py
+
+      - name: Распознавание новых сканов — карточки запросов
+        if: github.event_name == 'repository_dispatch' || inputs.ocr
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SOURCE: rfq
+          APPLY: "1"
+        run: python library/ocr.py
+
+      # Только если все шаги выше прошли (без if: always): упавший проход
+      # отметку не двигает.
+      - name: Отметка успешного прохода
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python library/increment.py отметка

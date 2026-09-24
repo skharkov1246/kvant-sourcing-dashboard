@@ -63,6 +63,15 @@ on:
       workers:
         description: "Потоков скачивания в каждой части"
         default: "12"
+      bitrix_rps:
+        # БЮДЖЕТ ПОРТАЛА НА ВЕСЬ ПРОГОН, а не на часть (CLAUDE.md, «Битрикс не
+        # перегружать»). Утечка ведра портала — 2 запроса в секунду на вебхук;
+        # 1,2 оставляет 0,8 деплою дашборда и скану чатов, если сойдутся. Каждая
+        # часть делит бюджет на число одновременно идущих частей сама.
+        description: "Запросов в секунду к порталу на ВЕСЬ прогон (лимит портала — 2)"
+        type: choice
+        options: ["0.8", "1.2", "1.5"]
+        default: "1.2"
       ocr:
         description: "Распознавать сканы (tesseract) вместо обычного разбора"
         type: boolean
@@ -146,6 +155,10 @@ jobs:
     timeout-minutes: 350
     strategy:
       fail-fast: false
+      # 12 — не предел портала, а предел базы (pooler Supabase держит 15
+      # клиентов). Портал защищён бюджетом: сколько бы частей ни шло, вместе
+      # они шлют BITRIX_RPS запросов в секунду. Больше частей разом не ускоряет
+      # чтение портала, но ускоряет разбор и распознавание — они процессорные.
       max-parallel: 12
       matrix:
         # Матрица на 50 мест; лишние части сразу выходят, увидев, что их номер
@@ -256,8 +269,16 @@ jobs:
           REPARSE_FAILED: ${{ inputs.reparse_failed && '1' || '' }}
           REVERT_KEY: ${{ inputs.ocr_revert }}
           OCR_MODE: ${{ inputs.ocr_mode != 'все' && inputs.ocr_mode || '' }}
+          BITRIX_RPS: ${{ inputs.bitrix_rps }}
         run: |
           set -euo pipefail
+          # СКОЛЬКО ЧАСТЕЙ ЧИТАЮТ ПОРТАЛ РАЗОМ: min(частей, max-parallel). Число 12
+          # обязано совпадать со strategy.max-parallel выше — это сверяет
+          # tests/test_bitrix_budget.py. Клиент делит бюджет BITRIX_RPS на него:
+          # пауза между запросами части = BITRIX_PARALLEL / BITRIX_RPS.
+          MAX_PARALLEL=12
+          export BITRIX_PARALLEL=$(( SHARDS < MAX_PARALLEL ? SHARDS : MAX_PARALLEL ))
+          echo "бюджет портала: ${BITRIX_RPS}/с на прогон, частей разом ${BITRIX_PARALLEL}"
           if [ -n "${REVERT_KEY:-}" ]; then
             # Откат — одна транзакция, и делать его должна ОДНА часть: две части
             # разом откатывали бы одни и те же записи параллельно. Ключ идёт через

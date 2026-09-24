@@ -420,3 +420,176 @@ test("плашка «Счётчики» показывается по тому �
   const нет = await (await call(env, "/", GUEST)).text();
   assert.doesNotMatch(нет, /href="\/counters"/);
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// БРЕНДЫ И КОДЫ (этап 8.1). Под тем же правом suppliers: карточка бренда и цены
+// по коду — те же коммерческие сведения, что номенклатура. Ключей несколько, и
+// корзина кода выбирается номером из запроса: номер обязан превращаться в имя
+// ключа только через закрытый список, иначе маршрут стал бы чтением любого KV.
+const BRANDS = { version: 1, published_at: "2026-09-24T01:00:00Z",
+  totals: { tiles: [{ id: "all", label: "кодов в базе всего", value: 10 }] },
+  brands: [{ k: "skf", name: "Учебный бренд", dict: true }],
+  suppliers: [{ k: "KV-S-000001-8", name: "Учебный завод", emails: ["nobody@example.test"] }] };
+const LINKS = { version: 1, brands: ["skf"], suppliers: ["KV-S-000001-8"],
+  codes: [["ab6205", "AB-6205", 3, [0], [0], 1]] };
+const PAIRS = { version: 1, brands: ["skf"], suppliers: ["KV-S-000001-8"],
+  pairs: [[0, 0, 1, 1, 0, 0, 0, 1, 2, "USD 1", 0]] };
+const PART3 = { version: 1, part: 3, codes: { ab6205: { n: "AB-6205",
+  offers: [{ s: "KV-S-000001-8", cur: "USD", min: 10, terms: "предоплата 30 %" }] } } };
+
+function envBrands() {
+  const env = envFor();
+  env.ACL.box.set("brands:v1", JSON.stringify(BRANDS));
+  env.ACL.box.set("brands:links:v1", JSON.stringify(LINKS));
+  env.ACL.box.set("brands:pairs:v1", JSON.stringify(PAIRS));
+  env.ACL.box.set("brands:codes:03", JSON.stringify(PART3));
+  return env;
+}
+const BRAND_PATHS = ["/brands", "/api/brands", "/api/brands/links", "/api/brands/pairs",
+                     "/api/brands/codes?b=03"];
+
+test("бренды закрыты без подписи Access", async () => {
+  const env = envBrands();
+  for (const path of [...BRAND_PATHS, "/brands/", "/brands.html"]) {
+    const response = await call(env, path, null);
+    assert.equal(response.status, 403, path);
+    assert.doesNotMatch(await response.text(), /Учебный бренд|UI SHELL|AB-6205/);
+  }
+  assert.deepEqual(env.assets, []);
+});
+
+test("бренды открывает то же право suppliers", async () => {
+  const env = envBrands();
+  for (const path of BRAND_PATHS) {
+    const deny = await call(env, path, GUEST);
+    assert.equal(deny.status, 403, path);
+    assert.equal((await deny.json()).error, "forbidden");
+    const allow = await call(env, path, READER);
+    assert.equal(allow.status, 200, path);
+  }
+  // Страница — своя, а не номенклатуры или реестра.
+  assert.deepEqual(env.assets, ["/brands.html"]);
+});
+
+test("каждый маршрут брендов отдаёт свой ключ", async () => {
+  const env = envBrands();
+  assert.equal((await (await call(env, "/api/brands", READER)).json()).brands[0].k, "skf");
+  assert.equal((await (await call(env, "/api/brands/links", READER)).json()).codes[0][0], "ab6205");
+  assert.equal((await (await call(env, "/api/brands/pairs", READER)).json()).pairs[0][9], "USD 1");
+  const part = await (await call(env, "/api/brands/codes?b=03", READER)).json();
+  assert.equal(part.part, 3);
+  assert.equal(part.codes.ab6205.offers[0].min, 10);
+});
+
+test("корзина кода — только две цифры из закрытого диапазона", async () => {
+  const env = envBrands();
+  env.ACL.box.set("brands:codes:3", JSON.stringify(PART3));
+  for (const b of ["3", "16", "99", "xx", "-1", "../acl", "03x", "", "acl:v1"]) {
+    const response = await call(env, "/api/brands/codes?b=" + encodeURIComponent(b), READER);
+    assert.equal(response.status, 400, b);
+    assert.equal((await response.json()).error, "invalid_part");
+  }
+  const без = await call(env, "/api/brands/codes", READER);
+  assert.equal(без.status, 400);
+});
+
+test("резка полей действует и в брендах", async () => {
+  const env = envBrands();
+  for (const path of ["/api/brands", "/api/brands/codes?b=03"]) {
+    const body = await (await call(env, path, READER)).text();
+    for (const secret of ["nobody@example.test", "предоплата 30 %"]) {
+      assert.ok(!body.includes(secret), `${path}: в ответе осталось «${secret}»`);
+    }
+  }
+  const part = await (await call(env, "/api/brands/codes?b=03", READER)).json();
+  assert.deepEqual(part.codes.ab6205.offers[0].terms, { закрыто: "suppliers_fin" });
+  // Цена КП не режется: ради неё раздел и существует.
+  assert.equal(part.codes.ab6205.offers[0].min, 10);
+});
+
+test("снимка брендов ещё нет — «нет данных», а не поломка; битый — 503", async () => {
+  const env = envFor();
+  for (const [path, поле] of [["/api/brands", "brands"], ["/api/brands/links", "codes"],
+                              ["/api/brands/pairs", "pairs"]]) {
+    const response = await call(env, path, READER);
+    assert.equal(response.status, 200, path);
+    assert.deepEqual((await response.json())[поле], [], path);
+  }
+  const пусто = await (await call(env, "/api/brands/codes?b=15", READER)).json();
+  assert.deepEqual(пусто.codes, {});
+  for (const плохой of ['{"version":2}', "не json вовсе"]) {
+    const e2 = envFor();
+    e2.ACL.box.set("brands:v1", плохой);
+    const response = await call(e2, "/api/brands", READER);
+    assert.equal(response.status, 503, плохой);
+  }
+});
+
+test("альтернативное написание пути брендов не обходит проверку права", async () => {
+  const env = envBrands();
+  for (const path of ["/brands/all", "/api/brands/list", "/brands%2f", "/%62rands", "/brands;x",
+                      "/api/brands;x", "/api/brands/codes/03", "/api/brands/links/x"]) {
+    const response = await call(env, path, GUEST);
+    assert.equal(response.status, 404, path);
+    assert.equal((await response.json()).error, "not_found");
+  }
+  assert.deepEqual(env.assets, []);
+});
+
+test("менять бренды запросом нельзя: только GET", async () => {
+  const env = envBrands();
+  for (const method of ["POST", "PUT", "DELETE"]) {
+    const response = await call(env, "/api/brands", OWNER, { method,
+      headers: { "Content-Type": "application/json" }, body: "{}" });
+    assert.equal(response.status, 405, method);
+  }
+});
+
+test("плашка «Бренды и коды» показывается по тому же праву", async () => {
+  const env = envBrands();
+  assert.match(await (await call(env, "/", READER)).text(), /href="\/brands"/);
+  assert.doesNotMatch(await (await call(env, "/", GUEST)).text(), /href="\/brands"/);
+});
+
+// ЖИВОЙ ПОИСК ПО СПРОСУ. Одна фиксированная функция базы: клиент задаёт только
+// строку поиска. Сеть подменена — проверяется, ЧТО воркер отправляет и что
+// пропускает обратно.
+test("поиск по спросу: право, проверка строки, одна фиксированная функция", async () => {
+  const env = envBrands();
+  env.SUPABASE_SERVICE_KEY = "sb_secret_TESTKEYTESTKEY";
+  const сеть = globalThis.fetch;
+  const вызовы = [];
+  globalThis.fetch = async (u, init) => {
+    вызовы.push({ u: String(u), init });
+    return new Response(JSON.stringify({ q: "x", key: "ab6205",
+      by_code: [{ code: "ab6205", written: "AB-6205", name: "Подшипник учебный", rows: 3, deals: 2, deal_id: "D-1" }],
+      by_words: [], word_rows: 0, capped: false }), { status: 200, headers: { "Content-Type": "application/json" } });
+  };
+  try {
+    const deny = await call(env, "/api/brands/search?q=AB-6205", GUEST);
+    assert.equal(deny.status, 403);
+    for (const q of ["", "a", "x".repeat(81), "ab\u0001cd"]) {
+      const bad = await call(env, "/api/brands/search?q=" + encodeURIComponent(q), READER);
+      assert.equal(bad.status, 400, JSON.stringify(q));
+    }
+    assert.equal(вызовы.length, 0, "отказ не должен ходить в базу");
+    const ok = await call(env, "/api/brands/search?q=" + encodeURIComponent("AB-6205") + "&fn=drop", READER);
+    assert.equal(ok.status, 200);
+    const v = await ok.json();
+    assert.equal(v.by_code[0].code, "ab6205");
+    assert.equal(v.by_code[0].deals, 2);
+    // Лишнее поле ответа базы (номер сделки) дальше воркера не идёт.
+    assert.equal(v.by_code[0].deal_id, undefined);
+    assert.equal(вызовы.length, 1);
+    assert.match(вызовы[0].u, /\/rest\/v1\/rpc\/lib_code_search$/);
+    assert.deepEqual(JSON.parse(вызовы[0].init.body), { q: "AB-6205", lim: 20 });
+    assert.equal(вызовы[0].init.headers.apikey, "sb_secret_TESTKEYTESTKEY");
+  } finally { globalThis.fetch = сеть; }
+});
+
+test("поиск по спросу без ключа базы — 503 с причиной, а не пустота", async () => {
+  const env = envBrands();
+  const response = await call(env, "/api/brands/search?q=AB-6205", READER);
+  assert.equal(response.status, 503);
+  assert.equal((await response.json()).error, "search_key_missing");
+});

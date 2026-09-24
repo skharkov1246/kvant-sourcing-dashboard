@@ -349,12 +349,13 @@ function по_сущности(снимок) {
   var карта = {};
   (снимок.companies || []).forEach(function (c) {
     if (!c.ent) return;
-    var у = карта[c.ent] || (карта[c.ent] = { parts: 0, rows: 0, brands: {}, list: [],
+    var у = карта[c.ent] || (карта[c.ent] = { ent: c.ent, parts: 0, rows: 0, brands: {}, oem: {}, list: [],
                                              keys: [], поkey: {} });
     у.parts += c.parts || 0;
     у.rows += c.rows || 0;
     у.keys.push(c.co);
     (c.brands || []).forEach(function (b) { у.brands[b] = 1; });
+    (c.oem || []).forEach(function (b) { у.oem[b] = 1; });
   });
   // По ключу портала — к какой сущности он относится.
   var сущность_по_ключу = {};
@@ -380,6 +381,7 @@ function по_сущности(снимок) {
   });
   Object.keys(карта).forEach(function (k) {
     карта[k].brands = Object.keys(карта[k].brands).sort();
+    карта[k].oem = Object.keys(карта[k].oem).sort();
     карта[k].list.sort(function (a, b) { return (b.cnt || 0) - (a.cnt || 0); });
   });
   return карта;
@@ -396,8 +398,28 @@ function нарисовать_предложения(card, узел_секции
   var dl = узел("dl");
   пара(dl, "Позиций, на которые давал", свод.parts);
   пара(dl, "Строк в котировках", свод.rows);
-  пара(dl, "Брендов", свод.brands.length ? свод.brands : null);
+  пара(dl, "Бренды с карточки запроса", свод.brands.length ? свод.brands : null);
   узел_секции.appendChild(dl);
+  // БРЕНДЫ ПО СЛОВУ ПОСТАВЩИКА — отдельной строкой (этап 8.1): «мы спросили» и
+  // «он написал в своём КП» — разные утверждения. Каждое ведёт в карточку бренда.
+  var сл = узел("p", "field-note");
+  сл.appendChild(document.createTextNode("Бренды, названные им в своих КП: "));
+  if (свод.oem.length) {
+    свод.oem.forEach(function (b, i) {
+      if (i) сл.appendChild(document.createTextNode(", "));
+      var a = узел("a", null, b);
+      a.href = "/brands#n=" + encodeURIComponent(b);
+      сл.appendChild(a);
+    });
+  } else сл.appendChild(узел("span", null, "не названы"));
+  узел_секции.appendChild(сл);
+  if (свод.ent) {
+    var вб = узел("p", "field-note");
+    var ab = узел("a", null, "Его бренды и коды с ценами — в «Бренды и коды»");
+    ab.href = "/brands#s=" + encodeURIComponent(свод.ent);
+    вб.appendChild(ab);
+    узел_секции.appendChild(вб);
+  }
 
   var tw = узел("div", "table-wrap");
   var tb = document.createElement("table");
@@ -413,7 +435,7 @@ function нарисовать_предложения(card, узел_секции
     var td = узел("td", "num");
     // Ссылка ведёт на страницу номенклатуры — обратная сторона той же связи.
     var a = узел("a", null, п.n || п.k);
-    a.href = "/nomenclature";
+    a.href = "/nomenclature#k=" + encodeURIComponent(п.k);
     td.appendChild(a);
     tr.appendChild(td);
     tr.appendChild(узел("td")).appendChild(значение(п.name));
@@ -559,6 +581,16 @@ fetch("/api/suppliers", { headers: { Accept: "application/json" } }).then(functi
   $("list").hidden = false;
   $("search").addEventListener("input", искать);
   искать();
+  // ПРЯМОЙ АДРЕС КАРТОЧКИ: /suppliers#e=<номер>. На него ссылаются карточки
+  // брендов и кодов; без него переход приводил бы к списку, а не к компании.
+  var h = typeof location !== "undefined" ? String(location.hash || "") : "";
+  var m = h.match(/^#e=(.+)$/);
+  if (m) {
+    var номер = m[1];
+    try { номер = decodeURIComponent(номер); } catch (e) { /* как есть */ }
+    var сущ = данные.entities.filter(function (e) { return e.number === номер; })[0];
+    if (сущ) открыть(сущ);
+  }
 }).catch(function (e) {
   if (e && e.message === "forbidden") {
     ошибка("Раздел закрыт", "Права «Поставщики» у вашей учётной записи нет. Запросите его у владельца портала.");

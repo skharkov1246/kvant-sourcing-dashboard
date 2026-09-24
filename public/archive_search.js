@@ -1,6 +1,8 @@
 // Private archive: called only after Access JWT verification and strict admin ACL.
 // Fixed read RPCs; no generic proxy, anonymous fallback, retries, or query logs.
 const ORIGIN = "https://vpjliavuuxjcvtxbthlp.supabase.co";
+// Тот же проект базы читает поиск по спросу на /brands (public/_worker.js).
+export const SUPABASE_ORIGIN = ORIGIN;
 const MAX_RESPONSE_BYTES = 1024 * 1024;
 const UNIT_RESPONSE_BYTES = 128 * 1024;
 const STATUS_RESPONSE_BYTES = 256 * 1024;

@@ -130,11 +130,14 @@ def main() -> int:
         print("нечего разбирать")
         return 0
 
-    refs = indexer.collect_refs(DAYS)
+    # ЧАСТЬ ПРОСИТ У ОБХОДА СВОЙ ДИАПАЗОН СДЕЛОК, как разбор, переразбор и
+    # распознавание. Прежде здесь стоял collect_refs(DAYS) без части и отбор по
+    # хешу файла потом: каждая часть читала ВЕСЬ портал — тот самый залп, на
+    # котором 24.09.2026 умер переразбор (CLAUDE.md, «Битрикс не перегружать»).
+    # Отбор по хешу снят: второе разбиение выбросило бы файлы (правило дробления).
+    refs = indexer.collect_refs(DAYS, SHARD, SHARDS)
     mine = [r for r in refs
-            if str(r["fo"].get("id") or r["fo"].get("ID")) in want
-            and int(hashlib.sha1(str(r["fo"].get("id") or r["fo"].get("ID")).encode()).hexdigest(), 16)
-            % SHARDS == SHARD]
+            if str(r["fo"].get("id") or r["fo"].get("ID")) in want]
     if LIMIT:
         mine = mine[:LIMIT]
     print(f"в этой части: {len(mine)}\n", flush=True)

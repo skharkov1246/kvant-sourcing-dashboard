@@ -321,6 +321,92 @@ begin
   end if;
 end $$;
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- ЖИВОЙ ПОИСК ПО СПРОСУ для страницы «Бренды и коды» (/brands, этап 8.1).
+-- Снимок в KV знает только коды с ценой КП; вопрос «спрашивали ли у нас этот
+-- код или такую деталь вообще» задаётся базе. Воркер портала вызывает функцию
+-- через PostgREST сервисным ключом, за Cloudflare Access и правом suppliers.
+--
+-- Два пути, и оба держатся за индексы:
+--   · по коду — равенство lib_pn_key(part_number) = ключ, ровно выражение
+--     индекса lib_demand_pnkey (ниже), иначе индекс не берётся;
+--   · по словам — fts @@ websearch_to_tsquery('russian', …), индекс
+--     lib_demand_fts (schema.sql, раздел 7).
+-- Только живые строки: то же условие, что у lib_demand_live (NOT EXISTS по
+-- lib_row_junk — анти-соединение, правило 8).
+-- Ответ — агрегаты по коду: строк, сделок, как написан, наименование. Ни
+-- номеров сделок, ни файлов.
+--
+-- Совпадений по словам бывает сотни тысяч («подшипник»), поэтому агрегат
+-- считается по первым lim_rows строкам, и ответ говорит об этом (capped) —
+-- усечение не молчаливое. Предел времени задан у самой функции: вызов через
+-- PostgREST иначе живёт под пределом пула.
+create or replace function lib_code_search(q text, lim int default 20, lim_rows int default 5000)
+returns jsonb
+language sql stable
+set statement_timeout = '8s'
+as $$
+with arg as (
+  select btrim(coalesce(q, '')) as q,
+         lib_pn_key(btrim(coalesce(q, ''))) as k,
+         least(greatest(coalesce(lim, 20), 1), 100) as lim,
+         least(greatest(coalesce(lim_rows, 5000), 100), 20000) as lim_rows
+), by_code as (
+  select lib_pn_key(d.part_number) as code,
+         count(*) as rows, count(distinct d.deal_id) as deals,
+         mode() within group (order by d.part_number) as written,
+         left(mode() within group (order by d.item_name), 160) as name
+    from lib_demand d, arg
+   where length(arg.k) >= 2
+     and lib_pn_key(d.part_number) = arg.k
+     and not exists (select 1 from lib_row_junk j
+                      where j.demand_id = d.id and j.revoked_at is null)
+   group by 1
+), word_rows as (
+  select d.part_number, d.item_name, d.deal_id
+    from lib_demand d, arg
+   where length(arg.q) >= 3
+     and d.fts @@ websearch_to_tsquery('russian', arg.q)
+     and coalesce(btrim(d.part_number), '') <> ''
+     and not exists (select 1 from lib_row_junk j
+                      where j.demand_id = d.id and j.revoked_at is null)
+   limit (select lim_rows from arg)
+), by_words as (
+  select lib_pn_key(part_number) as code,
+         count(*) as rows, count(distinct deal_id) as deals,
+         mode() within group (order by part_number) as written,
+         left(mode() within group (order by item_name), 160) as name
+    from word_rows
+   where length(lib_pn_key(part_number)) >= 2
+   group by 1
+   order by 2 desc, 1
+   limit (select lim from arg)
+)
+select jsonb_build_object(
+  'q', (select q from arg),
+  'key', (select k from arg),
+  'by_code', coalesce((select jsonb_agg(to_jsonb(c)) from by_code c), '[]'::jsonb),
+  'by_words', coalesce((select jsonb_agg(to_jsonb(w) order by w.rows desc, w.code) from by_words w), '[]'::jsonb),
+  'word_rows', (select count(*) from word_rows),
+  'capped', (select count(*) from word_rows) >= (select lim_rows from arg)
+);
+$$;
+-- Функции по умолчанию исполнимы всеми (PUBLIC): снимаем, и роли платформы —
+-- только через проверку наличия (правило 20). Исполняет сервисный ключ.
+revoke all on function lib_code_search(text, int, int) from public;
+do $$
+declare
+  кому text := lib_роли_которые_есть(array['anon', 'authenticated']);
+  сервис text := lib_роли_которые_есть(array['service_role']);
+begin
+  if кому is not null then
+    execute format('revoke all on function lib_code_search(text, int, int) from %s', кому);
+  end if;
+  if сервис is not null then
+    execute format('grant execute on function lib_code_search(text, int, int) to %s', сервис);
+  end if;
+end $$;
+
 -- Индекс по тому же выражению: без него соединение полутора миллионов строк с
 -- каталогом — последовательный проход с пересчётом функции на каждой строке.
 -- CONCURRENTLY и последним оператором — по той же причине, что выше.
