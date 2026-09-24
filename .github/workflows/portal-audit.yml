@@ -1,0 +1,120 @@
+name: Ревизия вкладок портала — дефекты и польза
+
+# Проходит по всем вкладкам портала тем же снимком KV, который видит страница
+# (/suppliers, /nomenclature, /brands, /counters, /library, плюс словарь брендов
+# dict/oem.json), и меряет по каждому полю, у скольких значений дефект, а по
+# вкладке — сколько в ней пользы для сорсера. Распоряжение владельца 24.09.2026:
+# «на ещё одну пятую ресурса постоянно просто проходиться по всем вкладкам и
+# смотреть, насколько адекватна информация там и насколько она полезна».
+# Порядок работы по итогам — навык .claude/skills/portal-audit/SKILL.md.
+#
+# ТОЛЬКО РУЧНОЙ ЗАПУСК. Расписание — решение владельца: он подключит прогон к
+# планировщику сам. Второе расписание здесь означало бы два писателя audit:v1.
+#
+# БИТРИКС И БАЗА НЕ ЧИТАЮТСЯ. Поэтому прогон стоит в СВОЕЙ группе, а не в
+# bitrix-portal: постановка туда сняла бы ожидающий ночной разбор (CLAUDE.md —
+# в группе ждёт один). Своя группа нужна, чтобы два прогона не писали audit:v1
+# наперегонки.
+#
+# ПО УМОЛЧАНИЮ ВХОЛОСТУЮ: печатает таблицы и ничего не пишет. Галка apply
+# кладёт итог (только агрегаты) в KV-ключ audit:v1 — оттуда его сможет
+# показать вкладка «Счётчики». Запись отказывает, если итог неполный: упала
+# вкладка, обход библиотеки встал на пределе, ключ не разобрался как JSON,
+# задан only или нет правила кода — такой итог затёр бы полный.
+#
+# В журнал идут ТОЛЬКО агрегаты (CLAUDE.md, правило 17): коды проверок,
+# счётчики, доли и образцы с цифрами «9» и буквами «a»/«я». Артефактов нет.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать итог ревизии в KV (audit:v1), иначе вхолостую"
+        type: boolean
+        default: false
+      only:
+        description: "Вкладки через запятую (suppliers,nomenclature,brands,counters,library,dict); пусто — все"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  actions: read          # gh run list: не идёт ли публикатор KV
+
+concurrency:
+  group: portal-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    # До 20 минут ожидания публикаторов плюс 25 минут обхода библиотеки
+    # (3000 блобов × 0,5 с) и остальные ключи.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        # Ревизия — на стандартной библиотеке: клиент KV из publish_suppliers и
+        # publish_library_v2 берёт psycopg2 только внутри функций записи базы,
+        # до которых ревизия не доходит. pytest — для проверок ниже.
+        run: pip install --quiet pytest
+
+      - name: Проверка секретов
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # Имена переменных — латиницей (CLAUDE.md, стиль работы).
+          [ -n "${T:-}" ] || { echo "::error::нет секрета CLOUDFLARE_API_TOKEN — снимки не прочитать"; exit 1; }
+          [ -n "${A:-}" ] || { echo "::error::нет секрета CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+          echo "секреты Cloudflare на месте"
+
+      - name: Публикаторы KV не идут
+        # Токен Cloudflare у ревизии тот же, что у публикаторов, а предел API —
+        # 1200 запросов за 5 минут на токен. PUT публикатора, получивший 429,
+        # не повторяется (CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED) и роняет запись
+        # снимка. Своя группа concurrency этого не исключает — поэтому ревизия
+        # ждёт, пока идущие публикаторы KV закончат (до 20 минут), и не стартует,
+        # если они всё ещё идут. Сама ревизия держит 0,5 с между запросами —
+        # половину предела; публикатор, пошедший уже после старта, уложится
+        # в оставшуюся.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20); do
+            busy=0
+            for wf in library-publish.yml suppliers-publish.yml suppliers-quotes.yml counters-publish.yml; do
+              n=$(gh run list -R "$REPO" --workflow "$wf" --status in_progress --json databaseId --jq 'length')
+              busy=$((busy + n))
+            done
+            if [ "$busy" -eq 0 ]; then echo "публикаторы KV не идут"; exit 0; fi
+            echo "идут публикаторы KV: $busy — ждём минуту ($attempt из 20)"
+            sleep 60
+          done
+          echo "::error::публикаторы KV идут больше 20 минут — ревизия не стартует, чтобы не отнять у них предел API Cloudflare"
+          exit 1
+
+      - name: Проверки ревизии на выдуманных снимках
+        run: python -m pytest tests/test_portal_audit.py -q
+
+      - name: Ревизия вкладок
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          APPLY: ${{ inputs.apply }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ -n "${ONLY:-}" ]; then args+=(--only "$ONLY"); fi
+          # Запись включается окружением, а не аргументом: так её не включить
+          # опечаткой в строке запуска.
+          if [ "$APPLY" = "true" ]; then export AUDIT_APPLY=1; fi
+          python scripts/portal_audit.py "${args[@]}"

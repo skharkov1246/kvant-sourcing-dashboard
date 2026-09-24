@@ -31,7 +31,8 @@
     "refresh_dict": "python scripts/build_dict.py   # общий словарь баз (проекция)",
     "check_dict": "python scripts/build_dict.py --check",
     "machine_dossier": "python zip/tools/r1700_bitrix.py && python zip/tools/r1700_dossier.py && python zip/tools/build_r1700.py && python zip/tools/r1700_sql.py   # досье машины ГШО: данные, страница, SQL",
-    "machine_dossier_pdf": "python zip/tools/r1700_report.py && python zip/tools/r1700_pdf.py   # справочный отчёт по машине"
+    "machine_dossier_pdf": "python zip/tools/r1700_report.py && python zip/tools/r1700_pdf.py   # справочный отчёт по машине",
+    "portal_audit": "python scripts/portal_audit.py --from-dir <папка снимков>   # ревизия вкладок портала: дефекты и польза, только агрегаты (живые снимки — прогон portal-audit.yml; процедура — навык portal-audit)"
   },
   "subprojects": [
     {

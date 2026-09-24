@@ -1,0 +1,988 @@
+{
+  "oem_key": "siemensenergy",
+  "name": "Siemens Energy (промышленные газовые турбины SGT-100…SGT-800)",
+  "segment_focus": "SGT-100, SGT-200, SGT-300, SGT-400 (Cyclone), SGT-600, SGT-700, SGT-800; запчасти горячего тракта, датчики, фильтры",
+  "researched_at": "2026-09-24",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Промышленная линейка Siemens Energy делится на две ветки, у каждой своя нумерация деталей. Ветка Lincoln (бывшие Ruston/Alstom): SGT-100 (Typhoon), SGT-200 (Tornado), SGT-300 (Tempest), SGT-400 (Cyclone). Ветка Finspång (бывшие ASEA-Stal/Alstom): SGT-500 (GT35), SGT-600, SGT-700, SGT-750, SGT-800 (GTX100). Сейчас на сайте изготовителя продаются SGT-100, 300, 400, 600, 700, 750 и 800 (и SGT-50). SGT-200 и SGT-500 в каталоге новых машин нет: по SGT-200 Forecast International ещё в 2018 г. писал, что её больше не продают; SGT-500 OEM обслуживает, но новых заказов не ждут.\n\nОткрытых каталогов деталей и сервисных книг Siemens Energy не нашлось. Все 40 кодов взяты из открытых перепечаток: заявки эксплуатантов на площадке industrialmarinepower.com, списки китайского изготовителя деталей по образцу Shenzhen Blaze (turbineblade.net), страницы трейдеров. Код записан, только если он дословно виден на странице.\n\nНумерация по ветвям. У Lincoln номера вида MW…/RW…/RM…/RT… (горячий тракт; по наблюдению, префикс совпадает с машиной: MW у SGT-400, RW у SGT-300, RM/RU у SGT-100, RT у SGT-200 — это гипотеза, не подтверждена), 64/…, 74/… (комплектующие пакета) и CT…/SP… У Finspång — семизначный номер с литерой (2409539-K), 1CSA…/1CS… и стандартные T3904-….\n\nПересчёт на номер изготовителя комплектующего подтверждён трижды:\n- Siemens 64/51009006/6 = игнитер Unison 9058685-5;\n- Siemens 64/05002071/8 = фильтроэлемент Pall HC2296FKN36H50;\n- 64/05002028/37 продаётся под маркой Pall.\n\nПо кодам пакета видны субпоставщики:\n- Bently Nevada (3500, 3300 XL);\n- Rockwell/Allen-Bradley (ControlLogix, FLEX I/O);\n- K-System (линейка Pepperl+Fuchs — вывод по названию модуля);\n- Moog (электропривод VGV);\n- Kinetrol, Masoneilan, MEDC, Albany, Erskine.\nПо открытому отчёту Forecast International у SGT-200 ещё Voith (редуктор), Wood Group Fuel Systems (форсунка), Altair (акустика); Allen Gears (генераторный редуктор SGT-200) — по листингу Skyline Turbine Services.\n\nПакетировщики и лицензиаты: Centrax (SGT-300/400, ЕС и Турция) и Hangzhou Steam Turbine (SGT-800, Китай, локализация свыше 50 %).\n\nВ России OEM-канала в открытых источниках нет. Сервис ведут:\n- «РИР энерго» (SGT-800/600);\n- «Турбосервис», Екатеринбург (компоненты SGT-800, в планах SGT-400/300);\n- DMEnergy;\n- KR Group;\n- DM Liefer.\nПоставщики запчастей: РусТурбо, МС Системы, UNICA. В Индии — MSR Industrade.\n\nГорячий тракт SGT-400 (MW21215M, MW22316B/01) совпадает с целями в gt/data/sgt400_checklist.json.",
+  "machines": [
+    {
+      "model": "SGT-100 (бывш. Ruston/Alstom Typhoon; исполнения SGT-100-1S и SGT-100-2S)",
+      "kind": "газовая турбина промышленная; одновальная для электростанций, двухвальная для механического привода",
+      "segment": "ГТУ",
+      "rating": "5,1 и 5,4 МВт(э) в генерации; 5,7 МВт на механическом приводе",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-100.html",
+        "https://msritrade.com/sgt-spare-parts.html",
+        "https://www.siemens-energy.com/global/en/home/products-services/product-offerings/gas-turbines.html"
+      ]
+    },
+    {
+      "model": "SGT-200 (бывш. Ruston/Alstom Tornado; SGT-200-1S / SGT-200-2S)",
+      "kind": "газовая турбина промышленная; 1S одновальная для генерации, 2S двухвальная для привода компрессоров и насосов",
+      "segment": "ГТУ",
+      "rating": "6,75 МВт(э) у SGT-200-1S (ISO); пакеты SGT-200-2S по 7,68 МВт (по обзору сервисника); компрессор 15 ступеней, 8 трубчатых камер сгорания",
+      "status": "снята с продаж (Forecast International, 2018: \"no longer available for purchase\"; в текущем каталоге Siemens Energy нет); сервис и запчасти через независимых",
+      "sources": [
+        "https://www.china-power-contractor.cn/UpFiles/old/download/QDR70-SGT200-siemens.pdf",
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1343",
+        "https://dm.energy/wp-content/uploads/pdf/turbine-efficiency/sgt-200-en.pdf",
+        "https://www.siemens-energy.com/global/en/home/products-services/product-offerings/gas-turbines.html"
+      ]
+    },
+    {
+      "model": "SGT-300 (бывш. Ruston/Alstom Tempest; SGT-300-1S / SGT-300-2S)",
+      "kind": "газовая турбина промышленная; одновальная (генерация) и двухвальная (механический привод)",
+      "segment": "ГТУ",
+      "rating": "8,0 МВт(э) у одновальной; 8,4 или 9,1 МВт у двухвальной на приводе",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-300.html",
+        "https://msritrade.com/sgt-spare-parts.html"
+      ]
+    },
+    {
+      "model": "SGT-400 (бывш. Ruston/Alstom Cyclone)",
+      "kind": "газовая турбина промышленная, двухвальная; генерация и механический привод",
+      "segment": "ГТУ",
+      "rating": "12,9–14,3 МВт(э) в генерации; 13,4–14,9 МВт на механическом приводе; межремонтный интервал горячего тракта 32 000 ч, капремонт в 64 000 ч",
+      "status": "выпускается (продано более 450 единиц)",
+      "sources": [
+        "https://www.siemens-energy.com/us/en/home/products-services/product/sgt-400.html",
+        "https://msritrade.com/sgt-spare-parts.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SGT-500 (бывш. Stal-Laval/Alstom GT35)",
+      "kind": "газовая турбина промышленная",
+      "segment": "ГТУ",
+      "rating": "19,1 МВт(э); парк от 11 до более чем 19 МВт; механический привод 17,36 МВт (Forecast International)",
+      "status": "в каталоге новых машин нет; OEM поддерживает запчастями и ремонтом; Forecast International: \"Aging design... no orders forecast\"",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/service/sgt-500-gas-turbine.html",
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1403"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SGT-600 (в отрасли — бывш. Alstom GT10B; по вторичному источнику)",
+      "kind": "газовая турбина промышленная, двухвальная; компрессор 10 ступеней, свободная силовая турбина 2 ступени",
+      "segment": "ГТУ",
+      "rating": "24,5 МВт(э) в генерации; 25,2 МВт на механическом приводе (3 850–8 085 об/мин)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-600.html",
+        "https://dmliefer.ru/remont-gazovyh-turbin"
+      ]
+    },
+    {
+      "model": "SGT-700 (развитие SGT-600; в отрасли — бывш. Alstom GT10C, по вторичному источнику)",
+      "kind": "газовая турбина промышленная, двухвальная; компрессор 11 ступеней, силовая турбина 2 ступени",
+      "segment": "ГТУ",
+      "rating": "32,6 или 35,2 МВт(э); 33,5 или 36,2 МВт на механическом приводе",
+      "status": "выпускается (продано более 142 единиц)",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-700.html",
+        "https://dmliefer.ru/remont-gazovyh-turbin"
+      ]
+    },
+    {
+      "model": "SGT-750",
+      "kind": "газовая турбина промышленная, двухвальная",
+      "segment": "ГТУ",
+      "rating": "40–42 МВт (по странице каталога Siemens Energy)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product-offerings/gas-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SGT-800 (бывш. Alstom GTX100)",
+      "kind": "газовая турбина промышленная, одновальная; компрессор 15 ступеней, турбина 3 ступени",
+      "segment": "ГТУ",
+      "rating": "45, 50, 56, 57, 62 МВт(э) по исполнениям; ранний ряд 47,5–57,0 МВт(э) (лист PGDG-T10040-00-7600)",
+      "status": "выпускается (Finspång; в Китае по лицензии HTC)",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-800.html",
+        "https://www.mobil.com/en/lubricants/for-businesses/industrial/lubricants/equipments/model-sgt-800-f_a1t41000004othjeac",
+        "https://assets.new.siemens.com/siemens/assets/api/uuid:daeb2935-2ea5-4400-a5dc-653de64ca7d3/gas-turbine-sgt-800.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "SIEMENS SGT-400 Operator's Manual (38 стр.; главы: сердечник двигателя, маслосистема, топливная система, воздух, зажигание, пуск, укрытие, пожаротушение и газообнаружение, редуктор и генератор, щиты)",
+      "doc_no": "номер на странице не указан",
+      "machine": "SGT-400",
+      "kind": "O&M (руководство оператора)",
+      "sources": [
+        "https://www.manualslib.com/manual/1606519/Siemens-Sgt-400.html",
+        "https://manualzz.com/doc/60397115/siemens-sgt-400-operator-s-manual"
+      ]
+    },
+    {
+      "title": "SIEMENS SGT-600 Basic Training Manual (203 стр.; принцип работы, газогенератор, силовая турбина, пуск, вспомогательные системы, KKS, промывка компрессора)",
+      "doc_no": "1CS36949",
+      "machine": "SGT-600",
+      "kind": "учебное руководство по эксплуатации (O&M)",
+      "sources": [
+        "https://www.manualslib.com/manual/3665726/Siemens-Sgt-600.html"
+      ]
+    },
+    {
+      "title": "64 62001289 300 I Manual SGT 200 Auxiliary Gearbox (найдено только название в выдаче Scribd; документ не открылся)",
+      "doc_no": "64/62001289/300 (по названию файла)",
+      "machine": "SGT-200",
+      "kind": "service manual (вспомогательный редуктор)",
+      "sources": [
+        "https://www.scribd.com/document/919560834/64-62001289-300-I-Manual-SGT-200-Auxiliary-Gearbox"
+      ]
+    },
+    {
+      "title": "SGT-600 Spare Parts Request December 2024 (по выдаче — перечень деталей на C-инспекцию; документ не открылся)",
+      "doc_no": "",
+      "machine": "SGT-600",
+      "kind": "перечень ЗИП на инспекцию",
+      "sources": [
+        "https://www.scribd.com/document/825839047/SGT-600-Spare-Parts-Request-December-2024"
+      ]
+    },
+    {
+      "title": "Spare parts for inspection level \"C\" (SGT-800, перечень эксплуатанта с номерами Siemens, перепечатан реселлером)",
+      "doc_no": "",
+      "machine": "SGT-800",
+      "kind": "перечень ЗИП на инспекцию",
+      "sources": [
+        "https://turbineblade.net/siemens-gtu-sgt-800-spare-part-numbers/"
+      ]
+    },
+    {
+      "title": "List of materials for level inspection \"E\" 2024 (SGT-700, перечень эксплуатанта с номерами Siemens, перепечатан реселлером)",
+      "doc_no": "",
+      "machine": "SGT-700",
+      "kind": "перечень ЗИП на инспекцию",
+      "sources": [
+        "https://turbineblade.net/sgt-700-spare-part-lists/"
+      ]
+    },
+    {
+      "title": "SGT-200 Industrial Gas Turbine, Power Generation (ISO) 6.75 MW(e) — буклет изготовителя",
+      "doc_no": "Order No. A96001-S90-A205-X-4A00",
+      "machine": "SGT-200",
+      "kind": "каталог/буклет изготовителя",
+      "sources": [
+        "https://www.china-power-contractor.cn/UpFiles/old/download/QDR70-SGT200-siemens.pdf"
+      ]
+    },
+    {
+      "title": "Gas turbine SGT-800 — технический лист (Siemens AG 2017)",
+      "doc_no": "Article No. PGDG-T10040-00-7600",
+      "machine": "SGT-800",
+      "kind": "каталог/технический лист изготовителя",
+      "sources": [
+        "https://assets.new.siemens.com/siemens/assets/api/uuid:daeb2935-2ea5-4400-a5dc-653de64ca7d3/gas-turbine-sgt-800.pdf"
+      ]
+    },
+    {
+      "title": "We power the world with innovative gas turbines — обзор линейки газовых турбин Siemens (© 2017–2019)",
+      "doc_no": "Article No. PGDG-B10006-06-7600",
+      "machine": "SGT-100, SGT-300, SGT-400, SGT-600, SGT-700, SGT-750, SGT-800",
+      "kind": "каталог линейки изготовителя",
+      "sources": [
+        "https://assets.new.siemens.com/siemens/assets/api/uuid:ab8578bf-d86f-45d9-a26b-7ac7a274fadd/siemens-gas-turbine-portfolio.pdf"
+      ]
+    },
+    {
+      "title": "SIEMENS SGT-400 Industrial Gas Turbine — буклет (копия в Internet Archive)",
+      "doc_no": "не указан",
+      "machine": "SGT-400",
+      "kind": "буклет изготовителя",
+      "sources": [
+        "https://archive.org/details/manuallib-id-2457586"
+      ]
+    },
+    {
+      "title": "SIEMENS SGT-600 Industrial Gas Turbine — буклет (копия в Internet Archive)",
+      "doc_no": "не указан",
+      "machine": "SGT-600",
+      "kind": "буклет изготовителя",
+      "sources": [
+        "https://archive.org/details/manuallib-id-2457588"
+      ]
+    },
+    {
+      "title": "SGT-200 (Tornado) Capability Overview 2015 — объём ремонта газогенератора и силовой турбины, испытательный стенд в Lincoln, поставка запчастей (документ Turbine Efficiency под маркой DMEnergy)",
+      "doc_no": "",
+      "machine": "SGT-200",
+      "kind": "сервисный обзор независимого ремонтника",
+      "sources": [
+        "https://dm.energy/wp-content/uploads/pdf/turbine-efficiency/sgt-200-en.pdf"
+      ]
+    },
+    {
+      "title": "ARCHIVED REPORT Siemens SGT-200 (Forecast International, октябрь 2018): описание, статус, прайм-подрядчики и субподрядчики",
+      "doc_no": "DACH_RECNO=1343",
+      "machine": "SGT-200",
+      "kind": "отраслевой отчёт (субподрядчики)",
+      "sources": [
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1343"
+      ]
+    },
+    {
+      "title": "ARCHIVED REPORT Siemens SGT-500 (Forecast International): описание, технические данные, субподрядчик",
+      "doc_no": "DACH_RECNO=1403",
+      "machine": "SGT-500",
+      "kind": "отраслевой отчёт (субподрядчики)",
+      "sources": [
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1403"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "64/51009006/6",
+      "issuer": "Siemens Energy",
+      "description": "Свеча зажигания (spark plug); у Unison ей соответствует игнитер 9058685-5",
+      "machine": "SGT-100",
+      "unit": "система зажигания",
+      "doc_ref": "заявка покупателя на запчасти SGT-100/SGT-300 (industrialmarinepower, 01.12.2023)",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "Spark plug 64/51009006/6"
+    },
+    {
+      "code": "9058685-5",
+      "issuer": "Unison Industries (изготовитель комплектующего)",
+      "description": "Игнитер Unison, Rev.M, ATEX KEMA 03ATEX2357X, Made in USA; на карточке указан номер Siemens 64/51009006/6",
+      "machine": "SGT-100",
+      "unit": "система зажигания",
+      "doc_ref": "карточка товара дилера (marineindustrialmachinery.com)",
+      "source_url": "https://www.marineindustrialmachinery.com/shop/unison-9058685-5-igniter-17166",
+      "quote": "Unison 9058685-5 Igniter / Rev.M / P/N:64/51009006/6 / KEMA 03ATEX2357X"
+    },
+    {
+      "code": "64/07001494/1",
+      "issuer": "Siemens Energy",
+      "description": "Блок зажигания (ignition unit). Внимание: в листинге SGT-400 на turbineblade.net тот же номер назван \"SIEMENS MOTHERBOARD\", назначение надо сверить",
+      "machine": "SGT-100",
+      "unit": "система зажигания",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "Ignition unit 64/07001494/1"
+    },
+    {
+      "code": "64/51004015/1",
+      "issuer": "Siemens Energy",
+      "description": "Термопара",
+      "machine": "SGT-100",
+      "unit": "контроль температуры газа",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "Thermocouple 64/51004015/1"
+    },
+    {
+      "code": "64/01007823/1",
+      "issuer": "Siemens Energy",
+      "description": "Датчик вибрации 3300 XL 8 mm (по описанию — токовихревой датчик Bently Nevada серии 3300 XL)",
+      "machine": "SGT-100",
+      "unit": "контроль вибрации подшипников",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "Vibration sensor 3300 XL 8 mm 64/01007823/1"
+    },
+    {
+      "code": "64/05002071/8",
+      "issuer": "Siemens Energy",
+      "description": "Фильтроэлемент тонкой очистки маслосистемы; у Pall соответствует HC2296FKN36H50",
+      "machine": "SGT-100",
+      "unit": "система смазки",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "Lubricating oil system fine filter element 64/05002071/8"
+    },
+    {
+      "code": "HC2296FKN36H50",
+      "issuer": "Pall (изготовитель комплектующего)",
+      "description": "Фильтроэлемент Pall; по листингу трейдера соответствует Siemens 64/05002071/8",
+      "machine": "SGT-100",
+      "unit": "система смазки",
+      "doc_ref": "листинг трейдера (silkroadsh.com, Шанхай)",
+      "source_url": "http://www.silkroadsh.com/Products-6332186.html",
+      "quote": "pall   64/05002071/8 HC2296FKN36H50"
+    },
+    {
+      "code": "64/05002028/37",
+      "issuer": "Siemens Energy (на турецкой витрине продаётся под маркой Pall)",
+      "description": "Фильтроэлемент аварийной маслосистемы ГТУ",
+      "machine": "SGT-100",
+      "unit": "система смазки (аварийная)",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300; витрина Pall: https://www.yursat.com.tr/640500202837.html",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "Filter element for the emergency oil system of a gas turbine unit 64/05002028/37"
+    },
+    {
+      "code": "RM22135/2",
+      "issuer": "Siemens Energy",
+      "description": "Металлическое C-кольцо пилотной горелки",
+      "machine": "SGT-100",
+      "unit": "камера сгорания / горелки",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "C-Ring metal pilot burner RM22135/2"
+    },
+    {
+      "code": "RM21023P",
+      "issuer": "Siemens Energy",
+      "description": "Жаровая труба в сборе, исполнение DLE",
+      "machine": "SGT-100",
+      "unit": "камера сгорания",
+      "doc_ref": "список деталей SGT-100 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-100-spare-parts/",
+      "quote": "RM21023P FLAME TUBE ASSEMBLY – DLE"
+    },
+    {
+      "code": "64/07001510/2",
+      "issuer": "Siemens Energy",
+      "description": "Высоковольтный блок зажигания в сборе",
+      "machine": "SGT-200",
+      "unit": "система зажигания",
+      "doc_ref": "список деталей SGT-200 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-200-spare-parts/",
+      "quote": "High-voltage ignition unit complete for Siemens turbine 64/07001510/2"
+    },
+    {
+      "code": "64/60003032/2",
+      "issuer": "Siemens Energy",
+      "description": "Датчик давления PT200",
+      "machine": "SGT-200",
+      "unit": "КИП / датчики давления",
+      "doc_ref": "список деталей SGT-200 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-200-spare-parts/",
+      "quote": "PT200 pressure transducer to Siemens turbine 64/60003032/2"
+    },
+    {
+      "code": "RT31083",
+      "issuer": "Siemens Energy (Ruston)",
+      "description": "Рабочая лопатка турбины, 1-я ступень (продаётся комплектом на двигатель)",
+      "machine": "SGT-200",
+      "unit": "турбина компрессора, горячий тракт",
+      "doc_ref": "карточка товара gasturbineresources.com",
+      "source_url": "http://www.gasturbineresources.com/product_details/10",
+      "quote": "SGT200/RT/Tornado Engine Model- Turbine Rotor Blade Stage 1 Part Number RT31083"
+    },
+    {
+      "code": "64/51009006/4",
+      "issuer": "Siemens Energy",
+      "description": "Свеча зажигания. Тот же номер в листинге SGT-400 назван \"SIEMENS IGNITER COMB 64/51009006/4\"",
+      "machine": "SGT-300; SGT-400",
+      "unit": "система зажигания",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300; https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "Spark plug 64/51009006/4"
+    },
+    {
+      "code": "RW 22314/7",
+      "issuer": "Siemens Energy",
+      "description": "Металлическое C-кольцо основной горелки (номер записан с пробелом, как у покупателя)",
+      "machine": "SGT-300",
+      "unit": "камера сгорания / горелки",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "C-Ring metal main burner RW 22314/7"
+    },
+    {
+      "code": "RW21215B",
+      "issuer": "Siemens Energy",
+      "description": "Жаровая труба",
+      "machine": "SGT-300",
+      "unit": "камера сгорания",
+      "doc_ref": "заявка покупателя SGT-100/SGT-300",
+      "source_url": "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/",
+      "quote": "Flame tube RW21215B"
+    },
+    {
+      "code": "MW14511/1",
+      "issuer": "Siemens Energy",
+      "description": "Фильтр",
+      "machine": "SGT-400",
+      "unit": "не указан (фильтр)",
+      "doc_ref": "список SGT-400 part numbers (turbineblade.net, 195 строк)",
+      "source_url": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "quote": "SIEMENS FILTER MW14511/1"
+    },
+    {
+      "code": "SP036027",
+      "issuer": "Siemens Energy",
+      "description": "Фильтроэлемент (сервисный комплект того же фильтра — SP036028)",
+      "machine": "SGT-400",
+      "unit": "не указан (фильтр)",
+      "doc_ref": "список SGT-400 part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "quote": "SIEMENS FLTR ELEMENT SP036027"
+    },
+    {
+      "code": "64/07001510/1",
+      "issuer": "Siemens Energy",
+      "description": "Блок зажигания",
+      "machine": "SGT-400",
+      "unit": "система зажигания",
+      "doc_ref": "список SGT-400 part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "quote": "SIEMENS IGNITION UNIT 64/07001510/1"
+    },
+    {
+      "code": "CT3116/1",
+      "issuer": "Siemens Energy",
+      "description": "Термопарный зонд",
+      "machine": "SGT-400",
+      "unit": "контроль температуры газа",
+      "doc_ref": "список SGT-400 part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "quote": "SIEMENS THERMOCOUPLE PROBE CT3116/1"
+    },
+    {
+      "code": "CT3036R/2",
+      "issuer": "Siemens Energy",
+      "description": "Токовихревой датчик (proximity probe)",
+      "machine": "SGT-400",
+      "unit": "контроль вибрации и положения ротора",
+      "doc_ref": "список SGT-400 part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "quote": "SIEMENS PROXY PROBE CT3036R/2"
+    },
+    {
+      "code": "CT4010J/1",
+      "issuer": "Siemens Energy",
+      "description": "Термопарный зонд (probe – T/C)",
+      "machine": "SGT-400",
+      "unit": "контроль температуры",
+      "doc_ref": "список SGT-400 part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "quote": "SIEMENS PROBE – T/C CT4010J/1"
+    },
+    {
+      "code": "RW22314/12",
+      "issuer": "Siemens Energy",
+      "description": "C-уплотнение (то же семейство RW22314, что у SGT-300)",
+      "machine": "SGT-400",
+      "unit": "камера сгорания / горелки",
+      "doc_ref": "список SGT-400 part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "quote": "SIEMENS C SEAL RW22314/12"
+    },
+    {
+      "code": "MW22320/02",
+      "issuer": "Siemens Energy",
+      "description": "Пилотная горелка в сборе",
+      "machine": "SGT-400",
+      "unit": "камера сгорания / горелки",
+      "doc_ref": "список SGT-400 part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/",
+      "quote": "SIEMENS PILOT BURNER ASSY MW22320/02"
+    },
+    {
+      "code": "MW21215M",
+      "issuer": "Siemens Energy",
+      "description": "Камера сгорания (6 шт. на машину по заявке)",
+      "machine": "SGT-400",
+      "unit": "камера сгорания",
+      "doc_ref": "заявка покупателя SGT-400 (industrialmarinepower); также на https://www.industrialmarinepower.com/wanted-spare-parts-@turbine-sgt400-15567/; на странице пробелы неразрывные",
+      "source_url": "https://www.industrialmarinepower.com/siemens-sgt-400-gas-turbines-spare-part-requiremnets-21050/",
+      "quote": "Combustion chamber SGT-400 Siemens MW21215M"
+    },
+    {
+      "code": "MW22316B/01",
+      "issuer": "Siemens Energy",
+      "description": "Горелка в сборе (6 шт. на машину по заявке)",
+      "machine": "SGT-400",
+      "unit": "камера сгорания / горелки",
+      "doc_ref": "заявка покупателя SGT-400 (industrialmarinepower); на странице пробелы неразрывные",
+      "source_url": "https://www.industrialmarinepower.com/siemens-sgt-400-gas-turbines-spare-part-requiremnets-21050/",
+      "quote": "Burner assembly SGT-400 Siemens MW22316B/01"
+    },
+    {
+      "code": "2409539-K",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Камера сгорания",
+      "machine": "SGT-600",
+      "unit": "камера сгорания",
+      "doc_ref": "список деталей SGT-600 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/sgt-600-siemens-gas-turbine-spare-parts/",
+      "quote": "2409539-K | combustion chamber"
+    },
+    {
+      "code": "2511628-A",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Рабочая лопатка турбины 1-й ступени",
+      "machine": "SGT-600",
+      "unit": "турбина, горячий тракт",
+      "doc_ref": "список деталей SGT-600 (turbineblade.net); «| 1» в цитате — количество, ступень 1 подтверждает строка «2511628 — 1st stage turbine blade» той же страницы",
+      "source_url": "https://turbineblade.net/sgt-600-siemens-gas-turbine-spare-parts/",
+      "quote": "994 2511628-A | Turbine blade | 1"
+    },
+    {
+      "code": "A2842152-591",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Уплотнительное кольцо (O-ring)",
+      "machine": "SGT-600",
+      "unit": "уплотнения",
+      "doc_ref": "список деталей SGT-600 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/sgt-600-siemens-gas-turbine-spare-parts/",
+      "quote": "1008 A2842152-591 | O-ring | 1"
+    },
+    {
+      "code": "2427063-1",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Свеча зажигания, позиция HG5085",
+      "machine": "SGT-700",
+      "unit": "система зажигания",
+      "doc_ref": "SGT-700 turbine part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/sgt-700-turbine-part-numbers/",
+      "quote": "Spark plug HG5085 | 2427063-1 | Siemens"
+    },
+    {
+      "code": "2460571-1",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Блок зажигания HG5085, 352x263x264",
+      "machine": "SGT-700",
+      "unit": "система зажигания",
+      "doc_ref": "SGT-700 turbine part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/sgt-700-turbine-part-numbers/",
+      "quote": "Ignition unit HG5085, 352x263x264 | 2460571-1 | Siemens"
+    },
+    {
+      "code": "2464875-B",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Топливная форсунка HG5051 (18 шт. на машину)",
+      "machine": "SGT-700",
+      "unit": "топливная система / горелки",
+      "doc_ref": "SGT-700 turbine part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/sgt-700-turbine-part-numbers/",
+      "quote": "Fuel injector HG5051 | 2464875-B | Siemens | 18"
+    },
+    {
+      "code": "1CSA13421-1",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Датчик температуры HG4270 (упорный подшипник)",
+      "machine": "SGT-700",
+      "unit": "подшипники / контроль температуры",
+      "doc_ref": "SGT-700 turbine part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/sgt-700-turbine-part-numbers/",
+      "quote": "Temperature sensor HG4270 | 1CSA13421-1 | Siemens"
+    },
+    {
+      "code": "2420792-1",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Прокладка форсунки HG5051 (36 шт.); тот же номер встречается и в списках SGT-800",
+      "machine": "SGT-700",
+      "unit": "топливная система / уплотнения",
+      "doc_ref": "SGT-700 turbine part numbers (turbineblade.net)",
+      "source_url": "https://turbineblade.net/sgt-700-turbine-part-numbers/",
+      "quote": "Gasket HG5051 | 2420792-1 | Siemens | 36"
+    },
+    {
+      "code": "2421928-1",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Термопара тип N",
+      "machine": "SGT-800",
+      "unit": "контроль температуры",
+      "doc_ref": "список деталей SGT-800, агрегат TG6 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-800-parts/",
+      "quote": "Termopar tipo N;2421928-1;(TG6)"
+    },
+    {
+      "code": "2421539-2",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Датчик пламени",
+      "machine": "SGT-800",
+      "unit": "контроль пламени",
+      "doc_ref": "список деталей SGT-800, агрегат TG6 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-800-parts/",
+      "quote": "Detector de llama;2421539-2;(TG6)"
+    },
+    {
+      "code": "2420911-2",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Термопара выхлопа",
+      "machine": "SGT-800",
+      "unit": "выхлоп / контроль температуры",
+      "doc_ref": "список деталей SGT-800, агрегат TG6 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-800-parts/",
+      "quote": "Medición d escape termopar;2420911-2;TG6"
+    },
+    {
+      "code": "1CSA14796-1",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Воздушный фильтр",
+      "machine": "SGT-800",
+      "unit": "воздушная система / фильтры",
+      "doc_ref": "список деталей SGT-800, агрегат TG6 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-800-parts/",
+      "quote": "Filtro de aire;1CSA14796-1;(TG6)"
+    },
+    {
+      "code": "2427341-B",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Топливная форсунка (инжектор)",
+      "machine": "SGT-800",
+      "unit": "топливная система / горелки",
+      "doc_ref": "список деталей SGT-800, агрегат TG6 (turbineblade.net)",
+      "source_url": "https://turbineblade.net/siemens-sgt-800-parts/",
+      "quote": "Inyector de combustible;2427341-B;(TG6)"
+    },
+    {
+      "code": "2428811-A",
+      "issuer": "Siemens Energy (Finspång)",
+      "description": "Горелка SGT-800 (30 шт. на C-инспекцию)",
+      "machine": "SGT-800",
+      "unit": "камера сгорания / горелки",
+      "doc_ref": "перечень ЗИП на C-инспекцию SGT-800 (turbineblade.net); в тексте без разметки номер стоит в строке «Shovel working 1 stage», к горелке он относится по шапке таблицы (номер Siemens — последний столбец)",
+      "source_url": "https://turbineblade.net/siemens-gtu-sgt-800-spare-part-numbers/",
+      "quote": "Burner SGT-800 | PCS | 30 | 2428811-A"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Unison Industries",
+      "component": "игнитеры (свечи зажигания)",
+      "machine": "SGT-100 (номер Siemens 64/51009006/6)",
+      "evidence": "На карточке игнитера Unison 9058685-5 указан номер Siemens P/N 64/51009006/6; в заявке покупателя SGT-100 этот номер назван \"Spark plug\"",
+      "sources": [
+        "https://www.marineindustrialmachinery.com/shop/unison-9058685-5-igniter-17166",
+        "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Pall",
+      "component": "фильтроэлементы масляной системы (тонкая очистка, аварийная маслосистема)",
+      "machine": "SGT-100 (вероятно, и другие машины Lincoln, где стоят номера 64/05002071, 64/05002028)",
+      "evidence": "Трейдер указывает Siemens 64/05002071/8 = Pall HC2296FKN36H50; турецкая витрина продаёт 64/05002028/37 под маркой Pall; оба номера есть в заявке SGT-100. Связь держится только на витринах трейдеров; витрина yursat генерирует страницы под любой номер",
+      "sources": [
+        "http://www.silkroadsh.com/Products-6332186.html",
+        "https://www.yursat.com.tr/640500202837.html",
+        "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/"
+      ]
+    },
+    {
+      "company": "Bently Nevada (Baker Hughes)",
+      "component": "система контроля вибрации 3500 (модули токовихревых датчиков, связи, питания) и датчики 3300 XL",
+      "machine": "SGT-400; SGT-100",
+      "evidence": "В списке SGT-400 названы \"BENTLY NEVADA 3500COMMS MODULE\" (64/51031004/10) и \"3500 4 CHANNEL PROX. MODULE\" (64/51031004/7); в заявке SGT-100 — \"Vibration sensor 3300 XL 8 mm 64/01007823/1\"",
+      "sources": [
+        "https://turbineblade.net/siemens-turbine-spare-parts-sgt-400/",
+        "https://www.industrialmarinepower.com/purchase-siemens-industrial-gas-turbine-parts-model-sgt100-sgt300-19103/"
+      ]
+    },
+    {
+      "company": "Rockwell Automation (Allen-Bradley)",
+      "component": "система управления: контроллеры ControlLogix 1756 и модули ввода-вывода FLEX I/O 1794",
+      "machine": "SGT-400; SGT-100-2S",
+      "evidence": "Под номерами Siemens стоят модули \"DC INPUT MODULE 1756-IB16\" (64/52004053/451, SGT-400) и \"PROCESSOR MODULE 1756-L63\" (64/52004053/023, SGT-100-2S)",
+      "sources": [
+        "https://turbineblade.net/siemens-turbine-spare-parts-sgt-400/",
+        "https://turbineblade.net/spare-parts-for-sgt-100-2s/"
+      ]
+    },
+    {
+      "company": "Pepperl+Fuchs (линейка K-System — определено по обозначению модуля)",
+      "component": "искробезопасные барьеры и изолирующие модули",
+      "machine": "SGT-100-2S",
+      "evidence": "\"MODULE K-SYSTEM KFD2-SOT2-Ex2. (Isolation and Switch Unit)\" под номером Siemens 64/09001062/122 и KFD2-SD-Ex1 под 64/09001062/114",
+      "sources": [
+        "https://turbineblade.net/spare-parts-for-sgt-100-2s/"
+      ]
+    },
+    {
+      "company": "Moog",
+      "component": "контроллер электропривода поворотных направляющих лопаток (EVGV)",
+      "machine": "SGT-400",
+      "evidence": "\"MOOG EVGV RAM CONTROLLER\" под номером Siemens 64/09001221/1",
+      "sources": [
+        "https://turbineblade.net/siemens-turbine-spare-parts-sgt-400/"
+      ]
+    },
+    {
+      "company": "Kinetrol",
+      "component": "поворотный пневмопривод арматуры",
+      "machine": "SGT-400",
+      "evidence": "строка \"SIEMENS ACTUADOR KINETROL 08 74/60040208\" в списке SGT-400",
+      "sources": [
+        "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/"
+      ]
+    },
+    {
+      "company": "Masoneilan (Baker Hughes)",
+      "component": "позиционер SVI2 регулирующего клапана на входе (вероятно, со стороны приводимого компрессора)",
+      "machine": "пакет SGT-400",
+      "evidence": "\"Masoneilan pososioner SVI2-21123111 (Inlet throttle valve positioner)\" в списке SGT-400",
+      "sources": [
+        "https://turbineblade.net/siemens-turbine-spare-parts-sgt-400/"
+      ]
+    },
+    {
+      "company": "MEDC (Eaton)",
+      "component": "тепловые извещатели системы пожаро- и газообнаружения",
+      "machine": "SGT-400",
+      "evidence": "\"MEDC HEAT DETECTOR TYPE HD1 — PART OF PN/ 64/91002963/219\"",
+      "sources": [
+        "https://turbineblade.net/siemens-turbine-spare-parts-sgt-400/"
+      ]
+    },
+    {
+      "company": "Albany (роторные насосы)",
+      "component": "аварийный масляный насос",
+      "machine": "SGT-200",
+      "evidence": "\"Emergency oil pump for Siemens turbine Albany rotary pump 64/05010071/10\"",
+      "sources": [
+        "https://turbineblade.net/siemens-sgt-200-spare-parts/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Erskine",
+      "component": "выпрямитель SR3K124",
+      "machine": "SGT-100-2S",
+      "evidence": "\"Erskine Rectifier SR3K124\" под номером Siemens SP105969",
+      "sources": [
+        "https://turbineblade.net/spare-parts-for-sgt-100-2s/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Allen Gears",
+      "component": "генераторный редуктор",
+      "machine": "SGT-200 (50 Гц)",
+      "evidence": "Skyline Turbine Services продаёт \"Allen Gears Gearbox for SGT 200, 50 Hz, new internals, part nr. : 64/63001237/1\"",
+      "sources": [
+        "https://www.sts-bv.com/turbines/gearbox"
+      ]
+    },
+    {
+      "company": "Voith Turbo GmbH & Co KG",
+      "component": "редуктор Type PT 90 SP",
+      "machine": "SGT-200",
+      "evidence": "Forecast International, раздел Subcontractor отчёта по SGT-200 (2018)",
+      "sources": [
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1343"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Wood Group Fuel Systems",
+      "component": "топливные форсунки",
+      "machine": "SGT-200",
+      "evidence": "Forecast International, раздел Subcontractor (\"Fuel Nozzle\")",
+      "sources": [
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1343"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Altair Clean Air Technology",
+      "component": "акустическое оборудование (шумоглушение)",
+      "machine": "SGT-200",
+      "evidence": "Forecast International, раздел Subcontractor (\"Acoustic Equipment\")",
+      "sources": [
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1343"
+      ]
+    },
+    {
+      "company": "Trestad Svets AB",
+      "component": "головка пламени (Flame Head) камеры сгорания",
+      "machine": "SGT-500",
+      "evidence": "Forecast International, раздел Subcontractor отчёта по SGT-500",
+      "sources": [
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1403"
+      ]
+    },
+    {
+      "company": "Centrax Ltd",
+      "component": "комплектация генераторных установок (пакетирование) на SGT-300 и SGT-400",
+      "machine": "SGT-300; SGT-400",
+      "evidence": "В 2011 г. подписано соглашение с Siemens о пакетировании SGT-300/400; позже соглашение распространено на все страны ЕС и Турцию",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Centrax"
+      ]
+    },
+    {
+      "company": "Hangzhou Steam Turbine Co. (HTC)",
+      "component": "лицензионное производство и комплектация SGT-800 с вспомогательным оборудованием (локализация более 50 %)",
+      "machine": "SGT-800",
+      "evidence": "Соглашение HTC и Siemens о передаче технологии SGT-800 (проектирование, закупки, изготовление); совместный долгосрочный сервисный договор на SGT-800 в Куньшане",
+      "sources": [
+        "https://m.en.htc.cn/news/News_113117/The_second_technology_transfer_agreement_Between_HTC_and_SIEMENS.html",
+        "https://www.powermag.com/press-releases/siemens-secures-first-ltp-order-for-industrial-gas-turbines-in-china/"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Siemens Energy (Lincoln, Великобритания — SGT-100…400; Finspång, Швеция — SGT-500…800)",
+      "country": "Германия / Великобритания / Швеция",
+      "role": "изготовитель: оригинальные запчасти, ремонт, долгосрочные сервисные договоры, модернизация",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/service/small-industrial-gas-turbine.html",
+        "https://www.siemens-energy.com/global/en/home/products-services/service/sgt-500-gas-turbine.html",
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1343",
+        "https://www.manualslib.com/manual/3665726/Siemens-Sgt-600.html"
+      ]
+    },
+    {
+      "company": "Hangzhou Steam Turbine Co. (HTC)",
+      "country": "Китай",
+      "role": "лицензиат и комплектовщик SGT-800 в Китае, сервисный партнёр Siemens по долгосрочному договору",
+      "sources": [
+        "https://m.en.htc.cn/news/News_113117/The_second_technology_transfer_agreement_Between_HTC_and_SIEMENS.html",
+        "https://www.powermag.com/press-releases/siemens-secures-first-ltp-order-for-industrial-gas-turbines-in-china/"
+      ]
+    },
+    {
+      "company": "Centrax Ltd",
+      "country": "Великобритания (рынки: ЕС и Турция)",
+      "role": "эксклюзивный пакетировщик SGT-300/SGT-400",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Centrax"
+      ]
+    },
+    {
+      "company": "РИР энерго (сервисный центр; Росатом инфраструктурные решения)",
+      "country": "Россия",
+      "role": "независимый сервис: техобслуживание, средние и капитальные ремонты SGT-800 и SGT-600",
+      "sources": [
+        "https://www.ixbt.com/news/2026/01/21/siemens-general-electric.html"
+      ]
+    },
+    {
+      "company": "Турбосервис (Екатеринбург)",
+      "country": "Россия",
+      "role": "независимый ремонт: локализован ремонт основных компонентов SGT-800, в планах SGT-400 и SGT-300",
+      "sources": [
+        "http://seturbo.ru/news/turboservis-vedet-rabotu-nad-rasshireniem-lineyki-obsluzhivaemykh-gtu-/"
+      ]
+    },
+    {
+      "company": "DMEnergy",
+      "country": "Россия",
+      "role": "сервис и ремонт SGT-200 (капремонт газогенератора и силовой турбины по линии Turbine Efficiency, Lincoln), поставка запчастей",
+      "sources": [
+        "https://dm.energy/wp-content/uploads/pdf/turbine-efficiency/sgt-200-en.pdf",
+        "https://dm.energy/gazovye-turbiny/servisnoe-obsluzhivanie/remont"
+      ]
+    },
+    {
+      "company": "DM Liefer",
+      "country": "Россия",
+      "role": "обслуживание газовых турбин Siemens (на странице перечислены SGT-100…SGT-800)",
+      "sources": [
+        "https://dmliefer.ru/remont-gazovyh-turbin"
+      ]
+    },
+    {
+      "company": "KR Group (ker-holding)",
+      "country": "Россия",
+      "role": "ремонт газовых турбин Siemens SGT-300, SGT-400, SGT-600",
+      "sources": [
+        "https://www.ker-holding.ru/services/remont-i-obsluzhivanie-gazovykh-turbin/"
+      ]
+    },
+    {
+      "company": "РусТурбо",
+      "country": "Россия",
+      "role": "поставка запчастей SGT-100…SGT-800; инспекции A/A+ SGT-300-2S, сопровождение монтажа SGT-800",
+      "sources": [
+        "https://russturbo.ru/uslugi/postavka-zapchastey/",
+        "https://russturbo.ru/proyekty/"
+      ]
+    },
+    {
+      "company": "MC Systems Energy (МС Системы)",
+      "country": "Россия",
+      "role": "поставка запчастей SGT-100, 200, 300, 400, 600, 800",
+      "sources": [
+        "https://mcenergy.ru/"
+      ]
+    },
+    {
+      "company": "UNICA LLC",
+      "country": "Россия",
+      "role": "поставка запчастей: SGT-400; SGT-600 и SGT-800 вер. 1–3 под запрос",
+      "sources": [
+        "https://unica.ru.com/gasturbines/en"
+      ]
+    },
+    {
+      "company": "MSR Industrade Pvt Ltd (MSRI)",
+      "country": "Индия (Нойда)",
+      "role": "независимый поставщик запчастей SGT-100…SGT-800 (новые и восстановленные)",
+      "sources": [
+        "https://msritrade.com/sgt-spare-parts.html"
+      ]
+    },
+    {
+      "company": "Shenzhen Blaze Turbine Co., Ltd",
+      "country": "Китай",
+      "role": "изготовление деталей горячего тракта по образцу или чертежу (реверс-инжиниринг); публикует списки номеров Siemens; сам заявляет, что не авторизован OEM",
+      "sources": [
+        "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/"
+      ]
+    },
+    {
+      "company": "Yursat",
+      "country": "Турция",
+      "role": "торговец компонентами Pall; продаёт фильтроэлемент под номером Siemens 64/05002028/37",
+      "sources": [
+        "https://www.yursat.com.tr/640500202837.html"
+      ]
+    },
+    {
+      "company": "EthosEnergy",
+      "country": "США / Великобритания (Aberdeen, Houston)",
+      "role": "независимый капремонт, обменные двигатели, ремонт компонентов и запчасти SGT-100 и SGT-200",
+      "sources": [
+        "https://ethosenergy.com/services/light-industrial-gas-turbines/siemens-energy-light-turbines",
+        "https://ethosenergy.com/services/light-industrial-gas-turbines/siemens-energy-light-turbines/sgt-200-gas-turbine-services"
+      ]
+    },
+    {
+      "company": "Skyline Turbine Services b.v.",
+      "country": "Нидерланды",
+      "role": "независимый сервис SGT-100…400 (стенды и калибровка SGT-400), продажа машин, редукторов и запчастей",
+      "sources": [
+        "https://www.sts-bv.com/turbines/gearbox",
+        "https://www.sts-bv.com/parts"
+      ]
+    },
+    {
+      "company": "Turbine Efficiency",
+      "country": "Великобритания (Lincoln)",
+      "role": "независимый капремонт SGT-200 с испытательным стендом; поставка запчастей",
+      "sources": [
+        "https://dm.energy/wp-content/uploads/pdf/turbine-efficiency/sgt-200-en.pdf",
+        "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=1343"
+      ]
+    }
+  ],
+  "gaps": [
+    "Иллюстрированных каталогов деталей (IPC/parts manual) и сервисных бюллетеней Siemens Energy по SGT-100…800 в открытом доступе нет. Они выдаются эксплуатанту с документацией пакета и через клиентский портал изготовителя. Все 40 кодов взяты из перепечаток: заявки эксплуатантов на industrialmarinepower.com, списки Shenzhen Blaze (turbineblade.net), страницы трейдеров. Перед закупкой каждый код надо сверить с ведомостью ЗИП конкретного пакета.",
+    "Противоречие в описании: 64/07001494/1 в заявке SGT-100 назван «Ignition unit», а в листинге SGT-400 — «SIEMENS MOTHERBOARD». Назначение не установлено.",
+    "В перепечатках реселлера есть кириллические двойники латиницы: «RW31081Н/1 НР» (SGT-300), «2461700-А» и «2462071-А» (SGT-700). Такие коды в выборку не взяты, при импорте их надо чистить. Список SGT-400 на turbineblade.net местами обрезан («64/5103», «74/0501»); обрезанные коды тоже не взяты.",
+    "Пересчёт номеров Siemens на номера изготовителей комплектующих найден только для трёх позиций: игнитер Unison и два фильтроэлемента Pall. Страницы Hangzhou Gas Turbine Parts (gas-turbine-parts.com), где по выдаче поиска есть пересчёт 64/05002028/37 → Pall HC7400SKT4H и 64/0500207x → Pall HC9404FCS26Z, недоступны: сертификат истёк, отдаёт 503, в Wayback Machine копий нет. Эти пары в выборку не включены.",
+    "Документы на Scribd (руководство по вспомогательному редуктору SGT-200 «64 62001289 300 I», «SGT-600 Spare Parts Request December 2024», обзор Typhoon SGT-100) не открываются без входа. Записаны только названия из выдачи.",
+    "Прежние названия GT10B/GT10C у SGT-600/700 подтверждены лишь вторичными источниками: dmliefer.ru, где ошибочно записано и «GT10C SGT-750», и заголовок ветки control.com, которая отдаёт 403. Прямой ссылки изготовителя нет.",
+    "Субпоставщики пакетов SGT-600/700/800 — генератор, редуктор, пусковое устройство, топливная арматура, система управления — в открытых источниках не подтверждены. Префикс 3BSM в списке ЗИП SGT-800 похож на артикулы ABB, но это вывод, а не факт. Разделы Subcontractor у Forecast International открыты только для снятых программ (SGT-200, SGT-500); отчёты по действующим SGT платные.",
+    "Официальной дилерской сети по промышленным ГТУ Siemens Energy не публикует. Авторизованного канала в России, СНГ, ОАЭ и Турции в открытых источниках не найдено. По ОАЭ есть лишь запись справочника 2GIS о региональном инструментальном центре Siemens Energy в Абу-Даби, без подтверждения на сайте изготовителя. Сервис в России ведут независимые компании; по статье ixbt, до 2022 г. эти работы были монополией иностранных поставщиков.",
+    "Уставок (пределы вибрации, температуры выхлопа), ресурсов расходников и интервалов замены фильтров и свечей по конкретным SGT в открытых источниках нет. Известны только интервалы инспекций SGT-400 (горячий тракт 32 000 ч, капремонт 64 000 ч) и SGT-800 (до 60 000 эквивалентных часов между капремонтами)."
+  ],
+  "verifier_notes": "Все 22 страницы-источника и 14 источников по машинам скачаны curl и проверены поиском точной строки в тексте (неразрывные пробелы нормализованы; PDF Forecast International и Siemens — через pdftotext). Все 41 код найдены точно, в том же написании. Ничего не опровергнуто. Слабые места для правки записей:\n(1) 64/07001494/1: в заявке SGT-100 это «Ignition unit», в листинге SGT-400 — «MOTHERBOARD». Назначение не установлено.\n(2) 2511628-A: в цитате «| 1» — это количество. Ступень 1 подтверждается другой строкой той же страницы: «2511628 — 1st stage turbine blade».\n(3) RT31083: на странице одновременно «Stage 1» и упоминание диска второй ступени RT31091.\n(4) 2428811-A: в тексте без разметки номер стоит в строке «Shovel working 1 stage», но по шапке таблицы (номер Siemens — последний столбец) он относится к горелке. При машинном разборе этой страницы легко ошибиться. На той же странице 2423483-A дан и для направляющих 1-й, и для направляющих 2-й ступени — дефект данных turbineblade.\n(5) Связь с Pall держится только на витринах трейдеров: silkroadsh и yursat. Yursat генерирует страницы под любой номер.\n(6) Производитель выведен по обозначению, а не назван источником: Pepperl+Fuchs (KFD2 — на сайте P+F есть страница KFD2-SOT2-Ex2), Rockwell (1756/1794), Bently Nevada (3300 XL в заявке SGT-100).\n(7) Прежние имена SGT-600 (GT10B) и SGT-700 (GT10C) — только по dmliefer.ru. Там же ошибочно «GT10C SGT-750», так что источник ненадёжен. «Alstom» в прежних именах SGT-100…400 и «Stal-Laval» у SGT-500 в приведённых источниках не названы: Siemens пишет только «GT35», msritrade — только «Ruston».\nЛимит WebSearch сессии исчерпан, но для вердиктов поиск не понадобился: все источники открылись напрямую.",
+  "corrections": [
+    "MW21215M, MW22316B/01: пояснение про неразрывные пробелы вынесено из цитаты в doc_ref — цитата дословная",
+    "2511628-A: пояснено, откуда ступень 1 — замечание 2",
+    "2428811-A: отмечена ловушка машинного разбора страницы — замечание 4",
+    "Pall: отмечено, что связь держится на витринах трейдеров — замечание 5"
+  ]
+}

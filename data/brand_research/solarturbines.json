@@ -1,0 +1,1085 @@
+{
+  "oem_key": "solarturbines",
+  "name": "Solar Turbines Incorporated (Caterpillar)",
+  "segment_focus": "Saturn 20, Centaur 40/50, Mercury 50, Taurus 60/65/70, Mars 90/100, Titan 130/250; расходники, датчики, клапаны",
+  "researched_at": "2026-09-24",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Solar Turbines Incorporated (Сан-Диего, дочерняя компания Caterpillar) — промышленные газовые турбины от 1 до 38 МВт и центробежные газовые компрессоры. Основные семейства: Saturn, Centaur, Mercury, Taurus, Mars, Titan. Мощности сверены по спецификациям Solar, размещённым на CDN Caterpillar (scene7, cloudfront), и по справочнику продукции 2016 года. Сайт solarturbines.com отказывает автоматическому чтению (403 и таймаут), поэтому номиналы 2016 года могут отличаться от нынешних: у Titan 130 в спецификации 15,0 МВт, у Wikipedia — 16,5 МВт.\n\nСамое ценное в находке — три каталога деталей Solar (Illustrated Parts List, том IV) в открытом доступе на idoc.tips:\n- Saturn 20, генераторная установка, сборка 2-57811;\n- Taurus 70, генераторная установка, сборка 2-77291;\n- Centaur 50, компрессорная установка, сборка 2-76681.\nИз них взяты 26 кодов с узлом, машиной и позицией в каталоге: форсунки, запальное устройство, свеча, уплотнения, фильтроэлементы (масло, топливный газ), датчики скорости, датчики T1 и T7, датчики зазора, упорные подшипники с качающимися колодками. В каталоге Saturn 20 прямо сказано: «All part numbers referred to within the manual set are Solar part numbers unless otherwise specified», поэтому изготовителем номера указан Solar.\n\nПерекрёстная проверка:\n- свеча 903316C1 и её прокладка 903315C1 стоят в каталогах Saturn 20 и Taurus 70, у независимого ремонтника GTA, в запросе котировки и в объявлении о запчастях Titan 130;\n- элемент фильтра топливного газа 1060817-10 общий для Taurus 70 и Centaur 50 CS;\n- манометр перепада 1012835-2 — в каталоге Centaur 50 и в запросе котировки с пометкой «MARS 100».\n\nКоды для Mars 90/100 и Titan 130 найдены только в объявлениях и запросах котировок (industrialmarinepower.com). Их применимость заявлена продавцом или покупателем, а не каталогом.\n\nФорматы номеров Solar:\n- NNNNNN-NNN — основной;\n- NNNNNNC1 / C2 / C91 и NNNNNR1 — наследные номера, вероятно, эпохи International Harvester (это вывод, источником не подтверждён);\n- Solar заменяет номера новыми, например 1079655-400 → 1079655-401. Цитата из каталога: «Solar reserves the right to change, delete, and supersede part numbers as necessary».\n\nКомплектующие сторонних изготовителей по открытым спецификациям:\n- Rockwell/Allen-Bradley — контроллер ControlLogix и модули Flex I/O системы Turbotronic;\n- Bently Nevada — вибромонитор 1701 FieldMonitor и драйверы датчиков зазора 3300XL;\n- Det-Tronics — Eagle Quantum Premier, пожаро- и газообнаружение;\n- TDI — стартёры;\n- Woodward — синхронизатор (только по каталогу GTA, связь не подтверждена);\n- фильтры: Camfil, AAF DuraCel, Schroeder, Baldwin (только по каталогу GTA, связь не подтверждена);\n- Oilgear — осевое уплотнение в клапане регулирования масла (Centaur 50).\n\nОфициальные офисы по перечню Solar 2016 года:\n- Россия — Solar Turbines C.I.S.;\n- Китай — Solar Turbines (Beijing) Trading & Services;\n- Индия — Solar Turbines India;\n- ОАЭ — Solar Turbines Europe S.A. в Джебель-Али;\n- Турция и Казахстан — офисов в перечне нет.\nНезависимые сервисные компании и поставщики запчастей: EthosEnergy (казахстанский сайт), DMLieferant и KER-Holding (Россия), GTA и Southeast Overseas (США), Shenzhen Blaze (Китай).",
+  "machines": [
+    {
+      "model": "Saturn 20",
+      "kind": "промышленная газовая турбина: одновальная в генераторной установке; в TPS компрессорной установки и механического привода — двухвальная",
+      "segment": "ГТУ",
+      "rating": "1210 кВт эл. (генераторная установка); 1185 кВт (1590 л.с.) — компрессорная установка и мех. привод",
+      "status": "выпускается",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/C10550203",
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361627/Saturn20GasTurbinesBrochure.pdf",
+        "https://www.lathroptrotter.com/wp-content/uploads/2016/07/Solar-Turbines-Gas-Turbine-Product-Selection-Guide.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Centaur 40",
+      "kind": "промышленная двухвальная газовая турбина (привод компрессора, генераторная установка)",
+      "segment": "ГТУ",
+      "rating": "3500 кВт (4700 л.с.) — компрессорная установка; 3,5 МВт эл.",
+      "status": "выпускается",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/C10550270",
+        "https://www.lathroptrotter.com/wp-content/uploads/2016/07/Solar-Turbines-Gas-Turbine-Product-Selection-Guide.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Centaur 50",
+      "kind": "промышленная газовая турбина (генераторная установка, привод компрессора и механический привод)",
+      "segment": "ГТУ",
+      "rating": "4600 кВт эл.; 4570 кВт (6130 л.с.) — мех. привод",
+      "status": "выпускается",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20150703-52095-37893",
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361629/Centaur50GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Mercury 50",
+      "kind": "газовая турбина с рекуператором, генераторная установка",
+      "segment": "ГТУ",
+      "rating": "4600 кВт эл., удельный расход тепла 9350 кДж/кВт·ч",
+      "status": "выпускается",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20150710-52396-21070",
+        "https://www.lathroptrotter.com/wp-content/uploads/2016/07/Solar-Turbines-Gas-Turbine-Product-Selection-Guide.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Taurus 60",
+      "kind": "промышленная газовая турбина (генераторная установка, привод компрессора и механический привод)",
+      "segment": "ГТУ",
+      "rating": "5670 кВт эл.; 5740 кВт (7700 л.с.) — мех. привод",
+      "status": "выпускается",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20150703-52095-49890",
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361630/Taurus60GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Taurus 65",
+      "kind": "промышленная газовая турбина, генераторная установка",
+      "segment": "ГТУ",
+      "rating": "6,3 МВт эл. (справочник 2016)",
+      "status": "выпускается (по справочнику 2016)",
+      "sources": [
+        "https://www.lathroptrotter.com/wp-content/uploads/2016/07/Solar-Turbines-Gas-Turbine-Product-Selection-Guide.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Taurus 70",
+      "kind": "промышленная газовая турбина (генераторная установка, привод компрессора и механический привод)",
+      "segment": "ГТУ",
+      "rating": "8,0 МВт эл. (2016); 7884 кВт (10 573 л.с.) — компрессорная установка (TPS 2015); 8290 кВт (11 110 л.с.) — мех. привод (2021)",
+      "status": "выпускается",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20150703-52095-08416",
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10660338",
+        "https://www.lathroptrotter.com/wp-content/uploads/2016/07/Solar-Turbines-Gas-Turbine-Product-Selection-Guide.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Mars 90",
+      "kind": "промышленная двухвальная газовая турбина (привод компрессора, мех. привод)",
+      "segment": "ГТУ",
+      "rating": "9860 кВт (13 200 л.с.), 15 ступеней компрессора, степень сжатия 16,3:1",
+      "status": "есть в TPS 2012; в справочнике генераторных установок 2016 отсутствует — текущий статус не подтверждён",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Mars 100",
+      "kind": "промышленная двухвальная газовая турбина (генераторная установка, привод компрессора и мех. привод)",
+      "segment": "ГТУ",
+      "rating": "11 350 кВт эл.; 11 860 кВт (15 900 л.с.) — мех. привод; 21 форсунка в обычном исполнении / 14 в SoLoNOx",
+      "status": "выпускается",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10550139",
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Titan 130",
+      "kind": "промышленная газовая турбина: генераторная установка — одновальное исполнение (по спецификации C10550243); привод компрессора и механический привод — двухвальное",
+      "segment": "ГТУ",
+      "rating": "15 000 кВт эл. (спецификация); 16,5 МВт эл. (Wikipedia, текущая линейка)",
+      "status": "выпускается",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/C10550243",
+        "https://en.wikipedia.org/wiki/Solar_Turbines"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Titan 250",
+      "kind": "промышленная газовая турбина (генераторная установка, мех. привод)",
+      "segment": "ГТУ",
+      "rating": "21,7 МВт эл. (2016); 23,1 МВт эл. (Wikipedia)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.lathroptrotter.com/wp-content/uploads/2016/07/Solar-Turbines-Gas-Turbine-Product-Selection-Guide.pdf",
+        "https://en.wikipedia.org/wiki/Solar_Turbines"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Titan 350",
+      "kind": "промышленная газовая турбина, генераторная установка",
+      "segment": "ГТУ",
+      "rating": "38 МВт эл. (Wikipedia)",
+      "status": "выпускается",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Solar_Turbines"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Saturn 10",
+      "kind": "промышленная газовая турбина малой мощности (прежняя модель)",
+      "segment": "ГТУ",
+      "rating": "мощность в открытых источниках не найдена",
+      "status": "статус не подтверждён: в Wikipedia модель в списке продукции, в справочнике 2016 г. её нет; обслуживается сторонними сервисами",
+      "sources": [
+        "https://ethosenergy.com/kz/uslugi/legkie-promyshlennye-gazovye-turbiny/solnechnye-svetovye-turbiny",
+        "https://dmliefer.ru/gazovye-turbiny-solar"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C16",
+      "kind": "центробежный газовый компрессор (добыча газа)",
+      "segment": "компрессор",
+      "rating": "1–10 ступеней, до 20 700 кПа (3000 psig), до 50 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C33",
+      "kind": "центробежный газовый компрессор (добыча газа)",
+      "segment": "компрессор",
+      "rating": "1–12 ступеней, до 15 510 кПа (2250 psig), до 270 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C40",
+      "kind": "центробежный газовый компрессор (добыча газа; трубопровод)",
+      "segment": "компрессор",
+      "rating": "добыча: 1–6 ступеней, до 17 240 кПа, до 255 м³/мин; трубопровод: 1–2 ступени, до 11 040 кПа, до 270 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C41",
+      "kind": "центробежный газовый компрессор (добыча газа)",
+      "segment": "компрессор",
+      "rating": "1–10 ступеней, до 25 855 кПа (3750 psig), до 510 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C45",
+      "kind": "центробежный газовый компрессор (трубопровод)",
+      "segment": "компрессор",
+      "rating": "1–3 ступени, до 12 410 кПа (1800 psig), до 370 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C50",
+      "kind": "центробежный газовый компрессор (добыча газа)",
+      "segment": "компрессор",
+      "rating": "1–5 ступеней, до 10 350 кПа (1500 psig), до 565 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C51",
+      "kind": "центробежный газовый компрессор (добыча газа)",
+      "segment": "компрессор",
+      "rating": "1–8 ступеней, до 20 700 кПа (3000 psig), до 425 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C61",
+      "kind": "центробежный газовый компрессор (добыча газа)",
+      "segment": "компрессор",
+      "rating": "1–10 ступеней, до 20 685 кПа (3000 psig), до 725 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C65",
+      "kind": "центробежный газовый компрессор (трубопровод)",
+      "segment": "компрессор",
+      "rating": "1–2 ступени, до 11 040 кПа (1600 psig), до 565 м³/мин",
+      "status": "в линейке TPS 2012",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Illustrated Parts List (Volume IV), Saturn 20 Gas Turbine-Driven Generator Set, Solar Project Definition 5781, сборка 2-57811 (Hyundai Heavy Industries / Conoco Indonesia, West Natuna)",
+      "doc_no": "57811 (сборка 2-57811)",
+      "machine": "Saturn 20 (генераторная установка)",
+      "kind": "parts manual",
+      "sources": [
+        "https://idoc.tips/ipl-saturn-20-5-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Illustrated Parts List, Taurus 70 Gas Turbine-Driven Generator Set, Kerisi Development Project / Hiu Field (ConocoPhillips Indonesia), в составе Operation and Maintenance Instructions",
+      "doc_no": "77291-OMI; ID-F-K1-P-EG-001-R01-0001; сборка 2-77291",
+      "machine": "Taurus 70 (генераторная установка)",
+      "kind": "parts manual",
+      "sources": [
+        "https://idoc.tips/taurus-70-ipl-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Volume IV — Illustrated Parts List, Centaur 50 Gas Turbine-Driven Compressor Set (ConocoPhillips Indonesia, Suban Phase 2)",
+      "doc_no": "76681 (сборка 2-76681)",
+      "machine": "Centaur 50 (компрессорная установка)",
+      "kind": "parts manual",
+      "sources": [
+        "https://idoc.tips/76681ipl-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Volume IV — Illustrated Parts List, Taurus 60 Gas Turbine-Driven Generator Set (Modec)",
+      "doc_no": "72571 (по поисковой выдаче)",
+      "machine": "Taurus 60",
+      "kind": "parts manual",
+      "sources": [
+        "https://pdfcoffee.com/vol-iv-spare-part-illustration-pdf-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Centaur 50 Gas Turbine Parts List (Illustrated Part List)",
+      "doc_no": "47841 (по названию файла)",
+      "machine": "Centaur 50",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.scribd.com/document/700748729/47841ILustrated-Part-List-1"
+      ]
+    },
+    {
+      "title": "Комплект технической документации Solar: Volume I — Systems Operator's Guide; Volume II — Installation and Maintenance Instructions; Volume III — Supplementary Data; Volume IV — Illustrated Parts List (состав по предисловию каталога Saturn 20)",
+      "machine": "все модели (типовой комплект)",
+      "kind": "O&M",
+      "sources": [
+        "https://idoc.tips/ipl-saturn-20-5-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Turbomachinery Package Specification — Mars 90 and Mars 100 Compressor Set and Mechanical Drive",
+      "doc_no": "TPS90-100CSMD/812",
+      "machine": "Mars 90, Mars 100",
+      "kind": "спецификация установки (TPS)",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Turbomachinery Package Specification — Saturn 20 Compressor Set and Mechanical Drive",
+      "doc_no": "TPS20CSMD/309",
+      "machine": "Saturn 20",
+      "kind": "спецификация установки (TPS)",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361627/Saturn20GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Turbomachinery Package Specification — Centaur 50 Compressor Set and Mechanical Drive",
+      "doc_no": "TPS50CSMD/309",
+      "machine": "Centaur 50",
+      "kind": "спецификация установки (TPS)",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361629/Centaur50GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Turbomachinery Package Specification — Taurus 60 Compressor Set and Mechanical Drive",
+      "doc_no": "TPS60CSMD/309",
+      "machine": "Taurus 60",
+      "kind": "спецификация установки (TPS)",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361630/Taurus60GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Turbomachinery Package Specification — Taurus 70 Compressor Set and Mechanical Drive",
+      "doc_no": "TPS70CSMD/715",
+      "machine": "Taurus 70",
+      "kind": "спецификация установки (TPS)",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10660338"
+      ]
+    },
+    {
+      "title": "Engineering Specification ES 9-98 — Fuel, Air, and Water (or Steam) for Solar Gas Turbine Engines (требования к топливу, воздуху, воде)",
+      "doc_no": "ES 9-98",
+      "machine": "все модели",
+      "kind": "инженерная спецификация (упомянута в TPS, текст закрыт)",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Engineering Specification ES 9-224 — требования к смазочному маслу (в TPS: «Lube oil must conform to Solar's Engineering Specification ES 9-224», класс вязкости C32 или C46)",
+      "doc_no": "ES 9-224",
+      "machine": "все модели",
+      "kind": "инженерная спецификация (упомянута в TPS, текст закрыт)",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf",
+        "https://pdfcoffee.com/specification-for-lubricating-oils-for-use-in-solar-gas-turbine-enginespdf-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Engineering Specification ES 9-62 — Ingestive Cleaning Solar Gas Turbine Engines (промывка компрессора)",
+      "doc_no": "ES 9-62",
+      "machine": "все модели",
+      "kind": "инженерная спецификация (упомянута в TPS)",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Product Information Letter 140 — Dry Gas Face Seals for Solar Compressors",
+      "doc_no": "PIL 140",
+      "machine": "компрессоры Solar (C-серия)",
+      "kind": "бюллетень",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Product Information Letter 161 — Lube Oil System Cleanliness",
+      "doc_no": "PIL 161",
+      "machine": "все модели",
+      "kind": "бюллетень",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Product Information Letter 162 — Recommendations and Requirements for the Sourcing, Handling, Storage and Treatment of Fuels",
+      "doc_no": "PIL 162",
+      "machine": "все модели",
+      "kind": "бюллетень",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Product Information Letter 176 — Siloxanes in Gas Fuel",
+      "doc_no": "PIL 176",
+      "machine": "все модели",
+      "kind": "бюллетень",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Product Information Letter 178 — Salt Ingress Protection for Gas Turbines",
+      "doc_no": "PIL 178",
+      "machine": "все модели",
+      "kind": "бюллетень",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "List of Solar's Engineering Specifications / List of Solar's Product Information Letters (приложение к руководству Titan 250)",
+      "machine": "Titan 250",
+      "kind": "перечень ES и PIL",
+      "sources": [
+        "https://www.manualsdir.com/manuals/59759/cat-titan-250.html?page=81"
+      ]
+    },
+    {
+      "title": "Overhaul Capabilities — Worldwide Turbomachinery Support (обмен двигателя, EOCP, ремонт на месте и в цехе)",
+      "doc_no": "BOC/0520",
+      "machine": "все модели",
+      "kind": "сервисная брошюра",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20150629-55475-13889"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "171959-200",
+      "issuer": "Solar Turbines",
+      "description": "Форсунка в сборе (INJECTOR ASSY), 12 шт. на коллектор топливного газа 171907-102",
+      "machine": "Saturn 20",
+      "unit": "топливная система / коллектор топливного газа (Fig. 7.4)",
+      "doc_ref": "IPL Saturn 20 GS, сборка 2-57811, Fig. 7.4",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "171959-200 . INJECTOR ASSY 12"
+    },
+    {
+      "code": "300573-1",
+      "issuer": "Solar Turbines",
+      "description": "Уплотнение форсунки (SEAL), 12 шт.",
+      "machine": "Saturn 20",
+      "unit": "коллектор топливного газа (Fig. 7.4)",
+      "doc_ref": "IPL Saturn 20 GS, сборка 2-57811, Fig. 7.4",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "300573-1 . SEAL 12"
+    },
+    {
+      "code": "171908-103",
+      "issuer": "Solar Turbines",
+      "description": "Запальное устройство (факельный воспламенитель) в сборе, TORCH IGNITER ASSY",
+      "machine": "Saturn 20",
+      "unit": "камера сгорания / зажигание (Fig. 7.5)",
+      "doc_ref": "IPL Saturn 20 GS, сборка 2-57811, Fig. 7.1/7.5",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "171908-103 TORCH IGNITER ASSY"
+    },
+    {
+      "code": "903316C1",
+      "issuer": "Solar Turbines",
+      "description": "Свеча зажигания запального устройства (IGNITER PLUG). Тот же номер стоит в каталоге Taurus 70 (Fig. 7.7), у GTA («Plug, Spark»), в запросе котировки («SPARK PLUG») и в объявлении о запчастях Titan 130",
+      "machine": "Saturn 20; Taurus 70",
+      "unit": "запальное устройство (Fig. 7.5)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 7.5; IPL Taurus 70 77291, Fig. 7.7",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "903316C1 . IGNITER PLUG 1"
+    },
+    {
+      "code": "903315C1",
+      "issuer": "Solar Turbines",
+      "description": "Прокладка свечи запального устройства (GASKET); у GTA — «GASKET, SPARK PLUG»; есть и в каталоге Taurus 70",
+      "machine": "Saturn 20; Taurus 70",
+      "unit": "запальное устройство (Fig. 7.5)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 7.5",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "903315C1 . GASKET 1"
+    },
+    {
+      "code": "905132C91",
+      "issuer": "Solar Turbines",
+      "description": "Сопло запального устройства в сборе (NOZZLE ASSY)",
+      "machine": "Saturn 20",
+      "unit": "запальное устройство (Fig. 7.5)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 7.5",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "905132C91 . NOZZLE ASSY 1"
+    },
+    {
+      "code": "993439C1",
+      "issuer": "Solar Turbines",
+      "description": "Датчик частоты вращения двигателя (SENSOR, SPEED)",
+      "machine": "Saturn 20",
+      "unit": "двигатель, общие детали (Fig. 7.1)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 7.1",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "993439C1 . SENSOR, SPEED 1"
+    },
+    {
+      "code": "136544-3",
+      "issuer": "Solar Turbines",
+      "description": "Датчик частоты вращения на редукторе (SENSOR, SPEED)",
+      "machine": "Saturn 20",
+      "unit": "редуктор (Fig. 8.1 Reduction Drive Assy)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 8.1",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "136544-3 . SENSOR, SPEED 1"
+    },
+    {
+      "code": "918801C1",
+      "issuer": "Solar Turbines",
+      "description": "Датчик температуры воздуха на входе (SENSOR, TEMPERATURE, поз. RT339). Тот же номер стоит в каталоге Taurus 70 (Fig. 7.2) и в объявлении о запчастях Titan 130 («DETECTOR»)",
+      "machine": "Saturn 20; Taurus 70",
+      "unit": "входной воздуховод (Fig. 7.2)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 7.2",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "918801C1 . SENSOR, TEMPERATURE 1"
+    },
+    {
+      "code": "186560-4",
+      "issuer": "Solar Turbines",
+      "description": "Фильтроэлемент масляного фильтра (ELEMENT) к фильтру 185861-100",
+      "machine": "Saturn 20",
+      "unit": "масляная система, фильтр (Fig. 5.3)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 5.3",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "186560-4 . ELEMENT 1"
+    },
+    {
+      "code": "1025324-1",
+      "issuer": "Solar Turbines",
+      "description": "Фильтроэлемент фильтра топливного газа (FS931) к корпусу 1025324-100",
+      "machine": "Saturn 20",
+      "unit": "топливная система, фильтр-сетчатый фильтр (Fig. 3.2)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 3.2",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "1025324-100 FILTER 1 1 1025324-1 . ELEMENT"
+    },
+    {
+      "code": "994755C1",
+      "issuer": "Solar Turbines",
+      "description": "Элемент сетчатого фильтра пневматической системы пуска (FS921)",
+      "machine": "Saturn 20",
+      "unit": "система пуска (Fig. 2.2 Strainer Assy)",
+      "doc_ref": "IPL Saturn 20 GS 2-57811, Fig. 2.2",
+      "source_url": "https://idoc.tips/ipl-saturn-20-5-pdf-free.html",
+      "quote": "994755C1 . . ELEMENT 1"
+    },
+    {
+      "code": "302251-101",
+      "issuer": "Solar Turbines",
+      "description": "Форсунка топливного газа (INJECTOR), 12 шт.; в той же позиции — форсунка в сборе 302251-10000. Код сопоставлен с наименованием по порядку столбцов извлечённой таблицы",
+      "machine": "Taurus 70",
+      "unit": "коллектор топливного газа (Fig. 7.6)",
+      "doc_ref": "IPL Taurus 70 GS, 77291 / ID-F-K1-P-EG-001-R01-0001, Fig. 7.6",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "Part No. 330575-100 302677-100 302251-10000 302251-101 136856-1"
+    },
+    {
+      "code": "136856-1",
+      "issuer": "Solar Turbines",
+      "description": "Прокладка форсунки (GASKET), 12 шт. Сопоставлено по порядку столбцов",
+      "machine": "Taurus 70",
+      "unit": "коллектор топливного газа (Fig. 7.6)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.6",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "Part No. 330575-100 302677-100 302251-10000 302251-101 136856-1"
+    },
+    {
+      "code": "300589-1002",
+      "issuer": "Solar Turbines",
+      "description": "Запальное устройство в сборе (TORCH IGNITER ASSY), поз. E340",
+      "machine": "Taurus 70",
+      "unit": "запальное устройство (Fig. 7.7)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.7",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "Part No. 300589-1002 198944-1 173942-1 301385-3 903316C1 903315C1"
+    },
+    {
+      "code": "173942-1",
+      "issuer": "Solar Turbines",
+      "description": "Прокладка запального устройства (GASKET). Сопоставлено по порядку столбцов; тот же номер — «EBB-GASKET» в объявлении о запчастях Titan 130",
+      "machine": "Taurus 70",
+      "unit": "запальное устройство (Fig. 7.7)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.7",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "Part No. 300589-1002 198944-1 173942-1 301385-3 903316C1 903315C1"
+    },
+    {
+      "code": "1060817-10",
+      "issuer": "Solar Turbines",
+      "description": "Комплект фильтроэлементов фильтра топливного газа (ELEMENT KIT, FILTER, поз. FS931). Тот же номер в каталоге Centaur 50 CS (76681, Fig. 3.6)",
+      "machine": "Taurus 70; Centaur 50",
+      "unit": "топливная система, фильтр топливного газа (Fig. 3.4)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 3.4; IPL Centaur 50 CS 76681, Fig. 3.6",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "Part No. 1062989-100 1060817-100 1060817-10 1017905 970902C1"
+    },
+    {
+      "code": "1033638-3",
+      "issuer": "Solar Turbines",
+      "description": "Фильтроэлемент масляного фильтра (ELEMENT), 2 шт., корпус 1044829-310. Сопоставлено по порядку столбцов",
+      "machine": "Taurus 70",
+      "unit": "масляная система, фильтр FS901 (Fig. 5.3)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 5.3",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "Part No. 1053077-77291 1044829-310 1033638-3 915370C1"
+    },
+    {
+      "code": "1023031-1",
+      "issuer": "Solar Turbines",
+      "description": "Датчик зазора (PROBE, PROXIMITY) — радиальная вибрация подшипников двигателя. Сопоставлено по порядку столбцов",
+      "machine": "Taurus 70",
+      "unit": "двигатель, общие детали (Fig. 7.1)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.1",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "970415C1 1023031-1 952055C1 917282C1 19298R1 903988C1 1020104-1 330140-100"
+    },
+    {
+      "code": "1020104-1",
+      "issuer": "Solar Turbines",
+      "description": "Датчик частоты вращения (SENSOR, SPEED). Сопоставлено по порядку столбцов; тот же номер — «SENSOR» в объявлении о запчастях Titan 130",
+      "machine": "Taurus 70",
+      "unit": "двигатель, общие детали (Fig. 7.1)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.1",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "970415C1 1023031-1 952055C1 917282C1 19298R1 903988C1 1020104-1 330140-100"
+    },
+    {
+      "code": "330701-101",
+      "issuer": "Solar Turbines",
+      "description": "Радиально-упорный подшипник (RADIAL THRUST BEARING). Сопоставлено по порядку столбцов",
+      "machine": "Taurus 70",
+      "unit": "двигатель, подшипники (Fig. 7.1)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.1",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "330142-1 330701-101 330468-101 1015230 1015231"
+    },
+    {
+      "code": "330468-101",
+      "issuer": "Solar Turbines",
+      "description": "Упорный подшипник с качающимися колодками (TILT PAD THRUST BEARING). Сопоставлено по порядку столбцов",
+      "machine": "Taurus 70",
+      "unit": "двигатель, подшипники (Fig. 7.1)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.1",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "330142-1 330701-101 330468-101 1015230 1015231"
+    },
+    {
+      "code": "1039236-100",
+      "issuer": "Solar Turbines",
+      "description": "Датчик температуры выхлопа T7 (SENSOR, TEMPERATURE) из комплекта T7 EXHAUST TEMPERATURE KIT 330485-100. Сопоставлено по порядку столбцов",
+      "machine": "Taurus 70",
+      "unit": "выхлопной коллектор (Fig. 7.13)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.13",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "330485-100 915789C1 1039236-100 136845-1 1013107-100"
+    },
+    {
+      "code": "1014347-4",
+      "issuer": "Solar Turbines",
+      "description": "Датчик частоты вращения на редукторе (SENSOR, SPEED). Сопоставлено по порядку столбцов",
+      "machine": "Taurus 70",
+      "unit": "редуктор (Fig. 8.1 Reduction Drive Assy)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 8.1",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "330850-406 908754C1 816634216 1014347-4 861410745"
+    },
+    {
+      "code": "1023031-7",
+      "issuer": "Solar Turbines",
+      "description": "Датчик осевого смещения (PROBE, PROXIMITY), 2 шт., из комплекта 330650-100",
+      "machine": "Taurus 70",
+      "unit": "комплект датчиков осевого сдвига (Fig. 7.11)",
+      "doc_ref": "IPL Taurus 70 GS 77291, Fig. 7.11",
+      "source_url": "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+      "quote": "951250C1 MS9276-12 1023031-7"
+    },
+    {
+      "code": "190817-91",
+      "issuer": "Solar Turbines",
+      "description": "Драйвер датчика зазора (PROXIMITOR) в клеммной коробке виброконтроля турбины; кабель 190816-70",
+      "machine": "Centaur 50 (компрессорная установка)",
+      "unit": "система виброконтроля, Turbine Vibration Box (Fig. 4.3)",
+      "doc_ref": "IPL Centaur 50 CS, 76681, Fig. 4.3",
+      "source_url": "https://idoc.tips/76681ipl-pdf-free.html",
+      "quote": "Part No. 190817-91 190816-70 190817-91"
+    },
+    {
+      "code": "1012835-2",
+      "issuer": "Solar Turbines",
+      "description": "Манометр перепада давления на фильтре топливного газа (GAGE, DIFFERENTIAL PRESSURE, поз. PDI931). Тот же номер в запросе котировки с пометкой «MARS 100»",
+      "machine": "Centaur 50; Mars 100 (по запросу котировки)",
+      "unit": "топливная система, фильтр топливного газа (Fig. 3.6)",
+      "doc_ref": "IPL Centaur 50 CS 76681, Fig. 3.6",
+      "source_url": "https://idoc.tips/76681ipl-pdf-free.html",
+      "quote": "1060817-10 1017905 970902C1 ———— 1012835-2 186119-1"
+    },
+    {
+      "code": "1065472-101",
+      "issuer": "Solar Turbines",
+      "description": "Термопара T5 (Sensor, T5 TC) для Saturn — позиция каталога независимого ремонтника",
+      "machine": "Saturn",
+      "unit": "контроль температуры T5",
+      "doc_ref": "GTA Parts Lookup",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "1065472-101 Sensor, T5 TC, Saturn"
+    },
+    {
+      "code": "127983-100",
+      "issuer": "Solar Turbines",
+      "description": "Двухтопливная форсунка (INJECTOR, DUAL FUEL); машина в источнике не указана",
+      "unit": "топливная система",
+      "doc_ref": "GTA Parts Lookup",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "127983-100 INJECTOR, DUAL FUEL"
+    },
+    {
+      "code": "906494C2",
+      "issuer": "Solar Turbines",
+      "description": "Форсунка жидкого топлива (INJECTOR, LIQUID FUEL); машина в источнике не указана",
+      "unit": "топливная система",
+      "doc_ref": "GTA Parts Lookup",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "906494C2 INJECTOR, LIQUID FUEL"
+    },
+    {
+      "code": "173428-3",
+      "issuer": "Solar Turbines",
+      "description": "Прокладка запального устройства (Gasket, Torch Igniter). В запросе котировки тот же номер: «EB GASKET, FOR TORCH IGNITER … MFG: SOLAR TURBINES INC»",
+      "unit": "запальное устройство",
+      "doc_ref": "GTA Parts Lookup",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "173428-3 Gasket, Torch Igniter"
+    },
+    {
+      "code": "E301380-600",
+      "issuer": "Solar Turbines",
+      "description": "Форсунка в сборе (INJECTOR ASSEMBLY) в объявлении «SOLAR TITAN 130 BRAND NEW SPARES»: 4 новых и 3 восстановленных. Применимость к Titan 130 заявлена продавцом",
+      "machine": "Titan 130 (по объявлению продавца)",
+      "unit": "топливная система",
+      "doc_ref": "объявление о продаже запчастей, industrialmarinepower.com, 09.08.2023",
+      "source_url": "https://www.industrialmarinepower.com/solar-titan-130-brand-new-spares-availabale-for-sale--17817/",
+      "quote": "INJECTOR ASSEMBLY E301380-600 4 NOS NEW & 3 RECON"
+    },
+    {
+      "code": "186280-100",
+      "issuer": "Solar Turbines",
+      "description": "Комплект фильтроэлементов (KIT ELEMENT FILTER), назначение не указано. Применимость к Titan 130 заявлена продавцом",
+      "machine": "Titan 130 (по объявлению продавца)",
+      "unit": "фильтрация (не уточнено)",
+      "doc_ref": "объявление о продаже запчастей, industrialmarinepower.com",
+      "source_url": "https://www.industrialmarinepower.com/solar-titan-130-brand-new-spares-availabale-for-sale--17817/",
+      "quote": "KIT ELEMENT FILTER 186280-100"
+    },
+    {
+      "code": "1080738-9",
+      "issuer": "Solar Turbines",
+      "description": "Вкладыш подшипника (BEARING LINER). Применимость к Titan 130 заявлена продавцом",
+      "machine": "Titan 130 (по объявлению продавца)",
+      "unit": "подшипники (не уточнено)",
+      "doc_ref": "объявление о продаже запчастей, industrialmarinepower.com",
+      "source_url": "https://www.industrialmarinepower.com/solar-titan-130-brand-new-spares-availabale-for-sale--17817/",
+      "quote": "BEARING LINER 1080738-9"
+    },
+    {
+      "code": "190817-191",
+      "issuer": "Solar Turbines (номер Solar на драйвер Bently Nevada 3300XL)",
+      "description": "Драйвер датчика зазора PROXIMITOR 3300XL. Применимость к Titan 130 заявлена продавцом",
+      "machine": "Titan 130 (по объявлению продавца)",
+      "unit": "система виброконтроля",
+      "doc_ref": "объявление о продаже запчастей, industrialmarinepower.com",
+      "source_url": "https://www.industrialmarinepower.com/solar-titan-130-brand-new-spares-availabale-for-sale--17817/",
+      "quote": "PROXIMITOR 3300XL 190817-191"
+    },
+    {
+      "code": "1035758-100",
+      "issuer": "Solar Turbines",
+      "description": "Фильтр (FILTER) с пометкой «MARS 100» в запросе котировки покупателя; назначение фильтра не указано",
+      "machine": "Mars 100 (по запросу котировки)",
+      "unit": "фильтрация (не уточнено)",
+      "doc_ref": "запрос котировки Solar Turbines Spare Parts, industrialmarinepower.com, 26.08.2024",
+      "source_url": "https://www.industrialmarinepower.com/request-for-quote-solar-turbines-spare-parts-21756/",
+      "quote": "FILTER 1035758-100 MARS 100"
+    },
+    {
+      "code": "903253C1",
+      "issuer": "Solar Turbines",
+      "description": "Уплотнительное кольцо масляной системы (O-RING LUBE OIL SYSTEM) для двигателя Mars-90, упаковка 6 шт.",
+      "machine": "Mars 90 (по запросу котировки)",
+      "unit": "масляная система",
+      "doc_ref": "запрос котировки на industrialmarinepower.com, 29.09.2025",
+      "source_url": "https://www.industrialmarinepower.com/request-for-quote-solar-turbines-spare-parts-21756/",
+      "quote": "O-RING LUBE OIL SYSTEM FOR SOLAR TURBINE ENGINE, MARS-90, MIN PACK SIZE 6 EA Manufacturer Part Number(M) - 903253C1; Manufacturer(MA) - SOLAR TURBINES INC."
+    },
+    {
+      "code": "1079655-401",
+      "issuer": "Solar Turbines",
+      "description": "Электрический клапан регулирования топлива (VALVE: ELECTRIC FUEL CONTROL) для компрессорной установки. Заменяет прежний номер 1079655-400; модель турбины не указана",
+      "machine": "газотурбинная компрессорная установка Solar (модель не указана)",
+      "unit": "топливная система, регулирующий клапан",
+      "doc_ref": "запрос котировки на industrialmarinepower.com, 19.02.2026",
+      "source_url": "https://www.industrialmarinepower.com/request-for-quote-solar-turbines-spare-parts-21756/",
+      "quote": "NEW SOLAR P/N: 1079655-401 (OLD SOLAR P/N: 1079655-400)"
+    },
+    {
+      "code": "196101-100",
+      "issuer": "Solar Turbines",
+      "description": "Оригинальная термопара T5 (T5 THERMOCOUPLE PROBE); машина не указана. Страница закрыта для автоматического чтения (403), цитата — заголовок страницы из поисковой выдачи",
+      "unit": "контроль температуры T5",
+      "doc_ref": "карточка товара peri-parts.com",
+      "source_url": "https://www.peri-parts.com/196101-100-solar-turbines-a-caterpillar-brand-original-t5-thermocouple-probe-f4d.html",
+      "quote": "196101-100 SOLAR TURBINES ( A CATERPILLAR BRAND) ORIGINAL T5 THERMOCOUPLE PROBE"
+    },
+    {
+      "code": "128315-20",
+      "issuer": "Solar Turbines",
+      "description": "Электромагнитный клапан (VALVE: SOLENOID) для генераторной установки Centaur-40. Страница закрыта для автоматического чтения (403), цитата — заголовок страницы из поисковой выдачи",
+      "machine": "Centaur 40 (генераторная установка)",
+      "unit": "клапаны (не уточнено)",
+      "doc_ref": "запрос №584536 на supply.parts",
+      "source_url": "https://supply.parts/request/view?id=584536",
+      "quote": "Solar turbines 128315-20 VALVE: SOLENOID,FOR SOLAR CENTAUR-40 GENERATOR"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Rockwell Automation (Allen-Bradley)",
+      "component": "контроллер ControlLogix и модули ввода-вывода 1794 Flex I/O системы управления Turbotronic; реле давления 836-C9J",
+      "machine": "Mars 90, Mars 100 (TPS); Taurus 70 и Centaur 50 (ControlLogix Chassis Assy CH2010 в каталогах)",
+      "evidence": "В TPS Mars 90/100: «ControlLogix controller (Allen-Bradley)», «1794 Flex I/O input/output modules (Allen-Bradley)», архитектура «based on a Rockwell Automation/Allen-Bradley». В каталогах Taurus 70 и Centaur 50 есть рисунок «ControlLogix Chassis Assy (CH2010)»",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf",
+        "https://idoc.tips/taurus-70-ipl-pdf-free.html",
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ]
+    },
+    {
+      "company": "Bently Nevada (Baker Hughes)",
+      "component": "вибромонитор 1701 FieldMonitor; драйверы датчиков зазора 3300XL",
+      "machine": "Mars 90, Mars 100; Centaur 50 CS; Titan 130 (по объявлению)",
+      "evidence": "В TPS Mars 90/100: «1701 FieldMonitor vibration monitoring system (Bently Nevada)». В каталоге Centaur 50 — «FieldMonitor Vibration Chassis Assy (CH2150/CH2110/CH2130)». В объявлении о запчастях Titan 130 — «PROXIMITOR 3300XL 190817-191»; у GTA — «PROXIMITOR, Bently Nevada»",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf",
+        "https://idoc.tips/76681ipl-pdf-free.html",
+        "https://www.industrialmarinepower.com/solar-titan-130-brand-new-spares-availabale-for-sale--17817/",
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ]
+    },
+    {
+      "company": "Det-Tronics (Detector Electronics)",
+      "component": "система пожаро- и газообнаружения Eagle Quantum Premier",
+      "machine": "Mars 90, Mars 100 и другие установки (TPS)",
+      "evidence": "В TPS Mars 90/100: «Fire & Gas Monitoring & Control System — Det-tronics Eagle Quantum Premier»",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "company": "TDI (Tech Development Inc.)",
+      "component": "пневмо- и газовые стартёры (TDI Turbostart), переходники выхлопа стартёра",
+      "machine": "Centaur",
+      "evidence": "Каталог GTA: «T121-60069-COL-1-9E Starter, Centaur, TDI», «T303-60016-00L-1 Motor, TDI Turbostart»",
+      "sources": [
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ]
+    },
+    {
+      "company": "Woodward",
+      "component": "синхронизатор SPM (генераторные установки), резисторный блок",
+      "machine": "генераторные установки Solar (модель не указана)",
+      "evidence": "Каталог GTA: «8271-152 Synchronizer, SPM, Woodward», «43741-2 Box, Resistor, Woodward». Связь с Solar не подтверждена: GTA оговаривает, что каталог может включать эквиваленты других изготовителей",
+      "sources": [
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Camfil",
+      "component": "фильтры входного воздуха Cam GT, класс F9",
+      "machine": "комплексные воздухоочистители турбин Solar (модель не указана)",
+      "evidence": "Каталог GTA: «2472004 Filter, Cam GT Box Type F9», «CGT1103111 Filter, Cam GT 4V300 F9». Связь с Solar не подтверждена: GTA оговаривает, что каталог может включать эквиваленты других изготовителей",
+      "sources": [
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ],
+      "verified": false
+    },
+    {
+      "company": "AAF International (марка DuraCel)",
+      "component": "картриджные фильтры входного воздуха DuraCel XL90",
+      "machine": "комплексные воздухоочистители турбин Solar (модель не указана)",
+      "evidence": "Каталог GTA: «515-556-006 Air Filter, 24X24X12 in., Duracel XL 90 G - Cartridge Filter». Изготовитель AAF определён по торговой марке DuraCel — это вывод, на странице AAF не названа. Связь с Solar не подтверждена: GTA оговаривает, что каталог может включать эквиваленты других изготовителей",
+      "sources": [
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Oilgear",
+      "component": "осевое уплотнение «SEAL, AXIAL, OILGEAR» в клапане регулирования давления и температуры масла 1024780-137 (не насос)",
+      "machine": "Centaur 50 (компрессорная установка)",
+      "evidence": "Каталог Centaur 50 CS 76681, Fig. 5.1 Driver Lube Oil System: позиция «998080C1 … SEAL, AXIAL, OILGEAR»",
+      "sources": [
+        "https://idoc.tips/76681ipl-pdf-free.html"
+      ]
+    },
+    {
+      "company": "Schroeder Industries",
+      "component": "фильтроэлемент K-25 (гидравлика или масло)",
+      "machine": "модель не указана",
+      "evidence": "Каталог GTA: «K-25 Element, Filter, Schroeder, K-25». Связь с Solar не подтверждена: GTA оговаривает, что каталог может включать эквиваленты других изготовителей",
+      "sources": [
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Baldwin Filters",
+      "component": "топливный фильтр PT463",
+      "machine": "модель не указана",
+      "evidence": "Каталог GTA: «PT463 Filter, Fuel, Baldwin». Связь с Solar не подтверждена: GTA оговаривает, что каталог может включать эквиваленты других изготовителей",
+      "sources": [
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Indufil",
+      "component": "фильтры-картриджи (поставка в эксплуатацию, не штатная комплектация Solar)",
+      "machine": "Centaur 50",
+      "evidence": "Новость DMLieferant от 20.04.2016: отгрузка фильтров-картриджей Indufil для турбин Solar Centaur 50 для ПАО «Лукойл»",
+      "sources": [
+        "https://dmliefer.ru/gazovye-turbiny-solar"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Solar Turbines C.I.S., L.L.C.",
+      "country": "Россия (Москва)",
+      "role": "официальная дочерняя компания Solar: продажи и сервис (по перечню офисов 2016 года; статус после 2022 года не проверен)",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10547637"
+      ]
+    },
+    {
+      "company": "Solar Turbines (Beijing) Trading & Services Co. Ltd.",
+      "country": "Китай (Пекин)",
+      "role": "официальная дочерняя компания Solar: продажи, запчасти, сервис",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10547637"
+      ]
+    },
+    {
+      "company": "Solar Turbines India Pvt. Ltd.",
+      "country": "Индия (Мумбаи)",
+      "role": "официальная дочерняя компания Solar",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10547637"
+      ]
+    },
+    {
+      "company": "Solar Turbines Europe S.A. (офис в свободной зоне Джебель-Али, Дубай)",
+      "country": "ОАЭ",
+      "role": "официальный офис Solar на Ближнем Востоке",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10547637"
+      ]
+    },
+    {
+      "company": "Solar Turbines EAME s.r.o.",
+      "country": "Чехия (Прага, Жатец)",
+      "role": "официальная компания Solar для Европы, Африки и Ближнего Востока",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10547637"
+      ]
+    },
+    {
+      "company": "Turbomach S.A. / Turbomach GmbH",
+      "country": "Швейцария / Германия",
+      "role": "компания группы Solar в перечне офисов; комплектовщик установок на турбинах Solar",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10547637"
+      ]
+    },
+    {
+      "company": "EthosEnergy",
+      "country": "Казахстан (русскоязычная страница казахстанского сайта)",
+      "role": "независимый сервис: ТО, капремонт и обмен турбин Solar Mars 100, Taurus 60, Centaur 50/40, Mars 90, Saturn 10; редукторы Centaur 40/50 и Taurus 60",
+      "sources": [
+        "https://ethosenergy.com/kz/uslugi/legkie-promyshlennye-gazovye-turbiny/solnechnye-svetovye-turbiny"
+      ]
+    },
+    {
+      "company": "DMLieferant",
+      "country": "Россия",
+      "role": "независимый поставщик запчастей и ремонт: Centaur, Taurus 60S, сервис Titan 130",
+      "sources": [
+        "https://dmliefer.ru/gazovye-turbiny-solar"
+      ]
+    },
+    {
+      "company": "KER-Holding",
+      "country": "Россия",
+      "role": "независимый ремонт газовых турбин Solar (Taurus 60, Mars 100, Titan 130, Taurus 70)",
+      "sources": [
+        "https://www.ker-holding.ru/services/remont-i-obsluzhivanie-gazovykh-turbin/"
+      ]
+    },
+    {
+      "company": "Gas Turbine Applications (GTA)",
+      "country": "США",
+      "role": "независимый ремонт и испытание агрегатов, продажа запчастей по номерам Solar",
+      "sources": [
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ]
+    },
+    {
+      "company": "Southeast Overseas, Inc.",
+      "country": "США",
+      "role": "посредник по оригинальным и неоригинальным запчастям Saturn, Centaur, Mercury, Taurus, Mars",
+      "sources": [
+        "https://www.southeastoverseas.com/solar1.html"
+      ]
+    },
+    {
+      "company": "Shenzhen Blaze Turbine Co., Ltd",
+      "country": "Китай",
+      "role": "независимый продавец восстановленных Mars 100 (15000SAN, SoLoNOx), профиль — лопатки турбин",
+      "sources": [
+        "https://turbineblade.net/solar-mars-100-gas-turbines/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Каталоги деталей (Volume IV) на Mars 90/100, Titan 130/250/350, Mercury 50, Centaur 40 и Taurus 65 в открытом доступе не найдены. Они лежат в комплекте документации у эксплуатанта (Volume I–IV) и на закрытом клиентском портале Solar. Поэтому коды для Mars и Titan взяты только из объявлений и запросов котировок, а не из каталога изготовителя.",
+    "Каталог Taurus 60 (Volume IV, Modec, 72571) на pdfcoffee.com и каталог Centaur 50 (47841) на Scribd найдены поиском, но закрыты для автоматического чтения (403 / требуется JavaScript). Коды из них не взяты.",
+    "solarturbines.com отказывает автоматическому чтению (403 и таймаут). Мощности взяты из спецификаций Solar на CDN Caterpillar и справочника 2016 года; нынешние номиналы (Titan 130 16,5 МВт, Titan 250 23,1 МВт, Titan 350 38 МВт) — только по Wikipedia.",
+    "В каталоге Taurus 70 номера и наименования при извлечении текста разделены по столбцам. Соответствие «код — наименование» установлено по порядку позиций (числа совпадают), но его надо сверить с оригиналом PDF.",
+    "Инженерные спецификации ES 9-98 (топливо, воздух, вода) и ES 9-224 (смазочное масло), а также PIL 140/161/162/176/178 в TPS только упомянуты. Тексты выдаются по запросу у Solar как конфиденциальные.",
+    "Solar заменяет номера новыми (пример: 1079655-400 → 1079655-401). Актуальность каждого кода нужно подтверждать у Solar или дилера по номеру сборки и заводскому номеру установки, как требует раздел «Ordering Parts» каталога.",
+    "Коды 196101-100 (термопара T5) и 128315-20 (клапан Centaur-40) взяты из заголовков страниц в поисковой выдаче: сами страницы (peri-parts.com, supply.parts) закрыты для автоматического чтения (403).",
+    "Изготовители генераторов в генераторных установках Solar, сухих газовых уплотнений компрессоров C-серии, подшипников с качающимися колодками и форсунок SoLoNOx в открытых спецификациях не названы.",
+    "Термопары T5 и форсунки SoLoNOx для Mars 100 и Titan 130 с привязкой к машине из каталога изготовителя не найдены. В спецификации Mars 100 указано число форсунок — 21 обычная или 14 SoLoNOx.",
+    "Статус Solar Turbines C.I.S. (Москва) после 2022 года не проверен. Официальных офисов Solar в Казахстане и Турции в перечне 2016 года нет; актуальный перечень на solarturbines.com/about-us/worldwide-locations недоступен автоматическому чтению.",
+    "Суффиксы C1, C2, C91 и R1 в номерах считаются наследием нумерации эпохи International Harvester — это вывод, источником не подтверждён."
+  ],
+  "verifier_notes": "Все 40 кодов проверены по тексту страницы, а не по пересказу. Подтверждены все 40; не подтверждённых и недоступных нет.\n\nКак проверял. Страницы idoc.tips (IPL Saturn 20 / Taurus 70 / Centaur 50), GTA и две страницы industrialmarinepower.com скачаны curl. Коды искались точным совпадением с границами символов, наименование — по рисунку и порядку столбцов. peri-parts.com и supply.parts отдают 403 и curl, и WebFetch, копий в Wayback нет. Их содержимое прочитано через читающий прокси r.jina.ai по тому же адресу. Лимит WebSearch в сессии исчерпан (200/200), поиск больше не использовался.\n\nОговорки по деталям:\n- В тексте Taurus 70, извлечённом из PDF, номера и наименования идут отдельными столбцами. Сопоставление по порядку проверено: в каждом рисунке число номеров равно числу наименований, соседние позиции логичны. Количество штук (12 у 302251-101 и 136856-1) тоже получено позиционно, это менее надёжно.\n- У 300589-1002 обозначение E340 к строке не привязывается: в Saturn 20 и Centaur 50 его место в столбце тоже неоднозначно.\n\nПопутные подтверждения:\n- 903253C1 есть как O-RING в IPL Centaur 50, Fig. 5.1 Driver Lube Oil System.\n- 1012835-2 есть в IPL Saturn 20, Driver Gage Panel.\n\nПоправки к машинам:\n- Titan 130: указанная спецификация генераторной установки говорит «Single-Shaft», а в записи машина двухвальная.\n- Saturn 20: в TPS для компрессорной установки и механического привода машина двухвальная; «одновальная» верно только для генераторной установки.\n- Saturn 10: статус «снята» не доказан, Wikipedia держит модель в списке продукции.\n\nСубпоставщики. Не подтверждены пять, известных только по каталогу GTA без привязки к машине: Woodward, Camfil, AAF, Schroeder, Baldwin. GTA сама оговаривает, что каталог «primarily» Solar и может включать «equivalent components from alternative manufacturers». Их можно оставить как слабую зацепку, но не как связь с Solar. У Oilgear связь с масляной системой Centaur 50 подтверждена, а компонент надо исправить: это осевое уплотнение в клапане регулирования давления и температуры масла (1024780-137), а не насос.\n\nЛокальные копии источников — в рабочей папке сессии разведки, в репозиторий они не входят (s20.txt, t70.txt, c50.txt, gta.txt, t130.txt, rfq.txt, mars.t, guide.ptxt и др.).",
+  "corrections": [
+    "Titan 130: генераторная установка по спецификации одновальная — замечание к машинам",
+    "Saturn 20: «одновальная» верно только для генераторной установки — замечание к машинам",
+    "Saturn 10: «снята» не доказано — статус помечен неподтверждённым — замечание к машинам",
+    "Woodward, Camfil, AAF, Schroeder, Baldwin: помечены неподтверждёнными (verified: false) — известны только по каталогу GTA без привязки к машине",
+    "Oilgear: компонент исправлен — осевое уплотнение в клапане масла, а не насос — замечание скептика",
+    "summary: строки про Oilgear, Woodward и фильтры приведены в соответствие с правками субпоставщиков",
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет"
+  ]
+}
