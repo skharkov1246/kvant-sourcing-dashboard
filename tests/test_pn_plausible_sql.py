@@ -62,6 +62,18 @@ def test_правдоподобный_код_в_sql_и_в_python_одинако�
             cur.execute(f'create schema "{схема}"')
             cur.execute(f'set search_path to "{схема}"')
             cur.execute(функции())
+            # Каталог защищает: номер из lib_parts кодом считается всегда. В
+            # каталоге — выдуманный размерный номер, который закрытый список
+            # иначе отверг бы (замер 24.09.2026: 6 таких номеров в живом каталоге).
+            cur.execute("create table lib_parts (id text primary key, catalog_no text not null)")
+            cur.execute("insert into lib_parts values ('1250x300', '1250X300'),"
+                        " ('выдум-7', 'ВЫДУМ-7')")
+            cur.execute("select " + docfilter.sql_код_годен("%s"), ("1250x300", "1250x300"))
+            assert cur.fetchone()[0] is True, "номер каталога отвергнут правилом"
+            assert not docfilter.код_правдоподобен("1250x300"), \
+                "корпус защиты должен быть обвиняемым без каталога"
+            cur.execute("select " + docfilter.sql_код_годен("%s"), ("640x480", "640x480"))
+            assert cur.fetchone()[0] is False, "размер вне каталога принят за код"
             for t in корпус:
                 cur.execute("select lib_pn_plausible(%s), lib_pn_plausible(lib_pn_key(%s))",
                             (t, t))
@@ -71,7 +83,7 @@ def test_правдоподобный_код_в_sql_и_в_python_одинако�
                 # Функцию зовут и от ключа, и от написания.
                 assert по_ключу == ждём, t
                 # Условие, вписанное в запросы crossref и codes_sql, — то же тело.
-                cur.execute("select " + docfilter.sql_код_годен("%s"), (t,))
+                cur.execute("select " + docfilter.sql_код_годен("%s"), (t, t))
                 assert cur.fetchone()[0] == ждём, t
             # NULL — не марка: пустое кодом не обвиняется, как и в Python.
             cur.execute("select lib_pn_plausible(null)")
