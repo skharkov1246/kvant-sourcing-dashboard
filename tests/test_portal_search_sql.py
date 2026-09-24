@@ -295,6 +295,9 @@ def test_в_ответе_только_агрегаты(база):
 def test_марка_материала_не_код_когда_есть_проверка(база):
     c = база.cursor()
     c.execute(f"set search_path to {ИМЯ}")
+    # С 24.09.2026 (PR #418) lib_pn_plausible приходит со schema.sql. Проверяем
+    # оба состояния базы: без функции поиск отдаёт код как есть, с ней — нет.
+    c.execute("drop function if exists lib_pn_plausible(text)")
     assert "ss316" in по_виду(искать(база, "SS316"), "код")   # проверки нет — код как есть
     c.execute(ПРАВДОПОДОБИЕ)
     try:
