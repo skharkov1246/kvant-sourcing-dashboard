@@ -55,9 +55,29 @@ def test_код_404_не_повторяется(monkeypatch):
 
 
 def test_код_429_повторяется_и_причина_названа(monkeypatch):
-    monkeypatch.setattr(indexer.requests, "get", lambda *_a, **_k: Ответ(429, b""))
+    """429 у закачки — блокировка метода по времени: ждать минуты, а не 1–2 с.
+
+    Терпение кончается бюджетом ожидания клиента, и причина это называет."""
+    попытки = {"n": 0}
+
+    def get(*_a, **_k):
+        попытки["n"] += 1
+        return Ответ(429, b"")
+
+    monkeypatch.setattr(indexer.requests, "get", get)
     тело, почему = indexer.скачать_адрес("https://пример/1")
-    assert тело is None and почему == "код 429"
+    assert тело is None and почему.startswith("код 429")
+    assert "бюджета ожидания" in почему
+    assert попытки["n"] > indexer.ПОПЫТОК_ЗАКАЧКИ, "лимит пережидали числом попыток, а не временем"
+
+
+def test_код_503_переждан_и_файл_получен(monkeypatch):
+    """Частота (503) проходит сама, если подождать: файл не теряется."""
+    ответы = [Ответ(503, b"")] * 5 + [Ответ(200)]
+    monkeypatch.setattr(indexer.requests, "get", lambda *_a, **_k: ответы.pop(0))
+    monkeypatch.setattr(indexer, "is_login_page", lambda _b: False)
+    тело, почему = indexer.скачать_адрес("https://пример/1")
+    assert тело and почему == ""
 
 
 def test_страница_входа_повтором_не_лечится(monkeypatch):

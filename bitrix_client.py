@@ -7,6 +7,7 @@
 """
 from __future__ import annotations
 
+import atexit
 import hashlib
 import json
 import os
@@ -63,24 +64,161 @@ class _Снимок:
 #: INTERNAL_SERVER_ERROR добавлен по разбору падения сборки 19.08.2026
 #: (crm.activity.list уронил весь 12-минутный прогон деплоя).
 RETRYABLE_BITRIX_ERRORS = frozenset({
-    "QUERY_LIMIT_EXCEEDED",     # превышен лимит запросов в секунду
-    "OPERATION_TIME_LIMIT",     # портал не успел выполнить операцию
+    "QUERY_LIMIT_EXCEEDED",     # превышена частота запросов (ведро переполнено)
+    "OPERATION_TIME_LIMIT",     # исчерпано время работы метода за 10 минут
     "INTERNAL_SERVER_ERROR",    # внутренняя ошибка портала
     "ERROR_CORE",               # ядро Bitrix отдало ошибку
     "OVERLOAD_LIMIT",           # портал перегружен
 })
+#: Отказы по лимитам портала: лечатся только временем и меряются бюджетом
+#: ожидания, а не числом попыток.
+ЛИМИТНЫЕ_ОШИБКИ = frozenset({"QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT", "OVERLOAD_LIMIT"})
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# БЮДЖЕТ ПОРТАЛА — ОДНА ТОЧКА ПРАВДЫ (CLAUDE.md, «Битрикс не перегружать»).
+#
+# Документация Битрикс24, «Ограничения REST API»
+# (https://apidocs.bitrix24.ru/limits.html), сверено 24.09.2026. Лимитов ДВА,
+# и оба считаются на вебхук в пределах портала, то есть общие для ВСЕХ наших
+# прогонов — у них один секрет BITRIX_WEBHOOK_URL:
+#
+#   1. Частота — «дырявое ведро». Каждый запрос добавляет единицу в счётчик,
+#      счётчик убывает на Y = 2 в секунду; при переполнении (X = 50, у
+#      «Энтерпрайза» 250) запрос отбивается: HTTP 503, QUERY_LIMIT_EXCEEDED.
+#      Устойчиво держится не больше двух запросов в секунду на ВЕСЬ портал.
+#   2. Время работы метода. Накопленное время выполнения КАЖДОГО метода за
+#      скользящие 10 минут не выше 420 с; сверх — HTTP 429, OPERATION_TIME_LIMIT,
+#      и метод заблокирован, пока не выпадет старая минута. Ответ несёт
+#      time.operating (накоплено) и time.operating_reset_at (когда выпадет
+#      старейшая минута). Заголовка Retry-After документация не обещает.
+#
+# 24.09.2026 холостой переразбор сделок упал в 44 частях из 50 с HTTP 429 на
+# crm.deal.list — это второй лимит, не первый: пятьдесят частей читали список
+# смещением с подсчётом total, и время метода кончилось за две минуты. А клиент
+# ждал не дольше минуты и падал раньше, чем метод разблокировался.
+#
+# Скачивание по urlMachine — тоже REST: ссылка ведёт на метод
+# crm.controller.item.getFile того же вебхука. Значит, закачка файла — такой же
+# запрос в ведро и в счёт времени метода, и идёт через ту же очередь.
+ПОРТАЛ_УТЕЧКА_В_С = 2.0          # Y: на столько убывает счётчик ведра в секунду
+ПОРТАЛ_ВЕДРО = 50                # X: порог ведра (не «Энтерпрайз»)
+ПОРТАЛ_ВРЕМЯ_МЕТОДА_С = 420.0    # время метода за скользящие 10 минут
+#: Запросов в секунду на ВЕСЬ портал по умолчанию: три четверти утечки ведра.
+#: Запас — на прогоны, идущие одновременно (деплой дашборда раз в шесть часов,
+#: ночной скан чатов), и на запросы людей из приложений портала.
+RPS_ПО_УМОЛЧАНИЮ = 1.5
+#: Доля времени метода, с которой клиент сам притормаживает, не дожидаясь 429.
+ДОЛЯ_ВРЕМЕНИ_ТОРМОЗ = 0.6
+#: Бюджет ожидания одного вызова на ЛИМИТАХ портала, секунд. Метод,
+#: заблокированный по времени, освобождается до десяти минут; часть разбора,
+#: которой некуда спешить, лучше прождёт полчаса, чем упадёт.
+ЖДАТЬ_ЛИМИТ_С = 1800.0
+#: Пауза на лимите: первая и наибольшая, секунд.
+ЛИМИТ_ПАУЗА_С = 5.0
+ЛИМИТ_ПАУЗА_МАКС_С = 180.0
+#: Ожидание по operating_reset_at/Retry-After не длиннее десяти минут: дольше
+#: время метода не держится по устройству лимита.
+ЛИМИТ_ПАУЗА_ПО_ПОРТАЛУ_МАКС_С = 600.0
+
+
+def _число(env: str, умолчание: float) -> float:
+    try:
+        return float(os.getenv(env) or умолчание)
+    except ValueError:
+        print(f"::warning::{env}={os.getenv(env)!r} не число — беру {умолчание}",
+              file=sys.stderr, flush=True)
+        return умолчание
+
+
+def бюджет_портала() -> tuple[float, int]:
+    """(запросов в секунду на весь портал, сколько наших процессов делят его).
+
+    BITRIX_RPS — бюджет на портал, а не на процесс. BITRIX_PARALLEL — сколько
+    процессов этого прогона читают портал одновременно: прогон частями передаёт
+    min(частей, max-parallel). Бюджет выше утечки ведра не бывает — такое
+    значение урезается ВСЛУХ, а не молча (правило «шаг не подменяет вход молча»).
+    """
+    rps = _число("BITRIX_RPS", RPS_ПО_УМОЛЧАНИЮ)
+    if rps <= 0:
+        rps = RPS_ПО_УМОЛЧАНИЮ
+    if rps > ПОРТАЛ_УТЕЧКА_В_С:
+        print(f"::warning::BITRIX_RPS={rps:g} выше утечки ведра портала "
+              f"({ПОРТАЛ_УТЕЧКА_В_С:g}/с) — урезано до {ПОРТАЛ_УТЕЧКА_В_С:g}",
+              file=sys.stderr, flush=True)
+        rps = ПОРТАЛ_УТЕЧКА_В_С
+    parallel = max(1, int(_число("BITRIX_PARALLEL", 1)))
+    return rps, parallel
+
+
+def интервал_портала(rps: float | None = None, parallel: int | None = None) -> float:
+    """Пауза между запросами ОДНОГО процесса: parallel / rps.
+
+    Двенадцать частей при бюджете 1,5 запроса в секунду — по восемь секунд между
+    запросами каждой: вместе те же полтора в секунду, сколько бы частей ни шло.
+    """
+    if rps is None or parallel is None:
+        r, p = бюджет_портала()
+        rps = r if rps is None else rps
+        parallel = p if parallel is None else parallel
+    return max(1, int(parallel)) / float(rps)
+
+
+# Нагрузка процесса на портал — для одной строки в журнале в конце прогона.
+# Только агрегаты: числа запросов и отказов, ни адресов, ни имён (правило 17).
+_НАГРУЗКА: dict[str, float] = {"запросов": 0, "файлов": 0, "отказ_503": 0,
+                               "отказ_429": 0, "ждали_с": 0.0, "тормоз_времени": 0}
+_НАГРУЗКА_ЗАМОК = threading.Lock()
+
+
+def _учесть(ключ: str, на: float = 1) -> None:
+    with _НАГРУЗКА_ЗАМОК:
+        _НАГРУЗКА[ключ] = _НАГРУЗКА.get(ключ, 0) + на
+
+
+def сводка_нагрузки() -> str:
+    н = dict(_НАГРУЗКА)
+    rps, par = бюджет_портала()
+    return (f"портал: запросов {int(н['запросов'])} (из них файлов {int(н['файлов'])})"
+            f" · отказов по частоте (503) {int(н['отказ_503'])}"
+            f" · по времени метода (429) {int(н['отказ_429'])}"
+            f" · торможений по времени метода {int(н['тормоз_времени'])}"
+            f" · ждали {н['ждали_с']:.0f} с"
+            f" · бюджет {rps:g}/с на портал, процессов {par}")
+
+
+@atexit.register
+def _сводка_при_выходе() -> None:
+    # Печатается и у упавшего прогона: сколько отказов он видел перед смертью —
+    # ровно то, что нужно разбору падения.
+    if _НАГРУЗКА["запросов"]:
+        print(сводка_нагрузки(), file=sys.stderr, flush=True)
+
+
+class BitrixLimitError(BitrixError):
+    """Портал держал лимит дольше бюджета ожидания."""
 
 
 class BitrixClient:
-    def __init__(self, webhook_url: str, *, timeout: int = 30, min_interval: float = 0.34,
+    def __init__(self, webhook_url: str, *, timeout: int = 30, min_interval: float | None = None,
                  retries: int | None = None, backoff_base: float = 0.5, backoff_max: float = 32.0):
         self.base = webhook_url.rstrip("/") + "/"
         self.timeout = timeout
-        self.min_interval = min_interval  # ~3 запроса/сек, под лимит Bitrix
+        # Пауза между запросами — из общего бюджета портала, а не своим числом:
+        # у каждого прогона своё число давало сумму выше лимита (CLAUDE.md,
+        # «Битрикс не перегружать»). Явное значение оставлено для проверок.
+        self.min_interval = интервал_портала() if min_interval is None else min_interval
         self.retries = int(os.getenv("BITRIX_RETRIES") or retries or 6)
         self.backoff_base = backoff_base
         self.backoff_max = backoff_max
+        self.limit_wait_budget = _число("BITRIX_WAIT_BUDGET", ЖДАТЬ_ЛИМИТ_С)
+        self.limit_pause = ЛИМИТ_ПАУЗА_С
+        self.limit_pause_max = ЛИМИТ_ПАУЗА_МАКС_С
         self.retry_count = 0              # счётчик повторов за прогон (для сводки сборки)
+        # Замедление после отказа по лимиту: пауза между запросами умножается,
+        # затем плавно возвращается. Так два прогона, случайно сошедшиеся на
+        # портале, сами расходятся по бюджету, не зная друг о друге.
+        self._замедление = 1.0
         self._session = requests.Session()
         self._lock = threading.Lock()
         self._last_call = 0.0
@@ -122,6 +260,7 @@ class BitrixClient:
                 except FileNotFoundError:
                     self.snapshot_misses += 1
         self._throttle()
+        _учесть("запросов")
         try:
             r = self._session.post(self.base + method + ".json", json=payload, timeout=self.timeout)
         except requests.RequestException as e:
@@ -143,46 +282,162 @@ class BitrixClient:
 
     # ----------------------------------------------------------------- low level
     def call_envelope(self, method: str, params: dict | None = None, *, retries: int | None = None) -> dict:
-        """Полный ответ Bitrix ({result, next, total}) с ретраями транзиентных сбоев.
+        """Полный ответ Bitrix ({result, next, total}) с повторами.
 
-        Повторяем: сетевые ошибки, HTTP 429 и >=500, не-JSON ответ (портал отдаёт HTML
-        при 500/502/504) и коды из RETRYABLE_BITRIX_ERRORS. Пауза — экспоненциальная
-        с джиттером (0.5 → 32 с), суммарный бюджет ожидания ~60 с.
+        Сбои двух родов, и счёт у них разный:
+          * ЛИМИТЫ портала — HTTP 429 и 503, QUERY_LIMIT_EXCEEDED,
+            OPERATION_TIME_LIMIT, OVERLOAD_LIMIT. Лечатся только временем, поэтому
+            меряются бюджетом ОЖИДАНИЯ (BITRIX_WAIT_BUDGET, по умолчанию 30 мин),
+            а не числом попыток: пауза растёт 5 → 180 с, а у блокировки по времени
+            метода — до отметки operating_reset_at из ответа;
+          * прочие сбои — сеть, 5xx, не-JSON, внутренние ошибки портала —
+            прежние `retries` попыток с паузой 0,5 → 32 с.
         """
         retries = self.retries if retries is None else retries
         payload = params or {}
         last_err: Exception | None = None
-        for attempt in range(retries):
+        попытка = 0          # прочие сбои
+        лимит = 0            # отказы по лимиту
+        ждали = 0.0          # сколько этот вызов уже прождал на лимитах
+        while попытка < retries:
             try:
                 r = self._post(method, payload)
             except requests.RequestException as e:                      # сеть/таймаут
                 last_err = e
-                self._backoff(attempt, method, без_вебхука(e).removeprefix(f"{method}: "))
-                continue
-            if r.status_code == 429 or r.status_code >= 500:
-                last_err = BitrixError(f"{method}: HTTP {r.status_code}")
-                self._backoff(attempt, method, f"HTTP {r.status_code}")
+                self._backoff(попытка, method, без_вебхука(e).removeprefix(f"{method}: "))
+                попытка += 1
                 continue
             try:
                 data = r.json()
             except ValueError:                                          # HTML вместо JSON
-                last_err = BitrixError(f"{method}: не JSON-ответ (HTTP {r.status_code}): {r.text[:200]}")
-                self._backoff(attempt, method, f"не JSON (HTTP {r.status_code})")
+                data = None
+            err = str(data.get("error") or "") if isinstance(data, dict) else ""
+            if r.status_code in (429, 503) or err in ЛИМИТНЫЕ_ОШИБКИ:
+                причина = f"HTTP {r.status_code}" + (f" {err}" if err else "")
+                last_err = BitrixLimitError(f"{method}: {причина}")
+                пауза = self.limit_delay(лимит, r, data)
+                if ждали + пауза > self.limit_wait_budget:
+                    raise BitrixLimitError(
+                        f"{method}: портал держит лимит дольше бюджета ожидания "
+                        f"{self.limit_wait_budget:.0f} с ({причина}, отказов {лимит + 1})")
+                self._limit_sleep(пауза, method, причина, r.status_code, err)
+                ждали += пауза
+                лимит += 1
                 continue
-            if isinstance(data, dict) and data.get("error"):
-                err = str(data.get("error"))
+            if r.status_code >= 500:
+                last_err = BitrixError(f"{method}: HTTP {r.status_code}")
+                self._backoff(попытка, method, f"HTTP {r.status_code}")
+                попытка += 1
+                continue
+            if data is None:
+                last_err = BitrixError(f"{method}: не JSON-ответ (HTTP {r.status_code}): {r.text[:200]}")
+                self._backoff(попытка, method, f"не JSON (HTTP {r.status_code})")
+                попытка += 1
+                continue
+            if err:
                 desc = data.get("error_description", "")
                 if err in RETRYABLE_BITRIX_ERRORS:
                     last_err = BitrixError(f"{method}: {err} {desc}")
-                    self._backoff(attempt, method, err)
+                    self._backoff(попытка, method, err)
+                    попытка += 1
                     continue
                 raise BitrixError(f"{method}: {err} {desc}")            # неустранимая ошибка
+            self._после_успеха(r, data)
             return data if isinstance(data, dict) else {"result": data}
         raise BitrixError(f"{method}: не удалось выполнить за {retries} попыток ({без_вебхука(last_err)})")
 
     def call(self, method: str, params: dict | None = None, *, retries: int | None = None) -> Any:
         data = self.call_envelope(method, params, retries=retries)
         return data.get("result")
+
+    # ----------------------------------------------------------------- лимиты
+    def limit_delay(self, n: int, r: Any = None, data: Any = None) -> float:
+        """Пауза перед повтором после n-го отказа по лимиту, секунд.
+
+        Растёт от ЛИМИТ_ПАУЗА_С вдвое до ЛИМИТ_ПАУЗА_МАКС_С. Если портал сказал,
+        когда станет можно (Retry-After или time.operating_reset_at у блокировки
+        по времени метода), ждём до этой отметки, но не дольше десяти минут.
+        """
+        пауза = min(self.limit_pause * (2 ** n), self.limit_pause_max)
+        пауза *= 0.75 + random.random() * 0.5                          # джиттер ±25 %
+        заголовки = getattr(r, "headers", None) or {}
+        try:
+            ra = float(заголовки.get("Retry-After") or 0)
+        except (TypeError, ValueError, AttributeError):
+            ra = 0.0
+        сброс = 0.0
+        if isinstance(data, dict):
+            t = data.get("time") if isinstance(data.get("time"), dict) else {}
+            try:
+                сброс = float(t.get("operating_reset_at") or 0) - time.time()
+            except (TypeError, ValueError):
+                сброс = 0.0
+        по_порталу = max(ra, сброс + 1 if сброс > 0 else 0)
+        if по_порталу > 0:
+            пауза = max(пауза, min(по_порталу, ЛИМИТ_ПАУЗА_ПО_ПОРТАЛУ_МАКС_С))
+        return пауза
+
+    def _limit_sleep(self, пауза: float, method: str, причина: str, код: int, err: str) -> None:
+        self.retry_count += 1
+        _учесть("отказ_429" if (код == 429 or err == "OPERATION_TIME_LIMIT") else "отказ_503")
+        _учесть("ждали_с", пауза)
+        with self._lock:
+            self._замедление = min(self._замедление * 2, 16.0)
+        print(f"  ⏸ лимит портала {method}: {причина} — пауза {пауза:.0f} с",
+              file=sys.stderr, flush=True)
+        time.sleep(пауза)
+
+    def wait_limit(self, n: int, ждали: float, method: str, r: Any = None) -> float | None:
+        """Для чужого цикла повторов (закачка файла): пауза по n-му отказу.
+
+        Возвращает сколько прождано, или None, если бюджет ожидания исчерпан и
+        ждать дальше не надо.
+        """
+        пауза = self.limit_delay(n, r)
+        if ждали + пауза > self.limit_wait_budget:
+            return None
+        код = int(getattr(r, "status_code", 0) or 0)
+        self._limit_sleep(пауза, method, f"HTTP {код}", код, "")
+        return пауза
+
+    def before_request(self, kind: str = "файл") -> None:
+        """Очередь и учёт для запроса мимо _post — закачки по urlMachine.
+
+        urlMachine — это REST-метод crm.controller.item.getFile того же
+        вебхука: закачка стоит в той же очереди, что и вызовы методов."""
+        self._throttle()
+        _учесть("запросов")
+        if kind == "файл":
+            _учесть("файлов")
+
+    def _после_успеха(self, r: Any, data: Any) -> None:
+        """Плавный возврат скорости и тормоз по времени метода до отказа.
+
+        time.operating — накопленное время метода за 10 минут, общее у всех наших
+        процессов на этом вебхуке. Каждый процесс видит его в своём ответе и
+        притормаживает сам: согласования между частями не нужно."""
+        with self._lock:
+            self._замедление = max(1.0, self._замедление * 0.95)
+        if isinstance(r, _Снимок) or not isinstance(data, dict):
+            return                          # ответ из снимка: портал не трогали
+        t = data.get("time")
+        if not isinstance(t, dict):
+            return
+        try:
+            накоплено = float(t.get("operating") or 0)
+            сброс = float(t.get("operating_reset_at") or 0) - time.time()
+        except (TypeError, ValueError):
+            return
+        доля = накоплено / ПОРТАЛ_ВРЕМЯ_МЕТОДА_С
+        if доля < ДОЛЯ_ВРЕМЕНИ_ТОРМОЗ or сброс <= 0:
+            return
+        # чем ближе к пределу, тем дольше: с 60 % — до минуты, с 85 % — до сброса
+        пауза = min(сброс + 1, 60.0 if доля < 0.85 else ЛИМИТ_ПАУЗА_ПО_ПОРТАЛУ_МАКС_С)
+        _учесть("тормоз_времени")
+        _учесть("ждали_с", пауза)
+        print(f"  ⏸ время метода {доля:.0%} от предела портала — пауза {пауза:.0f} с",
+              file=sys.stderr, flush=True)
+        time.sleep(пауза)
 
     def _backoff(self, attempt: int, method: str, reason: str) -> None:
         """Экспоненциальная пауза с джиттером; каждый повтор виден в логах CI."""
@@ -194,9 +449,10 @@ class BitrixClient:
 
     def _throttle(self) -> None:
         with self._lock:
+            интервал = self.min_interval * self._замедление
             dt = time.monotonic() - self._last_call
-            if dt < self.min_interval:
-                time.sleep(self.min_interval - dt)
+            if dt < интервал:
+                time.sleep(интервал - dt)
             self._last_call = time.monotonic()
 
     # ----------------------------------------------------------------- listing
@@ -207,9 +463,8 @@ class BitrixClient:
         start = 0
         while True:
             params["start"] = start
-            data = self._post(method, params).json()
-            if data.get("error"):
-                raise BitrixError(f"{method}: {data['error']} {data.get('error_description','')}")
+            # через call_envelope: лимиты портала пережидаются, как у всех вызовов
+            data = self.call_envelope(method, params)
             chunk = data.get("result") or []
             if isinstance(chunk, dict):  # некоторые методы возвращают dict
                 chunk = list(chunk.values())
@@ -256,15 +511,13 @@ class BitrixClient:
     def count(self, method: str, filter: dict | None = None) -> int:
         """Общее число записей list-метода: читает поле total из ответа.
         (call() возвращает только result-массив без total, поэтому считаем отдельным сырым запросом.)"""
-        for attempt in range(4):
-            try:
-                data = self._post(method, {"filter": filter or {}, "select": ["ID"], "start": 0}).json()
-            except requests.RequestException:
-                time.sleep(0.5 * (attempt + 1)); continue
-            if isinstance(data, dict) and data.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
-                time.sleep(0.7 * (attempt + 1)); continue
-            return int((data or {}).get("total") or 0)
-        return 0
+        # Прежде — свои четыре повтора по 0,5–2,8 с против лимита, который держится
+        # до десяти минут. Теперь общий путь; исчерпав его, как и прежде, ноль.
+        try:
+            data = self.call_envelope(method, {"filter": filter or {}, "select": ["ID"], "start": 0})
+        except (BitrixError, requests.RequestException):
+            return 0
+        return int((data or {}).get("total") or 0)
 
     def stage_first_entry(self, entity_type_id: int, category_id: int, since: str) -> dict[str, str]:
         """Момент ПЕРВОГО входа сущности в указанную воронку (category_id) — из истории стадий.
@@ -315,22 +568,10 @@ class BitrixClient:
         hist: dict[str, list[tuple[str, str]]] = {}
         seen: dict[str, set] = {}
         start = 0
-        fails = 0
         while True:
             params["start"] = start
-            try:
-                data = self._post("crm.stagehistory.list", params).json()
-            except requests.RequestException:
-                fails += 1
-                if fails > 3:
-                    raise BitrixError("crm.stagehistory.list: сеть недоступна (3 ретрая)")
-                time.sleep(1.0)
-                continue
-            if isinstance(data, dict) and data.get("error"):
-                if data.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
-                    time.sleep(0.7)
-                    continue
-                raise BitrixError(f"crm.stagehistory.list: {data['error']} {data.get('error_description', '')}")
+            # общий путь повторов: прежний цикл долбил лимит каждые 0,7 с без конца
+            data = self.call_envelope("crm.stagehistory.list", params)
             res = (data or {}).get("result") or {}
             items = res.get("items") if isinstance(res, dict) else res
             items = items or []

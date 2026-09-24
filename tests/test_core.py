@@ -944,8 +944,10 @@ def test_сетевая_ошибка_не_несёт_токена_вебхука
     with pytest.raises(bc.BitrixError) as e:
         c.call("crm.item.list")
     assert "ВЫДУМАННЫЙТОКЕН42" not in str(e.value) and "ConnectionError" in str(e.value)
-    c = _client([сбой])
-    with pytest.raises(requests.RequestException) as e:
+    # list_paged идёт общим путём повторов (лимиты портала), поэтому отказ
+    # приходит BitrixError после попыток — важно, что без токена
+    c = _client([сбой], retries=1)
+    with pytest.raises((bc.BitrixError, requests.RequestException)) as e:
         c.list_paged("user.get")
     assert "ВЫДУМАННЫЙТОКЕН42" not in str(e.value)
     assert "ВЫДУМАННЫЙТОКЕН42" not in bc.без_вебхука(f"url: {_ТОКЕН}user.get")

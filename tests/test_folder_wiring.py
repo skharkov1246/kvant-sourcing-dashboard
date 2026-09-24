@@ -265,18 +265,17 @@ def test_сделка_несёт_нашу_компанию_тем_же_запр�
                 "ufCrm_1585568303498": {"type": "file", "title": "Offer from us"},
                 "ufCrm_1633502831": {"type": "file", "title": "Техническая спецификация"},
                 "title": {"type": "string", "title": "Название"}}}}
+        if method == "crm.deal.list":
+            # список сделок читается по ключу (bx_all_by_id, ключ «ID»)
+            после = int(params["filter"].get(">ID", 0))
+            return {"result": [д for д in ({"ID": "501"}, {"ID": "502"}) if int(д["ID"]) > после]}
         assert method == "crm.item.list", method
         списки.append(params)
         выбрано = set(params["select"])
         return {"result": {"items": [{к: v for к, v in с.items() if к in выбрано}
                                      for с in сделки if с["id"] in params["filter"]["@id"]]}}
 
-    def bx_all(method, params):
-        assert method == "crm.deal.list", method
-        return [{"ID": "501"}, {"ID": "502"}]
-
     monkeypatch.setattr(ix, "bx", bx)
-    monkeypatch.setattr(ix, "bx_all", bx_all)
     refs = ix.collect_refs(30)
     assert len(списки) == 1, "наша компания сделки — тем же запросом, без лишних обращений"
     по_файлу = {r["fo"]["id"]: r for r in refs}

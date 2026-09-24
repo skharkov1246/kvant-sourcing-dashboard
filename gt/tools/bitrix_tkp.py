@@ -981,6 +981,12 @@ def from_chat(bx: BitrixClient, did: int) -> list:
 
 # ---------------------------------------------------------------- скачивание
 
+#: Клиент портала, через очередь которого идут закачки. urlMachine — это
+#: REST-метод crm.controller.item.getFile того же вебхука, то есть запрос в
+#: общий бюджет портала (CLAUDE.md, «Битрикс не перегружать»). Ставит main().
+_ОЧЕРЕДЬ = None
+
+
 def fetch(url: str, timeout: int = 45):
     """Байты по машинной ссылке. Прямой GET, без вызовов disk.*.
 
@@ -990,10 +996,21 @@ def fetch(url: str, timeout: int = 45):
     при ошибке шесть повторов с паузой до 3,5 минут. Отсюда и 28 минут.
     """
     import requests
-    try:
-        rr = requests.get(url, timeout=timeout)
-    except Exception as e:
-        return None, f"сеть: {type(e).__name__}", ""
+    отказов, ждали = 0, 0.0
+    while True:
+        if _ОЧЕРЕДЬ is not None:
+            _ОЧЕРЕДЬ.before_request("файл")
+        try:
+            rr = requests.get(url, timeout=timeout)
+        except Exception as e:
+            return None, f"сеть: {type(e).__name__}", ""
+        # лимит портала пережидается общим бюджетом ожидания клиента
+        if rr.status_code in (429, 503) and _ОЧЕРЕДЬ is not None:
+            прождано = _ОЧЕРЕДЬ.wait_limit(отказов, ждали, "закачка файла", rr)
+            if прождано is not None:
+                отказов, ждали = отказов + 1, ждали + прождано
+                continue
+        break
     if rr.status_code != 200:
         return None, f"HTTP {rr.status_code}", ""
     body = rr.content
@@ -1134,6 +1151,8 @@ def main() -> int:
         say("нет BITRIX_WEBHOOK_URL")
         return 1
     bx = BitrixClient(wh)
+    global _ОЧЕРЕДЬ
+    _ОЧЕРЕДЬ = bx
 
     if a.deal:
         ids = [a.deal]
