@@ -1739,7 +1739,9 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
                 т.счёт("n.o_date", dd is None or dd > будущее or dd < РАННЯЯ_ДАТА)
             if o.get("f") is not None:
                 т.счёт("n.o_f", not re.fullmatch(r"\d+", str(o["f"])))
-            кортежи[(o.get("c"), o.get("p"), o.get("u"), o.get("q"), o.get("d"))] += 1
+            # Правило дубля одно на сборку и ревизию (crossref.ключ_дубля):
+            # сборка схлопывает ровно то, что здесь считалось бы дублем.
+            кортежи[crossref.ключ_дубля(o)] += 1
             if o.get("c") is not None and o.get("p") is not None:
                 цены_компаний[(o.get("c"), o.get("p"), o.get("u"))] += 1
         for n_ in кортежи.values():
