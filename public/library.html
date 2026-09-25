@@ -186,9 +186,26 @@ button,input{font:inherit}button,a,input,summary{-webkit-tap-highlight-color:tra
     const meaningful=value=>{const plain=text(value).trim(),key=compact(plain);return key&&!['unknown','неуказано','неизвестно',pn,oem,oem+pn,pn+oem].includes(key)?plain:'';};
     return meaningful(fields.position_type)||meaningful(fields.name)||meaningful(fields.description)||componentTypeLabel(sourceInfo(article),article.segment_id)||meaningful(article.title)||'';
   }
+  // Бренд компонента — проекция публикатора library_brand (scripts/publish_library_v2.py,
+  // правило crossref.бренды_каталога — то же, что у /p и /brands). Своего сведения у
+  // страницы нет: имя и ключ берутся как есть, узнанный реестром бренд ведёт на
+  // /p#brand=<ключ> и /brands#b=<ключ>. Проекции нет — показывается написание источника.
+  function componentBrands(article) {
+    const projection=sourceInfo(article).library_brand;
+    if(projection?.version!==1||projection?.producer!=='publisher-v2'||!Array.isArray(projection.brands))return [];
+    return projection.brands.filter(b=>b&&typeof b.key==='string'&&b.key.length>=2&&b.key.length<=120&&typeof b.name==='string'&&b.name.trim()).slice(0,8);
+  }
+  function brandLabel(article) {const brands=componentBrands(article);return brands.length?brands.map(b=>b.name).join(', '):text(sourceInfo(article).component_fields?.oem);}
+  function brandDetails(article) {
+    const dd=node('dd'),brands=componentBrands(article),raw=text(sourceInfo(article).component_fields?.oem);
+    if(!brands.length){dd.textContent=raw;return dd;}
+    brands.forEach((b,i)=>{if(i)dd.append(document.createTextNode(', '));if(b.known===true){const key=encodeURIComponent(b.key);dd.append(link(b.name,'/p#brand='+key,'brand-link'),document.createTextNode(' '),link('(бренды)','/brands#b='+key,'field-note'));}else dd.append(document.createTextNode(b.name));});
+    if(raw&&normalize(brandLabel(article))!==normalize(raw))dd.append(node('span','field-note',' · в источнике: '+raw));
+    return dd;
+  }
   function articleTitle(article) {
     if(kind(article)!=='component')return text(article.title);
-    const fields=sourceInfo(article).component_fields||{},description=componentDescription(article),identity=[text(fields.oem),text(fields.part_number)].filter(Boolean).join(' ');
+    const fields=sourceInfo(article).component_fields||{},description=componentDescription(article),identity=[brandLabel(article),text(fields.part_number)].filter(Boolean).join(' ');
     if(!description)return text(article.title)||identity||'Компонент без описания';
     if(description===text(fields.position_type)&&text(fields.name)&&text(fields.name)!==description){const name=text(fields.name),number=text(fields.part_number);return description+' — '+name+(number&&!normalize(name).includes(normalize(number))?' · '+number:'');}
     return identity&&!normalize(description).includes(normalize(text(fields.part_number)||identity))?description+' — '+identity:description;
@@ -218,7 +235,7 @@ button,input{font:inherit}button,a,input,summary{-webkit-tap-highlight-color:tra
   function typedDetails(article) {
     const info=sourceInfo(article),original=kind(article)==='price'?info.price_fields:kind(article)==='supplier'?info.supplier_fields:kind(article)==='component'?info.component_fields:null;if(!original||typeof original!=='object')return null;const fields={...original};if(kind(article)==='component'){const description=info.typedfields?.specification?.catalogue_fields_as_printed?.DESCRIPTION;if(typeof description==='string')fields.source_description=description;const flow=info.typedfields?.specification?.flow_pattern;if(typeof flow==='string')fields.flow_pattern=Object.hasOwn(VALVE_FLOW_LABELS,flow)?VALVE_FLOW_LABELS[flow]:flow;}
     const labels={part_number:'Артикул',oem:'Бренд оборудования',family:'Группа',model:'Модель оборудования в источнике',purpose:'Назначение в узле',description:'Описание',source_description:'Описание в каталоге (оригинал)',flow_pattern:'Схема потока по источнику',position_type:'Тип позиции по источнику',aliases:'Другие обозначения в источнике',quantity:'Количество в запросе',unit:'Единица',priced:'Наличие расценки',name:kind(article)==='component'?'Компонент':'Компания',role:'Роль компании',oem_brands:'Бренды оборудования',verification:'Что подтверждено',amount:'Цена за единицу',currency:'Валюта',price_date:'Дата цены',price_type:'Тип цены',supplier:'Источник расценки',basis:'Условия / основа цены',note:'Ограничения',incoterms:'Условия поставки',valid_until:'Действует до',quote_valid_until:'Предложение действует до',direction:'Назначение цены'};
-    const dl=node('dl','record-details');for(const [key,label] of Object.entries(labels)){let value=fields[key];if(value==null||value==='')continue;if(key==='family')value=text(value);if(key==='role')value=ROLES[value]||String(value);if(key==='priced')value=value===true?'Есть в изученной расценке':value===false?'В изученной расценке нет':String(value);if(key==='direction')value=value==='input_estimate'?'Расценка из сделки':value==='outgoing_offer'?'Наше КП заказчику':String(value);if(key==='price_date'||key==='valid_until'||key==='quote_valid_until')value=date(value)||String(value);if(Array.isArray(value))value=value.join(', ');if(typeof value==='object')continue;const pair=node('div');pair.append(node('dt','',label),node('dd','',String(value)));dl.append(pair);}return dl.children.length?dl:null;
+    const dl=node('dl','record-details');for(const [key,label] of Object.entries(labels)){let value=fields[key];if(value==null||value==='')continue;if(key==='family')value=text(value);if(key==='role')value=ROLES[value]||String(value);if(key==='priced')value=value===true?'Есть в изученной расценке':value===false?'В изученной расценке нет':String(value);if(key==='direction')value=value==='input_estimate'?'Расценка из сделки':value==='outgoing_offer'?'Наше КП заказчику':String(value);if(key==='price_date'||key==='valid_until'||key==='quote_valid_until')value=date(value)||String(value);if(Array.isArray(value))value=value.join(', ');if(typeof value==='object')continue;const pair=node('div');pair.append(node('dt','',label),key==='oem'&&kind(article)==='component'?brandDetails(article):node('dd','',String(value)));dl.append(pair);}return dl.children.length?dl:null;
   }
   function equipmentIcon() {
     const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 32 32');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.3');svg.setAttribute('aria-hidden','true');

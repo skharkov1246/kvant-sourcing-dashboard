@@ -413,7 +413,12 @@ def закодировать(о: dict) -> dict[str, bytes]:
     out = {k: json.dumps(v, ensure_ascii=False).encode("utf-8") for k, v in о.items() if not k.startswith("_")}
     cf = _ХранилищеБлобов()
     store = lib2.Store(cf, "0" * 32)
-    builder = lib2.Builder(store, о["_segments"], о["_relations"])
+    # Бренд компонента публикатор называет общим правилом по словарю
+    # (crossref.реестр_сборки без реестра базы). «_publisher_dict» — словарь,
+    # по которому опубликована библиотека, если он отстал от словаря ревизии.
+    с_публикации = о.get("_publisher_dict", о["_dict"])
+    реестр = crossref.реестр_брендов(с_публикации, разложение=brands.разложение_словаря(с_публикации))
+    builder = lib2.Builder(store, о["_segments"], о["_relations"], реестр)
     for row in sorted(о["_library_rows"], key=lambda r: r["id"]):
         builder.add(row)
     manifest = builder.finish("rev-1", о.get("_library_published", СОБРАН))
@@ -965,6 +970,10 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("library", "l.oem_key", lambda о: поля(о, "bearings:c2").update(oem="schaefflergroup")),
     ("library", "l.oem_unknown", lambda о: поля(о, "bearings:c2").update(oem="не указан")),
     ("library", "l.oem_multi", lambda о: поля(о, "bearings:c2").update(oem="SKF/FAG")),
+    # Словарь пополнился FAG, а библиотека опубликована по прежнему: на /library
+    # «FAG» — слово без ссылки, на /p и /brands — бренд fag.
+    ("library", "l.oem_rule", lambda о: о.update(_publisher_dict={**о["_dict"], "records": [
+        r for r in о["_dict"]["records"] if r["oem_key"] != "fag"]})),
     ("library", "l.oem_instruction", lambda о: (о["_dict"]["records"].append(
         {"oem_key": "заказпоспецификации", "name": "Заказ по спецификации",
          "spellings": [{"spelling": "Заказ по спецификации", "where": "dict/oem.json:records"}]}),

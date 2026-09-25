@@ -15,6 +15,7 @@ import hashlib
 import json
 import re
 import os
+from pathlib import Path
 import sys
 import time
 from urllib import parse
@@ -38,6 +39,15 @@ MAX_RELATION_EDGES = 25_000
 MAX_COMPONENT_RELATIONS = 512
 MAX_RELATION_BYTES = 8 * 1024 * 1024
 KINDS = ("knowledge", "supplier", "price", "component")
+ROOT = Path(__file__).resolve().parents[1]
+# Бренд компонента — проекция публикации, как library_relations: исходная
+# запись не меняется, поле считается заново при каждой сборке общим правилом
+# /p и /brands (crossref.бренды_каталога по crossref.реестр_сборки). Своего
+# словаря или своего сведения у /library нет: написание «SKF (Швеция)» здесь
+# называется так же и ведёт на тот же ключ, что на /brands#b= и /p#brand=.
+BRAND_PROJECTION = "library_brand"
+BRAND_RULE = "crossref.бренды_каталога"
+MAX_COMPONENT_BRANDS = 8
 # Exact source-family labels only. Parity with the reader is tested; this adds
 # search aliases without rewriting canonical titles, sources or full records.
 COMPONENT_FAMILIES = {
@@ -208,6 +218,41 @@ VALVE_FLOW_LABELS = {
     "two_way_straight_shutoff": "Арматура: двухходовая прямоточная запорная",
     "three_way_switching": "Арматура: трёхходовая переключающая"
 }
+
+
+def _brand_modules():
+    # library/ — пакет корня репозитория; скрипт запускают как scripts/<имя>.py.
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from library import crossref, docfilter
+    return crossref, docfilter
+
+
+def brand_registry(registry_db=None):
+    """Реестр, которым узнаётся бренд: реестр базы или словарь-файл —
+    crossref.реестр_сборки, та же функция, что у публикатора /p."""
+    crossref, _ = _brand_modules()
+    return crossref.реестр_сборки(registry_db)
+
+
+def component_brand(fields, registry):
+    """Поле изготовителя компонента → проекция library_brand или None.
+
+    Правило одно с карточкой /p (crossref.бренды_каталога): узнанное реестром —
+    его ключ и имя (known), не узнанное — слово ячейки своим ключом написания,
+    пометки незнания и страны — не бренд. Ячейка, равная самому артикулу, —
+    не бренд."""
+    if not isinstance(fields, dict) or not isinstance(fields.get("oem"), str) or not registry:
+        return None
+    crossref, docfilter = _brand_modules()
+    pn = fields.get("part_number")
+    code = docfilter.ключ_кода(pn) if isinstance(pn, str) and pn.strip() else None
+    pairs = crossref.бренды_каталога(fields["oem"], registry, code)[:MAX_COMPONENT_BRANDS]
+    if not pairs:
+        return None
+    names = registry.get("имена") or {}
+    return {"version": 1, "producer": "publisher-v2", "rule": BRAND_RULE,
+            "brands": [{"key": k, "name": n, "known": k in names} for k, n in pairs]}
 
 
 def known_component_family(fields):
@@ -413,7 +458,8 @@ def summary(row):
     result_sources = {"kind": kind(row)}
     truncated = False
     if isinstance(sources, dict):
-        for key in ("component_fields", "supplier_fields", "price_fields", "library_relations", "typedfields", "references",
+        for key in ("component_fields", BRAND_PROJECTION, "supplier_fields", "price_fields", "library_relations",
+                    "typedfields", "references",
                     "review_status", "open_questions", "source_date", "origin", "importer_id"):
             if key not in sources:
                 continue
@@ -734,8 +780,10 @@ def entries(store, ref, category, depth=0):
 
 
 class Builder:
-    def __init__(self, store, segments, relations=None):
+    def __init__(self, store, segments, relations=None, brands=None):
         self.store = store
+        self.brands = brands
+        self.brand_metrics = defaultdict(int)
         self.segments = {v1.stable_id(x["id"]): copy.deepcopy(x) for x in segments}
         v1.require(len(self.segments) == len(segments) <= MAX_SEGMENTS, "INVALID_SEGMENTS")
         self.buffers, self.sizes, self.leaves = {}, {}, defaultdict(list)
@@ -792,6 +840,19 @@ class Builder:
                 "candidate_suppliers": self.relations[row["id"]]}}}
             normalized = v1.article(row)
             self.relation_targets_seen.add(row["id"])
+        if self.brands is not None and isinstance(row.get("sources"), dict) and kind(normalized) == "component":
+            # Проекция считается заново и у сохранённых прежней публикацией
+            # статей: правило или реестр сменились — имя сменится везде.
+            sources = {k: v for k, v in row["sources"].items() if k != BRAND_PROJECTION}
+            projected = component_brand(sources.get("component_fields"), self.brands)
+            if projected:
+                sources[BRAND_PROJECTION] = projected
+                self.brand_metrics["components_with_brand"] += 1
+                self.brand_metrics["components_with_known_brand"] += any(b["known"] for b in projected["brands"])
+            self.brand_metrics["components"] += 1
+            if sources != row["sources"]:
+                row = {**row, "sources": sources}
+                normalized = v1.article(row)
         v1.require(len(encode({"revision": "0" * 160, "article": row})) <= MAX_ARTICLE_RESPONSE_BYTES,
                    "ARTICLE_REQUIRES_PAGED_BODY")
         v1.require(row["segment_id"] in self.segments, "UNKNOWN_SEGMENT")
@@ -917,6 +978,31 @@ class Database(v1.Database):
             v1.require(len(rows) <= MAX_SEGMENTS, "SEGMENT_LIMIT")
             return [{"id": v1.stable_id(r[0]), "name": v1.string(r[1], 300),
                      "note": v1.string(r[2], 10000, True)} for r in rows]
+
+    def read_brand_registry(self):
+        """Реестр брендов базы (brands.читать_реестр) или None — тогда словарь-файл,
+        как у публикатора /p. Сбой чтения реестра — не сбой публикации: бренд
+        узнаётся по файлу, а в итог прогона идёт, откуда он узнан."""
+        _brand_modules()
+        from library import brands
+        try:
+            connection = self.connect()
+        except Exception:
+            return None, False
+        try:
+            cursor = connection.cursor()
+            try:
+                return brands.читать_реестр(cursor), True
+            finally:
+                cursor.close()
+        except Exception:
+            return None, False
+        finally:
+            for operation in (connection.rollback, connection.close):
+                try:
+                    operation()
+                except Exception:
+                    pass
 
     def read_segments(self):
         # Draft FK validation needs no relation projection or article cursor.
@@ -1071,12 +1157,15 @@ def run(db, cf, now=None):
     db.insert_drafts([d["article"] for d in drafts])
     revision = str(uuid.uuid4())
     published_at = v1.timestamp(now or datetime.now(timezone.utc))
+    read_registry = getattr(db, "read_brand_registry", None)
+    registry_db, registry_read = read_registry() if read_registry else (None, True)
+    brands = brand_registry(registry_db)
     with db.stream() as (segments, incoming):
         old_segments = old_manifest["segments"] if old_manifest else legacy["segments"]
         merged_segments = {x["id"]: {k: v for k, v in x.items() if k not in
                            ("indexes", "counts_by_kind", "counts_by_confidence", "article_count")} for x in old_segments}
         merged_segments.update({x["id"]: x for x in segments})
-        builder = Builder(store, list(merged_segments.values()), getattr(incoming, "relations", {}))
+        builder = Builder(store, list(merged_segments.values()), getattr(incoming, "relations", {}), brands)
         relation_metrics = getattr(incoming, "relation_metrics", {})
         reconcile(store, builder, old_rows(store, old_manifest, legacy), incoming,
                   {d["article"]["id"]: d["article"] for d in drafts})
@@ -1109,6 +1198,8 @@ def run(db, cf, now=None):
     return {"ok": True, "version": 2, "changed": not unchanged, "articles": manifest["article_count"],
             "segments": len(manifest["segments"]), "drafts_published": len(drafts),
             "supplier_relations": relation_metrics,
+            "component_brands": {"registry": brands["откуда"] if registry_read else "словарь-файл (реестр не прочитан)",
+                                 **dict(sorted(builder.brand_metrics.items()))},
             "draft_keys_deferred": metrics["draft_keys_deferred"],
             "next_manual_run_required": bool(metrics["draft_keys_deferred"])}
 
