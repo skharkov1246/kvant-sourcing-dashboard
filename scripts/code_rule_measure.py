@@ -26,7 +26,15 @@ docfilter.код_правдоподобен (двойник в SQL — lib_pn_pl
     («ss999», «99mm»), и число строк — без наименований и без самих номеров;
   · количество: строк цены и спроса больше quotes.МАКС_КОЛИЧЕСТВО, строк цены,
     где «количество × цена ≠ сумма», и строк с оговоркой разборщика о снятом
-    количестве.
+    количестве;
+  · СТАНДАРТ С РАЗМЕРОМ (правка 25.09.2026): ключи класса «стандарт» по
+    написанию — голый стандарт («DIN 933») и стандарт с размером («DIN 471 25»,
+    номер детали). Сколько ключей, строк и сделок вернулось в «код», сколько
+    карточек номенклатуры прибавилось, у скольких стало хуже (строка цены
+    уходит от каталожной детали part_id к ключу номера), сколько возвращённых
+    написаний похожи на «стандарт + год» через пробел (верхняя граница ложного
+    возврата). И сетка «длина цифр × написание»: можно ли было отличить стандарт
+    с размером по одному ключу — ограничением длины цифровой части.
 
 Только выборки: работает и при базе в режиме только чтения. Функция
 lib_pn_plausible в базе НЕ нужна — выражение передаётся параметром из
@@ -62,11 +70,19 @@ def параметры() -> dict:
          "кол_предел": "%" + quotes.КОЛ_НЕ_ЧИТАЕТСЯ + "%"}
     for класс, выр in docfilter._КЛАССЫ_НЕ_КОДА:
         п[класс] = "^(" + выр + ")$"
+    п["с_размером"] = docfilter.НАПИСАНИЕ_С_РАЗМЕРОМ
     return п
 
 
-# Класс ключа в SQL — в том же порядке, что в docfilter.класс_не_кода.
-КЛАСС = ("case when k ~ %(стандарт)s then 'стандарт'"
+# Отвергнут ли номер: ключ из закрытого списка, но стандарт с размером в
+# написании — код (docfilter.класс_не_кода). k — ключ, w — написание.
+ОТВЕРГНУТ = "(k ~ %(rx)s and not (w ~ %(с_размером)s and k ~ %(стандарт)s))"
+
+
+# Класс номера в SQL — в том же порядке, что в docfilter.класс_не_кода:
+# стандарт — только голый (без размера в написании w).
+КЛАСС = ("case when k ~ %(стандарт)s and not (w ~ %(с_размером)s) then 'стандарт'"
+         " when k ~ %(стандарт)s then null"
          " when k ~ %(размер)s then 'размер'"
          " when k ~ %(марка)s then 'марка' end")
 
@@ -75,7 +91,7 @@ select {КЛАСС}                                            as класс,
        count(*)::bigint                                   as строк,
        count(distinct k)::bigint                          as ключей,
        count(*) filter (where qty > %(макс)s)::bigint      as кол_больше_предела
-  from (select lib_pn_key(d.part_number) as k, d.qty
+  from (select lib_pn_key(d.part_number) as k, d.part_number as w, d.qty
           from lib_demand_live d
          where coalesce(btrim(d.part_number), '') <> ''
         offset 0) x
@@ -88,12 +104,12 @@ select {КЛАСС}                                            as класс,
        regexp_replace(k, '[0-9]', '9', 'g')               as образец,
        count(*)::bigint                                   as строк,
        count(distinct k)::bigint                          as ключей
-  from (select lib_pn_key(d.part_number) as k
+  from (select lib_pn_key(d.part_number) as k, d.part_number as w
           from lib_demand_live d
          where coalesce(btrim(d.part_number), '') <> ''
         offset 0) x
  where k <> '' and (hashtext(k) & 2147483647) %% %(n)s = %(i)s
-   and k ~ %(rx)s
+   and {ОТВЕРГНУТ}
  group by 1, 2
 """
 
@@ -115,7 +131,7 @@ select (p.feed = %(feed)s)                                as поток_кп,
                                                           as тройка_не_сошлась,
        count(*) filter (where {note} like %(кол_снято)s
                            or {note} like %(кол_предел)s)::bigint as кол_снято_разбором
-  from (select p.*, lib_pn_key(p.part_number) as k from lib_prices p
+  from (select p.*, lib_pn_key(p.part_number) as k, p.part_number as w from lib_prices p
          where coalesce(btrim(p.part_number), '') <> '') p
  where k <> ''
  group by 1, 2
@@ -127,19 +143,20 @@ select {КЛАСС}                                            as класс,
        regexp_replace(k, '[0-9]', '9', 'g')               as образец,
        count(*)::bigint                                   as строк,
        count(distinct k)::bigint                          as ключей
-  from (select lib_pn_key(part_number) as k from lib_prices
+  from (select lib_pn_key(part_number) as k, part_number as w from lib_prices
          where feed = %(feed)s and coalesce(btrim(part_number), '') <> '') x
- where k ~ %(rx)s
+ where {ОТВЕРГНУТ}
  group by 1, 2
 """
 
 # Спрос, который ложные карточки собирали по ключу: строки и сделки. Отбор
 # ключей — независимым подзапросом (правило 8), индекс по lib_pn_key есть.
-СНЯТЫЙ_СПРОС = """
+СНЯТЫЙ_СПРОС = f"""
 with ложные as materialized (
-  select distinct lib_pn_key(part_number) as k from lib_prices
-   where feed = %(feed)s and coalesce(btrim(part_number), '') <> ''
-     and lib_pn_key(part_number) ~ %(rx)s
+  select distinct k from (select lib_pn_key(part_number) as k, part_number as w
+                            from lib_prices
+                           where feed = %(feed)s and coalesce(btrim(part_number), '') <> '') x
+   where {ОТВЕРГНУТ}
 )
 select count(*)::bigint                                   as ключей,
        coalesce(sum(строк), 0)::bigint                    as строк_спроса,
@@ -153,26 +170,220 @@ select count(*)::bigint                                   as ключей,
 
 # Строки цены, чей код отвергнут, — наименования читает ТОЛЬКО этот процесс,
 # чтобы спросить docfilter.part_number_of; в журнал они не попадают.
-ОТВЕРГНУТЫЕ_ЦЕНЫ = """
-select item_name from lib_prices
- where feed = %(feed)s and coalesce(btrim(part_number), '') <> ''
-   and lib_pn_key(part_number) ~ %(rx)s
+ОТВЕРГНУТЫЕ_ЦЕНЫ = f"""
+select item_name from (select item_name, lib_pn_key(part_number) as k, part_number as w
+                         from lib_prices
+                        where feed = %(feed)s and coalesce(btrim(part_number), '') <> '') x
+ where {ОТВЕРГНУТ}
 """
 
 КАТАЛОГ = f"""
 select {КЛАСС}                                            as класс,
        regexp_replace(k, '[0-9]', '9', 'g')               as образец,
        count(*)::bigint                                   as номеров
-  from (select lib_pn_key(catalog_no) as k from lib_parts) x
- where k ~ %(rx)s
+  from (select lib_pn_key(catalog_no) as k, catalog_no as w from lib_parts) x
+ where {ОТВЕРГНУТ}
  group by 1, 2
 """
 
 КОЛОНКИ = """
 select column_name from information_schema.columns
- where table_name = 'lib_prices' and column_name in ('total', 'note')
+ where table_name = 'lib_prices' and column_name in ('total', 'note', 'part_id')
    and table_schema = any(current_schemas(false))
 """
+
+
+# ── СТАНДАРТ С РАЗМЕРОМ ──────────────────────────────────────────────────────
+# Ключи класса «стандарт» — по написанию. Один проход по спросу (строки с таким
+# ключом — сотни из сотен тысяч), ключи наружу не выходят: разбор в процессе,
+# в журнал — только числа и формы с цифрами «9» и без букв, кроме приставки
+# стандарта из ключа («din 999 99»).
+ПРОБЕЛ = r"[ \t\r\n ]"
+СТД_ПАРАМЕТРЫ = {
+    # Последний числовой токен — год: «ISO 9001 2015», «GB 276 2013».
+    "хвост_год": ПРОБЕЛ + r"(19|20)[0-9]{2}[^0-9]*$",
+    # Последний числовой токен — две цифры: размер «DIN 471 25» или год «ГОСТ 8752 79».
+    "хвост_2": ПРОБЕЛ + r"[0-9]{2}[^0-9]*$",
+    # Числа разделены знаком в пробелах: «ГОСТ 8752 - 79», «DIN 471 -25».
+    "через_знак": "[0-9](" + ПРОБЕЛ + "+[-–—:/]|[-–—:/]" + ПРОБЕЛ + ")",
+    "не_форма": r"[^9 .:/-]",
+}
+_СТД_СТРОКА = """
+  count(*) filter (where not р)::bigint                    as строк_голых,
+  count(*) filter (where р)::bigint                        as строк_размер,
+  count(*) filter (where р and w ~ %(хвост_год)s)::bigint  as хвост_год,
+  count(*) filter (where р and w ~ %(хвост_2)s)::bigint    as хвост_2,
+  count(*) filter (where р and w ~ %(через_знак)s)::bigint as через_знак,
+  mode() within group (order by ф) filter (where р)        as форма_размер,
+  mode() within group (order by ф) filter (where not р)    as форма_голая"""
+_СТД_ФОРМА = ("w ~ %(с_размером)s as р, substring(k from '^[a-zа-я]+') || ' ' ||"
+              " btrim(regexp_replace(regexp_replace(regexp_replace(w, '[0-9]', '9', 'g'),"
+              " %(не_форма)s, '', 'g'), ' +', ' ', 'g')) as ф")
+
+СТД_СПРОС = f"""
+select k,{_СТД_СТРОКА},
+  count(distinct deal_id) filter (where р)::bigint         as сделок_размер,
+  count(distinct deal_id)::bigint                          as сделок
+  from (select k, w, deal_id, {_СТД_ФОРМА}
+          from (select lib_pn_key(d.part_number) as k, d.part_number as w, d.deal_id
+                  from lib_demand_live d
+                 where coalesce(btrim(d.part_number), '') <> ''
+                offset 0) x
+         where k ~ %(стандарт)s) y
+ group by k
+"""
+
+
+def стд_цены_sql(есть_part_id: bool) -> str:
+    part_id = "p.part_id" if есть_part_id else "null::text"
+    return f"""
+select k, кп,{_СТД_СТРОКА},
+  count(*) filter (where р and part_id is not null and part_id <> k)::bigint
+                                                           as уходят_от_детали
+  from (select k, w, кп, part_id, {_СТД_ФОРМА}
+          from (select lib_pn_key(p.part_number) as k, p.part_number as w,
+                       (p.feed = %(feed)s) as кп, {part_id} as part_id
+                  from lib_prices p
+                 where coalesce(btrim(p.part_number), '') <> '') x
+         where k ~ %(стандарт)s) y
+ group by k, кп
+"""
+
+
+# Ключи каталога класса «стандарт»: они кодом остаются всегда (каталог защищает).
+СТД_КАТАЛОГ = """
+select distinct k from (select id as k from lib_parts
+                        union
+                        select lib_pn_key(catalog_no) from lib_parts
+                         where catalog_no is not null) z
+ where k ~ %(стандарт)s
+"""
+
+
+def приставка(k: str) -> str:
+    i = 0
+    while i < len(k) and not k[i].isdigit():
+        i += 1
+    return k[:i]
+
+
+def сетка_длины(ключи: dict) -> dict:
+    """Можно ли было обойтись ключом: лучший предел длины цифр по приставке.
+
+    Правило «обвинять ключ, если цифр не больше L» подбирается ПО САМИМ ДАННЫМ,
+    отдельно для каждой приставки, — это верхняя граница качества такого
+    правила. Ошибка: голый стандарт длиннее L (ложный код) плюс стандарт с
+    размером не длиннее L (по-прежнему выброшен). Эталон — написание."""
+    по_приставке = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0]))
+    for k, размер in ключи.items():
+        пр = приставка(k)
+        по_приставке[пр][len(k) - len(пр)][1 if размер else 0] += 1
+    итог = {}
+    for пр, цифры in по_приставке.items():
+        лучшее = None
+        for предел in range(0, 26):
+            ложный_код = sum(v[0] for ц, v in цифры.items() if ц > предел)
+            выброшен = sum(v[1] for ц, v in цифры.items() if ц <= предел)
+            if лучшее is None or ложный_код + выброшен < sum(лучшее[1:]):
+                лучшее = (предел, ложный_код, выброшен)
+        итог[пр] = {"цифры": {ц: tuple(v) for ц, v in sorted(цифры.items())},
+                    "предел": лучшее[0], "ложный_код": лучшее[1], "выброшен": лучшее[2]}
+    return итог
+
+
+def замер_стандарта(cur, п: dict, есть_part_id: bool) -> dict:
+    п = п | СТД_ПАРАМЕТРЫ
+    cur.execute(СТД_КАТАЛОГ, п)
+    каталог = {r[0] for r in cur.fetchall()}
+
+    cur.execute(СТД_СПРОС, п)
+    спрос = {r[0]: r[1:] for r in cur.fetchall()}
+    cur.execute(стд_цены_sql(есть_part_id), п)
+    цены = collections.defaultdict(dict)
+    for k, кп, *хвост in cur.fetchall():
+        цены["кп" if кп else "прочие"][k] = хвост
+
+    def свод(строки: dict, со_сделками: bool) -> dict:
+        с = collections.Counter()
+        формы = collections.Counter()
+        сделки = []
+        for k, v in строки.items():
+            голых, размер, год, два, знак, ф_размер, ф_голая = v[:7]
+            с["ключей"] += 1
+            с["строк_голых"] += голых
+            с["строк_размер"] += размер
+            с["ключей_только_голых"] += int(голых > 0 and размер == 0)
+            с["ключей_только_размер"] += int(размер > 0 and голых == 0)
+            с["ключей_смешанных"] += int(размер > 0 and голых > 0)
+            if размер and k not in каталог:
+                с["вернулось_ключей"] += 1
+                с["вернулось_строк"] += размер
+                с["хвост_год"] += год
+                с["хвост_2"] += два
+                с["через_знак"] += знак
+                с["строк_голых_у_вернувшихся"] += голых
+                формы[ф_размер or "?"] += размер
+                if со_сделками:
+                    сделки.append(v[7])
+            elif размер:
+                с["защищено_каталогом"] += 1
+            if not со_сделками and размер and k not in каталог:
+                с["уходят_от_детали"] += v[7]
+        if со_сделками:
+            с["сделок_у_вернувшихся"] = sum(сделки)
+            с["сделок_у_худшего"] = max(сделки, default=0)
+        return {"счёт": dict(с), "формы": формы.most_common(ОБРАЗЦОВ)}
+
+    ключи = {}
+    for строки in [спрос, *цены.values()]:
+        for k, v in строки.items():
+            ключи[k] = ключи.get(k, False) or v[1] > 0
+    return {"спрос": свод(спрос, True),
+            "цены": {поток: свод(строки, False) for поток, строки in цены.items()},
+            "каталог_ключей": len(каталог),
+            "сетка": сетка_длины(ключи)}
+
+
+def печать_стандарта(ст: dict) -> None:
+    print("\nСТАНДАРТ С РАЗМЕРОМ (ключ класса «стандарт», второй числовой токен в"
+          " написании — размер): вернулось в «код»")
+    for имя, свод in [("спрос (lib_demand_live)", ст["спрос"])] + \
+            [(f"цены, поток {'«' + FEED_КП + '»' if п == 'кп' else 'прочие'}", с)
+             for п, с in sorted(ст["цены"].items())]:
+        с = collections.Counter(свод["счёт"])
+        print(f"  {имя}: ключей класса «стандарт» {с['ключей']} — только голые"
+              f" {с['ключей_только_голых']}, только с размером {с['ключей_только_размер']},"
+              f" смешанные {с['ключей_смешанных']}; строк голых {с['строк_голых']},"
+              f" с размером {с['строк_размер']}")
+        print(f"    вернулось: ключей {с['вернулось_ключей']}, строк {с['вернулось_строк']}"
+              + (f", сделок (сумма по ключам) {с['сделок_у_вернувшихся']},"
+                 f" у худшего ключа {с['сделок_у_худшего']}" if "сделок_у_вернувшихся" in с else "")
+              + f"; уже защищены каталогом: {с['защищено_каталогом']}")
+        print(f"    сомнительные из вернувшихся строк: последний токен — год 19xx/20xx"
+              f" {с['хвост_год']}, две цифры (размер или год) {с['хвост_2']},"
+              f" числа через знак в пробелах {с['через_знак']}")
+        print(f"    стало хуже: строк голого написания у вернувшихся ключей (остаются"
+              f" отвергнуты) {с['строк_голых_у_вернувшихся']}"
+              + (f"; строк цены, уходящих от каталожной детали part_id к ключу номера"
+                 f" {с['уходят_от_детали']}" if "сделок_у_вернувшихся" not in с else ""))
+        if свод["формы"]:
+            print("    формы вернувшихся написаний: "
+                  + "; ".join(f"«{ф}» {n}" for ф, n in свод["формы"]))
+    print(f"  ключей класса «стандарт» в каталоге (защищены всегда): {ст['каталог_ключей']}")
+
+    print("\n  МОЖНО ЛИ ПО ОДНОМУ КЛЮЧУ: лучший предел длины цифр, подобранный по данным"
+          " для каждой приставки (цифр:голых/с размером)")
+    всего_ложных = всего_выброшено = всего_размер = 0
+    for пр, р in sorted(ст["сетка"].items(), key=lambda x: -sum(sum(v) for v in x[1]["цифры"].values())):
+        размер = sum(v[1] for v in р["цифры"].values())
+        всего_ложных += р["ложный_код"]
+        всего_выброшено += р["выброшен"]
+        всего_размер += размер
+        print(f"    {пр:<9s} " + " ".join(f"{ц}:{г}/{с}" for ц, (г, с) in р["цифры"].items())
+              + f"  → предел {р['предел']}: ложных кодов {р['ложный_код']},"
+                f" выброшено с размером {р['выброшен']}")
+    print(f"    итого у лучшего предела по длине: ложных кодов {всего_ложных},"
+          f" выброшено стандартов с размером {всего_выброшено} из {всего_размер}")
 
 
 def ч(v) -> int:
@@ -253,6 +464,9 @@ def замер(cur, частей: int) -> dict:
     итог["каталог_отвергнуто"] = sum(ч(r[2]) for r in каталог)
 
     итог["_образцы"] = (образцы_спроса, образцы_цен, каталог)
+
+    # ── стандарт с размером: что вернулось в «код» ───────────────────────────
+    итог["стандарт"] = замер_стандарта(cur, п, "part_id" in есть)
     return итог
 
 
@@ -312,6 +526,8 @@ def печать(итог: dict) -> None:
     печать_образцов("спрос", спрос_о)
     печать_образцов("цены «разбор КП»", цены_о)
     печать_образцов("каталог", [(к, о, n) for к, о, n in каталог_о])
+
+    печать_стандарта(итог["стандарт"])
 
 
 def main() -> int:
