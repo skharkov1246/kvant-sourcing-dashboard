@@ -1,0 +1,876 @@
+{
+  "oem_key": "dongfengcumminsengine",
+  "name": "Dongfeng Cummins Engine Co., Ltd. (DCEC)",
+  "segment_focus": "двигатели B/C/L серии в газовом исполнении: номера деталей DCEC против Cummins, дистрибьюторы",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "DCEC — совместное предприятие Cummins Inc. и Dongfeng Automobile на паях 50 на 50, завод в Сянъяне (провинция Хубэй). Страницы chinatrucks.org и chinabuses.org приписывают ему газовые двигатели серий B, C и L: 3,9–13 л, 80–680 л.с. Газовые модели DCEC по поколениям:\n(1) B5.9-150G, B5.9-195G, B5.9-230G и BGe 150-30, 195-31, 200-30, 230-31 — 5,9 л, 112–172 кВт, Евро II–III. Данные с сайта экспортёра HekoPower.\n(2) B Gas International (150–230 л.с.) — выпускается по лицензии Cummins Westport с 2006 г.\n(3) L8.9G (2014, 250–320 л.с., Китай V) и B6.7G (2015, 190–255 л.с., Китай V). По Sina, B6.7G делают на заводе DCEC в Сянъяне.\n(4) Нынешние газовые модели Китай VI в линейке dcec.com.cn: D6.7N, Z15N, Z16N.\nМодели B/C/L-газ на официальном сайте DCEC не значатся. Каталогов деталей DCEC для газовых машин в открытом доступе нет.\n\nКоды собраны тремя путями:\n- из разделов руководства владельца Cummins 4021390 (B5.9G / B Gas Plus / B Gas International): фильтры Fleetguard LF 3349 = 3937743, NG 5900 = 3607140, фильтр вентиляции картера 3607166;\n- из карточек продавцов: Оптимус-Групп (Россия, раздел «Cummins Gas BGE/CGE»), QD机电 (Чунцин), Hubei July (Китай);\n- по одному коду из объявлений Rupax, Murcal, jdzj и dsdiesel (Fab Heavy Parts — только для сверки номеров свечи 4955850).\nВсего 39 кодов: свечи, катушки, модули зажигания, датчики (детонации, кислорода, расхода газа, влажности), газовые клапаны и регулятор, термостаты, водяной насос, турбокомпрессоры Holset HX35G/HX40G, поршни, кольца, прокладки, фильтры.\n\nНомер DCEC против номера Cummins. Замечено, что номер DCEC — это буква «C» перед семизначным номером Cummins:\n- поршень газового B: C3922687 = 3922687, замена на 3802630;\n- свеча B6.7G: C5340597 = 5340597;\n- турбокомпрессор HX40W дизельного 6L: C2841270 / 2841270.\nОфициального описания этого правила не найдено.\n\nНормы из руководств Cummins:\n- зазор свечи для C8.3G, C Gas Plus, ISL G и L Gas Plus — 0,32–0,38 мм, не регулировать;\n- для B5.9G 230 л.с. и B Gas Plus 200/230 л.с. — выставить 0,508 мм;\n- свечи меняют через 1000 ч (200 л.с. и выше) или 1500 ч (195 л.с. и ниже).\n\nВ России газовые моторы этих платформ стояли на автобусах:\n- CG8.3 255 л.с. — ЛиАЗ-529370/525657/529267;\n- B6.7G — КАвЗ-4238/4270.\nОфициального дистрибьютора Cummins в России после 2022 г. нет, остались только независимые продавцы.",
+  "machines": [
+    {
+      "model": "B5.9-150G",
+      "kind": "газовый двигатель (КПГ/СПГ, искровое зажигание), рядный 6-цилиндровый, 5,9 л",
+      "segment": "двигатель",
+      "rating": "112 кВт (150 л.с.) при 2500 об/мин",
+      "status": "в текущей линейке dcec.com.cn не значится; экспортёр предлагает новые двигатели",
+      "sources": [
+        "https://www.hekopower.com/Cummins-B5-9-150G-p.html",
+        "https://www.hekopower.com/DCEC.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "B5.9-195G",
+      "kind": "газовый двигатель (КПГ/СПГ), рядный 6-цилиндровый, 5,9 л, степень сжатия 10,5:1",
+      "segment": "двигатель",
+      "rating": "145 кВт (195 л.с.) при 2800 об/мин, 569 Н·м при 1600 об/мин, Евро II (по данным экспортёра)",
+      "status": "в текущей линейке dcec.com.cn не значится; экспортёр заявляет выпуск DCEC в Сянъяне",
+      "sources": [
+        "https://www.hekopower.com/Cummins-B5-9-195G-p.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "B5.9-230G",
+      "kind": "газовый двигатель (КПГ/СПГ), рядный 6-цилиндровый, 5,9 л",
+      "segment": "двигатель",
+      "rating": "172 кВт (230 л.с.) при 2800 об/мин, Евро II (по данным экспортёра)",
+      "status": "в текущей линейке dcec.com.cn не значится",
+      "sources": [
+        "https://www.hekopower.com/Cummins-B5-9-230G-p.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "BGe 150-30",
+      "kind": "газовый двигатель, платформа B 5,9 л",
+      "segment": "двигатель",
+      "rating": "112 кВт (150 л.с.) при 2500 об/мин, Евро II (по данным экспортёра)",
+      "status": "в текущей линейке dcec.com.cn не значится",
+      "sources": [
+        "https://www.hekopower.com/Cummins-BGe-150-30-p.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "BGe 195-31",
+      "kind": "газовый двигатель, платформа B 5,9 л",
+      "segment": "двигатель",
+      "rating": "145 кВт (195 л.с.) при 2800 об/мин (по данным экспортёра)",
+      "status": "в текущей линейке dcec.com.cn не значится",
+      "sources": [
+        "https://www.hekopower.com/Cummins-BGe-195-31-p.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "BGe 200-30",
+      "kind": "газовый двигатель, платформа B 5,9 л",
+      "segment": "двигатель",
+      "rating": "у экспортёра указано «200KW(250HP), 2500 RPM». Это расходится с брошюрой Cummins Westport, где BG-200 — 149 кВт (200 л.с.) при 2800 об/мин; рейтинг не подтверждён",
+      "status": "в текущей линейке dcec.com.cn не значится",
+      "sources": [
+        "https://www.hekopower.com/Cummins-BGe-200-30-p.html",
+        "https://www.cummins.cz/pdf/motory/m/B%20Gas%20Plus%20-%20Natural%20Gas%20Engines.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "BGe 230-31",
+      "kind": "газовый двигатель, платформа B 5,9 л",
+      "segment": "двигатель",
+      "rating": "172 кВт (230 л.с.) при 2800 об/мин, Евро III (по данным экспортёра)",
+      "status": "в текущей линейке dcec.com.cn не значится",
+      "sources": [
+        "https://www.hekopower.com/Cummins-BGe-230-31-p.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "B Gas International (BGI)",
+      "kind": "газовый двигатель платформы B, выпуск на DCEC по лицензии Cummins Westport",
+      "segment": "двигатель",
+      "rating": "150–230 л.с.",
+      "status": "лицензия подписана в октябре 2005 г., начало выпуска планировалось на 2006 г.; нынешний статус не подтверждён",
+      "sources": [
+        "https://www.aftermarketnews.com/cummins-westport-completes-agreement-for-engine-manufacturing-in-china/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "B Gas Plus (BG-195, BG-200, BG-230)",
+      "kind": "газовый двигатель Cummins Westport 5,9 л, обеднённая смесь, ЭБУ CM556",
+      "segment": "двигатель",
+      "rating": "BG-195: 145 кВт при 2800 об/мин, 569 Н·м; BG-200: 149 кВт, 630 Н·м; BG-230: 172 кВт, 678 Н·м; Евро V/EEV",
+      "status": "изделие Cummins Westport (брошюра 4971311, 2011 г.); выпуск на DCEC не подтверждён, взят для сверки номеров B-газа",
+      "sources": [
+        "https://www.cummins.cz/pdf/motory/m/B%20Gas%20Plus%20-%20Natural%20Gas%20Engines.pdf"
+      ],
+      "verified": false
+    },
+    {
+      "model": "C Gas Plus (CGe 250-30, CGe 250-31, CGe 280-30)",
+      "kind": "газовый двигатель Cummins Westport 8,3 л, обеднённая смесь, катушка на свече, ЭБУ CM556",
+      "segment": "двигатель",
+      "rating": "CGe 250-30: 187 кВт при 2400 об/мин, 1017 Н·м; CGe 250-31: 187 кВт, 895 Н·м; CGe 280-30: 209 кВт, 1152 Н·м; Евро III/IV",
+      "status": "по брошюре 4103878 (2010 г.) двигатели выпускает Cummins; выпуск на DCEC не подтверждён. Двигатель ставили на автобусы ЛиАЗ (CG8.3, 255 л.с.)",
+      "sources": [
+        "https://www.cummins.cz/pdf/motory/m/C%20Gas%20Plus%20-%20Natural%20Gas%20Engines.pdf",
+        "https://dvsparts.ru/statiy/article_post/gazovye-dvigateli-cummins"
+      ],
+      "verified": false
+    },
+    {
+      "model": "L8.9G",
+      "kind": "газовый двигатель 8,9 л, первый газовый двигатель Cummins, разработанный для Китая",
+      "segment": "двигатель",
+      "rating": "250–320 л.с., 1200 Н·м, Китай V (выпуск 2014 г.)",
+      "status": "по Cummins China, серии B6.7G/L8.9G отвечают нормам Китай V и Китай VI; в текущей линейке dcec.com.cn не значится",
+      "sources": [
+        "https://www.360che.com/news/140516/31170.html",
+        "https://www.cummins.com.cn/%E5%85%AC%E8%B7%AF%E7%94%A8%E5%8F%91%E5%8A%A8%E6%9C%BA",
+        "https://m.chinatruck.org/news/15_47857.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "B6.7G",
+      "kind": "газовый двигатель 6,7 л на платформе B, для автобусов 8–12 м",
+      "segment": "двигатель",
+      "rating": "190–255 л.с., 860 Н·м, Китай V; выпуск объявлен 11.05.2015",
+      "status": "по Sina, двигатель выпускается на заводе DCEC в Сянъяне; сейчас в линейке dcec.com.cn не значится. В России стоял на КАвЗ-4238/4270",
+      "sources": [
+        "https://auto.sina.cn/news/2015-05-11/detail-ianfzhnk0829813.d.html",
+        "https://www.cummins.com.cn/%E5%85%AC%E8%B7%AF%E7%94%A8%E5%8F%91%E5%8A%A8%E6%9C%BA",
+        "https://dvsparts.ru/statiy/article_post/gazovye-dvigateli-cummins"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D6.7N",
+      "kind": "газовый двигатель 6,7 л (Китай VI) для грузовиков и автобусов",
+      "segment": "двигатель",
+      "rating": "140–205 кВт, до 280 л.с., до 1100 Н·м, Китай VI",
+      "status": "выпускается (линейка dcec.com.cn); по chinabuses — газовая модель, пришедшая на смену 15N",
+      "sources": [
+        "https://www.dcec.com.cn/product/kc-pro-detail-2027.htm",
+        "https://www.dcec.com.cn/product/kcy-pro-detail-2053.htm",
+        "https://m.chinabuses.com/news/8/article_104899.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Z15N",
+      "kind": "газовый двигатель 14,5–15 л (Китай VI) для тяжёлых грузовиков — вне фокуса B/C/L",
+      "segment": "двигатель",
+      "rating": "15N — до 550 л.с. и 2600 Н·м (новость Cummins China 2020; завод в новости не назван)",
+      "status": "выпускается (линейка dcec.com.cn)",
+      "sources": [
+        "https://www.dcec.com.cn/product/ka-che-fa-dong-ji-list-0.htm",
+        "https://www.cummins.com.cn/news/2020/09/28/kangmingsituichuquanxintianranqiguoliuzhongxingdonglijiejuefangan"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Z16N",
+      "kind": "газовый двигатель (Китай VI) для тяжёлых грузовиков — вне фокуса B/C/L",
+      "segment": "двигатель",
+      "rating": "в основном исполнении 700 л.с., 3200 Н·м (новость chinatruck, январь 2026 г.)",
+      "status": "выпускается (линейка dcec.com.cn)",
+      "sources": [
+        "https://www.dcec.com.cn/product/ka-che-fa-dong-ji-list-0.htm",
+        "https://m.chinatruck.org/news/15_135373.html"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "B5.9G, B5.9 LPG, B Gas Plus, B LPG Plus, and B Gas International Engines – Owners Manual",
+      "doc_no": "4021390",
+      "machine": "B5.9G, B Gas Plus, B Gas International (платформа B-газ)",
+      "kind": "O&M (руководство владельца): регламент ТО, фильтры, зазоры",
+      "sources": [
+        "http://www.dieselmotors.info/category/cummins/4021390",
+        "http://www.dieselmotors.info/cummins/4021390/4021390-49-102-002-owner.html"
+      ]
+    },
+    {
+      "title": "B5.9G, B5.9LPG, B Gas Plus, B LPG Plus, B Gas International, and G5.9 Engines – Troubleshooting and Repair Manual",
+      "doc_no": "3666164",
+      "machine": "B5.9G, B Gas Plus, B Gas International, G5.9",
+      "kind": "service manual (поиск неисправностей и ремонт базового двигателя)",
+      "sources": [
+        "http://www.dieselmotors.info/category/cummins/3666164"
+      ]
+    },
+    {
+      "title": "Electronic Control System Gas Plus Engines – Troubleshooting and Repair Manual",
+      "doc_no": "4021317",
+      "machine": "B Gas Plus, C Gas Plus, L Gas Plus",
+      "kind": "service manual (электронная система управления)",
+      "sources": [
+        "http://www.dieselmotors.info/category/cummins/4021317"
+      ]
+    },
+    {
+      "title": "Troubleshooting and Repair Manual, Electronic Control System, B5.9G, B5.9LPG, C8.3G, L10G Electronic Control Systems",
+      "doc_no": "3666118",
+      "machine": "B5.9G, C8.3G",
+      "kind": "service manual (электронная система управления) — известен только по перечню литературы",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021390/4021390-49-205-001-owner.html"
+      ]
+    },
+    {
+      "title": "B5.9G, B5.9LPG Wiring Diagram",
+      "doc_no": "3666119",
+      "machine": "B5.9G",
+      "kind": "электрическая схема — известна только по перечню литературы",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021390/4021390-49-205-001-owner.html"
+      ]
+    },
+    {
+      "title": "Parts Catalog, B5.9G and B5.9LPG",
+      "doc_no": "3672079",
+      "machine": "B5.9G",
+      "kind": "parts manual — известен только по перечню, текст не найден",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021390/4021390-49-205-001-owner.html"
+      ]
+    },
+    {
+      "title": "Parts Catalog, B Gas Plus",
+      "doc_no": "4056515",
+      "machine": "B Gas Plus",
+      "kind": "parts manual — известен только по перечню, текст не найден",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021390/4021390-49-205-001-owner.html"
+      ]
+    },
+    {
+      "title": "C Gas Plus Wiring Diagram (в перечне 4021390 — Gas Plus Wiring Diagram)",
+      "doc_no": "4021276",
+      "machine": "C Gas Plus (Gas Plus)",
+      "kind": "электрическая схема — известна только по перечню литературы",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021317/4021317-85-205-001.html",
+        "http://www.dieselmotors.info/cummins/4021390/4021390-49-205-001-owner.html"
+      ]
+    },
+    {
+      "title": "B Gas International Wiring Diagram",
+      "doc_no": "4021521",
+      "machine": "B Gas International",
+      "kind": "электрическая схема — известна только по перечню литературы",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021390/4021390-49-205-001-owner.html"
+      ]
+    },
+    {
+      "title": "Troubleshooting and Repair Manual C8.3G (Natural Gas) Engines",
+      "doc_no": "3666206",
+      "machine": "C8.3G",
+      "kind": "service manual — известен только по перечню литературы",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021317/4021317-85-205-001.html"
+      ]
+    },
+    {
+      "title": "Operation and Maintenance Manual C8.3G Engines",
+      "doc_no": "3666183",
+      "machine": "C8.3G",
+      "kind": "O&M — известен только по перечню литературы",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021317/4021317-85-205-001.html"
+      ]
+    },
+    {
+      "title": "Mechanical Gas Fuel System G5.9, G8.3, G855, G14, G19, G28, G38, G50, K19GC and KTA38GC Engines – Master Repair Manual",
+      "doc_no": "4021404",
+      "machine": "G5.9, G8.3 (промышленные газовые двигатели платформ B и C, Cummins)",
+      "kind": "service manual (механическая газовая топливная система); применимость к DCEC не подтверждена",
+      "sources": [
+        "http://www.dieselmotors.info/category/cummins/4021404"
+      ]
+    },
+    {
+      "title": "Every Alternative. C Gas Plus. Natural Gas Engines For Truck And Bus",
+      "doc_no": "Bulletin 4103878",
+      "machine": "C Gas Plus (CGe 250-30, CGe 250-31, CGe 280-30)",
+      "kind": "брошюра со спецификацией и интервалами обслуживания",
+      "sources": [
+        "https://www.cummins.cz/pdf/motory/m/C%20Gas%20Plus%20-%20Natural%20Gas%20Engines.pdf"
+      ]
+    },
+    {
+      "title": "Every Alternative. B Gas Plus",
+      "doc_no": "Bulletin 4971311",
+      "machine": "B Gas Plus (BG-195, BG-200, BG-230)",
+      "kind": "брошюра со спецификацией",
+      "sources": [
+        "https://www.cummins.cz/pdf/motory/m/B%20Gas%20Plus%20-%20Natural%20Gas%20Engines.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "3964408",
+      "issuer": "Cummins",
+      "description": "Свеча зажигания, 6 шт. на двигатель. По данным продавца заменяет 3922756, сама заменена на 4089629",
+      "machine": "ISB5.9G, B5.9 G, B5.9 Gas Plus (по данным продавца)",
+      "unit": "система зажигания",
+      "doc_ref": "Карточка продавца QD机电 (Чунцин). Применимость продавец даёт списком по платформе B, вперемешку с дизельными моделями; сверять по ESN",
+      "source_url": "https://cqksgs.com/product/3964408/",
+      "quote": "ISB5.9G CM2180发动机火花塞 3964408"
+    },
+    {
+      "code": "4089629",
+      "issuer": "Cummins",
+      "description": "Номер, на который, по тексту продавца, заменён 3964408 (цепочка 3922756 → 3964408 → 4089629). В перечне сопутствующих деталей той же карточки 4089629 назван «火花塞修理包» — ремкомплект (комплект) свечи, а не свеча; что именно поставляется под этим номером — сверять",
+      "machine": "B5.9 G, ISB5.9G, B5.9 Gas Plus (по данным продавца)",
+      "unit": "система зажигания",
+      "doc_ref": "Карточка QD机电 на 3964408, раздел «产品说明»",
+      "source_url": "https://cqksgs.com/product/3964408/",
+      "quote": "该火花塞件号为3964408，单次保养用量为6件。此件号已升级为4089629，并可替代旧件号3922756。"
+    },
+    {
+      "code": "4089086",
+      "issuer": "Cummins",
+      "description": "Свеча зажигания газового двигателя BGE. Варианты номеров у продавца: 4025235, 3607271, 4025236",
+      "machine": "BGe 5.9 (B-газ)",
+      "unit": "система зажигания",
+      "doc_ref": "Каталог Оптимус-Групп, раздел «Запчасти Cummins Gas BGE/CGE». Цепочка номеров расходится с QD机电",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Svecha_zazhiganija_Cummins_Gas_BGE_4089086_4025235_3607271_4025236-34792.html",
+      "quote": "Свеча зажигания Cummins Gas BGE 4089086 4025235 3607271 4025236"
+    },
+    {
+      "code": "3966404",
+      "issuer": "Cummins",
+      "description": "Высоковольтный провод свечи. На B Gas Plus катушки стоят на впускном коллекторе и соединены со свечами проводами (руководство 4021317, раздел 101-007)",
+      "machine": "BGe 5.9, B5.9G, B Gas Plus",
+      "unit": "система зажигания",
+      "doc_ref": "То же у Hubei July: «ignition harness 3966404». У QD机电 заменил 3938886 и 3934221",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Provod_svechi_Cummins_BGe_5_3966404-33995.html",
+      "quote": "Провод свечи Cummins BGe 5 3966404"
+    },
+    {
+      "code": "3937301",
+      "issuer": "Cummins",
+      "description": "Катушка (модуль) зажигания; у продавца варианты 5473993 и 3922701",
+      "machine": "BGe 5.9, B Gas Plus. Продавец относит её и к CG250/280, но по руководству 4021317 на C Gas Plus катушка стоит прямо на свече; сверять",
+      "unit": "система зажигания",
+      "doc_ref": "Объявление RuPax. У QD机电 3937301 заменяет 3922701, в перечне применимости — B5.9 G, B5.9 GAS PLUS, ISB5.9G",
+      "source_url": "https://rupax.ru/shop/191717/desc/5473993-3937301-3922701-katushka-modul-zazhiganija-cg250-280-cge-bge5-9-gas-plus",
+      "quote": "Катушка модуль зажигания 5473993, 3937301, 3922701 CG250/280/CGE/BGe5.9/GAS PLUS"
+    },
+    {
+      "code": "3933577",
+      "issuer": "Cummins",
+      "description": "Модуль управления зажиганием (ICM), 1 шт. на двигатель; заменяет 3922705, сам заменён на 5334728",
+      "machine": "B5.9 G, B5.9 GAS PLUS, ISB5.9G, G5.9 (по перечню продавца, который смешан с дизельными моделями платформы)",
+      "unit": "система зажигания",
+      "doc_ref": "Карточка QD机电",
+      "source_url": "https://cqksgs.com/product/3933577/",
+      "quote": "本点火控制模块，件号3933577，每台发动机用量为1件。"
+    },
+    {
+      "code": "5334728",
+      "issuer": "Cummins",
+      "description": "Модуль управления зажиганием — действующий номер вместо 3933577 и 3922705 (по QD机电)",
+      "machine": "B5.9 G, B5.9 GAS PLUS, ISB5.9G (по данным продавца)",
+      "unit": "система зажигания",
+      "doc_ref": "Карточка QD机电 на 3933577. Оптимус-Групп ставит 5334728 в один ряд с модулями C-газа CG250/280 — расхождение",
+      "source_url": "https://cqksgs.com/product/3933577/",
+      "quote": "请注意，此件号已升级为5334728，同时本件可替代旧件号3922705。"
+    },
+    {
+      "code": "4955850",
+      "issuer": "Cummins",
+      "description": "Свеча зажигания C/L-газа. Варианты у продавца: 2882116, 4937472, 4955851. Зазор 0,32–0,38 мм, не регулировать (3666164, раздел 013-016, табл. 1)",
+      "machine": "CGe 250/280 (C Gas Plus), L Gas Plus, ISL G; продавцы относят также к ISB5.9G",
+      "unit": "система зажигания",
+      "doc_ref": "Каталог Оптимус-Групп, раздел «Запчасти Cummins Gas BGE/CGE». Тот же набор номеров — у Fab Heavy Parts: 4955850, 4937472, 5473010",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Svecha_zazhiganija_Cummins_Gas_2882116_4937472_4955850_4955851-33999.html",
+      "quote": "Свеча зажигания Cummins Gas 2882116 4937472 4955850 4955851"
+    },
+    {
+      "code": "GK3-7",
+      "issuer": "Denso (аналог для вторичного рынка)",
+      "description": "Иридиевая свеча Denso GK3-7 (6128). Вместе с колпачком 97-8200 образует набор, заменяющий номер Cummins 4955850",
+      "machine": "ISL G (КПГ), по данным продавца",
+      "unit": "система зажигания",
+      "doc_ref": "Карточка Murcal; изготовитель оригинальной свечи Cummins этим не установлен",
+      "source_url": "https://www.murcal.com/DENSO-Cummins-Spark-Plug-Boot-Kit",
+      "quote": "We've combined the Denso GK3-7 (6128) Iridium Saver Spark Plug and a specially designed rubber boot (97-8200) to create an aftermarket kit that replaces Cummins part # 4955850."
+    },
+    {
+      "code": "3964547",
+      "issuer": "Cummins",
+      "description": "Катушка зажигания, устанавливается на свечу (coil-on-plug), 6 шт. на двигатель. Заменена на 5310989, заменяет 3934684",
+      "machine": "C GAS PLUS, L GAS PLUS, ISL G, G8.3, GTA8.3 (по перечню продавца)",
+      "unit": "система зажигания",
+      "doc_ref": "Карточка QD机电",
+      "source_url": "https://cqksgs.com/product/3964547/",
+      "quote": "此件号3964547已升级为5310989，并可替代旧件号3934684。"
+    },
+    {
+      "code": "5310989",
+      "issuer": "Cummins",
+      "description": "Катушка зажигания C Gas Plus — действующий номер. Варианты у продавца: 3964547, 3934684, 3608003, 3930027, 3928263",
+      "machine": "CGe 280 / CGe 250 (C Gas Plus)",
+      "unit": "система зажигания",
+      "doc_ref": "Каталог Оптимус-Групп, раздел «Запчасти Cummins Gas BGE/CGE»",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Katushka_zazhiganija_Cummins_CGE280_GAS_PLUS_5310989_3964547_3934684_3608003_3930027_3928263-36497.html",
+      "quote": "Катушка зажигания Cummins CGE280 GAS PLUS 5310989 3964547 3934684 3608003 3930027 3928263"
+    },
+    {
+      "code": "3973087",
+      "issuer": "Cummins",
+      "description": "Модуль управления зажиганием. Продавец ставит рядом номера 3968025, 3968024, 3933576, 3928272 и 5334728, смешивая, по QD机电, модули B- и C-исполнения",
+      "machine": "CG250, CG280 (C Gas Plus)",
+      "unit": "система зажигания",
+      "doc_ref": "Каталог Оптимус-Групп. У QD机电 3973087 заменяет 3968024",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Blok_upravlenija_zazhiganiem_Cummins_CG250_CG280_3973087_3968025_3968024_3933576_3928272_5334728-34752.html",
+      "quote": "Блок управления зажиганием Cummins CG250 CG280 3973087 3968025 3968024 3933576 3928272 5334728"
+    },
+    {
+      "code": "5320525",
+      "issuer": "Cummins",
+      "description": "Модуль зажигания газового двигателя. По QD机电 заменяет 5296050, в перечне применимости — C GAS PLUS, L GAS PLUS, ISL G",
+      "machine": "C/L Gas Plus, ISL G (по данным продавцов)",
+      "unit": "система зажигания",
+      "doc_ref": "Раздел Hubei July «Cummins natural gas engine parts»",
+      "source_url": "https://julyup.com/product/5237.html",
+      "quote": "Cummins natural gas engine ignition module 5320525"
+    },
+    {
+      "code": "3607945",
+      "issuer": "Cummins",
+      "description": "Датчик детонации; вариант у продавца — 2897654",
+      "machine": "CGE280 (C Gas Plus)",
+      "unit": "система управления (защита от детонации)",
+      "doc_ref": "Каталог Оптимус-Групп. Датчик детонации описан в разделе 019-346 руководства 4021317",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Datchik_detonacii_Cummins_CGE280_GAS_PLUS_3607945_2897654-34732.html",
+      "quote": "Датчик детонации Cummins CGE280 GAS PLUS 3607945 2897654"
+    },
+    {
+      "code": "4001675",
+      "issuer": "Cummins",
+      "description": "Датчик кислорода в выпуске, с подогревом (по руководству 4021317 стоит за турбиной)",
+      "machine": "CG250, CG280 (C Gas Plus)",
+      "unit": "выпуск / регулирование состава смеси",
+      "doc_ref": "Каталог Оптимус-Групп; руководство 4021317, раздел 019-100 «Heated Oxygen Sensor»",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Datchik_kisloroda_Cummins_CG250_CG280_4001675-35468.html",
+      "quote": "Датчик кислорода Cummins CG250 CG280 4001675"
+    },
+    {
+      "code": "5337744",
+      "issuer": "Cummins",
+      "description": "Датчик кислорода; вариант у продавца — 4365050",
+      "machine": "B6.7G",
+      "unit": "выпуск / регулирование состава смеси",
+      "doc_ref": "Каталог Оптимус-Групп, раздел «Запчасти Cummins Gas BGE/CGE»",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Datchik_kisloroda_Cummins_B6_7G_5337744_4365050-43081.html",
+      "quote": "Датчик кислорода Cummins B6.7G 5337744 4365050"
+    },
+    {
+      "code": "3929935",
+      "issuer": "Cummins",
+      "description": "Датчик массового расхода газа",
+      "machine": "CGE280; Hubei July относит его также к BGE",
+      "unit": "газовая топливная система",
+      "doc_ref": "Каталог Оптимус-Групп. У Hubei July — «CGE Air Flow Meter BGE 3929935»; в руководстве 4021317 это раздел 019-101 «Gas Mass Flow Sensor»",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Datchik_rashoda_gaza_Cummins_CGE280_3929935-37025.html",
+      "quote": "Датчик расхода газа Cummins CGE280 3929935"
+    },
+    {
+      "code": "3933846",
+      "issuer": "Cummins",
+      "description": "Клапан управления подачей газа (fuel control valve, в корпусе смесителя). Варианты у продавца: 3922721, 3084459, 3933847",
+      "machine": "CGE280, BGe5 (Gas Plus)",
+      "unit": "газовая топливная система",
+      "doc_ref": "Каталог Оптимус-Групп; руководство 4021317, раздел 019-102",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Klapan_upravlenija_podachi_gaza_Cummins_CGE280_BGe5_GAS_PLUS_3933846_3922721_3084459_3933847-35154.html",
+      "quote": "Клапан управления подачи газа Cummins CGE280 BGe5 GAS PLUS 3933846 3922721 3084459 3933847"
+    },
+    {
+      "code": "3931710",
+      "issuer": "Cummins",
+      "description": "Отсечной электромагнитный клапан газа. Продавец ставит его в один ряд с 3929160, 3922752, 3933080, 5397343",
+      "machine": "CGE280 (C Gas Plus)",
+      "unit": "газовая топливная система",
+      "doc_ref": "Каталог Оптимус-Групп; руководство 4021317, раздел 019-050 «Fuel Shutoff Valve»",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Klapan_ostanovki_podachi_gaza_Cummins_CGE280_3931710_3929160_3922752_3933080_5397343-37055.html",
+      "quote": "Клапан остановки подачи газа Cummins CGE280 3931710 3929160 3922752 3933080 5397343"
+    },
+    {
+      "code": "3607278",
+      "issuer": "Cummins",
+      "description": "Регулятор давления газа",
+      "machine": "ISBe 5.9G (по данным продавца)",
+      "unit": "газовая топливная система",
+      "doc_ref": "Каталог Оптимус-Групп. Регуляторы низкого и высокого давления описаны в 3666164, разделы 005-047 и 005-061",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Reguljator_davlenija_gaza_Cummins_ISBE_5_9G_3607278-36976.html",
+      "quote": "Регулятор давления газа Cummins ISBE 5.9G 3607278"
+    },
+    {
+      "code": "4955125",
+      "issuer": "Cummins",
+      "description": "Датчик влажности; второй номер у продавца — 4062315",
+      "machine": "ISC в газовом исполнении на грузовиках Dongfeng (по данным продавца)",
+      "unit": "система управления (впуск)",
+      "doc_ref": "Объявление Shiyan Dongsu (十堰东速). Датчик влажности есть в руководстве 4021317, раздел 019-356",
+      "source_url": "http://www.dsdiesel.com/c_productshow/?2643-4955125-2643.html",
+      "quote": "东风卡车ISC燃气发动机零件湿度传感器4955125 4062315"
+    },
+    {
+      "code": "3928639",
+      "issuer": "Cummins",
+      "description": "Термостат на 76 °C; варианты у продавца 3907242 и 3901845",
+      "machine": "CGe250, CGe280, C Gas Plus (платформа 6CT)",
+      "unit": "система охлаждения",
+      "doc_ref": "Каталог Оптимус-Групп",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Termostat_Cummins_CGe250_CGe280_C_Gas_Plus_6CT_t_76_C_3928639_3907242_3901845-35142.html",
+      "quote": "Термостат Cummins CGe250,CGe280,C Gas Plus 6CT t=76 C 3928639 3907242 3901845"
+    },
+    {
+      "code": "4080631",
+      "issuer": "Cummins",
+      "description": "Термостат на 83 °C",
+      "machine": "BGE 5.9",
+      "unit": "система охлаждения",
+      "doc_ref": "Каталог Оптимус-Групп",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Termostat_Cummins_BGE_5_9_t_83_C_4080631-36426.html",
+      "quote": "Термостат Cummins BGE 5.9 t=83 C 4080631"
+    },
+    {
+      "code": "3800976",
+      "issuer": "Cummins",
+      "description": "Водяной насос; варианты у продавца 3285324, 3929614, 3925540",
+      "machine": "CGE280 (C Gas Plus)",
+      "unit": "система охлаждения",
+      "doc_ref": "Каталог Оптимус-Групп",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Nasos_vodjanoi_Cummins_CGE280_GAS_PLUS_3800976_3285324_3929614_3925540-34724.html",
+      "quote": "Насос водяной Cummins CGE280 GAS PLUS 3800976 3285324 3929614 3925540"
+    },
+    {
+      "code": "4039930",
+      "issuer": "Cummins (Holset)",
+      "description": "Турбокомпрессор HX40G; варианты у продавца 4040023, 4039992, 4040022",
+      "machine": "CGe (C Gas Plus), Евро-4, автобусы ЛиАЗ",
+      "unit": "наддув",
+      "doc_ref": "Каталог Оптимус-Групп",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Turbokompressor_Cummins_HX40G_CGe_C_Gas_Plus_Evro4__LIAZ_SOR__4039930_4040023_4039992_4040022-34725.html",
+      "quote": "Турбокомпрессор Cummins HX40G CGe C Gas Plus Eвро-4 (ЛИАЗ SOR) 4039930 4040023 4039992 4040022"
+    },
+    {
+      "code": "3768610",
+      "issuer": "Cummins (Holset)",
+      "description": "Турбокомпрессор HX35G; варианты у продавца 5327404 и 5329431",
+      "machine": "BGE 230 л.с.",
+      "unit": "наддув",
+      "doc_ref": "Каталог Оптимус-Групп.",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Turbokompressor_Cummins_HX35G_BGE_230_l_s__3768610_5327404_5329431-37143.html",
+      "quote": "Турбокомпрессор Cummins HX35G BGE 230 л.с. 3768610 5327404 5329431"
+    },
+    {
+      "code": "2881955",
+      "issuer": "Cummins",
+      "description": "Верхний комплект прокладок",
+      "machine": "BGe (B-газ)",
+      "unit": "головка блока / уплотнения",
+      "doc_ref": "Каталог Оптимус-Групп",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Kt_prokladok_verhnii_Cummins_BGe_2881955-33033.html",
+      "quote": "К-т прокладок верхний Cummins BGe 2881955"
+    },
+    {
+      "code": "4025290",
+      "issuer": "Cummins",
+      "description": "Комплект поршневых колец на один поршень. Варианты у продавца: 4089351, 3802814, 3802913, 4025289, 4089347",
+      "machine": "Gas Plus (C/L-газ; у QD机电 в перечне также B5.9 G и ISB5.9G)",
+      "unit": "цилиндропоршневая группа",
+      "doc_ref": "Каталог Оптимус-Групп; у Hubei July продаётся как «natural gas engine piston ring 4025290»",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Kolca_porshnevie__kt_na_porshen__Cummins_GAS_PLUS_4025290_4089351_3802814_3802913_4025289_4089347-37019.html",
+      "quote": "Кольца поршневые (к-т на поршень) Cummins GAS PLUS 4025290 4089351 3802814 3802913 4025289 4089347"
+    },
+    {
+      "code": "3922687",
+      "issuer": "Cummins",
+      "description": "Поршень газового двигателя; вариант (замена) — 3802630",
+      "machine": "G6B5.9 / B5.9 газ (по данным продавца)",
+      "unit": "цилиндропоршневая группа",
+      "doc_ref": "Каталог Оптимус-Групп. У QD机电 3922687 заменён на 3802630. Номер DCEC для той же детали — C3922687 (Hubei July)",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Porshen__na_DVS__rabotayushii_na_gaze_Cummins_4BT__6BT__G6B5_9_3922687_3802630-36589.html",
+      "quote": "Поршень  на ДВС, работающий на газе Cummins 4BT, 6BT, G6B5.9 3922687 3802630"
+    },
+    {
+      "code": "C3922687",
+      "issuer": "Dongfeng Cummins (DCEC)",
+      "description": "Поршень газового двигателя по номеру DCEC: буква C перед номером Cummins 3922687",
+      "machine": "газовые двигатели DCEC платформы B (по данным продавца)",
+      "unit": "цилиндропоршневая группа",
+      "doc_ref": "Раздел Hubei July «Cummins natural gas engine parts»",
+      "source_url": "https://julyup.com/product/5234.html",
+      "quote": "Dongfeng Cummins engine natural gas piston C3922687"
+    },
+    {
+      "code": "LF3349",
+      "issuer": "Fleetguard (Cummins Filtration)",
+      "description": "Масляный фильтр; номер Cummins — 3937743. Замена через 250 ч, 10 000 км или 3 мес. (раздел 102-002)",
+      "machine": "B5.9G, B Gas Plus, B Gas International",
+      "unit": "система смазки",
+      "doc_ref": "Руководство владельца 4021390, раздел 018-024 «Cummins/Fleetguard Filter Specifications»; в источнике записано «LF 3349»",
+      "source_url": "http://www.dieselmotors.info/cummins/4021390/4021390-49-018-024-om.html",
+      "quote": "Lubricating Oil Filter Part Numbers Cummins Filtration Solutions LF 3349"
+    },
+    {
+      "code": "3937743",
+      "issuer": "Cummins",
+      "description": "Масляный фильтр по номеру Cummins; то же, что Fleetguard LF 3349",
+      "machine": "B5.9G, B Gas Plus, B Gas International",
+      "unit": "система смазки",
+      "doc_ref": "Руководство владельца 4021390, раздел 018-024",
+      "source_url": "http://www.dieselmotors.info/cummins/4021390/4021390-49-018-024-om.html",
+      "quote": "LF 3349 Cummins Inc. 3937743"
+    },
+    {
+      "code": "NG5900",
+      "issuer": "Fleetguard (Cummins Filtration)",
+      "description": "Фильтр газового топлива, улавливает масло из газа. Номер Cummins — 3607140. Замена через 1000 ч, 38 000 км или 12 мес.",
+      "machine": "B5.9G, B Gas Plus, B Gas International",
+      "unit": "газовая топливная система",
+      "doc_ref": "Руководство 4021390, разделы 018-024 и 102-002; в источнике записано «NG 5900»",
+      "source_url": "http://www.dieselmotors.info/cummins/4021390/4021390-49-018-024-om.html",
+      "quote": "Fuel Filter Part Numbers Cummins Filtration Solutions NG 5900"
+    },
+    {
+      "code": "3607140",
+      "issuer": "Cummins",
+      "description": "Фильтр газового топлива по номеру Cummins; то же, что Fleetguard NG 5900",
+      "machine": "B5.9G, B Gas Plus, B Gas International",
+      "unit": "газовая топливная система",
+      "doc_ref": "Руководство 4021390, раздел 018-024",
+      "source_url": "http://www.dieselmotors.info/cummins/4021390/4021390-49-018-024-om.html",
+      "quote": "NG 5900 Cummins Inc. 3607140"
+    },
+    {
+      "code": "3607166",
+      "issuer": "Cummins",
+      "description": "Фильтр закрытой вентиляции картера. Замена через 500 ч, 19 000 км или 6 мес., а также при давлении в картере 188,7 мм вод. ст.",
+      "machine": "B5.9G, B Gas Plus, B Gas International",
+      "unit": "вентиляция картера",
+      "doc_ref": "Руководство 4021390, разделы 018-024 и 102-002",
+      "source_url": "http://www.dieselmotors.info/cummins/4021390/4021390-49-018-024-om.html",
+      "quote": "Closed Crankcase Ventilation Filter 3607166"
+    },
+    {
+      "code": "BF7695",
+      "issuer": "Baldwin (номер аналога)",
+      "description": "Фильтр природного газа; продавец подаёт его как фильтр газа Dongfeng Cummins. По перекрёстным перечням соответствует NG5900 и Cummins 3606712 / 3607140",
+      "machine": "газовые двигатели DCEC (по данным продавца)",
+      "unit": "газовая топливная система",
+      "doc_ref": "Раздел Hubei July «Cummins natural gas engine parts». Соответствие NG5900 — по petroil.net (P550735 … 3606712 BF7695 NG5900)",
+      "source_url": "https://julyup.com/product/5227.html",
+      "quote": "Dongfeng Cummins natural gas filter BF7695"
+    },
+    {
+      "code": "5340597",
+      "issuer": "Cummins",
+      "description": "Свеча зажигания под номером Cummins; у продавца «Производитель: Китай» — неоригинал под номером Cummins. Номер DCEC для той же детали — C5340597",
+      "machine": "B6.7G",
+      "unit": "система зажигания",
+      "doc_ref": "Каталог Оптимус-Групп, раздел «Запчасти Cummins Gas BGE/CGE»; в карточке «Производитель: Китай»",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Svecha_zazhiganija_Cummins_B6_7_G_5340597-43073.html",
+      "quote": "Свеча зажигания Cummins B6.7 G 5340597"
+    },
+    {
+      "code": "C5340597",
+      "issuer": "Dongfeng Cummins (DCEC)",
+      "description": "Свеча зажигания по номеру DCEC: буква C перед номером Cummins 5340597",
+      "machine": "B6.7G (по номеру Cummins; в карточке продавца модель указана как «ISD» — расхождение)",
+      "unit": "система зажигания",
+      "doc_ref": "Объявление на jdzj.com, в карточке указан бренд 东风康明斯",
+      "source_url": "https://hsjx6688.jdzj.com/supplyinfo-4-5436787.html",
+      "quote": "湖北东康代理C5340597火花塞（发货）"
+    },
+    {
+      "code": "5314536",
+      "issuer": "Cummins",
+      "description": "Катушка зажигания газового двигателя",
+      "machine": "B6.7G / ISB6.7 газ",
+      "unit": "система зажигания",
+      "doc_ref": "Каталог Оптимус-Групп. То же у Hubei July: «Cummins ISB6.7 Natural Gas Original Ignition Coil 5314536»",
+      "source_url": "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Katushka_zazhiganija_Cummins_B6_7G_5314536-43076.html",
+      "quote": "Катушка зажигания Cummins B6.7G 5314536"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Cummins Westport Inc.",
+      "component": "конструкция и лицензия газового двигателя B Gas International (150–230 л.с.) для выпуска на DCEC",
+      "machine": "B Gas International (BGI), BGe",
+      "evidence": "В октябре 2005 г. Cummins Westport через Cummins Inc. подписала с DCEC лицензионное соглашение на выпуск BGI на заводе в Сянфане (ныне Сянъян). Начало производства ожидалось в 2006 г.",
+      "sources": [
+        "https://www.aftermarketnews.com/cummins-westport-completes-agreement-for-engine-manufacturing-in-china/"
+      ]
+    },
+    {
+      "company": "Holset (Cummins Turbo Technologies)",
+      "component": "турбокомпрессоры HX35G (BGE 230 л.с.) и HX40G (CGe / C Gas Plus)",
+      "machine": "BGe 230, C Gas Plus",
+      "evidence": "Обозначения HX35G и HX40G относятся к ряду Holset HX. Их называют карточки продавца Оптимус-Групп. У дизельного DCEC 6L продавец xzr8 указывает Holset HX40W с номером C2841270 / 2841270",
+      "sources": [
+        "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Turbokompressor_Cummins_HX35G_BGE_230_l_s__3768610_5327404_5329431-37143.html",
+        "https://optimusgroup.ru/product/Cummins_Parts_Gas_BGE_CGE/Turbokompressor_Cummins_HX40G_CGe_C_Gas_Plus_Evro4__LIAZ_SOR__4039930_4040023_4039992_4040022-34725.html",
+        "https://www.xzr8.com/info/holset-hx40w-turbocharger-c2841270-cummins-6l290-6l340/"
+      ]
+    },
+    {
+      "company": "Cummins Filtration Solutions (Fleetguard)",
+      "component": "масляный фильтр LF 3349, фильтр газового топлива NG 5900",
+      "machine": "B5.9G, B Gas Plus, B Gas International",
+      "evidence": "Руководство владельца 4021390, раздел 018-024: фильтры Cummins Filtration Solutions ставят на новые двигатели Cummins серийно; приведены номера LF 3349 / 3937743 и NG 5900 / 3607140",
+      "sources": [
+        "http://www.dieselmotors.info/cummins/4021390/4021390-49-018-024-om.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Denso",
+      "component": "свеча зажигания GK3-7 — аналог для вторичного рынка вместо Cummins 4955850",
+      "machine": "ISL G / C-L газ",
+      "evidence": "Murcal продаёт набор Denso GK3-7 с колпачком 97-8200 как аналог для вторичного рынка, заменяющий 4955850. Изготовитель оригинальной свечи Cummins этим не установлен",
+      "sources": [
+        "https://www.murcal.com/DENSO-Cummins-Spark-Plug-Boot-Kit",
+        "https://www.sparkplug-crossreference.com/convert/CUMMINS/4955850"
+      ]
+    },
+    {
+      "company": "Baldwin Filters",
+      "component": "фильтр природного газа BF7695 (аналог NG5900)",
+      "machine": "газовые двигатели DCEC (по данным продавца)",
+      "evidence": "Hubei July продаёт BF7695 как фильтр газа Dongfeng Cummins; перекрёстный перечень petroil ставит его в один ряд с NG5900 и Cummins 3606712. Это аналог для вторичного рынка, а не штатный поставщик",
+      "sources": [
+        "https://julyup.com/product/5227.html",
+        "https://www.petroil.net/productos/filtros-de-combustible/roscados/9872=p550735-filtro-combustible-gas-natural-donaldson-roscado-cdrenaje-cummins-3606712-bf7695-ng5900-33416"
+      ]
+    },
+    {
+      "company": "Donaldson",
+      "component": "фильтр природного газа P550735 (аналог NG5900 / BF7695)",
+      "machine": "двигатели Cummins на природном газе",
+      "evidence": "В перекрёстном перечне продавца: «P550735 … Donaldson … Cummins 3606712 BF7695 NG5900». Аналог для вторичного рынка",
+      "sources": [
+        "https://www.petroil.net/productos/filtros-de-combustible/roscados/9872=p550735-filtro-combustible-gas-natural-donaldson-roscado-cdrenaje-cummins-3606712-bf7695-ng5900-33416"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Dongfeng Cummins Engine Co., Ltd. (DCEC) — собственная сервисная сеть",
+      "country": "Китай",
+      "role": "сервисная сеть изготовителя: более 1500 сервисных точек и более 460 дистрибьюторов запчастей в 31 провинции; проверка подлинности деталей по этикетке DCEC",
+      "sources": [
+        "https://en.dcec.com.cn/service/network.jsp",
+        "https://www.dcec.com.cn/service/chun-zheng-bei-jian.htm"
+      ]
+    },
+    {
+      "company": "Hubei July Industrial and Trade Co., Ltd (julyup.com)",
+      "country": "Китай",
+      "role": "экспортёр запчастей DCEC; ведёт раздел запчастей для газовых двигателей. Независимый, официального статуса не заявлено",
+      "sources": [
+        "https://julyup.com/product/index86.html"
+      ]
+    },
+    {
+      "company": "Chongqing Qingdong Electromechanical Equipment Co., Ltd (QD机电, cqksgs.com)",
+      "country": "Китай",
+      "role": "независимый продавец запчастей Cummins, в том числе газовых B/C/L. На сайте прямо сказано, что авторизации брендов у компании нет",
+      "sources": [
+        "https://cqksgs.com/engine/b5-9-g/"
+      ]
+    },
+    {
+      "company": "HekoPower Group",
+      "country": "Китай",
+      "role": "экспортёр двигателей DCEC в сборе, в том числе газовых B5.9-150G/195G/230G и BGe; независимый",
+      "sources": [
+        "https://www.hekopower.com/DCEC.html"
+      ]
+    },
+    {
+      "company": "Shiyan Dongsu Industry and Trade Co., Ltd (十堰东速工贸有限公司)",
+      "country": "Китай",
+      "role": "продавец запчастей DCEC и CCEC, в том числе газовых ISC",
+      "sources": [
+        "http://www.dsdiesel.com/index_cn.html"
+      ]
+    },
+    {
+      "company": "Оптимус-Групп",
+      "country": "Россия",
+      "role": "независимый продавец запчастей Cummins со складом в Краснодаре; отдельный раздел «Запчасти Cummins Gas BGE/CGE» (B-газ, C Gas Plus, B6.7G)",
+      "sources": [
+        "https://optimusgroup.ru/catalog/Cummins_Parts_Gas_BGE_CGE-30245.html"
+      ]
+    },
+    {
+      "company": "Газимпорт",
+      "country": "Россия",
+      "role": "независимый продавец запчастей Dongfeng Cummins (в каталоге в основном дизельные линейки) в нескольких городах России",
+      "sources": [
+        "https://gazimport.ru/parts/dongfeng-cummins/"
+      ]
+    },
+    {
+      "company": "Cummins Turkey Motor Güç Sistemleri Satış Servis Ltd. Şti.",
+      "country": "Турция",
+      "role": "единственный авторизованный дистрибьютор Cummins в Турции, полностью принадлежит Cummins: двигатели, запчасти, сервис. Страница нашему загрузчику отдаёт 403, данные — из выдержки поиска",
+      "sources": [
+        "https://www.cummins.com/eu/countries/turkey"
+      ]
+    },
+    {
+      "company": "Cummins Arabia",
+      "country": "ОАЭ",
+      "role": "крупнейший дистрибьютор продукции Cummins на Ближнем Востоке, СП Cummins Inc. и Olayan Group (ОАЭ, Саудовская Аравия, Кувейт)",
+      "sources": [
+        "https://www.prnewswire.com/news-releases/cummins-launches-next-gen-battery-energy-storage-systems-bess-in-the-uae-302430201.html"
+      ]
+    },
+    {
+      "company": "Cummins Sales and Services Kazakhstan LLP",
+      "country": "Казахстан",
+      "role": "дистрибьютор Cummins (штаб-квартира в Караганде). Страница локатора отдаёт 403, данные — из выдержки поиска",
+      "sources": [
+        "https://www.cummins.com/en-na/locations/kazakhstan/karaganda/cummins-sales-and-services-kazakhstan-llp-hq"
+      ]
+    }
+  ],
+  "gaps": [
+    "Каталоги деталей DCEC для газовых двигателей (по CPL/ESN) открыто не найдены. На dcec.com.cn газовые модели B/C/L не значатся: из газовых там есть только D6.7N, Z15N и Z16N (Китай VI), а каталоги деталей не выложены. Каталоги лежат, вероятно, у сервисной сети DCEC и в Cummins QuickServe Online (подписка), а также в интернет-магазине Cummins China (mp.cummins.com.cn, нужен вход).",
+    "Каталоги Cummins 3672079 (B5.9G/B5.9LPG) и 4056515 (B Gas Plus), руководства 3666206 и 3666183 (C8.3G), 3666118 (система управления B5.9G/C8.3G) и схемы 3666119, 4021276, 4021521 известны только по номеру в перечнях литературы. Тексты не найдены — вероятно, лежат в QuickServe Online.",
+    "Руководства Cummins 4021390, 3666164 и 4021317 прочитаны на стороннем сайте dieselmotors.info (перепечатка разделов QuickServe). Подлинник у Cummins не сверен.",
+    "Правило номеров DCEC (буква C перед номером Cummins) выведено по трём парам: C3922687/3922687, C5340597/5340597, C2841270/2841270. Официального описания нет. Встречаются и номера DCEC без пары, например C6463316 и C6479779 для 15N у Hubei July.",
+    "Применимость у продавцов QD机电 и RuPax дана на уровне платформы: в перечни попадают дизельные QSB/QSL. Её нужно сверять по ESN. Есть противоречия: 5334728 (QD机电 — модуль B-газа, Оптимус-Групп — рядом с модулями CG250/280); 3937301 (RuPax относит к CG250/280, хотя на C Gas Plus катушка стоит на свече); 5340697 (Оптимус-Групп — провод свечи B6.7G, Hubei July — катушка 6BT); цепочки свечей B-газа 4089086/4025236 и 3922756 → 3964408 → 4089629 у разных продавцов не сходятся.",
+    "Для китайских газовых двигателей L8.9G, B6.7G и D6.7N (Китай V/VI) не найдены открытые регламенты ТО, руководства и каталоги. Нет и поставщиков газовой аппаратуры: ЭБУ, смесителя и дозатора, датчиков, катализатора, системы зажигания.",
+    "Поставщики газовых узлов Gas Plus (смеситель, клапан дозирования газа, датчик расхода газа, датчик кислорода, датчик детонации, ЭБУ CM556) в открытых источниках не названы. Изготовитель оригинальной свечи 4955850 не установлен: Denso GK3-7 — лишь аналог для вторичного рынка.",
+    "Не подтверждено, что DCEC выпускал C Gas Plus (CGe 250/280) и B Gas Plus. По брошюрам их выпускает Cummins. ISL G, по Википедии, делали в Роки-Маунт и Дарлингтоне, поэтому в перечень машин он не взят. Рейтинг BGe 200-30 у HekoPower (200 кВт / 250 л.с.) противоречит брошюре CWI для BG-200 (149 кВт).",
+    "Выпускаются ли сейчас B5.9-xxxG / BGe и сохранилась ли лицензия BGI — не подтверждено. Модели C8.3G и L Gas Plus производства DCEC не найдены.",
+    "Дилеры: страницы локатора cummins.com отдают 403, поэтому Турция и Казахстан записаны по выдержкам поиска. Дистрибьюторы по Узбекистану и Индии для газовых двигателей DCEC не установлены. В России официального дистрибьютора Cummins нет: деятельность приостановлена в 2022 г. (форма 10-K Cummins за 2022 г., https://www.sec.gov/Archives/edgar/data/26172/000002617223000005/cmi-20221231.htm), есть только независимые продавцы.",
+    "Источники, отказавшие нашему загрузчику: coopalpower.com (капча), dcec-engine.com и dcec-parts.com (пустой ответ), kdkms.com (ошибка сертификата и 503), cummins.com (403), eBay (403). Отдельные карточки cqksgs.com с прежними адресами /content/ и /s/ отдают 404/410."
+  ],
+  "verifier_notes": "Подтверждено 39 кодов из 39: каждая страница открылась, цитата найдена дословно (с поправкой на пробелы), код стоит рядом с названным изделием. Поправки по кодам: 4089629 у QD机电 — «火花塞修理包» (комплект свечи), а не свеча; 5340597 у Оптимус-Групп продаётся с пометкой «Производитель: Китай», то есть это неоригинал под номером Cummins; HX35G 3599491 из doc_ref для 3768610 на странице нет. Утверждения из doc_ref, ссылающиеся на другие страницы (у QD机电 — 3966404, 3937301, 3973087, 5320525; у Hubei July — 3929935, 5314536; Fab Heavy Parts), я не сверял. Не сверял и интервалы замены из раздела 102-002 руководства 4021390. Машины: B Gas Plus и C Gas Plus — изделия Cummins Westport, выпуск на DCEC источники не показывают, поэтому «не подтверждён». Страница 360che (L8.9G) недоступна (сброс соединения, HTTP 503); L8.9G подтверждён по yicai и chinatruck. Для Z16N рейтинг нашёлся (chinatruck): в основном исполнении 700 л.с. и 3200 Н·м. Petroil отдаётся только по HTTP/1.1. Скачанные страницы лежали в рабочей папке сессии скептика, в репозиторий не входят.",
+  "corrections": [
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет",
+    "summary: «Всего 40 кодов» исправлено на 39 — столько записей в parts и столько подтвердил скептик (39 из 39); Fab Heavy Parts убран из источников кодов — у него нет ни одного source_url, он упомянут только в doc_ref",
+    "4089629: описание «свеча зажигания» заменено — на карточке QD机电 номер назван «火花塞修理包» (комплект свечи), замечание скептика",
+    "5340597: отмечено, что Оптимус-Групп продаёт под этим номером неоригинал («Производитель: Китай»), замечание скептика",
+    "3768610: из doc_ref убрана позиция HX35G 3599491 для BGI — на странице её нет (замечание скептика); вместе с ней из записи Holset снята применимость HX35G к B Gas International, державшаяся на ней",
+    "Z16N: rating «не найден» заменён данными, найденными скептиком (700 л.с., 3200 Н·м), источник добавлен в sources",
+    "L8.9G: страница 360che недоступна (сброс соединения, HTTP 503) — добавлен источник chinatruck, по которому скептик подтвердил модель (250–320 л.с., 1200 Н·м, Китай V)"
+  ]
+}
