@@ -493,3 +493,93 @@ def test_параллельность_совпадает_с_матрицей():
     triggers = wf.get("on") or wf.get(True)
     части = triggers["workflow_dispatch"]["inputs"]["shards"]["options"]
     assert min(int(x) for x in части) >= 10, "делить минимум на 10 (правило дробления)"
+
+
+# ─────────────────────────────────────────────── тело письма
+ТЕЛО_HTML = (
+    "<div>Добрый день! Прошу коммерческое предложение:</div>"
+    "<table><tr><td>№</td><td>Наименование</td><td>Кол-во</td><td>Ед.</td></tr>"
+    "<tr><td>1</td><td>Подшипник выдуманный ВЫД-6205</td><td>10</td><td>шт</td></tr>"
+    "<tr><td>2</td><td>Уплотнение выдуманное УВ-40х52</td><td>4</td><td>шт</td></tr></table>"
+    "<div>С уважением, отдел снабжения</div>"
+    "<blockquote><div>Наш прежний запрос:</div>"
+    "<table><tr><td>1</td><td>Муфта выдуманная МВ-9</td><td>2</td><td>шт</td></tr></table>"
+    "</blockquote>")
+
+
+def письмо_с_телом(n: int, тело: str, тип_тела="3", файлы=(), **k) -> dict:
+    п = письмо(n, файлы, **k)
+    п.update({"DESCRIPTION": тело, "DESCRIPTION_TYPE": тип_тела})
+    return п
+
+
+def test_тело_без_цитаты_прежней_переписки():
+    """Ниже ответа заказчика лежит наш же запрос — его в тело не берём."""
+    б = ms.тело_письма(ТЕЛО_HTML, "3").decode("utf-8")
+    assert "ВЫД-6205" in б and "УВ-40х52" in б
+    assert "МВ-9" not in б and "blockquote" not in б
+    assert б.startswith("<html><head><meta charset=\"utf-8\">")
+
+
+def test_тело_текстом_режется_на_строке_цитаты():
+    текст = ("Здравствуйте, нужен подшипник выдуманный ВЫД-6205, 10 штук, срочно.\n"
+             "Спасибо.\n"
+             "\n"
+             "25.09.2026, 10:00, Отдел закупок пишет:\n"
+             "> Муфта выдуманная МВ-9, 2 шт\n")
+    б = ms.тело_письма(текст, "1").decode("utf-8")
+    assert "ВЫД-6205" in б and "МВ-9" not in б and "пишет" not in б
+
+
+def test_строки_цитаты_со_знаком_больше_пропускаются():
+    текст = "Прошу счёт на уплотнение выдуманное УВ-40х52, 4 шт.\n> старое: МВ-9\nЗаранее спасибо за ответ."
+    б = ms.тело_письма(текст, "1").decode("utf-8")
+    assert "УВ-40х52" in б and "МВ-9" not in б
+
+
+@pytest.mark.parametrize("тело", ["", "   ", "См. вложение.", "<div>Спасибо, получили.</div>",
+                                   "<p>&nbsp;</p><blockquote>" + "длинная цитата " * 20 + "</blockquote>"])
+def test_короткое_или_пустое_тело_ссылкой_не_становится(тело):
+    assert ms.тело_письма(тело, "3") == b""
+
+
+def test_тело_письма_только_со_входом(monkeypatch):
+    """Без MAIL_BODIES — прежнее поведение: только вложения, тело не читается."""
+    monkeypatch.delenv("MAIL_BODIES", raising=False)
+    п = письмо_с_телом(5, ТЕЛО_HTML, файлы=[77])
+    assert [r["file_id"] for r in ms.ссылки_письма(п, "mail-deal")] == ["mail:77"]
+    портал = Портал([п])
+    ms.collect_refs_mail("mail-deal", 0, 0, bx=портал)
+    assert "DESCRIPTION" not in портал.вызовы[0][1]["select"]
+
+
+def test_тело_письма_отдельной_ссылкой_со_своим_ключом(monkeypatch):
+    monkeypatch.setenv("MAIL_BODIES", "1")
+    п = письмо_с_телом(5, ТЕЛО_HTML, файлы=[77], тип=ms.ЛИД, владелец=31)
+    refs = ms.ссылки_письма(п, "mail-lead")
+    assert [r["file_id"] for r in refs] == ["mail:77", "mail-body:5"]
+    тело = refs[1]
+    # ключ тела не совпадает ни с номером Диска, ни с номером письма без приставки
+    assert тело["fo"]["тело"].startswith(b"<html>") and "id" not in тело["fo"]
+    assert (тело["deal"], тело["side"], тело["field"]) == ("L31", doc_side.ЗАКАЗЧИК, "письмо 5")
+    портал = Портал([п, письмо_с_телом(6, "коротко")])
+    refs, курсор = ms.collect_refs_mail("mail-lead", 0, 0, bx=портал)
+    assert "DESCRIPTION" in портал.вызовы[0][1]["select"]
+    assert [r["file_id"] for r in refs] == ["mail:77", "mail-body:5"] and курсор == 6
+
+
+def test_тело_письма_разбирается_без_запроса_к_порталу(monkeypatch):
+    """Тело уже пришло списком дел: download не зовёт портал и не качает."""
+    ix = индексатор()
+    # Справочник наших компаний индексатор читает один раз на прогон — это не
+    # запрос за телом; всё прочее к порталу из разбора тела — ошибка.
+    monkeypatch.setattr(ix, "bx", lambda m, _p: {"result": []} if m == "crm.company.list"
+                        else pytest.fail(f"тело письма пошло в портал: {m}"))
+    monkeypatch.setattr(ix, "bx_файлов", lambda *_a: pytest.fail("тело письма пошло в Диск"))
+    monkeypatch.setattr(ix.requests, "get", lambda *_a, **_k: pytest.fail("тело письма качали"))
+    monkeypatch.setenv("MAIL_BODIES", "1")
+    ref = ms.ссылки_письма(письмо_с_телом(8, ТЕЛО_HTML, тип=ms.ЛИД), "mail-lead")[0]
+    rec, items = ix.handle(ref)
+    assert rec["file_id"] == "mail-body:8" and rec["status"] != "не скачался"
+    имена = " ".join(it["item_name"] for it in items)
+    assert "ВЫД-6205" in имена and "УВ-40х52" in имена and "МВ-9" not in имена

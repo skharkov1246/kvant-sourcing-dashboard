@@ -1653,6 +1653,14 @@ def download(fo: dict, rec: dict | None = None) -> bytes | None:
     Порядок ссылок прежний: urlMachine с одноразовым токеном первой, disk.file.get
     последним — он стоит запроса к порталу.
     """
+    if "тело" in fo:
+        # Тело письма уже пришло в списке дел (library/mail_source.тело_письма):
+        # скачивать нечего, и портал за него не платит.
+        if fo["тело"]:
+            return fo["тело"]
+        if rec is not None:
+            rec["reason"] = "пустое тело письма"
+        return None
     причины: list[str] = []
     for key in ("urlMachine", "downloadUrl", "url", "URL_MACHINE", "DOWNLOAD_URL"):
         u = fo.get(key)
