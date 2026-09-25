@@ -112,6 +112,43 @@ def edge_kind(maker: str) -> str:
     return "maker"
 
 
+def поля_владения(справочник: dict) -> dict[str, dict]:
+    """Ключ записи словаря → {role, owner?, owner_since?, former_owners?, brand_key?}.
+
+    Запись словаря сводится с записью справочника рядов по ключу (oem_key =
+    brand_key) либо по ключу написания бренда (aliases: «Emerson Rosemount» →
+    rosemount); написание, которое дают два бренда, не сводит ни к одному.
+    Записи владельцев (owners) сводятся только по ключу."""
+    по_ключу, по_написанию, спорные = {}, {}, set()
+    for б in справочник.get("brands", []):
+        k = б.get("brand_key")
+        по_ключу[k] = б
+        for a in б.get("aliases", []):
+            kk = nkey(a)
+            if по_написанию.get(kk, k) != k:
+                спорные.add(kk)
+            по_написанию.setdefault(kk, k)
+    for б in справочник.get("owners", []):
+        по_ключу.setdefault(б.get("brand_key"), б)
+    out = {}
+    for kk in sorted(set(по_ключу) | (set(по_написанию) - спорные)):
+        б = по_ключу.get(kk) or по_ключу[по_написанию[kk]]
+        if not б.get("role"):
+            continue
+        поля = {"role": б["role"]}
+        if б.get("owner"):
+            поля["owner"] = б["owner"]
+        if б.get("owner_since"):
+            поля["owner_since"] = б["owner_since"]
+        бывшие = [h["owner"] for h in б.get("owner_history", []) if h.get("owner")]
+        if бывшие:
+            поля["former_owners"] = бывшие
+        if б["brand_key"] != kk:
+            поля["brand_key"] = б["brand_key"]
+        out[kk] = поля
+    return out
+
+
 def build_oem() -> dict:
     """Производители: канонический ключ и все написания, встреченные в базах."""
     spellings: dict[str, list[dict]] = {}
@@ -183,6 +220,14 @@ def build_oem() -> dict:
     out = [{"oem_key": r["oem_key"], "name": r["name"],
             **oem_kind.вид_записи(r["name"], r["oem_key"], чистые),
             "spellings": r["spellings"], "n_spellings": r["n_spellings"]} for r in out]
+    # ВЛАДЕНИЕ. Бренд машины и его холдинг — разные записи: Solar Turbines
+    # остаётся Solar Turbines, у него owner=caterpillar (dict/model_series.json,
+    # library/brand_owner.py). Поля только добавляются — ключ, имя, написания и
+    # вид записи не меняются; получает их лишь запись вида «бренд».
+    владение = поля_владения(load("dict/model_series.json", {}))
+    for r in out:
+        if r["kind"] == oem_kind.БРЕНД and r["oem_key"] in владение:
+            r.update(владение[r["oem_key"]])
     out.sort(key=lambda x: (-x["n_spellings"], x["oem_key"]))
     по_виду = {v: sum(1 for r in out if r["kind"] == v) for v in oem_kind.ВИДЫ}
     return {"note": "Производители: ключ nkey(name) и все написания, найденные в базах. "
@@ -192,7 +237,10 @@ def build_oem() -> dict:
                     "(бренд с пояснением), номер (детали вместо имени). Бренд позиции даёт только "
                     "вид «бренд»; у «несколько» и «описание» бренды — в поле brands, "
                     "неразложенные части — в unresolved; kind_why — почему вид такой "
-                    "(library/oem_kind.py).",
+                    "(library/oem_kind.py). У записи вида «бренд», сведённой со справочником "
+                    "рядов, role — «бренд» (марка на шильдике) или «владелец» (холдинг), owner — "
+                    "ключ или имя компании-владельца, owner_since — год, former_owners — бывшие "
+                    "владельцы, brand_key — ключ справочника, если он другой (library/brand_owner.py).",
             "count": len(out), "by_kind": по_виду, "records": out}
 
 

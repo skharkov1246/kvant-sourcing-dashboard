@@ -1963,6 +1963,9 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
     "b.registry_trunc": "бренд: реестр разведки усечён до 25, страница не пишет",
     "b.registry": "бренд: реестр — checked > parts или имя-ключ",
     "b.card": "бренд: элемент карточки не из списка элементов или не число",
+    "b.cloud_nomark": "облако: слово — не марка (пометка nb, служебное слово, страна) или ведёт не на бренд",
+    "b.cloud_dup": "облако: ключ в двух словах, одно имя у двух слов или сведённый ключ стоит своим словом",
+    "b.cloud_lost": "облако: бренд словаря без пометки не попал ни в одно слово",
     "b.s_name_key": "поставщик: имя похоже на ключ",
     "b.s_name_json": "поставщик: имя — JSON-массив («[…]»), а не название с кавычками",
     "b.s_name_number": "поставщик: номер вместо имени («Компания портала N»)",
@@ -2263,6 +2266,25 @@ def ревизия_брендов(с: Снимки, сейчас) -> Вклад�
             if isinstance(эл, dict):
                 т.счёт("b.card", not re.fullmatch(r"\d+", str(эл.get("id")))
                        or str(эл.get("id")) not in карточные_ид)
+    # Облако (library/brands.облако): в нём только марки, одна марка — одно слово.
+    слова_облака = [s for s in ((bv or {}).get("cloud") or []) if isinstance(s, dict)]
+    if слова_облака:
+        по_ключу_б = {b.get("k"): b for b in бренды_}
+        в_словах = collections.Counter()
+        имена_слов = collections.Counter(str(s.get("name") or "").casefold() for s in слова_облака)
+        for s in слова_облака:
+            for k in set(s.get("m") or []) | {s.get("k")}:
+                в_словах[k] += 1
+        for s in слова_облака:
+            b = по_ключу_б.get(s.get("k"))
+            т.счёт("b.cloud_nomark", b is None or bool(b.get("nb")) or служебное(s.get("name"))
+                   or bool(re.fullmatch(r"\s*%.*", str(s.get("name") or ""))))
+            т.счёт("b.cloud_dup", any(в_словах[k] > 1 for k in set(s.get("m") or []) | {s.get("k")})
+                   or имена_слов[str(s.get("name") or "").casefold()] > 1
+                   or (b is not None and bool(b.get("cg"))))
+        for b in бренды_:
+            if b.get("dict") and not b.get("nb"):
+                т.счёт("b.cloud_lost", в_словах[b.get("k")] == 0)
     # Машина у двух брендов законна, когда бренды связаны: владелец и марка
     # (Solar Turbines — Caterpillar), пакетировщик и изготовитель, «Siemens» и
     # «Siemens Energy». Связь — атлас (owner, former) или ключ одного —
@@ -2601,8 +2623,19 @@ def ревизия_брендов(с: Снимки, сейчас) -> Вклад�
         т.доля("u.dict", sum(1 for b in бренды_ if b.get("dict")), len(бренды_))
         т.доля("u.dict_weight", sum((b.get("codes") or {}).get("any") or 0 for b in бренды_ if b.get("dict")),
                sum((b.get("codes") or {}).get("any") or 0 for b in бренды_))
-        облако = sorted(бренды_, key=lambda b: -(((b.get("codes") or {}).get("any")) or (b.get("parts") or {}).get("n") or 0))[:120]
-        т.доля("u.cloud_clean", sum(1 for b in облако if b.get("dict")
+        # Облако — слова сводки (library/brands.облако): слово ведёт на бренд,
+        # его и судим. Снимок до слов облака — первые 120 брендов, как было.
+        по_ключу_о = {b.get("k"): b for b in бренды_}
+        слова_о = [s for s in (bv.get("cloud") or []) if isinstance(s, dict)]
+        if слова_о:
+            # Слово — марка словаря, если сборка так его пометила (d: словарь
+            # брендов или справочник рядов), даже когда ведёт на написание без ключа.
+            облако = [{**(по_ключу_о.get(s.get("k")) or {}), **({"dict": True} if s.get("d") else {})}
+                      for s in sorted(слова_о, key=lambda s: -(s.get("w") or 0))[:120]]
+        else:
+            облако = sorted(бренды_, key=lambda b: -(((b.get("codes") or {}).get("any"))
+                                                     or (b.get("parts") or {}).get("n") or 0))[:120]
+        т.доля("u.cloud_clean", sum(1 for b in облако if b.get("dict") and not b.get("nb")
                                     and not (b.get("name") == b.get("k") and re.fullmatch(r"[a-z0-9]{13,}", str(b.get("k"))))),
                len(облако))
     if isinstance(pairs, dict) and pairs.get("pairs"):

@@ -247,7 +247,7 @@ function плитки() {
 // ─── Облака и списки ─────────────────────────────────────────────────────────
 // Размер слова — логарифм веса: у крупнейшего бренда кодов в сотни раз больше,
 // чем у сотого, и линейная шкала оставила бы одно слово и россыпь точек.
-function облако(элементы, вес, имя, хеш, класс) {
+function облако(элементы, вес, имя, хеш, класс, подпись) {
   var box = узел("div", "cloud");
   var верх = элементы.slice().sort(function (a, b) { return вес(b) - вес(a); }).slice(0, 120);
   var макс = верх.length ? Math.log(1 + вес(верх[0])) : 1;
@@ -256,7 +256,7 @@ function облако(элементы, вес, имя, хеш, класс) {
     var a = ссылка(имя(e), хеш(e), класс ? класс(e) : null);
     var k = макс ? Math.log(1 + вес(e)) / макс : 0;
     a.style.fontSize = Math.round(12 + 18 * k) + "px";
-    a.title = число(вес(e));
+    a.title = число(вес(e)) + (подпись ? подпись(e) : "");
     box.appendChild(a);
   });
   return box;
@@ -286,8 +286,19 @@ function строки_брендов(b) {
   return [ссылка(b.name, хеш_бренда(b.k), b.dict ? null : "nokey"),
     c.any || 0, c.customer || 0, c.customer_kp || 0, b.sups || 0,
     b.models_n || 0, (b.parts || {}).n || 0,
-    b.dict ? узел("span", "ok", "в словаре") : узел("span", "thin", "имя без ключа")];
+    пометка_бренда(b)];
 }
+// Пометка строки списка: «не марка: причина» (library/brands.облако, поле nb),
+// «в облаке — X» у сведённого написания (поле cg), иначе — словарь.
+function пометка_бренда(b) {
+  if (b.nb) return узел("span", "warn", "не марка: " + b.nb);
+  if (b.cg) return узел("span", "thin", "в облаке — " + имя_слова(b.cg));
+  return b.dict ? узел("span", "ok", "в словаре") : узел("span", "thin", "имя без ключа");
+}
+function слово_облака(k) {
+  return (данные.cloud || []).filter(function (s) { return s.k === k; })[0] || null;
+}
+function имя_слова(k) { var s = слово_облака(k); return s ? s.name : имя_бренда(k); }
 function строки_поставщиков(s) {
   return [ссылка(s.name, хеш_поставщика(s.k)), s.codes || 0, s.rows || 0, s.brands_file || 0,
     s.cards || 0, (s.cur || []).join(" ") || "—", узел("span", "thin", s.from || "—")];
@@ -306,14 +317,28 @@ function список() {
   var найдено = [];
   if (раздел === "brands") {
     $("search").placeholder = "Бренд или написание";
+    // Без запроса список — только марки; поиском находится всё, и не марка
+    // видна пометкой (пометка, а не удаление).
     найдено = (данные.brands || []).filter(function (b) {
-      return !q || [b.name, b.k].concat(b.spellings || []).some(function (v) { return String(v).toLowerCase().indexOf(q) >= 0; });
+      return q ? [b.name, b.k].concat(b.spellings || []).some(function (v) { return String(v).toLowerCase().indexOf(q) >= 0; })
+        : !b.nb;
     });
     if (!q) {
-      view.appendChild(облако(данные.brands || [], function (b) { return (b.codes || {}).any || (b.parts || {}).n || 0; },
-        function (b) { return b.name; }, function (b) { return хеш_бренда(b.k); }, function (b) { return b.dict ? null : "nokey"; }));
-      view.appendChild(узел("p", "cloud-note", "Размер — число разных кодов бренда по трём источникам (спецификация, КП, каталог). "
-        + "Курсивом — имя без ключа словаря брендов: написание из данных, не сведённое с dict/oem.json."));
+      if (данные.cloud) {
+        view.appendChild(облако(данные.cloud, function (s) { return s.w || 0; }, function (s) { return s.name; },
+          function (s) { return хеш_бренда(s.k); },
+          function (s) { return s.d || (по_бренду[s.k] || {}).dict ? null : "nokey"; },
+          function (s) { return s.m ? " · сведено написаний: " + s.m.length : ""; }));
+      } else {
+        view.appendChild(облако(данные.brands || [], function (b) { return (b.codes || {}).any || (b.parts || {}).n || 0; },
+          function (b) { return b.name; }, function (b) { return хеш_бренда(b.k); }, function (b) { return b.dict ? null : "nokey"; }));
+      }
+      var не_марок = (данные.brands || []).filter(function (b) { return b.nb; }).length;
+      view.appendChild(узел("p", "cloud-note", "Размер — число разных кодов бренда по трём источникам (спецификация, КП, каталог); "
+        + "у слова, в которое сведены написания одной марки, — сумма по написаниям (код под двумя написаниями считается дважды). "
+        + "Курсивом — имя без ключа словаря брендов: написание из данных, не сведённое с dict/oem.json. "
+        + (данные.cloud ? "Не марки (страна, город, поле формы, пометка незнания, материал, общее слово оборудования) в облако и в список не идут — "
+          + число(не_марок) + "; их находит поиск с пометкой «не марка»." : "")));
     }
     показать_таблицу(view, найдено, ["Бренд", "Кодов", "В спросе заказчика", "Спрос с ценой КП",
       "Поставщиков с ценой", "Машин", "Деталей в каталоге", "Словарь"], строки_брендов);
@@ -485,7 +510,23 @@ function карточка_бренда(k) {
   var шапка = узел("p", "field-note");
   шапка.appendChild(document.createTextNode("Ключ: " + b.k + " · "));
   шапка.appendChild(b.dict ? узел("span", "ok", "в словаре брендов") : узел("span", "warn", "имя без ключа словаря — написание из данных"));
+  if (b.nb) {
+    шапка.appendChild(document.createTextNode(" · "));
+    шапка.appendChild(узел("span", "warn", "не марка: " + b.nb + " — в облако не идёт, данные не тронуты"));
+  }
+  if (b.cg) {
+    шапка.appendChild(document.createTextNode(" · в облаке сведено в "));
+    шапка.appendChild(ссылка(имя_слова(b.cg), хеш_бренда(b.cg)));
+  }
   card.appendChild(шапка);
+  var слово = слово_облака(b.k);
+  if (слово && слово.m) {
+    card.appendChild(узел("p", "field-note", "В облаке одним словом «" + слово.name + "» (" + число(слово.w) + "): "
+      + слово.m.map(function (k) {
+        var x = по_бренду[k] || {};
+        return (x.name || k) + " — " + число((x.codes || {}).any || (x.parts || {}).n || 0);
+      }).join(" · ") + "."));
+  }
 
   var c = b.codes || {};
   var пл = узел("div", "claims");

@@ -1,7 +1,7 @@
 {
  "schema": "kvant.model-series/1",
  "updated": "2026-09-25",
- "note": "Модельные ряды брендов с шаблоном распознавания. Одна запись ряда — название, тип машины, шаблоны (регулярные выражения Python без границ — границы слова ставит library/model_series.py), примеры обозначений, которые шаблон обязан узнавать (проверяет tests/test_model_series.py), и источники — официальная страница или каталог изготовителя; вторичный источник оговорён в note. context «сам» — обозначение различимо само, «бренд» — засчитывается только при имени бренда (aliases или context_aliases) в той же строке или в поле изготовителя. Ряд без источника не добавляется. brand_key — ключ dict/oem.json, если бренд там есть, иначе новый ключ того же вида. origin — западный / китайский / прочий. Сведения только общедоступные. field_aliases — написания, которые делают бренд только в поле изготовителя (CAT, NORD), а в тексте строки неоднозначны; по ним и по aliases замер сводит ключи реестра брендов, заведённые другим написанием того же бренда (cat → caterpillar, warman → weir, getriebebaunord… → nord).",
+ "note": "Модельные ряды брендов с шаблоном распознавания. Одна запись ряда — название, тип машины, шаблоны (регулярные выражения Python без границ — границы слова ставит library/model_series.py), примеры обозначений, которые шаблон обязан узнавать (проверяет tests/test_model_series.py), и источники — официальная страница или каталог изготовителя; вторичный источник оговорён в note. context «сам» — обозначение различимо само, «бренд» — засчитывается только при имени бренда (aliases или context_aliases) в той же строке или в поле изготовителя. Ряд без источника не добавляется. brand_key — ключ dict/oem.json, если бренд там есть, иначе новый ключ того же вида. origin — западный / китайский / прочий. Сведения только общедоступные. field_aliases — написания, которые делают бренд только в поле изготовителя (CAT, NORD), а в тексте строки неоднозначны; по ним и по aliases замер сводит ключи реестра брендов, заведённые другим написанием того же бренда (cat → caterpillar, warman → weir, getriebebaunord… → nord). ВЛАДЕНИЕ (25.09.2026): role — «бренд» (марка на шильдике; у всех записей brands), «владелец» (холдинг, чьё имя на шильдике не стоит или стоит рядом; записи owners — без рядов и без написаний, в распознавании не участвуют), «бывший владелец» (элементы owner_history). owner — ключ записи brands/owners либо имя компании, если записи нет; owner_since/owner_until — год, owner_source — страница изготовителя или отчёт, проверенные запросом 25.09.2026; поля бывают и у ряда, когда марка ряда ушла другому владельцу (Rolls-Royce RB211 → Siemens Energy). Бренд с владельцем не сливается: Solar Turbines остаётся Solar Turbines, owner=caterpillar. Применение — library/brand_owner.py; спорное и неподтверждённое — в gaps с приставкой «Владение:».",
  "types": [
   "ГПУ",
   "дизель",
@@ -28,7 +28,14 @@
   "SKF — подшипники, а не машины: ряда машин нет, бренд остаётся в реестре брендов.",
   "Бренды с context «бренд» не узнаются в строке без имени бренда — это намеренно: голые числа (3516, 4012, 75131) и короткие буквенные коды (GA, ZR, CR, SD, HP) без бренда неоднозначны.",
   "Dana (оси и коробки Spicer), Swagelok (фитинги и краны — артикулы, а не ряды машин) — ряд с официальным источником и форматом обозначения не собран в этой сессии, не добавлены.",
-  "Sulzer CP и ZPP, Goulds 3408, Ruhrpumpen ZM — страница изготовителя не открылась или формат обозначения не подтверждён: не заведены."
+  "Sulzer CP и ZPP, Goulds 3408, Ruhrpumpen ZM — страница изготовителя не открылась или формат обозначения не подтверждён: не заведены.",
+  "Владение: Dongfeng Cummins (DCEC) — совместное предприятие Dongfeng и Cummins 50/50, единого владельца нет; связь не записана.",
+  "Владение: Hitachi Construction Machinery — Hitachi Ltd. в 2022 году продала контрольный пакет (Itochu и JIP); нынешняя структура не подтверждена страницей изготовителя, не записана.",
+  "Владение: Gardner Denver PZ (буровые насосы) — сегмент High Pressure Solutions (GD Energy Products) с 01.04.2021 у American Industrial Partners, 45 % осталось у Ingersoll Rand; долевое владение, на уровне ряда не записано.",
+  "Владение: владелец самой INNIO (Advent International с 2018 года) на 2026 год не перепроверен — у записи innio владелец не указан.",
+  "Владение: Joy и P&H (Komatsu Mining, куплены Komatsu в 2017), CompAir и Seepex (Ingersoll Rand), Worthington, IDP и Byron Jackson (Flowserve), Nuovo Pignone (Baker Hughes), Nordberg (Metso), Vacon вне ряда, Bosch Rexroth — отдельных записей брендов в справочнике нет, связь не заведена: запись бренда появляется с его рядом.",
+  "Владение: Weichai, Shacman (Shaanxi Heavy Duty, 51 % у Weichai), Shantui (Shandong Heavy Industry), Shengdong (Sinopec), Yuchai, Zichai, Ruhrpumpen — владелец не подтверждён страницей изготовителя в этой сессии, не записан.",
+  "Владение: годы 1976 (Emerson — Rosemount), 1997 (ITT — Goulds), 1998/2008 (Dover — Wilden, PSG) и 2014 (Rolls-Royce — MTU целиком) известны по вторичным источникам; страницы изготовителей их не называют — owner_since не записан."
  ],
  "brands": [
   {
@@ -45,6 +52,7 @@
    "context_aliases": [
     "CAT"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "cat-g3500",
@@ -207,6 +215,7 @@
     "Камминз",
     "Каммингс"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "cummins-qsk-gas",
@@ -305,6 +314,19 @@
     "Енбахер",
     "Иенбахер"
    ],
+   "role": "бренд",
+   "owner": "innio",
+   "owner_since": 2018,
+   "owner_source": "https://www.innio.com/en/news-media/press-releases/innio-completes-carve-out-from-general-electric-and-emerges-as-stand-alone-energy-company/",
+   "owner_history": [
+    {
+     "owner": "generalelectric",
+     "role": "бывший владелец",
+     "owner_until": 2018,
+     "owner_source": "https://www.innio.com/en/news-media/press-releases/innio-completes-carve-out-from-general-electric-and-emerges-as-stand-alone-energy-company/",
+     "owner_note": "GE Distributed Power продан Advent International и переименован в INNIO 6 ноября 2018 года."
+    }
+   ],
    "series": [
     {
      "id": "jenbacher-3",
@@ -388,6 +410,18 @@
     "Waukesha",
     "Вокеша",
     "Уокеша"
+   ],
+   "role": "бренд",
+   "owner": "innio",
+   "owner_since": 2018,
+   "owner_source": "https://www.innio.com/en/news-media/press-releases/innio-completes-carve-out-from-general-electric-and-emerges-as-stand-alone-energy-company/",
+   "owner_history": [
+    {
+     "owner": "generalelectric",
+     "role": "бывший владелец",
+     "owner_until": 2018,
+     "owner_source": "https://www.innio.com/en/news-media/press-releases/innio-completes-carve-out-from-general-electric-and-emerges-as-stand-alone-energy-company/"
+    }
    ],
    "series": [
     {
@@ -478,6 +512,11 @@
     "MWM",
     "Caterpillar Energy Solutions"
    ],
+   "role": "бренд",
+   "owner": "caterpillar",
+   "owner_since": 2011,
+   "owner_source": "https://caterpillar-energy-solutions.de/en/news/news-releases/caterpillar-completes-acquisition-of-mwm/",
+   "owner_note": "Caterpillar закрыл покупку MWM Holding GmbH у 3i 1 ноября 2011 года; ныне Caterpillar Energy Solutions.",
    "series": [
     {
      "id": "mwm-tcg",
@@ -513,6 +552,7 @@
     "Дойц",
     "Дейтц"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "deutz-tcd-new",
@@ -609,6 +649,10 @@
     "МТУ",
     "Rolls-Royce Power Systems"
    ],
+   "role": "бренд",
+   "owner": "rollsroycepowersystems",
+   "owner_source": "https://www.mtu-solutions.com/eu/en/about-us/about-rolls-royce-power-systems.html",
+   "owner_note": "mtu — марка изделий бизнес-подразделения Power Systems группы Rolls-Royce. Год перехода к Rolls-Royce целиком (2014, до того СП с Daimler с 2011) страница изготовителя не называет — не записан.",
    "series": [
     {
      "id": "mtu-4000",
@@ -682,6 +726,7 @@
     "Вяртсиля",
     "Вартсила"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "wartsila-sg",
@@ -717,6 +762,11 @@
     "Перкинс",
     "FG Wilson"
    ],
+   "role": "бренд",
+   "owner": "caterpillar",
+   "owner_since": 1998,
+   "owner_source": "https://www.perkins.com/en_GB/company/heritage/the-perkins-story.html",
+   "owner_note": "Perkins куплен Caterpillar у LucasVarity в 1998 году, FG Wilson — полностью в 1999 году (49 % с 1996).",
    "series": [
     {
      "id": "perkins-4000",
@@ -763,6 +813,10 @@
     "Volvo",
     "Вольво"
    ],
+   "role": "бренд",
+   "owner": "volvogroup",
+   "owner_source": "https://www.volvogroup.com/en/about-us/brands.html",
+   "owner_note": "Volvo Penta — марка Volvo Group (AB Volvo).",
    "series": [
     {
      "id": "volvo-tad",
@@ -801,6 +855,10 @@
     "MAN",
     "МАН"
    ],
+   "role": "бренд",
+   "owner": "Volkswagen AG",
+   "owner_source": "https://www.everllence.com/company/press-releases/details/2026/06/25/volkswagen-group-enters-into-exclusive-arrangement-with-bain-capital-for-sale-of-majority-stake-in-everllence",
+   "owner_note": "Everllence (бывш. MAN Energy Solutions) принадлежит Volkswagen Group; 25.06.2026 объявлена продажа 51 % Bain Capital — сделка не закрыта, при закрытии владелец сменится.",
    "series": [
     {
      "id": "man-df",
@@ -836,6 +894,35 @@
    "context_aliases": [
     "Siemens",
     "Сименс"
+   ],
+   "role": "бренд",
+   "owner": "Mutares SE & Co. KGaA",
+   "owner_since": 2022,
+   "owner_source": "https://mutares.com/en/mutares-has-successfully-completed-the-acquisition-of-siemens-energy-engines-s-a-u-and-related-assets/",
+   "owner_note": "Siemens Energy Engines S.A.U. продана Mutares 2 ноября 2022 года и работает под именем Guascor Energy. Имя записи «Guascor (Siemens Energy)» историческое: Siemens Energy — бывший владелец.",
+   "owner_history": [
+    {
+     "owner": "siemensdemagdelavalturbomachinery",
+     "role": "бывший владелец",
+     "owner_since": 2011,
+     "owner_until": 2015,
+     "owner_source": "https://www.prnewswire.com/news-releases/dresser-rand-closes-its-acquisition-of-grupo-guascor-sl-121258799.html"
+    },
+    {
+     "owner": "siemens",
+     "role": "бывший владелец",
+     "owner_since": 2015,
+     "owner_until": 2020,
+     "owner_source": "https://www.sec.gov/Archives/edgar/data/0001316656/000114420415039541/v414223_8k.htm",
+     "owner_note": "вместе с Dresser-Rand"
+    },
+    {
+     "owner": "siemensenergy",
+     "role": "бывший владелец",
+     "owner_since": 2020,
+     "owner_until": 2022,
+     "owner_source": "https://mutares.com/en/mutares-has-successfully-completed-the-acquisition-of-siemens-energy-engines-s-a-u-and-related-assets/"
+    }
    ],
    "series": [
     {
@@ -881,6 +968,16 @@
    "context_aliases": [
     "Siemens",
     "Сименс"
+   ],
+   "role": "бренд",
+   "owner_history": [
+    {
+     "owner": "siemens",
+     "role": "бывший владелец",
+     "owner_until": 2020,
+     "owner_source": "https://www.siemens-energy.com/global/en/home/press-releases/initial-listing-siemens-energy.html",
+     "owner_note": "Выделена из Siemens AG, первые торги 28 сентября 2020 года; Siemens AG остался неконтролирующим акционером."
+    }
    ],
    "series": [
     {
@@ -961,6 +1058,20 @@
     "Siemens",
     "Сименс"
    ],
+   "role": "бренд",
+   "owner": "siemensenergy",
+   "owner_since": 2020,
+   "owner_source": "https://www.siemens-energy.com/global/en/home/press-releases/initial-listing-siemens-energy.html",
+   "owner_note": "Сделка Siemens — Dresser-Rand закрыта 30 июня 2015 года (не в 2016); с выделением Siemens Energy в 2020 году — у неё.",
+   "owner_history": [
+    {
+     "owner": "siemens",
+     "role": "бывший владелец",
+     "owner_since": 2015,
+     "owner_until": 2020,
+     "owner_source": "https://www.sec.gov/Archives/edgar/data/0001316656/000114420415039541/v414223_8k.htm"
+    }
+   ],
    "series": [
     {
      "id": "dresser-datum",
@@ -997,6 +1108,11 @@
     "Solar",
     "Солар"
    ],
+   "role": "бренд",
+   "owner": "caterpillar",
+   "owner_since": 1981,
+   "owner_source": "https://www.solarturbines.com/en_US/about-us/news-and-press-releases/happy-95th-anniversary.html",
+   "owner_note": "Solar Turbines Incorporated — дочерняя Caterpillar Inc.; до 1981 — International Harvester.",
    "series": [
     {
      "id": "solar-gt",
@@ -1059,6 +1175,7 @@
    "context_aliases": [
     "GE"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "ge-aero",
@@ -1106,6 +1223,7 @@
    "context_aliases": [
     "GE"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "bh-frame5",
@@ -1165,6 +1283,7 @@
    "context_aliases": [
     "Siemens"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "rr-rb211",
@@ -1184,6 +1303,25 @@
      "sources": [
       "https://www.rolls-royce.com/media/press-releases-archive/yr-2007/rr-rb211-gas.aspx",
       "https://www.turbomachinerymag.com/view/aeroderivative-gas-turbines"
+     ],
+     "owner": "siemensenergy",
+     "owner_since": 2020,
+     "owner_source": "https://press.siemens.com/global/en/pressrelease/siemens-acquire-rolls-royce-energy-gas-turbine-and-compressor-business-and-enter-long",
+     "owner_note": "Промышленные авиапроизводные ГТУ Rolls-Royce Energy куплены Siemens (сделка объявлена 06.05.2014, закрытие — декабрь 2014), с 2020 года у Siemens Energy.",
+     "owner_history": [
+      {
+       "owner": "rollsroyce",
+       "role": "бывший владелец",
+       "owner_until": 2014,
+       "owner_source": "https://press.siemens.com/global/en/pressrelease/siemens-acquire-rolls-royce-energy-gas-turbine-and-compressor-business-and-enter-long"
+      },
+      {
+       "owner": "siemens",
+       "role": "бывший владелец",
+       "owner_since": 2014,
+       "owner_until": 2020,
+       "owner_source": "https://www.siemens-energy.com/global/en/home/press-releases/initial-listing-siemens-energy.html"
+      }
      ]
     },
     {
@@ -1203,7 +1341,25 @@
      "sources": [
       "https://www.turbomachinerymag.com/view/aeroderivative-gas-turbines"
      ],
-     "note": "Avon — ещё и марка косметики: только рядом с именем бренда."
+     "note": "Avon — ещё и марка косметики: только рядом с именем бренда.",
+     "owner": "siemensenergy",
+     "owner_since": 2020,
+     "owner_source": "https://press.siemens.com/global/en/pressrelease/siemens-acquire-rolls-royce-energy-gas-turbine-and-compressor-business-and-enter-long",
+     "owner_history": [
+      {
+       "owner": "rollsroyce",
+       "role": "бывший владелец",
+       "owner_until": 2014,
+       "owner_source": "https://press.siemens.com/global/en/pressrelease/siemens-acquire-rolls-royce-energy-gas-turbine-and-compressor-business-and-enter-long"
+      },
+      {
+       "owner": "siemens",
+       "role": "бывший владелец",
+       "owner_since": 2014,
+       "owner_until": 2020,
+       "owner_source": "https://www.siemens-energy.com/global/en/home/press-releases/initial-listing-siemens-energy.html"
+      }
+     ]
     }
    ]
   },
@@ -1217,6 +1373,7 @@
     "Атлас Копко",
     "Atlas-Copco"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "ac-ga",
@@ -1269,6 +1426,7 @@
     "Инжерсолл Рэнд",
     "Ингерсолл Рэнд"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "ir-centac",
@@ -1325,6 +1483,11 @@
     "Tamrock",
     "Тамрок"
    ],
+   "role": "бренд",
+   "owner": "sandvik",
+   "owner_since": 1997,
+   "owner_source": "https://www.home.sandvik/en/news-and-media/news/1997/11/sandvik-makes-bid-to-acquire-tamrock/",
+   "owner_note": "Sandvik владел 48,9 % Tamrock с 1996 года и довёл долю до контрольной (76 %) в 1997 году. «Sandvik» на шильдике — марка, Sandvik AB — холдинг.",
    "series": [
     {
      "id": "sandvik-lh-th",
@@ -1389,6 +1552,16 @@
    "context_aliases": [
     "Atlas Copco",
     "Атлас Копко"
+   ],
+   "role": "бренд",
+   "owner_history": [
+    {
+     "owner": "atlascopco",
+     "role": "бывший владелец",
+     "owner_until": 2018,
+     "owner_source": "https://www.atlascopcogroup.com/en/investors/acquisitions-and-divestments/epiroc-split-from-atlas-copco-group",
+     "owner_note": "Epiroc AB распределён акционерам Atlas Copco, первые торги 18 июня 2018 года; самостоятельная компания."
+    }
    ],
    "series": [
     {
@@ -1513,6 +1686,7 @@
     "Комацу",
     "Коматсу"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "komatsu-e-trucks",
@@ -1564,6 +1738,7 @@
     "Либхерр",
     "Либхер"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "liebherr-t",
@@ -1616,6 +1791,7 @@
     "Nordberg",
     "Нордберг"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "metso-hp",
@@ -1671,6 +1847,7 @@
    "context_aliases": [
     "FLS"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "fls-raptor",
@@ -1711,6 +1888,11 @@
     "Weir",
     "Вейр"
    ],
+   "role": "бренд",
+   "owner": "weirgroup",
+   "owner_since": 1999,
+   "owner_source": "https://www.global.weir/brands/warman/",
+   "owner_note": "The Weir Group plc купила Warman в 1999 году; Warman — марка дивизиона Weir Minerals.",
    "series": [
     {
      "id": "weir-warman-ah",
@@ -1747,6 +1929,7 @@
     "KSB",
     "КСБ"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "ksb-eta",
@@ -1804,6 +1987,7 @@
     "Grundfos",
     "Грундфос"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "grundfos-cr",
@@ -1854,6 +2038,7 @@
     "Флоусерв",
     "Durco"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "flowserve-mark3",
@@ -1904,6 +2089,7 @@
     "BELAZ",
     "Белаз"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "belaz-trucks",
@@ -1940,6 +2126,7 @@
     "Вэйчай",
     "Weichai Power"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "weichai-wp",
@@ -1999,6 +2186,7 @@
     "Cummins",
     "Камминс"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "dcec-b-gas",
@@ -2042,6 +2230,7 @@
     "Ючай",
     "Guangxi Yuchai"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "yuchai-yc",
@@ -2078,6 +2267,10 @@
     "Чидун",
     "Chidong"
    ],
+   "role": "бренд",
+   "owner": "cnpc",
+   "owner_source": "http://talent.cnpc.com.cn/introduction?deptName=CNPC+Jichai+Power+Co.+Ltd%EF%BC%88JCPC%EF%BC%89&deptId=226",
+   "owner_note": "CNPC Jichai Power Co. Ltd. — единственный изготовитель энергооборудования в составе CNPC. Страница изготовителя jichai.com закрыта проверочным кодом; связь подтверждена страницей CNPC.",
    "series": [
     {
      "id": "jichai-190",
@@ -2113,6 +2306,7 @@
     "Шэндун",
     "Шендун"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "shengdong-gf",
@@ -2148,6 +2342,7 @@
     "Цзычай",
     "Цзибо"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "zichai-170",
@@ -2182,6 +2377,7 @@
    "aliases": [
     "SANY"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "sany-sy",
@@ -2215,6 +2411,7 @@
     "Сюйгун",
     "ХСМГ"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "xcmg-xde",
@@ -2247,6 +2444,7 @@
     "Zoomlion",
     "Зумлион"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "zoomlion-cranes",
@@ -2281,6 +2479,7 @@
     "Люгонг",
     "Лю Гонг"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "liugong-clg",
@@ -2318,6 +2517,7 @@
     "Шакман",
     "Шанкси"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "shacman-3000",
@@ -2356,6 +2556,7 @@
     "SITRAK",
     "Ситрак"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "sinotruk-howo",
@@ -2398,6 +2599,7 @@
     "Шантуй",
     "Шаньтуй"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "shantui-sd",
@@ -2432,6 +2634,7 @@
     "Кайшань",
     "Кайшан"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "kaishan-lg",
@@ -2465,6 +2668,7 @@
     "Джерех",
     "Цзеруй"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "jereh-frac",
@@ -2500,6 +2704,7 @@
     "Kerui",
     "Керуй"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "kerui-qws",
@@ -2530,6 +2735,7 @@
     "Taiyuan Heavy",
     "Тайюань"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "tyhi-wk",
@@ -2567,6 +2773,7 @@
     "DEC",
     "Dongfang"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "dongfang-g50",
@@ -2602,6 +2809,7 @@
     "Siemens",
     "Сименс"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "siemens-sinamics",
@@ -2664,6 +2872,19 @@
     "Innomotics",
     "Инномотикс"
    ],
+   "role": "бренд",
+   "owner": "KPS Capital Partners",
+   "owner_since": 2024,
+   "owner_source": "https://press.siemens.com/global/en/pressrelease/siemens-successfully-closes-sale-innomotics-kps-capital-partners",
+   "owner_note": "Siemens закрыл продажу Innomotics 1 октября 2024 года; до того — дочерняя Siemens AG (выделена в Innomotics в 2023 году).",
+   "owner_history": [
+    {
+     "owner": "siemens",
+     "role": "бывший владелец",
+     "owner_until": 2024,
+     "owner_source": "https://press.siemens.com/global/en/pressrelease/siemens-successfully-closes-sale-innomotics-kps-capital-partners"
+    }
+   ],
    "series": [
     {
      "id": "innomotics-lv",
@@ -2699,6 +2920,7 @@
     "Зульцер",
     "Сульцер"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "sulzer-msd",
@@ -2759,6 +2981,10 @@
    "context_aliases": [
     "ITT"
    ],
+   "role": "бренд",
+   "owner": "itt",
+   "owner_source": "https://www.gouldspumps.com/about",
+   "owner_note": "Goulds Pumps — марка ITT Inc. Год покупки (1997) страница изготовителя не называет — не записан.",
    "series": [
     {
      "id": "goulds-3196",
@@ -2844,6 +3070,7 @@
     "Хитачи",
     "Hitachi Construction Machinery"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "hitachi-ex",
@@ -2918,6 +3145,7 @@
     "Normet Group",
     "Нормет"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "normet-charmec",
@@ -2990,6 +3218,20 @@
     "Cryostar",
     "Криостар"
    ],
+   "role": "бренд",
+   "owner": "linde",
+   "owner_since": 2006,
+   "owner_source": "https://cryostar.com/history/",
+   "owner_note": "Cryostar входит в Linde с покупкой The BOC Group в 2006 году.",
+   "owner_history": [
+    {
+     "owner": "The BOC Group",
+     "role": "бывший владелец",
+     "owner_since": 1985,
+     "owner_until": 2006,
+     "owner_source": "https://cryostar.com/history/"
+    }
+   ],
    "series": [
     {
      "id": "cryostar-expanders",
@@ -3052,6 +3294,10 @@
     "Emerson",
     "Эмерсон"
    ],
+   "role": "бренд",
+   "owner": "emerson",
+   "owner_source": "https://www.emerson.com/en-us/about-us/company-history",
+   "owner_note": "Rosemount — марка Emerson (раздел измерительных приборов). Год покупки (1976) страница изготовителя не называет — не записан.",
    "series": [
     {
      "id": "rosemount-pressure",
@@ -3109,6 +3355,7 @@
    "context_aliases": [
     "Accelleron"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "abb-acs",
@@ -3178,7 +3425,19 @@
       "https://accelleron.com/products/turbochargers/a100-h",
       "https://accelleron.com/marine/upgrades/tpl"
      ],
-     "note": "Турбонагнетатели ABB Turbocharging выделены в Accelleron в 2022 году; в парке и спросе подписаны ABB."
+     "note": "Турбонагнетатели ABB Turbocharging выделены в Accelleron в 2022 году; в парке и спросе подписаны ABB.",
+     "owner": "Accelleron Industries",
+     "owner_since": 2022,
+     "owner_source": "https://new.abb.com/news/detail/95473/abb-completes-accelleron-spin-off",
+     "owner_note": "ABB Turbocharging выделена в самостоятельную Accelleron Industries AG, торги на SIX с 3 октября 2022 года.",
+     "owner_history": [
+      {
+       "owner": "abb",
+       "role": "бывший владелец",
+       "owner_until": 2022,
+       "owner_source": "https://new.abb.com/news/detail/95473/abb-completes-accelleron-spin-off"
+      }
+     ]
     }
    ]
   },
@@ -3191,6 +3450,7 @@
     "Ruhrpumpen",
     "Рурпумпен"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "ruhrpumpen-sce",
@@ -3242,6 +3502,7 @@
     "Нетцш",
     "Нетч"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "netzsch-nemo",
@@ -3289,6 +3550,7 @@
     "NORD",
     "Норд"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "nord-sk",
@@ -3332,6 +3594,7 @@
    "field_aliases": [
     "SEW"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "sew-gear",
@@ -3387,6 +3650,7 @@
     "Bonfiglioli",
     "Бонфиглиоли"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "bonfiglioli-vf-w",
@@ -3464,6 +3728,13 @@
     "Бургманн",
     "Игл Бургманн"
    ],
+   "role": "бренд",
+   "owner": "freudenberg",
+   "owner_source": "https://www.freudenberg.com/en/company/press-media/news-detail/2023-12-04-new-business-group-freudenberg-flow-technologies",
+   "owner_note": "Совместное предприятие Freudenberg и EKK (Eagle Industry); Freudenberg ведёт EagleBurgmann как стратегическую единицу своей бизнес-группы Freudenberg Flow Technologies с 1 января 2024 года.",
+   "co_owners": [
+    "EKK (Eagle Industry)"
+   ],
    "series": [
     {
      "id": "eagleburgmann-seals",
@@ -3499,6 +3770,7 @@
    "aliases": [
     "WEG"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "weg-w22",
@@ -3554,6 +3826,11 @@
     "Гарднер Денвер",
     "GD Energy Products"
    ],
+   "role": "бренд",
+   "owner": "ingersollrand",
+   "owner_since": 2020,
+   "owner_source": "https://www.sec.gov/Archives/edgar/data/1699150/000114036120004816/ex99_1.htm",
+   "owner_note": "Gardner Denver Holdings слилась с промышленным сегментом Ingersoll-Rand 29 февраля 2020 года и приняла имя Ingersoll Rand Inc.",
    "series": [
     {
      "id": "gd-pz",
@@ -3609,6 +3886,10 @@
     "Вилден",
     "Уилден"
    ],
+   "role": "бренд",
+   "owner": "psg",
+   "owner_source": "https://www.psgdover.com/wilden/company/about-psg-and-dover",
+   "owner_note": "Wilden — марка PSG, операционной компании Dover. Годы (Dover — 1998, PSG — 2008) страница изготовителя не называет — не записаны.",
    "series": [
     {
      "id": "wilden-aodd",
@@ -3646,6 +3927,7 @@
     "Доналдсон",
     "Дональдсон"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "donaldson-dfo",
@@ -3686,6 +3968,7 @@
     "Хоербигер",
     "Хёрбигер"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "hoerbiger-valves",
@@ -3724,6 +4007,7 @@
     "Parker",
     "Паркер"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "parker-pv",
@@ -3757,6 +4041,7 @@
     "Данфосс",
     "Данфос"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "danfoss-vlt",
@@ -3800,7 +4085,11 @@
      "sources": [
       "https://www.danfoss.com/en/products/dds/low-voltage-drives/vacon-drives/vacon-nxp-air-cooled/",
       "https://www.danfoss.com/en-us/products/dds/low-voltage-drives/vacon-drives/vacon-100-industrial/"
-     ]
+     ],
+     "owner": "danfoss",
+     "owner_since": 2014,
+     "owner_source": "https://www.danfoss.com/en/about-danfoss/news/cf/vacon-to-become-part-of-danfoss-group/",
+     "owner_note": "Vacon входит в Danfoss Group с 1 декабря 2014 года; марка VACON сохранена."
     }
    ]
   },
@@ -3818,6 +4107,7 @@
     "Rexroth",
     "Рексрот"
    ],
+   "role": "бренд",
    "series": [
     {
      "id": "rexroth-axial",
@@ -3857,6 +4147,19 @@
     "Bently",
     "Бентли",
     "Baker Hughes"
+   ],
+   "role": "бренд",
+   "owner": "bakerhughes",
+   "owner_since": 2017,
+   "owner_source": "https://www.bakerhughes.com/company/news/bently-nevada-celebrates-over-60-years-innovation",
+   "owner_history": [
+    {
+     "owner": "generalelectric",
+     "role": "бывший владелец",
+     "owner_since": 2002,
+     "owner_until": 2017,
+     "owner_source": "https://www.bakerhughes.com/company/news/bently-nevada-celebrates-over-60-years-innovation"
+    }
    ],
    "series": [
     {
@@ -3909,6 +4212,19 @@
    "aliases": [
     "LEWA"
    ],
+   "role": "бренд",
+   "owner": "atlascopco",
+   "owner_since": 2022,
+   "owner_source": "https://www.lewa.com/en/lewa-group/company-information/",
+   "owner_history": [
+    {
+     "owner": "Nikkiso Co., Ltd.",
+     "role": "бывший владелец",
+     "owner_since": 2009,
+     "owner_until": 2022,
+     "owner_source": "https://www.lewa.com/en/lewa-group/company-information/"
+    }
+   ],
    "series": [
     {
      "id": "lewa-ecoflow",
@@ -3938,5 +4254,93 @@
     }
    ]
   }
+ ],
+ "owners": [
+  {
+   "brand_key": "weirgroup",
+   "name": "The Weir Group",
+   "role": "владелец",
+   "country": "Великобритания",
+   "note": "Холдинг марки Warman (дивизион Weir Minerals)."
+  },
+  {
+   "brand_key": "emerson",
+   "name": "Emerson Electric",
+   "role": "владелец",
+   "country": "США"
+  },
+  {
+   "brand_key": "innio",
+   "name": "INNIO Group",
+   "role": "владелец",
+   "country": "Австрия",
+   "note": "Холдинг марок Jenbacher и Waukesha с 2018 года."
+  },
+  {
+   "brand_key": "rollsroycepowersystems",
+   "name": "Rolls-Royce Power Systems",
+   "role": "владелец",
+   "country": "Германия",
+   "owner": "rollsroyce",
+   "owner_source": "https://www.mtu-solutions.com/eu/en/about-us/about-rolls-royce-power-systems.html",
+   "owner_note": "Бизнес-подразделение Power Systems группы Rolls-Royce."
+  },
+  {
+   "brand_key": "freudenberg",
+   "name": "Freudenberg Group",
+   "role": "владелец",
+   "country": "Германия"
+  },
+  {
+   "brand_key": "psg",
+   "name": "PSG (Pump Solutions Group)",
+   "role": "владелец",
+   "country": "США",
+   "owner": "dover",
+   "owner_source": "https://www.psgdover.com/wilden/company/about-psg-and-dover",
+   "owner_note": "PSG — операционная компания Dover."
+  },
+  {
+   "brand_key": "dover",
+   "name": "Dover Corporation",
+   "role": "владелец",
+   "country": "США"
+  },
+  {
+   "brand_key": "linde",
+   "name": "Linde plc",
+   "role": "владелец",
+   "country": "Ирландия / Германия"
+  },
+  {
+   "brand_key": "itt",
+   "name": "ITT",
+   "role": "владелец",
+   "country": "США",
+   "note": "Ключ совпадает с записью dict/oem.json «ITT»."
+  },
+  {
+   "brand_key": "cnpc",
+   "name": "China National Petroleum Corporation (CNPC)",
+   "role": "владелец",
+   "country": "Китай"
+  },
+  {
+   "brand_key": "sandvik",
+   "name": "Sandvik AB",
+   "role": "владелец",
+   "country": "Швеция"
+  },
+  {
+   "brand_key": "volvogroup",
+   "name": "Volvo Group (AB Volvo)",
+   "role": "владелец",
+   "country": "Швеция"
+  }
+ ],
+ "roles": [
+  "бренд",
+  "владелец",
+  "бывший владелец"
  ]
 }
