@@ -1,0 +1,1111 @@
+{
+  "oem_key": "waukeshainnio",
+  "name": "Waukesha (INNIO Waukesha Gas Engines)",
+  "segment_focus": "газовые двигатели VHP (P9394GSI, L7044GSI), VGF, 275GL+ для привода компрессоров и генерации: руководства ТО, номера свечей, фильтров, катушек, датчиков; субпоставщики зажигания и регуляторов",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по INNIO Waukesha: газовые двигатели VHP (Series Five и Series Four: P9394GSI, L7044GSI, L7042GSI, F3524GSI, L5794), VGF (SE, GL/GLD, GSI/GSID) и 275GL+ (12V и 16V) для привода компрессоров и выработки электроэнергии. Текущий модельный ряд на waukeshaengine.com: 275GL+, VHP, mobileFLEX, VGF. Мощности взяты из официальных техлистов INNIO (IWK-123055, IWK-124054, IWK-123056, IWK-123083, IWK-123025, IWK-123020, IWK-123069, IWK-123077, iwk-119003) и из таблицы номинальных мощностей INNIO IWK-019010-EN (2022), которая выложена у дистрибьютора WPI.\n\nСобрано 38 кодов, у каждого есть открытая страница и дословная цитата с кодом. Источники кодов такие.\n- Руководство Waukesha Form 6243 (ремонт VGF F18/H24, 3-е изд., копия на ManualsLib): таблица запчастей ТО на 11 500 ч. Оттуда фильтры воздуха и масла, прокладка свечи, уплотнения, свечи.\n- Прикладное руководство MOTORTECH по VHP (01.00.014-EN, 2018) и его листовка по удлинителям свечей: перекрёстные таблицы «номер MOTORTECH — номер Waukesha — номер Altronic». Оттуда свечи, катушки, провода, датчики Холла, термопары, датчик O2, фильтры масла и антифриза, актуатор, дроссель.\n- Прайс-перечень реселлера McGill Industries: номера Waukesha с наименованиями, у части из них указана машина (275GL+, VGF, VHP).\n- Страница BG Service, сторонние продавцы (Everlasting, Yusen, SGJ) и Separator Spares. Применимость у них заявлена продавцом, и это оговорено в записях.\n\nПривязка кодов именно к P9394GSI слабая. Открытых перечней по этой модели не найдено, коды даны по серии VHP в целом. Опора для такой привязки — фраза официального техлиста, что у семейства Series Five общие сервисные детали.\n\nПо 275GL+ открыто найдены только удлинители свечей, монтажный набор датчика NOx и корпус дроссельной заслонки. Номера свечей и фильтров 275GL+ лежат в каталогах Form 6332-3 и 635100: их копии на Scribd автоматически не читаются.\n\nСубпоставщики:\n- зажигание: Altronic (по перекрёстным таблицам), Champion, BERU; DENSO — только аналог;\n- регулирование: HEINZMANN (актуатор VHP Series Four с ESM), газовые регуляторы Mooney и Fisher (наборы перевода VHP AFR2);\n- наддув: Garrett (турбокомпрессор 211896C для L7044GSI и F3524GSI); ABB — только общим утверждением;\n- прочее: IMPCO (карбюратор VGF GLD), Kato (генератор установок VHP Series Five для бурения), Detechtion (цифровой мониторинг SkidIQ).\n\nДилеры: из официального локатора waukeshaengine.com взяты партнёры в Казахстане, Узбекистане и Туркменистане, на Украине, в Турции (Hoerbiger), ОАЭ, Китае и Индии. В России партнёра в локаторе нет, есть только реселлеры, которые называют себя поставщиками сами.",
+  "machines": [
+    {
+      "model": "VHP Series Five P9394GSI S5",
+      "kind": "газовый двигатель V16, богатая смесь (rich-burn), ESM2 и emPact; привод компрессора, мехпривод, генерация",
+      "segment": "ГПУ",
+      "rating": "1 875–2 500 л. с. (1 400–1 865 кВт мех.), 9 388 куб. дюймов (154 л), 900–1 200 об/мин (1 875 л. с. — при 900 об/мин по таблице INNIO IWK-019010-EN); интервал свечей и масла 4 000 ч",
+      "status": "выпускается (текущий техлист INNIO, страница VHP Series Five)",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-123055-VHP-P9394GSI-S5.pdf",
+        "https://www.waukeshaengine.com/en/gas-engines/vhp-series-five",
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VHP Series Five L7044GSI S5",
+      "kind": "газовый двигатель V12, rich-burn, ESM2 и emPact",
+      "segment": "ГПУ",
+      "rating": "1 900 л. с. (1 417 кВт) при 1 200 об/мин; 7 040 куб. дюймов (115 л); по таблице INNIO 1 425–1 900 л. с. при 900–1 200 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-124054-VHP-L7044GSI-S5-08.04.25.pdf",
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VHP Series Five L7042GSI S5",
+      "kind": "газовый двигатель V12, rich-burn, ESM2",
+      "segment": "ГПУ",
+      "rating": "1 500 л. с. (1 119 кВт) при 1 200 об/мин; 7 040 куб. дюймов",
+      "status": "выпускается",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-123056-VHP-L7042GSI-S5.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VHP Series Five F3524GSI S5",
+      "kind": "газовый двигатель, рядный 6-цилиндровый, rich-burn, ESM2",
+      "segment": "ГПУ",
+      "rating": "740–950 л. с. (552–708 кВт), 3 520 куб. дюймов (58 л)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-123083-VHP-F3524GSI-S5-3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VHP Series Four L7044GSI (ESM2)",
+      "kind": "газовый двигатель V12, rich-burn",
+      "segment": "ГПУ",
+      "rating": "1 120–1 680 л. с. (835–1 253 кВт), степень сжатия 8:1",
+      "status": "предыдущая серия; INNIO предлагает её восстановленной по программе reUp (L7044GSI/L7042GSI S4 с ESM2)",
+      "sources": [
+        "https://innio.com/images/medias/files/1350/iwk-119003-vhp-l7044gsi.pdf",
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-224002-VHP-L7044GSI-42GSI-S4.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VHP Series Four L7042GSI S4",
+      "kind": "газовый двигатель V12, rich-burn",
+      "segment": "ГПУ",
+      "rating": "по таблице INNIO: 987–1 480 л. с. (736–1 104 кВт) при 800–1 200 об/мин",
+      "status": "предыдущая серия; по программе reUp",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf",
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-224002-VHP-L7044GSI-42GSI-S4.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VHP L5794GSI",
+      "kind": "газовый двигатель V12, 5 788 куб. дюймов (94,9 л), rich-burn",
+      "segment": "ГПУ",
+      "rating": "920–1 380 л. с. (686–1 029 кВт) при 800–1 200 об/мин",
+      "status": "в таблице номинальных мощностей INNIO 2022 г. (IWK-019010-EN) значится; в текущем техлисте Series Five нет",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VHP L5794LT / L5774LT",
+      "kind": "газовый двигатель V12, обеднённая смесь (lean-burn), 94,9 л",
+      "segment": "ГПУ",
+      "rating": "L5794LT: 614–1 450 л. с.; L5774LT: 614–1 280 л. с. (таблица INNIO 2022)",
+      "status": "в таблице INNIO 2022 г. значится; вне ряда Series Five",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "16V275GL+ с ESM2 (в т. ч. Fuel Flex)",
+      "kind": "газовый двигатель V16, lean-burn, 285 л, диаметр × ход 275 × 300 мм; привод компрессора, мехпривод, генерация",
+      "segment": "ГПУ",
+      "rating": "3 750–5 000 л. с. (2 796–3 729 кВт) при 750–1 000 об/мин; генерация: 3 600 кВт эл. (50 Гц, 1 000 об/мин), 3 200 кВт эл. (60 Гц, 900 об/мин)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.waukeshaengine.com/gas-engines/275gl-plus/",
+        "https://www.waukeshaengine.com/wp-content/uploads/2024/04/IWK-123020-16-275GL-powergen.pdf",
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12V275GL+ с ESM2 (в т. ч. Fuel Flex)",
+      "kind": "газовый двигатель V12, lean-burn, 214 л; ESM2 с прямым измерением NOx",
+      "segment": "ГПУ",
+      "rating": "2 812–3 750 л. с. (2 097–2 796 кВт) при 750–1 000 об/мин; генерация: 2 685 кВт эл. (50 Гц), 2 410 кВт эл. (60 Гц)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/2024/04/IWK-123025-12-275GL-ESM2-mech-drive.pdf",
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VGF H24SE (ESM2, emPact)",
+      "kind": "газовый двигатель, рядный 8-цилиндровый, 24 л; компрессоры, мехпривод, резервное питание",
+      "segment": "ГПУ",
+      "rating": "415–738 л. с. (310–550 кВт), 1 500–1 800 об/мин",
+      "status": "выпускается (текущая страница VGF)",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-123069-0726-EN-VGF-H24SE.pdf",
+        "https://www.waukeshaengine.com/gas-engines/vgf/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VGF P48SE (ESM2, emPact)",
+      "kind": "газовый двигатель V16, 48 л",
+      "segment": "ГПУ",
+      "rating": "1 065–1 475 л. с. (800–1 100 кВт), 1 800 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-123077-0726-EN-VGF-P48SE.pdf",
+        "https://www.waukeshaengine.com/gas-engines/vgf/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VGF F18GL/GLD, F18SE, F18G",
+      "kind": "газовый двигатель, рядный 6-цилиндровый, 18 л",
+      "segment": "ГПУ",
+      "rating": "310–440 л. с. (230–330 кВт) при 1 400–1 800 об/мин; F18G — 160–265 л. с.",
+      "status": "в таблице INNIO 2022 г. значится; на текущей странице VGF только H24SE и P48SE",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf",
+        "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VGF H24GL/GLD, H24GSID",
+      "kind": "газовый двигатель, рядный 8-цилиндровый, 24 л",
+      "segment": "ГПУ",
+      "rating": "355–585 л. с. (265–440 кВт)",
+      "status": "в таблице INNIO 2022 г. значится; на текущей странице VGF нет",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf",
+        "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VGF L36GL/GLD, L36GSI/GSID",
+      "kind": "газовый двигатель V12, 36 л",
+      "segment": "ГПУ",
+      "rating": "620–880 л. с. (460–660 кВт)",
+      "status": "в таблице INNIO 2022 г. значится; на текущей странице VGF нет",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VGF P48GL/GLD, P48GSI/GSID",
+      "kind": "газовый двигатель V16, 48 л",
+      "segment": "ГПУ",
+      "rating": "710–1 175 л. с. (530–880 кВт)",
+      "status": "в таблице INNIO 2022 г. значится; на текущей странице VGF только P48SE",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Enginator VHP9504GSI S5",
+      "kind": "генераторная установка на двигателе P9394GSI",
+      "segment": "ГПУ",
+      "rating": "1 770 кВт эл. (60 Гц, 1 200 об/мин), 1 600 кВт эл. (50 Гц, 1 000 об/мин)",
+      "status": "в таблице INNIO 2022 г.",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "mobileFLEX VHP7104GSI-EPA / -MOB Enginator",
+      "kind": "мобильная генераторная установка на L7044GSI (буровые, промысел)",
+      "segment": "ГПУ",
+      "rating": "1 200 кВт эл. (60 Гц); 1 100 кВт эл. (50 Гц, исполнение MOB)",
+      "status": "текущая линейка mobileFLEX",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf",
+        "https://kraftpower.com/wp-content/uploads/2024/04/Waukesha-VHP-Series-Five-brochure-CORRECT-for-WEBSITE-QR.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "AT25GL / AT27GL (в т. ч. LR)",
+      "kind": "газовый двигатель среднеоборотный (прежняя линейка)",
+      "segment": "ГПУ",
+      "rating": "не установлено открыто",
+      "status": "снята: в текущем ряду waukeshaengine.com нет; удлинители свечей под неё ещё продаются (MOTORTECH, BG)",
+      "sources": [
+        "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines-01.15.051-EN-2017-04.pdf",
+        "https://bgservice.com/ignition-products-for-waukesha-engines/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "APG1000 (серия APG)",
+      "kind": "газовый двигатель для генерации (прежняя линейка)",
+      "segment": "ГПУ",
+      "rating": "не установлено открыто",
+      "status": "снята: в текущем ряду нет; запчасти и инструмент ещё в перечнях (McGill: инструмент «VGF/APG1000»)",
+      "sources": [
+        "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines-01.15.051-EN-2017-04.pdf",
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "F18/H24 G/GL/GLD/GSID Repair & Overhaul Manual, 3-е издание (раздел 7.05 — перечень запчастей ТО на 11 500 ч, табл. 7.05-5 и 7.05-6; свечи — табл. 5.10-1 и 5.10-3)",
+      "doc_no": "Form 6243",
+      "machine": "VGF F18, H24 (G, GL, GLD, GSID)",
+      "kind": "service manual (ремонт и капремонт) с перечнем запчастей ТО",
+      "sources": [
+        "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html",
+        "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html?page=412"
+      ]
+    },
+    {
+      "title": "VGF F18/H24 GSID/GSI/GL/GLD 6 & 8 Cylinder Parts Catalog (2-е изд.; пользовательская копия, сайт отдаёт 403 — содержимое не прочитано)",
+      "doc_no": "Form 6330-2",
+      "machine": "VGF F18, H24",
+      "kind": "parts manual",
+      "sources": [
+        "https://pdfcoffee.com/6330-2-vgf-f18-h24-gsidgsiglgld-6-amp-8-cylinder-parts-catalog-pdf-free.html"
+      ]
+    },
+    {
+      "title": "VGF F18/H24 Parts Manual (строка перечня литературы Waukesha у реселлера)",
+      "doc_no": "Form 6252",
+      "machine": "VGF F18, H24",
+      "kind": "parts manual",
+      "sources": [
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/"
+      ]
+    },
+    {
+      "title": "VHP Series Five 12-Cylinder with ESM2 O&M",
+      "doc_no": "Form 10063-1",
+      "machine": "VHP Series Five 12-цилиндровые (L7044GSI S5, L7042GSI S5)",
+      "kind": "O&M",
+      "sources": [
+        "https://edoc.pub/10083-1-waukesha-vhp-series-five-packaging-guide--pdf-free.html",
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/"
+      ]
+    },
+    {
+      "title": "VHP 12 Cylinder with ESM2 Parts Catalog",
+      "doc_no": "Form 10064-1",
+      "machine": "VHP 12-цилиндровые с ESM2",
+      "kind": "parts manual",
+      "sources": [
+        "https://edoc.pub/10083-1-waukesha-vhp-series-five-packaging-guide--pdf-free.html"
+      ]
+    },
+    {
+      "title": "VHP 12 Cylinder with ESM2 Repair and Overhaul",
+      "doc_no": "Form 10065-1",
+      "machine": "VHP 12-цилиндровые с ESM2",
+      "kind": "service manual (ремонт и капремонт)",
+      "sources": [
+        "https://edoc.pub/10083-1-waukesha-vhp-series-five-packaging-guide--pdf-free.html"
+      ]
+    },
+    {
+      "title": "VHP Series Five Packaging Guide. Руководство по компоновке: смазка, выхлоп, emPact. Ссылается на спецификацию топливного газа S-7884-7, требования к пред- и послесмазке S-7382-56 и инструкцию по монтажу emPact S7232-374",
+      "doc_no": "Form 10083-1",
+      "machine": "VHP Series Five",
+      "kind": "руководство по компоновке и монтажу",
+      "sources": [
+        "https://edoc.pub/10083-1-waukesha-vhp-series-five-packaging-guide--pdf-free.html"
+      ]
+    },
+    {
+      "title": "VHP Series Four P9394GSI O&M с системой AFR2/emPact (пользовательская копия «6398-3 INNIO WEB 06-26-2024», содержимое не прочитано)",
+      "doc_no": "Form 6398-3",
+      "machine": "P9394GSI (Series Four)",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/889379780/6398-3-INNIO-WEB-06-26-2024"
+      ]
+    },
+    {
+      "title": "VHP9390 16 Cylinder R&O Manual (перечень литературы у реселлера)",
+      "doc_no": "Form 6348",
+      "machine": "P9390 (16-цилиндровый VHP, предшественник P9394GSI)",
+      "kind": "service manual",
+      "sources": [
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/"
+      ]
+    },
+    {
+      "title": "L5774/94LT, L5794/L7044GSI w/o ESM Parts Manual",
+      "doc_no": "Form 6291",
+      "machine": "L7044GSI, L5794GSI, L5794LT, L5774LT без ESM",
+      "kind": "parts manual",
+      "sources": [
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/"
+      ]
+    },
+    {
+      "title": "VHP Series Four Supplement Manual",
+      "doc_no": "Form 6282",
+      "machine": "VHP Series Four",
+      "kind": "service manual (дополнение)",
+      "sources": [
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/"
+      ]
+    },
+    {
+      "title": "VHP Series Operation & Service Book",
+      "doc_no": "Form 5579",
+      "machine": "VHP",
+      "kind": "O&M",
+      "sources": [
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/"
+      ]
+    },
+    {
+      "title": "275GL+ 16V / 275GL/GL+ Parts Catalog (пользовательская копия «6332-3 web», содержимое не прочитано)",
+      "doc_no": "Form 6332-3",
+      "machine": "16V275GL+, 275GL",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.scribd.com/document/508076104/6332-3-web"
+      ]
+    },
+    {
+      "title": "Parts catalog 275GL/275GL+ 12V (пользовательская копия «FORM 635100»; номер как в заголовке копии, содержимое не прочитано)",
+      "doc_no": "635100",
+      "machine": "12V275GL, 12V275GL+",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.scribd.com/document/707130975/FORM-635100"
+      ]
+    },
+    {
+      "title": "MOTORTECH Application Guide for WAUKESHA VHP Series. Перекрёстные таблицы «номер MOTORTECH — номер Waukesha — номер Altronic»: зажигание, датчики, фильтры",
+      "doc_no": "01.00.014-EN Rev.02/2018",
+      "machine": "VHP (F2895, F3521, L5108, L5790, L7042, L7044, P9394 и др.)",
+      "kind": "каталог аналогов (сторонний)",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf"
+      ]
+    },
+    {
+      "title": "MOTORTECH PolyMot Spark Plug Extensions for WAUKESHA Gas Engines. Таблица удлинителей и свечей по сериям, с номерами Waukesha и BG",
+      "doc_no": "01.15.051-EN (2017-04)",
+      "machine": "275GL+, APG, AT25/27GL, VGF, VHP Series Four, VHP GL",
+      "kind": "каталог аналогов (сторонний)",
+      "sources": [
+        "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines-01.15.051-EN-2017-04.pdf"
+      ]
+    },
+    {
+      "title": "Техлисты INNIO: VHP Series Five P9394GSI S5 и L7044GSI S5 (ESM2, emPact); интервал свечей и масла 4 000 ч",
+      "doc_no": "IWK-123055; IWK-124054",
+      "machine": "P9394GSI S5, L7044GSI S5",
+      "kind": "техлист (technical data)",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-123055-VHP-P9394GSI-S5.pdf",
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-124054-VHP-L7044GSI-S5-08.04.25.pdf"
+      ]
+    },
+    {
+      "title": "Техлисты INNIO 275GL+: 12V (мехпривод, ESM2) и 16V (генерация)",
+      "doc_no": "IWK-123025; IWK-123020",
+      "machine": "12V275GL+, 16V275GL+",
+      "kind": "техлист (technical data)",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/2024/04/IWK-123025-12-275GL-ESM2-mech-drive.pdf",
+        "https://www.waukeshaengine.com/wp-content/uploads/2024/04/IWK-123020-16-275GL-powergen.pdf"
+      ]
+    },
+    {
+      "title": "Номинальные мощности газовых двигателей Waukesha: компрессия и мехпривод, генерация, альтернативные газы, mobileFLEX",
+      "doc_no": "IWK-019010-EN (2022)",
+      "machine": "275GL+, VHP, VGF, mobileFLEX",
+      "kind": "таблица номинальных мощностей",
+      "sources": [
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "60999F",
+      "issuer": "Waukesha (номер изготовителя двигателя, приведён в перекрёстной таблице MOTORTECH)",
+      "description": "Свеча зажигания M18x1,5 под головки VHP с вылетом резьбы 0,500 дюйма; соответствует Champion RM77N",
+      "machine": "VHP (серия в целом, по MOTORTECH)",
+      "unit": "Система зажигания — свеча",
+      "doc_ref": "MOTORTECH Application Guide for WAUKESHA VHP Series 01.00.014-EN, раздел Spark Plugs (M18x1.5, 0.500 in reach)",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N RM77N WAUKESHA® P/N 60999F"
+    },
+    {
+      "code": "60999Z",
+      "issuer": "Waukesha (номер изготовителя двигателя, по таблице MOTORTECH)",
+      "description": "Свеча зажигания M18x1,5 под головки VHP с вылетом резьбы 0,750 дюйма; соответствует Champion FB77WPCC (также RB77WPCC, KB77WPCC)",
+      "machine": "VHP (головки с вылетом 0,750 дюйма)",
+      "unit": "Система зажигания — свеча",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Spark Plugs (0.750 in reach)",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N FB77WPCC WAUKESHA® P/N 60999Z"
+    },
+    {
+      "code": "60999T",
+      "issuer": "Waukesha (номер изготовителя двигателя, по листовке MOTORTECH)",
+      "description": "Свеча зажигания, эквивалент Champion FB77WPCC: M18x1,5, вылет 0,750 дюйма, J-тип Ir/Pt, шестигранник 7/8 дюйма",
+      "machine": "275GL+, VGF, VHP Series Four, VHP GL, APG, AT25/27GL-LR (по строкам удлинителей в листовке MOTORTECH)",
+      "unit": "Система зажигания — свеча",
+      "doc_ref": "MOTORTECH Sales Flyer 01.15.051-EN, Ordering Information — Optional Equipment",
+      "source_url": "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines-01.15.051-EN-2017-04.pdf",
+      "quote": "FB77WPCC CHAMPION® spark plug, M18x1.5, reach 0.750 in., J-type Ir/Pt, HEX 7/8 in. (22.2 mm) 69919, 60999T"
+    },
+    {
+      "code": "69919",
+      "issuer": "Waukesha (руководство изготовителя двигателя)",
+      "description": "Свеча зажигания для исполнения CSA с фланцевыми катушками; зазор 0,010–0,012 дюйма. Это единственная свеча, для которой при повторной установке прокладку не меняют",
+      "machine": "VGF F18/H24 (G, GL, GLD, GSID)",
+      "unit": "Система зажигания — свеча",
+      "doc_ref": "Waukesha Form 6243, 3-е изд., с. 222, примечание к табл. 5.10-3 (копия на ManualsLib)",
+      "source_url": "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html?page=222",
+      "quote": "Spark plugs 69919, 60999S and 60999W are used with CSA flange mounted coils."
+    },
+    {
+      "code": "69919H",
+      "issuer": "Waukesha (номер в названии карточки китайского аналога SGJ)",
+      "description": "Свеча зажигания M18x1,5 с четырьмя боковыми электродами, аналог SGJ X26-15; применимость по данным продавца",
+      "machine": "L7044GSI S5 (по данным продавца)",
+      "unit": "Система зажигания — свеча",
+      "doc_ref": "Карточка SGJ International на Made-in-China (аналог, не оригинал); скептик нашёл номер также как «Waukesha Spark Plug Part # 69919H» на eBay и в OneClick Warehouse",
+      "source_url": "https://sgj-international.en.made-in-china.com/product/SwsGciyMGCrW/China-Sgj-High-Quality-Spark-Plug-69919h-X26-15-Waukesha-Plug-4-Gnd-Spark-M18X1-5-for-Waukesha-or-Motor-L-7044-Sgi-S5-Pn-69919-H-P-N-69919h.html",
+      "quote": "Sgj High Quality Spark Plug 69919h (X26-15) Waukesha Plug, 4 Gnd Spark, M18X1.5 for Waukesha or Motor L 7044 Sgi S5, Pn 69919 H, P-N 69919h"
+    },
+    {
+      "code": "FB77WPCC",
+      "issuer": "Champion (номер изготовителя свечи, не номер Waukesha)",
+      "description": "Свеча Champion M18x1,5, вылет 0,750 дюйма, J-тип Ir/Pt. MOTORTECH ставит её в соответствие номерам Waukesha 69919 и 60999T, а в прикладном руководстве — и 60999Z",
+      "machine": "275GL+, VGF, VHP Series Four, VHP GL, APG (по MOTORTECH)",
+      "unit": "Система зажигания — свеча",
+      "doc_ref": "MOTORTECH Sales Flyer 01.15.051-EN, Optional Equipment",
+      "source_url": "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines-01.15.051-EN-2017-04.pdf",
+      "quote": "FB77WPCC CHAMPION® spark plug, M18x1.5, reach 0.750 in., J-type Ir/Pt, HEX 7/8 in. (22.2 mm)"
+    },
+    {
+      "code": "GI3-3",
+      "issuer": "DENSO (номер изготовителя свечи; аналог)",
+      "description": "Свеча DENSO M18x1,5, вылет 0,750 дюйма, J-тип Ir/Pt. По MOTORTECH — альтернатива Champion FB77WPCC",
+      "machine": "275GL+, VGF, VHP Series Four, VHP GL, APG (по MOTORTECH)",
+      "unit": "Система зажигания — свеча",
+      "doc_ref": "MOTORTECH Sales Flyer 01.15.051-EN, Optional Equipment",
+      "source_url": "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines-01.15.051-EN-2017-04.pdf",
+      "quote": "GI3-3 DENSO® spark plug, M18x1.5, reach 0.750 in., J-type Ir/Pt, HEX 7/8 in. (22.2 mm)"
+    },
+    {
+      "code": "69694G",
+      "issuer": "Waukesha (по перекрёстной таблице MOTORTECH; там же Altronic 591018)",
+      "description": "Фланцевая катушка зажигания, разъём MIL 3-pin, для контроллеров CEC или системы ESM; соответствует MOTORTECH 06.50.035 и Altronic 591018",
+      "machine": "VHP с ESM/CEC",
+      "unit": "Система зажигания — катушка",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Ignition Coils",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 06.50.035 WAUKESHA® P/N 69694G, A69694G"
+    },
+    {
+      "code": "69957",
+      "issuer": "Waukesha (по таблице MOTORTECH)",
+      "description": "Фланцевая катушка зажигания со встроенным первичным проводом 36 дюймов, для системы ESM; соответствует MOTORTECH 06.50.035-36-E",
+      "machine": "VHP с ESM",
+      "unit": "Система зажигания — катушка",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Ignition Coils",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 06.50.035-36-E WAUKESHA® P/N 69957, 69957A"
+    },
+    {
+      "code": "69694B",
+      "issuer": "Waukesha (по таблице MOTORTECH, рядом номер Altronic)",
+      "description": "Катушка зажигания в исполнении Altronic, неэкранированная, для контроллеров CEC; соответствует Altronic 591010",
+      "machine": "VHP с CEC (прежние исполнения)",
+      "unit": "Система зажигания — катушка",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Ignition Coils",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 06.50.054 WAUKESHA® P/N 69694B ALTRONIC® P/N 591010"
+    },
+    {
+      "code": "211357H",
+      "issuer": "Waukesha (по таблице MOTORTECH)",
+      "description": "Высоковольтный провод свечи зажигания; соответствует MOTORTECH PolyMot 06.85.422-16",
+      "machine": "VHP G/GU/GSI",
+      "unit": "Система зажигания — провод свечи",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Spark Plug Leads",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "For VHP G/GU/GSI series P/N 06.85.422-16 WAUKESHA® P/N 211357H"
+    },
+    {
+      "code": "211797A",
+      "issuer": "Waukesha (по таблице MOTORTECH)",
+      "description": "Удлинитель свечи зажигания VHP Series Four (также A211797G); соответствует MOTORTECH 06.80.340-T и BG 25080-06 / 26510-06",
+      "machine": "VHP Series Four",
+      "unit": "Система зажигания — удлинитель свечи",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Spark Plug Extensions",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "For VHP Series Four P/N 06.80.340-T WAUKESHA® P/N 211797A, A211797G"
+    },
+    {
+      "code": "A211797R",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Удлинитель свечи зажигания в сборе, VHP",
+      "machine": "VHP (по наименованию позиции)",
+      "unit": "Система зажигания — удлинитель свечи",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "A211797R - EXTENSION ASM., SPARK PLUG (VHP)"
+    },
+    {
+      "code": "A211797S",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Удлинитель свечи зажигания в сборе, VGF",
+      "machine": "VGF (по наименованию позиции)",
+      "unit": "Система зажигания — удлинитель свечи",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "A211797S - EXTENSION ASM., SPARK PLUG (VGF)"
+    },
+    {
+      "code": "A296064K",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Удлинитель свечи зажигания в сборе, 275GL+",
+      "machine": "275GL+ (по наименованию позиции)",
+      "unit": "Система зажигания — удлинитель свечи",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "A296064K - EXTENSION ASM., SPARK PLUG (275GL+)"
+    },
+    {
+      "code": "A296064J",
+      "issuer": "Waukesha (перекрёстная таблица BG Service: BG 26400-10)",
+      "description": "Удлинитель свечи зажигания 275GL. Аналог BG — 26400-10; у MOTORTECH — 06.80.471-T длиной 15 дюймов для серии 275GL+",
+      "machine": "275GL / 275GL+",
+      "unit": "Система зажигания — удлинитель свечи",
+      "doc_ref": "BG Service, «Spark Plug Extensions for Waukesha Engines», таблица Engine Model / BG P/N / Waukesha Cross-Reference",
+      "source_url": "https://bgservice.com/ignition-products-for-waukesha-engines/",
+      "quote": "275GL 26400-10 A296064J A296064K"
+    },
+    {
+      "code": "295844A",
+      "issuer": "Waukesha (по таблице MOTORTECH; также Altronic 791050-2)",
+      "description": "Датчик Холла (Active Low), резьба 5/8-18 UNF, длина 2,50 дюйма; соответствует MOTORTECH 95.70.002-250",
+      "machine": "VHP",
+      "unit": "Зажигание и управление — датчик положения",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Pickups",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 95.70.002-250 WAUKESHA® P/N 295844A"
+    },
+    {
+      "code": "211288S",
+      "issuer": "Waukesha (по таблице MOTORTECH)",
+      "description": "Термопара типа K (NiCr-Ni), 90°, провод 23 фута. Ставится в рейку термопар выхлопа 12-цилиндрового VHP",
+      "machine": "VHP 12-цилиндровые (L7044GSI, L7042GSI и др.)",
+      "unit": "Выхлоп — термопара",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Sensor Systems — Thermocouple Rails",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 56.01.094-23 WAUKESHA® P/N 211288S"
+    },
+    {
+      "code": "A740106E",
+      "issuer": "Waukesha (по таблице MOTORTECH; заменяет также A740106D, A740106C)",
+      "description": "Датчик кислорода для VHP G/GSI/LT; разъём на 2 контакта, длина 17 дюймов",
+      "machine": "VHP G/GSI/LT (как в источнике); L7044GSI и P9394GSI — вывод разведки по обозначению серии",
+      "unit": "Регулирование состава смеси — датчик O2",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Oxygen Sensors",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N A740106E-MOT WAUKESHA® P/N A740106E, A740106D,"
+    },
+    {
+      "code": "A740110C",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Датчик детонации в сборе (система ESM)",
+      "machine": "на странице не указана (двигатели с ESM)",
+      "unit": "Управление — датчик детонации",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "A740110C - SENSOR ASM,KNOCK CONTROL"
+    },
+    {
+      "code": "A740132",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Широкополосный датчик кислорода в сборе",
+      "machine": "на странице не указана",
+      "unit": "Регулирование состава смеси — датчик O2",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "A740132 - ASSEMBLY, WIDEBAND OXYGEN SENSOR"
+    },
+    {
+      "code": "740118",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Датчик давления масла",
+      "machine": "на странице не указана (номер из группы 740xxx — ESM)",
+      "unit": "Смазка — датчик давления",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "740118 - TRANSDUCER, PRESSURE, OIL"
+    },
+    {
+      "code": "495795",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Монтажный набор датчика NOx 275GL. ESM2 275GL+ ведёт замкнутое регулирование по прямому измерению NOx",
+      "machine": "275GL / 275GL+",
+      "unit": "Управление — датчик NOx",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "495795 - 275GL NOX SENSOR MOUNTING KIT"
+    },
+    {
+      "code": "K296236A",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Корпус дроссельной заслонки в сборе",
+      "machine": "12V275GL+",
+      "unit": "Впуск — дроссельная заслонка",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "K296236A - HOUSING ASM., BUTTERFLY VALVE (12V275GL+)"
+    },
+    {
+      "code": "168660B",
+      "issuer": "Waukesha (номер в карточке китайского продавца Everlasting Parts)",
+      "description": "Элемент масляного фильтра. Продавец даёт аналоги Fleetguard LF3963 и Donaldson P550614; у McGill позиция названа «ELEMENT FILT LUB OIL»",
+      "machine": "L5108, L7042GL, P9390 (VHP) — по данным продавца",
+      "unit": "Смазка — фильтр масла",
+      "doc_ref": "Карточка China Everlasting Parts (аналог или оригинал — продавец предлагает оба)",
+      "source_url": "https://www.enginegensetparts.com/auto-filters/oil-filters/lube-filter-168660b-for-waukesha.html",
+      "quote": "Lube Filter 168660B For WAUKESHA 168660B Hydraulic Filter Spin-On Exchage FLEETGUARD LF3963 DONALDSON P550614 Applied to WAUKESHA L5108 L7042GL P9390 ENGINE"
+    },
+    {
+      "code": "489493",
+      "issuer": "Waukesha (по таблице MOTORTECH; у McGill — ELEMENT,STAINLESS STEEL)",
+      "description": "Многоразовый элемент масляного фильтра из нержавеющей стали, 25 мкм, длина 30 дюймов, диаметр 3 дюйма; очищаемая замена элемента 168660B",
+      "machine": "VHP",
+      "unit": "Смазка — фильтр масла",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Lube Oil Filtration",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 25.00.311-WA WAUKESHA® P/N 168660B, 489493"
+    },
+    {
+      "code": "489508",
+      "issuer": "Waukesha (по таблице MOTORTECH)",
+      "description": "Элемент байпасного фильтра охлаждающей жидкости, 50 мкм, длина 9 дюймов (к фильтру 489501)",
+      "machine": "VHP",
+      "unit": "Охлаждение — фильтр ОЖ",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Coolant Filtration",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 25.00.109-50 WAUKESHA® P/N 489508"
+    },
+    {
+      "code": "214105",
+      "issuer": "Waukesha (номер на странице сервисной компании Separator Spares)",
+      "description": "Центрифуга Microspin тонкой очистки масла с нижним сливом",
+      "machine": "L7044GSI, L5794GSI, L5794LT, L5774LT",
+      "unit": "Смазка — центрифуга (байпасная очистка)",
+      "doc_ref": "Separator Spares & Equipment, «Need to replace your Waukesha Microspin Centrifuge?»",
+      "source_url": "https://separatorequipment.com/waukesha-microspin-centrifuge/",
+      "quote": "The Waukesha Microspin centrifuge P/N 214105 is designed for bottom drain applications. This centrifuge is utilized on the Waukesha L5774LT, Waukesha L5794GSI, Waukesha L5794LT, and Waukesha L7044GSI engines."
+    },
+    {
+      "code": "489189",
+      "issuer": "Waukesha (номер на странице Separator Spares)",
+      "description": "Байпасная центрифуга Microspin, большой типоразмер",
+      "machine": "VGF V-образные, все VHP, AT",
+      "unit": "Смазка — центрифуга (байпасная очистка)",
+      "doc_ref": "Separator Spares & Equipment, страница о Microspin",
+      "source_url": "https://separatorequipment.com/waukesha-microspin-centrifuge/",
+      "quote": "The P/N 489189 is designed for all Waukesha “VEE” model VGF, all Waukesha VHPs, and Waukesha AT engines."
+    },
+    {
+      "code": "211896C",
+      "issuer": "Waukesha (номер в карточке китайского изготовителя турбин YUSEN; там же номера Garrett 7048370002, 7048375002, 7048379002)",
+      "description": "Турбокомпрессор; на карточке номера Garrett — по ним установлен изготовитель турбины",
+      "machine": "F3524GSI, L7044GSI (по данным продавца)",
+      "unit": "Наддув — турбокомпрессор",
+      "doc_ref": "Карточка YUSEN Power (аналог; «OE Number: NA»)",
+      "source_url": "https://www.yusen-power.com/waukesha-211896c-f3524gsi-l7044gsi-turbocharger-ge.html",
+      "quote": "Waukesha: 211896C 211896 7048375002S 7048375002 AIR7048375002S Group Number 3.5001 GARRETT 7048370002 GARRETT 7048375002 GARRETT 7048379002 F3524GSI L7044GSI"
+    },
+    {
+      "code": "214046",
+      "issuer": "Waukesha (номер, которому MOTORTECH ставит в соответствие свой набор замены актуатора)",
+      "description": "Актуатор дроссельной заслонки. Штатный узел — HEINZMANN: набор MOTORTECH 63.04.176 «Eliminates HEINZMANN actuator»",
+      "machine": "VHP Series Four с ESM, исполнения Extender",
+      "unit": "Регулирование — актуатор дросселя",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Gas Engine Control Systems — Actuator Replacement Kit",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 63.04.176 WAUKESHA® P/N 214046"
+    },
+    {
+      "code": "E204072",
+      "issuer": "Waukesha (по таблице MOTORTECH)",
+      "description": "Корпус дроссельной заслонки для рядных 6- и V-образных 12-цилиндровых VHP",
+      "machine": "VHP G/GSI/LT 6 и 12 цилиндров",
+      "unit": "Впуск — дроссельная заслонка",
+      "doc_ref": "MOTORTECH Application Guide VHP 01.00.014-EN, Throttle Bodies",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+      "quote": "P/N 30.41.151-106-VHP-6 WAUKESHA® P/N E204072"
+    },
+    {
+      "code": "169180L",
+      "issuer": "Waukesha (руководство изготовителя)",
+      "description": "Элемент воздушного фильтра (для GL и GSID; для GLD — 169180K), 5 шт. на 11 500 ч",
+      "machine": "VGF F18 и H24 (GL, GSID)",
+      "unit": "Впуск — воздушный фильтр",
+      "doc_ref": "Waukesha Form 6243, табл. 7.05-5 «F18 Maintenance Parts Reference», с. 412",
+      "source_url": "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html?page=412",
+      "quote": "5 169180L Air Filter Element, GL"
+    },
+    {
+      "code": "208349",
+      "issuer": "Waukesha (руководство изготовителя)",
+      "description": "Элемент воздушного предочистителя (для G, GL и GSID; для GLD — 208349A)",
+      "machine": "VGF F18 и H24",
+      "unit": "Впуск — предочиститель воздуха",
+      "doc_ref": "Waukesha Form 6243, табл. 7.05-5 и 7.05-6, с. 412",
+      "source_url": "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html?page=412",
+      "quote": "5 208349 Air Precleaner Element, G, GL, GSID"
+    },
+    {
+      "code": "304126",
+      "issuer": "Waukesha (руководство изготовителя)",
+      "description": "Масляный фильтр: 3 шт. на замену, 12 шт. на 11 500 ч. У продавца Everlasting — аналог Donaldson P551102",
+      "machine": "VGF F18 и H24",
+      "unit": "Смазка — фильтр масла",
+      "doc_ref": "Waukesha Form 6243, табл. 7.05-5, с. 412",
+      "source_url": "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html?page=412",
+      "quote": "12 304126 Oil Filter (Use 3 per change)"
+    },
+    {
+      "code": "209681",
+      "issuer": "Waukesha (руководство изготовителя)",
+      "description": "Прокладка свечи зажигания 18 мм (в табл. 5.10-1 допускается и 499865); 42 шт. на F18 за 11 500 ч",
+      "machine": "VGF F18 и H24",
+      "unit": "Система зажигания — уплотнение свечи",
+      "doc_ref": "Waukesha Form 6243, табл. 7.05-5, с. 412",
+      "source_url": "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html?page=412",
+      "quote": "42 209681 Spark Plug Gasket"
+    },
+    {
+      "code": "304745L",
+      "issuer": "Waukesha (руководство изготовителя)",
+      "description": "Уплотнительное кольцо крышки коромысел",
+      "machine": "VGF F18 и H24",
+      "unit": "Головка цилиндров — уплотнения",
+      "doc_ref": "Waukesha Form 6243, табл. 7.05-5, с. 412",
+      "source_url": "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html?page=412",
+      "quote": "12 304745L Rocker Arm Cover O--ring"
+    },
+    {
+      "code": "489104",
+      "issuer": "Waukesha (перечень реселлера McGill Industries)",
+      "description": "Комплект масляного фильтра для VGF (только V-образные)",
+      "machine": "VGF V-образные (L36, P48)",
+      "unit": "Смазка — фильтр масла",
+      "doc_ref": "McGill Industries, перечень номеров Waukesha",
+      "source_url": "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+      "quote": "489104 - OIL FILTER KIT VGF (V ONLY)"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Altronic (группа HOERBIGER)",
+      "component": "катушки зажигания, выходные жгуты магнето и CPU, датчики Холла и магнитные датчики",
+      "machine": "VHP (исполнения CEC и ESM)",
+      "evidence": "В перекрёстных таблицах MOTORTECH номера Waukesha стоят рядом с номерами Altronic: 69694B = Altronic 591010, 69694G = 591018, жгут 69703 = 393018-1, датчик 295844A = 791050-2. То, что Altronic — штатный изготовитель этих узлов, — вывод по совпадению номеров, а не прямое утверждение",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf"
+      ]
+    },
+    {
+      "company": "Champion (ныне DRiV / Tenneco)",
+      "component": "свечи зажигания",
+      "machine": "VHP, VGF, 275GL+",
+      "evidence": "По MOTORTECH: Waukesha 60999F = Champion RM77N, 60999Z = Champion FB77WPCC, FB77WPCC = Waukesha 69919 и 60999T. Штатная поставка — вывод по перекрёстным таблицам",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+        "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines-01.15.051-EN-2017-04.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "BERU (BorgWarner)",
+      "component": "свечи зажигания",
+      "machine": "VHP, VGF (свеча группы 69919)",
+      "evidence": "В перечне номеров Waukesha у McGill: «69919C - DIP SPARK PLUG,BERU». Справочник sparkplug-crossreference даёт Beru Z202 и 18GZ6-77-2 как замену Waukesha 60999Z",
+      "sources": [
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/",
+        "https://www.sparkplug-crossreference.com/convert/WAUKESHA/60999Z"
+      ],
+      "verified": true
+    },
+    {
+      "company": "HEINZMANN",
+      "component": "актуатор (сервопривод) дроссельной заслонки",
+      "machine": "VHP Series Four с ESM, исполнения Extender",
+      "evidence": "Набор MOTORTECH 63.04.176 = Waukesha 214046 описан как «Eliminates HEINZMANN® actuator». В наборе EMIT для VHP есть позиция «Servo motor (heinzmann)»",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+        "https://data.emittechnologies.com/wiki/index.php?title=Waukesha_VHP_Engine_Controls"
+      ]
+    },
+    {
+      "company": "Garrett (Garrett Motion, ранее Honeywell)",
+      "component": "турбокомпрессор Waukesha 211896C",
+      "machine": "L7044GSI, F3524GSI",
+      "evidence": "На карточке YUSEN у номера Waukesha 211896C указаны номера Garrett 7048370002, 7048375002, 7048379002. Изготовитель установлен по этим номерам; модели турбин P9394GSI и 275GL+ не установлены. Держится на одной карточке продавца аналогов (YUSEN)",
+      "sources": [
+        "https://www.yusen-power.com/waukesha-211896c-f3524gsi-l7044gsi-turbocharger-ge.html"
+      ],
+      "verified": false
+    },
+    {
+      "company": "ABB Turbocharging (ныне Accelleron)",
+      "component": "турбокомпрессоры (серии RR, TPC, TPL, TPS, VTC, VTR)",
+      "machine": "двигатели Waukesha — модели не названы",
+      "evidence": "Cooper Machinery Services (TSI) о турбинах ABB: «Most of these are installed on Superior, Caterpillar and Waukesha engines». Утверждение общее, привязки к модели двигателя нет",
+      "sources": [
+        "https://www.cooperservices.com/turbochargers/turbocharger-brands/abb-turbochargers/"
+      ]
+    },
+    {
+      "company": "IMPCO",
+      "component": "карбюратор (газовый смеситель)",
+      "machine": "VGF F18/H24 GLD",
+      "evidence": "Waukesha Form 6243, с. 253: «AIR DUCT INSTALLATION - - G/GSID/GL AND IMPCO GLD Air ducts for the G, GSID, GL and IMPCO carbureted GLD engines»",
+      "sources": [
+        "https://www.manualslib.com/manual/3084720/Waukesha-Vgf-F18g.html?page=253"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Mooney и Fisher (Emerson)",
+      "component": "регуляторы давления топливного газа",
+      "machine": "VHP с AFR2",
+      "evidence": "В перечне номеров Waukesha у McGill есть наборы «495758C - MOONEY TO FISHER KIT (VHP AFR2)» и «VHP MOONEY TO FISHER SINGLE FUEL INLET KIT»: переход с регулятора Mooney на Fisher. Какой регулятор штатный в данном исполнении, из открытых данных не видно",
+      "sources": [
+        "https://mcgillindustries.com/brand/waukesha-engine-parts/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Kato Engineering",
+      "component": "генератор 600 В, 6 полюсов, двухопорный",
+      "machine": "генераторные установки VHP Series Five для бурения (слова mobileFLEX в брошюре нет; привязка к mobileFLEX — вывод)",
+      "evidence": "В брошюре VHP Series Five (выложена дистрибьютором Kraft Power) среди компонентов: «Kato 600V Alternator», «Kato 6 Pole/ 2-bearing optimized for drilling applications»",
+      "sources": [
+        "https://kraftpower.com/wp-content/uploads/2024/04/Waukesha-VHP-Series-Five-brochure-CORRECT-for-WEBSITE-QR.pdf"
+      ]
+    },
+    {
+      "company": "Detechtion Technologies",
+      "component": "цифровой мониторинг агрегата SkidIQ (аналитика двигателя и компрессора)",
+      "machine": "VHP Series Five, 275GL+ (компрессорные агрегаты); в техлистах VGF не упомянут",
+      "evidence": "Официальные техлисты INNIO: «our Waukesha digital solutions include a collaborative solution with Detechtion Technologies for gas compression applications»",
+      "sources": [
+        "https://www.waukeshaengine.com/wp-content/uploads/IWK-123055-VHP-P9394GSI-S5.pdf",
+        "https://www.waukeshaengine.com/wp-content/uploads/2024/04/IWK-123025-12-275GL-ESM2-mech-drive.pdf"
+      ]
+    },
+    {
+      "company": "Kenco",
+      "component": "регулятор уровня масла",
+      "machine": "VHP (по данным продавца)",
+      "evidence": "Каталог российского реселлера Детройт-СТ: «Регулятор уровня масла Kenco. KENCO 157255J». Держится на одной карточке продавца",
+      "sources": [
+        "https://detroit-st.ru/motors/waukesha/waukesha-vhp/"
+      ],
+      "verified": false
+    },
+    {
+      "company": "MOTORTECH (аналоги, не штатный поставщик)",
+      "component": "контроллеры зажигания, катушки, провода, удлинители и свечи, датчики, дроссели, фильтры — замены под номера Waukesha",
+      "machine": "VHP, VGF, 275GL+, APG, AT",
+      "evidence": "Прикладное руководство по VHP и листовка по удлинителям с построчной таблицей эквивалентов номеров Waukesha",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+        "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines-01.15.051-EN-2017-04.pdf"
+      ]
+    },
+    {
+      "company": "The BG Service Company (аналоги)",
+      "component": "удлинители свечей зажигания",
+      "machine": "VHP, VGF, APG, 275GL, AT25/27GL",
+      "evidence": "Таблица BG P/N ↔ номера Waukesha: например, 26400-10 = A296064J, A296064K (275GL)",
+      "sources": [
+        "https://bgservice.com/ignition-products-for-waukesha-engines/"
+      ]
+    },
+    {
+      "company": "Donaldson / Fleetguard (аналоги фильтров)",
+      "component": "фильтры масла",
+      "machine": "VHP (168660B), VGF (304126)",
+      "evidence": "Продавец Everlasting даёт замену 168660B — Fleetguard LF3963 и Donaldson P550614, замену 304126 — Donaldson P551102. Это перекрёстная таблица продавца, а не подтверждённая штатная поставка",
+      "sources": [
+        "https://www.enginegensetparts.com/auto-filters/oil-filters/lube-filter-168660b-for-waukesha.html"
+      ],
+      "verified": false
+    },
+    {
+      "company": "EMIT Technologies (аналог системы управления)",
+      "component": "регулятор соотношения воздух/топливо, модуль зажигания, модуль оборотов — замена ESM",
+      "machine": "VHP 7044, 5794, 3524",
+      "evidence": "Вики EMIT: «EMIT engine control products (AFRC, Ignition, and speed controller) can be used on Waukesha VHP engines… These kits can replace the ESM»",
+      "sources": [
+        "https://data.emittechnologies.com/wiki/index.php?title=Waukesha_VHP_Engine_Controls"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "ES Compression Too",
+      "country": "Казахстан",
+      "role": "официальный провайдер по локатору waukeshaengine.com (территория — Казахстан): продажа двигателей, компоновка компрессорных и энергоагрегатов, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/es-compression/"
+      ]
+    },
+    {
+      "company": "DYNATEC (иностранное ООО)",
+      "country": "Узбекистан",
+      "role": "официальный провайдер по локатору (Узбекистан, Туркменистан): продажа двигателей, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/dynatec-mas-uliyati-cheklangan-jamiyati-xorijiy-korxonasi/"
+      ]
+    },
+    {
+      "company": "KTS Engineering LLC",
+      "country": "Украина",
+      "role": "официальный провайдер по локатору (Украина): продажа двигателей, запчасти, сервис. По своему сайту — дистрибьютор INNIO, представительства в Словакии, Узбекистане и на Украине",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/kts-engineering-2/",
+        "https://www.kts-eng.com/en/product/waukesha-vhp-5-seriya/"
+      ]
+    },
+    {
+      "company": "Hoerbiger Service Middle East FZE",
+      "country": "Турция / ОАЭ",
+      "role": "официальный провайдер по локатору. Одна запись — на территорию Турции, другая — на Ближний Восток (ОАЭ, Ирак, Кувейт, Катар, Иордания и др.); адрес — Джебель-Али, Дубай. Продажа двигателей, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/hoerbiger-service-middle-east-fze/",
+        "https://www.waukeshaengine.com/providers/hoerbiger-service-middle-east-fze-6/"
+      ]
+    },
+    {
+      "company": "Orient Energy Systems FZCO",
+      "country": "ОАЭ",
+      "role": "официальный провайдер по локатору (ОАЭ; отдельные записи — Оман и Бахрейн): продажа двигателей, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/orient-energy-systems-fzco/"
+      ]
+    },
+    {
+      "company": "Wasco Engineering International Limited (Dubai BR)",
+      "country": "ОАЭ",
+      "role": "официальный провайдер по локатору: продажа двигателей, компоновка компрессорных агрегатов, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/wasco-engineering-international-limited-dubai-br/"
+      ]
+    },
+    {
+      "company": "Enerflex Middle East",
+      "country": "ОАЭ",
+      "role": "официальный провайдер по локатору (ОАЭ; также Оман, Бахрейн): компоновка компрессорных и энергоагрегатов, сервис; продажи двигателей и запчастей в записи нет",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/enerflex-middle-east-for-united-arab-emirates/"
+      ]
+    },
+    {
+      "company": "SHANDONG KERUI Petroleum & Gas Equipment Co., Ltd.",
+      "country": "Китай",
+      "role": "официальный провайдер по локатору (материковый Китай): продажа двигателей, компоновка агрегатов, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/shandong-kerui-petroleum-gas-equipment-co-ltd/"
+      ]
+    },
+    {
+      "company": "Jereh Oil & Gas Engineering Corporation",
+      "country": "Китай",
+      "role": "официальный провайдер по локатору (материковый Китай; отдельная запись — Пакистан): продажа двигателей, компоновка, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/jereh-oil-gas-engineering-corporation-zh/",
+        "https://www.waukeshaengine.com/providers/jereh-oil-gas-engineering-corporation-4/"
+      ]
+    },
+    {
+      "company": "Xian Ituo Petroleum Technology Co., Ltd.",
+      "country": "Китай",
+      "role": "официальный провайдер по локатору (материковый Китай): продажа двигателей, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/xi-an-ituo-petroleum-technology-co-ltd/"
+      ]
+    },
+    {
+      "company": "China Diesel Support Services Ltd",
+      "country": "Китай",
+      "role": "официальный провайдер по локатору (Китай, Гонконг, Тайвань), ремонтный цех в Чэнду. В записи оговорка: только газокомпрессорные применения, кроме месторождения Чанцин",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/china-diesel-support-services-ltd-chengdu/"
+      ]
+    },
+    {
+      "company": "Clarke Energy India Private Limited",
+      "country": "Индия",
+      "role": "официальный провайдер по локатору (Индия): продажа двигателей, запчасти, сервис",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/clarke-energy-india-provate-limited/"
+      ]
+    },
+    {
+      "company": "S&L Energie-Projekte GmbH",
+      "country": "Германия",
+      "role": "официальный провайдер по локатору, несколько европейских стран: продажа двигателей, запчасти, сервис; на своём сайте выкладывает техлисты Waukesha",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/s-l-energie-projekte-gmbh/"
+      ]
+    },
+    {
+      "company": "Waukesha-Pearce Industries (WPI)",
+      "country": "США",
+      "role": "официальный провайдер по локатору: продажа двигателей, компоновка, запчасти, сервис; выкладывает таблицы номинальных мощностей INNIO",
+      "sources": [
+        "https://www.waukeshaengine.com/providers/waukesha-pearce-industries-inc/",
+        "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+      ]
+    },
+    {
+      "company": "DMLieferant (dmliefer.ru)",
+      "country": "Россия",
+      "role": "по своему сайту — поставщик двигателей и запчастей Waukesha. Заявлены отгрузки 2016 г. для L7044GSI и F3521GSI, в т. ч. 350 свечей для L7044GSI. В официальном локаторе нет",
+      "sources": [
+        "https://dmliefer.ru/content/waukesha"
+      ]
+    },
+    {
+      "company": "Детройт-СТ (detroit-st.ru)",
+      "country": "Россия",
+      "role": "по своему сайту — поставщик запчастей Waukesha со склада, ремонт и шеф-монтаж. Карточки местами неаккуратны (номер катушки 69694G стоит у датчика оборотов). В официальном локаторе нет",
+      "sources": [
+        "https://detroit-st.ru/motors/waukesha/waukesha-vhp/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальные каталоги запчастей по серийному номеру открыто не найдены: Form 10064-1 (VHP 12 цил. с ESM2), Form 6332-3 (16V275GL+/275GL), 635100 (12V275GL/GL+), Form 6330-2 и 6252 (VGF F18/H24), Form 6291. Каталоги идут с двигателем и через Customer Portal INNIO и провайдеров. Пользовательские копии на Scribd, pdfcoffee и dokumen.tips автоматически не читаются: 403 или проверка JavaScript.",
+    "По P9394GSI (S4 и S5) не найдено ни одного открытого перечня, который привязывает коды именно к этой модели. Коды даны по серии VHP в целом (MOTORTECH, McGill). Официальный техлист говорит об общих сервисных деталях семейства Series Five, но перед закупкой применимость надо сверять с каталогом конкретного двигателя.",
+    "Для 275GL+ открыто не найдены номера свечи, фильтров масла и воздуха, датчиков детонации и NOx и уплотнений. Найдены только удлинители свечей (A296064J/K), монтажный набор датчика NOx (495795) и корпус дроссельной заслонки 12V (K296236A). Остальное — в каталогах Form 6332-3 и 635100.",
+    "Изготовители и модели турбокомпрессоров P9394GSI и 275GL+ не подтверждены. Garrett подтверждён только для 211896C (F3524GSI/L7044GSI) по номерам на карточке аналога. ABB упомянут лишь общим утверждением сервисной компании.",
+    "Изготовители датчиков ESM (детонации A740110C, O2 A740106E и A740132, NOx, давления 740118), центрифуги Microspin и масляных и воздушных фильтров в открытых источниках не названы. Везде стоит только номер Waukesha.",
+    "На VGF в Form 6243 упоминаются регуляторы PSG, EG-3P и 4024 (обозначения, похожие на Woodward), но на прочитанных страницах изготовитель не назван. В субпоставщики не внесено.",
+    "Сервисные бюллетени Waukesha открыто не найдены. Разбор бюллетеней VHP есть курсом на training.waukeshaengines.com (VHP Service Bulletin Reviews), доступ по записи. Страница указателя бюллетеней у WPI переехала (energy.wpi.com перенаправляет на wpi.com/energy).",
+    "Закрыты от автоматического чтения (403 или Cloudflare): aga-parts.com (там, в частности, датчик детонации A740110C), peri-parts.com (свечи 69919/69919D/60999Z, воздушный фильтр 214275A для VHP 12/16), supply.parts (заявки с номерами для P9394GSI S5 и L7044GSI S5: регулятор 209167T, фильтр 199395B), killerfilter.com, fluitek.com, pdfcoffee.com. По выдаче поиска там есть коды с привязкой к моделям, но проверить их по странице не удалось.",
+    "Россия: в официальном локаторе waukeshaengine.com партнёра в РФ нет. DMLieferant и Детройт-СТ — реселлеры, статус подтверждён только их собственными сайтами. Турция обслуживается через Hoerbiger Service Middle East FZE (Дубай).",
+    "Статус моделей VGF GL/GLD/GSI/GSID и VHP L5794, L5774LT не ясен: на текущей странице VGF только H24SE и P48SE, а таблица INNIO IWK-019010-EN (2022) их ещё содержит.",
+    "Цены, остатки и сроки поставки в этой разведке не собирались."
+  ],
+  "verifier_notes": "Все 37 кодов (в файле их 38; при сборке файла все 38 найдены в сохранённых скептиком копиях страниц-источников), 20 моделей и 15 субпоставщиков сверены с первоисточниками. PDF MOTORTECH (Application Guide VHP и листовка по удлинителям), техлисты INNIO и таблица INNIO IWK-019010-EN (копия на wpi.com) скачаны и разобраны pdftotext. Страницы McGill, BG Service, ManualsLib (с. 222, 253, 412), Separator Spares, YUSEN, Everlasting, Made-in-China, sparkplug-crossreference, EMIT, Cooper и Детройт-СТ тоже скачаны, коды найдены поиском по тексту. Ни одного опровержения нет. Уточнения к формулировкам, на вердикты не влияют: (1) P9394GSI S5 — 1 875 hp по таблице INNIO даётся при 900 об/мин, а не при 1 000; (2) у A740106E модели L7044GSI и P9394GSI — вывод разведки из «VHP G/GSI/LT series»; (3) Detechtion в техлистах VGF не упомянут; (4) в брошюре Kraft Power нет слова mobileFLEX, привязка Kato к mobileFLEX — вывод; (5) 69919H, 211896C, 168660B и Kenco 157255J держатся на карточках сторонних продавцов. 69919H дополнительно найден как «Waukesha Spark Plug Part # 69919H» на eBay и в OneClick Warehouse. Брошюра Kraft Power первый раз ответила 502, со второй попытки открылась. Рабочие файлы лежат в рабочей папке сессии разведки, в репозиторий они не входят.",
+  "corrections": [
+    "summary: число кодов исправлено с 39 на 38 — столько записей в разделе parts",
+    "P9394GSI S5: диапазон оборотов исправлен на 900–1 200 об/мин — 1 875 л. с. по таблице INNIO даются при 900, а не при 1 000 об/мин; таблица добавлена в sources (уточнение скептика 1)",
+    "A740106E: привязка к L7044GSI и P9394GSI помечена как вывод из «VHP G/GSI/LT series» (уточнение скептика 2)",
+    "Detechtion Technologies: VGF убран из machine — в техлистах VGF не упомянут (уточнение скептика 3)",
+    "Kato Engineering: привязка к mobileFLEX помечена как вывод — в брошюре Kraft Power этого слова нет (уточнение скептика 4)",
+    "69919H, 211896C, 168660B, Kenco 157255J держатся на карточках сторонних продавцов (уточнение скептика 5): у 69919H в doc_ref добавлены находки скептика (eBay, OneClick Warehouse); субпоставщики Kenco, Garrett и Donaldson/Fleetguard — verified false, как велит навык для записи на одном объявлении",
+    "verifier_notes: у числа «37 кодов» оговорено, что в файле 38 кодов и все 38 найдены в сохранённых скептиком копиях страниц; локальный путь к рабочим файлам заменён словами"
+  ]
+}
