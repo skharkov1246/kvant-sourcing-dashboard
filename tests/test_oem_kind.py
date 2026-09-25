@@ -242,8 +242,15 @@ def test_ключ_обрезкой_не_склеивает_бренды():
     обрезанным ключом записи вида «бренд» не бывает двух разных написаний."""
     bd = _модуль("kvant_build_dict_kind", "scripts/build_dict.py")
     assert bd.nkey("A" * 50) == bd.nkey_full("A" * 50)[:40] == "a" * 40
+    # Написания поля изготовителя из справочника рядов («SEW», «CAT») лежат под
+    # brand_key справочника, а не под своим nkey — это их назначение.
+    ключи_справочника = {б["brand_key"] for б in json.loads(
+        (ROOT / "dict" / "model_series.json").read_text(encoding="utf-8"))["brands"]}
     for r in _настоящий()["records"]:
-        полные = {bd.nkey_full(x["spelling"]) for x in r["spellings"]}
-        assert all(bd.nkey(x) == r["oem_key"] for x in полные)
+        из_баз = [x for x in r["spellings"] if not x["where"].startswith("dict/")]
+        assert all(bd.nkey(x["spelling"]) == r["oem_key"] for x in из_баз)
+        assert all(r["oem_key"] in ключи_справочника
+                   for x in r["spellings"] if x["where"].startswith("dict/"))
+        полные = {bd.nkey_full(x["spelling"]) for x in из_баз}
         if r["kind"] == "бренд":
             assert len(полные) == 1 or len(r["oem_key"]) < oem_kind.ДЛИНА_КЛЮЧА, r["oem_key"]

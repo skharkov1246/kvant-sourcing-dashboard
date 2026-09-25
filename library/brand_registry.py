@@ -117,6 +117,15 @@ def разрешить(имя, карта: dict[str, set]) -> tuple[str, set]:
         return РАЗРЕШЕНО, set(целиком)
     if len(целиком) > 1:
         return СПОРНО, set(целиком)
+    # Хвост-страна — общее правило codes_sql.без_страны: «Siemens - Germany»
+    # тире не делится, а «Sandvik Tamrock, FINLAND» сводится и по частям.
+    без = codes_sql.без_страны(имя)
+    if без:
+        сам = карта.get(ключ(без), set())
+        if len(сам) == 1:
+            return РАЗРЕШЕНО, set(сам)
+        if len(сам) > 1:
+            return СПОРНО, set(сам)
     по_частям = set()
     for ч in части_имени(имя):
         по_частям |= карта.get(ч, set())
@@ -205,6 +214,7 @@ class План:
     oem_kind.НЕСКОЛЬКО: "dict/oem.json: несколько брендов в одной записи",
     oem_kind.ОПИСАНИЕ: "dict/oem.json: бренд с пояснением",
     oem_kind.МАТЕРИАЛ: "dict/oem.json: материал, а не бренд (dict/material.json)",
+    oem_kind.ФОРМА: "dict/oem.json: заглушка или реквизит формы, а не бренд",
 }
 
 

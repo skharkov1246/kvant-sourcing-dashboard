@@ -1,13 +1,14 @@
 {
   "note": "Производители: ключ nkey(name) и все написания, найденные в базах. Разные написания одной компании собраны под одним ключом — это и есть то, чего сегодня нет ни в одном подпроекте. Поле kind — вид записи: бренд, указание (к закупке), несколько (брендов в одной записи), описание (бренд с пояснением), номер (детали вместо имени). Бренд позиции даёт только вид «бренд»; у «несколько» и «описание» бренды — в поле brands, неразложенные части — в unresolved; kind_why — почему вид такой (library/oem_kind.py).",
-  "count": 304,
+  "count": 306,
   "by_kind": {
-    "бренд": 234,
+    "бренд": 236,
     "указание": 31,
     "несколько": 22,
     "описание": 15,
     "номер": 2,
-    "материал": 0
+    "материал": 0,
+    "форма": 0
   },
   "records": [
     {
@@ -105,6 +106,38 @@
         }
       ],
       "n_spellings": 8
+    },
+    {
+      "oem_key": "caterpillar",
+      "name": "Caterpillar",
+      "kind": "бренд",
+      "spellings": [
+        {
+          "spelling": "Caterpillar",
+          "where": "gpu/data/models.json:oems[].name"
+        },
+        {
+          "spelling": "Caterpillar",
+          "where": "gpu/data/machines.json:machines[].oem"
+        },
+        {
+          "spelling": "Caterpillar",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Caterpillar",
+          "where": "pnw/data/item_master.json:items[].brand"
+        },
+        {
+          "spelling": "Caterpillar",
+          "where": "dict/model_series.json:brands[].field_aliases"
+        },
+        {
+          "spelling": "CAT",
+          "where": "dict/model_series.json:brands[].field_aliases"
+        }
+      ],
+      "n_spellings": 6
     },
     {
       "oem_key": "grundfos",
@@ -242,30 +275,6 @@
         {
           "spelling": "Atlas Copco Airpower N.V",
           "where": "pnw/data/item_master.json:items[].maker"
-        }
-      ],
-      "n_spellings": 4
-    },
-    {
-      "oem_key": "caterpillar",
-      "name": "Caterpillar",
-      "kind": "бренд",
-      "spellings": [
-        {
-          "spelling": "Caterpillar",
-          "where": "gpu/data/models.json:oems[].name"
-        },
-        {
-          "spelling": "Caterpillar",
-          "where": "gpu/data/machines.json:machines[].oem"
-        },
-        {
-          "spelling": "Caterpillar",
-          "where": "zip/data/positions.json:[].oem"
-        },
-        {
-          "spelling": "Caterpillar",
-          "where": "pnw/data/item_master.json:items[].brand"
         }
       ],
       "n_spellings": 4
@@ -663,6 +672,26 @@
         {
           "spelling": "MarFlex",
           "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 3
+    },
+    {
+      "oem_key": "nord",
+      "name": "NORD Drivesystems (Getriebebau NORD)",
+      "kind": "бренд",
+      "spellings": [
+        {
+          "spelling": "NORD Drivesystems (Getriebebau NORD)",
+          "where": "dict/model_series.json:brands[].field_aliases"
+        },
+        {
+          "spelling": "NORD",
+          "where": "dict/model_series.json:brands[].field_aliases"
+        },
+        {
+          "spelling": "Норд",
+          "where": "dict/model_series.json:brands[].field_aliases"
         }
       ],
       "n_spellings": 3
@@ -3372,6 +3401,22 @@
         {
           "spelling": "Selco",
           "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "seweurodrive",
+      "name": "SEW-EURODRIVE",
+      "kind": "бренд",
+      "spellings": [
+        {
+          "spelling": "SEW-EURODRIVE",
+          "where": "dict/model_series.json:brands[].field_aliases"
+        },
+        {
+          "spelling": "SEW",
+          "where": "dict/model_series.json:brands[].field_aliases"
         }
       ],
       "n_spellings": 2

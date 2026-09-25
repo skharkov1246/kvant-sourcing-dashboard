@@ -38,7 +38,7 @@ import inspect
 import re
 from pathlib import Path
 
-from library import company_names, doc_folder, doc_side, docfilter, equipment, materials, quotes
+from library import company_names, doc_folder, doc_side, docfilter, equipment, materials, oem_kind, quotes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -222,6 +222,10 @@ COUNTRIES = sorted(
         "mexico", "denmark", "norway", "slovakia", "hungary", "romania",
         "portugal", "israel", "belarus", "kazakhstan", "ukraine", "uzbekistan",
         "great britain", "england", "holland", "the netherlands", "czechia",
+        # Хвост «бренд, страна» (codes_sql.без_страны): таможенные и
+        # тендерные формы пишут страну полным и точечным именем.
+        "p.r.c", "p.r.china", "p.r. china", "pr china", "u.s.a", "u.s",
+        "соединенные штаты", "republic of korea", "korea republic",
     }
 )
 
@@ -262,6 +266,83 @@ UNKNOWN_RE = (r"^(не\s+(указан|известн|определен|обо�
 COUNTRY_RE = (r"^((производств[оа]|пр-во|made\s+in)(\s|$)"
               r"|(российск|китайск|европейск|германск|японск|итальянск|американск)\w*"
               r"\s+(производств|изготовлен))")
+# СТРАНА ХВОСТОМ: «Sandvik Tamrock, ФИНЛЯНДИЯ», «Caterpillar, UNITED STATES OF
+# AMERICA», «HUANYOU/CHINA», «Epiroc (Швеция)», «Siemens - Germany». Замер
+# brand-models 25.09.2026 (прогон 36178239483): самые массовые несведённые
+# написания изготовителя спроса — известный бренд с приписанной страной. Хвост
+# снимается, только если он ЦЕЛИКОМ страна (COUNTRIES, или «made in / производство»
+# + страна): «Brand, Ltd» и «Brand, Normet» не трогаются, «Russian Electric Motors»
+# и «China Yuchai» — тоже (разделителя нет). Разделитель — запятая, косая, скобка
+# или тире в пробелах; берётся ПОСЛЕДНИЙ. Одна сторона правила — без_страны ниже
+# (Python: library/brands.py, brand_registry.py, crossref.py, scripts/brand_models.py),
+# другая — запрос /brands: запятую, косую и скобки там делит SPLIT_RE, и часть-страна
+# отсеивается; тире — COUNTRY_DASH_SQL в pieces_nc (правило CLAUDE.md 14).
+# Заглушка или реквизит формы («Выбрать менеджера», «БИК:», «р/счет») — не бренд.
+# Выражение одно с library/oem_kind.поле_формы (закрытый список там).
+FORM_FIELD_RE = oem_kind.ПОЛЕ_ФОРМЫ_RE
+COUNTRY_PREFIX_RE =r"^(made\s+in|производств[оа]|пр-во)\s+"
+_ХВОСТ_СТРАНЫ = re.compile(r"^(?P<b>.*\S)(?:\s*[,/(]\s*|\s+[-–—]\s+)(?P<c>[^,/()]*[^,/()\s])\s*\)?\s*$")
+
+
+def страна_хвоста(t) -> bool:
+    """Текст целиком — страна: «FINLAND», «UNITED STATES OF AMERICA», «P.R.C.»,
+    «КНР», «Made in Germany». Нормализация — как у oem_kind.страна."""
+    n = " ".join(str(t or "").lower().replace("ё", "е").split()).strip(" .,;:")
+    if not n:
+        return False
+    return n in _СТРАНЫ_МН or re.sub(COUNTRY_PREFIX_RE, "", n) in _СТРАНЫ_МН
+
+
+_СТРАНЫ_МН = frozenset(COUNTRIES)
+
+
+def без_страны(написание) -> str:
+    """«<бренд><разделитель><страна>» → «<бренд>»; иначе пустая строка.
+
+    Бренд — всё до ПОСЛЕДНЕГО разделителя; сам он не должен быть страной и
+    обязан давать ключ от двух знаков. Хвост не целиком страна — «».
+    """
+    m = _ХВОСТ_СТРАНЫ.match(str(написание or "").strip())
+    if not m or not страна_хвоста(m.group("c")):
+        return ""
+    b = m.group("b").strip(" ,/(-–—")
+    if not b or страна_хвоста(b) or len(ключ_написания(b)) < 2:
+        return ""
+    return b
+
+
+def ключи_сведения(написание) -> list[str]:
+    """Ключи, по которым написание ищется в карте брендов, по порядку: сначала
+    написание целиком (сводится само — больше ничего не нужно), затем без
+    хвоста-страны. Повторы и ключи короче двух знаков не входят."""
+    out = []
+    for н in (написание, без_страны(написание)):
+        k = ключ_написания(н or "") if н else ""
+        if len(k) >= 2 and k not in out:
+            out.append(k)
+    return out
+
+
+def свести(написание, карта: dict):
+    """Написание → значение карты «ключ написания → бренд» по ключи_сведения;
+    нет в карте — None. Общее правило сведения поля изготовителя к бренду."""
+    for k in ключи_сведения(написание):
+        if k in карта:
+            return карта[k]
+    return None
+
+
+# Тире перед страной в части ячейки (запрос /brands): «Siemens - Germany»,
+# «Brand — United States». Двойник без_страны для разделителя, который SPLIT_RE
+# не делит. Выражение — над pc.piece; хвост нормализуется как в страна_хвоста.
+def country_dash_sql(col: str) -> str:
+    tail = (f"btrim(regexp_replace(replace(lower((regexp_match({col}, "
+            f"'^(.*\\S)\\s+[-–—]\\s+([^,/()]*[^,/()\\s])\\s*$'))[2]), 'ё', 'е'), "
+            f"'\\s+', ' ', 'g'), ' .,;:')")
+    return (f"({tail} = any({arr(COUNTRIES)}) "
+            f"or regexp_replace({tail}, {q(COUNTRY_PREFIX_RE)}, '') = any({arr(COUNTRIES)}))")
+
+
 # «Производитель: Siemens», «Изготовитель - SKF», «фирма FAG» — подпись снимается
 # в начале ячейки, если за ней что-то есть. Одиночное «Производитель» остаётся и
 # отсеивается стоп-словом; «Производительность насосов» не задевается (\M).
@@ -337,9 +418,14 @@ def brand_pipeline(judged_cols: str = "c.*, tj.brand_key, tj.brand_name") -> str
   -- СТРАНА В КОНЦЕ ЧАСТИ без разделителя: «SKF Швеция», «Siemens Россия» —
   -- последнее слово снимается, если оно страна, а до него что-то есть.
   -- Одиночная страна («Китай») не трогается и ниже отсеивается как страна.
+  -- СТРАНА ПОСЛЕ ТИРЕ: «Siemens - Germany», «Brand — United States» — хвост
+  -- снимается, если он целиком страна (двойник codes_sql.без_страны; запятую,
+  -- косую и скобки уже поделил SPLIT_RE).
   pieces_nc as (
     select pc.cell, pc.cell_key,
-           case when l.lw = any({arr(COUNTRIES)})
+           case when {country_dash_sql("pc.piece")}
+                then btrim((regexp_match(pc.piece, '^(.*\\S)\\s+[-–—]\\s+'))[1])
+                when l.lw = any({arr(COUNTRIES)})
                 then btrim(left(pc.piece, length(pc.piece) - length(l.lw)))
                 else pc.piece end as piece
       from pieces pc
@@ -392,6 +478,7 @@ def brand_pipeline(judged_cols: str = "c.*, tj.brand_key, tj.brand_name") -> str
              when n.t ~ {q(UNKNOWN_RE)}
                then 'пометка незнания или стоп-слово'
              when n.t = any({arr(JUNK_WORDS)}) then 'пометка незнания или стоп-слово'
+             when n.t ~ {q(FORM_FIELD_RE)} then 'поле формы'
              when n.t ~ {q(COUNTRY_RE)}
                then 'страна'
              when n.t = any({arr(COUNTRIES)}) then 'страна'

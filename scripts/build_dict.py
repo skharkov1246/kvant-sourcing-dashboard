@@ -116,10 +116,10 @@ def build_oem() -> dict:
     """Производители: канонический ключ и все написания, встреченные в базах."""
     spellings: dict[str, list[dict]] = {}
 
-    def add(name, path, field):
+    def add(name, path, field, k=None):
         if not name or not str(name).strip():
             return
-        k = nkey(name)
+        k = k or nkey(name)
         if not k:
             return
         spellings.setdefault(k, [])
@@ -146,10 +146,31 @@ def build_oem() -> dict:
         add(it.get("brand"), "pnw/data/item_master.json", "items[].brand")
         add(it.get("maker"), "pnw/data/item_master.json", "items[].maker")
 
+    # Написания ПОЛЯ ИЗГОТОВИТЕЛЯ из справочника рядов (dict/model_series.json,
+    # field_aliases): «SEW» — это SEW-EURODRIVE, «NORD» и «Норд» — NORD
+    # Drivesystems, «CAT» — Caterpillar, но только в поле изготовителя; в тексте
+    # строки короткое имя неоднозначно, и там его судит library/model_series.py.
+    # Словарь брендов читают только по полю изготовителя, поэтому такое написание
+    # здесь — написание бренда. Ключ — brand_key справочника (он же oem_key, когда
+    # бренд в словаре есть), а не nkey короткого имени: «sew» отдельным брендом не
+    # заводится. Замер brand-models 25.09.2026: «SEW» — 139 строк спроса в 25
+    # сделках без бренда. Имя бренда, которого в базах нет, — имя справочника.
+    имена_справочника = {}
+    for б in load("dict/model_series.json", {}).get("brands", []):
+        k, поле = б.get("brand_key"), list(б.get("field_aliases") or [])
+        if not k or not поле:
+            continue
+        if k not in spellings:
+            имена_справочника[k] = clean_name(б.get("name"))
+        for н in [б.get("name")] + поле:
+            add(н, "dict/model_series.json", "brands[].field_aliases", k=k)
+
     out = []
     for k, sp in sorted(spellings.items()):
         # каноническое написание — самое длинное: в нём обычно есть группа-владелец
-        canon = pick_canon([x["spelling"] for x in sp])
+        # Короткое написание поля («CAT») имя бренда из баз не вытесняет.
+        из_баз = [x["spelling"] for x in sp if not x["where"].startswith("dict/")]
+        canon = имена_справочника.get(k) or pick_canon(из_баз or [x["spelling"] for x in sp])
         out.append({"oem_key": k, "name": canon, "spellings": sp, "n_spellings": len(sp)})
     # ВИД ЗАПИСИ. В поля изготовителя люди писали и указания («Заказ по
     # спецификации»), и несколько марок сразу («Epiroc, Normet»), и марку с
