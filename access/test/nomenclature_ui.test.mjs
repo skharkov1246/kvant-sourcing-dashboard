@@ -437,3 +437,102 @@ test("корзина не прочиталась — карточка сказа
   // Строка списка всё равно на экране: изготовитель по каталогу и спрос.
   assert.match(t, /SKF/);
 });
+
+// ── ПОЗИЦИЯ — ПАРА «БРЕНД + КОД» (правила номенклатуры П1, П2; 25.09.2026) ──
+// Владелец: «код может стоять отдельно, но в соседнем столбце обязательно должен
+// быть бренд». Снимок несёт у пары бренд (bk, bn) и его источник (bs), у пары без
+// бренда — причину (bw) и кандидатов спора (bc); итоги — totals.brand. Код у двух
+// брендов — две строки с одним k: SKF 6205 и FAG 6205.
+
+const ПАРЫ = {
+  version: 1,
+  totals: { positions: 5, with_choice: 0, comparable: 0, in_catalog: 1, companies: 2,
+            companies_resolved: 1, no_demand: 5,
+            brand: { codes: 4, determined: 3, by: { "каталог": 1, "строка": 1, "карточка": 0, "маска": 1 },
+                     none: 1, disputed: 1 } },
+  positions: [
+    { k: "6205", bk: "skf", bn: "SKF", bs: "каталог", n: "6205", name: "Подшипник учебный", co: 1,
+      offers: 2, shown: 2, cat: true, oem_cat: "SKF", brands: [], oem_file: ["SKF"],
+      list: [{ c: "101", p: 10, u: "EUR", m: "SKF", o: "с:skf" }, { c: "102", p: 12, u: "EUR" }] },
+    { k: "6205", bk: "fag", bn: "FAG", bs: "строка", n: "6205", name: "Подшипник учебный", co: 1,
+      offers: 1, shown: 1, cat: true, oem_cat: "SKF", oem_file: ["FAG"],
+      list: [{ c: "102", p: 11, u: "EUR", m: "FAG", o: "с:fag" }] },
+    { k: "4088833", bk: "cummins", bn: "Cummins", bs: "маска", n: "4088833", name: "Фильтр учебный Cummins",
+      co: 1, offers: 1, shown: 1, list: [{ c: "101", p: 5, u: "USD" }] },
+    { k: "7001234", bw: "нет", n: "7001234", name: "Фильтр учебный", co: 1, offers: 1, shown: 1,
+      list: [{ c: "101", p: 6, u: "USD" }] },
+    { k: "kv4417b", bw: "спорно", bc: [["SKF", "строка"], ["FAG", "строка"]], n: "KV-4417-B",
+      name: "Уплотнение учебное", co: 1, offers: 1, shown: 1, list: [{ c: "102", p: 7, u: "USD" }] },
+  ],
+  companies: [{ co: "101", ent: "KV-S-000001-8", name: "Учебный завод", rows: 3, parts: 3 },
+              { co: "102", ent: null, name: null, rows: 3, parts: 3 }],
+};
+
+async function открыть_пары(hash = "") {
+  const маршруты = (url) => {
+    if (url === "/api/crossref") return ПАРЫ;
+    throw new Error("неожиданный адрес " + url);
+  };
+  return открыть(html, { маршруты, hash });
+}
+
+test("бренд и код одной строкой, источник мелко, счётчик бренда наверху", async () => {
+  const { карта } = await открыть_пары();
+  // Счётчик — первой плиткой: «3 из 5 с определённым брендом (60 %)».
+  assert.match(карта.totals.children[0].textContent, /3 из 5с определённым брендом \(60 %\)/);
+  // Основной список — только пары с брендом, по одной строке на пару.
+  assert.equal(карта.rows.children.length, 3);
+  const ячейки = карта.rows.children.map((tr) => tr.children[0].textContent);
+  assert.ok(ячейки.some((t) => /^SKF 6205каталог · у кода ещё 1 пара$/.test(t)), ячейки.join(" | "));
+  assert.ok(ячейки.some((t) => /^FAG 6205строка спецификации или КП/.test(t)), ячейки.join(" | "));
+  assert.ok(ячейки.some((t) => /^Cummins 4088833по маске кода — предположение$/.test(t)), ячейки.join(" | "));
+  // Папки: с брендом и «Бренд не определён» — отдельно от основного списка.
+  const папки = карта.folders.querySelectorAll("button");
+  assert.deepEqual(папки.map((b) => b.textContent),
+    ["С брендом · 3 из 5 (60 %)", "Бренд не определён · 2"]);
+  assert.match(карта["folder-note"].textContent,
+    /каталог 1 · строка спецификации или КП 1 · карточка запроса 0 · маска кода \(предположение\) 1/);
+});
+
+test("папка «Бренд не определён» с причиной: не назван никем или спорно с обоими", async () => {
+  const { карта } = await открыть_пары();
+  await карта.folders.querySelectorAll("button")[1].fire("click");
+  assert.equal(карта.rows.children.length, 2);
+  const t = карта.rows.children.map((tr) => tr.children[0].textContent).join(" | ");
+  assert.match(t, /7001234бренд не определён: не назван никем/);
+  assert.match(t, /KV-4417-Bспорно: SKF \(строка спецификации или КП\) · FAG \(строка спецификации или КП\)/);
+  assert.match(карта["folder-note"].textContent, /не дали \(1\).*«спорно» \(1\)/);
+  // Поиск видит и другую папку и говорит об этом, а не молчит.
+  карта.search.value = "6205";
+  await карта.search.fire("input");
+  assert.equal(карта.rows.children.length, 0);
+  assert.match(карта.count.textContent, /ещё 2 в папке «С брендом»/);
+});
+
+test("адрес кода, разбитого по брендам, показывает все его пары", async () => {
+  const { карта } = await открыть_пары("#k=6205");
+  for (let i = 0; i < 5; i++) await new Promise((r) => setTimeout(r, 0));
+  assert.equal(карта.card.hidden, true);
+  assert.equal(карта.rows.children.length, 2);
+  assert.equal(карта["code-filter"].hidden, false);
+  assert.match(карта["code-filter"].textContent, /Код 6205 — 2 позиции/);
+});
+
+test("адрес пары открывает её карточку, соседние пары кода — кнопками", async () => {
+  const { карта } = await открыть_пары("#k=6205~skf");
+  for (let i = 0; i < 5; i++) await new Promise((r) => setTimeout(r, 0));
+  assert.equal(карта.card.hidden, false);
+  const t = карта.card.textContent;
+  assert.match(t, /SKF 6205/);
+  assert.match(t, /Бренд SKF — по каталогу/);
+  assert.match(t, /FAG 6205 · 1 предложение/);
+  // Предложение без своего бренда в паре SKF: оригинал не подтверждён — сказано.
+  assert.match(t, /бренд в этом КП не назван/);
+});
+
+test("снимок до правила «бренд + код» — без папок и без выдуманных причин", async () => {
+  const { карта } = await открыть_страницу();
+  assert.equal(карта.folders.hidden, true);
+  assert.equal(карта.rows.children.length, 3);
+  assert.doesNotMatch(карта.rows.textContent, /бренд не определён/);
+});

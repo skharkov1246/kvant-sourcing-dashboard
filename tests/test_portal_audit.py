@@ -67,6 +67,8 @@ from library import brands, crossref  # noqa: E402
         ("ZX-6604", "Фильтр масляный"),
         ("QR-9015", "Датчик температуры"),
         ("HL-4478", "Рукав высокого давления")]
+# Код под маску изготовителя (crossref.МАСКИ): только номенклатуре.
+МАСКА = ("4088833", "Фильтр масляный Cummins")
 ОТКУДА = ("bitrix:title", "bitrix:requisite", "написание", "реестр")
 ПРИЧИНЫ = ("один источник, сливать не с чем", "домен совпал у двух и более источников",
            "имя совпало, но домен есть не у всех — проверить нечем",
@@ -136,6 +138,17 @@ def _номенклатура():
     for i, (n, имя) in enumerate(КОДЫ):
         k = ключ(n)
         каталог = i < 6
+        # Бренд пары (crossref.бренд_позиции): у каталожных — по каталогу, у
+        # следующих четырёх — по строке КП; последние две — «Бренд не
+        # определён», по одной на каждую причину.
+        if каталог:
+            бренд = {"bk": "skf", "bn": "SKF", "bs": "каталог"}
+        elif i < 10:
+            бренд = {"bk": "fag", "bn": "FAG", "bs": "строка"}
+        elif i == 10:
+            бренд = {"bw": "спорно", "bc": [["FAG", "строка"], ["SKF", "строка"]]}
+        else:
+            бренд = {"bw": "нет"}
         предл, рёбра = [], []
         for ci in _компании_позиции(i):
             c = компании[ci]
@@ -143,6 +156,8 @@ def _номенклатура():
             предл.append({"c": c["co"], "e": c["ent"], "p": цена, "u": "USD", "q": 10.0, "n": "шт",
                           "t": цена * 10, "d": ДАТА, "s": "DAP", "l": 30, "y": "30 % аванс, остальное по факту",
                           "a": 30.0, "r": "ссс?", "f": str(5001 + i), "v": 0.9, "b": ["SKF"], "m": "SKF"})
+            if "bk" in бренд:
+                предл[-1]["o"] = "с:" + бренд["bk"]
             if i == 8:
                 del предл[-1]["q"]
                 предл[-1]["t"] = цена * 3
@@ -150,7 +165,7 @@ def _номенклатура():
             c["rows"] += 1
             c["parts"] += 1
         позиции.append({
-            "k": k, "n": n, "name": имя, "co": len(рёбра), "offers": len(предл), "shown": len(предл),
+            "k": k, **бренд, "n": n, "name": имя, "co": len(рёбра), "offers": len(предл), "shown": len(предл),
             "cmp": len(предл) >= 2, "oem_file": ["FAG"] if not каталог else [],
             "oem_cat": "SKF" if каталог else None, "brands": ["SKF"] if каталог else ["FAG"],
             "makers": ([{"name": "SKF", "role": "OEM", "country": "SE", "makes": "подшипники",
@@ -161,13 +176,32 @@ def _номенклатура():
             "cat": каталог, "cat_name": имя if каталог else None,
             "category": "Подшипники" if каталог else None, "unit": "Насос" if каталог else None,
             "kv": None, "list": предл, "e": sorted(рёбра)})
+    # Бренд по маске кода (crossref.МАСКИ): семь цифр и слово Cummins в
+    # наименовании. Спроса у позиции нет — вне кодов корпуса страницы брендов.
+    c = компании[3]
+    позиции.append({
+        "k": МАСКА[0], "bk": "cummins", "bn": "Cummins", "bs": "маска", "n": МАСКА[0], "name": МАСКА[1],
+        "co": 1, "offers": 1, "shown": 1, "cmp": False, "oem_file": [], "oem_cat": None, "brands": [],
+        "makers": [], "alts": [], "models": [], "cat": False, "kv": None,
+        "list": [{"c": c["co"], "e": c["ent"], "p": 7.0, "u": "USD", "q": 2.0, "n": "шт", "t": 14.0,
+                  "d": ДАТА, "f": "5099", "v": 0.9}],
+        "e": [[3, 1, 7.0, "USD", ДАТА]]})
+    c["rows"] += 1
+    c["parts"] += 1
+    по_источнику = {и: sum(1 for p in позиции if p.get("bs") == и) for и in crossref.ИСТОЧНИКИ_БРЕНДА}
     снимок = {"version": 1, "published_at": СОБРАН, "positions": позиции, "companies": компании,
               "totals": {"positions": len(позиции),
                          "with_choice": sum(1 for p in позиции if p["co"] >= 2),
                          "comparable": sum(1 for p in позиции if p["cmp"]),
                          "in_catalog": sum(1 for p in позиции if p["cat"]),
                          "companies": len(компании), "companies_resolved": len(компании),
-                         "no_demand": 0, "offers": sum(p["offers"] for p in позиции)}}
+                         "no_demand": sum(1 for p in позиции if not p.get("demand")),
+                         "offers": sum(p["offers"] for p in позиции),
+                         "brand": {"codes": len(позиции), "determined": sum(по_источнику.values()),
+                                   "by": по_источнику,
+                                   "none": sum(1 for p in позиции if p.get("bw") == "нет"),
+                                   "disputed": sum(1 for p in позиции if p.get("bw") == "спорно"),
+                                   "offers_coded": sum(p["offers"] for p in позиции)}}}
     return crossref.разложить(снимок)
 
 
@@ -475,8 +509,18 @@ def поз(о, i=0):
 
 
 def подр(о, i=0):
-    k = ключ(КОДЫ[i][0])
-    return о[crossref.КЛЮЧИ_КОРЗИН[crossref.корзина(k)]]["positions"][k]
+    """Подробности пары КОДЫ[i] — под ключом пары (crossref.ид_позиции)."""
+    p = поз(о, i)
+    return о[crossref.КЛЮЧИ_КОРЗИН[crossref.корзина(p["k"])]]["positions"][crossref.ид_позиции(p)]
+
+
+def маск(о):
+    """Строка списка с позицией, чей бренд дан маской кода."""
+    for часть in crossref.КЛЮЧИ_СПИСКА:
+        for p in о[часть]["positions"]:
+            if p["k"] == МАСКА[0]:
+                return p
+    raise KeyError(МАСКА[0])
 
 
 def код_бр(о, i=0):
@@ -632,6 +676,12 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("nomenclature", "n.k_short_num", lambda о: поз(о, 3).update(k="12")),
     ("nomenclature", "n.k_dup", lambda о: поз(о, 3).update(k=ключ(КОДЫ[4][0]))),
     ("nomenclature", "n.k_bucket", lambda о: поз(о, 3).update(b=(поз(о, 3)["b"] + 1) % 32)),
+    ("nomenclature", "n.brand_src", lambda о: поз(о, 3).update(bs="догадка")),
+    ("nomenclature", "n.brand_why", lambda о: поз(о, 11).update(bw="неизвестно")),
+    ("nomenclature", "n.pair_split", lambda о: подр(о, 0)["list"][0].update(o="с:fag")),
+    ("nomenclature", "n.brand_mask", lambda о: маск(о).update(bk="skf", bn="SKF")),
+    ("nomenclature", "n.brand_undet_dup", lambda о: о[crossref.КЛЮЧИ_СПИСКА[0]]["positions"].append(
+        dict(поз(о, 11), bw="спорно", bc=[["SKF", "строка"], ["FAG", "строка"]]))),
     ("nomenclature", "n.n_empty", lambda о: поз(о, 3).pop("n")),
     ("nomenclature", "n.n_class", lambda о: поз(о, 3).update(n="12.09.2026")),
     ("nomenclature", "n.n_words", lambda о: поз(о, 3).update(n="втулка направляющая для насоса")),
@@ -1047,11 +1097,15 @@ def test_прошлый_снимок_считает_ухудшения():
     прошлое = закодировать(корпус())
 
     def хуже(о):
-        поз(о, 0).update(brands=[], oem_file=[])
-        поз(о, 0).pop("oem_cat")
+        поз(о, 0).update(brands=[], oem_file=[], bw="нет")
+        for поле in ("oem_cat", "bk", "bn", "bs"):
+            поз(о, 0).pop(поле)
         поз(о, 2)["e"] = [[r[0], r[1]] for r in поз(о, 2)["e"]]
         поз(о, 4).update(co=1)
         подр(о, 6)["list"][0].pop("q")
+        # Бренд у позиции 0 снят — её подробности переезжают под ключ кода.
+        корзина = о[crossref.КЛЮЧИ_КОРЗИН[crossref.корзина(ключ(КОДЫ[0][0]))]]["positions"]
+        корзина[ключ(КОДЫ[0][0])] = корзина.pop(ключ(КОДЫ[0][0]) + "~skf")
         for часть in crossref.КЛЮЧИ_СПИСКА:
             о[часть]["positions"] = [p for p in о[часть]["positions"] if p["k"] != ключ(КОДЫ[11][0])]
 
@@ -1100,6 +1154,34 @@ def test_сборка_схлопывает_ровно_то_что_ревизия
     сырьё[корзина] = json.dumps(испорчено, ensure_ascii=False).encode("utf-8")
     т = pa.ревизия_номенклатуры(pa.Снимки(Память(сырьё)), СЕЙЧАС)
     assert т.счета["n.o_dup"][1] == 2
+
+
+def test_пары_настоящей_сборки_ревизия_не_обвиняет():
+    """Снимок, где код разбит на пары «бренд + код» НАСТОЯЩЕЙ сборкой, чист.
+
+    Правило разбиения одно на сборку и ревизию: свой бренд предложения (o) —
+    всегда бренд его пары (n.pair_split), пара повторяется не больше раза
+    (n.k_dup), подробности лежат под ключом пары (n.k_bucket), итоги бренда
+    сходятся с пересчётом (n.totals), у кода не больше одной пары без бренда."""
+    from tests.test_crossref_snapshot import строка
+    р = crossref.реестр_брендов(_словарь())
+    строки = [строка("nu316", "NU 316", "1001", оем="SKF", цена=10.0, валюта="USD"),
+              строка("nu316", "NU 316", "1002", оем="FAG", цена=11.0, валюта="USD"),
+              строка("nu316", "NU 316", "1003", цена=12.0, валюта="USD"),
+              строка("rx7731", "RX-7731", "1001", оем="FAG", цена=5.0, валюта="USD"),
+              строка("rx7731", "RX-7731", "1002", цена=6.0, валюта="USD"),
+              строка("4088833", "4088833", "1001", наименование=МАСКА[1], цена=7.0, валюта="USD")]
+    снимок = crossref.собрать(строки, собран=СОБРАН, реестр=р)
+    assert {crossref.ид_позиции(p) for p in снимок["positions"]} == {
+        "nu316~skf", "nu316~fag", "nu316", "rx7731~fag", "4088833~cummins"}
+    сырьё = {k: json.dumps(v, ensure_ascii=False).encode("utf-8")
+             for k, v in crossref.разложить(снимок).items()}
+    т = pa.ревизия_номенклатуры(pa.Снимки(Память(сырьё)), СЕЙЧАС)
+    for код in ("n.pair_split", "n.k_dup", "n.k_bucket", "n.totals", "n.brand_src", "n.brand_why",
+                "n.brand_mask", "n.brand_undet_dup", "n.co_counts", "n.off", "n.e_cnt"):
+        п, д = т.счета[код]
+        assert п > 0 and д == 0, (код, п, д)
+    assert т.доли["u.brand"] == (4, 5)
 
 
 # ── Журнал, файлы, KV ────────────────────────────────────────────────────────

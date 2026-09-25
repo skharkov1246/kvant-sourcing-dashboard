@@ -95,6 +95,18 @@ td .src{margin-top:4px}
 .tabs button{background:var(--card);border:1px solid var(--line);border-radius:8px;
              color:var(--dim);padding:8px 15px;min-height:40px}
 .tabs button[aria-pressed="true"]{color:var(--ink);border-color:#3c5a80;background:var(--raised)}
+/* Позиция — пара «бренд + код» (правила номенклатуры П1, П2): бренд и код одной
+   строкой, источник бренда мелко под ней. Папка «Бренд не определён» — отдельно
+   от основного списка, переключателем над отборами. */
+.folders{margin:0 0 10px}.folders button{font-weight:500}
+.folder-note{font-size:12px;color:var(--dim);margin:0 0 16px;max-width:90ch;line-height:1.55}
+.kod{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
+.pair{min-width:150px}.pair .bn{font-weight:500}.pair .kod{font-size:12px}h2 .kod{font-size:.9em}
+.src.warn{color:var(--amber)}
+.pairs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px}
+.pairs button{background:var(--card);border:1px solid var(--line);border-radius:7px;color:var(--accent);
+              padding:4px 10px;font-size:13px;min-height:32px}
+.brandline{font-size:13px;color:#c4cedb;margin:-8px 0 14px;line-height:1.55}.brandline b{font-weight:500;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -120,9 +132,9 @@ td .src{margin-top:4px}
 
   <div class="search-row">
     <div class="search-box">
-      <label class="sr-only" for="search">Поиск по номеру, наименованию, бренду или изготовителю</label>
+      <label class="sr-only" for="search">Поиск по коду, бренду, наименованию или изготовителю</label>
       <input id="search" type="search" autocomplete="off" spellcheck="false"
-             placeholder="Номер, наименование, бренд, изготовитель">
+             placeholder="Код, бренд, наименование, изготовитель">
     </div>
     <p class="result-count" id="count"></p>
   </div>
@@ -130,11 +142,14 @@ td .src{margin-top:4px}
   <main id="main">
     <div id="status" class="status"><h2>Загружаем</h2><p>Читаем снимок номенклатуры.</p></div>
     <div id="list" hidden>
+      <div class="tabs folders" id="folders" role="group" aria-label="Папки номенклатуры"></div>
+      <p class="folder-note" id="folder-note" hidden></p>
+      <p class="gap" id="code-filter" hidden></p>
       <div class="tabs" id="tabs"></div>
       <div class="table-wrap">
         <table>
           <caption class="sr-only">Номенклатурные позиции</caption>
-          <thead><tr><th scope="col">Номер</th><th scope="col">Наименование</th>
+          <thead><tr><th scope="col">Бренд · код</th><th scope="col">Наименование</th>
             <th scope="col">Спрашивали</th><th scope="col">Предлагали</th>
             <th scope="col">Изготовитель</th>
             <th scope="col">Машина</th><th scope="col">Чем закрыть</th></tr></thead>
@@ -152,6 +167,11 @@ var ПРАВА = { suppliers_pii: "контакты", suppliers_fin: "догов
 var BXLINK = "https://kvantpro.bitrix24.ru/crm/company/details/";
 var ШАГ = 200;
 var данные = null, отфильтровано = [], показано = 0, отбор = "все";
+// ПАПКА И ОТБОР ПО КОДУ. Позиция — пара «бренд + код»: пары с брендом — основной
+// список, пары без бренда — папка «Бренд не определён» (правило П1). Адрес
+// /nomenclature#k=<код> кода, разбитого на пары, показывает все его пары разом,
+// поверх папок (код_отбора), пока его не сбросят.
+var папка = "бренд", код_отбора = null, есть_правило = false, пар_у_кода = {};
 // Имя компании по ключу портала. В снимке оно лежит ОДИН раз, в companies:
 // повторённое в каждом из 18 тысяч предложений, оно занимало бы сотни килобайт
 // и расходилось бы с реестром при первом же переименовании.
@@ -296,6 +316,62 @@ function метки(список, класс) {
   return frag;
 }
 
+// ─── Бренд позиции ───────────────────────────────────────────────────────────
+// ПОЗИЦИЯ — ПАРА «БРЕНД + КОД» (правила номенклатуры П1, П2; library/crossref.py,
+// бренд_позиции). У пары с брендом — bk (ключ), bn (имя) и bs (источник), у пары
+// без бренда — причина bw («нет» или «спорно») и кандидаты bc. Ключ пары — код,
+// а при бренде «код~бренд» (crossref.ид_позиции): под ним лежат подробности в
+// корзине. Снимок, собранный до правила, этих полей не знает (есть_правило).
+var ИСТОЧНИК = {
+  "каталог": "каталог",
+  "строка": "строка спецификации или КП",
+  "карточка": "карточка запроса",
+  "маска": "по маске кода — предположение"
+};
+var ИСТОЧНИК_ПОЛНО = {
+  "каталог": "по каталогу — наша ведомость деталей",
+  "строка": "назван в строке спецификации заказчика или КП и узнан реестром брендов",
+  "карточка": "марка на карточке запроса — наше намерение, а не ответ рынка",
+  "маска": "по маске кода: форма номера этого изготовителя, и его имя стоит у позиции. Это предположение, а не подтверждение"
+};
+
+function ид(p) { return p.k + (p.bk ? "~" + p.bk : ""); }
+
+function кандидаты(p) {
+  return (p.bc || []).map(function (c) {
+    return c[0] + (c[1] ? " (" + (ИСТОЧНИК[c[1]] || c[1]) + ")" : "");
+  }).join(" · ");
+}
+
+// Подпись бренда под парой «бренд + код»: источник мелко, спор — янтарём.
+function подпись_бренда(p) {
+  var el;
+  if (p.bk) {
+    el = узел("span", p.bs === "маска" ? "src warn" : "src", ИСТОЧНИК[p.bs] || p.bs || "источник не назван");
+  } else if (p.bw === "спорно") {
+    el = узел("span", "src warn", "спорно: " + кандидаты(p));
+  } else if (p.bw) {
+    el = узел("span", "src", "бренд не определён: не назван никем");
+  } else return null;
+  var ещё = (пар_у_кода[p.k] || 1) - 1;
+  if (ещё > 0) {
+    el.appendChild(document.createTextNode(" · у кода ещё " + число(ещё) + " "
+      + склонение(ещё, "пара", "пары", "пар")));
+  }
+  return el;
+}
+
+// «Cummins 4088833»: бренд и код одной строкой. Код без бренда — только код.
+function бренд_и_код(p) {
+  var frag = document.createDocumentFragment();
+  if (p.bn) {
+    frag.appendChild(узел("span", "bn", p.bn));
+    frag.appendChild(document.createTextNode(" "));
+  }
+  frag.appendChild(узел("span", "kod", p.n || p.k));
+  return frag;
+}
+
 // ─── Список ──────────────────────────────────────────────────────────────────
 
 var ОТБОРЫ = [
@@ -316,11 +392,17 @@ var ОТБОРЫ = [
 
 function строка(p) {
   var tr = document.createElement("tr");
-  var td = узел("td", "num");
-  var b = узел("button", "row-link", p.n || p.k);
+  // БРЕНД РЯДОМ С КОДОМ ВСЕГДА (владелец, 25.09.2026): «код может стоять
+  // отдельно, но в соседнем столбце обязательно должен быть бренд». Одной
+  // строкой «Бренд код», источник бренда — мелко под ней.
+  var td = узел("td", "pair");
+  var b = узел("button", "row-link");
+  b.appendChild(бренд_и_код(p));
   b.type = "button";
   b.addEventListener("click", function () { return открыть(p); });
   td.appendChild(b);
+  var подпись = подпись_бренда(p);
+  if (подпись) td.appendChild(подпись);
   tr.appendChild(td);
   tr.appendChild(узел("td", null, p.name || "—"));
   // СКОЛЬКО РАЗ СПРАШИВАЛИ НАС. По этому числу и выстроен порядок: рассылать
@@ -370,38 +452,116 @@ function дорисовать() {
   }
 }
 
+// Пара в текущей папке: с брендом — основной список, без — «Бренд не определён».
+function в_папке(p, какая) {
+  if (!есть_правило) return true;
+  return (какая || папка) === "бренд" ? !!p.bk : !p.bk;
+}
+
+function подходит(p, q) {
+  if (!q) return true;
+  var поля = [p.n, p.k, p.name, p.oem_cat, p.kv, p.bn].concat(p.oem_file || [], p.brands || [],
+    (p.alts || []).map(function (a) { return a.pn; }));
+  return поля.some(function (v) { return typeof v === "string" && v.toLowerCase().indexOf(q) >= 0; });
+}
+
 function искать() {
   var q = $("search").value.trim().toLowerCase();
   var правило = (ОТБОРЫ.filter(function (о) { return о[0] === отбор; })[0] || ОТБОРЫ[0])[2];
   отфильтровано = данные.positions.filter(function (p) {
-    if (!правило(p)) return false;
-    if (!q) return true;
-    var поля = [p.n, p.k, p.name, p.oem_cat, p.kv].concat(p.oem_file || [], p.brands || [],
-      (p.alts || []).map(function (a) { return a.pn; }));
-    return поля.some(function (v) { return typeof v === "string" && v.toLowerCase().indexOf(q) >= 0; });
+    if (код_отбора !== null) return p.k === код_отбора && подходит(p, q);
+    return в_папке(p) && правило(p) && подходит(p, q);
   });
   $("rows").textContent = "";
   показано = 0;
-  текст($("count"), число(отфильтровано.length) + " из " + число(данные.positions.length));
+  var всего = код_отбора !== null ? данные.positions.filter(function (p) { return p.k === код_отбора; }).length
+    : данные.positions.filter(function (p) { return в_папке(p); }).length;
+  var итог_ = число(отфильтровано.length) + " из " + число(всего);
+  // Искомое нашлось и в другой папке — сказать, а не молчать: пара без бренда
+  // по тому же коду иначе выглядела бы пропавшей.
+  if (q && есть_правило && код_отбора === null) {
+    var другая = папка === "бренд" ? "без" : "бренд";
+    var там = данные.positions.filter(function (p) { return в_папке(p, другая) && подходит(p, q); }).length;
+    if (там) итог_ += " · ещё " + число(там) + " в папке «"
+      + (другая === "бренд" ? "С брендом" : "Бренд не определён") + "»";
+  }
+  текст($("count"), итог_);
   дорисовать();
+}
+
+var ПАПКИ = [["бренд", "С брендом"], ["без", "Бренд не определён"]];
+
+function нарисовать_папки() {
+  var box = $("folders"), note = $("folder-note");
+  box.textContent = "";
+  box.hidden = !есть_правило;
+  note.hidden = !есть_правило;
+  if (!есть_правило) return;
+  var t = данные.totals || {}, б = t.brand || {}, всего = данные.positions.length;
+  ПАПКИ.forEach(function (п) {
+    var n = данные.positions.filter(function (p) { return в_папке(p, п[0]); }).length;
+    var b = узел("button", null, п[1] + " · " + число(n)
+      + (п[0] === "бренд" && всего ? " из " + число(всего) + " (" + Math.round(100 * n / всего) + " %)" : ""));
+    b.type = "button";
+    b.setAttribute("aria-pressed", п[0] === папка ? "true" : "false");
+    b.addEventListener("click", function () {
+      папка = п[0];
+      код_отбора = null;
+      нарисовать_папки();
+      нарисовать_отборы();
+      искать();
+    });
+    box.appendChild(b);
+  });
+  note.textContent = "";
+  var по = б.by || {};
+  if (папка === "бренд") {
+    note.appendChild(document.createTextNode("Позиция — пара «бренд + код»: один код у двух брендов — две позиции. "
+      + "Бренд выбран одним правилом по надёжности источника: каталог " + число(по["каталог"] || 0)
+      + " · строка спецификации или КП " + число(по["строка"] || 0)
+      + " · карточка запроса " + число(по["карточка"] || 0)
+      + " · маска кода (предположение) " + число(по["маска"] || 0) + "."));
+  } else {
+    note.appendChild(document.createTextNode("Код записан, а бренд не назван: ни каталог, ни строка спецификации "
+      + "или КП, ни карточка запроса его не дали (" + число(б.none || 0) + "), либо двое назвали разное — "
+      + "«спорно» (" + число(б.disputed || 0) + "). Предложения здесь те же, что и были: не потеряны, "
+      + "а отложены до бренда."));
+  }
 }
 
 function нарисовать_отборы() {
   var box = $("tabs");
   box.textContent = "";
   ОТБОРЫ.forEach(function (о) {
-    var n = данные.positions.filter(о[2]).length;
+    var n = данные.positions.filter(function (p) { return в_папке(p) && о[2](p); }).length;
     var b = узел("button", null, о[1] + " · " + число(n));
     b.type = "button";
     b.setAttribute("aria-pressed", о[0] === отбор ? "true" : "false");
     b.addEventListener("click", function () {
       отбор = о[0];
+      код_отбора = null;
+      показать_отбор_кода();
       подсветить_отбор();
       искать();
     });
     box.appendChild(b);
   });
 }
+function показать_отбор_кода() {
+  var el = $("code-filter");
+  el.textContent = "";
+  el.hidden = код_отбора === null;
+  if (код_отбора === null) return;
+  var пары = данные.positions.filter(function (p) { return p.k === код_отбора; });
+  el.appendChild(document.createTextNode("Код " + ((пары[0] || {}).n || код_отбора) + " — "
+    + число(пары.length) + " " + склонение(пары.length, "позиция", "позиции", "позиций")
+    + ": один код у разных брендов — разные позиции «бренд + код». "));
+  var b = узел("button", "row-link", "Показать весь список");
+  b.type = "button";
+  b.addEventListener("click", function () { код_отбора = null; показать_отбор_кода(); искать(); });
+  el.appendChild(b);
+}
+
 function подсветить_отбор() {
   var кнопки = $("tabs").querySelectorAll("button");
   for (var i = 0; i < кнопки.length; i++) {
@@ -439,12 +599,14 @@ function открыть(p) {
   if (p.list || typeof p.b !== "number") { нарисовать_карточку(p, null); return Promise.resolve(); }
   var card = $("card");
   card.textContent = "";
-  card.appendChild(узел("h2", null, p.n || p.k));
+  card.appendChild(узел("h2")).appendChild(бренд_и_код(p));
   card.appendChild(узел("p", "field-note", "Читаем предложения…"));
   $("list").hidden = true;
   card.hidden = false;
   return корзина(p.b).then(function (v) {
-    var подробно = (v && v.positions && v.positions[p.k]) || null;
+    // Подробности пары — под ключом пары (ид): у кода, разбитого по брендам,
+    // пар несколько, а корзина одна — по ключу кода.
+    var подробно = (v && v.positions && v.positions[ид(p)]) || null;
     var полная = {};
     Object.keys(p).forEach(function (k) { полная[k] = p[k]; });
     if (подробно) Object.keys(подробно).forEach(function (k) { полная[k] = подробно[k]; });
@@ -476,8 +638,43 @@ function нарисовать_карточку(p, примечание) {
     card.hidden = true; $("list").hidden = false; $("search").focus();
   });
   card.appendChild(back);
-  card.appendChild(узел("h2", null, p.n || p.k));
+  // «Бренд код» одной строкой — как в списке (правило П1).
+  card.appendChild(узел("h2")).appendChild(бренд_и_код(p));
   card.appendChild(узел("span", "num", p.name || "наименование не знаем"));
+  // ОТКУДА БРЕНД — словами, с источником (П2). Без бренда — причина.
+  if (есть_правило) {
+    var бл = узел("p", "brandline");
+    if (p.bk) {
+      бл.appendChild(document.createTextNode("Бренд "));
+      бл.appendChild(узел("b", null, p.bn));
+      бл.appendChild(document.createTextNode(" — " + (ИСТОЧНИК_ПОЛНО[p.bs] || p.bs || "источник не назван") + "."));
+    } else if (p.bw === "спорно") {
+      бл.appendChild(узел("b", null, "Бренд не определён: спорно. "));
+      бл.appendChild(document.createTextNode("Назвали разное: " + кандидаты(p)
+        + ". Позиция стоит в папке «Бренд не определён», пока спор не разрешён."));
+    } else {
+      бл.appendChild(узел("b", null, "Бренд не определён. "));
+      бл.appendChild(document.createTextNode("Его не назвали ни каталог, ни строка спецификации "
+        + "или КП (узнанная реестром брендов), ни карточка запроса. Слова поставщиков — в плитках ниже."));
+    }
+    card.appendChild(бл);
+    // ДРУГИЕ ПАРЫ ТОГО ЖЕ КОДА — кнопками: SKF 6205 и FAG 6205 — разные позиции,
+    // но сорсеру нужно видеть обе.
+    var соседи = данные.positions.filter(function (x) { return x.k === p.k && ид(x) !== ид(p); });
+    if (соседи.length) {
+      card.appendChild(узел("p", "field-note", "Этот код есть и в других позициях «бренд + код». "
+        + "Спрос ниже посчитан по коду целиком — у всех его пар он один."));
+      var пары = узел("div", "pairs");
+      соседи.forEach(function (x) {
+        var b = узел("button", null, (x.bn || "бренд не определён") + " " + (x.n || x.k)
+          + " · " + число(x.offers) + " " + склонение(x.offers, "предложение", "предложения", "предложений"));
+        b.type = "button";
+        b.addEventListener("click", function () { return открыть(x); });
+        пары.appendChild(b);
+      });
+      card.appendChild(пары);
+    }
+  }
   var шапка = узел("p", "field-note");
   шапка.appendChild(document.createTextNode("Спрашивали: "));
   шапка.appendChild(вес(p.demand));
@@ -495,6 +692,11 @@ function нарисовать_карточку(p, примечание) {
   претензии.appendChild(плитка("Бренд на карточке запроса", p.brands,
     "Проставлен нашим сотрудником при создании запроса. Наше намерение, а не ответ рынка.",
     "Не проставлен"));
+  if (есть_правило) {
+    претензии.appendChild(плитка("Назван в спецификации заказчика", p.spec,
+      "Строки спецификаций заказчиков по этому коду; только бренды, узнанные реестром.",
+      "Не назван или не узнан"));
+  }
   var родные = (p.alts || []).filter(function (a) { return a.kind === "номер изготовителя"; });
   претензии.appendChild(плитка("Чей это номер на самом деле",
     родные.map(function (a) { return a.pn + (a.maker ? " · " + a.maker : ""); }),
@@ -610,7 +812,15 @@ function нарисовать_карточку(p, примечание) {
     tr.appendChild(условие(o.k, o.r, 3));
     tr.appendChild(условие(o.l, o.r, 2));
     tr.appendChild(узел("td")).appendChild(значение(o.b, "—"));
-    tr.appendChild(узел("td")).appendChild(значение(o.m, "—"));
+    var изг_ф = tr.appendChild(узел("td"));
+    изг_ф.appendChild(значение(o.m, "—"));
+    // СВОЙ БРЕНД ПРЕДЛОЖЕНИЯ (поле o): «с:» — строка КП, «к:» — карточка запроса.
+    // Нет его у пары с брендом — предложение отнесено к бренду кода, а его КП
+    // бренда не называет: оригинал не подтверждён, и это сказано.
+    if (есть_правило && p.bk) {
+      if (!o.o) изг_ф.appendChild(узел("span", "src warn", "бренд в этом КП не назван"));
+      else if (String(o.o).charAt(0) === "к") изг_ф.appendChild(узел("span", "src", "бренд — по карточке запроса"));
+    }
     var дата = tr.appendChild(узел("td"));
     дата.appendChild(значение(o.d, "—"));
     // ТОЧНЫЙ ДУБЛЬ СХЛОПНУТ СБОРКОЙ (crossref.ключ_дубля): те же компания, цена,
@@ -664,9 +874,21 @@ function итог(значение_, подпись) {
 function показать() {
   (данные.companies || []).forEach(function (c) { if (c.name) имя_компании[c.co] = c.name; });
   var t = данные.totals || {};
+  есть_правило = !!(t.brand && typeof t.brand === "object");
+  пар_у_кода = {};
+  данные.positions.forEach(function (p) { пар_у_кода[p.k] = (пар_у_кода[p.k] || 0) + 1; });
   var box = $("totals");
   box.textContent = "";
-  box.appendChild(итог(t.positions, "позиций с предложением"));
+  // СЧЁТЧИК БРЕНДА — ПЕРВЫМ (правило П1, мерило): доля позиций «бренд + код» с
+  // определённым брендом. Снимок до правила его не несёт — плитки нет.
+  if (есть_правило && t.positions) {
+    var бренд_ = узел("div", "total");
+    бренд_.appendChild(узел("strong", null, число(t.brand.determined || 0) + " из " + число(t.positions)));
+    бренд_.appendChild(узел("span", null, "с определённым брендом ("
+      + Math.round(100 * (t.brand.determined || 0) / t.positions) + " %)"));
+    box.appendChild(бренд_);
+  }
+  box.appendChild(итог(t.positions, есть_правило ? "позиций «бренд + код» с предложением" : "позиций с предложением"));
   box.appendChild(итог(t.with_choice, "с выбором: 2+ компании"));
   box.appendChild(итог(t.comparable, "сравнимы по цене"));
   box.appendChild(итог(t.companies, "компаний предлагали"));
@@ -695,6 +917,7 @@ function показать() {
     c.hidden = false;
   }
 
+  нарисовать_папки();
   нарисовать_отборы();
   $("status").hidden = true;
   $("list").hidden = false;
@@ -756,14 +979,23 @@ function со_списком(v) {
     }
     показать();
     // ПРЯМОЙ АДРЕС ПОЗИЦИИ: /nomenclature#k=<ключ>. На него ссылаются карточки
-    // поставщика, бренда и кода; без него переход вёл бы к списку.
+    // поставщика, бренда и кода; без него переход вёл бы к списку. Ключ пары
+    // «код~бренд» открывает пару; ключ кода — его единственную пару, а код,
+    // разбитый по брендам, — списком всех его пар.
     var h = typeof location !== "undefined" ? String(location.hash || "") : "";
     var m = h.match(/^#k=(.+)$/);
     if (m) {
       var ключ = m[1];
       try { ключ = decodeURIComponent(ключ); } catch (e) { /* как есть */ }
-      var п = данные.positions.filter(function (x) { return x.k === ключ; })[0];
-      if (п) открыть(п);
+      var точно = данные.positions.filter(function (x) { return ид(x) === ключ; });
+      var по_коду = данные.positions.filter(function (x) { return x.k === ключ; });
+      if (точно.length === 1 && (ключ.indexOf("~") >= 0 || по_коду.length === 1)) открыть(точно[0]);
+      else if (по_коду.length === 1) открыть(по_коду[0]);
+      else if (по_коду.length > 1) {
+        код_отбора = ключ;
+        показать_отбор_кода();
+        искать();
+      }
     }
   })
   .catch(function (e) {

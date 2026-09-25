@@ -54,7 +54,14 @@ create table sup_identifier (sup_id text references sup_entity(id), kind text no
                              primary key (sup_id, kind, value_norm));
 create table lib_demand (
   id bigserial primary key, deal_id text, item_name text not null,
-  part_number text, qty numeric, unit text);
+  part_number text, qty numeric, unit text,
+  -- Ячейка изготовителя и файл строки: бренд, названный в спецификации
+  -- заказчика (СПРОС_БРЕНДЫ_SQL), и сторона файла, по которой его отличают от
+  -- бренда нашего же исходящего ТКП.
+  oem text, source_file text);
+-- Сторона файла читается запасным путём codes_sql.FILES_CTE: колонка side,
+-- поле карточки, код и название поля. Здесь стоит колонка — первая ступень.
+create table lib_files (file_id text primary key, origin text, field text, side text);
 -- ВИД, А НЕ ТАБЛИЦА: вес позиции обязан считаться по спросу без строк,
 -- помеченных как текст тендерного документа. Считать пункт договора спросом
 -- значит завысить вес тем, чего никто не спрашивал.
@@ -123,6 +130,17 @@ insert into lib_demand (deal_id, item_name, part_number, qty, unit) values
   ('D-9', 'Пункт 5.2 Условия оплаты', '6205', 999, 'шт');
 insert into lib_row_junk (demand_id, revoked_at)
   select id, null from lib_demand where item_name like 'Пункт 5.2%';
+
+-- БРЕНД В СТРОКЕ СПЕЦИФИКАЦИИ. D-1 — спецификация заказчика (SKF у обоих
+-- написаний 6205), D-2 — наш исходящий ТКП с аналогом: в бренд позиции он не
+-- идёт, только в счёт «не со стороны заказчика». D-3 — заказчик назвал Parker.
+-- Строка тендерного текста (D-9) бренда не даёт: вид её не пускает.
+insert into lib_files values ('ф-заказчик', 'поле сделки', null, 'заказчик'),
+                             ('ф-наш-ткп',  'поле сделки', null, 'мы');
+update lib_demand set oem = 'SKF',               source_file = 'ф-заказчик' where deal_id = 'D-1';
+update lib_demand set oem = 'Выдуманный Аналог', source_file = 'ф-наш-ткп'  where deal_id = 'D-2';
+update lib_demand set oem = 'Parker',            source_file = 'ф-заказчик' where deal_id = 'D-3';
+update lib_demand set oem = 'FAG',               source_file = 'ф-заказчик' where deal_id = 'D-9';
 
 -- КОММЕРЧЕСКИЕ УСЛОВИЯ ТРЕМЯ РАЗНЫМИ СОСТОЯНИЯМИ. Первая строка: всё прочитано
 -- из строки предложения. Вторая: разбор ПРОВЕРИЛ и условий не нашёл («нет» —
@@ -249,7 +267,12 @@ def test_каждый_запрос_вернул_ожидаемое_число_с
 
 
 def test_снимок_собирается_из_живых_строк(снимок):
-    t = снимок["totals"]
+    t = dict(снимок["totals"])
+    # Бренд позиции без реестра: каталог даёт SKF и FAG словом ведомости,
+    # карточка — PARKER, а nutm8 не назвал никто (подробно — ниже, с реестром).
+    б = t.pop("brand")
+    assert (б["codes"], б["determined"], б["none"]) == (4, 3, 1)
+    assert б["by"] == {"каталог": 2, "строка": 0, "карточка": 1, "маска": 0}
     assert t == {"positions": 4, "with_choice": 1, "comparable": 1, "in_catalog": 2,
                  "companies": 2, "companies_resolved": 1,
                  # Строк шесть, предложений пять: копия RFQ-1 схлопнута.
@@ -516,3 +539,122 @@ def test_бренд_карточки_берёт_имя_из_реестра():
     # справочника, неизвестный номер остаётся номером.
     assert имена == {"1138": "SKF", "340": "Учебная марка"}
     assert crossref._бренды("1138, 340,3448", имена) == ["3448", "SKF", "Учебная марка"]
+
+
+# ── БРЕНД ПОЗИЦИИ: ПАРА «БРЕНД + КОД» (П1, П2) ─────────────────────────────
+# Бренд, названный в строке спецификации, читается запросом СПРОС_БРЕНДЫ_SQL, а
+# узнаётся реестром брендов — настоящей схемой brands_schema.sql. Здесь вся
+# цепочка: запросы → реестр (brands.читать_реестр) → сборка → пары.
+
+def _выполнить_схему(cur, файл):
+    from tests.test_library_schema_sql import операторы
+    for оператор in операторы((ROOT / "library" / "supabase" / файл).read_text(encoding="utf-8")):
+        cur.execute(оператор)
+
+
+РЕЕСТР = """
+insert into lib_brands (brand_key, name, rule, run_id) values
+  ('skf', 'SKF', 'проверка', 'r-test'), ('fag', 'FAG', 'проверка', 'r-test'),
+  ('parker', 'Parker Hannifin', 'проверка', 'r-test');
+insert into lib_brand_alias (spelling, spelling_key, source, seen_at, sp176_id, brand_key,
+                             status, rule, run_id)
+  select s, lib_brand_key(s), src, seen, sp, k, 'разрешено', 'проверка', 'r-test'
+    from (values ('SKF', 'dict/oem.json', 'выдумка', null::bigint, 'skf'),
+                 ('FAG', 'dict/oem.json', 'выдумка', null, 'fag'),
+                 ('Parker', 'dict/oem.json', 'выдумка', null, 'parker'),
+                 ('SKF Group', 'СП-176', 'СП-176#1138', 1138, 'skf')) v(s, src, seen, sp, k);
+"""
+
+
+@pytest.fixture(scope="module")
+def с_реестром():
+    """Тот же корпус плюс реестр брендов (brands_schema.sql) в своей схеме."""
+    import psycopg2
+
+    from library import brands
+    схема = СХЕМА + "_пары"
+    conn = psycopg2.connect(DSN)
+    conn.autocommit = True
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f'drop schema if exists "{схема}" cascade')
+            cur.execute(f'create schema "{схема}"')
+            cur.execute(f'set search_path to "{схема}"')
+            cur.execute(функция_ключа())
+            cur.execute(КОРПУС)
+            # Реестра ещё нет — читатель отвечает None, а не падает.
+            нет_таблиц = brands.читать_реестр(cur)
+            _выполнить_схему(cur, "brands_schema.sql")
+            # Таблицы есть, строк нет — тоже None: пустой реестр оставил бы
+            # сборку без единого бренда, а словарь-файл их даёт.
+            пустой = brands.читать_реестр(cur)
+            cur.execute(РЕЕСТР)
+            есть = company_names.вид_имён_есть(cur)
+            наборы = []
+            for sql in (crossref.ПРЕДЛОЖЕНИЯ_SQL, crossref.КАТАЛОГ_SQL,
+                        crossref.АНАЛОГИ_SQL, crossref.МАШИНЫ_SQL,
+                        crossref.ИЗГОТОВИТЕЛИ_SQL, crossref.СПРОС_SQL):
+                cur.execute(company_names.имена_sql(sql, есть), (crossref.FEED,))
+                наборы.append(cur.fetchall())
+            имена = crossref.имена_брендов(cur)
+            cur.execute(crossref.СПРОС_БРЕНДЫ_SQL, (crossref.FEED,))
+            спрос_бренды = cur.fetchall()
+            реестр = brands.читать_реестр(cur)
+        yield {"наборы": наборы, "имена": имена, "спрос_бренды": спрос_бренды,
+               "реестр": реестр, "пустой": пустой, "нет_таблиц": нет_таблиц}
+    finally:
+        with conn.cursor() as cur:
+            cur.execute(f'drop schema if exists "{схема}" cascade')
+        conn.close()
+
+
+def test_бренд_спецификации_читается_со_стороной(с_реестром):
+    """Ячейки изготовителя спроса — по ключу кода и со стороной файла.
+
+    Наш исходящий ТКП (сторона «мы») едет со своей стороной, чтобы сборка его не
+    взяла; строка тендерного текста (вид lib_demand_live) не едет вовсе; код,
+    отвергнутый правилом правдоподобия, — тоже."""
+    строки = sorted((к, с, я, int(n)) for к, с, я, n in с_реестром["спрос_бренды"])
+    assert строки == [
+        ("6205", "наш документ", "Выдуманный Аналог", 1),
+        ("6205", "спецификация", "SKF", 2),
+        ("seal1", "спецификация", "Parker", 2),
+    ]
+
+
+def test_реестра_нет_или_он_пуст(с_реестром):
+    """Сборка тогда узнаёт бренд по словарю-файлу, а не по пустому реестру."""
+    assert с_реестром["нет_таблиц"] is None
+    assert с_реестром["пустой"] is None
+    assert с_реестром["реестр"]["карточка"] == {"1138": "skf"}
+
+
+def test_пары_бренд_код_из_живых_строк(с_реестром):
+    """Бренд у каждой пары — с источником по П2, предложения не теряются."""
+    р = crossref.реестр_брендов(с_реестром["реестр"]["словарь"],
+                                карточка=с_реестром["реестр"]["карточка"], откуда="реестр базы")
+    s = crossref.собрать(*с_реестром["наборы"], имена_брендов=с_реестром["имена"],
+                         спрос_бренды=с_реестром["спрос_бренды"], реестр=р)
+    поз = {crossref.ид_позиции(p): p for p in s["positions"]}
+    assert set(поз) == {"6205~skf", "seal1~parker", "bolt8~fag", "nutm8"}
+    # 6205: каталог SKF — выше спецификации и карточки; обе компании в одной паре.
+    p = поз["6205~skf"]
+    assert (p["bn"], p["bs"], p["co"], p["offers"]) == ("SKF", "каталог", 2, 2)
+    # Предложение RFQ-1 назвало SKF маркой карточки, RFQ-2 не назвало ничего.
+    assert sorted(o.get("o", "") for o in p["list"]) == ["", "к:skf"]
+    assert p["spec"] == ["SKF"]
+    # seal1: в каталоге нет; спецификация заказчика (строка) выше карточки.
+    q = поз["seal1~parker"]
+    assert (q["bn"], q["bs"]) == ("Parker Hannifin", "строка")
+    assert поз["bolt8~fag"]["bs"] == "каталог"
+    # nutm8: не назвал никто — «Бренд не определён», причина «нет».
+    assert поз["nutm8"]["bw"] == "нет" and "bk" not in поз["nutm8"]
+    б = s["totals"]["brand"]
+    assert б["determined"] == 3 and б["none"] == 1 and б["disputed"] == 0
+    assert б["by"] == {"каталог": 2, "строка": 1, "карточка": 0, "маска": 0}
+    assert б["offers_coded"] == s["totals"]["offers"] == 5
+    assert б["spec_other_side"] == 1
+    # Спецификация назвала SKF, каталог тоже: спора нет, счёт «каталог против
+    # строки» пуст.
+    assert б["cat_vs_row"] == 0
+    json.dumps(crossref.разложить(s), ensure_ascii=False)
