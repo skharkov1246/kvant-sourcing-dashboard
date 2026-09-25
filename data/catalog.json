@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 284,
-    "total_bytes": 124753103,
+    "datasets": 286,
+    "total_bytes": 124946353,
     "by_sensitivity": {
-      "внутреннее": 162,
+      "внутреннее": 164,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 20,
+      "дашборд сорсеров": 22,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -1189,7 +1189,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 1150021,
+      "bytes": 1236481,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1202,9 +1202,9 @@
         "key": "assessment",
         "records": 15
       },
-      "last_change": "2026-09-24",
+      "last_change": "2026-09-25",
       "last_author": "github-actions[bot]",
-      "last_commit": "ea6afeb",
+      "last_commit": "7768f8e",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3608,6 +3608,69 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 178798,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/dongfengcumminsengine.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/generalelectric.json",
+        "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/jichaijinandieselcnpc.json",
+        "data/brand_research/mturollsroycepowersystems.json",
+        "data/brand_research/mwmcaterpillarenergy.json",
+        "data/brand_research/perkinsfgwilson.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/waukeshainnio.json",
+        "data/brand_research/wrtsil.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/material.json",
+        "dict/model_series.json",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/budget_join_stats.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json"
+      ],
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "7268a62",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "ove/data/bi_lot2.json",
       "subproject": "ОВЭ-75",
       "bytes": 178391,
@@ -3744,69 +3807,6 @@
         "gt/tools/seller_index.py",
         "gt/tools/ship_decisions.py",
         "tests/test_seller_index.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 175094,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/deutz.json",
-        "data/brand_research/dongfengcumminsengine.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/guascorsiemensenergy.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/jichaijinandieselcnpc.json",
-        "data/brand_research/mturollsroycepowersystems.json",
-        "data/brand_research/mwmcaterpillarenergy.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/brand_research/waukeshainnio.json",
-        "data/brand_research/wrtsil.json",
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/material.json",
-        "dict/model_series.json",
-        "dict/node_map.json",
-        "dict/symptom.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/budget_join_stats.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/gap_letters.json",
-        "gt/data/maker_contacts.json"
-      ],
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "97094ed",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -7702,6 +7702,54 @@
       ]
     },
     {
+      "path": "data/brand_research/perkinsfgwilson.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 52425,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): Perkins / FG Wilson: двигатели серии 4000 — газовые 4006-23TRS, 4008-30TRS, 4016-61TRS, 4016-E61TRS и дизельные 4006/4008/4012/4016 TAG/TWG/TRG, агрегаты FG Wilson P2000/P2250/P2500. Машин и исполнений — 19, сервисных документов — 11, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 4, дилеров и сервисных компаний — 7, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 8 (поле corrections). 8 кодов — из руководств Perkins TSL 4230E и SEBU8430-02 (расходники ТО и инструмент), остальные 31 — у продавцов (Tide Power, Wintpower, made-in-china, Yichao, En-Gen Diesel, turbo-diesel.co.uk) с пометкой «по данным продавца» в doc_ref; каталог Perkins (shop.perkins.com) и сайты perkins.com и fgwilson.com автоматическому чтению недоступны. Официальный дистрибьютор в РФ — ГК «Хайтед», в Средней Азии — Mayphil UK. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 39,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "7268a62",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "data/brand_research/wrtsil.json",
       "subproject": "дашборд сорсеров",
       "bytes": 51807,
@@ -7865,6 +7913,53 @@
       "referenced_by": [
         "gidromet/build.py"
       ]
+    },
+    {
+      "path": "data/brand_research/generalelectric.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 50575,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): General Electric (GE Vernova): авиапроизводные ГТУ LM2500 (+, +G4, XPRESS) и LM6000 (PC, PF+), двухвальная MS5002 C/D/E и PGT25 (газогенератор LM2500 и силовая турбина Nuovo Pignone, Baker Hughes). Машин и исполнений — 13, сервисных документов — 12, кодов запчастей — 39, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 13, дилеров и сервисных компаний — 15, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 9 (поле corrections). Все коды — номера GE и Nuovo Pignone на страницах независимых поставщиков и в закупочных листах (GTSMRO, AP4, VBR, MFS, Istec, Hangzhou, Burak Marine), каталоги IPB GE Vernova и Baker Hughes закрыты; субпоставщики (Unison, Advanced Atomization Technologies, AMETEK, Vibro-Meter, Endevco, Lear Romec, Arkwin, Meggitt, Woodward) — по полю OEM на карточках деталей. Авторизованных сервис-центров GE Vernova в РФ и СНГ не найдено, все дилеры — независимые. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 39,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "7268a62",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "gt/data/pn_catalog.json",
@@ -9015,8 +9110,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 32279,
-      "note": "Очередь разведки брендов (обновлена 2026-09-25): 60 брендов из dict/oem.json, сделано — 14, в очереди — 46. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 32365,
+      "note": "Очередь разведки брендов (обновлена 2026-09-25): 60 брендов из dict/oem.json, сделано — 16, в очереди — 44. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -9045,8 +9140,8 @@
         ]
       },
       "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "97094ed",
+      "last_author": "Claude",
+      "last_commit": "7268a62",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9775,8 +9870,8 @@
         ]
       },
       "last_change": "2026-09-25",
-      "last_author": "Claude",
-      "last_commit": "dc65801",
+      "last_author": "skharkov1246",
+      "last_commit": "fb81011",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
