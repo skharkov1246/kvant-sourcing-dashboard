@@ -234,6 +234,37 @@ def bx(method: str, params: dict) -> dict:
     return клиент().call_envelope(method, params)
 
 
+#: Вебхук для файлов Диска, на которые у сотрудника основного вебхука нет прав.
+#: Вложения писем лежат на Дисках тех, чей это ящик: зонд 25.09.2026 (прогоны
+#: 36097961413 и 36098141718) — disk.file.get ACCESS_DENIED на 45 файлах из
+#: 45, url из FILES (crm_show_file.php) отдаёт вебхуку страницу входа, вебхук
+#: не администратор. Входящий вебхук работает с правами создавшего его
+#: сотрудника (apidocs.bitrix24.ru/local-integrations/local-webhooks.html),
+#: поэтому файлам нужен свой — от сотрудника с правом чтения, со scope disk.
+#: Не задан — всё идёт через основной, как прежде.
+ВЕБХУК_ФАЙЛОВ = os.environ.get("BITRIX_FILES_WEBHOOK_URL", "").strip()
+_КЛИЕНТ_ФАЙЛОВ = None
+
+
+def bx_файлов(method: str, params: dict) -> dict:
+    """Вызов метода Диска от имени вебхука файлов, если он задан.
+
+    ОЧЕРЕДЬ ЧАСТОТЫ — ОСНОВНОГО КЛИЕНТА. Пауза между запросами у BitrixClient
+    своя у каждого экземпляра; второй клиент со своей очередью удвоил бы
+    частоту процесса сверх бюджета части (CLAUDE.md, «Битрикс не перегружать»).
+    Поэтому клиент файлов ждёт в очереди основного.
+    """
+    global _КЛИЕНТ_ФАЙЛОВ
+    if not ВЕБХУК_ФАЙЛОВ:
+        return bx(method, params)
+    if _КЛИЕНТ_ФАЙЛОВ is None:
+        from bitrix_client import BitrixClient
+        к = BitrixClient(ВЕБХУК_ФАЙЛОВ)
+        к._throttle = клиент()._throttle
+        _КЛИЕНТ_ФАЙЛОВ = к
+    return _КЛИЕНТ_ФАЙЛОВ.call_envelope(method, params)
+
+
 # Размер страницы REST Битрикса. Полное чтение кончается КОРОТКОЙ страницей;
 # если последняя страница полна, а «next» не пришёл — чтение оборвалось, и это
 # надо кричать, а не молчать.
@@ -1634,7 +1665,7 @@ def download(fo: dict, rec: dict | None = None) -> bytes | None:
     fid = fo.get("id") or fo.get("ID")
     if fid:
         try:
-            u = (bx("disk.file.get", {"id": fid}).get("result") or {}).get("DOWNLOAD_URL")
+            u = (bx_файлов("disk.file.get", {"id": fid}).get("result") or {}).get("DOWNLOAD_URL")
         except Exception as e:                                          # noqa: BLE001
             причины.append(f"disk.file.get: {код_ошибки_портала(e)}")
             u = None
@@ -1643,6 +1674,9 @@ def download(fo: dict, rec: dict | None = None) -> bytes | None:
             if тело:
                 return тело
             причины.append(f"disk.file.get: {почему}")
+        elif not причины or not причины[-1].startswith("disk.file.get"):
+            # Ответ без ссылки — не «ссылок нет вовсе»: номер файла был.
+            причины.append("disk.file.get: ответил без ссылки")
     if rec is not None:
         rec["reason"] = "; ".join(причины)[:400] or "ссылок на файл нет вовсе"
     return None

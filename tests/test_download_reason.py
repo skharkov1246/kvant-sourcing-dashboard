@@ -122,3 +122,44 @@ def test_код_отказа_портала_без_описания():
     e = RuntimeError("disk.file.get: ERROR_NOT_FOUND Файл 123456 не найден")
     assert indexer.код_ошибки_портала(e) == "ERROR_NOT_FOUND"
     assert indexer.код_ошибки_портала(ValueError("сеть")) == "ValueError"
+
+
+def test_вебхук_файлов_не_задан_диск_идёт_через_основной(monkeypatch):
+    """Без BITRIX_FILES_WEBHOOK_URL disk.file.get идёт прежним путём — через bx."""
+    monkeypatch.setattr(indexer, "ВЕБХУК_ФАЙЛОВ", "")
+    вызовы = []
+    monkeypatch.setattr(indexer, "bx", lambda m, p: вызовы.append(m) or {"result": {}})
+    rec = {}
+    assert indexer.download({"id": "7"}, rec) is None
+    assert вызовы == ["disk.file.get"]
+    # номер файла был — причина не «ссылок нет вовсе», а ответ Диска без ссылки
+    assert rec["reason"] == "disk.file.get: ответил без ссылки"
+
+
+def test_вебхук_файлов_задан_диск_идёт_через_него_в_общей_очереди(monkeypatch):
+    """Вложения писем лежат на чужих Дисках: disk.file.get — от вебхука файлов,
+    а пауза частоты — основного клиента, чтобы второй вебхук не удвоил частоту."""
+    import bitrix_client
+
+    созданы = []
+
+    class Клиент:
+        def __init__(self, url):
+            self.url = url
+            созданы.append(self)
+
+        def _throttle(self):
+            pass
+
+        def call_envelope(self, m, p):
+            return {"result": {"DOWNLOAD_URL": f"{self.url}|{m}"}}
+
+    monkeypatch.setattr(bitrix_client, "BitrixClient", Клиент)
+    monkeypatch.setattr(indexer, "ВЕБХУК_ФАЙЛОВ", "https://файлы.example/rest/2/t/")
+    monkeypatch.setattr(indexer, "_КЛИЕНТ_ФАЙЛОВ", None)
+    основной = Клиент("https://основной.example/rest/1/t/")
+    monkeypatch.setattr(indexer, "клиент", lambda: основной)
+    monkeypatch.setattr(indexer, "bx", lambda *_a: pytest.fail("disk.file.get ушёл в основной вебхук"))
+    ответ = indexer.bx_файлов("disk.file.get", {"id": "7"})
+    assert ответ["result"]["DOWNLOAD_URL"].startswith("https://файлы.example/")
+    assert indexer._КЛИЕНТ_ФАЙЛОВ._throttle == основной._throttle

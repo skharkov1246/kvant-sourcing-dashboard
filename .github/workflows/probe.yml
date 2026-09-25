@@ -33,5 +33,6 @@ jobs:
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           YADISK_TOKEN: ${{ secrets.YADISK_TOKEN }}
+          BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
           PROBE_SCRIPT: ${{ inputs.script || 'bitrix_probe.py' }}
         run: python "scripts/$PROBE_SCRIPT"

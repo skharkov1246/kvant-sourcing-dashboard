@@ -51,7 +51,7 @@ from bitrix_client import BitrixClient, сводка_нагрузки  # noqa: E
     "компания и контакт (входящие)": {"TYPE_ID": 4, "OWNER_TYPE_ID": [3, 4], "DIRECTION": 1},
 }
 ПОРТАЛ = ""
-ФАЙЛОВ_НА_ГРУППУ = 3
+ФАЙЛОВ_НА_ГРУППУ = 5
 АДРЕСОВ_НА_ГРУППУ = 10
 
 #: Код отказа портала — заглавные и подчёркивания; описание рядом может нести
@@ -136,6 +136,19 @@ def main() -> int:
     bx = BitrixClient(os.environ["BITRIX_WEBHOOK_URL"])
     ч = urlsplit(os.environ["BITRIX_WEBHOOK_URL"])
     ПОРТАЛ = f"{ч.scheme}://{ч.netloc}"
+    # Вебхук файлов (library/indexer.bx_файлов): методы Диска — от его имени,
+    # в очереди частоты основного клиента.
+    вебхук_файлов = os.environ.get("BITRIX_FILES_WEBHOOK_URL", "").strip()
+    диск = bx
+    if вебхук_файлов:
+        диск = BitrixClient(вебхук_файлов)
+        диск._throttle = bx._throttle
+    print(f"вебхук файлов: {'задан' if вебхук_файлов else 'не задан — Диск спрашивается основным'}")
+    if вебхук_файлов:
+        try:
+            print(f"  его сотрудник — администратор портала: {'да' if диск.call('user.admin') else 'нет'}")
+        except Exception as e:                                      # noqa: BLE001
+            print(f"  user.admin: {код(e)}")
 
     print("== ВЕБХУК ==")
     try:
@@ -216,23 +229,24 @@ def main() -> int:
         for fid, свой in файлы[:ФАЙЛОВ_НА_ГРУППУ]:
             чей = "ответственный — вебхук" if свой else "ответственный — другой"
             for метод in ("disk.file.get", "disk.attachedObject.get"):
-                к, u = попытка(bx, метод, fid)
+                к, u = попытка(диск, метод, fid)
                 итоги[(метод, чей, к)] += 1
                 if u and закачки[метод] < 3:
                     закачки[метод] += 1
                     print(f"  закачка по DOWNLOAD_URL из {метод}: {закачка(bx, u)}")
         for aid, свой in привязки[:ФАЙЛОВ_НА_ГРУППУ]:
             чей = "ответственный — вебхук" if свой else "ответственный — другой"
-            к, u = попытка(bx, "disk.attachedObject.get", aid)
+            к, u = попытка(диск, "disk.attachedObject.get", aid)
             итоги[("attachedObject по attachedId", чей, к)] += 1
             if u and закачки["attachedId"] < 3:
                 закачки["attachedId"] += 1
                 print(f"  закачка по DOWNLOAD_URL привязки: {закачка(bx, u)}")
         print(f"номеров привязки в url: {len(привязки)}")
-        # Ссылка url из FILES: crm_show_file.php с токеном auth — права по ней
-        # проверяет CRM (дело), а не Диск сотрудника.
+        # Ссылка url из FILES: crm_show_file.php с токеном auth. Второй прогон
+        # (36098141718): 30 из 30 — страница входа; повтор только без вебхука
+        # файлов, чтобы не тратить запросы на измеренное.
         ответы_url = Counter()
-        for u in адреса[:АДРЕСОВ_НА_ГРУППУ]:
+        for u in ([] if вебхук_файлов else адреса[:АДРЕСОВ_НА_ГРУППУ]):
             if u.startswith("/"):
                 u = ПОРТАЛ + u
             ответы_url[закачка_ссылки(bx, u)] += 1

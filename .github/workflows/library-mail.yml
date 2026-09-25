@@ -165,6 +165,15 @@ jobs:
         if: matrix.shard < fromJSON(inputs.shards)
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          # Вложения писем лежат на Дисках владельцев ящиков, и основной вебхук
+          # получает на них ACCESS_DENIED (зонд 25.09.2026). Вебхук файлов — от
+          # сотрудника с правом чтения, scope disk; не задан — прежний путь.
+          BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
+          # «Не скачался» по письмам пачки — снова в работу. Письма пачки читаются
+          # один раз на сдвиг отметки, так что повтор касается только пачки,
+          # которую перечитывают: 25.09.2026 запись писем лидов записала сотни
+          # файлов «не скачался» (нет прав на Диск) и была снята до сдвига отметки.
+          RETRY_FAILED: "1"
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           SOURCE: mail
           MAIL_GROUP: ${{ inputs.group }}
