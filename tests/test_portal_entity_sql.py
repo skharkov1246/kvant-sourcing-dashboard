@@ -91,6 +91,21 @@ insert into lib_prices (feed, source, part_number, item_name, price, currency, q
  ('разбор КП','КП','ZC-2002','Седло выдуманное',70,'USD',1,70,'R7','91201','Kelton GmbH',null,'2026-04-02','письмо',null),
  ('разбор КП','КП','QX-1001','Втулка выдуманная',7,'USD',10,70,'R8','91401','Kelton',null,'2026-05-01','документ',null),
  ('ТКП КВАНТ (отпускная цена)','КП','ZZ-9999','Нечто выдуманное',99,'USD',null,null,'R1','91101',null,null,null,null,null);
+-- Условия КП и откуда они взяты: у R4 базис и оплата — из строки, срок
+-- поставки — из общих условий файла, срок изготовления проверенно не указан.
+update lib_prices set basis_src = 'строка', pay_terms = '30/70', pay_advance_pct = 30, pay_src = 'строка',
+                      lead_days = 30, lead_src = 'файл', make_src = 'нет'
+ where rfq_id = 'R4';
+-- Реестр исполнителей: кто делает KL-7 и у кого проверено наличие. Почта
+-- продавца — чтобы проверить, что контакты в карточку не попадают.
+insert into lib_suppliers (name, kind, country, contact_email, contact_phone) values
+ ('Выдуманный склад', 'дистрибьютор', 'Нигдения', 'sklad@example.test', '+0 000 000-00-00'),
+ ('Выдуманный завод', 'OEM', 'Нигдения', null, null);
+insert into lib_part_suppliers (part_id, supplier_id, makes, verdict, in_stock, stock_qty, lead_time, price, currency)
+  select 'kl7', id, 'клапаны выдуманные', 'in_stock', 'yes', '12', '5 дней', 88, 'EUR'
+    from lib_suppliers where name = 'Выдуманный склад';
+insert into lib_part_suppliers (part_id, supplier_id, makes)
+  select 'kl7', id, 'делает под заказ' from lib_suppliers where name = 'Выдуманный завод';
 """
 
 КОРПУС_РЕЕСТРА = """
@@ -264,28 +279,96 @@ def test_код_оригинал_и_аналог_отдельно(база):
     первая, вторая = o["original"]
     assert (первая["qty"], первая["qty_hidden"], первая["total"], первая["basis"]) == (2, False, 200, "DDP")
     assert (первая["month"], первая["month_src"]) == ("2026-03", "документ")
-    assert (вторая["qty"], вторая["qty_hidden"]) == (None, True)
+    # Количество не читается — и сумма под вопросом: её нет, есть признак.
+    assert (вторая["qty"], вторая["qty_hidden"], вторая["total"], вторая["total_hidden"]) == (None, True, None, True)
+    assert первая["total_hidden"] is False
     assert первая["company"] == {"id": "KV-S-000011-1", "name": "Альфа-Подшипник", "src": "bitrix:title",
                                  "number": None}
     assert первая["brand"] == {"key": "kelton", "name": "Kelton GmbH"}
-    # Аналог по слову поставщика; компания не сведена с реестром — её нет, а
-    # не номер портала.
+    # Бренд строки назван и совпал с позицией — оригинал подтверждён.
+    assert первая["unconfirmed"] is None and o["unconfirmed_n"] == 0
+    # Условия КП и их источник — как на /nomenclature: «в КП не указано» и
+    # «разбор не дошёл» различимы.
+    assert (первая["pay_terms"], первая["pay_advance_pct"], первая["pay_src"]) == ("30/70", 30, "строка")
+    assert (первая["lead_days"], первая["lead_src"], первая["make_days"], первая["make_src"]) == (30, "файл", None, "нет")
+    assert (первая["basis_src"], вторая["basis_src"]) == ("строка", None)
+    # Аналог по слову поставщика; компания не сведена с реестром — имени нет,
+    # номер её карточки Битрикса — только полем для ссылки.
     [аналог] = o["analog"]
     assert (аналог["price"], аналог["why"], аналог["company"]) == (90, "поставщик пишет «аналог»", None)
+    assert (аналог["bx"], аналог["unresolved"], первая["bx"], первая["unresolved"]) == ("91301", True, None, False)
+    # Поставщиков — по компаниям: Альфа, Бета и несведённая 91301.
+    assert (o["suppliers"], o["brand_judged"], o["brand_disputed"]) == (3, True, False)
 
 
-def test_код_аналог_по_бренду_строки_и_спор_когда_бренд_называют_только_кп(база):
+def test_код_ориентир_цены_по_валюте(база):
+    o = код(база, "KL-7")["offers"]
+    цены = {(x["group"], x["currency"]): x for x in o["prices"]}
+    assert set(цены) == {("original", "EUR"), ("analog", "EUR")}
+    ор = цены[("original", "EUR")]
+    assert (ор["rows"], ор["companies"], ор["min"], ор["max"]) == (2, 2, 95, 100)
+    assert (ор["last"]["price"], ор["last"]["month"], ор["last"]["company"]["name"]) == (100, "2026-03", "Альфа-Подшипник")
+    ан = цены[("analog", "EUR")]
+    assert (ан["rows"], ан["companies"], ан["last"]["company"], ан["last"]["bx"]) == (1, 1, None, "91301")
+
+
+def test_кто_делает_деталь_без_контактов(база):
+    r = код(база, "KL-7")
+    assert r["makers_n"] == 2
+    склад, завод = r["makers"]
+    assert (склад["name"], склад["role"], склад["verdict"], склад["in_stock"], склад["price"], склад["currency"]) == (
+        "Выдуманный склад", "дистрибьютор", "in_stock", "yes", 88, "EUR")
+    assert (завод["name"], завод["verdict"], завод["price"], завод["currency"]) == ("Выдуманный завод", None, None, None)
+    текст = json.dumps(r, ensure_ascii=False)
+    assert "@" not in текст and "000-00-00" not in текст
+
+
+def test_спор_только_между_кп_не_решается_большинством(база):
     r = код(база, "PR-3003")
     # Позицию называют только КП: Келтон + Kelton (один бренд) против SKF.
     assert r["brand"] == {"key": "kelton", "name": "Kelton GmbH", "src": "КП", "disputed": True}
     o = r["offers"]
-    assert [x["price"] for x in o["original"]] == [10, 11]
-    [аналог] = o["analog"]
-    assert аналог["price"] == 12 and аналог["brand"] == {"key": "skf", "name": "SKF"}
-    assert аналог["why"] == "бренд строки — SKF, у позиции — Kelton GmbH"
-    # Количество-мусор скрыто, строка осталась.
-    вторая = o["original"][1]
+    # Голосованием поставщиков оригинал не выбирается: строки по бренду не
+    # делятся, и SKF не объявлен аналогом только потому, что его назвал один.
+    assert (o["brand_judged"], o["brand_disputed"]) == (False, True)
+    # Новые первыми, строка без даты — последней.
+    assert [x["price"] for x in o["original"]] == [10, 12, 11] and o["analog"] == []
+    assert all(x["unconfirmed"] is None for x in o["original"])
+    assert o["original"][1]["brand"] == {"key": "skf", "name": "SKF"}
+    # Подбирать «кому писать» по неустановленному бренду нельзя.
+    assert r["write_to"] == []
+    # Количество-мусор скрыто, строка осталась; сумма при нём — тоже.
+    вторая = o["original"][2]
     assert (вторая["qty"], вторая["qty_hidden"], вторая["month"], вторая["month_src"]) == (None, True, None, "нет")
+    assert (вторая["total"], вторая["total_hidden"]) == (None, True)
+
+
+def test_аналог_по_бренду_строки_когда_бренд_позиции_установлен(база):
+    """Каталог называет Kelton — строка КП с SKF у того же кода уходит в аналоги."""
+    c = база.cursor()
+    c.execute(f"set search_path to {ИМЯ}")
+    c.execute("begin")
+    try:
+        c.execute("insert into lib_prices (feed, source, part_number, item_name, price, currency, rfq_id, "
+                  "rfq_company, oem, price_date) values ('разбор КП','КП','KL-7','Клапан выдуманный',60,'EUR',"
+                  "'R20','91101','SKF, FAG','2026-07-01'), ('разбор КП','КП','KL-7','Клапан выдуманный',61,'EUR',"
+                  "'R21','91101','Kelton, SKF','2026-07-02'), ('разбор КП','КП','KL-7','Клапан выдуманный',62,"
+                  "'EUR','R22','91101','China','2026-07-03'), ('разбор КП','КП','KL-7','Клапан выдуманный',63,"
+                  "'EUR','R23','91101',null,'2026-07-04')")
+        c.execute("select portal_code('KL-7')")
+        o = c.fetchone()[0]["offers"]
+    finally:
+        c.execute("rollback")
+    аналоги = {x["price"]: x for x in o["analog"]}
+    # «SKF, FAG» у позиции Kelton: FAG в реестре нет, SKF — чужой бренд.
+    assert аналоги[60]["why"] == "бренд строки — SKF, у позиции — Kelton GmbH"
+    оригинал = {x["price"]: x for x in o["original"]}
+    # «Kelton, SKF» у позиции Kelton — показывается Kelton, а не алфавитно первый.
+    assert оригинал[61]["brand"] == {"key": "kelton", "name": "Kelton GmbH"} and оригинал[61]["unconfirmed"] is None
+    # Слово не из реестра и пустой бренд — в оригинале, но с пометкой.
+    assert оригинал[62]["unconfirmed"] == "в КП «China» — такого бренда в реестре нет"
+    assert оригинал[63]["unconfirmed"] == "бренд в КП не назван"
+    assert o["unconfirmed_n"] == 2
 
 
 def test_спорный_бренд_когда_каталог_и_спецификация_расходятся(база):
@@ -327,7 +410,7 @@ def test_аналоги_машины_узлы_и_кому_писать(база)
         ("skf7", "SKF-7", "замена", {"key": "skf", "name": "SKF"}),
     ]
     assert r["machines"] == [{"id": "vm400", "name": "ВМ-400", "kind": "турбина", "segment": "gtu",
-                              "brand": {"key": "kelton", "name": "Kelton GmbH"}}]
+                              "segment_name": "ГТУ выдуманные", "brand": {"key": "kelton", "name": "Kelton GmbH"}}]
     assert r["units"] == [{"id": "hot.liner", "name": "Жаровая труба", "parent": "Горячая часть", "crit": "A"}]
     # Обратная связь: код аналога ведёт на деталь, к которой он аналог.
     a = код(база, "AN-4004")
@@ -356,12 +439,29 @@ def test_нет_нигде_и_пустой_ввод(база):
         assert код(база, q) is None, q
 
 
+def _значения(v, ключ=None):
+    """Все строковые значения ответа вместе с именем поля, где они лежат."""
+    if isinstance(v, dict):
+        for k, x in v.items():
+            yield from _значения(x, k)
+    elif isinstance(v, list):
+        for x in v:
+            yield from _значения(x, ключ)
+    elif isinstance(v, str):
+        yield ключ, v
+
+
 def test_имена_только_человеческие_и_без_номеров_справочников(база):
     for q in ("KL-7", "PR-3003", "ZC-2002", "QX-1001", "AB-6205"):
         r = код(база, q)
+        for поле, значение in _значения(r):
+            for номер in НОМЕРА_СПРАВОЧНИКОВ:
+                assert номер not in значение, (q, поле, значение)
+            # Номер карточки компании портала — только полем для ссылки в
+            # Битрикс (компании нет в справочнике), и нигде в тексте.
+            for номер in ("91101", "91201", "91301", "91401"):
+                assert номер not in значение or (поле == "bx" and значение == номер), (q, поле, значение)
         текст = json.dumps(r, ensure_ascii=False)
-        for номер in НОМЕРА_СПРАВОЧНИКОВ + ("91101", "91201", "91301", "91401"):
-            assert номер not in текст, (q, номер)
         assert "alphabearings" not in текст and "R4" not in текст and "D1" not in текст, q
 
 
@@ -375,18 +475,21 @@ def test_бренд(база):
     assert (r["demand"]["rows"], r["demand"]["deals"], r["demand"]["codes"]) == (3, 3, 2)
     assert r["demand"]["registry_rows"] == 3
     assert [(x["code"], x["deals"]) for x in r["codes_demand"]] == [("qx1001", 2), ("kl7", 1)]
-    # КП: словом (R1, R2, R4, R6, R7, R8), карточкой (R6 ещё раз) и каталогом (R5).
-    assert r["offers"]["rows"] == 7
+    # КП: словом (R1, R2, R4, R6, R7, R8), карточкой (R6 ещё раз) и каталогом
+    # (R5). R5 — «Клапан, аналог»: ответ аналогом на спрос по бренду, не цена
+    # по бренду — только числом.
+    assert (r["offers"]["rows"], r["offers"]["analog_rows"]) == (6, 1)
     assert [(x["code"], x["rows"], x["suppliers"]) for x in r["codes_offers"]] == [
-        ("kl7", 3, 3), ("pr3003", 2, 1), ("qx1001", 1, 1), ("zc2002", 1, 1)]
+        ("kl7", 2, 2), ("pr3003", 2, 1), ("qx1001", 1, 1), ("zc2002", 1, 1)]
     assert r["catalog"]["parts"] == 3
     assert {x["code"] for x in r["catalog"]["list"]} == {"zc2002", "kl7", "din933"}
     assert [m["name"] for m in r["machines"]] == ["ВМ-400"] and r["machines"][0]["parts"] == 2
+    assert r["machines"][0]["segment_name"] == "ГТУ выдуманные"
     # Поставщики — сведённые, по имени; слитая Гамма пришла Бетой.
     assert [(s["company"]["name"], s["codes"], s["rows"]) for s in r["suppliers"]] == [
         ("Бета Уплотнения", 3, 3), ("Альфа-Подшипник", 2, 3)]
-    # Несведённая компания (R5) в списке не стоит, но в счёте строк есть.
-    assert (r["offers"]["suppliers"], r["offers"]["rows_unresolved"]) == (2, 1)
+    # Несведённая компания дала только аналог (R5): в строках оригинала её нет.
+    assert (r["offers"]["suppliers"], r["offers"]["rows_unresolved"]) == (2, 0)
     # Аналоги к кодам бренда — других брендов; отвергнутый код — без ссылки.
     assert sorted((a["written"], a["alt_written"], a["alt_code"], (a["brand"] or {}).get("name"))
                   for a in r["analogs"]) == [
@@ -415,13 +518,17 @@ def test_поставщик(база):
     # Отзывчивость — только числа, посторонних полей факта нет.
     assert r["rfq"] == {"sent": 5, "answered": 3, "quoted": 2, "silent": 1, "no_outcome": 1, "cards": 6}
     assert (r["quotes"]["rows"], r["quotes"]["codes"], r["quotes"]["cards"]) == (4, 4, 4)
-    бренды = [(b["brand"]["key"], b["brand"]["name"], b["codes"]) for b in r["brands"]]
-    assert бренды == [("kelton", "Kelton GmbH", 3), ("skf", "SKF", 1)]
+    бренды = [(b["brand"]["key"], b["brand"]["name"], b["named_codes"], b["asked_codes"]) for b in r["brands"]]
+    assert бренды == [("kelton", "Kelton GmbH", 3, 0), ("skf", "SKF", 1, 0)]
     коды = {x["code"]: x for x in r["codes"]}
     assert set(коды) == {"qx1001", "zc2002", "kl7", "pr3003"}
     # KL-7 у Беты — количество не сходится с суммой: не знаем.
     assert (коды["kl7"]["qty"], коды["kl7"]["price"], коды["kl7"]["brand"]["key"]) == (None, 95, "kelton")
     assert коды["qx1001"]["qty"] == 10
+    # Бренд назвал сам поставщик; KL-7 спрашивали Kelton (карточка запроса),
+    # ZC-2002 — Kelton по каталогу: оригинал. PR-3003 спросить не у кого — не судим.
+    assert (коды["kl7"]["brand_src"], коды["kl7"]["verdict"]) == ("назвал поставщик", "оригинал")
+    assert (коды["zc2002"]["verdict"], коды["pr3003"]["verdict"], коды["qx1001"]["verdict"]) == ("оригинал", None, None)
     текст = json.dumps(r, ensure_ascii=False)
     assert "@" not in текст and "nobody" not in текст
 
@@ -471,20 +578,192 @@ def test_усечение_по_бюджету_видно(база):
         s = поставщик(база, "KV-S-000012-2")
     finally:
         c.execute("reset portal_entity.budget_ms")
-    assert r["partial"] == ["предложения", "аналоги", "машины", "кому ещё писать"]
+    assert r["partial"] == ["предложения", "аналоги", "машины", "кто делает", "кому ещё писать"]
     assert r["offers"]["rows"] == 0 and r["write_to"] == []
     assert b["partial"] == ["предложения", "поставщики", "машины", "аналоги"]
     assert s["partial"] == ["бренды", "коды"]
 
 
 def test_права_только_сервису(база):
+    """Права — у каждой функции файла. Список берётся из цикла схемы, а полнота
+    цикла сверяется с тем, что файл создаёт: новая функция без строки в цикле
+    осталась бы исполнимой для anon через /rest/v1/rpc."""
+    import re
+    sql = (ROOT / "library" / "supabase" / СХЕМА).read_text(encoding="utf-8")
+    без_пояснений = re.sub(r"--[^\n]*", "", sql)
+    созданные = set(re.findall(r"create (?:or replace )?function (portal_\w+)\(", без_пояснений))
+    цикл = без_пояснений[без_пояснений.index("foreach ф in array array["):]
+    цикл = цикл[:цикл.index("] loop")]
+    сигнатуры = re.findall(r"'(portal_\w+\([^']*\))'", цикл)
+    assert {s.split("(")[0] for s in сигнатуры} == созданные, (созданные, сигнатуры)
     c = база.cursor()
     c.execute(f"set search_path to {ИМЯ}")
-    for функция in ("portal_code(text)", "portal_brand(text)", "portal_supplier(text)",
-                    "portal_brand_rows(text, int)", "portal_companies(text[])"):
-        for роль, можно in (("anon", False), ("authenticated", False), ("service_role", True)):
+    for функция in сигнатуры:
+        for роль, можно in (("anon", False), ("authenticated", False), ("service_role", True), ("public", False)):
+            if роль == "public":
+                # Пустой proacl — права по умолчанию, то есть execute у PUBLIC.
+                c.execute("select p.proacl is null or exists (select 1 from aclexplode(p.proacl) a "
+                          "where a.grantee = 0 and a.privilege_type = 'EXECUTE') "
+                          "from pg_proc p where p.oid = %s::regprocedure", (f"{ИМЯ}.{функция}",))
+                assert c.fetchone()[0] is False, (функция, "PUBLIC")
+                continue
             c.execute("select has_function_privilege(%s, %s, 'execute')", (роль, f"{ИМЯ}.{функция}"))
             assert c.fetchone()[0] is можно, (функция, роль)
+
+
+# ── замечания скептиков 25.09.2026: каждый случай — на своей пробе ──────────
+#
+# Пробы кладут строки внутри транзакции и откатывают её: общий корпус и ответы
+# остальных тестов от них не меняются.
+
+def _в_пробе(conn, строки_sql: str, вызовы):
+    c = conn.cursor()
+    c.execute(f"set search_path to {ИМЯ}")
+    c.execute("begin")
+    try:
+        c.execute(строки_sql)
+        c.execute("analyze")
+        out = []
+        for функция, аргумент in вызовы:
+            c.execute(f"select {функция}(%s)", (аргумент,))
+            out.append(c.fetchone()[0])
+        return out
+    finally:
+        c.execute("rollback")
+
+
+def test_прилагательное_аналоговый_не_делает_аналогом(база):
+    c = база.cursor()
+    c.execute(f"set search_path to {ИМЯ}")
+    for текст, да in (("Клапан, аналог", True), ("Аналоги: SKF", True), ("из аналогов", True),
+                      ("equivalent to KL-7", True), ("эквивалент Kelton", True),
+                      ("Датчик давления аналоговый 4-20 мА", False), ("выход аналоговая", False),
+                      ("аналогичный клапан", False), ("эквивалентный диаметр 40", False),
+                      ("Каналог выдуманный", False), (None, False)):
+        c.execute("select portal_says_analog(%s)", (текст,))
+        assert c.fetchone()[0] is да, текст
+    [r] = _в_пробе(база, """
+        insert into lib_prices (feed, source, part_number, item_name, price, currency, rfq_id, rfq_company, oem,
+                                price_date)
+        values ('разбор КП','КП','KL-7','Датчик давления аналоговый 4-20 мА',80,'EUR','R30','91201','Kelton',
+                '2026-06-01')""", [("portal_code", "KL-7")])
+    assert 80 in [x["price"] for x in r["offers"]["original"]]
+    assert 80 not in [x["price"] for x in r["offers"]["analog"]]
+
+
+def test_цепочка_слияний_до_корня(база):
+    """A(91501) → B → C = KV-S-000012-2: ключ A — это C, и C видит строки A."""
+    проба = """
+        insert into sup_entity (id, kind, display_name, resolution, status, merged_into) values
+         ('KV-S-000015-5','legal','Бета Промежуточная','merged','active','KV-S-000012-2');
+        insert into sup_entity (id, kind, display_name, resolution, status, merged_into) values
+         ('KV-S-000014-4','legal','Бета Старейшая','merged','active','KV-S-000015-5');
+        insert into sup_identifier (sup_id, kind, value, value_norm, source, status, run_id) values
+         ('KV-S-000014-4','bitrix','91501','91501','bitrix','verified','r1'),
+         ('KV-S-000015-5','bitrix','91601','91601','bitrix','verified','r1');
+        insert into lib_prices (feed, source, part_number, item_name, price, currency, rfq_id, rfq_company, oem,
+                                price_date)
+        values ('разбор КП','КП','ZC-2002','Седло выдуманное',71,'USD','R31','91501','Kelton GmbH','2026-06-02'),
+               ('разбор КП','КП','PR-3003','Кольцо выдуманное',13,'USD','R32','91601','Kelton','2026-06-03'),
+               ('разбор КП','КП','KL-7','Клапан выдуманный',96,'EUR','R33','91401','Kelton','2026-06-04');
+    """
+    карта, бета, дальняя, kl7, кл = _в_пробе(база, проба, [
+        ("portal_companies", ["91501", "91601"]), ("portal_supplier", "KV-S-000012-2"),
+        ("portal_supplier", "KV-S-000014-4"), ("portal_code", "KL-7"), ("portal_code", "ZC-2002")])
+    assert {k: v["id"] for k, v in карта.items()} == {"91501": "KV-S-000012-2", "91601": "KV-S-000012-2"}
+    assert 71 in [x["price"] for x in бета["codes"]] and "91501" in бета["bitrix"]
+    assert (дальняя["id"], дальняя["merged_from"]) == ("KV-S-000012-2", "KV-S-000014-4")
+    # Две карточки Битрикса одной компании (91201 и 91401) — один поставщик.
+    assert kl7["offers"]["suppliers"] == 3
+    # Бета уже давала цену на ZC-2002 — «Бета Промежуточная» в «кому писать» не
+    # встаёт отдельной компанией.
+    assert [w["company"]["id"] for w in кл["write_to"]] == ["KV-S-000011-1"]
+
+
+def test_двусмысленное_написание_не_засчитывается_ни_одному_бренду(база):
+    проба = """
+        insert into lib_brand_alias (spelling, spelling_key, source, seen_at, brand_key, status, n_rows, rule, run_id)
+        values ('Kel', lib_brand_key('Kel'), 'dict/oem.json', 'x1', 'kelton', 'разрешено', 1, 'тест', 'тест'),
+               ('Kel', lib_brand_key('Kel'), 'lib_demand.oem', 'x2', 'skf', 'разрешено', 1, 'тест', 'тест');
+        insert into lib_demand (deal_id, item_name, oem, part_number, qty, unit)
+        values ('D20','Нечто выдуманное','Kel','YY-555',1,'шт');
+    """
+    skf, kelton, yy = _в_пробе(база, проба, [("portal_brand", "skf"), ("portal_brand", "kelton"),
+                                             ("portal_code", "YY-555")])
+    for б in (skf, kelton):
+        assert "yy555" not in коды_списка(б["codes_demand"]) and "Kel" not in б["spellings"]
+    assert kelton["demand"]["rows"] == 3 and kelton["demand"]["registry_rows"] == 3
+    # Карточка кода: «Kel» — слово, бренда реестра нет.
+    assert yy["brand"]["key"] is None
+
+
+def test_обрубок_в_конце_карточки_запроса_снимается(база):
+    """«…,5050» на 200-м знаке — обрубок «50501», а не элемент 5050 (SKF)."""
+    проба = """
+        insert into lib_brand_alias (spelling, spelling_key, source, seen_at, sp176_id, brand_key, status, n_rows,
+                                     rule, run_id)
+        values ('SKF', lib_brand_key('SKF'), 'СП-176', 'СП-176#5050', 5050, 'skf', 'разрешено', 1, 'тест', 'тест');
+        insert into lib_prices (feed, source, part_number, item_name, price, currency, rfq_id, rfq_company, oem,
+                                rfq_brands, price_date)
+        values ('разбор КП','КП','TR-808','Труба выдуманная',5,'USD','R34','91201',null,
+                repeat('99999,', 33) || '5050', '2026-06-05');
+    """
+    skf, бета = _в_пробе(база, проба, [("portal_brand", "skf"), ("portal_supplier", "KV-S-000012-2")])
+    assert "tr808" not in коды_списка(skf["codes_offers"])
+    tr = [x for x in бета["codes"] if x["code"] == "tr808"]
+    assert tr and tr[0]["brand"] is None
+    assert "skf" not in [(b["brand"] or {}).get("key") for b in бета["brands"] if b["asked_codes"]]
+
+
+def test_слово_не_бренд_и_столкновение_колонок_не_становятся_брендом(база):
+    проба = """
+        insert into lib_demand (deal_id, item_name, oem, part_number, qty, unit) values
+         ('D30','Прокладка выдуманная','любой','PQ-4040',2,'шт'),
+         ('D31','Прокладка выдуманная','PQ-4040','PQ-4040',3,'шт');
+        insert into lib_brand_alias (spelling, spelling_key, source, seen_at, brand_key, status, n_rows, rule, run_id)
+        values ('любой', lib_brand_key('любой'), 'lib_demand.oem', 'z', null, 'не бренд', 3, 'тест', 'тест');
+    """
+    [r] = _в_пробе(база, проба, [("portal_code", "PQ-4040")])
+    assert r["brand"] is None and r["brands"] == []
+
+
+def test_деталь_с_id_не_равным_ключу_номера(база):
+    """id «ht55norm», номер HT-55: по ссылке из каталога и по номеру — одна карточка."""
+    проба = """
+        insert into lib_parts (id, catalog_no, name, oem) values ('ht55norm', 'HT-55', 'Втулка нормальная', 'Kelton GmbH');
+        insert into lib_demand (deal_id, item_name, oem, part_number, qty, unit)
+        values ('D40','Втулка нормальная',null,'HT-55',1,'шт');
+        insert into lib_prices (feed, source, part_number, item_name, price, currency, rfq_id, rfq_company, oem,
+                                price_date)
+        values ('разбор КП','КП','HT 55','Втулка нормальная',3,'USD','R35','91201',null,'2026-06-06');
+    """
+    по_id, по_номеру, kelton, бета = _в_пробе(база, проба, [
+        ("portal_code", "ht55norm"), ("portal_code", "HT-55"), ("portal_brand", "kelton"),
+        ("portal_supplier", "KV-S-000012-2")])
+    for r in (по_id, по_номеру):
+        assert (r["catalog"], r["demand"]["rows"], r["offers"]["rows"]) == (True, 1, 1), r["key"]
+        assert r["brand"]["key"] == "kelton"
+    assert "ht55" in коды_списка(kelton["codes_offers"])
+    ht = [x for x in бета["codes"] if x["code"] == "ht55"]
+    assert ht and ht[0]["brand"] == {"key": "kelton", "name": "Kelton GmbH"} and ht[0]["brand_src"] == "по каталогу"
+
+
+def test_бренд_не_засчитывает_ответ_аналогом(база):
+    """Запрос на Kelton (карточка), ответ SKF: не цена по бренду Kelton."""
+    проба = """
+        insert into lib_prices (feed, source, part_number, item_name, price, currency, rfq_id, rfq_company, oem,
+                                rfq_brands, price_date)
+        values ('разбор КП','КП','ZC-2002','Седло выдуманное',55,'USD','R36','91101','SKF','50501','2026-06-07');
+    """
+    kelton, zc, альфа = _в_пробе(база, проба, [("portal_brand", "kelton"), ("portal_code", "ZC-2002"),
+                                                ("portal_supplier", "KV-S-000011-1")])
+    assert kelton["offers"]["analog_rows"] == 2
+    zc_строка = [x for x in kelton["codes_offers"] if x["code"] == "zc2002"]
+    assert zc_строка and zc_строка[0]["suppliers"] == 1
+    assert [x["price"] for x in zc["offers"]["analog"]] == [55]
+    коды = {x["code"]: x for x in альфа["codes"]}
+    assert (коды["zc2002"]["verdict"], коды["zc2002"]["why"]) == ("аналог", "назвал SKF, а спрашивали Kelton GmbH")
+    assert коды["zc2002"]["brand"] == {"key": "skf", "name": "SKF"}
 
 
 # ── планы: большие таблицы — только по индексам ──────────────────────────────

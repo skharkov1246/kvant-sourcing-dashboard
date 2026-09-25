@@ -973,13 +973,22 @@ async function portalSearch(url, env, rights) {
 // за правом suppliers. Клиент задаёт только ключ; имя функции и её параметр —
 // здесь. Ответ проходит ЗАКРЫТЫЙ список полей (схема ниже): поле, которого в
 // схеме нет, дальше воркера не идёт, а значение не того вида становится null.
-// Контактов людей и финансовых условий в схемах нет вовсе — как у suppliersCut:
-// им нечем сюда попасть, даже если функция когда-нибудь их отдаст.
+// Контактов людей в схемах нет вовсе — им нечем сюда попасть, даже если функция
+// когда-нибудь их отдаст. Условия КП (базис, оплата, сроки) — часть
+// предложения поставщика, как цена: /nomenclature показывает их под тем же
+// правом suppliers (ПОЛЯ_ПРЕДЛОЖЕНИЯ в library/crossref.py). НАШИ деньги —
+// договоры, лимиты, закупки — режет suppliersCut, и карточка тоже проходит
+// через него: поле с таким именем, появись оно в схеме, закроется правом.
 const PORTAL_ENTITY_MAX_BYTES = 512 * 1024;
 const PORTAL_ENTITY_TIMEOUT_MS = 10000;
 const PORTAL_CODE_KEY = /^[0-9a-zа-я]{1,80}$/;
 const PORTAL_BRAND_KEY = /^[0-9a-zа-я]{1,80}$/;
 const PORTAL_SUP_ID = /^KV-[SG]-[0-9]{6}-[0-9]$/;
+// Номер адреса проверяется без перевода регистра: «kv-ſ-000011-1».toUpperCase()
+// даёт ASCII «KV-S-…», и проверенная строка разошлась бы с отправленной. Флаг
+// «i» без «u» не сводит не-ASCII букву к ASCII.
+const PORTAL_SUP_ID_ANY_CASE = /^KV-[SG]-[0-9]{6}-[0-9]$/i;
+const PORTAL_BX_ID = /^[0-9]{1,18}$/;
 
 // Виды значений схемы: строка с пределом длины, строка по образцу, число,
 // логическое, объект с закрытым списком полей, массив с пределом длины.
@@ -1014,12 +1023,23 @@ const ПЕ_БРЕНД = ПС.o({ key: ПС.k(PORTAL_BRAND_KEY), name: ПС.s(120
 const ПЕ_КОМПАНИЯ = ПС.o({ id: ПС.k(PORTAL_SUP_ID), name: ПС.s(200), src: ПС.s(40), number: ПС.k(PORTAL_SUP_ID) });
 const ПЕ_МЕСЯЦ = ПС.k(/^[0-9]{4}-[0-9]{2}$/, 7);
 const ПЕ_ЧАСТИ = ПС.a(ПС.s(40), 10);
+// Откуда взято условие КП: строка, файл, нет (проверено — не указано),
+// несколько, не проверено (library/offer_terms.py).
+const ПЕ_ИСТОЧНИК = ПС.k(/^(строка|файл|нет|несколько|не проверено)$/, 20);
 const ПЕ_ПРЕДЛОЖЕНИЕ = ПС.o({
-  company: ПЕ_КОМПАНИЯ, brand: ПЕ_БРЕНД, written: ПС.s(120), price: ПС.n, currency: ПС.s(8),
-  qty: ПС.n, qty_hidden: ПС.b, unit: ПС.s(20), total: ПС.n, basis: ПС.s(40), lead_days: ПС.n,
-  month: ПЕ_МЕСЯЦ, month_src: ПС.s(40), why: ПС.s(200),
+  company: ПЕ_КОМПАНИЯ, bx: ПС.k(PORTAL_BX_ID, 18), unresolved: ПС.b, brand: ПЕ_БРЕНД, written: ПС.s(120),
+  price: ПС.n, currency: ПС.s(8), qty: ПС.n, qty_hidden: ПС.b, unit: ПС.s(20), total: ПС.n, total_hidden: ПС.b,
+  basis: ПС.s(40), basis_src: ПЕ_ИСТОЧНИК, lead_days: ПС.n, lead_src: ПЕ_ИСТОЧНИК,
+  make_days: ПС.n, make_src: ПЕ_ИСТОЧНИК, pay_terms: ПС.s(80), pay_advance_pct: ПС.n, pay_src: ПЕ_ИСТОЧНИК,
+  month: ПЕ_МЕСЯЦ, month_src: ПС.s(40), rfq: ПС.k(PORTAL_BX_ID, 18), why: ПС.s(200), unconfirmed: ПС.s(200),
+});
+const ПЕ_ЦЕНЫ = ПС.o({
+  group: ПС.k(/^(original|analog)$/, 8), currency: ПС.s(8), rows: ПС.n, companies: ПС.n, min: ПС.n, max: ПС.n,
+  last: ПС.o({ price: ПС.n, month: ПЕ_МЕСЯЦ, company: ПЕ_КОМПАНИЯ, bx: ПС.k(PORTAL_BX_ID, 18) }),
 });
 const ПЕ_АНАЛОГ = ПС.o({ code: ПЕ_КОД, written: ПС.s(120), kind: ПС.s(40), brand: ПЕ_БРЕНД });
+const ПЕ_МАШИНА = { id: ПС.s(80), name: ПС.s(200), kind: ПС.s(80), segment: ПС.k(/^[a-z0-9_-]+$/i, 40),
+  segment_name: ПС.s(80) };
 const PORTAL_ENTITY_SPECS = {
   portalCode: ПС.o({
     key: ПЕ_КОД, written: ПС.s(200), name: ПС.s(200), kv_no: ПС.s(40), catalog: ПС.b,
@@ -1028,12 +1048,18 @@ const PORTAL_ENTITY_SPECS = {
     demand: ПС.o({ rows: ПС.n, deals: ПС.n, units: ПС.n, qty: ПС.n, unit: ПС.s(20), qty_hidden: ПС.n,
       last_month: ПЕ_МЕСЯЦ, customers: ПС.n, capped: ПС.b }),
     offers: ПС.o({ rows: ПС.n, suppliers: ПС.n, cards: ПС.n, capped: ПС.b, brand_judged: ПС.b,
-      original_n: ПС.n, analog_n: ПС.n, original: ПС.a(ПЕ_ПРЕДЛОЖЕНИЕ, 100), analog: ПС.a(ПЕ_ПРЕДЛОЖЕНИЕ, 100) }),
+      brand_disputed: ПС.b, original_n: ПС.n, analog_n: ПС.n, unconfirmed_n: ПС.n,
+      original: ПС.a(ПЕ_ПРЕДЛОЖЕНИЕ, 100), analog: ПС.a(ПЕ_ПРЕДЛОЖЕНИЕ, 100), prices: ПС.a(ПЕ_ЦЕНЫ, 20) }),
     analogs: ПС.a(ПЕ_АНАЛОГ, 100),
     analog_of: ПС.a(ПЕ_АНАЛОГ, 50),
-    machines: ПС.a(ПС.o({ id: ПС.s(80), name: ПС.s(200), kind: ПС.s(80),
-      segment: ПС.k(/^[a-z0-9_-]+$/i, 40), brand: ПЕ_БРЕНД }), 50),
+    machines: ПС.a(ПС.o({ ...ПЕ_МАШИНА, brand: ПЕ_БРЕНД }), 50),
     units: ПС.a(ПС.o({ id: ПС.s(120), name: ПС.s(200), parent: ПС.s(200), crit: ПС.s(4) }), 10),
+    // Кто делает деталь (реестр исполнителей): имя, роль, наличие у продавца —
+    // словом проверки. Контактов в схеме нет.
+    makers: ПС.a(ПС.o({ name: ПС.s(200), role: ПС.s(40), country: ПС.s(80), makes: ПС.s(300),
+      verdict: ПС.s(60), in_stock: ПС.s(40), stock_qty: ПС.s(40), lead_time: ПС.s(120), price: ПС.n,
+      currency: ПС.s(10) }), 30),
+    makers_n: ПС.n,
     write_to: ПС.a(ПС.o({ company: ПЕ_КОМПАНИЯ, codes: ПС.n, rows: ПС.n, last_month: ПЕ_МЕСЯЦ }), 15),
     registry: ПС.b, partial: ПЕ_ЧАСТИ,
   }),
@@ -1044,11 +1070,10 @@ const PORTAL_ENTITY_SPECS = {
     codes_demand: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), deals: ПС.n, rows: ПС.n }), 25),
     codes_offers: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), rows: ПС.n, suppliers: ПС.n,
       last_month: ПЕ_МЕСЯЦ }), 25),
-    offers: ПС.o({ rows: ПС.n, capped: ПС.b, suppliers: ПС.n, rows_unresolved: ПС.n }),
+    offers: ПС.o({ rows: ПС.n, capped: ПС.b, suppliers: ПС.n, rows_unresolved: ПС.n, analog_rows: ПС.n }),
     catalog: ПС.o({ parts: ПС.n, list: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), name: ПС.s(200),
       kv_no: ПС.s(40) }), 25) }),
-    machines: ПС.a(ПС.o({ id: ПС.s(80), name: ПС.s(200), kind: ПС.s(80),
-      segment: ПС.k(/^[a-z0-9_-]+$/i, 40), parts: ПС.n }), 50),
+    machines: ПС.a(ПС.o({ ...ПЕ_МАШИНА, parts: ПС.n }), 50),
     suppliers: ПС.a(ПС.o({ company: ПЕ_КОМПАНИЯ, codes: ПС.n, rows: ПС.n, last_month: ПЕ_МЕСЯЦ }), 30),
     analogs: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), alt_code: ПЕ_КОД, alt_written: ПС.s(120),
       kind: ПС.s(40), brand: ПЕ_БРЕНД }), 100),
@@ -1060,8 +1085,11 @@ const PORTAL_ENTITY_SPECS = {
     country: ПС.s(80), city: ПС.s(80), status: ПС.s(20), bitrix: ПС.a(ПС.k(/^[0-9]{1,18}$/, 18), 10),
     rfq: ПС.o({ sent: ПС.n, answered: ПС.n, quoted: ПС.n, silent: ПС.n, no_outcome: ПС.n, cards: ПС.n }),
     quotes: ПС.o({ rows: ПС.n, cards: ПС.n, codes: ПС.n, last_month: ПЕ_МЕСЯЦ, capped: ПС.b }),
-    brands: ПС.a(ПС.o({ brand: ПЕ_БРЕНД, codes: ПС.n, rows: ПС.n, last_month: ПЕ_МЕСЯЦ }), 40),
-    codes: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), brand: ПЕ_БРЕНД, price: ПС.n, currency: ПС.s(8),
+    brands: ПС.a(ПС.o({ brand: ПЕ_БРЕНД, named_codes: ПС.n, asked_codes: ПС.n, rows: ПС.n,
+      last_month: ПЕ_МЕСЯЦ }), 40),
+    codes: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), brand: ПЕ_БРЕНД,
+      brand_src: ПС.k(/^(назвал поставщик|бренд запроса|по каталогу)$/, 20),
+      verdict: ПС.k(/^(оригинал|аналог)$/, 10), why: ПС.s(200), price: ПС.n, currency: ПС.s(8),
       qty: ПС.n, unit: ПС.s(20), month: ПЕ_МЕСЯЦ, offers: ПС.n }), 100),
     registry: ПС.b, partial: ПЕ_ЧАСТИ,
   }),
@@ -1071,7 +1099,7 @@ const PORTAL_ENTITIES = {
   portalCode: { param: "k", fn: "portal_code", arg: "key",
     ok: (v) => [...v].length >= 1 && [...v].length <= 120 },
   portalBrand: { param: "b", fn: "portal_brand", arg: "brand_key", ok: (v) => PORTAL_BRAND_KEY.test(v) },
-  portalSupplier: { param: "s", fn: "portal_supplier", arg: "sup_id", ok: (v) => PORTAL_SUP_ID.test(v.toUpperCase()) },
+  portalSupplier: { param: "s", fn: "portal_supplier", arg: "sup_id", ok: (v) => PORTAL_SUP_ID_ANY_CASE.test(v) },
 };
 
 async function portalEntity(route, url, env, rights) {
@@ -1112,7 +1140,9 @@ async function portalEntity(route, url, env, rights) {
     if (route === "portalBrand" && value.registry === false) return suppliersJson({ error: "brands_not_installed" }, 503);
     const card = portalClean(value, PORTAL_ENTITY_SPECS[route]);
     if (!card) return suppliersJson({ error: "entity_unavailable" }, 503);
-    return suppliersJson({ ...card,
+    // Страховка, как у /api/crossref и /api/brands: поле из SUPPLIERS_FIELDS,
+    // появись оно в схеме карточки, закроется правом, а не уйдёт как есть.
+    return suppliersJson({ ...suppliersCut(card, rights),
       // Машины и узлы ведут в библиотеку, а её право — отдельное (сайт knowledge).
       library: !!(rights.admin || (rights.sites || []).includes("knowledge")) });
   } catch {

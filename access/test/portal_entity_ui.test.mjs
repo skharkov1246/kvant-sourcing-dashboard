@@ -5,8 +5,14 @@
 //   · заголовок карточки кода — «Код · Бренд», бренд реестра — ссылкой на его
 //     карточку, слово без реестра — словом;
 //   · в каждой таблице, где есть «Код», следующая колонка — «Бренд»;
-//   · оригинал и аналоги — разными таблицами, у аналога — причина;
-//   · нечитаемое количество — «не знаем», а не число;
+//   · оригинал и аналоги — разными таблицами, у аналога — причина; оригинал
+//     без названного бренда — с пометкой «оригинал не подтверждён»; бренд
+//     позиции спорят только КП — одна таблица «Предложения» без деления;
+//   · нечитаемое количество — «не знаем», а не число, и сумма при нём тоже;
+//   · условие КП без значения — с причиной: «в КП не указано» и «разбор не
+//     дошёл» различимы; над таблицей — ориентир цены по валюте;
+//   · компания не из справочника — ссылкой в карточку Битрикса, номер только в
+//     адресе, не в тексте; служебных слов («сведена», «засев») на экране нет;
 //   · каждый код, бренд и компания — ссылка на свою карточку /p#…, отвергнутый
 //     код — без ссылки; прежние разделы — вторыми ссылками;
 //   · строка из базы разметкой не становится (innerHTML не используется);
@@ -27,36 +33,53 @@ const КОД = {
            { key: "skf", name: "SKF", rows: 1, sources: ["спецификация"] }],
   demand: { rows: 3, deals: 2, units: 1, qty: null, unit: null, qty_hidden: 1, last_month: "2026-09",
             customers: null, capped: false },
-  offers: { rows: 3, suppliers: 3, cards: 3, capped: false, brand_judged: true, original_n: 2, analog_n: 1,
+  offers: { rows: 3, suppliers: 3, cards: 3, capped: false, brand_judged: true, brand_disputed: false,
+    original_n: 102, analog_n: 1, unconfirmed_n: 1,
     original: [
       { company: { id: "KV-S-000011-1", name: "Альфа-Подшипник", src: "bitrix:title", number: null },
         brand: { key: "kelton", name: "Kelton GmbH" }, written: "KL-7", price: 1234.5, currency: "EUR",
-        qty: 2, qty_hidden: false, unit: "шт", total: 2469, basis: "DDP", lead_days: null,
-        month: "2026-03", month_src: "документ", why: null },
+        qty: 2, qty_hidden: false, unit: "шт", total: 2469, total_hidden: false, basis: "DDP", basis_src: "строка",
+        lead_days: 30, lead_src: "файл", make_days: null, make_src: "нет", pay_terms: "30/70", pay_advance_pct: 30,
+        pay_src: "строка", month: "2026-03", month_src: "документ", rfq: "4401", unconfirmed: null },
       { company: { id: "KV-S-000012-2", name: "Бета Уплотнения", src: "написание", number: "KV-S-000012-2" },
-        brand: { key: "kelton", name: "Kelton GmbH" }, written: "KL-7", price: 95, currency: "EUR",
-        qty: null, qty_hidden: true, unit: null, total: 999, basis: null, lead_days: null,
-        month: null, month_src: "нет", why: null }],
-    analog: [{ company: null, brand: { key: null, name: "Выдуманный литейщик" }, written: "KL-7A", price: 90,
-               currency: null, qty: null, qty_hidden: false, unit: null, total: null, basis: null,
-               lead_days: null, month: "2026-03", month_src: "письмо", why: "поставщик пишет «аналог»" }] },
+        brand: null, written: "KL-7", price: 95, currency: "EUR",
+        qty: null, qty_hidden: true, unit: null, total: null, total_hidden: true, basis: null, basis_src: null,
+        lead_days: null, month: null, month_src: "нет", unconfirmed: "бренд в КП не назван" }],
+    analog: [{ company: null, bx: "91301", unresolved: true, brand: { key: null, name: "Выдуманный литейщик" },
+               written: "KL-7A", price: 90, currency: null, qty: null, qty_hidden: false, unit: null, total: null,
+               basis: null, lead_days: null, month: "2026-03", month_src: "письмо", why: "поставщик пишет «аналог»" }],
+    prices: [{ group: "original", currency: "EUR", rows: 2, companies: 2, min: 95, max: 1234.5,
+               last: { price: 1234.5, month: "2026-03", company: { id: "KV-S-000011-1", name: "Альфа-Подшипник" } } },
+             { group: "original", currency: "RUB", rows: 1, companies: 1, min: 7, max: 7,
+               last: { price: 7, month: "2026-01", company: null, bx: "91301" } }] },
   analogs: [{ code: "an4004", written: "AN-4004", kind: "аналог", brand: { key: null, name: "Выдуманный литейщик" } },
             { code: null, written: "SS316", kind: "аналог", brand: null }],
-  analog_of: [],
-  machines: [{ id: "vm400", name: "ВМ-400", kind: "турбина", segment: "gtu", brand: { key: "kelton", name: "Kelton GmbH" } }],
+  analog_of: [{ code: "zc2002", written: "ZC-2002", kind: "замена", brand: { key: "kelton", name: "Kelton GmbH" } }],
+  machines: [{ id: "vm400", name: "ВМ-400", kind: "турбина", segment: "gtu", segment_name: "ГТУ выдуманные",
+               brand: { key: "kelton", name: "Kelton GmbH" } }],
   units: [{ id: "hot.liner", name: "Жаровая труба", parent: "Горячая часть", crit: "A" }],
+  makers: [{ name: "Выдуманный склад", role: "дистрибьютор", country: "Нигдения", makes: "клапаны", verdict: "in_stock",
+             in_stock: "yes", stock_qty: "12", lead_time: "5 дней", price: 88, currency: "EUR" },
+           { name: "Выдуманный завод", role: "OEM", country: null, makes: null, verdict: null, in_stock: null,
+             stock_qty: null, lead_time: null, price: null, currency: null }],
+  makers_n: 2,
   write_to: [{ company: { id: "KV-S-000013-5", name: "Гамма Выдуманная", src: "bitrix:title", number: null },
                codes: 2, rows: 3, last_month: "2026-02" }],
   registry: true, partial: ["кому ещё писать"], library: false,
 };
+// Бренд позиции называют только КП, и они спорят: строки не делятся.
+const КОД_СПОР = { ...КОД, key: "pr3003", written: "PR-3003", analog_of: [], makers: [], makers_n: 0, write_to: [],
+  brand: { key: "kelton", name: "Kelton GmbH", src: "КП", disputed: true }, partial: [],
+  offers: { ...КОД.offers, brand_judged: false, brand_disputed: true, original_n: 2, analog_n: 0, unconfirmed_n: 0,
+            analog: [], prices: [] } };
 const БРЕНД = {
   key: "kelton", name: "Kelton GmbH", country: "Нигдения", owner: "Выдуманный холдинг", former_names: null,
   spellings: ["Келтон", "Kelton"], demand: { rows: 3, deals: 3, codes: 2, capped: false, registry_rows: 3 },
   codes_demand: [{ code: "qx1001", written: "QX-1001", deals: 2, rows: 2 }],
   codes_offers: [{ code: "pr3003", written: "PR-3003", rows: 2, suppliers: 1, last_month: "2026-02" }],
-  offers: { rows: 7, capped: false, suppliers: 2, rows_unresolved: 1 },
+  offers: { rows: 7, capped: false, suppliers: 2, rows_unresolved: 1, analog_rows: 2 },
   catalog: { parts: 3, list: [{ code: "zc2002", written: "ZC-2002", name: "Седло", kv_no: "KV-000753-4" }] },
-  machines: [{ id: "vm400", name: "ВМ-400", kind: "турбина", segment: "gtu", parts: 2 }],
+  machines: [{ id: "vm400", name: "ВМ-400", kind: "турбина", segment: "gtu", segment_name: "ГТУ выдуманные", parts: 2 }],
   suppliers: [{ company: { id: "KV-S-000012-2", name: "Бета Уплотнения", src: "написание", number: "KV-S-000012-2" },
                 codes: 3, rows: 3, last_month: "2026-05" }],
   analogs: [{ code: "kl7", written: "KL-7", alt_code: null, alt_written: "SS316", kind: "аналог", brand: null },
@@ -68,11 +91,19 @@ const ПОСТАВЩИК = {
   id: "KV-S-000011-1", merged_from: "KV-S-000013-3", name: null, name_src: null, number: null,
   inn: ["7700000001"], domains: ["alpha-bearings.example"], country: "Нигдения", city: null, status: "active",
   bitrix: ["91101"], rfq: null, quotes: { rows: 3, cards: 2, codes: 2, last_month: "2026-03", capped: false },
-  brands: [{ brand: { key: "kelton", name: "Kelton GmbH" }, codes: 2, rows: 3, last_month: "2026-03" }],
-  codes: [{ code: "kl7", written: "KL-7", brand: { key: "kelton", name: "Kelton GmbH" }, price: 100,
-            currency: "EUR", qty: 2, unit: "шт", month: "2026-03", offers: 1 }],
+  brands: [{ brand: { key: "kelton", name: "Kelton GmbH" }, named_codes: 1, asked_codes: 1, rows: 3, last_month: "2026-03" }],
+  codes: [{ code: "kl7", written: "KL-7", brand: { key: "kelton", name: "Kelton GmbH" }, brand_src: "назвал поставщик",
+            verdict: "оригинал", why: null, price: 100, currency: "EUR", qty: 2, unit: "шт", month: "2026-03", offers: 1 },
+          { code: "zc2002", written: "ZC-2002", brand: { key: "skf", name: "SKF" }, brand_src: "назвал поставщик",
+            verdict: "аналог", why: "назвал SKF, а спрашивали Kelton GmbH", price: 55, currency: "USD", qty: null,
+            unit: null, month: "2026-06", offers: 1 },
+          { code: "pr3003", written: "PR-3003", brand: { key: "kelton", name: "Kelton GmbH" }, brand_src: "бренд запроса",
+            verdict: null, why: null, price: 10, currency: "USD", qty: null, unit: null, month: "2026-02", offers: 2 }],
   registry: true, partial: [], library: false,
 };
+const ПОСТАВЩИК_С_ОТЗЫВОМ = { ...ПОСТАВЩИК, id: "KV-S-000012-2", merged_from: null, name: "Бета Уплотнения",
+  number: "KV-S-000012-2", bitrix: ["91201", "91401"],
+  rfq: { sent: 5, answered: 3, quoted: 2, silent: 1, no_outcome: 1, cards: 6 } };
 
 async function открыть({ hash, ответ }) {
   const { карта } = разобрать(html);
@@ -138,25 +169,71 @@ test("карточка кода: «Код · Бренд», оригинал и �
   assert.equal(строки_таблицы(аналоги).length, 1);
   assert.ok(шапка_таблицы(аналоги).includes("Почему аналог"));
   assert.match(аналоги.textContent, /поставщик пишет «аналог»/);
-  assert.match(аналоги.textContent, /не сведена с реестром/);
   assert.match(аналоги.textContent, /90 \(валюта не указана\)/);
-  // Цена — с валютой и разрядами; нечитаемое количество — «не знаем».
+  // Компания не из справочника — ссылка в Битрикс, номер только в адресе.
+  const bx = потомки(аналоги).find((e) => e.tagName === "A");
+  assert.equal(bx.getAttribute("href"), "https://kvantpro.bitrix24.ru/crm/company/details/91301/");
+  assert.equal(bx.getAttribute("rel"), "noopener noreferrer");
+  assert.doesNotMatch(bx.textContent, /[0-9]/);
+  assert.match(аналоги.textContent, /нет в справочнике поставщиков/);
+  // Цена — с валютой и разрядами; нечитаемое количество — «не знаем», и сумма при нём — тоже.
   assert.match(оригинал.textContent, /1 234,5 EUR/);
-  const вторая = строки_таблицы(оригинал)[1];
-  assert.equal(вторая.children[4].textContent, "не знаем");
-  assert.match(вторая.children[7].textContent, /в КП и на карточке даты нет/);
+  const ячейка = (tr, подпись) => tr.children.find((td) => td.getAttribute("data-l") === подпись);
+  const [первая, вторая] = строки_таблицы(оригинал);
+  assert.equal(ячейка(вторая, "Кол-во").textContent, "не знаем");
+  assert.match(ячейка(вторая, "Сумма").textContent, /^не знаем/);
+  assert.doesNotMatch(ячейка(вторая, "Сумма").textContent, /999/);
+  assert.match(ячейка(вторая, "Месяц квотации").textContent, /в КП и на карточке даты нет/);
+  // Условия КП: значение с источником или причина, почему его нет.
+  assert.match(ячейка(первая, "Оплата").textContent, /30\/70аванс 30 %/);
+  assert.match(ячейка(первая, "Поставка, дн.").textContent, /30из общих условий КП/);
+  assert.equal(ячейка(первая, "Изготовл., дн.").textContent, "в КП не указано");
+  assert.equal(ячейка(вторая, "Базис").textContent, "разбор не дошёл");
+  // Первоисточник цены — карточка запроса в Битриксе.
+  assert.ok(ссылки(первая).includes("https://kvantpro.bitrix24.ru/crm/type/166/details/4401/"));
+  // Бренд в КП не назван — оригинал не подтверждён, видимой пометкой.
+  assert.match(ячейка(вторая, "Бренд").textContent, /оригинал не подтверждён: бренд в КП не назван/);
+  assert.match(env.card.textContent, /Из них 1 — оригинал не подтверждён/);
+  // Ориентир цены по валюте и оговорка про валюты; сколько строк показано.
+  assert.match(env.card.textContent, /EUR: последняя 1 234,5 \(2026-03, Альфа-Подшипник\)от 95 до 1 234,5 · 2 компании · 2 строки/);
+  assert.match(env.card.textContent, /RUB: последняя 7 \(2026-01, компании нет в справочнике поставщиков\)/);
+  assert.match(env.card.textContent, /Цены в разных валютах. Пересчёта по курсу здесь нет намеренно/);
+  assert.match(env.card.textContent, /Показаны 2 из 102, самые свежие/);
+  // Шапка: код сам — аналог к другому коду.
+  const hero = потомки(env.card).find((e) => e.tagName === "HEADER");
+  assert.match(hero.textContent, /По каталогу аналогов этот код — замена к ZC-2002 · Kelton GmbH/);
+  // Кто делает деталь: слово проверки — словами для сорсера.
+  const исполнители = таблицы(env.card).find((t) => шапка_таблицы(t).includes("Наличие у продавца"));
+  assert.match(исполнители.textContent, /есть на складена складе: есть · 12/);
+  assert.match(исполнители.textContent, /не проверяли/);
+  assert.match(env.card.textContent, /запись прошлой проверки у продавца, сейчас не перепроверены/);
   const все = ссылки(env.card);
   for (const href of ["/p#supplier=KV-S-000011-1", "/p#supplier=KV-S-000012-2", "/p#code=an4004",
-                      "/p#brand=kelton", "/p#supplier=KV-S-000013-5",
+                      "/p#brand=kelton", "/p#supplier=KV-S-000013-5", "/p#code=zc2002",
                       "/nomenclature#k=kl7", "/brands#c=kl7"]) {
     assert.ok(все.includes(href), href);
   }
-  // Отвергнутый код — текстом, без ссылки; машина без права на библиотеку — без ссылки.
+  // Отвергнутый код — текстом, без ссылки, с видимой пометкой; машина без права на библиотеку — без ссылки.
   assert.ok(!все.some((h) => /ss316/i.test(h)), все.join(" "));
+  assert.match(env.card.textContent, /SS316не код детали: марка или стандарт/);
   assert.ok(!все.some((h) => h.startsWith("/library")));
   assert.match(env.card.textContent, /библиотека закрыта правом/);
+  // Заказчиков не знаем по устройству базы — сноской, а не плиткой.
   assert.match(env.card.textContent, /заказчиков не знаем/);
+  assert.ok(!по_классу(env.card, "total").some((t) => /заказчик/.test(t.textContent)));
   assert.match(env.card.textContent, /Не успели посчитать: кому ещё писать/);
+  // Служебных слов на экране нет.
+  assert.doesNotMatch(env.card.textContent, /сведен|засев|\(слово\)/);
+});
+
+test("бренд позиции спорят только КП: одна таблица без деления, «кому писать» не подбирается", async () => {
+  const env = await открыть({ hash: "#code=pr3003", ответ: () => [200, КОД_СПОР] });
+  const заголовки = потомки(env.card).filter((e) => e.tagName === "H2").map((e) => e.textContent);
+  assert.ok(заголовки.some((h) => /^Предложения2$/.test(h)), заголовки.join(" | "));
+  assert.ok(!заголовки.some((h) => /оригинала/.test(h)), заголовки.join(" | "));
+  assert.match(env.card.textContent, /Оригинал голосованием не выбирается/);
+  assert.match(env.card.textContent, /поставщики называют разные — подбирать по бренду не по чему/);
+  assert.doesNotMatch(env.card.textContent, /Давали цену оригинала по бренду/);
 });
 
 test("строка из базы разметкой не становится", async () => {
@@ -177,8 +254,13 @@ test("карточка бренда: коды рядом с брендом, ма
   }
   assert.ok(!все.some((h) => /ss316/i.test(h)));
   assert.match(env.card.textContent, /не меньше/);
-  assert.match(env.card.textContent, /не сведённых с реестром: 1/);
+  assert.match(env.card.textContent, /которых нет в справочнике поставщиков: 1/);
+  assert.match(env.card.textContent, /Ещё 2 строки КП — ответы аналогом на спрос по бренду/);
   assert.match(env.card.textContent, /Показаны 1 из 3/);
+  // Машина — текстом, ссылка ведёт в раздел и так и подписана.
+  const раздел = потомки(env.card).find((e) => e.tagName === "A" && e.getAttribute("href") === "/library#segment=gtu");
+  assert.equal(раздел.textContent, "раздел «ГТУ выдуманные» в библиотеке →");
+  assert.doesNotMatch(env.card.textContent, /сведен|засев/);
 });
 
 test("карточка поставщика: без имени — «имя не известно», Битрикс и прежний раздел", async () => {
@@ -191,9 +273,33 @@ test("карточка поставщика: без имени — «имя не
   const bx = потомки(env.card).find((e) => e.tagName === "A" && /bitrix24/.test(e.getAttribute("href")));
   assert.equal(bx.getAttribute("href"), "https://kvantpro.bitrix24.ru/crm/company/details/91101/");
   assert.equal(bx.getAttribute("rel"), "noopener noreferrer");
+  assert.equal(bx.textContent, "карточка ↗");
   const все = ссылки(env.card);
   for (const href of ["/p#code=kl7", "/p#brand=kelton", "/suppliers#e=KV-S-000011-1"]) assert.ok(все.includes(href), href);
   assert.match(env.card.textContent, /Отзывчивость по запросам ещё не посчитана/);
+  // Бренды: названное поставщиком и спрошенное нами — разными колонками.
+  const бренды = таблицы(env.card).find((t) => шапка_таблицы(t)[0] === "Бренд");
+  assert.deepEqual(шапка_таблицы(бренды).slice(1, 3), ["Кодов: бренд назвал сам", "Кодов: бренд не назван — по запросу или каталогу"]);
+  // Коды: источник бренда и «оригинал / аналог».
+  const коды = таблицы(env.card).find((t) => шапка_таблицы(t).includes("Оригинал или аналог"));
+  const [kl7, zc, pr] = строки_таблицы(коды);
+  assert.match(kl7.textContent, /Kelton GmbHназвал поставщикоригинал/);
+  assert.match(zc.textContent, /аналогназвал SKF, а спрашивали Kelton GmbH/);
+  assert.match(pr.textContent, /Kelton GmbHбренд запросане судим/);
+});
+
+test("карточка поставщика: отзывчивость с «молчали» и долей, карточки Битрикса без номеров в тексте", async () => {
+  const env = await открыть({ hash: "#supplier=KV-S-000012-2", ответ: () => [200, ПОСТАВЩИК_С_ОТЗЫВОМ] });
+  const плитки = по_классу(env.card, "total").map((t) => t.textContent);
+  for (const т of ["5запросов отправлено", "3 · 60 %ответили", "2дали КП", "1молчали", "1без исхода"]) {
+    assert.ok(плитки.includes(т), плитки.join(" | "));
+  }
+  assert.match(env.card.textContent, /«Без исхода» — ни ответа, ни отказа/);
+  const bx = потомки(env.card).filter((e) => e.tagName === "A" && /bitrix24/.test(e.getAttribute("href")));
+  assert.deepEqual(bx.map((a) => a.textContent), ["карточка 1 ↗", "карточка 2 ↗"]);
+  assert.deepEqual(bx.map((a) => a.getAttribute("href")), ["https://kvantpro.bitrix24.ru/crm/company/details/91201/",
+                                                         "https://kvantpro.bitrix24.ru/crm/company/details/91401/"]);
+  assert.equal(env.document.title, "Бета Уплотнения · поставщик · КВАНТ");
 });
 
 test("отказы — словами; смена «#» перерисовывает карточку", async () => {

@@ -39,15 +39,25 @@ dt{font-size:11px;color:var(--dim);margin:0 0 3px}dd{margin:0;font-size:14px;ove
 .warn{color:var(--amber)}
 .none{color:var(--dim)}
 .word{color:var(--dim);border-bottom:1px dotted var(--dim)}
-.table-wrap{border:1px solid var(--line);border-radius:9px;overflow:hidden}
+/* Широкая таблица (предложения — 11–12 колонок) между телефоном и экраном
+   прокручивается внутри своей рамки, а не обрезается и не двигает страницу. */
+.table-wrap{border:1px solid var(--line);border-radius:9px;overflow-x:auto}
 .table-wrap+.note,.chips+.note{margin-top:10px}
 table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}
-th{background:#1a222d;color:var(--dim);font-size:11px;font-weight:400;white-space:nowrap}
+th{background:#1a222d;color:var(--dim);font-size:11px;font-weight:400}
 th,td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-tr:last-child td{border-bottom:0}td{color:#c4cedb;overflow-wrap:anywhere}
+/* break-word, а не anywhere: anywhere разрешает колонке сжаться до буквы, и на
+   средней ширине «Альфа-Подшипник» и «разбор не дошёл» шли столбиком по слогу.
+   Так колонка держит ширину слова, а широкая таблица прокручивается в рамке. */
+tr:last-child td{border-bottom:0}td{color:#c4cedb;overflow-wrap:break-word}
+td .num{overflow-wrap:normal}
 td a{text-decoration:none}
 .num{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;white-space:nowrap;color:var(--ink)}
-.src{display:block;font-size:11px;color:#7c8798;margin-top:3px}
+.src{display:block;font-size:11px;color:#7c8798;margin-top:3px}.src.warn{color:var(--amber)}
+#card h3{font-size:13px;font-weight:500;color:var(--dim);margin:16px 0 8px}
+.prices{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin:0 0 12px;font-size:13px}
+.prices p{margin:0 0 6px;overflow-wrap:anywhere}.prices p:last-child{margin-bottom:0}
+.prices strong{font-weight:500}.prices .src{display:inline;margin:0 0 0 8px}.prices .note{margin:6px 0 0}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;font-size:13px;min-width:0;overflow-wrap:anywhere}
 .chip .src{display:inline;margin:0 0 0 6px}.chip .src a{font-size:12px}
@@ -65,7 +75,7 @@ td a{text-decoration:none}
   table.st thead{display:none}
   table.st,table.st tbody,table.st tr,table.st td{display:block;width:100%}
   table.st tr{border:1px solid var(--line);border-radius:9px;background:var(--card);margin:0 0 10px;padding:6px 0}
-  table.st td{display:grid;grid-template-columns:38% minmax(0,1fr);gap:10px;border:0;padding:5px 12px}
+  table.st td{display:grid;grid-template-columns:38% minmax(0,1fr);gap:10px;border:0;padding:5px 12px;overflow-wrap:anywhere}
   table.st td::before{content:attr(data-l);color:var(--dim);font-size:11.5px}
   table.st td>*{justify-self:start}
   .num{white-space:normal}

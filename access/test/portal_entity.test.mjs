@@ -7,7 +7,11 @@
 //     воркер не ходит;
 //   · клиент задаёт только ключ: функция и имя её параметра — воркера;
 //   · ответ — закрытым списком полей: контакт, почта, номер сделки, лишнее
-//     поле базы и значение не того вида дальше воркера не идут;
+//     поле базы и значение не того вида дальше воркера не идут; условия КП
+//     (оплата, сроки) — часть предложения и идут, как на /nomenclature; номер
+//     карточки Битрикса — только цифрами и только своим полем для ссылки;
+//   · ни одно поле схем карточек не совпадает с полем, которое режет право
+//     (SUPPLIERS_FIELDS), — а совпади оно, карточку режет suppliersCut;
 //   · «нет такого», «не код», «реестра нет», «функции нет» — разными ответами;
 //   · прочие пути под /p и /api/portal — 404, а не страница из ASSETS;
 //   · прежние страницы раздела по-прежнему отдаются.
@@ -94,9 +98,10 @@ const КОД = {
                  brand: { key: "kelton", name: "Kelton GmbH" }, written: "KL-7", price: 100, currency: "EUR",
                  qty: 2, qty_hidden: false, unit: null, total: 200, basis: "DDP", lead_days: null,
                  month: "2026-03", month_src: "документ", rfq_company: "91101", pay_terms: "LC 30/70",
-                 note: "позвонить Ивану" }],
-    analog: [{ company: null, brand: null, written: "KL-7", price: 90, currency: "EUR", qty: "много",
-               qty_hidden: false, month: "март", why: "поставщик пишет «аналог»" }],
+                 pay_src: "строка", lead_src: "выдумано", rfq: "4401", note: "позвонить Ивану" }],
+    analog: [{ company: null, bx: "91301", unresolved: true, brand: null, written: "KL-7", price: 90, currency: "EUR",
+               qty: "много", qty_hidden: false, month: "март", why: "поставщик пишет «аналог»", rfq: "R5" },
+             { company: null, bx: "91 301<b>", unresolved: true, price: 1, currency: "EUR" }],
   },
   analogs: [{ code: "an4004", written: "AN-4004", kind: "аналог", brand: { key: null, name: "Выдуманный литейщик" } },
             { code: "SS 316!", written: "SS316", kind: "аналог", brand: { key: "Не Ключ", name: "X" } }],
@@ -116,7 +121,9 @@ test("карточки: право suppliers, проверка ключа, од�
     }
     for (const path of ["/api/portal/code?k=", "/api/portal/code?k=" + "x".repeat(121), "/api/portal/code?k=a%01b",
                         "/api/portal/brand?b=Kelton", "/api/portal/brand?b=", "/api/portal/brand?b=kel%20ton",
-                        "/api/portal/supplier?s=KV-S-1", "/api/portal/supplier?s=91101", "/api/portal/supplier?s="]) {
+                        "/api/portal/supplier?s=KV-S-1", "/api/portal/supplier?s=91101", "/api/portal/supplier?s=",
+                        // Не-ASCII буква, которую toUpperCase() свёл бы к «S» (ſ), и знак кельвина вместо «K».
+                        "/api/portal/supplier?s=kv-%C5%BF-000011-1", "/api/portal/supplier?s=%E2%84%AAV-S-000011-1"]) {
       const bad = await call(env, path, READER);
       assert.equal(bad.status, 400, path);
       assert.equal((await bad.json()).error, "invalid_key", path);
@@ -143,8 +150,8 @@ test("карточка кода идёт закрытым списком: кон
   const env = envFor({ SUPABASE_SERVICE_KEY: "sb_secret_TESTKEYTESTKEY" });
   await сетью(КОД, async () => {
     const text = await (await call(env, "/api/portal/code?k=kl7", READER)).text();
-    for (const secret of ["nobody@example.test", "+0 000", "D-1", "deal_ids", "91101", "LC 30/70",
-                          "позвонить", "50501", "contacts", "\"best\"", "<script>"]) {
+    for (const secret of ["nobody@example.test", "+0 000", "D-1", "deal_ids", "91101", "rfq_company",
+                          "позвонить", "50501", "contacts", "\"best\"", "<script>", "<b>", "выдумано"]) {
       assert.ok(!text.includes(secret), `в ответе осталось «${secret}»`);
     }
     const v = JSON.parse(text);
@@ -155,6 +162,16 @@ test("карточка кода идёт закрытым списком: кон
     assert.equal(v.offers.analog[0].qty, null);
     assert.equal(v.offers.analog[0].month, null);
     assert.equal(v.offers.analog[0].why, "поставщик пишет «аналог»");
+    // Условия КП — часть предложения, как цена; источник условия — только
+    // словом из закрытого списка.
+    assert.equal(v.offers.original[0].pay_terms, "LC 30/70");
+    assert.equal(v.offers.original[0].pay_src, "строка");
+    assert.equal(v.offers.original[0].lead_src, null);
+    // Номер карточки Битрикса (компании и запроса) — только цифрами.
+    assert.equal(v.offers.original[0].rfq, "4401");
+    assert.equal(v.offers.analog[0].rfq, null);
+    assert.equal(v.offers.analog[0].bx, "91301");
+    assert.equal(v.offers.analog[1].bx, null);
     // Ключ кода и бренда — только ключ: «SS 316!» ссылкой не станет.
     assert.equal(v.analogs[1].code, null);
     assert.equal(v.analogs[1].brand.key, null);
@@ -197,6 +214,18 @@ test("карточки бренда и поставщика — тоже зак�
     assert.deepEqual(s.bitrix, ["91201"]);
     assert.deepEqual(s.rfq, { sent: 5, answered: 3, quoted: 2, silent: 1, no_outcome: 1, cards: 6 });
   });
+});
+
+test("поля схем карточек не совпадают с полями, которые режет право", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const src = await readFile(new URL("../../public/_worker.js", import.meta.url), "utf8");
+  const режет = src.slice(src.indexOf("const SUPPLIERS_FIELDS"), src.indexOf("function suppliersCut"));
+  const закрытые = new Set([...режет.matchAll(/"([a-z_]+)"/g)].map((m) => m[1]).filter((x) => !x.startsWith("suppliers")));
+  assert.ok(закрытые.has("contacts") && закрытые.has("payment"), [...закрытые].join(","));
+  const схемы = src.slice(src.indexOf("const ПЕ_КОД"), src.indexOf("const PORTAL_ENTITIES"));
+  const поля = new Set([...схемы.matchAll(/([a-z_]+):\s*(?:ПС|ПЕ_|\{|\.\.\.)/g)].map((m) => m[1]));
+  assert.ok(поля.has("pay_terms") && поля.has("company"), [...поля].join(","));
+  for (const поле of поля) assert.ok(!закрытые.has(поле), `поле «${поле}» режется правом — нужна отдельная обработка`);
 });
 
 test("не карточка — словами: нет такого, не код, реестра нет, функции нет, база молчит", async () => {
