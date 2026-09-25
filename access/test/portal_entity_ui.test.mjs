@@ -266,6 +266,38 @@ test("карточка бренда: коды рядом с брендом, ма
   assert.doesNotMatch(env.card.textContent, /сведен|засев/);
 });
 
+// Владение (поле ownership от воркера): те же строки, что на /brands. Ссылка —
+// на карточку бренда /p#brand=…, только когда ключ есть; источник — наружу и
+// только http(s).
+test("карточка бренда: владение — «Входит в … с …», «Прежде: …», «Бренды группы: …»", async () => {
+  const ИСТ = "https://example.invalid/deal";
+  const ownership = {
+    o: { name: "Kordex", c: "kordex", since: 1994, until: null, src: ИСТ },
+    up: [{ name: "Lumeq Group", c: null }, { name: "Stavin Holding", c: "stavin" }],
+    was: [{ name: "Tarvo AG", c: null, since: 1971, until: 1994, src: "javascript:alert(1)" }],
+    group: [{ name: "Pranto Pumps", c: "pranto", since: 2011, via: "Lumeq Group" }, { name: "Ombra", c: null, since: null, via: null }],
+    series: [{ series: "RX", brand: "Velmora", c: "velmora", since: 2003 }], role: null };
+  const env = await открыть({ hash: "#brand=kelton", ответ: () => [200, { ...БРЕНД, ownership }] });
+  const [own] = по_классу(env.card, "own");
+  assert.ok(own, "блока владения нет");
+  const строки = own.children.map((p) => p.textContent);
+  assert.equal(строки[0], "Входит в Kordex с 1994 (группа Lumeq Group → Stavin Holding)источник");
+  assert.equal(строки[1], "Прежде: Tarvo AG с 1971 до 1994");
+  assert.equal(строки[2], "Бренды группы: Pranto Pumps (с 2011, через Lumeq Group); Ombra");
+  assert.equal(строки[3], "Ряды других марок: RX — Velmora с 2003");
+  const все = ссылки(own);
+  assert.deepEqual(все, ["/p#brand=kordex", "/p#brand=stavin", ИСТ, "/p#brand=pranto", "/p#brand=velmora"]);
+  const наружу = потомки(own).find((e) => e.tagName === "A" && e.getAttribute("href") === ИСТ);
+  assert.equal(наружу.getAttribute("rel"), "noopener noreferrer");
+  // Без поля ownership (ключа KV нет) — блока нет, карточка прежняя.
+  const без = await открыть({ hash: "#brand=kelton", ответ: () => [200, БРЕНД] });
+  assert.equal(по_классу(без.card, "own").length, 0);
+  // Пустое владение — тоже без блока.
+  const пусто = await открыть({ hash: "#brand=kelton", ответ: () => [200, { ...БРЕНД,
+    ownership: { o: null, up: [], was: [], group: [], series: [], role: "владелец" } }] });
+  assert.equal(по_классу(пусто.card, "own").length, 0);
+});
+
 test("карточка поставщика: без имени — «имя не известно», Битрикс и прежний раздел", async () => {
   const env = await открыть({ hash: "#supplier=KV-S-000011-1", ответ: () => [200, ПОСТАВЩИК] });
   assert.deepEqual(env.запросы, ["/api/portal/supplier?s=KV-S-000011-1"]);

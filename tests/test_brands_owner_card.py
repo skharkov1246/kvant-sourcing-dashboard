@@ -15,8 +15,10 @@
 from __future__ import annotations
 
 import copy
+import json
+from pathlib import Path
 
-from library import brands
+from library import brand_owner, brands
 
 ИСТ = "https://example.invalid/deal"
 
@@ -152,3 +154,51 @@ def test_владелец_своим_ключом_сильнее_сведённ�
     с = brands.собрать(_коды(("akordexgroup", "velmoraenergy", "kordex")), {}, словарь=словарь,
                        ряды=РЯДЫ)[brands.КЛЮЧ]
     assert _бренд(с, "velmoraenergy")["own"]["o"]["c"] == "kordex"
+
+
+# ── Ключ brands:owners:v1 для карточки бренда на /p ──────────────────────────
+
+def test_ключ_владения_тот_же_own_по_ключу_карточки():
+    """{ключ бренда: own} — ровно поле own карточки снимка, тем же ключом k
+    (им же /p адресует бренд), и только бренды с владением."""
+    снимки = brands.собрать(_коды(), {}, словарь=СЛОВАРЬ, ряды=РЯДЫ, собран="2026-09-25T00:00:00Z")
+    сводка, ключ = снимки[brands.КЛЮЧ], снимки[brands.КЛЮЧ_ВЛАДЕНИЯ]
+    assert ключ["version"] == 1 and ключ["published_at"] == "2026-09-25T00:00:00Z"
+    assert ключ["brands"] == {b["k"]: b["own"] for b in сводка["brands"] if b.get("own")}
+    assert set(ключ["brands"]) == {"velmoraenergy", "pranto", "kordex", "tirsa"}
+    # Ссылки ключа — на ключи карточек снимка, то есть на /p#brand=<ключ>.
+    ключи = {b["k"] for b in сводка["brands"]}
+    for own in ключ["brands"].values():
+        for x in ([own["o"]] if "o" in own else []) + own.get("was", []) + own.get("group", []):
+            assert x.get("c") is None or x["c"] in ключи
+
+
+def test_ключ_владения_без_справочника_пустой():
+    """Нет справочника рядов — ключ есть, но пустой; одна пометка role — не владение."""
+    снимки = brands.собрать(_коды(), {}, словарь=СЛОВАРЬ, ряды={"types": [], "brands": []})
+    assert снимки[brands.КЛЮЧ_ВЛАДЕНИЯ] == {"version": 1, "brands": {}}
+    assert not brands.есть_владение({"role": "владелец"})
+    assert brands.есть_владение({"group": [{"name": "X"}]})
+
+
+def test_ключ_владения_в_закрытом_списке_и_у_воркера():
+    """Ключ — в списке публикатора и тем же именем и пределом в воркере."""
+    assert brands.КЛЮЧ_ВЛАДЕНИЯ == "brands:owners:v1" and brands.КЛЮЧ_ВЛАДЕНИЯ in brands.ВСЕ_КЛЮЧИ
+    текст = (Path(__file__).resolve().parents[1] / "public" / "_worker.js").read_text(encoding="utf-8")
+    assert f'const BRANDS_OWNERS_KEY = "{brands.КЛЮЧ_ВЛАДЕНИЯ}"' in текст
+    assert f"const BRANDS_OWNERS_MAX_BYTES = {brands.ПРЕДЕЛ_ВЛАДЕНИЯ // 1024} * 1024;" in текст
+
+
+def test_ключ_владения_на_настоящем_справочнике_в_пределе():
+    """Верхняя граница размера: карточка на КАЖДУЮ запись справочника рядов и
+    владельцев (в живом снимке их не больше) — ключ всё равно в пределе."""
+    ряды = brands.читать_файл(brands.ФАЙЛ_РЯДОВ)
+    ключи = sorted(brand_owner.записи(ряды))
+    снимки = brands.собрать(
+        {"brands": [{"brand_key": k, "brand": k, "codes_any": 1} for k in ключи]}, {},
+        словарь={"records": [{"oem_key": k, "name": k, "spellings": [{"spelling": k, "where": "проверка"}]}
+                             for k in ключи]},
+        ряды=ряды, собран="2026-09-25T00:00:00Z")
+    сырой = json.dumps(снимки[brands.КЛЮЧ_ВЛАДЕНИЯ], ensure_ascii=False, separators=(",", ":")).encode()
+    assert снимки[brands.КЛЮЧ_ВЛАДЕНИЯ]["brands"], "в справочнике рядов нет ни одного владения"
+    assert len(сырой) <= brands.ПРЕДЕЛ_ВЛАДЕНИЯ, len(сырой)

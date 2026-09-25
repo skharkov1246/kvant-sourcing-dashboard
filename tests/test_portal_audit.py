@@ -290,6 +290,7 @@ def _бренды(ents_по_ci):
     out = {brands.КЛЮЧ: сводка, brands.КЛЮЧ_СВЯЗЕЙ: связи, brands.КЛЮЧ_ПАР: пары_снимок}
     for i, k in enumerate(brands.КЛЮЧИ_КОРЗИН):
         out[k] = корзины[i]
+    out[brands.КЛЮЧ_ВЛАДЕНИЯ] = {"version": 1, "published_at": СОБРАН, "brands": {}}
     return out
 
 

@@ -12,7 +12,8 @@
 ЧТО ЧИТАЕТСЯ. Те же ключи, что читает воркер (public/_worker.js), без правки:
   · /suppliers    — suppliers:v1 и котировки crossref:v1 + crossref:list:00..07;
   · /nomenclature — crossref:v1, части списка, корзины crossref:offers:00..31;
-  · /brands       — brands:v1, brands:links:v1, brands:pairs:v1, brands:codes:00..15;
+  · /brands       — brands:v1, brands:links:v1, brands:pairs:v1, brands:codes:00..15
+                    (и brands:owners:v1 из того же списка);
   · /counters     — counters:v1;
   · /library      — library:v2:current и блобы ревизии (обход деревьев catalog и
                     directory, как у scripts/publish_library_v2.py);

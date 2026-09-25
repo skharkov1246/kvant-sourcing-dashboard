@@ -589,12 +589,77 @@
   }
 
   // ── карточка бренда ────────────────────────────────────────────────────────
+  // Владение (library/brands.владение, поле own; воркер кладёт его в ответ полем
+  // ownership из ключа brands:owners:v1): бренд машины → компания-владелец по
+  // dict/model_series.json. Те же строки, что на /brands (владение_бренда в
+  // brands.html). Ссылка — только на бренд с карточкой (поле c), иначе имя.
+  // Источник связи — мелко, ссылкой наружу.
+  function бренд_или_имя(x) {
+    return x.c ? ссылка(адрес_бренда(x.c), x.name || x.c) : узел("span", null, x.name || "—");
+  }
+  function источник_связи(p, src) {
+    if (!src || !/^https?:\/\//.test(src)) return;
+    var s = узел("span", "by");
+    s.appendChild(наружу(src, "источник"));
+    p.appendChild(s);
+  }
+  // Текст строки — span, а не текстовый узел: вид тот же, а мини-DOM проверок
+  // и textContent работают одинаково.
+  function текст(t) { return узел("span", null, t); }
+  function годы(x) {
+    return (x.since ? " с " + x.since : "") + (x.until ? " до " + x.until : "");
+  }
+  function строка_списка(подпись, список, элемент) {
+    var p = узел("p");
+    p.appendChild(текст(подпись));
+    список.forEach(function (x, i) {
+      if (i) p.appendChild(текст("; "));
+      элемент(p, x);
+    });
+    return p;
+  }
+  function владение_бренда(o) {
+    if (!o) return null;
+    var box = узел("div", "own");
+    if (o.o) {
+      var p = узел("p");
+      p.appendChild(текст("Входит в "));
+      p.appendChild(бренд_или_имя(o.o));
+      if (o.o.since) p.appendChild(текст(" с " + o.o.since));
+      (o.up || []).forEach(function (u, i) {
+        p.appendChild(текст(i ? " → " : " (группа "));
+        p.appendChild(бренд_или_имя(u));
+      });
+      if ((o.up || []).length) p.appendChild(текст(")"));
+      источник_связи(p, o.o.src);
+      box.appendChild(p);
+    }
+    if ((o.was || []).length) box.appendChild(строка_списка("Прежде: ", o.was, function (p, x) {
+      p.appendChild(бренд_или_имя(x));
+      p.appendChild(текст(годы(x)));
+      источник_связи(p, x.src);
+    }));
+    if ((o.group || []).length) box.appendChild(строка_списка("Бренды группы: ", o.group, function (p, x) {
+      p.appendChild(бренд_или_имя(x));
+      var ещё = [x.since ? "с " + x.since : null, x.via ? "через " + x.via : null].filter(Boolean).join(", ");
+      if (ещё) p.appendChild(текст(" (" + ещё + ")"));
+    }));
+    if ((o.series || []).length) box.appendChild(строка_списка("Ряды других марок: ", o.series, function (p, x) {
+      p.appendChild(текст(x.series + " — "));
+      p.appendChild(бренд_или_имя({ name: x.brand, c: x.c }));
+      if (x.since) p.appendChild(текст(" с " + x.since));
+    }));
+    return box.children.length ? box : null;
+  }
+
   function карточка_бренда(v) {
     var out = [];
     var свой = { key: v.key, name: v.name };
     var подпись = [v.owner ? "владелец — " + v.owner : null, v.country,
       v.former_names ? "прежде: " + v.former_names : null].filter(Boolean).join(" · ");
     out.push(шапка("Бренд", узел("h1", null, v.name), [подпись ? узел("p", "lead", подпись) : null]));
+    var владение = владение_бренда(v.ownership);
+    if (владение) out.push(владение);
     var d = v.demand || {};
     out.push(факты([
       ["Страна", v.country], ["Владелец", v.owner], ["Прежние имена", v.former_names],
