@@ -1,0 +1,110 @@
+name: Поставщики — связь разведки с реестром
+
+# ШАГ 4 ПЛАНА «ОДНА СТАРТОВАЯ СТРАНИЦА»: связь реестра разведки (lib_suppliers,
+# lib_part_suppliers) с реестром компаний портала (sup_entity, номер KV-S).
+# Мерило — доля поставщиков разведки, сведённых с реестром компаний; рядом —
+# доля строк «кто делает» на карточке кода, получивших ссылку на компанию.
+# Правило и его обоснование — в шапке library/supplier_link.py, таблица —
+# library/supabase/supplier_link_schema.sql.
+#
+# СВОДЯТ ТОЛЬКО СИЛЬНЫЕ КЛЮЧИ: ИНН или VAT точно, домен сайта или почты точно,
+# кроме общих доменов (почта, площадки — закрытый список). Имя — только
+# кандидат для человека, связью не становится никогда.
+#
+# БЕЗ ГАЛОЧКИ «apply» — ВХОЛОСТУЮ: база открывается только на чтение, прогон
+# печатает замер и ничего не пишет. С галочкой — сначала проверки записи на
+# чистой одноразовой базе, потом схема в рабочей базе, потом запись с ключом
+# link-<номер прогона>; непройденный гейт отменяет запись целиком. Откат — вход
+# «rollback» с этим ключом: строки помечаются, а не удаляются, и действующим
+# снова становится прежний прогон. Откат идёт один, остальное не выполняется.
+#
+# ОДНОЙ ЧАСТЬЮ, И ЭТО РЕШЕНИЕ, а не забытое дробление: два чтения базы по
+# несколько тысяч строк, секунды; споры «одна сущность ← много поставщиков
+# разведки» считаются только по всему реестру сразу. Битрикс не читается
+# вовсе, поэтому прогон вне очереди bitrix-portal.
+#
+# В ЖУРНАЛ — ТОЛЬКО АГРЕГАТЫ (правило 17): ни названия, ни домена, ни ИНН.
+# Только ручной запуск: расписание — решение владельца.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать связи в базу (без галочки — вхолостую)"
+        type: boolean
+        default: false
+      rollback:
+        description: "Откатить прогон с этим ключом (link-…); остальное не идёт"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supplier-link
+  cancel-in-progress: false
+
+jobs:
+  link:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        # pytest — шагу проверок записи; версия psycopg2 — та же, что в гейте.
+        run: pip install --quiet pytest psycopg2-binary==2.9.10
+
+      - name: Проверка секрета
+        env:
+          S: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — ни замера, ни записи"; exit 1; }
+          echo "секрет базы на месте"
+
+      - name: Откат прогона по ключу
+        if: inputs.rollback != ''
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ROLLBACK_RUN_ID: ${{ inputs.rollback }}
+        run: python library/supplier_link.py
+
+      # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная
+      # проверка — не пройденная проверка (образец — supplier-merge.yml). База в
+      # локали UTF-8 (CLAUDE.md, правило 21а).
+      - name: Проверки записи на чистой базе
+        if: inputs.rollback == '' && inputs.apply
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
+          sudo pg_ctlcluster "$(pg_lsclusters -h | awk 'NR==1{print $1}')" main start
+          sudo -u postgres psql -q -c "alter user postgres password 'ci'"
+          sudo -u postgres createdb -T template0 --locale=C.UTF-8 --encoding=UTF8 library_sql_test
+          LIBRARY_SQL_TEST_DSN="postgresql://postgres:ci@127.0.0.1:5432/library_sql_test" \
+            python -m pytest tests/test_supplier_link.py tests/test_supplier_link_sql.py -q
+
+      # Схема перед записью, и только перед ней: файл идемпотентен и требует
+      # sup_entity и lib_suppliers — их схемы уже в рабочей базе (zip-db.yml).
+      - name: Схема связи в рабочей базе
+        if: inputs.rollback == '' && inputs.apply
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if ! command -v psql >/dev/null; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          fi
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f library/supabase/supplier_link_schema.sql
+
+      - name: Замер и связь
+        if: inputs.rollback == ''
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          RUN_ID: link-${{ github.run_id }}
+        run: python library/supplier_link.py

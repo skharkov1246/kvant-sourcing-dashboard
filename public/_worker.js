@@ -1036,6 +1036,9 @@ function portalClean(v, spec) {
 const ПЕ_КОД = ПС.k(PORTAL_CODE_KEY);
 const ПЕ_БРЕНД = ПС.o({ key: ПС.k(PORTAL_BRAND_KEY), name: ПС.s(120) });
 const ПЕ_КОМПАНИЯ = ПС.o({ id: ПС.k(PORTAL_SUP_ID), name: ПС.s(200), src: ПС.s(40), number: ПС.k(PORTAL_SUP_ID) });
+// Чем поставщик разведки сведён с компанией реестра (шаг 4, supplier_link_schema.sql):
+// только сильные ключи. Имя связью не бывает — такого значения схема не пропустит.
+const ПЕ_СВЕДЕНО = ПС.k(/^(инн|vat|домен сайта|домен почты)$/, 20);
 const ПЕ_МЕСЯЦ = ПС.k(/^[0-9]{4}-[0-9]{2}$/, 7);
 const ПЕ_ЧАСТИ = ПС.a(ПС.s(40), 10);
 // Откуда взято условие КП: строка, файл, нет (проверено — не указано),
@@ -1088,10 +1091,11 @@ const PORTAL_ENTITY_SPECS = {
     machines: ПС.a(ПС.o({ ...ПЕ_МАШИНА, brand: ПЕ_БРЕНД }), 50),
     units: ПС.a(ПС.o({ id: ПС.s(120), name: ПС.s(200), parent: ПС.s(200), crit: ПС.s(4) }), 10),
     // Кто делает деталь (реестр исполнителей): имя, роль, наличие у продавца —
-    // словом проверки. Контактов в схеме нет.
+    // словом проверки. Контактов в схеме нет. company и link — компания
+    // реестра, с которой исполнитель сведён по ИНН или домену (шаг 4).
     makers: ПС.a(ПС.o({ name: ПС.s(200), role: ПС.s(40), country: ПС.s(80), makes: ПС.s(300),
       verdict: ПС.s(60), in_stock: ПС.s(40), stock_qty: ПС.s(40), lead_time: ПС.s(120), price: ПС.n,
-      currency: ПС.s(10) }), 30),
+      currency: ПС.s(10), company: ПЕ_КОМПАНИЯ, link: ПЕ_СВЕДЕНО }), 30),
     makers_n: ПС.n,
     write_to: ПС.a(ПС.o({ company: ПЕ_КОМПАНИЯ, codes: ПС.n, rows: ПС.n, last_month: ПЕ_МЕСЯЦ }), 15),
     registry: ПС.b, partial: ПЕ_ЧАСТИ,
@@ -1124,6 +1128,11 @@ const PORTAL_ENTITY_SPECS = {
       brand_src: ПС.k(/^(назвал поставщик|бренд запроса|по каталогу)$/, 20),
       verdict: ПС.k(/^(оригинал|аналог)$/, 10), why: ПС.s(200), price: ПС.n, currency: ПС.s(8),
       qty: ПС.n, unit: ПС.s(20), month: ПЕ_МЕСЯЦ, offers: ПС.n }), 100),
+    // Поставщики разведки, сведённые с компанией (шаг 4); research_n = null —
+    // связь реестров в базе не установлена.
+    research: ПС.a(ПС.o({ name: ПС.s(200), role: ПС.s(40), country: ПС.s(80), rule: ПЕ_СВЕДЕНО,
+      parts: ПС.n, checked: ПС.n }), 30),
+    research_n: ПС.n,
     registry: ПС.b, partial: ПЕ_ЧАСТИ,
   }),
   portalModel: ПС.o({
