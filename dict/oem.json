@@ -1,10 +1,18 @@
 {
-  "note": "Производители: ключ nkey(name) и все написания, найденные в базах. Разные написания одной компании собраны под одним ключом — это и есть то, чего сегодня нет ни в одном подпроекте.",
+  "note": "Производители: ключ nkey(name) и все написания, найденные в базах. Разные написания одной компании собраны под одним ключом — это и есть то, чего сегодня нет ни в одном подпроекте. Поле kind — вид записи: бренд, указание (к закупке), несколько (брендов в одной записи), описание (бренд с пояснением), номер (детали вместо имени). Бренд позиции даёт только вид «бренд»; у «несколько» и «описание» бренды — в поле brands, неразложенные части — в unresolved; kind_why — почему вид такой (library/oem_kind.py).",
   "count": 304,
+  "by_kind": {
+    "бренд": 234,
+    "указание": 31,
+    "несколько": 22,
+    "описание": 15,
+    "номер": 2
+  },
   "records": [
     {
       "oem_key": "skf",
       "name": "Ab Skf",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Ab Skf",
@@ -60,6 +68,7 @@
     {
       "oem_key": "bentlynevada",
       "name": "Bently Nevada, Llc",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Bently Nevada",
@@ -99,6 +108,7 @@
     {
       "oem_key": "grundfos",
       "name": "Grundfos Holding A/S",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Grundfos Holding A/S",
@@ -130,6 +140,7 @@
     {
       "oem_key": "skfautomotivecomponentcorporation",
       "name": "Skf Automotive Component Corporation",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "\"Skf Automotivecomponentcorporation\"",
@@ -161,6 +172,7 @@
     {
       "oem_key": "inniojenbacher",
       "name": "INNIO Jenbacher",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "INNIO Jenbacher",
@@ -188,6 +200,7 @@
     {
       "oem_key": "atlascopco",
       "name": "Atlas Copco",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Atlas Copco",
@@ -211,6 +224,7 @@
     {
       "oem_key": "atlascopcoairpowernv",
       "name": "Atlas Copco Airpower N.V",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Atlas Copco Airpower N.V.",
@@ -234,6 +248,7 @@
     {
       "oem_key": "caterpillar",
       "name": "Caterpillar",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Caterpillar",
@@ -257,6 +272,7 @@
     {
       "oem_key": "cryostar",
       "name": "Cryostar",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Cryostar",
@@ -280,6 +296,7 @@
     {
       "oem_key": "cummins",
       "name": "Cummins",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Cummins",
@@ -303,6 +320,7 @@
     {
       "oem_key": "donaldson",
       "name": "Donaldson Company, Inc",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Donaldson Company, Inc",
@@ -326,6 +344,7 @@
     {
       "oem_key": "epiroc",
       "name": "Epiroc",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Epiroc",
@@ -349,6 +368,7 @@
     {
       "oem_key": "flexitallic",
       "name": "Flexitallic",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "\"Flexitallic\"",
@@ -372,6 +392,7 @@
     {
       "oem_key": "grundfoshungarymanufacturing",
       "name": "Grundfos Hungary Manufacturing Ltd",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Grundfos Hungary Manufacturing Ltd.",
@@ -395,6 +416,7 @@
     {
       "oem_key": "normet",
       "name": "Normet Group",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Normet",
@@ -418,6 +440,7 @@
     {
       "oem_key": "parkerhannifin",
       "name": "Parker Hannifin Corp",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Parker Hannifin",
@@ -441,6 +464,7 @@
     {
       "oem_key": "rochestergauges",
       "name": "Rochester Gauges",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Rochester Gauges",
@@ -464,6 +488,7 @@
     {
       "oem_key": "rosemount",
       "name": "Rosemount, Inc",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Rosemount, Inc",
@@ -487,6 +512,7 @@
     {
       "oem_key": "siemens",
       "name": "Siemens Ag",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Siemens",
@@ -510,6 +536,7 @@
     {
       "oem_key": "siemensenergy",
       "name": "Siemens Energy Ag",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Siemens Energy",
@@ -533,6 +560,7 @@
     {
       "oem_key": "versaproducts",
       "name": "Versa PRODUCTS COMPANY INC.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Versa Products",
@@ -556,6 +584,7 @@
     {
       "oem_key": "woodward",
       "name": "Woodward",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Woodward",
@@ -579,6 +608,8 @@
     {
       "oem_key": "bentlynevadabakerhughes",
       "name": "Bently Nevada / Baker Hughes",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "Bently Nevada (Baker Hughes)",
@@ -598,6 +629,7 @@
     {
       "oem_key": "deutz",
       "name": "Deutz",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Deutz",
@@ -617,6 +649,7 @@
     {
       "oem_key": "marflex",
       "name": "MarFlex",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "MarFlex",
@@ -636,6 +669,7 @@
     {
       "oem_key": "phoenixcontact",
       "name": "Phoenix Contact",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Phoenix Contact",
@@ -655,6 +689,8 @@
     {
       "oem_key": "330180330105speedprobe",
       "name": "330180/330105 (speed probe)",
+      "kind": "номер",
+      "kind_why": "номер детали вместо имени",
       "spellings": [
         {
           "spelling": "330180/330105 (speed probe)",
@@ -670,6 +706,8 @@
     {
       "oem_key": "330180x005proximitor",
       "name": "330180-X0-05 (proximitor)",
+      "kind": "номер",
+      "kind_why": "номер детали вместо имени",
       "spellings": [
         {
           "spelling": "330180-X0-05 (proximitor)",
@@ -685,6 +723,7 @@
     {
       "oem_key": "abb",
       "name": "ABB",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "ABB",
@@ -700,6 +739,7 @@
     {
       "oem_key": "agastatteconnectivity",
       "name": "Agastat (TE Connectivity)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Agastat (TE Connectivity)",
@@ -715,6 +755,8 @@
     {
       "oem_key": "airpaxsensatacarlingтиповойдляпакетовsol",
       "name": "Airpax (Sensata) / Carling — типовой для пакетов Solar",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «типовой»",
       "spellings": [
         {
           "spelling": "Airpax (Sensata) / Carling — типовой для пакетов Solar",
@@ -730,6 +772,7 @@
     {
       "oem_key": "altaindustries",
       "name": "ALTA industries",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "ALTA industries",
@@ -745,6 +788,7 @@
     {
       "oem_key": "amot",
       "name": "AMOT",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "AMOT",
@@ -760,6 +804,7 @@
     {
       "oem_key": "arkwinindustries",
       "name": "Arkwin Industries",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Arkwin Industries",
@@ -775,6 +820,7 @@
     {
       "oem_key": "asco",
       "name": "ASCO",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "ASCO",
@@ -790,6 +836,7 @@
     {
       "oem_key": "ashcroft",
       "name": "Ashcroft",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Ashcroft",
@@ -805,6 +852,7 @@
     {
       "oem_key": "ateliersfrancois",
       "name": "Ateliers Francois Sa",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Ateliers Francois Sa",
@@ -820,6 +868,7 @@
     {
       "oem_key": "atlascopcocrepellesas",
       "name": "Atlas Copco Crepelle S.A.S.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Atlas Copco Crepelle S.A.S.",
@@ -835,6 +884,7 @@
     {
       "oem_key": "atlascopcoenergas",
       "name": "Atlas Copco Energas Gmbh",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Atlas Copco Energas Gmbh",
@@ -850,6 +900,11 @@
     {
       "oem_key": "atlascopcoindia",
       "name": "Atlas Copco (India) Ltd.",
+      "kind": "описание",
+      "kind_why": "страна в имени",
+      "brands": [
+        "atlascopco"
+      ],
       "spellings": [
         {
           "spelling": "Atlas Copco (India) Ltd.",
@@ -865,6 +920,7 @@
     {
       "oem_key": "atlascopcoindustrialtechnique",
       "name": "Atlas Copco Industrial Technique Ab",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Atlas Copco Industrial Technique Ab",
@@ -880,6 +936,7 @@
     {
       "oem_key": "atlascopcoitaliasrl",
       "name": "Atlas Copco Italia S.R.L.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Atlas Copco Italia S.R.L.",
@@ -895,6 +952,7 @@
     {
       "oem_key": "atlascopcousa",
       "name": "Atlas Copco Usa",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Atlas Copco Usa",
@@ -910,6 +968,7 @@
     {
       "oem_key": "baldwinfilters",
       "name": "Baldwin Filters",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Baldwin Filters",
@@ -925,6 +984,7 @@
     {
       "oem_key": "bellgossettxylem",
       "name": "Bell & Gossett (Xylem)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Bell & Gossett (Xylem)",
@@ -940,6 +1000,11 @@
     {
       "oem_key": "bentlynevadaoesolarповибрации",
       "name": "Bently Nevada (OE Solar по вибрации)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "bentlynevada"
+      ],
       "spellings": [
         {
           "spelling": "Bently Nevada (OE Solar по вибрации)",
@@ -955,6 +1020,14 @@
     {
       "oem_key": "bentlynevadawilcoxonтип",
       "name": "Bently Nevada / Wilcoxon (тип.)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "brands": [
+        "bentlynevada"
+      ],
+      "unresolved": [
+        "Wilcoxon"
+      ],
       "spellings": [
         {
           "spelling": "Bently Nevada / Wilcoxon (тип.)",
@@ -970,6 +1043,11 @@
     {
       "oem_key": "bentlynevadaпопрофилю",
       "name": "Bently Nevada (по профилю)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "bentlynevada"
+      ],
       "spellings": [
         {
           "spelling": "Bently Nevada (по профилю)",
@@ -985,6 +1063,7 @@
     {
       "oem_key": "bosch",
       "name": "Bosch",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Bosch",
@@ -1000,6 +1079,7 @@
     {
       "oem_key": "braun",
       "name": "Braun",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Braun",
@@ -1015,6 +1095,7 @@
     {
       "oem_key": "cameronslb",
       "name": "Cameron (SLB)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Cameron (SLB)",
@@ -1030,6 +1111,7 @@
     {
       "oem_key": "camfil",
       "name": "Camfil",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Camfil",
@@ -1045,6 +1127,7 @@
     {
       "oem_key": "camfilfarr",
       "name": "Camfil Farr",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Camfil Farr",
@@ -1060,6 +1143,7 @@
     {
       "oem_key": "cashco",
       "name": "Cashco",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Cashco",
@@ -1075,6 +1159,11 @@
     {
       "oem_key": "caterpillarсоединенныештатыамерики",
       "name": "Caterpillar, СОЕДИНЕННЫЕ ШТАТЫ АМЕРИКИ",
+      "kind": "описание",
+      "kind_why": "страна в имени",
+      "brands": [
+        "caterpillar"
+      ],
       "spellings": [
         {
           "spelling": "Caterpillar, СОЕДИНЕННЫЕ ШТАТЫ АМЕРИКИ",
@@ -1090,6 +1179,7 @@
     {
       "oem_key": "ccscustomcontrolsensors",
       "name": "CCS (Custom Control Sensors)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "CCS (Custom Control Sensors)",
@@ -1105,6 +1195,12 @@
     {
       "oem_key": "ccsdwyeroesolarпореледавления",
       "name": "CCS / Dwyer (OE Solar по реле давления)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "CCS",
+        "Dwyer"
+      ],
       "spellings": [
         {
           "spelling": "CCS / Dwyer (OE Solar по реле давления)",
@@ -1120,6 +1216,15 @@
     {
       "oem_key": "ccssorashcroftподиапазонуизтз",
       "name": "CCS/SOR/Ashcroft (по диапазону из ТЗ)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов словаря в одной записи: 2",
+      "brands": [
+        "sor",
+        "ashcroft"
+      ],
+      "unresolved": [
+        "CCS"
+      ],
       "spellings": [
         {
           "spelling": "CCS/SOR/Ashcroft (по диапазону из ТЗ)",
@@ -1135,6 +1240,7 @@
     {
       "oem_key": "championaerospace",
       "name": "Champion Aerospace",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Champion Aerospace",
@@ -1150,6 +1256,14 @@
     {
       "oem_key": "championaerospaceunisonтип",
       "name": "Champion Aerospace / Unison (тип.)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "brands": [
+        "championaerospace"
+      ],
+      "unresolved": [
+        "Unison"
+      ],
       "spellings": [
         {
           "spelling": "Champion Aerospace / Unison (тип.)",
@@ -1165,6 +1279,11 @@
     {
       "oem_key": "championaerospaceтип",
       "name": "Champion Aerospace (тип.)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "championaerospace"
+      ],
       "spellings": [
         {
           "spelling": "Champion Aerospace (тип.)",
@@ -1180,6 +1299,12 @@
     {
       "oem_key": "championunisonexciterпопрофилю",
       "name": "Champion/Unison exciter (по профилю)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "Champion",
+        "Unison exciter"
+      ],
       "spellings": [
         {
           "spelling": "Champion/Unison exciter (по профилю)",
@@ -1195,6 +1320,12 @@
     {
       "oem_key": "championunisonigniterпопрофилю",
       "name": "Champion/Unison igniter (по профилю)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "Champion",
+        "Unison igniter"
+      ],
       "spellings": [
         {
           "spelling": "Champion/Unison igniter (по профилю)",
@@ -1210,6 +1341,7 @@
     {
       "oem_key": "circleseal",
       "name": "Circle Seal",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Circle Seal",
@@ -1225,6 +1357,7 @@
     {
       "oem_key": "cliffordandsnell",
       "name": "Clifford and Snell",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Clifford and Snell",
@@ -1240,6 +1373,7 @@
     {
       "oem_key": "comairrotron",
       "name": "Comair Rotron",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Comair Rotron",
@@ -1255,6 +1389,7 @@
     {
       "oem_key": "commercialintertech",
       "name": "Commercial Intertech",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Commercial Intertech",
@@ -1270,6 +1405,7 @@
     {
       "oem_key": "craneveyor",
       "name": "CraneVeyor",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "CraneVeyor",
@@ -1285,6 +1421,11 @@
     {
       "oem_key": "cryostaroemилисервисcryostarремонтпообра",
       "name": "Cryostar (OEM) или сервис Cryostar/ремонт по образцу",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по образц»",
+      "brands": [
+        "cryostar"
+      ],
       "spellings": [
         {
           "spelling": "Cryostar (OEM) или сервис Cryostar/ремонт по образцу",
@@ -1300,6 +1441,7 @@
     {
       "oem_key": "cryostarsas",
       "name": "Cryostar S.A.S",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Cryostar S.A.S",
@@ -1315,6 +1457,11 @@
     {
       "oem_key": "cumminsгазовыедвигателиqsk",
       "name": "Cummins (газовые двигатели QSK)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "cummins"
+      ],
       "spellings": [
         {
           "spelling": "Cummins (газовые двигатели QSK)",
@@ -1330,6 +1477,7 @@
     {
       "oem_key": "dana",
       "name": "Dana",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Dana",
@@ -1345,6 +1493,7 @@
     {
       "oem_key": "detectorelectronicsdettronics",
       "name": "Detector Electronics (Det-Tronics)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Detector Electronics (Det-Tronics)",
@@ -1360,6 +1509,7 @@
     {
       "oem_key": "dettronicsdetectorelectronics",
       "name": "Det-Tronics (Detector Electronics)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Det-Tronics (Detector Electronics)",
@@ -1375,6 +1525,8 @@
     {
       "oem_key": "dettronicsoesolarпогазопожарке",
       "name": "Det-Tronics (OE Solar по газо-пожарке)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Det-Tronics (OE Solar по газо-пожарке)",
@@ -1390,6 +1542,8 @@
     {
       "oem_key": "dettronicsпопрофилюfg",
       "name": "Det-Tronics (по профилю F&G)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Det-Tronics (по профилю F&G)",
@@ -1405,6 +1559,7 @@
     {
       "oem_key": "dimersro",
       "name": "Dimer S.R.O.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Dimer S.R.O.",
@@ -1420,6 +1575,7 @@
     {
       "oem_key": "donaldsonfiltrationdeutschland",
       "name": "Donaldson Filtration Deutschland Gmbh",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Donaldson Filtration Deutschland Gmbh",
@@ -1435,6 +1591,7 @@
     {
       "oem_key": "donaldsonfrance",
       "name": "Donaldson France Sas",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Donaldson France Sas",
@@ -1450,6 +1607,7 @@
     {
       "oem_key": "donaldsonmiddleeastfiltrationsystemsllc",
       "name": "Donaldson Middle East Filtration Systems L.L.C",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Donaldson Middle East Filtration Systems L.L.C",
@@ -1465,6 +1623,7 @@
     {
       "oem_key": "dongfengcumminsengine",
       "name": "Dongfeng Cummins Engine Company",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Dongfeng Cummins Engine Company",
@@ -1480,6 +1639,7 @@
     {
       "oem_key": "dowmolykote",
       "name": "Dow (Molykote)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Dow (Molykote)",
@@ -1495,6 +1655,7 @@
     {
       "oem_key": "drillmec",
       "name": "Drillmec",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Drillmec",
@@ -1510,6 +1671,7 @@
     {
       "oem_key": "druckbakerhughes",
       "name": "Druck (Baker Hughes)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Druck (Baker Hughes)",
@@ -1525,6 +1687,7 @@
     {
       "oem_key": "dwyerinstruments",
       "name": "Dwyer Instruments",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Dwyer Instruments",
@@ -1540,6 +1703,7 @@
     {
       "oem_key": "dynalco",
       "name": "DYNALCO",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "DYNALCO",
@@ -1555,6 +1719,7 @@
     {
       "oem_key": "elomatic",
       "name": "El-O-Matic",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "El-O-Matic",
@@ -1570,6 +1735,7 @@
     {
       "oem_key": "emersonprocessrosemount",
       "name": "EMERSON PROCESS Rosemount",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "EMERSON PROCESS Rosemount",
@@ -1585,6 +1751,7 @@
     {
       "oem_key": "emersonrosemount",
       "name": "Emerson Rosemount",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Emerson Rosemount",
@@ -1600,6 +1767,11 @@
     {
       "oem_key": "emersonrosemountoesolarпотрансмиттерам",
       "name": "Emerson Rosemount (OE Solar по трансмиттерам)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "emersonrosemount"
+      ],
       "spellings": [
         {
           "spelling": "Emerson Rosemount (OE Solar по трансмиттерам)",
@@ -1615,6 +1787,14 @@
     {
       "oem_key": "enersyssaftтип",
       "name": "EnerSys/Saft (тип.)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "brands": [
+        "saft"
+      ],
+      "unresolved": [
+        "EnerSys"
+      ],
       "spellings": [
         {
           "spelling": "EnerSys/Saft (тип.)",
@@ -1630,6 +1810,12 @@
     {
       "oem_key": "epirocnormet",
       "name": "Epiroc, Normet",
+      "kind": "несколько",
+      "kind_why": "несколько брендов словаря в одной записи: 2",
+      "brands": [
+        "epiroc",
+        "normet"
+      ],
       "spellings": [
         {
           "spelling": "Epiroc, Normet",
@@ -1645,6 +1831,13 @@
     {
       "oem_key": "epirocnormetdeutz",
       "name": "Epiroc/Normet/Deutz",
+      "kind": "несколько",
+      "kind_why": "несколько брендов словаря в одной записи: 3",
+      "brands": [
+        "epiroc",
+        "normet",
+        "deutz"
+      ],
       "spellings": [
         {
           "spelling": "Epiroc/Normet/Deutz",
@@ -1660,6 +1853,15 @@
     {
       "oem_key": "epirocnormethencon",
       "name": "Epiroc, Normet, Hencon",
+      "kind": "несколько",
+      "kind_why": "несколько брендов словаря в одной записи: 2",
+      "brands": [
+        "epiroc",
+        "normet"
+      ],
+      "unresolved": [
+        "Hencon"
+      ],
       "spellings": [
         {
           "spelling": "Epiroc, Normet, Hencon",
@@ -1675,6 +1877,15 @@
     {
       "oem_key": "epirocnormetpaus",
       "name": "Epiroc, Normet, Paus",
+      "kind": "несколько",
+      "kind_why": "несколько брендов словаря в одной записи: 2",
+      "brands": [
+        "epiroc",
+        "normet"
+      ],
+      "unresolved": [
+        "Paus"
+      ],
       "spellings": [
         {
           "spelling": "Epiroc, Normet, Paus",
@@ -1690,6 +1901,8 @@
     {
       "oem_key": "epirocpaus",
       "name": "Epiroc, PAUS",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "Epiroc, PAUS",
@@ -1705,6 +1918,7 @@
     {
       "oem_key": "exide",
       "name": "Exide",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Exide",
@@ -1720,6 +1934,7 @@
     {
       "oem_key": "federalsignal",
       "name": "Federal Signal",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Federal Signal",
@@ -1735,6 +1950,7 @@
     {
       "oem_key": "fishercontrol",
       "name": "FISHER CONTROL",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "FISHER CONTROL",
@@ -1750,6 +1966,7 @@
     {
       "oem_key": "fleetguardcummins",
       "name": "Fleetguard (Cummins)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Fleetguard (Cummins)",
@@ -1765,6 +1982,7 @@
     {
       "oem_key": "flendergraffenstaden",
       "name": "FLENDER GRAFFENSTADEN",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "FLENDER GRAFFENSTADEN",
@@ -1780,6 +1998,7 @@
     {
       "oem_key": "formspragaerofit",
       "name": "Formsprag (Aerofit)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Formsprag (Aerofit)",
@@ -1795,6 +2014,7 @@
     {
       "oem_key": "foxboroschneider",
       "name": "Foxboro (Schneider)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Foxboro (Schneider)",
@@ -1810,6 +2030,7 @@
     {
       "oem_key": "ge",
       "name": "GE",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "GE",
@@ -1825,6 +2046,7 @@
     {
       "oem_key": "generalelectric",
       "name": "General Electric Company",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "General Electric Company",
@@ -1840,6 +2062,7 @@
     {
       "oem_key": "generalelectricity",
       "name": "General Electricity Company S.P.A.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "General Electricity Company S.P.A.",
@@ -1855,6 +2078,7 @@
     {
       "oem_key": "gilkesclydeunion",
       "name": "Gilkes (ClydeUnion)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Gilkes (ClydeUnion)",
@@ -1870,6 +2094,7 @@
     {
       "oem_key": "goswitch",
       "name": "GO SWITCH",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "GO SWITCH",
@@ -1885,6 +2110,7 @@
     {
       "oem_key": "gravertechnologies",
       "name": "Graver Technologies",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Graver Technologies",
@@ -1900,6 +2126,7 @@
     {
       "oem_key": "grundfoscroatiadoo",
       "name": "Grundfos Croatia D.O.O.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Grundfos Croatia D.O.O.",
@@ -1915,6 +2142,7 @@
     {
       "oem_key": "grundfospompyspzoo",
       "name": "Grundfos Pompy Sp. Z.O.O.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Grundfos Pompy Sp. Z.O.O.",
@@ -1930,6 +2158,7 @@
     {
       "oem_key": "grundfospumpenfabrik",
       "name": "Grundfos Pumpenfabrik Gmbh",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Grundfos Pumpenfabrik Gmbh",
@@ -1945,6 +2174,7 @@
     {
       "oem_key": "grundfospumpsshanghai",
       "name": "Grundfos Pumps (Shanghai) Co. Ltd",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Grundfos Pumps (Shanghai) Co. Ltd",
@@ -1960,6 +2190,7 @@
     {
       "oem_key": "grundfossrbljadoomanufacturing",
       "name": "Grundfos Srblja D.O.O. (Manufacturing)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Grundfos Srblja D.O.O. (Manufacturing)",
@@ -1975,6 +2206,12 @@
     {
       "oem_key": "henkeldowрасходка",
       "name": "Henkel / Dow (расходка)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "Henkel",
+        "Dow"
+      ],
       "spellings": [
         {
           "spelling": "Henkel / Dow (расходка)",
@@ -1990,6 +2227,7 @@
     {
       "oem_key": "henkelloctite",
       "name": "Henkel Loctite",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Henkel Loctite",
@@ -2005,6 +2243,7 @@
     {
       "oem_key": "hermeticswitch",
       "name": "Hermetic Switch",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Hermetic Switch",
@@ -2020,6 +2259,7 @@
     {
       "oem_key": "hydac",
       "name": "Hydac",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Hydac",
@@ -2035,6 +2275,7 @@
     {
       "oem_key": "hydradynehydraulics",
       "name": "HYDRADYNE HYDRAULICS",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "HYDRADYNE HYDRAULICS",
@@ -2050,6 +2291,7 @@
     {
       "oem_key": "iminorgren",
       "name": "Imi Norgren Limited",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Imi Norgren Limited",
@@ -2065,6 +2307,7 @@
     {
       "oem_key": "imoindustries",
       "name": "IMO INDUSTRIES INC",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "IMO INDUSTRIES INC",
@@ -2080,6 +2323,7 @@
     {
       "oem_key": "itt",
       "name": "ITT",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "ITT",
@@ -2095,6 +2339,7 @@
     {
       "oem_key": "ittindustries",
       "name": "ITT Industries",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "ITT Industries",
@@ -2110,6 +2355,7 @@
     {
       "oem_key": "jetlube",
       "name": "JET LUBE",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "JET LUBE",
@@ -2125,6 +2371,7 @@
     {
       "oem_key": "jumo",
       "name": "Jumo",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Jumo",
@@ -2140,6 +2387,7 @@
     {
       "oem_key": "kessler",
       "name": "Kessler",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Kessler",
@@ -2155,6 +2403,7 @@
     {
       "oem_key": "kesslerellis",
       "name": "KESSLER - ELLIS",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "KESSLER - ELLIS",
@@ -2170,6 +2419,7 @@
     {
       "oem_key": "kiddefenwal",
       "name": "Kidde-Fenwal",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Kidde-Fenwal",
@@ -2185,6 +2435,7 @@
     {
       "oem_key": "kimray",
       "name": "Kimray",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Kimray",
@@ -2200,6 +2451,7 @@
     {
       "oem_key": "kinetrol",
       "name": "Kinetrol",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Kinetrol",
@@ -2215,6 +2467,7 @@
     {
       "oem_key": "kochengineering",
       "name": "Koch Engineering",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Koch Engineering",
@@ -2230,6 +2483,7 @@
     {
       "oem_key": "krauf",
       "name": "Krauf",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Krauf",
@@ -2245,6 +2499,7 @@
     {
       "oem_key": "lamarche",
       "name": "LaMarche",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "LaMarche",
@@ -2260,6 +2515,13 @@
     {
       "oem_key": "littelfusebussmanneatonпоамперажу",
       "name": "Littelfuse/Bussmann (Eaton) — по амперажу",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "Littelfuse",
+        "Bussmann",
+        "Eaton"
+      ],
       "spellings": [
         {
           "spelling": "Littelfuse/Bussmann (Eaton) — по амперажу",
@@ -2275,6 +2537,7 @@
     {
       "oem_key": "lovejoytimken",
       "name": "Lovejoy (Timken)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Lovejoy (Timken)",
@@ -2290,6 +2553,7 @@
     {
       "oem_key": "magnetek",
       "name": "Magnetek",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Magnetek",
@@ -2305,6 +2569,7 @@
     {
       "oem_key": "mcmastercarr",
       "name": "McMaster-Carr",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "McMaster-Carr",
@@ -2320,6 +2585,11 @@
     {
       "oem_key": "mcmastercarrпотаможне",
       "name": "McMaster-Carr (по таможне)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "mcmastercarr"
+      ],
       "spellings": [
         {
           "spelling": "McMaster-Carr (по таможне)",
@@ -2335,6 +2605,14 @@
     {
       "oem_key": "meanwellphoenixcontact24vdcпомощности",
       "name": "Mean Well/Phoenix Contact — 24 VDC по мощности",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "brands": [
+        "phoenixcontact"
+      ],
+      "unresolved": [
+        "Mean Well"
+      ],
       "spellings": [
         {
           "spelling": "Mean Well/Phoenix Contact — 24 VDC по мощности",
@@ -2350,6 +2628,7 @@
     {
       "oem_key": "medceaton",
       "name": "MEDC (Eaton)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "MEDC (Eaton)",
@@ -2365,6 +2644,7 @@
     {
       "oem_key": "meggittmeggittcontrols",
       "name": "Meggitt (Meggitt Controls)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Meggitt (Meggitt Controls)",
@@ -2380,6 +2660,7 @@
     {
       "oem_key": "metrix",
       "name": "Metrix",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Metrix",
@@ -2395,6 +2676,7 @@
     {
       "oem_key": "metsoautomation",
       "name": "Metso Automation",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Metso Automation",
@@ -2410,6 +2692,7 @@
     {
       "oem_key": "midwestinstrument",
       "name": "Mid-West Instrument",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Mid-West Instrument",
@@ -2425,6 +2708,7 @@
     {
       "oem_key": "minimax",
       "name": "Minimax",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Minimax",
@@ -2440,6 +2724,7 @@
     {
       "oem_key": "moog",
       "name": "Moog",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Moog",
@@ -2455,6 +2740,11 @@
     {
       "oem_key": "moogпопрофилюсервоклапановge",
       "name": "Moog (по профилю сервоклапанов GE)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "moog"
+      ],
       "spellings": [
         {
           "spelling": "Moog (по профилю сервоклапанов GE)",
@@ -2470,6 +2760,7 @@
     {
       "oem_key": "mtecorporation",
       "name": "MTE Corporation",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "MTE Corporation",
@@ -2485,6 +2776,7 @@
     {
       "oem_key": "muellersteam",
       "name": "Mueller Steam",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Mueller Steam",
@@ -2500,6 +2792,7 @@
     {
       "oem_key": "munters",
       "name": "Munters",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Munters",
@@ -2515,6 +2808,7 @@
     {
       "oem_key": "mwmcaterpillarenergy",
       "name": "MWM (Caterpillar Energy)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "MWM (Caterpillar Energy)",
@@ -2530,6 +2824,7 @@
     {
       "oem_key": "naksealingtechnologies",
       "name": "NAK Sealing Technologies",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "NAK Sealing Technologies",
@@ -2545,6 +2840,7 @@
     {
       "oem_key": "nationaloilwellvarconov",
       "name": "National Oilwell Varco (NOV)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "National Oilwell Varco (NOV)",
@@ -2560,6 +2856,7 @@
     {
       "oem_key": "nibco",
       "name": "Nibco",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Nibco",
@@ -2575,6 +2872,7 @@
     {
       "oem_key": "norgren",
       "name": "Norgren",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Norgren",
@@ -2590,6 +2888,7 @@
     {
       "oem_key": "ohmite",
       "name": "Ohmite",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Ohmite",
@@ -2605,6 +2904,7 @@
     {
       "oem_key": "oleobi",
       "name": "Oleobi",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Oleobi",
@@ -2620,6 +2920,7 @@
     {
       "oem_key": "palldanaher",
       "name": "Pall (Danaher)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Pall (Danaher)",
@@ -2635,6 +2936,7 @@
     {
       "oem_key": "pallindustrialhydraulics",
       "name": "Pall Industrial Hydraulics",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Pall Industrial Hydraulics",
@@ -2650,6 +2952,8 @@
     {
       "oem_key": "panduitpansteelhightemp",
       "name": "Panduit (Pan-Steel) — high temp",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Panduit (Pan-Steel) — high temp",
@@ -2665,6 +2969,7 @@
     {
       "oem_key": "parker",
       "name": "Parker",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Parker",
@@ -2680,6 +2985,7 @@
     {
       "oem_key": "parkerhannifinmanufacturingfrancesas",
       "name": "Parker Hannifin Manufacturing France S.A.S.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Parker Hannifin Manufacturing France S.A.S.",
@@ -2695,6 +3001,11 @@
     {
       "oem_key": "parkerhannifinтип",
       "name": "Parker Hannifin (тип.)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "parkerhannifin"
+      ],
       "spellings": [
         {
           "spelling": "Parker Hannifin (тип.)",
@@ -2710,6 +3021,7 @@
     {
       "oem_key": "parkerhcse",
       "name": "Parker Hcse",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Parker Hcse",
@@ -2725,6 +3037,7 @@
     {
       "oem_key": "parkerhydraulics",
       "name": "Parker Hydraulics",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Parker Hydraulics",
@@ -2740,6 +3053,7 @@
     {
       "oem_key": "pccvalvesandcontrols",
       "name": "PCC Valves and Controls",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "PCC Valves and Controls",
@@ -2755,6 +3069,7 @@
     {
       "oem_key": "pepperlfuchs",
       "name": "Pepperl+Fuchs",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Pepperl+Fuchs",
@@ -2770,6 +3085,12 @@
     {
       "oem_key": "pepperlfuchsrsd",
       "name": "Pepperl+Fuchs / RSD",
+      "kind": "несколько",
+      "kind_why": "несколько брендов словаря в одной записи: 2",
+      "brands": [
+        "pepperlfuchs",
+        "rsd"
+      ],
       "spellings": [
         {
           "spelling": "Pepperl+Fuchs / RSD",
@@ -2785,6 +3106,7 @@
     {
       "oem_key": "pizzato",
       "name": "Pizzato",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Pizzato",
@@ -2800,6 +3122,7 @@
     {
       "oem_key": "pompesgrundfosdistributionsas",
       "name": "Pompes Grundfos Distribution S.A.S.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Pompes Grundfos Distribution S.A.S.",
@@ -2815,6 +3138,7 @@
     {
       "oem_key": "pompesgrundfossa",
       "name": "Pompes Grundfos S.A.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Pompes Grundfos S.A.",
@@ -2830,6 +3154,7 @@
     {
       "oem_key": "prodematrejddoo",
       "name": "Prodema Trejd Doo",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Prodema Trejd Doo",
@@ -2845,6 +3170,7 @@
     {
       "oem_key": "renata",
       "name": "Renata",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Renata",
@@ -2860,6 +3186,7 @@
     {
       "oem_key": "rochem",
       "name": "Rochem",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Rochem",
@@ -2875,6 +3202,7 @@
     {
       "oem_key": "rockwellautomationallenbradley",
       "name": "Rockwell Automation (Allen-Bradley)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Rockwell Automation (Allen-Bradley)",
@@ -2890,6 +3218,7 @@
     {
       "oem_key": "rocol",
       "name": "Rocol",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Rocol",
@@ -2905,6 +3234,7 @@
     {
       "oem_key": "rollsroyce",
       "name": "Rolls-Royce",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Rolls-Royce",
@@ -2920,6 +3250,7 @@
     {
       "oem_key": "rosemountengineering",
       "name": "Rosemount Engineering Inc.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Rosemount Engineering Inc.",
@@ -2935,6 +3266,7 @@
     {
       "oem_key": "rosemounttankradar",
       "name": "Rosemount Tank Radar Ab",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Rosemount Tank Radar Ab",
@@ -2950,6 +3282,7 @@
     {
       "oem_key": "rsd",
       "name": "RSD",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "RSD",
@@ -2965,6 +3298,7 @@
     {
       "oem_key": "saft",
       "name": "Saft",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Saft",
@@ -2980,6 +3314,7 @@
     {
       "oem_key": "saia",
       "name": "SAIA",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "SAIA",
@@ -2995,6 +3330,7 @@
     {
       "oem_key": "sandviktamrock",
       "name": "Sandvik Tamrock",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Sandvik Tamrock",
@@ -3010,6 +3346,7 @@
     {
       "oem_key": "schroederindustries",
       "name": "Schroeder Industries",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Schroeder Industries",
@@ -3025,6 +3362,7 @@
     {
       "oem_key": "selco",
       "name": "Selco",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Selco",
@@ -3040,6 +3378,7 @@
     {
       "oem_key": "shanghaifleetguardfilter",
       "name": "Shanghai Fleetguard Filter Co., Ltd.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Shanghai Fleetguard Filter Co., Ltd.",
@@ -3055,6 +3394,7 @@
     {
       "oem_key": "shanghaigdoominingtechnology",
       "name": "Shanghai Gdoo Mining Technology Limited",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Shanghai Gdoo Mining Technology Limited",
@@ -3070,6 +3410,7 @@
     {
       "oem_key": "siemensdemagdelavalturbomachinery",
       "name": "Siemens Demag Delaval Turbomachinery, Inc",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Siemens Demag Delaval Turbomachinery, Inc",
@@ -3085,6 +3426,7 @@
     {
       "oem_key": "siemensdigitalindustriessimatic",
       "name": "Siemens Digital Industries (SIMATIC)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Siemens Digital Industries (SIMATIC)",
@@ -3100,6 +3442,7 @@
     {
       "oem_key": "siemensenergyindustrialturbomachinery",
       "name": "Siemens Energy Industrial Turbomachinery Limited",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Siemens Energy Industrial Turbomachinery Limited",
@@ -3115,6 +3458,7 @@
     {
       "oem_key": "siemenssro",
       "name": "Siemens S.R.O.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Siemens S.R.O.",
@@ -3130,6 +3474,7 @@
     {
       "oem_key": "skffrancesa",
       "name": "Skf France S.A",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Skf France S.A",
@@ -3145,6 +3490,7 @@
     {
       "oem_key": "skflubricationsystemsgermany",
       "name": "Skf Lubrication Systems Germany Gmbh",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Skf Lubrication Systems Germany Gmbh",
@@ -3160,6 +3506,7 @@
     {
       "oem_key": "skfsealingsolutionsaustria",
       "name": "Skf Sealing Solutions Austria Gmbh",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Skf Sealing Solutions Austria Gmbh",
@@ -3175,6 +3522,7 @@
     {
       "oem_key": "skfsolutionfactorygoteborg",
       "name": "Skf Solution Factory Goteborg",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Skf Solution Factory Goteborg",
@@ -3190,6 +3538,7 @@
     {
       "oem_key": "slb",
       "name": "SLB",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "SLB",
@@ -3205,6 +3554,7 @@
     {
       "oem_key": "solahd",
       "name": "Sola HD",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Sola HD",
@@ -3220,6 +3570,8 @@
     {
       "oem_key": "solarshopsolarturbinescom",
       "name": "Solar (shop.solarturbines.com)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Solar (shop.solarturbines.com)",
@@ -3235,6 +3587,11 @@
     {
       "oem_key": "solarshopпроизводительзарядных",
       "name": "Solar (shop) / производитель зарядных",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "Solar"
+      ],
       "spellings": [
         {
           "spelling": "Solar (shop) / производитель зарядных",
@@ -3250,6 +3607,8 @@
     {
       "oem_key": "solartoolingаналогriverhawk",
       "name": "Solar tooling; аналог: Riverhawk",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «аналог»",
       "spellings": [
         {
           "spelling": "Solar tooling; аналог: Riverhawk",
@@ -3265,6 +3624,7 @@
     {
       "oem_key": "solarturbines",
       "name": "Solar Turbines",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Solar Turbines",
@@ -3280,6 +3640,8 @@
     {
       "oem_key": "solarдизайнафтермаркетfluitek",
       "name": "Solar (дизайн); афтермаркет: Fluitek",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Solar (дизайн); афтермаркет: Fluitek",
@@ -3295,6 +3657,8 @@
     {
       "oem_key": "solarпрокладкафорсунки",
       "name": "Solar (прокладка форсунки)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Solar (прокладка форсунки)",
@@ -3310,6 +3674,7 @@
     {
       "oem_key": "soldo",
       "name": "Soldo",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Soldo",
@@ -3325,6 +3690,7 @@
     {
       "oem_key": "sor",
       "name": "SOR Inc.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "SOR Inc.",
@@ -3340,6 +3706,7 @@
     {
       "oem_key": "swagelok",
       "name": "Swagelok",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Swagelok",
@@ -3355,6 +3722,12 @@
     {
       "oem_key": "tcthermoelectricтип",
       "name": "TC Ltd / Thermo Electric (тип.)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "TC Ltd",
+        "Thermo Electric"
+      ],
       "spellings": [
         {
           "spelling": "TC Ltd / Thermo Electric (тип.)",
@@ -3370,6 +3743,7 @@
     {
       "oem_key": "tditechdevelopment",
       "name": "TDI (Tech Development)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "TDI (Tech Development)",
@@ -3385,6 +3759,7 @@
     {
       "oem_key": "techiflon",
       "name": "Techiflon Sas",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Techiflon Sas",
@@ -3400,6 +3775,7 @@
     {
       "oem_key": "tecniflonsas",
       "name": "Tecniflon S.A.S.",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Tecniflon S.A.S.",
@@ -3415,6 +3791,7 @@
     {
       "oem_key": "tescocorporation",
       "name": "Tesco Corporation",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Tesco Corporation",
@@ -3430,6 +3807,7 @@
     {
       "oem_key": "tesi",
       "name": "Tesi S.P.A",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Tesi S.P.A",
@@ -3445,6 +3823,7 @@
     {
       "oem_key": "thetatechinternational",
       "name": "Theta Tech International Ltd",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Theta Tech International Ltd",
@@ -3460,6 +3839,7 @@
     {
       "oem_key": "transcykal",
       "name": "Transcykal",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Transcykal",
@@ -3475,6 +3855,7 @@
     {
       "oem_key": "universalsilencer",
       "name": "Universal Silencer",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Universal Silencer",
@@ -3490,6 +3871,8 @@
     {
       "oem_key": "uvflamesensorпопрофилюhoneywellfireye",
       "name": "UV flame sensor (по профилю Honeywell/Fireye)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "UV flame sensor (по профилю Honeywell/Fireye)",
@@ -3505,6 +3888,7 @@
     {
       "oem_key": "versaprod",
       "name": "VERSA PROD",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "VERSA PROD",
@@ -3520,6 +3904,11 @@
     {
       "oem_key": "versaproductsoesolarпосоленоидамсерияvvs",
       "name": "Versa Products (OE Solar по соленоидам) — серия V/VSG",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "versaproducts"
+      ],
       "spellings": [
         {
           "spelling": "Versa Products (OE Solar по соленоидам) — серия V/VSG",
@@ -3535,6 +3924,7 @@
     {
       "oem_key": "vibrometermeggitt",
       "name": "Vibro-Meter (Meggitt)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Vibro-Meter (Meggitt)",
@@ -3550,6 +3940,7 @@
     {
       "oem_key": "vikingpump",
       "name": "Viking Pump",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Viking Pump",
@@ -3565,6 +3956,7 @@
     {
       "oem_key": "volvo",
       "name": "Volvo",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Volvo",
@@ -3580,6 +3972,7 @@
     {
       "oem_key": "wago",
       "name": "Wago",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Wago",
@@ -3595,6 +3988,7 @@
     {
       "oem_key": "waukeshainnio",
       "name": "Waukesha (INNIO)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Waukesha (INNIO)",
@@ -3610,6 +4004,7 @@
     {
       "oem_key": "webster",
       "name": "Webster",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Webster",
@@ -3625,6 +4020,7 @@
     {
       "oem_key": "weidmuller",
       "name": "Weidmuller",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Weidmuller",
@@ -3640,6 +4036,7 @@
     {
       "oem_key": "welkerengineering",
       "name": "Welker Engineering",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Welker Engineering",
@@ -3655,6 +4052,14 @@
     {
       "oem_key": "welkernorgrenoesolarпорегуляторам",
       "name": "Welker/Norgren (OE Solar по регуляторам)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "brands": [
+        "norgren"
+      ],
+      "unresolved": [
+        "Welker"
+      ],
       "spellings": [
         {
           "spelling": "Welker/Norgren (OE Solar по регуляторам)",
@@ -3670,6 +4075,7 @@
     {
       "oem_key": "weschler",
       "name": "Weschler",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Weschler",
@@ -3685,6 +4091,7 @@
     {
       "oem_key": "westwoodauburnbeckett",
       "name": "Westwood Auburn (Beckett)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Westwood Auburn (Beckett)",
@@ -3700,6 +4107,8 @@
     {
       "oem_key": "whiteyworcestercontrols",
       "name": "Whitey / Worcester Controls",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "Whitey / Worcester Controls",
@@ -3715,6 +4124,7 @@
     {
       "oem_key": "wlgoregoretex",
       "name": "W. L. Gore (Gore-Tex)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "W. L. Gore (Gore-Tex)",
@@ -3730,6 +4140,8 @@
     {
       "oem_key": "yokogawaoeпоофицдокументуsolar3r111voliv",
       "name": "Yokogawa (OE по офиц. документу Solar 3R111/Vol.IV)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Yokogawa (OE по офиц. документу Solar 3R111/Vol.IV)",
@@ -3745,6 +4157,7 @@
     {
       "oem_key": "youngtouchstonekelvion",
       "name": "Young Touchstone (Kelvion)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Young Touchstone (Kelvion)",
@@ -3760,6 +4173,8 @@
     {
       "oem_key": "изготавливаетсявкитаеjykj131",
       "name": "Изготавливается в Китае (jykj131)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Изготавливается в Китае (jykj131)",
@@ -3775,6 +4190,8 @@
     {
       "oem_key": "крепежныйзаводпоспецификацииdinisoэквива",
       "name": "Крепёжный завод по спецификации (DIN/ISO-эквивалент, никель) (частичная спецификация — дособрать по образцу/ТЗ)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Крепёжный завод по спецификации (DIN/ISO-эквивалент, никель) — OEM не нужен",
@@ -3790,6 +4207,7 @@
     {
       "oem_key": "мирколец",
       "name": "Мир Колец",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Мир Колец",
@@ -3805,6 +4223,7 @@
     {
       "oem_key": "прочие",
       "name": "Прочие",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Прочие",
@@ -3820,6 +4239,11 @@
     {
       "oem_key": "типовыеeaoabbschneiderпоформату",
       "name": "Типовые: EAO/ABB/Schneider — по формату",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «Типовые»",
+      "brands": [
+        "abb"
+      ],
       "spellings": [
         {
           "spelling": "Типовые: EAO/ABB/Schneider — по формату",
@@ -3835,6 +4259,13 @@
     {
       "oem_key": "типовыеswagelokparkercirclesealпопарамет",
       "name": "Типовые: Swagelok/Parker/Circle Seal — по параметрам из ТЗ",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «Типовые»",
+      "brands": [
+        "swagelok",
+        "parker",
+        "circleseal"
+      ],
       "spellings": [
         {
           "spelling": "Типовые: Swagelok/Parker/Circle Seal — по параметрам из ТЗ",
@@ -3850,6 +4281,8 @@
     {
       "oem_key": "3mпотипу",
       "name": "3M (по типу)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по типу»",
       "spellings": [
         {
           "spelling": "3M (по типу)",
@@ -3861,6 +4294,7 @@
     {
       "oem_key": "aaf",
       "name": "AAF",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "AAF",
@@ -3872,6 +4306,12 @@
     {
       "oem_key": "abbsiemensomronпотипу",
       "name": "ABB/Siemens/OMRON (по типу)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по типу»",
+      "brands": [
+        "abb",
+        "siemens"
+      ],
       "spellings": [
         {
           "spelling": "ABB/Siemens/OMRON (по типу)",
@@ -3883,6 +4323,11 @@
     {
       "oem_key": "abbсиловоймодульinfineonfs450r17ke3",
       "name": "ABB (силовой модуль Infineon FS450R17KE3)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "abb"
+      ],
       "spellings": [
         {
           "spelling": "ABB (силовой модуль Infineon FS450R17KE3)",
@@ -3894,6 +4339,7 @@
     {
       "oem_key": "allenbradleyrockwellautomation",
       "name": "Allen-Bradley (Rockwell Automation)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Allen-Bradley (Rockwell Automation)",
@@ -3905,6 +4351,11 @@
     {
       "oem_key": "amotvernathermпотипу",
       "name": "AMOT / Vernatherm (по типу)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по типу»",
+      "brands": [
+        "amot"
+      ],
       "spellings": [
         {
           "spelling": "AMOT / Vernatherm (по типу)",
@@ -3916,6 +4367,7 @@
     {
       "oem_key": "baslerelectric",
       "name": "Basler Electric",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Basler Electric",
@@ -3927,6 +4379,7 @@
     {
       "oem_key": "belimo",
       "name": "Belimo",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Belimo",
@@ -3938,6 +4391,13 @@
     {
       "oem_key": "comatrelecoturckc9series",
       "name": "Comat Releco / TURCK (C9 series)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "Comat Releco",
+        "TURCK",
+        "C9 series"
+      ],
       "spellings": [
         {
           "spelling": "Comat Releco / TURCK (C9 series)",
@@ -3949,6 +4409,7 @@
     {
       "oem_key": "denso",
       "name": "DENSO",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "DENSO",
@@ -3960,6 +4421,7 @@
     {
       "oem_key": "dettronicsemerson",
       "name": "Det-Tronics (Emerson)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Det-Tronics (Emerson)",
@@ -3971,6 +4433,7 @@
     {
       "oem_key": "faudi",
       "name": "Faudi",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Faudi",
@@ -3982,6 +4445,7 @@
     {
       "oem_key": "fleetguardcumminsfiltration",
       "name": "Fleetguard (Cummins Filtration)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Fleetguard (Cummins Filtration)",
@@ -3993,6 +4457,8 @@
     {
       "oem_key": "guangxiyuchaiweichai",
       "name": "Guangxi Yuchai / Weichai",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "Guangxi Yuchai / Weichai",
@@ -4004,6 +4470,7 @@
     {
       "oem_key": "guascorsiemensenergy",
       "name": "Guascor (Siemens Energy)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Guascor (Siemens Energy)",
@@ -4015,6 +4482,7 @@
     {
       "oem_key": "hdiinstruments",
       "name": "HDI Instruments",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "HDI Instruments",
@@ -4026,6 +4494,7 @@
     {
       "oem_key": "heinzmann",
       "name": "HEINZMANN",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "HEINZMANN",
@@ -4037,6 +4506,8 @@
     {
       "oem_key": "holsetcumminsturbotechnologies",
       "name": "Holset / Cummins Turbo Technologies",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "Holset / Cummins Turbo Technologies",
@@ -4048,6 +4519,8 @@
     {
       "oem_key": "jenbacherinnio",
       "name": "Jenbacher / INNIO",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "Jenbacher / INNIO",
@@ -4059,6 +4532,13 @@
     {
       "oem_key": "jenbacherinnioкартриджальтернативыmannhu",
       "name": "Jenbacher / INNIO (картридж альтернативы — Mann & Hummel)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "Jenbacher",
+        "INNIO",
+        "Mann & Hummel"
+      ],
       "spellings": [
         {
           "spelling": "Jenbacher / INNIO (картридж альтернативы — Mann & Hummel)",
@@ -4070,6 +4550,7 @@
     {
       "oem_key": "jichaijinandieselcnpc",
       "name": "Jichai (Jinan Diesel, CNPC)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Jichai (Jinan Diesel, CNPC)",
@@ -4081,6 +4562,8 @@
     {
       "oem_key": "mannhummelmannlc15001x",
       "name": "Mann & Hummel (MANN LC 15 001 x)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание, номер",
       "spellings": [
         {
           "spelling": "Mann & Hummel (MANN LC 15 001 x)",
@@ -4092,6 +4575,8 @@
     {
       "oem_key": "mturollsroycepowersystems",
       "name": "MTU / Rolls-Royce Power Systems",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "MTU / Rolls-Royce Power Systems",
@@ -4103,6 +4588,8 @@
     {
       "oem_key": "mwmcaterpillar",
       "name": "MWM / Caterpillar",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "MWM / Caterpillar",
@@ -4114,6 +4601,7 @@
     {
       "oem_key": "mwmcaterpillarenergysolutions",
       "name": "MWM (Caterpillar Energy Solutions)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "MWM (Caterpillar Energy Solutions)",
@@ -4125,6 +4613,13 @@
     {
       "oem_key": "mwmcaterpillarenergysolutionsсвечаfedera",
       "name": "MWM / Caterpillar Energy Solutions (свеча Federal-Mogul/BERU)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "MWM",
+        "Caterpillar Energy Solutions",
+        "BERU"
+      ],
       "spellings": [
         {
           "spelling": "MWM / Caterpillar Energy Solutions (свеча Federal-Mogul/BERU)",
@@ -4136,6 +4631,12 @@
     {
       "oem_key": "palldonaldsonparkerpecofacetпотипу",
       "name": "Pall/Donaldson/Parker/PECOFacet (по типу)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по типу»",
+      "brands": [
+        "donaldson",
+        "parker"
+      ],
       "spellings": [
         {
           "spelling": "Pall/Donaldson/Parker/PECOFacet (по типу)",
@@ -4147,6 +4648,8 @@
     {
       "oem_key": "panduitpansteelthomasbettsпотипу",
       "name": "Panduit (Pan-Steel) / Thomas&Betts (по типу)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по типу»",
       "spellings": [
         {
           "spelling": "Panduit (Pan-Steel) / Thomas&Betts (по типу)",
@@ -4158,6 +4661,8 @@
     {
       "oem_key": "parkeroringлюбойпоas568",
       "name": "Parker O-Ring / любой по AS568",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «любой»",
       "spellings": [
         {
           "spelling": "Parker O-Ring / любой по AS568",
@@ -4169,6 +4674,8 @@
     {
       "oem_key": "perkinsfgwilson",
       "name": "Perkins / FG Wilson",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: несколько",
       "spellings": [
         {
           "spelling": "Perkins / FG Wilson",
@@ -4180,6 +4687,7 @@
     {
       "oem_key": "prosofttechnology",
       "name": "ProSoft Technology",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "ProSoft Technology",
@@ -4191,6 +4699,7 @@
     {
       "oem_key": "renk",
       "name": "RENK",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "RENK",
@@ -4202,6 +4711,7 @@
     {
       "oem_key": "renkwerkhannover",
       "name": "RENK AG (Werk Hannover)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "RENK AG (Werk Hannover)",
@@ -4213,6 +4723,8 @@
     {
       "oem_key": "rochestersensorsранееrochestergaugesamph",
       "name": "Rochester Sensors (ранее Rochester Gauges, Amphenol)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "Rochester Sensors (ранее Rochester Gauges, Amphenol)",
@@ -4224,6 +4736,7 @@
     {
       "oem_key": "saiaburgess",
       "name": "Saia-Burgess",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Saia-Burgess",
@@ -4235,6 +4748,12 @@
     {
       "oem_key": "schrackteconnectivityназванвпозициизаказ",
       "name": "SCHRACK / TE Connectivity (назван в позиции заказчика)",
+      "kind": "несколько",
+      "kind_why": "несколько брендов с пояснением",
+      "unresolved": [
+        "SCHRACK",
+        "TE Connectivity"
+      ],
       "spellings": [
         {
           "spelling": "SCHRACK / TE Connectivity (назван в позиции заказчика)",
@@ -4246,6 +4765,8 @@
     {
       "oem_key": "siemensdigitalindustriesпрямойзаказпокод",
       "name": "Siemens Digital Industries — прямой заказ по коду (SIMATIC/SIRIUS)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по коду»",
       "spellings": [
         {
           "spelling": "Siemens Digital Industries — прямой заказ по коду (SIMATIC/SIRIUS)",
@@ -4257,6 +4778,11 @@
     {
       "oem_key": "siemensenergyлинкольнилиреверспообразцуч",
       "name": "Siemens Energy (Линкольн) или реверс по образцу/чертежу",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «реверс»",
+      "brands": [
+        "siemensenergy"
+      ],
       "spellings": [
         {
           "spelling": "Siemens Energy (Линкольн) или реверс по образцу/чертежу",
@@ -4268,6 +4794,11 @@
     {
       "oem_key": "siemensenergyлинкольнпо64кодуилиespпарас",
       "name": "Siemens Energy (Линкольн) по 64/-коду; или ESP-пара → сток",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «; или»",
+      "brands": [
+        "siemensenergy"
+      ],
       "spellings": [
         {
           "spelling": "Siemens Energy (Линкольн) по 64/-коду; или ESP-пара → сток",
@@ -4279,6 +4810,11 @@
     {
       "oem_key": "siemensenergyчертежзаводалинкольн",
       "name": "Siemens Energy (чертёж завода Линкольн)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "siemensenergy"
+      ],
       "spellings": [
         {
           "spelling": "Siemens Energy (чертёж завода Линкольн)",
@@ -4290,6 +4826,8 @@
     {
       "oem_key": "siemenssgt100400заводлинкольнвеликобрита",
       "name": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание, номер, страна",
       "spellings": [
         {
           "spelling": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
@@ -4301,6 +4839,8 @@
     {
       "oem_key": "siemenssgt500800заводфинспонгшвецияexabb",
       "name": "Siemens SGT-500…800 (завод Финспонг, Швеция — ex-ABB STAL)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание, номер, страна",
       "spellings": [
         {
           "spelling": "Siemens SGT-500…800 (завод Финспонг, Швеция — ex-ABB STAL)",
@@ -4312,6 +4852,12 @@
     {
       "oem_key": "skftimkenrenkпотипу",
       "name": "SKF / Timken / RENK (по типу)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по типу»",
+      "brands": [
+        "skf",
+        "renk"
+      ],
       "spellings": [
         {
           "spelling": "SKF / Timken / RENK (по типу)",
@@ -4323,6 +4869,7 @@
     {
       "oem_key": "solahdemerson",
       "name": "SolaHD (Emerson)",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "SolaHD (Emerson)",
@@ -4334,6 +4881,11 @@
     {
       "oem_key": "solarturbinesсандиегосшаcaterpillar",
       "name": "Solar Turbines (Сан-Диего, США — Caterpillar)",
+      "kind": "описание",
+      "kind_why": "пояснение при бренде словаря",
+      "brands": [
+        "solarturbines"
+      ],
       "spellings": [
         {
           "spelling": "Solar Turbines (Сан-Диего, США — Caterpillar)",
@@ -4345,6 +4897,8 @@
     {
       "oem_key": "solarдизайннезависимыеbdbagtреверсремонт",
       "name": "Solar (дизайн) → независимые: BDB/AGT/реверс-ремонт (EthosEnergy)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «→»",
       "spellings": [
         {
           "spelling": "Solar (дизайн) → независимые: BDB/AGT/реверс-ремонт (EthosEnergy)",
@@ -4356,6 +4910,8 @@
     {
       "oem_key": "solarстокantoniinternational",
       "name": "Solar; сток: Antoni International",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «сток»",
       "spellings": [
         {
           "spelling": "Solar; сток: Antoni International",
@@ -4367,6 +4923,8 @@
     {
       "oem_key": "teconnectivityschrackpotterbrumfield",
       "name": "TE Connectivity (SCHRACK / Potter & Brumfield)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: описание",
       "spellings": [
         {
           "spelling": "TE Connectivity (SCHRACK / Potter & Brumfield)",
@@ -4378,6 +4936,8 @@
     {
       "oem_key": "universalthermosensorsuk",
       "name": "Universal Thermosensors Ltd (UK)",
+      "kind": "бренд",
+      "kind_why": "признак без доказательства, защищена: страна",
       "spellings": [
         {
           "spelling": "Universal Thermosensors Ltd (UK)",
@@ -4389,6 +4949,11 @@
     {
       "oem_key": "vikingparkerпотипу",
       "name": "Viking/Parker (по типу)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по типу»",
+      "brands": [
+        "parker"
+      ],
       "spellings": [
         {
           "spelling": "Viking/Parker (по типу)",
@@ -4400,6 +4965,7 @@
     {
       "oem_key": "weidmller",
       "name": "Weidmüller",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Weidmüller",
@@ -4411,6 +4977,7 @@
     {
       "oem_key": "wrtsil",
       "name": "Wärtsilä",
+      "kind": "бренд",
       "spellings": [
         {
           "spelling": "Wärtsilä",
@@ -4422,6 +4989,8 @@
     {
       "oem_key": "заказпоспецификации",
       "name": "Заказ по спецификации",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Заказ по спецификации",
@@ -4433,6 +5002,8 @@
     {
       "oem_key": "заказпоспецификацииочищающаяжидкостьпосо",
       "name": "Заказ по спецификации: очищающая жидкость (по составу из ТЗ)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Заказ по спецификации: очищающая жидкость (по составу из ТЗ)",
@@ -4444,6 +5015,11 @@
     {
       "oem_key": "заказпоспецификациипрокладкапогабаритума",
       "name": "Заказ по спецификации: прокладка по габариту/материалу (Flexitallic/Garlock-тип)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
+      "brands": [
+        "flexitallic"
+      ],
       "spellings": [
         {
           "spelling": "Заказ по спецификации: прокладка по габариту/материалу (Flexitallic/Garlock-тип)",
@@ -4455,6 +5031,8 @@
     {
       "oem_key": "заказпоспецификацииразмерыизописания",
       "name": "Заказ по спецификации (размеры из описания)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Заказ по спецификации (размеры из описания)",
@@ -4466,6 +5044,8 @@
     {
       "oem_key": "заказпоспецификацииспиральнаяпрокладкаor",
       "name": "Заказ по спецификации: спиральная прокладка/O-ring по габариту (Flexitallic-тип) (частичная спецификация — дособрать по образцу/ТЗ)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Заказ по спецификации: спиральная прокладка/O-ring по габариту (Flexitallic-тип) (частичная спецификация — дособрать по образцу/ТЗ)",
@@ -4477,6 +5057,8 @@
     {
       "oem_key": "заказпоспецификациистеклотрос1подлине",
       "name": "Заказ по спецификации: стеклотрос 1\" (по длине)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Заказ по спецификации: стеклотрос 1\" (по длине)",
@@ -4488,6 +5070,8 @@
     {
       "oem_key": "заказпоспецификацииэкструзионноеуплотнен",
       "name": "Заказ по спецификации: экструзионное уплотнение 303 SS",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Заказ по спецификации: экструзионное уплотнение 303 SS",
@@ -4499,6 +5083,8 @@
     {
       "oem_key": "закупкапоспецификацииматериалстандартoem",
       "name": "Закупка по спецификации (материал+стандарт) — OEM не нужен",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «Закупк»",
       "spellings": [
         {
           "spelling": "Закупка по спецификации (материал+стандарт) — OEM не нужен",
@@ -4510,6 +5096,8 @@
     {
       "oem_key": "крепежныйзаводпоспецификациидюймовыйкреп",
       "name": "Крепёжный завод по спецификации (дюймовый крепёж BSP/UNC)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Крепёжный завод по спецификации (дюймовый крепёж BSP/UNC)",
@@ -4521,6 +5109,8 @@
     {
       "oem_key": "крепежныйзаводпоспецификацииразмеризопис",
       "name": "Крепёжный завод по спецификации (размер из описания, IH-стандарты Solar)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «по спецификац»",
       "spellings": [
         {
           "spelling": "Крепёжный завод по спецификации (размер из описания, IH-стандарты Solar)",
@@ -4532,6 +5122,8 @@
     {
       "oem_key": "любойдистрибьюторстандартапрямойзаказoem",
       "name": "Любой дистрибьютор стандарта (прямой заказ, OEM не нужен)",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «Любой»",
       "spellings": [
         {
           "spelling": "Любой дистрибьютор стандарта (прямой заказ, OEM не нужен)",
@@ -4543,6 +5135,8 @@
     {
       "oem_key": "оснасткаsolarарендауmroethosenergygolten",
       "name": "Оснастка Solar: аренда у MRO (EthosEnergy/Goltens) или OEM",
+      "kind": "указание",
+      "kind_why": "указание к закупке: «Оснастк»",
       "spellings": [
         {
           "spelling": "Оснастка Solar: аренда у MRO (EthosEnergy/Goltens) или OEM",
@@ -4554,6 +5148,12 @@
     {
       "oem_key": "тяжелыегтуgesiemensalstomэнергетикаиболь",
       "name": "Тяжёлые ГТУ (GE / Siemens / Alstom) — энергетика и большие ГПА",
+      "kind": "описание",
+      "kind_why": "пояснение называет несколько брендов словаря",
+      "brands": [
+        "ge",
+        "siemens"
+      ],
       "spellings": [
         {
           "spelling": "Тяжёлые ГТУ (GE / Siemens / Alstom) — энергетика и большие ГПА",

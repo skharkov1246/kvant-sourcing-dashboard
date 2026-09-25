@@ -32,6 +32,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "dict"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+# Вид записи словаря брендов — одно правило со сверкой ревизии (scripts/portal_audit.py,
+# проверки d.*): признаки и закрытые списки живут в library/oem_kind.py.
+from library import oem_kind  # noqa: E402
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Нормализация. Сегодня в репозитории пять несовместимых реализаций нормализации
@@ -39,13 +45,21 @@ OUT = ROOT / "dict"
 # канонической: приводить источники к ней можно по одному, не ломая остальные.
 
 
-def nkey(name: str) -> str:
-    """Ключ компании. Режет организационно-правовые формы и пунктуацию."""
+def nkey_full(name: str) -> str:
+    """Ключ компании без обрезки. Режет организационно-правовые формы и пунктуацию."""
     s = str(name or "").lower().replace("ё", "е")
     s = re.sub(r"\b(ооо|оао|зао|пао|ао|llc|ltd|inc|gmbh|s\.p\.a|spa|co|corp|company|"
                r"limited|holding|group|a/s|ab|bv|nv|sas|sa|plc|pte|kg|ag)\b", " ", s)
-    s = re.sub(r"[^a-z0-9а-я]+", "", s)
-    return s[:40]
+    return re.sub(r"[^a-z0-9а-я]+", "", s)
+
+
+def nkey(name: str) -> str:
+    """Ключ компании: nkey_full, обрезанный до 40 знаков. Обрезка — правило ключа
+    бренда в реестре базы (lib_brands.brand_key = oem_key словаря): менять длину —
+    значит менять ключи в базе. Склейку ею двух РАЗНЫХ написаний ревизия видит
+    проверкой d.key_glue; на словаре 25.09.2026 такая склейка одна, и это два
+    текста одного указания к закупке, а не две компании."""
+    return nkey_full(name)[:oem_kind.ДЛИНА_КЛЮЧА]
 
 
 def norm_pn(pn: str) -> str:
@@ -137,11 +151,28 @@ def build_oem() -> dict:
         # каноническое написание — самое длинное: в нём обычно есть группа-владелец
         canon = pick_canon([x["spelling"] for x in sp])
         out.append({"oem_key": k, "name": canon, "spellings": sp, "n_spellings": len(sp)})
+    # ВИД ЗАПИСИ. В поля изготовителя люди писали и указания («Заказ по
+    # спецификации»), и несколько марок сразу («Epiroc, Normet»), и марку с
+    # пояснением («Bently Nevada (по профилю)»). Запись не удаляется (правило 5),
+    # а получает вид; читатели словаря берут бренд только у вида «бренд», у
+    # «несколько» и «описание» — бренды из поля brands (разложение по брендам
+    # словаря), у «указание» и «номер» — ничего. Доказательство «бренд словаря» —
+    # чистая запись без единого признака (library/oem_kind.py).
+    чистые = oem_kind.карта_чистых(out)
+    out = [{"oem_key": r["oem_key"], "name": r["name"],
+            **oem_kind.вид_записи(r["name"], r["oem_key"], чистые),
+            "spellings": r["spellings"], "n_spellings": r["n_spellings"]} for r in out]
     out.sort(key=lambda x: (-x["n_spellings"], x["oem_key"]))
+    по_виду = {v: sum(1 for r in out if r["kind"] == v) for v in oem_kind.ВИДЫ}
     return {"note": "Производители: ключ nkey(name) и все написания, найденные в базах. "
                     "Разные написания одной компании собраны под одним ключом — это и есть "
-                    "то, чего сегодня нет ни в одном подпроекте.",
-            "count": len(out), "records": out}
+                    "то, чего сегодня нет ни в одном подпроекте. Поле kind — вид записи: "
+                    "бренд, указание (к закупке), несколько (брендов в одной записи), описание "
+                    "(бренд с пояснением), номер (детали вместо имени). Бренд позиции даёт только "
+                    "вид «бренд»; у «несколько» и «описание» бренды — в поле brands, "
+                    "неразложенные части — в unresolved; kind_why — почему вид такой "
+                    "(library/oem_kind.py).",
+            "count": len(out), "by_kind": по_виду, "records": out}
 
 
 def build_system() -> dict:
@@ -340,6 +371,7 @@ def main() -> int:
             "note": "Словарь — проекция существующих баз. Источники не изменяются; "
                     "пересобирается python scripts/build_dict.py.",
             "oem_keys": data["oem"]["count"],
+            "oem_by_kind": data["oem"]["by_kind"],
             "system_keys": data["system"]["count"],
             "system_scopes": data["system"]["scopes"],
             "chain_edges": data["chain"]["count"],
@@ -367,7 +399,7 @@ def main() -> int:
         (OUT / name).write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
                                 encoding="utf-8")
     s = files["summary.json"]
-    print(f"✓ dict/: производителей {s['oem_keys']}, узлов {s['system_keys']} "
+    print(f"✓ dict/: производителей {s['oem_keys']} (по видам {s['oem_by_kind']}), узлов {s['system_keys']} "
           f"в областях {s['system_scopes']}, рёбер {s['chain_edges']} "
           f"(изготовителей {s['chain_makers']}, указаний к закупке {s['chain_routing_notes']}), "
           f"машин {s['machines']} {s['machines_by_segment']}")
