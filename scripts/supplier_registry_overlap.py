@@ -124,13 +124,79 @@ def форма(s: str | None) -> frozenset[str]:
     return frozenset(формы - СЛУЖЕБНЫЕ_ФОРМЫ)
 
 
-def norm_domain(s: str | None) -> str:
+def хост(s: str | None) -> str:
+    """Имя узла из адреса сайта или почты — БЕЗ отсева хостингов.
+
+    Отдельно от norm_domain, чтобы отсеянный адрес можно было сосчитать: у
+    norm_domain пустой ответ значит и «адреса нет», и «адрес почтового
+    хостинга». Выражение одно на оба — второе написание разошлось бы.
+    """
     m = re.search(r"(?:https?://)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)+)",
                   (s or "").lower().strip())
-    if not m:
-        return ""
-    d = m.group(1)
-    return "" if d.split(".")[0] in ХОСТИНГИ else d
+    return m.group(1) if m else ""
+
+
+def norm_domain(s: str | None) -> str:
+    d = хост(s)
+    return "" if not d or d.split(".")[0] in ХОСТИНГИ else d
+
+
+# ОБЩИЙ ДОМЕН НЕ ОПОЗНАЁТ КОМПАНИЮ — закрытый список для СВЯЗИ реестров
+# (library/supplier_link.py). Адрес на gmail, витрина на eBay или made-in-china,
+# страница в соцсети и сайт на конструкторе принадлежат площадке, а не
+# продавцу: сведи по такому домену — и все продавцы площадки станут одной
+# компанией. Замер по файлам разведки 25.09.2026: ebay.com носят 22 разных
+# имени, made-in-china.com — 35, а витрины вида «продавец.en.made-in-china.com»
+# — ещё десятки.
+#
+# Два вида записей. МЕТКА — слово домена на любом месте, кроме зоны: ловит все
+# зоны и поддомены площадки разом (ebay.de, ebay.co.uk, x.en.made-in-china.com).
+# ДОМЕН — точное имя или его поддомены, для площадок, чья метка — обычное слово
+# (t.me, sites.google.com уже ловит метка google).
+#
+# Список ЗАЩИЩАЕТ, а не обвиняет (правило 7): лишнее слово в нём стоит связи,
+# которую сорсер увидит числом «придержано», и никогда — чужой компании.
+# Сведение реестров (load_supplier_master) пока отсеивает только ХОСТИНГИ по
+# первому слову, как и прежде: расширять его правило — отдельной правкой после
+# замера, потому что оно меняет состав сущностей с вечным номером.
+ОБЩИЕ_МЕТКИ = ХОСТИНГИ | {
+    # почта
+    "googlemail", "ya", "hotmail", "live", "msn", "icloud", "me", "mac", "aol",
+    "gmx", "protonmail", "proton", "zoho", "naver", "hanmail", "rediffmail",
+    "foxmail", "sina", "sohu", "aliyun", "yeah", "ukr", "rocketmail", "ymail",
+    "yahoo", "outlook", "yandex", "rambler", "inbox",
+    # площадки и витрины
+    "ebay", "amazon", "alibaba", "aliexpress", "made-in-china", "globalsources",
+    "1688", "taobao", "tmall", "dhgate", "indiamart", "tradeindia", "ec21",
+    "tradekey", "ecplaza", "avito", "ozon", "wildberries", "pulscen", "tiu",
+    "prom", "satu", "allbiz", "etsy", "walmart", "rakuten",
+    # соцсети и мессенджеры
+    "linkedin", "facebook", "instagram", "youtube", "vk", "twitter", "whatsapp",
+    "telegram", "wechat",
+    # конструкторы и хостинги страниц
+    "google", "wixsite", "wix", "tilda", "blogspot", "wordpress", "weebly",
+    "jimdo", "ucoz", "narod", "github",
+    # справочники компаний
+    "kompass", "europages", "yellowpages", "zoominfo", "dnb", "rusprofile",
+    "list-org", "checko", "zachestnyibiznes", "spark-interfax", "sbis",
+}
+ОБЩИЕ_ДОМЕНЫ = frozenset({
+    "t.me", "wa.me", "x.com", "ok.ru", "mail.com", "web.de", "t-online.de",
+    "i.ua", "tut.by", "free.fr", "orange.fr", "wanadoo.fr", "libero.it",
+    "seznam.cz", "wp.pl", "o2.pl", "interia.pl", "onet.pl", "139.com",
+    "189.cn", "21cn.com", "tom.com", "internet.ru", "market.yandex.ru",
+})
+
+
+def общий_домен(d: str | None) -> bool:
+    """Домен площадки или почтового хостинга — компанию он не опознаёт."""
+    d = (d or "").lower().strip(".")
+    if not d:
+        return False
+    метки = d.split(".")
+    if any(м in ОБЩИЕ_МЕТКИ for м in метки[:-1]):
+        return True
+    return any(d == x or d.endswith("." + x) for x in ОБЩИЕ_ДОМЕНЫ)
 
 
 def маска(d: str) -> str:

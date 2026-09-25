@@ -72,6 +72,9 @@ from library import (brand_registry, brands, codes_sql, company_names, crossref,
 # брендов (library/oem_kind.py): по ним сборщик ставит вид записи dict/oem.json,
 # а ревизия ищет дефекты. Одно правило в одном месте.
 from library.oem_kind import без_формы, похоже_на_описание  # noqa: E402
+# Контрольная сумма ИНН — в company_names: её же зовёт связь реестров
+# (library/supplier_link.py). Одно правило в одном месте.
+from library.company_names import инн_верен  # noqa: E402
 from kv_number import luhn  # noqa: E402
 
 КЛЮЧ_РЕВИЗИИ = "audit:v1"
@@ -465,21 +468,6 @@ def имя_ключ_компании(s) -> str:
     «ООО Ромашка» и «АО Ромашка» сведение разводит намеренно (разные юрлица),
     а «ООО Ромашка» и «ООО «Ромашка»» — одно имя."""
     return re.sub(r"[^0-9a-zа-я]", "", норм(s))
-
-
-def инн_верен(s) -> bool:
-    s = re.sub(r"\s", "", str(s or ""))      # «77 0000 0000» — тот же ИНН, что и без пробелов
-    if not re.fullmatch(r"\d{10}|\d{12}", s):
-        return False
-    d = [int(c) for c in s]
-
-    def контроль(веса):
-        return sum(w * x for w, x in zip(веса, d)) % 11 % 10
-
-    if len(d) == 10:
-        return контроль((2, 4, 10, 3, 5, 9, 4, 6, 8)) == d[9]
-    return (контроль((7, 2, 4, 10, 3, 5, 9, 4, 6, 8)) == d[10]
-            and контроль((3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8)) == d[11])
 
 
 def номер_верен(s) -> bool:
