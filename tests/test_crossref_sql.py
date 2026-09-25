@@ -71,7 +71,9 @@ create table lib_prices (
   -- 22.09.2026, и «в КП не указано» отличается на экране от «разбор не дошёл».
   make_days int, pay_terms text, pay_advance_pct numeric, total numeric,
   basis_src text, pay_src text, lead_src text, make_src text,
-  confidence text, price_date date, created_at timestamptz default now());
+  confidence text, price_date date, created_at timestamptz default now(),
+  -- Файл-источник: по нему сборка считает, откуда точный дубль предложения.
+  source_url text);
 
 insert into lib_models values ('sgt400', 'SGT-400');
 -- Каталог пишет номер иначе, чем котировки: «6-205» против «6205». Ключ один.
@@ -167,6 +169,22 @@ insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, oem,
   ('6205',   'Подшипник', 'прайс',     '999', 'RFQ-9', 'FAG', 'FAG',
    999, 'EUR', 1, 'шт', null, null,
    null, null, null, null, null, null, null, null, 'med', null);
+
+-- ТОЧНЫЙ ДУБЛЬ (ревизия 25.09.2026, n.o_dup): тот же КП карточки RFQ-1 лежит во
+-- втором поле КП — у копии свой файл, а компания, цена, валюта, количество и
+-- дата те же. Строк базы две, предложение одно.
+update lib_prices set source_url = 'вложение-11' where rfq_id = 'RFQ-1';
+insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, oem,
+                        rfq_brands, price, currency, qty, qty_unit, basis, lead_days,
+                        make_days, pay_terms, pay_advance_pct, total,
+                        basis_src, pay_src, lead_src, make_src,
+                        confidence, price_date, source_url)
+  select part_number, item_name, feed, rfq_company, rfq_id, oem,
+         rfq_brands, price, currency, qty, qty_unit, basis, lead_days,
+         make_days, pay_terms, pay_advance_pct, total,
+         basis_src, pay_src, lead_src, make_src,
+         confidence, price_date, 'вложение-12'
+    from lib_prices where rfq_id = 'RFQ-1';
 """
 
 
@@ -216,9 +234,12 @@ def снимок(наборы):
 
 def test_каждый_запрос_вернул_ожидаемое_число_строк(наборы):
     предложения, каталог, аналоги, машины, изготовители, спрос = наборы
-    # Пять строк потока «разбор КП» с непустым артикулом; строка потока «прайс»
-    # не считается. Если запрос перестанет фильтровать по feed, здесь будет 6.
-    assert len(предложения) == 5
+    # Шесть строк потока «разбор КП» с непустым артикулом (одна — копия RFQ-1 во
+    # втором файле); строка потока «прайс» не считается. Если запрос перестанет
+    # фильтровать по feed, здесь будет 7.
+    assert len(предложения) == 6
+    # Файл-источник — последней колонкой: по нему сборка считает происхождение дублей.
+    assert sorted(r[-1] for r in предложения if r[-1]) == ["вложение-11", "вложение-12"]
     # Каталог отдаёт ДВЕ строки: 6205 нашлась по id, «BOLT-8» — второй ступенью
     # сцепки. «NUT-M8» не нашлась: два каталожных номера дают один ключ.
     assert len(каталог) == 2
@@ -230,11 +251,16 @@ def test_каждый_запрос_вернул_ожидаемое_число_с
 def test_снимок_собирается_из_живых_строк(снимок):
     t = снимок["totals"]
     assert t == {"positions": 4, "with_choice": 1, "comparable": 1, "in_catalog": 2,
-                 "companies": 2, "companies_resolved": 1, "offers": 5,
+                 "companies": 2, "companies_resolved": 1,
+                 # Строк шесть, предложений пять: копия RFQ-1 схлопнута.
+                 "offers": 5, "offer_rows": 6,
                  # Позиций вне спроса нет: в корпусе спрос заведён на все
                  # четыре. На живой базе так же — артикулы котировок берутся из
                  # спецификаций, и это тавтология, видимая числом.
                  "no_demand": 0}
+    # Одна карточка, два файла — копия КП во втором поле карточки.
+    assert снимок["dups"] == {"groups": 1, "rows": 1, "cards": 0, "one_card": 1,
+                              "one_file": 0, "no_file": 0, "differ": 0}
 
 
 def test_позиция_несёт_всё_обещанное_карточкой(снимок):
@@ -354,6 +380,8 @@ def test_поставщик_видит_свои_позиции(снимок):
     assert комп["101"]["ent"] == "KV-S-000001-1"
     # 101 дала предложения по четырём позициям: 6205, seal1, bolt8, nutm8.
     assert комп["101"]["parts"] == 4 and комп["101"]["brands"] == ["PARKER", "SKF"]
+    # Строк базы у 101 пять (копия RFQ-1), предложений — четыре.
+    assert комп["101"]["rows"] == 4
     # Списка позиций в снимке нет: страница собирает его из positions. Здесь
     # проверяется, что счётчики при этом остались точными.
     assert "list" not in комп["101"]
@@ -383,8 +411,9 @@ def test_условия_предложения_доезжают_до_снимк�
     позиция = {p["k"]: p for p in снимок["positions"]}["6205"]
     # Строка RFQ-1: всё прочитано из строки предложения.
     полная = [o for o in позиция["list"] if o.get("f") == "RFQ-1"]
-    assert полная, "предложение RFQ-1 не попало в снимок"
+    assert len(полная) == 1, "предложение RFQ-1 не попало в снимок или не схлопнуто с копией"
     o = полная[0]
+    assert o["x"] == 2, "копия RFQ-1 во втором файле не посчитана"
     assert o["s"] == "EXW", "базис"
     assert o["l"] == 30, "срок поставки"
     assert o["k"] == 45, "срок ИЗГОТОВЛЕНИЯ — отдельно от срока поставки"
