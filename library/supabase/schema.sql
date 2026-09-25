@@ -464,8 +464,9 @@ create unique index if not exists lib_suppliers_key
 do $$
 declare дублей int;
 begin
-  if exists (select 1 from information_schema.columns
-              where table_name = 'lib_suppliers' and column_name = 'name_key') then
+  if exists (select 1 from pg_attribute
+              where attrelid = to_regclass('lib_suppliers') and attname = 'name_key'
+                and not attisdropped) then
     select count(*) into дублей from (
       select name_key from lib_suppliers where name_key is not null
        group by name_key having count(*) > 1) t;
@@ -593,20 +594,27 @@ alter table lib_prices add column if not exists make_src  text;
 -- Проверка списком значений — ОТДЕЛЬНЫМ alter, а не внутри create table:
 -- «create table if not exists» существующую таблицу НЕ меняет (CLAUDE.md,
 -- правило 21), и на свежей базе всё было бы зелено, а на живой вставка падала.
+-- Имя ищется у ЭТОЙ таблицы (conrelid), а не по всей базе: pg_constraint видит
+-- проверки всех схем, и во второй схеме с той же таблицей поиск по одному имени
+-- находил чужую проверку и молча не ставил свою. Так же — во всех блоках ниже.
 do $$ begin
-  if not exists (select 1 from pg_constraint where conname = 'lib_prices_basis_src_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_basis_src_chk'
+                   and conrelid = to_regclass('lib_prices')) then
     alter table lib_prices add constraint lib_prices_basis_src_chk
       check (basis_src is null or basis_src in ('строка','файл','нет','несколько','не проверено'));
   end if;
-  if not exists (select 1 from pg_constraint where conname = 'lib_prices_pay_src_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_pay_src_chk'
+                   and conrelid = to_regclass('lib_prices')) then
     alter table lib_prices add constraint lib_prices_pay_src_chk
       check (pay_src is null or pay_src in ('строка','файл','нет','несколько','не проверено'));
   end if;
-  if not exists (select 1 from pg_constraint where conname = 'lib_prices_lead_src_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_lead_src_chk'
+                   and conrelid = to_regclass('lib_prices')) then
     alter table lib_prices add constraint lib_prices_lead_src_chk
       check (lead_src is null or lead_src in ('строка','файл','нет','несколько','не проверено'));
   end if;
-  if not exists (select 1 from pg_constraint where conname = 'lib_prices_make_src_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_make_src_chk'
+                   and conrelid = to_regclass('lib_prices')) then
     alter table lib_prices add constraint lib_prices_make_src_chk
       check (make_src is null or make_src in ('строка','файл','нет','несколько','не проверено'));
   end if;
@@ -648,7 +656,8 @@ alter table lib_prices add column if not exists price_date_run text;
 -- Проверка значений отдельным do-блоком: create table if not exists
 -- существующую таблицу не меняет (CLAUDE.md, правило 21).
 do $$ begin
-  if not exists (select 1 from pg_constraint where conname = 'lib_prices_price_date_src_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_prices_price_date_src_chk'
+                   and conrelid = to_regclass('lib_prices')) then
     alter table lib_prices add constraint lib_prices_price_date_src_chk
       check (price_date_src is null
              or price_date_src in ('документ','письмо','карточка: создана','нет'));
@@ -695,14 +704,17 @@ create table if not exists lib_cpi (
   primary key (country, month, source)
 );
 do $$ begin
-  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_country_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_country_chk'
+                   and conrelid = to_regclass('lib_cpi')) then
     alter table lib_cpi add constraint lib_cpi_country_chk check (country ~ '^[A-Z]{3}$');
   end if;
-  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_month_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_month_chk'
+                   and conrelid = to_regclass('lib_cpi')) then
     alter table lib_cpi add constraint lib_cpi_month_chk
       check (month = date_trunc('month', month)::date);
   end if;
-  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_value_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_cpi_value_chk'
+                   and conrelid = to_regclass('lib_cpi')) then
     alter table lib_cpi add constraint lib_cpi_value_chk check (index_value > 0);
   end if;
 end $$;
@@ -1172,7 +1184,8 @@ alter table lib_files add column if not exists side text;
 -- таблицу не меняет, а add column ограничение не несёт (CLAUDE.md, правило 21).
 do $$
 begin
-  if not exists (select 1 from pg_constraint where conname = 'lib_files_side_вид') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_files_side_вид'
+                   and conrelid = to_regclass('lib_files')) then
     alter table lib_files add constraint lib_files_side_вид
       check (side is null or side in ('заказчик', 'мы', 'поставщик',
                                       'внутренний', 'неизвестно'));

@@ -207,7 +207,10 @@ def test_схема_применяется_повторно(база):
         for оператор in операторы((ROOT / "library" / "supabase" / "brands_schema.sql")
                                   .read_text(encoding="utf-8")):
             c.execute(оператор)
-        c.execute("select count(*) from pg_constraint where conname like 'lib_brand_alias_%%'")
+        # У таблицы этой схемы, а не по имени во всей базе: другая схема с той же
+        # таблицей удвоила бы счёт и скрыла пропажу здесь.
+        c.execute("select count(*) from pg_constraint where conname like 'lib_brand_alias_%%' "
+                  "and conrelid = to_regclass('lib_brand_alias')")
         assert c.fetchone()[0] >= 3
     conn.close()
 
