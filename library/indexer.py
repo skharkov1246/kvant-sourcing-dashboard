@@ -103,7 +103,8 @@ SPA_RFQ = 166
 #: ПИСЬМА — ТРЕТИЙ ИСТОЧНИК (SOURCE=mail, library/mail_source.py, распоряжение
 #: владельца 24.09.2026: спрос и предложение со всех сторон, понемногу). Группа
 #: — закрытый список mail_source.ГРУППЫ; пачку номеров писем [MAIL_FROM+1;
-#: MAIL_TO] определяет план прогона, часть берёт из неё свой смежный кусок.
+#: MAIL_TO] и границы частей поровну по письмам (MAIL_BOUNDS) определяет план
+#: прогона, часть берёт из них свой смежный кусок.
 #: Без MAIL_TO — пачка в MAIL_LIMIT писем от отметки в базе (ручной запуск).
 MAIL_GROUP = os.environ.get("MAIL_GROUP", "").strip()
 MAIL_LIMIT = int(os.environ.get("MAIL_LIMIT", "2000") or 2000)
@@ -2685,6 +2686,8 @@ def main() -> int:
     # правило дробления). Поэтому отбор по хешу снят вместе с добавлением части.
     if SOURCE == "mail":
         refs = collect_refs_mail_part()
+        if refs is None:
+            return 2
     else:
         refs = (collect_refs_rfq(DAYS, SHARD, SHARDS) if SOURCE == "rfq"
                 else collect_refs(DAYS, SHARD, SHARDS))
@@ -2814,21 +2817,30 @@ def main() -> int:
     return 0
 
 
-def collect_refs_mail_part() -> list[dict]:
-    """Ссылки на вложения писем своей части пачки.
+def collect_refs_mail_part() -> list[dict] | None:
+    """Ссылки на вложения писем своей части пачки. None — план и часть разошлись.
 
-    Пачку [MAIL_FROM+1; MAIL_TO] определил план прогона (mail_source.py план),
-    часть берёт из неё смежный кусок номеров — деление одно. Без MAIL_TO (ручной
-    запуск одним процессом) пачка — MAIL_LIMIT писем от отметки в базе; отметку
-    такой запуск не двигает: её двигает только шаг «отметка» прогона.
+    Пачку [MAIL_FROM+1; MAIL_TO] и границы частей MAIL_BOUNDS определил план
+    прогона (mail_source.py план): границы поровну ПО ПИСЬМАМ, часть берёт свой
+    смежный кусок по номеру SHARD — деление одно. Без MAIL_TO (ручной запуск
+    одним процессом) пачка — MAIL_LIMIT писем от отметки в базе; отметку такой
+    запуск не двигает: её двигает только шаг «отметка» прогона.
     """
     от_env, до_env = os.environ.get("MAIL_FROM", ""), os.environ.get("MAIL_TO", "")
     if до_env.strip():
         от, до = int(от_env or 0), int(до_env)
-        низ, верх = mail_source.границы_части(от, до, SHARD, SHARDS)
+        границы_env = os.environ.get("MAIL_BOUNDS", "").strip()
+        try:
+            границы = mail_source.разобрать_границы(границы_env) if границы_env else None
+            низ, верх = mail_source.границы_части(границы, от, до, SHARD, SHARDS)
+        except ValueError as e:
+            # Молча взятый чужой кусок терял бы письма: часть падает, и отметка
+            # (последний job, только после всех частей) не сдвигается.
+            print(f"::error::часть {SHARD + 1} из {SHARDS}: {e}", flush=True)
+            return None
         if SHARDS > 1:
             print(f"часть {SHARD + 1} из {SHARDS}: письма с номером от {низ + 1} до {верх}"
-                  f" (пачка {от + 1}…{до})", flush=True)
+                  f" (пачка {от + 1}…{до}, границы плана — поровну по письмам)", flush=True)
         if верх <= низ:
             return []
         refs, _ = mail_source.collect_refs_mail(MAIL_GROUP, низ, 0, до_id=верх)
