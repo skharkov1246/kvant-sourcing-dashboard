@@ -1,10 +1,18 @@
 // КАРТОЧКИ ПОРТАЛА — страница /p: код, бренд, поставщик (шаг 2 «одной
-// стартовой страницы», 25.09.2026).
+// стартовой страницы», 25.09.2026), машина и узел (шаг 3).
 //
-// АДРЕС. /p#code=<ключ кода>, /p#brand=<ключ бренда>, /p#supplier=<KV-S…>. Адрес
+// АДРЕС. /p#code=<ключ кода>, /p#brand=<ключ бренда>, /p#supplier=<KV-S…>,
+// /p#model=<ключ машины>, /p#unit=<ключ узла>. Адрес
 // после «#» — единственный вход: страница слушает его смену и перерисовывает
 // карточку, поэтому ссылка карточки на другую карточку не перезагружает
 // страницу, а «назад» браузера возвращает прежнюю.
+//
+// МАШИНА И УЗЕЛ — данные библиотеки, и открываются они по её праву (сайт
+// knowledge). Поэтому ссылка на машину или узел с карточек кода и бренда
+// ставится, только когда воркер сказал library: true; без права — имя текстом
+// и пометка «библиотека закрыта правом». Узлы машины показываются двумя
+// связями порознь: по деталям каталога (измерено) и типовым деревом
+// направления (ГТУ, ГПУ) — см. portal_entity_schema.sql, раздел 11.
 //
 // ПРАВИЛА НОМЕНКЛАТУРЫ НА ЭКРАНЕ (PDF владельцу 24.09.2026):
 //   · код и бренд — всегда два соседних столбца «Код» и «Бренд»; заголовок
@@ -27,7 +35,8 @@
 //     /nomenclature.
 //
 // ПРЕЖНИЕ СТРАНИЦЫ НЕ ЗАМЕНЯЮТСЯ: у каждой карточки есть ссылки «в прежнем
-// разделе» — /nomenclature#k=, /brands#b=, /brands#c=, /suppliers#e=.
+// разделе» — /nomenclature#k=, /brands#b=, /brands#c=, /suppliers#e=, у машины
+// и узла — /library#segment= и /library#section=component.
 //
 // Всё выводится через textContent: строка из базы разметкой не становится.
 (function () {
@@ -39,14 +48,31 @@
   var BXLINK = "https://kvantpro.bitrix24.ru/crm/company/details/";
   // Карточка запроса поставщику — смарт-процесс «Запросы поставщикам» (СП-166).
   var BXRFQ = "https://kvantpro.bitrix24.ru/crm/type/166/details/";
-  var API = { code: "/api/portal/code?k=", brand: "/api/portal/brand?b=", supplier: "/api/portal/supplier?s=" };
+  var API = { code: "/api/portal/code?k=", brand: "/api/portal/brand?b=", supplier: "/api/portal/supplier?s=",
+              model: "/api/portal/model?id=", unit: "/api/portal/unit?id=" };
   var ИСТОЧНИК_ИМЕНИ = {
     "bitrix:title": "карточка компании в Битриксе", "bitrix:requisite": "реквизиты в Битриксе",
     "написание": "из справочника поставщиков", "реестр": "справочник поставщиков", "домен": "домен сайта"
   };
   var ЧАСТИ = {
     "предложения": "предложения", "аналоги": "аналоги", "машины": "машины и узлы", "кто делает": "кто делает деталь",
-    "кому ещё писать": "кому ещё писать", "поставщики": "поставщиков", "бренды": "бренды", "коды": "коды"
+    "кому ещё писать": "кому ещё писать", "поставщики": "поставщиков", "бренды": "бренды", "коды": "коды",
+    "узлы": "узлы", "детали": "детали", "парк": "парк", "ведомость": "ведомость", "признаки": "признаки",
+    "дефекты": "дефекты", "ремонт": "ремонтные операции"
+  };
+  // Вид машины из реестра машин (dict/machine.json) — словами.
+  var ВИД_МАШИНЫ = {
+    "turbine": "газовая турбина", "gas_engine": "газопоршневой двигатель", "mining_machine": "горная машина",
+    "other_machine": "прочая машина"
+  };
+  var НАПРАВЛЕНИЕ = { "gtu": "ГТУ", "gpu": "ГПУ" };
+  // Критичность узла одной шкалой (library/equipment.CRIT_WORDS).
+  var КРИТ = { "A": "A — останавливает машину", "B": "B — плановая замена", "C": "C — расходник" };
+  // Почему дефект стоит на карточке машины.
+  var ПУТЬ_ДЕФЕКТА = { "деталь": "по детали этой машины", "машина": "записан для этой машины", "узел": "по узлу машины" };
+  var СЕМЕЙСТВО = {
+    "ansaldo": "Ansaldo Energia (V-машины)", "sgt": "Siemens SGT-100…400", "finspong": "Siemens SGT-500…800",
+    "solar": "Solar Turbines", "heavy": "тяжёлые ГТУ", "gpu": "ГПУ"
   };
   // Откуда дата квотации (lib_prices.price_date_src) — словами для сорсера.
   var ДАТА = {
@@ -104,6 +130,9 @@
   function адрес_кода(code) { return "/p#code=" + к(code); }
   function адрес_бренда(key) { return "/p#brand=" + к(key); }
   function адрес_поставщика(id) { return "/p#supplier=" + к(id); }
+  function адрес_машины(id) { return "/p#model=" + к(id); }
+  function адрес_узла(id) { return "/p#unit=" + к(id); }
+  function вид_машины(k) { return k ? (ВИД_МАШИНЫ[k] || k) : null; }
 
   // Код: ключ есть — ссылка на карточку; ключа нет (код отвергнут правилом
   // правдоподобия) — написание и видимая пометка: подсказки при наведении на
@@ -276,28 +305,30 @@
   function показаны(показано, всего, что) {
     return всего > показано ? пусто("Показаны " + число(показано) + " из " + число(всего) + (что || "") + ".") : null;
   }
-  // Машина: имя — текстом (у библиотеки нет адреса машины), рядом — ссылка на
-  // её раздел, подписанная именно как раздел.
-  function машина(m, library) {
+  // Машина: имя — ссылкой на её карточку /p#model=, если есть право на
+  // библиотеку; без права — текстом, и это сказано. «под» — своя подпись
+  // вызывающего (у карточки узла — сколько деталей машины в узле).
+  function машина(m, library, под) {
     var chip = узел("span", "chip");
-    chip.appendChild(узел("span", null, m.name));
-    var под = [m.kind, typeof m.parts === "number" ? "деталей " + число(m.parts) : null].filter(Boolean).join(" · ");
-    if (под) chip.appendChild(узел("span", "src", под));
+    chip.appendChild(library && m.id ? ссылка(адрес_машины(m.id), m.name) : узел("span", null, m.name));
+    var подпись = под !== undefined ? под
+      : [вид_машины(m.kind), typeof m.parts === "number" ? "деталей " + число(m.parts) : null].filter(Boolean).join(" · ");
+    if (подпись) chip.appendChild(узел("span", "src", подпись));
     if (m.brand && m.brand.name) {
       var бр = узел("span", "src");
       бр.appendChild(бренд(m.brand));
       chip.appendChild(бр);
     }
-    var раз = узел("span", "src");
-    if (library) {
-      раз.appendChild(ссылка(m.segment ? "/library#segment=" + к(m.segment) : "/library",
-        m.segment ? "раздел «" + (m.segment_name || m.segment) + "» в библиотеке →" : "библиотека →"));
-    } else {
-      раз.textContent = "библиотека закрыта правом";
-    }
-    chip.appendChild(раз);
+    if (!library) chip.appendChild(узел("span", "src", "библиотека закрыта правом"));
     return chip;
   }
+  // Узел — ссылкой на его карточку /p#unit=; без права на библиотеку — текстом.
+  function к_узлу(u, library, нет) {
+    if (!u || !u.name) return узел("span", "none", нет || "—");
+    return library && u.id ? ссылка(адрес_узла(u.id), u.name) : узел("span", null, u.name);
+  }
+  function не_посчитано(v, часть) { return (v.partial || []).indexOf(часть) >= 0; }
+  var НЕ_УСПЕЛИ = "Не успели посчитать — обновите страницу.";
 
   // ── карточка кода ──────────────────────────────────────────────────────────
   function предложения(список, аналоги) {
@@ -472,9 +503,10 @@
       (v.machines || []).forEach(function (m) { chips.appendChild(машина(m, v.library)); });
       (v.units || []).forEach(function (u) {
         var chip = узел("span", "chip");
-        chip.appendChild(узел("span", null, u.name));
+        chip.appendChild(к_узлу(u, v.library));
         var под = [u.parent ? "в узле «" + u.parent + "»" : null, u.crit ? "критичность " + u.crit : null].filter(Boolean).join(" · ");
         if (под) chip.appendChild(узел("span", "src", под));
+        if (!v.library) chip.appendChild(узел("span", "src", "библиотека закрыта правом"));
         chips.appendChild(chip);
       });
       мш.appendChild(chips);
@@ -731,16 +763,365 @@
     return { title: (v.name || "Имя не известно") + " · поставщик", nodes: out };
   }
 
+  // ── машина и узел: общие разделы ───────────────────────────────────────────
+  // Детали: «Код» и «Бренд» — соседние колонки, как везде в портале.
+  function таблица_деталей(список, library) {
+    return таблица([
+      ["Код", function (p) { return код(p.code, p.written); }],
+      ["Бренд", function (p) { return бренд(p.brand); }],
+      ["Наименование", function (p) { return p.name; }],
+      ["Узел", function (p) { return к_узлу(p.unit, library, "не определён"); }],
+      ["Наш номер KV", function (p) { return p.kv_no || "—"; }]
+    ], список);
+  }
+  function раздел_деталей(v, заголовок, пусто_текст, пояснение) {
+    var p = v.parts || {};
+    var s = раздел(заголовок, p.total ? число(p.total) : "");
+    if (не_посчитано(v, "детали")) {
+      s.appendChild(пусто(НЕ_УСПЕЛИ + (p.total ? " Деталей всего: " + число(p.total) + "." : "")));
+      return s;
+    }
+    if (!(p.list || []).length) { s.appendChild(пусто(пусто_текст)); return s; }
+    s.appendChild(таблица_деталей(p.list, v.library));
+    var ещё = показаны(p.list.length, p.total || 0, ": сначала с нашим номером KV, потом по потребности из сводки партномеров");
+    if (ещё) s.appendChild(ещё);
+    if (пояснение) s.appendChild(пусто(пояснение));
+    return s;
+  }
+  function раздел_признаков(v, нет) {
+    var x = v.symptoms || {};
+    var s = раздел("Признаки", x.n ? число(x.n) : "");
+    if (не_посчитано(v, "признаки")) { s.appendChild(пусто(НЕ_УСПЕЛИ)); return s; }
+    if (!(x.list || []).length) { s.appendChild(пусто(нет)); return s; }
+    s.appendChild(таблица([
+      ["Признак", function (r) {
+        var box = узел("span", null, r.name);
+        if (r.basis) box.appendChild(узел("span", "src", "основание: " + r.basis));
+        return box;
+      }],
+      ["Узел", function (r) { return к_узлу(r.unit, v.library); }],
+      ["Что меряют", function (r) { return r.measure; }],
+      ["Что обычно значит", function (r) {
+        var box = узел("span", null, r.defect || "—");
+        if (r.defects && r.defects.length) {
+          box.appendChild(узел("span", "src", "дефекты справочника: " + r.defects.map(function (d) { return d.name; }).join("; ")));
+        }
+        return box;
+      }],
+      ["Чем подтвердить", function (r) {
+        var box = узел("span", null, r.confirm || "—");
+        if (r.ops && r.ops.length) {
+          box.appendChild(узел("span", "src", "операции: " + r.ops.map(function (o) { return o.name; }).join("; ")));
+        }
+        return box;
+      }]
+    ], x.list));
+    var ещё = показаны(x.list.length, x.n || 0);
+    if (ещё) s.appendChild(ещё);
+    if (x.list.some(function (r) { return r.confidence === "low"; })) {
+      s.appendChild(пусто("Признаки — заготовка по общей практике диагностики и брошюрам изготовителей, а не наши "
+        + "измерения: уверенность низкая, пока инженер сервиса их не подтвердил. Уставок по машинам парка нет."));
+    }
+    return s;
+  }
+  function раздел_дефектов(v, машины_карточка, нет) {
+    var x = v.defects || {};
+    var s = раздел("Дефекты и ремонтные решения", x.n ? число(x.n) : "");
+    if (не_посчитано(v, "дефекты")) { s.appendChild(пусто(НЕ_УСПЕЛИ)); return s; }
+    if (!(x.list || []).length) { s.appendChild(пусто(нет)); return s; }
+    var колонки = [
+      ["Дефект", function (r) {
+        var box = узел("span", null, r.name);
+        if (r.model) box.appendChild(узел("span", "src", "записан для: " + r.model));
+        if (r.source) box.appendChild(узел("span", "src", r.source));
+        return box;
+      }],
+      ["Узел", function (r) { return к_узлу(r.unit, v.library); }],
+      // Номер детали дефекта — парой «код + бренд»; без номера — прочерк в обеих.
+      ["Код", function (r) { return r.written ? код(r.code, r.written) : узел("span", "none", "—"); }],
+      ["Бренд", function (r) { return r.written ? бренд(r.brand) : узел("span", "none", "—"); }],
+      ["Причина и последствие", function (r) {
+        var box = узел("span", null, r.consequence || "—");
+        if (r.cause) box.appendChild(узел("span", "src", "причина: " + r.cause));
+        return box;
+      }],
+      ["Решение", function (r) {
+        var box = узел("span", null, r.fix || (r.ops && r.ops.length ? "" : "—"));
+        if (r.ops && r.ops.length) {
+          box.appendChild(узел("span", "src", "операции: " + r.ops.map(function (o) { return o.name; }).join("; ")));
+        }
+        return box;
+      }]
+    ];
+    if (машины_карточка) колонки.push(["Почему здесь", function (r) { return ПУТЬ_ДЕФЕКТА[r.via] || r.via; }]);
+    s.appendChild(таблица(колонки, x.list));
+    var ещё = показаны(x.list.length, x.n || 0);
+    if (ещё) s.appendChild(ещё);
+    return s;
+  }
+  function раздел_ремонта(v, нет) {
+    var x = v.procedures || {};
+    var s = раздел("Ремонтные операции", x.n ? число(x.n) : "");
+    if (не_посчитано(v, "ремонт")) { s.appendChild(пусто(НЕ_УСПЕЛИ)); return s; }
+    if (!(x.list || []).length) { s.appendChild(пусто(нет)); return s; }
+    s.appendChild(таблица([
+      ["Вид", function (r) { return r.kind; }],
+      ["Операция", function (r) {
+        var box = узел("span", null, r.name);
+        if (r.family) box.appendChild(узел("span", "src", "для семейства: " + (СЕМЕЙСТВО[r.family] || r.family)));
+        if (r.source) box.appendChild(узел("span", "src", r.source));
+        return box;
+      }],
+      ["Узел", function (r) { return к_узлу(r.unit, v.library, "вся машина"); }],
+      ["Что делают", function (r) { return r.scope; }],
+      ["Срок", function (r) { return r.duration; }],
+      ["Исполнитель", function (r) { return r.performer; }]
+    ], x.list));
+    var ещё = показаны(x.list.length, x.n || 0);
+    if (ещё) s.appendChild(ещё);
+    s.appendChild(пусто("Сроков и стоимости ремонта в библиотеке нет; исполнитель назван, только если он известен."));
+    return s;
+  }
+
+  // ── карточка машины ────────────────────────────────────────────────────────
+  function карточка_машины(v) {
+    var out = [];
+    var lead = узел("p", "lead");
+    if (v.makers && v.makers.length) {
+      lead.appendChild(узел("span", null, "Изготовитель: "));
+      v.makers.forEach(function (b, i) {
+        if (i) lead.appendChild(узел("span", null, ", "));
+        // В строке шапки — в строку: пометка «нет в реестре» в скобках, а не
+        // отдельной строкой, иначе шапка рвётся посередине.
+        if (b.key) lead.appendChild(бренд(b));
+        else {
+          lead.appendChild(узел("span", "word", b.name));
+          lead.appendChild(узел("span", null, " (нет в реестре брендов)"));
+        }
+      });
+    } else {
+      lead.appendChild(узел("span", null, "Изготовитель в справочнике машин не указан"));
+    }
+    var вид = [вид_машины(v.kind), v.segment_name, v.legacy ? "прежнее имя " + v.legacy : null].filter(Boolean);
+    if (вид.length) lead.appendChild(узел("span", null, " · " + вид.join(" · ")));
+    out.push(шапка("Машина", узел("h1", null, v.name), [lead]));
+
+    // Ячейка изготовителя справочника — только когда она не совпадает с
+    // единственным брендом: иначе в ней несведённая часть («… / Выдумлит»).
+    var ячейка = v.maker_cell && !(v.makers && v.makers.length === 1 && v.makers[0].name === v.maker_cell);
+    var факт = [
+      ["Изготовитель в справочнике машин", ячейка ? v.maker_cell : null],
+      ["Прежнее имя", v.legacy],
+      ["Написания", v.aliases && v.aliases.length ? v.aliases.join(", ") : null],
+      ["Вид", вид_машины(v.kind)],
+      ["Сегмент", v.segment_name || v.segment],
+      ["Семейство", v.family],
+      ["Мощность", v.power],
+      ["КПД", v.efficiency],
+      [v.shafts_label || "Валы", v.shafts],
+      ["Применение", v.use_case],
+      ["Примечание", v.note],
+      ["Откуда в справочнике", v.source]
+    ].filter(function (p) { return p[1] !== null && p[1] !== undefined && p[1] !== ""; });
+    факт.push(["Типовое дерево узлов", v.dir ? НАПРАВЛЕНИЕ[v.dir] + (v.dir_via ? " — по " + (v.dir_via === "сегмент" ? "сегменту" : "семейству") + " машины" : "")
+      : "нет: для этого направления в библиотеке его не заведено"]);
+    факт.push(["В прежнем разделе", прежние([[v.segment ? "/library#segment=" + к(v.segment) : "/library", "библиотека"]])]);
+    out.push(факты(факт));
+
+    var p = v.parts || {}, f = v.fleet || {}, b = v.bom || {};
+    var totals = узел("div", "totals");
+    totals.appendChild(итог(число(p.total || 0), "деталей в каталоге"));
+    totals.appendChild(итог(число(p.with_unit || 0), "с определённым узлом"));
+    totals.appendChild(итог(число(f.n || 0), "площадок в парке"));
+    totals.appendChild(итог(число(b.n || 0), "строк ведомости"));
+    out.push(totals);
+
+    // Узлы: по деталям — измерено; типовое дерево — общее для направления.
+    var уз = раздел("Узлы машины", v.units && v.units.length ? число(v.units.length) : "");
+    if (не_посчитано(v, "узлы")) {
+      уз.appendChild(пусто(НЕ_УСПЕЛИ));
+    } else {
+      уз.appendChild(узел("h3", null, "По деталям каталога"));
+      if (v.units && v.units.length) {
+        уз.appendChild(таблица([
+          ["Узел", function (u) { return к_узлу(u, v.library); }],
+          ["Входит в", function (u) { return к_узлу(u.parent, v.library, "корень дерева"); }],
+          ["Критичность", function (u) { return u.crit ? (КРИТ[u.crit] || u.crit) : "—"; }],
+          ["Деталей машины", function (u) { return узел("span", "num", число(u.parts)); }]
+        ], v.units));
+      } else {
+        уз.appendChild(пусто(p.total ? "Ни у одной детали машины узел не определён." : "Деталей машины в каталоге нет — узлы по деталям не известны."));
+      }
+      if (p.no_unit) {
+        уз.appendChild(пусто("Ещё " + число(p.no_unit) + " " + склонение(p.no_unit, "деталь", "детали", "деталей")
+          + " без узла: по описанию узел не определился."));
+      }
+      var t = v.tree;
+      var систем = t && t.systems ? t.systems.length : 0;
+      уз.appendChild(узел("h3", null, t ? "Типовое дерево узлов " + НАПРАВЛЕНИЕ[t.dir]
+        + (систем ? " · " + число(систем) + " " + склонение(систем, "система", "системы", "систем") : "")
+        : "Типовое дерево узлов"));
+      if (t && t.systems && t.systems.length) {
+        var chips = узел("div", "chips");
+        t.systems.forEach(function (s) {
+          var chip = узел("span", "chip");
+          chip.appendChild(к_узлу(s, v.library));
+          chip.appendChild(узел("span", "src", [s.crit ? "критичность " + s.crit : null,
+            s.children ? "вложенных " + число(s.children) : null,
+            s.parts ? "деталей машины " + число(s.parts) : "деталей машины нет"].filter(Boolean).join(" · ")));
+          chips.appendChild(chip);
+        });
+        уз.appendChild(chips);
+        уз.appendChild(пусто("Дерево одно на все машины направления: узлы " + НАПРАВЛЕНИЕ[t.dir]
+          + " общие для разных изготовителей. Это состав типовой машины, а не ведомость этой."));
+      } else {
+        уз.appendChild(пусто(v.dir ? "Узлов этого направления в справочнике нет."
+          : "Направление машины не определено или для него типового дерева в библиотеке нет (есть для ГТУ и ГПУ)."));
+      }
+    }
+    out.push(уз);
+
+    out.push(раздел_деталей(v, "Детали каталога", "Деталей этой машины в каталоге нет."));
+    out.push(раздел_признаков(v, v.dir || (v.units && v.units.length)
+      ? "У узлов этой машины признаков в справочнике нет." : "Узлы машины не известны — признаков не к чему привязать."));
+    out.push(раздел_дефектов(v, true, "Дефектов по узлам и деталям этой машины в справочнике нет."));
+    out.push(раздел_ремонта(v, "Ремонтных операций по узлам этой машины в справочнике нет."));
+
+    var вд = раздел("Ведомость", b.n ? число(b.n) : "");
+    if (не_посчитано(v, "ведомость")) {
+      вд.appendChild(пусто(НЕ_УСПЕЛИ));
+    } else if (b.list && b.list.length) {
+      вд.appendChild(таблица([
+        ["Узел ведомости", function (r) { return r.node; }],
+        ["Позиция", function (r) { return r.position; }],
+        ["Код", function (r) { return код(r.code, r.written); }],
+        ["Бренд", function (r) { return бренд(r.brand); }],
+        ["Наименование", function (r) { return r.name; }],
+        ["Кол-во", function (r) { return r.qty; }]
+      ], b.list));
+      var ещё_в = показаны(b.list.length, b.n || 0);
+      if (ещё_в) вд.appendChild(ещё_в);
+      вд.appendChild(пусто("Узел ведомости — как он назван в самой ведомости, а не в дереве узлов."));
+    } else {
+      вд.appendChild(пусто("Ведомости состава на эту машину в библиотеке нет."));
+    }
+    out.push(вд);
+
+    var пк = раздел("Парк", f.n ? число(f.n) : "");
+    if (не_посчитано(v, "парк")) {
+      пк.appendChild(пусто(НЕ_УСПЕЛИ));
+    } else if (f.list && f.list.length) {
+      пк.appendChild(таблица([
+        ["Площадка", function (r) { return r.site; }],
+        ["Владелец", function (r) { return r.owner; }],
+        ["Машин", function (r) { return r.units; }],
+        ["Год", function (r) { return r.year; }],
+        ["Как записана машина", function (r) { return r.written; }],
+        ["Примечание", function (r) { return r.note; }]
+      ], f.list));
+      var ещё_п = показаны(f.list.length, f.n || 0);
+      if (ещё_п) пк.appendChild(ещё_п);
+    } else {
+      пк.appendChild(пусто("Площадок с этой машиной в справочнике парка нет."));
+    }
+    out.push(пк);
+    var н = не_успели(v);
+    if (н) out.push(н);
+    return { title: v.name + " · машина", nodes: out };
+  }
+
+  // ── карточка узла ──────────────────────────────────────────────────────────
+  function карточка_узла(v) {
+    var out = [];
+    var lead = узел("p", "lead");
+    lead.appendChild(узел("span", null, "Дерево " + (НАПРАВЛЕНИЕ[v.dir] || "узлов") + ": "));
+    (v.path || []).forEach(function (u) {
+      lead.appendChild(к_узлу(u, v.library));
+      lead.appendChild(узел("span", "sep", " › "));
+    });
+    lead.appendChild(узел("span", null, v.name));
+    if (v.name_en) lead.appendChild(узел("span", null, " · " + v.name_en));
+    out.push(шапка("Узел", узел("h1", null, v.name), [lead]));
+    var родитель = v.path && v.path.length ? v.path[v.path.length - 1] : null;
+    var факт = [
+      ["Английское имя", v.name_en],
+      ["Критичность", v.crit ? (КРИТ[v.crit] || v.crit) : null],
+      ["Доступность помимо изготовителя", v.aftermarket],
+      ["Примечание", v.note],
+      ["Откуда в справочнике", v.source]
+    ].filter(function (p) { return p[1] !== null && p[1] !== undefined && p[1] !== ""; });
+    факт.unshift(["Входит в", родитель ? к_узлу(родитель, v.library) : "корень дерева " + (НАПРАВЛЕНИЕ[v.dir] || "")]);
+    факт.push(["В прежнем разделе", прежние([["/library#section=component", "библиотека: узлы"]])]);
+    out.push(факты(факт));
+
+    var p = v.parts || {}, м = v.machines || {};
+    var totals = узел("div", "totals");
+    totals.appendChild(итог(число(p.total || 0), "деталей в узле и вложенных"));
+    totals.appendChild(итог(не_посчитано(v, "машины") ? "—" : число(м.with_parts || 0), "машин с деталями в узле"));
+    totals.appendChild(итог(не_посчитано(v, "машины") ? "—" : число(м.typical_n || 0),
+      "машин " + (НАПРАВЛЕНИЕ[v.dir] || "направления") + " — узел типовой"));
+    totals.appendChild(итог(число((v.children || []).length), "вложенных узлов"));
+    out.push(totals);
+
+    if (v.children && v.children.length) {
+      var вл = раздел("Вложенные узлы", число(v.children.length));
+      вл.appendChild(таблица([
+        ["Узел", function (u) { return к_узлу(u, v.library); }],
+        ["Критичность", function (u) { return u.crit ? (КРИТ[u.crit] || u.crit) : "—"; }],
+        ["Деталей", function (u) { return узел("span", "num", число(u.parts || 0)); }],
+        ["Вложенных", function (u) { return узел("span", "num", число(u.children || 0)); }]
+      ], v.children));
+      out.push(вл);
+    }
+
+    var мш = раздел("Машины", м.n ? число(м.n) : "");
+    if (не_посчитано(v, "машины")) {
+      мш.appendChild(пусто(НЕ_УСПЕЛИ));
+    } else if (м.list && м.list.length) {
+      var chips = узел("div", "chips");
+      м.list.forEach(function (x) {
+        chips.appendChild(машина(x, v.library, [вид_машины(x.kind),
+          x.parts ? "деталей в узле " + число(x.parts) : "деталей в узле нет",
+          x.typical ? "типово" : null].filter(Boolean).join(" · ")));
+      });
+      мш.appendChild(chips);
+      var ещё_м = показаны(м.list.length, м.n || 0, ": сначала с деталями в узле");
+      if (ещё_м) мш.appendChild(ещё_м);
+      мш.appendChild(пусто("«Типово» — машина того же направления (" + (НАПРАВЛЕНИЕ[v.dir] || "—")
+        + "): дерево узлов одно на все её машины. «Деталей в узле» — детали каталога машины, размеченные этим узлом "
+        + "или вложенным; это измерено, а не выведено."));
+    } else {
+      мш.appendChild(пусто("Машин с деталями в этом узле нет, и машин направления в справочнике нет."));
+    }
+    out.push(мш);
+
+    out.push(раздел_деталей(v, "Детали узла", "Деталей с этим узлом в каталоге нет.",
+      p.here !== undefined && p.total > p.here ? "Из них в самом узле — " + число(p.here || 0) + ", остальные — во вложенных." : null));
+    out.push(раздел_признаков(v, "У этого узла, вложенных и объемлющих признаков в справочнике нет."));
+    out.push(раздел_дефектов(v, false, "Дефектов этого узла в справочнике нет."));
+    out.push(раздел_ремонта(v, "Ремонтных операций по этому узлу в справочнике нет."));
+    var н = не_успели(v);
+    if (н) out.push(н);
+    return { title: v.name + " · узел", nodes: out };
+  }
+
   // ── отказ словами ──────────────────────────────────────────────────────────
   function отказ(status, v, что) {
     var err = (v && v.error) || "";
     var h = "Карточка не открылась", p = "База не ответила. Попробуйте ещё раз.";
-    if (status === 403) { h = "Нет доступа"; p = "Карточки открываются по праву «Поставщики» — его выдаёт владелец."; }
+    if (status === 403) {
+      h = "Нет доступа";
+      p = v && v.need === "knowledge"
+        ? "Машины и узлы — данные библиотеки: они открываются по праву «Библиотека оборудования и знаний» — его выдаёт владелец."
+        : "Карточки открываются по праву «Поставщики» — его выдаёт владелец.";
+    }
     else if (err === "not_a_code") { h = "Это не код детали"; p = "Так пишут марку материала, размер или стандарт — карточки у такого «кода» нет."; }
     else if (err === "not_found") {
       h = "Не нашлось";
       p = что === "code" ? "Этого кода нет ни в каталоге, ни в спросе, ни в КП."
-        : что === "brand" ? "Такого бренда нет в реестре брендов." : "Такого поставщика нет в справочнике поставщиков.";
+        : что === "brand" ? "Такого бренда нет в реестре брендов."
+        : что === "model" ? "Такой машины нет в справочнике машин."
+        : что === "unit" ? "Такого узла нет в справочнике узлов." : "Такого поставщика нет в справочнике поставщиков.";
     }
     else if (err === "brands_not_installed") { h = "Реестр брендов не установлен"; p = "Карточка бренда появится, когда в базе будет реестр брендов."; }
     else if (err === "entity_not_installed") { h = "Карточки ещё не установлены в базе"; p = "Нужна схема карточек портала — скажите владельцу."; }
@@ -760,13 +1141,13 @@
   var номер = 0;
   function открыть() {
     var h = typeof location !== "undefined" ? String(location.hash || "") : "";
-    var m = h.match(/^#(code|brand|supplier)=(.+)$/);
+    var m = h.match(/^#(code|brand|supplier|model|unit)=(.+)$/);
     if (!m) {
       // Без адреса карточки (или «#» стёрли) — подсказка, а не прежняя карточка.
       ++номер;
       var тихо = узел("div", "status");
       тихо.appendChild(узел("h2", null, "Карточка портала"));
-      тихо.appendChild(узел("p", null, "Код, бренд или поставщик открываются из строки поиска сверху; "
+      тихо.appendChild(узел("p", null, "Код, бренд, поставщик, машина или узел открываются из строки поиска сверху; "
         + "каждая ссылка карточки ведёт на карточку того, что в ней названо."));
       заменить([тихо]);
       document.title = "Карточка · КВАНТ";
@@ -786,7 +1167,8 @@
       .then(function (x) {
         if (мой !== номер) return;       // пришёл ответ на прежний адрес
         if (x.status !== 200 || !x.v || x.v.error) { заменить([отказ(x.status, x.v, что)]); return; }
-        var к_ = что === "code" ? карточка_кода(x.v) : что === "brand" ? карточка_бренда(x.v) : карточка_поставщика(x.v);
+        var к_ = что === "code" ? карточка_кода(x.v) : что === "brand" ? карточка_бренда(x.v)
+          : что === "model" ? карточка_машины(x.v) : что === "unit" ? карточка_узла(x.v) : карточка_поставщика(x.v);
         заменить(к_.nodes);
         document.title = к_.title + " · КВАНТ";
         if (typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, 0);

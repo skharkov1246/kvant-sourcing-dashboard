@@ -217,6 +217,8 @@ test("карточка кода: «Код · Бренд», оригинал и �
   assert.ok(!все.some((h) => /ss316/i.test(h)), все.join(" "));
   assert.match(env.card.textContent, /SS316не код детали: марка или стандарт/);
   assert.ok(!все.some((h) => h.startsWith("/library")));
+  // Машина и узел без права на библиотеку — без ссылок на свои карточки.
+  assert.ok(!все.some((h) => h.startsWith("/p#model=") || h.startsWith("/p#unit=")), все.join(" "));
   assert.match(env.card.textContent, /библиотека закрыта правом/);
   // Заказчиков не знаем по устройству базы — сноской, а не плиткой.
   assert.match(env.card.textContent, /заказчиков не знаем/);
@@ -249,7 +251,7 @@ test("карточка бренда: коды рядом с брендом, ма
   код_рядом_с_брендом(env.card);
   const все = ссылки(env.card);
   for (const href of ["/p#code=qx1001", "/p#code=pr3003", "/p#code=zc2002", "/p#supplier=KV-S-000012-2",
-                      "/p#brand=skf", "/p#code=skf7", "/library#segment=gtu", "/brands#b=kelton"]) {
+                      "/p#brand=skf", "/p#code=skf7", "/p#model=vm400", "/brands#b=kelton"]) {
     assert.ok(все.includes(href), href);
   }
   assert.ok(!все.some((h) => /ss316/i.test(h)));
@@ -257,9 +259,10 @@ test("карточка бренда: коды рядом с брендом, ма
   assert.match(env.card.textContent, /которых нет в справочнике поставщиков: 1/);
   assert.match(env.card.textContent, /Ещё 2 строки КП — ответы аналогом на спрос по бренду/);
   assert.match(env.card.textContent, /Показаны 1 из 3/);
-  // Машина — текстом, ссылка ведёт в раздел и так и подписана.
-  const раздел = потомки(env.card).find((e) => e.tagName === "A" && e.getAttribute("href") === "/library#segment=gtu");
-  assert.equal(раздел.textContent, "раздел «ГТУ выдуманные» в библиотеке →");
+  // Машина — ссылкой на её карточку (шаг 3), подписью — вид словами и детали.
+  const машина = потомки(env.card).find((e) => e.tagName === "A" && e.getAttribute("href") === "/p#model=vm400");
+  assert.equal(машина.textContent, "ВМ-400");
+  assert.match(env.card.textContent, /ВМ-400турбина · деталей 2/);
   assert.doesNotMatch(env.card.textContent, /сведен|засев/);
 });
 
@@ -332,4 +335,165 @@ test("страница подключает общую строку поиска
     assert.ok(html.includes(href), href);
   }
   assert.doesNotMatch(source, /innerHTML/);
+});
+
+// ── машина и узел (шаг 3) ────────────────────────────────────────────────────
+const МАШИНА = {
+  id: "тв10", name: "ТВ-10", legacy: "Смерч", aliases: ["TV 10", "ТВ10М"],
+  makers: [{ key: "turbovyd", name: "Турбовыдумка" }], maker_cell: "Турбовыдумка / Выдумлит",
+  segment: null, segment_name: null, kind: "turbine", family: "Выдуманное семейство", power: "≈10 МВт",
+  efficiency: "≈30%", shafts: "2 вала", shafts_label: "Валы", use_case: "ГПА выдуманные", note: null,
+  source: "справочник выдуманный", dir: "gtu", dir_via: "семейство",
+  parts: { total: 120, with_unit: 45, no_unit: 75, list: [
+    { code: "tvd117", written: "TVD-117", name: "Деталь турбины выдуманная 117", kv_no: "KV-000117-1",
+      brand: { key: "turbovyd", name: "Турбовыдумка" }, unit: null },
+    { code: "tvd030", written: "TVD-030", name: "<img src=x onerror=alert(1)>", kv_no: null,
+      brand: { key: null, name: "Выдумлит" }, unit: { id: "rotor.bearing", name: "Подшипник опорный выдуманный" } }] },
+  units: [{ id: "rotor.bearing", name: "Подшипник опорный выдуманный", crit: "B",
+            parent: { id: "rotor", name: "Ротор выдуманный" }, parts: 30, typical: true }],
+  tree: { dir: "gtu", via: "семейство", systems: [
+    { id: "hot", name: "Горячая часть", crit: "A", children: 1, parts: 10 },
+    { id: "rotor", name: "Ротор выдуманный", crit: "A", children: 1, parts: 30 },
+    { id: "exhaust", name: "Выхлоп выдуманный", crit: "B", children: 0, parts: 0 }] },
+  fleet: { n: 2, list: [{ site: "Выдуманная ТЭЦ-1", owner: "Выдуманная энергетика", units: "2", year: "2004",
+                          written: "ТВ-10 (Турбовыдумка)", note: null }] },
+  bom: { n: 3, list: [{ code: null, written: "SS316", name: "Лист выдуманный", node: "КОРПУС", qty: "4", position: "1",
+                        brand: null },
+                      { code: "tvd001", written: "TVD-001", name: "Деталь 1", node: "РОТОР", qty: "2", position: "1",
+                        brand: { key: "turbovyd", name: "Турбовыдумка" } }] },
+  symptoms: { n: 1, list: [{ name: "Рост вибрации выдуманный",
+    unit: { id: "rotor.bearing", name: "Подшипник опорный выдуманный" },
+    measure: "виброскорость на опоре", defect: "износ вкладыша", confirm: "осмотр вкладыша", basis: "общая практика",
+    confidence: "low", source: "справочник признаков (заготовка)", defects: [{ name: "Износ вкладыша выдуманный" }],
+    ops: [] }] },
+  defects: { n: 2, list: [
+    { name: "Риск отказа: деталь выдуманная 2", unit: { id: "hot.liner", name: "Жаровая труба" }, model: "ТВ-10",
+      via: "деталь", cause: null, consequence: "прогар", fix: "замена", source: "проработка позиции",
+      code: "tvd002", written: "TVD-002", brand: { key: "turbovyd", name: "Турбовыдумка" }, ops: [] },
+    { name: "Износ вкладыша выдуманный", unit: { id: "rotor.bearing", name: "Подшипник опорный выдуманный" }, model: null,
+      via: "узел", cause: "грязное масло", consequence: "рост вибрации", fix: "замена вкладыша", source: null,
+      code: null, written: null, brand: null, ops: [{ kind: "ремонт", name: "Замена вкладыша выдуманная" }] }] },
+  procedures: { n: 1, list: [{ kind: "модернизация", name: "Модернизация выдуманная", unit: null, scope: null,
+    duration: "3 недели", family: "sgt", performer: null, source: "разведка выдуманная" }] },
+  registry: true, partial: [], library: true,
+};
+const УЗЕЛ = {
+  id: "rotor.bearing", name: "Подшипник опорный выдуманный", name_en: "Journal bearing", crit: "B",
+  aftermarket: null, note: "примечание к узлу выдуманное", source: "номенклатура выдуманная", dir: "gtu",
+  path: [{ id: "rotor", name: "Ротор выдуманный" }], children: [],
+  machines: { n: 2, typical_n: 2, with_parts: 1, list: [
+    { id: "тв10", name: "ТВ-10", kind: "turbine", segment: null, segment_name: null,
+      brand: { key: "turbovyd", name: "Турбовыдумка" }, parts: 30, typical: true },
+    { id: "vm400", name: "ВМ-400", kind: "турбина", segment: "gtu", segment_name: "ГТУ выдуманные",
+      brand: { key: "kelton", name: "Kelton GmbH" }, parts: 0, typical: true }] },
+  parts: { total: 30, here: 30, list: [{ code: "tvd030", written: "TVD-030", name: "Деталь 30", kv_no: null,
+    brand: { key: "turbovyd", name: "Турбовыдумка" }, unit: { id: "rotor.bearing", name: "Подшипник опорный выдуманный" } }] },
+  symptoms: { n: 0, list: [] },
+  defects: { n: 1, list: [{ name: "Риск отказа: чужая машина",
+    unit: { id: "rotor.bearing", name: "Подшипник опорный выдуманный" },
+    model: "Другая выдуманная ГТУ", via: "узел", cause: null, consequence: "что-то", fix: null, source: null,
+    code: null, written: null, brand: null, ops: [] }] },
+  procedures: { n: 1, list: [{ kind: "ремонт", name: "Ремонт ротора выдуманный", unit: { id: "rotor", name: "Ротор выдуманный" },
+    scope: null, duration: null, family: "ansaldo", performer: null, source: null }] },
+  registry: true, partial: [], library: true,
+};
+
+test("карточка машины: изготовитель, узлы двумя связями, детали «код + бренд», парк, ведомость", async () => {
+  const env = await открыть({ hash: "#model=" + encodeURIComponent("тв10"), ответ: () => [200, МАШИНА] });
+  assert.deepEqual(env.запросы, ["/api/portal/model?id=" + encodeURIComponent("тв10")]);
+  assert.equal(потомки(env.card).find((e) => e.tagName === "H1").textContent, "ТВ-10");
+  assert.equal(env.document.title, "ТВ-10 · машина · КВАНТ");
+  const hero = потомки(env.card).find((e) => e.tagName === "HEADER");
+  assert.match(hero.textContent, /Изготовитель: Турбовыдумка · газовая турбина · прежнее имя Смерч/);
+  код_рядом_с_брендом(env.card);
+  // Несведённая часть ячейки изготовителя не пропадает.
+  assert.match(env.card.textContent, /Изготовитель в справочнике машинТурбовыдумка \/ Выдумлит/);
+  assert.match(env.card.textContent, /Валы2 вала/);
+  assert.match(env.card.textContent, /Типовое дерево узловГТУ — по семейству машины/);
+  const все = ссылки(env.card);
+  for (const href of ["/p#brand=turbovyd", "/p#code=tvd117", "/p#code=tvd030", "/p#unit=rotor.bearing",
+                      "/p#unit=rotor", "/p#unit=hot", "/p#unit=exhaust", "/p#code=tvd002", "/p#code=tvd001",
+                      "/library"]) {
+    assert.ok(все.includes(href), href);
+  }
+  // Марка стали в ведомости — не код: без ссылки, с пометкой.
+  assert.ok(!все.some((h) => /ss316/i.test(h)));
+  assert.match(env.card.textContent, /SS316не код детали/);
+  // Усечение видно числом, а не молчанием; детали без узла — числом.
+  assert.match(env.card.textContent, /Показаны 2 из 120: сначала с нашим номером KV/);
+  assert.match(env.card.textContent, /Ещё 75 деталей без узла/);
+  const плитки = по_классу(env.card, "total").map((t) => t.textContent);
+  for (const т of ["120деталей в каталоге", "45с определённым узлом", "2площадок в парке", "3строк ведомости"]) {
+    assert.ok(плитки.includes(т), плитки.join(" | "));
+  }
+  // Типовое дерево — чипами с числом деталей машины; «нет» — словами.
+  assert.match(env.card.textContent, /Типовое дерево узлов ГТУ · 3 системы/);
+  assert.match(env.card.textContent, /Выхлоп выдуманныйкритичность B · деталей машины нет/);
+  assert.match(env.card.textContent, /Это состав типовой машины, а не ведомость этой/);
+  // Деталь без узла — «не определён», а не пустота.
+  const детали = таблицы(env.card).find((t) => шапка_таблицы(t).includes("Наш номер KV"));
+  assert.match(строки_таблицы(детали)[0].textContent, /не определён/);
+  // Признак — заготовка, это сказано; дефект — с путём и операциями.
+  assert.match(env.card.textContent, /заготовка по общей практике диагностики/);
+  assert.match(env.card.textContent, /дефекты справочника: Износ вкладыша выдуманный/);
+  const дефекты = таблицы(env.card).find((t) => шапка_таблицы(t).includes("Почему здесь"));
+  assert.match(дефекты.textContent, /по детали этой машины/);
+  assert.match(дефекты.textContent, /операции: Замена вкладыша выдуманная/);
+  assert.match(env.card.textContent, /для семейства: Siemens SGT-100…400/);
+  assert.match(env.card.textContent, /Выдуманная ТЭЦ-1Выдуманная энергетика/);
+  assert.ok(env.созданные.every((e) => e.innerHTML === ""), "где-то использован innerHTML");
+  assert.ok(потомки(env.card).some((e) => e.textContent === "<img src=x onerror=alert(1)>"));
+});
+
+test("карточка узла: путь, машины с деталями и типовые, детали, дефекты с машиной записи", async () => {
+  const env = await открыть({ hash: "#unit=rotor.bearing", ответ: () => [200, УЗЕЛ] });
+  assert.deepEqual(env.запросы, ["/api/portal/unit?id=rotor.bearing"]);
+  assert.equal(env.document.title, "Подшипник опорный выдуманный · узел · КВАНТ");
+  const hero = потомки(env.card).find((e) => e.tagName === "HEADER");
+  assert.match(hero.textContent, /Дерево ГТУ: Ротор выдуманный › Подшипник опорный выдуманный · Journal bearing/);
+  код_рядом_с_брендом(env.card);
+  const все = ссылки(env.card);
+  for (const href of ["/p#unit=rotor", "/p#model=" + encodeURIComponent("тв10"), "/p#model=vm400",
+                      "/p#brand=turbovyd", "/p#brand=kelton", "/p#code=tvd030", "/library#section=component"]) {
+    assert.ok(все.includes(href), href);
+  }
+  assert.match(env.card.textContent, /ТВ-10газовая турбина · деталей в узле 30 · типово/);
+  assert.match(env.card.textContent, /ВМ-400турбина · деталей в узле нет · типово/);
+  assert.match(env.card.textContent, /КритичностьB — плановая замена/);
+  assert.match(env.card.textContent, /записан для: Другая выдуманная ГТУ/);
+  assert.match(env.card.textContent, /для семейства: Ansaldo Energia/);
+  assert.match(env.card.textContent, /У этого узла, вложенных и объемлющих признаков в справочнике нет/);
+  // У карточки узла колонки «почему здесь» нет: все дефекты — узла.
+  assert.ok(!таблицы(env.card).some((t) => шапка_таблицы(t).includes("Почему здесь")));
+});
+
+test("карточки кода и бренда с правом на библиотеку ведут на машину и узел", async () => {
+  const env = await открыть({ hash: "#code=kl7", ответ: () => [200, { ...КОД, library: true }] });
+  const все = ссылки(env.card);
+  assert.ok(все.includes("/p#model=vm400") && все.includes("/p#unit=hot.liner"), все.join(" "));
+  assert.doesNotMatch(env.card.textContent, /библиотека закрыта правом/);
+  assert.doesNotMatch(env.card.textContent, /нет адреса машины/);
+});
+
+test("машина и узел: отказ по праву библиотеки, «не нашлось», несчитанный раздел — словами", async () => {
+  const env = await открыть({ hash: "#model=nope", ответ: (url) => url.includes("model")
+    ? [404, { error: "not_found" }]
+    : [403, { error: "forbidden", need: "knowledge" }] });
+  assert.match(env.card.textContent, /Такой машины нет в справочнике машин/);
+  env.location.hash = "#unit=hot";
+  for (const fn of env.слушатели.hashchange) fn();
+  await дождаться();
+  assert.match(env.card.textContent, /Нет доступа/);
+  assert.match(env.card.textContent, /по праву «Библиотека оборудования и знаний»/);
+  const частично = await открыть({ hash: "#model=x", ответ: () => [200, { ...МАШИНА,
+    parts: { total: 120, with_unit: 45, no_unit: 75, list: [] }, partial: ["детали", "признаки"] }] });
+  assert.match(частично.card.textContent, /Не успели посчитать — обновите страницу. Деталей всего: 120/);
+  assert.doesNotMatch(частично.card.textContent, /Деталей этой машины в каталоге нет/);
+  assert.match(частично.card.textContent, /Не успели посчитать: детали, признаки/);
+  // Изготовитель не из реестра — словом в строке шапки, пометка в скобках, шапка не рвётся.
+  const горная = await открыть({ hash: "#model=x", ответ: () => [200, { ...МАШИНА, kind: "mining_machine",
+    makers: [{ key: null, name: "Горвыдумка" }], maker_cell: "Горвыдумка", dir: null, tree: null }] });
+  const шапка_г = потомки(горная.card).find((e) => e.tagName === "HEADER");
+  assert.match(шапка_г.textContent, /Изготовитель: Горвыдумка \(нет в реестре брендов\) · горная машина/);
+  assert.match(горная.card.textContent, /Направление машины не определено или для него типового дерева в библиотеке нет/);
 });

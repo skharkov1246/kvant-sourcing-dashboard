@@ -11,6 +11,10 @@
 -- Ни одна страница, функция и таблица при этом не меняются: файл только
 -- ДОБАВЛЯЕТ функции.
 --
+-- ШАГ 3 (25.09.2026): portal_model(ключ машины) и portal_unit(ключ узла) —
+-- карточки машины и узла (раздел 11): узлы машины по деталям и типовым деревом,
+-- детали парой «код + бренд», парк, ведомость, признаки, дефекты, ремонт.
+--
 -- ПРАВИЛА НОМЕНКЛАТУРЫ (PDF владельцу 24.09.2026), как они здесь исполнены:
 --   · позиция — пара «бренд + код»: у кода всегда стоит бренд, у бренда — коды;
 --   · бренд с ИСТОЧНИКОМ: каталог (lib_parts.oem), каталог аналогов
@@ -1508,9 +1512,642 @@ begin
 end $fn$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 11. Права: функции по умолчанию исполнимы всеми (PUBLIC) — снимаем; роли
+-- 11. МАШИНА И УЗЕЛ — шаг 3 плана «одна стартовая страница» (25.09.2026).
+--     Первые два звена цепочки портала (CLAUDE.md, «Куда мы идём»): по машине
+--     выйти на узлы и детали, по узлу — на машины, детали, признаки, дефекты и
+--     ремонт. Мерило шага — все машины lib_models и все узлы lib_units
+--     открываются карточкой (на живой базе 132 и 126).
+--
+--     КАК УЗЕЛ СВЯЗАН С МАШИНОЙ. Колонки «машина → узел» в базе нет, и это не
+--     упущение (schema.sql, 2в): узлы ГТУ общие для Solar и Siemens, поэтому
+--     дерево одно на все машины направления. Связь двух видов, и карточка
+--     показывает их порознь, не складывая:
+--       · ПО ДЕТАЛЯМ — измерено: lib_part_models (машина → деталь) →
+--         lib_parts.unit_id (деталь → узел). «У машины N деталей в узле X»;
+--         деталь без узла — отдельным числом, а не молчанием;
+--       · ТИПОВОЕ ДЕРЕВО НАПРАВЛЕНИЯ — lib_units двумя деревьями
+--         (load_equipment.build_units): ГПУ — под префиксом «gpu.», остальное —
+--         ГТУ (8 систем номенклатуры ЗИП и 6 разметки партномеров, 14 корней).
+--         Направление машины — её сегмент (gtu, gpu), без сегмента — семейство
+--         справочника моделей (portal_model_dir). У горно-шахтного и прочего
+--         оборудования типового дерева в библиотеке нет, и карточка так и
+--         говорит, а не подставляет чужое.
+--     Признаки, дефекты и ремонтные операции привязаны к узлу (unit_id) и
+--     достаются машине по её узлам — обоим видам связи и их предкам. Дефект,
+--     записанный для ДРУГОЙ машины (lib_defects.model), к этой не идёт;
+--     операция другого семейства (lib_procedures.model_family) — тоже.
+--
+--     ДЕТАЛЬ — ТОЛЬКО ПАРОЙ «КОД + БРЕНД» (распоряжение владельца): бренд —
+--     изготовитель по каталогу (lib_parts.oem), приведённый к реестру брендов
+--     тем же portal_brands_of, что у карточки кода; не разрешился — словом.
+--     Код каталога — код всегда (каталог защищает, как в portal_codes_ok).
+--     Списки ограничены пределом, и рядом всегда общее число: молчаливого
+--     усечения нет.
+--
+--     ВРЕМЯ. Таблицы здесь малые (машин 132, узлов 126, деталей 13 тыс., связей
+--     10 тыс.), но порядок тот же, что у соседних карточек: между разделами —
+--     бюджет portal_entity.budget_ms, и несчитанный раздел идёт в "partial".
+--     Номеров сделок и файлов (lib_defects.deal_id, source_file) в ответе нет.
+
+-- Направление машины: сегмент, без сегмента — семейство справочника моделей
+-- (load_equipment.build_models: sgt, finspong, heavy, solar, ansaldo — ГТУ;
+-- gpu — ГПУ). Одно выражение без FROM — встраивается в запрос.
+create or replace function portal_model_dir(segment text, family text) returns text
+  language sql immutable parallel safe as $$
+    select case when segment = 'gpu' or (segment is null and family = 'gpu') then 'gpu'
+                when segment = 'gtu' or (segment is null and family in ('sgt', 'finspong', 'heavy', 'solar', 'ansaldo'))
+                then 'gtu' end
+  $$;
+
+-- Дерево узла: «gpu.» — ГПУ, остальное — ГТУ (load_equipment.build_units).
+create or replace function portal_unit_dir(unit_id text) returns text
+  language sql immutable parallel safe as $$
+    select case when coalesce(unit_id, '') = '' then null when left(unit_id, 4) = 'gpu.' then 'gpu' else 'gtu' end
+  $$;
+
+-- Текст справочника в карточку — целиком до предела, а дальше с видимым «…»:
+-- обрезка без знака выдавала бы кусок за всё.
+create or replace function portal_cut(t text, n int) returns text
+  language sql immutable parallel safe as $$
+    select case when t is null or btrim(t) = '' then null
+                when char_length(t) > n then rtrim(left(t, n)) || '…' else t end
+  $$;
+
+-- Узлы и все вложенные / узлы и все предки. Глубина — не больше десяти:
+-- круг в parent_id — ошибка справочника, и ходить по нему нельзя.
+create or replace function portal_unit_down(ids text[]) returns text[]
+  language plpgsql stable as $fn$
+begin
+  return array(
+    with recursive вниз (id, depth) as (
+      select u.id, 0 from lib_units u where u.id = any(ids)
+      union all
+      select c.id, в.depth + 1 from lib_units c join вниз в on c.parent_id = в.id where в.depth < 10)
+    select distinct вниз.id from вниз);
+end $fn$;
+
+create or replace function portal_unit_up(ids text[]) returns text[]
+  language plpgsql stable as $fn$
+begin
+  return array(
+    with recursive вверх (id, parent_id, depth) as (
+      select u.id, u.parent_id, 0 from lib_units u where u.id = any(ids)
+      union all
+      select p.id, p.parent_id, в.depth + 1 from lib_units p join вверх в on p.id = в.parent_id where в.depth < 10)
+    select distinct вверх.id from вверх);
+end $fn$;
+
+-- Детали списком: код, бренд (соседним полем), наименование, узел, наш номер.
+-- Порядок — сначала с нашим номером KV (их знают склад и сорсер), потом по
+-- потребности из сводки партномеров (lib_parts.qty_demand), потом по номеру.
+create or replace function portal_part_list(ids text[], lim int) returns jsonb
+  language plpgsql stable set plan_cache_mode = force_custom_plan as $fn$
+declare
+  список jsonb;
+  бренды jsonb := '{}';
+begin
+  select coalesce(jsonb_agg(to_jsonb(x) order by x.n), '[]') into список
+    from (select p.id, p.catalog_no, left(p.name, 200) as name, nullif(left(btrim(p.oem), 200), '') as oem,
+                 p.kv_no, p.unit_id, u.name as unit_name,
+                 row_number() over (order by (p.kv_no is null), p.qty_demand desc nulls last, p.catalog_no, p.id) as n
+            from lib_parts p left join lib_units u on u.id = p.unit_id
+           where p.id = any(ids)
+           order by n limit least(greatest(coalesce(lim, 100), 1), 500)) x;
+  if to_regclass('lib_brands') is not null and to_regclass('lib_brand_map') is not null
+     and to_regprocedure('lib_brand_key(text)') is not null then
+    бренды := portal_brands_of(array(select distinct x ->> 'oem' from jsonb_array_elements(список) x
+                                      where x ->> 'oem' is not null));
+  end if;
+  return (select coalesce(jsonb_agg(jsonb_build_object(
+            'code', x ->> 'id', 'written', x ->> 'catalog_no', 'name', x ->> 'name', 'kv_no', x ->> 'kv_no',
+            'brand', case when бренды ? (x ->> 'oem')
+                          then jsonb_build_object('key', бренды -> (x ->> 'oem') -> 0 ->> 0,
+                                                  'name', бренды -> (x ->> 'oem') -> 0 ->> 1)
+                          when x ->> 'oem' is not null
+                          then jsonb_build_object('key', null, 'name', left(x ->> 'oem', 120)) end,
+            'unit', case when x ->> 'unit_id' is not null
+                         then jsonb_build_object('id', x ->> 'unit_id', 'name', x ->> 'unit_name') end)
+          order by (x ->> 'n')::int), '[]')
+            from jsonb_array_elements(список) x);
+end $fn$;
+
+-- Признаки узлов: что меряют, что обычно значит, чем подтвердить; связанные
+-- дефекты (lib_symptom_defects) и операции подтверждения (lib_symptom_ops).
+-- Справочник — заготовка по общей практике: уверенность отдаётся как есть.
+create or replace function portal_symptoms_of(units text[], lim int) returns jsonb
+  language plpgsql stable set plan_cache_mode = force_custom_plan as $fn$
+declare
+  выход jsonb;
+begin
+  with s as materialized (
+    select s.*, u.name as unit_name, row_number() over (order by u.name, s.name, s.id) as n
+      from lib_symptoms s left join lib_units u on u.id = s.unit_id
+     where s.unit_id = any(units))
+  select jsonb_build_object('n', (select count(*) from s),
+    'list', coalesce((select jsonb_agg(jsonb_build_object(
+        'name', x.name,
+        'unit', case when x.unit_id is not null then jsonb_build_object('id', x.unit_id, 'name', x.unit_name) end,
+        'measure', portal_cut(x.measure, 600), 'defect', portal_cut(x.defect, 600),
+        'confirm', portal_cut(x.confirm, 600), 'basis', portal_cut(x.basis, 300),
+        'confidence', x.confidence, 'source', portal_cut(x.source, 200),
+        'defects', (select coalesce(jsonb_agg(jsonb_build_object('name', d.name) order by d.name), '[]')
+                      from (select d.name from lib_symptom_defects sd join lib_defects d on d.id = sd.defect_id
+                             where sd.symptom_id = x.id order by d.name limit 8) d),
+        'ops', (select coalesce(jsonb_agg(jsonb_build_object('kind', p.kind, 'name', p.name) order by p.kind, p.name), '[]')
+                  from (select p.kind, p.name from lib_symptom_ops so join lib_procedures p on p.id = so.procedure_id
+                         where so.symptom_id = x.id order by p.kind, p.name limit 8) p))
+      order by x.n) from s x where x.n <= least(greatest(coalesce(lim, 50), 1), 200)), '[]'))
+    into выход;
+  return выход;
+end $fn$;
+
+-- Дефекты и ремонтные решения. Три пути, и путь назван (via):
+--   деталь — part_number дефекта — деталь из списка parts (ключом номера);
+--   машина — lib_defects.model называет машину: ключ имени, прежнего имени или
+--            написания (от четырёх знаков) входит в ключ поля model;
+--   узел    — дефект узла из units; если заданы имена машины (names), дефект,
+--            записанный для другой машины (model не пуст и не её), не идёт.
+-- Для карточки узла parts и names — null: идут все дефекты узла, и поле model
+-- показывает, для какой машины дефект записан. Таблица малая (десятки строк;
+-- извлечение из текстов ТЗ даст тысячи) — читается целиком за один проход.
+create or replace function portal_defects_of(units text[], parts text[], names text[], lim int) returns jsonb
+  language plpgsql stable set plan_cache_mode = force_custom_plan as $fn$
+declare
+  строки jsonb;
+  годные text[];
+  бренды jsonb := '{}';
+begin
+  with d as (
+    select d.id, d.name, d.unit_id, d.part_number, d.model, d.cause, d.consequence, d.fix, d.source, d.seen,
+           u.name as unit_name,
+           case when parts is not null and coalesce(btrim(d.part_number), '') <> ''
+                     and lib_pn_key(d.part_number) = any(parts) then 'деталь'
+                when names is not null and coalesce(btrim(d.model), '') <> ''
+                     and exists (select 1 from unnest(names) k where strpos(lib_pn_key(d.model), k) > 0) then 'машина'
+                when d.unit_id = any(units) and (names is null or coalesce(btrim(d.model), '') = '') then 'узел'
+           end as via
+      from lib_defects d left join lib_units u on u.id = d.unit_id
+  ), о as (
+    select d.*, row_number() over (order by case d.via when 'деталь' then 0 when 'машина' then 1 else 2 end,
+                                            d.seen desc nulls last, d.name, d.id) as n
+      from d where d.via is not null
+  )
+  select jsonb_build_object('n', (select count(*) from о),
+           'list', coalesce((select jsonb_agg(jsonb_build_object(
+               'name', x.name,
+               'unit', case when x.unit_id is not null then jsonb_build_object('id', x.unit_id, 'name', x.unit_name) end,
+               'model', nullif(btrim(x.model), ''), 'via', x.via,
+               'cause', portal_cut(x.cause, 600), 'consequence', portal_cut(x.consequence, 800),
+               'fix', portal_cut(x.fix, 800), 'source', portal_cut(x.source, 200),
+               'written', nullif(btrim(x.part_number), ''),
+               'key', case when coalesce(btrim(x.part_number), '') <> '' then lib_pn_key(x.part_number) end,
+               'oem', (select nullif(left(btrim(p.oem), 200), '') from lib_parts p
+                        where p.id = lib_pn_key(x.part_number) limit 1),
+               'ops', (select coalesce(jsonb_agg(jsonb_build_object('kind', p.kind, 'name', p.name) order by p.kind, p.name), '[]')
+                         from (select p.kind, p.name from lib_defect_ops dop join lib_procedures p on p.id = dop.procedure_id
+                                where dop.defect_id = x.id order by p.kind, p.name limit 8) p))
+             order by x.n) from о x where x.n <= least(greatest(coalesce(lim, 50), 1), 200)), '[]'))
+    into строки;
+  -- Код детали дефекта — только правдоподобный; бренд — изготовитель по
+  -- каталогу, а без каталога — «не назван» (номер без бренда не показывается
+  -- как позиция: страница ставит рядом «бренд не назван»).
+  годные := portal_codes_ok(array(select x ->> 'key' from jsonb_array_elements(строки -> 'list') x
+                                   where x ->> 'key' is not null));
+  if to_regclass('lib_brands') is not null and to_regclass('lib_brand_map') is not null
+     and to_regprocedure('lib_brand_key(text)') is not null then
+    бренды := portal_brands_of(array(select distinct x ->> 'oem' from jsonb_array_elements(строки -> 'list') x
+                                      where x ->> 'oem' is not null));
+  end if;
+  return jsonb_build_object('n', строки -> 'n',
+    'list', coalesce((select jsonb_agg(
+        (x - 'key' - 'oem')
+        || jsonb_build_object(
+             'code', case when x ->> 'key' = any(годные) and char_length(x ->> 'key') >= 2 then x ->> 'key' end,
+             'brand', case when x ->> 'written' is null then null
+                           when бренды ? (x ->> 'oem')
+                           then jsonb_build_object('key', бренды -> (x ->> 'oem') -> 0 ->> 0,
+                                                   'name', бренды -> (x ->> 'oem') -> 0 ->> 1)
+                           when x ->> 'oem' is not null
+                           then jsonb_build_object('key', null, 'name', left(x ->> 'oem', 120)) end)
+        order by n) from jsonb_array_elements(строки -> 'list') with ordinality as t(x, n)), '[]'));
+end $fn$;
+
+-- Ремонтные операции узлов: инспекции, контроль, ремонт, покрытия,
+-- модернизация. by_family — для машины: операция, записанная для другого
+-- семейства (model_family), к ней не идёт, а операция своего семейства без
+-- узла — идёт. Для узла by_family = false: все операции узла с подписью
+-- семейства.
+create or replace function portal_procedures_of(units text[], family text, by_family boolean, lim int) returns jsonb
+  language plpgsql stable set plan_cache_mode = force_custom_plan as $fn$
+declare
+  выход jsonb;
+begin
+  with о as materialized (
+    select p.*, u.name as unit_name,
+           row_number() over (order by case p.kind when 'инспекция' then 0 when 'контроль' then 1 when 'ремонт' then 2
+                                                   when 'покрытие' then 3 when 'модернизация' then 4 else 5 end,
+                                       p.name, p.id) as n
+      from lib_procedures p left join lib_units u on u.id = p.unit_id
+     where (p.unit_id = any(units)
+            and (not coalesce(by_family, false) or p.model_family is null or p.model_family = family))
+        or (coalesce(by_family, false) and family is not null and p.unit_id is null and p.model_family = family))
+  select jsonb_build_object('n', (select count(*) from о),
+    'list', coalesce((select jsonb_agg(jsonb_build_object(
+        'kind', x.kind, 'name', x.name,
+        'unit', case when x.unit_id is not null then jsonb_build_object('id', x.unit_id, 'name', x.unit_name) end,
+        'scope', portal_cut(x.scope, 400), 'duration', nullif(btrim(x.duration), ''),
+        'family', nullif(btrim(x.model_family), ''), 'performer', nullif(btrim(x.performer), ''),
+        'source', portal_cut(x.source, 200))
+      order by x.n) from о x where x.n <= least(greatest(coalesce(lim, 60), 1), 200)), '[]'))
+    into выход;
+  return выход;
+end $fn$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 11а. КАРТОЧКА МАШИНЫ.
+--
+--    имя          — имя, прежнее имя, написания (без повторов имени);
+--    изготовитель — lib_models.oem → бренды реестра (portal_brands_of, та же
+--                   ступень, что у машин карточки кода); ячейка «GE / Siemens /
+--                   Alstom» — тремя брендами, неразрешённая — словом, и сама
+--                   ячейка рядом (maker_cell), чтобы не потерять несведённую часть;
+--    паспорт      — сегмент, вид, семейство, мощность, КПД, валы (у ГПУ —
+--                   цилиндры, у Ansaldo — ступени: так их пишет загрузчик),
+--                   применение, примечание, откуда машина в справочнике;
+--    узлы         — по деталям (измерено) и типовое дерево направления;
+--    детали       — lib_part_models → lib_parts, 100 из всех, число рядом;
+--    парк         — lib_fleet этой машины: число и 50 площадок;
+--    ведомость    — lib_bom этой машины: число и 100 строк;
+--    признаки, дефекты, ремонт — по узлам машины (см. шапку раздела 11).
+drop function if exists portal_model(text);
+create function portal_model(model_id text) returns jsonb
+  language plpgsql stable
+  set plan_cache_mode = force_custom_plan
+  set jit = off
+as $fn$
+#variable_conflict use_column
+declare
+  ид       text := btrim(coalesce(portal_model.model_id, ''));
+  бюджет   interval := coalesce(nullif(current_setting('portal_entity.budget_ms', true), '')::int,
+                                5000) * interval '1 millisecond';
+  реестр   boolean := to_regclass('lib_brands') is not null
+                      and to_regclass('lib_brand_alias') is not null
+                      and to_regclass('lib_brand_map') is not null
+                      and to_regprocedure('lib_brand_key(text)') is not null;
+  м        record;
+  направление text;
+  откуда   text;
+  имена    text[];
+  детали   text[];
+  по_узлу  jsonb := '{}';    -- узел → деталей машины в нём
+  без_узла int := 0;
+  узлы     jsonb := '[]';
+  дерево   jsonb;
+  узлы_все text[] := '{}';
+  ячейки   jsonb := '{}';
+  изг      jsonb := '[]';
+  список   jsonb := '[]';
+  парк     jsonb := '[]';
+  парк_n   int := 0;
+  ведомость jsonb := '[]';
+  ведомость_n int := 0;
+  годные   text[];
+  признаки jsonb := jsonb_build_object('n', 0, 'list', '[]'::jsonb);
+  дефекты  jsonb := jsonb_build_object('n', 0, 'list', '[]'::jsonb);
+  ремонт   jsonb := jsonb_build_object('n', 0, 'list', '[]'::jsonb);
+  усечено  text[] := '{}';
+begin
+  if char_length(ид) = 0 or char_length(ид) > 120 then
+    return null;
+  end if;
+  select m.* into м from lib_models m where m.id = ид;
+  if not found then
+    return null;
+  end if;
+  направление := portal_model_dir(м.segment_id, м.family);
+  откуда := case when направление is null then null
+                 when м.segment_id in ('gtu', 'gpu') then 'сегмент' else 'семейство' end;
+  -- Ключи имён машины — для дефектов «записан для этой машины». Прежнее имя и
+  -- написания делятся по запятой, «;» и «/»: «Frame 5 (1 вал), MS5001PA».
+  имена := array(
+    select distinct z.k from (
+      select lib_pn_key(btrim(s)) as k
+        from unnest(array[м.name, м.legacy, м.id] || coalesce(м.aliases, '{}'::text[])) x
+        cross join lateral regexp_split_to_table(coalesce(x, ''), '\s*[,;/]\s*') s) z
+     where char_length(z.k) >= 4);
+
+  -- ── изготовитель ──
+  if coalesce(btrim(м.oem), '') <> '' then
+    if реестр then
+      ячейки := portal_brands_of(array[м.oem]);
+    end if;
+    изг := coalesce((select jsonb_agg(jsonb_build_object('key', y ->> 0, 'name', y ->> 1))
+                       from jsonb_array_elements(ячейки -> left(btrim(м.oem), 200)) y),
+                    jsonb_build_array(jsonb_build_object('key', null, 'name', left(btrim(м.oem), 120))));
+  end if;
+
+  -- ── детали машины и их узлы (счёт — всегда: он дешёв и нужен разделам) ──
+  детали := array(select pm.part_id from lib_part_models pm where pm.model_id = ид);
+  select coalesce(jsonb_object_agg(z.unit_id, z.n), '{}') into по_узлу
+    from (select p.unit_id, count(*)::int as n from lib_parts p
+           where p.id = any(детали) and p.unit_id is not null group by 1) z;
+  select count(*)::int into без_узла from lib_parts p where p.id = any(детали) and p.unit_id is null;
+  -- Узлы машины для признаков, дефектов и ремонта: по деталям — с предками,
+  -- и всё дерево направления.
+  узлы_все := array(
+    select distinct x from unnest(
+      portal_unit_up(array(select jsonb_object_keys(по_узлу)))
+      || array(select u.id from lib_units u where направление is not null and portal_unit_dir(u.id) = направление)) x);
+
+  -- ── узлы ──
+  if clock_timestamp() - statement_timestamp() > бюджет then
+    усечено := усечено || 'узлы'::text;
+  else
+    select coalesce(jsonb_agg(jsonb_build_object(
+             'id', u.id, 'name', u.name, 'crit', u.crit,
+             'parent', case when р.id is not null then jsonb_build_object('id', р.id, 'name', р.name) end,
+             'parts', (e.value)::int,
+             'typical', coalesce(направление is not null and portal_unit_dir(u.id) = направление, false))
+           order by (e.value)::int desc, u.name), '[]')
+      into узлы
+      from jsonb_each_text(по_узлу) e join lib_units u on u.id = e.key
+      left join lib_units р on р.id = u.parent_id;
+    if направление is not null then
+      select jsonb_build_object('dir', направление, 'via', откуда,
+               'systems', coalesce(jsonb_agg(jsonb_build_object(
+                   'id', r.id, 'name', r.name, 'crit', r.crit,
+                   'children', (select count(*) from lib_units c where c.parent_id = r.id),
+                   'parts', (select coalesce(sum((по_узлу ->> x)::int), 0)
+                               from unnest(portal_unit_down(array[r.id])) x))
+                 order by coalesce(r.crit, 'Z'), r.name), '[]'))
+        into дерево
+        from lib_units r where r.parent_id is null and portal_unit_dir(r.id) = направление;
+    end if;
+  end if;
+
+  -- ── детали списком ──
+  if clock_timestamp() - statement_timestamp() > бюджет then
+    усечено := усечено || 'детали'::text;
+  else
+    список := portal_part_list(детали, 100);
+  end if;
+
+  -- ── парк ──
+  if clock_timestamp() - statement_timestamp() > бюджет then
+    усечено := усечено || 'парк'::text;
+  else
+    select count(*)::int into парк_n from lib_fleet f where f.model_id = ид;
+    select coalesce(jsonb_agg(jsonb_build_object(
+             'site', f.site, 'owner', nullif(btrim(f.owner), ''), 'units', nullif(btrim(f.units), ''),
+             'year', nullif(btrim(f.year), ''), 'written', nullif(btrim(f.model_raw), ''),
+             'note', portal_cut(f.note, 400))
+           order by f.site, f.id), '[]')
+      into парк
+      from (select * from lib_fleet f where f.model_id = ид order by f.site, f.id limit 50) f;
+  end if;
+
+  -- ── ведомость ──
+  if clock_timestamp() - statement_timestamp() > бюджет then
+    усечено := усечено || 'ведомость'::text;
+  else
+    select count(*)::int into ведомость_n from lib_bom b where b.model_id = ид;
+    if ведомость_n > 0 then
+      select coalesce(jsonb_agg(to_jsonb(x) order by x.n), '[]') into ведомость
+        from (select b.part_id, b.part_no, left(b.name, 200) as name, nullif(btrim(b.node), '') as node,
+                     nullif(btrim(b.qty), '') as qty, nullif(btrim(b.position_no), '') as position,
+                     nullif(left(btrim(p.oem), 200), '') as oem,
+                     row_number() over (order by b.node nulls last, b.position_no, b.part_no, b.id) as n
+                from lib_bom b left join lib_parts p on p.id = b.part_id
+               where b.model_id = ид
+               order by n limit 100) x;
+      годные := portal_codes_ok(array(select lib_pn_key(x ->> 'part_no') from jsonb_array_elements(ведомость) x
+                                       where x ->> 'part_id' is null));
+      if реестр then
+        ячейки := portal_brands_of(array(select distinct x ->> 'oem' from jsonb_array_elements(ведомость) x
+                                          where x ->> 'oem' is not null));
+      end if;
+      select coalesce(jsonb_agg(jsonb_build_object(
+               -- Строка ведомости с деталью каталога — её код; без неё —
+               -- ключ номера, если он правдоподобен.
+               'code', coalesce(x ->> 'part_id',
+                                case when lib_pn_key(x ->> 'part_no') = any(годные)
+                                      and char_length(lib_pn_key(x ->> 'part_no')) >= 2
+                                     then lib_pn_key(x ->> 'part_no') end),
+               'written', x ->> 'part_no', 'name', x ->> 'name', 'node', x ->> 'node', 'qty', x ->> 'qty',
+               'position', x ->> 'position',
+               'brand', case when ячейки ? (x ->> 'oem')
+                             then jsonb_build_object('key', ячейки -> (x ->> 'oem') -> 0 ->> 0,
+                                                     'name', ячейки -> (x ->> 'oem') -> 0 ->> 1)
+                             when x ->> 'oem' is not null
+                             then jsonb_build_object('key', null, 'name', left(x ->> 'oem', 120)) end)
+             order by (x ->> 'n')::int), '[]')
+        into ведомость
+        from jsonb_array_elements(ведомость) x;
+    end if;
+  end if;
+
+  -- ── признаки, дефекты, ремонт ──
+  if clock_timestamp() - statement_timestamp() > бюджет then
+    усечено := усечено || 'признаки'::text || 'дефекты'::text || 'ремонт'::text;
+  else
+    признаки := portal_symptoms_of(узлы_все, 50);
+    дефекты := portal_defects_of(узлы_все, детали, имена, 50);
+    ремонт := portal_procedures_of(узлы_все, м.family, true, 60);
+  end if;
+
+  return jsonb_build_object(
+    'id', м.id,
+    'name', м.name,
+    'legacy', nullif(btrim(м.legacy), ''),
+    'aliases', coalesce((
+      select jsonb_agg(z.s order by z.s) from (
+        select distinct on (lib_pn_key(x)) btrim(x) as s
+          from unnest(coalesce(м.aliases, '{}'::text[])) x
+         where coalesce(btrim(x), '') <> ''
+           and lib_pn_key(x) <> lib_pn_key(м.name) and lib_pn_key(x) <> lib_pn_key(м.legacy)
+         order by lib_pn_key(x), btrim(x) limit 30) z), '[]'),
+    'makers', изг,
+    'maker_cell', nullif(btrim(м.oem), ''),
+    'segment', м.segment_id,
+    'segment_name', (select s.name from lib_segments s where s.id = м.segment_id),
+    'kind', nullif(btrim(м.kind), ''),
+    'family', nullif(btrim(м.family_title), ''),
+    'power', nullif(btrim(м.power), ''),
+    'efficiency', nullif(btrim(м.efficiency), ''),
+    'shafts', nullif(btrim(м.shafts), ''),
+    -- Поле shafts загрузчик заполняет по-разному: у ГПУ — цилиндры (паспорт
+    -- cyl), у Ansaldo — ступени (stages), у прочих — валы.
+    'shafts_label', case when м.family = 'gpu' then 'Цилиндры' when м.family = 'ansaldo' then 'Ступени'
+                         else 'Валы' end,
+    'use_case', nullif(btrim(м.use_case), ''),
+    'note', portal_cut(м.note, 600),
+    'source', nullif(btrim(м.source), ''),
+    'dir', направление,
+    'dir_via', откуда,
+    'parts', jsonb_build_object('total', cardinality(детали), 'with_unit', cardinality(детали) - без_узла,
+                                'no_unit', без_узла, 'list', список),
+    'units', узлы,
+    'tree', дерево,
+    'fleet', jsonb_build_object('n', парк_n, 'list', парк),
+    'bom', jsonb_build_object('n', ведомость_n, 'list', ведомость),
+    'symptoms', признаки,
+    'defects', дефекты,
+    'procedures', ремонт,
+    'registry', реестр,
+    'partial', to_jsonb(усечено));
+end $fn$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 11б. КАРТОЧКА УЗЛА.
+--
+--    узел     — имя, английское имя, критичность, доступность помимо OEM,
+--               примечание, откуда; дерево (ГТУ/ГПУ); путь от корня; вложенные
+--               узлы с числом деталей;
+--    машины   — две связи порознь: у машины есть детали каталога в этом узле
+--               или его вложенных (число), и машина — того же направления, что
+--               дерево узла (типово); список до 80, числа рядом;
+--    детали   — узла и вложенных, 100 из всех, число рядом;
+--    признаки, дефекты, ремонт — узла, вложенных и предков: признак системы
+--               («разброс по термопарам» горячего тракта) касается и её
+--               компонента. У каждой строки назван её узел.
+drop function if exists portal_unit(text);
+create function portal_unit(unit_id text) returns jsonb
+  language plpgsql stable
+  set plan_cache_mode = force_custom_plan
+  set jit = off
+as $fn$
+#variable_conflict use_column
+declare
+  ид       text := btrim(coalesce(portal_unit.unit_id, ''));
+  бюджет   interval := coalesce(nullif(current_setting('portal_entity.budget_ms', true), '')::int,
+                                5000) * interval '1 millisecond';
+  реестр   boolean := to_regclass('lib_brands') is not null
+                      and to_regclass('lib_brand_alias') is not null
+                      and to_regclass('lib_brand_map') is not null
+                      and to_regprocedure('lib_brand_key(text)') is not null;
+  у        record;
+  дерево   text;
+  вниз     text[];
+  вверх    text[];
+  путь     jsonb := '[]';
+  дети     jsonb := '[]';
+  детали   text[];
+  здесь    int := 0;
+  машины   jsonb := jsonb_build_object('n', 0, 'typical_n', 0, 'with_parts', 0, 'list', '[]'::jsonb);
+  ячейки   jsonb := '{}';
+  список   jsonb := '[]';
+  признаки jsonb := jsonb_build_object('n', 0, 'list', '[]'::jsonb);
+  дефекты  jsonb := jsonb_build_object('n', 0, 'list', '[]'::jsonb);
+  ремонт   jsonb := jsonb_build_object('n', 0, 'list', '[]'::jsonb);
+  усечено  text[] := '{}';
+begin
+  if char_length(ид) = 0 or char_length(ид) > 120 then
+    return null;
+  end if;
+  select u.* into у from lib_units u where u.id = ид;
+  if not found then
+    return null;
+  end if;
+  дерево := portal_unit_dir(у.id);
+  вниз := portal_unit_down(array[ид]);
+  вверх := portal_unit_up(array[ид]);
+  -- Путь от корня до родителя.
+  with recursive п (id, name, parent_id, depth) as (
+    select u.id, u.name, u.parent_id, 0 from lib_units u where u.id = у.parent_id
+    union all
+    select r.id, r.name, r.parent_id, п.depth + 1 from lib_units r join п on r.id = п.parent_id where п.depth < 10)
+  select coalesce(jsonb_agg(jsonb_build_object('id', п.id, 'name', п.name) order by п.depth desc), '[]')
+    into путь from п;
+  детали := array(select p.id from lib_parts p where p.unit_id = any(вниз));
+  select count(*)::int into здесь from lib_parts p where p.unit_id = ид;
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'id', c.id, 'name', c.name, 'crit', c.crit,
+           'children', (select count(*) from lib_units g where g.parent_id = c.id),
+           'parts', (select count(*) from lib_parts p where p.unit_id = any(portal_unit_down(array[c.id]))))
+         order by coalesce(c.crit, 'Z'), c.name), '[]')
+    into дети
+    from lib_units c where c.parent_id = ид;
+
+  -- ── машины ──
+  if clock_timestamp() - statement_timestamp() > бюджет then
+    усечено := усечено || 'машины'::text;
+  else
+    with д as (
+      select pm.model_id, count(distinct pm.part_id)::int as n
+        from lib_part_models pm where pm.part_id = any(детали) group by 1
+    ), все as materialized (
+      select m.id, m.name, m.oem, m.kind, m.family_title, m.segment_id, coalesce(д.n, 0) as n,
+             coalesce(portal_model_dir(m.segment_id, m.family) = дерево, false) as typical
+        from lib_models m left join д on д.model_id = m.id
+       where д.model_id is not null or portal_model_dir(m.segment_id, m.family) = дерево
+    ), показ as (
+      select * from все order by все.n desc, все.name, все.id limit 80
+    )
+    select jsonb_build_object('n', (select count(*) from все),
+             'typical_n', (select count(*) from все where все.typical),
+             'with_parts', (select count(*) from все where все.n > 0),
+             'list', coalesce((select jsonb_agg(jsonb_build_object(
+                         'id', x.id, 'name', x.name, 'kind', coalesce(x.kind, x.family_title),
+                         'segment', x.segment_id, 'segment_name', s.name,
+                         'maker', nullif(left(btrim(x.oem), 200), ''), 'parts', x.n, 'typical', x.typical)
+                       order by x.n desc, x.name, x.id)
+                         from показ x left join lib_segments s on s.id = x.segment_id), '[]'))
+      into машины;
+    if реестр then
+      ячейки := portal_brands_of(array(select distinct x ->> 'maker' from jsonb_array_elements(машины -> 'list') x
+                                        where x ->> 'maker' is not null));
+    end if;
+    машины := jsonb_set(машины, '{list}', coalesce((select jsonb_agg(
+        (x - 'maker')
+        || jsonb_build_object('brand', case when ячейки ? (x ->> 'maker')
+                                            then jsonb_build_object('key', ячейки -> (x ->> 'maker') -> 0 ->> 0,
+                                                                    'name', ячейки -> (x ->> 'maker') -> 0 ->> 1)
+                                            when x ->> 'maker' is not null
+                                            then jsonb_build_object('key', null, 'name', left(x ->> 'maker', 120)) end)
+        order by n) from jsonb_array_elements(машины -> 'list') with ordinality as t(x, n)), '[]'::jsonb));
+  end if;
+
+  -- ── детали ──
+  if clock_timestamp() - statement_timestamp() > бюджет then
+    усечено := усечено || 'детали'::text;
+  else
+    список := portal_part_list(детали, 100);
+  end if;
+
+  -- ── признаки, дефекты, ремонт ──
+  if clock_timestamp() - statement_timestamp() > бюджет then
+    усечено := усечено || 'признаки'::text || 'дефекты'::text || 'ремонт'::text;
+  else
+    признаки := portal_symptoms_of(вниз || вверх, 50);
+    дефекты := portal_defects_of(вниз || вверх, null, null, 50);
+    ремонт := portal_procedures_of(вниз || вверх, null, false, 60);
+  end if;
+
+  return jsonb_build_object(
+    'id', у.id,
+    'name', у.name,
+    'name_en', nullif(btrim(у.name_en), ''),
+    'crit', nullif(btrim(у.crit), ''),
+    'aftermarket', nullif(btrim(у.aftermarket), ''),
+    'note', portal_cut(у.note, 600),
+    'source', nullif(btrim(у.source), ''),
+    'dir', дерево,
+    'path', путь,
+    'children', дети,
+    'machines', машины,
+    'parts', jsonb_build_object('total', cardinality(детали), 'here', здесь, 'list', список),
+    'symptoms', признаки,
+    'defects', дефекты,
+    'procedures', ремонт,
+    'registry', реестр,
+    'partial', to_jsonb(усечено));
+end $fn$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 12. Права: функции по умолчанию исполнимы всеми (PUBLIC) — снимаем; роли
 --     платформы только через проверку наличия (правило 20). Исполняет
---     сервисный ключ воркера портала, за Cloudflare Access и правом suppliers.
+--     сервисный ключ воркера портала, за Cloudflare Access и правом suppliers
+--     (машина и узел — ещё и правом библиотеки, сайт knowledge).
 --     Помощники тоже: они вызываются от имени вызывающего. Список один — массив
 --     цикла ниже; тест прав читает его отсюда же, и новая функция без строки в
 --     нём не пройдёт проверку «у каждой функции файла права сняты».
@@ -1529,7 +2166,12 @@ begin
                            'portal_mask_re(text)', 'portal_codes_ok(text[])', 'portal_brands_of(text[])',
                            'portal_not_brands(text[])', 'portal_sup_names(text[])',
                            'portal_companies(text[])', 'portal_brand_keys(text)',
-                           'portal_brand_spellings(text)', 'portal_brand_rows(text, int)'] loop
+                           'portal_brand_spellings(text)', 'portal_brand_rows(text, int)',
+                           'portal_model(text)', 'portal_unit(text)',
+                           'portal_model_dir(text, text)', 'portal_unit_dir(text)', 'portal_cut(text, int)',
+                           'portal_unit_down(text[])', 'portal_unit_up(text[])', 'portal_part_list(text[], int)',
+                           'portal_symptoms_of(text[], int)', 'portal_defects_of(text[], text[], text[], int)',
+                           'portal_procedures_of(text[], text, boolean, int)'] loop
     execute format('revoke all on function %s from public', ф);
     if кому is not null then
       execute format('revoke all on function %s from %s', ф, кому);
