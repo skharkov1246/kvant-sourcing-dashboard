@@ -65,6 +65,7 @@ th,td{padding:12px 13px;border-bottom:1px solid var(--line);vertical-align:top}
 tr:last-child td{border-bottom:0}td{color:#c4cedb;max-width:300px;overflow-wrap:anywhere}
 .num{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;white-space:nowrap;color:var(--ink)}
 .nowrap{white-space:nowrap}
+.bsrc{display:block;margin-top:3px;font-size:11px;line-height:1.4;font-family:'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif;color:var(--dim);white-space:normal}
 .row-link{background:none;border:0;color:var(--accent);padding:0;text-align:left;font:inherit;line-height:1.5}
 .more{margin:0 0 26px}
 .status{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:28px;margin:18px 0;color:var(--dim)}
@@ -406,18 +407,23 @@ function по_сущности(снимок) {
   // котировок. Предложений в строке больше нет (они в корзинах), и собирать
   // список позиций компании надо из рёбер. Прежний снимок — с предложениями в
   // строке и без рёбер — читается старым путём ниже.
+  //
+  // ПОЗИЦИЯ — ПАРА «БРЕНД + КОД» (library/crossref.py, ид_позиции): один код у
+  // двух брендов — две строки списка, и складывать их по ключу кода значило бы
+  // склеить SKF 6205 с FAG 6205. Ключ строки — код, а при бренде «код~бренд».
   var компании = снимок.companies || [];
   (снимок.positions || []).forEach(function (p) {
     if (!Array.isArray(p.e)) return;
+    var ид = p.k + (p.bk ? "~" + p.bk : "");
     p.e.forEach(function (r) {
       var c = компании[r[0]];
       var ent = c ? сущность_по_ключу[c.co] : null;
       if (!ent || !карта[ent]) return;
       var у = карта[ent];
-      var строка = у.поkey[p.k];
+      var строка = у.поkey[ид];
       if (!строка) {
-        строка = у.поkey[p.k] = { k: p.k, n: p.n, name: p.name, cnt: 0,
-                                  price: null, cur: null, date: null };
+        строка = у.поkey[ид] = { k: p.k, id: ид, bn: p.bn || null, bw: p.bw || null, n: p.n,
+                                 name: p.name, cnt: 0, price: null, cur: null, date: null };
         у.list.push(строка);
       }
       // Одна сущность реестра бывает под несколькими ключами портала — строки
@@ -494,7 +500,7 @@ function нарисовать_предложения(card, узел_секции
   var tb = document.createElement("table");
   var th = document.createElement("thead");
   var htr = document.createElement("tr");
-  ["Позиция", "Наименование", "Строк", "Цена", "Дата"].forEach(function (h) {
+  ["Бренд · код", "Наименование", "Строк", "Цена", "Дата"].forEach(function (h) {
     htr.appendChild(узел("th", null, h));
   });
   th.appendChild(htr); tb.appendChild(th);
@@ -503,9 +509,14 @@ function нарисовать_предложения(card, узел_секции
     var tr = document.createElement("tr");
     var td = узел("td", "num");
     // Ссылка ведёт на страницу номенклатуры — обратная сторона той же связи.
-    var a = узел("a", null, п.n || п.k);
-    a.href = "/nomenclature#k=" + encodeURIComponent(п.k);
+    // Бренд стоит рядом с кодом одной строкой: кодировка без бренда — не
+    // позиция (правило номенклатуры П1). Бренд не определён — так и сказано.
+    var a = узел("a", null, (п.bn ? п.bn + " " : "") + (п.n || п.k));
+    a.href = "/nomenclature#k=" + encodeURIComponent(п.id || п.k);
     td.appendChild(a);
+    // Снимок, собранный до правила «бренд + код», причины (bw) не несёт — там
+    // молчим, а не пишем «не определён» о том, чего не определяли.
+    if (!п.bn && п.bw) td.appendChild(узел("span", "bsrc", "бренд не определён"));
     tr.appendChild(td);
     tr.appendChild(узел("td")).appendChild(значение(п.name));
     tr.appendChild(узел("td", "num", число(п.cnt)));

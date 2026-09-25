@@ -1143,7 +1143,7 @@ def ревизия_поставщиков(с: Снимки, сейчас) -> В�
             if т.счёт("x.edge_index", not целое(ci) or not 0 <= ci < len(companies)):
                 continue
             строк_по_компании[ci] += r[1] if len(r) > 1 and целое(r[1]) else 0
-            ключи_по_компании[ci].add(k)
+            ключи_по_компании[ci].add(crossref.ид_позиции(p))
             цена = r[2] if len(r) > 2 else None
             if цена is not None:
                 т.счёт("x.edge_price", not число(цена) or цена <= 0 or цена >= 1e14)
@@ -1264,8 +1264,13 @@ def ревизия_поставщиков(с: Снимки, сейчас) -> В�
     "n.k_desc": "ключ-описание: кириллица длиннее 30 или ровно 80 знаков",
     "n.k_nodigit": "ключ без цифр (слово, а не артикул)",
     "n.k_short_num": "ключ — только цифры короче 4 (номер позиции списка)",
-    "n.k_dup": "ключ повторяется в частях списка",
-    "n.k_bucket": "номер корзины не crc32(k) % 32 или позиции нет в корзине",
+    "n.k_dup": "пара «бренд + код» повторяется в частях списка",
+    "n.k_bucket": "номер корзины не crc32(k) % 32 или пары нет в корзине",
+    "n.brand_src": "пара с брендом: имени нет или источник не из списка (каталог, строка, карточка, маска)",
+    "n.brand_why": "пара без бренда: причина не «нет» и не «спорно», «спорно» без двух кандидатов или бренд вместе с причиной",
+    "n.pair_split": "предложение со своим брендом лежит в паре другого бренда (один код у двух брендов в одной позиции)",
+    "n.brand_mask": "бренд по маске кода, а код не подходит под маску этого бренда (crossref.МАСКИ)",
+    "n.brand_undet_dup": "у кода две пары «Бренд не определён»",
     "n.n_empty": "номер пуст (показывается сжатый ключ)",
     "n.n_class": "номер — марка, размер, стандарт, дата, пункт или год",
     "n.n_words": "номер из двух и больше слов от 4 букв — описание, а не номер",
@@ -1344,6 +1349,8 @@ def ревизия_поставщиков(с: Снимки, сейчас) -> В�
 }
 
 ПОЛЬЗА_НОМЕНКЛАТУРЫ = {
+    "u.brand": "пары с определённым брендом (позиция — «бренд + код», П1)",
+    "u.brand_guess": "(справочно) бренд по маске кода — предположение",
     "u.brand_any": "бренд определён хоть одним источником",
     "u.oem_cat": "изготовитель по каталогу",
     "u.oem_file_only": "(справочно) только со слов поставщика",
@@ -1442,6 +1449,20 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
     for имя, значение in пересчёт.items():
         if т.счёт("n.totals", tot.get(имя) != значение):
             т.заметка(f"расходится totals.{имя}")
+    # Бренд позиции (П1, П2): итоги сверяются, только если снимок их несёт —
+    # снимок, собранный до правила, их не знает, и это не дефект.
+    if isinstance(tot.get("brand"), dict):
+        б = tot["brand"]
+        по_источнику = collections.Counter(p.get("bs") for p in позиции if p.get("bk"))
+        for имя, значение in (("determined", sum(1 for p in позиции if p.get("bk"))),
+                              ("none", sum(1 for p in позиции if p.get("bw") == "нет")),
+                              ("disputed", sum(1 for p in позиции if p.get("bw") == "спорно")),
+                              ("codes", len({p.get("k") for p in позиции})),
+                              ("offers_coded", пересчёт["offers"])):
+            if т.счёт("n.totals", б.get(имя) != значение):
+                т.заметка(f"расходится totals.brand.{имя}")
+        if т.счёт("n.totals", (б.get("by") or {}) != {и: по_источнику[и] for и in crossref.ИСТОЧНИКИ_БРЕНДА}):
+            т.заметка("расходится totals.brand.by")
     т.счёт("n.empty", not позиции)
 
     # Компании.
@@ -1498,7 +1519,10 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
             т.счёт("n.co_oem_len", len(c["oem"]) > crossref.ОЕМ_НА_КОМПАНИЮ)
 
     # Позиции списка.
-    сколько_k = collections.Counter(p.get("k") for p in позиции)
+    # ПОЗИЦИЯ — ПАРА «БРЕНД + КОД» (crossref.ид_позиции): у кода, разбитого по
+    # брендам, строк списка несколько, и повтором считается повтор пары.
+    сколько_k = collections.Counter(crossref.ид_позиции(p) for p in позиции)
+    без_бренда_у_кода = collections.Counter(p.get("k") for p in позиции if not p.get("bk"))
     нбр = бренды_брендов(bv)
     карта = карта_брендов(словарь, bv)
     # Сутки запаса к дате сборки: КП из Китая «от сегодня» датировано завтра по UTC.
@@ -1513,9 +1537,22 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
         т.счёт("n.k_desc", (len(k) > 30 and bool(re.search(r"[а-я]", k))) or len(k) == 80)
         т.счёт("n.k_nodigit", not re.search(r"\d", k))
         т.счёт("n.k_short_num", bool(re.fullmatch(r"\d{1,3}", k)))
-        т.счёт("n.k_dup", сколько_k[k] > 1)
+        ид = crossref.ид_позиции(p)
+        т.счёт("n.k_dup", сколько_k[ид] > 1)
         т.счёт("n.k_bucket", p.get("b") != crossref.корзина(k)
-               or ((p.get("offers") or 0) >= 1 and k not in подробно))
+               or ((p.get("offers") or 0) >= 1 and ид not in подробно))
+        # Бренд пары: источник из закрытого списка, у пары без бренда — причина.
+        if p.get("bk"):
+            т.счёт("n.brand_src", not p.get("bn") or p.get("bs") not in crossref.ИСТОЧНИКИ_БРЕНДА
+                   or "bw" in p)
+            if p.get("bs") == "маска":
+                т.счёт("n.brand_mask", p["bk"] not in {м[0] for м in crossref.маска_кода(k)}
+                       and not any(норм(м[1]) == норм(p.get("bn")) for м in crossref.маска_кода(k)))
+        elif "bs" in p or "bw" in p or "bc" in p:
+            кандидаты = [c for c in p.get("bc") or [] if isinstance(c, list) and c]
+            т.счёт("n.brand_why", p.get("bw") not in crossref.ПРИЧИНЫ_БЕЗ_БРЕНДА or "bs" in p
+                   or (p.get("bw") == "спорно" and len(кандидаты) < 2))
+            т.счёт("n.brand_undet_dup", без_бренда_у_кода[k] > 1)
         n = p.get("n")
         if not т.счёт("n.n_empty", not n):
             if есть_правило_кода():
@@ -1567,8 +1604,13 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
             if len(r) > 4 and r[4] is not None:
                 dd = день(r[4])
                 т.счёт("n.e_date", dd is None or dd > будущее)
-        det = подробно.get(k) or {}
+        det = подробно.get(ид) or {}
         список = [o for o in det.get("list") or [] if isinstance(o, dict)]
+        # Свой бренд предложения (поле o, «с:ключ» или «к:ключ») — всегда бренд
+        # его пары: иначе в одной позиции лежат два бренда одного кода.
+        for o in список:
+            if isinstance(o.get("o"), str) and ":" in o["o"]:
+                т.счёт("n.pair_split", o["o"].split(":", 1)[1] != (p.get("bk") or ""))
         if p.get("cmp"):
             т.счёт("n.cmp_co", co < 2)
             if offers <= crossref.ПРЕДЛОЖЕНИЙ_НА_ПОЗИЦИЮ and det:
@@ -1713,7 +1755,7 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
             if m.get("makes"):
                 делает = str(m["makes"])
                 т.счёт("n.mk_note", len(делает) > 200 or bool(re.search(r"[.!?]\s+[А-ЯЁA-Z]", делает)))
-    строка_по_k = {p.get("k"): p for p in позиции}
+    строка_по_k = {crossref.ид_позиции(p): p for p in позиции}
     for k, det in подробно.items():
         p = строка_по_k.get(k)
         if p is None:
@@ -1725,8 +1767,9 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
         if det.get("makers"):
             т.счёт("n.mk_nocat", not p.get("cat"))
 
-    # Связи со страницей брендов.
-    ключи_позиций = set(строка_по_k)
+    # Связи со страницей брендов: страница ведёт по ключу КОДА (#k=), и адрес
+    # кода, разбитого на пары, открывает все его пары.
+    ключи_позиций = {p.get("k") for p in позиции}
     if isinstance(links, dict):
         for код in links.get("codes") or []:
             if isinstance(код, list) and код:
@@ -1743,28 +1786,35 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
             т.счёт("n.col_dead", sum(1 for p in позиции if p.get(поле)) < 0.05 * len(позиции))
 
     # Прошлый снимок — «у скольких стало хуже» поимённо, итог числом.
+    # ПО КОДУ, А НЕ ПО ПАРЕ: снимок до правила «бренд + код» знает код, а не
+    # пару, и сравнение по ключу пары объявило бы пропавшей каждую позицию с
+    # брендом. Пары кода складываются: код пропал — пропал весь; бренд, цена и
+    # количество — у кода в любой из пар; компании — у самой большой пары
+    # (разбиение, отнявшее выбор из двух компаний, — это «стало хуже»).
     if прошлые is not None:
-        было = {p.get("k"): p for p in _позиции_списка([прошлые.json(k) for k in crossref.КЛЮЧИ_СПИСКА])}
-        с_количеством_было = {k: sum(1 for o in v.get("list") or [] if isinstance(o, dict) and o.get("q") is not None)
-                              for k, v in _предложения(_корзины(прошлые)).items()}
-        с_количеством = {k: sum(1 for o in v.get("list") or [] if isinstance(o, dict) and o.get("q") is not None)
-                         for k, v in подробно.items()}
+        def по_коду(позиции_, корзины_) -> dict:
+            det_ = _предложения(корзины_)
+            out = {}
+            for p in позиции_:
+                к_ = p.get("k")
+                с = out.setdefault(к_, {"бренд": False, "цена": False, "co": 0, "q": 0})
+                с["бренд"] |= bool(p.get("bk") or p.get("brands") or p.get("oem_file") or p.get("oem_cat"))
+                с["цена"] |= any(isinstance(r, list) and len(r) > 2 and r[2] is not None for r in p.get("e") or [])
+                с["co"] = max(с["co"], p.get("co") or 0)
+                d_ = det_.get(crossref.ид_позиции(p)) or det_.get(к_) or {}
+                с["q"] += sum(1 for o in d_.get("list") or [] if isinstance(o, dict) and o.get("q") is not None)
+            return out
 
-        def бренд(p):
-            return bool(p.get("brands") or p.get("oem_file") or p.get("oem_cat"))
-
-        def цена(p):
-            return any(len(r) > 2 and r[2] is not None for r in p.get("e") or [])
-
+        было = по_коду(_позиции_списка([прошлые.json(k) for k in crossref.КЛЮЧИ_СПИСКА]), _корзины(прошлые))
+        стало = по_коду(позиции, корзины)
         for k, старая in было.items():
-            новая = строка_по_k.get(k)
+            новая = стало.get(k)
             if т.счёт("n.worse_lost", новая is None):
                 continue
-            т.счёт("n.worse_brand", бренд(старая) and not бренд(новая))
-            т.счёт("n.worse_price", цена(старая) and not цена(новая))
-            т.счёт("n.worse_co", (новая.get("co") or 0) < (старая.get("co") or 0))
-            if k in с_количеством_было:
-                т.счёт("n.worse_qty", с_количеством.get(k, 0) < с_количеством_было[k])
+            т.счёт("n.worse_brand", старая["бренд"] and not новая["бренд"])
+            т.счёт("n.worse_price", старая["цена"] and not новая["цена"])
+            т.счёт("n.worse_co", новая["co"] < старая["co"])
+            т.счёт("n.worse_qty", новая["q"] < старая["q"])
 
     # Польза.
     n = len(позиции)
@@ -1775,6 +1825,9 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
         def столбец(p):
             return правдоподобный_бренд(p.get("oem_cat")) or правдоподобный_бренд((p.get("oem_file") or [None])[0])
 
+        т.доля("u.brand", sum(1 for p in позиции if p.get("bk")), n)
+        т.доля("u.brand_guess", sum(1 for p in позиции if p.get("bk") and p.get("bs") == "маска"),
+               sum(1 for p in позиции if p.get("bk")))
         т.доля("u.brand_any", sum(1 for p in позиции if p.get("oem_cat") or p.get("oem_file")
                                   or p.get("brands")), n)
         т.доля("u.oem_cat", sum(1 for p in позиции if правдоподобный_бренд(p.get("oem_cat"))), n)
@@ -1813,7 +1866,8 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
         т.доля("u.cat_mfr", sum(1 for p in кат if any(isinstance(a, dict) and a.get("kind") == "номер изготовителя"
                                                     for a in p.get("alts") or [])), len(кат))
         т.доля("u.cat_models", sum(1 for p in кат if p.get("models")), len(кат))
-        т.доля("u.cat_makers", sum(1 for p in кат if (подробно.get(p.get("k")) or {}).get("makers")), len(кат))
+        т.доля("u.cat_makers", sum(1 for p in кат if (подробно.get(crossref.ид_позиции(p)) or {}).get("makers")),
+               len(кат))
         т.доля("u.col_models", sum(1 for p in позиции if p.get("models")), n)
         т.доля("u.col_alts", sum(1 for p in позиции if p.get("alts")), n)
         т.доля("u.n_key_cat", каталожных_с_другим_ключом, len(кат))

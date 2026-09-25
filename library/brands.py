@@ -300,6 +300,35 @@ select a.sp176_id, m.brand_key, min(a.spelling) as title
 """
 
 
+def читать_реестр(cur):
+    """Реестр брендов из базы (этап 8.2) либо None — тогда работаем по файлу.
+
+    None — и когда таблиц нет (миграция не применена), и когда они пусты
+    (засев не делался): пустой реестр оставил бы страницу без единого ключа,
+    а файл их даёт. Один читатель на публикаторы /brands и /nomenclature
+    (scripts/publish_brands.py, scripts/publish_crossref.py): разойдись они — и
+    бренд кода на двух страницах назывался бы по-разному."""
+    cur.execute(ЕСТЬ_РЕЕСТР_SQL)
+    if not cur.fetchone()[0]:
+        return None
+    cur.execute(РЕЕСТР_БРЕНДЫ_SQL)
+    бренды = cur.fetchall()
+    cur.execute(РЕЕСТР_НАПИСАНИЯ_SQL)
+    написания = cur.fetchall()
+    if not бренды or not написания:
+        return None
+    cur.execute(РЕЕСТР_КАРТОЧКА_SQL)
+    карточка, имена = {}, {}
+    for ид, ключ, название in cur.fetchall():
+        if ключ:
+            карточка[str(ид)] = ключ
+        if название:
+            имена[str(ид)] = название
+    return {"словарь": словарь_из_реестра(бренды, написания),
+            "карточка": карточка, "имена": имена,
+            "брендов": len(бренды), "написаний": len(написания)}
+
+
 def словарь_из_реестра(бренды, написания) -> dict:
     """Строки lib_brands и разрешённые lib_brand_alias → словарь той же формы,
     что dict/oem.json: {"records": [{oem_key, name, spellings[{spelling, where}]}]}.
