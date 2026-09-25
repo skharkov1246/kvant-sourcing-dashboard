@@ -118,6 +118,8 @@ def test_справочник_устроен_и_с_источниками():
         assert b["origin"] in ("западный", "китайский", "прочий"), b["brand_key"]
         assert re.fullmatch(r"[a-z0-9]+", b["brand_key"]), b["brand_key"]
         assert b["aliases"], b["brand_key"]
+        for поле in ("context_aliases", "field_aliases"):
+            assert all(isinstance(a, str) and a.strip() for a in b.get(поле, [])), (b["brand_key"], поле)
         for s in b["series"]:
             assert s["type"] in типы, s["id"]
             assert s["sources"] and all(u.startswith(("http://", "https://")) for u in s["sources"]), s["id"]
@@ -164,7 +166,14 @@ def test_обычный_русский_текст_без_ложных_модел
     for строка in ["Болт М12х40 ГОСТ 7798-70", "Кольцо уплотнительное 045-050-30",
                    "Подшипник 6205-2RS", "Сальник 35х52х7", "Шайба 12 оцинкованная",
                    "Труба 57х3,5 ст.20", "ТН ВЭД 8431 49 800 9", "Кабель ВВГнг 3х2,5",
-                   "Работы по договору № 12/2026 от 15.03.2026"]:
+                   "Работы по договору № 12/2026 от 15.03.2026",
+                   # приводы, КИП, уплотнения и редукторы — там, где заведены ряды
+                   # с короткими кодами (SK, CT, PV, 3051, 644, 3500/42)
+                   "Двигатель АИР132М4 У3", "Сталь СТ 20 лист", "Кран шаровой 11с67п Ду50",
+                   "Датчик давления Метран-150", "Редуктор Ч-100", "Насос ЦНС 180-1900",
+                   "Труба А175-М", "Преобразователь частоты 7,5 кВт", "Шланг РВД 3/4 3500/42",
+                   "Трансформатор ТМ 400/10", "Уплотнение торцевое 2Т-50", "Фильтр ФМ-009",
+                   "Клапан КТ 120", "Датчик 3051 мм", "Лента ПВ 046"]:
         assert ms.модель_в_тексте(строка, спр=с) == [], строка
 
 
@@ -187,7 +196,55 @@ def test_разведка_узнаётся_своим_брендом():
     assert всего and узнано / всего >= 0.85, (узнано, всего)
 
 
+def test_короткие_коды_только_рядом_с_брендом():
+    """Коды приводов, КИП и уплотнений без имени бренда не узнаются, с ним — узнаются."""
+    с = ms.справочник()
+    for строка, бренд in [("SK 9032.1", "nord"), ("R87", "seweurodrive"), ("3051", "rosemount"),
+                          ("CT 120", "hoerbiger"), ("PV046", "parkerhannifin"), ("3500/42M", "bentlynevada"),
+                          ("VF 49", "bonfiglioli"), ("W22", "weg"), ("P8", "wilden"), ("MSD", "sulzer")]:
+        assert ms.модель_в_тексте(строка, спр=с) == [], строка
+        assert [x[0] for x in ms.модель_в_тексте(строка, {бренд}, с)] == [бренд], строка
+
+
+def test_имя_бренда_в_строке_разрешает_код():
+    с = ms.справочник()
+    assert ms.модель_в_тексте("Мотор-редуктор NORD SK 9032.1", спр=с) == [("nord", "nord-sk", "SK9032.1")]
+    assert ms.модель_в_тексте("Клапан Hoerbiger CT 120", спр=с) == [("hoerbiger", "hoerbiger-valves", "CT120")]
+    assert ms.модель_в_тексте("Датчик Rosemount 3051S", спр=с) == [("rosemount", "rosemount-pressure", "3051S")]
+    # имя в поле изготовителя — только через field_aliases замера, в тексте NORD — контекст
+    assert ms.бренды_в_тексте("NORD SK 9032.1", с) == set()
+
+
 # ─── замер ───────────────────────────────────────────────────────────────────
+
+def test_свести_дубли_написаниями():
+    данные = json.loads(json.dumps(ВЫДУМАННЫЙ))
+    данные["brands"][0]["field_aliases"] = ["KLTN"]
+    данные["brands"][0]["aliases"].append("Kelton Werke")
+    с = ms.из_данных(данные)
+    карта = {"kltn": "kltn", "kltnwerk": "kltn", "keltonwerke": "keltonwerke",
+             "keltonwerkeгермания": "keltonwerkeгермания", "klt": "klt", "brisko": "brisko",
+             "прочее": "прочее"}
+    итог = bm.свести_дубли(карта, с)
+    # ключ реестра, равный написанию бренда, и все написания, ведущие к нему, — тот же бренд
+    assert итог["kltn"] == итог["kltnwerk"] == "kelton"
+    assert итог["keltonwerke"] == итог["keltonwerkeгермания"] == "kelton"
+    # context_aliases не сводят, чужое не трогается
+    assert итог["klt"] == "klt" and итог["brisko"] == "brisko" and итог["прочее"] == "прочее"
+    # написание, которое дают два бренда, не сводит ни к одному
+    данные["brands"][1]["aliases"].append("Kelton Werke")
+    итог = bm.свести_дубли({"keltonwerke": "keltonwerke"}, ms.из_данных(данные))
+    assert итог["keltonwerke"] == "keltonwerke"
+
+
+def test_дубли_замера_25_09_сведены():
+    """Ключи реестра из замера brand-models 25.09.2026 сводятся к брендам справочника."""
+    карта = {k: k for k in ("cat", "warman", "dresserrand", "getriebebaunordгермания", "parker")}
+    итог = {k: v for k, v in bm.свести_дубли(карта, ms.справочник()).items() if k in карта}
+    assert итог == {"cat": "caterpillar", "warman": "weir",
+                    "dresserrand": "siemensdemagdelavalturbomachinery",
+                    "getriebebaunordгермания": "nord", "parker": "parkerhannifin"}
+
 
 def test_учесть_пути_бренда_и_сделки():
     с = спр()
