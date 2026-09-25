@@ -48,6 +48,7 @@ from library import brands, codes_sql
     "Не применимо": "пометка незнания или стоп-слово",
     "Не указан": "пометка незнания или стоп-слово",
     "OEM p": "пометка незнания или стоп-слово",
+    "Original & New": "пометка незнания или стоп-слово",
     "турбина": "общее слово оборудования",
     "насос": "общее слово оборудования",
     "по чертежу заказчика": "указание к закупке",
@@ -56,7 +57,8 @@ from library import brands, codes_sql
 }
 МАРКИ = ["KLV", "Kalver", "Tamrin", "Kalver Original & New", "Brenno AG", "Brenno Energy AG", "Brenno",
          "Orla Flow", "Orlaflow Minerals", "Orla Flow International", "Orla Flow Germany & Co. KG",
-         "Zorvik", "Zorvik Original", "Zorvik, Inc", "Орла", "Насосмаш Выдуманный", "Прочие", "Вьетнам"]
+         "Zorvik", "Zorvik Original", "Zorvik, Inc", "Орла", "Насосмаш Выдуманный", "Прочие", "Вьетнам",
+         "KalverGroup,FINLAND", "Kalver Corporation", "Pelmar", "Pelmar, UNITED STATES OF AMERICA", "PelmarGroup"]
 
 
 def _корпус():
@@ -117,7 +119,8 @@ def test_дубли_одной_марки_одним_словом_с_суммо�
     по_ключу = {b["k"]: b for b in с["brands"]}
     kalver = _слово(с, "klv")
     assert set(kalver["m"]) == {codes_sql.ключ_написания(x)
-                                for x in ("KLV", "Kalver", "Tamrin", "Kalver Original & New")}
+                                for x in ("KLV", "Kalver", "Tamrin", "Kalver Original & New",
+                                          "KalverGroup,FINLAND", "Kalver Corporation")}
     assert kalver["name"] == "Kalver (Tamrin)"
     # Марка справочника рядов — словарное слово, хотя ни одного ключа словаря брендов у неё нет.
     assert kalver.get("d") == 1 and _слово(с, "zorvik").get("d") == 1
@@ -131,6 +134,16 @@ def test_дубли_одной_марки_одним_словом_с_суммо�
     for k in kalver["m"]:
         if k != kalver["k"]:
             assert по_ключу[k]["cg"] == kalver["k"]
+
+
+def test_хвост_страна_к_ключу_снимка_и_слитная_форма_только_по_словарю():
+    с = _сводка()
+    пелмар = _слово(с, "pelmar")
+    # «Pelmar, UNITED STATES OF AMERICA» — написание ключа pelmar (codes_sql.без_страны),
+    # хотя марки нет в словаре; слитное «PelmarGroup» словарём не доказано — своё слово.
+    assert set(пелмар["m"]) == {"pelmar", "pelmarunitedstatesofamerica"}
+    assert пелмар["name"] == "Pelmar" and not пелмар.get("d")
+    assert _слово(с, "pelmargroup")["k"] == "pelmargroup"
 
 
 def test_разные_записи_и_контекст_не_сливаются():
