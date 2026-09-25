@@ -654,6 +654,37 @@ const BRANDS_PARTS = 16;
 const BRANDS_PART_KEYS = Array.from({ length: BRANDS_PARTS },
   (_, i) => "brands:codes:" + String(i).padStart(2, "0"));
 
+// ВЛАДЕНИЕ БРЕНДА ДЛЯ КАРТОЧКИ /p — маленький ключ того же публикатора
+// (library/brands.КЛЮЧ_ВЛАДЕНИЯ): {ключ бренда: own} из dict/model_series.json.
+// Карточка бренда читает базу, а владения в базе нет; воркер подмешивает его в
+// ответ /api/portal/brand полем ownership. Нет ключа, битый, больше предела —
+// ответ прежний, без ошибки. Кэш в памяти изолята: ключ читает каждый запрос
+// карточки, а меняется он раз в сутки.
+const BRANDS_OWNERS_KEY = "brands:owners:v1";
+const BRANDS_OWNERS_MAX_BYTES = 256 * 1024;
+const BRANDS_OWNERS_TTL_MS = 5 * 60 * 1000;
+const BRANDS_OWNERS_FAIL_TTL_MS = 30 * 1000;
+const brandsOwnersCache = new WeakMap();
+
+async function readBrandsOwners(env) {
+  const kv = aclStore(env);
+  if (!kv || typeof kv !== "object") return null;
+  const now = Date.now();
+  const was = brandsOwnersCache.get(kv);
+  if (was && now - was.at < was.ttl) return was.map;
+  let map = null, ttl = BRANDS_OWNERS_TTL_MS;
+  try {
+    const raw = await kv.get(BRANDS_OWNERS_KEY);
+    if (typeof raw === "string" && new TextEncoder().encode(raw).byteLength <= BRANDS_OWNERS_MAX_BYTES) {
+      const value = JSON.parse(raw);
+      const b = value && value.version === 1 ? value.brands : null;
+      if (b && typeof b === "object" && !Array.isArray(b)) map = b;
+    }
+  } catch { map = null; ttl = BRANDS_OWNERS_FAIL_TTL_MS; }
+  brandsOwnersCache.set(kv, { at: now, ttl, map });
+  return map;
+}
+
 function suppliersRoute(path) {
   if (["/suppliers", "/suppliers/", "/suppliers.html"].includes(path)) return "page";
   if (path === "/api/suppliers") return "api";
@@ -1038,6 +1069,18 @@ const ПЕ_БРЕНД = ПС.o({ key: ПС.k(PORTAL_BRAND_KEY), name: ПС.s(120
 const ПЕ_КОМПАНИЯ = ПС.o({ id: ПС.k(PORTAL_SUP_ID), name: ПС.s(200), src: ПС.s(40), number: ПС.k(PORTAL_SUP_ID) });
 // Чем поставщик разведки сведён с компанией реестра (шаг 4, supplier_link_schema.sql):
 // только сильные ключи. Имя связью не бывает — такого значения схема не пропустит.
+// Владение бренда (library/brands.владение, поле own; ключ brands:owners:v1):
+// нынешний владелец, выше по цепочке, бывшие, бренды группы, ряды чужих марок.
+// c — ключ карточки бренда, src — источник связи (страница проверяет http(s)).
+const ПЕ_СВЯЗЬ_ВЛАДЕНИЯ = { name: ПС.s(200), c: ПС.k(PORTAL_BRAND_KEY), since: ПС.n, until: ПС.n, src: ПС.s(400) };
+const ПЕ_ВЛАДЕНИЕ = ПС.o({
+  o: ПС.o(ПЕ_СВЯЗЬ_ВЛАДЕНИЯ),
+  up: ПС.a(ПС.o({ name: ПС.s(200), c: ПС.k(PORTAL_BRAND_KEY) }), 10),
+  was: ПС.a(ПС.o(ПЕ_СВЯЗЬ_ВЛАДЕНИЯ), 20),
+  group: ПС.a(ПС.o({ name: ПС.s(200), c: ПС.k(PORTAL_BRAND_KEY), since: ПС.n, via: ПС.s(200) }), 300),
+  series: ПС.a(ПС.o({ series: ПС.s(120), brand: ПС.s(200), c: ПС.k(PORTAL_BRAND_KEY), since: ПС.n }), 100),
+  role: ПС.s(40),
+});
 const ПЕ_СВЕДЕНО = ПС.k(/^(инн|vat|домен сайта|домен почты)$/, 20);
 const ПЕ_МЕСЯЦ = ПС.k(/^[0-9]{4}-[0-9]{2}$/, 7);
 const ПЕ_ЧАСТИ = ПС.a(ПС.s(40), 10);
@@ -1216,6 +1259,10 @@ async function portalEntity(route, url, env, rights) {
     if (route === "portalBrand" && value.registry === false) return suppliersJson({ error: "brands_not_installed" }, 503);
     const card = portalClean(value, PORTAL_ENTITY_SPECS[route]);
     if (!card) return suppliersJson({ error: "entity_unavailable" }, 503);
+    if (route === "portalBrand") {
+      const own = await brandOwnership(env, card.key || v);
+      if (own) card.ownership = own;
+    }
     // Страховка, как у /api/crossref и /api/brands: поле из SUPPLIERS_FIELDS,
     // появись оно в схеме карточки, закроется правом, а не уйдёт как есть.
     return suppliersJson({ ...suppliersCut(card, rights),
@@ -1224,6 +1271,19 @@ async function portalEntity(route, url, env, rights) {
   } catch {
     return suppliersJson({ error: "entity_unavailable" }, 503);
   } finally { clearTimeout(timer); }
+}
+
+// Владение бренда из ключа brands:owners:v1 — закрытым списком полей, как
+// карточка. Нет ключа, нет бренда в нём, пустое владение — null, ответ прежний.
+async function brandOwnership(env, key) {
+  try {
+    const map = await readBrandsOwners(env);
+    if (!map || typeof key !== "string" || !Object.prototype.hasOwnProperty.call(map, key)) return null;
+    const own = portalClean(map[key], ПЕ_ВЛАДЕНИЕ);
+    if (!own) return null;
+    const есть = own.o || own.was.length || own.group.length || own.series.length;
+    return есть ? own : null;
+  } catch { return null; }
 }
 
 function suppliersJson(value, status = 200) {

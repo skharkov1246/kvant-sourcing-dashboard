@@ -6,7 +6,7 @@
 руками. Сборка — library/brands.py, запросы — library/codes_sql.py.
 
 КЛЮЧИ СВОИ И ЗАКРЫТЫМ СПИСКОМ: brands:v1, brands:links:v1, brands:pairs:v1,
-brands:codes:00…15
+brands:codes:00…15, brands:owners:v1
 (library/brands.ВСЕ_КЛЮЧИ). Клиент Cloudflare — публикатора поставщиков, как у
 publish_crossref.py: этот публикатор не может переписать ни suppliers:v1, ни
 crossref:v1, ни acl:v1.
@@ -190,8 +190,12 @@ def печать_итогов(снимки, размеры, предел):
               f" ({вселенная['total']}):")
         for п in вселенная["fields"]:
             print(f"  {п['label']:<42} {п['filled']:>6} из {п['total']:<6} {п['pct']:>5.1f} %  {п['status']}")
+    print(f"ключ владения {brands.КЛЮЧ_ВЛАДЕНИЯ}: брендов "
+          f"{len(снимки[brands.КЛЮЧ_ВЛАДЕНИЯ]['brands'])} (из карточек с полем own {в['cards']})")
     for ключ, n in размеры.items():
-        доля = n / предел
+        # Ключ владения читает каждый запрос карточки бренда на /p — предел свой.
+        свой = brands.ПРЕДЕЛ_ВЛАДЕНИЯ if ключ == brands.КЛЮЧ_ВЛАДЕНИЯ else предел
+        доля = n / свой
         print(f"размер {ключ}: {n} Б ({n / 1024 / 1024:.2f} МиБ, {100 * доля:.1f} % предела)")
         if доля > ЗАПАС:
             print(f"::warning::{ключ} занимает {100 * доля:.0f} % предела: запас меньше "
@@ -253,6 +257,7 @@ def main(argv=None):
         # РАЗМЕР — ГЕЙТ, А НЕ ПРИМЕЧАНИЕ: усечённая страница молча уносит часть
         # данных, отказ громче.
         ps.require(all(len(v) <= ps.MAX_BYTES for v in сырые.values()), "SNAPSHOT_TOO_LARGE")
+        ps.require(len(сырые[brands.КЛЮЧ_ВЛАДЕНИЯ]) <= brands.ПРЕДЕЛ_ВЛАДЕНИЯ, "SNAPSHOT_TOO_LARGE")
         ps.require(bool(снимки[brands.КЛЮЧ]["brands"]), "SNAPSHOT_EMPTY")
 
         if args.out:
@@ -272,10 +277,12 @@ def main(argv=None):
         # ПОРЯДОК ЗАПИСИ: корзины кодов, потом связи, сводка последней. Сводку
         # читают первой; пока она старая, страница не ведёт в корзины, которых
         # ещё нет, — а новые корзины со старыми ссылками совместимы.
-        for k in brands.КЛЮЧИ_КОРЗИН + (brands.КЛЮЧ_ПАР, brands.КЛЮЧ_СВЯЗЕЙ, brands.КЛЮЧ):
+        # Ключ владения от сводки не зависит: /p читает его сам по ключу бренда.
+        for k in brands.КЛЮЧИ_КОРЗИН + (brands.КЛЮЧ_ВЛАДЕНИЯ, brands.КЛЮЧ_ПАР,
+                                         brands.КЛЮЧ_СВЯЗЕЙ, brands.КЛЮЧ):
             cf.put(namespace, k, сырые[k])
         print(f"опубликовано в KV: {len(сырые)} ключей ({brands.КЛЮЧ}, {brands.КЛЮЧ_СВЯЗЕЙ}, "
-              f"{brands.КЛЮЧ_ПАР}, корзин кодов {brands.КОРЗИН})")
+              f"{brands.КЛЮЧ_ПАР}, {brands.КЛЮЧ_ВЛАДЕНИЯ}, корзин кодов {brands.КОРЗИН})")
         return 0
     except ps.PublishError as e:
         print(f"::error::публикация не состоялась: {e}")

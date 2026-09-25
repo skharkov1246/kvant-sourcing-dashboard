@@ -408,3 +408,62 @@ test("машина и узел: не нашлось и функции нет —
     assert.equal(response.status, 404, path);
   }
 });
+
+// Владение бренда (library/brands.КЛЮЧ_ВЛАДЕНИЯ): воркер подмешивает его в
+// карточку бренда из маленького ключа KV. Нет ключа, битый, не той версии —
+// ответ прежний, без ошибки; есть — поле ownership закрытым списком полей.
+test("карточка бренда: владение из brands:owners:v1, без ключа — ответ прежний", async () => {
+  const бренд = { key: "velmora", name: "Velmora Turbines", country: null, owner: null, former_names: null,
+    spellings: [], demand: { rows: 1, deals: 1, codes: 1, capped: false, registry_rows: 1 },
+    codes_demand: [], codes_offers: [], offers: { rows: 0, capped: false, suppliers: 0, rows_unresolved: 0 },
+    catalog: { parts: 0, list: [] }, machines: [], suppliers: [], analogs: [], registry: true, partial: [] };
+  const ИСТ = "https://example.invalid/deal";
+  const владение = { version: 1, published_at: "2026-09-25T00:00:00Z", brands: {
+    velmora: { o: { name: "Kordex", c: "kordex", since: 1994, src: ИСТ, emails: ["nobody@example.test"] },
+      up: [{ name: "Lumeq Group" }],
+      was: [{ name: "Stavin Holding", since: 1971, until: 1994, src: ИСТ }],
+      group: [{ name: "Pranto Pumps", c: "Не Ключ", since: 2011, via: "Lumeq Group" }],
+      series: [], note: "лишнее поле" },
+    ombra: { role: "владелец" } } };
+  const карточка = async (env, b = "velmora", ответ = бренд) => сетью(ответ, async () => {
+    const r = await call(env, "/api/portal/brand?b=" + b, READER);
+    assert.equal(r.status, 200);
+    return r.json();
+  });
+  const новая = () => envFor({ SUPABASE_SERVICE_KEY: "sb_secret_TESTKEYTESTKEY" });
+  const без = await карточка(новая());
+  assert.ok(!("ownership" in без));
+  // Битый ключ, чужая версия, больше предела — тот же прежний ответ, не 503.
+  for (const raw of ["{not json", JSON.stringify({ version: 2, brands: владение.brands }), "x".repeat(300 * 1024)]) {
+    const env = новая();
+    env.ACL.box.set("brands:owners:v1", raw);
+    assert.deepEqual(await карточка(env), без);
+  }
+  const env = новая();
+  env.ACL.box.set("brands:owners:v1", JSON.stringify(владение));
+  const с = await карточка(env);
+  const { ownership, ...остальное } = с;
+  assert.deepEqual(остальное, без);
+  assert.deepEqual(ownership.o, { name: "Kordex", c: "kordex", since: 1994, until: null, src: ИСТ });
+  assert.deepEqual(ownership.up, [{ name: "Lumeq Group", c: null }]);
+  assert.equal(ownership.was[0].until, 1994);
+  // Ключ карточки не того вида ссылкой не станет; лишние поля не идут.
+  assert.equal(ownership.group[0].c, null);
+  assert.equal(ownership.group[0].via, "Lumeq Group");
+  const текст = JSON.stringify(с);
+  for (const secret of ["nobody@example.test", "лишнее поле", "emails", "note"]) assert.ok(!текст.includes(secret), secret);
+  // Запись с одной пометкой role — не владение: поля нет.
+  const ombra = await карточка(env, "ombra", { ...бренд, key: "ombra", name: "Ombra" });
+  assert.ok(!("ownership" in ombra));
+  // Ключ читается из KV один раз и дальше берётся из памяти изолята.
+  let чтений = 0;
+  const get = env.ACL.get;
+  env.ACL.get = async (key, o) => { if (key === "brands:owners:v1") чтений++; return get(key, o); };
+  await карточка(env);
+  assert.equal(чтений, 0);
+  // Владение — только у карточки бренда: карточка кода ключа не касается.
+  await сетью(КОД, async () => {
+    const v = await (await call(env, "/api/portal/code?k=kl7", READER)).json();
+    assert.ok(!("ownership" in v));
+  });
+});
