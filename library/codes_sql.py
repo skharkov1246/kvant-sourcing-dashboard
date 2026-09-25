@@ -38,7 +38,7 @@ import inspect
 import re
 from pathlib import Path
 
-from library import company_names, doc_folder, doc_side, docfilter, equipment, quotes
+from library import company_names, doc_folder, doc_side, docfilter, equipment, materials, quotes
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -274,6 +274,10 @@ SPLIT_RE = r"\s*[,;/()\[\]]\s*|\s+(и|или|or)\s+"
 # Короткие имена, которые правило «не короче трёх знаков» и «без цифр» иначе
 # выбросило бы. Защищать можно щедро (правило 7): ошибочная защита видна числом.
 WHITELIST = ["ge", "3m"]
+# МАТЕРИАЛ — НЕ БРЕНД. «Viton», «PTFE», «фторопласт», «Inconel» в колонке
+# изготовителя — материал позиции, а не марка (справочник dict/material.json,
+# library/materials.py). Закрытый список ключей; бренд словаря сильнее пометки.
+MATERIAL_KEYS = list(materials.ключи_не_бренда())
 
 # ГРАНИЦА СЛОВА ЗАДАНА ЯВНО, а не «\\m…\\M». У PostgreSQL слово по \\m — любая
 # буква или цифра ПО ЛОКАЛИ базы: украинская «і», знак ударения, «½» — и Python
@@ -393,6 +397,8 @@ def brand_pipeline(judged_cols: str = "c.*, tj.brand_key, tj.brand_name") -> str
              when n.t = any({arr(COUNTRIES)}) then 'страна'
              when n.t ~* {q(NOT_A_COMPANY)}
                then 'указание к закупке'
+             when bm.oem_key is null and n.brand_key = any({arr(MATERIAL_KEYS)})
+               then 'материал, а не бренд'
              when n.brand_key = any(array[{", ".join(q(w) for w in WHITELIST)}]) then null
              when length(n.brand_key) < 3 then 'короче трёх знаков'
              when n.t !~ '[a-zа-я]{{3}}' then 'нет трёх букв подряд'

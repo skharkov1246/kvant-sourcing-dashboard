@@ -204,6 +204,7 @@ class План:
     oem_kind.НОМЕР: "dict/oem.json: номер детали, а не бренд",
     oem_kind.НЕСКОЛЬКО: "dict/oem.json: несколько брендов в одной записи",
     oem_kind.ОПИСАНИЕ: "dict/oem.json: бренд с пояснением",
+    oem_kind.МАТЕРИАЛ: "dict/oem.json: материал, а не бренд (dict/material.json)",
 }
 
 
