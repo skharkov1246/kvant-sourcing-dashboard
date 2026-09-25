@@ -1,0 +1,1069 @@
+{
+  "oem_key": "mwmcaterpillarenergy",
+  "name": "MWM (Caterpillar Energy Solutions)",
+  "segment_focus": "TCG 3016, TCG 2020, TCG 2032, TCG 3020: перечни ТО по наработке, свечи с форкамерой, фильтры, уплотнения, турбокомпрессоры и генераторы; сверить с разведкой caterpillar (серия CG)",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по открытым источникам: газовые двигатели и генераторные установки MWM (Caterpillar Energy Solutions, Мангейм) серий TCG 3016, TCG 2020, TCG 2032/2032B, TCG 3020, а также TCG 4170 и прежняя TCG 2016. Всего 15 машин и исполнений. Главный источник — сам mwm.net: страницы серий с таблицами интервалов ТО (первый сервис E10 после пуска, замена свечей, осмотр ГБЦ, капремонт через 48–80 тыс. ч в зависимости от газа), состав комплектов ТО E40/E40+ и открытая таблица ходовых оригинальных запчастей. Из этой таблицы взяты 26 из 40 кодов: воздушные и масляные фильтры, свечи с форкамерой по сериям (TCG 3016 — 12344841, TCG 2020 — 12453572/12453385, TCG 3020 — 12372401, TCG 2032 — 12286034/12453574), поршни, шатуны, вкладыши, толкатели, седло клапана, термопара. Остальные 14 кодов взяты у продавцов: «Газмоторсервис» (фильтры, уплотнения и датчики TCG 2032/2020, актуатор HEINZMANN), energyassistance.ru (элементы UPF, прокладка ГБЦ), iggnita (воздушный фильтр TCG 3016), PowerUP (номера MWM с изготовителем позиции) и руководство MOTORTECH (катушка зажигания 1215 3965 = ALTRONIC 501061). Официальный бюллетень 2105/28 по маслу (TCG 2016/3016/2020/3020/2032/2032B) требует менять масляные фильтры не позже 4 000 ч и не реже раза в год. Кто делает узлы: турбокомпрессор A140 (Accelleron/ABB — по обозначению) на TCG 2032B и TCR 16 (MAN — по обозначению) на TCG 2020; система управления TEM Evo — AVAT (пресс-релиз MWM); зажигание — ALTRONIC, актуаторы — HEINZMANN; у продавца аналогов PowerUP изготовителями позиций названы MAHLE (поршни), KS Gleitlager (вкладыши), Federal-Mogul (клапаны), Hasse & Wrede (демпфер) и MANN+HUMMEL (масляный фильтр); генераторы Marelli и AVK известны по объявлениям. Дилеры: официальная сеть MWM — MWM Austria (Восточная Европа и Центральная Азия, филиал в Алматы с 2024 г.; Россия и Беларусь в зону не входят), MWM China (Пекин, Шанхай), MWM Region Middle East/India; дистрибьюторы по пресс-релизам MWM — İltekno (Турция, Узбекистан), Green Power International (Индия), Kaltimex (Бангладеш); MKC Group (ОАЭ, Россия) заявляет о статусе дилера сама. Сверка с разведкой caterpillar (CG132/CG170/CG260 = TCG 2016/2020/2032): коды 12409797, 12453572 и 12453562 подтверждены изготовителем. Свеча 12285295 из комплекта CG260 в текущем перечне MWM не значится, масляные фильтры TCG 2032 по разным источникам расходятся.",
+  "machines": [
+    {
+      "model": "TCG 3016 V08",
+      "kind": "газовый двигатель / генераторная установка (когенерация)",
+      "segment": "ГПУ",
+      "rating": "400 кВт эл. (50 и 60 Гц), КПД эл. до 43,1 %; 8 цил., 132/160 мм, 17,5 л, 1500/1800 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3016/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 3016 V12",
+      "kind": "газовый двигатель / генераторная установка (когенерация)",
+      "segment": "ГПУ",
+      "rating": "600 кВт эл., КПД эл. до 43,4 %; 26,3 л",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3016/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 3016 V16",
+      "kind": "газовый двигатель / генераторная установка (когенерация)",
+      "segment": "ГПУ",
+      "rating": "800 кВт эл., КПД эл. до 43,6 %; 35,0 л",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3016/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 3016 V16 S (High Density)",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1 000 кВт эл. (50 Гц), КПД эл. 41,5 % с набором 25H2",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3016/",
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3016-v16/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 3020 V12",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1 380 кВт эл. (50 Гц), КПД эл. до 45 %; 170/195 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3020-v20/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 3020 V16",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1 840 кВт эл. (50 Гц), КПД эл. до 44,7 %",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3020-v20/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 3020 V20",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "2 000–2 300 кВт эл. (50 и 60 Гц); исполнение Z — для пропана",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3020-v20/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2020 V12 (в т. ч. K, R, RW, X, XW) — основа Cat CG170-12",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1 000–1 200 кВт эл.; 170/195 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2020 V16 (в т. ч. V16 K) — основа Cat CG170-16",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1 415 кВт (V16 K для Азиатско-Тихоокеанского региона и Бангладеш) – 1 560 кВт эл.",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2020 V20",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "2 000 кВт / 2 500 кВА, 50 Гц (по объявлению о продаже трёх установок 2014 г.)",
+      "status": "в текущем ряду на mwm.net нет (страница TCG 2020 показывает только V12 и V16); в эксплуатации, запчасти продаются (2G, energyassistance.ru)",
+      "sources": [
+        "https://www.impcorporation.com/en-gb/inventory/details/28318/2014-mwm-tcg2020v20-generator-set",
+        "https://shop.2-g.com/us/avusjenbachermwm/filters/air-filters/421/air-filter-element-tcg2020-v20-requires-4-filters-at-each-change"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2032 V12 — основа Cat CG260-12",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "3 333 кВт эл. (50 Гц), 3 000 кВт (60 Гц); 260/320 мм; для биогаза не поставляется",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2032/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2032 V16 — основа Cat CG260-16",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "4 300 кВт эл. (50 Гц), 4 000 кВт (60 Гц)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2032/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2032B V16",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "4 500 кВт эл. (50 Гц), 4 050 кВт (60 Гц); турбокомпрессор высокого давления A140; опция быстрого набора нагрузки",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2032/",
+        "https://www.mwm.net/files/upload/mwm/issuu/CES24019-Update-Produktbroschuere-TCG-2032B_210x297mm_EN_1_0_RZ_sm_screen.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 4170 V20",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "2 500 кВт эл., КПД эл. до 46 %; новая система управления TCS",
+      "status": "выпускается (50 Гц; исполнение 60 Гц заявлено на 2026 г.)",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-4170/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2016 (V08, V12, V16) — основа Cat CG132",
+      "kind": "газовый двигатель / генераторная установка",
+      "segment": "ГПУ",
+      "rating": "400–800 кВт эл.",
+      "status": "страница на mwm.net сохранилась, но в меню модельного ряда серии нет (вывод: сменена TCG 3016); запчасти в официальном перечне MWM есть",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2016/",
+        "https://www.mwm.net/en/services/parts-logistics/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Specifications and Service Intervals – MWM Gas Engine TCG 3016 (таблица интервалов ТО: первый сервис E10 — 2 000 ч, замена свечей — 4 000 ч, осмотр ГБЦ — до 40 000 ч, капремонт — 80 000 ч на природном газе; для неочищенного биогаза 1 500 / 3 000 / 24 000 / 48 000 ч)",
+      "machine": "TCG 3016",
+      "kind": "перечень ТО по наработке (раздел страницы изготовителя)",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3016/"
+      ]
+    },
+    {
+      "title": "Specifications and Service Intervals – MWM Gas Engine TCG 2020 / TCG 2020 K (первый сервис 4 000 ч, осмотр ГБЦ 32 000 ч, капремонт 64 000 ч; для V12 RW/XW на природном газе — 40 000 и 80 000 ч; для неочищенного биогаза 2 000 / 16 000 / 64 000 ч)",
+      "machine": "TCG 2020 V12, V16, V12 K, V16 K",
+      "kind": "перечень ТО по наработке (раздел страницы изготовителя)",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/"
+      ]
+    },
+    {
+      "title": "Specifications and Service Intervals – MWM Gas Engine TCG 2032 (первый сервис 4 000 ч, очистка охладителя смеси 20 000 ч, осмотр ГБЦ 40 000 ч, капремонт 80 000 ч)",
+      "machine": "TCG 2032, TCG 2032B",
+      "kind": "перечень ТО по наработке (раздел страницы изготовителя)",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2032/"
+      ]
+    },
+    {
+      "title": "Specifications and Service Intervals – MWM Gas Engine TCG 3020 (высокое качество газа: 4 000 / 40 000 / 80 000 ч; среднее: 4 000 / 32 000 / 64 000 ч; низкое — биогаз, свалочный, канализационный: 3 000 / 24 000 / 48 000 ч)",
+      "machine": "TCG 3020",
+      "kind": "перечень ТО по наработке (раздел страницы изготовителя)",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3020-v20/"
+      ]
+    },
+    {
+      "title": "Original MWM E40 and E40+ Maintenance Bundles — состав комплектов ТО E40 по сериям и числу цилиндров (уплотнения, масляный фильтр, фильтрующие патроны, воздушный фильтр, свечи с форкамерой, прокладки; E40+ — для TCG 2032); номеров позиций на странице нет",
+      "machine": "TCG 2016, TCG 2020, TCG 3016, TCG 2032",
+      "kind": "перечень комплекта ТО",
+      "sources": [
+        "https://www.mwm.net/en/services/parts-logistics/original-mwm-service-kit-e40-and-e40/"
+      ]
+    },
+    {
+      "title": "Original Spare Parts for Your MWM Gas Engines & Gensets — открытая таблица ходовых оригинальных запчастей с номерами и применимостью (фильтры, свечи, поршни, шатуны, вкладыши, гильзы, прокладки, термопара, толкатели)",
+      "machine": "TCG 2016, TCG 2020, TCG 2032, TCG 3016, TCG 3020 и прежние TBG/TBD",
+      "kind": "parts list (выборочный каталог изготовителя)",
+      "sources": [
+        "https://www.mwm.net/en/services/parts-logistics/"
+      ]
+    },
+    {
+      "title": "Technical Bulletin 2105/28 EN «Specification for lube oil» (заменяет 2105/27; от 2024-04-15): выбор, анализ и замена масла, замена масляных фильтров не позже 4 000 ч и не реже раза в год, перечни одобренных масел по сериям",
+      "doc_no": "TR 0199-99-2105/28 (в документе — 2105/28 EN)",
+      "machine": "TCG 2016, TCG 3016, TCG 2020, TCG 3020, TCG 2032, TCG 2032B",
+      "kind": "бюллетень (технический циркуляр)",
+      "sources": [
+        "https://www.mwm.net/files/upload/mwm/TR2105-28_en.pdf"
+      ]
+    },
+    {
+      "title": "MOTORTECH Application Guide MWM/DEUTZ Gas Engines — перекрёстные номера MWM/DEUTZ, ALTRONIC, CHAMPION, BERU и MOTORTECH по катушкам, проводам, свечам, датчикам, термопарам, шинам проводки",
+      "doc_no": "01.00.013-EN, 2023-06",
+      "machine": "TCG 2016, TCG 2020, TCG 2032 и прежние серии G/TBG",
+      "kind": "parts manual стороннего поставщика аналогов",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-MWM-DEUTZ-Gas-Engines-01.00.013-EN-2023-06.pdf"
+      ]
+    },
+    {
+      "title": "MOTORTECH Sales & Service Bulletin 2020-07: новые шины проводки зажигания для MWM TCG 2016 и TCG 2020",
+      "doc_no": "2020-07",
+      "machine": "TCG 2016, TCG 2020",
+      "kind": "бюллетень стороннего поставщика аналогов",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/salesandservicebulletins/MOTORTECH-Bulletin-2020-07-NPrd-Wiring-Rails-MWM-TCG2016-TCG2020-Series-EN.pdf"
+      ]
+    },
+    {
+      "title": "Продуктовые брошюры MWM: TCG 3016 (CES24031), TCG 2020 (CES23007), TCG 2032B (CES24019), TCG 3020 (CES24005) — техданные, конструктивные изменения (турбокомпрессор A140 у TCG 2032B, водоохлаждаемый турбокомпрессор у TCG 3016)",
+      "doc_no": "CES24031, CES23007, CES24019, CES24005",
+      "machine": "TCG 3016, TCG 2020, TCG 2032B, TCG 3020",
+      "kind": "брошюра изготовителя",
+      "sources": [
+        "https://www.mwm.net/files/upload/mwm/issuu/CES24031-Update-Produktbroschuere-TCG-3016_210x297mm_EN_1_0_RZ_RZ_sm_screen.pdf",
+        "https://www.mwm.net/files/upload/mwm/issuu/CES23007-Update-Produktbroschuere-TCG-2020_210x297mm_EN_2_0_RZ_sm_screen.pdf",
+        "https://www.mwm.net/files/upload/mwm/issuu/CES24019-Update-Produktbroschuere-TCG-2032B_210x297mm_EN_1_0_RZ_sm_screen.pdf",
+        "https://www.mwm.net/files/upload/mwm/issuu/CES24005-Update-Produktbroschuere-TCG-3020_210x297mm_EN_10_0_RZ_sm_screen_einzel.pdf"
+      ]
+    },
+    {
+      "title": "MWM 25H2-Kit — вкладыши о наборах для работы с примесью водорода до 25 % (модернизация действующих установок)",
+      "doc_no": "CES23041 (TCG 3016), CES24008 (TCG 2032), CES23046 (TCG 3020)",
+      "machine": "TCG 3016, TCG 2032, TCG 3020",
+      "kind": "бюллетень по модернизации (брошюра)",
+      "sources": [
+        "https://www.mwm.net/files/upload/mwm/issuu/CES23041-Einleger_25H2-Kit-TCG-3016_EN.pdf",
+        "https://www.mwm.net/files/upload/mwm/issuu/CES24008-Einleger-25H2-Kit_TCG-2032-Broschuere_EN.pdf",
+        "https://www.mwm.net/files/upload/mwm/issuu/CES23046-Einleger_25H2-Kit-fuer-TCG-3020_208x297mm_EN_3_001_RZ_ue_screen.pdf"
+      ]
+    },
+    {
+      "title": "MWM Service Tutorials «Do it the smart way», эпизоды 1–10: замена свечей, регулировка зазоров клапанов, проверка TPEM, замена масла, проверка осадки клапанов, замена датчика температуры камеры сгорания, замер выбросов, замена фильтра UPF, детонация",
+      "machine": "газовые двигатели MWM (серии не разделены)",
+      "kind": "видеоинструкции по ТО",
+      "sources": [
+        "https://www.mwm.net/en/services/parts-logistics/original-mwm-service-kit-e40-and-e40/",
+        "https://www.mwm.net/en/news/news-releases/mwm-service-tutorial-series-do-it-the-smart-way-episode-9-demonstrates-the-chnaging-of-the-upf-filter/"
+      ]
+    },
+    {
+      "title": "MWM Service — сегментная брошюра о сервисе (сервисные договоры, X-Change, логистический центр запчастей в Лорше)",
+      "machine": "газовые двигатели MWM",
+      "kind": "брошюра изготовителя (сервис)",
+      "sources": [
+        "https://www.mwm.net/files/upload/mwm/issuu/mwm_segmentbrochure_service_en.pdf"
+      ]
+    },
+    {
+      "title": "04.01.01 TCG 2020 V16 K, Maintenance Schedule, High Gas Quality — найден только заголовок в выдаче поиска (scribd); текст закрыт",
+      "doc_no": "0299 9504",
+      "machine": "TCG 2020 V16 K",
+      "kind": "перечень ТО по наработке (maintenance schedule)",
+      "sources": [
+        "https://www.scribd.com/document/816726528/04-01-01-TCG-2020-V16-K-Maintenance-Schedule-High-Gas-Quality-0299-9504-en"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "12409722",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Вставка воздушного фильтра (Air Cleaner Insert)",
+      "machine": "TCG 2020, TCG 2032 (также TBG 620)",
+      "unit": "система впуска воздуха",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12409722 Air Cleaner Insert TCG 2020, TCG 2032, TBG 620"
+    },
+    {
+      "code": "12409797",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Вставка воздушного фильтра (Air Cleaner Insert); тот же номер в комплекте ТО E40 CG260-16 у iggnita (разведка caterpillar). Применимость к TCG 2020 и TCG 2032 подтверждена таблицей изготовителя; модели Cat в строке MWM не названы — соответствие CG170/CG260 наше (по карточкам cat.com в разведке caterpillar)",
+      "machine": "TCG 2020, TCG 2032 / Cat CG170, CG260 (соответствие Cat — наше сопоставление серий, в строке MWM не названо)",
+      "unit": "система впуска воздуха",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12409797 Air Cleaner Insert TCG 2020, TCG 2032"
+    },
+    {
+      "code": "12189925",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Фильтрующий патрон (Filter Cartridge); у 2G описан как воздушный фильтр 2016 V08/V12, 2020 V12/V16, у energyassistance.ru — как воздушный фильтр TCG 2016, TCG 2020 V12. В таблице изготовителя прямо назван CG170",
+      "machine": "TCG 2016, TCG 2020 / Cat CG170",
+      "unit": "система впуска воздуха",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12189925 Filter Cartridge TCG 2016, TCG 2020, CG170, TBD 616, TBG 620"
+    },
+    {
+      "code": "12345869",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Фильтрующий патрон (Filter Cartridge) TCG 3016; вид фильтра в таблице не назван (в комплекте E40 TCG 3016 есть воздушный фильтр — сопоставление не проверено)",
+      "machine": "TCG 3016",
+      "unit": "фильтрация (вид не указан)",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12345869 Filter Cartridge TCG 3016"
+    },
+    {
+      "code": "12344436",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Воздушный фильтр, оригинал (по данным продавца iggnita, Стамбул)",
+      "machine": "TCG 3016",
+      "unit": "система впуска воздуха",
+      "doc_ref": "карточка продавца iggnita; поле «Engine Models: MWM, MWM TCG 3016»",
+      "source_url": "https://iggnita.com/en/urun/hava-filtresi-mwm-12344436-orijinal/",
+      "quote": "Air Filter MWM 12344436 Original"
+    },
+    {
+      "code": "12128936",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Масляный фильтр (Lubrication Oil Filter); у Газмоторсервиса — в комплектах E10/E40 TCG 2016 и TCG 2020",
+      "machine": "TCG 2020 (также TCG 2016, TBG 616/620)",
+      "unit": "система смазки",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12128936 Lubrication Oil Filter TCG 2020, G 604"
+    },
+    {
+      "code": "12343764",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Масляный фильтр (Lubrication Oil Filter, навинчиваемый); продавец аналогов PowerUP указывает изготовителем своей позиции с этим Ref.-No. Mann & Hummel",
+      "machine": "TCG 3016, TCG 2020",
+      "unit": "система смазки",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12343764 Lubrication Oil Filter TCG 2020, TCG 3016"
+    },
+    {
+      "code": "12343763",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Масляный фильтр (Lubrication Oil Filter)",
+      "machine": "TCG 3016",
+      "unit": "система смазки",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12343763 Lubrication Oil Filter TCG 3016"
+    },
+    {
+      "code": "12284353",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца",
+      "description": "Масляный фильтр в комплектах E10/E40 (вторым номером продавец даёт 12380073); в разведке caterpillar у CG260 указан другой элемент — 12284663, соотношение не выяснено",
+      "machine": "TCG 2032 (TBG 632)",
+      "unit": "система смазки",
+      "doc_ref": "перечень комплектов E10/E40 TBG632/TCG2032 у ООО «Газмоторсервис»",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml",
+      "quote": "масляные фильтры 12284353, 12380073, фильтры тонкой очистки 12217382"
+    },
+    {
+      "code": "12217382",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца",
+      "description": "Фильтр тонкой очистки масла (по бюллетеню MWM 2105/28 у TCG 2032/2032B есть частичнопоточный масляный фильтр — сопоставление наше)",
+      "machine": "TCG 2032 (TBG 632)",
+      "unit": "система смазки",
+      "doc_ref": "перечень комплектов E10/E40 TBG632/TCG2032 у ООО «Газмоторсервис»",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml",
+      "quote": "фильтры тонкой очистки 12217382"
+    },
+    {
+      "code": "12466712",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца",
+      "description": "Внутренний элемент маслоотделителя вентиляции картера (UPF), ступень 1; продавец даёт ссылку на UT99",
+      "machine": "TCG 2020 V16/V20 / Cat CG170-16/20",
+      "unit": "вентиляция картера",
+      "doc_ref": "карточка energyassistance.ru",
+      "source_url": "https://www.energyassistance.ru/en/filters/6-filter-mwm-12466712-inside-oil-mist-separator-filter-stage1.html",
+      "quote": "Filter UPF 12466712 inside (oil mist separator) filter stage"
+    },
+    {
+      "code": "12466713",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца",
+      "description": "Наружный элемент маслоотделителя вентиляции картера (UPF), ступень 2; продавец даёт ссылку на UT99",
+      "machine": "TCG 2020 V16/V20 / Cat CG170-16/20",
+      "unit": "вентиляция картера",
+      "doc_ref": "карточка energyassistance.ru",
+      "source_url": "https://www.energyassistance.ru/en/filters/8-filter-upf-12466713-outside-oil-mist-separator-filter-stage-2.html",
+      "quote": "OE Deutz MWM 12466713, 1246-6713, 1246 6713, UT99 Crank Case ventilation Filter"
+    },
+    {
+      "code": "12032892",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Прокладка (Gasket); по данным energyassistance.ru и Газмоторсервиса — прокладка крышки ГБЦ (клапанной крышки) 180×260 мм, входит в комплекты E10/E40 TCG 2020",
+      "machine": "TCG 2016, TCG 2020, TCG 3016, TCG 3020",
+      "unit": "ГБЦ, уплотнения",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12032892 Gasket TCG 2016, TCG 2020, TCG 3016, TCG 3020"
+    },
+    {
+      "code": "12280251",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца",
+      "description": "Уплотнение крышки ГБЦ (в комплектах E10/E40)",
+      "machine": "TCG 2032 (TBG 632)",
+      "unit": "ГБЦ, уплотнения",
+      "doc_ref": "перечень комплектов E10/E40 TBG632/TCG2032 у ООО «Газмоторсервис»",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml",
+      "quote": "Уплотнения 01181871 (01153892), 12280251 под крышки ГБЦ"
+    },
+    {
+      "code": "02931161",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Комплект прокладок (Gasket Set)",
+      "machine": "TCG 2020, TCG 3020",
+      "unit": "уплотнения",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "02931161 Gasket Set TCG 2020, TCG 3020, TBG 620"
+    },
+    {
+      "code": "01183301",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Уплотнительное кольцо (O-Ring); у energyassistance.ru — O-seal для TCG 2020",
+      "machine": "TCG 2020, TCG 3020",
+      "unit": "уплотнения",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "01183301 O-Ring TCG 2020, TCG 3020, TBD 620, TBG 620"
+    },
+    {
+      "code": "12452033",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца",
+      "description": "Прокладка головки цилиндров, оригинал",
+      "machine": "TCG 2020",
+      "unit": "ГБЦ, уплотнения",
+      "doc_ref": "карточка energyassistance.ru",
+      "source_url": "https://www.energyassistance.ru/en/gaskets/17-cylinder-head-gasket-mwm-12452033-original-for-tcg-2020.html",
+      "quote": "Cylinder head gasket MWM 12452033 original for TCG 2020"
+    },
+    {
+      "code": "12300136",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Провод (наконечник) свечи зажигания (Ignition Cable); в руководстве MOTORTECH ему соответствует аналог 06.85.179-20 (MWM 1230 0136), у PowerUP — «Spark plug connector TCG2020/3020/CG170»",
+      "machine": "TCG 2020 (по PowerUP также TCG 3020, CG170)",
+      "unit": "система зажигания",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12300136 Ignition Cable TCG 2020, TBD 604, TBD 620, TBG 604, TBG 620"
+    },
+    {
+      "code": "1215 3965",
+      "issuer": "MWM / DEUTZ (номер изготовителя двигателя; аналоги — MOTORTECH 06.50.055 и ALTRONIC 501061)",
+      "description": "Катушка зажигания ALTRONIC-типа (минус на массе) для контроллеров DISN и TEM-ZS",
+      "machine": "TCG 2016, TCG 2020, TCG 2032 (также TBG 616/620/632)",
+      "unit": "система зажигания",
+      "doc_ref": "MOTORTECH Application Guide MWM/DEUTZ Gas Engines 01.00.013-EN (2023-06), раздел Ignition Coils",
+      "source_url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-MWM-DEUTZ-Gas-Engines-01.00.013-EN-2023-06.pdf",
+      "quote": "P/N 06.50.055 MWM®/DEUTZ® P/N 1215 3965"
+    },
+    {
+      "code": "12344841",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой (Prechamber Spark Plug)",
+      "machine": "TCG 3016",
+      "unit": "система зажигания",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12344841 Prechamber Spark Plug TCG 3016"
+    },
+    {
+      "code": "12453385",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой (Prechamber Spark Plug)",
+      "machine": "TCG 2020",
+      "unit": "система зажигания",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12453385 Prechamber Spark Plug TCG 2020"
+    },
+    {
+      "code": "12453572",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой (Prechamber Spark Plug); у 2G — «Prechamber Spark Plug (8 hole) TCG 2020 (All) NG or BG», перекрёстная ссылка «Caterpillar/MWM: 12453572»; совпадает с разведкой caterpillar (CG170)",
+      "machine": "TCG 2020 / Cat CG170 (соответствие Cat — по разведке caterpillar, в строке MWM не названо)",
+      "unit": "система зажигания",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12453572 Prechamber Spark Plug TCG 2020"
+    },
+    {
+      "code": "12372401",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой (Prechamber Spark Plug)",
+      "machine": "TCG 3020",
+      "unit": "система зажигания",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12372401 Prechamber Spark Plug TCG 3020"
+    },
+    {
+      "code": "12286034",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой (Prechamber Spark Plug). В комплекте ТО E40 CG260-16 у iggnita (разведка caterpillar) стоит 12285295 — в текущем перечне mwm.net его нет; что 12286034 его заменяет, есть только в выдаче поиска и не подтверждено: страница AP Service & Parts не отдала содержимого",
+      "machine": "TCG 2032 / Cat CG260 (соответствие Cat — наше сопоставление серий, в строке MWM не названо)",
+      "unit": "система зажигания",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12286034 Prechamber Spark Plug TCG 2032"
+    },
+    {
+      "code": "12453574",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания с форкамерой (Prechamber Spark Plug)",
+      "machine": "TCG 2032 (также TBG 632)",
+      "unit": "система зажигания",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12453574 Prechamber Spark Plug TCG 2032, TBG 632"
+    },
+    {
+      "code": "12420480",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Свеча зажигания (Spark Plug) без форкамеры; в руководстве MOTORTECH номеру MWM 1242 0480 соответствует свеча BERU 18GZ5-77-2 (M18x1,5)",
+      "machine": "TCG 2016, TCG 2020 (также TBG 616)",
+      "unit": "система зажигания",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12420480 Spark Plug TCG 2016, TCG 2020, TBG 616"
+    },
+    {
+      "code": "12323810",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Термопара (Thermocouple), у Газмоторсервиса — датчик температуры в камере сгорания; MOTORTECH продаёт её под тем же номером (P/N 1232 3810, тип K)",
+      "machine": "TCG 2016, TCG 2020 (с системой TEM)",
+      "unit": "система контроля (температура камеры сгорания)",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12323810 Thermocouple TCG 2016, TCG 2020 (with TEM), TBG 616, TBG 620"
+    },
+    {
+      "code": "12323882",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца",
+      "description": "Датчик детонации; в скобках у продавца — 12298112 (что это прежний номер — наше толкование)",
+      "machine": "TCG 2020 (TBG 620), TCG 2032 (TBG 632)",
+      "unit": "система контроля (детонация)",
+      "doc_ref": "перечень датчиков у ООО «Газмоторсервис»",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml",
+      "quote": "Датчики детонации 12323882 (12298112, в камере сгорания)"
+    },
+    {
+      "code": "12322413",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца",
+      "description": "Датчик температуры в турбине",
+      "machine": "TCG 2020 (TBG 620)",
+      "unit": "турбонаддув, система контроля",
+      "doc_ref": "перечень датчиков для TBG620/TCG2020 у ООО «Газмоторсервис»",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml",
+      "quote": "датчики температуры 12322413 (в турбине)"
+    },
+    {
+      "code": "12282445",
+      "issuer": "MWM (Caterpillar Energy Solutions) — по данным продавца; исполнение HEINZMANN StG 2080.214-SVB",
+      "description": "Исполнительный механизм HEINZMANN StG 2080 (у Газмоторсервиса — исполнение StG 2080.214-SVB; строка перечня актуаторов кончается словами «для waste gate», относится ли это только к этой позиции — неясно). У energyassistance.ru тот же номер вместе с 12285100 отнесён к HEINZMANN StG 2080.239-KSVB (HEINZMANN 5140020100) — вероятно, замена исполнения, не проверено",
+      "machine": "TCG 2016, TCG 2020, TCG 2032 (перечень общий на три серии)",
+      "unit": "турбонаддув, система управления",
+      "doc_ref": "перечень актуаторов у ООО «Газмоторсервис»",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml",
+      "quote": "12282445 (StG 2080.214-SVB) для waste gate"
+    },
+    {
+      "code": "12420394",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Поршень (Piston); у PowerUP поршень с этим Ref.-No. для TCG 2020 — изготовитель Mahle",
+      "machine": "TCG 2016, TCG 2020, TCG 2032, TCG 3016, TCG 3020",
+      "unit": "цилиндропоршневая группа",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12420394 Piston TCG 2016, TCG 2020, TCG 2032, TCG 3016, TCG 3020, TBG 441, TBG 632"
+    },
+    {
+      "code": "12453754",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Стальной поршень (Steel Piston)",
+      "machine": "TCG 3020",
+      "unit": "цилиндропоршневая группа",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12453754 Piston TCG 3020 (Steel Piston)"
+    },
+    {
+      "code": "12211173",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Комплект поршневых колец (Piston Ring Set)",
+      "machine": "TCG 2020 (также TBG 604/620)",
+      "unit": "цилиндропоршневая группа",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12211173 Piston Ring Set TBD 604, TBD 620, TBG 620, TCG 2020"
+    },
+    {
+      "code": "12420916",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Вкладыш шатунного подшипника (Conrod Bearing)",
+      "machine": "TCG 2020, TCG 3020",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12420916 Conrod Bearing TCG 2020, TCG 3020, TBD 620, TCD 2020"
+    },
+    {
+      "code": "12452207",
+      "issuer": "MWM (Caterpillar Energy Solutions) — номер приведён продавцом аналогов PowerUP как Ref.-No.",
+      "description": "Коренной подшипник (вкладыш); у PowerUP изготовитель позиции — KS Gleitlager; energyassistance.ru: «Crankshaft bearing MWM 12452207 for TCG 2020, TCD 2020 V12»",
+      "machine": "TCG 2020",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "каталог PowerUP для TCG 2020 (PowerUP не авторизован MWM)",
+      "source_url": "https://www.powerup.at/products/spare-parts-for-mwm/tcg-2020/",
+      "quote": "Main Bearing – TCG 2020 PowerUP No.: 1110890 Ref.-No.: , 12452207"
+    },
+    {
+      "code": "12452423",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Шатун (Connecting Rod)",
+      "machine": "TCG 2020, TCG 3020",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12452423 Connecting Rod (Con Rod) TCG 2020, TCG 3020"
+    },
+    {
+      "code": "12454966",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Роликовый толкатель (Roller Tappet)",
+      "machine": "TCG 2020, TCG 3020",
+      "unit": "газораспределение",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12454966 Roller Tappet TCG 2020, TCG 3020, TBG 620"
+    },
+    {
+      "code": "12285547",
+      "issuer": "MWM (Caterpillar Energy Solutions)",
+      "description": "Кольцо седла клапана (Valve Seat Ring)",
+      "machine": "TCG 2032 (также TBG 632)",
+      "unit": "ГБЦ, клапаны",
+      "doc_ref": "таблица «Original Spare Parts for Your MWM Gas Engines & Gensets» на mwm.net (официальный перечень ходовых запчастей)",
+      "source_url": "https://www.mwm.net/en/services/parts-logistics/",
+      "quote": "12285547 Valve Seat Ring TCG 2032, TBG 632"
+    },
+    {
+      "code": "12372088",
+      "issuer": "MWM (Caterpillar Energy Solutions) — номер приведён продавцом аналогов PowerUP как Ref.-No. (вторым — 12372446)",
+      "description": "Выпускной клапан; у PowerUP изготовитель позиции — Federal-Mogul",
+      "machine": "TCG 3020",
+      "unit": "ГБЦ, клапаны",
+      "doc_ref": "каталог PowerUP для TCG 3020 (PowerUP не авторизован MWM)",
+      "source_url": "https://www.powerup.at/products/spare-parts-for-mwm/tcg-3020/",
+      "quote": "Exhaust valve PowerUP No.: 1112720 Ref.-No.: 12372088, 12372446 Manufacturer: Federal – Mogul"
+    },
+    {
+      "code": "12313316",
+      "issuer": "MWM (Caterpillar Energy Solutions) — номер приведён продавцом аналогов PowerUP как Ref.-No.",
+      "description": "Торсионный (крутильный) демпфер коленвала; у PowerUP изготовитель позиции — Hasse & Wrede",
+      "machine": "TCG 3020",
+      "unit": "коленчатый вал, гаситель крутильных колебаний",
+      "doc_ref": "каталог PowerUP для TCG 3020 (PowerUP не авторизован MWM)",
+      "source_url": "https://www.powerup.at/products/spare-parts-for-mwm/tcg-3020/",
+      "quote": "Tors. vibrat. damper PowerUP No.: 1108430 Ref.-No.: 12313316 Manufacturer: Hasse & Wrede"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Accelleron (бывш. ABB Turbocharging) — по обозначению",
+      "component": "турбокомпрессор высокого давления A140 с перепускным клапаном (wastegate)",
+      "machine": "TCG 2032 / TCG 2032B V16 (Cat CG260)",
+      "evidence": "Страница TCG 2032 на mwm.net и брошюра TCG 2032B (CES24019) называют «A140 high-pressure turbocharger»; изготовитель там не назван, принадлежность A140 к серии Accelleron (ABB) — вывод по обозначению. ООО «Газмоторсервис» на странице запчастей MWM предлагает «оригинальные турбокомпрессора ABB». Скептик нашёл подкрепление связи: продавец аналогов Weyeah предлагает сборку «ABB A140-H65 turbocharger assembly» с применимостью «CAT CG260, MWM TCG2032». Документа MWM, где изготовитель назван прямо, нет.",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2032/",
+        "https://www.mwm.net/files/upload/mwm/issuu/CES24019-Update-Produktbroschuere-TCG-2032B_210x297mm_EN_1_0_RZ_sm_screen.pdf",
+        "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml",
+        "https://www.weyeahmotor.com/ABB-A140-H65-turbocharger-assembly-pd43171073.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MAN Energy Solutions (ныне Everllence) — по обозначению",
+      "component": "турбокомпрессор TCR 16 с корпусом подшипников водяного охлаждения",
+      "machine": "TCG 2020 / Cat CG170",
+      "evidence": "На mwm.net: «New turbocharger TCR 16 for TCG 2020 with water-cooled bearing housing». Что TCR — серия MAN, выведено из обозначения, изготовитель на странице не назван. Скептик подтвердил по брошюре MAN «MAN TCR Turbochargers» (2018 г.), что TCR16 входит в ряд турбокомпрессоров MAN TCR. Документа MWM, где изготовитель назван прямо, нет.",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "AVAT Automation GmbH (Тюбинген)",
+      "component": "система управления двигателем TEM Evo: запчасти и сервис",
+      "machine": "двигатели MWM с системой TEM Evo (серии на странице не перечислены)",
+      "evidence": "Пресс-релиз MWM от 03.07.2020: Caterpillar Energy Solutions и AVAT продлили сотрудничество, цель — долгосрочная доступность запчастей ко всем системам TEM Evo для заказчиков MWM.",
+      "sources": [
+        "https://www.mwm.net/en/news/news-releases/expansion-of-the-mwm-customer-service-caterpillar-energy-solutions-and-avat-reinforce-long-term-col/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ALTRONIC",
+      "component": "катушки зажигания (MWM 1215 3965 = ALTRONIC 501061), активный датчик для контроллеров TEM-ZS (MWM 1229 9989 = ALTRONIC 791037-4), контроллеры D.I.S./DISN старых серий (MWM 1214 0986 = 791508-102)",
+      "machine": "TCG 2016, TCG 2020, TCG 2032 (катушки и датчик); G/TBG 232/234/604 (контроллеры)",
+      "evidence": "Перекрёстная таблица в руководстве MOTORTECH: «ALTRONIC® Style ignition coil … Equivalent to: MWM®/DEUTZ® P/N 1215 3965, ALTRONIC® P/N 501061». Номера контроллеров MWM даны с номерами ALTRONIC в скобках. Что ALTRONIC — штатный поставщик, а не только аналог, — вывод из этой таблицы, у MWM не подтверждено.",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-MWM-DEUTZ-Gas-Engines-01.00.013-EN-2023-06.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "HEINZMANN GmbH & Co. KG",
+      "component": "электрические исполнительные механизмы StG 2080 (дроссельная заслонка, перепускной клапан)",
+      "machine": "TCG 2020; по перечню Газмоторсервиса — также TCG 2016 и TCG 2032",
+      "evidence": "energyassistance.ru: «Actuator HEINZMANN StG 2080.239-KSVB MWM 12285100», в данных — MWM 12285100 и 12282445, HEINZMANN 5140020100. ООО «Газмоторсервис» даёт номера MWM актуаторов с обозначениями StG (12301011 — StG 2080.25-SV, 12282445 — StG 2080.214-SVB) и называет HEINZMANN поставщиком регуляторов и актуаторов. Установлено по данным продавцов.",
+      "sources": [
+        "https://www.energyassistance.ru/en/electrical-engineering/571-actuator-heinzmann-stg-2080239-ksvb-mwm-12285100.html",
+        "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MAHLE",
+      "component": "поршни",
+      "machine": "TCG 2020",
+      "evidence": "У продавца аналогов PowerUP позиция «Piston cpl. suitable for MWM® TCG2020», Ref.-No. 12420394, 12141838, «Manufacturer: Mahle». Это изготовитель позиции продавца; штатная поставка MAHLE для MWM не подтверждена.",
+      "sources": [
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-2020/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "KS Gleitlager (Rheinmetall)",
+      "component": "вкладыши коренных подшипников",
+      "machine": "TCG 2020",
+      "evidence": "PowerUP: «Main Bearing – TCG 2020», Ref.-No. 12452207, «Manufacturer: KS Gleitlager». Изготовитель позиции продавца, не подтверждение штатной поставки.",
+      "sources": [
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-2020/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Federal-Mogul (Tenneco)",
+      "component": "выпускные клапаны",
+      "machine": "TCG 3020",
+      "evidence": "PowerUP: «Exhaust valve», Ref.-No. 12372088, 12372446, «Manufacturer: Federal – Mogul». Изготовитель позиции продавца.",
+      "sources": [
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-3020/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Hasse & Wrede",
+      "component": "гаситель крутильных колебаний коленвала",
+      "machine": "TCG 3020",
+      "evidence": "PowerUP: «Tors. vibrat. damper», Ref.-No. 12313316, «Manufacturer: Hasse & Wrede». Изготовитель позиции продавца.",
+      "sources": [
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-3020/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MANN+HUMMEL",
+      "component": "масляный фильтр",
+      "machine": "TCG 3016 (номер MWM 12343764, по таблице MWM также TCG 2020)",
+      "evidence": "PowerUP: «Oil filter», Ref.-No. 12343764, «Manufacturer: Mann & Hummel». Изготовитель позиции продавца.",
+      "sources": [
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-3016/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "UT99 AG",
+      "component": "элементы маслоотделителя вентиляции картера UPF (ступени 1 и 2)",
+      "machine": "TCG 2020 V16/V20 / Cat CG170-16/20",
+      "evidence": "energyassistance.ru у элементов MWM 12466712 и 12466713 пишет «UT99 Crank Case ventilation Filter». Установлено по перекрёстной ссылке продавца.",
+      "sources": [
+        "https://www.energyassistance.ru/en/filters/6-filter-mwm-12466712-inside-oil-mist-separator-filter-stage1.html",
+        "https://www.energyassistance.ru/en/filters/8-filter-upf-12466713-outside-oil-mist-separator-filter-stage-2.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Robert Bosch",
+      "component": "стартер",
+      "machine": "TCG 2020 V20 (TBG 620 V20)",
+      "evidence": "energyassistance.ru: «Starter Bosch 0001601028, MWM 12307410 for TCG 2020V20». По данным продавца.",
+      "sources": [
+        "https://www.energyassistance.ru/en/electrical-engineering/214-starter-bosch-0001601028-mwm-12307410-for-tcg-2020v20.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Marelli Motori",
+      "component": "синхронный генератор (MJ 500 LA4 B2A на TCG 2020 V16 K; MJB560LB4 на TCG 2020 V20)",
+      "machine": "TCG 2020 V16 K, TCG 2020 V20",
+      "evidence": "Два объявления о продаже б/у установок (ReflowX — TCG 2020 V16 K 2014 г.; IMP — три TCG2020V20 2014 г. «with Marelli MJB560LB4 generator end»). Штатная комплектация по модели не подтверждена; MWM пишет, что возможны варианты с разными генераторами.",
+      "sources": [
+        "https://www.reflowx.com/power-generation/mwm-tcg-2020-v-16-k-gas-generator-2014",
+        "https://www.impcorporation.com/en-gb/inventory/details/28318/2014-mwm-tcg2020v20-generator-set"
+      ],
+      "verified": true
+    },
+    {
+      "company": "AVK (Cummins Generator Technologies)",
+      "component": "синхронный генератор AVK DIG 156 L6, 11 кВ",
+      "machine": "TCG 2032 V16 (четыре установки 2015 г.)",
+      "evidence": "Объявление о продаже на resale.info: «Alternator Type: AVK DIG 156 L6». Один случай; разведка caterpillar нашла AVK на TCG 2032 V16 в другом объявлении.",
+      "sources": [
+        "https://www.resale.info/mwm/used-mwm/mwm-tcg/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "BERU",
+      "component": "свеча зажигания без форкамеры 18GZ5-77-2 (M18x1,5)",
+      "machine": "TCG 2016, TCG 2020 (номер MWM 1242 0480)",
+      "evidence": "Руководство MOTORTECH: «BERU® spark plug … P/N 18GZ5-77-2 MWM®/DEUTZ® P/N 1242 0480». Это перекрёстная ссылка, а не подтверждение штатной поставки.",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-MWM-DEUTZ-Gas-Engines-01.00.013-EN-2023-06.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Kromschröder (Elster, Honeywell)",
+      "component": "реле давления (MWM 12188661)",
+      "machine": "TCG 2020 (TBG 620)",
+      "evidence": "ООО «Газмоторсервис» в перечне датчиков TBG620/TCG2020: «датчики-реле давления 12188661 (Kromschroeder)». По данным продавца.",
+      "sources": [
+        "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MOTORTECH GmbH",
+      "component": "аналоги: катушки зажигания, провода и наконечники, свечи, шины проводки для TCG 2016/2020, термопары, смеситель VariFuel2-TEM для TCG 2016",
+      "machine": "TCG 2016, TCG 2020, TCG 2032",
+      "evidence": "Руководство MOTORTECH Application Guide MWM/DEUTZ и бюллетень 2020-07 дают для каждой позиции эквивалентный номер MWM/DEUTZ. Изготовитель аналогов, не поставщик MWM.",
+      "sources": [
+        "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-MWM-DEUTZ-Gas-Engines-01.00.013-EN-2023-06.pdf",
+        "https://www.motortech.de/fileadmin/user_upload/salesandservicebulletins/MOTORTECH-Bulletin-2020-07-NPrd-Wiring-Rails-MWM-TCG2016-TCG2020-Series-EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "PowerUP GmbH",
+      "component": "аналоги: головки цилиндров, поршни, гильзы с антиполировочным кольцом, свечи и наконечники, фильтры, наборы для капремонта",
+      "machine": "TCG 2016, TCG 2020, TCG 3016, TCG 3020",
+      "evidence": "Каталог PowerUP по сериям MWM; на странице: «PowerUP GmbH is neither an authorised dealer of MWM® nor affiliated with MWM®». Изготовитель и продавец аналогов, не поставщик MWM.",
+      "sources": [
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-2020/",
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-3020/",
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-3016/"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "MWM Austria GmbH (дочерняя компания MWM)",
+      "country": "Австрия; зона — 29 стран Восточной Европы и Центральной Азии, в т. ч. Азербайджан, Армения, Грузия, Казахстан, Киргизия, Таджикистан, Туркменистан, Узбекистан, Украина, Молдова; России и Беларуси в перечне стран нет",
+      "role": "официальные продажи и сервис MWM",
+      "sources": [
+        "https://www.mwm.net/en/locations/mwm-austria-gmbh/",
+        "https://www.mwm.net/en/wp-json/wp/v2/locations/87459",
+        "https://www.mwm.energy/en/about-mwm/mwm-in-eastern-europe-and-central-asia/"
+      ]
+    },
+    {
+      "company": "MWM Austria GmbH – Branch Office Kazakhstan (Алматы, открыт в 2024 г.)",
+      "country": "Казахстан; также Киргизия, Таджикистан, Туркменистан, Узбекистан",
+      "role": "официальный филиал: сервис, поддержка заказчиков, обучение",
+      "sources": [
+        "https://www.mwm.net/en/locations/mwm-austria-gmbh-branch-office-kazakhstan/",
+        "https://www.mwm.energy/en/about-mwm/mwm-in-eastern-europe-and-central-asia/"
+      ]
+    },
+    {
+      "company": "İltekno A.Ş.",
+      "country": "Турция; также Узбекистан",
+      "role": "официальный дистрибьютор MWM по Турции с 2002 г.; с 26.07.2023 — MWM Solutions Provider (EPC) по Узбекистану; поставка, монтаж и сервис ГПУ MWM",
+      "sources": [
+        "https://www.mwm.net/en/news/news-releases/mwm-distributor-iltekno-signs-solutions-provider-agreement-for-uzbekistan/",
+        "https://iltekno.com/en/mwm-gas-engines/"
+      ]
+    },
+    {
+      "company": "MWM Region Western Europe (Caterpillar Energy Solutions)",
+      "country": "Германия; в зоне — Турция, Кипр, Греция и страны Западной Европы",
+      "role": "официальное подразделение MWM: продажи и сервис",
+      "sources": [
+        "https://www.mwm.net/en/locations/mwm-region-western-europe/"
+      ]
+    },
+    {
+      "company": "MWM China – Beijing Hub",
+      "country": "Китай, Гонконг",
+      "role": "официальное подразделение MWM: продажи и сервис",
+      "sources": [
+        "https://www.mwm.net/en/locations/mwm-china/"
+      ]
+    },
+    {
+      "company": "MWM China – Shanghai Sub-Hub (адрес страницы указывает на Caterpillar China Investment Co., Ltd., Shanghai Branch)",
+      "country": "Китай",
+      "role": "официальное подразделение MWM: продажи и сервис",
+      "sources": [
+        "https://www.mwm.net/en/locations/caterpillar-china-investment-co-ltd-shanghai-branch/"
+      ]
+    },
+    {
+      "company": "MWM Region Middle East/India",
+      "country": "ОАЭ, Индия, Катар, Оман, Кувейт, Бахрейн, Иордания, Ливан, Йемен, Афганистан",
+      "role": "официальное подразделение MWM: продажи",
+      "sources": [
+        "https://www.mwm.net/en/locations/mwm-region-middle-east-india/"
+      ]
+    },
+    {
+      "company": "Green Power International Pvt. Ltd.",
+      "country": "Индия",
+      "role": "дистрибьютор и сервисный партнёр MWM (по пресс-релизам MWM 2018 и 2023 гг.)",
+      "sources": [
+        "https://www.mwm.net/en/news/news-releases/three-mwm-gas-engines-generate-heat-and-power-for-gujarat-fluorochemicals-limited-gfl-indian-manufacturer-of-industrial-coolants/",
+        "https://www.mwm.net/en/news/news-releases/globally-successful-mwm-tcg-2020-gas-engine-for-distributed-energy-generation-popular-in-india-as-w/"
+      ]
+    },
+    {
+      "company": "MKC Group of Companies",
+      "country": "ОАЭ (Дубай, Абу-Даби) и Россия",
+      "role": "по своему сайту — официальный дилер и сервисный партнёр MWM (в России — с 2017 г.), склады запчастей MWM в Дубае и Абу-Даби, установки TCG 3020 V20 в каталоге; в локаторе mwm.net не значится, статус после 2022 г. не подтверждён",
+      "sources": [
+        "https://mkc.ae/equipment/mwm",
+        "https://mks-group.ru/en/e/gas-generator-set-mwm-tcg-3020-v20"
+      ]
+    },
+    {
+      "company": "Kaltimex Energy Bangladesh (Pvt.) Ltd. / PT Kaltimex Energy",
+      "country": "Бангладеш, Индонезия",
+      "role": "дистрибьютор MWM (договор продлён в 2022 г.); поставил в т. ч. 15 TCG 2032 V16",
+      "sources": [
+        "https://www.mwm.net/en/news/news-releases/1000-mw-of-installed-total-output-with-mwm-gas-engines-in-bangladesh-by-mwm-distributor-kaltimex-energy/"
+      ]
+    },
+    {
+      "company": "ООО «Газмоторсервис»",
+      "country": "Россия (Московская обл.)",
+      "role": "по своему сайту — поставка оригинальных запчастей MWM (около 50 000 наименований), комплекты E10–E60 для TCG 2016/2020/2032, датчики, актуаторы, ремонт ГБЦ, сервис турбокомпрессоров ABB; авторизация MWM на странице не заявлена",
+      "sources": [
+        "https://www.gasmotorservice.ru/parts/motorparts/mwm.phtml"
+      ]
+    },
+    {
+      "company": "Energy Assistance (energyassistance.ru)",
+      "country": "Россия (цены в рублях)",
+      "role": "продавец оригинальных и аналоговых запчастей MWM: фильтры UPF, прокладки, датчики, актуаторы HEINZMANN, стартеры; не официальный канал MWM",
+      "sources": [
+        "https://www.energyassistance.ru/en/9_mwm/"
+      ]
+    },
+    {
+      "company": "iggnita",
+      "country": "Турция (склад в Стамбуле)",
+      "role": "продавец запчастей и б/у двигателей MWM (оригиналы и аналоги); не официальный канал MWM",
+      "sources": [
+        "https://iggnita.com/en/urun/hava-filtresi-mwm-12344436-orijinal/"
+      ]
+    },
+    {
+      "company": "TEDOM a.s.",
+      "country": "Чехия",
+      "role": "сервисный партнёр: вместе с MWM Austria выполнил капремонт E70 двух TCG 2032 V16 (Братислава, 2022)",
+      "sources": [
+        "https://www.mwm.net/en/news/news-releases/tedom-and-mwm-service-complete-e70-general-overhaul-of-two-mwm-tcg-2032-v16-gas-engines-at-record-speed/"
+      ]
+    },
+    {
+      "company": "MWM X-Change Center Vigo / MWM Service Center Galicia",
+      "country": "Испания",
+      "role": "официальный центр MWM: обменные блоки двигателей и узлы X-Change для капремонта (в т. ч. TCG 2032 V16)",
+      "sources": [
+        "https://www.mwm.net/en/news/news-releases/tedom-and-mwm-service-complete-e70-general-overhaul-of-two-mwm-tcg-2032-v16-gas-engines-at-record-speed/",
+        "https://www.mwm.net/en/locations/mwm-service-center-galicia/",
+        "https://www.mwm.net/en/services/x-change/"
+      ]
+    },
+    {
+      "company": "2G Energy (интернет-магазин shop.2-g.com)",
+      "country": "Германия / США",
+      "role": "продавец запчастей к ГПУ, в т. ч. к MWM, с перекрёстными номерами Caterpillar/MWM (свечи 12453572, 12453564; воздушные фильтры 12409797, 12189925); не официальный канал MWM",
+      "sources": [
+        "https://shop.2-g.com/us/avusjenbachermwm/ignition/spark-plugs/426/prechamber-spark-plug-8-hole-tcg-2020-all-ng-or-bg",
+        "https://shop.2-g.com/us/avusjenbachermwm/filters/"
+      ]
+    },
+    {
+      "company": "PowerUP GmbH",
+      "country": "Австрия",
+      "role": "продавец и изготовитель аналогов для MWM TCG 2016/2020/3016/3020 (не авторизован MWM, так и указано на сайте)",
+      "sources": [
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-3020/",
+        "https://www.powerup.at/products/spare-parts-for-mwm/tcg-2020/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Полный каталог запчастей MWM (электронный список по узлам), планы ТО E10–E70 по сериям и технические циркуляры лежат в закрытом цифровом «TCG Portal» и сервисной библиотеке, куда ведут QR-коды на двигателях; доступ есть у заказчиков и дистрибьюторов. Открыто только выборочное: таблица около 40 ходовых позиций на mwm.net и бюллетень по маслу 2105/28.",
+    "По TCG 3020 в открытых источниках нет номеров воздушного и масляного фильтров и элементов UPF; по TCG 3016 нет номера элемента UPF. Номера фильтров, свечей и прокладок в составе комплекта E40 для каждой серии на mwm.net не приведены — только наименования и количество.",
+    "По TCG 4170 V20 (новая серия, 2 500 кВт) номеров запчастей и интервалов ТО в открытом доступе нет.",
+    "Изготовитель водоохлаждаемого турбокомпрессора TCG 3016 и турбокомпрессора TCG 3020 не назван. A140 (TCG 2032B) и TCR 16 (TCG 2020) отнесены к Accelleron и MAN Energy Solutions (Everllence) по обозначению; скептик нашёл подкрепление у продавца аналогов Weyeah (ABB A140-H65 для MWM TCG2032) и в брошюре MAN (TCR16 в ряду TCR), прямого указания MWM нет.",
+    "Штатные генераторы по моделям не опубликованы: Marelli (TCG 2020) и AVK (TCG 2032) известны по объявлениям о продаже б/у установок; MWM указывает, что поставляются варианты с разными генераторами. Техданные комплекта (data sheet) — у дистрибьютора.",
+    "Россия: в локаторе mwm.net (WordPress API, раздел locations) Россия и Беларусь не входят ни в одну зону; MKC Group of Companies, «Газмоторсервис», а также «Нойхаус», «Альфа Балт Инжиниринг» и «Эртех» из разведки caterpillar заявляют о работе с MWM сами, подтверждения у изготовителя нет. Уточнить можно только запросом в MWM Austria GmbH.",
+    "Крупный магазин запчастей MWM с перекрёстными номерами onergys.de / onergys.com, а также mopamotorparts.com отвечают 403 на автоматическое чтение; apserviceandparts.it не отдаёт текст. Поэтому не проверено, что 12286034 заменяет 12285295 (свеча TCG 2032 из комплекта E40 CG260-16 в разведке caterpillar): это есть только в выдаче поиска.",
+    "Сверка с разведкой caterpillar (CG132 = TCG 2016, CG170 = TCG 2020, CG260 = TCG 2032): 12409797, 12453572 и 12453562 подтверждены таблицей MWM, в ней же номер 12189925 прямо привязан к CG170. Не сошлись масляные фильтры TCG 2032: в комплекте E40 CG260 у iggnita — 12284663, у «Газмоторсервиса» — 12284353 и 12380073; соотношение не выяснено. У части позиций Cat даёт свой номер (energyassistance.ru: свеча MWM 12453562 = Caterpillar 12453546 для CG132); таблицы соответствия номеров Cat и MWM в открытом доступе нет.",
+    "Номер 12466707 противоречив: 2G числит его вместе с 12189925 воздушным фильтром TCG 2016/2020, а «Газмоторсервис» и energyassistance.ru — фильтром вентиляции картера (UT99). В перечень не включён.",
+    "Руководства по эксплуатации и планы ТО на scribd и pdfcoffee (например, «Maintenance Schedule TCG 2020 V16 K, High Gas Quality 0299 9504», «MWM TCG2032 Operation Manual») видны только по заголовкам: scribd требует входа, pdfcoffee отвечает 403.",
+    "Номера MWM, взятые у PowerUP (12452207, 12372088, 12313316), даны продавцом аналогов как Ref.-No., изготовителем не сверены; это страница магазина, и её состав может меняться."
+  ],
+  "verifier_notes": "Все источники открылись; страницы и PDF скачаны и проверены поиском по тексту. Копии лежали в рабочей папке сессии скептика, в репозиторий не входят. Вывод: все 40 кодов, 15 моделей и 18 субпоставщиков подтверждены. Ни одна запись не опровергнута.\n\nОсновной источник — таблица на mwm.net/en/services/parts-logistics/. В ней есть все 26 кодов, которые на неё ссылаются, с тем же наименованием и перечнем серий. Коды продавцов (Газмоторсервис, energyassistance.ru, iggnita, PowerUP, MOTORTECH) найдены на указанных страницах дословно.\n\nОговорки, не меняющие вердикт:\n1) CG170, CG260 и CG132 в строках изготовителя названы только один раз (12189925 — CG170). В остальных записях сопоставление с моделями Cat наше.\n2) То, что 12286034 заменяет 12285295, не подтверждено: страница AP Service & Parts вернула 202 без содержимого.\n3) «Прежний номер 12298112» у 12323882 — наше толкование скобки Газмоторсервиса.\n4) Для двух турбокомпрессоров, где изготовитель в записи выведен по обозначению, связь подтверждена дополнительными источниками. Accelleron/ABB A140 — страница продавца weyeahmotor.com («ABB A140-H65 … Suitable for … MWM TCG2032»). MAN TCR16 — собственная брошюра MAN, где TCR16 входит в ряд TCR. Документа MWM, где изготовитель назван прямо, нет ни для одного из двух.\n5) Субпоставщики по PowerUP, MOTORTECH, объявлениям о продаже и перекрёстным таблицам — это изготовители позиций продавцов или единичные комплектации, а не подтверждённые штатные поставщики MWM. В записях это оговорено верно.",
+  "corrections": [
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет",
+    "sub_suppliers: verified: true проставлен по итогу скептика (подтверждены все 18) у записей ALTRONIC, HEINZMANN, UT99 AG, Marelli Motori, MOTORTECH, PowerUP — это уровень перекрёстной ссылки, данных продавца или объявления, в evidence оговорено, что это изготовитель аналогов или что штатная поставка для MWM не подтверждена (замечание скептика 5)",
+    "12409797, 12453572, 12286034: соответствие моделям Cat CG170/CG260 помечено как наше сопоставление — в строках таблицы MWM модель Cat названа только у 12189925 (замечание скептика 1)",
+    "12286034: замена 12285295 на 12286034 записана как неподтверждённая — источник не отдал содержимого (замечание скептика 2)",
+    "12323882: «прежний номер 12298112» переписан как толкование скобки продавца (замечание скептика 3)",
+    "Accelleron (A140) и MAN (TCR 16): в evidence и gaps добавлено подкрепление, найденное скептиком, у Accelleron — ссылка на страницу Weyeah; оговорка «документа MWM с изготовителем нет» сохранена (замечание скептика 4)"
+  ]
+}
