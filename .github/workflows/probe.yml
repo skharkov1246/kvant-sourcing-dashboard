@@ -2,10 +2,18 @@ name: Bitrix probe (диагностика данных)
 
 # Разовый диагностический зонд: ТОЛЬКО ручной запуск (workflow_dispatch).
 # Читает Bitrix (и при наличии — Яндекс.Диск) через секреты CI, печатает диагностику в лог —
-# сами секреты не выводятся. Ничего не деплоит, минут ест ~1-3. Скрипт: scripts/bitrix_probe.py.
+# сами секреты не выводятся. Ничего не деплоит, минут ест ~1-3. Скрипт: scripts/bitrix_probe.py
+# или другой зонд из закрытого списка входа `script` (свои проверки у каждого зонда — в своём
+# файле: bitrix_probe.py покрыт тестами ролей, и разовый вопрос его не переписывает).
 # Запуск на ветке: gh workflow run probe.yml --ref <ветка> — выполнит версию скрипта с той ветки.
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      script:
+        description: "Какой зонд запустить"
+        type: choice
+        default: bitrix_probe.py
+        options: [bitrix_probe.py, probe_mail_files.py]
 
 permissions:
   contents: read
@@ -25,4 +33,5 @@ jobs:
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           YADISK_TOKEN: ${{ secrets.YADISK_TOKEN }}
-        run: python scripts/bitrix_probe.py
+          PROBE_SCRIPT: ${{ inputs.script || 'bitrix_probe.py' }}
+        run: python "scripts/$PROBE_SCRIPT"
