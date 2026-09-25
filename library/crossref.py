@@ -722,6 +722,10 @@ def узнать(ячейка, р, код=None) -> list[str]:
         return [р["карта"][k]]
     if k in р["разложение"]:
         return list(р["разложение"][k])
+    # Хвост-страна — общее правило codes_sql.без_страны («Siemens - Germany»).
+    kб = codes_sql.ключ_написания(codes_sql.без_страны(t))
+    if kб and kб in р["карта"]:
+        return [р["карта"][kб]]
     out = []
     for часть in _ДЕЛЕНИЕ.split(t):
         kч = codes_sql.ключ_написания(часть or "")

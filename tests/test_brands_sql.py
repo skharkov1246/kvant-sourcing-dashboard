@@ -35,6 +35,11 @@ pytestmark = pytest.mark.skipif(not DSN, reason="одноразовая база
 # ключ в запросе брендов: так ключ запроса сверяется с портом в Python.
 НАПИСАНИЯ = ["Wärtsilä Oyj", "SКF", "Brändström AB", "Cobalt Pumps", "ООО Ромашка",
              "Grundfos A/S"]
+# Хвост-страна после тире и заглушка формы (codes_sql.без_страны, oem_kind.поле_формы):
+# их ключи в запросе — не ключ написания целиком, поэтому отдельным списком.
+НАПИСАНИЯ_ПРАВИЛ = {"Borealis Pumps - Germany": "borealispumps",
+                    "Borealis Pumps — United States": "borealispumps",
+                    "Выбрать менеджера": None, "(Выпадающий список)": None, "БИК:": None}
 
 КОРПУС = """
 insert into lib_files (file_id, deal_id, origin, field, status) values
@@ -124,6 +129,9 @@ def наборы():
         for i, н in enumerate(НАПИСАНИЯ):
             c.execute("insert into lib_parts (id, catalog_no, name, oem) values (%s, %s, %s, %s)",
                       (f"нап{i}", f"НАП-{i}0{i}", "Деталь выдуманная", н))
+        for i, н in enumerate(НАПИСАНИЯ_ПРАВИЛ):
+            c.execute("insert into lib_parts (id, catalog_no, name, oem) values (%s, %s, %s, %s)",
+                      (f"прв{i}", f"ПРВ-{i}0{i}", "Деталь выдуманная", н))
         # Тот же порядок, что у публикатора: одна транзакция, настройки сеанса.
         c.execute("begin")
         c.execute(codes_sql.SETTINGS)
@@ -174,6 +182,22 @@ def test_ключ_написания_в_python_тот_же_что_в_sql(наб�
     по_каталогу = {r["brand_key"] for r in коды["brands"] if r.get("codes_catalog")}
     for н in НАПИСАНИЯ:
         assert codes_sql.ключ_написания(н) in по_каталогу, н
+
+
+def test_страна_после_тире_и_поле_формы_как_в_python(наборы):
+    """Двойник codes_sql.без_страны и oem_kind.поле_формы в запросе /brands:
+    хвост-страна после тире снимается, заглушка формы брендом не становится."""
+    коды, _ = наборы
+    ключи = {r["brand_key"] for r in коды["brands"] if r.get("codes_catalog")}
+    for н, ждём in НАПИСАНИЯ_ПРАВИЛ.items():
+        if ждём:
+            assert codes_sql.ключи_сведения(н)[-1] == ждём, н
+            assert ждём in ключи and codes_sql.ключ_написания(н) not in ключи, н
+        else:
+            assert codes_sql.ключ_написания(н) not in ключи, н
+    # «Borealis Pumps» — один бренд двух написаний: две детали, два кода.
+    b = {r["brand_key"]: r for r in коды["brands"]}["borealispumps"]
+    assert b["codes_catalog"] == 2
 
 
 def test_карта_словаря_сводит_написания_в_один_бренд(наборы):
