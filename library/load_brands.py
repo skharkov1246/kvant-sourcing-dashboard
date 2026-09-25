@@ -27,9 +27,11 @@ library/supabase/brands_schema.sql. Здесь — чтение источник
 написания бренд есть в lib_brands.
 
 ПОВТОРНЫЙ ЗАСЕВ ДУБЛЕЙ НЕ СОЗДАЁТ: бренд — первичный ключ, написание —
-уникальное (источник, написание, место). Меняется строка ровно в одном
-случае — была в очереди или спорной и разрешилась; прежнее состояние
-сохраняется, и откат его возвращает.
+уникальное (источник, написание, место). Меняется строка в двух случаях —
+была в очереди или спорной и разрешилась; либо это строка словаря-файла, и
+суждение о ней в файле стало другим (запись стала указанием, «несколькими» или
+описанием — library/oem_kind.py). Прежнее состояние сохраняется, и откат его
+возвращает.
 
 В ЖУРНАЛ — ТОЛЬКО АГРЕГАТЫ (правило 17): числа по источнику и статусу, доли по
 разрезам, число групп расхождения правил. Ни имени бренда, ни написания.
@@ -123,8 +125,15 @@ on conflict (brand_key) do nothing
 returning brand_key
 """
 
-# Строка меняется только из очереди в разрешённое; прежнее — в prev_*, откат
-# вернёт его. Решения людей («проверено», «отклонено») засев не трогает.
+# Строка меняется из очереди в разрешённое; прежнее — в prev_*, откат вернёт
+# его. Решения людей («проверено», «отклонено») засев не трогает.
+#
+# СТРОКА СЛОВАРЯ-ФАЙЛА ПОВТОРЯЕТ ФАЙЛ. Написание dict/oem.json, чья запись стала
+# указанием, «несколькими» или описанием (library/oem_kind.py), было разрешено
+# к самой записи как к бренду; повторный засев ставит ему суждение по виду
+# («не бренд», «спорно», разрешено к бренду описания), прежнее — в prev_*, и
+# откат прогона возвращает его. Пометка, а не удаление (правило 5): строка и
+# бренд прежней записи в lib_brands остаются, но lib_brand_map их не видит.
 ВСТАВКА_НАПИСАНИЙ = """
 insert into lib_brand_alias (spelling, spelling_key, source, seen_at, sp176_id, brand_key,
                              status, candidates, n_rows, note, rule, run_id)
@@ -137,7 +146,11 @@ on conflict (source, spelling, seen_at) do update set
   candidates = excluded.candidates, note = excluded.note,
   spelling_key = excluded.spelling_key, rule = excluded.rule,
   run_id = excluded.run_id, updated_at = now()
-where lib_brand_alias.status in ('в очереди', 'спорно') and excluded.status = 'разрешено'
+where (lib_brand_alias.status in ('в очереди', 'спорно') and excluded.status = 'разрешено')
+   or (lib_brand_alias.source = 'dict/oem.json'
+       and lib_brand_alias.status in ('разрешено', 'спорно', 'в очереди', 'не бренд')
+       and (lib_brand_alias.status, lib_brand_alias.brand_key, lib_brand_alias.candidates)
+           is distinct from (excluded.status, excluded.brand_key, excluded.candidates))
 returning (xmax = 0) as inserted
 """
 
@@ -303,8 +316,11 @@ def ступень_написания(conn, shard, shards, apply, run_id) -> int
         карта, карта_sql, откуда = карта_для_данных(cur)
         print(f"разрешение по: {откуда}; ключей написаний в карте {len(карта)}, "
               f"спорных {sum(1 for v in карта.values() if len(v) > 1)}")
+        # Записи словаря-файла, которые не бренд (library/oem_kind.py): компания с
+        # таким именем получает суждение по виду записи, а не очередь.
+        не_бренды = br.план_файлов(читать_json(br.ФАЙЛ_СЛОВАРЯ), читать_json(br.ФАЙЛ_АТЛАСА)).не_бренды
         cur.execute(br.КОМПАНИИ_SQL, {"n": shards, "k": shard})
-        написания = br.написания_компаний(cur.fetchall(), карта)
+        написания = br.написания_компаний(cur.fetchall(), карта, не_бренды)
         for источник in br.ИСТ_ДАННЫЕ:
             t = time.monotonic()
             cur.execute(br.данные_sql(источник, карта_sql), {"n": shards, "k": shard})

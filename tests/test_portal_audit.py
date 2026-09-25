@@ -330,11 +330,18 @@ def _библиотека():
 
 
 def _словарь():
-    return {"note": "выдуманный словарь", "count": 2, "records": [
-        {"oem_key": "skf", "name": "SKF", "spellings": [{"spelling": "SKF", "where": "dict/oem.json:records"},
-                                                        {"spelling": "Skf", "where": "dict/oem.json:records"}],
+    """Два бренда и запись «несколько», разложенная на них (library/oem_kind.py)."""
+    return {"note": "выдуманный словарь", "count": 3, "records": [
+        {"oem_key": "skf", "name": "SKF", "kind": "бренд",
+         "spellings": [{"spelling": "SKF", "where": "dict/oem.json:records"},
+                       {"spelling": "Skf", "where": "dict/oem.json:records"}],
          "n_spellings": 2},
-        {"oem_key": "fag", "name": "FAG", "spellings": [{"spelling": "FAG", "where": "dict/oem.json:records"}],
+        {"oem_key": "fag", "name": "FAG", "kind": "бренд",
+         "spellings": [{"spelling": "FAG", "where": "dict/oem.json:records"}],
+         "n_spellings": 1},
+        {"oem_key": "skffag", "name": "SKF, FAG", "kind": "несколько",
+         "kind_why": "несколько брендов словаря в одной записи: 2", "brands": ["skf", "fag"],
+         "spellings": [{"spelling": "SKF, FAG", "where": "dict/oem.json:records"}],
          "n_spellings": 1}]}
 
 
@@ -936,12 +943,18 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("library", "l.crm_url", lambda о: ст(о, "bearings:k1")["sources"].update(crm_links=[{"url": "javascript:alert(1)"}])),
     ("library", "l.open_q", lambda о: ст(о, "bearings:k1")["sources"].update(open_questions=["Совместимость?"])),
     # ── dict/oem.json
-    ("dict", "d.count", lambda о: о["_dict"].update(count=3)),
+    ("dict", "d.count", lambda о: о["_dict"].update(count=4)),
     ("dict", "d.key", lambda о: о["_dict"]["records"][1].update(oem_key="skf")),
     ("dict", "d.desc", lambda о: о["_dict"]["records"][1].update(name="Любой изготовитель подшипников по типу")),
+    ("dict", "d.kind", lambda о: о["_dict"]["records"][1].update(kind="марка")),
+    ("dict", "d.kind_ref", lambda о: о["_dict"]["records"][2].update(brands=["skf", "нетакого"])),
     ("dict", "d.key_40", lambda о: о["_dict"]["records"][1].update(oem_key="f" * 40)),
+    # Два разных написания, склеенные обрезкой ключа до 40 знаков.
+    ("dict", "d.key_glue", lambda о: о["_dict"]["records"][1].update(
+        oem_key="f" * 40, spellings=[{"spelling": "F" * 40 + " Один", "where": "dict/oem.json:records"},
+                                     {"spelling": "F" * 40 + " Два", "where": "dict/oem.json:records"}])),
     ("dict", "d.key_cyr", lambda о: о["_dict"]["records"][1].update(oem_key="fagпотипу")),
-    ("dict", "d.instruction", lambda о: о["_dict"]["records"][1].update(oem_key="любойдистрибьютор")),
+    ("dict", "d.instruction", lambda о: о["_dict"]["records"][1].update(name="Любой дистрибьютор")),
     ("dict", "d.multi", lambda о: о["_dict"]["records"][1].update(name="FAG/INA")),
     ("dict", "d.key_digits", lambda о: о["_dict"]["records"][1].update(oem_key="330180330105")),
     ("dict", "d.spell_quotes", lambda о: о["_dict"]["records"][1]["spellings"].append(
@@ -1200,12 +1213,18 @@ def test_запись_ревизии_только_своим_ключом(monkey
 
 
 def test_словарь_репозитория_меряется():
-    """На настоящем dict/oem.json ревизия проходит и что-то находит — это замер,
-    а не требование нуля: словарь засорён известно как (опись 24.09.2026)."""
+    """На настоящем dict/oem.json у каждой записи вид из закрытого списка, бренды
+    разложения — бренды словаря, и ни одно указание к закупке и ни одна склейка
+    обрезкой ключа не выдают себя за бренд. Защищённые записи (признак без
+    доказательства — «MTU / Rolls-Royce Power Systems») остаются брендом и видны
+    числом: это замер, а не требование нуля."""
     т = pa.ревизия_словаря(pa.читать_словарь())
     assert т.счета["d.count"] == [1, 0]
     assert т.счета["d.where"][1] == 0
-    assert т.счета["d.desc"][1] > 0
+    for код in ("d.kind", "d.kind_ref", "d.instruction", "d.key_glue"):
+        assert т.счета[код][1] == 0, код
+    настоящих, брендов = т.доли["u.brand_real"]
+    assert настоящих / брендов > т.доли["u.real"][0] / т.доли["u.real"][1]
 
 
 def test_образец_не_называет_значение():
@@ -1317,8 +1336,9 @@ def test_нормальные_значения_на_корпусе_не_обви
         поля(о, "bearings:c2").update(oem="Timken")             # нет в словаре, есть в /brands
         поля(о, "bearings:p0").update(unit="pcs")
         поля(о, "bearings:s1").update(name="SKF", role="maker")  # прямая поставка от изготовителя
-        о["_dict"]["records"].append({"oem_key": "bentlynevadallc", "name": "Bently Nevada, Llc", "spellings": []})
-        о["_dict"]["count"] = 3
+        о["_dict"]["records"].append({"oem_key": "bentlynevadallc", "name": "Bently Nevada, Llc",
+                                      "kind": "бренд", "spellings": []})
+        о["_dict"]["count"] = 4
     т = прогон(правка)
     дефекты = [(x.ид, к) for x in т.values() for к, (_, д) in x.счета.items() if д]
     assert not дефекты, дефекты

@@ -345,6 +345,49 @@ def test_разрешение_из_очереди_и_откат(засев):
     conn.rollback()
 
 
+def test_запись_словаря_стала_не_брендом_и_откат(засев):
+    """Сборщик пометил запись словаря видом «указание» (library/oem_kind.py):
+    повторный засев понижает её строки словаря до «не бренд», прежнее — в
+    prev_*, бренд в lib_brands остаётся (пометка, а не удаление), откат прогона
+    возвращает строки. Тот же словарь второй раз ничего не меняет."""
+    conn, mp, файлы = засев
+    было = счёт(conn)
+    словарь = {"records": [dict(r) for r in СЛОВАРЬ["records"]]}
+    for r in словарь["records"]:
+        if r["oem_key"] == "vortexa":
+            r.update(kind="указание", kind_why="указание к закупке: «выдумка»")
+    mp.setitem(файлы, br.ФАЙЛ_СЛОВАРЯ, словарь)
+    try:
+        засеять(conn, "r4")
+        with conn.cursor() as c:
+            c.execute("select count(*) from lib_brand_alias where run_id = 'r4'")
+            изменено = c.fetchone()[0]
+        conn.rollback()
+        засеять(conn, "r5")                   # тот же словарь — без изменений
+    finally:
+        mp.setitem(файлы, br.ФАЙЛ_СЛОВАРЯ, СЛОВАРЬ)
+    with conn.cursor() as c:
+        c.execute("select spelling, status, brand_key, prev_status, prev_brand_key, run_id "
+                  "from lib_brand_alias where source = 'dict/oem.json' and brand_key is distinct from 'kelton' "
+                  "and spelling in ('Vortexa', 'Vortexa AB', 'Vörtexa') order by spelling")
+        строки = c.fetchall()
+        c.execute("select count(*) from lib_brand_alias where run_id = 'r5'")
+        повтор = c.fetchone()[0]
+        c.execute("select count(*) from lib_brands where brand_key = 'vortexa'")
+        бренд_остался = c.fetchone()[0]
+    conn.rollback()
+    assert [(s, st, b, ps, pb, r) for s, st, b, ps, pb, r in строки] == [
+        (s, "не бренд", None, "разрешено", "vortexa", "r4") for s in ("Vortexa", "Vortexa AB", "Vörtexa")]
+    assert изменено >= 3 and повтор == 0 and бренд_остался == 1
+    lb.откатить(conn, "r4")
+    assert счёт(conn) == было
+    with conn.cursor() as c:
+        c.execute("select status, brand_key, run_id from lib_brand_alias "
+                  "where source = 'dict/oem.json' and spelling = 'Vortexa AB'")
+        assert c.fetchone() == ("разрешено", "vortexa", "r1")
+    conn.rollback()
+
+
 def test_гейт_отменяет_запись(засев):
     conn, _, _ = засев
     было = счёт(conn)

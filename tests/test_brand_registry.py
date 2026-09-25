@@ -90,9 +90,12 @@ def test_каждая_запись_файлов_ровно_в_одной_час�
         for н in п.написания:
             счёт[br.часть_ключа(н.get("brand_key") or н["spelling_key"] or н["spelling"], частей)] += 1
         assert sum(счёт) == len(п.написания)
-    # На живом словаре план не пуст, ключи брендов словаря сохранены как есть.
-    assert {r["oem_key"] for r in json.loads((ROOT / "dict/oem.json").read_text(encoding="utf-8"))["records"]} \
-        <= set(п.бренды)
+    # На живом словаре план не пуст, ключи брендов словаря сохранены как есть;
+    # записи другого вида (указание, несколько, описание, номер) брендом не
+    # заводятся (library/oem_kind.py).
+    записи = json.loads((ROOT / "dict/oem.json").read_text(encoding="utf-8"))["records"]
+    assert {r["oem_key"] for r in записи if r.get("kind", "бренд") == "бренд"} <= set(п.бренды)
+    assert not {r["oem_key"] for r in записи if r.get("kind", "бренд") != "бренд"} & set(п.бренды)
 
 
 def test_сверка_правил_считает_расхождения():
