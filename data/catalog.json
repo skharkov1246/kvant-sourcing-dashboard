@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 280,
-    "total_bytes": 124529887,
+    "datasets": 282,
+    "total_bytes": 124639475,
     "by_sensitivity": {
-      "внутреннее": 158,
+      "внутреннее": 160,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 16,
+      "дашборд сорсеров": 18,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3998,7 +3998,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 163498,
+      "bytes": 167961,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4009,11 +4009,13 @@
         "data/brand_research/dongfengcumminsengine.json",
         "data/brand_research/epiroc.json",
         "data/brand_research/inniojenbacher.json",
+        "data/brand_research/mturollsroycepowersystems.json",
         "data/brand_research/mwmcaterpillarenergy.json",
         "data/brand_research/queue.json",
         "data/brand_research/siemensenergy.json",
         "data/brand_research/solarturbines.json",
         "data/brand_research/waukeshainnio.json",
+        "data/brand_research/wrtsil.json",
         "data/budget_snapshot.json",
         "data/chain_coverage.json",
         "data/chat_snapshot.json",
@@ -4040,13 +4042,11 @@
         "gt/data/ms5001_vankor.json",
         "gt/data/pn_db.json",
         "gt/data/seller_index.json",
-        "gt/data/seller_sitemaps.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json"
+        "gt/data/seller_sitemaps.json"
       ],
       "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "0a4ab67",
+      "last_author": "Claude",
+      "last_commit": "17f8247",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7533,6 +7533,53 @@
       ]
     },
     {
+      "path": "data/brand_research/mturollsroycepowersystems.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 53231,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): MTU (Rolls-Royce Power Systems / Rolls-Royce Solutions): газовые Series 4000 (L61–L64, L32/L33) и Series 400 (6R400 GS, 12V400 GS), дизельные Series 4000 C-типов на горных самосвалах (Liebherr T 282, Bucyrus MT6300AC, БелАЗ 75710, Komatsu). Машин и исполнений — 18, сервисных документов — 11, кодов запчастей — 36: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 6, дилеров и сервисных компаний — 13, пробелов (gaps) — 10; по замечаниям скептика поправлено записей — 9 (поле corrections). 16 кодов — открытый каталог перепродавца engine-family.com, 8 — перечень ТО и верхнего ремонта у российского сервисника «Газмоторсервис», 4 — спецоснастка и контрольный набор из руководств MTU M015710/01E и MS150032/02E, 3 — пары номеров MTU и L'Orange в базе форсунок, остальные 5 — карточки продавцов аналогов с пометкой, кем заявлена применимость; цитаты у части страниц — выжимка инструментом загрузки, номера скептик нашёл дословно. Мощности L64 и L33 скептиком не подтверждены (verified: false). По Series 400 кодов не найдено. Официальных дилеров MTU в России и Казахстане после 2022 г. нет, сервисники указаны по их собственным заявлениям. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 36,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "17f8247",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gidromet/data/balansy.json",
       "subproject": "гидрометаллургия",
       "bytes": 53191,
@@ -7605,6 +7652,54 @@
       "referenced_by": [
         "gidromet/tools/spravka_gd.py"
       ]
+    },
+    {
+      "path": "data/brand_research/wrtsil.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 51807,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): Wärtsilä: газовые двигатели-генераторы 34SG (12V/16V/20V, раннее 18V, исполнения 34SG-LPG и power optimised), 31SG и 50SG. Машин и исполнений — 10, сервисных документов — 11, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 11, дилеров и сервисных компаний — 9, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 7 (поле corrections). 28 кодов — из выложенного эксплуатантом списка расходников на ТО 48 000 моточасов 18V34SG и из руководства 18V34SG (применимость к 12V/16V/20V сверять по серийному номеру), 4 — из сток-листа продавца Vesmec (форкамера, гильза, поршень, обкаточный фильтр), 8 — перекрёстные номера свечи 124002 (Denso, Champion, Motortech, 10-значные номера Wärtsilä по данным продавцов). По 31SG и 50SG кодов в открытом доступе нет: каталоги на закрытом портале Wärtsilä. Из России Wärtsilä ушла в июле 2022 г.; сервис в приоритетных странах — дочерние общества в Пакистане, Бангладеш, Индии, ОАЭ и Турции. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "17f8247",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "ove/data/reframe.json",
@@ -8875,8 +8970,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 32095,
-      "note": "Очередь разведки брендов (обновлена 2026-09-24): 60 брендов из dict/oem.json, сделано — 10, в очереди — 50. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 32182,
+      "note": "Очередь разведки брендов (обновлена 2026-09-25): 60 брендов из dict/oem.json, сделано — 12, в очереди — 48. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -8905,8 +9000,8 @@
         ]
       },
       "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "acc4e74",
+      "last_author": "Claude",
+      "last_commit": "17f8247",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
