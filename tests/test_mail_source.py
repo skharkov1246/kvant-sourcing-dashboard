@@ -585,17 +585,28 @@ def test_тело_письма_разбирается_без_запроса_к_�
     assert "ВЫД-6205" in имена and "УВ-40х52" in имена and "МВ-9" not in имена
 
 
-def test_без_вложений_только_тела_и_отметка_стоит(monkeypatch):
-    """Замер одних тел не тратит disk.file.get на вложения, а отметка группы
-    не двигается: иначе вложения этих писем пропали бы навсегда."""
+def test_без_вложений_только_тела_и_своя_отметка(monkeypatch):
+    """Прогон одних тел не тратит disk.file.get на вложения и двигает СВОЮ
+    отметку: общая осталась бы за письмами, чьи вложения не брали."""
     monkeypatch.setenv("MAIL_BODIES", "1")
     monkeypatch.setenv("MAIL_FILES", "0")
     п = письмо_с_телом(5, ТЕЛО_HTML, файлы=[77, 78])
     assert [r["file_id"] for r in ms.ссылки_письма(п, "mail-deal")] == ["mail-body:5"]
+    assert ms.имя_отметки("mail-lead") == "почта:mail-lead:тела"
+    к = Курсор(40)
+    assert ms.сдвинуть_отметку(к, "mail-lead", 40, 90, 50, "прогон-1")
+    assert к.записи[-1][0] == "почта:mail-lead:тела"
     monkeypatch.delenv("MAIL_FILES")
     assert [r["file_id"] for r in ms.ссылки_письма(п, "mail-deal")] == ["mail:77", "mail:78", "mail-body:5"]
-    шаг = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))["jobs"]["cursor"]["if"]
-    assert "inputs.files" in шаг and "inputs.apply" in шаг
+    assert ms.имя_отметки("mail-lead") == "почта:mail-lead"
+
+
+def test_план_и_отметка_знают_про_вложения():
+    """План читает, а шаг отметки пишет ту же отметку, что имел в виду прогон."""
+    wf = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    for job in ("plan", "cursor"):
+        envs = [st.get("env") or {} for st in wf["jobs"][job]["steps"]]
+        assert any("MAIL_FILES" in e and "MAIL_GROUP" in e for e in envs), job
 
 
 # ─────────────────────────────────────────────── позиции тела письма
