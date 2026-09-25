@@ -21,7 +21,11 @@ ACCESS_DENIED, то есть у сотрудника вебхука нет пр�
    - совпадают ли id из FILES и из STORAGE_ELEMENT_IDS;
    - доля удачи у писем, где ответственный — сам сотрудник вебхука, против
      остальных (если права решают, разница будет резкой);
-   - для удачных — ответил ли DOWNLOAD_URL файлом (код, не содержимое).
+   - для удачных — ответил ли DOWNLOAD_URL файлом (код, не содержимое);
+   - GET по url из FILES. Первый прогон зонда (36097961413) показал: url — это
+     crm_show_file.php с параметром auth, права по нему проверяет дело CRM, а не
+     Диск; disk.file.get при этом ACCESS_DENIED на всех 45 файлах, вебхук не
+     администратор. Адрес несёт токен и в журнал не пишется.
 4. Сколько хранилищ Диска видит вебхук по типу владельца (user, group, common).
 
 НАГРУЗКА НА ПОРТАЛ: около 120 запросов через общий бюджет клиента
@@ -46,7 +50,9 @@ from bitrix_client import BitrixClient, сводка_нагрузки  # noqa: E
     "сделка": {"TYPE_ID": 4, "OWNER_TYPE_ID": 2},
     "компания и контакт (входящие)": {"TYPE_ID": 4, "OWNER_TYPE_ID": [3, 4], "DIRECTION": 1},
 }
-ФАЙЛОВ_НА_ГРУППУ = 15
+ПОРТАЛ = ""
+ФАЙЛОВ_НА_ГРУППУ = 3
+АДРЕСОВ_НА_ГРУППУ = 10
 
 #: Код отказа портала — заглавные и подчёркивания; описание рядом может нести
 #: номер файла, поэтому в журнал идёт только код.
@@ -89,6 +95,32 @@ def попытка(bx: BitrixClient, метод: str, fid: str) -> tuple[str, st
     return "ответ не словарь", ""
 
 
+def сигнатура(b: bytes) -> str:
+    """Что пришло по первым байтам — без содержимого."""
+    for знак, имя in ((b"%PDF", "pdf"), (b"PK\x03\x04", "zip/xlsx/docx"),
+                      (b"\xd0\xcf\x11\xe0", "ole2 (xls/doc)"), (b"\x89PNG", "png"),
+                      (b"\xff\xd8", "jpeg")):
+        if b.startswith(знак):
+            return имя
+    голова = b[:2000].lower()
+    if b"<html" in голова or b"<!doctype" in голова:
+        return "страница входа" if (b"auth" in голова or b"login" in голова) else "html"
+    return "прочее"
+
+
+def закачка_ссылки(bx: BitrixClient, u: str) -> str:
+    """GET по url из FILES. Адрес несёт токен auth — в журнал не идёт никогда."""
+    bx.before_request("файл")
+    try:
+        r = requests.get(u, timeout=60, allow_redirects=True)
+    except Exception as e:                                          # noqa: BLE001
+        return f"сеть: {type(e).__name__}"
+    тип = (r.headers.get("content-type") or "").split(";")[0]
+    return (f"код {r.status_code} · {тип} · {сигнатура(r.content)} · "
+            f"{'больше' if len(r.content) > 2000 else 'меньше'} 2 КБ"
+            f"{' · имя в заголовке' if 'filename' in (r.headers.get('content-disposition') or '') else ''}")
+
+
 def закачка(bx: BitrixClient, u: str) -> str:
     bx.before_request("файл")
     try:
@@ -100,7 +132,10 @@ def закачка(bx: BitrixClient, u: str) -> str:
 
 
 def main() -> int:
+    global ПОРТАЛ
     bx = BitrixClient(os.environ["BITRIX_WEBHOOK_URL"])
+    ч = urlsplit(os.environ["BITRIX_WEBHOOK_URL"])
+    ПОРТАЛ = f"{ч.scheme}://{ч.netloc}"
 
     print("== ВЕБХУК ==")
     try:
@@ -148,6 +183,7 @@ def main() -> int:
         # Номер привязки из ссылки url (attachedId): у привязанного файла права
         # проверяет объект-владелец (дело CRM), а не Диск сотрудника.
         привязки: list[tuple[str, bool]] = []
+        адреса: list[str] = []
         for p in письма:
             провайдер[str(p.get("PROVIDER_ID"))] += 1
             хранение[str(p.get("STORAGE_TYPE_ID"))] += 1
@@ -156,6 +192,7 @@ def main() -> int:
                 ключи[",".join(sorted(o))] += 1
                 if o.get("url"):
                     ссылки[вид_ссылки(str(o["url"]))] += 1
+                    адреса.append(str(o["url"]))
                     параметры = dict(parse_qsl(urlsplit(str(o["url"])).query))
                     for имя_п in ("attachedId", "ATTACHED_ID", "attached_id"):
                         if str(параметры.get(имя_п) or "").isdigit():
@@ -192,6 +229,15 @@ def main() -> int:
                 закачки["attachedId"] += 1
                 print(f"  закачка по DOWNLOAD_URL привязки: {закачка(bx, u)}")
         print(f"номеров привязки в url: {len(привязки)}")
+        # Ссылка url из FILES: crm_show_file.php с токеном auth — права по ней
+        # проверяет CRM (дело), а не Диск сотрудника.
+        ответы_url = Counter()
+        for u in адреса[:АДРЕСОВ_НА_ГРУППУ]:
+            if u.startswith("/"):
+                u = ПОРТАЛ + u
+            ответы_url[закачка_ссылки(bx, u)] += 1
+        print(f"GET по url из FILES ({min(len(адреса), АДРЕСОВ_НА_ГРУППУ)} файлов):"
+              f" {dict(ответы_url.most_common())}")
         print(f"ответы по {min(len(файлы), ФАЙЛОВ_НА_ГРУППУ)} файлам:")
         for (метод, чей, к), n in sorted(итоги.items()):
             print(f"  {метод:30s} {чей:26s} {к:28s} {n:>3d}")
