@@ -1,0 +1,920 @@
+{
+  "oem_key": "jichaijinandieselcnpc",
+  "name": "Jichai (CNPC Jichai Power Company Limited, Jinan Diesel Engine Co., JDEC; бренды Jichai/Chidong)",
+  "segment_focus": "газовые двигатели серии 190 (12V190, H16V190) и агрегаты 500–1000 кВт: руководства, номера фильтров и свечей, дилеры в Казахстане и Узбекистане",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "CNPC Jichai Power (Цзинань, Китай; входит в CNPC) выпускает газопоршневые двигатели и агрегаты серии 190. На официальном сайте jinanengine.com (CNPC JICHAI POWER COMPANY LIMITED, есть русская версия jdec.ru) опубликованы технические данные: 12V190DT-2 (450 кВт) и 12V190ZDT-2 (552 кВт, агрегаты 400/500 кВт, заводской код исполнения 127/408), G12V190ZLDT (800 кВт, 1500 об/мин), C12V190ZLT-2 (830 кВт, агрегат 750GF-T), H16V190ZLT-2 и ZLT-1 (1200/1600 кВт, агрегаты 1100/1500 кВт), а также биогазовые и шахтно-метановые исполнения (ZLZ, ZLW). Там же названы поставщики комплектующих: Miba, Amot, Woodward, Alfa Laval, GEA, Parker, Bosch, Baldwin, Datcon, Ingersoll-Rand, Siemens/Leroy-Somer. Каталоги запчастей и руководства изготовитель открыто не публикует. Все коды запчастей взяты у китайских торговцев на made-in-china.com и сайтах продавцов, то есть это заводские номера Jichai в передаче продавца, а не выписка из каталога. Приоритет отдан газовым исполнениям: свечи (807BEX14.5/807BEX15-2 производства Stitt, узел 127.90.50, для H16V190 — 601T.90.20), катушка Altronic 591010, фильтры (воздушный 208L5.36.10, масляный 6016.18.00/6016.18.10A, центробежный 3008.19.00), клапаны, седла, вкладыши и кольца H16V190ZLT2-2 и 12V190. Официальные дистрибьюторы в России найдены: Valdex Energetica (статус с 2023 г.) и ООО «ГенМастер». Проекты изготовителя в Казахстане и Узбекистане подтверждены. Имя агента для Казахстана и Узбекистана не прочитано: страница агентов jichai.com/ru/node/349 отвечает 429. Персональные данные в ответ не включены.",
+  "machines": [
+    {
+      "model": "12V190DT-2 (агрегат 400GF-TK1)",
+      "kind": "газовый двигатель / газопоршневой агрегат, атмосферный",
+      "segment": "ГПУ",
+      "rating": "двигатель 450 кВт, агрегат 400 кВт, 1000 об/мин, код исполнения 408",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-1-Natural-Gas-1.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12V190ZDT-2 (агрегат 500GF18-TK; у продавца также 500GF-T6)",
+      "kind": "газовый двигатель с турбонаддувом, внешнее смесеобразование, магнето",
+      "segment": "ГПУ",
+      "rating": "двигатель 552 кВт, агрегат 500 кВт, 1000 об/мин, 12V, 190x210 мм, 71,5 л, код исполнения 127",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-1-Natural-Gas-1.html",
+        "http://www.jinanengine.com/3-1-127-natural-gas-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12V190ZDT1-2 (агрегат 550GF-TK)",
+      "kind": "газопоршневой агрегат",
+      "segment": "ГПУ",
+      "rating": "550 кВт, 1000 об/мин",
+      "status": "нет данных (только сведения продавца)",
+      "sources": [
+        "https://www.maofupower.com/news/jichai-gas-generator-overview.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "G12V190ZLDT",
+      "kind": "газовый двигатель, бедная смесь, электронное управление",
+      "segment": "ГПУ",
+      "rating": "800 кВт, 1500 об/мин",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-1-Natural-Gas-2.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G12V190ZLDT-2 / G12V190ZLDT-1 (агрегаты 500GF-TK1 / 550GF-T4)",
+      "kind": "газопоршневой агрегат, электронное управление",
+      "segment": "ГПУ",
+      "rating": "500 кВт, 1000 об/мин / 550 кВт, 1200 об/мин",
+      "status": "нет данных (только сведения продавца)",
+      "sources": [
+        "https://www.maofupower.com/news/jichai-gas-generator-overview.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "C12V190ZLT-2 (агрегат 750GF-T)",
+      "kind": "газовый двигатель с турбонаддувом, предварительное смешение (Woodward)",
+      "segment": "ГПУ",
+      "rating": "двигатель 830 кВт, агрегат 750 кВт, 1000 об/мин, 190x230 мм, 78,3 л",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-1-4-natural-gas-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "H16V190ZLT-2 (агрегаты 1100GF-T, 1000GF-T, 1200GF9-T)",
+      "kind": "газовый двигатель 16V с турбонаддувом",
+      "segment": "ГПУ",
+      "rating": "двигатель 1200 кВт, 1000 об/мин, агрегат 1100 кВт, 190x215 мм, 97,53 л",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-1-4-natural-gas-generator.html",
+        "https://jinanguohua.en.made-in-china.com/product/wBZEFmlxgPUn/China-H16V190zlt2-2-1200kw-Jichai-Chidong-Brand-Natural-Gas-Generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "H16V190ZLT-1 (агрегат 1500GF-T)",
+      "kind": "газовый двигатель 16V с турбонаддувом",
+      "segment": "ГПУ",
+      "rating": "двигатель 1600 кВт, 1200 об/мин, агрегат 1500 кВт, 60 Гц",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-1-4-natural-gas-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G12V190ZLDZ2-2 (агрегат 600GF-N)",
+      "kind": "биогазовый двигатель",
+      "segment": "ГПУ",
+      "rating": "агрегат 600 кВт, 1000/1200 об/мин",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-4-biogas-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C12V190ZLZ-2 (агрегат 700GF2-Z)",
+      "kind": "биогазовый двигатель",
+      "segment": "ГПУ",
+      "rating": "агрегат 700 кВт, 1000 об/мин",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-4-biogas-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "H16V190ZLZ-2 (агрегат 1000GF-Z)",
+      "kind": "биогазовый двигатель 16V",
+      "segment": "ГПУ",
+      "rating": "агрегат 1000 кВт",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-4-biogas-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G12V190ZLW-2 (агрегат 600GF-W)",
+      "kind": "двигатель на шахтном метане",
+      "segment": "ГПУ",
+      "rating": "двигатель 650 кВт, агрегат 600 кВт",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-5-coal-bed-methane-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "H16V190ZLW-2 (агрегат 1000GF-W)",
+      "kind": "двигатель на шахтном метане 16V",
+      "segment": "ГПУ",
+      "rating": "двигатель 1200 кВт, агрегат 1000 кВт",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-5-coal-bed-methane-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "L20V190ZLT-2 (агрегат 2000GF10-T)",
+      "kind": "газовый двигатель 20V, длинноходный",
+      "segment": "ГПУ",
+      "rating": "агрегат 2000 кВт, 190x255 мм",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/3-1-5-natural-gas-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Z12V190BC1 / A12V190PZL / G12V190PZL",
+      "kind": "дизельный двигатель серии 190 (буровой, судовой); общие узлы с газовыми исполнениями",
+      "segment": "двигатель",
+      "rating": "нет данных",
+      "status": "нет данных (модель подтверждена только страницами продавцов)",
+      "sources": [
+        "https://cusunmach.en.made-in-china.com/product/SOmatWhcHHpk/China-Jichai-12V190-Diesel-Engine-Turbocharger-223-20gj-00.html",
+        "https://www.weichaiengineparts.com/sale-48982206-jichai-a12v190pzl-diesel-filter-for-jinan-diesel-engine-parts-3012-18-10a-oil-filter.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "Gas Booster Compressor Packages (поршневые газовые компрессоры)",
+      "kind": "поршневой газовый компрессор, блочная поставка",
+      "segment": "компрессор",
+      "rating": "нет данных",
+      "status": "выпускается (на официальном сайте)",
+      "sources": [
+        "http://www.jinanengine.com/7-compressor.html"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Technical Parameters of Natural Gas Engine 12V190ZDT-2 / 12V190DT-2 (страница технических данных изготовителя)",
+      "kind": "технические данные (datasheet)",
+      "machine": "12V190ZDT-2, 12V190DT-2",
+      "sources": [
+        "http://www.jinanengine.com/3-1-Natural-Gas-1.html"
+      ]
+    },
+    {
+      "title": "Technical Parameters of Gas Generator 750GF-T / 1100GF-T / 1500GF-T (C12V190ZLT-2, H16V190ZLT-2, H16V190ZLT-1)",
+      "kind": "технические данные (datasheet)",
+      "machine": "C12V190ZLT-2, H16V190ZLT-2, H16V190ZLT-1",
+      "sources": [
+        "http://www.jinanengine.com/3-1-4-natural-gas-generator.html"
+      ]
+    },
+    {
+      "title": "Cylinder head assembly 1812T.03.00: перечень деталей с позициями (опубликован продавцом)",
+      "kind": "parts manual (выдержка)",
+      "machine": "12V190, газовое исполнение",
+      "sources": [
+        "https://cusunmach.en.made-in-china.com/product/gZhACzdEhpYL/China-Jichai-12V190-Natural-Gas-Engine-Cylinder-Head-Assembly1812t-03-00.html"
+      ]
+    },
+    {
+      "title": "H16V190 diesel engine parts: перечень узлов с номерами (опубликован продавцом)",
+      "kind": "parts manual (выдержка)",
+      "machine": "H16V190",
+      "sources": [
+        "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html"
+      ]
+    },
+    {
+      "title": "济柴12v190柴油机使用维护手册 (руководство по эксплуатации и ТО дизеля 12V190; найдено только по заголовку в поиске)",
+      "kind": "O&M",
+      "machine": "12V190 (дизель)",
+      "sources": [
+        "https://doc.quark.cn/preview/xingyeziliao-qita-qita/23F54F11B6B576A3DCE901DD0B7566C7"
+      ]
+    },
+    {
+      "title": "济柴12v190系列柴油机 说明书 配件图 (руководство и каталожные чертежи 190 серии; продаётся, открытого текста нет)",
+      "kind": "service manual / parts manual (объявление о продаже)",
+      "machine": "6190, 8190, 12V190",
+      "sources": [
+        "https://goods.jc001.cn/detail/4865999.html"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "807bex14.5",
+      "issuer": "Stitt (изготовитель свечи), по данным продавца",
+      "description": "Свеча зажигания",
+      "machine": "12V190ZDT-2",
+      "unit": "система зажигания",
+      "doc_ref": "",
+      "source_url": "https://www.made-in-china.com/showroom/12v190zdt/product-detailJBeENnrFauUH/China-Chidong-Jichai-12V190zdt-2-807bex14.5-127.90.50-Spark-Plug-Subassembly.html",
+      "quote": "Chidong Jichai 12V190zdt-2 807bex14.5 127.90.50 Spark Plug Subassembly"
+    },
+    {
+      "code": "807BEX15-2",
+      "issuer": "Stitt (изготовитель свечи)",
+      "description": "Свеча зажигания, импортная Stitt",
+      "machine": "12V190 (газовое исполнение)",
+      "unit": "система зажигания",
+      "doc_ref": "",
+      "source_url": "https://hongfanpower.en.made-in-china.com/product/dFUADSCzMNYW/China-6190-8190-12V190-16V190-Chidong-Jichai-Jinan-Diesel-Engine-Parts.html",
+      "quote": "STITT Imported Spark plug Win 127.90.50 Spark plug 807BEX15-2 spark plug accessories jichai chidong brand"
+    },
+    {
+      "code": "127.90.50",
+      "issuer": "Jichai",
+      "description": "Свеча зажигания в сборе (узел Jichai)",
+      "machine": "12V190ZDT-2",
+      "unit": "система зажигания",
+      "doc_ref": "",
+      "source_url": "https://www.made-in-china.com/showroom/12v190zdt/product-detailJBeENnrFauUH/China-Chidong-Jichai-12V190zdt-2-807bex14.5-127.90.50-Spark-Plug-Subassembly.html",
+      "quote": "Chidong Jichai 12V190zdt-2 807bex14.5 127.90.50 Spark Plug Subassembly"
+    },
+    {
+      "code": "127.90.50A",
+      "issuer": "Jichai",
+      "description": "Свеча зажигания для газового агрегата 12V190",
+      "machine": "12V190 (газовое исполнение)",
+      "unit": "система зажигания",
+      "doc_ref": "",
+      "source_url": "https://www.jichaipower.com/showroom/jinan-diesel-engine-parts-spark-plug-used-in-12v190-gas-generator-127-90-50a.html",
+      "quote": "Jinan Diesel Engine Parts Spark Plug Used in 12V190 Gas Generator 127.90.50A"
+    },
+    {
+      "code": "601t. 90.20",
+      "issuer": "Jichai",
+      "description": "Свеча зажигания (у продавца записано «601t. 90.20», у изготовителя вероятно 601T.90.20)",
+      "machine": "H16V190 (газовое исполнение)",
+      "unit": "система зажигания",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html",
+      "quote": "601t. 90.20 Spark Plug Used in 16V190 Gas Generator"
+    },
+    {
+      "code": "591010",
+      "issuer": "Altronic (изготовитель катушки)",
+      "description": "Высоковольтная катушка зажигания",
+      "machine": "Газовые агрегаты Jichai 190 (12V190)",
+      "unit": "система зажигания",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/pBUxPmYoRlrD/China-12V190-Ignition-Coil-for-Jichai-Wood-Altronic-591010-High-Voltage-Wire.html",
+      "quote": "Original Import Ignition Coils: Features Altronic 591010 high-voltage ignition coils for Jichai 190 gas generators."
+    },
+    {
+      "code": "206L.14.110",
+      "issuer": "Jichai",
+      "description": "Магнето в сборе (MAGNETO SUBASSEMBLY)",
+      "machine": "H16V190",
+      "unit": "система зажигания",
+      "doc_ref": "перечень продавца «H16V190 diesel engine parts»",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html",
+      "quote": "206L.14.110 MAGNETO SUBASSEMBLY"
+    },
+    {
+      "code": "208L5.36.10",
+      "issuer": "Jichai",
+      "description": "Элемент воздушного фильтра",
+      "machine": "H16V190 (газовое исполнение)",
+      "unit": "впускная система",
+      "doc_ref": "",
+      "source_url": "https://hongfanpower.en.made-in-china.com/product-group/IbhfLmuMVgpU/OEM-filter-element-catalog-1.html",
+      "quote": "Jichai H16V190 Gas Engine Accessories 208L5.36.10 Air Filter Element"
+    },
+    {
+      "code": "6016.18.00",
+      "issuer": "Jichai",
+      "description": "Масляный фильтр в сборе (OIL FILTER ASSEMBLY)",
+      "machine": "16V190 / H16V190ZLT2-2 (по перечню продавца)",
+      "unit": "система смазки",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/tSAQdUVMYipc/China-190-Series-Engine-Parts-G12V190pzl-Jichai-Chidong.html",
+      "quote": "OIL FILTER ASSEMBLY: Part No. 6016.18.00"
+    },
+    {
+      "code": "6016.18.10A",
+      "issuer": "Jichai",
+      "description": "Фильтрующий элемент в сборе (масляный фильтр)",
+      "machine": "16V190 / H16V190ZLT2-2 (по перечню продавца)",
+      "unit": "система смазки",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/tSAQdUVMYipc/China-190-Series-Engine-Parts-G12V190pzl-Jichai-Chidong.html",
+      "quote": "FILTER  ELEMENT SUBASSEMBLY  :Part No : 6016.18.10A"
+    },
+    {
+      "code": "3008.19.00",
+      "issuer": "Jichai",
+      "description": "Центробежный масляный фильтр в сборе",
+      "machine": "16V190 / H16V190ZLT2-2 (по перечню продавца)",
+      "unit": "система смазки",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/tSAQdUVMYipc/China-190-Series-Engine-Parts-G12V190pzl-Jichai-Chidong.html",
+      "quote": "CENTRIFUGAL  FILTER ASSEMBLY  :Part No : 3008.19.00"
+    },
+    {
+      "code": "601T.01.30.01",
+      "issuer": "Jichai",
+      "description": "Фильтрующий элемент в сборе (сапун картера); продавец на той же странице называет деталь то «breather body», то фильтрующим элементом",
+      "machine": "H16V190ZLT2-2",
+      "unit": "вентиляция картера",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/tSAQdUVMYipc/China-190-Series-Engine-Parts-G12V190pzl-Jichai-Chidong.html",
+      "quote": "FILTER  ELEMENT   SUBASSEMBLY  :Part No.601T.01.30.01"
+    },
+    {
+      "code": "601T.01.50A",
+      "issuer": "Jichai",
+      "description": "Взрывной (предохранительный) клапан картера",
+      "machine": "H16V190ZLT2-2",
+      "unit": "картер",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/tSAQdUVMYipc/China-190-Series-Engine-Parts-G12V190pzl-Jichai-Chidong.html",
+      "quote": "CRANKCASE  EXPLOSION- PROOF VALVE:Part No : 601T.01.50A"
+    },
+    {
+      "code": "3012.18.10A",
+      "issuer": "Jichai",
+      "description": "Масляный фильтр (элемент)",
+      "machine": "A12V190PZL (дизельное исполнение серии 190)",
+      "unit": "система смазки",
+      "doc_ref": "",
+      "source_url": "https://www.weichaiengineparts.com/sale-48982206-jichai-a12v190pzl-diesel-filter-for-jinan-diesel-engine-parts-3012-18-10a-oil-filter.html",
+      "quote": "jinan diesel engine parts Jichai chidong 3012.18.10A oil filter Jichai a12v190pzl oil filter diesel filter"
+    },
+    {
+      "code": "B3012.10.10",
+      "issuer": "Jichai (в паре с кодом BF9864, вероятно Baldwin)",
+      "description": "Топливный фильтр (дизельный)",
+      "machine": "16V190 (дизель), серия 190",
+      "unit": "топливная система",
+      "doc_ref": "",
+      "source_url": "https://rh-engine-parts.en.made-in-china.com/product/oRrUpQilRmkV/China-Jinan-Chidong-190-Engine-Spare-Parts-Bf9864-B3012-10-10-Diesel-Fuel-Filter-for-Jichai-16V190-Diesel-Engine.html",
+      "quote": "Jinan Chidong 190 Engine Spare Parts Bf9864 B3012.10.10 Diesel Fuel Filter for Jichai 16V190 Diesel Engine"
+    },
+    {
+      "code": "601.03.15A",
+      "issuer": "Jichai",
+      "description": "Впускной клапан",
+      "machine": "H16V190ZLT2-2 (1200GF9-T)",
+      "unit": "головка цилиндра / ГРМ",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "INLET VALVE: Part No. 601.03.15A. of JICHAI GAS ENGINE H16V190ZLT2-2/(1200GF9-T)"
+    },
+    {
+      "code": "601.03.14A",
+      "issuer": "Jichai",
+      "description": "Выпускной клапан",
+      "machine": "H16V190ZLT2-2 (1200GF9-T)",
+      "unit": "головка цилиндра / ГРМ",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "EXHAUST VALVE: Part No. 601.03.14A. of JICHAI GAS ENGINE H16V190ZLT2-2/(1200GF9-T)."
+    },
+    {
+      "code": "601T.03.10.07",
+      "issuer": "Jichai",
+      "description": "Седло выпускного клапана",
+      "machine": "H16V190ZLT2-2 (1200GF9-T)",
+      "unit": "головка цилиндра",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "SEAT EXHAUST VALVE : Part No. 601T.03.10.07 of JICHAI GAS ENGINE  H16V190ZLT2-2/(1200GF9-T)."
+    },
+    {
+      "code": "601T.03.10.06",
+      "issuer": "Jichai",
+      "description": "Седло впускного клапана",
+      "machine": "H16V190ZLT2-2 (1200GF9-T)",
+      "unit": "головка цилиндра",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "SEAT INLET VALVE: Part No. 601T.03.10.06 of JICHAI GAS ENGINE  H16V190ZLT2-2/(1200GF9-T)"
+    },
+    {
+      "code": "127.03.80.06",
+      "issuer": "Jichai",
+      "description": "Уплотнение направляющей клапана (маслосъёмный колпачок)",
+      "machine": "H16V190ZLT2-2 (1200GF9-T)",
+      "unit": "головка цилиндра",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "SEAL FOR VALVE GUIDE: Part No. 127.03.80.06 of JICHAI GAS ENGINE  H16V190ZLT2-2/(1200GF9-T)."
+    },
+    {
+      "code": "601.03.10.03A",
+      "issuer": "Jichai",
+      "description": "Направляющая клапана",
+      "machine": "H16V190ZLT2-2 (по перечню продавца)",
+      "unit": "головка цилиндра",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/tSAQdUVMYipc/China-190-Series-Engine-Parts-G12V190pzl-Jichai-Chidong.html",
+      "quote": "VALVE  GUIDE  : Part No. 601.03.10.03A"
+    },
+    {
+      "code": "601.05.02A-GJ",
+      "issuer": "Jichai",
+      "description": "Поршневое кольцо",
+      "machine": "H16V190",
+      "unit": "цилиндро-поршневая группа",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/gvAmXdCOlkpc/China-601-05-02A-Gj-Piston-Ring-Model-H16V190-Diesel-Engine-Parts.html",
+      "quote": "601.05.02A-Gj Piston Ring Model H16V190 Diesel Engine Parts"
+    },
+    {
+      "code": "601.05.07",
+      "issuer": "Jichai",
+      "description": "Верхний вкладыш (что вкладыш шатунный — выведено из соседних строк перечня, в строке сказано только «bearing shell»)",
+      "machine": "H16V190",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "перечень продавца «H16V190 diesel engine parts»",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html",
+      "quote": "601.05.07 UPPER BEARING SHELL"
+    },
+    {
+      "code": "601.05.08",
+      "issuer": "Jichai",
+      "description": "Нижний вкладыш (что вкладыш шатунный — выведено из соседних строк перечня, в строке сказано только «bearing shell»)",
+      "machine": "H16V190",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "перечень продавца «H16V190 diesel engine parts»",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html",
+      "quote": "601.05.08 LOWER BEARING SHELL"
+    },
+    {
+      "code": "601.21.20B",
+      "issuer": "Jichai",
+      "description": "Масляный термостат в сборе",
+      "machine": "H16V190",
+      "unit": "система смазки",
+      "doc_ref": "перечень продавца «H16V190 diesel engine parts»",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html",
+      "quote": "601.21.20B OIL THERMOSTAT SUBASSEMBLY"
+    },
+    {
+      "code": "6016.25.00",
+      "issuer": "Jichai",
+      "description": "Термостатический клапан в сборе (охлаждение)",
+      "machine": "H16V190",
+      "unit": "система охлаждения",
+      "doc_ref": "перечень продавца «H16V190 diesel engine parts»",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html",
+      "quote": "6016.25.00 THERMOSTAT VALVE ASSY"
+    },
+    {
+      "code": "6016.22D.00",
+      "issuer": "Jichai",
+      "description": "Водяной насос в сборе",
+      "machine": "H16V190",
+      "unit": "система охлаждения",
+      "doc_ref": "перечень продавца «H16V190 diesel engine parts»",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html",
+      "quote": "6016.22D.00 WATER PUMP ASSY"
+    },
+    {
+      "code": "6016.21.00",
+      "issuer": "Jichai",
+      "description": "Масляный охладитель в сборе",
+      "machine": "H16V190",
+      "unit": "система смазки",
+      "doc_ref": "перечень продавца «H16V190 diesel engine parts»",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/qvRQSmwYHVpl/China-601t-90-20-Spark-Plug-Used-in-16V190-Gas-Generator.html",
+      "quote": "6016.21.00 OIL COOLER ASSY"
+    },
+    {
+      "code": "307.54.00",
+      "issuer": "Jichai",
+      "description": "Электрический насос предпусковой прокачки масла в сборе",
+      "machine": "H16V190ZLT-2",
+      "unit": "система смазки",
+      "doc_ref": "номер взят из ссылки на соседний товар на странице турбокомпрессора 223.20GJ.00, а не из основной карточки",
+      "source_url": "https://cusunmach.en.made-in-china.com/product/SOmatWhcHHpk/China-Jichai-12V190-Diesel-Engine-Turbocharger-223-20gj-00.html",
+      "quote": "Jichai H16V190zlt-2 Natural Gas Engine Electric Pre-Supplying Oil Pump Assembly 307.54.00"
+    },
+    {
+      "code": "127.20GJ.00EB",
+      "issuer": "Jichai",
+      "description": "Турбокомпрессор (нагнетатель) газового исполнения с кодом 127",
+      "machine": "12V190ZDT-2 (код исполнения 127)",
+      "unit": "турбонаддув",
+      "doc_ref": "привязка к 12V190ZDT-2 — вывод разведки по коду исполнения 127; на странице продавца модель не названа",
+      "source_url": "https://hongfanpower.en.made-in-china.com/product/dFUADSCzMNYW/China-6190-8190-12V190-16V190-Chidong-Jichai-Jinan-Diesel-Engine-Parts.html",
+      "quote": "Cylinder head assembly 127.03.00B china supplier of diesel engine Supercharger 127.20GJ.00EB jinan jichai chidong brand"
+    },
+    {
+      "code": "127.03.00B",
+      "issuer": "Jichai",
+      "description": "Головка цилиндра в сборе (газовое исполнение, код 127)",
+      "machine": "12V190ZDT-2 (код исполнения 127)",
+      "unit": "головка цилиндра",
+      "doc_ref": "привязка к 12V190ZDT-2 — вывод разведки по коду исполнения 127; на странице продавца модель не названа",
+      "source_url": "https://hongfanpower.en.made-in-china.com/product/dFUADSCzMNYW/China-6190-8190-12V190-16V190-Chidong-Jichai-Jinan-Diesel-Engine-Parts.html",
+      "quote": "Cylinder head assembly 127.03.00B china supplier of diesel engine Supercharger 127.20GJ.00EB jinan jichai chidong brand"
+    },
+    {
+      "code": "1812T.03.00",
+      "issuer": "Jichai",
+      "description": "Головка цилиндра в сборе, газовый двигатель",
+      "machine": "12V190 (газовое исполнение)",
+      "unit": "головка цилиндра",
+      "doc_ref": "",
+      "source_url": "https://cusunmach.en.made-in-china.com/product/gZhACzdEhpYL/China-Jichai-12V190-Natural-Gas-Engine-Cylinder-Head-Assembly1812t-03-00.html",
+      "quote": "Cylinder head assembly 1812T.03.00"
+    },
+    {
+      "code": "223.20GJ.00",
+      "issuer": "Jichai",
+      "description": "Турбокомпрессор в сборе",
+      "machine": "Z12V190BC1 (дизель серии 190)",
+      "unit": "турбонаддув",
+      "doc_ref": "",
+      "source_url": "https://cusunmach.en.made-in-china.com/product/SOmatWhcHHpk/China-Jichai-12V190-Diesel-Engine-Turbocharger-223-20gj-00.html",
+      "quote": "223.20GJ.00"
+    },
+    {
+      "code": "12VB.05.10.04/05",
+      "issuer": "Jichai",
+      "description": "Шатунный вкладыш",
+      "machine": "12V190",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "12VB.05.10.04/05 connecting rod bearing"
+    },
+    {
+      "code": "12VB.01.23A/24A",
+      "issuer": "Jichai",
+      "description": "Коренные вкладыши, верхний и нижний",
+      "machine": "12V190",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "12VB.01.23A/24A UPPER/LOWER MAIN BEARING METAL"
+    },
+    {
+      "code": "12VB.05.09C-GJ",
+      "issuer": "Jichai",
+      "description": "Поршневое кольцо",
+      "machine": "12V190",
+      "unit": "цилиндро-поршневая группа",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "12VB.05.09C-GJ piston ring"
+    },
+    {
+      "code": "12V.01.02C",
+      "issuer": "Jichai",
+      "description": "Гильза цилиндра",
+      "machine": "12V190",
+      "unit": "цилиндро-поршневая группа",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "12V.01.02C cylinder liner"
+    },
+    {
+      "code": "12VB.03.37A",
+      "issuer": "Jichai",
+      "description": "Впускной клапан",
+      "machine": "12V190",
+      "unit": "головка цилиндра / ГРМ",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "12VB.03.37A INLET VALVE"
+    },
+    {
+      "code": "12VB.03.22",
+      "issuer": "Jichai",
+      "description": "Выпускной клапан",
+      "machine": "12V190",
+      "unit": "головка цилиндра / ГРМ",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "12VB.03.22 EXHAUST VALVE"
+    },
+    {
+      "code": "12VB.03.80.02",
+      "issuer": "Jichai",
+      "description": "Направляющая клапана",
+      "machine": "12V190",
+      "unit": "головка цилиндра",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "12VB.03.80.02 VALVE GUIDE"
+    },
+    {
+      "code": "12VB.03.11",
+      "issuer": "Jichai",
+      "description": "Уплотнительное кольцо I (головка цилиндра)",
+      "machine": "12V190",
+      "unit": "головка цилиндра",
+      "doc_ref": "",
+      "source_url": "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+      "quote": "12VB.03.11 SEAL RING I"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Woodward (США)",
+      "component": "система регулирования частоты вращения и управления двигателем; дозирование газа TECJET, система E6 для бедной смеси",
+      "machine": "газовые двигатели серии 190 (12V190ZDT-2, C12V190ZLT-2, H16V190ZLT, биогазовые G12V190)",
+      "evidence": "официальный список поставщиков Worldwide Partnership («Woodward | America | Speed regulation control system»); на страницах изделий: «WOODWARD controller», «developed in cooperation with WOODWARD», «TECJET automatic AFR adjustment», «WOODWARD's E6 system»",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html",
+        "http://www.jinanengine.com/3-1-127-natural-gas-generator.html",
+        "http://www.jinanengine.com/3-1-4-natural-gas-generator.html",
+        "http://www.jinanengine.com/3-1-5-natural-gas-generator.html",
+        "http://www.jinanengine.com/3-4-biogas-generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Miba (Германия)",
+      "component": "вкладыши распредвала, коренные и шатунные вкладыши",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership: «Miba | Germany | Camshaft bearing, Main bearing,Connecting rod bearing»",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Amot (Англия)",
+      "component": "термостатический клапан",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Alfa Laval (Швеция)",
+      "component": "масляный охладитель",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership («Alfal laval | Sweden | Oil cooler»)",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "GEA (Германия)",
+      "component": "охладитель наддувочного воздуха",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Parker (США)",
+      "component": "уплотнительные кольца",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Bosch (Германия)",
+      "component": "зажигание (топливная система), моноблочный ТНВД",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership («Bosch | Germany | Ignition (fuel system), monoblock pump»)",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Baldwin (США)",
+      "component": "фильтры",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership; у продавца код BF9864 (формат Baldwin) указан в паре с номером Jichai B3012.10.10",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html",
+        "https://rh-engine-parts.en.made-in-china.com/product/oRrUpQilRmkV/China-Jinan-Chidong-190-Engine-Spare-Parts-Bf9864-B3012-10-10-Diesel-Fuel-Filter-for-Jichai-16V190-Diesel-Engine.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Datcon (США)",
+      "component": "приборы",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Ingersoll-Rand (США)",
+      "component": "пусковой двигатель, редукционный клапан пневмостартера",
+      "machine": "двигатели Jichai (без указания серии)",
+      "evidence": "официальный список Worldwide Partnership",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Nova (Чехия)",
+      "component": "двухслойные трубки высокого давления",
+      "machine": "двигатели Jichai (без указания серии; применение на дизельных исполнениях — вывод разведки по назначению детали)",
+      "evidence": "официальный список Worldwide Partnership («Nova | Czechoslovakia | Dual-layer high pressure pipe»)",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Siemens / Leroy-Somer (Германия / Франция)",
+      "component": "генератор (альтернатор); на 500/400 кВт — 1FC5456-6TA42 / 1FC5454-6LA42",
+      "machine": "агрегаты 500GF18-TK, 400GF-TK1; 1000GF-T (H16V190ZLT-2, альтернатор серии 1FC)",
+      "evidence": "официальный список Worldwide Partnership; модель генератора в таблице технических данных изготовителя; у продавца для H16V190ZLT-2 указано «1FC series (siemens technology)»",
+      "sources": [
+        "http://www.jinanengine.com/Cooperators.html",
+        "http://www.jinanengine.com/3-1-Natural-Gas-1.html",
+        "https://jinanguohua.en.made-in-china.com/product/wBZEFmlxgPUn/China-H16V190zlt2-2-1200kw-Jichai-Chidong-Brand-Natural-Gas-Generator.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Altronic (США)",
+      "component": "высоковольтная катушка зажигания 591010",
+      "machine": "газовые агрегаты Jichai 190",
+      "evidence": "по данным продавца запчастей (JNGH), изготовитель не подтверждал",
+      "sources": [
+        "https://jinanguohua.en.made-in-china.com/product/pBUxPmYoRlrD/China-12V190-Ignition-Coil-for-Jichai-Wood-Altronic-591010-High-Voltage-Wire.html"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Stitt (свечи зажигания)",
+      "component": "свечи зажигания 807BEX14.5, 807BEX15-2",
+      "machine": "12V190 (газовое исполнение)",
+      "evidence": "по данным продавцов запчастей («STITT Imported Spark plug»), изготовитель не подтверждал",
+      "sources": [
+        "https://hongfanpower.en.made-in-china.com/product/dFUADSCzMNYW/China-6190-8190-12V190-16V190-Chidong-Jichai-Jinan-Diesel-Engine-Parts.html",
+        "https://www.jichaipower.com/engine-spare-part/12v190-spare-part/807bex14-5-jichai-12v190-imported-stitt-spark.html"
+      ],
+      "verified": false
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Валдекс Энергетика (Valdex Energetica)",
+      "country": "Россия",
+      "role": "официальный дистрибьютор CNPC Jichai в РФ (с 2023 г.), продажа, пусконаладка и сервис",
+      "sources": [
+        "https://valdex-energetica.com/jichai"
+      ]
+    },
+    {
+      "company": "ООО «ГенМастер» (сайт jichai.ru)",
+      "country": "Россия",
+      "role": "официальный партнёр CNPC JICHAI, энергетическое оборудование, дизельные и газопоршневые установки",
+      "sources": [
+        "https://jichai.ru/"
+      ]
+    },
+    {
+      "company": "РОСТ ЭНЕРДЖИ",
+      "country": "Россия",
+      "role": "поставщик газопоршневых установок Jichai; на странице бренда подписан «Официальный дистрибьютор» (статус изготовителем не подтверждён)",
+      "sources": [
+        "https://rostenergy.ru/vendors/jichai/"
+      ]
+    },
+    {
+      "company": "ООО «Альфа-Дизель»",
+      "country": "Россия",
+      "role": "агент Jichai по нефтегазовой и угольной отраслям (по выдержке поиска со страницы агентов jichai.com; сама страница отвечает 429)",
+      "sources": [
+        "https://www.jichai.com/ru/node/349"
+      ]
+    },
+    {
+      "company": "ООО «ЭНГЕН»",
+      "country": "Россия",
+      "role": "агент Jichai: нефтегазовая и угольная отрасли, рудники (по выдержке поиска со страницы агентов jichai.com; сама страница отвечает 429)",
+      "sources": [
+        "https://www.jichai.com/ru/node/349"
+      ]
+    },
+    {
+      "company": "CNPC Jichai Power Company Limited, зарубежный сбыт и сервис (регион СНГ)",
+      "country": "Китай",
+      "role": "изготовитель; у зарубежного отдела продаж и сервиса есть отдельный региональный руководитель по СНГ; обучение, выезд на площадку, шефмонтаж; проекты в Казахстане (попутный газ, дожимная станция) и Узбекистане (буровые газовые двигатели)",
+      "sources": [
+        "http://www.jinanengine.com/Service.html",
+        "http://www.jinanengine.com/projects.html",
+        "https://jdec.ru/"
+      ]
+    },
+    {
+      "company": "Jinan Guohua Green Power Equipment Co., Ltd (JNGH)",
+      "country": "Китай",
+      "role": "по собственной аттестации — сбытовая и сервисная компания Jinan Diesel Engine: запчасти 190 серии, капремонт; склад в Синьцзяне для западного рынка, работы в Казахстане",
+      "sources": [
+        "https://jinanguohua.en.made-in-china.com/product/lKIEUiqOCDYe/China-12V190-Series-Jinan-Diesel-Engine-Parts.html",
+        "https://jinanguohua.en.made-in-china.com/product/tSAQdUVMYipc/China-190-Series-Engine-Parts-G12V190pzl-Jichai-Chidong.html"
+      ]
+    },
+    {
+      "company": "Jinan Jichai Huanneng Gas Generating Equipment Co., Ltd",
+      "country": "Китай",
+      "role": "по собственной аттестации — дочерняя сбытовая компания: газовые агрегаты и запчасти 12V190, поставки в Казахстан",
+      "sources": [
+        "https://www.jichaipower.com/engine-spare-part/12v190-spare-part/",
+        "https://m.jichaipower.com/showroom/chidong-brand-gas-generator-parts-in-kazakhstan.html"
+      ]
+    },
+    {
+      "company": "Shandong Hongfan Power Technology Co., Ltd",
+      "country": "Китай",
+      "role": "торговец запчастями Jichai/Chidong 190 серии и газовыми агрегатами, есть русский сайт",
+      "sources": [
+        "https://hongfanpower.en.made-in-china.com/product/dFUADSCzMNYW/China-6190-8190-12V190-16V190-Chidong-Jichai-Jinan-Diesel-Engine-Parts.html",
+        "https://www.maofupower.com/news/jichai-gas-generator-overview.html"
+      ]
+    },
+    {
+      "company": "Jinan Yuecheng Power Machinery Co., Ltd",
+      "country": "Китай",
+      "role": "ремонт и ТО 12V190 (дизельных и газовых), сборка агрегатов, продажа запчастей",
+      "sources": [
+        "https://www.made-in-china.com/showroom/12v190zdt/product-detailJBeENnrFauUH/China-Chidong-Jichai-12V190zdt-2-807bex14.5-127.90.50-Spark-Plug-Subassembly.html"
+      ]
+    },
+    {
+      "company": "Jinan Cusun Mach Co., Ltd",
+      "country": "Китай",
+      "role": "торговец запчастями Jichai 12V190/H16V190 (турбокомпрессоры, головки цилиндров, маслонасосы)",
+      "sources": [
+        "https://cusunmach.en.made-in-china.com/product/SOmatWhcHHpk/China-Jichai-12V190-Diesel-Engine-Turbocharger-223-20gj-00.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Имя агента Jichai для Казахстана и Узбекистана не установлено. Страница агентов изготовителя https://www.jichai.com/ru/node/349 (по выдержке поиска там есть агент с территорией «Узбекистан и Казахстан») и сайт ru.cnpcjichai.com отдают 429 или «Нет доступа». Нужно открыть их из браузера или запросить у регионального отдела СНГ изготовителя.",
+    "Местных дилеров и сервисных центров Jichai в Казахстане и Узбекистане в открытых источниках не найдено. Там работают китайские продавцы (JNGH со складом в Синьцзяне, Jichai Huanneng) и российские дистрибьюторы.",
+    "Официальных каталогов запчастей (parts catalogue) и руководств по эксплуатации газовых 12V190ZDT-2, G12V190ZLDT, H16V190ZLT-2 в открытом доступе нет. Найдены только руководство по дизелю 12V190 на китайских файлообменниках (doc.quark.cn, по заголовку) и объявления о продаже бумажных руководств (jc001.cn). Вероятно, документы выдаются с поставкой агрегата или через дилера.",
+    "Все коды запчастей взяты у торговцев (made-in-china.com, weichaiengineparts.com, jichaipower.com), а не из документа изготовителя. Номера в формате Jichai (127.x — газовое исполнение 12V190ZDT-2, 601.x / 601T.x / 6016.x — 16V190/H16V190, 12VB.x — 12V190) требуют сверки с каталогом завода. Часть перечней продавец озаглавил «diesel engine parts», хотя там упомянут газовый H16V190ZLT2-2.",
+    "Номера расходников на газовых двигателях Woodward (исполнительные механизмы TECJET, контроллеры E6/EGS, датчики детонации и кислорода), как и номера термопар (у продавца упомянута MGR-1, код не проверен) и датчика температуры EDWD-1, по конкретной модели не найдены. Вероятно, они лежат в документации Woodward и в сервисных листах дилера.",
+    "Номер масляного фильтра именно для газового 12V190ZDT-2 (код 127) открыто не найден. Найденные 6016.18.00/6016.18.10A относятся к 16V190, а 3012.18.10A — к дизелю A12V190PZL.",
+    "Интервалы ТО, сервисные бюллетени и уставки защит газовых двигателей серии 190 открыто не публикуются.",
+    "Сайт https://www.jichai.com (основной, с английской и русской версиями каталога) закрыт проверкой («Your access to this site has been limited»). Технические данные взяты с официального зеркала jinanengine.com / jdec.ru."
+  ],
+  "verifier_notes": "Все 25 страниц-источников открылись (HTTP 200); две страницы jichaipower.com пришли сжатыми gzip и были распакованы. Все 42 кода найдены на своих source_url дословно, с точностью до регистра и пробелов, и относятся к заявленным изделиям. Неточности, которые не меняют вердикта: 1) 127.20GJ.00EB и 127.03.00B привязаны к 12V190ZDT-2 выводом разведки по коду исполнения 127, страница этого не говорит; 2) 307.54.00 взят из ссылки на соседний товар на странице турбокомпрессора, а не из основной карточки; 3) «500GF-T» у изготовителя не найден (официально 500GF18-TK, у продавца 500GF-T6); 4) у 601T.01.30.01 продавец называет деталь то «breather body», то фильтрующим элементом; 5) что 601.05.07/08 — шатунные вкладыши, выведено из соседних строк перечня; 6) пометка «дизельные исполнения» у Nova — вывод разведки. Модели Z12V190BC1, A12V190PZL, G12V190PZL, 12V190ZDT1-2 и G12V190ZLDT-1/-2 подтверждены только страницами продавцов. Сохранённые скептиком копии страниц остались в рабочей папке сессии, в репозиторий не входят. Оговорка при сборке файла: скептик назвал 42 кодов, в разделе parts 41 записей; каждый код раздела есть дословно в своей цитате (проверщик), число в отчёте скептика — его подсчёт.",
+  "corrections": [
+    "127.20GJ.00EB, 127.03.00B: в doc_ref оговорено, что привязка к 12V190ZDT-2 — вывод по коду исполнения 127, страница этого не говорит (замечание скептика 1)",
+    "307.54.00: в doc_ref оговорено, что номер взят из ссылки на соседний товар, а не из основной карточки (замечание скептика 2)",
+    "12V190ZDT-2: из модели убран агрегат «500GF-T» — у изготовителя он не найден, официально 500GF18-TK, у продавца 500GF-T6 (замечание скептика 3)",
+    "601T.01.30.01: в описании оговорено расхождение наименования у продавца — «breather body» и фильтрующий элемент (замечание скептика 4)",
+    "601.05.07, 601.05.08: в описании оговорено, что «шатунный» выведено из соседних строк перечня (замечание скептика 5)",
+    "Nova: пометка «дизельные исполнения» оговорена как вывод разведки — в списке изготовителя серия не указана (замечание скептика 6)",
+    "12V190ZDT1-2, G12V190ZLDT-2/-1, Z12V190BC1/A12V190PZL/G12V190PZL: verified: false — модели подтверждены только страницами продавцов, как велит навык для записи на объявлении",
+    "sub_suppliers: проставлено verified — Woodward, Miba, Bosch, Ingersoll-Rand и Siemens/Leroy-Somer true (официальный список Worldwide Partnership и техданные изготовителя), Altronic и Stitt false — только по данным продавцов",
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет",
+    "verifier_notes: оговорено расхождение числа кодов — в отчёте скептика 42, в разделе parts 41"
+  ]
+}

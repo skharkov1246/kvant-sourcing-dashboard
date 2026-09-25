@@ -1,6 +1,6 @@
 {
   "schema": "kvant.brand-research-queue/1",
-  "updated": "2026-09-24",
+  "updated": "2026-09-25",
   "rule": "Очередь разведки брендов: бренд за брендом — машины, сервисные книги, коды запчастей, субпоставщики, дилеры. Берётся запись «в очереди» с наименьшим priority, одна сессия — не больше двух брендов (пятая часть ресурса). Порядок: группа фокуса по списку groups (сначала изготовители машин, потом изготовители узлов), внутри группы — n_spellings из dict/oem.json по убыванию, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. oem_key — только существующий ключ словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) в очередь не берутся. Процедура — .claude/skills/brand-research/SKILL.md, проверка — scripts/brand_research_check.py.",
   "groups": [
     "ГПУ",
@@ -162,9 +162,9 @@
       "atlas": [
         "CNPC Jichai Power Company Limited — 中国石油济柴动力有限公司 (марки JICHAI / JDEC)"
       ],
-      "status": "в очереди",
-      "researched_at": null,
-      "file": null
+      "status": "сделано",
+      "researched_at": "2026-09-25",
+      "file": "data/brand_research/jichaijinandieselcnpc.json"
     },
     {
       "priority": 11,
@@ -175,9 +175,9 @@
       "focus": "газовые двигатели SFGLD/HGM: перечни ТО, свечи, фильтры; кто обслуживает после продажи подразделения",
       "n_spellings": 1,
       "atlas": [],
-      "status": "в очереди",
-      "researched_at": null,
-      "file": null
+      "status": "сделано",
+      "researched_at": "2026-09-25",
+      "file": "data/brand_research/guascorsiemensenergy.json"
     },
     {
       "priority": 12,
