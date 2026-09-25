@@ -1,0 +1,920 @@
+{
+  "oem_key": "generalelectric",
+  "name": "General Electric (GE Vernova)",
+  "segment_focus": "LM2500, LM6000, MS5002, PGT25: руководства по ТО, номера горячего тракта, форсунок, свечей, датчиков; субпоставщики пакета",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по открытым источникам: авиапроизводные ГТУ LM2500 (включая +, +G4, XPRESS) и LM6000 (PC, PF+, VELOX), тяжёлая двухвальная MS5002 (C/D/E, сейчас выпускает Baker Hughes / Nuovo Pignone как Frame 5/2E) и PGT25 (газогенератор LM2500 и силовая турбина Nuovo Pignone). Принято 39 кодов запчастей, каждый проверен на странице источника (текст получен curl, цитата дословная); ещё один код отклонён скептиком. Код для LM2500 и LM6000 — номер GE вида Lxxxxx Pxx / 9xxxMxxPxx. Для MS5002 — коды GE (xxxAxxxxPxxx) и Nuovo Pignone (SMR/KFZ). Номера PGT25 отдельно не найдены: газогенератор PGT25 — это LM2500, и коды LM2500 к нему применимы по конструкции (это вывод, а не цитата). Субпоставщики установлены по полю OEM на карточках деталей: Unison (свечи, возбудители), Advanced Atomization Technologies (форсунки), AMETEK (термопары T5.4), Vibro-Meter и Endevco (акселерометры и датчики пульсаций), Lear Romec (маслонасос), Arkwin (привод VBV), Meggitt (клапан отбора), Woodward (топливные клапаны). Цитаты взяты у независимых поставщиков запчастей, а не у GE: код подтверждён торговцем, а не каталогом изготовителя. Лист Blaze (turbineblade.net) сдвинут на строку, поэтому его описания не используются; L35166P02 — термометр сопротивления (RTD) по листу Hangzhou. Второй проход сделан: все 39 кодов найдены на страницах дословно, 9649M10P03 отклонён.",
+  "machines": [
+    {
+      "model": "LM2500",
+      "kind": "авиапроизводная газовая турбина (газогенератор + силовая турбина)",
+      "segment": "ГТУ",
+      "rating": "25,06 МВт (33 600 л.с.), КПД 36 %",
+      "status": "выпускается (семейство)",
+      "sources": [
+        "https://en.wikipedia.org/wiki/General_Electric_LM2500",
+        "https://www.gevernova.com/gas-power/products/gas-turbines/lm2500"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LM2500+",
+      "kind": "авиапроизводная газовая турбина",
+      "segment": "ГТУ",
+      "rating": "30,2 МВт, КПД 38 %",
+      "status": "выпускается",
+      "sources": [
+        "https://en.wikipedia.org/wiki/General_Electric_LM2500"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LM2500+G4",
+      "kind": "авиапроизводная газовая турбина",
+      "segment": "ГТУ",
+      "rating": "35,32 МВт, КПД 39 %",
+      "status": "выпускается",
+      "sources": [
+        "https://en.wikipedia.org/wiki/General_Electric_LM2500",
+        "https://www.ge.com/content/dam/gepower-pgdp/global/en_US/documents/technical/ger/ger-4250-ge-lm2500-g4-aero-gas-turbine-marine-industrial-applications.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LM2500XPRESS+G4 DLE UPT",
+      "kind": "модульная авиапроизводная ГТУ",
+      "segment": "ГТУ",
+      "rating": "34,5 МВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.gevernova.com/gas-power/products/gas-turbines/lm2500"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LM2500XPRESS+G5 DLE UPT",
+      "kind": "модульная авиапроизводная ГТУ",
+      "segment": "ГТУ",
+      "rating": "36,3 МВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.gevernova.com/gas-power/products/gas-turbines/lm2500"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LM6000 PC",
+      "kind": "авиапроизводная двухвальная газовая турбина",
+      "segment": "ГТУ",
+      "rating": "более 43 МВт, КПД около 42 %",
+      "status": "выпускается (как LM6000VELOX PC Sprint, 51,1 МВт)",
+      "sources": [
+        "https://en.wikipedia.org/wiki/General_Electric_LM6000",
+        "https://www.gevernova.com/gas-power/products/gas-turbines/lm6000"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LM6000 PF+ (LM6000VELOX PF+ Sprint)",
+      "kind": "авиапроизводная газовая турбина",
+      "segment": "ГТУ",
+      "rating": "56,9 МВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.gevernova.com/gas-power/products/gas-turbines/lm6000"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PGT25 (газогенератор LM2500)",
+      "kind": "авиапроизводная ГТУ, привод компрессора и генератора",
+      "segment": "ГТУ",
+      "rating": "класс 23 МВт",
+      "status": "выпускается (Baker Hughes / Nuovo Pignone)",
+      "sources": [
+        "https://vbr-turbinepartners.com/np-pgt25-gas-turbine/",
+        "https://www.kts-eng.com/en/product/pgt25-lm2500-aeroderivative-gas-turbine/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PGT25+ / LM2500+",
+      "kind": "авиапроизводная ГТУ",
+      "segment": "ГТУ",
+      "rating": "31 МВт",
+      "status": "выпускается (Baker Hughes); подтверждено только заголовком страницы в поисковой выдаче — bakerhughes.com закрыт от автоматического чтения",
+      "sources": [
+        "https://www.bakerhughes.com/gas-turbines/aeroderivative-technology/pgt25lm2500-aeroderivative-gas-turbine-31-mw-5060-hz"
+      ],
+      "verified": false
+    },
+    {
+      "model": "PGT25+G4 / LM2500+G4",
+      "kind": "авиапроизводная ГТУ",
+      "segment": "ГТУ",
+      "rating": "34 МВт",
+      "status": "выпускается (Baker Hughes); подтверждено только заголовком страницы в поисковой выдаче — bakerhughes.com закрыт от автоматического чтения",
+      "sources": [
+        "https://www.bakerhughes.com/gas-turbines/aeroderivative-technology/pgt25lm2500g4"
+      ],
+      "verified": false
+    },
+    {
+      "model": "PGT25+G5 / LM2500+G5",
+      "kind": "авиапроизводная ГТУ",
+      "segment": "ГТУ",
+      "rating": "38,3 МВт",
+      "status": "выпускается (Baker Hughes); подтверждено только заголовком страницы в поисковой выдаче — bakerhughes.com закрыт от автоматического чтения",
+      "sources": [
+        "https://www.bakerhughes.com/gas-turbines/aeroderivative-technology/pgt25lm2500g5-aeroderivative-gas-turbines"
+      ],
+      "verified": false
+    },
+    {
+      "model": "MS5002 C/D",
+      "kind": "тяжёлая двухвальная газовая турбина, привод компрессора",
+      "segment": "ГТУ",
+      "rating": "в источнике не указана",
+      "status": "снята с производства, в эксплуатации (в СССР и России — ГТК-25ИР)",
+      "sources": [
+        "https://www.turbineservices.com/products/tsl/ms5002/",
+        "https://www.turbinist.ru/58467-chertezh-gazovoy-turbiny-ms-5002-nuovo-pignone-gtk-25ir.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MS5002E (Frame 5/2E)",
+      "kind": "тяжёлая двухвальная газовая турбина",
+      "segment": "ГТУ",
+      "rating": "33,8 МВт (механический привод), 32,8 МВт (генератор)",
+      "status": "выпускается (Baker Hughes / Nuovo Pignone)",
+      "sources": [
+        "https://www.bakerhughes.com/gas-turbines/frame-technology/frame-52e",
+        "https://www.euronato.ru/card/vsya_texnika/neftegazovoe_oborudovanie/gazoturbinnyj_privod/ms5002e_gazovaya_turbina_moshhnostyu_32_mvt/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "LM2500+ SAC On-Site Operation and Maintenance Manual (gas generators GK/GV, gas turbines PK/PV)",
+      "doc_no": "GEK 105054",
+      "machine": "LM2500+",
+      "kind": "O&M",
+      "sources": [
+        "https://pdfcoffee.com/gek105054-lm2500-plus-oampm-manual-2-pdf-free.html",
+        "https://kupdf.net/download/gek105054-lm2500-plus-oampm-manual_5a30dce0e2b6f55251ed9598_pdf"
+      ]
+    },
+    {
+      "title": "LM2500 Gas Turbine Operation Manual (G/P series)",
+      "doc_no": "GEK 97310",
+      "machine": "LM2500",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/127184621/gek97310-file0001"
+      ]
+    },
+    {
+      "title": "LM2500+G4 O&M Manual: Water Wash System Description",
+      "machine": "LM2500+G4",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/481126428/lmx2g4-spd08"
+      ]
+    },
+    {
+      "title": "LM6000 PC On-Site Operation and Maintenance Manual",
+      "doc_no": "GEK 105059",
+      "machine": "LM6000 PC",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/656180573/LM6000-PC-O-M-GEK-105059-Chg-06",
+        "https://pdfcoffee.com/gek105059-pdf-free.html"
+      ]
+    },
+    {
+      "title": "LM6000 PD O&M Manual",
+      "doc_no": "GEK 105061",
+      "machine": "LM6000 PD",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/501853797/gek105061-file0004"
+      ]
+    },
+    {
+      "title": "LM6000 PF+ On-Site Operation and Maintenance Manual",
+      "doc_no": "GEK 119319",
+      "machine": "LM6000 PF+",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/881287096/LM6000-PF-GEK119319-Entire-Manual-book"
+      ]
+    },
+    {
+      "title": "GE's LM2500+G4 Aeroderivative Gas Turbine for Marine and Industrial Applications",
+      "doc_no": "GER-4250",
+      "machine": "LM2500+G4",
+      "kind": "техническое описание",
+      "sources": [
+        "https://www.ge.com/content/dam/gepower-pgdp/global/en_US/documents/technical/ger/ger-4250-ge-lm2500-g4-aero-gas-turbine-marine-industrial-applications.pdf"
+      ]
+    },
+    {
+      "title": "Performance and Reliability Improvements for MS5002 Gas Turbines",
+      "doc_no": "GER-4171",
+      "machine": "MS5002",
+      "kind": "бюллетень / модернизация",
+      "sources": [
+        "https://www.gevernova.com/content/dam/gepower-new/global/en_US/downloads/gas-new-site/resources/reference/ger-4171-perf-reliability-improvements-ms5002-gas-turbines.pdf"
+      ]
+    },
+    {
+      "title": "Operation and Maintenance Manual, revamping of GE MS 5002 D gas turbine",
+      "doc_no": "1241-MEQ00001-NA-A5016-00013",
+      "machine": "MS5002D",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/116011280/1241-MEQ00001-NA-A5016-00013-MS-5002-D-0X"
+      ]
+    },
+    {
+      "title": "GE Oil & Gas Nuovo Pignone Part List, Gas Turbine MS5002D (assembly material, bearing #2)",
+      "doc_no": "SMO9726144",
+      "machine": "MS5002D",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.scribd.com/document/502746187/SMO9726144"
+      ]
+    },
+    {
+      "title": "LM2500 T5.4 Exhaust Gas Thermocouple and Cable System (datasheet)",
+      "machine": "LM2500, LM2500+",
+      "kind": "паспорт комплектующего",
+      "sources": [
+        "https://www.ametekpower.com/-/media/ametekpower/files/products/flame-sensors-thermocouples-and-cable-assemblies/lm2500-t5-4-exhaust-gas-thermocouple/lm2500-t5-4-exhaust-gas-thermocouple.pdf?la=en&revision=6798def2-89d3-440c-a108-c570a0546b20"
+      ]
+    },
+    {
+      "title": "Reuter-Stokes Flame Tracker FS-9001 Operation and Maintenance",
+      "machine": "тяжёлые ГТУ GE (Frame)",
+      "kind": "O&M комплектующего",
+      "sources": [
+        "https://www.bakerhughes.com/sites/bakerhughes/files/2021-10/fs-9001om_rev_m.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "L43450P01",
+      "issuer": "GE (изготовитель Unison)",
+      "description": "Свеча зажигания (igniter plug)",
+      "machine": "LM2500, LM5000, LM6000",
+      "unit": "система зажигания",
+      "source_url": "https://www.gtsmro.com/parts/ignition/Industrial-Gas-Turbine/L43450P01",
+      "quote": "Part Number L43450P01 Description IGNITER PLUG OEM GE / UNISON"
+    },
+    {
+      "code": "9101M37P68",
+      "issuer": "GE",
+      "description": "Свеча зажигания LM2500",
+      "machine": "LM2500",
+      "unit": "система зажигания",
+      "source_url": "https://www.mfsupport.com/product/igniter-lm2500/",
+      "quote": "Igniter – LM2500 Part number : 9101M37P68 Description : Igniter – LM2500"
+    },
+    {
+      "code": "121T4154P0001",
+      "issuer": "GE (изготовитель Unison Industries)",
+      "description": "Блок возбуждения зажигания (ignition exciter)",
+      "machine": "LM6000",
+      "unit": "система зажигания",
+      "source_url": "https://www.gtsmro.com/parts/Industrial-Gas-Turbine/LM6000/121T4154P0001",
+      "quote": "Part Number 121T4154P0001 Description EXCITER, IGNITION OEM GE / Unison Industries"
+    },
+    {
+      "code": "L63585P01",
+      "issuer": "GE",
+      "description": "Блок возбуждения зажигания камеры сгорания",
+      "machine": "LM2500",
+      "unit": "система зажигания",
+      "doc_ref": "лист запчастей пакета LM2500, поз. 24",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "IGNITION EXCITER GE L63585P01 EXCITER,IGNITION,GE,L63585P01,COMBUSTER"
+    },
+    {
+      "code": "L44830P01",
+      "issuer": "GE (изготовитель AMETEK)",
+      "description": "Термопара T5.4 выхлопных газов (зонд)",
+      "machine": "LM2500, LM2500+, LM5000",
+      "unit": "контроль температуры газов T5.4",
+      "source_url": "https://www.ametekpower.com/products/thermocouples/aeroderivative-thermocouples/lm2500-t5-4-exhaust-gas-thermocouple",
+      "quote": "We supply the L44830P01, L44830P02 and L44830P03 probes for use on the LM2500, LM2500+ and LM5000 gas turbines"
+    },
+    {
+      "code": "L44830P03",
+      "issuer": "GE",
+      "description": "Термопара-зонд T5.4, заменяет L44830P02, альтернатива L47443P03",
+      "machine": "LM2500",
+      "unit": "контроль температуры газов T5.4",
+      "source_url": "https://www.gtsmro.com/parts/sensor/Industrial-Gas-Turbine/L44830P03",
+      "quote": "Part Number L44830P03 Description PROBE, THERMOCOUPLE OEM GE Services Available Test, Supply New Eligibility Industrial-Gas-Turbine Type sensor Additional Notes LM2500. Replaces L44830P02. Alt to L47443P03."
+    },
+    {
+      "code": "L47443P03",
+      "issuer": "GE",
+      "description": "Термопара-зонд T5.4",
+      "machine": "LM2500",
+      "unit": "контроль температуры газов T5.4",
+      "source_url": "https://vbr-turbinepartners.com/l47443p03/",
+      "quote": "L47443P03 Probe, Thermocouple T5.4 In Stock"
+    },
+    {
+      "code": "L44544P03",
+      "issuer": "GE",
+      "description": "Жгут термопар T5.4, левая сторона, исполнение DLE",
+      "machine": "LM2500 (DLE)",
+      "unit": "контроль температуры газов T5.4",
+      "source_url": "https://vbr-turbinepartners.com/l44544p03/",
+      "quote": "L44544P03 Harness, T5.4, Cable Left Side (DLE) In Stock"
+    },
+    {
+      "code": "L44721P01",
+      "issuer": "GE",
+      "description": "Жгут термопар газогенератора",
+      "machine": "LM2500",
+      "unit": "контроль температуры газов",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/319.html",
+      "quote": "Thermocouple Harness GG LM-2500 – Part No.: L44721P01"
+    },
+    {
+      "code": "L31809P12",
+      "issuer": "GE",
+      "description": "Топливная форсунка (30 шт. на машину по листу поставщика)",
+      "machine": "7LM2500",
+      "unit": "камера сгорания, топливные форсунки",
+      "source_url": "https://www.burakmarine.com/lm2500-fuel-nozzle/",
+      "quote": "Part Number: L31809P12 Fuel Nozzle for General Electric 7LM2500 Gas Turbine"
+    },
+    {
+      "code": "L31809P11",
+      "issuer": "GE",
+      "description": "Форсунка двухтопливная",
+      "machine": "LM2500 (применимость по серии L31809; на странице машина не названа)",
+      "unit": "камера сгорания, топливные форсунки",
+      "source_url": "https://vbr-turbinepartners.com/l31809p11/",
+      "quote": "L31809P11 Nozzle, dual fuel"
+    },
+    {
+      "code": "L31810G04",
+      "issuer": "GE (изготовитель Advanced Atomization Technologies)",
+      "description": "Форсунка топливная, только газ",
+      "machine": "LM2500",
+      "unit": "камера сгорания, топливные форсунки",
+      "source_url": "https://ap4.com/parts/l31810g04/",
+      "quote": "L31810G04 - NOZZLE,FUEL,GAS ONLY for GE LM2500 gas turbines"
+    },
+    {
+      "code": "L47197P05",
+      "issuer": "GE (изготовитель Advanced Atomization Technologies)",
+      "description": "Форсунка топливная DLE, двухчашечная, базовый двигатель",
+      "machine": "LM2500 DLE",
+      "unit": "камера сгорания, топливные форсунки",
+      "source_url": "https://ap4.com/parts/l47197p05/",
+      "quote": "L47197P05 - NOZZLE, FUEL, DLE 2-cup 'BASE' Engine for GE LM2500 gas turbines"
+    },
+    {
+      "code": "L61766P05",
+      "issuer": "GE (изготовитель Advanced Atomization Technologies)",
+      "description": "Форсунка двухтопливная, LM2500+G4 STIG",
+      "machine": "LM2500+G4",
+      "unit": "камера сгорания, топливные форсунки",
+      "source_url": "https://ap4.com/parts/l61766p05/",
+      "quote": "L61766P05 - NOZZLE, DUAL FUEL LM2500+G4 STIG for GE LM2500 gas turbines"
+    },
+    {
+      "code": "L63671P01",
+      "issuer": "GE (изготовитель Advanced Atomization Technologies)",
+      "description": "Форсунка топливная DLE+, трёхчашечная",
+      "machine": "LM6000",
+      "unit": "камера сгорания, топливные форсунки",
+      "source_url": "https://ap4.com/parts/l63671p01/",
+      "quote": "L63671P01 - NOZZLE, FUEL 3-CUP DLE+ for GE LM6000 gas turbines"
+    },
+    {
+      "code": "L31476P59",
+      "issuer": "GE",
+      "description": "Форсунка топливная двухтопливная (пара с L31476P60)",
+      "machine": "LM6000",
+      "unit": "камера сгорания, топливные форсунки",
+      "source_url": "https://www.burakmarine.com/ge-lm6000-dual-fuel-nozzles/",
+      "quote": "Part Number: L31476P59 & L31476P60 Fuel Nozzle for General Electric LM6000 Gas Turbine"
+    },
+    {
+      "code": "9655M01P12",
+      "issuer": "GE",
+      "description": "Уплотнительное кольцо топливной форсунки",
+      "machine": "LM2500",
+      "unit": "камера сгорания, топливные форсунки",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/319.html",
+      "quote": "Fuel Nozzle Seal Ring – Part No.: 9655M01P12 (General Electric)"
+    },
+    {
+      "code": "4058T39P01",
+      "issuer": "GE",
+      "description": "Кольцо уплотнительное металлическое",
+      "machine": "LM2500",
+      "unit": "уплотнения",
+      "source_url": "https://www.gtsmro.com/parts/seal/LM2500/4058T39P01",
+      "quote": "Part Number 4058T39P01 Description SEAL RING, METAL OEM GE Services Available SUPPLY NEW Eligibility LM2500"
+    },
+    {
+      "code": "L35166P02",
+      "issuer": "GE",
+      "description": "Термометр сопротивления погружной, двухэлементный",
+      "machine": "LM2500",
+      "unit": "датчики температуры",
+      "doc_ref": "в листе turbineblade.net тот же код назван свечой — лист сдвинут на строку, его описание неверно",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "TEMPERATURE ELEMENT GE L35166P02 ELEMENT,TEMPERATURE,GE,L35166P02,IMMERSION RTD,DUAL ELEMENT"
+    },
+    {
+      "code": "L47444P05",
+      "issuer": "GE",
+      "description": "Датчик температуры за компрессором",
+      "machine": "LM2500",
+      "unit": "датчики температуры",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "SENSOR GE L47444P05 SENSOR,GE,L47444P05,TEMPERATURE,COMPRESSOR DISCHARGE"
+    },
+    {
+      "code": "L43418P07",
+      "issuer": "GE",
+      "description": "Привод направляющих аппаратов VSV/IGV со встроенным резервированным LVDT",
+      "machine": "LM2500",
+      "unit": "механизация компрессора (VSV)",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "ACTUATOR GE L43418P07 ACTUATOR,GE,L43418P07,VARIABLE STATOR VANE/IGV,INTEGRAL DUAL REDUNDANT LVDT SENSOR"
+    },
+    {
+      "code": "L44569P24",
+      "issuer": "GE",
+      "description": "Сервоклапан гидронасоса и VSV",
+      "machine": "LM2500",
+      "unit": "механизация компрессора (VSV)",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "VALVE GE L44569P24 VALVE,GE,L44569P24,HYDRAULIC PUMP AND VARIABLE STATOR VANE, SERVOVALVE"
+    },
+    {
+      "code": "9207M68P01",
+      "issuer": "GE",
+      "description": "Втулка IGV со стеклянной основой",
+      "machine": "LM2500",
+      "unit": "механизация компрессора (VSV/IGV)",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "BUSHING GE 9207M68P01 BUSHING,GE 9207M68P01,IGV, GLASS BACKED"
+    },
+    {
+      "code": "250A4642P0001",
+      "issuer": "GE (пакет)",
+      "description": "Фильтрующий элемент (к нему уплотнение крышки 216A4806P0001)",
+      "machine": "пакет LM2500",
+      "unit": "маслосистема, фильтры",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "SEAL GE 216A4806P0001 SEAL,COVER,GE 216A4806P0001,FOR FILTER ELEMENT 250A4642P0001"
+    },
+    {
+      "code": "216A4806P0001",
+      "issuer": "GE (пакет)",
+      "description": "Уплотнение крышки фильтра",
+      "machine": "пакет LM2500",
+      "unit": "маслосистема, фильтры",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "SEAL GE 216A4806P0001 SEAL,COVER,GE 216A4806P0001,FOR FILTER ELEMENT 250A4642P0001"
+    },
+    {
+      "code": "382A1114P0001",
+      "issuer": "GE (пакет)",
+      "description": "Прокладка корпуса фильтра подачи турбинного масла",
+      "machine": "пакет LM2500",
+      "unit": "маслосистема, фильтры",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+      "quote": "GASKET GE 382A1114P0001 GASKET,GE 382A1114P0001,TURBINE LUBE OIL SUPPLY FILTER HOUSE"
+    },
+    {
+      "code": "LR47190",
+      "issuer": "Lear Romec",
+      "description": "Насос смазки и откачки масла",
+      "machine": "LM2500",
+      "unit": "маслосистема",
+      "source_url": "https://www.gtsmro.com/parts/lr47190",
+      "quote": "Part Number LR47190 Description PUMP, LUBE & SCAVENGE OEM LEAR ROMEC Services Available SUPPLY NEW Eligibility LM2500"
+    },
+    {
+      "code": "L43419P07",
+      "issuer": "GE (изготовитель Arkwin)",
+      "description": "Привод перепускных клапанов VBV, заменяет L43419P04",
+      "machine": "LM2500, LM5000, LM6000",
+      "unit": "механизация компрессора (VBV)",
+      "source_url": "https://www.gtsmro.com/parts/actuator/Industrial-Gas-Turbine/L43419P07",
+      "quote": "Part Number L43419P07 Description ACTUATOR, VBV OEM GE / ARKWIN"
+    },
+    {
+      "code": "L59090P02",
+      "issuer": "GE (изготовитель Meggitt)",
+      "description": "Клапан отбора воздуха, заменяет L47328P02",
+      "machine": "LM2500",
+      "unit": "воздушная система, отбор",
+      "source_url": "https://www.gtsmro.com/parts/valve/LM2500/L59090P02",
+      "quote": "Part Number L59090P02 Description VALVE, BLEED AIR OEM Meggitt Services Available SUPPLY Eligibility LM2500"
+    },
+    {
+      "code": "8915-861",
+      "issuer": "Woodward",
+      "description": "Клапан жидкого топлива TM55",
+      "machine": "LM2500",
+      "unit": "топливная система",
+      "source_url": "https://www.mfsupport.com/product/liquid-fuel-valve/",
+      "quote": "Manufacturer : Woodward Manufacturer Part number : TM55 Part number : 8915-861 Engine Type : LM2500 Description : Liquid fuel valve"
+    },
+    {
+      "code": "L59095P01",
+      "issuer": "GE",
+      "description": "Датчик частоты вращения, заменяет L59053P01",
+      "machine": "LM6000",
+      "unit": "датчики частоты вращения",
+      "source_url": "https://www.gtsmro.com/parts/sensor/LM6000/L59095P01",
+      "quote": "Part Number L59095P01 Description SENSOR, SPEED OEM GE Services Available Supply Eligibility LM6000"
+    },
+    {
+      "code": "L31967P06",
+      "issuer": "GE (аналог Vibro-Meter 144-303-000-241, Endevco/DSC 303-035)",
+      "description": "Акселерометр (вибродатчик)",
+      "machine": "LM6000",
+      "unit": "контроль вибрации",
+      "source_url": "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+      "quote": "Accel. L31967P06 - 303-035 144-303-000-241"
+    },
+    {
+      "code": "L44723P01",
+      "issuer": "GE (аналог Vibro-Meter CP106 143-106-000-011)",
+      "description": "Датчик динамического давления (пульсаций горения) CP106",
+      "machine": "LM6000",
+      "unit": "контроль пульсаций горения",
+      "doc_ref": "исполнение DLE в таблице Istec не указано",
+      "source_url": "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+      "quote": "CP106 L44723P01 - - 143-106-000-011"
+    },
+    {
+      "code": "L62774P01",
+      "issuer": "GE",
+      "description": "Обратный клапан",
+      "machine": "LM6000",
+      "unit": "клапаны",
+      "source_url": "https://www.gtsmro.com/parts/valve/LM6000/L62774P01",
+      "quote": "Part Number L62774P01 Description VALVE, CHECK OEM GE Services Available SUPPLY NEW Eligibility LM6000"
+    },
+    {
+      "code": "178C6072G002",
+      "issuer": "GE",
+      "description": "Свеча зажигания с пружинным позиционированием (Frame 5; в источнике MS5001/MS5002 не различаются)",
+      "machine": "Frame 5 (MS5001/MS5002)",
+      "unit": "система зажигания",
+      "source_url": "http://www.ptialaska.net/~recycle/invent.htm",
+      "quote": "PLUG, SPARK, SPRING POSITIONING, ML 1214 178C6072G002"
+    },
+    {
+      "code": "225A7886P001",
+      "issuer": "GE",
+      "description": "Уплотнение, стопорное кольцо сопла 1-й ступени",
+      "machine": "MS5002",
+      "unit": "горячий тракт, сопловой аппарат 1-й ступени",
+      "source_url": "http://www.ptialaska.net/~recycle/invent.htm",
+      "quote": "SEAL, MS-5002, RETAINING RING, NOZZLE, 1ST 225A7886P001"
+    },
+    {
+      "code": "SMR21717",
+      "issuer": "Nuovo Pignone",
+      "description": "Уплотнительный блок корпуса турбины, нержавеющая сталь",
+      "machine": "MS5002C / MS5002D",
+      "unit": "корпус турбины, уплотнения",
+      "doc_ref": "в поле модели записи — MS5002C, MS5002D упомянута в тексте записи",
+      "source_url": "http://gas-turbine-parts.com/index.php?m=home&c=View&a=index&aid=412",
+      "quote": "Manufacturer Part Number :SMR21717 Manufacturer number :0020008390 -NUOVO PIGNONE INTERNATIONAL SRL OEM Part Number : OEM Model Number :MS5002C"
+    },
+    {
+      "code": "KFZ326730004",
+      "issuer": "GE / Nuovo Pignone",
+      "description": "Прокладка спирально-навитая, нержавеющая сталь, стопорно-регулирующий газовый клапан",
+      "machine": "MS5002C",
+      "unit": "топливная система, стопорно-регулирующий клапан",
+      "source_url": "http://gas-turbine-parts.com/index.php?m=home&c=View&a=index&aid=412",
+      "quote": "Manufacturer Part Number :KFZ326730004 Manufacturer number :0020007651 -GENERAL ELECTRIC CO. OEM Part Number : OEM Model Number :MS5002C"
+    },
+    {
+      "code": "287A1187P001",
+      "issuer": "GE (аналоги Nuovo Pignone KFZ353440004, Thomassen 2427-1458-0000)",
+      "description": "Прокладка в рулоне 50 футов, детали корпуса выхлопа турбины",
+      "machine": "MS5002D DLN",
+      "unit": "корпус выхлопа, уплотнения",
+      "doc_ref": "в поле OEM Model записи стоит 7L5A1HP222-1, MS5002D DLN названа в тексте позиции",
+      "source_url": "http://gas-turbine-parts.com/index.php?m=home&c=View&a=index&aid=412",
+      "quote": "Manufacturer Part Number :287A1187P001 Manufacturer number :0020007651 -GENERAL ELECTRIC CO."
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "9649M10P03",
+      "verdict": "не подтверждён",
+      "reason": "код на turbineblade.net есть, но таблица этого листа сдвинута: в ней же L43450P01 (свеча) назван GASKET, а L35166P02 — IGNITER PULG, поэтому описание «bearing set» у 9649M10P03 ненадёжно; других источников с описанием поиск не дал"
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "Unison Industries",
+      "component": "свечи зажигания и блоки возбуждения зажигания",
+      "machine": "LM2500, LM5000, LM6000",
+      "evidence": "на карточках L43450P01 и 121T4154P0001 в поле OEM указано «GE / UNISON» и «GE / Unison Industries»",
+      "sources": [
+        "https://www.gtsmro.com/parts/ignition/Industrial-Gas-Turbine/L43450P01",
+        "https://www.gtsmro.com/parts/Industrial-Gas-Turbine/LM6000/121T4154P0001"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Advanced Atomization Technologies",
+      "component": "топливные форсунки (газовые, DLE, двухтопливные)",
+      "machine": "LM2500, LM2500+G4, LM6000",
+      "evidence": "в спецификации AP4 на L31810G04, L47197P05, L61766P05 и L63671P01 указано «OEM Advanced Atomization Technologies»",
+      "sources": [
+        "https://ap4.com/parts/l63671p01/",
+        "https://ap4.com/parts/l31810g04/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "AMETEK Power Instruments",
+      "component": "термопары выхлопных газов T5.4",
+      "machine": "LM2500, LM2500+, LM5000",
+      "evidence": "сам изготовитель пишет, что поставляет зонды L44830P01/P02/P03 и прошёл квалификацию GE по P/N L44830P01",
+      "sources": [
+        "https://www.ametekpower.com/products/thermocouples/aeroderivative-thermocouples/lm2500-t5-4-exhaust-gas-thermocouple"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Vibro-Meter (Meggitt, ныне Parker)",
+      "component": "акселерометры CA-серии и датчики динамического давления CP103/CP106",
+      "machine": "LM6000",
+      "evidence": "таблица соответствия Istec: номеру GE сопоставлен номер Vibro-Meter (например, L44723P01 = 143-106-000-011)",
+      "sources": [
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Endevco",
+      "component": "акселерометры",
+      "machine": "LM6000",
+      "evidence": "в той же таблице Istec есть графа «Endevco Type» (например, L31967P09 = 6240M21)",
+      "sources": [
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Lear Romec",
+      "component": "насос смазки и откачки масла",
+      "machine": "LM2500",
+      "evidence": "карточка LR47190: «OEM LEAR ROMEC», применимость LM2500",
+      "sources": [
+        "https://www.gtsmro.com/parts/lr47190"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Arkwin Industries",
+      "component": "привод перепускных клапанов VBV",
+      "machine": "LM2500, LM5000, LM6000",
+      "evidence": "карточка L43419P07: «OEM GE / ARKWIN»",
+      "sources": [
+        "https://www.gtsmro.com/parts/actuator/Industrial-Gas-Turbine/L43419P07"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Meggitt",
+      "component": "клапан отбора воздуха",
+      "machine": "LM2500",
+      "evidence": "карточка L59090P02: «OEM Meggitt»",
+      "sources": [
+        "https://www.gtsmro.com/parts/valve/LM2500/L59090P02"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Woodward",
+      "component": "клапаны жидкого топлива (TM55) и дозаторы газа",
+      "machine": "LM2500",
+      "evidence": "карточка MFS: «Manufacturer : Woodward», модель TM55, P/N 8915-861, двигатель LM2500",
+      "sources": [
+        "https://www.mfsupport.com/product/liquid-fuel-valve/",
+        "https://vbr-turbinepartners.com/9907-526/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Det-Tronics",
+      "component": "датчики-сигнализаторы горючих газов в укрытии пакета",
+      "machine": "пакет LM2500",
+      "evidence": "в листе запчастей пакета LM2500 поз. 20 — «TRANSMITTER,COMBUSTIBLE GAS,DETRONICS,382A4449P0001»",
+      "sources": [
+        "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Reuter-Stokes (Baker Hughes)",
+      "component": "датчики пламени Flame Tracker",
+      "machine": "тяжёлые ГТУ GE, в том числе Frame 5",
+      "evidence": "руководство FS-9001 по датчикам пламени для турбин GE; дистрибьюторы продают их как датчики для турбин GE; связь именно с Frame 5 не доказана — вывод разведки",
+      "sources": [
+        "https://www.bakerhughes.com/sites/bakerhughes/files/2021-10/fs-9001om_rev_m.pdf",
+        "https://www.clippercontrols.com/manufacturers/reuter-stokes"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Nuovo Pignone (Baker Hughes)",
+      "component": "силовая турбина PGT25, сборка и выпуск MS5002 и PGT25",
+      "machine": "PGT25, MS5002",
+      "evidence": "PGT25 — газогенератор LM2500 и силовая турбина Nuovo Pignone; коды MS5002C/D помечены изготовителем NUOVO PIGNONE INTERNATIONAL SRL",
+      "sources": [
+        "https://vbr-turbinepartners.com/np-pgt25-gas-turbine/",
+        "http://gas-turbine-parts.com/index.php?m=home&c=View&a=index&aid=412"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Thomassen International",
+      "component": "замещающие детали (прокладки, крепёж) для MS5002D",
+      "machine": "MS5002D",
+      "evidence": "в листе закупки у кода GE 287A1187P001 указан номер изготовителя THOMASSEN INTERNATIONAL B.V. 2427-1458-0000",
+      "sources": [
+        "http://gas-turbine-parts.com/index.php?m=home&c=View&a=index&aid=412"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "DMEnergy",
+      "country": "Россия",
+      "role": "независимый: поставка запчастей и ремонт ГТУ GE LM2500 и Nuovo Pignone (в том числе втулки вала VSV, лопатки)",
+      "sources": [
+        "https://dm.energy/news/postavka-zapchastej-dlya-obsluzhivaniya-gtu-ge-lm2500",
+        "https://dm.energy/gazovye-turbiny/general-electric/nuovo-pignone-gazovye-turbiny"
+      ]
+    },
+    {
+      "company": "ЦентрИнжиниринг",
+      "country": "Россия",
+      "role": "независимый: капитальный и средний ремонт, бороскопия, диагностика LM2500 и LM6000",
+      "sources": [
+        "https://energybase.ru/equipment/service-lm2500-lm6000"
+      ]
+    },
+    {
+      "company": "MC Systems Energy",
+      "country": "Россия",
+      "role": "независимый: поставка запчастей для LM1600, LM2500, LM6000, LMS100, Frame",
+      "sources": [
+        "https://mcenergy.ru/"
+      ]
+    },
+    {
+      "company": "EuroNato",
+      "country": "Россия",
+      "role": "независимый: поставка, ремонт и запчасти MS5002E и MS5002 (ГПА)",
+      "sources": [
+        "https://www.euronato.ru/card/vsya_texnika/neftegazovoe_oborudovanie/gazoturbinnyj_privod/ms5002e_gazovaya_turbina_moshhnostyu_32_mvt/"
+      ]
+    },
+    {
+      "company": "Русь-Турбо",
+      "country": "Россия",
+      "role": "независимый: реверс-инжиниринг и поставка деталей зарубежных ГТУ",
+      "sources": [
+        "https://russturbo.ru/uslugi/postavka-zapchastey/"
+      ]
+    },
+    {
+      "company": "Burak Marine",
+      "country": "Турция",
+      "role": "независимый поставщик запчастей LM2500 и LM6000 (форсунки)",
+      "sources": [
+        "https://www.burakmarine.com/ge-lm6000-dual-fuel-nozzles/",
+        "https://www.burakmarine.com/lm2500-fuel-nozzle/"
+      ]
+    },
+    {
+      "company": "Hangzhou Gas Turbine Parts Co.",
+      "country": "Китай",
+      "role": "независимый: поставщик запчастей LM2500, Nuovo Pignone MS5002C/D",
+      "sources": [
+        "http://www.gas-turbine-parts.com/News/Product_FAQ/424.html",
+        "http://gas-turbine-parts.com/index.php?m=home&c=View&a=index&aid=412"
+      ]
+    },
+    {
+      "company": "Shenzhen Blaze Turbine Co.",
+      "country": "Китай",
+      "role": "независимый: изготовление деталей LM2500 по образцу или чертежу (реверс-инжиниринг)",
+      "sources": [
+        "https://turbineblade.net/ge-lm2500-part-numbers-list/"
+      ]
+    },
+    {
+      "company": "VBR Turbine Partners",
+      "country": "Нидерланды",
+      "role": "независимый сервис LM6000, LM2500, LM1600 и PGT25 (замена HSPT), склад запчастей",
+      "sources": [
+        "https://vbr-turbinepartners.com/np-pgt25-gas-turbine/"
+      ]
+    },
+    {
+      "company": "MFS (Mechanical Field Support)",
+      "country": "Нидерланды",
+      "role": "независимый: запчасти и сервис LM2500 и Nuovo Pignone PGT10/PGT25",
+      "sources": [
+        "https://www.mfsupport.com/pgt10-parts-and-services/",
+        "https://www.mfsupport.com/product/igniter-lm2500/"
+      ]
+    },
+    {
+      "company": "Istec",
+      "country": "Нидерланды",
+      "role": "независимый: поставка датчиков вибрации и пульсаций на замену для LM6000",
+      "sources": [
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/"
+      ]
+    },
+    {
+      "company": "GTSMRO",
+      "country": "не установлена",
+      "role": "независимый: ремонт компонентов (MRO) и поставка запчастей LM2500 и LM6000",
+      "sources": [
+        "https://www.gtsmro.com/parts/sensor/LM6000/L59095P01"
+      ]
+    },
+    {
+      "company": "AP4",
+      "country": "США",
+      "role": "независимый: поставщик запчастей GE Aeroderivative и Frame, в том числе форсунок AA Tech",
+      "sources": [
+        "https://ap4.com/parts/l63671p01/"
+      ]
+    },
+    {
+      "company": "Turbine Services Ltd.",
+      "country": "США",
+      "role": "независимый: замещающие детали MS5002 A–D от фланца до фланца",
+      "sources": [
+        "https://www.turbineservices.com/products/tsl/ms5002/"
+      ]
+    },
+    {
+      "company": "Baker Hughes (Nuovo Pignone)",
+      "country": "Италия",
+      "role": "изготовитель пакетов PGT25 и MS5002E, сервис по ним",
+      "sources": [
+        "https://www.bakerhughes.com/gas-turbines/frame-technology/frame-52e",
+        "https://www.bakerhughes.com/gas-turbines/aeroderivative-technology/pgt25lm2500g4"
+      ]
+    }
+  ],
+  "gaps": [
+    "Иллюстрированные каталоги деталей (IPB) для LM2500 и LM6000 и списки запчастей Nuovo Pignone по PGT25 в открытом доступе не найдены. Они лежат на закрытом портале GE Vernova (myGEVernova / Customer Web Portal) и у Baker Hughes (iCenter).",
+    "Отдельных кодов PGT25 (силовая турбина HSPT, подшипники ПТ, уплотнения) не найдено. Газогенератор PGT25 — это LM2500, поэтому коды LM2500 к нему применимы по конструкции; это вывод, а не цитата.",
+    "MS5002: не найдены коды форсунок, жаровых труб, переходных патрубков и термопар выхлопа. Ссылки на SMO-чертежи есть только в документах Scribd (SMO9726144), недоступных для чтения без входа.",
+    "Коды свечи 9392M95P04 (LM1600/LM2500/LM6000) и датчика пламени 261A1812P0xx (Frame 5) видны лишь в заголовках поисковой выдачи: страница protectivesupplies.com отдала 403, код не подтверждён и в список не внесён.",
+    "Фильтры маслосистемы и КВОУ: найден элемент пакета 250A4642P0001 без изготовителя. Номера Pall, Donaldson и Camfil под LM2500 и LM6000 не найдены, вероятно, есть только в ведомости пакета.",
+    "Выходные мощности MS5002 C/D на официальной странице не найдены: bhge.com недоступен, GER-4171 отдаётся через JS-обёртку и не читается.",
+    "Руководства GEK (105054, 97310, 105059, 105061, 119319) видны лишь на Scribd и pdfcoffee как копии с пометкой GE Proprietary. Официального открытого источника нет, содержание разделов о ТО не прочитано.",
+    "Официальные авторизованные дилеры GE Vernova в России, СНГ, Турции, ОАЭ и Индии не подтверждены. Все найденные компании — независимые поставщики и ремонтники, а не авторизованные сервис-центры.",
+    "Все коды взяты у торговцев и из закупочных листов, а не из каталога GE; лист turbineblade.net оказался сдвинут на строку. Перед закупкой такие строки надо сверять с ведомостью конкретной машины."
+  ],
+  "verifier_notes": "Все 27 исходных страниц открылись через curl, кроме bakerhughes.com (Incapsula, 212 байт). Модели Baker Hughes подтверждены заголовками этих страниц в выдаче поиска. Найдено два дефекта. (1) 9649M10P03: таблица turbineblade.net сдвинута на строку — L43450P01 в ней назван GASKET, L35166P02 назван IGNITER. Описание «bearing set» поэтому ненадёжно, код не подтверждён. Расхождение по L35166P02, записанное в описании, — то же следствие сдвига; верное описание — RTD. (2) Reuter-Stokes: связь с Frame 5 не доказана. Мелочи: у 287A1187P001 поле OEM Model в записи — 7L5A1HP222-1, а MS5002D DLN указана в тексте позиции. SMR21717 помечен моделью MS5002C, а в тексте записи есть MS5002D. У L44723P01 исполнение DLE в таблице Istec не указано.",
+  "corrections": [
+    "summary: «собрано 40 кодов» исправлено на 39 принятых и 1 отклонённый — столько записей в parts и parts_rejected",
+    "L35166P02: из описания снято «расхождение» и «100 Ом» — расхождение было следствием сдвига строк в листе turbineblade.net, верное описание — RTD; оговорка перенесена в doc_ref (замечание скептика 1)",
+    "gaps: последняя строка переписана — «расхождение по L35166P02» оказалось сдвигом листа turbineblade.net (замечание скептика 1)",
+    "Reuter-Stokes: в evidence оговорено, что связь с Frame 5 не доказана, verified: false (замечание скептика 2)",
+    "287A1187P001, SMR21717: в doc_ref записано, где в источнике названа модель (мелкие замечания скептика)",
+    "L44723P01: machine «LM6000 DLE» сужено до «LM6000», исполнение DLE в таблице Istec не указано (мелкое замечание скептика)",
+    "PGT25+, PGT25+G4, PGT25+G5: verified: false с оговоркой — единственный источник bakerhughes.com не открылся, модели подтверждены заголовками в поиске",
+    "sub_suppliers: verified: true проставлен тем, у кого скептик открыл страницу-источник (поле OEM на карточке детали, таблица Istec, лист Hangzhou); Reuter-Stokes — false",
+    "dealers: в role прямо записано «независимый» — авторизованных сервис-центров GE Vernova не найдено (как в gaps)"
+  ]
+}

@@ -1,0 +1,841 @@
+{
+  "oem_key": "perkinsfgwilson",
+  "name": "Perkins / FG Wilson",
+  "segment_focus": "генераторные установки и двигатели серии 4000 (газовые 4000 GAS): номера фильтров и ремкомплектов, дилеры",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Perkins серии 4000 — двигатели на 6, 8, 12 и 16 цилиндров с диаметром и ходом 160×190 мм, в дизельном исполнении (4006/4008/4012/4016 TAG/TWG/TRG) и в газовом с искровым зажиганием (4006-23TRS, 4008-30TRS, 4016-61TRS, 4016-E61TRS). На них FG Wilson строит крупные агрегаты P2000/P2250/P2500. В открытом доступе найдены два документа самого Perkins: руководство пользователя 4016-E61TRS (TSL 4230E, выпуск 4) и руководство по эксплуатации и ТО 4016-61TRS1/2 (SEBU8430-02, 2022). В них есть оригинальные номера Perkins на расходники и инструмент: ингибитор охлаждающей жидкости OE45350, Perkins ELI T402623, шайбы 036620 и Y98/00038, инструмент 27610190, 27610178, T6253/312 и SE253. Те же документы называют изготовителей узлов: зажигание Altronic, газовый смеситель Woodward Tecjet 50, свечи Multitorch; в спецификациях турбокомпрессор — BorgWarner S500. Номера фильтров, свечей, наборов прокладок, вкладышей и поршневых комплектов — из открытых перечней китайских продавцов (Tide Power, Wintpower) и магазинов Великобритании и США, например масляный фильтр 4324909 (прежний номер SE111B — вывод разведки, источник замену не называет), топливный фильтр SE429B/4 (у продавца рядом с ним номер 4759205), свеча T431658 (прежний номер 486/39). Это вторичные источники, у каждого кода дословная цитата со страницы. Официальный магазин Perkins (shop.perkins.com) рисует страницы скриптом, а perkins.com и fgwilson.com не отвечают автоматическому чтению или отдают Access Denied, поэтому страницы деталей на сайте изготовителя прочитать не удалось. Дилеры: в России официальный дистрибьютор — ГК «Хайтед»; Среднюю Азию закрывает Mayphil UK (Узбекистан, Таджикистан, Киргизия, Туркмения), Индию — Gmmco Power, ОАЭ — дилер FG Wilson (fgwilson.ae). Второй проход сделан: скептик нашёл коды на страницах источников дословно, опровергнутых нет (кодов в файле 39, в отчёте скептика «38» — все 39 перепроверены повторным скачиванием страниц при записи файла); по его замечаниям поправлены записи (поле corrections).",
+  "machines": [
+    {
+      "model": "4006-23TRS1",
+      "kind": "газопоршневой двигатель, 6 цил., искровое зажигание",
+      "segment": "ГПУ",
+      "rating": "322 кВт мех. при 1500 об/мин",
+      "status": "выпуск не подтверждён (спецификация 2014 г.)",
+      "sources": [
+        "https://www.stuartgroup.co.uk/media/generators/products/73/files/4006-23TRS1.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4006-23TRS2",
+      "kind": "газопоршневой двигатель, 6 цил.",
+      "segment": "ГПУ",
+      "rating": "не установлена",
+      "status": "в линейке дистрибьютора",
+      "sources": [
+        "https://www.mayphiluk.com/products/4000-series-gas/",
+        "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4006-E23TRS3",
+      "kind": "газопоршневой двигатель, 6 цил.",
+      "segment": "ГПУ",
+      "rating": "в пределах линейки дистрибьютора 350–1250 кВА",
+      "status": "в линейке дистрибьютора",
+      "sources": [
+        "https://www.mayphiluk.com/products/4000-series-gas/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4006-E23TRS4",
+      "kind": "газопоршневой двигатель, 6 цил.",
+      "segment": "ГПУ",
+      "rating": "в пределах линейки дистрибьютора 350–1250 кВА",
+      "status": "в линейке дистрибьютора",
+      "sources": [
+        "https://www.mayphiluk.com/products/4000-series-gas/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4008-30TRS1",
+      "kind": "газопоршневой двигатель, 8 цил.",
+      "segment": "ГПУ",
+      "rating": "447 кВт мех. при 1500 об/мин",
+      "status": "спецификация PN1851/03/14",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/produits/notice/4008-30TRS1-2-Gas-PN1851.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4008-30TRS2",
+      "kind": "газопоршневой двигатель, 8 цил.",
+      "segment": "ГПУ",
+      "rating": "526 кВт мех. при 1500 об/мин",
+      "status": "спецификация PN1851/03/14",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/produits/notice/4008-30TRS1-2-Gas-PN1851.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4016-61TRS1",
+      "kind": "газопоршневой двигатель, V16, 61,123 л",
+      "segment": "ГПУ",
+      "rating": "1500 об/мин; 16 цил. 160×190 мм",
+      "status": "поддерживается (руководство SEBU8430-02, июнь 2022)",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20141104-30011-42475",
+        "https://www.manualslib.com/manual/1424286/Perkins-4016-61trs1.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4016-61TRS2",
+      "kind": "газопоршневой двигатель, V16, 61,123 л",
+      "segment": "ГПУ",
+      "rating": "1500 об/мин",
+      "status": "поддерживается (руководство SEBU8430-02, 2022); ссылка stuartgroup.ltd.uk при проверке не открылась (ошибка TLS), подтверждено руководством SEBU8430-02",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20141104-30011-42475",
+        "https://www.stuartgroup.ltd.uk/power/pdf/generator/engine/Gas_engines/4016-61TRS2.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4016-E61TRS",
+      "kind": "газопоршневой двигатель, V16, с турбонаддувом",
+      "segment": "ГПУ",
+      "rating": "природный газ; метановое число в TSL 4230E не найдено",
+      "status": "заменён (руководство 2002 г.)",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4016-61TRG1",
+      "kind": "дизельный двигатель, V16 (ElectropaK)",
+      "segment": "двигатель",
+      "rating": "основная мощность 1648 кВт мех.; 1850 кВА / 1480 кВт эл. при 1500 об/мин",
+      "status": "выпускается (PN3234/04/20)",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20200428-27388-47363"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4016-61TRG2",
+      "kind": "дизельный двигатель, V16",
+      "segment": "двигатель",
+      "rating": "основная мощность 1774 кВт мех.; 2000 кВА / 1600 кВт эл. при 1500 об/мин",
+      "status": "выпускается (PN3234/04/20)",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20200428-27388-47363"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4016-61TRG3",
+      "kind": "дизельный двигатель, V16",
+      "segment": "двигатель",
+      "rating": "основная мощность 1975 кВт мех.; 2250 кВА / 1800 кВт эл. при 1500 об/мин",
+      "status": "выпускается (PN3234/04/20)",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20200428-27388-47363"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4016TAG2",
+      "kind": "дизельный двигатель, V16",
+      "segment": "двигатель",
+      "rating": "не установлена",
+      "status": "не установлен (замена на 4016-61TRG источником не подтверждена)",
+      "sources": [
+        "https://www.soonparts.com/turbocharger-se652bz-317129-317227-turbo-s500-for-perkins-engine-4016-tag2.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4012-46TWG2A",
+      "kind": "дизельный двигатель, V12",
+      "segment": "двигатель",
+      "rating": "1500/1800 об/мин",
+      "status": "не установлен",
+      "sources": [
+        "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4008TAG2A",
+      "kind": "дизельный двигатель, 8 цил.",
+      "segment": "двигатель",
+      "rating": "не установлена",
+      "status": "не установлен",
+      "sources": [
+        "https://turbo-diesel.co.uk/product/turbo-318882-se652ce-perkins-4008tag2a-s500-new-borgwarner/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4006-23TAG",
+      "kind": "дизельный двигатель, 6 цил.",
+      "segment": "двигатель",
+      "rating": "не установлена",
+      "status": "есть на perkins.com; подтверждено только заголовком страницы в поисковой выдаче — сайт отдаёт Access Denied",
+      "sources": [
+        "https://www.perkins.com/en_GB/products/new/perkins/electric-power-generation/diesel-engines/1000002690.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "FG Wilson P2000-1/P2000-1E",
+      "kind": "дизельная генераторная установка (двигатель Perkins)",
+      "segment": "прочее",
+      "rating": "1850–2000 кВА",
+      "status": "выпускается; подтверждено только заголовком страницы в поисковой выдаче — сайт отдаёт Access Denied",
+      "sources": [
+        "https://www.fgwilson.com/en_GB/products/new/fg-wilson/diesel-generators/large-range-800-kva/129760.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "FG Wilson P2250-1/P2250-1E",
+      "kind": "дизельная генераторная установка (двигатель Perkins)",
+      "segment": "прочее",
+      "rating": "2000–2250 кВА",
+      "status": "выпускается; подтверждено только заголовком страницы в поисковой выдаче — сайт отдаёт Access Denied",
+      "sources": [
+        "https://www.fgwilson.com/en_GB/products/new/fg-wilson/diesel-generators/large-range-800-kva/129761.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "FG Wilson P2500-1/P2500-1E",
+      "kind": "дизельная генераторная установка (двигатель Perkins)",
+      "segment": "прочее",
+      "rating": "2250–2500 кВА",
+      "status": "выпускается; подтверждено только заголовком страницы в поисковой выдаче — сайт отдаёт Access Denied",
+      "sources": [
+        "https://www.fgwilson.com/en_GB/products/new/fg-wilson/diesel-generators/large-range-800-kva/129260.html"
+      ],
+      "verified": false
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Perkins 4000 Series Model 4016-E61TRS User's Handbook",
+      "doc_no": "TSL 4230E, Issue 4 (декабрь 2002)",
+      "machine": "4016-E61TRS",
+      "kind": "O&M",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf"
+      ]
+    },
+    {
+      "title": "Workshop Manual 4016-E61TRS (упомянуто в руководстве пользователя, в открытом доступе не найдено)",
+      "doc_no": "TSL 4235",
+      "machine": "4016-E61TRS",
+      "kind": "руководство по ремонту",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf"
+      ]
+    },
+    {
+      "title": "Diagnostic Manual 4016-E61TRS (упомянуто в руководстве пользователя, в открытом доступе не найдено)",
+      "doc_no": "TSL 4233",
+      "machine": "4016-E61TRS",
+      "kind": "руководство по диагностике",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf"
+      ]
+    },
+    {
+      "title": "OEM Application, Installation and Commissioning Manual (упомянуто, не найдено)",
+      "doc_no": "TSL 4232",
+      "machine": "4016-E61TRS",
+      "kind": "руководство по монтажу и пуску",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf"
+      ]
+    },
+    {
+      "title": "Operation and Maintenance Manual 4016-61TRS1 and 4016-61TRS2 Gas Engines",
+      "doc_no": "SEBU8430-02 (июнь 2022)",
+      "machine": "4016-61TRS1/TRS2",
+      "kind": "O&M",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20141104-30011-42475"
+      ]
+    },
+    {
+      "title": "Operation and Maintenance Manual 4016-61TRS1 and 4016-61TRS2 Gas (прежний выпуск)",
+      "doc_no": "SEBU8430-00 (август 2008)",
+      "machine": "4016-61TRS1/TRS2",
+      "kind": "O&M",
+      "sources": [
+        "https://www.manualslib.com/manual/1424286/Perkins-4016-61trs1.html",
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10337334"
+      ]
+    },
+    {
+      "title": "Perkins 4016-61 TRG Operation and Maintenance Manual",
+      "machine": "4016-61TRG",
+      "kind": "O&M",
+      "sources": [
+        "https://www.manualslib.com/manual/835642/Perkins-4016-61-Trg.html"
+      ]
+    },
+    {
+      "title": "Perkins Engine 4016-61TRS1, 4016-61TRS2 Service Manual",
+      "machine": "4016-61TRS1/TRS2",
+      "kind": "руководство по ремонту",
+      "sources": [
+        "https://manualmachine.com/perkinsengine/401661trs1/4535564-service-manual/"
+      ]
+    },
+    {
+      "title": "4000 Series 4006-23TRS1 Spark Ignited Gas Engine (спецификация)",
+      "doc_no": "PN1850A/12/14",
+      "machine": "4006-23TRS1",
+      "kind": "спецификация",
+      "sources": [
+        "https://www.stuartgroup.co.uk/media/generators/products/73/files/4006-23TRS1.pdf"
+      ]
+    },
+    {
+      "title": "4000 Series 4008-30TRS1 4008-30TRS2 (спецификация)",
+      "doc_no": "PN1851/03/14",
+      "machine": "4008-30TRS1/TRS2",
+      "kind": "спецификация",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/produits/notice/4008-30TRS1-2-Gas-PN1851.pdf"
+      ]
+    },
+    {
+      "title": "4016-61TRG Electric Power Engines (спецификация)",
+      "doc_no": "PN3234/04/20",
+      "machine": "4016-61TRG1/2/3",
+      "kind": "спецификация",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20200428-27388-47363"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "OE45350",
+      "issuer": "Perkins",
+      "description": "ингибитор коррозии для охлаждающей жидкости",
+      "machine": "4016-E61TRS",
+      "unit": "система охлаждения",
+      "doc_ref": "TSL 4230E",
+      "source_url": "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf",
+      "quote": "treated with 1% by volume of Perkins inhibitor (part number OE45350)."
+    },
+    {
+      "code": "036620",
+      "issuer": "Perkins",
+      "description": "уплотнительная шайба пробки-фильтра в масляной магистрали форсунок охлаждения поршней",
+      "machine": "4016-E61TRS",
+      "unit": "система смазки",
+      "doc_ref": "TSL 4230E",
+      "source_url": "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf",
+      "quote": "Refit the plug filter (A1), complete with a new sealing washer, part number 036620 (A2)"
+    },
+    {
+      "code": "Y98/00038",
+      "issuer": "Perkins",
+      "description": "уплотнительная шайба свечи зажигания",
+      "machine": "4016-E61TRS",
+      "unit": "система зажигания",
+      "doc_ref": "TSL 4230E",
+      "source_url": "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf",
+      "quote": "Every time a spark plug is refitted the sealing washer (A3) must be renewed. Use sealing washer part number Y98/00038."
+    },
+    {
+      "code": "27610190",
+      "issuer": "Perkins",
+      "description": "съёмник свечей зажигания",
+      "machine": "4016-E61TRS",
+      "unit": "инструмент",
+      "doc_ref": "TSL 4230E",
+      "source_url": "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf",
+      "quote": "27610190           Spark plug removal tool"
+    },
+    {
+      "code": "27610178",
+      "issuer": "Perkins",
+      "description": "инструмент для очистки резьбы свечного отверстия головки цилиндра",
+      "machine": "4016-E61TRS; 4016-61TRS1/TRS2",
+      "unit": "инструмент",
+      "doc_ref": "TSL 4230E; SEBU8430-02",
+      "source_url": "https://s7d2.scene7.com/is/content/Caterpillar/CM20141104-30011-42475",
+      "quote": "B         27610178                                       1"
+    },
+    {
+      "code": "T6253/312",
+      "issuer": "Perkins",
+      "description": "приспособление для проверки утопания клапана и седла",
+      "machine": "4016-E61TRS",
+      "unit": "инструмент / головка цилиндра",
+      "doc_ref": "TSL 4230E",
+      "source_url": "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf",
+      "quote": "T6253/312          Valve and seat recession tool"
+    },
+    {
+      "code": "SE253",
+      "issuer": "Perkins",
+      "description": "приспособление для проворачивания коленчатого вала",
+      "machine": "4016-61TRS1/TRS2; 4016-E61TRS",
+      "unit": "инструмент",
+      "doc_ref": "SEBU8430-02",
+      "source_url": "https://s7d2.scene7.com/is/content/Caterpillar/CM20141104-30011-42475",
+      "quote": "A             SE253     Crankshaft Turning Tool        1"
+    },
+    {
+      "code": "T402623",
+      "issuer": "Perkins",
+      "description": "Perkins ELI (ингибитор длительного действия), ёмкость 1,0 л",
+      "machine": "4016-61TRS1/TRS2",
+      "unit": "система охлаждения",
+      "doc_ref": "SEBU8430-02, таблица 9",
+      "source_url": "https://s7d2.scene7.com/is/content/Caterpillar/CM20141104-30011-42475",
+      "quote": "T402623                                  1.0 L (1.06 qt)                        13.3 L (3.5 US gal)"
+    },
+    {
+      "code": "4324909",
+      "issuer": "Perkins",
+      "description": "фильтр масляный",
+      "machine": "4006-23TRS1/2, 4008-30TRS1/2, 4016-61TRS1/2",
+      "unit": "система смазки",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "Engine Model:4006-23TRS1,4006-23TRS2,4008-30TRS1,4008-30TRS2,4016-61TRS1,4016-61TRS2 | No. | Parts Description | Spare Parts no. | 1, | Oil Filter | 4324909"
+    },
+    {
+      "code": "T431658",
+      "issuer": "Perkins",
+      "description": "свеча зажигания (прежний номер 486/39)",
+      "machine": "4006-23TRS, 4008-30TRS, 4016-61TRS",
+      "unit": "система зажигания",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "3, | Spark plug | 486/39,48639,T431658"
+    },
+    {
+      "code": "486/39",
+      "issuer": "Perkins",
+      "description": "свеча зажигания, прежний номер (заменён на T431658)",
+      "machine": "серия 4000, газовые",
+      "unit": "система зажигания",
+      "doc_ref": "по данным продавца (En-Gen Diesel), не документ Perkins",
+      "source_url": "https://www.engendiesel-shop.com/perkins/t431658-spark-plug.html",
+      "quote": "Description | SPARK PLUG | Old Part Number(s) | 486/39 | Manufacturer | Perkins"
+    },
+    {
+      "code": "479-7702",
+      "issuer": "Caterpillar (аналог указан продавцом)",
+      "description": "свеча зажигания, номер Caterpillar, соответствующий T431658",
+      "machine": "серия 4000, газовые",
+      "unit": "система зажигания",
+      "doc_ref": "по данным продавца (Yichao), не документ Perkins; соответствие номеру Caterpillar заявил продавец",
+      "source_url": "https://www.yichaotech.com/t431658-spark-plug.html",
+      "quote": "Perkins Engine Parts T431658 Spark Plug CAT 479-7702 Ignition Plug"
+    },
+    {
+      "code": "SE551C/4",
+      "issuer": "Perkins",
+      "description": "элемент воздушного фильтра (альтернатива 4526544)",
+      "machine": "4006-23TRS, 4008-30TRS, 4016-61TRS",
+      "unit": "впуск воздуха",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "4, | Air cleaner element | SE551C/4, 4526544"
+    },
+    {
+      "code": "4526544",
+      "issuer": "Perkins",
+      "description": "элемент воздушного фильтра (альтернатива SE551C/4)",
+      "machine": "4006-23TRS, 4008-30TRS, 4016-61TRS",
+      "unit": "впуск воздуха",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "4, | Air cleaner element | SE551C/4, 4526544"
+    },
+    {
+      "code": "SEV122/2",
+      "issuer": "Perkins",
+      "description": "фильтр сапуна картера",
+      "machine": "4006-23TRS, 4008-30TRS, 4016-61TRS",
+      "unit": "вентиляция картера",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "5, | Breather filter | SEV122/2"
+    },
+    {
+      "code": "16SE663W",
+      "issuer": "Perkins",
+      "description": "верхний комплект прокладок",
+      "machine": "4016-61TRS",
+      "unit": "блок / головка цилиндров",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "10, | Top joint set | 16SE663W"
+    },
+    {
+      "code": "16SE663V",
+      "issuer": "Perkins",
+      "description": "нижний комплект прокладок",
+      "machine": "4016-61TRS",
+      "unit": "блок цилиндров",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "26, | Bottom joint set | 16SE663V"
+    },
+    {
+      "code": "SE2H",
+      "issuer": "Perkins",
+      "description": "прокладка головки цилиндра",
+      "machine": "4006/4008/4016 TRS; 4012-46TWG2A",
+      "unit": "головка цилиндра",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "17, | Joint cylinder head | SE2H"
+    },
+    {
+      "code": "SE901AQ",
+      "issuer": "Perkins",
+      "description": "поршневой комплект (газовое исполнение)",
+      "machine": "серия 4000 TRS",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "27, | Piston kit | SE901AQ"
+    },
+    {
+      "code": "SE91AB/3M",
+      "issuer": "Perkins",
+      "description": "вкладыши нижней головки шатуна",
+      "machine": "серия 4000 TRS",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "28, | Conrod big bearings | SE91AB/3M"
+    },
+    {
+      "code": "SE7G/2",
+      "issuer": "Perkins",
+      "description": "гильза цилиндра",
+      "machine": "серия 4000 TRS",
+      "unit": "блок цилиндров",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "31, | Liner | SE7G/2"
+    },
+    {
+      "code": "554/129",
+      "issuer": "Perkins",
+      "description": "передний сальник коленчатого вала",
+      "machine": "серия 4000 TRS",
+      "unit": "коленчатый вал",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "33, | Seal-front end oil | 554/129"
+    },
+    {
+      "code": "554/127",
+      "issuer": "Perkins",
+      "description": "задний сальник коленчатого вала",
+      "machine": "серия 4000 TRS; 4012-46TWG2A",
+      "unit": "коленчатый вал",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "34, | Seal-rear end oil | 554/127"
+    },
+    {
+      "code": "SE652CQ",
+      "issuer": "Perkins",
+      "description": "турбокомпрессор",
+      "machine": "серия 4000 TRS",
+      "unit": "турбонаддув",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "36, | Turbocharger | SE652CQ"
+    },
+    {
+      "code": "T402615",
+      "issuer": "Perkins",
+      "description": "прокладка турбокомпрессора (прежний номер 278/383)",
+      "machine": "серия 4000 TRS",
+      "unit": "турбонаддув",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "21, | Joint Turbo | 278/383, 278383, T402615"
+    },
+    {
+      "code": "365/472",
+      "issuer": "Perkins",
+      "description": "пружина клапана",
+      "machine": "серия 4000 TRS; 4012-46TWG2A",
+      "unit": "газораспределительный механизм",
+      "doc_ref": "по данным продавца (Tide Power), не документ Perkins",
+      "source_url": "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html",
+      "quote": "15, | Valve Spring | 365/472"
+    },
+    {
+      "code": "SEV551H/4",
+      "issuer": "Perkins",
+      "description": "фильтр воздушный",
+      "machine": "4012-46TWG2A",
+      "unit": "впуск воздуха",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "AIR FILTER | SEV551H/4 | 2"
+    },
+    {
+      "code": "SE111B",
+      "issuer": "Perkins",
+      "description": "фильтр масляный (прежний номер)",
+      "machine": "4012-46TWG2A",
+      "unit": "система смазки",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins; замена на 4324909 — вывод разведки, в источнике её нет, проверить отдельно",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "OIL FILTER | SE111B | 6"
+    },
+    {
+      "code": "SE429B/4",
+      "issuer": "Perkins",
+      "description": "фильтр топливный",
+      "machine": "4012-46TWG2A",
+      "unit": "топливная система",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "FUEL FILTER | SE429B/4 | 1"
+    },
+    {
+      "code": "4759205",
+      "issuer": "Perkins",
+      "description": "фильтр топливный; у продавца стоит рядом с SE429B/4",
+      "machine": "4006/4008/4012",
+      "unit": "топливная система",
+      "doc_ref": "по данным продавца (perkinspart, made-in-china), не документ Perkins; связь с SE429B/4 — только из заголовка карточки продавца, какой номер новый, не сказано",
+      "source_url": "https://perkinspart.en.made-in-china.com/product/vagYDEPGjUhx/China-4759205-Se429b-4-Perkins-4006-4008-4012-Fuel-Filter.html",
+      "quote": "4759205 Se429b/4 Perkins 4006 4008 4012 Fuel Filter"
+    },
+    {
+      "code": "SE573/1",
+      "issuer": "Perkins",
+      "description": "термостат",
+      "machine": "4012-46TWG2A",
+      "unit": "система охлаждения",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "THERMOSTAT | SE573/1 | 2"
+    },
+    {
+      "code": "541/419",
+      "issuer": "Perkins",
+      "description": "ремень вентилятора",
+      "machine": "4012-46TWG2A",
+      "unit": "привод системы охлаждения",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "FAN BELT | 541/419 | 5"
+    },
+    {
+      "code": "554/126",
+      "issuer": "Perkins",
+      "description": "передний сальник коленчатого вала",
+      "machine": "4012-46TWG2A",
+      "unit": "коленчатый вал",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "FRONT OIL SEAL | 554/126 | 1"
+    },
+    {
+      "code": "SEV574T",
+      "issuer": "Perkins",
+      "description": "коренной вкладыш",
+      "machine": "4012-46TWG2A",
+      "unit": "коленчатый вал",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "MAIN BEARING | SEV574T | 7"
+    },
+    {
+      "code": "R/858/12",
+      "issuer": "Perkins",
+      "description": "форсунка топливная",
+      "machine": "4012-46TWG2A",
+      "unit": "топливная система",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "INJECTOR | R/858/12 | 12"
+    },
+    {
+      "code": "726/66",
+      "issuer": "Perkins",
+      "description": "распылитель форсунки",
+      "machine": "4012-46TWG2A",
+      "unit": "топливная система",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "NOZZLE | 726/66 | 12"
+    },
+    {
+      "code": "359/552",
+      "issuer": "Perkins",
+      "description": "комплект поршневых колец",
+      "machine": "4012-46TWG2A",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "KIT, PISTON RING | 359/552 | 12"
+    },
+    {
+      "code": "SE145BC",
+      "issuer": "Perkins",
+      "description": "ремонтный комплект (по перечню продавца; состав не раскрыт)",
+      "machine": "4012-46TWG2A",
+      "unit": "не установлен",
+      "doc_ref": "по данным продавца (Wintpower), не документ Perkins",
+      "source_url": "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/",
+      "quote": "KIT, REPAIR | SE145BC | 1"
+    },
+    {
+      "code": "318882",
+      "issuer": "BorgWarner",
+      "description": "турбокомпрессор S500, номер изготовителя; номер Perkins SE652CE",
+      "machine": "4008TAG2A",
+      "unit": "турбонаддув",
+      "doc_ref": "по данным продавца (turbo-diesel.co.uk), не документ Perkins",
+      "source_url": "https://turbo-diesel.co.uk/product/turbo-318882-se652ce-perkins-4008tag2a-s500-new-borgwarner/",
+      "quote": "New Original BorgWarner / Perkins Turbocharger 318882 / SE652CE"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Altronic",
+      "component": "система зажигания 800 'C' Series, катушка на каждый цилиндр",
+      "machine": "4006-23TRS1, 4008-30TRS1/TRS2",
+      "evidence": "спецификации Perkins PN1850A/12/14 и PN1851/03/14: «Altronic 800 'C' Series ignition system with individual cylinder ignition coils, spark plugs»",
+      "sources": [
+        "https://www.stuartgroup.co.uk/media/generators/products/73/files/4006-23TRS1.pdf",
+        "http://www.moteur-perkins.com/uploads/catalogue/produits/notice/4008-30TRS1-2-Gas-PN1851.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Woodward",
+      "component": "газовый смеситель / дозирующий клапан Tecjet 50",
+      "machine": "4016-E61TRS",
+      "evidence": "руководство пользователя TSL 4230E: «Carburettor type ... Woodward Tecjet 50»",
+      "sources": [
+        "http://www.moteur-perkins.com/uploads/catalogue/lettre/notice/perkins-manual-dig16.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Multitorch",
+      "component": "свечи зажигания (форкамерного типа)",
+      "machine": "4016-61TRS1/TRS2",
+      "evidence": "руководство SEBU8430-02: «The 4016-61TRS engine is equipped with Multitorch spark plugs»; продавец называет T431658 «Spark Plug - Multitorch»",
+      "sources": [
+        "https://s7d2.scene7.com/is/content/Caterpillar/CM20141104-30011-42475",
+        "https://tidepower.en.made-in-china.com/product/POitgUywZGaj/China-Genuine-Original-Perkins-Engine-4016-61trs1-4016-61trs2-4008-30trs1-30trs2-4006-23trs1-23trs2-Gas-Generator-Spare-Parts-Joint-Turbo-282-292-278-384-T402615.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "BorgWarner (Schwitzer)",
+      "component": "турбокомпрессоры S500 (Perkins SE652CE = BorgWarner 318882/318870; SE652BZ = 317227/317129)",
+      "machine": "4008TAG2A, 4016TAG2",
+      "evidence": "страница британского продавца турбокомпрессоров: «Brand new genuine BorgWarner turbocharger ... Model: S500», соответствие SE652CE; подтверждено на уровне продавцов, не документа Perkins",
+      "sources": [
+        "https://turbo-diesel.co.uk/product/turbo-318882-se652ce-perkins-4008tag2a-s500-new-borgwarner/",
+        "https://www.soonparts.com/turbocharger-se652bz-317129-317227-turbo-s500-for-perkins-engine-4016-tag2.html"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "ГК «Хайтед»",
+      "country": "Россия",
+      "role": "официальный дистрибьютор Perkins в России (двигатели, запчасти, сервис)",
+      "sources": [
+        "https://www.hited-shop.ru/page/perkins"
+      ]
+    },
+    {
+      "company": "Mayphil UK Ltd",
+      "country": "Великобритания (территория: Узбекистан, Таджикистан, Киргизия, Туркмения, Пакистан, Афганистан, Шри-Ланка, Монголия, Ливан, Мальдивы)",
+      "role": "официальный (назначенный) дистрибьютор Perkins, продаёт газовую серию 4000",
+      "sources": [
+        "https://www.mayphiluk.com/products/4000-series-gas/"
+      ]
+    },
+    {
+      "company": "Gmmco Power",
+      "country": "Индия",
+      "role": "официальный дистрибьютор Perkins (юг, центр и запад Индии), сервисная мастерская",
+      "sources": [
+        "https://www.gmmco.in/perkins-workshop",
+        "https://www.afaqs.com/company-briefs/41042_gmmco-power-appointed-as-perkins-indian-distributor"
+      ]
+    },
+    {
+      "company": "дилер FG Wilson (fgwilson.ae; FG Wilson Engineering FZE, Джебель-Али)",
+      "country": "ОАЭ",
+      "role": "дилер FG Wilson: агрегаты, сервис, оригинальные запчасти",
+      "sources": [
+        "https://fgwilson.ae/",
+        "https://www.tradersfind.com/seller/fg-wilson-engineering-fze"
+      ]
+    },
+    {
+      "company": "Tide Power System Co., Ltd.",
+      "country": "Китай",
+      "role": "независимый: сборщик газовых агрегатов и продавец запчастей газовой серии 4000 Perkins (не официальный дистрибьютор)",
+      "sources": [
+        "https://tidepowersystems.en.made-in-china.com/product/CBlJHKhOyqUN/China-4016-Gas-Engine-Spare-Parts-T431658-486-39-16se663W-Se2h-16se663V-Se91ab-3m-Se91b-7-Se901aq-Se7g-2-Se652cq-365-472-262-151-10000-16272.html"
+      ]
+    },
+    {
+      "company": "Wintpower",
+      "country": "Китай",
+      "role": "независимый: изготовитель агрегатов, продавец запчастей Perkins 4012 (не официальный дистрибьютор)",
+      "sources": [
+        "https://www.wintpower.com/perkins-4012-46twg2a-engine-part-sev551h4-se111b-se429b4-541398-541419-se5731-se478-se152d26-554126-554127-sev574t-sev574u-sev574v-se91aa3m-product/"
+      ]
+    },
+    {
+      "company": "En-Gen Diesel Products Limited",
+      "country": "Великобритания",
+      "role": "независимый склад запчастей (свеча Perkins T431658 в наличии)",
+      "sources": [
+        "https://www.engendiesel-shop.com/perkins/t431658-spark-plug.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальный каталог Perkins (shop.perkins.com, Salesforce) рисуется только скриптом: карточки 4324909, T431658 и SE652CQ прочитать не удалось, поэтому подтверждение кодов изготовителем есть только через руководства по эксплуатации и продавцов.",
+    "perkins.com и fgwilson.com не отвечают или отдают Access Denied при автоматическом чтении: мощности агрегатов P2000/P2250/P2500, установленные генераторы (Leroy-Somer — только в отрывке поисковой выдачи, не подтверждено) и локатор дилеров не прочитаны.",
+    "Каталог деталей Perkins (Parts Manual) на 4006/4008/4016 TRS в открытом доступе не найден; вероятно, лежит на дилерском портале (Perkins SPI²/EDI) или у дистрибьютора (ГК «Хайтед»).",
+    "Большинство кодов фильтров, наборов прокладок, вкладышей и поршневых комплектов для газовых TRS — у китайского продавца (Tide Power), а не у изготовителя; перед заказом сверять с официальным каталогом.",
+    "Номер масляного фильтра в руководствах по газовым двигателям не указан (только «обратитесь к дистрибьютору Perkins»); катушки зажигания и датчики детонации (Altronic/EIS) с кодами не найдены.",
+    "Workshop Manual TSL 4235, Diagnostic Manual TSL 4233 и Installation Manual TSL 4232 упомянуты в руководстве пользователя, но в открытом доступе не найдены; копии на manualmachine.com и scribd проверить не удалось.",
+    "Статус выпуска газовой серии 4000 (TRS) на текущем сайте Perkins не подтверждён; последний открытый документ — SEBU8430-02 (2022).",
+    "Официальные дилеры Perkins/FG Wilson в Турции, Казахстане и Китае не найдены; дистрибьютор FG Wilson в Индии (Green Power International) виден только в отрывке поисковой выдачи."
+  ],
+  "verifier_notes": "Все 38 кодов найдены на указанных страницах дословно. Страницы скачаны через curl и прочитаны pdftotext или разбором HTML. Опровергнутых записей нет. Замечания: (1) SE111B — слова 'now 4324909' в источнике нет, замену номера надо проверить отдельно; (2) у 4016TAG2 статус 'superseded by 4016-61TRG' источником не подтверждён; (3) у 4016-E61TRS в TSL 4230E не найдено 'methane number 75'; (4) у FG Wilson P2500 ссылка .../1000004959.html не проверена, рабочая — .../129260.html; (5) perkins.com и fgwilson.com отдают Access Denied, эти модели подтверждены по заголовкам в поиске; ссылка stuartgroup.ltd.uk на 4016-61TRS2 не открылась (ошибка TLS); (6) у 479-7702 (CAT), 4759205 и у кодов с Tide Power и wintpower источник — продавцы, а не документы Perkins.",
+  "corrections": [
+    "summary: итог второго прохода записан числом кодов в файле — 39; в отчёте скептика «38», это ошибка счёта: при записи файла все 39 страниц-источников скачаны заново, каждый код найден в тексте",
+    "SE111B: из описания снято «now 4324909» — в источнике замены номера нет, она помечена в doc_ref как вывод разведки (замечание скептика 1)",
+    "4016TAG2: статус «superseded by 4016-61TRG» заменён на «не установлен» — источник этого не говорит (замечание скептика 2)",
+    "4016-E61TRS: из rating снято «minimum methane number 75» — в TSL 4230E этого нет (замечание скептика 3)",
+    "FG Wilson P2500: ссылка …/1000004959.html заменена на рабочую …/129260.html (замечание скептика 4)",
+    "4006-23TAG и FG Wilson P2000/P2250/P2500: verified: false с оговоркой в status — perkins.com и fgwilson.com автоматическому чтению недоступны, модели подтверждены лишь заголовками в поиске (замечание скептика 5)",
+    "4016-61TRS2: в status оговорено, что вторая ссылка (stuartgroup.ltd.uk) не открылась, запись держится на SEBU8430-02 (замечание скептика 5)",
+    "коды продавцов (31 строк: Tide Power, Wintpower, made-in-china, Yichao, En-Gen, turbo-diesel.co.uk): в doc_ref записано «по данным продавца, не документ Perkins» (замечание скептика 6)"
+  ]
+}
