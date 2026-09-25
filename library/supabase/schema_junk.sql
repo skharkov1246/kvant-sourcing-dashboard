@@ -115,7 +115,8 @@ create table if not exists lib_ocr_writes (
 );
 create index if not exists lib_ocr_writes_file on lib_ocr_writes (file_id);
 do $$ begin
-  if not exists (select 1 from pg_constraint where conname = 'lib_ocr_writes_mode_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_ocr_writes_mode_chk'
+                   and conrelid = to_regclass('lib_ocr_writes')) then
     alter table lib_ocr_writes add constraint lib_ocr_writes_mode_chk
       check (mode in ('файл', 'страницы'));
   end if;
@@ -201,7 +202,8 @@ alter table lib_files add column if not exists our_company     text;
 create index if not exists lib_files_class on lib_files (doc_class);
 
 do $$ begin
-  if not exists (select 1 from pg_constraint where conname = 'lib_files_doc_class_chk') then
+  if not exists (select 1 from pg_constraint where conname = 'lib_files_doc_class_chk'
+                   and conrelid = to_regclass('lib_files')) then
     alter table lib_files add constraint lib_files_doc_class_chk
       check (doc_class is null or doc_class in ('документация','спецификация','неясно'));
   end if;

@@ -107,16 +107,16 @@ create index if not exists lib_brand_alias_sp176 on lib_brand_alias (sp176_id);
 
 -- Проверки — отдельными блоками: create table if not exists существующую таблицу
 -- не меняет (правило 21). Новый статус добавляется сносом и созданием проверки.
+-- Снос — «drop constraint if exists» у самой таблицы, а не поиск имени в
+-- pg_constraint: тот видит проверки всех схем базы, и при второй схеме с такой
+-- же таблицей находил чужую, сносил несуществующую — и файл падал целиком
+-- (24.09.2026, тестовая база с двумя схемами).
 do $$
 begin
-  if exists (select 1 from pg_constraint where conname = 'lib_brand_alias_статус') then
-    alter table lib_brand_alias drop constraint lib_brand_alias_статус;
-  end if;
+  alter table lib_brand_alias drop constraint if exists lib_brand_alias_статус;
   alter table lib_brand_alias add constraint lib_brand_alias_статус
     check (status in ('разрешено', 'спорно', 'в очереди', 'не бренд', 'проверено', 'отклонено'));
-  if exists (select 1 from pg_constraint where conname = 'lib_brand_alias_ключ_при_статусе') then
-    alter table lib_brand_alias drop constraint lib_brand_alias_ключ_при_статусе;
-  end if;
+  alter table lib_brand_alias drop constraint if exists lib_brand_alias_ключ_при_статусе;
   -- Ключ бренда есть ровно у разрешённых: «в очереди» с ключом — это
   -- разрешённое, которое никто не увидит в lib_brand_map, а «разрешено» без
   -- ключа — пропажа, выглядящая решением.
