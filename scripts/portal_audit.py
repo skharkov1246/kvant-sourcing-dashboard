@@ -1963,6 +1963,7 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
     "b.registry_trunc": "бренд: реестр разведки усечён до 25, страница не пишет",
     "b.registry": "бренд: реестр — checked > parts или имя-ключ",
     "b.card": "бренд: элемент карточки не из списка элементов или не число",
+    "b.own_link": "бренд: владение ссылается на ключ, которого нет в снимке, связь без имени или бренд владеет сам собой",
     "b.cloud_nomark": "облако: слово — не марка (пометка nb, служебное слово, страна) или ведёт не на бренд",
     "b.cloud_dup": "облако: ключ в двух словах, одно имя у двух слов или сведённый ключ стоит своим словом",
     "b.cloud_lost": "облако: бренд словаря без пометки не попал ни в одно слово",
@@ -2266,6 +2267,17 @@ def ревизия_брендов(с: Снимки, сейчас) -> Вклад�
             if isinstance(эл, dict):
                 т.счёт("b.card", not re.fullmatch(r"\d+", str(эл.get("id")))
                        or str(эл.get("id")) not in карточные_ид)
+        # Владение (library/brands.владение): ссылка c ставится только на карточку
+        # этого снимка — иначе страница ведёт в «Такого бренда в снимке нет».
+        own = b.get("own")
+        if isinstance(own, dict):
+            связи_владения = ([own["o"]] if isinstance(own.get("o"), dict) else []) + [
+                x for поле in ("up", "was", "group", "series") for x in own.get(поле) or []
+                if isinstance(x, dict)]
+            т.счёт("b.own_link", any(x.get("c") is not None and x.get("c") not in ключи_брендов
+                                     for x in связи_владения)
+                   or any(not (x.get("name") or x.get("series")) for x in связи_владения)
+                   or (isinstance(own.get("o"), dict) and own["o"].get("c") == b.get("k")))
     # Облако (library/brands.облако): в нём только марки, одна марка — одно слово.
     слова_облака = [s for s in ((bv or {}).get("cloud") or []) if isinstance(s, dict)]
     if слова_облака:

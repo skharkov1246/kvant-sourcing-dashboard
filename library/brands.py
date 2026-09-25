@@ -43,7 +43,7 @@ import re
 import zlib
 from pathlib import Path
 
-from library import codes_sql, equipment, materials, oem_kind
+from library import brand_owner, codes_sql, equipment, materials, oem_kind
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -476,7 +476,8 @@ def _имя_поставщика(r, имена_портала):
 
 def собрать(коды: dict, каталог: dict | None = None, *, словарь=None, цепочка=None,
             атлас=None, каналы=None, имена_портала=None, имена_брендов=None,
-            ключи_карточки=None, разложение=None, ряды=None, собран: str | None = None) -> dict:
+            ключи_карточки=None, разложение=None, ряды=None, ключи_рядов=None,
+            собран: str | None = None) -> dict:
     """Строки базы и файлы → {ключ KV: снимок}.
 
     коды     — {имя запроса codes_sql.ЗАПРОСЫ: [строки-словари]};
@@ -491,7 +492,12 @@ def собрать(коды: dict, каталог: dict | None = None, *, сло
     передаёт разложение словаря-файла.
     ряды — справочник рядов dict/model_series.json: по его написаниям дубли
     одной марки сводятся в одно слово облака (облако() ниже); без него сводит
-    только карта словаря.
+    только карта словаря. По его же полям владения карточка бренда получает
+    поле own (владение() ниже).
+    ключи_рядов — {ключ словаря: ключ справочника рядов}, где они разные
+    (поле brand_key dict/oem.json); без него — из переданного словаря. Словарь
+    из реестра базы этого поля не знает, поэтому публикатор передаёт карту
+    словаря-файла.
     """
     каталог = каталог or {}
     имена_портала = имена_портала or {}
@@ -757,6 +763,9 @@ def собрать(коды: dict, каталог: dict | None = None, *, сло
         if k and k in бренды:
             бренды[k].setdefault("card", []).append({"id": ид, "codes": _целое(r.get("codes"))})
 
+    # ── владение: бренд машины → компания-владелец ──────────────────────────
+    владение(бренды, ряды, ключи_рядов if ключи_рядов is not None else карта_рядов_словаря(словарь))
+
     # ── итог ────────────────────────────────────────────────────────────────
     список_брендов = sorted(бренды.values(), key=lambda b: (
         -(b.get("codes", {}).get("any") or 0), -(b.get("parts", {}).get("n") or 0),
@@ -824,6 +833,97 @@ def собрать(коды: dict, каталог: dict | None = None, *, сло
         снимки[ключ] = {"version": 1, **({"published_at": собран} if собран else {}),
                         "part": i, "codes": корзины[i]}
     return снимки
+
+
+# ── Владение: бренд машины → компания-владелец ───────────────────────────────
+# ЗАЧЕМ. Сорсеру на карточке Solar Turbines надо видеть, что это Caterpillar с
+# 1981 года, а на карточке Caterpillar — какие марки группы спрашивать у того же
+# дилера. Связи лежат в dict/model_series.json (owner, owner_since, owner_source,
+# owner_history, список owners) и читаются одним правилом — library/brand_owner.
+#
+# КЛЮЧИ НЕ МЕНЯЮТСЯ И БРЕНДЫ НЕ СЛИВАЮТСЯ. Карточка снимка остаётся своим
+# ключом словаря; ключ справочника рядов тот же, либо указан полем brand_key
+# записи словаря (Emerson Rosemount → rosemount). Ссылка на карточку владельца
+# (поле c) ставится, только если такая карточка есть в ЭТОМ снимке; иначе
+# владелец показывается именем без ссылки. Источник связи — owner_source, как в
+# справочнике: страница показывает его ссылкой.
+#
+# Поле own карточки: {o: нынешний владелец {name, c?, since?, src?},
+# up: [выше по цепочке {name, c?}], was: [бывшие {name, c?, since?, until?, src?}],
+# group: [бренды группы {name, c?, since?, via?}], series: [ряды чужих марок
+# {series, brand, c?, since?}], role: «владелец» у холдинга}.
+# Это агрегаты справочника, а не данные клиентов (правило 17).
+
+
+def карта_рядов_словаря(словарь) -> dict[str, str]:
+    """{ключ словаря брендов: ключ справочника рядов}, где они разные (brand_key)."""
+    return {r["oem_key"]: r["brand_key"] for r in (словарь or {}).get("records", [])
+            if r.get("oem_key") and r.get("brand_key") and r["brand_key"] != r["oem_key"]}
+
+
+def владение(бренды: dict[str, dict], ряды, ключи_рядов=None) -> int:
+    """Проставить карточкам снимка поле own. Возвращает число карточек с ним."""
+    if not ряды or not бренды:
+        return 0
+    ключи_рядов = ключи_рядов or {}
+    зап = brand_owner.записи(ряды)
+    # Ключ справочника → карточка снимка: свой ключ сильнее сведённого brand_key.
+    карточка: dict[str, str] = {}
+    for k in sorted(бренды):
+        мк = ключи_рядов.get(k, k)
+        if мк in зап and (мк == k or мк not in карточка):
+            карточка[мк] = k
+
+    def имя(ключ):
+        р = зап.get(ключ)
+        return (р.get("name") or ключ) if р else ключ
+
+    def связь(э: dict) -> dict:
+        return _без_пустых({"name": э.get("name"), "c": карточка.get(э.get("key")),
+                            "since": э.get("since"), "until": э.get("until"),
+                            "src": э.get("source")})
+
+    n = 0
+    for k, b in бренды.items():
+        мк = ключи_рядов.get(k, k)
+        if мк not in зап:
+            continue
+        own = {}
+        вверх = brand_owner.цепочка_владельцев(мк, ряды)
+        if вверх:
+            own["o"] = связь(вверх[0])
+            own["up"] = [_без_пустых({"name": э["name"], "c": карточка.get(э.get("key"))})
+                         for э in вверх[1:]]
+        own["was"] = [связь(э) for э in brand_owner.бывшие_владельцы(мк, ряды)]
+        own["group"] = [_без_пустых({"name": э["name"], "c": карточка.get(э["key"]),
+                                     "since": э.get("since"),
+                                     "via": имя(э["via"]) if э.get("via") else None})
+                        for э in brand_owner.бренды_владельца(мк, ряды)]
+        own["series"] = [_без_пустых({"series": r.get("series") or r.get("series_id"),
+                                      "brand": имя(r["brand"]), "c": карточка.get(r["brand"]),
+                                      "since": r.get("since")})
+                         for r in brand_owner.ряды_владельца(мк, ряды)]
+        if зап[мк].get("role") == brand_owner.ВЛАДЕЛЕЦ:
+            own["role"] = brand_owner.ВЛАДЕЛЕЦ
+        own = _без_пустых(own)
+        if own:
+            b["own"] = own
+            n += 1
+    return n
+
+
+def итоги_владения(сводка: dict) -> dict:
+    """Счётчики для журнала: только числа (правило 17)."""
+    бренды = сводка.get("brands") or []
+    own = [b["own"] for b in бренды if b.get("own")]
+    ссылок = [x for o in own for x in ([o.get("o")] if o.get("o") else [])
+              + o.get("up", []) + o.get("was", []) + o.get("group", [])]
+    return {"cards": len(own),
+            "with_owner": sum(1 for o in own if o.get("o")),
+            "with_former": sum(1 for o in own if o.get("was")),
+            "with_group": sum(1 for o in own if o.get("group")),
+            "links": len(ссылок),
+            "links_without_card": sum(1 for x in ссылок if not x.get("c"))}
 
 
 # ── Облако: только марки, одна марка — одно слово ────────────────────────────
