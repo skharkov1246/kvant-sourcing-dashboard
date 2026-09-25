@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 276,
-    "total_bytes": 124225870,
+    "datasets": 278,
+    "total_bytes": 124376703,
     "by_sensitivity": {
-      "внутреннее": 154,
+      "внутреннее": 156,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 12,
+      "дашборд сорсеров": 14,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -4081,6 +4081,69 @@
       "referenced_by": []
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 159324,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/waukeshainnio.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/budget_join_stats.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/gap_letters.json",
+        "gt/data/maker_contacts.json",
+        "gt/data/ms5001_vankor.json",
+        "gt/data/pn_db.json",
+        "gt/data/seller_index.json",
+        "gt/data/seller_sitemaps.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json"
+      ],
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "95be059",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/r1700_recon/engine.json",
       "subproject": "база ЗИП",
       "bytes": 158646,
@@ -4121,69 +4184,6 @@
         "markers": []
       },
       "referenced_by": []
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 155512,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "dict/symptom.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/budget_join_stats.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/gap_letters.json",
-        "gt/data/maker_contacts.json",
-        "gt/data/ms5001_vankor.json",
-        "gt/data/pn_db.json",
-        "gt/data/seller_index.json",
-        "gt/data/seller_sitemaps.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json"
-      ],
-      "last_change": "2026-09-24",
-      "last_author": "Claude",
-      "last_commit": "c6146e4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
-      ]
     },
     {
       "path": "gpu/data/overhaul_qsk60.json",
@@ -5862,6 +5862,54 @@
       ]
     },
     {
+      "path": "data/brand_research/waukeshainnio.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 79997,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): INNIO Waukesha: газовые двигатели VHP (P9394GSI, L7044GSI, L7042GSI, F3524GSI), VGF и 275GL+ для привода компрессоров и генерации. Машин и исполнений — 20, сервисных документов — 19, кодов запчастей — 38: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 15, дилеров и сервисных компаний — 16, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 7 (поле corrections). 6 кодов — из руководства Waukesha Form 6243 (VGF F18/H24), 17 — номера Waukesha в перекрёстных таблицах MOTORTECH, 9 — из перечня реселлера McGill, остальные 6 — карточки продавцов с пометкой, кем заявлена применимость. Открытого перечня именно по P9394GSI нет — коды даны по серии VHP; по 275GL+ найдены только удлинители свечей, набор датчика NOx и корпус дросселя. Дилеры — из официального локатора waukeshaengine.com, партнёра в РФ там нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 38,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "95be059",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gpu/data/motortech_cross.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 79705,
@@ -5942,9 +5990,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-24",
-      "last_author": "Claude",
-      "last_commit": "c6146e4",
+      "last_change": "2026-09-25",
+      "last_author": "skharkov1246",
+      "last_commit": "3bedd36",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6079,9 +6127,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-24",
-      "last_author": "Claude",
-      "last_commit": "c6146e4",
+      "last_change": "2026-09-25",
+      "last_author": "skharkov1246",
+      "last_commit": "3bedd36",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6127,9 +6175,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-24",
-      "last_author": "Claude",
-      "last_commit": "c6146e4",
+      "last_change": "2026-09-25",
+      "last_author": "skharkov1246",
+      "last_commit": "3bedd36",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6175,9 +6223,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-24",
-      "last_author": "Claude",
-      "last_commit": "c6146e4",
+      "last_change": "2026-09-25",
+      "last_author": "skharkov1246",
+      "last_commit": "3bedd36",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6223,9 +6271,57 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-24",
+      "last_change": "2026-09-25",
+      "last_author": "skharkov1246",
+      "last_commit": "3bedd36",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/deutz.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 66950,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): Deutz: дизели TCD 3.6/4.1/6.1/7.8 и не значащиеся в Engine Finder TCD 2012/2013 на буровых установках и ПДМ, газовые TBG 616/620 и TCG 2016/2020/2032 линии бывшей Deutz Power Systems (ныне MWM, Caterpillar Energy Solutions). Машин и исполнений — 18, сервисных документов — 12, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 4, дилеров и сервисных компаний — 16, пробелов (gaps) — 10; по замечаниям скептика поправлено записей — 10 (поле corrections). 26 кодов — номера DEUTZ AG у продавца Diesel Parts Direct (номер без ведущего нуля, полный 8-значный сверять), 3 — номера эксплуатационных жидкостей из PDF DEUTZ, 3 — номера Bosch и BorgWarner по кроссам продавцов, 8 — номера MWM на газовые двигатели у российского продавца. Официальный представитель в РФ и СНГ по сайту DEUTZ — ООО «ДОЙТЦ Восток»; продажа новых двигателей в Россию приостановлена с марта 2022 г. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-25",
       "last_author": "Claude",
-      "last_commit": "c6146e4",
+      "last_commit": "95be059",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6510,9 +6606,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-24",
-      "last_author": "Claude",
-      "last_commit": "c6146e4",
+      "last_change": "2026-09-25",
+      "last_author": "skharkov1246",
+      "last_commit": "3bedd36",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8683,8 +8779,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 31924,
-      "note": "Очередь разведки брендов (обновлена 2026-09-24): 60 брендов из dict/oem.json, сделано — 6, в очереди — 54. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 31998,
+      "note": "Очередь разведки брендов (обновлена 2026-09-24): 60 брендов из dict/oem.json, сделано — 8, в очереди — 52. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -8712,9 +8808,9 @@
           "status"
         ]
       },
-      "last_change": "2026-09-24",
+      "last_change": "2026-09-25",
       "last_author": "Claude",
-      "last_commit": "c6146e4",
+      "last_commit": "95be059",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",

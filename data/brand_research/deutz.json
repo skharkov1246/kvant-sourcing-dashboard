@@ -1,0 +1,945 @@
+{
+  "oem_key": "deutz",
+  "name": "Deutz",
+  "segment_focus": "двигатели TCD 3.6/4.1/6.1/2013 на буровых и ПДМ, газовые TCG парка: номера фильтров ТО и ремкомплектов, дилеры в СНГ",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по открытым источникам. Все находки проверены на странице источника (curl/pdftotext), затем вторым проходом — скептиком: подтверждены все 40 кодов и все 18 машин, из четырёх субпоставщиков не подтверждён один (MAN Energy Solutions).\n\nМашины. Текущий дизельный ряд DEUTZ AG взят со страниц Engine Finder и из паспортов 2026 г. на deutz.com: TD/TCD 3.6 L4 (55–105 кВт), TCD 4.1 L4 (80–115 кВт), TCD 6.1 L6 (105–180 кВт), TCD 7.8 L6 (до 260 кВт), TCD 12.0 V6 и TCD 16.0 V8. Все двигатели выпускаются в исполнении Stage V/Tier 4f, а для нерегулируемых рынков — Stage IIIA/Tier 3 без системы нейтрализации выхлопа (EAT). TCD 2012/2013 в Engine Finder отсутствуют. Однако Epiroc ставит TCD 2013 L04 2V (120 кВт) и TCD 2012 L06 2V (155 кВт) на Boomer M и Simba M4 в исполнении Stage IIIA. Там же указан TCD 3.6 (85–90 кВт) на Boomer S2. На ПДМ Sandvik LH203 стоят воздушные BF6L914 и TCD 914 L06.\n\nГазовые TCG парка — это не нынешняя DEUTZ AG. TBG 616/620, TCG 2016/2020/2032 — линия Deutz Power Systems (Мангейм). В 2007 г. её продали 3i, в 2008 г. переименовали в MWM, с 2011 г. она принадлежит Caterpillar (Caterpillar Energy Solutions). Поэтому номера запчастей на них — номера MWM. Сейчас MWM выпускает TCG 2020 V12/V16 (1 000–1 560 кВт эл.) и TCG 2032 (3 000–4 500 кВт эл.). Место TCG 2016 занял TCG 3016 (это вывод). Сама DEUTZ AG сейчас выпускает только малые газовые G 2.2/2.9. В США у неё был TCG 2015 V6/V8.\n\nКоды: 40 штук.\n- 26 оригинальных номеров Deutz с витрины Diesel Parts Direct (США, по собственному заявлению — «Authorized Deutz Service Dealer»): фильтры масла и топлива на TCD 3.6/4.1/6.1/7.8/2012/2013, форсунки, свечи накала, термостат, датчики, комплекты прокладок, кольца. Продавец пишет номер без ведущего нуля: 1174416 = Deutz 0117 4416.\n- 3 номера эксплуатационных жидкостей из официальных PDF Deutz: масло TLX 10W40 FE, охлаждающая жидкость Core Protect, PowerBlue.\n- 3 номера изготовителей узлов через кроссы продавцов: форсунки Bosch, турбокомпрессор BorgWarner.\n- 8 номеров MWM на газовые TBG 616/620, TCG 2016/2020 с витрины российского продавца spark-plugs.ru: масляный и воздушный фильтры, фильтр картерных газов, свечи, датчики, катушка.\n\nДилеры в РФ и СНГ. На странице deutz.com (раздел Central Asia) ООО «ДОЙТЦ Восток» (Москва) названо официальным представителем DEUTZ AG в РФ и СНГ. Там же — собственный сервисный центр и склад в Подольске. При этом с марта 2022 г. DEUTZ приостановила продажу новых двигателей в Россию и Белоруссию. Дилерство остальных — по их собственному заявлению:\n- Казахстан: СМС Унистар Текнолоджи, Евротехсервис К, OTR Group;\n- Россия: ИСТК;\n- Турция: DEMOSER, Baytem;\n- Индия: South Calcutta Diesels.\n\nДочерние компании DEUTZ — DEUTZ Engines India и DEUTZ Asia-Pacific (Сингапур). Газовые MWM в регионе ведёт MWM Eastern Europe & Central Asia. Официального дилера в ОАЭ и Китае не нашли. Документы: инструкция по эксплуатации TCD 2012/2013 2V (0312 1890 en) и технические циркуляры Deutz по топливу, маслам и охлаждающей жидкости.",
+  "machines": [
+    {
+      "model": "TCD 3.6 L4",
+      "kind": "дизельный двигатель 4 цил., 3,6 л, турбонаддув с охлаждением наддувочного воздуха; привод СБУ и мобильных машин (Epiroc Boomer S2 — 85–90 кВт)",
+      "segment": "двигатель",
+      "rating": "70–105 кВт при 2300 об/мин, 550 Н·м; EU Stage V / US Tier 4f / CN IV; исполнение Stage IIIA/Tier 3 без EAT",
+      "status": "выпускается",
+      "sources": [
+        "https://www.deutz.com/en/products/engine-finder/engine-detail/tcd-36-l4/",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TD_TCD_3.6__1_.pdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0090_01b_Boomer_S2_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TD 3.6 L4",
+      "kind": "дизельный двигатель 4 цил., 3,6 л, турбонаддув без охладителя",
+      "segment": "двигатель",
+      "rating": "55,4 кВт при 2600 об/мин, 340 Н·м",
+      "status": "выпускается",
+      "sources": [
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TD_TCD_3.6__1_.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCD 4.1 L4",
+      "kind": "дизельный двигатель 4 цил., 4,038 л; привод СБУ (Epiroc Boomer M-series, Simba M4 — 115 кВт)",
+      "segment": "двигатель",
+      "rating": "80–115 кВт при 2300 об/мин, 609 Н·м; Stage V / Tier 4f; исполнение Stage IIIA без EAT",
+      "status": "выпускается",
+      "sources": [
+        "https://www.deutz.com/en/products/engine-finder/engine-detail/tcd-41-l4/",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TCD_4.1.pdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0080_01f_Boomer_M-series_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCD 6.1 L6",
+      "kind": "дизельный двигатель 6 цил., 6,057 л; привод СБУ (Epiroc Boomer M-series — 129 кВт в исполнении CN4; Simba M4 — мощность TCD 6.1 L06 в спецификации не названа)",
+      "segment": "двигатель",
+      "rating": "105–180 кВт при 2100–2300 об/мин, 1000 Н·м; Stage V / Tier 4f; исполнение Stage IIIA без EAT",
+      "status": "выпускается",
+      "sources": [
+        "https://www.deutz.com/en/products/engine-finder/engine-detail/tcd-61-l6/",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TCD_6.1.pdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0070_01f_Simba_M4_technical_specification_englishpdf",
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0080_01f_Boomer_M-series_technical_specification_englishpdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCD 7.8 L6",
+      "kind": "дизельный двигатель 6 цил., 7,8 л, внешняя EGR, DCR, SCR+DPF",
+      "segment": "двигатель",
+      "rating": "до 260 кВт при 2300 об/мин, 1400 Н·м; US T4f, CN IV, EU IV, EU V",
+      "status": "выпускается",
+      "sources": [
+        "https://www.deutz.com/en/products/engine-finder/engine-detail/tcd-78-l6/",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TCD_7.8.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCD 12.0 V6",
+      "kind": "дизельный двигатель V6, 12 л",
+      "segment": "двигатель",
+      "rating": "до 390 кВт; US T4f, CN IV, EU IV, EU V",
+      "status": "выпускается",
+      "sources": [
+        "https://www.deutz.com/en/products/engine-finder/engine-detail/tcd-120-v6/",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/mobile_machinery/2023_en_product_datasheet_tcd_12.0_v6.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCD 16.0 V8",
+      "kind": "дизельный двигатель V8, 16 л",
+      "segment": "двигатель",
+      "rating": "до 520 кВт; US T4f, CN IV, EU IV, EU V",
+      "status": "выпускается",
+      "sources": [
+        "https://www.deutz.com/en/products/engine-finder/engine-detail/tcd-160-v8/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCD 2013 L04 2V",
+      "kind": "дизельный двигатель 4 цил.; привод СБУ (Epiroc Boomer M-series, Simba M4 — 120 кВт, Stage IIIA/Tier 3)",
+      "segment": "двигатель",
+      "rating": "120 кВт в машинах Epiroc; ряд 2013 в целом — 75–243 кВт (по данным Diesel Parts Direct)",
+      "status": "в Engine Finder deutz.com не значится; в спецификациях Epiroc — исполнение Stage IIIA/Tier 3; запчасти продаются",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0080_01f_Boomer_M-series_technical_specification_englishpdf",
+        "https://www.dieselpartsdirect.com/deutz-2013-engines",
+        "https://www.turboline.ru/deutz/tcd2012-2013.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCD 2013 L06 2V / L06 4V",
+      "kind": "дизельный двигатель 6 цил. (2V — двухклапанный, 4V — четырёхклапанный с Common Rail)",
+      "segment": "двигатель",
+      "rating": "ряд 2013: 75–243 кВт (мобильная техника), 250–263 кВА (генераторы) — по данным Diesel Parts Direct",
+      "status": "в Engine Finder deutz.com не значится; запчасти и руководства продаются",
+      "sources": [
+        "https://www.dieselpartsdirect.com/deutz-2013-engines",
+        "https://www.dieselpartsdirect.com/deutz-2013-service-manuals",
+        "https://procarmanuals.com/deutz-engine-tcd-2013-l04-06-4v-instruction-manual-0312-2443-en/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCD 2012 L04/L06 2V",
+      "kind": "дизельный двигатель 4/6 цил.; привод СБУ (Epiroc Simba M4 — TCD 2012 L06 2V, 155 кВт, Stage IIIA/Tier 3)",
+      "segment": "двигатель",
+      "rating": "155 кВт (L06 2V в Simba M4)",
+      "status": "в Engine Finder deutz.com не значится; запчасти продаются",
+      "sources": [
+        "https://epiroc.scene7.com/is/content/epiroc/9869_0070_01f_Simba_M4_technical_specification_englishpdf",
+        "https://www.turboline.ru/deutz/tcd2012-2013.pdf",
+        "https://www.dieselpartsdirect.com/deutz-2012-oil-filters"
+      ],
+      "verified": true
+    },
+    {
+      "model": "BF6L914 / TCD 914 L06",
+      "kind": "дизельный двигатель воздушного охлаждения 6 цил.; привод ПДМ Sandvik LH203",
+      "segment": "двигатель",
+      "rating": "BF6L914 — 71,5 кВт при 2300 об/мин; TCD 914 L06 — 72 кВт; два исполнения (Tier 2/Stage II и Tier 3/Stage IIIA)",
+      "status": "не установлен",
+      "sources": [
+        "https://amt-inc.ca/wp-content/uploads/2021/09/TS3-LH203-25-ENG-METRIC.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G 2.2 / G 2.9",
+      "kind": "газовые (LPG, CNG) и бензиновые двигатели 3/4 цил. на базе ряда 2.2/2.9",
+      "segment": "двигатель",
+      "rating": "G 2.2 — 41,5 кВт; G 2.9 — 54 кВт при 2800 об/мин; EU V / US T2",
+      "status": "выпускается",
+      "sources": [
+        "https://www.deutz.com/en/products/gas-and-gasoline-engines/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2015 V6 / V8",
+      "kind": "газовый двигатель (природный газ), V-образный 90°, турбонаддув с охлаждением наддувочного воздуха",
+      "segment": "ГПУ",
+      "rating": "V6 — 180 кВт (241 л. с.), V8 — 240 кВт (322 л. с.); ряд 220–322 л. с.",
+      "status": "не установлен (страница DEUTZ Power Center без указания статуса)",
+      "sources": [
+        "https://www.deutzsupport.com/product-details/tcg-2015-series/",
+        "https://www.directindustry.com/prod/deutz/product-5761-1621765.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TBG 616 (V8/V12/V16, K-исполнения)",
+      "kind": "газопоршневой двигатель Deutz (ныне линия MWM / Caterpillar Energy Solutions)",
+      "segment": "ГПУ",
+      "rating": "не найдено",
+      "status": "вероятно снят — вывод разведки (в перечне двигателей MWM отсутствует); прямого заявления о снятии в источниках нет",
+      "sources": [
+        "https://spark-plugs.ru/product/sparkplugs/mwm/",
+        "https://www.mwm.net/en/mwm-history/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TBG 620 (V8/V12/V16, K-исполнения)",
+      "kind": "газопоршневой двигатель Deutz (ныне линия MWM / Caterpillar Energy Solutions)",
+      "segment": "ГПУ",
+      "rating": "не найдено",
+      "status": "вероятно снят — вывод разведки (в перечне двигателей MWM отсутствует); прямого заявления о снятии в источниках нет",
+      "sources": [
+        "https://spark-plugs.ru/product/sparkplugs/mwm/",
+        "https://www.mwm.net/en/mwm-history/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2016 V8 / V12 / V16",
+      "kind": "газопоршневой двигатель Deutz Power Systems, затем MWM",
+      "segment": "ГПУ",
+      "rating": "не найдено; сменивший его TCG 3016 — 400–1 000 кВт эл.",
+      "status": "вероятно снят — вывод разведки (MWM выпускает TCG 3016, а TCG 2016 в перечне нет); прямого заявления о снятии в источниках нет",
+      "sources": [
+        "https://spark-plugs.ru/product/filters/mwm/",
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3016/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2020 V12 / V16 / V20",
+      "kind": "газопоршневой двигатель Deutz Power Systems, ныне MWM (Caterpillar Energy Solutions)",
+      "segment": "ГПУ",
+      "rating": "MWM TCG 2020 V12/V16 — 1 000–1 560 кВт эл.; Deutz TCG 2020 V20 выпуска 2003 г. — 1 850 кВт (объявление о продаже бывшего в эксплуатации)",
+      "status": "выпускается под маркой MWM (V12/V16); V20 в текущем ряду MWM — TCG 3020 V20",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/",
+        "https://rsmotorps.com/en/deutz-tcg-2020-v20-engine-for-sale/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TCG 2032 V12 / V16",
+      "kind": "газопоршневой двигатель Deutz Power Systems, ныне MWM (Caterpillar Energy Solutions)",
+      "segment": "ГПУ",
+      "rating": "3 000–4 500 кВт эл.",
+      "status": "выпускается под маркой MWM",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2032/",
+        "https://spark-plugs.ru/product/sensors/mwm/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Operation Manual TCD 2012 L04/06 V2, TCD 2013 L04/06 V2",
+      "doc_no": "0312 1890 en",
+      "machine": "TCD 2012 L04/06 2V, TCD 2013 L04/06 2V",
+      "kind": "O&M (руководство по эксплуатации, с номерами заказа масел DEUTZ, средства для системы охлаждения и специнструмента)",
+      "sources": [
+        "https://www.turboline.ru/deutz/tcd2012-2013.pdf"
+      ]
+    },
+    {
+      "title": "DEUTZ Engine TCD 2013 L04/06 4V Instruction Manual",
+      "doc_no": "0312 2443 en",
+      "machine": "TCD 2013 L04/L06 4V",
+      "kind": "O&M",
+      "sources": [
+        "https://procarmanuals.com/deutz-engine-tcd-2013-l04-06-4v-instruction-manual-0312-2443-en/"
+      ]
+    },
+    {
+      "title": "Service Repair Manual (competence level 2), Deutz Industry Engine",
+      "doc_no": "0312 3920 en",
+      "machine": "заголовок страницы — TCD 7.8 L6, текст — TCD 4.1 L4 (EU Stage IV / US EPA Tier 4); расхождение у продавца",
+      "kind": "service manual (платный)",
+      "sources": [
+        "https://www.servicemanualbit.com/downloads/deutz-tcd-7-8-l6-industry-engine-service-repair-manual/"
+      ]
+    },
+    {
+      "title": "DEUTZ TCD 2013 L04 2V / L06 2V / L06 4V Parts Manual; TCD 2013 L04 2V / L06 2V Service Manual",
+      "machine": "TCD 2013 L04 2V, L06 2V, L06 4V",
+      "kind": "parts manual и service manual (платные, бумажные и PDF, у дилера)",
+      "sources": [
+        "https://www.dieselpartsdirect.com/deutz-2013-service-manuals"
+      ]
+    },
+    {
+      "title": "Technical Circular: Fuels (Diesel engines)",
+      "doc_no": "TR 0199-99-01218/6 EN (07.11.2022)",
+      "machine": "все дизельные двигатели DEUTZ (компактные)",
+      "kind": "бюллетень",
+      "sources": [
+        "https://www.deutz.com/fileadmin/user_upload/produkte/kraftstoffe_der_zukunft/tr_0199_99_01218_6_en.pdf"
+      ]
+    },
+    {
+      "title": "Technical Circular: Lubricants (diesel engines)",
+      "doc_no": "TR 0199-99-01217/4 EN (12.03.2021)",
+      "machine": "дизельные двигатели DEUTZ",
+      "kind": "бюллетень (с номерами заказа масел DEUTZ)",
+      "sources": [
+        "https://www.deutz.com/fileadmin/contents/global/parts_service/service/betriebsstoffe/dqc_-_en/schmierstoffe/technische_rundschreiben/tr_0199_99_01217_4_en_lubricants.pdf"
+      ]
+    },
+    {
+      "title": "Technical Circular: Coolant",
+      "doc_no": "TR 0199-99-01228/5 EN (11.06.2024)",
+      "machine": "двигатели DEUTZ жидкостного охлаждения",
+      "kind": "бюллетень (с номерами заказа Coolant Core Protect)",
+      "sources": [
+        "https://www.deutz.com/fileadmin/contents/global/parts_service/service/betriebsstoffe/dqc_-_en/kuehlfluessigkeit/technische_rundschreiben/TR_0199_99_01228_5_EN.pdf"
+      ]
+    },
+    {
+      "title": "Lubricating oil change intervals for built-in and marine engines, DEUTZ Compact Engines",
+      "doc_no": "Issue 11/2020",
+      "machine": "1008, 1011, 2011, 1013, 2012, 2013 и др. (снятые ряды)",
+      "kind": "таблица интервалов ТО",
+      "sources": [
+        "https://www.deutz.com/fileadmin/contents/global/parts_service/service/betriebsstoffe/dqc_-_en/schmierstoffe/schmieroelwechselintervalle/tables_lubricating_oil_change_intervals_old_engines_11_2020.pdf"
+      ]
+    },
+    {
+      "title": "Company standard H 0685-3: DEUTZ Lubricating Oil Quality Classes DQC",
+      "doc_no": "H 0685-3, May 2018",
+      "machine": "быстроходные дизели DEUTZ",
+      "kind": "спецификация (классы масел)",
+      "sources": [
+        "https://www.deutz.com/fileadmin/contents/global/parts_service/service/betriebsstoffe/dqc_-_en/schmierstoffe/h_0685-3_05_2018_en.pdf"
+      ]
+    },
+    {
+      "title": "DEUTZ Product Datasheets TD/TCD 3.6, TCD 4.1, TCD 6.1, TCD 7.8 (2026), TCD 12.0 V6 (2023)",
+      "machine": "TD/TCD 3.6 L4, TCD 4.1 L4, TCD 6.1 L6, TCD 7.8 L6, TCD 12.0 V6",
+      "kind": "спецификация",
+      "sources": [
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TD_TCD_3.6__1_.pdf",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TCD_4.1.pdf",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TCD_6.1.pdf",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/ind/2026/DEUTZ_EN_ProductDatasheet_TCD_7.8.pdf",
+        "https://www.deutz.com/fileadmin/contents/global/produkte/datasheets/en/mobile_machinery/2023_en_product_datasheet_tcd_12.0_v6.pdf"
+      ]
+    },
+    {
+      "title": "Deutz Engine TD 3.6 L4 Parts Manual (Telescopic Handlers Gehl RS6-34, Manitou MT6034 T)",
+      "doc_no": "Form No. 50960088, Revision A, September 2014",
+      "machine": "TD 3.6 L4",
+      "kind": "parts manual машиностроителя (номера Manitou, не Deutz)",
+      "sources": [
+        "https://www.commatech.ro/images/upload/File/Deutz/TD-3.6-L4.pdf"
+      ]
+    },
+    {
+      "title": "MWM TCG 2020 product brochure",
+      "doc_no": "CES23007",
+      "machine": "TCG 2020 V12/V16 (MWM)",
+      "kind": "спецификация",
+      "sources": [
+        "https://www.mwm.net/files/upload/mwm/issuu/CES23007-Update-Produktbroschuere-TCG-2020_210x297mm_EN_2_0_RZ_sm_screen.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "1174416",
+      "issuer": "DEUTZ AG",
+      "description": "Масляный фильтр навинчиваемый (spin-on); оригинал Deutz",
+      "machine": "TCD 3.6, TCD 2.9, TCD 2.2 L3; также 511/1011/2011",
+      "unit": "система смазки",
+      "doc_ref": "Diesel Parts Direct, карточка товара. Продавец пишет номер без ведущего нуля; у Deutz номер 0117 4416",
+      "source_url": "https://www.dieselpartsdirect.com/1174416",
+      "quote": "Deutz 1174416 Oil Filter Compatible With 511, 1011, 2011, TCD 2.9, TCD 3.6, and TCD 2.2 L3 Engines (Spin-On)"
+    },
+    {
+      "code": "4120751",
+      "issuer": "DEUTZ AG",
+      "description": "Топливный фильтр навинчиваемый (spin-on)",
+      "machine": "TCD 3.6 L4",
+      "unit": "топливная система",
+      "doc_ref": "Diesel Parts Direct, карточка товара (раздел Lubrication System у продавца); номер без ведущего нуля",
+      "source_url": "https://www.dieselpartsdirect.com/4120751",
+      "quote": "Deutz 4120751 Fuel Filter For Diesel Engines (Spin On) TCD 3.6 L4"
+    },
+    {
+      "code": "2934912",
+      "issuer": "DEUTZ AG",
+      "description": "Масляный фильтр",
+      "machine": "TCD 3.6; TCD 6.1 L6",
+      "unit": "система смазки",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Lubrication System. На одном двигателе с 1174416 — сверять по номеру двигателя",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-lubrication-system",
+      "quote": "2934912 OIL FILTER - TCD 3.6 / TCD6.1L6"
+    },
+    {
+      "code": "4123831",
+      "issuer": "DEUTZ AG",
+      "description": "Топливная форсунка (Common Rail)",
+      "machine": "TCD 3.6",
+      "unit": "топливная аппаратура",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Fuel System",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-fuel-system",
+      "quote": "4123831 FUEL INJECTOR - TCD 3.6"
+    },
+    {
+      "code": "4126512",
+      "issuer": "DEUTZ AG",
+      "description": "Свеча накаливания",
+      "machine": "TCD 3.6 L4",
+      "unit": "система пуска",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Electrical Accessories",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-electrical-accessories",
+      "quote": "4126512 GLOW PLUG - TCD 3.6 L4"
+    },
+    {
+      "code": "4168001",
+      "issuer": "DEUTZ AG",
+      "description": "Термостат",
+      "machine": "TCD 3.6; 2.9 L4; TCD 2.2 L3",
+      "unit": "система охлаждения",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Cooling System",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-cooling-system",
+      "quote": "4168001 THERMOSTAT - 2.9 L4 / TCD 3.6 / TCD 2.2 L3"
+    },
+    {
+      "code": "4129090",
+      "issuer": "DEUTZ AG",
+      "description": "Водяной насос",
+      "machine": "TCD 3.6 L4",
+      "unit": "система охлаждения",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Cooling System",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-cooling-system",
+      "quote": "4129090 WATER PUMP - TCD 3.6 L4"
+    },
+    {
+      "code": "2937754",
+      "issuer": "DEUTZ AG",
+      "description": "Комплект прокладок для капитального ремонта",
+      "machine": "TCD 3.6 L4",
+      "unit": "двигатель — ремкомплект",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Overhaul Gasket Sets",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-overhaul-gasket-sets",
+      "quote": "2937754 OVERHAUL GASKET SET - TCD 3.6 L4"
+    },
+    {
+      "code": "4126014",
+      "issuer": "DEUTZ AG",
+      "description": "Комплект поршневых колец",
+      "machine": "TCD 3.6 L4",
+      "unit": "цилиндро-поршневая группа",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Pistons & Rods",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-pistons-and-rods",
+      "quote": "4126014 PISTON RING SET - TCD 3.6 L4"
+    },
+    {
+      "code": "4466632",
+      "issuer": "DEUTZ AG",
+      "description": "Датчик давления",
+      "machine": "TCD 3.6, TCD 4.1, TCD 6.1, TCD 7.8",
+      "unit": "электрооборудование — датчики",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Electrical Accessories",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-electrical-accessories",
+      "quote": "4466632 PRESSURE SENSOR - TCD 3.6 / TCD 4.1 / TCD 6.1 / TCD 7.8"
+    },
+    {
+      "code": "4217188",
+      "issuer": "DEUTZ AG",
+      "description": "Датчик давления воздуха (наддува)",
+      "machine": "TCD 2.9, TCD 3.6, 2015, 2013, 2012, 1015, 1013",
+      "unit": "впуск — датчики",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Electrical Accessories",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-electrical-accessories",
+      "quote": "4217188 AIR PRESSURE SENSOR - TCD 2.9 / TCD 3.6 / 2015 / 2013 / 2012 / 1015 / 1013"
+    },
+    {
+      "code": "4210195",
+      "issuer": "DEUTZ AG",
+      "description": "Датчик давления масла",
+      "machine": "TCD 2.9, TCD 3.6, 2013, 2012, TCD 2.2 L3",
+      "unit": "система смазки — датчики",
+      "doc_ref": "Diesel Parts Direct, раздел TCD 3.6 Electrical Accessories",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-tcd-36-electrical-accessories",
+      "quote": "4210195 OIL PRESSURE SENSOR - TCD 2.9 / TCD 3.6 / 2013 / 2012 / TCD 2.2 L3"
+    },
+    {
+      "code": "1183574",
+      "issuer": "DEUTZ AG",
+      "description": "Масляный фильтр навинчиваемый (spin-on)",
+      "machine": "TCD 4.1, TCD 6.1, TCD 7.8; 1013, 2012",
+      "unit": "система смазки",
+      "doc_ref": "Diesel Parts Direct, подборка Deutz Filters",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-filters",
+      "quote": "1183574 OIL FILTER - 4.1 / 6.1 / 7.8 / 1013 / 2012 (SPIN-ON)"
+    },
+    {
+      "code": "1182672",
+      "issuer": "DEUTZ AG",
+      "description": "Топливный фильтр",
+      "machine": "TCD 4.1, TCD 6.1; 2012, 2013",
+      "unit": "топливная система",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Fuel Filters",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-fuel-filters",
+      "quote": "1182672 FUEL FILTER - 2012 / 2013 / TCD 4.1 / TCD 6.1"
+    },
+    {
+      "code": "1182671",
+      "issuer": "DEUTZ AG",
+      "description": "Топливный фильтр навинчиваемый (spin-on)",
+      "machine": "TCD 4.1; 2012, 2013",
+      "unit": "топливная система",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Fuel Filters",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-fuel-filters",
+      "quote": "1182671 FUEL FILTER - 2012 / 2013 / TCD 4.1 (SPIN-ON)"
+    },
+    {
+      "code": "2931522",
+      "issuer": "DEUTZ AG",
+      "description": "Элемент масляного фильтра (сменная вставка)",
+      "machine": "TCD 2013 L4 4V; TCD 7.8 L6",
+      "unit": "система смазки",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Oil Filters",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-oil-filters",
+      "quote": "2931522 OIL FILTER ELEMENT - TCD2013 L4 4V DEUTZ / TCD7.8 L6"
+    },
+    {
+      "code": "2931095",
+      "issuer": "DEUTZ AG",
+      "description": "Элемент масляного фильтра (сменная вставка)",
+      "machine": "6.1; 1012, 2012, 2013",
+      "unit": "система смазки",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Oil Filters",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-oil-filters",
+      "quote": "2931095 OIL FILTER ELEMENT - 6.1 / 1012 / 2012 / 2013"
+    },
+    {
+      "code": "1181245",
+      "issuer": "DEUTZ AG",
+      "description": "Топливный фильтр навинчиваемый (spin-on)",
+      "machine": "1013, 1015, 2012, 2013, 2015",
+      "unit": "топливная система",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Fuel Filters",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-fuel-filters",
+      "quote": "1181245 FUEL FILTER - 1013 / 1015 / 2012 / 2013 / 2015 (SPIN-ON)"
+    },
+    {
+      "code": "4504438",
+      "issuer": "DEUTZ AG",
+      "description": "Топливный фильтрующий патрон",
+      "machine": "TCD 2012, TCD 2013",
+      "unit": "топливная система",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Fuel Filters",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-fuel-filters",
+      "quote": "4504438 FUEL FILTER CARTRIDGE - 2012 / 2013"
+    },
+    {
+      "code": "4506917",
+      "issuer": "DEUTZ AG",
+      "description": "Топливный фильтр предварительной очистки",
+      "machine": "TCD 2013 L4 2V, TCD 2013 L6 2V",
+      "unit": "топливная система",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Fuel Filters",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-fuel-filters",
+      "quote": "4506917 FUEL PREFILTER - TCD2013 L4 2V / TCD2013 L6 2V"
+    },
+    {
+      "code": "04290986",
+      "issuer": "DEUTZ AG",
+      "description": "Топливная форсунка (Common Rail; по кроссам продавцов — Bosch 0445120066)",
+      "machine": "TCD 2013",
+      "unit": "топливная аппаратура",
+      "doc_ref": "Diesel Parts Direct, подборка Deutz Fuel Injectors",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-fuel-injectors",
+      "quote": "04290986 FUEL INJECTOR - 2013"
+    },
+    {
+      "code": "01183247",
+      "issuer": "DEUTZ AG",
+      "description": "Свеча накаливания",
+      "machine": "TCD 2012, TCD 2013",
+      "unit": "система пуска",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Electrical Accessories",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-electrical-accessories",
+      "quote": "01183247 GLOW PLUG - 2012 / 2013"
+    },
+    {
+      "code": "02937626",
+      "issuer": "DEUTZ AG",
+      "description": "Базовый комплект прокладок двигателя",
+      "machine": "BF4M1013; 2013",
+      "unit": "двигатель — ремкомплект",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Overhaul Gasket Sets",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-overhaul-gasket-sets",
+      "quote": "02937626 BASIC ENGINE GASKET SET - BF4M1013 / 2013"
+    },
+    {
+      "code": "2937629",
+      "issuer": "DEUTZ AG",
+      "description": "Базовый комплект прокладок двигателя",
+      "machine": "TCD 2013 L06 2V",
+      "unit": "двигатель — ремкомплект",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Overhaul Gasket Sets",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-overhaul-gasket-sets",
+      "quote": "2937629 BASIC ENGINE GASKET SET - TCD2013L062V"
+    },
+    {
+      "code": "04294195",
+      "issuer": "DEUTZ AG",
+      "description": "Прокладка головки блока цилиндров",
+      "machine": "TCD 2013",
+      "unit": "головка блока",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Cylinder Head Components. Там же 04294196 — исполнение выбирать по номеру двигателя",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-cylinder-head-components",
+      "quote": "04294195 CYLINDER HEAD GASKET - 2013"
+    },
+    {
+      "code": "04199330",
+      "issuer": "DEUTZ AG",
+      "description": "Датчик (передатчик) температуры",
+      "machine": "616, 1013, 2012, 2013, 2016 (по данным продавца; что 616 и 2016 — газовые ряды, продавец не пишет — это толкование разведки)",
+      "unit": "электрооборудование — датчики",
+      "doc_ref": "Diesel Parts Direct, раздел 2013 Electrical Accessories",
+      "source_url": "https://www.dieselpartsdirect.com/deutz-2013-electrical-accessories",
+      "quote": "04199330 TEMPERATURE TRANSMITTER - 616 / 1013 / 2012 / 2013 / 2016"
+    },
+    {
+      "code": "0101 6335",
+      "issuer": "DEUTZ AG",
+      "description": "Моторное масло DEUTZ OIL TLX 10W40 FE (DQC III-18), канистра 5 л. Там же 0101 6336 — 20 л, 0101 6337 — 209 л",
+      "machine": "дизельные двигатели DEUTZ без системы нейтрализации выхлопа (EAT) — по документу DEUTZ; класс DQC III",
+      "unit": "эксплуатационные жидкости — масло",
+      "doc_ref": "DEUTZ, Technical product information DEUTZ OIL TLX 10W40 FE, раздел Order information",
+      "source_url": "https://www.deutz.com/fileadmin/contents/global/parts_service/service/betriebsstoffe/product_information/DEUTZ_OEl_DQC_TLX_10W40_FE_technical_product_information_EN_Final.pdf",
+      "quote": "Order information: DEUTZ part number Container 0101 6335 5 litres"
+    },
+    {
+      "code": "01016694",
+      "issuer": "DEUTZ AG",
+      "description": "Средство для системы охлаждения DEUTZ Coolant Core Protect (концентрат), 5 л. Там же 01016695 — 20 л, 01016696 — 209 л",
+      "machine": "двигатели DEUTZ жидкостного охлаждения",
+      "unit": "эксплуатационные жидкости — охлаждающая жидкость",
+      "doc_ref": "DEUTZ TR 0199-99-01228/5 EN (11.06.2024), таблица T1",
+      "source_url": "https://www.deutz.com/fileadmin/contents/global/parts_service/service/betriebsstoffe/dqc_-_en/kuehlfluessigkeit/technische_rundschreiben/TR_0199_99_01228_5_EN.pdf",
+      "quote": "5 litres 01016694 DEUTZ Coolant Core Protect"
+    },
+    {
+      "code": "0101 6546",
+      "issuer": "DEUTZ AG",
+      "description": "Раствор мочевины для SCR DEUTZ PowerBlue (аналог AdBlue / AUS 32), 10 л. Там же 0101 6547 — 209 л, 0101 6548 — 1000 л",
+      "machine": "двигатели DEUTZ с SCR; перечень моделей в документе не дан (TCD 3.6, 4.1, 6.1, 7.8 в исполнении Stage V / Tier 4 — вывод разведки)",
+      "unit": "нейтрализация выхлопа — SCR",
+      "doc_ref": "DEUTZ, Technical product information DEUTZ PowerBlue, раздел Order information",
+      "source_url": "https://www.deutz.com/fileadmin/contents/global/parts_service/service/betriebsstoffe/product_information/DEUTZ_PowerBlue_Technical_product_information_en_Final.pdf",
+      "quote": "Order information: DEUTZ part number Container 0101 6546 10 litres"
+    },
+    {
+      "code": "0445120066",
+      "issuer": "Robert Bosch (номер изготовителя форсунки)",
+      "description": "Форсунка Common Rail Bosch — соответствие номеру Deutz 04290986 (также 04299311)",
+      "machine": "TCD 2013 L04, TCD 2013 L06",
+      "unit": "топливная аппаратура",
+      "doc_ref": "FridayParts, карточка комплекта из 6 форсунок (продавец неоригинальных запчастей). Кросс и применимость — по данным продавца",
+      "source_url": "https://www.fridayparts.com/fuel-injector-04290986-for-deutz-engine-tcd2013l042v-tcd2013l062v",
+      "quote": "6 Pieces Fuel Injector 0445120066 04290986 04299311 for Deutz Engine TCD2013L04 TCD2013L06"
+    },
+    {
+      "code": "12709880018",
+      "issuer": "BorgWarner (KKK), номер изготовителя турбокомпрессора",
+      "description": "Турбокомпрессор KKK BorgWarner — соответствие номеру Deutz 04294676 (у продавца и ряд других номеров Deutz 042946xx/042947xx)",
+      "machine": "TCD 2013",
+      "unit": "турбонаддув",
+      "doc_ref": "Turbomoteur (Франция), карточка агрегата по обмену. Кросс — по данным продавца",
+      "source_url": "https://www.turbomoteur.fr/catalogue/85/22931/17379/TK12709880018-DEUTZ-TCD2013.htm",
+      "quote": "Achat turbo KKK BorgWarner petit prix pour DEUTZ TCD2013 Ref. OEM : 04294676 - Réf. Fab : 12709880018"
+    },
+    {
+      "code": "0445110558",
+      "issuer": "Robert Bosch (номер изготовителя форсунки)",
+      "description": "Форсунка Common Rail Bosch — соответствие номеру Deutz 04123831",
+      "machine": "TCD 3.6 L4",
+      "unit": "топливная аппаратура",
+      "doc_ref": "SINOCMP, карточка неоригинальной новой форсунки (Aftermarket new). Кросс и применимость — по данным продавца, доверие среднее",
+      "source_url": "https://sinocmp.com/products/common-rail-fuel-injector-04123831-0445110558-for-bosch-deutz-tcd-3-6-l4-diesel-engine",
+      "quote": "Common Rail Fuel Injector 04123831 0445110558 for Bosch Deutz TCD 3.6 L4 Diesel Engine"
+    },
+    {
+      "code": "12128936",
+      "issuer": "MWM (Caterpillar Energy Solutions; линия бывшей Deutz Power Systems)",
+      "description": "Масляный фильтр газового двигателя",
+      "machine": "TCG 2016, TCG 2020, TCG 2020 K",
+      "unit": "система смазки",
+      "doc_ref": "spark-plugs.ru, карточка товара (российский продавец запчастей MWM). В адресе страницы указан аналог MANN W 13 145/1; в тексте — только номер MWM",
+      "source_url": "https://spark-plugs.ru/product/filters/oilfilters/mannfilter-w131451.phtml",
+      "quote": "Масляный фильтр Артикул: 12128936 Производитель: MWM Узнать цену: Применимость: газовые двигатели MWM TCG2016, TCG2020, TCG2020K Заменяет: MWM 12128936, 1212 8936"
+    },
+    {
+      "code": "12154939",
+      "issuer": "MWM",
+      "description": "Воздушный фильтр, заменяет прежний номер MWM 01319368",
+      "machine": "TCG 2016",
+      "unit": "впуск воздуха",
+      "doc_ref": "spark-plugs.ru, раздел Фильтры MWM",
+      "source_url": "https://spark-plugs.ru/product/filters/mwm/",
+      "quote": "Фильтр воздушный MWM 12154939 Применимость: газовые двигатели MWM TCG2016 Заменяет: MWM 01319368, 0131 9368"
+    },
+    {
+      "code": "12466706",
+      "issuer": "MWM",
+      "description": "Фильтр системы вентиляции картера (там же парный 12466707)",
+      "machine": "TCG 2016; TCG 2020 V12; Cat CG132, CG170-12",
+      "unit": "вентиляция картера",
+      "doc_ref": "spark-plugs.ru, раздел Фильтры MWM. У продавца есть и аналог UPF с тем же номером — брать оригинал MWM",
+      "source_url": "https://spark-plugs.ru/product/filters/mwm/",
+      "quote": "Фильтр вентиляции картера Применимость: газовые двигатели MWM TCG2016 , TCG 2020V12, CG132 все, CG170-12 Заменяет: MWM 12466706,1246 6706"
+    },
+    {
+      "code": "12420480",
+      "issuer": "MWM",
+      "description": "Свеча зажигания; прежний номер 12420290",
+      "machine": "DEUTZ MWM G620 V8, TBG 616 V8/V12, TBG 616 K, TBG 620 V8/V12/V16, TBG 620 K, TCG 2016 V12/V16, TCG 2020 V12/V16/V20",
+      "unit": "система зажигания",
+      "doc_ref": "spark-plugs.ru, блок «Популярные товары». В перечне аналогов того же сайта позиция «АНАЛОГ 12420480» отнесена только к TCG2020 — применимость сверять",
+      "source_url": "https://spark-plugs.ru/product/sparkplugs/mwm/",
+      "quote": "Свеча зажигания Применимость: DEUTZ MWM G620 V8, TBG616 V8, TBG616 V12, TBG616K V8K, TBG616K V12, TBG616K V16K, TBG620 V8, TBG620 V12, TBG620 V16, TBG620K V12K, TBG620K V16K, TCG2016V12, TCG2016V16, TCG2020V12, TCG2020V16, TCG2020V20. Заменяет: MWM 12420480 (12420290), 1242 0480 (1242 0290)"
+    },
+    {
+      "code": "12453564",
+      "issuer": "MWM (номер; у продавца товар — аналог)",
+      "description": "Свеча зажигания; заменяет прежние номера MWM 12343048, 12342376, 12343758, 12344098. Тип на заявленной странице не указан; форкамерное исполнение — по другим источникам (onergys.com, apserviceandparts.it, energyassistance.ru)",
+      "machine": "TCG 2016 V8/V12/V16 (A, B, C); TCG 3016",
+      "unit": "система зажигания",
+      "doc_ref": "spark-plugs.ru, раздел «Свечи зажигания АНАЛОГИ MWM». Продавец предлагает аналог; номер MWM — ссылка на оригинал",
+      "source_url": "https://spark-plugs.ru/product/sparkplugs/mwm/",
+      "quote": "Свеча зажигания АНАЛОГ 12453564 Применимость: газовые двигатели MWM TCG2016V8, TCG2016V12, TCG2016V16 A-B-C, TCG 3016 Заменяет: MWM 12343048, 12342376, 12343758, 12344098"
+    },
+    {
+      "code": "04269108",
+      "issuer": "MWM",
+      "description": "Датчик детонации (в камерах сгорания)",
+      "machine": "TCG 2016",
+      "unit": "система управления — датчики",
+      "doc_ref": "spark-plugs.ru, раздел Датчики MWM",
+      "source_url": "https://spark-plugs.ru/product/sensors/mwm/",
+      "quote": "Датчик детонации (в камерах сгорания) MWM 04269108 Применимость: газовые двигатели MWM TCG2016"
+    },
+    {
+      "code": "12322055",
+      "issuer": "MWM",
+      "description": "Датчик частоты вращения коленчатого вала",
+      "machine": "TCG 2016",
+      "unit": "система управления — датчики",
+      "doc_ref": "spark-plugs.ru, раздел Датчики MWM",
+      "source_url": "https://spark-plugs.ru/product/sensors/mwm/",
+      "quote": "Датчик числа оборотов (коленвала) MWM 12322055 Применимость: газовые двигатели MWM TCG2016"
+    },
+    {
+      "code": "12153965",
+      "issuer": "MWM",
+      "description": "Катушка зажигания MWM. Продавец даёт соответствие Altronic 501061 и аналог MOTORTECH 06.50.055",
+      "machine": "TCG 2016, TCG 2020, TCG 2032",
+      "unit": "система зажигания",
+      "doc_ref": "spark-plugs.ru, раздел «Катушки зажигания MOTORTECH». Номер MWM приведён как заменяемый аналогом",
+      "source_url": "https://spark-plugs.ru/product/ignitioncoils/motortech/",
+      "quote": "Катушка зажигания MOTORTECH 06.50.055 Применимость: газовые двигатели MWM TCG2016, TCG2020, TCG2032 Заменяет: Altronic 501061, MWM 12153965, 1215 3965"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Robert Bosch GmbH",
+      "component": "форсунки Common Rail",
+      "machine": "TCD 2013 L04/L06 (Deutz 04290986 = Bosch 0445120066); TCD 3.6 L4 (Deutz 04123831 = Bosch 0445110558)",
+      "evidence": "Кроссы продавцов запчастей: FridayParts и Tamerx (0 445 120 066 указан среди номеров Deutz 04290986), SINOCMP (04123831 ↔ 0445110558). Подтверждения на сайте Deutz нет",
+      "sources": [
+        "https://www.fridayparts.com/fuel-injector-04290986-for-deutz-engine-tcd2013l042v-tcd2013l062v",
+        "https://www.tamerx.com/deutz-tcd-2013-l6-2v-6-1l-fuel-injector-2013-2018-oem-04290986-11039.html",
+        "https://sinocmp.com/products/common-rail-fuel-injector-04123831-0445110558-for-bosch-deutz-tcd-3-6-l4-diesel-engine"
+      ],
+      "verified": true
+    },
+    {
+      "company": "BorgWarner (KKK)",
+      "component": "турбокомпрессор",
+      "machine": "TCD 2013",
+      "evidence": "Turbomoteur продаёт турбокомпрессор «KKK BorgWarner» с номером изготовителя 12709880018 под номера Deutz 04294676 и ряд 042946xx/042947xx. Кросс продавца",
+      "sources": [
+        "https://www.turbomoteur.fr/catalogue/85/22931/17379/TK12709880018-DEUTZ-TCD2013.htm"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Altronic",
+      "component": "катушка зажигания",
+      "machine": "MWM (бывш. Deutz) TCG 2016, TCG 2020, TCG 2032",
+      "evidence": "spark-plugs.ru даёт для аналога MOTORTECH 06.50.055 соответствие «Altronic 501061, MWM 12153965». Это вывод по кроссу продавца, не заявление MWM",
+      "sources": [
+        "https://spark-plugs.ru/product/ignitioncoils/motortech/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MAN Energy Solutions (ныне Everllence) — предположительно",
+      "component": "турбокомпрессор TCR 16",
+      "machine": "MWM TCG 2020",
+      "evidence": "На странице MWM названа модель «New turbocharger TCR 16 for TCG 2020», изготовитель не указан. TCR — обозначение серии турбокомпрессоров MAN Energy Solutions; это вывод, не подтверждён. Скептик: не подтверждён — MWM изготовителя турбокомпрессора TCR 16 не называет",
+      "sources": [
+        "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/"
+      ],
+      "verified": false
+    }
+  ],
+  "dealers": [
+    {
+      "company": "ООО «ДОЙТЦ Восток»",
+      "country": "Россия (Москва; склад запчастей — Подольск)",
+      "role": "официальный представитель DEUTZ AG в РФ и странах СНГ, по странице раздела Central Asia на deutz.com: собственный сервисный центр (с 2018 г.), ремонт, выездной сервис, оригинальные запчасти, двигатели Xchange. Оговорка: в марте 2022 г. DEUTZ приостановила продажу новых двигателей в Россию и Белоруссию",
+      "sources": [
+        "https://www.deutz.com/central-asia/ru/deutz-centralnaja-azija/servisnyi-centr-deutz/",
+        "https://www.deutz.com/central-asia/ru/deutz-centralnaja-azija/servisnyi-centr-deutz/prodazha-zapchastei-i-xchange-dvigatelei/",
+        "https://www.marklines.com/en/news/266595"
+      ]
+    },
+    {
+      "company": "ИСТК (Инстройтехком)",
+      "country": "Россия",
+      "role": "по собственному заявлению — «Официальный дилер Deutz»: двигатели, запчасти, сервис, выездной сервис по европейской части России. Независимого подтверждения нет",
+      "sources": [
+        "https://istk-deutz.ru/"
+      ]
+    },
+    {
+      "company": "СМС Унистар Текнолоджи (SMS Unistar Technology)",
+      "country": "Казахстан",
+      "role": "по собственному заявлению — «Официальный дистрибьютор DEUTZ AG» (а также Yanmar, Kohler, Lombardini): двигатели, запчасти, оригинальное масло, гарантийный ремонт",
+      "sources": [
+        "https://sms-ut.kz/"
+      ]
+    },
+    {
+      "company": "Евротехсервис К (Eurotechservice)",
+      "country": "Казахстан",
+      "role": "по собственному заявлению — «официальный представитель DEUTZ AG в Республике Казахстан»: двигатели, оригинальные запчасти, пусконаладка, гарантийный и постгарантийный ремонт",
+      "sources": [
+        "https://ets-k.kz/deutz-ag/"
+      ]
+    },
+    {
+      "company": "OTR Group",
+      "country": "Казахстан",
+      "role": "по собственному заявлению — «официальный дилер запасных частей DEUTZ в Казахстане»",
+      "sources": [
+        "https://www.otr-tyres.kz/ru/news/912-otr-group-ofitsialnyy-diler-zapasnyh-chastey-deutz-v-kazahstane.html"
+      ]
+    },
+    {
+      "company": "WEST MOTOR",
+      "country": "Узбекистан (Ташкент)",
+      "role": "поставка запчастей и сервис двигателей DEUTZ AG (по собственному описанию). Официальный статус прямо не заявлен",
+      "sources": [
+        "https://westmotor.uz/"
+      ]
+    },
+    {
+      "company": "MWM Eastern Europe & Central Asia",
+      "country": "Восточная Европа и Центральная Азия (сайт на русском, казахском и узбекском)",
+      "role": "региональное представительство MWM (Caterpillar Energy Solutions): газовые TCG 2020/3016/3020/2032, запчасти и сервис для газовых двигателей бывшей Deutz Power Systems",
+      "sources": [
+        "https://www.mwm.energy/en/technology/tcg-2020-gas-engine/"
+      ]
+    },
+    {
+      "company": "spark-plugs.ru («Промышленные свечи зажигания»)",
+      "country": "Россия",
+      "role": "независимый продавец запчастей газовых двигателей MWM/Deutz: TBG 616/620, TCG 2016/2020/2032 — фильтры, свечи, датчики, катушки, в том числе аналоги; ТО газопоршневых двигателей",
+      "sources": [
+        "https://spark-plugs.ru/product/motor/mwm/"
+      ]
+    },
+    {
+      "company": "DEMOSER",
+      "country": "Турция",
+      "role": "по собственному заявлению — «Deutz AG yetkili servisi» (уполномоченный сервис DEUTZ AG): гарантийное обслуживание, ремонт, оригинальные запчасти",
+      "sources": [
+        "https://demoser.com.tr/"
+      ]
+    },
+    {
+      "company": "Baytem Motorlu Araçlar",
+      "country": "Турция",
+      "role": "по собственному заявлению — «Deutz Yetkili Servis ve Satıcısı» (уполномоченный сервис и продавец DEUTZ): запчасти, сервис",
+      "sources": [
+        "http://www.baytem.com.tr/"
+      ]
+    },
+    {
+      "company": "DEUTZ Engines India Private Limited",
+      "country": "Индия (Пуна)",
+      "role": "дочерняя компания DEUTZ AG: продажа, сервис, оригинальные запчасти через сеть уполномоченных дилеров",
+      "sources": [
+        "https://www.deutz.com/asia-pacific/en/regions/deutz-india/"
+      ]
+    },
+    {
+      "company": "South Calcutta Diesels Pvt. Ltd.",
+      "country": "Индия",
+      "role": "по собственному заявлению — назначен дистрибьютором DEUTZ на всю Индию в 2007 г.: послепродажная поддержка, гарантия, запчасти, двигатели на замену",
+      "sources": [
+        "https://southcalcuttadiesels.com/deutz-ag-germany/"
+      ]
+    },
+    {
+      "company": "DEUTZ Asia-Pacific",
+      "country": "Сингапур",
+      "role": "региональная структура DEUTZ AG для Азиатско-Тихоокеанского региона (продукция, сервис, запчасти)",
+      "sources": [
+        "https://www.deutz.com/asia-pacific/en/contact-us/"
+      ]
+    },
+    {
+      "company": "Beijing Antaios Technology Co., Ltd.",
+      "country": "Китай (Пекин)",
+      "role": "независимый продавец двигателей «for DEUTZ» (воздушного и жидкостного охлаждения) и запчастей; заявления об официальном статусе не найдено",
+      "sources": [
+        "https://www.antaiospower.com/"
+      ]
+    },
+    {
+      "company": "Совместное предприятие DEUTZ и SANY (Хунань)",
+      "country": "Китай",
+      "role": "СП по производству двигателей для SANY (двигатель D12 для грузовика Kingway 435); производство, не сбыт запчастей",
+      "sources": [
+        "https://www.deutz.com/en/investor-relations/investor-news/deutz-and-sany-together-on-course-for-success/"
+      ]
+    },
+    {
+      "company": "Diesel Parts Direct",
+      "country": "США",
+      "role": "по собственному заявлению — «Authorized Deutz Service Dealer»: оригинальные запчасти Deutz, руководства; основной источник кодов этой разведки",
+      "sources": [
+        "https://www.dieselpartsdirect.com/deutz-filters"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальный магазин запчастей DEUTZ (serviceportal.deutz.com/parts-shop) и комплекты ТО (Genuine DEUTZ Maintenance Kits) открываются только после входа. Номера фирменных комплектов ТО на TCD 3.6/4.1/6.1/2013 там и лежат; открыто их не нашли. Комплекты MK-… у Diesel Parts Direct — номера продавца, а не Deutz.",
+    "Локатор дилеров DEUTZ (deutz.com, раздел Find a DEUTZ Partner) — карта Google Maps за согласием на cookies, перечня текстом нет. Официального дистрибьютора в ОАЭ и в Китае подтвердить не удалось. В ОАЭ нашли только справочники и независимых продавцов.",
+    "Каталоги деталей Deutz (EPC/IPL) на TCD 3.6/4.1/6.1/7.8 и TCD 2013 открыто не лежат. У Diesel Parts Direct они продаются платно (бумага или PDF), на Scribd требуют входа. Инструкция по эксплуатации TCD 4.1/6.1 Tier 4 с omarcrane.it удалена, на manualzz закрыта для автоматического чтения.",
+    "Diesel Parts Direct пишет номера Deutz без ведущего нуля (1174416 вместо 0117 4416). Перед запросом полный 8-значный номер сверить по каталогу или у дилера.",
+    "Для газовых TCG 2016/2020/2032 и TBG 616/620 каталоги деталей и перечни ТО по ступеням E10–E70 лежат в закрытых MWM Online Portal и MWM Webshop. Коды MWM взяты у одного российского продавца. Объявление 2013 г. с перечнем деталей ТО E50 на TCG 2016 V12 (industrialmarinepower.com) — низкое доверие, в коды не включено.",
+    "На TCG 2015 V6/V8 (DEUTZ Corp, природный газ) коды запчастей не найдены; статус выпуска не установлен.",
+    "Изготовители фильтров (MANN+HUMMEL, Hengst и др.) и блока управления EMR для двигателей Deutz открытыми источниками не подтверждены. Bosch и BorgWarner подтверждены только кроссами продавцов.",
+    "Номера фильтров двигателя в каталогах машиностроителей (Epiroc Boomer/Simba, Sandvik LH202/LH203, Normet) даны номерами Epiroc/Sandvik/Normet, не Deutz. Их сопоставление с номерами Deutz не собрано. Каталоги Epiroc на epiroc.com отдают 403, спецификации брались с epiroc.scene7.com.",
+    "Модель двигателя Deutz на Sandvik LH202 на странице изготовителя не названа (только «Tier 2 engine from Deutz» и опция Stage IV с DPF).",
+    "Текущий объём поставок оригинальных запчастей через ООО «ДОЙТЦ Восток» после приостановки в 2022 г. не проверен. Страница deutz.com описывает сервис и склад, но не говорит о поставке новых двигателей."
+  ],
+  "verifier_notes": "Все источники скачаны и проверены по тексту страниц и PDF (curl + pdftotext), поиск кода — дословный.\n\nИтог проверки:\n- Детали: подтверждены все 40 кодов. Каждый есть на заявленной странице в цитируемом виде и относится к указанному изделию.\n- Машины: подтверждены все 18 моделей.\n- Субпоставщики: подтверждены три из четырёх — Bosch, BorgWarner/KKK и Altronic, все на уровне кросса продавцов. Не подтверждён MAN Energy Solutions (TCR 16 на TCG 2020): MWM изготовителя не называет.\n\nЗамечания для правки записей:\n1) Doc_ref у 04294195: на странице Diesel Parts Direct есть 04294196, но нет 04294194.\n2) TCD 6.1 L6: 129 кВт CN4 указаны только в Boomer M-series. В Simba M4 мощность TCD 6.1 L06 не названа.\n3) 0101 6335 (TLX 10W40 FE): по PDF DEUTZ масло для двигателей без нейтрализации выхлопа. Поле machine шире документа.\n4) 0101 6546 (PowerBlue): перечень двигателей TCD 3.6–7.8 с SCR — вывод разведки, в PDF его нет.\n5) 04199330: что 616 и 2016 — газовые ряды, продавец не пишет; это толкование.\n6) 12453564: слово «форкамерная» взято не из заявленного источника. Подтверждено в других местах: onergys.com, apserviceandparts.it, energyassistance.ru.\n7) Статус «снят» у TBG 616, TBG 620 и TCG 2016 — выводы разведки. Прямого заявления в источниках нет.\n8) Для TCG 2015 второй источник, directindustry.com, отдаёт HTTP 403. Модель подтверждена по deutzsupport.com.\n9) Коды 12128936–12153965 — номера MWM (Caterpillar Energy Solutions, бывшая Deutz Power Systems), а не DEUTZ AG. Поле issuer заполнено верно.\n\nРабочие копии страниц лежат в рабочей папке сессии разведки, в репозиторий они не входят.",
+  "corrections": [
+    "summary: снята фраза «Скептик их ещё не перепроверял» — второй проход сделан, итог скептика вписан в сводку (40 кодов и 18 машин подтверждены, MAN не подтверждён)",
+    "04294195: из doc_ref убран номер 04294194 — на странице Diesel Parts Direct его нет, есть только 04294196 (замечание скептика 1)",
+    "TCD 6.1 L6: 129 кВт CN4 отнесены только к Boomer M-series (спецификация добавлена в sources); в Simba M4 мощность TCD 6.1 L06 не названа (замечание скептика 2)",
+    "0101 6335 (TLX 10W40 FE): machine сужено до двигателей без нейтрализации выхлопа, как в PDF DEUTZ (замечание скептика 3)",
+    "0101 6546 (PowerBlue): перечень TCD 3.6–7.8 помечен как вывод разведки — в PDF его нет (замечание скептика 4)",
+    "04199330: «газовые ряды 616/2016» помечено как толкование разведки, а не данные продавца (замечание скептика 5)",
+    "12453564: слово «форкамерная» вынесено из описания в оговорку — на заявленной странице его нет, подтверждено другими источниками (замечание скептика 6)",
+    "TBG 616, TBG 620, TCG 2016: статус «снят» переписан как «вероятно снят — вывод разведки», прямого заявления в источниках нет (замечание скептика 7)",
+    "sub_suppliers: verified проставлен по итогу скептика — Bosch, BorgWarner (KKK) и Altronic true (на уровне кросса продавцов, оговорка в evidence), MAN Energy Solutions false с оговоркой «не подтверждён»",
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет"
+  ]
+}
