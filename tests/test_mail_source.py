@@ -236,14 +236,187 @@ def test_отметка_без_плана_отказ(monkeypatch):
     assert ms.main(["mail_source.py", "отметка"]) == 2
 
 
-def test_границы_частей_смежны_и_покрывают_пачку():
-    индексатор()
-    от, до, частей = 1000, 1737, 12
-    куски = [ms.границы_части(от, до, k, частей) for k in range(частей)]
-    assert куски[0][0] == от and куски[-1][1] == до
-    for (a, b), (c, d) in zip(куски, куски[1:]):
-        assert b == c and a < b
-    assert ms.границы_части(от, до, 0, 1) == (от, до)
+# ─────────────────────────────────────────────── деление пачки на части
+def редкие_в_начале(от: int = 0) -> list[int]:
+    """Придуманная пачка как у лидов 25.09.2026: в начале номера редки, дальше густо.
+
+    Прогон 36079859054 резал такую пачку равными отрезками номеров, и части 1–4
+    из 10 не получили ни одного письма. Номера выдуманы (правило 18).
+    """
+    редкие = [от + 1 + 900 * i for i in range(40)]          # 40 писем на 36 тыс. номеров
+    густые = [от + 40_000 + 3 * i for i in range(1960)]      # 1 960 писем подряд
+    return редкие + густые
+
+
+def в_части(n: int, низ: int, верх: int) -> bool:
+    return низ < n <= верх
+
+
+@pytest.mark.parametrize("частей", [10, 12, 25, 50])
+def test_границы_поровну_по_письмам_а_не_по_номерам(частей):
+    от = 17
+    номера = редкие_в_начале(от)
+    до = номера[-1]
+    б = ms.границы_по_письмам(номера, от, до, частей)
+    assert len(б) == частей + 1
+    # смежно: первая часть — от отметки, последняя — до конца пачки
+    assert б[0] == от and б[-1] == до
+    assert all(a <= c for a, c in zip(б, б[1:]))
+    куски = [ms.границы_части(б, от, до, k, частей) for k in range(частей)]
+    for (_, верх), (низ, _) in zip(куски, куски[1:]):
+        assert верх == низ, "между частями не должно быть щели"
+    # каждое письмо — ровно в одной части
+    for n in номера:
+        assert sum(в_части(n, низ, верх) for низ, верх in куски) == 1, (n, частей)
+    # и любой номер пачки, даже письма, появившегося после плана, — тоже
+    for n in range(от + 1, до + 1, 97):
+        assert sum(в_части(n, низ, верх) for низ, верх in куски) == 1, (n, частей)
+    # поровну: писем в частях — с точностью до одного, пустых частей нет
+    доли = [sum(в_части(n, низ, верх) for n in номера) for низ, верх in куски]
+    assert sum(доли) == len(номера)
+    assert max(доли) - min(доли) <= 1, доли
+    assert min(доли) > 0
+
+
+def test_писем_меньше_чем_частей():
+    номера = [120, 5_000, 90_000]
+    б = ms.границы_по_письмам(номера, 100, 90_000, 25)
+    куски = [ms.границы_части(б, 100, 90_000, k, 25) for k in range(25)]
+    доли = [sum(в_части(n, низ, верх) for n in номера) for низ, верх in куски]
+    assert sorted(доли) == [0] * 22 + [1] * 3
+    assert all(низ == верх for (низ, верх), д in zip(куски, доли) if д == 0), \
+        "пустая часть не должна читать портал"
+
+
+def test_границы_пустой_пачки_и_одной_части():
+    assert ms.границы_по_письмам([], 500, 500, 10) == [500] * 11
+    assert ms.границы_по_письмам([3, 9], 0, 9, 1) == [0, 9]
+    assert ms.границы_части(None, 0, 9, 0, 1) == (0, 9)
+    with pytest.raises(ValueError):
+        ms.границы_по_письмам([5, 50], 10, 50, 10)       # номер позади отметки
+
+
+def test_часть_отказывает_на_чужих_границах():
+    б = ms.границы_по_письмам(list(range(101, 201)), 100, 200, 10)
+    with pytest.raises(ValueError):
+        ms.границы_части(None, 100, 200, 0, 10)          # план границ не дал
+    with pytest.raises(ValueError):
+        ms.границы_части(б, 100, 200, 0, 12)             # деление на другое число
+    with pytest.raises(ValueError):
+        ms.границы_части(б, 100, 250, 0, 10)             # другая пачка
+    with pytest.raises(ValueError):
+        ms.границы_части([100, 150, 140, 200], 100, 200, 0, 3)
+    with pytest.raises(ValueError):
+        ms.границы_части(б, 100, 200, 10, 10)
+
+
+def test_границы_из_вывода_плана():
+    assert ms.разобрать_границы("[0,5,9]") == [0, 5, 9]
+    for мусор in ("", "не json", "{}", "[]", '["1"]', "[1.5]", "[true, 2]"):
+        with pytest.raises(ValueError):
+            ms.разобрать_границы(мусор)
+
+
+class База:
+    """Заглушка indexer.connect: план читает отметку, больше ничего."""
+
+    def cursor(self):
+        import contextlib
+        return contextlib.nullcontext(object())
+
+    def close(self):
+        pass
+
+
+def план(monkeypatch, tmp_path, письма, частей: int, отметка: int = 0, лимит: int = 2000):
+    """Прогнать «mail_source.py план» с подменой портала и базы. (выход, портал)."""
+    import types
+    портал = Портал(письма)
+    monkeypatch.setitem(sys.modules, "indexer",
+                        types.SimpleNamespace(connect=База, bx=портал))
+    monkeypatch.setattr(ms, "прочитать_отметку", lambda cur, группа: отметка)
+    выход = tmp_path / "out.txt"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(выход))
+    monkeypatch.setenv("MAIL_GROUP", "mail-lead")
+    monkeypatch.setenv("MAIL_LIMIT", str(лимит))
+    monkeypatch.setenv("SHARDS", str(частей))
+    assert ms.main(["mail_source.py", "план"]) == 0
+    строки = выход.read_text(encoding="utf-8").splitlines()
+    return dict(x.split("=", 1) for x in строки), портал
+
+
+@pytest.mark.parametrize("частей", [10, 50])
+def test_план_отдаёт_границы_и_части_делят_пачку_поровну(monkeypatch, tmp_path, частей):
+    """Сквозь: план читает номера пачки, части по его границам читают письма."""
+    письма = [письмо(n, [n], тип=ms.ЛИД) for n in редкие_в_начале()]
+    # за пределом лимита — ещё письма: пачка должна кончиться на лимите
+    письма += [письмо(n, [n], тип=ms.ЛИД) for n in range(100_000, 100_300)]
+    выход, портал = план(monkeypatch, tmp_path, письма, частей)
+    assert all(п["start"] == -1 and п["select"] == ["ID"] for _, п in портал.вызовы), \
+        "план читает одни номера и без подсчёта total"
+    assert len(портал.вызовы) == 2000 // ms.СТРАНИЦА, "лишних запросов на границы нет"
+    от, до = int(выход["mail_from"]), int(выход["mail_to"])
+    assert (от, до, int(выход["mail_count"])) == (0, редкие_в_начале()[-1], 2000)
+    б = ms.разобрать_границы(выход["mail_bounds"])
+    прочитано: list[int] = []
+    доли = []
+    for k in range(частей):
+        низ, верх = ms.границы_части(б, от, до, k, частей)
+        своих, _ = ms.читать_письма("mail-lead", низ, 0, до_id=верх, bx=Портал(письма)) \
+            if верх > низ else ([], низ)
+        доли.append(len(своих))
+        прочитано += [int(x["ID"]) for x in своих]
+    assert sorted(прочитано) == редкие_в_начале(), "каждое письмо пачки — ровно одной частью"
+    assert max(доли) - min(доли) <= 1 and min(доли) > 0, доли
+
+
+def test_выход_плана_совпадает_с_тем_что_ждёт_прогон(monkeypatch, tmp_path):
+    """Имена выхода плана — ровно те, что прогон передаёт дальше."""
+    import re
+    выход, _ = план(monkeypatch, tmp_path, [письмо(n, тип=ms.ЛИД) for n in range(1, 40)], 10)
+    wf = прогон()
+    ждёт = {m.group(1) for v in wf["jobs"]["plan"]["outputs"].values()
+            for m in [re.fullmatch(r"\$\{\{\s*steps\.plan\.outputs\.(\w+)\s*\}\}", v.strip())] if m}
+    assert ждёт == set(выход), (ждёт, set(выход))
+    assert "mail_bounds" in ждёт
+
+
+def test_прогон_передаёт_границы_плана_частям():
+    wf = прогон()
+    шаг_плана = next(ш for ш in wf["jobs"]["plan"]["steps"] if ш.get("id") == "plan")
+    assert шаг_плана["env"]["SHARDS"].replace(" ", "") == "${{inputs.shards}}", \
+        "план обязан делить на то же число частей, что и матрица"
+    env = шаг_разбора(wf)["env"]
+    assert env["MAIL_BOUNDS"].replace(" ", "") == "${{needs.plan.outputs.mail_bounds}}"
+    assert env["SHARDS"].replace(" ", "") == "${{inputs.shards}}"
+    assert env["SHARD"].replace(" ", "") == "${{matrix.shard}}"
+    assert "mail_source.py план" in шаг_плана["run"]
+
+
+def test_часть_индексатора_берёт_свой_кусок_и_отказывает_без_границ(monkeypatch):
+    ix = индексатор()
+    monkeypatch.setattr(ix, "mail_source", ms, raising=False)
+    monkeypatch.setattr(ix, "MAIL_GROUP", "mail-lead")
+    вызовы = []
+    monkeypatch.setattr(ms, "collect_refs_mail",
+                        lambda группа, после, лимит, до_id=None, bx=None:
+                        (вызовы.append((после, до_id)) or [], до_id))
+    номера = редкие_в_начале(1000)
+    от, до = 1000, номера[-1]
+    б = ms.границы_по_письмам(номера, от, до, 10)
+    monkeypatch.setenv("MAIL_FROM", str(от))
+    monkeypatch.setenv("MAIL_TO", str(до))
+    monkeypatch.setenv("MAIL_BOUNDS", json.dumps(б))
+    monkeypatch.setattr(ix, "SHARDS", 10)
+    for k in range(10):
+        monkeypatch.setattr(ix, "SHARD", k)
+        assert ix.collect_refs_mail_part() == []
+    assert вызовы == list(zip(б, б[1:])), "часть читает ровно свой кусок из границ плана"
+    # без границ, с чужими границами — отказ, а не равные отрезки номеров
+    monkeypatch.delenv("MAIL_BOUNDS")
+    assert ix.collect_refs_mail_part() is None
+    monkeypatch.setenv("MAIL_BOUNDS", json.dumps(б[:-1]))
+    assert ix.collect_refs_mail_part() is None
 
 
 # ─────────────────────────────────────────────── прогон

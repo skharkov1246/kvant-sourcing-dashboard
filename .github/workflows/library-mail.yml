@@ -8,8 +8,13 @@ name: Библиотека — вложения писем Битрикса
 #   mail-lead     — входящие письма лидов (запросы заказчиков).
 #
 # ПАЧКАМИ ОТ ОТМЕТКИ. План читает из базы, где группа остановилась, и номера
-# следующих `limit` писем (лимит/50 запросов, одни номера). Части делят номера
-# ЭТОЙ пачки смежными кусками — деление одно (CLAUDE.md, правило дробления).
+# следующих `limit` писем (лимит/50 запросов, одни номера). По этим же номерам
+# план считает границы частей ПОРОВНУ ПО ПИСЬМАМ (mail_bounds: shards+1 номеров,
+# часть k — (b[k]; b[k+1]]), и каждая часть берёт свой смежный кусок по номеру
+# SHARD — деление одно (CLAUDE.md, правило дробления). Не равными отрезками
+# номеров: прогон 36079859054 (25.09.2026, mail-lead, 2 000 писем на 10 частей)
+# так оставил части 1–4 без единого письма — номера лидов в начале пачки редки,
+# — а шесть частей несли всё по три часа.
 # Отметку двигает ПОСЛЕДНИЙ job и только когда прошли ВСЕ части и задан apply:
 # упавшая часть отметку не двигает, следующий запуск перечитает ту же пачку, а
 # разобранные файлы отсеются по lib_files. Холостой прогон (apply выключен)
@@ -77,6 +82,7 @@ jobs:
       mail_from: ${{ steps.plan.outputs.mail_from }}
       mail_to: ${{ steps.plan.outputs.mail_to }}
       mail_count: ${{ steps.plan.outputs.mail_count }}
+      mail_bounds: ${{ steps.plan.outputs.mail_bounds }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -104,6 +110,9 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           MAIL_GROUP: ${{ inputs.group }}
           MAIL_LIMIT: ${{ inputs.limit }}
+          # Границы частей считает план: поровну по письмам знает только тот,
+          # кто прочитал их номера.
+          SHARDS: ${{ inputs.shards }}
           # План читает портал одним процессом; у лидов — тот же потолок 0.3.
           BITRIX_RPS: ${{ inputs.group == 'mail-lead' && '0.3' || inputs.bitrix_rps }}
           BITRIX_PARALLEL: "1"
@@ -161,6 +170,9 @@ jobs:
           MAIL_GROUP: ${{ inputs.group }}
           MAIL_FROM: ${{ needs.plan.outputs.mail_from }}
           MAIL_TO: ${{ needs.plan.outputs.mail_to }}
+          # Границы всех частей от плана; часть берёт свою пару по SHARD и
+          # падает громко, если границы не сходятся с пачкой и числом частей.
+          MAIL_BOUNDS: ${{ needs.plan.outputs.mail_bounds }}
           SHARDS: ${{ inputs.shards }}
           SHARD: ${{ matrix.shard }}
           WORKERS: "4"
