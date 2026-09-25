@@ -340,7 +340,7 @@ def brand_pipeline(judged_cols: str = "c.*, tj.brand_key, tj.brand_name") -> str
                 else pc.piece end as piece
       from pieces pc
      cross join lateral (
-           select substring(replace(lower(pc.piece), 'ё', 'е') from '\s(\S+)$') as lw) l
+           select substring(replace(lower(pc.piece), 'ё', 'е') from '\\s(\\S+)$') as lw) l
   ),
   -- КЛЮЧ БРЕНДА — порт scripts/build_dict.nkey плюс свёртка диакритики
   -- (иначе Wärtsilä и Wartsila — два бренда) и кириллических двойников. Написания
