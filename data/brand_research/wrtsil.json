@@ -1,0 +1,845 @@
+{
+  "oem_key": "wrtsil",
+  "name": "Wärtsilä",
+  "segment_focus": "газовые 34SG, 31SG, 50SG: сервисные бюллетени, номера фильтров, свечей, форкамер, клапанов; субпоставщики турбонаддува и управления",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Wärtsilä (Финляндия): газовые поршневые двигатели-генераторы 34SG (12V/16V/20V, 5,8–9,8 МВт; исполнения 34SG-LPG и «power optimised»), 31SG (20V, 10,8–12,8 МВт, двухступенчатый наддув) и 50SG (18V, 18,4–18,9 МВт). Паспортные данные взяты из листков изготовителя (05/2022). Кодов собрано 40, каждый дословно со страницы источника; второй проход скептика подтвердил все 40. Основной источник по 34SG — открытый список расходников на ТО 48 000 моточасов для 18V34SG, выложенный эксплуатантом на industrialmarinepower.com: там свеча 124002, главный газовый клапан 164025, клапан управления форкамерой 164040, датчик детонации 120103, фильтрующие картриджи 470256/470258/471196, вкладыши, кольца, модули WECS. Сток-лист Vesmec добавляет форкамеру в сборе 124001, гильзу 100110 и поршень 113025. Для свечи нашлись перекрёстные номера: новые 10-значные коды Wärtsilä (PAAE250517, PAAF092377, PAAE059695, PABA791519), Denso GI3-4/GI3-5, Champion/Federal-Mogul FB78WW. Субпоставщики: турбонаддув — Napier 357 (на 20V34SG), ABB TPL-C (на 50SG), ABB двухступенчатый Power2 (линия W31); газовые клапаны — Woodward (SOGAV 105); поршни — KS и Mahle; свечи — Denso; генераторы — ABB AMG. Система управления у Wärtsilä своя: WECS 3000/7000/8000, позже UNIC. Сервис в приоритетных странах — дочерние общества Wärtsilä в Пакистане, Бангладеш, Индии, ОАЭ и Турции. Из России Wärtsilä ушла в июле 2022 г.; бывшая команда Wärtsilä Vostok работает как V-Vostok LLC и обслуживает только судовое оборудование. По 31SG и 50SG кодов в открытом доступе не нашлось.",
+  "machines": [
+    {
+      "model": "Wärtsilä 12V34SG",
+      "kind": "газопоршневой двигатель-генератор",
+      "segment": "ГПУ",
+      "rating": "5 840 кВт эл. (50 Гц) / 5 580 кВт (60 Гц); цилиндр 340×400 мм; 750/720 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-34sg.pdf?sfvrsn=c3c5a345_18"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 16V34SG",
+      "kind": "газопоршневой двигатель-генератор",
+      "segment": "ГПУ",
+      "rating": "7 830 кВт эл. (50 Гц) / 7 491 кВт (60 Гц)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-34sg.pdf?sfvrsn=c3c5a345_18"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 20V34SG",
+      "kind": "газопоршневой двигатель-генератор",
+      "segment": "ГПУ",
+      "rating": "9 795 кВт эл. (50 Гц) / 9 388 кВт (60 Гц)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-34sg.pdf?sfvrsn=c3c5a345_18",
+        "https://fin-marine.com/power-plant/wartsila-20v34sg-gas-power-plant-9-7-megawatts/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 18V34SG",
+      "kind": "газопоршневой двигатель-генератор (раннее исполнение)",
+      "segment": "ГПУ",
+      "rating": "18 цилиндров, 340 мм",
+      "status": "снята (в текущем листке исполнения 12V/16V/20V); в эксплуатации",
+      "sources": [
+        "https://www.manualslib.com/manual/2590282/W-Rtsil-41508.html",
+        "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 34SG-LPG (12V/16V/20V)",
+      "kind": "газопоршневой двигатель-генератор на пропан-бутане",
+      "segment": "ГПУ",
+      "rating": "4 380–7 346 кВт эл. (50 Гц)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-34sg-lpg.pdf?sfvrsn=77d8144_17"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 34SG power optimised",
+      "kind": "газопоршневой двигатель-генератор",
+      "segment": "ГПУ",
+      "rating": "н/д (на странице-источнике мощность не приведена)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.wartsila.com/energy/solutions/engine-power-plants/wartsila-34SG-power-optimised-gas-engine"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 20V31SG",
+      "kind": "газопоршневой двигатель-генератор с двухступенчатым наддувом",
+      "segment": "ГПУ",
+      "rating": "10 790–12 762 кВт эл. (50 Гц) в зависимости от исполнения; цилиндр 310×430 мм; 750/720 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-31sg.pdf?sfvrsn=f831cf44_31"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 31SG power optimised",
+      "kind": "газопоршневой двигатель-генератор",
+      "segment": "ГПУ",
+      "rating": "н/д (на странице-источнике мощность не приведена)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.wartsila.com/energy/engine-power-plant-solutions/engine-power-plant-products/wartsila-31sg-power-optimised-gas-engine"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 31SG (судовой)",
+      "kind": "судовой газовый двигатель с искровым зажиганием",
+      "segment": "двигатель",
+      "rating": "н/д (на странице-источнике мощность не приведена)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.wartsila.com/marine/products/engines-and-generating-sets/pure-gas-engines/wartsila-31sg"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Wärtsilä 18V50SG",
+      "kind": "газопоршневой двигатель-генератор",
+      "segment": "ГПУ",
+      "rating": "18 434 кВт эл. (50 Гц) / 18 875 кВт (60 Гц); цилиндр 500×580 мм; 500/514 об/мин",
+      "status": "выпускается (листок 05/2022)",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-50sg.pdf?sfvrsn=eeeda345_17"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Wärtsilä 18V34SG Instruction Manual (разделы: Maintenance Schedule, Maintenance Tools, Adjustments/Clearances/Wear Limits, Tightening Torques, Operating Troubles, WECS 3000)",
+      "doc_no": "34SG-200328-02 (раздел ТО 34SG-200349-10; инструмент 32-9801; неисправности 34SG-200414-04)",
+      "machine": "18V34SG",
+      "kind": "O&M / instruction manual",
+      "sources": [
+        "https://www.manualslib.com/manual/2590282/W-Rtsil-41508.html",
+        "https://studylib.net/doc/27740973/wartsilla-34sg-manual-41508"
+      ]
+    },
+    {
+      "title": "WECS 8000 manual 20V34SG",
+      "doc_no": "",
+      "machine": "20V34SG",
+      "kind": "service manual (система управления)",
+      "sources": [
+        "https://www.scribd.com/document/871618857/WECS-8000-manual-20V34SG-9-5-2007"
+      ]
+    },
+    {
+      "title": "WECS8000 Functions W34SG",
+      "doc_no": "",
+      "machine": "34SG",
+      "kind": "учебное руководство по системе управления",
+      "sources": [
+        "https://pdfcoffee.com/3-4-wecs8000-functions-w34sg-v00r07cb0809a001l-01en-ppt-pdf-free.html"
+      ]
+    },
+    {
+      "title": "W34SG Automation",
+      "doc_no": "",
+      "machine": "34SG",
+      "kind": "учебное руководство по автоматике и зажиганию",
+      "sources": [
+        "https://www.scribd.com/document/434255393/12-W34SGAutomation"
+      ]
+    },
+    {
+      "title": "Wärtsilä 34SG Product Guide",
+      "doc_no": "",
+      "machine": "34SG",
+      "kind": "product guide",
+      "sources": [
+        "https://www.scribd.com/doc/131216152/W34SG-Global-ProductGuide",
+        "https://pdfcoffee.com/w34sg-global-productguide-3-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Wärtsilä 34SG — листок генераторной установки",
+      "doc_no": "",
+      "machine": "34SG",
+      "kind": "product leaflet",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-34sg.pdf?sfvrsn=c3c5a345_18"
+      ]
+    },
+    {
+      "title": "Wärtsilä 31SG — листок генераторной установки",
+      "doc_no": "",
+      "machine": "31SG",
+      "kind": "product leaflet",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-31sg.pdf?sfvrsn=f831cf44_31"
+      ]
+    },
+    {
+      "title": "Wärtsilä 50SG — листок генераторной установки",
+      "doc_no": "",
+      "machine": "18V50SG",
+      "kind": "product leaflet",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-50sg.pdf?sfvrsn=eeeda345_17"
+      ]
+    },
+    {
+      "title": "Prechamber upgrade for Wärtsilä 34SG engines",
+      "doc_no": "",
+      "machine": "34SG",
+      "kind": "бюллетень / пакет модернизации (каталог услуг)",
+      "sources": [
+        "https://www.wartsila.com/services-catalogue/engine-services-4-stroke/prechamber-upgrade-34sg"
+      ]
+    },
+    {
+      "title": "Performance Upgrade for Wärtsilä 34SG",
+      "doc_no": "",
+      "machine": "34SG",
+      "kind": "бюллетень / пакет модернизации (каталог услуг)",
+      "sources": [
+        "https://www.wartsila.com/services-catalogue/engine-services-4-stroke/performance-upgrade-for-wartsila-w34sg"
+      ]
+    },
+    {
+      "title": "Wärtsilä UNIC engine control system for energy (замена WECS на UNIC)",
+      "doc_no": "",
+      "machine": "34SG",
+      "kind": "бюллетень / пакет модернизации (каталог услуг)",
+      "sources": [
+        "https://www.wartsila.com/services-catalogue/engine-services-4-stroke/wartsila-unic-engine-control-system-for-energy"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "124002",
+      "issuer": "Wärtsilä",
+      "description": "Свеча зажигания",
+      "machine": "18V34SG",
+      "unit": "система зажигания",
+      "doc_ref": "список расходников на ТО 48 000 моточасов (Consumable spare parts)",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "124002 Spark plug 18"
+    },
+    {
+      "code": "PAAE250517",
+      "issuer": "Wärtsilä (по данным продавца; что это новый 10-значный код Wärtsilä — вывод разведки)",
+      "description": "Свеча зажигания Denso, аналог 124002",
+      "machine": "W20V34SG",
+      "unit": "система зажигания",
+      "doc_ref": "карточка товара",
+      "source_url": "https://www.industrialspareparts.co.uk/products/124002-spark-plug-wartsila-w20v34sg-paae250517",
+      "quote": "Wartsila 124002 Denso spark plug, fits engine W20V34SG and other models, PAAE250517, GI3-4, HS 8511.10"
+    },
+    {
+      "code": "GI3-4",
+      "issuer": "Denso",
+      "description": "Иридиевая свеча зажигания Denso для 124002",
+      "machine": "W20V34SG",
+      "unit": "система зажигания",
+      "doc_ref": "карточка товара; номер Denso к Wärtsilä 124002 в источниках разный (industrialspareparts — GI3-4, Techie — GI3-5), равноценными аналогами не считать до сверки с каталогом Denso",
+      "source_url": "https://www.industrialspareparts.co.uk/products/124002-spark-plug-wartsila-w20v34sg-paae250517",
+      "quote": "Wartsila 124002 Denso spark plug, fits engine W20V34SG and other models, PAAE250517, GI3-4, HS 8511.10"
+    },
+    {
+      "code": "GI3-5",
+      "issuer": "Denso",
+      "description": "Свеча зажигания, указана в перекрёстных номерах к Wärtsilä 124002",
+      "machine": "W25SG / W28SG / W34SG / 34SG",
+      "unit": "система зажигания",
+      "doc_ref": "перекрёстные номера к TISS9835; номер Denso к Wärtsilä 124002 в источниках разный (industrialspareparts — GI3-4, Techie — GI3-5), равноценными аналогами не считать до сверки с каталогом Denso",
+      "source_url": "https://www.techiepowerparts.com/application/wartsila-gas-engine/",
+      "quote": "TISS9835 Gas Genset models: Wartsila / Wärtsilä: W25SG / W28SG / W34SG / W20V / 34SG / 34G Cross-References: Wartsila 124002/ Wärtsilä 124002 Denso: GI3-5"
+    },
+    {
+      "code": "FB78WW",
+      "issuer": "Champion / Federal-Mogul",
+      "description": "Мостовая свеча зажигания, аналог Wärtsilä 124002",
+      "machine": "34SG / 50SG / 20V34SG",
+      "unit": "система зажигания",
+      "doc_ref": "перекрёстные номера к TISS9836",
+      "source_url": "https://www.techiepowerparts.com/application/wartsila-gas-engine/",
+      "quote": "Wartsila / Wärtsilä: 34SG / 50SG / 20V34SG Cross-References: Wartsila 124002/ Wärtsilä 124002 CHAMPION / Federal Mogul: FB78WW Motortech: MBP1800"
+    },
+    {
+      "code": "MBP1800",
+      "issuer": "Motortech",
+      "description": "Свеча зажигания, аналог Wärtsilä 124002",
+      "machine": "34SG / 50SG / 20V34SG",
+      "unit": "система зажигания",
+      "doc_ref": "перекрёстные номера к TISS9836",
+      "source_url": "https://www.techiepowerparts.com/application/wartsila-gas-engine/",
+      "quote": "CHAMPION / Federal Mogul: FB78WW Motortech: MBP1800 Rolls-Royce: 710875/ 707447 / FB11047A"
+    },
+    {
+      "code": "PAAF092377",
+      "issuer": "Wärtsilä (в листовке Hatraco подписан «Wärtsila :»; что это новый 10-значный код — вывод разведки)",
+      "description": "Свеча зажигания (в перекрёстных номерах к Hatraco 18.030-01)",
+      "machine": "Wärtsilä SG-series",
+      "unit": "система зажигания",
+      "doc_ref": "листовка Hatraco 18.030-01, раздел Cross references",
+      "source_url": "https://www.hatraco.com/sites/default/files/downloads/FLYER-ERS-18.030-01-RollsRoyce-Wartsilla-V1.4.pdf",
+      "quote": "Wärtsila : PAAF092377"
+    },
+    {
+      "code": "PAAE059695",
+      "issuer": "Wärtsilä (в листовке Hatraco подписан «Wärtsila :»; что это новый 10-значный код — вывод разведки)",
+      "description": "Свеча зажигания (в перекрёстных номерах к Hatraco 18.030-01)",
+      "machine": "Wärtsilä SG-series",
+      "unit": "система зажигания",
+      "doc_ref": "листовка Hatraco 18.030-01, раздел Cross references",
+      "source_url": "https://www.hatraco.com/sites/default/files/downloads/FLYER-ERS-18.030-01-RollsRoyce-Wartsilla-V1.4.pdf",
+      "quote": "Wärtsila : PAAE059695"
+    },
+    {
+      "code": "PABA791519",
+      "issuer": "Wärtsilä (в листовке Hatraco подписан «Wärtsila :»; что это новый 10-значный код — вывод разведки)",
+      "description": "Свеча зажигания (в перекрёстных номерах к Hatraco 18.030-01)",
+      "machine": "Wärtsilä SG-series",
+      "unit": "система зажигания",
+      "doc_ref": "листовка Hatraco 18.030-01, раздел Cross references",
+      "source_url": "https://www.hatraco.com/sites/default/files/downloads/FLYER-ERS-18.030-01-RollsRoyce-Wartsilla-V1.4.pdf",
+      "quote": "Wärtsila : PABA791519"
+    },
+    {
+      "code": "124003",
+      "issuer": "Wärtsilä",
+      "description": "Удлинитель свечи (extension)",
+      "machine": "18V34SG",
+      "unit": "система зажигания",
+      "doc_ref": "Inspection dependable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "124003 Extension 18"
+    },
+    {
+      "code": "124004",
+      "issuer": "Wärtsilä",
+      "description": "Прокладка (узел свечи / форкамеры)",
+      "machine": "18V34SG",
+      "unit": "головка цилиндра / зажигание (выведено по группе кода, источник узел не называет)",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "124004 Gasket 18"
+    },
+    {
+      "code": "120096",
+      "issuer": "Wärtsilä",
+      "description": "Катушка зажигания",
+      "machine": "18V34SG",
+      "unit": "система зажигания",
+      "doc_ref": "Inspection dependable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "120096 Ignition coil 1"
+    },
+    {
+      "code": "124001",
+      "issuer": "Wärtsilä",
+      "description": "Форкамера (клапан впрыска топлива в сборе), восстановленная",
+      "machine": "34SG",
+      "unit": "форкамера / головка цилиндра",
+      "doc_ref": "сток-лист Vesmec, графа WARTSILA CODE",
+      "source_url": "https://www.vesmec.com/yuklenen/pdf/kategoriler/1610967945/1616761299warehouse_stock-list.pdf",
+      "quote": "PRECHAMBER (FUEL INJECTION VALVE WARTSILA / 34SG REFURBISHED 124001 23 COMPLETE)"
+    },
+    {
+      "code": "164025",
+      "issuer": "Wärtsilä",
+      "description": "Главный газовый (впускной) клапан",
+      "machine": "18V34SG / 34SG",
+      "unit": "газовая система",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "164025 Main gas valve 18"
+    },
+    {
+      "code": "164040",
+      "issuer": "Wärtsilä",
+      "description": "Клапан управления форкамерой (газ форкамеры)",
+      "machine": "18V34SG",
+      "unit": "газовая система / форкамера",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "164040 Prechamber control valve 18"
+    },
+    {
+      "code": "164076",
+      "issuer": "Wärtsilä",
+      "description": "Фильтр (газовая система, группа 164)",
+      "machine": "18V34SG",
+      "unit": "газовая система (выведено по группе кода, источник узел не называет)",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "164076 Filter 18"
+    },
+    {
+      "code": "120103",
+      "issuer": "Wärtsilä",
+      "description": "Датчик детонации",
+      "machine": "18V34SG",
+      "unit": "система управления / головка цилиндра",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "120103 Knock sensor 18"
+    },
+    {
+      "code": "120124",
+      "issuer": "Wärtsilä",
+      "description": "Комплект уплотнений для замены головки цилиндра",
+      "machine": "18V34SG",
+      "unit": "головка цилиндра",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "120124 Sealing set for cylinder head replacement 18"
+    },
+    {
+      "code": "100050",
+      "issuer": "Wärtsilä",
+      "description": "Комплект уплотнений (гильза цилиндра, группа 100)",
+      "machine": "18V34SG",
+      "unit": "блок / гильза цилиндра",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "100050 Sealing set 10"
+    },
+    {
+      "code": "100156",
+      "issuer": "Wärtsilä",
+      "description": "Антиполировочное кольцо гильзы",
+      "machine": "18V34SG",
+      "unit": "гильза цилиндра",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "100156 Antipolishing ring 18"
+    },
+    {
+      "code": "100110",
+      "issuer": "Wärtsilä",
+      "description": "Гильза цилиндра",
+      "machine": "34SG",
+      "unit": "блок / гильза цилиндра",
+      "doc_ref": "сток-лист Vesmec, графа WARTSILA CODE",
+      "source_url": "https://www.vesmec.com/yuklenen/pdf/kategoriler/1610967945/1616761299warehouse_stock-list.pdf",
+      "quote": "WARTSILA / 34SG CYLINDER LINER NEW 100110 1"
+    },
+    {
+      "code": "113025",
+      "issuer": "Wärtsilä",
+      "description": "Поршень в сборе (головка + юбка)",
+      "machine": "34SG",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "сток-лист Vesmec, графа WARTSILA CODE",
+      "source_url": "https://www.vesmec.com/yuklenen/pdf/kategoriler/1610967945/1616761299warehouse_stock-list.pdf",
+      "quote": "WARTSILA / 34 SG PISTON COMPLETE (CROWN+SKIRT) REFURBISHED 113025 20"
+    },
+    {
+      "code": "113013",
+      "issuer": "Wärtsilä",
+      "description": "Комплект поршневых колец",
+      "machine": "18V34SG",
+      "unit": "поршень",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "113013 Piston ring set 18"
+    },
+    {
+      "code": "111004",
+      "issuer": "Wärtsilä",
+      "description": "Вкладыш нижней головки шатуна, верхний",
+      "machine": "18V34SG",
+      "unit": "шатун",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "111004 Big end bearing shell upper 18"
+    },
+    {
+      "code": "111005",
+      "issuer": "Wärtsilä",
+      "description": "Вкладыш нижней головки шатуна, нижний",
+      "machine": "18V34SG",
+      "unit": "шатун",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "111005 Big end bearing shell lower 18"
+    },
+    {
+      "code": "131023",
+      "issuer": "Wärtsilä",
+      "description": "Упорный подшипник",
+      "machine": "18V34SG",
+      "unit": "распределительный вал / привод (выведено по группе кода, источник узел не называет)",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "131023 Thrust bearing 6"
+    },
+    {
+      "code": "143005",
+      "issuer": "Wärtsilä",
+      "description": "Втулка подшипника (привод клапанов)",
+      "machine": "18V34SG",
+      "unit": "клапанный механизм (выведено по группе кода, источник узел не называет)",
+      "doc_ref": "Inspection dependable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "143005 Bearing bush 36"
+    },
+    {
+      "code": "156380",
+      "issuer": "Wärtsilä",
+      "description": "Ремкомплект турбокомпрессора",
+      "machine": "18V34SG",
+      "unit": "турбонаддув",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "156380 Spare part kit for TC 2"
+    },
+    {
+      "code": "156381",
+      "issuer": "Wärtsilä",
+      "description": "Ремкомплект турбокомпрессора (по состоянию)",
+      "machine": "18V34SG",
+      "unit": "турбонаддув",
+      "doc_ref": "Inspection dependable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "156381 Spare part kit for TC 2"
+    },
+    {
+      "code": "470256",
+      "issuer": "Wärtsilä",
+      "description": "Фильтрующий картридж",
+      "machine": "18V34SG",
+      "unit": "система смазки / фильтры",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "470256 Filter cartridge 1"
+    },
+    {
+      "code": "470258",
+      "issuer": "Wärtsilä",
+      "description": "Фильтрующий картридж",
+      "machine": "18V34SG",
+      "unit": "система смазки / фильтры",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "470258 Filter cartridge 1"
+    },
+    {
+      "code": "471196",
+      "issuer": "Wärtsilä",
+      "description": "Фильтроэлемент (вставка)",
+      "machine": "18V34SG",
+      "unit": "система смазки / фильтры",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "471196 Filter insert 8"
+    },
+    {
+      "code": "473063",
+      "issuer": "Wärtsilä",
+      "description": "Картридж",
+      "machine": "18V34SG",
+      "unit": "вспомогательные системы (группа 47x)",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "473063 Cartridge 2"
+    },
+    {
+      "code": "471260",
+      "issuer": "Wärtsilä",
+      "description": "Обкаточный фильтр (running-in filter)",
+      "machine": "34SG",
+      "unit": "система смазки",
+      "doc_ref": "сток-лист Vesmec, графа WARTSILA CODE",
+      "source_url": "https://www.vesmec.com/yuklenen/pdf/kategoriler/1610967945/1616761299warehouse_stock-list.pdf",
+      "quote": "WARTSILA / 34SG RUNNING IN FILTER REFURBISHED 471260 25"
+    },
+    {
+      "code": "207926",
+      "issuer": "Wärtsilä",
+      "description": "Пилотный клапан",
+      "machine": "18V34SG",
+      "unit": "пусковой воздух / пневматика (выведено по группе кода, источник узел не называет)",
+      "doc_ref": "Consumable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "207926 Pilot valve 1"
+    },
+    {
+      "code": "506200",
+      "issuer": "Wärtsilä",
+      "description": "DCU — распределённый блок управления",
+      "machine": "18V34SG",
+      "unit": "система управления WECS",
+      "doc_ref": "Inspection dependable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "506200 DCU distributed control unit 1"
+    },
+    {
+      "code": "507800",
+      "issuer": "Wärtsilä",
+      "description": "Блок CCU (модуль управления цилиндрами)",
+      "machine": "18V34SG",
+      "unit": "система управления WECS",
+      "doc_ref": "Inspection dependable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "507800 CCU-unit 1"
+    },
+    {
+      "code": "507801",
+      "issuer": "Wärtsilä",
+      "description": "Модуль синхронизации зажигания",
+      "machine": "18V34SG",
+      "unit": "система зажигания / WECS",
+      "doc_ref": "Inspection dependable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "507801 Ignition trig module 1"
+    },
+    {
+      "code": "507761",
+      "issuer": "Wärtsilä",
+      "description": "Модуль отключения по превышению оборотов",
+      "machine": "18V34SG",
+      "unit": "система защиты",
+      "doc_ref": "Inspection dependable spare parts, ТО 48 000 моточасов",
+      "source_url": "https://www.industrialmarinepower.com/wanted-wartsila-34sg-gas-engine-overhaul-spare-parts/",
+      "quote": "507761 Overspeed trip module 1"
+    },
+    {
+      "code": "806056",
+      "issuer": "Wärtsilä",
+      "description": "Инструмент для затяжки газового клапана",
+      "machine": "18V34SG",
+      "unit": "инструмент / газовая система",
+      "doc_ref": "Instruction Manual, Maintenance Tools 32-9801 (чертёж 4V80G0035)",
+      "source_url": "https://www.manualslib.com/manual/2590282/W-Rtsil-41508.html",
+      "quote": "806056 Tightening tool for gas injection valve 4V80G0035"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Napier (Napier Turbochargers)",
+      "component": "турбокомпрессоры (2 × Napier 357)",
+      "machine": "20V34SG",
+      "evidence": "объявление о продаже б/у станции 20V34SG: «2 x Napier 357 turbochargers»; Napier также есть в списке марок, по которым Wärtsilä поставляет запчасти (Пакистан)",
+      "sources": [
+        "https://fin-marine.com/power-plant/wartsila-20v34sg-gas-power-plant-9-7-megawatts/",
+        "https://www.wartsila.com/docs/default-source/spare-parts-mea-cmpaign/spare-parts-and-contact---pakistan.pdf?sfvrsn=528e7a43_3"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ABB Turbo Systems (ныне Accelleron)",
+      "component": "турбокомпрессоры ABB TPL-C",
+      "machine": "50SG",
+      "evidence": "пресс-релиз Wärtsilä от 24.08.2017, подпись к фото: «ABB TPL-C turbocharger on a Wärtsilä 50SG engine»",
+      "sources": [
+        "https://www.wartsila.com/media/news/24-08-2017-wartsila-and-abb-to-push-boundaries-of-engine-performance-together"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ABB Turbo Systems (ныне Accelleron)",
+      "component": "двухступенчатый турбонаддув Power2 800-M",
+      "machine": "Wärtsilä 31 (на 31SG двухступенчатый наддув подтверждён листком; марка ABB — косвенно)",
+      "evidence": "Marine Log 04.06.2015: Wärtsilä 31 — первое судовое применение ABB Power2 800-M; Riviera 2018: двухступенчатый наддув 31SG вырос из совместной работы Wärtsilä и ABB Turbo Systems",
+      "sources": [
+        "https://www.marinelog.com/news/second-generation-abb-two-stage-turbocharger-makes-marine-debut/",
+        "https://www.rivieramm.com/opinion/wrtsil-unites-engine-and-turbo-expertise-24280",
+        "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-31sg.pdf?sfvrsn=f831cf44_31"
+      ],
+      "verified": true
+    },
+    {
+      "company": "KBB (Kompressorenbau Bannewitz)",
+      "component": "турбокомпрессоры",
+      "machine": "парк Wärtsilä (к модели не привязано)",
+      "evidence": "KBB есть в разделе Turbocharger списка марок, по которым Wärtsilä поставляет запчасти; слабая связь: марка из списка запчастей, которые продаёт Wärtsilä, поставка на конкретную машину не подтверждена",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/spare-parts-mea-cmpaign/spare-parts-and-contact---pakistan.pdf?sfvrsn=528e7a43_3"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Woodward",
+      "component": "главные и форкамерные газовые клапаны (SOGAV 105)",
+      "machine": "34SG",
+      "evidence": "в графике ТО руководства 18V34SG (34SG-200349-10) рядом с заменой главного и форкамерного газовых клапанов стоит «Woodward»; объявление: «main gas valves from Woodward model sogav 105 for the engine of Wärtsilä 34 sg»",
+      "sources": [
+        "https://www.manualslib.com/manual/2590282/W-Rtsil-41508.html",
+        "https://www.industrialmarinepower.com/man-gas-valve-woodward-sovag-105-for-wartsila-34/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "KS (Kolbenschmidt)",
+      "component": "поршни (тип 1)",
+      "machine": "34SG",
+      "evidence": "Instruction Manual, приложение Piston Overhaul 32-200138: «W34SG crown KS / (type 1)»",
+      "sources": [
+        "https://www.manualslib.com/manual/2590282/W-Rtsil-41508.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Mahle",
+      "component": "поршни (тип 2)",
+      "machine": "34SG",
+      "evidence": "Instruction Manual, приложение Piston Overhaul 32-200138: «Mahle / (type 2)»",
+      "sources": [
+        "https://www.manualslib.com/manual/2590282/W-Rtsil-41508.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Denso",
+      "component": "свечи зажигания (иридиевые, GI3-4 / GI3-5)",
+      "machine": "34SG / 20V34SG",
+      "evidence": "карточка товара: «Wartsila 124002 Denso spark plug, fits engine W20V34SG … GI3-4»; перекрёстные номера у Techie",
+      "sources": [
+        "https://www.industrialspareparts.co.uk/products/124002-spark-plug-wartsila-w20v34sg-paae250517",
+        "https://www.techiepowerparts.com/application/wartsila-gas-engine/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ABB",
+      "component": "генератор ABB AMG 1120LT08",
+      "machine": "20V34SG",
+      "evidence": "объявление о продаже станции 20V34SG: «ABB AMG 1120LT08 Alternator»",
+      "sources": [
+        "https://fin-marine.com/power-plant/wartsila-20v34sg-gas-power-plant-9-7-megawatts/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Wärtsilä (своя разработка)",
+      "component": "система управления двигателем WECS 3000/7000/8000, позже UNIC",
+      "machine": "34SG",
+      "evidence": "разделы WECS 3000 в руководстве 34SG; «20V34SG genset with UNIC Control system»; в каталоге услуг — переход с WECS на UNIC",
+      "sources": [
+        "https://www.manualslib.com/manual/2590282/W-Rtsil-41508.html",
+        "https://www.wartsila.com/services-catalogue/engine-services-4-stroke/wartsila-unic-engine-control-system-for-energy"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Boll & Kirch; Parker Hannifin; Alfa Laval; AAF",
+      "component": "фильтры и топливоподготовка (Boll & Kirch, Parker), сепараторы (Alfa Laval), фильтрация воздуха (AAF)",
+      "machine": "станции Wärtsilä (к модели не привязано)",
+      "evidence": "список марок вспомогательного оборудования, по которым Wärtsilä поставляет запчасти (Пакистан, Бангладеш); слабая связь: марки из списков запчастей, без привязки к модели",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/spare-parts-mea-cmpaign/spare-parts-and-contact---pakistan.pdf?sfvrsn=528e7a43_3",
+        "https://www.wartsila.com/docs/default-source/spare-parts-mea-cmpaign/spare-parts-and-contact---bangladesh.pdf?sfvrsn=bad16c43_3"
+      ],
+      "verified": false
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Wärtsilä Pakistan (Private) Ltd",
+      "country": "Пакистан",
+      "role": "дочернее общество изготовителя: запчасти и сервис для 31SG, 34SG, 46F, 50DF и др.",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/spare-parts-mea-cmpaign/spare-parts-and-contact---pakistan.pdf?sfvrsn=528e7a43_3"
+      ]
+    },
+    {
+      "company": "Wärtsilä Bangladesh",
+      "country": "Бангладеш",
+      "role": "дочернее общество изготовителя: запчасти для 34SG, 46F, 34DF и др.",
+      "sources": [
+        "https://www.wartsila.com/docs/default-source/spare-parts-mea-cmpaign/spare-parts-and-contact---bangladesh.pdf?sfvrsn=bad16c43_3"
+      ]
+    },
+    {
+      "company": "Wärtsilä India Pvt. Ltd.",
+      "country": "Индия",
+      "role": "дочернее общество изготовителя: шесть офисов продаж и сервиса, завод в Кхополи (восстановление и модернизация двигателей), мастерская в Визаге",
+      "sources": [
+        "https://www.wartsila.com/ind/about",
+        "https://www.wartsila.com/ind/about/how-to-reach-us"
+      ]
+    },
+    {
+      "company": "Wärtsilä в ОАЭ (Middle East)",
+      "country": "ОАЭ",
+      "role": "дочернее общество изготовителя: мастерские и офисы в Дубае, региональный центр запчастей для энергетики Ближнего Востока и Южной Азии",
+      "sources": [
+        "https://www.wartsila.com/are/about/contact-us",
+        "https://www.wartsila.com/docs/default-source/spare-parts-mea-cmpaign/spare-parts-and-contact---pakistan.pdf?sfvrsn=528e7a43_3"
+      ]
+    },
+    {
+      "company": "Wärtsilä Türkiye",
+      "country": "Турция",
+      "role": "дочернее общество изготовителя: сервисный офис и мастерская в Тузле (Стамбул), продажи электростанций",
+      "sources": [
+        "https://www.wartsila.com/tur/hakkimizda/contact",
+        "https://www.wartsila.com/media/news/26-06-2008-wartsila-opens-new-services-workshop-in-turkey"
+      ]
+    },
+    {
+      "company": "V-Vostok LLC (бывшая Wärtsilä Vostok LLC)",
+      "country": "Россия",
+      "role": "бывшая российская «дочка», в 2022 г. продана местному менеджменту; обслуживает судовое оборудование, от Wärtsilä не авторизована",
+      "sources": [
+        "https://www.wartsila.com/media/news/21-07-2022-wartsila-completes-russian-market-exit-3130664"
+      ]
+    },
+    {
+      "company": "Hatraco",
+      "country": "Нидерланды",
+      "role": "независимый поставщик аналоговых свечей зажигания для Wärtsilä SG (не дилер)",
+      "sources": [
+        "https://www.hatraco.com/en/products/spark-plugs-igniters/spark-plugs/hatraco-18030-01-spark-plug"
+      ]
+    },
+    {
+      "company": "Techie Power Parts",
+      "country": "Китай",
+      "role": "независимый производитель аналогов свечей для 34SG/50SG (не дилер)",
+      "sources": [
+        "https://www.techiepowerparts.com/application/wartsila-gas-engine/"
+      ]
+    },
+    {
+      "company": "Vesmec",
+      "country": "Турция",
+      "role": "независимый продавец складских б/у и восстановленных запчастей Wärtsilä 34SG (не дилер)",
+      "sources": [
+        "https://www.vesmec.com/yuklenen/pdf/kategoriler/1610967945/1616761299warehouse_stock-list.pdf"
+      ]
+    }
+  ],
+  "gaps": [
+    "31SG и 50SG: номеров запчастей в открытом доступе не найдено. Каталоги деталей (Spare Parts Catalogue) лежат на закрытом портале клиентов Wärtsilä (Wärtsilä Online / Parts), к ним нужен серийный номер двигателя.",
+    "Коды 34SG взяты в основном из списка расходников на ТО 48 000 ч для 18V34SG, который эксплуатант выложил на доске объявлений industrialmarinepower.com. Это не каталог изготовителя: коды записаны точно, но применимость к 12V/16V/20V34SG и к новым исполнениям надо сверять по серийному номеру.",
+    "Номер форкамеры в сборе для 34SG — только 124001 из сток-листа Vesmec (восстановленные). Номера форкамеры и её клапана после модернизации (Prechamber upgrade) и для 31SG/50SG не найдены.",
+    "Масляные и воздушные фильтры: есть коды Wärtsilä 470256/470258/471196/473063 и 164076 (газовый фильтр), но без назначения внутри системы и без номеров изготовителя фильтроэлемента (Boll & Kirch и др.). Ищется в Spare Parts Catalogue и в документации на автоматические фильтры Boll & Kirch.",
+    "Термопары, датчики давления и температуры, датчики детонации для 31SG/50SG и модули UNIC: номера в открытом доступе не найдены. Модули WECS известны только по 18V34SG.",
+    "Модели турбокомпрессоров для 12V/16V/20V34SG разных лет (ABB TPS/TPL или Napier) и для 31SG (какая именно ступень ABB) по открытым источникам точно не установлены. Для 20V34SG подтверждены Napier 357, для 50SG — ABB TPL-C.",
+    "Сервисные бюллетени Wärtsilä (Technical Bulletins / Service Letters) по 34SG/31SG/50SG в открытом доступе не найдены: они рассылаются владельцам через клиентский портал.",
+    "Официального дилера или сервисного партнёра Wärtsilä в России нет с июля 2022 г. По Китаю и по ГПУ в СНГ (Казахстан, Узбекистан) официальные сервисные адреса не подтверждены: нужна отдельная разведка по странице контактов wartsila.com.",
+    "Руководства на Scribd, pdfcoffee и studylib — копии, выложенные пользователями. Их тексты целиком не проверялись: использованы только названия и номера разделов, которые видны на открытой части."
+  ],
+  "verifier_notes": "Все 40 кодов подтверждены: каждый код стоит на указанной странице дословно. Страницы скачаны заново в рабочую папку сессии скептика, в репозиторий не входят.\n\nОговорки:\n1) Номер Denso к Wärtsilä 124002 в двух источниках разный: industrialspareparts даёт GI3-4, Techie — GI3-5 (разные серии TISS). Оба кода взяты с источника дословно, но без каталога Denso нельзя сказать, какой верен. Ставить их как равноценные аналоги нельзя.\n2) Что PAAE250517, PAAF092377, PAAE059695 и PABA791519 — новые 10-значные коды Wärtsilä, источник прямо не говорит: у PAAE250517 это вывод разведки, в листовке Hatraco они подписаны «Wärtsila :».\n3) Узлы у 124004, 131023, 143005, 164076 и 207926 выведены по группе кода, источник их не называет. В описании 164025 стоит «24 В», в источнике этого нет.\n4) fin-marine отдаёт curl 403, но через WebFetch содержимое видно: Napier 357, ABB AMG 1120LT08 и UNIC подтверждены.\n5) Субпоставщики из списков запчастей по Пакистану и Бангладеш — слабая связь: это марки, по которым Wärtsilä продаёт запчасти, без привязки к модели.",
+  "corrections": [
+    "summary: число кодов исправлено с 39 на 40 — столько записей в parts и столько подтвердил скептик; добавлен итог второго прохода",
+    "GI3-4, GI3-5: в doc_ref оговорено, что источники дают разные номера Denso к 124002 и равноценными аналогами они не считаются (замечание скептика 1)",
+    "PAAE250517, PAAF092377, PAAE059695, PABA791519: в issuer «новый 10-значный код» помечен как вывод разведки — источник этого прямо не говорит (замечание скептика 2)",
+    "124004, 131023, 143005, 164076, 207926: узел помечен как выведенный по группе кода — в источнике его нет (замечание скептика 3)",
+    "164025: из описания снято «24 В» — в источнике этого нет (замечание скептика 3)",
+    "sub_suppliers KBB и Boll & Kirch/Parker/Alfa Laval/AAF: verified: false с оговоркой — это марки из списков запчастей Wärtsilä по Пакистану и Бангладеш без привязки к модели (замечание скептика 5)",
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет"
+  ]
+}

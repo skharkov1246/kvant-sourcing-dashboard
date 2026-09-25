@@ -1,0 +1,839 @@
+{
+  "oem_key": "mturollsroycepowersystems",
+  "name": "MTU (Rolls-Royce Power Systems / Rolls-Royce Solutions)",
+  "segment_focus": "газовые Series 4000 и Series 400, дизели Series 4000 горных самосвалов: руководства ТО, номера фильтров, свечей, форсунок; субпоставщики",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по газовым Series 4000 (типы L61/L62/L63/L32/L33 и нынешний L64) и Series 400 (6R400 GS, 12V400 GS) и по дизельным Series 4000 C-типов для горных самосвалов. Всё собрано только из открытых источников.\n\nМашины. Мощности и типы подтверждены документами самой MTU: страница Series 4000 GS, лист 3232501 по C13/C23/C33 и лист 3236771 по Series 400 biogas с типами двигателей B3066 и B3042. На каких самосвалах стоят двигатели, установлено по открытым описаниям машин: Liebherr T 282 C, Bucyrus MT6300AC, BelAZ 75710, Komatsu 685/930.\n\nСервисные документы. Найдены четыре открытых руководства по эксплуатации с номерами: M015710/01E (выложено у Kohler как TP-6503), MS15027/00E, MS150032/02E, а также спецификация жидкостей A001061. Из M015710/01E и MS150032/02E взяты номера спецоснастки F… и контрольного набора 5605892099/00. Каталогов запчастей (Parts Catalog / Spare Parts List) в открытом доступе нет.\n\nКоды запчастей: 36, у каждого есть страница, где он виден; второй проход скептика нашёл на страницах все 36.\n- Газовые Series 4000: свечи X52404500056/62/49/50, провод зажигания, модуль детонации, датчик частоты вращения. Набор для ТО и верхнего ремонта взят с русского сервисника «Газмоторсервис»: масляный фильтр, воздушный фильтр, фильтры вентиляции картера, гильза, поршень, головка.\n- Дизельные Series 4000: форсунки MTU и L'Orange, топливные, масляный и охлаждающий фильтры, датчики, клапаны, топливный насос.\n\nБольшая часть страниц — открытый каталог китайского перекупщика engine-family.com. Цитаты у части кодов — выжимка страниц инструментом загрузки, а не символ в символ; номер детали в каждой скептик нашёл на странице.\n\nСубпоставщики:\n- Woodward L'Orange — форсунки; есть пары номеров MTU и L'Orange.\n- Racor (Parker) — фильтр-картридж FBO60337 в топливной системе; изготовитель выведен по обозначению, не подтверждён.\n- MTU Yuchai Power — совместное предприятие, собирает Series 4000 в Китае.\n- Федерал-Могул/BERU и Hatraco — только аналоги свечей из перекрёстных таблиц.\n\nДилеры: дочерние Rolls-Royce Solutions в Китае, Турции, ОАЭ и Индии; VPower (Китай, газовые установки MTU); сервисники в России и Казахстане, у которых официальный статус не подтверждён.",
+  "machines": [
+    {
+      "model": "8V 4000 GS (L64)",
+      "kind": "газопоршневая генераторная установка / газовый двигатель",
+      "segment": "ГПУ",
+      "rating": "1013 kWe (50 Hz) / 997 kWe (60 Hz) — по данным разведки; в статичном HTML страницы MTU скептик этих цифр не нашёл, у engine-family.com 1012 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/applications/power-generation/power-generation-products/gas-generator-sets/natural-gas-generator-sets/gas-powered-series-4000.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "12V 4000 GS (L64)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "1521 kWe (50 Hz) / 1506 kWe (60 Hz) — по данным разведки; в статичном HTML страницы MTU скептик этих цифр не нашёл, у engine-family.com 1523 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/applications/power-generation/power-generation-products/gas-generator-sets/natural-gas-generator-sets/gas-powered-series-4000.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "16V 4000 GS (L64)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "2028 kWe (50 Hz) / 2012 kWe (60 Hz) — по данным разведки; в статичном HTML страницы MTU скептик этих цифр не нашёл, у engine-family.com 2028 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/applications/power-generation/power-generation-products/gas-generator-sets/natural-gas-generator-sets/gas-powered-series-4000.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "20V 4000 GS (L64)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "2538 kWe (50 Hz) / 2521 kWe (60 Hz); ряд 776–2535 kWe, КПД эл. до 44,4 %, до капремонта 84 000 ч — по данным разведки; в статичном HTML страницы MTU скептик этих цифр не нашёл, у engine-family.com 2530 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/applications/power-generation/power-generation-products/gas-generator-sets/natural-gas-generator-sets/gas-powered-series-4000.html",
+        "https://www.mtu-solutions.com/eu/en/applications/power-generation/campaigns/l64.html"
+      ],
+      "verified": false
+    },
+    {
+      "model": "8V/12V/16V/20V 4000 L61, L62, L63 (в т.ч. L62 FB)",
+      "kind": "газовый двигатель ГПУ (предыдущие типы)",
+      "segment": "ГПУ",
+      "rating": "н/д",
+      "status": "предыдущее поколение (статус выпуска не подтверждён)",
+      "sources": [
+        "https://www.rmwalshltd.co.uk/products/hatraco%C2%AE-pre-chamber-spark-plugs-mtu%C2%AE-4000-gas-engines",
+        "https://www.manualslib.com/manual/820857/Mtu-Gas-Engine8-V-4000-L62.html?page=57"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12V/16V 4000 GS L32, L33 (в т.ч. L32 FB, L32 ER)",
+      "kind": "газовый двигатель ГПУ",
+      "segment": "ГПУ",
+      "rating": "12V4000 GS L33 — 1286 kWe по данным поиска, не подтверждено; в таблице engine-family.com — 1152 kW",
+      "status": "предыдущее поколение (статус не подтверждён)",
+      "sources": [
+        "https://www.rmwalshltd.co.uk/products/hatraco%C2%AE-pre-chamber-spark-plugs-mtu%C2%AE-4000-gas-engines",
+        "https://www.amasenergy.com/3626-equipment-materials-gas-engine-generator-set-mtu-12v4000-gs50-engine-type-l32"
+      ],
+      "verified": false
+    },
+    {
+      "model": "12V/16V 4000 Lx4 (L64)",
+      "kind": "газовый двигатель",
+      "segment": "ГПУ",
+      "rating": "н/д",
+      "status": "выпускается",
+      "sources": [
+        "https://www.manualslib.com/manual/950295/Mtu-12-V-4000-Lx4.html?page=49"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MTU 6R400 GS (двигатель B3066 L8 / B3066 Z8)",
+      "kind": "газопоршневая генераторная установка (биогаз/природный газ)",
+      "segment": "ГПУ",
+      "rating": "175 / 200 kWel (60 Hz, биогаз); 6 цил. в ряд, 130/155 мм",
+      "status": "н/д (лист 2014 г.)",
+      "sources": [
+        "https://cdn.wajax.com/wp-content/uploads/2018/03/MTU-SERIES-400-BIOGAS.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MTU 12V400 GS (двигатель B3042 Z7)",
+      "kind": "газопоршневая генераторная установка",
+      "segment": "ГПУ",
+      "rating": "350 kWel (60 Hz, биогаз); V12 90°, 130/142 мм",
+      "status": "н/д (лист 2014 г.)",
+      "sources": [
+        "https://cdn.wajax.com/wp-content/uploads/2018/03/MTU-SERIES-400-BIOGAS.pdf",
+        "https://www.amasenergy.com/3601-equipment-materials-gas-engine-generator-set-mtu-12v400-gs-engine-type-b3042-z7"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12V 4000 C13R / C13 / C13L",
+      "kind": "дизельный двигатель (горная техника, C&I)",
+      "segment": "ГШО",
+      "rating": "1193 / — / 1425 kW при 1800 об/мин (12V C13R/C13L); режим 5A",
+      "status": "выпускается (лист 01/19)",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/products/industrial/series-4000/3232501_Industrial_spec_S4000Cx3.pdf/_jcr_content/renditions/original./3232501_Industrial_spec_S4000Cx3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "16V 4000 C13R / C13 / C13L",
+      "kind": "дизельный двигатель (горная техника)",
+      "segment": "ГШО",
+      "rating": "1492 / 1750 / 1865 kW",
+      "status": "выпускается (лист 01/19)",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/products/industrial/series-4000/3232501_Industrial_spec_S4000Cx3.pdf/_jcr_content/renditions/original./3232501_Industrial_spec_S4000Cx3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12V 4000 C23R / C23",
+      "kind": "дизельный двигатель горного самосвала",
+      "segment": "ГШО",
+      "rating": "1510 / 1680 kW при 1800/1900 об/мин; режим 5B",
+      "status": "выпускается (лист 01/19)",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/products/industrial/series-4000/3232501_Industrial_spec_S4000Cx3.pdf/_jcr_content/renditions/original./3232501_Industrial_spec_S4000Cx3.pdf",
+        "https://www.mtu-solutions.com/seai/en/stories/mining/haul-trucks/brazilian-mining-and-construction-company-repowers-fleet-with-mtu-engines-from-rolls-royce.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "16V 4000 C23R / C23",
+      "kind": "дизельный двигатель горного самосвала",
+      "segment": "ГШО",
+      "rating": "2013 / 2240 kW",
+      "status": "выпускается (лист 01/19)",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/products/industrial/series-4000/3232501_Industrial_spec_S4000Cx3.pdf/_jcr_content/renditions/original./3232501_Industrial_spec_S4000Cx3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "20V 4000 C23 / C23L",
+      "kind": "дизельный двигатель горного самосвала",
+      "segment": "ГШО",
+      "rating": "2800 / 3000 kW при 1800 об/мин",
+      "status": "выпускается (лист 01/19)",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/products/industrial/series-4000/3232501_Industrial_spec_S4000Cx3.pdf/_jcr_content/renditions/original./3232501_Industrial_spec_S4000Cx3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12V 4000 C33R / C33",
+      "kind": "дизельный двигатель (горная техника)",
+      "segment": "ГШО",
+      "rating": "1150 / 1450 kW",
+      "status": "выпускается (лист 01/19)",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/products/industrial/series-4000/3232501_Industrial_spec_S4000Cx3.pdf/_jcr_content/renditions/original./3232501_Industrial_spec_S4000Cx3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12V 4000 C03 / C21",
+      "kind": "дизельный двигатель для перемоторизации горных самосвалов (Komatsu 685); Hitachi EX5500-6 перемоторизуется на C13R, Komatsu 930 испытывали с C23",
+      "segment": "ГШО",
+      "rating": "н/д",
+      "status": "применяется (C03 — предыдущее поколение)",
+      "sources": [
+        "https://www.mtu-solutions.com/seai/en/stories/mining/haul-trucks/brazilian-mining-and-construction-company-repowers-fleet-with-mtu-engines-from-rolls-royce.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "20V 4000 C22 / C23 (Liebherr T 282 C); DDC/MTU 20V4000 (T 282 B, Bucyrus MT6300AC)",
+      "kind": "дизельный двигатель горного самосвала",
+      "segment": "ГШО",
+      "rating": "2722 kW (T 282); 2800 kW (MT6300AC)",
+      "status": "в эксплуатации",
+      "sources": [
+        "https://en.wikipedia.org/wiki/Liebherr_T_282_series",
+        "https://en.wikipedia.org/wiki/Bucyrus_MT6300AC"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MTU DD 16V4000 (2 шт. на BelAZ 75710)",
+      "kind": "дизельный двигатель горного самосвала",
+      "segment": "ГШО",
+      "rating": "1715 kW каждый",
+      "status": "в эксплуатации",
+      "sources": [
+        "https://en.wikipedia.org/wiki/BelAZ_75710"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Operating Instructions, Diesel Engine 12V/16V 4000 G23, G43, G63, G83 (Kohler TP-6503)",
+      "doc_no": "M015710/01E",
+      "machine": "12V/16V 4000 Gx3 (дизель)",
+      "kind": "O&M",
+      "sources": [
+        "https://resources.kohler.com/power/kohler/industrial/pdf/tp6503.pdf"
+      ]
+    },
+    {
+      "title": "Operating Instructions 12 V 4000 Lx4 / 16 V 4000 Lx4",
+      "doc_no": "MS15027/00E (2013-10)",
+      "machine": "12V/16V 4000 L64 (газ)",
+      "kind": "O&M",
+      "sources": [
+        "https://www.manualslib.com/manual/950295/Mtu-12-V-4000-Lx4.html?page=49"
+      ]
+    },
+    {
+      "title": "Operating Instructions Gas engine 8 V 4000 L62",
+      "doc_no": "MS150032/02E (2012-07)",
+      "machine": "8V 4000 L62 (газ)",
+      "kind": "O&M",
+      "sources": [
+        "https://www.manualslib.com/manual/820857/Mtu-Gas-Engine8-V-4000-L62.html?page=57"
+      ]
+    },
+    {
+      "title": "MTU Fluids and Lubricants Specifications",
+      "doc_no": "A001061",
+      "machine": "все серии, включая Series 4000",
+      "kind": "service manual (спецификация эксплуатационных материалов)",
+      "sources": [
+        "https://resources.kohler.com/power/kohler/industrial/pdf/tp6503.pdf"
+      ]
+    },
+    {
+      "title": "Series 4000 Cx3 Industrial for C&I and Mining applications (технический лист)",
+      "doc_no": "3232501, Edition 01/19",
+      "machine": "12V/16V/20V 4000 C13/C23/C33",
+      "kind": "техническое описание",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/products/industrial/series-4000/3232501_Industrial_spec_S4000Cx3.pdf/_jcr_content/renditions/original./3232501_Industrial_spec_S4000Cx3.pdf"
+      ]
+    },
+    {
+      "title": "Gas System Series 400 Biogas 480V/60 Hz (технический лист)",
+      "doc_no": "3236771, Edition 02/14",
+      "machine": "6R400 GS, 12V400 GS",
+      "kind": "техническое описание",
+      "sources": [
+        "https://cdn.wajax.com/wp-content/uploads/2018/03/MTU-SERIES-400-BIOGAS.pdf"
+      ]
+    },
+    {
+      "title": "Series 4000 Biogas 480V/60 Hz (технический лист)",
+      "doc_no": "3237271",
+      "machine": "8V/12V/16V/20V 4000 GS",
+      "kind": "техническое описание",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/application/power-generation/series/biogas-4000/3237271_PG_spec_8V12V16V20V4000GS_3A_BG_NOx1_60Hz_NOx500_50Hz_NOx500_60Hz.pdf/_jcr_content/renditions/original./3237271_PG_spec_8V12V16V20V4000GS_3A_BG_NOx1_60Hz_NOx500_50Hz_NOx500_60Hz.pdf"
+      ]
+    },
+    {
+      "title": "Series 4000 Natural Gas 480V/60 Hz NOx<1 g/bhp-hr (технический лист)",
+      "doc_no": "3237301",
+      "machine": "8V/12V/16V/20V 4000 GS",
+      "kind": "техническое описание",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/products/power-generation/powergeneration-product-list-latest/3237301_PG_spec_8V12V16V20V4000_3A_NG_NOx1_60Hz.pdf/_jcr_content/renditions/original./3237301_PG_spec_8V12V16V20V4000_3A_NG_NOx1_60Hz.pdf"
+      ]
+    },
+    {
+      "title": "Gendrive Series 4000 Nomenclature Overview (Edition 1/19)",
+      "machine": "Series 4000 Gendrive",
+      "kind": "справочник обозначений",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/download/applications/power-generation/MTU_Gendrive_S4000_NOMENCLATURE_OVERVIEW.pdf/_jcr_content/renditions/original./MTU_Gendrive_S4000_NOMENCLATURE_OVERVIEW.pdf"
+      ]
+    },
+    {
+      "title": "Natural Gas Series 4000 brochure",
+      "doc_no": "16120795",
+      "machine": "Series 4000 GS L64",
+      "kind": "проспект",
+      "sources": [
+        "https://www.mtu-solutions.com/content/dam/mtu/download/applications/power-generation/16120795_PG_NaturalGas_S4000_brochure.pdf"
+      ]
+    },
+    {
+      "title": "MTU 4000 Maintenance Schedule (копия на Scribd, не проверена)",
+      "machine": "Series 4000",
+      "kind": "график ТО",
+      "sources": [
+        "https://www.scribd.com/doc/241085622/MTU-4000-Maintenance-Schedule"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "X52404500056",
+      "issuer": "MTU",
+      "description": "Свеча зажигания (SPARKPLUG); заменяет X52404500062",
+      "machine": "Series 4000 газ (8V/12V/16V/20V L64, L32, L33, FB)",
+      "unit": "система зажигания",
+      "source_url": "https://engine-family.com/part-product/x52404500056-sparkplug",
+      "quote": "Part Number: X52404500056 Description: \"SPARKPLUG\" Application: MTU 4000 GAS Engine ... Supersedes X52404500062"
+    },
+    {
+      "code": "X52404500062",
+      "issuer": "MTU",
+      "description": "Свеча зажигания (заменена на X52404500056)",
+      "machine": "Series 4000 газ (16V4000 L61, 12V4000 L33)",
+      "unit": "система зажигания",
+      "source_url": "https://engine-family.com/part-product/x52404500056-sparkplug",
+      "quote": "Supersedes X52404500062 (effective date N/A)"
+    },
+    {
+      "code": "X52404500049",
+      "issuer": "MTU",
+      "description": "Свеча зажигания (перекрёстная таблица аналога TAKUMI R6GC1-77M)",
+      "machine": "16V4000 L61/L62/L63/L62FB",
+      "unit": "система зажигания",
+      "source_url": "https://www.generatorsparkplug.com/sale-14255971-spark-plug-mtu-x52404500056-for-mtu-series-4000-gas-engines.html",
+      "quote": "MTU: X52404500049, X52404500056, X52404500062, X52404500050, X52404500052, X52404500027, X52404500039"
+    },
+    {
+      "code": "X52404500050",
+      "issuer": "MTU",
+      "description": "Свеча зажигания (регулярное ТО)",
+      "machine": "MTU 8V4000, 12V4000, 20V4000 газ",
+      "unit": "система зажигания",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml",
+      "quote": "Уплотнения под клапанные крышки 52400160321, масляные фильтры 0031845301, свечи зажигания X52404500050, воздушные фильтры X00005776"
+    },
+    {
+      "code": "X52404500034",
+      "issuer": "MTU",
+      "description": "Провод зажигания (Ignition Line), к свече X52404500056",
+      "machine": "Series 4000 газ",
+      "unit": "система зажигания",
+      "source_url": "https://engine-family.com/part-product/x52404500056-sparkplug",
+      "quote": "Related Components (per technical diagram): Ignition Line: X52404500034"
+    },
+    {
+      "code": "18.025-01",
+      "issuer": "Hatraco (аналог, не MTU)",
+      "description": "Форкамерная свеча Hatraco для всех газовых MTU 4000",
+      "machine": "4000 L61/L62/L63/L32/L33/L64, L62 FB, L32 FB, L64 FNER",
+      "unit": "система зажигания",
+      "source_url": "https://www.rmwalshltd.co.uk/products/hatraco%C2%AE-pre-chamber-spark-plugs-mtu%C2%AE-4000-gas-engines",
+      "quote": "Product Reference: 18.025-01 ... MTU X52 4045 000 49 ... MTU X52 4045 000 56"
+    },
+    {
+      "code": "18VGZ1-77",
+      "issuer": "Federal-Mogul/BERU (аналог по перекрёстной таблице)",
+      "description": "Свеча зажигания, аналог MTU X52404500056",
+      "machine": "MTU 4000 газ",
+      "unit": "система зажигания",
+      "source_url": "https://www.generatorsparkplug.com/sale-14255971-spark-plug-mtu-x52404500056-for-mtu-series-4000-gas-engines.html",
+      "quote": "Federal Mogul/BERU: 0004.800.986.00.07, 18VGZ1-77"
+    },
+    {
+      "code": "F30452574",
+      "issuer": "MTU",
+      "description": "Ключ свечной 20,8 мм (спецоснастка; соответствие номера ключу выведено из порядка строк в списке инструментов)",
+      "machine": "8V 4000 L62",
+      "unit": "система зажигания / инструмент",
+      "doc_ref": "MS150032/02E",
+      "source_url": "https://www.manualslib.com/manual/820857/Mtu-Gas-Engine8-V-4000-L62.html?page=57",
+      "quote": "Spark plug socket wrench: 20.8 mm (Part No. F30452574)"
+    },
+    {
+      "code": "X00E50203606/S0002",
+      "issuer": "MTU",
+      "description": "Модуль детонации для газового двигателя (KNOCKING MODULE FOR GAS ENGINE)",
+      "machine": "Series 4000 газ 8V–20V, 1500 об/мин",
+      "unit": "система управления / контроль детонации",
+      "source_url": "https://engine-family.com/part-product/x00e50203606-s0002-knocking-module",
+      "quote": "Part Number: X00E50203606/S0002 Description: \"KNOCKING MODULE FOR GAS ENGINE\""
+    },
+    {
+      "code": "X00040012",
+      "issuer": "MTU",
+      "description": "Датчик частоты вращения (газовые двигатели)",
+      "machine": "Series 4000 газ, 764–2516 kW",
+      "unit": "датчики",
+      "source_url": "https://engine-family.com/part-product/x00040012-speed-sensor",
+      "quote": "Part Number: X00040012 Description: \"SPEED SENSOR\" Application: MTU 4000 Engine Family (gas engines)"
+    },
+    {
+      "code": "0031845301",
+      "issuer": "MTU",
+      "description": "Масляный фильтр навинчиваемый (OIL FILTER SPIN-ON); заменяет 0031844201, S-25033469, SUA93192",
+      "machine": "MTU 8V/12V/20V4000 газ; Series 2000",
+      "unit": "система смазки",
+      "source_url": "https://engine-family.com/part-product/0031845301-oil-filter-spin-on",
+      "quote": "Part Number: \"0031845301\" Description: \"OIL FILTER SPIN-ON\""
+    },
+    {
+      "code": "X00005776",
+      "issuer": "MTU",
+      "description": "Воздушный фильтр (регулярное ТО)",
+      "machine": "MTU 8V4000, 12V4000, 20V4000 газ",
+      "unit": "впуск воздуха",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml",
+      "quote": "свечи зажигания X52404500050, воздушные фильтры X00005776"
+    },
+    {
+      "code": "XP52401800026",
+      "issuer": "MTU",
+      "description": "Фильтр вентиляции картера",
+      "machine": "MTU 8V4000, 12V4000, 20V4000 газ",
+      "unit": "вентиляция картера",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml",
+      "quote": "фильтры вентиляции картера XP52401800026, XP52401800027"
+    },
+    {
+      "code": "XP52401800027",
+      "issuer": "MTU",
+      "description": "Фильтр вентиляции картера",
+      "machine": "MTU 8V4000, 12V4000, 20V4000 газ",
+      "unit": "вентиляция картера",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml",
+      "quote": "фильтры вентиляции картера XP52401800026, XP52401800027"
+    },
+    {
+      "code": "52400160321",
+      "issuer": "MTU (как записано у сервисника)",
+      "description": "Уплотнение крышки клапанов",
+      "machine": "MTU 8V4000, 12V4000, 20V4000 газ",
+      "unit": "головка цилиндра",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml",
+      "quote": "Уплотнения под клапанные крышки 52400160321"
+    },
+    {
+      "code": "X59301300029",
+      "issuer": "MTU",
+      "description": "Гильза цилиндра (верхний ремонт)",
+      "machine": "MTU 8V/12V/20V4000 газ",
+      "unit": "цилиндропоршневая группа",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml",
+      "quote": "Гильзы X59301300029, поршни X52403700195, втулки шатуна 5240382550"
+    },
+    {
+      "code": "X52403700195",
+      "issuer": "MTU",
+      "description": "Поршень (верхний ремонт)",
+      "machine": "MTU 8V/12V/20V4000 газ",
+      "unit": "цилиндропоршневая группа",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml",
+      "quote": "Гильзы X59301300029, поршни X52403700195, втулки шатуна 5240382550"
+    },
+    {
+      "code": "X52604100093",
+      "issuer": "MTU",
+      "description": "Головка цилиндра",
+      "machine": "MTU 8V/12V/20V4000 газ",
+      "unit": "головка цилиндра",
+      "source_url": "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml",
+      "quote": "головки цилиндров X52604100093"
+    },
+    {
+      "code": "EX52407500064",
+      "issuer": "MTU",
+      "description": "Форсунка (INJECTOR), обменная; заменяет X52407500049, X52407500038 и др.",
+      "machine": "Series 4000 дизель 8V–20V, 746–3900 kW",
+      "unit": "топливная система (common rail)",
+      "source_url": "https://engine-family.com/part-product/ex52407500064-injector",
+      "quote": "Part Number: \"EX52407500064\" Description: \"INJECTOR\" Application: MTU 4000 Engine family"
+    },
+    {
+      "code": "X52907500116",
+      "issuer": "MTU (изготовитель форсунки — L'Orange, VTO-G10015A)",
+      "description": "Дизельная форсунка L'Orange",
+      "machine": "Series 4000 дизель",
+      "unit": "топливная система",
+      "source_url": "https://www.dieseldb.info/category/mtu/mtu-injectors/",
+      "quote": "X52907500116 MTU VTO-G10015A L'ORANGE diesel injector"
+    },
+    {
+      "code": "X52907500128",
+      "issuer": "MTU (изготовитель форсунки — L'Orange, VTO-G10051A)",
+      "description": "Дизельная форсунка L'Orange",
+      "machine": "Series 4000 дизель",
+      "unit": "топливная система",
+      "source_url": "https://www.dieseldb.info/category/mtu/mtu-injectors/",
+      "quote": "X52907500128 MTU VTO-G10051A L'Orange diesel injector"
+    },
+    {
+      "code": "X52907500108",
+      "issuer": "MTU (изготовитель форсунки — L'Orange, VTO-G308042S3)",
+      "description": "Дизельная форсунка L'Orange",
+      "machine": "Series 4000 дизель",
+      "unit": "топливная система",
+      "source_url": "https://www.dieseldb.info/category/mtu/mtu-injectors/",
+      "quote": "X52907500108 – VTO-G308042S3 L'Orange diesel injector for MTU 4000 engine"
+    },
+    {
+      "code": "F6784183",
+      "issuer": "MTU",
+      "description": "Съёмник форсунки (спецоснастка); к нему пресс-инструмент F6784167",
+      "machine": "12V/16V 4000 G23/G43/G63/G83",
+      "unit": "топливная система / инструмент",
+      "doc_ref": "M015710/01E, 6.5.2 Injector – Removal and Installation",
+      "source_url": "https://resources.kohler.com/power/kohler/industrial/pdf/tp6503.pdf",
+      "quote": "Puller                                                                           F6784183           1"
+    },
+    {
+      "code": "X57508300091",
+      "issuer": "MTU",
+      "description": "Топливный фильтр EasyChange (заменён на X59408300151)",
+      "machine": "Series 4000 дизель 8V–20V",
+      "unit": "топливная система",
+      "source_url": "https://engine-family.com/part-product/x57508300091-fuel-filter-spin-on",
+      "quote": "Part Number: X57508300091 Description: \"EASYCHANGE FUEL FLTR\" ... Superseded by: X59408300151 (effective 2018/03/06)"
+    },
+    {
+      "code": "XP59408300054",
+      "issuer": "MTU (картридж FBO60337; изготовитель Racor выведен по обозначению, в источнике не назван)",
+      "description": "Фильтр-картридж топливный, 5 мкм, 2 шт. на двигатель",
+      "machine": "Series 4000 дизель (R43, R54, R64, R84, M73L, R63)",
+      "unit": "топливная система",
+      "source_url": "https://engine-family.com/part-product/xp59408300054-filter-cartridge",
+      "quote": "Part Number: XP59408300054 ... \"FILTER CARTRIDGE FBO60337 14\" -5 MIC\""
+    },
+    {
+      "code": "XP52618300032",
+      "issuer": "MTU",
+      "description": "Элемент масляного фильтра (заменяет X00003620)",
+      "machine": "Series 4000 дизель 8V–20V R43/R54/R64/R84, C11",
+      "unit": "система смазки",
+      "source_url": "https://engine-family.com/part-product/xp52618300032-oil-filter-element",
+      "quote": "Part Number: XP52618300032 Description: \"OIL FILTER ELEMENT\""
+    },
+    {
+      "code": "23540455",
+      "issuer": "MTU",
+      "description": "Центробежный масляный фильтр в сборе",
+      "machine": "Series 4000 (8V M63, 12V M65L, 16V M63L, 20V M65L)",
+      "unit": "система смазки",
+      "source_url": "https://engine-family.com/part-product/23540455-centrifugal-oil-filter-asm",
+      "quote": "Part Number: 23540455 Description: \"CENTRIFUGAL OIL FILTER ASM\""
+    },
+    {
+      "code": "0180943002",
+      "issuer": "MTU",
+      "description": "Воздушный фильтр, очищаемый (пара 4592056116)",
+      "machine": "Series 4000",
+      "unit": "впуск воздуха",
+      "source_url": "https://mpwfilter.com/mtu-filters/mtu-4000-series-engine/",
+      "quote": "MTU 4000 Cleanable Air Filter Replacement 0180943002/4592056116"
+    },
+    {
+      "code": "X59320200040",
+      "issuer": "MTU",
+      "description": "Фильтр охлаждающей жидкости",
+      "machine": "Series 2000/4000",
+      "unit": "система охлаждения",
+      "source_url": "https://mpwfilter.com/mtu-filters/mtu-4000-series-engine/",
+      "quote": "MTU 2000/4000 Coolant Filter Replacement for X59320200040"
+    },
+    {
+      "code": "X00E50201372",
+      "issuer": "MTU",
+      "description": "Датчик температуры M14x1,5 (заменён на X00E50210379)",
+      "machine": "Series 4000 дизель R43/R54/R64/R84",
+      "unit": "датчики",
+      "source_url": "https://engine-family.com/part-product/x00e50201372-temperature-sensor",
+      "quote": "Part Number: X00E50201372 Description: \"TEMPERATURE SENSOR\" ... Superseded by: X00E50210379"
+    },
+    {
+      "code": "X00E50207213",
+      "issuer": "MTU",
+      "description": "Датчик давления, конус M14x1,5 (заменяет 0035353931, X00038945)",
+      "machine": "Series 4000 8V–20V",
+      "unit": "датчики",
+      "source_url": "https://engine-family.com/part-product/x00e50207213-pressure-sensor",
+      "quote": "Part Number: X00E50207213 Description: \"PRESSURE SENSOR\""
+    },
+    {
+      "code": "X52404200052",
+      "issuer": "MTU",
+      "description": "Уплотнительное кольцо (заменяет 5240160119, 5240160319)",
+      "machine": "Series 4000 8V–20V",
+      "unit": "головка цилиндра / уплотнения",
+      "source_url": "https://engine-family.com/part-product/x52404200052-seal-ring",
+      "quote": "Part Number: X52404200052 Description: \"SEAL RING\""
+    },
+    {
+      "code": "5240530805",
+      "issuer": "MTU",
+      "description": "Выпускной клапан (заменён на X52404100241 с 14.04.2022)",
+      "machine": "Series 4000 8V R43 … 20V R63L",
+      "unit": "газораспределение",
+      "source_url": "https://engine-family.com/part-product/5240530805-exhaust-valve",
+      "quote": "Part Number: 5240530805 Description: \"EXHAUST VALVE\" ... superseded by \"X52404100241\""
+    },
+    {
+      "code": "X52808100004",
+      "issuer": "MTU",
+      "description": "Топливоподкачивающий насос (заменён на X52808100015)",
+      "machine": "Series 4000 дизель 8V–20V",
+      "unit": "топливная система",
+      "source_url": "https://engine-family.com/part-product/x52808100004-fuel-delivery-pump",
+      "quote": "Part Number: X52808100004 Description: \"FUEL DELIVERY PUMP\""
+    },
+    {
+      "code": "F30379104",
+      "issuer": "MTU",
+      "description": "Ключ для фильтров (спецоснастка к замене топливного фильтра)",
+      "machine": "12V/16V 4000 Gx3",
+      "unit": "топливная система / инструмент",
+      "doc_ref": "M015710/01E, 6.7.1 Fuel filter – Replacement",
+      "source_url": "https://resources.kohler.com/power/kohler/industrial/pdf/tp6503.pdf",
+      "quote": "Filter wrench                                                                    F30379104   1"
+    },
+    {
+      "code": "5605892099/00",
+      "issuer": "MTU",
+      "description": "Контрольный набор MTU (проверка охлаждающей жидкости)",
+      "machine": "12V/16V 4000 Gx3",
+      "unit": "система охлаждения / инструмент",
+      "doc_ref": "M015710/01E",
+      "source_url": "https://resources.kohler.com/power/kohler/industrial/pdf/tp6503.pdf",
+      "quote": "MTU test kit                                                                  5605892099/00   1"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Woodward L'Orange GmbH (до 2018 — в составе MTU/Tognum/Rolls-Royce Power Systems)",
+      "component": "Дизельные форсунки и топливная аппаратура",
+      "machine": "Series 4000 дизель",
+      "evidence": "Пары номеров MTU и L'Orange в открытой базе форсунок: X52907500116 = VTO-G10015A, X52907500128 = VTO-G10051A, X52907500108 = VTO-G308042S3. В Википедии: L'Orange продана MTU в 1995 г., передана Woodward в 2018 г.",
+      "sources": [
+        "https://www.dieseldb.info/category/mtu/mtu-injectors/",
+        "https://en.wikipedia.org/wiki/L%27Orange_GmbH"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Racor (Parker Hannifin)",
+      "component": "Фильтр-картридж топливный FBO60337, 5 мкм",
+      "machine": "Series 4000 дизель",
+      "evidence": "На странице детали MTU XP59408300054 позиция названа «FILTER CARTRIDGE FBO60337»; FBO — обозначение картриджей Racor. Вывод о Racor — прочтение обозначения разведкой, скептиком не подтверждён, в тексте источника имени изготовителя нет.",
+      "sources": [
+        "https://engine-family.com/part-product/xp59408300054-filter-cartridge",
+        "https://mpwfilter.com/mtu-filters/mtu-4000-series-engine/"
+      ],
+      "verified": false
+    },
+    {
+      "company": "MTU Yuchai Power (СП Rolls-Royce Power Systems и Guangxi Yuchai Machinery)",
+      "component": "Сборка двигателей Series 4000 в Китае (1400–3490 kW, China Tier 3)",
+      "machine": "Series 4000 для энергетики и нефтегаза",
+      "evidence": "Пресс-релиз Rolls-Royce 2018 г. о выпуске первого Series 4000 в Юйлине; пресс-релиз 2024 г. о расширении программы",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases/2018/10-04-2018-mtu-yuchai-power-celebrates-production-of-the-first-mtu-series-4000-engine.aspx",
+        "https://www.rolls-royce.com/media/press-releases/2024/13-08-2024-rr-and-yuchai-intensify-co-operation.aspx"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Federal-Mogul / BERU (Tenneco)",
+      "component": "Свечи зажигания; в перекрёстной таблице аналог 18VGZ1-77",
+      "machine": "Series 4000 газ",
+      "evidence": "Только перекрёстная таблица продавца аналогов (TAKUMI). Что BERU — поставщик свечей на конвейер MTU, НЕ подтверждено.",
+      "sources": [
+        "https://www.generatorsparkplug.com/sale-14255971-spark-plug-mtu-x52404500056-for-mtu-series-4000-gas-engines.html"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Hatraco",
+      "component": "Форкамерные свечи 18.025-01 (аналог рынка запчастей)",
+      "machine": "Series 4000 газ L61–L64",
+      "evidence": "Каталог дистрибьютора R&M Walsh: «One plug for all MTU 4000 gas engines». Изделие рынка запчастей, а не поставка MTU.",
+      "sources": [
+        "https://www.rmwalshltd.co.uk/products/hatraco%C2%AE-pre-chamber-spark-plugs-mtu%C2%AE-4000-gas-engines"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Donaldson",
+      "component": "Топливный фильтр DBB8666, аналог MTU X52908300012",
+      "machine": "Series 4000",
+      "evidence": "Строка в магазине фильтров: «Bulk Fuel Filter DBB8666 For Donaldson Blue MTU X52908300012». Аналог рынка запчастей.",
+      "sources": [
+        "https://mpwfilter.com/mtu-filters/mtu-4000-series-engine/"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Rolls-Royce Solutions (Suzhou) Co., Ltd. (филиалы в Пекине, Шанхае и Даляне)",
+      "country": "Китай",
+      "role": "дочерняя компания изготовителя: продажи и сервис",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/about-us/global-presence.html"
+      ]
+    },
+    {
+      "company": "Rolls-Royce Solutions Hong Kong Ltd",
+      "country": "Китай (Гонконг)",
+      "role": "дочерняя компания изготовителя",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/about-us/global-presence.html"
+      ]
+    },
+    {
+      "company": "VPower Group",
+      "country": "Китай",
+      "role": "официальный дистрибьютор газовых генераторных установок и судовых двигателей MTU в Китае (с 2020 г.)",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases/2020/27-03-2020-vpower-group-is-new-distributor-for-rolls-royces-mtu-solutions-in-china.aspx"
+      ]
+    },
+    {
+      "company": "MTU Yuchai Power",
+      "country": "Китай",
+      "role": "совместное предприятие: производит Series 4000",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases/2018/10-04-2018-mtu-yuchai-power-celebrates-production-of-the-first-mtu-series-4000-engine.aspx"
+      ]
+    },
+    {
+      "company": "Rolls-Royce Solutions Enerji Deniz ve Savunma A.Ş.",
+      "country": "Турция",
+      "role": "дочерняя компания изготовителя (Стамбул)",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/about-us/global-presence.html"
+      ]
+    },
+    {
+      "company": "Rolls-Royce Solutions Middle East FZE",
+      "country": "ОАЭ",
+      "role": "дочерняя компания изготовителя (Дубай)",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/about-us/global-presence.html"
+      ]
+    },
+    {
+      "company": "MTU India Private Ltd.",
+      "country": "Индия",
+      "role": "дочерняя компания изготовителя (Пуна)",
+      "sources": [
+        "https://www.mtu-solutions.com/eu/en/about-us/global-presence.html"
+      ]
+    },
+    {
+      "company": "Apollo Power Systems",
+      "country": "Индия",
+      "role": "партнёр по продажам и сервису MTU India (по заявлению самой компании, не проверено)",
+      "sources": [
+        "https://www.apollopowersystems.com/how-small-facility-management-changes-can-make-major-impact-on-business/"
+      ]
+    },
+    {
+      "company": "ООО «Газмоторсервис»",
+      "country": "Россия",
+      "role": "сервис газопоршневых MTU 8V/16V/20V4000 и запчасти; официальный статус у MTU не подтверждён (заявлено партнёрство с Heinzmann, Motortech, MANN-FILTER, Bosch)",
+      "sources": [
+        "https://www.gasmotorservice.ru/parts/motorparts/mtu.phtml"
+      ]
+    },
+    {
+      "company": "MOTOR INDUSTRY",
+      "country": "Россия",
+      "role": "по выдаче поиска называет себя официальным сервисным партнёром MTU с 2007 г.; страница не открывалась, после ухода Rolls-Royce из России статус не подтверждён",
+      "sources": [
+        "https://motor-industry.ru/product-category/parts/spare-engines/"
+      ]
+    },
+    {
+      "company": "Eurasian Machinery",
+      "country": "Казахстан",
+      "role": "поставка и поддержка ГПУ MTU (8V4000 GS, 12V400 GS) в Казахстане, Кыргызстане, Узбекистане, Туркменистане и Таджикистане; официальный статус на странице не указан",
+      "sources": [
+        "https://www.eurasianmachinery.kz/en/catalog/power-systems/kopiya-gazoporshnevyie-ustanovki/mtu-12v400-gs"
+      ]
+    },
+    {
+      "company": "mtu do Brasil (при поддержке mtu America и mtu Peru)",
+      "country": "Бразилия",
+      "role": "дочерняя компания изготовителя: перемоторизация и сервис горных самосвалов",
+      "sources": [
+        "https://www.mtu-solutions.com/seai/en/stories/mining/haul-trucks/brazilian-mining-and-construction-company-repowers-fleet-with-mtu-engines-from-rolls-royce.html"
+      ]
+    },
+    {
+      "company": "W.W. Williams",
+      "country": "США",
+      "role": "дистрибьютор и сервис MTU (энергетика)",
+      "sources": [
+        "https://www.wwwilliams.com/mtu-power-generation/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Оригинальные каталоги запчастей MTU (Spare Parts Catalog / Parts List) по конкретным серийным номерам в открытом доступе не найдены. Они лежат в закрытом дилерском портале изготовителя (MTU Go! / Rolls-Royce Solutions) и у сервисных партнёров.",
+    "Series 400 (6R400 GS / B3066, 12V400 GS / B3042): не найдено ни одного кода запчастей — ни свечей, ни фильтров. Руководств с номерами публикаций тоже нет. Вероятные источники: дилеры бывшей MTU Onsite Energy (MDE), сайты ГПУ-сервисников Германии, например onergys.de (сайт отдаёт 403 автоматическому клиенту).",
+    "Текущий статус выпуска Series 400 не подтверждён: в найденных технических листах редакция 2014 г.",
+    "График ТО Series 4000 газ и дизель (Maintenance Schedule) с интервалами замены свечей и фильтров найден только как копия на Scribd, без проверки. Оригинальные номера публикаций MS… не установлены.",
+    "Коды расходников для горных C13/C23 (воздушные фильтры самосвальной компоновки, форсунки по поколениям) у изготовителя в открытом виде не найдены. Коды дизельных фильтров и форсунок взяты у перекупщиков и из общих таблиц Series 4000 без привязки к C-типу.",
+    "Кто поставляет турбокомпрессоры для газовых L64 и дизельных C23, из открытых источников не установлено: MTU делает часть турбокомпрессоров сама, внешний поставщик не назван.",
+    "Изготовитель системы зажигания газовых Series 4000 (по MTU — высоковольтная конденсаторная система, катушка на цилиндр) не назван в открытых документах MTU. Heinzmann, Motortech и Altronic встречаются только как поставщики аналогов.",
+    "Официальные дилеры MTU в России после 2022 г. не подтверждены: на странице глобального присутствия нет ни России, ни Казахстана. Сервисники, названные выше, указаны по их собственным заявлениям.",
+    "Номер X52401800018 (маслоотделитель для MTU 4000, ONERGYS ONE115406) виден только в выдаче поиска: страница onergys.de закрыта для загрузки, поэтому в коды он не внесён.",
+    "Дословность цитат: у большинства страниц (engine-family.com, dieseldb, gasmotorservice, manualslib) текст получен через выжимку инструментом загрузки. Скептик нашёл на страницах все номера, но формулировки цитат вокруг номера символ в символ не сверялись."
+  ],
+  "verifier_notes": "Страницы скачаны через curl, в них искались коды. dieseldb.info с первой попытки сбросил соединение, со второй открылся. Все 36 кодов на страницах-источниках нашлись. Оговорки. (1) F30452574: соответствие свечному ключу 20,8 мм выведено из порядка строк в списке инструментов. (2) Мощности L64 из записей (1013/1521/2538 kWe) в статичном HTML сайта MTU не найдены; на engine-family.com 1012/1523/2028/2530 kW. (3) 12V4000 GS L33 = 1286 kWe не подтверждено, в таблице engine-family указано 1152 kW. (4) 12V 4000 C03/C21: Hitachi EX5500-6 перемоторизуется на C13R, Komatsu 930 испытывали с C23. (5) Racor не подтверждён: изготовитель выведен из обозначения FBO. Скачанные страницы лежали в рабочей папке сессии скептика, в репозиторий не входят.",
+  "corrections": [
+    "summary: число кодов исправлено с 34 на 36 — столько записей в parts и столько нашёл скептик; Racor помечен как неподтверждённый",
+    "F30452574: в описании оговорено, что соответствие свечному ключу 20,8 мм выведено из порядка строк (замечание скептика 1)",
+    "8V/12V/16V/20V 4000 GS (L64): verified: false, в rating оговорка — мощности со страницы MTU скептик в статичном HTML не нашёл, у engine-family.com 1012/1523/2028/2530 kW (замечание скептика 2)",
+    "12V/16V 4000 GS L32, L33: verified: false, мощность 1286 kWe помечена как неподтверждённая, добавлено 1152 kW по engine-family.com (замечание скептика 3)",
+    "12V 4000 C03/C21: из kind убраны Hitachi EX5500-6 и Komatsu 930 как машины этого типа — по источнику EX5500-6 идёт с C13R, Komatsu 930 испытывали с C23 (замечание скептика 4)",
+    "Racor: verified: false, в evidence и в issuer кода XP59408300054 оговорено, что изготовитель выведен из обозначения FBO (замечание скептика 5)",
+    "sub_suppliers: проставлено verified — Woodward L'Orange (пары номеров на странице подтверждены), MTU Yuchai, Hatraco и Donaldson (как изготовители аналогов) true; Federal-Mogul/BERU false — поставка на конвейер MTU не подтверждена, только кросс-таблица",
+    "gaps: пробел о дословности цитат переписан по итогу скептика — номера подтверждены, формулировки вокруг них не сверялись",
+    "verifier_notes: локальный путь к скачанным страницам заменён словами — в репозитории его нет"
+  ]
+}
