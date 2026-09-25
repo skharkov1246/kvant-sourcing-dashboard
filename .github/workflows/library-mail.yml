@@ -56,6 +56,10 @@ on:
         description: "Разбирать и тексты писем (портал за них не платит: текст приходит списком писем)"
         type: boolean
         default: false
+      files:
+        description: "Брать вложения (без них отметка не сдвигается — вложения этих писем возьмёт следующий прогон)"
+        type: boolean
+        default: true
       bitrix_rps:
         # Для mail-lead вход НЕ действует: там всегда 0.3 (см. шаг разбора).
         description: "Запросов в секунду к порталу на ВЕСЬ прогон (кроме лидов — у них всегда 0.3)"
@@ -182,6 +186,9 @@ jobs:
           # (library/mail_source.тело_письма). Отметка группы общая с
           # вложениями: пачка, записанная без тел, тела уже не отдаст.
           MAIL_BODIES: ${{ inputs.bodies && '1' || '' }}
+          # Без вложений — только тела: замер тел не тратит запрос disk.file.get
+          # на каждое вложение (без прав на Диск все они — отказ).
+          MAIL_FILES: ${{ inputs.files && '1' || '0' }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           SOURCE: mail
           MAIL_GROUP: ${{ inputs.group }}
@@ -217,7 +224,9 @@ jobs:
   # часть отметку не двигает, и следующий запуск перечитает ту же пачку.
   cursor:
     needs: [plan, index]
-    if: inputs.apply && needs.plan.outputs.mail_count != '0'
+    # Без вложений отметку не двигаем: пачка, записанная одними телами, иначе
+    # навсегда потеряла бы свои вложения. Перечитанные тела отсеются по lib_files.
+    if: inputs.apply && inputs.files && needs.plan.outputs.mail_count != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

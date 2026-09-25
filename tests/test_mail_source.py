@@ -583,3 +583,16 @@ def test_тело_письма_разбирается_без_запроса_к_�
     assert rec["file_id"] == "mail-body:8" and rec["status"] != "не скачался"
     имена = " ".join(it["item_name"] for it in items)
     assert "ВЫД-6205" in имена and "УВ-40х52" in имена and "МВ-9" not in имена
+
+
+def test_без_вложений_только_тела_и_отметка_стоит(monkeypatch):
+    """Замер одних тел не тратит disk.file.get на вложения, а отметка группы
+    не двигается: иначе вложения этих писем пропали бы навсегда."""
+    monkeypatch.setenv("MAIL_BODIES", "1")
+    monkeypatch.setenv("MAIL_FILES", "0")
+    п = письмо_с_телом(5, ТЕЛО_HTML, файлы=[77, 78])
+    assert [r["file_id"] for r in ms.ссылки_письма(п, "mail-deal")] == ["mail-body:5"]
+    monkeypatch.delenv("MAIL_FILES")
+    assert [r["file_id"] for r in ms.ссылки_письма(п, "mail-deal")] == ["mail:77", "mail:78", "mail-body:5"]
+    шаг = yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))["jobs"]["cursor"]["if"]
+    assert "inputs.files" in шаг and "inputs.apply" in шаг
