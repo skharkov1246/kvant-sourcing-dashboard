@@ -259,7 +259,9 @@ def _бренды(ents_по_ci):
                                "cards": 1}],
               "dict": {"records": 2, "spellings_mapped": 3, "ambiguous": 0, "from": "dict/oem.json",
                        "card_keys": 1},
-              "parts": brands.КОРЗИН}
+              "parts": brands.КОРЗИН,
+              # Слова облака — настоящей сборкой облака (library/brands.облако).
+              "cloud": brands.облако(бренды_, {}, {})}
     сводка["coverage"] = brands.заполненность(сводка)
     список_б = ["skf"]
     список_с = все_поставщики
@@ -812,6 +814,10 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("brands", "b.registry_trunc", lambda о: бр(о, "skf")["registry"].update(n=26)),
     ("brands", "b.registry", lambda о: бр(о, "skf")["registry"]["list"][0].update(checked=9)),
     ("brands", "b.card", lambda о: бр(о, "skf")["card"].append({"id": "9999", "codes": 1})),
+    ("brands", "b.cloud_nomark", lambda о: бр(о, "timken").update(nb="страна или город")),
+    ("brands", "b.cloud_dup", lambda о: о[brands.КЛЮЧ]["cloud"][0].update(m=["fag", "skf"])),
+    ("brands", "b.cloud_lost", lambda о: о[brands.КЛЮЧ].update(
+        cloud=[s for s in о[brands.КЛЮЧ]["cloud"] if s["k"] != "fag"])),
     ("brands", "b.s_name_key", lambda о: пост(о, 0).update(name="bitrix:1001")),
     ("brands", "b.s_name_json", lambda о: пост(о, 0).update(name='["ООО Ромашка", "Ромашка"]')),
     ("brands", "b.s_name_number", lambda о: пост(о, 0).update(name="Компания портала 1001")),
