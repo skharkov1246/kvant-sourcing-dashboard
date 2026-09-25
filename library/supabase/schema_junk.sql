@@ -339,30 +339,50 @@ end $$;
 -- Ответ — агрегаты по коду: строк, сделок, как написан, наименование. Ни
 -- номеров сделок, ни файлов.
 --
--- Совпадений по словам бывает сотни тысяч («подшипник»), поэтому агрегат
--- считается по первым lim_rows строкам, и ответ говорит об этом (capped) —
--- усечение не молчаливое. Предел времени задан у самой функции: вызов через
--- PostgREST иначе живёт под пределом пула.
+-- ПРЕДЕЛ — ЧИСЛО СТРОК, А НЕ ВРЕМЯ. Каждый путь читает не больше lim_rows
+-- живых строк (100…20 000, по умолчанию 5 000): совпадений по словам бывает
+-- сотни тысяч («подшипник»), строк у одного ключа — тысячи. Упёрся хотя бы
+-- один путь — capped; какой именно, видно по счёту: у дошедшего до предела он
+-- равен пределу (rows у кода или word_rows), у другого меньше. Усечение не
+-- молчаливое. Замер 25.09.2026 на синтетике в 500 тыс. строк: ключ со 100 тыс.
+-- строк без предела у пути по коду читал 105 тыс. строк lib_demand за 334 мс,
+-- с пределом 5 000 — 11 тыс. за 58 мс (оба пути вместе).
+--
+-- ПРЕДЕЛА ВРЕМЕНИ У ФУНКЦИИ НЕТ. До 25.09.2026 здесь стояло «set
+-- statement_timeout = '8s'», и оно не действовало: таймер взводится в начале
+-- клиентского оператора, и смена настройки внутри функции его не перевзводит.
+-- Замер 24.09.2026 на PostgreSQL 16: функция с «set statement_timeout = '1s'» и
+-- pg_sleep(2) отработала две секунды без отмены — и на sql, и на plpgsql
+-- (tests/test_code_search_sql.py держит это наблюдение). Вызов целиком
+-- ограничивают только предел оператора у роли, под которой PostgREST исполняет
+-- вызов (нет его у роли — предел пула), и десятисекундный обрыв в воркере; обрыв
+-- отменяет ожидание ответа, а не запрос: тот дорабатывает в базе до предела
+-- роли. Поэтому работу держат пределы строк. Чего они не держат: поиск слова
+-- по индексу lib_demand_fts строит битовую карту по всему списку совпадений до
+-- того, как сработает предел, и проверку пометок по lib_row_junk.
 create or replace function lib_code_search(q text, lim int default 20, lim_rows int default 5000)
 returns jsonb
 language sql stable
-set statement_timeout = '8s'
 as $$
 with arg as (
   select btrim(coalesce(q, '')) as q,
          lib_pn_key(btrim(coalesce(q, ''))) as k,
          least(greatest(coalesce(lim, 20), 1), 100) as lim,
          least(greatest(coalesce(lim_rows, 5000), 100), 20000) as lim_rows
-), by_code as (
-  select lib_pn_key(d.part_number) as code,
-         count(*) as rows, count(distinct d.deal_id) as deals,
-         mode() within group (order by d.part_number) as written,
-         left(mode() within group (order by d.item_name), 160) as name
+), code_rows as (
+  select d.part_number, d.item_name, d.deal_id
     from lib_demand d, arg
    where length(arg.k) >= 2
      and lib_pn_key(d.part_number) = arg.k
      and not exists (select 1 from lib_row_junk j
                       where j.demand_id = d.id and j.revoked_at is null)
+   limit (select lim_rows from arg)
+), by_code as (
+  select lib_pn_key(part_number) as code,
+         count(*) as rows, count(distinct deal_id) as deals,
+         mode() within group (order by part_number) as written,
+         left(mode() within group (order by item_name), 160) as name
+    from code_rows
    group by 1
 ), word_rows as (
   select d.part_number, d.item_name, d.deal_id
@@ -391,6 +411,7 @@ select jsonb_build_object(
   'by_words', coalesce((select jsonb_agg(to_jsonb(w) order by w.rows desc, w.code) from by_words w), '[]'::jsonb),
   'word_rows', (select count(*) from word_rows),
   'capped', (select count(*) from word_rows) >= (select lim_rows from arg)
+         or (select count(*) from code_rows) >= (select lim_rows from arg)
 );
 $$;
 -- Функции по умолчанию исполнимы всеми (PUBLIC): снимаем, и роли платформы —
