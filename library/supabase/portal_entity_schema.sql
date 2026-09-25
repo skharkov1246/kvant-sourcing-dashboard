@@ -66,10 +66,16 @@
 -- номера HT-55), ищется в спросе и КП по ОБОИМ ключам — иначе карточка по
 -- ссылке из каталога и карточка по номеру показывали бы разное.
 --
+-- ШАГ 4 (25.09.2026): связь реестра разведки с реестром компаний. «Кто делает»
+-- у кода и раздел «разведка» у поставщика читают вид sup_research_link_live
+-- (supplier_link_schema.sql): исполнитель, сведённый по ИНН или домену, ведёт
+-- на карточку компании. Имя не сводит никогда — только кандидат для человека.
+--
 -- ОПОРЫ, КОТОРЫХ МОЖЕТ НЕ БЫТЬ: реестр брендов (brands_schema.sql), вид имён
 -- sup_name_shown, реестр номеров sup_number_registry, проверка
--- lib_pn_plausible, факты sup_fact. Функции — на plpgsql (как portal_search):
--- запрос разбирается при исполнении, и ветка без опоры просто не исполняется;
+-- lib_pn_plausible, факты sup_fact, вид связи реестров sup_research_link_live.
+-- Функции — на plpgsql (как portal_search): запрос разбирается при
+-- исполнении, и ветка без опоры просто не исполняется;
 -- наличие проверяется при ВЫЗОВЕ, а не при применении.
 --
 -- ВРЕМЯ. Предел времени у функции не действует (проверено в portal_schema.sql),
@@ -518,6 +524,10 @@ end $fn$;
 --      машины, узлы — lib_part_models → lib_models, lib_parts.unit_id → lib_units;
 --      кто делает  — lib_part_suppliers детали: роль, наличие у продавца, цена и
 --                    срок из записи проверки (слово продавца, как записано);
+--                    исполнитель, сведённый с реестром компаний по ИНН или
+--                    домену (вид sup_research_link_live, шаг 4), несёт
+--                    компанию реестра и правило связи — страница ставит ссылку
+--                    на её карточку. Вида нет — поля пусты, как прежде;
 --      кому писать — поставщики, дававшие цену ОРИГИНАЛА по бренду позиции на
 --                    ДРУГИЕ коды и не дававшие на этот (portal_brand_rows).
 drop function if exists portal_code(text);
@@ -565,6 +575,8 @@ declare
   узлы     jsonb := '[]';
   делают   jsonb := '[]';
   делают_n int := 0;
+  сведены  jsonb := '{}';    -- исполнитель разведки → [компания реестра, правило] (шаг 4)
+  сведены_и jsonb := '{}';   -- имена этих компаний (portal_sup_names)
   кому     jsonb := '[]';
   годные   text[];
   ещё      jsonb;
@@ -909,16 +921,30 @@ begin
       -- Кто делает деталь и у кого проверено наличие. Слово продавца и срок —
       -- как записаны проверкой; контактов нет (их в выборке нет вовсе).
       select count(*)::int into делают_n from lib_part_suppliers ps where ps.part_id = деталь ->> 'id';
+      -- Исполнитель, сведённый с реестром компаний по ИНН или домену (шаг 4,
+      -- supplier_link_schema.sql), ведёт на карточку компании. Вида связи нет
+      -- (схему не применяли) — ссылок нет, как прежде; имя не сводит никогда.
+      if to_regclass('sup_research_link_live') is not null then
+        execute $q$
+          select coalesce(jsonb_object_agg(l.research_id::text, jsonb_build_array(l.sup_id, l.rule)), '{}')
+            from sup_research_link_live l
+           where l.research_id in (select ps.supplier_id from lib_part_suppliers ps where ps.part_id = $1)
+        $q$ into сведены using деталь ->> 'id';
+        сведены_и := portal_sup_names(array(select distinct v ->> 0 from jsonb_each(сведены) t(k, v)));
+      end if;
       select coalesce(jsonb_agg(jsonb_build_object(
                'name', x.name, 'role', nullif(btrim(x.role), ''), 'country', nullif(btrim(x.country), ''),
                'makes', left(nullif(btrim(x.makes), ''), 300), 'verdict', nullif(btrim(x.verdict), ''),
                'in_stock', nullif(btrim(x.in_stock), ''), 'stock_qty', nullif(btrim(x.stock_qty), ''),
                'lead_time', nullif(btrim(x.lead_time), ''), 'price', x.price,
-               'currency', case when x.price is not null then nullif(btrim(x.currency), '') end)
+               'currency', case when x.price is not null then nullif(btrim(x.currency), '') end,
+               'company', сведены_и -> (сведены -> x.sid::text ->> 0),
+               'link', case when сведены_и ? (сведены -> x.sid::text ->> 0)
+                            then сведены -> x.sid::text ->> 1 end)
              order by x.n), '[]')
         into делают
         from (select ps.makes, ps.verdict, ps.in_stock, ps.stock_qty, ps.lead_time, ps.price, ps.currency,
-                     s.name, s.kind as role, s.country,
+                     s.id as sid, s.name, s.kind as role, s.country,
                      row_number() over (order by (ps.verdict is null), (ps.in_stock is distinct from 'yes'),
                                                  s.name, s.id) as n
                 from lib_part_suppliers ps join lib_suppliers s on s.id = ps.supplier_id
@@ -1277,7 +1303,12 @@ end $fn$;
 --                   предлагает» — разные утверждения;
 --    коды         — последнее предложение по коду, топ-100 по свежести, с
 --                   источником бренда и пометкой «оригинал / аналог»: по бренду
---                   запроса или каталога против названного поставщиком.
+--                   запроса или каталога против названного поставщиком;
+--    разведка     — поставщики реестра разведки (lib_suppliers), сведённые с
+--                   компанией по ИНН или домену (вид sup_research_link_live,
+--                   шаг 4): кто они там, сколько деталей за ними и у скольких
+--                   проверено наличие. Вида нет — research_n = null, и страница
+--                   говорит «связь не посчитана», а не «никого».
 drop function if exists portal_supplier(text);
 create function portal_supplier(sup_id text) returns jsonb
   language plpgsql stable
@@ -1308,6 +1339,8 @@ declare
   коды     jsonb := '[]';
   бренды   jsonb := '[]';
   годные   text[];
+  разведка jsonb := '[]';    -- поставщики разведки, сведённые с компанией (шаг 4)
+  разведка_n int;            -- null — вида связи нет, «не посчитано»
   бюджет   interval := coalesce(nullif(current_setting('portal_entity.budget_ms', true), '')::int,
                                 5000) * interval '1 millisecond';
   усечено  text[] := '{}';
@@ -1355,6 +1388,26 @@ begin
        where subject_kind = 'entity' and subject_id = $1 and field = 'rfq_stats' and status <> 'superseded'
        order by id desc limit 1
     $q$ into стат using номер;
+  end if;
+  -- Кто эта компания в реестре разведки: поставщики lib_suppliers, сведённые с
+  -- ней по ИНН или домену (вид отдаёт корень цепочки слияний — это номер).
+  -- Сначала те, за кем больше деталей; тридцать строк, число — всех.
+  if to_regclass('sup_research_link_live') is not null then
+    execute $q$
+      select count(*)::int,
+             coalesce(jsonb_agg(jsonb_build_object('name', x.name, 'role', x.role, 'country', x.country,
+                                                   'rule', x.rule, 'parts', x.parts, 'checked', x.checked)
+                                order by x.n) filter (where x.n <= 30), '[]')
+        from (select s.name, nullif(btrim(s.kind), '') as role, nullif(btrim(s.country), '') as country,
+                     l.rule, coalesce(р.parts, 0) as parts, coalesce(р.checked, 0) as checked,
+                     row_number() over (order by coalesce(р.parts, 0) desc, s.name, s.id) as n
+                from sup_research_link_live l
+                join lib_suppliers s on s.id = l.research_id
+                left join lateral (
+                  select count(*)::int as parts, count(*) filter (where ps.verdict is not null)::int as checked
+                    from lib_part_suppliers ps where ps.supplier_id = s.id) р on true
+               where l.sup_id = $1) x
+    $q$ into разведка_n, разведка using номер;
   end if;
 
   -- ── строки КП поставщика ──
@@ -1507,6 +1560,8 @@ begin
     'quotes', квоты,
     'brands', бренды,
     'codes', коды,
+    'research', разведка,
+    'research_n', разведка_n,
     'registry', реестр,
     'partial', to_jsonb(усечено));
 end $fn$;

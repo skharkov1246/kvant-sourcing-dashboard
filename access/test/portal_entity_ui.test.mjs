@@ -305,6 +305,43 @@ test("карточка поставщика: отзывчивость с «мо�
   assert.equal(env.document.title, "Бета Уплотнения · поставщик · КВАНТ");
 });
 
+// Шаг 4: исполнитель, у которого с компанией справочника совпал ИНН или домен
+// (supplier_link_schema.sql), ведёт на её карточку; остальные — именем, как прежде.
+const КОД_СВЯЗЬ = { ...КОД, partial: [], makers: [
+  { ...КОД.makers[0], link: "домен сайта",
+    company: { id: "KV-S-000031-1", name: "Склад Выдумка", src: "bitrix:title", number: "KV-S-000031-1" } },
+  { ...КОД.makers[1], company: null, link: null }] };
+
+test("кто делает: исполнитель из справочника — ссылкой на компанию, остальные — именем, без служебных слов", async () => {
+  const env = await открыть({ hash: "#code=KL-7", ответ: () => [200, КОД_СВЯЗЬ] });
+  const исполнители = таблицы(env.card).find((t) => шапка_таблицы(t).includes("Наличие у продавца"));
+  const [склад, завод] = строки_таблицы(исполнители);
+  assert.deepEqual(ссылки(склад), ["/p#supplier=KV-S-000031-1"]);
+  assert.equal(склад.children[0].textContent, "Склад ВыдумкаKV-S-000031-1в разведке — Выдуманный складсовпал домен сайта");
+  assert.deepEqual(ссылки(завод), []);
+  assert.equal(завод.children[0].textContent, "Выдуманный завод");
+  assert.match(env.card.textContent, /Компания со ссылкой есть в справочнике поставщиков: совпал ИНН или домен/);
+  assert.doesNotMatch(env.card.textContent, /сведен|засев/);
+});
+
+test("карточка поставщика: поставщики разведки с тем же ИНН или доменом; без связи реестров — «не посчитана»", async () => {
+  const связь = { ...ПОСТАВЩИК, research_n: 3, research: [
+    { name: "Выдуманный склад", role: "дистрибьютор", country: "Нигдения", rule: "домен сайта", parts: 12, checked: 2 },
+    { name: "Дочка склада", role: null, country: null, rule: "инн", parts: 0, checked: 0 }] };
+  let env = await открыть({ hash: "#supplier=KV-S-000011-1", ответ: () => [200, связь] });
+  const t = таблицы(env.card).find((x) => шапка_таблицы(x).includes("Компания в разведке"));
+  assert.deepEqual(шапка_таблицы(t), ["Компания в разведке", "Роль", "Страна", "Связь", "Деталей", "С проверкой наличия"]);
+  assert.equal(строки_таблицы(t).length, 2);
+  assert.match(t.textContent, /совпал домен сайта/);
+  assert.match(t.textContent, /совпал ИНН/);
+  assert.match(env.card.textContent, /Показаны 2 из 3/);
+  assert.doesNotMatch(env.card.textContent, /сведен|засев/);
+  env = await открыть({ hash: "#supplier=KV-S-000011-1", ответ: () => [200, { ...ПОСТАВЩИК, research_n: null, research: [] }] });
+  assert.match(env.card.textContent, /Связь с реестром исполнителей \(разведкой\) ещё не посчитана/);
+  env = await открыть({ hash: "#supplier=KV-S-000011-1", ответ: () => [200, { ...ПОСТАВЩИК, research_n: 0, research: [] }] });
+  assert.match(env.card.textContent, /по ИНН и домену не найдена/);
+});
+
 test("отказы — словами; смена «#» перерисовывает карточку", async () => {
   const env = await открыть({ hash: "#code=SS316", ответ: (url) => url.includes("SS316")
     ? [404, { error: "not_a_code", key: "ss316" }]
