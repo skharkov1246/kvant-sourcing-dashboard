@@ -25,6 +25,7 @@ C.UTF-8 (LIBRARY_SQL_TEST_DSN, правило 21а).
 from __future__ import annotations
 
 import os
+import re
 import random
 from pathlib import Path
 
@@ -51,7 +52,9 @@ insert into lib_demand (deal_id, item_name, oem, part_number) values
  ('D3','Втулка выдуманная',null,'QX-1002'),
  ('D4','Пункт договора','Junkbrand','QX-1003'),
  ('D5','Сталь выдуманная',null,'SS316'),
- ('D6','Подшипник выдуманный','SKF','AB-6205');
+ ('D6','Подшипник выдуманный','SKF','AB-6205'),
+ ('D7','Кольцо выдуманное',null,'DIN 471 25'),
+ ('D8','Болт выдуманный',null,'DIN 933');
 insert into lib_row_junk (demand_id, rule, run_id)
   select id, 'proza-тест', 'тест' from lib_demand where part_number = 'QX-1003';
 insert into lib_units (id, name, name_en, crit) values ('hot', 'Горячая часть', 'Hot section', 'A');
@@ -301,6 +304,28 @@ def test_в_ответе_только_агрегаты(база):
                 assert isinstance(v, (int, bool)), (q, k, v)
             текст = " ".join(str(v) for v in r.values())
             assert "D1" not in текст and "R1" not in текст, (q, r)
+
+
+def test_стандарт_с_размером_код_голый_стандарт_нет(база):
+    """Правило schema.sql: «DIN 471 25» в спросе — код, «DIN 933» — голый стандарт.
+    Кандидат поиска — ключ, и стандарт с размером судит lib_pn_std_sized."""
+    c = база.cursor()
+    c.execute(f"set search_path to {ИМЯ}")
+    текст = (ROOT / "library" / "supabase" / "schema.sql").read_text(encoding="utf-8")
+    for имя in ("lib_pn_plausible", "lib_pn_std_sized"):
+        m = re.search(rf"create or replace function {имя}\(.*?\$(fn)?\$;", текст, re.S)
+        c.execute(m.group(0))
+    try:
+        assert "din47125" in по_виду(искать(база, "DIN 471 25"), "код")
+        assert "din47125" in по_виду(искать(база, "din471"), "код")
+        assert not по_виду(искать(база, "DIN 933"), "код")
+        # Без функции по ключу стандарт с размером по одному ключу — стандарт.
+        c.execute("drop function lib_pn_std_sized(text[])")
+        assert not по_виду(искать(база, "DIN 471 25"), "код")
+    finally:
+        c.execute(f"set search_path to {ИМЯ}")
+        c.execute("drop function if exists lib_pn_std_sized(text[])")
+        c.execute("drop function if exists lib_pn_plausible(text)")
 
 
 # ── опоры, которых может не быть ─────────────────────────────────────────────

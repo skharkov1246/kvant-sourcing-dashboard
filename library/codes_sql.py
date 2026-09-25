@@ -417,7 +417,7 @@ def brand_pipeline(judged_cols: str = "c.*, tj.brand_key, tj.brand_name") -> str
            end as reject
       from cells c
       left join text_judged tj on tj.cell = c.cell
-     where length(c.code) >= 2 and {docfilter.sql_код_годен("c.code")}
+     where length(c.code) >= 2 and {docfilter.sql_код_годен("c.pn", "c.code")}
   ),
   clean as (
     select * from judged where reject is null
@@ -443,6 +443,9 @@ def part_ok(expr: str) -> str:
 # в один код все позиции из этой стали (карточка номенклатуры, 24.09.2026). Номер,
 # отвергнутый правилом, считается пустым: остаётся part_id, если он есть.
 # Правило применяется при чтении, накопленные строки не переписываются.
+# Судится НАПИСАНИЕ номера: стандарт с размером («DIN 471 25») — код, а по ключу
+# его от голого стандарта не отличить. Поэтому ячейки брендов (cells) несут
+# написание pn рядом с кодом, и отсев judged судит его.
 def price_code(a: str) -> str:
     return (f"case when length(lib_pn_key({a}.part_number)) >= 2 "
             f"and {docfilter.sql_код_годен(a + '.part_number')} "
@@ -468,9 +471,10 @@ def demand_cells_cte(where: str, with_sup: bool = False) -> str:
            {src_case("x.side")} as src,
            x.code, x.cell,
            lib_pn_key(x.item_name) as name_key, x.side, x.origin, x.deal_id,
-           x.rfq_company
+           x.rfq_company, x.pn
       from (select d.id,
                    lib_pn_key(d.part_number)     as code,
+                   d.part_number                 as pn,
                    d.oem                         as cell,
                    d.item_name,
                    coalesce(f.side, 'без файла') as side,
@@ -489,7 +493,7 @@ def demand_cells_cte(where: str, with_sup: bool = False) -> str:
 KP_CELLS = f"""\
     select 'p:' || p.id, 'кп'::text, {price_code("p")}, p.oem,
            lib_pn_key(p.item_name), 'поставщик'::text,
-           'поле запроса'::text, p.rfq_id, p.rfq_company
+           'поле запроса'::text, p.rfq_id, p.rfq_company, p.part_number
       from lib_prices p
      where p.feed = 'разбор КП' and {oem_set("p.oem")}
        and {part_ok(price_code("p"))}"""
@@ -498,7 +502,8 @@ CATALOG_CELLS = f"""\
     -- Каталог: код — ключ catalog_no, а не lib_parts.id (82 детали иначе
     -- выпадают, library/crossref.py СЦЕПКА).
     select 'c:' || pt.id, 'каталог'::text, lib_pn_key(pt.catalog_no), pt.oem,
-           lib_pn_key(pt.name), null::text, null::text, null::text, null::text
+           lib_pn_key(pt.name), null::text, null::text, null::text, null::text,
+           pt.catalog_no
       from lib_parts pt
      where {oem_set("pt.oem")}
        and {part_ok("lib_pn_key(pt.catalog_no)")}"""
@@ -573,6 +578,7 @@ SUPPLIER_CTES = f"""\
     select p.id, p.rfq_id, p.source_url, p.currency, p.oem, p.rfq_brands,
            p.rfq_company,
            {price_code("p")} as code,
+           p.part_number,
            lib_pn_key(p.item_name) as name_key,
            b.sup_id,
            case when p.rfq_company is null        then 'поставщик не указан'
@@ -727,13 +733,13 @@ with
   cells as (
     select 'p:' || pr.id as row_id, 'кп'::text as src, pr.code, pr.oem as cell,
            pr.name_key, 'поставщик'::text as side, 'поле запроса'::text as origin,
-           pr.rfq_id as deal_id, pr.supplier as rfq_company
+           pr.rfq_id as deal_id, pr.supplier as rfq_company, pr.part_number as pn
       from price_rows pr
      where {oem_set("pr.oem")} and pr.rfq_company is not null
     union all
     select 'd:' || d.id, 'кп'::text, lib_pn_key(d.part_number), d.oem,
            lib_pn_key(d.item_name), 'поставщик'::text, 'поле запроса'::text,
-           d.deal_id, fs.supplier
+           d.deal_id, fs.supplier, d.part_number
       from lib_demand_live d
       join file_sup fs on fs.file_id = d.source_file
      where {oem_set("d.oem")} and coalesce(btrim(d.part_number), '') <> ''
@@ -864,12 +870,13 @@ with
              f.origin,
              case when f.origin = 'поле запроса' then d.source_file end as kp_file,
              case when {oem_set("d.oem")} then d.oem end              as cell,
-             case when {oem_set("d.oem")} then lib_pn_key(d.item_name) end as name_key
+             case when {oem_set("d.oem")} then lib_pn_key(d.item_name) end as name_key,
+             d.part_number                                            as pn
         from lib_demand_live d
         left join files f on f.file_id = d.source_file
        where coalesce(btrim(d.part_number), '') <> ''
       offset 0) x
-     where length(x.code) >= 2 and {docfilter.sql_код_годен("x.code")} and {part_ok("x.code")}
+     where length(x.code) >= 2 and {docfilter.sql_код_годен("x.pn", "x.code")} and {part_ok("x.code")}
   ),
   demand_codes as materialized (
     select code, side, origin, side_by_col, count(*) as rows_n
@@ -881,7 +888,7 @@ with
   cells as (
     select 'd:' || row_id as row_id, {src_case("side")} as src,
            code, cell, name_key, side, origin, null::text as deal_id,
-           null::text as rfq_company
+           null::text as rfq_company, pn
       from demand where cell is not null
     union all
 {KP_CELLS}
@@ -931,6 +938,11 @@ with
     select 0, 'проверка', 'правдоподобный код: марка SS316 не код, ВЫДУМ-101 — код',
            (not {docfilter.sql_код_годен("'SS316'")}
             and {docfilter.sql_код_годен("'ВЫДУМ-101'")})::int,
+           'одинаково'
+    union all
+    select 0, 'проверка', 'стандарт с размером: DIN 471 25 — код, DIN 933 — не код',
+           ({docfilter.sql_код_годен("'DIN 471 25'")}
+            and not {docfilter.sql_код_годен("'DIN 933'")})::int,
            'одинаково'
     union all
     select 1, 'строки lib_demand (все стороны)',
@@ -1321,7 +1333,8 @@ KP_ROW_CELLS = """\
     select 'p:' || pr.id as row_id, 'кп'::text as src, pr.code, pr.oem as cell,
            lib_pn_key(pr.item_name) as name_key, 'поставщик'::text as side,
            'поле запроса'::text as origin, pr.rfq_id as deal_id,
-           case when pr.rfq_company is not null then pr.sup_group end as rfq_company
+           case when pr.rfq_company is not null then pr.sup_group end as rfq_company,
+           pr.part_number as pn
       from pr
      where {oem}"""
 
@@ -1393,7 +1406,7 @@ with
   ask_rows as materialized (
     select x.* from (
       select d.id, lib_pn_key(d.part_number) as code, d.deal_id, d.source_file,
-             d.oem, d.item_name
+             d.oem, d.item_name, d.part_number
         from lib_demand_live d
        where coalesce(btrim(d.part_number), '') <> ''
       offset 0) x
@@ -1422,12 +1435,13 @@ with
 {KP_ROW_CELLS.format(oem=oem_set("pr.oem"))}
     union all
     select 'd:' || a.id, {src_case("a.side")}, a.code, a.oem, lib_pn_key(a.item_name),
-           a.side, a.origin, a.deal_id, a.file_sup
+           a.side, a.origin, a.deal_id, a.file_sup, a.part_number
       from ask_sided a
      where {oem_set("a.oem")}
     union all
     select 'c:' || pt.id, 'каталог'::text, lib_pn_key(pt.catalog_no), pt.oem,
-           lib_pn_key(pt.name), null::text, null::text, null::text, null::text
+           lib_pn_key(pt.name), null::text, null::text, null::text, null::text,
+           pt.catalog_no
       from lib_parts pt
      where {oem_set("pt.oem")}
        and lib_pn_key(pt.catalog_no) in (select code from part_codes)
@@ -1634,7 +1648,8 @@ with
              d.deal_id,
              fs.supplier                   as file_sup,
              case when {oem_set("d.oem")} then d.oem end       as cell,
-             case when {oem_set("d.oem")} then d.item_name end as item_name
+             case when {oem_set("d.oem")} then d.item_name end as item_name,
+             case when {oem_set("d.oem")} then d.part_number end as pn
         from lib_demand_live d
         left join files f     on f.file_id = d.source_file
         left join file_sup fs on fs.file_id = d.source_file
@@ -1650,13 +1665,14 @@ with
   cells as (
     select 'd:' || id as row_id, {src_case("side")} as src, code, cell,
            lib_pn_key(item_name) as name_key, side, origin, deal_id,
-           file_sup as rfq_company
+           file_sup as rfq_company, pn
       from demand where cell is not null
     union all
 {KP_ROW_CELLS.format(oem=oem_set("pr.oem"))}
     union all
     select 'c:' || pt.id, 'каталог'::text, lib_pn_key(pt.catalog_no), pt.oem,
-           lib_pn_key(pt.name), null::text, null::text, null::text, null::text
+           lib_pn_key(pt.name), null::text, null::text, null::text, null::text,
+           pt.catalog_no
       from lib_parts pt
      where {oem_set("pt.oem")}
        and (lib_pn_key(pt.catalog_no) in (select code from kp_codes)

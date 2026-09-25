@@ -47,7 +47,10 @@ insert into lib_demand (deal_id, item_name, oem, part_number, source_file) value
  ('D1','Клапан выдуманный','Келтон','KL-7','fc1'),
  ('D1','Клапан выдуманный','Келтон','KL-8','fc1'),
  ('D2','Втулка выдуманная','Vortex','DD-40','fus'),
- ('D1','Пункт договора','Junkbrand','JN-55','fc1');
+ ('D1','Пункт договора','Junkbrand','JN-55','fc1'),
+ -- Стандарт с размером — код (кольцо по DIN 471 на вал 25); голый стандарт — нет.
+ ('D1','Кольцо выдуманное','Kronos Rings','DIN 471 25','fc1'),
+ ('D1','Болт выдуманный','Kronos Rings','DIN 933','fc1');
 insert into lib_row_junk (demand_id, rule, run_id)
   select id, 'proza-тест', 'тест' from lib_demand where part_number = 'JN-55';
 
@@ -81,7 +84,9 @@ insert into lib_prices (feed, source, part_number, item_name, price, currency, q
  ('разбор КП','КП','AB-6205','Подшипник выдуманный',0,'EUR',1,'шт',null,'R3','1201',null,null,'u3'),
  ('разбор КП','КП','KL-7','Клапан выдуманный',1500,'RUB',2,'шт',null,'R4','1201',null,'Kelton','u4'),
  ('разбор КП','КП','KL-7','Клапан выдуманный',1400,'RUB',null,null,null,'R5',null,null,null,'u5'),
- ('ТКП КВАНТ (отпускная цена)','КП','AB-6205','Подшипник',99,'USD',1,'шт',null,'R1','1101',null,'SKF','u1');
+ ('ТКП КВАНТ (отпускная цена)','КП','AB-6205','Подшипник',99,'USD',1,'шт',null,'R1','1101',null,'SKF','u1'),
+ ('разбор КП','КП','DIN 471 25','Кольцо выдуманное',3,'RUB',10,'шт',null,'R6','1201',null,'Kronos Rings','u6'),
+ ('разбор КП','КП','DIN 933','Болт выдуманный',1,'RUB',5,'шт',null,'R6','1201',null,'Kronos Rings','u6');
 """
 
 # Ключи словаря: «Келтон» и «Kelton GmbH» — один бренд kelton.
@@ -204,6 +209,17 @@ def test_цены_по_коду_поставщику_валюте_и_едини�
     assert float(без["цена_мин"]) == 1400
     # Наша отпускная цена в сопоставление не идёт.
     assert not any(float(r["цена_макс"] or 0) == 99 for r in коды["match"])
+
+
+def test_стандарт_с_размером_код_голый_стандарт_нет(наборы):
+    """«DIN 471 25» — номер детали: код в спецификации, в КП и в сопоставлении;
+    «DIN 933» — голый стандарт, кодом не становится нигде (docfilter.класс_не_кода)."""
+    коды, _ = наборы
+    kronos = {r["brand_key"]: r for r in коды["brands"]}[codes_sql.ключ_написания("Kronos Rings")]
+    assert kronos["codes_customer"] == 1 and kronos["codes_any"] == 1
+    assert kronos["codes_customer_kp_price"] == 1
+    ключи = {r["код_ключ"] for r in коды["match"]}
+    assert "din47125" in ключи and "din933" not in ключи
 
 
 def test_каталожная_часть_карточки(наборы):

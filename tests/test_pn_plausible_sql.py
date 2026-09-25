@@ -28,7 +28,17 @@ pytestmark = pytest.mark.skipif(not DSN, reason="одноразовая база
     "ss316", "Ss-316-L", "AISI  304 L", "12х18н10т", "12Х18Н10Т ", "(Ду 50)", "Ø50 мм",
     "шайба 12Ё", "0" * 90, "SS316" + "7" * 90, "  ", "мм", "ГОСТ", "ГОСТ Р 52857",
     "WCB-1", "A105N", "F316L", "S355J2", "ST52-3", "40Х", "65Г", "Ст.3", "10 кВт",
+    # Стандарт с размером: пробел, табуляция, перевод строки, неразрывный пробел;
+    # слитно и через узкий пробел — голый стандарт (узкого пробела в списке нет).
+    "DIN 471\t25", "DIN 471\n25", "DIN 471\u00a025", "DIN 471\u200925", "din 471 - 25",
+    "ГОСТ 9833-73  020-025-30", "ГОСТ 9833-73/020-025-30", " DIN 933 ", "ISO 9001 2015",
+    "G B / T 5 7 8 3 - 2 0 0 0", "DIN 7 6", "DIN 4 7 1 25", "DIN 471 2 5", "ГОСТ 9833-73\r\n020",
 ]
+
+
+def параметры(sql: str, t: str) -> tuple:
+    """Написание подставляется во все места %s условия."""
+    return (t,) * sql.count("%s")
 
 
 def функции() -> str:
@@ -68,22 +78,28 @@ def test_правдоподобный_код_в_sql_и_в_python_одинако�
             cur.execute("create table lib_parts (id text primary key, catalog_no text not null)")
             cur.execute("insert into lib_parts values ('1250x300', '1250X300'),"
                         " ('выдум-7', 'ВЫДУМ-7')")
-            cur.execute("select " + docfilter.sql_код_годен("%s"), ("1250x300", "1250x300"))
+            годен = "select " + docfilter.sql_код_годен("%s")
+            cur.execute(годен, параметры(годен, "1250x300"))
             assert cur.fetchone()[0] is True, "номер каталога отвергнут правилом"
             assert not docfilter.код_правдоподобен("1250x300"), \
                 "корпус защиты должен быть обвиняемым без каталога"
-            cur.execute("select " + docfilter.sql_код_годен("%s"), ("640x480", "640x480"))
+            cur.execute(годен, параметры(годен, "640x480"))
             assert cur.fetchone()[0] is False, "размер вне каталога принят за код"
+            # Условие с готовым ключом — как в codes_sql (x.pn, x.code).
+            с_ключом = "select " + docfilter.sql_код_годен("%s", "lib_pn_key(%s)")
             for t in корпус:
                 cur.execute("select lib_pn_plausible(%s), lib_pn_plausible(lib_pn_key(%s))",
                             (t, t))
                 по_написанию, по_ключу = cur.fetchone()
                 ждём = docfilter.код_правдоподобен(t)
                 assert по_написанию == ждём, f"{t!r}: SQL {по_написанию}, Python {ждём}"
-                # Функцию зовут и от ключа, и от написания.
-                assert по_ключу == ждём, t
+                # Функцию зовут и от ключа: в ключе пробелов нет, стандарт с
+                # размером по нему — стандарт, в SQL так же, как в Python.
+                assert по_ключу == docfilter.код_правдоподобен(docfilter.ключ_кода(t)), t
                 # Условие, вписанное в запросы crossref и codes_sql, — то же тело.
-                cur.execute("select " + docfilter.sql_код_годен("%s"), (t, t))
+                cur.execute(годен, параметры(годен, t))
+                assert cur.fetchone()[0] == ждём, t
+                cur.execute(с_ключом, параметры(с_ключом, t))
                 assert cur.fetchone()[0] == ждём, t
             # NULL — не марка: пустое кодом не обвиняется, как и в Python.
             cur.execute("select lib_pn_plausible(null)")
