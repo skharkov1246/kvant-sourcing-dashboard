@@ -6,6 +6,12 @@
 // существующую страницу. Пять копий разошлись бы с первой правки, поэтому
 // страница подключает этот файл одной строкой и больше ничего о поиске не знает.
 //
+// КУДА ВЕДУТ СТРОКИ (шаг 2, 25.09.2026). Код, бренд и поставщик — на свои
+// карточки /p#code=, /p#brand=, /p#supplier= (public/portal_entity.js), где
+// каждый код, бренд и компания снова ссылка. Прежние страницы не заменяются:
+// у каждой строки вторая ссылка «в прежнем разделе» — /nomenclature#k=,
+// /brands#b=, /suppliers#e= — ровно те адреса, что вели сюда до шага 2.
+//
 // ДВА ВИДА. Если на странице есть место <div id="kvps"> (стартовая страница) —
 // строка и выдача рисуются в нём, в потоке страницы. Иначе сверху страницы
 // встаёт тонкая полоска со строкой поиска, а выдача раскрывается под ней. Свои
@@ -29,7 +35,7 @@
   var НЕ_УСПЕЛИ = { "код": "коды", "бренд": "бренды", "поставщик": "поставщиков", "машина": "машины", "узел": "узлы" };
   // Страницы, которые сами переходят по смене адреса после «#». Остальные
   // читают его только при загрузке, и переход на них же нужно перезагрузить.
-  var СЛУШАЮТ_ХЕШ = ["/brands", "/library"];
+  var СЛУШАЮТ_ХЕШ = ["/brands", "/library", "/p"];
   var ЗАДЕРЖКА = 250;
 
   // Цвета — переменные страницы, где они есть, иначе те же значения, что у
@@ -48,7 +54,9 @@
     ".kvps-hint{color:var(--dim,#8b97a8);font-size:12.5px;margin:6px 2px 0}",
     ".kvps-status{padding:8px 14px;color:var(--dim,#a0acbd);font-size:13px}",
     ".kvps-status.kvps-err{color:#e7c488}",
-    ".kvps-group{padding:4px 0 6px}",
+    // Отступы группы — свои: правило «section{margin…}» страницы-хозяина
+    // (портала, карточек) иначе ложится и на выдачу пустой полосой.
+    "section.kvps-group{margin:0;padding:4px 0 6px}",
     ".kvps-group+.kvps-group{border-top:1px solid var(--line,var(--ln,#2a3341))}",
     ".kvps-gh{display:flex;gap:10px;align-items:baseline;padding:6px 14px 4px;font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--dim,#8b97a8)}",
     ".kvps-gh span{font-weight:400;letter-spacing:0;text-transform:none}",
@@ -64,6 +72,9 @@
     ".kvps-s{grid-column:1/-1;color:var(--dim,#a0acbd);font-size:12.5px;overflow-wrap:anywhere}",
     ".kvps-s a{color:var(--accent,var(--a,#73b6ff));text-decoration:none;margin-left:6px}",
     ".kvps-row .kvps-s{display:block}",
+    ".kvps-ent{display:block;padding:6px 14px;border-left:2px solid transparent}",
+    ".kvps-ent:hover,.kvps-ent:focus-within{background:rgba(115,182,255,.07);border-left-color:var(--accent,var(--a,#73b6ff))}",
+    ".kvps-ent .kvps-t,.kvps-ent .kvps-s{display:block}",
     // На узком экране выдача встаёт на всю ширину полоски, а не строки поиска.
     "@media(max-width:560px){.kvps-bar{gap:10px}.kvps-bar .kvps-field{position:static}.kvps-field input{font-size:16px}.kvps-bar .kvps-panel{left:8px;right:8px;top:calc(100% - 2px)}}"
   ].join("\n");
@@ -79,9 +90,9 @@
 
   function адрес(r, library) {
     var k = encodeURIComponent(r.key);
-    if (r.kind === "код") return "/nomenclature#k=" + k;
-    if (r.kind === "бренд") return "/brands#b=" + k;
-    if (r.kind === "поставщик") return "/suppliers#e=" + k;
+    if (r.kind === "код") return "/p#code=" + k;
+    if (r.kind === "бренд") return "/p#brand=" + k;
+    if (r.kind === "поставщик") return "/p#supplier=" + k;
     if (!library) return null;
     if (r.kind === "машина") return r.segment ? "/library#segment=" + encodeURIComponent(r.segment) : "/library";
     if (r.kind === "узел") return "/library#section=component";
@@ -109,6 +120,15 @@
       if (c.children) out.push("вложенных узлов " + число(c.children));
     }
     return out.join(" · ");
+  }
+
+  // Прежний адрес той же строки — вторая ссылка «в прежнем разделе».
+  function прежний(r) {
+    var k = encodeURIComponent(r.key);
+    if (r.kind === "код") return "/nomenclature#k=" + k;
+    if (r.kind === "бренд") return "/brands#b=" + k;
+    if (r.kind === "поставщик") return "/suppliers#e=" + k;
+    return null;
   }
 
   function перейти(e) {
@@ -140,7 +160,7 @@
     if (r.brand) {
       // Бренд реестра — ссылкой на карточку бренда; слово без ключа реестра —
       // ссылкой на поиск бренда по этому слову и приглушённо: это ещё не бренд.
-      if (r.brand_key) b.appendChild(ссылка("/brands#b=" + encodeURIComponent(r.brand_key), null, r.brand));
+      if (r.brand_key) b.appendChild(ссылка("/p#brand=" + encodeURIComponent(r.brand_key), null, r.brand));
       else b.appendChild(ссылка("/brands#n=" + encodeURIComponent(r.brand), "kvps-word", r.brand));
       b.setAttribute("title", {
         "каталог": "изготовитель по каталогу", "частота": "самый частый бренд в спросе и КП",
@@ -151,7 +171,19 @@
     }
     row.appendChild(b);
     var s = узел("div", "kvps-s", [r.subtitle, счёт(r), r.source].filter(Boolean).join(" · "));
+    s.appendChild(ссылка(прежний(r), null, "в прежнем разделе →"));
     s.appendChild(ссылка("/brands#c=" + encodeURIComponent(r.key), null, "код и цены →"));
+    row.appendChild(s);
+    return row;
+  }
+
+  // Бренд и поставщик: заголовок — карточка /p, в подписи — прежний раздел.
+  // Две ссылки не вкладываются одна в другую, поэтому строка — не ссылка.
+  function строка_карточки(r) {
+    var row = узел("div", "kvps-ent");
+    row.appendChild(ссылка(адрес(r), "kvps-t", r.title));
+    var s = узел("span", "kvps-s", [r.subtitle, счёт(r)].filter(Boolean).join(" · "));
+    s.appendChild(ссылка(прежний(r), null, "в прежнем разделе →"));
     row.appendChild(s);
     return row;
   }
@@ -190,6 +222,8 @@
         cols.appendChild(узел("span", null, "Бренд"));
         g.appendChild(cols);
         группы[вид].forEach(function (r) { g.appendChild(строка_кода(r)); });
+      } else if (вид === "бренд" || вид === "поставщик") {
+        группы[вид].forEach(function (r) { g.appendChild(строка_карточки(r)); });
       } else {
         группы[вид].forEach(function (r) { g.appendChild(строка(r, !!ответ.library)); });
       }

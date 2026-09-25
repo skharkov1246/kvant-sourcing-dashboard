@@ -671,6 +671,13 @@ function suppliersRoute(path) {
   if (path === "/api/brands/search") return "brandsSearch";
   // Единый поиск стартовой страницы: код, бренд, поставщик, машина, узел.
   if (path === "/api/portal/search") return "portalSearch";
+  // Карточки портала: код, бренд, поставщик — страница /p и три ответа базы.
+  // Оболочка страницы лежит файлом portal_entity.html; её прямые адреса тоже
+  // идут сюда, под право, а не мимо него через ASSETS.
+  if (["/p", "/p/", "/portal_entity", "/portal_entity/", "/portal_entity.html"].includes(path)) return "entityPage";
+  if (path === "/api/portal/code") return "portalCode";
+  if (path === "/api/portal/brand") return "portalBrand";
+  if (path === "/api/portal/supplier") return "portalSupplier";
   // Маршрута публикации здесь нет намеренно: снимок кладёт scripts/publish_suppliers.py
   // прямо в KV через API Cloudflare — так же, как публикуется библиотека. Второй стек
   // разбора и проверки тела запроса в воркере не нужен, а /admin/suppliers ниже
@@ -686,7 +693,9 @@ function suppliersRoute(path) {
     } catch { break; }
   }
   decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
-  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$)|brands(?:[/.;]|$)|api\/brands(?:[/.;]|$)|api\/portal(?:[/.;]|$))/i
+  // «p» и «portal_entity» — страница карточек; скрипт /portal_entity.js под
+  // этот образец не попадает (он статика, как /portal_search.js).
+  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$)|brands(?:[/.;]|$)|api\/brands(?:[/.;]|$)|api\/portal(?:[/.;]|$)|p(?:[/.;]|$)|portal_entity(?:\.html?|[/;]|$))/i
     .test(decoded) ? "invalid" : null;
 }
 
@@ -953,6 +962,161 @@ async function portalSearch(url, env, rights) {
       library: !!(rights.admin || (rights.sites || []).includes("knowledge")) });
   } catch {
     return suppliersJson({ error: "search_unavailable" }, 503);
+  } finally { clearTimeout(timer); }
+}
+
+// КАРТОЧКИ ПОРТАЛА (/api/portal/code?k=…, /api/portal/brand?b=…,
+// /api/portal/supplier?s=…) — шаг 2 «одной стартовой страницы»: на то, что
+// нашёл поиск, — карточка кода, бренда или поставщика со ссылками друг на друга.
+// Устроены как поиск: по одной фиксированной функции базы на карточку
+// (library/supabase/portal_entity_schema.sql) через PostgREST сервисным ключом,
+// за правом suppliers. Клиент задаёт только ключ; имя функции и её параметр —
+// здесь. Ответ проходит ЗАКРЫТЫЙ список полей (схема ниже): поле, которого в
+// схеме нет, дальше воркера не идёт, а значение не того вида становится null.
+// Контактов людей и финансовых условий в схемах нет вовсе — как у suppliersCut:
+// им нечем сюда попасть, даже если функция когда-нибудь их отдаст.
+const PORTAL_ENTITY_MAX_BYTES = 512 * 1024;
+const PORTAL_ENTITY_TIMEOUT_MS = 10000;
+const PORTAL_CODE_KEY = /^[0-9a-zа-я]{1,80}$/;
+const PORTAL_BRAND_KEY = /^[0-9a-zа-я]{1,80}$/;
+const PORTAL_SUP_ID = /^KV-[SG]-[0-9]{6}-[0-9]$/;
+
+// Виды значений схемы: строка с пределом длины, строка по образцу, число,
+// логическое, объект с закрытым списком полей, массив с пределом длины.
+const ПС = {
+  s: (max) => ({ t: "s", max }),
+  k: (re, max = 80) => ({ t: "k", re, max }),
+  n: { t: "n" },
+  b: { t: "b" },
+  o: (fields) => ({ t: "o", fields }),
+  a: (item, max) => ({ t: "a", item, max }),
+};
+function portalClean(v, spec) {
+  if (v === null || v === undefined) return spec.t === "a" ? [] : null;
+  if (spec.t === "s") return typeof v === "string" && v ? v.slice(0, spec.max) : null;
+  if (spec.t === "k") return typeof v === "string" && v.length <= spec.max && spec.re.test(v) ? v : null;
+  if (spec.t === "n") return typeof v === "number" && Number.isFinite(v) ? v : null;
+  if (spec.t === "b") return typeof v === "boolean" ? v : null;
+  if (spec.t === "a") {
+    return Array.isArray(v) ? v.slice(0, spec.max).map((x) => portalClean(x, spec.item)).filter((x) => x !== null) : [];
+  }
+  if (spec.t === "o") {
+    if (typeof v !== "object" || Array.isArray(v)) return null;
+    const out = {};
+    for (const [k, s] of Object.entries(spec.fields)) out[k] = portalClean(v[k], s);
+    return out;
+  }
+  return null;
+}
+
+const ПЕ_КОД = ПС.k(PORTAL_CODE_KEY);
+const ПЕ_БРЕНД = ПС.o({ key: ПС.k(PORTAL_BRAND_KEY), name: ПС.s(120) });
+const ПЕ_КОМПАНИЯ = ПС.o({ id: ПС.k(PORTAL_SUP_ID), name: ПС.s(200), src: ПС.s(40), number: ПС.k(PORTAL_SUP_ID) });
+const ПЕ_МЕСЯЦ = ПС.k(/^[0-9]{4}-[0-9]{2}$/, 7);
+const ПЕ_ЧАСТИ = ПС.a(ПС.s(40), 10);
+const ПЕ_ПРЕДЛОЖЕНИЕ = ПС.o({
+  company: ПЕ_КОМПАНИЯ, brand: ПЕ_БРЕНД, written: ПС.s(120), price: ПС.n, currency: ПС.s(8),
+  qty: ПС.n, qty_hidden: ПС.b, unit: ПС.s(20), total: ПС.n, basis: ПС.s(40), lead_days: ПС.n,
+  month: ПЕ_МЕСЯЦ, month_src: ПС.s(40), why: ПС.s(200),
+});
+const ПЕ_АНАЛОГ = ПС.o({ code: ПЕ_КОД, written: ПС.s(120), kind: ПС.s(40), brand: ПЕ_БРЕНД });
+const PORTAL_ENTITY_SPECS = {
+  portalCode: ПС.o({
+    key: ПЕ_КОД, written: ПС.s(200), name: ПС.s(200), kv_no: ПС.s(40), catalog: ПС.b,
+    brand: ПС.o({ key: ПС.k(PORTAL_BRAND_KEY), name: ПС.s(120), src: ПС.s(40), disputed: ПС.b }),
+    brands: ПС.a(ПС.o({ key: ПС.k(PORTAL_BRAND_KEY), name: ПС.s(120), rows: ПС.n, sources: ПС.a(ПС.s(40), 8) }), 30),
+    demand: ПС.o({ rows: ПС.n, deals: ПС.n, units: ПС.n, qty: ПС.n, unit: ПС.s(20), qty_hidden: ПС.n,
+      last_month: ПЕ_МЕСЯЦ, customers: ПС.n, capped: ПС.b }),
+    offers: ПС.o({ rows: ПС.n, suppliers: ПС.n, cards: ПС.n, capped: ПС.b, brand_judged: ПС.b,
+      original_n: ПС.n, analog_n: ПС.n, original: ПС.a(ПЕ_ПРЕДЛОЖЕНИЕ, 100), analog: ПС.a(ПЕ_ПРЕДЛОЖЕНИЕ, 100) }),
+    analogs: ПС.a(ПЕ_АНАЛОГ, 100),
+    analog_of: ПС.a(ПЕ_АНАЛОГ, 50),
+    machines: ПС.a(ПС.o({ id: ПС.s(80), name: ПС.s(200), kind: ПС.s(80),
+      segment: ПС.k(/^[a-z0-9_-]+$/i, 40), brand: ПЕ_БРЕНД }), 50),
+    units: ПС.a(ПС.o({ id: ПС.s(120), name: ПС.s(200), parent: ПС.s(200), crit: ПС.s(4) }), 10),
+    write_to: ПС.a(ПС.o({ company: ПЕ_КОМПАНИЯ, codes: ПС.n, rows: ПС.n, last_month: ПЕ_МЕСЯЦ }), 15),
+    registry: ПС.b, partial: ПЕ_ЧАСТИ,
+  }),
+  portalBrand: ПС.o({
+    key: ПС.k(PORTAL_BRAND_KEY), name: ПС.s(120), country: ПС.s(80), owner: ПС.s(200), former_names: ПС.s(300),
+    spellings: ПС.a(ПС.s(120), 30),
+    demand: ПС.o({ rows: ПС.n, deals: ПС.n, codes: ПС.n, capped: ПС.b, registry_rows: ПС.n }),
+    codes_demand: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), deals: ПС.n, rows: ПС.n }), 25),
+    codes_offers: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), rows: ПС.n, suppliers: ПС.n,
+      last_month: ПЕ_МЕСЯЦ }), 25),
+    offers: ПС.o({ rows: ПС.n, capped: ПС.b, suppliers: ПС.n, rows_unresolved: ПС.n }),
+    catalog: ПС.o({ parts: ПС.n, list: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), name: ПС.s(200),
+      kv_no: ПС.s(40) }), 25) }),
+    machines: ПС.a(ПС.o({ id: ПС.s(80), name: ПС.s(200), kind: ПС.s(80),
+      segment: ПС.k(/^[a-z0-9_-]+$/i, 40), parts: ПС.n }), 50),
+    suppliers: ПС.a(ПС.o({ company: ПЕ_КОМПАНИЯ, codes: ПС.n, rows: ПС.n, last_month: ПЕ_МЕСЯЦ }), 30),
+    analogs: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), alt_code: ПЕ_КОД, alt_written: ПС.s(120),
+      kind: ПС.s(40), brand: ПЕ_БРЕНД }), 100),
+    registry: ПС.b, partial: ПЕ_ЧАСТИ,
+  }),
+  portalSupplier: ПС.o({
+    id: ПС.k(PORTAL_SUP_ID), merged_from: ПС.k(PORTAL_SUP_ID), name: ПС.s(200), name_src: ПС.s(40),
+    number: ПС.k(PORTAL_SUP_ID), inn: ПС.a(ПС.k(/^[0-9]{9,15}$/, 15), 10), domains: ПС.a(ПС.s(120), 10),
+    country: ПС.s(80), city: ПС.s(80), status: ПС.s(20), bitrix: ПС.a(ПС.k(/^[0-9]{1,18}$/, 18), 10),
+    rfq: ПС.o({ sent: ПС.n, answered: ПС.n, quoted: ПС.n, silent: ПС.n, no_outcome: ПС.n, cards: ПС.n }),
+    quotes: ПС.o({ rows: ПС.n, cards: ПС.n, codes: ПС.n, last_month: ПЕ_МЕСЯЦ, capped: ПС.b }),
+    brands: ПС.a(ПС.o({ brand: ПЕ_БРЕНД, codes: ПС.n, rows: ПС.n, last_month: ПЕ_МЕСЯЦ }), 40),
+    codes: ПС.a(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), brand: ПЕ_БРЕНД, price: ПС.n, currency: ПС.s(8),
+      qty: ПС.n, unit: ПС.s(20), month: ПЕ_МЕСЯЦ, offers: ПС.n }), 100),
+    registry: ПС.b, partial: ПЕ_ЧАСТИ,
+  }),
+};
+// Маршрут → параметр адреса, функция базы, имя её аргумента, проверка ключа.
+const PORTAL_ENTITIES = {
+  portalCode: { param: "k", fn: "portal_code", arg: "key",
+    ok: (v) => [...v].length >= 1 && [...v].length <= 120 },
+  portalBrand: { param: "b", fn: "portal_brand", arg: "brand_key", ok: (v) => PORTAL_BRAND_KEY.test(v) },
+  portalSupplier: { param: "s", fn: "portal_supplier", arg: "sup_id", ok: (v) => PORTAL_SUP_ID.test(v.toUpperCase()) },
+};
+
+async function portalEntity(route, url, env, rights) {
+  const вид = PORTAL_ENTITIES[route];
+  const v = String(url.searchParams.get(вид.param) || "").trim();
+  if (!v || /[\u0000-\u001f\u007f]/.test(v) || !вид.ok(v)) return suppliersJson({ error: "invalid_key" }, 400);
+  const key = typeof env?.SUPABASE_SERVICE_KEY === "string" ? env.SUPABASE_SERVICE_KEY.trim() : "";
+  if (!key) return suppliersJson({ error: "search_key_missing" }, 503);
+  const headers = { apikey: key, "Content-Type": "application/json", Accept: "application/json" };
+  if (!key.startsWith("sb_secret_")) headers.Authorization = "Bearer " + key;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), PORTAL_ENTITY_TIMEOUT_MS);
+  try {
+    const response = await fetch(SUPABASE_ORIGIN + "/rest/v1/rpc/" + вид.fn, {
+      method: "POST", redirect: "manual", signal: controller.signal, headers,
+      body: JSON.stringify({ [вид.arg]: v }),
+    });
+    if (response.status !== 200) {
+      try { await response.body?.cancel(); } catch {}
+      // 404 PostgREST — функции в базе нет: схема карточек ещё не применена.
+      return suppliersJson({ error: response.status === 404 ? "entity_not_installed" : "entity_unavailable" }, 503);
+    }
+    const declared = response.headers.get("Content-Length");
+    if (declared !== null && !(Number(declared) <= PORTAL_ENTITY_MAX_BYTES)) {
+      try { await response.body?.cancel(); } catch {}
+      return suppliersJson({ error: "entity_unavailable" }, 503);
+    }
+    const raw = await response.text();
+    if (new TextEncoder().encode(raw).byteLength > PORTAL_ENTITY_MAX_BYTES) return suppliersJson({ error: "entity_unavailable" }, 503);
+    const value = JSON.parse(raw);
+    // Три ответа, которые не карточка, — словами, а не пустотой: такого нет,
+    // это не код (марка стали, размер, стандарт), реестра брендов в базе нет.
+    if (value === null) return suppliersJson({ error: "not_found" }, 404);
+    if (typeof value !== "object" || Array.isArray(value)) return suppliersJson({ error: "entity_unavailable" }, 503);
+    if (route === "portalCode" && value.rejected === true) {
+      return suppliersJson({ error: "not_a_code", key: portalClean(value.key, ПЕ_КОД) }, 404);
+    }
+    if (route === "portalBrand" && value.registry === false) return suppliersJson({ error: "brands_not_installed" }, 503);
+    const card = portalClean(value, PORTAL_ENTITY_SPECS[route]);
+    if (!card) return suppliersJson({ error: "entity_unavailable" }, 503);
+    return suppliersJson({ ...card,
+      // Машины и узлы ведут в библиотеку, а её право — отдельное (сайт knowledge).
+      library: !!(rights.admin || (rights.sites || []).includes("knowledge")) });
+  } catch {
+    return suppliersJson({ error: "entity_unavailable" }, 503);
   } finally { clearTimeout(timer); }
 }
 
@@ -1378,6 +1542,9 @@ export default {
       }
       if (suppliers === "brandsSearch") return brandsSearch(url, env);
       if (suppliers === "portalSearch") return portalSearch(url, env, rights);
+      if (suppliers === "portalCode" || suppliers === "portalBrand" || suppliers === "portalSupplier") {
+        return portalEntity(suppliers, url, env, rights);
+      }
       if (["brandsApi", "brandsLinks", "brandsPairs", "brandsCodes"].includes(suppliers)) {
         let key = BRANDS_KEY, empty = { version: 1, published_at: null, brands: [], suppliers: [], totals: {} };
         if (suppliers === "brandsLinks") { key = BRANDS_LINKS_KEY; empty = { version: 1, brands: [], suppliers: [], codes: [] }; }
@@ -1396,9 +1563,10 @@ export default {
         return suppliersJson({ ...suppliersCut(snapshot, rights), admin: rights.admin,
           rights: rights.rights.filter((r) => r.startsWith("suppliers")) });
       }
-      if (suppliers === "counters" || suppliers === "nomenclature" || suppliers === "brands") {
+      if (suppliers === "counters" || suppliers === "nomenclature" || suppliers === "brands" || suppliers === "entityPage") {
         const файл = suppliers === "counters" ? "/counters.html"
-          : suppliers === "brands" ? "/brands.html" : "/nomenclature.html";
+          : suppliers === "brands" ? "/brands.html"
+          : suppliers === "entityPage" ? "/portal_entity.html" : "/nomenclature.html";
         try {
           const asset = await env.ASSETS.fetch(new Request(url.origin + файл, { headers: request.headers }));
           if (!asset.ok) return suppliersJson({ error: "suppliers_page_unavailable" }, 503);
