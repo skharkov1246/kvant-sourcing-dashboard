@@ -6,7 +6,9 @@
 //   · на страницах раздела полоска встаёт сверху, а свои ссылки страницы
 //     остаются; на стартовой странице строка рисуется в отведённом месте;
 //   · выдача сгруппирована по видам, у кода две колонки рядом — «Код» и
-//     «Бренд», каждая строка ведёт на существующую страницу своим адресом;
+//     «Бренд»; код, бренд и поставщик ведут на свои карточки /p#…, а прежний
+//     адрес (/nomenclature#k=, /brands#b=, /suppliers#e=) остаётся второй
+//     ссылкой «в прежнем разделе»; машина и узел — в библиотеку, как раньше;
 //   · бренд без ключа реестра — словом, а не брендом; библиотека без права —
 //     без ссылки, и это сказано;
 //   · строка из базы разметкой не становится (innerHTML не используется);
@@ -113,7 +115,7 @@ test("на стартовой странице строка рисуется в 
   assert.match(потомки(место).map((e) => e.textContent).join(" "), /ИНН, домену или номеру KV-S/);
 });
 
-test("выдача по видам: код и бренд рядом, у каждой строки — адрес существующей страницы", async () => {
+test("выдача по видам: код и бренд рядом, строка ведёт на карточку, прежний раздел — второй ссылкой", async () => {
   const env = окружение();
   await набрать(env, "AB-6205");
   assert.deepEqual(env.запросы, ["/api/portal/search?q=AB-6205"]);
@@ -126,20 +128,32 @@ test("выдача по видам: код и бренд рядом, у кажд
   assert.deepEqual(по_классу(коды, "kvps-cols")[0].children.map((c) => c.textContent), ["Код", "Бренд"]);
   const [первый, второй] = по_классу(коды, "kvps-code");
   // Первая колонка — код, вторая — бренд, рядом.
-  assert.equal(первый.children[0].getAttribute("href"), "/nomenclature#k=ab6205");
+  assert.equal(первый.children[0].getAttribute("href"), "/p#code=ab6205");
   assert.equal(первый.children[0].textContent, "AB-6205");
-  assert.equal(первый.children[1].children[0].getAttribute("href"), "/brands#b=skf");
+  assert.equal(первый.children[1].children[0].getAttribute("href"), "/p#brand=skf");
   assert.equal(первый.children[1].children[0].textContent, "SKF");
   assert.ok(ссылки(первый).includes("/brands#c=ab6205"), "нет перехода к цене кода");
+  // Прежний адрес кода — второй ссылкой, после карточки.
+  assert.ok(ссылки(первый).indexOf("/nomenclature#k=ab6205") > ссылки(первый).indexOf("/p#code=ab6205"));
   assert.match(первый.textContent, /сделок 2 · строк КП 3 от 2 пост\./);
   // Бренд без ключа реестра — слово, и ведёт на поиск бренда по слову.
   assert.equal(второй.children[1].children[0].getAttribute("href"),
     "/brands#n=" + encodeURIComponent("Выдуманный литейщик"));
   assert.equal(второй.children[1].children[0].className, "kvps-word");
   const все = ссылки(env.out);
-  for (const href of ["/suppliers#e=KV-S-000011-1", "/brands#b=skf", "/library#segment=gtu",
-                      "/library#section=component"]) {
+  for (const href of ["/p#supplier=KV-S-000011-1", "/suppliers#e=KV-S-000011-1", "/p#brand=skf",
+                      "/brands#b=skf", "/library#segment=gtu", "/library#section=component"]) {
     assert.ok(все.includes(href), href);
+  }
+  // У бренда и поставщика заголовок — карточка, прежний раздел — второй
+  // ссылкой, и ссылки не вложены одна в другую.
+  for (const [вид, карточка, прежний] of [["kvps-ent", "/p#supplier=KV-S-000011-1", "/suppliers#e=KV-S-000011-1"],
+                                           ["kvps-ent", "/p#brand=skf", "/brands#b=skf"]]) {
+    const строка = по_классу(env.out, вид).find((e) => ссылки(e).includes(карточка));
+    assert.ok(строка, карточка);
+    assert.deepEqual(ссылки(строка), [карточка, прежний]);
+    assert.notEqual(строка.tagName, "A");
+    assert.match(строка.textContent, /в прежнем разделе/);
   }
 });
 
@@ -175,16 +189,25 @@ test("одна буква в базу не ходит; отказ базы и «
 test("Enter открывает первую строку; переход на эту же страницу перечитывает её", async () => {
   const env = окружение({ путь: "/nomenclature" });
   await набрать(env, "AB-6205");
-  const первая = потомки(env.out).find((e) => e.tagName === "A");
+  const прежняя = потомки(env.out).find((e) => e.tagName === "A" && e.getAttribute("href") === "/nomenclature#k=ab6205");
   let отменено = false;
   // Та же страница, другой «#»: номенклатура читает адрес только при загрузке.
-  for (const fn of первая.events.click) fn({ currentTarget: первая, preventDefault() { отменено = true; } });
+  for (const fn of прежняя.events.click) fn({ currentTarget: прежняя, preventDefault() { отменено = true; } });
   assert.equal(отменено, true);
   assert.equal(env.location.hash, "#k=ab6205");
   assert.equal(env.location.reloaded, 1);
-  // Enter в строке поиска открывает первую строку выдачи.
+  // Enter в строке поиска открывает первую строку выдачи — карточку кода.
   for (const fn of env.input.events.keydown) fn({ key: "Enter", preventDefault() {} });
-  assert.equal(env.location.href, "/nomenclature#k=ab6205");
+  assert.equal(env.location.href, "/p#code=ab6205");
+
+  // Карточки сами переходят по смене «#»: со страницы /p перезагружать незачем.
+  const карточки = окружение({ путь: "/p" });
+  await набрать(карточки, "AB-6205");
+  const карточка = потомки(карточки.out).find((e) => e.tagName === "A" && e.getAttribute("href") === "/p#code=ab6205");
+  let отменено3 = false;
+  for (const fn of карточка.events.click) fn({ currentTarget: карточка, preventDefault() { отменено3 = true; } });
+  assert.equal(отменено3, false);
+  assert.equal(карточки.location.reloaded, 0);
 
   // Бренды сами переходят по смене «#»: перезагружать их незачем.
   const бренды = окружение({ путь: "/brands" });

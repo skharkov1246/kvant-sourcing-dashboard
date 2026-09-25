@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Карточка · КВАНТ</title>
+<script src="/portal_search.js" defer></script>
+<script src="/portal_entity.js" defer></script>
+<style>
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(/fonts/ibm-plex-sans-var-cyr.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(/fonts/ibm-plex-sans-var-lat.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2212}
+:root{--bg:#0e1116;--card:#151a22;--raised:#1a222e;--line:#2a3341;--ink:#e7ecf3;--dim:#a0acbd;--accent:#73b6ff;--green:#86d9b1;--amber:#e7c488;--red:#f5a7a7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif}
+a{color:var(--accent);text-underline-offset:3px}a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+[hidden]{display:none!important}.wrap{max-width:1320px;margin:auto;padding:27px 28px 60px}
+.skip{position:absolute;left:20px;top:-70px;padding:10px;background:var(--card);z-index:4}.skip:focus{top:10px}
+.topbar{display:flex;align-items:center;gap:16px;justify-content:space-between;color:var(--dim);font-size:13px;flex-wrap:wrap}.topbar a{text-decoration:none}
+.access-label{display:flex;align-items:center;gap:7px}.access-label:before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%}
+.hero{margin:30px 0 20px}
+.eyebrow{font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin:0}
+h1{font-size:clamp(24px,3vw,34px);line-height:1.25;letter-spacing:-.02em;margin:8px 0 10px;font-weight:600;overflow-wrap:anywhere}
+h1 .sep{color:var(--dim);font-weight:400;margin:0 .35em}
+h1 a{text-decoration:none;border-bottom:1px solid #33506e}
+.lead{margin:0;color:var(--dim);max-width:78ch;overflow-wrap:anywhere}
+.lead .tag{display:inline-block;border:1px solid #524733;color:var(--amber);border-radius:5px;padding:0 7px;font-size:12px;margin-left:6px;white-space:nowrap}
+dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 22px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:18px 20px;margin:0 0 22px}
+dt{font-size:11px;color:var(--dim);margin:0 0 3px}dd{margin:0;font-size:14px;overflow-wrap:anywhere}
+.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:0 0 10px}
+.total{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:15px 18px;min-width:0}
+.total strong{display:block;font-size:24px;font-weight:400;line-height:1.1;margin-bottom:7px;overflow-wrap:anywhere}
+.total span{color:var(--dim);font-size:12.5px}
+#card section{margin:26px 0 0}
+#card h2{font-size:16px;font-weight:500;margin:0 0 10px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+#card h2 span{font-size:12.5px;color:var(--dim);font-weight:400}
+.note{font-size:12.5px;color:var(--dim);margin:0 0 12px;max-width:90ch}
+.warn{color:var(--amber)}
+.none{color:var(--dim)}
+.word{color:var(--dim);border-bottom:1px dotted var(--dim)}
+/* Широкая таблица (предложения — 11–12 колонок) между телефоном и экраном
+   прокручивается внутри своей рамки, а не обрезается и не двигает страницу. */
+.table-wrap{border:1px solid var(--line);border-radius:9px;overflow-x:auto}
+.table-wrap+.note,.chips+.note{margin-top:10px}
+table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}
+th{background:#1a222d;color:var(--dim);font-size:11px;font-weight:400}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+/* break-word, а не anywhere: anywhere разрешает колонке сжаться до буквы, и на
+   средней ширине «Альфа-Подшипник» и «разбор не дошёл» шли столбиком по слогу.
+   Так колонка держит ширину слова, а широкая таблица прокручивается в рамке. */
+tr:last-child td{border-bottom:0}td{color:#c4cedb;overflow-wrap:break-word}
+td .num{overflow-wrap:normal}
+td a{text-decoration:none}
+.num{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;white-space:nowrap;color:var(--ink)}
+.src{display:block;font-size:11px;color:#7c8798;margin-top:3px}.src.warn{color:var(--amber)}
+#card h3{font-size:13px;font-weight:500;color:var(--dim);margin:16px 0 8px}
+.prices{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin:0 0 12px;font-size:13px}
+.prices p{margin:0 0 6px;overflow-wrap:anywhere}.prices p:last-child{margin-bottom:0}
+.prices strong{font-weight:500}.prices .src{display:inline;margin:0 0 0 8px}.prices .note{margin:6px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;font-size:13px;min-width:0;overflow-wrap:anywhere}
+.chip .src{display:inline;margin:0 0 0 6px}.chip .src a{font-size:12px}
+.old{font-size:12.5px;color:var(--dim)}.old a{margin-right:12px}
+.status{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:26px;margin:24px 0;color:var(--dim)}
+.status h2{font-size:19px;color:var(--ink);font-weight:500;margin:0 0 7px}.status p{max-width:70ch;margin:0}
+.status.error{border-color:#594047}.status.error h2{color:var(--red)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:18px}
+/* На узком экране таблица встаёт карточками: подпись колонки — слева от
+   значения, горизонтальной прокрутки нет. «Код» и «Бренд» остаются соседями. */
+@media(max-width:700px){
+  .wrap{padding:18px 16px 40px}
+  dl{grid-template-columns:1fr}
+  .table-wrap{border:0;border-radius:0;overflow:visible}
+  table.st thead{display:none}
+  table.st,table.st tbody,table.st tr,table.st td{display:block;width:100%}
+  table.st tr{border:1px solid var(--line);border-radius:9px;background:var(--card);margin:0 0 10px;padding:6px 0}
+  table.st td{display:grid;grid-template-columns:38% minmax(0,1fr);gap:10px;border:0;padding:5px 12px;overflow-wrap:anywhere}
+  table.st td::before{content:attr(data-l);color:var(--dim);font-size:11.5px}
+  table.st td>*{justify-self:start}
+  .num{white-space:normal}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Перейти к карточке</a>
+<div class="wrap">
+  <nav class="topbar" aria-label="Портал">
+    <span><a href="/">← Портал КВАНТ</a> · <a href="/nomenclature">Номенклатура</a> · <a href="/brands">Бренды</a> · <a href="/suppliers">Поставщики</a></span>
+    <span class="access-label">Закрытый раздел</span>
+  </nav>
+  <main id="main">
+    <div id="card" aria-live="polite">
+      <div class="status"><h2>Карточка портала</h2><p>Код, бренд или поставщик открываются из строки поиска сверху; каждая ссылка карточки ведёт на карточку того, что в ней названо.</p></div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

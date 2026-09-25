@@ -201,6 +201,7 @@ declare
   коды     jsonb;
   написания text[];
   бренды   jsonb := '{}'; -- написание → [ключ бренда, имя бренда]
+  выданы   text[] := '{}';  -- у кого из найденных поставщиков выдан вечный номер
   реестр   boolean := to_regclass('lib_brands') is not null
                       and to_regclass('lib_brand_alias') is not null
                       and to_regclass('lib_brand_map') is not null;
@@ -302,9 +303,17 @@ begin
          where sup_id = any($1) and name is not null
       $q$ into имена using array(select k from jsonb_object_keys(отбор) k where not имена ? k), имена;
     end if;
+    -- НОМЕР В ПОДПИСИ — ТОЛЬКО ВЫДАННЫЙ. Сущность без строки в
+    -- sup_number_registry ждёт ИНН: раздел «Поставщики» и карточка /p пишут у
+    -- неё «номер не выдан», и подпись поиска не должна называть номером то,
+    -- что им не является (ключ записи остаётся в адресе ссылки).
+    if to_regclass('sup_number_registry') is not null then
+      execute 'select coalesce(array_agg(sup_id), ''{}'') from sup_number_registry where sup_id = any($1)'
+        into выданы using array(select k from jsonb_object_keys(отбор) k);
+    end if;
     return query
       select 'поставщик'::text, e.id, coalesce(имена ->> e.id, e.display_name),
-             concat_ws(' · ', e.id,
+             concat_ws(' · ', case when e.id = any(выданы) then e.id else 'номер не выдан' end,
                        case o.how when 'ИНН' then 'ИНН ' || o.val when 'VAT' then 'VAT ' || o.val
                                   when 'ОГРН' then 'ОГРН ' || o.val when 'домен' then o.val
                                   when 'написание' then 'написание «' || o.val || '»' end,
