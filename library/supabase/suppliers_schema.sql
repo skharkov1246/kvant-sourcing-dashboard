@@ -438,20 +438,24 @@ begin
 end $$;
 
 -- Последовательности: та же строгость, иначе anon может двигать счётчик.
+-- Схема — из search_path, как у таблиц выше: прибитый public в отдельной схеме
+-- теста закрывал чужие последовательности, а свои оставлял с правами по
+-- умолчанию (у Supabase это select, update, usage для anon и authenticated).
 do $$
 declare s text;
+declare сх text := current_schema();
 declare кому text := sup_роли_которые_есть(array['anon', 'authenticated']);
 declare служебная text := sup_роли_которые_есть(array['service_role']);
 begin
   for s in select sequence_name from information_schema.sequences
-            where sequence_schema = 'public' and sequence_name like 'sup_%'
+            where sequence_schema = сх and sequence_name like 'sup_%'
   loop
-    execute format('revoke all on sequence public.%I from public', s);
+    execute format('revoke all on sequence %I.%I from public', сх, s);
     if кому is not null then
-      execute format('revoke all on sequence public.%I from %s', s, кому);
+      execute format('revoke all on sequence %I.%I from %s', сх, s, кому);
     end if;
     if служебная is not null then
-      execute format('grant usage, select on sequence public.%I to %s', s, служебная);
+      execute format('grant usage, select on sequence %I.%I to %s', сх, s, служебная);
     end if;
   end loop;
 end $$;

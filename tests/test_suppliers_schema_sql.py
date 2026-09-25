@@ -130,6 +130,67 @@ def test_anon_не_получает_ничего(база):
     assert not права, f"у anon/authenticated остались права: {права}"
 
 
+def открытые_объекты(cur, схема: str = ИМЯ) -> list[tuple[str, str, str, str]]:
+    """Права anon, authenticated и PUBLIC на все объекты схемы, кроме функций.
+
+    Прямо по relacl, без information_schema: role_table_grants последовательности
+    не показывает вовсе. PUBLIC в acl — нулевой oid, поэтому имя через case."""
+    cur.execute("""
+        select c.relname, c.relkind::text,
+               case when a.grantee = 0 then 'PUBLIC' else pg_get_userbyid(a.grantee) end,
+               a.privilege_type
+          from pg_class c
+          join pg_namespace ns on ns.oid = c.relnamespace,
+               aclexplode(c.relacl) a
+         where ns.nspname = %s
+           and (a.grantee = 0 or pg_get_userbyid(a.grantee) in ('anon', 'authenticated'))
+         order by 1, 3, 4""", (схема,))
+    return cur.fetchall()
+
+
+def test_служебная_роль_получает_последовательности_своей_схемы(база):
+    """Выдача service_role обязана попасть в схему, куда применён файл.
+
+    До 25.09.2026 блок последовательностей был прибит к public: в отдельной
+    схеме он не находил ни одной своей последовательности, и выдача, как и
+    отзыв, молча ничего не делала."""
+    with база.cursor() as cur:
+        применить(cur)
+        cur.execute("""
+            select c.relname, has_sequence_privilege('service_role', c.oid, 'usage'),
+                   has_sequence_privilege('service_role', c.oid, 'select')
+              from pg_class c join pg_namespace ns on ns.oid = c.relnamespace
+             where ns.nspname = %s and c.relkind = 'S'""", (ИМЯ,))
+        строки = cur.fetchall()
+    assert строки, "последовательностей не создано — проверять нечего"
+    без_прав = [имя for имя, usage, select in строки if not (usage and select)]
+    assert not без_прав, f"у service_role нет usage/select: {без_прав}"
+
+
+def test_права_по_умолчанию_как_у_supabase_закрыты(база):
+    """Всё открытое правами по умолчанию схема обязана закрыть сама.
+
+    На голом PostgreSQL у anon изначально нет ничего, и отзыв там проверять не
+    на чем: пропущенный revoke так же зелен, как сделанный. Supabase в public
+    выдаёт по умолчанию всё на таблицы, виды и последовательности anon и
+    authenticated — здесь то же в схеме теста, и после применения у них не
+    должно остаться ни одного права. Смотрятся ВСЕ объекты схемы, а не
+    sup_* по имени: последовательность таблицы с другим именем блок отзыва
+    пропустил бы, а этот тест — нет."""
+    with база.cursor() as cur:
+        for вид in ("tables", "sequences", "functions"):
+            cur.execute(f"alter default privileges in schema {ИМЯ} grant all on {вид} "
+                        "to anon, authenticated, service_role")
+        применить(cur)
+        открыто = открытые_объекты(cur)
+        cur.execute("""select count(*) from pg_class c
+                         join pg_namespace ns on ns.oid = c.relnamespace
+                        where ns.nspname = %s and c.relkind = 'S'""", (ИМЯ,))
+        последовательностей = cur.fetchone()[0]
+    assert последовательностей >= 4, "последовательностей меньше, чем bigserial в файле"
+    assert not открыто, f"права по умолчанию не сняты: {открыто}"
+
+
 def test_забытая_в_списке_таблица_роняет_схему(база):
     """Главный сторож: таблица схемы без метки обязана уронить прогон.
 
