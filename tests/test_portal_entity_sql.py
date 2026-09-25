@@ -39,6 +39,9 @@ pytestmark = pytest.mark.skipif(not DSN, reason="одноразовая база
 
 ИМЯ = "portal_entity_sql_test"
 ГОЛАЯ = "portal_entity_sql_bare"
+# Схема, где pg_roles подменён пустым видом: так выглядит чистый PostgreSQL без
+# ролей платформы, хотя в кластере они есть (правило 20).
+БЕЗ_РОЛЕЙ = "portal_entity_sql_noroles"
 СХЕМА = "portal_entity_schema.sql"
 ФАЙЛЫ = ("schema.sql", "schema_junk.sql", "suppliers_schema.sql", "brands_schema.sql",
          "portal_schema.sql", СХЕМА, СХЕМА)
@@ -155,6 +158,95 @@ insert into sup_display_name (sup_id, source, name, inn, run_id) values
  ('KV-S-000012-2', 'bitrix:requisite', null, '7700000012', 'r1');
 """
 
+# Машины и узлы (шаг 3). Изготовители — не Kelton и не SKF: ответы карточек
+# кода и бренда выше от этого корпуса не меняются. Направлений три: ТВ-10 —
+# ГТУ по семейству (сегмента нет), ГП-7 — ГПУ по сегменту, БШ-3 — горно-
+# шахтная, типового дерева нет; «Пустая выдуманная» — машина без всего.
+# У ТВ-10 деталей 120 — больше предела списка (100): усечение видно числом.
+КОРПУС_МАШИН = """
+insert into lib_segments (id, name) values ('gpu', 'ГПУ выдуманные'), ('gsho', 'ГШО выдуманное');
+insert into lib_units (id, parent_id, name, name_en, crit, aftermarket, note, source) values
+ ('rotor', null, 'Ротор выдуманный', 'Rotor', 'A', 'только у изготовителя', null, 'номенклатура выдуманная'),
+ ('rotor.bearing', 'rotor', 'Подшипник опорный выдуманный', 'Journal bearing', 'B', null,
+  'примечание к узлу выдуманное', 'номенклатура выдуманная'),
+ ('fasteners', null, 'Крепёж выдуманный', 'fasteners', 'C', null, null, 'разметка выдуманная'),
+ ('gpu.cpg', null, 'ГПУ: ЦПГ выдуманная', 'Power cylinder', 'A', null, null, 'библиотека ГПУ выдуманная'),
+ ('gpu.cpg.piston', 'gpu.cpg', 'Поршень выдуманный', 'Piston', 'A', null, null, 'библиотека ГПУ выдуманная');
+insert into lib_models (id, name, oem, family, family_title, legacy, power, efficiency, shafts, use_case, aliases,
+                        note, source, segment_id, kind) values
+ ('тв10', 'ТВ-10', 'Турбовыдумка / Выдумлит', 'sgt', 'Выдуманное семейство', 'Смерч', '≈10 МВт', '≈30%',
+  '2 вала', 'ГПА выдуманные', array['ТВ-10', 'Смерч', 'TV 10', 'ТВ10М'], 'Примечание выдуманное',
+  'справочник выдуманный', null, null),
+ ('гп7', 'ГП-7', 'Выдуммоторс', 'gpu', 'ГПУ выдуманные', null, '700 кВт', '≈40 %', 'V12', null, array['ГП-7'],
+  null, 'библиотека ГПУ выдуманная', 'gpu', 'gas_engine'),
+ ('бш3', 'БШ-3', 'Горвыдумка', null, null, null, null, null, null, null, array['БШ-3'], null,
+  'реестр выдуманный', 'gsho', 'mining_machine'),
+ ('пусто1', 'Пустая выдуманная', null, null, null, null, null, null, null, null, null, null, null, null, null);
+insert into lib_parts (id, catalog_no, name, oem, unit_id, kv_no, qty_demand)
+  select 'tvd' || lpad(g::text, 3, '0'), 'TVD-' || lpad(g::text, 3, '0'), 'Деталь турбины выдуманная ' || g,
+         case when g % 10 = 0 then 'Выдумлит' else 'Турбовыдумка' end,
+         case when g <= 30 then 'rotor.bearing' when g <= 40 then 'hot.liner' when g <= 45 then 'fasteners' end,
+         case when g in (7, 77, 117) then 'KV-00' || lpad(g::text, 4, '0') || '-1' end, g
+    from generate_series(1, 120) g;
+insert into lib_part_models (part_id, model_id)
+  select 'tvd' || lpad(g::text, 3, '0'), 'тв10' from generate_series(1, 120) g;
+insert into lib_parts (id, catalog_no, name, oem, unit_id) values
+ ('gpv001', 'GPV-001', 'Поршень выдуманный', 'Выдуммоторс', 'gpu.cpg.piston'),
+ ('gpv002', 'GPV-002', 'Свеча выдуманная', 'Выдуммоторс', null),
+ ('gpv003', 'GPV-003', 'Фильтр выдуманный', null, null),
+ ('bsh001', 'BSH-001', 'Болт выдуманный горный', 'Горвыдумка', 'fasteners'),
+ ('bsh002', 'BSH-002', 'Коронка выдуманная', 'Горвыдумка', null);
+insert into lib_part_models (part_id, model_id) values
+ ('gpv001', 'гп7'), ('gpv002', 'гп7'), ('gpv003', 'гп7'), ('bsh001', 'бш3'), ('bsh002', 'бш3');
+insert into lib_fleet (id, site, owner, model_id, model_raw, units, year, note, source) values
+ ('парк.т1', 'Выдуманная ТЭЦ-1', 'Выдуманная энергетика', 'тв10', 'ТВ-10 (Турбовыдумка)', '2', '2004',
+  'Примечание к площадке выдуманное', 'разведка выдуманная'),
+ ('парк.т2', 'Выдуманная КС-2', null, 'тв10', 'Смерч', '1', null, null, 'разведка выдуманная'),
+ ('парк.г1', 'Выдуманная мини-ТЭЦ', 'Выдуманный завод', null, null, '2 МВт', null, null, 'парк ГПУ выдуманный');
+insert into lib_bom (id, machine, model_id, part_id, part_no, qty, name, node, position_no) values
+ ('в1', 'ТВ-10', 'тв10', 'tvd001', 'TVD-001', '2', 'Деталь турбины выдуманная 1', 'РОТОР', '1'),
+ ('в2', 'ТВ-10', 'тв10', null, 'ZZ-777', '1', 'Нечто по ведомости выдуманное', 'РОТОР', '2'),
+ ('в3', 'ТВ-10', 'тв10', null, 'SS316', '4', 'Лист выдуманный', 'КОРПУС', '1');
+insert into lib_symptoms (id, name, unit_id, measure, defect, confirm, basis, confidence, source) values
+ ('признак.т1', 'Рост вибрации выдуманный', 'rotor.bearing', 'виброскорость на опоре', 'износ вкладыша',
+  'осмотр вкладыша', 'общая практика', 'low', 'справочник признаков (заготовка)'),
+ ('признак.т2', 'Разброс термопар выдуманный', 'hot', 'температура за турбиной', 'прогар', 'эндоскопия', null,
+  'low', 'справочник признаков (заготовка)'),
+ ('признак.г1', 'Стук в цилиндре выдуманный', 'gpu.cpg', 'на слух', 'задир поршня', 'эндоскопия', null, 'low',
+  'справочник признаков (заготовка)');
+insert into lib_defects (id, name, unit_id, part_number, model, cause, consequence, fix, source, deal_id,
+                         source_file) values
+ ('дефект.т1', 'Износ вкладыша выдуманный', 'rotor.bearing', null, null, 'грязное масло', 'рост вибрации',
+  'замена вкладыша', 'справочник типовых дефектов (заготовка)', 'D-777', 'ФАЙЛ-777'),
+ ('дефект.т2', 'Риск отказа: деталь выдуманная 2', 'hot.liner', 'TVD-002', 'ТВ-10', null, 'прогар', 'замена',
+  'проработка позиции', null, null),
+ ('дефект.т3', 'Риск отказа: чужая машина', 'rotor.bearing', null, 'Другая выдуманная ГТУ', null, 'что-то',
+  null, 'проработка позиции', null, null),
+ ('дефект.т4', 'Ресурс выдуманный', null, null, 'семейство Смерч', null, 'только замена', null,
+  'разведка выдуманная', null, null),
+ ('дефект.г1', 'Задир поршня выдуманный', 'gpu.cpg.piston', 'SS316', null, null, 'стук', 'замена поршня',
+  'справочник типовых дефектов (заготовка)', null, null);
+insert into lib_procedures (id, kind, name, unit_id, scope, duration, model_family, performer, source) values
+ ('ремонт.т1', 'ремонт', 'Замена вкладыша выдуманная', 'rotor.bearing', 'разборка опоры', '2 смены', null, null,
+  'справочник ремонтных операций (заготовка)'),
+ ('контроль.т1', 'контроль', 'Эндоскопия выдуманная', 'hot', 'осмотр горячего тракта', null, null, null,
+  'справочник методов (заготовка)'),
+ ('ремонт.а1', 'ремонт', 'Ремонтный центр выдуманный', null, 'ремонт горячего тракта', null, 'ansaldo',
+  'Выдуманный ремонтный центр', 'разведка выдуманная'),
+ ('ремонт.а2', 'ремонт', 'Ремонт ротора выдуманный', 'rotor', null, null, 'ansaldo', null, 'разведка выдуманная'),
+ ('модерн.с1', 'модернизация', 'Модернизация выдуманная', null, null, '3 недели', 'sgt', null,
+  'разведка выдуманная');
+insert into lib_symptom_defects (symptom_id, defect_id, source) values ('признак.т1', 'дефект.т1', 'тест');
+insert into lib_symptom_ops (symptom_id, procedure_id, source) values ('признак.т2', 'контроль.т1', 'тест');
+insert into lib_defect_ops (defect_id, procedure_id, source) values ('дефект.т1', 'ремонт.т1', 'тест');
+"""
+
+КОРПУС_МАШИН_РЕЕСТРА = """
+insert into lib_brands (brand_key, name, rule, run_id) values ('turbovyd', 'Турбовыдумка', 'тест', 'тест');
+insert into lib_brand_alias (spelling, spelling_key, source, seen_at, brand_key, status, n_rows, rule, run_id) values
+ ('Турбовыдумка', lib_brand_key('Турбовыдумка'), 'lib_models.oem', 'm', 'turbovyd', 'разрешено', 1, 'тест', 'тест');
+"""
+
 # Номера портала и справочника, которых в ответе быть не должно ни в каком поле.
 НОМЕРА_СПРАВОЧНИКОВ = ("50501", "70777")
 
@@ -189,12 +281,15 @@ def база():
         c.execute(КОРПУС_РЕЕСТРА)
         c.execute(КОРПУС_ПОСТАВЩИКОВ)
         c.execute(КОРПУС_ИМЁН)
+        c.execute(КОРПУС_МАШИН)
+        c.execute(КОРПУС_МАШИН_РЕЕСТРА)
         c.execute("analyze")
         yield conn
     finally:
         c.execute("reset search_path")
         c.execute(f"drop schema if exists {ИМЯ} cascade")
         c.execute(f"drop schema if exists {ГОЛАЯ} cascade")
+        c.execute(f"drop schema if exists {БЕЗ_РОЛЕЙ} cascade")
         for роль in созданные:
             c.execute(f"drop role if exists {роль}")
         conn.close()
@@ -544,6 +639,201 @@ def test_слитый_ведёт_на_того_в_кого_слит_и_имя_б
     assert поставщик(база, "") is None
 
 
+# ── карточки машины и узла (шаг 3) ───────────────────────────────────────────
+
+def машина(conn, i, схема: str = ИМЯ):
+    return вызвать(conn, "portal_model", i, схема)
+
+
+def узел(conn, i, схема: str = ИМЯ):
+    return вызвать(conn, "portal_unit", i, схема)
+
+
+def test_каждая_машина_и_каждый_узел_открываются(база):
+    """Мерило шага 3 в малом: у каждой машины lib_models и каждого узла
+    lib_units есть карточка (на живой базе — 132 и 126)."""
+    c = база.cursor()
+    c.execute(f"set search_path to {ИМЯ}")
+    c.execute("select id from lib_models order by id")
+    машины = [r[0] for r in c.fetchall()]
+    c.execute("select id from lib_units order by id")
+    узлы = [r[0] for r in c.fetchall()]
+    assert (len(машины), len(узлы)) == (5, 7)
+    открылось_м = [i for i in машины if (машина(база, i) or {}).get("id") == i]
+    открылось_у = [i for i in узлы if (узел(база, i) or {}).get("id") == i]
+    assert (открылось_м, открылось_у) == (машины, узлы)
+
+
+def test_машина_имя_изготовитель_паспорт(база):
+    r = машина(база, "тв10")
+    assert (r["name"], r["legacy"], r["maker_cell"]) == ("ТВ-10", "Смерч", "Турбовыдумка / Выдумлит")
+    # Написания — без повторов имени и прежнего имени.
+    assert r["aliases"] == ["TV 10", "ТВ10М"]
+    # Ячейка «Турбовыдумка / Выдумлит»: разрешилась часть — бренд реестра, а
+    # сама ячейка рядом, чтобы несведённое «Выдумлит» не пропало.
+    assert r["makers"] == [{"key": "turbovyd", "name": "Турбовыдумка"}]
+    assert (r["power"], r["efficiency"], r["shafts"], r["shafts_label"]) == ("≈10 МВт", "≈30%", "2 вала", "Валы")
+    assert (r["use_case"], r["note"], r["family"], r["source"]) == (
+        "ГПА выдуманные", "Примечание выдуманное", "Выдуманное семейство", "справочник выдуманный")
+    # Сегмента нет — направление по семейству справочника моделей.
+    assert (r["segment"], r["dir"], r["dir_via"]) == (None, "gtu", "семейство")
+    г = машина(база, "гп7")
+    assert (г["dir"], г["dir_via"], г["shafts_label"], г["segment_name"]) == ("gpu", "сегмент", "Цилиндры",
+                                                                          "ГПУ выдуманные")
+    # Изготовителя нет в реестре — словом, ключа нет.
+    assert г["makers"] == [{"key": None, "name": "Выдуммоторс"}]
+    assert машина(база, "vm400")["makers"] == [{"key": "kelton", "name": "Kelton GmbH"}]
+
+
+def test_машина_детали_код_и_бренд_рядом_усечение_видно(база):
+    r = машина(база, "тв10")
+    p = r["parts"]
+    # 120 деталей, показаны 100 — общее число рядом со списком.
+    assert (p["total"], len(p["list"]), p["with_unit"], p["no_unit"]) == (120, 100, 45, 75)
+    # Сначала — с нашим номером KV, потом по потребности из сводки.
+    assert [x["code"] for x in p["list"][:5]] == ["tvd117", "tvd077", "tvd007", "tvd120", "tvd119"]
+    первая = p["list"][0]
+    assert первая == {"code": "tvd117", "written": "TVD-117", "name": "Деталь турбины выдуманная 117",
+                      "kv_no": "KV-000117-1", "brand": {"key": "turbovyd", "name": "Турбовыдумка"}, "unit": None}
+    # У каждой детали списка бренд — соседним полем: реестра нет — словом.
+    assert all(x["brand"] and x["brand"]["name"] for x in p["list"])
+    assert {"key": None, "name": "Выдумлит"} == [x for x in p["list"] if x["code"] == "tvd120"][0]["brand"]
+    с_узлом = [x for x in p["list"] if x["code"] == "tvd030"][0]
+    assert с_узлом["unit"] == {"id": "rotor.bearing", "name": "Подшипник опорный выдуманный"}
+
+
+def test_машина_узлы_по_деталям_и_типовое_дерево(база):
+    r = машина(база, "тв10")
+    assert [(u["id"], u["parts"], u["typical"], (u["parent"] or {}).get("id")) for u in r["units"]] == [
+        ("rotor.bearing", 30, True, "rotor"), ("hot.liner", 10, True, "hot"), ("fasteners", 5, True, None)]
+    # Типовое дерево ГТУ — корни не «gpu.»; число деталей машины — по поддереву;
+    # порядок — критичность, потом имя.
+    t = r["tree"]
+    assert (t["dir"], t["via"]) == ("gtu", "семейство")
+    assert [(s["id"], s["crit"], s["children"], s["parts"]) for s in t["systems"]] == [
+        ("hot", "A", 1, 10), ("rotor", "A", 1, 30), ("fasteners", "C", 0, 5)]
+    г = машина(база, "гп7")
+    assert [(s["id"], s["parts"]) for s in г["tree"]["systems"]] == [("gpu.cpg", 1)]
+    assert [(u["id"], u["parts"]) for u in г["units"]] == [("gpu.cpg.piston", 1)]
+    assert (г["parts"]["total"], г["parts"]["no_unit"]) == (3, 2)
+    # Горно-шахтной машине типового дерева нет — не подставляется чужое.
+    б = машина(база, "бш3")
+    assert (б["dir"], б["tree"]) == (None, None)
+    assert [(u["id"], u["parts"], u["typical"]) for u in б["units"]] == [("fasteners", 1, False)]
+    assert б["symptoms"]["n"] == 0
+
+
+def test_машина_парк_и_ведомость(база):
+    r = машина(база, "тв10")
+    assert r["fleet"]["n"] == 2
+    assert r["fleet"]["list"][0] == {"site": "Выдуманная КС-2", "owner": None, "units": "1", "year": None,
+                                     "written": "Смерч", "note": None}
+    assert r["fleet"]["list"][1]["owner"] == "Выдуманная энергетика"
+    # Ведомость: строка с деталью каталога — её код и бренд; без каталога — ключ
+    # номера; марка стали кодом не становится.
+    b = r["bom"]
+    assert b["n"] == 3
+    assert [(x["code"], x["written"], x["node"], x["brand"]) for x in b["list"]] == [
+        (None, "SS316", "КОРПУС", None),
+        ("tvd001", "TVD-001", "РОТОР", {"key": "turbovyd", "name": "Турбовыдумка"}),
+        ("zz777", "ZZ-777", "РОТОР", None)]
+
+
+def test_машина_признаки_дефекты_ремонт_по_её_узлам(база):
+    r = машина(база, "тв10")
+    assert [x["name"] for x in r["symptoms"]["list"]] == ["Разброс термопар выдуманный", "Рост вибрации выдуманный"]
+    # Признак узла ГПУ к турбине не идёт.
+    assert r["symptoms"]["n"] == 2
+    вибрация = r["symptoms"]["list"][1]
+    assert (вибрация["confidence"], вибрация["defects"]) == ("low", [{"name": "Износ вкладыша выдуманный"}])
+    assert r["symptoms"]["list"][0]["ops"] == [{"kind": "контроль", "name": "Эндоскопия выдуманная"}]
+    # Дефекты: по детали машины, по имени машины (прежнее имя «Смерч»), по узлу.
+    # Дефект, записанный для другой машины, к этой не идёт.
+    д = r["defects"]
+    assert [(x["name"], x["via"]) for x in д["list"]] == [
+        ("Риск отказа: деталь выдуманная 2", "деталь"), ("Ресурс выдуманный", "машина"),
+        ("Износ вкладыша выдуманный", "узел")]
+    assert д["n"] == 3
+    деталь = д["list"][0]
+    assert (деталь["code"], деталь["written"], деталь["brand"]) == (
+        "tvd002", "TVD-002", {"key": "turbovyd", "name": "Турбовыдумка"})
+    assert д["list"][2]["ops"] == [{"kind": "ремонт", "name": "Замена вкладыша выдуманная"}]
+    # Ремонт: операции узлов машины без семейства и своего семейства (sgt);
+    # операции семейства ansaldo к машине sgt не идут.
+    assert [(x["kind"], x["name"]) for x in r["procedures"]["list"]] == [
+        ("контроль", "Эндоскопия выдуманная"), ("ремонт", "Замена вкладыша выдуманная"),
+        ("модернизация", "Модернизация выдуманная")]
+    # Дефект узла ГПУ — у газопоршневой машины; номер-марка стали — без кода.
+    г = машина(база, "гп7")
+    assert [x["name"] for x in г["symptoms"]["list"]] == ["Стук в цилиндре выдуманный"]
+    [задир] = г["defects"]["list"]
+    assert (задир["code"], задир["written"], задир["brand"], задир["via"]) == (None, "SS316", None, "узел")
+    # У машины ВМ-400 (сегмент gtu) дефект детали чужой машины ТВ-10 не идёт.
+    assert [x["name"] for x in машина(база, "vm400")["defects"]["list"]] == ["Износ вкладыша выдуманный"]
+
+
+def test_машина_без_всего_открывается_пустой(база):
+    r = машина(база, "пусто1")
+    assert (r["name"], r["makers"], r["maker_cell"], r["dir"], r["tree"]) == ("Пустая выдуманная", [], None, None, None)
+    assert (r["parts"]["total"], r["parts"]["list"], r["units"], r["fleet"]["n"], r["bom"]["n"]) == (0, [], [], 0, 0)
+    assert r["partial"] == []
+
+
+def test_узел_путь_машины_детали(база):
+    r = узел(база, "rotor.bearing")
+    assert (r["name"], r["name_en"], r["crit"], r["dir"], r["note"]) == (
+        "Подшипник опорный выдуманный", "Journal bearing", "B", "gtu", "примечание к узлу выдуманное")
+    assert (r["path"], r["children"]) == ([{"id": "rotor", "name": "Ротор выдуманный"}], [])
+    # Машины: с деталями в узле — числом; того же направления — типово.
+    м = r["machines"]
+    assert (м["n"], м["typical_n"], м["with_parts"]) == (2, 2, 1)
+    assert [(x["id"], x["parts"], x["typical"]) for x in м["list"]] == [("тв10", 30, True), ("vm400", 0, True)]
+    assert м["list"][0]["brand"] == {"key": "turbovyd", "name": "Турбовыдумка"}
+    assert (r["parts"]["total"], r["parts"]["here"], len(r["parts"]["list"])) == (30, 30, 30)
+    assert all(x["brand"] for x in r["parts"]["list"])
+    корень = узел(база, "rotor")
+    assert (корень["path"], корень["parts"]["total"], корень["parts"]["here"]) == ([], 30, 0)
+    assert корень["children"] == [{"id": "rotor.bearing", "name": "Подшипник опорный выдуманный", "crit": "B",
+                                   "children": 0, "parts": 30}]
+    assert корень["aftermarket"] == "только у изготовителя"
+    # Крепёж: две машины ГТУ типово и горная — по детали, без «типово».
+    к = узел(база, "fasteners")
+    assert [(x["id"], x["parts"], x["typical"]) for x in к["machines"]["list"]] == [
+        ("тв10", 5, True), ("бш3", 1, False), ("vm400", 0, True)]
+    # Узел ГПУ: машины — ГПУ, признак системы — у её компонента.
+    п = узел(база, "gpu.cpg.piston")
+    assert (п["dir"], п["path"]) == ("gpu", [{"id": "gpu.cpg", "name": "ГПУ: ЦПГ выдуманная"}])
+    assert [(x["id"], x["parts"], x["typical"]) for x in п["machines"]["list"]] == [("гп7", 1, True)]
+    assert [(x["name"], x["unit"]["id"]) for x in п["symptoms"]["list"]] == [("Стук в цилиндре выдуманный", "gpu.cpg")]
+
+
+def test_узел_признаки_дефекты_ремонт(база):
+    r = узел(база, "rotor.bearing")
+    [признак] = r["symptoms"]["list"]
+    assert (признак["name"], признак["measure"], признак["defects"]) == (
+        "Рост вибрации выдуманный", "виброскорость на опоре", [{"name": "Износ вкладыша выдуманный"}])
+    # На карточке узла — все дефекты узла, и для какой машины записан — видно.
+    assert [(x["name"], x["model"]) for x in r["defects"]["list"]] == [
+        ("Износ вкладыша выдуманный", None), ("Риск отказа: чужая машина", "Другая выдуманная ГТУ")]
+    assert r["defects"]["list"][0]["ops"] == [{"kind": "ремонт", "name": "Замена вкладыша выдуманная"}]
+    # Операции узла и его предка (ротор), с подписью семейства.
+    assert [(x["name"], x["unit"]["id"], x["family"]) for x in r["procedures"]["list"]] == [
+        ("Замена вкладыша выдуманная", "rotor.bearing", None), ("Ремонт ротора выдуманный", "rotor", "ansaldo")]
+
+
+def test_машина_и_узел_неизвестные_и_пустые(база):
+    for i in ("nope", "", " ", "я" * 121):
+        assert машина(база, i) is None, i
+        assert узел(база, i) is None, i
+
+
+def test_машина_и_узел_без_номеров_сделок_файлов_и_внутренних_ключей(база):
+    for r in (машина(база, "тв10"), узел(база, "rotor.bearing"), машина(база, "vm400")):
+        текст = json.dumps(r, ensure_ascii=False)
+        for лишнее in ("D-777", "ФАЙЛ-777", "признак.", "дефект.", "ремонт.", "контроль.", "парк.т"):
+            assert лишнее not in текст, (r["id"], лишнее)
+
+
 # ── база без необязательных опор ─────────────────────────────────────────────
 
 def test_без_реестра_вида_имён_и_проверки_правдоподобия(база):
@@ -567,6 +857,14 @@ def test_без_реестра_вида_имён_и_проверки_правд�
     s = поставщик(база, "KV-S-000011-1", ГОЛАЯ)
     assert (s["name"], s["name_src"]) == (None, None)
     assert поставщик(база, "KV-S-000012-2", ГОЛАЯ)["name"] == "Бета Уплотнения"
+    # Машина и узел без реестра: изготовитель и бренд детали — словом, ключа нет.
+    c.execute(КОРПУС_МАШИН)
+    m = машина(база, "тв10", ГОЛАЯ)
+    assert (m["registry"], m["makers"]) == (False, [{"key": None, "name": "Турбовыдумка / Выдумлит"}])
+    assert m["parts"]["list"][0]["brand"] == {"key": None, "name": "Турбовыдумка"}
+    assert m["parts"]["total"] == 120 and m["tree"]["dir"] == "gtu"
+    u = узел(база, "rotor.bearing", ГОЛАЯ)
+    assert u["machines"]["list"][0]["brand"] == {"key": None, "name": "Турбовыдумка / Выдумлит"}
 
 
 def test_усечение_по_бюджету_видно(база):
@@ -576,12 +874,19 @@ def test_усечение_по_бюджету_видно(база):
         r = код(база, "ZC-2002")
         b = бренд(база, "kelton")
         s = поставщик(база, "KV-S-000012-2")
+        m = машина(база, "тв10")
+        u = узел(база, "rotor.bearing")
     finally:
         c.execute("reset portal_entity.budget_ms")
     assert r["partial"] == ["предложения", "аналоги", "машины", "кто делает", "кому ещё писать"]
     assert r["offers"]["rows"] == 0 and r["write_to"] == []
     assert b["partial"] == ["предложения", "поставщики", "машины", "аналоги"]
     assert s["partial"] == ["бренды", "коды"]
+    assert m["partial"] == ["узлы", "детали", "парк", "ведомость", "признаки", "дефекты", "ремонт"]
+    # Несчитанный список — пустой, но число деталей посчитано и видно.
+    assert (m["parts"]["total"], m["parts"]["list"], m["units"]) == (120, [], [])
+    assert u["partial"] == ["машины", "детали", "признаки", "дефекты", "ремонт"]
+    assert (u["parts"]["total"], u["machines"]["list"]) == (30, [])
 
 
 def test_права_только_сервису(база):
@@ -609,6 +914,44 @@ def test_права_только_сервису(база):
                 continue
             c.execute("select has_function_privilege(%s, %s, 'execute')", (роль, f"{ИМЯ}.{функция}"))
             assert c.fetchone()[0] is можно, (функция, роль)
+
+
+def test_схема_применяется_без_ролей_supabase(база):
+    """Файл применяется на чистом PostgreSQL, где ролей anon, authenticated и
+    service_role нет (правило 20), — по-настоящему, а не чтением текста.
+
+    Роли кластерные, и в базе тестов они есть (фикстура их заводит). Поэтому в
+    отдельной схеме заводится пустой вид pg_roles, а pg_catalog ставится в
+    search_path ПОСЛЕ неё: блок прав спрашивает pg_roles без схемы и видит
+    пустоту — ровно как на чистой базе. Файл обязан примениться целиком, снять
+    права у PUBLIC и не выдать ничего несуществующей (для него) роли."""
+    import re
+    sql = (ROOT / "library" / "supabase" / СХЕМА).read_text(encoding="utf-8")
+    без_пояснений = re.sub(r"--[^\n]*", "", sql)
+    цикл = без_пояснений[без_пояснений.index("foreach ф in array array["):]
+    сигнатуры = re.findall(r"'(portal_\w+\([^']*\))'", цикл[:цикл.index("] loop")])
+    c = база.cursor()
+    try:
+        c.execute(f"drop schema if exists {БЕЗ_РОЛЕЙ} cascade")
+        c.execute(f"create schema {БЕЗ_РОЛЕЙ}")
+        c.execute(f"create view {БЕЗ_РОЛЕЙ}.pg_roles as select rolname from pg_catalog.pg_roles where false")
+        c.execute(f"set search_path to {БЕЗ_РОЛЕЙ}, pg_catalog")
+        c.execute("select count(*) from pg_roles where rolname in ('anon', 'authenticated', 'service_role')")
+        assert c.fetchone()[0] == 0, "подмена pg_roles не действует — проверка ничего бы не доказала"
+        for оператор in операторы(sql):
+            c.execute(оператор)
+        for функция in сигнатуры:
+            c.execute("select p.proacl is null or exists (select 1 from aclexplode(p.proacl) a "
+                      "where a.grantee = 0 and a.privilege_type = 'EXECUTE') "
+                      "from pg_proc p where p.oid = %s::regprocedure", (f"{БЕЗ_РОЛЕЙ}.{функция}",))
+            assert c.fetchone()[0] is False, (функция, "PUBLIC")
+            # Для файла роли service_role нет — выдачи ей быть не должно.
+            c.execute("select has_function_privilege('service_role', %s, 'execute')", (f"{БЕЗ_РОЛЕЙ}.{функция}",))
+            assert c.fetchone()[0] is False, функция
+        assert {"portal_model(text)", "portal_unit(text)"} <= set(сигнатуры)
+    finally:
+        c.execute("reset search_path")
+        c.execute(f"drop schema if exists {БЕЗ_РОЛЕЙ} cascade")
 
 
 # ── замечания скептиков 25.09.2026: каждый случай — на своей пробе ──────────

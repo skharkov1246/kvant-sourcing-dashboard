@@ -11,6 +11,9 @@
 // каждый код, бренд и компания снова ссылка. Прежние страницы не заменяются:
 // у каждой строки вторая ссылка «в прежнем разделе» — /nomenclature#k=,
 // /brands#b=, /suppliers#e= — ровно те адреса, что вели сюда до шага 2.
+// Шаг 3: машина и узел — на карточки /p#model=, /p#unit=, а прежний раздел
+// библиотеки (/library#segment=, /library#section=component) — второй ссылкой.
+// Их данные — библиотека, и без её права строка остаётся без ссылок.
 //
 // ДВА ВИДА. Если на странице есть место <div id="kvps"> (стартовая страница) —
 // строка и выдача рисуются в нём, в потоке страницы. Иначе сверху страницы
@@ -93,9 +96,10 @@
     if (r.kind === "код") return "/p#code=" + k;
     if (r.kind === "бренд") return "/p#brand=" + k;
     if (r.kind === "поставщик") return "/p#supplier=" + k;
+    // Машина и узел — данные библиотеки: карточка открывается по её праву.
     if (!library) return null;
-    if (r.kind === "машина") return r.segment ? "/library#segment=" + encodeURIComponent(r.segment) : "/library";
-    if (r.kind === "узел") return "/library#section=component";
+    if (r.kind === "машина") return "/p#model=" + k;
+    if (r.kind === "узел") return "/p#unit=" + k;
     return null;
   }
 
@@ -128,6 +132,8 @@
     if (r.kind === "код") return "/nomenclature#k=" + k;
     if (r.kind === "бренд") return "/brands#b=" + k;
     if (r.kind === "поставщик") return "/suppliers#e=" + k;
+    if (r.kind === "машина") return r.segment ? "/library#segment=" + encodeURIComponent(r.segment) : "/library";
+    if (r.kind === "узел") return "/library#section=component";
     return null;
   }
 
@@ -177,11 +183,11 @@
     return row;
   }
 
-  // Бренд и поставщик: заголовок — карточка /p, в подписи — прежний раздел.
+  // Бренд, поставщик, машина и узел: заголовок — карточка /p, в подписи — прежний раздел.
   // Две ссылки не вкладываются одна в другую, поэтому строка — не ссылка.
-  function строка_карточки(r) {
+  function строка_карточки(r, library) {
     var row = узел("div", "kvps-ent");
-    row.appendChild(ссылка(адрес(r), "kvps-t", r.title));
+    row.appendChild(ссылка(адрес(r, library), "kvps-t", r.title));
     var s = узел("span", "kvps-s", [r.subtitle, счёт(r)].filter(Boolean).join(" · "));
     s.appendChild(ссылка(прежний(r), null, "в прежнем разделе →"));
     row.appendChild(s);
@@ -222,8 +228,11 @@
         cols.appendChild(узел("span", null, "Бренд"));
         g.appendChild(cols);
         группы[вид].forEach(function (r) { g.appendChild(строка_кода(r)); });
-      } else if (вид === "бренд" || вид === "поставщик") {
-        группы[вид].forEach(function (r) { g.appendChild(строка_карточки(r)); });
+      } else if (вид === "бренд" || вид === "поставщик" || ((вид === "машина" || вид === "узел") && ответ.library)) {
+        // Машина и узел с правом на библиотеку — как бренд: заголовок ведёт на
+        // карточку /p#model= или /p#unit=, прежний раздел библиотеки — второй
+        // ссылкой. Без права — строка без ссылок и с пометкой (строка() ниже).
+        группы[вид].forEach(function (r) { g.appendChild(строка_карточки(r, !!ответ.library)); });
       } else {
         группы[вид].forEach(function (r) { g.appendChild(строка(r, !!ответ.library)); });
       }

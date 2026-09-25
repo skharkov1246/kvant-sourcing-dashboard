@@ -27,6 +27,8 @@ const TEAM = "portal-entity-test.cloudflareaccess.com";
 const OWNER = "owner@example.test";
 const READER = "reader@example.test";     // право suppliers, библиотеки нет
 const ZIPPER = "zipper@example.test";     // сайт ГШО, права suppliers нет
+const LIBRARIAN = "librarian@example.test"; // право suppliers и библиотека (сайт knowledge)
+const KNOWER = "knower@example.test";       // библиотека есть, права suppliers нет
 const GUEST = "guest@example.test";
 const encoder = new TextEncoder();
 const b64 = (v) => Buffer.from(v).toString("base64url");
@@ -46,6 +48,8 @@ function envFor(extra = {}) {
   acl.defaultRole = "guest";
   acl.users[READER] = { role: "guest", sites: [], tabs: [], rights: ["suppliers"] };
   acl.users[ZIPPER] = { role: "guest", sites: ["zip"], tabs: [], rights: [] };
+  acl.users[LIBRARIAN] = { role: "guest", sites: ["knowledge"], tabs: [], rights: ["suppliers"] };
+  acl.users[KNOWER] = { role: "guest", sites: ["knowledge"], tabs: [], rights: [] };
   box.set("acl:v1", JSON.stringify(acl));
   return { CF_ACCESS_TEAM: TEAM, __certs: { keys: [jwk] }, ADMIN_EMAILS: OWNER, assets,
     ACL: { box, get: async (key, options) => {
@@ -310,4 +314,97 @@ test("прежние страницы раздела и их адреса раб
   assert.deepEqual(env.assets, ["/portal_search.js"]);
   const портал = await (await call(env, "/", READER)).text();
   assert.match(портал, /id="kvps"/);
+});
+
+// ── машина и узел (шаг 3) ────────────────────────────────────────────────────
+// Ответ базы — с мусором: номер сделки и файла дефекта, внутренние номера
+// признака и операции, почта, ключ узла не того вида.
+const МАШИНА = {
+  id: "тв10", name: "ТВ-10", legacy: "Смерч", aliases: ["TV 10"], makers: [{ key: "turbovyd", name: "Турбовыдумка" }],
+  maker_cell: "Турбовыдумка", segment: null, kind: "turbine", dir: "gtu", dir_via: "семейство", owner_email: "x@example.test",
+  parts: { total: 120, with_unit: 45, no_unit: 75, list: [{ code: "tvd001", written: "TVD-001", name: "Деталь",
+    brand: { key: "turbovyd", name: "Турбовыдумка" }, unit: { id: "rotor.bearing", name: "Подшипник" }, qty_demand: 5 }] },
+  units: [{ id: "rotor.bearing", name: "Подшипник", crit: "B", parent: { id: "rotor", name: "Ротор" }, parts: 30,
+            typical: true }, { id: "Не ключ!", name: "Узел", parts: 1 }],
+  tree: { dir: "gtu", via: "семейство", systems: [{ id: "rotor", name: "Ротор", crit: "A", children: 1, parts: 30 }] },
+  fleet: { n: 1, list: [{ site: "ТЭЦ выдуманная", owner: "Владелец", units: "2", phone: "+0 000" }] },
+  bom: { n: 0, list: [] },
+  symptoms: { n: 1, list: [{ id: "признак.секрет", name: "Вибрация", unit: { id: "rotor.bearing", name: "Подшипник" },
+    confidence: "low", defects: [{ id: "дефект.секрет", name: "Износ" }], ops: [] }] },
+  defects: { n: 1, list: [{ id: "дефект.секрет", name: "Износ", via: "узел", deal_id: "D-777", source_file: "ФАЙЛ-777",
+    code: "tvd002", written: "TVD-002", brand: { key: "turbovyd", name: "Турбовыдумка" }, ops: [] }] },
+  procedures: { n: 1, list: [{ id: "ремонт.секрет", kind: "ремонт", name: "Замена", performer_key: "ключ-исполнителя" }] },
+  registry: true, partial: [],
+};
+
+test("машина и узел: право библиотеки вдобавок к suppliers, ключ проверен, одна функция на карточку", async () => {
+  const env = envFor({ SUPABASE_SERVICE_KEY: "sb_secret_TESTKEYTESTKEY" });
+  await сетью(МАШИНА, async (вызовы) => {
+    for (const path of ["/api/portal/model?id=sgt400", "/api/portal/unit?id=hot"]) {
+      // Без права suppliers — отказ раздела; с suppliers, но без библиотеки —
+      // отказ по праву библиотеки, словом «knowledge».
+      assert.equal((await call(env, path, GUEST)).status, 403, path);
+      assert.equal((await call(env, path, KNOWER)).status, 403, path);
+      const r = await call(env, path, READER);
+      assert.equal(r.status, 403, path);
+      assert.deepEqual(await r.json(), { error: "forbidden", need: "knowledge" }, path);
+    }
+    for (const path of ["/api/portal/model?id=", "/api/portal/model?id=SGT400", "/api/portal/model?id=sgt-400",
+                        "/api/portal/model?id=" + "x".repeat(121), "/api/portal/model?id=a%01b",
+                        "/api/portal/unit?id=Hot", "/api/portal/unit?id=.hot", "/api/portal/unit?id=hot%2F..",
+                        "/api/portal/unit?id=" + encodeURIComponent("узел"), "/api/portal/unit?id="]) {
+      const bad = await call(env, path, LIBRARIAN);
+      assert.equal(bad.status, 400, path);
+      assert.equal((await bad.json()).error, "invalid_key", path);
+    }
+    assert.equal(вызовы.length, 0, "отказ не должен ходить в базу");
+    for (const [path, email, fn, body] of [
+      ["/api/portal/model?id=" + encodeURIComponent("тв10") + "&fn=drop", LIBRARIAN, "portal_model", { model_id: "тв10" }],
+      ["/api/portal/model?id=sgt400", OWNER, "portal_model", { model_id: "sgt400" }],
+      ["/api/portal/unit?id=gpu.cpg.piston-ring", LIBRARIAN, "portal_unit", { unit_id: "gpu.cpg.piston-ring" }],
+    ]) {
+      const ok = await call(env, path, email);
+      assert.equal(ok.status, 200, path);
+      const последний = вызовы[вызовы.length - 1];
+      assert.match(последний.u, new RegExp("/rest/v1/rpc/" + fn + "$"));
+      assert.deepEqual(последний.body, body, path);
+    }
+  });
+});
+
+test("карточка машины идёт закрытым списком: номера сделок, файлов и внутренние ключи отсекаются", async () => {
+  const env = envFor({ SUPABASE_SERVICE_KEY: "sb_secret_TESTKEYTESTKEY" });
+  await сетью(МАШИНА, async () => {
+    const text = await (await call(env, "/api/portal/model?id=sgt400", LIBRARIAN)).text();
+    for (const secret of ["D-777", "ФАЙЛ-777", "признак.секрет", "дефект.секрет", "ремонт.секрет", "x@example.test",
+                          "+0 000", "ключ-исполнителя", "qty_demand", "owner_email", "deal_id", "source_file"]) {
+      assert.ok(!text.includes(secret), `в ответе осталось «${secret}»`);
+    }
+    const v = JSON.parse(text);
+    assert.deepEqual(v.makers, [{ key: "turbovyd", name: "Турбовыдумка" }]);
+    assert.deepEqual(v.parts.list[0].brand, { key: "turbovyd", name: "Турбовыдумка" });
+    assert.equal(v.parts.total, 120);
+    // Ключ узла не того вида ссылкой не станет.
+    assert.equal(v.units[1].id, null);
+    assert.equal(v.defects.list[0].code, "tvd002");
+    assert.equal(v.library, true);
+  });
+});
+
+test("машина и узел: не нашлось и функции нет — словами; прочие пути — 404", async () => {
+  const env = envFor({ SUPABASE_SERVICE_KEY: "sb_secret_TESTKEYTESTKEY" });
+  await сетью(null, async () => {
+    const r = await call(env, "/api/portal/unit?id=nope", LIBRARIAN);
+    assert.equal(r.status, 404);
+    assert.equal((await r.json()).error, "not_found");
+  });
+  await сетью({ code: "PGRST202" }, async () => {
+    const r = await call(env, "/api/portal/model?id=sgt400", LIBRARIAN);
+    assert.equal(r.status, 503);
+    assert.equal((await r.json()).error, "entity_not_installed");
+  }, 404);
+  for (const path of ["/api/portal/model/x", "/api/portal/unit;x", "/api/portal/models", "/api/portal%2funit"]) {
+    const response = await call(env, path + "?id=hot", GUEST);
+    assert.equal(response.status, 404, path);
+  }
 });

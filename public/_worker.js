@@ -678,6 +678,10 @@ function suppliersRoute(path) {
   if (path === "/api/portal/code") return "portalCode";
   if (path === "/api/portal/brand") return "portalBrand";
   if (path === "/api/portal/supplier") return "portalSupplier";
+  // Машина и узел (шаг 3) — данные библиотеки: вдобавок к праву раздела нужен
+  // сайт knowledge, как у /library (проверка ниже, в разборе раздела).
+  if (path === "/api/portal/model") return "portalModel";
+  if (path === "/api/portal/unit") return "portalUnit";
   // Маршрута публикации здесь нет намеренно: снимок кладёт scripts/publish_suppliers.py
   // прямо в KV через API Cloudflare — так же, как публикуется библиотека. Второй стек
   // разбора и проверки тела запроса в воркере не нужен, а /admin/suppliers ниже
@@ -979,6 +983,11 @@ async function portalSearch(url, env, rights) {
 // правом suppliers (ПОЛЯ_ПРЕДЛОЖЕНИЯ в library/crossref.py). НАШИ деньги —
 // договоры, лимиты, закупки — режет suppliersCut, и карточка тоже проходит
 // через него: поле с таким именем, появись оно в схеме, закроется правом.
+//
+// Шаг 3: /api/portal/model?id=… и /api/portal/unit?id=… — карточки машины и
+// узла (portal_model, portal_unit). Их данные — библиотека, поэтому к праву
+// suppliers (оно у всего /api/portal и у страницы /p) добавляется право
+// библиотеки: сайт knowledge, как у /library.
 const PORTAL_ENTITY_MAX_BYTES = 512 * 1024;
 const PORTAL_ENTITY_TIMEOUT_MS = 10000;
 const PORTAL_CODE_KEY = /^[0-9a-zа-я]{1,80}$/;
@@ -989,6 +998,12 @@ const PORTAL_SUP_ID = /^KV-[SG]-[0-9]{6}-[0-9]$/;
 // «i» без «u» не сводит не-ASCII букву к ASCII.
 const PORTAL_SUP_ID_ANY_CASE = /^KV-[SG]-[0-9]{6}-[0-9]$/i;
 const PORTAL_BX_ID = /^[0-9]{1,18}$/;
+// Ключ машины — нормализованное имя (library/equipment.norm_model: строчные
+// латиница, кириллица и цифры); ключ узла — «система.компонент» из латиницы
+// (equipment.slug_en), у ГПУ с префиксом «gpu.». Регистр не переводится —
+// по той же причине, что у номера поставщика.
+const PORTAL_MODEL_ID = /^[0-9a-zа-яё]{1,120}$/;
+const PORTAL_UNIT_ID = /^[a-z0-9][a-z0-9._-]{0,119}$/;
 
 // Виды значений схемы: строка с пределом длины, строка по образцу, число,
 // логическое, объект с закрытым списком полей, массив с пределом длины.
@@ -1040,6 +1055,24 @@ const ПЕ_ЦЕНЫ = ПС.o({
 const ПЕ_АНАЛОГ = ПС.o({ code: ПЕ_КОД, written: ПС.s(120), kind: ПС.s(40), brand: ПЕ_БРЕНД });
 const ПЕ_МАШИНА = { id: ПС.s(80), name: ПС.s(200), kind: ПС.s(80), segment: ПС.k(/^[a-z0-9_-]+$/i, 40),
   segment_name: ПС.s(80) };
+// Машина и узел (шаг 3). Внутренних номеров признаков, дефектов и операций в
+// схеме нет — страниц у них нет, и ссылаться ими не на что; номеров сделок и
+// файлов (lib_defects.deal_id, source_file) — тоже.
+const ПЕ_УЗЕЛ = ПС.o({ id: ПС.k(PORTAL_UNIT_ID, 120), name: ПС.s(300) });
+const ПЕ_НАПРАВЛЕНИЕ = ПС.k(/^(gtu|gpu)$/, 3);
+const ПЕ_ДЕТАЛЬ = ПС.o({ code: ПЕ_КОД, written: ПС.s(120), name: ПС.s(200), kv_no: ПС.s(40), brand: ПЕ_БРЕНД,
+  unit: ПЕ_УЗЕЛ });
+const ПЕ_ДЕТАЛИ = (поля) => ПС.o({ total: ПС.n, ...поля, list: ПС.a(ПЕ_ДЕТАЛЬ, 100) });
+const ПЕ_ОПЕРАЦИЯ = ПС.o({ kind: ПС.s(40), name: ПС.s(300) });
+const ПЕ_СПИСОК = (item, max) => ПС.o({ n: ПС.n, list: ПС.a(item, max) });
+const ПЕ_ПРИЗНАКИ = ПЕ_СПИСОК(ПС.o({ name: ПС.s(300), unit: ПЕ_УЗЕЛ, measure: ПС.s(610), defect: ПС.s(610),
+  confirm: ПС.s(610), basis: ПС.s(310), confidence: ПС.s(20), source: ПС.s(210),
+  defects: ПС.a(ПС.o({ name: ПС.s(300) }), 8), ops: ПС.a(ПЕ_ОПЕРАЦИЯ, 8) }), 50);
+const ПЕ_ДЕФЕКТЫ = ПЕ_СПИСОК(ПС.o({ name: ПС.s(300), unit: ПЕ_УЗЕЛ, model: ПС.s(200),
+  via: ПС.k(/^(деталь|машина|узел)$/, 10), cause: ПС.s(610), consequence: ПС.s(810), fix: ПС.s(810),
+  source: ПС.s(210), code: ПЕ_КОД, written: ПС.s(120), brand: ПЕ_БРЕНД, ops: ПС.a(ПЕ_ОПЕРАЦИЯ, 8) }), 50);
+const ПЕ_РЕМОНТ = ПЕ_СПИСОК(ПС.o({ kind: ПС.s(40), name: ПС.s(300), unit: ПЕ_УЗЕЛ, scope: ПС.s(410),
+  duration: ПС.s(120), family: ПС.s(40), performer: ПС.s(200), source: ПС.s(210) }), 60);
 const PORTAL_ENTITY_SPECS = {
   portalCode: ПС.o({
     key: ПЕ_КОД, written: ПС.s(200), name: ПС.s(200), kv_no: ПС.s(40), catalog: ПС.b,
@@ -1093,6 +1126,36 @@ const PORTAL_ENTITY_SPECS = {
       qty: ПС.n, unit: ПС.s(20), month: ПЕ_МЕСЯЦ, offers: ПС.n }), 100),
     registry: ПС.b, partial: ПЕ_ЧАСТИ,
   }),
+  portalModel: ПС.o({
+    id: ПС.k(PORTAL_MODEL_ID, 120), name: ПС.s(200), legacy: ПС.s(300), aliases: ПС.a(ПС.s(120), 30),
+    makers: ПС.a(ПЕ_БРЕНД, 10), maker_cell: ПС.s(200),
+    segment: ПС.k(/^[a-z0-9_-]+$/i, 40), segment_name: ПС.s(80), kind: ПС.s(80), family: ПС.s(200),
+    power: ПС.s(120), efficiency: ПС.s(120), shafts: ПС.s(120), shafts_label: ПС.s(40), use_case: ПС.s(300),
+    note: ПС.s(610), source: ПС.s(200), dir: ПЕ_НАПРАВЛЕНИЕ, dir_via: ПС.s(40),
+    parts: ПЕ_ДЕТАЛИ({ with_unit: ПС.n, no_unit: ПС.n }),
+    units: ПС.a(ПС.o({ id: ПС.k(PORTAL_UNIT_ID, 120), name: ПС.s(300), crit: ПС.s(4), parent: ПЕ_УЗЕЛ,
+      parts: ПС.n, typical: ПС.b }), 130),
+    tree: ПС.o({ dir: ПЕ_НАПРАВЛЕНИЕ, via: ПС.s(40), systems: ПС.a(ПС.o({ id: ПС.k(PORTAL_UNIT_ID, 120),
+      name: ПС.s(300), crit: ПС.s(4), children: ПС.n, parts: ПС.n }), 40) }),
+    fleet: ПЕ_СПИСОК(ПС.o({ site: ПС.s(300), owner: ПС.s(200), units: ПС.s(40), year: ПС.s(40),
+      written: ПС.s(200), note: ПС.s(410) }), 50),
+    bom: ПЕ_СПИСОК(ПС.o({ code: ПЕ_КОД, written: ПС.s(120), name: ПС.s(200), node: ПС.s(200), qty: ПС.s(40),
+      position: ПС.s(40), brand: ПЕ_БРЕНД }), 100),
+    symptoms: ПЕ_ПРИЗНАКИ, defects: ПЕ_ДЕФЕКТЫ, procedures: ПЕ_РЕМОНТ,
+    registry: ПС.b, partial: ПЕ_ЧАСТИ,
+  }),
+  portalUnit: ПС.o({
+    id: ПС.k(PORTAL_UNIT_ID, 120), name: ПС.s(300), name_en: ПС.s(300), crit: ПС.s(4), aftermarket: ПС.s(300),
+    note: ПС.s(610), source: ПС.s(200), dir: ПЕ_НАПРАВЛЕНИЕ, path: ПС.a(ПЕ_УЗЕЛ, 10),
+    children: ПС.a(ПС.o({ id: ПС.k(PORTAL_UNIT_ID, 120), name: ПС.s(300), crit: ПС.s(4), children: ПС.n,
+      parts: ПС.n }), 130),
+    machines: ПС.o({ n: ПС.n, typical_n: ПС.n, with_parts: ПС.n,
+      list: ПС.a(ПС.o({ ...ПЕ_МАШИНА, id: ПС.k(PORTAL_MODEL_ID, 120), brand: ПЕ_БРЕНД, parts: ПС.n,
+        typical: ПС.b }), 80) }),
+    parts: ПЕ_ДЕТАЛИ({ here: ПС.n }),
+    symptoms: ПЕ_ПРИЗНАКИ, defects: ПЕ_ДЕФЕКТЫ, procedures: ПЕ_РЕМОНТ,
+    registry: ПС.b, partial: ПЕ_ЧАСТИ,
+  }),
 };
 // Маршрут → параметр адреса, функция базы, имя её аргумента, проверка ключа.
 const PORTAL_ENTITIES = {
@@ -1100,7 +1163,11 @@ const PORTAL_ENTITIES = {
     ok: (v) => [...v].length >= 1 && [...v].length <= 120 },
   portalBrand: { param: "b", fn: "portal_brand", arg: "brand_key", ok: (v) => PORTAL_BRAND_KEY.test(v) },
   portalSupplier: { param: "s", fn: "portal_supplier", arg: "sup_id", ok: (v) => PORTAL_SUP_ID_ANY_CASE.test(v) },
+  portalModel: { param: "id", fn: "portal_model", arg: "model_id", ok: (v) => PORTAL_MODEL_ID.test(v) },
+  portalUnit: { param: "id", fn: "portal_unit", arg: "unit_id", ok: (v) => PORTAL_UNIT_ID.test(v) },
 };
+// Карточки, чьи данные — библиотека: к праву раздела нужен сайт knowledge.
+const PORTAL_LIBRARY_ROUTES = ["portalModel", "portalUnit"];
 
 async function portalEntity(route, url, env, rights) {
   const вид = PORTAL_ENTITIES[route];
@@ -1573,6 +1640,17 @@ export default {
       if (suppliers === "brandsSearch") return brandsSearch(url, env);
       if (suppliers === "portalSearch") return portalSearch(url, env, rights);
       if (suppliers === "portalCode" || suppliers === "portalBrand" || suppliers === "portalSupplier") {
+        return portalEntity(suppliers, url, env, rights);
+      }
+      // Машина и узел — данные библиотеки. Право то же, что у /library и у
+      // ссылок на машины в поиске и карточках: сайт knowledge (или владелец).
+      // Отказ пишется в журнал под сайтом knowledge — как отказ самой
+      // библиотеки, чтобы было видно, кому её не хватает.
+      if (PORTAL_LIBRARY_ROUTES.includes(suppliers)) {
+        if (!rights.admin && !(rights.sites || []).includes("knowledge")) {
+          ctx.waitUntil(audit(env, request, who, "knowledge", url.pathname, { denied: true }));
+          return suppliersJson({ error: "forbidden", need: "knowledge" }, 403);
+        }
         return portalEntity(suppliers, url, env, rights);
       }
       if (["brandsApi", "brandsLinks", "brandsPairs", "brandsCodes"].includes(suppliers)) {

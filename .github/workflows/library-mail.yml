@@ -55,9 +55,11 @@ on:
       bodies:
         description: "Разбирать и тексты писем (портал за них не платит: текст приходит списком писем)"
         type: boolean
-        default: false
+        # Включено по замеру 25.09.2026 (прогон 36103645077): 2 000 писем лидов,
+        # 1 819 тел, 918 с перечнем, 2 457 позиций, из них с кодом 1 591.
+        default: true
       files:
-        description: "Брать вложения (без них отметка не сдвигается — вложения этих писем возьмёт следующий прогон)"
+        description: "Брать вложения (без них — только тела, по своей отметке «:тела»)"
         type: boolean
         default: true
       bitrix_rps:
@@ -117,6 +119,8 @@ jobs:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           MAIL_GROUP: ${{ inputs.group }}
+          # план и отметка читают ту же отметку, что пишет прогон (mail_source.имя_отметки)
+          MAIL_FILES: ${{ inputs.files && '1' || '0' }}
           MAIL_LIMIT: ${{ inputs.limit }}
           # Границы частей считает план: поровну по письмам знает только тот,
           # кто прочитал их номера.
@@ -224,9 +228,9 @@ jobs:
   # часть отметку не двигает, и следующий запуск перечитает ту же пачку.
   cursor:
     needs: [plan, index]
-    # Без вложений отметку не двигаем: пачка, записанная одними телами, иначе
-    # навсегда потеряла бы свои вложения. Перечитанные тела отсеются по lib_files.
-    if: inputs.apply && inputs.files && needs.plan.outputs.mail_count != '0'
+    # Без вложений двигается СВОЯ отметка «почта:<группа>:тела»
+    # (mail_source.имя_отметки): общая отметка вложений остаётся на месте.
+    if: inputs.apply && needs.plan.outputs.mail_count != '0'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -243,6 +247,8 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           MAIL_GROUP: ${{ inputs.group }}
+          # план и отметка читают ту же отметку, что пишет прогон (mail_source.имя_отметки)
+          MAIL_FILES: ${{ inputs.files && '1' || '0' }}
           MAIL_FROM: ${{ needs.plan.outputs.mail_from }}
           MAIL_TO: ${{ needs.plan.outputs.mail_to }}
           MAIL_COUNT: ${{ needs.plan.outputs.mail_count }}

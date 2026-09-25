@@ -21,7 +21,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 СХЕМА = ROOT / "library" / "supabase" / "portal_entity_schema.sql"
-ФУНКЦИИ = {"portal_code": "portalCode", "portal_brand": "portalBrand", "portal_supplier": "portalSupplier"}
+ФУНКЦИИ = {"portal_code": "portalCode", "portal_brand": "portalBrand", "portal_supplier": "portalSupplier",
+           "portal_model": "portalModel", "portal_unit": "portalUnit"}
 
 
 def без_комментариев_sql(текст: str) -> str:
@@ -50,21 +51,23 @@ def test_воркер_зовёт_те_функции_с_теми_парамет�
     for функция, маршрут in ФУНКЦИИ.items():
         m = re.search(rf"create function {функция}\((\w+) text\) returns jsonb", sql)
         assert m, f"в схеме нет {функция}(<параметр> text) returns jsonb"
-        вызов = re.search(rf'{маршрут}: \{{ param: "(\w)", fn: "(\w+)", arg: "(\w+)"', js)
+        вызов = re.search(rf'{маршрут}: \{{ param: "(\w+)", fn: "(\w+)", arg: "(\w+)"', js)
         assert вызов, маршрут
         assert вызов.group(2) == функция and вызов.group(3) == m.group(1), (маршрут, вызов.groups(), m.group(1))
-    for путь in ("/api/portal/code", "/api/portal/brand", "/api/portal/supplier"):
+    for путь in ("/api/portal/code", "/api/portal/brand", "/api/portal/supplier", "/api/portal/model",
+                 "/api/portal/unit"):
         assert f'"{путь}"' in js, путь
     assert '"/rest/v1/rpc/" + вид.fn' in js
 
 
 def test_адреса_страницы_и_параметры_совпадают_с_воркером():
-    """Страница спрашивает ?k=, ?b=, ?s= — ровно те параметры, что читает воркер."""
+    """Страница спрашивает ?k=, ?b=, ?s=, ?id= — ровно те параметры, что читает воркер."""
     js = без_комментариев_js((ROOT / "public" / "_worker.js").read_text(encoding="utf-8"))
     стр = (ROOT / "public" / "portal_entity.js").read_text(encoding="utf-8")
     for маршрут, путь in (("portalCode", "/api/portal/code"), ("portalBrand", "/api/portal/brand"),
-                          ("portalSupplier", "/api/portal/supplier")):
-        параметр = re.search(rf'{маршрут}: \{{ param: "(\w)"', js).group(1)
+                          ("portalSupplier", "/api/portal/supplier"), ("portalModel", "/api/portal/model"),
+                          ("portalUnit", "/api/portal/unit")):
+        параметр = re.search(rf'{маршрут}: \{{ param: "(\w+)"', js).group(1)
         assert f'"{путь}?{параметр}="' in стр, (путь, параметр)
 
 
@@ -96,3 +99,29 @@ def test_функции_карточек_ничего_не_пишут():
                       "drop table", "alter table"):
             assert слово not in тело, (имя, слово)
         assert re.search(r"language (plpgsql|sql) (stable|immutable)", sql[sql.index(f"function {имя}("):]), имя
+
+
+def test_машина_и_узел_закрыты_правом_библиотеки():
+    """Машина и узел — данные библиотеки: воркер пускает к ним по сайту
+    knowledge (как /library и как ссылки на машину в поиске), а не только по
+    праву suppliers. Проверка — по коду разбора раздела: маршруты машины и узла
+    идут через список PORTAL_LIBRARY_ROUTES, и проверка права стоит ДО вызова
+    карточки."""
+    js = без_комментариев_js((ROOT / "public" / "_worker.js").read_text(encoding="utf-8"))
+    assert re.search(r'PORTAL_LIBRARY_ROUTES = \["portalModel", "portalUnit"\]', js)
+    ветка = js[js.index("if (PORTAL_LIBRARY_ROUTES.includes(suppliers))"):]
+    ветка = ветка[:ветка.index("return portalEntity(suppliers")]
+    assert 'includes("knowledge")' in ветка and '"forbidden"' in ветка and "rights.admin" in ветка
+
+
+def test_ссылки_на_машину_и_узел_ведут_на_их_карточки():
+    """Поиск и карточки кода и бренда ведут на /p#model= и /p#unit=; прежняя
+    заглушка «у библиотеки нет адреса машины» ушла, а прежний раздел
+    библиотеки остался второй ссылкой, как у кода и бренда."""
+    стр = без_комментариев_js((ROOT / "public" / "portal_entity.js").read_text(encoding="utf-8"))
+    поиск = без_комментариев_js((ROOT / "public" / "portal_search.js").read_text(encoding="utf-8"))
+    assert '"/p#model=" + к(id)' in стр and '"/p#unit=" + к(id)' in стр
+    assert "/^#(code|brand|supplier|model|unit)=(.+)$/" in стр
+    assert "нет адреса машины" not in стр
+    assert 'return "/p#model=" + k;' in поиск and 'return "/p#unit=" + k;' in поиск
+    assert '"/library#section=component"' in поиск and '"/library#segment="' in поиск
