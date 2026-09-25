@@ -180,15 +180,23 @@ end $fn$;
 --    индекса по ключу каталожного номера нет, и чтение lib_parts на каждый
 --    отвергнутый код (13 тыс. деталей на код) у поставщика с тысячами кодов
 --    стоило бы секунд.
+--    Стандарт с размером («DIN 471 25», ключ din47125) — код, но по ключу его
+--    от голого стандарта не отличить: судят написания в данных
+--    (lib_pn_std_sized, schema.sql) — только для отвергнутых и только если
+--    функция уже стоит в базе.
 create or replace function portal_codes_ok(keys text[]) returns text[]
   language plpgsql stable as $fn$
 declare
   годные text[];
+  с_размером text := '';
 begin
   if to_regprocedure('lib_pn_plausible(text)') is null then
     return array(select distinct x from unnest(keys) x where coalesce(x, '') <> '');
   end if;
-  execute $q$
+  if to_regprocedure('lib_pn_std_sized(text[])') is not null then
+    с_размером := 'union select unnest(lib_pn_std_sized(array(select x from плохие)))';
+  end if;
+  execute format($q$
     with к as (
       select distinct x from unnest($1) x where coalesce(x, '') <> ''
     ), плохие as materialized (
@@ -198,10 +206,11 @@ begin
       union
       select lib_pn_key(p.catalog_no) from lib_parts p
        where exists (select 1 from плохие) and lib_pn_key(p.catalog_no) in (select x from плохие)
+      %s
     )
     select coalesce(array_agg(к.x), '{}') from к
      where к.x not in (select x from плохие) or к.x in (select x from защищены)
-  $q$ into годные using keys;
+  $q$, с_размером) into годные using keys;
   return годные;
 end $fn$;
 

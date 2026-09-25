@@ -562,7 +562,8 @@ def данные_sql(источник: str, карта_sql: str) -> str:
     return f"""\
 with
   src as ({ЯЧЕЙКИ[источник]}),
-  cells as (select cell, n, 'xx'::text as code, ''::text as name_key from src),
+  cells as (select cell, n, 'xx'::text as code, ''::text as name_key,
+                null::text as pn from src),
 {_конвейер(карта_sql)},
   pieces_n as (
     select tj.piece, tj.raw_key, tj.brand_key, tj.in_dict, tj.text_reject, sum(s.n) as n
@@ -625,7 +626,8 @@ with
     union select oem from art where btrim(coalesce(oem, '')) <> ''
     union select oem from dem where btrim(coalesce(oem, '')) <> ''
   ),
-  cells as (select cell, 'xx'::text as code, ''::text as name_key from all_cells),
+  cells as (select cell, 'xx'::text as code, ''::text as name_key,
+                null::text as pn from all_cells),
 {_конвейер(карта_sql)},
   cs as (
     select cell, bool_or(text_reject is null) as has_brand,
@@ -692,7 +694,8 @@ def вне_очереди_sql(карта_sql: str) -> str:
     return f"""\
 with
   src as ({части}),
-  cells as (select distinct cell, 'xx'::text as code, ''::text as name_key from src),
+  cells as (select distinct cell, 'xx'::text as code, ''::text as name_key,
+                null::text as pn from src),
 {_конвейер(карта_sql)},
   unresolved as (
     select distinct s.source, left(btrim(tj.piece), {ДЛИНА}) as piece

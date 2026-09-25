@@ -198,6 +198,7 @@ declare
   буквы    boolean;
   отбор    jsonb;
   кандидаты jsonb := '{}';
+  с_размером text[];
   коды     jsonb;
   написания text[];
   бренды   jsonb := '{}'; -- написание → [ключ бренда, имя бренда]
@@ -515,11 +516,18 @@ begin
   end if;
   -- Марки материала и обозначения стандартов («SS316», «ГОСТ 8752») кодом не
   -- являются. Проверка — соседней работы; пока её нет, кандидаты идут как есть.
+  -- Стандарт с размером («DIN 471 25») — код: кандидат — ключ, и написания
+  -- судит lib_pn_std_sized (schema.sql), если она уже стоит в базе.
   if to_regprocedure('lib_pn_plausible(text)') is not null then
+    с_размером := '{}';
+    if to_regprocedure('lib_pn_std_sized(text[])') is not null then
+      execute 'select lib_pn_std_sized(array(select jsonb_object_keys($1)))'
+        into с_размером using кандидаты;
+    end if;
     execute $q$
       select coalesce(jsonb_object_agg(e.key, e.value), '{}')
-        from jsonb_each($1) e where lib_pn_plausible(e.key)
-    $q$ into кандидаты using кандидаты;
+        from jsonb_each($1) e where lib_pn_plausible(e.key) or e.key = any($2)
+    $q$ into кандидаты using кандидаты, с_размером;
   end if;
   if кандидаты = '{}' then
     return;

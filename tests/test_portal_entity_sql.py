@@ -62,7 +62,8 @@ insert into lib_demand (deal_id, item_name, oem, part_number, qty, unit) values
  ('D7','Седло выдуманное','SKF','ZC-2002',2,'шт'),
  ('D8','Клапан выдуманный','Kelton','KL-7',1,'шт'),
  ('D9','Камера выдуманная',null,'MW21215M',12,'шт'),
- ('D10','Болт выдуманный',null,'DIN 912',100,'шт');
+ ('D10','Болт выдуманный',null,'DIN 912',100,'шт'),
+ ('D11','Кольцо выдуманное',null,'DIN 471 25',10,'шт');
 insert into lib_row_junk (demand_id, rule, run_id)
   select id, 'proza-тест', 'тест' from lib_demand where part_number = 'QX-1003';
 insert into lib_units (id, name, name_en, crit) values ('hot', 'Горячая часть', 'Hot section', 'A');
@@ -525,6 +526,11 @@ def test_отвергнутый_код_карточки_не_получает_к
     assert код(база, "DIN 912") == {"key": "din912", "rejected": True}
     # Номер курируемого каталога — код всегда, даже похожий на стандарт.
     assert код(база, "DIN 933")["catalog"] is True
+    # Стандарт с размером — номер детали: написание «DIN 471 25» есть в спросе,
+    # и карточка кода есть, откуда бы ни пришёл ключ (с сайта приходит ключ).
+    for q in ("DIN 471 25", "din47125", "DIN47125"):
+        r = код(база, q)
+        assert r["key"] == "din47125" and not r.get("rejected"), q
 
 
 def test_нет_нигде_и_пустой_ввод(база):
