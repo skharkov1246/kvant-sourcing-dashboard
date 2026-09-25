@@ -234,6 +234,37 @@ def bx(method: str, params: dict) -> dict:
     return клиент().call_envelope(method, params)
 
 
+#: Вебхук для файлов Диска, на которые у сотрудника основного вебхука нет прав.
+#: Вложения писем лежат на Дисках тех, чей это ящик: зонд 25.09.2026 (прогоны
+#: 36097961413 и 36098141718) — disk.file.get ACCESS_DENIED на 45 файлах из
+#: 45, url из FILES (crm_show_file.php) отдаёт вебхуку страницу входа, вебхук
+#: не администратор. Входящий вебхук работает с правами создавшего его
+#: сотрудника (apidocs.bitrix24.ru/local-integrations/local-webhooks.html),
+#: поэтому файлам нужен свой — от сотрудника с правом чтения, со scope disk.
+#: Не задан — всё идёт через основной, как прежде.
+ВЕБХУК_ФАЙЛОВ = os.environ.get("BITRIX_FILES_WEBHOOK_URL", "").strip()
+_КЛИЕНТ_ФАЙЛОВ = None
+
+
+def bx_файлов(method: str, params: dict) -> dict:
+    """Вызов метода Диска от имени вебхука файлов, если он задан.
+
+    ОЧЕРЕДЬ ЧАСТОТЫ — ОСНОВНОГО КЛИЕНТА. Пауза между запросами у BitrixClient
+    своя у каждого экземпляра; второй клиент со своей очередью удвоил бы
+    частоту процесса сверх бюджета части (CLAUDE.md, «Битрикс не перегружать»).
+    Поэтому клиент файлов ждёт в очереди основного.
+    """
+    global _КЛИЕНТ_ФАЙЛОВ
+    if not ВЕБХУК_ФАЙЛОВ:
+        return bx(method, params)
+    if _КЛИЕНТ_ФАЙЛОВ is None:
+        from bitrix_client import BitrixClient
+        к = BitrixClient(ВЕБХУК_ФАЙЛОВ)
+        к._throttle = клиент()._throttle
+        _КЛИЕНТ_ФАЙЛОВ = к
+    return _КЛИЕНТ_ФАЙЛОВ.call_envelope(method, params)
+
+
 # Размер страницы REST Битрикса. Полное чтение кончается КОРОТКОЙ страницей;
 # если последняя страница полна, а «next» не пришёл — чтение оборвалось, и это
 # надо кричать, а не молчать.
@@ -1622,6 +1653,14 @@ def download(fo: dict, rec: dict | None = None) -> bytes | None:
     Порядок ссылок прежний: urlMachine с одноразовым токеном первой, disk.file.get
     последним — он стоит запроса к порталу.
     """
+    if "тело" in fo:
+        # Тело письма уже пришло в списке дел (library/mail_source.тело_письма):
+        # скачивать нечего, и портал за него не платит.
+        if fo["тело"]:
+            return fo["тело"]
+        if rec is not None:
+            rec["reason"] = "пустое тело письма"
+        return None
     причины: list[str] = []
     for key in ("urlMachine", "downloadUrl", "url", "URL_MACHINE", "DOWNLOAD_URL"):
         u = fo.get(key)
@@ -1634,7 +1673,7 @@ def download(fo: dict, rec: dict | None = None) -> bytes | None:
     fid = fo.get("id") or fo.get("ID")
     if fid:
         try:
-            u = (bx("disk.file.get", {"id": fid}).get("result") or {}).get("DOWNLOAD_URL")
+            u = (bx_файлов("disk.file.get", {"id": fid}).get("result") or {}).get("DOWNLOAD_URL")
         except Exception as e:                                          # noqa: BLE001
             причины.append(f"disk.file.get: {код_ошибки_портала(e)}")
             u = None
@@ -1643,6 +1682,9 @@ def download(fo: dict, rec: dict | None = None) -> bytes | None:
             if тело:
                 return тело
             причины.append(f"disk.file.get: {почему}")
+        elif not причины or not причины[-1].startswith("disk.file.get"):
+            # Ответ без ссылки — не «ссылок нет вовсе»: номер файла был.
+            причины.append("disk.file.get: ответил без ссылки")
     if rec is not None:
         rec["reason"] = "; ".join(причины)[:400] or "ссылок на файл нет вовсе"
     return None
@@ -2710,6 +2752,11 @@ def main() -> int:
     # Папки по данным системы и расхождения с содержимым — только счётчики,
     # ключи — названия папок из кода (правило 17).
     папки_системы: Counter = Counter()
+    # Причины «не скачался». Без них прогон с нулём закачек выглядит как прогон
+    # без файлов: 25.09.2026 разбор писем прошёл 2 835 вложений, и у всех было
+    # «не скачался» — причина лежала только в базе, а холостой прогон её не пишет.
+    # Ключ — код портала или ответа (download кладёт только коды, правило 17).
+    не_скачались: Counter = Counter()
     расхождений = 0
     total_items = 0
     цен = 0
@@ -2777,6 +2824,8 @@ def main() -> int:
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(handle, mine), 1):
             stat[rec["status"]] += 1
+            if rec["status"] == "не скачался":
+                не_скачались[rec.get("reason") or "(без причины)"] += 1
             папки_системы[rec.get("doc_kind") or "(не записана)"] += 1
             расхождений += bool(rec.get("расхождение"))
             if rec["kind"]:
@@ -2807,6 +2856,8 @@ def main() -> int:
         print(f"строк с ценой: {цен}"
               + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
     print(f"по состоянию: {dict(stat.most_common())}")
+    if не_скачались:
+        print(f"почему не скачались: {dict(не_скачались.most_common(8))}")
     print(f"по формату:   {dict(kinds.most_common())}")
     print(f"папки по данным системы: {dict(папки_системы.most_common())}"
           f" · расхождений с содержимым: {расхождений}")
