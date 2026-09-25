@@ -236,12 +236,15 @@ def _бренды(ents_по_ci):
          "registry": {"n": 1, "list": [{"name": "ООО Ромашка", "role": "дистрибьютор", "country": "RU",
                                         "src": ["разведка"], "parts": 3, "checked": 1}]},
          "card": [{"id": "1138", "codes": 2}],
-         "atlas": {"name": "SKF", "country": "Швеция", "owner": "Группа SKF"}},
+         "atlas": {"name": "SKF", "country": "Швеция", "owner": "Группа SKF"},
+         "own": {"group": [{"name": "FAG", "c": "fag", "since": 2001}]}},
         {"k": "fag", "name": "FAG", "dict": True, "spellings": ["FAG"], "spellings_n": 1,
          "codes": {"any": 3, "plausible": 3, "customer": 2, "customer_kp": 1, "rows_customer": 3, "deals": 2},
          "spelled": 1, "sups": 1, "priced": 2, "asked": 2,
          "parts": {"n": 5, "unit": 5, "categories": 1},
-         "models": [{"id": "m2", "name": "Турбина ТВ-8", "family": "ТВ"}], "models_n": 1, "fleet": 0},
+         "models": [{"id": "m2", "name": "Турбина ТВ-8", "family": "ТВ"}], "models_n": 1, "fleet": 0,
+         "own": {"o": {"name": "SKF", "c": "skf", "since": 2001, "src": "https://example.org/fag"},
+                 "was": [{"name": "Выдуманный Холдинг", "until": 2001}]}},
         {"k": "timken", "name": "Timken", "dict": False, "codes": {"any": 1, "plausible": 1}},
     ]
     kp = len(коды)
@@ -814,7 +817,8 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("brands", "b.registry_trunc", lambda о: бр(о, "skf")["registry"].update(n=26)),
     ("brands", "b.registry", lambda о: бр(о, "skf")["registry"]["list"][0].update(checked=9)),
     ("brands", "b.card", lambda о: бр(о, "skf")["card"].append({"id": "9999", "codes": 1})),
-    ("brands", "b.cloud_nomark", lambda о: бр(о, "timken").update(nb="страна или город")),
+    ("brands", "b.own_link", lambda о: бр(о, "fag")["own"]["o"].update(c="schaeffler")),
+    ("brands", "b.cloud_nomark",lambda о: бр(о, "timken").update(nb="страна или город")),
     ("brands", "b.cloud_dup", lambda о: о[brands.КЛЮЧ]["cloud"][0].update(m=["fag", "skf"])),
     ("brands", "b.cloud_lost", lambda о: о[brands.КЛЮЧ].update(
         cloud=[s for s in о[brands.КЛЮЧ]["cloud"] if s["k"] != "fag"])),
