@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 282,
-    "total_bytes": 124642458,
+    "datasets": 284,
+    "total_bytes": 124753103,
     "by_sensitivity": {
-      "внутреннее": 160,
+      "внутреннее": 162,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 18,
+      "дашборд сорсеров": 20,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3747,6 +3747,69 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 175094,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/dongfengcumminsengine.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/jichaijinandieselcnpc.json",
+        "data/brand_research/mturollsroycepowersystems.json",
+        "data/brand_research/mwmcaterpillarenergy.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/waukeshainnio.json",
+        "data/brand_research/wrtsil.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/material.json",
+        "dict/model_series.json",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/budget_join_stats.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/gap_letters.json",
+        "gt/data/maker_contacts.json"
+      ],
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "f619e24",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "ove/data/discrepancies.json",
       "subproject": "ОВЭ-75",
       "bytes": 173950,
@@ -3828,69 +3891,6 @@
         "gt/tools/build_v643a.py",
         "gt/tools/drop_ru.py",
         "library/load_suppliers.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 170944,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/deutz.json",
-        "data/brand_research/dongfengcumminsengine.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/mturollsroycepowersystems.json",
-        "data/brand_research/mwmcaterpillarenergy.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/brand_research/waukeshainnio.json",
-        "data/brand_research/wrtsil.json",
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/material.json",
-        "dict/model_series.json",
-        "dict/node_map.json",
-        "dict/symptom.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/budget_join_stats.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/gap_letters.json",
-        "gt/data/maker_contacts.json",
-        "gt/data/ms5001_vankor.json",
-        "gt/data/pn_db.json"
-      ],
-      "last_change": "2026-09-25",
-      "last_author": "Claude",
-      "last_commit": "44656b1",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -7184,6 +7184,54 @@
       ]
     },
     {
+      "path": "data/brand_research/jichaijinandieselcnpc.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 57864,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): Jichai (CNPC Jichai Power, Jinan Diesel, марки Jichai/Chidong): газовые двигатели и агрегаты серии 190 — 12V190DT-2, 12V190ZDT-2, G12V190ZLDT, C12V190ZLT-2, H16V190ZLT-2/-1, L20V190ZLT-2, биогазовые и шахтно-метановые исполнения, дизельные 12V190 с общими узлами. Машин и исполнений — 16, сервисных документов — 6, кодов запчастей — 41: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 14, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Техданные машин и список поставщиков комплектующих (Woodward, Miba, Bosch, Alfa Laval и др.) — с официального сайта изготовителя jinanengine.com; все коды — заводские номера Jichai в передаче китайских продавцов (made-in-china.com и сайты продавцов), каталогов и руководств изготовитель открыто не публикует — перед закупкой сверять с заводом. Официальные дистрибьюторы в России — Valdex Energetica и ООО «ГенМастер»; имя агента для Казахстана и Узбекистана не прочитано (страница агентов изготовителя отвечает 429). Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 41,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "f619e24",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gidromet/data/oborud.json",
       "subproject": "гидрометаллургия",
       "bytes": 57613,
@@ -7892,6 +7940,54 @@
       "referenced_by": [
         "gidromet/build.py"
       ]
+    },
+    {
+      "path": "data/brand_research/guascorsiemensenergy.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 48534,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): Guascor (Siemens Energy; с 2022 г. Guascor Energy, Mutares): газовые двигатели S Series (SFGLD180–560, SFGM560) и H Series (HGM240, HGM560), прежние FG/FGLD и SFGRD. Машин и исполнений — 10, сервисных документов — 9, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 11, дилеров и сервисных компаний — 12, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 9 (поле corrections). Коды — у независимых поставщиков Birkas & Co (перечень ЗИП капремонта SFGLD560, таблица замены номеров Guascor на Siemens S76.xx, таблица ресурса свечей со ссылками на инструкции ТО IO-G-M-00-0xx) и Martin Energy Group; мощности — из листовки Siemens Gas Engines. После продажи 2022 г. обслуживает сам изготовитель Guascor Energy и его сеть; официальные дистрибьюторы для Казахстана и Узбекистана — Synergy Astana, Sonnenberg Power Solutions (ОАЭ), MCE (Турция); в России и Китае официальной сети нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 39,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "f619e24",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "gt/data/gap_letters.json",
@@ -8917,6 +9013,52 @@
       ]
     },
     {
+      "path": "data/brand_research/queue.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 32279,
+      "note": "Очередь разведки брендов (обновлена 2026-09-25): 60 брендов из dict/oem.json, сделано — 14, в очереди — 46. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "groups",
+        "records",
+        "rule",
+        "schema",
+        "statuses",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "records",
+        "records": 60,
+        "record_keys": [
+          "atlas",
+          "dict_name",
+          "file",
+          "focus",
+          "group",
+          "n_spellings",
+          "name",
+          "oem_key",
+          "priority",
+          "researched_at",
+          "status"
+        ]
+      },
+      "last_change": "2026-09-25",
+      "last_author": "Claude",
+      "last_commit": "f619e24",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/brand_research_check.py",
+        "tests/test_brand_research_check.py",
+        "tests/test_model_series.py"
+      ]
+    },
+    {
       "path": "gt/data/suppliers.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 32218,
@@ -8965,52 +9107,6 @@
         "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py"
-      ]
-    },
-    {
-      "path": "data/brand_research/queue.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 32182,
-      "note": "Очередь разведки брендов (обновлена 2026-09-25): 60 брендов из dict/oem.json, сделано — 12, в очереди — 48. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "groups",
-        "records",
-        "rule",
-        "schema",
-        "statuses",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "records",
-        "records": 60,
-        "record_keys": [
-          "atlas",
-          "dict_name",
-          "file",
-          "focus",
-          "group",
-          "n_spellings",
-          "name",
-          "oem_key",
-          "priority",
-          "researched_at",
-          "status"
-        ]
-      },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "cba5dec",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/brand_research_check.py",
-        "tests/test_brand_research_check.py",
-        "tests/test_model_series.py"
       ]
     },
     {
