@@ -60,6 +60,11 @@ name: Библиотека — сводка и переклассификаци�
 #                    хуже) и сколько вернёт переразбор; контроль по каталогу;
 #                    количества, которые не читаются. Только выборки. Ничего не
 #                    меняет.
+#   brand-models   — КАКИЕ БРЕНДЫ И МОДЕЛИ МАШИН У НАС В СПРОСЕ И В ПРЕДЛОЖЕНИЯХ:
+#                    по бренду — строки спроса, сделки, строки цены, карточки и
+#                    модели рядов dict/model_series.json рядом. Порядок наполнения
+#                    брендов модельными рядами. Частями по диапазону id (вход
+#                    parts). Только выборки. Ничего не меняет.
 #
 # В журнал прогона выводятся ТОЛЬКО агрегаты: репозиторий публичный, а в базе
 # лежат коммерческие данные заказчиков. Ни наименований позиций, ни номеров
@@ -74,7 +79,8 @@ on:
         default: stats
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
                   reclassify-apply, bridge, crossref, demand, funnel,
-                  calibration, part, match, codes, sides, dynamics, code-rule]
+                  calibration, part, match, codes, sides, dynamics, code-rule,
+                  brand-models]
       part:
         description: "Артикул для поиска — только для part (например 6265ZZ)"
         type: string
@@ -90,6 +96,11 @@ on:
       run_id:
         description: "Ключ прогона разметки — только для mark-revert"
         default: ""
+      parts:
+        description: "Частей обхода — только для brand-models"
+        type: choice
+        default: "16"
+        options: ["10", "16", "25", "50"]
       rule_deal:
         description: "Наследовать сегмент по сделке (слабое правило, для reclassify)"
         type: boolean
@@ -258,6 +269,25 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           PARTS: "16"
         run: python scripts/code_rule_measure.py
+
+      # Бренды и модели машин в спросе и предложениях: порядок наполнения
+      # брендов модельными рядами (распоряжение владельца 25.09.2026). Только
+      # выборки; агрегаты — в журнал и файлом-артефактом.
+      - name: Бренды и модели в спросе и предложениях
+        if: inputs.job == 'brand-models'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PARTS: ${{ inputs.parts }}
+          OUT: brand_models.json
+        run: python scripts/brand_models.py
+
+      - name: Агрегаты брендов и моделей файлом
+        if: inputs.job == 'brand-models' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brand-models
+          path: brand_models.json
+          if-no-files-found: ignore
 
       - name: Отвечает ли предложение на нашу заявку
         if: inputs.job == 'match'

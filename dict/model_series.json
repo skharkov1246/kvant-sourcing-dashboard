@@ -1,0 +1,2577 @@
+{
+ "schema": "kvant.model-series/1",
+ "updated": "2026-09-25",
+ "note": "Модельные ряды брендов с шаблоном распознавания. Одна запись ряда — название, тип машины, шаблоны (регулярные выражения Python без границ — границы слова ставит library/model_series.py), примеры обозначений, которые шаблон обязан узнавать (проверяет tests/test_model_series.py), и источники — официальная страница или каталог изготовителя; вторичный источник оговорён в note. context «сам» — обозначение различимо само, «бренд» — засчитывается только при имени бренда (aliases или context_aliases) в той же строке или в поле изготовителя. Ряд без источника не добавляется. brand_key — ключ dict/oem.json, если бренд там есть, иначе новый ключ того же вида. origin — западный / китайский / прочий. Сведения только общедоступные.",
+ "types": [
+  "ГПУ",
+  "дизель",
+  "ГТУ",
+  "компрессор",
+  "насос",
+  "горная",
+  "дорожно-строительная",
+  "грузовик",
+  "нефтепромысловая"
+ ],
+ "gaps": [
+  "Harbin Electric, Shanghai Electric, CRRC, Hongda — ряд с источником не найден в этой сессии, не добавлены.",
+  "SKF — подшипники, а не машины: ряда машин нет, бренд остаётся в реестре брендов.",
+  "Бренды с context «бренд» не узнаются в строке без имени бренда — это намеренно: голые числа (3516, 4012, 75131) и короткие буквенные коды (GA, ZR, CR, SD, HP) без бренда неоднозначны."
+ ],
+ "brands": [
+  {
+   "brand_key": "caterpillar",
+   "name": "Caterpillar",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Caterpillar",
+    "Катерпиллер",
+    "Катерпиллар",
+    "Катерпилар"
+   ],
+   "context_aliases": [
+    "CAT"
+   ],
+   "series": [
+    {
+     "id": "cat-g3500",
+     "series": "G3500 (газовые двигатели и ГПУ)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "G\\s?35(?:08|12|16|20)[A-KS]?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "G3516H",
+      "G3520C",
+      "G3512",
+      "G 3516 J"
+     ],
+     "sources": [
+      "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/18485094.html",
+      "https://www.cat.com/en_US/products/new/power-systems/oil-and-gas/gas-compression-engines/18443940.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/caterpillar.json."
+    },
+    {
+     "id": "cat-3500",
+     "series": "3500 (дизельные двигатели и ДГУ)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "35(?:08|12|16|20)[BCE]?(?:\\s?HD)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "3516B",
+      "3512C",
+      "3516E"
+     ],
+     "sources": [
+      "https://www.cat.com/en_US/products/new/power-systems/electric-power/diesel-generator-sets/18331799.html",
+      "https://www.cat.com/en_US/products/new/power-systems/electric-power/diesel-generator-sets/1000033111.html"
+     ],
+     "note": "Голое число 3516 — только рядом с именем бренда."
+    },
+    {
+     "id": "cat-c-diesel",
+     "series": "C-серия дизелей (C18, C32, C175)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "C(?:9|13|15|18|27|32)B?|C175-(?:16|20)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "C32B",
+      "C175-16",
+      "C18"
+     ],
+     "sources": [
+      "https://www.cat.com/en_US/products/new/power-systems/electric-power/diesel-generator-sets/1000028917.html",
+      "https://www.cat.com/en_US/products/new/power-systems/electric-power/diesel-generator-sets/1000028916.html"
+     ]
+    },
+    {
+     "id": "cat-cg",
+     "series": "CG (газовые ГПУ на двигателях MWM)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "CG\\s?(?:132|170|260)B?-(?:8|12|16|20)",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "CG132B-16",
+      "CG170-12",
+      "CG260-16"
+     ],
+     "sources": [
+      "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969936.html",
+      "https://www.cat.com/en_US/products/new/power-systems/electric-power/gas-generator-sets/15969830.html"
+     ]
+    },
+    {
+     "id": "cat-mining-trucks",
+     "series": "карьерные самосвалы 77x–79x",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "(?:77[0-7]|785|789|793|795|797|798)[B-G](?:\\s?AC)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "797F",
+      "793F"
+     ],
+     "sources": [
+      "https://www.cat.com/en_US/products/new/equipment/off-highway-trucks/mining-trucks/18093014.html",
+      "https://www.cat.com/en_GB/products/new/equipment/off-highway-trucks/mining-trucks/18092621.html"
+     ]
+    },
+    {
+     "id": "cat-underground",
+     "series": "подземные погрузчики R1300–R3000 и самосвалы AD",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "R\\s?(?:1300|1600|1700|2900|3000)[G-K]?(?:\\s?XE)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "AD\\s?(?:22|30|45|55|60|63)B?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "R1700",
+      "R1600G",
+      "AD45",
+      "AD30"
+     ],
+     "sources": [
+      "https://www.cat.com/en_ID/products/new/equipment/underground-hard-rock/underground-mining-trucks/104983.html",
+      "https://www.cat.com/en_US/products/new/equipment/underground-hard-rock/underground-mining-load-haul-dump-lhd-loaders/730743084457382.html"
+     ],
+     "note": "R1600G/R1600H встречаются в dict/machine.json."
+    },
+    {
+     "id": "cat-longwall",
+     "series": "очистные комбайны EL (EL2000, EL3000)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "EL\\s?[23]000",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "EL3000"
+     ],
+     "sources": [
+      "https://s7d2.scene7.com/is/content/Caterpillar/C764153"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "cummins",
+   "name": "Cummins",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Cummins",
+    "Камминс",
+    "Камминз",
+    "Каммингс"
+   ],
+   "series": [
+    {
+     "id": "cummins-qsk-gas",
+     "series": "QSK/QSV/HSK (газовые ГПУ lean-burn)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "(?:QSK\\s?\\d{2}|QSV\\s?(?:81|91)|HSK\\s?78)G",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "QSK60G",
+      "QSV91G",
+      "HSK78G",
+      "QSK19G"
+     ],
+     "sources": [
+      "https://www.cummins.com/sites/default/files/2019-08/Spec-Sheet-HSK78G-50Hz_2.pdf",
+      "https://ghaddar.com/wp-content/uploads/2025/09/Cummins-Natural-Gas-QSK60-Engine-series.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/cummins.json."
+    },
+    {
+     "id": "cummins-qsk-diesel",
+     "series": "QSK (дизели)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "QSK\\s?(?:19|23|38|45|50|60|78|95)(?:-G\\d{1,2})?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "QSK60",
+      "QSK50-G4"
+     ],
+     "sources": [
+      "https://ghaddar.com/wp-content/uploads/2025/09/Cummins-Natural-Gas-QSK60-Engine-series.pdf",
+      "https://www.cummins.com/generators/kta50"
+     ],
+     "note": "Семейство QSK подтверждено; номера 23/38/45/50/78/95 — грамматика ряда, не отдельная проверка."
+    },
+    {
+     "id": "cummins-k",
+     "series": "K-серия (KTA19, KTA38, KTA50)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "K(?:T|TA)\\s?(?:19|38|50)(?:-?G\\d{1,2}[A-Z]?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "KTA50-G3",
+      "KTA38",
+      "KTA19"
+     ],
+     "sources": [
+      "https://www.cummins.com/generators/kta50-g3",
+      "https://www.cummins.com/generators/kta38-series"
+     ]
+    },
+    {
+     "id": "cummins-cn5",
+     "series": "C…N5C/N6C/P5CD (газовые генераторные установки)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "C\\s?\\d{3,4}\\s?[NP][56]C?[A-D]?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "C1540N5C",
+      "C2000N5CD",
+      "C1000N6C",
+      "C1550P5CD"
+     ],
+     "sources": [
+      "https://mart.cummins.com/imagelibrary/data/assetfiles/0059494.pdf",
+      "https://www.cummins.com/sites/default/files/2019-08/c2000n5cd-datasheet-6399-mk.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "inniojenbacher",
+   "name": "INNIO Jenbacher",
+   "origin": "западный",
+   "country": "Австрия",
+   "aliases": [
+    "Jenbacher",
+    "INNIO Jenbacher",
+    "Йенбахер",
+    "Енбахер",
+    "Иенбахер"
+   ],
+   "series": [
+    {
+     "id": "jenbacher-3",
+     "series": "Type 3 (J312, J316, J320)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "J\\s?3(?:12|16|20)(?:\\s?GS)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "J320",
+      "J 316 GS"
+     ],
+     "sources": [
+      "https://www.jenbacher.com/en/gas-engines/type-3/j320/"
+     ]
+    },
+    {
+     "id": "jenbacher-4",
+     "series": "Type 4 (J412, J416, J420)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "J\\s?4(?:12|16|20)(?:\\s?GS)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "J420",
+      "J416"
+     ],
+     "sources": [
+      "https://www.jenbacher.com/en/gas-engines/type-4/j420/"
+     ]
+    },
+    {
+     "id": "jenbacher-6",
+     "series": "Type 6 (J612, J616, J620, J624)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "J\\s?6(?:12|16|20|24)(?:\\s?GS)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "J620",
+      "J624"
+     ],
+     "sources": [
+      "https://www.jenbacher.com/en/gas-engines/type-6/j620/"
+     ]
+    },
+    {
+     "id": "jenbacher-9",
+     "series": "Type 9 (J920 FleXtra)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "J\\s?920(?:\\s?FleXtra)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "J920 FleXtra"
+     ],
+     "sources": [
+      "https://www.jenbacher.com/en/gas-engines/type-9/j920-flextra/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "waukeshainnio",
+   "name": "Waukesha (INNIO)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Waukesha",
+    "Вокеша",
+    "Уокеша"
+   ],
+   "series": [
+    {
+     "id": "waukesha-vhp",
+     "series": "VHP (P9394GSI, L7044GSI, L7042GSI, F3524GSI, L5794GSI)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "(?:VHP\\s?)?(?:P9394|L7044|L7042|F3524|L5794|L5774|VHP9504|VHP7104)(?:GSI|LT)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "L7044GSI",
+      "P9394GSI",
+      "L5794LT",
+      "VHP9504GSI"
+     ],
+     "sources": [
+      "https://www.waukeshaengine.com/wp-content/uploads/IWK-123055-VHP-P9394GSI-S5.pdf",
+      "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+     ]
+    },
+    {
+     "id": "waukesha-275gl",
+     "series": "275GL+",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "(?:12|16)\\s?V\\s?275\\s?GL\\+?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "16V275GL+",
+      "12V275GL"
+     ],
+     "sources": [
+      "https://www.waukeshaengine.com/gas-engines/275gl-plus/"
+     ]
+    },
+    {
+     "id": "waukesha-vgf",
+     "series": "VGF (F18, H24, L36, P48)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "(?:F18|H24|L36|P48)(?:GLD|GL|GSID|GSI|SE|G)",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "H24GL",
+      "P48GSID",
+      "F18SE"
+     ],
+     "sources": [
+      "https://www.waukeshaengine.com/wp-content/uploads/IWK-123069-0726-EN-VGF-H24SE.pdf",
+      "https://www.wpi.com/wp-content/uploads/Tables-of-data-provided-by-Waukesha.pdf"
+     ]
+    },
+    {
+     "id": "waukesha-at",
+     "series": "AT-GL (AT25GL, AT27GL)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "AT\\s?2[57]\\s?GL",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "AT27GL"
+     ],
+     "sources": [
+      "https://www.motortech.de/fileadmin/download/sales/MOTORTECH-SalesFlyer-Spark-Plug-Extensions-for-WAUKESHA-Gas-Engines.pdf"
+     ],
+     "note": "Источник вторичный (изготовитель свечей), взят из разведки data/brand_research/waukeshainnio.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "mwmcaterpillarenergy",
+   "name": "MWM (Caterpillar Energy Solutions)",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "MWM",
+    "Caterpillar Energy Solutions"
+   ],
+   "series": [
+    {
+     "id": "mwm-tcg",
+     "series": "TCG 2016/2020/2032/3016/3020/4170",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "TCG\\s?(?:2016|2020|2032|3016|3020|4170)B?(?:\\s?V\\s?(?:0?8|12|16|20)(?:\\s?[KSRX]W?)?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "TCG 2020 V20",
+      "TCG2032B V16",
+      "TCG 3016 V12",
+      "TCG 4170 V20"
+     ],
+     "sources": [
+      "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-2020/",
+      "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-3016/",
+      "https://www.mwm.net/en/gas-engines-gensets/gas-engine-tcg-4170/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "deutz",
+   "name": "Deutz",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "Deutz",
+    "Дойц",
+    "Дейтц"
+   ],
+   "series": [
+    {
+     "id": "deutz-tcd-new",
+     "series": "TCD/TD 3.6–16.0",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "T?C?D\\s?(?:2\\.9|3\\.6|4\\.1|6\\.1|7\\.8|12\\.0|16\\.0)(?:\\s?[LV]\\s?\\d{1,2})?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "TCD 3.6 L4",
+      "TCD 12.0 V6",
+      "TD 3.6 L4"
+     ],
+     "sources": [
+      "https://www.deutz.com/en/products/engine-finder/engine-detail/tcd-36-l4/",
+      "https://www.deutz.com/en/products/engine-finder/engine-detail/tcd-120-v6/"
+     ]
+    },
+    {
+     "id": "deutz-tcd-20xx",
+     "series": "TCD 2012/2013, TCD 914",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "TCD\\s?(?:2011|2012|2013|914)(?:\\s?[LV]\\s?0?\\d{1,2}(?:\\s?[24]V)?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "TCD 2013 L06 4V",
+      "TCD2012 L04 2V",
+      "TCD 914 L06"
+     ],
+     "sources": [
+      "https://epiroc.scene7.com/is/content/epiroc/9869_0080_01f_Boomer_M-series_technical_specification_englishpdf",
+      "https://www.dieselpartsdirect.com/deutz-2013-engines"
+     ]
+    },
+    {
+     "id": "deutz-bf",
+     "series": "BF…L/M (воздушного и жидкостного охлаждения: BF6L914, BF4M1013)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "BF\\s?\\d{1,2}\\s?[LM]\\s?\\d{3,4}C?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "BF6L914",
+      "BF4M1013C"
+     ],
+     "sources": [
+      "https://amt-inc.ca/wp-content/uploads/2021/09/TS3-LH203-25-ENG-METRIC.pdf"
+     ],
+     "note": "Подтверждён BF6L914; буква M (жидкостное) — грамматика ряда."
+    },
+    {
+     "id": "deutz-gas",
+     "series": "TCG 2015, TBG 616/620 (газовые, до выделения MWM)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "TCG\\s?2015(?:\\s?V\\s?[68])?",
+       "context": "сам"
+      },
+      {
+       "rx": "TBG\\s?6(?:16|20)(?:\\s?V\\s?(?:8|12|16))?K?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "TCG 2015 V8",
+      "TBG 620 V16K",
+      "TBG616"
+     ],
+     "sources": [
+      "https://www.deutzsupport.com/product-details/tcg-2015-series/",
+      "https://spark-plugs.ru/product/sparkplugs/mwm/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "mturollsroycepowersystems",
+   "name": "MTU (Rolls-Royce Power Systems)",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "MTU",
+    "МТУ",
+    "Rolls-Royce Power Systems"
+   ],
+   "series": [
+    {
+     "id": "mtu-4000",
+     "series": "Series 4000 (дизели C/P/M, газовые GS L61–L64)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "(?:8|12|16|20)\\s?V\\s?4000(?:\\s?(?:GS\\s?)?[CGLMPS]\\d{2}[A-Z]{0,2})?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "16V4000",
+      "20V 4000 C23",
+      "12V 4000 GS L64",
+      "16V4000 L62"
+     ],
+     "sources": [
+      "https://www.mtu-solutions.com/na/en/applications/power-generation/power-generation-products/diesel-generator-sets/series/4000.html",
+      "https://www.mtu-solutions.com/eu/en/applications/power-generation/power-generation-products/gas-generator-sets"
+     ]
+    },
+    {
+     "id": "mtu-2000",
+     "series": "Series 2000",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "(?:8|10|12|16|18)\\s?V\\s?2000(?:\\s?[CGMPS]\\d{2}[A-Z]?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "16V2000",
+      "12V 2000 G65"
+     ],
+     "sources": [
+      "https://pdf.nauticexpo.com/pdf/mtu/series-2000-mtu-diesel-engines/31379-19374.html"
+     ],
+     "note": "Каталог MTU на площадке nauticexpo (документ изготовителя)."
+    },
+    {
+     "id": "mtu-400",
+     "series": "Series 400 (газовые 6R400 GS, 12V400 GS)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "(?:6\\s?R|12\\s?V)\\s?400\\s?GS",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "6R400 GS",
+      "12V400GS"
+     ],
+     "sources": [
+      "https://cdn.wajax.com/wp-content/uploads/2018/03/MTU-SERIES-400-BIOGAS.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "wrtsil",
+   "name": "Wärtsilä",
+   "origin": "западный",
+   "country": "Финляндия",
+   "aliases": [
+    "Wärtsilä",
+    "Wartsila",
+    "Waertsilae",
+    "Вяртсиля",
+    "Вартсила"
+   ],
+   "series": [
+    {
+     "id": "wartsila-sg",
+     "series": "34SG / 31SG / 50SG (газовые)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "(?:\\d{1,2}\\s?V\\s?)?(?:34|31|50)\\s?SG",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "20V34SG",
+      "34SG",
+      "18V50SG",
+      "20V31SG"
+     ],
+     "sources": [
+      "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-34sg.pdf",
+      "https://www.wartsila.com/docs/default-source/energy-docs/technology-products/product-leaflets/wartsila-50sg.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/wrtsil.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "perkinsfgwilson",
+   "name": "Perkins / FG Wilson",
+   "origin": "западный",
+   "country": "Великобритания",
+   "aliases": [
+    "Perkins",
+    "Перкинс",
+    "FG Wilson"
+   ],
+   "series": [
+    {
+     "id": "perkins-4000",
+     "series": "4000 Series (4006, 4008, 4012, 4016)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "40(?:06|08|12|16)-\\d{2}T[A-Z]{1,3}\\d?",
+       "context": "сам"
+      },
+      {
+       "rx": "40(?:06|08|12|16)T[A-Z]{1,3}\\d?",
+       "context": "сам"
+      },
+      {
+       "rx": "40(?:06|08|12|16)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "4012-46TWG",
+      "4008-30TAG",
+      "4016TAG",
+      "4006"
+     ],
+     "sources": [
+      "https://www.perkins.com/en_GB/products/new/perkins/electric-power-generation/diesel-engines/1000002714.html",
+      "https://www.perkins.com/en_GB/products/product-range/4000-series/4016.html"
+     ],
+     "note": "Голое 4012 — только рядом с именем бренда."
+    }
+   ]
+  },
+  {
+   "brand_key": "volvo",
+   "name": "Volvo Penta",
+   "origin": "западный",
+   "country": "Швеция",
+   "aliases": [
+    "Volvo Penta",
+    "Вольво Пента"
+   ],
+   "context_aliases": [
+    "Volvo",
+    "Вольво"
+   ],
+   "series": [
+    {
+     "id": "volvo-tad",
+     "series": "TAD/TWD (генераторные двигатели D13, D16)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "T[AW]D\\s?\\d{3,4}[A-Z]{0,3}",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "TAD1345GE",
+      "TAD1643GE",
+      "TWD1643GE"
+     ],
+     "sources": [
+      "https://volvopenta.com/industrialpowergeneration/en-en/products/engines/ranges/stand-by/tad1345ge-50-hz/tad1345ge-50-hz.html",
+      "https://www.volvopenta.com/industrial/power-generation-engines/power-generation-engine-range/d16-eu-stage-ii-epa-tier-2/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "manenergysolutions",
+   "name": "MAN Energy Solutions (Everllence)",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "MAN Energy Solutions",
+    "Everllence",
+    "MAN B&W",
+    "MAN Diesel"
+   ],
+   "context_aliases": [
+    "MAN",
+    "МАН"
+   ],
+   "series": [
+    {
+     "id": "man-df",
+     "series": "51/60DF, 35/44DF (двухтопливные)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "(?:\\d{1,2}\\s?)?[LV]?\\s?(?:51/60|35/44)\\s?(?:DF|G)",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "51/60DF",
+      "L35/44DF",
+      "18V51/60DF"
+     ],
+     "sources": [
+      "https://www.man-es.com/docs/default-source/document-sync/man-51-60df-eng.pdf?sfvrsn=685c8034_3",
+      "https://www.man-es.com/energy-storage/products/dual-fuel-engines"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "guascorsiemensenergy",
+   "name": "Guascor (Siemens Energy)",
+   "origin": "западный",
+   "country": "Испания",
+   "aliases": [
+    "Guascor",
+    "Гуаскор"
+   ],
+   "context_aliases": [
+    "Siemens",
+    "Сименс"
+   ],
+   "series": [
+    {
+     "id": "guascor-fg",
+     "series": "FGLD / SFGLD / SFGM / HGM, Siemens SGE",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "S?FG(?:LD|M)\\s?\\d{3}",
+       "context": "сам"
+      },
+      {
+       "rx": "HGM\\s?\\d{3}",
+       "context": "сам"
+      },
+      {
+       "rx": "SGE\\s?-?\\s?\\d{2}\\s?(?:SL|HM)",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "SFGLD 560",
+      "HGM 560",
+      "SGE-56SL",
+      "SFGM560"
+     ],
+     "sources": [
+      "https://guascor-energy.com/products/industrial-products/h-series-engines/",
+      "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "siemensenergy",
+   "name": "Siemens Energy",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "Siemens Energy",
+    "Ruston"
+   ],
+   "context_aliases": [
+    "Siemens",
+    "Сименс"
+   ],
+   "series": [
+    {
+     "id": "siemens-sgt",
+     "series": "SGT (SGT-100…SGT-800, SGT-A20/A35)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "SGT[5-8]?\\s?-?\\s?(?:A\\d{2}|\\d{3,4}[A-Z]?)(?:-\\d[SC])?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "SGT-400",
+      "SGT-100-2S",
+      "SGT-A35",
+      "SGT 800"
+     ],
+     "sources": [
+      "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-100.html",
+      "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-800.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/siemensenergy.json."
+    },
+    {
+     "id": "siemens-legacy",
+     "series": "наследные имена Ruston/Alstom (Typhoon, Tornado, Tempest, Cyclone)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "Typhoon|Tornado|Tempest|Cyclone",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Typhoon",
+      "Cyclone"
+     ],
+     "sources": [
+      "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-100.html",
+      "https://www.siemens-energy.com/us/en/home/products-services/product/sgt-400.html"
+     ],
+     "note": "Имена обычные слова — только рядом с Siemens/Ruston."
+    },
+    {
+     "id": "siemens-tb",
+     "series": "Ruston TA/TB (TA1750, TB5000)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "T[AB]\\s?(?:1750|3000|4000|5000|5400)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "TB5000",
+      "TA1750"
+     ],
+     "sources": [
+      "https://en.wikipedia.org/wiki/Ruston_(engine_builder)"
+     ],
+     "note": "Источник энциклопедический: называет линии TA и TB завода в Линкольне; номера 1750/3000/4000/5000/5400 — грамматика ряда, встречаются в dict/machine.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "siemensdemagdelavalturbomachinery",
+   "name": "Dresser-Rand (Siemens Energy)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Dresser-Rand",
+    "Dresser Rand",
+    "Дрессер-Рэнд",
+    "Дрессер Ранд"
+   ],
+   "context_aliases": [
+    "Siemens",
+    "Сименс"
+   ],
+   "series": [
+    {
+     "id": "dresser-datum",
+     "series": "DATUM (центробежные компрессоры)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "DATUM(?:\\s?[A-Z]\\d{1,2}[A-Z]\\d{1,2}[A-Z]?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "DATUM D10R8B",
+      "DATUM"
+     ],
+     "sources": [
+      "https://www.siemens-energy.com/global/en/home/products-services/product/single-shaft-centrifugal-compressors.html",
+      "https://datasheets.globalspec.com/ds/siemens-ag/datum/8fcf44f8-57aa-4e87-8aa0-d88341f38e66"
+     ],
+     "note": "DATUM — ещё и слово чертежа («базовая поверхность»): только рядом с именем бренда."
+    }
+   ]
+  },
+  {
+   "brand_key": "solarturbines",
+   "name": "Solar Turbines",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Solar Turbines",
+    "Солар Турбинс"
+   ],
+   "context_aliases": [
+    "Solar",
+    "Солар"
+   ],
+   "series": [
+    {
+     "id": "solar-gt",
+     "series": "Saturn, Centaur, Mercury, Taurus, Mars, Titan",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "(?:Saturn|Сатурн|Centaur|Центавр|Кентавр|Mercury|Taurus|Таурус|Mars|Марс|Titan|Титан)\\s?-?\\s?(?:10|20|40|50|60|65|70|90|100|130|250|350)(?:\\s?S|\\s?MD)?",
+       "context": "сам"
+      },
+      {
+       "rx": "Saturn|Centaur|Taurus|Mars|Titan|Mercury",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Taurus 60S",
+      "Centaur 50",
+      "Mars 100",
+      "Titan 130",
+      "Таурус 70",
+      "Taurus"
+     ],
+     "sources": [
+      "https://s7d2.scene7.com/is/content/Caterpillar/CM20150703-52095-08416",
+      "https://s7d2.scene7.com/is/content/Caterpillar/C10550243"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/solarturbines.json. Имя без номера — только рядом с Solar."
+    },
+    {
+     "id": "solar-compressors",
+     "series": "центробежные компрессоры C16…C65",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "C(?:16|33|40|41|45|50|51|61|65)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "C40",
+      "C45"
+     ],
+     "sources": [
+      "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361634/Mars90GasTurbinesBrochure.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "generalelectric",
+   "name": "General Electric (GE Vernova)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "General Electric",
+    "GE Vernova",
+    "Дженерал Электрик"
+   ],
+   "context_aliases": [
+    "GE"
+   ],
+   "series": [
+    {
+     "id": "ge-aero",
+     "series": "LM2500, LM6000, LMS100, TM2500 (авиапроизводные)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "LM\\s?(?:1600|2500|5000|6000|9000)(?:\\s?(?:\\+G4|XPRESS|PE|PF|PC|PG|\\+))?",
+       "context": "сам"
+      },
+      {
+       "rx": "LMS\\s?100",
+       "context": "сам"
+      },
+      {
+       "rx": "TM\\s?2500",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "LM2500",
+      "LM6000PF",
+      "LMS100",
+      "TM2500"
+     ],
+     "sources": [
+      "https://www.gevernova.com/gas-power/products/gas-turbines/lm2500",
+      "https://www.gevernova.com/gas-power/products/gas-turbines/lm6000",
+      "https://www.gevernova.com/gas-power/products/gas-turbines/lms100"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "bakerhughes",
+   "name": "Baker Hughes (Nuovo Pignone)",
+   "origin": "западный",
+   "country": "США / Италия",
+   "aliases": [
+    "Baker Hughes",
+    "Nuovo Pignone",
+    "BHGE",
+    "Нуово Пиньоне"
+   ],
+   "context_aliases": [
+    "GE"
+   ],
+   "series": [
+    {
+     "id": "bh-frame5",
+     "series": "Frame 5 (MS5001, MS5002)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "MS\\s?500[12][A-E]?",
+       "context": "сам"
+      },
+      {
+       "rx": "Frame\\s?5(?:/[12][A-Z]{0,2})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "MS5002E",
+      "MS5001",
+      "Frame 5/2E"
+     ],
+     "sources": [
+      "https://www.bhge.com/ms5002-e",
+      "https://www.bakerhughes.com/gas-turbines/frame-technology/frame-52e"
+     ],
+     "note": "Frame 5 выпускался GE; ныне ряд у Baker Hughes."
+    },
+    {
+     "id": "bh-novalt",
+     "series": "NovaLT (5, 12, 16)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "NovaLT\\s?(?:5|12|16)(?:-\\d)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "NovaLT16",
+      "NovaLT5-1"
+     ],
+     "sources": [
+      "https://www.bakerhughes.com/gas-turbines/novalt-technology/novalt16"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "rollsroyce",
+   "name": "Rolls-Royce (промышленные ГТУ)",
+   "origin": "западный",
+   "country": "Великобритания",
+   "aliases": [
+    "Rolls-Royce",
+    "Rolls Royce",
+    "Роллс-Ройс"
+   ],
+   "context_aliases": [
+    "Siemens"
+   ],
+   "series": [
+    {
+     "id": "rr-rb211",
+     "series": "Industrial RB211 (ныне SGT-A35)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "RB\\s?-?211(?:-\\d{4}[A-Z]?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "RB211",
+      "RB211-6562",
+      "RB-211"
+     ],
+     "sources": [
+      "https://www.rolls-royce.com/media/press-releases-archive/yr-2007/rr-rb211-gas.aspx",
+      "https://www.turbomachinerymag.com/view/aeroderivative-gas-turbines"
+     ]
+    },
+    {
+     "id": "rr-avon",
+     "series": "Industrial Avon (ныне SGT-A20)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "Avon(?:\\s?\\d{3,4}(?:/\\d{4})?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Avon 1533",
+      "Avon 200"
+     ],
+     "sources": [
+      "https://www.turbomachinerymag.com/view/aeroderivative-gas-turbines"
+     ],
+     "note": "Avon — ещё и марка косметики: только рядом с именем бренда."
+    }
+   ]
+  },
+  {
+   "brand_key": "atlascopco",
+   "name": "Atlas Copco",
+   "origin": "западный",
+   "country": "Швеция",
+   "aliases": [
+    "Atlas Copco",
+    "Атлас Копко",
+    "Atlas-Copco"
+   ],
+   "series": [
+    {
+     "id": "ac-ga",
+     "series": "GA (маслозаполненные винтовые)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "GA\\s?\\d{1,3}(?:\\s?(?:\\+|VSD\\+?|FF|VP))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "GA 90",
+      "GA37VSD+",
+      "GA 160 FF"
+     ],
+     "sources": [
+      "https://www.atlascopco.com/en-id/compressors/products/air-compressor/rotary-screw-compressor/ga-series"
+     ]
+    },
+    {
+     "id": "ac-zr-zt",
+     "series": "ZR / ZT (безмасляные винтовые)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "Z[RT]\\s?\\d{2,3}(?:\\s?(?:VSD\\+?|FF))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ZR 160",
+      "ZT 90 VSD",
+      "ZR300"
+     ],
+     "sources": [
+      "https://www.atlascopco.com/en-us/compressors/products/air-compressor/oil-free-air-compressors/rotary-screw-air-compressors-zr-zt"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "ingersollrand",
+   "name": "Ingersoll Rand",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Ingersoll Rand",
+    "Ingersoll-Rand",
+    "Инжерсолл Рэнд",
+    "Ингерсолл Рэнд"
+   ],
+   "series": [
+    {
+     "id": "ir-centac",
+     "series": "MSG Centac / TURBO-AIR (центробежные)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "(?:MSG\\s?)?Centac(?:\\s?C\\d{3,4})?",
+       "context": "сам"
+      },
+      {
+       "rx": "MSG\\s?TURBO-?AIR(?:\\s?\\d{4})?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "MSG Centac C400",
+      "Centac"
+     ],
+     "sources": [
+      "https://www.ingersollrand.com/en-us/products/air-compressors/centrifugal-compressors/",
+      "https://www.ingersollrand.com/en-gb/products/air-compressors/centrifugal-compressors/45-70-m3min-1600-2350-cfm/"
+     ]
+    },
+    {
+     "id": "ir-rs",
+     "series": "RS (винтовые маслозаполненные)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "RS\\s?\\d{2,3}[in]?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "RS55i",
+      "RS 110"
+     ],
+     "sources": [
+      "https://www.compressorworld.com/products/49725/ingersoll-rand-rs-series-fixed-speed-rotary-screw-air-compressor"
+     ],
+     "note": "Источник — каталог дилера."
+    }
+   ]
+  },
+  {
+   "brand_key": "sandviktamrock",
+   "name": "Sandvik (Tamrock)",
+   "origin": "западный",
+   "country": "Швеция / Финляндия",
+   "aliases": [
+    "Sandvik",
+    "Сандвик",
+    "Tamrock",
+    "Тамрок"
+   ],
+   "series": [
+    {
+     "id": "sandvik-lh-th",
+     "series": "Toro LH (погрузчики) и TH (самосвалы)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "L[H]\\s?-?\\s?\\d{3}[iE]?",
+       "context": "сам"
+      },
+      {
+       "rx": "T[H]\\s?-?\\s?\\d{3}[iE]?",
+       "context": "сам"
+      },
+      {
+       "rx": "Toro\\s?\\d{3,4}[A-Z]?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "LH517i",
+      "TH663i",
+      "LH410",
+      "TH-540",
+      "TH545i"
+     ],
+     "sources": [
+      "https://www.mining.sandvik/en/products/equipment/loaders/lh517i-underground-lhd/",
+      "https://im-mining.com/2023/07/10/northern-star-bolsters-sandvik-fleet-with-toro-trucks-and-loaders-plus-dd422i-jumbo/"
+     ],
+     "note": "LH410, TH-540, TH545i встречаются в dict/machine.json."
+    },
+    {
+     "id": "sandvik-dd",
+     "series": "DD (проходческие буровые установки)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "DD\\s?\\d{3}[i]?(?:-\\d{2}[A-Z]?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "DD422i",
+      "DD 321"
+     ],
+     "sources": [
+      "https://im-mining.com/2023/07/10/northern-star-bolsters-sandvik-fleet-with-toro-trucks-and-loaders-plus-dd422i-jumbo/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "epiroc",
+   "name": "Epiroc",
+   "origin": "западный",
+   "country": "Швеция",
+   "aliases": [
+    "Epiroc",
+    "Эпирок"
+   ],
+   "context_aliases": [
+    "Atlas Copco",
+    "Атлас Копко"
+   ],
+   "series": [
+    {
+     "id": "epiroc-boomer",
+     "series": "Boomer (проходческие буровые)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "Boomer(?:\\s?(?:[MSEL]\\d?\\s?[A-Z]{0,2}|282|\\d{3}))?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "Boomer S2",
+      "Boomer M2C",
+      "Boomer 282",
+      "Boomer E2 C"
+     ],
+     "sources": [
+      "https://epiroc.scene7.com/is/content/epiroc/9869_0090_01b_Boomer_S2_technical_specification_englishpdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/epiroc.json."
+    },
+    {
+     "id": "epiroc-simba",
+     "series": "Simba (буровые для добычи)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "Simba(?:\\s?[MSEL]\\d\\s?[A-Z]?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "Simba E7C",
+      "Simba M4 C",
+      "Simba S7 D"
+     ],
+     "sources": [
+      "https://epiroc.scene7.com/is/content/epiroc/9869_0081_01e_simba_E7-series_technical_specification_englishpdf"
+     ]
+    },
+    {
+     "id": "epiroc-scooptram",
+     "series": "Scooptram ST (погрузчики)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "Scooptram(?:\\s?ST\\s?\\d{1,4}[A-Z]{0,2})?",
+       "context": "сам"
+      },
+      {
+       "rx": "ST\\s?(?:2|3\\.5|7|14|18|1030|1020|2G|2D)(?:\\s?S|\\s?SG)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Scooptram ST14",
+      "ST7",
+      "ST1030"
+     ],
+     "sources": [
+      "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf"
+     ]
+    },
+    {
+     "id": "epiroc-cop",
+     "series": "COP (гидроперфораторы)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "COP\\s?(?:\\d{4}(?:\\s?(?:HD\\+?|ME|MUX|UX\\+?|EX\\+?|\\+))?|MD\\s?\\d{2}\\+?|RR\\s?\\d{2})",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "COP 1838HD+",
+      "COP 2238+",
+      "COP MD20",
+      "COP 3060MUX"
+     ],
+     "sources": [
+      "https://epiroc.scene7.com/is/content/epiroc/9865+0209+01+COP+1800%2B+series+brochurepdf"
+     ]
+    },
+    {
+     "id": "epiroc-surface",
+     "series": "Pit Viper, SmartROC (буровые для открытых работ)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "Pit\\s?Viper(?:\\s?\\d{3})?",
+       "context": "сам"
+      },
+      {
+       "rx": "PV-\\d{3}[A-Z]?",
+       "context": "сам"
+      },
+      {
+       "rx": "SmartROC\\s?[A-Z]\\d{2}",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "Pit Viper 271",
+      "PV-271",
+      "SmartROC D65"
+     ],
+     "sources": [
+      "https://www.epiroc.com/en-us/products/drill-rigs/surface-blasthole-drill-rigs/pv-271"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "komatsu",
+   "name": "Komatsu",
+   "origin": "западный",
+   "country": "Япония",
+   "aliases": [
+    "Komatsu",
+    "Комацу",
+    "Коматсу"
+   ],
+   "series": [
+    {
+     "id": "komatsu-e-trucks",
+     "series": "карьерные самосвалы с электроприводом (730E–980E)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "(?:730|830|860|930|960|980)E(?:-\\d(?:SE)?|-AC)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "830E-AC",
+      "930E-5",
+      "980E-5"
+     ],
+     "sources": [
+      "https://www.komatsu.com/en-us/products/equipment/trucks/electric-drive-mining-trucks/830e-5",
+      "https://www.komatsu.com/en-za/products/equipment/trucks/electric-drive-mining-trucks/830e-ac"
+     ]
+    },
+    {
+     "id": "komatsu-pc",
+     "series": "PC (экскаваторы, в т. ч. карьерные PC4000)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "PC\\s?\\d{3,4}(?:LC|SE|US)?-\\d{1,2}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "PC4000-11",
+      "PC200-8"
+     ],
+     "sources": [
+      "https://www.komatsu.com/en-us/products/equipment/excavators/surface-mining-excavators/pc4000-11"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "liebherr",
+   "name": "Liebherr",
+   "origin": "западный",
+   "country": "Германия / Швейцария",
+   "aliases": [
+    "Liebherr",
+    "Либхерр",
+    "Либхер"
+   ],
+   "series": [
+    {
+     "id": "liebherr-t",
+     "series": "карьерные самосвалы T 264, T 282, T 284",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "T\\s?2(?:64|82|84)[BC]?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "T 264",
+      "T 282 C",
+      "T284"
+     ],
+     "sources": [
+      "https://www.liebherr.com/en-us/p/t264-8056872",
+      "https://www.liebherr.com/en-us/mining-equipment/equipment/mining-trucks/t284-8361205"
+     ]
+    },
+    {
+     "id": "liebherr-r9",
+     "series": "карьерные экскаваторы R 9400, R 9600, R 9800",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "R\\s?9(?:400|600|800)(?:\\s?G\\d)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "R 9400",
+      "R 9600 G8"
+     ],
+     "sources": [
+      "https://www.liebherr.com/en-us/mining-equipment/equipment/mining-excavators/pdpe/product_detail_page_extended_pdpe_25-4707142"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "metso",
+   "name": "Metso (Nordberg)",
+   "origin": "западный",
+   "country": "Финляндия",
+   "aliases": [
+    "Metso",
+    "Метсо",
+    "Nordberg",
+    "Нордберг"
+   ],
+   "series": [
+    {
+     "id": "metso-hp",
+     "series": "Nordberg HP (конусные дробилки)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "HP\\s?(?:100|200|300|400|500|800|900|[3-6])",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HP300",
+      "HP 400",
+      "HP4"
+     ],
+     "sources": [
+      "https://www.metso.com/portfolio/nordberg-hp-series/nordberg-hp300/",
+      "https://www.metso.com/portfolio/nordberg-hp-series/"
+     ]
+    },
+    {
+     "id": "metso-c",
+     "series": "Nordberg C (щековые дробилки)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "C\\s?(?:80|96|106|116|120|125|130|150|160|200)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "C130",
+      "C 106"
+     ],
+     "sources": [
+      "https://www.metso.com/portfolio/nordberg-c-series/nordberg-c130/"
+     ],
+     "note": "Подтверждён C130; прочие номера ряда — грамматика, только рядом с Metso/Nordberg."
+    }
+   ]
+  },
+  {
+   "brand_key": "flsmidth",
+   "name": "FLSmidth",
+   "origin": "западный",
+   "country": "Дания",
+   "aliases": [
+    "FLSmidth",
+    "FL Smidth",
+    "ФЛСмидт"
+   ],
+   "context_aliases": [
+    "FLS"
+   ],
+   "series": [
+    {
+     "id": "fls-raptor",
+     "series": "Raptor (конусные дробилки)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "Raptor\\s?(?:250|350|450|500|900|1100|2000)",
+       "context": "сам"
+      },
+      {
+       "rx": "Raptor",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Raptor 450",
+      "Raptor 900"
+     ],
+     "sources": [
+      "https://fls.com/en/equipment/crushing/cone-crushers",
+      "https://prod.flsmidth.com/globalassets/frontify/2024/9/raptorconecrusher-miningaggregates_brochure_en.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "weir",
+   "name": "Weir (Warman)",
+   "origin": "западный",
+   "country": "Великобритания",
+   "aliases": [
+    "Weir Minerals",
+    "Warman",
+    "Варман"
+   ],
+   "context_aliases": [
+    "Weir",
+    "Вейр"
+   ],
+   "series": [
+    {
+     "id": "weir-warman-ah",
+     "series": "Warman AH / AHPP (грунтовые насосы)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "\\d{1,2}/\\d{1,2}\\s?[A-HST]{1,2}\\s?-\\s?AH(?:PP|P)?",
+       "context": "сам"
+      },
+      {
+       "rx": "Warman\\s?AH(?:PP)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "8/6 E-AH",
+      "6/4 D-AH",
+      "Warman AH"
+     ],
+     "sources": [
+      "https://www.global.weir/product-catalogue/pumps/warman-ah-heavy-duty-slurry-pumps/",
+      "https://www.global.weir/globalassets/resources/product-pdfs/warman/warman-ah-pumps-brochure.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "ksb",
+   "name": "KSB",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "KSB",
+    "КСБ"
+   ],
+   "series": [
+    {
+     "id": "ksb-eta",
+     "series": "Etanorm / Etabloc / Etaline",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "Eta(?:norm|bloc|line)(?:\\s?-?\\s?R)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "Etanorm",
+      "Etanorm-R",
+      "Etabloc"
+     ],
+     "sources": [
+      "https://www.ksb.com/en-at/lc/etanorm/E04B",
+      "https://www.ksb.com/en-us/applications/industry-technology/eta"
+     ]
+    },
+    {
+     "id": "ksb-process",
+     "series": "Multitec, Omega, RDLO, CPK / MegaCPK",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "Multitec|RDLO|MegaCPK",
+       "context": "сам"
+      },
+      {
+       "rx": "Omega|CPKN?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Multitec",
+      "RDLO",
+      "Omega",
+      "CPK"
+     ],
+     "sources": [
+      "https://live-commerce-proxy-e2e-sales.ksb.com/rest/v2/ksb/users/anonymous/odata/disfile?application=PDF&documentType=YTO&documentNumber=1070.808&documentPart=EN&documentVersion=02&checksum=cecf7f47d0db163d09d28c7323d44799121afbab16c94e622565974377559450&salesOrg=1109"
+     ],
+     "note": "Omega и CPK — только рядом с KSB."
+    }
+   ]
+  },
+  {
+   "brand_key": "grundfos",
+   "name": "Grundfos",
+   "origin": "западный",
+   "country": "Дания",
+   "aliases": [
+    "Grundfos",
+    "Грундфос"
+   ],
+   "series": [
+    {
+     "id": "grundfos-cr",
+     "series": "CR / CRN / CRI / CRE (вертикальные многоступенчатые)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "CR[INTE]{0,2}\\s?\\d{1,3}(?:-\\d{1,2})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CR 32-2",
+      "CRN 10-6",
+      "CRE 15"
+     ],
+     "sources": [
+      "https://product-selection.grundfos.com/us/products/cr-cre-cri-crie-crn-crne-crt-crte"
+     ]
+    },
+    {
+     "id": "grundfos-nb-nk",
+     "series": "NB / NK (консольные)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "N[BK]G?\\s?\\d{2,3}-\\d{3}(?:\\.\\d)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "NB 65-200",
+      "NK 80-250"
+     ],
+     "sources": [
+      "https://api.grundfos.com/literature/Grundfosliterature-4112587.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "flowserve",
+   "name": "Flowserve",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Flowserve",
+    "Флоусерв",
+    "Durco"
+   ],
+   "series": [
+    {
+     "id": "flowserve-mark3",
+     "series": "Durco Mark 3 (химические консольные)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "Mark\\s?(?:3|III)(?:\\s?(?:ISO|ANSI|MAG))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Mark 3",
+      "Mark III ISO"
+     ],
+     "sources": [
+      "https://www.flowserve.com/products/products-catalog/pumps/overhung-pumps/durco-mark-3-iso-sealed-chemical-process-pump/"
+     ]
+    },
+    {
+     "id": "flowserve-api",
+     "series": "DVSH, HPX, LPN (насосы нефтепроводов и процесса)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "DVSH|HPX|LPN|LPLD",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "DVSH",
+      "HPX"
+     ],
+     "sources": [
+      "https://pdf.directindustry.com/pdf/flowserve/pipeline-transportation-pumps/6194-407197.html"
+     ],
+     "note": "Каталог Flowserve на площадке directindustry."
+    }
+   ]
+  },
+  {
+   "brand_key": "belaz",
+   "name": "БелАЗ",
+   "origin": "прочий",
+   "country": "Беларусь",
+   "aliases": [
+    "БелАЗ",
+    "BELAZ",
+    "Белаз"
+   ],
+   "series": [
+    {
+     "id": "belaz-trucks",
+     "series": "карьерные самосвалы 7513, 7530, 75710",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "75(?:13|30|60|71)\\d{0,2}[A-Z]?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "75131",
+      "7513",
+      "75306",
+      "75710"
+     ],
+     "sources": [
+      "https://belaz.by/en/products/products-belaz/dumpers/dump-trucks-with-electromechanical-transmission/dump-truck-series-7513/",
+      "https://en.wikipedia.org/wiki/BelAZ_75710"
+     ],
+     "note": "Номера — только рядом с именем бренда."
+    }
+   ]
+  },
+  {
+   "brand_key": "weichai",
+   "name": "Weichai",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Weichai",
+    "Вейчай",
+    "Вэйчай",
+    "Weichai Power"
+   ],
+   "series": [
+    {
+     "id": "weichai-wp",
+     "series": "WP (WP4…WP17, в т. ч. газовые NG)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "WP\\s?(?:2\\.[13]|3|4\\.1|4\\.6|4|6|7|9H?|10H?|12|13|15H?|17)(?:NG|D|G|C|H)?(?:\\.\\d{3}[A-Z]?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "WP12",
+      "WP10H",
+      "WP12NG",
+      "WP13",
+      "WP12.400E"
+     ],
+     "sources": [
+      "https://m.en.weichaipower.com/product_business/powertrain/engine/construction_machinery/202101/t20210108_67748.html",
+      "https://m.en.weichaipower.com/product_business/powertrain/engine/bus/202210/t20221010_88141.html"
+     ]
+    },
+    {
+     "id": "weichai-m",
+     "series": "M26 / M33 / M55 (промышленные и генераторные)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "(?:6|8|12|16|20)\\s?M\\s?(?:26|33|55)(?:\\.\\d)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "12M33",
+      "16M33",
+      "12M26"
+     ],
+     "sources": [
+      "https://en.weichaipower.com/product_business/powertrain/engine/industrial/Genset/202310/t20231019_97677.html"
+     ],
+     "note": "Подтверждён 12M33; M26 и M55 названы на сайте Weichai как платформы."
+    }
+   ]
+  },
+  {
+   "brand_key": "dongfengcumminsengine",
+   "name": "Dongfeng Cummins (DCEC)",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Dongfeng Cummins",
+    "DCEC",
+    "Дунфэн Камминс"
+   ],
+   "context_aliases": [
+    "Cummins",
+    "Камминс"
+   ],
+   "series": [
+    {
+     "id": "dcec-b-gas",
+     "series": "B5.9 G / BGe / B6.7G / L8.9G (газовые)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "B\\s?5\\.9-\\d{3}G",
+       "context": "сам"
+      },
+      {
+       "rx": "BGe\\s?\\d{3}-\\d{2}",
+       "context": "сам"
+      },
+      {
+       "rx": "(?:B6\\.7|L8\\.9)G",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "B5.9-150G",
+      "BGe 195-31",
+      "L8.9G"
+     ],
+     "sources": [
+      "https://www.hekopower.com/Cummins-B5-9-150G-p.html",
+      "https://www.360che.com/news/140516/31170.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dongfengcumminsengine.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "yuchai",
+   "name": "Yuchai (Guangxi Yuchai)",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Yuchai",
+    "Юйчай",
+    "Ючай",
+    "Guangxi Yuchai"
+   ],
+   "series": [
+    {
+     "id": "yuchai-yc",
+     "series": "YC (YC4…YC6K, YC6MK, YC6L, YC6T)",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "YC\\s?[46][A-Z]{1,2}\\d{0,4}(?:[A-Z]{0,2}\\d{0,2})?(?:-\\d{2,3}[A-Z]?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "YC6K",
+      "YC6MK",
+      "YC6L",
+      "YC6MK375-30"
+     ],
+     "sources": [
+      "https://www.yuchaiglobal.com/product/yc6mk-2/",
+      "http://www.yuchaiie.com/product/11119.html"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "jichaijinandieselcnpc",
+   "name": "Jichai (CNPC Jichai Power)",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Jichai",
+    "Jinan Diesel",
+    "Цзичай",
+    "Чидун",
+    "Chidong"
+   ],
+   "series": [
+    {
+     "id": "jichai-190",
+     "series": "190 (6L190, 8V190, 12V190, 16V190; газовые H/G)",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "[ABGHZ]?\\s?(?:6\\s?L|8\\s?V|12\\s?V|16\\s?V)\\s?190[A-Z]{0,4}\\d?(?:-\\d)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "H16V190ZL",
+      "G12V190PZL",
+      "12V190",
+      "16V190"
+     ],
+     "sources": [
+      "https://www.jichai.com/product/coal_gas_engine_and_gensets/190_series_500kw1600kw.html",
+      "https://www.jichai.com/aggregate-190_series_450kw2200kw.html"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "shengdong",
+   "name": "Shengdong (Shengli Power Machinery)",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Shengdong",
+    "Shengli Power",
+    "Шэндун",
+    "Шендун"
+   ],
+   "series": [
+    {
+     "id": "shengdong-gf",
+     "series": "газовые генераторные установки …GF…",
+     "type": "ГПУ",
+     "patterns": [
+      {
+       "rx": "\\d{3,4}\\s?GF[A-Z]?\\d{0,2}-[A-Z0-9]{2,6}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "500GF1-3RT",
+      "500GF1-3RW",
+      "500GFZ1-PWZ"
+     ],
+     "sources": [
+      "http://www.shuifashengdong.com/products_details/1002177522841669632.html",
+      "https://www.shuifashengdong.com/about.html"
+     ],
+     "note": "Обозначение «…GF» у китайских ДГУ общее — только рядом с именем бренда."
+    }
+   ]
+  },
+  {
+   "brand_key": "zibodiesel",
+   "name": "Zichai (Zibo Diesel)",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Zichai",
+    "Zibo Diesel",
+    "Цзычай",
+    "Цзибо"
+   ],
+   "series": [
+    {
+     "id": "zichai-170",
+     "series": "Z6170 / Z8170 / Z6150",
+     "type": "дизель",
+     "patterns": [
+      {
+       "rx": "Z\\s?(?:6|8)\\s?1(?:70|50)[A-Z]{0,6}",
+       "context": "сам"
+      },
+      {
+       "rx": "(?:6|8)1(?:70|50)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Z6170",
+      "Z8170ZLCZ",
+      "8170"
+     ],
+     "sources": [
+      "http://www.zichai.com/MarineDieselEngine/10092.jhtml"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "sany",
+   "name": "SANY",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "SANY"
+   ],
+   "series": [
+    {
+     "id": "sany-sy",
+     "series": "SY (экскаваторы)",
+     "type": "дорожно-строительная",
+     "patterns": [
+      {
+       "rx": "SY\\s?\\d{2,4}[A-Z]{0,2}(?:\\s?Pro)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SY750H",
+      "SY365H",
+      "SY500H"
+     ],
+     "sources": [
+      "https://www.sanyglobal.com/product/excavator/large_excavator/115/847/",
+      "https://www.sanyglobal.com/press_releases/330/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "xcmg",
+   "name": "XCMG",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "XCMG",
+    "Сюйгун",
+    "ХСМГ"
+   ],
+   "series": [
+    {
+     "id": "xcmg-xde",
+     "series": "XDE (карьерные самосвалы с электроприводом)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "XDE\\s?\\d{2,3}[A-Z]?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "XDE240",
+      "XDE400",
+      "XDE260"
+     ],
+     "sources": [
+      "https://www.xcmg.com/ru-cis/product/product-detail-119777.htm",
+      "https://en.xcmg.com/en-ap/news/news-detail-25478.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "zoomlion",
+   "name": "Zoomlion",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Zoomlion",
+    "Зумлион"
+   ],
+   "series": [
+    {
+     "id": "zoomlion-cranes",
+     "series": "ZTC / ZAT (автомобильные и вездеходные краны)",
+     "type": "дорожно-строительная",
+     "patterns": [
+      {
+       "rx": "Z(?:TC|AT)\\s?\\d{3,4}[A-Z]?\\d{0,3}",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "ZTC250",
+      "ZAT1200",
+      "ZTC550V552"
+     ],
+     "sources": [
+      "https://en-product.zoomlion.com/product/pro_list.htm?sCat=54&fCat=66",
+      "https://en-product.zoomlion.com/product/pro_list.htm?sCat=59"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "liugong",
+   "name": "LiuGong",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "LiuGong",
+    "Liu Gong",
+    "Люгонг",
+    "Лю Гонг"
+   ],
+   "series": [
+    {
+     "id": "liugong-clg",
+     "series": "CLG (фронтальные погрузчики, экскаваторы)",
+     "type": "дорожно-строительная",
+     "patterns": [
+      {
+       "rx": "CLG\\s?\\d{3,4}[A-Z]?",
+       "context": "сам"
+      },
+      {
+       "rx": "8(?:5[0-9]|6[0-9]|7[0-9]|8[0-9]|90)H",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CLG856H",
+      "CLG890H",
+      "890H"
+     ],
+     "sources": [
+      "https://www.liugongna.com/wheel-loaders-890h"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "shacman",
+   "name": "Shacman (Shaanxi)",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Shacman",
+    "Shaanxi Automobile",
+    "Шакман",
+    "Шанкси"
+   ],
+   "series": [
+    {
+     "id": "shacman-3000",
+     "series": "X3000 / F3000 / H3000 / X5000 / X6000",
+     "type": "грузовик",
+     "patterns": [
+      {
+       "rx": "[XFHLM]\\s?[356]000",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "X3000",
+      "F3000",
+      "H3000"
+     ],
+     "sources": [
+      "https://www.shacman.com/product/3000-series/x3000/",
+      "https://www.shacman-group.com/models/shacman-f3000/"
+     ],
+     "note": "X5000/X6000 — грамматика ряда; подтверждены 3000-е."
+    }
+   ]
+  },
+  {
+   "brand_key": "sinotruk",
+   "name": "Sinotruk (CNHTC) / HOWO",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Sinotruk",
+    "CNHTC",
+    "HOWO",
+    "Синотрук",
+    "Хово",
+    "SITRAK",
+    "Ситрак"
+   ],
+   "series": [
+    {
+     "id": "sinotruk-howo",
+     "series": "HOWO (A7, T7H, T5G, TX, NX, TH7, MAX), SITRAK C5H/C7H/C9H",
+     "type": "грузовик",
+     "patterns": [
+      {
+       "rx": "HOWO(?:[-\\s]?(?:A7|T7H|T5G|TX7?|NX|TH7|MAX))?",
+       "context": "сам"
+      },
+      {
+       "rx": "SITRAK\\s?(?:C[579]H|G7S)?",
+       "context": "сам"
+      },
+      {
+       "rx": "T7H|T5G|TH7",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HOWO A7",
+      "HOWO-T7H",
+      "SITRAK C7H",
+      "T7H"
+     ],
+     "sources": [
+      "https://sinotruk.international/",
+      "https://www.sinotrukinternation.com/news/22.html"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "shantui",
+   "name": "Shantui",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Shantui",
+    "Шантуй",
+    "Шаньтуй"
+   ],
+   "series": [
+    {
+     "id": "shantui-sd",
+     "series": "SD (бульдозеры)",
+     "type": "дорожно-строительная",
+     "patterns": [
+      {
+       "rx": "SD\\s?\\d{2}[A-Z]?\\d?(?:-C\\d|-5|W)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SD16",
+      "SD22D",
+      "SD32W",
+      "SD20-C6"
+     ],
+     "sources": [
+      "https://ru.shantui.com/product/pro-detail-3243974.htm",
+      "https://en.shantui.com/about/tui-detail-615919.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "kaishan",
+   "name": "Kaishan",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Kaishan",
+    "Кайшань",
+    "Кайшан"
+   ],
+   "series": [
+    {
+     "id": "kaishan-lg",
+     "series": "LG / LGS / LGY (винтовые компрессоры)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "LG[SY]?\\s?-?\\s?\\d{1,3}(?:[/-]\\d{1,2}(?:\\.\\d)?)?[A-Z]?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "LG-22/8",
+      "LGY-17/7",
+      "LGS 250"
+     ],
+     "sources": [
+      "https://www.kaishan-group.com/products/16-Kaishan-LG-Series-Screw-Air-Compressor.html",
+      "https://www.kaishan-group.com/products/17-Kaishan-LGS-Water-cooled-Screw-Air-Compressor.html"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "jereh",
+   "name": "Jereh",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Jereh",
+    "Джерех",
+    "Цзеруй"
+   ],
+   "series": [
+    {
+     "id": "jereh-frac",
+     "series": "Apollo (ГТУ-привод ГРП), JR5000 (плунжерные насосы)",
+     "type": "нефтепромысловая",
+     "patterns": [
+      {
+       "rx": "JR\\s?\\d{4}[A-Z]{0,4}",
+       "context": "бренд"
+      },
+      {
+       "rx": "Apollo(?:\\s?\\d{4})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "JR5000QPW",
+      "Apollo 4500"
+     ],
+     "sources": [
+      "https://www.americanjereh.com/en/products/frac-spread/apollo-turbine-driven-frac-pumper.htm",
+      "https://www.jereh.com/en/news/news-detail-614881.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "kerui",
+   "name": "Kerui Petroleum",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Kerui",
+    "Керуй"
+   ],
+   "series": [
+    {
+     "id": "kerui-qws",
+     "series": "QWS (насосы ГРП)",
+     "type": "нефтепромысловая",
+     "patterns": [
+      {
+       "rx": "QWS\\s?\\d{4}[A-Z]?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "QWS2800"
+     ],
+     "sources": [
+      "https://www.keruigroup.com/en/sys-pd/287.html"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "tyhi",
+   "name": "TYHI (Taiyuan Heavy Industry)",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "TYHI",
+    "Taiyuan Heavy",
+    "Тайюань"
+   ],
+   "series": [
+    {
+     "id": "tyhi-wk",
+     "series": "WK (карьерные электрические экскаваторы)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "WK\\s?-?\\s?(?:4C|8|10B?|12|20|27|35|55|75)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "WK-10B",
+      "WK-20",
+      "WK-35"
+     ],
+     "sources": [
+      "http://product.tyhi.com/index/Mining_Equipment/MiningRopeShovel/WK20RopeShovel.htm",
+      "http://product.tyhi.com/index/Mining_Equipment/MiningRopeShovel/WK35RopeShovel.htm"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "dongfangelectric",
+   "name": "Dongfang Electric (DEC)",
+   "origin": "китайский",
+   "country": "Китай",
+   "aliases": [
+    "Dongfang Electric",
+    "Dongfang Turbine",
+    "Дунфан"
+   ],
+   "context_aliases": [
+    "DEC",
+    "Dongfang"
+   ],
+   "series": [
+    {
+     "id": "dongfang-g50",
+     "series": "G50 (тяжёлая ГТУ класса F, 50 МВт)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "G50",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "G50"
+     ],
+     "sources": [
+      "https://govt.chinadaily.com.cn/s/202304/06/WS642e28fa498ea274927b5ac0/f-class-50-mw-heavy-duty-gas-turbine-of-dec.html",
+      "https://en.wikipedia.org/wiki/Dongfang_Electric"
+     ]
+    }
+   ]
+  }
+ ]
+}
