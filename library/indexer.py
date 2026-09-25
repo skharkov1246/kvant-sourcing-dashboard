@@ -2333,6 +2333,36 @@ def определить_папку(rec: dict, текст: str, строки: li
     rec["doc_kind_why"] = итог[:ДЛИНА_ПОЧЕМУ]
 
 
+#: Строка контактов письма: почта, адрес сайта, телефон, факс. Закрытый список —
+#: обвиняет (правило 7): в наименовании позиции этих слов не бывает.
+_КОНТАКТ_ПИСЬМА = re.compile(
+    r"@|https?://|www\.|(?<![а-яёa-z])(?:тел|телефон|моб|мобильный|факс|e-?mail|почта)"
+    r"(?![а-яёa-z])", re.I)
+
+
+def позиции_письма(items: list[dict]) -> list[dict]:
+    """Строки тела письма, которые похожи на позицию, — остальное проза письма.
+
+    Защита щедрая (правило 7): остаётся строка с любым признаком позиции
+    (docfilter.spec_marks: колонка количества или единицы, стандарт, типоразмер,
+    количество с единицей, марка) или со словом словаря сегментов («насос»,
+    «подшипник»). Обвинение — закрытым списком контактов (_КОНТАКТ_ПИСЬМА).
+    Построчный отбор здесь, а не отказ по файлу (правило 13), потому что письмо —
+    не спецификация с переносами наименования, а проза, в которой перечень —
+    исключение.
+    """
+    out = []
+    for it in items:
+        имя = str(it.get("item_name") or "")
+        if _КОНТАКТ_ПИСЬМА.search(имя):
+            continue
+        sp, _ = docfilter.row_marks(имя, it.get("oem") or "", it.get("unit") or "",
+                                    it.get("qty"), dict_hit=classify(имя) is not None)
+        if sp:
+            out.append(it)
+    return out
+
+
 def handle(ref: dict) -> tuple[dict, list[dict]]:
     fo = ref["fo"]
     fid = ключ_ссылки(ref)
@@ -2442,6 +2472,17 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
                           "oem": "", "unit": "", "qty": ц["qty"] if ц else None,
                           "_row": ln[:600], "_цена": ц})
 
+    if "тело" in fo and items:
+        # ТЕЛО ПИСЬМА — ПРОЗА С ВКРАПЛЕНИЯМИ ПЕРЕЧНЯ, отбор ПО СТРОКЕ (позиции_письма).
+        # Ворота файла (docfilter.file_verdict) рассчитаны на длинный документ: у
+        # письма в десять строк они говорят «мало строк», и позицией становилось
+        # всё — приветствие, подпись, телефон. Холостой замер 25.09.2026 (прогон
+        # 36102189853): 1 819 тел писем лидов дали 33 231 позицию, по 18 на письмо.
+        до = len(items)
+        items = позиции_письма(items)
+        rec["item_lines"] = len(items)
+        if not items:
+            rec["reason"] = f"в тексте письма нет строк с признаками позиции (строк {до})"
     rec["chars"] = len(text)
     rec["rows_found"] = len(items)
     rec["segment_id"] = classify(text) if text else None
@@ -2757,6 +2798,9 @@ def main() -> int:
     # «не скачался» — причина лежала только в базе, а холостой прогон её не пишет.
     # Ключ — код портала или ответа (download кладёт только коды, правило 17).
     не_скачались: Counter = Counter()
+    # Качество позиций — только числа: с кодом, с количеством, путь разбора.
+    с_кодом = с_колвом = 0
+    пути: Counter = Counter()
     расхождений = 0
     total_items = 0
     цен = 0
@@ -2833,6 +2877,10 @@ def main() -> int:
             if rec["segment_id"]:
                 segs[rec["segment_id"]] += rec["rows_found"]
             total_items += rec["rows_found"]
+            if rec["rows_found"]:
+                пути[rec.get("parse_path") or "(нет)"] += rec["rows_found"]
+            с_кодом += sum(1 for it in items if (it.get("part_number") or "").strip())
+            с_колвом += sum(1 for it in items if it.get("qty") is not None)
             buf_files.append(кортеж_файла(rec, колонки))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
@@ -2852,6 +2900,9 @@ def main() -> int:
 
     print("\n=== ИТОГ ЧАСТИ ===")
     print(f"файлов: {sum(stat.values())} · позиций номенклатуры: {total_items}")
+    if total_items:
+        print(f"позиции: с кодом {с_кодом} · с количеством {с_колвом}"
+              f" · по пути разбора {dict(пути.most_common())}")
     if SOURCE == "rfq":
         print(f"строк с ценой: {цен}"
               + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
