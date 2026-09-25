@@ -137,10 +137,14 @@ jobs:
     timeout-minutes: 350
     strategy:
       fail-fast: false
-      # 12 — предел базы (pooler Supabase держит 15 клиентов), как в
-      # library-index.yml. Портал защищён бюджетом: сколько бы частей ни шло,
-      # вместе они шлют BITRIX_RPS запросов в секунду.
-      max-parallel: 12
+      # 10 — предел базы (pooler Supabase держит 15 клиентов) и раннеров: у
+      # публичного репозитория их 20 на всё, и 25.09.2026 двенадцать частей лидов
+      # плюс двенадцать частей сделок заняли все, а деплой дашборда и гейты
+      # стояли в очереди часами. Лидам — 3: на 0,3 запроса в секунду больше
+      # частей не ускоряют прогон, а лишь держат раннеры во сне между запросами.
+      # Портал защищён бюджетом: сколько бы частей ни шло, вместе они шлют
+      # BITRIX_RPS запросов в секунду.
+      max-parallel: ${{ inputs.group == 'mail-lead' && 3 || 10 }}
       matrix:
         # Матрица на 50 мест; лишние части сразу выходят (см. library-index.yml).
         shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
@@ -217,9 +221,9 @@ jobs:
             BITRIX_RPS="${INPUT_RPS}"
           fi
           export BITRIX_RPS
-          # СКОЛЬКО ЧАСТЕЙ ЧИТАЮТ ПОРТАЛ РАЗОМ: min(частей, max-parallel). Число 12
-          # обязано совпадать со strategy.max-parallel выше.
-          MAX_PARALLEL=12
+          # СКОЛЬКО ЧАСТЕЙ ЧИТАЮТ ПОРТАЛ РАЗОМ: min(частей, max-parallel). Числа
+          # обязаны совпадать со strategy.max-parallel выше.
+          if [ "${{ inputs.group }}" = "mail-lead" ]; then MAX_PARALLEL=3; else MAX_PARALLEL=10; fi
           export BITRIX_PARALLEL=$(( SHARDS < MAX_PARALLEL ? SHARDS : MAX_PARALLEL ))
           echo "бюджет портала: ${BITRIX_RPS}/с на прогон, частей разом ${BITRIX_PARALLEL}"
           python library/indexer.py
