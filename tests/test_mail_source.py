@@ -463,7 +463,8 @@ def test_лиды_всегда_пятая_часть():
     for вход in ("0.8", "1.2", "1.5"):
         assert бюджет_шага("mail-lead", вход)["RPS"] == "0.3"
     assert бюджет_шага("mail-deal", "1.5")["RPS"] == "1.5"
-    assert бюджет_шага("mail-supplier", "1.2")["PAR"] == "12"
+    assert бюджет_шага("mail-supplier", "1.2")["PAR"] == "10"
+    assert бюджет_шага("mail-lead", "1.2")["PAR"] == "3"
 
 
 def test_план_лидов_тоже_пятая_часть():
@@ -488,8 +489,17 @@ def test_отметка_последней_и_только_после_всех_�
 def test_параллельность_совпадает_с_матрицей():
     wf = прогон()
     import re
-    assert int(re.search(r"MAX_PARALLEL=(\d+)", шаг_разбора(wf)["run"]).group(1)) == \
-        wf["jobs"]["index"]["strategy"]["max-parallel"]
+    # Параллельность зависит от группы: лидам — меньше (пятая часть портала,
+    # лишние части лишь занимают раннеры). Шаг и матрица обязаны давать одно
+    # и то же число для каждой группы.
+    матрица = str(wf["jobs"]["index"]["strategy"]["max-parallel"])
+    м = re.search(r"mail-lead' && (\d+) \|\| (\d+)", матрица)
+    assert м, "max-parallel задаётся по группе"
+    лиды, прочие = int(м.group(1)), int(м.group(2))
+    шаг = re.search(r'= "mail-lead" \]; then MAX_PARALLEL=(\d+); else MAX_PARALLEL=(\d+)',
+                    шаг_разбора(wf)["run"])
+    assert шаг and (int(шаг.group(1)), int(шаг.group(2))) == (лиды, прочие)
+    assert лиды < прочие <= 10, "раннеров 20 на весь репозиторий: оставить деплою и гейтам"
     triggers = wf.get("on") or wf.get(True)
     части = triggers["workflow_dispatch"]["inputs"]["shards"]["options"]
     assert min(int(x) for x in части) >= 10, "делить минимум на 10 (правило дробления)"

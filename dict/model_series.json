@@ -1,7 +1,7 @@
 {
  "schema": "kvant.model-series/1",
  "updated": "2026-09-25",
- "note": "Модельные ряды брендов с шаблоном распознавания. Одна запись ряда — название, тип машины, шаблоны (регулярные выражения Python без границ — границы слова ставит library/model_series.py), примеры обозначений, которые шаблон обязан узнавать (проверяет tests/test_model_series.py), и источники — официальная страница или каталог изготовителя; вторичный источник оговорён в note. context «сам» — обозначение различимо само, «бренд» — засчитывается только при имени бренда (aliases или context_aliases) в той же строке или в поле изготовителя. Ряд без источника не добавляется. brand_key — ключ dict/oem.json, если бренд там есть, иначе новый ключ того же вида. origin — западный / китайский / прочий. Сведения только общедоступные.",
+ "note": "Модельные ряды брендов с шаблоном распознавания. Одна запись ряда — название, тип машины, шаблоны (регулярные выражения Python без границ — границы слова ставит library/model_series.py), примеры обозначений, которые шаблон обязан узнавать (проверяет tests/test_model_series.py), и источники — официальная страница или каталог изготовителя; вторичный источник оговорён в note. context «сам» — обозначение различимо само, «бренд» — засчитывается только при имени бренда (aliases или context_aliases) в той же строке или в поле изготовителя. Ряд без источника не добавляется. brand_key — ключ dict/oem.json, если бренд там есть, иначе новый ключ того же вида. origin — западный / китайский / прочий. Сведения только общедоступные. field_aliases — написания, которые делают бренд только в поле изготовителя (CAT, NORD), а в тексте строки неоднозначны; по ним и по aliases замер сводит ключи реестра брендов, заведённые другим написанием того же бренда (cat → caterpillar, warman → weir, getriebebaunord… → nord).",
  "types": [
   "ГПУ",
   "дизель",
@@ -11,12 +11,24 @@
   "горная",
   "дорожно-строительная",
   "грузовик",
-  "нефтепромысловая"
+  "нефтепромысловая",
+  "электродвигатель",
+  "преобразователь частоты",
+  "редуктор",
+  "КИП",
+  "торцевое уплотнение",
+  "клапан компрессора",
+  "гидравлика",
+  "турбонагнетатель",
+  "детандер",
+  "пылеуловитель"
  ],
  "gaps": [
   "Harbin Electric, Shanghai Electric, CRRC, Hongda — ряд с источником не найден в этой сессии, не добавлены.",
   "SKF — подшипники, а не машины: ряда машин нет, бренд остаётся в реестре брендов.",
-  "Бренды с context «бренд» не узнаются в строке без имени бренда — это намеренно: голые числа (3516, 4012, 75131) и короткие буквенные коды (GA, ZR, CR, SD, HP) без бренда неоднозначны."
+  "Бренды с context «бренд» не узнаются в строке без имени бренда — это намеренно: голые числа (3516, 4012, 75131) и короткие буквенные коды (GA, ZR, CR, SD, HP) без бренда неоднозначны.",
+  "Dana (оси и коробки Spicer), Swagelok (фитинги и краны — артикулы, а не ряды машин) — ряд с официальным источником и форматом обозначения не собран в этой сессии, не добавлены.",
+  "Sulzer CP и ZPP, Goulds 3408, Ruhrpumpen ZM — страница изготовителя не открылась или формат обозначения не подтверждён: не заведены."
  ],
  "brands": [
   {
@@ -179,6 +191,9 @@
       "https://s7d2.scene7.com/is/content/Caterpillar/C764153"
      ]
     }
+   ],
+   "field_aliases": [
+    "CAT"
    ]
   },
   {
@@ -2570,6 +2585,1352 @@
       "https://govt.chinadaily.com.cn/s/202304/06/WS642e28fa498ea274927b5ac0/f-class-50-mw-heavy-duty-gas-turbine-of-dec.html",
       "https://en.wikipedia.org/wiki/Dongfang_Electric"
      ]
+    }
+   ]
+  },
+  {
+   "brand_key": "siemens",
+   "name": "Siemens AG",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "Siemens AG",
+    "Сименс АГ",
+    "Siemens Digital Industries"
+   ],
+   "context_aliases": [
+    "Siemens",
+    "Сименс"
+   ],
+   "series": [
+    {
+     "id": "siemens-sinamics",
+     "series": "SINAMICS (преобразователи частоты)",
+     "type": "преобразователь частоты",
+     "patterns": [
+      {
+       "rx": "SINAMICS(?:\\s?(?:[GSV]\\s?\\d{2,3}[A-Z]?|GM\\s?150|SM\\s?1[25]0|SL\\s?150|GL\\s?150|GH\\s?1[58]0|DCM))?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "SINAMICS G120",
+      "SINAMICS S120",
+      "SINAMICS V20",
+      "SINAMICS G120C",
+      "SINAMICS"
+     ],
+     "sources": [
+      "https://www.siemens.com/en-us/products/sinamics/g120/",
+      "https://www.siemens.com/en-us/products/sinamics/g120c/"
+     ],
+     "note": "Имя семейства различимо само."
+    },
+    {
+     "id": "siemens-lv-motors",
+     "series": "SIMOTICS GP/SD/XP/DP и заказные номера 1LA/1LE/1LG/1PC/1FP/1MB (низковольтные двигатели)",
+     "type": "электродвигатель",
+     "patterns": [
+      {
+       "rx": "1(?:LA|LE|LG|PC|FP|MB)\\d{4}-\\d[A-Z]{2}\\d{2}(?:-\\d[A-Z]{2}\\d)?",
+       "context": "сам"
+      },
+      {
+       "rx": "SIMOTICS(?:\\s?(?:GP|SD|XP|DP|FD|HV|TN|HT|S|M|T|L))?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "1LA7163-4AA60",
+      "1LE1001-1DB23-4AA4",
+      "1LG4283-2AB60",
+      "SIMOTICS SD",
+      "SIMOTICS GP"
+     ],
+     "sources": [
+      "https://cache.industry.siemens.com/dl/files/197/109749197/att_955119/v1/simotics-gp-sd-xp-dp-catalogue-d-81-1-en-2018.pdf",
+      "https://assets.new.siemens.com/siemens/assets/api/uuid:55d636b3-ab21-4f19-8b9c-c0f17f38353d/dimc-y10067-00-7600-poster-simotics-lv-mlfb-630x280-72.pdf"
+     ],
+     "note": "Заказной номер (MLFB) — шестнадцать знаков вида 1LE1001-1DB23-4AA4. С выделением Innomotics (2023–2024) те же 1LE1/1PC1 продаются под её именем; в парке и в спросе двигатель подписан Siemens, поэтому ряд оставлен за Siemens."
+    }
+   ]
+  },
+  {
+   "brand_key": "innomotics",
+   "name": "Innomotics",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "Innomotics",
+    "Инномотикс"
+   ],
+   "series": [
+    {
+     "id": "innomotics-lv",
+     "series": "Innomotics GP/SD/XP/DP (низковольтные двигатели, бывшие SIMOTICS)",
+     "type": "электродвигатель",
+     "patterns": [
+      {
+       "rx": "Innomotics\\s?(?:GP|SD|XP|DP|FD)(?:\\s?Pro)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "Innomotics SD",
+      "Innomotics GP",
+      "Innomotics SD Pro"
+     ],
+     "sources": [
+      "https://www.innomotics.com/hub/en/62354760",
+      "https://www.innomotics.com/hub/en/18859"
+     ],
+     "note": "Имя ряда пишется вместе с именем изготовителя; заказные номера 1LE1… узнаются рядом Siemens."
+    }
+   ]
+  },
+  {
+   "brand_key": "sulzer",
+   "name": "Sulzer",
+   "origin": "западный",
+   "country": "Швейцария",
+   "aliases": [
+    "Sulzer",
+    "Sulzer Pumps",
+    "Зульцер",
+    "Сульцер"
+   ],
+   "series": [
+    {
+     "id": "sulzer-msd",
+     "series": "MSD (многоступенчатые насосы с осевым разъёмом, API 610 BB3)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "MSD(?:[\\s-]?(?:D|RO))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "MSD",
+      "MSD-D"
+     ],
+     "sources": [
+      "https://www.sulzer.com/en/shared/products/msd-axially-split-multistage-pump"
+     ],
+     "note": "Три буквы без бренда неоднозначны."
+    },
+    {
+     "id": "sulzer-barrel",
+     "series": "HPcp, HPT, GSG, CP (корпусные насосы, API 610 BB5)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "HPcp|HPT|GSG(?:-BFP)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HPcp",
+      "HPT",
+      "GSG",
+      "GSG-BFP"
+     ],
+     "sources": [
+      "https://www.sulzer.com/en/shared/products/hpcp-barrel-casing-pump",
+      "https://www.sulzer.com/en/shared/products/hpt-high-pressure-barrel-casing-pump",
+      "https://www.sulzer.com/en/-/media/files/products/pumps/radial-split-pumps/brochures/gsg_diffuserstylebarrelpump_e00612.pdf"
+     ],
+     "note": "CP не заведён шаблоном: две буквы без размера неотличимы от посторонних сокращений."
+    }
+   ]
+  },
+  {
+   "brand_key": "ittgouldspumps",
+   "name": "ITT Goulds Pumps",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "ITT Goulds Pumps",
+    "Goulds Pumps",
+    "ITT Goulds",
+    "Goulds",
+    "Гулдс"
+   ],
+   "context_aliases": [
+    "ITT"
+   ],
+   "series": [
+    {
+     "id": "goulds-3196",
+     "series": "3196 i-FRAME (ANSI, консольные химические)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "(?:(?:LF|HT|CV|NM)\\s?)?3196(?:\\s?i-?FRAME)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "3196",
+      "LF 3196",
+      "3196 i-FRAME",
+      "CV 3196"
+     ],
+     "sources": [
+      "https://www.gouldspumps.com/getmedia/43288e5d-6edf-444d-b553-1bcfb8db6805/B_3196i.pdf",
+      "https://www.gouldspumps.com/products/3196-lf"
+     ],
+     "note": "Голое число — только рядом с именем бренда."
+    },
+    {
+     "id": "goulds-api",
+     "series": "3700, 3600, 3620 (API 610: OH2, BB3, BB2)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "3700|36[02]0i?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "3700",
+      "3600",
+      "3620i"
+     ],
+     "sources": [
+      "https://www.gouldspumps.com/products/3700",
+      "https://www.gouldspumps.com/products/3600i",
+      "https://www.gouldspumps.com/products/3620i"
+     ]
+    },
+    {
+     "id": "goulds-other",
+     "series": "3410, 3316, 3171, 3298, VIT (двусторонний вход, многоступенчатые, вертикальные)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "3410|3316|3171|3298",
+       "context": "бренд"
+      },
+      {
+       "rx": "VIT(?:-[A-Z]{1,2})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "3410",
+      "3316",
+      "3171",
+      "3298",
+      "VIT"
+     ],
+     "sources": [
+      "https://www.gouldspumps.com/products/3410",
+      "https://www.gouldspumps.com/products/3316",
+      "https://www.gouldspumps.com/products/3171",
+      "https://www.gouldspumps.com/products/3298",
+      "https://www.gouldspumps.com/products/vit"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "hitachi",
+   "name": "Hitachi Construction Machinery",
+   "origin": "прочий",
+   "country": "Япония",
+   "aliases": [
+    "Hitachi",
+    "Хитачи",
+    "Hitachi Construction Machinery"
+   ],
+   "series": [
+    {
+     "id": "hitachi-ex",
+     "series": "EX (карьерные экскаваторы EX1200–EX8000)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "EX\\s?(?:1200|1900|2500|2600|3600|5500|5600|8000)(?:-\\d[A-Z]?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "EX5600-7",
+      "EX1200-7",
+      "EX3600-6",
+      "EX8000"
+     ],
+     "sources": [
+      "https://www.hitachicm.com/global/en/solutions/mining-business/products/large-excavators/product.ex5600-7p/",
+      "https://www.hitachicm.com/us/en/products/excavators/mining/product.ex5600-7e-elec/"
+     ]
+    },
+    {
+     "id": "hitachi-eh",
+     "series": "EH (карьерные самосвалы EH3500–EH5000)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "EH\\s?(?:3000|3500|4000|4500|5000)(?:\\s?AC(?:-\\d)?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "EH5000AC-3",
+      "EH3500AC-3",
+      "EH4000"
+     ],
+     "sources": [
+      "https://www.hitachicm.com/global/en/solutions/mining-business/products/rigid-dump-trucks/product.eh5000ac-3/",
+      "https://www.hitachicm.com/global/en/solutions/mining-business/products/rigid-dump-trucks/product.eh3500ac-3/"
+     ]
+    },
+    {
+     "id": "hitachi-zx",
+     "series": "ZAXIS (гусеничные экскаваторы ZX)",
+     "type": "дорожно-строительная",
+     "patterns": [
+      {
+       "rx": "ZX\\s?\\d{2,3}(?:LCH|LCR|LC|H|K|W|U)?(?:-\\d[A-Z]?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ZX490LCH-7",
+      "ZX890LCH-7",
+      "ZX200"
+     ],
+     "sources": [
+      "https://www.hitachicm.com/eu/en/machinery/excavators/large-excavators/product.zx490lch-7/",
+      "https://www.hitachicm.com/eu/en/machinery/excavators/large-excavators/product.zx890lch-7%20zx890lcr-7/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "normet",
+   "name": "Normet",
+   "origin": "западный",
+   "country": "Финляндия",
+   "aliases": [
+    "Normet",
+    "Normet Group",
+    "Нормет"
+   ],
+   "series": [
+    {
+     "id": "normet-charmec",
+     "series": "Charmec (зарядные машины)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "Charmec(?:\\s?(?:Revo|(?:MC|MF|RM)\\s?\\d{3,4}(?:\\s?[A-Z]{1,3})?))?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "Charmec MC 605 VE",
+      "Charmec MF 605 D",
+      "Charmec"
+     ],
+     "sources": [
+      "https://www.normet.com/en/products-and-services/equipment/explosives-charging",
+      "https://www.normet.com/en/products-and-services/equipment/explosives-charging/emulsion-charging/charmec-mc-605-v-e-sd"
+     ]
+    },
+    {
+     "id": "normet-spraymec",
+     "series": "Spraymec (торкрет-машины)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "Spraymec(?:\\s?(?:NorRunner\\s?\\d{3}|(?:MF|SF)\\s?\\d{3}|\\d{4})(?:\\s?[A-Z]{1,3})?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "Spraymec 8100 VC",
+      "Spraymec MF 050 VC",
+      "Spraymec"
+     ],
+     "sources": [
+      "https://www.normet.com/en/products-and-services/equipment"
+     ]
+    },
+    {
+     "id": "normet-utility",
+     "series": "Utimec, Multimec, Variomec, Scamec (подземные вспомогательные машины)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "(?:Utimec|Multimec|Variomec|Scamec)(?:\\s?(?:MF|LF|LC|XS|XL)\\s?\\d{3,4}(?:\\s?[A-Z]{1,3})?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "Utimec LF 600",
+      "Utimec MF 500",
+      "Multimec MF 100",
+      "Scamec LC 135 T",
+      "Variomec XS 035"
+     ],
+     "sources": [
+      "https://www.normet.com/en/products-and-services/equipment"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "cryostar",
+   "name": "Cryostar",
+   "origin": "западный",
+   "country": "Франция",
+   "aliases": [
+    "Cryostar",
+    "Криостар"
+   ],
+   "series": [
+    {
+     "id": "cryostar-expanders",
+     "series": "турбодетандеры TC, TG, TP, TFC, LTG",
+     "type": "детандер",
+     "patterns": [
+      {
+       "rx": "(?:TC|TG|TP|TFC|LTG)(?:\\s?\\d{2,4})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "TC",
+      "TG200",
+      "TP",
+      "TFC",
+      "LTG"
+     ],
+     "sources": [
+      "https://cryostar.com/datas-pdf/datasheet/TC.pdf",
+      "https://cryostar.com/datas-pdf/datasheet/TG200.pdf",
+      "https://cryostar.com/datas-pdf/datasheet/TP.pdf",
+      "https://cryostar.com/datas-pdf/datasheet/TFC.pdf"
+     ],
+     "note": "Две-три буквы — только рядом с именем бренда."
+    },
+    {
+     "id": "cryostar-subtran",
+     "series": "SUBTRAN (погружные криогенные насосы)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "SUBTRAN(?:\\s?LH2)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "SUBTRAN",
+      "SUBTRAN LH2"
+     ],
+     "sources": [
+      "https://cryostar.com/industrial-gas/bulk-and-microbulk/submerged-pumps/",
+      "https://cryostar.com/hydrogen/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "rosemount",
+   "name": "Rosemount (Emerson)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Rosemount",
+    "Розмаунт",
+    "Emerson Rosemount",
+    "Emerson Process Rosemount"
+   ],
+   "context_aliases": [
+    "Emerson",
+    "Эмерсон"
+   ],
+   "series": [
+    {
+     "id": "rosemount-pressure",
+     "series": "3051, 3051S, 2051 (датчики давления)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "(?:3051|2051)(?:S|C|T|P|L)?(?:[A-Z]{1,2}\\d[0-9A-Z]*)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "3051",
+      "3051S",
+      "3051CD2A22A1AB4M5",
+      "2051"
+     ],
+     "sources": [
+      "https://www.emerson.com/en/measurement-instrumentation/products/rosemount-3051-pressure-transmitter-family",
+      "https://www.emerson.com/en/measurement-instrumentation/products/rosemount-3051s-pressure-transmitter-family"
+     ],
+     "note": "Код заказа целиком (3051CD2A…) — модель с исполнением; голое число — только рядом с брендом."
+    },
+    {
+     "id": "rosemount-temperature",
+     "series": "644, 3144P (датчики температуры)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "(?:644|3144P?)(?:[A-Z]{1,2}[0-9A-Z]*)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "644",
+      "644HANAJ5",
+      "3144P"
+     ],
+     "sources": [
+      "https://www.emerson.com/en/measurement-instrumentation/products/rosemount-644-temperature-transmitter-family",
+      "https://www.emerson.com/en/measurement-instrumentation/products/rosemount-3144p-temperature-transmitter-family"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "abb",
+   "name": "ABB",
+   "origin": "западный",
+   "country": "Швейцария",
+   "aliases": [
+    "ABB",
+    "АББ"
+   ],
+   "context_aliases": [
+    "Accelleron"
+   ],
+   "series": [
+    {
+     "id": "abb-acs",
+     "series": "ACS (преобразователи частоты ACS150…ACS880, ACS1000/6000)",
+     "type": "преобразователь частоты",
+     "patterns": [
+      {
+       "rx": "ACS\\s?-?(?:1000|2000|5000|6000|6080|8000|150|310|355|380|480|550|580|800|850|880)(?:-\\d{2}[A-Z]?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "ACS880",
+      "ACS580-01",
+      "ACS550",
+      "ACS 800",
+      "ACS6000"
+     ],
+     "sources": [
+      "https://new.abb.com/drives/low-voltage-ac/industrial-drives/acs880-single-drives"
+     ]
+    },
+    {
+     "id": "abb-motors",
+     "series": "M3BP, M3AA, M2BAX (низковольтные двигатели)",
+     "type": "электродвигатель",
+     "patterns": [
+      {
+       "rx": "M(?:3BP|3AA|2BAX|3BAX)\\s?\\d{2,3}(?:\\s?[SML]{1,3}[A-Z]{0,2})?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "M3BP 315SMC",
+      "M3AA 132M",
+      "M2BAX 160MLA",
+      "M3BP 280"
+     ],
+     "sources": [
+      "https://library.e.abb.com/public/28e5206d6766e183c1257b130056f4f6/Catalog_process%20performance%20motors_EN_04_2010_lowres.pdf",
+      "https://new.abb.com/motors-generators/iec-low-voltage-motors/general-performance-motors"
+     ]
+    },
+    {
+     "id": "abb-turbochargers",
+     "series": "турбонагнетатели TPS, TPL, A100/A200 (с 2022 — Accelleron)",
+     "type": "турбонагнетатель",
+     "patterns": [
+      {
+       "rx": "TP[SL]\\s?\\d{2}(?:[A-F]\\d{0,2})?(?:-[A-F]\\d{2})?",
+       "context": "сам"
+      },
+      {
+       "rx": "A[12]\\d{2}-[LMH]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "TPS48",
+      "TPS57-F33",
+      "TPL73-B12",
+      "A140-H",
+      "A265-L"
+     ],
+     "sources": [
+      "https://accelleron.com/power/products/turbochargers",
+      "https://accelleron.com/products/turbochargers/a100-h",
+      "https://accelleron.com/marine/upgrades/tpl"
+     ],
+     "note": "Турбонагнетатели ABB Turbocharging выделены в Accelleron в 2022 году; в парке и спросе подписаны ABB."
+    }
+   ]
+  },
+  {
+   "brand_key": "ruhrpumpen",
+   "name": "Ruhrpumpen",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "Ruhrpumpen",
+    "Рурпумпен"
+   ],
+   "series": [
+    {
+     "id": "ruhrpumpen-sce",
+     "series": "SCE, SCE-L (консольные API 610 OH2)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "SCE(?:-[LM])?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SCE",
+      "SCE-L"
+     ],
+     "sources": [
+      "https://ruhrpumpen.com/product/sce-api-process-pump/",
+      "https://ruhrpumpen.com/product/sce-l-hhlf-pump/"
+     ]
+    },
+    {
+     "id": "ruhrpumpen-bb",
+     "series": "HSC, JTN (с осевым разъёмом, одно- и многоступенчатые)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "HSC|JTN",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HSC",
+      "JTN"
+     ],
+     "sources": [
+      "https://ruhrpumpen.com/product/hsc-split-case-pump/",
+      "https://ruhrpumpen.com/product/jtn-horizontal-multi-stage-pump/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "netzsch",
+   "name": "NETZSCH",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "NETZSCH",
+    "Нетцш",
+    "Нетч"
+   ],
+   "series": [
+    {
+     "id": "netzsch-nemo",
+     "series": "NEMO (винтовые насосы, типоразмер NM…)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "NM\\s?\\d{3}[A-Z]{2}\\d{2}[A-Z]\\d{2}[A-Z]?",
+       "context": "сам"
+      },
+      {
+       "rx": "NEMO(?:\\s?(?:BY|SY|BO|BT|BF|BS|FSIP))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "NM063BY02S12B",
+      "NM045BY01L06B",
+      "NEMO BY",
+      "NEMO"
+     ],
+     "sources": [
+      "https://pumps-systems.netzsch.com/en-US/products-and-accessories/nemo-progressing-cavity-pumps",
+      "https://pumps-systems.netzsch.com/en-US/products-and-accessories/nemo-progressing-cavity-pumps/nemo-by-progressing-cavity-pump-in-industrial-design"
+     ],
+     "note": "Полный типовой ключ NM… различим сам; слово NEMO — только рядом с именем бренда."
+    }
+   ]
+  },
+  {
+   "brand_key": "nord",
+   "name": "NORD Drivesystems (Getriebebau NORD)",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "NORD Drivesystems",
+    "Getriebebau NORD",
+    "NORD Gear"
+   ],
+   "context_aliases": [
+    "NORD",
+    "Норд"
+   ],
+   "field_aliases": [
+    "NORD"
+   ],
+   "series": [
+    {
+     "id": "nord-sk",
+     "series": "SK (мотор-редукторы UNICASE: цилиндрические, конические, червячные)",
+     "type": "редуктор",
+     "patterns": [
+      {
+       "rx": "SK\\s?\\d{4,5}(?:\\.1)?(?:\\s?(?:AZ|AF|AX|AZSH|VL|VF|XZ|XF))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SK 9032.1",
+      "SK 11282",
+      "SK 32100",
+      "SK 9072.1 AZ"
+     ],
+     "sources": [
+      "https://www.nord.com/en/products/geared-motors/helical-bevel-geared-motors/unicase-bevel-geared-motor.jsp",
+      "https://www.nord.com/en/products/geared-motors/helical-inline-geared-motors/unicase-helical-in-line-geared-motor.jsp",
+      "https://www.nord.com/en/documentation/manuals/details/b1000.jsp"
+     ],
+     "note": "SK — частое сокращение: только рядом с именем бренда. «NORD» в поле изготовителя — бренд (field_aliases), в тексте строки — только контекст."
+    }
+   ]
+  },
+  {
+   "brand_key": "seweurodrive",
+   "name": "SEW-EURODRIVE",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "SEW-EURODRIVE",
+    "SEW Eurodrive",
+    "SEW Евродрайв",
+    "СЕВ Евродрайв"
+   ],
+   "context_aliases": [
+    "SEW"
+   ],
+   "series": [
+    {
+     "id": "sew-gear",
+     "series": "R, F, K, S, W (мотор-редукторы, типоразмеры …7)",
+     "type": "редуктор",
+     "patterns": [
+      {
+       "rx": "(?:R|RF|RX|RXF|RM|RZ|F|FA|FAF|FF|FH|FHF|FV|FAZ|K|KA|KAF|KF|KH|KHF|KV|KAZ|S|SA|SAF|SF|W|WA|WF)(?:07|17|19|27|29|37|39|47|49|57|67|77|87|97|107|127|137|147|157|167|187)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "R87",
+      "KA77",
+      "FA67",
+      "SAF47",
+      "RF37"
+     ],
+     "sources": [
+      "https://www.sew-eurodrive.de/products/gear-units/standard-gear-units/helical-gear-units-r/helical-gear-units-r.html",
+      "https://www.sew-eurodrive.de/en_us/technical_pages/forwarding/driveconfigurator_1/gear_units_1/helical_bevel_gear_units.html",
+      "https://www.sew-eurodrive.de/en_us/technical_pages/forwarding/driveconfigurator_1/gear_units_1/parallel_shaft_helical_gear_units.html"
+     ]
+    },
+    {
+     "id": "sew-motors",
+     "series": "DRN, DRE, DRS, DRP (двигатели)",
+     "type": "электродвигатель",
+     "patterns": [
+      {
+       "rx": "DR[NESP]\\s?\\d{2,3}[SML]{1,2}\\d{1,2}",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "DRN132M4",
+      "DRE100L4",
+      "DRS71S4"
+     ],
+     "sources": [
+      "https://www.sew-eurodrive.de/products/gearmotors/standard-gearmotors/helical-gearmotors-rdr/helical-gearmotors-rdr.html",
+      "https://download.sew-eurodrive.com/download/html/31964060/en-EN/4990501517951313118219.html"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "bonfiglioli",
+   "name": "Bonfiglioli",
+   "origin": "западный",
+   "country": "Италия",
+   "aliases": [
+    "Bonfiglioli",
+    "Бонфиглиоли"
+   ],
+   "series": [
+    {
+     "id": "bonfiglioli-vf-w",
+     "series": "VF, W (червячные)",
+     "type": "редуктор",
+     "patterns": [
+      {
+       "rx": "VF\\s?(?:27|30|44|49|62|86|110|130|150|185|210|250)(?:/\\d{2,3})?",
+       "context": "бренд"
+      },
+      {
+       "rx": "W\\s?(?:63|75|86|110)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "VF 49",
+      "VF 130/210",
+      "W 75",
+      "VF44"
+     ],
+     "sources": [
+      "https://www.bonfiglioli.com/international/en/product/vf-w-series_industrial-gearmotors_right-angle-gear-units"
+     ]
+    },
+    {
+     "id": "bonfiglioli-a",
+     "series": "A (коническо-цилиндрические)",
+     "type": "редуктор",
+     "patterns": [
+      {
+       "rx": "A\\s?(?:05|10|20|30|35|41|50|55|60|70|80|90)\\s?[234]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "A 30 3",
+      "A 41 2",
+      "A603"
+     ],
+     "sources": [
+      "https://www.bonfiglioli.com/international/en/product/a-series_industrial-gearmotors_right-angle-gear-units"
+     ]
+    },
+    {
+     "id": "bonfiglioli-c",
+     "series": "C (соосные цилиндрические)",
+     "type": "редуктор",
+     "patterns": [
+      {
+       "rx": "C\\s?(?:05|11|12|21|22|31|32|35|41|51|61|70|80|90|100)\\s?[234]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "C 41 2",
+      "C 80 3",
+      "C612"
+     ],
+     "sources": [
+      "https://www.bonfiglioli.com/international/en/product/c-series_industrial-gearmotors_in-line-geared-units"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "eagleburgmann",
+   "name": "EagleBurgmann",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "EagleBurgmann",
+    "Eagle Burgmann",
+    "Burgmann",
+    "Бургманн",
+    "Игл Бургманн"
+   ],
+   "series": [
+    {
+     "id": "eagleburgmann-seals",
+     "series": "H7N, M7N, MG1/eMG1, MG12, M74 (торцевые уплотнения насосов)",
+     "type": "торцевое уплотнение",
+     "patterns": [
+      {
+       "rx": "(?:H7N|M7N|e?MG1[23]?|M74[A-Z]?\\d?|H75[A-Z]?\\d?|HJ92N|MFL85N)(?:\\s?/\\s?\\d{2,3}(?:-[A-Z0-9]+)?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "H7N",
+      "M7N/45",
+      "MG1/40-G60",
+      "eMG1",
+      "MG12"
+     ],
+     "sources": [
+      "https://www.eagleburgmann.com/en/products/mechanical-seals/mechanical-seals-for-pumps/pusher-seals/h7n/",
+      "https://www.eagleburgmann.com/en/products/mechanical-seals/mechanical-seals-for-pumps/pusher-seals/m7n/",
+      "https://cms.eagleburgmann.com/en/products/mechanical-seals/mechanical-seals-for-pumps/elastomer-bellows-seals/emg1/"
+     ],
+     "note": "Типоразмер после косой (MG1/40) — диаметр вала; короткие коды — только рядом с брендом."
+    }
+   ]
+  },
+  {
+   "brand_key": "weg",
+   "name": "WEG",
+   "origin": "прочий",
+   "country": "Бразилия",
+   "aliases": [
+    "WEG"
+   ],
+   "series": [
+    {
+     "id": "weg-w22",
+     "series": "W22, W21 (низковольтные двигатели)",
+     "type": "электродвигатель",
+     "patterns": [
+      {
+       "rx": "W2[12](?:\\s?(?:IE[1-4]|Premium|Plus|Xd|Magnet|NEMA))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "W22",
+      "W22 IE3",
+      "W21"
+     ],
+     "sources": [
+      "https://www.weg.net/catalog/weg/GB/en/Electric-Motors/Low-Voltage-IEC-Motors/Three-Phase/W22-/c/EU_MT_LV_IEC_CASTIRON_TEFC_GENERAL_W22",
+      "https://www.weg.net/institutional/SI/en/news/products-and-solutions/new-weg-w22"
+     ]
+    },
+    {
+     "id": "weg-cfw",
+     "series": "CFW (преобразователи частоты)",
+     "type": "преобразователь частоты",
+     "patterns": [
+      {
+       "rx": "CFW\\s?-?(?:08|09|10|11|300|500|700|701|900)(?:[A-Z]\\d{2,4}[0-9A-Z]*)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "CFW500",
+      "CFW11",
+      "CFW-08",
+      "CFW500G0211T4DB20G2"
+     ],
+     "sources": [
+      "https://www.weg.net/catalog/weg/US/en/Drives/Variable-Speed-Drives/OEM-and-General-Purpose-Drives/Variable-Speed-Drive-CFW500/Variable-Speed-Drive-CFW500/p/MKT_WDC_GLOBAL_VARIABLE_SPEED_DRIVE_CFW500",
+      "https://www.weg.net/catalog/weg/US/en/Drives/Variable-Speed-Drives/System-Drives/Variable-Speed-Drive-CFW11/Frequency-Inverter---CFW11-Series/p/MKT_WDC_GLOBAL_VARIABLE_SPEED_DRIVE_CFW11"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "gardnerdenver",
+   "name": "Gardner Denver",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Gardner Denver",
+    "Gardner-Denver",
+    "Гарднер Денвер",
+    "GD Energy Products"
+   ],
+   "series": [
+    {
+     "id": "gd-pz",
+     "series": "PZ (буровые насосы; с 2022 — GD Energy Products)",
+     "type": "нефтепромысловая",
+     "patterns": [
+      {
+       "rx": "PZ[\\s-]?(?:7|8|9|10|11|L|1600|2000|2400)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "PZ-11",
+      "PZ9",
+      "PZ 2000",
+      "PZL"
+     ],
+     "sources": [
+      "https://gdenergyproducts.com/products/pumps/mud-pumps",
+      "https://gdenergyproducts.com/products/pumps/mud-pumps/pz-2000"
+     ],
+     "note": "Буровые насосы Gardner Denver выпускает GD Energy Products; в спросе подписаны Gardner Denver."
+    },
+    {
+     "id": "gd-esm-vs",
+     "series": "ESM, VS (винтовые компрессоры)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "(?:ESM|VS)\\s?\\d{1,3}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ESM 30",
+      "VS 45",
+      "ESM160"
+     ],
+     "sources": [
+      "https://www.gardnerdenver.com/en-emeia/air-compressors/oil-lubricated-air-compressors/esm-vs-7-22-compressors/",
+      "https://www.gardnerdenver.com/en/lubricated-rotary-screw-compressors/esm-vs-30-132-compressors"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "wilden",
+   "name": "Wilden (PSG)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Wilden",
+    "Вилден",
+    "Уилден"
+   ],
+   "series": [
+    {
+     "id": "wilden-aodd",
+     "series": "P, PX, PS, T (пневматические мембранные насосы)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "(?:PX|PS|PV|P|T)\\s?(?:025|1|2|4|8|15|20|100|200|220|400|420|800|810|1500|2000)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "P8",
+      "PX8",
+      "PS8",
+      "P400",
+      "T8"
+     ],
+     "sources": [
+      "https://wildenstore.psgdover.com/products/aodd-pumps/pro-flo/",
+      "https://www.psgdover.com/wilden/products/pro-flo-series/clamped-metal/51-mm-(2-)-pro-flo-clamped-metal-pump-(p8)"
+     ],
+     "note": "Цифра после буквы — размер (8 — 2 дюйма); без бренда такие коды неоднозначны."
+    }
+   ]
+  },
+  {
+   "brand_key": "donaldson",
+   "name": "Donaldson",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Donaldson",
+    "Donaldson Torit",
+    "Доналдсон",
+    "Дональдсон"
+   ],
+   "series": [
+    {
+     "id": "donaldson-dfo",
+     "series": "Downflo Oval DFO (картриджные пылеуловители Torit)",
+     "type": "пылеуловитель",
+     "patterns": [
+      {
+       "rx": "DFO\\s?\\d-\\d{1,3}",
+       "context": "сам"
+      },
+      {
+       "rx": "Downflo(?:\\s?(?:Oval|Evolution))?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "DFO 3-18",
+      "DFO 2-4",
+      "Downflo Oval"
+     ],
+     "sources": [
+      "https://www.donaldson.com/content/dam/donaldson/dust-fume-mist/literature/north-america/equipment/dust-collectors/cartridge/downflo-oval/f118006/Downflo-Oval-Dust-Collector.pdf",
+      "https://www.donaldson.com/en-us/industrial-dust-fume-mist/equipment/dust-collectors/cartridge/downflo-oval/"
+     ],
+     "note": "Фильтры Donaldson идут артикулами (P55…), а не рядами: здесь только пылеуловители."
+    }
+   ]
+  },
+  {
+   "brand_key": "hoerbiger",
+   "name": "Hoerbiger",
+   "origin": "западный",
+   "country": "Австрия",
+   "aliases": [
+    "Hoerbiger",
+    "Hörbiger",
+    "Хербигер",
+    "Хоербигер",
+    "Хёрбигер"
+   ],
+   "series": [
+    {
+     "id": "hoerbiger-valves",
+     "series": "CT, CS, CE, HPV, RN (клапаны поршневых компрессоров)",
+     "type": "клапан компрессора",
+     "patterns": [
+      {
+       "rx": "(?:CT|CS|CE|HPV|RN)(?:\\s?\\d{2,3}(?:-\\d{1,3})?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CT",
+      "CS",
+      "CE",
+      "HPV",
+      "CT 120"
+     ],
+     "sources": [
+      "https://www.hoerbiger.com/en/products-and-services/reciprocating-compressor-components/ct-valve.html",
+      "https://www.hoerbiger.com/en/products-and-services/reciprocating-compressor-components/cs-valve.html",
+      "https://www.hoerbiger.com/en/products-and-services/reciprocating-compressor-components/ce-valve.html",
+      "https://www.hoerbiger.com/en/products-and-services/reciprocating-compressor-components/hpv-valve.html"
+     ],
+     "note": "Две буквы — только рядом с именем бренда."
+    }
+   ]
+  },
+  {
+   "brand_key": "parkerhannifin",
+   "name": "Parker Hannifin",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Parker Hannifin",
+    "Parker",
+    "Паркер"
+   ],
+   "series": [
+    {
+     "id": "parker-pv",
+     "series": "PV / PVplus (аксиально-поршневые насосы)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "PV\\s?(?:016|020|023|028|032|040|046|063|080|092|140|180|270|360)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "PV046",
+      "PV180",
+      "PV 092"
+     ],
+     "sources": [
+      "https://ph.parker.com/us/en/product-list/axial-piston-variable-pumps-series-pvplus",
+      "https://www.parker.com/content/dam/Parker-com/Literature/PMDE/Catalogs/Piston_Pumps/PV-/MSG30-3245_UK.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "danfoss",
+   "name": "Danfoss",
+   "origin": "западный",
+   "country": "Дания",
+   "aliases": [
+    "Danfoss",
+    "Данфосс",
+    "Данфос"
+   ],
+   "series": [
+    {
+     "id": "danfoss-vlt",
+     "series": "VLT FC (преобразователи частоты FC 051…FC 360)",
+     "type": "преобразователь частоты",
+     "patterns": [
+      {
+       "rx": "VLT\\s?FC[\\s-]?\\d{3}",
+       "context": "сам"
+      },
+      {
+       "rx": "FC[\\s-]?(?:051|101|102|103|202|280|301|302|360)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "VLT FC 102",
+      "FC-302",
+      "FC 202"
+     ],
+     "sources": [
+      "https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-drives/vlt-automationdrive-fc-301-fc-302/",
+      "https://www.danfoss.com/en-us/products/dds/low-voltage-drives/vlt-drives/vlt-hvac-drive-fc-102/"
+     ]
+    },
+    {
+     "id": "danfoss-vacon",
+     "series": "VACON NX, VACON 100 (преобразователи частоты)",
+     "type": "преобразователь частоты",
+     "patterns": [
+      {
+       "rx": "VACON\\s?(?:NX[PSLC]|100(?:\\s?(?:X|FLOW|INDUSTRIAL))?|20)",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "VACON NXP",
+      "VACON 100",
+      "VACON NXS"
+     ],
+     "sources": [
+      "https://www.danfoss.com/en/products/dds/low-voltage-drives/vacon-drives/vacon-nxp-air-cooled/",
+      "https://www.danfoss.com/en-us/products/dds/low-voltage-drives/vacon-drives/vacon-100-industrial/"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "bosch",
+   "name": "Bosch (Bosch Rexroth)",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "Bosch",
+    "Бош",
+    "Bosch Rexroth"
+   ],
+   "context_aliases": [
+    "Rexroth",
+    "Рексрот"
+   ],
+   "series": [
+    {
+     "id": "rexroth-axial",
+     "series": "A10VSO, A4VG, A2FM, A6VM, A11VO (аксиально-поршневые гидромашины Rexroth)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "A{1,2}(?:10VSO|10VO|10VG|4VG|4VSO|2FM|2FO|6VM|11VO|11VLO)\\s?\\d{2,3}",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "A10VSO 71",
+      "A4VG 125",
+      "A2FM 45",
+      "AA10VSO 45",
+      "A10VO100"
+     ],
+     "sources": [
+      "https://www.boschrexroth.com/media/57e7b0f4-fd27-41f6-8d13-469a539f590c",
+      "https://store.boschrexroth.com/en/us/axial-piston-variable-pumps"
+     ],
+     "note": "Rexroth — дочерняя Bosch: в спросе гидравлика идёт и «Bosch», и «Bosch Rexroth»."
+    }
+   ]
+  },
+  {
+   "brand_key": "bentlynevada",
+   "name": "Bently Nevada (Baker Hughes)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Bently Nevada",
+    "Бентли Невада"
+   ],
+   "context_aliases": [
+    "Bently",
+    "Бентли",
+    "Baker Hughes"
+   ],
+   "series": [
+    {
+     "id": "bently-3500",
+     "series": "3500 (система защиты машин, модули 3500/xx)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "3500\\s?/\\s?\\d{2}[A-Z]?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "3500/42M",
+      "3500/22M",
+      "3500/45"
+     ],
+     "sources": [
+      "https://www.bakerhughes.com/bently-nevada/monitoring-systems/machinery-protection/3500-machinery-protection-systems"
+     ],
+     "note": "Номер модуля через косую без бренда похож на размер или дробь."
+    },
+    {
+     "id": "bently-3300xl",
+     "series": "3300 XL (вихретоковые датчики зазора)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "3300\\s?XL(?:\\s?(?:NSv|8\\s?mm|11\\s?mm|25\\s?mm|50\\s?mm))?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "3300 XL",
+      "3300 XL 8mm",
+      "3300 XL NSv"
+     ],
+     "sources": [
+      "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "https://www.bakerhughes.com/bently-nevada/sensors/proximity-sensors"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "lewa",
+   "name": "LEWA",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "LEWA"
+   ],
+   "series": [
+    {
+     "id": "lewa-ecoflow",
+     "series": "ecoflow (мембранные дозировочные и технологические насосы, приводы LDB…LDG)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "ecoflow",
+       "context": "сам"
+      },
+      {
+       "rx": "LD[B-G]\\d?(?:\\s?M\\d{3})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ecoflow",
+      "LDC",
+      "LDE1",
+      "LDB M900"
+     ],
+     "sources": [
+      "https://www.lewa.com/en/pumps/metering-pumps/lewa-ecoflow",
+      "https://www.lewa.com/en/pumps/process-pumps/lewa-ecoflow-process-diaphragm-pump"
+     ],
+     "note": "Приводы LD… — только рядом с именем бренда."
     }
    ]
   }

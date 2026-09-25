@@ -1,0 +1,832 @@
+{
+  "oem_key": "guascorsiemensenergy",
+  "name": "Guascor (Siemens Energy; с 2022 г. Guascor Energy, Mutares)",
+  "segment_focus": "газовые двигатели SFGLD/HGM: перечни ТО, свечи, фильтры; кто обслуживает после продажи подразделения",
+  "researched_at": "2026-09-25",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Guascor — испанский (Страна Басков) изготовитель газовых и дизельных двигателей. Двигатели продавались под марками Dresser-Rand и Siemens Energy. В ноябре 2022 г. Mutares SE купила Siemens Energy Engines S.A.U.; бизнес снова называется Guascor Energy. Штаб-квартира и завод — в Сумайе, НИОКР — в Витории. Сеть — более 50 официальных дистрибьюторов в 30+ странах, для США отдельная компания Guascor Power USA. Выходит, что после продажи обслуживает сам изготовитель Guascor Energy и его сеть, а не Siemens Energy. Отсюда смена обозначений: номера Guascor вида 76.64.375 получили номера Siemens вида S76.64.762, их принимают и нынешние каталоги. Газовые ГПУ в фокусе: S Series — SFGLD180/240/360/480/560 и SFGM560, 300–1 000 кВт эл. при 1 500 об/мин; H Series — HGM240 и HGM560, 502 и 1 204 кВт эл. Мощности взяты из листовки Siemens Gas Engines 1,200/1,500/1,800 rpm. Коды запчастей взяты из открытых страниц независимых поставщиков: Birkas & Co (birkasco.com) и Martin Energy Group. Это перечень ЗИП капремонта SFGLD560, таблица замены номеров, таблица замены свечей со ссылками на инструкции ТО вида IO-G-M-00-0xx и страницы деталей. Сменные расходники ТО: свечи, масляный, воздушный и картерный фильтры, провода и катушки зажигания, термостаты. Ресурс свечей по той же таблице: для SFGLD на природном газе 76.64.375 — 4 500 ч при 1 200 об/мин, 3 750 ч при 1 500 об/мин, 3 000 ч при 1 800 об/мин; для HGM свеча 76.64.604 — 3 500 ч. Субпоставщики по открытым данным: Mitsubishi (турбины TD13M на SFGLD560 и SFGM560), MAN и PBS (турбины HGM560), Altronic (зажигание CPU-95), Motortech (DetCon20), Bosch (датчик детонации), MultiTorch (форкамерные свечи HGM560), Donaldson (фильтры). Все коды — номера Guascor в написании поставщика, кроме помеченных issuer.",
+  "machines": [
+    {
+      "model": "SFGLD180",
+      "kind": "газовый поршневой двигатель / генераторная установка, рядный 6 цил., обеднённая смесь",
+      "segment": "ГПУ",
+      "rating": "315 кВт мех / 304 кВт эл при 1500 об/мин (242–336 кВт эл при 1200–1800)",
+      "status": "S Series в линейке Guascor Energy; выпуск модели не подтверждён",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SFGLD240",
+      "kind": "газовый поршневой двигатель, рядный 8 цил.",
+      "segment": "ГПУ",
+      "rating": "419 кВт мех / 405 кВт эл при 1500 об/мин",
+      "status": "S Series; выпуск модели не подтверждён",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SFGLD360",
+      "kind": "газовый поршневой двигатель, V12",
+      "segment": "ГПУ",
+      "rating": "630 кВт мех / 609 кВт эл при 1500 об/мин",
+      "status": "S Series; выпуск модели не подтверждён",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SFGLD480",
+      "kind": "газовый поршневой двигатель, V16",
+      "segment": "ГПУ",
+      "rating": "838 кВт мех / 813 кВт эл при 1500 об/мин",
+      "status": "S Series; выпуск модели не подтверждён",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SFGLD560",
+      "kind": "газовый поршневой двигатель, V16",
+      "segment": "ГПУ",
+      "rating": "985 кВт мех / 957 кВт эл при 1500 об/мин; 1028 кВт эл при 1800",
+      "status": "S Series; в эксплуатации, ЗИП капремонта в открытом доступе",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf",
+        "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SFGM560",
+      "kind": "газовый поршневой двигатель, V16",
+      "segment": "ГПУ",
+      "rating": "1055 кВт мех / 1025 кВт эл при 1500 об/мин; 1065 кВт эл при 1800",
+      "status": "S Series; выпуск модели не подтверждён",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HGM240",
+      "kind": "газовый поршневой двигатель, рядный 8 цил., цилиндр 152 мм",
+      "segment": "ГПУ",
+      "rating": "520 кВт мех / 502 кВт эл при 1500 и 1800 об/мин",
+      "status": "H Series выпускается (линейка H: 520–1373 кВт мех)",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf",
+        "https://guascor-energy.com/products/industrial-products/h-series-engines/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HGM560",
+      "kind": "газовый поршневой двигатель, V16, цилиндр 160 мм",
+      "segment": "ГПУ",
+      "rating": "1240 кВт мех / 1204 кВт эл при 1500 об/мин; 1308 кВт эл при 1800",
+      "status": "H Series выпускается",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf",
+        "https://guascor-energy.com/products/industrial-products/h-series-engines/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "FGLD180/240/360/480, FG180/240",
+      "kind": "газовые поршневые двигатели предыдущего поколения",
+      "segment": "ГПУ",
+      "rating": "мощность не найдена",
+      "status": "статус не установлен: источник не говорит, что модели сняты; упоминаются только в каталогах ЗИП и таблице замены свечей",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts-manuals-download",
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664356-7664764-guascor-pre-chamber-spark-plug"
+      ],
+      "verified": false
+    },
+    {
+      "model": "SFGRD",
+      "kind": "газовый поршневой двигатель (режимы prime и stand-by)",
+      "segment": "ГПУ",
+      "rating": "мощность не найдена",
+      "status": "статус не установлен",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664356-7664764-guascor-pre-chamber-spark-plug"
+      ],
+      "verified": false
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Spark Plugs Replacement Guide: таблица ресурса свечей по сериям FG/FGLD/SFGLD/SFGRD/HGM/SFGM со ссылками на инструкции ТО",
+      "doc_no": "IO-G-M-00-067, IO-G-M-00-065, IO-G-M-00-066 (SFGLD, природный газ, 1200/1500/1800 об/мин)",
+      "machine": "SFGLD",
+      "kind": "бюллетень / инструкция ТО",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664356-7664764-guascor-pre-chamber-spark-plug"
+      ]
+    },
+    {
+      "title": "Инструкции ТО для HGM, природный газ и биогаз (по ссылке из таблицы замены свечей)",
+      "doc_no": "IO-G-M-00-072, IO-G-M-00-070, IO-G-M-00-071",
+      "machine": "HGM",
+      "kind": "инструкция ТО",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664356-7664764-guascor-pre-chamber-spark-plug"
+      ]
+    },
+    {
+      "title": "Инструкции ТО для SFGLD: остров, prime, stand-by, LCR 9,3:1 и 8:1, сингаз (по ссылке из таблицы замены свечей)",
+      "doc_no": "IO-G-M-00-057, -038, -058, -061, -019, -034, -024, -035, -042, -003, -043",
+      "machine": "SFGLD",
+      "kind": "инструкция ТО",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664356-7664764-guascor-pre-chamber-spark-plug"
+      ]
+    },
+    {
+      "title": "Инструкции ТО для SFGRD: природный газ, prime, stand-by",
+      "doc_no": "IO-G-M-00-062, IO-G-M-00-063, IO-G-M-00-064",
+      "machine": "SFGRD",
+      "kind": "инструкция ТО",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664356-7664764-guascor-pre-chamber-spark-plug"
+      ]
+    },
+    {
+      "title": "Guascor SFGLD560 gas engine major overhaul detailed parts list",
+      "machine": "SFGLD560",
+      "kind": "перечень ЗИП капремонта (независимый поставщик)",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul"
+      ]
+    },
+    {
+      "title": "Guascor recent part number change and quick reference guide: таблица замены номеров Guascor на Siemens",
+      "machine": "все серии Guascor",
+      "kind": "бюллетень замены номеров (независимый поставщик)",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-part-number-change"
+      ]
+    },
+    {
+      "title": "Spare Parts Manual Guascor HGM560 / HGM240 / SFGM560 / SFGLD560 / SFGLD480 / SFGLD360 / SFGLD240 / SFGLD180 / FGLD480 / FGLD360 / FGLD240 / FGLD180 / FG240 / FG180",
+      "machine": "HGM, SFGM, SFGLD, FGLD, FG",
+      "kind": "parts manual (есть в перечне, скачивается у поставщика)",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts-manuals-download"
+      ]
+    },
+    {
+      "title": "Repair & Overhaul Manual for Guascor Gas Engines",
+      "machine": "газовые двигатели Guascor",
+      "kind": "service manual",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts-manuals-download"
+      ]
+    },
+    {
+      "title": "Siemens Gas Engines and Gensets 1,200/1,500/1,800 rpm: технические данные SFGLD180–560, SFGM560, HGM240, HGM560",
+      "machine": "SFGLD, SFGM, HGM",
+      "kind": "каталог / техданные",
+      "sources": [
+        "https://reliablehp.com/hubfs/guascor-engines-brochure-web.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "7664293",
+      "issuer": "Guascor",
+      "description": "Свеча зажигания SFGLD (LF)",
+      "machine": "SFGLD560",
+      "unit": "зажигание",
+      "doc_ref": "SFGLD560 major overhaul parts list, группа E3",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7664293 SPARK PLUG SFGLD (LF)"
+    },
+    {
+      "code": "7650262",
+      "issuer": "Guascor",
+      "description": "Масляный фильтр FV (заменён на 7650416)",
+      "machine": "SFGLD560",
+      "unit": "система смазки",
+      "doc_ref": "SFGLD560 major overhaul parts list, группа E2",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7650262 OIL FILTER FV"
+    },
+    {
+      "code": "76.50.416",
+      "issuer": "Guascor / Siemens",
+      "description": "Масляный фильтр, новый номер взамен 76.50.262",
+      "machine": "SFGLD, газовые двигатели Guascor",
+      "unit": "система смазки",
+      "doc_ref": "Part number change guide",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-part-number-change",
+      "quote": "76.50.262 - Oil filter - new part number 76.50.416"
+    },
+    {
+      "code": "7673484",
+      "issuer": "Guascor",
+      "description": "Картридж фильтра CCV55 (вентиляция картера)",
+      "machine": "SFGLD560",
+      "unit": "вентиляция картера",
+      "doc_ref": "SFGLD560 major overhaul parts list, группа E2",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7673484 CARTRIDGE FILTER CCV55"
+    },
+    {
+      "code": "7650281",
+      "issuer": "Guascor",
+      "description": "Основной элемент воздушного фильтра FTG21",
+      "machine": "SFGLD560",
+      "unit": "впуск воздуха",
+      "doc_ref": "SFGLD560 major overhaul parts list, группа E4",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7650281 FTG21 MAIN ELEMENT"
+    },
+    {
+      "code": "7650282",
+      "issuer": "Guascor",
+      "description": "Предохранительный элемент воздушного фильтра FTG21",
+      "machine": "SFGLD560",
+      "unit": "впуск воздуха",
+      "doc_ref": "SFGLD560 major overhaul parts list, группа E4",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7650282 FTG21 SAFETY ELEMENT"
+    },
+    {
+      "code": "7650298",
+      "issuer": "Guascor / Siemens",
+      "description": "Картридж воздушного фильтра (PowerCore)",
+      "machine": "газовые двигатели Guascor",
+      "unit": "впуск воздуха",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7650298-guascor-air-filter",
+      "quote": "Guascor / Siemens 7650298 air filter, air filter cartridge",
+      "doc_ref": ""
+    },
+    {
+      "code": "7664303",
+      "issuer": "Guascor",
+      "description": "Провод свечи зажигания",
+      "machine": "SFGLD560",
+      "unit": "зажигание",
+      "doc_ref": "SFGLD560 major overhaul parts list, группа R1",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7664303 SPARK PLUG CABLE GUASCOR"
+    },
+    {
+      "code": "7664302",
+      "issuer": "Guascor",
+      "description": "Катушка зажигания",
+      "machine": "SFGLD560",
+      "unit": "зажигание",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7664302 IGNITION COIL GUASCOR"
+    },
+    {
+      "code": "S76.64.762",
+      "issuer": "Siemens (новый номер Guascor 76.64.375)",
+      "description": "Свеча зажигания, замена 76.64.375",
+      "machine": "SFGLD, FG/FGLD",
+      "unit": "зажигание",
+      "doc_ref": "Part number change guide",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-part-number-change",
+      "quote": "76.64.375 - Guascor spark plugs - Siemens S76.64.762"
+    },
+    {
+      "code": "S76.64.761",
+      "issuer": "Siemens (новый номер Guascor 76.64.292)",
+      "description": "Свеча зажигания для биогаза, замена 76.64.292",
+      "machine": "SFGLD (биогаз)",
+      "unit": "зажигание",
+      "doc_ref": "Part number change guide; по таблице замены свечей 76.64.292 на SFGM не ставится — для SFGM указана 76.64.685",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-part-number-change",
+      "quote": "76.64.292 - Guascor biogas spark plugs - Siemens S76.64.761"
+    },
+    {
+      "code": "76.64.765",
+      "issuer": "Guascor / Siemens",
+      "description": "Свеча для биогаза, замена 76.64.604",
+      "machine": "HGM560, SFGM560",
+      "unit": "зажигание",
+      "doc_ref": "Part number change guide",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-part-number-change",
+      "quote": "76.64.604 - Guascor biogas spark plugs - 76.64.765"
+    },
+    {
+      "code": "7664653",
+      "issuer": "Siemens / Guascor",
+      "description": "Форкамерная свеча, обновлённое исполнение взамен 7664604 / 7664765",
+      "machine": "HGM560, SFGM560",
+      "unit": "зажигание",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664604-7664765-guascor-pre-chamber-spark-plug",
+      "quote": "Guascor 7664604 / Siemens 7664653 ( old 7664765) and replacement pre-chamber for HGM560 and SFGM560 engines",
+      "doc_ref": ""
+    },
+    {
+      "code": "76.64.356",
+      "issuer": "Guascor (Siemens 76.64.764)",
+      "description": "Форкамерная свеча с проводом, поставщик MultiTorch",
+      "machine": "HGM560",
+      "unit": "зажигание",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664356-7664764-guascor-pre-chamber-spark-plug",
+      "quote": "76.64.356 (Siemens 76.64.764) prechamber spark plugs available for Guascor HGM560 gas engines supplied by MultiTorch.",
+      "doc_ref": "в карточке детали — HGM560; в таблице замены свечей на той же странице номер стоит у SFGM на пропане"
+    },
+    {
+      "code": "1910079",
+      "issuer": "Guascor",
+      "description": "Прокладки втулки свечного колодца",
+      "machine": "SFGLD560",
+      "unit": "головка цилиндра / зажигание",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "1910079 SPARKPLUG HOUSING SLEEVE GASKS"
+    },
+    {
+      "code": "7601268",
+      "issuer": "Guascor (изготовитель Bosch)",
+      "description": "Датчик детонации Bosch",
+      "machine": "SFGLD, HGMI",
+      "unit": "контроль детонации",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7601268-bosch-knock-sensor",
+      "quote": "7601268 Bosch Knock Sensor for Guascor SFGLD and HGMI engines",
+      "doc_ref": ""
+    },
+    {
+      "code": "7664117",
+      "issuer": "Guascor",
+      "description": "Датчик абсолютного давления во впускном коллекторе (MAP), 40–304 кПа",
+      "machine": "газовые двигатели Guascor",
+      "unit": "система управления",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664117-map-sensor",
+      "quote": "7664117 MAP Sensor",
+      "doc_ref": ""
+    },
+    {
+      "code": "76.64.317",
+      "issuer": "Guascor (на базе Altronic CPU-95)",
+      "description": "Система зажигания CPU-95 в исполнении Guascor, вход 4–20 мА для Motortech DetCon20",
+      "machine": "газовые двигатели Guascor",
+      "unit": "зажигание",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664317-ignition-system",
+      "quote": "76.64.317 CPU-95 ignition system uses Modbus RTU communication protocol and 4-20 mA input signal and connected to Motortech DetCon20.",
+      "doc_ref": ""
+    },
+    {
+      "code": "791 950-16",
+      "issuer": "Altronic",
+      "description": "Стандартный блок зажигания Altronic CPU-95, основа 7664317",
+      "machine": "газовые двигатели Guascor",
+      "unit": "зажигание",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664317-ignition-system",
+      "quote": "This custom made ignition system based on a traditional Altronic CPU-95 ignition system part number 791 950-16",
+      "doc_ref": ""
+    },
+    {
+      "code": "7679033",
+      "issuer": "Guascor",
+      "description": "Термостат",
+      "machine": "SFGLD560",
+      "unit": "система охлаждения",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7679033 THERMOSTAT"
+    },
+    {
+      "code": "1677470",
+      "issuer": "Guascor",
+      "description": "Ремкомплект водяного насоса",
+      "machine": "SFGLD560",
+      "unit": "система охлаждения",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "1677470 REPAIR KIT WATER PUMP"
+    },
+    {
+      "code": "1677520",
+      "issuer": "Guascor",
+      "description": "Ремкомплект масляного насоса",
+      "machine": "SFGLD560",
+      "unit": "система смазки",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "1677520 REPAIR KIT OIL PUMP"
+    },
+    {
+      "code": "1975600",
+      "issuer": "Guascor",
+      "description": "Комплект прокладок головки цилиндра",
+      "machine": "SFGLD560",
+      "unit": "головка цилиндра",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "1975600 CYLINDER HEAD GASKET SET"
+    },
+    {
+      "code": "1975790",
+      "issuer": "Guascor",
+      "description": "Полный комплект прокладок двигателя SFGLD560",
+      "machine": "SFGLD560",
+      "unit": "двигатель",
+      "doc_ref": "SFGLD560 major overhaul parts list, группа R3",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "1975790 ENGINE GASKET SET(SFGLD560)"
+    },
+    {
+      "code": "19.10.273",
+      "issuer": "Guascor",
+      "description": "Прокладка головки цилиндра из нержавеющей стали; на странице есть фраза «part of 1975B90», но к какой прокладке она относится, неясно",
+      "machine": "HGM560",
+      "unit": "головка цилиндра",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/1910273-guascor-hgm560-cylinder-head-gasket",
+      "quote": "Guascor 19.10.273 Cylinder Head Gasket",
+      "doc_ref": ""
+    },
+    {
+      "code": "1910550",
+      "issuer": "Guascor",
+      "description": "Гильза цилиндра",
+      "machine": "SFGLD560",
+      "unit": "цилиндро-поршневая группа",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "1910550 CYLINDER LINER"
+    },
+    {
+      "code": "19.15.560",
+      "issuer": "Guascor",
+      "description": "Поршневой комплект SFGLD560 / SFGM560 / HGMI560",
+      "machine": "SFGLD560, SFGM560, HGM560",
+      "unit": "цилиндро-поршневая группа",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/1915560-guascor-sfgm-hgmi-piston",
+      "quote": "19.15.560 Guascor SFGLD, SFGM & HGM Piston Kit",
+      "doc_ref": ""
+    },
+    {
+      "code": "1616840",
+      "issuer": "Guascor",
+      "description": "Вкладыш шатунного подшипника",
+      "machine": "SFGLD560",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "1616840 CONNECTING ROD BEARING"
+    },
+    {
+      "code": "1610850",
+      "issuer": "Guascor",
+      "description": "Коренной подшипник FV",
+      "machine": "SFGLD560",
+      "unit": "кривошипно-шатунный механизм",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "1610850 MAIN BEARING \"FV\""
+    },
+    {
+      "code": "76.73.526",
+      "issuer": "Guascor / Siemens",
+      "description": "Сердцевина интеркулера, замена 16.45.160",
+      "machine": "газовые двигатели Guascor",
+      "unit": "охладитель наддувочного воздуха",
+      "doc_ref": "Part number change guide",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-part-number-change",
+      "quote": "16.45.160 - Intercooler core - new part number 76.73.526"
+    },
+    {
+      "code": "19.45.254",
+      "issuer": "Guascor",
+      "description": "Прокладка переходника турбокомпрессора, замена 19.45.029",
+      "machine": "газовые двигатели Guascor",
+      "unit": "турбонаддув",
+      "doc_ref": "Part number change guide",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-part-number-change",
+      "quote": "19.45.029 - Turbo adapter gasket - new part number 19.45.254"
+    },
+    {
+      "code": "7689071",
+      "issuer": "Guascor (изготовитель Mitsubishi, модель TD13M-48QRC)",
+      "description": "Турбокомпрессор Mitsubishi TD13M-48QRC",
+      "machine": "SFGLD560",
+      "unit": "турбонаддув",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689071-turbo-charger",
+      "quote": "OEM Part Number : 7689071",
+      "doc_ref": ""
+    },
+    {
+      "code": "76.89.099",
+      "issuer": "Guascor (изготовитель Mitsubishi, TD13M-43QRC, 49182-05230)",
+      "description": "Турбокомпрессор Mitsubishi TD13M-43QRC",
+      "machine": "SFGM560",
+      "unit": "турбонаддув",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689099-turbo-charger",
+      "quote": "Numbers necessary for identification: Guascor 76.89.099, TD13M-43QRC, 49182-05230.",
+      "doc_ref": ""
+    },
+    {
+      "code": "7689330",
+      "issuer": "Guascor",
+      "description": "Ремкомплект турбокомпрессора TD13M-43QRC",
+      "machine": "SFGM560",
+      "unit": "турбонаддув",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689099-turbo-charger",
+      "quote": "Turbo repair kit for TD13M-43QRC is also available. Guascor part number 7689330. Mitsubishi part number 49132-80010",
+      "doc_ref": ""
+    },
+    {
+      "code": "49132-80010",
+      "issuer": "Mitsubishi",
+      "description": "Ремкомплект турбокомпрессора TD13M-43QRC (номер Mitsubishi для 7689330)",
+      "machine": "SFGM560",
+      "unit": "турбонаддув",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689099-turbo-charger",
+      "quote": "Guascor part number 7689330. Mitsubishi part number 49132-80010",
+      "doc_ref": ""
+    },
+    {
+      "code": "7689360",
+      "issuer": "Guascor",
+      "description": "Ремкомплект турбокомпрессора TD13",
+      "machine": "SFGLD560",
+      "unit": "турбонаддув",
+      "doc_ref": "SFGLD560 major overhaul parts list",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-sfgld560-overhaul",
+      "quote": "7689360 KIT TURBO TD13"
+    },
+    {
+      "code": "7689040",
+      "issuer": "Guascor (турбокомпрессор PBS NR17/SJ5101-1488Y)",
+      "description": "Турбокомпрессор HGM560 (варианты 7689030, 7689089, 7689088)",
+      "machine": "HGM560",
+      "unit": "турбонаддув",
+      "source_url": "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689040-turbo-charger",
+      "quote": "7689040 PBS Turbo charger NR17/SJ5101-1488Y",
+      "doc_ref": ""
+    },
+    {
+      "code": "P554005",
+      "issuer": "Donaldson",
+      "description": "Масляный фильтр; до 2004 г. ставился на SFGLD с завода, сейчас годится взамен 7650262 при замене штуцера на 1625168",
+      "machine": "SFGLD",
+      "unit": "система смазки",
+      "source_url": "https://www.birkasco.com/index.php/en/donaldson-filters-for-guascor-engines",
+      "quote": "Up until 2004, Guascor engines were routinely equipped with the Donaldson P554005 oil filter.",
+      "doc_ref": ""
+    },
+    {
+      "code": "76.64.653",
+      "issuer": "Guascor (номер у дистрибьютора Martin Energy Group)",
+      "description": "Форкамерная свеча взамен 76.64.604",
+      "machine": "HGM / SFGM",
+      "unit": "зажигание",
+      "source_url": "https://parts.martinenergygroup.com/engine-parts/guascor-engine-parts/electrical-controls/ignition-components/spark-plugs.html",
+      "quote": "Spark Plug, Prechamber, Replaces: 76.64.604 Guascor Part # 76.64.653",
+      "doc_ref": ""
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Mitsubishi Heavy Industries (турбины Mitsubishi)",
+      "component": "турбокомпрессоры TD13M-48QRC (7689071) и TD13M-43QRC (7689099), ремкомплект 49132-80010",
+      "machine": "SFGLD560, SFGM560",
+      "evidence": "На страницах деталей поставщика указаны модели и номера Mitsubishi рядом с номерами Guascor",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689071-turbo-charger",
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689099-turbo-charger"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MAN",
+      "component": "специальный турбокомпрессор (7689040, 7689030, 7689089, 7689088)",
+      "machine": "HGM560",
+      "evidence": "Поставщик пишет: «MAN special turbo charger designed and manufactured for Guascor HGM560 gas engines»",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689040-turbo-charger"
+      ],
+      "verified": true
+    },
+    {
+      "company": "PBS Turbo",
+      "component": "турбокомпрессоры NR17 (7689040; номера 7689090, 7689804, 7689805 к HGM560 прямо не привязаны)",
+      "machine": "HGM560",
+      "evidence": "На той же странице PBS NR17 — модели турбин под номерами Guascor; на одной странице указаны и MAN, и PBS — какая турбина на каком исполнении, не проверено",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7689040-turbo-charger"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Altronic",
+      "component": "блок зажигания CPU-95 (791 950-16) с платой Guascor 772 118-1 (номер Guascor 7664317 / 7664312)",
+      "machine": "газовые двигатели Guascor",
+      "evidence": "В описании детали 7664317 сказано, что она сделана на основе Altronic CPU-95",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664317-ignition-system"
+      ]
+    },
+    {
+      "company": "Motortech",
+      "component": "система контроля детонации DetCon20",
+      "machine": "газовые двигатели Guascor",
+      "evidence": "В описании 7664317 сказано: CPU-95 подключается к Motortech DetCon20",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664317-ignition-system"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Bosch",
+      "component": "датчик детонации (7601268)",
+      "machine": "SFGLD, HGMI",
+      "evidence": "Название детали: «Bosch Knock Sensor for Guascor SFGLD and HGMI engines»",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7601268-bosch-knock-sensor"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MultiTorch",
+      "component": "форкамерные свечи 76.64.356 / 76.64.764",
+      "machine": "HGM560",
+      "evidence": "На странице детали: «supplied by MultiTorch»",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7664356-7664764-guascor-pre-chamber-spark-plug"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Donaldson",
+      "component": "масляный фильтр P554005 (заводской до 2004 г.); воздушный фильтр 7650298 с маркой PowerCore — изготовитель Donaldson выведен по марке, не подтверждён",
+      "machine": "SFGLD",
+      "evidence": "Поставщик пишет, что до 2004 г. двигатели комплектовались P554005; воздушный фильтр 7650298 продаётся с маркой PowerCore. Изготовитель 7650298 назван не прямо — это вывод по торговой марке",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/donaldson-filters-for-guascor-engines",
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7650298-guascor-air-filter"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Heinzmann",
+      "component": "регулятор EDC202 (7641461 / 7641462)",
+      "machine": "модель не указана (вероятно дизельные серии)",
+      "evidence": "Таблица замены номеров: строки «REG.HEINZMANN EDC202»",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-engine-tutorial/guascor-part-number-change"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Murphy (FW Murphy)",
+      "component": "приборы серии B Murphygage (Guascor 76.01.017)",
+      "machine": "двигатели Guascor",
+      "evidence": "Описание детали 7601017 — прибор Murphygage",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/guascor-spare-parts/7601017-thermometer"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Denso, Federal-Mogul (Champion)",
+      "component": "свечи зажигания Denso GI3-5; Federal Mogul 30001244",
+      "machine": "двигатели Guascor",
+      "evidence": "Позиции есть в разделе свечей для Guascor у дистрибьютора Martin Energy Group. Это взаимозаменяемость по каталогу дилера, а не заводская комплектация",
+      "sources": [
+        "https://parts.martinenergygroup.com/engine-parts/guascor-engine-parts/electrical-controls/ignition-components/spark-plugs.html"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Guascor Energy S.A.U. (бывш. Siemens Energy Engines S.A.U., с 2022 г. — Mutares)",
+      "country": "Испания",
+      "role": "изготовитель; обслуживание, запчасти, удалённый мониторинг RCS, модернизация",
+      "sources": [
+        "https://mutares.com/en/mutares-has-successfully-completed-the-acquisition-of-siemens-energy-engines-s-a-u-and-related-assets/",
+        "https://guascor-energy.com/about-us/",
+        "https://guascor-energy.com/contact/"
+      ]
+    },
+    {
+      "company": "Guascor Power USA Inc",
+      "country": "США",
+      "role": "дочерняя компания изготовителя",
+      "sources": [
+        "https://guascor-energy.com/contact/"
+      ]
+    },
+    {
+      "company": "Sonnenberg Power Solutions LLC",
+      "country": "ОАЭ",
+      "role": "официальный дистрибьютор: ОАЭ, Саудовская Аравия, Оман, Кувейт, Катар, Бахрейн, Ирак, Египет, Пакистан, Узбекистан, Казахстан, Азербайджан, Туркменистан, Киргизия, Таджикистан",
+      "sources": [
+        "https://guascor-energy.com/contact/"
+      ]
+    },
+    {
+      "company": "MCE Alternatif Enerji A.S.",
+      "country": "Турция",
+      "role": "официальный дистрибьютор: Турция, Туркменистан, Азербайджан, Казахстан, Ирак",
+      "sources": [
+        "https://guascor-energy.com/contact/"
+      ]
+    },
+    {
+      "company": "Synergy Astana LLP",
+      "country": "Казахстан",
+      "role": "официальный дистрибьютор: Казахстан, Узбекистан, Киргизия",
+      "sources": [
+        "https://guascor-energy.com/contact/"
+      ]
+    },
+    {
+      "company": "Green Energy Leasing LLC",
+      "country": "Украина",
+      "role": "официальный дистрибьютор",
+      "sources": [
+        "https://guascor-energy.com/contact/"
+      ]
+    },
+    {
+      "company": "GGE Genset Pvt. Ltd.",
+      "country": "Индия",
+      "role": "официальный дистрибьютор",
+      "sources": [
+        "https://guascor-energy.com/contact/"
+      ]
+    },
+    {
+      "company": "Energypac Power Generation Ltd.",
+      "country": "Бангладеш",
+      "role": "официальный дистрибьютор",
+      "sources": [
+        "https://guascor-energy.com/contact/"
+      ]
+    },
+    {
+      "company": "Kraft Power",
+      "country": "США",
+      "role": "официальный дистрибьютор",
+      "sources": [
+        "https://guascor-energy.com/contact/",
+        "https://kraftpower.com/guascor-energy/"
+      ]
+    },
+    {
+      "company": "Birkas & Co (birkasco.com)",
+      "role": "независимый поставщик запчастей Guascor; публикует перечни ЗИП и таблицы замены номеров",
+      "sources": [
+        "https://www.birkasco.com/index.php/en/"
+      ],
+      "country": "не указана"
+    },
+    {
+      "company": "Martin Energy Group",
+      "country": "США",
+      "role": "независимый дистрибьютор запчастей Guascor / Siemens / Dresser-Rand",
+      "sources": [
+        "https://parts.martinenergygroup.com/engine-parts/guascor-engine-parts/electrical-controls/ignition-components/spark-plugs.html"
+      ]
+    },
+    {
+      "company": "ДизельГазСервис (dieselgass.ru)",
+      "country": "Россия",
+      "role": "независимый сервис: ТО, капремонт и запчасти Guascor. Официальный статус не подтверждён; страница не открылась (503), сведения только из выдачи поиска",
+      "sources": [
+        "https://dieselgass.ru/portfolio-items/guascor/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальный каталог ЗИП и сервисный портал Guascor Energy закрыты. Документы ТО серии IO-G-M-00-0xx известны только по номерам из таблицы стороннего поставщика; самих текстов в открытом доступе нет.",
+    "Спецификации Parts Manual для HGM560, SFGLD и SFGM указаны в перечне на birkasco.com, но скачиваются после запроса; содержимое не проверено.",
+    "Коды ЗИП для HGM240/HGM560 найдены только частично: свечи, турбины, прокладка ГБЦ, поршень. Полного перечня ТО для H Series в открытом доступе нет.",
+    "Официальной таблицы интервалов ТО на 1 000 / 2 000 / 4 000 ч и т. д. не найдено. Есть только ресурс свечей по таблице Birkasco.",
+    "В официальной сети Guascor Energy нет дистрибьюторов в России и Китае. Российские сервисы независимые, их статус не подтверждён: страница dieselgass.ru не открылась.",
+    "Выпускаются ли ещё модели SFGLD и SFGM у Guascor Energy, не подтверждено: на официальном сайте техданные S Series лежат в PDF, их не разбирали.",
+    "Все коды взяты у независимых поставщиков, а не из документа изготовителя. Перед заказом номер нужно сверить с изготовителем: номера Guascor меняются на номера Siemens с префиксом S.",
+    "Кто изготовил турбину HGM560 — MAN или PBS — по исполнениям 7689040/7689090 не разведено: на одной странице упоминаются оба.",
+    "Датчики температуры PT100 и газоанализаторы есть в таблице замены номеров (7600152, 7600174, 7600179, 7601748), но модель двигателя у них не указана, поэтому в перечень не вошли."
+  ],
+  "verifier_notes": "Все 18 страниц birkasco и Martin Energy открылись (HTTP 200), брошюра reliablehp.com скачалась и прочитана через pdftotext. Все 38 кодов найдены на указанных страницах дословно, опровергнутых нет. Оговорки по применяемости и полноте записей: 1) S76.64.761: по таблице замены свечей 76.64.292 на SFGM не ставится, для SFGM указана 76.64.685. Машину в записи стоит поправить. 2) 76.64.356: на странице детали — HGM560, в таблице замены на той же странице — SFGM на пропане. 3) 1910273: неясно, к какой прокладке относится фраза «part of 1975B90». 4) Donaldson как изготовитель 7650298 не подтверждён: на странице только марка PowerCore. 5) PBS: номера 7689090/7689804/7689805 к HGM560 прямо не привязаны. 6) Статусы «снята» у FG/FGLD и мощность SFGRD источники не дают. Для MAN и PBS все сведения со страницы торговца birkasco, заводских документов нет. Оговорка при сборке файла: скептик назвал 38 кодов, в разделе parts 39 записей; каждый код раздела есть дословно в своей цитате (проверщик), число в отчёте скептика — его подсчёт.",
+  "corrections": [
+    "S76.64.761: SFGM убран из machine — по таблице замены свечей 76.64.292 на SFGM не ставится, для SFGM указана 76.64.685 (замечание скептика 1)",
+    "76.64.356: в doc_ref оговорено расхождение — в карточке HGM560, в таблице замены на той же странице SFGM на пропане (замечание скептика 2)",
+    "1910273: вхождение в комплект 1975B90 переведено из утверждения в оговорку — неясно, к какой прокладке относится фраза (замечание скептика 3)",
+    "Donaldson: в component оговорено, что изготовитель 7650298 выведен по марке PowerCore и не подтверждён; verified оставлен true — поставка P554005 на страницу подтверждена (замечание скептика 4)",
+    "PBS Turbo: verified: false, в component оговорено, что 7689090/7689804/7689805 к HGM560 прямо не привязаны (замечание скептика 5)",
+    "FGLD/FG и SFGRD: статус «снята» снят, verified: false — источники не дают ни статуса, ни мощности (замечание скептика 6)",
+    "Birkas & Co: добавлено country «не указана» — поле обязательное, страну источник не называет",
+    "verifier_notes: оговорено расхождение числа кодов — в отчёте скептика 38, в разделе parts 39",
+    "7664317 и 1910273: код записан в написании цитаты — 76.64.317 и 19.10.273 (слитное написание стоит на тех же страницах только в меню каталога, проверщик точки не снимает)"
+  ]
+}

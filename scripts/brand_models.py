@@ -134,13 +134,53 @@ def карта_брендов(cur=None) -> tuple[dict, str]:
             реестр = dict(cur.fetchall())
             карта = {**карта, **реестр}
             откуда = "lib_brand_map + dict/oem.json"
-    # Ключи справочника рядов, которых нет в словаре, сводятся по их aliases.
-    for к, б in model_series.справочник().бренды.items():
-        for a in [б.get("name", "")] + list(б.get("aliases", [])):
+    return свести_дубли(карта, model_series.справочник()), откуда
+
+
+# Хвост ключа написания из одной кириллицы — страна при латинском имени
+# («Getriebebau Nord, ГЕРМАНИЯ» → getriebebaunordгермания).
+_С_СТРАНОЙ = re.compile(r"([0-9a-z]{5,})([а-я]+)")
+
+
+def свести_дубли(карта: dict, спр) -> dict:
+    """Карта написаний → та же карта, где дубли брендов справочника рядов сведены.
+
+    Реестр базы заводит бренд и по написанию, которого в словаре нет: «CAT»,
+    «Warman», «Dresser Rand», «Getriebebau Nord, ГЕРМАНИЯ» стали ключами cat,
+    warman, dresserrand, getriebebaunordгермания — отдельными от caterpillar,
+    weir, siemensdemagdelavalturbomachinery и nord. Сводятся они НАПИСАНИЯМИ
+    бренда справочника (name, aliases, field_aliases), а не новыми записями:
+    ключ реестра, равный ключу такого написания (или ему же с хвостом страны
+    по-русски), — тот же бренд, и все написания, ведущие к нему, переводятся
+    на ключ справочника. context_aliases не сводят: «Siemens» — контекст у
+    четырёх брендов. Написание, которое дают два бренда справочника, не
+    сводит ни к одному — выбрать между ними нечем.
+    """
+    свои = set(спр.бренды)
+    имя_к, спорные = {}, set()
+    for к, б in спр.бренды.items():
+        for a in [б.get("name", "")] + list(б.get("aliases", [])) + list(б.get("field_aliases", [])):
             kk = codes_sql.ключ_написания(a)
-            if len(kk) >= 3:
-                карта.setdefault(kk, к)
-    return карта, откуда
+            if len(kk) < 3:
+                continue
+            if имя_к.get(kk, к) != к:
+                спорные.add(kk)
+            имя_к.setdefault(kk, к)
+    for kk in спорные:
+        del имя_к[kk]
+
+    def свой(ключ):
+        if ключ in свои:
+            return ключ
+        if ключ in имя_к:
+            return имя_к[ключ]
+        m = _С_СТРАНОЙ.fullmatch(ключ or "")
+        return имя_к.get(m.group(1)) if m else None
+
+    итог = {kk: (свой(v) or v) for kk, v in карта.items()}
+    for kk, к in имя_к.items():
+        итог.setdefault(kk, к)
+    return итог
 
 
 def словарь_реестра(строки) -> tuple[re.Pattern | None, dict]:
