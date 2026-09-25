@@ -178,6 +178,37 @@ test("поиск по всему спросу: код с ценой ведёт �
   assert.match(т, /Подшипник выдуманный/);
   assert.match(т, /Подшипник другой/);
   assert.match(т, /посчитаны по первым 5\s?000/);
+  assert.doesNotMatch(т, /Строк с этим кодом/, "в предел упёрлись слова, а не код");
   assert.ok(ссылки(карта.view).includes("#c=ab6205"));
   assert.ok(!ссылки(карта.view).includes("#c=zz1"), "код без цены КП не должен вести в пустую карточку");
+});
+
+// Предел строк стоит на обоих путях (lib_code_search). Упёрся код — пометка
+// у кода; пометка слов со счётом «0 строк» была бы враньём.
+async function найти_в_базе(ответ) {
+  const { карта, создано } = await открыть(html, { hash: "", маршруты: (url) =>
+    (url.startsWith("/api/brands/search") ? ответ : маршруты(url)) });
+  const вкладка = потомки(карта.tabs).find((e) => e.tagName === "BUTTON" && /Коды с ценой/.test(e.textContent));
+  await вкладка.fire("click");
+  создано.find((e) => e.id === "dbq").value = "бн";
+  await создано.find((e) => e.tagName === "BUTTON" && e.textContent === "Искать в базе").fire("click");
+  for (let i = 0; i < 20; i++) await Promise.resolve();
+  await new Promise((r) => setTimeout(r, 0));
+  return карта.view.textContent;
+}
+
+test("поиск по всему спросу: в предел упёрся код — пометка у кода, не у слов", async () => {
+  const т = await найти_в_базе({ q: "бн", key: "бн",
+    by_code: [{ code: "бн", written: "б/н", name: "Деталь выдуманная", rows: 5000, deals: 812 }],
+    by_words: [], word_rows: 0, capped: true });
+  assert.match(т, /Строк с этим кодом не меньше 5\s?000/);
+  assert.doesNotMatch(т, /Совпадений больше/);
+});
+
+test("поиск по всему спросу: предела не достигли — пометок нет", async () => {
+  const т = await найти_в_базе({ q: "бн", key: "бн",
+    by_code: [{ code: "бн", written: "б/н", name: "Деталь выдуманная", rows: 40, deals: 12 }],
+    by_words: [], word_rows: 0, capped: false });
+  assert.match(т, /Деталь выдуманная/);
+  assert.doesNotMatch(т, /Строк с этим кодом|Совпадений больше/);
 });
