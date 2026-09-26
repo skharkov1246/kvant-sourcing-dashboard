@@ -139,6 +139,19 @@ on:
         description: "Ослабленное правило шапки: английские слова, цена в зачёт колонок, одного наименования хватит, просмотр 200 строк (выключать только для замера)"
         type: boolean
         default: true
+      # ПРАВКА ЧТЕНИЯ ЦЕНЫ (26.09.2026, library/quotes.py и indexer.items_from_rows).
+      # Оба входа по умолчанию выключены: правило сначала меряют холостым
+      # переразбором (reparse без apply), и только потом пишут. Холостой прогон
+      # печатает «ЗАМЕР ПРАВКИ ЦЕНЫ НА ТЕХ ЖЕ БАЙТАХ» — сколько файлов получили и
+      # сколько ПОТЕРЯЛИ цены. Расписания у прогона нет: ночной разбор флагов не видит.
+      price_dict_v2:
+        description: "Цена: словарь v2 (Price, Net price, Preis, 单价, «Стоимость» со сверкой суммой; цена без НДС при двух колонках; «Сумма НДС» не сумма)"
+        type: boolean
+        default: false
+      headerless_price:
+        description: "Цена: таблица без шапки — колонки по тройке кол-во × цена = сумма (уверенность low)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -231,6 +244,8 @@ jobs:
           LIMIT: ${{ inputs.limit }}
           SOURCE: ${{ inputs.source }}
           APPLY: ${{ inputs.apply && '1' || '' }}
+          PRICE_DICT_V2: ${{ inputs.price_dict_v2 && '1' || '' }}
+          HEADERLESS_PRICE: ${{ inputs.headerless_price && '1' || '' }}
           OCR_RETRY: ${{ inputs.ocr_retry && '1' || '' }}
           REPARSE_FAILED: ${{ inputs.reparse_failed && '1' || '' }}
           REVERT_KEY: ${{ inputs.ocr_revert }}
