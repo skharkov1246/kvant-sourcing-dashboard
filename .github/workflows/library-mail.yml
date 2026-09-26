@@ -69,6 +69,25 @@ on:
         description: "Цены из КП во вложениях (только mail-supplier; без apply — замер)"
         type: boolean
         default: false
+      contact_company:
+        # ПОСТАВЩИК ПИСЬМА КОНТАКТА (indexer.MAIL_CONTACT_COMPANY). У письма,
+        # привязанного к контакту, поставщика нет: холостой замер 36237684851 —
+        # с поставщиком 332 строки цены из 837. Со входом часть узнаёт компанию
+        # контакта и ставит её, только если компания ровно одна. Действует лишь
+        # вместе с prices в группе mail-supplier, иначе журнал говорит, что не
+        # действует. Пишется только rfq_company строки цены: rfq_id остаётся
+        # «K<контакт>», lib_files и lib_demand не меняются.
+        #
+        # НАГРУЗКА (CLAUDE.md, «Битрикс не перегружать», пункт 5). На часть —
+        # crm.contact.list по списку номеров: ⌈контактов/50⌉ запросов, один
+        # контакт — один раз. Если портал не отдаёт в списке COMPANY_IDS, у
+        # контактов с основной компанией число компаний проверяет batch из
+        # crm.contact.company.items.get — ещё не больше ⌈контактов/50⌉. Итого
+        # ≈ контактов/50, в худшем случае вдвое: у пачки 2 000 писем на 10
+        # частей это единицы запросов на часть против сотен на закачку файлов.
+        description: "Поставщик письма контакта — его единственная компания (только с prices, mail-supplier)"
+        type: boolean
+        default: false
       bitrix_rps:
         # Для mail-lead вход НЕ действует: там всегда 0.3 (см. шаг разбора).
         description: "Запросов в секунду к порталу на ВЕСЬ прогон (кроме лидов — у них всегда 0.3)"
@@ -218,6 +237,7 @@ jobs:
           APPLY: ${{ inputs.apply && '1' || '' }}
           INPUT_RPS: ${{ inputs.bitrix_rps }}
           INPUT_PRICES: ${{ inputs.prices && '1' || '' }}
+          INPUT_CONTACT_COMPANY: ${{ inputs.contact_company && '1' || '' }}
         run: |
           set -euo pipefail
           # ЦЕНЫ — ТОЛЬКО ИЗ ПИСЕМ ПОСТАВЩИКОВ. Письмо сделки и лида — сторона
@@ -233,6 +253,17 @@ jobs:
             fi
           fi
           export MAIL_PRICES
+          # КОМПАНИЯ КОНТАКТА НУЖНА ТОЛЬКО ЦЕНЕ: без prices у mail-supplier вход
+          # ничего не делал бы, кроме запросов к порталу, — и говорит об этом.
+          if [ -n "${MAIL_PRICES:-}" ]; then
+            MAIL_CONTACT_COMPANY="${INPUT_CONTACT_COMPANY:-}"
+          else
+            MAIL_CONTACT_COMPANY=""
+            if [ -n "${INPUT_CONTACT_COMPANY:-}" ]; then
+              echo "группа ${{ inputs.group }}: вход contact_company не действует — компания контакта нужна только ценам писем поставщиков (prices, mail-supplier)"
+            fi
+          fi
+          export MAIL_CONTACT_COMPANY
           # ЛИДЫ — ПЯТАЯ ЧАСТЬ ПОРТАЛА, И ВХОД ЭТО НЕ ОТМЕНЯЕТ (распоряжение
           # владельца 24.09.2026). Подмена входа — вслух, а не молча.
           if [ "${{ inputs.group }}" = "mail-lead" ]; then

@@ -122,6 +122,15 @@ APPLY = os.environ.get("APPLY", "").strip().lower() in ("1", "true", "yes")
 #: письмо заказчика, наше и неизвестной стороны цен не даёт никогда. Холостой
 #: прогон (без APPLY) печатает замер и не пишет ничего (CLAUDE.md, правило 3).
 MAIL_PRICES = os.environ.get("MAIL_PRICES", "").strip().lower() in ("1", "true", "yes")
+#: ПОСТАВЩИК ПИСЬМА КОНТАКТА — ТОЛЬКО СО ВХОДОМ (вход contact_company прогона
+#: library-mail.yml, по умолчанию выключен). У письма, привязанного к контакту,
+#: компании нет, и строка цены остаётся без поставщика: холостой замер 36237684851
+#: — с поставщиком 332 строки цены из 837. Со входом часть одним пакетом на
+#: пятьдесят контактов узнаёт компанию контакта и ставит её, только если она
+#: одна (mail_source.дополнить_компании_контактов). Действует лишь вместе с
+#: MAIL_PRICES в группе mail-supplier: компания нужна только строке цены.
+MAIL_CONTACT_COMPANY = os.environ.get("MAIL_CONTACT_COMPANY", "").strip().lower() in (
+    "1", "true", "yes")
 #: ЕЖЕДНЕВНЫЙ ПРОХОД (library/increment.py): обход читает только сделки и
 #: карточки, созданные или изменённые после прошлого успешного прохода, —
 #: десятки запросов вместо тысяч. DAYS и деление на части при этом не
@@ -2401,6 +2410,21 @@ def цены_файла(rec: dict) -> bool:
             and rec.get("side") == doc_side.ПОСТАВЩИК)
 
 
+def компании_контактов_части(refs: list[dict]) -> list[str]:
+    """Вход MAIL_CONTACT_COMPANY: поставщик писем контактов части. Строки журнала.
+
+    Вход действует только вместе с MAIL_PRICES в группе mail-supplier: компания
+    нужна одной строке цены, а lib_files и lib_demand её не пишут. Иначе — ни
+    одного запроса, и журнал говорит, что вход не действует.
+    """
+    if not MAIL_CONTACT_COMPANY:
+        return []
+    if not (SOURCE == "mail" and MAIL_PRICES and MAIL_GROUP == "mail-supplier"):
+        return ["вход MAIL_CONTACT_COMPANY не действует — компания контакта нужна только"
+                " ценам писем поставщиков (MAIL_PRICES, группа mail-supplier)"]
+    return mail_source.дополнить_компании_контактов(refs, bx)
+
+
 def поток_цены() -> tuple[str, str]:
     """(источник, поток) строки цены: у писем свои, у карточек прежние."""
     if SOURCE == "mail":
@@ -2876,6 +2900,11 @@ def main() -> int:
               f" · новых: {len(mine)}", flush=True)
     if LIMIT:
         mine = mine[:LIMIT]
+    if SOURCE == "mail" and MAIL_CONTACT_COMPANY:
+        # Только новые файлы части (mine): за разобранный ранее файл цена не
+        # пишется, и спрашивать его контакт незачем.
+        for строка_журнала in компании_контактов_части(mine):
+            print(строка_журнала, flush=True)
     print(f"к разбору в этой части: {len(mine)}\n", flush=True)
     if not mine:
         print("нечего делать")
@@ -3036,6 +3065,9 @@ class ЗамерЦен:
     def __init__(self) -> None:
         self.строк = self.с_колвом = self.с_датой = self.с_поставщиком = 0
         self.низкая = self.с_оговоркой = self.расхождение_папки = 0
+        # Поставщик из компании контакта (вход MAIL_CONTACT_COMPANY): «до» —
+        # с_поставщиком минус эти, «после» — с_поставщиком.
+        self.с_поставщиком_контакта = 0
         self.валюты: Counter = Counter()
         self.дата_откуда: Counter = Counter()
         self.разобрано: Counter = Counter()        # формат → разобранных файлов
@@ -3066,6 +3098,9 @@ class ЗамерЦен:
             self.с_датой += bool(it.get("price_date"))
             self.дата_откуда[it.get("price_date_src") or "(не искали)"] += 1
             self.с_поставщиком += bool(it.get("company"))
+            self.с_поставщиком_контакта += bool(
+                it.get("company") and str(rec.get("deal_id") or "").startswith(
+                    mail_source.БУКВА_ВЛАДЕЛЬЦА[mail_source.КОНТАКТ]))
             self.низкая += ц.get("confidence") == "low"
             self.с_оговоркой += bool(ц.get("note"))
 
@@ -3079,6 +3114,11 @@ class ЗамерЦен:
                        f" (откуда: {dict(self.дата_откуда.most_common())})"
                        f" · с поставщиком (компания письма) {self.с_поставщиком}"
                        f" · без поставщика {н - self.с_поставщиком}")
+            if MAIL_CONTACT_COMPANY:
+                out.append(f"  с поставщиком: до компании контакта"
+                           f" {self.с_поставщиком - self.с_поставщиком_контакта}"
+                           f" · после {self.с_поставщиком}"
+                           f" (из компании контакта {self.с_поставщиком_контакта})")
             out.append(f"  подозрительных: низкая уверенность {self.низкая}"
                        f" · с оговоркой разбора {self.с_оговоркой}"
                        f" · из файлов с расхождением папки и содержимого {self.расхождение_папки}")
