@@ -212,3 +212,32 @@ test("поиск по всему спросу: предела не достиг�
   assert.match(т, /Деталь выдуманная/);
   assert.doesNotMatch(т, /Строк с этим кодом|Совпадений больше/);
 });
+
+// Кто делает узлы (поле subs карточки, library/brands.субпоставщики):
+// «Узел — Компания (машины) · источник»; компания реестра — ссылкой на
+// /suppliers#e=, источник — наружу и только http(s); без источника строки нет.
+test("карточка бренда: «Кто делает узлы» — узел, компания, машины, источник", async () => {
+  const ИСТ = "https://example.invalid/spec";
+  const subs = [
+    { name: "Искрон", unit: "Свечи зажигания", m: "VT-10, VT-20", src: [ИСТ, "javascript:alert(1)", ИСТ + "/2"],
+      by: "разведка", e: "KV-S-000101-1" },
+    { name: "<b>Форсунов</b>", unit: "Топливные форсунки", src: [ИСТ], by: "сверка а" },
+    { name: "Без Источника", unit: "Корпус", src: ["javascript:alert(1)"], by: "разведка" },
+  ];
+  const сводка = { ...СВОДКА, brands: [{ ...СВОДКА.brands[0], subs }, СВОДКА.brands[1]] };
+  const { карта } = await открыть(html, { hash: "#b=skf",
+    маршруты: (url) => (url === "/api/brands" ? сводка : маршруты(url)) });
+  const box = потомки(карта.card).find((e) => /(^| )subs( |$)/.test(e.className || ""));
+  assert.ok(box, "блока нет");
+  const строки = box.children.filter((e) => e.tagName === "P").map((p) => p.textContent);
+  assert.deepEqual(строки, [
+    "Свечи зажигания — Искрон (VT-10, VT-20) · источник · источник 2",
+    "Топливные форсунки — <b>Форсунов</b> · источник"]);
+  assert.match(box.textContent, /^Кто делает узлы/);
+  assert.deepEqual(ссылки(box), ["/suppliers#e=KV-S-000101-1", ИСТ, ИСТ + "/2", ИСТ]);
+  const наружу = потомки(box).filter((e) => e.tagName === "A" && e.href === ИСТ);
+  assert.ok(наружу.length === 2 && наружу.every((a) => a.rel === "noopener noreferrer" && a.target === "_blank"));
+  // Без поля subs — блока нет.
+  const без = await страница("#b=skf");
+  assert.ok(!потомки(без.карта.card).some((e) => /(^| )subs( |$)/.test(e.className || "")));
+});

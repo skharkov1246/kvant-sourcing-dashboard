@@ -240,7 +240,13 @@ def _бренды(ents_по_ci):
                                         "src": ["разведка"], "parts": 3, "checked": 1}]},
          "card": [{"id": "1138", "codes": 2}],
          "atlas": {"name": "SKF", "country": "Швеция", "owner": "Группа SKF"},
-         "own": {"group": [{"name": "FAG", "c": "fag", "since": 2001}]}},
+         "own": {"group": [{"name": "FAG", "c": "fag", "since": 2001}]},
+         # Субпоставщики (library/brands.субпоставщики): выдуманные компании.
+         "subs": [{"name": "Выдумсепаратор", "unit": "Сепараторы подшипника", "m": "НМ-1250",
+                   "src": ["https://example.org/separator"], "by": "разведка", "e": все_поставщики[0]},
+                  {"name": "Кольцевой Завод Н", "unit": "Кольца", "src": ["https://example.org/ring",
+                                                                        "http://example.org/ring2"],
+                   "by": "сверка б"}]},
         {"k": "fag", "name": "FAG", "dict": True, "spellings": ["FAG"], "spellings_n": 1,
          "codes": {"any": 3, "plausible": 3, "customer": 2, "customer_kp": 1, "rows_customer": 3, "deals": 2},
          "spelled": 1, "sups": 1, "priced": 2, "asked": 2,
@@ -294,6 +300,8 @@ def _бренды(ents_по_ci):
     for i, k in enumerate(brands.КЛЮЧИ_КОРЗИН):
         out[k] = корзины[i]
     out[brands.КЛЮЧ_ВЛАДЕНИЯ] = {"version": 1, "published_at": СОБРАН, "brands": {}}
+    out[brands.КЛЮЧ_СУБПОСТАВЩИКОВ] = {"version": 1, "published_at": СОБРАН,
+                                       "brands": {"skf": copy.deepcopy(бренды_[0]["subs"])}}
     return out
 
 
@@ -827,6 +835,7 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("brands", "b.registry", lambda о: бр(о, "skf")["registry"]["list"][0].update(checked=9)),
     ("brands", "b.card", lambda о: бр(о, "skf")["card"].append({"id": "9999", "codes": 1})),
     ("brands", "b.own_link", lambda о: бр(о, "fag")["own"]["o"].update(c="schaeffler")),
+    ("brands", "b.subs", lambda о: бр(о, "skf")["subs"][0].update(src=[])),
     ("brands", "b.cloud_nomark",lambda о: бр(о, "timken").update(nb="страна или город")),
     ("brands", "b.cloud_dup", lambda о: о[brands.КЛЮЧ]["cloud"][0].update(m=["fag", "skf"])),
     ("brands", "b.cloud_lost", lambda о: о[brands.КЛЮЧ].update(
@@ -1674,3 +1683,52 @@ def test_чтение_библиотеки_закрытым_списком_и_б
     with pytest.raises(Exception, match="AUDIT_READ_ONLY"):
         источник.библиотека.call("PUT", источник.библиотека.value_path(NS, pa.КЛЮЧ_БИБЛИОТЕКИ), b"{}")
     assert all(метод == "GET" for метод, _ in транспорт.вызовы)
+
+
+# ── Субпоставщики на карточке бренда (b.subs) ────────────────────────────────
+
+@pytest.mark.parametrize("правка", [
+    lambda о: бр(о, "skf")["subs"][0].update(src=["javascript:alert(1)"]),
+    lambda о: бр(о, "skf")["subs"][0].pop("src"),
+    lambda о: бр(о, "skf")["subs"][1].update(by="черновик"),
+    lambda о: бр(о, "skf")["subs"][1].update(name=""),
+    lambda о: бр(о, "skf")["subs"][0].update(e="romashka"),
+    # Ключ /p разошёлся с карточкой /brands.
+    lambda о: о[brands.КЛЮЧ_СУБПОСТАВЩИКОВ]["brands"]["skf"].pop(),
+], ids=["не_http", "без_источника", "основание", "без_компании", "номер", "ключ_разошёлся"])
+def test_субпоставщик_дефект_каждого_признака(правка):
+    о = корпус()
+    правка(о)
+    с = pa.Снимки(Память(закодировать(о)))
+    т = pa.ревизия_брендов(с, СЕЙЧАС)
+    assert т.счета["b.subs"][1] == 1
+
+
+def test_субпоставщик_неподтверждённый_по_файлам(tmp_path):
+    """Сверка с файлами своим чтением: запись без verified: true (черновик
+    разведки) на карточке — дефект; запись сверки verified.json — годна."""
+    (tmp_path / "data" / "brand_research").mkdir(parents=True)
+    (tmp_path / "data" / "subsuppliers").mkdir(parents=True)
+    (tmp_path / "data" / "brand_research" / "skf.json").write_text(json.dumps({
+        "oem_key": "skf", "sub_suppliers": [
+            {"company": "Выдумсепаратор", "component": "сепараторы  подшипника", "verified": True},
+            {"company": "Черновой Литейщик", "component": "Кольца", "verified": False},
+            {"company": "Безпометочный", "component": "Кольца"}]}, ensure_ascii=False), encoding="utf-8")
+    (tmp_path / "data" / "subsuppliers" / "verified.json").write_text(json.dumps({
+        "schema": 1, "records": [{"oem_key": "skf", "company": "Кольцевой завод Н", "component": "кольца",
+                                  "evidence_kind": "б", "sources": ["https://example.org/ring"]}],
+        "gaps": []}, ensure_ascii=False), encoding="utf-8")
+    подтверждённые = pa.подтверждённые_субпоставщики(tmp_path)
+    assert len(подтверждённые) == 2
+    о = корпус()
+    т = pa.ревизия_брендов(pa.Снимки(Память(закодировать(о))), СЕЙЧАС, подтверждённые)
+    assert т.счета["b.subs"] == [1, 0]
+    for имя in ("Черновой Литейщик", "Безпометочный"):
+        о = корпус()
+        бр(о, "skf")["subs"][1]["name"] = имя
+        о[brands.КЛЮЧ_СУБПОСТАВЩИКОВ]["brands"]["skf"][1]["name"] = имя
+        т = pa.ревизия_брендов(pa.Снимки(Память(закодировать(о))), СЕЙЧАС, подтверждённые)
+        assert т.счета["b.subs"] == [1, 1], имя
+    # Без файла сверки читается одна разведка.
+    (tmp_path / "data" / "subsuppliers" / "verified.json").unlink()
+    assert len(pa.подтверждённые_субпоставщики(tmp_path)) == 1

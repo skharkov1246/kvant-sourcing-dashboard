@@ -664,26 +664,37 @@ const BRANDS_OWNERS_KEY = "brands:owners:v1";
 const BRANDS_OWNERS_MAX_BYTES = 256 * 1024;
 const BRANDS_OWNERS_TTL_MS = 5 * 60 * 1000;
 const BRANDS_OWNERS_FAIL_TTL_MS = 30 * 1000;
-const brandsOwnersCache = new WeakMap();
+// СУБПОСТАВЩИКИ БРЕНДА — тем же порядком и тем же читателем
+// (library/brands.КЛЮЧ_СУБПОСТАВЩИКОВ): {ключ бренда: [строки]} из файлов
+// разведки и сверки, только подтверждённые. Поле ответа — subsuppliers.
+const BRANDS_SUBS_KEY = "brands:subs:v1";
+const BRANDS_SUBS_MAX_BYTES = 256 * 1024;
+const brandsSmallCache = new WeakMap();
 
-async function readBrandsOwners(env) {
+// Маленький ключ {version: 1, brands: {…}} → карта или null (нет, битый, чужая
+// версия, больше предела). Кэш — по хранилищу и ключу.
+async function readBrandsSmall(env, key, maxBytes) {
   const kv = aclStore(env);
   if (!kv || typeof kv !== "object") return null;
   const now = Date.now();
-  const was = brandsOwnersCache.get(kv);
+  let кэш = brandsSmallCache.get(kv);
+  if (!кэш) { кэш = new Map(); brandsSmallCache.set(kv, кэш); }
+  const was = кэш.get(key);
   if (was && now - was.at < was.ttl) return was.map;
   let map = null, ttl = BRANDS_OWNERS_TTL_MS;
   try {
-    const raw = await kv.get(BRANDS_OWNERS_KEY);
-    if (typeof raw === "string" && new TextEncoder().encode(raw).byteLength <= BRANDS_OWNERS_MAX_BYTES) {
+    const raw = await kv.get(key);
+    if (typeof raw === "string" && new TextEncoder().encode(raw).byteLength <= maxBytes) {
       const value = JSON.parse(raw);
       const b = value && value.version === 1 ? value.brands : null;
       if (b && typeof b === "object" && !Array.isArray(b)) map = b;
     }
   } catch { map = null; ttl = BRANDS_OWNERS_FAIL_TTL_MS; }
-  brandsOwnersCache.set(kv, { at: now, ttl, map });
+  кэш.set(key, { at: now, ttl, map });
   return map;
 }
+function readBrandsOwners(env) { return readBrandsSmall(env, BRANDS_OWNERS_KEY, BRANDS_OWNERS_MAX_BYTES); }
+function readBrandsSubs(env) { return readBrandsSmall(env, BRANDS_SUBS_KEY, BRANDS_SUBS_MAX_BYTES); }
 
 function suppliersRoute(path) {
   if (["/suppliers", "/suppliers/", "/suppliers.html"].includes(path)) return "page";
@@ -1081,6 +1092,11 @@ const ПЕ_ВЛАДЕНИЕ = ПС.o({
   series: ПС.a(ПС.o({ series: ПС.s(120), brand: ПС.s(200), c: ПС.k(PORTAL_BRAND_KEY), since: ПС.n }), 100),
   role: ПС.s(40),
 });
+// Субпоставщик бренда (library/brands.субпоставщики, ключ brands:subs:v1): кто
+// делает узел машин бренда. src — ссылки на источник (страница проверяет
+// http(s)), e — номер компании в реестре поставщиков KV-S, by — основание.
+const ПЕ_СУБПОСТАВЩИК = ПС.o({ name: ПС.s(200), unit: ПС.s(200), m: ПС.s(300),
+  src: ПС.a(ПС.s(400), 3), by: ПС.s(20), e: ПС.k(PORTAL_SUP_ID) });
 const ПЕ_СВЕДЕНО = ПС.k(/^(инн|vat|домен сайта|домен почты)$/, 20);
 const ПЕ_МЕСЯЦ = ПС.k(/^[0-9]{4}-[0-9]{2}$/, 7);
 const ПЕ_ЧАСТИ = ПС.a(ПС.s(40), 10);
@@ -1262,6 +1278,8 @@ async function portalEntity(route, url, env, rights) {
     if (route === "portalBrand") {
       const own = await brandOwnership(env, card.key || v);
       if (own) card.ownership = own;
+      const subs = await brandSubsuppliers(env, card.key || v);
+      if (subs) card.subsuppliers = subs;
     }
     // Страховка, как у /api/crossref и /api/brands: поле из SUPPLIERS_FIELDS,
     // появись оно в схеме карточки, закроется правом, а не уйдёт как есть.
@@ -1283,6 +1301,20 @@ async function brandOwnership(env, key) {
     if (!own) return null;
     const есть = own.o || own.was.length || own.group.length || own.series.length;
     return есть ? own : null;
+  } catch { return null; }
+}
+
+// Субпоставщики бренда из ключа brands:subs:v1 — закрытым списком полей; строка
+// без компании, узла или источника http(s) не идёт. Нет ключа, нет бренда,
+// пусто — null, ответ прежний.
+async function brandSubsuppliers(env, key) {
+  try {
+    const map = await readBrandsSubs(env);
+    if (!map || typeof key !== "string" || !Object.prototype.hasOwnProperty.call(map, key)) return null;
+    const subs = portalClean(map[key], ПС.a(ПЕ_СУБПОСТАВЩИК, 60))
+      .map((x) => ({ ...x, src: x.src.filter((u) => /^https?:\/\//.test(u)) }))
+      .filter((x) => x.name && x.unit && x.src.length);
+    return subs.length ? subs : null;
   } catch { return null; }
 }
 

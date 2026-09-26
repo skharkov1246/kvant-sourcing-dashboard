@@ -1,0 +1,649 @@
+{
+ "schema": 1,
+ "updated": "2026-09-26",
+ "rule": "Запись вносится только при первичном доказательстве одного из трёх видов: а — страница или каталог самого бренда-изготовителя машины, где субпоставщик назван поставщиком узла или детали (в спецификации, перечне комплектации, магазине запчастей бренда); б — страница, пресс-релиз или отчёт субпоставщика, где прямо сказано, что он поставляет узел этому бренду; в — официальный документ бренда (руководство, каталог запчастей, буклет) с маркой субпоставщика на детали. Сайты перепродавцов, форумы, маркетплейсы и отраслевые издания доказательством не считаются. У каждой записи — дословная цитата (до 300 знаков) и адрес, прочитанный запросом 26.09.2026; скептик вторым проходом сверил цитату с текстом источника и пытался опровергнуть «штатность» узла. Сомнение — не в records, а в rejected или gaps.",
+ "records": [
+  {
+   "oem_key": "sandviktamrock",
+   "brand": "Sandvik (Tamrock)",
+   "company": "Volvo Penta (AB Volvo)",
+   "component": "дизельный двигатель",
+   "machines": "погрузочно-доставочная машина LH517 (Volvo TAD1341VE, TAD1372VE); самосвал TH663 / TH663i (Volvo TAD1643VE-B, TWD1683VE)",
+   "evidence_kind": "б",
+   "quote": "Volvo Penta's new 16-liter engine is installed into the latest TH663 underground truck from Sandvik, to provide enhanced performance and cost savings.",
+   "sources": [
+    "https://www.volvogroup.com/en/news-and-media/news/2016/may/news-151862.html",
+    "https://www.mining.sandvik/siteassets/product-documents/trucks/diesel-trucks/th663i-specification-sheet-english.pdf",
+    "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh517-specification-sheet-english.pdf",
+    "https://www.mining.sandvik/en/news-and-media/news-archive/2021/06/sandvik-introduces-a-16-liter-stage-v-engine-for-its-largest-truck-toro-th663i/"
+   ],
+   "checked": "2026-09-26",
+   "note": "Спецификации Sandvik подтверждают со стороны бренда: «Diesel engine Volvo TAD1341VE» (LH517), «Diesel engine Volvo TAD1643VE-B (Tier 2)» (TH663i)."
+  },
+  {
+   "oem_key": "sandviktamrock",
+   "brand": "Sandvik (Tamrock)",
+   "company": "Dana Incorporated (Spicer Off-Highway)",
+   "component": "гидротрансформатор и коробка передач (powershift)",
+   "machines": "LH517 (гидротрансформатор Dana C9602, коробка Dana 6422); TH663i (автоматическая коробка Dana)",
+   "evidence_kind": "а",
+   "quote": "Dana 6422, automatic gear shift control, four gears forward and reverse.",
+   "sources": [
+    "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh517-specification-sheet-english.pdf",
+    "https://www.mining.sandvik/siteassets/product-documents/trucks/diesel-trucks/th663i-specification-sheet-english.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "В TH663i: «Fully automatic Dana transmission with electric shifting system»."
+  },
+  {
+   "oem_key": "sandviktamrock",
+   "brand": "Sandvik (Tamrock)",
+   "company": "Kessler + Co",
+   "component": "ведущие мосты (передний и задний)",
+   "machines": "LH517 (Kessler D106)",
+   "evidence_kind": "а",
+   "quote": "Kessler D106, limited slip differential.",
+   "sources": [
+    "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh517-specification-sheet-english.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "sandviktamrock",
+   "brand": "Sandvik (Tamrock)",
+   "company": "Ansul (Johnson Controls)",
+   "component": "система пожаротушения",
+   "machines": "LH517, TH663i (опция)",
+   "evidence_kind": "а",
+   "quote": "Fire suppression system ANSUL, 2 tanks, 8 nozzles (CEN) including auto engine shutdown",
+   "sources": [
+    "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh517-specification-sheet-english.pdf",
+    "https://www.mining.sandvik/siteassets/product-documents/trucks/diesel-trucks/th663i-specification-sheet-english.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Опция из заводского перечня; в TH663i — «ANSUL Twin fire suppression system (CE)»."
+  },
+  {
+   "oem_key": "sandviktamrock",
+   "brand": "Sandvik (Tamrock)",
+   "company": "HBC-radiomatic",
+   "component": "радиоуправление машиной (дистанционное)",
+   "machines": "LH517 (опция)",
+   "evidence_kind": "а",
+   "quote": "Radio remote control HBC CAN",
+   "sources": [
+    "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh517-specification-sheet-english.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Опция из заводского перечня."
+  },
+  {
+   "oem_key": "sandviktamrock",
+   "brand": "Sandvik (Tamrock)",
+   "company": "Caterpillar",
+   "component": "дизельный двигатель",
+   "machines": "буровые станки DR412i (CAT C27), DR410i (CAT C18, C27), Leopard DI650i (CAT C15)",
+   "evidence_kind": "а",
+   "quote": "CAT C27 (Non Tier 4/Tier 4)",
+   "sources": [
+    "https://www.mining.sandvik/globalassets/products/surface-drill-rigs/pdf/dr412i-specification-sheet-english.pdf",
+    "https://www.mining.sandvik/en/products/equipment/surface-drill-rigs/dr410i-rotary-blasthole-drill-rig/",
+    "https://www.mining.sandvik/en/news-and-media/news-archive/2020/03/new-leopard-di650i-more-intelligent-dth-surface-drilling/"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "sandviktamrock",
+   "brand": "Sandvik (Tamrock)",
+   "company": "Cummins",
+   "component": "дизельный двигатель",
+   "machines": "буровые станки DR412i (Cummins QST30), DR410i (Cummins QSK19)",
+   "evidence_kind": "а",
+   "quote": "Cummins QST30 (Non Tier 4/Tier 4) 783 kW / 1,050 HP",
+   "sources": [
+    "https://www.mining.sandvik/globalassets/products/surface-drill-rigs/pdf/dr412i-specification-sheet-english.pdf",
+    "https://www.mining.sandvik/en/products/equipment/surface-drill-rigs/dr410i-rotary-blasthole-drill-rig/"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "komatsu",
+   "brand": "Komatsu",
+   "company": "Cummins",
+   "component": "дизельный двигатель",
+   "machines": "карьерный погрузчик WE1850 (Cummins QSK60); буровой станок ZR77 (Cummins QST30)",
+   "evidence_kind": "а",
+   "quote": "Cummins diesel engine Tier 1, Tier 2 or Tier 4",
+   "sources": [
+    "https://www.komatsu.com/content/dam/komatsu/sales-and-marketing-documents/spec-sheet/wheel-loaders/en-we1850-3-sp01-0921-v1.pdf",
+    "https://www.komatsu.com/content/dam/komatsu/sales-and-marketing-documents/spec-sheet/blasthole-drills/zr77-blasthole-drill-specification-sheet.pdf",
+    "https://investor.cummins.com/news/detail/685/cummins-and-komatsu-to-collaborate-on-joint-mining-hybrid"
+   ],
+   "checked": "2026-09-26",
+   "note": "Со стороны Cummins (вид «б»): «Building on a strong legacy of diesel engine supply across a wide variety of mining and construction equipment, Cummins and Komatsu will add hybrids…». В спецификации WE1850 ниже: «Model QSK 60»."
+  },
+  {
+   "oem_key": "komatsu",
+   "brand": "Komatsu",
+   "company": "MTU (Rolls-Royce Power Systems)",
+   "component": "дизельный двигатель (альтернатива)",
+   "machines": "карьерный погрузчик WE1850 (MTU 16V/12V Series 4000)",
+   "evidence_kind": "а",
+   "quote": "MTU Detroit diesel engine Tier 1, Tier 2 Tier 4",
+   "sources": [
+    "https://www.komatsu.com/content/dam/komatsu/sales-and-marketing-documents/spec-sheet/wheel-loaders/en-we1850-3-sp01-0921-v1.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Второй вариант двигателя в спецификации: Model 16V series 4000 / 12V series 4000."
+  },
+  {
+   "oem_key": "komatsu",
+   "brand": "Komatsu",
+   "company": "GE Transportation (с 2019 — Wabtec)",
+   "component": "тяговый генератор (главный генератор электропривода)",
+   "machines": "самосвал 830E-AC (GTA41)",
+   "evidence_kind": "а",
+   "quote": "GE ALTERNATOR GTA41 SUITS 830E AC",
+   "sources": [
+    "https://my.komatsu.com.au/shop/tractionalternator_5637145621/5638389949_ge-alternator-gta41-suits-830e-ac_np5gta41lp"
+   ],
+   "checked": "2026-09-26",
+   "note": "Магазин запчастей Komatsu Australia; в поле марки — «Local Purchase», т. е. Komatsu закупает узел у изготовителя. Обозначения GTA-62 и GDY106-C в спецификации 930E-5SE — той же линейки, но марка там не названа."
+  },
+  {
+   "oem_key": "komatsu",
+   "brand": "Komatsu",
+   "company": "Donaldson",
+   "component": "воздушные фильтры двигателя",
+   "machines": "самосвал 830E-5",
+   "evidence_kind": "а",
+   "quote": "Air cleaners, Donaldson® SSG w/ auto evacuators",
+   "sources": [
+    "https://www.komatsu.com/content/dam/komatsu/websites/oceania/documents/brochures/dump-trucks/Komatsu-830E5-brochure.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "normet",
+   "brand": "Normet",
+   "company": "Volvo Penta (AB Volvo)",
+   "component": "дизельный двигатель",
+   "machines": "бетоносмеситель Utimec LF 600 Transmixer (TAD851VE, TAD881VE)",
+   "evidence_kind": "а",
+   "quote": "Volvo Penta TAD851VE, 185 kW/2200 rpm, with engine brake, Tier 3 / Stage IIIA approved",
+   "sources": [
+    "https://assets.ctfassets.net/idihyv8a6g5y/25FEyDsH52OwqnhTN4kZLv/5c9d2a4143c00818827a850f409b1bb8/Utimec_LF_600_Transmixer_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+    "https://www.normet.com/en/products-and-services/equipment/concrete-transportation/concrete-transmixers/utimec-lf-600-transmixer"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "normet",
+   "brand": "Normet",
+   "company": "Dana Incorporated (Spicer Off-Highway)",
+   "component": "коробка передач и мосты",
+   "machines": "Utimec LF 600 Transmixer (коробка Dana T14, мосты Dana 113); Spraymec 8100 VC (мосты Dana 212)",
+   "evidence_kind": "а",
+   "quote": "Dana T14 series powershift transmission with lock-up",
+   "sources": [
+    "https://assets.ctfassets.net/idihyv8a6g5y/25FEyDsH52OwqnhTN4kZLv/5c9d2a4143c00818827a850f409b1bb8/Utimec_LF_600_Transmixer_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+    "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Мосты: «Dana 113 series» (LF 600), «Planetary type axles Dana 212» (Spraymec 8100 VC)."
+  },
+  {
+   "oem_key": "normet",
+   "brand": "Normet",
+   "company": "Deutz",
+   "component": "дизельный двигатель",
+   "machines": "торкрет-машина Spraymec 8100 VC (Deutz TCD 2012 L4 2V)",
+   "evidence_kind": "а",
+   "quote": "Deutz TCD 2012 L4 2V, 96 kW/2200 rpm, Tier 3 / Stage IIIA & CANMET approved",
+   "sources": [
+    "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf",
+    "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/spraymec-8100-vc"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "normet",
+   "brand": "Normet",
+   "company": "Nokian Tyres",
+   "component": "шины 14.00–24 (стандарт)",
+   "machines": "Utimec LF 600 Transmixer",
+   "evidence_kind": "а",
+   "quote": "Nokian Tyres 14.00–24” with NDT inspected rims",
+   "sources": [
+    "https://assets.ctfassets.net/idihyv8a6g5y/25FEyDsH52OwqnhTN4kZLv/5c9d2a4143c00818827a850f409b1bb8/Utimec_LF_600_Transmixer_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Отмечено знаком стандартной комплектации (•)."
+  },
+  {
+   "oem_key": "normet",
+   "brand": "Normet",
+   "company": "Bridgestone",
+   "component": "шины 14.00–24 (опция)",
+   "machines": "Utimec LF 600 Transmixer",
+   "evidence_kind": "а",
+   "quote": "Bridgestone 14.00–24” Tubeless tires NDT inspected rims",
+   "sources": [
+    "https://assets.ctfassets.net/idihyv8a6g5y/25FEyDsH52OwqnhTN4kZLv/5c9d2a4143c00818827a850f409b1bb8/Utimec_LF_600_Transmixer_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Отмечено знаком опции (∘)."
+  },
+  {
+   "oem_key": "normet",
+   "brand": "Normet",
+   "company": "Ansul (Johnson Controls)",
+   "component": "система пожаротушения",
+   "machines": "Utimec LF 600 Transmixer; Spraymec 8100 VC",
+   "evidence_kind": "а",
+   "quote": "Ansul A-101 dry chemical",
+   "sources": [
+    "https://assets.ctfassets.net/idihyv8a6g5y/25FEyDsH52OwqnhTN4kZLv/5c9d2a4143c00818827a850f409b1bb8/Utimec_LF_600_Transmixer_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+    "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "В перечне также «Ansul LVS Liquid agent» (опция) и огнетушитель «Ansul Sentry»."
+  },
+  {
+   "oem_key": "atlascopco",
+   "brand": "Atlas Copco",
+   "company": "Kubota",
+   "component": "дизельный двигатель",
+   "machines": "передвижной компрессор XAS 110 KD (Kubota D902)",
+   "evidence_kind": "а",
+   "quote": "The unit hosts the new generation C67 Screw element in its air end, combined with a Kubota made diesel engine model D902 complying with the Tier4Final emission standard.",
+   "sources": [
+    "https://www.atlascopco.com/en-us/construction-equipment/products/mobile-air-compressors-usa/small-towable-compressors/xas-110-kd"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "atlascopco",
+   "brand": "Atlas Copco",
+   "company": "Deutz",
+   "component": "дизельный двигатель",
+   "machines": "передвижной компрессор XAS 97 (Deutz 2011 L03)",
+   "evidence_kind": "а",
+   "quote": "Deutz engine and the high performance Atlas Copco compressor element guarantees outstanding efficiency and reduced wear.",
+   "sources": [
+    "https://www.atlascopco.com/content/dam/atlas-copco/construction-technique/portable-energy/documents/1_compressors/XAS97-Technical-Spec.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "atlascopco",
+   "brand": "Atlas Copco",
+   "company": "Caterpillar",
+   "component": "дизельный двигатель",
+   "machines": "передвижные компрессоры XATS 400 CD (Cat C4.4), XAS 1800 PACE (Cat C13B)",
+   "evidence_kind": "а",
+   "quote": "Caterpillar C4.4 T4F turbo charged four-cylinder, liquid-cooled diesel engine provides ample power to operate the compressor",
+   "sources": [
+    "https://www.atlascopco.com/content/dam/atlas-copco/local-countries/united-states/documents/ptna-usa/compressors/xas-400-cd/XATS%20400%20CD%20T4F%20Product%20Reference%20Sheet.pdf",
+    "https://www.atlascopco.com/content/dam/atlas-copco/local-countries/united-states/documents/ptna-usa/compressors/XAS%201800%20PACE%20Product%20Reference%20Sheet%20Final.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "atlascopco",
+   "brand": "Atlas Copco",
+   "company": "Volvo Penta (AB Volvo)",
+   "component": "дизельный двигатель",
+   "machines": "дизель-генератор QAS 700 VD (Volvo TWD1683GE)",
+   "evidence_kind": "а",
+   "quote": "Volvo TWD1683GE T4F engine (also StageV approved)",
+   "sources": [
+    "https://www.atlascopco.com/content/dam/atlas-copco/construction-technique/portable-energy/documents/2_generators/usa/qas-generator/2_QAS_700_VD_T4F_PRS_June_2025.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "atlascopco",
+   "brand": "Atlas Copco",
+   "company": "FPT Industrial (Iveco Group)",
+   "component": "дизельный двигатель",
+   "machines": "дизель-генераторы QAS 175–235 FD (FPT N67)",
+   "evidence_kind": "а",
+   "quote": "FPT N67TEVP01/02 engine models with DOC+SCRoF+CUC",
+   "sources": [
+    "https://www.atlascopco.com/content/dam/atlas-copco/construction-technique/portable-energy/documents/2_generators/usa/qas-generator/QAS_175_235_FD_PRS_US.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "atlascopco",
+   "brand": "Atlas Copco",
+   "company": "Isuzu",
+   "component": "дизельный двигатель",
+   "machines": "дизель-генераторы QAS 25–45 (Isuzu 4LE2)",
+   "evidence_kind": "а",
+   "quote": "Isuzu 4LE2 Tier 4 Final, turbo charged, intercooled (QAS 45 only), four-cylinder, liquid-cooled diesel engine provides ample",
+   "sources": [
+    "https://www.atlascopco.com/content/dam/atlas-copco/local-countries/united-states/documents/ptna-usa/generators/Product%20Reference%20Sheet%20QAS%2025-45%20Id%20T4F%20HOP%20.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "atlascopco",
+   "brand": "Atlas Copco",
+   "company": "Leroy-Somer (Nidec)",
+   "component": "синхронный генератор (альтернатор)",
+   "machines": "дизель-генераторы QAS 700 (LSA 47.2), QAS 175–235 (TAL), QAS 25–45 (LSA)",
+   "evidence_kind": "а",
+   "quote": "The Leroy Somer LSA alternators are designed for heavy duty continuous applications, with marine winding protection",
+   "sources": [
+    "https://www.atlascopco.com/content/dam/atlas-copco/construction-technique/portable-energy/documents/2_generators/usa/qas-generator/2_QAS_700_VD_T4F_PRS_June_2025.pdf",
+    "https://www.atlascopco.com/content/dam/atlas-copco/construction-technique/portable-energy/documents/2_generators/usa/qas-generator/QAS_175_235_FD_PRS_US.pdf",
+    "https://www.atlascopco.com/content/dam/atlas-copco/local-countries/united-states/documents/ptna-usa/generators/Product%20Reference%20Sheet%20QAS%2025-45%20Id%20T4F%20HOP%20.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "grundfos",
+   "brand": "Grundfos",
+   "company": "WEG",
+   "component": "электродвигатель насоса",
+   "machines": "вертикальные многоступенчатые насосы CR, CRI, CRN (исполнение 60 Гц, США)",
+   "evidence_kind": "а",
+   "quote": "The pumps are supplied with WEG motors as standard. Grundfos ML motors (0.33 to 30 HP, TEFC three-phase) are available on request.",
+   "sources": [
+    "https://www.gogrundfos.com/hubfs/GRUNDFOS%20PRODUCT%20GUIDES/CR%20Product%20Guide-USA.pdf?hsLang=en"
+   ],
+   "checked": "2026-09-26",
+   "note": "Документ Grundfos (домен маркетинга Grundfos США)."
+  },
+  {
+   "oem_key": "grundfos",
+   "brand": "Grundfos",
+   "company": "Danfoss",
+   "component": "преобразователь частоты",
+   "machines": "станции повышения давления Hydro MPC (VLT 2800, VLT 6000, VLT FC 100); Hydro Multi-B (FC51)",
+   "evidence_kind": "в",
+   "quote": "For further documentation on Danfoss frequency converters, see the manual supplied with the frequency converter",
+   "sources": [
+    "https://api.grundfos.com/literature/Grundfosliterature-2667235.pdf",
+    "https://api.grundfos.com/literature/Grundfosliterature-5564590.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "В Hydro Multi-B: «E system with two to four CR pumps and Danfoss FC51 VFD.»"
+  },
+  {
+   "oem_key": "grundfos",
+   "brand": "Grundfos",
+   "company": "Danfoss",
+   "component": "датчик давления (принадлежность)",
+   "machines": "преобразователь частоты CUE (датчик MBS 3000)",
+   "evidence_kind": "в",
+   "quote": "Danfoss pressure sensor, cable not included",
+   "sources": [
+    "https://api.grundfos.com/literature/Grundfosliterature-1073108.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Позиция каталога принадлежностей CUE с номерами Grundfos (например 96428016 — MBS 3000)."
+  },
+  {
+   "oem_key": "grundfos",
+   "brand": "Grundfos",
+   "company": "Siemens",
+   "component": "электромагнитный расходомер (принадлежность)",
+   "machines": "преобразователь частоты CUE (MAG 3100/5000)",
+   "evidence_kind": "в",
+   "quote": "Siemens flowmeter, MAGFLO",
+   "sources": [
+    "https://api.grundfos.com/literature/Grundfosliterature-1073108.pdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Позиция каталога принадлежностей CUE."
+  },
+  {
+   "oem_key": "flowserve",
+   "brand": "Flowserve",
+   "company": "Trico Corporation",
+   "component": "масленка постоянного уровня (указатель уровня масла)",
+   "machines": "химические насосы Durco Mark 3",
+   "evidence_kind": "в",
+   "quote": "Remove the Trico oiler/site gage [3855] (Figure 48) and oil level tag (Figure 49) from the bearing",
+   "sources": [
+    "https://www.flowserve.com/sites/default/files/dam/documents/PUIOM000712_EN_AQ.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "flowserve",
+   "brand": "Flowserve",
+   "company": "Inpro/Seal",
+   "component": "лабиринтное уплотнение подшипникового узла (bearing isolator VBXX)",
+   "machines": "химические насосы Durco Mark 3",
+   "evidence_kind": "в",
+   "quote": "The following are general installation instructions regarding the VBXX Inpro seal. Follow the instructions provided with the seal by the manufacturer.",
+   "sources": [
+    "https://www.flowserve.com/sites/default/files/dam/documents/PUIOM000712_EN_AQ.pdf"
+   ],
+   "checked": "2026-09-26"
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "Deutz",
+   "component": "дизельный двигатель",
+   "machines": "буровые установки Boomer M1D / M2D (TCD 2013 L04, TCD 4.1 L04, TCD 6.1 L06)",
+   "evidence_kind": "а",
+   "quote": "Deutz TCD 2013 L04, Stage IIIA/Tier 3, 120 kW",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869-0229-01f-boomer-m1d-m2d-technical-specification-englishpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Подтверждает запись Deutz в data/brand_research/epiroc.json (там verified не проставлен)."
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "Cummins",
+   "component": "дизельный двигатель",
+   "machines": "ПДМ Scooptram ST7 (QSB6.7), Scooptram ST14 S (QSM11, X12)",
+   "evidence_kind": "а",
+   "quote": "Cummins/QSM11",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Табличная ячейка «Brand/model». В ST7 — «Cummins, QSB6.7». Подтверждает запись Cummins в epiroc.json."
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "Dana Incorporated (Spicer Off-Highway)",
+   "component": "мосты и коробка передач",
+   "machines": "Boomer M1D / M2D (мост Dana 113); Scooptram ST14 S (коробка Dana TE32); ST14 SG (Dana ERTE32)",
+   "evidence_kind": "а",
+   "quote": "Dana 113 (short) axle",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869-0229-01f-boomer-m1d-m2d-technical-specification-englishpdf",
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0237+01b+Scooptram+14+SG+Technical+Specification_digitalpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "В ST14 S — «Dana / TE32», в ST14 SG — «Dana/ERTE32». Подтверждает запись Dana в epiroc.json."
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "Kessler + Co",
+   "component": "ведущие мосты",
+   "machines": "Scooptram ST14 S, ST14 SG (Kessler D106)",
+   "evidence_kind": "а",
+   "quote": "Kessler/ D106",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0237+01b+Scooptram+14+SG+Technical+Specification_digitalpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Подтверждает запись Kessler в epiroc.json."
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "Funk (John Deere Power Products)",
+   "component": "коробка передач (powershift с гидротрансформатором)",
+   "machines": "Scooptram ST7 (Funk DF150)",
+   "evidence_kind": "а",
+   "quote": "Funk DF150",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Подтверждает запись John Deere (Funk) в epiroc.json."
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "Ansul (Johnson Controls)",
+   "component": "система пожаротушения",
+   "machines": "Scooptram ST7, ST14 S, ST14 SG",
+   "evidence_kind": "а",
+   "quote": "Ansul Foray (powder) with Checkfire 210 fire suppression automatic release",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf",
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf",
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0237+01b+Scooptram+14+SG+Technical+Specification_digitalpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Подтверждает запись Ansul в epiroc.json."
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "Wiggins",
+   "component": "система быстрой заправки (топливо, масла, охлаждающая жидкость)",
+   "machines": "Scooptram ST7, ST14 S",
+   "evidence_kind": "а",
+   "quote": "Wiggins fast fill for engine oil, transmission, hydraulic and radiator",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0107+01d+Scooptram+ST7+technical+specification_digitalpdf",
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0234+01b+Scooptram+14+S+Technical+Specification_digitalpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Подтверждает запись Wiggins в epiroc.json."
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "ABB",
+   "component": "тяговый двигатель, двигатель гидравлики и силовая электроника (инверторы)",
+   "machines": "ПДМ Scooptram ST14 SG (батарейная)",
+   "evidence_kind": "а",
+   "quote": "Brand/model ABB ABB",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869+0237+01b+Scooptram+14+SG+Technical+Specification_digitalpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Таблица «Motor» (столбцы Traction и Auxiliary, 200 и 150 кВт); в разделе «Power electrics: inverters, transformers» — «Brand ABB». Подтверждает запись ABB в epiroc.json."
+  },
+  {
+   "oem_key": "epiroc",
+   "brand": "Epiroc",
+   "company": "Atlas Copco",
+   "component": "винтовой компрессор (гидропривод)",
+   "machines": "Boomer M1D / M2D (GAR 5, GAR 30)",
+   "evidence_kind": "а",
+   "quote": "Hydraulically driven screw compressor Atlas Copco GAR 5",
+   "sources": [
+    "https://epiroc.scene7.com/is/content/epiroc/9869-0229-01f-boomer-m1d-m2d-technical-specification-englishpdf"
+   ],
+   "checked": "2026-09-26",
+   "note": "Подтверждает запись Atlas Copco в epiroc.json."
+  }
+ ],
+ "rejected": [
+  {
+   "oem_key": "flowserve",
+   "company": "SKF",
+   "component": "подшипники насосов Durco Mark 3",
+   "reason": "Руководство Flowserve даёт таблицу «SKF part numbers» как систему обозначений и рядом упоминает обозначения NTN; это не доказывает, что штатно ставится именно SKF.",
+   "sources": [
+    "https://www.flowserve.com/sites/default/files/dam/documents/PUIOM000712_EN_AQ.pdf"
+   ]
+  },
+  {
+   "oem_key": "sulzer",
+   "company": "FMC Technologies (TechnipFMC)",
+   "component": "двигатель с постоянными магнитами подводного насосного агрегата",
+   "reason": "Пресс-релиз Sulzer описывает соглашение, по которому Sulzer поставляет насосы FMC: FMC — заказчик и интегратор, а не субпоставщик машины Sulzer.",
+   "sources": [
+    "https://www.sulzer.com/-/media/files/news/news_archive/2013/130205_mm_sulzer_pumps_fmc.ashx?la=en"
+   ]
+  },
+  {
+   "oem_key": "komatsu",
+   "company": "MTU (Rolls-Royce Power Systems)",
+   "component": "двигатель Series 4000 на самосвалах 830E/930E",
+   "reason": "Найдено только как перемоторизация парка горной компании через дистрибьютора (послепродажная замена), источник — отраслевое издание. Штатная поставка MTU подтверждена только для WE1850 (отдельная запись).",
+   "sources": [
+    "https://im-mining.com/2023/02/21/rolls-royce-mtu-repowers-for-yancoal-mining-trucks-to-reach-75-by-2025/"
+   ]
+  },
+  {
+   "oem_key": "komatsu",
+   "company": "Cummins",
+   "component": "двигатель QSK60 на погрузчике WE2350",
+   "reason": "Источник — сайт перепродавца двигателей (не Komatsu и не Cummins); спецификация Komatsu WE2350 не прочитана.",
+   "sources": [
+    "https://komatsu-engine.com/we2350-qsk60/"
+   ]
+  },
+  {
+   "oem_key": "ksb",
+   "company": "Siemens",
+   "component": "электродвигатели 6,3 МВт питательных насосов АЭС",
+   "reason": "Источник — отраслевое издание; по тексту это совместная поставка насосных агрегатов заказчику, а не штатный узел насоса KSB. Первичного пресс-релиза Siemens или KSB не найдено.",
+   "sources": [
+    "https://www.power-eng.com/nuclear/siemens-ksb-to-supply-motors-for-nuclear-power-plant-pumps/"
+   ]
+  },
+  {
+   "oem_key": "weir",
+   "company": "ExxonMobil (Mobil)",
+   "component": "пластичная смазка Mobilgrease XHP 222 подшипникового узла Warman",
+   "reason": "Руководство Weir называет смазку, которой рассчитан интервал; это расходный материал, а не деталь или узел, и оговорено «или эквивалент».",
+   "sources": [
+    "https://www.furey.otcindustrial.com/media/sftp_uploads/documents/brochures/Weir/Weir-Warman-AH-AHP-AHU-HH-L-M-and-XU-Series-IOM-Manual-1.pdf"
+   ]
+  },
+  {
+   "oem_key": "sulzer",
+   "company": "Klüber Lubrication",
+   "component": "масло Klubersynth GH6-460 для масленки торцового уплотнения насоса PC Cake Perform",
+   "reason": "Расходный материал, а не деталь; рядом перечислены равноценные масла других марок.",
+   "sources": [
+    "https://www.sulzer.com/en/-/media/files/products/pumps/progressing-cavity-pumps-and-macerators/product-information/pc-cake-perform-pump/manuals/pc_cake_perform_pump_iom.pdf"
+   ]
+  },
+  {
+   "oem_key": "sandviktamrock",
+   "company": "Kessler + Co",
+   "component": "мосты (по каталогу дистрибьютора)",
+   "reason": "Список «кто ставит мосты Kessler» взят со страницы дистрибьютора — не доказательство; запись Kessler для Sandvik оставлена только по спецификации самого Sandvik.",
+   "sources": [
+    "https://www.pjpower.com/products/kessler-co/axles/drive-axle"
+   ]
+  }
+ ],
+ "gaps": [
+  "Weir Minerals (Warman): в открытых документах Weir сторонние марки узлов не названы; подшипниковые узлы, уплотнения и приводы — собственного изготовления. Подсказки перепродавцов (SKF, Timken, WEG) без первичного источника не записаны.",
+  "Sulzer: в руководствах и брошюрах насосов (VMS, PC Transfer, PC Cake Perform, BE, XFP, AHLSTAR) сторонние марки узлов не названы — только смазки; торцовые уплотнения и двигатели ABS собственные.",
+  "KSB: в прочитанных документах (руководство Amarex N) сторонних марок нет; буклет Etanorm говорит о двигателе «западноевропейской марки по выбору KSB» без имени. Нужен буклет, где марка двигателя названа.",
+  "Grundfos: двигатели MG/MGE и MS/MMS собственные; для 50 Гц марка стороннего двигателя в буклете CR не найдена (WEG подтверждён только для 60 Гц, США).",
+  "Flowserve: марка торцовых уплотнений — собственная (Flowserve); подшипники — по таблице обозначений SKF, но штатная марка не утверждается (см. rejected).",
+  "Komatsu: марка электропривода 930E-5SE (GTA-62, GDY106-C) в спецификации не названа; на страницах myKomatsu мотор-колёса 930E идут под маркой Komatsu America (реман). Спецификации WE2350, PC4000/PC8000 (двигатели Komatsu) не дают субпоставщиков.",
+  "Epiroc: страницы и PDF на www.epiroc.com закрыты для запроса (403); прочитаны копии тех же документов с сервера Epiroc epiroc.scene7.com. Записи Okubo, Clark и Michelin в epiroc.json уже подтверждены и здесь не повторены.",
+  "Sandvik: производитель компрессора Leopard DI650i в пресс-релизе Sandvik не назван (в отраслевых обзорах — GHH), не записан.",
+  "Atlas Copco (промышленные компрессоры GA/ZR): стороннего изготовителя узлов в открытых данных Atlas Copco не найдено — электродвигатели и винтовые блоки представлены как собственные. Записи относятся к передвижным компрессорам и генераторам (Power Technique).",
+  "Normet: марка бетононасоса NSP и компрессора Spraymec в документах не названа (собственные узлы Normet)."
+ ]
+}

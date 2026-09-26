@@ -298,6 +298,35 @@ test("карточка бренда: владение — «Входит в … 
   assert.equal(по_классу(пусто.card, "own").length, 0);
 });
 
+// Кто делает узлы (поле subsuppliers от воркера, ключ brands:subs:v1): те же
+// строки, что на /brands. Компания реестра — ссылкой на /suppliers#e=,
+// источник — наружу и только http(s); строка без источника не рисуется.
+test("карточка бренда: «Кто делает узлы» — узел, компания, машины, источник", async () => {
+  const ИСТ = "https://example.invalid/spec";
+  const subsuppliers = [
+    { name: "Искрон", unit: "Свечи зажигания", m: "VT-10, VT-20", src: [ИСТ, "javascript:alert(1)"],
+      by: "разведка", e: "KV-S-000101-1" },
+    { name: "<img src=x>", unit: "Топливные форсунки", m: null, src: [ИСТ, ИСТ + "/2"], by: "сверка а", e: null },
+    { name: "Без Источника", unit: "Корпус", m: null, src: [], by: "разведка", e: null },
+  ];
+  const env = await открыть({ hash: "#brand=kelton", ответ: () => [200, { ...БРЕНД, subsuppliers }] });
+  const [box] = по_классу(env.card, "subs");
+  assert.ok(box, "блока нет");
+  const строки = box.children.filter((e) => e.tagName === "P").map((p) => p.textContent);
+  assert.deepEqual(строки, [
+    "Свечи зажигания — Искрон (VT-10, VT-20) · источник",
+    "Топливные форсунки — <img src=x> · источник · источник 2"]);
+  assert.equal(box.children[0].textContent, "Кто делает узлы");
+  assert.deepEqual(ссылки(box), ["/suppliers#e=KV-S-000101-1", ИСТ, ИСТ, ИСТ + "/2"]);
+  assert.ok(потомки(box).filter((e) => e.tagName === "A" && /^https:/.test(e.getAttribute("href")))
+    .every((a) => a.getAttribute("rel") === "noopener noreferrer"));
+  // Без поля и с пустым списком — блока нет.
+  for (const ответ of [БРЕНД, { ...БРЕНД, subsuppliers: [] }]) {
+    const без = await открыть({ hash: "#brand=kelton", ответ: () => [200, ответ] });
+    assert.equal(по_классу(без.card, "subs").length, 0);
+  }
+});
+
 test("карточка поставщика: без имени — «имя не известно», Битрикс и прежний раздел", async () => {
   const env = await открыть({ hash: "#supplier=KV-S-000011-1", ответ: () => [200, ПОСТАВЩИК] });
   assert.deepEqual(env.запросы, ["/api/portal/supplier?s=KV-S-000011-1"]);
