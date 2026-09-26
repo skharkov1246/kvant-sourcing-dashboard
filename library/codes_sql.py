@@ -1285,6 +1285,50 @@ UNIT_SET = ("компл", "комплект", "комплекта", "кт", "set
 UNIT_M = ("м", "метр", "метра", "метров", "m", "mtr")
 NO_UNIT = "(не указана)"
 
+# СВЕДЕНИЕ ЕДИНИЦЫ — ОДНО ПРАВИЛО НА SQL /brands И PYTHON /nomenclature.
+# Ревизия 26.09.2026: страница номенклатуры звала «сравнимыми» цену за штуку и
+# цену за комплект, а /brands их различала — два правила об одном. Теперь
+# написание сводится здесь: UNIT_KEY_SQL и unit_case_sql() собирают запрос,
+# единица_группа() повторяет их в Python из тех же констант, а совпадение на
+# одном корпусе проверяет tests/test_unit_rule.py (и на базе, когда она есть).
+# Ключ — нижний регистр без всего, кроме латиницы, кириллицы а–я и цифр.
+UNIT_KEY_RE = "[^a-zа-я0-9]"
+
+
+def unit_key_sql(col: str) -> str:
+    """Ключ написания единицы в SQL: пустой — null."""
+    return f"nullif(regexp_replace(lower(btrim({col})), '{UNIT_KEY_RE}', '', 'g'), '')"
+
+
+def unit_case_sql(k: str) -> str:
+    """Ключ написания → единица группы (шт, компл, м, иначе сам ключ)."""
+    return (f"case when {k} is null then {q(NO_UNIT)}\n"
+            f"                when {k} in ({_in(UNIT_SHT)}) then 'шт'\n"
+            f"                when {k} in ({_in(UNIT_SET)}) then 'компл'\n"
+            f"                when {k} in ({_in(UNIT_M)}) then 'м'\n"
+            f"                else {k} end")
+
+
+def единица_ключ(написание) -> str | None:
+    """Python-двойник unit_key_sql: тот же ключ из тех же знаков."""
+    if написание is None:
+        return None
+    return re.sub(UNIT_KEY_RE, "", str(написание).strip().lower()) or None
+
+
+def единица_группа(написание) -> str:
+    """Python-двойник unit_case_sql(unit_key_sql(…)): «pcs» и «шт.» — «шт»."""
+    k = единица_ключ(написание)
+    if k is None:
+        return NO_UNIT
+    if k in UNIT_SHT:
+        return "шт"
+    if k in UNIT_SET:
+        return "компл"
+    if k in UNIT_M:
+        return "м"
+    return k
+
 
 def _in(words: tuple[str, ...]) -> str:
     return ", ".join(q(w) for w in words)
@@ -1316,11 +1360,7 @@ PR_ALL = f"""\
            r.rfq_brands, r.source_url, r.review_id,
            coalesce(r.supplier, 'lib:' || p.supplier_id, '(не указан)')     as sup_group,
            coalesce(nullif(upper(btrim(r.currency)), ''), '(не названа)')  as cur,
-           case when u.k is null then {q(NO_UNIT)}
-                when u.k in ({_in(UNIT_SHT)}) then 'шт'
-                when u.k in ({_in(UNIT_SET)}) then 'компл'
-                when u.k in ({_in(UNIT_M)}) then 'м'
-                else u.k end                                               as unit,
+           {unit_case_sql("u.k")}                                               as unit,
            p.part_number, p.item_name, p.price,
            -- КОЛИЧЕСТВО, КОТОРОЕ НЕ ЧИТАЕТСЯ, В МОДУ/МИН/МАКС НЕ ИДЁТ: больше
            -- quotes.МАКС_КОЛИЧЕСТВО или «количество × цена ≠ сумма» (склейка
@@ -1361,8 +1401,7 @@ PR_ALL = f"""\
       from price_rows r
       join lib_prices p on p.id = r.id
      cross join lateral (
-           select nullif(regexp_replace(lower(btrim(p.qty_unit)), '[^a-zа-я0-9]', '', 'g'),
-                         '') as k,
+           select {unit_key_sql("p.qty_unit")} as k,
                   (to_jsonb(p) ->> 'total')::numeric as total) u
      where length(r.code) >= 2
   )"""
