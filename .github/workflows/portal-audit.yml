@@ -51,7 +51,7 @@ jobs:
     # (3000 блобов × 0,5 с) и остальные ключи.
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"

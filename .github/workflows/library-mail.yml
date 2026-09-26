@@ -120,7 +120,7 @@ jobs:
       mail_count: ${{ steps.plan.outputs.mail_count }}
       mail_bounds: ${{ steps.plan.outputs.mail_bounds }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -181,7 +181,7 @@ jobs:
         if: matrix.shard >= fromJSON(inputs.shards)
         run: echo "часть ${{ matrix.shard }} не нужна при ${{ inputs.shards }} частях"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: matrix.shard < fromJSON(inputs.shards)
       - uses: actions/setup-python@v6
         if: matrix.shard < fromJSON(inputs.shards)
@@ -290,7 +290,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
