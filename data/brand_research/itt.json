@@ -1,0 +1,791 @@
+{
+  "oem_key": "itt",
+  "name": "ITT (Goulds Pumps)",
+  "segment_focus": "насосы 3196 и 3700 API 610: номера уплотнений и подшипниковых узлов",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Проверена насосная часть ITT Goulds в заданном фокусе: ANSI-насос 3196 (i-FRAME, прежние ST/MT/LT/XLT) и API 610 OH2 3700/3700i. Коды подшипников взяты дословно из таблиц открытых руководств по монтажу и обслуживанию (IOM) изготовителя. Для 3196 i-FRAME это Table 21 «Bearing types» по рамам STi/MTi/LTi/XLT-i/i17, документ en-US.2011-04.IOM.3196.i-FRAME. Для 3700 это Table 4 «3700 bearings based on SKF / MRC designations» по группам SA…XXL, документ en_US.2012.02.IOM.3700. Уплотнение подшипникового узла у обеих машин — лабиринт INPRO VBXX-D (позиции 332A/333A у 3196, дефлекторы 123/123A у 3700), это подтверждают руководства и проспект. Номера ITT для лабиринтной пары 3196 LT (A00710A01/A00711A01) взяты со страницы продавца аналогов Mesco, где они даны как справочные номера OEM, и подтверждены скептиком на 3ppumps.com; пара для XLT (A00785A01/A00786A01) не подтверждена и вынесена в parts_rejected. Номера сервисных комплектов R196-… и их состав (лип-уплотнения 8690-…, шайба 8910-…) взяты с витрин складских остатков. Номера торцовых уплотнений и полные артикулы ITT для 3700 в открытом доступе не найдены. Источник IOM на сайте gouldspumps.com отдаёт страницу защиты от ботов, поэтому цитаты сняты с идентичных копий на сайте дистрибьютора ifcpump.com.",
+  "machines": [
+    {
+      "model": "3196 i-FRAME (рамы STi, MTi, LTi, XLT-i, i17)",
+      "kind": "центробежный консольный насос ANSI B73.1, химический/технологический",
+      "segment": "насос",
+      "rating": "до 7000 GPM (1590 м3/ч), напор до 730 ft (223 м), до 700°F (371°C), до 375 psig (26 бар)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+        "https://www.ifcpump.com/files/product/3196_i_FRAME_brochure.pdf",
+        "https://www.gouldspumps.com/products/3196-i-frame"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3196 ST / MT / LT / XLT (STX, MTX, LTX, XLTX) — исполнение до i-FRAME",
+      "kind": "центробежный консольный насос ANSI",
+      "segment": "насос",
+      "rating": "типоразмеры 1x1-1/2-6 … 3x4-8 и далее по группам ST/MT/LT/XLT",
+      "status": "снят, заменён i-FRAME (запчасти продаются)",
+      "sources": [
+        "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mk56/",
+        "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mkm8-no-gasket/",
+        "https://www.mescocorp.com/product/goulds-3196-xlt-2/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HT 3196 i-FRAME",
+      "kind": "высокотемпературный консольный насос ANSI",
+      "segment": "насос",
+      "status": "выпускается",
+      "sources": [
+        "https://www.ifcpump.com/files/product/ht-3196-iframe.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "LF 3196 i-FRAME",
+      "kind": "малорасходный консольный насос ANSI",
+      "segment": "насос",
+      "status": "выпускается",
+      "sources": [
+        "https://www.gouldspumps.com/getmedia/7583b539-1c4d-455c-8c2a-ebdb0f08eff9/IOM_LF3196i.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "NM 3196 i-FRAME",
+      "kind": "неметаллический (FRP) консольный насос ANSI",
+      "segment": "насос",
+      "status": "выпускается",
+      "sources": [
+        "https://www.manualslib.com/manual/3162345/Itt-Goulds-Pumps-Nm-3196-I-Frame.html"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "3196CC",
+      "kind": "консольный насос ANSI (исполнение CC)",
+      "segment": "насос",
+      "status": "не установлен",
+      "sources": [
+        "https://www.gouldspumps.com/getmedia/ab98b357-f966-468d-aee6-f58a578f1c0f/IOM_3196cc.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "3700 (API 610 8–11 изд., OH2)",
+      "kind": "центробежный консольный насос API 610 OH2 с опорами по оси",
+      "segment": "насос",
+      "rating": "до 8500 GPM (1930 м3/ч), до 800°F (425°C), до 870 psig (60 бар); группы рам SA, MA, SX, MX, LA, LX, XLA, XLX, XXL",
+      "status": "выпускался; в линейке изготовителя сейчас 3700i",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3700.pdf",
+        "https://www.ifcpump.com/files/product/3700_brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3700i (API 610 12 изд., OH2)",
+      "kind": "центробежный консольный насос API 610 OH2",
+      "segment": "насос",
+      "rating": "до 8500 GPM (1930 м3/ч), напор до 1200 ft (360 м), до 800°F (425°C), 870 psig (60 бар)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.gouldspumps.com/products/3700i",
+        "https://www.gouldspumps.com/getmedia/e1e87f4f-4eb3-4967-9c19-05adb39d3231/IOM_3700i.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3700LF / 3700LFi",
+      "kind": "малорасходное исполнение насоса API 610 OH2",
+      "segment": "насос",
+      "status": "выпускается",
+      "sources": [
+        "https://fischerprocess.com/wp-content/uploads/2023/08/Goulds_Pumps_3700LFI_brochure.pdf",
+        "https://www.lenntech.com/Data-sheets/Goulds-3700-L.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "3703",
+      "kind": "исполнение 3700 с традиционной схемой (опция по проспекту)",
+      "segment": "насос",
+      "status": "не установлен",
+      "sources": [
+        "https://www.lenntech.com/Data-sheets/Goulds-3700-L.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Installation, Operation, and Maintenance Manual Model 3196 i-FRAME",
+      "doc_no": "en-US.2011-04.IOM.3196.i-FRAME",
+      "machine": "3196 i-FRAME",
+      "kind": "O&M",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+        "https://www.gouldspumps.com/getmedia/62837e9b-ee18-46dd-87ba-c65f27d95ed3/IOM_3196i-FRAME.pdf"
+      ]
+    },
+    {
+      "title": "Installation, Operation, and Maintenance Manual HT 3196 i-FRAME",
+      "machine": "HT 3196 i-FRAME",
+      "kind": "O&M",
+      "sources": [
+        "https://www.ifcpump.com/files/product/ht-3196-iframe.pdf"
+      ]
+    },
+    {
+      "title": "Installation, Operation, and Maintenance Manual Model LF 3196 i-FRAME",
+      "machine": "LF 3196 i-FRAME",
+      "kind": "O&M",
+      "sources": [
+        "https://www.gouldspumps.com/getmedia/7583b539-1c4d-455c-8c2a-ebdb0f08eff9/IOM_LF3196i.pdf"
+      ]
+    },
+    {
+      "title": "Installation, Operation, and Maintenance Manual Model 3196CC",
+      "machine": "3196CC",
+      "kind": "O&M",
+      "sources": [
+        "https://www.gouldspumps.com/getmedia/ab98b357-f966-468d-aee6-f58a578f1c0f/IOM_3196cc.pdf"
+      ]
+    },
+    {
+      "title": "NM 3196 i-FRAME Installation, Operation and Maintenance Manual (копия)",
+      "machine": "NM 3196 i-FRAME",
+      "kind": "O&M",
+      "sources": [
+        "https://www.manualslib.com/manual/3162345/Itt-Goulds-Pumps-Nm-3196-I-Frame.html"
+      ]
+    },
+    {
+      "title": "Goulds model 3196 Kits (Maintenance Kit, Repair Kit, Shaft Kit, Power End Kit — состав по позициям)",
+      "doc_no": "P.3196Kit.en.US.2015-07",
+      "machine": "3196 i-FRAME",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.phoenixpumps.com/pdf/ITT_Goulds_3196_Service_Kits.pdf"
+      ]
+    },
+    {
+      "title": "3196 i-FRAME ANSI Process Pump — проспект с перечнем деталей и материалов",
+      "doc_no": "Form B3196i-FRAME 06/09",
+      "machine": "3196 i-FRAME",
+      "kind": "каталог/проспект",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3196_i_FRAME_brochure.pdf",
+        "https://www.gouldspumps.com/getmedia/43288e5d-6edf-444d-b553-1bcfb8db6805/B_3196i.pdf"
+      ]
+    },
+    {
+      "title": "Installation, Operation, and Maintenance Manual Model 3700, API Type OH2 / ISO 13709 / API 610 8th–11th Editions",
+      "doc_no": "en_US.2012.02.IOM.3700",
+      "machine": "3700",
+      "kind": "O&M",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3700.pdf",
+        "https://www.gouldspumps.com/getmedia/63bf9cf5-f878-4a12-9c94-08ebc37ae54d/IOM_3700.pdf"
+      ]
+    },
+    {
+      "title": "Manual de instalación, funcionamiento y mantenimiento 3700 (исп.)",
+      "machine": "3700",
+      "kind": "O&M",
+      "sources": [
+        "https://www.gouldspumps.com/getmedia/0b2e8c4d-a661-422a-a881-d50163dd1a08/IOM_3700_es_LA.pdf"
+      ]
+    },
+    {
+      "title": "Installation, Operation, and Maintenance Manual Model 3700i API610 / Type OH2",
+      "machine": "3700i",
+      "kind": "O&M",
+      "sources": [
+        "https://www.gouldspumps.com/getmedia/e1e87f4f-4eb3-4967-9c19-05adb39d3231/IOM_3700i.pdf"
+      ]
+    },
+    {
+      "title": "Goulds 3700 ISO 13709 2nd Edition / API 610 11th Edition — проспект",
+      "machine": "3700",
+      "kind": "каталог/проспект",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3700_brochure.pdf",
+        "https://www.gouldspumps.com/getmedia/3e1c8801-cd5c-452b-a21c-7afa9192c8aa/B_3700.pdf"
+      ]
+    },
+    {
+      "title": "Goulds 3700LFI API 610 11th Edition — проспект",
+      "machine": "3700LFi",
+      "kind": "каталог/проспект",
+      "sources": [
+        "https://fischerprocess.com/wp-content/uploads/2023/08/Goulds_Pumps_3700LFI_brochure.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "6207",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "радиальный однорядный шарикоподшипник, внутренний (inboard)",
+      "machine": "3196 i-FRAME, рама STi",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21 Bearing types",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "Table 21: Bearing types ... Frame Inboard bearing Double row Duplex STi 6207 3306 7306"
+    },
+    {
+      "code": "3306",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "двухрядный радиально-упорный шарикоподшипник, наружный (outboard), исполнение double row",
+      "machine": "3196 i-FRAME, рама STi",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "STi 6207 3306 7306"
+    },
+    {
+      "code": "7306",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "пара радиально-упорных шарикоподшипников, наружная опора, исполнение duplex",
+      "machine": "3196 i-FRAME, рама STi",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "STi 6207 3306 7306"
+    },
+    {
+      "code": "6309",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "радиальный шарикоподшипник, внутренний (inboard)",
+      "machine": "3196 i-FRAME, рама MTi",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "MTi 6309 3309 7309"
+    },
+    {
+      "code": "3309",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "двухрядный радиально-упорный шарикоподшипник, наружная опора",
+      "machine": "3196 i-FRAME, рама MTi",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "MTi 6309 3309 7309"
+    },
+    {
+      "code": "7309",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "пара радиально-упорных шарикоподшипников, наружная опора (duplex)",
+      "machine": "3196 i-FRAME, рама MTi",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "MTi 6309 3309 7309"
+    },
+    {
+      "code": "6311",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "радиальный шарикоподшипник, внутренний (inboard)",
+      "machine": "3196 i-FRAME, рама LTi",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "LTi 6311 Not applicable 7310"
+    },
+    {
+      "code": "7310",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "пара радиально-упорных шарикоподшипников спина к спине, наружная опора (у LTi только duplex)",
+      "machine": "3196 i-FRAME, рама LTi",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "LTi 6311 Not applicable 7310"
+    },
+    {
+      "code": "6313",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "радиальный шарикоподшипник, внутренний (inboard)",
+      "machine": "3196 i-FRAME, рамы XLT-i и i17",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "XLT-i, i17 6313 3313 7313"
+    },
+    {
+      "code": "3313",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "двухрядный радиально-упорный шарикоподшипник, наружная опора",
+      "machine": "3196 i-FRAME, рамы XLT-i и i17",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "XLT-i, i17 6313 3313 7313"
+    },
+    {
+      "code": "7313",
+      "issuer": "стандартное обозначение подшипника (ISO), указано Goulds",
+      "description": "пара радиально-упорных шарикоподшипников, наружная опора (duplex)",
+      "machine": "3196 i-FRAME, рамы XLT-i и i17",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Table 21",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "XLT-i, i17 6313 3313 7313"
+    },
+    {
+      "code": "6210 C3",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "радиальный шарикоподшипник, зазор C3, внутренняя опора",
+      "machine": "3700, группа SA",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "Table 4: 3700 bearings based on SKF / MRC designations Group Radial (inboard) Thrust (outboard) SA 6210 C3 7310 BEGAM"
+    },
+    {
+      "code": "7310 BEGAM",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "пара радиально-упорных шарикоподшипников, упорная (наружная) опора",
+      "machine": "3700, группа SA",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "SA 6210 C3 7310 BEGAM"
+    },
+    {
+      "code": "6211 C3",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "радиальный шарикоподшипник, зазор C3",
+      "machine": "3700, группа MA",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "MA 6211 C3 7311 BEGAM"
+    },
+    {
+      "code": "7311 BEGAM",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "пара радиально-упорных шарикоподшипников, упорная опора",
+      "machine": "3700, группа MA",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "MA 6211 C3 7311 BEGAM"
+    },
+    {
+      "code": "6212 C3",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "радиальный шарикоподшипник, зазор C3",
+      "machine": "3700, группа SX",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "SX 6212 C3 7312 BEGAM"
+    },
+    {
+      "code": "7312 BEGAM",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "пара радиально-упорных шарикоподшипников, упорная опора",
+      "machine": "3700, группы SX, MX, LA",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "SX 6212 C3 7312 BEGAM"
+    },
+    {
+      "code": "6213 C3",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "радиальный шарикоподшипник, зазор C3",
+      "machine": "3700, группы MX, LA",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "MX, LA 6213 C3 7312 BEGAM"
+    },
+    {
+      "code": "6215 C3",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "радиальный шарикоподшипник, зазор C3",
+      "machine": "3700, группы LX, XLA",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "LX, XLA 6215 C3 7313 BEGAM"
+    },
+    {
+      "code": "7313 BEGAM",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "пара радиально-упорных шарикоподшипников, упорная опора",
+      "machine": "3700, группы LX, XLA",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "LX, XLA 6215 C3 7313 BEGAM"
+    },
+    {
+      "code": "6218 C3",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "радиальный шарикоподшипник, зазор C3",
+      "machine": "3700, группа XLX",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "XLX 6218 C3 7317 BEGAM"
+    },
+    {
+      "code": "7317 BEGAM",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "пара радиально-упорных шарикоподшипников, упорная опора",
+      "machine": "3700, группа XLX",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "XLX 6218 C3 7317 BEGAM"
+    },
+    {
+      "code": "6220 C3",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "радиальный шарикоподшипник, зазор C3",
+      "machine": "3700, группа XXL",
+      "unit": "подшипниковый узел, радиальная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "XXL 6220 C3 7318 BEGAM"
+    },
+    {
+      "code": "7318 BEGAM",
+      "issuer": "SKF / MRC (обозначение по таблице Goulds)",
+      "description": "пара радиально-упорных шарикоподшипников, упорная опора",
+      "machine": "3700, группа XXL",
+      "unit": "подшипниковый узел, упорная опора",
+      "doc_ref": "en_US.2012.02.IOM.3700, Table 4",
+      "source_url": "https://www.ifcpump.com/files/product/3700.pdf",
+      "quote": "XXL 6220 C3 7318 BEGAM"
+    },
+    {
+      "code": "A00710A01",
+      "issuer": "ITT Goulds (номер OEM приведён продавцом аналога «для справки»)",
+      "description": "лабиринтное уплотнение подшипникового узла (одно из пары inboard/outboard)",
+      "machine": "3196 LT/LTX",
+      "unit": "подшипниковый узел, лабиринтное уплотнение",
+      "doc_ref": "Mesco LSK01-LT; страница Mesco при проверке недоступна (connection reset, 503), код подтверждён скептиком на 3ppumps.com/types/bearing-isolator/",
+      "source_url": "https://www.mescocorp.com/product/goulds-3196-mt-bearing-isolator/",
+      "quote": "FOR GOULDS 3196 LT/LTX PUMPS MATERIALS: BRONZE & VITON O-RINGS SET INCLUDES: INBOARD & OUTBOARD LABYRINTH SEALS OEM NAME AND # USED FOR REFERENCE PURPOSES ONLY: GOULDS A00710A01, A00711A01"
+    },
+    {
+      "code": "A00711A01",
+      "issuer": "ITT Goulds (номер OEM приведён продавцом аналога «для справки»)",
+      "description": "лабиринтное уплотнение подшипникового узла (второе из пары)",
+      "machine": "3196 LT/LTX",
+      "unit": "подшипниковый узел, лабиринтное уплотнение",
+      "doc_ref": "Mesco LSK01-LT; страница Mesco при проверке недоступна (connection reset, 503), код подтверждён скептиком на 3ppumps.com/types/bearing-isolator/",
+      "source_url": "https://www.mescocorp.com/product/goulds-3196-mt-bearing-isolator/",
+      "quote": "OEM NAME AND # USED FOR REFERENCE PURPOSES ONLY: GOULDS A00710A01, A00711A01"
+    },
+    {
+      "code": "R196-MKS6",
+      "issuer": "ITT Goulds",
+      "description": "комплект для ТО (maintenance kit), 6 дюймов, группа ST",
+      "machine": "3196 ST 1x1-1/2-6, 1-1/2x3-6, 2x3-6; 3996 ST",
+      "unit": "комплект ТО: лип-уплотнения, шайба, кольца, прокладка",
+      "doc_ref": "витрина складских остатков GPM Surplus; в адресе страницы опечатка «mk56», на самой странице код R196-MKS6",
+      "source_url": "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mk56/",
+      "quote": "Manufacturer: Goulds Model#: R196-MKS6 Manufacture Date: 3/09/90 Size: 6 INCH GRP : ST For Use With: Model: 3196 ST Sizes: 1×1-1/2-6; 1-1/2×3-6; 2×3-6"
+    },
+    {
+      "code": "R196-MKM6",
+      "issuer": "ITT Goulds",
+      "description": "комплект для ТО, 6 дюймов, группа MT",
+      "machine": "3196 MT 2x3-6",
+      "unit": "комплект ТО",
+      "doc_ref": "витрина складских остатков GPM Surplus",
+      "source_url": "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mkm6/",
+      "quote": "Manufacturer: Goulds Model/Part#: R196-MKM6 Manufacture Date: 3/04/91 Size: 6 INCH GRP : MT For Use With: Model: 3196 MT Sizes: 2×3-6"
+    },
+    {
+      "code": "R196-MKM8",
+      "issuer": "ITT Goulds",
+      "description": "комплект для ТО, 8 дюймов, группа MT",
+      "machine": "3196 MT, MTX 2x3-8, 3x4-8, 3x4-8G, 3x4-7",
+      "unit": "комплект ТО",
+      "doc_ref": "витрина складских остатков GPM Surplus",
+      "source_url": "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mkm8-no-gasket/",
+      "quote": "Manufacturer: Goulds Model#: R196-MKM8 Condition: Used Size: 8 INCH GRP : MT For Use With: Model: 3196 MT, MTX Sizes: 2×3-8, 3×4-8, 3×4-8G, 3×4-7"
+    },
+    {
+      "code": "R196-MKM10Z",
+      "issuer": "ITT Goulds",
+      "description": "комплект для ТО",
+      "machine": "3196 MTX",
+      "unit": "комплект ТО",
+      "doc_ref": "витрина PLC Source",
+      "source_url": "https://www.plcsource.com/shop/goulds-pumps-r196-mkm10z-maintenance-repair-kit-3196-mtx-b459/",
+      "quote": "GOULDS PUMPS R196-MKM10Z MAINTENANCE REPAIR KIT 3196 MTX (B459)"
+    },
+    {
+      "code": "R196MTPRKO",
+      "issuer": "ITT Goulds",
+      "description": "ремонтный комплект (rebuild kit)",
+      "machine": "3196 MT, MTX 7, 8, 10, 13 дюймов",
+      "unit": "ремонтный комплект силовой части",
+      "doc_ref": "витрина складских остатков GPM Surplus",
+      "source_url": "https://gpmsurplus.com/product/goulds-pumps-r196mtprko-condesate-hotwell-pump-rebuild-kit/",
+      "quote": "Manufacturer : Goulds Pumps Model/Part # : R196MTPRKO Condition : New Surplus Type: Condensate Hotwell Pump Rebuild Kit"
+    },
+    {
+      "code": "8690-11220",
+      "issuer": "не установлен (номер детали в составе комплекта Goulds)",
+      "description": "лип-уплотнение подшипникового узла",
+      "machine": "3196 MT, MTX (комплекты R196-MKM6, R196-MKM8)",
+      "unit": "подшипниковый узел, манжетное уплотнение",
+      "doc_ref": "состав R196-MKM8",
+      "source_url": "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mkm8-no-gasket/",
+      "quote": "Includes: Lip Seal 8690-11220 Lip Seal 8690-17645 Gasket 73078 5130 0001 Lockwasher 8910-009"
+    },
+    {
+      "code": "8690-17645",
+      "issuer": "не установлен (номер детали в составе комплекта Goulds)",
+      "description": "лип-уплотнение подшипникового узла",
+      "machine": "3196 MT, MTX (комплекты R196-MKM6, R196-MKM8)",
+      "unit": "подшипниковый узел, манжетное уплотнение",
+      "doc_ref": "состав R196-MKM8",
+      "source_url": "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mkm8-no-gasket/",
+      "quote": "Includes: Lip Seal 8690-11220 Lip Seal 8690-17645 Gasket 73078 5130 0001 Lockwasher 8910-009"
+    },
+    {
+      "code": "8690-63447",
+      "issuer": "не установлен (номер детали в составе комплекта Goulds)",
+      "description": "лип-уплотнение подшипникового узла",
+      "machine": "3196 ST (комплект R196-MKS6)",
+      "unit": "подшипниковый узел, манжетное уплотнение",
+      "doc_ref": "состав R196-MKS6",
+      "source_url": "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mk56/",
+      "quote": "Includes: Lip Seal 8690-63447 Lip Seal 8690-13535 Bearing Lockwasher 8910-0006 O-Ring 70721-137 O-Ring 70721-144 Gasket 70782-81-5127-0006"
+    },
+    {
+      "code": "8690-13535",
+      "issuer": "не установлен (номер детали в составе комплекта Goulds)",
+      "description": "лип-уплотнение подшипникового узла",
+      "machine": "3196 ST (комплект R196-MKS6)",
+      "unit": "подшипниковый узел, манжетное уплотнение",
+      "doc_ref": "состав R196-MKS6",
+      "source_url": "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mk56/",
+      "quote": "Includes: Lip Seal 8690-63447 Lip Seal 8690-13535 Bearing Lockwasher 8910-0006"
+    },
+    {
+      "code": "8910-0006",
+      "issuer": "не установлен (номер детали в составе комплекта Goulds)",
+      "description": "стопорная шайба подшипника (bearing lockwasher)",
+      "machine": "3196 ST (комплект R196-MKS6)",
+      "unit": "подшипниковый узел, крепление упорного подшипника",
+      "doc_ref": "состав R196-MKS6",
+      "source_url": "https://gpmsurplus.com/product/goulds-maintenance-repair-kit-r196-mk56/",
+      "quote": "Lip Seal 8690-13535 Bearing Lockwasher 8910-0006 O-Ring 70721-137"
+    },
+    {
+      "code": "LGMT 2",
+      "issuer": "SKF (смазка, допущена Goulds)",
+      "description": "пластичная смазка NLGI 2 для подшипников при температуре перекачиваемой среды ниже 350°F",
+      "machine": "3196 i-FRAME (исполнение с консистентной смазкой)",
+      "unit": "подшипниковый узел, смазка",
+      "doc_ref": "en-US.2011-04.IOM.3196.i-FRAME, Grease recommendations",
+      "source_url": "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+      "quote": "Exxon Unirex N2 Unirex N3 ... SKF LGMT 2 LGMT 3"
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "A00786A01",
+      "verdict": "источник недоступен",
+      "reason": "mescocorp.com рвёт соединение (curl reset, WebFetch 503). Поиск по сайту Mesco на A00786A01 выдаёт товар «Goulds 3196 XLT Bronze Labyrinth Seal Set», но текст с кодом на открытой странице не виден. Второй открытой страницы с этим кодом не нашлось: 3ppumps по XLT отдаёт 404"
+    },
+    {
+      "code": "A00785A01",
+      "verdict": "источник недоступен",
+      "reason": "То же, что у A00786A01: страница Mesco не открывается, в выдаче поиска код стоит только в сниппетах Mesco и 3ppumps, а сами страницы 3ppumps по XLT отдают 404"
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "Inpro/Seal",
+      "component": "лабиринтные уплотнения подшипникового узла VBXX-D (позиции 332A наружное, 333A внутреннее)",
+      "machine": "3196 i-FRAME",
+      "evidence": "в перечне деталей проспекта: «332A INPRO ® VB-XX-D Labyrinth Oil Seal (Outboard)», «333A INPRO ® VB-XX-D Labyrinth Oil Seal (Inboard)»; в IOM есть раздел «INPRO labyrinth oil seal description»; в листовке комплектов: «SEAL,LABY INBOARD (VBXX-D)»",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3196_i_FRAME_brochure.pdf",
+        "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+        "https://www.phoenixpumps.com/pdf/ITT_Goulds_3196_Service_Kits.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Inpro/Seal",
+      "component": "радиальный (123) и упорный (123A) дефлекторы INPRO подшипникового корпуса",
+      "machine": "3700",
+      "evidence": "в IOM 3700, в перечне запчастей для ответственных применений: «Radial INPRO seal (123)», «Thrust INPRO (123A)»; в проспекте 3700LFi упомянуты гибридные лабиринтные уплотнения INPRO VBXX-D",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3700.pdf",
+        "https://fischerprocess.com/wp-content/uploads/2023/08/Goulds_Pumps_3700LFI_brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "SKF / MRC",
+      "component": "подшипники качения радиальной и упорной опор (обозначения таблицы замены)",
+      "machine": "3700",
+      "evidence": "в IOM 3700 заголовок таблицы: «Table 4: 3700 bearings based on SKF / MRC designations» и оговорка «Replacement bearings must be the same as, or equivalent to, those listed in this table». Поставщик на заводской сборке этим не доказан",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3700.pdf"
+      ],
+      "verified": false
+    },
+    {
+      "company": "ITT (собственная разработка)",
+      "component": "монитор состояния i-ALERT, позиция 761B (вибрация и температура силовой части)",
+      "machine": "3196 i-FRAME",
+      "evidence": "в IOM: раздел «General description i-ALERT™ Condition Monitor»; в перечне комплекта Power End: «761B CONDITION MONITOR - i ALERT»",
+      "sources": [
+        "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf",
+        "https://www.phoenixpumps.com/pdf/ITT_Goulds_3196_Service_Kits.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Chesterton",
+      "component": "картриджные торцовые уплотнения и датчики Chesterton Connect (как опция дистрибьютора)",
+      "machine": "3700i",
+      "evidence": "указано только на странице дистрибьютора Phoenix Pumps, на страницах изготовителя не подтверждено",
+      "sources": [
+        "https://www.phoenixpumps.com/goulds-pumps-itt-3700i-single-stage-overhung-process-pump_8_1238_1302.html"
+      ],
+      "verified": false
+    }
+  ],
+  "dealers": [
+    {
+      "company": "ITT Saudi Company (завод и сервисный центр ITT Industrial Process, Даммам)",
+      "country": "Саудовская Аравия",
+      "role": "изготовитель: производство насосов API 610 и сервис",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/216228/000021622814000008/exhibit21.htm",
+        "https://www.turbomachinerymag.com/view/itt-invests-25m-to-expand-pump-engineering-manufacturing-site-in-saudi-arabia"
+      ]
+    },
+    {
+      "company": "ITT Corporation India Pvt. Ltd. (площадка Industrial Process, Вадодара)",
+      "country": "Индия",
+      "role": "изготовитель: производство и испытания насосов",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/216228/000021622814000008/exhibit21.htm",
+        "https://www.itt.com/newsroom/news-releases/2024/itt-announces-investment-for-expanded-pump-testing-capabilities"
+      ]
+    },
+    {
+      "company": "Shanghai Goulds Pumps Co. Ltd.",
+      "country": "Китай",
+      "role": "дочерняя компания ITT (по перечню дочерних обществ 2014 г.)",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/216228/000021622814000008/exhibit21.htm"
+      ]
+    },
+    {
+      "company": "Dubai Branch of ITT Fluid Technology International, Inc.",
+      "country": "ОАЭ",
+      "role": "отделение ITT (по перечню дочерних обществ 2014 г.)",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/216228/000021622814000008/exhibit21.htm"
+      ]
+    },
+    {
+      "company": "ITT Industries Rus LLC",
+      "country": "Россия",
+      "role": "дочернее общество ITT по перечню 2014 г.; нынешний статус не проверен",
+      "sources": [
+        "https://www.sec.gov/Archives/edgar/data/216228/000021622814000008/exhibit21.htm"
+      ]
+    },
+    {
+      "company": "Далкос",
+      "country": "Россия",
+      "role": "перепродавец насосов и запчастей Goulds (в том числе HT 3196 i-FRAME), не официальный дилер",
+      "sources": [
+        "https://dalkos.ru/catalog/nasosy-i-nasosnye-stantsii/tsentrobezhnye-nasosy/nasosy-goulds-pumps/goulds-pumps-ht-3196-i-frame-/"
+      ]
+    },
+    {
+      "company": "Alforest",
+      "country": "Россия",
+      "role": "перепродавец комплектующих Goulds Pumps",
+      "sources": [
+        "https://alforest.ru/goulds-pumps-brand-of-itt"
+      ]
+    },
+    {
+      "company": "Phoenix Pumps",
+      "country": "США",
+      "role": "дистрибьютор и заводской авторизованный сервисный центр ITT Goulds (Аризона, Нью-Мексико)",
+      "sources": [
+        "https://www.phoenixpumps.com/itt-goulds-pumps-repair-services.html"
+      ]
+    },
+    {
+      "company": "Industrial Fluid Consultants (IFC)",
+      "country": "США",
+      "role": "дистрибьютор Goulds; выкладывает IOM и проспекты",
+      "sources": [
+        "https://www.ifcpump.com/product/goulds-3196-i-frame"
+      ]
+    },
+    {
+      "company": "Fischer Process Industries",
+      "country": "США",
+      "role": "дистрибьютор ITT Goulds",
+      "sources": [
+        "https://fischerprocess.com/industrial-distributor-supplier-itt-goulds-pumps/"
+      ]
+    },
+    {
+      "company": "Hayes Pump",
+      "country": "США",
+      "role": "авторизованный дистрибьютор насосов и запчастей ITT Goulds",
+      "sources": [
+        "https://shop.hayespump.com/brandsupplier/itt-goulds-pumps"
+      ]
+    },
+    {
+      "company": "Mesco Corporation",
+      "country": "США",
+      "role": "изготовитель неоригинальных (aftermarket) лабиринтных уплотнений и ремкомплектов для 3196",
+      "sources": [
+        "https://www.mescocorp.com/product/goulds-3196-xlt-2/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Артикулы ITT для торцовых (механических) уплотнений 3196 и 3700 (позиция 383, картриджное уплотнение по API 682) в открытых источниках не найдены. Уплотнение подбирается под заказ; номера есть в паспорте конкретного насоса у ITT PRO Services и у дистрибьютора, их запрашивают по серийному номеру.",
+    "Номера лабиринтных пар ITT для рам 3196 STi/MTi (i-FRAME) не подтверждены. В выдаче поисковика у Mesco LSK01-ST стоят A04951A127/A04951A128, но страница не открылась (503), поэтому в parts эти номера не внесены.",
+    "Номера комплектов ТО и ремонта для i-FRAME (R196-MKS6Z, R196-MKM8Z, R196-MKM13Z) видны только в объявлениях eBay и NRI Parts. eBay закрыт для чтения (403), состав комплектов с буквой Z не подтверждён. Листовка изготовителя P.3196Kit.en.US.2015-07 даёт состав по позициям, но без номеров комплектов.",
+    "Для 3700 номера ITT для дефлекторов INPRO 123/123A, масляных колец 114, колец износа 164/202/203/230 и прокладки корпуса 351 не найдены. Ведомость запчастей с номерами выдаётся с заказом (Parts List по серийному номеру).",
+    "На eBay есть номер Goulds A07735A03 (Inpro 1901-Z7-22203-5, отверстие 3.938, вал 2.062), но модель насоса в объявлении не названа. В parts номер не внесён до привязки к машине.",
+    "Таблица подшипников в IOM 3700i (12-е изд. API 610) не прочитана: gouldspumps.com отдаёт страницу защиты от ботов. Нужно сверить, совпадают ли обозначения с таблицей 3700 (7310 BEGAM и далее).",
+    "Официальных дилеров в России, Турции и Китае по списку изготовителя установить не удалось: страница поиска дистрибьюторов gouldspumps.com/distributors динамическая. Российские продавцы в списке — перепродавцы, а статус ITT Industries Rus после 2022 г. не проверен.",
+    "Полные IOM сняты с копий на ifcpump.com, потому что оригинальные ссылки gouldspumps.com/getmedia закрыты от автоматического скачивания. Текст документа совпадает по номеру публикации."
+  ],
+  "verifier_notes": "Источники скачаны заново (PDF через pdftotext, HTML-страницы). mescocorp.com недоступен (connection reset, 503). A00710A01 и A00711A01 подтверждены через 3ppumps.com/types/bearing-isolator/. A00786A01 и A00785A01 не подтверждены ни на одной открытой странице. Ссылка gouldspumps.com/en-US/Products/LF-3196-i-FRAME/ отдаёт 404, её надо заменить на IOM. У R196-MKS6 в адресе стоит «mk56», но на странице код R196-MKS6.",
+  "corrections": [
+    "LF 3196 i-FRAME: ссылка gouldspumps.com/en-US/Products/LF-3196-i-FRAME/ отдаёт 404 — убрана, источником оставлено IOM LF 3196 — замечание скептика",
+    "A00710A01, A00711A01: в doc_ref записано, что страница Mesco недоступна и код подтверждён на 3ppumps.com/types/bearing-isolator/ — замечание скептика",
+    "R196-MKS6: в doc_ref отмечена опечатка «mk56» в адресе страницы при коде R196-MKS6 на странице — замечание скептика",
+    "summary: пара XLT A00785A01/A00786A01 больше не называется найденной — она в parts_rejected (замечание скептика)",
+    "sub_suppliers: SKF / MRC и Chesterton помечены verified=false — поставка на заводской сборке не доказана, Chesterton назван только дистрибьютором; Inpro/Seal и i-ALERT сверены по IOM и проспекту — verified=true"
+  ]
+}
