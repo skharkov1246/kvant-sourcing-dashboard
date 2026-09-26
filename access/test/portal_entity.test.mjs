@@ -467,3 +467,60 @@ test("карточка бренда: владение из brands:owners:v1, б�
     assert.ok(!("ownership" in v));
   });
 });
+
+// Субпоставщики бренда (library/brands.КЛЮЧ_СУБПОСТАВЩИКОВ): воркер подмешивает
+// их в карточку бренда из маленького ключа KV полем subsuppliers. Нет ключа,
+// битый, не той версии — ответ прежний; строка без компании, узла или
+// источника http(s) не идёт, лишние поля отсекаются.
+test("карточка бренда: субпоставщики из brands:subs:v1, без ключа — ответ прежний", async () => {
+  const бренд = { key: "velmora", name: "Velmora Turbines", country: null, owner: null, former_names: null,
+    spellings: [], demand: { rows: 1, deals: 1, codes: 1, capped: false, registry_rows: 1 },
+    codes_demand: [], codes_offers: [], offers: { rows: 0, capped: false, suppliers: 0, rows_unresolved: 0 },
+    catalog: { parts: 0, list: [] }, machines: [], suppliers: [], analogs: [], registry: true, partial: [] };
+  const ИСТ = "https://example.invalid/spec";
+  const ключ = { version: 1, published_at: "2026-09-26T00:00:00Z", brands: {
+    velmora: [
+      { name: "Искрон", unit: "Свечи зажигания", m: "VT-10", src: [ИСТ, "javascript:alert(1)"], by: "разведка",
+        e: "KV-S-000101-1", emails: ["nobody@example.test"] },
+      { name: "Форсунов", unit: "Форсунки", src: [ИСТ], by: "сверка а", e: "не номер" },
+      { name: "Без Источника", unit: "Корпус", src: ["ftp://example.invalid/x"], by: "разведка" },
+      { name: "", unit: "Лопатки", src: [ИСТ], by: "разведка" }],
+    ombra: [{ name: "Без Источника", unit: "Корпус", src: [], by: "разведка" }] } };
+  const карточка = async (env, b = "velmora", ответ = бренд) => сетью(ответ, async () => {
+    const r = await call(env, "/api/portal/brand?b=" + b, READER);
+    assert.equal(r.status, 200);
+    return r.json();
+  });
+  const новая = () => envFor({ SUPABASE_SERVICE_KEY: "sb_secret_TESTKEYTESTKEY" });
+  const без = await карточка(новая());
+  assert.ok(!("subsuppliers" in без));
+  for (const raw of ["{not json", JSON.stringify({ version: 2, brands: ключ.brands }), "x".repeat(300 * 1024)]) {
+    const env = новая();
+    env.ACL.box.set("brands:subs:v1", raw);
+    assert.deepEqual(await карточка(env), без);
+  }
+  const env = новая();
+  env.ACL.box.set("brands:subs:v1", JSON.stringify(ключ));
+  const с = await карточка(env);
+  const { subsuppliers, ...остальное } = с;
+  assert.deepEqual(остальное, без);
+  assert.deepEqual(subsuppliers, [
+    { name: "Искрон", unit: "Свечи зажигания", m: "VT-10", src: [ИСТ], by: "разведка", e: "KV-S-000101-1" },
+    { name: "Форсунов", unit: "Форсунки", m: null, src: [ИСТ], by: "сверка а", e: null }]);
+  const текст = JSON.stringify(с);
+  for (const secret of ["nobody@example.test", "emails", "javascript", "ftp:", "Лопатки"]) assert.ok(!текст.includes(secret), secret);
+  // Все строки без источника — поля нет.
+  const ombra = await карточка(env, "ombra", { ...бренд, key: "ombra", name: "Ombra" });
+  assert.ok(!("subsuppliers" in ombra));
+  // Ключ читается один раз; владение и субпоставщики — разными ключами.
+  let чтений = 0;
+  const get = env.ACL.get;
+  env.ACL.get = async (key, o) => { if (key === "brands:subs:v1") чтений++; return get(key, o); };
+  await карточка(env);
+  assert.equal(чтений, 0);
+  assert.ok(!("ownership" in с));
+  await сетью(КОД, async () => {
+    const v = await (await call(env, "/api/portal/code?k=kl7", READER)).json();
+    assert.ok(!("subsuppliers" in v));
+  });
+});

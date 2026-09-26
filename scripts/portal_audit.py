@@ -13,7 +13,7 @@
   · /suppliers    — suppliers:v1 и котировки crossref:v1 + crossref:list:00..07;
   · /nomenclature — crossref:v1, части списка, корзины crossref:offers:00..31;
   · /brands       — brands:v1, brands:links:v1, brands:pairs:v1, brands:codes:00..15
-                    (и brands:owners:v1 из того же списка);
+                    (и brands:owners:v1, brands:subs:v1 из того же списка);
   · /counters     — counters:v1;
   · /library      — library:v2:current и блобы ревизии (обход деревьев catalog и
                     directory, как у scripts/publish_library_v2.py);
@@ -1987,6 +1987,7 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
     "b.registry": "бренд: реестр — checked > parts или имя-ключ",
     "b.card": "бренд: элемент карточки не из списка элементов или не число",
     "b.own_link": "бренд: владение ссылается на ключ, которого нет в снимке, связь без имени или бренд владеет сам собой",
+    "b.subs": "бренд: субпоставщик без источника http(s), без компании или узла, не из подтверждённых записей или разошёлся с brands:subs:v1",
     "b.cloud_nomark": "облако: слово — не марка (пометка nb, служебное слово, страна) или ведёт не на бренд",
     "b.cloud_dup": "облако: ключ в двух словах, одно имя у двух слов или сведённый ключ стоит своим словом",
     "b.cloud_lost": "облако: бренд словаря без пометки не попал ни в одно слово",
@@ -2096,7 +2097,10 @@ def _развернуть(список, номера) -> list:
     return [список[i] if целое(i) and 0 <= i < len(список) else None for i in номера]
 
 
-def ревизия_брендов(с: Снимки, сейчас) -> Вкладка:
+def ревизия_брендов(с: Снимки, сейчас, подтверждённые=None) -> Вкладка:
+    """подтверждённые — {(ключ компании, узел)} из файлов разведки и сверки
+    (подтверждённые_субпоставщики); None — сверки с файлами нет, остальные
+    признаки субпоставщика проверяются."""
     т = Вкладка("brands", "Бренды и коды (/brands)", ПРОВЕРКИ_БРЕНДОВ, ПОЛЬЗА_БРЕНДОВ)
     bv = с.json(brands.КЛЮЧ)
     т.снимок(brands.КЛЮЧ, с, сейчас, (bv or {}).get("published_at"))
@@ -2172,6 +2176,8 @@ def ревизия_брендов(с: Снимки, сейчас) -> Вклад�
 
     # Бренды.
     ключи_брендов = {b.get("k") for b in бренды_}
+    subs_v = с.json(brands.КЛЮЧ_СУБПОСТАВЩИКОВ)
+    subs_kv = subs_v.get("brands") if isinstance(subs_v, dict) else None
     сколько_k = collections.Counter(b.get("k") for b in бренды_)
     имена = collections.defaultdict(set)
     for b in бренды_:
@@ -2301,6 +2307,12 @@ def ревизия_брендов(с: Снимки, сейчас) -> Вклад�
                                      for x in связи_владения)
                    or any(not (x.get("name") or x.get("series")) for x in связи_владения)
                    or (isinstance(own.get("o"), dict) and own["o"].get("c") == b.get("k")))
+        # Субпоставщики (library/brands.субпоставщики): на карточке — только
+        # подтверждённая запись с источником, и ключ /p показывает то же самое.
+        subs = b.get("subs")
+        if isinstance(subs, list) and subs:
+            т.счёт("b.subs", any(not субпоставщик_годен(x, подтверждённые) for x in subs)
+                   or (isinstance(subs_kv, dict) and subs_kv.get(b.get("k")) != subs))
     # Облако (library/brands.облако): в нём только марки, одна марка — одно слово.
     слова_облака = [s for s in ((bv or {}).get("cloud") or []) if isinstance(s, dict)]
     if слова_облака:
@@ -3673,19 +3685,60 @@ def ревизия_словаря(словарь, корень: Path = ROOT) -> 
 
 # ── Прогон ───────────────────────────────────────────────────────────────────
 
+def _пара_субпоставщика(компания, узел) -> tuple[str, str]:
+    return (codes_sql.ключ_написания(компания or ""),
+            re.sub(r"\s+", " ", str(узел or "")).strip().casefold())
+
+
+def подтверждённые_субпоставщики(корень: Path = ROOT) -> set[tuple[str, str]]:
+    """Пары (ключ компании, узел) подтверждённых записей — своим чтением файлов,
+    а не сборщиком снимка (эталон не производный от правила): разведка —
+    verified: true, сверка — любая запись."""
+    out = set()
+    сверка = корень / brands.ФАЙЛ_СВЕРКИ_СУБПОСТАВЩИКОВ
+    if сверка.is_file():
+        for r in (json.loads(сверка.read_text(encoding="utf-8")) or {}).get("records") or []:
+            if isinstance(r, dict):
+                out.add(_пара_субпоставщика(r.get("company"), r.get("component")))
+    for файл in sorted((корень / brands.ПАПКА_РАЗВЕДКИ).glob("*.json")):
+        д = json.loads(файл.read_text(encoding="utf-8"))
+        for r in (д.get("sub_suppliers") or []) if isinstance(д, dict) else []:
+            if isinstance(r, dict) and r.get("verified") is True:
+                out.add(_пара_субпоставщика(r.get("company"), r.get("component")))
+    return out
+
+
+def субпоставщик_годен(x, подтверждённые=None) -> bool:
+    """Строка субпоставщика карточки: компания и узел есть, источник — http(s),
+    основание из закрытого списка, номер реестра — KV-S; при сверке с файлами —
+    пара «компания · узел» из подтверждённых записей."""
+    if not isinstance(x, dict) or not x.get("name") or not x.get("unit"):
+        return False
+    src = x.get("src")
+    if not isinstance(src, list) or not src or not all(
+            isinstance(u, str) and re.match(r"https?://\S+$", u) for u in src):
+        return False
+    if x.get("by") not in brands.ОСНОВАНИЯ_СУБПОСТАВЩИКА:
+        return False
+    if x.get("e") is not None and not re.fullmatch(r"KV-S-\d{6}-\d", str(x["e"])):
+        return False
+    return подтверждённые is None or _пара_субпоставщика(x["name"], x["unit"]) in подтверждённые
+
+
 def читать_словарь(путь: Path = ROOT / brands.ФАЙЛ_СЛОВАРЯ):
     return json.loads(путь.read_text(encoding="utf-8")) if путь.is_file() else None
 
 
 def ревизия(с: Снимки, сейчас, словарь=None, прошлые: Снимки | None = None, lib2=None,
-            только=None, страница_библиотеки: str | None = None) -> list[Вкладка]:
+            только=None, страница_библиотеки: str | None = None,
+            субпоставщики=None) -> list[Вкладка]:
     """Все вкладки по очереди. Упавшая вкладка не роняет остальные: вместо неё
     в итоге — пустая вкладка с пометкой «упала» и именем исключения (без данных).
     Ошибку чтения KV это не глотает: её тип — PublishError публикатора, и она
     поднимается дальше, потому что без снимков мерить нечего."""
     шаги = [("suppliers", "Поставщики (/suppliers)", lambda: ревизия_поставщиков(с, сейчас)),
             ("nomenclature", "Номенклатура (/nomenclature)", lambda: ревизия_номенклатуры(с, сейчас, прошлые, словарь)),
-            ("brands", "Бренды и коды (/brands)", lambda: ревизия_брендов(с, сейчас)),
+            ("brands", "Бренды и коды (/brands)", lambda: ревизия_брендов(с, сейчас, субпоставщики)),
             ("counters", "Счётчики (/counters)", lambda: ревизия_счётчиков(с, сейчас)),
             ("library", "Библиотека (/library)", lambda: ревизия_библиотеки(с, сейчас, словарь, lib2, страница_библиотеки)),
             ("dict", "Словарь брендов (dict/oem.json)", lambda: ревизия_словаря(словарь))]
@@ -3823,7 +3876,8 @@ def main(argv=None) -> int:
         прошлая = с.json(КЛЮЧ_РЕВИЗИИ)
         прошлые = Снимки(Папка(a.prev_dir)) if a.prev_dir else None
         только = set(a.only.split(",")) if a.only else None
-        вкладки = ревизия(с, сейчас, читать_словарь(), прошлые, только=только)
+        вкладки = ревизия(с, сейчас, читать_словарь(), прошлые, только=только,
+                          субпоставщики=подтверждённые_субпоставщики())
     except Exception as ошибка:  # noqa: BLE001 — наружу только код, без данных
         код = str(ошибка) if re.fullmatch(r"[A-Z_]+", str(ошибка)) else type(ошибка).__name__
         print(f"::error::ревизия не состоялась: {код}")

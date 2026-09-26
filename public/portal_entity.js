@@ -652,6 +652,31 @@
     return box.children.length ? box : null;
   }
 
+  // Кто делает узлы (library/brands.субпоставщики; воркер кладёт поле
+  // subsuppliers из ключа brands:subs:v1): подтверждённые субпоставщики.
+  // «Узел — Компания (машины) · источник» — те же строки, что на /brands.
+  // Компания из реестра — ссылкой на /suppliers#e=, источник — наружу, http(s).
+  function субпоставщики_бренда(список) {
+    список = (список || []).filter(function (x) {
+      return x && x.name && x.unit && (x.src || []).some(function (u) { return /^https?:\/\//.test(u); });
+    });
+    if (!список.length) return null;
+    var box = узел("div", "own subs");
+    box.appendChild(узел("h4", null, "Кто делает узлы"));
+    список.forEach(function (x) {
+      var p = узел("p");
+      p.appendChild(текст(x.unit + " — "));
+      p.appendChild(x.e && /^KV-S-/.test(x.e) ? ссылка("/suppliers#e=" + к(x.e), x.name) : текст(x.name));
+      if (x.m) p.appendChild(текст(" (" + x.m + ")"));
+      x.src.filter(function (u) { return /^https?:\/\//.test(u); }).forEach(function (u, i) {
+        p.appendChild(текст(" · "));
+        p.appendChild(наружу(u, i ? "источник " + (i + 1) : "источник"));
+      });
+      box.appendChild(p);
+    });
+    return box;
+  }
+
   function карточка_бренда(v) {
     var out = [];
     var свой = { key: v.key, name: v.name };
@@ -660,6 +685,8 @@
     out.push(шапка("Бренд", узел("h1", null, v.name), [подпись ? узел("p", "lead", подпись) : null]));
     var владение = владение_бренда(v.ownership);
     if (владение) out.push(владение);
+    var субпоставщики = субпоставщики_бренда(v.subsuppliers);
+    if (субпоставщики) out.push(субпоставщики);
     var d = v.demand || {};
     out.push(факты([
       ["Страна", v.country], ["Владелец", v.owner], ["Прежние имена", v.former_names],
