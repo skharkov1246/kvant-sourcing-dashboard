@@ -1,0 +1,3204 @@
+{
+ "описание": "Помесячные индексы потребительских цен по валютам цен: множитель индексации цены на инфляцию (library/inflation.py). Числа — ровно как у источника, без досчёта; месяца нет у источника — нет и здесь.",
+ "выбор_индекса": "ИПЦ (потребительские цены), а не ИЦП: ИЦП России и Китая — индексы всей промышленности с весом сырья и энергии, ходили на ±20 % в год вслед за нефтью и металлом; у Китая уровень ряда НБС не публикует ни для ИПЦ, ни для ИЦП; ИПЦ есть у всех пяти валют одним определением и почти не пересматривается. Для промышленных запчастей ИПЦ — приближение.",
+ "выгружено": "2026-09-26",
+ "база_разная": "У каждого ряда своя база; коэффициент — отношение двух точек ОДНОГО ряда, поэтому база не важна.",
+ "ряды": {
+  "RUB": {
+   "страна": "Россия",
+   "индекс": "ИПЦ, все товары и услуги (CPI, COICOP _T)",
+   "база": "2010A = 100",
+   "url": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+   "первоисточник": "Росстат",
+   "официальный": false,
+   "зеркало": "МВФ, набор CPI (IMF.STA:CPI) — Росстат недоступен из песочницы: rosstat.gov.ru/gks.ru не проходят проверку TLS, fedstat.ru — 403",
+   "первый_месяц": "2018-01",
+   "последний_месяц": "2026-07",
+   "точек": 103,
+   "точки": [
+    {
+     "месяц": "2018-01",
+     "значение": 170.1047,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-02",
+     "значение": 170.4619,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-03",
+     "значение": 170.9562,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-04",
+     "значение": 171.6059,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-05",
+     "значение": 172.258,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-06",
+     "значение": 173.102,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-07",
+     "значение": 173.5694,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-08",
+     "значение": 173.5868,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-09",
+     "значение": 173.8645,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-10",
+     "значение": 174.473,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-11",
+     "значение": 175.3454,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-12",
+     "значение": 176.8183,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-01",
+     "значение": 178.6042,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-02",
+     "значение": 179.39,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-03",
+     "значение": 179.9641,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-04",
+     "значение": 180.4898,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-05",
+     "значение": 181.1034,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-06",
+     "значение": 181.1759,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-07",
+     "значение": 181.5382,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-08",
+     "значение": 181.1025,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-09",
+     "значение": 180.8128,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-10",
+     "значение": 181.0478,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-11",
+     "значение": 181.5548,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-12",
+     "значение": 182.2084,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-01",
+     "значение": 182.9372,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-02",
+     "значение": 183.5409,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-03",
+     "значение": 184.5504,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-04",
+     "значение": 186.0821,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-05",
+     "значение": 186.5845,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-06",
+     "значение": 186.995,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-07",
+     "значение": 187.6495,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-08",
+     "значение": 187.5745,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-09",
+     "значение": 187.4432,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-10",
+     "значение": 188.2492,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-11",
+     "значение": 189.5857,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-12",
+     "значение": 191.1593,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-01",
+     "значение": 192.4401,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-02",
+     "значение": 193.9411,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-03",
+     "значение": 195.2211,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-04",
+     "значение": 196.3534,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-05",
+     "значение": 197.8064,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-06",
+     "значение": 199.1713,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-07",
+     "значение": 199.7887,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-08",
+     "значение": 200.1283,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-09",
+     "значение": 201.3291,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-10",
+     "значение": 203.5639,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-11",
+     "значение": 205.5181,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-12",
+     "значение": 207.2033,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-01",
+     "значение": 209.2546,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-02",
+     "значение": 211.7029,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-03",
+     "значение": 227.82,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-04",
+     "значение": 231.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-05",
+     "значение": 231.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-06",
+     "значение": 230.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-07",
+     "значение": 229.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-08",
+     "значение": 228.7,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-09",
+     "значение": 228.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-10",
+     "значение": 229.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-11",
+     "значение": 230.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-12",
+     "значение": 231.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-01",
+     "значение": 233.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-02",
+     "значение": 234.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-03",
+     "значение": 235.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-04",
+     "значение": 236.7,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-05",
+     "значение": 237.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-06",
+     "значение": 238.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-07",
+     "значение": 239.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-08",
+     "значение": 240.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-09",
+     "значение": 242.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-10",
+     "значение": 244.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-11",
+     "значение": 247.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-12",
+     "значение": 249.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-01",
+     "значение": 251.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-02",
+     "значение": 253.0,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-03",
+     "значение": 254.0,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-04",
+     "значение": 255.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-05",
+     "значение": 257.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-06",
+     "значение": 258.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-07",
+     "значение": 261.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-08",
+     "значение": 262.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-09",
+     "значение": 263.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-10",
+     "значение": 265.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-11",
+     "значение": 269.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-12",
+     "значение": 272.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-01",
+     "значение": 276.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-02",
+     "значение": 278.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-03",
+     "значение": 280.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-04",
+     "значение": 281.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-05",
+     "значение": 282.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-06",
+     "значение": 283.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-07",
+     "значение": 284.7,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-08",
+     "значение": 283.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-09",
+     "значение": 284.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-10",
+     "значение": 286.0,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-11",
+     "значение": 287.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-12",
+     "значение": 288.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-01",
+     "значение": 292.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-02",
+     "значение": 294.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-03",
+     "значение": 296.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-04",
+     "значение": 297.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-05",
+     "значение": 297.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-06",
+     "значение": 300.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-07",
+     "значение": 301.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/RUS.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    }
+   ]
+  },
+  "USD": {
+   "страна": "США",
+   "индекс": "CPI-U, U.S. city average, all items, без сезонной поправки (BLS CUUR0000SA0)",
+   "база": "1982-84 = 100",
+   "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+   "первоисточник": "U.S. BLS",
+   "официальный": false,
+   "зеркало": "FRED (ФРБ Сент-Луиса), ряд CPIAUCNS = BLS CUUR0000SA0 — bls.gov отвечает 403, API BLS без ключа исчерпал суточный лимит",
+   "сверка": {
+    "с_чем": "МВФ CPI USA",
+    "общих_месяцев": 103,
+    "наибольшее_расхождение_месячного_темпа": 0.0,
+    "месяц": "2019-02"
+   },
+   "первый_месяц": "2018-01",
+   "последний_месяц": "2026-08",
+   "точек": 103,
+   "точки": [
+    {
+     "месяц": "2018-01",
+     "значение": 247.867,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-02",
+     "значение": 248.991,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-03",
+     "значение": 249.554,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-04",
+     "значение": 250.546,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-05",
+     "значение": 251.588,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-06",
+     "значение": 251.989,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-07",
+     "значение": 252.006,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-08",
+     "значение": 252.146,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-09",
+     "значение": 252.439,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-10",
+     "значение": 252.885,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-11",
+     "значение": 252.038,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-12",
+     "значение": 251.233,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-01",
+     "значение": 251.712,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-02",
+     "значение": 252.776,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-03",
+     "значение": 254.202,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-04",
+     "значение": 255.548,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-05",
+     "значение": 256.092,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-06",
+     "значение": 256.143,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-07",
+     "значение": 256.571,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-08",
+     "значение": 256.558,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-09",
+     "значение": 256.759,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-10",
+     "значение": 257.346,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-11",
+     "значение": 257.208,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-12",
+     "значение": 256.974,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-01",
+     "значение": 257.971,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-02",
+     "значение": 258.678,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-03",
+     "значение": 258.115,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-04",
+     "значение": 256.389,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-05",
+     "значение": 256.394,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-06",
+     "значение": 257.797,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-07",
+     "значение": 259.101,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-08",
+     "значение": 259.918,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-09",
+     "значение": 260.28,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-10",
+     "значение": 260.388,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-11",
+     "значение": 260.229,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-12",
+     "значение": 260.474,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-01",
+     "значение": 261.582,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-02",
+     "значение": 263.014,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-03",
+     "значение": 264.877,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-04",
+     "значение": 267.054,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-05",
+     "значение": 269.195,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-06",
+     "значение": 271.696,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-07",
+     "значение": 273.003,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-08",
+     "значение": 273.567,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-09",
+     "значение": 274.31,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-10",
+     "значение": 276.589,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-11",
+     "значение": 277.948,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-12",
+     "значение": 278.802,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-01",
+     "значение": 281.148,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-02",
+     "значение": 283.716,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-03",
+     "значение": 287.504,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-04",
+     "значение": 289.109,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-05",
+     "значение": 292.296,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-06",
+     "значение": 296.311,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-07",
+     "значение": 296.276,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-08",
+     "значение": 296.171,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-09",
+     "значение": 296.808,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-10",
+     "значение": 298.012,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-11",
+     "значение": 297.711,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-12",
+     "значение": 296.797,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-01",
+     "значение": 299.17,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-02",
+     "значение": 300.84,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-03",
+     "значение": 301.836,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-04",
+     "значение": 303.363,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-05",
+     "значение": 304.127,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-06",
+     "значение": 305.109,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-07",
+     "значение": 305.691,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-08",
+     "значение": 307.026,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-09",
+     "значение": 307.789,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-10",
+     "значение": 307.671,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-11",
+     "значение": 307.051,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-12",
+     "значение": 306.746,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-01",
+     "значение": 308.417,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-02",
+     "значение": 310.326,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-03",
+     "значение": 312.332,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-04",
+     "значение": 313.548,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-05",
+     "значение": 314.069,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-06",
+     "значение": 314.175,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-07",
+     "значение": 314.54,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-08",
+     "значение": 314.796,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-09",
+     "значение": 315.301,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-10",
+     "значение": 315.664,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-11",
+     "значение": 315.493,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-12",
+     "значение": 315.605,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-01",
+     "значение": 317.671,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-02",
+     "значение": 319.082,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-03",
+     "значение": 319.799,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-04",
+     "значение": 320.795,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-05",
+     "значение": 321.465,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-06",
+     "значение": 322.561,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-07",
+     "значение": 323.048,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-08",
+     "значение": 323.976,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-09",
+     "значение": 324.8,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-11",
+     "значение": 324.122,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-12",
+     "значение": 324.054,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-01",
+     "значение": 325.252,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-02",
+     "значение": 326.785,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-03",
+     "значение": 330.213,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-04",
+     "значение": 333.02,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-05",
+     "значение": 335.123,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-06",
+     "значение": 333.952,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-07",
+     "значение": 333.918,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-08",
+     "значение": 334.98,
+     "источник": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+     "выгружено": "2026-09-26"
+    }
+   ]
+  },
+  "EUR": {
+   "страна": "Еврозона (EA, меняющийся состав)",
+   "индекс": "HICP, все товары и услуги, ECOICOP ver.2 (Eurostat prc_hicp_minr, TOTAL)",
+   "база": "2025 = 100",
+   "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+   "первоисточник": "Eurostat",
+   "официальный": true,
+   "обновлено_источником": "2026-09-17T11:00:00+0200",
+   "сверка": {
+    "с_чем": "ЕЦБ ICP.M.U2.N.000000.4.INX",
+    "общих_месяцев": 96,
+    "наибольшее_расхождение_месячного_темпа": 0.00017,
+    "месяц": "2025-12"
+   },
+   "первый_месяц": "2018-01",
+   "последний_месяц": "2026-08",
+   "точек": 104,
+   "точки": [
+    {
+     "месяц": "2018-01",
+     "значение": 78.88,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-02",
+     "значение": 79.05,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-03",
+     "значение": 79.93,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-04",
+     "значение": 80.25,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-05",
+     "значение": 80.76,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-06",
+     "значение": 80.85,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-07",
+     "значение": 80.66,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-08",
+     "значение": 80.78,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-09",
+     "значение": 81.1,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-10",
+     "значение": 81.3,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-11",
+     "значение": 80.85,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-12",
+     "значение": 80.82,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-01",
+     "значение": 79.98,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-02",
+     "значение": 80.23,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-03",
+     "значение": 81.05,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-04",
+     "значение": 81.63,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-05",
+     "значение": 81.74,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-06",
+     "значение": 81.87,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-07",
+     "значение": 81.49,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-08",
+     "значение": 81.6,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-09",
+     "значение": 81.78,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-10",
+     "значение": 81.89,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-11",
+     "значение": 81.63,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-12",
+     "значение": 81.89,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-01",
+     "значение": 81.07,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-02",
+     "значение": 81.21,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-03",
+     "значение": 81.65,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-04",
+     "значение": 81.89,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-05",
+     "значение": 81.81,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-06",
+     "значение": 82.09,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-07",
+     "значение": 81.8,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-08",
+     "значение": 81.46,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-09",
+     "значение": 81.52,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-10",
+     "значение": 81.67,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-11",
+     "значение": 81.4,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-12",
+     "значение": 81.67,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-01",
+     "значение": 81.8,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-02",
+     "значение": 81.97,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-03",
+     "значение": 82.74,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-04",
+     "значение": 83.21,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-05",
+     "значение": 83.43,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-06",
+     "значение": 83.65,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-07",
+     "значение": 83.58,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-08",
+     "значение": 83.87,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-09",
+     "значение": 84.26,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-10",
+     "значение": 84.98,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-11",
+     "значение": 85.36,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-12",
+     "значение": 85.72,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-01",
+     "значение": 85.98,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-02",
+     "значение": 86.79,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-03",
+     "значение": 88.9,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-04",
+     "значение": 89.41,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-05",
+     "значение": 90.15,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-06",
+     "значение": 90.88,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-07",
+     "значение": 90.98,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-08",
+     "значение": 91.53,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-09",
+     "значение": 92.63,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-10",
+     "значение": 94.0,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-11",
+     "значение": 93.94,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-12",
+     "значение": 93.61,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-01",
+     "значение": 93.41,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-02",
+     "значение": 94.17,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-03",
+     "значение": 95.02,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-04",
+     "значение": 95.62,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-05",
+     "значение": 95.65,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-06",
+     "значение": 95.9,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-07",
+     "значение": 95.81,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-08",
+     "значение": 96.33,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-09",
+     "значение": 96.64,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-10",
+     "значение": 96.73,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-11",
+     "значение": 96.19,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-12",
+     "значение": 96.35,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-01",
+     "значение": 96.0,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-02",
+     "значение": 96.6,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-03",
+     "значение": 97.33,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-04",
+     "значение": 97.89,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-05",
+     "значение": 98.1,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-06",
+     "значение": 98.31,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-07",
+     "значение": 98.29,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-08",
+     "значение": 98.42,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-09",
+     "значение": 98.33,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-10",
+     "значение": 98.67,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-11",
+     "значение": 98.35,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-12",
+     "значение": 98.69,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-01",
+     "значение": 98.42,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-02",
+     "значение": 98.84,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-03",
+     "значение": 99.45,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-04",
+     "значение": 100.01,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-05",
+     "значение": 99.96,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-06",
+     "значение": 100.26,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-07",
+     "значение": 100.29,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-08",
+     "значение": 100.43,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-09",
+     "значение": 100.52,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-10",
+     "значение": 100.74,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-11",
+     "значение": 100.45,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-12",
+     "значение": 100.63,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-01",
+     "значение": 100.07,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-02",
+     "значение": 100.71,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-03",
+     "значение": 101.99,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-04",
+     "значение": 103.04,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-05",
+     "значение": 103.13,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-06",
+     "значение": 103.02,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-07",
+     "значение": 103.24,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-08",
+     "значение": 103.69,
+     "источник": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/prc_hicp_minr?geo=EA&coicop18=TOTAL&unit=I25&format=JSON&sinceTimePeriod=2018-01",
+     "выгружено": "2026-09-26"
+    }
+   ]
+  },
+  "CNY": {
+   "страна": "Китай",
+   "индекс": "ИПЦ, все товары и услуги (CPI, COICOP _T)",
+   "база": "2020A = 100",
+   "url": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+   "первоисточник": "НБС КНР",
+   "официальный": false,
+   "зеркало": "МВФ, набор CPI — data.stats.gov.cn не отвечает из песочницы; НБС публикует только темпы, уровень ряда собран МВФ",
+   "первый_месяц": "2018-01",
+   "последний_месяц": "2026-08",
+   "точек": 104,
+   "точки": [
+    {
+     "месяц": "2018-01",
+     "значение": 94.3108,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-02",
+     "значение": 95.47623,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-03",
+     "значение": 94.40044,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-04",
+     "значение": 94.22115,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-05",
+     "значение": 94.04185,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-06",
+     "значение": 94.04185,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-07",
+     "значение": 94.3108,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-08",
+     "значение": 94.93834,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-09",
+     "значение": 95.56588,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-10",
+     "значение": 95.74518,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-11",
+     "значение": 95.38658,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-12",
+     "значение": 95.47623,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-01",
+     "значение": 95.92448,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-02",
+     "значение": 96.91061,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-03",
+     "значение": 96.55202,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-04",
+     "значение": 96.64167,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-05",
+     "значение": 96.64167,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-06",
+     "значение": 96.55202,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-07",
+     "значение": 96.91061,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-08",
+     "значение": 97.62781,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-09",
+     "значение": 98.43465,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-10",
+     "значение": 99.33114,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-11",
+     "значение": 99.68974,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-12",
+     "значение": 99.68974,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-01",
+     "значение": 101.1241,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-02",
+     "значение": 101.931,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-03",
+     "значение": 100.6759,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-04",
+     "значение": 99.77939,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-05",
+     "значение": 98.97254,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-06",
+     "значение": 98.97254,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-07",
+     "значение": 98.61395,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-08",
+     "значение": 99.95869,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-09",
+     "значение": 100.138,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-10",
+     "значение": 99.86903,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-11",
+     "значение": 99.24149,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-12",
+     "значение": 99.95869,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-01",
+     "значение": 100.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-02",
+     "значение": 101.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-03",
+     "значение": 101.0,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-04",
+     "значение": 100.7,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-05",
+     "значение": 100.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-06",
+     "значение": 100.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-07",
+     "значение": 100.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-08",
+     "значение": 100.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-09",
+     "значение": 100.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-10",
+     "значение": 101.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-11",
+     "значение": 101.7,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-12",
+     "значение": 101.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-01",
+     "значение": 101.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-02",
+     "значение": 102.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-03",
+     "значение": 102.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-04",
+     "значение": 102.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-05",
+     "значение": 102.7,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-06",
+     "значение": 102.7,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-07",
+     "значение": 103.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-08",
+     "значение": 103.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-09",
+     "значение": 103.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-10",
+     "значение": 103.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-11",
+     "значение": 103.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-12",
+     "значение": 103.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-01",
+     "значение": 104.0,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-02",
+     "значение": 103.5,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-03",
+     "значение": 103.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-04",
+     "значение": 103.0,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-05",
+     "значение": 102.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-06",
+     "значение": 102.7,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-07",
+     "значение": 102.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-08",
+     "значение": 103.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-09",
+     "значение": 103.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-10",
+     "значение": 103.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-11",
+     "значение": 102.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-12",
+     "значение": 102.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-01",
+     "значение": 103.1,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-02",
+     "значение": 104.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-03",
+     "значение": 103.3,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-04",
+     "значение": 103.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-05",
+     "значение": 103.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-06",
+     "значение": 102.9,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-07",
+     "значение": 103.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-08",
+     "значение": 103.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-09",
+     "значение": 103.8,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-10",
+     "значение": 103.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-11",
+     "значение": 103.0,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-12",
+     "значение": 103.0,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-01",
+     "значение": 103.6,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-02",
+     "значение": 103.4,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-03",
+     "значение": 103.2,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-04",
+     "значение": 103.123,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-05",
+     "значение": 103.1236,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-06",
+     "значение": 103.0133,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-07",
+     "значение": 103.4184,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-08",
+     "значение": 103.4221,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-09",
+     "значение": 103.519,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-10",
+     "значение": 103.8396,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-11",
+     "значение": 103.7373,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-12",
+     "значение": 103.8426,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-01",
+     "значение": 103.8373,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-02",
+     "значение": 104.7772,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-03",
+     "значение": 104.2648,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-04",
+     "значение": 104.3605,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-05",
+     "значение": 104.361,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-06",
+     "значение": 104.0435,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-07",
+     "значение": 103.9355,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-08",
+     "значение": 104.2495,
+     "источник": "https://api.imf.org/external/sdmx/2.1/data/CPI/CHN.CPI._T.IX.M?startPeriod=2018-01",
+     "выгружено": "2026-09-26"
+    }
+   ]
+  },
+  "GBP": {
+   "страна": "Великобритания",
+   "индекс": "CPI INDEX 00: ALL ITEMS (ONS D7BT, набор MM23)",
+   "база": "2015 = 100",
+   "url": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+   "первоисточник": "ONS",
+   "официальный": true,
+   "обновлено_источником": "16-09-2026",
+   "сверка": {
+    "с_чем": "МВФ CPI GBR",
+    "общих_месяцев": 103,
+    "наибольшее_расхождение_месячного_темпа": 0.00331,
+    "месяц": "2022-04"
+   },
+   "первый_месяц": "2018-01",
+   "последний_месяц": "2026-08",
+   "точек": 104,
+   "точки": [
+    {
+     "месяц": "2018-01",
+     "значение": 104.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-02",
+     "значение": 104.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-03",
+     "значение": 105.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-04",
+     "значение": 105.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-05",
+     "значение": 105.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-06",
+     "значение": 105.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-07",
+     "значение": 105.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-08",
+     "значение": 106.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-09",
+     "значение": 106.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-10",
+     "значение": 106.7,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-11",
+     "значение": 107.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2018-12",
+     "значение": 107.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-01",
+     "значение": 106.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-02",
+     "значение": 106.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-03",
+     "значение": 107.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-04",
+     "значение": 107.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-05",
+     "значение": 107.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-06",
+     "значение": 107.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-07",
+     "значение": 107.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-08",
+     "значение": 108.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-09",
+     "значение": 108.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-10",
+     "значение": 108.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-11",
+     "значение": 108.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2019-12",
+     "значение": 108.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-01",
+     "значение": 108.2,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-02",
+     "значение": 108.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-03",
+     "значение": 108.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-04",
+     "значение": 108.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-05",
+     "значение": 108.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-06",
+     "значение": 108.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-07",
+     "значение": 109.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-08",
+     "значение": 108.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-09",
+     "значение": 109.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-10",
+     "значение": 109.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-11",
+     "значение": 108.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2020-12",
+     "значение": 109.2,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-01",
+     "значение": 109.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-02",
+     "значение": 109.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-03",
+     "значение": 109.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-04",
+     "значение": 110.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-05",
+     "значение": 110.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-06",
+     "значение": 111.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-07",
+     "значение": 111.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-08",
+     "значение": 112.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-09",
+     "значение": 112.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-10",
+     "значение": 113.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-11",
+     "значение": 114.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2021-12",
+     "значение": 115.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-01",
+     "значение": 114.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-02",
+     "значение": 115.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-03",
+     "значение": 117.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-04",
+     "значение": 120.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-05",
+     "значение": 120.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-06",
+     "значение": 121.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-07",
+     "значение": 122.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-08",
+     "значение": 123.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-09",
+     "значение": 123.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-10",
+     "значение": 126.2,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-11",
+     "значение": 126.7,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2022-12",
+     "значение": 127.2,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-01",
+     "значение": 126.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-02",
+     "значение": 127.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-03",
+     "значение": 128.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-04",
+     "значение": 130.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-05",
+     "значение": 131.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-06",
+     "значение": 131.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-07",
+     "значение": 130.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-08",
+     "значение": 131.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-09",
+     "значение": 132.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-10",
+     "значение": 132.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-11",
+     "значение": 131.7,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2023-12",
+     "значение": 132.2,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-01",
+     "значение": 131.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-02",
+     "значение": 132.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-03",
+     "значение": 133.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-04",
+     "значение": 133.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-05",
+     "значение": 133.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-06",
+     "значение": 134.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-07",
+     "значение": 133.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-08",
+     "значение": 134.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-09",
+     "значение": 134.2,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-10",
+     "значение": 135.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-11",
+     "значение": 135.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2024-12",
+     "значение": 135.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-01",
+     "значение": 135.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-02",
+     "значение": 136.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-03",
+     "значение": 136.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-04",
+     "значение": 138.2,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-05",
+     "значение": 138.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-06",
+     "значение": 138.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-07",
+     "значение": 139.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-08",
+     "значение": 139.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-09",
+     "значение": 139.3,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-10",
+     "значение": 139.8,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-11",
+     "значение": 139.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2025-12",
+     "значение": 140.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-01",
+     "значение": 139.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-02",
+     "значение": 140.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-03",
+     "значение": 141.0,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-04",
+     "значение": 142.1,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-05",
+     "значение": 142.4,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-06",
+     "значение": 142.5,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-07",
+     "значение": 142.9,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    },
+    {
+     "месяц": "2026-08",
+     "значение": 143.6,
+     "источник": "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/d7bt/mm23",
+     "выгружено": "2026-09-26"
+    }
+   ]
+  }
+ }
+}

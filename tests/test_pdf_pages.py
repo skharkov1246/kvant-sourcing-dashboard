@@ -176,5 +176,6 @@ def test_один_проход_включается_входом_а_не_при�
     yml = (Path(__file__).resolve().parent.parent
            / ".github/workflows/library-index.yml").read_text(encoding="utf-8")
     assert "pdf_one_pass:" in yml, "входа нет — замерить нечем"
-    assert re.search(r"PDF_ONE_PASS:\s*\$\{\{\s*inputs\.pdf_one_pass", yml)
+    # Флаг доезжает через одну точку (.github/actions/parse-env) параметром.
+    assert re.search(r"pdf_one_pass:\s*\$\{\{\s*inputs\.pdf_one_pass", yml)
     assert not re.search(r"PDF_ONE_PASS=\S+\s+python", yml), "значение прибито в шаге"

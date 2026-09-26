@@ -114,7 +114,8 @@ def test_добор_повторяет_только_несостоявшиеся
     assert "where status <> 'не скачался'" in ind, (
         "добор должен исключать из «уже сделано» только не скачавшиеся файлы")
     wf = (ROOT / ".github" / "workflows" / "library-index.yml").read_text(encoding="utf-8")
-    assert "RETRY_FAILED" in wf, "флаг добора не проброшен в workflow"
+    assert re.search(r"retry_failed:\s*\$\{\{\s*inputs\.retry_failed", wf), \
+        "флаг добора не проброшен в workflow"
 
 
 def test_секреты_индексатора_читаются_лениво():

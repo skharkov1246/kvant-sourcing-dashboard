@@ -125,6 +125,15 @@ def _команды(узел) -> str:
         for ключ, значение in узел.items():
             if ключ == "run" and isinstance(значение, str):
                 куски.append(значение)
+            elif (ключ == "uses" and isinstance(значение, str)
+                  and значение.startswith("./.github/actions/")):
+                # Своё составное действие (например, parse-env — пакеты разбора
+                # одной точкой): его команды исполняются в той же работе, и то,
+                # что оно ставит, работа получает.
+                действие = ROOT / значение / "action.yml"
+                if действие.exists():
+                    куски.append(_команды(yaml.safe_load(
+                        действие.read_text(encoding="utf-8")).get("runs")))
             else:
                 куски.append(_команды(значение))
     elif isinstance(узел, list):
