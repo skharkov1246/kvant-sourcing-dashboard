@@ -117,3 +117,15 @@ def test_прогон_частями_и_вхолостую():
     assert "BITRIX_PARALLEL" in текст and "BITRIX_RPS" in текст
     assert "library/supabase/brands_schema.sql" in (
         ROOT / ".github/workflows/zip-db.yml").read_text(encoding="utf-8")
+
+
+def test_классы_расхождения_без_написаний():
+    """Гейт ключа печатает класс, а не написание (правило 17)."""
+    строки = [("İco Выдумка", "icoвыдумка", "iвыдумка", "i̇co выдумка"),
+              ("Kelton", "kelton", "kelton", "kelton")]
+    счёт = br.классы_расхождения(строки)
+    assert счёт["строк"] == 2
+    assert счёт["шаг lower(): база ≠ Python"] == 1
+    assert счёт["ключ базы короче"] == 1 and счёт["ключ базы той же длины"] == 1
+    assert счёт["знак Lu U+0100–U+01FF"] == 1
+    assert not any("Выдумка" in к or "kelton" in к for к in счёт)

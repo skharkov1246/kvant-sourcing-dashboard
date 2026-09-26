@@ -154,16 +154,28 @@ where (lib_brand_alias.status in ('в очереди', 'спорно') and exclu
 returning (xmax = 0) as inserted
 """
 
+ГЕЙТ_КЛЮЧА = "ключ написания в SQL совпал с ключом в Python"
 ГЕЙТЫ = [
     ("локаль базы складывает кириллицу (правило 21а)",
      "select case when lower('ШАЙБА') = 'шайба' then 0 else 1 end"),
-    ("ключ написания в SQL совпал с ключом в Python",
+    (ГЕЙТ_КЛЮЧА,
      "select count(*) from lib_brand_alias where run_id = %(run)s "
      "and spelling_key <> lib_brand_key(spelling)"),
     ("у разрешённого написания бренд есть в реестре",
      "select count(*) from lib_brand_alias where run_id = %(run)s and brand_key is not null "
      "and brand_key not in (select brand_key from lib_brands)"),
 ]
+
+
+def печать_расхождения(cur, run_id: str) -> None:
+    """Класс расхождения ключа — агрегатом, без написаний (правило 17)."""
+    cur.execute(br.СРЕДА_SQL)
+    версия, поставщик, ctype, icu = cur.fetchone()
+    print(f"    среда базы: версия {версия}, свёртка {поставщик or '?'}, "
+          f"ctype {ctype or '?'}" + (f", icu {icu}" if icu else ""))
+    cur.execute(br.РАСХОЖДЕНИЯ_SQL, {"run": run_id})
+    for класс, n in sorted(br.классы_расхождения(cur.fetchall()).items()):
+        print(f"    расхождение ключа: {класс} ×{n}")
 
 
 def без_повторов(написания: list[dict]) -> list[dict]:
@@ -208,6 +220,8 @@ def записать(conn, бренды: list[dict], написания: list[di
             print(f"  гейт: {имя} — {'пройден' if n == 0 else f'НЕ ПРОЙДЕН ({n})'}")
             if n:
                 провалы.append(имя)
+                if имя == ГЕЙТ_КЛЮЧА:
+                    печать_расхождения(cur, run_id)
     if провалы:
         conn.rollback()
         raise RuntimeError("гейты не пройдены, запись отменена: " + "; ".join(провалы))

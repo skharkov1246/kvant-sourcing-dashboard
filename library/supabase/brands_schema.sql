@@ -36,12 +36,18 @@
 --    расхождение ловит tests/test_brand_registry_sql.py.
 --    Работает верно только в базе с локалью UTF-8 (правило 21а): в локали C
 --    lower() не складывает кириллицу.
+--    «İ» (U+0130) заменяется на «I» ДО lower(), как в Python. libc складывает
+--    «İ» в «i», а ICU и полная свёртка Юникода — в «i» с отдельной точкой
+--    U+0307; точка не буква, и «İco» у такой базы снимало «co» как правовую
+--    форму: ключ «i» против «ico» в Python. Гейт засева брендов отменил так
+--    часть 5 прогона 36221302235 (26.09.2026). С заменой ключ от поставщика
+--    свёртки не зависит; на libc он прежний знак в знак.
 create or replace function lib_brand_key(t text) returns text as $$
   select case when x.k ~ '[a-z]' and x.k ~ '[а-я]'
               then translate(x.k, 'аевкмнорстху', 'aebkmhopctxy')
               else x.k end
     from (select left(regexp_replace(regexp_replace(
-                   translate(replace(lower(coalesce(t, '')), 'ё', 'е'),
+                   translate(replace(lower(replace(coalesce(t, ''), 'İ', 'I')), 'ё', 'е'),
                              'äöüåáàâãéèêëíìîïóòôõúùûñçøšžčřýłæœß',
                              'aouaaaaaeeeeiiiioooouuuncoszcrylaos'),
                    '(?<![0-9a-zа-я_])(ооо|оао|зао|пао|ао|llc|ltd|inc|gmbh|s\.p\.a|spa|co|corp|company|limited|holding|group|a/s|ab|bv|nv|sas|sa|plc|pte|kg|ag|oy|oyj|srl|as)(?![0-9a-zа-я_])',

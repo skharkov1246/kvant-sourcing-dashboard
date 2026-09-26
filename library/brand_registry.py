@@ -459,6 +459,58 @@ def карта_из_строк(строки) -> dict[str, set]:
     return карта
 
 
+# ── Разбор расхождения ключа (гейт засева) ───────────────────────────────────
+#
+# Гейт «ключ написания в SQL совпал с ключом в Python» до 26.09.2026 печатал
+# одно число, и класс расхождения приходилось искать вслепую. Теперь при
+# провале печатается КЛАСС — без самого написания (правило 17): на каком шаге
+# база и Python разошлись, какие знаки вне ASCII и русской азбуки в написании
+# (категория Юникода и блок по 256 кодов), и среда базы (версия, поставщик
+# свёртки, локаль) — от неё зависит lower().
+
+РАСХОЖДЕНИЯ_SQL = """
+select spelling, spelling_key, lib_brand_key(spelling),
+       lower(replace(spelling, 'İ', 'I'))
+  from lib_brand_alias
+ where run_id = %(run)s and spelling_key <> lib_brand_key(spelling)
+ limit 1000
+"""
+# to_jsonb, а не колонки: datlocprovider есть только с PostgreSQL 15.
+СРЕДА_SQL = """
+select current_setting('server_version_num'), to_jsonb(d) ->> 'datlocprovider',
+       to_jsonb(d) ->> 'datctype', to_jsonb(d) ->> 'daticulocale'
+  from pg_database d where d.datname = current_database()
+"""
+_ПРОСТЫЕ_ЗНАКИ = frozenset(
+    " 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "абвгдежзийклмнопрстуфхцчшщъыьэюяАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯёЁ")
+
+
+def классы_расхождения(строки) -> collections.Counter:
+    """Строки РАСХОЖДЕНИЯ_SQL → счётчик классов. Ни написания, ни ключа наружу.
+
+    Строка: (написание, записанный ключ, ключ базы, lower() базы после замены İ)."""
+    import unicodedata
+
+    счёт: collections.Counter = collections.Counter()
+    for написание, записанный, ключ_базы, lower_базы in строки:
+        написание = str(написание or "")
+        счёт["строк"] += 1
+        if lower_базы != написание.replace("İ", "I").lower():
+            счёт["шаг lower(): база ≠ Python"] += 1
+        if записанный != codes_sql.ключ_написания(написание):
+            счёт["записанный ключ ≠ ключ Python сейчас (правило сменилось)"] += 1
+        разница = len(ключ_базы or "") - len(записанный or "")
+        счёт["ключ базы " + ("короче" if разница < 0 else "длиннее" if разница > 0
+                              else "той же длины")] += 1
+        if len(написание) > 40:
+            счёт["написание длиннее 40 знаков"] += 1
+        for знак in sorted(set(написание) - _ПРОСТЫЕ_ЗНАКИ):
+            блок = ord(знак) & ~0xFF
+            счёт[f"знак {unicodedata.category(знак)} U+{блок:04X}–U+{блок + 0xFF:04X}"] += 1
+    return счёт
+
+
 def итоги(написания) -> dict[tuple[str, str], int]:
     """(источник, статус) → число строк. Для журнала: только числа."""
     return dict(collections.Counter((н["source"], н["status"]) for н in написания))
