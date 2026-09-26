@@ -1,0 +1,824 @@
+{
+  "oem_key": "rollsroyce",
+  "name": "Rolls-Royce (промышленные ГТУ: Industrial Avon, Industrial RB211, Industrial Trent 60)",
+  "segment_focus": "RB211, Avon, Industrial Trent 60: номера деталей и их переходы после продажи Siemens; ремонтники",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Направление промышленных газовых турбин Rolls-Royce Energy (Avon, RB211, Trent 60) продано Siemens в 2014 году. По пресс-релизу Siemens, установленный парк — около 2 500 ГТУ, к сделке приложено 25-летнее технологическое партнёрство. Siemens переименовала машины: Industrial Avon 200 (пакет модернизации 1533/1534/1535) стала SGT-A20, Industrial RB211 — SGT-A30/SGT-A35 (SGT-A35 RB — «previously known as the Industrial RB211-GT30»), Industrial Trent 60 — SGT-A65 TR. Trent 60 выпускается в Маунт-Верноне (США) и Монреале. Дольше всех на рынке Avon: введён в 1964 году, продано более 1 200 штук; до стандарта Avon 200 модернизируются марки 1533/1534/1535. Смена номеров деталей после продажи в открытых источниках не видна. На деталях, которые продаются сейчас, стоят прежние обозначения Rolls-Royce: у Avon — AG5xxxxA, у RB211-24C/24G — LWxxxxx, у зажигания — TRNxxxxx и 2-02J-xxx-xxx. Косвенное свидетельство перехода есть в отчёте TransCanada Turbines о ремонте RB211-22 в 2016 году: прежний сегмент уплотнения Siemens больше не выпускает, а замену надо проводить через «Siemens approval scheme». Техническое согласование (TLRF) там тоже направлялось в Siemens. Собрано 43 кода, у каждого есть страница с кодом и дословная цитата: 40 от исследователя и 3 номера Rolls-Royce из тех же таблиц Champion, добавленные по замечанию скептика. Самые ценные для ТО — перекрёстная таблица зажигания Champion Aerospace (RB211, Avon и промышленный Trent с номерами Rolls-Royce), номера выводов свечей и датчиков частоты от Rolaar, лопатки и сопловые аппараты горячей части Avon 1533/1534/1535 и RB211-24C/24G с площадки TurbineMarketplace. Ремонтники: Siemens Energy (правообладатель), TransCanada Turbines (лицензия Siemens Energy на все марки SGT-A35/RB211 и SGT-A20/Avon), RWG (бывшее СП Rolls-Royce и Wood, теперь у Siemens Energy), независимые Rolaar и Score Energy (Великобритания). В России найден посредник ПРОМИМПОРТ со стендом партнёра под Avon; в Китае — продавец лопаток Hangzhou Gas Turbine Parts.",
+  "machines": [
+    {
+      "model": "Industrial Avon 1533",
+      "kind": "газогенератор / ГТУ (авиапроизводная)",
+      "segment": "ГТУ",
+      "rating": "марка до Avon 200; модернизируется до стандарта Avon 200",
+      "status": "снята; обслуживается, модернизируется",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2009/260309-avon-upgrades.aspx",
+        "https://www.turbinemarketplace.com/home/detail/222"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial Avon 1534",
+      "kind": "газогенератор / ГТУ (авиапроизводная)",
+      "segment": "ГТУ",
+      "rating": "модернизируется до Avon 200",
+      "status": "снята; обслуживается",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2009/260309-avon-upgrades.aspx",
+        "https://www.turbinemarketplace.com/home/detail/223"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial Avon 1535",
+      "kind": "газогенератор / ГТУ (авиапроизводная)",
+      "segment": "ГТУ",
+      "rating": "модернизируется до Avon 200",
+      "status": "снята; обслуживается",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2009/260309-avon-upgrades.aspx",
+        "https://www.turbinemarketplace.com/home/detail/221"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial Avon 200 / Siemens SGT-A20 (SGT-A20 AV)",
+      "kind": "пакет модернизации газогенератора Avon 1533/1534/1535 до стандарта Avon 200 (не отдельная новая машина); у Siemens — SGT-A20",
+      "segment": "ГТУ",
+      "rating": "10–15 МВт по Siemens (источник turbomachinerymag скептиком не открыт — не проверено); по Rolls-Royce 2009 г.: +8,9 % мощности к 1533/1534/1535, межремонтный интервал 36 000 ч",
+      "status": "обслуживается (RWG, TCT); страница SGT-A20 на siemens-energy.com не найдена (404) — выпуск новых не подтверждён",
+      "sources": [
+        "https://www.turbomachinerymag.com/view/aeroderivative-gas-turbines",
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2009/260309-avon-upgrades.aspx",
+        "https://www.tcturbines.com/Engines"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial RB211-22 (RB211-22B)",
+      "kind": "газогенератор ГТУ (авиапроизводная)",
+      "segment": "ГТУ",
+      "rating": "первая промышленная марка, 1974 г.",
+      "status": "снята; обслуживается (TCT)",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2010/100608-rb211h63-gasturbine.aspx",
+        "https://www.corpassets.com/wp-content/uploads/2018/10/UGL-Compression-Engine.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial RB211-24A",
+      "kind": "газогенератор ГТУ",
+      "segment": "ГТУ",
+      "rating": "1980 г.",
+      "status": "снята",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2010/100608-rb211h63-gasturbine.aspx"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial RB211-24C",
+      "kind": "газогенератор ГТУ",
+      "segment": "ГТУ",
+      "rating": "1985 г.; доступна модернизация RB211-Gzero",
+      "status": "снята; обслуживается",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2010/100608-rb211h63-gasturbine.aspx",
+        "https://turbinemarketplace.com/home/detail/212"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial RB211-24G",
+      "kind": "газогенератор ГТУ",
+      "segment": "ГТУ",
+      "rating": "27 МВт; модернизация 1999 г. — 30,78 МВт, КПД 38,9 %; силовые турбины RT56/RT61/RT62",
+      "status": "снята; обслуживается",
+      "sources": [
+        "https://www.modernpowersystems.com/analysis/rb211-gas-turbine-upgrades-to-38-9-per-cent-efficiency/",
+        "https://turbinemarketplace.com/home/detail/231"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial RB211-24GT / RB211-GT61",
+      "kind": "газогенератор ГТУ",
+      "segment": "ГТУ",
+      "rating": "GT — 2001 г.; GT61 — около 32 МВт",
+      "status": "вошли в линейку SGT-A35 (варианты GT61/GT62)",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2010/100608-rb211h63-gasturbine.aspx",
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-a35.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial RB211-H63",
+      "kind": "газогенератор ГТУ",
+      "segment": "ГТУ",
+      "rating": "44 МВт (объявлена в 2010 г.)",
+      "status": "выпуск не подтверждён",
+      "sources": [
+        "https://www.rolls-royce.com/media/press-releases-archive/yr-2010/100608-rb211h63-gasturbine.aspx"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Siemens SGT-A35 (Industrial RB211, в т. ч. SGT-A35 RB = бывшая Industrial RB211-GT30)",
+      "kind": "ГТУ (авиапроизводная), генераторный и механический привод",
+      "segment": "ГТУ",
+      "rating": "генераторы 31,8–38,1 МВт; механический привод — на странице Siemens видны 32–38 МВт (33,1–39,5 МВт не подтверждено); RB — 34 и 38 МВт, пакет Dresser-Rand",
+      "status": "выпускается (Siemens Energy)",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-a35.html",
+        "https://press.siemens.com/global/en/pressrelease/siemens-introduces-38-mw-aeroderivative-gas-turbine-oil-and-gas-industry"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Industrial Trent 60 (DLE / WLE) / Siemens SGT-A65 TR",
+      "kind": "ГТУ (авиапроизводная), генераторный и механический привод",
+      "segment": "ГТУ",
+      "rating": "до 66 МВт (ISI), КПД 41,4 %; WLE — 58 МВт ISO (Centrax, 2008)",
+      "status": "выпускается (Siemens Energy, Маунт-Вернон и Монреаль)",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-a65.html",
+        "https://press.siemens.com/global/en/pressrelease/siemens-wins-order-argentina-four-industrial-power-plants",
+        "https://www.nsenergybusiness.com/analysis/featurecentrax-wins-trent-60-genset-franchise-for-europe/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Industrial Parts List (Champion Aerospace): зажигание промышленных ГТУ с номерами OEM, в т. ч. Rolls-Royce RB211, Avon, промышленный Trent",
+      "doc_no": "редакция 05-12-2023",
+      "machine": "RB211, Avon, промышленный Trent",
+      "kind": "каталог запчастей изготовителя комплектующих",
+      "sources": [
+        "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf"
+      ]
+    },
+    {
+      "title": "Champion Industrial Ignition Products for Gas Turbine Engines: перекрёстная таблица «номер Rolls-Royce → номер Champion»",
+      "doc_no": "March 2015",
+      "machine": "RB211, Avon",
+      "kind": "перекрёстная таблица дистрибьютора",
+      "sources": [
+        "http://www.falconcrestaviation.com/Documents/indxref.pdf"
+      ]
+    },
+    {
+      "title": "Champion Aerospace Technical Publication Index: CMM на свечу CH34736 (Trent 700/800, RB211-524) и др.",
+      "doc_no": "TPI20220101-001; ACMM 74-21-04 (CH34736)",
+      "machine": "RB211 / Trent (свеча авиаисполнения, общая по номеру с промышленной)",
+      "kind": "руководство по компоненту (CMM)",
+      "sources": [
+        "https://www.championaerospace.com/wp-content/uploads/2021/12/TechPubIndex20220101_Master.pdf"
+      ]
+    },
+    {
+      "title": "Industrial Gas Generator Illustrated Parts Catalogue (Avon), глава 7-3 «Igniter plugs» и другие главы",
+      "doc_no": "Avon UTC c7s3, c1s2, c1s6, c2s5, Ac1s00 (обозначения загрузки на Scribd)",
+      "machine": "Avon Mk.1535",
+      "kind": "parts manual (IPC)",
+      "sources": [
+        "https://www.scribd.com/document/541870020/Avon-UTC-c7s3",
+        "https://www.scribd.com/document/541858814/Avon-UTC-c1s2"
+      ]
+    },
+    {
+      "title": "RB211 24G DLE Gas Generator — Operations and Maintenance Manual, Volume 2",
+      "machine": "RB211-24G DLE",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/921665478/000-Operations-and-Maintenance-Manual-Volume-2"
+      ]
+    },
+    {
+      "title": "RB211 Lube System (SSLOC) Description",
+      "machine": "Industrial RB211",
+      "kind": "описание системы (O&M)",
+      "sources": [
+        "https://www.scribd.com/document/646268027/RB211-LUBE-SYSTEM-SSLOC-DESCRIPTION"
+      ]
+    },
+    {
+      "title": "Отчёт TransCanada Turbines о ремонте и испытании RB211-22 по программе CTS 5017/02; упомянуто указание OIA075 по храповику (pawl carrier)",
+      "doc_no": "CTS5017/02; OIA075",
+      "machine": "Industrial RB211-22",
+      "kind": "отчёт о ремонте / программа испытаний / бюллетень (ссылка)",
+      "sources": [
+        "https://www.corpassets.com/wp-content/uploads/2018/10/UGL-Compression-Engine.pdf"
+      ]
+    },
+    {
+      "title": "Product Bulletin 04005: Rolls-Royce Avon Gas Turbine Generator Drive Application Control Package (Petrotech)",
+      "doc_no": "04005",
+      "machine": "Avon (генераторный привод)",
+      "kind": "бюллетень (модернизация САУ)",
+      "sources": [
+        "https://petrotechinc.com/literature-library-files/gas-steam-turbines/rolls-royce-avon.pdf"
+      ]
+    },
+    {
+      "title": "RTH0106941A Thermocouple Harness & Analyser lead (Rolaar), к поставке прилагается Installation manual",
+      "doc_no": "RTH0106941A",
+      "machine": "Industrial Avon",
+      "kind": "бюллетень изделия / инструкция по монтажу",
+      "sources": [
+        "https://www.rolaar.co.uk/wp-content/uploads/2018/08/Rolaar-RTH0106941A-Thermocouple-Harness-Analyser-leads.pdf"
+      ]
+    },
+    {
+      "title": "Проспекты Rolls-Royce: RB211 Gas Turbines, RB211-Gzero, RB211-H63, Trent 60, Avon 200",
+      "machine": "RB211, Trent 60, Avon",
+      "kind": "проспект",
+      "sources": [
+        "https://pdf.directindustry.com/pdf/rolls-royce/rb211-gas-turbines/22649-359495.html",
+        "https://pdf.directindustry.com/pdf/rolls-royce/trent-60/22649-359479.html",
+        "https://pdf.directindustry.com/pdf/rolls-royce/avon-200/22649-359485.html"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "TRN16214",
+      "issuer": "Rolls-Royce",
+      "description": "Свеча зажигания (igniter) промышленного RB211 и Trent; аналог Champion CH34736-1",
+      "machine": "Industrial RB211; промышленный Trent",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "CH34736-1        Rolls-Royce RB211 & Trent 800 Industrial Igniter           TRN16214"
+    },
+    {
+      "code": "CH34736-1",
+      "issuer": "Champion Aerospace",
+      "description": "Промышленная свеча зажигания для RB211 и Trent (номер OEM — TRN16214)",
+      "machine": "Industrial RB211; промышленный Trent",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "CH34736-1        Rolls-Royce RB211 & Trent 800 Industrial Igniter           TRN16214"
+    },
+    {
+      "code": "TRN16213",
+      "issuer": "Rolls-Royce",
+      "description": "Высоковольтный провод свечи 12,9 фута для RB211; аналог Champion 53363-1",
+      "machine": "Industrial RB211",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "53363-1           Rolls-Royce RB211 & PSM LEC-III Ignition Lead 12.9’      TRN16213, 2-02J-201-001"
+    },
+    {
+      "code": "2-02J-201-001",
+      "issuer": "Rolls-Royce",
+      "description": "Провод зажигания RB211 (второй номер OEM той же позиции, что TRN16213)",
+      "machine": "Industrial RB211",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "53363-1           Rolls-Royce RB211 & PSM LEC-III Ignition Lead 12.9’      TRN16213, 2-02J-201-001"
+    },
+    {
+      "code": "53363-1",
+      "issuer": "Champion Aerospace",
+      "description": "Провод зажигания 12,9 фута для RB211",
+      "machine": "Industrial RB211",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "53363-1           Rolls-Royce RB211 & PSM LEC-III Ignition Lead 12.9’      TRN16213, 2-02J-201-001"
+    },
+    {
+      "code": "2-02J-202-001",
+      "issuer": "Rolls-Royce",
+      "description": "Провод зажигания Avon 10 футов; аналог Champion 53363-3",
+      "machine": "Industrial Avon",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "53363-3           Rolls-Royce Avon 10’ Lead                                2-02J-202-001"
+    },
+    {
+      "code": "53363-3",
+      "issuer": "Champion Aerospace",
+      "description": "Провод зажигания Avon 10 футов",
+      "machine": "Industrial Avon",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "53363-3           Rolls-Royce Avon 10’ Lead                                2-02J-202-001"
+    },
+    {
+      "code": "TRN16678",
+      "issuer": "Rolls-Royce",
+      "description": "Блок зажигания (exciter), промышленное исполнение Rolls-Royce; аналог Champion 305136",
+      "machine": "промышленные ГТУ Rolls-Royce (к какой машине — RB211 или Avon — в источнике не сказано)",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "305136            Rolls-Royce CE and ATEX Certified Industrial Exciter     TRN16678, TRN17234, RRE003350,"
+    },
+    {
+      "code": "TRN17234",
+      "issuer": "Rolls-Royce",
+      "description": "Блок зажигания в исполнении CE/ATEX; аналог Champion 305136CE",
+      "machine": "промышленные ГТУ Rolls-Royce (к какой машине — RB211 или Avon — в источнике не сказано)",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Ignition Products cross-reference, March 2015",
+      "source_url": "http://www.falconcrestaviation.com/Documents/indxref.pdf",
+      "quote": "TRN17234                         305136CE                       Exciter Box"
+    },
+    {
+      "code": "2-02J-199-001",
+      "issuer": "Rolls-Royce",
+      "description": "Блок зажигания (exciter box); аналог Champion 305136",
+      "machine": "промышленные ГТУ Rolls-Royce (к какой машине — RB211 или Avon — в источнике не сказано)",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Ignition Products cross-reference, March 2015",
+      "source_url": "http://www.falconcrestaviation.com/Documents/indxref.pdf",
+      "quote": "2-02J-199-001                        305136                       Exciter Box"
+    },
+    {
+      "code": "305136",
+      "issuer": "Champion Aerospace",
+      "description": "Промышленный блок зажигания с сертификацией CE и ATEX для Rolls-Royce",
+      "machine": "промышленные ГТУ Rolls-Royce (к какой машине — RB211 или Avon — в источнике не сказано)",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "305136            Rolls-Royce CE and ATEX Certified Industrial Exciter     TRN16678, TRN17234, RRE003350,"
+    },
+    {
+      "code": "TRN17109",
+      "issuer": "Rolls-Royce",
+      "description": "Свеча зажигания в исполнении CE; аналог Champion CH34736CE",
+      "machine": "Industrial RB211 / промышленный Trent (по аналогу CH34736)",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Ignition Products cross-reference, March 2015",
+      "source_url": "http://www.falconcrestaviation.com/Documents/indxref.pdf",
+      "quote": "TRN17109                        CH34736CE                         Igniter"
+    },
+    {
+      "code": "TRN17235",
+      "issuer": "Rolls-Royce",
+      "description": "В таблице Champion записан как «Exciter Box» с аналогом 53363-1CE (номер Champion для провода) — строка в источнике противоречива, проверить до заказа",
+      "machine": "промышленные ГТУ Rolls-Royce",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Ignition Products cross-reference, March 2015; строка противоречива (Exciter Box против номера провода 53363-1CE) — до заказа сверить с Champion",
+      "source_url": "http://www.falconcrestaviation.com/Documents/indxref.pdf",
+      "quote": "TRN17235                        53363-1CE                       Exciter Box"
+    },
+    {
+      "code": "RRE003350",
+      "issuer": "Rolls-Royce",
+      "description": "Блок зажигания (exciter) промышленного исполнения, CE/ATEX; ещё один номер OEM к Champion 305136",
+      "machine": "промышленные ГТУ Rolls-Royce (к какой машине — RB211 или Avon — в источнике не сказано)",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Parts List 05-12-2023; добавлен по замечанию скептика 3",
+      "source_url": "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf",
+      "quote": "305136            Rolls-Royce CE and ATEX Certified Industrial Exciter     TRN16678, TRN17234, RRE003350,"
+    },
+    {
+      "code": "2-02J-199-003",
+      "issuer": "Rolls-Royce",
+      "description": "Блок зажигания (exciter box) в исполнении CE; аналог Champion 305136CE",
+      "machine": "промышленные ГТУ Rolls-Royce (к какой машине — RB211 или Avon — в источнике не сказано)",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Ignition Products cross-reference, March 2015; в перечне Champion 2023 тот же номер стоит в строке 305136; добавлен по замечанию скептика 3",
+      "source_url": "http://www.falconcrestaviation.com/Documents/indxref.pdf",
+      "quote": "2-02J-199-003                      305136CE                       Exciter Box"
+    },
+    {
+      "code": "2-02J-201-003",
+      "issuer": "Rolls-Royce",
+      "description": "Провод зажигания в исполнении CE; аналог Champion 53363-1CE (пара к 2-02J-201-001 — проводу RB211 12,9 фута)",
+      "machine": "Industrial RB211 (по аналогу 53363-1)",
+      "unit": "система зажигания",
+      "doc_ref": "Champion Industrial Ignition Products cross-reference, March 2015; добавлен по замечанию скептика 3",
+      "source_url": "http://www.falconcrestaviation.com/Documents/indxref.pdf",
+      "quote": "2-02J-201-003                     53363-1CE                      Ignition Lead"
+    },
+    {
+      "code": "S400401",
+      "issuer": "не установлен (Rolaar называет «recognised part numbers»)",
+      "description": "Провод к свече зажигания (ignitor lead) для Avon и RB211",
+      "machine": "Industrial Avon; Industrial RB211",
+      "unit": "система зажигания",
+      "doc_ref": "Rolaar, Ignitor Leads and Speed Probes",
+      "source_url": "https://www.rolaar.co.uk/wp-content/uploads/2018/08/rolaar-ignitor-leads-probes.pdf",
+      "quote": "Recognised part numbers are: S400401 / S400501/ S400502 / 810-500-1523"
+    },
+    {
+      "code": "S400501",
+      "issuer": "не установлен (Rolaar называет «recognised part numbers»)",
+      "description": "Провод к свече зажигания (ignitor lead)",
+      "machine": "Industrial Avon; Industrial RB211",
+      "unit": "система зажигания",
+      "doc_ref": "Rolaar, Ignitor Leads and Speed Probes",
+      "source_url": "https://www.rolaar.co.uk/wp-content/uploads/2018/08/rolaar-ignitor-leads-probes.pdf",
+      "quote": "Recognised part numbers are: S400401 / S400501/ S400502 / 810-500-1523"
+    },
+    {
+      "code": "S400502",
+      "issuer": "не установлен (Rolaar называет «recognised part numbers»)",
+      "description": "Провод к свече зажигания (ignitor lead)",
+      "machine": "Industrial Avon; Industrial RB211",
+      "unit": "система зажигания",
+      "doc_ref": "Rolaar, Ignitor Leads and Speed Probes",
+      "source_url": "https://www.rolaar.co.uk/wp-content/uploads/2018/08/rolaar-ignitor-leads-probes.pdf",
+      "quote": "Recognised part numbers are: S400401 / S400501/ S400502 / 810-500-1523"
+    },
+    {
+      "code": "810-500-1523",
+      "issuer": "не установлен (Rolaar называет «recognised part numbers»)",
+      "description": "Провод к свече зажигания (ignitor lead)",
+      "machine": "Industrial Avon; Industrial RB211",
+      "unit": "система зажигания",
+      "doc_ref": "Rolaar, Ignitor Leads and Speed Probes",
+      "source_url": "https://www.rolaar.co.uk/wp-content/uploads/2018/08/rolaar-ignitor-leads-probes.pdf",
+      "quote": "Recognised part numbers are: S400401 / S400501/ S400502 / 810-500-1523"
+    },
+    {
+      "code": "S400100",
+      "issuer": "не установлен (Rolaar называет «recognised part numbers»)",
+      "description": "Провод магнитного датчика частоты вращения (MPU)",
+      "machine": "Industrial Avon; Industrial RB211",
+      "unit": "датчики частоты вращения / САУ",
+      "doc_ref": "Rolaar, Ignitor Leads and Speed Probes",
+      "source_url": "https://www.rolaar.co.uk/wp-content/uploads/2018/08/rolaar-ignitor-leads-probes.pdf",
+      "quote": "Recognised part numbers are: S400100 / 3040A / 72-5287A"
+    },
+    {
+      "code": "3040A",
+      "issuer": "не установлен (Rolaar называет «recognised part numbers»)",
+      "description": "Провод магнитного датчика частоты вращения (MPU)",
+      "machine": "Industrial Avon; Industrial RB211",
+      "unit": "датчики частоты вращения / САУ",
+      "doc_ref": "Rolaar, Ignitor Leads and Speed Probes",
+      "source_url": "https://www.rolaar.co.uk/wp-content/uploads/2018/08/rolaar-ignitor-leads-probes.pdf",
+      "quote": "Recognised part numbers are: S400100 / 3040A / 72-5287A"
+    },
+    {
+      "code": "72-5287A",
+      "issuer": "не установлен (Rolaar называет «recognised part numbers»)",
+      "description": "Провод магнитного датчика частоты вращения (MPU)",
+      "machine": "Industrial Avon; Industrial RB211",
+      "unit": "датчики частоты вращения / САУ",
+      "doc_ref": "Rolaar, Ignitor Leads and Speed Probes",
+      "source_url": "https://www.rolaar.co.uk/wp-content/uploads/2018/08/rolaar-ignitor-leads-probes.pdf",
+      "quote": "Recognised part numbers are: S400100 / 3040A / 72-5287A"
+    },
+    {
+      "code": "RTH0106941A",
+      "issuer": "Rolaar (собственный номер изделия-замены)",
+      "description": "Жгут термопар выходных газов с проводом анализатора, 5 или 2 коробки; модернизация для промышленного Avon",
+      "machine": "Industrial Avon",
+      "unit": "термопары выходных газов",
+      "doc_ref": "Rolaar, RTH0106941A Thermocouple Harness & Analyser lead",
+      "source_url": "https://www.rolaar.co.uk/wp-content/uploads/2018/08/Rolaar-RTH0106941A-Thermocouple-Harness-Analyser-leads.pdf",
+      "quote": "The RTH0106941A five box or two box type Thermocouple & Analyser Harness Assembly is a full retrofit system designed specifically for industrial Avon operations."
+    },
+    {
+      "code": "AG56002A",
+      "issuer": "Rolls-Royce (номер OEM, к которому Rolaar предлагает эквивалент)",
+      "description": "Обтекатель стартера (starter fairing)",
+      "machine": "Industrial Avon (по контексту страницы: Avon 1533/1534/1535)",
+      "unit": "стартер",
+      "doc_ref": "Rolaar, OEM Components and Parts Supply",
+      "source_url": "https://www.rolaar.co.uk/part-supply",
+      "quote": "We are now offering a Starter Fairing, equivalent to AG56002A."
+    },
+    {
+      "code": "AG56672A",
+      "issuer": "Rolls-Royce",
+      "description": "Лопатка турбины высокого давления (восстановленная)",
+      "machine": "Avon 1535",
+      "unit": "турбина ВД",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/221",
+      "quote": "Part Name Avon 1535 High Pressure Turbine Blades Part number AG56672A Turbine Manufacturer Rolls Royce Turbine Model Avon 1535"
+    },
+    {
+      "code": "AG59181A",
+      "issuer": "Rolls-Royce",
+      "description": "Лопатка турбины высокого давления (восстановленная)",
+      "machine": "Avon 1533",
+      "unit": "турбина ВД",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/222",
+      "quote": "Part Name Avon 1533 High Pressure Turbine Blades Part number AG59181A Turbine Manufacturer Rolls Royce Turbine Model Avon 1533"
+    },
+    {
+      "code": "AG56041A",
+      "issuer": "Rolls-Royce",
+      "description": "Лопатка турбины высокого давления (восстановленная)",
+      "machine": "Avon 1534",
+      "unit": "турбина ВД",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/223",
+      "quote": "Part Name Avon 1534 High Pressure Turbine Blades Part number AG56041A Turbine Manufacturer Rolls Royce Turbine Model Avon 1534"
+    },
+    {
+      "code": "AG55772A",
+      "issuer": "Rolls-Royce",
+      "description": "Лопатка турбины промежуточного давления",
+      "machine": "Avon 1533, 1534, 1535",
+      "unit": "турбина ПД",
+      "source_url": "https://turbinemarketplace.com/home/detail/224",
+      "quote": "Part Name Avon Intermediate Pressure Blades Part number AG55772A Turbine Manufacturer Rolls Royce Turbine Model Avon 1533, 1534, 1535"
+    },
+    {
+      "code": "AG55785A",
+      "issuer": "Rolls-Royce",
+      "description": "Лопатки турбины низкого давления, комплект; в объявлении выставлен как лом (scrap) — для ремонта не годится, только как образец",
+      "machine": "Avon 1535",
+      "unit": "турбина НД",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/213",
+      "quote": "Part Name Avon Low Pressure Turbine Blades Part number AG55785A Turbine Manufacturer Rolls Royce Turbine Model AVON 1535"
+    },
+    {
+      "code": "AG55857A",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины высокого давления (NGV), комплект",
+      "machine": "Avon 1533",
+      "unit": "турбина ВД, сопловой аппарат",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/225",
+      "quote": "Part Name Avon 1533 High Pressure Nozzle Guide Vanes Part number AG55857A & AG55858A Turbine Manufacturer Rolls Royce Turbine Model Avon 1533"
+    },
+    {
+      "code": "AG55858A",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины высокого давления (NGV), парный номер к AG55857A",
+      "machine": "Avon 1533",
+      "unit": "турбина ВД, сопловой аппарат",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/225",
+      "quote": "Part Name Avon 1533 High Pressure Nozzle Guide Vanes Part number AG55857A & AG55858A Turbine Manufacturer Rolls Royce Turbine Model Avon 1533"
+    },
+    {
+      "code": "AG58930A",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины промежуточного давления (NGV)",
+      "machine": "Avon 1533, 1534, 1535",
+      "unit": "турбина ПД, сопловой аппарат",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/227",
+      "quote": "Part Name Avon 1533, 1534, 1535 Intermediate Pressure Nozzle Guide Vanes Part number AG58930A/AG58931A Turbine Manufacturer Rolls Royce Turbine Model Avon 1533, 1534, 1535"
+    },
+    {
+      "code": "AG58931A",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины промежуточного давления (NGV), парный номер к AG58930A",
+      "machine": "Avon 1533, 1534, 1535",
+      "unit": "турбина ПД, сопловой аппарат",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/227",
+      "quote": "Part Name Avon 1533, 1534, 1535 Intermediate Pressure Nozzle Guide Vanes Part number AG58930A/AG58931A Turbine Manufacturer Rolls Royce Turbine Model Avon 1533, 1534, 1535"
+    },
+    {
+      "code": "AG59297A",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины низкого давления (NGV)",
+      "machine": "Avon 1533, 1534, 1535",
+      "unit": "турбина НД, сопловой аппарат",
+      "source_url": "http://turbinemarketplace.com/home/detail/230",
+      "quote": "Part Name Avon Low Pressure Nozzle Guide Vanes Part number AG59297A/AG59298A Turbine Manufacturer Rolls Royce Turbine Model Avon 1533, 1534, 1535"
+    },
+    {
+      "code": "AG59298A",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины низкого давления (NGV), парный номер к AG59297A",
+      "machine": "Avon 1533, 1534, 1535",
+      "unit": "турбина НД, сопловой аппарат",
+      "source_url": "http://turbinemarketplace.com/home/detail/230",
+      "quote": "Part Name Avon Low Pressure Nozzle Guide Vanes Part number AG59297A/AG59298A Turbine Manufacturer Rolls Royce Turbine Model Avon 1533, 1534, 1535"
+    },
+    {
+      "code": "LW16244",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины высокого давления (NGV), комплект",
+      "machine": "RB211-24C",
+      "unit": "турбина ВД, сопловой аппарат",
+      "source_url": "https://turbinemarketplace.com/home/detail/212",
+      "quote": "Part Name RB.211-24C High Pressure Nozzle Guide Vanes Part number LW16244/LW16245 Turbine Manufacturer Rolls Royce Turbine Model RB.211-24C"
+    },
+    {
+      "code": "LW16245",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины высокого давления (NGV), парный номер к LW16244",
+      "machine": "RB211-24C",
+      "unit": "турбина ВД, сопловой аппарат",
+      "source_url": "https://turbinemarketplace.com/home/detail/212",
+      "quote": "Part Name RB.211-24C High Pressure Nozzle Guide Vanes Part number LW16244/LW16245 Turbine Manufacturer Rolls Royce Turbine Model RB.211-24C"
+    },
+    {
+      "code": "LW17508",
+      "issuer": "Rolls-Royce",
+      "description": "Сопловой аппарат турбины высокого давления (NGV)",
+      "machine": "RB211-24G",
+      "unit": "турбина ВД, сопловой аппарат",
+      "source_url": "https://turbinemarketplace.com/home/detail/231",
+      "quote": "Part Name RB.211-24G High Pressure Nozzle Guide Vanes Part number LW17508 Turbine Manufacturer Rolls Royce Turbine Model RB.211-24G"
+    },
+    {
+      "code": "LW19405",
+      "issuer": "Rolls-Royce",
+      "description": "Лопатки турбины высокого давления, комплект",
+      "machine": "RB211-24G",
+      "unit": "турбина ВД",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/215",
+      "quote": "Part Name RB.211-24G HPT Blades Part number LW19405 Turbine Manufacturer Rolls Royce Turbine Model RB.211-24G"
+    },
+    {
+      "code": "LW17527",
+      "issuer": "Rolls-Royce",
+      "description": "Лопатка турбины промежуточного давления; в объявлении марка записана противоречиво: в названии 24C, в поле модели 24G",
+      "machine": "RB211-24C / RB211-24G (проверить)",
+      "unit": "турбина ПД",
+      "source_url": "https://www.turbinemarketplace.com/home/detail/216",
+      "quote": "Part Name RB.211-24C IPT Blades Part number LW17527 Turbine Manufacturer Rolls Royce Turbine Model RB.211-24G",
+      "doc_ref": "TurbineMarketplace: марка в названии (24C) и в поле модели (24G) расходится — сверить до заказа"
+    },
+    {
+      "code": "LW15163",
+      "issuer": "Rolls-Royce",
+      "description": "Сегмент уплотнения турбины высокого давления (сотовое уплотнение)",
+      "machine": "RB211-24C",
+      "unit": "турбина ВД, уплотнения",
+      "source_url": "https://turbinemarketplace.com/home/detail/232",
+      "quote": "Part Name RB.211-24C High Pressure Seal Segment Part number LW15163 Turbine Manufacturer Rolls Royce Turbine Model RB.211-24C"
+    },
+    {
+      "code": "LW20101",
+      "issuer": "Rolls-Royce",
+      "description": "Сегмент уплотнения турбины высокого давления (сотовое уплотнение)",
+      "machine": "RB211-24G",
+      "unit": "турбина ВД, уплотнения",
+      "source_url": "https://turbinemarketplace.com/home/detail/233",
+      "quote": "Part Name RB.211-24G High Pressure Seal Segment Part number LW20101 Turbine Manufacturer Rolls Royce Turbine Model RB.211-24G"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Champion Aerospace (США)",
+      "component": "система зажигания: свечи, провода, блоки зажигания (exciter), в т. ч. исполнения CE/ATEX",
+      "machine": "Industrial RB211, промышленный Trent, Industrial Avon",
+      "evidence": "На странице рынка промышленных ГТУ сказано: «Champion's well established Ignition System is used successfully on multi-fuel ... (RB211, Trent and Avon Industrial)»; в перечне деталей даны номера Rolls-Royce (TRN16213, TRN16214, TRN16678, 2-02J-202-001)",
+      "sources": [
+        "https://www.championaerospace.com/markets/industrial-gas-turbine",
+        "https://www.championaerospace.com/wp-content/uploads/2023/06/Champion-Industrial-Parts-05-12-2023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Dresser-Rand (ныне Siemens Energy)",
+      "component": "пакет ГТУ SGT-A35 RB; центробежные компрессоры DATUM, которые приводит Trent 60 DLE",
+      "machine": "SGT-A35 RB (RB211-GT30); Industrial Trent 60",
+      "evidence": "Пресс-релиз Siemens: «integrated into a compact, lightweight Dresser-Rand package»; Offshore Magazine: шесть Trent 60 DLE приводят шесть компрессоров Dresser-Rand DATUM (проект Dolphin, Катар — ОАЭ)",
+      "sources": [
+        "https://press.siemens.com/global/en/pressrelease/siemens-introduces-38-mw-aeroderivative-gas-turbine-oil-and-gas-industry",
+        "https://www.offshore-mag.com/business-briefs/equipment-engineering/article/16762790/middle-east-gas-project-matches-dresser-rand-centrifugal-compressor-and-the-rolls-royce-industrial-trent-60-gas-turbine-for-the-first-time"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Centrax Gas Turbines (Великобритания)",
+      "component": "комплектация генераторных установок Trent 60 (пакетировщик, EPC)",
+      "machine": "Industrial Trent 60 WLE",
+      "evidence": "Centrax собирает генераторные установки Trent 60 из узлов, поставленных Rolls-Royce (франшиза на Европу, 2007–2008 гг.)",
+      "sources": [
+        "https://www.nsenergybusiness.com/analysis/featurecentrax-wins-trent-60-genset-franchise-for-europe/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Petrotech Inc. (США)",
+      "component": "модернизация САУ генераторного привода Avon на ПЛК (топливные клапаны, ВНА, частота вращения, термопары выходных газов)",
+      "machine": "Industrial Avon (генераторный привод)",
+      "evidence": "Product Bulletin 04005: пакет управления заменяет прежние механико-гидравлические регуляторы топлива Avon",
+      "sources": [
+        "https://petrotechinc.com/literature-library-files/gas-steam-turbines/rolls-royce-avon.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Rolls-Royce Entronics",
+      "component": "система управления и контроля испытательного стенда (FT-110)",
+      "machine": "Industrial RB211 (испытательный стенд TCT)",
+      "evidence": "Отчёт TCT: «PLC based engine control and monitoring system, which is provided by the Rolls-Royce Entronics FT-110»",
+      "sources": [
+        "https://www.corpassets.com/wp-content/uploads/2018/10/UGL-Compression-Engine.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Siemens Energy",
+      "country": "Германия / глобально (производство Trent 60 — Маунт-Вернон, США, и Монреаль, Канада)",
+      "role": "официальный: правообладатель и изготовитель после покупки Rolls-Royce Energy в 2014 г.: запчасти, долгосрочные программы (LTP), капремонт, обменный фонд газогенераторов",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-a35.html",
+        "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-a65.html",
+        "https://press.siemens.com/global/en/pressrelease/siemens-acquire-rolls-royce-energy-gas-turbine-and-compressor-business-and-enter-long"
+      ]
+    },
+    {
+      "company": "TransCanada Turbines Ltd. (TCT)",
+      "country": "Канада (депо в Эрдри, стенд в Калгари)",
+      "role": "официальный (лицензиат): лицензированный Siemens Energy ремонт, капремонт и выездной сервис всех марок SGT-A35 (RB211), в т. ч. DLE, и SGT-A20 (Avon); испытательный стенд с категорией 1 от Rolls-Royce",
+      "sources": [
+        "https://www.tcturbines.com/Engines",
+        "https://www.tcturbines.com/",
+        "https://www.corpassets.com/wp-content/uploads/2018/10/UGL-Compression-Engine.pdf"
+      ]
+    },
+    {
+      "company": "RWG (Repair & Overhauls) Ltd",
+      "country": "Великобритания (Абердин); площадки также в США и Азиатско-Тихоокеанском регионе",
+      "role": "официальный (с 2025 г. целиком у Siemens Energy): ремонт и капремонт SGT-A20 (Industrial Avon), SGT-A35 (Industrial RB211), модернизация Avon 200; бывшее СП Rolls-Royce и Wood, доля Rolls-Royce перешла к Siemens в 2014 г., в 2025 г. Wood продала свою долю Siemens Energy",
+      "sources": [
+        "https://rwgroup.com/gas-turbines/avon/",
+        "https://rwgroup.com/gas-turbines/rb211/",
+        "https://www.woodgroup.com/news/latest-press-releases/2025/sale-of-joint-venture-interest-in-rwg-to-siemens-energy-global",
+        "https://www.turbomachinerymag.com/view/rwg-completes-130th-siemens-sgt-a20-av-gas-generator-upgrade"
+      ]
+    },
+    {
+      "company": "Rolaar Ltd",
+      "country": "Великобритания",
+      "role": "независимый поставщик новых и восстановленных деталей Avon 1533/1534/1535 и RB211 (сертификат ISO 9001), ремонт узлов, собственные жгуты термопар и провода зажигания",
+      "sources": [
+        "https://www.rolaar.co.uk/part-supply",
+        "https://www.rolaar.co.uk/wp-content/uploads/2018/08/rolaar-overhall-capability.pdf"
+      ]
+    },
+    {
+      "company": "Score Energy Ltd (Score Group)",
+      "country": "Великобритания; на карте в проспекте также США, ОАЭ, Китай, Малайзия, Венесуэла",
+      "role": "независимый: склад новых и восстановленных деталей Avon и RB211 (по проспекту — более 30 млн долл.), детали Avon 1533/1534/1535 собственного изготовления, испытательный стенд Glen Test",
+      "sources": [
+        "https://cdn1.scoreltd.com/pdf/flyers/score-group/Score-Energy-Parts.pdf"
+      ]
+    },
+    {
+      "company": "ПРОМИМПОРТ",
+      "country": "Россия",
+      "role": "независимый посредник по ремонту и сервису ГТУ; сообщает о стенде партнёра, «полностью настроенном» для двигателей Avon и Olympus",
+      "sources": [
+        "https://promimport.info/service/remont-i-servisnoe-obsluzhivanie-gazovyh-turbin/"
+      ]
+    },
+    {
+      "company": "Hangzhou Gas Turbine Parts Co. Ltd",
+      "country": "Китай",
+      "role": "независимый продавец деталей горячей части, в т. ч. лопаток ТВД Avon 1535 (AG56672A)",
+      "sources": [
+        "http://gas-turbine-parts.com/?m=home&c=View&a=index&aid=252"
+      ]
+    },
+    {
+      "company": "Falcon Crest Aviation",
+      "country": "США",
+      "role": "независимый по отношению к Rolls-Royce и Siemens Energy; по собственному заявлению — эксклюзивный дистрибьютор Champion на вторичном рынке, в т. ч. зажигания промышленных ГТУ Rolls-Royce (перекрёстная таблица номеров)",
+      "sources": [
+        "http://www.falconcrestaviation.com/Documents/indxref.pdf"
+      ]
+    },
+    {
+      "company": "AeroTurbineSpare",
+      "country": "США (адрес во Флориде, телефон в Омане)",
+      "role": "независимый торговый посредник по деталям RB211, Avon и Trent; номеров деталей на страницах нет, технические описания недостоверны — годится только как адресат запроса",
+      "sources": [
+        "https://aeroturbinespare.com/rolls-royce-rb211-parts"
+      ]
+    }
+  ],
+  "gaps": [
+    "Переходы номеров деталей Rolls-Royce → Siemens Energy в открытых источниках не найдены. Все найденные коды — прежние обозначения Rolls-Royce (AG…A, LW…, TRN…, 2-02J-…). Таблица замен, вероятно, лежит в закрытых бюллетенях и на портале заказчика Siemens Energy (Customer Portal) и у TCT/RWG. Косвенное свидетельство: прежний сегмент уплотнения IP для RB211-22 Siemens больше не выпускает, замену проводят через «Siemens approval scheme» (отчёт TCT, 2016).",
+    "По Industrial Trent 60 / SGT-A65 не найдено ни одного номера детали, у которого на странице стоит именно эта машина. Ближайшее — строка Champion «RB211 & Trent 800 Industrial Igniter» (TRN16214); к какому промышленному Trent она относится, надо проверить.",
+    "Нет кодов фильтров (масло, топливо, КВОУ), подшипников, топливных форсунок, термопар и датчиков вибрации с цитатой изготовителя. По описаниям такие перечни есть в IPC Avon (главы на Scribd, например c7s3 «Igniter plugs») и в O&M RB211-24G DLE Vol. 2, но Scribd закрыт для автоматического чтения — нужен ручной просмотр или покупка.",
+    "Коды TurbineMarketplace относятся к восстановленным деталям горячей части, объявления 2015 года; наличие и цены сейчас не проверены, продавец на странице не назван.",
+    "Номера выводов зажигания и датчиков частоты от Rolaar (S400401, 810-500-1523, 3040A, 72-5287A и др.) даны как «recognised part numbers» без указания владельца номера. Какие из них номера Rolls-Royce, а какие изготовителей комплектующих (например, Unison или Woodward), не установлено.",
+    "Строка Champion TRN17235 → 53363-1CE подписана «Exciter Box», хотя 53363-1 у Champion — провод зажигания. Возможна ошибка в таблице, до заказа нужна сверка.",
+    "Лот Salvex с деталями RB211 (UL23463, LK86796 и др.) — авиационные RB211 (упомянут отчёт Iberia), промышленная применимость не подтверждена, в список не включён.",
+    "Сервисные центры в России, СНГ, Турции, Индии и ОАЭ с лицензией Siemens Energy на RB211, Avon или Trent 60 не найдены. По китайским источникам, у PetroChina есть центр ремонта газоперекачивающих агрегатов, где заводской ремонт RB211 идёт параллельно с LM2500+SAC (56 RB211 на Западно-Восточном газопроводе), но название и адрес по первоисточнику не подтверждены (статьи bjx и sohu недоступны).",
+    "Сайт RWG (rwgroup.com) не отдаёт содержимое автоматическим клиентам, и сведения о его площадках и охвате взяты из выдачи поиска. Пресс-релиз Wood о продаже доли в RWG (2025) тоже недоступен (403).",
+    "Изготовители подшипников, фильтров, топливной аппаратуры (Lucas, Dowty и др.) и системы управления штатной поставки RB211 и Trent 60 открытыми источниками не подтверждены.",
+    "У блоков зажигания Rolls-Royce (TRN16678, TRN17234, RRE003350, 2-02J-199-001, 2-02J-199-003) и у Champion 305136 машина в источнике не названа — применимость к RB211 или Avon сверять по ведомости пакета."
+  ],
+  "verifier_notes": "Опровергать нечего: все 40 кодов и все цитаты найдены в источниках дословно, с точностью до пробелов. Страницы открыты curl (PDF разобраны pdftotext), turbinemarketplace 212–233 — тоже. Три страницы отдали curl 403: nsenergybusiness и modernpowersystems прочитаны через WebFetch, turbomachinerymag не открылся ничем, поэтому мощность 10–15 МВт для SGT-A20 не проверена. Существование модели подтверждено другими источниками. Замечания до записи в библиотеку. (1) У TRN17235 в таблице Champion/falconcrest стоит «Exciter Box», а аналог 53363-1CE — провод; вероятно, ошибка таблицы, код до заказа проверить. (2) У TRN16678/TRN17234/305136 в источнике не указано, к какой машине они относятся (RB211 или Avon): там только «Rolls-Royce Industrial Exciter». (3) В строке 305136 Champion 2023 есть ещё номера OEM, не внесённые в разведку: RRE003350 и 2-02J-199-003; в таблице falconcrest есть 2-02J-201-003 → 53363-1CE Ignition Lead. (4) AG55785A выставлен как scrap. (5) LW17527: в объявлении противоречие по марке 24C/24G. (6) Avon 200 по Rolls-Royce — пакет модернизации 1533/1534/1535, а не отдельная новая машина. (7) Механический привод SGT-A35 39,5 МВт на странице Siemens не найден, там видны 32–38 МВт.",
+  "corrections": [
+    "TRN16678, TRN17234, 305136, 2-02J-199-001: machine сужено до «промышленные ГТУ Rolls-Royce» — машина (RB211 или Avon) в источнике не названа (замечание скептика 2)",
+    "TRN17235: противоречие строки таблицы вынесено и в doc_ref — до заказа сверить (замечание скептика 1)",
+    "RRE003350, 2-02J-199-003, 2-02J-201-003: добавлены три номера OEM из замечания скептика 3 — PDF Champion 2023 и таблица falconcrest скачаны заново 26.09.2026, цитаты взяты из текста pdftotext",
+    "AG55785A: в description отмечено, что лот выставлен как scrap (замечание скептика 4)",
+    "LW17527: расхождение марок 24C/24G вынесено в doc_ref (замечание скептика 5)",
+    "Avon 200 / SGT-A20: kind переписан — пакет модернизации 1533/1534/1535, а не новая машина (замечание скептика 6); в rating оговорено, что 10–15 МВт скептиком не проверены (turbomachinerymag не открылся)",
+    "SGT-A35: мощность механического привода 39,5 МВт на странице Siemens не найдена — rating исправлен на видимые 32–38 МВт (замечание скептика 7)",
+    "sub_suppliers: verified: true — страницы-источники открыты скептиком (curl или WebFetch)",
+    "dealers: в role прямо записано «официальный» или «независимый» (требование навыка)",
+    "summary: число кодов 40 → 43 и уточнение про Avon 200"
+  ]
+}

@@ -1,6 +1,6 @@
 {
  "schema": "kvant.model-series/1",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "note": "Модельные ряды брендов с шаблоном распознавания. Одна запись ряда — название, тип машины, шаблоны (регулярные выражения Python без границ — границы слова ставит library/model_series.py), примеры обозначений, которые шаблон обязан узнавать (проверяет tests/test_model_series.py), и источники — официальная страница или каталог изготовителя; вторичный источник оговорён в note. context «сам» — обозначение различимо само, «бренд» — засчитывается только при имени бренда (aliases или context_aliases) в той же строке или в поле изготовителя. Ряд без источника не добавляется. brand_key — ключ dict/oem.json, если бренд там есть, иначе новый ключ того же вида. origin — западный / китайский / прочий. Сведения только общедоступные. field_aliases — написания, которые делают бренд только в поле изготовителя (CAT, NORD), а в тексте строки неоднозначны; по ним и по aliases замер сводит ключи реестра брендов, заведённые другим написанием того же бренда (cat → caterpillar, warman → weir, getriebebaunord… → nord). ВЛАДЕНИЕ (25.09.2026): role — «бренд» (марка на шильдике; у всех записей brands), «владелец» (холдинг, чьё имя на шильдике не стоит или стоит рядом; записи owners — без рядов и без написаний, в распознавании не участвуют), «бывший владелец» (элементы owner_history). owner — ключ записи brands/owners либо имя компании, если записи нет; owner_since/owner_until — год, owner_source — страница изготовителя или отчёт, проверенные запросом 25.09.2026; поля бывают и у ряда, когда марка ряда ушла другому владельцу (Rolls-Royce RB211 → Siemens Energy). Бренд с владельцем не сливается: Solar Turbines остаётся Solar Turbines, owner=caterpillar. Применение — library/brand_owner.py; спорное и неподтверждённое — в gaps с приставкой «Владение:».",
  "types": [
   "ГПУ",
@@ -21,7 +21,8 @@
   "гидравлика",
   "турбонагнетатель",
   "детандер",
-  "пылеуловитель"
+  "пылеуловитель",
+  "паровая турбина"
  ],
  "gaps": [
   "Harbin Electric, Shanghai Electric, CRRC, Hongda — ряд с источником не найден в этой сессии, не добавлены.",
@@ -1092,6 +1093,66 @@
       "https://datasheets.globalspec.com/ds/siemens-ag/datum/8fcf44f8-57aa-4e87-8aa0-d88341f38e66"
      ],
      "note": "DATUM — ещё и слово чертежа («базовая поверхность»): только рядом с именем бренда."
+    },
+    {
+     "id": "dresser-hos",
+     "series": "HOS (оппозитные поршневые компрессоры, рамы 5/6/7HOS2–6)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "[5-7]\\s?HOS\\s?[246]",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "7HOS6",
+      "5HOS4",
+      "6 HOS 2"
+     ],
+     "sources": [
+      "https://assets.siemens-energy.com/dam/89766c13-8a07-4210-9742-b05000a7c55b/HOS-Specification-Sheet-June-2021-pdf_Original%20file.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/siemensdemagdelavalturbomachinery.json."
+    },
+    {
+     "id": "dresser-rla",
+     "series": "RLA, RLVA, RLH (одноступенчатые паровые турбины D-R)",
+     "type": "паровая турбина",
+     "patterns": [
+      {
+       "rx": "RL(?:VA|A|H)(?:\\s?-?\\s?\\d{2}[A-Z]?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "RLA-16L",
+      "RLVA",
+      "RLH-24"
+     ],
+     "sources": [
+      "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html",
+      "https://www.mcraeeng.com/files/single-stage-turbine-686140.pdf"
+     ],
+     "note": "Короткий код: только рядом с именем бренда. Брошюра RLA/RLVA — у дистрибьютора (mcraeeng.com), документ изготовителя."
+    },
+    {
+     "id": "dresser-sst",
+     "series": "SST 350/500/700 (одноступенчатые паровые турбины D-R)",
+     "type": "паровая турбина",
+     "patterns": [
+      {
+       "rx": "SST\\s?-?\\s?(?:350|500|700)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SST 350",
+      "SST-700"
+     ],
+     "sources": [
+      "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+     ],
+     "note": "У Siemens Energy есть и свои паровые SST-xxx (SST-300, SST-600…): без имени Dresser-Rand не засчитывается."
     }
    ]
   },
@@ -1360,6 +1421,26 @@
        "owner_source": "https://www.siemens-energy.com/global/en/home/press-releases/initial-listing-siemens-energy.html"
       }
      ]
+    },
+    {
+     "id": "rr-trent60",
+     "series": "Industrial Trent 60 (ныне SGT-A65 TR)",
+     "type": "ГТУ",
+     "patterns": [
+      {
+       "rx": "(?:Industrial\\s?)?Trent\\s?60(?:\\s?(?:DLE|WLE))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Trent 60",
+      "Industrial Trent 60 DLE",
+      "Trent 60 WLE"
+     ],
+     "sources": [
+      "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-a65.html"
+     ],
+     "note": "Trent — ещё и имя собственное: только рядом с именем бренда. Подтверждено разведкой data/brand_research/rollsroyce.json."
     }
    ]
   },

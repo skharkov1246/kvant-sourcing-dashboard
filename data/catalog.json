@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 286,
-    "total_bytes": 124946353,
+    "datasets": 288,
+    "total_bytes": 125061462,
     "by_sensitivity": {
-      "внутреннее": 164,
+      "внутреннее": 166,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 22,
+      "дашборд сорсеров": 24,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3610,7 +3610,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 178798,
+      "bytes": 183073,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -3628,6 +3628,8 @@
         "data/brand_research/mwmcaterpillarenergy.json",
         "data/brand_research/perkinsfgwilson.json",
         "data/brand_research/queue.json",
+        "data/brand_research/rollsroyce.json",
+        "data/brand_research/siemensdemagdelavalturbomachinery.json",
         "data/brand_research/siemensenergy.json",
         "data/brand_research/solarturbines.json",
         "data/brand_research/waukeshainnio.json",
@@ -3652,13 +3654,11 @@
         "gt/data/bitrix_gt.json",
         "gt/data/bitrix_tkp_index.json",
         "gt/data/budget_join_stats.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json"
+        "gt/data/dossiers.json"
       ],
-      "last_change": "2026-09-25",
+      "last_change": "2026-09-26",
       "last_author": "Claude",
-      "last_commit": "7268a62",
+      "last_commit": "4e364da",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6958,6 +6958,54 @@
       ]
     },
     {
+      "path": "data/brand_research/rollsroyce.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 59936,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Rolls-Royce: промышленные ГТУ Industrial Avon (1533/1534/1535, Avon 200 = SGT-A20), Industrial RB211 (-22, -24A/C/G/GT, H63; ныне SGT-A35) и Industrial Trent 60 (SGT-A65), с 2014 г. у Siemens Energy. Машин и исполнений — 12, сервисных документов — 10, кодов запчастей — 43: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 9, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 10 (поле corrections). Все коды — прежние номера Rolls-Royce (AG…A у Avon, LW… у RB211, TRN… и 2-02J-… у зажигания): 16 — из перечня зажигания Champion Aerospace 2023 и перекрёстной таблицы Champion 2015, 9 — со страниц Rolaar (номера проводов и датчиков без владельца номера, жгут термопар, обтекатель стартера), 18 — объявления TurbineMarketplace по горячей части Avon и RB211-24C/24G (2015 г., восстановленные). Таблицы переходов номеров Rolls-Royce → Siemens Energy в открытых источниках нет; по Trent 60 ни одного номера с названной машиной. Ремонт по лицензии Siemens Energy — TransCanada Turbines и RWG; в РФ и СНГ лицензиатов не найдено. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 43,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "4cf6fa8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "zip/data/r1700_recon/contacts.json",
       "subproject": "база ЗИП",
       "bytes": 59850,
@@ -7739,9 +7787,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "Claude",
-      "last_commit": "7268a62",
+      "last_change": "2026-09-26",
+      "last_author": "skharkov1246",
+      "last_commit": "e704269",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7880,6 +7928,54 @@
       ]
     },
     {
+      "path": "data/brand_research/siemensdemagdelavalturbomachinery.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 50799,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Dresser-Rand (Siemens Energy): паровые турбины D-R (RLA/RLVA, SST 350/500/700, C, B, R/RS и др.), поршневые компрессоры HOS, ESH, HSE и центробежные DATUM. Машин и исполнений — 25, сервисных документов — 8, кодов запчастей — 38: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 6, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Коды — номера Dresser-Rand у склада излишков NRI Industrial (22), в каталоге закупщика Soluparts (10, из них 4 — бренд по категории страницы) и в перекрёстных ссылках изготовителя аналогов торцевых уплотнений Springer Parts (6); машина названа только у двух (7HOS6, 361B5/5). Открытых каталогов деталей Dresser-Rand нет: номера на машину выдаёт Siemens Energy по серийному номеру. Субпоставщики (Woodward, Fisher, Bently Nevada, Tri-Sen, CCC) — по инструкции SST Manual 107-A и брошюре RLA. Официальных сервисных центров в РФ и СНГ не найдено, российские поставщики — независимые. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 38,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "4cf6fa8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gidromet/data/pirrotin.json",
       "subproject": "гидрометаллургия",
       "bytes": 50636,
@@ -7951,9 +8047,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "Claude",
-      "last_commit": "7268a62",
+      "last_change": "2026-09-26",
+      "last_author": "skharkov1246",
+      "last_commit": "e704269",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9073,6 +9169,52 @@
       ]
     },
     {
+      "path": "data/brand_research/queue.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 32464,
+      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 18, в очереди — 42. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "groups",
+        "records",
+        "rule",
+        "schema",
+        "statuses",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "records",
+        "records": 60,
+        "record_keys": [
+          "atlas",
+          "dict_name",
+          "file",
+          "focus",
+          "group",
+          "n_spellings",
+          "name",
+          "oem_key",
+          "priority",
+          "researched_at",
+          "status"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "4cf6fa8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/brand_research_check.py",
+        "tests/test_brand_research_check.py",
+        "tests/test_model_series.py"
+      ]
+    },
+    {
       "path": "ove/data/automation.json",
       "subproject": "ОВЭ-75",
       "bytes": 32384,
@@ -9105,52 +9247,6 @@
       "referenced_by": [
         "ove/build.py",
         "ove/site/index.template.html"
-      ]
-    },
-    {
-      "path": "data/brand_research/queue.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 32365,
-      "note": "Очередь разведки брендов (обновлена 2026-09-25): 60 брендов из dict/oem.json, сделано — 16, в очереди — 44. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "groups",
-        "records",
-        "rule",
-        "schema",
-        "statuses",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "records",
-        "records": 60,
-        "record_keys": [
-          "atlas",
-          "dict_name",
-          "file",
-          "focus",
-          "group",
-          "n_spellings",
-          "name",
-          "oem_key",
-          "priority",
-          "researched_at",
-          "status"
-        ]
-      },
-      "last_change": "2026-09-25",
-      "last_author": "Claude",
-      "last_commit": "7268a62",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/brand_research_check.py",
-        "tests/test_brand_research_check.py",
-        "tests/test_model_series.py"
       ]
     },
     {

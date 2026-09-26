@@ -1,0 +1,925 @@
+{
+  "oem_key": "siemensdemagdelavalturbomachinery",
+  "name": "Dresser-Rand (Siemens Energy; Siemens Demag Delaval Turbomachinery)",
+  "segment_focus": "центробежные и поршневые компрессоры, паровые турбины: номера уплотнений, подшипников, клапанов; сервис",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Dresser-Rand с 2015 г. принадлежит Siemens (сейчас Siemens Energy), марка сохранена для паровых турбин, поршневых и центробежных компрессоров. Найдено: 25 моделей в фокусе. Сюда входят 14 серий паровых турбин с официальной страницы Siemens Energy, 9 рам поршневого компрессора HOS с листа данных Siemens Energy (июнь 2021) поршневые ESH и HSE со страницы Siemens Energy, серии центробежных компрессоров DATUM (I, C, P, R/A) из брошюры и две модели, известные только по строкам запчастей (361B5/5, 24 ZSA-1). Нашлись 3 открытых сервисных документа: инструкция по эксплуатации SST 350/500/700 Manual 107 Rev. A, брошюра RLA/RLVA и лист данных HOS. Записано 38 кодов запчастей. У каждого кода есть дословная цитата со страницы: NRI Industrial (склад излишков, США), Soluparts (закупочная компания) и Springer Parts (аналоги торцевых уплотнений с перекрёстными ссылками на номера Dresser-Rand). Почти все коды относятся к поршневым компрессорам (поршневые и опорные кольца, уплотнения, вкладыши, клапаны) и к уплотнениям турбин. Машина к коду привязана только в двух случаях: 7HOS6 и 361B5/5. Субпоставщики установлены по инструкции SST и брошюре RLA: Woodward (регуляторы TG/PG/UG/Peak 150), Fisher, Bently Nevada, Tri-Sen, CCC. Датчик ABB виден в строке запчасти. Официальной дилерской сети в РФ/СНГ нет, работают только независимые поставщики ЗИП (НПО Инеко, Станкомплект, ДАЛКОС, AMCOR). Сервисные центры Siemens Energy есть в Индии и ОАЭ.",
+  "machines": [
+    {
+      "model": "D-R RLA (RLA-12L/16L/16E/20L/23L/23E)",
+      "kind": "паровая турбина одноступенчатая, горизонтальная",
+      "segment": "прочее",
+      "rating": "до 1000 HP (746 kW)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mcraeeng.com/files/single-stage-turbine-686140.pdf",
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R RLVA",
+      "kind": "паровая турбина одноступенчатая, вертикальная",
+      "segment": "прочее",
+      "rating": "те же размеры, что RLA; до 1000 HP",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mcraeeng.com/files/single-stage-turbine-686140.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R RLH-15 & 24",
+      "kind": "паровая турбина одноступенчатая",
+      "segment": "прочее",
+      "rating": "1 865 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R SST 350 / 500 / 700",
+      "kind": "паровая турбина одноступенчатая",
+      "segment": "прочее",
+      "rating": "3 500 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html",
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R 2TA",
+      "kind": "паровая турбина",
+      "segment": "прочее",
+      "rating": "3 640 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R C",
+      "kind": "паровая турбина",
+      "segment": "прочее",
+      "rating": "2 500 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R AVTTW",
+      "kind": "паровая турбина",
+      "segment": "прочее",
+      "rating": "4 500 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R GTW",
+      "kind": "паровая турбина",
+      "segment": "прочее",
+      "rating": "4 500 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R GAF",
+      "kind": "паровая турбина",
+      "segment": "прочее",
+      "rating": "3 500 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R U",
+      "kind": "паровая турбина многоступенчатая",
+      "segment": "прочее",
+      "rating": "6 340 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html",
+        "https://www.mcraeeng.com/files/multi-stage-steam-turbine-261825.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R R/RS",
+      "kind": "паровая турбина многоступенчатая",
+      "segment": "прочее",
+      "rating": "25 000 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R K",
+      "kind": "паровая турбина",
+      "segment": "прочее",
+      "rating": "4 850 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R B",
+      "kind": "паровая турбина",
+      "segment": "прочее",
+      "rating": "11 000 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-R Tandem",
+      "kind": "паровая турбина",
+      "segment": "прочее",
+      "rating": "12 500 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "5HOS2 / 5HOS4 / 5HOS6",
+      "kind": "поршневой компрессор оппозитный, ход 5 in",
+      "segment": "компрессор",
+      "rating": "2 400 / 4 800 / 7 200 HP (1 790 / 3 580 / 5 370 kW), 1 500 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.siemens-energy.com/dam/89766c13-8a07-4210-9742-b05000a7c55b/HOS-Specification-Sheet-June-2021-pdf_Original%20file.pdf",
+        "https://www.salvex.com/listings/listing_detail.cfm/aucid/183038901/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "6HOS2 / 6HOS4 / 6HOS6",
+      "kind": "поршневой компрессор оппозитный, ход 6 in",
+      "segment": "компрессор",
+      "rating": "2 000 / 4 000 / 6 000 HP (1 492 / 2 983 / 4 475 kW), 1 200 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.siemens-energy.com/dam/89766c13-8a07-4210-9742-b05000a7c55b/HOS-Specification-Sheet-June-2021-pdf_Original%20file.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "7HOS2 / 7HOS4 / 7HOS6",
+      "kind": "поршневой компрессор оппозитный, ход 7 in",
+      "segment": "компрессор",
+      "rating": "2 200 / 4 400 / 6 000 HP (1 641 / 3 281 / 4 475 kW), 1 000 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.siemens-energy.com/dam/89766c13-8a07-4210-9742-b05000a7c55b/HOS-Specification-Sheet-June-2021-pdf_Original%20file.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ESH",
+      "kind": "поршневой компрессор одноцилиндровый (ход 7, 9, 11 in)",
+      "segment": "компрессор",
+      "rating": "у Siemens Energy: 7-ESH 70 HP, 11-ESH 180 HP (прежние 5–1 000 HP из выдачи поиска не подтверждены)",
+      "status": "в линейке Siemens Energy (страница поршневых компрессоров)",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/reciprocating-compressors.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HSE",
+      "kind": "поршневой компрессор 2 или 4 ряда, ход до 11 in",
+      "segment": "компрессор",
+      "rating": "источник противоречив: на странице Siemens Energy до 1 000 HP, в листке Siemens Energy (июнь 2021) 786 HP",
+      "status": "в линейке Siemens Energy (страница поршневых компрессоров)",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/reciprocating-compressors.html",
+        "https://assets.siemens-energy.com/dam/fccc7d67-6a61-4fb7-82a8-b05000ab6574/HSE-Recip-Compressor-Flyer-June-2021-pdf_Original%20file.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DATUM (R — радиальный разъём, A — осевой разъём; рамы D2–D28)",
+      "kind": "центробежный компрессор многоступенчатый",
+      "segment": "компрессор",
+      "rating": "15 типоразмеров рам; до 15 000 psig (1 000 bar)",
+      "status": "выпускается по брошюре Dresser-Rand (старая брошюра; текущий выпуск не проверялся)",
+      "sources": [
+        "https://hickman-shearer.co.uk/wp-content/uploads/2020/06/vdocuments.mx_dresser-rand-datum-compressors.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DATUM I (ICS, рамы D4–D14)",
+      "kind": "интегрированная компрессорная система: центробежный компрессор + ротационный сепаратор + высокооборотный электродвигатель на магнитных подшипниках",
+      "segment": "компрессор",
+      "rating": "рамы D4–D14",
+      "status": "выпускается по брошюре Dresser-Rand (старая брошюра; текущий выпуск не проверялся)",
+      "sources": [
+        "https://hickman-shearer.co.uk/wp-content/uploads/2020/06/vdocuments.mx_dresser-rand-datum-compressors.pdf",
+        "https://www.worldoil.com/news/2013/5/20/dresser-rand-introduces-newest-datum-centrifugal-compressor"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DATUM C (рамы D6–D16)",
+      "kind": "центробежный компрессор герметичный, на магнитных подшипниках",
+      "segment": "компрессор",
+      "rating": "рамы D6–D16",
+      "status": "выпускается по брошюре Dresser-Rand (старая брошюра; текущий выпуск не проверялся)",
+      "sources": [
+        "https://hickman-shearer.co.uk/wp-content/uploads/2020/06/vdocuments.mx_dresser-rand-datum-compressors.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DATUM P (рамы D8–D16)",
+      "kind": "центробежный компрессор трубопроводный (корпус-бочка)",
+      "segment": "компрессор",
+      "rating": "рамы D8–D16",
+      "status": "выпускается по брошюре Dresser-Rand (старая брошюра; текущий выпуск не проверялся)",
+      "sources": [
+        "https://hickman-shearer.co.uk/wp-content/uploads/2020/06/vdocuments.mx_dresser-rand-datum-compressors.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "361B5/5",
+      "kind": "компрессор (тип по источнику не указан)",
+      "segment": "компрессор",
+      "rating": "не указано",
+      "status": "не установлено; модель известна только по строке запчасти Soluparts",
+      "sources": [
+        "https://soluparts.com/products/dresser-rand/"
+      ],
+      "verified": false
+    },
+    {
+      "model": "24 ZSA-1",
+      "kind": "турбина (так в строке запчасти; изготовитель в строке — Dresser Consolidated)",
+      "segment": "прочее",
+      "rating": "не указано",
+      "status": "не установлено; модель известна только по строке запчасти Soluparts",
+      "sources": [
+        "https://soluparts.com/products/dresser-rand/"
+      ],
+      "verified": false
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Instruction Manual for Single Stage 350, 500, and 700 Frame Steam Turbines (Dresser-Rand SST 350, SST 500, SST 700), March 2011",
+      "doc_no": "Manual 107, Revision A",
+      "machine": "D-R SST 350 / 500 / 700",
+      "kind": "O&M",
+      "sources": [
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ]
+    },
+    {
+      "title": "RLA / RLVA Single-Stage Steam Turbine (брошюра и таблица предельных параметров)",
+      "doc_no": "",
+      "machine": "D-R RLA / RLVA",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.mcraeeng.com/files/single-stage-turbine-686140.pdf"
+      ]
+    },
+    {
+      "title": "Dresser-Rand HOS compressor — Specification Sheet, June 2021",
+      "doc_no": "",
+      "machine": "5HOS / 6HOS / 7HOS",
+      "kind": "каталог / лист данных",
+      "sources": [
+        "https://assets.siemens-energy.com/dam/89766c13-8a07-4210-9742-b05000a7c55b/HOS-Specification-Sheet-June-2021-pdf_Original%20file.pdf"
+      ]
+    },
+    {
+      "title": "DATUM Centrifugal Compressors (брошюра со схемой обозначения моделей и картой рам)",
+      "doc_no": "85188",
+      "machine": "DATUM",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://hickman-shearer.co.uk/wp-content/uploads/2020/06/vdocuments.mx_dresser-rand-datum-compressors.pdf"
+      ]
+    },
+    {
+      "title": "Model U multi-stage steam turbine (брошюра)",
+      "doc_no": "",
+      "machine": "D-R U",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.mcraeeng.com/files/multi-stage-steam-turbine-261825.pdf"
+      ]
+    },
+    {
+      "title": "Dresser-Rand RLA Turbine Instruction Manual (копия на стороннем хостинге, не открывалась)",
+      "doc_no": "",
+      "machine": "D-R RLA",
+      "kind": "O&M",
+      "sources": [
+        "https://pdfcoffee.com/steam-turbine-manual-10-pdf-free.html"
+      ]
+    },
+    {
+      "title": "Woodward Bulletin 25071 (на него ссылается Manual 107-A, регулятор TG)",
+      "doc_no": "25071",
+      "machine": "D-R SST 350 / 500 / 700",
+      "kind": "бюллетень",
+      "sources": [
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ]
+    },
+    {
+      "title": "Woodward Peak 150 Installation and Operation manual (на него ссылается Manual 107-A)",
+      "doc_no": "85565",
+      "machine": "D-R SST 350 / 500 / 700",
+      "kind": "O&M",
+      "sources": [
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "610-159-201",
+      "issuer": "Dresser-Rand",
+      "description": "уплотнительное кольцо",
+      "machine": "не указана",
+      "unit": "уплотнения",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 610-159-201 SEAL RING"
+    },
+    {
+      "code": "421449001",
+      "issuer": "Dresser-Rand",
+      "description": "уплотнительное кольцо",
+      "machine": "не указана",
+      "unit": "уплотнения",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 421449001 SEAL RING"
+    },
+    {
+      "code": "T10393",
+      "issuer": "Dresser-Rand",
+      "description": "угольное уплотнительное кольцо",
+      "machine": "не указана (вероятно, уплотнение вала паровой турбины)",
+      "unit": "концевые уплотнения",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND T10393 CARBON RING SEAL"
+    },
+    {
+      "code": "407 692 005",
+      "issuer": "Dresser-Rand",
+      "description": "лабиринтное уплотнение компрессора",
+      "machine": "не указана",
+      "unit": "уплотнения",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 407 692 005 COMPRESSOR LABYRINTH SEAL"
+    },
+    {
+      "code": "125303-008",
+      "issuer": "Dresser-Rand",
+      "description": "лабиринтное кольцо уплотнения, прямое, 6 сегментов",
+      "machine": "не указана",
+      "unit": "уплотнения",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 125303-008 LABYRINTH RING PACKING STRAIGHT 6PT"
+    },
+    {
+      "code": "002 271 464",
+      "issuer": "Dresser-Rand",
+      "description": "уплотнительное кольцо (O-ring) компрессора",
+      "machine": "не указана",
+      "unit": "уплотнения",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 002 271 464 COMPRESSOR O-RING"
+    },
+    {
+      "code": "1W79287C",
+      "issuer": "Dresser-Rand",
+      "description": "вкладыш подшипника",
+      "machine": "не указана",
+      "unit": "подшипники",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 1W79287C BEARING SHELL"
+    },
+    {
+      "code": "1H36482",
+      "issuer": "Dresser-Rand",
+      "description": "башмак крейцкопфа",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "крейцкопф",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER RAND 1H36482 SHOE CROSSHEAD"
+    },
+    {
+      "code": "109-752-001",
+      "issuer": "Dresser-Rand",
+      "description": "болт шатуна PPC2",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "шатун",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 109-752-001 PPC2 CONNECTING ROD BOLT"
+    },
+    {
+      "code": "W39163",
+      "issuer": "Dresser-Rand",
+      "description": "нагнетательный клапан",
+      "machine": "не указана",
+      "unit": "клапаны цилиндра",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND W39163 EXHAUST VALVE"
+    },
+    {
+      "code": "1R35818AP1",
+      "issuer": "Dresser-Rand",
+      "description": "плунжер разгрузочного устройства",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "разгрузка клапанов",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 1R35818AP1 PLUNGER UNLOADER"
+    },
+    {
+      "code": "92355 001",
+      "issuer": "Dresser-Rand",
+      "description": "подъёмный шток",
+      "machine": "не указана",
+      "unit": "клапаны",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 92355 001 LIFTING STEM"
+    },
+    {
+      "code": "228214D1",
+      "issuer": "Dresser-Rand",
+      "description": "крышка (колпак) компрессора",
+      "machine": "не указана",
+      "unit": "цилиндр / клапанная крышка",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 228214D1 COMPRESSOR BONNET"
+    },
+    {
+      "code": "100973-001",
+      "issuer": "Dresser-Rand",
+      "description": "приводной вал регулятора",
+      "machine": "не указана (вероятно, паровая турбина)",
+      "unit": "регулятор",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 100973-001 DRIVESHAFT GOVERNOR"
+    },
+    {
+      "code": "50A18AA790",
+      "issuer": "Dresser-Rand",
+      "description": "поршневое кольцо 6 in",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "поршень",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "PACK OF 4 DRESSER-RAND 50A18AA790 6IN PISTON RING"
+    },
+    {
+      "code": "50A18AA1024",
+      "issuer": "Dresser-Rand",
+      "description": "поршневое кольцо 19 in",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "поршень",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "PACK OF 6 DRESSER-RAND 50A18AA1024 PISTON RING 19IN"
+    },
+    {
+      "code": "W115185",
+      "issuer": "Dresser-Rand",
+      "description": "поршневое кольцо 10-1/2 in",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "поршень",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND W115185 10-1/2IN PISTON RING"
+    },
+    {
+      "code": "1W115185",
+      "issuer": "Dresser-Rand",
+      "description": "поршневое кольцо",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "поршень",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "PACK OF 4 DRESSER-RAND 1W115185 PISTON RING"
+    },
+    {
+      "code": "W115186",
+      "issuer": "Dresser-Rand",
+      "description": "опорное кольцо 10-1/2 in",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "поршень",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND W115186 10-1/2IN RIDER RING"
+    },
+    {
+      "code": "12520318",
+      "issuer": "Dresser-Rand",
+      "description": "опорное кольцо 9-1/2 in",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "поршень",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND 12520318 9-1/2IN RIDER RING"
+    },
+    {
+      "code": "12780D1T51",
+      "issuer": "Dresser-Rand",
+      "description": "опорное кольцо 19 in",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "поршень",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "PACK OF 2 DRESSER-RAND 12780D1T51 19IN RIDER RING"
+    },
+    {
+      "code": "X1099TL18",
+      "issuer": "Dresser-Rand",
+      "description": "маслосъёмная набивка",
+      "machine": "не указана (поршневой компрессор)",
+      "unit": "сальник штока",
+      "doc_ref": "",
+      "source_url": "https://www.nriparts.com/brands/dresser-rand/11790",
+      "quote": "DRESSER-RAND X1099TL18 OIL WIPER PACKING"
+    },
+    {
+      "code": "471-685-060",
+      "issuer": "Dresser-Rand",
+      "description": "уплотнительное кольцо",
+      "machine": "компрессор 361B5/5",
+      "unit": "уплотнения",
+      "doc_ref": "",
+      "source_url": "https://soluparts.com/products/dresser-rand/",
+      "quote": "RING:SEAL;FOR COMPRESSOR MODEL: 361B5/5,S/N 361.10.5540,TAG K-601A;MFG: DRESSER-RAND,P/N 471-685-060"
+    },
+    {
+      "code": "S0102241562",
+      "issuer": "Dresser-Rand (в строке также «DRESSER CONSOLIDATED»)",
+      "description": "лабиринтное маслоудерживающее уплотнение турбины",
+      "machine": "турбина 24 ZSA-1",
+      "unit": "подшипниковый узел / масляное уплотнение",
+      "doc_ref": "в той же строке изготовителем названа и DRESSER CONSOLIDATED",
+      "source_url": "https://soluparts.com/products/dresser-rand/",
+      "quote": "SEAL, LABYRINTH; TYPE: OIL RETAINER, APPLICATION: TURBINE; FFT: TURBINETYPE: 24 ZSA-1; SERIAL NO. 82016; MFR. DRESSER RAND; P/N: S0102241562,MNFR: DRESSER CONSOLIDATED"
+    },
+    {
+      "code": "23050/4050",
+      "issuer": "Dresser-Rand",
+      "description": "шпилька M24 корпуса",
+      "machine": "не указана",
+      "unit": "корпус",
+      "doc_ref": "",
+      "source_url": "https://soluparts.com/products/dresser-rand/",
+      "quote": "STUD, SPEC M24, CASING 23050/4050, MANUFACTURER: DRESSER RAND, PART NUMBER: 23050/4050"
+    },
+    {
+      "code": "OD37568/1/REF/01&02",
+      "issuer": "Dresser-Rand (сам прибор — ABB AGSG12E3SN12)",
+      "description": "измерительный преобразователь температуры, головка ABB типа AGSG12E3SN12",
+      "machine": "не указана",
+      "unit": "КИП",
+      "doc_ref": "",
+      "source_url": "https://soluparts.com/products/dresser-rand/",
+      "quote": "TEMPERATURE TRANSMITTER, HEAD ABB TYPE AGSG12E3SN12, PART NUMBER: OD37568/1/REF/01 & 02, MANUFACTURER: DRESSER RAND"
+    },
+    {
+      "code": "G705620547D",
+      "issuer": "Dresser-Rand",
+      "description": "круглая кольцевая прокладка",
+      "machine": "7HOS6",
+      "unit": "цилиндр",
+      "doc_ref": "",
+      "source_url": "https://soluparts.com/products/dresser-rand/page/3/",
+      "quote": "GASKET CIRC RING – G705620547D RECIPROCATING COMPRESSOR – 7HOS6 – 7HOS6"
+    },
+    {
+      "code": "7A11G40HL",
+      "issuer": "Dresser-Rand (по категории страницы Soluparts; в самой строке бренд не назван)",
+      "description": "кольцо набивки",
+      "machine": "основной газовый компрессорный агрегат BC10 (модель не указана)",
+      "unit": "сальник штока",
+      "doc_ref": "Soluparts, раздел DRESSER RAND, стр. 3; бренд в строке не назван",
+      "source_url": "https://soluparts.com/products/dresser-rand/page/3/",
+      "quote": "RING PACKING – 7A11G40HL MAIN GAS COMP PKG BC10 – –"
+    },
+    {
+      "code": "VBZP0001T341",
+      "issuer": "Dresser-Rand (по категории страницы Soluparts; в самой строке бренд не назван)",
+      "description": "уплотнительное кольцо (O-ring) разгрузочного устройства 4-й ступени",
+      "machine": "основной газовый компрессорный агрегат BC10",
+      "unit": "разгрузка клапанов",
+      "doc_ref": "Soluparts, раздел DRESSER RAND, стр. 3; бренд в строке не назван",
+      "source_url": "https://soluparts.com/products/dresser-rand/page/3/",
+      "quote": "O-RING 4TH STAGE UNLOADER SIDE – VBZP0001T341 MAIN GAS COMP PKG BC10 – –"
+    },
+    {
+      "code": "VBZP0001T438",
+      "issuer": "Dresser-Rand (по категории страницы Soluparts; в самой строке бренд не назван)",
+      "description": "уплотнительное кольцо (O-ring)",
+      "machine": "основной газовый компрессорный агрегат BC10",
+      "unit": "уплотнения",
+      "doc_ref": "Soluparts, раздел DRESSER RAND, стр. 3; бренд в строке не назван",
+      "source_url": "https://soluparts.com/products/dresser-rand/page/3/",
+      "quote": "O-RING – VBZP0001T438 MAIN GAS COMP PKG BC10 – –"
+    },
+    {
+      "code": "W139438",
+      "issuer": "Dresser-Rand (по категории страницы Soluparts; в самой строке бренд не назван)",
+      "description": "втулка (collar)",
+      "machine": "основной газовый компрессорный агрегат BC10",
+      "unit": "не указан",
+      "doc_ref": "Soluparts, раздел DRESSER RAND, стр. 3; бренд в строке не назван",
+      "source_url": "https://soluparts.com/products/dresser-rand/page/3/",
+      "quote": "COLLAR – W139438 MAIN GAS COMP PKG BC10 – –"
+    },
+    {
+      "code": "720025J1",
+      "issuer": "Dresser-Rand (аналог Springer Parts 720025J1SP)",
+      "description": "торцевое уплотнение",
+      "machine": "не указана (вероятно, насос)",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "номер Dresser-Rand приводит изготовитель аналога Springer Parts («replaces DRESSER RAND part number»)",
+      "source_url": "https://www.springerparts.com/shop-by-brand/dresser-rand",
+      "quote": "Springer Parts® 720025J1SP part number Mechanical Seal; replaces DRESSER RAND part number 720025J1"
+    },
+    {
+      "code": "050-825-201",
+      "issuer": "Dresser-Rand (аналог Springer Parts 050-825-201SP)",
+      "description": "торцевое уплотнение, FKM/углерод/нерж. сталь",
+      "machine": "не указана",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "номер Dresser-Rand приводит изготовитель аналога Springer Parts («replaces DRESSER RAND part number»)",
+      "source_url": "https://www.springerparts.com/shop-by-brand/dresser-rand",
+      "quote": "Springer Parts® 050-825-201SP part number Mechanical Seal; replaces DRESSER RAND part number 050-825-201"
+    },
+    {
+      "code": "000-049-082",
+      "issuer": "Dresser-Rand (аналог Springer Parts 000-049-082SP)",
+      "description": "торцевое уплотнение",
+      "machine": "не указана",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "номер Dresser-Rand приводит изготовитель аналога Springer Parts («replaces DRESSER RAND part number»)",
+      "source_url": "https://www.springerparts.com/shop-by-brand/dresser-rand",
+      "quote": "Springer Parts® 000-049-082SP part number Mechanical Seal; replaces DRESSER RAND part number 000-049-082"
+    },
+    {
+      "code": "W27658P1",
+      "issuer": "Dresser-Rand (аналог Springer Parts W27658P1SP)",
+      "description": "торцевое уплотнение",
+      "machine": "не указана",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "номер Dresser-Rand приводит изготовитель аналога Springer Parts («replaces DRESSER RAND part number»)",
+      "source_url": "https://www.springerparts.com/shop-by-brand/dresser-rand",
+      "quote": "Springer Parts® W27658P1SP part number Mechanical Seal; replaces DRESSER RAND part number W27658P1"
+    },
+    {
+      "code": "W27658P2",
+      "issuer": "Dresser-Rand (аналог Springer Parts W27658P2SP)",
+      "description": "торцевое уплотнение",
+      "machine": "не указана",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "номер Dresser-Rand приводит изготовитель аналога Springer Parts («replaces DRESSER RAND part number»)",
+      "source_url": "https://www.springerparts.com/shop-by-brand/dresser-rand",
+      "quote": "Springer Parts® W27658P2SP part number Mechanical Seal; replaces DRESSER RAND part number W27658P2"
+    },
+    {
+      "code": "W35548P1",
+      "issuer": "Dresser-Rand (аналог Springer Parts W35548P1SP)",
+      "description": "торцевое уплотнение",
+      "machine": "не указана",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "номер Dresser-Rand приводит изготовитель аналога Springer Parts («replaces DRESSER RAND part number»)",
+      "source_url": "https://www.springerparts.com/shop-by-brand/dresser-rand",
+      "quote": "Springer Parts® W35548P1SP part number Mechanical Seal; replaces DRESSER RAND part number W35548P1"
+    },
+    {
+      "code": "AGSG12E3SN12",
+      "issuer": "ABB",
+      "description": "тип головки преобразователя температуры, применяемой в позиции Dresser-Rand OD37568/1/REF",
+      "machine": "не указана",
+      "unit": "КИП",
+      "doc_ref": "тип головки ABB, а не номер Dresser-Rand",
+      "source_url": "https://soluparts.com/products/dresser-rand/",
+      "quote": "TEMPERATURE TRANSMITTER, HEAD ABB TYPE AGSG12E3SN12, PART NUMBER: OD37568/1/REF/01 & 02, MANUFACTURER: DRESSER RAND"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Woodward",
+      "component": "механико-гидравлический регулятор частоты вращения TG (стандарт); регуляторы PG и UG; электронный регулятор Peak 150",
+      "machine": "D-R RLA/RLVA, SST 350/500/700",
+      "evidence": "В брошюре RLA: «The Woodward TG series, constant speed, oil relay governor is standard equipment for RLA/RLVA steam turbines». В Manual 107-A есть разделы о Woodward TG, PG, UG и Peak 150 (manual 85565)",
+      "sources": [
+        "https://www.mcraeeng.com/files/single-stage-turbine-686140.pdf",
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Fisher (Emerson)",
+      "component": "пневматический механизм задания скорости к регулятору Woodward TG-13L",
+      "machine": "D-R SST 350/500/700",
+      "evidence": "Manual 107-A, раздел L.13.3 «Woodward TG-13L Governor with Fisher Control»",
+      "sources": [
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Bently Nevada (Baker Hughes)",
+      "component": "датчики вибрации и осевого сдвига, фазовая отметка (keyphasor)",
+      "machine": "D-R SST 350/500/700",
+      "evidence": "Manual 107-A: «inclusion of a keyphasor probe for the Bently Nevada…»",
+      "sources": [
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Tri-Sen",
+      "component": "электронный регулятор турбины",
+      "machine": "D-R SST 350/500/700",
+      "evidence": "Manual 107-A: «Turbines with electronic governors (Tri-Sen, CCC, and Woodward)»",
+      "sources": [
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "CCC (Compressor Controls Corporation)",
+      "component": "электронный регулятор турбины",
+      "machine": "D-R SST 350/500/700",
+      "evidence": "Manual 107-A: та же строка «Tri-Sen, CCC, and Woodward»",
+      "sources": [
+        "http://amgcorporation.de/images/catalog/generation/annex38-350-500-700-turbine-manual-107-rev-A.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ABB",
+      "component": "преобразователь температуры, головка AGSG12E3SN12",
+      "machine": "не указана",
+      "evidence": "строка запчасти Dresser-Rand OD37568/1/REF/01 & 02 на Soluparts",
+      "sources": [
+        "https://soluparts.com/products/dresser-rand/"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Siemens Energy (Dresser-Rand business)",
+      "country": "США / глобально",
+      "role": "официальный: изготовитель: оригинальные запчасти, сервис, модернизация",
+      "sources": [
+        "https://www.siemens-energy.com/global/en/home/products-services/product/D-r-steam-turbines.html",
+        "https://www.siemens-energy.com/global/en/home/products-services/training/contact-aeroderivative-dresser-rand.html"
+      ]
+    },
+    {
+      "company": "Siemens Energy Industrial Turbomachinery India Private Limited (бывш. Dresser-Rand India Pvt Ltd)",
+      "country": "Индия",
+      "role": "официальный: дочерняя компания изготовителя; сервис и запчасти (по заголовку карточки IndiaMART, страница не читается)",
+      "sources": [
+        "https://www.indiamart.com/dresser-rand-india-private-limited/about-us.html"
+      ]
+    },
+    {
+      "company": "Siemens-Energy Dresser-Rand, Abu Dhabi Service Centre",
+      "country": "ОАЭ",
+      "role": "официальный: сервисный центр изготовителя (по заголовку каталога; страница закрыта защитой от ботов, 403)",
+      "sources": [
+        "https://www.indoconnex.com/public/business/about/SiemensEnergyDresserRandAbuDhabiServiceCentre"
+      ]
+    },
+    {
+      "company": "НПО Инеко",
+      "country": "Россия",
+      "role": "независимый поставщик оборудования и ЗИП Dresser-Rand, в том числе аналогов (не официальный дилер)",
+      "sources": [
+        "https://npoineko.ru/brands/dresser-rand/"
+      ]
+    },
+    {
+      "company": "Станкомплект",
+      "country": "Россия",
+      "role": "независимый перепродавец, заявляет поставку компрессоров и запчастей Dresser-Rand",
+      "sources": [
+        "https://stankomplekt.com/dresser-rand"
+      ]
+    },
+    {
+      "company": "ДАЛКОС",
+      "country": "Россия",
+      "role": "независимый перепродавец, заявляет поставку DATUM",
+      "sources": [
+        "https://dalkos.ru/catalog/kompressory/kompressory-porshnevye/porshnevye-kompressory-dresser-rand/-dresser-rand-datum/"
+      ]
+    },
+    {
+      "company": "AMCOR GmbH",
+      "country": "Германия / Россия",
+      "role": "независимый: изготовление деталей обратным инжинирингом и поставка аналогов для компрессоров Dresser-Rand",
+      "sources": [
+        "https://amcor.ru/dresser-rand-kompressory"
+      ]
+    },
+    {
+      "company": "NRI Industrial",
+      "country": "США",
+      "role": "независимый: склад излишков и б/у запчастей (коды видны в открытом виде)",
+      "sources": [
+        "https://www.nriparts.com/brands/dresser-rand/11790"
+      ]
+    },
+    {
+      "company": "Soluparts",
+      "country": "Португалия / Бразилия / США / Гонконг / Индия / Германия",
+      "role": "независимый: международная закупка промышленных запчастей, в каталоге есть номера Dresser-Rand",
+      "sources": [
+        "https://soluparts.com/products/dresser-rand/"
+      ]
+    },
+    {
+      "company": "Springer Parts",
+      "country": "США",
+      "role": "независимый: аналоги торцевых уплотнений с перекрёстными ссылками на номера Dresser-Rand",
+      "sources": [
+        "https://www.springerparts.com/shop-by-brand/dresser-rand"
+      ]
+    },
+    {
+      "company": "Hunter Compressor & Engine",
+      "country": "США",
+      "role": "независимый: новые, восстановленные и неоригинальные запчасти для компрессоров Dresser-Rand",
+      "sources": [
+        "https://hunter-compressor.com/dresser-rand/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Иллюстрированных каталогов запчастей (IPL) и перечней рекомендованных запасных частей Dresser-Rand в открытом доступе нет. В Manual 107-A есть раздел M.4 «Recommended Spare Parts», но номеров там нет: номера на конкретную машину выдаёт Siemens Energy по серийному номеру через свой закрытый клиентский портал или в сервисном центре.",
+    "Ни один номер угольных колец, сухих газовых уплотнений, подшипников или клапанов не привязан к конкретной модели турбины (RLA, SST, C, B). Коды NRI, кроме 7HOS6 и 361B5/5, машину не называют.",
+    "Номеров сухих газовых уплотнений (изготовитель, вероятно, John Crane или Flowserve) и опорно-упорных подшипников DATUM нет в открытых источниках. В брошюре перечислены только виды уплотнений.",
+    "Номеров ремкомплектов клапанов Magnum/HammerHead не найдено. Страница GlobalSpec о клапанах Magnum закрыта защитой от ботов (403). Мощности ESH/HSE сверены скептиком по странице и листку Siemens Energy (у HSE — противоречие 1 000 / 786 HP).",
+    "Документ Scribd «Dresser Rand Compressor Parts Number» (номера и SAP-коды клапанов, колец, штоков) закрыт регистрацией и не открывался.",
+    "Инструкция RLA (pdfcoffee) и брошюра Siemens по паровым турбинам 2021 г. (Scribd) не открывались.",
+    "Документов по машинам Demag Delaval (осевые и центробежные компрессоры STC, промышленные турбины Siemens) в этой разведке нет, это отдельная ветка.",
+    "Официальных дилеров и сервисных центров Siemens Energy / Dresser-Rand в России, Казахстане, Китае и Турции в открытых источниках не найдено. Российские поставщики — независимые перепродавцы. Страницы ComPro Energy, Radwell, Zoro и Collicutt отдали 403 или 503."
+  ],
+  "verifier_notes": "Все страницы-источники открылись (curl, код 200), кроме GlobalSpec (403). Коды запчастей: подтверждены все 38. У 7A11G40HL, VBZP0001T341, VBZP0001T438 и W139438 бренд в самой строке не назван: он взят из категории страницы «DRESSER RAND» на Soluparts. Коды с Springer — это D-R номера, которые приводит изготовитель аналога. AGSG12E3SN12 — тип головки ABB, а не код D-R. У S0102241562 в той же строке указан ещё и DRESSER CONSOLIDATED. Машины: не подтверждены 361B5/5 и 24 ZSA-1, обе есть только в строках запчастей Soluparts. По ESH и HSE нужно сменить источник: GlobalSpec недоступен, вместо него страница https://www.siemens-energy.com/global/en/home/products-services/product/reciprocating-compressors.html и листок https://assets.siemens-energy.com/dam/fccc7d67-6a61-4fb7-82a8-b05000ab6574/HSE-Recip-Compressor-Flyer-June-2021-pdf_Original%20file.pdf. Мощность ESH (5–1 000 HP) не подтверждена, у Siemens 7-ESH 70 HP и 11-ESH 180 HP. Для HSE Siemens сам себе противоречит: на странице 1 000 HP, в листке 786 HP. Статус DATUM «выпускается» взят из старой брошюры D-R, текущий выпуск не проверялся.",
+  "corrections": [
+    "7A11G40HL, VBZP0001T341, VBZP0001T438, W139438: в issuer и doc_ref оговорено, что бренд взят из категории страницы, а не из строки (замечание скептика)",
+    "коды Springer (6): в doc_ref записано, что номер D-R приводит изготовитель аналога (замечание скептика)",
+    "AGSG12E3SN12, S0102241562: оговорки скептика записаны в doc_ref",
+    "ESH, HSE: источник GlobalSpec (403) заменён страницей и листком Siemens Energy; rating ESH исправлен на 70/180 HP, у HSE записано противоречие 1 000 / 786 HP (замечание скептика)",
+    "DATUM (4 записи): статус оговорён — «выпускается» взято из старой брошюры D-R (замечание скептика)",
+    "361B5/5, 24 ZSA-1: в status оговорено, что модель известна только по строке запчасти (verified: false, замечание скептика)",
+    "sub_suppliers: verified: true — страницы-источники (брошюра RLA, Manual 107-A) скептик открыл, код 200",
+    "dealers: в role прямо записано «официальный» или «независимый» (требование навыка)",
+    "gaps: строка про ESH/HSE переписана — мощности сверены по источникам Siemens Energy",
+    "summary: перечень 25 моделей дополнен ESH/HSE и двумя моделями из строк запчастей — иначе слагаемые не сходились с итогом"
+  ]
+}
