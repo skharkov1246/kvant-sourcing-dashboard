@@ -1726,11 +1726,11 @@
      "type": "горная",
      "patterns": [
       {
-       "rx": "L[H]\\s?-?\\s?\\d{3}[iE]?",
+       "rx": "L[H]\\s?-?\\s?\\d{3}(?:iE|i|E)?",
        "context": "сам"
       },
       {
-       "rx": "T[H]\\s?-?\\s?\\d{3}[iE]?",
+       "rx": "T[H]\\s?-?\\s?\\d{3}(?:iE|i|E)?",
        "context": "сам"
       },
       {
@@ -1743,7 +1743,8 @@
       "TH663i",
       "LH410",
       "TH-540",
-      "TH545i"
+      "TH545i",
+      "LH625iE"
      ],
      "sources": [
       "https://www.mining.sandvik/en/products/equipment/loaders/lh517i-underground-lhd/",
@@ -1753,21 +1754,55 @@
     },
     {
      "id": "sandvik-dd",
-     "series": "DD (проходческие буровые установки)",
+     "series": "DD (проходческие) и DL (глубокого бурения) буровые установки",
      "type": "горная",
      "patterns": [
       {
-       "rx": "DD\\s?\\d{3}[i]?(?:-\\d{2}[A-Z]?)?",
+       "rx": "D[DL]\\s?\\d{3}(?:iE|i)?(?:-\\d{2}[A-Z]?)?",
        "context": "бренд"
       }
      ],
      "examples": [
       "DD422i",
-      "DD 321"
+      "DD 321",
+      "DD422iE",
+      "DL421",
+      "DL432i"
      ],
      "sources": [
-      "https://im-mining.com/2023/07/10/northern-star-bolsters-sandvik-fleet-with-toro-trucks-and-loaders-plus-dd422i-jumbo/"
-     ]
+      "https://im-mining.com/2023/07/10/northern-star-bolsters-sandvik-fleet-with-toro-trucks-and-loaders-plus-dd422i-jumbo/",
+      "https://www.mining.sandvik/en/products/equipment/underground-drill-rigs/"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/sandviktamrock.json."
+    },
+    {
+     "id": "sandvik-rd-hl",
+     "series": "RD, HL, HLX (гидроперфораторы; HL и HLX — наследные Tamrock)",
+     "type": "горная",
+     "patterns": [
+      {
+       "rx": "RD\\s?\\d{3,4}(?:CF|C)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "HLX\\s?\\d{1,2}T?|HL\\s?\\d{3,4}(?:ST|T|S)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "RD525",
+      "RD1635CF",
+      "HL1560ST",
+      "HLX5",
+      "HL510",
+      "HL1010"
+     ],
+     "sources": [
+      "https://www.mining.sandvik/en/products/parts-and-components/rock-drills/",
+      "https://miccont.com/catalogs/sandvik/hl-x5/",
+      "http://www.drifterparts.com/hl510.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/sandviktamrock.json. Короткие коды RD/HL — только рядом с именем бренда."
     }
    ]
   },
@@ -2241,21 +2276,47 @@
     },
     {
      "id": "grundfos-nb-nk",
-     "series": "NB / NK (консольные)",
+     "series": "NB / NBE / NBS / NBG / NK / NKE (консольные)",
      "type": "насос",
      "patterns": [
       {
-       "rx": "N[BK]G?\\s?\\d{2,3}-\\d{3}(?:\\.\\d)?",
+       "rx": "N[BK](?:SE|G|S|E)?\\s?\\d{2,3}(?:-\\d{3}(?:\\.\\d)?)?",
        "context": "бренд"
       }
      ],
      "examples": [
       "NB 65-200",
-      "NK 80-250"
+      "NK 80-250",
+      "NBS 012-070",
+      "NB 32"
      ],
      "sources": [
-      "https://api.grundfos.com/literature/Grundfosliterature-4112587.pdf"
-     ]
+      "https://api.grundfos.com/literature/Grundfosliterature-4112587.pdf",
+      "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/grundfos.json. Названия ряда без типоразмера («NB, NBE Range 6») не узнаются — у них нет обозначения."
+    },
+    {
+     "id": "grundfos-se-sl",
+     "series": "SE1 / SEV / SL1 / SLV (погружные канализационные)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "S[EL](?:1|V)(?:\\.\\d{2,3})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SE1",
+      "SEV",
+      "SL1.50",
+      "SLV.65"
+     ],
+     "sources": [
+      "https://api.grundfos.com/literature/Grundfosliterature-6859143.pdf",
+      "https://www.lenntech.com/Data-sheets/Grundfos-SL-SL1_SLV+SL1_SLV-Autoadapt-SKC-L.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/grundfos.json."
     }
    ]
   },
@@ -4619,6 +4680,108 @@
       "https://www.lewa.com/en/pumps/process-pumps/lewa-ecoflow-process-diaphragm-pump"
      ],
      "note": "Приводы LD… — только рядом с именем бренда."
+    }
+   ]
+  },
+  {
+   "brand_key": "drillmec",
+   "name": "Drillmec",
+   "origin": "западный",
+   "country": "Италия",
+   "aliases": [
+    "Drillmec",
+    "Дриллмек"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "drillmec-hh",
+     "series": "HH (гидравлические буровые установки)",
+     "type": "нефтепромысловая",
+     "patterns": [
+      {
+       "rx": "HH\\s?-?\\s?\\d{2,3}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HH55",
+      "HH 102",
+      "HH-300",
+      "HH350"
+     ],
+     "sources": [
+      "https://www.drillmec.com/en/onshore/hh-series-rigs",
+      "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/drillmec.json. Короткие коды — только рядом с именем бренда."
+    },
+    {
+     "id": "drillmec-td",
+     "series": "HTD / ETD (верхние приводы)",
+     "type": "нефтепромысловая",
+     "patterns": [
+      {
+       "rx": "[HE]TD\\s?-?\\s?\\d{3}(?:\\s?C)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HTD 250 C",
+      "HTD250",
+      "ETD 500"
+     ],
+     "sources": [
+      "https://www.drillmec.com/en/equipment/top-drives"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/drillmec.json. Короткие коды — только рядом с именем бренда."
+    },
+    {
+     "id": "drillmec-pump",
+     "series": "Трёхпоршневые буровые насосы nT / nTS и TF",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "\\d{1,2}TS?\\s?\\d{3,4}(?:GD)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "TF\\s?-?\\s?\\d{3,4}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "7T450",
+      "7TS600",
+      "9T1000",
+      "12T1600GD",
+      "14T2200",
+      "TF-1000"
+     ],
+     "sources": [
+      "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf",
+      "https://americanplantandequipment.com/tt-4031-drillmec-hh-300-drilling-rig.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/drillmec.json. Короткие коды — только рядом с именем бренда."
+    },
+    {
+     "id": "drillmec-mr",
+     "series": "MR (буровые установки с лебёдкой)",
+     "type": "нефтепромысловая",
+     "patterns": [
+      {
+       "rx": "MR\\s?\\d{4}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "MR8000",
+      "MR 8000"
+     ],
+     "sources": [
+      "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/drillmec.json. Короткие коды — только рядом с именем бренда."
     }
    ]
   }
