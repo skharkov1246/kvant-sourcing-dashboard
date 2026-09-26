@@ -1,0 +1,973 @@
+{
+  "oem_key": "sandviktamrock",
+  "name": "Sandvik (Tamrock)",
+  "segment_focus": "проходческие DD, добычные DL, ПДМ LH, самосвалы TH, перфораторы RD/HL: ремкомплекты перфораторов, фильтры; субпоставщики двигателей и мостов",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по открытым источникам для подземной линейки Sandvik Mining and Rock Solutions (наследница Tamrock/Toro): проходческие буровые DD, установки глубокого бурения DL, ПДМ Toro LH, подземные самосвалы Toro TH и гидроперфораторы RD/HL. Машины и субпоставщики взяты из официальных технических спецификаций на mining.sandvik (PDF прочитаны pdftotext). Что показывают спецификации: двигатели почти везде Volvo Penta (TAD1340/1342/1344/1382/1140/882/1641/1643/1385VE), гидропередачи и трансмиссии Dana (SOH 6000/9000, C9000/8000, 8421H, C5472, C9602), мосты Kessler (D102/D106/D111) на ПДМ и самосвалах. На буровых DD421/DL421 стоят мосты Spicer, на DD421 ещё трансмиссия Spicer T20000 и двигатель MB OM904LA, на DL421 — Cummins QSB4.5/B4.5. Кодов запчастей 39, у каждого есть страница, где код виден. Уплотнения и ремкомплекты перфораторов HLX5/HL510/HL1010/HL1560T взяты из открытого каталога MICCONT и перечней DrifterParts: это продавцы альтернативных деталей, которые ссылаются на номера Sandvik. Фильтры ПДМ и самосвалов взяты из таблиц взаимозаменяемости Brett's Truck Parts (HIFI ↔ Sandvik) и FridayParts. Ни одного кода по перфоратору RD525 подтвердить не удалось: drill-parts.com закрыт Cloudflare. Официальные каталоги (My Sandvik) закрыты. В России Sandvik работу свернул, юрлицо ликвидировано 30.05.2023.",
+  "machines": [
+    {
+      "model": "DD421",
+      "kind": "проходческая буровая установка (2 стрелы)",
+      "segment": "ГШО",
+      "rating": "2 x RD525 по 25 кВт; дизель MB OM904LA 110 кВт",
+      "status": "в спецификации изготовителя (на текущей странице линейки видны DD422i/DD423i)",
+      "sources": [
+        "https://www.mining.sandvik/globalassets/products/underground-drill-rigs-and-bolters/pdf/dd421-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DD422i",
+      "kind": "проходческая буровая установка",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/underground-drill-rigs/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DD422iE",
+      "kind": "проходческая буровая установка, аккумуляторная",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/underground-drill-rigs/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DD423i",
+      "kind": "проходческая буровая установка",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/underground-drill-rigs/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DD321",
+      "kind": "проходческая буровая установка",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/underground-drill-rigs/dd321-development-drill-rig/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DD311",
+      "kind": "проходческая буровая установка",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/underground-drill-rigs/dd311-development-drill-rig/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DD210",
+      "kind": "проходческая буровая установка малого сечения",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/underground-drill-rigs/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DL421",
+      "kind": "установка глубокого (веерного) бурения",
+      "segment": "ГШО",
+      "rating": "перфоратор HL1560ST 33 кВт; дизель Cummins QSB4.5 124 кВт",
+      "status": "в спецификации изготовителя",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/underground-drill-rigs/top-hammer-longhole-drill-rigs/dl421-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DL432i",
+      "kind": "установка глубокого бурения",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/underground-drill-rigs/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro LH517i",
+      "kind": "ПДМ (погрузочно-доставочная машина)",
+      "segment": "ГШО",
+      "rating": "Volvo TAD1342VE 310 кВт (Tier 2) / TAD1382VE 315 кВт (Stage V)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh517i-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/en/products/equipment/loaders/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro LH514",
+      "kind": "ПДМ",
+      "segment": "ГШО",
+      "rating": "Volvo TAD1340VE 256 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh514-technical-specifications-english.pdf",
+        "https://www.mining.sandvik/en/products/equipment/loaders/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro LH410",
+      "kind": "ПДМ",
+      "segment": "ГШО",
+      "rating": "Volvo TAD1140VE 235 кВт / TAD882VE 210 кВт (Stage V)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh410-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro LH621 / LH621i",
+      "kind": "ПДМ",
+      "segment": "ГШО",
+      "rating": "Volvo TAD1344VE 352 кВт",
+      "status": "LH621i выпускается",
+      "sources": [
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh621-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/en/products/equipment/loaders/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro LH307",
+      "kind": "ПДМ",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/loaders/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro LH625iE",
+      "kind": "ПДМ, электрическая",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/loaders/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro LH515i",
+      "kind": "ПДМ",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/loaders/lh515i-underground-loader/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro TH663i",
+      "kind": "подземный самосвал",
+      "segment": "ГШО",
+      "rating": "63 т; Volvo TAD1643VE-B 565 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/trucks/th663i-underground-truck"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro TH551i",
+      "kind": "подземный самосвал",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/trucks/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro TH545i",
+      "kind": "подземный самосвал",
+      "segment": "ГШО",
+      "rating": "45 т; Volvo TAD1641VE-B 450 кВт / TAD1385VE 405 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/trucks/diesel-trucks/th545i-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Toro TH430",
+      "kind": "подземный самосвал",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/trucks/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "RD525",
+      "kind": "гидравлический перфоратор",
+      "segment": "ГШО",
+      "rating": "25 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/globalassets/products/rock-drills/pdf/rd525-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/en/products/parts-and-components/rock-drills/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "RD1635CF",
+      "kind": "гидравлический перфоратор",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.mining.sandvik/en/products/parts-and-components/rock-drills/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HL1560ST / HL1560T",
+      "kind": "гидравлический перфоратор (глубокое бурение)",
+      "segment": "ГШО",
+      "rating": "33 кВт (HL1560ST)",
+      "status": "стоит на DL421; в текущем списке перфораторов на mining.sandvik нет",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/underground-drill-rigs/top-hammer-longhole-drill-rigs/dl421-specification-sheet-english.pdf",
+        "http://www.drifterparts.com/hl1560t.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HLX5",
+      "kind": "гидравлический перфоратор",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "наследная модель; в текущем списке перфораторов на mining.sandvik нет",
+      "sources": [
+        "https://miccont.com/catalogs/sandvik/hl-x5/",
+        "http://drifterparts.com/hlx5.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HL510 / HL1010",
+      "kind": "гидравлический перфоратор (Tamrock)",
+      "segment": "ГШО",
+      "rating": "данных нет",
+      "status": "наследная модель Tamrock; в текущем списке перфораторов на mining.sandvik нет",
+      "sources": [
+        "http://www.drifterparts.com/hl510.html",
+        "http://www.drifterparts.com/hl1010.html"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Sandvik LH517i Mining Loader Service and Parts Manual",
+      "doc_no": "L017D744",
+      "machine": "Toro LH517i",
+      "kind": "service manual + parts manual (продаётся сторонним продавцом документации)",
+      "sources": [
+        "https://machinecatalogic.com/sandvik-lh517i-mining-loader-service-and-parts-manual-l017d744/"
+      ]
+    },
+    {
+      "title": "Sandvik LH517i Mining Loader Service and Parts Manual",
+      "doc_no": "L517DVMA0A0888",
+      "machine": "Toro LH517i",
+      "kind": "service manual + parts manual (продаётся сторонним продавцом документации)",
+      "sources": [
+        "https://machinecatalogic.com/sandvik-lh517i-mining-loader-service-and-parts-manual-l517dvma0a0888/"
+      ]
+    },
+    {
+      "title": "HL X5 Rock Drill spare parts catalog (перечень деталей с позициями, номерами Sandvik и составом ремкомплекта)",
+      "machine": "HLX5",
+      "kind": "parts manual (открытый онлайн-каталог)",
+      "sources": [
+        "https://miccont.com/catalogs/sandvik/hl-x5/"
+      ]
+    },
+    {
+      "title": "Part List Rock Drill HLX5",
+      "machine": "HLX5",
+      "kind": "parts manual (копия на Scribd)",
+      "sources": [
+        "https://www.scribd.com/document/423899986/Part-List-Rock-Drill-HLX5"
+      ]
+    },
+    {
+      "title": "Sandvik RD525 Rock Drill specification sheet (включает перечень спецоснастки для RD525)",
+      "machine": "RD525",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://www.mining.sandvik/globalassets/products/rock-drills/pdf/rd525-specification-sheet-english.pdf"
+      ]
+    },
+    {
+      "title": "DD421 Development drill technical specification (перфоратор RD525 по спецификации TS2-236, стрела SB60 по TS2-264)",
+      "machine": "DD421",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://www.mining.sandvik/globalassets/products/underground-drill-rigs-and-bolters/pdf/dd421-specification-sheet-english.pdf"
+      ]
+    },
+    {
+      "title": "Testing and Adjusting DD421 Jumbo",
+      "doc_no": "MT220608",
+      "machine": "DD421",
+      "kind": "бюллетень / инструкция стороннего сервиса (MT Underground)",
+      "sources": [
+        "https://www.mtunderground.com/parts-catalogues-and-products/technical-information-and-shared-documents/tech-info-sandvik/"
+      ]
+    },
+    {
+      "title": "Work Instruction – Sandvik DD422 Offline Cooling Upgrade",
+      "doc_no": "MTU10222",
+      "machine": "DD422i",
+      "kind": "бюллетень / инструкция стороннего сервиса (MT Underground)",
+      "sources": [
+        "https://www.mtunderground.com/parts-catalogues-and-products/technical-information-and-shared-documents/tech-info-sandvik/"
+      ]
+    },
+    {
+      "title": "Toro TH545i specification sheet",
+      "machine": "Toro TH545i",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/trucks/diesel-trucks/th545i-specification-sheet-english.pdf"
+      ]
+    },
+    {
+      "title": "Toro LH517i specification sheet",
+      "machine": "Toro LH517i",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh517i-specification-sheet-english.pdf"
+      ]
+    },
+    {
+      "title": "DL421 Top hammer longhole drill specification sheet",
+      "machine": "DL421",
+      "kind": "техническая спецификация",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/underground-drill-rigs/top-hammer-longhole-drill-rigs/dl421-specification-sheet-english.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "550 252 93",
+      "issuer": "Sandvik",
+      "description": "Seal kit for rock drill (ремкомплект уплотнений перфоратора)",
+      "machine": "HLX5",
+      "unit": "перфоратор",
+      "doc_ref": "HL X5 spare parts catalog (MICCONT)",
+      "source_url": "https://miccont.com/catalogs/sandvik/hl-x5/",
+      "quote": "550 252 93 SEAL KIT FOR ROCK DRILL INCL. PARTS 26. 39. 44"
+    },
+    {
+      "code": "092 602 98",
+      "issuer": "Sandvik",
+      "description": "Diaphragm (мембрана аккумулятора)",
+      "machine": "HLX5; также HL1560T, HL1010",
+      "unit": "перфоратор, гидроаккумулятор",
+      "source_url": "http://drifterparts.com/hlx5.html",
+      "quote": "Diaphragm - 092 602 98"
+    },
+    {
+      "code": "550 036 25",
+      "issuer": "Sandvik",
+      "description": "Low pressure accumulator",
+      "machine": "HLX5",
+      "unit": "перфоратор, гидроаккумулятор",
+      "doc_ref": "HL X5 spare parts catalog (MICCONT)",
+      "source_url": "https://miccont.com/catalogs/sandvik/hl-x5/",
+      "quote": "550 036 25 LOW PRESSURE ACCUMULATOR"
+    },
+    {
+      "code": "550 036 27",
+      "issuer": "Sandvik",
+      "description": "High pressure accumulator",
+      "machine": "HLX5",
+      "unit": "перфоратор, гидроаккумулятор",
+      "doc_ref": "HL X5 spare parts catalog (MICCONT)",
+      "source_url": "https://miccont.com/catalogs/sandvik/hl-x5/",
+      "quote": "550 036 27 HIGH PRESSURE ACCUMULATOR"
+    },
+    {
+      "code": "887 944 59",
+      "issuer": "Sandvik",
+      "description": "Piston rod seal",
+      "machine": "HLX5",
+      "unit": "перфоратор",
+      "doc_ref": "HL X5 spare parts catalog (MICCONT)",
+      "source_url": "https://miccont.com/catalogs/sandvik/hl-x5/",
+      "quote": "887 944 59 PISTON ROD SEAL"
+    },
+    {
+      "code": "887 945 89",
+      "issuer": "Sandvik",
+      "description": "Piston rod seal",
+      "machine": "HLX5",
+      "unit": "перфоратор",
+      "doc_ref": "HL X5 spare parts catalog (MICCONT)",
+      "source_url": "https://miccont.com/catalogs/sandvik/hl-x5/",
+      "quote": "887 945 89 PISTON ROD SEAL"
+    },
+    {
+      "code": "550 695 68",
+      "issuer": "Sandvik",
+      "description": "Seal housing (корпус уплотнений)",
+      "machine": "HLX5 / HLX5T",
+      "unit": "перфоратор",
+      "source_url": "http://drifterparts.com/hlx5.html",
+      "quote": "Seal Housing - 550 695 68"
+    },
+    {
+      "code": "152 715 08",
+      "issuer": "Sandvik",
+      "description": "Front bushing (передняя втулка)",
+      "machine": "HLX5",
+      "unit": "перфоратор",
+      "source_url": "http://drifterparts.com/hlx5.html",
+      "quote": "Front Bushing - 152 715 08"
+    },
+    {
+      "code": "868 780 89",
+      "issuer": "Sandvik",
+      "description": "Seal kit for rock drill",
+      "machine": "HL510",
+      "unit": "перфоратор",
+      "source_url": "http://www.drifterparts.com/hl510.html",
+      "quote": "Seal Kit For Rock Drill - 868 780 89"
+    },
+    {
+      "code": "815 035 19",
+      "issuer": "Sandvik",
+      "description": "Needle bearing (игольчатый подшипник)",
+      "machine": "HL510",
+      "unit": "перфоратор, механизм вращения",
+      "source_url": "http://www.drifterparts.com/hl510.html",
+      "quote": "Needle Bearing - 815 035 19"
+    },
+    {
+      "code": "150 520 08",
+      "issuer": "Sandvik",
+      "description": "Bearing",
+      "machine": "HL510",
+      "unit": "перфоратор",
+      "source_url": "http://www.drifterparts.com/hl510.html",
+      "quote": "Bearing - 150 520 08"
+    },
+    {
+      "code": "807 590 69",
+      "issuer": "Sandvik",
+      "description": "Valve assy",
+      "machine": "HL510; также HL1010, HL1560T",
+      "unit": "перфоратор, распределитель",
+      "source_url": "http://www.drifterparts.com/hl510.html",
+      "quote": "Valve Assy - 807 590 69"
+    },
+    {
+      "code": "550 391 15",
+      "issuer": "Sandvik",
+      "description": "Seal kit",
+      "machine": "HL1560T",
+      "unit": "перфоратор",
+      "source_url": "http://www.drifterparts.com/hl1560t.html",
+      "quote": "Seal Kit - 550 391 15"
+    },
+    {
+      "code": "550 348 41",
+      "issuer": "Sandvik",
+      "description": "Rotation bushing",
+      "machine": "HL1560T",
+      "unit": "перфоратор, механизм вращения",
+      "source_url": "http://www.drifterparts.com/hl1560t.html",
+      "quote": "Rotation Bushing - 550 348 41"
+    },
+    {
+      "code": "866 234 99",
+      "issuer": "Sandvik",
+      "description": "Seal kit",
+      "machine": "HL1010",
+      "unit": "перфоратор",
+      "source_url": "http://www.drifterparts.com/hl1010.html",
+      "quote": "Seal Kit - 866 234 99"
+    },
+    {
+      "code": "879 484 49",
+      "issuer": "Sandvik (указан продавцом как Reference No, принадлежность не подтверждена)",
+      "description": "Seal kit HL510T",
+      "machine": "HL510T",
+      "unit": "перфоратор",
+      "source_url": "https://delkomrockdrill.com/e-commerce/seal-kit-hl510t/",
+      "quote": "Seal Kit HL510T ... Reference No : 879 484 49",
+      "doc_ref": "Delkom, карточка Seal kit HL510T: бренд Sandvik на странице не назван, связь с Sandvik только через модель HL510T — доверие низкое"
+    },
+    {
+      "code": "55199068",
+      "issuer": "Sandvik",
+      "description": "Air filter (воздушный фильтр), аналог HIFI SA12689",
+      "machine": "DD421, DL421, LH517, TH663, TH551i",
+      "unit": "двигатель, воздухоочистка",
+      "source_url": "https://brettstruck.com.au/products/sa12689-air-filter-sandvik-dd-421-dd421-dl-421-dl421-dx-800i-s5-ranger-dx800is5-dx-900i-s5-ranger-bdx900is5-lh-517-lh517-th-663-th663-toro-th-551-i-th551i",
+      "quote": "SANDVIK 55199068 replacement filters"
+    },
+    {
+      "code": "SA12689",
+      "issuer": "HIFI Filter",
+      "description": "Air filter",
+      "machine": "DD421, DL421, LH517, TH663, TH551i",
+      "unit": "двигатель, воздухоочистка",
+      "source_url": "https://brettstruck.com.au/products/sa12689-air-filter-sandvik-dd-421-dd421-dl-421-dl421-dx-800i-s5-ranger-dx800is5-dx-900i-s5-ranger-bdx900is5-lh-517-lh517-th-663-th663-toro-th-551-i-th551i",
+      "quote": "SA12689 AIR FILTER  SANDVIK DD 421 DD421 DL 421 , DL421 DX 800i S5 RANGER DX800IS5 DX 900i S5 RANGER BDX900IS5 LH 517 , LH517 TH 663 , TH663 TORO TH 551 I ,TH551I"
+    },
+    {
+      "code": "P766811",
+      "issuer": "Donaldson",
+      "description": "Hydraulic cartridge filter element",
+      "machine": "LH514, LH517, TH551i",
+      "unit": "гидросистема",
+      "source_url": "https://www.fridayparts.com/aftermarket-donaldson-p766811-hydraulic-cartridge-filter-element-for-sandvik-loader-lh-514-lh517-truck-toro-th-551-i",
+      "quote": "Hydraulic Cartridge Filter Element for Sandvik Loader LH 514 LH517 Truck Toro TH-551-I - Replaces Donaldson P766811",
+      "doc_ref": "неоригинальная страница продавца (aftermarket), перекрёстный номер — не каталог Sandvik"
+    },
+    {
+      "code": "SH66358",
+      "issuer": "HIFI Filter",
+      "description": "Hydraulic cartridge filter element (перекрёстный номер)",
+      "machine": "LH514, LH517, TH551i",
+      "unit": "гидросистема",
+      "source_url": "https://www.fridayparts.com/aftermarket-donaldson-p766811-hydraulic-cartridge-filter-element-for-sandvik-loader-lh-514-lh517-truck-toro-th-551-i",
+      "quote": "SH66358, SH 66358, 4221160, BG00729292, P766811",
+      "doc_ref": "неоригинальная страница продавца (aftermarket), перекрёстный номер — не каталог Sandvik"
+    },
+    {
+      "code": "944432Q",
+      "issuer": "не указан на странице (по формату — Parker)",
+      "description": "High pressure hydraulic oil filter",
+      "machine": "LH517, LH621i, TH430, TH551, TH663",
+      "unit": "гидросистема, напорный фильтр",
+      "source_url": "https://au.fridayparts.com/high-pressure-hydraulic-oil-filter-944432q-for-sandvik-loader-lh517-lh621i-truck-toro-th430-th551-th663",
+      "quote": "High Pressure Hydraulic Oil Filter 944432Q for Sandvik Loader LH517 LH621I Truck Toro TH430 TH551 TH663",
+      "doc_ref": "FridayParts: изготовитель фильтра на странице не указан; Parker — предположение разведки по формату номера"
+    },
+    {
+      "code": "SH 51410",
+      "issuer": "HIFI Filter",
+      "description": "High pressure hydraulic oil filter (перекрёстный номер к 944432Q)",
+      "machine": "LH517, LH621i, TH430, TH551, TH663",
+      "unit": "гидросистема",
+      "source_url": "https://au.fridayparts.com/high-pressure-hydraulic-oil-filter-944432q-for-sandvik-loader-lh517-lh621i-truck-toro-th430-th551-th663",
+      "quote": "SH 51410, SH51410, 944432Q, HY 19281, HY19281",
+      "doc_ref": "неоригинальная страница продавца (aftermarket), перекрёстный номер — не каталог Sandvik"
+    },
+    {
+      "code": "56008551",
+      "issuer": "Sandvik",
+      "description": "Air filter, аналог HIFI SA12603",
+      "machine": "LH410, LH621i, TH663, TH430, TH551i (по странице SA12603)",
+      "unit": "двигатель, воздухоочистка",
+      "source_url": "https://brettstruck.com.au/products/sa-12603-sa12603-air-filter-parker-eac20c015-sandvik-56008551-sf-filter-sbl23204",
+      "quote": "SA 12603 SA12603 AIR FILTER PARKER EAC20C015 ,SANDVIK 56008551 ,SF-FILTER SBL23204,"
+    },
+    {
+      "code": "SA12603",
+      "issuer": "HIFI Filter",
+      "description": "Air filter",
+      "machine": "LH410, LH621i, TH663, TH430, TH551i",
+      "unit": "двигатель, воздухоочистка",
+      "source_url": "https://brettstruck.com.au/products/sa-12603-sa12603-air-filter-for-sandvik-lh410-lh621i-th663-toro-th430-toro-th551i",
+      "quote": "SA 12603 SA12603 AIR FILTER FOR SANDVIK LH410 ,LH621i ,TH663 ,TORO TH430 ,TORO TH551I ,"
+    },
+    {
+      "code": "56040822",
+      "issuer": "Sandvik",
+      "description": "Air filter, аналог HIFI SA16509",
+      "machine": "LH307, LH410, TH663 (по странице SA16509)",
+      "unit": "двигатель, воздухоочистка",
+      "source_url": "https://brettstruck.com.au/products/sa-16509-sa16509-air-filter-sandvik-56040822-sandvik-69042682-sennebogen-146689-sullair-02250175063-uniflux-xa3181-wirtgen-2185460-wirtgen-2185480-wismet-wai24214",
+      "quote": "SA 16509 SA16509 AIR FILTER SANDVIK 56040822, SANDVIK 69042682, SENNEBOGEN 146689"
+    },
+    {
+      "code": "SA16509",
+      "issuer": "HIFI Filter",
+      "description": "Air filter",
+      "machine": "LH307, LH410, TH663, DI550, DP1100i",
+      "unit": "двигатель, воздухоочистка",
+      "source_url": "https://brettstruck.com.au/products/sa-16509-sa16509-air-filter-for-sandvik-di550-dp1100i-dx900is5-ranger-lh307-lh410-qi440-qi441-th663-sennebogen-5500e-temsa-bus-maraton-12-maraton-13",
+      "quote": "SA 16509 SA16509 AIR FILTER FOR SANDVIK DI550, DP1100I, DX900iS5 RANGER, LH307, LH410, QI440, QI441, TH663"
+    },
+    {
+      "code": "56044761",
+      "issuer": "Sandvik",
+      "description": "Fuel filter, аналог HIFI SN920430",
+      "machine": "LH410 (по странице SN920430)",
+      "unit": "двигатель, топливная система",
+      "source_url": "https://brettstruck.com.au/products/sn-920430-sn920430-fuel-filter-racor-2040pm-racor-2040pmor-rivard-16883-sampo-rosenlew-0485012-sandvik-56044761-sany-222100000729-sany-b222100000729-scania-1675795",
+      "quote": "SN 920430 SN920430 FUEL FILTER RACOR 2040PM ,RACOR 2040PMOR ,RIVARD 16883 ,SAMPO-ROSENLEW 0485012, SANDVIK 56044761"
+    },
+    {
+      "code": "SN920430",
+      "issuer": "HIFI Filter",
+      "description": "Fuel filter",
+      "machine": "LH410",
+      "unit": "двигатель, топливная система",
+      "source_url": "https://brettstruck.com.au/products/sn-920430-sn920430-fuel-filter-for-sandvik-lh410-volvo-penta-marine-tad1630-yamaha-marine-divers-nbsp",
+      "quote": "SN 920430 SN920430 FUEL FILTER FOR SANDVIK LH410,  VOLVO-PENTA MARINE TAD1630"
+    },
+    {
+      "code": "56012848",
+      "issuer": "Sandvik",
+      "description": "Oil filter, аналог HIFI SO7082",
+      "machine": "LH307, LH410 (по странице SO7082)",
+      "unit": "двигатель, смазка",
+      "source_url": "https://brettstruck.com.au/products/so-7082-so7082-oil-filter-sakura-eo2404-sampa-202438-sampa-20243801-sandvik-56012848-sandvik-69042849-schaeff-5411657158-schaeff-5501661137-schaeffer-070990233-sct-sh4746-sf-filter-so52421-silvatec-41733-step-filters-hc845",
+      "quote": "SO 7082 SO7082 OIL FILTER Sakura EO2404, SAMPA 202438, SAMPA 20243801, SANDVIK 56012848, SANDVIK 69042849"
+    },
+    {
+      "code": "69042849",
+      "issuer": "Sandvik",
+      "description": "Oil filter, аналог HIFI SO7082",
+      "machine": "LH307, LH410 (по странице SO7082)",
+      "unit": "двигатель, смазка",
+      "source_url": "https://brettstruck.com.au/products/so-7082-so7082-oil-filter-sakura-eo2404-sampa-202438-sampa-20243801-sandvik-56012848-sandvik-69042849-schaeff-5411657158-schaeff-5501661137-schaeffer-070990233-sct-sh4746-sf-filter-so52421-silvatec-41733-step-filters-hc845",
+      "quote": "SANDVIK 56012848, SANDVIK 69042849, SCHAEFF 5411657158"
+    },
+    {
+      "code": "SO7082",
+      "issuer": "HIFI Filter",
+      "description": "Oil filter",
+      "machine": "LH307, LH307-15, LH410",
+      "unit": "двигатель, смазка",
+      "source_url": "https://brettstruck.com.au/products/so-7082-so7082-oil-filter-for-same-150-iron-160-iron-hiline-dcr-sandvik-lh307-lh307-15-lh307topo-lh410-sany-ltu120f-schaffer-9300z-9310t-9330t-9330z",
+      "quote": "SO 7082 SO7082 OIL FILTER FOR SAME 150 IRON, 160 IRON HILINE DCR,  SANDVIK LH307, LH307-15, LH307TOPO, LH410"
+    },
+    {
+      "code": "56202447",
+      "issuer": "Sandvik",
+      "description": "Hydraulic filter, аналог HIFI SH55295V",
+      "machine": "LH307",
+      "unit": "гидросистема",
+      "source_url": "https://brettstruck.com.au/products/sh-55295-v-sh55295v-hyd-hydraulic-filter-sandvik-lh-307-lh307-hifi-filter-sh87415v-pall-hcg300fct8z-pall-hcg300fkt8z-pall-hcg300frt8z-sandvik-4221892-sandvik-56202447",
+      "quote": "SH 55295 V SH55295V HYD HYDRAULIC FILTER SANDVIK LH 307 LH307 HIFI-FILTER SH87415V PALL HCG300FCT8Z PALL HCG300FKT8Z PALL HCG300FRT8Z SANDVIK 4221892 SANDVIK 56202447"
+    },
+    {
+      "code": "4221892",
+      "issuer": "Sandvik",
+      "description": "Hydraulic filter, второй номер Sandvik рядом с 56202447 в перечне кроссов к HIFI SH55295V (что это прежний номер — толкование разведки, на странице не сказано)",
+      "machine": "LH307",
+      "unit": "гидросистема",
+      "source_url": "https://brettstruck.com.au/products/sh-55295-v-sh55295v-hyd-hydraulic-filter-sandvik-lh-307-lh307-hifi-filter-sh87415v-pall-hcg300fct8z-pall-hcg300fkt8z-pall-hcg300frt8z-sandvik-4221892-sandvik-56202447",
+      "quote": "SANDVIK 4221892 SANDVIK 56202447"
+    },
+    {
+      "code": "SH 55153",
+      "issuer": "HIFI Filter",
+      "description": "Hydraulic filter",
+      "machine": "LH307, LH410, TH551i",
+      "unit": "гидросистема",
+      "source_url": "https://brettstruck.com.au/products/sh-55153-sh55153-hyd-hydraulic-filter-sandvik-lh-307-lh-410-toro-007-toro-400-d-toro-501-toro-501-d-toro-th-551-i-lh307-lh410-toro007-toro400d-toro501-toro501d-toroth551i",
+      "quote": "SH 55153 SH55153 HYD HYDRAULIC FILTER SANDVIK LH 307 LH 410 TORO 007 TORO 400 D TORO 501 TORO 501 D TORO TH 551 I"
+    },
+    {
+      "code": "SN70141",
+      "issuer": "HIFI Filter",
+      "description": "Fuel filter",
+      "machine": "LH410",
+      "unit": "двигатель, топливная система",
+      "source_url": "https://brettstruck.com.au/products/sn-70141-sn70141-fuel-filter-hifi-sandvik-lh-410-wirtgen-w-1500-w-1900-wr-2000-wr-2400",
+      "quote": "SN 70141 SN70141 FUEL FILTER HIFI SANDVIK LH 410 WIRTGEN W 1500 W 1900 WR 2000 WR 2400"
+    },
+    {
+      "code": "SD70318",
+      "issuer": "HIFI Filter",
+      "description": "Urea (DEF/AdBlue) filter",
+      "machine": "TH663",
+      "unit": "система SCR",
+      "source_url": "https://brettstruck.com.au/products/sd-70318-sd70318-urea-filter-filters-for-sandvik-th663",
+      "quote": "SD 70318 SD70318 UREA FILTER FOR SANDVIK TH663"
+    },
+    {
+      "code": "SC60200",
+      "issuer": "HIFI Filter",
+      "description": "Cabin air filter",
+      "machine": "LH621i",
+      "unit": "кабина, вентиляция",
+      "source_url": "https://brettstruck.com.au/products/sc-60200-sc60200-cabin-air-filter-for-sandvik-lh621i",
+      "quote": "SC 60200 SC60200 CABIN AIR FILTER FOR SANDVIK LH621i"
+    },
+    {
+      "code": "FS709",
+      "issuer": "HIFI Filter",
+      "description": "Breather filter (сапун бака)",
+      "machine": "DD421, DT820",
+      "unit": "гидробак, сапун",
+      "source_url": "https://brettstruck.com.au/products/fs-709-fs709-breather-filter-for-sandvik-780r-dd421-di550-dp1100-dp1100i-dp1500-dt820",
+      "quote": "FS 709 FS709 BREATHER FILTER FOR  SANDVIK 780R ,DD421 ,DI550 ,DP1100 ,DP1100I ,DP1500 ,DT820,"
+    },
+    {
+      "code": "85079404",
+      "issuer": "Sandvik",
+      "description": "Breather filter, аналог HIFI FS709",
+      "machine": "DD421 (по странице FS709)",
+      "unit": "гидробак, сапун",
+      "source_url": "https://brettstruck.com.au/products/fs-709-fs709-breather-filter-metso-no2445732-nordberg-2445732-nordberg-n02445732-ponsse-0009755-ponsse-9755-ponsse-ffw823-sandvik-85079404",
+      "quote": "FS 709 FS709 BREATHER FILTER METSO NO2445732 ,NORDBERG 2445732 ,NORDBERG N02445732, PONSSE 0009755 ,PONSSE 9755 ,PONSSE FFW823 ,SANDVIK 85079404,"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Volvo Penta",
+      "component": "дизельный двигатель TAD1643VE-B (16 л, 565 кВт)",
+      "machine": "Toro TH663i",
+      "evidence": "страница изготовителя: «Volvo TAD1643VE-B (Tier 2)»; пресс-релиз Sandvik о двигателе Stage V называет Volvo Penta без обозначения двигателя",
+      "sources": [
+        "https://www.mining.sandvik/en/products/equipment/trucks/th663i-underground-truck",
+        "https://www.mining.sandvik/en/news-and-media/news-archive/2021/06/sandvik-introduces-a-16-liter-stage-v-engine-for-its-largest-truck-toro-th663i/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Volvo Penta",
+      "component": "дизельные двигатели TAD1641VE-B / TAD1385VE",
+      "machine": "Toro TH545i",
+      "evidence": "техническая спецификация TH545i",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/trucks/diesel-trucks/th545i-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Volvo Penta",
+      "component": "дизельные двигатели TAD1342VE / TAD1382VE (LH517i), TAD1340VE / TAD1171VE (LH514), TAD1140VE / TAD882VE (LH410), TAD1344VE / TAD1363VE (LH621)",
+      "machine": "Toro LH517i, LH514, LH410, LH621",
+      "evidence": "технические спецификации ПДМ на mining.sandvik",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh517i-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh514-technical-specifications-english.pdf",
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh410-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh621-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Dana",
+      "component": "гидротрансформатор и коробка передач (SOH 6000 / SOH 9000 на LH517i; C9602 и SOH 6000 на LH514; C5472 на LH410; 8421H и CL9672 на LH621; C9000 и 8000 Series на TH545i)",
+      "machine": "Toro LH517i, LH514, LH410, LH621, TH545i",
+      "evidence": "технические спецификации изготовителя",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh517i-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh514-technical-specifications-english.pdf",
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh410-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh621-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/siteassets/product-documents/trucks/diesel-trucks/th545i-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Kessler",
+      "component": "ведущие мосты (D106 на LH517i, LH514, TH545i; D102 на LH410; D111 на LH621)",
+      "machine": "Toro LH517i, LH514, LH410, LH621, TH545i",
+      "evidence": "технические спецификации изготовителя",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh517i-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh514-technical-specifications-english.pdf",
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh410-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh621-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/siteassets/product-documents/trucks/diesel-trucks/th545i-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Spicer (Dana)",
+      "component": "мосты на обеих машинах; гидродинамическая трансмиссия T20000 на DD421",
+      "machine": "DD421, DL421",
+      "evidence": "технические спецификации: «Axles Spicer», «Transmission Hydrodynamic, Spicer T20000»",
+      "sources": [
+        "https://www.mining.sandvik/globalassets/products/underground-drill-rigs-and-bolters/pdf/dd421-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/siteassets/product-documents/underground-drill-rigs/top-hammer-longhole-drill-rigs/dl421-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Mercedes-Benz",
+      "component": "дизельный двигатель OM904LA 110 кВт (транспортный ход)",
+      "machine": "DD421",
+      "evidence": "техническая спецификация: «Diesel engine MB OM904LA, 110 kW»",
+      "sources": [
+        "https://www.mining.sandvik/globalassets/products/underground-drill-rigs-and-bolters/pdf/dd421-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Cummins",
+      "component": "дизельный двигатель QSB4.5 124 кВт (Stage IIIA) / B4.5 129 кВт (Stage V)",
+      "machine": "DL421",
+      "evidence": "техническая спецификация DL421",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/underground-drill-rigs/top-hammer-longhole-drill-rigs/dl421-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Lincoln",
+      "component": "система централизованной смазки",
+      "machine": "DL421",
+      "evidence": "техническая спецификация: «Automatic system Lincoln»",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/underground-drill-rigs/top-hammer-longhole-drill-rigs/dl421-specification-sheet-english.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ANSUL",
+      "component": "система пожаротушения (опция)",
+      "machine": "Toro LH517i, LH514",
+      "evidence": "технические спецификации: «ANSUL Twin fire suppression system»",
+      "sources": [
+        "https://www.mining.sandvik/siteassets/product-documents/loaders/diesel-loaders/lh517i-specification-sheet-english.pdf",
+        "https://www.mining.sandvik/globalassets/products/underground-loaders-and-trucks/pdf/lh514-technical-specifications-english.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Sandvik Mining and Construction (China) Ltd",
+      "country": "Китай",
+      "role": "собственная дочерняя компания Sandvik, завод в Цзядине (Шанхай)",
+      "sources": [
+        "http://english.jiading.gov.cn/2013-07/12/c_709480.htm"
+      ]
+    },
+    {
+      "company": "Sandvik Mining and Rock Technology India Pvt Ltd",
+      "country": "Индия",
+      "role": "собственная дочерняя компания: продажи, запчасти, сервис; центр восстановления в Удайпуре",
+      "sources": [
+        "https://www.indiamart.com/sandvik-rockmining/profile.html",
+        "https://www.nbmcw.com/interviews/sandvik-underground-surface-mining-equipment-technology.html"
+      ]
+    },
+    {
+      "company": "Sandvik (офис продаж в Турции)",
+      "country": "Турция",
+      "role": "собственный офис продаж: подземные буровые установки и анкероустановщики, буровой инструмент",
+      "sources": [
+        "https://www.rocktechnology.sandvik/en/sales-offices/world/europe/turkey/"
+      ]
+    },
+    {
+      "company": "Sandvik Mining and Construction Kazakhstan Ltd",
+      "country": "Казахстан",
+      "role": "юрлицо Sandvik в Алматы; видно только по торговым данным, объём сервиса не подтверждён",
+      "sources": [
+        "https://www.volza.com/company-profile/sandvik-mining-and-construction-kazakhstan-ltd.-72879912/"
+      ]
+    },
+    {
+      "company": "Delkom",
+      "country": "Турция",
+      "role": "изготовитель альтернативных (не оригинальных) деталей перфораторов под номера Sandvik/Tamrock",
+      "sources": [
+        "https://delkomrockdrill.com/e-commerce/seal-kit-hl510t/",
+        "https://hydraulicrockdrill.com/shop/hlx5/"
+      ]
+    },
+    {
+      "company": "DrifterParts.com",
+      "country": "Турция",
+      "role": "изготовитель и продавец альтернативных деталей перфораторов HL/HLX (не оригинал)",
+      "sources": [
+        "http://www.drifterparts.com/hl510.html"
+      ]
+    },
+    {
+      "company": "Sancop Drill",
+      "country": "Турция",
+      "role": "продавец альтернативных деталей перфораторов Sandvik/Tamrock (не оригинал)",
+      "sources": [
+        "https://sancopdrill.com/product/rd525/"
+      ]
+    },
+    {
+      "company": "Brett's Truck Parts",
+      "country": "Австралия",
+      "role": "продавец фильтров HIFI с таблицами перекрёстных номеров Sandvik (неоригинальные фильтры)",
+      "sources": [
+        "https://brettstruck.com.au/search?q=sandvik&type=product"
+      ]
+    },
+    {
+      "company": "FridayParts",
+      "country": "не указана",
+      "role": "интернет-магазин неоригинальных фильтров и деталей для машин Sandvik",
+      "sources": [
+        "https://www.fridayparts.com/aftermarket-donaldson-p766811-hydraulic-cartridge-filter-element-for-sandvik-loader-lh-514-lh517-truck-toro-th-551-i"
+      ]
+    },
+    {
+      "company": "MT Underground",
+      "country": "Австралия",
+      "role": "сторонний сервис и модернизация буровых установок Sandvik DD421/DD422, публикует инструкции",
+      "sources": [
+        "https://www.mtunderground.com/parts-catalogues-and-products/technical-information-and-shared-documents/tech-info-sandvik/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Россия: Sandvik приостановил работу 28.02.2022, в июне 2022 решил свернуть бизнес, российское юрлицо ликвидировано 30.05.2023 (https://www.prnewswire.com/news-releases/sandvik-announces-a-non-recurring-charge-for-the-second-quarter-related-to-russia-301577682.html). Официального дилера или сервиса в РФ нет; нынешних поставщиков в РФ и СНГ (через Казахстан, Китай, Турцию) по открытым источникам не нашли.",
+    "Коды по RD525/RD520 (перфоратор DD421/DD422i) не подтверждены: карточки drill-parts.com (551 718 26, 551 587 66, 815 174 59 из выдачи поиска) закрыты проверкой Cloudflare, кодов в них не видно — в ответ не включены.",
+    "Оригинальные каталоги запчастей и сервисные книги Sandvik лежат на закрытом портале My Sandvik (об этом говорит спецификация DL421). В открытом доступе только копии у продавцов документации (machinecatalogic, eBay) и на Scribd.",
+    "Фильтры DD/DL-буровых и TH663i с номерами Sandvik подтверждены частично (55199068, 85079404). Сервисные комплекты на 250/500/1000 ч (например, DT69041680 для LH410 у aga-parts.com) не проверены: страница закрыта Cloudflare.",
+    "Номера фильтров самих двигателей Volvo Penta (масло, топливо) для TAD13xx/TAD16xx в привязке к машинам Sandvik ищите в каталогах Volvo Penta; в этой разведке их не собирали.",
+    "Страница 56009813 (масляный фильтр LH410, positivo-grupo.com) отдаёт 404 — код не включён.",
+    "Часть кодов перфораторов HL/HLX взята с сайтов продавцов альтернативных деталей, которые ссылаются на номер Sandvik. Сверку с оригинальным каталогом Sandvik не делали.",
+    "Мосты и трансмиссии Toro TH663i и TH551i по спецификациям не проверены (спецификации не скачивались). По LH514 старших ревизий есть упоминание Detroit S-60 (выдача поиска, Scribd), но оно не подтверждено."
+  ],
+  "verifier_notes": "Все 39 кодов, 25 моделей и 10 субпоставщиков найдены на указанных страницах: все источники открылись (HTTP 200), PDF изготовителя прочитаны pdftotext. Неподтверждённых записей нет. Оговорки: 879 484 49 — на странице Delkom бренд Sandvik не назван, связь идёт только через модель HL510T. 944432Q — изготовитель на странице не указан. 4221892 — то, что это «прежний номер», есть только в толковании разведки. P766811, SH66358 и SH 51410 взяты с неоригинальных страниц (aftermarket, перекрёстные номера), это не каталог Sandvik. У Kessler для LH514 подтверждение взято из PDF LH514, которого нет в sources записи. В пресс-релизе о TH663i Volvo Penta названа, а обозначения двигателя нет — оно есть на странице модели.",
+  "corrections": [
+    "summary: число кодов 38 → 39 — в файле и у скептика их 39",
+    "879 484 49: в doc_ref — бренд Sandvik на странице Delkom не назван, связь только через модель (замечание скептика)",
+    "944432Q: в doc_ref — изготовитель на странице не указан, Parker — предположение (замечание скептика)",
+    "4221892: «прежний номер» переведён в толкование разведки — на странице этого нет (замечание скептика)",
+    "P766811, SH66358, SH 51410: в doc_ref — неоригинальные страницы с перекрёстными номерами, не каталог Sandvik (замечание скептика)",
+    "Kessler: в sources добавлена спецификация LH514 — подтверждение для LH514 взято из неё (замечание скептика)",
+    "Volvo Penta на TH663i: в evidence уточнено, что обозначение двигателя есть только на странице модели, в пресс-релизе его нет (замечание скептика)",
+    "субпоставщикам из технических спецификаций Sandvik проставлено verified=true — скептик подтвердил все 10",
+    "машины без характеристики (15) получили rating «данных нет»",
+    "FridayParts: страна на источнике не указана — country «не указана»"
+  ]
+}

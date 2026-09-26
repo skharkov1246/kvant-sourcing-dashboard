@@ -1,0 +1,889 @@
+{
+  "oem_key": "drillmec",
+  "name": "Drillmec",
+  "segment_focus": "буровые установки серии HH: верхние приводы, насосы, номера уплотнений; сервис",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Drillmec (Пьяченца, Италия; с 2020-х в группе индийской MEIL, производство также в Хайдарабаде) выпускает гидравлические буровые установки серии HH. По брошюре 2023 г. в серии семь моделей: HH55, HH75, HH102, HH150, HH220, HH300 и HH350, крюковая нагрузка 55–317 т, 328–1150 кВт. Вместо буровой лебёдки у них гидроцилиндр, верхний привод встроенный, 13 560–52 230 Н·м. К серии относятся гидравлические (HTD) и электрические (ETD) верхние приводы, а также трёхпоршневые буровые насосы 7T450…14T2200. Документации изготовителя с кодами деталей в открытом доступе нет. Коды собраны из трёх открытых страниц третьих лиц. Первая — перечень запчастей верхних приводов и лебёдки MR8000 на drillingbase.com; судя по полю «ZIP» и хвостовым номерам, это заявка российского заказчика в машинном переводе. Вторая и третья — таблицы «DRILLMEC PART #» для насосов 12T1600 и 14T2200 у китайского производителя-аналога Premium и перечень гильз и прокладок 9T800/9T1000 у Longwell. Коды 8-значные: 0191xxxx — детали гидравлической части насоса, 5270xxxx — уплотнения, 6xxxxxxx — подшипники; у ремкомплектов уплотнений префикс RI. Кто на деле выпускает эти номера (Drillmec или его поставщики), по странице не установить. В России работает 100-процентная дочка ООО «Дриллмек Р» (Москва), вид деятельности — ремонт и обслуживание.",
+  "machines": [
+    {
+      "model": "HH55",
+      "kind": "гидравлическая буровая установка",
+      "segment": "прочее",
+      "rating": "55 т крюковая, 328 кВт, верхний привод 13 560 Н·м",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/en/onshore/hh-series-rigs",
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HH75",
+      "kind": "гидравлическая буровая установка",
+      "segment": "прочее",
+      "rating": "75 т, 403 кВт, ВП 13 560 Н·м",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/en/onshore/hh-series-rigs",
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HH102",
+      "kind": "гидравлическая буровая установка",
+      "segment": "прочее",
+      "rating": "100 т, 429 кВт, ВП 32 300 Н·м",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/en/onshore/hh-series-rigs",
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HH150",
+      "kind": "гидравлическая буровая установка",
+      "segment": "прочее",
+      "rating": "150 т, 720 кВт, ВП 32 300 Н·м",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/en/onshore/hh-series-rigs",
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HH220",
+      "kind": "гидравлическая буровая установка",
+      "segment": "прочее",
+      "rating": "200 т, 1000 кВт, ВП 35 840 Н·м",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/en/onshore/hh-series-rigs",
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HH300",
+      "kind": "гидравлическая буровая установка",
+      "segment": "прочее",
+      "rating": "272 т, 1150 кВт, ВП 49 080 Н·м",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/en/onshore/hh-series-rigs",
+        "https://www.drillmec.com/en/drillmec-hydraulic-rig-hh300",
+        "https://americanplantandequipment.com/tt-4031-drillmec-hh-300-drilling-rig.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HH350",
+      "kind": "гидравлическая буровая установка",
+      "segment": "прочее",
+      "rating": "317 т, 1150 кВт, ВП 52 230 Н·м",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/en/onshore/hh-series-rigs",
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HTD 200 C",
+      "kind": "гидравлический верхний привод",
+      "segment": "прочее",
+      "rating": "181 т, 3600 даН·м",
+      "status": "на текущей странице изготовителя нет (вероятно, снят)",
+      "sources": [
+        "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+        "https://www.environmental-expert.com/products/model-htd-series-hydraulic-top-drives-289996"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HTD 250 C",
+      "kind": "гидравлический верхний привод",
+      "segment": "прочее",
+      "rating": "226 т, 36 000 Н·м, 403 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.drillmec.com/en/equipment/top-drives",
+        "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HTD 350",
+      "kind": "гидравлический верхний привод",
+      "segment": "прочее",
+      "rating": "317 т, 39 240 Н·м, 470 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.drillmec.com/en/equipment/top-drives"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ETD 250",
+      "kind": "электрический верхний привод",
+      "segment": "прочее",
+      "rating": "245 т, 43 200 Н·м, 450 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.drillmec.com/en/equipment/top-drives"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ETD 375",
+      "kind": "электрический верхний привод",
+      "segment": "прочее",
+      "rating": "340 т, 72 000 Н·м, 850 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.drillmec.com/en/equipment/top-drives"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ETD 500",
+      "kind": "электрический верхний привод",
+      "segment": "прочее",
+      "rating": "498 т, 70 000 Н·м, 850 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.drillmec.com/en/equipment/top-drives",
+        "https://www.magitech.com.tw/wp-content/uploads/2018/10/ETD500.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ETD 750",
+      "kind": "электрический верхний привод",
+      "segment": "прочее",
+      "rating": "680 т, 80 000 Н·м, 850 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.drillmec.com/en/equipment/top-drives"
+      ],
+      "verified": true
+    },
+    {
+      "model": "7T450",
+      "kind": "трёхпоршневой буровой насос",
+      "segment": "насос",
+      "rating": "450 л.с., 207 бар, ход 7\"",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "7TS600",
+      "kind": "трёхпоршневой буровой насос",
+      "segment": "насос",
+      "rating": "600 л.с., 345 бар, ход 7\"",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "9T1000",
+      "kind": "трёхпоршневой буровой насос",
+      "segment": "насос",
+      "rating": "1000 л.с., 345 бар, ход 9\"",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf",
+        "https://www.longwell.ltd/inventory-list/drillmec-mud-pump-liner-and-parts.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "9T1300",
+      "kind": "трёхпоршневой буровой насос",
+      "segment": "насос",
+      "rating": "1370 л.с., 345 бар, ход 9\"",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12T1600",
+      "kind": "трёхпоршневой буровой насос",
+      "segment": "насос",
+      "rating": "1600 л.с., 345/517 бар, ход 12\"",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf",
+        "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "12T1600GD",
+      "kind": "трёхпоршневой буровой насос",
+      "segment": "насос",
+      "rating": "1600 л.с., 517 бар (7500 psi)",
+      "status": "выпускается (брошюра 2023)",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "14T2200",
+      "kind": "трёхпоршневой буровой насос",
+      "segment": "насос",
+      "rating": "2200 л.с. (по индексу модели)",
+      "status": "упоминается в каталогах аналогов; в таблице брошюры HH 2023 не указан",
+      "sources": [
+        "https://www.premiummudpump.com/sale-12615945-drillmec-14t2200-mud-pump-ceramic-liners.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "9T800",
+      "kind": "трёхпоршневой буровой насос",
+      "segment": "насос",
+      "rating": "800 л.с. (по индексу модели)",
+      "status": "в текущем каталоге нет, запчасти ходят в продаже",
+      "sources": [
+        "https://www.longwell.ltd/inventory-list/drillmec-mud-pump-liner-and-parts.html",
+        "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TF-1000",
+      "kind": "трёхпоршневой буровой насос (на установке HH300, привод от двигателя постоянного тока)",
+      "segment": "насос",
+      "rating": "1000 л.с.",
+      "status": "в текущем каталоге нет (бывший в употреблении комплект)",
+      "sources": [
+        "https://americanplantandequipment.com/tt-4031-drillmec-hh-300-drilling-rig.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MR8000",
+      "kind": "буровая установка / лебёдка (по перечню запчастей: вал барабана, ротор 27 1/2\", кронблок)",
+      "segment": "прочее",
+      "rating": "не указано",
+      "status": "не установлено",
+      "sources": [
+        "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "HH Series Automated Hydraulic Rigs (брошюра 2023, таблица моделей HH и буровых насосов)",
+      "machine": "HH55–HH350, насосы 7T450–12T1600GD",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ]
+    },
+    {
+      "title": "Drillmec HH Series (брошюра 11-016, редакция 2016)",
+      "machine": "HH102–HH300",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://drillmec.net.pl/wp-content/uploads/2017/02/03-drillmec-hh-series_11-016_web-d3b6b843-e8f5-4240-a6c1-602cba194363.pdf"
+      ]
+    },
+    {
+      "title": "Drillmec Top Drive Spare Parts List (HTD 200 C/250 C/350, ETD 375/500/750; фактически позиции HTD250, MR8000, 9T800) — сборник третьего лица",
+      "doc_no": "1502 (номер записи на сайте)",
+      "machine": "HTD250, MR8000, 9T800",
+      "kind": "parts list",
+      "sources": [
+        "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/"
+      ]
+    },
+    {
+      "title": "ETD Series electric top drive (буклет 011-016)",
+      "machine": "ETD 375/500/750",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://drillmec.net.pl/wp-content/uploads/2017/02/11-drillmec-electric-top-drive_011-016_web-10cb95c0-3316-4c37-bdc9-a426a9b4a200.pdf"
+      ]
+    },
+    {
+      "title": "Electric Top Drive ETD 500 (техническая карта)",
+      "machine": "ETD 500",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.magitech.com.tw/wp-content/uploads/2018/10/ETD500.pdf"
+      ]
+    },
+    {
+      "title": "Drillmec Spare Parts Price List 2015 (Euro) — Scribd, содержимое не проверено",
+      "machine": "не указана (прайс-лист по номенклатуре запчастей)",
+      "kind": "прайс-лист запчастей",
+      "sources": [
+        "https://www.scribd.com/document/895476948/Drillmec-Spare-Parts-Price-List-2015-Euro"
+      ]
+    },
+    {
+      "title": "Drillmec Mud Pumps — Scribd, содержимое не проверено",
+      "machine": "буровые насосы",
+      "kind": "каталог насосов",
+      "sources": [
+        "https://www.scribd.com/document/400753213/Drillmec-Mud-Pumps"
+      ]
+    },
+    {
+      "title": "Drillmec 12T1600 Triplex Mud Pump Parts List Manual — страница Willway (при проверке сайт отвечал HTTP 500)",
+      "machine": "12T1600",
+      "kind": "parts manual",
+      "sources": [
+        "https://willwaytech.com/?m=home&c=View&a=index&aid=2214&lang=en"
+      ]
+    },
+    {
+      "title": "HTD Series hydraulic top drives — Scribd, содержимое не проверено",
+      "machine": "HTD 200C/250C/350",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.scribd.com/document/349275111/HTD-Series"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "01900693",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Внутренний превентор (IBOP) 4-1/2\" IF",
+      "machine": "верхний привод Drillmec (HTD/ETD)",
+      "unit": "IBOP верхнего привода",
+      "doc_ref": "DrillingBase: Drillmec Top Drive Spare Parts List",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Inside BOP Valve 4-1/2″ IF for Drillmec Top Drive 01900693"
+    },
+    {
+      "code": "R140410910-04",
+      "issuer": "не установлен",
+      "description": "Ремкомплект IBOP",
+      "machine": "верхний привод Drillmec",
+      "unit": "IBOP",
+      "doc_ref": "DrillingBase",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Repair Kit for Above IBOP R140410910-04"
+    },
+    {
+      "code": "1954",
+      "issuer": "не установлен",
+      "description": "Труба промывочного узла (washpipe) 3\"",
+      "machine": "верхний привод Drillmec",
+      "unit": "вертлюг / промывочный узел",
+      "doc_ref": "DrillingBase; номер не похож на номер Drillmec — доверие низкое",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Wash pipe Tube 3″ for drillmec top drive 1954"
+    },
+    {
+      "code": "AJWP64",
+      "issuer": "не установлен (похоже на номер изготовителя уплотнений, а не Drillmec)",
+      "description": "Набивка промывочного узла (washpipe packing)",
+      "machine": "верхний привод Drillmec",
+      "unit": "вертлюг / промывочный узел",
+      "doc_ref": "DrillingBase; номер не похож на номер Drillmec — доверие низкое",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Wash Pipe Packing for drillmec top drive AJWP64"
+    },
+    {
+      "code": "52700524",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Прокладка коллектора привода",
+      "machine": "HTD250",
+      "unit": "коллектор привода (manifold ground drive)",
+      "doc_ref": "DrillingBase, п. 79",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Gasket 52700524 Manifold ground drive HTD250 DRILLMEC 1740278"
+    },
+    {
+      "code": "52700265",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Комплект уплотнений коллектора привода",
+      "machine": "HTD250",
+      "unit": "коллектор привода",
+      "doc_ref": "DrillingBase, п. 81",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "The composition of the sealing 52700265 Manifold ground drive HTD250 DRILLMEC 1740280"
+    },
+    {
+      "code": "52700277",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Комплект уплотнений тормоза привода",
+      "machine": "HTD250",
+      "unit": "тормоз привода",
+      "doc_ref": "DrillingBase, п. 86",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "The composition of the sealing 52700277 Brake ground drive HTD250 DRILLMEC 1740474"
+    },
+    {
+      "code": "52700262",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Комплект уплотнений привода",
+      "machine": "HTD250",
+      "unit": "привод вращения",
+      "doc_ref": "DrillingBase, п. 88",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "The composition of the sealing 52700262 Ground drive HTD250 DRILLMEC 1740526"
+    },
+    {
+      "code": "52700536",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Уплотнительное кольцо тормоза привода",
+      "machine": "HTD250",
+      "unit": "тормоз привода",
+      "doc_ref": "DrillingBase, п. 87",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "O-Ring 52700536 Brake ground drive HTD250 DRILLMEC 1740475"
+    },
+    {
+      "code": "52700522",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Прокладка привода",
+      "machine": "HTD250",
+      "unit": "привод вращения",
+      "doc_ref": "DrillingBase, п. 82",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Gasket 52700522 HTD250 Drillmec Ground drive HTD250 DRILLMEC 1817469"
+    },
+    {
+      "code": "52700495",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Грязесъёмник привода",
+      "machine": "HTD250",
+      "unit": "привод вращения",
+      "doc_ref": "DrillingBase, п. 83",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Scraper 52700495 HTD250 Drillmec Ground drive HTD250 DRILLMEC 1817470"
+    },
+    {
+      "code": "61070065",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Подшипник привода",
+      "machine": "HTD250",
+      "unit": "привод вращения",
+      "doc_ref": "DrillingBase, п. 18",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Bearing 61070065 ZIP Drillmec Ground drive HTD250"
+    },
+    {
+      "code": "61040014",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Подшипник привода",
+      "machine": "HTD250",
+      "unit": "привод вращения",
+      "doc_ref": "DrillingBase, п. 106",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Bearing 61040014 Drillmec Ground drive HTD250 DRILLMEC 1746301"
+    },
+    {
+      "code": "61230006",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Подшипник коллектора привода",
+      "machine": "HTD250",
+      "unit": "коллектор привода",
+      "doc_ref": "DrillingBase, п. 17",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Bearing 61230006 ZIP Drillmec Manifold ground drive HTD250"
+    },
+    {
+      "code": "5085-1152",
+      "issuer": "не установлен (вероятно, изготовитель гидроаппаратуры)",
+      "description": "Распределитель ключа (torque wrench) гидросистемы",
+      "machine": "HTD250",
+      "unit": "гидросистема",
+      "doc_ref": "DrillingBase, п. 11",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Control valve torque wrench 5085-1152 ZIP Drillmec Hydraulic system HTD250"
+    },
+    {
+      "code": "5085-1660",
+      "issuer": "не установлен",
+      "description": "Запорный клапан с обводом",
+      "machine": "HTD250",
+      "unit": "гидросистема",
+      "doc_ref": "DrillingBase, п. 5",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Shut-off valve with bypass 5085-1660 ZIP Drillmec Hydraulic system HTD250"
+    },
+    {
+      "code": "5069-0572",
+      "issuer": "не установлен",
+      "description": "Электромагнитный клапан",
+      "machine": "HTD250",
+      "unit": "гидросистема",
+      "doc_ref": "DrillingBase, п. 43",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Elektroklapon 1 SOL.ADPE 5069-0572 ZIP Drillmec Hydraulic system HTD250"
+    },
+    {
+      "code": "29510910",
+      "issuer": "не установлен",
+      "description": "Фильтроэлемент масляный",
+      "machine": "MR8000",
+      "unit": "маслосистема",
+      "doc_ref": "DrillingBase, п. 1 и 124",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Oil filter 29510910 The filter element MR 8000 DRILLMEC 1316274"
+    },
+    {
+      "code": "RI 55100525-01",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Комплект уплотнений гидроцилиндра",
+      "machine": "MR8000",
+      "unit": "гидроцилиндр",
+      "doc_ref": "DrillingBase, п. 103",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Set uplot. RI 55100525-01 Drillmec Hydraulic cylinder MR8000 DRILLMEC 1737122"
+    },
+    {
+      "code": "RI 51100020-01",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Комплект уплотнений гидроцилиндра с двусторонним штоком",
+      "machine": "MR8000",
+      "unit": "гидроцилиндр",
+      "doc_ref": "DrillingBase, п. 13",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Compl seals gidrotselindra RI 51100020-01 ZIP Drillmec The cylinder with double rod MR8000"
+    },
+    {
+      "code": "40390797",
+      "issuer": "Drillmec (графа DRILLMEC PART # в таблице изготовителя-аналога)",
+      "description": "Тарелка клапана (valve head)",
+      "machine": "12T1600 (по Premium); DrillingBase относит тот же номер к клапанному комплекту API 7\" насоса 9T800",
+      "unit": "гидравлическая часть, клапаны",
+      "doc_ref": "Premium: DRILLMEC 12T1600 FLUID END MODULE & ACCESSORIES, п. 1; принадлежность к машине расходится между источниками",
+      "source_url": "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html",
+      "quote": "40390797 DRILLMEC OEM DRAIWINGS VALVE HEAD"
+    },
+    {
+      "code": "40390798",
+      "issuer": "Drillmec (графа DRILLMEC PART #)",
+      "description": "Седло клапана",
+      "machine": "12T1600 (по Premium); DrillingBase относит тот же номер к клапанному комплекту API 7\" насоса 9T800",
+      "unit": "гидравлическая часть, клапаны",
+      "doc_ref": "Premium, п. 2; принадлежность к машине расходится между источниками",
+      "source_url": "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html",
+      "quote": "40390798 DRILLMEC OEM DRAIWINGS VALVE SEAT"
+    },
+    {
+      "code": "RI40390796-03",
+      "issuer": "Drillmec (графа DRILLMEC PART #)",
+      "description": "Пружина клапана",
+      "machine": "12T1600 (по Premium); DrillingBase относит тот же номер к клапанному комплекту API 7\" насоса 9T800",
+      "unit": "гидравлическая часть, клапаны",
+      "doc_ref": "Premium, п. 3; принадлежность к машине расходится между источниками",
+      "source_url": "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html",
+      "quote": "RI40390796-03 DRILLMEC OEM DRAIWINGS SPRING"
+    },
+    {
+      "code": "40390797-01",
+      "issuer": "Drillmec (графа DRILLMEC PART #)",
+      "description": "Уплотнительная вставка клапана (insert)",
+      "machine": "12T1600 (по Premium); DrillingBase относит тот же номер к клапанному комплекту API 7\" насоса 9T800",
+      "unit": "гидравлическая часть, клапаны",
+      "doc_ref": "Premium, п. 4; принадлежность к машине расходится между источниками",
+      "source_url": "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html",
+      "quote": "40390797-01 DRILLMEC OEM DRAIWINGS INSERT"
+    },
+    {
+      "code": "01917431",
+      "issuer": "Drillmec (графа DRILLMEC PART #)",
+      "description": "Цилиндровая втулка 6\"",
+      "machine": "12T1600",
+      "unit": "гидравлическая часть, втулки",
+      "doc_ref": "Premium, п. 8",
+      "source_url": "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html",
+      "quote": "01917431 DRILLMEC OEM DRAIWINGS LINER 6\""
+    },
+    {
+      "code": "01917450",
+      "issuer": "Drillmec (графа DRILLMEC PART #)",
+      "description": "Цилиндровая втулка 7\"",
+      "machine": "12T1600",
+      "unit": "гидравлическая часть, втулки",
+      "doc_ref": "Premium, п. 12",
+      "source_url": "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html",
+      "quote": "01917450 DRILLMEC OEM DRAIWINGS LINER 7\""
+    },
+    {
+      "code": "01912163",
+      "issuer": "Drillmec (графа DRILLMEC PART #)",
+      "description": "Поршень 6\"",
+      "machine": "12T1600",
+      "unit": "гидравлическая часть, поршни",
+      "doc_ref": "Premium, п. 18",
+      "source_url": "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html",
+      "quote": "01912163 DRILLMEC OEM DRAIWINGS 6\" PISTON"
+    },
+    {
+      "code": "01912155",
+      "issuer": "Drillmec (графа DRILLMEC PART #)",
+      "description": "Поршень 7\"",
+      "machine": "12T1600",
+      "unit": "гидравлическая часть, поршни",
+      "doc_ref": "Premium, п. 22",
+      "source_url": "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html",
+      "quote": "01912155 DRILLMEC OEM DRAIWINGS 7\" PISTON"
+    },
+    {
+      "code": "40392143",
+      "issuer": "Drillmec (по перечню изготовителя-аналога)",
+      "description": "Клапан со вставкой, полнопроходной",
+      "machine": "14T2200",
+      "unit": "гидравлическая часть, клапаны",
+      "doc_ref": "Premium: Drillmec 14T2200 mud pump parts, п. 16",
+      "source_url": "https://www.premiummudpump.com/sale-12615945-drillmec-14t2200-mud-pump-ceramic-liners.html",
+      "quote": "40392143 Valve with insert Full Open"
+    },
+    {
+      "code": "40392144",
+      "issuer": "Drillmec (по перечню изготовителя-аналога)",
+      "description": "Седло клапана",
+      "machine": "14T2200",
+      "unit": "гидравлическая часть, клапаны",
+      "doc_ref": "Premium, п. 17",
+      "source_url": "https://www.premiummudpump.com/sale-12615945-drillmec-14t2200-mud-pump-ceramic-liners.html",
+      "quote": "40392144 Seat, Valve"
+    },
+    {
+      "code": "40392145",
+      "issuer": "Drillmec (по перечню изготовителя-аналога)",
+      "description": "Пружина клапана",
+      "machine": "14T2200",
+      "unit": "гидравлическая часть, клапаны",
+      "doc_ref": "Premium, п. 18",
+      "source_url": "https://www.premiummudpump.com/sale-12615945-drillmec-14t2200-mud-pump-ceramic-liners.html",
+      "quote": "40392145 Spring, Valve"
+    },
+    {
+      "code": "01913290",
+      "issuer": "Drillmec",
+      "description": "Биметаллическая цилиндровая втулка 6 1/2\"",
+      "machine": "9T800, 9T1000",
+      "unit": "гидравлическая часть, втулки",
+      "doc_ref": "Longwell: inventory list, п. 2; также DrillingBase, п. 101",
+      "source_url": "https://www.longwell.ltd/inventory-list/drillmec-mud-pump-liner-and-parts.html",
+      "quote": "Liner 6 1/2″ 01913290 Drillmec"
+    },
+    {
+      "code": "01913284",
+      "issuer": "Drillmec",
+      "description": "Прокладка втулки 5\"",
+      "machine": "9T800, 9T1000",
+      "unit": "гидравлическая часть, уплотнения втулок",
+      "doc_ref": "Longwell, п. 6",
+      "source_url": "https://www.longwell.ltd/inventory-list/drillmec-mud-pump-liner-and-parts.html",
+      "quote": "Gasket for Liner 5″ 01913284 Drillmec"
+    },
+    {
+      "code": "01913315",
+      "issuer": "Drillmec",
+      "description": "Прокладка гидравлической части",
+      "machine": "9T800, 9T1000",
+      "unit": "гидравлическая часть",
+      "doc_ref": "Longwell, п. 5; DrillingBase, п. 50",
+      "source_url": "https://www.longwell.ltd/inventory-list/drillmec-mud-pump-liner-and-parts.html",
+      "quote": "Gasket 01913315 Drillmec"
+    },
+    {
+      "code": "01913581",
+      "issuer": "Drillmec",
+      "description": "Уплотнительное кольцо (у Longwell). У DrillingBase тот же номер записан как «spacer sleeve» 6 1/2\" — назначение расходится",
+      "machine": "9T800, 9T1000",
+      "unit": "гидравлическая часть",
+      "doc_ref": "Longwell, п. 7",
+      "source_url": "https://www.longwell.ltd/inventory-list/drillmec-mud-pump-liner-and-parts.html",
+      "quote": "O-ring 01913581 Drillmec"
+    },
+    {
+      "code": "52108450",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Уплотнительное кольцо гидравлической части",
+      "machine": "9T800",
+      "unit": "гидравлическая часть",
+      "doc_ref": "DrillingBase, п. 51",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "O-Ring 52108450 ZIP Drillmec The hydraulic part of the pump 9T800"
+    },
+    {
+      "code": "52106150",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Уплотнительное кольцо узла «втулка — поршень» 6 1/2\"",
+      "machine": "9T800",
+      "unit": "втулка / поршень",
+      "doc_ref": "DrillingBase, п. 74",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "O-Ring 52106150 ZIP Drillmec Set sleeve-piston 6 1/2"
+    },
+    {
+      "code": "52500047",
+      "issuer": "Drillmec (по данным третьего лица)",
+      "description": "Грязесъёмное кольцо узла крейцкопфа",
+      "machine": "9T800",
+      "unit": "крейцкопф / шток",
+      "doc_ref": "DrillingBase, п. 59",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Scraper ring 52500047 ZIP Drillmec Collection crosshead pump 9T800"
+    },
+    {
+      "code": "01913303",
+      "issuer": "Drillmec",
+      "description": "Крышка клапана",
+      "machine": "9T800 (у Premium — в перечне модулей гидравлической части)",
+      "unit": "гидравлическая часть, клапаны",
+      "doc_ref": "DrillingBase, п. 44",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Valve cover 01913303 ZIP Drillmec The hydraulic part of the pump 9T800"
+    },
+    {
+      "code": "01961652",
+      "issuer": "Drillmec",
+      "description": "Прокладка гидравлической части",
+      "machine": "9T800",
+      "unit": "гидравлическая часть",
+      "doc_ref": "DrillingBase, п. 48",
+      "source_url": "https://drillingbase.com/drillmec-top-drive-spare-parts-list-1502/",
+      "quote": "Gasket 01961652 ZIP Drillmec The hydraulic part of the pump 9T800"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Caterpillar",
+      "component": "Дизельные двигатели Cat 3512 (1321 л.с.) и генераторы SR4B 1000 кВА",
+      "machine": "HH300 (конкретный бывший в употреблении комплект)",
+      "evidence": "Спецификация продаваемой установки: «Three Cat 3512 diesel engines, 1321 hp at 1200 rpm, each driving one generator SR4B 1000 kva»",
+      "sources": [
+        "https://americanplantandequipment.com/tt-4031-drillmec-hh-300-drilling-rig.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Hydril",
+      "component": "Кольцевой превентор GK 13 5/8\" x 5000 psi",
+      "machine": "HH300 (конкретный комплект)",
+      "evidence": "Спецификация продаваемой установки: «Hydril GK 13 5/8 in x 5000 psi wp annular preventer»",
+      "sources": [
+        "https://americanplantandequipment.com/tt-4031-drillmec-hh-300-drilling-rig.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Cameron",
+      "component": "Сдвоенный плашечный превентор 13 5/8\" x 5000 psi",
+      "machine": "HH300 (конкретный комплект)",
+      "evidence": "Спецификация продаваемой установки: «Cameron 13 5/8 in x 5000 psi wp double rams»",
+      "sources": [
+        "https://americanplantandequipment.com/tt-4031-drillmec-hh-300-drilling-rig.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Volant",
+      "component": "Устройство спуска обсадных труб (CRT), базовое или опциональное",
+      "machine": "серия HH",
+      "evidence": "Брошюра изготовителя 2023: «Drillmec partners with Volant to offer its customers CRTs as standard or optional equipment»",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "King Cobra (изготовитель вибросит на странице не назван)",
+      "component": "Вибросита, 500 галлонов в минуту, 3 шт.",
+      "machine": "HH300 (конкретный комплект)",
+      "evidence": "Спецификация продаваемой установки: «Three King Cobra shaker 500 gpm»",
+      "sources": [
+        "https://americanplantandequipment.com/tt-4031-drillmec-hh-300-drilling-rig.html"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Drillmec S.p.A.",
+      "country": "Италия (Пьяченца)",
+      "role": "изготовитель, головная площадка",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf"
+      ]
+    },
+    {
+      "company": "Drillmec Inc.",
+      "country": "США (Хьюстон)",
+      "role": "дочерняя компания изготовителя; единственный адрес на странице запчастей изготовителя",
+      "sources": [
+        "https://www.drillmec.com/en/services/spare-parts",
+        "https://www.drillmec.com/en/contacts"
+      ]
+    },
+    {
+      "company": "Drillmec (площадка в Хайдарабаде), группа MEIL — Megha Engineering & Infrastructures",
+      "country": "Индия",
+      "role": "площадка изготовителя и материнская группа; производство буровых установок в Хайдарабаде и Какинаде",
+      "sources": [
+        "https://www.drillmec.com/media/userfiles/files/05%20Drillmec%20HH%20Series%202023.pdf",
+        "https://smestreet.in/infocus/megha-engineering-meil-subsidiary-drillmec-international-rolls-out-indigenous-oil-drilling-rig-under-make-in-india/"
+      ]
+    },
+    {
+      "company": "ООО «Дриллмек Р» (ИНН 7729634343)",
+      "country": "Россия (Москва)",
+      "role": "100-процентная дочка Drillmec S.p.A.; по реестру основной вид деятельности — ремонт и обслуживание машин и оборудования",
+      "sources": [
+        "https://www.rusprofile.ru/id/2701911",
+        "https://zachestnyibiznes.ru/company/ul/1097746358511_7729634343_OOO-DRILLMEK-R"
+      ]
+    },
+    {
+      "company": "Premium (premiummudpump.com)",
+      "country": "Китай",
+      "role": "неофициальный производитель аналогов запчастей к насосам Drillmec 7TS-500…14T2200 (не дилер)",
+      "sources": [
+        "http://www.premiummudpump.com/sale-12049320-drillmec-12t1600-mud-pump-power-end-spares.html"
+      ]
+    },
+    {
+      "company": "Longwell",
+      "country": "Китай (Сиань)",
+      "role": "неофициальный поставщик гильз и прокладок к насосам 9T800/9T1000 (не дилер)",
+      "sources": [
+        "https://www.longwell.ltd/inventory-list/drillmec-mud-pump-liner-and-parts.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Каталогов деталей изготовителя (parts manual) и руководств по эксплуатации установок HH, верхних приводов HTD/ETD и насосов в открытом доступе нет. Они выдаются владельцам установок, запросы идут через службу запчастей Drillmec. Изготовитель заявляет срок ответа 24–48 ч и строит онлайн-платформу с 3D-моделями.",
+    "Своих страниц с кодами запчастей у изготовителя нет. Все коды взяты у третьих лиц: DrillingBase — машинный перевод, судя по всему, российской заявки; Premium и Longwell — китайские производители аналогов. Номера нужно сверить с каталогом Drillmec или с ООО «Дриллмек Р».",
+    "Номер 01913581 у двух источников описан по-разному: у Longwell — уплотнительное кольцо, у DrillingBase — распорная втулка 6 1/2\".",
+    "Кодов деталей встроенного гидравлического верхнего привода установок HH (гидромоторы, уплотнения цилиндра подъёма, набивка промывочного узла) по моделям HH не найдено. Коды из перечня относятся к HTD250 и MR8000.",
+    "Изготовители гидромоторов, гидронасосов HPU, частотных преобразователей и ПЛК на установках HH открыто не названы. В брошюре сказано только «first class components made by primary suppliers».",
+    "На Scribd лежат прайс-лист Drillmec 2015, каталог насосов и каталог HTD, но без входа они недоступны, и содержимое не проверено.",
+    "Официальных дилеров в СНГ, Турции, ОАЭ и Китае не найдено. Российская страница изготовителя «Местное присутствие» (drillmec.com/ru/p/local-presence) отвечает 404.",
+    "Коды фильтров HPU и деталей двигателей и генераторов (Caterpillar) у установок HH не найдены."
+  ],
+  "verifier_notes": "Все 41 код, 25 моделей и 5 субпоставщиков подтверждены источниками. Страницы скачаны curl, тексты сверены поиском по строке: drillingbase.com (страница 1502), longwell.ltd, premiummudpump.com (12T1600 и 14T2200), americanplantandequipment TT-4031, drillmec.com/top-drives, страница серии HH и брошюра HH 2023 (PDF), drillmec.com/…-hh300. Страница environmental-expert вернула 403; HTD 200 C подтверждён шапкой DrillingBase. MR8000 подтверждён результатами поиска (drillmec.com/en/drillmec-mr-8000 и др.), саму страницу я не открывал. Оговорки: (1) коды клапанов 40390797, 40390798, RI40390796-03 и 40390797-01 Premium относит к 12T1600, а DrillingBase — к клапанному комплекту API 7\\\" насоса 9T800; к какой машине они относятся, неясно. (2) 01913581: у Longwell это O-ring, у DrillingBase — распорная втулка 6 1/2\\\". (3) Коды 1954 и AJWP64 на странице есть, но похожи не на номера Drillmec. (4) Все коды взяты у третьих лиц (китайских продавцов), документа изготовителя нет. (5) Субпоставщики Cat, Hydril, Cameron и King Cobra взяты из одной бывшей в употреблении HH300, а не из стандартной комплектации. (6) Перечень Premium к 14T2200 небрежный: один номер 1919522 стоит у втулок 5\\\", 6\\\" и 6-1/2\\\".",
+  "corrections": [
+    "счёт скептика «41 код, 25 моделей» не сходится с файлом: кодов 40, машин и исполнений 24 — записи сверены поштучно, пропусков нет; в сводных числах — 40 и 24",
+    "40390797, 40390798, RI40390796-03, 40390797-01: в machine и doc_ref — расхождение Premium (12T1600) и DrillingBase (9T800) (замечание скептика)",
+    "1954, AJWP64: в doc_ref — не похожи на номера Drillmec, доверие низкое (замечание скептика)",
+    "Caterpillar, Volant, King Cobra: verified=true — скептик подтвердил всех 5 субпоставщиков; что Cat, Hydril, Cameron и King Cobra взяты из одной бывшей в употреблении HH300, сказано в machine",
+    "прайс-лист Drillmec 2015 на Scribd: machine «не указана» — содержимое недоступно"
+  ]
+}
