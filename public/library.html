@@ -279,9 +279,12 @@ button,input{font:inherit}button,a,input,summary{-webkit-tap-highlight-color:tra
     const labels={verified:'Проверено по источникам',high:'Проверено по источникам',reviewed:'Проверено по источникам',confirmed:'Проверено по источникам',verified_observations_with_explicit_open_questions:'Проверено; есть открытые вопросы',partial:'Частично проверено',medium:'Требует уточнения',med:'Требует уточнения',low:'Недостаточно подтверждений',hypothesis:'Гипотеза',unverified:'Требует проверки',draft:'Предварительный материал'};
     return {label:label||labels[level]||'Уровень проверки не указан',limited:!VERIFIED_LEVELS.includes(level),note:text(raw?.note||raw?.description)};
   }
+  // Подписи указателя места источника. Ревизия (scripts/portal_audit.py, l.ref_locator)
+  // читает ключи отсюда: ключ без подписи сорсер видит сырым английским словом.
+  const LOCATOR_LABELS={page:'Страница',pages:'Страницы',sheet:'Лист',cells:'Ячейки',cell:'Ячейка',table:'Таблица',table_row:'Строка таблицы',table_rows:'Строки таблицы',json_pointer:'Запись',json_pointers:'Записи',row:'Строка',rows:'Строки',column:'Колонка',section:'Раздел',line:'Строка текста',lines:'Строки текста',paragraph:'Абзац',archive_member:'Файл внутри архива'};
   function formatLocator(value) {
     if(typeof value==='string')return value;if(!value||typeof value!=='object')return '';
-    const labels={page:'Страница',pages:'Страницы',sheet:'Лист',cells:'Ячейки',cell:'Ячейка',table_row:'Строка таблицы',table_rows:'Строки таблицы',json_pointer:'Запись',row:'Строка',column:'Колонка',archive_member:'Файл внутри архива'};
+    const labels=LOCATOR_LABELS;
     return Object.entries(value).map(([key,val])=>{if(val==null)return '';const shown=Array.isArray(val)?val.join(', '):typeof val==='object'?JSON.stringify(val):String(val);return (labels[key]||key)+': '+shown;}).filter(Boolean).join(' · ');
   }
   function updateUrl() {const hash=new URLSearchParams();if(state.segment!=='all')hash.set('segment',state.segment);if(state.section!=='overview')hash.set('section',state.section);if(state.selected)hash.set('article',state.selected);const suffix=hash.toString();history.replaceState(null,'',location.pathname+location.search+(suffix?'#'+suffix:''));}

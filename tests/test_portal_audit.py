@@ -370,7 +370,9 @@ def _библиотека():
         знание["body"] = ("Опыт замены подшипника на насосе.\n\n| узел | деталь |\n|---|---|\n| опора | NU 316 |\n\n"
                           "| размер | допуск | зазор |\n|---|---|---|\n| 80 | h6 | C3 |\n\n"
                           "Подробнее: [каталог](https://example.test/catalog) и [раздел](/library#segment=bearings).")
-        знание["sources"]["references"][0]["locator"] = {"page": 3}
+        # Законные формы указателя: перечень записей и ячеек страница показывает списком.
+        знание["sources"]["references"][0]["locator"] = {"page": 3, "json_pointers": ["/items/0", "/items/1"],
+                                                         "cells": [["A1", "B2"]], "table_row": 4}
         знание["sources"]["crm_links"] = [{"url": "https://example.test/crm/1", "title": "Сделка"}]
         знание["sources"]["open_questions"] = []
         строки.append(знание)
@@ -1140,6 +1142,81 @@ def test_счёт_страницы_совпадает_с_ярлыком_карт
           + "console.log(JSON.stringify([pendingCount(Q),limited,pendingCount(null),pendingCount({verified:3})]));")
     вывод = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=30, check=True).stdout
     assert json.loads(вывод) == [20, 20, 0, 0]
+
+
+# Подписи formatLocator до 26.09.2026: json_pointers, rows, section, table, line,
+# lines, paragraph страница показывала сырым английским словом.
+ПОДПИСИ_УКАЗАТЕЛЯ_ПРЕЖНИЕ = ("{page:'Страница',pages:'Страницы',sheet:'Лист',cells:'Ячейки',cell:'Ячейка',"
+                             "table_row:'Строка таблицы',table_rows:'Строки таблицы',json_pointer:'Запись',"
+                             "row:'Строка',column:'Колонка',archive_member:'Файл внутри архива'}")
+# Выдуманный корпус указателей: каждая форма, которую страница умеет показать.
+УКАЗАТЕЛИ = [{"page": 3}, {"pages": [3, 4]}, {"sheet": "Лист1", "cells": [["A1", "B2"]]}, {"cell": "C7"},
+             {"json_pointer": "/items/0"}, {"json_pointers": ["/items/0", "/items/1"]},
+             {"table_row": 4, "column": "Цена"}, {"table_rows": [4, 5]}, {"row": 2, "rows": [2, 3]},
+             {"section": "3.2", "table": 1, "paragraph": 5}, {"line": 12, "lines": [12, 14]},
+             {"archive_member": "spec/a.xlsx", "sheet": "Лист1"}, {"page": None, "row": 1}]
+
+
+def test_ключи_указателя_читаются_со_страницы():
+    ключи = pa.ключи_указателя_страницы(СТРАНИЦА_БИБЛИОТЕКИ)
+    прежние = frozenset(re.findall(r"(\w+):'", ПОДПИСИ_УКАЗАТЕЛЯ_ПРЕЖНИЕ))
+    # Ни одна прежняя подпись не пропала; прежний закрытый список ревизии весь подписан.
+    assert прежние <= ключи
+    assert {"page", "pages", "sheet", "cells", "cell", "row", "rows", "column", "json_pointer",
+            "section", "table", "line", "lines", "paragraph", "json_pointers"} <= ключи
+    assert pa.ключи_указателя_страницы("<html></html>") == frozenset()
+    # Правило читается из страницы: снятая подпись делает ключ неизвестным.
+    без_подписи = СТРАНИЦА_БИБЛИОТЕКИ.replace("json_pointers:'Записи',", "")
+    assert без_подписи != СТРАНИЦА_БИБЛИОТЕКИ
+    assert "json_pointers" not in pa.ключи_указателя_страницы(без_подписи)
+    # Закомментированный словарь не считается.
+    assert pa.ключи_указателя_страницы("  // const LOCATOR_LABELS={x:'X'};") == frozenset()
+
+
+def test_указатель_законные_формы_не_дефект():
+    ключи = pa.ключи_указателя_страницы(СТРАНИЦА_БИБЛИОТЕКИ)
+    assert [л for л in УКАЗАТЕЛИ if pa.указатель_не_виден(л, ключи)] == []
+
+
+@pytest.mark.parametrize("указатель", [
+    {"page": 3, "extra": 1},                       # неизвестный ключ
+    {"page": {"from": 3, "to": 4}},                 # объект — JSON-строкой
+    {"json_pointers": [{"p": "/items/0"}]},         # объект в массиве — [object Object]
+    {"cells": [["A1", {"b": 2}]]},                  # объект глубже
+])
+def test_указатель_вложенный_или_неизвестный_дефект(указатель):
+    assert pa.указатель_не_виден(указатель, pa.ключи_указателя_страницы(СТРАНИЦА_БИБЛИОТЕКИ))
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="нет node")
+def test_показ_указателя_ничего_не_теряет():
+    """Правило 0: исполняется formatLocator страницы и прежний (с прежними
+    подписями) на одном выдуманном корпусе. Значения те же — ни у одного
+    указателя не хуже, — подписи прежних ключей не изменились, сырых
+    английских ключей не осталось."""
+    код = re.search(r"  const LOCATOR_LABELS=.*?\n  function formatLocator\(value\) \{.*?\n  \}\n",
+                    СТРАНИЦА_БИБЛИОТЕКИ, re.S).group(0)
+    тело = код.split("  function formatLocator", 1)[1]
+    прежний = "function oldFormatLocator" + тело.replace(
+        "const labels=LOCATOR_LABELS;", "const labels=" + ПОДПИСИ_УКАЗАТЕЛЯ_ПРЕЖНИЕ + ";")
+    корпус = УКАЗАТЕЛИ + ["стр. 3"]
+    js = (код + прежний + "const L=" + json.dumps(корпус, ensure_ascii=False) + ";\n"
+          + "console.log(JSON.stringify(L.map(l=>[oldFormatLocator(l),formatLocator(l)])));")
+    пары = json.loads(subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=30,
+                                     check=True).stdout)
+    хуже = 0
+    for указатель, (было, стало) in zip(корпус, пары):
+        части_было, части_стало = было.split(" · "), стало.split(" · ")
+        значения_было = [ч.split(": ", 1)[-1] for ч in части_было]
+        значения_стало = [ч.split(": ", 1)[-1] for ч in части_стало]
+        хуже += len(части_было) != len(части_стало) or значения_было != значения_стало
+        for ч_было, ч_стало in zip(части_было, части_стало):
+            if not re.fullmatch(r"[a-z_]+", ч_было.split(": ", 1)[0]):
+                assert ч_было == ч_стало                     # прежняя подпись не тронута
+        if isinstance(указатель, dict):
+            assert not re.search(r"(?:^| · )[a-z_]+: ", стало), стало
+    assert хуже == 0
+    assert пары[5] == ["json_pointers: /items/0, /items/1", "Записи: /items/0, /items/1"]
 
 
 def test_требуют_проверки_без_правила_видят_всё_скрытым():
