@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 288,
-    "total_bytes": 125061462,
+    "datasets": 289,
+    "total_bytes": 125099897,
     "by_sensitivity": {
-      "внутреннее": 166,
+      "внутреннее": 167,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 24,
+      "дашборд сорсеров": 25,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3560,6 +3560,69 @@
       "referenced_by": []
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 184771,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/dongfengcumminsengine.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/generalelectric.json",
+        "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/jichaijinandieselcnpc.json",
+        "data/brand_research/mturollsroycepowersystems.json",
+        "data/brand_research/mwmcaterpillarenergy.json",
+        "data/brand_research/perkinsfgwilson.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/rollsroyce.json",
+        "data/brand_research/siemensdemagdelavalturbomachinery.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/waukeshainnio.json",
+        "data/brand_research/wrtsil.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "data/subsuppliers/verified.json",
+        "dict/",
+        "dict/material.json",
+        "dict/model_series.json",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/budget_join_stats.json"
+      ],
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "5433b12",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_questions.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 184605,
@@ -3605,69 +3668,6 @@
         "gt/tools/ship_final.py",
         "gt/tools/ship_questions.py",
         "tests/test_ship_collisions.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 183073,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/deutz.json",
-        "data/brand_research/dongfengcumminsengine.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/generalelectric.json",
-        "data/brand_research/guascorsiemensenergy.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/jichaijinandieselcnpc.json",
-        "data/brand_research/mturollsroycepowersystems.json",
-        "data/brand_research/mwmcaterpillarenergy.json",
-        "data/brand_research/perkinsfgwilson.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/rollsroyce.json",
-        "data/brand_research/siemensdemagdelavalturbomachinery.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/brand_research/waukeshainnio.json",
-        "data/brand_research/wrtsil.json",
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/material.json",
-        "dict/model_series.json",
-        "dict/node_map.json",
-        "dict/symptom.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/budget_join_stats.json",
-        "gt/data/dossiers.json"
-      ],
-      "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "4e364da",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -6996,8 +6996,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "4cf6fa8",
+      "last_author": "skharkov1246",
+      "last_commit": "6bc6bcc",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7966,8 +7966,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "4cf6fa8",
+      "last_author": "skharkov1246",
+      "last_commit": "6bc6bcc",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8965,6 +8965,53 @@
       ]
     },
     {
+      "path": "data/subsuppliers/verified.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 36737,
+      "note": "Подтверждённые субпоставщики брендов (разведка 2026-09-26): компании, чей узел или деталь идёт в машину бренда штатно. Записей — 39 по брендам спроса: Epiroc 9 (подтверждение записей data/brand_research/epiroc.json), Sandvik (Tamrock) 7, Atlas Copco 7, Normet 6, Komatsu 4, Grundfos 4, Flowserve 2. Вносится только при первичном доказательстве: а — спецификация, перечень комплектации или магазин запчастей самого бренда (33 записи), б — пресс-релиз субпоставщика (1), в — официальный документ бренда с маркой субпоставщика на детали (5). У каждой записи дословная цитата и адрес, прочитанный запросом; скептик вторым проходом сверил все цитаты PDF с текстом документа, перечитал страницы HTML и отклонил 8 кандидатов (поле rejected: перемоторизация вместо штатной поставки, сайты перепродавцов, расходные материалы, обозначения вместо марки). По Weir (Warman), Sulzer и KSB первичных подтверждений не найдено — причины в gaps. Контактов людей нет — проверяется. Проверщик — scripts/subsuppliers_check.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "records",
+        "rejected",
+        "rule",
+        "schema",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "records",
+        "records": 39,
+        "record_keys": [
+          "brand",
+          "checked",
+          "company",
+          "component",
+          "evidence_kind",
+          "machines",
+          "note",
+          "oem_key",
+          "quote",
+          "sources"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "5433b12",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/brands.py",
+        "scripts/subsuppliers_check.py",
+        "tests/test_brands_subsuppliers.py",
+        "tests/test_portal_audit.py",
+        "tests/test_subsuppliers_check.py"
+      ]
+    },
+    {
       "path": "ove/data/disc_c.json",
       "subproject": "ОВЭ-75",
       "bytes": 35757,
@@ -9201,8 +9248,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "4cf6fa8",
+      "last_author": "skharkov1246",
+      "last_commit": "6bc6bcc",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
