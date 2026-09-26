@@ -230,7 +230,9 @@ def test_прогон_передаёт_ослабление_входом_а_не
     yml = (Path(__file__).resolve().parent.parent
            / ".github/workflows/library-index.yml").read_text(encoding="utf-8")
     assert "header_relax:" in yml, "входа нет — ослабление не включить прогоном"
-    assert re.search(r"HEADER_RELAX:\s*\$\{\{\s*inputs\.header_relax", yml), \
+    # Флаг доезжает через одну точку (.github/actions/parse-env), вход прогона
+    # передаётся ей параметром.
+    assert re.search(r"header_relax:\s*\$\{\{\s*inputs\.header_relax", yml), \
         "HEADER_RELAX не привязан к входу"
     # Прибитого значения в строке запуска быть не должно ни у одной ветки.
     assert not re.search(r"HEADER_RELAX=\S+\s+python", yml), "значение прибито в шаге"

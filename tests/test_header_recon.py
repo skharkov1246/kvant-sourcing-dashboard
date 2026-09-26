@@ -119,7 +119,8 @@ def test_прогон_разведки_ставит_читатели_табли�
     """
     import re
     разведка = (ROOT / ".github" / "workflows" / "demand-sides.yml").read_text(encoding="utf-8")
-    разбор = (ROOT / ".github" / "workflows" / "library-index.yml").read_text(encoding="utf-8")
+    # Пакеты разбора ставит одна точка всех прогонов разбора — parse-env.
+    разбор = (ROOT / ".github" / "actions" / "parse-env" / "action.yml").read_text(encoding="utf-8")
 
     def ставит(текст: str) -> set[str]:
         без_пояснений = "\n".join(s.split("#")[0] for s in текст.splitlines())

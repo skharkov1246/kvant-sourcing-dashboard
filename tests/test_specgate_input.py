@@ -25,7 +25,7 @@ def без_комментариев(путь: str, знак: str = "#") -> str:
 def test_ворота_передаются_прогоном():
     yml = без_комментариев(".github/workflows/library-index.yml")
     assert "specgate:" in yml, "входа нет — выключить ворота прогоном нельзя"
-    assert re.search(r"SPECGATE:\s*\$\{\{\s*inputs\.specgate", yml), \
+    assert re.search(r"specgate:\s*\$\{\{\s*inputs\.specgate", yml), \
         "SPECGATE не привязан к входу"
 
 
@@ -53,7 +53,7 @@ def test_пустое_значение_входа_не_включает_воро
     выключенным... проверим прямо): важно, чтобы выключение доезжало однозначно.
     """
     yml = без_комментариев(".github/workflows/library-index.yml")
-    assert re.search(r"SPECGATE:[^\n]*\|\|\s*'0'", yml), \
+    assert re.search(r"specgate:\s*\$\{\{[^\n]*\|\|\s*'0'", yml), \
         "при выключенном входе передаётся пустая строка, а не ноль"
 
 

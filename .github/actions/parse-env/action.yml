@@ -1,0 +1,128 @@
+name: Окружение разбора вложений
+description: >-
+  Одна точка правды для всех прогонов разбора: пакеты Python и системные читатели
+  форматов, распознавание и флаги разбора (HEADER_RELAX, CASCADE, SPECGATE,
+  PDF_ONE_PASS, RETRY_FAILED, RETRY_FAILED_LIMIT) в окружение задания.
+
+# ЗАЧЕМ ОДНА ТОЧКА. До 26.09.2026 ночной разбор котировок (suppliers-quotes.yml)
+# и ежедневное пополнение (library-daily.yml) шли без ослабленной шапки и без
+# каскада, а ночной — ещё и без antiword, catdoc, unrar, 7z, poppler и qpdf: файл,
+# пришедший ночью, разбирался ИНАЧЕ, чем тот же файл при ручном переразборе, и
+# .doc, rar и 7z ночью терялись целиком. Владелец 26.09.2026: «поменять ночной
+# разбор так, чтобы он считал так же, как ручной». Четыре прогона — ночной,
+# ежедневный, ручной разбор и переразбор (library-index.yml) — зовут это
+# действие, и набор пакетов и флагов у них больше не может разойтись молча.
+# Сверяет tests/test_parse_env.py.
+#
+# КАК ДОЕЗЖАЮТ ФЛАГИ. Действие пишет их в $GITHUB_ENV — они действуют во всех
+# следующих шагах задания. Поэтому шаг запуска НЕ должен задавать эти же
+# переменные в своём env: переменная шага перекрывает окружение задания, и прогон
+# молча считал бы по-своему (тест это ловит).
+#
+# УМОЛЧАНИЯ = ТО, КАК СЧИТАЕТ РУЧНОЙ ПЕРЕРАЗБОР. Ослабленная шапка действует
+# только на офисные виды (indexer.ШИРЕ_ПРИМЕНИМО, на PDF — нет, это замер);
+# каскад — свой читатель по формату → починка текста → LibreOffice. Ручной прогон
+# может выключить любой флаг своим входом — для замера A/B.
+
+inputs:
+  header_relax:
+    description: "Ослабленное правило шапки: 1 — включено, 0 или пусто — выключено"
+    default: "1"
+  cascade:
+    description: "Каскад чтения: 1 — включён (ставится LibreOffice), 0 или пусто — выключен"
+    default: "1"
+  specgate:
+    description: "Ворота спецификации: 1 — включены, 0 — выключены (только для замера)"
+    default: "1"
+  pdf_one_pass:
+    description: "PDF читать один раз: 1 — да, 0 или пусто — нет"
+    default: ""
+  retry_failed:
+    description: "Повторять файлы «не скачался»: 1 — да, 0 или пусто — нет"
+    default: "1"
+  retry_failed_limit:
+    description: "Не больше стольких повторов «не скачался» на часть (0 — без предела)"
+    default: "150"
+  parse:
+    description: "Ставить читателей форматов (antiword, catdoc, 7z, unrar, bsdtar, poppler, qpdf)"
+    default: "true"
+  ocr:
+    description: "Ставить распознавание (tesseract с русским)"
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    # Пакеты Python — одним списком для всех: pyxlsb (книги .xlsb) ночной
+    # прогон прежде не ставил, и такие КП ночью уходили в «формат не читаем».
+    - name: Пакеты Python для разбора
+      shell: bash
+      run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+
+    # ЧИТАТЕЛИ ФОРМАТОВ, КОТОРЫХ НЕТ В PYTHON.
+    # Замер 23.09.2026: 375 файлов «старого office» упали в xlrd — это .doc и
+    # .msg, контейнер OLE2; читатель .doc внешний (library/readers.py) и без
+    # antiword/catdoc честно теряет файл. Плюс 169 архивов с rar и 7z.
+    # unrar и bsdtar — не лишние: в Ubuntu 24.04 p7zip-full — переходник на 7zip
+    # 23.01 без кодека RAR, сжатый RAR даёт «Unsupported Method».
+    # poppler-utils и qpdf — для library/read_pdf.py: pdftotext держит колонки,
+    # qpdf снимает пустой пароль и чинит таблицу ссылок.
+    # LibreOffice — последний рубеж каскада (library/convert_office.py); ставится
+    # только под каскад: пакет тяжёлый (около минуты), а без каскада его не зовут.
+    - name: Системные пакеты разбора
+      shell: bash
+      env:
+        PARSE: ${{ inputs.parse }}
+        OCR: ${{ inputs.ocr }}
+        CASCADE_IN: ${{ inputs.cascade }}
+      run: |
+        set -euo pipefail
+        pkgs=()
+        if [ "$PARSE" = "true" ]; then
+          pkgs+=(antiword catdoc p7zip-full unrar libarchive-tools poppler-utils qpdf)
+        fi
+        if [ "$OCR" = "true" ]; then
+          pkgs+=(tesseract-ocr tesseract-ocr-rus poppler-utils)
+        fi
+        if [ "${#pkgs[@]}" -gt 0 ]; then
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "${pkgs[@]}"
+        fi
+        if [ "$PARSE" = "true" ] && [ "$CASCADE_IN" = "1" ]; then
+          sudo apt-get install -y -qq --no-install-recommends \
+            libreoffice-calc-nogui libreoffice-writer-nogui
+        fi
+        for t in antiword catdoc 7z unrar bsdtar pdftotext qpdf soffice tesseract; do
+          printf '%-10s %s\n' "$t:" "$(command -v "$t" || echo нет)"
+        done
+
+    # Значения идут через env, а не подстановкой в текст команды. Допустимы только
+    # «1», «0» и пусто (у предела — целое): опечатка во входе не должна молча
+    # превращаться в «выключено».
+    - name: Флаги разбора в окружение задания
+      shell: bash
+      env:
+        IN_HEADER_RELAX: ${{ inputs.header_relax }}
+        IN_CASCADE: ${{ inputs.cascade }}
+        IN_SPECGATE: ${{ inputs.specgate }}
+        IN_PDF_ONE_PASS: ${{ inputs.pdf_one_pass }}
+        IN_RETRY_FAILED: ${{ inputs.retry_failed }}
+        IN_RETRY_FAILED_LIMIT: ${{ inputs.retry_failed_limit }}
+      run: |
+        set -euo pipefail
+        for pair in "HEADER_RELAX=$IN_HEADER_RELAX" "CASCADE=$IN_CASCADE" \
+                    "SPECGATE=$IN_SPECGATE" "PDF_ONE_PASS=$IN_PDF_ONE_PASS" \
+                    "RETRY_FAILED=$IN_RETRY_FAILED"; do
+          case "${pair#*=}" in
+            1|0|"") ;;
+            *) echo "::error::флаг разбора ${pair%%=*}: «${pair#*=}» — допустимо 1, 0 или пусто"; exit 1 ;;
+          esac
+          echo "$pair" >> "$GITHUB_ENV"
+        done
+        case "$IN_RETRY_FAILED_LIMIT" in
+          ''|*[!0-9]*) echo "::error::RETRY_FAILED_LIMIT: «$IN_RETRY_FAILED_LIMIT» — нужно целое"; exit 1 ;;
+        esac
+        echo "RETRY_FAILED_LIMIT=$IN_RETRY_FAILED_LIMIT" >> "$GITHUB_ENV"
+        echo "флаги разбора: HEADER_RELAX=${IN_HEADER_RELAX:-пусто} CASCADE=${IN_CASCADE:-пусто}" \
+             "SPECGATE=${IN_SPECGATE:-пусто} PDF_ONE_PASS=${IN_PDF_ONE_PASS:-пусто}" \
+             "RETRY_FAILED=${IN_RETRY_FAILED:-пусто} RETRY_FAILED_LIMIT=$IN_RETRY_FAILED_LIMIT"

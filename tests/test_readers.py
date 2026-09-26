@@ -157,21 +157,24 @@ def test_внешние_читатели_ставятся_прогоном():
     """
     import re
     from pathlib import Path
-    сырой = (Path(__file__).resolve().parent.parent
-             / ".github/workflows/library-index.yml").read_text(encoding="utf-8")
+    корень = Path(__file__).resolve().parent.parent
+    # Пакеты ставит одна точка всех прогонов разбора — .github/actions/parse-env.
+    сырой = (корень / ".github/actions/parse-env/action.yml").read_text(encoding="utf-8")
     # РАЗБОР ЧИТАЕТ КОД, А НЕ КОММЕНТАРИИ (CLAUDE.md, стиль работы). Первая
     # редакция этой проверки искала «antiword» по всему файлу и ПЕРЕЖИЛА мутацию
     # «убрать antiword из установки»: слово нашлось в пояснении над шагом.
     yml = re.sub(r"(?m)^\s*#[^\n]*$", "", сырой)
-    шаг = yml[yml.index("Установка читателей форматов"):]
+    шаг = yml[yml.index("Системные пакеты разбора"):]
     шаг = шаг[:шаг.index("- name:", 10)]
-    ставятся = re.search(r"apt-get install[^\n]*", шаг)
-    assert ставятся, "в шаге нет установки пакетов"
+    ставятся = re.search(r'if \[ "\$PARSE" = "true" \]; then\n\s*pkgs\+=\(([^)]*)\)', шаг)
+    assert ставятся, "в шаге нет установки пакетов разбора"
     for имя, _ключи in readers.ДОК_ЧИТАТЕЛИ:
-        assert имя in ставятся.group(0), \
+        assert имя in ставятся.group(1), \
             f"{имя} зовётся из кода, но не стоит в команде установки"
-    assert re.search(r"if:\s*\$\{\{\s*!inputs\.ocr\s*\}\}", шаг), \
-        "шаг стоит под условием распознавания — для разбора читателей не будет"
+    # Ручной прогон просит читателей всегда, кроме распознавания.
+    wf = (корень / ".github/workflows/library-index.yml").read_text(encoding="utf-8")
+    assert re.search(r"parse:\s*\$\{\{\s*!inputs\.ocr\s*\}\}", wf), \
+        "читатели стоят под условием распознавания — для разбора их не будет"
 
 
 # RTF ОТ LIBREOFFICE: кириллица знаком Юникода с «?» запасным, переводы строк

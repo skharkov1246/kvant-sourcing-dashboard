@@ -440,19 +440,22 @@ def test_схема_добавляет_колонку_пути_чтения():
 
 
 def test_прогон_ставит_читателей_каскада():
-    """Код зовёт pdftotext, qpdf и soffice — прогон обязан их поставить."""
-    сырой = (ROOT / ".github/workflows/library-index.yml").read_text(encoding="utf-8")
+    """Код зовёт pdftotext, qpdf и soffice — прогон обязан их поставить.
+
+    Пакеты ставит одна точка — .github/actions/parse-env; что её зовут все
+    прогоны разбора, сверяет tests/test_parse_env.py."""
+    сырой = (ROOT / ".github/actions/parse-env/action.yml").read_text(encoding="utf-8")
     yml = re.sub(r"(?m)^\s*#[^\n]*$", "", сырой)
-    шаг = yml[yml.index("Установка читателей форматов"):]
+    шаг = yml[yml.index("Системные пакеты разбора"):]
     шаг = шаг[:шаг.index("- name:", 10)]
-    команда = re.search(r"apt-get install(?:[^\n]*\\\n)*[^\n]*", шаг).group(0)
-    for пакет in ("poppler-utils", "qpdf"):
-        assert пакет in команда, f"{пакет} не ставится"
-    lo = yml[yml.index("Установка LibreOffice"):]
-    lo = lo[:lo.index("- name:", 10)]
-    assert re.search(r"if:\s*\$\{\{\s*!inputs\.ocr\s*&&\s*inputs\.cascade\s*\}\}", lo)
-    assert "libreoffice-calc-nogui" in lo and "libreoffice-writer-nogui" in lo
-    assert re.search(r"CASCADE:\s*\$\{\{\s*inputs\.cascade\s*&&\s*'1'\s*\|\|\s*''\s*\}\}", yml)
+    for пакет in ("poppler-utils", "qpdf", "antiword", "catdoc", "unrar"):
+        assert пакет in шаг, f"{пакет} не ставится"
+    # LibreOffice — только под каскад.
+    ветка = шаг[шаг.index('"$CASCADE_IN" = "1"'):]
+    ветка = re.split(r"\n\s*fi\n", ветка)[0]
+    assert "libreoffice-calc-nogui" in ветка and "libreoffice-writer-nogui" in ветка
+    wf = (ROOT / ".github/workflows/library-index.yml").read_text(encoding="utf-8")
+    assert re.search(r"cascade:\s*\$\{\{\s*inputs\.cascade\s*&&\s*'1'\s*\|\|\s*'0'\s*\}\}", wf)
 
 
 def test_прежний_читатель_xls_защищён_от_зацикливания_и_утечки(monkeypatch):

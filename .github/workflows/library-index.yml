@@ -128,14 +128,17 @@ on:
         description: "PDF читать один раз: текст брать из тех же страниц, что и таблицу"
         type: boolean
         default: false
+      # КАСКАД И ОСЛАБЛЕННАЯ ШАПКА ВКЛЮЧЕНЫ ПО УМОЛЧАНИЮ с 26.09.2026: так считает
+      # и ночной разбор (одна точка — .github/actions/parse-env), и выключать их
+      # имеет смысл только для замера A/B.
       cascade:
-        description: "Каскад чтения: свой читатель по формату → починка текста → LibreOffice (сначала холостым прогоном)"
+        description: "Каскад чтения: свой читатель по формату → починка текста → LibreOffice (выключать только для замера)"
         type: boolean
-        default: false
+        default: true
       header_relax:
-        description: "Ослабленное правило шапки: английские слова, цена в зачёт колонок, одного наименования хватит, просмотр 200 строк"
+        description: "Ослабленное правило шапки: английские слова, цена в зачёт колонок, одного наименования хватит, просмотр 200 строк (выключать только для замера)"
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
@@ -175,58 +178,26 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Установка зависимостей
-        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
-
-      # ЧИТАТЕЛИ ФОРМАТОВ, КОТОРЫХ НЕТ В PYTHON. Ставятся для разбора и переразбора,
-      # но не для распознавания: тому нужен только tesseract.
-      #
-      # ЗАЧЕМ. Замер 23.09.2026: 375 файлов «старого office» упали в xlrd — это
-      # .doc и .msg, такой же контейнер OLE2, как .xls. Читатель .doc у нас
-      # внешний (library/readers.py), и без пакета он честно говорит «нет ни
-      # antiword, ни catdoc», то есть файл всё равно теряется. Плюс 169 архивов, в
-      # которых встречаются rar и 7z.
-      - name: Установка читателей форматов (для разбора)
-        if: ${{ !inputs.ocr }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          # unrar и bsdtar — не лишние. В Ubuntu 24.04 p7zip-full стал пустым
-          # переходником на 7zip 23.01 (сборка dfsg) БЕЗ кодека RAR: сжатый RAR даёт
-          # «Unsupported Method», читается только несжатый. Нашёл агент архивов
-          # 23.09.2026 на живой сборке. Хватит любого из двух, оба надёжнее.
-          # poppler-utils и qpdf — для library/read_pdf.py: pdftotext читает
-          # постранично и держит колонки, qpdf снимает пустой пароль и чинит
-          # таблицу ссылок. Без них остаётся один pypdf, и каскад это назовёт.
-          sudo apt-get install -y -qq antiword catdoc p7zip-full unrar libarchive-tools \
-            poppler-utils qpdf
-          echo "antiword: $(command -v antiword || echo нет)"
-          echo "catdoc:   $(command -v catdoc || echo нет)"
-          echo "7z:       $(command -v 7z || echo нет)"
-          echo "unrar:    $(command -v unrar || echo нет)"
-          echo "bsdtar:   $(command -v bsdtar || echo нет)"
-          echo "pdftotext: $(command -v pdftotext || echo нет)"
-          echo "qpdf:     $(command -v qpdf || echo нет)"
-
-      # LIBREOFFICE — ПОСЛЕДНИЙ РУБЕЖ КАСКАДА (library/convert_office.py): офисный
-      # файл, который не прочитал ни один свой читатель. Ставится только под
-      # каскад: пакет тяжёлый (около минуты на часть), а без каскада его никто
-      # не зовёт.
-      - name: Установка LibreOffice (для каскада чтения)
-        if: ${{ !inputs.ocr && inputs.cascade }}
-        run: |
-          set -euo pipefail
-          sudo apt-get install -y -qq --no-install-recommends \
-            libreoffice-calc-nogui libreoffice-writer-nogui
-          echo "soffice:  $(command -v soffice || echo нет)"
-
-      - name: Установка распознавания (только для ocr)
-        if: inputs.ocr
-        run: |
-          set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-rus poppler-utils
-          tesseract --version | head -1
+      # ПАКЕТЫ И ФЛАГИ РАЗБОРА — ОДНОЙ ТОЧКОЙ (.github/actions/parse-env): те же,
+      # что у ночного разбора котировок и ежедневного пополнения. Прежде здесь
+      # стояли четыре своих шага установки, а ночной ставил один pip, и один и
+      # тот же файл ночью и руками разбирался по-разному. Входы прогона только
+      # переопределяют умолчания действия — для замера A/B.
+      # Лишние части матрицы ничего не ставят: они сразу выходят ниже.
+      - name: Окружение разбора (пакеты и флаги)
+        if: matrix.shard < fromJSON(inputs.shards)
+        uses: ./.github/actions/parse-env
+        with:
+          parse: ${{ !inputs.ocr }}
+          ocr: ${{ inputs.ocr }}
+          header_relax: ${{ inputs.header_relax && '1' || '0' }}
+          cascade: ${{ inputs.cascade && '1' || '0' }}
+          specgate: ${{ inputs.specgate && '1' || '0' }}
+          pdf_one_pass: ${{ inputs.pdf_one_pass && '1' || '0' }}
+          retry_failed: ${{ inputs.retry_failed && '1' || '0' }}
+          # Ручной добор «не скачался» — без предела: его запускают руками и
+          # по делу, бюджет портала считает тот, кто запускает.
+          retry_failed_limit: "0"
 
       - name: Проверка секретов
         env:
@@ -259,13 +230,8 @@ jobs:
           DAYS: ${{ inputs.days }}
           LIMIT: ${{ inputs.limit }}
           SOURCE: ${{ inputs.source }}
-          RETRY_FAILED: ${{ inputs.retry_failed && '1' || '' }}
           APPLY: ${{ inputs.apply && '1' || '' }}
-          HEADER_RELAX: ${{ inputs.header_relax && '1' || '' }}
           OCR_RETRY: ${{ inputs.ocr_retry && '1' || '' }}
-          PDF_ONE_PASS: ${{ inputs.pdf_one_pass && '1' || '' }}
-          CASCADE: ${{ inputs.cascade && '1' || '' }}
-          SPECGATE: ${{ inputs.specgate && '1' || '0' }}
           REPARSE_FAILED: ${{ inputs.reparse_failed && '1' || '' }}
           REVERT_KEY: ${{ inputs.ocr_revert }}
           OCR_MODE: ${{ inputs.ocr_mode != 'все' && inputs.ocr_mode || '' }}

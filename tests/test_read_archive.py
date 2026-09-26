@@ -631,12 +631,13 @@ def test_прогон_ставит_распаковщики_которые_зо�
     from pathlib import Path
     from library import read_archive
 
+    # Пакеты ставит одна точка всех прогонов разбора — .github/actions/parse-env.
     сырой = (Path(__file__).resolve().parent.parent
-             / ".github/workflows/library-index.yml").read_text(encoding="utf-8")
+             / ".github/actions/parse-env/action.yml").read_text(encoding="utf-8")
     yml = re.sub(r"(?m)^\s*#[^\n]*$", "", сырой)
-    шаг = yml[yml.index("Установка читателей форматов"):]
+    шаг = yml[yml.index("Системные пакеты разбора"):]
     шаг = шаг[:шаг.index("- name:", 10)]
-    команда = re.search(r"apt-get install[^\n]*", шаг).group(0)
+    команда = re.search(r'if \[ "\$PARSE" = "true" \]; then\n\s*pkgs\+=\(([^)]*)\)', шаг).group(1)
     пакет_программы = {"unrar": "unrar", "bsdtar": "libarchive-tools", "7z": "p7zip-full"}
     for программы in read_archive._ИНСТРУМЕНТЫ.values():
         for программа in программы:

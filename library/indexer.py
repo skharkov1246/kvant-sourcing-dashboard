@@ -74,6 +74,16 @@ WORKERS = int(os.environ.get("WORKERS", "12"))
 DAYS = int(os.environ.get("DAYS", "365"))
 LIMIT = int(os.environ.get("LIMIT", "0"))          # 0 — без ограничения
 RETRY_FAILED = os.environ.get("RETRY_FAILED", "") not in ("", "0", "false")
+#: ПРЕДЕЛ ПОВТОРА «НЕ СКАЧАЛСЯ» НА ЧАСТЬ (0 — без предела). Ночной и ежедневный
+#: прогоны повторяют такие файлы сами (.github/actions/parse-env), и повтор без
+#: предела сделал бы нагрузку на портал неизвестной: каждая закачка — запрос
+#: crm.controller.item.getFile, до DOWNLOAD_RETRIES попыток (CLAUDE.md, «Битрикс
+#: не перегружать», п. 5). Новые файлы идут первыми и пределом не режутся;
+#: повторы — от давнего к свежему по processed_at: повтор переписывает отметку
+#: времени, и файл, упавший снова, уходит в конец очереди, не заслоняя
+#: остальные. Навсегда битая ссылка (404) стоит одного запроса за проход, а не
+#: всего бюджета ночи.
+RETRY_FAILED_LIMIT = int(os.environ.get("RETRY_FAILED_LIMIT", "0") or 0)
 # Ворота спецификации можно выключить без выката кода — на случай, если правило
 # начнёт отбрасывать нужное. Выключение видно в журнале прогона.
 #
@@ -2826,6 +2836,20 @@ def вставка_файлов(колонки: tuple[str, ...]) -> tuple[str, s
     return запрос, "(" + ", ".join(["%s"] * len(колонки)) + ")"
 
 
+def отобрать_повторы(mine: list[dict], очередь: dict[str, int],
+                     предел: int) -> tuple[list[dict], int, int]:
+    """Новые файлы части — все и первыми, повторы «не скачался» — не больше предела.
+
+    `очередь` — место файла в очереди повтора (0 — давняя попытка). Возвращает
+    (список к разбору, взято повторов, отложено повторов). Предел 0 — без предела.
+    """
+    новые = [r for r in mine if ключ_ссылки(r) not in очередь]
+    повторы = sorted((r for r in mine if ключ_ссылки(r) in очередь),
+                     key=lambda r: очередь[ключ_ссылки(r)])
+    взять = повторы if предел <= 0 else повторы[:предел]
+    return новые + взять, len(взять), len(повторы) - len(взять)
+
+
 def main() -> int:
     for var in ("BITRIX_WEBHOOK_URL", "SUPABASE_DB_URL"):
         if not os.environ.get(var):
@@ -2849,6 +2873,12 @@ def main() -> int:
         cur.execute("select file_id from lib_files"
                     + (" where status <> 'не скачался'" if RETRY_FAILED else ""))
         done = {r[0] for r in cur.fetchall()}
+        # Очередь повтора: от давней попытки к свежей (см. RETRY_FAILED_LIMIT).
+        очередь_повтора: dict[str, int] = {}
+        if RETRY_FAILED:
+            cur.execute("select file_id from lib_files where status = 'не скачался'"
+                        " order by processed_at nulls first, file_id")
+            очередь_повтора = {r[0]: i for i, r in enumerate(cur.fetchall())}
     conn.close()
     print(f"уже разобрано ранее: {len(done)}"
           + (" (файлы со статусом «не скачался» пойдут заново)" if RETRY_FAILED else ""), flush=True)
@@ -2893,6 +2923,11 @@ def main() -> int:
         refs = (collect_refs_rfq(DAYS, SHARD, SHARDS) if SOURCE == "rfq"
                 else collect_refs(DAYS, SHARD, SHARDS))
     mine = [r for r in refs if ключ_ссылки(r) not in done]
+    if RETRY_FAILED:
+        mine, взято, отложено = отобрать_повторы(mine, очередь_повтора, RETRY_FAILED_LIMIT)
+        print(f"повтор «не скачался»: в этой части {взято + отложено}, берём {взято}"
+              + (f", отложено до следующего прохода {отложено} "
+                 f"(RETRY_FAILED_LIMIT={RETRY_FAILED_LIMIT})" if отложено else ""), flush=True)
     if SOURCE == "mail":
         # Отсев по lib_files ДО обращения к Диску: за разобранный файл портал
         # не платит ни disk.file.get, ни закачки.
