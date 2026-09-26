@@ -51,15 +51,10 @@ FEED = "разбор КП"
 ИСТОЧНИКИ = ("файл", "карточка", "каталог", "итог")
 ТОП_БРЕНДОВ = 30
 
+# Домены и ИНН компании — тот же запрос, что читает публикатор снимка
+# номенклатуры (offer_role.ИДЕНТИФИКАТОРЫ_SQL): роль в снимке и в замере одна.
 ЧАСТЬ_SQL = """
-with ид as (
-  select sup_id,
-         array_agg(distinct lower(value)) filter (where kind = 'domain') as домены,
-         array_agg(distinct value_norm) filter (where kind = 'inn')     as инн
-    from sup_identifier
-   where status <> 'rejected' and kind in ('domain', 'inn')
-   group by sup_id
-)
+with ид as (""" + offer_role.ИДЕНТИФИКАТОРЫ_SQL.replace("%", "%%") + """)
 select e.id                                   as сущность,
        coalesce(nm.name, e.display_name)      as имя,
        nullif(btrim(p.oem), '')               as файл,
@@ -175,11 +170,7 @@ def замер(cur, частей: int) -> tuple[Итог, str] | None:
         if not есть(cur, т):
             print(f"нет таблицы {т} — мерить нечего")
             return None
-    доп, откуда = [], "файлы репозитория"
-    if есть(cur, "lib_brand_map"):
-        cur.execute("select spelling_key, brand_key from lib_brand_map")
-        доп = cur.fetchall()
-        откуда = f"файлы репозитория + lib_brand_map ({len(доп):,} написаний)"
+    доп, откуда = offer_role.карта_базы(cur)
     sp176 = {}
     if есть(cur, "lib_brand_sp176"):
         cur.execute("select sp176_id::text, brand_key from lib_brand_sp176")

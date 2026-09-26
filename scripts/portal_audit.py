@@ -68,7 +68,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "pnw" / "tools"))
 
 from library import (brand_registry, brands, codes_sql, company_names, crossref, doc_side,  # noqa: E402
-                     docfilter, oem_kind, offer_role, offer_terms, quotes)
+                     docfilter, oem_kind, offer_role, offer_terms, price_norm, quotes)
 # Правовая форма, описание вместо имени и указание к закупке — правила словаря
 # брендов (library/oem_kind.py): по ним сборщик ставит вид записи dict/oem.json,
 # а ревизия ищет дефекты. Одно правило в одном месте.
@@ -1395,6 +1395,10 @@ def ревизия_поставщиков(с: Снимки, сейчас) -> В�
     "n.o_repeat": "одна компания с одной ценой больше трёх раз (повторный разбор)",
     "n.o_f": "предложение: карточка запроса не число",
     "n.o_card_label": "предложение: у компании нет имени — страница пишет «карточка N в Битриксе»",
+    "n.o_role": "предложение: роль (h) не из закрытого списка crossref.КОДЫ_РОЛИ",
+    "n.o_role_dr": "пара: прямых предложений dr меньше показанных прямых, больше offers или ≠ им при полном списке",
+    "n.o_norm": "предложение: приведённая цена (i) отрицательна, коэффициент индексации вне 0,5–3, ставка НДС не из закона или цена не сходится с исходной, ставкой и коэффициентом",
+    "n.o_norm_note": "предложение: приведённая цена без оговорок, номер оговорки вне notes корзины, индекса нет — а оговорки об индексе нет, базис не стандартный или НДС снят — без оговорки",
     "n.mk": "изготовитель по каталогу: имя пусто или ключ, роль вне списка, повтор имени",
     "n.mk_raw": "изготовитель по каталогу: машинный код вместо слов в «Роль», «Страна», «Что делает», «Проверка»",
     "n.mk_note": "изготовитель по каталогу: «Что именно делает» — заметка разведки (> 200 знаков или 2+ предложения)",
@@ -1436,6 +1440,11 @@ def ревизия_поставщиков(с: Снимки, сейчас) -> В�
     "u.offer_co": "предложения с компанией",
     "u.offer_qty": "предложения с количеством (без него страница пишет «— шт»)",
     "u.o_m_self": "(справочно) изготовитель по файлу — сама компания КП (прямая поставка)",
+    "u.o_role": "предложения с определённой ролью (прямое или трейдер, offer_role)",
+    "u.o_direct": "(справочно) прямые предложения — от самого бренда или изготовителя",
+    "u.pos_direct": "(справочно) пары с прямым предложением",
+    "u.o_norm": "предложения с ценой, у которых есть приведённая цена (без НДС, на дату сборки)",
+    "u.o_norm_index": "из них проиндексированы (индекс валюты найден)",
     "u.pos_co": "позиции, у которых компания названа",
     "u.cat": "позиции в каталоге",
     "u.cat_alts": "из них с аналогами",
@@ -1452,6 +1461,63 @@ def ревизия_поставщиков(с: Снимки, сейчас) -> В�
     "u.ent_open": "компании открываются на /suppliers#e=",
     "u.brand_found": "бренды позиций найдены в brands:v1",
 }
+
+
+# ПРИВЕДЁННАЯ ЦЕНА (crossref.приведение, price_norm.привести_подробно): границы
+# правдоподобия. Ряды индексов идут с 2018 года; накопленная инфляция самой
+# быстрой валюты набора (рубль) за восемь лет — около 1,8, назад — не ниже 0,5.
+# Коэффициент вне этих границ — ошибка ряда или даты, а не инфляция.
+ПРЕДЕЛЫ_ИНДЕКСА = (0.5, 3.0)
+СТАВКИ_НДС = frozenset(ст for _, ст in price_norm.НДС_РФ)
+
+
+def приведённая_правдоподобна(i, p) -> bool:
+    """Поле i предложения: [цена, k, стандартный, ставка] — правдоподобно и
+    сходится с исходной ценой p тем же счётом, что у price_norm."""
+    if not isinstance(i, list) or len(i) != 4:
+        return False
+    цена, k, std, ставка = i
+    if not число(цена) or цена < 0:
+        return False
+    if k is not None and (not число(k) or not ПРЕДЕЛЫ_ИНДЕКСА[0] <= k <= ПРЕДЕЛЫ_ИНДЕКСА[1]):
+        return False
+    if std not in (0, 1, None) or (ставка is not None and ставка not in СТАВКИ_НДС):
+        return False
+    if число(p):
+        ожид = round(p / (1 + ставка), 2) if ставка else p
+        ожид = round(ожид * k, 2) if k is not None else ожид
+        if abs(цена - ожид) > 0.011 + 1e-6 * abs(ожид):
+            return False
+    return True
+
+
+def оговорки_приведения_верны(i, оговорки) -> bool:
+    """Оговорки (уже развёрнутые из номеров) есть и говорят о том, что сделано:
+    индекса нет — сказано об индексе; базис не стандартный — сказано; НДС снят —
+    сказано."""
+    if not оговорки or any(not isinstance(x, str) or not x for x in оговорки):
+        return False
+    if not isinstance(i, list) or len(i) != 4:
+        return True                      # форму судит n.o_norm
+    _, k, std, ставка = i
+    if k is None and not any("индекс" in x for x in оговорки):
+        return False
+    if std == 0 and not any("не стандартный" in x for x in оговорки):
+        return False
+    if ставка is not None and not any("НДС" in x and "снят" in x for x in оговорки):
+        return False
+    return True
+
+
+def _оговорки_корзин(корзины) -> dict[str, list]:
+    """Ключ пары → список notes её корзины (оговорки приведённой цены номерами)."""
+    out = {}
+    for b in корзины:
+        if isinstance(b, dict):
+            notes = b.get("notes") if isinstance(b.get("notes"), list) else []
+            for k in (b.get("positions") or {}):
+                out[k] = notes
+    return out
 
 
 def _корзины(с: Снимки) -> list:
@@ -1529,6 +1595,14 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
                 т.заметка(f"расходится totals.brand.{имя}")
         if т.счёт("n.totals", (б.get("by") or {}) != {и: по_источнику[и] for и in crossref.ИСТОЧНИКИ_БРЕНДА}):
             т.заметка("расходится totals.brand.by")
+    # Роль предложения: прямых — сумма dr пар, пар с прямым — пары с dr.
+    if isinstance(tot.get("roles"), dict):
+        р_ = tot["roles"]
+        for имя, значение in (("п", sum(p.get("dr") or 0 for p in позиции)),
+                              ("positions_direct", sum(1 for p in позиции if p.get("dr"))),
+                              ("offers", sum(р_.get(б) or 0 for б in ("п", "т", "?")))):
+            if т.счёт("n.totals", р_.get(имя) != значение):
+                т.заметка(f"расходится totals.roles.{имя}")
     т.счёт("n.empty", not позиции)
 
     # Компании.
@@ -1738,6 +1812,8 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
     # Корзины.
     по_co = {str(c.get("co")): c for c in companies}
     изготовитель_сам = 0
+    оговорки_корзины = _оговорки_корзин(корзины)
+    прямых_показано = collections.Counter()
     for k, det in подробно.items():
         список = [o for o in det.get("list") or [] if isinstance(o, dict)]
         т.счёт("n.b_shown", det.get("shown") != len(список))
@@ -1811,6 +1887,16 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
                 т.счёт("n.o_date", dd is None or dd > будущее or dd < РАННЯЯ_ДАТА)
             if o.get("f") is not None:
                 т.счёт("n.o_f", not re.fullmatch(r"\d+", str(o["f"])))
+            # Роль (crossref.КОДЫ_РОЛИ) и приведённая цена (crossref.приведение).
+            if o.get("h") is not None:
+                т.счёт("n.o_role", o["h"] not in crossref.КОДЫ_РОЛИ)
+                прямых_показано[k] += str(o["h"]).startswith("п")
+            if o.get("i") is not None:
+                т.счёт("n.o_norm", not приведённая_правдоподобна(o["i"], p_))
+                notes = оговорки_корзины.get(k) or []
+                развёрнуты = [notes[x] if целое(x) and 0 <= x < len(notes) else (x if isinstance(x, str) else None)
+                              for x in (o.get("j") if isinstance(o.get("j"), list) else [])]
+                т.счёт("n.o_norm_note", not оговорки_приведения_верны(o["i"], развёрнуты))
             # Правило дубля одно на сборку и ревизию (crossref.ключ_дубля):
             # сборка схлопывает ровно то, что здесь считалось бы дублем.
             кортежи[crossref.ключ_дубля(o)] += 1
@@ -1845,6 +1931,14 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
                and bool(список))
         if det.get("makers"):
             т.счёт("n.mk_nocat", not p.get("cat"))
+        # Прямых у пары (dr) — по всем предложениям: не меньше показанных прямых,
+        # не больше offers, а при полном списке — ровно показанные. Снимок без
+        # ролей (ни у одного предложения h) не судится.
+        if any(isinstance(o, dict) and o.get("h") is not None for o in список):
+            dr = p.get("dr") or 0
+            т.счёт("n.o_role_dr", not целое(dr) or dr < прямых_показано[k]
+                   or dr > (p.get("offers") or 0)
+                   or (len(список) >= (p.get("offers") or 0) and dr != прямых_показано[k]))
 
     # Связи со страницей брендов: страница ведёт по ключу КОДА (#k=), и адрес
     # кода, разбитого на пары, открывает все его пары.
@@ -1986,6 +2080,17 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
         т.доля("u.offer_co", sum(1 for o in предложения if o.get("c") is not None), m)
         т.доля("u.offer_qty", sum(1 for o in предложения if число(o.get("q"))), m)
         т.доля("u.o_m_self", изготовитель_сам, sum(1 for o in предложения if o.get("m") is not None))
+        с_ролью = [o for o in предложения if o.get("h") is not None]
+        if с_ролью:
+            т.доля("u.o_role", sum(1 for o in с_ролью if str(o["h"])[:1] in "пт"), len(с_ролью))
+            т.доля("u.o_direct", sum(1 for o in с_ролью if str(o["h"]).startswith("п")), len(с_ролью))
+            т.доля("u.pos_direct", sum(1 for p in позиции if p.get("dr")), len(позиции))
+        с_ценой_ = [o for o in предложения if o.get("p") is not None]
+        if с_ценой_ and any(o.get("i") is not None for o in с_ценой_):
+            приведены = [o for o in с_ценой_ if isinstance(o.get("i"), list)]
+            т.доля("u.o_norm", len(приведены), len(с_ценой_))
+            т.доля("u.o_norm_index", sum(1 for o in приведены if len(o["i"]) > 1 and o["i"][1] is not None),
+                   len(приведены))
     if companies:
         т.доля("u.co_name", sum(1 for c in companies if c.get("name")
                                 and not company_names.как_ключ(c["name"])), len(companies))
