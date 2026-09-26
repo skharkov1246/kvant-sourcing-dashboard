@@ -20,6 +20,9 @@ import hashlib
 import importlib.util
 import io
 import json
+import re
+import shutil
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -948,7 +951,8 @@ def _сдвинуть_дату(о, ключ_, дата):
                                                                 if "pumps" not in k})),
     ("library", "l.seg_empty", lambda о: о["_segments"].append({"id": "valves", "name": "Арматура", "note": "Краны"})),
     ("library", "l.conf_keys", lambda о: ст(о, "bearings:k1").update(confidence="почти")),
-    ("library", "l.conf_hidden", lambda о: ст(о, "bearings:k1").update(confidence="hypothesis")),
+    ("library", "l.conf_hidden", lambda о: (ст(о, "bearings:k1").update(confidence="hypothesis"),
+                                            о.update(_library_html=СТРАНИЦА_ПРЕЖНЕГО_СЧЁТА))),
     ("library", "l.updated", lambda о: ст(о, "bearings:k1").update(updated_at="2026-09-30T00:00:00Z")),
     ("library", "l.title", lambda о: ст(о, "bearings:k1").update(title="bitrix:2002")),
     ("library", "l.title_pn", lambda о: ст(о, "bearings:c1").update(title="SKF NU 316")),
@@ -1090,6 +1094,49 @@ def test_каждая_проверка_ловит_свой_дефект():
     assert покрыто - все == set(), "мутация на код, которого нет среди проверок"
 
 
+# Страница библиотеки со счётом «Требуют проверки» до 26.09.2026: три слагаемых,
+# гипотеза, частичная и средняя проверка в счёт не входили.
+СТРАНИЦА_БИБЛИОТЕКИ = pa.СТРАНИЦА_БИБЛИОТЕКИ.read_text(encoding="utf-8")
+СТРАНИЦА_ПРЕЖНЕГО_СЧЁТА = СТРАНИЦА_БИБЛИОТЕКИ.replace(
+    "pending=pendingCount(quality)", "pending=(quality.low||0)+(quality.unverified||0)+(quality.draft||0)")
+
+
+def test_требуют_проверки_считают_всё_непроверенное():
+    """Счёт «Требуют проверки» и ярлык карточки — одним списком VERIFIED_LEVELS:
+    всё, что карточка не называет проверенным, входит в счёт сегмента."""
+    assert СТРАНИЦА_ПРЕЖНЕГО_СЧЁТА != СТРАНИЦА_БИБЛИОТЕКИ
+    assert СТРАНИЦА_БИБЛИОТЕКИ.count("pending=pendingCount(quality)") == 2
+    assert "limited:!VERIFIED_LEVELS.includes(level)" in СТРАНИЦА_БИБЛИОТЕКИ
+    assert pa.проверено_страницы(СТРАНИЦА_БИБЛИОТЕКИ) == pa.ПРОВЕРЕНО
+    assert pa.требуют_проверки_страницы(СТРАНИЦА_БИБЛИОТЕКИ) == pa.УРОВНИ_ПРОВЕРКИ - pa.ПРОВЕРЕНО
+    assert pa.требуют_проверки_страницы(СТРАНИЦА_ПРЕЖНЕГО_СЧЁТА) == {"low", "unverified", "draft"}
+    # Счёт в одном месте странице не поможет: оба места обязаны идти через pendingCount.
+    одно_место = СТРАНИЦА_БИБЛИОТЕКИ.replace(
+        "pending=pendingCount(quality);if(pending)holder",
+        "pending=(quality.low||0)+(quality.unverified||0)+(quality.draft||0);if(pending)holder")
+    assert pa.требуют_проверки_страницы(одно_место) == {"low", "unverified", "draft"}
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="нет node")
+def test_счёт_страницы_совпадает_с_ярлыком_карточки():
+    """Исполняется сам код страницы: счёт сегмента равен числу карточек с ярлыком
+    «ограниченной» проверки — выдуманный разброс уровней, включая неизвестный."""
+    код = re.search(r"  const VERIFIED_LEVELS=.*?\n  function pendingCount\(quality\)\{.*?\n", СТРАНИЦА_БИБЛИОТЕКИ, re.S).group(0)
+    ярлык = re.search(r"  function confidence\(article\) \{.*?\n  \}\n", СТРАНИЦА_БИБЛИОТЕКИ, re.S).group(0)
+    уровни = {"verified": 5, "high": 1, "partial": 3, "medium": 2, "med": 1, "hypothesis": 4,
+              "low": 2, "unverified": 6, "draft": 1, "почти": 1}
+    js = ("const text=v=>typeof v==='string'?v:(typeof v==='number'?String(v):'');\n" + код + ярлык
+          + "const Q=" + json.dumps(уровни, ensure_ascii=False) + ";\n"
+          + "const limited=Object.entries(Q).reduce((s,[k,n])=>confidence({confidence:k}).limited?s+n:s,0);\n"
+          + "console.log(JSON.stringify([pendingCount(Q),limited,pendingCount(null),pendingCount({verified:3})]));")
+    вывод = subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=30, check=True).stdout
+    assert json.loads(вывод) == [20, 20, 0, 0]
+
+
+def test_требуют_проверки_без_правила_видят_всё_скрытым():
+    assert pa.требуют_проверки_страницы("<html></html>") == frozenset()
+
+
 def _без_библиотеки(о, сырьё):
     if о.get("_drop_library"):
         сырьё.pop(pa.КЛЮЧ_БИБЛИОТЕКИ)
@@ -1102,7 +1149,8 @@ def test_мутация(вкладка, код, правка):
     сырьё = закодировать(о)
     _без_библиотеки(о, сырьё)
     с = pa.Снимки(Память(сырьё))
-    т = {x.ид: x for x in pa.ревизия(с, СЕЙЧАС, о["_dict"], lib2=lib2)}[вкладка]
+    т = {x.ид: x for x in pa.ревизия(с, СЕЙЧАС, о["_dict"], lib2=lib2,
+                                      страница_библиотеки=о.get("_library_html"))}[вкладка]
     п, д = т.счета[код]
     assert д > 0, f"{код}: проверено {п}, дефект не пойман"
 
