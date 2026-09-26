@@ -1,0 +1,122 @@
+name: Поставщики — дилеры разведки брендов в реестр
+
+# Разрешение владельца 26.09.2026: дилеров из разведки брендов
+# (data/brand_research/*.json, раздел dealers), которых нет в реестре компаний,
+# завести в него. Правило и его обоснование — в шапке
+# library/load_research_dealers.py; таблица происхождения —
+# library/supabase/research_dealers_schema.sql.
+#
+# ЗАВОДЯТСЯ ТОЛЬКО СИЛЬНЫЕ КЛЮЧИ: домен сайта с доказательством или ИНН с верной
+# контрольной суммой, которых не носит ни одна сущность реестра (правило
+# library/dealer_link.py). Спорные, ключ с разными именами, домен самого бренда,
+# домен почты или площадки — не заводятся.
+#
+# БЕЗ ГАЛОЧКИ «apply» — ВХОЛОСТУЮ: база открывается только на чтение, прогон
+# печатает, сколько к заведению (по видам и брендам) и сколько отсеяно почему.
+# С галочкой — сначала проверки записи на чистой одноразовой базе, потом схема в
+# рабочей базе, потом запись с ключом dealers-<номер прогона> одной транзакцией.
+# Гейты (число к заведению ≤ 200, споров 0, ни одного домена почты или
+# площадки, у каждой записи ссылка-доказательство) и проверка после записи
+# (замер dealer_link из базы сводит каждую заведённую запись в её сущность)
+# отменяют запись целиком. Откат — вход «rollback» с этим ключом: пометкой,
+# номера остаются выданными. Откат идёт один, остальное не выполняется.
+#
+# ОДНОЙ ЧАСТЬЮ, И ЭТО РЕШЕНИЕ: сотни записей из файлов и три выборки реестра,
+# секунды. Битрикс не читается вовсе, поэтому прогон вне очереди bitrix-portal;
+# группа — общая со связью разведки с реестром (supplier-link): обе пишут в
+# реестр компаний и читают его целиком. Номер выдаётся под блокировкой
+# sup_number_registry, так что и сведение реестров номер не раздвоит.
+#
+# В ЖУРНАЛ — ТОЛЬКО АГРЕГАТЫ (правило 17): ни названия, ни домена, ни ИНН.
+# Только ручной запуск: расписание — решение владельца.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Завести в реестр (без галочки — вхолостую)"
+        type: boolean
+        default: false
+      rollback:
+        description: "Откатить прогон с этим ключом (dealers-…); остальное не идёт"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supplier-link
+  cancel-in-progress: false
+
+jobs:
+  dealers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        # pytest — шагу проверок записи; версия psycopg2 — та же, что в гейте.
+        run: pip install --quiet pytest psycopg2-binary==2.9.10
+
+      - name: Проверка секрета
+        env:
+          S: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — ни замера, ни записи"; exit 1; }
+          echo "секрет базы на месте"
+
+      - name: Откат прогона по ключу
+        if: inputs.rollback != ''
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ROLLBACK_RUN_ID: ${{ inputs.rollback }}
+        run: python library/load_research_dealers.py
+
+      # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная
+      # проверка — не пройденная проверка. База в локали UTF-8 (правило 21а).
+      - name: Проверки записи на чистой базе
+        if: inputs.rollback == '' && inputs.apply
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
+          sudo pg_ctlcluster "$(pg_lsclusters -h | awk 'NR==1{print $1}')" main start
+          sudo -u postgres psql -q -c "alter user postgres password 'ci'"
+          sudo -u postgres createdb -T template0 --locale=C.UTF-8 --encoding=UTF8 library_sql_test
+          LIBRARY_SQL_TEST_DSN="postgresql://postgres:ci@127.0.0.1:5432/library_sql_test" \
+            python -m pytest tests/test_load_research_dealers.py tests/test_load_research_dealers_sql.py \
+              tests/test_dealer_link.py tests/test_dealer_link_sql.py -q
+
+      # Схема перед записью, и только перед ней: файл идемпотентен и требует
+      # sup_entity — схема поставщиков уже в рабочей базе (zip-db.yml).
+      - name: Схема происхождения в рабочей базе
+        if: inputs.rollback == '' && inputs.apply
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if ! command -v psql >/dev/null; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          fi
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f library/supabase/research_dealers_schema.sql
+
+      - name: Замер и заведение
+        if: inputs.rollback == ''
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          RUN_ID: dealers-${{ github.run_id }}
+        run: python library/load_research_dealers.py
+
+      # Контроль тем же замером, что и до записи, отдельным процессом на
+      # соединении только для чтения: «сведено» обязано вырасти на заведённых.
+      - name: Замер сведения после записи
+        if: inputs.rollback == '' && inputs.apply
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python library/dealer_link.py
