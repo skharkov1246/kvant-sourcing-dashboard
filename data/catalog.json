@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 293,
-    "total_bytes": 125297917,
+    "datasets": 296,
+    "total_bytes": 125454330,
     "by_sensitivity": {
-      "внутреннее": 171,
+      "внутреннее": 174,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 29,
+      "дашборд сорсеров": 32,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3387,6 +3387,69 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 196307,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/atlascopco.json",
+        "data/brand_research/atlascopcoenergas.json",
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cryostar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/dongfengcumminsengine.json",
+        "data/brand_research/drillmec.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/generalelectric.json",
+        "data/brand_research/grundfos.json",
+        "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/jichaijinandieselcnpc.json",
+        "data/brand_research/mturollsroycepowersystems.json",
+        "data/brand_research/mwmcaterpillarenergy.json",
+        "data/brand_research/normet.json",
+        "data/brand_research/perkinsfgwilson.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/rollsroyce.json",
+        "data/brand_research/sandviktamrock.json",
+        "data/brand_research/siemensdemagdelavalturbomachinery.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/waukeshainnio.json",
+        "data/brand_research/wrtsil.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "data/subsuppliers/verified.json",
+        "dict/",
+        "dict/material.json",
+        "dict/model_series.json",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json"
+      ],
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "7878915",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/material_suppliers.json",
       "subproject": "база ЗИП",
       "bytes": 195837,
@@ -3418,69 +3481,6 @@
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 191120,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/atlascopco.json",
-        "data/brand_research/atlascopcoenergas.json",
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cryostar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/deutz.json",
-        "data/brand_research/dongfengcumminsengine.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/generalelectric.json",
-        "data/brand_research/guascorsiemensenergy.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/jichaijinandieselcnpc.json",
-        "data/brand_research/mturollsroycepowersystems.json",
-        "data/brand_research/mwmcaterpillarenergy.json",
-        "data/brand_research/normet.json",
-        "data/brand_research/perkinsfgwilson.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/rollsroyce.json",
-        "data/brand_research/siemensdemagdelavalturbomachinery.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/brand_research/waukeshainnio.json",
-        "data/brand_research/wrtsil.json",
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "data/subsuppliers/verified.json",
-        "dict/",
-        "dict/material.json",
-        "dict/model_series.json",
-        "dict/node_map.json",
-        "dict/symptom.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json"
-      ],
-      "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "c796574",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -7750,6 +7750,54 @@
       ]
     },
     {
+      "path": "data/brand_research/sandviktamrock.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 52910,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Sandvik (Tamrock): проходческие DD, добычные DL, ПДМ Toro LH, самосвалы Toro TH, перфораторы RD/HL. Машин и исполнений — 25, сервисных документов — 11, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 10, дилеров и сервисных компаний — 10, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Машины и субпоставщики (Volvo Penta, Dana, Kessler, Spicer, Mercedes-Benz, Cummins) — из технических спецификаций на mining.sandvik; 16 кодов перфораторов HL/HLX — номера Sandvik у продавцов альтернативных деталей (MICCONT, DrifterParts, Delkom), 23 кода фильтров — из таблиц кроссов HIFI ↔ Sandvik (Brett's Truck Parts) и FridayParts; каталоги My Sandvik закрыты, коды RD525 не подтверждены. Российское юрлицо Sandvik ликвидировано 30.05.2023. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 39,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "7878915",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "data/brand_research/perkinsfgwilson.json",
       "subproject": "дашборд сорсеров",
       "bytes": 52425,
@@ -7924,8 +7972,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "cc14597",
+      "last_author": "skharkov1246",
+      "last_commit": "c5c7433",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8142,8 +8190,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "cc14597",
+      "last_author": "skharkov1246",
+      "last_commit": "c5c7433",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8225,6 +8273,102 @@
       "referenced_by": [
         "gidromet/build.py"
       ]
+    },
+    {
+      "path": "data/brand_research/grundfos.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 49123,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Grundfos: центробежные насосы CR/CRI/CRN, NB/NBS/NBE/NK/NBG, SE1/SEV (через родственную SL1/SLV). Машин и исполнений — 17, сервисных документов — 13, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 15, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 6 (поле corrections). Все коды — из открытых каталогов сервисных наборов изготовителя (Service Kit Catalogue CR, NB model B, NBS/NBSE, SL): номер набора находится по шильдику — типоразмер, диаметр вала, буквенный код уплотнения. Grundfos ушёл из России в 2022 г., завод в Истре с 2024 г. — ООО «ИСТРАТЕХ Групп» без прав на бренд; российские продавцы запчастей — неофициальные. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "7878915",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/drillmec.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 49079,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Drillmec: гидравлические буровые установки серии HH (HH55–HH350), верхние приводы HTD/ETD, трёхпоршневые буровые насосы 7T450…14T2200. Машин и исполнений — 24, сервисных документов — 9, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 6, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 5 (поле corrections). Документации изготовителя с кодами в открытом доступе нет: все коды — у третьих лиц (перечень DrillingBase по HTD250, MR8000 и 9T800; таблицы DRILLMEC PART # у китайских изготовителей аналогов Premium и Longwell), сверять с каталогом Drillmec; четыре номера клапанов источники относят к разным насосам. В России — дочерняя компания ООО «Дриллмек Р». Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "7878915",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "data/brand_research/guascorsiemensenergy.json",
@@ -8527,8 +8671,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "cc14597",
+      "last_author": "skharkov1246",
+      "last_commit": "c5c7433",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8743,8 +8887,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "cc14597",
+      "last_author": "skharkov1246",
+      "last_commit": "c5c7433",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9406,8 +9550,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 32617,
-      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 22, в очереди — 38. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 32731,
+      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 25, в очереди — 35. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -9437,7 +9581,7 @@
       },
       "last_change": "2026-09-26",
       "last_author": "Claude",
-      "last_commit": "cc14597",
+      "last_commit": "7878915",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
