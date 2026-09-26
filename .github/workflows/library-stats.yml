@@ -296,7 +296,7 @@ jobs:
 
       - name: Агрегаты брендов и моделей файлом
         if: inputs.job == 'brand-models' && always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: brand-models
           path: brand_models.json
