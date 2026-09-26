@@ -62,6 +62,13 @@ on:
         description: "Брать вложения (без них — только тела, по своей отметке «:тела»)"
         type: boolean
         default: true
+      prices:
+        # ЦЕНЫ ИЗ ПИСЕМ ПОСТАВЩИКОВ (indexer.MAIL_PRICES). Только для
+        # mail-supplier: у сделок и лидов вход не действует, и шаг разбора
+        # говорит об этом в журнале. Без apply — холостой замер цен.
+        description: "Цены из КП во вложениях (только mail-supplier; без apply — замер)"
+        type: boolean
+        default: false
       bitrix_rps:
         # Для mail-lead вход НЕ действует: там всегда 0.3 (см. шаг разбора).
         description: "Запросов в секунду к порталу на ВЕСЬ прогон (кроме лидов — у них всегда 0.3)"
@@ -210,8 +217,22 @@ jobs:
           WORKERS: "4"
           APPLY: ${{ inputs.apply && '1' || '' }}
           INPUT_RPS: ${{ inputs.bitrix_rps }}
+          INPUT_PRICES: ${{ inputs.prices && '1' || '' }}
         run: |
           set -euo pipefail
+          # ЦЕНЫ — ТОЛЬКО ИЗ ПИСЕМ ПОСТАВЩИКОВ. Письмо сделки и лида — сторона
+          # заказчика, его цена не котировка. Разбор и сам не пишет цену файла
+          # не поставщика (indexer.цены_файла), но вход, который ничего не
+          # делает, должен сказать об этом вслух, а не молча.
+          if [ "${{ inputs.group }}" = "mail-supplier" ]; then
+            MAIL_PRICES="${INPUT_PRICES:-}"
+          else
+            MAIL_PRICES=""
+            if [ -n "${INPUT_PRICES:-}" ]; then
+              echo "группа ${{ inputs.group }}: вход prices не действует — цены пишутся только из писем поставщиков (mail-supplier)"
+            fi
+          fi
+          export MAIL_PRICES
           # ЛИДЫ — ПЯТАЯ ЧАСТЬ ПОРТАЛА, И ВХОД ЭТО НЕ ОТМЕНЯЕТ (распоряжение
           # владельца 24.09.2026). Подмена входа — вслух, а не молча.
           if [ "${{ inputs.group }}" = "mail-lead" ]; then
