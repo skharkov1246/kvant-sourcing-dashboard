@@ -65,6 +65,12 @@ name: Библиотека — сводка и переклассификаци�
 #                    модели рядов dict/model_series.json рядом. Порядок наполнения
 #                    брендов модельными рядами. Частями по диапазону id (вход
 #                    parts). Только выборки. Ничего не меняет.
+#   offer-role     — ПРЯМОЕ ПРЕДЛОЖЕНИЕ ИЛИ ТРЕЙДЕР (решение владельца 26.09.2026):
+#                    предложения «разбор КП» по роли компании — прямых, трейдеров,
+#                    не определено, по причинам и по источнику бренда позиции;
+#                    сверка с прежним правилом ревизии (у скольких стало хуже).
+#                    Правило — library/offer_role.py. Частями по остатку id (вход
+#                    parts). Только выборки. Ничего не меняет.
 #
 # В журнал прогона выводятся ТОЛЬКО агрегаты: репозиторий публичный, а в базе
 # лежат коммерческие данные заказчиков. Ни наименований позиций, ни номеров
@@ -80,7 +86,7 @@ on:
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
                   reclassify-apply, bridge, crossref, demand, funnel,
                   calibration, part, match, codes, sides, dynamics, code-rule,
-                  brand-models]
+                  brand-models, offer-role]
       part:
         description: "Артикул для поиска — только для part (например 6265ZZ)"
         type: string
@@ -97,7 +103,7 @@ on:
         description: "Ключ прогона разметки — только для mark-revert"
         default: ""
       parts:
-        description: "Частей обхода — только для brand-models"
+        description: "Частей обхода — только для brand-models и offer-role"
         type: choice
         default: "16"
         options: ["10", "16", "25", "50"]
@@ -288,6 +294,16 @@ jobs:
           name: brand-models
           path: brand_models.json
           if-no-files-found: ignore
+
+      # Роль предложения: прямое (от самого бренда или изготовителя) или от
+      # трейдера. Замер вхолостую перед тем, как роль появится на карточках
+      # (CLAUDE.md, правило 3). Только выборки, в журнал — только агрегаты.
+      - name: Прямые предложения и трейдеры
+        if: inputs.job == 'offer-role'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PARTS: ${{ inputs.parts }}
+        run: python scripts/offer_role_measure.py
 
       - name: Отвечает ли предложение на нашу заявку
         if: inputs.job == 'match'

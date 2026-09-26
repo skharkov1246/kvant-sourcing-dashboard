@@ -68,7 +68,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "pnw" / "tools"))
 
 from library import (brand_registry, brands, codes_sql, company_names, crossref, doc_side,  # noqa: E402
-                     docfilter, oem_kind, offer_terms, quotes)
+                     docfilter, oem_kind, offer_role, offer_terms, quotes)
 # Правовая форма, описание вместо имени и указание к закупке — правила словаря
 # брендов (library/oem_kind.py): по ним сборщик ставит вид записи dict/oem.json,
 # а ревизия ищет дефекты. Одно правило в одном месте.
@@ -1801,7 +1801,11 @@ def ревизия_номенклатуры(с: Снимки, сейчас, пр
                 т.счёт("n.o_m", только_цифры(m) or служебное(m) or len(m) > 60
                        or форма_у_неизвестного(m, карта))
                 # Изготовитель, сам приславший КП, — прямая поставка, а не дефект.
-                изготовитель_сам += bool(имя_c) and норм(без_формы(имя_c)) == норм(без_формы(m))
+                # Правило одно — library/offer_role.py (решение владельца 26.09.2026:
+                # прямое — только от бренда или изготовителя, дилеры — трейдеры).
+                # Сравнение строк «SKF» и «СКФ» не сводило никогда: 0 из 5 883.
+                изготовитель_сам += bool(имя_c) and (
+                    offer_role.роль_предложения(имя_c, m)["role"] == offer_role.ПРЯМОЕ)
             if o.get("d") is not None:
                 dd = день(o["d"])
                 т.счёт("n.o_date", dd is None or dd > будущее or dd < РАННЯЯ_ДАТА)
