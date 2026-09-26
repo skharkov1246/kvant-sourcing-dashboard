@@ -282,8 +282,30 @@ def проверено_страницы(html: str) -> frozenset | None:
 ЦЕНЫ_ПОСТАВЩИКА = frozenset(("Предложение поставщика", "Открытая цена из источника"))
 ЗАГЛУШКИ_ПОСТАВЩИКА = frozenset(("Не указан", "Автор не подтверждён"))
 ВАЛЮТЫ_БИБЛИОТЕКИ = frozenset(("RUB", "USD", "EUR", "CNY", "AED", "GBP", "INR"))
-ЛОКАТОР = frozenset(("page", "pages", "sheet", "cells", "cell", "row", "rows", "column",
-                     "json_pointer", "section", "table", "line", "lines", "paragraph"))
+
+
+def ключи_указателя_страницы(html: str) -> frozenset:
+    """Ключи указателя места, которые страница подписывает по-русски
+    (LOCATOR_LABELS в public/library.html) — читается из самой страницы, а не
+    зеркалом: ключ без подписи formatLocator показывает сырым английским словом.
+    Словаря нет — пустое множество, и каждый ключ считается неизвестным."""
+    html = re.sub(r"^\s*//.*$", "", html, flags=re.M)
+    m = re.search(r"const LOCATOR_LABELS=\{([^}]*)\}", html)
+    return frozenset(re.findall(r"(?:^|,)\s*([A-Za-z_][A-Za-z0-9_]*)\s*:", m.group(1))) if m else frozenset()
+
+
+def _вложено_в_указатель(v) -> bool:
+    """Значение, которое formatLocator не покажет: объект — JSON-строкой, объект
+    внутри массива — «[object Object]». Массив скаляров (и массив массивов)
+    Array.join показывает перечнем — это законная форма (json_pointers, pages)."""
+    if isinstance(v, dict):
+        return True
+    return isinstance(v, list) and any(_вложено_в_указатель(x) for x in v)
+
+
+def указатель_не_виден(loc: dict, ключи: frozenset) -> bool:
+    """Дефект l.ref_locator: ключ без подписи страницы или вложенный объект."""
+    return any(k not in ключи or _вложено_в_указатель(v) for k, v in loc.items())
 
 # Счётчики: поля последней точки «коды_и_цены», которые читает страница.
 ПОЛЯ_СЧЁТЧИКОВ = ("asked", "rows_asked", "with_kp", "price_rows", "no_price", "rows_without",
@@ -3149,6 +3171,7 @@ def ревизия_библиотеки(с: Снимки, сейчас, слов
     if страница is None:
         страница = СТРАНИЦА_БИБЛИОТЕКИ.read_text(encoding="utf-8")
     не_видно_как_требует = УРОВНИ_ПРОВЕРКИ - ПРОВЕРЕНО - требуют_проверки_страницы(страница)
+    ключи_указателя = ключи_указателя_страницы(страница)
     указатель = с.json(КЛЮЧ_БИБЛИОТЕКИ)
     if т.счёт("l.present", not isinstance(указатель, dict)):
         return т
@@ -3392,8 +3415,7 @@ def ревизия_библиотеки(с: Снимки, сейчас, слов
                        or (r.get("sha256") is not None and not re.fullmatch(r"[0-9a-f]{64}", str(r["sha256"]))))
             loc = r.get("locator")
             if isinstance(loc, dict):
-                т.счёт("l.ref_locator", any(isinstance(v, (dict, list)) and k != "cells" for k, v in loc.items())
-                       or any(k not in ЛОКАТОР for k in loc))
+                т.счёт("l.ref_locator", указатель_не_виден(loc, ключи_указателя))
             виденные_ref[(r.get("sha256") or r.get("url") or r.get("title"))] += 1
         for ключ_, n_ in виденные_ref.items():
             if ключ_:
