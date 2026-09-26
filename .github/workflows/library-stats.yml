@@ -83,8 +83,10 @@ name: Библиотека — сводка и переклассификаци�
 #                    обработали в окне (processed_at: впервые или повторно), по
 #                    источнику и по дню — статусы разбора, позиции, цены по
 #                    валютам, компании, бренды, карточки, роли; что расшифровано
-#                    и почему нет. Окно — входы days / date_from / date_to (дни
-#                    UTC). В журнал только агрегаты. Подробная часть (компании,
+#                    и почему нет. Окно — входы days / date_from / date_to (дни;
+#                    «поступило» — МСК портала, «обработано» — UTC). Копии КП в
+#                    полях сделки и файлы одного письма во «всего» не
+#                    задваиваются. В журнал только агрегаты. Подробная часть (компании,
 #                    номера, строки цены) — ТОЛЬКО со входом pubkey и только
 #                    зашифрованной: открытый файл стирается до загрузки, в
 #                    артефакт идёт *.enc на сутки. Только выборки. Ничего не меняет.
@@ -128,8 +130,9 @@ on:
         description: "Наследовать сегмент по сделке (слабое правило, для reclassify)"
         type: boolean
         default: false
-      # ОКНО weekly-offers — дни UTC, обе границы включительно. date_from и
-      # date_to вместе — ровно они; один date_from — до сегодня; один date_to —
+      # ОКНО weekly-offers — дни, обе границы включительно: «поступило» — по
+      # календарю портала (МСК), «обработано» — дни UTC. date_from и date_to
+      # вместе — ровно они; один date_from — до сегодня (UTC); один date_to —
       # days дней, кончая им; ни одного — days дней, кончая сегодня.
       days:
         description: "weekly-offers: дней в окне, кончая сегодня (UTC)"
@@ -145,11 +148,12 @@ on:
         default: ""
       # ОТКРЫТЫЙ КЛЮЧ — НЕ СЕКРЕТ: входы запуска видны всем, кто видит прогоны,
       # поэтому сюда кладётся только открытый ключ. Закрытый ключ во входе —
-      # отказ скрипта (его пару больше не использовать). Длина: RSA-4096 в PEM
+      # отказ скрипта (его пару больше не использовать); ключ не RSA или короче
+      # 2048 бит — тоже отказ, и скрипта, и шага шифрования. Длина: RSA-4096 в PEM
       # и base64 — около 1 100 знаков; предел входов workflow_dispatch —
       # 65 535 знаков на все входы вместе, так что помещается с запасом.
       pubkey:
-        description: "weekly-offers: открытый ключ RSA (PEM в base64 одной строкой) — подробная часть шифруется им; пусто — только агрегаты"
+        description: "weekly-offers: открытый ключ RSA от 2048 бит (PEM в base64 одной строкой) — подробная часть шифруется им; пусто — только агрегаты"
         type: string
         default: ""
 
@@ -396,14 +400,27 @@ jobs:
             echo "подробной части нет — шифровать нечего"
             exit 0
           fi
-          printf '%s' "$PUBKEY_B64" | tr -d ' \r\n' | base64 -d > "$work/public.pem"
-          openssl pkey -pubin -in "$work/public.pem" -noout
-          mkdir -p "$ENC_DIR"
+          printf '%s' "$PUBKEY_B64" | tr -d ' \t\r\n' | base64 -d > "$work/public.pem"
+          # Только RSA от 2048 бит: EC и Ed25519 openssl читает, но RSA-OAEP с
+          # ними не работает, а RSA-1024 слаб для выложенного артефактом.
+          # «<<<», а не «printf | grep -q»: при pipefail ранний выход grep
+          # роняет конвейер по SIGPIPE, и годный ключ сошёл бы за негодный.
+          info="$(openssl pkey -pubin -in "$work/public.pem" -noout -text)"
+          bits="$(sed -n 's/^.*Public-Key: (\([0-9]*\) bit).*$/\1/p' <<<"$info" | head -n1)"
+          if ! grep -q '^Modulus:' <<<"$info" || [ "${bits:-0}" -lt 2048 ]; then
+            echo "::error::вход pubkey — не RSA от 2048 бит: RSA-OAEP с ним не работает или слаб. Подробная часть стёрта"
+            exit 1
+          fi
+          # Оба файла готовятся в рабочей папке и переносятся в папку артефакта
+          # только вместе: упавшая на середине пара не оставляет там одиночный
+          # шифртекст, который никто не расшифрует.
           openssl rand -hex 32 > "$work/session.key"
-          openssl enc -aes-256-cbc -salt -pbkdf2 -iter 200000 -md sha256 \
-            -in "$DETAIL" -out "$ENC_DIR/weekly_offers_detail.json.enc" -pass "file:$work/session.key"
           openssl pkeyutl -encrypt -pubin -inkey "$work/public.pem" -pkeyopt rsa_padding_mode:oaep \
-            -in "$work/session.key" -out "$ENC_DIR/weekly_offers_key.enc"
+            -in "$work/session.key" -out "$work/weekly_offers_key.enc"
+          openssl enc -aes-256-cbc -salt -pbkdf2 -iter 200000 -md sha256 \
+            -in "$DETAIL" -out "$work/weekly_offers_detail.json.enc" -pass "file:$work/session.key"
+          mkdir -p "$ENC_DIR"
+          mv "$work/weekly_offers_key.enc" "$work/weekly_offers_detail.json.enc" "$ENC_DIR/"
           echo "зашифровано: $(ls "$ENC_DIR" | wc -l) файла, открытый файл стирается"
 
       - name: Подробная часть — только зашифрованной
