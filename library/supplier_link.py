@@ -627,6 +627,24 @@ def колонки(cur, таблица: str) -> set[str]:
     return {r[0] for r in cur.fetchall()}
 
 
+def читать_реестр(cur) -> tuple[Реестр, int]:
+    """Реестр компаний (sup_entity, sup_identifier, sup_display_name) → (Реестр,
+    число сущностей). Одно чтение на оба сведения: поставщиков разведки
+    (здесь) и дилеров разведки брендов (library/dealer_link.py)."""
+    cur.execute("select id, merged_into, country, display_name from sup_entity")
+    сущности = cur.fetchall()
+    cur.execute("select sup_id, kind, value from sup_identifier where status <> 'rejected' "
+                "and kind in ('inn', 'vat', 'domain', 'alias', 'trading', 'legal')")
+    признаки = cur.fetchall()
+    имена_показа = []
+    if есть(cur, "sup_display_name"):
+        cur.execute("select distinct on (sup_id, source) sup_id, name, full_name, inn "
+                    "from sup_display_name where rolled_back_at is null "
+                    "order by sup_id, source, id desc")
+        имена_показа = cur.fetchall()
+    return собрать_реестр(сущности, признаки, имена_показа), len(сущности)
+
+
 def читать(cur):
     """→ (разведка, реестр, рёбра {research_id: (строк, с проверкой)}, прежние
     связи {research_id: корень} или None, число сущностей)."""
@@ -645,24 +663,13 @@ def читать(cur):
         cur.execute(f"select supplier_id, count(*), {проверка} from lib_part_suppliers group by 1")
         рёбра = {int(i): (int(a), int(b)) for i, a, b in cur.fetchall()}
 
-    cur.execute("select id, merged_into, country, display_name from sup_entity")
-    сущности = cur.fetchall()
-    cur.execute("select sup_id, kind, value from sup_identifier where status <> 'rejected' "
-                "and kind in ('inn', 'vat', 'domain', 'alias', 'trading', 'legal')")
-    признаки = cur.fetchall()
-    имена_показа = []
-    if есть(cur, "sup_display_name"):
-        cur.execute("select distinct on (sup_id, source) sup_id, name, full_name, inn "
-                    "from sup_display_name where rolled_back_at is null "
-                    "order by sup_id, source, id desc")
-        имена_показа = cur.fetchall()
-    р = собрать_реестр(сущности, признаки, имена_показа)
+    р, сущностей = читать_реестр(cur)
 
     прежние = None
     if есть(cur, "sup_research_link_live"):
         cur.execute("select research_id, sup_id from sup_research_link_live")
         прежние = {int(i): s for i, s in cur.fetchall()} or None
-    return разведка, р, рёбра, прежние, len(сущности)
+    return разведка, р, рёбра, прежние, сущностей
 
 
 def записать(cur, итог: Итог, run_id: str) -> int:
