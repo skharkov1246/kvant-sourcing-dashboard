@@ -1,0 +1,615 @@
+{
+  "oem_key": "atlascopcoenergas",
+  "name": "Atlas Copco Energas (Atlas Copco Gas and Process)",
+  "segment_focus": "интегрально-редукторные компрессоры и турбодетандеры: номера уплотнений и подшипников, сервисные центры",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Atlas Copco Energas GmbH (Кёльн) — головная компания подразделения Atlas Copco Gas and Process. В подразделение входят Atlas Copco Mafi-Trench (Санта-Мария, США; турбодетандеры для углеводородов), Atlas Copco Comptec (Вурхисвилл, США; центробежные компрессоры), упаковочная площадка в Пуне (Индия) и Atlas Copco Process Equipment (Шанхай). Производимые линейки: интегрально-редукторные компрессоры GT (до 8 ступеней, до 37 МВт, до 205 бар), H, SC, TP; одновальные T и RT; стандартизированные TurboBlock, AeroBlock, Polyblock и HPBOG; турбодетандеры EC/ECM, ECOTS Plus/ECOTS-M (с компрессорной нагрузкой) и ETB/ETG/EG/EGI/ETI (с генератором или бустером); компандеры. Типоразмеры (GT021…GT153, EC-5.0, ECM-4.0, ETG 190 MS-3 и др.) взяты из референс-листов открытых брошюр изготовителя. Сервисные руководства и каталоги запчастей в открытом доступе не найдены: машины изготавливаются под заказ, ведомость запчастей привязана к заводскому номеру. Подтверждено 8 кодов. Шесть — номера Atlas Copco Mafi-Trench вида 1249xxxxxx (комплект, датчик приближения, опора, уплотнительное кольцо, привод ВНА, плата интерфейса) с распродаж неликвида. Ещё один — номер Comptec 235038G01 (разрезное уплотнение входного вала), последний — обозначение шкафа управления магнитными подшипниками SKF S2M E300V2. Зонд Mafi-Trench 1249114532 отклонён: страница источника закрыта (403). Субпоставщики с подтверждением: SKF S2M (активные магнитные подшипники и шкафы управления), Rockwell Allen-Bradley (ПЛК в ECOTS), Fisher (позиционер DVC на приводе ВНА). John Crane (сухие газовые уплотнения) подтверждён только подписью к фото в брошюрах — это слабое свидетельство. Сервис: 10 сервисных центров Gas and Process (Хьюстон, Сантьяго, Кёльн, Дубай, Пуна, Шанхай, Чаченгсао) и 7 ремонтных центров. В России — заявление DMEnergy о статусе официального дистрибьютора центробежных компрессоров Atlas Copco (по индексу поисковика, страница не открылась). Референс в РФ: три дожимных компрессора топливного газа GT для ПГУ-250 ПАО «Казаньоргсинтез».",
+  "machines": [
+    {
+      "model": "GT Series (интегрально-редукторный центробежный компрессор, ETO)",
+      "kind": "центробежный компрессор интегрально-редукторный",
+      "segment": "компрессор",
+      "rating": "до 8 ступеней, до 37 МВт, до 205 бар, до 500 000 м3/ч; уплотнения угольные кольца или сухие газовые",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/products/centrifugal-compressors/gt-series",
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT050 (шестиступенчатый, дожимной компрессор топливного газа)",
+      "kind": "центробежный компрессор интегрально-редукторный",
+      "segment": "компрессор",
+      "rating": "5,7 → 48,3 бар(а), 14 300 м3/ч; ПГУ на природном газе в России",
+      "status": "выпускается (типоразмер GT)",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf",
+        "https://www.turbomachinerymag.com/view/atlas-copco-to-provide-compressors-for-russian-power-market"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT032 (в т. ч. GT032 T1D1, GT 032 N3D0)",
+      "kind": "центробежный компрессор интегрально-редукторный",
+      "segment": "компрессор",
+      "rating": "пятиступенчатый: 1,8 → 37,9 бар(а), 30 000 м3/ч (нефтехимия, Китай)",
+      "status": "выпускается (типоразмер GT)",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT026",
+      "kind": "центробежный компрессор интегрально-редукторный",
+      "segment": "компрессор",
+      "rating": "одноступенчатый (газ регенерации, ОАЭ) 67,4 → 74,3 бар(а); четырёхступенчатый (метанол) 6,4 → 38,9 бар(а)",
+      "status": "выпускается (типоразмер GT)",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT021",
+      "kind": "центробежный компрессор интегрально-редукторный",
+      "segment": "компрессор",
+      "rating": "четырёхступенчатый, этилен: 18,5 → 74,5 бар(а), 2 200 м3/ч",
+      "status": "выпускается (типоразмер GT)",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT040",
+      "kind": "центробежный компрессор интегрально-редукторный",
+      "segment": "компрессор",
+      "rating": "шестиступенчатый комбинированный: 5,6 → 62 бар(а), 8 800 м3/ч",
+      "status": "выпускается (типоразмер GT)",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT056",
+      "kind": "центробежный компрессор интегрально-редукторный (в составе компандера GT056 / ETI300NS)",
+      "segment": "компрессор",
+      "rating": "трёхступенчатый: 1,1 → 8,7 бар(а), 37 500 м3/ч (HPPO, Бельгия)",
+      "status": "выпускается (типоразмер GT)",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT070",
+      "kind": "центробежный компрессор интегрально-редукторный",
+      "segment": "компрессор",
+      "rating": "пятиступенчатый, CO: 1,1 → 83,4 бар(а), 43 000 м3/ч",
+      "status": "выпускается (типоразмер GT)",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT153",
+      "kind": "центробежный компрессор интегрально-редукторный (главный воздушный)",
+      "segment": "компрессор",
+      "rating": "трёхступенчатый: 0,99 → 6,4 бар(а), 380 000 м3/ч",
+      "status": "выпускается (типоразмер GT)",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "H Series (H16000, H26000)",
+      "kind": "центробежный компрессор интегрально-редукторный (воздух, азот)",
+      "segment": "компрессор",
+      "rating": "1–6 ступеней, нагнетание до 35 бар(а), 3 500–49 500 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TP Series (TP14 / 14)",
+      "kind": "центробежный компрессор интегрально-редукторный",
+      "segment": "компрессор",
+      "rating": "2–6 ступеней, нагнетание до 100 бар(а), 250–65 000 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SC Series",
+      "kind": "одноступенчатый центробежный компрессор (в т. ч. дожимной топливного газа)",
+      "segment": "компрессор",
+      "rating": "1 ступень, нагнетание до 100 бар(а), 250–155 000 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "T Series",
+      "kind": "одновальный центробежный компрессор (полиэтилен, полипропилен)",
+      "segment": "компрессор",
+      "rating": "1 ступень, до 40 бар(а), 15 000–80 000 м3/ч, API 617",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/products/centrifugal-compressors",
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "RT Series",
+      "kind": "одновальный радиальный компрессор (главный воздушный для ВРУ)",
+      "segment": "компрессор",
+      "rating": "3 ступени, до 7 бар(а), 240 000–480 000 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/products/centrifugal-compressors",
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TurboBlock",
+      "kind": "стандартизированный дожимной компрессор топливного газа",
+      "segment": "компрессор",
+      "rating": "745–5 220 кВт, 28–50 бар(а) на выходе, 250–10 000 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas_Copco_Centrifugal_Fuel_Gas_Boosters.pdf",
+        "https://www.atlascopco.com/gas-and-process/en/products/centrifugal-compressors/turbo-block"
+      ],
+      "verified": true
+    },
+    {
+      "model": "AeroBlock / Polyblock / HPBOG",
+      "kind": "стандартизированные центробежные компрессоры (главный воздушный, полиолефины, газ отпарки высокого давления, шесть ступеней на одном редукторе)",
+      "segment": "компрессор",
+      "rating": "по данным изготовителя без численных параметров",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/products/centrifugal-compressors"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EC Series (EC-5.0, EC-6.0)",
+      "kind": "турбодетандер с компрессорной нагрузкой (детандер-компрессор), масляные подшипники",
+      "segment": "прочее",
+      "rating": "до 25 МВт, вход до 200 бар(а); EC-5.0 8 936 кВт, 13 400 об/мин; EC-6.0 7 860 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/products/turboexpanders/ec-series",
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/driving-expander-technology.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ECM (ECM-4.0, ECM-5.0)",
+      "kind": "детандер-компрессор на активных магнитных подшипниках",
+      "segment": "прочее",
+      "rating": "ECM-5.0 7 303 кВт, 10 900 об/мин (регазификация СПГ); ECM-4.0 1 161 кВт, 13 000 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/driving-expander-technology.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ECOTS Plus / ECOTS-M",
+      "kind": "стандартизированный детандер-компрессор (масляные подшипники или активные магнитные подшипники)",
+      "segment": "прочее",
+      "rating": "вход до 82 бар(а), до 5 200 кВт, до 50 000 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas_Copco_Gas_and_Process_Expander_Brochure.pdf",
+        "https://www.atlascopco.com/gas-and-process/en/products/turboexpanders/ec-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ETB (ETB 190 NS, ETB 560 NS-2)",
+      "kind": "турбодетандер интегрально-редукторный с бустер-компрессором (ВРУ)",
+      "segment": "прочее",
+      "rating": "ETB 190 NS — холод 207 кВт; ETB 560 NS-2 — две ступени, 1 280 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/driving-expander-technology.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ETG (ETG 150 MS, ETG 190 MS-2, ETG 190 MS-3, ETG 360 MS-2)",
+      "kind": "турбодетандер-генератор интегрально-редукторный (сброс давления газа, компандер)",
+      "segment": "прочее",
+      "rating": "ETG 190 MS-3 4 526 кВт; ETG 360 MS-2 9 488 кВт; ETG 190 MS-2 2 530 кВт; до 25 МВт на агрегат",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/driving-expander-technology.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EG Series (EG-6.0, EGI-8)",
+      "kind": "турбодетандер-генератор (прямой привод, интегральный или внешний редуктор; геотермальный ORC, сброс давления)",
+      "segment": "прочее",
+      "rating": "до 25 МВт на ступень, до двух ступеней; EGI-8 14 541 кВт; EG-6.0 634 кВт, 3 000 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/products/turboexpanders/eg-series",
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/driving-expander-technology.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Compander (GT 032 N3D0 / ETG 150 MS; GT056 / ETI300NS)",
+      "kind": "интегрально-редукторный компандер (компрессор и детандер на одном редукторе)",
+      "segment": "компрессор",
+      "rating": "до 30 МВт, до 8 ступеней, до 480 000 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/products/compander",
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Mafi-Trench EC3 / Frame 2 (наследная линия Mafi-Trench)",
+      "kind": "детандер-компрессор для углеводородов (типоразмер рамы)",
+      "segment": "прочее",
+      "rating": "н/д",
+      "status": "в эксплуатации; обслуживает Atlas Copco Mafi-Trench",
+      "sources": [
+        "https://www.salvex.com/listings/listing_detail.cfm/aucid/183048273/",
+        "https://www.salvex.com/listings/listing_detail.cfm/aucid/183048127/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GZ Series",
+      "kind": "безмасляный винтовой газовый компрессор",
+      "segment": "компрессор",
+      "rating": "до 9 000 м3/ч, нагнетание до 26 бар(а)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/products"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Driving Expander Technology — Atlas Copco Gas and Process Solutions (брошюра с референс-листом типоразмеров EC/ECM/ETB/ETG/EG)",
+      "doc_no": "B03/004/24/0215",
+      "machine": "турбодетандеры EC, ECM, ETB, ETG, EG, EGI, ETF, EHB",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/driving-expander-technology.pdf"
+      ]
+    },
+    {
+      "title": "Driving Expander Technology (новая редакция, таблица характеристик, ECOTS Plus / ECOTS-M, опции: сдвоенный фильтр затворного газа, ПЛК Allen Bradley)",
+      "doc_no": "B26/004/036/0618",
+      "machine": "турбодетандеры, ECOTS",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas_Copco_Gas_and_Process_Expander_Brochure.pdf",
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/5626-Driving-expander-technology-LR.pdf"
+      ]
+    },
+    {
+      "title": "Driving Centrifugal Compressor Technology (2016; таблица серий H/SC/TP/GT/T/RT, уплотнения, подшипники, референс-лист типоразмеров GT)",
+      "doc_no": "B19/004/52/0916",
+      "machine": "GT, H, SC, TP, T, RT, компандер",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ]
+    },
+    {
+      "title": "Driving centrifugal compressor technology (редакция апреля 2022)",
+      "machine": "GT, T, RT, TurboBlock, AeroBlock, Polyblock, компандер",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas%20Copco%20GAP%20Driving%20Centrifugal%20Compressor%20Technology.pdf"
+      ]
+    },
+    {
+      "title": "Proven power: Centrifugal fuel gas boosters",
+      "doc_no": "B30/004/006/0717",
+      "machine": "GT (дожимные топливного газа), TurboBlock",
+      "kind": "каталог / брошюра",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas_Copco_Centrifugal_Fuel_Gas_Boosters.pdf"
+      ]
+    },
+    {
+      "title": "Magnetic Bearing Control Cabinet Upgrade for Atlas Copco Turboexpanders (SKF S2M E300V2 взамен E300V1; поддержка V1 прекращена в 2024)",
+      "doc_no": "F20/004/02/0316",
+      "machine": "турбодетандеры на активных магнитных подшипниках (ECM, ECOTS-M)",
+      "kind": "бюллетень (модернизация)",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Aftermarket%20Flyer%20-%20V2%20Cabinet%20Upgrade%20Marketing%20Flyer_A4_D2.pdf"
+      ]
+    },
+    {
+      "title": "All Brand support for turboexpanders (сервис чужих турбодетандеров: Rotoflow, LA Turbine, Texas Turbine, Cryostar, ACD)",
+      "machine": "турбодетандеры любых марок",
+      "kind": "бюллетень (сервисное предложение)",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas%20Copco%20GAP%20All%20Brand%20Aftermarket%20Services.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "1249126709",
+      "issuer": "Atlas Copco Mafi-Trench",
+      "description": "Комплект запасных частей турбодетандера (Replacement Set): датчик приближения, опора, уплотнительное кольцо",
+      "machine": "Mafi-Trench EC3",
+      "unit": "детандер-компрессор, система контроля ротора",
+      "source_url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/183048273/",
+      "quote": "Brand : Mafi-Trench Model : EC3 Part Number : 1249126709 Product : Replacement Part for Turboexpander Replacement Set"
+    },
+    {
+      "code": "1249047170",
+      "issuer": "Atlas Copco Mafi-Trench",
+      "description": "Датчик приближения (Proximity Sensor), позиция комплекта 1249126709",
+      "machine": "Mafi-Trench EC3",
+      "unit": "контроль вибрации и осевого сдвига ротора",
+      "source_url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/183048273/",
+      "quote": "Components : Proximity Sensor Part Number: 1249047170"
+    },
+    {
+      "code": "1249140181",
+      "issuer": "Atlas Copco Mafi-Trench",
+      "description": "Опора (Support), позиция комплекта 1249126709",
+      "machine": "Mafi-Trench EC3",
+      "unit": "крепление датчика приближения",
+      "source_url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/183048273/",
+      "quote": "Support Part Number: 1249140181"
+    },
+    {
+      "code": "1249039640",
+      "issuer": "Atlas Copco Mafi-Trench",
+      "description": "Уплотнительное кольцо (O-Ring Seal), позиция комплекта 1249126709",
+      "machine": "Mafi-Trench EC3",
+      "unit": "уплотнения",
+      "source_url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/183048273/",
+      "quote": "O-Ring Seal Part Number: 1249039640"
+    },
+    {
+      "code": "1249291129",
+      "issuer": "Atlas Copco Mafi-Trench",
+      "description": "Привод входного направляющего аппарата (IGV), пневматический мембранный обратного действия, с позиционером Fisher DVC",
+      "machine": "Mafi-Trench Frame 2",
+      "unit": "входной направляющий аппарат детандера",
+      "source_url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/183048127/",
+      "quote": "Brand : Mafi-Trench Model : Frame 2 Replacement Part : Actuator Part Number : 1249291129 Type : IGV Inlet Guide Vanes Actuator"
+    },
+    {
+      "code": "1249158802",
+      "issuer": "Atlas Copco Mafi-Trench",
+      "description": "Плата интерфейса сигналов машины (Signal Machine Interface PCB), модель ELCART-0952",
+      "machine": "турбодетандер Mafi-Trench (типоразмер не указан)",
+      "unit": "система управления",
+      "source_url": "https://www.compressionsource.com/listings?manufacturer=AC+Mafi-Trench+Company",
+      "quote": "AC Mafi-Trench Company Signal Machine Interface PCB Model ELCART-0952 PN 1249158802"
+    },
+    {
+      "code": "235038G01",
+      "issuer": "Atlas Copco Comptec",
+      "description": "Разрезное уплотнение входного вала (Seal Split Input Shaft), размер 373",
+      "machine": "центробежный компрессор Comptec (модель не указана)",
+      "unit": "уплотнение входного (тихоходного) вала редуктора",
+      "source_url": "https://industrialgaragesales.com/products/atlas-copco-comptec-235038g01-seal-spilt-input-shaft-373",
+      "quote": "ATLAS COPCO COMPTEC 235038G01 SEAL SPILT INPUT SHAFT 373"
+    },
+    {
+      "code": "E300V2",
+      "issuer": "SKF (S2M)",
+      "description": "Шкаф управления активными магнитными подшипниками, замена снятого с поддержки E300V1",
+      "machine": "турбодетандеры Atlas Copco на магнитных подшипниках (в листке — «Atlas Copco turboexpanders», серии не названы; по брошюре — ECM, ECOTS-M)",
+      "unit": "активные магнитные подшипники, система управления",
+      "doc_ref": "F20/004/02/0316",
+      "source_url": "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Aftermarket%20Flyer%20-%20V2%20Cabinet%20Upgrade%20Marketing%20Flyer_A4_D2.pdf",
+      "quote": "SKF S2M Magnetic Bearing E300V2 Control Cabinet Upgrade for Atlas Copco Turboexpanders"
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "1249114532",
+      "verdict": "источник недоступен",
+      "reason": "supply.parts/request/view?id=467199 отвечает HTTP 403. Код есть только в заголовке этой же страницы в выдаче поисковика («MAFI-TRENCH MTCEC30583B16 1249114532 Probe»). Другой открытой страницы с этим кодом поиск не нашёл, поэтому содержимое страницы проверить нельзя."
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "SKF (S2M)",
+      "component": "активные магнитные подшипники и шкафы управления E300V1/E300V2 (ПО MBScope)",
+      "machine": "турбодетандеры ECM, ECOTS-M",
+      "evidence": "Сервисный листок Atlas Copco: «Atlas Copco Gas and Process and SKF have joined together to offer the next-generation Magnetic Bearing control cabinet E300V2»",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Aftermarket%20Flyer%20-%20V2%20Cabinet%20Upgrade%20Marketing%20Flyer_A4_D2.pdf",
+        "https://evolution.skf.com/magnetic-bearings-boost-turboexpander-performance/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Rockwell Automation (Allen-Bradley)",
+      "component": "ПЛК системы управления (опция модернизации «Allen Bradley PLC upgrade»)",
+      "machine": "ECOTS Plus / ECOTS-M",
+      "evidence": "Перечень опций ECOTS в брошюре турбодетандеров Atlas Copco",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas_Copco_Gas_and_Process_Expander_Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Fisher (Emerson)",
+      "component": "интеллектуальный позиционер DVC на пневмоприводе ВНА",
+      "machine": "Mafi-Trench Frame 2",
+      "evidence": "В описании привода 1249291129: «Positioner : Intelligent Type Fisher DVC Positioner»",
+      "sources": [
+        "https://www.salvex.com/listings/listing_detail.cfm/aucid/183048127/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "John Crane",
+      "component": "сухие газовые уплотнения (вероятно)",
+      "machine": "GT, турбодетандеры",
+      "evidence": "Слабое свидетельство: в брошюрах Atlas Copco разворот «Our Seal Options» сопровождается подписью к фото «© John Crane Group Corporation». Прямого утверждения о поставке нет",
+      "sources": [
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf",
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas_Copco_Gas_and_Process_Expander_Brochure.pdf"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Cashco",
+      "component": "регуляторы перепада давления в системе затворного газа (при модернизации Atlas Copco ставит клапаны своей конструкции)",
+      "machine": "турбодетандеры, в т. ч. чужих марок (All Brand)",
+      "evidence": "Листок All Brand: «we can install or upgrade Cashco differential pressure regulators with more reliable jigger valves». Связь подтверждена только для модернизации (All Brand), не для поставки в новые машины",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas%20Copco%20GAP%20All%20Brand%20Aftermarket%20Services.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Atlas Copco Energas GmbH",
+      "country": "Германия",
+      "role": "изготовитель, головная компания Gas and Process; сервисный центр Europe и ремонтный центр Europe (Кёльн)",
+      "sources": [
+        "https://www.atlascopco.com/gas-and-process/en/contact-us",
+        "https://www.atlascopco.com/en-rs/compressors/gap-worldwide-contacts/repair-centers"
+      ]
+    },
+    {
+      "company": "Atlas Copco Services Middle East (Service Center Middle East & Africa)",
+      "country": "ОАЭ",
+      "role": "сервисный и ремонтный центр Gas and Process (Дубай)",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/gap-worldwide-contacts/service-centers",
+        "https://www.atlascopco.com/en-rs/compressors/gap-worldwide-contacts/repair-centers"
+      ]
+    },
+    {
+      "company": "Atlas Copco (Shanghai) Process Equipment Co., Ltd.",
+      "country": "Китай",
+      "role": "упаковка турбокомпрессоров и детандеров; сервисный центр China и ремонтный центр (Шанхай)",
+      "sources": [
+        "https://www.atlascopco.com/en-rs/compressors/gap-worldwide-contacts/repair-centers",
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ]
+    },
+    {
+      "company": "Atlas Copco India (Gas and Process)",
+      "country": "Индия",
+      "role": "упаковочная площадка центробежных компрессоров; сервисные центры India по регионам (Пуна)",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/gap-worldwide-contacts/service-centers",
+        "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+      ]
+    },
+    {
+      "company": "Atlas Copco Mafi-Trench Company LLC",
+      "country": "США",
+      "role": "изготовитель турбодетандеров для углеводородов, запчасти и ремонт (All Brand); ремонтный центр (Санта-Мария)",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Atlas%20Copco%20GAP%20All%20Brand%20Aftermarket%20Services.pdf",
+        "https://www.atlascopco.com/en-rs/compressors/gap-worldwide-contacts/repair-centers"
+      ]
+    },
+    {
+      "company": "Atlas Copco Comptec LLC",
+      "country": "США",
+      "role": "изготовитель центробежных компрессоров, ремонтный центр (Вурхисвилл)",
+      "sources": [
+        "https://www.atlascopco.com/en-rs/compressors/gap-worldwide-contacts/repair-centers"
+      ]
+    },
+    {
+      "company": "Atlas Copco Service Center North America",
+      "country": "США",
+      "role": "сервисный и ремонтный центр Gas and Process (Хьюстон, Дир-Парк)",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/gap-worldwide-contacts/service-centers",
+        "https://www.atlascopco.com/en-rs/compressors/gap-worldwide-contacts/repair-centers"
+      ]
+    },
+    {
+      "company": "Atlas Copco Service Center Southeast Asia",
+      "country": "Таиланд",
+      "role": "сервисный центр Gas and Process (Чаченгсао)",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/gap-worldwide-contacts/service-centers"
+      ]
+    },
+    {
+      "company": "Atlas Copco Service Center South America",
+      "country": "Чили",
+      "role": "сервисный центр Gas and Process (Сантьяго)",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/gap-worldwide-contacts/service-centers"
+      ]
+    },
+    {
+      "company": "Industrial Plant & Services",
+      "country": "Австралия",
+      "role": "ремонтный центр в перечне Gas and Process (Сомерсби)",
+      "sources": [
+        "https://www.atlascopco.com/en-rs/compressors/gap-worldwide-contacts/repair-centers"
+      ]
+    },
+    {
+      "company": "DMEnergy",
+      "country": "Россия",
+      "role": "по собственному заявлению — официальный дистрибьютор центробежных компрессоров Atlas Copco в России и СНГ (топливный газ ГТУ). Не подтверждено изготовителем, страница при прямом запросе пуста",
+      "sources": [
+        "https://dm.energy/partner/centrobezhnye-turbokompressory-atlas-copco"
+      ]
+    },
+    {
+      "company": "Lone Star Blower",
+      "country": "США",
+      "role": "независимый сервис и неоригинальные запчасти для GT Series (комплекты подшипников, уплотнения, шестерни, ВНА/ДНА)",
+      "sources": [
+        "https://lonestarblower.com/aftermarket-compressor-atlas-copco-gt-series-oem-service-repair-parts/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Сервисные руководства (O&M), каталоги запчастей и ведомости ЗИП на GT, EC, ECM и ETG в открытом доступе не найдены. Машины изготавливаются под заказ, перечень ЗИП привязан к заводскому номеру и выдаётся с документацией поставки или через службу Aftermarket (Кёльн, Хьюстон, Санта-Мария).",
+    "Номера сухих газовых уплотнений, подшипников с наклонными колодками (пятиколодочные вкладыши шестерён), угольных колец, фильтров масла и затворного газа, термопар и датчиков вибрации для GT и EC не найдены ни на одной открытой странице. Номера, вероятно, лежат в закрытых ведомостях ЗИП Atlas Copco и у изготовителей уплотнений (John Crane, EagleBurgmann, Flowserve) под заказной номер машины.",
+    "Номера Atlas Copco Energas (кёльнская линия GT, ETB, ETG) в открытых распродажах не встречены. Найденные коды относятся к Mafi-Trench (1249xxxxxx) и Comptec.",
+    "Код 1249114532 (supply.parts) и страница hardwarefulfillment.com с каталогом Mafi-Trench закрыты проверкой Cloudflare. Код взят из заголовка, проиндексированного поисковиком; полный каталог hardwarefulfillment не прочитан.",
+    "На eBay (ebay.co.uk/itm/122585817323) есть лот «MAFI TRENCH VANE COMPRESSOR STATOR … 318C47 DWG 318D1»: страница не открылась, связь с турбодетандером не проверена, в список не включён.",
+    "Изготовители подшипников скольжения, редукторов (зубчатых колёс) и электродвигателей приводов GT не названы в открытых источниках: по брошюрам зубчатые колёса и роторы Atlas Copco делает сама.",
+    "Официальных дилеров и сервисных центров Gas and Process в России, Казахстане, Турции и Узбекистане в перечнях изготовителя нет. Статус DMEnergy изготовителем не подтверждён; актуальное присутствие Atlas Copco в РФ после 2022 года не проверялось.",
+    "Список установленных в России машин неполон. Найден только референс: три дожимных компрессора топливного газа для ПГУ ПАО «Казаньоргсинтез» (одна машина — GT050) и компрессор CO2 для производства карбамида в России (типоразмер не назван)."
+  ],
+  "verifier_notes": "Все источники, кроме supply.parts (HTTP 403), открыты. Тексты PDF Atlas Copco извлечены pdftotext и сверены дословно. Итог: 8 кодов из 9 подтверждены. Код 1249114532 — «источник недоступен»: он виден только в заголовке страницы в поисковой выдаче. У E300V2 в записи разведки указаны машины ECM и ECOTS-M, но в листке сказано только «Atlas Copco turboexpanders»; поле machine стоит ослабить. Все 25 машин подтверждены. Из субпоставщиков не подтверждён John Crane: есть только подпись к фото. У Cashco связь подтверждена только для модернизации (All Brand).",
+  "corrections": [
+    "E300V2: поле machine ослаблено — в листке серии ECM и ECOTS-M не названы (замечание скептика)",
+    "sub_suppliers: John Crane — verified=false (есть только подпись к фото), у Cashco оговорка, что связь подтверждена только для модернизации (замечание скептика)",
+    "summary: число кодов приведено к итогу скептика (8 подтверждены, зонд 1249114532 отклонён), исправлено название Чаченгсао"
+  ]
+}

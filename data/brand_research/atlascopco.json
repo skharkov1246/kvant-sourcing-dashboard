@@ -1,0 +1,861 @@
+{
+  "oem_key": "atlascopco",
+  "name": "Atlas Copco",
+  "segment_focus": "винтовые и центробежные компрессоры GA, ZR, ZH: сервисные наборы ТО, фильтры, сепараторы, клапаны; дилеры",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Atlas Copco (Швеция/Бельгия, Compressor Technique): винтовые маслозаполненные GA (5-900 кВт), безмасляные винтовые ZR (водяное охлаждение) / ZT (воздушное) 15-900 кВт и центробежные безмасляные ZH/ZH+ (350 кВт - 26 МВт класса ZH 4000-26000). Запчасти: 10-значная нумерация Atlas Copco (пишется «1613 6105 90» либо слитно), сервисные наборы на 4000/8000/16000/24000/48000 ч, фильтры, сепараторы, клапаны MPV/разгрузки/термостата. Основная открытая база кодов — официальный магазин shopct.atlascopco.com (название изделия + номер) и таблицы применяемости у дилеров США (compressornow.com: фильтры и сепараторы GA по сериям и серийным номерам). Для ZH открыто мало: наборы ТО ZH400-900 у китайских перепродавцов, подшипник ZH 4000/7000/10000. Atlas Copco объявил об уходе из России; в регионе работают дочерние общества в Турции, ОАЭ, Индии, Китае. Субпоставщики узлов в открытых источниках почти не видны: ключевые узлы (элементы, Elektronikon, двигатели с магнитными подшипниками ZH 350+, инверторы Neos) — собственные.",
+  "machines": [
+    {
+      "model": "GA 5-37 VSDs",
+      "kind": "винтовой маслозаполненный компрессор с частотным приводом",
+      "segment": "компрессор",
+      "rating": "5-37 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/products/air-compressor/rotary-screw-compressor/ga-vsds-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GA 7-37 VSD+",
+      "kind": "винтовой маслозаполненный компрессор VSD",
+      "segment": "компрессор",
+      "rating": "7-37 кВт",
+      "status": "выпускается (источник — листовка GA 37-110 VSD+ из папки ga7-37_vsd_plus; листовка GA 7-37 VSD+ 2935098145 по прямому адресу не найдена)",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/industrial-air/documents/leaflets/compressors/ga7-37_vsd_plus/2935081743_L.pdf"
+      ],
+      "verified": false
+    },
+    {
+      "model": "GA 37+ - 45+",
+      "kind": "винтовой маслозаполненный компрессор",
+      "segment": "компрессор",
+      "rating": "37-45 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/products/air-compressor/oil-injected-rotary-screw-air-compressor/ga-37-plus-45-plus"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GA 37-90",
+      "kind": "винтовой маслозаполненный компрессор",
+      "segment": "компрессор",
+      "rating": "37-90 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/products/air-compressor/rotary-screw-compressor/ga-screw-compressor"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GA 30+-90 / GA 37-110 VSD+",
+      "kind": "винтовой маслозаполненный компрессор",
+      "segment": "компрессор",
+      "rating": "30-110 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/industrial-air/documents/brochures/ga-30-plus-90-ga-37-110-vsd-plus-30-110kw.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GA 30+-90 / GA 37-90 VSD (поколение 2013)",
+      "kind": "винтовой маслозаполненный компрессор",
+      "segment": "компрессор",
+      "rating": "30-90 кВт",
+      "status": "предыдущее поколение",
+      "sources": [
+        "https://www.e-pneumatic.com/media/pdf/atlas-copco-ga-37-manual.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GA 90+-160 (VSD+)",
+      "kind": "винтовой маслозаполненный компрессор",
+      "segment": "компрессор",
+      "rating": "90-160 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/GA%2090+%20-%20160%20(VSD+)_EN.pdf",
+        "https://www.atlascopco.com/en-us/compressors/customerbenefit/ga90plus-160vsd"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GA 160+-315 (VSD)",
+      "kind": "винтовой маслозаполненный компрессор",
+      "segment": "компрессор",
+      "rating": "160-315 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/GA160+-315%20VSD%20English_leaflet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GA 355-900",
+      "kind": "винтовой маслозаполненный компрессор",
+      "segment": "компрессор",
+      "rating": "355-900 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/manuals/ga-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GA 11-160 (старые серии GA11...GA160, GA C, GA PLUS)",
+      "kind": "винтовой маслозаполненный компрессор",
+      "segment": "компрессор",
+      "rating": "11-160 кВт",
+      "status": "снята, в эксплуатации",
+      "sources": [
+        "https://compressornow.com/atlas-copco-service-kits/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZT15-45 / ZR30-45",
+      "kind": "безмасляный винтовой компрессор, ZT воздушное, ZR водяное охлаждение",
+      "segment": "компрессор",
+      "rating": "15-45 кВт",
+      "status": "предыдущее поколение",
+      "sources": [
+        "https://www.manualslib.com/manual/1599926/Atlas-Copco-Zt-Series.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZR/ZT 55-90 (VSD) (FF)",
+      "kind": "безмасляный винтовой компрессор",
+      "segment": "компрессор",
+      "rating": "55-90 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/products/air-compressor/oil-free-air-compressors/rotary-screw-air-compressors-zr-zt"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZR/ZT 75-160 VSD+",
+      "kind": "безмасляный винтовой компрессор VSD",
+      "segment": "компрессор",
+      "rating": "75-160 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/products/air-compressor/oil-free-air-compressors/rotary-screw-air-compressors-zr-zt"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZR/ZT 110-160 (VSD) FF",
+      "kind": "безмасляный винтовой компрессор",
+      "segment": "компрессор",
+      "rating": "110-160 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZRZT-110-160-(VSD)-FF.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZR/ZT 160-315 (VSD)",
+      "kind": "безмасляный винтовой компрессор",
+      "segment": "компрессор",
+      "rating": "160-315 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/products/air-compressor/oil-free-air-compressors/rotary-screw-air-compressors-zr-zt"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZR/ZT 200-355 VSD+",
+      "kind": "безмасляный винтовой компрессор VSD",
+      "segment": "компрессор",
+      "rating": "200-355 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/products/air-compressor/oil-free-air-compressors/rotary-screw-air-compressors-zr-zt"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZR 300-750 кВт / ZR-ZT 400-900 кВт VSD",
+      "kind": "безмасляный винтовой компрессор большой мощности",
+      "segment": "компрессор",
+      "rating": "300-900 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/products/air-compressor/oil-free-air-compressors/rotary-screw-air-compressors-zr-zt"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZH 350+",
+      "kind": "центробежный безмасляный компрессор, высокоскоростной привод, магнитные подшипники",
+      "segment": "компрессор",
+      "rating": "350 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZH350plus%20brochure_LR_ineko.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZH+ & ZH 355-900",
+      "kind": "центробежный безмасляный компрессор",
+      "segment": "компрессор",
+      "rating": "355-900 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZH_plus_ZH_355-900_ZH_630-1600_leaflet_EN_LR_ineko.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZH+ & ZH 630-1600",
+      "kind": "центробежный безмасляный компрессор",
+      "segment": "компрессор",
+      "rating": "630-1600 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZH_plus_ZH_355-900_ZH_630-1600_leaflet_EN_LR_ineko.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZH 1000-3150",
+      "kind": "центробежный безмасляный компрессор",
+      "segment": "компрессор",
+      "rating": "1000-3150 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZH%20&%20ZH+%20series%20(355-3150%20kW)_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZH 4000-26000 (ZH 4000, ZH 7000, ZH 10000 и др.)",
+      "kind": "центробежный безмасляный компрессор большой производительности",
+      "segment": "компрессор",
+      "rating": "класс ZH 4000-26000",
+      "status": "в эксплуатации",
+      "sources": [
+        "https://www.aircompressoragent.com/product/atlas-copco-1320406611-journal-and-thrust-combination-bearing"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ZH400-ZH900 (предыдущее поколение)",
+      "kind": "центробежный безмасляный компрессор",
+      "segment": "компрессор",
+      "rating": "400-900 кВт",
+      "status": "снята, в эксплуатации",
+      "sources": [
+        "https://www.answk.com/product/atlas-copco-zh-and-zh-centrifugal-compressor-and-spare-parts/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Instruction book, Stationary air compressors ZT15-ZT45, ZR30-ZR45",
+      "doc_no": "2920 1472 03 (заменяет 2920 1472 02)",
+      "machine": "ZT15, ZT18, ZT22, ZT30, ZT37, ZT45, ZR30, ZR37, ZR45",
+      "kind": "O&M (instruction book)",
+      "sources": [
+        "https://www.manualslib.com/manual/1599926/Atlas-Copco-Zt-Series.html"
+      ]
+    },
+    {
+      "title": "Instruction book, Atlas Copco Stationary Air Compressors ZT/ZR 55-75-90",
+      "doc_no": "2920 1452 02",
+      "machine": "ZT55-90, ZR55-90",
+      "kind": "O&M (instruction book)",
+      "sources": [
+        "https://jahancompressor.com/wp-content/uploads/2022/11/Atlas-Copco-instruction-book-zt-zr-55-75-90-%D8%AC%D9%87%D8%A7%D9%86-%DA%A9%D9%85%D9%BE%D8%B1%D8%B3%D9%88%D8%B1.pdf"
+      ]
+    },
+    {
+      "title": "Atlas Copco GA 37 VSD instruction book",
+      "machine": "GA 37 VSD, GA 45 VSD",
+      "kind": "O&M (instruction book)",
+      "sources": [
+        "https://www.manualslib.com/manual/1772023/Atlas-Copco-Ga-37-Vsd.html"
+      ]
+    },
+    {
+      "title": "Atlas Copco GA 37+ instruction book",
+      "machine": "GA 37+, GA 45+, GA 55, GA 75",
+      "kind": "O&M (instruction book)",
+      "sources": [
+        "https://www.manualslib.com/manual/3389165/Atlas-Copco-Ga-37Plus.html",
+        "https://manuals.plus/m/17f6274e2d6514114fc0aaf809eb7ec7c59b0b612530838ce5970008dde8038b"
+      ]
+    },
+    {
+      "title": "Oil-injected Rotary Screw Compressors GA 30+-90/GA 37-90 VSD (30-90 kW)",
+      "doc_no": "2935 0892 47",
+      "machine": "GA 30+-90, GA 37-90 VSD",
+      "kind": "брошюра (технические данные)",
+      "sources": [
+        "https://www.e-pneumatic.com/media/pdf/atlas-copco-ga-37-manual.pdf"
+      ]
+    },
+    {
+      "title": "GA 37-110 VSD+ oil-injected rotary screw compressors, leaflet",
+      "doc_no": "2935081743",
+      "machine": "GA VSD+",
+      "kind": "брошюра (технические данные)",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/industrial-air/documents/leaflets/compressors/ga7-37_vsd_plus/2935081743_L.pdf"
+      ]
+    },
+    {
+      "title": "GA compressors official manuals (библиотека руководств, полные книги по серийному номеру через SMARTLINK)",
+      "machine": "серия GA",
+      "kind": "каталог руководств изготовителя",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/manuals/ga-series"
+      ]
+    },
+    {
+      "title": "ZR & ZT compressors official manuals",
+      "machine": "серия ZR/ZT",
+      "kind": "каталог руководств изготовителя",
+      "sources": [
+        "https://www.atlascopco.com/en-us/compressors/manuals/zr-zt-series"
+      ]
+    },
+    {
+      "title": "Oil-free centrifugal compressors ZH+ & ZH 355-900 / ZH 630-1600, leaflet",
+      "machine": "ZH/ZH+ 355-1600",
+      "kind": "брошюра (технические данные)",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZH_plus_ZH_355-900_ZH_630-1600_leaflet_EN_LR_ineko.pdf"
+      ]
+    },
+    {
+      "title": "Oil-free high-speed drive centrifugal compressor ZH 350+, brochure",
+      "machine": "ZH 350+",
+      "kind": "брошюра (технические данные)",
+      "sources": [
+        "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZH350plus%20brochure_LR_ineko.pdf"
+      ]
+    },
+    {
+      "title": "Таблица сервисных наборов Atlas Copco: воздушные, масляные фильтры и сепараторы GA по моделям и серийным номерам (дилер)",
+      "machine": "GA5-GA450, GX, XA/XAS",
+      "kind": "таблица применяемости запчастей (дилер)",
+      "sources": [
+        "https://compressornow.com/atlas-copco-service-kits/"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "1614874799",
+      "issuer": "Atlas Copco",
+      "description": "Элемент масляного фильтра (=1614.8747.00) для безмасляных ZR/ZT",
+      "machine": "ZR/ZT",
+      "unit": "система смазки",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/1614874799/oilfilterel-1614874700",
+      "quote": "OIL FILTER ELEMENT(=1614.8747.00) FOR ZR ZT OIL FREE COMPRESSORS | 1614874799 | Atlas Copco"
+    },
+    {
+      "code": "1614.8747.00",
+      "issuer": "Atlas Copco",
+      "description": "Элемент масляного фильтра ZR/ZT (прежний номер, заменён на 1614874799)",
+      "machine": "ZR/ZT",
+      "unit": "система смазки",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/1614874799/oilfilterel-1614874700",
+      "quote": "OIL FILTER ELEMENT(=1614.8747.00) FOR ZR ZT OIL FREE COMPRESSORS"
+    },
+    {
+      "code": "2903088200",
+      "issuer": "Atlas Copco",
+      "description": "Масляный фильтр для безмасляных машин ZR-ZT (альтернативный номер 1030 0882 00)",
+      "machine": "ZR/ZT",
+      "unit": "система смазки",
+      "source_url": "https://shopct.atlascopco.com/en-FR/products/2903088200/1030-0882-00oil-filter",
+      "quote": "OIL FILTER FOR OIL FREE ZR-ZT MACHINES | 2903088200 | Atlas Copco"
+    },
+    {
+      "code": "2901110500",
+      "issuer": "Atlas Copco",
+      "description": "Набор фильтров воздух+масло для ZR/ZT",
+      "machine": "ZR/ZT",
+      "unit": "сервисный набор ТО",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/2901110500/kit-filter-airoil",
+      "quote": "KIT FILTER AIR+OIL FOR ZR ZT OIL FREE COMPRESSORS | 2901110500 - KIT FILTER AIR+OIL | Atlas Copco"
+    },
+    {
+      "code": "2906054900",
+      "issuer": "Atlas Copco",
+      "description": "Годовой набор ТО для ZR/ZT",
+      "machine": "ZR/ZT",
+      "unit": "сервисный набор ТО",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/2906054900/yearly-maintenence-kit",
+      "quote": "YEARLY MAINTENENCE KIT FOR ZR ZT OIL FREE COMPRESSORS | 2906054900 | Atlas Copco"
+    },
+    {
+      "code": "2906074300",
+      "issuer": "Atlas Copco",
+      "description": "Набор ТО на 16000 ч для ZR/ZT 110-145",
+      "machine": "ZR/ZT 110-145",
+      "unit": "сервисный набор ТО",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/2906074300/zrzt-110-145-16000h-maint",
+      "quote": "ZR/ZT 110-145 16000H MAINT FOR ZR ZT OIL FREE COMPRESSORS | 2906074300 | Atlas Copco"
+    },
+    {
+      "code": "2906073000",
+      "issuer": "Atlas Copco (по данным стороннего продавца)",
+      "description": "Набор фильтров воздух/масло для ZR/ZT 160 VSD",
+      "machine": "ZR/ZT 160 VSD",
+      "unit": "сервисный набор ТО",
+      "source_url": "https://www.mengmafilter.com/showroom/atlas-copco-zr-zt160vsd-air-oil-filter-kit-2906073000.html",
+      "quote": "Atlas Copco Zr/Zt160VSD Air/Oil Filter Kit 2906073000",
+      "doc_ref": "подтверждён только страницей стороннего продавца, на shopct.atlascopco.com не проверен"
+    },
+    {
+      "code": "2906049800",
+      "issuer": "Atlas Copco",
+      "description": "Набор капремонта впускного клапана для безмасляных ZR/ZT",
+      "machine": "ZR/ZT 110-145 (по польскому названию «Z 110-145»)",
+      "unit": "впускной (регулирующий) клапан",
+      "source_url": "https://shopct.atlascopco.com/en-US/products/2906049800/inlet-valve-overhaul-kit",
+      "quote": "INLET VALVE OVERHAUL KIT FOR ZR ZT OIL FREE COMPRESSORS | 2906049800 | Atlas Copco",
+      "doc_ref": "Скептик: код на странице есть, но в нынешнем английском заголовке нет «ZR ZT» — цитата снята при разведке, заголовок, видимо, изменился; на ZR/ZT указывает польское название «Z 110-145»"
+    },
+    {
+      "code": "2908 8503 00",
+      "issuer": "Atlas Copco",
+      "description": "Масло Roto-Z, канистра 5 л",
+      "machine": "ZT15-45, ZR30-45",
+      "unit": "система смазки (редуктор)",
+      "doc_ref": "Instruction book 2920 1472 03",
+      "source_url": "https://www.manualslib.com/manual/1599926/Atlas-Copco-Zt-Series.html?page=53",
+      "quote": "Quantity Ordering number 5-litre can 2908 8503 00 20-litre can 2908 8501 01 209-litre drum 2908 8500 00"
+    },
+    {
+      "code": "2908 8501 01",
+      "issuer": "Atlas Copco",
+      "description": "Масло Roto-Z, канистра 20 л",
+      "machine": "ZT15-45, ZR30-45",
+      "unit": "система смазки (редуктор)",
+      "doc_ref": "Instruction book 2920 1472 03",
+      "source_url": "https://www.manualslib.com/manual/1599926/Atlas-Copco-Zt-Series.html?page=53",
+      "quote": "20-litre can 2908 8501 01"
+    },
+    {
+      "code": "2906909800",
+      "issuer": "Atlas Copco",
+      "description": "Набор ТО 4000 ч для ZH9000/2",
+      "machine": "ZH 9000",
+      "unit": "сервисный набор ТО",
+      "source_url": "https://shopct.atlascopco.com/en-GB/products/2906909800/zh90002-4000hr-maint-kit",
+      "quote": "ZH9000/2 4000HR MAINT. KIT FOR OIL-FREE TURBO COMPRESSORS | 2906909800 | Atlas Copco"
+    },
+    {
+      "code": "3001500720",
+      "issuer": "Atlas Copco",
+      "description": "Набор прокладок Victaulic для центробежных компрессоров",
+      "machine": "ZH",
+      "unit": "трубопроводы, уплотнения",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/3001500720/victaulic-gasket-kit",
+      "quote": "VICTAULIC GASKET KIT FOR OIL-FREE TURBO COMPRESSORS | 3001500720 | Atlas Copco"
+    },
+    {
+      "code": "2230 0142 00",
+      "issuer": "Atlas Copco (по данным стороннего продавца)",
+      "description": "Сервисный набор 8000 ч ZH400-ZH900",
+      "machine": "ZH400-ZH900",
+      "unit": "сервисный набор ТО",
+      "source_url": "https://www.answk.com/product/atlas-copco-zh-and-zh-centrifugal-compressor-and-spare-parts/",
+      "quote": "2230 0142 00 – KIT SERVICE 8000H ZH400-ZH900",
+      "doc_ref": "подтверждён только страницей стороннего продавца, на shopct.atlascopco.com не проверен"
+    },
+    {
+      "code": "2230 0142 03",
+      "issuer": "Atlas Copco (по данным стороннего продавца)",
+      "description": "Сервисный набор 24000 ч ZH400-ZH900",
+      "machine": "ZH400-ZH900",
+      "unit": "сервисный набор ТО",
+      "source_url": "https://www.answk.com/product/atlas-copco-zh-and-zh-centrifugal-compressor-and-spare-parts/",
+      "quote": "2230 0142 03 – KIT SERVICE 24000H ZH400-ZH900",
+      "doc_ref": "подтверждён только страницей стороннего продавца, на shopct.atlascopco.com не проверен"
+    },
+    {
+      "code": "2230 0142 05",
+      "issuer": "Atlas Copco (по данным стороннего продавца)",
+      "description": "Сервисный набор 48000 ч ZH400-ZH900",
+      "machine": "ZH400-ZH900",
+      "unit": "сервисный набор ТО",
+      "source_url": "https://www.answk.com/product/atlas-copco-zh-and-zh-centrifugal-compressor-and-spare-parts/",
+      "quote": "2230 0142 05 – KIT SERVICE48000H ZH400-ZH900",
+      "doc_ref": "подтверждён только страницей стороннего продавца, на shopct.atlascopco.com не проверен"
+    },
+    {
+      "code": "2230 0142 04",
+      "issuer": "Atlas Copco (по данным стороннего продавца)",
+      "description": "Набор уплотнений охладителя ZH400-ZH900",
+      "machine": "ZH400-ZH900",
+      "unit": "промежуточный / концевой охладитель",
+      "source_url": "https://www.answk.com/product/atlas-copco-zh-and-zh-centrifugal-compressor-and-spare-parts/",
+      "quote": "2230 0142 04 – COOLER SEAL KIT ZH400-ZH900",
+      "doc_ref": "подтверждён только страницей стороннего продавца, на shopct.atlascopco.com не проверен"
+    },
+    {
+      "code": "2906 0314 00",
+      "issuer": "Atlas Copco (по данным стороннего продавца)",
+      "description": "Набор клапана слива конденсата промежуточного охладителя ZH400-900",
+      "machine": "ZH400-ZH900",
+      "unit": "промежуточный охладитель, дренаж",
+      "source_url": "https://www.answk.com/product/atlas-copco-zh-and-zh-centrifugal-compressor-and-spare-parts/",
+      "quote": "2906 0314 00 – ZH400-900 IC DRAIN VLV KIT",
+      "doc_ref": "подтверждён только страницей стороннего продавца, на shopct.atlascopco.com не проверен"
+    },
+    {
+      "code": "2906 0380 00",
+      "issuer": "Atlas Copco (по данным стороннего продавца)",
+      "description": "Набор клапана слива конденсата концевого охладителя ZH400-900",
+      "machine": "ZH400-ZH900",
+      "unit": "концевой охладитель, дренаж",
+      "source_url": "https://www.answk.com/product/atlas-copco-zh-and-zh-centrifugal-compressor-and-spare-parts/",
+      "quote": "2906 0380 00 – ZH400-900 AC DRAIN VALVE KIT",
+      "doc_ref": "подтверждён только страницей стороннего продавца, на shopct.atlascopco.com не проверен"
+    },
+    {
+      "code": "1320406611",
+      "issuer": "Atlas Copco (по данным стороннего продавца)",
+      "description": "Подшипник опорно-упорный комбинированный (BRG JNL/THR 1.625ID) вала второй ступени",
+      "machine": "ZH 4000, ZH 7000, ZH 10000",
+      "unit": "подшипники ротора 2-й ступени",
+      "source_url": "https://www.aircompressoragent.com/product/atlas-copco-1320406611-journal-and-thrust-combination-bearing",
+      "quote": "Atlas Copco lists the 1320406611 for the second-stage shaft of the ZH 4000, ZH 7000 and ZH 10000 centrifugal compressors",
+      "doc_ref": "подтверждён только страницей стороннего продавца, на shopct.atlascopco.com не проверен"
+    },
+    {
+      "code": "2901145300",
+      "issuer": "Atlas Copco",
+      "description": "Набор клапана минимального давления, маслозаполненные винтовые 30-90 кВт",
+      "machine": "GA 30-90 кВт",
+      "unit": "клапан минимального давления",
+      "source_url": "https://shopct.atlascopco.com/en-US/products/2901145300/kit-valve-minimum-pressure",
+      "quote": "KIT VALVE MINIMUM PRESSURE FOR OIL INJECTED SCREW COMPRESSOR | 2901145300 | Atlas Copco"
+    },
+    {
+      "code": "2906095800",
+      "issuer": "Atlas Copco",
+      "description": "Набор разгрузочного клапана для GA90-160",
+      "machine": "GA90-160",
+      "unit": "разгрузочный (впускной) клапан",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/2906095800/kit-unloader-valve",
+      "quote": "UNLOADER VALVE KIT FOR OIL INJECTED SCREW COMPRESSORS | 2906095800 | Atlas Copco"
+    },
+    {
+      "code": "2901000201",
+      "issuer": "Atlas Copco",
+      "description": "Набор разгрузочного клапана SCU GA11-30",
+      "machine": "GA11-30",
+      "unit": "разгрузочный клапан",
+      "source_url": "https://shopct.atlascopco.com/en-US/products/2901000201/kit-unloader-valve-scu-ga11-30",
+      "quote": "KIT UNLOADER VALVE SCU GA11-30 | 2901000201 | Atlas Copco",
+      "doc_ref": "Скептик: английский заголовок страницы — «UNLOADER VALVE KIT», «SCU GA11-30» стоит в локализованных названиях"
+    },
+    {
+      "code": "2901162200",
+      "issuer": "Atlas Copco",
+      "description": "Набор капремонта разгрузочного клапана",
+      "machine": "GA",
+      "unit": "разгрузочный клапан",
+      "source_url": "https://shopct.atlascopco.com/en-US/products/2901162200/unloader-valve-overhaul-kit",
+      "quote": "UNLOADER VALVE OVERHAUL KIT FOR OIL INJECTED SCREW COMPRESSOR | 2901162200 - UNLOADER VALVE OVERHAUL KIT | Atlas Copco"
+    },
+    {
+      "code": "2902035000",
+      "issuer": "Atlas Copco",
+      "description": "Набор термостатического клапана",
+      "machine": "GA",
+      "unit": "термостатический клапан масляного контура",
+      "source_url": "https://shopct.atlascopco.com/en-GX/products/2902035000/thermostatic-valve-kit",
+      "quote": "THERMOSTATIC VALVE KIT FOR OIL INJECTED SCREW COMPRESSOR | 2902035000 | Atlas Copco"
+    },
+    {
+      "code": "1625703600",
+      "issuer": "Atlas Copco",
+      "description": "Маслоотделитель (сепаратор) GA11-30",
+      "machine": "GA11-30",
+      "unit": "маслоотделитель",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/1625703600/separator-oil-ga11-30",
+      "quote": "SEPARATOR OIL GA11-30 FOR OIL INJECTED SCREW COMPRESSORS | 1625703600 | Atlas Copco"
+    },
+    {
+      "code": "2901205500",
+      "issuer": "Atlas Copco",
+      "description": "Набор сепаратора GA 30-40 кВт",
+      "machine": "GA 30-40 кВт",
+      "unit": "маслоотделитель",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/2901205500/separator-kit-ga-30-40kw",
+      "quote": "SEPARATOR KIT GA 30-40KW FOR OIL INJECTED SCREW COMPRESSOR | 2901205500 | Atlas Copco"
+    },
+    {
+      "code": "2901920040",
+      "issuer": "Atlas Copco",
+      "description": "Набор сепаратора GA 55-90 кВт",
+      "machine": "GA 55-90 кВт",
+      "unit": "маслоотделитель",
+      "source_url": "https://shopct.atlascopco.com/en-INT/products/2901920040/kit-separator-ga55-90kw",
+      "quote": "SEPARATOR KIT GA 55-90KW FOR OIL INJECTED SCREW COMPRESSORS | 2901920040 | Atlas Copco"
+    },
+    {
+      "code": "1622065800",
+      "issuer": "Atlas Copco",
+      "description": "Элемент воздушного фильтра, маслозаполненный винтовой компрессор",
+      "machine": "маслозаполненный винтовой компрессор (модель на странице изготовителя не указана)",
+      "unit": "воздушный фильтр",
+      "source_url": "https://shopct.atlascopco.com/en-US/products/1622065800/air-filter-element",
+      "quote": "AIR FILTER (ELEMENT) FOR OIL INJECTED SCREW COMPRESSOR | 1622065800 | Atlas Copco",
+      "doc_ref": "по таблице дилера compressornow — GX4; на странице shopct привязки к модели нет"
+    },
+    {
+      "code": "1089057568",
+      "issuer": "Atlas Copco",
+      "description": "Датчик давления (преобразователь) для маслозаполненного винтового компрессора",
+      "machine": "GA",
+      "unit": "система управления Elektronikon, датчики",
+      "source_url": "https://shopct.atlascopco.com/en-US/products/1089057568/pressure-transducer",
+      "quote": "PRESSURE TRANSDUCER FOR OIL INJECTED SCREW COMPRESSOR | 1089057568 | Atlas Copco"
+    },
+    {
+      "code": "1613610590",
+      "issuer": "Atlas Copco",
+      "description": "Масляный фильтр (навинчиваемый)",
+      "machine": "GA37 (с сер. № 315330); также GA11-GA160 старых серий",
+      "unit": "система смазки",
+      "source_url": "https://compressornow.com/atlas-copco-service-kits/",
+      "quote": "GA37 From 315330 1613610590"
+    },
+    {
+      "code": "1630840180",
+      "issuer": "Atlas Copco",
+      "description": "Масляный фильтр",
+      "machine": "GA37 PLUS (с сер. № 507438)",
+      "unit": "система смазки",
+      "source_url": "https://compressornow.com/atlas-copco-service-kits/",
+      "quote": "GA37 PLUS From 507438 1630840180"
+    },
+    {
+      "code": "2901162600",
+      "issuer": "Atlas Copco",
+      "description": "Набор сепаратора (маслоотделителя)",
+      "machine": "GA37 PLUS (с сер. № 507438), GA30-GA55 PLUS/VSD",
+      "unit": "маслоотделитель",
+      "source_url": "https://compressornow.com/atlas-copco-service-kits/",
+      "quote": "GA37 PLUS From 507438 2901162600"
+    },
+    {
+      "code": "2901056602",
+      "issuer": "Atlas Copco",
+      "description": "Сепаратор (маслоотделитель)",
+      "machine": "GA37 1998 (с сер. № 360000)",
+      "unit": "маслоотделитель",
+      "source_url": "https://compressornow.com/atlas-copco-service-kits/",
+      "quote": "GA37 1998 From 360000 2901056602"
+    },
+    {
+      "code": "1613740800",
+      "issuer": "Atlas Copco",
+      "description": "Элемент воздушного фильтра",
+      "machine": "GA45 (с сер. № 315330), GA37-GA55",
+      "unit": "воздушный фильтр",
+      "source_url": "https://compressornow.com/atlas-copco-service-kits/",
+      "quote": "GA45 Starting 315330 1613740800"
+    },
+    {
+      "code": "1630040699",
+      "issuer": "Atlas Copco",
+      "description": "Элемент воздушного фильтра",
+      "machine": "GA90 1999 (с сер. № 056813), GA110-GA315",
+      "unit": "воздушный фильтр",
+      "source_url": "https://compressornow.com/atlas-copco-service-kits/",
+      "quote": "GA90 1999 Starting 056813 1630040699"
+    },
+    {
+      "code": "1621737890",
+      "issuer": "Atlas Copco",
+      "description": "Масляный фильтр",
+      "machine": "GA90-GA160 10-14 бар с 2008",
+      "unit": "система смазки",
+      "source_url": "https://compressornow.com/atlas-copco-service-kits/",
+      "quote": "GA90 – 10-14 Bar From 2008 1621737890"
+    },
+    {
+      "code": "2901077901",
+      "issuer": "Atlas Copco",
+      "description": "Сепаратор (маслоотделитель)",
+      "machine": "GA18 C (с сер. № 268500), GA11-GA30C",
+      "unit": "маслоотделитель",
+      "source_url": "https://compressornow.com/atlas-copco-service-kits/",
+      "quote": "GA18 C From 268500 2901077901"
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "3001523000",
+      "verdict": "не подтверждён",
+      "reason": "Код есть, но заголовок страницы другой: «AIR / WATER FILTER KIT 15L FOR OIL FREE COMPRESSORS», без «ZR ZT». Описание страницы — про работу осушителя, немецкое название «Kit Luft-Wasserfilter WIS20-40». Привязка к ZR/ZT и цитата источником не подтверждаются."
+    },
+    {
+      "code": "2906909000",
+      "verdict": "не подтверждён",
+      "reason": "Код и «OIL COOLER KIT FOR OIL-FREE TURBO COMPRESSORS» на странице есть, но ZH250 нигде не упомянут. В немецком названии «OELKUEHLER KIT ZH9000/3», то есть привязка к ZH250 неверна."
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "Siemens",
+      "component": "частотный преобразователь (инвертор) привода",
+      "machine": "GA18 VSD FF (ранние VSD)",
+      "evidence": "Описание продавца бывшей в употреблении машины: «It is equipped with an inverter (Siemens inverter) for speed control.» Единичное свидетельство, не подтверждено изготовителем; в новых VSD+ используется собственный инвертор Atlas Copco Neos.",
+      "sources": [
+        "https://www.exapro.com/atlas-copco-ga18-vsd-ff-p250516143/"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Atlas Copco Services Middle East (дочернее общество, Дубай)",
+      "country": "ОАЭ",
+      "role": "продажи, запчасти и сервис компрессоров; региональная сеть на ОАЭ, Оман, Бахрейн, Катар, Ирак, Йемен",
+      "sources": [
+        "https://www.atlascopco.com/en-ae/dubai-customer-center/uae-office-address",
+        "https://www.atlascopco.com/en-ae/compressors/contact-compressors-middle-east/authorized-partners"
+      ]
+    },
+    {
+      "company": "Atlas Copco Kompresör Tekniği Türkiye (Тузла, Стамбул)",
+      "country": "Турция",
+      "role": "дочернее общество: продажи и сервис компрессоров; ведёт список авторизованных дистрибьюторов для Турции, Грузии, Туркменистана, Азербайджана",
+      "sources": [
+        "https://www.atlascopco.com/tr-tr/compressors/iletisim/kompresor-teknik-istanbul",
+        "https://www.atlascopco.com/tr-tr/compressors/distributor-listesi"
+      ]
+    },
+    {
+      "company": "Dost Kompresör ve Endüstri Makinalari (приобретена Atlas Copco в 2013)",
+      "country": "Турция",
+      "role": "дистрибьютор и сервис компрессоров, вошёл в группу Atlas Copco",
+      "sources": [
+        "https://www.atlascopcogroup.com/en/media/press-releases/2013/130909-turkey"
+      ]
+    },
+    {
+      "company": "Atlas Copco (India) Ltd, Compressor Technique (Даподи, Пуна)",
+      "country": "Индия",
+      "role": "дочернее общество: производство безмасляных компрессоров, продажи и сервис, региональные офисы",
+      "sources": [
+        "https://www.atlascopco.com/en-in/compressors/contact-us/regional-offices",
+        "https://www.motorindiaonline.in/atlas-copcos-new-compressor-facility-in-pune-commissioned/"
+      ]
+    },
+    {
+      "company": "Atlas Copco (Wuxi) Compressor Co., Ltd.",
+      "country": "Китай",
+      "role": "завод винтовых компрессоров и центр НИОКР группы",
+      "sources": [
+        "https://www.atlascopcogroup.com/en/media/press-releases/2023/20230626-wuxi-groundbreaking",
+        "https://www.atlascopcogroup.com/en/media/press-releases/2006/atlas-copco-opens-screw-compressor-manufacturing-plant-in-china"
+      ]
+    },
+    {
+      "company": "Atlas Copco China",
+      "country": "Китай",
+      "role": "дочернее общество, продажи и сервис",
+      "sources": [
+        "https://www.atlascopco.com.cn/en-cn"
+      ]
+    },
+    {
+      "company": "DKSH Technology",
+      "country": "Азия (Юго-Восточная)",
+      "role": "дистрибьютор оборудования Atlas Copco, в т. ч. ZH 350+",
+      "sources": [
+        "https://technology-products.dksh.com/product/atlas-copco-zh-350plus/"
+      ]
+    },
+    {
+      "company": "Atlas Copco Rental Kazakhstan",
+      "country": "Казахстан",
+      "role": "аренда передвижных компрессоров и бустеров, техническая поддержка (не стационарные GA/ZR/ZH)",
+      "sources": [
+        "https://www.atlascopco.com/en-uk/rental/news/news-europe/pressure-testing-gas-pipeline-kazakhstan"
+      ]
+    },
+    {
+      "company": "Atlas Copco Россия",
+      "country": "Россия",
+      "role": "прекращение деятельности: поставки остановлены в 2022 г., группа объявила об уходе с рынка",
+      "sources": [
+        "https://swedenherald.com/article/atlas-copco-is-discontinuing-operations-in-russia",
+        "https://leave-russia.org/atlas-copco"
+      ]
+    },
+    {
+      "company": "Answk",
+      "country": "Китай",
+      "role": "неофициальный продавец запчастей и сервисных наборов ZH/ZR/GA (не авторизован изготовителем)",
+      "sources": [
+        "https://www.answk.com/product/atlas-copco-zh-and-zh-centrifugal-compressor-and-spare-parts/"
+      ]
+    },
+    {
+      "company": "Seadweer (aircompressoragent.com)",
+      "country": "Китай",
+      "role": "неофициальный продавец запчастей, в т. ч. для ZH 4000-10000",
+      "sources": [
+        "https://www.aircompressoragent.com/product/atlas-copco-1320406611-journal-and-thrust-combination-bearing"
+      ]
+    },
+    {
+      "company": "Bhawani Sales & Service",
+      "country": "Индия",
+      "role": "торговец запчастями и сервисными наборами Atlas Copco (Ахмадабад), статус авторизации не подтверждён",
+      "sources": [
+        "https://www.bhawanisalesservice.com/atlas-copco-air-compressor-parts-service-kits.html"
+      ]
+    },
+    {
+      "company": "Alkom Kompresör",
+      "country": "Турция",
+      "role": "независимый сервис Atlas Copco в Стамбуле, статус авторизации не подтверждён",
+      "sources": [
+        "https://www.alkomkompresor.com/atlas-copco-servis-istanbul"
+      ]
+    }
+  ],
+  "gaps": [
+    "Полные каталоги запчастей (parts list) GA/ZR/ZT/ZH открыто не публикуются: выдаются по серийному номеру через SMARTLINK / портал клиента Atlas Copco и с машиной.",
+    "Состав сервисных наборов (какие фильтры и уплотнения внутри 2906..., 2230 0142 ...) на shopct.atlascopco.com показывается динамически, при простой загрузке страницы не виден.",
+    "Коды для современных ZH+ / ZH 355-3150 и ZH 4000-26000 (фильтры воздуха, масла, уплотнения, подшипники, датчики вибрации) почти не представлены открыто; нашлись только наборы ZH400-900 у китайского перепродавца, подшипник 1320406611 и набор ZH9000/2. Таблица aircompressorstrade.com по ZH400-900 закрыта защитой Cloudflare (403).",
+    "Инструкция ZT/ZR 55-90 (2920 1452 02) с сайта jahancompressor.com не скачалась: номер виден только в заголовке файла в выдаче поиска; таблицы сервисных наборов из неё не извлечены.",
+    "Субпоставщики узлов не установлены: винтовые элементы, контроллер Elektronikon, инверторы Neos, высокоскоростные двигатели и магнитные подшипники ZH 350+ Atlas Copco заявляет как собственные разработки; изготовители фильтроэлементов, двигателей GA/ZR/ZH, редукторов и подшипников ZH в открытых источниках не названы (вероятно, только в договорах поставки и таблицах запчастей с маркировкой изготовителя).",
+    "Список авторизованных дистрибьюторов в Турции, странах Персидского залива, Казахстане и Узбекистане на сайте изготовителя загружается интерактивно, названия компаний не извлечены; сведений о сервисных партнёрах в России после 2022 г. нет.",
+    "Номер 1622065800 по таблице дилера относится к GX4, а применимость к конкретным моделям GA на странице изготовителя не указана; датчик 1089057568 без привязки к модели."
+  ],
+  "verifier_notes": "Проверено 38 кодов, 23 модели и 1 субпоставщик; не подтверждены 2 кода.\n1) 3001523000: цитаты «FOR ZR ZT» на странице нет. Заголовок — «FOR OIL FREE COMPRESSORS», немецкое название «WIS20-40», описание — про осушитель.\n2) 2906909000: ZH250 не подтверждён, немецкое название указывает на ZH9000/3.\nНеточные цитаты при подтверждённом коде:\n- 2906049800: в заголовке нет «ZR ZT», на ZR/ZT указывает польское название «Z 110-145».\n- 2901000201: английский заголовок «UNLOADER VALVE KIT», «SCU GA11-30» стоит в локализованных названиях.\n- 3001523000 и 2906049800: заголовки страниц, видимо, изменились с момента разведки.\nПрочее:\n- У GA 7-37 VSD+ источник указывает на листовку GA 37-110 VSD+; нужно заменить ссылку на 2935098145_L (1).pdf.\n- Коды Roto-Z находятся на странице 53 руководства на manualslib (?page=53), а не на первой.\n- ien.eu не отвечает (curl без ответа).\n- Коды 2230 0142 xx и 2906 03xx 00 (answk.com), 1320406611 (aircompressoragent.com) и 2906073000 (mengmafilter.com) подтверждены только сторонними продавцами, на shopct.atlascopco.com не проверены.\n- Привязка 1622065800 к GX4 на странице отсутствует.",
+  "corrections": [
+    "GA 7-37 VSD+: verified=false и оговорка в status — ссылка ведёт на листовку GA 37-110 VSD+, а нужная листовка 2935098145_L по прямому адресу отвечает 404 (замечание скептика)",
+    "2908 8503 00, 2908 8501 01: source_url указывает на страницу 53 руководства на manualslib, где стоят коды Roto-Z (замечание скептика)",
+    "2906049800: машина уточнена по польскому названию, в doc_ref — расхождение цитаты с нынешним заголовком (замечание скептика)",
+    "2901000201: в doc_ref — где на странице стоит «SCU GA11-30» (замечание скептика)",
+    "2230 0142 xx, 2906 0314 00, 2906 0380 00, 1320406611, 2906073000: issuer и doc_ref — код подтверждён только сторонним продавцом (answk, aircompressoragent, mengmafilter), не магазином изготовителя (замечание скептика)",
+    "1622065800: привязка к GX4 убрана из описания и машины и перенесена в doc_ref как утверждение дилера — на странице изготовителя её нет (замечание скептика)",
+    "ZH 4000-26000: убрана ссылка ien.eu — не отвечает; машина держится на странице подшипника 1320406611 (замечание скептика)"
+  ]
+}

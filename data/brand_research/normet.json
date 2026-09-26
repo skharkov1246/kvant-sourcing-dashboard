@@ -1,0 +1,886 @@
+{
+  "oem_key": "normet",
+  "name": "Normet",
+  "segment_focus": "Spraymec, Charmec, Utimec: сервисные наборы, фильтры, бетононасосы; субпоставщики шасси и двигателей",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Normet (Финляндия) выпускает подземную самоходную технику для горных работ и тоннелей: торкрет-машины Spraymec, зарядчики Charmec, бетоновозы и миксеры Utimec. Модельный ряд и узлы взяты из открытых технических листов изготовителя на assets.ctfassets.net (CDN сайта normet.com). По ним установлены субпоставщики. Двигатели: Deutz TCD 2011/2012/2013, Mercedes-Benz OM 904 LA, Cummins B4.5, Volvo Penta TAD851VE/881VE. Мосты и коробки передач: Dana (мосты 212/123/113, КП 24000 и T14). Прочее: Ansul (пожаротушение), Speck и Dynaset (насосы высокого давления воды). Бетононасосы собственные: NSP 30 и NSP 40. Собственные номера деталей Normet бывают девятизначными (100xxxxxx) и восьмизначными (5xxxxxxx). Коды взяты только со страниц перепродавцов: 30 — с двух страниц китайского продавца doobotec на made-in-china.com, 1 — у российского acceltrade; ещё 2 кода скептик отклонил из-за противоречивых названий на странице продавца. Каталогов изготовителя в открытом доступе нет, поэтому принадлежность кода Normet указана со слов продавца.",
+  "machines": [
+    {
+      "model": "Spraymec 8100 VC",
+      "kind": "самоходная машина для набрызг-бетона (торкрет)",
+      "segment": "ГШО",
+      "rating": "Deutz TCD 2012 L4 2V 96 kW; насос NSP 40 до 30 м3/ч; компрессор 12 м3/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/spraymec-8100-vc",
+        "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec 8100 VC SD",
+      "kind": "торкрет-машина на аккумуляторах",
+      "segment": "ГШО",
+      "rating": "30 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/spraymec-8100-vc-sd/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec MF 050 (DV/VC)",
+      "kind": "шарнирно-сочленённая торкрет-машина для шахт",
+      "segment": "ГШО",
+      "rating": "насос NSP 30; 19 м3/ч от дизеля, 27 м3/ч от электропривода; Deutz TCD 2013 L4 120 kW / Mercedes-Benz OM 904 LA 110 kW / Cummins B4.5 121 kW",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/3fd0YTHovz5OkC1uhojhjj/787af11e0e2eb3c81b2439806b0ea642/Spraymec_MF_050_DV_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec MF 050 VC SD",
+      "kind": "торкрет-машина на аккумуляторах",
+      "segment": "ГШО",
+      "rating": "до 27 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/spraymec-mf-050-vc-sd"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec LF 050",
+      "kind": "шарнирно-сочленённая торкрет-машина для шахт",
+      "segment": "ГШО",
+      "rating": "19/27 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec 2100",
+      "kind": "торкрет-машина с жёсткой рамой",
+      "segment": "ГШО",
+      "rating": "20/27 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec 4100",
+      "kind": "торкрет-машина с жёсткой рамой",
+      "segment": "ГШО",
+      "rating": "27 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec 5100",
+      "kind": "торкрет-машина для тоннелей",
+      "segment": "ГШО",
+      "rating": "насос NSP 30; Deutz TCD 2012 L4 2V 96 kW; мосты Dana 212",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/5JRRWdK5gJshcniMQzCzbG/271032a56a04c33e30da1d2f1a4184e9/Spraymec_5100_V_C__Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec 9100",
+      "kind": "торкрет-машина для тоннелей",
+      "segment": "ГШО",
+      "rating": "30 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec NorRunner 140 DVC",
+      "kind": "торкрет-машина на базе грузовика",
+      "segment": "ГШО",
+      "rating": "насос NSP 30, 30 м3/ч; компрессор 12 м3/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/truck-based-tunnelling-sprayer-draft/spraymec-norrunner-140-dvc"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec NorRunner 160 DVC",
+      "kind": "торкрет-машина на базе грузовика",
+      "segment": "ГШО",
+      "rating": "30 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-spraying/wet-mix-concrete-sprayers/spraymec-norrunner-160-dvc"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Spraymec 6050 WP(C)",
+      "kind": "торкрет-машина (прежнее поколение)",
+      "segment": "ГШО",
+      "status": "снята (нет в текущем каталоге изготовителя)",
+      "sources": [
+        "https://www.scribd.com/document/632828907/Normet-Spraymec-Spare-part-manual-pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "Spraymec 9150 WP",
+      "kind": "торкрет-машина (прежнее поколение)",
+      "segment": "ГШО",
+      "status": "снята (нет в текущем каталоге изготовителя)",
+      "sources": [
+        "https://pdf.directindustry.com/pdf/normet-group-oy/spraymec-9150-wp/59086-131057.html"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "Charmec MC 605 D(V)",
+      "kind": "зарядная машина для эмульсионных ВВ",
+      "segment": "ГШО",
+      "rating": "Deutz TCD 2013 L4 120 kW / Mercedes-Benz OM 904 LA 110 kW / Cummins B4.5 121 kW; КП Dana 24000",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/5GHxuuWBJ297iGKWgZC7RM/d74ce2a2641f22459f522793cb37b1a2/Charmec_MC_605_D_V__Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Charmec MC 605 DA(V)",
+      "kind": "зарядная машина для АНФО",
+      "segment": "ГШО",
+      "rating": "как у MC 605 D(V)",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/5dOHr9L1tQ15i0Pv2klPdQ/45a70dc3511cbf867ad0c3660aad5fa7/Charmec_MC_605_DA_V__Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+        "https://www.normet.com/en/products-and-services/equipment/explosives-charging/anfo-charging/charmec-mc-605-da-v-le/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Charmec MC 605 V SD",
+      "kind": "зарядная машина на Li-ion аккумуляторах",
+      "segment": "ГШО",
+      "rating": "мосты Dana планетарные",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/7hOWd17KEOzUxOjVd63UBG/534a6ec3863d5bd61d550a3a4324a931/Charmec_MC_605_V_SD_BEV_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Charmec LC 605 D(V)",
+      "kind": "зарядная машина",
+      "segment": "ГШО",
+      "status": "выпускается (технический лист на DirectIndustry)",
+      "sources": [
+        "https://pdf.directindustry.com/pdf/normet/charmec-lc-605-d-v/59086-377753.html"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "Charmec 1605",
+      "kind": "зарядная машина (прежнее поколение); продавец называет её буровой машиной",
+      "segment": "ГШО",
+      "status": "статус не установлен; запчасти продаются",
+      "sources": [
+        "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html"
+      ],
+      "verified": false,
+      "rating": "данных нет"
+    },
+    {
+      "model": "Utimec LF 600 Transmixer",
+      "kind": "подземный бетоновоз-миксер",
+      "segment": "ГШО",
+      "rating": "5,6 м3 по выдаче поиска; двигатель Deutz TCD 2012 L6 и КП Dana 32000 на странице изготовителя не найдены",
+      "status": "выпускается",
+      "sources": [
+        "https://www.normet.com/en/products-and-services/equipment/concrete-transportation/concrete-transmixers/utimec-lf-600-transmixer"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Utimec LF 600 Agitator",
+      "kind": "подземный бетоновоз-агитатор",
+      "segment": "ГШО",
+      "rating": "Volvo Penta TAD851VE/TAD881VE 185 kW; КП Dana T14; мосты Dana 113",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/4imbUy15QS4FxV8ULeUmox/22908f02bffcf3887823e8257cce6178/Utimec_LF_600_Agitator_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Utimec LF 500 Transmixer",
+      "kind": "подземный бетоновоз-миксер",
+      "segment": "ГШО",
+      "rating": "Volvo Penta TAD851VE/TAD881VE 185 kW; КП Dana T14; мосты Dana 113",
+      "status": "выпускается",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/7JLAqW4eidZSKHkTKulFMz/bac853f67319409a43a6b4bbfa34bddf/Utimec_LF_500_Transmixer_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Utimec MF 500 Transmixer",
+      "kind": "подземный бетоновоз-миксер",
+      "segment": "ГШО",
+      "status": "технический лист на DirectIndustry",
+      "sources": [
+        "https://pdf.directindustry.com/pdf/normet/utimec-mf-500-transmixer/59086-377631.html"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "Utimec SF 300 Transmixer",
+      "kind": "подземный бетоновоз-миксер (прежнее поколение)",
+      "segment": "ГШО",
+      "status": "статус не установлен; запчасти продаются",
+      "sources": [
+        "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "Utimec LF 130 Material",
+      "kind": "подземная машина для перевозки материалов",
+      "segment": "ГШО",
+      "status": "технический лист на DirectIndustry",
+      "sources": [
+        "https://pdf.directindustry.com/pdf/normet/utimec-lf-130-material/59086-981768.html"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "Utimec MF 205 PER",
+      "kind": "подземная машина для перевозки людей",
+      "segment": "ГШО",
+      "status": "технический лист на DirectIndustry",
+      "sources": [
+        "https://pdf.directindustry.com/pdf/normet/utimec-mf-205-per/59086-981773.html"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Spraymec 8100 VC Technical data sheet (Stage III)",
+      "doc_no": "DOC058707.5 (05.05.2023)",
+      "machine": "Spraymec 8100 VC",
+      "kind": "технический лист",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+      ]
+    },
+    {
+      "title": "Spraymec 8100 VC Technical data sheet",
+      "doc_no": "100016122 (23.4.2010)",
+      "machine": "Spraymec 8100 VC (Deutz TCD 2011 L4 74,9 kW)",
+      "kind": "технический лист",
+      "sources": [
+        "https://www.zoko.co.il/sites/zoko/UserContent/files/1_Technical_Data_Sheet_SM8100(2).pdf"
+      ]
+    },
+    {
+      "title": "Spraymec 8100 VC Stage V overview",
+      "doc_no": "100164520 / DOC058706",
+      "machine": "Spraymec 8100 VC",
+      "kind": "технический лист (копия на Scribd)",
+      "sources": [
+        "https://www.scribd.com/document/578442910/Spraymec-8100-VC-Stage-V-100164520-2-DOC058706-2"
+      ]
+    },
+    {
+      "title": "Spraymec MF 050 DV Technical data sheet (Stage III / Stage V)",
+      "doc_no": "DOC064196.2 (22.02.2023)",
+      "machine": "Spraymec MF 050 DV",
+      "kind": "технический лист",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/3fd0YTHovz5OkC1uhojhjj/787af11e0e2eb3c81b2439806b0ea642/Spraymec_MF_050_DV_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ]
+    },
+    {
+      "title": "Spraymec 5100 V(C) Technical data sheet (Stage III)",
+      "doc_no": "DOC068037.1 (27.03.2025)",
+      "machine": "Spraymec 5100",
+      "kind": "технический лист",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/5JRRWdK5gJshcniMQzCzbG/271032a56a04c33e30da1d2f1a4184e9/Spraymec_5100_V_C__Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+      ]
+    },
+    {
+      "title": "Charmec MC 605 DA(V) Technical data sheet",
+      "doc_no": "100118424.1 (02.08.2022)",
+      "machine": "Charmec MC 605 DA(V)",
+      "kind": "технический лист",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/5dOHr9L1tQ15i0Pv2klPdQ/147701f3b0f7ab71ea6be6d7a7393b1c/Charmec_MC_605_DA_V__Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+      ]
+    },
+    {
+      "title": "Charmec MC 605 D(V) Technical data sheet (Stage III / Stage V)",
+      "machine": "Charmec MC 605 D(V)",
+      "kind": "технический лист",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/5GHxuuWBJ297iGKWgZC7RM/d74ce2a2641f22459f522793cb37b1a2/Charmec_MC_605_D_V__Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ]
+    },
+    {
+      "title": "Charmec MC 605 V SD Technical data sheet (BEV)",
+      "doc_no": "DOC059115.7",
+      "machine": "Charmec MC 605 V SD",
+      "kind": "технический лист",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/7hOWd17KEOzUxOjVd63UBG/534a6ec3863d5bd61d550a3a4324a931/Charmec_MC_605_V_SD_BEV_Technical_Data_Sheet_Global_EN.pdf"
+      ]
+    },
+    {
+      "title": "Utimec LF 600 Agitator Technical data sheet (Stage III / Stage V)",
+      "doc_no": "DOC056123.2",
+      "machine": "Utimec LF 600 Agitator",
+      "kind": "технический лист",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/4imbUy15QS4FxV8ULeUmox/22908f02bffcf3887823e8257cce6178/Utimec_LF_600_Agitator_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ]
+    },
+    {
+      "title": "Utimec LF 500 Transmixer Technical data sheet (Stage III / Stage V)",
+      "doc_no": "DOC056118.3",
+      "machine": "Utimec LF 500 Transmixer",
+      "kind": "технический лист",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/7JLAqW4eidZSKHkTKulFMz/bac853f67319409a43a6b4bbfa34bddf/Utimec_LF_500_Transmixer_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ]
+    },
+    {
+      "title": "Normet Spraymec spare part manual (Spraymec 6050 W)",
+      "machine": "Spraymec 6050 WP",
+      "kind": "parts manual (копия на Scribd, текст недоступен без входа)",
+      "sources": [
+        "https://www.scribd.com/document/632828907/Normet-Spraymec-Spare-part-manual-pdf"
+      ]
+    },
+    {
+      "title": "Normet Utimec LF 600 Spare Parts Manual",
+      "machine": "Utimec LF 600",
+      "kind": "parts manual (копия на Scribd)",
+      "sources": [
+        "https://www.scribd.com/document/698987119/Spare-Parts-Manual"
+      ]
+    },
+    {
+      "title": "Spare Part Manual NORMET UTILIFT 6605 B",
+      "machine": "Utilift 6605 B",
+      "kind": "parts manual (копия на Scribd)",
+      "sources": [
+        "https://www.scribd.com/document/359452531/Spare-Part-Manual-NORMET-UTILIFT-6605-B"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "100068844",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Возвратный фильтр гидросистемы в сборе, 1 1/4\"",
+      "machine": "Spraymec MF 050 VC",
+      "unit": "гидросистема",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Hydraulic oil return filter 1 1/4\" complete 100068844 alog Spraymec MF 050 VC"
+    },
+    {
+      "code": "100068841",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Возвратный фильтр гидросистемы в сборе, 1\"",
+      "machine": "Spraymec MF 050 VC",
+      "unit": "гидросистема",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Hydraulic oil return filter 1\" complete 100068841 alog Spraymec MF 050 VC"
+    },
+    {
+      "code": "100013075",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Фильтроэлемент возвратного масла бетононасоса",
+      "machine": "Spraymec MF 050 VC",
+      "unit": "бетононасос, гидравлика",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Return oil filter element for concrete pump 100013075 Spraymec MF 050 VC EJ168"
+    },
+    {
+      "code": "100107996",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Масляный фильтр",
+      "machine": "Spraymec MF 050 (страница продавца; машина при строке не указана)",
+      "unit": "двигатель",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Oil filter 100107996"
+    },
+    {
+      "code": "100107998",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Топливный фильтр",
+      "machine": "Spraymec MF 050 (страница продавца; машина при строке не указана)",
+      "unit": "топливная система",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Fuel filter 100107998"
+    },
+    {
+      "code": "100042526",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Топливный фильтр-влагоотделитель",
+      "machine": "Spraymec MF 050 (страница продавца)",
+      "unit": "топливная система",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Fuel filter with moisture separator 100042526"
+    },
+    {
+      "code": "100107997",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Фильтр трансмиссии",
+      "machine": "Spraymec MF 050 (страница продавца)",
+      "unit": "трансмиссия",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Transmission filter 100107997"
+    },
+    {
+      "code": "56052657",
+      "issuer": "Normet (со слов продавца); SA17088 — перекрёстный номер без указания изготовителя",
+      "description": "Фильтроэлемент",
+      "machine": "Spraymec MF 050 (страница продавца)",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Filter element 56052657 (SA17088)"
+    },
+    {
+      "code": "56052665",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Элемент воздушного фильтра (предохранительный патрон)",
+      "machine": "Spraymec MF 050 (страница продавца)",
+      "unit": "впуск двигателя",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Air filter element 56052665"
+    },
+    {
+      "code": "100038573",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Ремкомплект уплотнений цилиндра бетононасоса",
+      "machine": "Spraymec (страница MF 050)",
+      "unit": "бетононасос",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Seal kit for concrete pump cylinder .№100038573"
+    },
+    {
+      "code": "100042980",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Поршень бетононасоса",
+      "machine": "Spraymec MF 050 VC",
+      "unit": "бетононасос",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "1. Piston for Spraymec MF050VC concrete pump, .100042980"
+    },
+    {
+      "code": "100042086",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Заправочный клапан в сборе",
+      "machine": "Spraymec (страница MF 050)",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Filling valve complete unit .№ 100042086"
+    },
+    {
+      "code": "100012817",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Подшипник",
+      "machine": "Spraymec MF",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "2. Bearing for Spraymec MF, 100012817"
+    },
+    {
+      "code": "100013583",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Радиальный шарикоподшипник",
+      "machine": "Spraymec",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "10. Grooved ball bearing for Spraymec, 100013583"
+    },
+    {
+      "code": "100018595",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Корпус сопла с S-образным соединением",
+      "machine": "Spraymec MF",
+      "unit": "сопло / стрела набрызга",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "3. Nozzle body with S-connection for Spraymec MF, 100018595"
+    },
+    {
+      "code": "54919972",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Рукав бетононасоса",
+      "machine": "Spraymec",
+      "unit": "бетоновод",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "11. Concrete pump hose Normet, 54919972"
+    },
+    {
+      "code": "100132146",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Ремкомплект уплотнений",
+      "machine": "Spraymec",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "23. Seal kit for Spraymec Normet, 100132146"
+    },
+    {
+      "code": "100066008",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Электромагнитный клапан",
+      "machine": "Spraymec MF 050 VC",
+      "unit": "гидросистема",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Solenoid valve 100066008 Spraymec MF 050 VC alog"
+    },
+    {
+      "code": "100050752",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Уплотнительное кольцо",
+      "machine": "Spraymec MF 050 VC",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Sealing ring 100050752 Spraymec MF 050 VC alog"
+    },
+    {
+      "code": "57974750",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Ремкомплект уплотнений",
+      "machine": "Spraymec 6050 WPC",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Seal kit 57974750 Spraymec-6050 WPC 57974750"
+    },
+    {
+      "code": "54512314",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Опорный подшипник (в строке — «Thrust bearing», по скептику скорее опорный: support / pillow block bearing)",
+      "machine": "Utimec SF 300 Transmixer",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Thrust bearing 54512314 alog Utimec SF300 Transmixer"
+    },
+    {
+      "code": "52355484",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Ремкомплект уплотнений опоры со стороны двигателя",
+      "machine": "Utimec SF 300 Transmixer",
+      "unit": "опора барабана / привод",
+      "source_url": "https://doobotec.en.made-in-china.com/product/qnBUPtojnXYs/China-Concrete-Sprayer-Spraymec-Mf050-Spare-Parts-Replacement-for-Underground-Mining.html",
+      "quote": "Seal kit engine side support Utimec SF300 Transmixer 52355484"
+    },
+    {
+      "code": "100152680",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Топливный фильтроэлемент",
+      "machine": "Charmec 1605",
+      "unit": "топливная система",
+      "source_url": "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html",
+      "quote": "100152680 FUEL FILTER ELEMENT"
+    },
+    {
+      "code": "56076200",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Топливный фильтр-водоотделитель",
+      "machine": "Charmec 1605 (страница продавца)",
+      "unit": "топливная система",
+      "source_url": "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html",
+      "quote": "56076200 FUEL WATER SEPARATOR FILTER"
+    },
+    {
+      "code": "56076310",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Фильтр: масляный по этой строке; назначение на страницах продавца расходится (масляный или возвратный)",
+      "machine": "Charmec 1605 (страница продавца)",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html",
+      "quote": "56076310 OIL FILTER"
+    },
+    {
+      "code": "100019891",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Возвратный фильтр",
+      "machine": "Charmec 1605 (страница продавца)",
+      "unit": "гидросистема",
+      "source_url": "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html",
+      "quote": "100019891 FILTER, RETURN"
+    },
+    {
+      "code": "57986457",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Воздушный фильтр кабины (фильтр свежего воздуха)",
+      "machine": "Charmec 1605 (страница продавца)",
+      "unit": "кабина",
+      "source_url": "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html",
+      "quote": "57986457 AIR FILTER"
+    },
+    {
+      "code": "57987877",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Салонный воздушный фильтр",
+      "machine": "Charmec 1605 (страница продавца)",
+      "unit": "кабина",
+      "source_url": "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html",
+      "quote": "57987877 AIR FILTER, CABIN"
+    },
+    {
+      "code": "100049177",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Водяной фильтр",
+      "machine": "Charmec 1605 (страница продавца)",
+      "unit": "водяная система",
+      "source_url": "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html",
+      "quote": "100049177 WATER FILTER"
+    },
+    {
+      "code": "100083240",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Датчик давления",
+      "machine": "Charmec 1605 (страница продавца)",
+      "unit": "не указан",
+      "source_url": "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html",
+      "quote": "100083240 PRESSURE SENSOR"
+    },
+    {
+      "code": "100004872",
+      "issuer": "Normet (со слов продавца)",
+      "description": "Генератор",
+      "machine": "не указана",
+      "unit": "электрооборудование двигателя",
+      "source_url": "https://acceltrade.ru/catalog/normet/",
+      "quote": "Генератор Normet (100004872)"
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "56072812",
+      "verdict": "не подтверждён",
+      "reason": "Строка «Bypass valve 56072812 alog Spraymec MF 050 VC» на странице есть, но в другом списке той же страницы этот код стоит рядом с «CONTROL HANDLE» и «NON-RETURN VALVE». Какое изделие обозначает код, неясно: перепускной клапан, обратный клапан или рукоять."
+    },
+    {
+      "code": "54923404",
+      "verdict": "не подтверждён",
+      "reason": "Строка «54923404 Vibration sensor» на странице есть, но в другом списке той же страницы этот код стоит между «RUBBER MOUNT» и «PROPELLER SHAFT». Изделие противоречиво, датчиком вибрации код может не быть: возможно, это виброопора."
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "Deutz AG",
+      "component": "Дизельные двигатели TCD 2012 L4 2V (96 kW), TCD 2013 L4 (120 kW), TCD 2011 L4 (74,9 kW, ранний лист)",
+      "machine": "Spraymec 8100 VC, Spraymec 5100, Spraymec MF 050 DV, Charmec MC 605 D(V)/DA(V)",
+      "evidence": "Технические листы Normet: «Deutz TCD 2012 L4 2V, 96 kW/2200 rpm, Tier 3 / Stage IIIA»; «Deutz TCD 2013 L4, 120 kW/2300 rpm»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf",
+        "https://assets.ctfassets.net/idihyv8a6g5y/5GHxuuWBJ297iGKWgZC7RM/d74ce2a2641f22459f522793cb37b1a2/Charmec_MC_605_D_V__Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+        "https://www.zoko.co.il/sites/zoko/UserContent/files/1_Technical_Data_Sheet_SM8100(2).pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Mercedes-Benz (Daimler Truck)",
+      "component": "Дизельный двигатель OM 904 LA, 110 kW (вариант)",
+      "machine": "Spraymec MF 050 DV, Charmec MC 605 D(V)/DA(V)",
+      "evidence": "Технический лист: «Mercedes-Benz OM 904 LA,110 kW/2200 rpm»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/3fd0YTHovz5OkC1uhojhjj/787af11e0e2eb3c81b2439806b0ea642/Spraymec_MF_050_DV_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Cummins",
+      "component": "Дизельный двигатель B4.5, 121 kW (вариант с моторным тормозом)",
+      "machine": "Spraymec MF 050 DV, Charmec MC 605 D(V)/DA(V)",
+      "evidence": "Технический лист: «Cummins B4.5, 121 kW/2500 rpm with exhaust brake»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/3fd0YTHovz5OkC1uhojhjj/787af11e0e2eb3c81b2439806b0ea642/Spraymec_MF_050_DV_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Volvo Penta",
+      "component": "Дизельные двигатели TAD851VE / TAD881VE, 185 kW",
+      "machine": "Utimec LF 600 Agitator, Utimec LF 500 Transmixer",
+      "evidence": "Технический лист: «Volvo Penta TAD851VE, 185 kW/2200 rpm»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/4imbUy15QS4FxV8ULeUmox/22908f02bffcf3887823e8257cce6178/Utimec_LF_600_Agitator_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+        "https://assets.ctfassets.net/idihyv8a6g5y/7JLAqW4eidZSKHkTKulFMz/bac853f67319409a43a6b4bbfa34bddf/Utimec_LF_500_Transmixer_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Dana (Spicer)",
+      "component": "Планетарные мосты Dana 212 / 602, 123, 113; коробки передач с переключением под нагрузкой Dana 24000 и T14",
+      "machine": "Spraymec 8100 VC, 5100, MF 050; Charmec MC 605; Utimec LF 500/600",
+      "evidence": "Технические листы: «Planetary type axles Dana 212»; «Dana 24000 series powershift transmission»; «Dana T14 series powershift transmission with lock-up»; «Dana 113 series fixed»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf",
+        "https://assets.ctfassets.net/idihyv8a6g5y/5GHxuuWBJ297iGKWgZC7RM/d74ce2a2641f22459f522793cb37b1a2/Charmec_MC_605_D_V__Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+        "https://assets.ctfassets.net/idihyv8a6g5y/4imbUy15QS4FxV8ULeUmox/22908f02bffcf3887823e8257cce6178/Utimec_LF_600_Agitator_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Speck",
+      "component": "Водяной насос высокого давления (опция промывки скалы / машины)",
+      "machine": "Spraymec 8100 VC, Spraymec 5100",
+      "evidence": "Технический лист: «...hydraulic motor drive for water pump (Speck), nozzle holder with 3 nozzles»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf",
+        "https://assets.ctfassets.net/idihyv8a6g5y/5JRRWdK5gJshcniMQzCzbG/271032a56a04c33e30da1d2f1a4184e9/Spraymec_5100_V_C__Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Dynaset",
+      "component": "Гидравлический водяной насос высокого давления (опция)",
+      "machine": "Spraymec 8100 VC",
+      "evidence": "Технический лист: «pump (Dynaset), nozzle holder with 1 nozzle»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/6UAsGM005smb93lvR80jFH/20c6b177cb27660faf09600743781091/Spraymec_8100_VC_Stage_III_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Ansul (Johnson Controls)",
+      "component": "Системы пожаротушения A-101, Sentry, LVS",
+      "machine": "Charmec MC 605 D(V)/DA(V)/V SD, Utimec LF 500/600",
+      "evidence": "В технических листах названы «Ansul A-101», «Ansul Sentry», «Ansul LVS»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/5GHxuuWBJ297iGKWgZC7RM/d74ce2a2641f22459f522793cb37b1a2/Charmec_MC_605_D_V__Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf",
+        "https://assets.ctfassets.net/idihyv8a6g5y/4imbUy15QS4FxV8ULeUmox/22908f02bffcf3887823e8257cce6178/Utimec_LF_600_Agitator_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Bridgestone",
+      "component": "Шины 14.00–24\"",
+      "machine": "Utimec LF 600 Agitator",
+      "evidence": "Технический лист: «Bridgestone 14.00–24”»",
+      "sources": [
+        "https://assets.ctfassets.net/idihyv8a6g5y/4imbUy15QS4FxV8ULeUmox/22908f02bffcf3887823e8257cce6178/Utimec_LF_600_Agitator_Stage_III_and_Stage_V_Technical_Data_Sheet_Global_EN.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Normet (Shanghai) Trading Ltd.",
+      "country": "Китай",
+      "role": "дочерняя компания изготовителя: продажи и сервис (Шанхай, Чэнду)",
+      "sources": [
+        "https://www.normet.com/en/contact/p-r-china"
+      ]
+    },
+    {
+      "company": "Normet India Private Limited",
+      "country": "Индия",
+      "role": "дочерняя компания изготовителя: заводы (Кхополи, Джайпур, Хаура), склад (Аджмер), офисы",
+      "sources": [
+        "https://www.normet.com/en/contact/india"
+      ]
+    },
+    {
+      "company": "Norservice LLP",
+      "country": "Казахстан",
+      "role": "представитель Normet по сервису (Жезказган, Усть-Каменогорск, Астана)",
+      "sources": [
+        "https://www.normet.com/en/contact/kazakhstan"
+      ]
+    },
+    {
+      "company": "Normet International Ltd. Rep. Office in Uzbekistan",
+      "country": "Узбекистан",
+      "role": "представительство изготовителя (Ташкент)",
+      "sources": [
+        "https://www.normet.com/en/contact/uzbekistan"
+      ]
+    },
+    {
+      "company": "Normet Doha LLC",
+      "country": "Катар",
+      "role": "представительство на Ближнем Востоке (в составе Al Jabor Group Holding)",
+      "sources": [
+        "https://www.normet.com/en/contact/qatar"
+      ]
+    },
+    {
+      "company": "НОВА-ТЕХ",
+      "country": "Россия",
+      "role": "независимый продавец запчастей Normet; официальным дилером себя не называет",
+      "sources": [
+        "https://nova1tech.com/catalog/zapchasti-dlya-gorno-shakhtnogo-oborudovaniya-ankernye-sistemy/zapchasti-dlya-normet/"
+      ]
+    },
+    {
+      "company": "Qingdao Qingchi Intelligent Technology Co., Ltd. (магазин doobotec на made-in-china.com)",
+      "country": "Китай",
+      "role": "независимый продавец запчастей Normet (Spraymec, Charmec, Utimec)",
+      "sources": [
+        "https://doobotec.en.made-in-china.com/product/txHpWOdbEyUe/China-Original-Normet-Drilling-Machine-Charmec-1605-Spare-Parts-100152680.html"
+      ]
+    },
+    {
+      "company": "Shanghai Machfans",
+      "country": "Китай",
+      "role": "независимый продавец запчастей Normet",
+      "sources": [
+        "https://shanghaimachfans.com/normet-spare-parts-catalog-100058041/"
+      ]
+    },
+    {
+      "company": "Formine",
+      "country": "Китай",
+      "role": "независимый продавец запчастей Normet",
+      "sources": [
+        "https://www.formine.cn/normet-parts.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Собственного открытого каталога запчастей или интернет-магазина у Normet не найдено. Каталоги (spare parts manuals) выдаются вместе с машиной и, вероятно, лежат на закрытом клиентском портале. Копии на Scribd (Spraymec 6050, Utimec LF 600, Utilift 6605 B) без входа не читаются.",
+    "Все коды Normet взяты у перепродавцов (made-in-china.com, НОВА-ТЕХ, acceltrade). Принадлежность коду Normet указана со слов продавца, а привязка к машине иногда только по названию страницы. Перед закупкой коды нужно сверить с каталогом конкретного серийного номера.",
+    "Перекрёстные номера изготовителей фильтров (Donaldson, MANN, Hydac, Parker) для кодов Normet не найдены, изготовитель ни одного фильтра не установлен. Номер SA17088 на странице продавца стоит без указания изготовителя.",
+    "На normet.com нет контактной страницы по России и Турции. Состав российских представительств (ранее Москва, Санкт-Петербург, Норильск по сообщению 2007 года) по открытым источникам не подтверждён. Страница дилеров на exkavator.ru без входа пуста.",
+    "Изготовители компрессора (винтовой, 12 м3/мин), гидронасосов и гидрораспределителей, дозирующего насоса (Mono по листу 2010 года), системы управления NorSmart и аккумуляторов SD-машин в открытых листах не названы.",
+    "Шасси NorRunner 140/160 DVC: марка грузовика в открытых источниках не найдена.",
+    "Двигатель Utimec LF 600 Transmixer (Deutz TCD 2012 L6, КП Dana 32000) взят из выдержки поисковой системы. Сам лист не открывался, и эти данные могут относиться к прежнему выпуску: в листах LF 600 Agitator и LF 500 указан Volvo Penta."
+  ],
+  "verifier_notes": "Все 33 кода найдены дословно на указанных страницах: doobotec на made-in-china (2 страницы) и acceltrade. Не подтверждены два кода, потому что на той же странице продавца им даны противоречивые названия: 56072812 (перепускной клапан, но рядом «CONTROL HANDLE» и «NON-RETURN VALVE») и 54923404 (датчик вибрации, но рядом «RUBBER MOUNT» и «PROPELLER SHAFT»). Описания стоит уточнить: у 54512314 это скорее опорный, а не упорный подшипник (support/pillow block bearing); у 57986457 — фильтр кабины; у 56076310 назначение расходится (масляный или возвратный). Все коды известны только со слов продавца, каталога изготовителя нет. Из машин не подтверждена Charmec 1605: она есть только у продавца, и он называет её буровой машиной. У Utimec LF 600 Transmixer характеристики Deutz TCD 2012 L6 и Dana 32000 на странице изготовителя не найдены. Ссылки на DirectIndustry отвечают 403, а Scribd отдаёт заглушку. Эти модели подтверждены по выдаче поиска и страницам normet.com.",
+  "corrections": [
+    "54512314, 57986457, 56076310: описания уточнены по замечанию скептика (опорный подшипник, фильтр кабины, расхождение назначения)",
+    "Charmec 1605: в kind — что продавец называет её буровой машиной; остаётся verified=false (замечание скептика)",
+    "Utimec LF 600 Transmixer: Deutz TCD 2012 L6 и Dana 32000 сняты из характеристики — на странице изготовителя не найдены (замечание скептика)",
+    "машины без характеристики получили rating «данных нет»; субпоставщикам из технических листов Normet проставлено verified=true — скептик их не оспорил",
+    "summary: источники кодов приведены к итогу скептика (doobotec, две страницы, и acceltrade; НОВА-ТЕХ кодов не дал), упомянуты 2 отклонённых кода"
+  ]
+}
