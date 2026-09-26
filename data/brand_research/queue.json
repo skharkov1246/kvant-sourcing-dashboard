@@ -1,6 +1,6 @@
 {
   "schema": "kvant.brand-research-queue/1",
-  "updated": "2026-09-25",
+  "updated": "2026-09-26",
   "rule": "Очередь разведки брендов: бренд за брендом — машины, сервисные книги, коды запчастей, субпоставщики, дилеры. Берётся запись «в очереди» с наименьшим priority, одна сессия — не больше двух брендов (пятая часть ресурса). Порядок: группа фокуса по списку groups (сначала изготовители машин, потом изготовители узлов), внутри группы — n_spellings из dict/oem.json по убыванию, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. oem_key — только существующий ключ словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) в очередь не берутся. Процедура — .claude/skills/brand-research/SKILL.md, проверка — scripts/brand_research_check.py.",
   "groups": [
     "ГПУ",
@@ -248,9 +248,9 @@
       "atlas": [
         "Rolls-Royce plc"
       ],
-      "status": "в очереди",
-      "researched_at": null,
-      "file": null
+      "status": "сделано",
+      "researched_at": "2026-09-26",
+      "file": "data/brand_research/rollsroyce.json"
     },
     {
       "priority": 17,
@@ -263,9 +263,9 @@
       "atlas": [
         "Siemens Energy (портфель Dresser-Rand)"
       ],
-      "status": "в очереди",
-      "researched_at": null,
-      "file": null
+      "status": "сделано",
+      "researched_at": "2026-09-26",
+      "file": "data/brand_research/siemensdemagdelavalturbomachinery.json"
     },
     {
       "priority": 18,
