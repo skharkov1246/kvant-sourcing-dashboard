@@ -3284,7 +3284,7 @@
      "type": "насос",
      "patterns": [
       {
-       "rx": "(?:(?:LF|HT|CV|NM)\\s?)?3196(?:\\s?i-?FRAME)?",
+       "rx": "(?:(?:LF|HT|CV|NM)\\s?)?3196(?:\\s?i-?FRAME|\\s?(?:CC|XLTX|XLT|STX|MTX|LTX|ST|MT|LT))?",
        "context": "бренд"
       }
      ],
@@ -3292,13 +3292,16 @@
       "3196",
       "LF 3196",
       "3196 i-FRAME",
-      "CV 3196"
+      "CV 3196",
+      "3196CC",
+      "3196 MTX"
      ],
      "sources": [
       "https://www.gouldspumps.com/getmedia/43288e5d-6edf-444d-b553-1bcfb8db6805/B_3196i.pdf",
-      "https://www.gouldspumps.com/products/3196-lf"
+      "https://www.gouldspumps.com/products/3196-lf",
+      "https://www.ifcpump.com/files/product/3196iframe_IOM.pdf"
      ],
-     "note": "Голое число — только рядом с именем бренда."
+     "note": "Голое число — только рядом с именем бренда. Исполнения CC и прежние ST/MT/LT/XLT — по разведке data/brand_research/itt.json."
     },
     {
      "id": "goulds-api",
@@ -3306,20 +3309,25 @@
      "type": "насос",
      "patterns": [
       {
-       "rx": "3700|36[02]0i?",
+       "rx": "3700(?:LFi|LF|i)?|3703|36[02]0i?",
        "context": "бренд"
       }
      ],
      "examples": [
       "3700",
       "3600",
-      "3620i"
+      "3620i",
+      "3700i",
+      "3700LFi",
+      "3703"
      ],
      "sources": [
       "https://www.gouldspumps.com/products/3700",
       "https://www.gouldspumps.com/products/3600i",
-      "https://www.gouldspumps.com/products/3620i"
-     ]
+      "https://www.gouldspumps.com/products/3620i",
+      "https://www.ifcpump.com/files/product/3700.pdf"
+     ],
+     "note": "3700i, 3700LF(i) и 3703 — по разведке data/brand_research/itt.json."
     },
     {
      "id": "goulds-other",
@@ -4630,6 +4638,89 @@
       "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
       "https://www.bakerhughes.com/bently-nevada/sensors/proximity-sensors"
      ]
+    },
+    {
+     "id": "bently-330400",
+     "series": "330400 / 330425 (акселерометры)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "3304(?:00|25)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "330400",
+      "330425"
+     ],
+     "sources": [
+      "https://www.bakerhughes.com/bently-nevada/sensors/acceleration-velocity-sensors/330400330425-accelerometers"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/bentlynevada.json."
+    },
+    {
+     "id": "bently-330500",
+     "series": "330500 Velomitor (датчик виброскорости)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "330500",
+       "context": "бренд"
+      },
+      {
+       "rx": "Velomitor",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "330500",
+      "Velomitor"
+     ],
+     "sources": [
+      "https://dam.bakerhughes.com/m/6936199b5fed75d8/original/330500-Velomitor-Piezo-velocity-Sensor-Datasheet-141632-pdf.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/bentlynevada.json."
+    },
+    {
+     "id": "bently-1701",
+     "series": "1701 FieldMonitor (распределённая защита машин)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "1701(?:\\s?/\\s?\\d{2})?",
+       "context": "бренд"
+      },
+      {
+       "rx": "FieldMonitor",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "1701/15",
+      "FieldMonitor"
+     ],
+     "sources": [
+      "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/bentlynevada.json; источник — копия datasheet 141476-01 у дистрибьютора."
+    },
+    {
+     "id": "bently-1900",
+     "series": "1900/65A (монитор машин общего назначения)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "1900\\s?/\\s?65A?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "1900/65A"
+     ],
+     "sources": [
+      "https://dam.bakerhughes.com/m/431ea7aa66550d9f/original/1900-65A-General-Purpose-Equipment-Monitor-Datasheet-173401-pdf.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/bentlynevada.json."
     }
    ]
   },
@@ -5011,6 +5102,262 @@
       "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-ab/low-pressure-line"
      ],
      "note": "Подтверждено разведкой data/brand_research/imoindustries.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "woodward",
+   "name": "Woodward",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Woodward",
+    "Вудворд"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "woodward-505",
+     "series": "505 / 505-XT / 505-DR / 505HT / 5009XT (регуляторы паровых и гидротурбин)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "505(?:-XT|-DR|HT)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "5009(?:XT)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "505",
+      "505-XT",
+      "505-DR",
+      "505HT",
+      "5009XT"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-2301",
+     "series": "2301E / 2301E-ST (регуляторы частоты вращения)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "2301[ADE]?(?:-ST)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "2301E-ST",
+      "2301E"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-vertex",
+     "series": "Vertex / VertexDR (управление компрессором)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "Vertex(?:\\s?DR)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Vertex",
+      "VertexDR"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-protech",
+     "series": "ProTech-GII / ProTech TPS (защита от разгона)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "ProTech(?:-GII|\\s?TPS)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ProTech-GII",
+      "ProTech TPS"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-proact",
+     "series": "ProAct (электрические приводы: Gen3, Analog, 75)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "ProAct",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ProAct"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26147_H.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-lseries",
+     "series": "L-Series (малые приводы и дроссели ITB)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "L-Series",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "L-Series"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-tecjet",
+     "series": "TecJet 50/52/85/110 (газодозирующие клапаны)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "TecJet\\s?(?:50|52|85|110)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "TecJet 52",
+      "TecJet 110",
+      "TecJet"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/B06989_-.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-lecm-egs",
+     "series": "LECM E6, EGS-01/EGS-02 (управление газовым двигателем)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "LECM(?:\\s?E6)?",
+       "context": "сам"
+      },
+      {
+       "rx": "EGS-?0[12]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "LECM E6",
+      "EGS-01"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json; EGS — только как протокол TecJet в каталоге 25182."
+    },
+    {
+     "id": "woodward-fuel-valves",
+     "series": "GS40/GS50, LQ6/LQ25 (топливные клапаны ГТУ)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "GS(?:40|50)",
+       "context": "бренд"
+      },
+      {
+       "rx": "LQ(?:6|25)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "GS40",
+      "LQ25"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-varistroke",
+     "series": "VariStroke (электрогидравлические приводы клапанов)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "VariStroke(?:\\s?(?:II|I))?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "VariStroke",
+      "VariStroke II"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-ug",
+     "series": "UG-25+ (гидромеханические регуляторы)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "UG-?25",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "UG-25+"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    },
+    {
+     "id": "woodward-easygen",
+     "series": "easYgen (контроллеры генераторных установок)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "easYgen-?\\d{4}(?:XT)?(?:-P\\d)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "easYgen-3200XT",
+      "easYgen-2300"
+     ],
+     "sources": [
+      "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/woodward.json."
     }
    ]
   }

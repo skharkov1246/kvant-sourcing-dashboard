@@ -1,0 +1,850 @@
+{
+  "oem_key": "bentlynevada",
+  "name": "Bently Nevada (Baker Hughes)",
+  "segment_focus": "системы 3500, 3300 XL, 1701, 1900: модули, датчики, драйверы; номера, совместимость и применение по машинам",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Bently Nevada делает не машины, а системы защиты и вибромониторинга для машин. Их ставят на ГТУ, компрессоры, насосы, паровые турбины и поршневые компрессоры. Все коды ниже взяты из открытых технических описаний изготовителя (dam.bakerhughes.com) и из их копий у перепродавцов. Ограничение: pdftotext раскладывает многоколоночный текст в строки, поэтому часть цитат склеена из соседних строк одной ячейки таблицы и может немного отличаться от вида страницы. Собраны 14 изделий: стойка 3500 (/15, /22M, /25, /32M, /42M, /53M), датчики 3300 XL 8 мм, 330400/330425 и 330500, мониторы 1701 FieldMonitor и 1900/65A. Найдено 42 кодов с цитатами. Это запасные модули, модули ввода-вывода, предохранители, кабели, разъёмы, испытательная вилка и барьеры искробезопасности. Субпоставщиков в документах изготовителя удалось установить двоих: Rockwell (Allen-Bradley Flex I/O в 1701) и MTL (барьеры в принадлежностях 1900/65A). По России найдены только перепродавцы. Официальный канал после ухода Baker Hughes в 2022 году не подтверждён.",
+  "machines": [
+    {
+      "model": "3300 XL 8 mm Proximity Transducer System (330101/330102/330103/330104 + 330130 + 330180)",
+      "kind": "вихретоковый датчик перемещения и вибрации вала (зонд, удлинительный кабель, преобразователь Proximitor)",
+      "segment": "прочее",
+      "rating": "8 мм, система 1/5/9 м, соответствует API 670",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3500 System (3500/05 rack)",
+      "kind": "стоечная система защиты машин",
+      "segment": "прочее",
+      "rating": "стойка 3500/05; ГТУ, компрессоры, насосы, поршневые компрессоры",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/3e2d1931acef5630/original/3500-System-Datasheet-162096-pdf.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3500/15 AC and DC Power Supplies",
+      "kind": "модуль питания стойки 3500",
+      "segment": "прочее",
+      "rating": "половинной высоты, AC или DC",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/c508e118bc517da/original/3500-15-AC-and-DC-Power-Supplies-Datasheet-141530-pdf.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3500/22M Transient Data Interface",
+      "kind": "интерфейсный модуль стойки 3500 (связь с System 1)",
+      "segment": "прочее",
+      "rating": "USB/Ethernet",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/3067f290d79c13de/original/3500-22M-Transient-Data-Interface-Module-Datasheet-161581-pdf.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3500/25 Enhanced Keyphasor Module",
+      "kind": "модуль фазовой отметки (Keyphasor)",
+      "segment": "прочее",
+      "rating": "2 канала",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/22d0219c69acbaf5/original/3500-25-Enhanced-Keyphasor-Module-Datasheet-141532-pdf.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3500/32M 4-Channel Relay Module",
+      "kind": "релейный модуль стойки 3500",
+      "segment": "прочее",
+      "rating": "4 реле",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/7260d6def531c094/original/3500-32M-4-Channel-Relay-Module-Datasheet-141533-pdf.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3500/42M Proximitor/Seismic Monitor",
+      "kind": "4-канальный монитор вибрации и положения",
+      "segment": "прочее",
+      "rating": "4 канала",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/3500%2042M%20Proximitor%20Seismic%20Monitor.pdf",
+        "https://dam.bakerhughes.com/m/3e2d1931acef5630/original/3500-System-Datasheet-162096-pdf.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "3500/53M Electronic Overspeed Detection System",
+      "kind": "система защиты от разгона (голосование 2 из 2 или 2 из 3), API 670/612",
+      "segment": "ГТУ",
+      "rating": "турбины",
+      "status": "не установлен",
+      "sources": [
+        "https://www.protectivesupplies.com/datasheets/19_3500_53_electronic_overspeed_detection_system_datasheet_141539_cda_000_0.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "330400 / 330425 Accelerometer",
+      "kind": "датчик ускорения корпуса (зубчатые передачи и т. п.)",
+      "segment": "прочее",
+      "rating": "330400: 50 g, 100 мВ/g, API 670",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/330400%20and%20330425%20Accelerometer%20Acceleration%20Transducers.pdf",
+        "https://www.bakerhughes.com/bently-nevada/sensors/acceleration-velocity-sensors/330400330425-accelerometers"
+      ],
+      "verified": true
+    },
+    {
+      "model": "330500 Velomitor Piezo-velocity Sensor",
+      "kind": "пьезодатчик виброскорости (машины на подшипниках качения)",
+      "segment": "прочее",
+      "rating": "2-контактный",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/6936199b5fed75d8/original/330500-Velomitor-Piezo-velocity-Sensor-Datasheet-141632-pdf.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "1701 FieldMonitor",
+      "kind": "распределённая система защиты машин (на базе Allen-Bradley Flex I/O)",
+      "segment": "прочее",
+      "rating": "2-канальные модули 1701/15, 1701/25, 1701/30",
+      "status": "не установлен",
+      "sources": [
+        "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "1701/15 Proximitor Input Monitor",
+      "kind": "монитор радиальной вибрации и осевого положения",
+      "segment": "прочее",
+      "rating": "2 канала",
+      "status": "не установлен",
+      "sources": [
+        "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "1701/25 Seismic Input Monitor",
+      "kind": "монитор виброскорости и виброускорения",
+      "segment": "прочее",
+      "rating": "2 канала",
+      "status": "не установлен",
+      "sources": [
+        "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "1900/65A General Purpose Equipment Monitor",
+      "kind": "монитор для машин общего назначения (насосы, вентиляторы, двигатели)",
+      "segment": "насос",
+      "rating": "4 входа датчиков + 4 температурных входа, 6 реле",
+      "status": "выпускается (по datasheet; скептиком не проверялось)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/431ea7aa66550d9f/original/1900-65A-General-Purpose-Equipment-Monitor-Datasheet-173401-pdf.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "3300 XL 8 mm Proximity Transducer System Datasheet",
+      "doc_no": "141194 Rev. AM",
+      "machine": "3300 XL 8 mm",
+      "kind": "datasheet с данными для заказа",
+      "sources": [
+        "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf"
+      ]
+    },
+    {
+      "title": "3300 XL 8 mm and 3300 5 mm Proximity Transducer System Manual",
+      "doc_no": "141078",
+      "machine": "3300 XL 8 mm / 3300 5 mm",
+      "kind": "O&M (упомянут в datasheet 141194; самого файла нет)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf"
+      ]
+    },
+    {
+      "title": "3500 System Datasheet",
+      "doc_no": "162096 Rev. J",
+      "machine": "3500",
+      "kind": "системный datasheet",
+      "sources": [
+        "https://dam.bakerhughes.com/m/3e2d1931acef5630/original/3500-System-Datasheet-162096-pdf.pdf"
+      ]
+    },
+    {
+      "title": "3500/15 AC and DC Power Supplies Datasheet",
+      "doc_no": "141530 Rev. P",
+      "machine": "3500/15",
+      "kind": "datasheet с перечнем запчастей",
+      "sources": [
+        "https://dam.bakerhughes.com/m/c508e118bc517da/original/3500-15-AC-and-DC-Power-Supplies-Datasheet-141530-pdf.pdf"
+      ]
+    },
+    {
+      "title": "3500/22M Transient Data Interface Datasheet",
+      "doc_no": "161581 Rev. AC",
+      "machine": "3500/22M",
+      "kind": "datasheet с перечнем запчастей",
+      "sources": [
+        "https://dam.bakerhughes.com/m/3067f290d79c13de/original/3500-22M-Transient-Data-Interface-Module-Datasheet-161581-pdf.pdf"
+      ]
+    },
+    {
+      "title": "3500/22M TDI Operation and Maintenance User Guide",
+      "doc_no": "161580",
+      "machine": "3500/22M",
+      "kind": "O&M (упомянут в datasheet 161581)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/3067f290d79c13de/original/3500-22M-Transient-Data-Interface-Module-Datasheet-161581-pdf.pdf"
+      ]
+    },
+    {
+      "title": "3500/25 Enhanced Keyphasor Module Datasheet",
+      "doc_no": "141532 Rev. Y",
+      "machine": "3500/25",
+      "kind": "datasheet с перечнем запчастей",
+      "sources": [
+        "https://dam.bakerhughes.com/m/22d0219c69acbaf5/original/3500-25-Enhanced-Keyphasor-Module-Datasheet-141532-pdf.pdf"
+      ]
+    },
+    {
+      "title": "3500/32M 4-Channel Relay Module Datasheet",
+      "doc_no": "141533 Rev. W",
+      "machine": "3500/32M",
+      "kind": "datasheet с перечнем запчастей",
+      "sources": [
+        "https://dam.bakerhughes.com/m/7260d6def531c094/original/3500-32M-4-Channel-Relay-Module-Datasheet-141533-pdf.pdf"
+      ]
+    },
+    {
+      "title": "3500/42M Proximitor/Seismic Monitor Specifications and Ordering Information",
+      "doc_no": "143694-01 Rev. J (12/11)",
+      "machine": "3500/42M",
+      "kind": "datasheet с перечнем запчастей",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/3500%2042M%20Proximitor%20Seismic%20Monitor.pdf"
+      ]
+    },
+    {
+      "title": "3500/42M Monitor Manual",
+      "doc_no": "143489-01",
+      "machine": "3500/42M",
+      "kind": "O&M (упомянут в datasheet 143694-01)",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/3500%2042M%20Proximitor%20Seismic%20Monitor.pdf"
+      ]
+    },
+    {
+      "title": "3500/53M Electronic Overspeed Detection System Specifications and Ordering Information",
+      "doc_no": "141539-01 Rev. G (10/13)",
+      "machine": "3500/53M",
+      "kind": "datasheet с перечнем запчастей",
+      "sources": [
+        "https://www.protectivesupplies.com/datasheets/19_3500_53_electronic_overspeed_detection_system_datasheet_141539_cda_000_0.pdf"
+      ]
+    },
+    {
+      "title": "330400 and 330425 Accelerometer Acceleration Transducers Specifications and Ordering Information",
+      "doc_no": "141638-01 Rev. V (08/14)",
+      "machine": "330400/330425",
+      "kind": "datasheet",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/330400%20and%20330425%20Accelerometer%20Acceleration%20Transducers.pdf"
+      ]
+    },
+    {
+      "title": "330400 and 330425 Accelerometer Operations Manual",
+      "doc_no": "127088-01",
+      "machine": "330400/330425",
+      "kind": "O&M (упомянут в datasheet 141638-01)",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/330400%20and%20330425%20Accelerometer%20Acceleration%20Transducers.pdf"
+      ]
+    },
+    {
+      "title": "330500 Velomitor Piezo-velocity Sensor Datasheet",
+      "doc_no": "141632 Rev. V",
+      "machine": "330500",
+      "kind": "datasheet",
+      "sources": [
+        "https://dam.bakerhughes.com/m/6936199b5fed75d8/original/330500-Velomitor-Piezo-velocity-Sensor-Datasheet-141632-pdf.pdf"
+      ]
+    },
+    {
+      "title": "FieldMonitor Machinery Protection System Specifications and Ordering Information",
+      "doc_no": "141476-01 Rev. H (10/12)",
+      "machine": "1701 FieldMonitor",
+      "kind": "datasheet с перечнем компонентов",
+      "sources": [
+        "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf"
+      ]
+    },
+    {
+      "title": "FieldMonitor User Manual",
+      "doc_no": "139256-01",
+      "machine": "1701 FieldMonitor",
+      "kind": "O&M (упомянут в datasheet 141476-01)",
+      "sources": [
+        "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf"
+      ]
+    },
+    {
+      "title": "1900/65A General Purpose Equipment Monitor Datasheet",
+      "doc_no": "173401 Rev. AC",
+      "machine": "1900/65A",
+      "kind": "datasheet с принадлежностями",
+      "sources": [
+        "https://dam.bakerhughes.com/m/431ea7aa66550d9f/original/1900-65A-General-Purpose-Equipment-Monitor-Datasheet-173401-pdf.pdf"
+      ]
+    },
+    {
+      "title": "1900/65A User Guide",
+      "doc_no": "173400",
+      "machine": "1900/65A",
+      "kind": "O&M (упомянут в datasheet 173401)",
+      "sources": [
+        "https://dam.bakerhughes.com/m/431ea7aa66550d9f/original/1900-65A-General-Purpose-Equipment-Monitor-Datasheet-173401-pdf.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "330101",
+      "issuer": "Bently Nevada",
+      "description": "Зонд 3300 XL 8 мм, резьба 3/8-24 UNF, без брони (базовый номер, опции -AA-BB-CC-DD-EE)",
+      "machine": "3300 XL 8 mm",
+      "unit": "вихретоковый зонд",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "330101 3300 XL 8 mm Probe, 3/8-24 UNF thread, without armor"
+    },
+    {
+      "code": "330102",
+      "issuer": "Bently Nevada",
+      "description": "Зонд 3300 XL 8 мм, 3/8-24 UNF, с бронёй",
+      "machine": "3300 XL 8 mm",
+      "unit": "вихретоковый зонд",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "330102 3300 XL 8 mm Probe, 3/8-24 UNF thread, with armor"
+    },
+    {
+      "code": "330103",
+      "issuer": "Bently Nevada",
+      "description": "Зонд 3300 XL 8 мм, резьба M10 x 1, без брони",
+      "machine": "3300 XL 8 mm",
+      "unit": "вихретоковый зонд",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "330103 3300 XL 8 mm Probe, M10 x 1 thread,"
+    },
+    {
+      "code": "330104",
+      "issuer": "Bently Nevada",
+      "description": "Зонд 3300 XL 8 мм, резьба M10 x 1, с бронёй",
+      "machine": "3300 XL 8 mm",
+      "unit": "вихретоковый зонд",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "330104 3300 XL 8 mm Probe, M10 x 1 thread,"
+    },
+    {
+      "code": "330191",
+      "issuer": "Bently Nevada",
+      "description": "Зонд 3300 XL 8 мм расширенного температурного диапазона (ETR), 3/8-24 UNF",
+      "machine": "3300 XL 8 mm",
+      "unit": "вихретоковый зонд",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "330191 3300 XL 8 mm ETR Probe, 3/8-24 UNF"
+    },
+    {
+      "code": "330130-AAA-BB-CC",
+      "issuer": "Bently Nevada",
+      "description": "Стандартный удлинительный кабель 3300 XL (длина, исполнение, сертификация — опциями)",
+      "machine": "3300 XL 8 mm",
+      "unit": "удлинительный кабель",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "3300 XL Standard Extension Cable 330130-AAA-BB-CC"
+    },
+    {
+      "code": "330180-AA-BB",
+      "issuer": "Bently Nevada",
+      "description": "Преобразователь 3300 XL Proximitor Sensor (длина системы и монтаж — опциями)",
+      "machine": "3300 XL 8 mm",
+      "unit": "преобразователь Proximitor",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "3300 XL Proximitor Sensor 330180-AA-BB"
+    },
+    {
+      "code": "148722-01",
+      "issuer": "Bently Nevada",
+      "description": "Испытательная вилка 3300 XL для проверки преобразователя без снятия проводки",
+      "machine": "3300 XL 8 mm",
+      "unit": "принадлежности",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "148722-01 3300 XL test plug. The 3300 XL Test Plug contains 3 small test"
+    },
+    {
+      "code": "330153-01",
+      "issuer": "Bently Nevada",
+      "description": "Комплект разъёмов 3300 XL (пара ClickLoc, муфты, трубка FEP, лента)",
+      "machine": "3300 XL 8 mm",
+      "unit": "разъёмы",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "330153-01 3300 XL connector kit. Used on 3300 XL 8 mm probes and extension cables."
+    },
+    {
+      "code": "40180-02",
+      "issuer": "Bently Nevada",
+      "description": "Защитные колпачки разъёмов, 10 пар",
+      "machine": "3300 XL 8 mm",
+      "unit": "разъёмы",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "40180-02 Connector protectors. Package contains 10 pairs of connector"
+    },
+    {
+      "code": "163356",
+      "issuer": "Bently Nevada",
+      "description": "Комплект обжимного инструмента для разъёмов (совместим с 330153)",
+      "machine": "3300 XL 8 mm",
+      "unit": "инструмент",
+      "doc_ref": "141194 Rev. AM",
+      "source_url": "https://dam.bakerhughes.com/m/23d2a1de24360b13/original/3300-XL-8mm-Proximity-Transducer-System-Datasheet-141194-pdf.pdf",
+      "quote": "163356 Compatible only with 330153 connector kits"
+    },
+    {
+      "code": "288055-01",
+      "issuer": "Bently Nevada",
+      "description": "Стандартный модуль TDI 3500/22M с кабелем USB (запасной)",
+      "machine": "3500/22M",
+      "unit": "интерфейсный модуль стойки",
+      "doc_ref": "161581 Rev. AC",
+      "source_url": "https://dam.bakerhughes.com/m/3067f290d79c13de/original/3500-22M-Transient-Data-Interface-Module-Datasheet-161581-pdf.pdf",
+      "quote": "288055-01 Standard Transient Data Interface Module with USB cable"
+    },
+    {
+      "code": "146031-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль ввода-вывода TDI 10Base-T/100Base-TX",
+      "machine": "3500/22M",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "161581 Rev. AC",
+      "source_url": "https://dam.bakerhughes.com/m/3067f290d79c13de/original/3500-22M-Transient-Data-Interface-Module-Datasheet-161581-pdf.pdf",
+      "quote": "146031-01 10Base-T/100Base-TX I/O Module"
+    },
+    {
+      "code": "146031-02",
+      "issuer": "Bently Nevada",
+      "description": "Модуль ввода-вывода TDI 100Base-FX (оптика)",
+      "machine": "3500/22M",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "161581 Rev. AC",
+      "source_url": "https://dam.bakerhughes.com/m/3067f290d79c13de/original/3500-22M-Transient-Data-Interface-Module-Datasheet-161581-pdf.pdf",
+      "quote": "146031-02 100Base-FX (Fiber Optic) I/O Module"
+    },
+    {
+      "code": "176449-02",
+      "issuer": "Bently Nevada",
+      "description": "Монитор 3500/42M Proximitor/Seismic (запасной)",
+      "machine": "3500/42M",
+      "unit": "монитор вибрации",
+      "doc_ref": "143694-01 Rev. J",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/3500%2042M%20Proximitor%20Seismic%20Monitor.pdf",
+      "quote": "176449-02 3500/42M Proximitor/Seismic Monitor"
+    },
+    {
+      "code": "128229-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль ввода-вывода Prox/Seismic, внутренние клеммы",
+      "machine": "3500/42M",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "143694-01 Rev. J",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/3500%2042M%20Proximitor%20Seismic%20Monitor.pdf",
+      "quote": "128229-01 Prox/Seismic I/O Module with Internal Terminations"
+    },
+    {
+      "code": "128240-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль ввода-вывода Prox/Seismic, внешние клеммы",
+      "machine": "3500/42M",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "143694-01 Rev. J",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/3500%2042M%20Proximitor%20Seismic%20Monitor.pdf",
+      "quote": "128240-01 Prox/Seismic I/O Module with External Terminations"
+    },
+    {
+      "code": "135489-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль ввода-вывода со встроенными барьерами, 4 x Prox/Accel",
+      "machine": "3500/42M",
+      "unit": "модуль ввода-вывода (искробезопасный)",
+      "doc_ref": "143694-01 Rev. J",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/3500%2042M%20Proximitor%20Seismic%20Monitor.pdf",
+      "quote": "135489-01 I/O Module with Internal Barriers (Internal Terminations) (4 x Prox/Accel)."
+    },
+    {
+      "code": "140471-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль ввода-вывода Prox/Velom, внутренние клеммы",
+      "machine": "3500/42M",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "143694-01 Rev. J",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/3500%2042M%20Proximitor%20Seismic%20Monitor.pdf",
+      "quote": "140471-01 Prox/Velom I/O Module with Internal Terminations"
+    },
+    {
+      "code": "106M1079-01",
+      "issuer": "Bently Nevada",
+      "description": "Универсальный модуль питания AC стойки 3500",
+      "machine": "3500/15",
+      "unit": "питание стойки",
+      "doc_ref": "141530 Rev. P",
+      "source_url": "https://dam.bakerhughes.com/m/c508e118bc517da/original/3500-15-AC-and-DC-Power-Supplies-Datasheet-141530-pdf.pdf",
+      "quote": "106M1079- 01 Universal AC Power Supply Module"
+    },
+    {
+      "code": "106M1081-01",
+      "issuer": "Bently Nevada",
+      "description": "Универсальный входной модуль питания AC (PIM)",
+      "machine": "3500/15",
+      "unit": "питание стойки",
+      "doc_ref": "141530 Rev. P",
+      "source_url": "https://dam.bakerhughes.com/m/c508e118bc517da/original/3500-15-AC-and-DC-Power-Supplies-Datasheet-141530-pdf.pdf",
+      "quote": "106M1081-01 Universal AC Power Input Module"
+    },
+    {
+      "code": "114M5330-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль питания DC низкого напряжения",
+      "machine": "3500/15",
+      "unit": "питание стойки",
+      "doc_ref": "141530 Rev. P",
+      "source_url": "https://dam.bakerhughes.com/m/c508e118bc517da/original/3500-15-AC-and-DC-Power-Supplies-Datasheet-141530-pdf.pdf",
+      "quote": "114M5330- 01 Low Voltage DC Power Supply"
+    },
+    {
+      "code": "120M3877",
+      "issuer": "Bently Nevada",
+      "description": "Сменный предохранитель, быстрый, 5 А / 500 В AC, 6,3 x 32 мм (для универсального AC PIM)",
+      "machine": "3500/15",
+      "unit": "питание стойки",
+      "doc_ref": "141530 Rev. P",
+      "source_url": "https://dam.bakerhughes.com/m/c508e118bc517da/original/3500-15-AC-and-DC-Power-Supplies-Datasheet-141530-pdf.pdf",
+      "quote": "120M3877 Replacement Fuse Fast blow rated at 5A/500 Vac Size 6.3 x 32 mm"
+    },
+    {
+      "code": "01720025",
+      "issuer": "Bently Nevada",
+      "description": "Сменный предохранитель для AC PIM и устаревшего PIM высокого напряжения DC",
+      "machine": "3500/15",
+      "unit": "питание стойки",
+      "doc_ref": "141530 Rev. P",
+      "source_url": "https://dam.bakerhughes.com/m/c508e118bc517da/original/3500-15-AC-and-DC-Power-Supplies-Datasheet-141530-pdf.pdf",
+      "quote": "01720025 Replacement Fuse (for both AC Power Input Module and Legacy High Voltage DC Power Input Module)"
+    },
+    {
+      "code": "149369-01",
+      "issuer": "Bently Nevada",
+      "description": "Улучшенный модуль Keyphasor; прямая замена модуля 125792-01",
+      "machine": "3500/25",
+      "unit": "модуль Keyphasor",
+      "doc_ref": "141532 Rev. Y",
+      "source_url": "https://dam.bakerhughes.com/m/22d0219c69acbaf5/original/3500-25-Enhanced-Keyphasor-Module-Datasheet-141532-pdf.pdf",
+      "quote": "149369-01 Enhanced Keyphasor Module This module may be ordered as a direct plug-in replacement for Keyphasor Module 125792-01."
+    },
+    {
+      "code": "125800-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль ввода-вывода Keyphasor, внутренние клеммы",
+      "machine": "3500/25",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "141532 Rev. Y",
+      "source_url": "https://dam.bakerhughes.com/m/22d0219c69acbaf5/original/3500-25-Enhanced-Keyphasor-Module-Datasheet-141532-pdf.pdf",
+      "quote": "125800-01 Keyphasor I/O Module (Internal Terminations)"
+    },
+    {
+      "code": "125800-02",
+      "issuer": "Bently Nevada",
+      "description": "Изолированный модуль ввода-вывода Keyphasor для магнитных датчиков, внутренние клеммы",
+      "machine": "3500/25",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "141532 Rev. Y",
+      "source_url": "https://dam.bakerhughes.com/m/22d0219c69acbaf5/original/3500-25-Enhanced-Keyphasor-Module-Datasheet-141532-pdf.pdf",
+      "quote": "125800-02 Isolated Keyphasor I/O Module (Internal Terminations) (Designed for use with Magnetic Pickups)"
+    },
+    {
+      "code": "149986-02",
+      "issuer": "Bently Nevada",
+      "description": "Запасной 4-канальный модуль управления реле",
+      "machine": "3500/32M",
+      "unit": "релейный модуль",
+      "doc_ref": "141533 Rev. W",
+      "source_url": "https://dam.bakerhughes.com/m/7260d6def531c094/original/3500-32M-4-Channel-Relay-Module-Datasheet-141533-pdf.pdf",
+      "quote": "149986-02 Spare 4-Channel Relay Control Module"
+    },
+    {
+      "code": "125720-01",
+      "issuer": "Bently Nevada",
+      "description": "Запасной 4-канальный модуль релейных выходов (только для ремонта)",
+      "machine": "3500/32M",
+      "unit": "релейный модуль",
+      "doc_ref": "141533 Rev. W",
+      "source_url": "https://dam.bakerhughes.com/m/7260d6def531c094/original/3500-32M-4-Channel-Relay-Module-Datasheet-141533-pdf.pdf",
+      "quote": "125720-01 Spare 4-Channel Relay Output Module (available for repair only)"
+    },
+    {
+      "code": "288062-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль защиты от разгона 3500/53M",
+      "machine": "3500/53M",
+      "unit": "защита от разгона",
+      "doc_ref": "141539-01 Rev. G",
+      "source_url": "https://www.protectivesupplies.com/datasheets/19_3500_53_electronic_overspeed_detection_system_datasheet_141539_cda_000_0.pdf",
+      "quote": "288062-01 3500/53M Overspeed Detection Module"
+    },
+    {
+      "code": "323133-01",
+      "issuer": "Bently Nevada",
+      "description": "Модуль ввода-вывода защиты от разгона",
+      "machine": "3500/53M",
+      "unit": "защита от разгона",
+      "doc_ref": "141539-01 Rev. G",
+      "source_url": "https://www.protectivesupplies.com/datasheets/19_3500_53_electronic_overspeed_detection_system_datasheet_141539_cda_000_0.pdf",
+      "quote": "323133-01 Overspeed Detection I/O Module"
+    },
+    {
+      "code": "330400-AA-BB",
+      "issuer": "Bently Nevada",
+      "description": "Акселерометр 330400 (резьба шпильки и сертификация — опциями)",
+      "machine": "330400/330425",
+      "unit": "датчик ускорения",
+      "doc_ref": "141638-01 Rev. V",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/330400%20and%20330425%20Accelerometer%20Acceleration%20Transducers.pdf",
+      "quote": "330400-AA-BB"
+    },
+    {
+      "code": "330425-AA-BB",
+      "issuer": "Bently Nevada",
+      "description": "Акселерометр 330425",
+      "machine": "330400/330425",
+      "unit": "датчик ускорения",
+      "doc_ref": "141638-01 Rev. V",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/330400%20and%20330425%20Accelerometer%20Acceleration%20Transducers.pdf",
+      "quote": "330425 Accelerometer 330425-AA-BB"
+    },
+    {
+      "code": "00531080",
+      "issuer": "Bently Nevada",
+      "description": "Ответный разъём для акселерометров 330400 и 330425",
+      "machine": "330400/330425",
+      "unit": "разъём",
+      "doc_ref": "141638-01 Rev. V",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Bently%20Nevada/330400%20and%20330425%20Accelerometer%20Acceleration%20Transducers.pdf",
+      "quote": "00531080 Mating connector for 330400 and 330425 Accelerometers."
+    },
+    {
+      "code": "330500-AA-BB",
+      "issuer": "Bently Nevada",
+      "description": "Пьезодатчик скорости Velomitor 330500 (переходник резьбы и сертификация — опциями)",
+      "machine": "330500",
+      "unit": "датчик виброскорости",
+      "doc_ref": "141632 Rev. V",
+      "source_url": "https://dam.bakerhughes.com/m/6936199b5fed75d8/original/330500-Velomitor-Piezo-velocity-Sensor-Datasheet-141632-pdf.pdf",
+      "quote": "Velomitor Piezo-velocity Sensor 330500-AA-BB"
+    },
+    {
+      "code": "9571-NN",
+      "issuer": "Bently Nevada",
+      "description": "Двухжильный экранированный кабель 22 AWG с влагостойким разъёмом для Velomitor (длина в футах)",
+      "machine": "330500",
+      "unit": "кабель",
+      "doc_ref": "141632 Rev. V",
+      "source_url": "https://dam.bakerhughes.com/m/6936199b5fed75d8/original/330500-Velomitor-Piezo-velocity-Sensor-Datasheet-141632-pdf.pdf",
+      "quote": "9571-NN Two-conductor twisted, shielded 22 AWG cable"
+    },
+    {
+      "code": "1701/15-01",
+      "issuer": "Bently Nevada",
+      "description": "Монитор входов Proximitor FieldMonitor",
+      "machine": "1701 FieldMonitor",
+      "unit": "модуль монитора",
+      "doc_ref": "141476-01 Rev. H",
+      "source_url": "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf",
+      "quote": "1701/15-01 Proximitor Input Monitor 141483-01"
+    },
+    {
+      "code": "1701/25-01",
+      "issuer": "Bently Nevada",
+      "description": "Монитор сейсмических входов FieldMonitor",
+      "machine": "1701 FieldMonitor",
+      "unit": "модуль монитора",
+      "doc_ref": "141476-01 Rev. H",
+      "source_url": "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf",
+      "quote": "1701/25-01 Seismic Input Monitor 141484-01"
+    },
+    {
+      "code": "170133-XXX-XX",
+      "issuer": "Bently Nevada",
+      "description": "Встроенный модуль 3300 Proximitor для FieldMonitor",
+      "machine": "1701 FieldMonitor",
+      "unit": "модуль ввода-вывода датчика",
+      "doc_ref": "141476-01 Rev. H",
+      "source_url": "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf",
+      "quote": "170133-XXX-XX Internal 3300 Proximitor Module 141481-01"
+    },
+    {
+      "code": "1701/10-01",
+      "issuer": "Bently Nevada",
+      "description": "Блок питания FieldMonitor 24 В DC",
+      "machine": "1701 FieldMonitor",
+      "unit": "питание",
+      "doc_ref": "141476-01 Rev. H",
+      "source_url": "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf",
+      "quote": "1701/10-01 24-volt dc Power Supply 141479-01"
+    },
+    {
+      "code": "167699-02",
+      "issuer": "Bently Nevada",
+      "description": "Модуль дисплея 1900/65A",
+      "machine": "1900/65A",
+      "unit": "дисплей",
+      "doc_ref": "173401 Rev. AC",
+      "source_url": "https://dam.bakerhughes.com/m/431ea7aa66550d9f/original/1900-65A-General-Purpose-Equipment-Monitor-Datasheet-173401-pdf.pdf",
+      "quote": "167699-02 1900/65A Display Module"
+    },
+    {
+      "code": "284785",
+      "issuer": "Bently Nevada (номер для барьера MTL 7728)",
+      "description": "Барьер искробезопасности MTL 7728(-)",
+      "machine": "1900/65A",
+      "unit": "барьер искробезопасности",
+      "doc_ref": "173401 Rev. AC",
+      "source_url": "https://dam.bakerhughes.com/m/431ea7aa66550d9f/original/1900-65A-General-Purpose-Equipment-Monitor-Datasheet-173401-pdf.pdf",
+      "quote": "284785 MTL 7728(-) barrier"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Rockwell Automation (Allen-Bradley)",
+      "component": "встроенная платформа Flex I/O (серия 1794) и сетевые адаптеры",
+      "machine": "1701 FieldMonitor",
+      "evidence": "В datasheet 141476-01 изготовителя сказано: «The FieldMonitor Machinery Protection System uses embedded technology from Allen-Bradley... physically connects to Allen-Bradley's 1794 series Flex I/O family»",
+      "sources": [
+        "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "MTL",
+      "component": "барьеры искробезопасности MTL 7728 и MTL 7796",
+      "machine": "1900/65A",
+      "evidence": "В перечне принадлежностей datasheet 173401 есть строки «284785 MTL 7728(-) barrier» и «175502 MTL 7796(-) barrier». Это принадлежности под номером Bently, а не узел внутри монитора. Принадлежность MTL к Eaton источником не подтверждается.",
+      "sources": [
+        "https://dam.bakerhughes.com/m/431ea7aa66550d9f/original/1900-65A-General-Purpose-Equipment-Monitor-Datasheet-173401-pdf.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Квазартек",
+      "country": "Россия",
+      "role": "перепродавец: сообщает о поставках модулей 3500 и датчиков 3300 XL в РФ; статус официального партнёра не подтверждён",
+      "sources": [
+        "https://qtec.spb.ru/press/postavka-moduley-bently-nevada/"
+      ]
+    },
+    {
+      "company": "СКБ-4",
+      "country": "Россия",
+      "role": "перепродавец: поставки датчиков 3300 XL NSv и блоков преобразователя; статус официального партнёра не подтверждён",
+      "sources": [
+        "https://www.skb-4.com/novosti/postavka-beskontaktnyh-datchikov-bently-nevada-3300xl-nsv",
+        "https://www.skb-4.com/novosti/postavka-produkcii-bently-nevada"
+      ]
+    },
+    {
+      "company": "Промимпорт",
+      "country": "Россия",
+      "role": "перепродавец: поставки датчиков 3300 XL и комплектующих системы 3500; статус официального партнёра не подтверждён",
+      "sources": [
+        "https://promimport.info/partners/bently-nevada/beskontaktnye-datchiki-3300xl/",
+        "https://promimport.info/krupnaya-postavka-datchikov-i-komplektuyushhih-bently-nevada/"
+      ]
+    },
+    {
+      "company": "Roots Supply Solutions",
+      "country": "ОАЭ",
+      "role": "на своей странице называет себя авторизованным дистрибьютором Bently Nevada в ОАЭ; изготовитель это не подтвердил",
+      "sources": [
+        "https://roots-gt.ocat.ae/pages/Authorized-Distributors-of-Bently-Nevada-in-the-UAE-Roots-Supply-Solutions-cntid-20246.aspx"
+      ]
+    },
+    {
+      "company": "Oilmark International",
+      "country": "ОАЭ",
+      "role": "поставщик продукции Bently Nevada (защита машин и мониторинг состояния); статус не подтверждён",
+      "sources": [
+        "https://www.oilmarkinternational.com/bently-nevada.php"
+      ]
+    },
+    {
+      "company": "DCSModule (dcsmodule.com)",
+      "country": "Китай",
+      "role": "перепродавец запасных модулей и датчиков (330101-..., 3500/22M 288055-01, 3500/32M 149986-02)",
+      "sources": [
+        "https://www.dcsmodule.com/3500-22m-288055-01-bently-nevada-transient-data-interface-module_p631.html"
+      ]
+    },
+    {
+      "company": "Instrumart",
+      "country": "США",
+      "role": "интернет-магазин: 1900/65A и 330400/330425, выкладывает datasheet изготовителя",
+      "sources": [
+        "https://www.instrumart.com/products/38357/bently-nevada-190065a-general-purpose-equipment-monitor",
+        "https://www.instrumart.com/products/44331/bently-nevada-330400-330425-accelerometer"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальный список партнёров и сервисных центров Bently Nevada (поиск на сайте Baker Hughes) не найден в открытом виде. Статус поставок в Россию после ухода Baker Hughes в 2022 году не подтверждён. Все российские и китайские адресаты записаны как перепродавцы.",
+    "Руководства по эксплуатации (141078, 161580, 143489-01, 139256-01, 173400, 127088-01) упомянуты в datasheet, но лежат в закрытой медиатеке Bently Nevada: вход через bntechsupport.com.",
+    "Прайс-листы и перечни снятых с производства изделий не найдены. Выпускается ли ещё 1701 FieldMonitor и прежний 3500/53, не проверено.",
+    "Не собраны коды 3300 XL 11 мм (330703/330780), 3300 XL NSv (330903/330980), 3300 5 мм, стойки 3500/05, шлюза 3500/92, монитора 3500/40M, модулей 1701/44 и 1900/65A: поиск до них не дошёл.",
+    "Применение по конкретным машинам (какие модули стоят на GE Frame, Siemens SGT, компрессорах и насосах парка) в открытых документах изготовителя не указано. Искать в ведомостях ЗИП заказчиков и в спецификациях KKS/API 670 проектов.",
+    "Кто изготавливает узлы внутри модулей 3500 (платы, блоки питания), в открытых источниках не указано."
+  ],
+  "verifier_notes": "Все 12 источников скачаны через curl и прочитаны через pdftotext. Все 42 кода найдены в указанных документах, описание при каждом совпадает. Ревизии документов тоже совпадают: 141194 AM, 161581 AC, 143694-01 J, 141530 P, 141532 Y, 141533 W, 141539-01 G, 141638-01 V, 141632 V, 141476-01 H, 173401 AC, 162096 J. В 141530 номера 106M1079-01 и 114M5330-01 разорваны переносом строки. Таблица запчастей 3500/42M в двух колонках, и сплошной текст её перемешивает, поэтому соответствие кода и строки проверено по раскладке страниц 12–13. Источники для 3500/42M, 3500/53M, 330400/330425 и 1701 лежат на сайтах дистрибьюторов (quicktimeonline, protectivesupplies, imimg), но это копии даташитов изготовителя с его номерами документов. Статусы машин («выпускается» и «не установлен») не проверялись. Вхождение MTL в Eaton из источника не подтверждается.",
+  "corrections": [
+    "summary: число кодов исправлено с 38 на 42 — по фактическому числу записей parts (скептик сверил все коды)",
+    "sub_suppliers MTL: снята приписка «(Eaton)» — источник её не подтверждает (замечание скептика)",
+    "machines: к статусу «выпускается» добавлена оговорка — скептик статусы не проверял (замечание скептика)"
+  ]
+}

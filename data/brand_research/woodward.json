@@ -1,0 +1,871 @@
+{
+  "oem_key": "woodward",
+  "name": "Woodward, Inc.",
+  "segment_focus": "регуляторы 505, ProAct, TecJet, EGS, easYgen, топливные клапаны: номера и применимость по двигателям и турбинам",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Woodward не делает саму машину. Он поставляет системы управления, исполнительные механизмы и топливные клапаны для паровых, газовых и гидротурбин, компрессоров и газопоршневых двигателей. Главный открытый источник — каталог изготовителя «Industrial Turbine Products Catalog», публикация 25182 Rev. AG (2025), на сайте woodward.com. В нём найдены товарные номера регуляторов 505, 505-XT, 505-DR, 505HT, 5009XT и Vertex, защиты ProTech, приводов ProAct Gen3 и L-Series, газовых дозаторов TecJet 52/85/110, блоков LECM E6, топливных клапанов ГТУ (GS40, GS50, LQ25), контроллеров easYgen и датчиков частоты MPU. Применимость TecJet по двигателям взята из каталога: исполнения для протоколов EGS-01 и EGS-02/E6, а также отдельные номера для Jenbacher, MTU, MHI и CAT. Замены при снятии TecJet 52 с выпуска подтверждены уведомлением PCN 06989. Расходные позиции взяты из руководств изготовителя. Для 505 это батарея часов 1743-1017, кабель CAN 2008-1512 (Belden YR58684) и кабель Ethernet. Для ProAct — ответный разъём 1635-1113 и кабель RS-232. Все 40 кодов подтверждены дословной строкой из PDF изготовителя.",
+  "machines": [
+    {
+      "model": "505 (8200-1300/-1301/-1302)",
+      "kind": "цифровой регулятор паровой турбины",
+      "segment": "ГТУ",
+      "rating": "одно- или двухклапанные паровые турбины, питание LVDC или HVAC/DC",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/09/26839V1_G.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "505-XT (8200-1310/-1311/-1312)",
+      "kind": "регулятор паровой турбины, расширенный ввод-вывод",
+      "segment": "ГТУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "505-DR (8200-1330/-1331)",
+      "kind": "резервированный регулятор паровой турбины",
+      "segment": "ГТУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "505HT (8200-1400…1403)",
+      "kind": "регулятор гидротурбины (Pelton, Francis, Kaplan)",
+      "segment": "прочее",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "5009XT (8262-1141/-1142/-1143)",
+      "kind": "система управления паровой турбиной на базе MicroNet",
+      "segment": "ГТУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "Vertex / VertexDR (8200-1370…1375)",
+      "kind": "система управления компрессором (антипомпаж)",
+      "segment": "компрессор",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "2301E-ST (8273-1013/-1014)",
+      "kind": "регулятор паровой турбины",
+      "segment": "ГТУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "ProTech-GII / ProTech TPS",
+      "kind": "защита турбины от разгона",
+      "segment": "ГТУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "ProAct Gen3 Flex, модели II/III/IV",
+      "kind": "электрический исполнительный механизм и позиционер для топливной рейки или дросселя",
+      "segment": "двигатель",
+      "rating": "модели II–IV (по моменту)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26578_D.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ProAct Analog (8404-005/-006/-200/-201)",
+      "kind": "электрический привод со встроенным драйвером",
+      "segment": "двигатель",
+      "rating": "модели 1 и 2, поворот 75°",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26147_H.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ProAct 75 (1-е поколение)",
+      "kind": "регулятор частоты вращения и привод",
+      "segment": "двигатель",
+      "status": "в каталоге указаны замены старых номеров на новые (RoHS)",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "L-Series (привод, дроссель ITB, LC50 со смесителем)",
+      "kind": "малый электрический привод и дроссельная заслонка газового двигателя",
+      "segment": "ГПУ",
+      "rating": "дроссель 25–50 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TecJet 52",
+      "kind": "электронный газодозирующий клапан",
+      "segment": "ГПУ",
+      "status": "поколение 1 (без RoHS) снято 30.09.2025, выпускается поколение 2 (RoHS)",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/B06989_-.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "TecJet 85 / TecJet 110",
+      "kind": "электронный газодозирующий клапан",
+      "segment": "ГПУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "TecJet 50 / 50 Plus",
+      "kind": "газовый регулирующий клапан",
+      "segment": "ГПУ",
+      "status": "статус не установлен",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/36102_B.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "LECM E6 (8280-40xx)",
+      "kind": "блок управления большим газовым двигателем (зажигание, детонация, термопары)",
+      "segment": "ГПУ",
+      "rating": "бедная и богатая смесь, до 20 цилиндров зажигания",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EGS-01 / EGS-02",
+      "kind": "система управления газовым двигателем (соотношение воздух–топливо)",
+      "segment": "ГПУ",
+      "status": "в каталоге есть только как протокол TecJet (EGS-01, EGS-02/E6); что преемник — E6, говорит только сторонний сайт (страница стороннего сайта при проверке пустая, утверждение не проверено)",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+        "http://e6-lecm.com/Woodward-LECM-E6-gas-engine-replacements.html"
+      ],
+      "verified": false,
+      "rating": "данных нет"
+    },
+    {
+      "model": "GS40 / GS50",
+      "kind": "газовый топливный клапан ГТУ со встроенным драйвером",
+      "segment": "ГТУ",
+      "rating": "фланец 1,5 и 2 дюйма",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LQ6 / LQ25",
+      "kind": "клапан жидкого топлива ГТУ",
+      "segment": "ГТУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "VariStroke I / II",
+      "kind": "электрогидравлический привод клапанов паровой турбины",
+      "segment": "ГТУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "UG-25+",
+      "kind": "гидромеханический регулятор частоты вращения",
+      "segment": "двигатель",
+      "rating": "25–31 lb·ft",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "easYgen-3100XT / 3200XT",
+      "kind": "контроллер генераторной установки, параллельная работа",
+      "segment": "ГПУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "easYgen-3400XT / 3500XT",
+      "kind": "контроллер генераторной установки со встроенной логикой выключателей",
+      "segment": "ГПУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "easYgen-2200/2300/2500",
+      "kind": "контроллер генераторной установки, простая параллельная работа",
+      "segment": "ГПУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Industrial Turbine Products Catalog",
+      "doc_no": "25182 Rev. AG",
+      "machine": "вся промышленная линейка (505, 5009XT, ProAct, L-Series, TecJet, LECM, easYgen, GS/LQ, MPU)",
+      "kind": "каталог запчастей и изделий",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
+      ]
+    },
+    {
+      "title": "505 Digital Control for Steam Turbines — Installation and Operation (Vol. 1)",
+      "doc_no": "26839V1 Rev. G (8/2024)",
+      "machine": "505 (8200-1300/-1301/-1302)",
+      "kind": "O&M",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/09/26839V1_G.pdf"
+      ]
+    },
+    {
+      "title": "505 Digital Control for Steam Turbines (Vol. 2)",
+      "doc_no": "26839V2 Rev. D (10/2021)",
+      "machine": "505",
+      "kind": "service manual",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26839V2_D.pdf"
+      ]
+    },
+    {
+      "title": "ProAct Analog Electric Actuator with Integral Driver",
+      "doc_no": "26147 Rev. H (6/2016)",
+      "machine": "ProAct Analog",
+      "kind": "O&M",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26147_H.pdf"
+      ]
+    },
+    {
+      "title": "ProAct P-Series Position Controller, Actuator Models II through IV — Installation, Programming, and Troubleshooting",
+      "doc_no": "26578 Rev. D (6/2016)",
+      "machine": "ProAct II–IV",
+      "kind": "service manual",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26578_D.pdf"
+      ]
+    },
+    {
+      "title": "ProAct Analog & Digital Plus — Product Specification",
+      "doc_no": "03231 Rev. J",
+      "machine": "ProAct",
+      "kind": "спецификация",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/03231_J.pdf"
+      ]
+    },
+    {
+      "title": "TecJet 50 Gas Control Valve — Installation and Operation Manual",
+      "doc_no": "36102 Rev. B",
+      "machine": "TecJet 50",
+      "kind": "O&M",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/36102_B.pdf"
+      ]
+    },
+    {
+      "title": "Product Change Notification 06989 — TecJet 52 Product Change",
+      "doc_no": "PCN 06989 Rev- (11/2023)",
+      "machine": "TecJet 52",
+      "kind": "бюллетень",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/B06989_-.pdf"
+      ]
+    },
+    {
+      "title": "ProAct I/II Actuator Technical Manual",
+      "doc_no": "04121 Rev. K",
+      "machine": "ProAct I/II",
+      "kind": "service manual",
+      "sources": [
+        "https://www.precisioncontrols.co.uk/assets/downloads/woodward/proact-I+II-Actuator-Tech-Manual-04121-Rev-K.pdf"
+      ]
+    },
+    {
+      "title": "2300G Gas Engine Control",
+      "doc_no": "91372",
+      "machine": "2300G (газовый двигатель)",
+      "kind": "спецификация",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/91372_NEW.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "1680-613",
+      "issuer": "Woodward",
+      "description": "Магнитный датчик частоты вращения MPU-50, резьба 0.625-18, 2.0 дюйма",
+      "machine": "505 / 2301E / ProTech (вход частоты)",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "25182 Rev. AG, Magnetic Pickups, стр. 17",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "MPU-50 VPP 0.625-18 2.0” 200 ohms None 1630-755 1680-613"
+    },
+    {
+      "code": "202816",
+      "issuer": "Woodward",
+      "description": "Магнитный датчик частоты вращения MPU-70, 0.625-18, 1.4 дюйма",
+      "machine": "регуляторы турбин Woodward",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "25182 Rev. AG, стр. 17",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "MPU-70 VPP 0.625-18 1.4” 210 ohms None 1630-755 202816"
+    },
+    {
+      "code": "1680-649",
+      "issuer": "Woodward",
+      "description": "Магнитный датчик частоты вращения MPU-60, метрическая резьба M16x1.5, 3.0 дюйма",
+      "machine": "регуляторы турбин Woodward",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "25182 Rev. AG, стр. 17",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "MPU-60 VPP M16x1.5 3.0” 250 ohms None 1630-755 1680-649"
+    },
+    {
+      "code": "1630-755",
+      "issuer": "Woodward",
+      "description": "Ответный разъём к магнитным датчикам MPU-50/60/70",
+      "machine": "регуляторы турбин Woodward",
+      "unit": "датчик частоты вращения, разъём",
+      "doc_ref": "25182 Rev. AG, стр. 17 (графа Compatible Connector)",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "MPU-50 VPP 0.625-18 2.0” 200 ohms None 1630-755 1680-613"
+    },
+    {
+      "code": "1680-2004",
+      "issuer": "Woodward",
+      "description": "Магнитный датчик MPU-54, 0.750-20, 1.87 дюйма, CSA и ATEX Div1, выводы 3 шт. по 10 футов",
+      "machine": "турбины во взрывоопасной зоне",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "25182 Rev. AG, стр. 17",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "MPU-54 VPP 0.750-20 1.87” 180 ohms CSA&ATEX – None-3x 10ft. 1680-2004"
+    },
+    {
+      "code": "1680-2004.SIL",
+      "issuer": "Woodward",
+      "description": "Магнитный датчик MPU, исполнение SIL3, взрывонепроницаемое",
+      "machine": "ProTech / защита от разгона",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "25182 Rev. AG, стр. 17",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "0.750-20 1.87” 180 ohms SIL3 Ex Proof 1680-2004.SIL"
+    },
+    {
+      "code": "5430-915",
+      "issuer": "Woodward",
+      "description": "Комплект: датчик MPU 1680-613 с разъёмом",
+      "machine": "регуляторы турбин Woodward",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "25182 Rev. AG, стр. 17 (MPU Kit (1680-613))",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "0.625-18 2.0” 200 ohms None Included 5430-915"
+    },
+    {
+      "code": "8200-1300",
+      "issuer": "Woodward",
+      "description": "Регулятор 505, питание LVDC, общепромышленное исполнение",
+      "machine": "паровая турбина",
+      "unit": "система регулирования",
+      "doc_ref": "25182 Rev. AG, раздел 505",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "505 - LVDC, Ordinary Location 8200-1300"
+    },
+    {
+      "code": "8200-1301",
+      "issuer": "Woodward",
+      "description": "Регулятор 505, питание HVAC/DC",
+      "machine": "паровая турбина",
+      "unit": "система регулирования",
+      "doc_ref": "25182 Rev. AG, раздел 505",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "505 - HVAC/DC, Ordinary Location 8200-1301"
+    },
+    {
+      "code": "8200-1310",
+      "issuer": "Woodward",
+      "description": "Регулятор 505-XT, питание LVDC",
+      "machine": "паровая турбина",
+      "unit": "система регулирования",
+      "doc_ref": "25182 Rev. AG, раздел 505-XT",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "505-XT - LVDC, Ordinary Location 8200-1310"
+    },
+    {
+      "code": "5404-1801",
+      "issuer": "Woodward",
+      "description": "Комплект проводки для замены старого 505 на новый",
+      "machine": "паровая турбина (модернизация 505)",
+      "unit": "система регулирования",
+      "doc_ref": "25182 Rev. AG",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "Old 505 to New 505 Retrofit Wiring Kit 5404-1801"
+    },
+    {
+      "code": "1743-1017",
+      "issuer": "Woodward",
+      "description": "Литиевый элемент питания часов реального времени (RTC) регулятора 505",
+      "machine": "505",
+      "unit": "система регулирования, контроллер",
+      "doc_ref": "26839V1 Rev. G",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/09/26839V1_G.pdf",
+      "quote": "The RTC battery is a replaceable lithium coin cell Woodward PN 1743-1017."
+    },
+    {
+      "code": "2008-1512",
+      "issuer": "Woodward (кабель Belden YR58684)",
+      "description": "Кабель CAN, 120 Ом, трёхжильный, экранированный",
+      "machine": "505",
+      "unit": "связь CAN",
+      "doc_ref": "26839V1 Rev. G, Table 2-6",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/09/26839V1_G.pdf",
+      "quote": "Belden YR58684 (Woodward PN 2008-1512) communications / CAN cable is approved and"
+    },
+    {
+      "code": "5417-394",
+      "issuer": "Woodward",
+      "description": "Кабель Ethernet SSTP Cat5, 10 футов",
+      "machine": "505",
+      "unit": "связь Ethernet",
+      "doc_ref": "26839V1 Rev. G",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/09/26839V1_G.pdf",
+      "quote": "(Woodward PN 5417-394, 10 feet)"
+    },
+    {
+      "code": "8404-200",
+      "issuer": "Woodward",
+      "description": "ProAct Analog, модель 1, вход 0–200 mA / 4–20 mA",
+      "machine": "двигатель (топливная рейка, дроссель)",
+      "unit": "исполнительный механизм",
+      "doc_ref": "26147 Rev. H, стр. 7",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26147_H.pdf",
+      "quote": "8404-200 1 0–200 mA / 4–20 mA"
+    },
+    {
+      "code": "8404-201",
+      "issuer": "Woodward",
+      "description": "ProAct Analog, модель 2, вход 0–200 mA / 4–20 mA",
+      "machine": "двигатель",
+      "unit": "исполнительный механизм",
+      "doc_ref": "26147 Rev. H, стр. 7",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26147_H.pdf",
+      "quote": "8404-201 2 0–200 mA / 4–20 mA"
+    },
+    {
+      "code": "8404-319",
+      "issuer": "Woodward",
+      "description": "ProAct Gen3 Flex, модель II, 16 контактов, конфигурация D+; заменяет 8404-008",
+      "machine": "двигатель, ГПУ",
+      "unit": "исполнительный механизм",
+      "doc_ref": "25182 Rev. AG, ProAct Positioner (Flex I/O), стр. 59",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "PROACT GEN3 FLEX, MODEL II (16-PIN (C/P/A), D+ CONFIG, 8404-008 8404-319"
+    },
+    {
+      "code": "8404-318",
+      "issuer": "Woodward",
+      "description": "ProAct Gen3 Flex, модель III, 16 контактов, D+, 4–20 mA; заменяет 8404-009 и 8404-037",
+      "machine": "двигатель, ГПУ",
+      "unit": "исполнительный механизм",
+      "doc_ref": "25182 Rev. AG, стр. 59",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "PROACT GEN3 FLEX, MODEL III (16-PIN (C/P/A), D+ CONFIG, 4-20 mA 8404-009, 8404-037 8404-318"
+    },
+    {
+      "code": "8404-325",
+      "issuer": "Woodward",
+      "description": "ProAct Gen3 Flex, модель IV, 16 контактов, D+, 4–20 mA; заменяет 8404-010 и 8404-211",
+      "machine": "двигатель, ГПУ",
+      "unit": "исполнительный механизм",
+      "doc_ref": "25182 Rev. AG, стр. 59",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "PROACT GEN3 FLEX, MODEL IV (16-PIN (C/P/A), D+ CONFIG, 4-20 mA 8404-010, 8404-211 8404-325"
+    },
+    {
+      "code": "8335-004",
+      "issuer": "Woodward",
+      "description": "Дроссельная заслонка ITB 120 мм под ProAct Gen3 модели II",
+      "machine": "газовый двигатель",
+      "unit": "дроссельная заслонка",
+      "doc_ref": "25182 Rev. AG, ProAct ITB, стр. 60",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "120 MM ITB, PROACT GEN3 MODEL II (GENERAL SALE) 8335-004"
+    },
+    {
+      "code": "1635-1113",
+      "issuer": "Woodward",
+      "description": "Ответный разъём ProAct (комплект 6995-1021)",
+      "machine": "ProAct II–IV",
+      "unit": "исполнительный механизм, разъём",
+      "doc_ref": "26578 Rev. D",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26578_D.pdf",
+      "quote": "As an option, a connector can be ordered from Woodward, part number 1635-1113, kit 6995-1021."
+    },
+    {
+      "code": "1249-1147",
+      "issuer": "Woodward",
+      "description": "Кабель RS-232 для сервисной программы ProAct",
+      "machine": "ProAct II–IV",
+      "unit": "сервисная связь",
+      "doc_ref": "26578 Rev. D",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26578_D.pdf",
+      "quote": "An RS-232 breakout cable is available for purchase from Woodward, part number 1249-1147."
+    },
+    {
+      "code": "8407-603",
+      "issuer": "Woodward",
+      "description": "TecJet 52 для EGS-02/E6; заменяет 8407-526 и 8407-534",
+      "machine": "газовый двигатель с EGS-02 или E6",
+      "unit": "газодозирующий клапан",
+      "doc_ref": "25182 Rev. AG, стр. 61; PCN 06989",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "TecJet 52 for EGS-02/E6 8407-526, 8407-534 8407-603"
+    },
+    {
+      "code": "8407-605",
+      "issuer": "Woodward",
+      "description": "TecJet 52 для EGS-01; заменяет 8407-526 и 8407-540",
+      "machine": "газовый двигатель с EGS-01",
+      "unit": "газодозирующий клапан",
+      "doc_ref": "25182 Rev. AG, стр. 61",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "TecJet 52 for EGS-01 8407-526, 8407-540 8407-605"
+    },
+    {
+      "code": "8407-647",
+      "issuer": "Woodward",
+      "description": "TecJet 52 второго поколения (RoHS), замена 8407-547; в каталоге 25182 номер стоит и в строке «EGS02, METAL CAP», и в строке «Jenbacher»; в той же таблице строка «EGS02, METAL CAP» стоит и с номером 8407-604 — применимость сверять с Woodward",
+      "machine": "Jenbacher (протокол заказчика)",
+      "unit": "газодозирующий клапан",
+      "doc_ref": "PCN 06989, стр. 2",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/B06989_-.pdf",
+      "quote": "8407-547 (June ’24) 8407-647"
+    },
+    {
+      "code": "8407-537",
+      "issuer": "Woodward",
+      "description": "TecJet 52 для MHI; заменяет 8407-600 и 8407-602",
+      "machine": "газовый двигатель MHI",
+      "unit": "газодозирующий клапан",
+      "doc_ref": "25182 Rev. AG, стр. 61",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "TecJet 52 for MHI 8407-600, 8407-602 8407-537"
+    },
+    {
+      "code": "8407-523",
+      "issuer": "Woodward",
+      "description": "TecJet 110 для EGS-02/E6",
+      "machine": "газовый двигатель большой мощности с EGS-02 или E6",
+      "unit": "газодозирующий клапан",
+      "doc_ref": "25182 Rev. AG, стр. 61",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "TecJet 110 for EGS-02/E6 8407-523"
+    },
+    {
+      "code": "8407-515",
+      "issuer": "Woodward",
+      "description": "TecJet 110 для Jenbacher (эксклюзивное исполнение)",
+      "machine": "Jenbacher",
+      "unit": "газодозирующий клапан",
+      "doc_ref": "25182 Rev. AG, стр. 61",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "TecJet 110 for Jenbacher (Exclusive) 8407-515"
+    },
+    {
+      "code": "8407-543",
+      "issuer": "Woodward",
+      "description": "TecJet 110 для MTU",
+      "machine": "газовый двигатель MTU",
+      "unit": "газодозирующий клапан",
+      "doc_ref": "25182 Rev. AG, стр. 61",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "TecJet 110 for MTU 8407-543"
+    },
+    {
+      "code": "8407-533",
+      "issuer": "Woodward",
+      "description": "TecJet 85; заменяет 8407-538",
+      "machine": "газовый двигатель",
+      "unit": "газодозирующий клапан",
+      "doc_ref": "25182 Rev. AG, стр. 61",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "TecJet 85 8407-538 8407-533"
+    },
+    {
+      "code": "8280-4003",
+      "issuer": "Woodward",
+      "description": "Блок LECM E6 из трёх модулей, бедная смесь: 20 каналов зажигания, 10 каналов детонации, 14 термопар",
+      "machine": "газовый двигатель (ГПУ)",
+      "unit": "система управления двигателем",
+      "doc_ref": "25182 Rev. AG, стр. 62",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "CONTROL - LECM - E6 (3-STACK) LEAN-BURN, 20 IGNITION, 10 KNOCK, 14 TC 8280-4003"
+    },
+    {
+      "code": "9908-1606",
+      "issuer": "Woodward",
+      "description": "Газовый топливный клапан GS50, 2 дюйма RF600#, нержавеющая сталь, 1.5 ACD, 125 В",
+      "machine": "газовая турбина",
+      "unit": "топливная система ГТУ",
+      "doc_ref": "25182 Rev. AG, стр. 48 (спецификация 03456, руководство 35136)",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "GS50, 2IN RF600#, SST, 1.5 ACD, 125V, NO-SIL, NO-RTE, CONDUIT 9908-1606"
+    },
+    {
+      "code": "9908-1609",
+      "issuer": "Woodward",
+      "description": "Газовый топливный клапан GS40, 1.5 дюйма RF600#, нержавеющая сталь, 0.75 ACD, 125 В",
+      "machine": "газовая турбина",
+      "unit": "топливная система ГТУ",
+      "doc_ref": "25182 Rev. AG, стр. 48",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "GS40, 1.5IN RF600#, SST, 0.75 ACD, 125V, NO-SIL, NO-RTE, CONDUIT 9908-1609"
+    },
+    {
+      "code": "9907-696",
+      "issuer": "Woodward",
+      "description": "Клапан жидкого топлива LQ25, 0.2 кв. дюйма, с PIV и SOV, резольвер, ATEX/PED",
+      "machine": "газовая турбина (жидкое топливо)",
+      "unit": "топливная система ГТУ",
+      "doc_ref": "25182 Rev. AG, стр. 49 (спецификация 40174, руководство 26161)",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "LQ25 - 0.2 SQ INCH, PIV AND SOV, 3 SPD RESOLVER, ATEX/PED 9907-696"
+    },
+    {
+      "code": "8923-3024",
+      "issuer": "Woodward",
+      "description": "Запасной соленоид сбросного клапана (dump valve) VariStroke",
+      "machine": "паровая турбина (привод VariStroke)",
+      "unit": "электрогидравлический привод клапана",
+      "doc_ref": "25182 Rev. AG, запасные части VariStroke",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "DV Solenoid Replacement Dump Valve Solenoid - Spare 8923-3024"
+    },
+    {
+      "code": "8404-7207",
+      "issuer": "Woodward",
+      "description": "L-Series с дросселем ITB 36 мм, регулирование частоты; аналог 8404-2007",
+      "machine": "газовый двигатель малой мощности",
+      "unit": "дроссельная заслонка с приводом",
+      "doc_ref": "25182 Rev. AG, стр. 53",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "L-Series ITB, 36 mm, Spd Ctrl, Dflt Pmtrs 8404-2007 8404-7207"
+    },
+    {
+      "code": "8528-122",
+      "issuer": "Woodward",
+      "description": "Гидромеханический регулятор UG-25+, 25 lb·ft, шлицевой привод",
+      "machine": "дизельный или газовый двигатель, малая турбина",
+      "unit": "регулятор частоты вращения",
+      "doc_ref": "25182 Rev. AG, раздел UG-25+",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "GOVERNOR - P3, UG-25+, 25 LB FT, .625 PUMP, SERR DRIVE, .625 TERM 8528-122"
+    },
+    {
+      "code": "8440-2082",
+      "issuer": "Woodward",
+      "description": "Контроллер генераторной установки easYgen-3200XT",
+      "machine": "ГПУ / ДГУ",
+      "unit": "управление генератором",
+      "doc_ref": "25182 Rev. AG, стр. 65 (спецификация 37582, руководство 37574)",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "easYgen-3200XT 8440-2082"
+    },
+    {
+      "code": "8440-2085",
+      "issuer": "Woodward",
+      "description": "Контроллер генераторной установки easYgen-3500XT-P1",
+      "machine": "ГПУ / ДГУ",
+      "unit": "управление генератором",
+      "doc_ref": "25182 Rev. AG, стр. 65 (спецификация 37583, руководство 37580)",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "easYgen-3500XT-P1 8440-2085"
+    },
+    {
+      "code": "8237-2596",
+      "issuer": "Woodward",
+      "description": "Защита от разгона ProTech-GII, щитовой монтаж, HV/LV, релейное голосование",
+      "machine": "паровая или газовая турбина, компрессор",
+      "unit": "защита от разгона",
+      "doc_ref": "25182 Rev. AG, раздел ProTech-GII",
+      "source_url": "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf",
+      "quote": "ProTech-GII - Bulkhead Mount, HV/LV, Voted Relays 8237-2596"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Belden",
+      "component": "Кабель CAN YR58684 (номер Woodward 2008-1512)",
+      "machine": "505",
+      "evidence": "В руководстве 26839V1 кабель Belden YR58684 назван одобренным и рекомендуемым, с номером Woodward 2008-1512",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/09/26839V1_G.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Amphenol",
+      "component": "Ответный разъём ACC 06E 24-28S (025), контакты 10-597109-171, заглушки 10-405996-16",
+      "machine": "ProAct II–IV",
+      "evidence": "Руководство 26578 даёт разъём Amphenol как совместимый ответный разъём привода ProAct",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26578_D.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Cannon",
+      "component": "Ответный разъём CA 06R 24-28S A206, контакты 031-0560-161, заглушки 225-0017-000",
+      "machine": "ProAct II–IV",
+      "evidence": "Руководство 26578 даёт разъём Cannon как второй совместимый вариант; принадлежность к ITT в источнике не указана",
+      "sources": [
+        "https://www.woodward.com/products/wp-content/uploads/sites/3/2024/08/26578_D.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Goltens",
+      "country": "ОАЭ (Дубай); также Саудовская Аравия, Бахрейн, Оман, Иордания, Ирак, Катар, Кувейт, Африка",
+      "role": "Официальный дистрибьютор Woodward по линиям Engine Systems и Controls, признанный ретрофиттер двигателей (RER); ремонтные центры AISF во Вьетнаме, Бахрейне, Саудовской Аравии и на Филиппинах",
+      "sources": [
+        "https://www.goltens.com/services/engine-controls/woodward/",
+        "https://www.goltens.com/news/woodward-inc-appoints-goltens-dubai/"
+      ]
+    },
+    {
+      "company": "Tamay Shipping and Engineering",
+      "country": "Турция (Стамбул)",
+      "role": "Authorized Independent Service Facility: сервис механических и электромеханических регуляторов и приводов, поставка по Турции",
+      "sources": [
+        "https://tamayshipping.com/woodward/"
+      ]
+    },
+    {
+      "company": "PM Control",
+      "country": "Индонезия (территория: Восточная, Южная и Центральная, Юго-Восточная Азия, Индия)",
+      "role": "Партнёр Woodward: поставка, ремонт, ретрофит, обучение",
+      "sources": [
+        "https://pmcontrol.co.id/partners"
+      ]
+    },
+    {
+      "company": "MAS (MAS Europe)",
+      "country": "Европа",
+      "role": "Woodward Premium Partner (Platinum): авторизованный системный интегратор (ASI), центральный склад дистрибуции, AISF, учебный центр",
+      "sources": [
+        "https://www.maseurope.com/partners/woodward/"
+      ]
+    },
+    {
+      "company": "Sicagen India Ltd",
+      "country": "Индия (Бхубанешвар)",
+      "role": "Сервис регуляторов Woodward на испытательном стенде, продажа и переход с механического регулирования на электронное; статус авторизации виден только в выдаче поиска, страница не открылась (429)",
+      "sources": [
+        "https://www.indiamart.com/sicagen-india-ltd/governor-service.html"
+      ]
+    },
+    {
+      "company": "Woodward (собственный офис, Пекин)",
+      "country": "Китай",
+      "role": "Представительство изготовителя",
+      "sources": [
+        "https://wss.woodward.com/prehire/locations/China/Pages/Contact.aspx"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальный реестр партнёров Woodward (Channel Partner Contacts, woodward.com/support/industrial-service-and-support/sales-inquiries/) собирается скриптом, его текст не прочитан. Проверенных официальных партнёров по России, Казахстану, Узбекистану и Китаю найти не удалось. Китайские площадки (Alibaba, made-in-china, zhexunplc) и wiautomation — перекупщики без подтверждённого статуса.",
+    "Каталог 25182 — это номенклатура изделий. Спецификаций запасных частей внутри изделий (платы, уплотнения ProAct и TecJet, ремкомплекты UG-25+) в открытом доступе нет: они в закрытом портале Woodward (e-business, на который ссылается и сам каталог) и у сервисных центров AISF.",
+    "EGS-01 и EGS-02: собственных документов изготовителя с номерами блоков не найдено. Что E6 заменяет EGS-01, EGS-02 и E3, пишет только сторонний сайт e6-lecm.com, и страница вернула 503.",
+    "Список машин по брендам двигателей (какой TecJet или ProAct стоит на какой модели Jenbacher J320/J420/J620, MWM, Waukesha, CAT G3500) открыто не опубликован. В каталоге указаны только варианты протоколов «for Jenbacher», «for MTU», «for MHI», «for CAT». Точнее — в сервисных книгах изготовителей двигателей.",
+    "Строка TecJet 52 8407-647 в каталоге 25182 стоит дважды (EGS02 METAL CAP и JENBACHER WITH MOUNTING SUPPORT); по PCN 06989 это замена 8407-547. Точную применимость надо подтвердить у Woodward.",
+    "Номера TecJet 50 / 50 Plus (8407-105, 8407-522) видны только в руководстве 36102 (рисунок) и на Alibaba. В каталог 25182 они не записаны; статус выпуска не установлен.",
+    "Производители комплектующих внутри регуляторов (электроника, подшипники и уплотнения приводов) в открытых документах не названы. Найдены только поставщики кабелей и разъёмов."
+  ],
+  "verifier_notes": "Скачал все шесть PDF Woodward через curl и разобрал их pdftotext; каждую запись искал по тексту. Все 40 кодов на страницах источника есть, и их описания совпадают. Опровергнутых записей нет. Две оговорки. (1) 8407-647 в 25182_AG встречается дважды: в строке «TECJET 52 GEN II, EGS02, METAL CAP, ROHS» и в строке «TECJET 52 GEN II, WITH MOUNTING SUPPORT, JENBACHER, ROHS» с заменой 8407-547; в описании записи это уже отмечено. Кроме того, в той же таблице «EGS02, METAL CAP» стоит и с номером 8407-604. (2) Сторонний сайт e6-lecm.com отдал пустую страницу (381 байт), поэтому утверждение «преемник EGS — E6» не проверено. Субпоставщик «Cannon (ITT)»: в источнике написано только «Cannon», принадлежность ITT — добавление разведки.",
+  "corrections": [
+    "8407-647: в описание добавлено, что строка «EGS02, METAL CAP» в 25182 стоит и с номером 8407-604 — замечание скептика",
+    "EGS-01 / EGS-02: verified=false и оговорка в статусе — сторонний сайт e6-lecm.com отдал пустую страницу, преемственность E6 не проверена (замечание скептика)",
+    "sub_suppliers: «Cannon (ITT)» заменено на «Cannon» — в источнике только «Cannon», принадлежность ITT — добавление разведки (замечание скептика)"
+  ]
+}
