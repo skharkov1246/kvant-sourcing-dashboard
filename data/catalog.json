@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 299,
-    "total_bytes": 125587996,
+    "datasets": 302,
+    "total_bytes": 125737190,
     "by_sensitivity": {
-      "внутреннее": 177,
+      "внутреннее": 180,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 35,
+      "дашборд сорсеров": 38,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3225,6 +3225,69 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 207382,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/atlascopco.json",
+        "data/brand_research/atlascopcoenergas.json",
+        "data/brand_research/bentlynevada.json",
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cryostar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/dongfengcumminsengine.json",
+        "data/brand_research/drillmec.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/generalelectric.json",
+        "data/brand_research/gilkesclydeunion.json",
+        "data/brand_research/grundfos.json",
+        "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/imoindustries.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/itt.json",
+        "data/brand_research/jichaijinandieselcnpc.json",
+        "data/brand_research/mturollsroycepowersystems.json",
+        "data/brand_research/mwmcaterpillarenergy.json",
+        "data/brand_research/normet.json",
+        "data/brand_research/perkinsfgwilson.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/rollsroyce.json",
+        "data/brand_research/sandviktamrock.json",
+        "data/brand_research/siemensdemagdelavalturbomachinery.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/vikingpump.json",
+        "data/brand_research/waukeshainnio.json",
+        "data/brand_research/woodward.json",
+        "data/brand_research/wrtsil.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "data/subsuppliers/verified.json",
+        "dict/",
+        "dict/material.json"
+      ],
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "857df86",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gt/data/plugs_world.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 207204,
@@ -3384,69 +3447,6 @@
         "gt/tools/ship_decisions.py",
         "gt/tools/ship_questions.py",
         "tests/test_english_source_qty.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 201727,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/atlascopco.json",
-        "data/brand_research/atlascopcoenergas.json",
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cryostar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/deutz.json",
-        "data/brand_research/dongfengcumminsengine.json",
-        "data/brand_research/drillmec.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/generalelectric.json",
-        "data/brand_research/gilkesclydeunion.json",
-        "data/brand_research/grundfos.json",
-        "data/brand_research/guascorsiemensenergy.json",
-        "data/brand_research/imoindustries.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/jichaijinandieselcnpc.json",
-        "data/brand_research/mturollsroycepowersystems.json",
-        "data/brand_research/mwmcaterpillarenergy.json",
-        "data/brand_research/normet.json",
-        "data/brand_research/perkinsfgwilson.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/rollsroyce.json",
-        "data/brand_research/sandviktamrock.json",
-        "data/brand_research/siemensdemagdelavalturbomachinery.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/brand_research/vikingpump.json",
-        "data/brand_research/waukeshainnio.json",
-        "data/brand_research/wrtsil.json",
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "data/subsuppliers/verified.json",
-        "dict/",
-        "dict/material.json",
-        "dict/model_series.json",
-        "dict/node_map.json",
-        "dict/symptom.json"
-      ],
-      "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b21a8e3",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -8513,6 +8513,102 @@
       ]
     },
     {
+      "path": "data/brand_research/woodward.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 48165,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Woodward: регуляторы турбин 505/505-XT/5009XT, защита ProTech, приводы ProAct и L-Series, газовые дозаторы TecJet 52/85/110, блоки LECM E6, топливные клапаны ГТУ GS40/GS50/LQ25, контроллеры easYgen, датчики MPU. Машин и исполнений — 24, сервисных документов — 10, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 6, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 3 (поле corrections). Коды — из каталога изготовителя Industrial Turbine Products Catalog 25182 Rev. AG, руководств 26839 (505), 26147 и 26578 (ProAct) и уведомления PCN 06989 (замены TecJet 52); применимость TecJet — по протоколам EGS-01, EGS-02/E6 и исполнениям для Jenbacher, MTU, MHI. Запасные части внутри изделий — в закрытом портале Woodward; официальных партнёров по России и СНГ не найдено. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "5ef2d73",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/itt.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 48051,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): ITT (Goulds Pumps): консольные насосы ANSI 3196 (i-FRAME и прежние ST/MT/LT/XLT) и API 610 OH2 3700/3700i — подшипниковые узлы и их уплотнения. Машин и исполнений — 10, сервисных документов — 12, кодов запчастей — 37, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 12, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 5 (поле corrections). 24 кода — обозначения подшипников из таблиц IOM изготовителя (3196 i-FRAME Table 21, 3700 Table 4 по SKF/MRC), лабиринтная пара 3196 LT — номера ITT у продавца аналогов Mesco, комплекты ТО R196-… и их состав — с витрин складских остатков. Номера торцовых уплотнений и ведомости запчастей 3700 открыто не найдены — выдаются по серийному номеру; пара для XLT вынесена в parts_rejected. В России только перепродавцы. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 37,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "5ef2d73",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "ove/data/hedge.json",
       "subproject": "ОВЭ-75",
       "bytes": 47959,
@@ -8587,6 +8683,54 @@
       "referenced_by": [
         "gidromet/build.py"
       ]
+    },
+    {
+      "path": "data/brand_research/bentlynevada.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 47216,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Bently Nevada (Baker Hughes): системы защиты и вибромониторинга 3500 (/15, /22M, /25, /32M, /42M, /53M), датчики 3300 XL 8 мм, 330400/330425, 330500, мониторы 1701 FieldMonitor и 1900/65A. Машин и исполнений — 14, сервисных документов — 18, кодов запчастей — 42: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 2, дилеров и сервисных компаний — 7, пробелов (gaps) — 6; по замечаниям скептика поправлено записей — 3 (поле corrections). Все коды — из технических описаний изготовителя (dam.bakerhughes.com и копии у дистрибьюторов с номерами документов Bently): запасные модули, модули ввода-вывода, предохранители, кабели, разъёмы, барьеры искробезопасности. Применение по конкретным машинам парка в открытых документах не указано; руководства по эксплуатации — в закрытой медиатеке. В России только перепродавцы, официальный канал после 2022 г. не подтверждён. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 42,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "5ef2d73",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "zip/data/customs_market.json",
@@ -8762,8 +8906,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b21a8e3",
+      "last_author": "skharkov1246",
+      "last_commit": "0b82ddb",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8810,8 +8954,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b21a8e3",
+      "last_author": "skharkov1246",
+      "last_commit": "0b82ddb",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9477,8 +9621,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b21a8e3",
+      "last_author": "skharkov1246",
+      "last_commit": "0b82ddb",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9693,8 +9837,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 32854,
-      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 28, в очереди — 32. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 32961,
+      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 31, в очереди — 29. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -9724,7 +9868,7 @@
       },
       "last_change": "2026-09-26",
       "last_author": "Claude",
-      "last_commit": "b21a8e3",
+      "last_commit": "5ef2d73",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
