@@ -1,0 +1,896 @@
+{
+  "oem_key": "grundfos",
+  "name": "Grundfos",
+  "segment_focus": "центробежные насосы CR, NB, SE: сервисные наборы уплотнений, номера по типоразмеру; дилеры",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Разведка по центробежным насосам Grundfos CR/CRI/CRN, NB/NBS/NBE/NK/NBG и SE1/SEV (через родственную SL1/SLV). Основа — открытые сервисные каталоги изготовителя (Service Kit Catalogue) на api.grundfos.com и grundfos.com: скачаны и разобраны в текст, коды взяты из строк таблиц. Собрано 40 кодов: наборы торцевых уплотнений по типоразмерам (для CR по диаметру вала 16/22/32 мм и по буквенному коду уплотнения HQQE/HQQV/HQBE/HUBE/HUUE; для NB/NBS по диаметру 28/38/48/55 мм и коду BAQE/BQQE/BAQV/DQQE), наборы колец круглого сечения, наборы изнашиваемых деталей, щелевые кольца, дистанционные втулки уплотнения. Буквенный код уплотнения стоит в обозначении насоса (например, NB 32-125.1/104 A-F-A-BAQE), поэтому код набора находится по шильдику: типоразмер → диаметр вала → буквенный код → номер набора. Проверено: у CR 10, 15 и 20 номер набора HQQE один и тот же (96511844). У одного и того же уплотнения BQQE 28 мм номер разный: 98434904 в каталоге NB model B и 99884645 в каталоге NBS 60 Гц (США). Субпоставщик: двигатели Siemens на больших NB/NK (по буклету). Grundfos ушёл из России в 2022 г.; завод «Грундфос Истра» с 2024 г. — ООО «ИСТРАТЕХ Групп», бренд и права на интеллектуальную собственность ему не передавались. Детали в РФ продают сторонние интернет-магазины, которые официальными дилерами не являются.",
+  "machines": [
+    {
+      "model": "CR 1, CR 3 (CRI, CRN)",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 1 и 3 м³/ч; до 36 ступеней (набор изнашиваемых деталей -9…-36)",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 5 (CRI, CRN)",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 5 м³/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 10 (CRI, CRN)",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 10 м³/ч; 1–22 ступени; вал уплотнения 16 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 15 (CRI, CRN)",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 15 м³/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 20 (CRI, CRN)",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 20 м³/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 32 (CRN), в т.ч. model B",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 32 м³/ч; уплотнение 22 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 45 (CRN)",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 45 м³/ч; уплотнение 22 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 64 (CRN), в т.ч. model B",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 64 м³/ч; уплотнение 22 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 90 (CRN)",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 90 м³/ч; уплотнение 22 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CR 120, CR 150 (CRN)",
+      "kind": "вертикальный многоступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "номинальная подача 120 и 150 м³/ч; уплотнение 22 или 32 мм; двигатели MG 160 – MMG 280S",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "NB model B (NB 32…NB 150)",
+      "kind": "консольно-моноблочный одноступенчатый центробежный насос (EN 733)",
+      "segment": "насос",
+      "rating": "типоразмеры NB 32-125.1 … 80-400; вал уплотнения 28/38/48 мм",
+      "status": "выпускается или заменён NB Range 6 — не подтверждено",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf",
+        "https://api.grundfos.com/literature/Grundfosliterature-4112587.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "NB, NBE Range 6",
+      "kind": "консольно-моноблочный одноступенчатый центробежный насос",
+      "segment": "насос",
+      "rating": "типоразмеры 012-070 … (пример NB 025-095/8.43)",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6909947.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "NBS, NBSE (60 Гц)",
+      "kind": "консольно-моноблочный одноступенчатый центробежный насос, исполнение для рынка США",
+      "segment": "насос",
+      "rating": "типоразмеры NBS 012-070 … 100-150; вал уплотнения 28/38/48/55 мм",
+      "status": "выпускается (каталог 2020)",
+      "sources": [
+        "https://www.grundfos.com/content/dam/local/en-us/catalogues/_jcr_content1/NBS_NBSE_Service_Kit_Catalogue.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "NK, NKE (Range 6)",
+      "kind": "консольный одноступенчатый центробежный насос на раме",
+      "segment": "насос",
+      "rating": "в каталоге NK Range 6 данных нет; двигатели Siemens — по буклету NB, NBG, NK, NKG (4112587)",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6909048.pdf",
+        "https://api.grundfos.com/literature/Grundfosliterature-4112587.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "NBG model B",
+      "kind": "консольно-моноблочный центробежный насос (ISO 2858)",
+      "segment": "насос",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-3814154.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SE1, SEV",
+      "kind": "погружной канализационный центробежный насос (сухая и мокрая установка)",
+      "segment": "насос",
+      "rating": "1,1–11 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6859143.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SL1, SLV",
+      "kind": "погружной канализационный центробежный насос (гидравлика родственна SE1/SEV)",
+      "segment": "насос",
+      "rating": "0,9–11 кВт; SL1.50/80/100, SLV.65/80/100",
+      "status": "выпускается",
+      "sources": [
+        "https://www.lenntech.com/Data-sheets/Grundfos-SL-SL1_SLV+SL1_SLV-Autoadapt-SKC-L.pdf",
+        "https://api.grundfos.com/literature/Grundfosliterature-3379424.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Service Kit Catalogue, chapter 13. CR — CR, CRI, CRN 1…150 50/60 Hz (наборы уплотнений, колец круглого сечения, изнашиваемых деталей, пакетов камер)",
+      "doc_no": "Grundfosliterature-6405",
+      "machine": "CR/CRI/CRN 1–150",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf"
+      ]
+    },
+    {
+      "title": "100. Recommended spare parts: CR, CRI, CRN 1 to 150 50/60 Hz (рекомендованный ЗИП на 2 и 5 лет)",
+      "doc_no": "Grundfosliterature-3367009",
+      "machine": "CR/CRI/CRN 1–150",
+      "kind": "parts manual (рекомендованный ЗИП)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-3367009.pdf"
+      ]
+    },
+    {
+      "title": "Service Kit Catalogue, chapter 56. NB Model B 50/60 Hz",
+      "doc_no": "Grundfosliterature-2138485",
+      "machine": "NB model B",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf"
+      ]
+    },
+    {
+      "title": "Service Kit Catalogue 2020, chapter 55. NBS, NBSE 60 Hz",
+      "machine": "NBS, NBSE",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://www.grundfos.com/content/dam/local/en-us/catalogues/_jcr_content1/NBS_NBSE_Service_Kit_Catalogue.pdf"
+      ]
+    },
+    {
+      "title": "Service Kit Catalogue NB, NBE - Range 6",
+      "doc_no": "Grundfosliterature-6909947",
+      "machine": "NB, NBE Range 6",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6909947.pdf"
+      ]
+    },
+    {
+      "title": "Service Kit Catalogue NK - Range 6",
+      "doc_no": "Grundfosliterature-6909048",
+      "machine": "NK Range 6",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6909048.pdf"
+      ]
+    },
+    {
+      "title": "Service Kit Catalogue NK/E - Range 2",
+      "doc_no": "Grundfosliterature-6859727",
+      "machine": "NK, NKE",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6859727.pdf"
+      ]
+    },
+    {
+      "title": "Service Kit Catalogue, chapter 57. NBG Model B 50/60 Hz",
+      "doc_no": "Grundfosliterature-3814154",
+      "machine": "NBG model B",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-3814154.pdf"
+      ]
+    },
+    {
+      "title": "NB, NBG, NK, NKG — Fitting single shaft seals with set screws",
+      "doc_no": "Grundfosliterature-5141008",
+      "machine": "NB, NBG, NK, NKG",
+      "kind": "service manual (инструкция по замене уплотнения)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-5141008.pdf"
+      ]
+    },
+    {
+      "title": "Grundfos Data Booklet NB, NBG, NK, NKG (данные по двигателям, в т.ч. Siemens)",
+      "doc_no": "Grundfosliterature-4112587",
+      "machine": "NB, NBG, NK, NKG",
+      "kind": "каталог (data booklet)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-4112587.pdf"
+      ]
+    },
+    {
+      "title": "111. Recommended spare parts: SE1/SEV and SL1/SLV 1.1 to 11 kW",
+      "doc_no": "Grundfosliterature-6859143",
+      "machine": "SE1/SEV, SL1/SLV",
+      "kind": "parts manual (рекомендованный ЗИП, без номеров)",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-6859143.pdf"
+      ]
+    },
+    {
+      "title": "Service Kit Catalogue, chapter 74. SL — SL1, SLV (зеркало на lenntech.com)",
+      "machine": "SL1, SLV",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://www.lenntech.com/Data-sheets/Grundfos-SL-SL1_SLV+SL1_SLV-Autoadapt-SKC-L.pdf"
+      ]
+    },
+    {
+      "title": "Service Kit Catalogue CR MAGdrive (CR, CRI, CRN 1-90; зеркало на lenntech.com)",
+      "machine": "CR MAGdrive",
+      "kind": "parts manual (service kit catalogue)",
+      "sources": [
+        "https://www.lenntech.com/Data-sheets/Grundfos-CR-MAGdrive_SKC-L.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "96455086",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQE",
+      "machine": "CR, CRI, CRN 1, 3 (и CR 5)",
+      "unit": "торцевое уплотнение (поз. 105)",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 1,3",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQE                                                  96455086"
+    },
+    {
+      "code": "96455087",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQV",
+      "machine": "CR, CRI, CRN 1, 3",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQV                                                  96455087"
+    },
+    {
+      "code": "96455088",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQBE",
+      "machine": "CR, CRI, CRN 1, 3",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQBE                                                  96455088"
+    },
+    {
+      "code": "96455090",
+      "issuer": "Grundfos",
+      "description": "Kit, O-ring EPDM",
+      "machine": "CR, CRI, CRN 1, 3",
+      "unit": "уплотнения корпуса (кольца круглого сечения)",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, раздел O-ring",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "EPDM                                           96455090"
+    },
+    {
+      "code": "96455091",
+      "issuer": "Grundfos",
+      "description": "Kit, O-ring FKM",
+      "machine": "CR, CRI, CRN 1, 3",
+      "unit": "уплотнения корпуса (кольца круглого сечения)",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, раздел O-ring",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "FKM                                            96455091"
+    },
+    {
+      "code": "96455095",
+      "issuer": "Grundfos",
+      "description": "Kit, wear parts, подшипники карбид кремния, до 9 ступеней (камера с подшипником, щелевые кольца, вращающееся кольцо подшипника, дистанционная труба)",
+      "machine": "CR, CRI, CRN 1, 3",
+      "unit": "гидравлическая часть / промежуточные подшипники",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, раздел Wear parts",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "Silicon carbide                         96455095               96455092                    96455093   96455094"
+    },
+    {
+      "code": "96455102",
+      "issuer": "Grundfos",
+      "description": "Kit, wear parts, подшипники бронза, до 9 ступеней",
+      "machine": "CR, CRI, CRN 1, 3",
+      "unit": "гидравлическая часть / промежуточные подшипники",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, раздел Wear parts",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "Bronze                                  96455102               96455104                    96455105   96455106"
+    },
+    {
+      "code": "96511844",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQE (вал 16 мм)",
+      "machine": "CR, CRI, CRN 10, 15, 20",
+      "unit": "торцевое уплотнение (поз. 105)",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 10/15/20",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQE                                    96511844"
+    },
+    {
+      "code": "96511845",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQV",
+      "machine": "CR, CRI, CRN 10, 15, 20",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQV                                    96511845"
+    },
+    {
+      "code": "96511846",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQK",
+      "machine": "CR, CRI, CRN 10",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQK                                    96511846"
+    },
+    {
+      "code": "96511848",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQBE",
+      "machine": "CR, CRI, CRN 10, 15, 20",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQBE                                    96511848"
+    },
+    {
+      "code": "96511836",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HUBE",
+      "machine": "CR, CRI, CRN 10",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HUBE                                    96511836"
+    },
+    {
+      "code": "96511840",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HUUE",
+      "machine": "CR, CRI, CRN 10",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HUUE                                    96511840"
+    },
+    {
+      "code": "96509609",
+      "issuer": "Grundfos",
+      "description": "Kit, O-ring EPDM",
+      "machine": "CR, CRI, CRN 10",
+      "unit": "уплотнения корпуса (кольца круглого сечения)",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 10",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "EPDM                                                          96509609"
+    },
+    {
+      "code": "96508403",
+      "issuer": "Grundfos",
+      "description": "Chamber stack complete (silicon-carbide bearing), CR, 1 ступень",
+      "machine": "CR 10",
+      "unit": "пакет камер (проточная часть)",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 10",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "1            96508403   96491694   96491720"
+    },
+    {
+      "code": "96525458",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQE, 22 мм",
+      "machine": "CR, CRN 32, 45, 64, 90, 120, 150",
+      "unit": "торцевое уплотнение (поз. 105)",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 32 … CR 120/150",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQE                                                          96525458"
+    },
+    {
+      "code": "96525490",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQV, 22 мм",
+      "machine": "CR, CRN 32–150",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQV                                                          96525490"
+    },
+    {
+      "code": "96525457",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQBE, 22 мм",
+      "machine": "CR, CRN 32–150",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQBE                                                          96525457"
+    },
+    {
+      "code": "96533369",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQK, 22 мм",
+      "machine": "CR, CRN 32–150",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQK                                                          96533369"
+    },
+    {
+      "code": "95059802",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQE, 32 мм",
+      "machine": "CR, CRN 120, 150",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 120/150",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQE                  95059802"
+    },
+    {
+      "code": "95059876",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQE, 32 мм, обезжиренное (de-oiled)",
+      "machine": "CR, CRN 120, 150",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 120/150",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQE                  95059876"
+    },
+    {
+      "code": "96881983",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal HQQE, 22 мм, обезжиренное (de-oiled)",
+      "machine": "CR, CRN 120, 150",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 120/150",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "HQQE                  96881983"
+    },
+    {
+      "code": "95059804",
+      "issuer": "Grundfos",
+      "description": "Kit, O-ring (поз. 37, 38, 60, 100, 109, 110); материал EPDM — по разведке, в выгрузке PDF заголовок столбца материала не виден",
+      "machine": "CR, CRN 120, 150",
+      "unit": "уплотнения корпуса",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 120/150",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "Kit No                                    95059804 95059805"
+    },
+    {
+      "code": "96416597",
+      "issuer": "Grundfos",
+      "description": "Kit, O-ring EPDM",
+      "machine": "CR, CRN 32",
+      "unit": "уплотнения корпуса",
+      "doc_ref": "Service Kit Catalogue ch.13 CR, стр. CR 32",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-6405.pdf",
+      "quote": "EPDM                                               96416597"
+    },
+    {
+      "code": "96488302",
+      "issuer": "Grundfos",
+      "description": "Shaft seal BAQE, MG13, вал 28 мм",
+      "machine": "NB model B (32-125.1 … 80-160 и др.)",
+      "unit": "торцевое уплотнение (поз. 105)",
+      "doc_ref": "Service Kit Catalogue ch.56 NB Model B, Shaft seal",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf",
+      "quote": "125.1         28        96488302       96548353      98434904   98434905   98670789    96551963   97769885     96548351   96548355"
+    },
+    {
+      "code": "96548353",
+      "issuer": "Grundfos",
+      "description": "Shaft seal BAQV, MG13, вал 28 мм",
+      "machine": "NB model B",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.56 NB Model B",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf",
+      "quote": "125.1         28        96488302       96548353      98434904   98434905   98670789    96551963   97769885     96548351   96548355"
+    },
+    {
+      "code": "98434904",
+      "issuer": "Grundfos",
+      "description": "Shaft seal BQQE, MG13, вал 28 мм",
+      "machine": "NB model B",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.56 NB Model B",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf",
+      "quote": "125.1         28        96488302       96548353      98434904   98434905   98670789    96551963   97769885     96548351   96548355"
+    },
+    {
+      "code": "96537605",
+      "issuer": "Grundfos",
+      "description": "Shaft seal BAQE, MG13, вал 38 мм",
+      "machine": "NB model B (40-315, 50-315, 65-250 и др.); NBS 015-090 и др.",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.56 NB Model B",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf",
+      "quote": "315           38        96537605       96548357      98434906   98434908   98670790    96551928   97769887     96548356   96548359"
+    },
+    {
+      "code": "98434906",
+      "issuer": "Grundfos",
+      "description": "Shaft seal BQQE, MG13, вал 38 мм",
+      "machine": "NB model B; NBS (Class 125)",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.56 NB Model B",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf",
+      "quote": "315           38        96537605       96548357      98434906   98434908   98670790    96551928   97769887     96548356   96548359"
+    },
+    {
+      "code": "96306472",
+      "issuer": "Grundfos",
+      "description": "Shaft seal BAQE, MG13, вал 48 мм",
+      "machine": "NB model B 80-400; NBS 040-150, 050-095 и др.",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.56 NB Model B",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf",
+      "quote": "400           48        96306472       96658791      98434909   98434941   98670801    96658794   97769889        -       96658796"
+    },
+    {
+      "code": "98434909",
+      "issuer": "Grundfos",
+      "description": "Shaft seal BQQE, MG13, вал 48 мм",
+      "machine": "NB model B 80-400; NBS",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.56 NB Model B",
+      "source_url": "https://api.grundfos.com/literature/Grundfosliterature-2138485.pdf",
+      "quote": "400           48        96306472       96658791      98434909   98434941   98670801    96658794   97769889        -       96658796"
+    },
+    {
+      "code": "99884645",
+      "issuer": "Grundfos",
+      "description": "Spare, shaft seal BQQE, eMG13, вал 28 мм, 1 шт. (Class 125)",
+      "machine": "NBS, NBSE 012-070 … 050-070",
+      "unit": "торцевое уплотнение (поз. 105)",
+      "doc_ref": "Service Kit Catalogue 2020 ch.55 NBS, NBSE, стр. 780",
+      "source_url": "https://www.grundfos.com/content/dam/local/en-us/catalogues/_jcr_content1/NBS_NBSE_Service_Kit_Catalogue.pdf",
+      "quote": "28    eMG13       99884645      99380916       98434905         92514269        96488302          99380919"
+    },
+    {
+      "code": "96306475",
+      "issuer": "Grundfos",
+      "description": "Spare, shaft seal BAQE, eMG13, вал 55 мм",
+      "machine": "NBS 060-150, 080-150, 100-150",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue 2020 ch.55 NBS, NBSE, стр. 780",
+      "source_url": "https://www.grundfos.com/content/dam/local/en-us/catalogues/_jcr_content1/NBS_NBSE_Service_Kit_Catalogue.pdf",
+      "quote": "NBS 100-150             ●     ●     55    eMG13       98434943      92514388       98434944         92514387        96306475          99707259"
+    },
+    {
+      "code": "92526464",
+      "issuer": "Grundfos",
+      "description": "Spare, shaft seal DQQE, HJ92N, вал 28 мм (Class 300)",
+      "machine": "NBS 012-070 и др.",
+      "unit": "торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue 2020 ch.55 NBS, NBSE, стр. 781",
+      "source_url": "https://www.grundfos.com/content/dam/local/en-us/catalogues/_jcr_content1/NBS_NBSE_Service_Kit_Catalogue.pdf",
+      "quote": "28    HJ92N      92526464 92526483 92526469 92526487 92526474 92526491                 96938597   96938598"
+    },
+    {
+      "code": "96938597",
+      "issuer": "Grundfos",
+      "description": "Spare, spacer (поз. 105c), 1.4401, вал 28 мм",
+      "machine": "NBS 012-070 и др.",
+      "unit": "дистанционная втулка уплотнения",
+      "doc_ref": "Service Kit Catalogue 2020 ch.55 NBS, NBSE, стр. 781",
+      "source_url": "https://www.grundfos.com/content/dam/local/en-us/catalogues/_jcr_content1/NBS_NBSE_Service_Kit_Catalogue.pdf",
+      "quote": "28    HJ92N      92526464 92526483 92526469 92526487 92526474 92526491                 96938597   96938598"
+    },
+    {
+      "code": "99208775",
+      "issuer": "Grundfos",
+      "description": "Spare, wear ring, латунь, D63/D77x10",
+      "machine": "NBS 012-070",
+      "unit": "щелевое кольцо рабочего колеса (поз. 45)",
+      "doc_ref": "Service Kit Catalogue 2020 ch.55 NBS, NBSE, Kit/spare - Wear ring",
+      "source_url": "https://www.grundfos.com/content/dam/local/en-us/catalogues/_jcr_content1/NBS_NBSE_Service_Kit_Catalogue.pdf",
+      "quote": "●                D63/D77x10      99208775         -      96810098          -      96810122          -"
+    },
+    {
+      "code": "99756265",
+      "issuer": "Grundfos",
+      "description": "Spare, O-ring EPDM (поз. 72a, соединение крышки и корпуса)",
+      "machine": "NBS 012-070, 015-070, 025-070",
+      "unit": "уплотнение корпуса",
+      "doc_ref": "Service Kit Catalogue 2020 ch.55 NBS, NBSE, Spare - O-ring",
+      "source_url": "https://www.grundfos.com/content/dam/local/en-us/catalogues/_jcr_content1/NBS_NBSE_Service_Kit_Catalogue.pdf",
+      "quote": "●              99756265        92526498                   92526500         92526508       92526514       92526520"
+    },
+    {
+      "code": "96102360",
+      "issuer": "Grundfos",
+      "description": "Shaft seal cartridge, NBR, с кольцами круглого сечения (2-pole 2,2–4,0 кВт / 4-pole 1,1–2,2 кВт)",
+      "machine": "SL1, SLV от 2,2 кВт (гидравлика родственна SE1/SEV)",
+      "unit": "картриджное торцевое уплотнение (поз. 105)",
+      "doc_ref": "Service Kit Catalogue ch.74 SL, SL1.50/80/100 from 2.2 kW",
+      "source_url": "https://www.lenntech.com/Data-sheets/Grundfos-SL-SL1_SLV+SL1_SLV-Autoadapt-SKC-L.pdf",
+      "quote": "Kit No                                     96102360                                      96102361"
+    },
+    {
+      "code": "96102361",
+      "issuer": "Grundfos",
+      "description": "Shaft seal cartridge, NBR (2-pole 6,0–11 кВт / 4-pole 3,0–7,5 кВт)",
+      "machine": "SL1, SLV от 2,2 кВт",
+      "unit": "картриджное торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.74 SL",
+      "source_url": "https://www.lenntech.com/Data-sheets/Grundfos-SL-SL1_SLV+SL1_SLV-Autoadapt-SKC-L.pdf",
+      "quote": "Kit No                                     96102360                                      96102361"
+    },
+    {
+      "code": "96106536",
+      "issuer": "Grundfos",
+      "description": "Kit, shaft seal BQQP (картридж, шпонка, стопорная шайба, винт M8x25, уплотнительные шайбы)",
+      "machine": "SL1.50, SLV.65 0,9–1,5 кВт",
+      "unit": "картриджное торцевое уплотнение",
+      "doc_ref": "Service Kit Catalogue ch.74 SL, SL1.50 0.9-1.5 kW",
+      "source_url": "https://www.lenntech.com/Data-sheets/Grundfos-SL-SL1_SLV+SL1_SLV-Autoadapt-SKC-L.pdf",
+      "quote": "Kit No                        96106536      96645161"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Siemens",
+      "component": "стандартные электродвигатели (типоразмеры 160M … 315.1MA)",
+      "machine": "NB, NBG, NK, NKG (большие типоразмеры)",
+      "evidence": "В буклете изготовителя Data Booklet NB, NBG, NK, NKG в строках «Standard Motor» указаны Siemens 160M … Siemens 315.1MA, Siemens 353/398",
+      "sources": [
+        "https://api.grundfos.com/literature/Grundfosliterature-4112587.pdf"
+      ],
+      "verified": false
+    },
+    {
+      "company": "TECO",
+      "component": "электродвигатели (опция)",
+      "machine": "NB, NK",
+      "evidence": "По выдаче поиска по буклету NB/NK: в буклете есть поправочные таблицы для двигателей TECO EFF1/EFF2. В скачанной редакции строки не найдены, поэтому довод слабый",
+      "sources": [
+        "https://www.scribd.com/document/247249979/GRUNDFOS-DATA-BOOKLET-pdf"
+      ],
+      "verified": false
+    },
+    {
+      "company": "U.S. Seal (аналог, не поставщик изготовителя)",
+      "component": "торцевое уплотнение-аналог VGMG-1519 16 мм EPDM вместо 96511844",
+      "machine": "CR/CRN 10/15/20",
+      "evidence": "На странице реселлера в названии товара: «Торцевое уплотнение 16mm Grundfos P/N 96511844 - VGMG-1519 ... U.S. Seal». Это кросс-замена, а не поставка комплектующих изготовителю",
+      "sources": [
+        "https://vodokon.ru/product/torcevoe-uplotnenie-16mm-grundfos-p-n-96511844-vgmg-1519-16mm-epdm-cr-crn-10-15-20-u-s-seal/"
+      ],
+      "verified": false
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Grundfos Pumps (Shanghai) Co. Ltd",
+      "country": "Китай",
+      "role": "дочерняя сбытовая компания изготовителя",
+      "sources": [
+        "https://www.grundfos.com/legal/local-sales-companies-full-info-list"
+      ]
+    },
+    {
+      "company": "Grundfos (China) Holding Co. Ltd.",
+      "country": "Китай",
+      "role": "холдинг изготовителя в Китае",
+      "sources": [
+        "https://www.grundfos.com/legal/local-sales-companies-full-info-list"
+      ]
+    },
+    {
+      "company": "Grundfos Pumps (Suzhou) Ltd.",
+      "country": "Китай",
+      "role": "компания группы (производство и сбыт)",
+      "sources": [
+        "https://www.grundfos.com/legal/local-sales-companies-full-info-list"
+      ]
+    },
+    {
+      "company": "Grundfos Pompa Sanayi ve Ticaret Ltd. Sti.",
+      "country": "Турция",
+      "role": "дочерняя сбытовая компания изготовителя",
+      "sources": [
+        "https://www.grundfos.com/legal/local-sales-companies-full-info-list"
+      ]
+    },
+    {
+      "company": "Grundfos Gulf Distribution FZE",
+      "country": "ОАЭ",
+      "role": "дочерняя сбытовая компания изготовителя (Ближний Восток)",
+      "sources": [
+        "https://www.grundfos.com/legal/local-sales-companies-full-info-list"
+      ]
+    },
+    {
+      "company": "Grundfos Pumps India Private Limited",
+      "country": "Индия",
+      "role": "дочерняя сбытовая компания изготовителя; ведёт реестр региональных дистрибьюторов",
+      "sources": [
+        "https://www.grundfos.com/legal/local-sales-companies-full-info-list",
+        "https://www.grundfos.com/in/contact/where-to-buy/distributors-list"
+      ]
+    },
+    {
+      "company": "Grundfos Kazakhstan LLP",
+      "country": "Казахстан",
+      "role": "дочерняя сбытовая компания изготовителя",
+      "sources": [
+        "https://www.grundfos.com/legal/local-sales-companies-full-info-list"
+      ]
+    },
+    {
+      "company": "TOV Grundfos Ukraine",
+      "country": "Украина",
+      "role": "дочерняя сбытовая компания изготовителя",
+      "sources": [
+        "https://www.grundfos.com/legal/local-sales-companies-full-info-list"
+      ]
+    },
+    {
+      "company": "Alantech",
+      "country": "Индия / Оман / ОАЭ",
+      "role": "дилер насосов Grundfos (по собственному заявлению, в реестре изготовителя не проверен)",
+      "sources": [
+        "https://alantech.in/grundfos-pumps"
+      ]
+    },
+    {
+      "company": "ООО «ИСТРАТЕХ Групп» (бывш. ООО «Грундфос Истра»)",
+      "country": "Россия",
+      "role": "бывший завод Grundfos в Истре, выкуплен в 2024 г.; выпускает насосы под своей маркой; права на бренд и ИС Grundfos не получил — не дилер",
+      "sources": [
+        "https://www.grundfos.com/media/latest-news/grundfos-completes-divestment-of-its-russian-business",
+        "https://www.istratex.ru/about/",
+        "https://www.kommersant.ru/doc/6493459"
+      ]
+    },
+    {
+      "company": "НасосКлаб",
+      "country": "Россия",
+      "role": "интернет-магазин запчастей Grundfos (торцевые уплотнения CR); не официальный",
+      "sources": [
+        "https://nasosclub.ru/catalog/zapasnye_chasti_grundfos/tortsevye_uplotneniya/tortsevye_uplotneniya_grundfos_cr/"
+      ]
+    },
+    {
+      "company": "Абиана",
+      "country": "Россия",
+      "role": "интернет-магазин запчастей Grundfos (HQQE для CR 10/15/20); не официальный",
+      "sources": [
+        "https://www.abiana.ru/g/grundfos/300401/"
+      ]
+    },
+    {
+      "company": "ООО «Молтехснаб»",
+      "country": "Россия",
+      "role": "продавец торцевых уплотнений для насосов Grundfos; не официальный",
+      "sources": [
+        "https://moltechsnab.ru/catalog/tortsevye-uplotneniya-dlya-nasosov-grundfos/tortsevoe-uplotnenie-grunfos-cr-16-mm-96511844/"
+      ]
+    },
+    {
+      "company": "Климат Технологии (klimatt.com)",
+      "country": "Украина",
+      "role": "продавец запасных частей для Grundfos CR",
+      "sources": [
+        "https://klimatt.com/ru/zapasnye-chasti-dlya-grundfos-cr/torcevoe-uplotnenie-torceve-ushhilnennya-hqqe-dlya-cr-grundfos-art-96511844-t3715"
+      ]
+    },
+    {
+      "company": "BTS Engineering (mechanical-seal.pro)",
+      "country": "Украина",
+      "role": "продавец торцевых уплотнений для TP/NB/NK Grundfos (BAQE 96537605 и др.)",
+      "sources": [
+        "https://mechanical-seal.pro/eng/po-marke-nasosa/seal_grundfos/ushch-lnennya-valu-baqe-gg-d38-grundfos-tp-nb-nk-art-96537605/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Карточки товаров на product-selection.grundfos.com (Grundfos Product Center) рисуются скриптом, и WebFetch их не читает. Карточки 96549650, 96549062, 96161884 (Kit, shaft seal BAQE) видны только в выдаче поиска: применимость и диаметр по ним не подтверждены, в parts не внесены. Прочитать можно браузером или через API Product Center.",
+    "SE1/SEV: номера наборов уплотнений есть только в каталоге SL1/SLV. Такие же ли они для SE1/SEV, не проверено. Отдельный Service Kit Catalogue SE1/SEV в открытом доступе не найден, а «Recommended spare parts SE1/SEV» (6859143) номеров не содержит.",
+    "Подшипники двигателей MG/MMG и насосов NK (типоразмеры SKF/FAG 62xx/63xx) в разобранных каталогах не найдены. Вероятно, они в Service instructions к двигателям MG/MMG и в каталоге NK Range 6 (6909048 не разбирался).",
+    "NB/NBE Range 6 (6909947) и NK Range 6 скачаны, но таблицы уплотнений в них не разобраны. Возможно, номера совпадают с NBS (BQQE 28 мм = 99884645) — не проверено.",
+    "CR 185/255 и CR 95/125/155 (новые типоразмеры) в каталоге 6405 не описаны. Нужен более свежий Service Kit Catalogue CR.",
+    "Статус NB model B (выпускается или заменён Range 6) не подтверждён источником.",
+    "Официальные сервис-партнёры (ASP) по России, Турции, ОАЭ и Китаю: список в ASP Finder на grundfos.com рисуется скриптом и не прочитан. После ухода изготовителя из РФ в 2022 г. официальных дилеров в России нет; запчасти возят сторонние реселлеры.",
+    "Субпоставщики торцевых уплотнений: Grundfos делает их сам (картриджи HQQE и т. п.). Сторонние изготовители комплектующих CR (подшипники, резина) в открытых источниках не названы. Слух о том, что CUE сделан на платформе Danfoss VLT, поиском не подтверждён и в список не внесён.",
+    "Номера публикаций (формат 96xxxxxx / ECM) у каталогов не найдены. В таблице стоят идентификаторы Grundfosliterature-N из URL."
+  ],
+  "verifier_notes": "Все 41 код найдены дословно в указанных источниках и относятся к заявленным изделиям. Источники: Grundfosliterature-6405.pdf (CR), 2138485.pdf (NB model B), NBS_NBSE_Service_Kit_Catalogue.pdf и lenntech SL SKC. Файлы скачаны через curl, текст извлечён pdftotext. Каталог NBS отдался только со второй попытки: первый ответ оборвался ошибкой HTTP/2, но PDF читается, и все коды найдены. Оговорки. 95059804: код и состав набора (поз. 37, 38, 60, 100, 109, 110) подтверждены, но что это именно EPDM, по тексту выгрузки не проверено: в столбцах 95059804/95059805 заголовков материала не видно. NK Range 6: детали rating («model A», «32-125.1», двигатели Siemens) в каталоге NK Range 6 не найдены. TECO: источник недоступен.",
+  "corrections": [
+    "summary: транслит «Subpostavshchik» заменён на «Субпоставщик»",
+    "счёт скептика «41 код» не сходится с файлом: кодов 40 — записи сверены поштучно; в сводных числах — 40",
+    "95059804: материал EPDM помечен как неподтверждённый (замечание скептика)",
+    "NK, NKE Range 6: из модели и характеристики сняты «model A» и «32-125.1» — в каталоге NK Range 6 не найдены (замечание скептика)",
+    "Siemens и U.S. Seal: verified=false — скептик их отдельно не сверял; U.S. Seal — кросс-замена по странице реселлера",
+    "машины без характеристики (1) получили rating «данных нет»"
+  ]
+}
