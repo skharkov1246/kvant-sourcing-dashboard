@@ -15,6 +15,7 @@ crossref.разложить, brands.заполненность, publish_counters
 """
 from __future__ import annotations
 
+import collections
 import copy
 import hashlib
 import importlib.util
@@ -164,11 +165,19 @@ def _номенклатура():
             if i == 8:
                 del предл[-1]["q"]
                 предл[-1]["t"] = цена * 3
+            # Роль (crossref.КОДЫ_РОЛИ): у пары с брендом компания 0 — сам бренд,
+            # прочие — трейдеры; у пары без бренда — «нет бренда позиции».
+            предл[-1]["h"] = ("?0" if "bk" not in бренд else "п9" if ci == 0 else "т5")
+            # Приведённая цена — тем же правилом, что у сборки (на день сборки).
+            приведено, оговорки = crossref.приведение(цена, "USD", ДАТА, на_дату=СОБРАН[:10], базис="DAP")
+            предл[-1]["i"], предл[-1]["j"] = приведено, оговорки
             рёбра.append([ci, 1, цена, "USD", ДАТА])
             c["rows"] += 1
             c["parts"] += 1
+        прямых = sum(1 for o in предл if o["h"].startswith("п"))
         позиции.append({
-            "k": k, **бренд, "n": n, "name": имя, "co": len(рёбра), "offers": len(предл), "shown": len(предл),
+            "k": k, **бренд, **({"dr": прямых} if прямых else {}),
+            "n": n, "name": имя, "co": len(рёбра), "offers": len(предл), "shown": len(предл),
             "cmp": len(предл) >= 2, "oem_file": ["FAG"] if not каталог else [],
             "oem_cat": "SKF" if каталог else None, "brands": ["SKF"] if каталог else ["FAG"],
             "makers": ([{"name": "SKF", "role": "OEM", "country": "SE", "makes": "подшипники",
@@ -192,6 +201,7 @@ def _номенклатура():
     c["rows"] += 1
     c["parts"] += 1
     по_источнику = {и: sum(1 for p in позиции if p.get("bs") == и) for и in crossref.ИСТОЧНИКИ_БРЕНДА}
+    роли = collections.Counter(o["h"][0] for p in позиции for o in p["list"] if o.get("h"))
     снимок = {"version": 1, "published_at": СОБРАН, "positions": позиции, "companies": компании,
               "totals": {"positions": len(позиции),
                          "with_choice": sum(1 for p in позиции if p["co"] >= 2),
@@ -204,7 +214,10 @@ def _номенклатура():
                                    "by": по_источнику,
                                    "none": sum(1 for p in позиции if p.get("bw") == "нет"),
                                    "disputed": sum(1 for p in позиции if p.get("bw") == "спорно"),
-                                   "offers_coded": sum(p["offers"] for p in позиции)}}}
+                                   "offers_coded": sum(p["offers"] for p in позиции)},
+                         "roles": {"offers": sum(роли.values()), "п": роли["п"], "т": роли["т"],
+                                   "?": роли["?"],
+                                   "positions_direct": sum(1 for p in позиции if p.get("dr"))}}}
     return crossref.разложить(снимок)
 
 
@@ -584,6 +597,22 @@ def поля(о, суффикс):
                          "price": "price_fields"}[вид]]
 
 
+def _оговорки_без(о, слово):
+    """Снять у предложения оговорки со словом (номера — в notes корзины)."""
+    o = подр(о, 0)["list"][0]
+    notes = о[crossref.КЛЮЧИ_КОРЗИН[crossref.корзина(поз(о, 0)["k"])]]["notes"]
+    было = len(o["j"])
+    o["j"] = [x for x in o["j"] if слово not in notes[x]]
+    assert len(o["j"]) < было, "мутация обязана снять оговорку"
+
+
+def _номер_оговорки_вне(о):
+    """Номер оговорки за концом notes корзины (провод сломан, фраза потеряна)."""
+    o = подр(о, 0)["list"][0]
+    корзина = о[crossref.КЛЮЧИ_КОРЗИН[crossref.корзина(поз(о, 0)["k"])]]
+    o["j"] = [len(корзина["notes"]) + 5]
+
+
 def _удалить(ключ_):
     return lambda о: о.pop(ключ_)
 
@@ -777,6 +806,24 @@ def _сдвинуть_дату(о, ключ_, дата):
     ("nomenclature", "n.o_repeat", lambda о: подр(о, 0)["list"].extend(
         dict(подр(о, 0)["list"][0], d=f"2026-08-0{i}") for i in range(1, 4))),
     ("nomenclature", "n.o_f", lambda о: подр(о, 0)["list"][0].update(f="bitrix:5001")),
+    ("nomenclature", "n.o_role", lambda о: подр(о, 0)["list"][0].update(h="х1")),
+    ("nomenclature", "n.o_role", lambda о: подр(о, 0)["list"][0].update(h="п99")),
+    # Прямых у пары меньше, чем показано прямых; и прямых больше, чем предложений.
+    ("nomenclature", "n.o_role_dr", lambda о: поз(о, 0).pop("dr")),
+    ("nomenclature", "n.o_role_dr", lambda о: поз(о, 0).update(dr=9)),
+    # Приведённая цена: коэффициент вне границ, отрицательная цена, не сходится
+    # с исходной, ставка НДС не из закона.
+    ("nomenclature", "n.o_norm", lambda о: подр(о, 0)["list"][0]["i"].__setitem__(1, 7.0)),
+    ("nomenclature", "n.o_norm", lambda о: подр(о, 0)["list"][0]["i"].__setitem__(0, -1.0)),
+    ("nomenclature", "n.o_norm", lambda о: подр(о, 0)["list"][0]["i"].__setitem__(0, 999.0)),
+    ("nomenclature", "n.o_norm", lambda о: подр(о, 0)["list"][0]["i"].__setitem__(3, 0.3)),
+    # Оговорки: индекса нет — а оговорки об индексе нет; номер вне notes; пусто.
+    ("nomenclature", "n.o_norm_note", lambda о: (
+        подр(о, 0)["list"][0].update(i=[подр(о, 0)["list"][0]["p"], None, 0, None]),
+        _оговорки_без(о, "индекс"))),
+    ("nomenclature", "n.o_norm_note", lambda о: _номер_оговорки_вне(о)),
+    ("nomenclature", "n.o_norm_note", lambda о: подр(о, 0)["list"][0].update(j=[])),
+    ("nomenclature", "n.o_norm_note", lambda о: _оговорки_без(о, "не стандартный")),
     ("nomenclature", "n.mk", lambda о: подр(о, 0)["makers"][0].update(role="хозяин")),
     ("nomenclature", "n.mk_nocat", lambda о: подр(о, 7).update(makers=[{"name": "SKF", "role": "OEM"}])),
     ("nomenclature", "n.mk_raw", lambda о: подр(о, 0)["makers"][0].update(verdict="pn_not_found")),
@@ -1383,6 +1430,30 @@ def test_пары_настоящей_сборки_ревизия_не_обвин
         п, д = т.счета[код]
         assert п > 0 and д == 0, (код, п, д)
     assert т.доли["u.brand"] == (4, 5)
+
+
+def test_роль_и_приведённая_цена_настоящей_сборки_ревизия_не_обвиняет():
+    """Роль (h, dr) и приведённая цена (i, j и notes корзины) НАСТОЯЩЕЙ сборки —
+    чисты: правило одно на сборку и ревизию, мутации выше ловят поломку."""
+    from tests.test_crossref_role import РОЛИ, РЯДЫ_ИНДЕКСОВ, Р_БРЕНДОВ, строка
+    строки = [строка("zx100", "101", сущность="KV-S-000001-1", сущность_имя="Zentrix GmbH", оем="Zentrix",
+                     цена=122, валюта="RUB", примечание="цена с НДС", базис="FCA"),
+              строка("zx100", "102", сущность="KV-S-000002-2", сущность_имя="Ромашка Трейд", оем="Zentrix",
+                     цена=204, валюта="EUR", базис="DAP"),
+              строка("zx100", "103", сущность="KV-S-000003-3", сущность_имя="ООО Альфа", оем="Zentrix",
+                     цена=10, валюта="GBP"),
+              строка("qq1", "103", сущность="KV-S-000003-3", сущность_имя="ООО Альфа", цена=5,
+                     валюта="RUB", дата=None)]
+    снимок = crossref.собрать(строки, собран=СОБРАН, реестр=Р_БРЕНДОВ, на_дату=СОБРАН[:10],
+                              роли=РОЛИ, ряды_индексов=РЯДЫ_ИНДЕКСОВ)
+    сырьё = {k: json.dumps(v, ensure_ascii=False).encode("utf-8")
+             for k, v in crossref.разложить(снимок).items()}
+    т = pa.ревизия_номенклатуры(pa.Снимки(Память(сырьё)), СЕЙЧАС)
+    for код in ("n.o_role", "n.o_role_dr", "n.o_norm", "n.o_norm_note", "n.totals"):
+        п, д = т.счета[код]
+        assert п > 0 and д == 0, (код, п, д)
+    assert т.доли["u.o_direct"] == (2, 4) and т.доли["u.pos_direct"] == (1, 2)
+    assert т.доли["u.o_norm"] == (4, 4) and т.доли["u.o_norm_index"] == (3, 4)
 
 
 # ── Журнал, файлы, KV ────────────────────────────────────────────────────────

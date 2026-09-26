@@ -285,6 +285,47 @@ def собрать(словарь=None, ряды=None, разведка=None, д
     return р
 
 
+# ── Сведения о компании из базы — ОДИН запрос на замер и на снимок ──────────
+#
+# Домены и ИНН компании реестра (sup_identifier): тот же текст читает замер
+# (scripts/offer_role_measure.py, как CTE своей части) и публикатор снимка
+# номенклатуры (scripts/publish_crossref.py, одним запросом). Разойдись они — и
+# снимок показал бы роль, которую замер не мерил.
+ИДЕНТИФИКАТОРЫ_SQL = """
+select sup_id,
+       array_agg(distinct lower(value)) filter (where kind = 'domain') as домены,
+       array_agg(distinct value_norm) filter (where kind = 'inn')     as инн
+  from sup_identifier
+ where status <> 'rejected' and kind in ('domain', 'inn')
+ group by sup_id
+"""
+
+КАРТА_БАЗЫ_SQL = "select spelling_key, brand_key from lib_brand_map"
+
+
+def _есть_таблица(cur, имя: str) -> bool:
+    cur.execute("select to_regclass(%s) is not null", (имя,))
+    return bool(cur.fetchone()[0])
+
+
+def карта_базы(cur) -> tuple[list, str]:
+    """Пары (ключ написания, ключ бренда) из lib_brand_map и откуда карта —
+    словами для журнала. Таблицы нет — пусто, реестр строится из файлов."""
+    if not _есть_таблица(cur, "lib_brand_map"):
+        return [], "файлы репозитория"
+    cur.execute(КАРТА_БАЗЫ_SQL)
+    доп = [tuple(x) for x in cur.fetchall()]
+    return доп, f"файлы репозитория + lib_brand_map ({len(доп):,} написаний)"
+
+
+def идентификаторы(cur) -> dict[str, tuple[list, list]]:
+    """Сущность реестра → (домены, ИНН). Таблицы нет — пусто."""
+    if not _есть_таблица(cur, "sup_identifier"):
+        return {}
+    cur.execute(ИДЕНТИФИКАТОРЫ_SQL)
+    return {str(sup): (list(дом or ()), list(инн or ())) for sup, дом, инн in cur.fetchall()}
+
+
 def _json(путь: Path):
     with open(путь, encoding="utf-8") as f:
         return json.load(f)
