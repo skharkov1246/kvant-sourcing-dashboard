@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 302,
-    "total_bytes": 125737190,
+    "datasets": 303,
+    "total_bytes": 125867894,
     "by_sensitivity": {
-      "внутреннее": 180,
+      "внутреннее": 181,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 38,
+      "дашборд сорсеров": 39,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3196,38 +3196,9 @@
       ]
     },
     {
-      "path": "gt/data/badge_overrides.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 208188,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "checks",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "checks",
-        "records": 238
-      },
-      "last_change": "2026-08-21",
-      "last_author": "skharkov1246",
-      "last_commit": "c80990f",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/build.py",
-        "gt/tools/apply_badge_checks.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 207382,
+      "bytes": 208701,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -3269,13 +3240,13 @@
         "data/chat_snapshot.json",
         "data/import_cost.json",
         "data/index.json",
+        "data/inflation/cpi_monthly.json",
         "data/subsuppliers/verified.json",
-        "dict/",
-        "dict/material.json"
+        "dict/"
       ],
       "last_change": "2026-09-26",
       "last_author": "Claude",
-      "last_commit": "857df86",
+      "last_commit": "5bd7a67",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3285,6 +3256,35 @@
         "library/load_customs.py",
         "scripts/build_catalog.py",
         "tests/test_catalog_guard.py"
+      ]
+    },
+    {
+      "path": "gt/data/badge_overrides.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 208188,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "checks",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "checks",
+        "records": 238
+      },
+      "last_change": "2026-08-21",
+      "last_author": "skharkov1246",
+      "last_commit": "c80990f",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/apply_badge_checks.py"
       ]
     },
     {
@@ -4772,6 +4772,37 @@
         "ove/build.py",
         "ove/tools/build_paket.py",
         "ove/tools/build_release.py"
+      ]
+    },
+    {
+      "path": "data/inflation/cpi_monthly.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 129385,
+      "note": "Помесячные индексы потребительских цен по валютам цен (выгрузка 2026-09-26, scripts/fetch_inflation.py): RUB — ИПЦ России, зеркало МВФ (Росстат из песочницы недоступен), 2018-01…2026-07; USD — CPI-U NSA (BLS CUUR0000SA0), зеркало FRED CPIAUCNS (bls.gov — 403), 2018-01…2026-08 без 2025-10 (BLS не опубликовал); EUR — HICP еврозоны, Eurostat prc_hicp_minr напрямую, 2018-01…2026-08; CNY — ИПЦ Китая, зеркало МВФ (НБС недоступен и уровня ряда не публикует), 2018-01…2026-08; GBP — ONS D7BT напрямую, 2018-01…2026-08. У каждой точки URL источника и дата выгрузки; числа — как у источника, без досчёта. ИПЦ, а не ИЦП: ИЦП России и Китая — сырьевые индексы промышленности, а у Китая уровня ряда нет вовсе; для промышленных запчастей ИПЦ — приближение. Читает library/inflation.py (индексация цены на дату), через него library/price_norm.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "база_разная",
+        "выбор_индекса",
+        "выгружено",
+        "описание",
+        "ряды"
+      ],
+      "main_collection": {
+        "key": "ряды",
+        "records": 5
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "5bd7a67",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/inflation.py",
+        "scripts/fetch_inflation.py"
       ]
     },
     {
@@ -8551,8 +8582,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "5ef2d73",
+      "last_author": "skharkov1246",
+      "last_commit": "e611a85",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8599,8 +8630,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "5ef2d73",
+      "last_author": "skharkov1246",
+      "last_commit": "e611a85",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8723,8 +8754,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "5ef2d73",
+      "last_author": "skharkov1246",
+      "last_commit": "e611a85",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9867,8 +9898,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "5ef2d73",
+      "last_author": "skharkov1246",
+      "last_commit": "e611a85",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
