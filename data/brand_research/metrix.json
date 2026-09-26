@@ -1,0 +1,781 @@
+{
+  "oem_key": "metrix",
+  "name": "Metrix Instrument Co., L.P. (Metrix Vibration), Хьюстон, США",
+  "segment_focus": "датчики и реле вибрации, трансмиттеры: коды моделей, замены Bently Nevada",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Metrix, основана в 1965 году, делает КИП контроля вибрации для вращающихся и поршневых машин: сейсмические датчики скорости и ускорения, трансмиттеры 4–20 мА, электронные и механические реле вибрации, вихретоковые датчики зазора с драйверами. В 1998 году купила PMC/BETA (электронные реле 440/450), в 2007-м — вибрационное подразделение Hardy Instruments. Платформу SETPOINT в 2017 году продала Brüel & Kjær Vibro. По сайту изготовителя, Metrix входит в AMETEK с 26.08.2026; ранее входила в Indicor.\n\nЗамены Bently Nevada подтверждены самими паспортами изготовителя:\n- датчики MX2030 и MX8030 с удлинителями MX2031 и MX8031 «fully interchangeable» с BN 3300 и 3300XL 5/8 мм (паспорт DPS, Doc# 1087015);\n- серия 10000 (7200) 5/8 мм и 11 мм взаимозаменяема с BN 7200 (Doc# 1009553 и 1004596);\n- драйвер MX2033 и трансмиттер MX2034 настраиваются на датчики BN 3300/3300XL/7200/3000, NSv и RAM;\n- переходник 9647 повторяет разметку крепления BN Proximitor 3300/7200/3000 и трансмиттеров BN 990/991.\n\nМеханические реле 5550 выпускаются с монтажной плитой под Robertshaw 366/365 и Murphy VS-2 EX. Датчик скорости 5485C (до 375 °C) Metrix называет штатным почти на всех тяжёлых промышленных ГТУ.\n\nСобрано 30 кодов с дословной цитатой, все из открытых паспортов изготовителя. Это кабели, переходники, кабельные вводы, взрывозащищённые коробки, редукторы, пример полной конфигурации датчика и удлинителя, корпус выносного датчика, USB-кабель. Коды с «XXXX» или «AAA» — это ключ заказа, длину подставляют по паспорту.",
+  "machines": [
+    {
+      "model": "ST5484E",
+      "kind": "сейсмический трансмиттер виброскорости 4–20 мА (пьезоакселерометр + интегратор)",
+      "segment": "прочее",
+      "rating": "диапазоны 0,5–5,0 in/s пик или СКЗ; машины 120–6000 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/seismic/transmitters/st5484e-velocity-transmitter",
+        "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ST5491E",
+      "kind": "трансмиттер виброскорости 4–20 мА с ЖК-индикатором",
+      "segment": "прочее",
+      "rating": "2-проводная петля 4–20 мА, -10…+70 °C",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/seismic/transmitters/st5491e-indicating"
+      ],
+      "verified": true
+    },
+    {
+      "model": "5485C",
+      "kind": "высокотемпературный датчик виброскорости с подвижной катушкой",
+      "segment": "ГТУ",
+      "rating": "до 375 °C; 105/145/150/200 mV/in/s; 15 Гц–2 кГц",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/seismic/sensors/velocity-sensors/5485c-high-temp-velocity-sensor",
+        "https://cerodigi.com/wp-content/uploads/2024/10/Metrix-5485C-datasheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SA6200A",
+      "kind": "акселерометр общего назначения по API 670",
+      "segment": "прочее",
+      "rating": "100 mV/g, 0,5 Гц–10 кГц, 50 g",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/seismic/sensors/accelerometers/sa6200a-api-670-accelerometer"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SA6200",
+      "kind": "акселерометр",
+      "segment": "прочее",
+      "rating": "данных нет",
+      "status": "снята",
+      "sources": [
+        "https://www.metrixvibration.com/products/discontinued/sa6200-accelerometer"
+      ],
+      "verified": true
+    },
+    {
+      "model": "440",
+      "kind": "электронное реле вибрации (бывш. PMC/BETA 440)",
+      "segment": "прочее",
+      "rating": "0,1–1,5 / 0,2–3,0 in/s или 3–40 / 6–80 мм/с; Class I Div 2",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/switches/electronic-vibration-switches/440-economical-switch",
+        "https://www.alliantech.com/img/cms/Product_DataSheet/METRIX/450.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "450",
+      "kind": "электронное реле вибрации во взрывозащищённом корпусе",
+      "segment": "прочее",
+      "rating": "как 440; Class I Div 1",
+      "status": "выпускается",
+      "sources": [
+        "https://www.alliantech.com/img/cms/Product_DataSheet/METRIX/450.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "5550",
+      "kind": "механическое реле вибрации",
+      "segment": "прочее",
+      "rating": "SPDT/DPDT, 15 А (серебро) / 1 А (золото)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.nexinstrument.com/assets/images/pdf/5550_5550G%20Datasheet.pdf",
+        "https://lit.stromquist.com/docs/es/5550spec.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "5550G",
+      "kind": "механическое реле вибрации, ATEX/IECEx Ex d",
+      "segment": "прочее",
+      "rating": "SPDT/DPDT",
+      "status": "выпускается",
+      "sources": [
+        "https://www.nexinstrument.com/assets/images/pdf/5550_5550G%20Datasheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MX2030",
+      "kind": "вихретоковый датчик зазора 5/8 мм (аналог BN 3300/3300XL)",
+      "segment": "прочее",
+      "rating": "диапазон 80 mil (2 мм)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/proximity/digital-proximity-system/product/657/mx2030-probe-series",
+        "https://www.nexinstrument.com/assets/images/pdf/MX2034.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MX2031",
+      "kind": "удлинитель к датчику зазора",
+      "segment": "прочее",
+      "rating": "система 5/7/9 м",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/proximity/probes"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MX8030 / MX8031",
+      "kind": "датчик зазора и удлинитель (аналог BN 3300/3300XL)",
+      "segment": "прочее",
+      "rating": "5/8 мм",
+      "status": "выпускается",
+      "sources": [
+        "https://www.nexinstrument.com/assets/images/pdf/MX2034.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MX2033",
+      "kind": "цифровой 3-проводный драйвер датчика зазора (DPS)",
+      "segment": "прочее",
+      "rating": "настраивается на датчики Metrix и BN 3300/3300XL/7200/3000/NSv",
+      "status": "выпускается",
+      "sources": [
+        "https://www.nexinstrument.com/assets/images/pdf/MX2034.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MX2034",
+      "kind": "трансмиттер 4–20 мА для датчика зазора (радиальная вибрация, осевой сдвиг, частота вращения)",
+      "segment": "прочее",
+      "rating": "питание +24 В, петля 4–20 мА",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/proximity/vibration-transmitters",
+        "https://www.nexinstrument.com/assets/images/pdf/MX2034.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "10000 (7200) 5 и 8 мм",
+      "kind": "датчики зазора, взаимозаменяемые с BN 7200",
+      "segment": "прочее",
+      "rating": "система 5 или 9 м; номера исполнений 10001–10008, 10026, 10030 — по данным разведки, скептиком целиком не сверены",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/media/xyboo3hk/10000-probes-7200-series-datasheet-5-8-mm-doc-1009553-rev-j.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "10000 (7200) 11 мм",
+      "kind": "датчики зазора 11 мм, взаимозаменяемые с BN 7200",
+      "segment": "прочее",
+      "rating": "11 мм; номера исполнений 10037–10042 — по данным разведки, скептиком целиком не сверены",
+      "status": "выпускается",
+      "sources": [
+        "https://cerodigi.com/wp-content/uploads/2024/10/Metrix-10000-7200-11mm-datasheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "10000 (3000)",
+      "kind": "датчики зазора под систему BN 3000",
+      "segment": "прочее",
+      "rating": "0,190 in / 0,300 in",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/proximity/probes"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IT6810",
+      "kind": "трансмиттер ударных импульсов для поршневых машин",
+      "segment": "компрессор",
+      "rating": "контроль ослабления крепежа на поршневых компрессорах",
+      "status": "выпускается",
+      "sources": [
+        "https://metrixvibration.com/products/seismic/transmitters/it6810-impact"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IT6811",
+      "kind": "трансмиттер ударных импульсов",
+      "segment": "компрессор",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.metrixvibration.com/products/seismic/transmitters/it6811-impact"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SETPOINT",
+      "kind": "стоечная система защиты машин по API 670",
+      "segment": "прочее",
+      "rating": "данных нет",
+      "status": "снята у Metrix (платформа продана Brüel & Kjær Vibro в 2017 году)",
+      "sources": [
+        "https://www.hydrocarbonengineering.com/refining/19052017/bkv-completes-setpoint-acquisition/",
+        "https://www.automation.com/en-us/articles/2017/brel-kjr-vibro-announce-acquisition-of-setpoint-te"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "ST5484E Seismic Velocity 4-20 mA Transmitter Datasheet",
+      "doc_no": "1004457 (Rev AY, Aug 2023)",
+      "machine": "ST5484E",
+      "kind": "datasheet / каталог (ключ заказа, принадлежности)",
+      "sources": [
+        "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf"
+      ]
+    },
+    {
+      "title": "ST5484E 2-Wire Seismic Vibration Transmitter Installation Manual",
+      "doc_no": "M9162 (Rev W, Feb 2016)",
+      "machine": "ST5484E",
+      "kind": "installation / O&M manual",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Metrix/ST5484E%20Installation%20Manual%20ST5484E%202-Wire%20Seismic%20Vibration%20Transmitter.pdf"
+      ]
+    },
+    {
+      "title": "Safety Manual ST5484E / ST5491E (SIL)",
+      "doc_no": "QP064-42 Rev D",
+      "machine": "ST5484E, ST5491E",
+      "kind": "safety manual",
+      "sources": [
+        "https://www.metrixvibration.com/media/idoe13h2/safety-manual-st5484e-st5491e-doc-qp064-42-rev-d.pdf"
+      ]
+    },
+    {
+      "title": "Установочные чертежи ST5484E (искробезопасные барьеры NRTL и CENELEC, Div 2 / Zone 2)",
+      "doc_no": "9426; 9278; 1086105",
+      "machine": "ST5484E",
+      "kind": "installation drawing",
+      "sources": [
+        "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf"
+      ]
+    },
+    {
+      "title": "10000 Proximity Probes & Cables for 7200 Series (5 & 8 mm) Datasheet",
+      "doc_no": "1009553 (Rev J, Mar 2025)",
+      "machine": "10000 (7200) 5/8 мм",
+      "kind": "datasheet / каталог",
+      "sources": [
+        "https://www.metrixvibration.com/media/xyboo3hk/10000-probes-7200-series-datasheet-5-8-mm-doc-1009553-rev-j.pdf"
+      ]
+    },
+    {
+      "title": "10000 Proximity Probes & Cables for 7200 Series (11 mm) Datasheet",
+      "doc_no": "1004596 (Rev J, Jan 2023)",
+      "machine": "10000 (7200) 11 мм",
+      "kind": "datasheet / каталог",
+      "sources": [
+        "https://cerodigi.com/wp-content/uploads/2024/10/Metrix-10000-7200-11mm-datasheet.pdf"
+      ]
+    },
+    {
+      "title": "Digital Proximity System (DPS) Datasheet — MX2030/MX2031/MX8030/MX8031/MX2033/MX2034",
+      "doc_no": "1087015 (Rev AW, Jul 2023)",
+      "machine": "MX2033, MX2034, MX2030, MX8030",
+      "kind": "datasheet / каталог",
+      "sources": [
+        "https://www.nexinstrument.com/assets/images/pdf/MX2034.pdf"
+      ]
+    },
+    {
+      "title": "MX2030 Datasheet",
+      "doc_no": "1115343 (Rev M, Aug 2026)",
+      "machine": "MX2030",
+      "kind": "datasheet",
+      "sources": [
+        "https://www.metrixvibration.com/products/proximity/digital-proximity-system/product/657/mx2030-probe-series"
+      ]
+    },
+    {
+      "title": "DPS SIL Safety Manual (DPS and probes)",
+      "doc_no": "QP064-40 Rev D",
+      "machine": "MX2033, MX2034, MX2030, MX8030",
+      "kind": "safety manual",
+      "sources": [
+        "https://www.metrixvibration.com/products/proximity/digital-proximity-system/product/657/mx2030-probe-series"
+      ]
+    },
+    {
+      "title": "Руководство по установке MX2032/MX2033/MX2034 DPS (на русском)",
+      "doc_no": "100545",
+      "machine": "MX2033, MX2034",
+      "kind": "installation manual",
+      "sources": [
+        "https://www.metrixvibration.com/products/proximity/digital-proximity-system/product/657/mx2030-probe-series"
+      ]
+    },
+    {
+      "title": "Proximity System Troubleshooting Guide",
+      "doc_no": "1966043 Rev A (Apr 2025)",
+      "machine": "системы датчиков зазора",
+      "kind": "service guide / поиск неисправностей",
+      "sources": [
+        "https://www.metrixvibration.com/products/proximity/digital-proximity-system/product/657/mx2030-probe-series"
+      ]
+    },
+    {
+      "title": "5485C Velocity Sensor Datasheet",
+      "doc_no": "1004251 (Rev R, Oct 2023; Rev U, Mar 2025)",
+      "machine": "5485C",
+      "kind": "datasheet / каталог",
+      "sources": [
+        "https://cerodigi.com/wp-content/uploads/2024/10/Metrix-5485C-datasheet.pdf",
+        "https://www.metrixvibration.com/media/llmppc0f/5485c-datasheet-doc-1004251-rev-u-march-2025.pdf"
+      ]
+    },
+    {
+      "title": "440/450 Electronic Vibration Switches Datasheet",
+      "doc_no": "1004730 (Rev L, Apr 2019)",
+      "machine": "440, 450",
+      "kind": "datasheet / каталог",
+      "sources": [
+        "https://www.alliantech.com/img/cms/Product_DataSheet/METRIX/450.pdf"
+      ]
+    },
+    {
+      "title": "440 & 450 Electronic Vibration Switches Installation Manual",
+      "doc_no": "90018-031 (Rev R, May 2025)",
+      "machine": "440, 450",
+      "kind": "installation / O&M manual",
+      "sources": [
+        "https://www.metrixvibration.com/media/y4xketdl/440-450-manual-doc-90018-031-rev-r-may-2025.pdf"
+      ]
+    },
+    {
+      "title": "5550 & 5550G Mechanical Vibration Switches Datasheet",
+      "doc_no": "1004461 (Rev T, Jan 2015; Rev AE, Mar 2023)",
+      "machine": "5550, 5550G",
+      "kind": "datasheet / каталог",
+      "sources": [
+        "https://www.nexinstrument.com/assets/images/pdf/5550_5550G%20Datasheet.pdf",
+        "https://lit.stromquist.com/docs/es/5550spec.pdf"
+      ]
+    },
+    {
+      "title": "SA6200A API 670 General Purpose Accelerometer Datasheet",
+      "doc_no": "1009516",
+      "machine": "SA6200A",
+      "kind": "datasheet",
+      "sources": [
+        "https://www.metrixvibration.com/media/gdscpn2g/sa6200a-1009516-dec-2022-rev-ab.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "8978-111-XXXX",
+      "issuer": "Metrix",
+      "description": "Кабельная сборка с 2-контактным разъёмом MIL, брызгозащищённая (IP66); XXXX — длина в дм, шаг 0,5 м",
+      "machine": "ST5484E",
+      "unit": "кабель датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.8",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "8978-111-XXXX 2-pin MIL Splash-Proof (IP66) Cable Assembly"
+    },
+    {
+      "code": "8978-211-XXXX",
+      "issuer": "Metrix",
+      "description": "Кабельная сборка с разъёмом MIL без брызгозащитного чехла",
+      "machine": "ST5484E",
+      "unit": "кабель датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.8",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "8978-211-XXXX 2-pin MIL Cable Assembly"
+    },
+    {
+      "code": "8978-200-0000",
+      "issuer": "Metrix",
+      "description": "Разъём MIL 2-контактный без кабеля, разборный для монтажа на месте",
+      "machine": "ST5484E",
+      "unit": "разъём датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.8",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "8978-200-0000 2-pin MIL Connector Assembly"
+    },
+    {
+      "code": "8978-311-XXXX",
+      "issuer": "Metrix",
+      "description": "Кабельная сборка с разъёмом MIL, IP67, накидная гайка 316L; длины 5, 10, 20 м",
+      "machine": "ST5484E",
+      "unit": "кабель датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.8",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "8978-311-XXXX 2-pin MIL (IP67) Cable Assembly"
+    },
+    {
+      "code": "9334-111-XXXX-YYYY",
+      "issuer": "Metrix",
+      "description": "Бронированная кабельная сборка с разъёмом MIL, брызгозащищённая; XXXX — длина брони, YYYY — длина кабеля",
+      "machine": "ST5484E",
+      "unit": "кабель датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.8",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "9334-111-XXXX-YYYY 2-pin MIL Splash-Proof Cable Assembly With Armor"
+    },
+    {
+      "code": "9334-211-XXXX-YYYY",
+      "issuer": "Metrix",
+      "description": "Бронированная кабельная сборка с разъёмом MIL (IP66) без чехла",
+      "machine": "ST5484E",
+      "unit": "кабель датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.8",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "9334-211-XXXX-YYYY 2-pin MIL Armored Cable Assembly (IP66)"
+    },
+    {
+      "code": "8169-75-002-XXX",
+      "issuer": "Metrix",
+      "description": "2-жильная кабельная сборка без кабельного канала, к коробкам 8200 с редуктором 3/4 NPT; XXX — длина в футах",
+      "machine": "ST5484E",
+      "unit": "кабель / ввод",
+      "doc_ref": "Doc# 1004457 Rev AY, p.8",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "8169-75-002-XXX 2-wire Cable Assembly"
+    },
+    {
+      "code": "8201-001",
+      "issuer": "Metrix",
+      "description": "Муфта кабельного канала между ST5484E и коробкой 8200",
+      "machine": "ST5484E",
+      "unit": "кабельный ввод",
+      "doc_ref": "Doc# 1004457 Rev AY, p.8",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "8201-001 Conduit Union"
+    },
+    {
+      "code": "7084-001",
+      "issuer": "Metrix",
+      "description": "Фланцевый переходник: шпилька 1/2 NPT на 3-точечное плоское крепление, нержавеющая сталь 303",
+      "machine": "ST5484E",
+      "unit": "крепление датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.9",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "7084-001 Flange Mount Adapter"
+    },
+    {
+      "code": "7084-002",
+      "issuer": "Metrix",
+      "description": "Фланцевый переходник под шпильку 1/4 NPT",
+      "machine": "ST5484E",
+      "unit": "крепление датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.9",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "7084-002 Flange Mount Adapter Same as 7084-001 except center hole adapts ¼” NPT stud on the 5484E."
+    },
+    {
+      "code": "7084-005",
+      "issuer": "Metrix",
+      "description": "Фланцевый переходник под шпильку 3/8x24 UNF",
+      "machine": "ST5484E",
+      "unit": "крепление датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.9",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "7084-005 Flange Mount Adapter Same as 7084-001 except center hole adapts ⅜ x 24 UNF stud on the 5484E."
+    },
+    {
+      "code": "8253-002",
+      "issuer": "Metrix",
+      "description": "Переходная втулка 1/2 NPT на 1/4 NPT, нержавеющая сталь 303",
+      "machine": "ST5484E",
+      "unit": "крепление датчика",
+      "doc_ref": "Doc# 1004457 Rev AY, p.9",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "8253-002 ½” NPT to ¼” NPT Reducer Bushing"
+    },
+    {
+      "code": "93818-004",
+      "issuer": "Metrix",
+      "description": "Кабельный ввод с разгрузкой натяжения, 3/4 NPT, кабель 0,156–0,25 дюйма",
+      "machine": "ST5484E",
+      "unit": "кабельный ввод",
+      "doc_ref": "Doc# 1004457 Rev AY, p.9",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "93818-004 Cable Grip Strain Relief Fitting"
+    },
+    {
+      "code": "93818-018",
+      "issuer": "Metrix",
+      "description": "Кабельный ввод с разгрузкой натяжения под кабель 0,4–0,5 дюйма",
+      "machine": "ST5484E",
+      "unit": "кабельный ввод",
+      "doc_ref": "Doc# 1004457 Rev AY, p.9",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "93818-018 Cable Grip Strain Relief Fitting Similar to 93818-004, but fits larger cable diameters from 0.4”"
+    },
+    {
+      "code": "91104-032",
+      "issuer": "Metrix",
+      "description": "Редуктор 1 NPT(M) на 3/4 NPT(F), никелированная латунь, к коробке 8200-000 IEC",
+      "machine": "ST5484E",
+      "unit": "взрывозащищённая коробка",
+      "doc_ref": "Doc# 1004457 Rev AY, p.7",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "91104-032 Reducer, 1”NPT(M) - ¾”NPT(F)"
+    },
+    {
+      "code": "91104-031",
+      "issuer": "Metrix",
+      "description": "Редуктор 1 NPT(M) на 1/2 NPT(F), к коробке 8200-000 IEC",
+      "machine": "ST5484E",
+      "unit": "взрывозащищённая коробка",
+      "doc_ref": "Doc# 1004457 Rev AY, p.7",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "91104-031 Reducer, 1”NPT(M) - ½”NPT(F)"
+    },
+    {
+      "code": "91104-022",
+      "issuer": "Metrix",
+      "description": "Редуктор 1 NPT(M) на M20x1,5(F), к коробке 8200-000 IEC",
+      "machine": "ST5484E",
+      "unit": "взрывозащищённая коробка",
+      "doc_ref": "Doc# 1004457 Rev AY, p.7",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "91104-022 Reducer, 1”NPT(M) - M20 X 1.5(F)"
+    },
+    {
+      "code": "91104-033",
+      "issuer": "Metrix",
+      "description": "Редуктор 1 NPT(M) на M20x1,5(F), 316SS, ATEX/IECEx",
+      "machine": "ST5484E",
+      "unit": "взрывозащищённая коробка",
+      "doc_ref": "Doc# 1004457 Rev AY, p.7",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "91104-033 Reducer, 1”NPT(M) - M20 X 1.5(F)"
+    },
+    {
+      "code": "91104-011",
+      "issuer": "Metrix",
+      "description": "Редуктор 1 NPT(M) на 3/4 NPT(F), алюминий без меди, к коробке 8200-000 (NRTL)",
+      "machine": "ST5484E",
+      "unit": "взрывозащищённая коробка",
+      "doc_ref": "Doc# 1004457 Rev AY, p.7",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "91104-011 Reducer, 1”NPT(M) - ¾”NPT(F)"
+    },
+    {
+      "code": "91104-015",
+      "issuer": "Metrix",
+      "description": "Редуктор 1 NPT(M) на 1/2 NPT(F), к коробке 8200-000 (NRTL)",
+      "machine": "ST5484E",
+      "unit": "взрывозащищённая коробка",
+      "doc_ref": "Doc# 1004457 Rev AY, p.7",
+      "source_url": "https://techquip.com/images/pdfs/Metrix/st5484e-datsheet.pdf",
+      "quote": "91104-015 Reducer, 1”NPT(M) - ½”NPT(F)"
+    },
+    {
+      "code": "8200-001-IEC",
+      "issuer": "Metrix (изделие Killark Y-3-EX)",
+      "description": "Взрывозащищённая коробка кабельного канала для ATEX Ex d",
+      "machine": "ST5484E",
+      "unit": "взрывозащищённая коробка",
+      "doc_ref": "Doc# M9162 Rev W, p.6",
+      "source_url": "https://www.quicktimeonline.com/assets/images/pdf/Metrix/ST5484E%20Installation%20Manual%20ST5484E%202-Wire%20Seismic%20Vibration%20Transmitter.pdf",
+      "quote": "Use conduit elbow, Metrix reference 8200-001-IEC, which is a Killark product with"
+    },
+    {
+      "code": "10005-00-30-10-02",
+      "issuer": "Metrix",
+      "description": "Датчик зазора 8 мм 3/8-24, корпус 3,0 дюйма, вывод 1 м, без брони (пример конфигурации, замена BN 7200)",
+      "machine": "10000 (7200) 5/8 мм",
+      "unit": "датчик зазора",
+      "doc_ref": "Doc# 1009553 Rev J, p.2",
+      "source_url": "https://www.metrixvibration.com/media/xyboo3hk/10000-probes-7200-series-datasheet-5-8-mm-doc-1009553-rev-j.pdf",
+      "quote": "• Probe: 10005-00-30-10-02"
+    },
+    {
+      "code": "7402-040-01",
+      "issuer": "Metrix",
+      "description": "Удлинитель серии 7200, 4,0 м, бронированный",
+      "machine": "10000 (7200) 5/8 мм",
+      "unit": "удлинитель датчика зазора",
+      "doc_ref": "Doc# 1009553 Rev J, p.2",
+      "source_url": "https://www.metrixvibration.com/media/xyboo3hk/10000-probes-7200-series-datasheet-5-8-mm-doc-1009553-rev-j.pdf",
+      "quote": "• Extension cable: 7402-040-01"
+    },
+    {
+      "code": "10037-00-30-05-02",
+      "issuer": "Metrix",
+      "description": "Датчик зазора 11 мм, замена BN 7200 11 мм (пример конфигурации)",
+      "machine": "10000 (7200) 11 мм",
+      "unit": "датчик зазора",
+      "doc_ref": "Doc# 1004596 Rev J, p.2",
+      "source_url": "https://cerodigi.com/wp-content/uploads/2024/10/Metrix-10000-7200-11mm-datasheet.pdf",
+      "quote": "• Probe: 10037-00-30-05-02"
+    },
+    {
+      "code": "9282-085-01",
+      "issuer": "Metrix",
+      "description": "Удлинитель к датчику 11 мм серии 7200, 8,5 м, бронированный (пример конфигурации)",
+      "machine": "10000 (7200) 11 мм",
+      "unit": "удлинитель датчика зазора",
+      "doc_ref": "Doc# 1004596 Rev J, p.2",
+      "source_url": "https://cerodigi.com/wp-content/uploads/2024/10/Metrix-10000-7200-11mm-datasheet.pdf",
+      "quote": "• Extension cable: 9282-085-01"
+    },
+    {
+      "code": "9647",
+      "issuer": "Metrix",
+      "description": "Переходник с DIN-рейки на 4-точечное плоское крепление; разметка под BN Proximitor 3300/7200/3000 и трансмиттеры BN 990/991",
+      "machine": "MX2033, MX2034",
+      "unit": "крепление драйвера",
+      "doc_ref": "Doc# 1087015 Rev AW, p.12",
+      "source_url": "https://www.nexinstrument.com/assets/images/pdf/MX2034.pdf",
+      "quote": "DIN to 4-Hole Flat Base Mounting Adapter (P/N 9647)"
+    },
+    {
+      "code": "100527",
+      "issuer": "Metrix",
+      "description": "Комплект маркировочных этикеток DPS на 16 устройств",
+      "machine": "MX2033, MX2034",
+      "unit": "драйвер / трансмиттер",
+      "doc_ref": "Doc# 1087015 Rev AW, p.12",
+      "source_url": "https://www.nexinstrument.com/assets/images/pdf/MX2034.pdf",
+      "quote": "DPS User Label Kit for up to 16 devices (P/N 100527)"
+    },
+    {
+      "code": "4850-AAA",
+      "issuer": "Metrix",
+      "description": "Высокотемпературный бронированный кабель к 5485C со съёмным кабелем; AAA — длина в футах",
+      "machine": "5485C",
+      "unit": "кабель датчика",
+      "doc_ref": "Doc# 1004251 Rev R, p.2",
+      "source_url": "https://cerodigi.com/wp-content/uploads/2024/10/Metrix-5485C-datasheet.pdf",
+      "quote": "4850-AAA High Temperature Armored Cable Assembly"
+    },
+    {
+      "code": "7295-002",
+      "issuer": "Metrix",
+      "description": "Взрывозащищённый корпус выносного акселерометра к реле 450 (CSA Class I Gr A-D)",
+      "machine": "450 (440)",
+      "unit": "выносной датчик",
+      "doc_ref": "Doc# 1004730 Rev L, p.7",
+      "source_url": "https://www.alliantech.com/img/cms/Product_DataSheet/METRIX/450.pdf",
+      "quote": "11. Use Explosion-Proof transducer housing model 7295-002."
+    },
+    {
+      "code": "100468",
+      "issuer": "Metrix",
+      "description": "USB-кабель, в разделе принадлежностей реле вибрации на китайском сайте Metrix; к какой серии реле относится, в источнике прямо не сказано",
+      "machine": "реле вибрации (раздел принадлежностей)",
+      "unit": "принадлежность реле",
+      "doc_ref": "metrixvibration.cn, раздел Vibration Switch Accessories",
+      "source_url": "https://metrixvibration.cn/products/switches/vibration-switch-accessories/66.html",
+      "quote": "100468USB电缆"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Killark",
+      "component": "взрывозащищённая коробка кабельного канала 8200-001-IEC (у Killark — Y-3-EX)",
+      "machine": "ST5484E",
+      "evidence": "В руководстве по установке M9162 изготовитель прямо пишет: коробка Metrix 8200-001-IEC — изделие Killark с обозначением Y-3-EX",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Metrix/ST5484E%20Installation%20Manual%20ST5484E%202-Wire%20Seismic%20Vibration%20Transmitter.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Brüel & Kjær Vibro",
+      "component": "правопреемник платформы защиты машин SETPOINT; это не поставщик узлов для Metrix",
+      "machine": "SETPOINT",
+      "evidence": "Отраслевое сообщение от 2017 года: B&K Vibro завершила покупку платформы SETPOINT у Metrix Instrument Company",
+      "sources": [
+        "https://www.automation.com/en-us/articles/2017/brel-kjr-vibro-announce-acquisition-of-setpoint-te",
+        "https://www.hydrocarbonengineering.com/refining/19052017/bkv-completes-setpoint-acquisition/"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Metrix Instrument Co. — прямой офис (Metrix Direct), Эль-Хубар",
+      "country": "Саудовская Аравия",
+      "role": "прямые продажи изготовителя, Ближний Восток",
+      "sources": [
+        "https://www.metrixvibration.com/distributor-search"
+      ]
+    },
+    {
+      "company": "Metrix Instrument Co. — прямой офис (Metrix Direct), Мумбаи",
+      "country": "Индия",
+      "role": "прямые продажи изготовителя",
+      "sources": [
+        "https://www.metrixvibration.com/distributor-search"
+      ]
+    },
+    {
+      "company": "儒博控制系统制造（上海）有限公司 (Ruobo Control Systems Manufacturing (Shanghai) Co., Ltd.)",
+      "country": "Китай",
+      "role": "ведёт китайский сайт Metrix (metrixvibration.cn); структура прежней материнской группы Indicor/Roper, продажи в Китае",
+      "sources": [
+        "https://www.metrixvibration.cn/about-us/index.html",
+        "https://metrixvibration.cn/products/index.html"
+      ]
+    },
+    {
+      "company": "New Technologies Group (metrix.nt-rt.ru)",
+      "country": "Россия / СНГ",
+      "role": "перепродавец по каталогу Metrix; сам называет себя представительством в РФ и СНГ, у изготовителя это не подтверждено",
+      "sources": [
+        "https://metrix.nt-rt.ru/en"
+      ]
+    },
+    {
+      "company": "Branom Instrument Company",
+      "country": "США",
+      "role": "дистрибьютор (страница бренда Metrix)",
+      "sources": [
+        "https://www.branom.com/metrix"
+      ]
+    },
+    {
+      "company": "Radwell International",
+      "country": "США",
+      "role": "перепродавец запчастей (5485C-006, 5485C-008)",
+      "sources": [
+        "https://www.radwell.com/Buy/METRIX%20VIBRATION/METRIX%20VIBRATION/5485C-006"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальный список дистрибьюторов по странам (Турция, ОАЭ, Россия, Казахстан) виден только через форму поиска на metrixvibration.com/distributor-search; без интерактива названия партнёров не получены.",
+    "Паспорт MX2030/MX2031 (Doc 1115343) и SA6200A (Doc 1009516) с сайта изготовителя не скачался: 404, 502 и 403 на DirectIndustry. Поэтому ключи заказа MX2030-, MX2031- и полные коды SA6200A не записаны. Паспорта лежат на media.metrixvibration.com, при повторной попытке скачиваются вручную.",
+    "Кодов сменных внутренних деталей нет: трансмиттеры и датчики Metrix не ремонтируются, меняются целиком. Реальные ЗИП — кабели, переходники, коробки, этикетки, и они собраны. Коды ремкомплектов механических реле 5550 (плунжер сброса, катушка) в открытых паспортах не найдены; вероятно, есть только в руководстве по эксплуатации 5550 или у завода.",
+    "Таблица перекрёстных замен «номер Bently Nevada → номер Metrix» (например 330101/330130 → MX2030/MX2031) в открытом виде не найдена. Совместимость подтверждена только на уровне серий. Вероятно, это внутренний справочник продаж Metrix.",
+    "На каких конкретных ГТУ (GE Frame и др.) штатно стоит 5485C, изготовитель не пишет, только «most heavy-duty industrial gas turbines». Каталожные номера OEM турбин на этот датчик не найдены.",
+    "Субпоставщики пьезоэлементов, электроники и кабеля не раскрыты. Паспорт ST5484E лишь отмечает, что NRTL-сертификат коробки 8200-000 выдан через её изготовителя, «not Metrix».",
+    "Смена владельца (AMETEK, 26.08.2026) взята только со страницы About Us изготовителя; пресс-релиз AMETEK не проверялся.",
+    "Полные коды конфигураций с сайтов перепродавцов (например ST5484E-121-0132-00 на swdwq.com) не записаны: страницы не открывались для проверки дословной цитаты."
+  ],
+  "verifier_notes": "Все 30 кодов найдены дословно в открытых источниках, страницы и номера документов совпадают. Замечания, которые не опровергают записи: (1) у 8978-111-XXXX указано «также SA6200A», но лист ST5484E этого не говорит; (2) у SETPOINT слова «теперь VC-8000» и о раме по размерам BN не подтверждены открытым источником; первая ссылка automation.com отдаёт 403; (3) 100468 отнесено к «реле PRO» по разделу принадлежностей, прямой формулировки в источнике нет; (4) диапазоны номеров датчиков 10001–10008/10026/10030 и 10037–10042 целиком не сверялись. PDF скачаны и прочитаны через pdftotext в scratchpad.",
+  "corrections": [
+    "8978-111-XXXX: снято «также SA6200A» — лист ST5484E этого не говорит (замечание скептика)",
+    "SETPOINT (машины, субпоставщики, summary): сняты «теперь VC-8000», «рама по размерам BN 7200/3300» и «рамы на 8 и 16 мест» — открытым источником не подтверждены; первым источником поставлен hydrocarbonengineering.com, automation.com отдаёт 403 (замечание скептика)",
+    "100468: снята привязка к «реле серии PRO» и «Type A–Type B, 3 м» — в источнике только раздел принадлежностей реле (замечание скептика)",
+    "10000 (7200) 5/8 мм и 11 мм: диапазоны номеров датчиков вынесены из model в rating с оговоркой — скептик их целиком не сверял",
+    "summary: «31 код» исправлено на 30 — столько кодов в записи и столько подтвердил скептик",
+    "7084-002, 7084-005, 93818-018: цитата дополнена строкой таблицы с самим кодом — прежняя цитата была пояснением под кодом и кода не содержала; сверено по тексту паспорта Doc# 1004457 Rev AY"
+  ]
+}

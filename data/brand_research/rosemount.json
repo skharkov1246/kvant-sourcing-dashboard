@@ -1,0 +1,848 @@
+{
+  "oem_key": "rosemount",
+  "name": "Rosemount (Emerson)",
+  "segment_focus": "датчики давления и температуры 3051, 644 на пакетах ГТУ и ГПУ: коды моделей, взаимозаменяемость",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Rosemount здесь поставляет не машины, а КИП: датчики давления семейства 3051 (3051C, 3051T, 3051L, 3051S) и преобразователи температуры 644. Их ставят на пакеты ГТУ и ГПУ, но в открытых источниках это подтвердить не удалось. Все коды запчастей взяты из таблиц запчастей в открытых руководствах и листах данных изготовителя. По 3051 это руководство 00809-0100-4007 Rev BA (2017) и старое 00809-0100-4001 Rev EA (2002), по 644 — руководства 00809-0100-4728 Rev MB и 00809-0200-4728 Rev RA и лист данных 00813-0100-4728. Каждый код сверен по тексту PDF, извлечённому pdftotext. В цитатах пробелы раскладки сжаты до одного. Главное по ТО 3051: пакеты уплотнительных колец по 12 шт. (03031-0232/0233/0234/0242), комплекты дренажа и воздушника (01151-0028-xxxx, 03031-0378-xxxx), сменные сенсорные модули (03031-1045/1145 для 3051C, 03031-31xx для 3051T; изготовитель рекомендует один запасной на 50 датчиков), платы и клеммные колодки, болты фланцев. По взаимозаменяемости: 3051 — преемник снятого 1151, токовая петля 4–20 мА совместима. Переходники фланца у 1151 и у группы 3051/3051S/2024/3095 разные, и кольца к ним не взаимозаменяемы. Коды внешнего заземления 3051 в двух редакциях руководства разные: 03031-0398-0001 в 2002 г. и 03031-0383-0001 в 2017 г. В России Emerson продал бизнес вместе с «Метраном» местному руководству (разрешение на сделку от 21.02.2023). «Метран» выпускает собственный датчик «Метран-150» и значится изготовителем 3051 в описании типа СИ 14061-15. Действующее сейчас дилерство Rosemount в РФ не подтверждено.",
+  "machines": [
+    {
+      "model": "Rosemount 3051C (3051CD / 3051CG / 3051CA) Coplanar",
+      "kind": "датчик давления (дифференциальное, избыточное, абсолютное), 4–20 мА HART",
+      "segment": "прочее (КИП на пакетах ГТУ/ГПУ)",
+      "rating": "диапазоны 0–5; сенсорные модули по диапазонам (Range 1…5)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+        "https://www.emerson.com/en/measurement-instrumentation/products/rosemount-3051-pressure-transmitter-family"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 3051T (3051TG / 3051TA) In-line",
+      "kind": "датчик давления прямого монтажа (избыточное, абсолютное)",
+      "segment": "прочее (КИП на пакетах ГТУ/ГПУ)",
+      "rating": "диапазоны 1–6, присоединение 1/4–18 NPT, 1/2–14 NPT, G1/2 A DIN 16288, Autoclave F-250-C",
+      "status": "выпускается",
+      "sources": [
+        "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 3051L",
+      "kind": "датчик уровня с фланцевой мембраной",
+      "segment": "прочее (КИП)",
+      "rating": "фланцы 2–3 in класс 150/300, DN 50/80 PN 40",
+      "status": "выпускается",
+      "sources": [
+        "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+        "https://www.egm-llc.com/pdfs/iomanuals/rosemount__series_3051_pressure_transmitter_io_manual.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 3051H",
+      "kind": "датчик давления для высоких температур процесса (исполнение раннего 3051)",
+      "segment": "прочее (КИП)",
+      "rating": "данных нет",
+      "status": "в руководстве 2002 г.; текущий статус не проверен",
+      "sources": [
+        "https://www.egm-llc.com/pdfs/iomanuals/rosemount__series_3051_pressure_transmitter_io_manual.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 3051S (Scalable)",
+      "kind": "датчик давления, следующее поколение 3051",
+      "segment": "прочее (КИП на пакетах ГТУ/ГПУ)",
+      "rating": "данных нет",
+      "status": "выпускается (лист данных 00813-0100-4801 Rev UW, апрель 2026)",
+      "sources": [
+        "https://www.emerson.com/documents/automation/product-data-sheet-rosemount-3051s-series-of-instrumentation-en-73154.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 3051SMV",
+      "kind": "многопараметрический датчик (давление, перепад, температура) для расхода",
+      "segment": "прочее (КИП, учёт топливного газа)",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.emerson.com/documents/automation/product-data-sheet-rosemount-3051s-series-of-instrumentation-en-73154.pdf",
+        "https://www.transcat.com/media/pdf/3051SMV.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 3051SFA / 3051SFC / 3051SFP",
+      "kind": "расходомеры на базе 3051S (Annubar, компактная диафрагма, встроенная диафрагма)",
+      "segment": "прочее (КИП, расход газа)",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.emerson.com/documents/automation/product-data-sheet-rosemount-3051s-series-of-instrumentation-en-73154.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 3051SAL / 3051SAM",
+      "kind": "уровнемер и измерительный модуль ERS на базе 3051S",
+      "segment": "прочее (КИП)",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.emerson.com/documents/automation/product-data-sheet-rosemount-3051s-series-of-instrumentation-en-73154.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 2051 / 2051CF",
+      "kind": "датчик давления базового класса, расходомеры 2051CFA/CFC/CFP",
+      "segment": "прочее (КИП)",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+        "https://www.sps-cart.net/Documentation/Document/aYOr1Z/quick-start-guide-rosemount-2051-pressure-transmitter-2051cf-series-flowmeter-4-20-ma-hart-1-5-vdc-low-power-hart-protocol-rev-5-7-en-193436.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 1151 Alphaline",
+      "kind": "датчик давления прежнего поколения",
+      "segment": "прочее (КИП, старые пакеты)",
+      "rating": "данных нет",
+      "status": "снят; преемник — 3051",
+      "sources": [
+        "https://www.emersonautomationexperts.com/2014/measurement-instrumentation/upgrading-rosemount-1151-to-3051-pressure-transmitters/",
+        "https://www.instrumart.com/assets/1151_Manual.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 644H (головного монтажа)",
+      "kind": "преобразователь температуры (ТС/ТП), HART / FOUNDATION Fieldbus / PROFIBUS PA",
+      "segment": "прочее (КИП на пакетах ГТУ/ГПУ)",
+      "rating": "точность HART Standard ±0,15 °C (Pt100)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf",
+        "https://www.emerson.com/documents/automation/manual-rosemount-644-temperature-transmitter-en-89604.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 644R (на DIN-рейку)",
+      "kind": "преобразователь температуры рельсового монтажа",
+      "segment": "прочее (КИП)",
+      "rating": "данных нет",
+      "status": "выпускается",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf",
+        "https://www.emerson.com/documents/automation/safety-manual-rosemount-644-rail-mount-temperature-transmitter-en-8046344.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 644S",
+      "kind": "преобразователь температуры с двумя входами",
+      "segment": "прочее (КИП)",
+      "rating": "данных нет",
+      "status": "упомянут в руководстве 2016 г.; текущий статус не проверен",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Rosemount 3144P",
+      "kind": "преобразователь температуры полевого монтажа, два датчика",
+      "segment": "прочее (КИП)",
+      "rating": "данных нет",
+      "status": "упомянут в руководстве 644 как вариант для двух заземлённых термопар",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Rosemount 3051 Pressure Transmitter with 4–20 mA HART (Revision 5 and 7) — Reference Manual, Rev BA, январь 2017 (раздел A.8 Spare parts)",
+      "doc_no": "00809-0100-4007",
+      "machine": "3051C / 3051T / 3051L",
+      "kind": "service manual (O&M + parts list)",
+      "sources": [
+        "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 3051 Reference Manual, Rev BG, июль 2024",
+      "doc_no": "00809-0100-4007",
+      "machine": "3051",
+      "kind": "service manual (O&M); таблиц запчастей в извлечённом тексте нет",
+      "sources": [
+        "https://kecocontrols.com/wp-content/uploads/2025/04/Rosemount-3051-Reference-Manual-7-2024.pdf"
+      ]
+    },
+    {
+      "title": "Model 3051 Reference Manual, Rev EA, декабрь 2002 (приложение A, spare parts)",
+      "doc_no": "00809-0100-4001",
+      "machine": "3051C / 3051T / 3051L / 3051H",
+      "kind": "service manual (O&M + parts list)",
+      "sources": [
+        "https://www.egm-llc.com/pdfs/iomanuals/rosemount__series_3051_pressure_transmitter_io_manual.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 3051 with FOUNDATION Fieldbus — Reference Manual, Rev CA, 2014",
+      "doc_no": "00809-0100-4774",
+      "machine": "3051 FF",
+      "kind": "O&M",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Rosemount%203051%20Pressure%20Transmitter/Manuals%20%20Guides/Manual-%20Rosemount%203051%20with%20FOUNDATION%E2%84%A2%20Fieldbus%20protocol.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 3051 HART — Quick Start Guide, Rev CB, 2015",
+      "doc_no": "00825-0100-4007",
+      "machine": "3051",
+      "kind": "O&M (краткое)",
+      "sources": [
+        "https://www.quicktimeonline.com/assets/images/pdf/Rosemount%203051%20Pressure%20Transmitter/Manuals%20%20Guides/Quick%20start%20Guide-%20Rosemount%203051%20with%204-20mA%20HART%20(Revision%205%20and%207).pdf"
+      ]
+    },
+    {
+      "title": "Преобразователь давления Rosemount модели 3051 — руководство по эксплуатации (рус.)",
+      "doc_no": "",
+      "machine": "3051",
+      "kind": "O&M",
+      "sources": [
+        "https://www.emerson.com/documents/automation/%D1%80%D1%83%D0%BA%D0%BE%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE-%D0%BF%D0%BE-%D1%8D%D0%BA%D1%81%D0%BF%D0%BB%D1%83%D0%B0%D1%82%D0%B0%D1%86%D0%B8%D0%B8-%D0%BF%D1%80%D0%B5%D0%BE%D0%B1%D1%80%D0%B0%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C-%D0%B4%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-rosemount-%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8-3051-ru-ru-75998.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 3051S Series of Instrumentation — Product Data Sheet, Rev UW, апрель 2026",
+      "doc_no": "00813-0100-4801",
+      "machine": "3051S / 3051SMV / 3051SF / 3051SAL",
+      "kind": "каталог (лист данных с кодами заказа)",
+      "sources": [
+        "https://www.emerson.com/documents/automation/product-data-sheet-rosemount-3051s-series-of-instrumentation-en-73154.pdf"
+      ]
+    },
+    {
+      "title": "Model 1151 Alphaline Pressure Transmitters — Manual, Rev AA",
+      "doc_no": "00809-0100-4360",
+      "machine": "1151",
+      "kind": "O&M",
+      "sources": [
+        "https://www.instrumart.com/assets/1151_Manual.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 644 Head Mount and Rail Mount with HART — Reference Manual, Rev MB, июль 2016 (таблицы запчастей)",
+      "doc_no": "00809-0100-4728",
+      "machine": "644H / 644R",
+      "kind": "service manual (O&M + parts list)",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 644 Temperature Transmitter — Reference Manual, Rev SF, январь 2023",
+      "doc_no": "00809-0200-4728",
+      "machine": "644",
+      "kind": "O&M",
+      "sources": [
+        "https://www.emerson.com/documents/automation/manual-rosemount-644-temperature-transmitter-en-89604.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 644 Temperature Transmitter — Reference Manual, Rev RA, апрель 2015 (таблицы запчастей)",
+      "doc_no": "00809-0200-4728",
+      "machine": "644",
+      "kind": "service manual (O&M + parts list)",
+      "sources": [
+        "https://www.instrumart.com/assets/644_manual.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 644 FOUNDATION Fieldbus — Reference Manual, Rev CB, май 2024",
+      "doc_no": "00809-0400-4728",
+      "machine": "644 FF",
+      "kind": "O&M",
+      "sources": [
+        "https://www.emerson.com/documents/automation/reference-manual-rosemount-644-temperature-transmitter-en-88444.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 644 Rail Mount — Safety Manual, Rev AA, декабрь 2021",
+      "doc_no": "00809-0600-4728",
+      "machine": "644R",
+      "kind": "руководство по функциональной безопасности",
+      "sources": [
+        "https://www.emerson.com/documents/automation/safety-manual-rosemount-644-rail-mount-temperature-transmitter-en-8046344.pdf"
+      ]
+    },
+    {
+      "title": "Rosemount 644 Temperature Transmitter — Product Data Sheet, Rev SB, август 2013 (Enclosure, Display, Transient Protection, Miscellaneous Accessories)",
+      "doc_no": "00813-0100-4728",
+      "machine": "644",
+      "kind": "каталог (лист данных с кодами запчастей)",
+      "sources": [
+        "https://www.transcat.com/media/pdf/00813-0100-4728.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "03031-0232-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Пакет уплотнительных колец, крышка корпуса электроники (12 шт.)",
+      "machine": "3051C/3051T/3051L",
+      "unit": "корпус электроники",
+      "doc_ref": "00809-0100-4007 Rev BA, O-Ring packages (package of 12)",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "O-Ring packages (package of 12) Electronics housing, cover 03031-0232-0001"
+    },
+    {
+      "code": "03031-0233-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Пакет уплотнительных колец, стык корпуса электроники с модулем (12 шт.)",
+      "machine": "3051C/3051T/3051L",
+      "unit": "корпус электроники / сенсорный модуль",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Electronics housing, module 03031-0233-0001"
+    },
+    {
+      "code": "03031-0234-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Пакет колец технологического фланца, PTFE со стекловолокном (белые)",
+      "machine": "3051C",
+      "unit": "фланец Coplanar",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Process flange, glass-filled PTFE (white) 03031-0234-0001"
+    },
+    {
+      "code": "03031-0234-0002",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Пакет колец технологического фланца, PTFE с графитом (чёрные)",
+      "machine": "3051C",
+      "unit": "фланец Coplanar",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Process flange, graphite-filled PTFE (black) 03031-0234-0002"
+    },
+    {
+      "code": "03031-0242-0002",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Пакет колец переходника фланца, PTFE с графитом (чёрные)",
+      "machine": "3051C",
+      "unit": "переходник фланца",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Flange adapter, graphite-filled PTFE (black) 03031-0242-0002"
+    },
+    {
+      "code": "01151-0028-0022",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект штока и седла дренажа/воздушника, 316 SST, дифференциальное исполнение",
+      "machine": "3051CD",
+      "unit": "дренаж/воздушник",
+      "doc_ref": "00809-0100-4007 Rev BA, Differential Drain/Vent Kits",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "316 SST stem and seat kit 01151-0028-0022"
+    },
+    {
+      "code": "03031-0378-0022",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект дренажа/воздушника с керамическим шариком, 316 SST, дифференциальное исполнение",
+      "machine": "3051CD",
+      "unit": "дренаж/воздушник",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "316 SST ceramic ball drain/vent kit 03031-0378-0022"
+    },
+    {
+      "code": "01151-0028-0012",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект штока и седла дренажа/воздушника, 316 SST, исполнение избыточного/абсолютного давления",
+      "machine": "3051CG/3051CA",
+      "unit": "дренаж/воздушник",
+      "doc_ref": "00809-0100-4007 Rev BA, Gage/absolute drain/vent Kits",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "316 SST stem and seat kit 01151-0028-0012"
+    },
+    {
+      "code": "03031-1045-0012",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Сенсорный модуль 3051C, Range 1, изолятор 316L SST, силиконовое заполнение (изготовитель рекомендует 1 запасной на 50 датчиков)",
+      "machine": "3051C",
+      "unit": "сенсорный модуль",
+      "doc_ref": "00809-0100-4007 Rev BA, Table A-20",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "316L SST 03031-1045-0012 03031-1145-0012"
+    },
+    {
+      "code": "03031-1145-0012",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Сенсорный модуль 3051C, Range 1, изолятор 316L SST, инертное заполнение",
+      "machine": "3051C",
+      "unit": "сенсорный модуль",
+      "doc_ref": "00809-0100-4007 Rev BA, Table A-20",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "316L SST 03031-1045-0012 03031-1145-0012"
+    },
+    {
+      "code": "03031-3112-3112",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Сенсорный модуль 3051T, Range 1 (0–0,3/30 psig), алюминий, изолятор 316L SST, внутренняя резьба 1/4–18 NPT, силиконовое заполнение",
+      "machine": "3051T",
+      "unit": "сенсорный модуль",
+      "doc_ref": "00809-0100-4007 Rev BA, Table A-22",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "03031-3112-3112 03031-3112-1112"
+    },
+    {
+      "code": "03031-0020-3100",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект модернизации Enhanced 3051: плата электроники 4–20 мА HART без кнопок настройки",
+      "machine": "3051",
+      "unit": "электроника",
+      "doc_ref": "00809-0100-4007 Rev BA, Enhanced Rosemount 3051 upgrade kits",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "4–20 mA HART with no configuration buttons 03031-0020-3100"
+    },
+    {
+      "code": "03031-0020-3110",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект модернизации Enhanced 3051: плата 4–20 мА HART с цифровой подстройкой нуля",
+      "machine": "3051",
+      "unit": "электроника",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "4–20 mA HART with digital zero trim 03031-0020-3110"
+    },
+    {
+      "code": "03031-0001-0002",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Плата электроники Improved Standard 4–20 мА HART (исполнение 2002 г.)",
+      "machine": "3051 (прежнее исполнение)",
+      "unit": "электроника",
+      "doc_ref": "00809-0100-4001 Rev EA, приложение A",
+      "source_url": "https://www.egm-llc.com/pdfs/iomanuals/rosemount__series_3051_pressure_transmitter_io_manual.pdf",
+      "quote": "Improved Standard (4–20 mA/HART protocol)(1) 03031-0001-0002"
+    },
+    {
+      "code": "03031-0332-0015",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Стандартная клеммная колодка, выход 4–20 мА HART",
+      "machine": "3051",
+      "unit": "клеммный отсек",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Standard terminal block 03031-0332-0015"
+    },
+    {
+      "code": "03031-0332-0012",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Клеммная колодка с защитой от импульсных перенапряжений (опция T1)",
+      "machine": "3051",
+      "unit": "клеммный отсек",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Transient terminal block (option T1) 03031-0332-0012"
+    },
+    {
+      "code": "03031-0292-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Крышка клеммного отсека, алюминий (с уплотнительным кольцом)",
+      "machine": "3051",
+      "unit": "корпус",
+      "doc_ref": "00809-0100-4007 Rev BA, Housing covers (include o-ring)",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Field terminal cover - Aluminum 03031-0292-0001"
+    },
+    {
+      "code": "03031-0199-0011",
+      "issuer": "Rosemount (Emerson)",
+      "description": "ЖК-индикатор Enhanced 3051 с крышкой корпуса, 4–20 мА HART, алюминий",
+      "machine": "3051",
+      "unit": "индикатор",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "4–20mA HART - Aluminum 03031-0199-0011"
+    },
+    {
+      "code": "03031-0293-0002",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект местной установки нуля и диапазона",
+      "machine": "3051",
+      "unit": "электроника",
+      "doc_ref": "00809-0100-4007 Rev BA, Miscellaneous hardware",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Local zero and span kit 03031-0293-0002"
+    },
+    {
+      "code": "03031-0383-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Узел внешнего винта заземления (опция V5), редакция 2017 г.",
+      "machine": "3051",
+      "unit": "корпус",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "External ground screw assembly (option V5) 03031-0383-0001"
+    },
+    {
+      "code": "03031-0398-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Узел внешнего заземления (опция V5), редакция 2002 г.; в Rev BA 2017 г. указан 03031-0383-0001",
+      "machine": "3051 (прежнее исполнение)",
+      "unit": "корпус",
+      "doc_ref": "00809-0100-4001 Rev EA",
+      "source_url": "https://www.egm-llc.com/pdfs/iomanuals/rosemount__series_3051_pressure_transmitter_io_manual.pdf",
+      "quote": "External Ground Assembly (Option V5)(1) 03031-0398-0001"
+    },
+    {
+      "code": "03031-0312-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект болтов фланца Coplanar 44 мм, углеродистая сталь (4 шт.)",
+      "machine": "3051C",
+      "unit": "фланец Coplanar",
+      "doc_ref": "00809-0100-4007 Rev BA, Bolt kits",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "Carbon steel 03031-0312-0001"
+    },
+    {
+      "code": "03031-0312-0003",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект болтов фланца Coplanar 44 мм, ASTM A 193 B7M (4 шт.)",
+      "machine": "3051C",
+      "unit": "фланец Coplanar",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "ASTM A 193, Grade B7M 03031-0312-0003"
+    },
+    {
+      "code": "03031-1300-0002",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект переходников фланца: болты CS, кольца PTFE со стекловолокном, переходники SST (на 1 датчик ДД или 2 ДИ/ДА)",
+      "machine": "3051C",
+      "unit": "переходник фланца",
+      "doc_ref": "00809-0100-4007 Rev BA, Flange adapter kits",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "SST adapters 03031-1300-0002"
+    },
+    {
+      "code": "02024-0069-0002",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Переходник фланца 1/2–14 NPT, 316 SST",
+      "machine": "3051C",
+      "unit": "переходник фланца",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "316 SST 02024-0069-0002"
+    },
+    {
+      "code": "03031-0388-0022",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Фланец Coplanar дифференциальный, 316 SST",
+      "machine": "3051CD",
+      "unit": "фланец Coplanar",
+      "doc_ref": "00809-0100-4007 Rev BA",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "316 SST 03031-0388-0022"
+    },
+    {
+      "code": "03031-0544-0003",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Заглушка кабельного ввода 1/2 NPT",
+      "machine": "3051",
+      "unit": "корпус",
+      "doc_ref": "00809-0100-4007 Rev BA, Housing conduit plugs",
+      "source_url": "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+      "quote": "03031-0544-0003"
+    },
+    {
+      "code": "00644-4430-0002",
+      "issuer": "Rosemount (Emerson)",
+      "description": "ЖК-индикатор (индикатор с проставкой) для 644; в более поздних редакциях руководства этот код означает другое исполнение индикатора — HART Legacy display (Rev SB) или индикатор FF (Rev RA): перед заказом сверить с редакцией",
+      "machine": "644H",
+      "unit": "индикатор",
+      "doc_ref": "00809-0100-4728 Rev MB, spare parts",
+      "source_url": "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf",
+      "quote": "LCD Display (includes meter and meter spacer assembly) 00644-4430-0002"
+    },
+    {
+      "code": "00644-7630-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "ЖК-индикатор 644 HART (опция M5)",
+      "machine": "644H",
+      "unit": "индикатор",
+      "doc_ref": "00809-0200-4728 Rev RA",
+      "source_url": "https://www.instrumart.com/assets/644_manual.pdf",
+      "quote": "644 HART LCD Display (option M5) 00644-7630-0001"
+    },
+    {
+      "code": "00644-4437-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Защита от импульсных перенапряжений без корпуса",
+      "machine": "644",
+      "unit": "защита входа/выхода",
+      "doc_ref": "00813-0100-4728 Rev SB, Transient Protection",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "Transient Protector without Enclosure 00644-4437-0001"
+    },
+    {
+      "code": "00644-4431-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект винта заземления",
+      "machine": "644",
+      "unit": "корпус",
+      "doc_ref": "00813-0100-4728 Rev SB, Table 6 Miscellaneous Accessories",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "Ground Screw Assembly Kit 00644-4431-0001"
+    },
+    {
+      "code": "00644-4424-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Монтажные винты и пружины",
+      "machine": "644H",
+      "unit": "крепление",
+      "doc_ref": "00813-0100-4728 Rev SB, Table 6",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "Mounting Screws and Springs 00644-4424-0001"
+    },
+    {
+      "code": "00644-4432-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект стопорных колец для сборки с датчиком DIN",
+      "machine": "644H",
+      "unit": "крепление к датчику",
+      "doc_ref": "00813-0100-4728 Rev SB, Table 6",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "Snap Rings Kit (used for assembly to a DIN sensor) 00644-4432-0001"
+    },
+    {
+      "code": "00644-5301-0010",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Комплект для установки 644 головного монтажа на DIN-рейку (обе рейки)",
+      "machine": "644H",
+      "unit": "крепление",
+      "doc_ref": "00809-0100-4728 Rev MB; 00813-0100-4728",
+      "source_url": "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf",
+      "quote": "Note: Kit (part number 00644-5301-0010) includes mounting hardware and both types of rail kits."
+    },
+    {
+      "code": "00644-4420-0002",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Универсальная головка, алюминий, стандартная крышка, 2 ввода M20",
+      "machine": "644H",
+      "unit": "корпус (головка)",
+      "doc_ref": "00813-0100-4728 Rev SB",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "Universal Head, Aluminum, Standard cover, 2-conduit - M20 entries 00644-4420-0002"
+    },
+    {
+      "code": "00644-4410-0021",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Соединительная головка, алюминий, стандартная крышка, вводы M20 x 1/2 ANPT",
+      "machine": "644H",
+      "unit": "корпус (головка)",
+      "doc_ref": "00813-0100-4728 Rev SB",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "Connection Head, Aluminum, Standard cover, 2-conduit - M20 x 1/2 ANPT entries 00644-4410-0021"
+    },
+    {
+      "code": "00644-4434-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Узел фиксатора крышки",
+      "machine": "644",
+      "unit": "корпус",
+      "doc_ref": "00813-0100-4728 Rev SB, Table 6",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "Cover Clamp Assembly 00644-4434-0001"
+    },
+    {
+      "code": "00065-0305-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Клеммный блок, монтажные винты M4 13 мм",
+      "machine": "644H",
+      "unit": "клеммы",
+      "doc_ref": "00813-0100-4728 Rev SB, Table 6",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "Terminal Block, 13mm M4 Mounting Screws 00065-0305-0001"
+    },
+    {
+      "code": "00644-7610-0001",
+      "issuer": "Rosemount (Emerson)",
+      "description": "Кронштейн с U-болтом на трубу 2 in, 316 SST, вибростойкость 2g (опция B4)",
+      "machine": "644",
+      "unit": "крепление",
+      "doc_ref": "00813-0100-4728 Rev SB, Table 6",
+      "source_url": "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+      "quote": "U-bolt Mounting Bracket, 2-in pipe mount, 2g vibration rating with SST enclosure - 316 SST (option 00644-7610-0001"
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "03031-0242-0001",
+      "verdict": "не подтверждён",
+      "reason": "Код и строка 'Flange adapter, glass-filled PTFE (light brown) 03031-0242-0001' в Rev BA есть, но утверждение в описании «к переходникам 1151 не подходят» в источнике отсутствует (слово 1151 в Rev BA встречается только в кодах дренажных комплектов 01151-0028-…; в руководстве 2002 г. сноска (1) у этой строки говорит лишь «1 запасной на 25 датчиков»). Подтвердится, если убрать эту оговорку из описания."
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "Beijing Rosemount Far East Instrument Co., Ltd. (Китай)",
+      "component": "сборка преобразователей (производственная площадка Emerson; начиналась как совместное предприятие)",
+      "machine": "644; семейство 3051",
+      "evidence": "В руководстве 644 00809-0100-4728 Rev MB площадка значится в разделе B.1 «Approved manufacturing locations». Сертификат ISO 14001 и справочник Baidu скептику не открылись.",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf",
+        "https://www.emerson.com/documents/automation/certificate-iso-14001-rosemount-beijing-china-en-en-77956.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Emerson Process Management (India) Private Ltd. (Мумбаи)",
+      "component": "сборка преобразователей 644",
+      "machine": "644",
+      "evidence": "Значится в разделе B.1 «Approved manufacturing locations» руководства 644 Rev MB",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Emerson Process Management GmbH & Co. (Карлштайн, Германия); Emerson Asia Pacific (Сингапур); Emerson Brazil (Сорокаба); Emerson FZE (Дубай)",
+      "component": "сборка преобразователей 644",
+      "machine": "644",
+      "evidence": "Значатся в разделе B.1 «Approved manufacturing locations» руководства 644 Rev MB",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Метран (Челябинск, Россия)",
+      "component": "изготовитель датчиков 3051 в Челябинске (значится изготовителем в описании типа СИ 14061-15; по отраслевому сообщению — выпуск беспроводных 3051 и 3051S); собственный датчик «Метран-150»",
+      "machine": "3051 / 3051S",
+      "evidence": "В описании типа средства измерений 14061-15 («Преобразователи давления измерительные 3051») изготовителем наряду с Rosemount Inc. назван АО «ПГ «Метран» (Челябинск). Control Engineering Russia сообщает о выпуске беспроводных 3051 и 3051S в Челябинске на ПГ «Метран». На сайте «Метрана»: разрешение на покупку российского бизнеса Emerson выдано 21.02.2023. Поставляет ли «Метран» сегодня изделия Rosemount, не установлено.",
+      "sources": [
+        "https://all-pribors.ru/opisanie/14061-15-3051",
+        "https://controleng.ru/apparatnye-sredstva/sensory-i-datchiki/rosemount-3051-i-3051s/",
+        "https://www.metran.ru/news/kompaniya_metran_poluchila_spetsialnoe_razreshenie_na_sdelku_po_priobreteniyu_rossiyskogo_biznesa_ko/",
+        "https://www.metran.ru/catalog/pressure/metran-150/"
+      ],
+      "verified": false
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Emerson Automation Solutions — Emerson FZE (Jebel Ali, Дубай)",
+      "country": "ОАЭ",
+      "role": "региональный офис изготовителя по Ближнему Востоку и Африке (приём запросов) и производственная площадка 644",
+      "sources": [
+        "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf"
+      ]
+    },
+    {
+      "company": "Emerson Automation Solutions Asia Pacific Pte Ltd",
+      "country": "Сингапур",
+      "role": "региональный офис изготовителя по Азиатско-Тихоокеанскому региону",
+      "sources": [
+        "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf"
+      ]
+    },
+    {
+      "company": "Emerson Process Management (India) Private Ltd.",
+      "country": "Индия",
+      "role": "дочерняя компания изготовителя, производственная площадка 644",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf"
+      ]
+    },
+    {
+      "company": "Beijing Rosemount Far East Instrument Co., Ltd.",
+      "country": "Китай",
+      "role": "производственная площадка изготовителя",
+      "sources": [
+        "https://www.emerson.com/is/content/emerson/en/measurement-instrumentation/technical/products/temperature/documents/doc-rosemount-00809-0100-4728.pdf",
+        "https://www.emerson.com/documents/automation/certificate-iso-14001-rosemount-beijing-china-en-en-77956.pdf"
+      ]
+    },
+    {
+      "company": "Метран",
+      "country": "Россия",
+      "role": "бывшая дочерняя компания Emerson, в 2022–2023 гг. выкуплена местным руководством; выпускает аналог «Метран-150»; статус поставщика Rosemount сейчас не подтверждён",
+      "sources": [
+        "https://www.metran.ru/news/kompaniya_metran_poluchila_spetsialnoe_razreshenie_na_sdelku_po_priobreteniyu_rossiyskogo_biznesa_ko/",
+        "https://www.interfax.ru/russia/887234"
+      ]
+    },
+    {
+      "company": "ГК «Теплоприбор»",
+      "country": "Россия",
+      "role": "продавец (каталог Rosemount 3051C/T/L); официальный статус не подтверждён",
+      "sources": [
+        "https://xn--90ahjlpcccjdm.xn--p1ai/catalog/preobrazovatel-rosemount-3051-3051c-3051t-3051l/"
+      ]
+    },
+    {
+      "company": "ЭКОХИМ",
+      "country": "Россия",
+      "role": "продавец (каталог Rosemount 3051); официальный статус не подтверждён",
+      "sources": [
+        "https://ekohim.com/catalog/metrologiya_kip/davlenie/datchiki_davleniya/preobrazovateli_davleniya_rosemount_3051/"
+      ]
+    },
+    {
+      "company": "Метр-К",
+      "country": "Россия",
+      "role": "продавец (раздел Rosemount 3051); официальный статус не подтверждён",
+      "sources": [
+        "https://metr-k.ru/products/instrumentation/pressure/rosemount-3051/"
+      ]
+    },
+    {
+      "company": "Instrumart",
+      "country": "США",
+      "role": "интернет-дистрибьютор, выкладывает руководства 3051, 644 и 1151",
+      "sources": [
+        "https://www.instrumart.com/assets/rosemount_3051-420ma_manual.pdf",
+        "https://www.instrumart.com/assets/644_manual.pdf"
+      ]
+    },
+    {
+      "company": "Transcat",
+      "country": "США",
+      "role": "дистрибьютор, выкладывает листы данных 644 и 3051SMV",
+      "sources": [
+        "https://www.transcat.com/media/pdf/00813-0100-4728.pdf"
+      ]
+    }
+  ],
+  "gaps": [
+    "В открытых источниках не найдено подтверждения, какие модели Rosemount (3051, 3051S, 644) и с какими кодами заказа стоят на конкретных пакетах ГТУ (Solar, GE LM2500/LM6000, Siemens) и ГПУ (Jenbacher, Waukesha, Caterpillar). Это есть в перечнях КИП и P&ID пакетов у изготовителей машин (закрытая документация пакета) и в ведомостях запчастей ЗИП у эксплуатантов.",
+    "Таблицы запчастей в Rev BG (2024) руководства 3051 00809-0100-4007 не найдены: в извлечённом тексте кодов нет. Коды взяты из Rev BA (2017) и Rev EA (2002) — перед заказом их надо сверить с действующим прайсом Emerson или эквивалентом в Emerson Store.",
+    "Расхождения между редакциями: код внешнего заземления V5 — 03031-0398-0001 (2002) против 03031-0383-0001 (2017); коды плат 3051 прежнего исполнения (03031-0001-xxxx) заменены комплектами Enhanced (03031-0020-31xx). Таблицу перехода кодов на заменяющие изготовитель открыто не публикует.",
+    "Таблица запчастей 3051S (коды 03151-xxxx-xxxx) в открытом листе данных 00813-0100-4801 не приведена. Страницы SKU в каталоге emerson.com (например, 03151-9041-0001) существуют, но дословный текст с кодом снять надёжно не удалось; нужен справочник 3051S 00809-0100-4801 или Emerson Store.",
+    "Датчики температуры к 644 (Rosemount 0065/0068/0078/0183/0185, термопары и ТС) в этой разведке не разобраны. Их коды есть в листах данных Rosemount Temperature Sensors (00813-0100-2654 и др.), нужен отдельный проход.",
+    "Официального дистрибьютора Rosemount в РФ после 2022 г. нет. Российские продавцы (Теплоприбор, Экохим, Метр-К) официальными не подтверждены. По Турции и Казахстану дилерских списков не найдено — нужен локатор каналов продаж Emerson (emerson.com, раздел contact / Impact Partners).",
+    "Взаимозаменяемость подтверждена только в общем виде. 3051 — преемник 1151, петля 4–20 мА совместима, кольца переходников фланца у 1151 и у 3051/3051S/2024/3095 разные. Близость «Метран-150» к 3051 открытым источником не подтверждена. Таблицы соответствия кодов заказа 1151 → 3051 и 3051 → Метран-150 открыто не найдено (вероятно, в документах подбора аналогов «Метрана»)."
+  ],
+  "verifier_notes": "Проверено по тексту PDF (pdftotext + grep): все 40 кодов из записи есть в указанных источниках. Все источники открылись, кроме ISO-сертификата Beijing (emerson.com отдаёт HTML), baike.baidu.com (соединение сброшено) и emersonautomationexperts.com (Cloudflare). Не подтверждён один код — 03031-0242-0001: в описание добавлено утверждение про 1151, которого в источнике нет. Для других записей нужны правки: у Метрана заменить источники на all-pribors 14061-15 и controleng.ru и убрать «2013 г.» и «выносные мембраны»; у 00644-4430-0002 отметить, что в более поздних ревизиях руководства этот код означает HART Legacy display (Rev SB) или индикатор FF (Rev RA). Тексты PDF скачаны и прочитаны во временной папке сессии.",
+  "corrections": [
+    "verifier_notes: локальный путь к файлам проверки заменён словами — локальные пути в набор не пишутся",
+    "sub_suppliers «Метран»: источник isup.ru заменён описанием типа СИ 14061-15 (all-pribors.ru) и статьёй controleng.ru, сняты «линия открыта в 2013 г.», «выносные мембраны» и «на ёмкостной ячейке Rosemount»; verified=false — текущие поставки не установлены (замечание скептика)",
+    "summary: фраза о сборке 3051C/T/L с выносными мембранами заменена ссылкой на описание типа СИ 14061-15 — как у записи субпоставщика (замечание скептика)",
+    "00644-4430-0002: в описание добавлено, что в более поздних редакциях код означает HART Legacy display (Rev SB) или индикатор FF (Rev RA) — замечание скептика",
+    "sub_suppliers Beijing Rosemount: снята ссылка на baike.baidu.com и утверждение о 3051SFA по ней — скептику источник не открылся; verified=true по руководству 644 Rev MB",
+    "dealers Beijing Rosemount: добавлено руководство 644 Rev MB как источник — сертификат ISO 14001 скептику не открылся"
+  ]
+}

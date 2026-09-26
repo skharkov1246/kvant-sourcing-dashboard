@@ -1,0 +1,496 @@
+{
+  "oem_key": "versaproducts",
+  "name": "Versa Products",
+  "segment_focus": "соленоидные клапаны серии V/VVS на пакетах Solar: коды исполнений",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Versa Products Company, Inc. (Парамус, Нью-Джерси, США; европейская «дочка» Versa BV в Апелдорне, Нидерланды) выпускает соленоидные, пилотные и ручные распределители. Сама она машин не делает: это комплектующие к пакетам ГТУ Solar Turbines (соленоидные клапаны топливной системы, пневмо- и гидроуправления). В открытом доступе связь Versa и Solar подтверждена двумя списками. Первый — кросс-таблица SEPOC на gas-turbine-parts.com: номер Solar сопоставлен с номером Versa для 1046410-1 (VXX-4423-316-2100W), 1016391-2 (VSG-4322-316-2100E) и 992140C1 (E5-3198-34XX-D024, Centaur 50, 3B681). Второй — сток-лист GTA Turbines: пять номеров Solar с пометкой «Versa». Коды исполнений собираются по системе нумерации изготовителя (бюллетени VT и V-316). Позиция за позицией: V или T — серия; вторая буква — привод слева (S — пружинный возврат, X — центрирование пружиной); третья — привод справа (G — соленоид-пилот); затем функция (2/3/4/5-ходовой), размер порта, исполнение корпуса, число позиций; -316 — нержавеющая сталь 316; далее опции и код катушки (A120, D024 и т. п.). Для природного газа изготовитель рекомендует суффикс -NGS (-NGST при низкой температуре). Расходники из бюллетеня VT: ремкомплекты V-4332/V-4532/V-4732 (-G, -GG), плунжер P-1002-08 с вариантами уплотнений, катушка P-1002-02-<код катушки>. Серии «VVS» в документах изготовителя не найдено: вероятно, это искажение префикса VSG или VXX. В трёх случаях код Solar прямо сопоставлен с кодом Versa, остальные номера Solar подтверждают только, что изготовитель — Versa.",
+  "machines": [
+    {
+      "model": "Series V (brass), 1/8\"–1\" NPT, 2/3/4/5-ходовые",
+      "kind": "соленоидный/пилотный распределитель (пневматика до 200 psi)",
+      "segment": "прочее",
+      "rating": "порты 1/8\"–1\" NPT (1-1/4\" с суффиксом -12), VAC–200 psi",
+      "status": "выпускается",
+      "sources": [
+        "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+        "https://www.versa-valves.com/vsg-4302-xx-d024"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Series T (гидравлика)",
+      "kind": "распределитель гидравлический",
+      "segment": "прочее",
+      "rating": "до 500 psi (35 bar)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "V-316 Series (нержавеющая сталь 316, NACE MR-01-75)",
+      "kind": "соленоидный распределитель для агрессивных сред и газа",
+      "segment": "ГТУ",
+      "rating": "порты 1/4\"–1\" NPT; 3/2, 3/3, 5/2, 5/3",
+      "status": "выпускается",
+      "sources": [
+        "https://www.versa-valves.com/media/wysiwyg/PDF_Catalog/Versa-V316-Stainless-Steel-Valves.pdf",
+        "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "C-316 Series (1/4\", нержавеющая сталь)",
+      "kind": "соленоидный распределитель",
+      "segment": "прочее",
+      "rating": "1/4\" NPT",
+      "status": "выпускается",
+      "sources": [
+        "https://www.versa-valves.com/versa-product-catalogs",
+        "https://www.wilson-company.com/product/VSP-3501-316/versa-c-316-series-stainless-steel-valves-cag"
+      ],
+      "verified": true
+    },
+    {
+      "model": "E-3198 / E5-3198 (соленоидный оператор)",
+      "kind": "соленоидный оператор (пилот) к распределителям V/V-316",
+      "segment": "ГТУ",
+      "rating": "катушки A120, D024 и др.; ввод 1/2\" NPT",
+      "status": "выпускается",
+      "sources": [
+        "https://www.versa-valves.com/e-3198-34-a120",
+        "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "V & T Series (каталог с системой нумерации, ремкомплектами, катушками)",
+      "doc_no": "Bulletin VT 2020",
+      "machine": "Series V / Series T",
+      "kind": "parts manual / каталог",
+      "sources": [
+        "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+        "https://selector.versa-valves.com/media/wysiwyg/PDF_Catalog/Versa-VT-Series-Brass-Spool-Valves.pdf"
+      ]
+    },
+    {
+      "title": "V-316 Series (нержавеющие распределители; суффиксы -NGS/-NGST для природного газа)",
+      "doc_no": "Bulletin V-316, Revised 11/2025",
+      "machine": "V-316 Series",
+      "kind": "каталог",
+      "sources": [
+        "https://www.versa-valves.com/media/wysiwyg/PDF_Catalog/Versa-V316-Stainless-Steel-Valves.pdf"
+      ]
+    },
+    {
+      "title": "Series V & T Valves (прежняя редакция)",
+      "doc_no": "Bulletin VT-2003",
+      "machine": "Series V / Series T",
+      "kind": "каталог",
+      "sources": [
+        "https://www.smcpneumatics.com/versavalve/V_and_T_Series_Valves.pdf"
+      ]
+    },
+    {
+      "title": "Solenoid valves & accessories for valve automation",
+      "machine": "NAMUR/автоматизация арматуры",
+      "kind": "каталог",
+      "sources": [
+        "https://www.versa-valves.com/wp-content/uploads/Versa-Valve-Automation.pdf"
+      ]
+    },
+    {
+      "title": "Solar Turbine spare parts — кросс SEPOC (номер Solar и номер изготовителя)",
+      "machine": "Solar Centaur 50 (3B681) и др.",
+      "kind": "кросс-таблица запчастей (сторонняя)",
+      "sources": [
+        "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "VXX-4423-316-2100W",
+      "issuer": "Versa Products",
+      "description": "4-ходовой 3-позиционный распределитель с двумя соленоидами, взрывозащищённый, порты 3/8 NPT (Solar 1046410-1)",
+      "machine": "пакеты Solar Turbines (SEPOC)",
+      "unit": "система управления / пневмоуправление",
+      "doc_ref": "SEPOC cross, п. 50 (SEPOC 800002780)",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html",
+      "quote": "VALVE, SOLENOID 4 way, 3 -positions, explosion proof 3/8 NPT ports Versa Products VXX-4423-316-2100W"
+    },
+    {
+      "code": "VSG-4322-316-2100E",
+      "issuer": "Versa Products",
+      "description": "Соленоидный распределитель с корпусом из нержавеющей стали, 2-позиционный, 4-ходовой, внутренний пилот, пружинный возврат (Solar 1016391-2)",
+      "machine": "пакеты Solar Turbines (SEPOC)",
+      "unit": "система управления / пневмоуправление",
+      "doc_ref": "SEPOC cross, п. 51 (SEPOC 800001380)",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html",
+      "quote": "spring reurn Versa PRODUCTS COMPANY INC. VSG-4322-316-2100E"
+    },
+    {
+      "code": "E5-3198-34XX-D024",
+      "issuer": "Versa Products",
+      "description": "Привод клапана — соленоидный оператор (Solar 992140C1); 24 В пост. тока выведено из кода катушки D024, дословно в источнике не указано",
+      "machine": "Solar Centaur 50 (турбогенератор 3B681)",
+      "unit": "топливная система / управление клапаном",
+      "doc_ref": "SEPOC cross, п. 49 (SEPOC 800005160)",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html",
+      "quote": "800005160 ACTUATOR, VALVE VERSA PROD E5-3198-34XX-D024"
+    },
+    {
+      "code": "1046410-1",
+      "issuer": "Solar Turbines",
+      "description": "Распределитель с двумя соленоидами, 3 позиции, 4-ходовой, взрывозащищённый, 3/8 NPT; исполнение Versa VXX-4423-316-2100W",
+      "machine": "пакеты Solar Turbines",
+      "unit": "система управления",
+      "doc_ref": "SEPOC cross, таблица «Vendor», п. 1",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html",
+      "quote": "explosion proof 3/8 NPT ports SOLAR 1046410-1"
+    },
+    {
+      "code": "1016391-2",
+      "issuer": "Solar Turbines",
+      "description": "Соленоидный распределитель с корпусом из нержавеющей стали, 2 позиции, 4-ходовой; исполнение Versa VSG-4322-316-2100E",
+      "machine": "пакеты Solar Turbines",
+      "unit": "система управления",
+      "doc_ref": "SEPOC cross, таблица «Vendor», п. 2",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html",
+      "quote": "spring reurn SOLAR 1016391-2"
+    },
+    {
+      "code": "992140C1",
+      "issuer": "Solar Turbines",
+      "description": "Привод клапана газовой турбины, турбогенератор Solar Centaur 50; исполнение Versa E5-3198-34XX-D024",
+      "machine": "Solar Centaur 50 (3B681)",
+      "unit": "топливная система / управление клапаном",
+      "doc_ref": "SEPOC cross, таблица «Vendor», п. 18",
+      "source_url": "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html",
+      "quote": "SOLAR CENTAUR 50 - 3B681-TURBO GENERATOR - (Solar) SOLAR 992140C1"
+    },
+    {
+      "code": "186230-1",
+      "issuer": "Solar Turbines",
+      "description": "Клапан Versa (номер Solar)",
+      "machine": "ГТУ Solar (сток-лист)",
+      "unit": "клапаны",
+      "doc_ref": "GTA parts lookup — сток-лист ремонтника Solar, номер к модели турбины не привязан",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "186230-1 Valve, Versa"
+    },
+    {
+      "code": "900924925",
+      "issuer": "Solar Turbines",
+      "description": "Соленоидный клапан Versa (номер Solar)",
+      "machine": "ГТУ Solar (сток-лист)",
+      "unit": "клапаны",
+      "doc_ref": "GTA parts lookup — сток-лист ремонтника Solar, номер к модели турбины не привязан",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "900924925 Valve, Solenoid, Versa Valve"
+    },
+    {
+      "code": "904978C2",
+      "issuer": "Solar Turbines",
+      "description": "Клапан Versa (номер Solar; суффикс C2 похож на нумерацию International Harvester — вывод разведки, в источнике не сказано)",
+      "machine": "ГТУ Solar (сток-лист)",
+      "unit": "клапаны",
+      "doc_ref": "GTA parts lookup — сток-лист ремонтника Solar, номер к модели турбины не привязан",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "904978C2 VALVE, Versa"
+    },
+    {
+      "code": "909583C2",
+      "issuer": "Solar Turbines",
+      "description": "Клапан Versa с соленоидным приводом, 2 порта",
+      "machine": "ГТУ Solar (сток-лист)",
+      "unit": "клапаны",
+      "doc_ref": "GTA parts lookup — сток-лист ремонтника Solar, номер к модели турбины не привязан",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "909583C2 Versa Valve, Solenoid Actuated 2 Port"
+    },
+    {
+      "code": "948032C2",
+      "issuer": "Solar Turbines",
+      "description": "Клапан Versa (номер Solar)",
+      "machine": "ГТУ Solar (сток-лист)",
+      "unit": "клапаны",
+      "doc_ref": "GTA parts lookup — сток-лист ремонтника Solar, номер к модели турбины не привязан",
+      "source_url": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+      "quote": "948032C2 VALVE, VERSA"
+    },
+    {
+      "code": "P-1002-02-A120",
+      "issuer": "Versa Products",
+      "description": "Отдельная катушка к клапанам Series V/T, 120 В 60 Гц (формат P-1002-02-<код катушки>)",
+      "machine": "Series V / T",
+      "unit": "соленоид — катушка",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "number would be P-1002-02-A120."
+    },
+    {
+      "code": "P-1002-08",
+      "issuer": "Versa Products",
+      "description": "Плунжер соленоида, стандартное уплотнение NBR",
+      "machine": "Series V / T",
+      "unit": "соленоид — плунжер",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "P-1002-08 Standard NBR (nitrile) seal"
+    },
+    {
+      "code": "P-1002-08-3",
+      "issuer": "Versa Products",
+      "description": "Плунжер соленоида, уплотнение FKM (к опциям -3 и -155)",
+      "machine": "Series V / T",
+      "unit": "соленоид — плунжер",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "P-1002-08-3 FKM (fluorocarbon) seal"
+    },
+    {
+      "code": "P-1002-08-11",
+      "issuer": "Versa Products",
+      "description": "Плунжер соленоида, уплотнение NBR с повышенным содержанием нитрила (опция -11, в т. ч. «сладкий» природный газ)",
+      "machine": "Series V / T",
+      "unit": "соленоид — плунжер",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "P-1002-08-11 NBR (high nitrile) seal"
+    },
+    {
+      "code": "P-1002-08-EP",
+      "issuer": "Versa Products",
+      "description": "Плунжер соленоида, уплотнение EPR",
+      "machine": "Series V / T",
+      "unit": "соленоид — плунжер",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "P-1002-08-EP EPR (ethylene propylene) seal"
+    },
+    {
+      "code": "V-4332-G",
+      "issuer": "Versa Products",
+      "description": "Универсальный ремкомплект клапанов 1/8\" и 1/4\" с одним соленоидом, 2 позиции",
+      "machine": "Series V 1/8–1/4\"",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71 (Repair Kits)",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "1/8 & 1/4 V-4332 V-4332-G V-4332-GG"
+    },
+    {
+      "code": "V-4332-GG",
+      "issuer": "Versa Products",
+      "description": "Универсальный ремкомплект клапанов 1/8\" и 1/4\" с двумя соленоидами, 2 или 3 позиции",
+      "machine": "Series V 1/8–1/4\"",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "1/8 & 1/4 V-4332 V-4332-G V-4332-GG"
+    },
+    {
+      "code": "V-4332",
+      "issuer": "Versa Products",
+      "description": "Универсальный ремкомплект клапанов 1/8\" и 1/4\" с ручным, ножным, кулачковым или пилотным приводом",
+      "machine": "Series V 1/8–1/4\"",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "1/8 & 1/4 V-4332 V-4332-G V-4332-GG"
+    },
+    {
+      "code": "V-4332-155",
+      "issuer": "Versa Products",
+      "description": "Ремкомплект V-4332 с уплотнениями FKM (суффикс -155)",
+      "machine": "Series V 1/8–1/4\"",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "becomes V-4332-155 (fluorocarbon seals)."
+    },
+    {
+      "code": "V-4532-G",
+      "issuer": "Versa Products",
+      "description": "Универсальный ремкомплект клапанов 3/8\" и 1/2\" с одним соленоидом",
+      "machine": "Series V 3/8–1/2\"",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "3/8 & 1/2 V-4532 V-4532-G V-4532-GG"
+    },
+    {
+      "code": "V-4532-GG",
+      "issuer": "Versa Products",
+      "description": "Универсальный ремкомплект клапанов 3/8\" и 1/2\" с двумя соленоидами",
+      "machine": "Series V 3/8–1/2\"",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "3/8 & 1/2 V-4532 V-4532-G V-4532-GG"
+    },
+    {
+      "code": "V-4732-G",
+      "issuer": "Versa Products",
+      "description": "Универсальный ремкомплект клапанов 3/4\" и 1\" с одним соленоидом",
+      "machine": "Series V 3/4–1\"",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "3/4 & 1 V-4732 V-4732-G V-4732-GG"
+    },
+    {
+      "code": "V-4732-12-G",
+      "issuer": "Versa Products",
+      "description": "Универсальный ремкомплект клапанов 1-1/4\" с одним соленоидом",
+      "machine": "Series V 1-1/4\"",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "1-1/4 V-4732-12 V-4732-12-G V-4732-12-GG"
+    },
+    {
+      "code": "V-4302-W-31",
+      "issuer": "Versa Products",
+      "description": "Ремкомплект клапанов 1/8–1/4\" с мембранным приводом, 2 позиции",
+      "machine": "Series V 1/8–1/4\" (мембранный привод)",
+      "unit": "ремкомплект уплотнений",
+      "doc_ref": "Bulletin VT 2020, с. 71",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "V-4302-W-31 V-4302-WW-31"
+    },
+    {
+      "code": "VSG-4522-U-14-A120",
+      "issuer": "Versa Products",
+      "description": "Пример кода из системы нумерации: пневматика, пружинный возврат, соленоид-пилот, 4-ходовой, 1/2\" NPT, вертикальный соленоид, пылезащитная гайка, катушка 120 В 60 Гц",
+      "machine": "Series V",
+      "unit": "распределитель в сборе",
+      "doc_ref": "Bulletin VT 2020, с. 12 (How to select); пример каталога для объяснения системы нумерации, не складская позиция",
+      "source_url": "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+      "quote": "The product number shown below (VSG-4522-U-14-A120) indicates the following:"
+    },
+    {
+      "code": "VSG-4522-316-L14-A120",
+      "issuer": "Versa Products",
+      "description": "Пример кода V-316: 4-ходовой, 1/2\" NPT, 2 позиции, нержавеющая сталь 316, оператор с пылезащитой, катушка 120 В 60 Гц",
+      "machine": "V-316 Series",
+      "unit": "распределитель в сборе",
+      "doc_ref": "Bulletin V-316 rev. 11/2025 (How to select); пример каталога для объяснения системы нумерации, не складская позиция",
+      "source_url": "https://www.versa-valves.com/media/wysiwyg/PDF_Catalog/Versa-V316-Stainless-Steel-Valves.pdf",
+      "quote": "The product number shown below (VSG-4522-316-L14-A120) indicates the following:"
+    },
+    {
+      "code": "VSG-4522-316-PC-XX-D024",
+      "issuer": "Versa Products",
+      "description": "Распределитель V-316, 4-ходовой, 1/2\", залитая катушка, взрывозащищённый соленоид, 24 В пост. тока",
+      "machine": "V-316 Series",
+      "unit": "распределитель в сборе",
+      "doc_ref": "Bulletin V-316 rev. 11/2025",
+      "source_url": "https://www.versa-valves.com/media/wysiwyg/PDF_Catalog/Versa-V316-Stainless-Steel-Valves.pdf",
+      "quote": "Shown: VSG-4522-316-PC-XX-D024"
+    },
+    {
+      "code": "VSG-3501-316-PC-XX-D024",
+      "issuer": "Versa Products",
+      "description": "Распределитель V-316, 3-ходовой, 1/2\", 24 В пост. тока",
+      "machine": "V-316 Series",
+      "unit": "распределитель в сборе",
+      "doc_ref": "Bulletin V-316 rev. 11/2025",
+      "source_url": "https://www.versa-valves.com/media/wysiwyg/PDF_Catalog/Versa-V316-Stainless-Steel-Valves.pdf",
+      "quote": "Shown: VSG-3501-316-PC-XX-D024"
+    },
+    {
+      "code": "VSG-4302-XX-D024",
+      "issuer": "Versa Products",
+      "description": "Латунный 4-ходовой распределитель 1/4\", 24 В пост. тока, cULus для взрывоопасных зон",
+      "machine": "Series V",
+      "unit": "распределитель в сборе",
+      "doc_ref": "карточка изделия на сайте изготовителя",
+      "source_url": "https://www.versa-valves.com/vsg-4302-xx-d024",
+      "quote": "VSG-4302-XX-D024"
+    },
+    {
+      "code": "E-3198-34-A120",
+      "issuer": "Versa Products",
+      "description": "Соленоидный оператор, ввод 1/2\" NPT с выводами 24\"; напряжение 120 В 60 Гц выведено из кода катушки A120, дословно в источнике не указано",
+      "machine": "Series V / V-316",
+      "unit": "соленоидный оператор",
+      "doc_ref": "карточка изделия на сайте изготовителя",
+      "source_url": "https://www.versa-valves.com/e-3198-34-a120",
+      "quote": "E-3198-34-A120"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [],
+  "dealers": [
+    {
+      "company": "Versa BV (европейское подразделение Versa Products)",
+      "country": "Нидерланды",
+      "role": "собственное подразделение изготовителя, продажи в Европе",
+      "sources": [
+        "https://www.versa-valves.com/view/versa-distributors-worldwide/",
+        "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf"
+      ]
+    },
+    {
+      "company": "AIV, Inc.",
+      "country": "США",
+      "role": "авторизованный складской дистрибьютор Versa (сам себя называет «Master Distributor»)",
+      "sources": [
+        "https://www.aivinc.com/products/product-line/versa"
+      ]
+    },
+    {
+      "company": "TFC Industrial Controls",
+      "country": "США",
+      "role": "дистрибьютор, в каталоге операторы Versa E5-3198",
+      "sources": [
+        "https://www.tfcindustrialcontrols.com/versa"
+      ]
+    },
+    {
+      "company": "Hangzhou Gas Turbine Parts Co. Ltd (gas-turbine-parts.com)",
+      "country": "Китай",
+      "role": "продавец запчастей Solar; публикует кросс SEPOC «номер Solar ↔ номер Versa»; дилерство Versa не подтверждено",
+      "sources": [
+        "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html"
+      ]
+    },
+    {
+      "company": "Gas Turbine Applications (GTA Turbines)",
+      "country": "США",
+      "role": "ремонт агрегатов и склад запчастей Solar, в том числе клапанов Versa под номерами Solar; не дилер Versa",
+      "sources": [
+        "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
+      ]
+    },
+    {
+      "company": "Anything Flows",
+      "country": "США",
+      "role": "дистрибьютор; распространяет каталог VT со своим штампом",
+      "sources": [
+        "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf"
+      ]
+    }
+  ],
+  "gaps": [
+    "Серия VVS в документах Versa не найдена: префиксы по системе нумерации — VSG, VXX, VSP, VGG, VAG и др. Название, вероятно, искажено в заявках; нужна сверка с шильдиками или ТЗ.",
+    "Полной таблицы «номер Solar → код исполнения Versa» в открытом доступе нет. Прямо сопоставлены только три пары из кросса SEPOC. Остальные пары лежат в сборочных ведомостях и Parts List Solar (закрытый портал Solar и сервисная документация заказчика).",
+    "Документ Solar Centaur 50 Supplementary Data на pdfcoffee.com: по записям репозитория (gt/data/pn_db.json) там названы номера Solar с изготовителем Versa — 1023518-100, 1027228-100, 117942-4/-5, 910380C4, 1045095-100. Сейчас страница закрыта Cloudflare (403), цитату снять не удалось, поэтому эти номера в ответ не включены.",
+    "Номера Solar 190015-xx, 1027484-101, 1046410-3, 190016-xx, 1986366-5000 связаны с Versa в pn_db.json только по классу изделия; для 190015 эта связь уже опровергнута. Из открытых источников подтверждения нет.",
+    "Ремкомплекты и катушки именно для нержавеющей V-316 и для взрывозащищённых операторов (суффиксы -XX, -2100E/-2100W) в бюллетенях не приведены: там сказано «consult factory». Суффиксы -2100E и -2100W в открытом каталоге не расшифрованы.",
+    "Официальный перечень дистрибьюторов Versa по странам (versa-valves.com/view/versa-distributors-worldwide) подгружается скриптом и без браузера не читается. Дистрибьюторы в России, СНГ, Китае, Турции, ОАЭ и Индии не подтверждены.",
+    "Субпоставщики узлов Versa (катушки, уплотнения) в открытых источниках не найдены. Versa сама выступает субпоставщиком соленоидных клапанов для Solar Turbines.",
+    "Сайт изготовителя (selector.versa-valves.com), бюллетень VT-2003 (smcpneumatics.com) и каталог Valve Automation (более 10 МБ) через средство чтения не открылись. Коды взяты из бюллетеня VT 2020 (копия дистрибьютора) и бюллетеня V-316, скачанного с versa-valves.com."
+  ],
+  "verifier_notes": "Проверил 31 код и 5 моделей, все подтверждены: каждый код найден на указанной странице дословно. Страницы скачаны целиком через curl и прочитаны: SEPOC cross на gas-turbine-parts.com, GTA parts lookup, Bulletin VT (73 с.), Bulletin V-316 (Revised 11/2025), карточки на versa-valves.com, wilson-company.com. Субпоставщиков в записях нет. Уточнения: (1) VSG-4522-U-14-A120 и VSG-4522-316-L14-A120 — примеры, которыми каталог объясняет систему нумерации, а не складские позиции. (2) Напряжение у E-3198-34-A120 (120 В 60 Гц) и E5-3198-34XX-D024 (24 В пост. тока), а также пометка «наследие IH» у 904978C2 выведены из суффиксов; дословно в источниках этого нет. (3) GTA — сток-лист ремонтника Solar. К конкретной модели турбины номера там не привязаны.",
+  "corrections": [
+    "VSG-4522-U-14-A120, VSG-4522-316-L14-A120: в doc_ref отмечено, что это примеры системы нумерации, а не складские позиции (замечание скептика)",
+    "E-3198-34-A120, E5-3198-34XX-D024, 904978C2: напряжение и «наследие IH» помечены как выведенные из суффиксов, а не взятые из источника (замечание скептика)",
+    "номера Solar из сток-листа GTA: в doc_ref отмечено, что это сток-лист ремонтника и к модели турбины номера не привязаны (замечание скептика)"
+  ]
+}

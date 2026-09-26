@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 303,
-    "total_bytes": 125890385,
+    "datasets": 306,
+    "total_bytes": 126025190,
     "by_sensitivity": {
-      "внутреннее": 181,
+      "внутреннее": 184,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 39,
+      "дашборд сорсеров": 42,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3148,6 +3148,69 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 214341,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/atlascopco.json",
+        "data/brand_research/atlascopcoenergas.json",
+        "data/brand_research/bentlynevada.json",
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cryostar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/dongfengcumminsengine.json",
+        "data/brand_research/drillmec.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/generalelectric.json",
+        "data/brand_research/gilkesclydeunion.json",
+        "data/brand_research/grundfos.json",
+        "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/imoindustries.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/itt.json",
+        "data/brand_research/jichaijinandieselcnpc.json",
+        "data/brand_research/metrix.json",
+        "data/brand_research/mturollsroycepowersystems.json",
+        "data/brand_research/mwmcaterpillarenergy.json",
+        "data/brand_research/normet.json",
+        "data/brand_research/perkinsfgwilson.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/rollsroyce.json",
+        "data/brand_research/rosemount.json",
+        "data/brand_research/sandviktamrock.json",
+        "data/brand_research/siemensdemagdelavalturbomachinery.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/versaproducts.json",
+        "data/brand_research/vikingpump.json",
+        "data/brand_research/waukeshainnio.json",
+        "data/brand_research/woodward.json",
+        "data/brand_research/wrtsil.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json"
+      ],
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "afd21d7",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gt/data/faults.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 213993,
@@ -3193,69 +3256,6 @@
         "gt/tools/build_faults.py",
         "scripts/build_chain_coverage.py",
         "tests/test_faults_slices.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 208701,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/atlascopco.json",
-        "data/brand_research/atlascopcoenergas.json",
-        "data/brand_research/bentlynevada.json",
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cryostar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/deutz.json",
-        "data/brand_research/dongfengcumminsengine.json",
-        "data/brand_research/drillmec.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/generalelectric.json",
-        "data/brand_research/gilkesclydeunion.json",
-        "data/brand_research/grundfos.json",
-        "data/brand_research/guascorsiemensenergy.json",
-        "data/brand_research/imoindustries.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/itt.json",
-        "data/brand_research/jichaijinandieselcnpc.json",
-        "data/brand_research/mturollsroycepowersystems.json",
-        "data/brand_research/mwmcaterpillarenergy.json",
-        "data/brand_research/normet.json",
-        "data/brand_research/perkinsfgwilson.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/rollsroyce.json",
-        "data/brand_research/sandviktamrock.json",
-        "data/brand_research/siemensdemagdelavalturbomachinery.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/brand_research/vikingpump.json",
-        "data/brand_research/waukeshainnio.json",
-        "data/brand_research/woodward.json",
-        "data/brand_research/wrtsil.json",
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "data/inflation/cpi_monthly.json",
-        "data/subsuppliers/verified.json",
-        "dict/"
-      ],
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "10f579a",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -5893,8 +5893,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5979,8 +5979,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6070,8 +6070,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6167,8 +6167,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6255,8 +6255,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6303,8 +6303,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6351,8 +6351,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6399,8 +6399,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6513,8 +6513,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6690,8 +6690,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6992,8 +6992,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7227,8 +7227,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7662,8 +7662,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7710,8 +7710,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7867,8 +7867,56 @@
         ]
       },
       "last_change": "2026-09-26",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/rosemount.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 52607,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Rosemount (Emerson): датчики давления 3051 (3051C/T/L, 3051S, 3051SMV, 1151 как предшественник) и преобразователи температуры 644. Машин и исполнений — 14, сервисных документов — 14, кодов запчастей — 39, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 4, дилеров и сервисных компаний — 10, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 6 (поле corrections). Коды — из таблиц запчастей руководств 3051 00809-0100-4007 Rev BA и 00809-0100-4001 Rev EA, руководств 644 и листа данных 00813-0100-4728: уплотнительные кольца, дренажи, сенсорные модули, платы, клеммные колодки, болты и переходники фланцев, индикаторы и крепёж 644; один код без подтверждения вынесен в parts_rejected. На каких пакетах ГТУ и ГПУ стоят конкретные исполнения, в открытых источниках не указано. В России «Метран» после 2023 г. самостоятелен, официальный канал Rosemount не подтверждён. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 39,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
       "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_commit": "afd21d7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7915,8 +7963,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7962,8 +8010,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8009,8 +8057,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8098,8 +8146,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8145,8 +8193,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8269,8 +8317,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8356,8 +8404,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8440,8 +8488,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8488,8 +8536,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8536,8 +8584,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8678,8 +8726,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8802,8 +8850,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8849,8 +8897,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8942,8 +8990,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9115,8 +9163,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9225,6 +9273,54 @@
         "ove/build.py",
         "ove/tools/bitrix_ove.py"
       ]
+    },
+    {
+      "path": "data/brand_research/metrix.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 42732,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Metrix (Хьюстон): трансмиттеры вибрации ST5484E/ST5491E, датчики 5485C и SA6200A, реле 440/450 и 5550, датчики зазора MX2030/MX8030 и серия 10000, драйвер MX2033 и трансмиттер MX2034. Машин и исполнений — 20, сервисных документов — 16, кодов запчастей — 30: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 2, дилеров и сервисных компаний — 6, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 6 (поле corrections). Коды — из паспортов изготовителя (Doc# 1004457, 1009553, 1004596, 1087015, 1004251, 1004730) и руководства M9162: кабели, переходники, кабельные вводы, взрывозащищённые коробки и редукторы, примеры конфигурации датчиков зазора. Взаимозаменяемость с Bently Nevada 3300/3300XL/7200 подтверждена паспортами на уровне серий; таблицы «номер BN → номер Metrix» в открытом виде нет. Официальных партнёров по России и СНГ не найдено. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 30,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "afd21d7",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "ove/data/partner.json",
@@ -9605,8 +9701,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "b212286",
+      "last_author": "skharkov1246",
+      "last_commit": "7712d07",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9829,6 +9925,54 @@
       ]
     },
     {
+      "path": "data/brand_research/versaproducts.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 33714,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Versa Products: соленоидные распределители Series V/T, V-316 и C-316 и операторы E-3198 на пакетах Solar Turbines. Машин и исполнений — 5, сервисных документов — 5, кодов запчастей — 31: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 0, дилеров и сервисных компаний — 6, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 3 (поле corrections). Три пары «номер Solar → код Versa» — из кросс-таблицы SEPOC, ещё пять номеров Solar с пометкой Versa — из сток-листа ремонтника GTA; ремкомплекты, плунжеры и катушки — из бюллетеня VT 2020 и бюллетеня V-316. Серия «VVS» в документах изготовителя не найдена — вероятно, искажение префикса VSG/VXX. Дистрибьюторы в России и СНГ не подтверждены. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 31,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "afd21d7",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "ove/data/bi_docs.json",
       "subproject": "ОВЭ-75",
       "bytes": 33566,
@@ -9868,8 +10012,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 32961,
-      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 31, в очереди — 29. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 33073,
+      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 34, в очереди — 26. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -9898,8 +10042,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "e611a85",
+      "last_author": "Claude",
+      "last_commit": "afd21d7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
