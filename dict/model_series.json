@@ -1493,6 +1493,156 @@
      "sources": [
       "https://www.atlascopco.com/en-us/compressors/products/air-compressor/oil-free-air-compressors/rotary-screw-air-compressors-zr-zt"
      ]
+    },
+    {
+     "id": "ac-zh",
+     "series": "ZH / ZH+ (центробежные безмасляные)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "ZH\\+?\\s?\\d{3,5}\\+?(?:/\\d)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ZH 350+",
+      "ZH 355",
+      "ZH+ 630",
+      "ZH 10000",
+      "ZH400",
+      "ZH9000/2"
+     ],
+     "sources": [
+      "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZH%20&%20ZH+%20series%20(355-3150%20kW)_EN.pdf",
+      "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/oil-free-air/documents/ZH350plus%20brochure_LR_ineko.pdf"
+     ]
+    }
+   ]
+  },
+  {
+   "brand_key": "atlascopcoenergas",
+   "name": "Atlas Copco Energas",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "Atlas Copco Energas",
+    "Atlas Copco Gas and Process",
+    "Атлас Копко Энергас"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "ace-gt",
+     "series": "GT (интегрально-редукторные центробежные компрессоры)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "GT\\s?\\d{3}(?:\\s?[A-Z]\\d[A-Z]\\d)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "GT\\s?Series",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "GT050",
+      "GT 032 N3D0",
+      "GT153",
+      "GT Series"
+     ],
+     "sources": [
+      "https://www.atlascopco.com/gas-and-process/en/products/centrifugal-compressors/gt-series",
+      "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+     ]
+    },
+    {
+     "id": "ace-centrifugal",
+     "series": "H, TP, SC, T, RT, GZ и стандартизированные TurboBlock, AeroBlock, Polyblock, HPBOG",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "H\\s?\\d{5}|TP\\s?\\d{2}",
+       "context": "бренд"
+      },
+      {
+       "rx": "(?:H|TP|SC|T|RT|GZ)\\s?Series",
+       "context": "бренд"
+      },
+      {
+       "rx": "TurboBlock|AeroBlock|Polyblock|HPBOG",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "H16000",
+      "TP14",
+      "SC Series",
+      "RT Series",
+      "TurboBlock",
+      "HPBOG"
+     ],
+     "sources": [
+      "https://www.atlascopco.com/gas-and-process/en/products/centrifugal-compressors",
+      "https://www.atlascopcogroup.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/Centrifugal%20Compressor%20Brochure.pdf"
+     ],
+     "note": "Буквенные обозначения — только рядом с именем бренда."
+    },
+    {
+     "id": "ace-expanders",
+     "series": "турбодетандеры EC, ECM, ECOTS, ETB, ETG, ETI, EG, EGI (в т. ч. наследная линия Mafi-Trench)",
+     "type": "детандер",
+     "patterns": [
+      {
+       "rx": "ECOTS(?:\\s?Plus|-M)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "ECM(?:-\\d\\.\\d)?|EC-?\\d(?:\\.\\d)?|EGI?-?\\d(?:\\.\\d)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "ET[BGI]\\s?\\d{3}(?:\\s?[MN]S(?:-\\d)?)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "(?:EC|EG|ECM|ETB|ETG)(?=\\s?(?:Series|\\())",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ECOTS Plus",
+      "ECM-5.0",
+      "EC-5.0",
+      "EC3",
+      "EGI-8",
+      "ETG 190 MS-3",
+      "ETB 560 NS-2",
+      "ETI300NS"
+     ],
+     "sources": [
+      "https://www.atlascopco.com/content/dam/atlas-copco/compressor-technique/gas-and-process/documents/driving-expander-technology.pdf",
+      "https://www.atlascopco.com/gas-and-process/en/products/turboexpanders/ec-series",
+      "https://www.atlascopco.com/gas-and-process/en/products/turboexpanders/eg-series"
+     ],
+     "note": "EC3 и Frame 2 — наследная линия Atlas Copco Mafi-Trench, подтверждена объявлениями распродаж (вторичный источник)."
+    },
+    {
+     "id": "ace-compander",
+     "series": "компандер (компрессор и детандер на одном редукторе)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "Compander",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Compander"
+     ],
+     "sources": [
+      "https://www.atlascopco.com/gas-and-process/en/products/compander"
+     ]
     }
    ]
   },
@@ -3356,6 +3506,143 @@
      "sources": [
       "https://cryostar.com/industrial-gas/bulk-and-microbulk/submerged-pumps/",
       "https://cryostar.com/hydrogen/"
+     ]
+    },
+    {
+     "id": "cryostar-centrifugal",
+     "series": "выносные центробежные криогенные насосы GBS, CBS, GBSD, CBSD, CO, CSH",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "(?:A-)?(?:GBSD|CBSD|GBS|CBS|CSH)(?:\\s?\\d{3}(?:\\s?/\\s?\\d(?:[.,]\\d)?)?)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "CO\\s?\\d{3}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "GBS 155/4,5",
+      "A-CBS",
+      "GBSD 190/4",
+      "CBSD 185",
+      "CO 120",
+      "CSH 260/5"
+     ],
+     "sources": [
+      "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf",
+      "https://cryostar.com/datas-pdf/datasheet/CSH.pdf",
+      "https://cryostar.com/datas-pdf/datasheet/CO.pdf"
+     ],
+     "note": "Буквенные коды — только рядом с именем бренда."
+    },
+    {
+     "id": "cryostar-magstar",
+     "series": "MAGSTAR (центробежный насос с магнитной муфтой)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "MAGSTAR(?:\\s?\\d{3}/\\d(?:-H)?)?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "MAGSTAR",
+      "MAGSTAR 260/5-H"
+     ],
+     "sources": [
+      "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf"
+     ]
+    },
+    {
+     "id": "cryostar-vs-vp",
+     "series": "погружные насосы VS и судовые поршневые насосы VP",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "VS(?:\\s?\\d+x\\d+x\\d+)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "VP(?:\\s?\\d{3})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "VS 3x2x7",
+      "VP 185"
+     ],
+     "sources": [
+      "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf",
+      "https://cryostar.com/datas-pdf/booklet/en/Catalogue_Marine_LNG_fuelling_and_bunkering-WEB012026.pdf"
+     ],
+     "note": "Две буквы — только рядом с именем бренда."
+    },
+    {
+     "id": "cryostar-reciprocating",
+     "series": "поршневые криогенные насосы HPP, SDPD, LDPD, MRP, SRP, PD3000",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "(?:A-)?(?:HPP|SDPD|LDPD|MRP|SRP)(?:\\s?\\d{2}/\\d{2,3}(?:-T)?)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "PD\\s?3000|CV\\s?40",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HPP 65/110",
+      "SDPD 30/32",
+      "A-LDPD 65/40-T",
+      "MRP 40/55",
+      "PD3000",
+      "CV40"
+     ],
+     "sources": [
+      "https://cryostar.com/wp-content/uploads/2026/09/CRYOGENIC-RECIPROCATING-PUMPS-FOR-LIQUEFIED-GASES_2024_WEB.pdf",
+      "https://cryostar.com/datas-pdf/datasheet/pd-3000.pdf"
+     ]
+    },
+    {
+     "id": "cryostar-mtc",
+     "series": "MTC, MTG (турбодетандеры на магнитных подшипниках)",
+     "type": "детандер",
+     "patterns": [
+      {
+       "rx": "MT[CG](?:\\s?\\d{3})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "MTC200",
+      "MTG"
+     ],
+     "sources": [
+      "https://cryostar.com/datas-pdf/booklet/en/HYDROCARBON-TURBO_EXPANDERS.pdf"
+     ]
+    },
+    {
+     "id": "cryostar-cm",
+     "series": "CM, CM2, CM4-200, CM6-200 (центробежные компрессоры отпарного и топливного газа)",
+     "type": "компрессор",
+     "patterns": [
+      {
+       "rx": "CM\\d?(?:-\\d{3})?(?:\\s?\\d{3}(?:/\\d{3})?)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CM 300",
+      "CM2 200/300",
+      "CM4-200",
+      "CM6-200"
+     ],
+     "sources": [
+      "https://cryostar.com/datas-pdf/booklet/en/Catalogue_LNG%20T&T_WEB.pdf",
+      "https://cryostar.com/datas-pdf/datasheet/CM6.pdf"
      ]
     }
    ]
