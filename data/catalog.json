@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 289,
-    "total_bytes": 125099897,
+    "datasets": 293,
+    "total_bytes": 125297917,
     "by_sensitivity": {
-      "внутреннее": 167,
+      "внутреннее": 171,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 25,
+      "дашборд сорсеров": 29,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3421,6 +3421,69 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 191120,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/atlascopco.json",
+        "data/brand_research/atlascopcoenergas.json",
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cryostar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/dongfengcumminsengine.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/generalelectric.json",
+        "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/jichaijinandieselcnpc.json",
+        "data/brand_research/mturollsroycepowersystems.json",
+        "data/brand_research/mwmcaterpillarenergy.json",
+        "data/brand_research/normet.json",
+        "data/brand_research/perkinsfgwilson.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/rollsroyce.json",
+        "data/brand_research/siemensdemagdelavalturbomachinery.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/waukeshainnio.json",
+        "data/brand_research/wrtsil.json",
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "data/subsuppliers/verified.json",
+        "dict/",
+        "dict/material.json",
+        "dict/model_series.json",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json"
+      ],
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "c796574",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gt/data/hot_parts.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 190966,
@@ -3558,69 +3621,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 184771,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/deutz.json",
-        "data/brand_research/dongfengcumminsengine.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/generalelectric.json",
-        "data/brand_research/guascorsiemensenergy.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/jichaijinandieselcnpc.json",
-        "data/brand_research/mturollsroycepowersystems.json",
-        "data/brand_research/mwmcaterpillarenergy.json",
-        "data/brand_research/perkinsfgwilson.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/rollsroyce.json",
-        "data/brand_research/siemensdemagdelavalturbomachinery.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/brand_research/waukeshainnio.json",
-        "data/brand_research/wrtsil.json",
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "data/subsuppliers/verified.json",
-        "dict/",
-        "dict/material.json",
-        "dict/model_series.json",
-        "dict/node_map.json",
-        "dict/symptom.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/budget_join_stats.json"
-      ],
-      "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "5433b12",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
-      ]
     },
     {
       "path": "gt/data/ship_questions.json",
@@ -7887,6 +7887,53 @@
       ]
     },
     {
+      "path": "data/brand_research/normet.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 51490,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Normet: подземные торкрет-машины Spraymec, зарядчики Charmec, бетоновозы Utimec. Машин и исполнений — 25, сервисных документов — 13, кодов запчастей — 31, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 9, дилеров и сервисных компаний — 9, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 5 (поле corrections). Все коды — со слов перепродавцов (doobotec на made-in-china.com, acceltrade), каталогов изготовителя в открытом доступе нет; двигатели и мосты установлены по техническим листам Normet (Deutz, Mercedes-Benz, Cummins, Volvo Penta, Dana). Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 31,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "cc14597",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "ove/data/tianxin.json",
       "subproject": "ОВЭ-75",
       "bytes": 51045,
@@ -8050,6 +8097,53 @@
       "last_change": "2026-09-26",
       "last_author": "skharkov1246",
       "last_commit": "e704269",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/atlascopco.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 50401,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Atlas Copco: винтовые маслозаполненные GA, безмасляные ZR/ZT и центробежные ZH/ZH+. Машин и исполнений — 23, сервисных документов — 11, кодов запчастей — 37, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 1, дилеров и сервисных компаний — 13, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 7 (поле corrections). Основная часть кодов — из официального магазина shopct.atlascopco.com и таблицы применяемости дилера compressornow; 8 кодов подтверждены только сторонними продавцами (answk, aircompressoragent, mengmafilter), это сказано в строке. Atlas Copco объявил об уходе из России. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 37,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "cc14597",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8396,6 +8490,53 @@
       ]
     },
     {
+      "path": "data/brand_research/cryostar.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 46052,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Cryostar: криогенные центробежные и поршневые насосы, турбодетандеры TC/MTC, компрессоры отпарного газа CM. Машин и исполнений — 21, сервисных документов — 11, кодов запчастей — 30, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 1, дилеров и сервисных компаний — 13, пробелов (gaps) — 6; по замечаниям скептика поправлено записей — 10 (поле corrections). Открытого каталога запчастей изготовителя нет: коды — со страниц продавцов Soluparts и thecryoshop.com (CryoVation) с пометкой, кем заявлена применимость; насос PD3000 — изделие Cryostar по листу изготовителя. Кодов по турбодетандерам и компрессорам в открытом доступе нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 30,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "cc14597",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gpu/data/analogs.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 46047,
@@ -8563,6 +8704,53 @@
         "library/load_crossrefs.py",
         "library/load_tkp_prices.py"
       ]
+    },
+    {
+      "path": "data/brand_research/atlascopcoenergas.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 43575,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Atlas Copco Energas (Gas and Process): интегрально-редукторные компрессоры GT/H/TP/SC, одновальные T/RT, турбодетандеры EC/ECM/ETB/ETG/EG, наследная линия Mafi-Trench. Машин и исполнений — 25, сервисных документов — 7, кодов запчастей — 8, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 12, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 3 (поле corrections). Машины делаются под заказ, ведомости ЗИП открыто не публикуются: коды — номера Mafi-Trench и Comptec с распродаж неликвида и обозначение шкафа SKF S2M E300V2 из листка изготовителя. Официального сервиса Gas and Process в РФ в перечнях изготовителя нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "machines",
+        "records": 25,
+        "record_keys": [
+          "kind",
+          "model",
+          "rating",
+          "segment",
+          "sources",
+          "status",
+          "verified"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "cc14597",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "gpu/data/suppliers.json",
@@ -8996,8 +9184,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "5433b12",
+      "last_author": "skharkov1246",
+      "last_commit": "9755091",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9218,8 +9406,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 32464,
-      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 18, в очереди — 42. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 32617,
+      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 22, в очереди — 38. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -9248,8 +9436,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "6bc6bcc",
+      "last_author": "Claude",
+      "last_commit": "cc14597",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
