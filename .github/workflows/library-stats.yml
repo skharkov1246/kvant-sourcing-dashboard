@@ -71,6 +71,13 @@ name: Библиотека — сводка и переклассификаци�
 #                    сверка с прежним правилом ревизии (у скольких стало хуже).
 #                    Правило — library/offer_role.py. Частями по остатку id (вход
 #                    parts). Только выборки. Ничего не меняет.
+#   dealer-link    — ДИЛЕРЫ РАЗВЕДКИ БРЕНДОВ → РЕЕСТР КОМПАНИЙ: сколько записей
+#                    dealers (data/brand_research) с доменом и ИНН, сколько
+#                    сведено доменом или ИНН (по виду: своя площадка, официальный
+#                    дилер, дилер), споры, кандидаты по имени (только кандидат).
+#                    Правило — library/dealer_link.py (сопоставитель
+#                    supplier_link). Одной частью: сотни записей из файлов и три
+#                    выборки реестра. Только выборки. Ничего не меняет.
 #
 # В журнал прогона выводятся ТОЛЬКО агрегаты: репозиторий публичный, а в базе
 # лежат коммерческие данные заказчиков. Ни наименований позиций, ни номеров
@@ -86,7 +93,7 @@ on:
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
                   reclassify-apply, bridge, crossref, demand, funnel,
                   calibration, part, match, codes, sides, dynamics, code-rule,
-                  brand-models, offer-role]
+                  brand-models, offer-role, dealer-link]
       part:
         description: "Артикул для поиска — только для part (например 6265ZZ)"
         type: string
@@ -304,6 +311,15 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           PARTS: ${{ inputs.parts }}
         run: python scripts/offer_role_measure.py
+
+      # Дилеры разведки брендов → реестр компаний: сведение доменом и ИНН,
+      # имя — только кандидат. Замер вхолостую перед тем, как причина роли
+      # «официальный дилер» пойдёт в снимок (CLAUDE.md, правило 3).
+      - name: Дилеры разведки брендов в реестре компаний
+        if: inputs.job == 'dealer-link'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python library/dealer_link.py
 
       - name: Отвечает ли предложение на нашу заявку
         if: inputs.job == 'match'

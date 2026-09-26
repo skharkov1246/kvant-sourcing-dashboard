@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 303,
-    "total_bytes": 125867894,
+    "total_bytes": 125890385,
     "by_sensitivity": {
       "внутреннее": 181,
       "конфиденциально": 69,
@@ -3245,8 +3245,8 @@
         "dict/"
       ],
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "5bd7a67",
+      "last_author": "skharkov1246",
+      "last_commit": "10f579a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4793,8 +4793,8 @@
         "records": 5
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "5bd7a67",
+      "last_author": "skharkov1246",
+      "last_commit": "10f579a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5857,7 +5857,7 @@
     {
       "path": "data/brand_research/mwmcaterpillarenergy.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 83076,
+      "bytes": 83893,
       "note": "Разведка бренда по открытым источникам (2026-09-25): MWM (Caterpillar Energy Solutions): газовые двигатели и ГПУ TCG 3016, TCG 2020, TCG 2032/2032B, TCG 3020, TCG 4170 и прежняя TCG 2016 — основа серии Cat CG. Машин и исполнений — 15, сервисных документов — 14, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 18, дилеров и сервисных компаний — 17, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 6 (поле corrections). 26 кодов — из открытой таблицы ходовых оригинальных запчастей на mwm.net, 14 — у продавцов (Газмоторсервис, energyassistance.ru, iggnita, PowerUP) и в руководстве MOTORTECH с пометкой, кем заявлена применимость; интервалы ТО — со страниц серий на mwm.net и из бюллетеня по маслу 2105/28. Официальная сеть MWM (MWM Austria — Восточная Европа и Центральная Азия, филиал в Алматы) Россию и Беларусь не покрывает; российские продавцы о связи с MWM заявляют сами. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -5892,9 +5892,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "acc4e74",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5943,7 +5943,7 @@
     {
       "path": "data/brand_research/waukeshainnio.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 79997,
+      "bytes": 80449,
       "note": "Разведка бренда по открытым источникам (2026-09-25): INNIO Waukesha: газовые двигатели VHP (P9394GSI, L7044GSI, L7042GSI, F3524GSI), VGF и 275GL+ для привода компрессоров и генерации. Машин и исполнений — 20, сервисных документов — 19, кодов запчастей — 38: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 15, дилеров и сервисных компаний — 16, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 7 (поле corrections). 6 кодов — из руководства Waukesha Form 6243 (VGF F18/H24), 17 — номера Waukesha в перекрёстных таблицах MOTORTECH, 9 — из перечня реселлера McGill, остальные 6 — карточки продавцов с пометкой, кем заявлена применимость. Открытого перечня именно по P9394GSI нет — коды даны по серии VHP; по 275GL+ найдены только удлинители свечей, набор датчика NOx и корпус дросселя. Дилеры — из официального локатора waukeshaengine.com, партнёра в РФ там нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -5978,9 +5978,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "64bab4a",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6034,7 +6034,7 @@
     {
       "path": "data/brand_research/epiroc.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 78292,
+      "bytes": 79207,
       "note": "Разведка бренда по открытым источникам (2026-09-24): Epiroc: проходческие Boomer, добычные Simba, ПДМ Scooptram, перфораторы COP. Машин и исполнений — 25, сервисных документов — 25, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 12, дилеров и сервисных компаний — 13, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 5 (поле corrections). 17 кодов — из буклетов перфораторов COP самого Epiroc (ремкомплекты и комплекты ТО), остальные — номера Epiroc у неофициальных поставщиков с пометкой доверия. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -6069,9 +6069,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "3bedd36",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6130,6 +6130,53 @@
       ]
     },
     {
+      "path": "data/brand_research/caterpillar.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 74013,
+      "note": "Разведка бренда по открытым источникам (2026-09-24): Caterpillar: газовые ГПУ G3500 и серия CG (двигатели MWM), горная техника 797F/793F/R1700/AD45, очистные комбайны. Машин и исполнений — 25, сервисных документов — 20, кодов запчастей — 38, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 9, дилеров и сервисных компаний — 14, пробелов (gaps) — 12; по замечаниям скептика поправлено записей — 7 (поле corrections). Часть кодов — номера Caterpillar в руководстве MOTORTECH и каталоге аналогов IPD; два кода без подтверждения вынесены в parts_rejected. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 38,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gidromet/data/postav.json",
       "subproject": "гидрометаллургия",
       "bytes": 73868,
@@ -6170,56 +6217,9 @@
       ]
     },
     {
-      "path": "data/brand_research/caterpillar.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 72671,
-      "note": "Разведка бренда по открытым источникам (2026-09-24): Caterpillar: газовые ГПУ G3500 и серия CG (двигатели MWM), горная техника 797F/793F/R1700/AD45, очистные комбайны. Машин и исполнений — 25, сервисных документов — 20, кодов запчастей — 38, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 9, дилеров и сервисных компаний — 14, пробелов (gaps) — 12; по замечаниям скептика поправлено записей — 7 (поле corrections). Часть кодов — номера Caterpillar в руководстве MOTORTECH и каталоге аналогов IPD; два кода без подтверждения вынесены в parts_rejected. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 38,
-        "record_keys": [
-          "code",
-          "description",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "3bedd36",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
       "path": "data/brand_research/solarturbines.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 71911,
+      "bytes": 72537,
       "note": "Разведка бренда по открытым источникам (2026-09-24): Solar Turbines: ГТУ Saturn, Centaur, Mercury, Taurus, Mars, Titan и компрессоры C-серии. Машин и исполнений — 22, сервисных документов — 21, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 11, дилеров и сервисных компаний — 12, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 7 (поле corrections). 27 кодов — из трёх открытых иллюстрированных каталогов деталей Solar (Saturn 20, Taurus 70, Centaur 50), остальные — из объявлений и запросов котировок с пометкой, кем заявлена применимость. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -6254,9 +6254,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "3bedd36",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6267,7 +6267,7 @@
     {
       "path": "data/brand_research/inniojenbacher.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 68857,
+      "bytes": 69768,
       "note": "Разведка бренда по открытым источникам (2026-09-24): INNIO Jenbacher: газовые двигатели Type 3/4/6/9 (J320, J416, J420, J612–J624, J920). Машин и исполнений — 12, сервисных документов — 14, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 8, дилеров и сервисных компаний — 26, пробелов (gaps) — 12; по замечаниям скептика поправлено записей — 7 (поле corrections). Привязка кодов к моделям — в основном по карточкам продавцов аналогов (Weyeah, Zuhon, FridayParts), номера подтверждены также parts-systems.de; цены того же продавца — gt/data/ship_jenbacher_prices.json. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -6302,9 +6302,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "3bedd36",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6315,7 +6315,7 @@
     {
       "path": "data/brand_research/cummins.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 68564,
+      "bytes": 69539,
       "note": "Разведка бренда по открытым источникам (2026-09-24): Cummins (газовые ГПУ lean-burn). Машин и исполнений — 24, сервисных документов — 12, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 13, дилеров и сервисных компаний — 12, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 7 (поле corrections). Коды двигателя взяты из открытых каталогов перепродавцов (каталоги Cummins QuickServe закрыты), у каждой такой строки это сказано. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -6350,9 +6350,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "3bedd36",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6363,7 +6363,7 @@
     {
       "path": "data/brand_research/deutz.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 66950,
+      "bytes": 68030,
       "note": "Разведка бренда по открытым источникам (2026-09-25): Deutz: дизели TCD 3.6/4.1/6.1/7.8 и не значащиеся в Engine Finder TCD 2012/2013 на буровых установках и ПДМ, газовые TBG 616/620 и TCG 2016/2020/2032 линии бывшей Deutz Power Systems (ныне MWM, Caterpillar Energy Solutions). Машин и исполнений — 18, сервисных документов — 12, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 4, дилеров и сервисных компаний — 16, пробелов (gaps) — 10; по замечаниям скептика поправлено записей — 10 (поле corrections). 26 кодов — номера DEUTZ AG у продавца Diesel Parts Direct (номер без ведущего нуля, полный 8-значный сверять), 3 — номера эксплуатационных жидкостей из PDF DEUTZ, 3 — номера Bosch и BorgWarner по кроссам продавцов, 8 — номера MWM на газовые двигатели у российского продавца. Официальный представитель в РФ и СНГ по сайту DEUTZ — ООО «ДОЙТЦ Восток»; продажа новых двигателей в Россию приостановлена с марта 2022 г. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -6398,9 +6398,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "64bab4a",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6473,6 +6473,54 @@
       "referenced_by": [
         "gidromet/build.py"
       ]
+    },
+    {
+      "path": "data/brand_research/dongfengcumminsengine.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 66447,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): Dongfeng Cummins (DCEC): газовые двигатели платформ B, C и L (B5.9G и BGe, B Gas International по лицензии Cummins Westport, L8.9G, B6.7G) и нынешние газовые D6.7N, Z15N, Z16N. Машин и исполнений — 15, сервисных документов — 14, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 6, дилеров и сервисных компаний — 10, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 7 (поле corrections). Каталогов деталей DCEC для газовых машин в открытом доступе нет: 5 кодов — из руководства владельца Cummins 4021390 (перепечатка на dieselmotors.info), остальные — карточки продавцов (Оптимус-Групп, QD机电, Hubei July и др.) с пометкой, кем заявлена применимость; номер DCEC — буква C перед номером Cummins (выведено по трём парам, официального описания нет). B Gas Plus и C Gas Plus взяты для сверки номеров, выпуск на DCEC не подтверждён. Официального дистрибьютора Cummins в России после 2022 г. нет, только независимые продавцы. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 39,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "ove/data/zakladki.json",
@@ -6562,54 +6610,6 @@
       ]
     },
     {
-      "path": "data/brand_research/dongfengcumminsengine.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 65837,
-      "note": "Разведка бренда по открытым источникам (2026-09-25): Dongfeng Cummins (DCEC): газовые двигатели платформ B, C и L (B5.9G и BGe, B Gas International по лицензии Cummins Westport, L8.9G, B6.7G) и нынешние газовые D6.7N, Z15N, Z16N. Машин и исполнений — 15, сервисных документов — 14, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 6, дилеров и сервисных компаний — 10, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 7 (поле corrections). Каталогов деталей DCEC для газовых машин в открытом доступе нет: 5 кодов — из руководства владельца Cummins 4021390 (перепечатка на dieselmotors.info), остальные — карточки продавцов (Оптимус-Групп, QD机电, Hubei July и др.) с пометкой, кем заявлена применимость; номер DCEC — буква C перед номером Cummins (выведено по трём парам, официального описания нет). B Gas Plus и C Gas Plus взяты для сверки номеров, выпуск на DCEC не подтверждён. Официального дистрибьютора Cummins в России после 2022 г. нет, только независимые продавцы. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 39,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "acc4e74",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
       "path": "ove/data/software.json",
       "subproject": "ОВЭ-75",
       "bytes": 65702,
@@ -6650,6 +6650,54 @@
       "referenced_by": [
         "ove/build.py"
       ]
+    },
+    {
+      "path": "data/brand_research/siemensenergy.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 65015,
+      "note": "Разведка бренда по открытым источникам (2026-09-24): Siemens Energy: промышленные ГТУ SGT-100…SGT-800 двух ветвей нумерации (Lincoln и Finspång). Машин и исполнений — 9, сервисных документов — 14, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 18, дилеров и сервисных компаний — 17, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 4 (поле corrections). Открытых каталогов деталей изготовителя нет: коды — из опубликованных заявок эксплуатантов и списков реверс-изготовителей, перед закупкой сверять с ведомостью ЗИП пакета. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "gpu/data/analog_classes.json",
@@ -6694,54 +6742,6 @@
         "gpu/build.py",
         "gpu/site/index.template.html"
       ]
-    },
-    {
-      "path": "data/brand_research/siemensenergy.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 63757,
-      "note": "Разведка бренда по открытым источникам (2026-09-24): Siemens Energy: промышленные ГТУ SGT-100…SGT-800 двух ветвей нумерации (Lincoln и Finspång). Машин и исполнений — 9, сервисных документов — 14, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 18, дилеров и сервисных компаний — 17, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 4 (поле corrections). Открытых каталогов деталей изготовителя нет: коды — из опубликованных заявок эксплуатантов и списков реверс-изготовителей, перед закупкой сверять с ведомостью ЗИП пакета. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 40,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "3bedd36",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "zip/data/perf_class_packets.json",
@@ -6954,44 +6954,9 @@
       "referenced_by": []
     },
     {
-      "path": "gidromet/data/serebro.json",
-      "subproject": "гидрометаллургия",
-      "bytes": 59946,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "footnote",
-        "lead",
-        "sections",
-        "tiles"
-      ],
-      "main_collection": {
-        "key": "sections",
-        "records": 9,
-        "record_keys": [
-          "boxes",
-          "h",
-          "table",
-          "text"
-        ]
-      },
-      "last_change": "2026-09-01",
-      "last_author": "skharkov1246",
-      "last_commit": "9ebf5b2",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gidromet/build.py"
-      ]
-    },
-    {
       "path": "data/brand_research/rollsroyce.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 59936,
+      "bytes": 60866,
       "note": "Разведка бренда по открытым источникам (2026-09-26): Rolls-Royce: промышленные ГТУ Industrial Avon (1533/1534/1535, Avon 200 = SGT-A20), Industrial RB211 (-22, -24A/C/G/GT, H63; ныне SGT-A35) и Industrial Trent 60 (SGT-A65), с 2014 г. у Siemens Energy. Машин и исполнений — 12, сервисных документов — 10, кодов запчастей — 43: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 9, пробелов (gaps) — 11; по замечаниям скептика поправлено записей — 10 (поле corrections). Все коды — прежние номера Rolls-Royce (AG…A у Avon, LW… у RB211, TRN… и 2-02J-… у зажигания): 16 — из перечня зажигания Champion Aerospace 2023 и перекрёстной таблицы Champion 2015, 9 — со страниц Rolaar (номера проводов и датчиков без владельца номера, жгут термопар, обтекатель стартера), 18 — объявления TurbineMarketplace по горячей части Avon и RB211-24C/24G (2015 г., восстановленные). Таблицы переходов номеров Rolls-Royce → Siemens Energy в открытых источниках нет; по Trent 60 ни одного номера с названной машиной. Ремонт по лицензии Siemens Energy — TransCanada Turbines и RWG; в РФ и СНГ лицензиатов не найдено. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -7027,14 +6992,49 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "6bc6bcc",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
       },
       "referenced_by": []
+    },
+    {
+      "path": "gidromet/data/serebro.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 59946,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 9,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
     },
     {
       "path": "zip/data/r1700_recon/contacts.json",
@@ -7189,6 +7189,54 @@
       ]
     },
     {
+      "path": "data/brand_research/jichaijinandieselcnpc.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 58139,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): Jichai (CNPC Jichai Power, Jinan Diesel, марки Jichai/Chidong): газовые двигатели и агрегаты серии 190 — 12V190DT-2, 12V190ZDT-2, G12V190ZLDT, C12V190ZLT-2, H16V190ZLT-2/-1, L20V190ZLT-2, биогазовые и шахтно-метановые исполнения, дизельные 12V190 с общими узлами. Машин и исполнений — 16, сервисных документов — 6, кодов запчастей — 41: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 14, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Техданные машин и список поставщиков комплектующих (Woodward, Miba, Bosch, Alfa Laval и др.) — с официального сайта изготовителя jinanengine.com; все коды — заводские номера Jichai в передаче китайских продавцов (made-in-china.com и сайты продавцов), каталогов и руководств изготовитель открыто не публикует — перед закупкой сверять с заводом. Официальные дистрибьюторы в России — Valdex Energetica и ООО «ГенМастер»; имя агента для Казахстана и Узбекистана не прочитано (страница агентов изготовителя отвечает 429). Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 41,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gidromet/data/programma.json",
       "subproject": "гидрометаллургия",
       "bytes": 58118,
@@ -7261,54 +7309,6 @@
         "gt/tools/stocklist_cross.py",
         "tests/test_stocklist_cross.py"
       ]
-    },
-    {
-      "path": "data/brand_research/jichaijinandieselcnpc.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 57864,
-      "note": "Разведка бренда по открытым источникам (2026-09-25): Jichai (CNPC Jichai Power, Jinan Diesel, марки Jichai/Chidong): газовые двигатели и агрегаты серии 190 — 12V190DT-2, 12V190ZDT-2, G12V190ZLDT, C12V190ZLT-2, H16V190ZLT-2/-1, L20V190ZLT-2, биогазовые и шахтно-метановые исполнения, дизельные 12V190 с общими узлами. Машин и исполнений — 16, сервисных документов — 6, кодов запчастей — 41: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 14, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Техданные машин и список поставщиков комплектующих (Woodward, Miba, Bosch, Alfa Laval и др.) — с официального сайта изготовителя jinanengine.com; все коды — заводские номера Jichai в передаче китайских продавцов (made-in-china.com и сайты продавцов), каталогов и руководств изготовитель открыто не публикует — перед закупкой сверять с заводом. Официальные дистрибьюторы в России — Valdex Energetica и ООО «ГенМастер»; имя агента для Казахстана и Узбекистана не прочитано (страница агентов изготовителя отвечает 429). Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 41,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "97094ed",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "gidromet/data/oborud.json",
@@ -7625,44 +7625,9 @@
       ]
     },
     {
-      "path": "gidromet/data/etapy.json",
-      "subproject": "гидрометаллургия",
-      "bytes": 53302,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "footnote",
-        "lead",
-        "sections",
-        "tiles"
-      ],
-      "main_collection": {
-        "key": "sections",
-        "records": 8,
-        "record_keys": [
-          "boxes",
-          "h",
-          "table",
-          "text"
-        ]
-      },
-      "last_change": "2026-09-01",
-      "last_author": "skharkov1246",
-      "last_commit": "9ebf5b2",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gidromet/build.py"
-      ]
-    },
-    {
       "path": "data/brand_research/mturollsroycepowersystems.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 53231,
+      "bytes": 53936,
       "note": "Разведка бренда по открытым источникам (2026-09-25): MTU (Rolls-Royce Power Systems / Rolls-Royce Solutions): газовые Series 4000 (L61–L64, L32/L33) и Series 400 (6R400 GS, 12V400 GS), дизельные Series 4000 C-типов на горных самосвалах (Liebherr T 282, Bucyrus MT6300AC, БелАЗ 75710, Komatsu). Машин и исполнений — 18, сервисных документов — 11, кодов запчастей — 36: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 6, дилеров и сервисных компаний — 13, пробелов (gaps) — 10; по замечаниям скептика поправлено записей — 9 (поле corrections). 16 кодов — открытый каталог перепродавца engine-family.com, 8 — перечень ТО и верхнего ремонта у российского сервисника «Газмоторсервис», 4 — спецоснастка и контрольный набор из руководств MTU M015710/01E и MS150032/02E, 3 — пары номеров MTU и L'Orange в базе форсунок, остальные 5 — карточки продавцов аналогов с пометкой, кем заявлена применимость; цитаты у части страниц — выжимка инструментом загрузки, номера скептик нашёл дословно. Мощности L64 и L33 скептиком не подтверждены (verified: false). По Series 400 кодов не найдено. Официальных дилеров MTU в России и Казахстане после 2022 г. нет, сервисники указаны по их собственным заявлениям. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -7696,15 +7661,98 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "cba5dec",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
       },
       "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/sandviktamrock.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 53744,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Sandvik (Tamrock): проходческие DD, добычные DL, ПДМ Toro LH, самосвалы Toro TH, перфораторы RD/HL. Машин и исполнений — 25, сервисных документов — 11, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 10, дилеров и сервисных компаний — 10, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Машины и субпоставщики (Volvo Penta, Dana, Kessler, Spicer, Mercedes-Benz, Cummins) — из технических спецификаций на mining.sandvik; 16 кодов перфораторов HL/HLX — номера Sandvik у продавцов альтернативных деталей (MICCONT, DrifterParts, Delkom), 23 кода фильтров — из таблиц кроссов HIFI ↔ Sandvik (Brett's Truck Parts) и FridayParts; каталоги My Sandvik закрыты, коды RD525 не подтверждены. Российское юрлицо Sandvik ликвидировано 30.05.2023. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 39,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "gidromet/data/etapy.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 53302,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
     },
     {
       "path": "gidromet/data/balansy.json",
@@ -7781,57 +7829,9 @@
       ]
     },
     {
-      "path": "data/brand_research/sandviktamrock.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 52910,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Sandvik (Tamrock): проходческие DD, добычные DL, ПДМ Toro LH, самосвалы Toro TH, перфораторы RD/HL. Машин и исполнений — 25, сервисных документов — 11, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 10, дилеров и сервисных компаний — 10, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Машины и субпоставщики (Volvo Penta, Dana, Kessler, Spicer, Mercedes-Benz, Cummins) — из технических спецификаций на mining.sandvik; 16 кодов перфораторов HL/HLX — номера Sandvik у продавцов альтернативных деталей (MICCONT, DrifterParts, Delkom), 23 кода фильтров — из таблиц кроссов HIFI ↔ Sandvik (Brett's Truck Parts) и FridayParts; каталоги My Sandvik закрыты, коды RD525 не подтверждены. Российское юрлицо Sandvik ликвидировано 30.05.2023. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 39,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "b19fab4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
       "path": "data/brand_research/perkinsfgwilson.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 52425,
+      "bytes": 53169,
       "note": "Разведка бренда по открытым источникам (2026-09-25): Perkins / FG Wilson: двигатели серии 4000 — газовые 4006-23TRS, 4008-30TRS, 4016-61TRS, 4016-E61TRS и дизельные 4006/4008/4012/4016 TAG/TWG/TRG, агрегаты FG Wilson P2000/P2250/P2500. Машин и исполнений — 19, сервисных документов — 11, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 4, дилеров и сервисных компаний — 7, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 8 (поле corrections). 8 кодов — из руководств Perkins TSL 4230E и SEBU8430-02 (расходники ТО и инструмент), остальные 31 — у продавцов (Tide Power, Wintpower, made-in-china, Yichao, En-Gen Diesel, turbo-diesel.co.uk) с пометкой «по данным продавца» в doc_ref; каталог Perkins (shop.perkins.com) и сайты perkins.com и fgwilson.com автоматическому чтению недоступны. Официальный дистрибьютор в РФ — ГК «Хайтед», в Средней Азии — Mayphil UK. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -7867,8 +7867,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "e704269",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7879,7 +7879,7 @@
     {
       "path": "data/brand_research/wrtsil.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 51807,
+      "bytes": 52243,
       "note": "Разведка бренда по открытым источникам (2026-09-25): Wärtsilä: газовые двигатели-генераторы 34SG (12V/16V/20V, раннее 18V, исполнения 34SG-LPG и power optimised), 31SG и 50SG. Машин и исполнений — 10, сервисных документов — 11, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 11, дилеров и сервисных компаний — 9, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 7 (поле corrections). 28 кодов — из выложенного эксплуатантом списка расходников на ТО 48 000 моточасов 18V34SG и из руководства 18V34SG (применимость к 12V/16V/20V сверять по серийному номеру), 4 — из сток-листа продавца Vesmec (форкамера, гильза, поршень, обкаточный фильтр), 8 — перекрёстные номера свечи 124002 (Denso, Champion, Motortech, 10-значные номера Wärtsilä по данным продавцов). По 31SG и 50SG кодов в открытом доступе нет: каталоги на закрытом портале Wärtsilä. Из России Wärtsilä ушла в июле 2022 г.; сервис в приоритетных странах — дочерние общества в Пакистане, Бангладеш, Индии, ОАЭ и Турции. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -7914,9 +7914,103 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "cba5dec",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/generalelectric.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 52116,
+      "note": "Разведка бренда по открытым источникам (2026-09-25): General Electric (GE Vernova): авиапроизводные ГТУ LM2500 (+, +G4, XPRESS) и LM6000 (PC, PF+), двухвальная MS5002 C/D/E и PGT25 (газогенератор LM2500 и силовая турбина Nuovo Pignone, Baker Hughes). Машин и исполнений — 13, сервисных документов — 12, кодов запчастей — 39, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 13, дилеров и сервисных компаний — 15, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 9 (поле corrections). Все коды — номера GE и Nuovo Pignone на страницах независимых поставщиков и в закупочных листах (GTSMRO, AP4, VBR, MFS, Istec, Hangzhou, Burak Marine), каталоги IPB GE Vernova и Baker Hughes закрыты; субпоставщики (Unison, Advanced Atomization Technologies, AMETEK, Vibro-Meter, Endevco, Lear Romec, Arkwin, Meggitt, Woodward) — по полю OEM на карточках деталей. Авторизованных сервис-центров GE Vernova в РФ и СНГ не найдено, все дилеры — независимые. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 39,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/normet.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 51895,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Normet: подземные торкрет-машины Spraymec, зарядчики Charmec, бетоновозы Utimec. Машин и исполнений — 25, сервисных документов — 13, кодов запчастей — 31, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 9, дилеров и сервисных компаний — 9, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 5 (поле corrections). Все коды — со слов перепродавцов (doobotec на made-in-china.com, acceltrade), каталогов изготовителя в открытом доступе нет; двигатели и мосты установлены по техническим листам Normet (Deutz, Mercedes-Benz, Cummins, Volvo Penta, Dana). Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 31,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7966,10 +8060,10 @@
       ]
     },
     {
-      "path": "data/brand_research/normet.json",
+      "path": "data/brand_research/siemensdemagdelavalturbomachinery.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 51490,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Normet: подземные торкрет-машины Spraymec, зарядчики Charmec, бетоновозы Utimec. Машин и исполнений — 25, сервисных документов — 13, кодов запчастей — 31, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 9, дилеров и сервисных компаний — 9, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 5 (поле corrections). Все коды — со слов перепродавцов (doobotec на made-in-china.com, acceltrade), каталогов изготовителя в открытом доступе нет; двигатели и мосты установлены по техническим листам Normet (Deutz, Mercedes-Benz, Cummins, Volvo Penta, Dana). Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 51710,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Dresser-Rand (Siemens Energy): паровые турбины D-R (RLA/RLVA, SST 350/500/700, C, B, R/RS и др.), поршневые компрессоры HOS, ESH, HSE и центробежные DATUM. Машин и исполнений — 25, сервисных документов — 8, кодов запчастей — 38: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 6, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Коды — номера Dresser-Rand у склада излишков NRI Industrial (22), в каталоге закупщика Soluparts (10, из них 4 — бренд по категории страницы) и в перекрёстных ссылках изготовителя аналогов торцевых уплотнений Springer Parts (6); машина названа только у двух (7HOS6, 361B5/5). Открытых каталогов деталей Dresser-Rand нет: номера на машину выдаёт Siemens Energy по серийному номеру. Субпоставщики (Woodward, Fisher, Bently Nevada, Tri-Sen, CCC) — по инструкции SST Manual 107-A и брошюре RLA. Официальных сервисных центров в РФ и СНГ не найдено, российские поставщики — независимые. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -7991,7 +8085,55 @@
       ],
       "main_collection": {
         "key": "parts",
-        "records": 31,
+        "records": 38,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/atlascopco.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 51123,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Atlas Copco: винтовые маслозаполненные GA, безмасляные ZR/ZT и центробежные ZH/ZH+. Машин и исполнений — 23, сервисных документов — 11, кодов запчастей — 37, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 1, дилеров и сервисных компаний — 13, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 7 (поле corrections). Основная часть кодов — из официального магазина shopct.atlascopco.com и таблицы применяемости дилера compressornow; 8 кодов подтверждены только сторонними продавцами (answk, aircompressoragent, mengmafilter), это сказано в строке. Atlas Copco объявил об уходе из России. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 37,
         "record_keys": [
           "code",
           "description",
@@ -8003,8 +8145,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "c5c7433",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8054,54 +8196,6 @@
       ]
     },
     {
-      "path": "data/brand_research/siemensdemagdelavalturbomachinery.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 50799,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Dresser-Rand (Siemens Energy): паровые турбины D-R (RLA/RLVA, SST 350/500/700, C, B, R/RS и др.), поршневые компрессоры HOS, ESH, HSE и центробежные DATUM. Машин и исполнений — 25, сервисных документов — 8, кодов запчастей — 38: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 6, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 10 (поле corrections). Коды — номера Dresser-Rand у склада излишков NRI Industrial (22), в каталоге закупщика Soluparts (10, из них 4 — бренд по категории страницы) и в перекрёстных ссылках изготовителя аналогов торцевых уплотнений Springer Parts (6); машина названа только у двух (7HOS6, 361B5/5). Открытых каталогов деталей Dresser-Rand нет: номера на машину выдаёт Siemens Energy по серийному номеру. Субпоставщики (Woodward, Fisher, Bently Nevada, Tri-Sen, CCC) — по инструкции SST Manual 107-A и брошюре RLA. Официальных сервисных центров в РФ и СНГ не найдено, российские поставщики — независимые. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 38,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "6bc6bcc",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
       "path": "gidromet/data/pirrotin.json",
       "subproject": "гидрометаллургия",
       "bytes": 50636,
@@ -8137,10 +8231,10 @@
       ]
     },
     {
-      "path": "data/brand_research/generalelectric.json",
+      "path": "data/brand_research/grundfos.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 50575,
-      "note": "Разведка бренда по открытым источникам (2026-09-25): General Electric (GE Vernova): авиапроизводные ГТУ LM2500 (+, +G4, XPRESS) и LM6000 (PC, PF+), двухвальная MS5002 C/D/E и PGT25 (газогенератор LM2500 и силовая турбина Nuovo Pignone, Baker Hughes). Машин и исполнений — 13, сервисных документов — 12, кодов запчастей — 39, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 13, дилеров и сервисных компаний — 15, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 9 (поле corrections). Все коды — номера GE и Nuovo Pignone на страницах независимых поставщиков и в закупочных листах (GTSMRO, AP4, VBR, MFS, Istec, Hangzhou, Burak Marine), каталоги IPB GE Vernova и Baker Hughes закрыты; субпоставщики (Unison, Advanced Atomization Technologies, AMETEK, Vibro-Meter, Endevco, Lear Romec, Arkwin, Meggitt, Woodward) — по полю OEM на карточках деталей. Авторизованных сервис-центров GE Vernova в РФ и СНГ не найдено, все дилеры — независимые. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 50136,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Grundfos: центробежные насосы CR/CRI/CRN, NB/NBS/NBE/NK/NBG, SE1/SEV (через родственную SL1/SLV). Машин и исполнений — 17, сервисных документов — 13, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 15, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 6 (поле corrections). Все коды — из открытых каталогов сервисных наборов изготовителя (Service Kit Catalogue CR, NB model B, NBS/NBSE, SL): номер набора находится по шильдику — типоразмер, диаметр вала, буквенный код уплотнения. Grundfos ушёл из России в 2022 г., завод в Истре с 2024 г. — ООО «ИСТРАТЕХ Групп» без прав на бренд; российские продавцы запчастей — неофициальные. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -8162,10 +8256,11 @@
       ],
       "main_collection": {
         "key": "parts",
-        "records": 39,
+        "records": 40,
         "record_keys": [
           "code",
           "description",
+          "doc_ref",
           "issuer",
           "machine",
           "quote",
@@ -8174,55 +8269,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "e704269",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
-      "path": "data/brand_research/atlascopco.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 50401,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Atlas Copco: винтовые маслозаполненные GA, безмасляные ZR/ZT и центробежные ZH/ZH+. Машин и исполнений — 23, сервисных документов — 11, кодов запчастей — 37, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 1, дилеров и сервисных компаний — 13, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 7 (поле corrections). Основная часть кодов — из официального магазина shopct.atlascopco.com и таблицы применяемости дилера compressornow; 8 кодов подтверждены только сторонними продавцами (answk, aircompressoragent, mengmafilter), это сказано в строке. Atlas Copco объявил об уходе из России. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 37,
-        "record_keys": [
-          "code",
-          "description",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "c5c7433",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8270,6 +8318,54 @@
       ]
     },
     {
+      "path": "data/brand_research/drillmec.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 49372,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Drillmec: гидравлические буровые установки серии HH (HH55–HH350), верхние приводы HTD/ETD, трёхпоршневые буровые насосы 7T450…14T2200. Машин и исполнений — 24, сервисных документов — 9, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 6, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 5 (поле corrections). Документации изготовителя с кодами в открытом доступе нет: все коды — у третьих лиц (перечень DrillingBase по HTD250, MR8000 и 9T800; таблицы DRILLMEC PART # у китайских изготовителей аналогов Premium и Longwell), сверять с каталогом Drillmec; четыре номера клапанов источники относят к разным насосам. В России — дочерняя компания ООО «Дриллмек Р». Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gidromet/data/nic.json",
       "subproject": "гидрометаллургия",
       "bytes": 49265,
@@ -8306,105 +8402,9 @@
       ]
     },
     {
-      "path": "data/brand_research/grundfos.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 49123,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Grundfos: центробежные насосы CR/CRI/CRN, NB/NBS/NBE/NK/NBG, SE1/SEV (через родственную SL1/SLV). Машин и исполнений — 17, сервисных документов — 13, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 15, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 6 (поле corrections). Все коды — из открытых каталогов сервисных наборов изготовителя (Service Kit Catalogue CR, NB model B, NBS/NBSE, SL): номер набора находится по шильдику — типоразмер, диаметр вала, буквенный код уплотнения. Grundfos ушёл из России в 2022 г., завод в Истре с 2024 г. — ООО «ИСТРАТЕХ Групп» без прав на бренд; российские продавцы запчастей — неофициальные. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 40,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "b19fab4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
-      "path": "data/brand_research/drillmec.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 49079,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Drillmec: гидравлические буровые установки серии HH (HH55–HH350), верхние приводы HTD/ETD, трёхпоршневые буровые насосы 7T450…14T2200. Машин и исполнений — 24, сервисных документов — 9, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 6, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 5 (поле corrections). Документации изготовителя с кодами в открытом доступе нет: все коды — у третьих лиц (перечень DrillingBase по HTD250, MR8000 и 9T800; таблицы DRILLMEC PART # у китайских изготовителей аналогов Premium и Longwell), сверять с каталогом Drillmec; четыре номера клапанов источники относят к разным насосам. В России — дочерняя компания ООО «Дриллмек Р». Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 40,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "b19fab4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
       "path": "data/brand_research/guascorsiemensenergy.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 48534,
+      "bytes": 49030,
       "note": "Разведка бренда по открытым источникам (2026-09-25): Guascor (Siemens Energy; с 2022 г. Guascor Energy, Mutares): газовые двигатели S Series (SFGLD180–560, SFGM560) и H Series (HGM240, HGM560), прежние FG/FGLD и SFGRD. Машин и исполнений — 10, сервисных документов — 9, кодов запчастей — 39: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 11, дилеров и сервисных компаний — 12, пробелов (gaps) — 9; по замечаниям скептика поправлено записей — 9 (поле corrections). Коды — у независимых поставщиков Birkas & Co (перечень ЗИП капремонта SFGLD560, таблица замены номеров Guascor на Siemens S76.xx, таблица ресурса свечей со ссылками на инструкции ТО IO-G-M-00-0xx) и Martin Energy Group; мощности — из листовки Siemens Gas Engines. После продажи 2022 г. обслуживает сам изготовитель Guascor Energy и его сеть; официальные дистрибьюторы для Казахстана и Узбекистана — Synergy Astana, Sonnenberg Power Solutions (ОАЭ), MCE (Турция); в России и Китае официальной сети нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
@@ -8439,9 +8439,105 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-25",
-      "last_author": "skharkov1246",
-      "last_commit": "97094ed",
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/itt.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 48943,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): ITT (Goulds Pumps): консольные насосы ANSI 3196 (i-FRAME и прежние ST/MT/LT/XLT) и API 610 OH2 3700/3700i — подшипниковые узлы и их уплотнения. Машин и исполнений — 10, сервисных документов — 12, кодов запчастей — 37, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 12, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 5 (поле corrections). 24 кода — обозначения подшипников из таблиц IOM изготовителя (3196 i-FRAME Table 21, 3700 Table 4 по SKF/MRC), лабиринтная пара 3196 LT — номера ITT у продавца аналогов Mesco, комплекты ТО R196-… и их состав — с витрин складских остатков. Номера торцовых уплотнений и ведомости запчастей 3700 открыто не найдены — выдаются по серийному номеру; пара для XLT вынесена в parts_rejected. В России только перепродавцы. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 37,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/woodward.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 48578,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Woodward: регуляторы турбин 505/505-XT/5009XT, защита ProTech, приводы ProAct и L-Series, газовые дозаторы TecJet 52/85/110, блоки LECM E6, топливные клапаны ГТУ GS40/GS50/LQ25, контроллеры easYgen, датчики MPU. Машин и исполнений — 24, сервисных документов — 10, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 6, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 3 (поле corrections). Коды — из каталога изготовителя Industrial Turbine Products Catalog 25182 Rev. AG, руководств 26839 (505), 26147 и 26578 (ProAct) и уведомления PCN 06989 (замены TecJet 52); применимость TecJet — по протоколам EGS-01, EGS-02/E6 и исполнениям для Jenbacher, MTU, MHI. Запасные части внутри изделий — в закрытом портале Woodward; официальных партнёров по России и СНГ не найдено. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8544,10 +8640,10 @@
       ]
     },
     {
-      "path": "data/brand_research/woodward.json",
+      "path": "data/brand_research/bentlynevada.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 48165,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Woodward: регуляторы турбин 505/505-XT/5009XT, защита ProTech, приводы ProAct и L-Series, газовые дозаторы TecJet 52/85/110, блоки LECM E6, топливные клапаны ГТУ GS40/GS50/LQ25, контроллеры easYgen, датчики MPU. Машин и исполнений — 24, сервисных документов — 10, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 6, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 3 (поле corrections). Коды — из каталога изготовителя Industrial Turbine Products Catalog 25182 Rev. AG, руководств 26839 (505), 26147 и 26578 (ProAct) и уведомления PCN 06989 (замены TecJet 52); применимость TecJet — по протоколам EGS-01, EGS-02/E6 и исполнениям для Jenbacher, MTU, MHI. Запасные части внутри изделий — в закрытом портале Woodward; официальных партнёров по России и СНГ не найдено. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 48056,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Bently Nevada (Baker Hughes): системы защиты и вибромониторинга 3500 (/15, /22M, /25, /32M, /42M, /53M), датчики 3300 XL 8 мм, 330400/330425, 330500, мониторы 1701 FieldMonitor и 1900/65A. Машин и исполнений — 14, сервисных документов — 18, кодов запчастей — 42: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 2, дилеров и сервисных компаний — 7, пробелов (gaps) — 6; по замечаниям скептика поправлено записей — 3 (поле corrections). Все коды — из технических описаний изготовителя (dam.bakerhughes.com и копии у дистрибьюторов с номерами документов Bently): запасные модули, модули ввода-вывода, предохранители, кабели, разъёмы, барьеры искробезопасности. Применение по конкретным машинам парка в открытых документах не указано; руководства по эксплуатации — в закрытой медиатеке. В России только перепродавцы, официальный канал после 2022 г. не подтверждён. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -8569,7 +8665,7 @@
       ],
       "main_collection": {
         "key": "parts",
-        "records": 40,
+        "records": 42,
         "record_keys": [
           "code",
           "description",
@@ -8582,56 +8678,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "e611a85",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
-      "path": "data/brand_research/itt.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 48051,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): ITT (Goulds Pumps): консольные насосы ANSI 3196 (i-FRAME и прежние ST/MT/LT/XLT) и API 610 OH2 3700/3700i — подшипниковые узлы и их уплотнения. Машин и исполнений — 10, сервисных документов — 12, кодов запчастей — 37, 2 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 12, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 5 (поле corrections). 24 кода — обозначения подшипников из таблиц IOM изготовителя (3196 i-FRAME Table 21, 3700 Table 4 по SKF/MRC), лабиринтная пара 3196 LT — номера ITT у продавца аналогов Mesco, комплекты ТО R196-… и их состав — с витрин складских остатков. Номера торцовых уплотнений и ведомости запчастей 3700 открыто не найдены — выдаются по серийному номеру; пара для XLT вынесена в parts_rejected. В России только перепродавцы. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 37,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "e611a85",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8716,10 +8764,10 @@
       ]
     },
     {
-      "path": "data/brand_research/bentlynevada.json",
+      "path": "data/brand_research/gilkesclydeunion.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 47216,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Bently Nevada (Baker Hughes): системы защиты и вибромониторинга 3500 (/15, /22M, /25, /32M, /42M, /53M), датчики 3300 XL 8 мм, 330400/330425, 330500, мониторы 1701 FieldMonitor и 1900/65A. Машин и исполнений — 14, сервисных документов — 18, кодов запчастей — 42: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 2, дилеров и сервисных компаний — 7, пробелов (gaps) — 6; по замечаниям скептика поправлено записей — 3 (поле corrections). Все коды — из технических описаний изготовителя (dam.bakerhughes.com и копии у дистрибьюторов с номерами документов Bently): запасные модули, модули ввода-вывода, предохранители, кабели, разъёмы, барьеры искробезопасности. Применение по конкретным машинам парка в открытых документах не указано; руководства по эксплуатации — в закрытой медиатеке. В России только перепродавцы, официальный канал после 2022 г. не подтверждён. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 46349,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): ClydeUnion Pumps (Celeros Flow Technology) и Gilkes: насосы API 610 (OH2, OH3/VLK, BB1, BB2, BB3, BB5, VS1, VS6), питательные CUP-FT/FK, поршневые Union; у Gilkes — маслонасосы турбин и насосы охлаждения двигателей. Машин и исполнений — 16, сервисных документов — 6, кодов запчастей — 34: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 2, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 8 (поле corrections). Открытых каталогов запчастей изготовителя нет: 28 кодов — реестр NSN по CAGE 61748 (Clyde Union Inc), к модели насоса не привязаны; 5 — карточки продавца неоригинальных деталей Industrial Pump Parts; 1 — номер Cummins на насос Gilkes. Сайт celerosft.com закрыт для автоматического чтения (403), часть моделей подтверждена выдачей поиска. Официального дистрибьютора в России и СНГ нет, только перепродавцы под заказ. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -8741,7 +8789,7 @@
       ],
       "main_collection": {
         "key": "parts",
-        "records": 42,
+        "records": 34,
         "record_keys": [
           "code",
           "description",
@@ -8754,8 +8802,55 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "e611a85",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/cryostar.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 46305,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Cryostar: криогенные центробежные и поршневые насосы, турбодетандеры TC/MTC, компрессоры отпарного газа CM. Машин и исполнений — 21, сервисных документов — 11, кодов запчастей — 30, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 1, дилеров и сервисных компаний — 13, пробелов (gaps) — 6; по замечаниям скептика поправлено записей — 10 (поле corrections). Открытого каталога запчастей изготовителя нет: коды — со страниц продавцов Soluparts и thecryoshop.com (CryoVation) с пометкой, кем заявлена применимость; насос PD3000 — изделие Cryostar по листу изготовителя. Кодов по турбодетандерам и компрессорам в открытом доступе нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 30,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8809,10 +8904,10 @@
       ]
     },
     {
-      "path": "data/brand_research/cryostar.json",
+      "path": "data/brand_research/imoindustries.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 46052,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Cryostar: криогенные центробежные и поршневые насосы, турбодетандеры TC/MTC, компрессоры отпарного газа CM. Машин и исполнений — 21, сервисных документов — 11, кодов запчастей — 30, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 1, дилеров и сервисных компаний — 13, пробелов (gaps) — 6; по замечаниям скептика поправлено записей — 10 (поле corrections). Открытого каталога запчастей изготовителя нет: коды — со страниц продавцов Soluparts и thecryoshop.com (CryoVation) с пометкой, кем заявлена применимость; насос PD3000 — изделие Cryostar по листу изготовителя. Кодов по турбодетандерам и компрессорам в открытом доступе нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 46183,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): IMO: трёхвинтовые насосы IMO Pump (США; 3D, 3E, 3G, 6D, 12D, 324, 8L, 323F) и IMO AB (Швеция; ACD, ACE, ACF, ACG, LPQ); марка у CIRCOR Pumping Technologies (CIRCOR с 2023 г. у KKR). Машин и исполнений — 17, сервисных документов — 16, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 10, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 6 (поле corrections). 35 кодов — из открытой базы составов imo-pump.com по номеру ведомости насоса (роторы, уплотнения, подшипники, малые …RA и большие …R ремкомплекты), 4 — складской список дилера по IMO AB, 1 — карточка интернет-магазина; запчасти изготовитель продаёт только комплектами. Официальных партнёров CIRCOR в России и СНГ нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -8834,10 +8929,11 @@
       ],
       "main_collection": {
         "key": "parts",
-        "records": 30,
+        "records": 40,
         "record_keys": [
           "code",
           "description",
+          "doc_ref",
           "issuer",
           "machine",
           "quote",
@@ -8846,8 +8942,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "c5c7433",
+      "last_author": "Claude",
+      "last_commit": "b212286",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8897,102 +8993,6 @@
         "gt/public/faults.html",
         "scripts/build_chain_coverage.py"
       ]
-    },
-    {
-      "path": "data/brand_research/imoindustries.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 45996,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): IMO: трёхвинтовые насосы IMO Pump (США; 3D, 3E, 3G, 6D, 12D, 324, 8L, 323F) и IMO AB (Швеция; ACD, ACE, ACF, ACG, LPQ); марка у CIRCOR Pumping Technologies (CIRCOR с 2023 г. у KKR). Машин и исполнений — 17, сервисных документов — 16, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 10, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 6 (поле corrections). 35 кодов — из открытой базы составов imo-pump.com по номеру ведомости насоса (роторы, уплотнения, подшипники, малые …RA и большие …R ремкомплекты), 4 — складской список дилера по IMO AB, 1 — карточка интернет-магазина; запчасти изготовитель продаёт только комплектами. Официальных партнёров CIRCOR в России и СНГ нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 40,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "0b82ddb",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
-      "path": "data/brand_research/gilkesclydeunion.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 45736,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): ClydeUnion Pumps (Celeros Flow Technology) и Gilkes: насосы API 610 (OH2, OH3/VLK, BB1, BB2, BB3, BB5, VS1, VS6), питательные CUP-FT/FK, поршневые Union; у Gilkes — маслонасосы турбин и насосы охлаждения двигателей. Машин и исполнений — 16, сервисных документов — 6, кодов запчастей — 34: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 2, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 8 (поле corrections). Открытых каталогов запчастей изготовителя нет: 28 кодов — реестр NSN по CAGE 61748 (Clyde Union Inc), к модели насоса не привязаны; 5 — карточки продавца неоригинальных деталей Industrial Pump Parts; 1 — номер Cummins на насос Gilkes. Сайт celerosft.com закрыт для автоматического чтения (403), часть моделей подтверждена выдачей поиска. Официального дистрибьютора в России и СНГ нет, только перепродавцы под заказ. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 34,
-        "record_keys": [
-          "code",
-          "description",
-          "doc_ref",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "0b82ddb",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "gidromet/data/scenarii.json",
@@ -9078,6 +9078,53 @@
       ]
     },
     {
+      "path": "data/brand_research/atlascopcoenergas.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 43861,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Atlas Copco Energas (Gas and Process): интегрально-редукторные компрессоры GT/H/TP/SC, одновальные T/RT, турбодетандеры EC/ECM/ETB/ETG/EG, наследная линия Mafi-Trench. Машин и исполнений — 25, сервисных документов — 7, кодов запчастей — 8, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 12, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 3 (поле corrections). Машины делаются под заказ, ведомости ЗИП открыто не публикуются: коды — номера Mafi-Trench и Comptec с распродаж неликвида и обозначение шкафа SKF S2M E300V2 из листка изготовителя. Официального сервиса Gas and Process в РФ в перечнях изготовителя нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "machines",
+        "records": 25,
+        "record_keys": [
+          "kind",
+          "model",
+          "rating",
+          "segment",
+          "sources",
+          "status",
+          "verified"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gt/data/ms5001_vankor.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 43791,
@@ -9119,53 +9166,6 @@
         "library/load_crossrefs.py",
         "library/load_tkp_prices.py"
       ]
-    },
-    {
-      "path": "data/brand_research/atlascopcoenergas.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 43575,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Atlas Copco Energas (Gas and Process): интегрально-редукторные компрессоры GT/H/TP/SC, одновальные T/RT, турбодетандеры EC/ECM/ETB/ETG/EG, наследная линия Mafi-Trench. Машин и исполнений — 25, сервисных документов — 7, кодов запчастей — 8, 1 отклонено скептиком: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 5, дилеров и сервисных компаний — 12, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 3 (поле corrections). Машины делаются под заказ, ведомости ЗИП открыто не публикуются: коды — номера Mafi-Trench и Comptec с распродаж неликвида и обозначение шкафа SKF S2M E300V2 из листка изготовителя. Официального сервиса Gas and Process в РФ в перечнях изготовителя нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "machines",
-        "records": 25,
-        "record_keys": [
-          "kind",
-          "model",
-          "rating",
-          "segment",
-          "sources",
-          "status",
-          "verified"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "c5c7433",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "gpu/data/suppliers.json",
@@ -9568,6 +9568,53 @@
       ]
     },
     {
+      "path": "data/brand_research/vikingpump.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 37107,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Viking Pump (IDEX): шестерённые насосы внутреннего зацепления маслосистем — серии 4195/495, 4193/493, 4197, 4227AA, SG, 4124A. Машин и исполнений — 10, сервисных документов — 7, кодов запчастей — 34: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 0, дилеров и сервисных компаний — 7, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 6 (поле corrections). Коды — ремкомплекты 3-464-REBUILD-K и комплекты уплотнений 3-464-SEAL-K по типоразмеру и исполнению крышки у открытых магазинов дистрибьюторов (ShopPumps, Hayes Pump, NRI) и ремонтный инструмент из TSM 144. На каком пакете ГТУ стоит насос Viking и под каким номером упаковщика — не найдено; связь HJ495 с рамами Ariel не подтверждена. Субпоставщики не названы. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 34,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b212286",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "data/subsuppliers/verified.json",
       "subproject": "дашборд сорсеров",
       "bytes": 36737,
@@ -9613,53 +9660,6 @@
         "tests/test_portal_audit.py",
         "tests/test_subsuppliers_check.py"
       ]
-    },
-    {
-      "path": "data/brand_research/vikingpump.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 36391,
-      "note": "Разведка бренда по открытым источникам (2026-09-26): Viking Pump (IDEX): шестерённые насосы внутреннего зацепления маслосистем — серии 4195/495, 4193/493, 4197, 4227AA, SG, 4124A. Машин и исполнений — 10, сервисных документов — 7, кодов запчастей — 34: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 0, дилеров и сервисных компаний — 7, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 6 (поле corrections). Коды — ремкомплекты 3-464-REBUILD-K и комплекты уплотнений 3-464-SEAL-K по типоразмеру и исполнению крышки у открытых магазинов дистрибьюторов (ShopPumps, Hayes Pump, NRI) и ремонтный инструмент из TSM 144. На каком пакете ГТУ стоит насос Viking и под каким номером упаковщика — не найдено; связь HJ495 с рамами Ariel не подтверждена. Субпоставщики не названы. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "corrections",
-        "dealers",
-        "gaps",
-        "machines",
-        "method",
-        "name",
-        "oem_key",
-        "parts",
-        "parts_rejected",
-        "researched_at",
-        "segment_focus",
-        "service_docs",
-        "sub_suppliers",
-        "summary",
-        "verifier_notes"
-      ],
-      "main_collection": {
-        "key": "parts",
-        "records": 34,
-        "record_keys": [
-          "code",
-          "description",
-          "issuer",
-          "machine",
-          "quote",
-          "source_url",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-26",
-      "last_author": "skharkov1246",
-      "last_commit": "0b82ddb",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "ove/data/disc_c.json",
