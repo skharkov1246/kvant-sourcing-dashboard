@@ -106,6 +106,7 @@ td .src{margin-top:4px}
 .pairs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px}
 .pairs button{background:var(--card);border:1px solid var(--line);border-radius:7px;color:var(--accent);
               padding:4px 10px;font-size:13px;min-height:32px}
+.brl a{white-space:nowrap}
 .brandline{font-size:13px;color:#c4cedb;margin:-8px 0 14px;line-height:1.55}.brandline b{font-weight:500;color:var(--ink)}
 </style>
 </head>
@@ -152,7 +153,7 @@ td .src{margin-top:4px}
           <thead><tr><th scope="col">Бренд · код</th><th scope="col">Наименование</th>
             <th scope="col">Спрашивали</th><th scope="col">Предлагали</th>
             <th scope="col">Изготовитель</th>
-            <th scope="col">Машина</th><th scope="col">Чем закрыть</th></tr></thead>
+            <th scope="col" id="col-models">Машина</th><th scope="col" id="col-alts">Чем закрыть</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
@@ -165,6 +166,9 @@ td .src{margin-top:4px}
 "use strict";
 var ПРАВА = { suppliers_pii: "контакты", suppliers_fin: "договоры и деньги" };
 var BXLINK = "https://kvantpro.bitrix24.ru/crm/company/details/";
+// Карточка запроса поставщику — смарт-процесс «Запросы поставщикам» (СП-166),
+// тот же адрес, что у карточки кода (public/portal_entity.js, BXRFQ).
+var BXRFQ = "https://kvantpro.bitrix24.ru/crm/type/166/details/";
 var ШАГ = 200;
 var данные = null, отфильтровано = [], показано = 0, отбор = "все";
 // ПАПКА И ОТБОР ПО КОДУ. Позиция — пара «бренд + код»: пары с брендом — основной
@@ -175,7 +179,14 @@ var папка = "бренд", код_отбора = null, есть_правил
 // Имя компании по ключу портала. В снимке оно лежит ОДИН раз, в companies:
 // повторённое в каждом из 18 тысяч предложений, оно занимало бы сотни килобайт
 // и расходилось бы с реестром при первом же переименовании.
-var имя_компании = {};
+var имя_компании = {}, сущность_компании = {};
+// СТОЛБЦЫ, ЗАПОЛНЕННЫЕ У НЕМНОГИХ (ревизия 36259633674: машины у 456 позиций из
+// 16 982, аналоги у 41). Пустая клетка — «—», а не «Нет связи» (читалось как сбой
+// сети); столбец скрыт, если в текущей выборке пуст у всех строк. Этот же
+// перечень читает ревизия (scripts/portal_audit.py, n.col_dead): столбец из него
+// мёртвым не считается, потому что страница его прячет.
+var СКРЫВАЕМЫЕ_СТОЛБЦЫ = ["models", "alts"];
+var виден_столбец = { models: true, alts: true };
 var $ = function (id) { return document.getElementById(id); };
 
 function текст(el, v) { el.textContent = v == null ? "" : String(v); return el; }
@@ -276,11 +287,11 @@ function дата_снимка(v) {
   }
 }
 
-function плитка(подпись, v, источник, пусто) {
+function плитка(подпись, v, источник, пусто, бренды) {
   var box = узел("div", "claim");
   box.appendChild(узел("dt", null, подпись));
   var dd = узел("dd");
-  dd.appendChild(значение(v, пусто));
+  dd.appendChild(бренды ? бренды_ссылками(v, пусто) : значение(v, пусто));
   if (источник) dd.appendChild(узел("span", "src", источник));
   box.appendChild(dd);
   return box;
@@ -314,6 +325,45 @@ function метки(список, класс) {
   var frag = document.createDocumentFragment();
   (список || []).forEach(function (t) { frag.appendChild(узел("span", класс || "pill", t)); });
   return frag;
+}
+
+// БРЕНД — ССЫЛКОЙ НА /brands#n=<ключ или написание>: страница брендов ищет по
+// ключу, имени и написаниям словаря, а не найдя — открывает список с этим словом
+// в поиске. Так из позиции один щелчок до всех кодов и поставщиков бренда.
+function ссылка_бренда(ключ, имя) {
+  var a = узел("a", null, имя || ключ);
+  a.href = "/brands#n=" + encodeURIComponent(ключ || имя);
+  return a;
+}
+
+function бренды_ссылками(v, пусто) {
+  if (закрыто(v)) return значение(v, пусто);
+  var список = (Array.isArray(v) ? v : (v == null || v === "" ? [] : [v]))
+    .filter(function (x) { return typeof x === "string" && x.trim(); });
+  if (!список.length) return узел("span", "none", пусто || "Не знаем");
+  var el = узел("span", "brl");
+  список.forEach(function (x, i) {
+    if (i) el.appendChild(document.createTextNode(", "));
+    el.appendChild(ссылка_бренда(null, x));
+  });
+  return el;
+}
+
+// Номер карточки запроса — ссылкой в Битрикс; номер не числом — только текстом.
+function карточка_запроса(f) {
+  var s = String(f);
+  if (!/^\d+$/.test(s)) return узел("span", null, s);
+  var a = узел("a", "kod", "№ " + s);
+  a.href = BXRFQ + s + "/";
+  a.rel = "noreferrer";
+  a.target = "_blank";
+  a.title = "Карточка запроса поставщику в Битриксе";
+  return a;
+}
+
+function заполнено(v) {
+  if (закрыто(v)) return true;
+  return Array.isArray(v) ? v.length > 0 : v != null && v !== "";
 }
 
 // ─── Бренд позиции ───────────────────────────────────────────────────────────
@@ -426,11 +476,11 @@ function строка(p) {
     изг.appendChild(узел("span", "thin", " (со слов поставщика)"));
   } else изг.appendChild(узел("span", "none", "Не знаем"));
   tr.appendChild(изг);
-  tr.appendChild(узел("td")).appendChild(значение(p.models, "Нет связи"));
-  tr.appendChild(узел("td")).appendChild(
+  if (виден_столбец.models) tr.appendChild(узел("td")).appendChild(значение(p.models, "—"));
+  if (виден_столбец.alts) tr.appendChild(узел("td")).appendChild(
     (p.alts || []).length ? узел("span", null, число(p.alts.length) + " "
       + склонение(p.alts.length, "вариант", "варианта", "вариантов"))
-      : узел("span", "none", "Нет"));
+      : узел("span", "none", "—"));
   return tr;
 }
 
@@ -474,6 +524,12 @@ function искать() {
   });
   $("rows").textContent = "";
   показано = 0;
+  // Пустой у всех строк выборки столбец — скрыт вместе с заголовком.
+  СКРЫВАЕМЫЕ_СТОЛБЦЫ.forEach(function (поле) {
+    виден_столбец[поле] = отфильтровано.some(function (p) { return заполнено(p[поле]); });
+    var th = $(поле === "models" ? "col-models" : "col-alts");
+    if (th) th.hidden = !виден_столбец[поле];
+  });
   var всего = код_отбора !== null ? данные.positions.filter(function (p) { return p.k === код_отбора; }).length
     : данные.positions.filter(function (p) { return в_папке(p); }).length;
   var итог_ = число(отфильтровано.length) + " из " + число(всего);
@@ -540,6 +596,7 @@ function нарисовать_отборы() {
     b.addEventListener("click", function () {
       отбор = о[0];
       код_отбора = null;
+      не_найден = null;
       показать_отбор_кода();
       подсветить_отбор();
       искать();
@@ -547,10 +604,25 @@ function нарисовать_отборы() {
     box.appendChild(b);
   });
 }
+// #k= С КЛЮЧОМ, КОТОРОГО В СНИМКЕ НЕТ: прежде страница молча показывала список,
+// и сорсер не понимал, открылась ли позиция. Теперь — надпись с кодом.
+var не_найден = null;
+
 function показать_отбор_кода() {
   var el = $("code-filter");
   el.textContent = "";
-  el.hidden = код_отбора === null;
+  el.hidden = код_отбора === null && не_найден === null;
+  if (код_отбора === null && не_найден !== null) {
+    el.appendChild(узел("b", null, "Позиция не найдена: "));
+    el.appendChild(узел("span", "kod", не_найден));
+    el.appendChild(document.createTextNode(". В этом снимке номенклатуры такого кода нет — по нему не было "
+      + "разобранного предложения, либо ссылка из другой сборки. Ниже — весь список; код можно поискать строкой поиска. "));
+    var сброс = узел("button", "row-link", "Скрыть");
+    сброс.type = "button";
+    сброс.addEventListener("click", function () { не_найден = null; показать_отбор_кода(); });
+    el.appendChild(сброс);
+    return;
+  }
   if (код_отбора === null) return;
   var пары = данные.positions.filter(function (p) { return p.k === код_отбора; });
   el.appendChild(document.createTextNode("Код " + ((пары[0] || {}).n || код_отбора) + " — "
@@ -646,7 +718,7 @@ function нарисовать_карточку(p, примечание) {
     var бл = узел("p", "brandline");
     if (p.bk) {
       бл.appendChild(document.createTextNode("Бренд "));
-      бл.appendChild(узел("b", null, p.bn));
+      бл.appendChild(узел("b")).appendChild(ссылка_бренда(p.bk, p.bn));
       бл.appendChild(document.createTextNode(" — " + (ИСТОЧНИК_ПОЛНО[p.bs] || p.bs || "источник не назван") + "."));
     } else if (p.bw === "спорно") {
       бл.appendChild(узел("b", null, "Бренд не определён: спорно. "));
@@ -688,14 +760,14 @@ function нарисовать_карточку(p, примечание) {
   претензии.appendChild(плитка("Изготовитель по каталогу", p.oem_cat,
     "Наш каталог. Ближе всего к «оригиналу».", "В каталоге позиции нет"));
   претензии.appendChild(плитка("Назвал поставщик в файле", p.oem_file,
-    "Слово поставщика из его же КП, ничем не подтверждённое.", "В файлах не назван"));
+    "Слово поставщика из его же КП, ничем не подтверждённое.", "В файлах не назван", true));
   претензии.appendChild(плитка("Бренд на карточке запроса", p.brands,
     "Проставлен нашим сотрудником при создании запроса. Наше намерение, а не ответ рынка.",
-    "Не проставлен"));
+    "Не проставлен", true));
   if (есть_правило) {
     претензии.appendChild(плитка("Назван в спецификации заказчика", p.spec,
       "Строки спецификаций заказчиков по этому коду; только бренды, узнанные реестром.",
-      "Не назван или не узнан"));
+      "Не назван или не узнан", true));
   }
   var родные = (p.alts || []).filter(function (a) { return a.kind === "номер изготовителя"; });
   претензии.appendChild(плитка("Чей это номер на самом деле",
@@ -778,7 +850,7 @@ function нарисовать_карточку(p, примечание) {
   var th2 = document.createElement("thead");
   var htr2 = document.createElement("tr");
   ["Компания", "Цена", "Количество", "Сумма", "Базис", "Оплата",
-   "Изготовл., дн.", "Поставка, дн.", "Бренд", "Изготовитель по файлу", "Дата"]
+   "Изготовл., дн.", "Поставка, дн.", "Бренд", "Изготовитель по файлу", "Дата", "Запрос"]
     .forEach(function (h) { htr2.appendChild(узел("th", null, h)); });
   th2.appendChild(htr2); t2.appendChild(th2);
   var tbody2 = document.createElement("tbody");
@@ -787,8 +859,11 @@ function нарисовать_карточку(p, примечание) {
     var td = узел("td");
     var имя = o.c ? имя_компании[o.c] : null;
     if (имя) {
+      // Сущность реестра — у предложения (e) или у компании снимка: ссылка ведёт
+      // в карточку компании (/suppliers#e=), а не к началу реестра.
+      var сущ = o.e || (o.c ? сущность_компании[o.c] : null);
       var a = узел("a", null, имя);
-      a.href = "/suppliers";
+      a.href = "/suppliers" + (сущ ? "#e=" + encodeURIComponent(сущ) : "");
       td.appendChild(a);
     } else if (o.c) {
       // Компания не сведена с реестром — ведём прямо в карточку Битрикса, а не
@@ -811,7 +886,7 @@ function нарисовать_карточку(p, примечание) {
     tr.appendChild(оплата(o.y, o.a, o.r));
     tr.appendChild(условие(o.k, o.r, 3));
     tr.appendChild(условие(o.l, o.r, 2));
-    tr.appendChild(узел("td")).appendChild(значение(o.b, "—"));
+    tr.appendChild(узел("td")).appendChild(бренды_ссылками(o.b, "—"));
     var изг_ф = tr.appendChild(узел("td"));
     изг_ф.appendChild(значение(o.m, "—"));
     // СВОЙ БРЕНД ПРЕДЛОЖЕНИЯ (поле o): «с:» — строка КП, «к:» — карточка запроса.
@@ -838,6 +913,16 @@ function нарисовать_карточку(p, примечание) {
         + (o.w ? " В одной из копий есть значение, которого здесь нет: сверьте карточки запроса." : "");
       дата.appendChild(повтор);
     }
+    // НОМЕР КАРТОЧКИ ЗАПРОСА (f) и другие карточки схлопнутого дубля (g) — в Битрикс.
+    var зап = tr.appendChild(узел("td"));
+    if (o.f != null && o.f !== "") зап.appendChild(карточка_запроса(o.f));
+    else зап.appendChild(узел("span", "none", "—"));
+    (o.g || []).forEach(function (g) {
+      var ещё = узел("span", "src");
+      ещё.appendChild(document.createTextNode("и "));
+      ещё.appendChild(карточка_запроса(g));
+      зап.appendChild(ещё);
+    });
     tbody2.appendChild(tr);
   });
   t2.appendChild(tbody2); tw2.appendChild(t2); card.appendChild(tw2);
@@ -872,7 +957,10 @@ function итог(значение_, подпись) {
 }
 
 function показать() {
-  (данные.companies || []).forEach(function (c) { if (c.name) имя_компании[c.co] = c.name; });
+  (данные.companies || []).forEach(function (c) {
+    if (c.name) имя_компании[c.co] = c.name;
+    if (c.ent) сущность_компании[c.co] = c.ent;
+  });
   var t = данные.totals || {};
   есть_правило = !!(t.brand && typeof t.brand === "object");
   пар_у_кода = {};
@@ -995,6 +1083,9 @@ function со_списком(v) {
         код_отбора = ключ;
         показать_отбор_кода();
         искать();
+      } else {
+        не_найден = ключ;
+        показать_отбор_кода();
       }
     }
   })
