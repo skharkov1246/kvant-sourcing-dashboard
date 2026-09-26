@@ -1,0 +1,886 @@
+{
+  "oem_key": "imoindustries",
+  "name": "IMO (винтовые насосы) — IMO Pump (CIRCOR Pumps North America, США) и IMO AB (Стокгольм)",
+  "segment_focus": "винтовые насосы маслосистем ГТУ и компрессоров: номера роторов и уплотнений, нынешний владелец марки",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Нынешний владелец марки: товарный знак IMO принадлежит CIRCOR Pumping Technologies, дочерней компании CIRCOR International. Так написано в подвале открытой базы запчастей imo-pump.com. Сам CIRCOR с 18.10.2023 принадлежит KKR: сделка на 1,6 млрд USD, акции сняты с NYSE. С 2025 года IMO и Houttuin официально стали товарными брендами внутри Allweiler; это сказано в выдаче поиска со ссылкой на pumps.circor.com, дословно на странице не проверено.\n\nПроизводств два. IMO Pump — США, серии 3D/A3D, 3E, 3G, 6D, 12D, 324, 8L, 323F. IMO AB — Швеция, «Low Pressure Line»: ACD, ACE, ACF/UCF, ACG/UCG, LPQ. Для маслосистем ГТУ и компрессоров изготовитель прямо называет серию 3G (Turbine lubrication, до 17,2 бар) и линию IMO AB (lubrication of … turbines, до 16 бар).\n\nГлавная находка — открытая база составов на imo-pump.com (/cf/displaybomactive.php?partnumber=…), обновлена 25.09.2026. По номеру ведомости насоса в ней видны коды ведущего ротора (DSC…/DSJ…/DSP…), ведомых роторов (RSC…/RSJ…), торцевых уплотнений (PP046…), подшипников (PP047…), колец (PP056…). Там же номера комплектов: …RA — малый комплект (уплотнение, подшипник, прокладки, кольца), …R — большой комплект (плюс роторы и изнашиваемые детали). Для 3G ремкомплекты оформлены модулями ME3G…, роторы — модулями MR3G…. Изготовитель прямо пишет, что запчасти продаются только комплектами. Все 40 кодов сняты с этой базы, с одного открытого складского списка дилера по IMO AB и с одной карточки интернет-магазина, каждый с дословной цитатой.\n\nСервисные книги SRM000xx лежат открыто на imo-pump.com/servicemanuals.htm. В них даны позиции деталей, а не коды, поэтому коды взяты из базы составов.\n\nВ субпоставщиках: картриджное уплотнение Flowserve Type BX на насосах H/G323FXFSX и муфты Lovejoy и Falk в агрегатах 3G.\n\nОфициальных партнёров в России и СНГ на карте CIRCOR нет. Есть Китай (офис CIRCOR в Шанхае, Marinequip), Турция (Argus Makine, Yakamoz), ОАЭ (Kanoo Group, Goltens Dubai), Саудовская Аравия (Yusuf Bin Ahmed), Индия (Allweiler India и около 28 дистрибьюторов).",
+  "machines": [
+    {
+      "model": "IMO 3G (AA3G) размеры 95, 118, 143, 162",
+      "kind": "трёхвинтовой насос маслосистемы (смазка турбин, гидравлика, масло управления)",
+      "segment": "насос",
+      "rating": "до 55 GPM (208 л/мин) номинально, перепад до 250 psig (17,2 бар), до 3600 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-imo-3g-series",
+        "https://www.imo-pump.com/servicemanuals/SRM00020.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO 3G размеры 187, 200, 250",
+      "kind": "трёхвинтовой насос маслосистемы",
+      "segment": "насос",
+      "rating": "роторы 187–250",
+      "status": "выпускается (есть сервисная книга)",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO 3E (C3EB, D3EBS) размеры 87, 95, 118, 143, 162, 187, 200",
+      "kind": "трёхвинтовой насос (смазка, гидравлика, топливо)",
+      "segment": "насос",
+      "rating": "роторы 87–200; уплотнения типа B/H — до 4000 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-imo-3e-series",
+        "https://www.imo-pump.com/servicemanuals/SRM00018.pdf",
+        "https://www.imo-pump.com/servicemanuals/SRM00019.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO 3D / A3D / G3DB (размеры 106–400)",
+      "kind": "трёхвинтовой насос (масло смазки, гидравлика, топливо, нефть)",
+      "segment": "насос",
+      "rating": "роторы 106–400",
+      "status": "выпускается",
+      "sources": [
+        "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-imo-3d-series",
+        "https://www.imo-pump.com/servicemanuals/srm00038.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO PG/RG3D-275, PG/RG3D-187/218/250/312",
+      "kind": "трёхвинтовой насос высокого давления",
+      "segment": "насос",
+      "rating": "роторы 187–312",
+      "status": "выпускается (сервисные книги 2020)",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00081.pdf",
+        "https://www.imo-pump.com/servicemanuals/SRM00086.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO 6D / A6D / B6D / C6D (106–400)",
+      "kind": "трёхвинтовой насос",
+      "segment": "насос",
+      "rating": "роторы 106–400",
+      "status": "выпускается",
+      "sources": [
+        "https://www.circor.com/products/pumps/three-screw/imo-6d-series-three-screw-pump",
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO LB6D",
+      "kind": "трёхвинтовой бустерный насос (узлы учёта нефти LACT)",
+      "segment": "насос",
+      "status": "выпускается (анонс, по-видимому, 04.2025)",
+      "sources": [
+        "https://www.circor.com/news/press-releases/circor-highlights-imo-lb6d-3-screw-pumps-lact-boost"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "IMO 12D / A12D / B12D / C12D (106–400)",
+      "kind": "трёхвинтовой насос высокого давления (в т. ч. впрыск топлива ГТУ, уплотнение газа центробежных компрессоров)",
+      "segment": "насос",
+      "rating": "роторы 106–400",
+      "status": "выпускается",
+      "sources": [
+        "https://www.circor.com/products/pumps/three-screw/imo-imo-three-screw-12d-series",
+        "https://www.imo-pump.com/series12d.htm"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO 324 (A324A, C324A) размеры 162–412",
+      "kind": "трёхвинтовой насос большой подачи",
+      "segment": "насос",
+      "rating": "роторы 162–412",
+      "status": "выпускается (сервисные книги 2021)",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO 8L-400, 462, 630",
+      "kind": "трёхвинтовой насос большой подачи",
+      "segment": "насос",
+      "rating": "роторы 400–630",
+      "status": "выпускается (сервисная книга есть)",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO H/G323FXFSX-500/800 (323F-550, 630, 800)",
+      "kind": "трёхвинтовой насос большой подачи с картриджным уплотнением",
+      "segment": "насос",
+      "rating": "роторы 500–800",
+      "status": "выпускается (сервисная книга 10.2021)",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00088.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO 4T/6T, 4U/6U (118–250)",
+      "kind": "трёхвинтовой насос",
+      "segment": "насос",
+      "rating": "роторы 118–250",
+      "status": "выпускается",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO AB ACE / LPE",
+      "kind": "трёхвинтовой насос низкого давления (масло смазки, топливо)",
+      "segment": "насос",
+      "rating": "10–180 л/мин, до 16 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-ab/low-pressure-line"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO AB ACG / UCG",
+      "kind": "трёхвинтовой насос низкого давления (смазка турбин, редукторов, дизелей)",
+      "segment": "насос",
+      "rating": "80–1200 л/мин, до 16 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-ab/low-pressure-line",
+        "https://www.directindustry.com/prod/imo-ab/product-5783-410379.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO AB ACF / UCF",
+      "kind": "трёхвинтовой насос низкого давления",
+      "segment": "насос",
+      "rating": "310–2900 л/мин, до 16 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-ab/low-pressure-line"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO AB ACD / LPD",
+      "kind": "трёхвинтовой насос низкого давления",
+      "segment": "насос",
+      "rating": "ACD 10–42 л/мин, 12 бар; LPD 2–20 л/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-ab/low-pressure-line"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IMO AB LPQ",
+      "kind": "трёхвинтовой насос низкого давления, проходного исполнения",
+      "segment": "насос",
+      "rating": "1450–8100 л/мин, до 13 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-ab/low-pressure-line"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "General Installation, Operation, Maintenance and Troubleshooting Manual for Three Screw and CIG Series Pumps",
+      "doc_no": "SRM00046",
+      "machine": "все трёхвинтовые IMO Pump",
+      "kind": "O&M",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00046.pdf"
+      ]
+    },
+    {
+      "title": "Instruction Manual and Parts List for 3E Series Pumps, Rotor Sizes 87, 87P and 95 (Rev. 08, Dec 2019)",
+      "doc_no": "SRM00016",
+      "machine": "3E-87/95",
+      "kind": "service manual + parts list",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00016.pdf"
+      ]
+    },
+    {
+      "title": "Instruction Manual and Parts List for 3E Series Pumps, Rotor Sizes 118 and 118P (Rev. 06, Feb 2020)",
+      "doc_no": "SRM00017",
+      "machine": "3E-118",
+      "kind": "service manual + parts list",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00017.pdf"
+      ]
+    },
+    {
+      "title": "Product Service Manual and Parts List for 3E Series Pumps, Rotor Sizes 143, 143J and 162 (Rev. 04, Feb 2020)",
+      "doc_no": "SRM00018",
+      "machine": "3E-143/162",
+      "kind": "service manual + parts list",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00018.pdf"
+      ]
+    },
+    {
+      "title": "Product Service Manual for 3E-187/200 Series Pumps (Rev. 08, Feb 2020)",
+      "doc_no": "SRM00019",
+      "machine": "3E-187/200",
+      "kind": "service manual",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00019.pdf"
+      ]
+    },
+    {
+      "title": "Product Service Manual for AA3G Series Pumps Size 95 Through 162",
+      "doc_no": "SRM00020",
+      "machine": "3G-95/118/143/162",
+      "kind": "service manual",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00020.pdf"
+      ]
+    },
+    {
+      "title": "Service manual 3G-187, 200, 250",
+      "doc_no": "SRM00074",
+      "machine": "3G-187/200/250",
+      "kind": "service manual",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ]
+    },
+    {
+      "title": "Instruction Manual and Parts List for A3D Series Pumps (Rev. 16, Feb 2020)",
+      "doc_no": "SRM00038",
+      "machine": "A3D/A3DF-106…400",
+      "kind": "service manual + parts list",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/srm00038.pdf"
+      ]
+    },
+    {
+      "title": "Service manual A12D/B12D/C12D-106…400",
+      "doc_no": "SRM00035",
+      "machine": "12D",
+      "kind": "service manual",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ]
+    },
+    {
+      "title": "Service manual A324A-162…412",
+      "doc_no": "SRM00037",
+      "machine": "A324A",
+      "kind": "service manual",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ]
+    },
+    {
+      "title": "Service manual A6D/B6D/C6D-106…400",
+      "doc_no": "SRM00027",
+      "machine": "6D",
+      "kind": "service manual",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ]
+    },
+    {
+      "title": "Service manual 8L-400, 462",
+      "doc_no": "SRM00031",
+      "machine": "8L-400/462",
+      "kind": "service manual",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals.htm"
+      ]
+    },
+    {
+      "title": "Instruction Manual and Parts List for PG/RG3D-275 Series Pumps (Idler Cup and Hydrostatic Thrust Designs), Rev. 01, Aug 2020",
+      "doc_no": "SRM00081",
+      "machine": "PG/RG3D-275",
+      "kind": "service manual + parts list",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00081.pdf"
+      ]
+    },
+    {
+      "title": "Instruction Manual and Parts List for PG/RG3D_-187, 218, 250 and 312",
+      "doc_no": "SRM00086",
+      "machine": "PG/RG3D-187…312",
+      "kind": "service manual + parts list",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00086.pdf"
+      ]
+    },
+    {
+      "title": "Instruction Manual & Parts List for H/G323FXFSX-500_ & 800_ Pumps with Flowserve Type BX Cartridge Seal (Rev. 01, Oct 2021)",
+      "doc_no": "SRM00088",
+      "machine": "H/G323FXFSX-500/800",
+      "kind": "service manual + parts list",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00088.pdf"
+      ]
+    },
+    {
+      "title": "Imo Pump Parts Database (составы насосов и ремкомплектов по номеру ведомости, обновлено 25.09.2026)",
+      "machine": "все насосы IMO Pump (США)",
+      "kind": "parts catalog (онлайн)",
+      "sources": [
+        "https://www.imo-pump.com/bomsearch.htm",
+        "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3212%2F150&exactmatch=yes"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "3212/150RA",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "малый ремкомплект (уплотнение, подшипник, прокладки, кольца)",
+      "machine": "G3DB/S/C/CS-218",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3212%2F150RA&exactmatch=yes",
+      "quote": "3212/150RA G3DB/S/C/CS-218/D/L MINOR KIT"
+    },
+    {
+      "code": "3212/150R",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "большой ремкомплект",
+      "machine": "G3DB-218",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database, список совпадений по 3212/150 (exactmatch=no), а не ведомость",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3212%2F150&exactmatch=no",
+      "quote": "3212/150R | G3DB-218 MAJOR KIT"
+    },
+    {
+      "code": "DSC218AF",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведущий ротор (power rotor)",
+      "machine": "G3DB-218 (ведомость 3212/150)",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, IDP 0011",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3212%2F150&exactmatch=yes",
+      "quote": "0011 | 1 ea. | DSC218AF | POWER ROTOR"
+    },
+    {
+      "code": "RSC218AJ",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведомый ротор (idler), 2 шт.",
+      "machine": "G3DB-218 (ведомость 3212/150)",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, IDP 0019",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3212%2F150&exactmatch=yes",
+      "quote": "0019 | 2 ea. | RSC218AJ | IDLER"
+    },
+    {
+      "code": "PP046JHL",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "торцевое уплотнение вала 1.625",
+      "machine": "G3DB-218",
+      "unit": "уплотнение вала",
+      "doc_ref": "Imo Parts Database, IDP 0025",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3212%2F150RA&exactmatch=yes",
+      "quote": "0025 | 1 ea. | PP046JHL | SEAL 1.625 RO RBRBLW"
+    },
+    {
+      "code": "PP047BE/C",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "подшипник",
+      "machine": "G3DB-218",
+      "unit": "подшипниковый узел",
+      "doc_ref": "Imo Parts Database, IDP 0015",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3212%2F150RA&exactmatch=yes",
+      "quote": "0015 | 1 ea. | PP047BE/C | BEARING"
+    },
+    {
+      "code": "PP056SB1-356",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "уплотнительное кольцо",
+      "machine": "G3DB-218",
+      "unit": "корпус",
+      "doc_ref": "Imo Parts Database, IDP 0007",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3212%2F150RA&exactmatch=yes",
+      "quote": "0007 | 1 ea. | PP056SB1-356 | O-RING"
+    },
+    {
+      "code": "3252/650RA",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "малый ремкомплект",
+      "machine": "D3EBS-143/162",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3252%2F650RA&exactmatch=yes",
+      "quote": "3252/650RA D3EBS-143/162 MINOR KIT"
+    },
+    {
+      "code": "3252/650R",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "большой ремкомплект (роторы, корпус, крышка, уплотнение, подшипник)",
+      "machine": "D3EBS-143",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3252%2F650R&exactmatch=yes",
+      "quote": "3252/650R D3EBS-143 MAJOR KIT"
+    },
+    {
+      "code": "DSC143RX4",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведущий ротор в сборе",
+      "machine": "D3EBS-143",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, 3252/650R IDP 0007",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3252%2F650R&exactmatch=yes",
+      "quote": "0007 | 1 ea. | DSC143RX4 | POWER ROTOR SUB-ASSY"
+    },
+    {
+      "code": "RSC143R",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведомый ротор, 2 шт.",
+      "machine": "D3EBS-143",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, 3252/650R IDP 0008",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3252%2F650R&exactmatch=yes",
+      "quote": "0008 | 2 ea. | RSC143R | IDLER ROTOR"
+    },
+    {
+      "code": "PP046JKN",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "торцевое уплотнение вала 1.000",
+      "machine": "3E-143/162 (C3EB, D3EBS)",
+      "unit": "уплотнение вала",
+      "doc_ref": "Imo Parts Database, IDP 0016",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3252%2F650RA&exactmatch=yes",
+      "quote": "0016 | 1 ea. | PP046JKN | SEAL 1.000 RO RBRBLW"
+    },
+    {
+      "code": "PP047BM",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "подшипник",
+      "machine": "3E-143/162",
+      "unit": "подшипниковый узел",
+      "doc_ref": "Imo Parts Database, IDP 0011",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3252%2F650RA&exactmatch=yes",
+      "quote": "0011 | 1 ea. | PP047BM | BEARING"
+    },
+    {
+      "code": "3242/250RA",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "малый ремкомплект",
+      "machine": "C3EB-143/162",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3242%2F250RA&exactmatch=yes",
+      "quote": "3242/250RA C3EB-143/162 MINOR KIT"
+    },
+    {
+      "code": "1000004156",
+      "issuer": "IMO Pump (CIRCOR), по карточке интернет-магазина",
+      "description": "ремкомплект насоса серии 3E, роторы 143, 143J, 162",
+      "machine": "3E-143/162",
+      "unit": "ремкомплект",
+      "source_url": "https://www.plcsource.com/shop/imo-pump-1000004156-pump-repair-kit-series-3e-143-143j-162/",
+      "quote": "IMO PUMP 1000004156 PUMP REPAIR KIT, SERIES 3E, 143, 143J, 162",
+      "doc_ref": "карточка интернет-магазина plcsource; изготовителем не подтверждён"
+    },
+    {
+      "code": "ME3G014X4",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "модуль «эластомеры / малый ремкомплект» (подшипник, уплотнение, дроссельная втулка, кольца)",
+      "machine": "AA3G/NXSSFA143SJ291 (3G-143)",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database, 3535/291RA",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3535%2F291RA&exactmatch=yes",
+      "quote": "ME3G014X4 | ELAS/MINOR KIT MODULE"
+    },
+    {
+      "code": "DSJ143RG",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведущий ротор",
+      "machine": "3G-143 (роторный модуль MR3G015)",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, MR3G015 IDP 0007",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=MR3G015&exactmatch=yes",
+      "quote": "0007 | 1 ea. | DSJ143RG | POWER ROTOR"
+    },
+    {
+      "code": "RSJ143RD",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведомый ротор, 2 шт.",
+      "machine": "3G-143 (MR3G015)",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, MR3G015 IDP 0008",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=MR3G015&exactmatch=yes",
+      "quote": "0008 | 2 ea. | RSJ143RD | IDLER ROTOR"
+    },
+    {
+      "code": "MR3G015",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "роторный модуль (ведущий ротор, два ведомых, шпонка)",
+      "machine": "AA3G/NXSSFA143SJ291",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, 3535/291",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3535%2F291&exactmatch=yes",
+      "quote": "MR3G015 | ROTOR MODULE"
+    },
+    {
+      "code": "PP046KML/CR",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "торцевое уплотнение вала 1.000",
+      "machine": "3G-143 (ME3G014X4)",
+      "unit": "уплотнение вала",
+      "doc_ref": "Imo Parts Database, IDP 0016",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=ME3G014X4&exactmatch=yes",
+      "quote": "0016 | 1 ea. | PP046KML/CR | SEAL 1.000 CR RBRBLW"
+    },
+    {
+      "code": "PP047BMA",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "подшипник",
+      "machine": "3G-143 (ME3G014X4)",
+      "unit": "подшипниковый узел",
+      "doc_ref": "Imo Parts Database, IDP 0011",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=ME3G014X4&exactmatch=yes",
+      "quote": "0011 | 1 ea. | PP047BMA | BEARING"
+    },
+    {
+      "code": "S5307BA",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "дроссельная втулка",
+      "machine": "3G-143 (ME3G014X4)",
+      "unit": "уплотнение вала",
+      "doc_ref": "Imo Parts Database, IDP 0019",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=ME3G014X4&exactmatch=yes",
+      "quote": "0019 | 1 ea. | S5307BA | THROTTLE BUSHING"
+    },
+    {
+      "code": "ME3G002",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "модуль «эластомеры / малый ремкомплект»",
+      "machine": "AA3G/NVPKCA095SP (3G-95)",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database, 3515/005",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3515%2F005&exactmatch=yes",
+      "quote": "ME3G002 | ELAS/MINOR KIT MODULE"
+    },
+    {
+      "code": "DSP95RB",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведущий ротор",
+      "machine": "3G-95 (MR3G003)",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, MR3G003 IDP 0007",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=MR3G003&exactmatch=yes",
+      "quote": "0007 | 1 ea. | DSP95RB | POWER ROTOR"
+    },
+    {
+      "code": "PP046KMJ",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "торцевое уплотнение вала 0.625",
+      "machine": "3G-95 (ME3G002)",
+      "unit": "уплотнение вала",
+      "doc_ref": "Imo Parts Database, IDP 0016",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=ME3G002&exactmatch=yes",
+      "quote": "0016 | 1 ea. | PP046KMJ | SEAL 0.625 RO RBRBLW"
+    },
+    {
+      "code": "3043/101R",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ремкомплект (в базе назван MINOR KIT: прокладки и набивка)",
+      "machine": "A324A-162",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3043%2F101R&exactmatch=yes",
+      "quote": "3043/101R A324A-162 MINOR KIT"
+    },
+    {
+      "code": "3043/101RA",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ремкомплект (в базе назван MAJOR KIT: роторы, корпуса, набивка)",
+      "machine": "A324A-162",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3043%2F101RA&exactmatch=yes",
+      "quote": "3043/101RA A324A-162 MAJOR KIT"
+    },
+    {
+      "code": "DSC162H",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведущий ротор",
+      "machine": "A324A-162",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, 3043/101RA IDP 0013",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3043%2F101RA&exactmatch=yes",
+      "quote": "0013 | 1 ea. | DSC162H | ROTOR POWER"
+    },
+    {
+      "code": "RSC162H",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведомый ротор, 2 шт.",
+      "machine": "A324A-162",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, 3043/101RA IDP 0014",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3043%2F101RA&exactmatch=yes",
+      "quote": "0014 | 2 ea. | RSC162H | IDLER"
+    },
+    {
+      "code": "PP055B-8",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "комплект сальниковой набивки, до 600 °F",
+      "machine": "A324A-162",
+      "unit": "уплотнение вала",
+      "doc_ref": "Imo Parts Database, IDP 0027",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3043%2F101R&exactmatch=yes",
+      "quote": "0027 | 1 ea. | PP055B-8 | PACKING, SET, 600 DEG. F MAX"
+    },
+    {
+      "code": "3201/511RA",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "малый ремкомплект",
+      "machine": "A12DB-106",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3201%2F511RA&exactmatch=yes",
+      "quote": "3201/511RA A12DB-106 MINOR KIT"
+    },
+    {
+      "code": "DSC106DB",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "ведущий ротор в сборе",
+      "machine": "A12DB-106",
+      "unit": "винтовая пара",
+      "doc_ref": "Imo Parts Database, 3201/511R IDP 0063",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3201%2F511R&exactmatch=yes",
+      "quote": "0063 | 1 ea. | DSC106DB | POWER ROTOR SUB-ASSY"
+    },
+    {
+      "code": "PP046JHF",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "торцевое уплотнение вала 1.000",
+      "machine": "A12DB-106",
+      "unit": "уплотнение вала",
+      "doc_ref": "Imo Parts Database, IDP 0025",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3201%2F511RA&exactmatch=yes",
+      "quote": "0025 | 1 ea. | PP046JHF | SEAL 1.000 RO RBRBLW"
+    },
+    {
+      "code": "PP047BB/C",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "подшипник",
+      "machine": "A12DB-106",
+      "unit": "подшипниковый узел",
+      "doc_ref": "Imo Parts Database, IDP 0049",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3201%2F511RA&exactmatch=yes",
+      "quote": "0049 | 1 ea. | PP047BB/C | BEARING"
+    },
+    {
+      "code": "3125/176RA",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "малый ремкомплект",
+      "machine": "A3DBS-156",
+      "unit": "ремкомплект",
+      "doc_ref": "Imo Parts Database",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3125%2F176RA&exactmatch=yes",
+      "quote": "3125/176RA A3DBS-156 MINOR KIT"
+    },
+    {
+      "code": "PP046JH",
+      "issuer": "IMO Pump (CIRCOR)",
+      "description": "торцевое уплотнение вала 1.250",
+      "machine": "A3DBS-156",
+      "unit": "уплотнение вала",
+      "doc_ref": "Imo Parts Database, IDP 0025",
+      "source_url": "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3125%2F176RA&exactmatch=yes",
+      "quote": "0025 | 1 ea. | PP046JH | SEAL 1.250 DS 21/43"
+    },
+    {
+      "code": "190501",
+      "issuer": "IMO AB (Швеция), по складскому списку дилера",
+      "description": "малый ремкомплект (G053) ACE 025",
+      "machine": "IMO AB ACE 025",
+      "unit": "ремкомплект",
+      "doc_ref": "IMO Stock List, Adams International; изготовителем не подтверждён",
+      "source_url": "https://adamsllc.net/static/files/docs/imo.pdf",
+      "quote": "ACE 025X3 XVXX G053 MINOR KIT 190501"
+    },
+    {
+      "code": "190525",
+      "issuer": "IMO AB (Швеция), по складскому списку дилера",
+      "description": "комплект прокладок (G057) ACE 025",
+      "machine": "IMO AB ACE 025",
+      "unit": "ремкомплект",
+      "doc_ref": "IMO Stock List, Adams International; изготовителем не подтверждён",
+      "source_url": "https://adamsllc.net/static/files/docs/imo.pdf",
+      "quote": "ACE 025X3 XVXX G057 JOINT KIT 190525"
+    },
+    {
+      "code": "194030",
+      "issuer": "IMO AB (Швеция), по складскому списку дилера",
+      "description": "уплотнение вала (G050/V) ACE 025–038",
+      "machine": "IMO AB ACE 025–038",
+      "unit": "уплотнение вала",
+      "doc_ref": "IMO Stock List, Adams International; изготовителем не подтверждён",
+      "source_url": "https://adamsllc.net/static/files/docs/imo.pdf",
+      "quote": "ACE 025-038 G050/V SHAFT SEAL 194030"
+    },
+    {
+      "code": "189197",
+      "issuer": "IMO AB (Швеция), по складскому списку дилера",
+      "description": "малый ремкомплект (G053) ACG 045",
+      "machine": "IMO AB ACG 045",
+      "unit": "ремкомплект",
+      "doc_ref": "IMO Stock List, Adams International; изготовителем не подтверждён",
+      "source_url": "https://adamsllc.net/static/files/docs/imo.pdf",
+      "quote": "189197 ACG 045X5 XTXX G053 MINOR KIT"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Flowserve",
+      "component": "картриджное торцевое уплотнение Type BX",
+      "machine": "IMO H/G323FXFSX-500/800",
+      "evidence": "В заголовке сервисной книги SRM00088: «Instruction Manual & Parts List For H/G323FXFSX-500_ & 800_ Pumps With Flowserve Type BX Cartridge Seal»",
+      "sources": [
+        "https://www.imo-pump.com/servicemanuals/SRM00088.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Lovejoy (Timken)",
+      "component": "кулачковые муфты L110, L150, L190, L225, C226 для агрегатов насос–двигатель",
+      "machine": "IMO 3G / 3GR / 2.5GR / 3GRW",
+      "evidence": "Позиции базы составов IMO, например «000KHB00 | CPLG SUB ASSY LOVEJOY L190 3GR», «00NCCJ00 | CPLG LOVEJOY L 110 2/3GX MOT»",
+      "sources": [
+        "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3G"
+      ]
+    },
+    {
+      "company": "Falk (Rexnord / Regal Rexnord)",
+      "component": "муфты Falk 40T10, 50T10, 60T10 для агрегатов насос–двигатель",
+      "machine": "IMO 3G / 3GR / 3GRW",
+      "evidence": "Позиции базы составов IMO, например «000KGZ00 | CPLG SUB ASSY FALK 50T10 3GRW», «00NCDJ00 | CPLG FALK 40T 10 2/3GX MOT143T»",
+      "sources": [
+        "https://www.imo-pump.com/cf/displaybomactive.php?partnumber=3G"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "CIRCOR Shanghai Office",
+      "country": "Китай",
+      "role": "офис изготовителя и дистрибьютор (Allweiler, IMO, Warren, Zenith), промышленность",
+      "sources": [
+        "https://pumps.circor.com/sales-partners/map"
+      ]
+    },
+    {
+      "company": "Marinequip China Co., Ltd.",
+      "country": "Китай",
+      "role": "дистрибьютор Allweiler и IMO, морской рынок",
+      "sources": [
+        "https://pumps.circor.com/sales-partners/map"
+      ]
+    },
+    {
+      "company": "Argus Makine Ekipmani San. Tic. Ltd. Sti.",
+      "country": "Турция",
+      "role": "дистрибьютор Allweiler, IMO и Warren: промышленность, нефть и газ, энергетика",
+      "sources": [
+        "https://pumps.circor.com/sales-partners/map"
+      ]
+    },
+    {
+      "company": "Yakamoz Gemi Malzemeleri Ve Acentalik",
+      "country": "Турция",
+      "role": "дистрибьютор IMO, Allweiler, Warren и Zenith, оборонный сегмент",
+      "sources": [
+        "https://pumps.circor.com/sales-partners/map"
+      ]
+    },
+    {
+      "company": "The Kanoo Group",
+      "country": "ОАЭ",
+      "role": "дистрибьютор Allweiler, IMO и Warren: промышленность, нефть и газ",
+      "sources": [
+        "https://pumps.circor.com/sales-partners/map"
+      ]
+    },
+    {
+      "company": "Goltens Co Ltd. Dubai Branch",
+      "country": "ОАЭ",
+      "role": "дистрибьютор Allweiler и IMO, морской рынок",
+      "sources": [
+        "https://pumps.circor.com/sales-partners/map"
+      ]
+    },
+    {
+      "company": "Yusuf Bin Ahmed Company Ltd",
+      "country": "Саудовская Аравия",
+      "role": "дистрибьютор IMO, Allweiler, Zenith и Warren, нефть и газ",
+      "sources": [
+        "https://pumps.circor.com/sales-partners/map"
+      ]
+    },
+    {
+      "company": "Allweiler India (CIRCOR)",
+      "country": "Индия",
+      "role": "собственное подразделение CIRCOR по насосам в Индии; в 2025 году в него влиты Swelore и Hiro Nisha. Кроме того, на карте около 28 индийских дистрибьюторов, например A TO Z Engineers & Equipments, Aero Tech India, Airways Industrial Systems",
+      "sources": [
+        "https://pumps.circor.com/news-press/press-releases/circor-international-completes-acquisition-swelore",
+        "https://pumps.circor.com/sales-partners/map"
+      ]
+    },
+    {
+      "company": "AMCOR GmbH",
+      "country": "Россия (поставки)",
+      "role": "неофициальный поставщик и сервис насосов IMO (3E, 3G, 3D, 12D, 6D, 12L); статуса официального дилера не заявляет",
+      "sources": [
+        "https://amcor.ru/imo-nasosy"
+      ]
+    },
+    {
+      "company": "Adams International LLC",
+      "country": "США",
+      "role": "складской торговец запчастями IMO AB (открытый складской список); не официальный партнёр",
+      "sources": [
+        "https://adamsllc.net/static/files/docs/imo.pdf"
+      ]
+    }
+  ],
+  "gaps": [
+    "Коды комплектов для конкретных маслоагрегатов ГТУ (GE, Siemens, Solar и другие), где стоит IMO, не найдены. Изготовитель ГТУ перенумеровывает насос своим номером; связь «номер OEM ГТУ → ведомость IMO» лежит в документации пакета ГТУ, в открытом доступе её нет.",
+    "Сервисные книги в формате PDF (SRM00016–00088) дают только позиции деталей, а не коды. Коды берутся из онлайн-базы imo-pump.com/cf/displaybomactive.php по номеру ведомости с шильдика; без номера ведомости (формат 3xxx/yyy) код подобрать нельзя.",
+    "Изготовитель: «Repair parts are only sold as Minor Kits … or Major Kits». Отдельные коды PP046 (уплотнения) и PP047 (подшипники) под своими номерами не продаются, заказывать нужно комплект …RA или …R. Изготовители самих подшипников и торцевых уплотнений (кроме Flowserve BX на 323F) в открытых источниках не названы.",
+    "Каталог запчастей IMO AB (Швеция), вида SP_1207.02_GB, раньше лежал на imo.se/docs/pdf/spares/…; сейчас ссылка ведёт на HTML-страницу. Коды IMO AB взяты только из складского списка дилера: без описания узла сверх G050/G053/G057, с пометкой «по дилеру».",
+    "У пары 3043/101R и 3043/101RA (A324A-162) база изготовителя подписывает MINOR и MAJOR наоборот относительно правила других серий (…RA — малый). Записано как в источнике, требует уточнения у CIRCOR.",
+    "На карте партнёров CIRCOR нет ни одного официального партнёра в России, Казахстане, Узбекистане и Азербайджане. Каналы в РФ — только неофициальные поставщики (AMCOR и другие).",
+    "Прямая цитата со страницы pumps.circor.com о переходе IMO и Houttuin под бренд Allweiler в 2025 году не получена: факт взят из выдачи поиска и должен быть проверен скептиком.",
+    "Цен и сроков поставки ремкомплектов из открытых источников нет, кроме одной карточки NRI Industrial (3E-B rotor repair kit, 1019,55 USD, без номера изготовителя). В коды эта карточка не включена."
+  ],
+  "verifier_notes": "Все 40 кодов найдены на страницах, дословно и с совпадающими номерами позиций (IDP). Страницы базы imo-pump.com открываются через curl. У 3212/150R ссылка источника ведёт на список совпадений (exactmatch=no), а не на ведомость; код в этом списке есть. Коды 190501, 190525, 194030 и 189197 взяты из складского списка дилера Adams, у 1000004156 источник — интернет-магазин plcsource: изготовитель их не подтверждал. Домен imopump.com (без www) отдаёт просроченный сертификат, те же PDF открываются с www.imo-pump.com. Страницы pumps.circor.com через curl дают 406, через WebFetch открываются. LB6D: анонс, по-видимому, 04.2025, а не 04.2024.",
+  "corrections": [
+    "ссылки на домен imopump.com (просроченный сертификат) заменены на www.imo-pump.com — 10 шт., замечание скептика",
+    "LB6D: дата анонса исправлена на 04.2025 — замечание скептика",
+    "3212/150R: в doc_ref отмечено, что источник — список совпадений, а не ведомость (замечание скептика)",
+    "1000004156 и 4 кода IMO AB из складского списка Adams: в doc_ref записано «изготовителем не подтверждён» (замечание скептика)",
+    "summary: «39 кодов» исправлено на 40 — счёт по файлу и по скептику",
+    "машины без характеристики (1) получили rating «данных нет»"
+  ]
+}

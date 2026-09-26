@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 296,
-    "total_bytes": 125454330,
+    "datasets": 299,
+    "total_bytes": 125587996,
     "by_sensitivity": {
-      "внутреннее": 174,
+      "внутреннее": 177,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 32,
+      "дашборд сорсеров": 35,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -3389,7 +3389,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 196307,
+      "bytes": 201727,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -3404,8 +3404,10 @@
         "data/brand_research/drillmec.json",
         "data/brand_research/epiroc.json",
         "data/brand_research/generalelectric.json",
+        "data/brand_research/gilkesclydeunion.json",
         "data/brand_research/grundfos.json",
         "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/imoindustries.json",
         "data/brand_research/inniojenbacher.json",
         "data/brand_research/jichaijinandieselcnpc.json",
         "data/brand_research/mturollsroycepowersystems.json",
@@ -3418,6 +3420,7 @@
         "data/brand_research/siemensdemagdelavalturbomachinery.json",
         "data/brand_research/siemensenergy.json",
         "data/brand_research/solarturbines.json",
+        "data/brand_research/vikingpump.json",
         "data/brand_research/waukeshainnio.json",
         "data/brand_research/wrtsil.json",
         "data/budget_snapshot.json",
@@ -3430,14 +3433,11 @@
         "dict/material.json",
         "dict/model_series.json",
         "dict/node_map.json",
-        "dict/symptom.json",
-        "docs/ПРАВИЛА-ОСТАТКА.md",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json"
+        "dict/symptom.json"
       ],
       "last_change": "2026-09-26",
       "last_author": "Claude",
-      "last_commit": "7878915",
+      "last_commit": "b21a8e3",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7788,8 +7788,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "7878915",
+      "last_author": "skharkov1246",
+      "last_commit": "b19fab4",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8313,8 +8313,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "7878915",
+      "last_author": "skharkov1246",
+      "last_commit": "b19fab4",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8361,8 +8361,8 @@
         ]
       },
       "last_change": "2026-09-26",
-      "last_author": "Claude",
-      "last_commit": "7878915",
+      "last_author": "skharkov1246",
+      "last_commit": "b19fab4",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8722,6 +8722,102 @@
         "gt/public/faults.html",
         "scripts/build_chain_coverage.py"
       ]
+    },
+    {
+      "path": "data/brand_research/imoindustries.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 45996,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): IMO: трёхвинтовые насосы IMO Pump (США; 3D, 3E, 3G, 6D, 12D, 324, 8L, 323F) и IMO AB (Швеция; ACD, ACE, ACF, ACG, LPQ); марка у CIRCOR Pumping Technologies (CIRCOR с 2023 г. у KKR). Машин и исполнений — 17, сервисных документов — 16, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 10, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 6 (поле corrections). 35 кодов — из открытой базы составов imo-pump.com по номеру ведомости насоса (роторы, уплотнения, подшипники, малые …RA и большие …R ремкомплекты), 4 — складской список дилера по IMO AB, 1 — карточка интернет-магазина; запчасти изготовитель продаёт только комплектами. Официальных партнёров CIRCOR в России и СНГ нет. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b21a8e3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/gilkesclydeunion.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 45736,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): ClydeUnion Pumps (Celeros Flow Technology) и Gilkes: насосы API 610 (OH2, OH3/VLK, BB1, BB2, BB3, BB5, VS1, VS6), питательные CUP-FT/FK, поршневые Union; у Gilkes — маслонасосы турбин и насосы охлаждения двигателей. Машин и исполнений — 16, сервисных документов — 6, кодов запчастей — 34: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 2, дилеров и сервисных компаний — 11, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 8 (поле corrections). Открытых каталогов запчастей изготовителя нет: 28 кодов — реестр NSN по CAGE 61748 (Clyde Union Inc), к модели насоса не привязаны; 5 — карточки продавца неоригинальных деталей Industrial Pump Parts; 1 — номер Cummins на насос Gilkes. Сайт celerosft.com закрыт для автоматического чтения (403), часть моделей подтверждена выдачей поиска. Официального дистрибьютора в России и СНГ нет, только перепродавцы под заказ. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 34,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b21a8e3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "gidromet/data/scenarii.json",
@@ -9344,6 +9440,53 @@
       ]
     },
     {
+      "path": "data/brand_research/vikingpump.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 36391,
+      "note": "Разведка бренда по открытым источникам (2026-09-26): Viking Pump (IDEX): шестерённые насосы внутреннего зацепления маслосистем — серии 4195/495, 4193/493, 4197, 4227AA, SG, 4124A. Машин и исполнений — 10, сервисных документов — 7, кодов запчастей — 34: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 0, дилеров и сервисных компаний — 7, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 6 (поле corrections). Коды — ремкомплекты 3-464-REBUILD-K и комплекты уплотнений 3-464-SEAL-K по типоразмеру и исполнению крышки у открытых магазинов дистрибьюторов (ShopPumps, Hayes Pump, NRI) и ремонтный инструмент из TSM 144. На каком пакете ГТУ стоит насос Viking и под каким номером упаковщика — не найдено; связь HJ495 с рамами Ariel не подтверждена. Субпоставщики не названы. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 34,
+        "record_keys": [
+          "code",
+          "description",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-26",
+      "last_author": "Claude",
+      "last_commit": "b21a8e3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "ove/data/disc_c.json",
       "subproject": "ОВЭ-75",
       "bytes": 35757,
@@ -9550,8 +9693,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 32731,
-      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 25, в очереди — 35. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 32854,
+      "note": "Очередь разведки брендов (обновлена 2026-09-26): 60 брендов из dict/oem.json, сделано — 28, в очереди — 32. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -9581,7 +9724,7 @@
       },
       "last_change": "2026-09-26",
       "last_author": "Claude",
-      "last_commit": "7878915",
+      "last_commit": "b21a8e3",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",

@@ -1,0 +1,722 @@
+{
+  "oem_key": "gilkesclydeunion",
+  "name": "ClydeUnion Pumps (Celeros Flow Technology) / Gilkes",
+  "segment_focus": "насосы API 610 и питательные: номера уплотнений и подшипников; сервис",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "ClydeUnion Pumps — бренд Celeros Flow Technology (ранее SPX Flow). В него вошли G&J Weir (Глазго), Union Pump (Battle Creek, США) и Clyde Pumps. Линейка по API 610: OH2, OH3 (VLK/VLK-BB), BB1, BB2/BB2T, BB3, BB5, BB5HP, BB5-V, VS1, VS6, а также питательные насосы CUP-FT (корпус на стяжных шпильках) и CUP-FK (двойной корпус), по данным изготовителя их установлено свыше 500 и поршневые насосы (TX, TD, QD). Открытых каталогов запчастей изготовителя нет. Коды взяты из трёх источников: карточки канадского продавца неоригинальных деталей Industrial Pump Parts (валы VLK/HHS/UNICHEM, седло клапана TD-60), реестр NSN по CAGE 61748 Clyde Union Inc (уплотнения, наборы для торцевых уплотнений, подшипники, гильзы вала, кольца щелевого уплотнения, седла клапанов, набивка — в основном поршневые насосы, машина на странице не названа) и страница Cummins/Gilkes. В открытых брошюрах BB2 и BB5 названы комплектующие: изоляторы подшипников INPRO стоят в стандартной комплектации, на VLK-BB и HHS применены изоляторы Isomag; упругие мембранные муфты, торцевые уплотнения по API 682. Gilkes (Gilbert Gilkes & Gordon, Великобритания) — отдельная компания: насосы охлаждения двигателей и маслонасосы паровых и газовых турбин (GE Frame 7). Официальные сервисные центры ClydeUnion: Дубай, Абу-Даби, Саудовская Аравия, Газиабад (Индия), Шанхай (Китай). В России найдены только перепродавцы.",
+  "machines": [
+    {
+      "model": "CUP-BB5",
+      "kind": "многоступенчатый насос с радиальным разъёмом, двойной корпус (BB5), API 610",
+      "segment": "насос",
+      "rating": "до 2 800 м3/ч, напор до 4 100 м, свыше 425 °C; 100 бар стандартно, до 300 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-bb5-v",
+        "https://www.johnbrooks.ca/hubfs/JohnBrooks/Resources/ClydeUnion-BB5-Pump-Brochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CUP-BB5HP",
+      "kind": "многоступенчатый секционный насос высокого давления с двойным корпусом, API 610/682",
+      "segment": "насос",
+      "rating": "исполнение под заказ; колёса в ряд или встречно",
+      "status": "выпускается (подтверждено выдачей поиска: celerosft.com отдаёт 403)",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-bb5-hp"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CUP-BB5-V",
+      "kind": "многоступенчатый насос BB5, API 610 (питательная вода, закачка воды, горячие нефтепродукты)",
+      "segment": "насос",
+      "status": "выпускается (подтверждено выдачей поиска: celerosft.com отдаёт 403)",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-bb5-v"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "CUP-FT / CUP-FK",
+      "kind": "питательный насос котла с выемным картриджем: у CUP-FT корпус на стяжных шпильках (throughbolt), двойной корпус — у CUP-FK (в т.ч. пусковой питательный насос АЭС)",
+      "segment": "насос",
+      "rating": "высокие давление, температура и частота вращения; свыше 500 шт. установлено с 2000 г.",
+      "status": "выпускается",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/nuclear-startup-feed-pump",
+        "https://impeller.net/magazin/spx-clydeunion-cup-ft-fk-feed-pumps-delivers-reliability-and-high-performance/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CUP-BB3",
+      "kind": "многоступенчатый насос с осевым разъёмом корпуса (BB3), API 610/682",
+      "segment": "насос",
+      "rating": "напор до 2 000 м, давление до 260 бар (по данным третьих сайтов, скептиком не проверено)",
+      "status": "выпускается (подтверждено выдачей поиска: celerosft.com отдаёт 403)",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-bb3"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CUP-BB2 / CUP-BB2T",
+      "kind": "одно-/двухступенчатый насос с радиальным разъёмом, между опорами (BB2), API 610",
+      "segment": "насос",
+      "rating": "BB2 до 3 500 м3/ч и 450 м; BB2T до 1 600 м3/ч и 700 м; до 427 °C; до 6,75 МВт с подшипниками скольжения и упорными с качающимися колодками",
+      "status": "выпускается",
+      "sources": [
+        "https://www.johnbrooks.ca/hubfs/JohnBrooks/Resources/ClydeUnion-CUP-BB2-Brochure.pdf",
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-bb2"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CUP-BB1",
+      "kind": "одно-/двухступенчатый насос с осевым разъёмом, между опорами (BB1), API 610/682",
+      "segment": "насос",
+      "status": "выпускается (подтверждено выдачей поиска: celerosft.com отдаёт 403)",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-bb1"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "CUP-OH2",
+      "kind": "одноступенчатый консольный насос с торцевым входом (OH2), API 610",
+      "segment": "насос",
+      "status": "выпускается (подтверждено выдачей поиска: celerosft.com отдаёт 403)",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-oh2"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "HHS",
+      "kind": "одноступенчатый консольный насос OH2 по API 610 (наследная модель Union Pump)",
+      "segment": "насос",
+      "status": "наследная модель (статус не подтверждён)",
+      "sources": [
+        "https://isomag.com/news/clyde-union-hhs-api-pump-sealed-with-isomag-bearing-isolators",
+        "https://www.industrialpumpparts.com/products/clyde-union-pump-shaft-part-820-d9016200"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "VLK / VLK-BB (CUP-OH3)",
+      "kind": "одноступенчатый вертикальный линейный насос (OH3), API 610",
+      "segment": "насос",
+      "rating": "типоразмеры 1.5x2x10B … 10x10x15B, фланцы 300 lb RF",
+      "status": "выпускается как CUP-OH3",
+      "sources": [
+        "https://www.industrialpumprepair.ca/resource-files/centrifugal-pumps/ClydeUnion_VLK_Technical_Manual_BW.pdf",
+        "https://isomag.com/news/clyde-union-vlk-bb-api-pump-sealed-with-isomag-bearing-isolators"
+      ],
+      "verified": true
+    },
+    {
+      "model": "UNICHEM",
+      "kind": "химический консольный насос (наследная модель Union Pump)",
+      "segment": "насос",
+      "status": "наследная модель",
+      "sources": [
+        "https://www.industrialpumpparts.com/collections/pump-parts/products/pump-shaft-for-unichem-pumps-with-mechanical-seal"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "CUP-VS1",
+      "kind": "вертикальный многоступенчатый турбинный насос (VS1), API 610/682",
+      "segment": "насос",
+      "status": "выпускается (подтверждено выдачей поиска: celerosft.com отдаёт 403)",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-vs1"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "CUP-VS6",
+      "kind": "вертикальный многоступенчатый насос с двойным корпусом (VS6), API 610/682",
+      "segment": "насос",
+      "status": "выпускается (подтверждено выдачей поиска: celerosft.com отдаёт 403)",
+      "sources": [
+        "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-vs6"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    },
+    {
+      "model": "TD-60 / TX10",
+      "kind": "поршневой трёхплунжерный насос (Union)",
+      "segment": "насос",
+      "rating": "TX10 1-5/8 X 2-1/4; TD-60 1-3/4 X 3",
+      "status": "наследная модель",
+      "sources": [
+        "https://www.industrialpumpparts.com/collections/pump-parts/products/triplex-pump-seat-valve-suction-discharge-322-b0808700f21501",
+        "https://aerobasegroup.com/cage-code/61748/page/4/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Gilkes: маслонасосы паровых и газовых турбин (MOP, BPT)",
+      "kind": "главные и резервные маслонасосы, насос-бустер BPT для паровых турбин свыше 120 МВт",
+      "segment": "ГТУ",
+      "rating": "маслоблоки для GE Frame 7",
+      "status": "выпускается",
+      "sources": [
+        "https://www.gilkes.com/lubricating-oil-pumps/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Gilkes: насосы охлаждения двигателей",
+      "kind": "насосы рубашки охлаждения, забортной воды и двухконтурные насосы для дизелей и газопоршневых двигателей",
+      "segment": "ГПУ",
+      "status": "выпускается",
+      "sources": [
+        "https://www.gilkes.com/engine-cooling-pumps/",
+        "https://www.gilkes.com/engine-cooling-pumps/pump-applications/"
+      ],
+      "verified": true,
+      "rating": "данных нет"
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Model VLK Product Manual — Single Stage Vertical In-Line Centrifugal Pumps, API 610 (в т.ч. Cross Sectional Details, чертёж SEC-E0142015, перечень позиций 800–870)",
+      "doc_no": "VLK-0000 (разделы VLK-0020, VLK-0040, VLK-0080, VLK-0140), 25.10.2007",
+      "machine": "VLK",
+      "kind": "product manual / каталог разрезов и материалов",
+      "sources": [
+        "https://www.industrialpumprepair.ca/resource-files/centrifugal-pumps/ClydeUnion_VLK_Technical_Manual_BW.pdf"
+      ]
+    },
+    {
+      "title": "ClydeUnion VLK Installation, Operation & Maintenance Manual",
+      "machine": "VLK",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/457190728/ClydeUnion-VLK-Installation-Operation-Maintenance-Manual"
+      ]
+    },
+    {
+      "title": "ClydeUnion Operation Manual — M-Pump B/B, многоступенчатый насос (монтаж, центровка, пуск, ТО)",
+      "machine": "многоступенчатый насос между опорами (M-Pump)",
+      "kind": "O&M",
+      "sources": [
+        "https://www.scribd.com/document/345221324/Clydeunion-Operation-Manual"
+      ]
+    },
+    {
+      "title": "CUP-BB5 Heavy Duty, Radially Split, Multi-Stage Pumps — брошюра (подшипники, уплотнения, муфты)",
+      "machine": "CUP-BB5",
+      "kind": "брошюра / технические данные",
+      "sources": [
+        "https://www.johnbrooks.ca/hubfs/JohnBrooks/Resources/ClydeUnion-BB5-Pump-Brochure.pdf"
+      ]
+    },
+    {
+      "title": "CUP-BB2 / CUP-BB2T Heavy Duty, Radially Split, Single & Two Stage Pumps — брошюра",
+      "machine": "CUP-BB2 / BB2T",
+      "kind": "брошюра / технические данные",
+      "sources": [
+        "https://www.johnbrooks.ca/hubfs/JohnBrooks/Resources/ClydeUnion-CUP-BB2-Brochure.pdf"
+      ]
+    },
+    {
+      "title": "Reciprocating Pumps — каталог Celeros",
+      "machine": "поршневые насосы ClydeUnion",
+      "kind": "каталог",
+      "sources": [
+        "https://pdf.directindustry.com/pdf/celeros/reciprocating-pumps/102999-1056794.html"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "820-E0369503",
+      "issuer": "ClydeUnion (номер указан продавцом неоригинальных деталей Industrial Pump Parts)",
+      "description": "вал насоса",
+      "machine": "VLK-BB 2x2x10, 2x3x10, 3X410, 4X6X10",
+      "unit": "ротор",
+      "source_url": "https://www.industrialpumpparts.com/collections/pump-parts/products/pump-shaft-for-vlk-bb-2x2x10-2x3x10-3x410-4x6x10",
+      "quote": "Pump shaft, Clyde Union For VLK-BB 2x2x10, 2x3x10, 3X410, 4X6X10 820-E0369503 Aftermarket Pump Parts",
+      "doc_ref": "карточка продавца неоригинальных деталей Industrial Pump Parts; изготовителем номер не подтверждён"
+    },
+    {
+      "code": "820C90589",
+      "issuer": "ClydeUnion (номер указан продавцом неоригинальных деталей Industrial Pump Parts)",
+      "description": "вал насоса",
+      "machine": "VLK 4X410B, 6X6X10",
+      "unit": "ротор",
+      "source_url": "https://www.industrialpumpparts.com/collections/pump-parts/products/pump-shaft-for-vlk-4x410b-and-6x6x10",
+      "quote": "Pump shaft, Clyde Union For VLK 4X410B and 6X6X10 820C90589 Aftermarket Pump Parts",
+      "doc_ref": "карточка продавца неоригинальных деталей Industrial Pump Parts; изготовителем номер не подтверждён"
+    },
+    {
+      "code": "820-D9016200",
+      "issuer": "ClydeUnion (номер указан продавцом неоригинальных деталей Industrial Pump Parts)",
+      "description": "вал насоса",
+      "machine": "HHS",
+      "unit": "ротор",
+      "source_url": "https://www.industrialpumpparts.com/products/clyde-union-pump-shaft-part-820-d9016200",
+      "quote": "Pump shaft, Clyde Union For HHS pumps 820-D9016200 Aftermarket Pump Parts",
+      "doc_ref": "карточка продавца неоригинальных деталей Industrial Pump Parts; изготовителем номер не подтверждён"
+    },
+    {
+      "code": "820-A02016",
+      "issuer": "ClydeUnion (номер указан продавцом неоригинальных деталей Industrial Pump Parts)",
+      "description": "вал насоса под торцевое уплотнение",
+      "machine": "UNICHEM",
+      "unit": "ротор / узел уплотнения",
+      "source_url": "https://www.industrialpumpparts.com/collections/pump-parts/products/pump-shaft-for-unichem-pumps-with-mechanical-seal",
+      "quote": "Pump shaft, Clyde Union For UNICHEM pumps with mechanical seal 820-A02016 Aftermarket Pump Parts",
+      "doc_ref": "карточка продавца неоригинальных деталей Industrial Pump Parts; изготовителем номер не подтверждён"
+    },
+    {
+      "code": "322-B0808700F21501",
+      "issuer": "ClydeUnion (номер указан продавцом неоригинальных деталей Industrial Pump Parts)",
+      "description": "седло клапана всасывания и нагнетания",
+      "machine": "TD-60",
+      "unit": "гидравлическая часть, клапаны",
+      "source_url": "https://www.industrialpumpparts.com/collections/pump-parts/products/triplex-pump-seat-valve-suction-discharge-322-b0808700f21501",
+      "quote": "Clyde Union Triplex Pump Seat Valve -Suction/ Discharge TD-60 1-5/8\" X 3\" Clyde Union Pump Model TD-60 (1-3/4 X 3) Part #322-B0808700F21501",
+      "doc_ref": "карточка продавца неоригинальных деталей Industrial Pump Parts; изготовителем номер не подтверждён"
+    },
+    {
+      "code": "94111000127",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "уплотнение в обойме (plain encased seal)",
+      "machine": "не указана (реестр NSN)",
+      "unit": "уплотнения",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 94111000127 seal NSN: 5330-01-356-2436 plain encased seal",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "94111000103",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "уплотнение (plain seal)",
+      "machine": "не указана (реестр NSN)",
+      "unit": "уплотнения",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 94111000103 seal NSN: 5330-01-425-9936 plain seal",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "9300W000170",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "ремкомплект торцевого уплотнения",
+      "machine": "не указана (реестр NSN)",
+      "unit": "торцевое уплотнение",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 9300W000170 kit NSN: 5330-01-356-2511 mecha seal replacement parts kit",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "111327",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "ремкомплект торцевого уплотнения",
+      "machine": "не указана (реестр NSN)",
+      "unit": "торцевое уплотнение",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 111327 kit NSN: 5330-01-356-5089 mecha seal replacement parts kit",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "9422W000104",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "пружинное уплотнение вала в сборе",
+      "machine": "не указана (реестр NSN)",
+      "unit": "уплотнение вала",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/2/",
+      "quote": "Part Number: 9422W000104 assembly NSN: 4320-01-091-3863 spring loade shaft seal assembly",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 2; к модели насоса не привязан"
+    },
+    {
+      "code": "111329",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "набор формованных уплотнений (preformed packing assortment)",
+      "machine": "не указана (реестр NSN)",
+      "unit": "уплотнения",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 111329 assortment NSN: 5330-01-356-5081 preformed packing assortment",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "007520",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "набивка плунжера",
+      "machine": "поршневой насос (не указан)",
+      "unit": "сальник плунжера",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/2/",
+      "quote": "Part Number: 007520 packing NSN: 5330-01-355-2231 plunger packing",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 2; к модели насоса не привязан"
+    },
+    {
+      "code": "9301-568-023",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "формованное уплотнение (preformed packing)",
+      "machine": "не указана (реестр NSN)",
+      "unit": "уплотнения",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/2/",
+      "quote": "Part Number: 9301-568-023 packing NSN: 5330-01-046-8005 preformed packing",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 2; к модели насоса не привязан"
+    },
+    {
+      "code": "338B0839302B22300",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "держатель набивки",
+      "machine": "не указана (реестр NSN)",
+      "unit": "сальник",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 338B0839302B22300 retainer NSN: 5330-01-425-9940 packing retainer",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "9610BECA041",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "конический роликовый подшипник",
+      "machine": "не указана (реестр NSN; на той же странице TX10)",
+      "unit": "подшипники",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 9610BECA041 bearing NSN: 3110-01-426-9722 tapered roller bearing",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "9610CECA001",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "наружное кольцо конического роликового подшипника",
+      "machine": "не указана (реестр NSN)",
+      "unit": "подшипники",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/1/",
+      "quote": "Part Number: 9610CECA001 cup NSN: 3110-00-100-0570 tapered roller bearing cup",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 1; к модели насоса не привязан"
+    },
+    {
+      "code": "96103ECA041",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "внутреннее кольцо с роликами конического подшипника",
+      "machine": "не указана (реестр NSN)",
+      "unit": "подшипники",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/1/",
+      "quote": "Part Number: 96103ECA041 rollers NSN: 3110-00-100-3568 tapered roller cone and rollers",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 1; к модели насоса не привязан"
+    },
+    {
+      "code": "116B0829900R15600",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "подшипник скольжения",
+      "machine": "не указана (реестр NSN)",
+      "unit": "подшипники",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 116B0829900R15600 bearing NSN: 3120-01-426-9924 sleeve bearing",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "116B1107300R15300",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "половина вкладыша подшипника скольжения",
+      "machine": "не указана (реестр NSN)",
+      "unit": "подшипники",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 116B1107300R15300 half NSN: 3120-01-356-5076 sleeve bearing half",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "V-6-823B-1-A",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "защитная гильза вала",
+      "machine": "центробежный насос (не указан)",
+      "unit": "уплотнение вала",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: V-6-823B-1-A sleeve NSN: 4320-01-377-7974 pump shaft sleeve",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "V-6-823B-1-B",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "защитная гильза вала",
+      "machine": "центробежный насос (не указан)",
+      "unit": "уплотнение вала",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: V-6-823B-1-B sleeve NSN: 4320-01-377-7973 pump shaft sleeve",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "V-8-806-1/2-8",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "корпусное кольцо щелевого уплотнения",
+      "machine": "центробежный насос (не указан)",
+      "unit": "проточная часть",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: V-8-806-1/2-8 casing NSN: 4320-01-378-4444 wearing ring casing",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "V-8-805-10",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "рабочее колесо",
+      "machine": "центробежный насос (не указан)",
+      "unit": "проточная часть",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: V-8-805-10 impeller NSN: 4320-01-378-9055 pump impeller",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "001314",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "кольцо щелевого уплотнения",
+      "machine": "не указана (реестр NSN)",
+      "unit": "проточная часть",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 001314 ring NSN: 4320-01-426-0276 wearing ring",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "322B0809000F21501",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "седло клапана",
+      "machine": "поршневой насос (на странице рядом TX10)",
+      "unit": "клапаны гидравлической части",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 322B0809000F21501 seat NSN: 4820-01-426-0277 valve seat",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "320B0792300F11505",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "обратный клапан",
+      "machine": "поршневой насос (не указан)",
+      "unit": "клапаны гидравлической части",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 320B0792300F11505 valve NSN: 4820-01-426-0278 check valve",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "9243BA328A7",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "седло клапана",
+      "machine": "не указана (реестр NSN)",
+      "unit": "клапаны",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 9243BA328A7 seat NSN: 4820-01-357-9660 valve seat",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "92432A328A4",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "ремкомплект клапана",
+      "machine": "не указана (реестр NSN)",
+      "unit": "клапаны",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 92432A328A4 kit NSN: 4820-01-357-3467 valve parts kit",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "617A0620002T51000",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "прокладка",
+      "machine": "не указана (реестр NSN)",
+      "unit": "корпус",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 617A0620002T51000 gasket NSN: 5330-01-425-9919 gasket",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "624B0823400U51100",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "прокладка",
+      "machine": "не указана (реестр NSN)",
+      "unit": "корпус",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/4/",
+      "quote": "Part Number: 624B0823400U51100 gasket NSN: 5330-01-425-9920 gasket",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 4; к модели насоса не привязан"
+    },
+    {
+      "code": "52734APC242A",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "горловая втулка",
+      "machine": "не указана (реестр NSN)",
+      "unit": "камера уплотнения",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/1/",
+      "quote": "Part Number: 52734APC242A bushing NSN: 5365-00-035-7399 throat bushing",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 1; к модели насоса не привязан"
+    },
+    {
+      "code": "9514B1D0000",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "сапун",
+      "machine": "не указана (реестр NSN)",
+      "unit": "корпус подшипников / картер",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 9514B1D0000 breather NSN: 3040-01-357-6569 breather",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "9513ECABOBB",
+      "issuer": "Clyde Union Inc (CAGE 61748)",
+      "description": "указатель уровня жидкости",
+      "machine": "не указана (реестр NSN)",
+      "unit": "система смазки",
+      "source_url": "https://aerobasegroup.com/cage-code/61748/page/3/",
+      "quote": "Part Number: 9513ECABOBB indicator NSN: 6680-01-359-4979 liquid sight indicator",
+      "doc_ref": "реестр NSN по CAGE 61748 (aerobasegroup), стр. 3; к модели насоса не привязан"
+    },
+    {
+      "code": "4085944",
+      "issuer": "Cummins (номер Cummins на насос изготовления Gilkes)",
+      "description": "вспомогательный насос забортной воды Cummins Gilkes 120275",
+      "machine": "двигатель Cummins (модель не указана)",
+      "unit": "система охлаждения двигателя",
+      "source_url": "https://gpsenginespares.com/product/cummins-gilkes-120275-sea-water-pump-part-number-4085944-3647642-4352241/",
+      "quote": "CUMMINS GILKES 120275 SEA WATER PUMP; PART NUMBER: 4085944; 3647642; 4352241",
+      "doc_ref": "карточка продавца gpsenginespares (неавторизованный продавец); изготовителем номер не подтверждён"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Inpro/Seal (INPRO)",
+      "component": "изоляторы подшипников (масляные уплотнения корпуса подшипников)",
+      "machine": "CUP-BB2, CUP-BB5",
+      "evidence": "в брошюрах изготовителя: «INPRO™ bearing isolators throughout» (BB2) и «INPRO™ oil seals fitted as standard» (BB5)",
+      "sources": [
+        "https://www.johnbrooks.ca/hubfs/JohnBrooks/Resources/ClydeUnion-CUP-BB2-Brochure.pdf",
+        "https://www.johnbrooks.ca/hubfs/JohnBrooks/Resources/ClydeUnion-BB5-Pump-Brochure.pdf"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Isomag",
+      "component": "магнитные изоляторы подшипников",
+      "machine": "VLK-BB (CUP-OH3), HHS (OH2)",
+      "evidence": "описания применения на сайте Isomag: с 2015 г. Clyde Union ставит изоляторы Isomag на VLK-BB; ими дооснащён HHS на НПЗ Suncor",
+      "sources": [
+        "https://isomag.com/news/clyde-union-vlk-bb-api-pump-sealed-with-isomag-bearing-isolators",
+        "https://isomag.com/news/clyde-union-hhs-api-pump-sealed-with-isomag-bearing-isolators"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Celeros Flow Technology — сервисный центр Дубай",
+      "country": "ОАЭ",
+      "role": "официальный сервис и запчасти ClydeUnion Pumps (изготовитель)",
+      "sources": [
+        "https://www.celerosft.com/en-us/locations/dubai-uae"
+      ]
+    },
+    {
+      "company": "Celeros Flow Technology — сервисный центр Абу-Даби",
+      "country": "ОАЭ",
+      "role": "официальный сервисный центр ClydeUnion Pumps",
+      "sources": [
+        "https://www.celerosft.com/en-us/locations/abu-dhabi"
+      ]
+    },
+    {
+      "company": "Celeros Flow Technology — Саудовская Аравия",
+      "country": "Саудовская Аравия",
+      "role": "официальная площадка ClydeUnion Pumps",
+      "sources": [
+        "https://www.celerosft.com/en-us/locations/saudi-arabia"
+      ]
+    },
+    {
+      "company": "Celeros Flow Technology — Газиабад",
+      "country": "Индия",
+      "role": "официальная площадка ClydeUnion Pumps",
+      "sources": [
+        "https://www.celerosft.com/en-us/locations/ghaziabad"
+      ]
+    },
+    {
+      "company": "Celeros Flow Technology — Шанхай",
+      "country": "Китай",
+      "role": "официальный офис ClydeUnion Pumps (по результатам поиска; страница площадки не открылась)",
+      "sources": [
+        "https://www.celerosft.com/en-us/locations"
+      ]
+    },
+    {
+      "company": "John Brooks Company",
+      "country": "Канада",
+      "role": "дистрибьютор; на его сайте лежат брошюры ClydeUnion",
+      "sources": [
+        "https://www.johnbrooks.ca/hubfs/JohnBrooks/Resources/ClydeUnion-BB5-Pump-Brochure.pdf"
+      ]
+    },
+    {
+      "company": "Industrial Pump & Pump Parts (IPP)",
+      "country": "Канада",
+      "role": "изготовитель и продавец неоригинальных запчастей (не официальный дилер)",
+      "sources": [
+        "https://www.industrialpumpparts.com/products/clyde-union-pump-shaft-part-820-d9016200"
+      ]
+    },
+    {
+      "company": "Emnor Mechanical",
+      "country": "Канада",
+      "role": "независимый ремонт насосов ClydeUnion и торцевых уплотнений",
+      "sources": [
+        "https://www.emnor.com/clydeunion-pump-repair"
+      ]
+    },
+    {
+      "company": "Далкос (DALKOS)",
+      "country": "Россия",
+      "role": "перепродавец под заказ («прямые поставки от производителя»); официальный статус не подтверждён",
+      "sources": [
+        "https://dalkos.ru/manufacturers/clydeunion-pumps/"
+      ]
+    },
+    {
+      "company": "Т-Логистик",
+      "country": "Россия",
+      "role": "перепродавец: поставка оборудования и запчастей под заказ; кодов на сайте нет",
+      "sources": [
+        "https://tlogistik.ru/zapchasti/Clyde-Union-Pumps/"
+      ]
+    },
+    {
+      "company": "Gilbert Gilkes & Gordon Ltd",
+      "country": "Великобритания",
+      "role": "изготовитель; запчасти и восстановление насосов охлаждения двигателей",
+      "sources": [
+        "https://www.gilkes.com/engine-cooling-pumps/refurbishment-spare-parts/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Сайт celerosft.com (страницы продуктов, запчастей, площадок) и брошюры на cloudfront отвечают 403 при прямом чтении. Модели и площадки подтверждены только выдачей поиска.",
+    "Открытых каталогов запчастей (parts list) на CUP-BB3/BB5/FT/FK нет. Номера деталей питательных насосов, в том числе торцевых уплотнений и подшипников, лежат в документации конкретного заказа (IOM и перечень запчастей к заводскому номеру) и на закрытом портале Celeros.",
+    "Номера подшипников изготовителей (SKF, FAG и т. п.) и тип или номер картриджного уплотнения (John Crane, Flowserve, EagleBurgmann) для насосов ClydeUnion в открытом доступе не найдены: уплотнение по API 682 подбирается под заказ.",
+    "Коды из реестра NSN (CAGE 61748) на странице к модели насоса не привязаны. Судя по соседним позициям (TX10, плунжеры, крейцкопфы), многие относятся к поршневым насосам Union.",
+    "Кольцо щелевого уплотнения 806A0141800E11500 видно только в заголовке объявления eBay.de, страница закрыта (403). Код не записан.",
+    "Руководства VLK и M-Pump на Scribd и послепродажный каталог ClydeUnion на krodex.com прочитать не удалось: Scribd требует входа, krodex отдаёт HTML вместо PDF.",
+    "Gilkes — отдельная компания (Gilbert Gilkes & Gordon), к ClydeUnion не относится. У неё открыт только номер Cummins на насос забортной воды. Номера деталей насосов охлаждения и маслонасосов турбин (BPT, MOP) — у самой Gilkes.",
+    "Официального дистрибьютора ClydeUnion в России, СНГ и Турции не найдено. Российские поставщики — перепродавцы под заказ."
+  ],
+  "verifier_notes": "Подтверждены все 34 кода. 28 кодов по реестру CAGE 61748 (Clyde Union Inc) совпадают дословно. Кодам 5 шт. с industrialpumpparts и Cummins 4085944 источником служат продавцы неоригинальных и неавторизованных деталей, а не изготовитель. Сайт celerosft.com отдаёт 403 и через curl, и через WebFetch, поэтому модели CUP-BB5HP, BB5-V, BB3, BB1, OH2, VLK-BB, VS1 и VS6 подтверждены по результатам поиска с тех же адресов (заголовки и выдержки), а не по открытой странице. У ссылки impeller.net doc8378x ответ 404, рабочий адрес: https://impeller.net/magazin/spx-clydeunion-cup-ft-fk-feed-pumps-delivers-reliability-and-high-performance/. Нужны правки: у CUP-FT корпус на стяжных шпильках (throughbolt), двойной корпус только у CUP-FK; значения CUP-BB3 (2 000 м, 260 бар) не проверены.",
+  "corrections": [
+    "CUP-FT / CUP-FK: ссылка impeller.net doc8378x (404) заменена рабочим адресом статьи — замечание скептика",
+    "CUP-FT / CUP-FK: «двойной корпус» отнесён только к CUP-FK, у CUP-FT корпус на стяжных шпильках — замечание скептика",
+    "CUP-BB3: характеристика помечена «скептиком не проверено» — страница изготовителя закрыта (403)",
+    "summary: уточнено исполнение корпусов CUP-FT и CUP-FK — замечание скептика",
+    "модели, подтверждённые только выдачей поиска по celerosft.com (403), — 7 шт. — получили оговорку в status (замечание скептика)",
+    "5 кодов Industrial Pump Parts и Cummins 4085944: в doc_ref записано, что источник — продавец, а не изготовитель (замечание скептика)",
+    "Inpro/Seal: verified=false — скептик запись отдельно не сверял (брошюры лежат на сайте дистрибьютора)",
+    "машины без характеристики (8) получили rating «данных нет»"
+  ]
+}

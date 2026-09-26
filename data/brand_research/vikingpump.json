@@ -1,0 +1,581 @@
+{
+  "oem_key": "vikingpump",
+  "name": "Viking Pump, Inc. (подразделение IDEX Corporation, Сидар-Фолс, Айова, США)",
+  "segment_focus": "шестерённые насосы маслосистем: ремкомплекты, номера по модели, применение на пакетах ГТУ",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Viking Pump делает шестерённые насосы внутреннего зацепления (с паразитной шестернёй). В нашем фокусе это насосы маслосистем. Для смазки машин и компрессоров изготовитель прямо указывает серии 4195/495 (чугун, до 580 GPM / 132 м3/ч, 17 бар) и 4193/493 и 4197 (сталь и нержавейка, «compressor lubrication», до 75 GPM). Для нефтегазовых применений по API 676/682 есть серия 4227AA, для смазки также подходит серия SG с прямозубыми шестернями. HJ495 (20 GPM при 1800 об/мин) продаётся как насос смазочного масла; связь его с рамами компрессоров Ariel (номер D292) видна только в заголовке объявления и открытыми источниками не подтверждена. Изготовитель поставляет насосы смазки по OEM для газовых турбин и компрессоров, но это видно только в сниппете поиска страницы vikingpump.com/liquids/lube-oils: сама страница на прямой запрос отдаёт 403, фраза не проверена. Какой пакет ГТУ и какой номер насоса у упаковщика — в открытых источниках не найдено. Коды запчастей по системе Viking: ремкомплекты 3-464-REBUILD-Kxx и комплекты уплотнений 3-464-SEAL-Kxx по типоразмеру и исполнению крышки (с предохранительным клапаном или глухая); торцевые уплотнения 2-47x-xxx; ремонтный инструмент 2-810-xxx и 2-751-xxx по TSM 144. Все коды взяты из открытых магазинов дистрибьюторов (ShopPumps, Hayes Pump, NRI) и из TSM 144 с дословной цитатой. Сервисная документация: TSM 144 (серии 4195/495, выпуск F) в открытом PDF; руководства 1441 и 1341 и сборочный чертёж 493/4193/495/4195/4197 выложены на страницах серий. Пономерной перечень деталей изготовитель отдаёт только по серийному номеру через дистрибьютора и kits.vikingpump.com.",
+  "machines": [
+    {
+      "model": "4195 Series (G4195, GG4195, H4195, HJ4195, HL4195, AS4195, AK4195, AL4195, KE4195, KKE4195, LQE4195, LSE4195, Q4195, QS4195)",
+      "kind": "шестерённый насос внутреннего зацепления, чугун, на лапах; смазочное масло, «rotating equipment lubrication»",
+      "segment": "насос",
+      "rating": "до 580 GPM (132 м3/ч), до 250 psi (17 бар); G4195 8 GPM … QS4195 580 GPM",
+      "status": "выпускается",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4195-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "495 Series (G495, GG495, H495, HJ495, HL495, AS495, AK495, AL495)",
+      "kind": "шестерённый насос внутреннего зацепления, чугун, фланцевое крепление; смазочное масло",
+      "segment": "насос",
+      "rating": "до 115 GPM (26 м3/ч), 250 psi (17 бар), до 1750 об/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.vikingpump.com/pumps/495-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HJ495",
+      "kind": "шестерённый насос внутреннего зацепления, фланцевый (серия 495); продаётся как насос смазочного масла (lube oil pump)",
+      "segment": "насос",
+      "rating": "20 GPM (4,5 м3/ч), 1,5 дюйма, 250 psi",
+      "status": "выпускается",
+      "sources": [
+        "https://www.vikingpump.com/pumps/495-series/HJ495",
+        "https://www.nriparts.com/products/viking-pump-hj495-lube-oil-pump/671877/933212"
+      ],
+      "verified": true
+    },
+    {
+      "model": "AK495",
+      "kind": "масляный насос (продаётся как запчасть к промышленным холодильным компрессорам)",
+      "segment": "компрессор",
+      "rating": "85 GPM (19 м3/ч)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.keepsupply.com/ak495-viking-oil-pump",
+        "https://www.vikingpump.com/pumps/495-series"
+      ],
+      "verified": false
+    },
+    {
+      "model": "4193 Series (GG4193, HJ4193, HL4193, AS4193, AK4193, AL4193)",
+      "kind": "шестерённый насос внутреннего зацепления, сталь, фланцы Class 300; «compressor lubrication, fuels, and lube oils»",
+      "segment": "насос",
+      "rating": "до 75 GPM (17 м3/ч), 250 psi (17 бар)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4193-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "493 Series (GG493, HJ493, HL493, AS493, AK493, AL493)",
+      "kind": "стальной вариант фланцевого исполнения (виден по названиям ремкомплектов)",
+      "segment": "насос",
+      "rating": "по типоразмеру, как у 4193",
+      "status": "не установлено",
+      "sources": [
+        "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4197 Series (GG4197, HJ4197, HL4197, AS4197, AK4197, AL4197)",
+      "kind": "шестерённый насос внутреннего зацепления, нержавеющая сталь; «compressor lubrication, fuels, and lube oils»",
+      "segment": "насос",
+      "rating": "до 75 GPM (17 м3/ч), 200 psi (14 бар)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4197-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4227AA Series",
+      "kind": "шестерённый насос внутреннего зацепления, нержавеющая сталь, картриджные уплотнения по API 682, с оговорками к API 676; для нефти и газа",
+      "segment": "насос",
+      "rating": "до 1 600 GPM (363 м3/ч), 150 psi (10 бар); на странице изготовителя стоят два максимума расхода — 320 и 1 600 GPM",
+      "status": "выпускается",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4227AA-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SG Series (SG-0417 … SG-xxxx)",
+      "kind": "шестерённый насос внешнего зацепления, прямозубый, ковкий чугун; изготовитель рекомендует его для смазочного масла",
+      "segment": "насос",
+      "rating": "до 190 GPM (43 м3/ч), до 500 psi (34 бар)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.vikingpump.com/pumps/SG-series"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4124A Series (G4124A … M4124A)",
+      "kind": "шестерённый насос внутреннего зацепления для тяжёлых условий, чугун",
+      "segment": "насос",
+      "rating": "до 420 GPM (95 м3/ч), 200 psi",
+      "status": "выпускается",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4124A-series"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Technical Service Manual: Heavy-Duty Pumps Series 4195 and 495, Sizes G, GG, H, HJ, HL, AS, AK, AL",
+      "doc_no": "TSM 144, Issue F",
+      "machine": "4195 / 495",
+      "kind": "service manual",
+      "sources": [
+        "https://www.altorfer.com/app/uploads/2022/01/APS2000-Viking-Pump-Technical-Service-Manual-TSM144.pdf"
+      ]
+    },
+    {
+      "title": "Service Manual 1441 и Catalog Section 1441 (495/4195 Series), Flyer Form 1441",
+      "doc_no": "1441",
+      "machine": "495 / 4195",
+      "kind": "service manual",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4195-series"
+      ]
+    },
+    {
+      "title": "Service Manual 1341 и Catalog Section 1341 (493/4193 Series)",
+      "doc_no": "1341",
+      "machine": "493 / 4193",
+      "kind": "service manual",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4193-series"
+      ]
+    },
+    {
+      "title": "Exploded Diagram for Series 493/4193 (Steel), 495/4195 (iron) and 4197 (SS)",
+      "machine": "493/4193, 495/4195, 4197",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4193-series",
+        "https://www.vikingpump.com/pumps/4195-series"
+      ]
+    },
+    {
+      "title": "Service Manual 1707 AA (4227AA Series)",
+      "doc_no": "1707 AA",
+      "machine": "4227AA",
+      "kind": "service manual",
+      "sources": [
+        "https://www.vikingpump.com/pumps/4227AA-series"
+      ]
+    },
+    {
+      "title": "Technical Service Manual TSM 000 (общие указания, предохранительные клапаны) и Engineering Service Bulletin ESB-31 (предохранительные клапаны) — ссылки из TSM 144",
+      "doc_no": "TSM 000; ESB-31",
+      "machine": "все серии",
+      "kind": "бюллетень",
+      "sources": [
+        "https://www.altorfer.com/app/uploads/2022/01/APS2000-Viking-Pump-Technical-Service-Manual-TSM144.pdf"
+      ]
+    },
+    {
+      "title": "TSM 2300 Universal Product Line: Steel Externals, 123C/4123C/223C/4223C; ссылается на Engineering Service Bulletin ESB-515 (смазка)",
+      "doc_no": "TSM 2300, Issue A; ESB-515",
+      "machine": "123C / 4123C / 223C / 4223C",
+      "kind": "O&M",
+      "sources": [
+        "https://www.ifcpump.com/files/product/TSM_2300.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "3-464-REBUILD-K1",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "GG495 / GG4195",
+      "unit": "проточная часть (паразитная шестерня, втулки, крышка, палец)",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K1 Rebuild Kit GG495 GG4195 Relief Valve Head, 3-464-REBUILD-K1"
+    },
+    {
+      "code": "3-464-REBUILD-K2",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "G495 / G4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K2 Rebuild Kit G495 G4195 Relief Valve Head, 3-464-REBUILD-K2"
+    },
+    {
+      "code": "3-464-REBUILD-K3",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, глухая крышка",
+      "machine": "GG495 / GG4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K3 Rebuild Kit GG495 GG4195 Plain Head, 3-464-REBUILD-K3"
+    },
+    {
+      "code": "3-464-REBUILD-K4",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "HJ495 / HJ4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-3-464-REBUILD-K4-Rebuild-Kit-HJ495-4195-Rel-p/3-464-rebuild-k4.htm",
+      "quote": "Viking 3-464-REBUILD-K4 Rebuild Kit HJ495 HJ4195 Relief Valve Head"
+    },
+    {
+      "code": "3-464-REBUILD-K5",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "H495 / H4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K5 Rebuild Kit H495 H4195 Relief Valve Head, 3-464-REBUILD-K5"
+    },
+    {
+      "code": "3-464-REBUILD-K6",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, глухая крышка",
+      "machine": "HJ495 / HJ4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K6 Rebuild Kit HJ495 HJ4195 Plain Head, 3-464-REBUILD-K6"
+    },
+    {
+      "code": "3-464-REBUILD-K7",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект: паразитная шестерня из порошкового металла, втулки из углеграфита, крышка с предохранительным клапаном",
+      "machine": "HL495 / HL4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.nriparts.com/products/viking-pump-3-464-rebuild-k7-pump-parts-and-accessories/687948",
+      "quote": "VIKING PUMP 3-464-REBUILD-K7 HL495 4195 PM OOCG RV HEAD KIT"
+    },
+    {
+      "code": "3-464-REBUILD-K8",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, глухая крышка",
+      "machine": "HL495 / HL4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-3-464-REBUILD-K8-Rebuild-Kit-HL495-4195-Pla-p/3-464-rebuild-k8.htm",
+      "quote": "Viking 3-464-REBUILD-K8 Rebuild Kit HL495 HL4195 Plain Head"
+    },
+    {
+      "code": "3-464-REBUILD-K10",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект",
+      "machine": "AK495 / AK4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K10 Rebuild Kit AK495 AK4195, 3-464-REBUILD-K10"
+    },
+    {
+      "code": "3-464-REBUILD-K11",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект",
+      "machine": "AL495 / AL4195",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K11 Rebuild Kit AL495 AL4195, 3-464-REBUILD-K11"
+    },
+    {
+      "code": "3-464-REBUILD-K12",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "GG493 / GG4193",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K12 Rebuild Kit GG493 GG4193 Relief Valve Head, 3-464-REBUILD-K12"
+    },
+    {
+      "code": "3-464-REBUILD-K13",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, глухая крышка",
+      "machine": "GG493 / GG4193",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K13 Rebuild Kit GG493 GG4193 Plain Head, 3-464-REBUILD-K13"
+    },
+    {
+      "code": "3-464-REBUILD-K14",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "HJ493 / HJ4193",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K14 Rebuild Kit HJ493 HJ4193 Relief Valve Head, 3-464-REBUILD-K14"
+    },
+    {
+      "code": "3-464-REBUILD-K17",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, глухая крышка",
+      "machine": "HL493 / HL4193",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K17 Rebuild Kit HL493 HL4193 Plain Head, 3-464-REBUILD-K17"
+    },
+    {
+      "code": "3-464-REBUILD-K18",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект",
+      "machine": "AS493 / AS4193",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K18 Rebuild Kit AS493 AS4193, 3-464-REBUILD-K18"
+    },
+    {
+      "code": "3-464-REBUILD-K19",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект",
+      "machine": "AK493 / AK4193",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K19 Rebuild Kit AK493 AK4193, 3-464-REBUILD-K19"
+    },
+    {
+      "code": "3-464-REBUILD-K20",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект",
+      "machine": "AL493 / AL4193",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K20 Rebuild Kit AL493 AL4193, 3-464-REBUILD-K20"
+    },
+    {
+      "code": "3-464-REBUILD-K21",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "GG497 / GG4197",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K21 Rebuild Kit GG497 GG4197 Relief Valve Head, 3-464-REBUILD-K21"
+    },
+    {
+      "code": "3-464-REBUILD-K23",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "HJ497 / HJ4197",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K23 Rebuild Kit HJ497 HJ4197 Relief Valve Head, 3-464-REBUILD-K23"
+    },
+    {
+      "code": "3-464-REBUILD-K25",
+      "issuer": "Viking Pump",
+      "description": "ремкомплект, крышка с предохранительным клапаном",
+      "machine": "HL497 / HL4197",
+      "unit": "проточная часть",
+      "source_url": "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm",
+      "quote": "Viking 3-464-REBUILD-K25 Rebuild Kit HL497 HL4197 Relief Valve Head, 3-464-REBUILD-K25"
+    },
+    {
+      "code": "3-464-SEAL-K1",
+      "issuer": "Viking Pump",
+      "description": "комплект уплотнений: торцевое уплотнение 2-473-003 (Buna N), уплотнительное кольцо крышки, прокладка 806 под клапан, детали корпуса подшипника",
+      "machine": "G, GG495 / 4195",
+      "unit": "уплотнение вала",
+      "source_url": "https://shop.hayespump.com/itemdetail/3-464-SEAL-K1",
+      "quote": "ITEM# 3-464-SEAL-K1 IS A GENUINE VIKING PUMP OEM SEAL KIT FOR PUMP MODELS: G – GG495 & 4195, CONTAINING: – 2-473-003 BUNA N SEAL – BUNA N O-RING HEAD GASKET – 806 RELIEF VALVE MOUNTING GASKET – BEARING HOUSING COMPONENTS"
+    },
+    {
+      "code": "2-473-003",
+      "issuer": "Viking Pump",
+      "description": "торцевое уплотнение, Buna N (входит в 3-464-SEAL-K1)",
+      "machine": "G, GG495 / 4195",
+      "unit": "уплотнение вала",
+      "source_url": "https://shop.hayespump.com/itemdetail/3-464-SEAL-K1",
+      "quote": "CONTAINING: – 2-473-003 BUNA N SEAL – BUNA N O-RING HEAD GASKET"
+    },
+    {
+      "code": "3-464-SEAL-K5",
+      "issuer": "Viking Pump",
+      "description": "комплект уплотнений, Buna N: торцевое уплотнение 2-475-001, уплотнительное кольцо крышки, прокладка 806, детали корпуса подшипника",
+      "machine": "H, HJ, HL493 / 4193 / 495 / 4195",
+      "unit": "уплотнение вала",
+      "source_url": "https://shop.hayespump.com/itemdetail/3-464-SEAL-K5",
+      "quote": "ITEM# 3-464-SEAL-K5 IS A GENUINE VIKING PUMP OEM SEAL KIT FOR PUMP MODELS: H – HJ – HL493, 4193, 495 & 4195, CONTAINING: – 2-475-001 BUNA N SEAL"
+    },
+    {
+      "code": "2-475-001",
+      "issuer": "Viking Pump",
+      "description": "торцевое уплотнение, Buna N (входит в 3-464-SEAL-K5)",
+      "machine": "H, HJ, HL493 / 4193 / 495 / 4195",
+      "unit": "уплотнение вала",
+      "source_url": "https://shop.hayespump.com/itemdetail/3-464-SEAL-K5",
+      "quote": "CONTAINING: – 2-475-001 BUNA N SEAL – BUNA N O-RING HEAD GASKET – 806 RELIEF VALVE MOUNTING GASKET"
+    },
+    {
+      "code": "3-464-SEAL-K406",
+      "issuer": "Viking Pump",
+      "description": "комплект уплотнений, FKM: торцевое уплотнение 2-475-267, уплотнительное кольцо крышки, прокладка 806, детали корпуса подшипника",
+      "machine": "H, HJ, HL493 / 4193 / 495 / 4195",
+      "unit": "уплотнение вала",
+      "source_url": "https://shop.hayespump.com/itemdetail/3-464-SEAL-K406",
+      "quote": "ITEM# 3-464-SEAL-K406 IS A GENUINE VIKING PUMP OEM SEAL KIT FOR PUMP MODELS: H – HJ – HL493, 4193, 495 & 4195, CONTAINING: – 2-475-267 FKM SEAL"
+    },
+    {
+      "code": "2-475-267",
+      "issuer": "Viking Pump",
+      "description": "торцевое уплотнение, FKM (входит в 3-464-SEAL-K406)",
+      "machine": "H, HJ, HL493 / 4193 / 495 / 4195",
+      "unit": "уплотнение вала",
+      "source_url": "https://shop.hayespump.com/itemdetail/3-464-SEAL-K406",
+      "quote": "CONTAINING: – 2-475-267 FKM SEAL – FKM O-RING HEAD GASKET – 806 RELIEF VALVE MOUNTING GASKET"
+    },
+    {
+      "code": "2-810-047-999",
+      "issuer": "Viking Pump",
+      "description": "щипцы для стопорных колец, внутренние (ремонтный инструмент)",
+      "machine": "G-GG-H-HJ-HL 4195/495",
+      "unit": "инструмент",
+      "doc_ref": "TSM 144, с. 3, Suggested Repair Tools",
+      "source_url": "https://www.altorfer.com/app/uploads/2022/01/APS2000-Viking-Pump-Technical-Service-Manual-TSM144.pdf",
+      "quote": "INTERNAL – Viking Part No. 2-810-047-999"
+    },
+    {
+      "code": "2-810-029-375",
+      "issuer": "Viking Pump",
+      "description": "щипцы для стопорных колец, наружные (ремонтный инструмент)",
+      "machine": "G-GG-H-HJ-HL 4195/495",
+      "unit": "инструмент",
+      "doc_ref": "TSM 144, с. 3",
+      "source_url": "https://www.altorfer.com/app/uploads/2022/01/APS2000-Viking-Pump-Technical-Service-Manual-TSM144.pdf",
+      "quote": "EXTERNAL – Viking Part No. 2-810-029-375"
+    },
+    {
+      "code": "2-751-001-730",
+      "issuer": "Viking Pump",
+      "description": "монтажная гильза торцевого уплотнения 0,75 дюйма",
+      "machine": "G-GG 4195/495",
+      "unit": "уплотнение вала (инструмент)",
+      "doc_ref": "TSM 144, с. 3",
+      "source_url": "https://www.altorfer.com/app/uploads/2022/01/APS2000-Viking-Pump-Technical-Service-Manual-TSM144.pdf",
+      "quote": "2-751-001-730 for 0.75 inch seal; G-GG 4195-495"
+    },
+    {
+      "code": "2-751-004-730",
+      "issuer": "Viking Pump",
+      "description": "монтажная гильза торцевого уплотнения 1,25 дюйма",
+      "machine": "AS-AL 4195/495",
+      "unit": "уплотнение вала (инструмент)",
+      "doc_ref": "TSM 144, с. 3",
+      "source_url": "https://www.altorfer.com/app/uploads/2022/01/APS2000-Viking-Pump-Technical-Service-Manual-TSM144.pdf",
+      "quote": "2-751-004-730 for 1.25 inch seal; AS-AL 4195-495"
+    },
+    {
+      "code": "2-810-043-375",
+      "issuer": "Viking Pump",
+      "description": "ключ для гайки подшипника",
+      "machine": "4195 / 495",
+      "unit": "подшипниковый узел (инструмент)",
+      "doc_ref": "TSM 144, с. 3",
+      "source_url": "https://www.altorfer.com/app/uploads/2022/01/APS2000-Viking-Pump-Technical-Service-Manual-TSM144.pdf",
+      "quote": "Bearing Locknut Spanner Wrench – 2-810-043-375"
+    },
+    {
+      "code": "2-810-008-375",
+      "issuer": "Viking Pump",
+      "description": "регулируемый штифтовой ключ для крышки корпуса подшипника",
+      "machine": "4195 / 495",
+      "unit": "подшипниковый узел (инструмент)",
+      "doc_ref": "TSM 144, с. 3",
+      "source_url": "https://www.altorfer.com/app/uploads/2022/01/APS2000-Viking-Pump-Technical-Service-Manual-TSM144.pdf",
+      "quote": "housing end cap. – 2-810-008-375"
+    },
+    {
+      "code": "2-055-021-375-00",
+      "issuer": "Viking Pump",
+      "description": "двухрядный радиально-упорный шарикоподшипник (к какой модели — на странице не сказано)",
+      "machine": "не указана",
+      "unit": "подшипниковый узел",
+      "source_url": "https://shop.hayespump.com/brandsupplier/viking-pump-idex",
+      "quote": "VK BALL BEARING, ST Item # 2-055-021-375-00 Brand: VIKING PUMP - IDEX Customer Part Number: A VIKING PUMP DOUBLE ROW ANGULAR CONTACT BALL BEARING"
+    },
+    {
+      "code": "2-477-015-999-00",
+      "issuer": "Viking Pump",
+      "description": "торцевое уплотнение 1,25 дюйма, Buna N",
+      "machine": "AS-AL 4195",
+      "unit": "уплотнение вала",
+      "source_url": "https://shop.hayespump.com/brandsupplier/viking-pump-idex",
+      "quote": "VK SEAL,MECHANICAL 1.25 JC BN AS-AL4195 Item # 2-477-015-999-00 Brand: VIKING PUMP - IDEX Customer Part Number: A VIKING PUMP MECHANICAL SEAL"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [],
+  "dealers": [
+    {
+      "company": "IDEX India Pvt. Ltd. (Viking Pump by IDEX India)",
+      "country": "Индия",
+      "role": "завод и продажи изготовителя (Вадодара); страница Viking для Индии",
+      "sources": [
+        "https://www.vikingpump.com/india",
+        "https://www.idexindia.in/viking-pumps/"
+      ]
+    },
+    {
+      "company": "Hayes Pump, Inc.",
+      "country": "США",
+      "role": "уполномоченный дистрибьютор с запасом на складе, прошёл заводское обучение; открытый интернет-магазин кодов Viking",
+      "sources": [
+        "https://hayespump.com/manufacturers/viking-pump/",
+        "https://shop.hayespump.com/brandsupplier/viking-pump-idex"
+      ]
+    },
+    {
+      "company": "Michael Smith Engineers",
+      "country": "Великобритания",
+      "role": "местный дистрибьютор Viking Pump (так назван в кейсе на сайте изготовителя)",
+      "sources": [
+        "https://www.vikingpump.com/india"
+      ]
+    },
+    {
+      "company": "ShopPumps.com",
+      "country": "США",
+      "role": "интернет-магазин ремкомплектов Viking с ценами и сроками; официальный статус не проверен",
+      "sources": [
+        "https://www.shoppumps.com/Viking-Pump-Rebuild-Kits-s/225.htm"
+      ]
+    },
+    {
+      "company": "NRI Industrial Sales",
+      "country": "США",
+      "role": "перепродавец запчастей и насосов Viking (в том числе насос смазки HJ495); статус не официальный",
+      "sources": [
+        "https://www.nriparts.com/products/viking-pump-hj495-lube-oil-pump/671877/933212"
+      ]
+    },
+    {
+      "company": "Carotek",
+      "country": "США",
+      "role": "дистрибьютор, в каталоге комплекты уплотнений Viking 3-464-SEAL-K*",
+      "sources": [
+        "https://www.carotek.com/Product/Viking-Pump-Parts-And-Repair-Kits"
+      ]
+    },
+    {
+      "company": "Keep Supply (IndustrialRefrigerationParts.com)",
+      "country": "США",
+      "role": "перепродавец масляных насосов и комплектов Viking для холодильных компрессоров",
+      "sources": [
+        "https://www.keepsupply.com/shop-by-products/shop-by-brand/viking-pump"
+      ]
+    }
+  ],
+  "gaps": [
+    "На каком пакете ГТУ (Solar, Siemens, GE, Baker Hughes) стоит насос Viking и под каким номером упаковщика — в открытых источниках не найдено. Что Viking поставляет по OEM насосы смазки для газовых турбин и компрессоров, известно только по сниппету поиска страницы vikingpump.com/liquids/lube-oils: сама страница отдаёт 403, фраза не проверена. Вероятно, это лежит в перечнях запчастей упаковщиков ГТУ (закрытые порталы Solar и прочих).",
+    "Номер Ariel D292 для HJ495 виден только в заголовке объявления eBay/PicClick; страница не открылась, поэтому в коды не внесён. Его надо сверить с руководством на раму Ariel (Ariel Technical Manual, раздел о насосе смазки).",
+    "Пономерной перечень деталей (Parts List) на конкретный насос изготовитель выдаёт только по серийному номеру: kits.vikingpump.com и дистрибьюторы. Номера паразитных шестерён, втулок, пальцев, роторов и клапанов по типоразмеру в открытом виде не найдены, кроме цитат из ремкомплектов.",
+    "Руководства 1441 и 1341 (4195/4193) и сборочный чертёж выложены на vikingpump.com, но при загрузке ботом сайт отдаёт 403, содержимое не прочитано. Копия TSM 144 на keepsupply.com тоже закрыта для бота; прочитана копия altorfer.com.",
+    "Субпоставщики (изготовители торцевых уплотнений, подшипников, редукторов P-drive, двигателей) в открытых источниках не названы. Бренд торцевых уплотнений 2-47x-xxx не установлен.",
+    "Официальных дистрибьюторов Viking в России, Казахстане, Китае, Турции и ОАЭ найти не удалось: международный поиск дистрибьютора на vikingpump.com/contact/stocking-distributor работает формой, а сторонние справочники (reachuae, made-in-china) не подтверждают статус.",
+    "Цены и сроки на ShopPumps (например, 3-464-REBUILD-K4 — 448,40 USD, в наличии 1 шт.) — снимок на 26.09.2026, а не подтверждённое наличие под объём."
+  ],
+  "verifier_notes": "Все 34 кода найдены на источниках дословно (curl, HTTP 200; TSM 144 разобран через pdftotext, инструменты на стр. 3 из 10). Опровергнутых кодов нет. Две правки к записям. 1) 2-477-015-999-00: у hayespump модель указана — «SEAL,MECHANICAL 1.25 JC BN AS-AL4195», это нужно внести в machine. 2) HJ495: связь с Ariel, D292 и компрессором ни одним открытым источником не подтверждается; приписку и сегмент «компрессор» снять. Страница keepsupply AK495 отдаёт 403, сведения по ней взяты из поисковой выдачи. У 4227AA на странице изготовителя два разных максимума расхода (320 и 1 600 GPM); у 4124A по паспорту расход до 420 GPM, а не до 500. Субпоставщиков в разведке нет.",
+  "corrections": [
+    "2-477-015-999-00: machine «не указана» заменено на AS-AL 4195 по строке hayespump «SEAL,MECHANICAL 1.25 JC BN AS-AL4195»; цитата взята целиком, вместе с кодом (прежняя кода не содержала) — замечание скептика",
+    "HJ495: сняты приписка Ariel D292 и сегмент «компрессор» — связь ни одним открытым источником не подтверждена (замечание скептика); номер D292 остался только в gaps",
+    "summary: утверждение о HJ495 на рамах Ariel заменено оговоркой — замечание скептика",
+    "AK495: verified=false — страница keepsupply отдаёт 403, сведения из поисковой выдачи (замечание скептика)",
+    "4227AA: в характеристику внесено расхождение максимумов расхода (320 и 1 600 GPM) на странице изготовителя — замечание скептика",
+    "4124A: максимум расхода исправлен на 420 GPM по паспорту (было «420–500») — замечание скептика"
+  ]
+}

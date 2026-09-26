@@ -4784,6 +4784,235 @@
      "note": "Подтверждено разведкой data/brand_research/drillmec.json. Короткие коды — только рядом с именем бренда."
     }
    ]
+  },
+  {
+   "brand_key": "gilkesclydeunion",
+   "name": "ClydeUnion Pumps",
+   "origin": "западный",
+   "country": "Великобритания",
+   "aliases": [
+    "ClydeUnion",
+    "Clyde Union",
+    "Gilkes",
+    "Union Pump"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "clydeunion-cup",
+     "series": "CUP-BB1/BB2/BB3/BB5, CUP-OH2/OH3, CUP-VS1/VS6, CUP-FT/FK (API 610 и питательные)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "CUP-?(?:BB\\d(?:HP|T|-V)?|OH\\d|VS\\d|F[TK])",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CUP-BB5",
+      "CUP-BB5HP",
+      "CUP-BB2T",
+      "CUP-OH2",
+      "CUP-VS6",
+      "CUP-FK"
+     ],
+     "sources": [
+      "https://www.celerosft.com/en-us/brands/clydeunion-pumps/products/cup-bb5-v",
+      "https://www.johnbrooks.ca/hubfs/JohnBrooks/Resources/ClydeUnion-CUP-BB2-Brochure.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/gilkesclydeunion.json."
+    },
+    {
+     "id": "clydeunion-legacy",
+     "series": "VLK / VLK-BB, HHS, UNICHEM (наследные Union Pump)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "VLK(?:-BB)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "HHS",
+       "context": "бренд"
+      },
+      {
+       "rx": "UNICHEM",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "VLK-BB",
+      "VLK",
+      "HHS",
+      "UNICHEM"
+     ],
+     "sources": [
+      "https://www.industrialpumprepair.ca/resource-files/centrifugal-pumps/ClydeUnion_VLK_Technical_Manual_BW.pdf",
+      "https://isomag.com/news/clyde-union-hhs-api-pump-sealed-with-isomag-bearing-isolators"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/gilkesclydeunion.json."
+    },
+    {
+     "id": "clydeunion-recip",
+     "series": "TD, TX (трёхплунжерные поршневые Union)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "T[DX]-?\\d{2,3}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "TD-60",
+      "TX10"
+     ],
+     "sources": [
+      "https://www.industrialpumpparts.com/collections/pump-parts/products/triplex-pump-seat-valve-suction-discharge-322-b0808700f21501",
+      "https://aerobasegroup.com/cage-code/61748/page/4/"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/gilkesclydeunion.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "vikingpump",
+   "name": "Viking Pump",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Viking Pump",
+    "Viking Pumps"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "viking-495-4195",
+     "series": "495/4195, 493/4193, 497/4197 (шестерённые внутреннего зацепления, маслосистемы)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "(?:G|GG|H|HJ|HL|AS|AK|AL|KE|KKE|LQE|LSE|Q|QS)?(?:41|4)9[357]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HJ495",
+      "4195",
+      "AK4193",
+      "GG4197",
+      "QS4195"
+     ],
+     "sources": [
+      "https://www.vikingpump.com/pumps/4195-series",
+      "https://www.vikingpump.com/pumps/4193-series"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vikingpump.json."
+    },
+    {
+     "id": "viking-heavy",
+     "series": "4227AA, 4124A, SG (нефтегазовые, тяжёлые, внешнего зацепления)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "4227AA",
+       "context": "бренд"
+      },
+      {
+       "rx": "(?:G|H|K|L|M|Q)?4124A",
+       "context": "бренд"
+      },
+      {
+       "rx": "SG-?\\d{4,6}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "4227AA",
+      "M4124A",
+      "SG-0417"
+     ],
+     "sources": [
+      "https://www.vikingpump.com/pumps/4227AA-series",
+      "https://www.vikingpump.com/pumps/4124A-series",
+      "https://www.vikingpump.com/pumps/SG-series"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vikingpump.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "imoindustries",
+   "name": "IMO (винтовые насосы)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "IMO Pump",
+    "IMO Pumps",
+    "IMO AB",
+    "IMO Industries"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "imo-three-screw",
+     "series": "3D, 3E, 3G, 6D, 12D, 8L, 324, 323F, 4T/6T, 4U/6U (трёхвинтовые IMO Pump)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "[A-Z]{0,3}(?:3|6|8|12)[DEGL][A-Z]{0,4}(?:-\\d{2,3})?",
+       "context": "бренд"
+      },
+      {
+       "rx": "[A-C]?324A?(?:-\\d{3})?",
+       "context": "бренд"
+      },
+      {
+       "rx": "[A-Z]?323F[A-Z]*(?:-\\d{3})?",
+       "context": "бренд"
+      },
+      {
+       "rx": "[46][TU]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "AA3G",
+      "D3EBS-143",
+      "A12D",
+      "LB6D",
+      "8L-400",
+      "A324A",
+      "G323FXFSX-500",
+      "6T"
+     ],
+     "sources": [
+      "https://www.imo-pump.com/servicemanuals.htm",
+      "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-imo-3g-series"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/imoindustries.json."
+    },
+    {
+     "id": "imo-ab-lp",
+     "series": "ACD, ACE, ACF, ACG, UCF, UCG, LPD, LPE, LPQ (Low Pressure Line IMO AB)",
+     "type": "насос",
+     "patterns": [
+      {
+       "rx": "(?:AC[DEFG]|UC[FG]|LP[DEQ])(?:\\s?\\d{3})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ACE 025",
+      "ACG",
+      "UCF",
+      "LPQ"
+     ],
+     "sources": [
+      "https://pumps.circor.com/products/pumps/three-screw-pumps/imo-ab/low-pressure-line"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/imoindustries.json."
+    }
+   ]
   }
  ],
  "owners": [
