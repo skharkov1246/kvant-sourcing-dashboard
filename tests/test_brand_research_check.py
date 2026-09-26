@@ -210,3 +210,87 @@ def test_main_код_возврата_и_печать_только_агрега�
 def test_набор_в_репозитории_проходит_проверку(capsys):
     """Настоящие файлы data/brand_research/ — по тем же правилам."""
     assert M.main([]) == 0, capsys.readouterr().out
+
+
+# ── Домен дилера (domain, domain_source) ────────────────────────────────────
+
+def _с_доменом(домен="primer-dilera.test", источник="https://shop.primer-dilera.test/o-nas"):
+    d = _бренд()
+    r = d["dealers"][0]
+    r["sources"] = [источник]
+    r["domain"], r["domain_source"] = домен, источник
+    return d
+
+
+def _правила_дилера(d):
+    return [n for n in _нарушения(d) if "dealers[" in n]
+
+
+def test_домен_дилера_с_доказательством_принят():
+    assert _нарушения(_с_доменом()) == []
+    # Узел источника — сам домен, а не поддомен.
+    assert _нарушения(_с_доменом("primer-dilera.test", "https://primer-dilera.test/")) == []
+
+
+def test_домен_только_парой():
+    d = _с_доменом()
+    del d["dealers"][0]["domain_source"]
+    assert any("только парой" in n for n in _правила_дилера(d))
+    d = _с_доменом()
+    del d["dealers"][0]["domain"]
+    assert any("только парой" in n for n in _правила_дилера(d))
+
+
+def test_домен_закрытого_формата():
+    for плохой in ("www.primer-dilera.test", "https://primer-dilera.test", "Primer-Dilera.test",
+                   "primer-dilera.test/o-nas", "primer dilera.test", "primer-dilera", "primer-dilera.123",
+                   "-primer.test", "", None):
+        d = _с_доменом(плохой, "https://primer-dilera.test/")
+        assert any("закрытого формата" in n for n in _правила_дилера(d)), плохой
+
+
+def test_домен_общий_отвергнут():
+    d = _с_доменом("gmail.com", "https://gmail.com/primer")
+    assert any("общий" in n for n in _правила_дилера(d))
+    d = _с_доменом("primer.en.made-in-china.com", "https://primer.en.made-in-china.com/")
+    assert any("общий" in n for n in _правила_дилера(d))
+
+
+def test_источник_домена_из_sources_и_с_тем_же_узлом():
+    d = _с_доменом()
+    d["dealers"][0]["domain_source"] = "https://primer-dilera.test/drugaya"
+    assert any("не ссылка из sources" in n for n in _правила_дилера(d))
+    # Узел источника — другой сайт: подстрока — не поддомен.
+    d = _с_доменом("primer-dilera.test", "https://neprimer-dilera.test/")
+    assert any("не совпадает с доменом" in n for n in _правила_дилера(d))
+
+
+def test_домен_страницы_сети_бренда_отвергнут():
+    """Локатор бренда стоит в источниках многих дилеров — это не сайт дилера."""
+    d = _с_доменом("vydumka-lokator.test", "https://vydumka-lokator.test/dealers")
+    for i in range(2):
+        d["dealers"].append({"company": f"Другой дилер {i}", "country": "Нигдения", "role": "продажи",
+                             "sources": ["https://vydumka-lokator.test/dealers"]})
+    assert any("страница сети бренда" in n for n in _правила_дилера(d))
+    d["dealers"].pop()
+    assert _правила_дилера(d) == []            # один другой — ещё не сеть
+
+
+def test_площадки_одного_дилера_с_тем_же_доменом_не_сеть():
+    """Две записи одного дилера (офисы) с доказанным тем же доменом — не локатор."""
+    d = _с_доменом()
+    for i in range(2):
+        r = copy.deepcopy(d["dealers"][0])
+        r["company"] = f"Придуманный дилер, офис {i}"
+        d["dealers"].append(r)
+    assert _правила_дилера(d) == []
+
+
+def test_сводка_печатает_дилеров_с_доменом(tmp_path, capsys):
+    очередь = {"records": [{"oem_key": "vydumka", "name": "Выдумка", "focus": "насосы",
+                            "status": "сделано", "researched_at": "2026-01-01"}]}
+    папка, словарь = _набор(tmp_path, _с_доменом(), очередь)
+    assert M.main(["--dir", str(папка), "--dict", str(словарь)]) == 0
+    out = capsys.readouterr().out
+    assert "(с доменом 1)" in out
+    assert "primer-dilera" not in out

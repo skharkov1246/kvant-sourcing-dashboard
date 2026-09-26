@@ -23,6 +23,13 @@
   * oem_key — существующий ключ dict/oem.json, запись вида «бренд» (поле kind,
     library/oem_kind.py: не указание, не несколько брендов, не описание, не
     номер) и не ключ со вставленным описанием; имя файла совпадает с ключом;
+  * домен дилера (domain, domain_source — только парой): узел закрытого
+    формата (строчная латиница, без www., схемы и пути, буквенная зона), не
+    общий домен (почтовый хостинг, площадка, соцсеть — закрытый список
+    supplier_registry_overlap.общий_домен); domain_source — одна из ссылок
+    sources, и её узел — сам домен или его поддомен (доказательство); домен не
+    стоит в источниках двух и больше ДРУГИХ дилеров файла — так выглядит
+    страница дилерской сети бренда, а не сайт дилера;
   * очередь queue.json: ключи словаря, статусы из закрытого списка, «сделано»
     только при наличии файла бренда и наоборот.
 
@@ -44,6 +51,10 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+# Разбор адреса и общий домен — те же, каким сведение реестров пишет признак
+# domain (supplier_registry_overlap): домен дилера сводится ими же.
+from supplier_registry_overlap import общий_домен, хост  # noqa: E402
 ПАПКА = ROOT / "data" / "brand_research"
 СЛОВАРЬ = ROOT / "dict" / "oem.json"
 ОЧЕРЕДЬ = "queue.json"
@@ -86,6 +97,14 @@ EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-
     re.compile(r"(?<!\d)8\s?\(\d{3,5}\)\s?\d{1,3}[\s\-]?\d{2}[\s\-]?\d{2}(?!\d)"),
 )
 ЛОКАЛЬНЫЙ_ПУТЬ = re.compile(r"(?:^|[\s(«\"'])(?:/tmp/|/home/|/root/|/var/|[A-Za-z]:\\)")
+
+# Домен дилера — узел строчной латиницей: метки через точку, буквенная зона,
+# без www., схемы, пути, порта и пробелов.
+ДОМЕН = re.compile(r"^(?!www\.)[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*"
+                   r"\.[a-z][a-z0-9-]*[a-z0-9]$")
+# Столько ДРУГИХ дилеров файла со ссылкой на этот домен — это страница сети
+# бренда (локатор), а не сайт дилера.
+ДРУГИХ_НА_ДОМЕНЕ = 2
 
 ЛАТИНИЦА = re.compile(r"[a-z]")
 КИРИЛЛИЦА = re.compile(r"[а-яё]")
@@ -148,6 +167,38 @@ def _ссылки_записи(r: dict, поле: str) -> list:
     return v if isinstance(v, list) else [v]
 
 
+def _на_домене(u, домен: str) -> bool:
+    h = хост(u) if isinstance(u, str) else ""
+    return bool(h) and (h == домен or h.endswith("." + домен))
+
+
+def нарушения_домена(r: dict, дилеры: list) -> list[str]:
+    """Правила домена дилера (domain, domain_source) — список нарушений.
+    дилеры — все записи dealers файла: домен в источниках двух и больше
+    других — страница сети бренда."""
+    out = []
+    есть_д, есть_и = "domain" in r, "domain_source" in r
+    if not есть_д and not есть_и:
+        return out
+    if есть_д != есть_и:
+        return ["domain и domain_source — только парой"]
+    д, и = r["domain"], r["domain_source"]
+    if not isinstance(д, str) or not ДОМЕН.match(д):
+        return ["домен не закрытого формата (узел строчной латиницей без www., схемы и пути)"]
+    if общий_домен(д):
+        out.append("домен общий: почтовый хостинг, площадка или соцсеть")
+    ссылки = r.get("sources") if isinstance(r.get("sources"), list) else []
+    if not isinstance(и, str) or и not in ссылки:
+        out.append("domain_source — не ссылка из sources")
+    elif not _на_домене(и, д):
+        out.append("узел domain_source не совпадает с доменом")
+    других = sum(1 for x in дилеры if isinstance(x, dict) and x is not r and x.get("domain") != д
+                 and any(_на_домене(u, д) for u in (x.get("sources") if isinstance(x.get("sources"), list) else [])))
+    if других >= ДРУГИХ_НА_ДОМЕНЕ:
+        out.append("домен стоит в источниках других дилеров — страница сети бренда, а не сайт дилера")
+    return out
+
+
 НЕ_БРЕНД = "запись словаря не бренд: указание, несколько брендов, описание или номер (kind)"
 
 
@@ -207,6 +258,9 @@ def проверить_бренд(данные, имя_файла: str, ключ
                     нарушение(место, "нет источника-URL")
                 elif not all(isinstance(u, str) and ССЫЛКА.match(u) for u in ссылки):
                     нарушение(место, "источник не ссылка http(s)")
+            if раздел == "dealers":
+                for правило in нарушения_домена(r, записи):
+                    нарушение(место, правило)
             if раздел == "parts" and isinstance(r.get("code"), str) and isinstance(r.get("quote"), str):
                 if len(нормализовать_код(r["code"])) < 3:
                     нарушение(место, "код короче трёх знаков")
@@ -290,6 +344,7 @@ def сводка(бренды: dict[str, dict]) -> dict[str, int]:
         итог["брендов"] += 1
         for раздел in ("machines", "parts", "parts_rejected", "sub_suppliers", "dealers", "service_docs"):
             итог[раздел] += len(d.get(раздел) or [])
+        итог["dealers_domain"] += sum(1 for r in d.get("dealers") or [] if isinstance(r, dict) and r.get("domain"))
     return dict(итог)
 
 
@@ -344,7 +399,8 @@ def main(argv: list[str] | None = None) -> int:
     с = сводка(бренды)
     print(f"разведка брендов: брендов {с.get('брендов', 0)} · машин {с.get('machines', 0)} · "
           f"кодов с цитатой {с.get('parts', 0)} · отклонено кодов {с.get('parts_rejected', 0)} · "
-          f"субпоставщиков {с.get('sub_suppliers', 0)} · дилеров {с.get('dealers', 0)} · "
+          f"субпоставщиков {с.get('sub_suppliers', 0)} · дилеров {с.get('dealers', 0)} "
+          f"(с доменом {с.get('dealers_domain', 0)}) · "
           f"сервисных документов {с.get('service_docs', 0)}")
     if isinstance(очередь, dict) and isinstance(очередь.get("records"), list):
         статусы = Counter(r.get("status") for r in очередь["records"] if isinstance(r, dict))

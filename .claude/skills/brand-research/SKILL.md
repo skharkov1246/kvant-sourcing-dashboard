@@ -159,7 +159,17 @@ python scripts/preflight.py > /tmp/pf.txt 2>&1; echo $?; tail -20 /tmp/pf.txt
 | `parts[]` | `code`, `issuer`, `description`, `machine` (если известна), `unit`, `doc_ref`, `source_url`, `quote` |
 | `parts_rejected[]` | `code`, `verdict`, `reason` |
 | `sub_suppliers[]` | `company`, `component`, `machine`, `evidence`, `sources[]`, `verified` |
-| `dealers[]` | `company`, `country`, `role` (официальный или независимый — прямо), `sources[]` |
+| `dealers[]` | `company`, `country`, `role` (официальный или независимый — прямо), `sources[]`; `domain` и `domain_source` — только парой, см. ниже |
+
+**Домен дилера** (`domain`, `domain_source`) — ключ сведения дилера с реестром
+компаний (`library/dealer_link.py`). Пишется ТОЛЬКО когда в `sources` стоит
+собственный сайт дилера: `domain_source` — одна из ссылок `sources`, её узел равен
+домену или его поддомену (`shop.hayespump.com` → `hayespump.com`). Домен бренда,
+его локатора дилеров, агрегатора, справочника, новостного сайта, площадки или
+почтового хостинга доменом дилера не бывает; если в источниках только страница
+дилерской сети бренда — поля нет, домен не выдумывается. Формат закрытый: узел
+строчными латиницей без `www.`, схемы и пути. Проверщик ловит нарушения и домен,
+стоящий в источниках двух и больше других дилеров файла (страница сети бренда).
 | `gaps[]` | чего не нашли и где это лежит |
 | `verifier_notes` | отчёт скептика |
 | `corrections[]` | правки записей по замечаниям скептика |
