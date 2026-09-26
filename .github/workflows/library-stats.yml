@@ -78,6 +78,16 @@ name: Библиотека — сводка и переклассификаци�
 #                    Правило — library/dealer_link.py (сопоставитель
 #                    supplier_link). Одной частью: сотни записей из файлов и три
 #                    выборки реестра. Только выборки. Ничего не меняет.
+#   weekly-offers  — ПРЕДЛОЖЕНИЯ ПОСТАВЩИКОВ ЗА НЕДЕЛЮ (вопрос владельца 26.09.2026):
+#                    что поступило (дата КП, письма или карточки в окне) и что мы
+#                    обработали в окне (processed_at: впервые или повторно), по
+#                    источнику и по дню — статусы разбора, позиции, цены по
+#                    валютам, компании, бренды, карточки, роли; что расшифровано
+#                    и почему нет. Окно — входы days / date_from / date_to (дни
+#                    UTC). В журнал только агрегаты. Подробная часть (компании,
+#                    номера, строки цены) — ТОЛЬКО со входом pubkey и только
+#                    зашифрованной: открытый файл стирается до загрузки, в
+#                    артефакт идёт *.enc на сутки. Только выборки. Ничего не меняет.
 #
 # В журнал прогона выводятся ТОЛЬКО агрегаты: репозиторий публичный, а в базе
 # лежат коммерческие данные заказчиков. Ни наименований позиций, ни номеров
@@ -93,7 +103,7 @@ on:
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
                   reclassify-apply, bridge, crossref, demand, funnel,
                   calibration, part, match, codes, sides, dynamics, code-rule,
-                  brand-models, offer-role, dealer-link]
+                  brand-models, offer-role, dealer-link, weekly-offers]
       part:
         description: "Артикул для поиска — только для part (например 6265ZZ)"
         type: string
@@ -118,6 +128,30 @@ on:
         description: "Наследовать сегмент по сделке (слабое правило, для reclassify)"
         type: boolean
         default: false
+      # ОКНО weekly-offers — дни UTC, обе границы включительно. date_from и
+      # date_to вместе — ровно они; один date_from — до сегодня; один date_to —
+      # days дней, кончая им; ни одного — days дней, кончая сегодня.
+      days:
+        description: "weekly-offers: дней в окне, кончая сегодня (UTC)"
+        type: string
+        default: "7"
+      date_from:
+        description: "weekly-offers: первый день окна ГГГГ-ММ-ДД (пусто — по days)"
+        type: string
+        default: ""
+      date_to:
+        description: "weekly-offers: последний день окна ГГГГ-ММ-ДД (пусто — сегодня)"
+        type: string
+        default: ""
+      # ОТКРЫТЫЙ КЛЮЧ — НЕ СЕКРЕТ: входы запуска видны всем, кто видит прогоны,
+      # поэтому сюда кладётся только открытый ключ. Закрытый ключ во входе —
+      # отказ скрипта (его пару больше не использовать). Длина: RSA-4096 в PEM
+      # и base64 — около 1 100 знаков; предел входов workflow_dispatch —
+      # 65 535 знаков на все входы вместе, так что помещается с запасом.
+      pubkey:
+        description: "weekly-offers: открытый ключ RSA (PEM в base64 одной строкой) — подробная часть шифруется им; пусто — только агрегаты"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -320,6 +354,66 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python library/dealer_link.py
+
+      # ПРЕДЛОЖЕНИЯ ПОСТАВЩИКОВ ЗА НЕДЕЛЮ. Только выборки, соединение только для
+      # чтения. Входы идут в окружение как есть: шаг их не подменяет (CLAUDE.md,
+      # «Читай ВЫЗОВ»), и журнал говорит ровно о том окне, которое задано.
+      # Подробный файл пишется ВНЕ рабочей папки (/tmp) и только со входом pubkey.
+      - name: Предложения поставщиков за неделю
+        if: inputs.job == 'weekly-offers'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DAYS: ${{ inputs.days }}
+          FROM: ${{ inputs.date_from }}
+          TO: ${{ inputs.date_to }}
+          PUBKEY_B64: ${{ inputs.pubkey }}
+          DETAIL_OUT: /tmp/weekly_offers_detail.json
+        run: python scripts/weekly_offers.py
+
+      # ШИФРОВАНИЕ ГИБРИДНОЕ: случайный ключ (32 байта из openssl rand, в hex —
+      # чтобы -pass file: не обрезал его на байте перевода строки) шифрует файл
+      # AES-256-CBC с PBKDF2, а сам ключ шифруется открытым ключом RSA-OAEP.
+      # Открытый файл и ключ сессии стираются в том же шаге, до загрузки, и шаг
+      # идёт при любом исходе замера: упавший на середине замер не оставляет
+      # открытого файла. Расшифровка у владельца закрытого ключа:
+      #   openssl pkeyutl -decrypt -inkey private.pem -pkeyopt rsa_padding_mode:oaep \
+      #     -in weekly_offers_key.enc -out key.txt
+      #   openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -md sha256 \
+      #     -in weekly_offers_detail.json.enc -out weekly_offers_detail.json -pass file:key.txt
+      - name: Шифрование подробной части
+        if: always() && inputs.job == 'weekly-offers' && inputs.pubkey != ''
+        env:
+          PUBKEY_B64: ${{ inputs.pubkey }}
+          DETAIL: /tmp/weekly_offers_detail.json
+          ENC_DIR: weekly-offers-enc
+        run: |
+          set -euo pipefail
+          umask 077
+          wipe() { for f in "$@"; do [ -e "$f" ] && { shred -u "$f" 2>/dev/null || rm -f "$f"; }; done; return 0; }
+          work="$(mktemp -d)"
+          trap 'wipe "$DETAIL" "$work/session.key" "$work/public.pem"; rm -rf "$work"' EXIT
+          if [ ! -s "$DETAIL" ]; then
+            echo "подробной части нет — шифровать нечего"
+            exit 0
+          fi
+          printf '%s' "$PUBKEY_B64" | tr -d ' \r\n' | base64 -d > "$work/public.pem"
+          openssl pkey -pubin -in "$work/public.pem" -noout
+          mkdir -p "$ENC_DIR"
+          openssl rand -hex 32 > "$work/session.key"
+          openssl enc -aes-256-cbc -salt -pbkdf2 -iter 200000 -md sha256 \
+            -in "$DETAIL" -out "$ENC_DIR/weekly_offers_detail.json.enc" -pass "file:$work/session.key"
+          openssl pkeyutl -encrypt -pubin -inkey "$work/public.pem" -pkeyopt rsa_padding_mode:oaep \
+            -in "$work/session.key" -out "$ENC_DIR/weekly_offers_key.enc"
+          echo "зашифровано: $(ls "$ENC_DIR" | wc -l) файла, открытый файл стирается"
+
+      - name: Подробная часть — только зашифрованной
+        if: always() && inputs.job == 'weekly-offers' && inputs.pubkey != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-offers-encrypted
+          path: weekly-offers-enc/*.enc
+          retention-days: 1
+          if-no-files-found: ignore
 
       - name: Отвечает ли предложение на нашу заявку
         if: inputs.job == 'match'
