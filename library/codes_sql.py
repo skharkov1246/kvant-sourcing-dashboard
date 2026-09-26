@@ -451,7 +451,7 @@ def brand_pipeline(judged_cols: str = "c.*, tj.brand_key, tj.brand_name") -> str
       from pieces_nc pc
      cross join lateral (
            select left(regexp_replace(regexp_replace(
-                    translate(replace(lower(pc.piece), 'ё', 'е'),
+                    translate(replace(lower(replace(pc.piece, 'İ', 'I')), 'ё', 'е'),
                               {q(DIACRITICS_FROM)},
                               {q(DIACRITICS_TO)}),
                     {q(LEGAL_FORMS_KEY)}, ' ', 'g'),
@@ -1990,9 +1990,12 @@ _ДВОЙНИКИ = str.maketrans(HOMO_FROM, HOMO_TO)
 
 
 def ключ_написания(s: str) -> str:
-    # «İ» (U+0130) Python складывает в «i» с отдельной точкой сверху, PostgreSQL —
-    # в «i»: это единственное расхождение lower() на всём Юникоде (замер
-    # 24.09.2026, 139 тыс. знаков, база C.UTF-8).
+    # «İ» (U+0130) Python складывает в «i» с отдельной точкой сверху, libc — в
+    # «i», ICU — снова с точкой: единственное расхождение lower() на всём
+    # Юникоде (замер 24.09.2026 на C.UTF-8 и 26.09.2026 на ICU, 1,1 млн знаков).
+    # Поэтому замена «İ» → «I» стоит до lower() и здесь, и в lib_brand_key, и в
+    # ключе brand_pipeline: точка — не буква, и у базы на ICU «İco» теряло «co»
+    # как правовую форму (гейт засева, прогон 36221302235).
     t = str(s or "").replace("İ", "I").lower().replace("ё", "е").translate(_ДИАКРИТИКА)
     t = _ФОРМЫ.sub(" ", t)
     k = re.sub(r"[^0-9a-zа-я]", "", t)[:40]
