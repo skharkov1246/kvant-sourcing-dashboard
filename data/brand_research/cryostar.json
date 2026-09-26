@@ -1,0 +1,789 @@
+{
+  "oem_key": "cryostar",
+  "name": "Cryostar SAS (Hésingue, Франция; группа Linde)",
+  "segment_focus": "криогенные насосы, турбодетандеры, компрессоры отпарного газа: номера уплотнений, подшипников, ремкомплектов; сервис",
+  "researched_at": "2026-09-26",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Cryostar делает криогенные центробежные насосы (выносные GBS/CBS/GBSD/CBSD, CO, CSH, MAGSTAR; погружные VS и SUBTRAN; судовые VP), поршневые насосы (SDPD, LDPD, MRP/SRP, HPP, PD3000), турбодетандеры (TC, MTC на магнитных подшипниках, TG, LTP/LTG) и компрессоры отпарного газа (CM, CM2, CM4-200, CM6-200). Все модели и диапазоны взяты из открытых буклетов и паспортов изготовителя на cryostar.com. Открытого каталога запчастей у изготовителя нет: на его странице запчастей только форма запроса по заводскому номеру машины. Поэтому 30 кодов деталей взяты со страниц двух продавцов с дословной цитатой. Soluparts даёт 6 кодов по насосам GBS 155, CBSD 185 и LDPD 65 (седьмой, вибродатчик 792414506-04, отклонён скептиком: ни изготовитель, ни машина не названы), в том числе торцевое уплотнение 798250074 и уплотнительное кольцо 740021371. thecryoshop.com (CryoVation) даёт 14 кодов Cryostar с таблицей ремкомплекта SDPD 1.2\" и 10 кодов 51-2533-… и 05-6135-… по насосу PD3000; насос CVI PD 3000 по листу изготовителя делает Cryostar. Кодов по турбодетандерам и компрессорам в открытом доступе не найдено. Субпоставщик по публикациям один: SKF S2M, магнитные подшипники и шкаф E300V2 для турбодетандеров MTC200. Дилеры и сервис взяты из указателя изготовителя: свои центры в Китае (Ханчжоу) и Индии (Нью-Дели); дилеры в Турции (Kryo Teknik), Китае (4 компании), Египте, Катаре (PETROTEC), Омане; Wehn kryoplus в Германии занимается сервисом и запчастями насосов GBSD и CBS.",
+  "machines": [
+    {
+      "model": "GBS / CBS (напр. GBS 155/4,5; A-CBS)",
+      "kind": "центробежный криогенный насос выносной, постоянная скорость, с мультипликатором",
+      "segment": "насос",
+      "rating": "GBS 11–22 кВт, CBS 30–37 кВт; до 30 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GBSD / CBSD (GBSD 155/4,5; 185/3; 190/4)",
+      "kind": "центробежный криогенный насос выносной, прямой привод, переменная скорость",
+      "segment": "насос",
+      "rating": "27 кВт (125 Гц) / 40 кВт (150 Гц); 4000–9000 об/мин; до 800 л/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf",
+        "https://www.wehn-group.de/en/services/cryotechnology/cryostar-pumps/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CO 120",
+      "kind": "центробежный насос для минибалка",
+      "segment": "насос",
+      "rating": "8,8 кВт (87 Гц); до 160 л/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf",
+        "https://cryostar.com/datas-pdf/datasheet/CO.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CSH (155/4.5; 185/3; 185/4; 260/5)",
+      "kind": "центробежный насос с гидроприводом (Hytran) для автоцистерн",
+      "segment": "насос",
+      "rating": "гидромотор до 70 кВт; до 50 бар расчётное",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/CSH.pdf",
+        "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MAGSTAR 260/5-H",
+      "kind": "центробежный насос с магнитной муфтой и гидромотором",
+      "segment": "насос",
+      "rating": "до 1000 л/мин",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VS (напр. VS 3x2x7)",
+      "kind": "погружной герметичный (капсулированный) насос",
+      "segment": "насос",
+      "rating": "5,5–30 кВт; до 90 м3/ч",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SUBTRAN (15/7 … 200/480; LH2: 6,6-2/24, 15-2/35, 26-2/70, 26-2/110)",
+      "kind": "погружной насос в зумпфе или в резервуаре (СПГ, LH2, бункеровка)",
+      "segment": "насос",
+      "rating": "22–200 кВт; до 520 м3/ч; до 500 м напора",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf",
+        "https://cryostar.com/datas-pdf/booklet/en/Catalogue_Marine_LNG_fuelling_and_bunkering-WEB012026.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VP (115, 145, 185, 240, 255, 270, 310, 330)",
+      "kind": "поршневой насос высокого давления для топливного газа судовых двигателей и ГТУ",
+      "segment": "насос",
+      "rating": "до 50 бар для газовой турбины (судовые ДВС 17 / 6,5 бар)",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/Catalogue_Marine_LNG_fuelling_and_bunkering-WEB012026.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HPP (48/90, 65/70, 65/90, 65/110, 65/120, 75/90, 75/110)",
+      "kind": "поршневой криогенный насос высокого давления (симплекс/триплекс)",
+      "segment": "насос",
+      "rating": "до 520 бар расчётное, до 500 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/wp-content/uploads/2026/09/CRYOGENIC-RECIPROCATING-PUMPS-FOR-LIQUEFIED-GASES_2024_WEB.pdf",
+        "https://cryostar.com/datas-pdf/booklet/en/Catalogue_LNG%20T&T_WEB.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SDPD (22/20, 30/20, 30/32)",
+      "kind": "поршневой криогенный насос для наполнения баллонов",
+      "segment": "насос",
+      "rating": "до 215 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/wp-content/uploads/2026/09/CRYOGENIC-RECIPROCATING-PUMPS-FOR-LIQUEFIED-GASES_2024_WEB.pdf",
+        "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LDPD (50/55, 65/55, 88/55; A-LDPD 65/40-T)",
+      "kind": "поршневой криогенный насос для термосифонного резервуара",
+      "segment": "насос",
+      "rating": "90–165 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/wp-content/uploads/2026/09/CRYOGENIC-RECIPROCATING-PUMPS-FOR-LIQUEFIED-GASES_2024_WEB.pdf",
+        "https://soluparts.com/products/cryostar/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MRP / SRP (напр. MRP 40/55)",
+      "kind": "поршневой криогенный насос (заправка, LH2, СПГ/КПГ)",
+      "segment": "насос",
+      "rating": "до 500 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/wp-content/uploads/2026/09/CRYOGENIC-RECIPROCATING-PUMPS-FOR-LIQUEFIED-GASES_2024_WEB.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PD3000 / CV40",
+      "kind": "вертикальный поршневой криогенный насос",
+      "segment": "насос",
+      "rating": "поршень 1,5\" или 1,75\", ход 1,5\"",
+      "status": "в каталоге изготовителя (лист pd-3000.pdf)",
+      "sources": [
+        "https://thecryoshop.com/pd3000-and-cv40-drive-end-1-50-stroke/",
+        "https://cryostar.com/datas-pdf/datasheet/pd-3000.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TC (TC120, TC200, TC300 … TC800; 2TC; TC120 ECO)",
+      "kind": "турбодетандер с компрессорным тормозом, подшипники на масле",
+      "segment": "компрессор",
+      "rating": "50–12 000 кВт; до 2,5 млн нм3/ч; до 200 бар; от −270 до +200 °C",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/TC.pdf",
+        "https://cryostar.com/datas-pdf/booklet/en/HYDROCARBON-TURBO_EXPANDERS.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MTC (напр. MTC200)",
+      "kind": "турбодетандер-компрессор на активных магнитных подшипниках",
+      "segment": "компрессор",
+      "rating": "данных о мощности нет",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/HYDROCARBON-TURBO_EXPANDERS.pdf",
+        "https://www.skf.com/africa/en/news-and-media/news-search/2016-11-24_skf_delivers_magnetic_bearings_to_cryostar_for_use_in_turboexpanders_in_china.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TG / MTG",
+      "kind": "турбодетандер-генератор (TG — масляные подшипники; MTG — магнитные, высокочастотный генератор)",
+      "segment": "прочее",
+      "rating": "данных о мощности нет",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/HYDROCARBON-TURBO_EXPANDERS.pdf",
+        "https://cryostar.com/datas-pdf/datasheet/TC.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TFC / TCC",
+      "kind": "криогенный детандер с криогенным компрессором и возможным масляным тормозом",
+      "segment": "компрессор",
+      "rating": "данных о мощности нет",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/TFC.pdf",
+        "https://cryostar.com/datas-pdf/datasheet/TC.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LTP / LTG",
+      "kind": "жидкостной детандер (с масляным тормозом или генератором)",
+      "segment": "прочее",
+      "rating": "данных о мощности нет",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/HYDROCARBON-TURBO_EXPANDERS.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CM / CM2 (CM 300, CM2 200/300)",
+      "kind": "центробежный криогенный компрессор отпарного газа (BOG), одно- и двухступенчатый",
+      "segment": "компрессор",
+      "rating": "данных о производительности в источниках не найдено",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/natural-gas/land-based/lng-terminal-boil-off-gas-handling/",
+        "https://cryostar.com/datas-pdf/booklet/en/Catalogue_LNG%20T&T_WEB.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CM4-200 (Type A/B, C/D/E)",
+      "kind": "четырёхступенчатый компрессор топливного газа для судов с 4-тактными двухтопливными двигателями",
+      "segment": "компрессор",
+      "rating": "данных о мощности нет",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/Catalogue_LNG%20T&T_WEB.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CM6-200 (CM6, Type A/B/C)",
+      "kind": "шестиступенчатый компрессор топливного газа для газовозов с двигателями XDF",
+      "segment": "компрессор",
+      "rating": "до 5500 м3/ч, 17 бар абс.",
+      "status": "выпускается",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/CM6.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Cryogenic Transfer Pumps for Liquefied Gases (2024), каталог",
+      "kind": "каталог / брошюра",
+      "machine": "GBS/CBS, GBSD/CBSD, CO, CSH, MAGSTAR, VS, SUBTRAN",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/CRYOGENIC_TRANSFER_PUMPS_FOR_LIQUEFIED_GASES_2024_WEB.pdf"
+      ]
+    },
+    {
+      "title": "Cryogenic Reciprocating Pumps for Liquefied Gases (2024), каталог",
+      "kind": "каталог / брошюра",
+      "machine": "SDPD, LDPD, MRP/SRP, HPP, PPC",
+      "sources": [
+        "https://cryostar.com/wp-content/uploads/2026/09/CRYOGENIC-RECIPROCATING-PUMPS-FOR-LIQUEFIED-GASES_2024_WEB.pdf"
+      ]
+    },
+    {
+      "title": "Hydrocarbon Turbo-Expanders, буклет",
+      "kind": "каталог / брошюра",
+      "machine": "TC, MTC, TG, LTP/LTG",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/HYDROCARBON-TURBO_EXPANDERS.pdf"
+      ]
+    },
+    {
+      "title": "Turbo expander with compressor brake TC, паспорт",
+      "kind": "паспорт изделия",
+      "machine": "TC",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/TC.pdf"
+      ]
+    },
+    {
+      "title": "Transfer Pump CSH, паспорт",
+      "kind": "паспорт изделия",
+      "machine": "CSH",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/CSH.pdf"
+      ]
+    },
+    {
+      "title": "6-Stage Gas Compressor CM6, паспорт",
+      "kind": "паспорт изделия",
+      "machine": "CM6-200",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/CM6.pdf"
+      ]
+    },
+    {
+      "title": "LNG Transportation, Cargo Handling & Fuelling Equipment and Solutions, каталог",
+      "kind": "каталог / брошюра",
+      "machine": "CM, CM4-200, CM6-200, HPP, SUBTRAN",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/Catalogue_LNG%20T&T_WEB.pdf"
+      ]
+    },
+    {
+      "title": "Marine LNG Fuelling and Bunkering, каталог",
+      "kind": "каталог / брошюра",
+      "machine": "VP, HPP, SUBTRAN",
+      "sources": [
+        "https://cryostar.com/datas-pdf/booklet/en/Catalogue_Marine_LNG_fuelling_and_bunkering-WEB012026.pdf"
+      ]
+    },
+    {
+      "title": "Cryostar Centrifugal Pump User Manual (по описанию — чертежи и перечни запчастей в приложениях; копия на Scribd, загрузить не удалось)",
+      "kind": "O&M",
+      "machine": "центробежные насосы Cryostar",
+      "sources": [
+        "https://www.scribd.com/document/428444772/Cryostar-Centrifugal-Pump-User-Manual"
+      ]
+    },
+    {
+      "title": "Transfer Pump CO 120, паспорт",
+      "kind": "паспорт изделия",
+      "machine": "CO 120",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/CO.pdf"
+      ]
+    },
+    {
+      "title": "Expander with cryogenic compressor and oil brake TFC, паспорт",
+      "kind": "паспорт изделия",
+      "machine": "TFC",
+      "sources": [
+        "https://cryostar.com/datas-pdf/datasheet/TFC.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "798250074",
+      "issuer": "Cryostar",
+      "description": "торцевое уплотнение (mechanical seal)",
+      "machine": "GBS 155 4.5-6.8-C3",
+      "unit": "уплотнение вала",
+      "source_url": "https://soluparts.com/products/cryostar/",
+      "quote": "MECHANICAL SEAL, MANUFACTURER NAME: CRYOSTAR, PART NUMBER: 798250074, KIT O COMPONENT TO WHICH IT BELONGS: CRYOSTAR GBS 155 PUMP 4.5-6.8-C3"
+    },
+    {
+      "code": "740021371",
+      "issuer": "Cryostar",
+      "description": "уплотнительное кольцо (seal ring)",
+      "machine": "A-CBSD 185 / GBS 155 (кислородные)",
+      "unit": "уплотнение вала",
+      "source_url": "https://soluparts.com/products/cryostar/",
+      "quote": "SEAL RING (SEAL RING), CRYOSTAR 740021371, USE: OXYGEN PUMP CRYOSTAR A-CBSD 185 170 4-2,8C AND GBS 155 4,5-6.8"
+    },
+    {
+      "code": "740022986",
+      "issuer": "Cryostar",
+      "description": "зубчатое колесо мультипликатора",
+      "machine": "GBS 155 4.5",
+      "unit": "мультипликатор",
+      "source_url": "https://soluparts.com/products/cryostar/",
+      "quote": "GEAR WHEEL, CRYOSTAR 740022986, USE: CRYOSTAR PUMP GBS155 4.5"
+    },
+    {
+      "code": "740022646",
+      "issuer": "Cryostar",
+      "description": "шестерня (вал-шестерня) мультипликатора",
+      "machine": "GBS 155 4.5",
+      "unit": "мультипликатор",
+      "source_url": "https://soluparts.com/products/cryostar/",
+      "quote": "PINION CRYOSTAR 740022646 USE: CRYOSTAR GBS155 4.5 PUMP, GR10A 2, OXYGEN PLANT N 2"
+    },
+    {
+      "code": "770025235",
+      "issuer": "Cryostar",
+      "description": "холодная часть (cold end) поршневого насоса в сборе",
+      "machine": "A-LDPD 65/40-T",
+      "unit": "холодная часть",
+      "source_url": "https://soluparts.com/products/cryostar/",
+      "quote": "COLD END RECIPROCATING PUMP, P PUMP MODEL A-LDPD 65 40-T, CRYO STAR N P 770025235"
+    },
+    {
+      "code": "763120174",
+      "issuer": "Cryostar",
+      "description": "центробежный насос в сборе (номер изделия), LO2, мотор LS 180MT, 22 кВт",
+      "machine": "GBS 155 4,5-6,8-C 3",
+      "unit": "насос в сборе",
+      "source_url": "https://soluparts.com/products/cryostar/",
+      "quote": "763120174 CENTRIFUGAL PUMP, MODEL DESIGNATION: GBS 155 4,5-6,8-C 3, INLET CONNECTION SIZE TYPE: 2-1 2”",
+      "doc_ref": "код стоит заголовком листинга, пометки «Cryostar P/N» нет"
+    },
+    {
+      "code": "740022186",
+      "issuer": "Cryostar",
+      "description": "тарелка клапана (poppet)",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "клапаны холодной части",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 3",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "CRYOSTAR SDPD, 1.2\" MINOR KIT Qty 3 0955-4900 740022186 POPPET 1"
+    },
+    {
+      "code": "740105305",
+      "issuer": "Cryostar",
+      "description": "прокладка нагнетания",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "клапаны холодной части",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 4",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "4 0935-4663 740105305 GASKET, DISCHARGE 1"
+    },
+    {
+      "code": "740023273",
+      "issuer": "Cryostar",
+      "description": "манжета (hat seal), 9 шт. в комплекте",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "уплотнение поршня",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 6",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "6 0935-4727 740023273 HAT SEAL 9"
+    },
+    {
+      "code": "740002082",
+      "issuer": "Cryostar",
+      "description": "прокладка всасывающего клапана",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "клапаны холодной части",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 15",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "15 0935-4736 740002082 GASKET, SUCTION VALVE 1"
+    },
+    {
+      "code": "740002071",
+      "issuer": "Cryostar",
+      "description": "опорное кольцо поршня (rider ring)",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "поршневая группа",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 17",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "17 0935-4738 740002071 RIDER RING 1"
+    },
+    {
+      "code": "760002066",
+      "issuer": "Cryostar",
+      "description": "комплект поршневых и расширительных колец",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "поршневая группа",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 19",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "19 0935-4757 760002066 PISTON RING / EXPANDER RING SET 3"
+    },
+    {
+      "code": "730002086",
+      "issuer": "Cryostar",
+      "description": "уплотнительное кольцо круглого сечения (O-ring)",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "холодная часть",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 23",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "23 0935-4744 730002086 O-RING 1"
+    },
+    {
+      "code": "768002085",
+      "issuer": "Cryostar",
+      "description": "скребок 1,2\"",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "поршневая группа",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 24",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "24 0935-4746 768002085 SCRAPER 1"
+    },
+    {
+      "code": "730010738",
+      "issuer": "Cryostar",
+      "description": "спирально-навитая прокладка всасывающей плиты",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "холодная часть",
+      "doc_ref": "CRYOSTAR SDPD, 1.2\" MINOR KIT, поз. 28",
+      "source_url": "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+      "quote": "28 0955-2051 730010738 SPIRAL WOUND GASKET 1"
+    },
+    {
+      "code": "740021216",
+      "issuer": "Cryostar",
+      "description": "коленвал из нержавеющей стали, ход 32 мм",
+      "machine": "SDPD",
+      "unit": "кривошипный привод",
+      "source_url": "https://thecryoshop.com/search.php?search_query=cryostar",
+      "quote": "SS Crankshaft for ACD model NDPD or Cryostar Model SDPD pumps, 1.26\" stroke, 32mm stroke Reference Numbers: 740021216"
+    },
+    {
+      "code": "740024347",
+      "issuer": "Cryostar (номер-ссылка продавца)",
+      "description": "проставка холодной части 1,2\"",
+      "machine": "горизонтальные насосы с холодной частью 1.2\" (SDPD)",
+      "unit": "холодная часть",
+      "source_url": "https://thecryoshop.com/sdpd-cold-end-1-2/",
+      "quote": "Spacer, 1.2\", CV 1.2\" Cold End Reference #: 740024347 15763-1",
+      "doc_ref": "слова Cryostar на странице нет: бренд выведен по рубрике SDPD и серии номеров"
+    },
+    {
+      "code": "730002084",
+      "issuer": "Cryostar (номер-ссылка продавца)",
+      "description": "стопорное кольцо 1,2\"",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "поршневая группа",
+      "source_url": "https://thecryoshop.com/sdpd-cold-end-1-2/",
+      "quote": "Retaining Ring, 1.2\" Reference number 85017 730002084",
+      "doc_ref": "слова Cryostar на странице нет: бренд выведен по рубрике SDPD и серии номеров"
+    },
+    {
+      "code": "740002078",
+      "issuer": "Cryostar (номер-ссылка продавца)",
+      "description": "фонарное кольцо",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "уплотнение поршня",
+      "source_url": "https://thecryoshop.com/sdpd-cold-end-1-2/",
+      "quote": "Lantern, Ring Ref No. 15767-1 740002078",
+      "doc_ref": "слова Cryostar на странице нет: бренд выведен по рубрике SDPD и серии номеров"
+    },
+    {
+      "code": "760020197",
+      "issuer": "Cryostar (номер-ссылка продавца)",
+      "description": "всасывающий клапан в сборе для холодной части 1,2\"",
+      "machine": "SDPD 1.2\" cold end",
+      "unit": "клапаны холодной части",
+      "source_url": "https://thecryoshop.com/sdpd-cold-end-1-2/",
+      "quote": "Suction Valve Assembly for 1.2\" bore cold ends, cleaned for oxygen service reference 15756-3 760020197 46920-1",
+      "doc_ref": "слова Cryostar на странице нет: бренд выведен по рубрике SDPD и серии номеров"
+    },
+    {
+      "code": "51-2533-30880",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "коленвал",
+      "machine": "PD3000 / P2K",
+      "unit": "кривошипный привод",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-drive-end-1-50-stroke/",
+      "quote": "Crankshaft for P2K or PD3000 pumps, cleaned for oxygen service Cryostar PN 51-2533-30880 ACD PN 56485-1",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "51-2533-30980",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "грязевое уплотнение коленвала",
+      "machine": "PD3000",
+      "unit": "кривошипный привод",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-drive-end-1-50-stroke/",
+      "quote": "0985-3068 51-2533-30980 Dirt Seal (Crankshaft) 1",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "05-6135-02076",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "коренной подшипник",
+      "machine": "PD3000",
+      "unit": "кривошипный привод",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-drive-end-1-50-stroke/",
+      "quote": "0945-0115 05-6135-02076 Main Bearing 2",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "05-6135-02052",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "средний подшипник",
+      "machine": "PD3000",
+      "unit": "кривошипный привод",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-drive-end-1-50-stroke/",
+      "quote": "0945-0105 05-6135-02052 Center Bearing 1",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "05-6135-02001",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "игольчатый подшипник",
+      "machine": "PD3000",
+      "unit": "кривошипный привод",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-drive-end-1-50-stroke/",
+      "quote": "0985-3007 05-6135-02001 Needle Bearing 2",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "51-2533-30889",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "газовые уплотнения толкателя",
+      "machine": "PD3000 / CV40, 1,5\"",
+      "unit": "уплотнение толкателя",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-cold-end-1-5-piston/",
+      "quote": "0985-3061 51-2533-30889 Pushrod Gas Seals 3",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "51-2533-07115",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "уплотнительное кольцо поршня, цилиндр 1,5\"",
+      "machine": "PD3000 / CV40, 1,5\"",
+      "unit": "поршневая группа",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-cold-end-1-5-piston/",
+      "quote": "0985-3044 51-2533-07115 Seal Ring 1-1/2\" Bore 3*",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "51-2533-07015",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "опорное кольцо (wear ring), цилиндр 1,5\"",
+      "machine": "PD3000 / CV40, 1,5\"",
+      "unit": "поршневая группа",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-cold-end-1-5-piston/",
+      "quote": "0985-3043 51-2533-07015 Wear Ring 1-1/2\" Bore 1*",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "51-2533-03827",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "всасывающий клапан в сборе",
+      "machine": "PD3000 / CV40",
+      "unit": "клапаны холодной части",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-cold-end-1-5-piston/",
+      "quote": "0985-3097 51-2533-03827 Inlet Valve Ass'ly (ACD 46247-1) 1",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    },
+    {
+      "code": "51-2533-02096",
+      "issuer": "Cryostar (насос CVI PD 3000 изготавливает Cryostar)",
+      "description": "нагнетательный клапан в сборе",
+      "machine": "PD3000 / CV40",
+      "unit": "клапаны холодной части",
+      "source_url": "https://thecryoshop.com/pd3000-and-cv40-cold-end-1-5-piston/",
+      "quote": "0985-3110 51-2533-02096 Discharge Valve Assembly 1",
+      "doc_ref": "бренд подтверждён листом изготовителя pd-3000.pdf: «CVI PD 3000 ... manufactured by CRYOSTAR»"
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "792414506-04",
+      "verdict": "не подтверждён",
+      "reason": "Код на странице soluparts/cryostar есть: «VIBRATION TRANSMITTER ... 0-100 µM PP = 4–20 MA ... P/N 792414506-04 (7MTR CABLE)». Но ни изготовитель, ни машина не названы: к Cryostar деталь относят только по рубрике продавца, поэтому принадлежность бренду не доказана"
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "SKF (S2M)",
+      "component": "активные магнитные подшипники и шкаф управления E300V2",
+      "machine": "турбодетандеры MTC200 (поставка в Китай)",
+      "evidence": "пресс-релиз SKF 24.11.2016 о контракте с Cryostar",
+      "sources": [
+        "https://www.skf.com/africa/en/news-and-media/news-search/2016-11-24_skf_delivers_magnetic_bearings_to_cryostar_for_use_in_turboexpanders_in_china.html",
+        "https://www.gasworld.com/story/skf-supplies-magnetic-bearings-to-cryostar-for-use-in-turboexpanders-in-china/2082455.article/"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "CRYOSTAR China",
+      "country": "Китай (Ханчжоу)",
+      "role": "собственный центр: производство насосов, сборка турбодетандеров, продажа запчастей, ремонт, обучение, выезд на объект",
+      "sources": [
+        "https://cryostar.com/localdealer/cryostar-china/"
+      ]
+    },
+    {
+      "company": "CRYOSTAR India",
+      "country": "Индия (Нью-Дели)",
+      "role": "собственный центр продаж и сервиса: мастерская, ремонт и монтаж насосов и детандеров",
+      "sources": [
+        "https://cryostar.com/localdealer/india/"
+      ]
+    },
+    {
+      "company": "KRYO TEKNİK Makine ve Dış Ticaret Limited Şirketi",
+      "country": "Турция (Стамбул)",
+      "role": "местный дилер",
+      "sources": [
+        "https://cryostar.com/localdealer/kryo-teknik-makine-ve-dis-ticaret-limited-sirketi/"
+      ]
+    },
+    {
+      "company": "Chengdu Kostar Cryogenic Equipment Co.",
+      "country": "Китай (Чэнду)",
+      "role": "местный дилер, продажа и сервис (СПГ, воздухоразделение)",
+      "sources": [
+        "https://cryostar.com/localdealer/chengdu-kostar-cryogenic-equipment-co/"
+      ]
+    },
+    {
+      "company": "Hangzhou Energy Cryogenic Equipment Co. Ltd",
+      "country": "Китай (Ханчжоу)",
+      "role": "местный дилер",
+      "sources": [
+        "https://cryostar.com/localdealer/hangzhou-energy-cryogenic-equipment-co-ltd/"
+      ]
+    },
+    {
+      "company": "Shaanxi Rongke Cryogenic Equipment Co., Ltd.",
+      "country": "Китай (Сиань)",
+      "role": "местный дилер (СПГ-терминалы, пиковые хранилища, АЗС)",
+      "sources": [
+        "https://cryostar.com/localdealer/shaanxi-rongke-cryogenic-equipment-co-ltd/"
+      ]
+    },
+    {
+      "company": "Hangzhou Heyi M&E Engineering Co., Ltd.",
+      "country": "Китай",
+      "role": "местный дилер (по указателю изготовителя)",
+      "sources": [
+        "https://cryostar.com/localdealer/hangzhou-heyi-me-engineering-co-ltd/"
+      ]
+    },
+    {
+      "company": "Hangzhou Lierma Engineering Equipment Co. Ltd.",
+      "country": "Китай",
+      "role": "местный дилер (по указателю изготовителя)",
+      "sources": [
+        "https://cryostar.com/localdealer/hangzhou-lierma-engineering-equipment-co-ltd/"
+      ]
+    },
+    {
+      "company": "PETROTEC",
+      "country": "Катар (Доха), Ближний Восток",
+      "role": "местный дилер",
+      "sources": [
+        "https://cryostar.com/localdealer/middle-east/"
+      ]
+    },
+    {
+      "company": "Superior For Petroleum Services",
+      "country": "Египет (Каир)",
+      "role": "местный дилер: продажа, сервис, запчасти",
+      "sources": [
+        "https://cryostar.com/localdealer/superior-petroleum-services/"
+      ]
+    },
+    {
+      "company": "SOHAR INDUSTRIAL SUPPLIES & TRADING",
+      "country": "Оман",
+      "role": "местный дилер (по указателю изготовителя)",
+      "sources": [
+        "https://cryostar.com/localdealer/sohar-industrial-supplies-trading/"
+      ]
+    },
+    {
+      "company": "Wehn kryoplus GmbH",
+      "country": "Германия",
+      "role": "сервисный партнёр и дистрибьютор запчастей, стандартные пакеты ТО для насосов GBSD и CBS",
+      "sources": [
+        "https://www.wehn-group.de/en/services/cryotechnology/cryostar-pumps/",
+        "https://cryostar.com/localdealer/wehn-kryoplus-gmbh/"
+      ]
+    },
+    {
+      "company": "CryoVation (thecryoshop.com)",
+      "country": "не установлена",
+      "role": "независимый продавец неоригинальных ремкомплектов и деталей холодной и приводной части под номера Cryostar (SDPD, PD3000), своими артикулами 0955-…, 0935-…, 0985-…; не субпоставщик изготовителя",
+      "sources": [
+        "https://www.thecryoshop.com/minor-repair-kit-sdpd-1-2-cold-end/",
+        "https://thecryoshop.com/pd3000-and-cv40-drive-end-1-50-stroke/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официального каталога запчастей в открытом доступе нет: на cryostar.com/spare-parts только форма запроса по типу машины и заводскому номеру. Номера деталей есть в перечнях запчастей, которые прикладывают к руководству по эксплуатации каждого заводского номера.",
+    "Кодов деталей по турбодетандерам (TC, MTC, TG) и компрессорам BOG (CM, CM4-200, CM6-200) — лабиринтов, уплотнений с затворным газом, упорных и опорных подшипников с наклонными колодками — открыто не найдено. Они есть только у эксплуатантов и в сервисе Cryostar.",
+    "Номера торцевых уплотнений и подшипников для насосов GBSD, CBSD, VS, SUBTRAN и VP не найдены. Руководство по центробежному насосу лежит на Scribd, но страница не загрузилась.",
+    "Изготовители комплектующих, кроме SKF S2M, открыто не названы: торцевые уплотнения, мультипликаторы, электродвигатели погружных насосов, вибродатчик 792414506-04. Изготовитель вибродатчика в листинге не указан.",
+    "Представительство Cryostar в России упомянуто в общих сведениях поиска. В указателе дилеров на cryostar.com нет ни России, ни стран СНГ, ни ОАЭ. Возможные адресаты по Средней Азии и ОАЭ — PETROTEC (Катар) и Kryo Teknik (Турция); их покрытие не проверено.",
+    "По Индии в указателе есть только собственный центр Cryostar India, независимых дистрибьюторов нет."
+  ],
+  "verifier_notes": "Все 31 код найдены на исходных страницах дословно: страницы скачаны через curl и проверены grep по снятому тексту. Отклонён один код — 792414506-04: на странице не названы ни изготовитель датчика, ни машина. У 763120174 код стоит заголовком листинга, а не с пометкой «Cryostar P/N»; в цитату записи его нужно добавить. У кодов 51-2533-* и 05-6135-* (PD3000) бренд подтверждён листом изготовителя https://cryostar.com/datas-pdf/datasheet/pd-3000.pdf («CVI PD 3000 ... manufactured by CRYOSTAR»), поэтому пометку «принадлежность Cryostar не подтверждена» в поле issuer можно снять. У четырёх кодов со страницы sdpd-cold-end-1-2 бренд выведен из рубрики SDPD и серии номеров: слова Cryostar на этой странице нет. Все модели машин подтверждены источниками Cryostar. Поправки к деталям записей: у TFC/TCC источник для TCC — TC.pdf, а не TFC.pdf; для CM/2-CM цифры 2500–6000 м3/ч и написание «2-CM» не нашлись; у GBS/CBS не нашлись «до 600 л/мин»; статус PD3000 «не установлен» стоит поправить. Субпоставщика CryoVation перевести в поставщики неоригинальных деталей. Страница gasworld вернула 403, skf.com собирается скриптом — связь SKF с Cryostar подтверждена по нескольким копиям того же пресс-релиза.",
+  "corrections": [
+    "763120174: в цитату добавлен сам код — он стоит заголовком листинга (замечание скептика; цитата сверена со страницей)",
+    "коды PD3000 (51-2533-*, 05-6135-*): снята пометка «принадлежность Cryostar не подтверждена» — лист cryostar.com pd-3000.pdf называет CVI PD 3000 изделием Cryostar (замечание скептика)",
+    "PD3000 / CV40: статус «не установлен» заменён, добавлен лист изготовителя pd-3000.pdf (замечание скептика)",
+    "740024347, 730002084, 740002078, 760020197: в doc_ref — бренд выведен по рубрике и серии номеров, слова Cryostar на странице нет (замечание скептика)",
+    "TFC / TCC: для TCC добавлен источник TC.pdf (замечание скептика)",
+    "CM / 2-CM: написание «2-CM» и цифры 2500–6000 м3/ч в источниках не нашлись — модель названа как у изготовителя (CM2), характеристика снята (замечание скептика)",
+    "GBS / CBS: снято «до 600 л/мин» — в каталоге не нашлось (замечание скептика)",
+    "CryoVation перенесена из субпоставщиков в дилеры как независимый поставщик неоригинальных деталей (замечание скептика)",
+    "summary и gaps: снят пробел о принадлежности номеров PD3000 — закрыт листом pd-3000.pdf",
+    "summary: число кодов приведено к итогу скептика (30 подтверждены, у Soluparts 6, вибродатчик отклонён), CM2 вместо «2-CM»"
+  ]
+}
