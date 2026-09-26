@@ -257,7 +257,7 @@ def test_каждый_запрос_вернул_ожидаемое_число_с
     # фильтровать по feed, здесь будет 7.
     assert len(предложения) == 6
     # Файл-источник — последней колонкой: по нему сборка считает происхождение дублей.
-    assert sorted(r[-1] for r in предложения if r[-1]) == ["вложение-11", "вложение-12"]
+    assert sorted(r[26] for r in предложения if r[26]) == ["вложение-11", "вложение-12"]
     # Каталог отдаёт ДВЕ строки: 6205 нашлась по id, «BOLT-8» — второй ступенью
     # сцепки. «NUT-M8» не нашлась: два каталожных номера дают один ключ.
     assert len(каталог) == 2
@@ -273,7 +273,13 @@ def test_снимок_собирается_из_живых_строк(снимо
     б = t.pop("brand")
     assert (б["codes"], б["determined"], б["none"]) == (4, 3, 1)
     assert б["by"] == {"каталог": 2, "строка": 0, "карточка": 1, "маска": 0}
-    assert t == {"positions": 4, "with_choice": 1, "comparable": 1, "in_catalog": 2,
+    # 6205: у 101 цена за штуку, 102 единицы не назвал — по правилу 26.09.2026
+    # (crossref.сравнима, единица как в /brands) это разные группы, и позиция
+    # больше не «сравнима»; потеря видна числом cmp_lost_unit_empty.
+    assert t.pop("rule") == {"cmp_before": 1, "cmp_after": 0, "cmp_lost_units": 0,
+                             "cmp_lost_unit_empty": 1, "cmp_lost_one_ent": 0, "cmp_gained": 0,
+                             "choice_bitrix": 1, "choice_ent": 1, "choice_lost_one_ent": 0}
+    assert t == {"positions": 4, "with_choice": 1, "comparable": 0, "in_catalog": 2,
                  "companies": 2, "companies_resolved": 1,
                  # Строк шесть, предложений пять: копия RFQ-1 схлопнута.
                  "offers": 5, "offer_rows": 6,
