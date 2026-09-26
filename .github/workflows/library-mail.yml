@@ -121,7 +121,7 @@ jobs:
       mail_bounds: ${{ steps.plan.outputs.mail_bounds }}
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -183,7 +183,7 @@ jobs:
 
       - uses: actions/checkout@v5
         if: matrix.shard < fromJSON(inputs.shards)
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         if: matrix.shard < fromJSON(inputs.shards)
         with:
           python-version: "3.12"
@@ -291,7 +291,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip

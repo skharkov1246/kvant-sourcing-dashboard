@@ -186,7 +186,7 @@ jobs:
                 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
