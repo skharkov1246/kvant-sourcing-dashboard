@@ -16,6 +16,7 @@
 """
 from __future__ import annotations
 
+import functools
 import importlib.util
 import io
 import os
@@ -75,6 +76,10 @@ def индексатор(monkeypatch, цены: bool, группа: str = "mail-
     return mod
 
 
+# ОДНИ БАЙТЫ НА ВЕСЬ ПРОГОН. openpyxl пишет в docProps время создания книги, и
+# две сборки по разные стороны секунды дают разные sha256 и размер: сравнение
+# «с входом и без» краснело на ровном месте (поймано 26.09.2026 в preflight).
+@functools.lru_cache(maxsize=1)
 def xlsx_кп() -> bytes:
     openpyxl = pytest.importorskip("openpyxl")
     wb = openpyxl.Workbook()
