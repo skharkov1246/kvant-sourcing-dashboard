@@ -481,7 +481,10 @@ def записать(conn, замер: Замер, run_id: str, execute_values) 
                              sum(1 for ф in замер.файлы.values() if ф.обвинено),
                              "lib_price_junk: ложные строки цены"))
         for пачка in _пачки(новые):
-            execute_values(cur, ЗАПИСАТЬ, пачка, page_size=1000)
+            # Одна пачка — один оператор: у execute_values с несколькими
+            # страницами rowcount говорит только о последней, и счёт записанного
+            # разошёлся бы со сверкой на ровном месте.
+            execute_values(cur, ЗАПИСАТЬ, пачка, page_size=len(пачка))
             записано += cur.rowcount
         ошибки = сверить(cur, замер, run_id, записано)
         if ошибки:
