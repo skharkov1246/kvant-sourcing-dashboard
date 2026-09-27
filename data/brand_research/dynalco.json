@@ -1,0 +1,1113 @@
+{
+  "oem_key": "dynalco",
+  "name": "DYNALCO",
+  "segment_focus": "датчики и мониторы частоты вращения на двигателях и компрессорах: коды моделей",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Dynalco — американский бренд приборов контроля частоты вращения. Основан в 1968 г. в Форт-Лодердейле, с 1994 г. входит в Crane Co., в октябре 2011 г. объединён с Barksdale. Сейчас это продуктовая линия «Speed (a Dynalco brand)» компании Barksdale Inc. (Лос-Анджелес, дочерняя компания Crane Co.). Машин Dynalco не выпускает. Это КИП для поршневых двигателей и ГПУ, компрессоров, паровых и газовых турбин, турбокомпрессоров и насосов.\n\nВ текущем каталоге изготовителя:\n- магнитные датчики частоты вращения: пассивные M1xx/M2xx/M3xx, активные на эффекте Холла M919/M928/M951/M806, для взрывоопасных зон — серии M321 и M920 (ATEX/IECEx/CSA);\n- реле и преобразователи частоты вращения: аналоговые SST-2000A/H, цифровые SST7000/7100/7200/7400 и SST-7200D/7400D;\n- тахометры: SPD-100, SPH-100 и MTH-103E (последний заменил MTH-103D);\n- мониторы: UM-200, UM-600 и Catalyst Monitor (контроль катализатора двигателей по RICE NESHAP);\n- панельные индикаторы DPM-105 и LMD-120A.\n\nВне текущего каталога найдены прежние изделия для двигателей: реле разноса SW-200B, SW-50 и PNT-202 с клапаном останова SPV-200, регулятор соотношения воздух/топливо AF-900PC, сканер SC-2124, монитор CANbus D-100, пирометры TMP-100 и TMP-200, тахометры DST-2000C и CRT-9X, калибратор F-16.\n\nСобрано:\n- 25 моделей и серий;\n- 18 документов, в том числе 6 руководств по установке и эксплуатации с номерами 145F-…;\n- 40 кодов с дословной цитатой. Коды — датчики на замену, кабели, разъёмы, корпуса, кабели связи, клапан останова, элементы питания;\n- 5 субпоставщиков комплектующих (разъёмы Deutsch и Phoenix, элементы питания 9 В);\n- 19 дилеров и дистрибьюторов.\n\nДля России: датчик DYNALCO M-203 внесён в Госреестр СИ РФ под № 68963-17 (2017, единичная партия). Официального дистрибьютора по России, СНГ и Турции нет в списке Dynalco Distributor Lookup. Нашёлся российский импортёр «СиБ Контролс», статус дилера у него не заявлен. В Китае Dynalco представляет авторизованный дистрибьютор CNMEC Technology. В ОАЭ и Индии работает Assent Trading, авторизованный дистрибьютор Barksdale.",
+  "machines": [
+    {
+      "model": "SST-2000 series (SST-2000A, SST-2200A, SST-2400A, SST-2000H, SST-2200H, SST-2400H)",
+      "kind": "аналоговое реле и преобразователь частоты вращения (speed switch/transmitter) с 0, 2 или 4 уставками",
+      "segment": "прочее",
+      "rating": "вход 0–0,1 Гц … 0–50 кГц; 4–20 мА, 0–5/0–10 В, 0–1 мА; реле: A — 6 А при 28 В пост., H — герметичные, CSA Cl. I Div. 2 (в сертифицированном корпусе); питание 115/220 В перем. или 22–30 В пост.",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/speed/dynalco-speed-switches-all-speed-dynalco-brand-products/speed-switch-transmitter",
+        "https://www.barksdale.com/sites/default/files/literature/documents/sst-20000610-ds_0.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SST-7000 series (SST7000, SST7100, SST7200, SST7400)",
+      "kind": "цифровое реле и преобразователь частоты вращения на DIN-рейку, программирование по USB",
+      "segment": "прочее",
+      "rating": "0–50 кГц; 0, 1, 2 или 4 реле SPDT 6 А; изолированный выход 4–20 мА; 10–36 В пост.; CSA Class 1 Div. 2",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/speed-dynalco-speed-switches-all-speed-dynalco-brand-products/digital-speed-switch",
+        "https://www.barksdale.com/sites/default/files/2025-06/sst7000-dsv1.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SST-7200D / SST-7400D (исполнения -I, -AC, -I-AC)",
+      "kind": "цифровое реле частоты вращения с ЖК-дисплеем и клавиатурой, 2 или 4 уставки",
+      "segment": "прочее",
+      "rating": "0–50 кГц; 4–20 мА; -I — изолированный вход частоты, -AC — питание переменным током",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/manual-sst2-4d-revh.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SPD-100 series (SPD-100, SPD-108, SPD-100L)",
+      "kind": "цифровой тахометр с питанием от сигнала магнитного датчика, 4 разряда, искробезопасный",
+      "segment": "прочее",
+      "rating": "до 20 000 Гц; CSA Cl. I Div. 1 с датчиками M134, M135, M139, M203, M204, M205; одобрение ABS для судов",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/dynalco-tachometers-gauges-meters",
+        "https://www.barksdale.com/sites/default/files/2026-04/spd-1000309-ds.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SPH-100",
+      "kind": "тахометр, счётчик моточасов и регистратор пиковой скорости (10 последних пиков); для паровых турбин и турбокомпрессоров",
+      "segment": "прочее",
+      "rating": "5 разрядов; питание от датчика M204/M205; CSA Cl. I Div. 1",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/dynalco-tachometers-gauges-meters",
+        "https://www.barksdale.com/sites/default/files/2026-04/sph-1000309-ds%20%281%29.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MTH-103E (замена MTH-103D)",
+      "kind": "тахометр и счётчик моточасов с выходом отключения при разносе, падении оборотов или по часам",
+      "segment": "двигатель",
+      "rating": "10–13 000 Гц; питание от датчика или 9–30 В пост.; срабатывание 100 мс; CSA Cl. I Div. 1/2",
+      "status": "выпускается (MTH-103D заменён моделью MTH-103E)",
+      "sources": [
+        "https://www.barksdale.com/products/dynalco-tachometers-gauges-meters",
+        "https://www.barksdale.com/sites/default/files/2025-06/mth-103e050719revised.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "UM-200",
+      "kind": "двухканальный монитор (термопара, 4–20 мА, напряжение) с тахометром и счётчиком моточасов, выход аварии и останова",
+      "segment": "двигатель",
+      "rating": "10–36 В пост.; CSA Class I Div. 2",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/dynalco-tachometers-gauges-meters",
+        "https://www.barksdale.com/sites/default/files/2025-06/um-200datasheet%20%283%29.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "UM-600",
+      "kind": "шестиканальный монитор аналоговых сигналов, частоты вращения и моточасов двигателя с сигналами аварии и останова",
+      "segment": "двигатель",
+      "rating": "6 аналоговых каналов + обороты + часы",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/dynalco-tachometers-gauges-meters",
+        "http://www.dynalcoproducts.com/pdf/UM600_Rev_G.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Catalyst Monitor",
+      "kind": "монитор и регистратор катализатора (NSCR и окислительного) газовых и дизельных двигателей по RICE NESHAP",
+      "segment": "ГПУ",
+      "rating": "6 каналов, обороты и часы двигателя, Modbus RS-485, 10–36 В пост., CSA Class I Div. 2",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/dynalco-tachometers-gauges-meters",
+        "https://www.barksdale.com/sites/default/files/2025-06/catalyst-monitor-datasheet%20%281%29.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DPM-105 / LMD-120A",
+      "kind": "панельные индикаторы: DPM-105 — вход 0–1 мА от преобразователей Dynalco; LMD-120A — индикатор с питанием от петли 4–20 мА",
+      "segment": "прочее",
+      "rating": "корпус SAE под вырез 3-3/8 дюйма",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/dynalco-tachometers-gauges-meters",
+        "https://www.barksdale.com/sites/default/files/2026-04/dpm-1050309-manual%20%281%29.pdf",
+        "https://www.barksdale.com/sites/default/files/2026-04/lmd-120a%20datsheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Магнитные датчики пассивные, обычная зона (M101, M102, M107, M131, M142, M151, M183, M185, M207, M208, M281, M320, M343 и др.)",
+      "kind": "пассивные индуктивные датчики частоты вращения по зубчатому колесу",
+      "segment": "прочее",
+      "rating": "резьба 5/8-18, 3/4-16, 3/4-20, M16x1,5, M18x1,5; чувствительность стандартная (>500 об/мин), высокая (>300 об/мин) и сверхвысокая (<300 об/мин)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickups-non",
+        "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Магнитные датчики пассивные для опасных зон (M104, M134, M135, M139, M140, M180, M201–M205, M219, M231, M233, M318, M319, M337)",
+      "kind": "искробезопасные и взрывозащищённые пассивные датчики частоты вращения",
+      "segment": "прочее",
+      "rating": "CSA Class 1 Div. 1/2; у M180 и M319 — ATEX (LCIE 04 ATEX 6019X)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickups-hazardous",
+        "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "M321 series",
+      "kind": "пассивный датчик высокой чувствительности для опасных зон, код по конфигуратору (резьба, длина, выводы, разъём -P)",
+      "segment": "прочее",
+      "rating": "ATEX/IECEx Ex ia (зоны 0–2) и Ex mb (зоны 1–2), CSA; резьба 5/8-18 … M20x1,5, длина 1,875–6 дюймов",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/speed-dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickup-0",
+        "https://www.barksdale.com/sites/default/files/2026-04/800-0321%20REV%20G.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "M920 series",
+      "kind": "активный датчик на эффекте Холла для опасных зон, измерение от нулевой скорости, выход TTL",
+      "segment": "прочее",
+      "rating": "ATEX/IECEx Ex ia и Ex mb; Ex mb — 4,5–18 В пост.",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/speed-dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickups-hazardous",
+        "https://www.barksdale.com/sites/default/files/2026-06/800-0920.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Активные датчики, обычная зона (M919, M919-3, M919-3-25, M919-3-45, M919-4, M928, M928-24, M951, M806)",
+      "kind": "активные датчики на эффекте Холла (нулевая скорость) и с выходом TTL",
+      "segment": "прочее",
+      "rating": "5/8-18 UNF, 3 контакта; питание 8–32 В пост. (M806/M951)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickups-non-0",
+        "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SW-200B",
+      "kind": "реле частоты вращения двигателя с 3 уставками: разнос, отключение стартера, возбуждение генератора, контроль скорости",
+      "segment": "двигатель",
+      "rating": "9–40 В пост., 300 мА; 3 реле и выход 0–1 мА",
+      "status": "нет в текущем каталоге Barksdale (лист данных 2009 г.); продаётся реселлерами",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/SW-200B.0309.pdf",
+        "https://www.mshs.com/products/monitoring-solutions/dynalco-meters-sensors/dynalco-speed-switches/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SW-50",
+      "kind": "реле разноса двигателя с 2 уставками (разнос и отключение стартера или авария)",
+      "segment": "двигатель",
+      "rating": "8–32 В пост.; реле 5 А при 30 В пост.; диапазон 0–5000 или 0–10 000 Гц",
+      "status": "нет в текущем каталоге Barksdale; продаётся реселлерами",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/SW-50.0810.pdf",
+        "https://www.mshs.com/products/monitoring-solutions/dynalco-meters-sensors/dynalco-speed-switches/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PNT-202 (с клапаном SPV-200)",
+      "kind": "защита двигателя от разноса с питанием от двух магнитных датчиков; срабатывает соленоидный пневмоклапан останова SPV-200",
+      "segment": "двигатель",
+      "rating": "без внешнего питания; 2 уставки; CSA Class I Div. 1, группы A–D",
+      "status": "нет в текущем каталоге Barksdale",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/PNT-202.pdf",
+        "https://www.mshs.com/products/monitoring-solutions/dynalco-meters-sensors/dynalco-speed-switches/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "AF-900PC",
+      "kind": "регулятор соотношения воздух/топливо для газовых двигателей на богатой смеси (подогреваемые датчики O2, ШИМ-клапаны топлива полного хода)",
+      "segment": "ГПУ",
+      "rating": "10–30 В пост.; 3 реле; Modbus; CSA Class I Div. 2",
+      "status": "нет в текущем каталоге Barksdale (лист данных 11.2010)",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/AF900PC_1110.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "SC-2124 / SC-2124M",
+      "kind": "24-канальный сканер-монитор температуры и давления для защиты двигателей и компрессоров; исполнение M — с Modbus",
+      "segment": "двигатель",
+      "rating": "24 канала (термопары J/K, RTD, 0–5 В, 4–20 мА); 4 реле; Class I Div. 2",
+      "status": "нет в текущем каталоге Barksdale (лист данных 2009 г.)",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/SC-2124.0309.pdf",
+        "http://www.dynalcoproducts.com/Monitors%20&%20Scanners.htm"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D-100 (D-100-B, D-100-C, D-100-B-C)",
+      "kind": "монитор параметров двигателя по CANbus J1939, в том числе двигателей Tier 4",
+      "segment": "двигатель",
+      "rating": "10–30 В пост.; 7 аналоговых и 2 дискретных входа, 1 частотный вход; 4 реле; IP66/IP67",
+      "status": "нет в текущем каталоге Barksdale; статус не подтверждён",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/d-100-datasheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TMP-100 / TMP-100DC / TMP-200",
+      "kind": "многоточечные цифровые пирометры по термопарам (защита двигателя)",
+      "segment": "двигатель",
+      "rating": "TMP-100 — 19 каналов, питание от батареи; TMP-100DC — 18 каналов, 24 В пост.; TMP-200 — 24 канала",
+      "status": "нет в текущем каталоге Barksdale",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/TMP-100.pdf",
+        "http://www.dynalcoproducts.com/pdf/Dynalco_Catalog.pdf",
+        "https://www.barksdale.com/sites/default/files/literature/documents/tmp-200---data-sheet-amp-1%20%281%29.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DST-2000C",
+      "kind": "тахометр с определением направления вращения (с датчиком M343)",
+      "segment": "прочее",
+      "rating": "данные листа 2009 г.",
+      "status": "нет в текущем каталоге Barksdale; у официального представителя Mod-Tronic числится",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/DST-2000C_0309.pdf",
+        "https://www.mod-tronic.com/Dynalco_Tachometers.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "F-16",
+      "kind": "портативный генератор частоты, счётчик и калибратор тахометров, реле частоты и регуляторов",
+      "segment": "прочее",
+      "rating": "10–20 000 Гц, выход 10 В от пика до пика; батарея 9 В; искробезопасен с допущенными батареями",
+      "status": "нет в текущем каталоге Barksdale",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/F-16.0309.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CRT-9X",
+      "kind": "тахометр; по данным китайского дистрибьютора — замена тахометров Caterpillar, на странице записанных как CAT-9X114, CAT-9X116, CAT-9X117 (по выдаче поиска настоящие номера Caterpillar — вида 9X-1116, 9X-1117); доверие низкое",
+      "segment": "двигатель",
+      "rating": "не указан",
+      "status": "не подтверждён (только перечень дистрибьютора)",
+      "sources": [
+        "http://www.increaseinc.cn/nh/dynalco/dynalco.htm"
+      ],
+      "verified": false
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "SST2000 Series Universal Speed Switch & Speed Transmitter — Installation and Operation Manual, Rev. C (2016)",
+      "doc_no": "145F-11761",
+      "machine": "SST-2000A/H, SST-2200A/H, SST-2400A/H",
+      "kind": "O&M",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/145f-11761-rev-c-sst2000-manual-3.pdf"
+      ]
+    },
+    {
+      "title": "SST7000 / SST7100 Speed Switch / Transmitter — Installation and Operation Manual, Rev. E (2015)",
+      "doc_no": "145F-13091",
+      "machine": "SST7000, SST7100",
+      "kind": "O&M",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/a145f-13091-01reve-4rvq4smf-1manual.pdf"
+      ]
+    },
+    {
+      "title": "SST7200D / SST7400D Speed Switch / Transmitter — Installation and Operation Manual, Rev. H (2018)",
+      "doc_no": "145F-13130",
+      "machine": "SST-7200D, SST-7400D",
+      "kind": "O&M",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/manual-sst2-4d-revh.pdf"
+      ]
+    },
+    {
+      "title": "UM-600 6-Channel Monitor Version 2 — Installation and Operation Manual, Rev. G (2014)",
+      "doc_no": "145F-12990",
+      "machine": "UM-600",
+      "kind": "O&M",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/UM600_Rev_G.pdf"
+      ]
+    },
+    {
+      "title": "M920 Installation Instructions Bulletin — Hazardous Location Magnetic Pickup, Rev. B (2020)",
+      "doc_no": "145F-13238",
+      "machine": "M920 series",
+      "kind": "инструкция по монтажу",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/m920-manual-145f-13238.pdf"
+      ]
+    },
+    {
+      "title": "M321 Installation Instructions Bulletin — Hazardous Location Magnetic Pickup, Rev. C (2026)",
+      "doc_no": "145F-13228",
+      "machine": "M321 series",
+      "kind": "инструкция по монтажу",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/145F-13228%20REV%20C_0.pdf"
+      ]
+    },
+    {
+      "title": "Dynalco Magnetic Pickups (Speed Sensors) — Data Sheet и Selection Guide",
+      "doc_no": "Bulletin #D0601-A (08/24)",
+      "machine": "все магнитные датчики и принадлежности",
+      "kind": "каталог",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf"
+      ]
+    },
+    {
+      "title": "Magnetic Pickup Look-Up (указатель кодов датчиков)",
+      "doc_no": "",
+      "machine": "все магнитные датчики",
+      "kind": "каталог",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-website-magnetic-pickups-architecture2020-1%20%281%29.pdf"
+      ]
+    },
+    {
+      "title": "Чертёж и конфигуратор M321 (Magnetic Pickup with Hazardous Area Approval), Rev. G",
+      "doc_no": "800-0321",
+      "machine": "M321 series",
+      "kind": "лист данных / чертёж",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/2026-04/800-0321%20REV%20G.pdf"
+      ]
+    },
+    {
+      "title": "Чертёж и конфигуратор M920",
+      "doc_no": "800-0920",
+      "machine": "M920 series",
+      "kind": "лист данных / чертёж",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/2026-06/800-0920.pdf"
+      ]
+    },
+    {
+      "title": "SST-2000 Speed Switches/Transmitters — Product Data Sheet (January 2026)",
+      "doc_no": "",
+      "machine": "SST-2000 series",
+      "kind": "лист данных",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/sst-20000610-ds_0.pdf"
+      ]
+    },
+    {
+      "title": "SST7000 Series Digital Speed Switch & Transmitter — datasheet (чертёж 800-13087)",
+      "doc_no": "800-13087",
+      "machine": "SST7000/7100/7200/7400",
+      "kind": "лист данных",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/2025-06/sst7000-dsv1.pdf"
+      ]
+    },
+    {
+      "title": "MTH-103E Tachometer / Hourmeter / Trip — Product Data Sheet (May 2019)",
+      "doc_no": "",
+      "machine": "MTH-103E",
+      "kind": "лист данных",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/2025-06/mth-103e050719revised.pdf"
+      ]
+    },
+    {
+      "title": "Dynalco Instrumentation & Controls — Product Data Sheets (сборник: AF900PC, Catalyst Monitor, F-16, SC-2124, SPD-100, SPH-100, SST-2000, SW-100, SW-200B, SW-50, SWT-1000/SWTD-1000, SWT-2000, TID-110, TMP-100, TMP-100DC, UM-200 и др.)",
+      "doc_no": "",
+      "machine": "прежние и текущие приборы Dynalco",
+      "kind": "каталог",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/Dynalco_Catalog.pdf"
+      ]
+    },
+    {
+      "title": "D-100 Series CANbus Monitor — datasheet (коды исполнений и принадлежностей)",
+      "doc_no": "",
+      "machine": "D-100",
+      "kind": "лист данных",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/d-100-datasheet.pdf"
+      ]
+    },
+    {
+      "title": "DYNALCO SW-200B Operation, Installation and Calibration Instructions (© 2000 Dynalco Controls, 2 с.)",
+      "doc_no": "",
+      "machine": "SW-200B",
+      "kind": "O&M",
+      "sources": [
+        "https://www.manualslib.com/manual/2526388/Dynalco-Sw-200b.html"
+      ]
+    },
+    {
+      "title": "Описание типа СИ «Датчики частоты вращения магнитные DYNALCO M-203» и методика поверки DYNALCO М-203МП (АО «НИИФИ», 22.08.2017)",
+      "doc_no": "ГРСИ 68963-17",
+      "machine": "M203",
+      "kind": "реестр СИ / методика поверки",
+      "sources": [
+        "https://all-pribors.ru/opisanie/68963-17-dynalco-m-203-78444"
+      ]
+    },
+    {
+      "title": "Dynalco Tachometers and Hour Meters — брошюра",
+      "doc_no": "",
+      "machine": "SPD-100, SPH-100, MTH-103E, UM-200, UM-600",
+      "kind": "каталог",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Hour-Meters-Tachometers-Speed-Measurement.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "M101",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Пассивный магнитный датчик частоты вращения, стандартная чувствительность (мин. > 500 об/мин), резьба 5/8-18, вылет 1,125 дюйма, 2-контактный разъём MS",
+      "machine": "двигатели, компрессоры, турбины (обычная зона); привязку к конкретному прибору изготовитель не называет",
+      "unit": "датчик частоты вращения (магнитный)",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; обычная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M101 - 5/8-18 x 1.125” - 2 Pin"
+    },
+    {
+      "code": "M102",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Пассивный магнитный датчик высокой чувствительности (мин. > 300 об/мин), 5/8-18 x 1,125 дюйма; по листу данных SPD-100 — штатный датчик этих тахометров",
+      "machine": "SPD-100 (по листу данных SPD-100 — вместе с M107 основной датчик этих тахометров)",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M102 - 5/8-18 x 1.125” - 2 Pin"
+    },
+    {
+      "code": "M107",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Пассивный магнитный датчик с усиленным сигналом (Power Source) для питания приборов от датчика, 5/8-18 x 1,125 дюйма",
+      "machine": "SPD-100 (по листу данных SPD-100 — вместе с M102 основной датчик этих тахометров)",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M107 - 5/8-18 x 1.125” - 2 Pin - Power Source"
+    },
+    {
+      "code": "M142",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Пассивный магнитный датчик сверхвысокой чувствительности (мин. < 300 об/мин), 5/8-18 x 1,125 дюйма; для малых оборотов и увеличенных зазоров",
+      "machine": "SPD-100 (по листу данных SPD-100 — для малых оборотов и увеличенных зазоров)",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M142 - 5/8-18 x 1.125” - 2 Pin"
+    },
+    {
+      "code": "M320",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Пассивный магнитный датчик с метрической резьбой M18x1,5, стандартная чувствительность, 2 контакта",
+      "machine": "обычная зона; привязку к конкретному прибору изготовитель не называет",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M320 - M18 x 1.5 - 2 Pin"
+    },
+    {
+      "code": "M343",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Двухканальный магнитный датчик с определением направления вращения, 3/4-20 x 2 дюйма, 6-контактный разъём (для тахометра DST-2000C)",
+      "machine": "DST-2000C",
+      "unit": "датчик частоты и направления вращения",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M343 - 3/4-20 x 2” - 6 Pin - Dual output (Bi directional)"
+    },
+    {
+      "code": "M104",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Взрывозащищённый пассивный магнитный датчик в глухом корпусе, 3/4-20 x 1,875 дюйма, выводы 30 дюймов под кабелепровод",
+      "machine": "приборы Dynalco во взрывоопасной зоне; к какому прибору — изготовитель не называет (в перечнях датчиков MTH-103E и SPD-100 M104 нет)",
+      "unit": "датчик частоты вращения, взрывозащищённый",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M104 - 3/4-20 x 1.875”- 30” Leads"
+    },
+    {
+      "code": "M134",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Искробезопасный пассивный магнитный датчик, вылет 1,125 дюйма; по листу данных SPD-100 — один из двух самых применяемых с SPD-100 во взрывоопасной зоне",
+      "machine": "SPD-100 (CSA Cl. I Div. 1)",
+      "unit": "датчик частоты вращения, искробезопасный",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M134 - 5/8-18 x 1.125” - 2 Pin"
+    },
+    {
+      "code": "M180",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Взрывозащищённый пассивный магнитный датчик, 5/8-18 x 1,5 дюйма, выводы 30 дюймов; по чертежу 800-0180 — ATEX LCIE 04 ATEX 6019X",
+      "machine": "приборы Dynalco во взрывоопасной зоне; к какому прибору — изготовитель не называет (в перечне CSA листа SPD-100 M180 нет)",
+      "unit": "датчик частоты вращения, взрывозащищённый",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M180 - 5/8-18 x 1.5” - 30” Leads"
+    },
+    {
+      "code": "M202",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Искробезопасный пассивный магнитный датчик высокой чувствительности, 5/8-18 x 1,125 дюйма; ответный разъём MS3106A-10SL-4S",
+      "machine": "SPD-100 / MTH-103E во взрывоопасной зоне",
+      "unit": "датчик частоты вращения, искробезопасный",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона; веб-таблица Barksdale Hazardous Passive даёт 3 контакта, Selection Guide и чертёж 800-0202 — 2 контакта и разъём MS3106A-10SL-4S: принят каталог",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M202 - 5/8-18 x 1.125” - 2 Pin"
+    },
+    {
+      "code": "M203",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Искробезопасный пассивный датчик сверхвысокой чувствительности со стабилитронным ограничением, вылет 4 дюйма. Внесён в Госреестр СИ РФ под № 68963-17 как «DYNALCO M-203» для роторов турбин",
+      "machine": "MTH-103E / SPD-100 (питание от датчика, CSA Cl. I Div. 1)",
+      "unit": "датчик частоты вращения, искробезопасный",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M203 - 5/8-18 x 4” - 2 Pin - Zener-Limited"
+    },
+    {
+      "code": "M204",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Искробезопасный пассивный датчик сверхвысокой чувствительности со стабилитронным ограничением, вылет 2,5 дюйма; изготовитель рекомендует его для SPH-100",
+      "machine": "SPH-100 / MTH-103E (питание от датчика)",
+      "unit": "датчик частоты вращения, искробезопасный",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M204 - 5/8-18 x 2.5” - 2 Pin - Zener-Limited"
+    },
+    {
+      "code": "M205",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Искробезопасный пассивный датчик сверхвысокой чувствительности, вылет 4 дюйма, полюс 0,25 дюйма; изготовитель рекомендует его для SPH-100",
+      "machine": "SPH-100 / MTH-103E",
+      "unit": "датчик частоты вращения, искробезопасный",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M205 - 5/8-18 x 4” - 2 Pin - Zener-Limited"
+    },
+    {
+      "code": "M233",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Искробезопасный пассивный датчик высокой чувствительности, вылет 4 дюйма",
+      "machine": "SPD-100 / MTH-103E во взрывоопасной зоне",
+      "unit": "датчик частоты вращения, искробезопасный",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M233 - 5/8-18 x 4” - 2 Pin"
+    },
+    {
+      "code": "M319",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Взрывозащищённый пассивный датчик высокой чувствительности, 5/8-18 x 3,5 дюйма, выводы 30 дюймов, ATEX",
+      "machine": "приборы Dynalco во взрывоопасной зоне; к какому прибору — изготовитель не называет",
+      "unit": "датчик частоты вращения, взрывозащищённый",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide; опасная зона",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M319 - 5/8-18 x 3.5”- 30” Leads"
+    },
+    {
+      "code": "M208",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Пассивный датчик сверхвысокой чувствительности с усиленным сигналом (Power Source), 3/4-16 x 4 дюйма",
+      "machine": "MTH-103E (CSA Div. 2) / приборы с питанием от датчика",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M208 - 3/4-16 x 4” - 2 Pin - Power Source"
+    },
+    {
+      "code": "M321-P",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Пассивный датчик серии M321 (ATEX/IECEx Ex ia) с разъёмом вместо выводов; кабель C101-XX заказывается отдельно",
+      "machine": "приборы Dynalco во взрывоопасной зоне; к какому прибору — изготовитель не называет",
+      "unit": "датчик частоты вращения, ATEX/IECEx",
+      "doc_ref": "черт. 800-0321 Rev G, конфигуратор M321",
+      "source_url": "https://www.barksdale.com/sites/default/files/2026-04/800-0321%20REV%20G.pdf",
+      "quote": "DYNALCO M321-P"
+    },
+    {
+      "code": "M928",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Активный датчик с выходом TTL, 5/8-18 x 2,5 дюйма, 3 контакта; по руководству SST-2000 питается от его выхода +14 В",
+      "machine": "SST-2000 / SST-7000",
+      "unit": "активный датчик частоты вращения",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M928 - 5/8-18 x 2.5” - 3 Pin"
+    },
+    {
+      "code": "M919-3-45",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Датчик на эффекте Холла с измерением от нулевой скорости, 5/8-18 x 4,5 дюйма, 3 контакта",
+      "machine": "привязку к прибору изготовитель не называет (в перечне датчиков руководства SST7000/7100 есть M928, M928-24 и M951, M919 — нет)",
+      "unit": "датчик частоты вращения на эффекте Холла",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M919-3-45 - 5/8-18 x 4.5” - 3 Pin"
+    },
+    {
+      "code": "M951",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Датчик на эффекте Холла (от нулевой скорости) на ферромагнитную метку, 5/8-18 x 4,5 дюйма, 3 контакта",
+      "machine": "SST-7000",
+      "unit": "датчик частоты вращения на эффекте Холла",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M951 - 5/8-18 x 4.5” - 3 Pin"
+    },
+    {
+      "code": "M806",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Датчик на эффекте Холла на магнитную метку (полюс N или S), 5/8-18 x 4,5 дюйма, 3 контакта, 8–32 В пост.; по тексту каталога Dynalco — для систем зажигания, которым нужен импульс от распредвала",
+      "machine": "системы зажигания газовых двигателей (по тексту каталога Dynalco)",
+      "unit": "датчик Холла (распредвал)",
+      "doc_ref": "Bulletin #D0601-A 08/24, Selection Guide",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "quote": "M806 - 5/8-18 x 4.5” - 3 Pin"
+    },
+    {
+      "code": "C101-XX",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Кабель с разъёмом для 2-контактных датчиков; XX — длина в футах (10–100, шаг 10)",
+      "machine": "все 2-контактные датчики M1xx/M2xx",
+      "unit": "кабель датчика",
+      "doc_ref": "страница Magnetic Pickup: Accessories",
+      "source_url": "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickup",
+      "quote": "C101-XX Connector + cable assy, XX feet, for 2-pin magnetic pickups"
+    },
+    {
+      "code": "C101-10",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Прямой разъём с кабелем 10 футов для 2-контактных датчиков (исполнение C101-XX)",
+      "machine": "все 2-контактные датчики",
+      "unit": "кабель датчика",
+      "doc_ref": "перечень загрузок Dynalco у официального партнёра",
+      "source_url": "https://www.precisioncontrols.co.uk/products/azonix-dynalco.html",
+      "quote": "C101-10 Straight Connector with 10ft cable"
+    },
+    {
+      "code": "C101-KIT",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Комплект: разъём и кабельный зажим для 2-контактных датчиков (без кабеля)",
+      "machine": "все 2-контактные датчики",
+      "unit": "разъём датчика",
+      "doc_ref": "страница Magnetic Pickup: Accessories",
+      "source_url": "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickup",
+      "quote": "C101-KIT Connector + cable clamp kit for 2-pin magnetic pickups"
+    },
+    {
+      "code": "C910-XX",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Кабель с разъёмом для 3-контактных активных датчиков; XX — длина в футах",
+      "machine": "M928, M919, M951, M920-P",
+      "unit": "кабель датчика",
+      "doc_ref": "страница Magnetic Pickup: Accessories",
+      "source_url": "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickup",
+      "quote": "C910-XX Connector + cable assy, XX feet, for 3-pin active magnetic pickups"
+    },
+    {
+      "code": "C917-XX",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Кабель с разъёмом для 6-контактных датчиков; XX — длина в футах",
+      "machine": "M343",
+      "unit": "кабель датчика",
+      "doc_ref": "страница Magnetic Pickup: Accessories",
+      "source_url": "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickup",
+      "quote": "C917-XX Connector + cable assy, XX feet, for 6-pin active magnetic pickups"
+    },
+    {
+      "code": "MS3106A-10SL-4S",
+      "issuer": "военный стандарт MS3106 (MIL-DTL-5015); изготовитель разъёма в источнике не назван",
+      "description": "Ответный 2-контактный разъём датчика M101; тот же разъём указан на чертежах M202 и M204",
+      "machine": "M101",
+      "unit": "разъём датчика",
+      "doc_ref": "чертёж 800-0101 (M101)",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/m101-ds%20%281%29.pdf",
+      "quote": "MATES WITH MS3106A-10SL-4S"
+    },
+    {
+      "code": "ISB101",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Искробезопасный барьер для магнитных датчиков (опасная зона)",
+      "machine": "магнитные датчики во взрывоопасной зоне",
+      "unit": "барьер искробезопасности",
+      "doc_ref": "страница Magnetic Pickup: Accessories",
+      "source_url": "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickup",
+      "quote": "ISB101 Intrinsically Safe Barrier (Hazardous Area)"
+    },
+    {
+      "code": "PG100",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Импульсный датчик (пульсер) с резьбой под 5/8-18 для валов без зубчатого колеса",
+      "machine": "тахометры SPD-100 и др.",
+      "unit": "задатчик импульсов",
+      "doc_ref": "страница Magnetic Pickup: Accessories",
+      "source_url": "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickup",
+      "quote": "PG100 RPM pulser; tapped for 5/8 x 18 thread"
+    },
+    {
+      "code": "TT100",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Тахометрическая лента на гладкий вал (ферро- или неферромагнитный) под магнитный датчик",
+      "machine": "магнитные датчики",
+      "unit": "метка на валу",
+      "doc_ref": "страница Magnetic Pickup: Accessories",
+      "source_url": "https://www.barksdale.com/products/speed/dynalco-magnetic-pickups-all-speed-dynalco-brand-products/magnetic-pickup",
+      "quote": "TT100 Tach Tape"
+    },
+    {
+      "code": "SPV-200",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Соленоидный пневмоклапан аварийного останова. Срабатывает от реле 1 SST-2000 (опция Pneumatic Trip) или от PNT-202",
+      "machine": "SST-2000 / PNT-202 (пневмосистема останова двигателя)",
+      "unit": "клапан аварийного останова",
+      "doc_ref": "SST-2000 Product Data Sheet, раздел OPTIONS",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/sst-20000610-ds_0.pdf",
+      "quote": "optional Dynalco SPV-200 Solenoid Pneumatic Valve on"
+    },
+    {
+      "code": "ENC-6210",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Взрывозащищённый литой корпус 8x10x5 дюймов с окном и кнопкой для SST-2000A/H",
+      "machine": "SST-2000",
+      "unit": "взрывозащищённый корпус",
+      "doc_ref": "SST2000 Manual P/N 145F-11761 Rev. C, с. 6",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/145f-11761-rev-c-sst2000-manual-3.pdf",
+      "quote": "ENC-6210 XP Cast Housing: 8”H x 10”W x 5” D; 100’s window + P-button"
+    },
+    {
+      "code": "ENC-5000",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Взрывозащищённый литой корпус 7x9x5 дюймов без окна для SST-2000A/H",
+      "machine": "SST-2000",
+      "unit": "взрывозащищённый корпус",
+      "doc_ref": "SST2000 Manual P/N 145F-11761 Rev. C, с. 6",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/145f-11761-rev-c-sst2000-manual-3.pdf",
+      "quote": "ENC-5000 XP Cast Housing: 7”H x 9”W x 5”D; No Window"
+    },
+    {
+      "code": "270A-105574",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Кабель связи с ПК (USB) для программирования SST7200D/SST7400D; тот же номер указан в руководстве SST7000/7100",
+      "machine": "SST-7200D / SST-7400D / SST7000 / SST7100",
+      "unit": "кабель программирования",
+      "doc_ref": "SST7200D/SST7400D Manual P/N 145F-13130 Rev. H",
+      "source_url": "https://www.barksdale.com/sites/default/files/literature/documents/manual-sst2-4d-revh.pdf",
+      "quote": "P/N 270A-105574 serial communication cable"
+    },
+    {
+      "code": "270A-13020",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "USB-кабель выгрузки журнала данных; по руководству UM-600 — 6 футов, штекер Phoenix на 4 контакта",
+      "machine": "Catalyst Monitor / UM-600",
+      "unit": "кабель выгрузки данных",
+      "doc_ref": "Catalyst Monitor Product Data Sheet, январь 2012",
+      "source_url": "https://www.barksdale.com/sites/default/files/2025-06/catalyst-monitor-datasheet%20%281%29.pdf",
+      "quote": "with USB cable p/n 270A-13020"
+    },
+    {
+      "code": "270A-105560",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Кабельный жгут 3 фута с двумя разъёмами Deutsch для монитора D-100",
+      "machine": "D-100 CANbus Monitor",
+      "unit": "кабельный жгут",
+      "doc_ref": "D-100 Series datasheet, Accessories",
+      "source_url": "http://www.dynalcoproducts.com/pdf/d-100-datasheet.pdf",
+      "quote": "270A-105560 Cable harness – 3 ft. length with (2) Deutsch connectors."
+    },
+    {
+      "code": "240D-13177",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Монтажный кронштейн монитора D-100",
+      "machine": "D-100 CANbus Monitor",
+      "unit": "крепёж",
+      "doc_ref": "D-100 Series datasheet, Accessories",
+      "source_url": "http://www.dynalcoproducts.com/pdf/d-100-datasheet.pdf",
+      "quote": "240D-13177 Mounting bracket."
+    },
+    {
+      "code": "M1604HD2",
+      "issuer": "Mallory (Duracell)",
+      "description": "Батарея 9 В, допущенная изготовителем для калибратора F-16 (в том числе для его искробезопасности) и для пирометра TMP-100; равноценны Eveready 1222 и Ray-O-Vac D1604",
+      "machine": "F-16 / TMP-100",
+      "unit": "элемент питания",
+      "doc_ref": "F-16 Product Data Sheet, март 2009",
+      "source_url": "http://www.dynalcoproducts.com/pdf/F-16.0309.pdf",
+      "quote": "Eveready 1222, Mallory M1604HD2, or Ray-O-Vac D1604"
+    },
+    {
+      "code": "TMP-100DC-13",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Исполнение пирометра TMP-100DC под термопары типа K, шкала от -50 до +1800 °F",
+      "machine": "TMP-100DC",
+      "unit": "многоточечный пирометр двигателя (исполнение)",
+      "doc_ref": "Dynalco Product Data Sheets, TMP-100DC, PART NUMBERS AND RANGES",
+      "source_url": "http://www.dynalcoproducts.com/pdf/Dynalco_Catalog.pdf",
+      "quote": "TMP-100DC-13 -50º to +1800ºF K (Iron-Alumel)"
+    },
+    {
+      "code": "CRT-9X",
+      "issuer": "Dynalco (Barksdale)",
+      "description": "Тахометр; по данным китайского дистрибьютора — замена тахометров Caterpillar, записанных на странице как CAT-9X114, CAT-9X116, CAT-9X117. С каталогом Caterpillar не сверено",
+      "machine": "двигатели Caterpillar (по данным дистрибьютора)",
+      "unit": "тахометр",
+      "doc_ref": "перечень моделей дистрибьютора CNMEC / Increase; доверие низкое: одно объявление дистрибьютора, номера Caterpillar на странице записаны как CAT-9X116/…, а по выдаче поиска настоящие имеют вид 9X-1116 и 9X-1117",
+      "source_url": "http://www.increaseinc.cn/nh/dynalco/dynalco.htm",
+      "quote": "CRT-9X TACHOMETER: Replacement for CAT-9X114"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Deutsch",
+      "component": "12-контактные приборные розетки DT04-12P (2 шт.) и разъёмы кабельного жгута 270A-105560",
+      "machine": "D-100 CANbus Monitor",
+      "evidence": "В спецификации D-100: «Two 12-pin Deutsch DT04-12P receptacles», жгут 270A-105560 — «with (2) Deutsch connectors»",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/d-100-datasheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Phoenix (по названию, вероятно Phoenix Contact; в источниках указано только «Phoenix»)",
+      "component": "съёмные клеммные разъёмы и 4-контактный штекер кабеля выгрузки данных",
+      "machine": "SST-7000 series, UM-600",
+      "evidence": "На странице SST7000 у Barksdale: «Phoenix connectors on the units allow for quick dis-connect». В руководстве UM-600: кабель 270A-13020 подключается «via a 4 pin Phoenix plug»",
+      "sources": [
+        "https://www.barksdale.com/products/speed-dynalco-speed-switches-all-speed-dynalco-brand-products/digital-speed-switch",
+        "http://www.dynalcoproducts.com/pdf/UM600_Rev_G.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Mallory (Duracell)",
+      "component": "батарея 9 В M1604HD2",
+      "machine": "F-16, TMP-100",
+      "evidence": "В листах данных F-16 и TMP-100 изготовитель перечисляет допущенные батареи; для F-16 искробезопасность обеспечивается только с ними",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/F-16.0309.pdf",
+        "http://www.dynalcoproducts.com/pdf/TMP-100.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Eveready (Energizer)",
+      "component": "батарея 9 В Eveready 1222",
+      "machine": "F-16, TMP-100",
+      "evidence": "Там же, в том же перечне допущенных батарей",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/F-16.0309.pdf",
+        "http://www.dynalcoproducts.com/pdf/TMP-100.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Ray-O-Vac (Rayovac)",
+      "component": "батарея 9 В D1604",
+      "machine": "F-16, TMP-100",
+      "evidence": "Там же, в том же перечне допущенных батарей",
+      "sources": [
+        "http://www.dynalcoproducts.com/pdf/F-16.0309.pdf",
+        "http://www.dynalcoproducts.com/pdf/TMP-100.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Barksdale Inc. (Barksdale Control Products; дочерняя компания Crane Co.)",
+      "country": "США",
+      "role": "изготовитель и владелец бренда Dynalco: продажи и техподдержка, завод в Лос-Анджелесе",
+      "sources": [
+        "https://www.barksdale.com/about-us",
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Barksdale GmbH",
+      "country": "Германия",
+      "role": "отделение изготовителя в Европе и производственная площадка Barksdale (Райхельсхайм)",
+      "sources": [
+        "https://www.barksdale.com/about-us",
+        "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Speed-Measurement-Product-Overview.pdf"
+      ]
+    },
+    {
+      "company": "Barksdale Inc. – China",
+      "country": "Китай",
+      "role": "отделение Barksdale в Китае (Шанхай) и площадка в Сучжоу",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Speed-Measurement-Product-Overview.pdf",
+        "https://www.barksdale.com/about-us"
+      ]
+    },
+    {
+      "company": "CNMEC Technology (信德迈科技(北京)有限公司), сайты dynalcoproducts.com и increaseinc.cn",
+      "country": "Китай",
+      "role": "авторизованный дистрибьютор Barksdale и Dynalco с 2007 г. На сайте опубликовано письмо Barksdale о назначении (сбыт и сервис в общем машиностроении); выкладывает листы данных и руководства",
+      "sources": [
+        "http://www.dynalcoproducts.com/Dynalco_Authorized_Distributor.htm",
+        "http://www.increaseinc.cn/nh/dynalco/dynalco.htm"
+      ]
+    },
+    {
+      "company": "Assent Trading",
+      "country": "ОАЭ",
+      "role": "авторизованный дистрибьютор Barksdale в ОАЭ, Саудовской Аравии, Катаре, Омане, Бахрейне, Кувейте, Индии, Пакистане, Шри-Ланке, Бангладеш; бренд Dynalco описан на той же странице",
+      "sources": [
+        "https://assent.co.ae/manufacturer/barksdale/"
+      ]
+    },
+    {
+      "company": "Famaga (famaga.ae)",
+      "country": "ОАЭ",
+      "role": "сам называет себя перепродавцом (reseller) продукции Dynalco; авторизацией не подтверждён",
+      "sources": [
+        "https://famaga.ae/catalog/dynalco"
+      ]
+    },
+    {
+      "company": "ООО «СиБ Контролс»",
+      "country": "Россия",
+      "role": "импортёр КИП, статус дилера не заявлен и не подтверждён; в перечне Dynalco: датчики M180, M203, M202, M319, кабель C101-20, тахометр SPD100",
+      "sources": [
+        "https://sibcontrols.com/dynalco"
+      ]
+    },
+    {
+      "company": "Precision Controls Ltd",
+      "country": "Великобритания",
+      "role": "официальный международный партнёр по продажам по указателю изготовителя (Dynalco Distributor Lookup); сам тоже называет себя авторизованным дистрибьютором Barksdale Dynalco",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf",
+        "https://www.precisioncontrols.co.uk/products/azonix-dynalco.html"
+      ]
+    },
+    {
+      "company": "Barcol-Air Engineering Pte Ltd",
+      "country": "Сингапур",
+      "role": "официальный международный партнёр по продажам (Dynalco Distributor Lookup)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Precision Power Services Co. Ltd",
+      "country": "Таиланд",
+      "role": "официальный международный партнёр по продажам (Dynalco Distributor Lookup)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Measurement Solutions Pty Ltd",
+      "country": "Австралия",
+      "role": "официальный международный партнёр по продажам (Dynalco Distributor Lookup)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Drake Controls",
+      "country": "США",
+      "role": "официальный партнёр по продажам (Калифорния, Невада, Техас, Оклахома, Канзас)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Governor Control Systems",
+      "country": "США",
+      "role": "официальный партнёр по продажам (юго-восток, побережье Мексиканского залива, северо-запад США)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Peaker Services, Inc.",
+      "country": "США",
+      "role": "официальный партнёр по продажам (северо-восток и Средний Запад США)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Gilmore Global Instruments",
+      "country": "США",
+      "role": "официальный партнёр по продажам (Техас)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Spartan Controls",
+      "country": "Канада",
+      "role": "официальный партнёр по продажам (Западная Канада)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "Mod-Tronic Instruments",
+      "country": "Канада",
+      "role": "официальный партнёр по продажам (Манитоба, Онтарио, Квебек); в каталоге тахометры и мониторы Dynalco",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf",
+        "https://www.mod-tronic.com/Dynalco_Tachometers.html"
+      ]
+    },
+    {
+      "company": "Madsen Diesel & Turbine",
+      "country": "Канада",
+      "role": "официальный партнёр по продажам (Ньюфаундленд, Лабрадор, Новая Шотландия)",
+      "sources": [
+        "https://www.barksdale.com/sites/default/files/literature/documents/dynalco-rep-locatorpd%20(1).pdf"
+      ]
+    },
+    {
+      "company": "MSHS Pacific Power Group",
+      "country": "США",
+      "role": "продаёт реле частоты вращения Dynalco (SST-2000A/H, SW-200B, SW-50, PNT-202); в списке Distributor Lookup не значится",
+      "sources": [
+        "https://www.mshs.com/products/monitoring-solutions/dynalco-meters-sensors/dynalco-speed-switches/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Не найдено ни одного открытого источника, где код Dynalco привязан к номеру детали изготовителя машины (Waukesha, Caterpillar, Ajax, Ariel, Solar, Dresser-Rand). Такие привязки обычно лежат в каталогах деталей изготовителей машин и на закрытых порталах их дилеров. Единственная привязка — тахометр CRT-9X с номерами Caterpillar, и та со слов китайского дистрибьютора; с каталогом Caterpillar она не сверена. В руководстве по применению MOTORTECH для Waukesha VHP датчики даны номерами Waukesha и Altronic, а не Dynalco.",
+    "Перечней запасных частей для приборов Dynalco (реле, платы, клеммники, предохранители) в открытом доступе нет. В руководствах SST сказано, что ремонт делает только завод Dynalco. Цены, сроки и конфигуратор, вероятно, на закрытом портале партнёров Barksdale (Partner Portal).",
+    "AF-900PC: изготовители и коды подогреваемых датчиков O2 и топливных клапанов полного хода в открытом листе данных не названы. Руководство по эксплуатации AF-900PC не найдено.",
+    "Изготовитель ответного разъёма MS3106A-10SL-4S в документах Dynalco не назван: известен только стандарт.",
+    "Сроки снятия с производства SW-200B, SW-50, PNT-202, SWT-1000/SWT-2000, AF-900PC, SC-2124, TMP-100/200, D-100, DST-2000C, F-16 и CRT-9X не найдены. Можно утверждать только, что этих изделий нет в текущем каталоге Barksdale. Листы данных к ним взяты с сайта китайского дистрибьютора (dynalcoproducts.com), а не у изготовителя.",
+    "Россия, СНГ, Турция, Индия: в списке Dynalco Distributor Lookup партнёров нет. В России найден только импортёр без заявленного статуса дилера (СиБ Контролс). Ещё один российский перепродавец — kipinteh.ru (датчик M180) — был недоступен при проверке. По Турции не найдено ничего. По Индии есть только авторизация Assent Trading из ОАЭ и упоминание сотрудников Barksdale в Индии на странице About Us, без названия компании.",
+    "Госреестр СИ РФ: зарегистрирован только DYNALCO M-203 (№ 68963-17, единичная партия из 4 шт., 2017). Описание типа называет его датчиком на эффекте Холла, а изготовитель — пассивным индуктивным датчиком со стабилитронным ограничением: расхождение не разрешено. Другие модели Dynalco в реестре не найдены. Файлы описания типа и методики поверки лежат во ФГИС «Аршин» и на all-pribors.ru, но не скачивались.",
+    "Руководства Catalyst Monitor (Version 1 и 2), SPH-100, LST-100 и DPM-105 значатся на сайте дистрибьютора CNMEC только названиями; сами файлы не скачивались.",
+    "Страницы mshs.com и aircompressorstrade.com автоматическому чтению отдают 403. Страница MSHS прочитана только через пересказ WebFetch, страница aircompressorstrade.com не прочитана вовсе. Список моделей MSHS надо перепроверить вручную."
+  ],
+  "verifier_notes": "Все источники скачаны заново через curl, PDF разобраны pdftotext; коды искались по тексту. Результат: 40 кодов из 40 найдены дословно на указанных страницах; 24 машины из 25 подтверждены, CRT-9X — нет (одно объявление дистрибьютора); 5 субпоставщиков из 5 подтверждены. Правки, которые нужно внести в записи (corrections): (1) M104 — убрать привязку к «MTH-103E во взрывоопасной зоне»: в листе данных MTH-103E перечислены датчики для Div 1 (M203/M204/M205) и для Div 2 (M201, M202, M203, M204, M205, M207, M208, M231, M233, M281), M104 среди них нет. (2) M180 — убрать привязку к SPD-100: M180 нет в перечне CSA листа SPD-100. (3) Привязки M104, M180 и M319 к SST-2000H, M101 и M320 к SST-2000/SST-7000, M919-3-45 к SST-7000, M107 к MTH-103E — выводы исследователя, изготовитель их не называет; пометить как вывод или снять. (4) Машина TMP-100/TMP-100DC/TMP-200: TMP-200 в указанных источниках нет, добавить источник https://www.barksdale.com/sites/default/files/literature/documents/tmp-200---data-sheet-amp-1%20%281%29.pdf. (5) CRT-9X (и деталь, и машина): доверие низкое; настоящие номера Caterpillar, по выдаче поиска, имеют вид 9X-1116 и 9X-1117, а на странице дистрибьютора они записаны как «CAT-9X116/…». Прочие наблюдения: веб-таблица Barksdale Hazardous Passive даёт M202 «3 PIN», а Selection Guide и чертёж 800-0202 — 2 контакта и разъём MS3106A-10SL-4S; верным считаю каталог. dynalcoproducts.com — сайт китайского реселлера («Since 2007», текст на китайском), на нём лежат оригинальные PDF Dynalco: документы годятся как источник, но сам сайт — не изготовителя. Недоступны: mshs.com (403), dynalco.com (403/503), web.archive.org (закрыт для чтения), aircompressorstrade.com (403). Номер Госреестра 68963-17 для M-203 подтверждён на all-pribors.ru.",
+  "corrections": [
+    "M104: снята привязка к MTH-103E — в перечнях датчиков листа MTH-103E (Div 1 и Div 2) M104 нет (замечание скептика 1)",
+    "M180: снята привязка к SPD-100 — M180 нет в перечне CSA листа SPD-100 (замечание скептика 2)",
+    "M104, M180, M319 — снята привязка к SST-2000H; M101 и M320 — к SST-2000/SST-7000; M919-3-45 — к SST-7000; M107 — к MTH-103E: изготовитель их не называет, это выводы исследователя (замечание скептика 3)",
+    "M102, M142 — снята привязка к SST-2000, M321-P — к SST-2000/SST-7000: перепроверено при сборке файла — руководство SST-2000 (145F-11761) называет из датчиков только M928, перечень CSA руководства SST7000/7100 — M201–M205, M231, M233, M928, M928-24, M951; привязки M107, M102, M142, M202, M233 к SPD-100 и M928/M951 к SST-7000 источниками подтверждаются и оставлены",
+    "TMP-100/TMP-100DC/TMP-200: добавлен источник листа данных TMP-200 — в прежних источниках TMP-200 нет (замечание скептика 4)",
+    "CRT-9X (деталь и машина): доверие низкое — одно объявление дистрибьютора, номера Caterpillar записаны на странице искажённо (замечание скептика 5)",
+    "M202: в doc_ref записано расхождение веб-таблицы (3 контакта) с каталогом и чертежом 800-0202 (2 контакта); принят каталог (наблюдение скептика)",
+    "Дилеры, перепроверено при сборке файла: Barksdale GmbH записан как отделение изготовителя; у «СиБ Контролс» явно — статус не подтверждён; у Precision Controls официальный статус — по указателю изготовителя, а не по самозаявлению",
+    "verifier_notes: снят локальный путь к скачанным копиям — пути рабочей машины в набор не пишутся"
+  ]
+}

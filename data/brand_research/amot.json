@@ -1,0 +1,1116 @@
+{
+  "oem_key": "amot",
+  "name": "AMOT (США и Великобритания; бренды Chalwyn, Roda Deaco, Rigsaver, Walton)",
+  "segment_focus": "термостатические клапаны и защиты двигателей: коды моделей и ремкомплекты",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "AMOT основан в 1948 году под именем American Motors. Компания сделала первый промышленный термостатический клапан с восковым элементом. Сейчас это изготовитель КИП и арматуры защиты для двигателей, компрессоров, турбин и насосов. Своих офисов шесть: США (Хьюстон), Великобритания (Бери-Сент-Эдмундс), Китай (Шанхай), Канада (Эдмонтон), Индия (Мумбаи), Сингапур; на странице выбора дистрибьютора есть ещё Германия. Под AMOT собраны бренды отсечных клапанов воздуха Chalwyn, Roda Deaco и Rigsaver. О владельце: сайт AMOT ссылается на условия использования и кодекс AMETEK, а AMETEK 26.08.2026 закрыл покупку Indicor Instrumentation. Однако в пресс-релизе AMOT поимённо не назван, так что принадлежность выведена по ссылкам сайта, а не по документу.\n\nФокус разведки — термостатические клапаны и защиты двигателей.\n\nТрёхходовые термоклапаны:\n- Model B — DN40–DN200;\n- Model C и E — DN15–DN40;\n- Model H — DN100–DN150;\n- Model R — DN20–DN80;\n- поворотный Model G с электро- или пневмоприводом.\n\nКак устроены номера:\n- номер элемента — база плюс уставка в °F тремя цифрами: 1096X150, 1125X075, 5435X095;\n- буква P в базе означает никелированный элемент;\n- в Европе и Азии клапан обслуживают комплектом уплотнений (46342X, 9170X0, 82334X, 46857X1) и отдельным элементом;\n- сервисный комплект KIT- продаётся только через отделения AMOT в США и Канаде. Его номер — это номер клапана, в котором материал корпуса и тип присоединения заменены на «KIT-».\n\nAMOT советует обслуживать клапан при каждом капремонте машины, но не реже чем раз в 24 месяца.\n\nЗащиты двигателя:\n- датчики температуры подшипников с плавким стержнем 4102 и 4103: сменные стержни 6702X, 7334X, 6710X, 7280X, ресурс стержня 5 лет;\n- механическое устройство аварийного останова 2800D;\n- реле давления и температуры 4140 и 4250;\n- вибрационные клапан и выключатель 4109B и 4121;\n- клапан-датчик превышения оборотов 4110B;\n- детектор металлических частиц в масле MPD2;\n- отсечные клапаны воздуха XT, 7001 (под MTU Series 4000), 7002 (под Cummins QSK50), Chalwyn D;\n- для ГТУ — отсечной клапан 4420F и дозирующий клапан 8402G.\n\nСобрано 39 кодов, ещё один (6938S) скептик отклонил. 37 из них — номера AMOT из паспортов и руководств изготовителя: элементы, комплекты уплотнений, кольца, сервисные комплекты, плавкие стержни. Два кода — номера Caterpillar (128-2062, 151-6017) регулятора для CAT 3508/3512/3516. Российский дилер ставит их в перечень термоэлементов для замены рядом с элементами AMOT, но прямо с элементом 1096X не связывает, так что соответствие не подтверждено.",
+  "machines": [
+    {
+      "model": "Model B (BO/BM/BR/BC/BF/BG/BH)",
+      "kind": "термостатический трёхходовой клапан с восковым элементом (смешение или разделение потока)",
+      "segment": "двигатель, ГПУ, компрессор, ГТУ (охлаждение ОЖ и масла)",
+      "rating": "DN40–DN200 (1½–8″), 15–400 м³/ч, уставки 13–116 °C, до 45 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_b_thermostatic_control_valve.pdf",
+        "https://www.amot.com/en/products/temperature-control-valves/thermostatic-3-way-control-valves/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Model C (CCM/CF/CL/CM)",
+      "kind": "термостатический трёхходовой клапан",
+      "segment": "двигатель, ГПУ, компрессор",
+      "rating": "DN15–DN40 (½–1½″), 0,3–13,1 м³/ч, уставки 18–113 °C, до 72 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download//d/a/datasheet_c_thermostatic_control_valve_1.pdf",
+        "https://www.amot.com/en/1125x-thermostatic-wax-element-replacement-temperature-regulator-for-model-c-valves/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Model E (EF/EL/EM/EO)",
+      "kind": "термостатический трёхходовой клапан",
+      "segment": "двигатель, ГПУ, компрессор",
+      "rating": "DN15–DN40, 0,3–17 м³/ч, уставки 29–114 °C, до 68 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_e_thermostatic_control_valve_0119_rev12.pdf",
+        "https://www.amot.com/en/5435x-thermostatic-wax-element-replacement-temperature-regulator-for-model-e-valves/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Model H (HO/HM)",
+      "kind": "термостатический трёхходовой клапан (HM — с ручным дублёром)",
+      "segment": "двигатель, ГПУ, компрессор",
+      "rating": "DN100–DN150 (4–6″), 56–280 м³/ч",
+      "status": "есть паспорт изготовителя DS-H-Thermostatic-Valve-0113-Rev1 (2013); на витрине сайта не найден",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_h-thermostatic-valve-0113-rev1.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Model R (RO)",
+      "kind": "термостатический трёхходовой клапан без протечек",
+      "segment": "компрессор (холодильный и промышленный), ГТУ, двигатель, редуктор",
+      "rating": "DN20–DN80 (¾–3″), 3–82 м³/ч, уставки 35–82 °C, до 35 бар",
+      "status": "выпускается (паспорт 0120 rev 5)",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_r_thermostatic_control_valve.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Model G (GGH/GGS), версия G",
+      "kind": "трёхходовой поворотный регулирующий клапан с электро- или пневмоприводом (ПИД-регулятор 8071D, датчик 8060)",
+      "segment": "двигатель, ГПУ, ГТУ, компрессор, редуктор",
+      "rating": "DN15–DN250 (½–10″); до 16 бар (сталь, 0,5–4″)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/model-g-3-way-rotary-control-valves/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_gg_temp_control_valve_0224_rev24.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4500D",
+      "kind": "клапан регулирования температуры и давления масла (с термоэлементами 1096X/1096P)",
+      "segment": "двигатель, компрессор, ГТУ",
+      "rating": "2–4″ (DN50–DN100)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4500d-temperature-pressure-control-valve-2-to-4-dn-50-to-dn100/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4500_temperature_and_pressure_control_valve_0120_rev4.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "2230 / 4430",
+      "kind": "двухходовой клапан-датчик температуры (пневматический или гидравлический сигнал останова)",
+      "segment": "двигатель, компрессор (защита)",
+      "rating": "30–118 °C (стандарт); на входе до 8,6 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/2230-4430-2-way-temperature-sensing-valves/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_2230_4430_2-way_sensing_valve_0119rev3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4075D / 4475B",
+      "kind": "высокотемпературный клапан-датчик (биметаллические диски), уставка настраивается на месте",
+      "segment": "двигатель, компрессор (защита)",
+      "rating": "уставка 54–260 °C",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4075-4475-high-temperature-valves/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4075_4475_high_temperature_valve_0621_rev5.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4087B",
+      "kind": "клапан-датчик температуры выхлопных газов",
+      "segment": "двигатель, ГПУ (защита)",
+      "rating": "150–760 °C",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4087-exhaust-gas-temperature-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4087_exhaust_gas_temp_valve_0119rev4.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4102D / 4102E / 4102J / 4102M",
+      "kind": "датчик температуры подвижных подшипников с плавким стержнем",
+      "segment": "двигатель, компрессор поршневой, ГПУ",
+      "rating": "срабатывание 174–343 °F (79–173 °C)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4102d-4102j-temperature-valves-and-4102m-miniature-temperature-valves/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4102_temperature_detector_feb18_rev3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4103D / 4103M",
+      "kind": "клапан температуры неподвижных подшипников с плавким стержнем",
+      "segment": "двигатель, компрессор поршневой, ГПУ",
+      "rating": "срабатывание 174–343 °F (79–173 °C)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4103d-temperature-detector-and-4103-m-n-t-r-miniature-temperature-detector/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4103_temperature_valve_feb18_rev2.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4140 (4140A/C/D/E/F)",
+      "kind": "реле давления и температуры",
+      "segment": "двигатель, компрессор, насос, редуктор",
+      "rating": "диапазоны давления 1–4 и 9; температурное исполнение",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4140-pressure-and-temperature-switches/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4140_pressure_temperature_switch_0119rev12.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4250 (4251M–4255M)",
+      "kind": "взрывозащищённое реле температуры и давления",
+      "segment": "двигатель, компрессор, ГПУ",
+      "rating": "II 2G Ex db IIB T5/T4 Gb",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4250-hazardous-area-temperature-pressure-switch/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4250_temp_pressure_switch_0821rev4.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "2800D",
+      "kind": "механическое устройство аварийного останова по падению давления масла или управляющего давления",
+      "segment": "двигатель, компрессор, ГПУ",
+      "rating": "уставка 0,35–2,8 бар (с завода 0,7 бар)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/2800-safety-shutdown-device/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_2800_safety_shutdown_device_0320rev5.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4109B Vibro-Guard / 4121",
+      "kind": "вибрационный клапан (4109B) и вибрационный выключатель (4121) с возвратом в исходное положение",
+      "segment": "двигатель, насос, компрессор, вентилятор",
+      "rating": "4121: до 93 °C",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4109-vibro-guard-vibration-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4109_vibroguard_2-way_sensing_valve_0119rev3.pdf",
+        "https://www.amot.com/en/4121-vibro-guard-vibration-switch/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4110B",
+      "kind": "гидромеханический клапан-датчик превышения оборотов",
+      "segment": "двигатель, ГШО",
+      "rating": "800–4200 об/мин; до 5,5 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4110-hydro-mechanical-overspeed-sensing-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4110_overspeed_sensing_valve_1015_rev1.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MPD2 (MPD)",
+      "kind": "детектор металлических частиц в масле",
+      "segment": "двигатель, ГПУ, ГТУ, компрессор, редуктор, насос",
+      "rating": "до 13,8 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/mpd2-metal-particle-detector/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_mpd_metal_particle_detector_0119rev6.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "XT",
+      "kind": "поворотный (дисковый) отсечной клапан воздуха на впуске дизеля (защита от разноса)",
+      "segment": "двигатель, ГШО",
+      "rating": "−40…+125 °C; комплекты хомутов 3,5–7″ (89–178 мм)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/xt-air-shut-off-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/s/ds-amot-xt-0122-rev20.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "7001",
+      "kind": "шиберный отсечной клапан воздуха (под MTU Series 4000)",
+      "segment": "двигатель",
+      "rating": "5″ (127 мм), наддув до 5 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/7001-swing-air-gate-shut-off-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7001-air-shut_off-valve-0719-rev3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "7002",
+      "kind": "шиберный отсечной клапан воздуха (под Cummins QSK50)",
+      "segment": "двигатель",
+      "rating": "4″, наддув до 5 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/7002-swing-gate-air-shut-off-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7002-air-shut_off-valve-0719rev3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Chalwyn D (D45, D51, D57, D64, D70, D80)",
+      "kind": "автоматический тарельчатый отсечной клапан воздуха; срабатывает от потока при превышении оборотов",
+      "segment": "двигатель, ГШО",
+      "rating": "типоразмеры D45–D80",
+      "status": "выпускается (бренд Chalwyn)",
+      "sources": [
+        "https://www.amot.com/en/d-automatic-air-shut-off-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download//////c/h/chalwyn-d-bendix-ce204_13_0716.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4164",
+      "kind": "гидромеханический отсечной клапан дизельного топлива",
+      "segment": "двигатель, ГШО",
+      "rating": "вход топлива до 20,7 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4164-hydro-mechanical-diesel-fuel-shutoff-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4164_diesel_fuel_shutoff_valve1011rev1.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "4420F (4420F20 / 4420F30)",
+      "kind": "отсечной клапан топливного газа ГТУ",
+      "segment": "ГТУ",
+      "rating": "2″ и 3″; ГТУ 5–50 МВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/4420-gas-turbine-fuel-shutoff-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4420f_fuel_shut_off_valve_0726_rev_5.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "8402G",
+      "kind": "дозирующий клапан топливного газа ГТУ с электроприводом",
+      "segment": "ГТУ",
+      "rating": "Cv 12–90; полный ход 350 мс",
+      "status": "выпускается",
+      "sources": [
+        "https://www.amot.com/en/8402-gas-turbine-fuel-metering-valve/",
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_8402_gas_turbine_fuel_control_valve_0719_rev3.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Thermostatic Control Valve Model B — паспорт с разделами How to Order и Maintenance and Service Parts",
+      "doc_no": "Datasheet B Thermostatic Control Valve 0321rev19",
+      "machine": "Model B",
+      "kind": "паспорт-каталог с перечнем запчастей (parts)",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_b_thermostatic_control_valve.pdf"
+      ]
+    },
+    {
+      "title": "Thermostatic Control Valve Model C — паспорт с запчастями",
+      "doc_no": "Datasheet C Thermostatic Control Valve 1020rev9",
+      "machine": "Model C",
+      "kind": "паспорт-каталог с перечнем запчастей (parts)",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download//d/a/datasheet_c_thermostatic_control_valve_1.pdf"
+      ]
+    },
+    {
+      "title": "Thermostatic Control Valve Model E — паспорт с запчастями",
+      "doc_no": "Datasheet E Thermostatic Control Valve 0119rev12",
+      "machine": "Model E",
+      "kind": "паспорт-каталог с перечнем запчастей (parts)",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_e_thermostatic_control_valve_0119_rev12.pdf"
+      ]
+    },
+    {
+      "title": "Thermostatic Control Valve Model R — паспорт с запчастями",
+      "doc_no": "Datasheet R Thermostatic Control Valve 0120 rev 5",
+      "machine": "Model R",
+      "kind": "паспорт-каталог с перечнем запчастей (parts)",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_r_thermostatic_control_valve.pdf"
+      ]
+    },
+    {
+      "title": "Thermostatic Control Valves Model H — паспорт с рекомендуемыми запчастями",
+      "doc_no": "DS-H-Thermostatic-Valve-0113-Rev1",
+      "machine": "Model H",
+      "kind": "паспорт-каталог с перечнем запчастей (parts)",
+      "sources": [
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_h-thermostatic-valve-0113-rev1.pdf"
+      ]
+    },
+    {
+      "title": "B Valve — Thermostatic valve for diverting and mixing applications. Installation, Operation and Maintenance Manual",
+      "doc_no": "OMMB00301, Revision 1 – Nov 2019",
+      "machine": "Model B (BO/BC/BF/BH)",
+      "kind": "O&M (таблицы элементов и комплектов уплотнений)",
+      "sources": [
+        "https://www.manualslib.com/manual/2136583/Amot-B-Series.html"
+      ]
+    },
+    {
+      "title": "Model B Valve — Thermostatic valve for diverting and mixing applications. Installation, Operation and Maintenance Manual",
+      "doc_no": "OMMB00010, Revision 7 – Mar 2014",
+      "machine": "Model B",
+      "kind": "O&M",
+      "sources": [
+        "https://www.manualslib.com/manual/3217565/Amot-B.html"
+      ]
+    },
+    {
+      "title": "Service Bulletin — Model B Service Kit",
+      "doc_no": "FORM 5000 A1310",
+      "machine": "Model B",
+      "kind": "бюллетень (как получить номер сервисного комплекта и как его поставить)",
+      "sources": [
+        "https://www.summit.dk/wp-content/uploads/2019/09/Service-manual-B-Ventil-1.pdf"
+      ]
+    },
+    {
+      "title": "G Valve с электроприводом — Operation, Installation and Maintenance Manual",
+      "doc_no": "OMMGGE00217, Revision 4, May 2019",
+      "machine": "Model G (02GGH…08GGH, 03GGS…06GGS)",
+      "kind": "O&M (рекомендуемые запчасти корпуса и привода)",
+      "sources": [
+        "https://www.manualslib.com/manual/2136693/Amot-G-Series.html"
+      ]
+    },
+    {
+      "title": "G Valve с пневмоприводом — Installation, Operation and Maintenance Manual",
+      "doc_no": "OMMGGP00185, Revision 5, May 2019",
+      "machine": "Model G с пневмоприводом 82046L и позиционером 47224X",
+      "kind": "O&M (сервисные комплекты привода)",
+      "sources": [
+        "https://www.manualslib.com/manual/2136695/Amot-G-Series.html"
+      ]
+    },
+    {
+      "title": "3-Way Temperature Control Valve — Model G, Version G and Accessories",
+      "doc_no": "Datasheet_GG_Temp_Control_Valve_1224_rev24",
+      "machine": "Model G, регулятор 8071D/8072E, датчик 8060, преобразователи 8064A/8064C",
+      "kind": "паспорт-каталог",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_gg_temp_control_valve_0224_rev24.pdf"
+      ]
+    },
+    {
+      "title": "Pressure and Temp. Regulating Valve Model 4500D — паспорт с таблицей Service parts",
+      "doc_no": "Datasheet 4500 Pressure Temp Regulating Valve 0120rev4",
+      "machine": "4500D",
+      "kind": "паспорт-каталог с перечнем запчастей (parts)",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4500_temperature_and_pressure_control_valve_0120_rev4.pdf"
+      ]
+    },
+    {
+      "title": "Temperature Detectors for Moving Bearings — Models 4102D, E, J & M",
+      "doc_no": "Datasheet_4102_Temperature_Detector_FEB18_Rev3",
+      "machine": "4102D/E/J/M",
+      "kind": "паспорт с разделом Service Kits (сменные плавкие стержни)",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4102_temperature_detector_feb18_rev3.pdf",
+        "https://www.manualslib.com/manual/2005133/Amot-4102d.html"
+      ]
+    },
+    {
+      "title": "Temperature Valve for Static Bearings — Models 4103D/M",
+      "doc_no": "Datasheet_4103_Temperature_Valve_FEB18_Rev2",
+      "machine": "4103D/M",
+      "kind": "паспорт с разделом запчастей",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4103_temperature_valve_feb18_rev2.pdf"
+      ]
+    },
+    {
+      "title": "Safety Shutdown Device — Model 2800D",
+      "doc_no": "Datasheet 2800 Safety Shutdown Device 0320rev5",
+      "machine": "2800D",
+      "kind": "паспорт с сервисным комплектом",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_2800_safety_shutdown_device_0320rev5.pdf"
+      ]
+    },
+    {
+      "title": "Pressure and Temperature Switches — Model 4140",
+      "doc_no": "DS 4140 Pressure Temperature Switch 0119rev12",
+      "machine": "4140",
+      "kind": "паспорт с сервисными комплектами",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4140_pressure_temperature_switch_0119rev12.pdf"
+      ]
+    },
+    {
+      "title": "Hazardous Area Temp. & Pressure Switches — 4250 Series",
+      "doc_no": "Datasheet 4250 Temp Pressure Switch 0821rev4",
+      "machine": "4251M–4255M",
+      "kind": "паспорт с перечнем запчастей (parts)",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4250_temp_pressure_switch_0821rev4.pdf"
+      ]
+    },
+    {
+      "title": "Metal Particle Detector — MPD",
+      "doc_no": "Datasheet MPD Metal Particle Detector 0119 rev 6",
+      "machine": "MPD2",
+      "kind": "паспорт с сервисными комплектами",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_mpd_metal_particle_detector_0119rev6.pdf"
+      ]
+    },
+    {
+      "title": "2-Way Sensing Valve — Model 4109B Vibro-Guard",
+      "doc_no": "Datasheet 4109 2 Way Sensing Valve 0119rev3",
+      "machine": "4109B",
+      "kind": "паспорт с сервисными комплектами",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4109_vibroguard_2-way_sensing_valve_0119rev3.pdf"
+      ]
+    },
+    {
+      "title": "Overspeed Sensing Valve — Model 4110B",
+      "doc_no": "Datasheet_4110_Overspeed_Sensing_Valve_1015_Rev1",
+      "machine": "4110B",
+      "kind": "паспорт с сервисными комплектами",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4110_overspeed_sensing_valve_1015_rev1.pdf"
+      ]
+    },
+    {
+      "title": "Positive Air Shutoff Valve — Model XT Butterfly Valve",
+      "doc_no": "DS-AMOT-XT-0925-Rev22",
+      "machine": "XT",
+      "kind": "паспорт с комплектами активации и монтажа",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/s/ds-amot-xt-0122-rev20.pdf"
+      ]
+    },
+    {
+      "title": "7001 Air Shutoff Valve — Service Kits & Accessories",
+      "doc_no": "DS-7001-Air-Shutoff-Valve-0719rev3",
+      "machine": "7001 (MTU Series 4000)",
+      "kind": "паспорт с сервисными комплектами",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7001-air-shut_off-valve-0719-rev3.pdf"
+      ]
+    },
+    {
+      "title": "D-Series Automatic Engine Overspeed Shut Down Valves (Bendix Types) — Selection, Application and Maintenance",
+      "doc_no": "CE204 (13)",
+      "machine": "Chalwyn D45–D80",
+      "kind": "паспорт с разделами подбора и обслуживания",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download//////c/h/chalwyn-d-bendix-ce204_13_0716.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "1096X",
+      "issuer": "AMOT",
+      "description": "Термостатический восковой элемент Model B, стандартное исполнение. Полный номер — база плюс уставка в °F, пример по паспорту: 1096X150",
+      "machine": "Model B 1½–8″; также Model R RO80 (2 шт.) и 4500D",
+      "unit": "термоэлемент (регулятор температуры)",
+      "doc_ref": "страница товара amot.com",
+      "source_url": "https://www.amot.com/en/1096x-thermostatic-wax-element-replacement-temperature-regulator-for-model-b-valves/",
+      "quote": "1096X Thermostatic Wax Element - Replacement Temperature Regulator for Model B Valves"
+    },
+    {
+      "code": "1096P",
+      "issuer": "AMOT",
+      "description": "Никелированный термоэлемент Model B: код материала 02 — уплотнения Viton, 45 — Neoprene. Номер плюс уставка в °F",
+      "machine": "Model B; 4500D (исполнения -BTJ/-BTU)",
+      "unit": "термоэлемент",
+      "doc_ref": "Datasheet B Thermostatic Control Valve 0321rev19, таблица Element type and seal material",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_b_thermostatic_control_valve.pdf",
+      "quote": "02 1096P Nickel plated Viton"
+    },
+    {
+      "code": "2433X",
+      "issuer": "AMOT",
+      "description": "Термоэлемент Model B с ручным дублёром (manual override), исполнения BM/BR",
+      "machine": "Model BM/BR",
+      "unit": "термоэлемент",
+      "doc_ref": "OMMB00301 Rev 1 (Nov 2019), Table 3 Element/Seal Types",
+      "source_url": "https://www.manualslib.com/manual/2136583/Amot-B-Series.html",
+      "quote": "2433X manual override with Viton seals"
+    },
+    {
+      "code": "5566X",
+      "issuer": "AMOT",
+      "description": "Термоэлемент Model B с укороченным ходом, для повышенного перегрева (short stroke, high overtemp.)",
+      "machine": "Model B",
+      "unit": "термоэлемент",
+      "doc_ref": "OMMB00301 Rev 1 (Nov 2019), Table 3",
+      "source_url": "https://www.manualslib.com/manual/2136583/Amot-B-Series.html",
+      "quote": "5566X reduce stroke with Viton seals"
+    },
+    {
+      "code": "48920X",
+      "issuer": "AMOT",
+      "description": "Стандартный термоэлемент Model B с обоймой и золотником из нержавеющей стали: код 66 — Nitrile, 70 — Viton",
+      "machine": "Model B",
+      "unit": "термоэлемент",
+      "doc_ref": "Datasheet B 0321rev19, таблица Element type and seal material",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_b_thermostatic_control_valve.pdf",
+      "quote": "70 48920X Viton"
+    },
+    {
+      "code": "46342X",
+      "issuer": "AMOT",
+      "description": "Базовый номер комплекта уплотнений Model B для заказа в Европе и Азии. Полный номер: 46342X + код размера + код уплотнения; пример для клапана 4BORJ15001-D4-AA — 46342X, 41, 1",
+      "machine": "Model B",
+      "unit": "комплект уплотнений (уплотнения и прокладка корпуса)",
+      "doc_ref": "Datasheet B 0321rev19, Table 3 Seal kit identification",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_b_thermostatic_control_valve.pdf",
+      "quote": "4BORJ15001-D4-AA 46342X 41 1"
+    },
+    {
+      "code": "46342X151",
+      "issuer": "AMOT",
+      "description": "Комплект уплотнений Model B (BO/BC/BF/BH) 1½″. Первое из шести исполнений 46342X151…156, которые различаются материалом (Nitrile/Viton/Neoprene)",
+      "machine": "Model B 1½″",
+      "unit": "комплект уплотнений",
+      "doc_ref": "OMMB00301 Rev 1, таблица Seal Kits",
+      "source_url": "https://www.manualslib.com/manual/2136583/Amot-B-Series.html",
+      "quote": "1.1/2” 46342X151 46342X152 46342X153 46342X154 46342X155 46342X156"
+    },
+    {
+      "code": "4BOKIT-18501-E4",
+      "issuer": "AMOT",
+      "description": "Сервисный комплект (элементы и уплотнения) к клапану 4BOCF18501-E4-AA. Номер клапана, где материал корпуса и присоединение заменены на KIT-. Продаётся только через отделения AMOT в США и Канаде",
+      "machine": "Model B 4″ BO, уставка 185 °F",
+      "unit": "сервисный комплект",
+      "doc_ref": "Service Bulletin Model B Service Kit, FORM 5000 A1310",
+      "source_url": "https://www.summit.dk/wp-content/uploads/2019/09/Service-manual-B-Ventil-1.pdf",
+      "quote": "4BOCF18501-E4-AA 4BOKIT-18501-E4"
+    },
+    {
+      "code": "1125X",
+      "issuer": "AMOT",
+      "description": "Термоэлемент Model C (CCM/CF/CM), стандартный. Номер плюс уставка в °F, пример по паспорту: 1125X075",
+      "machine": "Model C",
+      "unit": "термоэлемент",
+      "doc_ref": "страница товара amot.com; Datasheet C 1020rev9",
+      "source_url": "https://www.amot.com/en/1125x-thermostatic-wax-element-replacement-temperature-regulator-for-model-c-valves/",
+      "quote": "1125X Thermostatic Wax Element - Replacement Temperature Regulator for Model C Valves"
+    },
+    {
+      "code": "10765X",
+      "issuer": "AMOT",
+      "description": "Термоэлемент Model C исполнения CL, стандартный",
+      "machine": "Model C (CL)",
+      "unit": "термоэлемент",
+      "doc_ref": "Datasheet C Thermostatic Control Valve 1020rev9",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download//d/a/datasheet_c_thermostatic_control_valve_1.pdf",
+      "quote": "CL 10765X"
+    },
+    {
+      "code": "44844X",
+      "issuer": "AMOT",
+      "description": "Термоэлемент Model C для морской воды (нержавеющая сталь), код 86, уплотнения Viton",
+      "machine": "Model C (CCM/CF/CM)",
+      "unit": "термоэлемент",
+      "doc_ref": "Datasheet C 1020rev9",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download//d/a/datasheet_c_thermostatic_control_valve_1.pdf",
+      "quote": "86 ALL 44844X Salt water (SS) Viton"
+    },
+    {
+      "code": "9170X0",
+      "issuer": "AMOT",
+      "description": "Базовый номер комплекта уплотнений Model C для всех присоединений, кроме K. Полный номер: 9170X0 + код уплотнения (01/11/21)",
+      "machine": "Model C",
+      "unit": "комплект уплотнений",
+      "doc_ref": "Datasheet C 1020rev9, Table 3 Seal kit identification",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download//d/a/datasheet_c_thermostatic_control_valve_1.pdf",
+      "quote": "1 ¼CCMCT07506-B2-AA 9170X0 11"
+    },
+    {
+      "code": "5435X",
+      "issuer": "AMOT",
+      "description": "Стандартный термоэлемент Model E (EF/EL/EO). Номер плюс уставка в °F, пример: 5435X095",
+      "machine": "Model E; также Model R RO20–RO40",
+      "unit": "термоэлемент",
+      "doc_ref": "Datasheet E Thermostatic Control Valve 0119rev12",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_e_thermostatic_control_valve_0119_rev12.pdf",
+      "quote": "01 EF/EL/EO 5435X Standard Buna N/Nitrile"
+    },
+    {
+      "code": "9831X",
+      "issuer": "AMOT",
+      "description": "Термоэлемент Model E исполнения EM (с ручным дублёром), коды материала 07/11/14",
+      "machine": "Model E (EM)",
+      "unit": "термоэлемент",
+      "doc_ref": "Datasheet E 0119rev12, Table 4",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_e_thermostatic_control_valve_0119_rev12.pdf",
+      "quote": "07, 11, 14 9831X(Temp.)"
+    },
+    {
+      "code": "82334X",
+      "issuer": "AMOT",
+      "description": "Базовый номер комплекта уплотнений Model E. Полный номер: 82334X + код уплотнения + код клапана",
+      "machine": "Model E",
+      "unit": "комплект уплотнений",
+      "doc_ref": "Datasheet E 0119rev12, Table 3",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_e_thermostatic_control_valve_0119_rev12.pdf",
+      "quote": "1 ¼ ELCT09501-B-AA 82334X 1 01"
+    },
+    {
+      "code": "9760X",
+      "issuer": "AMOT",
+      "description": "Стандартный термоэлемент (element assembly) Model H",
+      "machine": "Model H (HO)",
+      "unit": "термоэлемент",
+      "doc_ref": "DS-H-Thermostatic-Valve-0113-Rev1, Recommended spares",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_h-thermostatic-valve-0113-rev1.pdf",
+      "quote": "01 9760X Standard element Nitrile (Buna N)"
+    },
+    {
+      "code": "9844X",
+      "issuer": "AMOT",
+      "description": "Термоэлемент Model H с ручным дублёром",
+      "machine": "Model H (HM)",
+      "unit": "термоэлемент",
+      "doc_ref": "DS-H-Thermostatic-Valve-0113-Rev1",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_h-thermostatic-valve-0113-rev1.pdf",
+      "quote": "07 9844X Standard manual override Nitrile (Buna N)"
+    },
+    {
+      "code": "11009L001",
+      "issuer": "AMOT",
+      "description": "Уплотнительное кольцо элемента Model H, Nitrile (стандарт); в Viton — 11009L002",
+      "machine": "Model H",
+      "unit": "уплотнение элемента",
+      "doc_ref": "DS-H-Thermostatic-Valve-0113-Rev1, Recommended spares",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_h-thermostatic-valve-0113-rev1.pdf",
+      "quote": "11009L001 O-ring, element, Nitrile"
+    },
+    {
+      "code": "11007L001",
+      "issuer": "AMOT",
+      "description": "Уплотнительное кольцо корпуса Model H, Nitrile; в Viton — 11007L002",
+      "machine": "Model H",
+      "unit": "уплотнение корпуса",
+      "doc_ref": "DS-H-Thermostatic-Valve-0113-Rev1",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_h-thermostatic-valve-0113-rev1.pdf",
+      "quote": "11007L001 O-ring, housing, Nitrile"
+    },
+    {
+      "code": "11148L001",
+      "issuer": "AMOT",
+      "description": "Уплотнительное кольцо штока Model H, Viton; в Nitrile — 11148",
+      "machine": "Model H (HM)",
+      "unit": "уплотнение штока",
+      "doc_ref": "DS-H-Thermostatic-Valve-0113-Rev1",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_h-thermostatic-valve-0113-rev1.pdf",
+      "quote": "11148L001 O-ring, stem seal, Viton"
+    },
+    {
+      "code": "21376X",
+      "issuer": "AMOT",
+      "description": "Термоэлемент Model R для RO50–RO65 при заказе в США и Канаде; для Европы и Азии — 46856X",
+      "machine": "Model R (RO50, RO65)",
+      "unit": "термоэлемент",
+      "doc_ref": "Datasheet R Thermostatic Control Valve 0120 rev 5, Table 4",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_r_thermostatic_control_valve.pdf",
+      "quote": "21376X(Temp.) 1 USA/Canada ONLY"
+    },
+    {
+      "code": "46857X1",
+      "issuer": "AMOT",
+      "description": "Базовый номер комплекта уплотнений Model R для RO20/RO25/RO40. Полный номер: 46857X1 + код уплотнения 01–03",
+      "machine": "Model R (RO20–RO40)",
+      "unit": "комплект уплотнений",
+      "doc_ref": "Datasheet R 0120 rev 5, Table 3",
+      "source_url": "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_r_thermostatic_control_valve.pdf",
+      "quote": "RO25SX120010 46857X1 01"
+    },
+    {
+      "code": "43603L002",
+      "issuer": "AMOT",
+      "description": "Уплотнительное кольцо крышки клапана G, Viton",
+      "machine": "Model G 08GGH",
+      "unit": "корпус клапана, уплотнение",
+      "doc_ref": "OMMGGE00217 Rev 4 (May 2019), 3.4.2 Recommended Spares",
+      "source_url": "https://www.manualslib.com/manual/2136693/Amot-G-Series.html",
+      "quote": "O Ring, Cover 43603L002 (1)"
+    },
+    {
+      "code": "43611L002",
+      "issuer": "AMOT",
+      "description": "Уплотнительное кольцо вала клапана G, Viton",
+      "machine": "Model G 08GGH",
+      "unit": "корпус клапана, уплотнение вала",
+      "doc_ref": "OMMGGE00217 Rev 4, 3.4.2 Recommended Spares",
+      "source_url": "https://www.manualslib.com/manual/2136693/Amot-G-Series.html",
+      "quote": "O Ring, Upper Shaft 43611L002 (1)"
+    },
+    {
+      "code": "82138X001",
+      "issuer": "AMOT",
+      "description": "Сервисный комплект пневмопривода 82046L1 для клапанов G 02GGH/03GGS/03GGH/04GGS",
+      "machine": "Model G с пневмоприводом",
+      "unit": "пневмопривод",
+      "doc_ref": "OMMGGP00185 Rev 5 (May 2019), Table 4 Spares Kits for 82046L Actuator",
+      "source_url": "https://www.manualslib.com/manual/2136695/Amot-G-Series.html",
+      "quote": "82046L1…… 82138X001"
+    },
+    {
+      "code": "82434X005",
+      "issuer": "AMOT",
+      "description": "Датчик Холла электропривода клапана G",
+      "machine": "Model G с электроприводом",
+      "unit": "электропривод",
+      "doc_ref": "OMMGGE00217 Rev 4, 4.11 Available Spares",
+      "source_url": "https://www.manualslib.com/manual/2136693/Amot-G-Series.html",
+      "quote": "Hall Sensor 82434X005"
+    },
+    {
+      "code": "48022X",
+      "issuer": "AMOT",
+      "description": "Комплект переделки дроссельных отверстий 4500D с 1,2/1,4 мм на 3 мм: кольца Viton, дроссели, фильтр 17 мкм",
+      "machine": "4500D",
+      "unit": "гидравлика регулятора, дроссели",
+      "doc_ref": "Datasheet 4500 Pressure Temp Regulating Valve 0120rev4",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4500_temperature_and_pressure_control_valve_0120_rev4.pdf",
+      "quote": "An upgrade kit 48022X is available to convert"
+    },
+    {
+      "code": "6710X",
+      "issuer": "AMOT",
+      "description": "Сменный плавкий стержень 4103D. Полный номер: 6710X + код длины + T + температура срабатывания в °F",
+      "machine": "4103D",
+      "unit": "датчик температуры подшипника",
+      "doc_ref": "Datasheet_4103_Temperature_Valve_FEB18_Rev2",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4103_temperature_valve_feb18_rev2.pdf",
+      "quote": "6710X 4103D ONLY"
+    },
+    {
+      "code": "7280X",
+      "issuer": "AMOT",
+      "description": "Сменный плавкий стержень 4103M, пример по паспорту: 7280X 02 T 228",
+      "machine": "4103M",
+      "unit": "датчик температуры подшипника",
+      "doc_ref": "Datasheet_4103_Temperature_Valve_FEB18_Rev2",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4103_temperature_valve_feb18_rev2.pdf",
+      "quote": "7280X 4103M ONLY"
+    },
+    {
+      "code": "6702X",
+      "issuer": "AMOT",
+      "description": "Сменный плавкий стержень 4102D/E/J, пример: 6702X 11 T 217. По паспорту стержень служит пять лет; для 4102M — 7334X",
+      "machine": "4102D/E/J",
+      "unit": "датчик температуры подвижного подшипника",
+      "doc_ref": "Datasheet_4102_Temperature_Detector_FEB18_Rev3",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4102_temperature_detector_feb18_rev3.pdf",
+      "quote": "6702X 4102D/E/J ONLY"
+    },
+    {
+      "code": "10049X",
+      "issuer": "AMOT",
+      "description": "Сервисный комплект 2800D: уплотнения, диафрагма, прокладка; один на все 2800D",
+      "machine": "2800D",
+      "unit": "устройство аварийного останова",
+      "doc_ref": "Datasheet 2800 Safety Shutdown Device 0320rev5",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_2800_safety_shutdown_device_0320rev5.pdf",
+      "quote": "same service kit 10049X."
+    },
+    {
+      "code": "9163X002",
+      "issuer": "AMOT",
+      "description": "Сервисный комплект 4109B при коде выключателя (C) = 0: клапан в сборе, уплотнения, прокладка",
+      "machine": "4109B Vibro-Guard",
+      "unit": "вибрационный клапан",
+      "doc_ref": "Datasheet 4109 2 Way Sensing Valve 0119rev3",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4109_vibroguard_2-way_sensing_valve_0119rev3.pdf",
+      "quote": "4109B 1 0 B 9163X002"
+    },
+    {
+      "code": "9114X003",
+      "issuer": "AMOT",
+      "description": "Сервисный комплект 4110B для работы на масле: кольца, пружина, корпус, толкатель, прокладка. Для работы на воздухе — 9114X001",
+      "machine": "4110B",
+      "unit": "клапан-датчик превышения оборотов",
+      "doc_ref": "Datasheet_4110_Overspeed_Sensing_Valve_1015_Rev1",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4110_overspeed_sensing_valve_1015_rev1.pdf",
+      "quote": "number 9114X003 which includes the"
+    },
+    {
+      "code": "44046L",
+      "issuer": "AMOT",
+      "description": "Сервисный комплект реле 4140A: микровыключатель, диафрагма, прокладки. Полный номер: 44046L + коды микровыключателя, диапазона и присоединения",
+      "machine": "4140A",
+      "unit": "реле давления и температуры",
+      "doc_ref": "DS 4140 Pressure Temperature Switch 0119rev12",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4140_pressure_temperature_switch_0119rev12.pdf",
+      "quote": "44046L Service kit for 4140A ONLY"
+    },
+    {
+      "code": "10829X101",
+      "issuer": "AMOT",
+      "description": "Сервисный комплект MPD (решётка, уплотнения) при коде уплотнения 1, без особых требований (NONE или -AA)",
+      "machine": "MPD2",
+      "unit": "детектор металлических частиц",
+      "doc_ref": "Datasheet MPD Metal Particle Detector 0119 rev 6",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_mpd_metal_particle_detector_0119rev6.pdf",
+      "quote": "NONE or -AA 10829X101"
+    },
+    {
+      "code": "1981X145",
+      "issuer": "AMOT",
+      "description": "Температурный элемент реле 4251M/4253M/4254M при коде температуры (E) = 4",
+      "machine": "4250 series",
+      "unit": "реле температуры, чувствительный элемент",
+      "doc_ref": "Datasheet 4250 Temp Pressure Switch 0821rev4, Service parts",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4250_temp_pressure_switch_0821rev4.pdf",
+      "quote": "39 1981X145 1 - 1 1 - Temperature (E) = 4"
+    },
+    {
+      "code": "RKS-7001-04",
+      "issuer": "AMOT",
+      "description": "Комплект соленоида 24 В с разъёмом Deutsch для клапана 7001",
+      "machine": "7001 (MTU Series 4000)",
+      "unit": "отсечной клапан воздуха, привод",
+      "doc_ref": "DS-7001-Air-Shutoff-Valve-0719rev3, Service Kits & Accessories",
+      "source_url": "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7001-air-shut_off-valve-0719-rev3.pdf",
+      "quote": "RKS-7001-04 Solenoid kit, 24V, Deutsch"
+    },
+    {
+      "code": "128-2062",
+      "issuer": "Caterpillar",
+      "description": "Номер Caterpillar регулятора (Regulator AS) для двигателей 3508/3512/3516. У дилера стоит в перечне «Термостатические элементы для замены» рядом с элементами AMOT; прямой записи «1096X = 128-2062» нет — соответствие элементу AMOT не подтверждено ни изготовителем, ни явно дилером",
+      "machine": "Caterpillar 3508, 3512, 3516",
+      "unit": "термоэлемент системы охлаждения",
+      "doc_ref": "страница дилера «Балтик-Дизель»",
+      "source_url": "http://www.baltik-diesel.com/amot-controls/",
+      "quote": "Caterpillar (CAT) 3508, 3512, 3516, 128-2062, 151-6017 Regulator AS"
+    },
+    {
+      "code": "151-6017",
+      "issuer": "Caterpillar",
+      "description": "Второй номер Caterpillar того же регулятора (Regulator AS) для 3508/3512/3516, в том же перечне дилера; прямой записи о соответствии элементу AMOT 1096X нет. По проверке скептика номер есть на parts.cat.com как Coolant Temperature Regulator Assembly",
+      "machine": "Caterpillar 3508, 3512, 3516",
+      "unit": "термоэлемент системы охлаждения",
+      "doc_ref": "страница дилера «Балтик-Дизель»",
+      "source_url": "http://www.baltik-diesel.com/amot-controls/",
+      "quote": "Caterpillar (CAT) 3508, 3512, 3516, 128-2062, 151-6017 Regulator AS"
+    }
+  ],
+  "parts_rejected": [
+    {
+      "code": "6938S",
+      "verdict": "не подтверждён",
+      "reason": "Код существует, но относится к другому изделию. Отдельная страница manualslib (стр. 29, Table 6) даёт «6938S(°F) — Element assembly, 'Saltwater' plated, with manual override», а стр. 11 (Table 3) — «09 6938S saltwater manual override with Nitrile seals». В паспорте B 0321rev19 код 09 6938S — «Saltwater manual override». Простой элемент Saltwater без ручного дублёра — 6836S (код 05). Цитата разведки — неверно склеенный фрагмент сводки manualslib."
+    }
+  ],
+  "sub_suppliers": [
+    {
+      "company": "Sun Hydraulics (Helios Technologies)",
+      "component": "пилотный предохранительный картридж RGFA-LGV (позиция 30, номер AMOT 11859L001)",
+      "machine": "4500D",
+      "evidence": "В таблице Service parts паспорта 4500D есть строка «11859L001 … RELIEF PILOT REG - SUN RGFA-LGV». Принадлежность марки Sun к Helios Technologies — из общих сведений, не из паспорта.",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4500_temperature_and_pressure_control_valve_0120_rev4.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Pall Corporation",
+      "component": "фильтр 17 мкм (номер AMOT 47590)",
+      "machine": "4500D",
+      "evidence": "В таблице Service parts паспорта 4500D есть строка «47590 … PALL FILTER - 17 MICRON».",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4500_temperature_and_pressure_control_valve_0120_rev4.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Deutsch (TE Connectivity)",
+      "component": "разъём соленоида DT04-4P и разъём со встроенным шунтом 33 кОм DT06-2S (коды — в паспорте 7002); у 7001 паспорт называет только марку Deutsch (комплект соленоида RKS-7001-04)",
+      "machine": "7002 (коды разъёмов), 7001 (только марка)",
+      "evidence": "В таблице заказа 7002: «Deutsch Solenoid Connector (DT04-4P)» и «Connector with integral 33 kΩ Shunt (DT06-2S)». В паспорте 7001: «RKS-7001-04 Solenoid kit, 24V, Deutsch». Что марка Deutsch принадлежит TE — общие сведения.",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7002-air-shut_off-valve-0719rev3.pdf",
+        "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7001-air-shut_off-valve-0719-rev3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Weather Pack (Aptiv, бывший Delphi Packard)",
+      "component": "разъём соленоида 12015792 (исполнение HAC)",
+      "machine": "7002",
+      "evidence": "В таблице заказа 7002: «Weatherpack Solenoid Connector (12015792)». Владелец марки — из общих сведений.",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7002-air-shut_off-valve-0719rev3.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Chemours (Krytox)",
+      "component": "смазка Krytox GPL296 (номер AMOT 21721L001)",
+      "machine": "4075D / 4475B",
+      "evidence": "В перечне запчастей паспорта 4075/4475 есть строка «21721L001 1 Krytox GPL296 grease».",
+      "sources": [
+        "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4075_4475_high_temperature_valve_0621_rev5.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Curtiss-Wright Nuclear",
+      "component": "изготовление продукции AMOT в исполнении safety-related и ASME Code Section III для АЭС США и Канады",
+      "machine": "термостатические клапаны, поворотные регулирующие клапаны, пусковые и отсечные газовые клапаны AMOT",
+      "evidence": "На странице Curtiss-Wright: «All Safety-Related and ASME Code AMOT products will be manufactured under Curtiss-Wright Nuclear’s 10CFR50 Appendix B Program and ASME N and NPT Stamps»; партнёрство действует с 2009 года.",
+      "sources": [
+        "https://nuclear.curtisswright.com/brands/enertech/valves/thermostatic"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "AMOT UK",
+      "country": "Великобритания",
+      "role": "Изготовитель: производство и офис EMEA (Бери-Сент-Эдмундс), прямое предложение. В Европе и Азии элемент и комплект уплотнений заказываются раздельно",
+      "sources": [
+        "https://www.amot.com/en/catalog/category/view/s/locations/id/54/",
+        "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_b_thermostatic_control_valve.pdf"
+      ]
+    },
+    {
+      "company": "AMOT USA",
+      "country": "США",
+      "role": "Изготовитель: офис Americas (Хьюстон), прямое предложение. Сервисные комплекты KIT- продаются только через Americas и Canada",
+      "sources": [
+        "https://www.amot.com/en/catalog/category/view/s/locations/id/54/"
+      ]
+    },
+    {
+      "company": "AMOT Canada",
+      "country": "Канада",
+      "role": "Изготовитель: офис в Эдмонтоне (там же бренд Roda Deaco), прямое предложение",
+      "sources": [
+        "https://www.amot.com/en/catalog/category/view/s/locations/id/54/",
+        "https://www.amot.com/contact-a-distributor"
+      ]
+    },
+    {
+      "company": "AMOT China",
+      "country": "Китай",
+      "role": "Изготовитель: офис Азиатско-Тихоокеанского региона (Шанхай), прямое предложение",
+      "sources": [
+        "https://www.amot.com/en/catalog/category/view/s/locations/id/54/"
+      ]
+    },
+    {
+      "company": "AMOT India",
+      "country": "Индия",
+      "role": "Изготовитель: офис в Мумбаи, прямое предложение",
+      "sources": [
+        "https://www.amot.com/en/catalog/category/view/s/locations/id/54/"
+      ]
+    },
+    {
+      "company": "AMOT Singapore",
+      "country": "Сингапур",
+      "role": "Представительство изготовителя (офис AMOT), есть в форме выбора дистрибьютора на сайте AMOT",
+      "sources": [
+        "https://www.amot.com/contact-a-distributor"
+      ]
+    },
+    {
+      "company": "ООО «Балтик-Дизель»",
+      "country": "Россия",
+      "role": "Трейдер. На сайте называет себя официальным дилером AMOT, работает с 2006 года, поставляет по РФ и СНГ. Приводит номера Caterpillar и Wärtsilä в перечне термоэлементов для замены, прямо с элементом 1096X их не связывает. Изготовитель статус не подтверждает: в его перечне офисов российских дилеров нет",
+      "sources": [
+        "http://www.baltik-diesel.com/amot-controls/",
+        "http://www.baltik-diesel.com/amot-controls/termostaticheskie-3-kh-khodovye-klapany/"
+      ]
+    },
+    {
+      "company": "Дивита Рус",
+      "country": "Россия",
+      "role": "Трейдер. На сайте называет себя официальным поставщиком клапанов, генераторов, искрогасителей и термостатов Amot; изготовителем не подтверждено",
+      "sources": [
+        "https://divitarus.ru/provaider/amott"
+      ]
+    },
+    {
+      "company": "ООО «Интерснаб»",
+      "country": "Россия",
+      "role": "Трейдер: поставляет оборудование AMOT Controls со склада или под заказ по России и в СНГ",
+      "sources": [
+        "https://intsnab.com/vendors/amot.php"
+      ]
+    },
+    {
+      "company": "AHF Industries (AHF Group)",
+      "country": "Сингапур (филиалы: Малайзия, Австралия, Корея, Китай, Индия, ОАЭ, Катар)",
+      "role": "Торговая группа арматуры: AMOT есть в её перечне брендов, статус дистрибьютора не подтверждён (на странице не указан)",
+      "sources": [
+        "https://www.ahfindustries.com/our-brands/amot/"
+      ]
+    },
+    {
+      "company": "Lavastica International",
+      "country": "Нидерланды",
+      "role": "Трейдер: поставляет по всему миру приводы, клапаны и запчасти AMOT со склада, даёт сервисных инженеров",
+      "sources": [
+        "https://www.lavastica.com/brand/amot/"
+      ]
+    },
+    {
+      "company": "Curtiss-Wright Nuclear",
+      "country": "США",
+      "role": "Авторизованный дистрибьютор safety-related и коммерческой продукции AMOT (атомная энергетика США и Канады)",
+      "sources": [
+        "https://nuclear.curtisswright.com/brands/enertech/valves/thermostatic"
+      ]
+    },
+    {
+      "company": "Fluid Power Energy",
+      "country": "США",
+      "role": "Не дилер: делает неоригинальные запчасти к термоклапанам Amot (по форме, посадке и функции), с AMOT не связан. Источник аналогов, не оригинала",
+      "sources": [
+        "https://www.fpevalves.com/spare-parts-for-amot-tcvs/"
+      ]
+    }
+  ],
+  "gaps": [
+    "Бюллетени по монтажу и обслуживанию (Installation and Service Bulletins) ISB-4103-001, ISB-4087-001, ISB-4250-001/002/003, ISB-4395-001 и ISB-4075-4475-001 упомянуты в паспортах AMOT как поставляемые с запчастями, но в открытом доступе не найдены. Вероятный путь — форма запроса запчастей на amot.com/en/service-parts или офис AMOT.",
+    "Руководство по ПИД-регулятору 8071D (AMOT publication OMM807100043) упомянуто в руководствах по клапану G, но в открытом доступе не найдено.",
+    "Руководства по монтажу и обслуживанию (IOM) на клапаны Model C, E, H и R не найдены. Открыто лежат только руководства по Model B (OMMB00301, OMMB00010) и Model G (OMMGGE00217, OMMGGP00185), и только на ManualsLib, не на сайте изготовителя.",
+    "Для Model C, E и R в паспортах дана только структура номера комплекта уплотнений (база + код), таблиц с готовыми номерами нет. Готовая таблица есть лишь для Model B (46342X151…206 в OMMB00301).",
+    "Сервисные комплекты KIT- списком не опубликованы: номер получают из номера клапана с шильдика. Продаются они только через AMOT USA и Canada; в Европе и Азии берут комплект уплотнений и элемент отдельно.",
+    "Модели D (8″, DN200) и J (¾″, DN20) названы только у дилера «Балтик-Дизель». В текущем каталоге AMOT их нет, коды элементов к ним не найдены; скорее всего, модели сняты с производства.",
+    "В паспорте 4500D есть номера комплектующих сторонних изготовителей без названия фирм: «MFG.# BA13355», «MFG.#BM13816», «AX90210», «AX90200», «PFS# ST25500», «PI61972», «PH59646». Кто их делает, не установлено.",
+    "Перекрёстные номера OEM (Caterpillar, Wärtsilä, MTU, Cummins) для элементов и отсечных клапанов AMOT найдены только у российского дилера. Каталоги OEM (CAT SIS, порталы MTU и Wärtsilä) закрыты, и соответствие изготовителем не подтверждено.",
+    "Официальных дистрибьюторов AMOT в России, СНГ, Турции и ОАЭ изготовитель не публикует: на его карте и в форме выбора дистрибьютора только собственные офисы. Статусы российских продавцов заявлены ими самими. Страница поиска дистрибьюторов Chalwyn (chalwyn.com/find-local-dist/view) отвечает 404.",
+    "Систему контроля износа подшипников XTS-W упоминает дилер, но в текущем каталоге AMOT её нет; данных и кодов по ней не найдено.",
+    "Владелец: сайт AMOT ссылается на условия и кодекс AMETEK, но в пресс-релизах AMETEK о покупке Indicor Instrumentation (закрыта 26.08.2026) AMOT поимённо не назван. Прямого документа о принадлежности нет.",
+    "Цены, сроки и наличие не собирались. Открытые цены есть у торговых площадок (Radwell, Zoro, eBay), но там номера элементов пишут с дефисом (1096X-160), а не так, как в паспорте изготовителя (1096X160).",
+    "6938S (элемент Saltwater с ручным дублёром) и 6836S (элемент Saltwater без дублёра, паспорт B, код 05) в parts не внесены: цитата разведки к 6938S склеена неверно, а 6836S разведка не записывала. Для записи нужна дословная цитата из паспорта B 0321rev19 или OMMB00301 и повторная проверка."
+  ],
+  "verifier_notes": "Все источники открылись: 26 PDF, 23 страницы товаров amot.com, manualslib (включая отдельные страницы 11, 29, 30 руководства B; 18 и 60 руководства G; 46 руководства G пневмо), summit.dk, baltik-diesel.com, curtisswright.com. Текст PDF снят через pdftotext -layout; каждый код найден в своём источнике.\n\nИтог по кодам: 40 из 41 подтверждены, 1 не подтверждён.\n\nНе подтверждён 6938S. Это термоэлемент Saltwater с ручным дублёром (manual override): так он назван в OMMB00301 (Table 3 и Table 6) и в паспорте B 0321rev19 (код 09). Простой элемент Saltwater — 6836S (код 05). Цитата разведки «Element assembly, ‘Saltwater’ plated 6938S(°F)» склеена из сводки manualslib, где столбцы описаний и номеров смешаны. Исправление: либо поменять описание 6938S на «Saltwater plated, with manual override», либо завести запись 6836S — Saltwater (паспорт B, код 05, Buna N).\n\nМелкие оговорки без смены вердикта:\n- Model G: по паспорту размеры DN15–DN250 (0,5–10″), а не DN25–DN250.\n- Коды Deutsch DT04-4P/DT06-2S документированы только для 7002; для 7001 паспорт называет лишь марку Deutsch.\n- CAT 128-2062 и 151-6017 стоят у дилера соседними строками под заголовком «Термостатические элементы для замены», прямой ссылки «= 1096X» нет. Сами номера — настоящие номера CAT (151-6017 есть в parts.cat.com как Coolant Temperature Regulator Assembly).\n- Принадлежность марок Sun→Helios, Deutsch→TE, Weather Pack→Aptiv взята из общих сведений, а не из источника.",
+  "corrections": [
+    "Model G: размеры по паспорту — DN15–DN250 (½–10″), а не DN25–DN250 (замечание скептика)",
+    "Deutsch: коды DT04-4P/DT06-2S отнесены к 7002, у 7001 — только марка; DT06-2S — разъём со встроенным шунтом, а не разъём концевого выключателя (замечание скептика)",
+    "128-2062, 151-6017, summary, роль «Балтик-Дизель»: снято «замена элемента 1096X» — у дилера номера CAT стоят соседними строками под заголовком «Термостатические элементы для замены», прямой записи «= 1096X» нет (замечание скептика)",
+    "summary: «40 кодов, 38 номеров AMOT» исправлено на 39 и 37 — столько кодов в parts; 6938S отклонён скептиком",
+    "sub_suppliers: verified: true у всех 6 — скептик открыл все источники; принадлежность марок Sun→Helios, Deutsch→TE, Weather Pack→Aptiv оговорена в evidence как общие сведения",
+    "6938S: оставлен в parts_rejected; путь исправления из отчёта скептика (описание «Saltwater, manual override» и запись 6836S) вынесен строкой в gaps — без новой цитаты и проверки код не записывается",
+    "Дилеры, перепроверено при сборке файла: AMOT Singapore записан как представительство изготовителя; у AHF явно — статус дистрибьютора не подтверждён",
+    "verifier_notes: снят локальный путь к рабочим файлам скептика — пути рабочей машины в набор не пишутся"
+  ]
+}
