@@ -383,6 +383,23 @@ create or replace function sup_имя_как_ключ(t text) returns boolean as
       or t ~ '^[a-zа-яё0-9]+$'
 $$ language sql immutable;
 
+-- ПЕРЕХОД 27.09.2026. Первая редакция lib_deal_customer (deal_links_schema.sql)
+-- стояла прямо поверх sup_name_shown, и «drop view» ниже падал на живой базе.
+-- Новая берёт имена функцией и зависимости не пишет. Вид первой редакции (и
+-- lib_rfq_chain над ним) снимается здесь, только если он и правда зависит от
+-- sup_name_shown; пересобирает оба deal_links_schema.sql — в zip-db он идёт
+-- следом. После первого прохода блок ничего не делает.
+do $$
+begin
+  if exists (select 1 from pg_depend d join pg_rewrite r on r.oid = d.objid
+              where r.ev_class = to_regclass('lib_deal_customer')
+                and d.refobjid = to_regclass('sup_name_shown')) then
+    execute 'drop view if exists lib_rfq_chain';
+    execute 'drop view if exists lib_deal_customer';
+    raise notice 'переход: снят lib_deal_customer первой редакции — пересоберёт deal_links_schema.sql';
+  end if;
+end $$;
+
 drop view if exists sup_name_shown;
 create view sup_name_shown with (security_invoker = true) as
 with active as (

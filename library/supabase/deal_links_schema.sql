@@ -24,7 +24,8 @@
 --
 -- ВИД lib_deal_customer — сделка с именем заказчика ИЗ РЕЕСТРА КОМПАНИЙ, без
 -- нового обхода компаний портала: company_id → sup_identifier (kind 'bitrix')
--- → корень цепочки слияний → sup_name_shown. Реестр собран по поставщикам,
+-- → корень цепочки слияний → sup_name_shown (через функцию lib_имена_компаний:
+-- вид поверх того вида ронял бы схему поставщиков). Реестр собран по поставщикам,
 -- поэтому у заказчика, которого там нет, имя пусто, а company_id есть — пусто
 -- видно числом (досчёт печатает охват), а не выдумывается. Без схемы
 -- поставщиков вид всё равно создаётся — с пустым именем: читатель вида не
@@ -88,9 +89,23 @@ do $$
 begin
   execute 'drop view if exists lib_rfq_chain';
   execute 'drop view if exists lib_deal_customer';
+  execute 'drop function if exists lib_имена_компаний()';
   if to_regclass(current_schema() || '.sup_identifier') is not null
      and to_regclass(current_schema() || '.sup_entity') is not null
      and to_regclass(current_schema() || '.sup_name_shown') is not null then
+    -- ИМЯ — ФУНКЦИЕЙ, А НЕ СОЕДИНЕНИЕМ С ВИДОМ sup_name_shown. Схема поставщиков
+    -- пересобирает тот вид drop + create (tests/test_schema_views_droppable.py), и
+    -- вид поверх него ронял её повторное применение — zip-db, supplier-merge,
+    -- suppliers-names: «cannot drop view sup_name_shown because other objects
+    -- depend on it» (та же ловушка — у lib_prices_live в schema_junk.sql). Тело
+    -- функции на языке sql имя вида разрешает при вызове и зависимости в базе не
+    -- пишет, а планировщик встраивает его в запрос обычным подзапросом.
+    execute $f$
+      create function lib_имена_компаний()
+        returns table (sup_id text, name text, name_source text)
+        language sql stable
+        as $b$ select n.sup_id::text, n.name::text, n.name_source::text from sup_name_shown n $b$
+    $f$;
     execute $v$
       create view lib_deal_customer with (security_invoker = true) as
       with recursive walk (id, root, depth) as (
@@ -117,7 +132,7 @@ begin
              d.run_id, d.seen_at
         from lib_deals d
         left join bx b on b.company_id = d.company_id
-        left join sup_name_shown n on n.sup_id = b.sup_id
+        left join lib_имена_компаний() n on n.sup_id = b.sup_id
     $v$;
   else
     execute $v$
@@ -158,5 +173,15 @@ begin
   if служебная is not null then
     execute format('grant select on lib_rfq_cards, lib_deals, lib_deal_customer, lib_rfq_chain to %s',
                    служебная);
+  end if;
+  -- Функция имён есть только при схеме поставщиков; права — те же, что у видов.
+  if to_regprocedure('lib_имена_компаний()') is not null then
+    execute 'revoke all on function lib_имена_компаний() from public';
+    if кому is not null then
+      execute format('revoke all on function lib_имена_компаний() from %s', кому);
+    end if;
+    if служебная is not null then
+      execute format('grant execute on function lib_имена_компаний() to %s', служебная);
+    end if;
   end if;
 end $$;
