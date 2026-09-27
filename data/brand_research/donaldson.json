@@ -1,0 +1,611 @@
+{
+  "oem_key": "donaldson",
+  "name": "Donaldson Company, Inc.",
+  "segment_focus": "фильтры двигателей и воздухоочистителей ГТУ: номера и кроссы к номерам изготовителей машин",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Donaldson (США) — изготовитель фильтров, а не машин. В нашем фокусе две линии. Первая — системы воздухоочистки на входе ГТУ (Gas Turbine Systems): импульсно очищаемые GDX и TTD, статические GDS/GDS-II, композитные CFS, панельные PowerCore/XLR, картриджи Turbo-Tek (материалы Spider-Web, Duratek, Synthetic, Cellulose). Вторая — фильтры двигателей: масло, топливо, воздух, в том числе для газопоршневых и дизельных двигателей Caterpillar, Waukesha, Jenbacher, MTU и Cummins. Коды ГТУ взяты из открытого каталога GTS-400 «Replacement Filters & Spare Parts Catalog» (PDF у дистрибьютора; издание старое, в нём записи вида P19-1280, а в магазине Donaldson тот же код пишется P191280). В каталоге прямо названы машины: 22-дюймовые картриджи для статических систем S&S LM2500/LM5000/LM6000 и для TTD на турбинах Solar, панель G4 под рамку «Guard Filter» LM6000. Кроссы фильтров двигателей к номерам изготовителей машин взяты со страниц товаров дистрибьютора Diesel Equipment Inc (Caterpillar 1R0739, 1R0749, 1R0751, 1R0762, 6I2501/6I2502, 7N7500; Waukesha 168660, 172607, 169180G; Guascor 1835002; Jenbacher Werke; MTU X59408300030 и 20922101; Cummins/Fleetguard LF9080). Кроссов входных фильтров ГТУ к номерам GE и Solar в открытых источниках не нашлось. Официальный магазин shop.donaldson.com закрыт для автоматического чтения (403). В августе 2022 года Donaldson прекратил работу в России и Беларуси. На Ближнем Востоке фильтры ГТУ выпускает Northern Technical LLC (Абу-Даби), купленная Donaldson в 2014 году.",
+  "machines": [
+    {
+      "model": "GDX",
+      "kind": "система воздухоочистки на входе ГТУ, самоочищаемая импульсом (пара цилиндр + конус 26\")",
+      "segment": "ГТУ",
+      "rating": "картриджи OD 12¾\"/324 мм, длина 26\"/660 мм",
+      "status": "поддерживается запчастями (фильтры в каталоге)",
+      "sources": [
+        "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GDS",
+      "kind": "статическая система воздухоочистки на входе ГТУ (пара цилиндр + конус)",
+      "segment": "ГТУ",
+      "rating": "картриджи 26\"/660 мм",
+      "status": "поддерживается запчастями",
+      "sources": [
+        "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GDS-II",
+      "kind": "статическая система воздухоочистки ГТУ (пара из двух конусов 28\"), поставлялась в Европу и Азию",
+      "segment": "ГТУ",
+      "rating": "конусы длиной 28\"/711 мм",
+      "status": "поддерживается запчастями",
+      "sources": [
+        "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TTD (Huff 'n Puff)",
+      "kind": "самоочищаемый фильтр-дом ГТУ с вертикальными картриджами; по каталогу применяется на турбинах Solar",
+      "segment": "ГТУ",
+      "rating": "картриджи 22\"-36\"",
+      "status": "поддерживается запчастями",
+      "sources": [
+        "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Composite-Filter System (CFS)",
+      "kind": "двухступенчатый картридж (внешний и внутренний) для входа ГТУ, по каталогу — в том числе LM6000",
+      "segment": "ГТУ",
+      "rating": "внешний OD 18¾\"/476 мм, длина 26\"/660 мм",
+      "status": "поддерживается запчастями",
+      "sources": [
+        "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "XLR (PowerCore)",
+      "kind": "панельная система воздухоочистки ГТУ с панелями PowerCore",
+      "segment": "ГТУ",
+      "rating": "панели 24\"x24\" (610x610 мм)",
+      "status": "поддерживается запчастями",
+      "sources": [
+        "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Turbo-Tek (картриджи с рейтингом Er/W/P)",
+      "kind": "линейка сменных картриджей входа ГТУ",
+      "segment": "ГТУ",
+      "rating": "шкала эффективности Er0–Er5, влагостойкости W0–W5, восстановления после импульса S/P1–P5",
+      "status": "выпускается",
+      "sources": [
+        "https://www.donaldson.com/content/dam/donaldson/gas-turbine-systems/literature/north-america/filters-parts/cartridge-filters/f117168-eng/GTS-Cartridge-Selection-Guide.pdf",
+        "https://www.donaldson.com/en/products/gas-turbine-filters/cartridge/"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Donaldson Replacement Filters & Spare Parts Catalog (Gas Turbine Systems)",
+      "doc_no": "GTS-400",
+      "machine": "GDX, GDS, GDS-II, TTD, CFS, XLR; сменные фильтры для систем Braden, Farr Tenkay, AAF Pulstar, Pneumafil",
+      "kind": "parts catalog",
+      "sources": [
+        "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+      ]
+    },
+    {
+      "title": "Cartridge Selection Guide, Gas Turbine Systems (Turbo-Tek)",
+      "doc_no": "F117168 ENG (09/21)",
+      "machine": "картриджи входа ГТУ Turbo-Tek",
+      "kind": "руководство по выбору",
+      "sources": [
+        "https://www.donaldson.com/content/dam/donaldson/gas-turbine-systems/literature/north-america/filters-parts/cartridge-filters/f117168-eng/GTS-Cartridge-Selection-Guide.pdf"
+      ]
+    },
+    {
+      "title": "Air Intake Product Guide (EMEA)",
+      "doc_no": "F116005",
+      "machine": "воздухоочистители двигателей",
+      "kind": "каталог продукции (найден по ссылке, не разобран)",
+      "sources": [
+        "https://www.donaldson.com/content/dam/donaldson/engine-hydraulics-bulk/catalogs/air-intake/emea/f116005/Air-Intake-Product-Guide.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "P19-1280",
+      "issuer": "Donaldson",
+      "description": "цилиндрический картридж 26\"/660 мм, Duratek/Spider-Web; работает один (TTD) или в паре с P19-1281 (GDX/GDS). В магазине Donaldson пишется P191280",
+      "machine": "GDX / GDS / TTD",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 7",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-1280 26\"/ 660mm Duratek/Spider-Web Use alone (TTD) or mate to P19-1281 (GDX/GDS)"
+    },
+    {
+      "code": "P19-1281",
+      "issuer": "Donaldson",
+      "description": "конический картридж 26\", Duratek/Spider-Web, пара к P19-1280",
+      "machine": "GDX / GDS",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 3, 5",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "26\" Conical Duratek/Spider-Web P19-1281 5"
+    },
+    {
+      "code": "P19-1236",
+      "issuer": "Donaldson",
+      "description": "цилиндрический картридж 26\", Duratek; пара к P19-1238",
+      "machine": "GDX / GDS / TTD",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 7",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-1236 26\"/ 660mm Duratek Use alone (TTD) or mate to P19-1238 (GDX/GDS)"
+    },
+    {
+      "code": "P19-1238",
+      "issuer": "Donaldson",
+      "description": "конический картридж 26\", Duratek, пара к P19-1236",
+      "machine": "GDX / GDS",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 3, 5",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "26\" Conical Duratek P19-1238 5"
+    },
+    {
+      "code": "P19-1033",
+      "issuer": "Donaldson",
+      "description": "цилиндрический картридж 26\", Synthetic; пара к P19-1107",
+      "machine": "GDX / GDS / TTD",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 7",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-1033 26\"/ 660mm Synthetic Use alone (TTD) or mate to P19-1107 (GDX/GDS)"
+    },
+    {
+      "code": "P19-1177",
+      "issuer": "Donaldson",
+      "description": "цилиндрический картридж 26\", Synthetic/Spider-Web; пара к P19-1178",
+      "machine": "GDX / GDS / TTD",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 7",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-1177 26\"/ 660mm Synthetic/Spider-Web Use alone (TTD) or mate to P19-1178 (GDX/GDS)"
+    },
+    {
+      "code": "P19-1234",
+      "issuer": "Donaldson",
+      "description": "цилиндрический картридж 22\"/559 мм, Duratek, оцинкованный; по каталогу применяется в статических системах S&S LM2500/LM5000/LM6000 и в TTD на турбинах Solar",
+      "machine": "S&S LM2500/LM5000/LM6000 static; TTD (Solar)",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 6",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-1234 Duratek Galvanized"
+    },
+    {
+      "code": "P19-0949",
+      "issuer": "Donaldson",
+      "description": "цилиндрический картридж 22\", Synthetic/Spider-Web, оцинкованный",
+      "machine": "S&S LM2500/LM5000/LM6000 static; TTD (Solar)",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 6",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-0949 Synthetic/Spider-Web Galvanized"
+    },
+    {
+      "code": "P19-1005",
+      "issuer": "Donaldson",
+      "description": "предфильтр-обмотка 22\" из полиэстера, 30 шт. в коробке",
+      "machine": "картриджи 22\"",
+      "unit": "предфильтр входа ГТУ",
+      "doc_ref": "GTS-400, с. 6",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-1005 22\" Poly Pre-Filter Wrap** Packaged 30 per box"
+    },
+    {
+      "code": "P03-0228",
+      "issuer": "Donaldson",
+      "description": "панель G4 24x24x3,5\" в картонной рамке под раму «Guard Filter» LM6000",
+      "machine": "GE LM6000",
+      "unit": "предфильтр входа ГТУ",
+      "doc_ref": "GTS-400, с. 2, 14",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "24\" Sq Panel G4 LM6000 Guard Filter P03-0228 14"
+    },
+    {
+      "code": "P19-0848",
+      "issuer": "Donaldson",
+      "description": "внешний композитный фильтр CFS, Synthetic/Spider-Web, оцинкованные обечайки",
+      "machine": "CFS (в т. ч. LM6000)",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 10",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-0848 Composite Filter, outer Synthetic/Spider-Web Galvanized liners"
+    },
+    {
+      "code": "P19-0844",
+      "issuer": "Donaldson",
+      "description": "внутренний фильтр CFS, плоский, с пружинным фиксатором",
+      "machine": "CFS",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 10",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-0844 Composite Filter, inner poly Flat style, w/ spring retainer"
+    },
+    {
+      "code": "P77-7171",
+      "issuer": "Donaldson",
+      "description": "комплект GDS-II: пара конусов (большой и малый), Synthetic/Spider-Web; вторая половина комплекта — P77-7172",
+      "machine": "GDS-II",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 4",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P77-7171 & P77-7172 Synthetic/Spider-Web"
+    },
+    {
+      "code": "P15-7523",
+      "issuer": "Donaldson",
+      "description": "элемент маслоотделителя масляного тумана системы смазки (корпуса P12-5489 на один элемент, P12-5490 на два)",
+      "machine": "маслосистема ГТУ",
+      "unit": "суфлёр / маслоотделитель системы смазки",
+      "doc_ref": "GTS-400, с. 14",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "Oil Mist Eliminator Element P15-7523"
+    },
+    {
+      "code": "P19-1261",
+      "issuer": "Donaldson",
+      "description": "картридж с фланцем 27\", Duratek/Spider-Web, замена для систем Farr Tenkay-GT",
+      "machine": "фильтр-дом Camfil Farr Tenkay-GT",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 8",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-1261 Duratek/Spider-Web"
+    },
+    {
+      "code": "P19-1781",
+      "issuer": "Donaldson",
+      "description": "картридж OD 16\", длина 34,5\"/876 мм, Synthetic/Spider-Web, для систем AAF Pulstar",
+      "machine": "фильтр-дом AAF Pulstar",
+      "unit": "входной воздушный фильтр ГТУ",
+      "doc_ref": "GTS-400, с. 9",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "P19-1781 Synthetic/Spider-Web 34.5\" / 876mm"
+    },
+    {
+      "code": "26106-00",
+      "issuer": "Donaldson (номер на самом клапане — 8495735.9305/2)",
+      "description": "электрическая крышка мембранного клапана в сборе A (крышка, мембрана, соленоид, катушка, разъём) для импульсной очистки GDX",
+      "machine": "GDX",
+      "unit": "система импульсной очистки фильтр-дома",
+      "doc_ref": "GTS-400, с. 42",
+      "source_url": "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf",
+      "quote": "Elect. Valve Hat Assy A 26106-00* 8495735.9305/2 Valve hat, diaphragm,"
+    },
+    {
+      "code": "P554004",
+      "issuer": "Donaldson (кросс к Caterpillar 1R0739)",
+      "description": "масляный фильтр, накручиваемый, полнопоточный; в кроссах Caterpillar 1R0739, 1R0658, 2P4004",
+      "machine": "двигатели Caterpillar (основное применение — CATERPILLAR 2P4004)",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «CATERPILLAR -81521036 ,1R0658 ,1R0739 ,1W3300 ,»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p554004",
+      "quote": "Donaldson Lube Filter Spin-on Full Flow- P554004 CASE"
+    },
+    {
+      "code": "P554005",
+      "issuer": "Donaldson (кросс к Caterpillar 2P4005)",
+      "description": "масляный фильтр, накручиваемый, полнопоточный",
+      "machine": "двигатели Caterpillar",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «1W2660 ,2P4005»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p554005",
+      "quote": "Donaldson Lube Filter Spin-on Full Flow- P554005"
+    },
+    {
+      "code": "P551311",
+      "issuer": "Donaldson (кросс к Caterpillar 1R0749)",
+      "description": "топливный фильтр, накручиваемый",
+      "machine": "двигатели Caterpillar",
+      "unit": "топливная система двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «Primary Application - CATERPILLAR 1R0749»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p551311",
+      "quote": "Donaldson Fuel Filter Spin-on- P551311"
+    },
+    {
+      "code": "P551315",
+      "issuer": "Donaldson (кросс к Caterpillar 1R0751 / 1R0759)",
+      "description": "топливный фильтр, накручиваемый",
+      "machine": "двигатели Caterpillar",
+      "unit": "топливная система двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «CATERPILLAR -614783 ,1R0751 ,1R0759 ,6I4783»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p551315",
+      "quote": "Donaldson Fuel Filter Spin-on- P551315"
+    },
+    {
+      "code": "P550625",
+      "issuer": "Donaldson (кросс к Caterpillar 1R0762)",
+      "description": "топливный фильтр тонкой очистки, накручиваемый",
+      "machine": "двигатели Caterpillar",
+      "unit": "топливная система двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «Primary Application - CATERPILLAR 1R0762»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p550625",
+      "quote": "Donaldson Fuel Filter Spin-on Secondary- P550625"
+    },
+    {
+      "code": "P532501",
+      "issuer": "Donaldson (кросс к Caterpillar 6I2501)",
+      "description": "основной воздушный фильтр Radialseal",
+      "machine": "двигатели и машины Caterpillar",
+      "unit": "воздухоочиститель двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «CATERPILLAR -612501 ,1282686 ,6I2501 ,6I2501C»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p532501",
+      "quote": "Donaldson Air Filter Primary Radialseal- P532501"
+    },
+    {
+      "code": "P532502",
+      "issuer": "Donaldson (кросс к Caterpillar 6I2502)",
+      "description": "предохранительный (внутренний) воздушный фильтр Radialseal",
+      "machine": "двигатели и машины Caterpillar",
+      "unit": "воздухоочиститель двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «CATERPILLAR -612502 ,6I2502»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p532502",
+      "quote": "Donaldson Air Filter Safety Radialseal- P532502"
+    },
+    {
+      "code": "P557500",
+      "issuer": "Donaldson (кросс к Caterpillar 7N7500 / 1R0726)",
+      "description": "масляный фильтр-картридж",
+      "machine": "двигатели Caterpillar",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «CATERPILLAR -1R0246 ,1R0726 ,4P2839 ,7N500 ,7N7500»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p557500",
+      "quote": "Donaldson Lube Filter Cartridge- P557500"
+    },
+    {
+      "code": "P551712",
+      "issuer": "Donaldson (кросс к Caterpillar 1R0712)",
+      "description": "топливный фильтр, накручиваемый",
+      "machine": "двигатели Caterpillar",
+      "unit": "топливная система двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «Primary Application - CATERPILLAR 1R0712»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p551712",
+      "quote": "Donaldson Fuel Filter Spin-on- P551712"
+    },
+    {
+      "code": "P551807",
+      "issuer": "Donaldson (кросс к Caterpillar 1R1807)",
+      "description": "масляный фильтр, накручиваемый, полнопоточный",
+      "machine": "двигатели Caterpillar",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «CATERPILLAR -1R1807 ; ECOLOG -7015196»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p551807",
+      "quote": "Donaldson Lube Filter Spin-on Full Flow- P551807"
+    },
+    {
+      "code": "P550949",
+      "issuer": "Donaldson (кросс к Cummins 4331005 / Fleetguard LF9080)",
+      "description": "масляный фильтр, накручиваемый, полнопоточный",
+      "machine": "двигатели Cummins",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «CUMMINS -4331005 ; FLEETGUARD -LF14000NN ,LF9070 ,LF9080»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p550949",
+      "quote": "Donaldson Lube Filter Spin-on Full Flow- P550949"
+    },
+    {
+      "code": "P550520",
+      "issuer": "Donaldson (кросс к Cummins 4897898)",
+      "description": "масляный фильтр, накручиваемый, полнопоточный",
+      "machine": "двигатели Cummins и др.",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «CUMMINS -4897898 ,4989314»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p550520",
+      "quote": "Donaldson Lube Filter Spin-on Full Flow- P550520"
+    },
+    {
+      "code": "P550614",
+      "issuer": "Donaldson (кросс к Waukesha 168660)",
+      "description": "масляный фильтр-картридж, 95 % на 15 мкм",
+      "machine": "газовые двигатели Waukesha",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «Primary Application - WAUKESHA 168660»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p550614",
+      "quote": "Donaldson Lube Filter Cartridge- P550614"
+    },
+    {
+      "code": "P550807",
+      "issuer": "Donaldson (кросс к Waukesha 168660H)",
+      "description": "масляный фильтр-картридж, 99 % на 15 мкм",
+      "machine": "газовые двигатели Waukesha",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «Cross Reference: WAUKESHA -168660H»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p550807",
+      "quote": "Donaldson - P550807"
+    },
+    {
+      "code": "P552414",
+      "issuer": "Donaldson (кросс к Waukesha 172607)",
+      "description": "масляный фильтр-картридж (мешкового типа)",
+      "machine": "газовые двигатели Waukesha",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «WAUKESHA -172607 ,172607A»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p552414",
+      "quote": "Donaldson Lube Filter Cartridge Sock- P552414"
+    },
+    {
+      "code": "P140277",
+      "issuer": "Donaldson (кросс к Waukesha 169180G и Guascor 1835002)",
+      "description": "панельный фильтр вентиляции, целлюлоза, 647,8x495,5x55,7 мм, ISO 5011",
+      "machine": "газовые двигатели Waukesha, Guascor",
+      "unit": "воздухоочиститель / вентиляция",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «Primary Application WAUKESHA 169180G Type Ventilation»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p140277",
+      "quote": "Donaldson Air Filter Panel Ventilation- P140277"
+    },
+    {
+      "code": "P551102",
+      "issuer": "Donaldson (кросс к Jenbacher Werke 100116 / 225125)",
+      "description": "масляный фильтр, накручиваемый, полнопоточный (основное применение Deutz 1174420)",
+      "machine": "двигатели Jenbacher Werke / Deutz",
+      "unit": "система смазки двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «JENBACHER WERKE -100116 ,225125 ,1173765»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p551102",
+      "quote": "Donaldson Lube Filter Spin-on Full Flow- P551102"
+    },
+    {
+      "code": "P776697",
+      "issuer": "Donaldson (кросс к Jenbacher Werke CF1300)",
+      "description": "воздушный фильтр",
+      "machine": "двигатели Jenbacher Werke и др.",
+      "unit": "воздухоочиститель двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «JENBACHER WERKE -CF1300»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p776697",
+      "quote": "Donaldson Air Filter - P776697"
+    },
+    {
+      "code": "P780006",
+      "issuer": "Donaldson (кросс к Jenbacher Werke 108036 и MTU 8690940003)",
+      "description": "воздушный фильтр (основное применение Liebherr 7368216)",
+      "machine": "двигатели Jenbacher Werke, MTU и др.",
+      "unit": "воздухоочиститель двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «JENBACHER WERKE -108036»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p780006",
+      "quote": "Donaldson Air Filter - P780006"
+    },
+    {
+      "code": "P181137",
+      "issuer": "Donaldson (кросс к Jenbacher Werke C246501 и MTU 10945104)",
+      "description": "основной воздушный фильтр, круглый",
+      "machine": "двигатели Jenbacher Werke, MTU и др.",
+      "unit": "воздухоочиститель двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «JENBACHER WERKE -10002000,C246501»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p181137",
+      "quote": "Donaldson Air Filter Primary Round- P181137"
+    },
+    {
+      "code": "P551131",
+      "issuer": "Donaldson (кросс к MTU X59408300030)",
+      "description": "накручиваемый фильтр, 95 % на 12 мкм, резьба 1 3/4-12 UN",
+      "machine": "двигатели MTU",
+      "unit": "фильтр двигателя (назначение на странице не указано)",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «Filter Cross Reference: MTU -X59408300030»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p551131",
+      "quote": "Donaldson - P551131"
+    },
+    {
+      "code": "P765199",
+      "issuer": "Donaldson (кросс к MTU 20922101)",
+      "description": "топливный фильтр",
+      "machine": "двигатели MTU",
+      "unit": "топливная система двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «MTU -20922101 ,20922101»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p765199",
+      "quote": "Donaldson Fuel Filter - P765199"
+    },
+    {
+      "code": "P781098",
+      "issuer": "Donaldson (кросс к MTU XP52712100005)",
+      "description": "воздушный фильтр",
+      "machine": "двигатели MTU и др.",
+      "unit": "воздухоочиститель двигателя",
+      "doc_ref": "страница товара дистрибьютора (заголовок карточки); строка кроссов на той же странице: «MTU -XP52712100005»",
+      "source_url": "https://www.dieselequipmentinc.com/products/p781098",
+      "quote": "Donaldson Air Filter - P781098"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Northern Technical LLC (Абу-Даби, ОАЭ)",
+      "component": "системы воздухоочистки на входе ГТУ и сменные фильтры",
+      "machine": "входные системы ГТУ",
+      "evidence": "В 2014 году объявлено, что Donaldson Europe BVBA через отделение в ОАЭ покупает Northern Technical LLC — изготовителя систем воздухоочистки на входе ГТУ и сменных фильтров. Источник подтверждает намерение купить; это дочерняя компания, а не сторонний поставщик.",
+      "sources": [
+        "https://www.aftermarketnews.com/donaldson-to-acquire-northern-technical-llc/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "DuPont Dow Elastomers (торговая марка Viton)",
+      "component": "уплотнения Viton в гидравлических фильтрах (исполнения P1712732, P1712742 и др.)",
+      "machine": "гидравлические фильтры из каталога GTS",
+      "evidence": "В каталоге GTS-400 есть исполнения «Viton seals» и оговорка, что Viton — зарегистрированная марка DuPont Dow Elastomers. Названа только марка материала, а не прямой поставщик. Не подтверждено как субпоставщик: источник называет только владельца марки.",
+      "sources": [
+        "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+      ],
+      "verified": false
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Donaldson (Wuxi) Filters Co., Ltd.",
+      "country": "Китай",
+      "role": "завод Donaldson (крупнейшая площадка компании), изготовитель",
+      "sources": [
+        "https://www.donaldson.com/en-au/news/wuxi-facility-expansion/",
+        "https://regional.chinadaily.com.cn/bizwnden/2019-07/30/c_482481.htm"
+      ]
+    },
+    {
+      "company": "Donaldson India Filter Systems Pvt Ltd",
+      "country": "Индия",
+      "role": "дочерняя компания Donaldson, изготовитель и продажи (Гуруграм, Харьяна)",
+      "sources": [
+        "https://www.indiamart.com/donaldson-indiafilter/",
+        "https://www.dnb.com/business-directory/company-profiles.donaldson_india_filter_systems_private_limited.9091d4ba6b51b7c6e4800ceb1797ab53.html"
+      ]
+    },
+    {
+      "company": "Northern Technical LLC",
+      "country": "ОАЭ",
+      "role": "дочерняя компания Donaldson (с 2014 года): входные системы ГТУ и сменные фильтры",
+      "sources": [
+        "https://www.aftermarketnews.com/donaldson-to-acquire-northern-technical-llc/"
+      ]
+    },
+    {
+      "company": "Yiğittaşlar A.Ş.",
+      "country": "Турция",
+      "role": "официальный дистрибьютор в Турции по собственному заявлению (весь ассортимент Donaldson)",
+      "sources": [
+        "https://yigittaslar.com/donaldson-bayi/"
+      ]
+    },
+    {
+      "company": "Atılım Filtre",
+      "country": "Турция",
+      "role": "дистрибьютор и дилер Donaldson по заголовку собственного сайта (не перепроверено)",
+      "sources": [
+        "https://www.atilimfiltre.com.tr/tr/markalarimiz/donaldson.html"
+      ]
+    },
+    {
+      "company": "Diesel Equipment Inc",
+      "country": "США",
+      "role": "интернет-дистрибьютор фильтров Donaldson; страницы товаров с кроссами к номерам изготовителей машин",
+      "sources": [
+        "https://www.dieselequipmentinc.com/products/p550614"
+      ]
+    }
+  ],
+  "gaps": [
+    "Кроссы входных фильтров ГТУ Donaldson к номерам GE, Solar, Siemens и Baker Hughes в открытых источниках не найдены. Вероятно, они лежат в закрытом кроссе shop.donaldson.com (сайт отдаёт автоматическому чтению 403) или у изготовителей турбин.",
+    "Брошюра GTS-406 по фильтрам LM6000 в каталоге упомянута, но открытого PDF нет.",
+    "Каталог GTS-400 старый: у части записей в нём формат P19-xxxx, а в текущем магазине те же коды пишутся P19xxxx с суффиксами исполнения вроде -016-909. Действуют ли все номера сейчас, не проверено.",
+    "Кроссы фильтров двигателей взяты с одного дистрибьютора (Diesel Equipment Inc). По официальному кроссу Donaldson они не сверены. По MTU X59408300030 назначение фильтра (масло или топливо) на странице не указано.",
+    "Изготовитель мембранных клапанов импульсной очистки GDX (номер на клапане 8495735.9305/2) в каталоге не назван.",
+    "Перечень официальных дистрибьюторов по странам в открытом виде не найден: локатор «где купить» на donaldson.com не разобран.",
+    "Россия: в августе 2022 года Donaldson прекратил прямые поставки в Россию и Беларусь и закрыл там операции (leave-russia.org, businesswire). Действующих официальных каналов в РФ нет, в СНГ не искали.",
+    "Номера фильтров под конкретные модели газопоршневых двигателей (Caterpillar G3500/G3600, Jenbacher J320/J420/J620, Waukesha VHP/APG) в открытом доступе с привязкой к модели не найдены: у дистрибьютора указан только номер изготовителя, без модели двигателя."
+  ],
+  "verifier_notes": "Проверено по скачанному каталогу GTS-400 (49 страниц, pdftotext) и по 23 страницам dieselequipmentinc.com; все источники открылись. Все 40 кодов на страницах источников есть, изделие и бренд совпадают. Одна правка цитаты: у P554005 фразы «Primary Application CATERPILLAR 2P4005» на странице нет, её надо заменить строкой кросса «CATERPILLAR -…,1W2660 ,2P4005 ,…». Семь машин подтверждены. Northern Technical подтверждён как намерение купить (2014) — это дочерняя компания, а не сторонний субпоставщик. DuPont Dow Elastomers не подтверждён: источник называет только владельца марки Viton, а не поставщика.",
+  "corrections": [
+    "P554005: фраза «Primary Application CATERPILLAR 2P4005» на странице отсутствует — как подтверждение кросса записан фрагмент строки кроссов «1W2660 ,2P4005» (в doc_ref; проверен на странице 27.09.2026) (замечание скептика)",
+    "Northern Technical: в evidence оговорено, что источник подтверждает намерение купить (2014), и что это дочерняя компания (замечание скептика)",
+    "DuPont Dow Elastomers: verified=false — источник называет только владельца марки Viton, а не поставщика (замечание скептика)",
+    "23 кода фильтров двигателей (P554004 … P781098): в quote поставлен заголовок карточки товара с кодом Donaldson (страницы скачаны заново 27.09.2026), прежняя цитата — строка кросса к номеру изготовителя машины — перенесена в doc_ref: в ней стоял только номер Caterpillar, Waukesha, Jenbacher, MTU или Cummins, а не код Donaldson"
+  ]
+}
