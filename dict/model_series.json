@@ -5762,6 +5762,536 @@
      "note": "Подтверждено разведкой data/brand_research/dettronicsdetectorelectronics.json."
     }
    ]
+  },
+  {
+   "brand_key": "moog",
+   "name": "Moog",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Moog",
+    "Муг"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "moog-77x",
+     "series": "G771K / G772K / G773K и 771 / 772 / 773 (сервоклапаны серии 77X/77XK, в том числе исполнение PGO для ГТУ GE)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "G77[123]K(?:\\d{3}A?)?",
+       "context": "сам"
+      },
+      {
+       "rx": "77[123]K?|G77[123]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "G771K",
+      "G772K336A",
+      "771K",
+      "G773"
+     ],
+     "sources": [
+      "https://www.moog.com/products/servovalves-servo-proportional-valves/industrial/servo-valves-without-integrated-electronics/direct-operated-servo-valves-for-analog-signals-771-772-773-series.html",
+      "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77x-Catalog-en.pdf",
+      "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-PGO-Overview-en.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/moog.json. Полные номера исполнений (G771K202A, G772K336A) взяты у продавцов; обозначение G77xK с буквой K различимо само, голые 771/772/773 — только рядом с брендом."
+    },
+    {
+     "id": "moog-760-761",
+     "series": "760 / 760K / 760N (сняты) и 761 / 761K / G761 (сервоклапаны)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "G?76[01][KN]?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "761",
+      "G761",
+      "761K",
+      "760N"
+     ],
+     "sources": [
+      "https://www.moog.com/products/servovalves-servo-proportional-valves/industrial/servo-valves-without-integrated-electronics/direct-operated-servo-valves-for-analog-signals-761-series.html",
+      "https://www.moog.com/products/servovalves-servo-proportional-valves/industrial/legacy-servo-valves/legacy-product-direct-operated-servo-valves-for-analog-signals-760-series.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/moog.json."
+    },
+    {
+     "id": "moog-78",
+     "series": "78N / 78K (взрывозащищённые и искробезопасные сервоклапаны приводов топливного клапана и ВНА)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "78[NK]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "78N",
+      "78K"
+     ],
+     "sources": [
+      "https://www.moog.com/news/ideas-in-motion-control/2005/03/motion-control-solutions-for-hazardous-environments.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/moog.json. Характеристик серии в открытом источнике нет, только упоминание в статье изготовителя."
+    },
+    {
+     "id": "moog-d63x",
+     "series": "D633K / D634K (взрывозащищённые сервоклапаны прямого привода)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "D63[34]K?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "D633K",
+      "D634"
+     ],
+     "sources": [
+      "https://www.moog.com/news/ideas-in-motion-control/2005/03/motion-control-solutions-for-hazardous-environments.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/moog.json."
+    },
+    {
+     "id": "moog-80-series",
+     "series": "80 Series (гидравлические приводы регулирующих клапанов газовых и паровых турбин)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "80\\s?Series",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "80 Series"
+     ],
+     "sources": [
+      "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Gas-Steam-Overview-en2.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/moog.json."
+    },
+    {
+     "id": "moog-880-series",
+     "series": "880 Series (электроприводы ВНА и топливных клапанов турбин)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "880\\s?Series",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "880 Series"
+     ],
+     "sources": [
+      "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Gas-Steam-Overview-en2.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/moog.json."
+    },
+    {
+     "id": "moog-extended-life",
+     "series": "Extended Life / Extended Life 2.0 (гидравлические сервоприводы газового клапана и ВНА, GE 7FA)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "Extended\\s?Life(?:\\s?2\\.0)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Extended Life",
+      "Extended Life 2.0"
+     ],
+     "sources": [
+      "https://www.moog.com/news/ideas-in-motion-control/2010/12/unlocking-the-keys-to-longer-life-for-gas-power-generation-turbines.html",
+      "https://www.moog.com/content/dam/moog/literature/service/Moog-GE-7FA-Turbine-64K-Upgrade-Flyer-en.pdf",
+      "https://www.powerprogress.com/news/moogs-new-fuel-system-components-for-gas-turbine-retrofits/8023792.article"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/moog.json. Extended Life 2.0 — по статье отраслевого издания Power Progress (2022)."
+    }
+   ]
+  },
+  {
+   "brand_key": "dynalco",
+   "name": "Dynalco",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Dynalco",
+    "Диналко"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "dynalco-pickups",
+     "series": "Магнитные датчики частоты вращения M1xx–M3xx (пассивные), M321, M920 (опасные зоны), M919, M928, M951, M806 (активные)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "M-?[1-9]\\d{2}(?:-\\d{1,2}(?:-\\d{2})?)?(?:-P)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "M101",
+      "M203",
+      "M-203",
+      "M919-3-45",
+      "M321-P",
+      "M920"
+     ],
+     "sources": [
+      "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Magnetic-Pickup-Speed-Sensors-D0601-A-08-24.pdf",
+      "https://www.barksdale.com/sites/default/files/2026-04/800-0321%20REV%20G.pdf",
+      "https://www.barksdale.com/sites/default/files/2026-06/800-0920.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dynalco.json. Обозначение «M + три цифры» без имени бренда неоднозначно — только рядом с брендом."
+    },
+    {
+     "id": "dynalco-sst",
+     "series": "SST-2000 / SST-2200 / SST-2400 (A, H) и SST7000 / 7100 / 7200 / 7400, SST-7200D / SST-7400D (реле и преобразователи частоты вращения)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "SST-?(?:2[024]00[AH]?|7[0124]00D?(?:-I)?(?:-AC)?)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SST-2000A",
+      "SST-2400H",
+      "SST7200",
+      "SST-7400D"
+     ],
+     "sources": [
+      "https://www.barksdale.com/sites/default/files/literature/documents/sst-20000610-ds_0.pdf",
+      "https://www.barksdale.com/sites/default/files/2025-06/sst7000-dsv1.pdf",
+      "https://www.barksdale.com/sites/default/files/literature/documents/manual-sst2-4d-revh.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dynalco.json."
+    },
+    {
+     "id": "dynalco-tachometers",
+     "series": "SPD-100 / SPD-108, SPH-100, MTH-103D / MTH-103E, DST-2000C (тахометры и счётчики моточасов)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "SPD-?10[08]L?|SPH-?100|MTH-?103[DE]?|DST-?2000C?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SPD-100",
+      "SPD-108",
+      "SPH-100",
+      "MTH-103E",
+      "DST-2000C"
+     ],
+     "sources": [
+      "https://www.barksdale.com/sites/default/files/2026-04/spd-1000309-ds.pdf",
+      "https://www.barksdale.com/sites/default/files/2025-06/mth-103e050719revised.pdf",
+      "https://www.barksdale.com/sites/default/files/literature/documents/Dynalco-Hour-Meters-Tachometers-Speed-Measurement.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dynalco.json. DST-2000C в текущем каталоге изготовителя нет, лист данных — копия у дистрибьютора CNMEC."
+    },
+    {
+     "id": "dynalco-monitors",
+     "series": "UM-200 / UM-600 (мониторы двигателя), DPM-105 и LMD-120A (панельные индикаторы)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "UM-?[26]00|DPM-?105|LMD-?120A?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "UM-200",
+      "UM-600",
+      "DPM-105",
+      "LMD-120A"
+     ],
+     "sources": [
+      "https://www.barksdale.com/products/dynalco-tachometers-gauges-meters",
+      "https://www.barksdale.com/sites/default/files/2025-06/um-200datasheet%20%283%29.pdf",
+      "https://www.barksdale.com/sites/default/files/2026-04/lmd-120a%20datsheet.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dynalco.json."
+    },
+    {
+     "id": "dynalco-legacy",
+     "series": "Прежние приборы защиты двигателей: реле разноса SW-200B, SW-50, PNT-202 с клапаном SPV-200, регулятор AF-900PC, сканер SC-2124, монитор D-100, пирометры TMP-100 / TMP-200, калибратор F-16",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "SW-?(?:200B?|50)|PNT-?202|SPV-?200|AF-?900(?:PC)?|SC-?2124M?|TMP-?[12]00(?:DC)?|D-100(?:-B)?(?:-C)?|F-16",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "SW-200B",
+      "SW-50",
+      "PNT-202",
+      "SPV-200",
+      "AF-900PC",
+      "SC-2124M",
+      "TMP-100DC",
+      "D-100-B-C",
+      "F-16"
+     ],
+     "sources": [
+      "https://www.barksdale.com/sites/default/files/literature/documents/sst-20000610-ds_0.pdf",
+      "http://www.dynalcoproducts.com/pdf/Dynalco_Catalog.pdf",
+      "http://www.dynalcoproducts.com/pdf/d-100-datasheet.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dynalco.json. В текущем каталоге Barksdale этих изделий нет; листы данных — копии у дистрибьютора CNMEC (dynalcoproducts.com), SPV-200 назван и в текущем листе SST-2000. Короткие обозначения (F-16, D-100) — только рядом с брендом."
+    }
+   ]
+  },
+  {
+   "brand_key": "amot",
+   "name": "AMOT",
+   "origin": "западный",
+   "country": "США / Великобритания",
+   "aliases": [
+    "AMOT"
+   ],
+   "context_aliases": [
+    "Chalwyn",
+    "Roda Deaco",
+    "Rigsaver"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "amot-thermostatic",
+     "series": "Model B / C / E / H / R (термостатические трёхходовые клапаны с восковым элементом)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "Model\\s?[BCEHR]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Model B",
+      "Model C",
+      "Model E",
+      "Model H",
+      "Model R"
+     ],
+     "sources": [
+      "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_b_thermostatic_control_valve.pdf",
+      "https://www.amot.com/pub/media/product_spec_sheets/download//d/a/datasheet_c_thermostatic_control_valve_1.pdf",
+      "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_e_thermostatic_control_valve_0119_rev12.pdf",
+      "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_model_h-thermostatic-valve-0113-rev1.pdf",
+      "https://www.amot.com/pub/media/product_spec_sheets/download/d/a/datasheet_r_thermostatic_control_valve.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    },
+    {
+     "id": "amot-g",
+     "series": "Model G (GGH / GGS) — трёхходовой поворотный регулирующий клапан с приводом",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "Model\\s?G|\\d{2}GG[HS]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Model G",
+      "08GGH"
+     ],
+     "sources": [
+      "https://www.amot.com/en/model-g-3-way-rotary-control-valves/",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_gg_temp_control_valve_0224_rev24.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    },
+    {
+     "id": "amot-4500",
+     "series": "4500D (клапан регулирования температуры и давления масла)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "4500D?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "4500D"
+     ],
+     "sources": [
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4500_temperature_and_pressure_control_valve_0120_rev4.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    },
+    {
+     "id": "amot-temp-sensing",
+     "series": "2230 / 4430, 4075D / 4475B, 4087B (клапаны-датчики температуры)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "2230|4430|4075D?|4475B?|4087B?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "2230",
+      "4430",
+      "4075D",
+      "4475B",
+      "4087B"
+     ],
+     "sources": [
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_2230_4430_2-way_sensing_valve_0119rev3.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4075_4475_high_temperature_valve_0621_rev5.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4087_exhaust_gas_temp_valve_0119rev4.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    },
+    {
+     "id": "amot-bearing",
+     "series": "4102D / E / J / M и 4103D / M (датчики температуры подшипников с плавким стержнем)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "410[23][DEJM]?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "4102D",
+      "4102M",
+      "4103D"
+     ],
+     "sources": [
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4102_temperature_detector_feb18_rev3.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4103_temperature_valve_feb18_rev2.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    },
+    {
+     "id": "amot-switches",
+     "series": "4140 (4140A–F) и 4250 (4251M–4255M) — реле давления и температуры",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "4140[ACDEF]?|425[0-5]M?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "4140A",
+      "4250",
+      "4251M"
+     ],
+     "sources": [
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4140_pressure_temperature_switch_0119rev12.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4250_temp_pressure_switch_0821rev4.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    },
+    {
+     "id": "amot-shutdown",
+     "series": "2800D, 4109B / 4121 (Vibro-Guard), 4110B, 4164 — устройства останова, вибрационные и по превышению оборотов, отсечной клапан топлива",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "2800D?|4109B?|4121|4110B?|4164",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "2800D",
+      "4109B",
+      "4121",
+      "4110B",
+      "4164"
+     ],
+     "sources": [
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_2800_safety_shutdown_device_0320rev5.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4109_vibroguard_2-way_sensing_valve_0119rev3.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4110_overspeed_sensing_valve_1015_rev1.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4164_diesel_fuel_shutoff_valve1011rev1.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    },
+    {
+     "id": "amot-mpd",
+     "series": "MPD / MPD2 (детектор металлических частиц в масле)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "MPD2?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "MPD2",
+      "MPD"
+     ],
+     "sources": [
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_mpd_metal_particle_detector_0119rev6.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    },
+    {
+     "id": "amot-air-shutoff",
+     "series": "XT, 7001, 7002 и Chalwyn D45–D80 (отсечные клапаны воздуха на впуске дизеля)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "XT|700[12]|D(?:45|51|57|64|70|80)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "XT",
+      "7001",
+      "7002",
+      "D45",
+      "D80"
+     ],
+     "sources": [
+      "https://www.amot.com/media/product_spec_sheets/download/d/s/ds-amot-xt-0122-rev20.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7001-air-shut_off-valve-0719-rev3.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/////d/a/datasheet-7002-air-shut_off-valve-0719rev3.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download//////c/h/chalwyn-d-bendix-ce204_13_0716.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json. Короткие обозначения (XT, D45) — только рядом с брендом, в том числе с марками Chalwyn, Roda Deaco, Rigsaver."
+    },
+    {
+     "id": "amot-gas-turbine",
+     "series": "4420F (4420F20 / 4420F30) и 8402G — клапаны топливного газа ГТУ",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "4420F(?:[23]0)?|8402G?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "4420F",
+      "4420F30",
+      "8402G"
+     ],
+     "sources": [
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_4420f_fuel_shut_off_valve_0726_rev_5.pdf",
+      "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_8402_gas_turbine_fuel_control_valve_0719_rev3.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/amot.json."
+    }
+   ]
   }
  ],
  "owners": [
