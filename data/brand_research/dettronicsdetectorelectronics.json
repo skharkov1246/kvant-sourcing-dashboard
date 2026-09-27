@@ -1,0 +1,1191 @@
+{
+  "oem_key": "dettronicsdetectorelectronics",
+  "name": "Det-Tronics (Detector Electronics)",
+  "segment_focus": "пожаро- и газообнаружение Eagle Quantum Premier: извещатели, модули, номера",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Det-Tronics (Detector Electronics, LLC, Миннеаполис, США) — изготовитель взрывозащищённых извещателей пламени и газоанализаторов. Ей же принадлежит система пожаро- и газообнаружения с управлением пожаротушением Eagle Quantum Premier (EQP): SIL 2, NFPA 72, адресная петля LON/SLC класса X. С 02.07.2024 компания входит в Spectrum Safety Solutions: Sentinel Capital Partners купила у Carrier промышленное пожарное направление (Det-Tronics, Autronica, Fireye, Marioff). EQP ставят на укрытия ГТУ, генераторы и компрессоры. В спецификации EQP среди применений прямо названы «Turbines / generators / compressors», для укрытий ГТУ есть отдельные брошюры (92-1085). По брошюре, извещатели X3301/X3302 устанавливают «как OEM-оборудование крупные изготовители турбин», но имена в ней не названы. Собрано: 25 изделий (контроллер, модули ввода-вывода, питание и сеть, извещатели пламени, газа, тепла и дыма), 24 документа, 40 кодов с дословной цитатой (все с det-tronics.com: руководства 95-xxxx и каталог 52-1002-26.0 на 2026 год), 13 субпоставщиков и смежных изготовителей, 12 дилеров и офисов. В руководствах записано, что полевые устройства в поле не ремонтируют: ремонт только на заводе в Миннеаполисе по RMA. Поэтому запчасти здесь — расходники ТО (кольца, смазка, фильтры, отражатели oi, калибровочные наборы), сменные модули (сенсорные, электронные) и сами модули EQP. Статусы: X5200/X5200M и X2200/X2200M сняты в 2024 году (замена — X5200G и X2200G). Производитель переводит C7050B и EQ2200UVHT (УФ для горячих зон турбин) в ремонт-только, с 2025 года — в снятые; сменная УФ-трубка DE1888K3 тоже снята. Для OPECL производитель даёт путь замены на LS2000. В каталоге 2026 года остались исполнения для России (одобрение R, VNIIFTRI/VNIIPO) с пометкой «Contact factory for availability». В локаторе продаж Det-Tronics строки «Россия» нет.",
+  "machines": [
+    {
+      "model": "EQ3001 / EQ3016 (Eagle Quantum Premier Controller)",
+      "kind": "контроллер системы пожаро- и газообнаружения и управления пожаротушением",
+      "segment": "прочее",
+      "rating": "EQ3001 — до 246 узлов, EQ3016 — до 16 узлов на петле LON/SLC; 24 В пост. тока (18–30 В); SIL 2; резервирование «ведущий/горячий резерв»; Modbus RTU/TCP, ControlNet, EtherNet/IP DLR",
+      "status": "выпускается (руководство 95-8533 ред. 25.0 от 08.2025, каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+        "https://www.det-tronics.com/product/eqp-system-devices/eagle-quantum-premier-controller/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ2001 EQP Monitor",
+      "kind": "диагностический монитор сети LON (без функций сигнализации)",
+      "segment": "прочее",
+      "rating": "подключается отдельным отводом к LON, ведёт журнал неисправностей полевых устройств",
+      "status": "есть в руководстве 95-8533 ред. 25.0; в каталоге 2026 не найден",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ3730 EDIO",
+      "kind": "модуль дискретного ввода-вывода расширенный (сигнализация, пуск тушения)",
+      "segment": "прочее",
+      "rating": "8 каналов, классы A/B, выходы 24 В до 2 А на канал; SIL 2",
+      "status": "выпускается (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ3700 DCIO",
+      "kind": "модуль дискретного ввода-вывода",
+      "segment": "прочее",
+      "rating": "8 каналов, только класс B",
+      "status": "выпускается (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ3710 AIM",
+      "kind": "модуль аналогового ввода 4–20 мА (газоанализаторы сторонних изготовителей)",
+      "segment": "прочее",
+      "rating": "8 каналов, режимы «горючий газ» и «универсальный»; SIL 2",
+      "status": "выпускается (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ3720 RM",
+      "kind": "релейный модуль вывода",
+      "segment": "прочее",
+      "rating": "8 реле, 24 В пост. тока до 1 А; есть исполнение «Russia» (EQ3720DR/PR)",
+      "status": "выпускается; исполнение для России — «Contact factory for availability» (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ3760ASM",
+      "kind": "модуль адресной петли дымовых и тепловых извещателей (шлюз Apollo)",
+      "segment": "прочее",
+      "rating": "до 100 адресных устройств Apollo Discovery/XP95 на модуль, до 10 модулей на контроллер; SIL 2",
+      "status": "выпускается (руководство 95-8755 ред. 1.5 от 03.2024, каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8755-1.5-EQ3760ASM-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ3780 HSDM",
+      "kind": "модуль сверхбыстрого пуска дренчерных систем",
+      "segment": "прочее",
+      "rating": "6 входов и 6 выходов на электромагнитные клапаны, каскадирование; SIL 2",
+      "status": "выпускается (руководство 95-8782 ред. 2.4)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8782-2.4-HSDM-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ3770 EIO",
+      "kind": "взрывозащищённый корпус с модулями ввода-вывода EQP (EDIO/HSDM/AIM/RM/DCIO)",
+      "segment": "прочее",
+      "rating": "Class I Div 1, Zone 1; в каталоге 2026 — исполнения 000520-051 и 000520-052: алюминий, 8 вводов NPT; можно совместить со встроенным монитором замыкания на землю",
+      "status": "выпускается (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ3900 (EQ3900N / EQ3900E / EQ3900G) и EQ3900RPS",
+      "kind": "шкафы и панели системы EQP; взрывозащищённый источник питания",
+      "segment": "прочее",
+      "rating": "EQ3900N — Class 1 Div 2, EQ3900E — Class 1 Div 1, EQ3900G — общепромышленное исполнение; EQ3900RPS — два ввода переменного тока, 24 В до 18 А",
+      "status": "выпускается (руководства 95-8559, 95-8763, 95-8641, 95-8745)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8745-3.1-EQ3900RPS-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ21xxPS / EQ2100PSM / EQP2120PS / EQP2410PS / EQ2220GFM",
+      "kind": "источники питания, монитор источника питания, преобразователь, монитор замыкания на землю системы EQP",
+      "segment": "прочее",
+      "rating": "EQ2110/2130/2175PS — 10/30/75 А (60 Гц), EQ2131/2176PS — 30/75 А (50 Гц); EQP2120PS — 20 А; EQP2410PS — 10 А 24 В",
+      "status": "выпускается (руководство 95-8533 ред. 25.0)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ2400NE / EQ2400PLR",
+      "kind": "сетевой расширитель и повторитель физического уровня петли LON",
+      "segment": "прочее",
+      "rating": "сегмент до 2000 м, до 6 расширителей на петлю, петля до 10 000 м",
+      "status": "выпускается (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "X3301",
+      "kind": "многоспектральный ИК-извещатель пламени (углеводороды), исполнение EQP — выход 14",
+      "segment": "прочее",
+      "rating": "3 ИК-сенсора, автоматическая проверка оптики oi; выходы: реле, 0–20 мА, HART, EQP LON; Ex d e / Ex d; SIL 2; одобрение R — VNIIPO/VNIIFTRI (Россия)",
+      "status": "выпускается (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1037-12.7-Product-Line-Card-A4-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "X3302",
+      "kind": "многоспектральный ИК-извещатель пламени водорода и синтез-газа",
+      "segment": "прочее",
+      "rating": "сертифицирован FM для пламени водорода, метана, метанола и синтез-газа; HART; SIL 2",
+      "status": "выпускается (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8768-4.1-X3302-Enhanced-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1085-2.0-Gas-Turbine-Enclosures-4-Page-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "X5200 / X5200G",
+      "kind": "УФ/ИК-извещатель пламени, есть исполнение EQP",
+      "segment": "прочее",
+      "rating": "совмещение УФ- и ИК-сенсоров; SIL 2",
+      "status": "X5200 и X5200M сняты в 2024 году, выпускаются X5200G/X5200GM (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8546-19.2-X5200-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "X2200 / X2200G",
+      "kind": "УФ-извещатель пламени",
+      "segment": "прочее",
+      "rating": "солнечно-слепой УФ-диапазон; HART; SIL 2",
+      "status": "X2200 и X2200M сняты в 2024 году, выпускаются X2200G/X2200GM (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8549-19.1-X2200.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "X9800",
+      "kind": "одночастотный ИК-извещатель пламени (углеводороды)",
+      "segment": "прочее",
+      "rating": "HART; SIL 2",
+      "status": "выпускается (каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8554-17.3-X9800.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1037-12.7-Product-Line-Card-A4-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "EQ2200UVHT + C7050B",
+      "kind": "высокотемпературный УФ-извещатель пламени для укрытий турбин и машинных залов генераторов",
+      "segment": "ГТУ",
+      "rating": "для зон, где температура постоянно выше 75 °C",
+      "status": "снят: UVHT — только ремонт, снят с 01.01.2025; C7050B — только ремонт с 01.01.2024, снят с 01.01.2025; замена — извещатели X-серии (бюллетень 31-1033-1.1)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/31-1033-1.1-C7050B-UVHT.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PIRECL PointWatch Eclipse",
+      "kind": "точечный ИК-газоанализатор горючих углеводородов, исполнение EQP — выходы 4 и 14",
+      "segment": "прочее",
+      "rating": "0–100 % НКПР; порог в исполнении EQP 5–40 % НКПР; SIL 2; одобрение R — VNIIFTRI (Россия)",
+      "status": "выпускается (руководство 95-8526 ред. 20.14, каталог 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8526-20.14-PIRECL-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1085-2.0-Gas-Turbine-Enclosures-4-Page-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "OPECL Open Path Eclipse",
+      "kind": "трассовый ИК-газоанализатор горючих углеводородов, исполнение EQP — выход 14",
+      "segment": "прочее",
+      "rating": "0–5 НКПР·м",
+      "status": "устаревает: производитель предлагает путь замены на LS2000; в каталоге 2026 остались только переходники OPECL → LS2000",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8556-OPECL.pdf",
+        "https://www.det-tronics.com/products/product-upgrades/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "LS2000 FlexSight",
+      "kind": "трассовый ИК-газоанализатор с интерфейсом LON",
+      "segment": "прочее",
+      "rating": "0–5 НКПР·м на дистанции 5–200 м",
+      "status": "выпускается (руководство 95-8714 ред. 7.2, 2026)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/95-8714-7.2-LS2000-1.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1037-12.7-Product-Line-Card-A4-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "UD10-DCU FlexVu",
+      "kind": "дисплей и эмулятор DCU: переводит 4–20 мА газоанализатора в сеть LON EQP",
+      "segment": "прочее",
+      "rating": "выход 28 — EQP/DCU; плата CGS для термокаталитических сенсоров; одобрение R (Россия)",
+      "status": "выпускается (руководство 95-8656 ред. 6.4)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8656-6.4-UD10-DCU-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GT3000 (GTX + GTS)",
+      "kind": "электрохимический газоанализатор токсичных газов и кислорода, к EQP подключается через UD10-DCU",
+      "segment": "прочее",
+      "rating": "H2S 0–20/50/100 ppm, CO, NH3, SO2, Cl2, H2, NO2, O2; сенсорный модуль GTS меняют без снятия питания; одобрения R (Россия) и K (Казахстан)",
+      "status": "выпускается; в ЕС и Великобритании не продаётся (страница Product Upgrades)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8616-12.8-GT3000-Web.pdf",
+        "https://www.det-tronics.com/products/product-upgrades/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Model HD",
+      "kind": "взрывозащищённый тепловой извещатель зоны риска",
+      "segment": "прочее",
+      "rating": "уставки от 60 до 385 °C; контактный выход; SIL 2",
+      "status": "выпускается (руководство 95-8666 ред. 8.3)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8666-8.3-Model-HD-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1085-2.0-Gas-Turbine-Enclosures-4-Page-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "U5015 SmokeWatch / ClearView 3D",
+      "kind": "взрывозащищённый дымовой извещатель",
+      "segment": "прочее",
+      "rating": "Class I Div 1/2, Zone 1; выходы: светодиод, 0–20 мА, реле",
+      "status": "выпускается (каталог 2026, в нём есть сменный сенсорный модуль 104286-003)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/U5015-ClearView-3D%E2%84%A2-Explosion-Proof-Smoke-Detector-%E2%80%93-Instructions.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1037-12.7-Product-Line-Card-A4-Web.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Instructions Eagle Quantum Premier (установка, эксплуатация, поиск неисправностей, запчасти, заказ)",
+      "doc_no": "95-8533 ред. 25.0 (08.2025)",
+      "machine": "система EQP (контроллер, модули, питание, сеть)",
+      "kind": "O&M с перечнем запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ]
+    },
+    {
+      "title": "Safety Manual Eagle Quantum Premier (SIL, интервалы контрольных проверок)",
+      "doc_no": "95-8599 ред. 11.1",
+      "machine": "система EQP",
+      "kind": "safety manual",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8599-11.1-EQP-Safety.pdf"
+      ]
+    },
+    {
+      "title": "Safety System Software (S3) User Guide",
+      "doc_no": "95-8560 ред. 7.1",
+      "machine": "система EQP — ПО конфигурирования",
+      "kind": "руководство по ПО",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8560-7.1-S3-Manual.pdf"
+      ]
+    },
+    {
+      "title": "EQP Controller — спецификация",
+      "doc_no": "90-1148 ред. 6.1",
+      "machine": "EQ3001/EQ3016",
+      "kind": "спецификация",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/90-1148-6.1-EQP-Controller.pdf"
+      ]
+    },
+    {
+      "title": "2026 Product Catalog (модельные матрицы, номера деталей, сменные модули, запчасти)",
+      "doc_no": "52-1002-26.0",
+      "machine": "вся линейка, включая EQP и X-серию",
+      "kind": "каталог запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+      ]
+    },
+    {
+      "title": "Instructions X3301 Multispectrum IR Flame Detector",
+      "doc_no": "95-8704 ред. 5.1 (08.2021)",
+      "machine": "X3301",
+      "kind": "O&M с перечнем запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions X3302 Multispectrum IR Flame Detector",
+      "doc_no": "95-8768 ред. 4.1",
+      "machine": "X3302",
+      "kind": "O&M с перечнем запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8768-4.1-X3302-Enhanced-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions UVIR Flame Detector X5200 Series",
+      "doc_no": "95-8546 ред. 19.2 (01.2023)",
+      "machine": "X5200/X5200G/X5200M",
+      "kind": "O&M с перечнем запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8546-19.2-X5200-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions X2200 UV Flame Detector",
+      "doc_no": "95-8549 ред. 19.1",
+      "machine": "X2200",
+      "kind": "O&M",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8549-19.1-X2200.pdf"
+      ]
+    },
+    {
+      "title": "Instructions X9800 IR Flame Detector",
+      "doc_no": "95-8554 ред. 17.3",
+      "machine": "X9800",
+      "kind": "O&M",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8554-17.3-X9800.pdf"
+      ]
+    },
+    {
+      "title": "Safety Manual Models X2200 UV, X9800 IR, X5200 UVIR",
+      "doc_no": "95-8672 ред. 1.3",
+      "machine": "X2200, X9800, X5200",
+      "kind": "safety manual",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8672-1.3-X22-X98-X5200-Safety.pdf"
+      ]
+    },
+    {
+      "title": "Instructions PointWatch Eclipse PIRECL",
+      "doc_no": "95-8526 ред. 20.14",
+      "machine": "PIRECL",
+      "kind": "O&M с перечнем запчастей и калибровочных наборов",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8526-20.14-PIRECL-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions Open Path Eclipse OPECL",
+      "doc_no": "95-8556 ред. 11.3 (06.2017)",
+      "machine": "OPECL",
+      "kind": "O&M с перечнем запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8556-OPECL.pdf"
+      ]
+    },
+    {
+      "title": "Instructions FlexSight LS2000 Line-of-Sight IR Gas Detector",
+      "doc_no": "95-8714 ред. 7.2",
+      "machine": "LS2000",
+      "kind": "O&M с перечнем запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/95-8714-7.2-LS2000-1.pdf"
+      ]
+    },
+    {
+      "title": "Instructions Electrochemical Gas Detector GT3000 Series",
+      "doc_no": "95-8616 ред. 12.8",
+      "machine": "GT3000 (GTX/GTS)",
+      "kind": "O&M с перечнем запчастей и калибровочных наборов",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8616-12.8-GT3000-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions FlexVu UD10-DCU Emulator",
+      "doc_no": "95-8656 ред. 6.4",
+      "machine": "UD10-DCU",
+      "kind": "O&M с перечнем запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8656-6.4-UD10-DCU-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions EQ3760ASM Addressable Smoke Module (таблица соответствия номеров Det-Tronics и Apollo)",
+      "doc_no": "95-8755 ред. 1.5 (03.2024)",
+      "machine": "EQ3760ASM",
+      "kind": "O&M",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8755-1.5-EQ3760ASM-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions EQ3780 HSDM High Speed Deluge Module",
+      "doc_no": "95-8782 ред. 2.4",
+      "machine": "EQ3780HSDM",
+      "kind": "O&M",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8782-2.4-HSDM-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions EQ3900RPS Explosion-Proof Power Supply",
+      "doc_no": "95-8745 ред. 3.1",
+      "machine": "EQ3900RPS",
+      "kind": "O&M",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8745-3.1-EQ3900RPS-Web.pdf"
+      ]
+    },
+    {
+      "title": "Instructions Model HD Risk Area Heat Detector",
+      "doc_no": "95-8666 ред. 8.3",
+      "machine": "Model HD",
+      "kind": "O&M с перечнем запчастей",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8666-8.3-Model-HD-Web.pdf"
+      ]
+    },
+    {
+      "title": "Product Bulletin: C7050B and EQ UVHT High Temperature UV Detector — Product Lifecycle Notification",
+      "doc_no": "31-1033-1.1 (02.2023)",
+      "machine": "EQ2200UVHT + C7050B",
+      "kind": "бюллетень (снятие с производства)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/31-1033-1.1-C7050B-UVHT.pdf"
+      ]
+    },
+    {
+      "title": "Instructions Ultraviolet Flame Detection System R7404 Controller / C7050 Detector (раздел Recommended Spare Parts)",
+      "doc_no": "95-8242 ред. 7.1",
+      "machine": "C7050 (детектор, работающий в паре с UVHT)",
+      "kind": "O&M с рекомендуемыми запчастями",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8242-7.1-R7404_C7050.pdf"
+      ]
+    },
+    {
+      "title": "R-Series to EQP Product Upgrade Bulletin",
+      "doc_no": "31-1015 ред. 1.2",
+      "machine": "замена контроллеров R-серии на EQP",
+      "kind": "бюллетень (модернизация)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/R-series-EQP-product-upgrade-bulletin-31-1015-1.2.pdf",
+        "https://www.det-tronics.com/products/product-upgrades/"
+      ]
+    },
+    {
+      "title": "Certified Fire & Gas Safety System for Gas Turbine Enclosures (брошюры на 4 и 16 страниц)",
+      "doc_no": "92-1085 ред. 2.0",
+      "machine": "EQP для укрытий ГТУ (X3301/X3302, PIRECL, HD)",
+      "kind": "брошюра по применению",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1085-2.0-Gas-Turbine-Enclosures-4-Page-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1085-2.0-Gas-Turbine-Encl-16Page-Web.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "006979-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "EQ21xxPSM — монитор источника питания системы EQP",
+      "machine": "EQP",
+      "unit": "питание системы",
+      "doc_ref": "95-8533 ред. 25.0, разд. 5 Replacement Parts / Power Supplies, с. 5-4",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "006979-001 EQ21xxPSM Power Supply"
+    },
+    {
+      "code": "010988-002",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Источник питания EQP2120PS, 20 А, 50–60 Гц, на DIN-рейку. По разд. 7 руководства вариант EQP2120PS-B (010988-001) — это Phoenix Contact QUINT-PS-1AC/24DC/20",
+      "machine": "EQP",
+      "unit": "питание системы",
+      "doc_ref": "95-8533 ред. 25.0, разд. 5, с. 5-4",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "010988-002 EQP2120PS Power Supply,"
+    },
+    {
+      "code": "010892-002",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Преобразователь EQ2410PS, 10 А / 24 В пост. тока, на DIN-рейку (регулятор резервного питания)",
+      "machine": "EQP",
+      "unit": "питание системы",
+      "doc_ref": "95-8533 ред. 25.0, разд. 5, с. 5-4",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "010892-002 EQ2410PS Converter,"
+    },
+    {
+      "code": "009934-004",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Модуль диодного резервирования питания, на DIN-рейку. Панельный вариант 009934-003 по разд. 7 — Phoenix Contact QUINT4-DIODE",
+      "machine": "EQP",
+      "unit": "питание системы",
+      "doc_ref": "95-8533 ред. 25.0, разд. 5, с. 5-4",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "009934-004 Diode Redundancy Module,"
+    },
+    {
+      "code": "007941-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "EQ2220GFM — монитор замыкания на землю цепей 24 В",
+      "machine": "EQP",
+      "unit": "питание системы / контроль изоляции",
+      "doc_ref": "95-8533 ред. 25.0, разд. 5, с. 5-4",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "007941-001 EQ2220GFM Ground Fault"
+    },
+    {
+      "code": "008982-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "EQ3LTM — оконечный модуль петли LON (на сайте: 2 на петлю)",
+      "machine": "EQP",
+      "unit": "сеть LON/SLC",
+      "doc_ref": "95-8533 ред. 25.0, разд. 5 LON Devices / Redundancy, с. 5-4",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "008982-001 EQ3LTM LON Termination"
+    },
+    {
+      "code": "000128-191",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Выключатель физического отключения цепи пуска (между выходом HSDM/EDIO и электромагнитным клапаном), одобрен для шкафов EQ3900G",
+      "machine": "EQP (EQ3780HSDM, EQ3730EDIO)",
+      "unit": "цепь пуска пожаротушения",
+      "doc_ref": "95-8533 ред. 25.0, разд. 3 Physical Disconnect Switch, с. 3-33",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "part number 000128-191) is approved to"
+    },
+    {
+      "code": "225130-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Калибровочный набор: метан, 50 % НКПР (для UD10-DCU и PIRECL, проверен FM)",
+      "machine": "EQP: UD10-DCU, PIRECL",
+      "unit": "калибровка газоанализаторов",
+      "doc_ref": "95-8533 ред. 25.0, прил. A (FM Approval), с. A-1",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "Det-Tronics 225130-001 (50% LFL methane) and/or 227115-001"
+    },
+    {
+      "code": "227115-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Калибровочный набор H2S",
+      "machine": "EQP: UD10-DCU с сенсорами H2S",
+      "unit": "калибровка газоанализаторов",
+      "doc_ref": "95-8533 ред. 25.0, прил. A, с. A-1",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "225130-001 (50% LFL methane) and/or 227115-001 H2S Calibration Kits"
+    },
+    {
+      "code": "8210G207",
+      "issuer": "ASCO (RedHat) — номер изготовителя клапана, не Det-Tronics",
+      "description": "Электромагнитный клапан пуска дренчерной и предварительной систем из списка совместимых с выходами EDIO/HSDM; ток 365 мА при 20,4 В",
+      "machine": "EQP (EQ3730EDIO, EQ3780HSDM)",
+      "unit": "цепь пуска пожаротушения",
+      "doc_ref": "95-8533 ред. 25.0, табл. 3-10, с. 3-34",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "ASCO RedHat 8210G207"
+    },
+    {
+      "code": "FB02016-001",
+      "issuer": "Rockbestos — номер изготовителя кабеля",
+      "description": "Кабель LON Gardex Fieldbus: 1 экранированная пара 16 AWG, тип TC, 600 В; сегмент до 2000 м",
+      "machine": "EQP",
+      "unit": "сеть LON/SLC — кабель",
+      "doc_ref": "95-8533 ред. 25.0, табл. 3-7, с. 3-9",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "quote": "Type TC, p/n FB02016-001"
+    },
+    {
+      "code": "007609-072",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Контроллер EQ3001PNNT, панельный, SIL/FM/CSA/ATEX/IECEx",
+      "machine": "EQP",
+      "unit": "контроллер",
+      "doc_ref": "каталог 52-1002-26.0, раздел Systems / Control Room, EQ3001 Controller - SIL 2",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+      "quote": "EQ3001PNNT 007609-072 Panel"
+    },
+    {
+      "code": "009174-012",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Модуль EQ3730PT EDIO, панельный, SIL 2",
+      "machine": "EQP",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "каталог 52-1002-26.0, раздел Systems / Devices, EQ3730 EDIO Module - SIL 2",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+      "quote": "EQ3730PT 009174-012 AL"
+    },
+    {
+      "code": "007918-012",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Модуль аналогового ввода EQ3710PT AIM, панельный, SIL 2",
+      "machine": "EQP",
+      "unit": "модуль ввода-вывода",
+      "doc_ref": "каталог 52-1002-26.0, раздел Systems / Devices, EQ3710 AIM",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+      "quote": "EQ3710PT 007918-012 AL"
+    },
+    {
+      "code": "007792-902",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Релейный модуль EQ3720PR, панельный, исполнение «Russia» (в каталоге: «Contact factory for availability»)",
+      "machine": "EQP",
+      "unit": "модуль вывода",
+      "doc_ref": "каталог 52-1002-26.0, раздел Systems / Devices, EQ3720 Relay Module - Russia",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+      "quote": "EQ3720PR 007792-902 AL"
+    },
+    {
+      "code": "027866-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Сменный сенсорный модуль X3301 EQP/LON, алюминий, Ex d e — для извещателей EQP/LON, выпущенных до декабря 2008 года",
+      "machine": "X3301 (исполнение EQP)",
+      "unit": "извещатель пламени — сенсорный модуль",
+      "doc_ref": "каталог 52-1002-26.0, X-Series Flame Detector Spare Parts, с. Flame E.1",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+      "quote": "X3301 EQP/LON† 027866-001 AL"
+    },
+    {
+      "code": "006824-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Термокаталитический сенсор горючих газов CGSS1A6C2R1X, постоянный ток, резьба 3/4 NPT, выводы 6 дюймов (для UD10/UD10-DCU, UD30, CTX10); заменяет старые номера 225006-004, 226530-003 и др.",
+      "machine": "UD10-DCU с платой CGS",
+      "unit": "газоанализатор — чувствительный элемент",
+      "doc_ref": "каталог 52-1002-26.0, CGS Combustible Gas Sensor, с. Gas C.1",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+      "quote": "CGSS1A6C2R1X 006824-001"
+    },
+    {
+      "code": "009208-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Комплект замены oi для X3301 (отражатели проверки оптики)",
+      "machine": "X3301",
+      "unit": "извещатель пламени — проверка оптики oi",
+      "doc_ref": "каталог 52-1002-26.0, X-Series Flame Detector Spare Parts",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+      "quote": "oi Replacement Kit, X3301 009208-001 Black Plastic"
+    },
+    {
+      "code": "007307-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Отражатель oi для X3301, чёрный пластик (после замены нужна калибровка через Inspector Connector)",
+      "machine": "X3301",
+      "unit": "извещатель пламени — проверка оптики oi",
+      "doc_ref": "каталог 52-1002-26.0, X-Series Flame Detector Spare Parts",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf",
+      "quote": "oi Reflector Plate, X3301 007307-001 Black Plastic"
+    },
+    {
+      "code": "107427-040",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Уплотнительное кольцо задней крышки, Viton (чёрное или коричневое)",
+      "machine": "X3301, X3302, X5200 (тот же номер в их руководствах)",
+      "unit": "корпус извещателя — уплотнение крышки",
+      "doc_ref": "95-8704 ред. 5.1, Accessories, с. 20",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf",
+      "quote": "107427-040 O-ring - Rear Cover (Viton) - black or brown"
+    },
+    {
+      "code": "104346-154",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Уплотнительное кольцо задней крышки, фторсиликон (синее); в PIRECL и OPECL — кольцо крышки клеммного отсека 3,75 дюйма",
+      "machine": "X3301, X3302, X5200, PIRECL, OPECL, LS2000",
+      "unit": "корпус — уплотнение крышки",
+      "doc_ref": "95-8704 ред. 5.1, Accessories, с. 20",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf",
+      "quote": "104346-154 O-ring - Rear Cover (Fluorosilicone) - blue"
+    },
+    {
+      "code": "005003-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Смазка без силикона для извещателей, 1 унция; в руководстве CTX10 (95-8789) под этим номером — «Lubriplate grease, 1 oz.»",
+      "machine": "X-серия, PIRECL, CGS/CTX10",
+      "unit": "резьба и уплотнения корпуса — смазка",
+      "doc_ref": "95-8704 ред. 5.1, Accessories, с. 20",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf",
+      "quote": "005003-001 1 oz grease for detectors (silicone-free)"
+    },
+    {
+      "code": "001680-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Средство для очистки окна, упаковка 6 шт.",
+      "machine": "X3301, X3302, X5200, C7050",
+      "unit": "оптика извещателя пламени — очистка",
+      "doc_ref": "95-8704 ред. 5.1, Accessories, с. 20",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf",
+      "quote": "001680-001 Window cleaner (6 pack)"
+    },
+    {
+      "code": "012549-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Смазка PTFE без силикона, 1 унция",
+      "machine": "X-серия, UD10-DCU, OPECL, Model HD",
+      "unit": "резьба и уплотнения корпуса — смазка",
+      "doc_ref": "95-8704 ред. 5.1, Accessories, с. 20",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf",
+      "quote": "012549-001 1 oz PTFE silicone-free lubricant"
+    },
+    {
+      "code": "102740-002",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Магнит калибровки и ручного теста oi",
+      "machine": "X3301, X3302, X5200, PIRECL, OPECL, LS2000",
+      "unit": "калибровка и проверка",
+      "doc_ref": "95-8768 ред. 4.1, Accessories, с. 18",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8768-4.1-X3302-Enhanced-Web.pdf",
+      "quote": "102740-002 Magnet"
+    },
+    {
+      "code": "007819-002",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "USB Inspector Connector W6300B1003 с ПО Enhanced Flame Inspector: связь с извещателем, журналы, калибровка отражателя oi после замены",
+      "machine": "X3301, X3302, X5200",
+      "unit": "диагностика и настройка",
+      "doc_ref": "95-8768 ред. 4.1, Accessories, с. 18",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8768-4.1-X3302-Enhanced-Web.pdf",
+      "quote": "007819-002 W6300B1003 USB Inspector Connector (Enhanced Flame Inspector software included)"
+    },
+    {
+      "code": "009208-002",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Комплект замены oi для X5200/X2200/X9800 (5 отражателей, Inspector Connector и монитор)",
+      "machine": "X5200, X2200, X9800",
+      "unit": "извещатель пламени — проверка оптики oi",
+      "doc_ref": "95-8546 ред. 19.2, Replacement Parts List, с. 20",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8546-19.2-X5200-Web.pdf",
+      "quote": "009208-002 oi Replacement kit for X52/X22/X98 (5 Reflector Plates)"
+    },
+    {
+      "code": "007165-002",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Защитный колпак с входным соплом и гидрофобным фильтром (фильтр забит — заменить и перекалибровать)",
+      "machine": "PIRECL",
+      "unit": "газоанализатор — защита от погоды и фильтр",
+      "doc_ref": "95-8526 ред. 20.14, Spare Parts, с. 30",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8526-20.14-PIRECL-Web.pdf",
+      "quote": "with Hydrophobic Filter 007165-002"
+    },
+    {
+      "code": "107427-053",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Уплотнительное кольцо переднего фланца (внутреннее), 3,25 дюйма",
+      "machine": "PIRECL, OPECL",
+      "unit": "корпус газоанализатора — уплотнение фланца",
+      "doc_ref": "95-8526 ред. 20.14, Spare Parts, с. 30",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8526-20.14-PIRECL-Web.pdf",
+      "quote": "for front flange (internal) 107427-053"
+    },
+    {
+      "code": "107427-052",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Уплотнительное кольцо защитного колпака, 2,44 дюйма",
+      "machine": "PIRECL",
+      "unit": "защитный колпак — уплотнение",
+      "doc_ref": "95-8526 ред. 20.14, Spare Parts, с. 30",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8526-20.14-PIRECL-Web.pdf",
+      "quote": "O-Ring, 2.44” i.d., for weather baffle 107427-052"
+    },
+    {
+      "code": "006468-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Калибровочный набор PIRECL: метан 50 % НКПР (2,5 % об.), два баллона, регулятор, трубка",
+      "machine": "PIRECL",
+      "unit": "калибровка",
+      "doc_ref": "95-8526 ред. 20.14, Calibration Equipment, с. 30",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8526-20.14-PIRECL-Web.pdf",
+      "quote": "Methane, 50% LFL, 2.5% by volume 006468-001"
+    },
+    {
+      "code": "009640-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Сменный фильтр сенсорного модуля GTS",
+      "machine": "GT3000 (к EQP через UD10-DCU)",
+      "unit": "газоанализатор токсичных газов — фильтр",
+      "doc_ref": "95-8616 ред. 12.8, Parts & Accessories, с. 15",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8616-12.8-GT3000-Web.pdf",
+      "quote": "009640-001 Replacement Filter"
+    },
+    {
+      "code": "010274-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Калибровочный набор GT3000: H2S 10 ppm",
+      "machine": "GT3000",
+      "unit": "калибровка",
+      "doc_ref": "95-8616 ред. 12.8, Calibration Kits for Gas Sensors, с. 15",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8616-12.8-GT3000-Web.pdf",
+      "quote": "010274-001 H2S / 10 ppm"
+    },
+    {
+      "code": "010535-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Сменный электронный модуль UD10-DCU (в каталоге 2026 — «UD10 Display Module, EQP-DCU»)",
+      "machine": "UD10-DCU",
+      "unit": "электроника дисплея и интерфейса LON",
+      "doc_ref": "95-8656 ред. 6.4, Replacement Parts, с. 20",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8656-6.4-UD10-DCU-Web.pdf",
+      "quote": "010535-001 Electronics Module, DCU"
+    },
+    {
+      "code": "011406-002",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Запасной электронный модуль приёмника OPECL, исполнение EQP",
+      "machine": "OPECL (исполнение EQP)",
+      "unit": "приёмник — электроника",
+      "doc_ref": "95-8556 ред. 11.3, Spare Parts, с. 27",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8556-OPECL.pdf",
+      "quote": "011406-002 Spare electronics module for OPECL"
+    },
+    {
+      "code": "DE1888K3",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Высокотемпературный сменный модуль УФ-трубки для C7050B; по бюллетеню только ремонт с 01.01.2024, снят с 01.01.2025",
+      "machine": "EQ2200UVHT + C7050B (укрытия турбин)",
+      "unit": "УФ-сенсор",
+      "doc_ref": "бюллетень 31-1033-1.1 (02.2023), таблица жизненного цикла",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/31-1033-1.1-C7050B-UVHT.pdf",
+      "quote": "DE1888K3 Replacement UV Tube"
+    },
+    {
+      "code": "003088-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Кольцо oi для УФ-детектора C7050 (рекомендуемая запчасть)",
+      "machine": "C7050 / C7050B",
+      "unit": "оптика — проверка oi",
+      "doc_ref": "95-8242 ред. 7.1, Recommended Spare Parts, с. 24",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8242-7.1-R7404_C7050.pdf",
+      "quote": "oi ring for UV detector (part number 003088-001)."
+    },
+    {
+      "code": "58000-650",
+      "issuer": "Apollo Fire Detectors — номер изготовителя извещателя",
+      "description": "Адресный оптический дымовой извещатель Apollo, исполнение FM; номер Det-Tronics — 000515-552",
+      "machine": "EQ3760ASM",
+      "unit": "адресная петля дымовых и тепловых извещателей",
+      "doc_ref": "95-8755 ред. 1.5, табл. 3 «List of supported devices», с. 4",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8755-1.5-EQ3760ASM-Web.pdf",
+      "quote": "000515-552 58000-650 Apollo Optical Smoke Detector, FM"
+    },
+    {
+      "code": "000515-552",
+      "issuer": "Det-Tronics (Detector Electronics) — номер Det-Tronics на изделие Apollo 58000-650",
+      "description": "Адресный оптический дымовой извещатель Apollo, исполнение FM, по номеру Det-Tronics",
+      "machine": "EQ3760ASM",
+      "unit": "адресная петля дымовых и тепловых извещателей",
+      "doc_ref": "95-8755 ред. 1.5, табл. 3, с. 4",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8755-1.5-EQ3760ASM-Web.pdf",
+      "quote": "000515-552 58000-650 Apollo Optical Smoke Detector, FM"
+    },
+    {
+      "code": "104106-001",
+      "issuer": "Det-Tronics (Detector Electronics)",
+      "description": "Оконечный резистор 10 кОм ±1 %, проволочный (контроль линии входов и выходов)",
+      "machine": "EQ3780HSDM, EDIO, Model HD",
+      "unit": "контроль шлейфов",
+      "doc_ref": "95-8782 ред. 2.4, разд. 12.0 Ordering Information, с. 16",
+      "source_url": "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8782-2.4-HSDM-Web.pdf",
+      "quote": "104106-001: EOL Resistor, 10K Ohms, 1%,"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Phoenix Contact",
+      "component": "источники питания QUINT: EQP2120PS-B = QUINT-PS-1AC/24DC/20, EQP2410PS-P = QUINT-PS-24DC/24DC/10; диодный модуль QUINT4-DIODE/12-24DC/2X20/1X40; одобренный оптический преобразователь PSI-MOS-RS485W2/FO",
+      "machine": "EQP (питание, оптическая связь контроллеров)",
+      "evidence": "95-8533 ред. 25.0, разд. 7, таблица «DEC Part Number / Model / Description»: против 010988-001, 010892-001 и 009934-003 указано «Phoenix Contact» и модель QUINT; табл. 3-9 — одобренные преобразователи оптической линии",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Apollo Fire Detectors",
+      "component": "адресные дымовые, тепловые и мультисенсорные извещатели, ручные извещатели, оповещатели и модули ввода-вывода серий Discovery и XP95",
+      "machine": "EQ3760ASM (EQP)",
+      "evidence": "95-8755 ред. 1.5, табл. 3: соответствие номеров Det-Tronics (000515-xxx) номерам Apollo (58000-xxx, 55000-xxx, 45681-xxx)",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8755-1.5-EQ3760ASM-Web.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Moxa",
+      "component": "преобразователь RS-485 в одномодовое волокно TCF-142-S (одобренный для оптической линии между контроллерами)",
+      "machine": "EQP (резервированные контроллеры)",
+      "evidence": "95-8533 ред. 25.0, табл. 3-9 «Approved Supported Media Converters for Fiber Optic Link»",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Belden",
+      "component": "кабель LON 3073F (для кабельных лотков)",
+      "machine": "EQP (петля LON/SLC)",
+      "evidence": "95-8533 ред. 25.0, табл. 3-7 «LON Maximum Cable Lengths»; страница «EQP Safety System Accessories & Spares» отсылает к Belden как к одному из двух изготовителей кабеля",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/product/accessories-spares/eqp-safety-system-accessories-and-spares/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Rockbestos",
+      "component": "кабель LON Gardex Fieldbus FB02016-001 (16 AWG) и FB02018-001 (18 AWG)",
+      "machine": "EQP (петля LON/SLC)",
+      "evidence": "95-8533 ред. 25.0, табл. 3-7; страница аксессуаров EQP называет Rockbestos вторым изготовителем кабеля",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+        "https://www.det-tronics.com/product/accessories-spares/eqp-safety-system-accessories-and-spares/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ASCO (RedHat)",
+      "component": "электромагнитные клапаны пуска дренчерных и предварительных систем: R8210A107, 8210A107, 8210G207, HV2740607, HV274608",
+      "machine": "EQP (выходы EDIO/HSDM)",
+      "evidence": "95-8533 ред. 25.0, табл. 3-10 «Typical Maximum Wire Length for FM Approved Solenoids» — одобренные совместимые клапаны, в поставку Det-Tronics не входят",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Parker (Viking)",
+      "component": "электромагнитные клапаны пуска: 11591 NC, 11592 NC, 71395SN2ENJ1NOH111C2, 73218BN4UNLVNOC111C2 и др.",
+      "machine": "EQP (выходы EDIO/HSDM)",
+      "evidence": "95-8533 ред. 25.0, табл. 3-10 — одобренные совместимые клапаны",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Kidde-Fenwal",
+      "component": "исполнительные устройства и клапаны пуска: 897494, 895630, 890181 (для 890181 номер Det-Tronics 00219-209)",
+      "machine": "EQP (выходы EDIO/HSDM)",
+      "evidence": "95-8533 ред. 25.0, табл. 3-10 — одобренные совместимые устройства пуска",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Emerson (AMS Trex, Model 475)",
+      "component": "HART-коммуникаторы, продаются под номерами Det-Tronics 103922-003 (AMS Trex) и 103922-001 (Model 475)",
+      "machine": "X3301, X3302, X5200, PIRECL, LS2000, OPECL",
+      "evidence": "в руководствах 95-8704, 95-8768, 95-8526, 95-8714 они стоят в перечнях аксессуаров; на странице руководств Det-Tronics лежит документ по AMS Trex. страница Instruction Manuals прямо называет изготовителя: «Emerson’s user’s manual for their AMS Trex™ Handheld Communicator»",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8768-4.1-X3302-Enhanced-Web.pdf",
+        "https://www.det-tronics.com/resources/instruction-manuals/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Lubriplate",
+      "component": "смазка без силикона, продаётся под номером Det-Tronics 005003-001",
+      "machine": "X-серия, PIRECL, сенсоры CGS/CTX10",
+      "evidence": "95-8789 ред. 2.1 (CTX10 with CGS), разд. 11.1: «005003-001 Lubriplate grease, 1 oz.»; в руководстве X3301 тот же номер — «1 oz grease for detectors (silicone-free)»",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8789-2.1-CTX10-with-CGS.pdf",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Echelon",
+      "component": "сетевая технология LON (Local Operating Network), на которой построена петля EQP SLC; в контроллерах — сопроцессоры neuron. Echelon — лицензиар технологии, а не поставщик детали к закупке",
+      "machine": "EQP (контроллер и все устройства LON)",
+      "evidence": "95-8533 ред. 25.0: «a version of Echelon’s Local Operating Network (LON) customized specifically for the EQP System»; «EQP Controllers utilize neuron co-processors». Изготовитель микросхем прямо не назван",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Marioff",
+      "component": "водяной туман высокого давления, работает в паре с системой EQP в решении для укрытий ГТУ",
+      "machine": "EQP для укрытий ГТУ",
+      "evidence": "брошюра 92-1085 ред. 2.0 на 16 страниц, раздел Water Mist Suppression со ссылкой «SOURCE: Marioff»; Marioff и Det-Tronics с 02.07.2024 входят в Spectrum Safety Solutions",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1085-2.0-Gas-Turbine-Encl-16Page-Web.pdf",
+        "https://www.det-tronics.com/news/news/brand_press_release/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Kidde Fire Systems",
+      "component": "тушение CO2 высокого давления (NFPA 12), работает в паре с системой EQP в решении для укрытий ГТУ",
+      "machine": "EQP для укрытий ГТУ",
+      "evidence": "брошюра 92-1085 ред. 2.0 на 16 страниц, раздел High Pressure CO2 Suppression со ссылкой «SOURCE: Kidde Fire Systems»",
+      "sources": [
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1085-2.0-Gas-Turbine-Encl-16Page-Web.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "ООО «КОДА-ОПТИМ» (KODA-OPTIM)",
+      "country": "Россия",
+      "role": "заявляет себя официальным представителем Detector Electronics Corporation в России: поставка EQP, извещателей и газоанализаторов, шеф-монтаж, пусконаладка, гарантийное и послегарантийное обслуживание. Последняя новость на сайте — 2017 год, в локаторе Det-Tronics не значится: статус после 2022 года не подтверждён",
+      "sources": [
+        "http://www.koda-optim.ru/about",
+        "http://www.koda-optim.ru/products/eqp",
+        "http://www.koda-optim.ru/news"
+      ]
+    },
+    {
+      "company": "FAST Engineering",
+      "country": "Казахстан",
+      "role": "представитель в локаторе продаж Det-Tronics по Казахстану",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "ZE-Tronics CJSC",
+      "country": "Азербайджан",
+      "role": "представитель в локаторе продаж Det-Tronics по Азербайджану и Грузии (Баку)",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "Detector Electronics (UK) Limited",
+      "country": "Великобритания",
+      "role": "региональное подразделение Det-Tronics; по локатору ведёт Армению, Таджикистан, Туркменистан и Узбекистан",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "CIT Ltd",
+      "country": "Украина",
+      "role": "представитель в локаторе продаж Det-Tronics по Украине (Киев)",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "ELVA Muhendislik LTD",
+      "country": "Турция",
+      "role": "представитель в локаторе продаж Det-Tronics по Турции (Стамбул, Умрание)",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "TELECTRON",
+      "country": "ОАЭ",
+      "role": "представитель в локаторе продаж Det-Tronics по ОАЭ",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "Det-Tronics — офис продаж в Дубае",
+      "country": "ОАЭ",
+      "role": "региональный офис продаж бренда (Dubai Sports City); в локаторе стоит также по Турции и Кувейту",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "Apex Industrial Services Company",
+      "country": "Саудовская Аравия",
+      "role": "представитель в локаторе продаж Det-Tronics по Саудовской Аравии (Даммам)",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "Safe-Tronics Automation Private Limited",
+      "country": "Индия",
+      "role": "представитель в локаторе продаж Det-Tronics по Индии (Мумбаи)",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "Det-Tronics — офис продаж в Пекине",
+      "country": "Китай",
+      "role": "офис продаж бренда; в локаторе по Китаю и Монголии других компаний нет",
+      "sources": [
+        "https://www.det-tronics.com/global-sales-network/"
+      ]
+    },
+    {
+      "company": "Detector Electronics, LLC (завод, Миннеаполис)",
+      "country": "США",
+      "role": "изготовитель; единственный ремонт полевых устройств и модулей EQP — возврат на завод по номеру RMA",
+      "sources": [
+        "https://www.det-tronics.com/support-services/returns/",
+        "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf"
+      ]
+    }
+  ],
+  "gaps": [
+    "Портал и электронный магазин Det-Tronics (вход «E-Commerce/Portal», Salesforce spectrum-det-tronics.my.site.com) закрыты: цены, наличие, статус RMA и полная база замен устаревших номеров там, наружу не выложены.",
+    "Сервис «Model & Part Number Reference Tool» (det-tronics.com/products/cross-reference/) ищет по одному номеру через скрипт, выгрузки нет. Соответствие старых и новых номеров собрано только для сенсоров CGS (по каталогу 2026).",
+    "Номера сенсорных модулей GTS (GT3000), например 009471-3xx, в каталоге 52-1002-26.0 при извлечении текста сливаются со сносками. Коды не записаны: их надо снять с PDF визуально (с. Gas D.3–D.4).",
+    "Внутренние компоненты извещателей и модулей (ИК-пироприёмники, УФ-трубки, платы) изготовитель не раскрывает. Полевые устройства «not designed to be repaired in the field», ремонт только на заводе по RMA, поэтому ремонтных комплектов в открытом доступе нет. Сроки и стоимость ремонта не опубликованы.",
+    "Россия: ООО «КОДА-ОПТИМ» называет себя официальным представителем, но последняя новость на его сайте — 2017 год. В локаторе Det-Tronics строки «Россия» нет, в списке стран нет и Беларуси. В каталоге 2026 года исполнения для России (R, VNIIFTRI/VNIIPO) остались с пометкой «Contact factory for availability». Действующий канал поставки после 2022 года не подтверждён.",
+    "Китай: в локаторе только офис продаж Det-Tronics в Пекине, дистрибьюторы и сервисные партнёры по имени не найдены.",
+    "Какие изготовители ГТУ и компрессорных агрегатов ставят EQP и X3301/X3302 штатно — в брошюре 92-1085 сказано только «Installed as OEM equipment by major turbine manufacturers», имён нет. Искать в спецификациях пакетов Solar Turbines, Siemens Energy, Baker Hughes и в опросных листах F&G — в этой сессии не подтверждено.",
+    "Аккумуляторы резервного питания EQP поставляет заказчик (герметичные свинцово-кислотные, ёмкость по расчёту из табл. 3-4/3-5 руководства 95-8533). Марка изготовителем не задана.",
+    "Руководство X3301 ред. 5.3 (95-8704-5.3) по ссылке с сайта отдаёт HTML вместо PDF. Использована ред. 5.1 (08.2021), перечень запчастей по ред. 5.3/5.5 не сверен.",
+    "В табл. 3 руководства 95-8755 номер Apollo для теплового извещателя EU напечатан как «5800-400» (вероятно, опечатка вместо 58000-400) — код не записан.",
+    "Отдельного parts manual или IPL для EQP нет: запчасти разнесены по руководствам 95-xxxx и каталогу 52-1002. Номер 006414-XXX (коробка PIRTB) и части кодов 0xxxxx-XXX даны с переменным хвостом конфигурации и как коды не записаны."
+  ],
+  "verifier_notes": "Как проверял: все 23 PDF по source_url скачаны curl (каждый ответил HTTP 200, открылся как PDF) и переведены в текст pdftotext. Страницы det-tronics.com (контроллер EQP, Product Upgrades, EQP Accessories & Spares, Instruction Manuals, пресс-релиз Spectrum) скачаны тоже. Каждый код искался в тексте источника с контекстом и номером страницы по колонтитулу. Все 40 кодов найдены дословно, и все относятся к описанному изделию. Все 25 машин и 13 субпоставщиков подтверждаются источниками. Замечания к записи, на вердикт не влияют: (1) у 010892-002 и 009934-004 в doc_ref указана стр. 5-3, у 010988-002 — «5-3/5-4»; по колонтитулу весь список Power Supplies стоит на стр. 5-4 (стр. 95 PDF). (2) У EQ3770 EIO детали «есть исполнение Russia» и «метрические вводы» источниками не подтверждаются: в каталоге 2026 только 000520-051/-052, AL, 8-NPT, графы Russia нет. Сама модель подтверждена. (3) Для Emerson страница Instruction Manuals прямо называет изготовителя («Emerson’s user’s manual for their AMS Trex»), оговорку «вывод по названию» можно снять. (4) Echelon — лицензиар технологии LON, а не поставщик детали к закупке.",
+  "corrections": [
+    "010892-002, 009934-004, 010988-002: страница в doc_ref — 5-4, по колонтитулу весь список Power Supplies стоит там (замечание скептика 1)",
+    "EQ3770 EIO: из rating сняты «метрические вводы» и «исполнение Russia» — в каталоге 2026 только 000520-051/-052, AL, 8-NPT (замечание скептика 2)",
+    "Emerson: снята оговорка «вывод по названию» — страница Instruction Manuals прямо называет Emerson; перепроверено при сборке файла (замечание скептика 3)",
+    "Echelon: в component оговорено — лицензиар технологии LON, а не поставщик детали к закупке (замечание скептика 4)",
+    "sub_suppliers: verified: true у всех 13 — скептик подтвердил их источниками",
+    "verifier_notes: снят локальный путь к рабочим файлам скептика — пути рабочей машины в набор не пишутся"
+  ]
+}

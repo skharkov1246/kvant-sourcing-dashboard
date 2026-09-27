@@ -1,0 +1,1026 @@
+{
+  "oem_key": "vibrometermeggitt",
+  "name": "Vibro-Meter (Meggitt SA, Фрибур, Швейцария; с 2022 года в составе Parker как Parker Meggitt, продуктовая линия vibro-meter)",
+  "segment_focus": "датчики вибрации CA/CE, системы VM600: номера, применение на ГТУ",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Vibro-Meter делает не машины, а измерительные цепи и системы защиты для ГТУ, паровых турбин, турбокомпрессоров и насосов: пьезоэлектрические акселерометры CA (зарядовый выход) и CE (со встроенной электроникой), датчики динамического давления CP (пульсации горения в ГТУ), вихретоковые цепи TQ/EA/IQS, усилители заряда IPC, блоки развязки GSI, стоечную систему защиты и мониторинга VM600 и VM600Mk2 (карты MPC4/IOC4T, XMx16/XIO16T, CPUM/IOCN, питание RPS6U), распределённую VibroSmart и ПО VibroSight. Коды взяты из каталожных листов и руководств изготовителя, номера CA303, CP103 и CP106 — из таблиц замен Istec и Swann, номер 144-134-000-203 — только с карточки перепродавца. Листы изготовителя лежат копиями у дилеров (Istec, Vogi, RuiMingSheng) или на ManualsLib, потому что сайты catalogue.meggittsensing.com и meggittsensing.com отвечают 403 на автоматическое чтение. Нумерация у изготовителя единая: 144-xxx — акселерометры CA, 143-xxx — датчики давления CP, 444-xxx — CE, 111-/913-/204-xxx — зонд, удлинитель и формирователь вихретоковой цепи, 244-xxx — IPC/GSI, 809-xxx — монтажные адаптеры, 200-5xx — карты VM600, 60x-/620-xxx — модули VM600Mk2. Применение на ГТУ по листам изготовителя: CA202 и CA134 — для горячих и тяжёлых условий ГТУ; о CA280 это утверждает только выдача каталога изготовителя, проверить не удалось. CA303 (изготовитель Endevco, модель 6240M) и датчики давления CP103/CP106 — прямые замены по номерам GE для LM6000 (таблица Istec: L31967P03 → 144-303-000-311, L44550P01 → 143-103-000-532). VibroSmart, по данным изготовителя, стоит на GE LM2500, RR RB211 и Siemens SGT-750 (модуль VSV301 изготовитель уже объявил устаревшим); XMC16 — модуль мониторинга горения. Замены у изготовителя: IPC707 (244-707-000-012) заменяет все IPC704 (244-704-000-xxx) по форме, посадке и функции. Для MPC4 и IOC4T с 2017 года идут версии RoHS с выходом 50 Ом, при этом IOC4T с 200-560-000-114/-212. Для MPC4Mk2 запасная часть — ненастроенный модуль 601-041-A0. Дилеры в РФ (СКБ-4, DALKOS) называют себя официальными поставщиками, изготовитель это не подтверждает. Региональный офис изготовителя для Ближнего Востока и Турции — Абу-Даби.",
+  "machines": [
+    {
+      "model": "CA202",
+      "kind": "пьезоэлектрический акселерометр, зарядовый выход 100 пКл/g, встроенный кабель в герметичном металлорукаве; Ex и стандартное исполнение",
+      "segment": "ГТУ",
+      "rating": "−55…260 °C; 0,5–6000 Гц; крепление 4 винта M6×35",
+      "status": "выпускается (DS 262-020, ред. 9 от 15.06.2021)",
+      "sources": [
+        "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+        "https://catalogue.meggittsensing.com/shop/sensors-and-signal-conditioners/high-temperature-vibration-sensors/ca202-piezoelectric-accelerometer/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CA134",
+      "kind": "высокотемпературный пьезоэлектрический акселерометр, 10 пКл/g, крепление ARINC 554, для экстремальных сред (ГТУ, криогеника, АЭС)",
+      "segment": "ГТУ",
+      "rating": "по карточке продавца −196…+500 °C",
+      "status": "выпускается (в каталоге изготовителя; прежний лист 262-002 от 04.06)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CA-134-product-sheet.pdf",
+        "https://catalogue.meggittsensing.com/shop/sensors-and-signal-conditioners/high-temperature-vibration-sensors/ca134-piezoelectric-accelerometer/",
+        "https://www.ontrium.com/en/usa/brands/meggitt/ca134-pnr-144-134-000-203"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CA136",
+      "kind": "пьезоэлектрический акселерометр, крепление ARINC 554, дифференциальный выход",
+      "segment": "ГТУ",
+      "rating": "не проверено",
+      "status": "статус не подтверждён (лист 262-004 от 04.06)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CA-136-product-sheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CA201",
+      "kind": "промышленный пьезоэлектрический акселерометр с дифференциальным выходом (предшественник CA202 по посадке: 4 винта M6×35)",
+      "segment": "прочее",
+      "rating": "не проверено",
+      "status": "раннее исполнение (лист 262-021 от 11.02); выпуск не подтверждён",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CA-201-product-sheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CA280",
+      "kind": "пьезоэлектрический акселерометр серии CA, зарядовый выход (применение на тяжёлых ГТУ и паровых турбинах и работа с IPC707 названы только в выдаче каталога изготовителя, скептиком не проверены)",
+      "segment": "ГТУ",
+      "rating": "не проверено (карточка каталога закрыта для чтения)",
+      "status": "в каталоге изготовителя",
+      "sources": [
+        "https://catalogue.meggittsensing.com/shop/sensors-and-signal-conditioners/high-temperature-vibration-sensors/ca280-piezoelectric-accelerometer/",
+        "https://www.istec.com/en/product/piezoelectric-accelerometer-ca-serie/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CA303",
+      "kind": "высокотемпературный акселерометр горячей части, зарядовый; изготовитель Endevco (модель 6240M), распространяет Vibro-Meter",
+      "segment": "ГТУ",
+      "rating": "для GE LM1600, LM2500, LM3500, LM5000, LM6000",
+      "status": "поставляется как прямая замена по номерам GE (L31967Pxx, L34xxxPxx)",
+      "sources": [
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+        "https://www.swann-associates.com/vibration-sensors/endevco-6240-ca303/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CE680 M511",
+      "kind": "пьезоэлектрический акселерометр со встроенной электроникой",
+      "segment": "прочее",
+      "rating": "не проверено",
+      "status": "лист 262-053 от 08.06; выпуск не подтверждён",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CE-680-product-sheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CP216",
+      "kind": "пьезоэлектрический датчик динамического давления (пульсации горения), встроенный минерально-изолированный кабель, разъём LEMO или высокотемпературный разъём Vibro-Meter",
+      "segment": "ГТУ",
+      "rating": "200 пКл/бар; −70…+520 °C; до 350 бар",
+      "status": "в каталоге (лист 262-016 от 04.06; поставки в РФ в 2022 по данным СКБ-4)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CP-216-product-sheet.pdf",
+        "http://www.skb-4.com/manufacturers/vibro-meter-meggitt"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CP103",
+      "kind": "пьезоэлектрический датчик динамического давления для контроля горения; для GE LM6000 (номер GE L44550P01)",
+      "segment": "ГТУ",
+      "rating": "не проверено",
+      "status": "в каталоге изготовителя",
+      "sources": [
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+        "https://catalogue.meggittsensing.com/shop/sensors-and-signal-conditioners/dynamic-pressure-sensors/cp103-piezoelectric-pressure-transducer/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CP106",
+      "kind": "вариант датчика динамического давления под изготовителя ГТУ; для GE LM6000 (номера GE L44723P01/P03/P04)",
+      "segment": "ГТУ",
+      "rating": "не проверено",
+      "status": "поставляется как замена по номерам GE",
+      "sources": [
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "CP211",
+      "kind": "пьезоэлектрический датчик динамического давления для высоких температур",
+      "segment": "ГТУ",
+      "rating": "25 пКл/бар; −54…650 °C (по странице дистрибьютора tsisl.es; лист изготовителя DS_CP211 закрыт — 403)",
+      "status": "в каталоге изготовителя",
+      "sources": [
+        "https://catalogue.meggittsensing.com/wp-content/uploads/2020/12/DS_CP211-en.pdf",
+        "https://tsisl.es/en/instrumentacion/meggitt-vibro-meter/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TQ402 / TQ412 + EA402 + IQS450",
+      "kind": "вихретоковая цепь (зонд, удлинитель, формирователь) по API 670 для относительной вибрации и осевого положения валов",
+      "segment": "ГТУ",
+      "rating": "зонд −40…+180 °C; 8 мВ/мкм (опция B21)",
+      "status": "лист 265-062, ред. 7 от 05.03.2015; с 2020 года выходит новая цепь TQ9xx/IQS900",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2018/07/TQ402-TQ412-EA402-IQS450-vibro-meter-datasheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TQ902 / TQ912 + EA902 + IQS900",
+      "kind": "вихретоковая цепь нового поколения с диагностикой формирователя",
+      "segment": "ГТУ",
+      "rating": "не проверено",
+      "status": "выпускается (DS 265-101, ред. 1 от 17.09.2020)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2020/09/TQ902-TQ912-EA902-IQS900-vibro-meter-datasheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IPC704",
+      "kind": "усилитель заряда (формирователь сигнала) для датчиков CA и CP",
+      "segment": "ГТУ",
+      "rating": "питание 18–30 В",
+      "status": "снят: заменён IPC707 (замена по форме, посадке и функции)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/11/ipc704-vibro-meter-signal-conditioner.pdf",
+        "https://www.vogi-interl.com/upload/7959/file/20241220/ipc707-781750.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "IPC707",
+      "kind": "усилитель заряда для CAxxx и CPxxx, фильтры, интегратор, диагностика цепи (SIL 2 по конструкции)",
+      "segment": "ГТУ",
+      "rating": "0,5 Гц – 20 кГц; −40…85 °C",
+      "status": "выпускается (DS 262-712, ред. 12 от 02.09.2024)",
+      "sources": [
+        "https://www.vogi-interl.com/upload/7959/file/20241220/ipc707-781750.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GSI127",
+      "kind": "блок гальванической развязки и питания измерительной цепи, SIL 2, DIN-рейка",
+      "segment": "прочее",
+      "rating": "развязка 4 кВ (скз)",
+      "status": "выпускается (DS 262-870, ред. 13 от 23.02.2024, новая версия PNR 244-127-000-021)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/DS_GSI127-en-newer-version-PNR-244-127-000-021.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VM600 MPC4 / IOC4T",
+      "kind": "карта защиты машин: 4 динамических канала и 2 канала оборотов; исполнения стандартное, с раздельными цепями и SIL",
+      "segment": "ГТУ",
+      "rating": "стойка 19″ 6U (ABE04x)",
+      "status": "выпускается (DS 268-021, ред. 12 от 06.01.2020); с 2017 года версии RoHS",
+      "sources": [
+        "https://vogi-interl.com/upload/7959/file/20250722/vibro-meter-mpc4-datasheet-570615.pdf",
+        "https://www.istec.com/wp-content/uploads/2021/01/MPC4-MPC4SIL-datasheet-DS_MPC4-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VM600 CPUM / IOCN",
+      "kind": "процессорная карта стойки и её карта ввода-вывода (Modbus RTU)",
+      "segment": "ГТУ",
+      "rating": "не применимо",
+      "status": "поддерживается; с 2015 года на модуле PFM-541I (MAMPS-HW/E, ред. 18)",
+      "sources": [
+        "https://www.manualslib.com/manual/2606902/Meggitt-Vibro-Meter-Vm600.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VM600 / VM600Mk2 XMx16 + XIO16T (XMV16, XMC16, XMVS16)",
+      "kind": "модули мониторинга состояния: 16 динамических и 4 тахоканала; XMC16 — мониторинг горения и пульсаций давления",
+      "segment": "ГТУ",
+      "rating": "не применимо",
+      "status": "выпускается в обеих линейках (DS 660-020-010-211A, ред. 11 от 28.02.2022)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2019/08/XMx16-XIO16T-datasheet-DS_VM600_Mk2_VM600_XMx16_XIO16T-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VM600Mk2 MPC4Mk2 + IOC4Mk2",
+      "kind": "модуль защиты и мониторинга второго поколения (лицензия CMS отдельно)",
+      "segment": "ГТУ",
+      "rating": "не применимо",
+      "status": "выпускается (DS 268-121)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2019/08/MPC4-IOC4-datasheet-DS_VM600_Mk2_MPC4_Mk2_IOC4_Mk2-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VM600 RPS6U",
+      "kind": "блок питания стойки VM600/VM600Mk2 (AC или DC, возможно резервирование)",
+      "segment": "ГТУ",
+      "rating": "у поздних версий суммарная выходная мощность до 330 Вт",
+      "status": "выпускается (в каталоге DS VM600Mk2/VM600 RPS6U)",
+      "sources": [
+        "https://www.manualslib.com/manual/2606902/Meggitt-Vibro-Meter-Vm600.html",
+        "https://catalogue.meggittsensing.com/wp-content/uploads/2021/11/DS_VM600_Mk2_VM600_RPS6U-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VibroSmart VSV301",
+      "kind": "распределённая система мониторинга вибрации и горения на DIN-рейке; по данным изготовителя стоит на GE LM2500, RR RB211, Siemens SGT-750",
+      "segment": "ГТУ",
+      "rating": "не применимо",
+      "status": "снят: изготовитель объявил VSV301 устаревшим (Istec: «The VSV301 has been declared obsolete by the OEM»)",
+      "sources": [
+        "https://catalogue.meggittsensing.com/shop/modular-vibration-combustion-monitoring/vibrosmart/vibrosmart-vsv301-monitoring-module/",
+        "https://meggittsensing.com/energy/applications/gas-turbines/",
+        "https://amcvibro.com/product/vibrosmart/",
+        "https://www.istec.com/product/vibrosmart-vsv301/"
+      ],
+      "verified": true
+    },
+    {
+      "model": "VibroSight",
+      "kind": "ПО защиты и мониторинга машин (пакеты «Combustion monitoring», «Hydro air-gap»)",
+      "segment": "прочее",
+      "rating": "не применимо",
+      "status": "выпускается (DS 660-020-005-227A)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2023/04/DS_VibroSight_software-en.pdf"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "CA202 piezoelectric accelerometer — data sheet",
+      "doc_no": "DS 262-020, ред. 9 от 15.06.2021",
+      "machine": "CA202",
+      "kind": "data sheet (каталожный лист с номерами заказа и принадлежностями)",
+      "sources": [
+        "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+        "https://www.colletplc.com/uploadfile/downloads/CA202-Datasheet.pdf"
+      ]
+    },
+    {
+      "title": "Instruction Manual — Piezoelectric accelerometers CA xxx / CE xxx",
+      "doc_no": "MACA-CE/E, ред. 4",
+      "machine": "CA134, CA135, CA136, CA201, CA216, CE134, CE136, CE310 и цепи с IPC704/GSI12x",
+      "kind": "O&M (руководство по монтажу, кабелям, крепёжным принадлежностям и обслуживанию)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CAxxx-CExxx-instruction-manual.pdf"
+      ]
+    },
+    {
+      "title": "VM600 machinery protection system (MPS) hardware manual — standard version",
+      "doc_no": "MAMPS-HW/E, ред. 18, март 2022",
+      "machine": "VM600 (MPC4/IOC4T, AMC8/IOC8T, CPUM/IOCN, RPS6U, RLC16, IRC4, ABE04x)",
+      "kind": "service manual (руководство по аппаратной части, настройке и обслуживанию)",
+      "sources": [
+        "https://www.manualslib.com/manual/2606902/Meggitt-Vibro-Meter-Vm600.html"
+      ]
+    },
+    {
+      "title": "VM600 MPC4 machinery protection card — data sheet",
+      "doc_no": "DS 268-021, ред. 12 от 06.01.2020 (также ред. 10 от 13.04.2017)",
+      "machine": "VM600 MPC4 / IOC4T",
+      "kind": "data sheet",
+      "sources": [
+        "https://vogi-interl.com/upload/7959/file/20250722/vibro-meter-mpc4-datasheet-570615.pdf",
+        "https://www.istec.com/wp-content/uploads/2021/01/MPC4-MPC4SIL-datasheet-DS_MPC4-en.pdf"
+      ]
+    },
+    {
+      "title": "VM600Mk2 MPC4Mk2 + IOC4Mk2 machinery protection and condition monitoring module — data sheet",
+      "doc_no": "DS 268-121",
+      "machine": "VM600Mk2",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2019/08/MPC4-IOC4-datasheet-DS_VM600_Mk2_MPC4_Mk2_IOC4_Mk2-en.pdf"
+      ]
+    },
+    {
+      "title": "VM600Mk2/VM600 XMx16 + XIO16T extended condition monitoring modules — data sheet",
+      "doc_no": "DS 660-020-010-211A, ред. 11 от 28.02.2022",
+      "machine": "XMV16, XMC16, XMVS16, XIO16T",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2019/08/XMx16-XIO16T-datasheet-DS_VM600_Mk2_VM600_XMx16_XIO16T-en.pdf"
+      ]
+    },
+    {
+      "title": "VibroSight software — data sheet",
+      "doc_no": "DS 660-020-005-227A",
+      "machine": "VibroSight / VM600 / VibroSmart",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2023/04/DS_VibroSight_software-en.pdf"
+      ]
+    },
+    {
+      "title": "TQ402 and TQ412 / EA402 / IQS450 proximity measuring system — data sheet",
+      "doc_no": "265-062, ред. 7 от 05.03.2015",
+      "machine": "TQ402, TQ412, EA402, IQS450",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2018/07/TQ402-TQ412-EA402-IQS450-vibro-meter-datasheet.pdf"
+      ]
+    },
+    {
+      "title": "TQ902 / TQ912, EA902 and IQS900 proximity measurement chain — data sheet",
+      "doc_no": "DS 265-101, ред. 1 от 17.09.2020",
+      "machine": "TQ902, TQ912, EA902, IQS900",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2020/09/TQ902-TQ912-EA902-IQS900-vibro-meter-datasheet.pdf"
+      ]
+    },
+    {
+      "title": "CP 216 piezoelectric pressure transducer — data sheet",
+      "doc_no": "262-016 (04.06)",
+      "machine": "CP216",
+      "kind": "data sheet (с уплотнениями и адаптерами)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CP-216-product-sheet.pdf"
+      ]
+    },
+    {
+      "title": "IPC704 signal conditioner — data sheet",
+      "doc_no": "262-710, ред. 12 от 08.11.2017",
+      "machine": "IPC704",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/11/ipc704-vibro-meter-signal-conditioner.pdf"
+      ]
+    },
+    {
+      "title": "IPC707 signal conditioner — data sheet",
+      "doc_no": "DS 262-712, ред. 12 от 02.09.2024",
+      "machine": "IPC707 (замена IPC704)",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.vogi-interl.com/upload/7959/file/20241220/ipc707-781750.pdf"
+      ]
+    },
+    {
+      "title": "GSI127 galvanic separation unit — data sheet",
+      "doc_no": "DS 262-870, ред. 13 от 23.02.2024",
+      "machine": "GSI127",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/DS_GSI127-en-newer-version-PNR-244-127-000-021.pdf"
+      ]
+    },
+    {
+      "title": "CE 680 M511 piezoelectric accelerometer — data sheet",
+      "doc_no": "262-053 (08.06)",
+      "machine": "CE680",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CE-680-product-sheet.pdf"
+      ]
+    },
+    {
+      "title": "CA 134 и CA 136 piezoelectric accelerometer — data sheets",
+      "doc_no": "262-002 и 262-004 (04.06)",
+      "machine": "CA134, CA136",
+      "kind": "data sheet (номер заказа дан без окончания)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CA-134-product-sheet.pdf",
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CA-136-product-sheet.pdf"
+      ]
+    },
+    {
+      "title": "MPS1 & MPS2 VM600 configuration software — data sheet",
+      "doc_no": "268-101 (04.06)",
+      "machine": "VM600 (MPC4, AMC8)",
+      "kind": "data sheet (ПО настройки)",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-VM600-product-sheet.pdf"
+      ]
+    },
+    {
+      "title": "Sensor cross-reference list LM6000 (номера GE → Vibro-Meter/Endevco)",
+      "machine": "GE LM6000: акселерометры CA303, датчики давления CP103/CP106",
+      "kind": "таблица взаимозаменяемости дилера",
+      "sources": [
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/"
+      ]
+    },
+    {
+      "title": "VM600 machinery protection system (MPS) safety manual (ссылка из поиска, файл закрыт для чтения — 403)",
+      "machine": "VM600",
+      "kind": "руководство по функциональной безопасности",
+      "sources": [
+        "https://meggittsensing.com/wp-content/uploads/Manual_VM600_Safety-en.pdf"
+      ]
+    },
+    {
+      "title": "VM600Mk2 machinery monitoring system — safety manual, IEC 61508 SIL 2 (ссылка из поиска, 403)",
+      "machine": "VM600Mk2",
+      "kind": "руководство по функциональной безопасности",
+      "sources": [
+        "https://meggittsensing.com/wp-content/uploads/Manual_VM600_Mk2_safety_SIL_2-en.pdf"
+      ]
+    },
+    {
+      "title": "IPC707 signal conditioner — safety manual, IEC 61508 SIL (ссылка из поиска, 403)",
+      "machine": "IPC707",
+      "kind": "руководство по функциональной безопасности",
+      "sources": [
+        "https://meggittsensing.com/wp-content/uploads/Manual_IPC707_safety-en.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "144-202-000-106",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Акселерометр CA202, Ex-исполнение, встроенный кабель 3 м",
+      "machine": "CA202",
+      "unit": "датчик вибрации корпуса",
+      "doc_ref": "DS 262-020, ред. 9",
+      "source_url": "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+      "quote": "Ex version with 3 m integral cable 144-202-000-106"
+    },
+    {
+      "code": "144-202-000-116",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Акселерометр CA202, Ex-исполнение, встроенный кабель 6 м",
+      "machine": "CA202",
+      "unit": "датчик вибрации корпуса",
+      "doc_ref": "DS 262-020, ред. 9",
+      "source_url": "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+      "quote": "Ex version with 6 m integral cable 144-202-000-116"
+    },
+    {
+      "code": "144-202-000-206",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Акселерометр CA202, стандартное исполнение, встроенный кабель 3 м",
+      "machine": "CA202",
+      "unit": "датчик вибрации корпуса",
+      "doc_ref": "DS 262-020, ред. 9",
+      "source_url": "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+      "quote": "Standard version with 3 m integral cable 144-202-000-206"
+    },
+    {
+      "code": "144-202-000-216",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Акселерометр CA202, стандартное исполнение, встроенный кабель 6 м",
+      "machine": "CA202",
+      "unit": "датчик вибрации корпуса",
+      "doc_ref": "DS 262-020, ред. 9",
+      "source_url": "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+      "quote": "Standard version with 6 m integral cable 144-202-000-216"
+    },
+    {
+      "code": "144-202-000-226",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Акселерометр CA202, стандартное исполнение, встроенный кабель 11 м",
+      "machine": "CA202",
+      "unit": "датчик вибрации корпуса",
+      "doc_ref": "DS 262-020, ред. 9",
+      "source_url": "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+      "quote": "Standard version with 11 m integral cable 144-202-000-226"
+    },
+    {
+      "code": "144-202-000-236",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Акселерометр CA202, стандартное исполнение, встроенный кабель 20 м",
+      "machine": "CA202",
+      "unit": "датчик вибрации корпуса",
+      "doc_ref": "DS 262-020, ред. 9",
+      "source_url": "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+      "quote": "Standard version with 20 m integral cable 144-202-000-236"
+    },
+    {
+      "code": "809-133-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Монтажный адаптер MA133 для CA20x и CE31x с теплоизолирующим основанием Micaver (слюдостекло)",
+      "machine": "CA202, CA201, CE31x",
+      "unit": "крепление датчика вибрации",
+      "doc_ref": "DS 262-020, ред. 9, раздел Accessories",
+      "source_url": "https://www.rms-dcs.com/uploads/CA202-piezoelectric-accelerometer-data-sheet-English-.pdf",
+      "quote": "Mounting MA133 809-133-000-011"
+    },
+    {
+      "code": "144-134-000-203",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Акселерометр CA134 без электроники, −196…+500 °C (по карточке продавца)",
+      "machine": "CA134",
+      "unit": "датчик вибрации корпуса (высокотемпературный)",
+      "doc_ref": "карточка перепродавца Enapart LLC (не авторизован изготовителем); в листе изготовителя 262-002 стоит лишь базовый номер 144-134-000-2 — доверие низкое",
+      "source_url": "https://www.ontrium.com/en/usa/brands/meggitt/ca134-pnr-144-134-000-203",
+      "quote": "CA134 PNR 144-134-000-203"
+    },
+    {
+      "code": "144-136-301-101",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Монтажная шпилька TA104 для акселерометров CA134, CA135, CA136, CE134, CE136",
+      "machine": "CA134, CA136, CE134, CE136",
+      "unit": "крепление датчика вибрации",
+      "doc_ref": "MACA-CE/E ред. 4, рис. 8-2",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CAxxx-CExxx-instruction-manual.pdf",
+      "quote": "P/N 144-136-301-101 Figure 8-2: TA 104 mounting stud for CA 134, CA 135, CA 136, CE 134 and CE 136 accelerometers"
+    },
+    {
+      "code": "144-136-302-101",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Теплоизолирующая опора TA105 (толщина 5 мм, до 300 °C) для CA135, CA136, CE136",
+      "machine": "CA136, CE136",
+      "unit": "крепление датчика вибрации",
+      "doc_ref": "MACA-CE/E ред. 4, рис. 8-5",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CAxxx-CExxx-instruction-manual.pdf",
+      "quote": "P/N 144-136-302-101 Figure 8-5: TA 105 thermally insulating support for CA 135, CA 136 and CE 136 accelerometers"
+    },
+    {
+      "code": "444-310-401-101",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Монтажная шпилька TA102 для акселерометров CA201 и CE310",
+      "machine": "CA201, CE310",
+      "unit": "крепление датчика вибрации",
+      "doc_ref": "MACA-CE/E ред. 4, рис. 8-1",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CAxxx-CExxx-instruction-manual.pdf",
+      "quote": "P/N 444-310-401-101 Figure 8-1: TA 102 mounting stud for CA 201 and CE 310 accelerometers"
+    },
+    {
+      "code": "444-310-500-201",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Электроизолирующая опора TA101 (пластина, втулки, винты M6×35) для CA201 и CE310",
+      "machine": "CA201, CE310",
+      "unit": "крепление датчика вибрации",
+      "doc_ref": "MACA-CE/E ред. 4, рис. 8-4",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CAxxx-CExxx-instruction-manual.pdf",
+      "quote": "P/N 444-310-500-201 Figure 8-4: TA 101 electrically insulating support for CA 201 and CE 310 accelerometers"
+    },
+    {
+      "code": "144-303-000-311",
+      "issuer": "Vibro-Meter (Meggitt SA); изделие Endevco",
+      "description": "Акселерометр CA303, замена GE L31967P03 / P01 / P18 / P27 (передний, в т. ч. DLE)",
+      "machine": "GE LM6000",
+      "unit": "датчик вибрации ГТУ",
+      "doc_ref": "Istec, Sensor cross-reference list LM6000; обозначение CA303 на странице Istec не названо — выведено из префикса 144-303 и карточки Swann (Product ID: CA303)",
+      "source_url": "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+      "quote": "Accel. L31967P03 - 303-032 144-303-000-311"
+    },
+    {
+      "code": "144-303-000-331",
+      "issuer": "Vibro-Meter (Meggitt SA); изделие Endevco",
+      "description": "Акселерометр CA303, замена GE L31967P05",
+      "machine": "GE LM6000",
+      "unit": "датчик вибрации ГТУ",
+      "doc_ref": "Istec, Sensor cross-reference list LM6000; обозначение CA303 на странице Istec не названо — выведено из префикса 144-303 и карточки Swann (Product ID: CA303)",
+      "source_url": "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+      "quote": "Accel. L31967P05 - 303-034 144-303-000-331"
+    },
+    {
+      "code": "144-303-000-241",
+      "issuer": "Vibro-Meter (Meggitt SA); изделие Endevco",
+      "description": "Акселерометр CA303, замена GE L31967P06",
+      "machine": "GE LM6000",
+      "unit": "датчик вибрации ГТУ",
+      "doc_ref": "Istec, Sensor cross-reference list LM6000; обозначение CA303 на странице Istec не названо — выведено из префикса 144-303 и карточки Swann (Product ID: CA303)",
+      "source_url": "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+      "quote": "Accel. L31967P06 - 303-035 144-303-000-241"
+    },
+    {
+      "code": "144-303-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA); изделие Endevco",
+      "description": "Акселерометр горячей части CA303, передний; замена GE L34246P03, L34246P04 и L34151P02 (по таблице Swann)",
+      "machine": "GE LM1600/LM2500/LM3500/LM5000/LM6000",
+      "unit": "датчик вибрации ГТУ",
+      "doc_ref": "Swann-Associates, карточка Endevco 6240 (CA303); модель Endevco у номера противоречива: во вводной фразе — 6240M56, в таблице — 6240M52 и 6222M59, а Istec ставит 6240M56 к 144-303-000-311",
+      "source_url": "https://www.swann-associates.com/vibration-sensors/endevco-6240-ca303/",
+      "quote": "The ENDEVCO® Model 6240M56 (Vibro-Meter 144-303-000-011/111) accelerometer is designed to be sensitive to mechanical vibration of turbine engines"
+    },
+    {
+      "code": "144-303-000-111",
+      "issuer": "Vibro-Meter (Meggitt SA); изделие Endevco",
+      "description": "Акселерометр горячей части CA303; замена GE L34152P01 (на Swann — «Accel. Aft.», задний) и L34152P04 (на Swann — «Accel. Fwd.», передний)",
+      "machine": "GE LM-серия",
+      "unit": "датчик вибрации ГТУ",
+      "doc_ref": "Swann-Associates, карточка Endevco 6240 (CA303); в таблице рядом с номером стоит модель Endevco 6240M51, а во вводной фразе той же страницы 144-303-000-011/111 отнесены к 6240M56 — модель Endevco для номера не установлена",
+      "source_url": "https://www.swann-associates.com/vibration-sensors/endevco-6240-ca303/",
+      "quote": "Accel. Aft. L34152P01 6240M51 303-02 144-303-000-111"
+    },
+    {
+      "code": "143-106-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Датчик динамического давления CP106, замена GE L44723P01",
+      "machine": "GE LM6000",
+      "unit": "контроль пульсаций горения",
+      "doc_ref": "Istec, Sensor cross-reference list LM6000",
+      "source_url": "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+      "quote": "CP106 L44723P01 - - 143-106-000-011"
+    },
+    {
+      "code": "143-106-000-111",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Датчик динамического давления CP106, замена GE L44723P03",
+      "machine": "GE LM6000",
+      "unit": "контроль пульсаций горения",
+      "doc_ref": "Istec, Sensor cross-reference list LM6000",
+      "source_url": "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+      "quote": "CP106 L44723P03 - - 143-106-000-111"
+    },
+    {
+      "code": "143-103-000-532",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Датчик динамического давления CP103, замена GE L44550P01",
+      "machine": "GE LM6000",
+      "unit": "контроль пульсаций горения",
+      "doc_ref": "Istec, Sensor cross-reference list LM6000",
+      "source_url": "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+      "quote": "CP103 L44550P01 - - 143-103-000-532"
+    },
+    {
+      "code": "143-215-902-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Внутреннее уплотнение давления для датчиков CP21x",
+      "machine": "CP216 (CP21x)",
+      "unit": "датчик динамического давления, камера сгорания",
+      "doc_ref": "262-016 (04.06), CP21X Pressure Seals",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CP-216-product-sheet.pdf",
+      "quote": "MA Internal pressure seal 143-215-902-011"
+    },
+    {
+      "code": "143-215-903-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Наружное уплотнение давления для датчиков CP21x",
+      "machine": "CP216 (CP21x)",
+      "unit": "датчик динамического давления, камера сгорания",
+      "doc_ref": "262-016 (04.06), CP21X Pressure Seals",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CP-216-product-sheet.pdf",
+      "quote": "MA External pressure seal 143-215-903-011"
+    },
+    {
+      "code": "809-104-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Монтажный адаптер MA104 для CP216 (исполнение с разъёмом LEMO)",
+      "machine": "CP216",
+      "unit": "крепление датчика давления",
+      "doc_ref": "262-016 (04.06), Accessories",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CP-216-product-sheet.pdf",
+      "quote": "MA 104 Mounting adapter 809-104-000-011"
+    },
+    {
+      "code": "809-126-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Монтажный адаптер MA126 для CP216 версии 1XX (высокотемпературный разъём Vibro-Meter)",
+      "machine": "CP216",
+      "unit": "крепление датчика давления",
+      "doc_ref": "262-016 (04.06), Accessories",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CP-216-product-sheet.pdf",
+      "quote": "MA 126 Mounting adapter 809-126-000-011"
+    },
+    {
+      "code": "444-680-000-511",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Акселерометр CE680 M511 со встроенной электроникой",
+      "machine": "CE680",
+      "unit": "датчик вибрации вспомогательного оборудования",
+      "doc_ref": "262-053 (08.06)",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CE-680-product-sheet.pdf",
+      "quote": "CE 680 M511 Piezoelectric Accelerometer 444-680-000-511"
+    },
+    {
+      "code": "111-402-000-013",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Вихретоковый зонд TQ402 (базовый номер; далее опции A–H: исполнение, резьба, длины)",
+      "machine": "TQ402 + IQS450",
+      "unit": "датчик относительной вибрации и осевого сдвига вала",
+      "doc_ref": "265-062, ред. 7",
+      "source_url": "https://www.istec.com/wp-content/uploads/2018/07/TQ402-TQ412-EA402-IQS450-vibro-meter-datasheet.pdf",
+      "quote": "Ordering number: 111 - 402 - 000 - 013 A B C D E F G H"
+    },
+    {
+      "code": "913-402-000-013",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Удлинительный кабель EA402 (базовый номер; опции A, E, F, G)",
+      "machine": "TQ402/TQ412 + IQS450",
+      "unit": "кабельная линия вихретоковой цепи",
+      "doc_ref": "265-062, ред. 7",
+      "source_url": "https://www.istec.com/wp-content/uploads/2018/07/TQ402-TQ412-EA402-IQS450-vibro-meter-datasheet.pdf",
+      "quote": "Ordering number: 913 - 402 - 000 - 013 A E F G"
+    },
+    {
+      "code": "204-450-000-002",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Формирователь сигнала IQS450 (базовый номер; опции A, B, H, I)",
+      "machine": "TQ402/TQ412 + EA402",
+      "unit": "формирователь вихретоковой цепи",
+      "doc_ref": "265-062, ред. 7",
+      "source_url": "https://www.istec.com/wp-content/uploads/2018/07/TQ402-TQ412-EA402-IQS450-vibro-meter-datasheet.pdf",
+      "quote": "Ordering number: 204 - 450 - 000 - 002 A B H I"
+    },
+    {
+      "code": "809-130-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Адаптер MA130 для установки IQS450 на DIN-рейку; для IPC704 тот же номер даёт лист IPC704 262-710, у IPC707 адаптер MA130 другой — 809-130-000-021",
+      "machine": "IQS450, IPC704",
+      "unit": "крепление формирователя",
+      "doc_ref": "265-062, ред. 7, Mounting accessories (IQS450); связь с IPC704 — по листу 262-710, ред. 12",
+      "source_url": "https://www.istec.com/wp-content/uploads/2018/07/TQ402-TQ412-EA402-IQS450-vibro-meter-datasheet.pdf",
+      "quote": "Ordering number: 809-130-000-011"
+    },
+    {
+      "code": "111-902-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Вихретоковый зонд TQ902, стандартное крепление (базовый номер; опции A–H)",
+      "machine": "TQ902 + IQS900",
+      "unit": "датчик относительной вибрации и осевого сдвига вала",
+      "doc_ref": "DS 265-101, ред. 1",
+      "source_url": "https://www.istec.com/wp-content/uploads/2020/09/TQ902-TQ912-EA902-IQS900-vibro-meter-datasheet.pdf",
+      "quote": "Ordering number: 111 - 902 - 000 - 011 A B C D E F G H"
+    },
+    {
+      "code": "913-902-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Удлинительный кабель EA902 (базовый номер; опции A, E, F, G)",
+      "machine": "TQ902/TQ912 + IQS900",
+      "unit": "кабельная линия вихретоковой цепи",
+      "doc_ref": "DS 265-101, ред. 1",
+      "source_url": "https://www.istec.com/wp-content/uploads/2020/09/TQ902-TQ912-EA902-IQS900-vibro-meter-datasheet.pdf",
+      "quote": "913 - 902 - 000 - 011 A E F G"
+    },
+    {
+      "code": "204-900-000-011",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Формирователь сигнала IQS900 с диагностикой (базовый номер; опции A, B, C, H, I)",
+      "machine": "TQ902/TQ912 + EA902",
+      "unit": "формирователь вихретоковой цепи",
+      "doc_ref": "DS 265-101, ред. 1",
+      "source_url": "https://www.istec.com/wp-content/uploads/2020/09/TQ902-TQ912-EA902-IQS900-vibro-meter-datasheet.pdf",
+      "quote": "Ordering number: 204 - 900 - 000 - 011 A B C H I"
+    },
+    {
+      "code": "244-707-000-012",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Усилитель заряда IPC707 для CAxxx и CPxxx (базовый номер; опции A–G); заменяет IPC704",
+      "machine": "датчики CAxxx и CPxxx (по листу IPC707)",
+      "unit": "усилитель заряда измерительной цепи",
+      "doc_ref": "DS 262-712, ред. 12",
+      "source_url": "https://www.vogi-interl.com/upload/7959/file/20241220/ipc707-781750.pdf",
+      "quote": "Part number (PNR): 244 - 707 - 000 - 012 A B C D E F G"
+    },
+    {
+      "code": "244-704-000-042",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Усилитель заряда IPC704 для датчиков со стандартным пьезоматериалом (снят, замена — IPC707)",
+      "machine": "CA и CP",
+      "unit": "усилитель заряда измерительной цепи",
+      "doc_ref": "262-710, ред. 12",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/11/ipc704-vibro-meter-signal-conditioner.pdf",
+      "quote": "IPC704 for sensors using standard piezoelectric materials (244-704-000-042-... )"
+    },
+    {
+      "code": "244-127-000-021",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Блок гальванической развязки GSI127, новая версия (опции A — исполнение, B — передаточная функция)",
+      "machine": "цепи CA/CE/CP/TQ с IPC и IQS",
+      "unit": "развязка и питание измерительной цепи",
+      "doc_ref": "DS 262-870, ред. 13",
+      "source_url": "https://www.istec.com/wp-content/uploads/2017/07/DS_GSI127-en-newer-version-PNR-244-127-000-021.pdf",
+      "quote": "Ordering number (PNR): 244-127-000-021 A B"
+    },
+    {
+      "code": "200-560-000-114",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Карта ввода-вывода IOC4T к MPC4, версия RoHS с выходом 50 Ом (с 2017 года)",
+      "machine": "VM600 MPC4 / IOC4T",
+      "unit": "стойка защиты VM600",
+      "doc_ref": "DS 268-021, ред. 12",
+      "source_url": "https://vogi-interl.com/upload/7959/file/20250722/vibro-meter-mpc4-datasheet-570615.pdf",
+      "quote": "IOC4T (PNR 200-560-000-114 and 200-560-000-212 or later), which are RoHS compliant and have an output impedance of 50 Ω."
+    },
+    {
+      "code": "601-041-A0",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Модуль MPC4Mk2 только для защиты, без настройки — штатное исполнение запасной части",
+      "machine": "VM600Mk2 MPC4Mk2 + IOC4Mk2",
+      "unit": "стойка защиты VM600Mk2",
+      "doc_ref": "DS 268-121",
+      "source_url": "https://www.istec.com/wp-content/uploads/2019/08/MPC4-IOC4-datasheet-DS_VM600_Mk2_MPC4_Mk2_IOC4_Mk2-en.pdf",
+      "quote": "a complete ordering number for a MPC4Mk2 module that supports machinery protection only and is not configured is 601-041-A0."
+    },
+    {
+      "code": "620-002-000-113",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Модуль ввода-вывода XIO16T для XMV16/XMC16, исполнение VM600 (крашеная панель)",
+      "machine": "VM600 XMx16 + XIO16T",
+      "unit": "мониторинг вибрации и горения",
+      "doc_ref": "DS 660-020-010-211A, ред. 11",
+      "source_url": "https://www.istec.com/wp-content/uploads/2019/08/XMx16-XIO16T-datasheet-DS_VM600_Mk2_VM600_XMx16_XIO16T-en.pdf",
+      "quote": "XIO16T Extended input/output module (for combustion or vibration) 620-002-000-113"
+    },
+    {
+      "code": "620-002-000-213",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Модуль ввода-вывода XIO16T, исполнение VM600Mk2 (панель из некрашеного алюминия)",
+      "machine": "VM600Mk2 XMx16 + XIO16T",
+      "unit": "мониторинг вибрации и горения",
+      "doc_ref": "DS 660-020-010-211A, ред. 11",
+      "source_url": "https://www.istec.com/wp-content/uploads/2019/08/XMx16-XIO16T-datasheet-DS_VM600_Mk2_VM600_XMx16_XIO16T-en.pdf",
+      "quote": "XIO16T Extended input/output module (for combustion or vibration) 620-002-000-213"
+    },
+    {
+      "code": "200-595-510-110",
+      "issuer": "Vibro-Meter (Meggitt SA)",
+      "description": "Модуль последовательной связи (RS-485) карты CPUM поздних версий на PFM-541I",
+      "machine": "VM600 CPUM / IOCN",
+      "unit": "процессорная карта стойки VM600",
+      "doc_ref": "MAMPS-HW/E ред. 18, рис. 13-5",
+      "source_url": "https://www.manualslib.com/manual/2606902/Meggitt-Vibro-Meter-Vm600.html",
+      "quote": "Figure 13-5: Serial communications module (PNR 200-595-510-110) jumper settings to select half-duplex RS-485 for later versions of the CPUM card (PFM-541I)"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Endevco (группа Meggitt)",
+      "component": "акселерометр горячей части CA303 = Endevco 6240M (6240M51/M52/M56)",
+      "machine": "CA303 на GE LM1600/LM2500/LM3500/LM5000/LM6000",
+      "evidence": "Карточка дилера: «Made by Endevco and distributed by Meggitt Vibro-meter»; в таблице Istec одни и те же номера GE идут на Endevco 6240Mxx и Vibro-Meter 144-303-000-xxx",
+      "sources": [
+        "https://www.swann-associates.com/vibration-sensors/endevco-6240-ca303/",
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "LEMO",
+      "component": "разъём на минерально-изолированном кабеле датчика давления (исполнение 143-216-000-0X)",
+      "machine": "CP216",
+      "evidence": "Лист 262-016: кабель «terminated by either a Lemo connector or a high-temperature connector developed by Vibro-Meter»; строка заказа «with VM Lemo connector»",
+      "sources": [
+        "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CP-216-product-sheet.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "AAEON",
+      "component": "процессорный модуль PC/104 PFM-541I (AMD Geode LX800) — эталонный модуль карты CPUM с 2015 года; руководство допускает «or equivalent», поэтому не обязательно стоит на каждой карте",
+      "machine": "VM600 CPUM",
+      "evidence": "Руководство MAMPS-HW/E: «In 2015, the CPUM card was updated to use a new PC/104 CPU module (PFM-541I or equivalent)»; PFM-541I — изделие AAEON по сайту AAEON (снято с производства)",
+      "sources": [
+        "https://www.manualslib.com/manual/2606902/Meggitt-Vibro-Meter-Vm600.html",
+        "https://www.aaeon.com/en/p/pc104-modules-pfm-541i"
+      ],
+      "verified": false
+    },
+    {
+      "company": "Arcom (ныне Eurotech)",
+      "component": "дополнительный модуль последовательной связи PC/104 AIM104-COM4 — эталонный, руководство допускает «or equivalent»",
+      "machine": "VM600 CPUM",
+      "evidence": "Руководство MAMPS-HW/E: «Optional serial comms. module: AIM104-COM4 or equivalent»; AIM104-COM4 — модуль Arcom, документация на сайте Eurotech",
+      "sources": [
+        "https://www.manualslib.com/manual/2606902/Meggitt-Vibro-Meter-Vm600.html",
+        "https://www.eurotech.com/download/en/pb.aspx?pg=aim104-com4"
+      ],
+      "verified": false
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Meggitt (Parker Meggitt), региональная штаб-квартира в Абу-Даби",
+      "country": "ОАЭ",
+      "role": "региональный офис изготовителя для линии vibro-meter Energy: продажи, сервис, проекты, обучение на Ближнем Востоке, в том числе в Турции и ОАЭ (по выдаче поиска; страница закрыта для автоматического чтения)",
+      "sources": [
+        "https://meggittsensing.com/news/meggitt-opens-new-regional-headquarters-in-the-middle-east-for-the-vibro-meter-energy-product-line/"
+      ]
+    },
+    {
+      "company": "СКБ-4",
+      "country": "Россия",
+      "role": "называет себя официальным поставщиком продукции Vibro Meter Meggitt в Россию; изготовитель это не подтверждает; сообщает о поставке CP216 (2022)",
+      "sources": [
+        "http://www.skb-4.com/manufacturers/vibro-meter-meggitt"
+      ]
+    },
+    {
+      "company": "DALKOS",
+      "country": "Россия",
+      "role": "перепродавец: «Прямые поставки продукции от производителя», поставка под заказ; статус официального партнёра не подтверждён",
+      "sources": [
+        "https://dalkos.ru/manufacturers/vibro-meter/"
+      ]
+    },
+    {
+      "company": "Istec International BV",
+      "country": "Нидерланды",
+      "role": "дистрибьютор датчиков и систем vibro-meter: таблица прямых замен датчиков GE LM6000, копии каталожных листов; тип договора с изготовителем на странице не указан",
+      "sources": [
+        "https://www.istec.com/sensor-cross-reference-list-lm6000/",
+        "https://www.istec.com/en/product/piezoelectric-accelerometer-ca-serie/"
+      ]
+    },
+    {
+      "company": "AMC VIBRO",
+      "country": "Польша",
+      "role": "дистрибьютор Parker Meggitt в Польше, Чехии, Эстонии, Латвии, Литве и Словакии (VM600Mk2, VibroSmart)",
+      "sources": [
+        "https://amcvibro.com/product/vm600/"
+      ]
+    },
+    {
+      "company": "NC Group (NCG)",
+      "country": "Франция",
+      "role": "официальный торговый представитель Vibro-Meter во Франции с 2021 года (VibroSight, VM600, VibroSmart, IQS900, TQ902)",
+      "sources": [
+        "https://ncgroup.fr/en/parker-meggitt-catalog/"
+      ]
+    },
+    {
+      "company": "VBR Turbine Partners",
+      "country": "Нидерланды",
+      "role": "дистрибьютор запчастей для турбин; указывает Parker Meggitt среди представляемых изготовителей, характер представительства не раскрыт",
+      "sources": [
+        "https://vbr-turbinepartners.com/ca202/"
+      ]
+    },
+    {
+      "company": "Swann-Associates",
+      "country": "США",
+      "role": "магазин датчиков: CA303/Endevco 6240 с перекрёстными номерами GE",
+      "sources": [
+        "https://www.swann-associates.com/vibration-sensors/endevco-6240-ca303/"
+      ]
+    },
+    {
+      "company": "Enapart LLC",
+      "country": "США",
+      "role": "перепродавец (CA134 144-134-000-203)",
+      "sources": [
+        "https://www.ontrium.com/en/usa/brands/meggitt/ca134-pnr-144-134-000-203"
+      ]
+    },
+    {
+      "company": "Xiamen RuiMingSheng",
+      "country": "Китай",
+      "role": "перепродавец запчастей АСУ ТП без заявленного статуса; держит копию листа CA202",
+      "sources": [
+        "https://www.rms-dcs.com/ca202-144-202-000-205-piezoelectric-accelerometer-product/"
+      ]
+    },
+    {
+      "company": "Vogi International Trading Co., Ltd.",
+      "country": "Китай",
+      "role": "перепродавец (Сямэнь) без заявленного статуса; держит копии листов MPC4 и IPC707",
+      "sources": [
+        "https://www.vogi-interl.com/vibration-ipc707.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Сайты изготовителя catalogue.meggittsensing.com и meggittsensing.com отвечают 403 на автоматическое чтение. Поэтому действующие редакции листов прочитаны только по копиям у дилеров и не сверены с оригиналом: CA202 ред. 10 от 10.01.2024 и CA134 DS 262-002 ред. 7 от 16.05.2025 видны лишь в выдаче поиска. Закрыт и поиск местных дистрибьюторов (find-local-contact). Проверять нужно из браузера.",
+    "Полных номеров CA134, CA136 и CA201 в открытых листах нет: старые листы дают «144-134-000-2», «144-136-000-2», «144-201-000-2» без окончания по длине кабеля. Действующий лист CA134 (DS 262-002) закрыт. Номер 144-134-000-203 взят только с карточки продавца.",
+    "У CA202 дилеры продают окончания -205 и -225, а лист изготовителя даёт -206/-216/-226/-236. Похоже, что -205 и -225 — прежняя аппаратная ревизия, но изготовитель эту связь не подтверждает.",
+    "Для MPC4 лист даёт только шаблон 200-510-SSS-1Hh/2Hh/3Hh (SSS — прошивка, Hh — аппаратная версия). Конкретные номера (200-510-071-113 и др.), а также номера CPUM (200-595-xxx), IOCN (200-566-xxx), RLC16 (200-570-xxx), RPS6U (200-582-500-013/-021, модели SIM-275A/SIM-330A), AMC8 и IRC4 видны только у серых перепродавцов из Китая. Листы этих карт на сайте изготовителя закрыты.",
+    "Номера XMC16/XMV16 (601-052, 601-053, 600-002, 600-003) даны с «/ Code *» без расшифровки кода, поэтому в перечень не вошли.",
+    "Не найдено руководство по монтажу «Vibration measurement chains using CAxxx piezoelectric accelerometers», на которое ссылается лист CA202. Руководства по функциональной безопасности VM600, VM600Mk2 и IPC707 найдены только ссылками (403). Каталоги кабелей (EC318/EC319 922-31x-000-xxx, K2xx) и соединительных коробок JB1xx/JB118 в открытом виде с полными номерами не найдены.",
+    "Для GE LM6000 в таблице Istec есть кабельные сборки GE 298A8030P004/5/6 (номера 654-15/654-20). Номер Vibro-Meter у них не указан, поэтому в перечень они не вошли.",
+    "Субпоставщики не установлены: изготовитель блоков SIM-275A/SIM-330A в RPS6U; поставщик кристаллов GaPO4 для датчиков, с которыми работает IPC704 511 (вероятно Piezocryst — не подтверждено); изготовитель основания Micaver адаптера MA133; изготовитель корпуса ABA160.",
+    "Официальных дистрибьюторов в Индии, Турции и Китае в открытом виде не найдено: изготовитель отсылает к закрытому локатору. Заявления российских дилеров (СКБ-4, DALKOS) изготовитель не подтверждает. Статус поставок в РФ после перехода Meggitt к Parker (2022) не проверен.",
+    "Открытых источников, связывающих конкретные российские ГТУ и ГПА с датчиками или стойками Vibro-Meter, не найдено. Применение подтверждено только на зарубежных машинах: GE LM-серия, RR RB211 и Avon, Siemens SGT-750, SGT-A35."
+  ],
+  "verifier_notes": "Все 40 кодов найдены в указанных источниках дословно (с точностью до пробелов вокруг дефисов). Ни один код не опровергнут. PDF-файлы Istec, rms-dcs и vogi-interl скачаны и прочитаны через pdftotext. Страница Swann-Associates отдаёт curl 406, но открылась через WebFetch. Все страницы catalogue.meggittsensing.com, meggittsensing.com и aaeon.com отдают 403, поэтому утверждения, опирающиеся только на них, проверены по другим открытым страницам.\n\nЧто исправить в записях разведки:\n1) VibroSmart VSV301: статус «выпускается» опровергнут. Istec пишет: «The VSV301 has been declared obsolete by the OEM».\n2) 143-215-902-011: пометки «расходник при переустановке» в листе 262-016 нет. Снять её из описания.\n3) 144-303-000-111: на Swann строка L34152P04 помечена «Accel. Fwd.», поэтому «задний» верно только для L34152P01.\n4) Привязка моделей Endevco к номерам противоречит сама себе. Istec: L31967P27 / 6240M56 → 144-303-000-311. Swann во вводной фразе пишет «6240M56 (Vibro-Meter 144-303-000-011/111)», а в таблице ставит 011 рядом с 6240M52 и 6222M59, а 111 — рядом с 6240M51. Модель Endevco в поле issuer для 011 и 111 надёжной считать нельзя.\n5) 144-303-000-311, -331, -241: на странице Istec обозначение CA303 не названо. Оно выведено из префикса 144-303 и карточки Swann (Product ID: CA303).\n6) 144-134-000-203 подтверждён только страницей неавторизованного перепродавца (Enapart/ontrium). В листе изготовителя 262-002 стоит лишь базовый номер 144-134-000-2.\n7) 809-130-000-011: связь с IPC704 подтверждается не указанным источником (лист TQ402), а листом IPC704 262-710. У IPC707 номер адаптера MA130 другой — 809-130-000-021, в запись его не переносить как тот же адаптер.\n8) CPUM/IOCN: PROFINET в доступном тексте руководства не найден, найден только Modbus RTU.\n9) CA280: утверждения о применении («тяжёлые ГТУ и паровые турбины», «работает с IPC707») не проверены. Сама модель подтверждена Istec.\n10) CP211: лист изготовителя недоступен (403). Параметры 25 pC/bar и −54…650 °C подтверждены страницей tsisl.es.\n11) В записях субпоставщиков AAEON и Arcom у модулей PFM-541I и AIM104-COM4 в руководстве стоит оговорка «or equivalent». Это эталонные модули, а не обязательно те, что установлены на каждой карте CPUM.\n\nДополнение при сборке файла (27.09.2026): страница Swann-Associates скачана повторно (с заголовками браузера отдаёт 200) — строки с 144-303-000-011 и 144-303-000-111 на ней есть; цитаты остальных 38 кодов найдены в страницах, скачанных скептиком.",
+  "corrections": [
+    "VibroSmart VSV301: статус «выпускается» заменён на «снят» — Istec пишет «declared obsolete by the OEM»; страница Istec добавлена в sources и перечитана при сборке файла (замечание скептика 1)",
+    "143-215-902-011: снята пометка «расходник при переустановке» — в листе 262-016 её нет (замечание скептика 2)",
+    "144-303-000-111: «задний» оставлен только для L34152P01 — L34152P04 на Swann помечен «Accel. Fwd.» (замечание скептика 3)",
+    "144-303-000-011 и 144-303-000-111: модель Endevco снята из issuer и description, противоречие страниц Swann и Istec записано в doc_ref (замечание скептика 4)",
+    "144-303-000-311, -331, -241: в doc_ref оговорено, что обозначение CA303 выведено из префикса 144-303 и карточки Swann, у Istec его нет (замечание скептика 5)",
+    "144-134-000-203: в doc_ref записано, что номер держится на странице неавторизованного перепродавца, а лист 262-002 даёт только базовый номер (замечание скептика 6)",
+    "809-130-000-011: связь с IPC704 отнесена к листу IPC704 262-710, а не к листу TQ402; оговорено, что у IPC707 адаптер MA130 другой (809-130-000-021) и это не тот же номер (замечание скептика 7)",
+    "VM600 CPUM / IOCN: сняты «Modbus TCP» и «PROFINET» — в тексте руководства MAMPS-HW/E найден только Modbus RTU (замечание скептика 8)",
+    "CA280: «для тяжёлых ГТУ и паровых турбин» и «работает с IPC707» переведены в оговорку — не проверены; в summary CA280 снят из подтверждённого применения, у 244-707-000-012 машина — «датчики CAxxx и CPxxx» (замечание скептика 9)",
+    "CP211: параметры отнесены к странице tsisl.es (лист изготовителя отдаёт 403), страница добавлена в sources и перечитана при сборке файла (замечание скептика 10)",
+    "AAEON и Arcom: в component записана оговорка «or equivalent» — это эталонные модули, а не обязательно установленные на каждой карте CPUM; verified: false (замечание скептика 11)",
+    "sub_suppliers: проставлено verified — Endevco и LEMO подтверждены страницами Swann, Istec и листом 262-016, AAEON и Arcom держатся на оговорке «or equivalent»",
+    "summary: «Все коды взяты из каталожных листов изготовителя» уточнено — часть номеров из таблиц замен дилеров и одна карточка перепродавца; у VibroSmart добавлено снятие VSV301",
+    "verifier_notes: снят локальный путь к рабочим файлам скептика — пути рабочей машины в набор не пишутся"
+  ]
+}
