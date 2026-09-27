@@ -30,6 +30,8 @@ USES = "./.github/actions/parse-env"
     "suppliers-quotes.yml": "quotes",     # ночной разбор котировок
     "library-daily.yml": "daily",         # ежедневное пополнение
     "library-index.yml": "index",         # ручной разбор и переразбор
+    "library-mail.yml": "index",          # пачка писем: те же письма поставщиков,
+                                          # что читает ежедневный проход
 }
 #: Флаги, от которых зависит РЕЗУЛЬТАТ разбора, — они обязаны совпадать.
 ФЛАГИ_РАЗБОРА = ("HEADER_RELAX", "CASCADE", "SPECGATE", "PDF_ONE_PASS")

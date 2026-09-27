@@ -3230,6 +3230,24 @@ def отобрать_повторы(mine: list[dict], очередь: dict[str, 
 
 
 def main() -> int:
+    """Разбор части. У ежедневного прохода писем с записью — ещё строка шага.
+
+    Строку шага (increment.ШАГ_ПИСЕМ) разбор пишет ДО первой записи, а её
+    «конец» — при ЛЮБОМ выходе: возврате, отказе гейта закачки, исключении
+    посреди разбора. По ней откат (increment.py «откат письма») находит и то,
+    что успел записать упавший проход: flush() пишет пакетами по ходу разбора, а
+    отметки у упавшего нет (ревизия 27.09.2026). Конца нет лишь у снятого
+    задания (таймаут, потеря раннера) — тогда его называет ROLLBACK_TO.
+    """
+    шаг: dict = {}
+    try:
+        return _разбор(шаг)
+    finally:
+        if шаг.get("run_key"):
+            закончить_шаг_писем(шаг["run_key"])
+
+
+def _разбор(шаг: dict) -> int:
     for var in ("BITRIX_WEBHOOK_URL", "SUPABASE_DB_URL"):
         if not os.environ.get(var):
             print(f"нет переменной {var}", file=sys.stderr)
@@ -3302,6 +3320,13 @@ def main() -> int:
         if собрано is None:
             return 2
         refs, граница_писем = собрано
+        # Строка шага — до первой записи; без неё запись не начинается: её
+        # нечем было бы откатить, если проход упадёт.
+        if запись and граница_писем is not None:
+            ключ = начать_шаг_писем(граница_писем)
+            if ключ is None:
+                return 2
+            шаг["run_key"] = ключ
     elif SOURCE == "mail":
         refs = collect_refs_mail_part()
         if refs is None:
@@ -3653,18 +3678,69 @@ def collect_refs_mail_increment() -> tuple[list[dict], int] | None:
     if SHARD > 0:
         print(f"ежедневный проход идёт одной частью — часть {SHARD + 1} не нужна", flush=True)
         return [], None
+    # ВХОДЫ ПИСЕМ ПРОВЕРЯЮТСЯ ЗДЕСЬ, А НЕ В ОБЩЕМ ШАГЕ «начало»: там их ошибка
+    # остановила бы и сделки с карточками (ревизия 27.09.2026). Здесь она роняет
+    # только шаг писем, и отметка писем не двигается.
+    try:
+        increment.режим_писем()
+        increment.первый_дней_писем()
+        лимит = increment.лимит_писем()
+        if MAIL_GROUP != increment.ПИСЬМА:
+            raise ValueError(f"ежедневный проход — только группа {increment.ПИСЬМА}")
+    except ValueError as e:
+        print(f"::error::ежедневный проход писем: {e}", flush=True)
+        return None
     try:
         до = int(os.environ["INCREMENT_MAX_MAIL"])
-        лимит = increment.лимит_писем()
     except (KeyError, ValueError) as e:
-        print(f"::error::ежедневный проход писем: нет верха прохода INCREMENT_MAX_MAIL "
-              f"(шаг «начало» не прошёл) или неверный лимит — {type(e).__name__}", flush=True)
+        print(f"::error::ежедневный проход писем: нет верха прохода INCREMENT_MAX_MAIL — шаг "
+              f"«начало» не прочитал его (см. предупреждение там) — {type(e).__name__}", flush=True)
         return None
     с, после_id = increment.окно_из_базы(MAIL_GROUP)
     письма, граница, _ = mail_source.письма_прохода(MAIL_GROUP, после_id, с, до, лимит, bx=bx)
     refs, счёт = mail_source.ссылки_писем(письма, MAIL_GROUP)
     print(mail_source.строка_счёта(счёт) + f" · группа {MAIL_GROUP}", flush=True)
     return refs, граница
+
+
+def начать_шаг_писем(граница: int) -> str | None:
+    """Строка шага прохода писем с записью (increment.начать_шаг). Ключ или None."""
+    import increment
+    try:
+        ключ = increment.ключ_шага()
+        conn = connect()
+        try:
+            with conn.cursor() as cur:
+                increment.начать_шаг(cur, ключ, граница)
+            conn.commit()
+        finally:
+            conn.close()
+    except (KeyError, ValueError, psycopg2.Error) as e:
+        print(f"::error::строка шага писем не записана ({type(e).__name__}) — без неё запись "
+              "прохода нечем откатить; разбор не начат", flush=True)
+        return None
+    print(f"шаг писем {ключ}: начало записано (откат: ROLLBACK={ключ.split('.')[0]} "
+          "python library/increment.py откат письма)", flush=True)
+    return ключ
+
+
+def закончить_шаг_писем(ключ: str) -> None:
+    """«Конец» строки шага. Вызывается из finally: своя ошибка не должна
+    заслонить исключение разбора, поэтому она — предупреждение."""
+    import increment
+    try:
+        conn = connect()
+        try:
+            with conn.cursor() as cur:
+                increment.закончить_шаг(cur, ключ)
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as e:  # finally разбора: чужое исключение важнее
+        print(f"::warning::конец шага писем {ключ} не записан ({type(e).__name__}) — откат этого "
+              "прохода попросит ROLLBACK_TO (время конца задания)", flush=True)
+        return
+    print(f"шаг писем {ключ}: конец записан", flush=True)
 
 
 def итог_прохода_писем(граница: int | None, запись: bool, вложений: int, скачано: int,

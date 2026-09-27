@@ -8,11 +8,17 @@
     сверх лимита переносится на завтра от границы без потерь;
   • отметка писем сдвигается только после разбора с записью, дошедшего до
     конца: холостой замер, падение разбора, отказ Диска — отметка стоит;
+  • разбор с записью кладёт строку шага ДО первой записи и её конец при любом
+    выходе — по ней откатывается и упавший проход; без строки шага запись не
+    начинается; откат — только последнего прохода;
+  • письма не держат сделки и карточки и в общем шаге «начало»: сбой верха
+    писем и неверный вход писем — предупреждение, отказывает шаг писем;
   • повтор того же окна не дублирует ни файлов, ни строк спроса, ни цен и не
     платит порталу за разобранное; письмо, разобранное ручной пачкой,
     отсеивается по lib_files; отметки пачки и прохода друг друга не трогают;
   • прогон: шаг писем после отметки сделок и карточек, своя отметка последней,
-    умолчание режима — замер, расписание не тронуто.
+    ручное умолчание режима — замер, ночное — off (ночной замер повторял бы
+    первый проход каждую ночь), расписание не тронуто.
 
 Корпус придуман (CLAUDE.md, правило 18): номера писем, компаний, контактов,
 файлов и позиции выдуманы. Портал и база подменены: портал отдаёт письма по
@@ -232,6 +238,9 @@ class База:
         self.цены: list[tuple] = []
         self.замеры: dict[tuple[str, str], tuple[dict, int]] = {}
         self.такт = 0
+        # Порядок записей: строка шага обязана лечь раньше первой записи разбора,
+        # а её конец — позже последней.
+        self.журнал: list[str] = []
 
     def cursor(self):
         return Курсор(self)
@@ -278,6 +287,12 @@ class Курсор:
             metric, run_key, nums, _note = params
             б.такт += 1
             б.замеры[(metric, run_key)] = (json.loads(nums), б.такт)
+            б.журнал.append(f"замер {metric}")
+        elif s.startswith("update lib_metric_runs set nums = nums ||"):
+            metric, run_key = params
+            assert "'конец'" in s and (metric, run_key) in б.замеры, "конец шага без строки шага"
+            б.замеры[(metric, run_key)][0]["конец"] = datetime.now(timezone.utc).timestamp()
+            б.журнал.append(f"конец {metric}")
         elif s.startswith("delete from lib_prices"):
             поток, _источник, файлы = params
             б.цены = [r for r in б.цены if not (r[ПОТОК] == поток and r[ФАЙЛ] in файлы)]
@@ -300,6 +315,7 @@ def вставка(cur, sql, rows, template=None, page_size=100):
         колонки = re.search(r"insert into lib_files \(([^)]*)\)", s).group(1).split(", ")
         for r in rows:
             б.файлы[r[0]] = r[колонки.index("status")]
+        б.журнал.append("файлы")
     elif "insert into lib_demand" in s:
         б.спрос.extend(rows)
     elif "insert into lib_prices" in s:
@@ -360,6 +376,9 @@ def индексатор(monkeypatch, tmp_path, база: База, портал
                  "WORKERS": "1", "SHARDS": "1", "SHARD": "0", "LIMIT": "0",
                  "MAIL_DAILY": "apply" if запись else "dry",
                  "INCREMENT_MAX_MAIL": str(верх),
+                 # Ключ строки шага — как у прогона Actions: прогон и попытка.
+                 "GITHUB_RUN_ID": "5001", "GITHUB_RUN_ATTEMPT": "1",
+                 "INCREMENT_START": str(int(СЕЙЧАС.timestamp())),
                  "BITRIX_WEBHOOK_URL": "https://portal.example.test/rest/1/x",
                  "SUPABASE_DB_URL": "postgresql://example.test/db"}.items():
         monkeypatch.setenv(к, v)
@@ -556,6 +575,135 @@ def test_отказ_диска_роняет_шаг_и_повтор_дочиты�
     assert env_шага(tmp_path)["INCREMENT_MAIL_TO"] == "2012"
 
 
+ШАГ = (increment.ШАГ_ПИСЕМ, "5001.1")
+
+
+def test_строка_шага_раньше_первой_записи_и_конец_после_последней(monkeypatch, tmp_path):
+    """По строке шага откат находит запись и упавшего прохода: она обязана лечь
+    ДО первой записи разбора, а конец — ПОСЛЕ последней."""
+    база = База()
+    ix = индексатор(monkeypatch, tmp_path, база, Портал(корпус(), КОНТАКТЫ), Закачка(),
+                    запись=True, верх=1040)
+    assert ix.main() == 0
+    assert база.журнал[0] == f"замер {increment.ШАГ_ПИСЕМ}", база.журнал
+    assert база.журнал[-1] == f"конец {increment.ШАГ_ПИСЕМ}", база.журнал
+    assert "файлы" in база.журнал
+    nums = база.замеры[ШАГ][0]
+    assert nums["граница"] == 1040 and nums["конец"] > 0
+    assert all(isinstance(v, (int, float)) for v in nums.values()), "в nums — только числа"
+    # Отметку прохода пишет не разбор, а свой шаг прогона.
+    assert база.отметка(increment.ЗАМЕР["mail-supplier"]) is None
+
+
+@pytest.mark.parametrize("как", ["исключение", "отказ Диска"])
+def test_упавший_проход_пишет_конец_шага(monkeypatch, tmp_path, как):
+    """Упавший разбор отметки не пишет, но конец строки шага — пишет: иначе его
+    запись (flush пишет пакетами по ходу) было бы нечем откатить."""
+    база = База()
+    if как == "исключение":
+        ix = индексатор(monkeypatch, tmp_path, база, Портал(корпус(), КОНТАКТЫ),
+                        Закачка(падение=str(диск(1034))), запись=True, верх=1040)
+        with pytest.raises(RuntimeError):
+            ix.main()
+    else:
+        письма = [письмо(n, назад(hours=3), [диск(n)]) for n in range(2001, 2013)]
+        ix = индексатор(monkeypatch, tmp_path, база, Портал(письма), Закачка(отказ=True),
+                        запись=True, верх=2012)
+        assert ix.main() == 3
+        assert база.файлы, "гейт срабатывает после записи — её и снимает откат"
+    assert "конец" in база.замеры[ШАГ][0]
+    assert "INCREMENT_MAIL_TO" not in env_шага(tmp_path)
+
+
+def test_без_строки_шага_запись_не_начинается(monkeypatch, tmp_path):
+    """Строка шага не легла (нет ключа прогона, база отказала) — разбор не
+    начинается: запись, которую нечем откатить, хуже пропущенного дня."""
+    база, закачка = База(), Закачка()
+    ix = индексатор(monkeypatch, tmp_path, база, Портал(корпус(), КОНТАКТЫ), закачка,
+                    запись=True, верх=1040)
+    monkeypatch.delenv("GITHUB_RUN_ID")
+    monkeypatch.delenv("INCREMENT_START")
+    assert ix.main() == 2
+    assert закачка.диск == [] and база.файлы == {} and база.спрос == [] and база.цены == []
+    assert база.замеры == {}
+
+
+def test_ключ_шага_прогон_и_попытка(monkeypatch):
+    monkeypatch.setenv("GITHUB_RUN_ID", "36300000001")
+    monkeypatch.setenv("GITHUB_RUN_ATTEMPT", "2")
+    assert increment.ключ_шага() == "36300000001.2"
+    monkeypatch.delenv("GITHUB_RUN_ID")
+    monkeypatch.delenv("GITHUB_RUN_ATTEMPT")
+    monkeypatch.setenv("INCREMENT_START", "1790000000")
+    assert increment.ключ_шага() == "1790000000.1", "как у отметки: прогон — начало прохода"
+
+
+# ─────────────────────────────────────────────── окна отката (без базы)
+Т0 = datetime(2026, 9, 27, 2, 10, tzinfo=timezone.utc)
+
+
+def мин(n: float) -> datetime:
+    return Т0 + timedelta(minutes=n)
+
+
+def отметка_(с: float, по: float) -> tuple:
+    return ({"начало": мин(с).timestamp(), "после_id": 300}, мин(по))
+
+
+def шаг_(ключ: str, с: float, по: float | None) -> tuple:
+    return (ключ, мин(с), {"граница": 300, **({"конец": мин(по).timestamp()} if по is not None else {})})
+
+
+def test_окна_отметка_и_попытки_без_промежутка():
+    """Попытка 1 упала (конец есть), попытка 2 дошла до отметки: окна — по
+    попыткам, промежуток между ними (там могла пройти ручная пачка) не берётся."""
+    окна = increment.окна_прохода(отметка_(300, 340), [шаг_("77.1", 5, 30), шаг_("77.2", 305, 335)])
+    пары = sorted((с, по) for с, по, _ in окна)
+    assert пары == [(мин(5), мин(30)), (мин(300), мин(340)), (мин(305), мин(335))]
+    assert not any(с < мин(200) < по for с, по in пары), "промежуток между попытками в окне"
+
+
+def test_окно_упавшего_прохода_по_строке_шага():
+    (с, по, откуда), = increment.окна_прохода(None, [шаг_("78.1", 0, 42)])
+    assert (с, по) == (мин(0), мин(42)) and "78.1" in откуда
+
+
+def test_шаг_без_конца_требует_ROLLBACK_TO():
+    with pytest.raises(increment.ОтказОтката, match="ROLLBACK_TO"):
+        increment.окна_прохода(None, [шаг_("79.1", 0, None)])
+    (с, по, _), = increment.окна_прохода(None, [шаг_("79.1", 0, None)], мин(170))
+    assert (с, по) == (мин(0), мин(170))
+    for до in (мин(-1), мин(increment.ЗАДАНИЕ_МИН + 1)):
+        with pytest.raises(increment.ОтказОтката):
+            increment.окна_прохода(None, [шаг_("79.1", 0, None)], до)
+    with pytest.raises(increment.ОтказОтката, match="попытки"):
+        increment.окна_прохода(None, [шаг_("79.1", 0, None), шаг_("79.2", 60, None)], мин(90))
+
+
+def test_шаг_без_конца_внутри_отметки_покрыт_ей():
+    """Конец не записался (база моргнула), но отметка прогона есть — её окно
+    покрывает шаг, ROLLBACK_TO не нужен."""
+    окна = increment.окна_прохода(отметка_(0, 50), [шаг_("80.1", 3, None)])
+    assert [(с, по) for с, по, _ in окна] == [(мин(0), мин(50))]
+    with pytest.raises(increment.ОтказОтката, match="сними ROLLBACK_TO"):
+        increment.окна_прохода(отметка_(0, 50), [шаг_("80.1", 3, 45)], мин(60))
+
+
+def test_окно_без_начала_или_длиннее_задания_отказ():
+    with pytest.raises(increment.ОтказОтката, match="1970"):
+        increment.окна_прохода(({"после_id": 300}, мин(10)), [])
+    with pytest.raises(increment.ОтказОтката, match="длиннее"):
+        increment.окна_прохода(отметка_(0, increment.ЗАДАНИЕ_МИН + 5), [])
+
+
+def test_ROLLBACK_TO_эпоха_или_ISO_с_поясом():
+    assert increment.момент("1790000000") == datetime.fromtimestamp(1790000000, tz=timezone.utc)
+    assert increment.момент("2026-09-27T05:40:00+03:00") == datetime(2026, 9, 27, 2, 40, tzinfo=timezone.utc)
+    assert increment.момент("2026-09-27T02:40:00Z") == datetime(2026, 9, 27, 2, 40, tzinfo=timezone.utc)
+    with pytest.raises(ValueError):
+        increment.момент("2026-09-27T02:40:00")
+
+
 def test_срезанные_LIMIT_новые_файлы_держат_границу(monkeypatch, tmp_path):
     """LIMIT срезал новые файлы окна — граница не отдаётся; без среза проход
     дочитывает остаток и отдаёт её."""
@@ -650,15 +798,60 @@ def test_режим_писем(monkeypatch):
     monkeypatch.setenv("MAIL_DAILY", "yes")
     with pytest.raises(ValueError):
         increment.режим_писем()
-    assert increment.main(["increment.py", "окно"]) == 2
+    # Там, где работают письма, опечатка — отказ; в общем шаге — «письма не читаются».
+    assert increment.main(["increment.py", "отметка", "письма"]) == 2
+    assert increment.режим_писем_в_общем_шаге() == "off"
+
+
+def test_неверный_режим_писем_не_держит_сделки(monkeypatch, tmp_path):
+    """Опечатка в режиме писем: «начало» и отметка сделок идут, верх писем не
+    читается и не пишется — шаг писем откажет сам."""
+    портал = Портал([письмо(n, СЕЙЧАС, [n]) for n in (3, 8)])
+
+    def bx(метод, п):
+        return {"result": [{"ID": "4100"}]} if метод == "crm.deal.list" else портал(метод, п)
+    база = База()
+    _подставной_индексатор(monkeypatch, bx, база)
+    monkeypatch.setenv("MAIL_DAILY", "yes")
+    файл = tmp_path / "env"
+    файл.touch()
+    monkeypatch.setenv("GITHUB_ENV", str(файл))
+    assert increment.main(["increment.py", "начало"]) == 0
+    записано = dict(с.split("=", 1) for с in файл.read_text(encoding="utf-8").splitlines())
+    assert записано["INCREMENT_MAX_DEALS"] == "4100" and "INCREMENT_MAX_MAIL" not in записано
+    assert портал.вызовы == []
+    for к, v in записано.items():
+        monkeypatch.setenv(к, v)
+    assert increment.main(["increment.py", "отметка"]) == 0
+    assert база.отметка(increment.ЗАМЕР["deals"])["после_id"] == 4100
 
 
 @pytest.mark.parametrize("имя, значение", [("MAIL_FIRST_DAYS", "0"), ("MAIL_FIRST_DAYS", "неделя"),
-                                           ("MAIL_DAILY_LIMIT", "-5")])
-def test_входы_писем_проверяются(monkeypatch, имя, значение):
+                                           ("MAIL_DAILY_LIMIT", "-5"), ("MAIL_DAILY", "yes")])
+def test_входы_писем_проверяет_шаг_писем_а_не_начало(monkeypatch, tmp_path, имя, значение):
+    """Неверный вход писем роняет только шаг писем — до портала и Диска; общие
+    шаги «начало» и «окно» идут, и сделки с карточками разбираются."""
+    портал = Портал([письмо(n, СЕЙЧАС, [n]) for n in (3, 8, 13)])
+
+    def bx(метод, п):
+        return {"result": [{"ID": "4100"}]} if метод == "crm.deal.list" else портал(метод, п)
+    _подставной_индексатор(monkeypatch, bx)
     monkeypatch.setenv("MAIL_DAILY", "dry")
     monkeypatch.setenv(имя, значение)
-    assert increment.main(["increment.py", "начало"]) == 2
+    файл = tmp_path / "env"
+    файл.touch()
+    monkeypatch.setenv("GITHUB_ENV", str(файл))
+    assert increment.main(["increment.py", "начало"]) == 0
+    assert "INCREMENT_MAX_DEALS=4100" in файл.read_text(encoding="utf-8")
+    assert increment.main(["increment.py", "окно"]) == 0
+
+    база, закачка = База(), Закачка()
+    портал_шага = Портал(корпус(), КОНТАКТЫ)
+    ix = индексатор(monkeypatch, tmp_path, база, портал_шага, закачка, запись=True, верх=1040)
+    monkeypatch.setenv(имя, значение)
+    assert ix.main() == 2
+    assert портал_шага.вызовы == [] and закачка.диск == [] and база.файлы == {}
+    assert база.замеры == {}, "строка шага без разбора"
 
 
 def test_первое_окно_писем_своё(monkeypatch):
@@ -700,11 +893,39 @@ def test_начало_читает_верх_писем_только_с_пись�
     assert записано["INCREMENT_MAX_DEALS"] == "4100"
 
 
-def test_начало_без_писем_в_группе_отказ(monkeypatch, tmp_path):
+@pytest.mark.parametrize("сбой", ["пусто", "портал"])
+def test_сбой_верха_писем_не_держит_сделки(monkeypatch, tmp_path, сбой):
+    """Шаг «начало» общий: пустая группа или отказ портала на письмах (429/503
+    после бюджета ожидания, сеть) — предупреждение, а не отказ. Верх писем не
+    пишется, и шаг писем сам выходит с отказом «нет верха»."""
     def bx(метод, п):
-        return {"result": [{"ID": "4100"}]} if метод == "crm.deal.list" else {"result": []}
+        if метод == "crm.deal.list":
+            return {"result": [{"ID": "4100"}]}
+        if сбой == "портал":
+            raise RuntimeError("503 после бюджета ожидания")
+        return {"result": []}
     _подставной_индексатор(monkeypatch, bx)
     monkeypatch.setenv("MAIL_DAILY", "apply")
+    файл = tmp_path / "env"
+    файл.touch()
+    monkeypatch.setenv("GITHUB_ENV", str(файл))
+    assert increment.main(["increment.py", "начало"]) == 0
+    записано = dict(с.split("=", 1) for с in файл.read_text(encoding="utf-8").splitlines())
+    assert записано["INCREMENT_MAX_DEALS"] == "4100" and записано["INCREMENT_MAX_RFQ"] == "700"
+    assert "INCREMENT_MAX_MAIL" not in записано, "ноль значит «все письма»"
+
+    база, закачка = База(), Закачка()
+    ix = индексатор(monkeypatch, tmp_path, база, Портал(корпус(), КОНТАКТЫ), закачка,
+                    запись=True, верх=1040)
+    monkeypatch.delenv("INCREMENT_MAX_MAIL")
+    assert ix.main() == 2
+    assert закачка.диск == [] and база.файлы == {} and база.замеры == {}
+
+
+def test_начало_без_сделок_отказ(monkeypatch, tmp_path):
+    """Нулевой верх СДЕЛОК по-прежнему отказ: ноль значит «все записи»."""
+    _подставной_индексатор(monkeypatch, lambda м, п: {"result": []})
+    monkeypatch.setenv("MAIL_DAILY", "off")
     monkeypatch.setenv("GITHUB_ENV", str(tmp_path / "env"))
     assert increment.main(["increment.py", "начало"]) == 2
 
@@ -805,22 +1026,33 @@ def test_запись_только_в_режиме_apply(режим, запис�
     assert f"APPLY=[{запись}]" in out
 
 
-def test_умолчания_режима_одни_у_входа_и_у_dispatch():
-    """У repository_dispatch входов нет: действует умолчание в env задания, и оно
-    обязано совпадать с умолчанием входа — иначе ручной и ночной прогон разойдутся."""
+def test_ночью_письма_выключены_руками_замер():
+    """У repository_dispatch входов нет: ночью действует умолчание в env задания.
+
+    Ночью — off, а не dry: замер отметку не пишет, и каждая ночь была бы первым
+    проходом заново — до ЛИМИТ_ПИСЕМ писем за ПЕРВЫЙ_ДНЕЙ_ПИСЕМ дней с закачкой
+    всех вложений, тысячи запросов к порталу за ночь (ревизия 27.09.2026). Руками
+    по умолчанию — замер. Окно и лимит — одни у входа и у ночи."""
     wf = прогон()
     входы = (wf.get("on") or wf[True])["workflow_dispatch"]["inputs"]
     env = wf["jobs"]["daily"]["env"]
-    for вход, переменная, код in (("mail", "MAIL_DAILY", None),
-                                  ("mail_days", "MAIL_FIRST_DAYS", increment.ПЕРВЫЙ_ДНЕЙ_ПИСЕМ),
-                                  ("mail_limit", "MAIL_DAILY_LIMIT", increment.ЛИМИТ_ПИСЕМ)):
+    ночь = {}
+    for вход, переменная in (("mail", "MAIL_DAILY"), ("mail_days", "MAIL_FIRST_DAYS"),
+                             ("mail_limit", "MAIL_DAILY_LIMIT")):
         м = re.fullmatch(r"\$\{\{\s*inputs\.(\w+)\s*\|\|\s*'([^']*)'\s*\}\}", env[переменная].strip())
         assert м and м.group(1) == вход, env[переменная]
-        assert м.group(2) == str(входы[вход]["default"])
-        if код is not None:
-            assert int(м.group(2)) == код
-    assert входы["mail"]["default"] == "dry", "запись включается после разбора замера"
+        ночь[вход] = м.group(2)
+    assert ночь["mail"] in ("off", "apply"), "ночной dry повторял бы первый проход каждую ночь"
+    assert ночь["mail"] == "off", "запись ночью включается после первой отметки, не в этой правке"
+    assert входы["mail"]["default"] == "dry", "ручной запуск по умолчанию — замер"
     assert set(входы["mail"]["options"]) == set(increment.РЕЖИМЫ)
+    for вход, код in (("mail_days", increment.ПЕРВЫЙ_ДНЕЙ_ПИСЕМ), ("mail_limit", increment.ЛИМИТ_ПИСЕМ)):
+        assert ночь[вход] == str(входы[вход]["default"]) == str(код), вход
+
+
+def test_предел_окна_отката_не_меньше_задания():
+    """Окно прохода длиннее задания — не окно одного задания (increment.ЗАДАНИЕ_МИН)."""
+    assert прогон()["jobs"]["daily"]["timeout-minutes"] == increment.ЗАДАНИЕ_МИН
 
 
 def test_расписание_и_бюджет_не_тронуты():
