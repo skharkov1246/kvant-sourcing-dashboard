@@ -1150,6 +1150,10 @@ create table if not exists lib_files (
 create index if not exists lib_files_deal   on lib_files (deal_id);
 create index if not exists lib_files_status on lib_files (status);
 create index if not exists lib_files_sha    on lib_files (sha256);
+-- processed_at — ПОСЛЕДНЯЯ обработка: её переписывают разбор при конфликте,
+-- переразбор и распознавание. Когда файл пришёл — не она: first_seen_at (первая
+-- вставка, не переписывается) и source_created_at (дата у источника) заводит
+-- library/supabase/file_dates_schema.sql.
 
 alter table lib_files enable row level security;
 

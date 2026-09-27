@@ -1,6 +1,6 @@
 {
   "schema": "kvant.brand-research-queue/1",
-  "updated": "2026-09-26",
+  "updated": "2026-09-27",
   "rule": "Очередь разведки брендов: бренд за брендом — машины, сервисные книги, коды запчастей, субпоставщики, дилеры. Берётся запись «в очереди» с наименьшим priority, одна сессия — не больше двух брендов (пятая часть ресурса). Порядок: группа фокуса по списку groups (сначала изготовители машин, потом изготовители узлов), внутри группы — n_spellings из dict/oem.json по убыванию, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. oem_key — только существующий ключ словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) в очередь не берутся. Процедура — .claude/skills/brand-research/SKILL.md, проверка — scripts/brand_research_check.py.",
   "groups": [
     "ГПУ",
@@ -503,9 +503,9 @@
       "focus": "датчики вибрации CA/CE, системы VM600: номера, применение на ГТУ",
       "n_spellings": 2,
       "atlas": [],
-      "status": "в очереди",
-      "researched_at": null,
-      "file": null
+      "status": "сделано",
+      "researched_at": "2026-09-27",
+      "file": "data/brand_research/vibrometermeggitt.json"
     },
     {
       "priority": 36,
@@ -516,9 +516,9 @@
       "focus": "ControlLogix и FLEX I/O в системах управления пакетов ГТУ: номера модулей, снятые с производства",
       "n_spellings": 2,
       "atlas": [],
-      "status": "в очереди",
-      "researched_at": null,
-      "file": null
+      "status": "сделано",
+      "researched_at": "2026-09-27",
+      "file": "data/brand_research/rockwellautomationallenbradley.json"
     },
     {
       "priority": 37,
@@ -529,9 +529,9 @@
       "focus": "пожаро- и газообнаружение Eagle Quantum Premier: извещатели, модули, номера",
       "n_spellings": 2,
       "atlas": [],
-      "status": "в очереди",
-      "researched_at": null,
-      "file": null
+      "status": "сделано",
+      "researched_at": "2026-09-27",
+      "file": "data/brand_research/dettronicsdetectorelectronics.json"
     },
     {
       "priority": 38,

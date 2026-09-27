@@ -1,6 +1,6 @@
 {
  "schema": "kvant.model-series/1",
- "updated": "2026-09-26",
+ "updated": "2026-09-27",
  "note": "Модельные ряды брендов с шаблоном распознавания. Одна запись ряда — название, тип машины, шаблоны (регулярные выражения Python без границ — границы слова ставит library/model_series.py), примеры обозначений, которые шаблон обязан узнавать (проверяет tests/test_model_series.py), и источники — официальная страница или каталог изготовителя; вторичный источник оговорён в note. context «сам» — обозначение различимо само, «бренд» — засчитывается только при имени бренда (aliases или context_aliases) в той же строке или в поле изготовителя. Ряд без источника не добавляется. brand_key — ключ dict/oem.json, если бренд там есть, иначе новый ключ того же вида. origin — западный / китайский / прочий. Сведения только общедоступные. field_aliases — написания, которые делают бренд только в поле изготовителя (CAT, NORD), а в тексте строки неоднозначны; по ним и по aliases замер сводит ключи реестра брендов, заведённые другим написанием того же бренда (cat → caterpillar, warman → weir, getriebebaunord… → nord). ВЛАДЕНИЕ (25.09.2026): role — «бренд» (марка на шильдике; у всех записей brands), «владелец» (холдинг, чьё имя на шильдике не стоит или стоит рядом; записи owners — без рядов и без написаний, в распознавании не участвуют), «бывший владелец» (элементы owner_history). owner — ключ записи brands/owners либо имя компании, если записи нет; owner_since/owner_until — год, owner_source — страница изготовителя или отчёт, проверенные запросом 25.09.2026; поля бывают и у ряда, когда марка ряда ушла другому владельцу (Rolls-Royce RB211 → Siemens Energy). Бренд с владельцем не сливается: Solar Turbines остаётся Solar Turbines, owner=caterpillar. Применение — library/brand_owner.py; спорное и неподтверждённое — в gaps с приставкой «Владение:».",
  "types": [
   "ГПУ",
@@ -5358,6 +5358,408 @@
       "https://www.woodward.com/products/wp-content/uploads/sites/3/2025/03/25182_AG.pdf"
      ],
      "note": "Подтверждено разведкой data/brand_research/woodward.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "vibrometermeggitt",
+   "name": "Vibro-Meter (Meggitt)",
+   "origin": "западный",
+   "country": "Швейцария",
+   "aliases": [
+    "Vibro-Meter",
+    "Meggitt Vibro-Meter"
+   ],
+   "context_aliases": [
+    "Meggitt"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "vibrometer-ca-ce",
+     "series": "CA / CE (пьезоэлектрические акселерометры: CA202, CA134, CA303, CE680)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "C[AE]\\s?\\d{3}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CA202",
+      "CA 134",
+      "CE680"
+     ],
+     "sources": [
+      "https://catalogue.meggittsensing.com/shop/sensors-and-signal-conditioners/high-temperature-vibration-sensors/ca202-piezoelectric-accelerometer/",
+      "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CAxxx-CExxx-instruction-manual.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vibrometermeggitt.json. Страницы изготовителя (catalogue.meggittsensing.com) отдают роботу 403 — листы прочитаны по копиям дистрибьютора Istec. Голое «CA202» без бренда похоже на артикул чего угодно."
+    },
+    {
+     "id": "vibrometer-cp",
+     "series": "CP (датчики динамического давления, пульсации горения: CP103, CP106, CP211, CP216)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "CP\\s?\\d{3}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CP216",
+      "CP103"
+     ],
+     "sources": [
+      "https://catalogue.meggittsensing.com/shop/sensors-and-signal-conditioners/dynamic-pressure-sensors/cp103-piezoelectric-pressure-transducer/",
+      "https://www.istec.com/wp-content/uploads/2017/07/Vibro-Meter-CP-216-product-sheet.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vibrometermeggitt.json. Страницы изготовителя (catalogue.meggittsensing.com) отдают роботу 403 — листы прочитаны по копиям дистрибьютора Istec."
+    },
+    {
+     "id": "vibrometer-proximity",
+     "series": "TQ / EA / IQS (вихретоковые цепи: TQ402, TQ412, TQ902, IQS450, IQS900)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "(?:TQ|IQS)\\s?\\d{3}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "TQ402",
+      "IQS450",
+      "TQ912"
+     ],
+     "sources": [
+      "https://www.istec.com/wp-content/uploads/2018/07/TQ402-TQ412-EA402-IQS450-vibro-meter-datasheet.pdf",
+      "https://www.istec.com/wp-content/uploads/2020/09/TQ902-TQ912-EA902-IQS900-vibro-meter-datasheet.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vibrometermeggitt.json. Листы изготовителя (номера 265-062, 265-101) — копии у дистрибьютора Istec."
+    },
+    {
+     "id": "vibrometer-ipc-gsi",
+     "series": "IPC / GSI (усилители заряда IPC704, IPC707, блоки развязки GSI127)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "(?:IPC\\s?70\\d|GSI\\s?1\\d{2})",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "IPC707",
+      "IPC704",
+      "GSI127"
+     ],
+     "sources": [
+      "https://www.vogi-interl.com/upload/7959/file/20241220/ipc707-781750.pdf",
+      "https://www.istec.com/wp-content/uploads/2017/07/DS_GSI127-en-newer-version-PNR-244-127-000-021.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vibrometermeggitt.json. Листы изготовителя (DS 262-712, DS 262-870) — копии у перепродавца Vogi и дистрибьютора Istec."
+    },
+    {
+     "id": "vibrometer-vm600",
+     "series": "VM600 / VM600Mk2 (стойка защиты и мониторинга: MPC4, IOC4T, XMV16, XMC16, XIO16T, CPUM, IOCN, RPS6U)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "VM\\s?600(?:\\s?Mk\\s?2)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "(?:MPC\\s?4(?:\\s?Mk\\s?2|SIL)?|IOC\\s?4T?(?:\\s?Mk\\s?2)?|XM[CV]S?\\s?16|XIO\\s?16T|CPUM|IOCN|RPS\\s?6U)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "VM600",
+      "VM600Mk2",
+      "MPC4",
+      "XMC16",
+      "RPS6U"
+     ],
+     "sources": [
+      "https://www.istec.com/wp-content/uploads/2021/01/MPC4-MPC4SIL-datasheet-DS_MPC4-en.pdf",
+      "https://www.istec.com/wp-content/uploads/2019/08/XMx16-XIO16T-datasheet-DS_VM600_Mk2_VM600_XMx16_XIO16T-en.pdf",
+      "https://www.manualslib.com/manual/2606902/Meggitt-Vibro-Meter-Vm600.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vibrometermeggitt.json. Листы изготовителя (DS 268-021, DS 660-020-010-211A) — копии у дистрибьютора Istec, руководство MAMPS-HW/E — на ManualsLib."
+    },
+    {
+     "id": "vibrometer-vibrosmart",
+     "series": "VibroSmart (распределённый мониторинг вибрации и горения, модуль VSV301)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "VibroSmart",
+       "context": "сам"
+      },
+      {
+       "rx": "VSV\\s?30\\d",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "VibroSmart",
+      "VSV301"
+     ],
+     "sources": [
+      "https://catalogue.meggittsensing.com/shop/modular-vibration-combustion-monitoring/vibrosmart/vibrosmart-vsv301-monitoring-module/",
+      "https://www.istec.com/product/vibrosmart-vsv301/"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vibrometermeggitt.json. Страницы изготовителя (catalogue.meggittsensing.com) отдают роботу 403 — листы прочитаны по копиям дистрибьютора Istec. Модуль VSV301 изготовитель объявил устаревшим (Istec)."
+    },
+    {
+     "id": "vibrometer-vibrosight",
+     "series": "VibroSight (ПО защиты и мониторинга машин)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "VibroSight",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "VibroSight"
+     ],
+     "sources": [
+      "https://www.istec.com/wp-content/uploads/2023/04/DS_VibroSight_software-en.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/vibrometermeggitt.json. Лист изготовителя DS 660-020-005-227A — копия у дистрибьютора Istec."
+    }
+   ]
+  },
+  {
+   "brand_key": "rockwellautomationallenbradley",
+   "name": "Rockwell Automation (Allen-Bradley)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Allen-Bradley",
+    "Rockwell Automation"
+   ],
+   "context_aliases": [
+    "Rockwell"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "ab-logix",
+     "series": "ControlLogix / GuardLogix (контроллеры и модули шасси 1756)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "(?:Control|Guard)Logix(?:[\\s\\-]?XT)?(?:\\s?55[5-8]\\dS?)?",
+       "context": "сам"
+      },
+      {
+       "rx": "1756-[A-Z][A-Z0-9]{1,9}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ControlLogix 5570",
+      "GuardLogix 5560S",
+      "ControlLogix-XT",
+      "1756-L63",
+      "1756-CNBR"
+     ],
+     "sources": [
+      "https://www.rockwellautomation.com/en-us/products/details.1756-L63.html",
+      "https://www.rockwellautomation.com/en-us/products/details.1756-L73.html",
+      "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1756-sg002_-en-p.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/rockwellautomationallenbradley.json. Каталожный номер 1756-… без бренда не узнаётся: цифры с дефисом и буквой встречаются и в чужих артикулах."
+    },
+    {
+     "id": "ab-flex",
+     "series": "FLEX I/O 1794, FLEX Ex 1797, FLEX 5000 5094 (распределённый ввод-вывод)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "FLEX\\s?(?:I/O(?:-XT)?|Ex|5000)",
+       "context": "бренд"
+      },
+      {
+       "rx": "(?:1794|1797|5094)-[A-Z][A-Z0-9]{1,9}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "FLEX I/O",
+      "FLEX 5000",
+      "1794-ACNR15",
+      "1797-IE8",
+      "5094-AENTR"
+     ],
+     "sources": [
+      "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf",
+      "https://www.rockwellautomation.com/en-us/products/hardware/allen-bradley/i-o/in-cabinet-distributed-i-o/5094-flex-5000-i-o.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/rockwellautomationallenbradley.json."
+    },
+    {
+     "id": "ab-plc5",
+     "series": "PLC-5 (1785) и удалённый ввод-вывод 1771",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "PLC-?5(?:/\\d{2}[A-Z]?)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "(?:1785|1771)-[A-Z][A-Z0-9]{1,9}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "PLC-5",
+      "1785-L80C15",
+      "1771-ASB"
+     ],
+     "sources": [
+      "https://www.rockwellautomation.com/en-us/products/details.1785-L80C15.html",
+      "https://www.rockwellautomation.com/en-us/products/details.1771-ASB.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/rockwellautomationallenbradley.json. Сняты с производства в 2017 году."
+    },
+    {
+     "id": "ab-cgcm",
+     "series": "1407-CGCM (модуль управления генератором: возбуждение, синхронизация, защита)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "1407-CGCM",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "1407-CGCM"
+     ],
+     "sources": [
+      "https://www.rockwellautomation.com/en-us/products/details.1407-CGCM.html"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/rockwellautomationallenbradley.json. Снят с производства 31.12.2023."
+    }
+   ]
+  },
+  {
+   "brand_key": "dettronicsdetectorelectronics",
+   "name": "Det-Tronics (Detector Electronics)",
+   "origin": "западный",
+   "country": "США",
+   "aliases": [
+    "Det-Tronics",
+    "Detector Electronics"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "dettronics-eqp",
+     "series": "Eagle Quantum Premier (EQP): контроллеры EQ3001/EQ3016, модули EQ37xx, питание EQ21xx",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "Eagle\\s?Quantum(?:\\s?Premier)?",
+       "context": "сам"
+      },
+      {
+       "rx": "(?:EQP?\\s?\\d{4}[A-Z]{0,4}|EQ\\d{2}xx[A-Z]{0,4})",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Eagle Quantum Premier",
+      "EQ3001",
+      "EQ3730",
+      "EQ3760ASM",
+      "EQP2120PS"
+     ],
+     "sources": [
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8533-25.0-EQP-Web.pdf",
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/52-1002-26.0-2026-Product-Catalog.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dettronicsdetectorelectronics.json."
+    },
+    {
+     "id": "dettronics-flame",
+     "series": "Извещатели пламени X3301, X3302, X5200, X2200, X9800, УФ-детектор C7050B",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "X(?:3301|3302|5200|2200|9800)[A-Z]{0,2}",
+       "context": "бренд"
+      },
+      {
+       "rx": "C7050B?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "X3301",
+      "X5200G",
+      "C7050B"
+     ],
+     "sources": [
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8704-5.1-X3301-Enhanced-Web.pdf",
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/92-1037-12.7-Product-Line-Card-A4-Web.pdf",
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/31-1033-1.1-C7050B-UVHT.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dettronicsdetectorelectronics.json."
+    },
+    {
+     "id": "dettronics-gas",
+     "series": "Газоанализаторы PointWatch Eclipse PIRECL, Open Path Eclipse OPECL, FlexSight LS2000, GT3000, дисплей FlexVu UD10-DCU",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "(?:PIRECL|OPECL|PointWatch(?:\\s?Eclipse)?)",
+       "context": "сам"
+      },
+      {
+       "rx": "(?:LS\\s?2000|GT\\s?3000|UD10(?:-DCU)?|FlexSight|FlexVu)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "PIRECL",
+      "OPECL",
+      "LS2000",
+      "GT3000",
+      "UD10-DCU"
+     ],
+     "sources": [
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8526-20.14-PIRECL-Web.pdf",
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/95-8714-7.2-LS2000-1.pdf",
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8616-12.8-GT3000-Web.pdf",
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8656-6.4-UD10-DCU-Web.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dettronicsdetectorelectronics.json."
+    },
+    {
+     "id": "dettronics-heat-smoke",
+     "series": "Тепловой извещатель Model HD, дымовой извещатель U5015 (SmokeWatch / ClearView 3D)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "Model\\s?HD",
+       "context": "бренд"
+      },
+      {
+       "rx": "U5015",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Model HD",
+      "U5015"
+     ],
+     "sources": [
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2025/04/95-8666-8.3-Model-HD-Web.pdf",
+      "https://www.det-tronics.com/wp-content/uploads/sites/8/2026/03/U5015-ClearView-3D%E2%84%A2-Explosion-Proof-Smoke-Detector-%E2%80%93-Instructions.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/dettronicsdetectorelectronics.json."
     }
    ]
   }

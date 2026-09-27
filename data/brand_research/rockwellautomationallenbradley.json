@@ -1,0 +1,1012 @@
+{
+  "oem_key": "rockwellautomationallenbradley",
+  "name": "Rockwell Automation (Allen-Bradley)",
+  "segment_focus": "ControlLogix и FLEX I/O в системах управления пакетов ГТУ: номера модулей, снятые с производства",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Rockwell Automation (Allen-Bradley) сама машин не делает. Она поставляет ПЛК и ввод-вывод, на которых построены системы управления пакетов ГТУ. Применение в ГТУ подтверждено документами Solar Turbines, которые лежат в открытом доступе: спецификациями пакетов Centaur 50 (TPS50CSMD/309), Taurus 70 (TPS70CSMD/715) и Titan 250. Система управления у них — Turbotronic 4: контроллер ControlLogix, модули 1794 FLEX I/O и сеть ControlNet 1.5 с резервированным кабелем. Вибрацию контролирует Bently Nevada 1701 FieldMonitor, собранный на базе FLEX I/O. У генераторного Titan 250 есть ещё модуль генератора 1407-CGCM (Allen-Bradley/Basler Electric). Статусы жизненного цикла взяты дословно со страниц изделий rockwellautomation.com. Сняты с производства: 01.06.2017 — контроллеры ControlLogix 5560 (1756-L61…L65, L63XT) и GuardLogix L6xS; 31.03.2017 — изолированные модули аналога, термопар и термосопротивлений 1756-IF6I/IT6I/IR6I; 31.12.2021 — мост 1756-ENBT (замена 1756-EN2T); 31.12.2023 — 1407-CGCM; 31.12.2024 — мосты ControlNet 1756-CNB/CNBR (замена 1756-CN2/CN2R) и 1756-DHRIO. Главный риск ближайших месяцев — FLEX I/O. Адаптеры ControlNet 1794-ACN15/ACNR15, на которых стоит Turbotronic 4, снимаются 31.10.2026, а 1794-ACNR15XT — 31.12.2027. У FLEX 5000 адаптеров ControlNet нет вовсе: перейти можно только через сеть EtherNet/IP (5094-RM001A, CNET-RM001A). Кроме того, 28.02.2027 снимается 1794-OE4, а 30.09.2028 — 1794-AENT. Батареи контроллеров L6x (1756-BA1/BA2/BATA) — End of Life 31.12.2027, и замены у изготовителя нет. По 1756-UM001Q их меняют раз в 3 года при 36–40 °C под шасси. Основные модули FLEX I/O (1794-IE8, IT8, IRT8, IR8, VHSC, IJ2, TB3T, PS13) — Active Mature. Все 40 кодов подтверждены дословной строкой со страницы изделия или из PDF изготовителя. 07.03.2022 Rockwell приостановила работу в России и Белоруссии. Единственный авторизованный дистрибьютор в Турции — AB Market Otomasyon; в Индии дистрибьютором себя называет Pima Controls. Авторизованных дистрибьюторов в Казахстане и Китае открытые источники не подтвердили.",
+  "machines": [
+    {
+      "model": "ControlLogix 5560 (1756-L61, -L62, -L63, -L64, -L65)",
+      "kind": "контроллер ПЛК; спецификации Solar называют в Turbotronic 4 контроллер ControlLogix без поколения, поэтому связь именно L6x с Turbotronic 4 — вывод",
+      "segment": "ГТУ",
+      "rating": "память 2 / 4 / 8 / 16 / 32 МБ",
+      "status": "снята 01.06.2017, у изготовителя — замена функциональная",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-L63.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-L61.html",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1756-um001_-en-p.pdf",
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361629/Centaur50GasTurbinesBrochure.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ControlLogix 5555 (1756-L55, 1756-L55Mxx)",
+      "kind": "контроллер ПЛК раннего поколения ControlLogix (источника о применении в ГТУ нет)",
+      "segment": "прочее",
+      "rating": "модули памяти 1756-M12…M24",
+      "status": "снята; страницы изделия на сайте изготовителя больше нет, дата снятия в открытых источниках не найдена",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/in/1756-in101_-en-p.pdf",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1756-um523_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ControlLogix-XT 1756-L63XT",
+      "kind": "контроллер ПЛК в исполнении для расширенного диапазона температур",
+      "segment": "ГТУ",
+      "rating": "8 МБ",
+      "status": "снята 01.06.2017",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-L63XT.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "GuardLogix 5560S (1756-L61S, 1756-L63S, партнёр 1756-LSP)",
+      "kind": "контроллер противоаварийной защиты",
+      "segment": "ГТУ",
+      "rating": "2 / 8 МБ стандартной памяти",
+      "status": "снята 01.06.2017; замена 1756-L71S / 1756-L73S / 1756-L7SP",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-L63S.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-L61S.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-LSP.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ControlLogix 5570 (1756-L71, -L72, -L73, -L73XT)",
+      "kind": "контроллер ПЛК, преемник L6x",
+      "segment": "ГТУ",
+      "rating": "память 2 / 4 / 8 МБ; накопитель энергии ESM вместо батареи",
+      "status": "выпускается (Active Mature)",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-L73.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-L73XT.html",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1756-um001_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ControlLogix 5580 (1756-L81E, -L83E, -L84E, -L85E)",
+      "kind": "контроллер ПЛК текущего поколения",
+      "segment": "ГТУ",
+      "rating": "встроенный порт EtherNet/IP",
+      "status": "выпускается (Active)",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-L83E.html",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1756-sg002_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Мосты ControlNet ControlLogix 1756-CNB / 1756-CNBR",
+      "kind": "коммуникационный модуль ControlNet в шасси 1756",
+      "segment": "ГТУ",
+      "rating": "40–48 соединений; CNBR — резервированная среда",
+      "status": "снята 31.12.2024; инженерная замена 1756-CN2 / 1756-CN2R (Active Mature)",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-CNBR.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-CNB.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-CN2R.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Мост EtherNet/IP ControlLogix 1756-ENBT",
+      "kind": "коммуникационный модуль EtherNet/IP",
+      "segment": "ГТУ",
+      "rating": "10/100 Мбит, 64 соединения TCP",
+      "status": "снята 31.12.2021; замена 1756-EN2T (Active)",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-ENBT.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-EN2T.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Модуль DH+/RIO ControlLogix 1756-DHRIO",
+      "kind": "коммуникационный модуль Data Highway Plus / Remote I/O (связь с PLC-5 и 1771)",
+      "segment": "ГТУ",
+      "rating": "данных нет",
+      "status": "снята 31.12.2024",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-DHRIO.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Изолированные модули аналога и температуры ControlLogix (1756-IF6I, -IT6I, -IT6I2, -IR6I, -OF6CI, -OF6VI, -IF6CIS)",
+      "kind": "модули ввода-вывода: ток/напряжение, термопары, термосопротивления",
+      "segment": "ГТУ",
+      "rating": "6 изолированных каналов",
+      "status": "сняты 21.12.2016 – 31.03.2017",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1756-IT6I.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-IR6I.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-IF6I.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1756-OF6CI.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "FLEX I/O 1794 (платформа)",
+      "kind": "распределённый ввод-вывод пакета (1794 Flex I/O в Solar Turbotronic 4)",
+      "segment": "ГТУ",
+      "rating": "до 8 модулей на адаптер; дискретные, аналоговые, температурные входы, входы частоты",
+      "status": "выпускается (Active Mature) большинство номеров; часть адаптеров и модулей — End of Life",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf",
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361629/Centaur50GasTurbinesBrochure.pdf",
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10660338"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Адаптеры ControlNet FLEX I/O 1794-ACN15 / 1794-ACNR15",
+      "kind": "сетевой адаптер FLEX I/O для ControlNet (резервированная среда у ACNR15)",
+      "segment": "ГТУ",
+      "rating": "ControlNet 5 Мбит/с, до 8 модулей",
+      "status": "End of Life; снимается 31.10.2026; на FLEX 5000 — только EtherNet/IP (5094-AENTR)",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1794-ACNR15.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1794-ACN15.html",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/rm/5094-rm001_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Адаптер ControlNet FLEX I/O-XT 1794-ACNR15XT",
+      "kind": "сетевой адаптер ControlNet в исполнении для расширенного диапазона температур",
+      "segment": "ГТУ",
+      "rating": "-25…+70 °C",
+      "status": "End of Life; снимается 31.12.2027; замена 5094-AENTRXT",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1794-ACNR15XT.html",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Адаптер EtherNet/IP FLEX I/O 1794-AENT",
+      "kind": "сетевой адаптер FLEX I/O для EtherNet/IP",
+      "segment": "ГТУ",
+      "rating": "10/100 Мбит",
+      "status": "End of Life; снимается 30.09.2028; замена 1794-AENTR (Active Mature)",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1794-AENT.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1794-AENTR.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Адаптер DeviceNet FLEX I/O 1794-ADN",
+      "kind": "сетевой адаптер FLEX I/O для DeviceNet",
+      "segment": "ГТУ",
+      "rating": "данных нет",
+      "status": "End of Life; снимается 31.10.2026; замена 5094-AENTR",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1794-ADN.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Аналоговые выходы FLEX I/O 1794-OE4, 1794-OE4XT, 1794-IE4XOE2",
+      "kind": "модули аналогового вывода (команды на клапаны и приводы)",
+      "segment": "ГТУ",
+      "rating": "4 выхода (OE4); 4 входа + 2 выхода (IE4XOE2)",
+      "status": "End of Life; снимаются 28.02.2027; замена 5094-OF8 / 5094-OF8XT",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1794-OE4.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1794-OE4XT.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1794-IE4XOE2.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HART-модули FLEX I/O 1794-IE8H / 1794-OE8H",
+      "kind": "аналоговый ввод-вывод с HART",
+      "segment": "ГТУ",
+      "rating": "8 каналов",
+      "status": "End of Life, дата снятия 31.03.2026 уже прошла; замена 1794-IF8IH / 5094-OF8IH",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1794-IE8H.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1794-OE8H.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Счётные и комбинированные модули FLEX I/O 1794-ID2, 1794-IP4, 1794-IM16, 1794-OM16",
+      "kind": "модули счёта импульсов и энкодера, дискретный ввод-вывод 120 В",
+      "segment": "ГТУ",
+      "rating": "2 / 4 / 16 каналов",
+      "status": "End of Life; снимаются 31.10.2026; для 1794-IP4 замены нет",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1794-ID2.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1794-IP4.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1794-IM16.html",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/rm/5094-rm001_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "FLEX Ex 1797 (1797-ACNR15, 1797-IE8, 1797-OE8)",
+      "kind": "искробезопасный ввод-вывод для взрывоопасных зон",
+      "segment": "ГТУ",
+      "rating": "8 каналов, ControlNet",
+      "status": "снята 31.12.2017",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1797-ACNR15.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1797-IE8.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "FLEX 5000 (5094)",
+      "kind": "распределённый ввод-вывод, назначенный преемник FLEX I/O",
+      "segment": "ГТУ",
+      "rating": "только EtherNet/IP; по описанию изготовителя — управление турбиной и компрессором",
+      "status": "выпускается (Active)",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/hardware/allen-bradley/i-o/in-cabinet-distributed-i-o/5094-flex-5000-i-o.html",
+        "https://www.rockwellautomation.com/en-us/products/details.5094-AENTR.html",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/rm/5094-rm001_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PLC-5 (1785-L80C15) и Remote I/O 1771-ASB",
+      "kind": "ПЛК прежнего поколения и адаптер удалённого ввода-вывода 1771",
+      "segment": "прочее",
+      "rating": "процессор PLC-5 с ControlNet 1.5",
+      "status": "сняты 31.07.2017 (1785-L80C15) и 31.12.2017 (1771-ASB)",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1785-L80C15.html",
+        "https://www.rockwellautomation.com/en-us/products/details.1771-ASB.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Combination Generator Control Module 1407-CGCM",
+      "kind": "модуль возбуждения, синхронизации и защиты генератора (в генераторной установке Solar Titan 250)",
+      "segment": "ГТУ",
+      "rating": "данных нет",
+      "status": "снята 31.12.2023, замена инженерная",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/products/details.1407-CGCM.html",
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1407-um001_-en-p.pdf",
+        "https://www.manualsdir.com/manuals/59759/cat-titan-250.html?page=30"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "ControlLogix 5570 and 5560 Controllers User Manual",
+      "doc_no": "1756-UM001Q-EN-P (December 2024)",
+      "machine": "1756-L71…L75, L73XT, L61…L65, L63XT",
+      "kind": "O&M (руководство пользователя; обслуживание батарей L6x, ESM, карты памяти)",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1756-um001_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "ControlLogix Controller and Memory Board Installation Instructions",
+      "doc_no": "1756-IN101L-EN-P (June 2008)",
+      "machine": "1756-L1, 1756-L55 (M12…M24), 1756-L61…L65, модули памяти 1756-M1…M24",
+      "kind": "инструкция по монтажу",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/in/1756-in101_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "ControlLogix Redundancy System User Manual",
+      "doc_no": "1756-UM523F-EN-P (December 2006)",
+      "machine": "1756-CNB/CNBR, 1756-ENBT, 1756-L55, 1756-L6x в резервированной схеме",
+      "kind": "O&M",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1756-um523_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "ControlLogix and GuardLogix Controller Specifications (Technical Data)",
+      "doc_no": "1756-TD001W-EN-P (October 2025)",
+      "machine": "контроллеры 1756",
+      "kind": "технические данные",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/td/1756-td001_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "ControlLogix I/O Modules Specifications (Technical Data)",
+      "doc_no": "1756-TD002U-EN-E (September 2026)",
+      "machine": "модули ввода-вывода 1756",
+      "kind": "технические данные",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/td/1756-td002_-en-e.pdf"
+      ]
+    },
+    {
+      "title": "ControlLogix 5580 and ControlLogix 5570 Systems Selection Guide",
+      "doc_no": "1756-SG002D-EN-P (October 2025)",
+      "machine": "системы 1756 (L7x, L8x)",
+      "kind": "каталог (selection guide)",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1756-sg002_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "FLEX I/O and FLEX I/O-XT Selection Guide",
+      "doc_no": "1794-SG002I-EN-P (April 2024)",
+      "machine": "FLEX I/O 1794, FLEX I/O-XT",
+      "kind": "каталог (selection guide) с базами, предохранителями и компенсаторами холодного спая",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "FLEX I/O ControlNet Adapters Installation Instructions",
+      "doc_no": "1794-IN128J-EN-P (November 2024)",
+      "machine": "1794-ACN15, 1794-ACNR15, 1794-ACNR15XT, series D",
+      "kind": "инструкция по монтажу",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/in/1794-in128_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "FLEX I/O Thermocouple/Millivolt Input Module User Manual",
+      "doc_no": "1794-UM007B-EN-P (August 2024)",
+      "machine": "1794-IT8",
+      "kind": "O&M",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1794-um007_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "FLEX I/O Isolated Analog Modules User Manual",
+      "doc_no": "1794-UM008G-EN-P (July 2025)",
+      "machine": "1794-IF4I, 1794-OF4I, 1794-IF2XOF2I и их XT-исполнения",
+      "kind": "O&M",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1794-um008_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "FLEX I/O Analog Modules User Manual (Cat. No. 1794-IE8, OE4 and IE4XOE2 Series B)",
+      "doc_no": "1794-6.5.2 (May 1996)",
+      "machine": "1794-IE8, 1794-OE4, 1794-IE4XOE2",
+      "kind": "O&M",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1794-um002_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "FLEX I/O to FLEX 5000 I/O Migration Guide",
+      "doc_no": "5094-RM001A-EN-P (November 2024)",
+      "machine": "FLEX I/O 1794 → FLEX 5000 5094",
+      "kind": "бюллетень (руководство по замене снятых модулей)",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/rm/5094-rm001_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "ControlNet to EtherNet/IP Migration Reference Manual",
+      "doc_no": "CNET-RM001A-EN-P (December 2019)",
+      "machine": "сети ControlNet (1756-CNB/CNBR, 1794-ACN15/ACNR15)",
+      "kind": "бюллетень (руководство по переходу)",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/rm/cnet-rm001_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "Combination Generator Control Module User Manual",
+      "doc_no": "1407-UM001H-EN-P (November 2014)",
+      "machine": "1407-CGCM",
+      "kind": "O&M",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/um/1407-um001_-en-p.pdf"
+      ]
+    },
+    {
+      "title": "Centaur 50 Turbomachinery Package Specification — Compressor Set and Mechanical Drive (раздел 10: Turbotronic 4 Control System)",
+      "doc_no": "TPS50CSMD/309 (Solar Turbines, 2009)",
+      "machine": "Solar Centaur 50, система Turbotronic 4 (ControlLogix, 1794 Flex I/O, ControlNet 1.5)",
+      "kind": "спецификация пакета ГТУ",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361629/Centaur50GasTurbinesBrochure.pdf"
+      ]
+    },
+    {
+      "title": "Taurus 70 Turbomachinery Package Specification — Compressor Set and Mechanical Drive (раздел 10: Turbotronic 4 Control System)",
+      "doc_no": "TPS70CSMD/715 (Solar Turbines, 2015)",
+      "machine": "Solar Taurus 70, система Turbotronic 4",
+      "kind": "спецификация пакета ГТУ",
+      "sources": [
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10660338",
+        "https://www.manualsdir.com/manuals/66910/caterpillar-taurus-70.html?page=35"
+      ]
+    },
+    {
+      "title": "Titan 250 Turbomachinery Package Specification — Generator Set (раздел 9: Turbotronic 4 Control System)",
+      "machine": "Solar Titan 250, Turbotronic 4 и модуль генератора Allen-Bradley/Basler Electric",
+      "kind": "спецификация пакета ГТУ",
+      "sources": [
+        "https://www.manualsdir.com/manuals/59759/cat-titan-250.html?page=30"
+      ]
+    },
+    {
+      "title": "FieldMonitor Machinery Protection System — Specifications and Ordering Information",
+      "doc_no": "141476-01 Rev. H (10/12), Bently Nevada",
+      "machine": "Bently Nevada 1701 FieldMonitor на базе FLEX I/O 1794",
+      "kind": "спецификация и данные для заказа",
+      "sources": [
+        "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "1756-BA1",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Литиевая батарея для контроллеров 1756-L6x серии A. End of Life, снимается 31.12.2027, у изготовителя замены нет (No planned RA replacement). По 1756-UM001Q при 36–40 °C под шасси менять раз в 3 года",
+      "machine": "ControlLogix 5560 (1756-L61/L62/L63 серии A)",
+      "unit": "батарея резервного питания памяти контроллера",
+      "doc_ref": "страница изделия rockwellautomation.com; 1756-UM001Q-EN-P, гл. 2",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-BA1.html",
+      "quote": "1756-BA1 ControlLogix FlexLogix Battery"
+    },
+    {
+      "code": "1756-BA2",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Литиевая батарея для контроллеров 1756-L6x серии B и 1756-L63XT. End of Life, снимается 31.12.2027, у изготовителя замены нет",
+      "machine": "ControlLogix 5560 (1756-L61…L65, L63XT серии B)",
+      "unit": "батарея резервного питания памяти контроллера",
+      "doc_ref": "страница изделия; 1756-UM001Q-EN-P, табл. 8",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-BA2.html",
+      "quote": "1756-BA2 ControlLogix L6X Ser B ONLY Battery Assy"
+    },
+    {
+      "code": "1756-BATA",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Сменная батарея для модуля 1756-BATM. End of Life, снимается 31.12.2027, у изготовителя замены нет",
+      "machine": "ControlLogix 5560 серии A с модулем 1756-BATM",
+      "unit": "батарея резервного питания памяти контроллера",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-BATA.html",
+      "quote": "1756-BATA placement Battery For 1756-BATM"
+    },
+    {
+      "code": "1756-BATM",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Выносной модуль батареи для контроллеров L6x серии A. Снят 18.07.2017, у изготовителя замены нет",
+      "machine": "ControlLogix 5560 серии A",
+      "unit": "модуль резервного питания памяти",
+      "doc_ref": "страница изделия; 1756-UM001Q-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-BATM.html",
+      "quote": "1756-BATM ControlLogix Battery Module"
+    },
+    {
+      "code": "1756-ESMCAP",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Накопитель энергии на конденсаторах для контроллеров L7x: заменяет батарею. Active Mature",
+      "machine": "ControlLogix 5570 (1756-L7x)",
+      "unit": "модуль сохранения памяти контроллера",
+      "doc_ref": "страница изделия; 1756-UM001Q-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-ESMCAP.html",
+      "quote": "1756-ESMCAP ControlLogix Energy Storage Module-CAP"
+    },
+    {
+      "code": "1756-ESMNSE",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Накопитель энергии без запаса энергии, без питания часов реального времени, для L7x. Active Mature",
+      "machine": "ControlLogix 5570 (1756-L73 и меньше)",
+      "unit": "модуль сохранения памяти контроллера",
+      "doc_ref": "страница изделия; 1756-UM001Q-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-ESMNSE.html",
+      "quote": "1756-ESMNSE ControlLogix Energy Storage Module NSE"
+    },
+    {
+      "code": "1784-CF128",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Промышленная карта CompactFlash на 128 МБ: энергонезависимая память контроллеров L6x. Active Mature",
+      "machine": "ControlLogix 5560 (1756-L6x)",
+      "unit": "карта памяти контроллера",
+      "doc_ref": "страница изделия; 1756-UM001Q-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1784-CF128.html",
+      "quote": "1784-CF128 ControlLogix CompactFlash Card"
+    },
+    {
+      "code": "1784-SD1",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Промышленная карта SD на 1 ГБ для контроллеров ControlLogix 5570 (L7x). Active",
+      "machine": "ControlLogix 5570",
+      "unit": "карта памяти контроллера",
+      "doc_ref": "страница изделия; 1756-UM001Q-EN-P; 1756-SG002D-EN-P относит SD1/SD2 к ControlLogix 5570 и GuardLogix 5570, у 5580 — SD4, SDHC8, SDHC32",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1784-SD1.html",
+      "quote": "1784-SD1 Industrial 1GB Secure Digital Card"
+    },
+    {
+      "code": "1756-L61",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Контроллер ControlLogix 5561 на 2 МБ. Снят 01.06.2017, замена функциональная",
+      "machine": "ControlLogix 5560",
+      "unit": "контроллер",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-L61.html",
+      "quote": "1756-L61 ControlLogix 2 MB Memory Controller"
+    },
+    {
+      "code": "1756-L63",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Контроллер ControlLogix 5563 на 8 МБ. Снят 01.06.2017, замена функциональная",
+      "machine": "ControlLogix 5560",
+      "unit": "контроллер",
+      "doc_ref": "страница изделия; 1756-UM001Q-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-L63.html",
+      "quote": "1756-L63 ControlLogix 8 MB Memory Controller"
+    },
+    {
+      "code": "1756-L63XT",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Контроллер ControlLogix-XT на 8 МБ для расширенного диапазона температур. Снят 01.06.2017",
+      "machine": "ControlLogix-XT 5560",
+      "unit": "контроллер",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-L63XT.html",
+      "quote": "1756-L63XT ControlLogix XT 8 MB Memory Controller"
+    },
+    {
+      "code": "1756-L73",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Контроллер ControlLogix 5573 на 8 МБ. Active Mature. В одном руководстве 1756-UM001 с L6x",
+      "machine": "ControlLogix 5570",
+      "unit": "контроллер",
+      "doc_ref": "страница изделия; 1756-UM001Q-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-L73.html",
+      "quote": "1756-L73 ControlLogix 8 MB Controller"
+    },
+    {
+      "code": "1756-CNB",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Мост ControlNet на 40–48 соединений. Снят 31.12.2024; инженерная замена 1756-CN2",
+      "machine": "ControlLogix (связь с FLEX I/O по ControlNet)",
+      "unit": "коммуникационный модуль ControlNet",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-CNB.html",
+      "quote": "1756-CNB ControlLogix Communication Module"
+    },
+    {
+      "code": "1756-CNBR",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Мост ControlNet с резервированной средой на 40–48 соединений. Снят 31.12.2024; инженерная замена 1756-CN2R",
+      "machine": "ControlLogix (ControlNet с резервированным кабелем, как в Turbotronic 4)",
+      "unit": "коммуникационный модуль ControlNet",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-CNBR.html",
+      "quote": "1756-CNBR ControlLogix Communication Module"
+    },
+    {
+      "code": "1756-CN2R",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль ControlNet с резервированной средой на 100 соединений. Active Mature; замена 1756-CNBR",
+      "machine": "ControlLogix",
+      "unit": "коммуникационный модуль ControlNet",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-CN2R.html",
+      "quote": "1756-CN2R ControlLogix Communication Module"
+    },
+    {
+      "code": "1756-ENBT",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль EtherNet/IP, 10/100 Мбит, 64 соединения TCP. Снят 31.12.2021; функциональная замена 1756-EN2T",
+      "machine": "ControlLogix",
+      "unit": "коммуникационный модуль EtherNet/IP",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-ENBT.html",
+      "quote": "1756-ENBT ControlLogix Enet/IP Comms Module"
+    },
+    {
+      "code": "1756-EN2T",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль EtherNet/IP, 10/100 Мбит, 128 соединений TCP. Active; замена 1756-ENBT",
+      "machine": "ControlLogix",
+      "unit": "коммуникационный модуль EtherNet/IP",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-EN2T.html",
+      "quote": "1756-EN2T CLX ENet/IP 100M"
+    },
+    {
+      "code": "1756-DHRIO",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль Data Highway Plus / Remote I/O. Снят 31.12.2024, замена инженерная",
+      "machine": "ControlLogix (связь с PLC-5 и вводом-выводом 1771)",
+      "unit": "коммуникационный модуль DH+/RIO",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-DHRIO.html",
+      "quote": "1756-DHRIO ControlLogix DH Plus/RIO Comms Module"
+    },
+    {
+      "code": "1756-IT6I",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Изолированный модуль ввода термопар и мВ, 6 каналов. Снят 31.03.2017, замена функциональная",
+      "machine": "ControlLogix 1756",
+      "unit": "модуль ввода термопар",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-IT6I.html",
+      "quote": "1756-IT6I ControlLogix 6 Pt Isolated TC In Module"
+    },
+    {
+      "code": "1756-IR6I",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Изолированный модуль ввода термосопротивлений, 6 каналов. Снят 31.03.2017, замена функциональная",
+      "machine": "ControlLogix 1756",
+      "unit": "модуль ввода термосопротивлений",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-IR6I.html",
+      "quote": "1756-IR6I ControlLogix 6 Pt Isolated RTD In Module"
+    },
+    {
+      "code": "1756-IF6I",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Изолированный модуль аналогового ввода тока и напряжения, 6 каналов. Снят 31.03.2017, замена функциональная",
+      "machine": "ControlLogix 1756",
+      "unit": "модуль аналогового ввода",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1756-IF6I.html",
+      "quote": "1756-IF6I ControlLogix 6 Point Isolated A/I Module"
+    },
+    {
+      "code": "1794-ACNR15",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Адаптер FLEX I/O для ControlNet с резервированной средой. End of Life, снимается 31.10.2026, замена инженерная. По 5094-RM001A путь — 5094-AENTR только по EtherNet/IP. Серия D (прошивка 10.3) заменяет серию C без переделки",
+      "machine": "FLEX I/O 1794 на ControlNet (Solar Turbotronic 4: ControlNet 1.5 с резервированным кабелем)",
+      "unit": "сетевой адаптер ControlNet",
+      "doc_ref": "страница изделия; 1794-IN128J-EN-P; 5094-RM001A-EN-P, табл. 2",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-ACNR15.html",
+      "quote": "1794-ACNR15 Flex Controlnet Adapter"
+    },
+    {
+      "code": "1794-ACN15",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Адаптер FLEX I/O для ControlNet без резервирования. End of Life, снимается 31.10.2026; путь — 5094-AENTR по EtherNet/IP",
+      "machine": "FLEX I/O 1794 на ControlNet",
+      "unit": "сетевой адаптер ControlNet",
+      "doc_ref": "страница изделия; 5094-RM001A-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-ACN15.html",
+      "quote": "1794-ACN15 Flex ControlNet Adapter"
+    },
+    {
+      "code": "1794-ACNR15XT",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Адаптер ControlNet FLEX I/O-XT, -25…+70 °C. End of Life, снимается 31.12.2027; инженерная замена 5094-AENTRXT",
+      "machine": "FLEX I/O-XT на ControlNet",
+      "unit": "сетевой адаптер ControlNet",
+      "doc_ref": "страница изделия; 1794-SG002I-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-ACNR15XT.html",
+      "quote": "1794-ACNR15XT Flex XT Controlnet Adapter"
+    },
+    {
+      "code": "1794-AENT",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Адаптер FLEX I/O для EtherNet/IP, 10/100 Мбит. End of Life, снимается 30.09.2028; функциональная замена 1794-AENTR",
+      "machine": "FLEX I/O 1794 на EtherNet/IP",
+      "unit": "сетевой адаптер EtherNet/IP",
+      "doc_ref": "страница изделия",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-AENT.html",
+      "quote": "1794-AENT Flex EtherNet/IP Adaptor"
+    },
+    {
+      "code": "1794-OE4",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль аналогового вывода, 4 канала. End of Life, снимается 28.02.2027; инженерная замена 5094-OF8",
+      "machine": "FLEX I/O 1794 (аналоговые выходы пакета)",
+      "unit": "модуль аналогового вывода",
+      "doc_ref": "страница изделия; 5094-RM001A-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-OE4.html",
+      "quote": "1794-OE4 Flex 4 Point Analog Output Module"
+    },
+    {
+      "code": "1794-IE8",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль аналогового ввода, 8 несимметричных входов. Active Mature; путь миграции — 5094-IF8",
+      "machine": "FLEX I/O 1794 (аналоговые входы пакета)",
+      "unit": "модуль аналогового ввода",
+      "doc_ref": "страница изделия; 5094-RM001A-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-IE8.html",
+      "quote": "1794-IE8 Flex 8 Point Analog Input Module"
+    },
+    {
+      "code": "1794-IT8",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль ввода термопар и мВ, 8 каналов; ставится на базу 1794-TB3T. Active Mature; путь миграции — 5094-IY8",
+      "machine": "FLEX I/O 1794 (температурные входы пакета)",
+      "unit": "модуль ввода термопар",
+      "doc_ref": "страница изделия; 1794-UM007B-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-IT8.html",
+      "quote": "1794-IT8 Flex 8 Thermocouple Input Module"
+    },
+    {
+      "code": "1794-IRT8",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль ввода термопар, термосопротивлений и мВ, 8 каналов. Active Mature; путь миграции — 5094-IY8",
+      "machine": "FLEX I/O 1794 (температурные входы пакета)",
+      "unit": "модуль ввода термопар и термосопротивлений",
+      "doc_ref": "страница изделия; 1794-SG002I-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-IRT8.html",
+      "quote": "1794-IRT8 Flex 8 Point Thermocouple RTD Module"
+    },
+    {
+      "code": "1794-IR8",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль ввода термосопротивлений, 8 каналов. Active Mature; путь миграции — 5094-IY8",
+      "machine": "FLEX I/O 1794",
+      "unit": "модуль ввода термосопротивлений",
+      "doc_ref": "страница изделия; 5094-RM001A-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-IR8.html",
+      "quote": "1794-IR8 Flex 8 Point RTD Input Module"
+    },
+    {
+      "code": "1794-VHSC",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Сверхбыстрый счётчик, 2 канала до 1 МГц. Active Mature; путь миграции — 5094-HSC",
+      "machine": "FLEX I/O 1794 (входы частоты вращения)",
+      "unit": "модуль счёта импульсов",
+      "doc_ref": "страница изделия; 5094-RM001A-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-VHSC.html",
+      "quote": "1794-VHSC Flex 2 Point High Speed Counter Module"
+    },
+    {
+      "code": "1794-IJ2",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Модуль ввода частоты высокого разрешения, 2 канала. Active Mature; путь миграции — 5094-IJ2I",
+      "machine": "FLEX I/O 1794 (входы частоты вращения)",
+      "unit": "модуль ввода частоты",
+      "doc_ref": "страница изделия; 5094-RM001A-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-IJ2.html",
+      "quote": "1794-IJ2 Flex 2 Point Input Frequency Module"
+    },
+    {
+      "code": "1794-TB3T",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Клеммная база, 3-проводная, для температурных модулей: гнёзда компенсаторов холодного спая, клеммы с зажимом cage clamp (пружинные spring clamp — у 1794-TB3TS). Active Mature",
+      "machine": "FLEX I/O 1794 (под 1794-IT8 / IRT8)",
+      "unit": "клеммная база",
+      "doc_ref": "страница изделия; 1794-UM007B-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-TB3T.html",
+      "quote": "1794-TB3T Flex Terminal Base"
+    },
+    {
+      "code": "1794-CJC2",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Комплект из двух компенсаторов холодного спая для термопарных модулей FLEX I/O. Active Mature",
+      "machine": "FLEX I/O 1794-IRT8 / 1794-IT8",
+      "unit": "компенсатор холодного спая термопар",
+      "doc_ref": "1794-SG002I-EN-P, раздел 1794-IRT8 and 1794-IRT8XT",
+      "source_url": "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf",
+      "quote": "Use cold junction compensators 1794-CJC2 in thermocouple mode. Two cold junction compensators are shipped with the 1794-IRT8."
+    },
+    {
+      "code": "1794-PS13",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Блок питания FLEX, 85–264 В перем. тока → 24 В пост. тока, 1,3 А. Active Mature",
+      "machine": "FLEX I/O 1794",
+      "unit": "блок питания",
+      "doc_ref": "страница изделия; 1794-SG002I-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1794-PS13.html",
+      "quote": "1794-PS13 Flex Power Supply"
+    },
+    {
+      "code": "94171304",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Номер Allen-Bradley для предохранителя SAN-O SD6-1.6 A (1,6 А, 250 В, с задержкой). Предохранители этого типа уже стоят в клеммной базе 1794-TBNF",
+      "machine": "FLEX I/O 1794-TBNF (выходы 1794-OA8, 1794-OA8I)",
+      "unit": "предохранитель клеммной базы",
+      "doc_ref": "1794-SG002I-EN-P, раздел Digital AC Output",
+      "source_url": "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf",
+      "quote": "SAN-O SD6-1.6 A (Allen-Bradley part number 94171304). The 1794-TBNF comes with SD6-1.6 A fuses installed."
+    },
+    {
+      "code": "239003",
+      "issuer": "Littelfuse",
+      "description": "Предохранитель на 3,0 А, 250 В перем. тока, с задержкой, для релейного модуля 1794-OW8",
+      "machine": "FLEX I/O 1794-OW8 / 1794-OW8XT",
+      "unit": "предохранитель релейного выхода",
+      "doc_ref": "1794-SG002I-EN-P, табл. 18",
+      "source_url": "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf",
+      "quote": "3.0 A. 250V AC slow-blow fuse (Littelfuse part number 239003)."
+    },
+    {
+      "code": "5094-AENTR",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Адаптер EtherNet/IP FLEX 5000 на 8 модулей, RJ45. Active. Назначенная замена адаптерам 1794-ACN15/ACNR15/ADN/AENT при переходе на FLEX 5000",
+      "machine": "FLEX 5000 (5094)",
+      "unit": "сетевой адаптер EtherNet/IP",
+      "doc_ref": "страница изделия; 5094-RM001A-EN-P, табл. 2",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.5094-AENTR.html",
+      "quote": "5094-AENTR 5094 Ethernet Adapter 8 Modules RJ45"
+    },
+    {
+      "code": "5094-IY8",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Универсальный модуль аналогового ввода FLEX 5000, 8 каналов: ток, напряжение, термопары, термосопротивления. Active. Путь миграции для 1794-IT8/IRT8/IR8",
+      "machine": "FLEX 5000 (5094)",
+      "unit": "модуль ввода температуры и аналога",
+      "doc_ref": "страница изделия; 5094-RM001A-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.5094-IY8.html",
+      "quote": "5094-IY8 5094 Universal Analog 8 Input"
+    },
+    {
+      "code": "1407-CGCM",
+      "issuer": "Rockwell Automation (Allen-Bradley)",
+      "description": "Комбинированный модуль управления генератором: возбуждение, синхронизация, защита. Снят 31.12.2023, замена инженерная. В спецификации Solar Titan 250 значится как модуль Allen-Bradley/Basler Electric",
+      "machine": "генераторная установка Solar Titan 250 (Turbotronic 4)",
+      "unit": "модуль управления генератором",
+      "doc_ref": "страница изделия; 1407-UM001H-EN-P",
+      "source_url": "https://www.rockwellautomation.com/en-us/products/details.1407-CGCM.html",
+      "quote": "1407-CGCM Cgcm Generator Control Contol"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Basler Electric",
+      "component": "комбинированный модуль управления генератором 1407-CGCM",
+      "machine": "генераторная установка Solar Titan 250 (Turbotronic 4)",
+      "evidence": "В спецификации пакета Titan 250, раздел 9.2, в составе системы указано: «Combination generator control module (Allen-Bradley/Basler Electric)»",
+      "sources": [
+        "https://www.manualsdir.com/manuals/59759/cat-titan-250.html?page=30",
+        "https://www.rockwellautomation.com/en-us/products/details.1407-CGCM.html"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Bently Nevada (Baker Hughes)",
+      "component": "система защиты по вибрации 1701 FieldMonitor на базе FLEX I/O 1794 и адаптеров Allen-Bradley",
+      "machine": "Solar Turbotronic 4 (Centaur 50, Taurus 70, Titan 250)",
+      "evidence": "В спецификации Bently 141476-01 Rev. H сказано: «uses embedded technology from Allen-Bradley… physically connects to Allen-Bradley’s 1794 series Flex I/O». В спецификации Solar Centaur 50 (п. 10.3.4): «The system uses 1701 FieldMonitors… from Bently Nevada»; в спецификации Taurus 70 (TPS70CSMD/715): «The Bently Nevada system uses 1701 FieldMonitor»; в спецификации Titan 250: «1701 FieldMonitor vibration monitoring system (Bently Nevada)»",
+      "sources": [
+        "https://5.imimg.com/data5/SELLER/Doc/2022/2/ZW/EH/RG/38012644/bently-nevada-field-monitor-170190-01e.pdf",
+        "https://bbpsales.com/product/1701-fieldmonitor-series-machinery-protection-system/",
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361629/Centaur50GasTurbinesBrochure.pdf",
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10660338",
+        "https://www.manualsdir.com/manuals/59759/cat-titan-250.html?page=30"
+      ],
+      "verified": true
+    },
+    {
+      "company": "SAN-O",
+      "component": "предохранители SD6-1.6 A (в клеммной базе 1794-TBNF; номер Allen-Bradley 94171304) и MQ4-800 mA (для выходов 1794-OB8/OB16/OV16)",
+      "machine": "FLEX I/O 1794",
+      "evidence": "Изготовитель рекомендует их в каталоге 1794-SG002I-EN-P: база 1794-TBNF поставляется с установленными SD6-1.6 A",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Littelfuse",
+      "component": "предохранители 239003 (1794-OW8), 23901.6 (1794-OA8), 235-003 (1794-IB10XOB6)",
+      "machine": "FLEX I/O 1794",
+      "evidence": "Номера Littelfuse прямо указаны в каталоге изделий 1794-SG002I-EN-P",
+      "sources": [
+        "https://literature.rockwellautomation.com/idc/groups/literature/documents/sg/1794-sg002_-en-p.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "ProSoft Technology",
+      "component": "модули Modbus в шасси ControlLogix (MVI56E-MCM, MVI56E-MCMXT)",
+      "machine": "ControlLogix 1756",
+      "evidence": "Руководство ProSoft «MVI56E-MCM ControlLogix Platform Modbus Communication Module» (13.10.2025): модуль ставится в шасси 1756, с ним работают процессор ControlLogix и RSLogix 5000",
+      "sources": [
+        "https://www.prosoft-technology.com/prosoft/download/2903/22381/file/MVI56E_MCM_MCMXT_UM.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Det-Tronics",
+      "component": "система пожарной и газовой защиты Eagle Quantum Premier; сигнал на останов идёт в процессор Turbotronic. Это субпоставщик пакета Solar, а не Rockwell",
+      "machine": "Solar Turbotronic 4 (Centaur 50, Taurus 70)",
+      "evidence": "В спецификации Centaur 50, п. 10.3.6: «The Eagle Quantum Premier system from Det-Tronics… instructs the Turbotronic control processor to initiate a package shutdown»; в спецификации Taurus 70 (TPS70CSMD/715): «The Eagle Quantum Premier system from Det-Tronics detects combustible gas and/or fire inside the enclosure»",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361629/Centaur50GasTurbinesBrochure.pdf",
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10660338"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "AB Market Otomasyon (Market Otomasyon)",
+      "country": "Турция",
+      "role": "единственный авторизованный дистрибьютор Rockwell Automation в Турции (с 07.08.2019), Стамбул; продажа, логистика, сервис",
+      "sources": [
+        "https://abmarketotomasyon.com/hakkimizda/",
+        "https://www.aa.com.tr/tr/isdunyasi/hizmet/rockwell-automationin-turkiyedeki-tek-yetkili-distributoru-market-otomasyon-oldu/652593"
+      ]
+    },
+    {
+      "company": "Pima Controls",
+      "country": "Индия",
+      "role": "авторизованный дистрибьютор Rockwell Automation в Северном Гуджарате и Раджастхане (по собственному заявлению на сайте); склады в Ахмадабаде и Джайпуре",
+      "sources": [
+        "https://pima.in/our-offering/technology-partners/rockwell-automation/"
+      ]
+    },
+    {
+      "company": "Precast FZCO",
+      "country": "ОАЭ",
+      "role": "авторизованный дистрибьютор программного обеспечения Rockwell Automation на Ближнем Востоке: только ПО, не оборудование; офисы в ОАЭ, Турции, Ливане, Египте, Саудовской Аравии",
+      "sources": [
+        "https://www.rockwellautomation.com/en-pl/company/news/press-releases/company/driving-digital-strength-across-the-middle-east.html"
+      ]
+    },
+    {
+      "company": "Solar Turbines",
+      "country": "США",
+      "role": "интегратор систем Turbotronic 4/5 на ControlLogix и FLEX I/O; поставщик ЗИП систем управления своих пакетов под собственными номерами",
+      "sources": [
+        "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361629/Centaur50GasTurbinesBrochure.pdf",
+        "http://s7d2.scene7.com/is/content/Caterpillar/C10660338"
+      ]
+    },
+    {
+      "company": "GTC Control Solutions",
+      "country": "США",
+      "role": "независимый поставщик и ремонтник ЗИП систем управления газовых турбин, в том числе модулей Allen-Bradley (1794-ACNR15); не официальный дистрибьютор",
+      "sources": [
+        "https://callgtc.com/product/1794-acnr15/"
+      ]
+    },
+    {
+      "company": "Turbo Control Solutions (TCS)",
+      "country": "Малайзия",
+      "role": "модернизация систем управления ГТУ (Solar, Siemens SGT, GE LM и Frame) на платформе Allen-Bradley ControlLogix 5000; не официальный дистрибьютор",
+      "sources": [
+        "https://www.tcssb.com/our-solution/retrofits-upgrades/"
+      ]
+    },
+    {
+      "company": "Grupo GTIS (Gas Turbines Integrated Services)",
+      "country": "США / Венесуэла",
+      "role": "ремонт турбинных пакетов и модернизация их систем управления на платформах Rockwell Allen-Bradley (PLC-5, ControlLogix)",
+      "sources": [
+        "https://gasturbinesllc.com/en/"
+      ]
+    },
+    {
+      "company": "Rockwell Automation (представительство в России)",
+      "country": "Россия",
+      "role": "бывшее представительство изготовителя: 07.03.2022 продажи и работа в России и Белоруссии приостановлены, официального канала поставки в РФ нет",
+      "sources": [
+        "https://www.rockwellautomation.com/en-us/company/news/press-releases/rockwell-automation-suspends-business-in-russia.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Точный состав модулей в шкафах Turbotronic 4/5 по конкретным пакетам (какой контроллер L55/L6x/L7x, какие модули 1794 на входах температуры и частоты) в открытом доступе не найден. Он лежит в закрытой документации Solar Turbines (перечни деталей пакета, клиентский портал Solar).",
+    "Перекрёстные номера Solar ↔ Allen-Bradley подтвердить не удалось. По выдаче поиска, в объявлении eBay «Allen-Bradley 1794-IRT8 Ser B, Solar Turbines 1051931-30» (ebay.com/itm/336525596094). Страница отдаёт роботу 403, поэтому код не записан.",
+    "Уведомления о снятии изделий (PCN) и полная база статусов жизненного цикла закрыты входом на support.rockwellautomation.com, например «Product Lifecycle Notice: 1756-L55 processor», a_id 46913. Дата снятия 1756-L55 не найдена: страницы изделия на сайте изготовителя больше нет.",
+    "Прайс-листы и наличие на сайте изготовителя видны только после входа; цены дилеров не собирались.",
+    "Turbotronic 5 (ControlLogix, EtherNet/IP DLR) известен только по выдаче поиска: страницы solarturbines.com и показания mass.gov роботу недоступны (403 или таймаут).",
+    "Модернизация систем управления Siemens SGT-200 на ControlLogix (Proeon Systems, Великобритания) и перечень работ VBR Turbine Partners подтвердить не удалось: страница Proeon за защитой от роботов, PDF VBR удалён (404).",
+    "Россия и СНГ. С 07.03.2022 Rockwell приостановила работу в России и Белоруссии. Авторизованный дистрибьютор в Казахстане в открытых источниках не найден. Локатор партнёров изготовителя работает только через закрытый API.",
+    "Китай. По справке Rockwell Automation (China) у неё около 12 авторизованных дистрибьюторов, но их названия в открытых источниках не подтверждены. Сайты вида «代理» заявляют о себе сами, и проверить эти заявления нельзя.",
+    "Батареи 1756-BA1/BA2/BATA: изготовитель прямо пишет «No planned RA replacement». Кто делает литиевые элементы, в открытых источниках нет. После 31.12.2027 остаются складские остатки, ремонтники или переход на L7x.",
+    "Переход Turbotronic 4 с FLEX I/O на FLEX 5000 требует смены сети ControlNet на EtherNet/IP (5094-RM001A, CNET-RM001A). Готовых пакетов модернизации от Solar в открытых источниках нет: вероятно, это предложения Solar по системным обновлениям, закрытые."
+  ],
+  "verifier_notes": "Опровергнуть не удалось ни одной записи: все 39 кодов, 22 машины и 6 субпоставщиков подтверждены источниками. Проверка 27.09.2026: страницы rockwellautomation.com/en-us/products/details.<код>.html скачаны curl и отдают серверный HTML. Сверены заголовок изделия, lifecycle status, дата снятия, категория замены и описание. Цитаты в quote совпадают с заголовками страниц; перед 1756-EN2T, 5094-AENTR и 5094-IY8 на странице стоит метка «Preferred». Скачаны и прочитаны pdftotext такие PDF: 1794-SG002I-EN-P (апр. 2024), 5094-RM001A-EN-P (нояб. 2024), 1756-UM001Q-EN-P (дек. 2024), 1794-IN128J-EN-P, 1756-IN101L, 1756-UM523F, 1407-UM001H, 1756-SG002D-EN-P (окт. 2025), спецификации Solar Centaur 50 (cloudfront) и Taurus 70 (Caterpillar C10660338), лист Bently 141476-01 Rev. H, руководство ProSoft MVI56E-MCM. Страница Titan 250 на manualsdir тоже открыта. Единственный недоступный адрес — страница 1756-L55 (404); модель подтверждена литературой.\n\nПравки, которые нужно внести, хотя вердикт «подтверждён»:\n(1) 1784-SD1: применимость к L8x/5580 источником не подтверждена. 1756-SG002D относит SD1/SD2 к ControlLogix 5570 и GuardLogix 5570, а у 5580 — SD4, SDHC8 и SDHC32. Машину сузить до 5570 или дать источник.\n(2) 1794-TB3T: «пружинные клеммы» заменить на cage clamp; spring clamp — это 1794-TB3TS.\n(3) Bently Nevada: Taurus 60 не подтверждён. Taurus 70 и Titan 250 подтверждаются C10660338 и manualsdir, но их нужно добавить в sources.\n(4) Det-Tronics: добавить C10660338 в sources для Taurus 70 и оговорить, что это субпоставщик пакета Solar, а не Rockwell.\n(5) ControlLogix 5560: спецификации Solar называют в Turbotronic 4 просто ControlLogix, без поколения, поэтому связь именно L6x с Turbotronic 4 — вывод.\n(6) ControlLogix 5555: источника про применение в ГТУ нет.\n\nДилеров не проверял, как и требовалось.\n\nДополнение при сборке файла (27.09.2026): в записи 40 кодов, а не 39 — цитаты всех 40 найдены в страницах и PDF, скачанных скептиком (в том числе 1756-BATM: страница изделия, статус Discontinued с 18.07.2017, «No planned RA replacement»).",
+  "corrections": [
+    "1784-SD1: машина сужена до ControlLogix 5570, «и L8x» снято — 1756-SG002D относит SD1/SD2 к 5570, у 5580 карты SD4, SDHC8, SDHC32 (замечание скептика 1)",
+    "1794-TB3T: «пружинные клеммы» заменены на cage clamp — spring clamp у 1794-TB3TS (замечание скептика 2)",
+    "Bently Nevada: снят Taurus 60 — не подтверждён; в sources добавлены спецификация Taurus 70 (C10660338) и страница Titan 250 (manualsdir), строки из них — в evidence (замечание скептика 3)",
+    "Det-Tronics: добавлен источник C10660338 (Taurus 70), оговорено, что это субпоставщик пакета Solar, а не Rockwell (замечание скептика 4)",
+    "sub_suppliers: verified: true проставлено у Bently Nevada, SAN-O и Det-Tronics — скептик подтвердил все 6 субпоставщиков",
+    "ControlLogix 5560: в kind оговорено, что спецификации Solar не называют поколение контроллера — связь L6x с Turbotronic 4 выведена (замечание скептика 5)",
+    "ControlLogix 5555: segment «ГТУ» заменён на «прочее», в kind — источника о применении в ГТУ нет (замечание скептика 6)",
+    "summary: снят Taurus 60 — спецификации Taurus 60 среди источников нет, скептик его не подтвердил",
+    "verifier_notes: дописано, что кодов 40, а не 39, — повторная сверка по скачанным скептиком страницам нашла цитаты всех 40"
+  ]
+}

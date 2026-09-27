@@ -472,7 +472,8 @@ def test_переразбор_пишет_нашу_компанию_не_зати
     assert "our_company = coalesce(%s, our_company)" in sql
     assert sql.count("%s") == len(значения) == len(колонки) + 1
     monkeypatch.setattr(r.indexer, "_НАШИ_СБОЙ", False)
-    assert "coalesce" not in r.правка_файла(колонки)
+    без_сбоя = r.правка_файла(колонки)
+    assert "our_company = %s" in без_сбоя and "coalesce(%s," not in без_сбоя
     assert значения[колонки.index("our_company")] == "ООО «Кордален»"
     assert значения[-1] == запись["file_id"] and sql.rstrip().endswith("where file_id = %s")
 
