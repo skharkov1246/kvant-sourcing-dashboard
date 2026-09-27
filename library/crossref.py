@@ -148,6 +148,12 @@ def корзина(ключ: str) -> int:
 # карточка показала бы предложения по ключу, которого нет в спросе и каталоге.
 КОД_ГОДЕН = docfilter.sql_код_годен("part_number")
 
+# ЖИВЫЕ СТРОКИ ЦЕНЫ. Все запросы к ценам читают вид lib_prices_live
+# (library/supabase/schema_junk.sql): строка цены, помеченная ложной — номер
+# страницы, телефон, «Total Amount», «x × 1 = x» (quotes.ложная_цена,
+# scripts/mark_false_prices.py), — в снимок не едет. Условие одно и живёт в
+# виде; публикатор, пока вида в базе нет, читает таблицу (price_store.живые_sql).
+
 # КОЛИЧЕСТВО, КОТОРОЕ НЕ ЧИТАЕТСЯ, НЕ ПОКАЗЫВАЕТСЯ. До 24.09.2026 разбор склеивал
 # все цифры ячейки количества («3 163 518 182,316»), и карточка печатала это
 # числом. Новый разбор так не пишет (indexer.количество_ячейки), а накопленные
@@ -203,7 +209,7 @@ select lib_pn_key(p.part_number)      as ключ,
        -- причине, что дата_откуда: сборка читает и базу без колонки.
        to_jsonb(p) ->> 'note'           as примечание,
        to_jsonb(p) ->> 'country'        as страна
-  from lib_prices p
+  from lib_prices_live p
   left join sup_identifier i
          on i.kind = 'bitrix' and i.status <> 'rejected'
         and i.value_norm = p.rfq_company
@@ -234,7 +240,7 @@ select lib_pn_key(p.part_number)      as ключ,
 СПРОС_SQL = """
 with ключи as (
   select distinct lib_pn_key(part_number) as ключ
-    from lib_prices
+    from lib_prices_live
    where feed = %s and coalesce(btrim(part_number), '') <> ''
      and lib_pn_key(part_number) <> '' and """ + КОД_ГОДЕН + """
 )
@@ -279,7 +285,7 @@ select к.ключ,
 СПРОС_БРЕНДЫ_SQL = """
 with ключи as (
   select distinct lib_pn_key(part_number) as ключ
-    from lib_prices
+    from lib_prices_live
    where feed = %s and coalesce(btrim(part_number), '') <> ''
      and lib_pn_key(part_number) <> '' and """ + КОД_ГОДЕН + """
 ),
@@ -314,7 +320,7 @@ select к.ключ,
 СЦЕПКА = """
 with ключи as (
   select distinct lib_pn_key(part_number) as ключ
-    from lib_prices
+    from lib_prices_live
    where feed = %s and coalesce(btrim(part_number), '') <> ''
      and lib_pn_key(part_number) <> '' and """ + КОД_ГОДЕН + """
 ), точно as (

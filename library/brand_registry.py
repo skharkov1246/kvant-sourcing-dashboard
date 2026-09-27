@@ -44,7 +44,7 @@ import re
 import zlib
 from pathlib import Path
 
-from library import codes_sql, crossref, equipment, oem_kind
+from library import codes_sql, crossref, equipment, oem_kind, price_store
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -649,7 +649,11 @@ def замер_sql(из_реестра: bool, карта_sql: str) -> str:
     карточки без реестра не разрешается ничем: у ключей портала имён нет."""
     сцепка = crossref.СЦЕПКА.strip()
     assert сцепка.startswith("with ")
-    сцепка = сцепка[len("with "):].replace("%s", "'разбор КП'")
+    # Замер реестра читает ВСЮ таблицу цен (kp ниже), и сцепка — по ней же:
+    # страница читает живые строки (вид lib_prices_live), а замер меряет то,
+    # что лежит, и не зависит от того, применён ли вид (price_store.живые_sql).
+    сцепка = price_store.живые_sql(сцепка[len("with "):], False)
+    сцепка = сцепка.replace("%s", "'разбор КП'")
     if из_реестра:
         карточка = """
   card as (

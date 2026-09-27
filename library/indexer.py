@@ -2610,8 +2610,11 @@ def строки_цен(rec: dict, items: list[dict]) -> list[tuple]:
     if not цены_файла(rec):
         return []
     источник, поток = поток_цены()
-    return [price_store.строка(it, it["_цена"], pg, источник, поток)
-            for it in items if it.get("_цена")]
+    # Ложные строки цены (реквизит, итог, «x × 1 = x») снимаются на готовом
+    # кортеже — тем же правилом, что помечает уже записанные
+    # (price_store.отобрать, quotes.ложная_цена).
+    return price_store.отобрать([price_store.строка(it, it["_цена"], pg, источник, поток)
+                                 for it in items if it.get("_цена")])
 
 
 def позиции_письма(items: list[dict]) -> list[dict]:
@@ -3227,6 +3230,8 @@ def main() -> int:
     if SOURCE == "rfq":
         print(f"строк с ценой: {цен}"
               + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
+    if SOURCE == "rfq" or (SOURCE == "mail" and MAIL_PRICES):
+        print(price_store.строка_отказов())
     if SOURCE == "mail" and MAIL_PRICES:
         for строка_замера in замер_цен.строки(запись):
             print(строка_замера)

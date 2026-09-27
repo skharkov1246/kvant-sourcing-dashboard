@@ -14,6 +14,17 @@ name: Библиотека — сводка и переклассификаци�
 #                    документа и шесть гейтов приёмки. Ничего не меняет.
 #   mark-apply     — запись пометок. Запись отменяется сама, если гейты не сошлись.
 #   mark-revert    — снять пометки прогона (вход run_id). Секунды.
+#   false-prices   — вхолостую: сколько строк цены (lib_prices, потоки «разбор КП»
+#                    и «письмо поставщика») правило ложной цены обвиняет — по
+#                    причинам закрытого списка, по потокам, по пути разбора;
+#                    сколько файлов теряют строки и сколько ВСЕ цены; кого спасла
+#                    защита; четыре гейта. Правило — quotes.ложная_цена, то же,
+#                    что при записи. Частями по диапазону id (вход parts).
+#                    Только выборки. Ничего не меняет.
+#   false-prices-apply — пометки в lib_price_junk (вид lib_prices_live их
+#                    исключает). Запись отменяется сама, если гейты не сошлись
+#                    или сверка Python ↔ SQL после записи разошлась.
+#   false-prices-revert — снять пометки прогона (вход run_id). Секунды.
 #   reclassify     — вхолостую: сколько позиций без сегмента удалось бы разобрать
 #                    и каким правилом. Ничего не меняет.
 #   reclassify-apply — то же самое с записью сегмента в lib_demand.
@@ -105,7 +116,8 @@ on:
         options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify,
                   reclassify-apply, bridge, crossref, demand, funnel,
                   calibration, part, match, codes, sides, dynamics, code-rule,
-                  brand-models, offer-role, dealer-link, weekly-offers]
+                  brand-models, offer-role, dealer-link, weekly-offers,
+                  false-prices, false-prices-apply, false-prices-revert]
       part:
         description: "Артикул для поиска — только для part (например 6265ZZ)"
         type: string
@@ -119,10 +131,10 @@ on:
         type: string
         default: ""
       run_id:
-        description: "Ключ прогона разметки — только для mark-revert"
+        description: "Ключ прогона разметки — только для mark-revert и false-prices-revert"
         default: ""
       parts:
-        description: "Частей обхода — только для brand-models и offer-role"
+        description: "Частей обхода — только для brand-models, offer-role и false-prices"
         type: choice
         default: "16"
         options: ["10", "16", "25", "50"]
@@ -230,6 +242,36 @@ jobs:
           set -euo pipefail
           [ -n "${REVERT:-}" ] || { echo "::error::для отката нужен вход run_id"; exit 1; }
           python library/mark_prose.py
+
+      # ЛОЖНЫЕ СТРОКИ ЦЕНЫ (номер страницы, телефон, «Total Amount», «x × 1 = x»):
+      # правило quotes.ложная_цена — то же, что снимает их при записи. Сначала
+      # холостой замер (правило 3), запись — только при пройденных гейтах, и
+      # сверка Python ↔ SQL после неё в той же транзакции. Входы идут в
+      # окружение как есть: шаг их не подменяет (CLAUDE.md, «Читай ВЫЗОВ»).
+      - name: Ложные строки цены вхолостую — гейты
+        if: inputs.job == 'false-prices'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PARTS: ${{ inputs.parts }}
+        run: python scripts/mark_false_prices.py
+
+      - name: Ложные строки цены — запись пометок
+        if: inputs.job == 'false-prices-apply'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PARTS: ${{ inputs.parts }}
+          APPLY: "1"
+        run: python scripts/mark_false_prices.py
+
+      - name: Ложные строки цены — откат пометок
+        if: inputs.job == 'false-prices-revert'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          REVERT: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          [ -n "${REVERT:-}" ] || { echo "::error::для отката нужен вход run_id"; exit 1; }
+          python scripts/mark_false_prices.py
 
       - name: Переклассификация вхолостую
         if: inputs.job == 'reclassify'

@@ -476,8 +476,11 @@ def main() -> int:
                     # ключ — файл, потому что естественного ключа у цены нет
                     # (одна позиция законно имеет и цену, и сумму). Переразбор
                     # того же КП поэтому идемпотентен.
-                    цены = [price_store.строка(it, it["_цена"], indexer.pg)
-                            for it in items if it.get("_цена")]
+                    # Ложные строки цены снимаются тем же правилом, что при
+                    # разборе; счёт им ведёт общий цикл (и в холостом прогоне).
+                    цены = price_store.отобрать([price_store.строка(it, it["_цена"], indexer.pg)
+                                                 for it in items if it.get("_цена")],
+                                                считать=False)
                     if цены:
                         price_store.записать(cur, цены,
                                              psycopg2.extras.execute_values)
@@ -493,6 +496,11 @@ def main() -> int:
             новое = len(items)
             стат[rec["status"]] += 1
             с_ценой = sum(1 for it in items if it.get("_цена"))
+            if indexer.SOURCE == "rfq" and с_ценой:
+                # Счёт ложных строк цены, которые запись снимет (price_store.
+                # отобрать), — и в холостом прогоне: так он и меряет правило.
+                price_store.отобрать([price_store.строка(it, it["_цена"], indexer.pg)
+                                      for it in items if it.get("_цена")])
             цен_найдено += с_ценой
             файлов_с_ценой += bool(с_ценой)
             клетка = (rec.get("parse_path") or "(не указан)",
@@ -680,6 +688,8 @@ def main() -> int:
               f" «Price» вместо деления суммы)")
     print(f"строк с ценой в этих файлах: {num(цен_найдено)} "
           f"у {файлов_с_ценой} файлов из {len(mine)}")
+    if indexer.SOURCE == "rfq":
+        print(price_store.строка_отказов())
     if indexer.SOURCE == "rfq":
         print("цены " + ("ЗАПИСАНЫ" if APPLY else "будут записаны при APPLY=1")
               + ": это ответ поставщика, другого смысла у неё нет.")

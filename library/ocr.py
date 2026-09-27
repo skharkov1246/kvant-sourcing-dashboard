@@ -805,8 +805,9 @@ def записать_файл(cur, run_id: str, rec: dict, items: list[dict],
             новые_строки = [x[0] for x in execute_values(
                 cur, ВСТАВИТЬ_СТРОКИ, [строка_спроса(it) for it in items],
                 page_size=500, fetch=True)]
-        цены = [price_store.строка(it, it["_цена"], indexer.pg, price_store.ИСТОЧНИК_СКАНА)
-                for it in items if it.get("_цена") and indexer.SOURCE == "rfq"]
+        цены = price_store.отобрать(
+            [price_store.строка(it, it["_цена"], indexer.pg, price_store.ИСТОЧНИК_СКАНА)
+             for it in items if it.get("_цена") and indexer.SOURCE == "rfq"])
         новые_цены, выведены = price_store.записать_скан(cur, fid, цены, execute_values)
 
     if режим == ПОСТРАНИЧНО:
@@ -1089,6 +1090,7 @@ def main() -> int:
     if indexer.SOURCE == "rfq":
         print(f"строк с ценой: {цен}"
               + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
+        print(price_store.строка_отказов())
     print(f"по состоянию (распознаны целиком): {dict(stat.most_common())}")
     print(f"по формату:   {dict(kinds.most_common())}")
     if причины:
