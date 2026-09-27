@@ -158,6 +158,16 @@ on:
         description: "Отсев ложных строк цены при записи (выключать только для замера)"
         type: boolean
         default: true
+      # ЦЕНЫ НАШЕГО КП ЗАКАЗЧИКУ (27.09.2026): поля сделки Offer from us, Result
+      # ТКП, Образец ТКП — только точным кодом поля (library/doc_folder.py). Свой
+      # поток «наше КП заказчику»: ни предложения поставщиков, ни страницы портала
+      # его не читают. С reparse — переразбор ТОЛЬКО цен этих файлов (спрос и
+      # lib_files не трогаются; без apply — холостой замер); без reparse — разбор
+      # новых файлов сделок пишет и их цены. Только source=deals.
+      our_offer:
+        description: "Цены нашего КП заказчику (поля сделки Offer from us, Result ТКП, Образец ТКП) — свой поток; с reparse — только они (source=deals)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -255,6 +265,8 @@ jobs:
           HEADERLESS_PRICE: ${{ inputs.headerless_price && '1' || '' }}
           OCR_RETRY: ${{ inputs.ocr_retry && '1' || '' }}
           REPARSE_FAILED: ${{ inputs.reparse_failed && '1' || '' }}
+          OUR_OFFER_PRICES: ${{ inputs.our_offer && '1' || '' }}
+          REPARSE_FOLDER: ${{ inputs.our_offer && 'наше предложение заказчику' || '' }}
           REVERT_KEY: ${{ inputs.ocr_revert }}
           OCR_MODE: ${{ inputs.ocr_mode != 'все' && inputs.ocr_mode || '' }}
           BITRIX_RPS: ${{ inputs.bitrix_rps }}

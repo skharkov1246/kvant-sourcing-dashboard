@@ -58,6 +58,7 @@ import read_word  # noqa: E402  (Word, OpenDocument, RTF, HTML под видом
 import text_quality  # noqa: E402  (оценка и починка извлечённого текста)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
 import quote_date  # noqa: E402  (дата квотации — одна на все разборы)
+import deal_links  # noqa: E402  (карточка → сделка → заказчик: lib_rfq_cards, lib_deals)
 # Список полей КП держим в одном месте со всеми замерами котировок: два списка
 # разошлись бы молча — разбирали бы одно, а считали другое.
 from quote_coverage import ПОЛЕ_ЗАПРОСА, ПОЛЯ_КП  # noqa: E402
@@ -149,6 +150,17 @@ MAIL_CONTACT_COMPANY = os.environ.get("MAIL_CONTACT_COMPANY", "").strip().lower(
 #: С SOURCE=mail — письма группы после СВОЕЙ отметки прохода, не отметки ручной
 #: пачки (collect_refs_mail_increment); граница прохода уходит шагу отметки.
 ИНКРЕМЕНТ = os.environ.get("INCREMENT", "").strip().lower() in ("1", "true", "yes")
+#: ЦЕНЫ НАШЕГО КП ЗАКАЗЧИКУ — ТОЛЬКО СО ВХОДОМ (по умолчанию выключено: правило
+#: сначала меряют, потом применяют — CLAUDE.md, правило 3). У SOURCE=deals цену
+#: пишет только файл поля сделки с НАШИМ КП, опознанным ТОЧНЫМ кодом поля
+#: (doc_folder.наше_кп_сделки: Offer from us, Result ТКП, Образец ТКП; «Result
+#: file» — нет), тем же правилом чтения цены, что у КП поставщика (v2 и отсев
+#: ложных строк), — но СВОИМ потоком price_store.FEED_НАШЕ_КП, которого ни
+#: сводки поставщиков, ни страницы портала не читают. Заявка заказчика и копии
+#: КП поставщиков в полях сделки цены по-прежнему не дают никогда.
+#: Историю переразбирает library/reparse.py с REPARSE_FOLDER «наше предложение
+#: заказчику» — он сам включает этот признак.
+НАШЕ_КП = os.environ.get("OUR_OFFER_PRICES", "").strip().lower() in ("1", "true", "yes")
 # Подпись источника строки. Раньше здесь всегда стояла «спецификация сделки» —
 # и строки из КП поставщика ложились под чужим именем: спецификация говорит, что
 # заказчик просит, котировка — что поставщик предлагает и почём.
@@ -1679,8 +1691,13 @@ def collect_refs(days: int, shard: int = 0, shards: int = 1,
     # метода: у него свой предел 420 с за 10 минут на вебхук, общий для всех
     # частей. 24.09.2026 пятьдесят частей исчерпали его за две минуты — HTTP 429
     # на crm.deal.list и есть OPERATION_TIME_LIMIT (apidocs.bitrix24.ru/limits.html).
-    deals = bx_all_by_id("crm.deal.list", {"filter": фильтр, "select": ["ID"]},
+    # НАЗВАНИЕ, КОМПАНИЯ И СТАДИЯ СДЕЛКИ — В ТОМ ЖЕ SELECT (deal_links.ПОЛЯ_СДЕЛКИ):
+    # заказчик сделки нужен недельному своду, а страницы те же — ни одного
+    # лишнего запроса. Пишутся в lib_deals после обхода (записать_связи).
+    deals = bx_all_by_id("crm.deal.list", {"filter": фильтр,
+                                           "select": list(deal_links.ПОЛЯ_СДЕЛКИ)},
                          ключ="ID")
+    запомнить_сделки(deals)
     ids = [int(d["ID"]) for d in deals]
     print(f"сделок за {days} дн.: {len(ids)}"
           + (f" (часть {shard + 1} из {shards})" if shards > 1 else "")
@@ -1709,12 +1726,14 @@ def collect_refs_increment() -> list[dict]:
     """
     import increment
     с, после_id = increment.окно_из_базы("deals")
+    поля = list(deal_links.ПОЛЯ_СДЕЛКИ)
     изменённые = bx_all_by_id("crm.deal.list",
                               {"filter": {">=DATE_MODIFY": increment.для_фильтра(с)},
-                               "select": ["ID"]}, ключ="ID")
-    новые = (bx_all_by_id("crm.deal.list", {"filter": {}, "select": ["ID"]},
+                               "select": поля}, ключ="ID")
+    новые = (bx_all_by_id("crm.deal.list", {"filter": {}, "select": поля},
                           с_id=после_id, ключ="ID") if после_id else [])
     сделки = increment.объединить(изменённые, новые, ключ="ID")
+    запомнить_сделки(сделки)
     ids = [int(d["ID"]) for d in сделки]
     print(f"сделок изменено: {len(изменённые)} · новых по номеру: {len(новые)}"
           f" · к чтению вложений: {len(ids)}", flush=True)
@@ -1872,6 +1891,9 @@ def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
     карточки = bx_all_by_id("crm.item.list",
                             {"entityTypeId": SPA_RFQ, "select": ПОЛЯ_КАРТОЧКИ + поля},
                             с_id=низ, до_id=верх)
+    # СВЯЗЬ КАРТОЧКИ СО СДЕЛКОЙ — ДО ОКНА ДАТ: карточки уже прочитаны, и старая
+    # карточка связана со сделкой не хуже свежей.
+    запомнить_карточки(карточки)
     всего = len(карточки)
     без_даты = 0
     if days and days > 0:
@@ -1891,8 +1913,75 @@ def collect_refs_rfq(days: int, shard: int = 0, shards: int = 1) -> list[dict]:
 
 
 #: Поля карточки запроса, кроме файловых полей КП: дата, наша компания,
-#: поставщик, бренды и наш «Request file» (только для счёта).
-ПОЛЯ_КАРТОЧКИ = ["id", "createdTime", "mycompanyId", ПОЛЕ_ПОСТАВЩИКА, ПОЛЕ_БРЕНДОВ, ПОЛЕ_ЗАПРОСА]
+#: поставщик, бренды и наш «Request file» (только для счёта). Сделка карточки
+#: (parentId2) и её название (title) — для связи lib_rfq_cards
+#: (library/deal_links.py): в том же select, ни одного лишнего запроса.
+ПОЛЯ_КАРТОЧКИ = ["id", "createdTime", "mycompanyId", ПОЛЕ_ПОСТАВЩИКА, ПОЛЕ_БРЕНДОВ, ПОЛЕ_ЗАПРОСА,
+                 deal_links.ПОЛЕ_СДЕЛКИ_КАРТОЧКИ, "title"]
+
+
+# ── СВЯЗИ КАРТОЧКА → СДЕЛКА → ЗАКАЗЧИК ИЗ ТОГО ЖЕ ОБХОДА ─────────────────────
+# Обход кладёт сюда строки lib_rfq_cards и lib_deals (deal_links.строка_*),
+# разбор пишет их одним пакетом после обхода (записать_связи). Ключ — номер:
+# карточка, прочитанная дважды (изменённая и новая по номеру), даёт одну строку.
+_СВЯЗИ: dict[str, dict[str, tuple]] = {"карточки": {}, "сделки": {}}
+
+
+def запомнить_карточки(карточки: list[dict]) -> None:
+    for x in карточки:
+        r = deal_links.строка_карточки(x)
+        if r:
+            _СВЯЗИ["карточки"][r[0]] = r
+
+
+def запомнить_сделки(сделки: list[dict]) -> None:
+    for x in сделки:
+        r = deal_links.строка_сделки(x)
+        if r:
+            _СВЯЗИ["сделки"][r[0]] = r
+
+
+def ключ_прогона_связей() -> str:
+    """run_id строк связи из разбора: номер прогона Actions, источник и часть."""
+    return (f"ix-{os.environ.get('GITHUB_RUN_ID') or int(time.time())}"
+            f"-{SOURCE}-p{SHARD}")
+
+
+def записать_связи() -> None:
+    """Связи из обхода — в базу, одним пакетом. В журнал только агрегаты.
+
+    ВСПОМОГАТЕЛЬНАЯ ЗАПИСЬ РАЗБОР НЕ РОНЯЕТ: нет таблиц (схему ещё не
+    применили) или сбой записи — предупреждение, и разбор файлов идёт дальше.
+    Связь досчитает library/backfill_deal_links.py, а файлы — только разбор.
+    """
+    карточки = list(_СВЯЗИ["карточки"].values())
+    сделки = list(_СВЯЗИ["сделки"].values())
+    if not карточки and not сделки:
+        return
+    к_всего, к_связь = deal_links.счёт_python(карточки, 1)
+    с_всего, с_связь = deal_links.счёт_python(сделки, 2)
+    try:
+        conn = connect()
+        try:
+            with conn.cursor() as cur:
+                итог = deal_links.записать_свежие(cur, карточки, сделки, ключ_прогона_связей(),
+                                                  psycopg2.extras.execute_values)
+            conn.commit()
+        finally:
+            conn.close()
+    except psycopg2.Error as e:
+        print(f"::warning::связи карточка → сделка не записаны ({type(e).__name__}) — "
+              "разбор идёт дальше; историю досчитает library/backfill_deal_links.py",
+              flush=True)
+        return
+    if итог is None:
+        print("::warning::нет таблиц lib_rfq_cards и lib_deals — примените "
+              "library/supabase/deal_links_schema.sql прогоном «ZIP base — apply DB "
+              "migrations»; разбор идёт без записи связей", flush=True)
+        return
+    print(f"связи: карточек {к_всего} (со сделкой {к_связь}) · сделок {с_всего} "
+          f"(с компанией {с_связь}) · вставлено или изменено: карточек {итог[0]}, "
+          f"сделок {итог[1]}", flush=True)
 
 
 def collect_refs_rfq_increment() -> list[dict]:
@@ -1907,6 +1996,7 @@ def collect_refs_rfq_increment() -> list[dict]:
                               {**параметры, "filter": {">=updatedTime": increment.для_фильтра(с)}})
     новые = (bx_all_by_id("crm.item.list", параметры, с_id=после_id) if после_id else [])
     карточки = increment.объединить(изменённые, новые)
+    запомнить_карточки(карточки)
     print(f"карточек запросов изменено: {len(изменённые)} · новых по номеру: {len(новые)}"
           f" · к чтению вложений: {len(карточки)}", flush=True)
     return ссылки_карточек(карточки, поля)
@@ -2848,16 +2938,25 @@ def количество_в_строке(строка: str) -> tuple[float | Non
     return None, None
 
 
+def наше_кп_файла(rec: dict) -> bool:
+    """Файл — наше КП заказчику: поле сделки, опознанное точным кодом."""
+    return doc_folder.наше_кп_сделки(rec.get("origin"), rec.get("field"))
+
+
 def цены_файла(rec: dict) -> bool:
     """Искать ли в этом файле цену и писать ли её строки в lib_prices.
 
     Карточка запроса — всегда (прежнее поведение). Письмо — только со входом
     MAIL_PRICES и только файл стороны «поставщик»: сторону ставит источник
     (mail_source.СТОРОНА по группе и направлению), а не содержимое. Сделки —
-    никогда: заявка заказчика не котировка.
+    только со входом OUR_OFFER_PRICES и только НАШЕ КП заказчику (наше_кп_файла),
+    своим потоком (поток_цены): заявка заказчика не котировка, а копия КП
+    поставщика в поле сделки — дубль карточки запроса без поставщика.
     """
     if SOURCE == "rfq":
         return True
+    if SOURCE == "deals":
+        return НАШЕ_КП and наше_кп_файла(rec)
     return (SOURCE == "mail" and MAIL_PRICES
             and rec.get("side") == doc_side.ПОСТАВЩИК)
 
@@ -2878,9 +2977,14 @@ def компании_контактов_части(refs: list[dict]) -> list[str
 
 
 def поток_цены() -> tuple[str, str]:
-    """(источник, поток) строки цены: у писем свои, у карточек прежние."""
+    """(источник, поток) строки цены: у писем и у нашего КП свои, у карточек прежние.
+
+    У сделок цену даёт только наше КП (цены_файла), поэтому поток сделки — всегда
+    FEED_НАШЕ_КП: в «разбор КП» цена из поля сделки не попадает ни при каком входе."""
     if SOURCE == "mail":
         return price_store.ИСТОЧНИК_ПИСЬМА, price_store.FEED_ПИСЬМА
+    if SOURCE == "deals":
+        return price_store.ИСТОЧНИК_НАШЕ_КП, price_store.FEED_НАШЕ_КП
     return price_store.ИСТОЧНИК, price_store.FEED
 
 
@@ -3508,6 +3612,10 @@ def _разбор(шаг: dict) -> int:
     запись = SOURCE != "mail" or APPLY
     if not запись:
         print("режим: холостой, без записи в базу (APPLY не задан)", flush=True)
+    if SOURCE == "deals" and НАШЕ_КП:
+        print(f"цены нашего КП: включены — строки цены файлов полей сделки "
+              f"{', '.join(doc_folder.ПОЛЯ_НАШЕГО_КП)} идут в поток «{price_store.FEED_НАШЕ_КП}»"
+              + ("" if запись else " (холостой: только замер)"), flush=True)
     if SOURCE == "mail" and MAIL_PRICES:
         print(f"цены писем: включены — строки цены файлов стороны «поставщик» идут в поток "
               f"«{price_store.FEED_ПИСЬМА}»"
@@ -3548,6 +3656,8 @@ def _разбор(шаг: dict) -> int:
     else:
         refs = (collect_refs_rfq(DAYS, SHARD, SHARDS) if SOURCE == "rfq"
                 else collect_refs(DAYS, SHARD, SHARDS))
+        if запись:
+            записать_связи()
     mine = [r for r in refs if ключ_ссылки(r) not in done]
     # Новые файлы окна, срезанные LIMIT: с ними ежедневный проход писем границу
     # не отдаёт (итог_прохода_писем). Повторы «не скачался» сверх предела её не
@@ -3713,10 +3823,11 @@ def _разбор(шаг: dict) -> int:
     if total_items:
         print(f"позиции: с кодом {с_кодом} · с количеством {с_колвом}"
               f" · по пути разбора {dict(пути.most_common())}")
-    if SOURCE == "rfq":
+    if SOURCE == "rfq" or (SOURCE == "deals" and НАШЕ_КП):
         print(f"строк с ценой: {цен}"
-              + (f" ({цен * 100 // total_items} % позиций)" if total_items else ""))
-    if SOURCE == "rfq" or (SOURCE == "mail" and MAIL_PRICES):
+              + (f" ({цен * 100 // total_items} % позиций)" if total_items else "")
+              + (f" · поток «{price_store.FEED_НАШЕ_КП}»" if SOURCE == "deals" else ""))
+    if SOURCE == "rfq" or (SOURCE == "mail" and MAIL_PRICES) or (SOURCE == "deals" and НАШЕ_КП):
         print(price_store.строка_отказов())
     if SOURCE == "mail" and MAIL_PRICES:
         for строка_замера in замер_цен.строки(запись):

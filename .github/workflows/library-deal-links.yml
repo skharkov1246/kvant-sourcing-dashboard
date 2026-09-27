@@ -1,0 +1,99 @@
+name: Библиотека — досчёт связей карточка → сделка → заказчик
+
+# СКВОЗНОЙ СВОД. Недельный свод предложений (scripts/weekly_offers.py) идёт
+# «КП поставщика → запрос → сделка → заказчик → наше КП заказчику», а в
+# библиотеке не хранилось, какой сделке служит карточка запроса СП-166
+# (parentId2) и кто заказчик сделки. Разбор теперь пишет обе связи из того же
+# обхода (indexer.записать_связи); этот прогон досчитывает ИСТОРИЮ — все
+# карточки и все сделки (library/backfill_deal_links.py) в таблицы
+# lib_rfq_cards и lib_deals (library/supabase/deal_links_schema.sql).
+#
+# ПОРЯДОК: сначала «ZIP base — apply DB migrations» (таблицы и виды), потом этот
+# прогон с plan (только счёт из базы), потом вхолостую с limit (замер и сверка
+# Python ↔ SQL на выборке), и только по замеру — с apply. Откат — вход rollback
+# с ключом lk-… из журнала записи.
+#
+# НАГРУЗКА НА ПОРТАЛ (CLAUDE.md, «Битрикс не перегружать»): по ключу «>id»/«>ID»
+# с start=-1, страница 50 записей — около записей/50 запросов на сущность плюс
+# по одному на часть и на наибольший номер. План с оценкой сверху печатается до
+# обращения к порталу. Части идут подряд в одном процессе, поэтому
+# BITRIX_PARALLEL=1; очередь — общая bitrix-portal (ожидающий в группе ОДИН:
+# новая постановка снимает ожидающую).
+#
+# Только ручной запуск. В журнал — только агрегаты (правило 17).
+on:
+  workflow_dispatch:
+    inputs:
+      entities:
+        description: "Что досчитывать через запятую: cards (карточки СП-166 → сделка), deals (сделка → заказчик)"
+        type: string
+        default: "cards,deals"
+      shards:
+        # Правило дробления: части — вход, а не число в файле. Упавшая часть
+        # уносит только свою долю, повтор берёт то, чего нет в таблицах.
+        description: "На сколько частей делить диапазон номеров каждой сущности"
+        type: choice
+        options: ["10", "25", "50"]
+        default: "10"
+      limit:
+        description: "Не больше стольких записей на сущность, от свежих номеров (0 — все); для замера — 500"
+        type: string
+        default: "0"
+      plan:
+        description: "Только план: счёт из базы, портал не читается"
+        type: boolean
+        default: false
+      apply:
+        description: "Записать новые строки (без галочки — вхолостую, соединение только для чтения)"
+        type: boolean
+        default: false
+      rollback:
+        description: "Откатить досчёт с этим ключом (lk-…); портал не читается"
+        type: string
+        default: ""
+      bitrix_rps:
+        description: "Запросов в секунду к порталу (лимит портала — 2)"
+        type: choice
+        options: ["0.8", "1.2"]
+        default: "1.2"
+
+permissions:
+  contents: read
+
+concurrency:
+  # plan и rollback портал НЕ читают (выход до первого запроса), поэтому им в
+  # общей очереди портала не место: там ждёт ОДИН, и постановка «только план»
+  # или «откат» сняла бы ожидающий прогон, который портал читает. Замер и
+  # запись — в общей bitrix-portal.
+  group: ${{ (inputs.plan || inputs.rollback != '') && 'library-deal-links-db' || 'bitrix-portal' }}
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      BITRIX_RPS: ${{ inputs.bitrix_rps }}
+      BITRIX_PARALLEL: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+
+      - name: Досчёт связей карточка → сделка → заказчик
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ENTITIES: ${{ inputs.entities }}
+          SHARDS: ${{ inputs.shards }}
+          LIMIT: ${{ inputs.limit }}
+          PLAN: ${{ inputs.plan && '1' || '' }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          ROLLBACK: ${{ inputs.rollback }}
+          RUN_ID: lk-${{ github.run_id }}
+        run: python library/backfill_deal_links.py

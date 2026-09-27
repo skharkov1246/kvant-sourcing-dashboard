@@ -35,6 +35,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import indexer  # noqa: E402
+import doc_folder  # noqa: E402  (папка файла по сущности и коду поля)
 import price_store  # noqa: E402  (запись цены — одна на все разборы)
 
 APPLY = os.environ.get("APPLY", "") not in ("", "0", "false")
@@ -43,6 +44,24 @@ APPLY = os.environ.get("APPLY", "") not in ("", "0", "false")
 # Цена — ответ поставщика, другого источника у неё нет; позиции восстановимы
 # переразбором, а цена, которой в файле больше не увидят, — нет.
 НЕ_ХУЖЕ = os.environ.get("APPLY_ONLY_BETTER", "1") not in ("0", "false")
+
+#: ОТБОР ПО ПАПКЕ ДОКУМЕНТА (REPARSE_FOLDER — название папки из doc_folder.ПАПКИ).
+#: Папка считается ЗДЕСЬ, по сущности и полю файла (doc_folder.определить), а не
+#: читается из lib_files.doc_kind: у файлов, разобранных до появления колонки,
+#: её нет, а поле есть у всех.
+ПАПКА = os.environ.get("REPARSE_FOLDER", "").strip()
+#: ЦЕНЫ НАШЕГО КП ЗАКАЗЧИКУ (REPARSE_FOLDER = «наше предложение заказчику»,
+#: только SOURCE=deals). Особый режим: переразбор пишет ТОЛЬКО строки цены в
+#: поток price_store.FEED_НАШЕ_КП — спрос (lib_demand) и учёт файлов (lib_files)
+#: не трогаются вовсе. Поэтому версия разборщика здесь не отбирает: цен этого
+#: потока до 27.09.2026 не писал никто, а повтор режима идемпотентен (прежние
+#: цены потока снимаются по файлу, price_store.записать) и пометок спроса не
+#: плодит. Берутся файлы только с ТОЧНЫМ кодом поля нашего КП
+#: (doc_folder.наше_кп_сделки) — то же правило, по которому пишет разбор.
+#: «Стало хуже» судится по цене потока, как у предложений.
+#: Откат потока целиком — снять его строки по feed (до 27.09.2026 поток пуст,
+#: ни один вид его не читает; price_store.СНЯТЬ делает то же по файлу).
+НАШЕ_КП_РЕЖИМ = ПАПКА == doc_folder.НАШЕ_ПРЕДЛОЖЕНИЕ
 
 
 def стало_хуже(источник: str, цен_было: int, цен_стало: int,
@@ -57,7 +76,7 @@ def стало_хуже(источник: str, цен_было: int, цен_ст
     лучше 6 860 файлов, ХУЖЕ 2 813 — а по цене «меньше» 0. Позиция сделки — это
     спрос заказчика, звено, из которого достаются машины, узлы и запчасти.
     """
-    if источник == "rfq":
+    if источник == "rfq" or НАШЕ_КП_РЕЖИМ:
         return цен_стало < цен_было
     return позиций_стало < позиций_было
 
@@ -292,10 +311,23 @@ ORIGIN = "поле запроса" if indexer.SOURCE == "rfq" else "поле с�
 # выбывает из кандидатов: границы, посчитанные по кандидатам, у поздних частей
 # сдвинулись бы, и между частями легли бы пропуски. Этот набор записью не меняется.
 DEALS_OF_FILES = """
-select coalesce(nullif(regexp_replace(f.deal_id, '[^0-9]', '', 'g'), ''), '0')::bigint
+select coalesce(nullif(regexp_replace(f.deal_id, '[^0-9]', '', 'g'), ''), '0')::bigint,
+       f.field, to_jsonb(f) ->> 'field_title'
   from lib_files f
  where f.kind = any(%s)
    and f.origin = %s"""
+
+
+def в_папке(поле: str | None, название: str | None) -> bool:
+    """Файл в папке отбора (REPARSE_FOLDER). Без отбора — любой.
+
+    Наше КП — только по ТОЧНОМУ коду поля (doc_folder.наше_кп_сделки), как пишет
+    разбор; прочие папки — doc_folder.определить по коду, иначе по названию."""
+    if not ПАПКА:
+        return True
+    if НАШЕ_КП_РЕЖИМ:
+        return doc_folder.наше_кп_сделки(ORIGIN, поле)
+    return doc_folder.определить(ORIGIN, поле, название)[0] == ПАПКА
 
 
 def границы_по_файлам(номера: list[int], shard: int, shards: int) -> tuple[int, int | None]:
@@ -321,10 +353,10 @@ def границы_по_файлам(номера: list[int], shard: int, shards
 
 
 CANDIDATES = """
-select f.file_id, f.kind, coalesce(f.rows_found, 0)
+select f.file_id, f.kind, coalesce(f.rows_found, 0), f.field, to_jsonb(f) ->> 'field_title'
   from lib_files f
  where (f.status = 'разобран' or (%s and f.status = any(%s)))
-   and coalesce(f.parser_version, 1) < %s
+   and (%s or coalesce(f.parser_version, 1) < %s)
    and f.kind = any(%s)
    and f.origin = %s"""
 
@@ -408,6 +440,9 @@ select source_url, count(*)::bigint
 # СТРОКИ РАСПОЗНАВАНИЯ — НЕ СВОИ. У смешанного PDF строки страниц-сканов пишет
 # распознавание, и переразбор текстовых страниц их не заменяет: пометь он их
 # вместе со своими — следующий же переразбор стирал бы вклад сканов.
+#: Поток, чьи цены «было» и которым судится «стало хуже».
+ПОТОК_ЦЕН = price_store.FEED_НАШЕ_КП if НАШЕ_КП_РЕЖИМ else price_store.FEED
+
 OLD_ROWS = ("select id from lib_demand where source_file = %s"
             " and source is distinct from %s")
 MARK = ("insert into lib_row_junk (demand_id, rule, run_id, marks) "
@@ -426,6 +461,18 @@ def main() -> int:
         print(f"переразбор источника SOURCE={indexer.SOURCE!r} не поддержан: "
               "только deals или rfq", file=sys.stderr)
         return 2
+    if ПАПКА and ПАПКА not in doc_folder.ПАПКИ:
+        print(f"неизвестная папка REPARSE_FOLDER={ПАПКА!r}: допустимо "
+              + ", ".join(doc_folder.ПАПКИ), file=sys.stderr)
+        return 2
+    if НАШЕ_КП_РЕЖИМ and indexer.SOURCE != "deals":
+        print("цены нашего КП лежат в полях СДЕЛКИ: REPARSE_FOLDER «наше предложение "
+              "заказчику» — только с SOURCE=deals", file=sys.stderr)
+        return 2
+    if НАШЕ_КП_РЕЖИМ:
+        # Тот же признак, что у разбора со входом OUR_OFFER_PRICES: handle()
+        # ищет цену (и в текстовом пути) только у файлов, где цены_файла — да.
+        indexer.НАШЕ_КП = True
     for var in ("BITRIX_WEBHOOK_URL", "SUPABASE_DB_URL"):
         if not os.environ.get(var):
             print(f"нет переменной {var}", file=sys.stderr)
@@ -439,6 +486,11 @@ def main() -> int:
     print(f"режим: {'ЗАПИСЬ В БАЗУ' if APPLY else 'холостой, без записи'} · прогон {run_id}")
     print(f"источник: {ОПИСАНИЕ_ИСТОЧНИКА} (origin = «{ORIGIN}»)")
     print(f"форматы к переразбору: {', '.join(KINDS)}", flush=True)
+    if ПАПКА:
+        print(f"отбор по папке: «{ПАПКА}»"
+              + (f" — ТОЛЬКО цены в поток «{price_store.FEED_НАШЕ_КП}» (поля "
+                 f"{', '.join(doc_folder.ПОЛЯ_НАШЕГО_КП)}); спрос и lib_files не трогаются,"
+                 " версия разборщика не отбирает" if НАШЕ_КП_РЕЖИМ else ""), flush=True)
     # ПРАВКА ЦЕНЫ ПЕЧАТАЕТСЯ ЯВНО: журнал обязан говорить, на чём шёл прогон.
     print(f"правка цены: словарь v2 (PRICE_DICT_V2) "
           f"{'ВКЛ' if indexer.quotes.СЛОВАРЬ_V2 else 'выкл'} · таблица без шапки "
@@ -477,16 +529,18 @@ def main() -> int:
                   f"{', '.join(нет_обязательных + нет_сведений)} — холостому прогону они не "
                   "нужны" + (", но запись без миграции не пройдёт" if нет_обязательных
                              else ", запись пойдёт без них"), flush=True)
-        cur.execute(CANDIDATES, (НЕУДАВШИЕСЯ, list(СТАТУСЫ_НЕУДАЧИ),
+        cur.execute(CANDIDATES, (НЕУДАВШИЕСЯ, list(СТАТУСЫ_НЕУДАЧИ), НАШЕ_КП_РЕЖИМ,
                                  indexer.PARSER_VERSION, list(KINDS), ORIGIN))
-        было = {r[0]: (r[1], r[2]) for r in cur.fetchall()}
-        cur.execute(ЦЕНЫ_БЫЛО, (price_store.FEED, price_store.ИСТОЧНИК_СКАНА,
+        было = {r[0]: (r[1], r[2]) for r in cur.fetchall()
+                if not ПАПКА or в_папке(r[3], r[4])}
+        cur.execute(ЦЕНЫ_БЫЛО, (ПОТОК_ЦЕН, price_store.ИСТОЧНИК_СКАНА,
                                 sorted(было)))
         цен_было_по_файлу = {r[0]: int(r[1]) for r in cur.fetchall()}
         номера_сделок: list[int] = []
         if indexer.SOURCE != "rfq":
             cur.execute(DEALS_OF_FILES, (list(KINDS), ORIGIN))
-            номера_сделок = [int(r[0]) for r in cur.fetchall()]
+            номера_сделок = [int(r[0]) for r in cur.fetchall()
+                              if not ПАПКА or в_папке(r[1], r[2])]
     conn.close()
     print(f"кандидатов на переразбор: {len(было)}"
           + (" (включая НЕУДАВШИЕСЯ: пусто, формат не читаем, текст без спецификации)"
@@ -601,6 +655,17 @@ def main() -> int:
         """
         c = indexer.connect()
         try:
+            if НАШЕ_КП_РЕЖИМ:
+                # ТОЛЬКО ЦЕНЫ НАШЕГО КП: прежние строки потока по файлу снимаются
+                # и явно (записать() пустой буфер пропускает), спрос и lib_files
+                # не трогаются.
+                with c.cursor() as cur:
+                    cur.execute(price_store.СНЯТЬ, (price_store.FEED_НАШЕ_КП,
+                                                    price_store.ИСТОЧНИК_СКАНА,
+                                                    [rec["file_id"]]))
+                    price_store.записать(cur, цены, psycopg2.extras.execute_values)
+                c.commit()
+                return
             with c.cursor() as cur:
                 cur.execute(OLD_ROWS, (rec["file_id"], price_store.ИСТОЧНИК_СКАНА))
                 старые = [r[0] for r in cur.fetchall()]
@@ -646,6 +711,12 @@ def main() -> int:
             найдено = sum(1 for it in items if it.get("_цена"))
             цены = цены_к_записи(items) if indexer.SOURCE == "rfq" else []
             с_ценой = len(цены) if indexer.SOURCE == "rfq" else найдено
+            if НАШЕ_КП_РЕЖИМ:
+                # Строки нашего КП — той же дорогой, что у разбора (строки_цен:
+                # поток FEED_НАШЕ_КП и отсев ложных строк), и тем же списком
+                # судится «стало хуже».
+                цены = indexer.строки_цен(rec, items)
+                с_ценой = len(цены)
             цен_найдено += с_ценой
             файлов_с_ценой += bool(с_ценой)
             клетка = (rec.get("parse_path") or "(не указан)",
@@ -844,11 +915,16 @@ def main() -> int:
             print(f"        {n:>7}  {вид}")
     print(f"строк с ценой в этих файлах: {num(цен_найдено)} "
           f"у {файлов_с_ценой} файлов из {len(mine)}")
-    if indexer.SOURCE == "rfq":
+    if indexer.SOURCE == "rfq" or НАШЕ_КП_РЕЖИМ:
         print(price_store.строка_отказов())
     if indexer.SOURCE == "rfq":
         print("цены " + ("ЗАПИСАНЫ" if APPLY else "будут записаны при APPLY=1")
               + ": это ответ поставщика, другого смысла у неё нет.")
+    elif НАШЕ_КП_РЕЖИМ:
+        print("цены нашего КП " + ("ЗАПИСАНЫ" if APPLY else "будут записаны при APPLY=1")
+              + f" в поток «{price_store.FEED_НАШЕ_КП}» — отдельно от предложений"
+              " поставщиков; спрос и lib_files не тронуты. Откат — снять строки"
+              " этого потока (до 27.09.2026 он пуст).")
     else:
         print("цены НЕ записаны: во вложении сделки цена бывает и предложением")
         print("поставщика, и бюджетом заказчика — писать их вперемешку значит")
@@ -862,7 +938,9 @@ def main() -> int:
     if not APPLY:
         print("\nхолостой прогон — в базе ничего не изменилось. Для записи: APPLY=1")
     else:
-        print(f"\n✓ записано файлов: {записано_файлов} · откат: REVERT={run_id} у mark_prose.py")
+        print(f"\n✓ записано файлов: {записано_файлов}"
+              + (" (только цены нашего КП)" if НАШЕ_КП_РЕЖИМ
+                 else f" · откат: REVERT={run_id} у mark_prose.py"))
         if пропущено_хуже:
             мерило = "цене" if indexer.SOURCE == "rfq" else "позициям"
             print(f"  пропущено как «стало хуже по {мерило}»: {пропущено_хуже} файлов —"
