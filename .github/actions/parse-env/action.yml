@@ -2,7 +2,7 @@ name: Окружение разбора вложений
 description: >-
   Одна точка правды для всех прогонов разбора: пакеты Python и системные читатели
   форматов, распознавание и флаги разбора (HEADER_RELAX, CASCADE, SPECGATE,
-  PDF_ONE_PASS, RETRY_FAILED, RETRY_FAILED_LIMIT) в окружение задания.
+  PDF_ONE_PASS, RETRY_FAILED, RETRY_FAILED_LIMIT, FALSE_PRICE_RULE) в окружение задания.
 
 # ЗАЧЕМ ОДНА ТОЧКА. До 26.09.2026 ночной разбор котировок (suppliers-quotes.yml)
 # и ежедневное пополнение (library-daily.yml) шли без ослабленной шапки и без
@@ -38,6 +38,14 @@ inputs:
   pdf_one_pass:
     description: "PDF читать один раз: 1 — да, 0 или пусто — нет"
     default: ""
+  # ОТСЕВ ЛОЖНЫХ СТРОК ЦЕНЫ ПРИ ЗАПИСИ (quotes.ложная_цена, price_store.отобрать).
+  # Включён 27.09.2026 после холостого замера и пометки записанного
+  # (scripts/mark_false_prices.py: 701 строка из 64 915, четыре гейта, сверка
+  # Python ↔ SQL): без него ночной разбор писал бы строки, которые пометка уже
+  # сняла. Выключается входом ручного прогона — для замера A/B.
+  false_price_rule:
+    description: "Отсев ложных строк цены при записи: 1 — включён, 0 или пусто — выключен"
+    default: "1"
   retry_failed:
     description: "Повторять файлы «не скачался»: 1 — да, 0 или пусто — нет"
     default: "1"
@@ -109,11 +117,12 @@ runs:
         IN_PDF_ONE_PASS: ${{ inputs.pdf_one_pass }}
         IN_RETRY_FAILED: ${{ inputs.retry_failed }}
         IN_RETRY_FAILED_LIMIT: ${{ inputs.retry_failed_limit }}
+        IN_FALSE_PRICE_RULE: ${{ inputs.false_price_rule }}
       run: |
         set -euo pipefail
         for pair in "HEADER_RELAX=$IN_HEADER_RELAX" "CASCADE=$IN_CASCADE" \
                     "SPECGATE=$IN_SPECGATE" "PDF_ONE_PASS=$IN_PDF_ONE_PASS" \
-                    "RETRY_FAILED=$IN_RETRY_FAILED"; do
+                    "RETRY_FAILED=$IN_RETRY_FAILED" "FALSE_PRICE_RULE=$IN_FALSE_PRICE_RULE"; do
           case "${pair#*=}" in
             1|0|"") ;;
             *) echo "::error::флаг разбора ${pair%%=*}: «${pair#*=}» — допустимо 1, 0 или пусто"; exit 1 ;;
@@ -126,4 +135,5 @@ runs:
         echo "RETRY_FAILED_LIMIT=$IN_RETRY_FAILED_LIMIT" >> "$GITHUB_ENV"
         echo "флаги разбора: HEADER_RELAX=${IN_HEADER_RELAX:-пусто} CASCADE=${IN_CASCADE:-пусто}" \
              "SPECGATE=${IN_SPECGATE:-пусто} PDF_ONE_PASS=${IN_PDF_ONE_PASS:-пусто}" \
-             "RETRY_FAILED=${IN_RETRY_FAILED:-пусто} RETRY_FAILED_LIMIT=$IN_RETRY_FAILED_LIMIT"
+             "RETRY_FAILED=${IN_RETRY_FAILED:-пусто} RETRY_FAILED_LIMIT=$IN_RETRY_FAILED_LIMIT" \
+             "FALSE_PRICE_RULE=${IN_FALSE_PRICE_RULE:-пусто}"

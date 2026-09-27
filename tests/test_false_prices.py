@@ -40,6 +40,7 @@ from __future__ import annotations
 import importlib.util
 import inspect
 import sys
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -687,3 +688,43 @@ def test_мутация_ловится(имя, monkeypatch):
     эталон = _ответы()
     МУТАЦИИ[имя](monkeypatch)
     assert _ответы() != эталон, f"мутация «{имя}» выжила"
+
+
+def _табличная(имя, кол, цена, сумма, код="", ед="") -> tuple:
+    """Строка цены табличного пути так, как её пишет разбор."""
+    return price_store.строка({"source_file": "Ф-Т", "item_name": имя, "part_number": код,
+                               "oem": "", "unit": ед, "qty": кол},
+                              {"price": цена, "currency": None, "confidence": "low",
+                               "note": ИЗ_СУММЫ, "total": сумма}, str)
+
+
+def test_запись_не_режет_массово_обвинённую_таблицу_как_и_пометка(monkeypatch):
+    """Таблица, у которой обвинено не меньше МАССОВО_СТРОК строк и не меньше
+    МАССОВО_ДОЛЯ, пишется как есть и считается в ОТЛОЖЕНО — так же, как пометка
+    откладывает её (MASS_HOLD). Одиночная ложная строка другого файла снимается;
+    строки текстового пути массовость не спасает."""
+    monkeypatch.setattr(price_store, "ОТКАЗАНО", Counter())
+    monkeypatch.setattr(price_store, "ОТЛОЖЕНО", Counter())
+    ложная = _табличная("Page 1", 1, 1.0, 1.0)
+    настоящая = _табличная("Втулка выдуманная", 5, 12.0, 60.0, код="QX-1001", ед="шт")
+    файл = [ложная] * price_store.МАССОВО_СТРОК + [настоящая] * 3
+    assert price_store.отобрать(файл) == файл
+    assert price_store.ОТЛОЖЕНО == Counter({"файлов": 1, "строк": price_store.МАССОВО_СТРОК})
+    assert not price_store.ОТКАЗАНО
+    # Строка текстового пути того же файла массовостью таблицы не спасается.
+    текстовая = price_store.строка({"source_file": "Ф-Т", "item_name": "Page 2", "qty": 20,
+                                    "part_number": "", "oem": "", "unit": ""},
+                                   {"price": 1.0, "currency": None, "confidence": "low",
+                                    "note": ТЕКСТ, "total": None}, str)
+    assert price_store.отобрать(файл + [текстовая]) == файл
+    assert price_store.ОТКАЗАНО == Counter({"страница": 1})
+    price_store.ОТКАЗАНО.clear()
+    # Меньше порога — ложные строки снимаются, как у пометки.
+    мало = [ложная] * (price_store.МАССОВО_СТРОК - 1) + [настоящая] * 3
+    assert price_store.отобрать(мало) == [настоящая] * 3
+    assert sum(price_store.ОТКАЗАНО.values()) == price_store.МАССОВО_СТРОК - 1
+    # Пороги пометки — те же числа.
+    м = _прибор()
+    assert (м.MASS_ROWS, м.MASS_SHARE) == (price_store.МАССОВО_СТРОК, price_store.МАССОВО_ДОЛЯ)
+    # Два вызова с массовой таблицей (сам файл и он же с текстовой строкой).
+    assert "массово обвинённых таблиц записано как есть: 2 (строк 10)" in price_store.строка_отказов()
