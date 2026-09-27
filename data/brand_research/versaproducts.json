@@ -442,7 +442,9 @@
       "role": "авторизованный складской дистрибьютор Versa (сам себя называет «Master Distributor»)",
       "sources": [
         "https://www.aivinc.com/products/product-line/versa"
-      ]
+      ],
+      "domain": "aivinc.com",
+      "domain_source": "https://www.aivinc.com/products/product-line/versa"
     },
     {
       "company": "TFC Industrial Controls",
@@ -450,7 +452,9 @@
       "role": "дистрибьютор, в каталоге операторы Versa E5-3198",
       "sources": [
         "https://www.tfcindustrialcontrols.com/versa"
-      ]
+      ],
+      "domain": "tfcindustrialcontrols.com",
+      "domain_source": "https://www.tfcindustrialcontrols.com/versa"
     },
     {
       "company": "Hangzhou Gas Turbine Parts Co. Ltd (gas-turbine-parts.com)",
@@ -458,7 +462,9 @@
       "role": "продавец запчастей Solar; публикует кросс SEPOC «номер Solar ↔ номер Versa»; дилерство Versa не подтверждено",
       "sources": [
         "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html"
-      ]
+      ],
+      "domain": "gas-turbine-parts.com",
+      "domain_source": "http://www.gas-turbine-parts.com/News/Product_FAQ/404.html"
     },
     {
       "company": "Gas Turbine Applications (GTA Turbines)",
@@ -466,15 +472,20 @@
       "role": "ремонт агрегатов и склад запчастей Solar, в том числе клапанов Versa под номерами Solar; не дилер Versa",
       "sources": [
         "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
-      ]
+      ],
+      "domain": "gtaturbines.com",
+      "domain_source": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php"
     },
     {
       "company": "Anything Flows",
       "country": "США",
       "role": "дистрибьютор; распространяет каталог VT со своим штампом",
       "sources": [
-        "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf"
-      ]
+        "https://www.anythingflows.com/en/wp-content/uploads/2016/05/Versa-VTSeries-Brass-Solenoid-Catalog_FPD.pdf",
+        "https://www.anythingflows.com/en/"
+      ],
+      "domain": "anythingflows.com",
+      "domain_source": "https://www.anythingflows.com/en/"
     }
   ],
   "gaps": [

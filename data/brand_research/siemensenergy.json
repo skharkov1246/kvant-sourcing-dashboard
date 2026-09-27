@@ -848,16 +848,22 @@
       "country": "Великобритания (рынки: ЕС и Турция)",
       "role": "эксклюзивный пакетировщик SGT-300/SGT-400",
       "sources": [
-        "https://en.wikipedia.org/wiki/Centrax"
-      ]
+        "https://en.wikipedia.org/wiki/Centrax",
+        "https://centraxgt.com/"
+      ],
+      "domain": "centraxgt.com",
+      "domain_source": "https://centraxgt.com/"
     },
     {
       "company": "РИР энерго (сервисный центр; Росатом инфраструктурные решения)",
       "country": "Россия",
       "role": "независимый сервис: техобслуживание, средние и капитальные ремонты SGT-800 и SGT-600",
       "sources": [
-        "https://www.ixbt.com/news/2026/01/21/siemens-general-electric.html"
-      ]
+        "https://www.ixbt.com/news/2026/01/21/siemens-general-electric.html",
+        "https://orel.rirenergy.ru/press/news/na-tets-rosatoma-v-ryazani-i-v-tule-zavershyen-kapitalnyy-remont-importnogo-oborudovaniya-parogazovy/"
+      ],
+      "domain": "rirenergy.ru",
+      "domain_source": "https://orel.rirenergy.ru/press/news/na-tets-rosatoma-v-ryazani-i-v-tule-zavershyen-kapitalnyy-remont-importnogo-oborudovaniya-parogazovy/"
     },
     {
       "company": "Турбосервис (Екатеринбург)",
@@ -865,7 +871,9 @@
       "role": "независимый ремонт: локализован ремонт основных компонентов SGT-800, в планах SGT-400 и SGT-300",
       "sources": [
         "http://seturbo.ru/news/turboservis-vedet-rabotu-nad-rasshireniem-lineyki-obsluzhivaemykh-gtu-/"
-      ]
+      ],
+      "domain": "seturbo.ru",
+      "domain_source": "http://seturbo.ru/news/turboservis-vedet-rabotu-nad-rasshireniem-lineyki-obsluzhivaemykh-gtu-/"
     },
     {
       "company": "DMEnergy",
@@ -945,7 +953,9 @@
       "role": "изготовление деталей горячего тракта по образцу или чертежу (реверс-инжиниринг); публикует списки номеров Siemens; сам заявляет, что не авторизован OEM",
       "sources": [
         "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/"
-      ]
+      ],
+      "domain": "turbineblade.net",
+      "domain_source": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/"
     },
     {
       "company": "Yursat",
