@@ -185,7 +185,7 @@ def test_запись_помечает_ровно_обвинённое_и_вид
     assert причины <= set(price_store.quotes.ПРИЧИНЫ_ЛОЖНОЙ)
     журнал = _выбрать(база, "select rule, mode, rows_marked, finished_at is not null"
                             " from lib_mark_runs where run_id = 'ложная-цена-тест-1'")
-    assert журнал == [("ложная-цена-v1", "разметка", len(ЛОЖНЫЕ), True)]
+    assert журнал == [(price_store.quotes.ЛОЖНАЯ_ЦЕНА_ВЕРСИЯ, "разметка", len(ЛОЖНЫЕ), True)]
     # Чужой поток не тронут, хоть строка и похожа на итог.
     assert _выбрать(база, "select count(*) from lib_prices_live where feed = 'прайс'") == [(1,)]
     # Повторная запись не ставит пометок заново: уже помечены.

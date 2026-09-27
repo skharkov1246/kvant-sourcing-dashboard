@@ -805,9 +805,11 @@ def записать_файл(cur, run_id: str, rec: dict, items: list[dict],
             новые_строки = [x[0] for x in execute_values(
                 cur, ВСТАВИТЬ_СТРОКИ, [строка_спроса(it) for it in items],
                 page_size=500, fetch=True)]
+        # Отказы ложных строк уже сосчитаны общим циклом (main, и в холостом
+        # прогоне тоже): здесь тот же отбор без повторного счёта.
         цены = price_store.отобрать(
             [price_store.строка(it, it["_цена"], indexer.pg, price_store.ИСТОЧНИК_СКАНА)
-             for it in items if it.get("_цена") and indexer.SOURCE == "rfq"])
+             for it in items if it.get("_цена") and indexer.SOURCE == "rfq"], считать=False)
         новые_цены, выведены = price_store.записать_скан(cur, fid, цены, execute_values)
 
     if режим == ПОСТРАНИЧНО:
@@ -1062,8 +1064,13 @@ def main() -> int:
 
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         for n, (rec, items) in enumerate(pool.map(recognise, mine), 1):
-            с_ценой = sum(1 for it in items
-                          if it.get("_цена") and indexer.SOURCE == "rfq")
+            # «С ЦЕНОЙ» — ТО, ЧТО ЛЯЖЕТ В БАЗУ: строки после отбора ложных, как их
+            # пишет записать_файл. Счёт отказов — здесь, чтобы его видел и
+            # холостой прогон (запись в нём не зовётся), и «своих стало меньше»
+            # мерилось по записываемому (ревизия 27.09.2026, правило 0).
+            с_ценой = len(price_store.отобрать(
+                [price_store.строка(it, it["_цена"], indexer.pg, price_store.ИСТОЧНИК_СКАНА)
+                 for it in items if it.get("_цена") and indexer.SOURCE == "rfq"]))
             if rec["режим"] == ПОСТРАНИЧНО:
                 учесть_слияние(слияние, rec, items, с_ценой, было)
             else:
