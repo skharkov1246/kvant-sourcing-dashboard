@@ -34,7 +34,7 @@ USES = "./.github/actions/parse-env"
                                           # что читает ежедневный проход
 }
 #: Флаги, от которых зависит РЕЗУЛЬТАТ разбора, — они обязаны совпадать.
-ФЛАГИ_РАЗБОРА = ("HEADER_RELAX", "CASCADE", "SPECGATE", "PDF_ONE_PASS")
+ФЛАГИ_РАЗБОРА = ("HEADER_RELAX", "CASCADE", "SPECGATE", "PDF_ONE_PASS", "FALSE_PRICE_RULE")
 #: Всё, что пишет действие, — ни один прогон не вправе задать это сам.
 ВСЕ_ФЛАГИ = ФЛАГИ_РАЗБОРА + ("RETRY_FAILED", "RETRY_FAILED_LIMIT")
 #: Запуск разбора в строке команды.
@@ -116,7 +116,8 @@ def _понял_индексатор(окружение: dict[str, str]) -> dict
     """Что индексатор прочитал из окружения — читает ВЫЗОВ, а не объявление."""
     код = ("import json, indexer as i; print(json.dumps({'HEADER_RELAX': i.ШАПКА_ШИРЕ, "
            "'CASCADE': i.КАСКАД, 'SPECGATE': i.SPECGATE, 'PDF_ONE_PASS': i.ОДИН_ПРОХОД, "
-           "'RETRY_FAILED': i.RETRY_FAILED, 'RETRY_FAILED_LIMIT': i.RETRY_FAILED_LIMIT}))")
+           "'RETRY_FAILED': i.RETRY_FAILED, 'RETRY_FAILED_LIMIT': i.RETRY_FAILED_LIMIT, "
+           "'FALSE_PRICE_RULE': i.quotes.ОТБОР_ЛОЖНЫХ}))")
     env = {к: v for к, v in os.environ.items() if к not in ВСЕ_ФЛАГИ}
     env.update(окружение)
     env["PYTHONPATH"] = str(ROOT / "library") + os.pathsep + env.get("PYTHONPATH", "")
@@ -171,6 +172,7 @@ def test_ночной_ежедневный_и_ручной_считают_оди
         assert п["HEADER_RELAX"] is True, f"{имя}: ослабленная шапка выключена"
         assert п["CASCADE"] is True, f"{имя}: каскад выключен"
         assert п["SPECGATE"] is True, f"{имя}: ворота спецификации выключены"
+        assert п["FALSE_PRICE_RULE"] is True, f"{имя}: отсев ложных цен при записи выключен"
 
 
 @pytest.mark.parametrize("имя", ["suppliers-quotes.yml", "library-daily.yml"])
@@ -187,13 +189,14 @@ def test_выключенный_вход_ручного_прогона_доез�
     wf = _прогон("library-index.yml")
     _, шаг = _шаг_действия(wf, "index")
     входы = {к: dict(v) for к, v in _входы_прогона(wf).items()}
-    for к in ("header_relax", "cascade", "specgate"):
+    for к in ("header_relax", "cascade", "specgate", "false_price_rule"):
         входы[к]["default"] = False
     значения = {к: str(v.get("default", "")) for к, v in _действие()["inputs"].items()}
     for к, v in шаг["with"].items():
         значения[к] = _значение(v, входы)
     п = _понял_индексатор(_исполнить_флаги(значения, tmp_path))
     assert п["HEADER_RELAX"] is False and п["CASCADE"] is False and п["SPECGATE"] is False
+    assert п["FALSE_PRICE_RULE"] is False
 
 
 def test_опечатка_во_флаге_роняет_шаг(tmp_path):

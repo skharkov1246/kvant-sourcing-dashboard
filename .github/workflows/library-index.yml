@@ -152,6 +152,12 @@ on:
         description: "Цена: таблица без шапки — колонки по тройке кол-во × цена = сумма (уверенность low)"
         type: boolean
         default: false
+      # Отсев ложных строк цены при записи — как у ночного разбора (parse-env,
+      # включён 27.09.2026); выключать только для замера A/B.
+      false_price_rule:
+        description: "Отсев ложных строк цены при записи (выключать только для замера)"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -208,6 +214,7 @@ jobs:
           specgate: ${{ inputs.specgate && '1' || '0' }}
           pdf_one_pass: ${{ inputs.pdf_one_pass && '1' || '0' }}
           retry_failed: ${{ inputs.retry_failed && '1' || '0' }}
+          false_price_rule: ${{ inputs.false_price_rule && '1' || '0' }}
           # Ручной добор «не скачался» — без предела: его запускают руками и
           # по делу, бюджет портала считает тот, кто запускает.
           retry_failed_limit: "0"
