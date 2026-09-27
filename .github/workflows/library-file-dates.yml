@@ -1,0 +1,102 @@
+name: Библиотека — досчёт даты прихода файлов
+
+# ДАТА ПРИХОДА ФАЙЛОВ СТОРОНЫ ПОСТАВЩИКА. У lib_files не было даты появления:
+# processed_at переписывает каждая обработка, и недельный свод предложений
+# (scripts/weekly_offers.py) не мог сказать, какие КП пришли за неделю. Новые
+# файлы получают first_seen_at и дату у источника при разборе
+# (library/supabase/file_dates_schema.sql, indexer.дата_у_источника); этот
+# прогон досчитывает дату у источника для уже записанных файлов последних
+# days дней (library/backfill_file_dates.py): письма — CREATED дела-письма,
+# карточки СП-166 и сделки — заголовок Last-Modified ответа закачки файла,
+# с перекрёстными проверками.
+#
+# ПОРЯДОК: сначала «ZIP base — apply DB migrations» (колонки first_seen_at,
+# source_created_at, source_date_src, source_date_run), потом этот прогон с
+# plan (только счёт из базы), потом вхолостую с limit (замер на выборке —
+# смысл заголовка Last-Modified на портале не проверен), и только по замеру —
+# с apply. Откат — вход rollback с ключом fd-… из журнала записи.
+#
+# НАГРУЗКА НА ПОРТАЛ (CLAUDE.md, «Битрикс не перегружать»): запрос на 50 писем,
+# на 50 карточек или сделок и по запросу на файл карточки или сделки — план с
+# числом запросов и временем печатается до обращения к порталу. Части идут
+# подряд в одном процессе, поэтому BITRIX_PARALLEL=1; очередь — общая
+# bitrix-portal (ожидающий в группе ОДИН: новая постановка снимает ожидающую).
+#
+# Только ручной запуск. В журнал — только агрегаты (правило 17).
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "За сколько дней файлы (по их обработке)"
+        type: string
+        default: "60"
+      shards:
+        # Правило дробления: части — вход, а не число в файле. Упавшая часть
+        # уносит только свою долю, повтор берёт то, что осталось пустым.
+        description: "На сколько частей делить владельцев файлов"
+        type: choice
+        options: ["10", "25", "50"]
+        default: "10"
+      sources:
+        description: "Источники через запятую: mail, rfq, deals"
+        type: string
+        default: "mail,rfq,deals"
+      limit:
+        description: "Не больше стольких файлов (0 — все); для замера — 200"
+        type: string
+        default: "0"
+      plan:
+        description: "Только план: счёт из базы, портал не читается"
+        type: boolean
+        default: false
+      apply:
+        description: "Записать даты в базу (без галочки — вхолостую, соединение только для чтения)"
+        type: boolean
+        default: false
+      rollback:
+        description: "Откатить досчёт с этим ключом (fd-…); портал не читается"
+        type: string
+        default: ""
+      bitrix_rps:
+        description: "Запросов в секунду к порталу (лимит портала — 2)"
+        type: choice
+        options: ["0.8", "1.2"]
+        default: "1.2"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      BITRIX_RPS: ${{ inputs.bitrix_rps }}
+      BITRIX_PARALLEL: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary pyxlsb
+
+      - name: Досчёт даты прихода файлов
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          DAYS: ${{ inputs.days }}
+          SHARDS: ${{ inputs.shards }}
+          SOURCES: ${{ inputs.sources }}
+          LIMIT: ${{ inputs.limit }}
+          PLAN: ${{ inputs.plan && '1' || '' }}
+          APPLY: ${{ inputs.apply && '1' || '' }}
+          ROLLBACK: ${{ inputs.rollback }}
+          RUN_ID: fd-${{ github.run_id }}
+        run: python library/backfill_file_dates.py

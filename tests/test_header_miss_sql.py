@@ -108,7 +108,8 @@ def test_переразбор_проверяет_колонки_до_запис�
     """
     import library.reparse as r
     sql, _ = правка()
-    названные = set(re.findall(r"(\w+) = (?:%s|coalesce\(%s)", sql[:sql.index("where")]))
+    названные = set(re.findall(r"(\w+) = (?:%s|coalesce\(%s|coalesce\(\1, %s)",
+                               sql[:sql.index("where")]))
     assert названные == set(r.КОЛОНКИ_ЗАПИСИ), \
         f"UPDATE и проверка разошлись: {sorted(названные ^ set(r.КОЛОНКИ_ЗАПИСИ))}"
     # И проверка должна стоять РАНЬШЕ обхода портала: иначе половина уже записана.
