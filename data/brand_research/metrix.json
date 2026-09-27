@@ -740,7 +740,9 @@
       "role": "перепродавец по каталогу Metrix; сам называет себя представительством в РФ и СНГ, у изготовителя это не подтверждено",
       "sources": [
         "https://metrix.nt-rt.ru/en"
-      ]
+      ],
+      "domain": "nt-rt.ru",
+      "domain_source": "https://metrix.nt-rt.ru/en"
     },
     {
       "company": "Branom Instrument Company",
@@ -748,15 +750,20 @@
       "role": "дистрибьютор (страница бренда Metrix)",
       "sources": [
         "https://www.branom.com/metrix"
-      ]
+      ],
+      "domain": "branom.com",
+      "domain_source": "https://www.branom.com/metrix"
     },
     {
       "company": "Radwell International",
       "country": "США",
       "role": "перепродавец запчастей (5485C-006, 5485C-008)",
       "sources": [
-        "https://www.radwell.com/Buy/METRIX%20VIBRATION/METRIX%20VIBRATION/5485C-006"
-      ]
+        "https://www.radwell.com/Buy/METRIX%20VIBRATION/METRIX%20VIBRATION/5485C-006",
+        "https://www.radwell.com/"
+      ],
+      "domain": "radwell.com",
+      "domain_source": "https://www.radwell.com/"
     }
   ],
   "gaps": [

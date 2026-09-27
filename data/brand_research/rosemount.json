@@ -783,7 +783,9 @@
       "sources": [
         "https://www.metran.ru/news/kompaniya_metran_poluchila_spetsialnoe_razreshenie_na_sdelku_po_priobreteniyu_rossiyskogo_biznesa_ko/",
         "https://www.interfax.ru/russia/887234"
-      ]
+      ],
+      "domain": "metran.ru",
+      "domain_source": "https://www.metran.ru/news/kompaniya_metran_poluchila_spetsialnoe_razreshenie_na_sdelku_po_priobreteniyu_rossiyskogo_biznesa_ko/"
     },
     {
       "company": "ГК «Теплоприбор»",
@@ -791,7 +793,9 @@
       "role": "продавец (каталог Rosemount 3051C/T/L); официальный статус не подтверждён",
       "sources": [
         "https://xn--90ahjlpcccjdm.xn--p1ai/catalog/preobrazovatel-rosemount-3051-3051c-3051t-3051l/"
-      ]
+      ],
+      "domain": "xn--90ahjlpcccjdm.xn--p1ai",
+      "domain_source": "https://xn--90ahjlpcccjdm.xn--p1ai/catalog/preobrazovatel-rosemount-3051-3051c-3051t-3051l/"
     },
     {
       "company": "ЭКОХИМ",
@@ -799,15 +803,20 @@
       "role": "продавец (каталог Rosemount 3051); официальный статус не подтверждён",
       "sources": [
         "https://ekohim.com/catalog/metrologiya_kip/davlenie/datchiki_davleniya/preobrazovateli_davleniya_rosemount_3051/"
-      ]
+      ],
+      "domain": "ekohim.com",
+      "domain_source": "https://ekohim.com/catalog/metrologiya_kip/davlenie/datchiki_davleniya/preobrazovateli_davleniya_rosemount_3051/"
     },
     {
       "company": "Метр-К",
       "country": "Россия",
       "role": "продавец (раздел Rosemount 3051); официальный статус не подтверждён",
       "sources": [
-        "https://metr-k.ru/products/instrumentation/pressure/rosemount-3051/"
-      ]
+        "https://metr-k.ru/products/instrumentation/pressure/rosemount-3051/",
+        "https://metr-k.ru/"
+      ],
+      "domain": "metr-k.ru",
+      "domain_source": "https://metr-k.ru/"
     },
     {
       "company": "Instrumart",
@@ -823,8 +832,11 @@
       "country": "США",
       "role": "дистрибьютор, выкладывает листы данных 644 и 3051SMV",
       "sources": [
-        "https://www.transcat.com/media/pdf/00813-0100-4728.pdf"
-      ]
+        "https://www.transcat.com/media/pdf/00813-0100-4728.pdf",
+        "https://www.transcat.com/brand/rosemount-store"
+      ],
+      "domain": "transcat.com",
+      "domain_source": "https://www.transcat.com/brand/rosemount-store"
     }
   ],
   "gaps": [

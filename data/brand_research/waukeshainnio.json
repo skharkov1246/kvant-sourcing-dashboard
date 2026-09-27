@@ -957,16 +957,22 @@
       "country": "Казахстан",
       "role": "официальный провайдер по локатору waukeshaengine.com (территория — Казахстан): продажа двигателей, компоновка компрессорных и энергоагрегатов, запчасти, сервис",
       "sources": [
-        "https://www.waukeshaengine.com/providers/es-compression/"
-      ]
+        "https://www.waukeshaengine.com/providers/es-compression/",
+        "https://www.es-compression.com/"
+      ],
+      "domain": "es-compression.com",
+      "domain_source": "https://www.es-compression.com/"
     },
     {
       "company": "DYNATEC (иностранное ООО)",
       "country": "Узбекистан",
       "role": "официальный провайдер по локатору (Узбекистан, Туркменистан): продажа двигателей, запчасти, сервис",
       "sources": [
-        "https://www.waukeshaengine.com/providers/dynatec-mas-uliyati-cheklangan-jamiyati-xorijiy-korxonasi/"
-      ]
+        "https://www.waukeshaengine.com/providers/dynatec-mas-uliyati-cheklangan-jamiyati-xorijiy-korxonasi/",
+        "https://dynatec.uz/"
+      ],
+      "domain": "dynatec.uz",
+      "domain_source": "https://dynatec.uz/"
     },
     {
       "company": "KTS Engineering LLC",
@@ -985,40 +991,55 @@
       "role": "официальный провайдер по локатору. Одна запись — на территорию Турции, другая — на Ближний Восток (ОАЭ, Ирак, Кувейт, Катар, Иордания и др.); адрес — Джебель-Али, Дубай. Продажа двигателей, запчасти, сервис",
       "sources": [
         "https://www.waukeshaengine.com/providers/hoerbiger-service-middle-east-fze/",
-        "https://www.waukeshaengine.com/providers/hoerbiger-service-middle-east-fze-6/"
-      ]
+        "https://www.waukeshaengine.com/providers/hoerbiger-service-middle-east-fze-6/",
+        "http://hoerbiger.ae/"
+      ],
+      "domain": "hoerbiger.ae",
+      "domain_source": "http://hoerbiger.ae/"
     },
     {
       "company": "Orient Energy Systems FZCO",
       "country": "ОАЭ",
       "role": "официальный провайдер по локатору (ОАЭ; отдельные записи — Оман и Бахрейн): продажа двигателей, запчасти, сервис",
       "sources": [
-        "https://www.waukeshaengine.com/providers/orient-energy-systems-fzco/"
-      ]
+        "https://www.waukeshaengine.com/providers/orient-energy-systems-fzco/",
+        "https://orient-power.com/contact-us/"
+      ],
+      "domain": "orient-power.com",
+      "domain_source": "https://orient-power.com/contact-us/"
     },
     {
       "company": "Wasco Engineering International Limited (Dubai BR)",
       "country": "ОАЭ",
       "role": "официальный провайдер по локатору: продажа двигателей, компоновка компрессорных агрегатов, запчасти, сервис",
       "sources": [
-        "https://www.waukeshaengine.com/providers/wasco-engineering-international-limited-dubai-br/"
-      ]
+        "https://www.waukeshaengine.com/providers/wasco-engineering-international-limited-dubai-br/",
+        "https://www.wascoenergy.com/global-offices.php"
+      ],
+      "domain": "wascoenergy.com",
+      "domain_source": "https://www.wascoenergy.com/global-offices.php"
     },
     {
       "company": "Enerflex Middle East",
       "country": "ОАЭ",
       "role": "официальный провайдер по локатору (ОАЭ; также Оман, Бахрейн): компоновка компрессорных и энергоагрегатов, сервис; продажи двигателей и запчастей в записи нет",
       "sources": [
-        "https://www.waukeshaengine.com/providers/enerflex-middle-east-for-united-arab-emirates/"
-      ]
+        "https://www.waukeshaengine.com/providers/enerflex-middle-east-for-united-arab-emirates/",
+        "https://www.enerflex.com/contact-us/"
+      ],
+      "domain": "enerflex.com",
+      "domain_source": "https://www.enerflex.com/contact-us/"
     },
     {
       "company": "SHANDONG KERUI Petroleum & Gas Equipment Co., Ltd.",
       "country": "Китай",
       "role": "официальный провайдер по локатору (материковый Китай): продажа двигателей, компоновка агрегатов, запчасти, сервис",
       "sources": [
-        "https://www.waukeshaengine.com/providers/shandong-kerui-petroleum-gas-equipment-co-ltd/"
-      ]
+        "https://www.waukeshaengine.com/providers/shandong-kerui-petroleum-gas-equipment-co-ltd/",
+        "https://www.keruigroup.com/"
+      ],
+      "domain": "keruigroup.com",
+      "domain_source": "https://www.keruigroup.com/"
     },
     {
       "company": "Jereh Oil & Gas Engineering Corporation",
@@ -1026,8 +1047,11 @@
       "role": "официальный провайдер по локатору (материковый Китай; отдельная запись — Пакистан): продажа двигателей, компоновка, запчасти, сервис",
       "sources": [
         "https://www.waukeshaengine.com/providers/jereh-oil-gas-engineering-corporation-zh/",
-        "https://www.waukeshaengine.com/providers/jereh-oil-gas-engineering-corporation-4/"
-      ]
+        "https://www.waukeshaengine.com/providers/jereh-oil-gas-engineering-corporation-4/",
+        "https://www.jereh-gas.com/en/"
+      ],
+      "domain": "jereh-gas.com",
+      "domain_source": "https://www.jereh-gas.com/en/"
     },
     {
       "company": "Xian Ituo Petroleum Technology Co., Ltd.",
@@ -1042,24 +1066,33 @@
       "country": "Китай",
       "role": "официальный провайдер по локатору (Китай, Гонконг, Тайвань), ремонтный цех в Чэнду. В записи оговорка: только газокомпрессорные применения, кроме месторождения Чанцин",
       "sources": [
-        "https://www.waukeshaengine.com/providers/china-diesel-support-services-ltd-chengdu/"
-      ]
+        "https://www.waukeshaengine.com/providers/china-diesel-support-services-ltd-chengdu/",
+        "https://en.cdss.net.cn/"
+      ],
+      "domain": "cdss.net.cn",
+      "domain_source": "https://en.cdss.net.cn/"
     },
     {
       "company": "Clarke Energy India Private Limited",
       "country": "Индия",
       "role": "официальный провайдер по локатору (Индия): продажа двигателей, запчасти, сервис",
       "sources": [
-        "https://www.waukeshaengine.com/providers/clarke-energy-india-provate-limited/"
-      ]
+        "https://www.waukeshaengine.com/providers/clarke-energy-india-provate-limited/",
+        "https://www.clarke-energy.com/company/locations/"
+      ],
+      "domain": "clarke-energy.com",
+      "domain_source": "https://www.clarke-energy.com/company/locations/"
     },
     {
       "company": "S&L Energie-Projekte GmbH",
       "country": "Германия",
       "role": "официальный провайдер по локатору, несколько европейских стран: продажа двигателей, запчасти, сервис; на своём сайте выкладывает техлисты Waukesha",
       "sources": [
-        "https://www.waukeshaengine.com/providers/s-l-energie-projekte-gmbh/"
-      ]
+        "https://www.waukeshaengine.com/providers/s-l-energie-projekte-gmbh/",
+        "https://www.sl-energie.com/de"
+      ],
+      "domain": "sl-energie.com",
+      "domain_source": "https://www.sl-energie.com/de"
     },
     {
       "company": "Waukesha-Pearce Industries (WPI)",
