@@ -609,8 +609,9 @@ CATALOG_CELLS = f"""\
 
 
 # Коды с ценой. Поток «разбор КП» — предложение поставщика в ответ на запрос;
-# «закупочная цена» — любой поток, кроме нашей отпускной цены и розницы
-# конкурента (scripts/codes_with_prices.py, НЕ_ЗАКУПОЧНЫЕ). У каталожных потоков
+# «закупочная цена» — любой поток, кроме нашей отпускной цены, нашего КП
+# заказчику и розницы конкурента (price_store.НЕ_ЗАКУПОЧНЫЕ; сверяет
+# tests/test_our_offer_feed_sql.py). У каталожных потоков
 # part_number пуст, и ключ лежит в part_id — так же и у «разбор КП».
 PRICE_SETS = f"""\
   kp_codes as materialized (
@@ -625,6 +626,7 @@ PRICE_SETS = f"""\
       from (select {price_code("p")} as code
               from lib_prices_live p
              where coalesce(p.feed, '') not in ('ТКП КВАНТ (отпускная цена)',
+                                                'наше КП заказчику',
                                                 'прайсы конкурентов')) z
      where length(z.code) >= 2 and {part_ok("z.code")}
   )"""

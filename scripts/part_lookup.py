@@ -162,8 +162,12 @@ select coalesce(p.currency, '(не названа)')                      as в�
        percentile_disc(0.5) within group (order by p.price)::numeric as медиана,
        max(p.price)::numeric                                     as максимум
   from lib_prices p
- where lib_pn_key(p.part_number) = any(%s)
-    or p.item_name ~* %s
+ where (lib_pn_key(p.part_number) = any(%s)
+        or p.item_name ~* %s)
+   -- Только закупочные потоки: наша отпускная цена и наше КП заказчику — не
+   -- ответ поставщика (library/price_store.py, НЕ_ЗАКУПОЧНЫЕ).
+   and coalesce(p.feed, '') not in ('ТКП КВАНТ (отпускная цена)', 'наше КП заказчику',
+                                    'прайсы конкурентов')
  group by 1 order by 2 desc
 """
 
@@ -174,8 +178,12 @@ select coalesce(p.basis, '(нет)')                                as бази�
        min(p.lead_days)::int                                     as срок_мин,
        max(p.lead_days)::int                                     as срок_макс
   from lib_prices p
- where lib_pn_key(p.part_number) = any(%s)
-    or p.item_name ~* %s
+ where (lib_pn_key(p.part_number) = any(%s)
+        or p.item_name ~* %s)
+   -- Только закупочные потоки: наша отпускная цена и наше КП заказчику — не
+   -- ответ поставщика (library/price_store.py, НЕ_ЗАКУПОЧНЫЕ).
+   and coalesce(p.feed, '') not in ('ТКП КВАНТ (отпускная цена)', 'наше КП заказчику',
+                                    'прайсы конкурентов')
  group by 1, 2 order by 3 desc limit 20
 """
 
@@ -196,8 +204,12 @@ select count(*)::int
 select coalesce(p.rfq_company, '(не указана)'), p.price, p.currency,
        p.lead_days, p.basis, p.pay_terms
   from lib_prices p
- where lib_pn_key(p.part_number) = any(%s)
-    or p.item_name ~* %s
+ where (lib_pn_key(p.part_number) = any(%s)
+        or p.item_name ~* %s)
+   -- Только закупочные потоки: наша отпускная цена и наше КП заказчику — не
+   -- ответ поставщика (library/price_store.py, НЕ_ЗАКУПОЧНЫЕ).
+   and coalesce(p.feed, '') not in ('ТКП КВАНТ (отпускная цена)', 'наше КП заказчику',
+                                    'прайсы конкурентов')
  order by p.price nulls last limit 100
 """
 
