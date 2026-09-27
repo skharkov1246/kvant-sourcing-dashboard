@@ -282,10 +282,19 @@ button,input{font:inherit}button,a,input,summary{-webkit-tap-highlight-color:tra
   // Подписи указателя места источника. Ревизия (scripts/portal_audit.py, l.ref_locator)
   // читает ключи отсюда: ключ без подписи сорсер видит сырым английским словом.
   const LOCATOR_LABELS={page:'Страница',pages:'Страницы',sheet:'Лист',cells:'Ячейки',cell:'Ячейка',table:'Таблица',table_row:'Строка таблицы',table_rows:'Строки таблицы',json_pointer:'Запись',json_pointers:'Записи',row:'Строка',rows:'Строки',column:'Колонка',section:'Раздел',line:'Строка текста',lines:'Строки текста',paragraph:'Абзац',archive_member:'Файл внутри архива'};
+  // Вложенный объект показывается по ключам с подписями — не JSON-строкой и не
+  // «[object Object]»; массив без объектов — перечнем через запятую, как прежде.
+  // То же правило держит ревизия (причины_указателя), тест исполняет обе стороны.
+  function locatorLabel(key) {return Object.hasOwn(LOCATOR_LABELS,key)?LOCATOR_LABELS[key]:key;}
+  function locatorHasObject(val) {return Array.isArray(val)?val.some(locatorHasObject):!!val&&typeof val==='object';}
+  function locatorPart(val) {
+    if(val==null)return '';if(Array.isArray(val))return locatorHasObject(val)?val.map(locatorPart).filter(Boolean).join('; '):val.join(', ');
+    if(typeof val==='object')return Object.entries(val).map(([key,v])=>{const shown=locatorPart(v);return shown?locatorLabel(key)+' '+shown:'';}).filter(Boolean).join(', ');
+    return String(val);
+  }
   function formatLocator(value) {
     if(typeof value==='string')return value;if(!value||typeof value!=='object')return '';
-    const labels=LOCATOR_LABELS;
-    return Object.entries(value).map(([key,val])=>{if(val==null)return '';const shown=Array.isArray(val)?val.join(', '):typeof val==='object'?JSON.stringify(val):String(val);return (labels[key]||key)+': '+shown;}).filter(Boolean).join(' · ');
+    return Object.entries(value).map(([key,val])=>val==null?'':locatorLabel(key)+': '+locatorPart(val)).filter(Boolean).join(' · ');
   }
   function updateUrl() {const hash=new URLSearchParams();if(state.segment!=='all')hash.set('segment',state.segment);if(state.section!=='overview')hash.set('section',state.section);if(state.selected)hash.set('article',state.selected);const suffix=hash.toString();history.replaceState(null,'',location.pathname+location.search+(suffix?'#'+suffix:''));}
   function results() {if(state.version===2)return state.articles.filter(a=>state.subtype==='all'||subtype(a)===state.subtype);const terms=normalize(state.query).trim().split(/\s+/).filter(Boolean);return state.articles.filter((a)=>(state.segment==='all'||a.segment_id===state.segment)&&(state.segment==='all'||['overview','sources'].includes(state.section)||kind(a)===state.section)&&(state.subtype==='all'||subtype(a)===state.subtype)&&terms.every((t)=>a.searchable.includes(t)));}

@@ -21,6 +21,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import random
 import re
 import shutil
 import subprocess
@@ -1083,6 +1084,12 @@ def _сдвинуть_дату(о, ключ_, дата):
         dict(ст(о, "bearings:k1")["sources"]["references"][0]))),
     ("library", "l.ref_locator", lambda о: ст(о, "bearings:k1")["sources"]["references"][0].update(
         locator={"page": 3, "extra": {"a": 1}})),
+    # Неподписанный ключ внутри вложенного объекта: страница показывает его сырым словом.
+    ("library", "l.ref_locator", lambda о: ст(о, "bearings:k1")["sources"]["references"][0].update(
+        locator={"cells": [{"sheet": "Лист1", "zqb_from": 3}]})),
+    # locator пуст — страница показывает location (source.locator||source.location).
+    ("library", "l.ref_locator", lambda о: ст(о, "bearings:k1")["sources"]["references"][0].update(
+        locator=None, location={"page": 3, "zqa": 1})),
     ("library", "l.crm_url", lambda о: ст(о, "bearings:k1")["sources"].update(crm_links=[{"url": "javascript:alert(1)"}])),
     ("library", "l.open_q", lambda о: ст(о, "bearings:k1")["sources"].update(open_questions=["Совместимость?"])),
     # ── dict/oem.json
@@ -1207,12 +1214,86 @@ def test_счёт_страницы_совпадает_с_ярлыком_карт
 ПОДПИСИ_УКАЗАТЕЛЯ_ПРЕЖНИЕ = ("{page:'Страница',pages:'Страницы',sheet:'Лист',cells:'Ячейки',cell:'Ячейка',"
                              "table_row:'Строка таблицы',table_rows:'Строки таблицы',json_pointer:'Запись',"
                              "row:'Строка',column:'Колонка',archive_member:'Файл внутри архива'}")
+# formatLocator до 27.09.2026 — дословно: вложенный объект он показывал JSON-строкой,
+# объект внутри массива — «[object Object]». Эталон «было» для правила 0.
+FORMAT_LOCATOR_ПРЕЖНИЙ = (
+    "  function oldFormatLocator(value) {\n"
+    "    if(typeof value==='string')return value;if(!value||typeof value!=='object')return '';\n"
+    "    const labels=LOCATOR_LABELS;\n"
+    "    return Object.entries(value).map(([key,val])=>{if(val==null)return '';const shown=Array.isArray(val)?"
+    "val.join(', '):typeof val==='object'?JSON.stringify(val):String(val);return (labels[key]||key)+': '+shown;})"
+    ".filter(Boolean).join(' · ');\n"
+    "  }\n")
 # Выдуманный корпус указателей: каждая форма, которую страница умеет показать.
-УКАЗАТЕЛИ = [{"page": 3}, {"pages": [3, 4]}, {"sheet": "Лист1", "cells": [["A1", "B2"]]}, {"cell": "C7"},
-             {"json_pointer": "/items/0"}, {"json_pointers": ["/items/0", "/items/1"]},
-             {"table_row": 4, "column": "Цена"}, {"table_rows": [4, 5]}, {"row": 2, "rows": [2, 3]},
-             {"section": "3.2", "table": 1, "paragraph": 5}, {"line": 12, "lines": [12, 14]},
-             {"archive_member": "spec/a.xlsx", "sheet": "Лист1"}, {"page": None, "row": 1}]
+УКАЗАТЕЛИ_ПЛОСКИЕ = [{"page": 3}, {"pages": [3, 4]}, {"sheet": "Лист1", "cells": [["A1", "B2"]]}, {"cell": "C7"},
+                     {"json_pointer": "/items/0"}, {"json_pointers": ["/items/0", "/items/1"]},
+                     {"table_row": 4, "column": "Цена"}, {"table_rows": [4, 5]}, {"row": 2, "rows": [2, 3]},
+                     {"section": "3.2", "table": 1, "paragraph": 5}, {"line": 12, "lines": [12, 14]},
+                     {"archive_member": "spec/a.xlsx", "sheet": "Лист1"}, {"page": None, "row": 1}]
+# Вложенные объекты с подписанными ключами страница с 27.09.2026 показывает по
+# ключам; ключ без подписи со значением null (или пустым) не показывается вовсе.
+УКАЗАТЕЛИ_ВЛОЖЕННЫЕ = [{"cells": [{"sheet": "Лист1", "cell": "A1"}, {"sheet": "Лист2", "cell": "B3"}]},
+                       {"table": {"page": 3, "row": 4}}, {"page": 2, "extra": None},
+                       {"rows": [{"row": 2, "column": "Цена", "note": None}, 5]},
+                       {"section": {"paragraph": 2, "lines": [4, 5], "remark": ""}},
+                       {"table": {"row": 1, "zqa": [""], "zqb_from": [[]], "zqc_to": [None], "extra": {}}}]
+УКАЗАТЕЛИ = УКАЗАТЕЛИ_ПЛОСКИЕ + УКАЗАТЕЛИ_ВЛОЖЕННЫЕ
+
+
+def _код_указателя(страница: str = СТРАНИЦА_БИБЛИОТЕКИ) -> str:
+    """Подписи и все функции показа указателя страницы — от LOCATOR_LABELS до конца formatLocator."""
+    return re.search(r"  const LOCATOR_LABELS=.*?\n  function formatLocator\(value\) \{.*?\n  \}\n",
+                     страница, re.S).group(0)
+
+
+def _показ(код: str, корпус: list, *функции: str) -> list:
+    """Исполняет функции показа на корпусе в node: по строке на указатель, по столбцу на функцию."""
+    js = (код + "const L=" + json.dumps(корпус, ensure_ascii=False) + ";\n"
+          + "console.log(JSON.stringify(L.map(l=>[" + ",".join(f"{ф}(l)" for ф in функции) + "])));")
+    # Скрипт — через stdin: корпус в три тысячи указателей не лезет в строку аргументов.
+    return json.loads(subprocess.run(["node", "-"], input=js, capture_output=True, text=True, timeout=60,
+                                     check=True).stdout)
+
+
+# Выдуманный случайный корпус: ключи с подписью страницы и заведомо без неё
+# («zq…» — такого сочетания нет ни в подписях, ни в значениях), значения всех
+# форм, вложенность до трёх уровней. Семя закреплено: корпус один и тот же.
+НЕПОДПИСАННЫЕ = ("zqa", "zqb_from", "zqc_to")
+СКАЛЯРЫ = (None, "", 0, 7, 12.5, True, False, "Лист1", "стр. 4", "A1:B7", "/items/3")
+
+
+def _случайный_корпус(n=3000, семя=20260927) -> list:
+    г = random.Random(семя)
+    подписанные = sorted(pa.ключи_указателя_страницы(СТРАНИЦА_БИБЛИОТЕКИ))
+
+    def ключ():
+        return г.choice(НЕПОДПИСАННЫЕ) if г.random() < 0.25 else г.choice(подписанные)
+
+    def значение(глубина):
+        x = г.random()
+        if глубина >= 3 or x < 0.45:
+            return г.choice(СКАЛЯРЫ)
+        if x < 0.75:
+            return [значение(глубина + 1) for _ in range(г.randint(0, 3))]
+        return {ключ(): значение(глубина + 1) for _ in range(г.randint(0, 3))}
+
+    return [{ключ(): значение(1) for _ in range(г.randint(1, 4))} for _ in range(n)]
+
+
+def _листья(v) -> list[str]:
+    """Непустые скалярные значения указателя так, как их пишет String() в JS."""
+    if isinstance(v, dict):
+        return [x for y in v.values() for x in _листья(y)]
+    if isinstance(v, list):
+        return [x for y in v for x in _листья(y)]
+    if v is None or v == "":
+        return []
+    return [v if isinstance(v, str) else json.dumps(v)]
+
+
+def _сырое_в_показе(текст: str) -> bool:
+    """Сорсер видит не по-русски: слово без подписи, JSON-строку или «[object Object]»."""
+    return "zq" in текст or "[object Object]" in текст or '{"' in текст
 
 
 def test_ключи_указателя_читаются_со_страницы():
@@ -1237,31 +1318,76 @@ def test_указатель_законные_формы_не_дефект():
 
 
 @pytest.mark.parametrize("указатель", [
-    {"page": 3, "extra": 1},                       # неизвестный ключ
-    {"page": {"from": 3, "to": 4}},                 # объект — JSON-строкой
-    {"json_pointers": [{"p": "/items/0"}]},         # объект в массиве — [object Object]
-    {"cells": [["A1", {"b": 2}]]},                  # объект глубже
+    {"page": 3, "extra": 1},                        # неизвестный ключ
+    {"page": 3, "extra": ""},                       # и с пустым значением: «extra: » видно
+    {"page": {"from": 3, "to": 4}},                 # объект с неподписанными ключами
+    {"json_pointers": [{"p": "/items/0"}]},         # то же внутри массива
+    {"cells": [["A1", {"b": 2}]]},                  # и глубже
+    {"table": {"page": 3, "rows": [{"zqa": 1}]}},   # неподписанный ключ на третьем уровне
 ])
 def test_указатель_вложенный_или_неизвестный_дефект(указатель):
     assert pa.указатель_не_виден(указатель, pa.ключи_указателя_страницы(СТРАНИЦА_БИБЛИОТЕКИ))
 
 
+def test_причины_указателя_по_ключам():
+    ключи = pa.ключи_указателя_страницы(СТРАНИЦА_БИБЛИОТЕКИ)
+    причины = pa.причины_указателя({"page": 3, "zqa": 1, "cells": [{"sheet": "Лист1", "zqb_from": 2}],
+                                     "zqc_to": None, "table": {"zqa": [], "row": 4}}, ключи)
+    assert sorted(причины) == [("неизвестный ключ", ("zqa",)),
+                               ("неизвестный ключ внутри", ("cells", "zqb_from"))]
+
+
+def test_указатель_ссылки_как_на_странице():
+    """Страница показывает source.locator||source.location — по истинности JS."""
+    assert pa.указатель_ссылки({"locator": {"page": 1}, "location": {"zqa": 1}}) == {"page": 1}
+    assert pa.указатель_ссылки({"locator": {}, "location": {"zqa": 1}}) == {}
+    for пусто in (None, "", 0, False):
+        assert pa.указатель_ссылки({"locator": пусто, "location": {"zqa": 1}}) == {"zqa": 1}
+    assert pa.указатель_ссылки({"location": "стр. 3"}) == "стр. 3"
+
+
+def test_имя_ключа_в_журнале_без_значений():
+    """Правило 17: в журнал — слово схемы; ключ, похожий на значение, — образцом."""
+    assert pa.имя_ключа_для_журнала("record_index") == "record_index"
+    assert pa.имя_ключа_для_журнала("NU316") == "~aa999"
+    assert pa.имя_ключа_для_журнала("6205-2RS") == "~9999-9aa"
+    assert pa.имя_ключа_для_журнала("Лист") == "~яяяя"
+    assert pa.имя_ключа_для_журнала("a" * 33).startswith("~")
+    счёт = collections.Counter({"неизвестный ключ zqa": 5, "неизвестный ключ zqb_from": 3,
+                                "неизвестный ключ zqc_to": 2, "неизвестный ключ внутри cells.zqa": 1})
+    assert pa.сводка_счёта(счёт) == "неизвестный ключ zqa ×5, неизвестный ключ zqb_from ×3, прочие ×3"
+    assert pa.сводка_счёта(счёт, верх=1) == "неизвестный ключ zqa ×5, прочие ×6"
+
+
+def test_разбивка_указателей_в_заметках():
+    """Прогон ревизии печатает, какие ключи делают указатель невидимым, — именами
+    схемы, а ключ-значение образцом; указатель из location считается и назван."""
+    def правка(о):
+        refs = ст(о, "bearings:k1")["sources"]["references"]
+        for i in range(3):
+            refs.append({"url": f"https://example.test/r{i}", "locator": {"page": i + 1, "record_index": i}})
+        refs.append({"url": "https://example.test/r3", "locator": {"cells": [{"sheet": "Лист1", "zqb_from": 1}]}})
+        refs.append({"url": "https://example.test/r4", "locator": None, "location": {"NU316": 1}})
+    т = прогон(правка=правка)["library"]
+    assert т.счета["l.ref_locator"][1] == 5
+    заметки = "\n".join(т.заметки)
+    assert "неизвестный ключ record_index ×3" in заметки
+    assert "{page, record_index} ×3" in заметки
+    assert "прочие ×2" in заметки                   # редкие причины — без имён
+    assert "NU316" not in заметки and "zqb_from" not in заметки
+    assert "указатель из поля location (locator пуст) — 1" in заметки
+
+
 @pytest.mark.skipif(not shutil.which("node"), reason="нет node")
 def test_показ_указателя_ничего_не_теряет():
-    """Правило 0: исполняется formatLocator страницы и прежний (с прежними
-    подписями) на одном выдуманном корпусе. Значения те же — ни у одного
-    указателя не хуже, — подписи прежних ключей не изменились, сырых
-    английских ключей не осталось."""
-    код = re.search(r"  const LOCATOR_LABELS=.*?\n  function formatLocator\(value\) \{.*?\n  \}\n",
-                    СТРАНИЦА_БИБЛИОТЕКИ, re.S).group(0)
-    тело = код.split("  function formatLocator", 1)[1]
-    прежний = "function oldFormatLocator" + тело.replace(
-        "const labels=LOCATOR_LABELS;", "const labels=" + ПОДПИСИ_УКАЗАТЕЛЯ_ПРЕЖНИЕ + ";")
-    корпус = УКАЗАТЕЛИ + ["стр. 3"]
-    js = (код + прежний + "const L=" + json.dumps(корпус, ensure_ascii=False) + ";\n"
-          + "console.log(JSON.stringify(L.map(l=>[oldFormatLocator(l),formatLocator(l)])));")
-    пары = json.loads(subprocess.run(["node", "-e", js], capture_output=True, text=True, timeout=30,
-                                     check=True).stdout)
+    """Правило 0 по подписям 26.09.2026: исполняется formatLocator страницы и
+    прежний (с прежними подписями) на одном выдуманном корпусе плоских форм.
+    Значения те же — ни у одного указателя не хуже, — подписи прежних ключей не
+    изменились, сырых английских ключей не осталось."""
+    прежний = FORMAT_LOCATOR_ПРЕЖНИЙ.replace("const labels=LOCATOR_LABELS;",
+                                            "const labels=" + ПОДПИСИ_УКАЗАТЕЛЯ_ПРЕЖНИЕ + ";")
+    корпус = УКАЗАТЕЛИ_ПЛОСКИЕ + ["стр. 3"]
+    пары = _показ(_код_указателя() + прежний, корпус, "oldFormatLocator", "formatLocator")
     хуже = 0
     for указатель, (было, стало) in zip(корпус, пары):
         части_было, части_стало = было.split(" · "), стало.split(" · ")
@@ -1275,6 +1401,49 @@ def test_показ_указателя_ничего_не_теряет():
             assert not re.search(r"(?:^| · )[a-z_]+: ", стало), стало
     assert хуже == 0
     assert пары[5] == ["json_pointers: /items/0, /items/1", "Записи: /items/0, /items/1"]
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="нет node")
+def test_показ_вложенного_у_скольких_хуже():
+    """Правило 0 по показу вложенного (27.09.2026): formatLocator до правки и после
+    на одном корпусе — законные формы и три тысячи случайных указателей. Без
+    объекта показ обязан совпасть до знака; с объектом — стать без JSON-строки и
+    «[object Object]» и не потерять ни одного значения."""
+    корпус = УКАЗАТЕЛИ + _случайный_корпус()
+    пары = _показ(_код_указателя() + FORMAT_LOCATOR_ПРЕЖНИЙ, корпус, "oldFormatLocator", "formatLocator")
+    хуже, изменилось = [], 0
+    for i, (указатель, (было, стало)) in enumerate(zip(корпус, пары)):
+        if not any(pa._есть_объект(v) for v in указатель.values()):
+            if было != стало:
+                хуже.append(i)
+            continue
+        изменилось += было != стало
+        if "[object Object]" in стало or '{"' in стало or any(x not in стало for x in _листья(указатель)):
+            хуже.append(i)
+    assert хуже == [], [(корпус[i], пары[i]) for i in хуже[:3]]
+    assert изменилось > 500
+    вложенные = _показ(_код_указателя(), УКАЗАТЕЛИ_ВЛОЖЕННЫЕ, "formatLocator")
+    assert вложенные[0] == ["Ячейки: Лист Лист1, Ячейка A1; Лист Лист2, Ячейка B3"]
+    assert вложенные[1] == ["Таблица: Страница 3, Строка 4"]
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="нет node")
+@pytest.mark.parametrize("страница_после", [True, False], ids=["страница", "страница_до_правки"])
+def test_ревизия_и_страница_согласны(страница_после):
+    """Ревизия обвиняет ровно те указатели, которые страница показывает сырым
+    словом, JSON-строкой или «[object Object]», — на законных формах, мутациях и
+    случайном корпусе. Показ до правки с новым правилом ревизии расходится: без
+    этого расхождения тест не проверял бы ничего."""
+    ключи = pa.ключи_указателя_страницы(СТРАНИЦА_БИБЛИОТЕКИ)
+    корпус = УКАЗАТЕЛИ + [{"page": 3, "zqa": 1}, {"page": {"zqb_from": 3}}, {"cells": [["A1", {"zqa": 2}]]},
+                          {"table": {"zqa": None, "row": 1}}] + _случайный_корпус()
+    код = _код_указателя() + FORMAT_LOCATOR_ПРЕЖНИЙ
+    показ = [x[0] for x in _показ(код, корпус, "formatLocator" if страница_после else "oldFormatLocator")]
+    расходится = [(л, т) for л, т in zip(корпус, показ) if pa.указатель_не_виден(л, ключи) != _сырое_в_показе(т)]
+    if страница_после:
+        assert расходится == [], расходится[:3]
+    else:
+        assert расходится
 
 
 def test_требуют_проверки_без_правила_видят_всё_скрытым():
