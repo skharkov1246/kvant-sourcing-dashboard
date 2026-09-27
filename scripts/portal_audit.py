@@ -294,18 +294,97 @@ def ключи_указателя_страницы(html: str) -> frozenset:
     return frozenset(re.findall(r"(?:^|,)\s*([A-Za-z_][A-Za-z0-9_]*)\s*:", m.group(1))) if m else frozenset()
 
 
-def _вложено_в_указатель(v) -> bool:
-    """Значение, которое formatLocator не покажет: объект — JSON-строкой, объект
-    внутри массива — «[object Object]». Массив скаляров (и массив массивов)
-    Array.join показывает перечнем — это законная форма (json_pointers, pages)."""
-    if isinstance(v, dict):
+def _есть_объект(v) -> bool:
+    """locatorHasObject страницы: объект — сам или где-то внутри массива."""
+    if isinstance(v, list):
+        return any(_есть_объект(x) for x in v)
+    return isinstance(v, dict)
+
+
+def _перечень_пуст(v: list) -> bool:
+    """Array.join без объектов даёт пустую строку: пустой массив или один
+    пустой элемент (null, «», пустой перечень)."""
+    if len(v) != 1:
+        return not v
+    x = v[0]
+    return x is None or x == "" or (isinstance(x, list) and _перечень_пуст(x))
+
+
+def _показ_пуст(v) -> bool:
+    """locatorPart страницы вернёт пустую строку: внутри объекта такое значение
+    не показывается вовсе — вместе с ключом."""
+    if v is None:
         return True
-    return isinstance(v, list) and any(_вложено_в_указатель(x) for x in v)
+    if isinstance(v, dict):
+        return all(_показ_пуст(x) for x in v.values())
+    if isinstance(v, list):
+        return all(_показ_пуст(x) for x in v) if _есть_объект(v) else _перечень_пуст(v)
+    return isinstance(v, str) and v == ""
+
+
+def _причины_значения(v, путь: tuple, ключи: frozenset) -> list[tuple[str, tuple]]:
+    if isinstance(v, list):
+        return [p for x in v for p in _причины_значения(x, путь, ключи)] if _есть_объект(v) else []
+    if not isinstance(v, dict):
+        return []
+    out = []
+    for k, x in v.items():
+        if _показ_пуст(x):
+            continue
+        if k not in ключи:
+            out.append(("неизвестный ключ внутри", путь + (k,)))
+        out.extend(_причины_значения(x, путь + (k,), ключи))
+    return out
+
+
+def причины_указателя(loc: dict, ключи: frozenset) -> list[tuple[str, tuple]]:
+    """Почему formatLocator страницы покажет указатель не по-русски: пары
+    (причина, путь ключа). Пусто — всё подписано. Правило — то же, что у
+    страницы (locatorPart): ключ со значением null не показывается; массив без
+    объектов — перечень; вложенный объект — по ключам с подписями, и ключ без
+    подписи внутри него виден сорсеру так же сырым словом, как снаружи."""
+    out = []
+    for k, v in loc.items():
+        if v is None:
+            continue
+        if k not in ключи:
+            out.append(("неизвестный ключ", (k,)))
+        out.extend(_причины_значения(v, (k,), ключи))
+    return out
 
 
 def указатель_не_виден(loc: dict, ключи: frozenset) -> bool:
-    """Дефект l.ref_locator: ключ без подписи страницы или вложенный объект."""
-    return any(k not in ключи or _вложено_в_указатель(v) for k, v in loc.items())
+    """Дефект l.ref_locator: ключ без подписи страницы — снаружи или внутри
+    вложенного объекта."""
+    return bool(причины_указателя(loc, ключи))
+
+
+def указатель_ссылки(r: dict):
+    """Что страница передаёт в formatLocator: source.locator||source.location —
+    по истинности JS (пустой объект истинен, 0 и «» — нет)."""
+    loc = r.get("locator")
+    ложно = loc is None or (isinstance(loc, (bool, int, float, str)) and not loc)
+    return r.get("location") if ложно else loc
+
+
+ИМЯ_КЛЮЧА_СХЕМЫ = re.compile(r"[a-z]+(?:_[a-z]+)*")
+
+
+def имя_ключа_для_журнала(k) -> str:
+    """Имя ключа указателя в журнале: слово схемы импортёра (латиница в нижнем
+    регистре, слова через «_», без цифр, до 32 знаков) — как есть; иное —
+    образцом (правило 17: ключом может оказаться значение — код, имя, номер)."""
+    k = str(k)
+    return k if len(k) <= 32 and ИМЯ_КЛЮЧА_СХЕМЫ.fullmatch(k) else "~" + образец(k)
+
+
+def сводка_счёта(счёт: collections.Counter, верх=12, порог=3) -> str:
+    """«имя ×N» по убыванию; редкое (меньше порога) и хвост — одной строкой
+    «прочие»: редкий ключ скорее окажется значением, чем словом схемы."""
+    частые = [(к, n) for к, n in счёт.most_common() if n >= порог]
+    показано = частые[:верх]
+    прочие = sum(счёт.values()) - sum(n for _, n in показано)
+    return ", ".join([f"{к} ×{n}" for к, n in показано] + ([f"прочие ×{прочие}"] if прочие else []))
 
 СТРАНИЦА_НОМЕНКЛАТУРЫ = ROOT / "public" / "nomenclature.html"
 
@@ -3511,6 +3590,12 @@ def ревизия_библиотеки(с: Снимки, сейчас, слов
             if f.get("name") and f.get("role") in ("maker", "service"):
                 изготовители_сегмента[seg].add(codes_sql.ключ_написания(f["name"]))
 
+    # Разбивка l.ref_locator по причине и имени ключа — чтобы следующая правка
+    # знала, какую подпись добавить. Имена ключей — слова схемы импортёра;
+    # значения указателя в журнал не идут (правило 17).
+    причины_указателей = collections.Counter()
+    наборы_указателей = collections.Counter()
+    указателей_из_location = 0
     # Польза: копим по ходу.
     с_брендом = спорных = код_и_бренд = с_описанием = с_назначением = в_очереди = длинных_pn = 0
     два_предложения = два_кандидата = без_кандидатов = цепочка = 0
@@ -3563,9 +3648,15 @@ def ревизия_библиотеки(с: Снимки, сейчас, слов
                 т.счёт("l.ref_url", (r.get("url") is not None and not re.match(r"https?://", str(r["url"])))
                        or (r.get("url") is not None and not _безопасный_url(r["url"]))
                        or (r.get("sha256") is not None and not re.fullmatch(r"[0-9a-f]{64}", str(r["sha256"]))))
-            loc = r.get("locator")
+            loc = указатель_ссылки(r)
             if isinstance(loc, dict):
-                т.счёт("l.ref_locator", указатель_не_виден(loc, ключи_указателя))
+                причины = причины_указателя(loc, ключи_указателя)
+                т.счёт("l.ref_locator", bool(причины))
+                указателей_из_location += loc is not r.get("locator")
+                for причина, путь in set(причины):
+                    причины_указателей[f"{причина} " + ".".join(имя_ключа_для_журнала(x) for x in путь)] += 1
+                if причины:
+                    наборы_указателей["{" + ", ".join(sorted({имя_ключа_для_журнала(k) for k in loc})) + "}"] += 1
             виденные_ref[(r.get("sha256") or r.get("url") or r.get("title"))] += 1
         for ключ_, n_ in виденные_ref.items():
             if ключ_:
@@ -3714,6 +3805,13 @@ def ревизия_библиотеки(с: Снимки, сейчас, слов
                 comp = pn_компонентов[s.get("segment_id")].get(k)
                 if comp and comp.get("unit") and f.get("unit"):
                     т.счёт("l.p_unit", единица(comp["unit"]) != единица(f["unit"]))
+
+    if причины_указателей:
+        т.заметка("l.ref_locator по причинам (указателей; у одного их бывает несколько): "
+                  + сводка_счёта(причины_указателей))
+        т.заметка("l.ref_locator, ключи дефектных указателей (наборы): " + сводка_счёта(наборы_указателей, верх=6))
+    if указателей_из_location:
+        т.заметка(f"l.ref_locator: указатель из поля location (locator пуст) — {указателей_из_location}")
 
     # Польза.
     if компонентов:
