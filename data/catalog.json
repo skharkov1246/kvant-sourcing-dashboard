@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 312,
-    "total_bytes": 126581873,
+    "datasets": 315,
+    "total_bytes": 126748727,
     "by_sensitivity": {
-      "внутреннее": 190,
+      "внутреннее": 193,
       "конфиденциально": 69,
       "публикуемо": 53
     },
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 4,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 48,
+      "дашборд сорсеров": 51,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -2981,6 +2981,69 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 234157,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/brand_research/amot.json",
+        "data/brand_research/atlascopco.json",
+        "data/brand_research/atlascopcoenergas.json",
+        "data/brand_research/bentlynevada.json",
+        "data/brand_research/caterpillar.json",
+        "data/brand_research/cryostar.json",
+        "data/brand_research/cummins.json",
+        "data/brand_research/dettronicsdetectorelectronics.json",
+        "data/brand_research/deutz.json",
+        "data/brand_research/donaldson.json",
+        "data/brand_research/dongfengcumminsengine.json",
+        "data/brand_research/drillmec.json",
+        "data/brand_research/dynalco.json",
+        "data/brand_research/epiroc.json",
+        "data/brand_research/generalelectric.json",
+        "data/brand_research/gilkesclydeunion.json",
+        "data/brand_research/grundfos.json",
+        "data/brand_research/guascorsiemensenergy.json",
+        "data/brand_research/heinzmann.json",
+        "data/brand_research/imoindustries.json",
+        "data/brand_research/inniojenbacher.json",
+        "data/brand_research/itt.json",
+        "data/brand_research/jichaijinandieselcnpc.json",
+        "data/brand_research/metrix.json",
+        "data/brand_research/moog.json",
+        "data/brand_research/mturollsroycepowersystems.json",
+        "data/brand_research/mwmcaterpillarenergy.json",
+        "data/brand_research/normet.json",
+        "data/brand_research/parkerhannifin.json",
+        "data/brand_research/perkinsfgwilson.json",
+        "data/brand_research/queue.json",
+        "data/brand_research/rockwellautomationallenbradley.json",
+        "data/brand_research/rollsroyce.json",
+        "data/brand_research/rosemount.json",
+        "data/brand_research/sandviktamrock.json",
+        "data/brand_research/siemensdemagdelavalturbomachinery.json",
+        "data/brand_research/siemensenergy.json",
+        "data/brand_research/solarturbines.json",
+        "data/brand_research/versaproducts.json",
+        "data/brand_research/vibrometermeggitt.json"
+      ],
+      "last_change": "2026-09-27",
+      "last_author": "Claude",
+      "last_commit": "71b57ac",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_customs.py",
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gt/data/bitrix_gt.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 234020,
@@ -3023,69 +3086,6 @@
         "scripts/build_index.py",
         "scripts/preflight.py",
         "tests/test_dataset_has_reader.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 228084,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/brand_research/amot.json",
-        "data/brand_research/atlascopco.json",
-        "data/brand_research/atlascopcoenergas.json",
-        "data/brand_research/bentlynevada.json",
-        "data/brand_research/caterpillar.json",
-        "data/brand_research/cryostar.json",
-        "data/brand_research/cummins.json",
-        "data/brand_research/dettronicsdetectorelectronics.json",
-        "data/brand_research/deutz.json",
-        "data/brand_research/dongfengcumminsengine.json",
-        "data/brand_research/drillmec.json",
-        "data/brand_research/dynalco.json",
-        "data/brand_research/epiroc.json",
-        "data/brand_research/generalelectric.json",
-        "data/brand_research/gilkesclydeunion.json",
-        "data/brand_research/grundfos.json",
-        "data/brand_research/guascorsiemensenergy.json",
-        "data/brand_research/imoindustries.json",
-        "data/brand_research/inniojenbacher.json",
-        "data/brand_research/itt.json",
-        "data/brand_research/jichaijinandieselcnpc.json",
-        "data/brand_research/metrix.json",
-        "data/brand_research/moog.json",
-        "data/brand_research/mturollsroycepowersystems.json",
-        "data/brand_research/mwmcaterpillarenergy.json",
-        "data/brand_research/normet.json",
-        "data/brand_research/perkinsfgwilson.json",
-        "data/brand_research/queue.json",
-        "data/brand_research/rockwellautomationallenbradley.json",
-        "data/brand_research/rollsroyce.json",
-        "data/brand_research/rosemount.json",
-        "data/brand_research/sandviktamrock.json",
-        "data/brand_research/siemensdemagdelavalturbomachinery.json",
-        "data/brand_research/siemensenergy.json",
-        "data/brand_research/solarturbines.json",
-        "data/brand_research/versaproducts.json",
-        "data/brand_research/vibrometermeggitt.json",
-        "data/brand_research/vikingpump.json",
-        "data/brand_research/waukeshainnio.json",
-        "data/brand_research/woodward.json"
-      ],
-      "last_change": "2026-09-27",
-      "last_author": "Claude",
-      "last_commit": "c3d8cbc",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_customs.py",
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -6118,8 +6118,8 @@
         ]
       },
       "last_change": "2026-09-27",
-      "last_author": "Claude",
-      "last_commit": "c3d8cbc",
+      "last_author": "skharkov1246",
+      "last_commit": "2a3312b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6214,8 +6214,8 @@
         ]
       },
       "last_change": "2026-09-27",
-      "last_author": "Claude",
-      "last_commit": "c3d8cbc",
+      "last_author": "skharkov1246",
+      "last_commit": "2a3312b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6399,8 +6399,8 @@
         ]
       },
       "last_change": "2026-09-27",
-      "last_author": "Claude",
-      "last_commit": "c3d8cbc",
+      "last_author": "skharkov1246",
+      "last_commit": "2a3312b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6545,6 +6545,54 @@
       "last_change": "2026-09-27",
       "last_author": "skharkov1246",
       "last_commit": "770330e",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/heinzmann.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 70812,
+      "note": "Разведка бренда по открытым источникам (2026-09-27): HEINZMANN: регуляторы частоты вращения PANDAROS DC 6, ORION DC 9/10, HELENOS, PRIAMOS, XIOS; приводы StG и заслонки DK; управление газовым двигателем — KRONOS 10–40, дозаторы GMCU, зажигание PHLOX II/III, контроль детонации ARIADNE, XIOS Gas/CHP, TRITON OMD; турбинная линия дочерних HEINZMANN UK, HEINZMANN Australia и REGULATEURS EUROPA. Машин и исполнений — 25, сервисных документов — 20, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 8, дилеров и сервисных компаний — 14, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 9 (поле corrections). 30 кодов — из открытого каталога Gas Engine Management 2019 года (рейки и провода зажигания привязаны к двигателям MAN, Liebherr, Perkins, Doosan), 2 — из бюллетеня PHLOX для MAN E3262, 1 — из листа данных катушки, 4 — из руководств PHLOX II и PANDAROS II (копии на ManualsLib), 3 — перекрёстные номера MWM у российского продавца с пометкой, что изготовителем не подтверждены. В официальной сети продаж на 2026 год в России два дистрибьютора (MiT Power Systems, «ДВС Ресурс»), Центральную Азию и Закавказье ведёт отделение группы в Киеве. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-27",
+      "last_author": "Claude",
+      "last_commit": "71b57ac",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9331,6 +9379,54 @@
       ]
     },
     {
+      "path": "data/brand_research/parkerhannifin.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 45870,
+      "note": "Разведка бренда по открытым источникам (2026-09-27): Parker Hannifin: топливные фильтры-влагоотделители Racor Turbine Series (500FG, 900FH, 1000FH и сборки), вентиляция картера Racor CCV, фильтры-сепараторы топлива Velcon, гидрофильтры Parker (Moduflow Plus, 12AT, CN, 15P/30P, 50P, EPF), кольца ORD 5700. Машин и исполнений — 15, сервисных документов — 9, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 3, дилеров и сервисных компаний — 10, пробелов (gaps) — 7; по замечаниям скептика поправлено записей — 9 (поле corrections). Коды Racor — из сборника чертежей и спецификаций изготовителя RSL0385 у дилера и со страниц дилеров (цепочки замен 2040TM-OR → 2040N-10 → 2040V10 и 2020TM-OR → 2020V10, кроссы дилера на Donaldson и Fleetguard), Velcon — из каталога 2005–2006 гг., гидрофильтры — из карточек дистрибьютора Hyspeco; parker.com автоматическому чтению закрыт (403). В России Parker не работает с 31.03.2022. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-27",
+      "last_author": "Claude",
+      "last_commit": "71b57ac",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gidromet/data/scenarii.json",
       "subproject": "гидрометаллургия",
       "bytes": 45327,
@@ -9453,6 +9549,54 @@
       "last_change": "2026-09-27",
       "last_author": "skharkov1246",
       "last_commit": "5d7834c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/brand_research/donaldson.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 43983,
+      "note": "Разведка бренда по открытым источникам (2026-09-27): Donaldson: воздухоочистка на входе ГТУ (GDX, GDS, GDS-II, TTD, CFS, XLR, картриджи Turbo-Tek) и фильтры двигателей с кроссами к номерам Caterpillar, Waukesha, Guascor, Jenbacher, MTU и Cummins. Машин и исполнений — 7, сервисных документов — 3, кодов запчастей — 40: у каждого кода ссылка на страницу и дословная цитата, код проверен вторым проходом (скептик скачал страницу заново и нашёл код в тексте). Субпоставщиков — 2, дилеров и сервисных компаний — 6, пробелов (gaps) — 8; по замечаниям скептика поправлено записей — 4 (поле corrections). 17 кодов — из открытого каталога сменных фильтров ГТУ GTS-400 (картриджи 22\" для S&S LM2500/LM5000/LM6000 и TTD на турбинах Solar, панель G4 под раму LM6000), 23 — фильтры двигателей по кроссам дистрибьютора Diesel Equipment Inc, официальным кроссом Donaldson не сверены. Кроссов входных фильтров ГТУ к номерам GE и Solar в открытых источниках нет. В России и Беларуси Donaldson не работает с августа 2022 г. Контактов людей (e-mail, телефонов) нет — проверяется. Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "dealers",
+        "gaps",
+        "machines",
+        "method",
+        "name",
+        "oem_key",
+        "parts",
+        "parts_rejected",
+        "researched_at",
+        "segment_focus",
+        "service_docs",
+        "sub_suppliers",
+        "summary",
+        "verifier_notes"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 40,
+        "record_keys": [
+          "code",
+          "description",
+          "doc_ref",
+          "issuer",
+          "machine",
+          "quote",
+          "source_url",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-27",
+      "last_author": "Claude",
+      "last_commit": "71b57ac",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -10300,8 +10444,8 @@
     {
       "path": "data/brand_research/queue.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 33332,
-      "note": "Очередь разведки брендов (обновлена 2026-09-27): 60 брендов из dict/oem.json, сделано — 40, в очереди — 20. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
+      "bytes": 33448,
+      "note": "Очередь разведки брендов (обновлена 2026-09-27): 60 брендов из dict/oem.json, сделано — 43, в очереди — 17. Порядок правилом: группа фокуса (сначала изготовители машин ГПУ, ГТУ, компрессоров, ГШО, насосов, потом изготовители узлов — управление и вибрация, фильтры, подшипники и уплотнения, узлы машин), внутри группы — число написаний в словаре, при равенстве — есть ли бренд в атласе zip/data/oem_atlas.json. Ключи — только существующие ключи словаря; ключи со вставленным описанием (латиница и кириллица в одном ключе) и указания к закупке в очередь не берутся. Сессия берёт не больше двух брендов (пятая часть ресурса, распоряжение владельца 24.09.2026). Проверщик — scripts/brand_research_check.py, процедура — навык .claude/skills/brand-research.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -10331,7 +10475,7 @@
       },
       "last_change": "2026-09-27",
       "last_author": "Claude",
-      "last_commit": "c3d8cbc",
+      "last_commit": "71b57ac",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
