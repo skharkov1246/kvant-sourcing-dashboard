@@ -1,0 +1,947 @@
+{
+  "oem_key": "moog",
+  "name": "Moog Inc. (Industrial Group)",
+  "segment_focus": "сервоклапаны и электроприводы направляющих аппаратов ГТУ: номера, ремонт",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Moog не делает саму турбину. Он поставляет сервоклапаны и сервоприводы для газовых и паровых турбин: входного направляющего аппарата (ВНА), клапанов газового и жидкого топлива, перепуска и отбора воздуха. Moog пишет о себе, что его сервоклапаны стоят почти на всех электрогидравлических сервоприводах энергетики: более 10 000 клапанов на более чем 1 000 станций.\n\nГлавные серии для ГТУ GE Frame — искробезопасные сервоклапаны G771K и G772K (серия 77XK). Moog прямо связывает их со спецификацией GE 312A6077. В 2021 году по запросу GE для них вышло исполнение PGO (Power Generation Optimized, клапан с красной крышкой), менее чувствительное к лаку в масле. Для GE 7FA Moog поставляет гидравлические приводы газового клапана и ВНА Extended Life (с 2022 года — Extended Life 2.0) и программу «64K»: привод Moog и клапан Fisher EAB производства Emerson, межремонтный интервал 64 000 ч вместо 48 000 ч. Электрические приводы: отказобезопасный электромеханический привод (ход 50 или 100 мм, пружина 15 или 30 кН), приводы серии 880, электроприводы ВНА, топливного газа и клапана воздуха для малых ГТУ 5–12 МВт немецкого изготовителя (с 2003 года), сервоусилители MSD и взрывозащищённые серводвигатели ExD.\n\nРемонт. Moog Global Support ремонтирует сервоприводы на заводе и на месте, есть обменный фонд. Ремонтные центры — в Северной Америке, Великобритании, Китае, Японии и Индии. Moog — единственный авторизованный сервис в Северной Америке для топливных клапанов Nakakita на Mitsubishi M501F/G. Moog MRO Services в Дублине ремонтирует агрегаты авиапроизводных ГТУ: для GE LM1600/LM2500/LM6000 — приводы VSV и VBV, насос VG, блок HCU; из перечня также Avon, RB211 и другие.\n\nОткуда коды. Расходные позиции взяты из каталогов и руководств Moog: ремкомплекты B52555RK054K001 (77X/77XK), B52555RK201K001 и B52555RK204K001 (761), фильтр, кольца, крепёж, разъём, катушки. Номера агрегатов LM2500/LM6000 — из документа Moog MRO Form 500-1514. Пары «номер GE 312A6077Pxxx — модель Moog G771K» и цепочки замен (G771K200 → G771K289A, G772K240 → G772K336A и другие) есть только у продавцов: Quicktime Online, Leda Greenpower и Teknihaus. Официальной таблицы соответствия в открытом доступе нет.\n\nДилеры. Официальные дистрибьюторы с отраслью «газовые и паровые турбины» найдены по локатору Moog: в Индии, ОАЭ и Турции. Дочерние компании — в Индии и Китае. Страниц России, Казахстана и Узбекистана в локаторе нет. В России найдены только независимые ремонтники.",
+  "machines": [
+    {
+      "model": "G771K / 771K (серия 77XK, типоразмер 02 по ISO 10372)",
+      "kind": "двухкаскадный электрогидравлический сервоклапан с механической обратной связью, искробезопасное исполнение",
+      "segment": "ГТУ",
+      "rating": "по каталогу у 771 — до 17 л/мин при перепаде 70 бар (1,9–57 л/мин — диапазон всей семьи 771/772/773); до 210 бар (G771)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.moog.com/products/servovalves-servo-proportional-valves/industrial/servo-valves-without-integrated-electronics/direct-operated-servo-valves-for-analog-signals-771-772-773-series.html",
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77xK-Manual-en.pdf",
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-PGO-Overview-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "G772K / 772K (серия 77XK, типоразмер 03 по ISO 10372)",
+      "kind": "двухкаскадный электрогидравлический сервоклапан, искробезопасное исполнение",
+      "segment": "ГТУ",
+      "rating": "до 57 л/мин при перепаде 70 бар; 210 или 350 бар",
+      "status": "выпускается",
+      "sources": [
+        "https://www.moog.com/products/servovalves-servo-proportional-valves/industrial/servo-valves-without-integrated-electronics/direct-operated-servo-valves-for-analog-signals-771-772-773-series.html",
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77x-Catalog-en.pdf",
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-PGO-Overview-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PGO (Power Generation Optimized) — исполнение G771K/G772K",
+      "kind": "исполнение сервоклапана для ГТУ и паровых турбин GE, прямая замена G771K/G772K",
+      "segment": "ГТУ",
+      "rating": "превышает спецификацию GE 312A6077; допускает чистоту масла ISO 4406 18/16/13",
+      "status": "выпускается (с 2021 г.)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-PGO-Overview-en.pdf",
+        "https://www.powerprogress.com/news/moogs-new-fuel-system-components-for-gas-turbine-retrofits/8023792.article"
+      ],
+      "verified": true
+    },
+    {
+      "model": "761 / 761K (G761), типоразмер 04",
+      "kind": "двухкаскадный сервоклапан с механической обратной связью; общепромышленная серия, в материалах Moog по ГТУ не названа",
+      "segment": "прочее",
+      "rating": "0,5–75 л/мин при перепаде 70 бар; до 315 бар (алюминиевый корпус), до 350 бар (стальной корпус)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.moog.com/products/servovalves-servo-proportional-valves/industrial/servo-valves-without-integrated-electronics/direct-operated-servo-valves-for-analog-signals-761-series.html",
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-761Series-Catalog-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "760 (760K, 760N)",
+      "kind": "двухкаскадный сервоклапан; исполнение 760N (взрывозащищённое) стоит в приводе Moog для топливного клапана и ВНА ГТУ",
+      "segment": "ГТУ",
+      "rating": "0,5–60 л/мин; 210 бар",
+      "status": "снята (legacy, замена — G761/761)",
+      "sources": [
+        "https://www.moog.com/products/servovalves-servo-proportional-valves/industrial/legacy-servo-valves/legacy-product-direct-operated-servo-valves-for-analog-signals-760-series.html",
+        "https://www.moog.com/news/ideas-in-motion-control/2005/03/motion-control-solutions-for-hazardous-environments.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "78N / 78K",
+      "kind": "взрывозащищённый или искробезопасный сервоклапан; стоит в приводе Moog для топливного клапана и ВНА ГТУ",
+      "segment": "ГТУ",
+      "rating": "данных нет",
+      "status": "данных нет",
+      "sources": [
+        "https://www.moog.com/news/ideas-in-motion-control/2005/03/motion-control-solutions-for-hazardous-environments.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Взрывозащищённый гидравлический привод топливного клапана и ВНА ГТУ (на сервоклапанах 760N/78N)",
+      "kind": "гидравлический сервопривод с взрывозащищённой клеммной коробкой и датчиком положения LVDT",
+      "segment": "ГТУ",
+      "rating": "серийно в Японии с 2004 г.; к 2005 г. более 300 шт.; проекты в Китае и Европе",
+      "status": "данных нет",
+      "sources": [
+        "https://www.moog.com/news/ideas-in-motion-control/2005/03/motion-control-solutions-for-hazardous-environments.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Failsafe Electro-mechanical Actuator, типоразмеры S и M",
+      "kind": "отказобезопасный электромеханический привод регулирующего клапана газовых и паровых турбин",
+      "segment": "ГТУ",
+      "rating": "ход 50 / 100 мм; пружина не менее 15 / 30 кН; закрытие 200–300 мс; до капремонта 40 000 экв. ч или 1 500 пусков; ATEX II 3G, IP54",
+      "status": "данных нет (брошюра 2012 г.)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Actuator-Fail-Safe-Overview.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "880 Series Electric Actuator",
+      "kind": "электропривод линейный и поворотный: ВНА, клапаны газового и жидкого топлива",
+      "segment": "ГТУ",
+      "rating": "исполнения для взрывоопасных зон",
+      "status": "данных нет (брошюра 2010 г.)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Gas-Steam-Overview-en2.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Inlet Guide Vane (IGV) Actuator, электрический",
+      "kind": "электропривод ВНА: серводвигатель и шарико-винтовая передача",
+      "segment": "ГТУ",
+      "rating": "малые ГТУ 5–12 МВт (немецкий изготовитель, не назван); до пяти электрических осей на одну ГТУ",
+      "status": "данных нет (прототип 2003 г.)",
+      "sources": [
+        "https://www.moog.com/news/ideas-in-motion-control/2010/07/making-the-switch-employing-electric-actuation-for-higher-turbine-productivity.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Fuel Gas Actuator, электрический",
+      "kind": "электропривод линейного клапана топливного газа: серводвигатель и шарико-винтовая передача, концевые датчики",
+      "segment": "ГТУ",
+      "rating": "малые ГТУ 5–12 МВт",
+      "status": "данных нет",
+      "sources": [
+        "https://www.moog.com/news/ideas-in-motion-control/2010/07/making-the-switch-employing-electric-actuation-for-higher-turbine-productivity.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Air Ratio Control Valve, электропривод",
+      "kind": "электропривод клапана подачи воздуха в выхлоп (серводвигатель и редуктор)",
+      "segment": "ГТУ",
+      "rating": "малые ГТУ 5–12 МВт",
+      "status": "данных нет",
+      "sources": [
+        "https://www.moog.com/news/ideas-in-motion-control/2010/07/making-the-switch-employing-electric-actuation-for-higher-turbine-productivity.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "80 Series Hydraulic Actuator",
+      "kind": "гидравлический привод регулирующих клапанов газовых и паровых турбин: пружина отказобезопасности, коллектор с сервоклапаном Moog, датчики положения, встроенный фильтр",
+      "segment": "ГТУ",
+      "rating": "данных нет",
+      "status": "данных нет (брошюра 2010 г.)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Gas-Steam-Overview-en2.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Inlet Guide Vane Control Actuator (гидравлический и электрический)",
+      "kind": "привод ВНА ГТУ",
+      "segment": "ГТУ",
+      "rating": "данных нет",
+      "status": "данных нет (брошюра 2010 г.)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Gas-Steam-Overview-en2.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Extended Life Actuator — гидравлический сервопривод газового клапана и ВНА",
+      "kind": "гидравлический сервопривод; переработан с 2007 г.: покрытие штока, двойное эластомерное и буферное уплотнение, твёрдый хром в цилиндре",
+      "segment": "ГТУ",
+      "rating": "GE 7FA — по брошюре 64K (CDL49834); «около 5 600 приводов до переработки» — из статьи 2010 г., где не названы ни имя привода, ни GE 7FA",
+      "status": "выпускается",
+      "sources": [
+        "https://www.moog.com/news/ideas-in-motion-control/2010/12/unlocking-the-keys-to-longer-life-for-gas-power-generation-turbines.html",
+        "https://www.moog.com/content/dam/moog/literature/service/Moog-GE-7FA-Turbine-64K-Upgrade-Flyer-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Extended Life 2.0 — гидравлический привод газового регулирующего клапана",
+      "kind": "гидравлический сервопривод с тонким плотным хромом (TDC) в цилиндре",
+      "segment": "ГТУ",
+      "rating": "заявлена применимость к ГТУ GE, Siemens, Mitsubishi",
+      "status": "выпускается (анонс 2022 г.)",
+      "sources": [
+        "https://www.powerprogress.com/news/moogs-new-fuel-system-components-for-gas-turbine-retrofits/8023792.article"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Газовый регулирующий клапан Moog для GE 7FA (привод Moog + клапан Fisher EAB), программа 64K",
+      "kind": "сборка «привод — клапан» с доведением до нулевого ресурса; обменный фонд",
+      "segment": "ГТУ",
+      "rating": "межремонтный интервал 64 000 ч вместо 48 000 ч",
+      "status": "выпускается (программа с 2017 г.)",
+      "sources": [
+        "https://www.moog.com/news/operating-group-news/2018/Moog-Gas-Control-Valve-64K-Upgrade-Program-Extends-GE7FA-Gas-Turbine-Operation.html",
+        "https://www.moog.com/content/dam/moog/literature/service/Moog-GE-7FA-Turbine-64K-Upgrade-Flyer-en.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "MSD — Modular Multi-axis Programmable Motion Control Servo Drive",
+      "kind": "многоосевой сервоусилитель электроприводов турбины",
+      "segment": "ГТУ",
+      "rating": "кабель до 500 м (усилитель вне взрывоопасной зоны)",
+      "status": "данных нет",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Actuator-Fail-Safe-Overview.pdf",
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Gas-Steam-Overview-en2.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Moog (Ruggedized) Motion Controller",
+      "kind": "контроллер движения для электроприводов турбины: CANopen, Profibus-DP, 4–20 мА; ПО с сертификатом TÜV",
+      "segment": "ГТУ",
+      "rating": "данных нет",
+      "status": "данных нет",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Actuator-Fail-Safe-Overview.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ExD — взрывозащищённый бесщёточный серводвигатель",
+      "kind": "серводвигатель электроприводов ВНА и топливного газа ГТУ",
+      "segment": "ГТУ",
+      "rating": "данных нет",
+      "status": "данных нет",
+      "sources": [
+        "https://www.moog.com/news/ideas-in-motion-control/2010/07/making-the-switch-employing-electric-actuation-for-higher-turbine-productivity.html"
+      ],
+      "verified": true
+    },
+    {
+      "model": "D633K / D634K",
+      "kind": "взрывозащищённые сервоклапаны прямого привода; названы в статье Moog о взрывоопасных зонах. Привязка к сервоприводам регулирующих клапанов паровой турбины — вывод: в абзаце о турбине модель не названа",
+      "segment": "прочее",
+      "rating": "до 100 л/мин",
+      "status": "данных нет",
+      "sources": [
+        "https://www.moog.com/news/ideas-in-motion-control/2005/03/motion-control-solutions-for-hazardous-environments.html"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Power Generation Optimized (PGO) Servo Valve — improved reliability and performance in GE gas and steam turbines",
+      "doc_no": "CDL62906-en, Rev. A, май 2021",
+      "machine": "G771K / G772K",
+      "kind": "бюллетень (модернизация)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-PGO-Overview-en.pdf"
+      ]
+    },
+    {
+      "title": "Performance behind the power. Gas and steam turbine solutions",
+      "doc_no": "CDL28175-en, февраль 2010",
+      "machine": "приводы и сервоклапаны газовых и паровых турбин (880, 80 Series, Failsafe EMA, MSD)",
+      "kind": "обзор продукции",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Gas-Steam-Overview-en2.pdf"
+      ]
+    },
+    {
+      "title": "Failsafe Electro-mechanical Actuator — high performance electric technology for failsafe operation in gas and steam turbines",
+      "doc_no": "CDL31174-en, Rev. B, октябрь 2012",
+      "machine": "Failsafe Electro-mechanical Actuator S/M",
+      "kind": "спецификация",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/Moog-PowerGen-Actuator-Fail-Safe-Overview.pdf"
+      ]
+    },
+    {
+      "title": "64K Service Life Upgrade for GE 7FA turbines",
+      "doc_no": "CDL49834, Rev A, ноябрь 2016",
+      "machine": "газовый регулирующий клапан GE 7FA (привод Moog Extended Life + клапан Fisher EAB)",
+      "kind": "сервисный бюллетень (модернизация и обмен)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/service/Moog-GE-7FA-Turbine-64K-Upgrade-Flyer-en.pdf"
+      ]
+    },
+    {
+      "title": "MRO Services for Industrial Gas Turbines",
+      "doc_no": "Form 500-1514, 03.2026",
+      "machine": "GE LM2500/LM5000/LM6000: HCU, насос VG, топливный регулятор, приводы VSV и VBV, клапаны ступенчатой подачи, клапан отбора воздуха",
+      "kind": "перечень ремонтируемых агрегатов с номерами",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf"
+      ]
+    },
+    {
+      "title": "Moog 77X Series Flow Control Servo Valves (catalog)",
+      "doc_no": "CDL6651, Rev. N, апрель 2024",
+      "machine": "771/772/773, G771K/G772K/G773K",
+      "kind": "каталог с запчастями",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77x-Catalog-en.pdf"
+      ]
+    },
+    {
+      "title": "77X Series Installation and Operation Instruction",
+      "doc_no": "CDS6674, Rev. D, июль 2024",
+      "machine": "771/772/773",
+      "kind": "O&M (установка, эксплуатация, замена фильтра)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/77X_Manual_CDS6674_D.pdf"
+      ]
+    },
+    {
+      "title": "77XK Series Installation and Operation Instruction (intrinsic safety protected)",
+      "doc_no": "CDS6768, Rev. K, декабрь 2025",
+      "machine": "771K/772K/773K",
+      "kind": "O&M (установка, поиск неисправностей, замена фильтра, параметры катушек)",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77xK-Manual-en.pdf"
+      ]
+    },
+    {
+      "title": "Installation Drawing, 771K / G771K Series Servo Valves",
+      "machine": "G771K",
+      "kind": "установочный чертёж",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Instl_Dwg-771K_G771K_Series_Servovalves.pdf"
+      ]
+    },
+    {
+      "title": "Installation Drawing, 772K / G772K Series Servo Valves",
+      "machine": "G772K",
+      "kind": "установочный чертёж",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Instl_Dwg-772K_G772K_Series_Servovalves.pdf"
+      ]
+    },
+    {
+      "title": "Moog 761 Series Flow Control Servo Valves (catalog)",
+      "doc_no": "CDL6642, Rev. M, апрель 2024",
+      "machine": "761 / 761K",
+      "kind": "каталог с запчастями",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-761Series-Catalog-en.pdf"
+      ]
+    },
+    {
+      "title": "761 Series Installation and Operation Instruction",
+      "doc_no": "CDS6673, Rev. F, май 2024",
+      "machine": "761",
+      "kind": "O&M",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/761_Manual_CDS6673_F.pdf"
+      ]
+    },
+    {
+      "title": "761K Series Installation and Operation Instruction",
+      "doc_no": "CDS6769, Rev. G, май 2024",
+      "machine": "761K",
+      "kind": "O&M",
+      "sources": [
+        "https://www.moog.com/content/dam/moog/literature/products/servovalves/761K_Manual_CDS6769_G.pdf"
+      ]
+    },
+    {
+      "title": "G761/761 Series Flow Control Servo Valves (catalog, прежняя редакция с полной таблицей принадлежностей)",
+      "doc_no": "CDL6642-en, Rev. H, январь 2014",
+      "machine": "G761 / 761",
+      "kind": "каталог с запчастями (копия каталога Moog на сайте стороннего продавца)",
+      "sources": [
+        "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "B52555RK054K001",
+      "issuer": "Moog",
+      "description": "ремкомплект 77X/77XK: кольца основания (FKM по AMS7259), кольца доступа к фильтру, трубчатый фильтр",
+      "machine": "G771K, G772K, G773K и 771/772/773",
+      "unit": "сервоклапан — фильтр пилотной ступени и уплотнения",
+      "doc_ref": "CDL6651 Rev. N, раздел Accessories and spare parts; тот же номер в таблице 1 руководств CDS6768 и CDS6674",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77x-Catalog-en.pdf",
+      "quote": "Maintenance kit Base o-rings FKM per B52555RK054K001"
+    },
+    {
+      "code": "G4220-042",
+      "issuer": "Moog",
+      "description": "катушка моментного двигателя 77XK (параллельное и последовательное включение); номер катушки выбит на шильдике клапана",
+      "machine": "G771K, G772K, G773K",
+      "unit": "сервоклапан — моментный двигатель",
+      "doc_ref": "CDS6768 Rev. K, таблица параметров искробезопасности катушек",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77xK-Manual-en.pdf",
+      "quote": "G4220-042 (parallel) Ex ia IIC T4 30 V 20 mA"
+    },
+    {
+      "code": "G4221-001",
+      "issuer": "Moog",
+      "description": "катушка моментного двигателя 77XK, одинарная",
+      "machine": "G771K, G772K, G773K",
+      "unit": "сервоклапан — моментный двигатель",
+      "doc_ref": "CDS6768 Rev. K, таблица параметров искробезопасности катушек",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77xK-Manual-en.pdf",
+      "quote": "G4221-001 (single) Ex ia IIC T4 30 V 28 mA"
+    },
+    {
+      "code": "G4220-051",
+      "issuer": "Moog",
+      "description": "катушка моментного двигателя 77XK (исполнения -051 и -098: одинарная, последовательная, параллельная)",
+      "machine": "G771K, G772K, G773K",
+      "unit": "сервоклапан — моментный двигатель",
+      "doc_ref": "CDS6768 Rev. K; в источнике записано как G4220-051/098",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77xK-Manual-en.pdf",
+      "quote": "G4220-051/098 (single, series, parallel)"
+    },
+    {
+      "code": "MS3106F14S-2S",
+      "issuer": "военный стандарт MS (стандартный номер разъёма, изготовитель не назван)",
+      "description": "ответный 4-контактный разъём сервоклапана",
+      "machine": "771/772/773, G771K/G772K",
+      "unit": "сервоклапан — электрический разъём",
+      "doc_ref": "CDL6651 Rev. N, установочный чертёж, примечание 5",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-Servo-Valves-G77x-Catalog-en.pdf",
+      "quote": "Connector mates with MS3106F14S-2S"
+    },
+    {
+      "code": "B52555RK201K001",
+      "issuer": "Moog",
+      "description": "ремкомплект 761/761K: кольца основания (FKM по AMS7259), кольца доступа к фильтру, фильтрующий диск 63 мкм",
+      "machine": "761 / 761K",
+      "unit": "сервоклапан — фильтр пилотной ступени и уплотнения",
+      "doc_ref": "CDL6642 Rev. M, Spare Parts; тот же номер в CDS6673 и CDS6769, таблица 1",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-761Series-Catalog-en.pdf",
+      "quote": "Maintenance Base o-rings FKM per AMS7259 B52555RK201K001"
+    },
+    {
+      "code": "B52555RK204K001",
+      "issuer": "Moog",
+      "description": "ремкомплект 761/761K с фильтрующим диском 28 мкм",
+      "machine": "761 / 761K",
+      "unit": "сервоклапан — фильтр пилотной ступени и уплотнения",
+      "doc_ref": "CDL6642 Rev. M, Spare Parts",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-761Series-Catalog-en.pdf",
+      "quote": "Maintenance Base o-rings FKM per AMS7259 B52555RK204K001"
+    },
+    {
+      "code": "A67999-065",
+      "issuer": "Moog",
+      "description": "сменный фильтр пилотной ступени, 60 мкм номинал",
+      "machine": "G761 / 761",
+      "unit": "сервоклапан — фильтр пилотной ступени",
+      "doc_ref": "CDL6642-en Rev. H (2014), Spare Parts G761/761; копия каталога Moog на сайте стороннего продавца; в Rev. M отдельно не выделен",
+      "source_url": "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf",
+      "quote": "Replaceable filter, 60 mµ nominal A67999-065"
+    },
+    {
+      "code": "-42082-022",
+      "issuer": "Moog",
+      "description": "уплотнительное кольцо основания портов P, T, A, B, 10,82 × 1,78 мм, FKM 85 (MIL-R-83248 размер -013), 4 шт. на клапан",
+      "machine": "G761 / 761",
+      "unit": "сервоклапан — уплотнения основания",
+      "doc_ref": "CDL6642-en Rev. H (2014), Spare Parts G761/761",
+      "source_url": "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf",
+      "quote": "Base O-ring for P, T, A 4 required for P, T, A, and B ports 10.82 mm Fluorocarbon FKM 85 shore -42082-022"
+    },
+    {
+      "code": "-42082-013",
+      "issuer": "Moog",
+      "description": "уплотнительное кольцо порта X, 9,25 × 1,8 мм, FKM 85 (MIL-R-83248 размер -012)",
+      "machine": "G761 / 761",
+      "unit": "сервоклапан — уплотнения основания",
+      "doc_ref": "CDL6642-en Rev. H (2014), Spare Parts G761/761",
+      "source_url": "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf",
+      "quote": "X port O-ring 1 required for the X port 9.25 (0.364 in) x Fluorocarbon FKM 85 shore -42082-013"
+    },
+    {
+      "code": "-49054F014S002S",
+      "issuer": "Moog",
+      "description": "ответный 4-контактный разъём (номер Moog для MS3106F14S-2S)",
+      "machine": "G761 / 761",
+      "unit": "сервоклапан — электрический разъём",
+      "doc_ref": "CDL6642-en Rev. H (2014), Accessories G761/761",
+      "source_url": "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf",
+      "quote": "Mating connector 4 pin electrical connector -49054F014S002S (MS3106F14S-2S)"
+    },
+    {
+      "code": "B64929-008B045",
+      "issuer": "Moog",
+      "description": "крепёжные винты M8x45 ISO 4762-10.9, 4 шт., момент 11 Н·м",
+      "machine": "G761 / 761",
+      "unit": "сервоклапан — крепление к коллектору",
+      "doc_ref": "CDL6642-en Rev. H (2014), Accessories G761/761",
+      "source_url": "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf",
+      "quote": "Attachment screws 4 required M8x45 ISO 4762-10.9 tightening Torque 11 Nm (8 lbf-in) B64929-008B045"
+    },
+    {
+      "code": "A31324-228B",
+      "issuer": "Moog",
+      "description": "крепёжные винты 5/16-18NC длиной 1,75 дюйма (дюймовое исполнение)",
+      "machine": "G761 / 761",
+      "unit": "сервоклапан — крепление к коллектору",
+      "doc_ref": "CDL6642-en Rev. H (2014), Accessories G761/761",
+      "source_url": "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf",
+      "quote": "Attachment screws 5/16-18NC by 1.75 long A31324-228B"
+    },
+    {
+      "code": "-43586AM007",
+      "issuer": "Moog",
+      "description": "монтажная плита (коллектор) четырёхпортовая",
+      "machine": "G761 / 761",
+      "unit": "сервоклапан — монтажная плита",
+      "doc_ref": "CDL6642-en Rev. H (2014), Accessories G761/761",
+      "source_url": "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf",
+      "quote": "Mounting manifold Base mounting manifold, four port -43586AM007"
+    },
+    {
+      "code": "-23718-001K002",
+      "issuer": "Moog",
+      "description": "промывочная плита: ставится вместо клапана при промывке гидросистемы",
+      "machine": "G761 / 761",
+      "unit": "гидросистема — промывка",
+      "doc_ref": "CDL6642-en Rev. H (2014), Accessories G761/761",
+      "source_url": "https://vercoil.com/wp-content/uploads/2025/10/Moog-ServoValves-G761_761Series-Catalog-en-2.pdf",
+      "quote": "Flushing plate Manifold employed in place of valve when initially cleaning hydraulic fluids -23718-001K002"
+    },
+    {
+      "code": "312A6077",
+      "issuer": "GE",
+      "description": "базовая спецификация GE на сервоклапаны газовых и паровых турбин; исполнение Moog PGO для G771K/G772K её превышает",
+      "machine": "ГТУ и паровые турбины GE",
+      "unit": "сервоклапан ВНА и топливных клапанов",
+      "doc_ref": "CDL62906-en, Moog PGO Overview",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/products/servovalves/Moog-ServoValves-PGO-Overview-en.pdf",
+      "quote": "exceeds GE 312A6077 specifications"
+    },
+    {
+      "code": "312A6077P001",
+      "issuer": "GE",
+      "description": "сервоклапан GE; по данным продавца соответствует Moog G771K200",
+      "machine": "ГТУ GE (рама не указана)",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online (продавец, США) — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/g771k200-312a6077p001-moog-g771-series-servo-valve",
+      "quote": "Part Number: G771K200, 312A6077P001"
+    },
+    {
+      "code": "G771K200",
+      "issuer": "Moog",
+      "description": "сервоклапан G771; по данным продавца заменён на G771K200A, затем на G771K289A",
+      "machine": "ГТУ GE (по данным продавца — GE 312A6077P001)",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online, список сервоклапанов — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/Servo-Valves_c_1732.html",
+      "quote": "G771K200 | MOOG G771 Series Servo Valve - Upgraded to G771K200A - Replaced by G771K289A"
+    },
+    {
+      "code": "G771K289A",
+      "issuer": "Moog",
+      "description": "сервоклапан G771 — по данным продавца замена G771K200A и G771K240A (то же пишет Teknihaus)",
+      "machine": "ГТУ GE — вывод по серии G77xK и PGO; на странице продавца названа только серия клапана",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/g771k289a-moog-g771-series-servo-valve",
+      "quote": "Part Number: G771K289A Model: G771 Series Servo Valve Manufacturer: MOOG Condition: New & Original in Factory Packing Factory Warranty: 12 Months Remark: This is item is a replacement for G771K200A & G771K240A"
+    },
+    {
+      "code": "312A6077P002",
+      "issuer": "GE",
+      "description": "сервоклапан GE; по данным продавца соответствует Moog G771K201A, тип H04FOFA4VH4R",
+      "machine": "ГТУ GE (по данным Leda Greenpower — MS5001PA, Nuovo Pignone)",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/312a6077p002-ge-servo-valve",
+      "quote": "Product Number: 312A6077P002 MOOG Model: G771K201A Type: H04FOFA4VH4R"
+    },
+    {
+      "code": "G771K201",
+      "issuer": "Moog",
+      "description": "сервоклапан G771K, 3000 psi, 4-линейный; по данным продавца стоит на ГТУ GE MS5001PA (Nuovo Pignone), номера GE 312A6077P002 и 381A7058P002",
+      "machine": "GE MS5001PA (Nuovo Pignone)",
+      "unit": "сервоклапан системы управления ГТУ",
+      "doc_ref": "Leda Greenpower (china-power-contractor.cn, Китай) — по данным продавца, доверие среднее",
+      "source_url": "https://www.china-power-contractor.cn/312A6077P002-RVO29265-65FP-G771K201-SERVO-VALVE-MOOG-GE-SPARE-PARTS.html",
+      "quote": "MOOG INCORPORATED: Model#G771K201 NUOVO PIGNONE: RVO29265 65FP"
+    },
+    {
+      "code": "381A7058P002",
+      "issuer": "GE",
+      "description": "номер GE того же сервоклапана Moog G771K201 (наряду с 312A6077P002) — по данным продавца; у Quicktime Online клапан G771K201A записан с номером 312A7058P002 — один из двух номеров может быть опечаткой, синонимами их без третьего источника не считать",
+      "machine": "GE MS5001PA (Nuovo Pignone)",
+      "unit": "сервоклапан",
+      "doc_ref": "Leda Greenpower — по данным продавца",
+      "source_url": "https://www.china-power-contractor.cn/312A6077P002-RVO29265-65FP-G771K201-SERVO-VALVE-MOOG-GE-SPARE-PARTS.html",
+      "quote": "GENERAL ELECTRIC/DIELEKTROL/LENTRONICS: P/N#381A7058P002"
+    },
+    {
+      "code": "RVO29265",
+      "issuer": "Nuovo Pignone",
+      "description": "номер Nuovo Pignone сервоклапана Moog G771K201 (позиция 65FP) — по данным продавца",
+      "machine": "GE MS5001PA (Nuovo Pignone)",
+      "unit": "сервоклапан",
+      "doc_ref": "Leda Greenpower — по данным продавца",
+      "source_url": "https://www.china-power-contractor.cn/312A6077P002-RVO29265-65FP-G771K201-SERVO-VALVE-MOOG-GE-SPARE-PARTS.html",
+      "quote": "NUOVO PIGNONE: RVO29265 65FP"
+    },
+    {
+      "code": "312A6077P004",
+      "issuer": "GE",
+      "description": "сервоклапан GE; по данным продавца соответствует Moog G771K202A, тип H19FOFA4VJ4R",
+      "machine": "ГТУ GE (рама не указана)",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/312a6077p004-ge-servo-valve",
+      "quote": "GE Part Number: 312A6077P004 Type: Servo Valve MOOG Type H19FOFA4VJ4R MOOG Model G771K202A"
+    },
+    {
+      "code": "G771K202A",
+      "issuer": "Moog",
+      "description": "сервоклапан G771K; по данным продавца соответствует GE 312A6077P004",
+      "machine": "ГТУ GE",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/312a6077p004-ge-servo-valve",
+      "quote": "GE Part Number: 312A6077P004 Type: Servo Valve MOOG Type H19FOFA4VJ4R MOOG Model G771K202A"
+    },
+    {
+      "code": "312A6077P007",
+      "issuer": "GE",
+      "description": "сервоклапан GE; по данным продавца соответствует Moog G771K208",
+      "machine": "ГТУ GE",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/g771k208-moog-servo-valve.html",
+      "quote": "Part Number: G771K208 Type: G771 Series Servo Valve GE Part Number: 312A6077P007"
+    },
+    {
+      "code": "312A7058P002",
+      "issuer": "GE",
+      "description": "сервоклапан GE; по данным продавца соответствует Moog G771K201A, тип H04FOFA4VH4R; у Leda Greenpower тот же G771K201 записан с номером GE 381A7058P002 — один из двух номеров может быть опечаткой, синонимами их без третьего источника не считать",
+      "machine": "ГТУ GE",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/312a7058p002-ge-servo-valve",
+      "quote": "Product Number: 312A7058P002 MOOG Model: G771K201A Type: H04FOFA4VH4R"
+    },
+    {
+      "code": "G771K291A",
+      "issuer": "Moog",
+      "description": "сервоклапан G771 — по данным продавца замена снятого G771K203A",
+      "machine": "ГТУ GE — вывод по серии G77xK и PGO; на странице продавца названа только серия клапана",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online, карточка G771K203A — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/g771k203a-moog-selvo-valve",
+      "quote": "Remark: This item has been replaced by G771K291A"
+    },
+    {
+      "code": "G772K240",
+      "issuer": "Moog",
+      "description": "сервоклапан G772 (типоразмер 03), снят с производства; по данным продавца замена — G772K336A",
+      "machine": "ГТУ GE — вывод по серии G77xK и PGO; на странице продавца названа только серия клапана",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/g772k240-moog-servo-valve",
+      "quote": "Part Number: G772K240 - Discontinued & Out of Stock Model: G772 Series Servo Valve Replacement: G772K336A"
+    },
+    {
+      "code": "G772K336A",
+      "issuer": "Moog",
+      "description": "сервоклапан G772 — по данным продавца замена G772K240A и G772K272A",
+      "machine": "ГТУ GE — вывод по серии G77xK и PGO; на странице продавца названа только серия клапана",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/g772k336a-moog-servo-valve",
+      "quote": "Part Number: G772K336A Model: G772 Servo Valve Manufacturer: MOOG Condition: New & Original in Factory Packing Factory Warranty: 12 Months Remark: This is a replacement for G772K240A and G772K272A"
+    },
+    {
+      "code": "G772K337A",
+      "issuer": "Moog",
+      "description": "сервоклапан G772 — по данным продавца замена снятого G772K241A",
+      "machine": "ГТУ GE — вывод по серии G77xK и PGO; на странице продавца названа только серия клапана",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online, карточка G772K241A — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/g772k241a-moog-servo-valve",
+      "quote": "Remark: This item has been replaced by G772K337A"
+    },
+    {
+      "code": "G772K338A",
+      "issuer": "Moog",
+      "description": "сервоклапан G772 — по данным продавца замена G772K620A",
+      "machine": "ГТУ GE — вывод по серии G77xK и PGO; на странице продавца названа только серия клапана",
+      "unit": "сервоклапан",
+      "doc_ref": "Quicktime Online — по данным продавца; продавец сам пишет, что не является авторизованным дилером Moog",
+      "source_url": "https://www.quicktimeonline.com/g772k338a-moog-servo-valve",
+      "quote": "Part Number: G772K338A Model: G772 Servo Valve Manufacturer: MOOG Condition: New & Original in Factory Packing Factory Warranty: 12 Months Remark: This is a replacement for G772K620A"
+    },
+    {
+      "code": "L43418P03",
+      "issuer": "GE — в перечне Moog MRO Typical P/N без владельца; принадлежность GE по проверке скептика подтверждает также vbr-turbinepartners.com",
+      "description": "привод направляющих аппаратов компрессора (VSV actuator), Moog ремонтирует полностью",
+      "machine": "GE LM2500 / LM5000 / LM6000",
+      "unit": "привод поворотных направляющих аппаратов компрессора (VSV)",
+      "doc_ref": "Moog MRO Services, Form 500-1514, таблица High volume repairs",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf",
+      "quote": "VSV Actuator L43418P03, 1211245-017, 1211245-020 Full Overhaul Capability"
+    },
+    {
+      "code": "1211245-017",
+      "issuer": "владелец номера в источнике не назван (Typical P/N в перечне Moog MRO)",
+      "description": "привод направляющих аппаратов компрессора (VSV actuator)",
+      "machine": "GE LM2500 / LM5000 / LM6000",
+      "unit": "привод VSV",
+      "doc_ref": "Moog MRO Services, Form 500-1514",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf",
+      "quote": "VSV Actuator L43418P03, 1211245-017, 1211245-020 Full Overhaul Capability"
+    },
+    {
+      "code": "1211245-020",
+      "issuer": "владелец номера в источнике не назван (Typical P/N в перечне Moog MRO)",
+      "description": "привод направляющих аппаратов компрессора (VSV actuator)",
+      "machine": "GE LM2500 / LM5000 / LM6000",
+      "unit": "привод VSV",
+      "doc_ref": "Moog MRO Services, Form 500-1514",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf",
+      "quote": "VSV Actuator L43418P03, 1211245-017, 1211245-020 Full Overhaul Capability"
+    },
+    {
+      "code": "L43419P06",
+      "issuer": "GE — вывод по формату номера; в перечне Moog MRO — Typical P/N без владельца",
+      "description": "привод клапанов перепуска воздуха (VBV actuator)",
+      "machine": "GE LM2500 / LM5000 / LM6000",
+      "unit": "привод VBV",
+      "doc_ref": "Moog MRO Services, Form 500-1514",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf",
+      "quote": "VBV Actuator L43419P06, L43419P07, L43420P07 Full Overhaul Capability"
+    },
+    {
+      "code": "L43420P07",
+      "issuer": "GE — вывод по формату номера; в перечне Moog MRO — Typical P/N без владельца",
+      "description": "привод клапанов перепуска воздуха (VBV actuator)",
+      "machine": "GE LM2500 / LM5000 / LM6000",
+      "unit": "привод VBV",
+      "doc_ref": "Moog MRO Services, Form 500-1514",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf",
+      "quote": "VBV Actuator L43419P06, L43419P07, L43420P07 Full Overhaul Capability"
+    },
+    {
+      "code": "L24922P03",
+      "issuer": "GE — вывод по формату номера; в перечне Moog MRO — Typical P/N без владельца",
+      "description": "насос системы изменяемой геометрии (VG pump), Moog ремонтирует полностью",
+      "machine": "GE LM2500 / LM5000 / LM6000",
+      "unit": "насос VG",
+      "doc_ref": "Moog MRO Services, Form 500-1514",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf",
+      "quote": "VG Pump L24922P03 Full Overhaul Capability"
+    },
+    {
+      "code": "L44570P01",
+      "issuer": "GE — вывод по формату номера; в перечне Moog MRO — Typical P/N без владельца",
+      "description": "агрегат HCU (так в перечне Moog; расшифровка в источнике не дана), Moog ремонтирует полностью",
+      "machine": "GE LM2500 / LM5000 / LM6000",
+      "unit": "агрегат HCU",
+      "doc_ref": "Moog MRO Services, Form 500-1514",
+      "source_url": "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf",
+      "quote": "HCU L44570P01, L44571P02, L47108P02 Full Overhaul Capability"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Emerson (Fisher)",
+      "component": "клапан Fisher EAB в сборке газового регулирующего клапана Moog; ремонт клапана Fisher Encore в ремонтном центре Emerson IVS",
+      "machine": "газовый регулирующий клапан GE 7FA (программа Moog 64K)",
+      "evidence": "Пресс-релиз Moog: программа 64K даёт владельцам GE «Moog Extended Life Actuator и Fisher Extended Life EAB Process Valve». Клапан проходит ремонт Fisher Encore в местном ремонтном центре Emerson IVS. В брошюре CDL49834 сказано, что доработку клапана EAB разработал Emerson.",
+      "sources": [
+        "https://www.moog.com/news/operating-group-news/2018/Moog-Gas-Control-Valve-64K-Upgrade-Program-Extends-GE7FA-Gas-Turbine-Operation.html",
+        "https://www.moog.com/content/dam/moog/literature/service/Moog-GE-7FA-Turbine-64K-Upgrade-Flyer-en.pdf",
+        "https://confluids.com/industry/power-generation-industry/"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Emerson (Fisher)",
+      "component": "самоподтягивающаяся сальниковая набивка Enviro-Seal в доработке «64k» регулирующего клапана (там же втулка штока из сплава Stellite, изготовитель втулки не назван)",
+      "machine": "газовые регулирующие клапаны ГТУ, доработка «64k» (изготовитель ГТУ для клапана в статье не назван; GE, Siemens и Mitsubishi Moog называет для привода Extended Life 2.0)",
+      "evidence": "В статье Power Progress (2022) доработка «64k» описана со втулкой из Stellite и набивками Enviro-Seal. Что Enviro-Seal — марка Fisher (Emerson), в статье не сказано; скептик подтвердил это по каталогу Emerson.",
+      "sources": [
+        "https://www.powerprogress.com/news/moogs-new-fuel-system-components-for-gas-turbine-retrofits/8023792.article"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "Moog Motion Controls Pvt. Ltd.",
+      "country": "Индия",
+      "role": "официальный: дочерняя компания Moog в Бангалоре (продажи, поддержка, отгрузка и сервис); Индия названа среди мест ремонтных центров Moog по турбинному оборудованию",
+      "sources": [
+        "https://www.moog.com/contact-us/moog-facilities.html",
+        "https://www.moog.com/service-support/industries/gas-steam-turbine-overhauls.html"
+      ]
+    },
+    {
+      "company": "3A Technologies",
+      "country": "Индия",
+      "role": "официальный дистрибьютор (локатор Moog): сервоклапаны и пропорциональные клапаны, насосы RKP, двигатели, поворотные приводы; отрасль «Power Generation - Gas and Steam Turbines»",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/india/3a-technologies-7d31e0da1ab99fe8b08a22118e2f402b.html"
+      ]
+    },
+    {
+      "company": "Omkar Enterprises",
+      "country": "Индия",
+      "role": "официальный дистрибьютор (локатор Moog): сервоклапаны, насосы RKP, серводвигатели и сервоусилители, электромеханические приводы; отрасль «Power Generation - Gas and Steam Turbines»",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/india/omkar-enterprises-7d31e0da1ab99fe8b08a22118e2f402b.html"
+      ]
+    },
+    {
+      "company": "RKB International Pvt. Limited",
+      "country": "Индия",
+      "role": "официальный дистрибьютор (локатор Moog): сервоклапаны, насосы RKP, сервоприводы, электромеханические приводы; отрасль «Power Generation - Gas and Steam Turbines»",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/india/rkb-international-pvt-limited-7d31e0da1ab99fe8b08a22118e2f402b.html"
+      ]
+    },
+    {
+      "company": "Sri Pavani Engineering Company Private Limited",
+      "country": "Индия",
+      "role": "официальный дистрибьютор (локатор Moog): сервоклапаны и пропорциональные клапаны, насосы RKP; отрасль «Power Generation - Gas and Steam Turbines»",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/india/sri-pavani-engineering-company-private-limited-7d31e0da1ab99fe8b08a22118e2f402b.html"
+      ]
+    },
+    {
+      "company": "Sun Power-Gen FZCO",
+      "country": "ОАЭ",
+      "role": "официальный дистрибьютор (локатор Moog), Джебель-Али: сервоклапаны, насосы RKP, серводвигатели и сервоусилители, электромеханические приводы; отрасли — газовые и паровые турбины, нефтегаз; обслуживает ОАЭ, Саудовскую Аравию, Оман, Катар, Кувейт, Бахрейн, Ирак, Йемен, Афганистан",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/united-arab-emirates/sun-power-gen-fzco.html"
+      ]
+    },
+    {
+      "company": "Guney Hidropar Ltd Sti",
+      "country": "Турция",
+      "role": "официальный дистрибьютор (локатор Moog), Адана: сервоклапаны и пропорциональные клапаны, насосы RKP; отрасль в локаторе — Industrial (энергетика не указана)",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/turkey/guney-hidropar-ltd-sti-221cdfb73049678e244380b45872cbb2.html"
+      ]
+    },
+    {
+      "company": "Mert Teknik Fab Malz A.S.",
+      "country": "Турция",
+      "role": "официальный дистрибьютор (локатор Moog), Стамбул: сервоклапаны и пропорциональные клапаны, насосы RKP; отрасль — Industrial",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/turkey/mert-teknik-fab-malz-as-221cdfb73049678e244380b45872cbb2.html"
+      ]
+    },
+    {
+      "company": "Rota Teknik Makina Sanayi",
+      "country": "Турция",
+      "role": "официальный дистрибьютор (локатор Moog), Стамбул: сервоклапаны и пропорциональные клапаны, насосы RKP; отрасль — Industrial",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/turkey/rota-teknik-makina-sanayi-221cdfb73049678e244380b45872cbb2.html"
+      ]
+    },
+    {
+      "company": "Moog Industrial Control (Suzhou) Co., Ltd.",
+      "country": "Китай",
+      "role": "площадка изготовителя: Moog в Тайцане (провинция Цзянсу), из перечня площадок Moog; Китай назван среди мест ремонтных центров Moog по турбинному оборудованию",
+      "sources": [
+        "https://www.moog.com/contact-us/moog-facilities.html",
+        "https://www.moog.com/service-support/industries/gas-steam-turbine-overhauls.html"
+      ]
+    },
+    {
+      "company": "Moog China (Шанхай, зона Вайгаоцяо)",
+      "country": "Китай",
+      "role": "подразделение Moog (в локаторе Moog): электромеханическая продукция — двигатели, электромеханические приводы; отрасли — энергетика и ветер, промышленность; обслуживает Китай, Гонконг и Монголию",
+      "sources": [
+        "https://www.moog.com/contact-us/dist-rep-locator/dist-reps/china/moog-china-588034eafbff6ba611764e78cd4aa5a1.html"
+      ]
+    },
+    {
+      "company": "Moog MRO Services (Дублин)",
+      "country": "Ирландия",
+      "role": "подразделение Moog: ремонт и капремонт агрегатов авиапроизводных ГТУ — GE LM1600/LM2500/LM6000, P&W GG3/GG4/JT4/GG8, Rolls-Royce Avon/RB211/Olympus/Tyne",
+      "sources": [
+        "https://www.moog.com/service-support/industries/aero-derivative-gas-turbine-services.html",
+        "https://www.moog.com/content/dam/moog/literature/industries/energy/500-1514-mroservices-igt-031926.pdf"
+      ]
+    },
+    {
+      "company": "CFI (ConFluids)",
+      "country": "США",
+      "role": "по собственному заявлению — крупнейший дистрибьютор Moog Industrial в Северной Америке и авторизованный интегратор (приводы Moog на клапанах Fisher); обменный фонд турбинных приводов, передача в заводской ремонт Moog",
+      "sources": [
+        "https://confluids.com/industry/power-generation-industry/"
+      ]
+    },
+    {
+      "company": "ООО «МС Лаб» (MC Lab)",
+      "country": "Россия",
+      "role": "независимый: продажа и ремонт сервоклапанов Moog, диагностика на стенде; по заявлению компании персонал обучен на заводах Moog в Германии. В локаторе Moog её нет. Контактные данные сайта совпадают с данными российского офиса Moog из брошюры CDL28175 (2010) — вероятно, преемник бывшего офиса; не подтверждено",
+      "sources": [
+        "https://mc-lab.ru/",
+        "https://mc-lab.ru/remont/"
+      ]
+    },
+    {
+      "company": "ГИТРОН",
+      "country": "Россия",
+      "role": "независимый: ремонт пропорциональных клапанов Moog (модели D662, D682, D684 и др.); турбинная специализация не заявлена",
+      "sources": [
+        "https://gitron.ru/proporcionalnye-klapany/moog"
+      ]
+    }
+  ],
+  "gaps": [
+    "Официальной таблицы соответствия номеров GE (312A6077Pxxx, 381A7058Pxxx, 312A7058Pxxx) и моделей Moog G771K/G772K в открытом доступе нет. Все пары и цепочки замен в файле взяты у продавцов (Quicktime Online, Leda Greenpower, Teknihaus). Первичный источник — шильдик клапана, руководства GE (GEK, например GEK106910 по системе ВНА — закрыты, копии на scribd и pdfcoffee отдают 403) или Moog по запросу.",
+    "Пара G772K240 ↔ GE 312A6077P003 (сервоклапан ВНА, по поисковой выдаче) видна только на форуме control.com, а он отдаёт 403. Пара не записана. Записи госзакупок с G772K619 для привода ВНА (govtribe.com) тоже недоступны (403).",
+    "Номера деталей электроприводов Moog для ГТУ не опубликованы: 880 Series, Failsafe EMA S/M, электроприводы ВНА и топливного газа, сервоусилители MSD, двигатели ExD. Изделия заказные. Номера — в документации поставки турбины (немецкий изготовитель малых ГТУ 5–12 МВт в источнике не назван) и у Moog по запросу.",
+    "Ремкомплекты гидравлических сервоприводов газового клапана и ВНА GE 7FA/7EA (уплотнения, LVDT, фильтры) в открытых источниках не найдены. Moog ведёт их ремонт у себя на заводе и через обменный фонд (Advanced Exchange). По руководству CDS6768 ремонт у неавторизованной мастерской снимает гарантию Moog.",
+    "В действующем каталоге 77X (CDL6651 Rev. N) фильтр отдельным номером не выделен — есть только комплект B52555RK054K001. Отдельный фильтр A67999-065 и принадлежности G761 взяты из прежней редакции каталога CDL6642 Rev. H (2014), копия которой лежит на сайте стороннего продавца (vercoil.com). Актуальность этих номеров на 2026 год не проверена.",
+    "Сайт сервиса moogglobalsupport.com недоступен (сброс соединения или 503): страницы программы 64K, газовых и паровых турбин, адреса сервисных центров.",
+    "Россия, Казахстан, Узбекистан. В локаторе дистрибьюторов Moog страниц этих стран нет (404), в перечне площадок Moog России тоже нет. В брошюре 2010 года российский офис указан. Статус присутствия после 2022 года по открытым источникам не установлен. Найдены только независимые ремонтники.",
+    "Модели и номера японского серийного взрывозащищённого привода топливного клапана и ВНА на сервоклапанах 760N/78N (с 2004 года, более 300 шт.) не найдены. Вероятно, они есть у Moog Japan (Хирацука).",
+    "Для ГТУ Siemens, Mitsubishi (топливные клапаны Nakakita на M501F/G, обслуживает Moog) и Solar конкретные номера Moog не найдены. Moog только заявляет, что Extended Life подходит для ГТУ GE, Siemens и Mitsubishi.",
+    "Владелец номеров 1211245-017 и 1211245-020 (привод VSV LM2500/LM6000) в документе Moog не назван. Номера L…P… записаны как номера GE по формату и по перечню Moog MRO. Для подтверждения нужен иллюстрированный каталог деталей GE LM2500/LM6000 (закрыт)."
+  ],
+  "verifier_notes": "Все источники скачаны заново и прочитаны целиком (pdftotext и HTML в текст). Все 40 кодов найдены на заявленной странице, написание совпадает с точностью до дефисов. Случаев «не подтверждён» или «источник недоступен» нет.\n\nОговорки для записи в библиотеку:\n1) Коды продавцов Quicktime Online и Leda Greenpower держатся только на продавцах. Quicktime прямо пишет, что не является авторизованным дилером. Нужна пометка «по данным продавца».\n2) Для G771K289A, G771K291A и G772K240/336A/337A/338A поле machine «ГТУ GE» на страницах продавца не подтверждено: там только серия клапана. Это вывод по серии G77xK и PGO.\n3) Номер GE клапана G771K201A расходится: у Quicktime 312A7058P002, у Leda Greenpower 381A7058P002. Один из них может быть опечаткой, связывать их как синонимы без третьего источника нельзя.\n4) В перечне Moog MRO (Form 500-1514) номера даны как «Typical P/N» без владельца. Что L-номера выпущены GE — вывод. Для L43418P03 его подтверждает vbr-turbinepartners.com.\n5) У L24922P03 («питает приводы VSV/VBV») и L44570P01 (расшифровка HCU) описание дополнено исследователем, в источнике этого нет.\n6) В машинах: для G771K диапазон 1,9–57 л/мин относится ко всей семье 771/772/773; по каталогу у 771 максимум 17 л/мин. Для D633K/D634K привязка к паровой турбине — вывод, модель в этом абзаце статьи не названа. «5 600 шт.» у Extended Life Actuator взято из статьи 2010 г., где не названы ни имя привода, ни GE 7FA.\n7) Для Enviro-Seal принадлежность Fisher/Emerson подтверждена каталогом Emerson. Но GE/Siemens/Mitsubishi в поле machine относится к приводу, а не к клапану 64k.\n8) Ссылки doc_ref на CDS6674, CDS6673 и CDS6769 сверены по PDF-файлам этих руководств: номера ремкомплектов там есть.",
+  "corrections": [
+    "Коды продавцов (Quicktime Online — 13, Leda Greenpower — 3): «по данным продавца» теперь стоит в description у всех (у 381A7058P002 и RVO29265 добавлено); в doc_ref кодов Quicktime — что продавец сам называет себя неавторизованным дилером (замечание скептика 1)",
+    "G771K289A, G771K291A, G772K240, G772K336A, G772K337A, G772K338A: machine «ГТУ GE» помечен как вывод — на страницах продавца названа только серия клапана (замечание скептика 2)",
+    "312A7058P002 и 381A7058P002: в description записано расхождение — у Quicktime и Leda Greenpower разные номера GE одного клапана G771K201(A), синонимами без третьего источника не считаются (замечание скептика 3)",
+    "L43418P03, L43419P06, L43420P07, L24922P03, L44570P01: issuer — GE как вывод по формату номера, в перечне Moog номера даны как Typical P/N без владельца; для L43418P03 отмечено подтверждение vbr-turbinepartners.com (замечание скептика 4)",
+    "L24922P03: снято «питает приводы VSV и VBV»; L44570P01: снята расшифровка «гидромеханический блок управления» — в источнике этого нет, дописано исследователем (замечание скептика 5)",
+    "Машины: у G771K диапазон расхода 1,9–57 л/мин оговорён как диапазон всей семьи 771/772/773 (у 771 по каталогу до 17 л/мин); у D633K/D634K привязка к паровой турбине помечена как вывод; у Extended Life Actuator «5 600 шт.» оговорено — статья 2010 г. не называет ни привод, ни GE 7FA (замечание скептика 6)",
+    "Enviro-Seal: снята оговорка «вывод» — принадлежность марки Fisher (Emerson) скептик подтвердил каталогом Emerson; GE/Siemens/Mitsubishi из machine отнесены к приводу, а не к клапану 64k; Stellite вынесен в оговорку — это не изделие Emerson (замечание скептика 7)",
+    "sub_suppliers: verified: true у обоих — скептик подтвердил их источниками",
+    "80 Series, Inlet Guide Vane Control Actuator, Motion Controller, ExD: rating «данных нет» — поле обязательно, характеристик в источниках нет",
+    "Дилеры, перепроверено при сборке файла: площадки Moog в Тайцане и Шанхае и Moog MRO Services записаны как площадка и подразделения изготовителя (прямое предложение), а не как официальные дилеры; у CFI статус дистрибьютора — по собственному заявлению, «официальный» снято",
+    "verifier_notes: снят локальный путь к рабочим файлам скептика — пути рабочей машины в набор не пишутся",
+    "Счёт: в parts 39 кодов, в отчёте скептика — «все 40»; отклонённых кодов нет, отчёт скептика не правился"
+  ]
+}
