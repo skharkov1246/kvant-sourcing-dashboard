@@ -179,6 +179,12 @@ def _ключ(код: str | None) -> str:
     return re.sub(r"[^0-9a-z]", "", (код or "").lower())
 
 
+#: Тот же ключ под публичным именем: им досчёт даты прихода
+#: (library/backfill_file_dates.py) сверяет код поля из базы с ответом
+#: crm.item.*, который отдаёт только написание «ufCrm…».
+ключ_поля = _ключ
+
+
 _ПО_КЛЮЧУ: dict[str, dict[str, tuple[str, str]]] = {
     сущность: {_ключ(к): v for к, v in поля.items()} for сущность, поля in ПО_КОДУ.items()
 }
