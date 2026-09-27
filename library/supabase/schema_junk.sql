@@ -226,6 +226,69 @@ begin
 end $$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- ЛОЖНЫЕ СТРОКИ ЦЕНЫ — ПОМЕТКА, А НЕ УДАЛЕНИЕ (scripts/mark_false_prices.py).
+--
+-- ЗАЧЕМ. Недельный свод 21–27.09.2026: из 83 проверенных строк цены 20 — не
+-- цены (номер страницы, телефон, CIN, условия оплаты, «Total Amount», срок
+-- поставки, строки служебной записки: цена 1,0 при сумме, равной количеству).
+-- Правило — library/quotes.ложная_цена, закрытым списком причин; то же правило
+-- не пускает такие строки в запись (price_store.отобрать), когда отбор при
+-- записи включён (FALSE_PRICE_RULE=1; по умолчанию выключен до замера).
+--
+-- ПОЧЕМУ ТАБЛИЦА-СПУТНИК, А НЕ КОЛОНКА lib_prices. Тот же довод, что у
+-- lib_row_junk (правило 5): пометка и откат — вставка и удаление в маленькой
+-- таблице по run_id, секунды; большая таблица не переписывается. Внешний ключ с
+-- каскадом: переразбор файла снимает его строки цены (price_store.СНЯТЬ), и
+-- пометки уходят вместе с ними — новые строки судит запись при включённом
+-- отборе, а при выключенном их помечает следующий прогон пометки.
+--
+-- reason — причина из закрытого списка quotes.ПРИЧИНЫ_ЛОЖНОЙ; журнал прогонов
+-- общий с разметкой прозы (lib_mark_runs, правило 'ложная-цена-v2').
+create table if not exists lib_price_junk (
+  price_id   bigint primary key references lib_prices(id) on delete cascade,
+  rule       text        not null,          -- версия правила: 'ложная-цена-v2'
+  run_id     text        not null,          -- ключ отката: одна пачка = один прогон
+  reason     text        not null,          -- причина из закрытого списка
+  marked_at  timestamptz not null default now(),
+  revoked_at timestamptz,                   -- снятие пометки без удаления
+  revoked_by text
+);
+create index if not exists lib_price_junk_run on lib_price_junk (run_id);
+alter table lib_price_junk enable row level security;
+do $$
+declare кому text := lib_роли_которые_есть(array['anon', 'authenticated']);
+begin
+  if кому is not null then
+    execute format('revoke all on lib_price_junk from %s', кому);
+  end if;
+end $$;
+
+-- ЖИВЫЕ СТРОКИ ЦЕНЫ — ОДНО УСЛОВИЕ В ОДНОМ МЕСТЕ. Его читают все страницы:
+-- карточки портала и поиск (portal_entity_schema.sql, portal_schema.sql),
+-- бренды и коды (library/codes_sql.py), перекрёстная система
+-- (library/crossref.py). Своего фильтра по lib_price_junk в них нет.
+--
+-- drop + create, как у lib_demand_live: вид пересобирается при каждом
+-- применении и подхватывает новые колонки lib_prices. Поэтому НИ ОДИН ВИД НЕ
+-- СТРОИТСЯ ПОВЕРХ lib_prices_live — «drop view» без cascade уронил бы файл на
+-- живой базе, где зависимый вид уже стоит (на чистой ошибки не видно никогда).
+-- Функции (plpgsql) имя вида разрешают при вызове, им пересборка не мешает.
+-- NOT EXISTS в WHERE вида — анти-соединение (правило 8), индексы lib_prices
+-- (lib_prices_pn_key, lib_prices_rfqco, lib_prices_oem) остаются в деле.
+drop view if exists lib_prices_live;
+create view lib_prices_live with (security_invoker = true) as
+  select p.* from lib_prices p
+   where not exists (select 1 from lib_price_junk j
+                      where j.price_id = p.id and j.revoked_at is null);
+do $$
+declare кому text := lib_роли_которые_есть(array['anon', 'authenticated']);
+begin
+  if кому is not null then
+    execute format('revoke all on lib_prices_live from %s', кому);
+  end if;
+end $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- Задним числом: каким путём разобраны уже лежащие файлы. Нужно, чтобы расслоить
 -- калибровку по пути разбора — весь риск в текстовом пути.
 --

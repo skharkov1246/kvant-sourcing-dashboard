@@ -11,8 +11,9 @@
 --
 -- ЧТО ИЩЕТСЯ И ГДЕ
 --   код       — ключ lib_pn_key(запрос), точно и по началу, в четырёх
---               источниках: спрос (lib_demand_live), разбор КП (lib_prices,
---               поток «разбор КП»), каталог (lib_parts: id, catalog_no, kv_no)
+--               источниках: спрос (lib_demand_live), разбор КП (lib_prices_live —
+--               без строк, помеченных ложными, schema_junk.sql; поток «разбор
+--               КП»), каталог (lib_parts: id, catalog_no, kv_no)
 --               и аналоги (lib_part_alt.alt_pn). Рядом с кодом — бренд: сначала
 --               изготовитель по каталогу, приведённый к имени реестра брендов;
 --               нет его — самый частый бренд реестра среди написаний спроса и
@@ -328,7 +329,7 @@ begin
         -- Предложения поставщика: строки разбора КП с карточек его ключей портала.
         left join lateral (
           select count(*)::int as rows, count(distinct lib_pn_key(p.part_number))::int as codes
-            from lib_prices p
+            from lib_prices_live p
            where p.feed = 'разбор КП'
              and p.rfq_company in (select i.value_norm from sup_identifier i
                                     where i.sup_id = e.id and i.kind = 'bitrix'
@@ -478,12 +479,12 @@ begin
         select x.c from (
           -- Разбор КП: те же прыжки по частичному индексу lib_prices_pn_key.
           with recursive t(c) as (
-            (select lib_pn_key(p.part_number) from lib_prices p
+            (select lib_pn_key(p.part_number) from lib_prices_live p
               where p.feed = 'разбор КП'
                 and lib_pn_key(p.part_number) > ключ and lib_pn_key(p.part_number) < граница
               order by lib_pn_key(p.part_number) limit 1)
             union all
-            select (select lib_pn_key(p.part_number) from lib_prices p
+            select (select lib_pn_key(p.part_number) from lib_prices_live p
                      where p.feed = 'разбор КП'
                        and lib_pn_key(p.part_number) > t.c and lib_pn_key(p.part_number) < граница
                      order by lib_pn_key(p.part_number) limit 1)
@@ -550,7 +551,7 @@ begin
         select c.code, x.part_number, x.item_name, x.oem, x.rfq_company
           from c cross join lateral (
             select p.part_number, p.item_name, p.oem, p.rfq_company
-              from lib_prices p
+              from lib_prices_live p
              where p.feed = 'разбор КП' and lib_pn_key(p.part_number) = c.code limit 5000) x
       ), dem as (
         select s.code, count(*)::int as rows, count(distinct s.deal_id)::int as deals,

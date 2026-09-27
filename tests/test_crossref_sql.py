@@ -203,7 +203,33 @@ insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, oem,
          basis_src, pay_src, lead_src, make_src,
          confidence, price_date, 'вложение-12'
     from lib_prices where rfq_id = 'RFQ-1';
+
+-- ЛОЖНАЯ СТРОКА ЦЕНЫ (quotes.ложная_цена): итог документа под кодом 6205 от
+-- своей компании (105) и из своего файла. Помечена в lib_price_junk — вид
+-- lib_prices_live её не пускает. Прочитай запрос таблицу вместо вида —
+-- предложений стало бы семь, а у позиции 6205 появилась бы третья компания.
+insert into lib_prices (part_number, item_name, feed, rfq_company, rfq_id, price,
+                        currency, qty, total, confidence, source_url)
+  values ('6205', 'Total Amount (RMB): 6205', 'разбор КП', '105', 'RFQ-8', 1, 'CNY',
+          6205, 6205, 'low', 'ложная-строка');
 """
+
+# Таблица пометок и вид живых строк — из настоящей миграции, а не копией: условие
+# «строка не помечена» живёт в одном месте (schema_junk.sql).
+ЖИВЫЕ_ЦЕНЫ = ("create table if not exists lib_price_junk", "create view lib_prices_live")
+ПОМЕТКА = """
+insert into lib_price_junk (price_id, rule, run_id, reason)
+  select id, 'ложная-цена-тест', 'тест', 'итог' from lib_prices where source_url = 'ложная-строка';
+"""
+
+
+def живые_цены() -> list[str]:
+    """Операторы таблицы пометок и вида lib_prices_live из schema_junk.sql."""
+    from tests.test_library_schema_sql import операторы
+    текст = (ROOT / "library" / "supabase" / "schema_junk.sql").read_text(encoding="utf-8")
+    нашлись = [о for о in операторы(текст) if о.lower().startswith(ЖИВЫЕ_ЦЕНЫ)]
+    assert len(нашлись) == 2, "в schema_junk.sql нет таблицы пометок или вида живых цен"
+    return нашлись
 
 
 def функция_ключа() -> str:
@@ -230,6 +256,9 @@ def наборы():
             cur.execute(f'set search_path to "{СХЕМА}"')
             cur.execute(функция_ключа())
             cur.execute(КОРПУС)
+            for оператор in живые_цены():
+                cur.execute(оператор)
+            cur.execute(ПОМЕТКА)
             # Как у публикатора: вида имён в этом корпусе нет — на его месте
             # пустая выборка, имя компании остаётся display_name.
             есть = company_names.вид_имён_есть(cur)
@@ -257,6 +286,7 @@ def test_каждый_запрос_вернул_ожидаемое_число_с
     # фильтровать по feed, здесь будет 7.
     assert len(предложения) == 6
     # Файл-источник — последней колонкой: по нему сборка считает происхождение дублей.
+    # Строка, помеченная ложной («ложная-строка»), сюда не доезжает: вид.
     assert sorted(r[26] for r in предложения if r[26]) == ["вложение-11", "вложение-12"]
     # Каталог отдаёт ДВЕ строки: 6205 нашлась по id, «BOLT-8» — второй ступенью
     # сцепки. «NUT-M8» не нашлась: два каталожных номера дают один ключ.
@@ -588,6 +618,9 @@ def с_реестром():
             cur.execute(f'set search_path to "{схема}"')
             cur.execute(функция_ключа())
             cur.execute(КОРПУС)
+            for оператор in живые_цены():
+                cur.execute(оператор)
+            cur.execute(ПОМЕТКА)
             # Реестра ещё нет — читатель отвечает None, а не падает.
             нет_таблиц = brands.читать_реестр(cur)
             _выполнить_схему(cur, "brands_schema.sql")

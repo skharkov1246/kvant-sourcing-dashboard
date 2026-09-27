@@ -39,6 +39,7 @@ import re
 from pathlib import Path
 
 from library import company_names, doc_folder, doc_side, docfilter, equipment, materials, oem_kind, quotes
+from library import price_store
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -583,11 +584,16 @@ def demand_cells_cte(where: str, with_sup: bool = False) -> str:
   )"""
 
 
+# ЖИВЫЕ СТРОКИ ЦЕНЫ. Цены КП читаются видом lib_prices_live
+# (library/supabase/schema_junk.sql): строка, помеченная ложной (номер страницы,
+# телефон, «Total Amount», «x × 1 = x» — quotes.ложная_цена), не даёт ни кода с
+# ценой, ни ячейки бренда, ни поставщика. Условие одно и живёт в виде; сборщик,
+# пока вида в базе нет, читает таблицу (запросы(..., живые=False)).
 KP_CELLS = f"""\
     select 'p:' || p.id, 'кп'::text, {price_code("p")}, p.oem,
            lib_pn_key(p.item_name), 'поставщик'::text,
            'поле запроса'::text, p.rfq_id, p.rfq_company, p.part_number
-      from lib_prices p
+      from lib_prices_live p
      where p.feed = 'разбор КП' and {oem_set("p.oem")}
        and {part_ok(price_code("p"))}"""
 
@@ -610,14 +616,14 @@ PRICE_SETS = f"""\
   kp_codes as materialized (
     select distinct z.code
       from (select {price_code("p")} as code
-              from lib_prices p
+              from lib_prices_live p
              where p.feed = 'разбор КП') z
      where length(z.code) >= 2 and {part_ok("z.code")}
   ),
   buy_codes as materialized (
     select distinct z.code
       from (select {price_code("p")} as code
-              from lib_prices p
+              from lib_prices_live p
              where coalesce(p.feed, '') not in ('ТКП КВАНТ (отпускная цена)',
                                                 'прайсы конкурентов')) z
      where length(z.code) >= 2 and {part_ok("z.code")}
@@ -681,7 +687,7 @@ SUPPLIER_CTES = f"""\
            coalesce(b.sup_id, 'bitrix:' || p.rfq_company) as supplier,
            dd.names                                        as deferred_names,
            dd.review_id
-      from lib_prices p
+      from lib_prices_live p
       left join bx b        on b.portal_key  = p.rfq_company
       left join deferred dd on dd.portal_key = p.rfq_company
      where p.feed = 'разбор КП'
@@ -2002,7 +2008,8 @@ def карта_sql(карта) -> str:
 КАРТА_РЕЕСТРА = "    select spelling_key, brand_key from lib_brand_map"
 
 
-def запросы(карта=(), из_реестра: bool = False, имена: bool = False) -> dict[str, str]:
+def запросы(карта=(), из_реестра: bool = False, имена: bool = False,
+            живые: bool = True) -> dict[str, str]:
     """Тексты запросов с подставленной картой ключей.
 
     из_реестра — карта берётся из базы (вид lib_brand_map), иначе — строками
@@ -2010,9 +2017,14 @@ def запросы(карта=(), из_реестра: bool = False, имена:
     работают по-старому.
 
     имена — вид sup_name_shown в базе есть (company_names.вид_имён_есть); нет —
-    на его месте пустая выборка, и имя поставщика берётся по-старому."""
+    на его месте пустая выборка, и имя поставщика берётся по-старому.
+
+    живые — вид lib_prices_live в базе есть (price_store.живые_есть); нет —
+    цены читаются из таблицы: вид и пометки ложных строк приходят одним файлом
+    миграции, и без вида пометок нет."""
     вставка = КАРТА_РЕЕСТРА if из_реестра else карта_sql(карта)
-    return {имя: company_names.имена_sql(sql.replace(МЕТКА_КАРТЫ, вставка), имена)
+    return {имя: price_store.живые_sql(
+                company_names.имена_sql(sql.replace(МЕТКА_КАРТЫ, вставка), имена), живые)
             for имя, sql in ЗАПРОСЫ.items()}
 
 

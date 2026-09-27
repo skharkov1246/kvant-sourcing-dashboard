@@ -86,7 +86,9 @@
 -- ЧТЕНИЕ БОЛЬШИХ ТАБЛИЦ — ТОЛЬКО ПО СТОЯЩИМ ИНДЕКСАМ. Спрос — lib_demand_pnkey
 -- (код) и lib_demand_oem (бренд), КП — lib_prices_pn_key (код),
 -- lib_prices_oem (бренд), lib_prices_rfqco (поставщик). Новых индексов файл не
--- строит. Бренд по спросу и КП ищется по ДОСЛОВНЫМ написаниям реестра
+-- строит. Строки КП читаются видом lib_prices_live (schema_junk.sql): строки,
+-- помеченные ложными (lib_price_junk), в карточку не идут, а индексы
+-- lib_prices под видом те же. Бренд по спросу и КП ищется по ДОСЛОВНЫМ написаниям реестра
 -- (lib_brand_alias.spelling), и только тем, чей ключ ОДНОЗНАЧЕН (lib_brand_map:
 -- написание, сведённое к двум брендам, не считается ни одному). Ключ написания
 -- lib_brand_key стоит ~60 мкс на ячейку, и разрешать им все ячейки таблицы на
@@ -473,12 +475,12 @@ begin
           select p.id, p.part_number, p.rfq_company, p.price_date, p.created_at, p.oem,
                  portal_says_analog(concat_ws(' ', p.item_name, p.note, p.oem)) as says,
                  'слово КП'::text as via, 0 as ord
-            from lib_prices p
+            from lib_prices_live p
            where p.feed = 'разбор КП' and p.oem = any(написания)
           union all
           select p.id, p.part_number, p.rfq_company, p.price_date, p.created_at, p.oem,
                  portal_says_analog(concat_ws(' ', p.item_name, p.note, p.oem)), 'карточка запроса', 1
-            from lib_prices p
+            from lib_prices_live p
            where p.feed = 'разбор КП' and cardinality(элементы) > 0 and p.rfq_brands is not null
              -- Обрубок в конце (обрезка price_store на 200 знаках) снимается,
              -- как codes_sql.CARD_KEYS: «…,5050» может быть началом «50501».
@@ -488,7 +490,7 @@ begin
           union all
           select p.id, p.part_number, p.rfq_company, p.price_date, p.created_at, p.oem,
                  portal_says_analog(concat_ws(' ', p.item_name, p.note, p.oem)), 'каталог', 2
-            from lib_prices p
+            from lib_prices_live p
            where p.feed = 'разбор КП' and cardinality(коды) > 0
              and lib_pn_key(p.part_number) = any(коды)
         ) z0
@@ -674,7 +676,7 @@ begin
                nullif(btrim(p.pay_terms), '') as pay_terms, p.pay_advance_pct, p.pay_src,
                to_char(p.price_date, 'YYYY-MM') as month, p.price_date_src as month_src,
                portal_says_analog(concat_ws(' ', p.item_name, p.note, p.oem)) as says_analog
-          from lib_prices p
+          from lib_prices_live p
          where p.feed = 'разбор КП' and lib_pn_key(p.part_number) = any(ключи)
          order by p.price_date desc nulls last, p.created_at desc, p.id desc
          limit 2000) x;
@@ -1430,7 +1432,7 @@ begin
                    p.rfq_id, p.price, p.currency, portal_qty(p.qty, p.price, p.total) as qty,
                    nullif(btrim(p.qty_unit), '') as unit, to_char(p.price_date, 'YYYY-MM') as month,
                    portal_says_analog(concat_ws(' ', p.item_name, p.note, p.oem)) as says_analog
-              from lib_prices p
+              from lib_prices_live p
              where p.feed = 'разбор КП' and p.rfq_company = any(ключи)
                and coalesce(btrim(p.part_number), '') <> ''
              order by p.price_date desc nulls last, p.created_at desc, p.id desc

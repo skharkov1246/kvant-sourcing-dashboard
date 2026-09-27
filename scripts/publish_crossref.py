@@ -41,7 +41,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from library import brands, company_names, crossref, offer_role  # noqa: E402
+from library import brands, company_names, crossref, offer_role, price_store  # noqa: E402
 
 KEY = crossref.КЛЮЧ
 # Код возврата для переполнения предела: прогон обязан покраснеть именно на нём, а
@@ -83,17 +83,22 @@ def читать_базу(dsn):
             # Вида имён может ещё не быть в рабочей базе — тогда на его месте
             # пустая выборка, и имя компании остаётся display_name.
             есть = company_names.вид_имён_есть(cur)
+            # Живые строки цены — видом lib_prices_live; вида ещё нет — таблицей
+            # (вид и пометки ложных строк приходят одним файлом миграции).
+            живые = price_store.живые_есть(cur)
             for sql in (crossref.ПРЕДЛОЖЕНИЯ_SQL, crossref.КАТАЛОГ_SQL,
                         crossref.АНАЛОГИ_SQL, crossref.МАШИНЫ_SQL,
                         crossref.ИЗГОТОВИТЕЛИ_SQL, crossref.СПРОС_SQL):
-                cur.execute(company_names.имена_sql(sql, есть), (crossref.FEED,))
+                cur.execute(price_store.живые_sql(company_names.имена_sql(sql, есть), живые),
+                            (crossref.FEED,))
                 наборы.append(cur.fetchall())
             # Имена брендов карточки запроса — из реестра, если он в базе есть.
             наборы.append(crossref.имена_брендов(cur))
             # Бренд позиции (П2): ячейки изготовителя спецификаций по коду и
             # реестр брендов, которым узнаётся бренд строки. Реестра нет —
             # None, и сборка узнаёт бренд по словарю-файлу.
-            cur.execute(crossref.СПРОС_БРЕНДЫ_SQL, (crossref.FEED,))
+            cur.execute(price_store.живые_sql(crossref.СПРОС_БРЕНДЫ_SQL, живые),
+                        (crossref.FEED,))
             наборы.append(cur.fetchall())
             наборы.append(brands.читать_реестр(cur))
             # РОЛЬ ПРЕДЛОЖЕНИЯ (library/offer_role.py): карта написаний базы
