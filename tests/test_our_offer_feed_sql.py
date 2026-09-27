@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import importlib.util
-import io
 import os
 import sys
 from pathlib import Path
@@ -30,6 +29,7 @@ sys.path.insert(0, str(ROOT / "library"))
 import doc_folder  # noqa: E402
 import indexer as ix  # noqa: E402
 import price_store  # noqa: E402
+from tests.test_read_sheet import c as ячейка, xlsx, лист as разметка_листа  # noqa: E402
 
 DSN = os.environ.get("LIBRARY_SQL_TEST_DSN")
 pytestmark = pytest.mark.skipif(not DSN, reason="одноразовая база PostgreSQL не настроена")
@@ -145,17 +145,16 @@ def test_замер_кодов_видит_наш_поток_отдельно(б�
 # ── разбор и переразбор файла нашего КП ─────────────────────────────────────
 
 def кп_xlsx() -> bytes:
-    import openpyxl
-    книга = openpyxl.Workbook()
-    лист = книга.active
-    for строка in (["Коммерческое предложение выдуманное"],
-                   ["№", "Наименование", "Артикул", "Кол-во", "Ед. изм.", "Цена, USD", "Сумма, USD"],
-                   [1, "Клапан выдуманный", "KL-7", 2, "шт", ЦЕНА, 2 * ЦЕНА],
-                   [2, "Седло выдуманное", "ZC-2002", 3, "шт", 100, 300]):
-        лист.append(строка)
-    буфер = io.BytesIO()
-    книга.save(буфер)
-    return буфер.getvalue()
+    """Книга собирается из XML через zipfile, как в tests/test_read_sheet.py:
+    openpyxl в гейте не ставится (gate.yml), и разбор обязан идти без него."""
+    ряды = []
+    for r, строка in enumerate(
+            (["Коммерческое предложение выдуманное"],
+             ["№", "Наименование", "Артикул", "Кол-во", "Ед. изм.", "Цена, USD", "Сумма, USD"],
+             [1, "Клапан выдуманный", "KL-7", 2, "шт", ЦЕНА, 2 * ЦЕНА],
+             [2, "Седло выдуманное", "ZC-2002", 3, "шт", 100, 300]), 1):
+        ряды.append([ячейка(f"{chr(ord('A') + k)}{r}", v) for k, v in enumerate(строка)])
+    return xlsx([("КП", разметка_листа(ряды), None)])
 
 
 def ссылка(fid: str, поле: str) -> dict:
@@ -166,6 +165,8 @@ def ссылка(fid: str, поле: str) -> dict:
 
 @pytest.fixture
 def разбор(monkeypatch):
+    # Каскад чтения: книгу читает read_sheet, а не openpyxl, которого в гейте нет.
+    monkeypatch.setattr(ix, "КАСКАД", True)
     monkeypatch.setattr(ix, "SOURCE", "deals")
     monkeypatch.setattr(ix, "НАШЕ_КП", False)
     monkeypatch.setattr(ix, "download", lambda fo, rec=None: кп_xlsx())
