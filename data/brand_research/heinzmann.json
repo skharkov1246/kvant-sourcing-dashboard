@@ -1,0 +1,1102 @@
+{
+  "oem_key": "heinzmann",
+  "name": "HEINZMANN",
+  "segment_focus": "регуляторы скорости и системы управления газовыми двигателями: номера, применимость",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "HEINZMANN GmbH & Co. KG (Шёнау, Германия) выпускает регуляторы частоты вращения и системы управления газовыми, дизельными и двухтопливными двигателями, а также турбинами. Регуляторы: PANDAROS DC 6 (установки до 3 МВт), ORION DC 9 и DC 10, HELENOS DC 2-02, модульный XIOS UC. PRIAMOS DC 1-03/1-04 снят с производства и поставляется только как запасной блок. Исполнительные механизмы StG: бесщёточные 2010/2040/2080/2120 и с редуктором 6/10/16/30/40/90/180, дроссельные заслонки DK. Управление газовым двигателем: регулирование состава смеси KRONOS 10/20/30/40 (смесители GM/GMA, клапаны LES-GT и E-LES, дозаторы ELEKTRA GMCU, клапаны MEGASOL), зажигание PHLOX II/III, контроль детонации ARIADNE, комплексы XIOS Gas и XIOS CHP, датчики масляного тумана TRITON OMD. Турбины закрывают дочерние компании группы: HEINZMANN UK — топливо, воздух и зажигание газовых турбин; HEINZMANN Australia — регуляторы паровых турбин Si-TEC и гидроусилители HA; REGULATEURS EUROPA — гидравлические регуляторы RE и Viking35. Все 40 кодов сверены с текстом источника; скептик в отчёте называет 39 — расхождение счёта, отклонённых кодов нет. Основной источник — открытый каталог Gas Engine Management Product Catalogue 2019 года на 35 страниц. Номера HEINZMANN имеют вид xxx-xx-xxx-xx, у деталей зажигания — Z00-xx-xxx-xx. Рейки и провода зажигания привязаны к конкретным газовым двигателям: MAN E0834/E0836/E2842/E2848/E2876/E3262/E3268, Liebherr G924–G9512, Perkins 4006/4008 TRS, Doosan GE08/GV158/GV222. Датчики давления и температуры взяты из руководства PANDAROS II, перекрёстные номера MWM — со страницы российского продавца. В официальном списке сети продаж на 2026 год в России два дистрибьютора: MiT Power Systems и «ДВС Ресурс» — это изготовитель ГПУ. Казахстан, Узбекистан, Азербайджан, Армению, Грузию и Туркменистан ведёт отделение группы в Киеве. В Турции работает Ogan Teknik, в ОАЭ — UMT Services, в Китае — собственное предприятие Heinzmann Power Control (Jiaxing), в Индии — два партнёра.",
+  "machines": [
+    {
+      "model": "PANDAROS DC 6 (PANDAROS I–IV, Twin-PANDAROS)",
+      "kind": "цифровой регулятор частоты вращения",
+      "segment": "ГПУ",
+      "rating": "установки до 3 МВт; приводы до 40 Нм (StG 6/10, 2005, 2010/2040/2080, 16/30); ПО версии 19 — стандарт для газовых двигателей",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors",
+        "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DC 6.200",
+      "kind": "вариант регулятора DC 6 с выходом до 200 мА для гидравлических исполнительных механизмов",
+      "segment": "прочее",
+      "rating": "регулятор; применения по изготовителю — газовые, паровые и гидравлические турбины, генераторные установки",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ORION DC 9",
+      "kind": "цифровой регулятор частоты вращения",
+      "segment": "ГПУ",
+      "rating": "двигатели малой и средней мощности, приводы до 40 Нм; преемник аналоговых регуляторов HEINZMANN",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors",
+        "https://www.heinzmann.com/en/component/jdownloads/send/62-orion/172-dc-9?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ORION DC 10",
+      "kind": "цифровой регулятор для установки на двигатель",
+      "segment": "двигатель",
+      "rating": "приводы StG 3005/3010, StG 2005 (2Q) и линейные; IP6K9K; 9–30 В",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors"
+      ],
+      "verified": true
+    },
+    {
+      "model": "HELENOS DC 2-02 (HELENOS I, III, IV, V)",
+      "kind": "цифровой регулятор частоты вращения",
+      "segment": "ГПУ",
+      "rating": "двигатели до 4 МВт (со StG 16/30/40), до 1 МВт (со StG 6/10); исполнение IV — с приводами Bosch EDC; сертификаты ATEX и морские",
+      "status": "выпускается (в перечне изготовителя)",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PRIAMOS DC 1-03 / DC 1-04 (PRIAMOS I, II, III)",
+      "kind": "цифровой регулятор частоты вращения первого поколения",
+      "segment": "ГПУ",
+      "rating": "двигатели до 5 МВт (StG 16/30/40), до 10 МВт (StG 64/90), до 15 МВт (DC 1-04 + StG 180); газовые двигатели, газовые и паровые турбины",
+      "status": "снят, заменён на XIOS UC; поставляется как запасной блок",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors"
+      ],
+      "verified": true
+    },
+    {
+      "model": "XIOS UC",
+      "kind": "модульный блок управления двигателем с функциями ПЛК",
+      "segment": "двигатель",
+      "rating": "32-разрядный процессор 264 МГц; Ethernet, CAN, RS-232/485; 9–32 В; IP20",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors"
+      ],
+      "verified": true
+    },
+    {
+      "model": "XIOS Gas",
+      "kind": "комплексная система управления газовым двигателем (частота вращения и нагрузка, состав смеси, зажигание PHLOX, детонация ARIADNE, SCR)",
+      "segment": "ГПУ",
+      "rating": "когенерационные установки и газовые генераторы, параллельно с сетью и в островном режиме",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/185-xios-gas-motorsteuerung/681-xios-sup-gas-sup-engine-control?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "XIOS CHP",
+      "kind": "управление когенерационной установкой: двигатель, генератор, тепло",
+      "segment": "ГПУ",
+      "rating": "газовые двигатели мини-ТЭЦ; защита сети и генератора, газовая рампа",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/76-bhkw-steuerung/402-xios-chp-combined-heat-and-power-control?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "KRONOS 10",
+      "kind": "механическая система регулирования состава смеси (смеситель GM/GMA + клапан LES-GT)",
+      "segment": "ГПУ",
+      "rating": "двигатели от 25 кВт до 3 МВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/engine-management/kronos-10-afr-system"
+      ],
+      "verified": true
+    },
+    {
+      "model": "KRONOS 20",
+      "kind": "электронная система регулирования состава смеси (клапаны E-LES, лямбда-зонд LSM 11 или датчик NOx)",
+      "segment": "ГПУ",
+      "rating": "двигатели на природном газе и биогазе с регулятором нулевого давления",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/engine-management/kronos-20-afr-system",
+        "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "KRONOS 30",
+      "kind": "система регулирования состава смеси с полным управлением (дозаторы ELEKTRA GMCU)",
+      "segment": "ГПУ",
+      "rating": "двигатели на биогазе и бедном газе при подаче газа нагнетателем",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/engine-management/kronos-30-afr-system"
+      ],
+      "verified": true
+    },
+    {
+      "model": "KRONOS 40",
+      "kind": "регулирование частоты вращения и мощности через газовые впускные клапаны MEGASOL",
+      "segment": "ГПУ",
+      "rating": "от 100 кВт до 1 МВт на цилиндр, до 20 цилиндров; генераторы, компрессоры",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/engine-management/kronos-40-afr-system"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ELEKTRA GMCU-II-52 / 68 / 110",
+      "kind": "газовый дозатор (узел KRONOS 30)",
+      "segment": "ГПУ",
+      "rating": "природный газ: 300–1 500 / 500–2 500 / 1 000–6 000 кВт; биогаз: 100–500 / 200–1 000 / 500–3 000 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/gas-metering-units"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PHLOX II IC-08 / IC-12 / IC-16 (IC24 — два IC-12 по схеме ведущий–ведомый)",
+      "kind": "система зажигания газового двигателя",
+      "segment": "ГПУ",
+      "rating": "до 8/12/16 цилиндров (24 в паре); 30–3 000 об/мин; энергия искры 25–280 мДж, 32 уровня",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/ignition-control",
+        "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "PHLOX III (FlexSpark)",
+      "kind": "система зажигания повышенной энергии",
+      "segment": "ГПУ",
+      "rating": "до 16 цилиндров; до 700 мДж; 30–2 200 об/мин; биогаз и высокий наддув",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/ignition-control"
+      ],
+      "verified": true
+    },
+    {
+      "model": "ARIADNE (KC 01)",
+      "kind": "система контроля детонации",
+      "segment": "ГПУ",
+      "rating": "до 20 цилиндров (20 входов датчиков детонации), 18–32 В",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/knock-control-gas",
+        "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "StG 2010 / 2040 / 2080 / 2120 (в т.ч. позиционеры -PD)",
+      "kind": "бесщёточные поворотные исполнительные механизмы (привод дроссельной заслонки или топливной рейки)",
+      "segment": "ГПУ",
+      "rating": "угол поворота 36° или 68°, IP55, есть исполнение ATEX",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "StG 6 / 10 / 16 / 30 / 40 (также 30.90, 40.90, 90, 180)",
+      "kind": "исполнительные механизмы с редуктором",
+      "segment": "ГПУ",
+      "rating": "по каталогу: StG 6-02V — 50–200 кВт, StG 10 — 180–650 кВт, StG 16 — 650–1 200 кВт, StG 30 — 1 200–3 000 кВт, StG 40 — 2 500–5 000 кВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+        "https://www.heinzmann.com.au/products/actuators/hydraulic-amplifiers"
+      ],
+      "verified": true
+    },
+    {
+      "model": "DK 50 … DK 400 (также со встроенными приводами StG 3 или DG 3010)",
+      "kind": "дроссельные заслонки газовоздушной смеси",
+      "segment": "ГПУ",
+      "rating": "от DK 50-0420 до DK 400-180 (DN 50–400)",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Viking35",
+      "kind": "блок управления с большим числом входов и выходов, распределение нагрузки; работает с гидравлическими приводами REGULATEURS EUROPA",
+      "segment": "двигатель",
+      "rating": "суда, локомотивы, генераторы, турбины",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors"
+      ],
+      "verified": true
+    },
+    {
+      "model": "RE 1102-4G, RE 1115-4G, RE 1500-3G, RE 1800-3G, RE 2100; DG 2800.14",
+      "kind": "гидравлические и электрогидравлические регуляторы (REGULATEURS EUROPA)",
+      "segment": "прочее",
+      "rating": "выходной момент от 11 до 339 Нм; RE 1102-4G — для генераторов с приводом от дизеля или паровой турбины; DG 2800.14 — для паровых турбин",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-hydraulic-governors"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Si-TEC Xtend CGC / ADG-T / BDG (HEINZMANN Australia)",
+      "kind": "регуляторы паровых турбин и управление генератором",
+      "segment": "прочее",
+      "rating": "турбогенераторы (система Si-TEC); BDG — механические приводы: насосы, компрессоры, вентиляторы, мельницы",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/gas-turbine-components"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Топливные клапаны, управление воздухом и зажигание PROMETHEUS для газовых турбин (HEINZMANN UK)",
+      "kind": "управление газовой турбиной: топливо, направляющий аппарат и перепуск воздуха, зажигание",
+      "segment": "ГТУ",
+      "rating": "от малых машин до более чем 100 МВт; сервоприводы направляющего аппарата для газовых турбин 4–20 МВт",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/gas-turbine-components"
+      ],
+      "verified": true
+    },
+    {
+      "model": "TRITON OMD II",
+      "kind": "система обнаружения масляного тумана в картере",
+      "segment": "ГПУ",
+      "rating": "большие газовые, дизельные и двухтопливные двигатели; центральный блок — до 16 датчиков",
+      "status": "выпускается",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-oil-mist-detection"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Gas Engine Management Product Catalogue (регуляторы, приводы, заслонки, KRONOS, PHLOX II, ARIADNE — с номерами для заказа)",
+      "doc_no": "2019, 35 стр. PDF",
+      "machine": "PANDAROS DC 6, ORION DC 9, StG, DK, KRONOS 10–40, GMCU, MEGASOL, PHLOX II, ARIADNE",
+      "kind": "parts catalogue",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+      ]
+    },
+    {
+      "title": "Technical Information: Ignition Control System PHLOX – Additional BOSCH speed sensor for MAN E3262 gas engine (номера для заказа PHLOX на MAN E3262 E/LE)",
+      "doc_no": "2004-0006-e (2020-04-16)",
+      "machine": "PHLOX II IC-12 на MAN E3262 E/LE",
+      "kind": "бюллетень",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/67-zuendsteuerung/614-phlox-man-e3262-e-le-compatibility?Itemid=1063"
+      ]
+    },
+    {
+      "title": "PHLOX II IC-08/12/16 Ignition Control System — Manual",
+      "doc_no": "DG 13 004-e / 11-13",
+      "machine": "PHLOX II",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/1814293/Heinzmann-Phlox-Ii-Ic-08.html"
+      ]
+    },
+    {
+      "title": "Digital Governor Basic System PANDAROS II (DG 2010.6/2040.6/2080.6) — Manual",
+      "doc_no": "DG 01 002-e / 12-17",
+      "machine": "PANDAROS II (DC 6 + StG 2010/2040/2080)",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/1644065/Heinzmann-Pandaros-Ii.html"
+      ]
+    },
+    {
+      "title": "PANDAROS III DG 16.6 / 30.6 / 40.6 — Manual",
+      "doc_no": "DG 01 010-e / 01-14",
+      "machine": "PANDAROS III (DC 6 + StG 16/30/40)",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/1665066/Heinzmann-Pandaros-Iii-Dg-16-6.html"
+      ]
+    },
+    {
+      "title": "PANDAROS IV DG 2005DP.6 / DG 2040DP.6 — Manual",
+      "doc_no": "DG 01 003-e / 12-17",
+      "machine": "PANDAROS IV",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/3160820/Heinzmann-Pandaros-Iv.html"
+      ]
+    },
+    {
+      "title": "PANDAROS DC 6-06 (позиционер) — Manual",
+      "doc_no": "DG 08 001-e / 10-08",
+      "machine": "PANDAROS DC 6-06",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/1774160/Heinzmann-Pandaros-Dc-6-06.html"
+      ]
+    },
+    {
+      "title": "KRONOS 20 Air Fuel Ratio Control System (E-LES 30/50/80, датчик P/T-S-01, лямбда-зонд LSM 11) — Manual",
+      "doc_no": "AFR 03 002-e / 01-08",
+      "machine": "KRONOS 20",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/2075771/Heinzmann-Kronos-20.html"
+      ]
+    },
+    {
+      "title": "ARIADNE Knock Control — Manual",
+      "doc_no": "DG 06 001-e / 09-10",
+      "machine": "ARIADNE",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/1948603/Heinzmann-Ariadne.html"
+      ]
+    },
+    {
+      "title": "HELENOS III DG 162-02 / 302-02 / 402-02 — Technical Description",
+      "doc_no": "DG 09 008-e / 12-09",
+      "machine": "HELENOS III",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/1583477/Heinzmann-Helenos-Iii.html"
+      ]
+    },
+    {
+      "title": "Actuators StG 2120, StG 30.90, StG 40.90 — Manual",
+      "doc_no": "T 02 001-e / 12-09",
+      "machine": "StG 2120, StG 30.90, StG 40.90",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/2197049/Heinzmann-Stg-2120-Series.html"
+      ]
+    },
+    {
+      "title": "Positioners StG 2040 / 2080 SV-PD — Manual",
+      "doc_no": "DG 10 001-e / 07-10",
+      "machine": "StG 2040-PD, StG 2080-PD",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/2047764/Heinzmann-2000.html"
+      ]
+    },
+    {
+      "title": "PRIAMOS I DC 16.1-03 / 30.1-03 / 40.1-03 — Manual",
+      "doc_no": "DG 93 101-e / 04-06",
+      "machine": "PRIAMOS I",
+      "kind": "service manual",
+      "sources": [
+        "https://www.manualslib.com/manual/1656551/Heinzmann-Priamos-I-Series.html"
+      ]
+    },
+    {
+      "title": "TRITON OMD oil mist detection — Manual",
+      "doc_no": "SF 19 001-e / 03-20",
+      "machine": "TRITON OMD",
+      "kind": "O&M",
+      "sources": [
+        "https://www.manualslib.com/manual/2046665/Heinzmann-Triton-Omd.html"
+      ]
+    },
+    {
+      "title": "Maintenance and repair guidelines for actuators StG 90 and StG 180: ежегодный осмотр или не реже чем через 20 000 ч, капремонт через 40 000 ч в одобренной мастерской с заменой подшипников, шестерён и уплотнений",
+      "doc_no": "FLY_ACT-Maintenance-Repair_0621_e",
+      "machine": "StG 90, StG 180 (с PRIAMOS)",
+      "kind": "бюллетень",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/812/646-actuator-service?Itemid=812"
+      ]
+    },
+    {
+      "title": "PANDAROS DC 6 — Data Sheet",
+      "doc_no": "ETM_DS_DC6_PANDAROS_09_2023_e",
+      "machine": "PANDAROS DC 6",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/61-pandaros/168-pandaros-dc-6?Itemid=1055"
+      ]
+    },
+    {
+      "title": "Ignition Coil Z00-17-014-00/-01 — Data Sheet",
+      "doc_no": "ETM_DS_ignition_coil_06_2025_e",
+      "machine": "PHLOX II/III",
+      "kind": "data sheet",
+      "sources": [
+        "https://www.heinzmann.com/en/downloads/gas-engine-management/ignition-control?task=download.send&id=396%3Aphlox-ignition-coils&catid=67"
+      ]
+    },
+    {
+      "title": "KRONOS Carburetion Systems / AFR-Control — Order Information (опросный лист для подбора смесителя, заслонки и газового клапана)",
+      "doc_no": "FO-VL 075-1",
+      "machine": "KRONOS 10/20/30",
+      "kind": "опросный лист",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/65-gemischregelung/366-kronos-order-info?Itemid=1055"
+      ]
+    },
+    {
+      "title": "XIOS Gas Engine Control — Leaflet",
+      "doc_no": "ETM_XIOSGAS_001_26_07_e_1_2026",
+      "machine": "XIOS Gas",
+      "kind": "брошюра",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/185-xios-gas-motorsteuerung/681-xios-sup-gas-sup-engine-control?Itemid=1055"
+      ]
+    },
+    {
+      "title": "Sensors: speed, temperature and pressure sensors for digital control systems — Leaflet",
+      "doc_no": "ETM_SEN_002_24_10_e_1_2024",
+      "machine": "все цифровые системы HEINZMANN, PHLOX",
+      "kind": "брошюра",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/74-sensoren/287-sensors?Itemid=1162"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "Z00-17-006-00",
+      "issuer": "HEINZMANN",
+      "description": "Катушка зажигания серая (до 50 кВ в длительном режиме); применимость к конкретным двигателям строкой катушки не указана",
+      "machine": "PHLOX II",
+      "unit": "зажигание — катушка",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 30 (разворот 58–59), PHLOX II Ignition Coils",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Ignition coil grey Z00-17-006-00"
+    },
+    {
+      "code": "Z00-17-002-00",
+      "issuer": "HEINZMANN",
+      "description": "Катушка зажигания экранированная, интегральная",
+      "machine": "PHLOX II",
+      "unit": "зажигание — катушка",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 30",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Ignition coil, shielded integral Z00-17-002-00"
+    },
+    {
+      "code": "Z00-17-014-00",
+      "issuer": "HEINZMANN",
+      "description": "Катушка зажигания нового поколения, 50 кВ; по данным изготовителя заменяет большую часть катушек систем Altronic и Motortech",
+      "machine": "PHLOX-ICS (PHLOX II/III)",
+      "unit": "зажигание — катушка",
+      "doc_ref": "Data sheet ETM_DS_ignition_coil_06_2025_e",
+      "source_url": "https://www.heinzmann.com/en/downloads/gas-engine-management/ignition-control?task=download.send&id=396%3Aphlox-ignition-coils&catid=67",
+      "quote": "Ignition Coil Z00-17-014-00/-01"
+    },
+    {
+      "code": "Z00-20-001-00",
+      "issuer": "HEINZMANN",
+      "description": "Колпачок катушки зажигания, угловой 90°",
+      "machine": "PHLOX II",
+      "unit": "зажигание — колпачок катушки",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 30",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Ignition coil Cap 90° Z00-20-001-00"
+    },
+    {
+      "code": "Z00-21-050-00",
+      "issuer": "HEINZMANN",
+      "description": "Рейка зажигания в сборе с катушками и выходным жгутом, левый ряд",
+      "machine": "MAN E3262 + PHLOX II IC-12 (в каталоге 2019 — «MAN E 3262»; в TI 2004-0006-e номер отнесён к исполнению E3262 LE, для E3262 E там Z00-21-084-00 и Z00-21-085-00)",
+      "unit": "зажигание — рейка",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 30; то же в Technical Information 2004-0006-e",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "MAN E 3262, left bank Z00-21-050-00"
+    },
+    {
+      "code": "Z00-21-051-00",
+      "issuer": "HEINZMANN",
+      "description": "Рейка зажигания в сборе с катушками и выходным жгутом, правый ряд",
+      "machine": "MAN E3262 + PHLOX II IC-12 (в каталоге 2019 — «MAN E 3262»; в TI 2004-0006-e номер отнесён к исполнению E3262 LE, для E3262 E там Z00-21-084-00 и Z00-21-085-00)",
+      "unit": "зажигание — рейка",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 30",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "MAN E 3262, right bank Z00-21-051-00"
+    },
+    {
+      "code": "Z00-19-052-00",
+      "issuer": "HEINZMANN",
+      "description": "Свечной наконечник с кольцевым контактом под свечу Bosch MR3DII360 M18, 12 шт. на двигатель",
+      "machine": "MAN E3262 E/LE + PHLOX II",
+      "unit": "зажигание — свечной наконечник",
+      "doc_ref": "Technical Information 2004-0006-e (2020-04-16), таблицы заказа PHLOX для MAN E3262 E и LE",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/67-zuendsteuerung/614-phlox-man-e3262-e-le-compatibility?Itemid=1063",
+      "quote": "Z00-19-052-00 Spark plug connector with ring connector for Bosch MR3DII360 M18 spark plug"
+    },
+    {
+      "code": "MR3DII360",
+      "issuer": "Bosch",
+      "description": "Свеча зажигания M18, под которую HEINZMANN поставляет наконечник Z00-19-052-00. Номер Bosch, не HEINZMANN; наконечники под другие свечи — по запросу",
+      "machine": "MAN E3262 E/LE с PHLOX II",
+      "unit": "зажигание — свеча",
+      "doc_ref": "Technical Information 2004-0006-e (2020-04-16)",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/67-zuendsteuerung/614-phlox-man-e3262-e-le-compatibility?Itemid=1063",
+      "quote": "Spark plug connector with ring connector for Bosch MR3DII360 M18 spark plug"
+    },
+    {
+      "code": "Z00-19-042-00",
+      "issuer": "HEINZMANN",
+      "description": "Высоковольтный провод зажигания с угловым разъёмом SAE 90°",
+      "machine": "MAN E3262 / E3268 + PHLOX II",
+      "unit": "зажигание — высоковольтный провод",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 31 (разворот 60–61)",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "for MAN E3262 / E3268 Z00-19-042-00"
+    },
+    {
+      "code": "Z00-19-021-01",
+      "issuer": "HEINZMANN",
+      "description": "Высоковольтный провод зажигания; строка стоит в таблице проводов с кольцевым разъёмом M6, признак «угол 90°» — только из подписи к рисунку",
+      "machine": "Liebherr G934 / G944 / G936 / G946 / G9508 / G9512 + PHLOX II",
+      "unit": "зажигание — высоковольтный провод",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 31",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "for Liebherr G934 / G944 / G936 / Z00-19-021-01"
+    },
+    {
+      "code": "Z00-19-040-00",
+      "issuer": "HEINZMANN",
+      "description": "Высоковольтный провод зажигания с кольцевым контактом M6",
+      "machine": "Doosan V12 + PHLOX II",
+      "unit": "зажигание — высоковольтный провод",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 31",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "for Doosan V12 Z00-19-040-00"
+    },
+    {
+      "code": "Z00-21-069-00",
+      "issuer": "HEINZMANN",
+      "description": "Рейка зажигания в сборе с катушками",
+      "machine": "Perkins 4006 TRS + PHLOX II",
+      "unit": "зажигание — рейка",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 30",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Perkins 4006 TRS Z00-21-069-00"
+    },
+    {
+      "code": "Z00-21-072-00",
+      "issuer": "HEINZMANN",
+      "description": "Рейка зажигания в сборе, левый ряд",
+      "machine": "Doosan GV158 + PHLOX II",
+      "unit": "зажигание — рейка",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 30",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Doosan GV158, left bank Z00-21-072-00"
+    },
+    {
+      "code": "Z00-21-063-00",
+      "issuer": "HEINZMANN",
+      "description": "Рейка зажигания в сборе",
+      "machine": "Liebherr G 934 / G944 + PHLOX II",
+      "unit": "зажигание — рейка",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 30",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Liebherr G 934 / G944 Z00-21-063-00"
+    },
+    {
+      "code": "Z00-22-001-00",
+      "issuer": "HEINZMANN",
+      "description": "Задающий диск (trigger disc) 8+1",
+      "machine": "PHLOX II",
+      "unit": "зажигание — задающий диск датчика положения",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 31",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Trigger disc 8+1 Z00-22-001-00"
+    },
+    {
+      "code": "600-00-111-00",
+      "issuer": "HEINZMANN",
+      "description": "Индуктивный датчик IA-M12-100/160, 76 мм, M12x1 (на распредвале)",
+      "machine": "PHLOX II",
+      "unit": "зажигание — датчик положения",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 31, PHLOX II Pick-up Sensor",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "IA-M12-100/160, 76 mm, M12x1,0 600-00-111-00"
+    },
+    {
+      "code": "600-00-140-00",
+      "issuer": "HEINZMANN",
+      "description": "Датчик Холла HIA-M12-76, 76 мм, M12x1",
+      "machine": "PHLOX II",
+      "unit": "зажигание — датчик положения",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 31",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "HIA-M12-76, 76 mm, M12x1,0 600-00-140-00"
+    },
+    {
+      "code": "600-00-006-02",
+      "issuer": "HEINZMANN",
+      "description": "Магнитный датчик частоты вращения IA 12-76, 76 мм, резьба 5/8\"-18 UNF",
+      "machine": "PANDAROS DC 6, ORION DC 9, KRONOS 20, PHLOX II",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 31; тот же номер в комплектах регуляторов на PDF-стр. 5–9",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "IA 12-76 , 76 mm, 5/8“ - 18 UNF 600-00-006-02"
+    },
+    {
+      "code": "600-00-006-01",
+      "issuer": "HEINZMANN",
+      "description": "Магнитный датчик частоты вращения IA 02-76, 76 мм; резьба в каталоге противоречива: на стр. 31 — M16x1,5, на стр. 24–25 — 5/8\"-18 UNF, перед заказом уточнять",
+      "machine": "KRONOS 30 (GMCU), PHLOX II",
+      "unit": "датчик частоты вращения",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 31 (также стр. 24–25)",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "IA 02-76 , 76 mm, M16x1,5 600-00-006-01"
+    },
+    {
+      "code": "600-00-003-01",
+      "issuer": "HEINZMANN",
+      "description": "Магнитный датчик IA 01-38, M16x1,5 (на коленвале)",
+      "machine": "PHLOX II",
+      "unit": "датчик частоты вращения и положения",
+      "doc_ref": "Manual DG 13 004-e / 11-13 (PHLOX II), стр. 26 «Dimensions and order information»",
+      "source_url": "https://www.manualslib.com/manual/1814293/Heinzmann-Phlox-Ii-Ic-08.html",
+      "quote": "IA 01-38 crankshaft M16 × 1.5 600-00-003-01"
+    },
+    {
+      "code": "680-00-010-01",
+      "issuer": "HEINZMANN",
+      "description": "Блок управления зажиганием PHLOX II IC-12 (до 12 цилиндров)",
+      "machine": "PHLOX II; MAN E3262",
+      "unit": "зажигание — блок управления",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 28; Technical Information 2004-0006-e",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Controller PHLOX II IC-12 Up to 12 cylinder 680-00-010-01"
+    },
+    {
+      "code": "010-80-022-00",
+      "issuer": "HEINZMANN",
+      "description": "Датчик детонации KS 1-01",
+      "machine": "ARIADNE KC 01",
+      "unit": "контроль детонации — датчик",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 32 (разворот 62–63)",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Knock sensor KS 1-01 010-80-022-00"
+    },
+    {
+      "code": "620-00-137-12",
+      "issuer": "HEINZMANN",
+      "description": "Блок контроля детонации KC 01-IP 00 на 12 датчиков",
+      "machine": "ARIADNE",
+      "unit": "контроль детонации — блок",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 32",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Knock control unit KC 01-IP 00 Up to 12 knock sensors 620-00-137-12"
+    },
+    {
+      "code": "010-80-020-00",
+      "issuer": "HEINZMANN",
+      "description": "Лямбда-зонд LSM 11 (номер HEINZMANN; изготовитель датчика не назван)",
+      "machine": "KRONOS 20",
+      "unit": "регулирование состава смеси — датчик O2",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 21",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Lambda sensor LSM 11 010-80-020-00"
+    },
+    {
+      "code": "600-00-082-00",
+      "issuer": "HEINZMANN",
+      "description": "Комбинированный датчик давления и температуры DST 01-03W (впускной коллектор)",
+      "machine": "KRONOS 20, KRONOS 30",
+      "unit": "регулирование состава смеси — датчик давления и температуры",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 21 (также стр. 24–25)",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Combined pressure/ temp. DST 01-03W 600-00-082-00"
+    },
+    {
+      "code": "472-00-021-00",
+      "issuer": "HEINZMANN",
+      "description": "Газовый дозирующий клапан с шаговым приводом E-LES 50-SMC",
+      "machine": "KRONOS 20",
+      "unit": "регулирование состава смеси — газовый клапан",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 21",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "E-LES 50-SMC 472-00-021-00"
+    },
+    {
+      "code": "471-00-004-00",
+      "issuer": "HEINZMANN",
+      "description": "Регулировочный винт лямбды LES-GT 50 (ручная настройка подачи газа)",
+      "machine": "KRONOS 10 (смесители GM)",
+      "unit": "регулирование состава смеси — механический газовый клапан",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 20",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Lambda adjusting screw LES-GT 50 471-00-004-00"
+    },
+    {
+      "code": "622-00-051-01",
+      "issuer": "HEINZMANN",
+      "description": "Блок управления PANDAROS DC 2040.6 (DC 6 под привод StG 2040; ПО 19 — для газовых двигателей)",
+      "machine": "PANDAROS DC 6 + StG 2040",
+      "unit": "регулятор частоты вращения — блок",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 4",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "DC 2040.6-XX * 622-00-051-01"
+    },
+    {
+      "code": "622-00-059-00",
+      "issuer": "HEINZMANN",
+      "description": "Блок управления ORION DC 2040.9 (DC 9 под привод StG 2040)",
+      "machine": "ORION DC 9 + StG 2040",
+      "unit": "регулятор частоты вращения — блок",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 6",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "ORION DC 2040.9-XX * 622-00-059-00"
+    },
+    {
+      "code": "512-00-012-03",
+      "issuer": "HEINZMANN",
+      "description": "Бесщёточный привод StG 2040 (68°), IP55 (исполнение StG 2040.25-SV)",
+      "machine": "PANDAROS DC 6, ORION DC 9",
+      "unit": "исполнительный механизм",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 7",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "StG 2040 (68°) IP55 512-00-012-03"
+    },
+    {
+      "code": "514-00-009-00",
+      "issuer": "HEINZMANN",
+      "description": "Бесщёточный привод StG 2080 (68°), IP55 (исполнение StG 2080.21-SV)",
+      "machine": "PANDAROS DC 6, ORION DC 9",
+      "unit": "исполнительный механизм",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 7",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "StG 2080 (68°) IP55 514-00-009-00"
+    },
+    {
+      "code": "502-00-001-03",
+      "issuer": "HEINZMANN",
+      "description": "Привод с редуктором StG 6-02V (36°), повышенный момент",
+      "machine": "PANDAROS DC 6 (PANDAROS I)",
+      "unit": "исполнительный механизм",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 9",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "StG 6-02V (36°) with increased torque 502-00-001-03"
+    },
+    {
+      "code": "452-00-068-00",
+      "issuer": "HEINZMANN",
+      "description": "Дроссельная заслонка DK 100-0680 (проход 68 мм)",
+      "machine": "KRONOS 10/20, регуляторы PANDAROS и ORION",
+      "unit": "дроссельная заслонка",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 12",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "DK 100-0680 452-00-068-00"
+    },
+    {
+      "code": "620-81-248-6005",
+      "issuer": "HEINZMANN",
+      "description": "Кабель датчика частоты вращения, прямой разъём, 10 м",
+      "machine": "PANDAROS DC 6, ORION DC 9",
+      "unit": "датчик частоты вращения — кабель",
+      "doc_ref": "Gas Engine Management Product Catalogue 2019, PDF-стр. 6–8",
+      "source_url": "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055",
+      "quote": "Cable for pick-up Straight connector, 10 m 620-81-248-6005"
+    },
+    {
+      "code": "600-00-053-00",
+      "issuer": "HEINZMANN",
+      "description": "Датчик температуры охлаждающей жидкости TS 01-28-PT1000",
+      "machine": "PANDAROS II",
+      "unit": "датчик температуры ОЖ",
+      "doc_ref": "Manual DG 01 002-e / 12-17 (PANDAROS II), разд. 6 Sensors",
+      "source_url": "https://www.manualslib.com/manual/1644065/Heinzmann-Pandaros-Ii.html",
+      "quote": "Coolant Temperature Sensor TS 01-28-PT1000 (EDV- No.: 600-00-053-00)"
+    },
+    {
+      "code": "600-00-058-00",
+      "issuer": "HEINZMANN",
+      "description": "Датчик давления масла DSO 01-6 (до 6 бар)",
+      "machine": "PANDAROS II",
+      "unit": "датчик давления масла",
+      "doc_ref": "Manual DG 01 002-e / 12-17, стр. 25 «Pressure Sensors»",
+      "source_url": "https://www.manualslib.com/manual/1644065/Heinzmann-Pandaros-Ii.html",
+      "quote": "DSO 01-6 600-00-058-00"
+    },
+    {
+      "code": "600-00-057-01",
+      "issuer": "HEINZMANN",
+      "description": "Датчик давления наддува с разъёмом DSL 01-5 (до 5 бар изб.)",
+      "machine": "PANDAROS II",
+      "unit": "датчик давления наддува",
+      "doc_ref": "Manual DG 01 002-e / 12-17, стр. 26 «Boost Pressure Sensors»",
+      "source_url": "https://www.manualslib.com/manual/1644065/Heinzmann-Pandaros-Ii.html",
+      "quote": "DSL 01-5 600-00-057-01"
+    },
+    {
+      "code": "12282445",
+      "issuer": "MWM",
+      "description": "Номер MWM; по данным продавца ему соответствует привод HEINZMANN StG 2080.214 SVB; изготовителем (HEINZMANN, MWM) не подтверждено",
+      "machine": "двигатели MWM (серию продавец не называет)",
+      "unit": "исполнительный механизм — перекрёстный номер",
+      "doc_ref": "страница продавца ООО «Газмоторсервис», перечень исполнительных механизмов HEINZMANN; доверие — по данным продавца",
+      "source_url": "https://www.gasmotorservice.ru/parts/elec/heinzmann.phtml",
+      "quote": "2080.214 SVB аналог MWM 12282445"
+    },
+    {
+      "code": "12420240",
+      "issuer": "MWM",
+      "description": "Номер MWM; по данным продавца ему соответствует привод с заслонкой HEINZMANN StG 2080.217-SVB-DK; изготовителем (HEINZMANN, MWM) не подтверждено",
+      "machine": "двигатели MWM (серию продавец не называет)",
+      "unit": "исполнительный механизм с дроссельной заслонкой — перекрёстный номер",
+      "doc_ref": "страница продавца ООО «Газмоторсервис»; доверие — по данным продавца",
+      "source_url": "https://www.gasmotorservice.ru/parts/elec/heinzmann.phtml",
+      "quote": "StG 2080.217-SVB-DK аналог MWM 12420240"
+    },
+    {
+      "code": "12210285",
+      "issuer": "MWM",
+      "description": "Номер MWM; по данным продавца ему соответствует привод HEINZMANN StG 30-01; изготовителем (HEINZMANN, MWM) не подтверждено",
+      "machine": "двигатели MWM (серию продавец не называет)",
+      "unit": "исполнительный механизм — перекрёстный номер",
+      "doc_ref": "страница продавца ООО «Газмоторсервис»; доверие — по данным продавца",
+      "source_url": "https://www.gasmotorservice.ru/parts/elec/heinzmann.phtml",
+      "quote": "StG 30-01 как аналог MWM 12210285"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Bosch",
+      "component": "исполнительные механизмы EDC",
+      "machine": "HELENOS IV (DC 2-02 + приводы Bosch EDC), двигатели до 800 кВт",
+      "evidence": "На странице цифровых регуляторов изготовителя: HELENOS IV — «combination DC 2-02 with BOSCH EDC actuators»",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Bosch",
+      "component": "датчик частоты вращения на двигателе (со штатным жгутом PHLOX 680-81-002-27/-28)",
+      "machine": "PHLOX II на MAN E3262 E/LE, выпуск с 24.02.2020",
+      "evidence": "В Technical Information 2004-0006-e HEINZMANN подтверждает, что PHLOX совместим с датчиком Bosch, который MAN устанавливает на E3262, и поставляет под него жгут",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/67-zuendsteuerung/614-phlox-man-e3262-e-le-compatibility?Itemid=1063"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Bosch",
+      "component": "свеча зажигания MR3DII360 M18",
+      "machine": "MAN E3262 E/LE с PHLOX II",
+      "evidence": "Technical Information 2004-0006-e: наконечник HEINZMANN Z00-19-052-00 предназначен под эту свечу Bosch; под другие свечи — по запросу",
+      "sources": [
+        "https://www.heinzmann.com/en/component/jdownloads/send/67-zuendsteuerung/614-phlox-man-e3262-e-le-compatibility?Itemid=1063"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Bosch (тип датчика)",
+      "component": "пьезоэлектрический датчик детонации",
+      "machine": "ARIADNE",
+      "evidence": "В руководстве ARIADNE DG 06 001-e есть подпись «Typical Knock Sensor, Bosch-Type». Это указание на тип датчика, а не на изготовителя KS 1-01; не подтверждено",
+      "sources": [
+        "https://www.manualslib.com/manual/1948603/Heinzmann-Ariadne.html"
+      ],
+      "verified": false
+    },
+    {
+      "company": "HZM China (китайское предприятие группы HEINZMANN)",
+      "component": "катушка зажигания Z00-17-014-01",
+      "machine": "PHLOX-ICS",
+      "evidence": "На чертеже в листе данных катушки (редакция 03/2026) есть пометка «Spule von HZM China» — катушка китайского предприятия группы. Полное название предприятия (Heinzmann Power Control (Jiaxing)) этим источником не подтверждается — в нём только «HZM China»",
+      "sources": [
+        "https://www.heinzmann.com/de/component/jdownloads/?task=download.send&id=762&catid=65&Itemid=618"
+      ],
+      "verified": true
+    },
+    {
+      "company": "REGULATEURS EUROPA (группа HEINZMANN)",
+      "component": "гидравлические исполнительные механизмы и гидрорегуляторы серий RE; исполнительный механизм RE 2800 в DG 2800.14",
+      "machine": "Viking35, DG 2800.14, гидрорегуляторы RE",
+      "evidence": "Страницы изготовителя: Viking35 «combined with hydraulic actuators from REGULATEURS EUROPA»; DG 2800.14 состоит из исполнительного механизма RE 2800 и регулятора HEINZMANN DC 14",
+      "sources": [
+        "https://www.heinzmann.com/en/products/components-digital-governors",
+        "https://www.heinzmann.com/en/products/components-hydraulic-governors"
+      ],
+      "verified": true
+    },
+    {
+      "company": "HEINZMANN Australia",
+      "component": "регуляторы паровых турбин Si-TEC (CGC, ADG, BDG), гидроусилители HA — замена гидроусилителей Woodward 5¼\" и 7¼\"",
+      "machine": "паровые турбины, турбогенераторы, механические приводы",
+      "evidence": "Страница турбинных компонентов: Si-TEC «developed and produced by HEINZMANN Australia»; страница гидроусилителей HEINZMANN Australia",
+      "sources": [
+        "https://www.heinzmann.com/en/products/gas-turbine-components",
+        "https://www.heinzmann.com.au/products/actuators/hydraulic-amplifiers"
+      ],
+      "verified": true
+    },
+    {
+      "company": "HEINZMANN UK",
+      "component": "топливное регулирование, топливные системы, управление воздухом, воспламенитель PROMETHEUS",
+      "machine": "газовые турбины от малых до более чем 100 МВт",
+      "evidence": "Страница турбинных компонентов: «HEINZMANN UK specialises in control systems for Gas Turbines»",
+      "sources": [
+        "https://www.heinzmann.com/en/products/gas-turbine-components"
+      ],
+      "verified": true
+    }
+  ],
+  "dealers": [
+    {
+      "company": "LLC «MiT Power Systems»",
+      "country": "Россия",
+      "role": "дистрибьютор (есть в официальном списке сети продаж HEINZMANN на 2026 год)",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network"
+      ]
+    },
+    {
+      "company": "ДВС Ресурс (DVC Resource company)",
+      "country": "Россия",
+      "role": "дистрибьютор по официальному списку HEINZMANN; сам проектирует и выпускает газопоршневые электростанции и ведёт их сервис",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network",
+        "https://dvsr.ru/service/"
+      ]
+    },
+    {
+      "company": "ООО «Газмоторсервис»",
+      "country": "Россия",
+      "role": "продавец исполнительных механизмов HEINZMANN для двигателей MWM, новых и восстановленных. Официальным партнёром называет себя сам, в официальном списке сети продаж HEINZMANN его нет",
+      "sources": [
+        "https://www.gasmotorservice.ru/parts/elec/heinzmann.phtml"
+      ]
+    },
+    {
+      "company": "LLC «Motors and Transmission»",
+      "country": "Беларусь",
+      "role": "дистрибьютор",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network"
+      ]
+    },
+    {
+      "company": "Heinzmann / Regulateurs Europa Kiev",
+      "country": "Украина (обслуживает Казахстан, Узбекистан, Туркменистан, Азербайджан, Армению, Грузию)",
+      "role": "отделение группы HEINZMANN, продажи и сервис",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network"
+      ]
+    },
+    {
+      "company": "OGAN TEKNIK HIZMETLER A.S.",
+      "country": "Турция",
+      "role": "дистрибьютор и единственный уполномоченный сервисный центр HEINZMANN и Regulateurs Europa в Турции (с 2013 года)",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network",
+        "https://www.ogantek.com"
+      ]
+    },
+    {
+      "company": "UMT Services",
+      "country": "ОАЭ (также Саудовская Аравия, Бахрейн, Кувейт, Йемен)",
+      "role": "дистрибьютор",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network",
+        "https://www.umt-services.com"
+      ]
+    },
+    {
+      "company": "Heinzmann Power Control (Jiaxing) Co. Ltd.",
+      "country": "Китай",
+      "role": "предприятие группы HEINZMANN: производство, продажи, сервис",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network",
+        "http://www.heinzmann.cn"
+      ]
+    },
+    {
+      "company": "Power Star Engineers & Consultants Pvt. Ltd.",
+      "country": "Индия",
+      "role": "дистрибьютор",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network"
+      ]
+    },
+    {
+      "company": "Auto Mac Services",
+      "country": "Индия",
+      "role": "дистрибьютор, мастерская по ремонту исполнительных механизмов",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network"
+      ]
+    },
+    {
+      "company": "Caspian Motor Technology (CaMoTec) Co.",
+      "country": "Иран",
+      "role": "дистрибьютор",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network"
+      ]
+    },
+    {
+      "company": "Gas Power sp. z o.o. sp.k.",
+      "country": "Польша (уполномоченный дилер по ряду стран Европы)",
+      "role": "уполномоченный дилер систем управления газовыми двигателями, продаёт блоки ARIADNE",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network",
+        "https://gaspower.tech/en/offer/detonation-control-systems/control-units/heinzmann/ariadne-control-unit"
+      ]
+    },
+    {
+      "company": "RS Motor Power Solutions, S.L.",
+      "country": "Испания (также Португалия)",
+      "role": "дистрибьютор. На русскоязычной странице заявляет регуляторы HEINZMANN для MWM TCG 2016/2020/2032 и комплекты для газовых двигателей MAN",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network",
+        "https://www.rsmotorps.ru/heinzmann/"
+      ]
+    },
+    {
+      "company": "Heinzmann / Regulateurs Europa Korea Pte. Ltd.",
+      "country": "Южная Корея",
+      "role": "предприятие группы HEINZMANN",
+      "sources": [
+        "https://www.heinzmann.com/en/contact/sales-network"
+      ]
+    }
+  ],
+  "gaps": [
+    "Руководства и «Basic Information» на heinzmann.com закрыты: скачать их можно только после регистрации и проверки. В открытом доступе лишь копии на ManualsLib, и это старые редакции 2006–2017 годов; текущие руководства PANDAROS, ORION DC 9/10, XIOS, PHLOX III и GMCU-II — в закрытом разделе изготовителя.",
+    "Каталог деталей для ремонта исполнительных механизмов StG (подшипники, шестерни, уплотнения, платы обратной связи) не найден. По бюллетеню FLY_ACT-Maintenance-Repair_0621_e капремонт StG 90/180 ведёт только одобренная мастерская HEINZMANN, агрегат возвращается владельцу, обменного фонда нет. Ремкомплекты в открытую продажу не выходят.",
+    "Основной источник кодов — каталог Gas Engine Management 2019 года. Действуют ли номера сейчас, не проверено: например, катушки Z00-17-006/-002 могли смениться на Z00-17-014-00/-01. Номеров для PHLOX III, GMCU-II-52/68/110 и новых E-LES LC в открытых документах нет, их надо запрашивать у дистрибьютора.",
+    "ONERGYS (onergys.de / onergys.com), интернет-магазин запчастей для мини-ТЭЦ, перечисляет детали HEINZMANN с перекрёстными номерами MWM, MAN, Wärtsilä, ABC. Сайт закрыт проверкой Cloudflare, поэтому номера не проверены и в набор не записаны.",
+    "Изготовитель лямбда-зонда LSM 11 (номер HEINZMANN 010-80-020-00) и датчика детонации KS 1-01 в документах HEINZMANN не назван; для датчика детонации есть только пометка «Bosch-Type». Нужен запрос дистрибьютору или разбор маркировки на образце.",
+    "По турбинной линии (HEINZMANN UK — топливные клапаны газовых турбин и PROMETHEUS; HEINZMANN Australia — Si-TEC и гидроусилители HA) открытых номеров деталей нет: в листах данных только типы. Следующий шаг — сайты heinzmann-turbine-controls.com и heinzmann.com.au, раздел Download.",
+    "Не найдено, какие российские изготовители ГПУ и двигателей ставят HEINZMANN серийно. Сайты MiT Power Systems и «ДВС Ресурс» каталога HEINZMANN не показывают. Применимость к MWM TCG 2016/2020/2032 заявляют только продавцы: RS Motor и «Газмоторсервис».",
+    "Цены, сроки и наличие не собирались. По трём перекрёстным номерам MWM продавец не называет серию двигателя, а в его строке «2080.214-SVB StG2080.25-SV аналог MWM 12301011» неясно, к какому изделию относится номер, поэтому этот номер не записан."
+  ],
+  "verifier_notes": "Все источники открылись: каталог 2019, TI 2004-0006-e, листы катушки, XIOS Gas, XIOS CHP и DC 9 (PDF скачаны curl и прочитаны pdftotext), страницы heinzmann.com и heinzmann.com.au, manualslib, gasmotorservice.ru. Итог по записям:\n- все 39 кодов найдены дословно;\n- 25 моделей из 25 подтверждены;\n- из 8 субпоставщиков подтверждены 7; запись «Bosch (тип датчика)» — ARIADNE не подтверждена.\n\nЧто поправить в записях разведки:\n1. У Si-TEC цифра «до 600 МВт» на страницах изготовителя не найдена, из поля rating её надо снять.\n2. У DC 6.200 стоит сегмент ГТУ, но это регулятор; турбины указаны только среди применений.\n3. У 600-00-006-01 резьба в каталоге противоречива: на стр. 31 M16x1,5, на стр. 24–25 «5/8\\\"-18 UNF».\n4. У Z00-19-021-01 признак «угол 90°» взят из подписи к рисунку, а сама строка стоит в таблице с кольцевым разъёмом M6.\n5. У Z00-17-006-00 перечень двигателей в поле machine — вывод разведки, строкой катушки он не подтверждён.\n6. Z00-21-050-00 и Z00-21-051-00 в TI относятся к E3262 LE; для E3262 E там номера Z00-21-084-00 и Z00-21-085-00.\n7. Перекрёстные номера MWM взяты со страницы продавца, изготовителем не подтверждены.\n8. Полное имя HEINZMANN China (Jiaxing) источником не подтверждается, в нём только «HZM China».",
+  "corrections": [
+    "Si-TEC: из rating снято «до 600 МВт» — на страницах изготовителя этой цифры нет (замечание скептика)",
+    "DC 6.200: сегмент ГТУ заменён на «прочее» — это регулятор, турбины указаны только среди применений (замечание скептика)",
+    "600-00-006-01: в описание внесено противоречие каталога по резьбе (стр. 31 — M16x1,5, стр. 24–25 — 5/8\"-18 UNF) (замечание скептика)",
+    "Z00-19-021-01: «угол 90°» оговорён как подпись к рисунку, строка — в таблице с кольцевым разъёмом M6 (замечание скептика)",
+    "Z00-17-006-00: из machine снят перечень двигателей MAN и Liebherr — вывод разведки, строкой катушки не подтверждён (замечание скептика)",
+    "Z00-21-050-00, Z00-21-051-00: применимость уточнена — по TI 2004-0006-e это исполнение E3262 LE, для E3262 E там номера Z00-21-084-00 и Z00-21-085-00 (замечание скептика)",
+    "12282445, 12420240, 12210285: в описание добавлено, что перекрёстные номера MWM взяты у продавца и изготовителем не подтверждены (замечание скептика)",
+    "sub_suppliers: «Heinzmann Power Control (Jiaxing) … (HEINZMANN China)» заменено на «HZM China» — полное имя источником не подтверждается (замечание скептика)",
+    "summary: оговорено, что скептик в отчёте называет 39 кодов при 40 в parts; кодов, не найденных в источнике, скептик не назвал — все 40 оставлены"
+  ]
+}

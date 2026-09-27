@@ -1,0 +1,797 @@
+{
+  "oem_key": "parkerhannifin",
+  "name": "Parker Hannifin (Racor, Velcon, Parker Hydraulic Filter, Parker O-Ring & Engineered Seals)",
+  "segment_focus": "фильтры, уплотнения, гидравлика (Racor, Velcon, Parker O-ring): номера и кроссы",
+  "researched_at": "2026-09-27",
+  "method": "Разведка по открытым источникам: сайты и PDF изготовителя, каталоги деталей и спецификации в открытом доступе, страницы продавцов и ремонтников. Закрытые порталы, платные каталоги и контакты людей не используются. Код запчасти записывается только тогда, когда он дословно стоит на странице источника: рядом с кодом хранится ссылка (source_url) и цитата (quote). Второй проход — проверка скептиком: страница скачивается заново, код ищется поиском по тексту; не найденный код уходит в parts_rejected с вердиктом и причиной. Замечания скептика собраны в verifier_notes, применённые по ним правки записей — в corrections.",
+  "summary": "Parker Hannifin не делает самих машин, он поставщик узлов для них. Для нашего профиля важны четыре линии: Racor (топливные фильтры-влагоотделители Turbine Series 500FG/900FH/1000FH, сдвоенные и строенные сборки, вентиляция картера CCV для дизельных и газовых двигателей ГПУ и ДГУ), Velcon (фильтры-сепараторы жидкого топлива серии V, по данным изготовителя в том числе для газовых турбин), гидравлические фильтры (Moduflow Plus, 12AT, 15/40/80CN, 15P/30P, 50P, EPF) и уплотнительные кольца (справочник ORD 5700: код = компаунд + типоразмер AS568). Самый надёжный источник — официальный сборник чертежей и спецификаций Racor RSL0385 «Turbine Series Technical Information». Его выложил дилер racorstore.com, так что каждый код в нём сверен с перечнем деталей изготовителя. Номера элементов менялись: 2040TM-OR → 2040N-10 → 2040V10, 2020TM-OR → 2020N-10 → 2020V10. Корпуса 900FH/1000FH, по данным дилера, заменены на 900FV/1000FV. На странице дилера FCP Solutions найдены кроссы 2040V10 на Donaldson P552040, Fleetguard FS20402, Baldwin PF7889-10 и Sakura SF1913-10. В каталоге Velcon — кросс DC-614PLF1 = Facet CIF 1, в карточке Hyspeco — кросс 926835Q на HC9600FKS4H. Сайт parker.com (ph.parker.com) отдаёт 403 на автоматические запросы, поэтому коды взяты с дилерских страниц и из PDF изготовителя у дилеров. С 31.03.2022 Parker закрыл офис и склад в Москве и не работает в России. Взятые в 2017 году бренды CLARCOR (Baldwin, PECOFacet, BHA и др.) теперь принадлежат Parker.",
+  "machines": [
+    {
+      "model": "Racor 500FG (Turbine Series)",
+      "kind": "фильтр-влагоотделитель топлива, одиночный",
+      "segment": "двигатель",
+      "rating": "60 gph (227 л/ч), 2/10/30 мкм",
+      "status": "выпускается (по каталогу RSL0288 Rev F 5/18)",
+      "sources": [
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+        "https://www.racorstore.com/products/racor-500fg30-fg-fuel-filter-water-separator"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Racor 900FH (Turbine Series)",
+      "kind": "фильтр-влагоотделитель топлива, одиночный",
+      "segment": "двигатель",
+      "rating": "90 gph (341 л/ч)",
+      "status": "снята у дилера: «replaced with the 900FV10»",
+      "sources": [
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+        "https://www.racorstore.com/products/racor-900fh30-90-gph-clear-bowl-turbine"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Racor 1000FH (Turbine Series)",
+      "kind": "фильтр-влагоотделитель топлива, одиночный",
+      "segment": "двигатель",
+      "rating": "180 gph (681 л/ч)",
+      "status": "снята у дилера: «replaced with the 1000FV10»",
+      "sources": [
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+        "https://www.racorstore.com/products/racor-1000fh30-180-gph-clear-bowl-turbine"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Racor 75900FHX / 751000FHX",
+      "kind": "сдвоенный фильтр-влагоотделитель с поворотным краном",
+      "segment": "двигатель",
+      "rating": "на базе 900FH/1000FH",
+      "status": "751000FHX30 снят, замена 751000FV10 (по данным дилера)",
+      "sources": [
+        "https://www.racorstore.com/PDF/75900-1000FHX.pdf",
+        "https://www.racorstore.com/products/racor-751000fhx30-fgx-dual-ff-ws-rotary-valve"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Racor 731000FH",
+      "kind": "сдвоенная сборка фильтров-влагоотделителей",
+      "segment": "двигатель",
+      "rating": "2 × 1000FH",
+      "status": "в каталоге RSL0385; 731000FH2 снят",
+      "sources": [
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Racor 771000FH",
+      "kind": "строенная сборка фильтров-влагоотделителей",
+      "segment": "двигатель",
+      "rating": "3 × 1000FH",
+      "status": "в каталоге RSL0385",
+      "sources": [
+        "https://www.racorstore.com/products/racor-771000fh30-triple-ff-ws-assembly",
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Racor 791000FHV",
+      "kind": "строенный коллектор фильтров-сепараторов",
+      "segment": "двигатель",
+      "rating": "3 × 1000FH",
+      "status": "в каталоге RSL0385",
+      "sources": [
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Racor CCV4500 / CCV6000 / CCV8000 / CCV12000",
+      "kind": "закрытая вентиляция картера (коалесцер масляного тумана)",
+      "segment": "ГПУ",
+      "rating": "по размеру двигателя",
+      "status": "выпускается (в наличии у дилера)",
+      "sources": [
+        "https://www.racorstore.com/products/racor-ccv4500-08r-ccv4500-bypass-high-eff-media-right-inlet",
+        "https://www.racorstore.com/products/racor-ccv8000-10r-crankcase-ventilation-system"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Velcon V Series Filter/Separators (V-1222 … VV-4856)",
+      "kind": "сосуд фильтра-сепаратора жидкого топлива (коалесцер + сепаратор)",
+      "segment": "ГТУ",
+      "rating": "V-1222: 50 USGPM по керосину; VV-4856: 3000 USGPM",
+      "status": "есть в каталоге Velcon 2005–2006; линейка V-серии есть и на сайте Parker",
+      "sources": [
+        "https://www.airtt.se/assets/products-for-fuelhandling2.pdf",
+        "https://ph.parker.com/gb/en/v-series-vertical-filter-separator-vessels"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Parker Moduflow Plus (RFP/ILP/DILP/TFP)",
+      "kind": "гидрофильтр низкого давления (всас/слив/сдвоенный)",
+      "segment": "прочее",
+      "rating": "в источнике не указано",
+      "status": "выпускается",
+      "sources": [
+        "https://www.hyspeco.com/itemdetail/937399Q"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Parker 15/40/80CN",
+      "kind": "гидрофильтр среднего давления",
+      "segment": "прочее",
+      "rating": "в источнике не указано",
+      "status": "выпускается",
+      "sources": [
+        "https://www.hyspeco.com/itemdetail/926835Q"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Parker 15P/30P",
+      "kind": "гидрофильтр высокого давления",
+      "segment": "прочее",
+      "rating": "в источнике не указано",
+      "status": "выпускается",
+      "sources": [
+        "https://www.hyspeco.com/itemdetail/932617Q"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Parker 50P",
+      "kind": "гидрофильтр высокого давления, по стандарту SAE HF4",
+      "segment": "прочее",
+      "rating": "в источнике не указано",
+      "status": "выпускается",
+      "sources": [
+        "https://www.hyspeco.com/itemdetail/932677Q"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Parker EPF",
+      "kind": "гидрофильтр высокого давления",
+      "segment": "прочее",
+      "rating": "в источнике не указано",
+      "status": "выпускается",
+      "sources": [
+        "https://www.hyspeco.com/itemdetail/944511Q"
+      ],
+      "verified": true
+    },
+    {
+      "model": "Parker 12AT",
+      "kind": "навинчиваемый гидрофильтр",
+      "segment": "прочее",
+      "rating": "в источнике не указано",
+      "status": "выпускается",
+      "sources": [
+        "https://www.hyspeco.com/itemdetail/926543",
+        "https://www.hyspeco.com/itemdetail/925023"
+      ],
+      "verified": true
+    }
+  ],
+  "service_docs": [
+    {
+      "title": "Turbine Series Technical Information — Mobile and Marine Applications (сборник чертежей и спецификаций 500FG, 900FH/1000FH, 75500FGX, 75900/1000FHX, 731000FH, 771000FH, 791000FHV)",
+      "doc_no": "RSL0385",
+      "machine": "Racor Turbine Series",
+      "kind": "parts manual (чертежи, спецификации и перечень запчастей)",
+      "sources": [
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf"
+      ]
+    },
+    {
+      "title": "Turbine Series - 500FG (cut sheet)",
+      "doc_no": "RSL0288_CUT_Turbine-500FG (5/18 Rev F)",
+      "machine": "Racor 500FG",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf"
+      ]
+    },
+    {
+      "title": "Turbine Series - 900FH/1000FH (cut sheet)",
+      "doc_no": "RSL0292",
+      "machine": "Racor 900FH/1000FH",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.parker.com/content/dam/Parker-com/Literature/Racor/RSL/RSL0292_CUT_900FH-1000FH.pdf",
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf"
+      ]
+    },
+    {
+      "title": "Turbine Series 900FH and 1000FH Fuel Filter/Water Separators",
+      "doc_no": "12960 Rev D",
+      "machine": "Racor 900FH/1000FH",
+      "kind": "O&M (инструкция по монтажу; найдена поиском, parker.com отдаёт 403 — не прочитана)",
+      "sources": [
+        "https://www.parker.com/content/dam/Parker-com/Literature/Racor/12960_Rev_D_900FH_and_1000FH_Turbine_Filters.pdf"
+      ]
+    },
+    {
+      "title": "Turbine Series - 75900/1000FHX (cut sheet)",
+      "machine": "Racor 75900FHX/751000FHX",
+      "kind": "parts manual",
+      "sources": [
+        "https://www.racorstore.com/PDF/75900-1000FHX.pdf"
+      ]
+    },
+    {
+      "title": "Parker O-Ring Handbook",
+      "doc_no": "ORD 5700",
+      "machine": "уплотнения общего назначения (AS568)",
+      "kind": "каталог / справочник по проектированию",
+      "sources": [
+        "https://nianticseal.com/wp-content/uploads/2024/04/ORD-5700.pdf",
+        "https://www.parker.com/content/dam/Parker-com/Literature/O-Ring-Division-Literature/ORD-5700.pdf"
+      ]
+    },
+    {
+      "title": "Velcon Products for Fuel Handling (сборник листов данных: подбор картриджей для V Series, таблицы кроссов)",
+      "doc_no": "листы 1212-R19, 1811-R17 и др.",
+      "machine": "Velcon V Series Filter/Separators",
+      "kind": "каталог",
+      "sources": [
+        "https://www.airtt.se/assets/products-for-fuelhandling2.pdf"
+      ]
+    },
+    {
+      "title": "Standard Filter/Separator Installation and Operation Manual",
+      "doc_no": "VEL2162",
+      "machine": "сосуды фильтров-сепараторов Velcon",
+      "kind": "O&M (найдена поиском, parker.com отдаёт 403 — не прочитана)",
+      "sources": [
+        "https://www.parker.com/content/dam/Parker-com/Literature/Velcon-Filtration-Division/Installation/VEL2162-MAN-Filter-Separator-Vessel.pdf"
+      ]
+    },
+    {
+      "title": "Velcon Industrial Products Catalog",
+      "doc_no": "VEL1894R10-0714",
+      "machine": "промышленные фильтры Velcon (турбинное, трансмиссионное и гидравлическое масло)",
+      "kind": "каталог (найден поиском, не прочитан — 403)",
+      "sources": [
+        "https://www.parker.com/content/dam/Parker-com/Literature/Velcon-Filtration-Division/Catalogs/VEL1894R10-0714-CATALOG-Industrial-Products-web.pdf"
+      ]
+    }
+  ],
+  "parts": [
+    {
+      "code": "2010SM-OR",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 2 мкм",
+      "machine": "Racor 500FG",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0288 (в составе RSL0385), поз. 3A",
+      "source_url": "https://www.racorstore.com/products/racor-2010sm-or-replacement-element-for-500-turbine-2-micron",
+      "quote": "Racor 2010sm-or replacement element for 500 Turbine 2 Micron"
+    },
+    {
+      "code": "2010TM-OR",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 10 мкм",
+      "machine": "Racor 500FG",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0288, поз. 3A",
+      "source_url": "https://www.racorstore.com/products/racor-2010tm-or-replacement-element-for-500-turbine-10-micron",
+      "quote": "Racor 2010tm-or replacement element for 500 Turbine 10 Micron"
+    },
+    {
+      "code": "2010PM-OR",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 30 мкм",
+      "machine": "Racor 500FG",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0288, поз. 3A",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "2010PM-OR        Replacement Element 30 micron - Includes 1B and 2B"
+    },
+    {
+      "code": "RK 15013D",
+      "issuer": "Parker Racor",
+      "description": "Комплект центрифуги и отражателя",
+      "machine": "Racor 500FG",
+      "unit": "корпус фильтра",
+      "doc_ref": "RSL0288, поз. 6B",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "RK 15013D        Centrifuge and Baffle Kit - Includes 6A and 7A"
+    },
+    {
+      "code": "RK 15211",
+      "issuer": "Parker Racor",
+      "description": "Полный комплект уплотнений для фильтров серии 500",
+      "machine": "Racor 500FG",
+      "unit": "уплотнения",
+      "doc_ref": "RSL0288, поз. 10A",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "RK 15211         Complete Seal Service Kit - 500 Series Filters"
+    },
+    {
+      "code": "RK15405",
+      "issuer": "Parker Racor",
+      "description": "Комплект колбы (с 2002 года)",
+      "machine": "Racor 500FG",
+      "unit": "колба и слив",
+      "doc_ref": "RSL0288, поз. 7B",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "RK15405          Bowl Kit (2002 to Present) - Includes 7A, 8A and 8B"
+    },
+    {
+      "code": "2040N-02",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 2 мкм",
+      "machine": "Racor 900FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0292 (в составе RSL0385), поз. 3A",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "2040N-02          900FH Replacement Element 2 micron - Includes 1B & 2B"
+    },
+    {
+      "code": "2040N-10",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 10 мкм",
+      "machine": "Racor 900FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0292, поз. 3A",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "2040N-10          900FH Replacement Element 10 micron - Includes 1B & 2B"
+    },
+    {
+      "code": "2040N-30",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 30 мкм",
+      "machine": "Racor 900FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0292, поз. 3A",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "2040N-30          900FH Replacement Element 30 micron - Includes 1B & 2B"
+    },
+    {
+      "code": "2040TM-OR",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 10 мкм, прежний номер; дилер указывает новый номер 2040V10",
+      "machine": "Racor 900FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "source_url": "https://www.racorstore.com/racor-2040tm-or-element-repl-900-turbine-10m.html",
+      "quote": "Racor 2040Tm-Or Element-Repl 900 Turbine 10M"
+    },
+    {
+      "code": "2040V10",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 10 мкм, действующий номер; взаимозаменяем с 2040TM, 2040TM-OR, 2040N-10",
+      "machine": "Racor 900FH / 900MA",
+      "unit": "топливный фильтр-влагоотделитель",
+      "source_url": "https://www.fcpsolutions.com.au/p/filters/parker-racor-2040-series-10-micron-filter-2040v10-2040n-10-2040tm-or-p552040-fs20402-sf1913-10-pf7889-10",
+      "quote": "Racor 2040 Series 10-Micron Filter Element, 2040V10, 2040N-10 / 2040TM-OR, Suits 900MA & 900FH",
+      "doc_ref": "страница дилера FCP Solutions; строка взаимозаменяемости: «Interchangeable With Racor 2040TM, Racor 2040TM-OR, Racor 2040N-10,Donaldson P552040, Fleetguard FS20402, Sakura SF1913-10, Baldwin PF7889-10»"
+    },
+    {
+      "code": "P552040",
+      "issuer": "Donaldson",
+      "description": "Аналог элемента Racor 2040V10 (кросс, указанный дилером)",
+      "machine": "Racor 900FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "source_url": "https://www.fcpsolutions.com.au/p/filters/parker-racor-2040-series-10-micron-filter-2040v10-2040n-10-2040tm-or-p552040-fs20402-sf1913-10-pf7889-10",
+      "quote": "Interchangeable With Racor 2040TM, Racor 2040TM-OR, Racor 2040N-10,Donaldson P552040, Fleetguard FS20402",
+      "doc_ref": "кросс дилера FCP Solutions; документами Donaldson и Cummins не подтверждён"
+    },
+    {
+      "code": "FS20402",
+      "issuer": "Fleetguard (Cummins Filtration)",
+      "description": "Аналог элемента Racor 2040V10 (кросс, указанный дилером)",
+      "machine": "Racor 900FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "source_url": "https://www.fcpsolutions.com.au/p/filters/parker-racor-2040-series-10-micron-filter-2040v10-2040n-10-2040tm-or-p552040-fs20402-sf1913-10-pf7889-10",
+      "quote": "Donaldson P552040, Fleetguard FS20402, Sakura SF1913-10, Baldwin PF7889-10",
+      "doc_ref": "кросс дилера FCP Solutions; документами Donaldson и Cummins не подтверждён"
+    },
+    {
+      "code": "2020N-02",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 2 мкм",
+      "machine": "Racor 1000FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0385, сборка 771000FH/791000FHV",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "2020N-02         1000FH Replacement Element 2 micron"
+    },
+    {
+      "code": "2020N-10",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 10 мкм",
+      "machine": "Racor 1000FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0385",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "2020N-10         1000FH Replacement Element 10 micron"
+    },
+    {
+      "code": "2020N-30",
+      "issuer": "Parker Racor",
+      "description": "Сменный элемент, 30 мкм",
+      "machine": "Racor 1000FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "doc_ref": "RSL0292, поз. 3B",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "2020N-30          1000FH Replacement Element 30 micron - Includes 1B & 2B"
+    },
+    {
+      "code": "2020V10",
+      "issuer": "Parker Racor",
+      "description": "Действующий номер элемента 10 мкм для 1000FH (прежний — 2020TM-OR)",
+      "machine": "Racor 1000FH",
+      "unit": "топливный фильтр-влагоотделитель",
+      "source_url": "https://www.racorstore.com/products/racor-2020tm-or-element-repl-1000-turbine-10m-this-item-superceded-by-racor-2020n10",
+      "quote": "RACOR NEW PART NUMBER 2020V10",
+      "doc_ref": "страница дилера: адрес упоминает 2020N10, на самой странице — «NEW PART NUMBER 2020V10»"
+    },
+    {
+      "code": "RK 11-1939",
+      "issuer": "Parker Racor",
+      "description": "Комплект центрифуги и отражателя",
+      "machine": "Racor 900FH/1000FH",
+      "unit": "корпус фильтра",
+      "doc_ref": "RSL0292, поз. 6B",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "RK 11-1939  Centrifuge and Baffle Kit - Includes 6A & 7A"
+    },
+    {
+      "code": "RK 11-1952",
+      "issuer": "Parker Racor",
+      "description": "Полный комплект уплотнений",
+      "machine": "Racor 900FH/1000FH",
+      "unit": "уплотнения",
+      "doc_ref": "RSL0292, поз. 9A",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "RK 11-1952  Complete Seal Service Kit - 900FH/1000FH Series Filters"
+    },
+    {
+      "code": "RK 11-1927-01",
+      "issuer": "Parker Racor",
+      "description": "Комплект крышки",
+      "machine": "Racor 900FH/1000FH",
+      "unit": "крышка",
+      "doc_ref": "RSL0292, поз. 2A",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "RK 11-1927-01  900FH/1000FH Lid Kit - Includes 1B & 2B"
+    },
+    {
+      "code": "RK11-2016",
+      "issuer": "Parker Racor",
+      "description": "Комплект подогревателя, 12 В пост. тока, 325 Вт",
+      "machine": "Racor 900FH/1000FH",
+      "unit": "подогреватель топлива",
+      "doc_ref": "RSL0292, поз. 4A",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "RK11-2016  Heater Kit - 12 vdc, 325 watt - Includes 1B, 2B & 4B"
+    },
+    {
+      "code": "RK33802",
+      "issuer": "Parker Racor",
+      "description": "Датчик воды в топливе (WIF), резьба 1/2\"-20 UNF",
+      "machine": "Racor 900FH/1000FH, 500FG",
+      "unit": "датчик воды в топливе",
+      "doc_ref": "RSL0292, поз. 7D",
+      "source_url": "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+      "quote": "RK33802  WIF Probe Kit - 1/2”-20 UNF - Two Wire Pigtail"
+    },
+    {
+      "code": "RK 30476",
+      "issuer": "Parker Racor",
+      "description": "Самостравливающий сливной клапан; по данным дилера — внутренняя часть RK 30488 (в RSL0385 есть только RK 30488)",
+      "machine": "Racor 500FG, 900/1000FH",
+      "unit": "колба и слив",
+      "source_url": "https://www.racorstore.com/products/racor-rk-30476-replacement-valve-for-fh-bowls-and-others",
+      "quote": "Racor rk 30476 RK30476 Repl valve for 500fg, 900/1000 FH Series",
+      "doc_ref": "страница дилера racorstore.com; в RSL0385 номера нет"
+    },
+    {
+      "code": "CCV55222-10",
+      "issuer": "Parker Racor",
+      "description": "Элемент CCV8000 с двухслойной средой",
+      "machine": "Racor CCV8000",
+      "unit": "вентиляция картера",
+      "source_url": "https://www.racorstore.com/products/racor-ccv55222-10-ccv8000-element-w-dual-media",
+      "quote": "Racor CCV55222-10 CCV8000 ELEMENT W/DUAL MEDIA"
+    },
+    {
+      "code": "CCV55274-10",
+      "issuer": "Parker Racor",
+      "description": "Сменный фильтр CCV6000 в сборе",
+      "machine": "Racor CCV6000",
+      "unit": "вентиляция картера",
+      "source_url": "https://www.racorstore.com/products/racor-ccv55274-10-repl-filter-assembly-ccv6000",
+      "quote": "Racor CCV55274-10 REPL FILTER ASSEMBLY,CCV6000"
+    },
+    {
+      "code": "CCV55248-10",
+      "issuer": "Parker Racor",
+      "description": "Сменный фильтр CCV4500 в сборе",
+      "machine": "Racor CCV4500",
+      "unit": "вентиляция картера",
+      "source_url": "https://www.racorstore.com/products/racor-ccv55248-10-repl-filter-assm-cv4500",
+      "quote": "Racor CCV55248-10 REPL FILTER ASSM, CV4500"
+    },
+    {
+      "code": "CCV55222-12-10",
+      "issuer": "Parker Racor",
+      "description": "Элемент CCV12000 с двухслойной средой",
+      "machine": "Racor CCV12000",
+      "unit": "вентиляция картера",
+      "source_url": "https://www.racorstore.com/products/racor-ccv55222-12-10-ccv12000-element-w-dual-media",
+      "quote": "Racor CCV55222-12-10 CCV12000 ELEMENT W/DUAL MEDIA"
+    },
+    {
+      "code": "I-62283TB",
+      "issuer": "Parker Velcon",
+      "description": "Коалесцирующий элемент, серия 83, с резьбовым основанием",
+      "machine": "Velcon V-1222 / V-1622",
+      "unit": "фильтр-сепаратор жидкого топлива, 1-я ступень",
+      "doc_ref": "Velcon, лист 1212-R19 (Cartridge Selection)",
+      "source_url": "https://www.airtt.se/assets/products-for-fuelhandling2.pdf",
+      "quote": "V-1222 50 70 1 I-62283TB I-62287TB 1 SO-318C"
+    },
+    {
+      "code": "I-62287TB",
+      "issuer": "Parker Velcon",
+      "description": "Коалесцирующий элемент, серия 85/87",
+      "machine": "Velcon V-1222 / V-1622",
+      "unit": "фильтр-сепаратор жидкого топлива, 1-я ступень",
+      "doc_ref": "Velcon, лист 1212-R19",
+      "source_url": "https://www.airtt.se/assets/products-for-fuelhandling2.pdf",
+      "quote": "V-1622 100 140 2 I-62283TB I-62287TB 1 SO-623C"
+    },
+    {
+      "code": "SO-318C",
+      "issuer": "Parker Velcon",
+      "description": "Сепарирующий элемент (2-я ступень)",
+      "machine": "Velcon V-1222",
+      "unit": "фильтр-сепаратор жидкого топлива, 2-я ступень",
+      "doc_ref": "Velcon, лист 1212-R19",
+      "source_url": "https://www.airtt.se/assets/products-for-fuelhandling2.pdf",
+      "quote": "V-1222 50 70 1 I-62283TB I-62287TB 1 SO-318C"
+    },
+    {
+      "code": "DC-614PLF1",
+      "issuer": "Parker Velcon",
+      "description": "Картридж из гофрированной бумаги, 1 мкм, длина 14; кросс Facet CIF 1",
+      "machine": "фильтры Velcon для топлива и масел (в т. ч. турбинного и гидравлического)",
+      "unit": "тонкая фильтрация",
+      "doc_ref": "Velcon, Filter Cross-Reference Table",
+      "source_url": "https://www.airtt.se/assets/products-for-fuelhandling2.pdf",
+      "quote": "DC-614PLF1                 CIF 1                     14          1"
+    },
+    {
+      "code": "OS-61488",
+      "issuer": "Parker Velcon",
+      "description": "Коалесцирующий-сепарирующий картридж 0,5 мкм, 6 × 13 дюймов, для топлива Jet-A и дизельного",
+      "machine": "фильтры-сепараторы Velcon серии OS",
+      "unit": "фильтр-сепаратор топлива",
+      "source_url": "https://skygeek.com/velcon-os-61288-aviation-fuel-filter-cartridge.html",
+      "quote": "Parker-Hannifin Velcon OS-61488 Aviation & Diesel Fuel Coalescer/Separator Cartridge",
+      "doc_ref": "карточка продавца SkyGeek; адрес страницы — OS-61288, в тексте — OS-61488"
+    },
+    {
+      "code": "937399Q",
+      "issuer": "Parker Hydraulic Filter",
+      "description": "Элемент Moduflow Plus, 10 мкм, стекловолокно",
+      "machine": "Parker Moduflow Plus (RFP/ILP/DILP/TFP)",
+      "unit": "гидросистема, фильтр низкого давления",
+      "source_url": "https://www.hyspeco.com/itemdetail/937399Q",
+      "quote": "Parker 937399Q Filter Element Item #: 937399Q Product Info Brand: Parker Hannifin The patented Parker Moduflow™ Plus Series Low Pressure (In-Line Suction/Return/Duplex) Filter element"
+    },
+    {
+      "code": "937397Q",
+      "issuer": "Parker Hydraulic Filter",
+      "description": "Элемент RFP-2-02Q-B-35, уплотнение Buna",
+      "machine": "Parker Moduflow Plus",
+      "unit": "гидросистема, фильтр низкого давления",
+      "source_url": "https://www.hyspeco.com/itemdetail/937397Q",
+      "quote": "Parker 937397Q RFP-2-02q-b-35 Buna Ele Assy"
+    },
+    {
+      "code": "926835Q",
+      "issuer": "Parker Hydraulic Filter",
+      "description": "Элемент серии 15/40/80CN; в наименовании указан номер HC9600FKS4H (кросс на Pall)",
+      "machine": "Parker 15/40/80CN",
+      "unit": "гидросистема, фильтр среднего давления",
+      "source_url": "https://www.hyspeco.com/itemdetail/926835Q",
+      "quote": "Parker 926835Q HC9600FKS4H Or Z Elem (10q)"
+    },
+    {
+      "code": "932617Q",
+      "issuer": "Parker Hydraulic Filter",
+      "description": "Элемент 15P-2, 5Q, уплотнение Viton",
+      "machine": "Parker 15P/30P",
+      "unit": "гидросистема, фильтр высокого давления",
+      "source_url": "https://www.hyspeco.com/itemdetail/932617Q",
+      "quote": "Parker 932617Q 15p-2 5Q Elem Assy Viton"
+    },
+    {
+      "code": "932677Q",
+      "issuer": "Parker Hydraulic Filter",
+      "description": "Элемент 50P-2, 2Q, Viton, по стандарту HF4",
+      "machine": "Parker 50P",
+      "unit": "гидросистема, фильтр высокого давления",
+      "source_url": "https://www.hyspeco.com/itemdetail/932677Q",
+      "quote": "Parker 932677Q 50P-2 2q Viton Hf4 Style Elem"
+    },
+    {
+      "code": "944511Q",
+      "issuer": "Parker Hydraulic Filter",
+      "description": "Элемент EPF4210QIHB высокого давления",
+      "machine": "Parker EPF",
+      "unit": "гидросистема, фильтр высокого давления",
+      "source_url": "https://www.hyspeco.com/itemdetail/944511Q",
+      "quote": "Parker 944511Q Element EPF4210qihb Hp Elem"
+    },
+    {
+      "code": "926543",
+      "issuer": "Parker Hydraulic Filter",
+      "description": "Навинчиваемый элемент 03C, целлюлоза, корпус 12AT",
+      "machine": "Parker 12AT",
+      "unit": "гидросистема, навинчиваемый фильтр",
+      "source_url": "https://www.hyspeco.com/itemdetail/926543",
+      "quote": "Parker 926543 Filter",
+      "doc_ref": "карточка дистрибьютора Hyspeco; в описании: «Element Type Spin-On Filter Element 03C Cellulose Filter Housing Series 12AT», в разметке — «12AT-1 03C CAN»"
+    },
+    {
+      "code": "N0674-70 2-325",
+      "issuer": "Parker O-Ring & Engineered Seals",
+      "description": "Образец кода заказа кольца: компаунд NBR 70 ShA + типоразмер AS568 2-325",
+      "machine": "уплотнения общего назначения (насосы, компрессоры, гидравлика)",
+      "unit": "уплотнения",
+      "doc_ref": "ORD 5700, разд. I",
+      "source_url": "https://nianticseal.com/wp-content/uploads/2024/04/ORD-5700.pdf",
+      "quote": "For industrial use, order the O-rings by the Parker compound number followed by the size number. Example: N0674-70 2-325"
+    }
+  ],
+  "parts_rejected": [],
+  "sub_suppliers": [
+    {
+      "company": "Racor (Parker Hannifin, Racor Division)",
+      "component": "топливные фильтры-влагоотделители, вентиляция картера CCV",
+      "machine": "Racor Turbine Series, CCV",
+      "evidence": "на документах RSL0385 и описаниях дилера: «Parker Racor Division»",
+      "sources": [
+        "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf",
+        "https://www.racorstore.com/products/racor-771000fh30-triple-ff-ws-assembly"
+      ],
+      "verified": true
+    },
+    {
+      "company": "Velcon Filters (Parker Velcon Filtration Division)",
+      "component": "коалесцеры, сепараторы, сосуды фильтров-сепараторов",
+      "machine": "Velcon V Series, OS",
+      "evidence": "изготовитель указан в каталоге Velcon; дилеры продают картриджи как «Parker-Hannifin Velcon»",
+      "sources": [
+        "https://www.airtt.se/assets/products-for-fuelhandling2.pdf",
+        "https://skygeek.com/velcon-os-61288-aviation-fuel-filter-cartridge.html"
+      ]
+    },
+    {
+      "company": "CLARCOR (бренды Baldwin, PECOFacet, BHA, Airguard, Purolator и др.)",
+      "component": "фильтры двигателей, фильтрация газа, воздухозаборные фильтры газовых турбин",
+      "machine": "фильтрация ГТУ и ГПУ",
+      "evidence": "Parker завершил покупку CLARCOR 28.02.2017 (пресс-релиз Parker, Wikipedia)",
+      "sources": [
+        "https://investors.parker.com/news-events/press-releases/detail/165/parker-hannifin-completes-clarcor-acquisition",
+        "https://en.wikipedia.org/wiki/Clarcor"
+      ]
+    }
+  ],
+  "dealers": [
+    {
+      "company": "RacorStore",
+      "country": "США",
+      "role": "интернет-дилер Racor: запчасти, ремкомплекты, выкладывает сборники чертежей и спецификаций изготовителя",
+      "sources": [
+        "https://www.racorstore.com/racor-2040tm-or-element-repl-900-turbine-10m.html"
+      ]
+    },
+    {
+      "company": "Hyspeco",
+      "country": "США",
+      "role": "дистрибьютор гидравлики и гидрофильтров Parker",
+      "sources": [
+        "https://www.hyspeco.com/itemdetail/937399Q"
+      ]
+    },
+    {
+      "company": "Valin Corporation",
+      "country": "США",
+      "role": "дистрибьютор Parker Filtration, в том числе Velcon",
+      "sources": [
+        "https://www.valin.com/filtration/brands/parker-filtration",
+        "https://www.valin.com/filtration/products/velcon-coalescer-cartridges"
+      ]
+    },
+    {
+      "company": "FCP Solutions",
+      "country": "Австралия",
+      "role": "дилер фильтров Racor с таблицами кроссов",
+      "sources": [
+        "https://www.fcpsolutions.com.au/p/filters/parker-racor-2040-series-10-micron-filter-2040v10-2040n-10-2040tm-or-p552040-fs20402-sf1913-10-pf7889-10"
+      ]
+    },
+    {
+      "company": "Triune",
+      "country": "ОАЭ",
+      "role": "дистрибьютор Parker Racor по ОАЭ и MENA (по собственному заявлению)",
+      "sources": [
+        "https://triuneme.com/brands/parker-racor/"
+      ]
+    },
+    {
+      "company": "Hidroser",
+      "country": "Турция",
+      "role": "основной дистрибьютор Parker в Турции, сеть ParkerStore",
+      "sources": [
+        "https://www.hidroser.com.tr/en/about-parker/"
+      ]
+    },
+    {
+      "company": "Ece Filter",
+      "country": "Турция",
+      "role": "партнёр по фильтрам Racor и гидрофильтрам Parker",
+      "sources": [
+        "https://ecefilter.com/parker-racor"
+      ]
+    },
+    {
+      "company": "Alpem Filtre",
+      "country": "Турция",
+      "role": "поставщик фильтрации Parker",
+      "sources": [
+        "https://alpem.com.tr/tr/parker"
+      ]
+    },
+    {
+      "company": "信德迈科技(北京)有限公司 (Xindemai)",
+      "country": "Китай",
+      "role": "авторизованный дистрибьютор Parker (соединения); на сайте есть разделы о фильтрах Racor и PECO",
+      "sources": [
+        "http://www.parkersnap-tite.com/parker_atuthorized_distributor.htm",
+        "http://www.parkersnap-tite.com/engine_filtration.htm"
+      ]
+    },
+    {
+      "company": "Filtration And Separation Technology",
+      "country": "Индия",
+      "role": "продавец коалесцеров и сепараторов Velcon (объявление на IndiaMART, статус авторизации не подтверждён)",
+      "sources": [
+        "https://www.indiamart.com/proddetail/velcon-parker-coalescer-separator-2849461443473.html"
+      ]
+    }
+  ],
+  "gaps": [
+    "Россия: с 31.03.2022 Parker закрыл офис и склад в Москве и ушёл с рынка (leave-russia.org, отчётность Parker для SEC). Официальных дилеров в РФ нет; поставка только через третьи страны (Турция, ОАЭ, Китай).",
+    "parker.com и ph.parker.com отдают 403 на автоматические запросы. Поэтому по страницам изготовителя (2040N-10, 944511Q, 932677Q, раздел о фильтрации для газовых турбин) коды сверены только по дилерам и PDF у дилеров. Страницы Parker стоит проверить вручную в браузере.",
+    "Каталог Velcon, который мы прочитали, — редакция 2005–2006 (зеркало airtt.se). Актуальные номера (серии I-6xxC5, SO-6xxV5) и данные по сосудам для топлива ГТУ — в VEL1894 и VEL2162 на parker.com, прочитать их не удалось (403).",
+    "Воздухозаборные фильтры газовых турбин (линии бывших CLARCOR и BHA): на открытых страницах номеров картриджей нет. Их надо брать у Parker Gas Turbine Filtration по запросу или из ведомостей конкретных ГТУ.",
+    "Какие Racor, Velcon и гидрофильтры Parker стоят на конкретных ГТУ, ГПУ и компрессорах парка, открытые источники не говорят. Это есть в ведомостях ЗИП изготовителей машин (Jenbacher, Caterpillar, Solar и др.) и в порталах дилеров.",
+    "Кольца Parker: в ORD 5700 даны только компаунды и типоразмеры AS568. Кольцо к узлу конкретной машины не привязано — такая привязка есть только в ведомостях узлов изготовителей машин.",
+    "Официального списка дистрибьюторов по странам (страница Parker Distribution Network) прочитать не удалось (403). Статус Triune и индийского продавца подтверждён только их собственными страницами."
+  ],
+  "verifier_notes": "Все 40 кодов подтверждены. RSL0385, каталог Velcon и ORD 5700 скачаны и прочитаны через pdftotext, HTML-страницы — через curl. Недоступна одна страница, ph.parker.com (403); Velcon V Series подтверждена каталогом Velcon. Уточнения по описаниям: у 937399Q и Moduflow Plus значения «200 psi» в источнике нет; «iProtect» у EPF не подтверждено; P552040 и FS20402 — кроссы дилера fcpsolutions, а не документы Donaldson и Cummins; RK 30476 есть только у дилера, в RSL0385 его нет (там только RK 30488); у 2020V10 заголовок URL упоминает 2020N10, но на странице — «NEW PART NUMBER 2020V10»; OS-61488 лежит на странице с URL 61288. Про фильтры турбинного масла у Velcon источники ничего не говорят.",
+  "corrections": [
+    "937399Q и Moduflow Plus: снято «200 psi» — значения в источнике нет (замечание скептика)",
+    "Parker EPF: снято «iProtect» — в источнике не подтверждено (замечание скептика)",
+    "P552040, FS20402: в doc_ref оговорено, что это кросс дилера fcpsolutions, а не документы Donaldson и Cummins (замечание скептика)",
+    "RK 30476: оговорено, что номер есть только у дилера, в RSL0385 — только RK 30488 (замечание скептика)",
+    "2020V10: в doc_ref отмечено расхождение адреса страницы (2020N10) и текста (2020V10) (замечание скептика)",
+    "OS-61488: в doc_ref отмечено, что код стоит на странице с адресом OS-61288 (замечание скептика)",
+    "Velcon: из component снято «фильтры турбинного масла» — источники об этом ничего не говорят (замечание скептика)",
+    "2040V10, 926543: в quote поставлен текст страницы с самим кодом (заголовок карточки), прежняя цитата без кода перенесена в doc_ref (страницы скачаны заново 27.09.2026)",
+    "гидрофильтры Parker (6 записей machines): rating «в источнике не указано» — у карточек дистрибьютора характеристик корпуса нет"
+  ]
+}

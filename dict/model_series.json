@@ -22,7 +22,8 @@
   "турбонагнетатель",
   "детандер",
   "пылеуловитель",
-  "паровая турбина"
+  "паровая турбина",
+  "фильтр"
  ],
  "gaps": [
   "Harbin Electric, Shanghai Electric, CRRC, Hongda — ряд с источником не найден в этой сессии, не добавлены.",
@@ -4389,7 +4390,126 @@
       "https://www.donaldson.com/content/dam/donaldson/dust-fume-mist/literature/north-america/equipment/dust-collectors/cartridge/downflo-oval/f118006/Downflo-Oval-Dust-Collector.pdf",
       "https://www.donaldson.com/en-us/industrial-dust-fume-mist/equipment/dust-collectors/cartridge/downflo-oval/"
      ],
-     "note": "Фильтры Donaldson идут артикулами (P55…), а не рядами: здесь только пылеуловители."
+     "note": "Фильтры двигателей Donaldson идут артикулами (P55…), а не рядами: здесь пылеуловители и системы воздухоочистки на входе ГТУ."
+    },
+    {
+     "id": "donaldson-gdx",
+     "series": "GDX (импульсно очищаемая воздухоочистка на входе ГТУ)",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "GDX",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "GDX"
+     ],
+     "sources": [
+      "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/donaldson.json."
+    },
+    {
+     "id": "donaldson-gds",
+     "series": "GDS / GDS-II (статическая воздухоочистка на входе ГТУ)",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "GDS(?:-?II)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "GDS",
+      "GDS-II"
+     ],
+     "sources": [
+      "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/donaldson.json."
+    },
+    {
+     "id": "donaldson-ttd",
+     "series": "TTD (Huff 'n Puff) — самоочищаемый фильтр-дом ГТУ",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "TTD",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "TTD"
+     ],
+     "sources": [
+      "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/donaldson.json."
+    },
+    {
+     "id": "donaldson-cfs",
+     "series": "Composite-Filter System (CFS) — двухступенчатые картриджи входа ГТУ",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "CFS",
+       "context": "бренд"
+      },
+      {
+       "rx": "Composite-?Filter\\s?System",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CFS",
+      "Composite-Filter System"
+     ],
+     "sources": [
+      "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/donaldson.json."
+    },
+    {
+     "id": "donaldson-xlr",
+     "series": "XLR (PowerCore) — панельная воздухоочистка ГТУ",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "XLR",
+       "context": "бренд"
+      },
+      {
+       "rx": "PowerCore",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "XLR",
+      "PowerCore"
+     ],
+     "sources": [
+      "https://www.aecfilterparts.com/userfiles2/product-specification/36689/872cb55a-97b4-4f58-9e31-49c3e2c63895/GTS-400Catalog.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/donaldson.json."
+    },
+    {
+     "id": "donaldson-turbotek",
+     "series": "Turbo-Tek (сменные картриджи входа ГТУ)",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "Turbo-?Tek",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Turbo-Tek"
+     ],
+     "sources": [
+      "https://www.donaldson.com/content/dam/donaldson/gas-turbine-systems/literature/north-america/filters-parts/cartridge-filters/f117168-eng/GTS-Cartridge-Selection-Guide.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/donaldson.json."
     }
    ]
   },
@@ -4465,7 +4585,168 @@
       "https://ph.parker.com/us/en/product-list/axial-piston-variable-pumps-series-pvplus",
       "https://www.parker.com/content/dam/Parker-com/Literature/PMDE/Catalogs/Piston_Pumps/PV-/MSG30-3245_UK.pdf"
      ]
+    },
+    {
+     "id": "parker-racor-turbine",
+     "series": "Racor Turbine Series 500FG / 900FH / 1000FH и сборки 73/75/77/79 (фильтры-влагоотделители топлива)",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "(?:7[3579])?(?:500FG|900F[HV]|1000F[HV])[XV]?(?:\\d{2})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "500FG",
+      "900FH",
+      "1000FH",
+      "751000FHX",
+      "791000FHV",
+      "500FG30"
+     ],
+     "sources": [
+      "https://www.racorstore.com/cut-sheets/fuel-cuts/RSL0385_Turbine-Series_Catalog.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/parkerhannifin.json."
+    },
+    {
+     "id": "parker-racor-ccv",
+     "series": "Racor CCV4500 / 6000 / 8000 / 12000 (закрытая вентиляция картера)",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "CCV\\s?(?:4500|6000|8000|12000)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "CCV4500",
+      "CCV8000",
+      "CCV12000"
+     ],
+     "sources": [
+      "https://www.racorstore.com/products/racor-ccv8000-10r-crankcase-ventilation-system"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/parkerhannifin.json."
+    },
+    {
+     "id": "parker-velcon-v",
+     "series": "Velcon V Series (фильтры-сепараторы жидкого топлива V-1222 … VV-4856)",
+     "type": "фильтр",
+     "patterns": [
+      {
+       "rx": "VV?-\\d{4}",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "V-1222",
+      "VV-4856"
+     ],
+     "sources": [
+      "https://www.airtt.se/assets/products-for-fuelhandling2.pdf"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/parkerhannifin.json."
+    },
+    {
+     "id": "parker-moduflow",
+     "series": "Moduflow Plus (гидрофильтры низкого давления)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "Moduflow(?:\\s?Plus)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Moduflow Plus",
+      "Moduflow"
+     ],
+     "sources": [
+      "https://www.hyspeco.com/itemdetail/937399Q"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/parkerhannifin.json."
+    },
+    {
+     "id": "parker-cn",
+     "series": "15CN / 40CN / 80CN (гидрофильтры среднего давления)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "(?:15|40|80)CN",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "15CN",
+      "80CN"
+     ],
+     "sources": [
+      "https://www.hyspeco.com/itemdetail/926835Q"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/parkerhannifin.json."
+    },
+    {
+     "id": "parker-p-hp",
+     "series": "15P / 30P / 50P (гидрофильтры высокого давления)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "(?:15|30|50)P",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "15P",
+      "30P",
+      "50P"
+     ],
+     "sources": [
+      "https://www.hyspeco.com/itemdetail/932617Q",
+      "https://www.hyspeco.com/itemdetail/932677Q"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/parkerhannifin.json."
+    },
+    {
+     "id": "parker-epf",
+     "series": "EPF (гидрофильтры высокого давления)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "EPF",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "EPF"
+     ],
+     "sources": [
+      "https://www.hyspeco.com/itemdetail/944511Q"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/parkerhannifin.json."
+    },
+    {
+     "id": "parker-12at",
+     "series": "12AT (навинчиваемые гидрофильтры)",
+     "type": "гидравлика",
+     "patterns": [
+      {
+       "rx": "12AT",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "12AT"
+     ],
+     "sources": [
+      "https://www.hyspeco.com/itemdetail/926543"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/parkerhannifin.json."
     }
+   ],
+   "context_aliases": [
+    "Racor",
+    "Velcon"
    ]
   },
   {
@@ -6290,6 +6571,369 @@
       "https://www.amot.com/media/product_spec_sheets/download/d/a/datasheet_8402_gas_turbine_fuel_control_valve_0719_rev3.pdf"
      ],
      "note": "Подтверждено разведкой data/brand_research/amot.json."
+    }
+   ]
+  },
+  {
+   "brand_key": "heinzmann",
+   "name": "HEINZMANN",
+   "origin": "западный",
+   "country": "Германия",
+   "aliases": [
+    "HEINZMANN",
+    "Heinzmann",
+    "Хайнцманн"
+   ],
+   "context_aliases": [
+    "Regulateurs Europa"
+   ],
+   "role": "бренд",
+   "series": [
+    {
+     "id": "heinzmann-pandaros",
+     "series": "PANDAROS DC 6 (цифровые регуляторы частоты вращения, в т. ч. DC 6.200)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "(?:Twin-)?PANDAROS",
+       "context": "сам"
+      },
+      {
+       "rx": "DC\\s?6(?:\\.200|-0\\d)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "PANDAROS",
+      "Twin-PANDAROS",
+      "DC 6",
+      "DC 6.200"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/components-digital-governors",
+      "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-orion",
+     "series": "ORION DC 9 / DC 10 (цифровые регуляторы частоты вращения)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "ORION(?:\\s?DC\\s?(?:9|10))?",
+       "context": "бренд"
+      },
+      {
+       "rx": "DC\\s?(?:9|10)",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ORION DC 9",
+      "ORION DC 10",
+      "DC 9"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/components-digital-governors"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-helenos",
+     "series": "HELENOS DC 2-02 (цифровые регуляторы частоты вращения)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "HELENOS",
+       "context": "сам"
+      },
+      {
+       "rx": "DC\\s?2-02",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "HELENOS",
+      "DC 2-02"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/components-digital-governors"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-priamos",
+     "series": "PRIAMOS DC 1-03 / DC 1-04 (регуляторы первого поколения, сняты)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "PRIAMOS",
+       "context": "сам"
+      },
+      {
+       "rx": "DC\\s?1-0[34]",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "PRIAMOS",
+      "DC 1-03",
+      "DC 1-04"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/components-digital-governors"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-xios",
+     "series": "XIOS UC / XIOS Gas / XIOS CHP (блоки и комплексы управления двигателем)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "XIOS(?:\\s?(?:UC|Gas|CHP))?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "XIOS UC",
+      "XIOS Gas",
+      "XIOS CHP"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/components-digital-governors",
+      "https://www.heinzmann.com/en/component/jdownloads/send/185-xios-gas-motorsteuerung/681-xios-sup-gas-sup-engine-control?Itemid=1055"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-kronos",
+     "series": "KRONOS 10 / 20 / 30 / 40 (регулирование состава смеси газового двигателя)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "KRONOS\\s?[1-4]0",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "KRONOS 10",
+      "KRONOS 20",
+      "KRONOS 30",
+      "KRONOS 40"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/engine-management/kronos-20-afr-system",
+      "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-gmcu",
+     "series": "ELEKTRA GMCU-II-52 / 68 / 110 (газовые дозаторы KRONOS 30)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "GMCU(?:-II)?(?:-(?:52|68|110))?",
+       "context": "бренд"
+      },
+      {
+       "rx": "ELEKTRA",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "GMCU-II-52",
+      "GMCU-II-110",
+      "ELEKTRA"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/gas-metering-units"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-phlox",
+     "series": "PHLOX II / PHLOX III (системы зажигания газовых двигателей)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "PHLOX(?:\\s?(?:II|III))?",
+       "context": "сам"
+      }
+     ],
+     "examples": [
+      "PHLOX II",
+      "PHLOX III",
+      "PHLOX"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/ignition-control"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-ariadne",
+     "series": "ARIADNE KC 01 (контроль детонации)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "ARIADNE",
+       "context": "бренд"
+      },
+      {
+       "rx": "KC\\s?01",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "ARIADNE",
+      "KC 01"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/knock-control-gas"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-stg",
+     "series": "StG (исполнительные механизмы: бесщёточные 2010–2120 и с редуктором 6–180)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "StG\\s?\\d{1,4}(?:\\.\\d{2,3})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "StG 2040",
+      "StG 30.90",
+      "StG 6",
+      "StG 180"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-dk",
+     "series": "DK 50 … DK 400 (дроссельные заслонки)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "DK\\s?\\d{2,3}(?:-\\d{3,4})?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "DK 100-0680",
+      "DK 50",
+      "DK 400-180"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/component/jdownloads/send/58-gasmotor-management/324-gas-engine-management-product-catalogue?Itemid=1055"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-viking35",
+     "series": "Viking35 (блок управления с гидроприводами REGULATEURS EUROPA)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "Viking\\s?35",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Viking35"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/components-digital-governors"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-re",
+     "series": "RE 1102 … RE 2100, DG 2800.14 (гидравлические регуляторы REGULATEURS EUROPA)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "RE\\s?(?:1102|1115|1500|1800|2100|2800)(?:-\\dG)?",
+       "context": "бренд"
+      },
+      {
+       "rx": "DG\\s?2800(?:\\.14)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "RE 1102-4G",
+      "RE 2100",
+      "DG 2800.14"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/components-hydraulic-governors"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-sitec",
+     "series": "Si-TEC Xtend (регуляторы паровых турбин HEINZMANN Australia)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "Si-?TEC(?:\\s?Xtend)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "Si-TEC Xtend",
+      "Si-TEC"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/gas-turbine-components"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-prometheus",
+     "series": "PROMETHEUS (зажигание газовых турбин HEINZMANN UK)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "PROMETHEUS",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "PROMETHEUS"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/gas-turbine-components"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
+    },
+    {
+     "id": "heinzmann-triton",
+     "series": "TRITON OMD (обнаружение масляного тумана в картере)",
+     "type": "КИП",
+     "patterns": [
+      {
+       "rx": "TRITON\\s?OMD(?:\\s?II)?",
+       "context": "бренд"
+      }
+     ],
+     "examples": [
+      "TRITON OMD II",
+      "TRITON OMD"
+     ],
+     "sources": [
+      "https://www.heinzmann.com/en/products/components-oil-mist-detection"
+     ],
+     "note": "Подтверждено разведкой data/brand_research/heinzmann.json."
     }
    ]
   }
