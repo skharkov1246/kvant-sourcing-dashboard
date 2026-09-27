@@ -2,7 +2,8 @@
 
 Проверяется там, где ошибка и случилась бы, — в самой базе:
   · схема применяется дважды, во вторую схему той же базы, без схемы
-    поставщиков (вид создаётся с пустым именем) и без ролей платформы;
+    поставщиков (вид создаётся с пустым именем) и без ролей платформы; схема
+    поставщиков применяется повторно поверх вида заказчика (порядок zip-db);
   · свежая запись разбора: вставка, изменение с новым ключом прогона, неизменная
     строка остаётся за тем, кто её записал;
   · досчёт истории целиком (library/backfill_deal_links.py) на подставном
@@ -70,9 +71,12 @@ def conn():
     c.execute(f"drop schema if exists {СХЕМА} cascade")
     c.execute(f"create schema {СХЕМА}")
     c.execute(f"set search_path to {СХЕМА}")
-    применить(c, "schema.sql", "schema_junk.sql", "suppliers_schema.sql")
-    for _ in range(2):                          # повторяемость (правило 21)
-        применить(c, "deal_links_schema.sql")
+    применить(c, "schema.sql", "schema_junk.sql")
+    # Повторяемость (правило 21) — в порядке zip-db: второй проход применяет схему
+    # поставщиков, когда вид lib_deal_customer уже стоит и берёт из неё имена.
+    # Так идут и повторный zip-db, и supplier-merge, и suppliers-names.
+    for _ in range(2):
+        применить(c, "suppliers_schema.sql", "deal_links_schema.sql")
     c.execute(ПОСТАВЩИКИ)
     с.autocommit = False
     try:
@@ -136,6 +140,42 @@ def test_имя_заказчика_из_реестра_по_корню_слия�
                         " order by 1") == [
         ("11", "С1", "Заказчик Один Выдуманный"), ("12", "С3", None), ("13", None, None)]
 
+
+def test_схема_поставщиков_поверх_вида_заказчика(conn):
+    """supplier-merge и suppliers-names применяют ОДНУ схему поставщиков, когда вид
+    заказчика уже стоит: она пересобирает sup_name_shown drop + create, и вид
+    заказчика не должен ни ронять её, ни терять имена после неё."""
+    with conn.cursor() as c:
+        c.execute("insert into lib_deals (deal_id, title, company_id, run_id)"
+                  " values ('41','С1','901','t')")
+        применить(c, "suppliers_schema.sql")
+    assert строки(conn, "select deal_id, company_title from lib_deal_customer") == [
+        ("41", "Заказчик Один Выдуманный")]
+    # Зависимости вида от sup_name_shown в базе нет — иначе drop выше упал бы.
+    assert строки(conn, "select count(*) from pg_depend d join pg_rewrite r on r.oid = d.objid"
+                        " where r.ev_class = 'lib_deal_customer'::regclass"
+                        "   and d.refobjid = 'sup_name_shown'::regclass") == [(0,)]
+
+
+def test_переход_с_первой_редакции_вида_заказчика(conn):
+    """На живой базе стоит первая редакция lib_deal_customer — прямо поверх
+    sup_name_shown. Следующий zip-db применяет схему поставщиков раньше схемы
+    связей: переход снимает прежний вид, схема связей ставит новый, имена целы."""
+    старый = "left join lib_имена_компаний() n on n.sup_id = b.sup_id"
+    текст = МИГРАЦИЯ.read_text(encoding="utf-8")
+    assert старый in текст
+    from tests.test_library_schema_sql import операторы as резать
+    with conn.cursor() as c:
+        for оператор in резать(текст.replace(старый, "left join sup_name_shown n on n.sup_id = b.sup_id")):
+            c.execute(оператор)
+        c.execute("insert into lib_deals (deal_id, title, company_id, run_id)"
+                  " values ('41','С1','901','t')")
+        применить(c, "suppliers_schema.sql")                 # раньше падал здесь
+        c.execute("select to_regclass('lib_deal_customer'), to_regclass('lib_rfq_chain')")
+        assert c.fetchone() == (None, None)                 # сняты переходом
+        применить(c, "deal_links_schema.sql", "suppliers_schema.sql")
+    assert строки(conn, "select deal_id, company_title from lib_deal_customer") == [
+        ("41", "Заказчик Один Выдуманный")]
 
 # ── досчёт истории на подставном портале ─────────────────────────────────────
 
