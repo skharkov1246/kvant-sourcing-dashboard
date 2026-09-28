@@ -243,13 +243,18 @@ def test_переразбор_нашего_кп_пишет_только_цены
             f" ({ix.doc_kind.ПРЕДЛОЖЕНИЕ_ПОСТАВЩИКА} 1/2; файлов/строк)") in out
     assert "прежних строк потока у файлов с таким содержимым: 2 в 1 файлах — сняты" in out
     assert "пропущено как «стало хуже" not in out
+    # Повтор: прежних строк уже нет — писать нечего, в «записано файлов» не идёт.
+    assert reparse.main() == 0
+    out = capsys.readouterr().out
+    assert состояние()[0] == [] and "записано файлов: 0 (только цены нашего КП)" in out
+    assert "прежних строк потока у файлов" not in out
     # Холостой прогон того же файла ничего не снимает, а только говорит, что снял бы.
     monkeypatch.setattr(ix.doc_kind, "вид_документа", lambda *a, **k: (
         ix.doc_kind.НАШЕ_ПРЕДЛОЖЕНИЕ, 0.9, "выдумано"))
     assert reparse.main() == 0
     assert состояние()[0] == [(price_store.FEED_НАШЕ_КП, "41", 2)]
     monkeypatch.setattr(ix.doc_kind, "вид_документа", lambda *a, **k: (
-        ix.doc_kind.ДОГОВОР, 0.9, "выдумано"))
+        ix.doc_kind.ЗАПРОС_ЗАКАЗЧИКА, 0.9, "выдумано"))
     monkeypatch.setattr(reparse, "APPLY", False)
     capsys.readouterr()
     assert reparse.main() == 0
