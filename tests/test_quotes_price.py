@@ -331,18 +331,33 @@ def test_выведенная_делением_остаётся_низкой_д�
     assert "делением" in ц["note"]
 
 
-def test_текстовая_цена_только_у_котировок():
+def test_текстовая_цена_только_у_котировок(monkeypatch):
     """Спецификация заказчика через текстовый путь цены не получает: в ней
-    встречаются бюджетные суммы, и выдать их за предложение поставщика нельзя."""
+    встречаются бюджетные суммы, и выдать их за предложение поставщика нельзя.
+
+    Проверяется поведение разбора, а не написание вызова: прежняя редакция
+    искала строку «quotes.цена_из_текста(ln) if цены else None» в исходнике
+    handle и покраснела, когда разбор байтов вынесли из handle в свою функцию
+    (замер правок КП на тех же байтах, 28.09.2026) при сохранном поведении."""
     import indexer
     assert indexer.SOURCE == "deals"          # умолчание прогона
-    # Ветку цены в текстовом пути открывает indexer.цены_файла — проверяем её
-    # поведение, а не написание: при SOURCE=deals она закрыта для любой стороны
-    # файла, в том числе «поставщик» (цены писем — tests/test_mail_prices.py).
-    import inspect
-    исходник = inspect.getsource(indexer.handle)
-    assert "quotes.цена_из_текста(ln) if цены else None" in исходник
-    assert "цены = цены_файла(rec)" in исходник
+    текст = "\n".join(f"{k}. Насос условный ЦНС-38 исп. {k} 2 шт 1 000,00 2 000,00"
+                      for k in range(1, 8))
+    monkeypatch.setattr(indexer, "download", lambda fo, rec=None: b"x" * 40)
+    monkeypatch.setattr(indexer, "читать", lambda b, п, rec=None: ([], текст, ""))
+    monkeypatch.setattr(indexer, "наши_имена", lambda: ())
+    ссылка = {"fo": {"id": "1"}, "deal": "1", "origin": "поле сделки",
+              "field": "UF_CRM_SPEC", "field_title": "Спецификация заказчика"}
+    rec, items = indexer.handle(ссылка)
+    assert rec["parse_path"] == "текст" and items
+    assert not any(it.get("_цена") for it in items), "цена у спецификации сделки"
+    monkeypatch.setattr(indexer, "SOURCE", "rfq")
+    _, items = indexer.handle({**ссылка, "origin": "поле запроса"})
+    assert items and all(it.get("_цена") for it in items), "у котировки цена теряется"
+    # Ветку цены открывает indexer.цены_файла: при SOURCE=deals она закрыта для
+    # любой стороны файла, в том числе «поставщик» (цены писем —
+    # tests/test_mail_prices.py).
+    monkeypatch.setattr(indexer, "SOURCE", "deals")
     for сторона in ("заказчик", "поставщик", "мы", "неизвестно", None):
         assert indexer.цены_файла({"side": сторона}) is False
 

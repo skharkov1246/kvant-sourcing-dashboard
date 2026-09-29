@@ -22,6 +22,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
 from library import indexer
 
 
@@ -54,22 +56,32 @@ def test_ворота_таблицы_берут_правило_по_виду(mon
     assert строки == [] and текст == "проза", "PDF получил ослабление"
 
 
-def test_сборка_таблицы_pdf_тоже_идёт_строгим_правилом():
+@pytest.mark.parametrize("постранично", [False, True], ids=["joined", "pagewise"])
+def test_сборка_таблицы_pdf_тоже_идёт_строгим_правилом(monkeypatch, постранично):
     """Ворота передаются ВНУТРЬ pdftable: там выбирается ступень допуска.
 
     Если туда уйдёт ослабленное правило, PDF получит ослабление окольным путём —
-    мимо `ослаблять`, и замер по видам окажется обойдён.
-    """
-    код = re.sub(r"(?<!\w)#[^\n]*", "",
-                 (Path(__file__).resolve().parent.parent
-                  / "library/indexer.py").read_text(encoding="utf-8"))
-    # Регулярка со [^)]* обрезала бы захват на ВЛОЖЕННОЙ скобе вызова
-    # `ослаблять("pdf")` — берём строку целиком до конца выражения.
-    ворота = [s for s in код.splitlines() if "годится=lambda rows: header_map(" in s]
-    assert ворота, "ворота шапки в сборке таблицы PDF не найдены"
-    assert len(ворота) == 1, f"ворот шапки больше одних: {ворота}"
-    assert 'шире=ослаблять("pdf")' in ворота[0], \
-        f"ворота PDF не спрашивают правило по виду: {ворота[0]!r}"
+    мимо `ослаблять`, и замер по видам окажется обойдён. Прежняя редакция искала
+    строку вызова в исходнике и покраснела от перестановки кода при сохранном
+    поведении (правка F1, постраничная сборка, 28.09.2026): теперь спрашивается
+    каждый вызов правила шапки из сборки таблицы PDF — склейкой страниц и
+    постранично (PDF_PAGEWISE), при включённом общем выключателе ослабления."""
+    monkeypatch.setattr(indexer, "ШАПКА_ШИРЕ", True)
+    monkeypatch.setattr(indexer, "ПОСТРАНИЧНО", постранично)
+    правила: list = []
+    настоящее = indexer.найти_шапку
+
+    def шпион(rows, *, шире=None, глубина=None, строго=False):
+        правила.append(indexer.ШАПКА_ШИРЕ if шире is None else шире)
+        return настоящее(rows, шире=шире, глубина=глубина, строго=строго)
+
+    monkeypatch.setattr(indexer, "найти_шапку", шпион)
+    страница = "\n".join(["№   Наименование             Кол-во     Цена, руб."]
+                          + [f"{k}   Насос условный {k}         {k + 1}          {k}00,00"
+                             for k in range(1, 7)])
+    таблица = indexer.таблица_из_страниц([страница, страница])
+    assert таблица and правила, "сборка таблицы PDF правило шапки не спросила"
+    assert not any(правила), "ворота PDF получили ослабленное правило"
 
 
 def test_разбор_позиций_тоже_берёт_правило_по_виду(monkeypatch):
@@ -87,14 +99,29 @@ def test_разбор_позиций_тоже_берёт_правило_по_в�
     assert any(it["item_name"] == "Equipment" for it in строго) or len(строго) != len(широко)
 
 
-def test_handle_передаёт_вид_файла_в_разбор_позиций():
-    """Связь проверяется по коду вызова: разбор позиций в handle получает правило
-    по виду, а не общий выключатель."""
-    import tests.test_reparse_wiring as w
-    код = w.без_комментариев((Path(__file__).resolve().parents[1] / "library" / "indexer.py")
-                             .read_text(encoding="utf-8"))
-    assert re.search(r"шире_файла = ослаблять\(", код)
-    assert "позиции_по_листам(rows, шире_файла)" in код
+@pytest.mark.parametrize("вид, ждём", [("xlsx", True), ("pdf", False)])
+def test_handle_передаёт_вид_файла_в_разбор_позиций(monkeypatch, вид, ждём):
+    """Разбор позиций в handle получает правило по ВИДУ файла, а не общий
+    выключатель. Прежняя редакция искала строку вызова в исходнике и краснела
+    от перестановки кода при сохранном поведении (ревизия 28.09.2026): теперь
+    шпион позиции_по_листам смотрит, с каким правилом его позвал handle."""
+    monkeypatch.setattr(indexer, "ШАПКА_ШИРЕ", True)
+    monkeypatch.setattr(indexer, "download", lambda fo, rec=None: b"x")
+    monkeypatch.setattr(indexer, "подвид", lambda b: вид)
+    monkeypatch.setattr(indexer, "читать",
+                        lambda b, п, rec=None: ([["Equipment", "Qty"], ["Pump CNS-38", "2"]], "", ""))
+    monkeypatch.setattr(indexer, "наши_имена", lambda: ())
+    вызовы: list = []
+    настоящее = indexer.позиции_по_листам
+
+    def шпион(rows, шире=None, глубина=None):
+        вызовы.append(шире)
+        return настоящее(rows, шире, глубина)
+
+    monkeypatch.setattr(indexer, "позиции_по_листам", шпион)
+    indexer.handle({"fo": {"id": "f"}, "deal": "1", "origin": "поле сделки",
+                    "field": "UF_CRM_SPEC", "field_title": "Спецификация заказчика"})
+    assert вызовы == [ждём]
 
 
 def test_книга_ods_ослабляется_как_xlsx():
