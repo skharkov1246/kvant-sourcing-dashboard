@@ -48,7 +48,7 @@ python scripts/pdf_check.py shema.pdf --expect "862" --expect "СП-172"
 | 32 ИНН из 8 298 в портале, 0 в реестре | замер 21:50 и холостой прогон 22:55 |
 | 5 231 карточка с файлом КП, 0 с ненулевой суммой, 21 865 карточек | прогон `quote_coverage` 21.09.2026 00:24 |
 | 12 899 деталей, 13 164 номера, 4 726 связей, 433 с наличием | `CLAUDE.md` и `docs/suppliers/DATA_MODEL.md` |
-| 19 → 1 достижимая таблица | `docs/suppliers/DECISIONS.md`, решение Р-6 |
+| 19 → 1 достижимая таблица | `docs/agents/DECISIONS.md`, решение Р-6 |
 | восемь этапов и их состояние | `docs/suppliers/IMPLEMENTATION_PLAN.md` |
 | заполняемость звеньев библиотеки | таблица звеньев в `CLAUDE.md` |
 
