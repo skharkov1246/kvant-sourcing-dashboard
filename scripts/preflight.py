@@ -19,7 +19,7 @@
 одиннадцати способов его уронить.
 
     python scripts/preflight.py            # всё
-    python scripts/preflight.py --fix      # пересобрать каталог и указатель, если устарели
+    python scripts/preflight.py --fix      # пересобрать каталог, указатель и блок INDEX базы знаний
     python scripts/preflight.py --quick    # без тестов и smoke-сборки
 """
 from __future__ import annotations
@@ -140,6 +140,10 @@ def main() -> int:
         ("файлы тестов под версией", [py, "scripts/tracked_test_inputs.py"], None),
         ("каталог данных актуален", [py, "scripts/build_catalog.py", "--check"], None),
         ("поисковый указатель актуален", [py, "scripts/build_index.py", "--check"], None),
+        # База знаний docs/kb и docs/agents: ссылки живы, нет почт, телефонов и
+        # цен (репозиторий публичный, коммерческое — в Notion), указатель
+        # совпадает с каталогом, из прежнего CLAUDE.md не потеряно ни одно правило.
+        ("база знаний", [py, "scripts/kb_check.py"], None),
         ("разметка узлов не хуже порога",
          [py, "scripts/library_units_check.py", "--min-precision", "84",
           "--min-coverage", "78"], None),
@@ -147,6 +151,9 @@ def main() -> int:
     if not a.quick:
         steps.append(("smoke-сборка дашборда", [py, "-"], SMOKE))
 
+    if a.fix:
+        # блок каталога в docs/kb/INDEX.md пересобирается идемпотентно
+        subprocess.run([py, "scripts/kb_check.py", "--fix"], cwd=ROOT, capture_output=True)
     results = [compile_all()]
     for name, cmd, stdin in steps:
         results.append(run(name, cmd, stdin))
