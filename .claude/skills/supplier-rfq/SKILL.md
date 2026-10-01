@@ -130,7 +130,9 @@ description: Кампания запросов ТКП поставщикам ч�
 ## 3. Bitrix REST: рабочие приёмы
 
 Вебхук хранится в `.env` (`BITRIX_WEBHOOK_URL`), в репозиторий не попадает.
-Вызовы — JSON POST на `crm.item.{list,get,add,update}`, паузы 0.2–0.4 с.
+Вызовы — JSON POST на `crm.item.{list,get,add,update}` через `bitrix_client.BitrixClient`;
+пауза — только `bitrix_client.интервал_портала()` (бюджет `BITRIX_RPS` на весь портал),
+своих пауз и повторов не заводить (CLAUDE.md, «Битрикс не перегружать»; навык `bitrix-ingest`).
 
 ```python
 # файл в пользовательское поле: массив [имя, base64] — НЕ {"fileData": [...]}

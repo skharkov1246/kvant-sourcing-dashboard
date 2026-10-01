@@ -106,7 +106,8 @@
       "mcp__claude-code-remote__get_*",
       "mcp__claude-code-remote__list_*",
       "mcp__claude-code-remote__subscribe_pr_activity",
-      "mcp__claude-code-remote__unsubscribe_pr_activity"
+      "mcp__claude-code-remote__unsubscribe_pr_activity",
+      "mcp__b24-dev-mcp"
     ],
     "ask": [
       "Bash(git push)",
@@ -229,5 +230,8 @@
       "Edit(./data/budget_snapshot.json)",
       "Edit(./gt/data/bitrix_gt.json)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "b24-dev-mcp"
+  ]
 }
