@@ -704,3 +704,44 @@ test("поиск по спросу без ключа базы — 503 с при�
   assert.equal(response.status, 503);
   assert.equal((await response.json()).error, "search_key_missing");
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// БАЗА УПРАВЛЕНИЯ ПОСТАВЩИКАМИ И КОНСТРУКТОР ОТЧЁТОВ (01.10.2026). Те же снимки,
+// то же право suppliers: новой двери в данные нет, есть новая оболочка.
+test("база и отчёты закрыты без подписи и без права suppliers", async () => {
+  const env = envFor();
+  for (const path of ["/base", "/base/", "/base.html", "/reports", "/reports/", "/reports.html"]) {
+    assert.equal((await call(env, path, null)).status, 403, path);
+    const deny = await call(env, path, GUEST);
+    assert.equal(deny.status, 403, path);
+    assert.equal((await deny.json()).error, "forbidden");
+  }
+  assert.deepEqual(env.assets, []);
+});
+
+test("база и отчёты отдаются своими файлами по праву suppliers", async () => {
+  const env = envFor();
+  assert.equal((await call(env, "/base", READER)).status, 200);
+  assert.equal((await call(env, "/reports", READER)).status, 200);
+  assert.deepEqual(env.assets, ["/base.html", "/reports.html"]);
+  // Обходные написания мимо права не проходят.
+  for (const path of ["/base;x", "/reports.json", "/%62ase", "/reports/x"]) {
+    const r = await call(env, path, READER);
+    assert.equal(r.status, 404, path);
+  }
+});
+
+test("главная: два входа — управление компанией и управление поставщиками", async () => {
+  const env = envFor();
+  const reader = await (await call(env, "/", READER)).text();
+  assert.match(reader, /Управление поставщиками/);
+  assert.match(reader, /href="\/base"/);
+  assert.match(reader, /href="\/reports"/);
+  assert.doesNotMatch(reader, /Управление компанией/, "без дашборда вход компании не показывается");
+  const owner = await (await call(env, "/", OWNER)).text();
+  assert.match(owner, /Управление компанией/);
+  assert.match(owner, /Управление поставщиками/);
+  assert.match(owner, /href="\/admin"/);
+  const guest = await (await call(env, "/", GUEST)).text();
+  assert.doesNotMatch(guest, /href="\/base"/);
+});

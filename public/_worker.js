@@ -706,6 +706,11 @@ function suppliersRoute(path) {
   if (["/counters", "/counters/", "/counters.html"].includes(path)) return "counters";
   if (path === "/api/counters") return "countersApi";
   if (["/brands", "/brands/", "/brands.html"].includes(path)) return "brands";
+  // БАЗА УПРАВЛЕНИЯ ПОСТАВЩИКАМИ — единая точка входа раздела (распоряжение
+  // владельца 01.10.2026): сводка, переходы во все страницы раздела, общий поиск.
+  // И конструктор отчётов поверх тех же снимков. Право то же — suppliers.
+  if (["/base", "/base/", "/base.html"].includes(path)) return "base";
+  if (["/reports", "/reports/", "/reports.html"].includes(path)) return "reports";
   if (path === "/api/brands") return "brandsApi";
   if (path === "/api/brands/links") return "brandsLinks";
   if (path === "/api/brands/pairs") return "brandsPairs";
@@ -741,7 +746,7 @@ function suppliersRoute(path) {
   decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
   // «p» и «portal_entity» — страница карточек; скрипт /portal_entity.js под
   // этот образец не попадает (он статика, как /portal_search.js).
-  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$)|brands(?:[/.;]|$)|api\/brands(?:[/.;]|$)|api\/portal(?:[/.;]|$)|p(?:[/.;]|$)|portal_entity(?:\.html?|[/;]|$))/i
+  return /^\/(?:suppliers(?:[/.;]|$)|api\/suppliers(?:[/.;]|$)|admin\/suppliers(?:[/.;]|$)|nomenclature(?:[/.;]|$)|api\/crossref(?:[/.;]|$)|counters(?:[/.;]|$)|api\/counters(?:[/.;]|$)|brands(?:[/.;]|$)|api\/brands(?:[/.;]|$)|base(?:[/.;]|$)|reports(?:[/.;]|$)|api\/portal(?:[/.;]|$)|p(?:[/.;]|$)|portal_entity(?:\.html?|[/;]|$))/i
     .test(decoded) ? "invalid" : null;
 }
 
@@ -1772,9 +1777,11 @@ export default {
         return suppliersJson({ ...suppliersCut(snapshot, rights), admin: rights.admin,
           rights: rights.rights.filter((r) => r.startsWith("suppliers")) });
       }
-      if (suppliers === "counters" || suppliers === "nomenclature" || suppliers === "brands" || suppliers === "entityPage") {
+      if (["counters", "nomenclature", "brands", "entityPage", "base", "reports"].includes(suppliers)) {
         const файл = suppliers === "counters" ? "/counters.html"
           : suppliers === "brands" ? "/brands.html"
+          : suppliers === "base" ? "/base.html"
+          : suppliers === "reports" ? "/reports.html"
           : suppliers === "entityPage" ? "/portal_entity.html" : "/nomenclature.html";
         try {
           const asset = await env.ASSETS.fetch(new Request(url.origin + файл, { headers: request.headers }));
@@ -2364,33 +2371,32 @@ function portalPage(who, rights, env) {
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const mine = SITES.filter((s) => rights.sites.includes(s.id) || (s.id === "knowledge" && rights.admin));
-  // «Поставщики» — раздел портала за тонким правом, а не сайт: в SITES его нет
+  // ДВА ВХОДА (распоряжение владельца 01.10.2026): «Управление компанией» —
+  // дашборд сорсинга и доступы, «Управление поставщиками» — база раздела
+  // /base, а уже внутри неё поставщики, номенклатура, бренды, счётчики,
+  // библиотека и отчёты с общей строкой разделов. Отдельные плитки страниц
+  // раздела с главной убраны: вход в них — через базу.
+  // «Поставщики» — раздел за тонким правом, а не сайт: в SITES его нет
   // намеренно, иначе он выдавался бы целиком, вместе с контактами и деньгами.
-  // Плашку поэтому собираем отдельно и кладём в группу ежедневных инструментов.
-  if (rights.admin || rights.rights.includes("suppliers")) {
-    mine.push({ id: "suppliers", group: "work", name: "Поставщики", href: "/suppliers",
-      note: "сведённый реестр компаний: один вечный номер на компанию, ИНН, домен, чем слито" });
-    // Обратная сторона той же связи. Отдельной плашкой, а не ссылкой внутри
-    // реестра: сорсер приходит с номером детали в руках чаще, чем с названием
-    // компании, и заставлять его начинать с компании значит разворачивать
-    // цепочку задом наперёд.
-    mine.push({ id: "counters", group: "work", name: "Счётчики",
-      href: "/counters",
-      note: "сколько кодов мы вывели на рынок и по скольким лежит цена поставщика; динамика по замерам" });
-    mine.push({ id: "nomenclature", group: "work", name: "Номенклатура",
-      href: "/nomenclature",
-      note: "по позиции — кто давал предложение и за сколько, чей это номер, чем закрыть" });
-    // Сводка для руководителя: сколько кодов в базе и чем они закрыты, облака
-    // брендов и поставщиков, переходы бренд → поставщики и коды → цены. Под тем
-    // же правом suppliers — отдельного «руководящего» права в матрице нет, а
-    // заводить его ради сводки значило бы разделить один секрет на два замка.
-    mine.push({ id: "brands", group: "work", name: "Бренды и коды",
-      href: "/brands",
-      note: "сколько кодов в базе и с какой ценой; бренды и поставщики облаком; бренд → поставщики → цены по коду" });
+  const canBase = rights.admin || rights.rights.includes("suppliers");
+  const canDash = rights.sites.includes("dashboard");
+  const entries = [];
+  if (canDash || rights.admin) {
+    const links = [canDash ? '<a href="/dashboard">Дашборд сорсинга</a>' : "",
+      rights.admin ? '<a href="/admin">Доступы и журнал</a>' : ""].filter(Boolean).join(" · ");
+    entries.push(`<div class="entry"><a class="tile" href="${canDash ? "/dashboard" : "/admin"}"><div class="eb">Вход 1</div><div class="n">Управление компанией</div>` +
+      `<div class="d">Дашборд сорсинга: воронка запросов, работа людей, сделки, советник, качество ведения Bitrix.</div></a>` +
+      `<div class="sub">${links}</div></div>`);
+  }
+  if (canBase) {
+    entries.push(`<div class="entry"><a class="tile" href="/base"><div class="eb">Вход 2</div><div class="n">Управление поставщиками</div>` +
+      `<div class="d">Единая база: поставщики, номенклатура и цены, бренды и коды, счётчики, библиотека и конструктор отчётов.</div></a>` +
+      `<div class="sub"><a href="/suppliers">Поставщики</a> · <a href="/nomenclature">Номенклатура</a> · <a href="/brands">Бренды и коды</a> · <a href="/counters">Счётчики</a> · <a href="/reports">Отчёты</a></div></div>`);
   }
   // разделы: плашка показывается, только если в ней человеку что-то доступно
   const sections = GROUPS.map((g) => {
-    const own = mine.filter((s) => s.group === g.id);
+    // дашборд — во входе «Управление компанией», второй плиткой не повторяется
+    const own = mine.filter((s) => s.group === g.id && !(s.id === "dashboard" && entries.length));
     if (!own.length) return "";
     const tiles = own.map((s) =>
       `<a class="tile" href="${esc(s.href)}"><div class="n">${esc(s.name)}</div><div class="d">${esc(s.note)}</div></a>`).join("");
@@ -2424,12 +2430,17 @@ section h2 span{font-size:12px;font-weight:400;letter-spacing:0;text-transform:n
 .tile{display:block;background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:18px 20px;color:inherit;text-decoration:none;transition:border-color .15s}
 .tile:hover,.tile:focus-visible{border-color:var(--a);outline:none}.tile .n{font-weight:600;font-size:17px;margin-bottom:6px}.tile .d{color:var(--dim);font-size:13px}
 .card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:18px 20px;color:var(--dim)}
+.entries{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin:6px 0 30px}
+.entry .tile{padding:24px 26px;min-height:150px}.entry .tile .n{font-size:22px}
+.entry .eb{color:var(--a);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.entry .sub{font-size:13px;color:var(--dim);margin:8px 4px 0}.entry .sub a{color:var(--a);text-decoration:none}
 .note{color:var(--dim);font-size:12.5px;margin-top:22px;max-width:70ch}
 </style></head><body><div class="wrap">
 <div class="top"><div><div class="eyebrow">КВАНТ · единый вход</div><h1>Портал</h1></div>
 <div class="who">${esc(who.email)}${rights.admin ? '<a href="/admin">доступы</a>' : ""}<a href="https://${esc(team)}/cdn-cgi/access/logout">выйти</a></div></div>
 ${search}
-${mine.length ? sections : empty}
+${entries.length ? `<div class="entries">${entries.join("")}</div>` : ""}
+${mine.length || entries.length ? sections : empty}
 ${rights.admin ? '<section><h2>Закрытый архив<span>доступ администратора</span></h2><div class="grid"><a class="tile" href="/library/archive"><div class="n">Поиск в архиве</div><div class="d">Исходные тексты, координаты фрагментов и исторические версии. Поиск по доступному индексу.</div></a></div></section>' : ''}
 <div class="note">Вход по корпоративной почте, сессия действует месяц. Права на разделы назначает владелец.</div>
 </div></body></html>`;
@@ -2443,7 +2454,8 @@ function portalBar(who, rights, env) {
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   return `<div style="display:flex;gap:14px;align-items:center;justify-content:space-between;font:12px/1.4 'IBM Plex Sans',sans-serif;color:#8b97a8;padding:8px 14px 0">` +
-    `<a href="/" style="color:#5aa9ff;text-decoration:none">← Портал КВАНТ</a>` +
+    `<span><a href="/" style="color:#5aa9ff;text-decoration:none">← Портал КВАНТ</a>` +
+    (rights.admin || rights.rights.includes("suppliers") ? ` · <a href="/base" style="color:#5aa9ff;text-decoration:none">Управление поставщиками →</a>` : "") + `</span>` +
     `<span>${esc(who.email)}${rights.admin ? ' · <a href="/admin" style="color:#5aa9ff;text-decoration:none">доступы</a>' : ""}` +
     ` · <a href="https://${esc(team)}/cdn-cgi/access/logout" style="color:#5aa9ff;text-decoration:none">выйти</a></span></div>`;
 }
