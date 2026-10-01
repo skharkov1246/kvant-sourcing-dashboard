@@ -125,4 +125,6 @@ Times New Roman, ведомость на белой бумаге (навык `tk
 3. `git ls-remote --heads origin` — висят невлитые `claude/*` ветки — сказать владельцу.
 
 Навыки — `.claude/skills/`: `supplier-rfq`, `pdf-analysis`, `brand-research` (внешняя разведка
-приостановлена 29.09.2026), `portal-audit`, `tkp-vedomost`. Локальный запуск и стиль работы — LESSONS.
+приостановлена 29.09.2026), `portal-audit`, `tkp-vedomost`, `bitrix-ingest` (чтение из Битрикса),
+`db-schema` (схема и миграции Supabase), `portal-ui` (вёрстка портала). Справка по REST Битрикса —
+коннектор документации `b24-dev-mcp` (`.mcp.json`, доступа к порталу нет). Локальный запуск и стиль работы — LESSONS.

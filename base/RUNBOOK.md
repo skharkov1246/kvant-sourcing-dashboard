@@ -29,15 +29,12 @@
 Нужен `psql`: macOS — `brew install postgresql@16`, Ubuntu —
 `sudo apt install postgresql-client`, Windows — через WSL.
 
-### Путь Б: чтобы заливал и поддерживал агент
+### Путь Б: заливка прогоном, без строки подключения у агента
 
-1. claude.ai/code → окружение этой сессии → **Environment variables** →
-   добавить `SUPABASE_DB_URL` со строкой Session pooler
-   ([документация](https://code.claude.com/docs/en/claude-code-on-the-web)).
-2. Написать в чате «залей базу». Агент выполнит `python base/load_kb.py --dir kb`
-   и отчитается числами по каждой таблице.
-
-Переменная хранится в настройках окружения и в репозиторий не попадает.
+Строку подключения к базе агенту не дают (CLAUDE.md, «Агентские сессии»,
+распоряжение 30.09.2026): закрытых ключей в сессии агента нет. Агент готовит код
+заливки и PR, а пишет в базу прогон GitHub Actions с секретом `SUPABASE_DB_URL`
+(Settings → Secrets and variables → Actions репозитория) либо владелец — путём А.
 
 ---
 
