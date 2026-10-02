@@ -55,6 +55,7 @@ h2{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
     <a class="tile" href="/brands"><span class="n">Бренды и коды</span><span class="d">Сколько кодов в базе и с какой ценой; бренд → поставщики → цены по коду.</span><span class="m" data-m="brands"></span></a>
     <a class="tile" href="/counters"><span class="n">Счётчики</span><span class="d">Сколько кодов выведено на рынок и по скольким лежит цена; динамика по замерам.</span><span class="m" data-m="counters"></span></a>
     <a class="tile" href="/library" id="t-library" hidden><span class="n">Библиотека оборудования</span><span class="d">Машины, узлы, запчасти, проверенные материалы.</span></a>
+    <a class="tile" href="/reports#preset=orders_by_supplier"><span class="n">Сделки, запросы и заказы</span><span class="d">Запросы поставщикам и заказы поставщикам по сделкам — подлинная история закупки: у кого, что и почём покупали.</span><span class="m" data-m="deals"></span></a>
     <a class="tile" href="/reports"><span class="n">Конструктор отчётов</span><span class="d">Любой срез: выберите набор, поля, фильтры и группировку; выгрузка в CSV и печать в PDF.</span></a>
   </div>
 
@@ -73,6 +74,10 @@ h2{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
     ["offers_by_company", "Предложения по компаниям", "число предложений и кодов у каждой компании"],
     ["brands_priced", "Бренды по кодам с ценой", "где цена есть, где спрашивали без ответа"],
     ["pairs_top", "Бренд × поставщик", "кто по какому бренду даёт цены"],
+    ["funnel", "Поставщики: запрос → КП → заказ", "кому писали, кто прислал КП и у кого заказали"],
+    ["orders_by_supplier", "Закупка по поставщикам", "заказы поставщикам по сделкам: сумма, сделок, последний заказ"],
+    ["purchase_history", "История закупки по позициям", "строки заказов: что, у кого, почём и когда покупали"],
+    ["deals_no_order", "КП есть, заказа нет", "сделки, где поставщики прислали КП, а заказа поставщику нет"],
   ];
   var p = document.getElementById("presets");
   ПРЕСЕТЫ.forEach(function (x) {
@@ -97,9 +102,10 @@ h2{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
   };
   var метка = function (k, t) { var e = document.querySelector('[data-m="' + k + '"]'); if (e) e.textContent = t; };
 
-  Promise.all([get("/api/suppliers"), get("/api/crossref"), get("/api/brands"), get("/api/counters"), get("/api/rights")])
+  Promise.all([get("/api/suppliers"), get("/api/crossref"), get("/api/brands"), get("/api/counters"), get("/api/rights"), get("/api/deals")])
     .then(function (r) {
-      var s = r[0], c = r[1], b = r[2], cnt = r[3], rights = r[4];
+      var s = r[0], c = r[1], b = r[2], cnt = r[3], rights = r[4], dl = r[5];
+      var td = (dl && dl.totals) || {};
       kp.textContent = "";
       var ts = (s && s.totals) || {}, tc = (c && c.totals) || {};
       var tiles = [];
@@ -109,6 +115,9 @@ h2{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
       if (c) tiles.push([tc.offers, "предложений поставщиков"]);
       if (c && tc.comparable != null) tiles.push([tc.comparable, "позиций со сравнимой ценой"]);
       if (b && b.brands) tiles.push([b.brands.length, "брендов"]);
+      if (td.rfq != null) tiles.push([td.rfq, "запросов поставщикам с " + (dl.since || "2025-01-01").slice(0, 4) + " г."]);
+      if (td.orders != null) tiles.push([td.orders, "заказов поставщикам"]);
+      if (td.lines != null) tiles.push([td.lines, "строк закупки в заказах"]);
       if (!tiles.length) {
         var e = document.createElement("div"); e.className = "state";
         e.textContent = "Нет данных: снимки ещё не опубликованы или раздел недоступен по правам.";
@@ -118,6 +127,7 @@ h2{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
       if (s) метка("suppliers", fmt(ts.entities != null ? ts.entities : (s.entities || []).length) + " компаний · ИНН у " + fmt(ts.with_inn));
       if (c) метка("nomenclature", fmt(tc.positions) + " позиций · " + fmt(tc.offers) + " предложений");
       if (b && b.brands) метка("brands", fmt(b.brands.length) + " брендов · " + fmt((b.suppliers || []).length) + " поставщиков");
+      if (td.orders != null) метка("deals", fmt(td.deals) + " сделок · " + fmt(td.orders) + " заказов · снимок " + String(dl.published_at || "").slice(0, 10));
       if (cnt && cnt.metrics) метка("counters", fmt(Object.keys(cnt.metrics).length) + " замеров");
       if (rights && (rights.admin || (rights.sites || []).indexOf("knowledge") >= 0)) document.getElementById("t-library").hidden = false;
     });

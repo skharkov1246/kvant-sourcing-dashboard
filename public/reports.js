@@ -131,12 +131,180 @@
       },
       need: ["pairs", "brands"],
     },
+    // СДЕЛКИ, ЗАПРОСЫ И ЗАКАЗЫ ПОСТАВЩИКАМ (deals:v1, распоряжение владельца
+    // 02.10.2026). Заказ поставщику (СП-172) — подлинная история закупки: то,
+    // что мы уже оплачиваем. Суммы приходят разделом money; без права
+    // suppliers_fin воркер отдаёт его закрытым, и денежные поля здесь — «закрыто».
+    deals: {
+      title: "Сделки",
+      fields: [["id", "Сделка №"], ["title", "Сделка"], ["customer", "Заказчик"], ["category", "Воронка"],
+        ["stage", "Стадия"], ["outcome", "Исход"], ["created", "Создана"], ["closed", "Закрыта"],
+        ["rfq", "Запросов поставщикам"], ["rfq_quote", "Запросов с КП"], ["asked", "Поставщиков спрошено"],
+        ["orders", "Заказов поставщикам"], ["ordered", "Поставщиков с заказом"],
+        ["sale", "Сумма сделки"], ["sale_cur", "Валюта сделки"], ["paid", "Оплачено"], ["rest", "Остаток к оплате"],
+        ["buy_eur", "Закупка, в базовой валюте"]],
+      разобрать: function (d) {
+        var x = связиСделок(d.deals);
+        return (x.s.deals || []).map(function (дл) {
+          var зап = x.запросыСделки[дл.id] || [], зак = x.заказыСделки[дл.id] || [];
+          var м = x.деньги ? (x.деньги.deals || {})[дл.id] || [] : null;
+          var закупка = null;
+          if (x.деньги) зак.forEach(function (o) { var e = x.вБазе(o.id); if (e != null) закупка = (закупка || 0) + e; });
+          return { id: дл.id, title: дл.title, customer: x.имя(дл.customer), category: x.воронка(дл.category),
+            stage: x.стадия("deal", дл.stage), outcome: ИСХОД[дл.outcome] || "", created: дл.created, closed: дл.closed,
+            rfq: зап.length, rfq_quote: зап.filter(function (r) { return r.quote; }).length,
+            asked: уникальных(зап, "supplier"), orders: зак.length, ordered: уникальных(зак, "supplier"),
+            sale: м ? м[0] : ЗАКРЫТО, sale_cur: м ? м[1] : ЗАКРЫТО, paid: м ? м[2] : ЗАКРЫТО,
+            rest: м ? м[3] : ЗАКРЫТО, buy_eur: x.деньги ? закупка : ЗАКРЫТО };
+        });
+      },
+      need: ["deals"],
+    },
+    rfq: {
+      title: "Запросы поставщикам",
+      fields: [["id", "Запрос №"], ["deal", "Сделка №"], ["deal_title", "Сделка"], ["customer", "Заказчик"],
+        ["supplier", "Поставщик"], ["stage", "Стадия"], ["outcome", "Исход"], ["created", "Создан"],
+        ["moved", "Стадия сменена"], ["quote", "КП получено"], ["ordered", "Заказ этому поставщику по сделке"]],
+      разобрать: function (d) {
+        var x = связиСделок(d.deals);
+        return (x.s.rfq || []).map(function (r) {
+          var дл = x.сделка[r.deal] || {};
+          return { id: r.id, deal: r.deal, deal_title: дл.title, customer: x.имя(дл.customer),
+            supplier: x.имя(r.supplier), stage: x.стадия("rfq", r.stage), outcome: ИСХОД[r.outcome] || "",
+            created: r.created, moved: r.moved, quote: да(r.quote),
+            ordered: да(r.deal && r.supplier && x.заказано[r.deal + "|" + r.supplier]) };
+        });
+      },
+      need: ["deals"],
+    },
+    orders: {
+      title: "Заказы поставщикам",
+      fields: [["id", "Заказ №"], ["title", "Заказ"], ["deal", "Сделка №"], ["deal_title", "Сделка"],
+        ["customer", "Заказчик"], ["supplier", "Поставщик"], ["stage", "Стадия"], ["outcome", "Исход"],
+        ["created", "Создан"], ["deadline", "Срок клиенту"], ["prod_end", "Конец производства (план)"],
+        ["inbound", "Поступление (план)"], ["lines", "Строк"], ["sum", "Сумма закупки"], ["cur", "Валюта"],
+        ["sum_base", "Сумма в базовой валюте"]],
+      разобрать: function (d) {
+        var x = связиСделок(d.deals);
+        return (x.s.orders || []).map(function (o) {
+          var дл = x.сделка[o.deal] || {};
+          var м = x.деньги ? (x.деньги.orders || {})[o.id] || [] : null;
+          return { id: o.id, title: o.title, deal: o.deal, deal_title: дл.title, customer: x.имя(дл.customer),
+            supplier: x.имя(o.supplier), stage: x.стадия("order", o.stage), outcome: ИСХОД[o.outcome] || "",
+            created: o.created, deadline: o.deadline, prod_end: o.prod_end, inbound: o.inbound,
+            lines: (x.строкиЗаказа[o.id] || []).length,
+            sum: м ? м[0] : ЗАКРЫТО, cur: м ? м[1] : ЗАКРЫТО, sum_base: x.деньги ? x.вБазе(o.id) : ЗАКРЫТО };
+        });
+      },
+      need: ["deals"],
+    },
+    order_lines: {
+      title: "Строки заказов поставщикам (закупка)",
+      fields: [["order", "Заказ №"], ["order_title", "Заказ"], ["created", "Дата заказа"], ["deal", "Сделка №"],
+        ["customer", "Заказчик"], ["supplier", "Поставщик"], ["outcome", "Исход заказа"], ["name", "Позиция"],
+        ["qty", "Кол-во"], ["unit", "Ед."], ["price", "Цена без НДС"], ["tax", "НДС, %"], ["cur", "Валюта"],
+        ["price_base", "Цена без НДС, в базовой валюте"], ["line_base", "Строка без НДС, в базовой валюте"]],
+      разобрать: function (d) {
+        var x = связиСделок(d.deals);
+        var цены = x.деньги ? x.деньги.lines || [] : null;
+        return (x.s.lines || []).map(function (l, i) {
+          var o = x.заказ[l.order] || {}, дл = x.сделка[o.deal] || {};
+          var ц = цены ? цены[i] || [] : null;
+          var курс = ц ? x.курс(ц[3]) : null;
+          var вБазе = ц && ц[0] != null && курс != null ? ц[0] * курс : null;
+          return { order: l.order, order_title: o.title, created: o.created, deal: o.deal,
+            customer: x.имя(дл.customer), supplier: x.имя(o.supplier), outcome: ИСХОД[o.outcome] || "",
+            name: l.name, qty: l.qty, unit: l.unit,
+            price: ц ? ц[0] : ЗАКРЫТО, tax: ц ? ц[2] : ЗАКРЫТО, cur: ц ? ц[3] : ЗАКРЫТО,
+            price_base: ц ? вБазе : ЗАКРЫТО,
+            line_base: ц ? (вБазе != null && l.qty != null ? вБазе * l.qty : null) : ЗАКРЫТО };
+        });
+      },
+      need: ["deals"],
+    },
+    supplier_funnel: {
+      title: "Поставщики: запросы → КП → заказы",
+      fields: [["supplier", "Поставщик"], ["rfq", "Запросов"], ["quote", "С КП"], ["deals_asked", "Сделок спрошено"],
+        ["orders", "Заказов"], ["orders_live", "Заказов не проиграно"], ["deals_ordered", "Сделок с заказом"],
+        ["won_of_asked", "Сделок: спросили и заказали"], ["buy_base", "Закупка, в базовой валюте"],
+        ["last_order", "Последний заказ"]],
+      разобрать: function (d) {
+        var x = связиСделок(d.deals), по = {};
+        var строка = function (k) {
+          return по[k] || (по[k] = { supplier: x.имя(k), rfq: 0, quote: 0, da: {}, orders: 0, orders_live: 0,
+            заказы_: {}, buy: x.деньги ? 0 : ЗАКРЫТО, last_order: null });
+        };
+        (x.s.rfq || []).forEach(function (r) {
+          if (!r.supplier) return;
+          var с = строка(r.supplier); с.rfq++; if (r.quote) с.quote++; if (r.deal) с.da[r.deal] = 1;
+        });
+        (x.s.orders || []).forEach(function (o) {
+          if (!o.supplier) return;
+          var с = строка(o.supplier); с.orders++;
+          if (o.outcome !== "F") с.orders_live++;
+          if (o.deal) с.заказы_[o.deal] = 1;
+          if (o.created && (!с.last_order || o.created > с.last_order)) с.last_order = o.created;
+          if (x.деньги && o.outcome !== "F") { var e = x.вБазе(o.id); if (e != null) с.buy += e; }
+        });
+        return Object.keys(по).map(function (k) {
+          var с = по[k], да_ = Object.keys(с.da), до_ = Object.keys(с.заказы_);
+          return { supplier: с.supplier, rfq: с.rfq, quote: с.quote, deals_asked: да_.length, orders: с.orders,
+            orders_live: с.orders_live, deals_ordered: до_.length,
+            won_of_asked: до_.filter(function (z) { return с.da[z]; }).length,
+            buy_base: с.buy, last_order: с.last_order };
+        });
+      },
+      need: ["deals"],
+    },
   };
+
+  var ЗАКРЫТО = "закрыто";
+  var ИСХОД = { S: "успех", F: "проигрыш", P: "в работе" };
+  var уникальных = function (rows, k) {
+    var s = {}; rows.forEach(function (r) { if (r[k]) s[r[k]] = 1; }); return Object.keys(s).length;
+  };
+  // Индексы снимка deals:v1 — один раз на снимок (наборов пять, снимок один).
+  function связиСделок(s) {
+    s = s || {};
+    if (s.__связи) return s.__связи;
+    var x = { s: s, сделка: {}, заказ: {}, запросыСделки: {}, заказыСделки: {}, строкиЗаказа: {}, заказано: {} };
+    var деньги = s.money && typeof s.money === "object" && !s.money["закрыто"] ? s.money : null;
+    x.деньги = деньги;
+    (s.deals || []).forEach(function (дл) { x.сделка[дл.id] = дл; });
+    (s.orders || []).forEach(function (o) {
+      x.заказ[o.id] = o;
+      if (o.deal) (x.заказыСделки[o.deal] = x.заказыСделки[o.deal] || []).push(o);
+      if (o.deal && o.supplier && o.outcome !== "F") x.заказано[o.deal + "|" + o.supplier] = 1;
+    });
+    (s.rfq || []).forEach(function (r) { if (r.deal) (x.запросыСделки[r.deal] = x.запросыСделки[r.deal] || []).push(r); });
+    (s.lines || []).forEach(function (l) { (x.строкиЗаказа[l.order] = x.строкиЗаказа[l.order] || []).push(l); });
+    var компании = s.companies || {}, стадии = s.stages || {};
+    x.имя = function (id) { return id ? компании[id] || ("компания #" + id) : ""; };
+    x.стадия = function (вид, id) { return id ? ((стадии[вид] || {})[id] || id) : ""; };
+    x.воронка = function (id) { return (стадии.deal_category || {})[id] || (id === "0" ? "Общая" : id || ""); };
+    // Курс к базовой валюте портала (crm.currency.list); нет курса — нет пересчёта,
+    // а не «1 к 1».
+    x.курс = function (cur) {
+      if (!деньги) return null;
+      if (!cur || cur === деньги.base) return 1;
+      var k = (деньги.rates || {})[cur];
+      return typeof k === "number" && k > 0 ? k : null;
+    };
+    x.вБазе = function (orderId) {
+      var м = деньги && (деньги.orders || {})[orderId];
+      if (!м || м[0] == null) return null;
+      var k = x.курс(м[1]);
+      return k == null ? null : м[0] * k;
+    };
+    try { Object.defineProperty(s, "__связи", { value: x, enumerable: false }); } catch (e) { /* замороженный снимок */ }
+    return x;
+  }
 
   var ИСТОЧНИКИ = {
     suppliers: function (get) { return get("/api/suppliers"); },
     brands: function (get) { return get("/api/brands"); },
     pairs: function (get) { return get("/api/brands/pairs"); },
+    deals: function (get) { return get("/api/deals"); },
     crossref: function (get) {
       return get("/api/crossref").then(function (h) {
         var n = Number(h.lists) || 0, ждём = [];
@@ -200,7 +368,15 @@
           var s = new Set(); rs.forEach(function (r) { if (!пусто(r[a.col])) s.add(String(r[a.col])); });
           o[id] = s.size; return;
         }
+        // Деньги без права: показатель группы — тоже «закрыто», а не пусто.
+        if (a.fn !== "distinct" && rs.length && rs.every(function (r) { return r[a.col] === ЗАКРЫТО; })) { o[id] = ЗАКРЫТО; return; }
         var nums = rs.map(function (r) { return число(r[a.col]); }).filter(function (x) { return !isNaN(x); });
+        if (!nums.length && (a.fn === "min" || a.fn === "max")) {
+          // Даты (ГГГГ-ММ-ДД) и прочий текст: минимум и максимум — по порядку строк.
+          var тексты = rs.map(function (r) { return r[a.col]; }).filter(function (v) { return !пусто(v) && v !== ЗАКРЫТО; }).map(String).sort();
+          o[id] = тексты.length ? (a.fn === "min" ? тексты[0] : тексты[тексты.length - 1]) : null;
+          return;
+        }
         if (!nums.length) { o[id] = null; return; }
         var sum = nums.reduce(function (x, y) { return x + y; }, 0);
         o[id] = a.fn === "sum" ? sum : a.fn === "avg" ? sum / nums.length
@@ -271,6 +447,14 @@
       sort: "__count", dir: "desc" },
     brands_priced: { ds: "brands", sort: "priced", dir: "desc", cols: ["name", "any", "priced", "asked", "sups", "deals"] },
     pairs_top: { ds: "pairs", sort: "priced", dir: "desc" },
+    funnel: { ds: "supplier_funnel", sort: "orders", dir: "desc" },
+    orders_by_supplier: { ds: "orders", filters: [{ col: "outcome", op: "ne", val: "проигрыш" }], group: "supplier",
+      aggs: [{ fn: "sum", col: "sum_base" }, { fn: "distinct", col: "deal" }, { fn: "max", col: "created" }],
+      sort: "sum:sum_base", dir: "desc" },
+    purchase_history: { ds: "order_lines", filters: [{ col: "outcome", op: "ne", val: "проигрыш" }],
+      sort: "created", dir: "desc" },
+    deals_no_order: { ds: "deals", filters: [{ col: "rfq_quote", op: "gt", val: "0" }, { col: "orders", op: "eq", val: "0" }],
+      sort: "rfq_quote", dir: "desc", cols: ["id", "title", "customer", "stage", "outcome", "rfq", "rfq_quote", "asked"] },
   };
 
   // Состояние ↔ адрес: отчёт пересылается ссылкой.

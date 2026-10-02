@@ -637,6 +637,7 @@ const CROSSREF_PART_KEYS = Array.from({ length: CROSSREF_PARTS },
 // замка, и слабейший решал бы. Свой предел размера — история замеров это сотни
 // точек по десятку чисел, мегабайт здесь означал бы ошибку публикатора.
 const COUNTERS_KEY = "counters:v1";
+const DEALS_KEY = "deals:v1";
 const COUNTERS_MAX_BYTES = 1024 * 1024;
 
 // БРЕНДЫ И КОДЫ — ТОТ ЖЕ ЗАМОК suppliers. Карточка бренда и сводка «код · цена ·
@@ -711,6 +712,10 @@ function suppliersRoute(path) {
   // И конструктор отчётов поверх тех же снимков. Право то же — suppliers.
   if (["/base", "/base/", "/base.html"].includes(path)) return "base";
   if (["/reports", "/reports/", "/reports.html"].includes(path)) return "reports";
+  // Сделки, запросы и заказы поставщикам построчно (deals:v1, распоряжение
+  // владельца 02.10.2026) — набор конструктора отчётов. Суммы — в разделе money,
+  // его закрывает право suppliers_fin (SUPPLIERS_FIELDS).
+  if (path === "/api/deals") return "dealsApi";
   if (path === "/api/brands") return "brandsApi";
   if (path === "/api/brands/links") return "brandsLinks";
   if (path === "/api/brands/pairs") return "brandsPairs";
@@ -771,7 +776,7 @@ function suppliersRoute(path) {
 // пустоты не будет.
 const SUPPLIERS_FIELDS = [
   { right: "suppliers_pii", fields: ["contacts", "emails", "phones", "persons"] },
-  { right: "suppliers_fin", fields: ["terms", "payment", "limits", "contracts", "spend"] },
+  { right: "suppliers_fin", fields: ["terms", "payment", "limits", "contracts", "spend", "money"] },
 ];
 
 function suppliersCut(снимок, rights) {
@@ -1742,6 +1747,17 @@ export default {
         try { snapshot = await readCounters(env); }
         catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
         return suppliersJson({ ...snapshot, admin: rights.admin });
+      }
+      if (suppliers === "dealsApi") {
+        let snapshot;
+        try {
+          snapshot = await readCrossref(env, DEALS_KEY,
+            { version: 1, published_at: null, deals: [], rfq: [], orders: [], lines: [], companies: {}, totals: {} });
+        } catch { return suppliersJson({ error: "suppliers_unavailable" }, 503); }
+        // Деньги сделок и заказов — раздел money: без suppliers_fin он уходит
+        // как {закрыто: "suppliers_fin"}, строки и даты остаются.
+        return suppliersJson({ ...suppliersCut(snapshot, rights), admin: rights.admin,
+          rights: rights.rights.filter((r) => r.startsWith("suppliers")) });
       }
       if (suppliers === "brandsSearch") return brandsSearch(url, env);
       if (suppliers === "portalSearch") return portalSearch(url, env, rights);

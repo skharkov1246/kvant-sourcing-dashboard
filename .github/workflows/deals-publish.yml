@@ -1,0 +1,82 @@
+name: Сделки, запросы и заказы поставщикам — снимок в KV
+
+# Кладёт снимок сделок, карточек «Запросы поставщикам» (СП-166) и «Заказы»
+# поставщикам (СП-172) с товарными строками в KV Cloudflare (ключ deals:v1),
+# откуда его читает конструктор отчётов /reports базы «Управление поставщиками».
+# Распоряжение владельца 02.10.2026: «ночную выгрузку запросов и сделок
+# подключай; в заказах поставщикам — подлинная история того, что мы оплачиваем».
+#
+# НОЧЬЮ снимок собирает задание deals в «Библиотека — ежедневное пополнение»
+# (02:07 UTC, планировщик). Этот прогон — ручной: замер и внеочередная запись.
+#
+# ПО УМОЛЧАНИЮ ВХОЛОСТУЮ: читает портал, собирает снимок, печатает счётчики,
+# зонд полей СП-172 и размер — в KV ничего не пишет. Запись включается галкой.
+#
+# НАГРУЗКА (навык bitrix-ingest): ≈ карточек/50 + 2 × заказов/50 + сделок/50 +
+# компаний/50 + справочники; оценку печатает сам прогон до обхода. Прогон один,
+# одним процессом, в общей очереди чтения портала.
+#
+# В журнал — только агрегаты (CLAUDE.md, правило 17): счётчики, коды и
+# названия полей. Ни компаний, ни сумм, ни названий сделок.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Записать снимок в KV (иначе вхолостую)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # ОБЩАЯ ОЧЕРЕДЬ ЧТЕНИЯ ПОРТАЛА — см. пояснение в suppliers-publish.yml.
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      BITRIX_RPS: "1.0"
+      BITRIX_PARALLEL: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests python-dotenv pytest pyyaml
+
+      - name: Проверка секретов
+        env:
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          if [ "$APPLY" = "true" ]; then
+            [ -n "${T:-}" ] || { echo "::error::запись запрошена, но нет CLOUDFLARE_API_TOKEN"; exit 1; }
+            [ -n "${A:-}" ] || { echo "::error::запись запрошена, но нет CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+          fi
+          echo "секреты на месте"
+
+      - name: Проверки сборки снимка
+        run: python -m pytest tests/test_publish_deals.py -q
+
+      - name: Снимок
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          python scripts/publish_deals.py "${args[@]}"
