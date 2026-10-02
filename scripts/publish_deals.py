@@ -61,6 +61,26 @@ RFQ_SELECT_BASE = ["id", "title", "stageId", "categoryId", "createdTime", "moved
 DL_CUSTOMER = "ufCrm20_1728900218435"   # «Date of deadline to customer»
 PROD_END = "ufCrm20_1724941935"         # «Production end date, budget»
 INBOUND_PLAN = "ufCrm20_1709294315471"  # «Inbound Delivery Date, planned»
+# Факт и план исполнения заказа и оплата поставщику — по зонду полей СП-172
+# первого холостого прогона 02.10.2026 (заполнено у 70–90 % из 1 238 заказов).
+SHIP_PLAN = "ufCrm20_1723235828"        # «Supplier Shipment Date, planned» — 877
+SHIP_FACT = "ufCrm20_1723236324"        # «Supplier Shipment Date, actual» — 875
+INBOUND_FACT = "ufCrm20_1723236306"     # «Inbound Delivery Date, actual» — 871
+CUST_PLAN = "ufCrm20_1723236261"        # «Customer delivery date, planned» — 804
+CUST_FACT = "ufCrm20_1723236501"        # «Customer delivery date, actual» — 797
+PROD_START = "ufCrm20_1724941908"       # «Production start date, budget» — 980
+UTD_DATE = "ufCrm20_1723236848"         # «Date of signing of the UTD» — 682
+PAY_TERM = "ufCrm20_1723236853"         # «Planned payment term» — 682
+ORDER_NO = "ufCrm20_1782258299868"      # «Номер заказа» — 1 162
+SUP_TYPE = "ufCrm20_1755847772314"      # «Тип поставщика», список — 413
+SCHEME = "ufCrm20_1724941500"           # «Схема поставки», список — 1 149
+DIRECTION = "ufCrm20_1769424743906"     # «Направление поставки», список — 1 205
+BRANDS = "ufCrm20_1723234629"           # «Brands», ссылка на СП-176 — 1 083
+PAID_SUP = "ufCrm20_1755759056275"      # «Оплачено поставщику, %» — 830
+PAID_AGENT = "ufCrm20_1755759212432"    # «Оплачено агенту, %» — 285
+FIRST_PAY = "ufCrm20_1775138654290"     # «Доля первичной оплаты, %» — 301
+СПИСКИ = (SUP_TYPE, SCHEME, DIRECTION)
+BRAND_ENTITY = 176
 
 # Деньги сделки, продублированные из «экономики проекта» (contracts.py).
 ECON_PAID = "UF_CRM_1713874110281"      # «Оплачено»
@@ -135,12 +155,31 @@ def валюта_денег(v, умолчание=None):
     return s.split("|", 1)[1].strip() or умолчание
 
 
+def ссылки_элементов(v) -> list[str]:
+    """Ссылка crm-поля на элементы смарт-процесса («T b0_12», «DYNAMIC_176_12», «12»)
+    → номера элементов."""
+    out = []
+    for x in (v if isinstance(v, list) else [v] if v else []):
+        хвост = str(x).strip().rsplit("_", 1)[-1]
+        n = номер(хвост)
+        if n and n not in out:
+            out.append(n)
+    return out
+
+
+def подпись_списка(справочник, поле, v):
+    """Значение поля-списка → подпись; несколько значений — через запятую."""
+    метки = (справочник or {}).get(поле) or {}
+    значения = v if isinstance(v, list) else [v] if v not in (None, "", 0, "0") else []
+    return ", ".join(метки.get(str(x), str(x)) for x in значения) or None
+
+
 def есть_кп(карточка, поля) -> bool:
     return any(карточка.get(f) not in (None, "", [], {}, False) for f in поля)
 
 
 def собрать(*, сделки, запросы, заказы, строки, компании, стадии, курсы, база_валюты,
-            поля_кп, сейчас=None) -> dict:
+            поля_кп, справочники=None, сейчас=None) -> dict:
     """Записи портала → снимок deals:v1. Чистая функция.
 
     сделки   — {id: crm.deal}; запросы, заказы — списки crm.item;
@@ -148,6 +187,7 @@ def собрать(*, сделки, запросы, заказы, строки, 
     стадии   — {"deal": {...}, "rfq": {...}, "order": {...}}; курсы — {валюта: к базе}.
     """
     мои_деньги = {"deals": {}, "orders": {}, "lines": [], "base": база_валюты, "rates": курсы}
+    спр = справочники or {}
     нужные_компании = set()
 
     out_rfq = []
@@ -178,11 +218,23 @@ def собрать(*, сделки, запросы, заказы, строки, 
             "stage": з.get("stageId"), "outcome": исход_стадии(з.get("stageId")),
             "created": дата(з.get("createdTime")), "moved": дата(з.get("movedTime")),
             "deadline": дата(з.get(DL_CUSTOMER)), "prod_end": дата(з.get(PROD_END)),
-            "inbound": дата(з.get(INBOUND_PLAN)),
+            "inbound": дата(з.get(INBOUND_PLAN)), "inbound_fact": дата(з.get(INBOUND_FACT)),
+            "ship_plan": дата(з.get(SHIP_PLAN)), "ship_fact": дата(з.get(SHIP_FACT)),
+            "cust_plan": дата(з.get(CUST_PLAN)), "cust_fact": дата(з.get(CUST_FACT)),
+            "prod_start": дата(з.get(PROD_START)), "utd": дата(з.get(UTD_DATE)),
+            "number": (str(з.get(ORDER_NO) or "").strip() or None),
+            "sup_type": подпись_списка(спр.get("lists"), SUP_TYPE, з.get(SUP_TYPE)),
+            "scheme": подпись_списка(спр.get("lists"), SCHEME, з.get(SCHEME)),
+            "direction": подпись_списка(спр.get("lists"), DIRECTION, з.get(DIRECTION)),
+            "brands": [спр.get("brands", {}).get(b, "бренд #" + b) for b in ссылки_элементов(з.get(BRANDS))],
         })
+        # Деньги и условия оплаты — только здесь: раздел закрывается правом.
         сумма = число(з.get("opportunity"))
-        if сумма is not None:
-            мои_деньги["orders"][n] = [сумма, з.get("currencyId") or база_валюты]
+        деньги_заказа = [сумма, з.get("currencyId") or база_валюты,
+                         число(з.get(PAID_SUP)), число(з.get(PAID_AGENT)), число(з.get(FIRST_PAY)),
+                         дата(з.get(PAY_TERM))]
+        if any(x is not None for x in деньги_заказа[2:]) or сумма is not None:
+            мои_деньги["orders"][n] = деньги_заказа
 
     валюта_заказа = {номер(з.get("id")): з.get("currencyId") or база_валюты for з in заказы}
     out_lines = []
@@ -229,6 +281,9 @@ def собрать(*, сделки, запросы, заказы, строки, 
             "rfq_with_quote": sum(1 for r in out_rfq if r["quote"]),
             "orders_live": sum(1 for o in out_orders if o["outcome"] != "F"),
             "orders_with_lines": sum(1 for k, v in строки.items() if v),
+            "orders_ship_fact": sum(1 for o in out_orders if o["ship_fact"]),
+            "orders_cust_fact": sum(1 for o in out_orders if o["cust_fact"]),
+            "orders_with_brands": sum(1 for o in out_orders if o["brands"]),
             "lost_deal_links": без_сделки,
         },
         "companies": {c: компании[c] for c in sorted(нужные_компании, key=int) if c in компании},
@@ -244,7 +299,7 @@ def собрать(*, сделки, запросы, заказы, строки, 
 
 # ── портал ──────────────────────────────────────────────────────────────────
 
-def строки_заказов(client, номера) -> dict[str, list]:
+def строки_заказов(client, номера, ошибки_счёт=None) -> dict[str, list]:
     """Товарные строки заказов СП-172 пакетами batch по 50 команд.
 
     ownerType смарт-процесса — «T» и шестнадцатеричный номер типа (172 → Tac).
@@ -267,6 +322,9 @@ def строки_заказов(client, номера) -> dict[str, list]:
             k = f"o{n}"
             if k in ошибки and ошибки[k]:
                 out[n] = []            # ACCESS_DENIED: тип без товарных строк
+                if ошибки_счёт is not None:
+                    e = ошибки[k]
+                    ошибки_счёт[str(e.get("error") if isinstance(e, dict) else e)[:40]] += 1
                 continue
             ряды = (результаты.get(k) or {}).get("productRows") or [] if isinstance(результаты, dict) else []
             out[n] = list(ряды)
@@ -328,7 +386,27 @@ def читать_портал(webhook):
     require(len(заказы) >= ждём_заказов, "ORDERS_READ_INCOMPLETE")
 
     номера_заказов = [n for n in (номер(з.get("id")) for з in заказы) if n]
-    строки = строки_заказов(client, номера_заказов)
+    ошибки_строк = collections.Counter()
+    строки = строки_заказов(client, номера_заказов, ошибки_строк)
+    print(f"товарные строки заказов: с строками {sum(1 for v in строки.values() if v)} из {len(строки)}; "
+          "ошибки пакета: " + (", ".join(f"{k} {v}" for k, v in ошибки_строк.most_common()) or "нет"))
+
+    # Подписи полей-списков и названия брендов (СП-176) — справочники снимка.
+    поля = (client.call("crm.item.fields", {"entityTypeId": ORDER_ENTITY}) or {}).get("fields") or {}
+    списки = {}
+    for f in СПИСКИ:
+        items = (поля.get(f) or {}).get("items") or []
+        списки[f] = {str(i.get("ID")): i.get("VALUE") for i in items if i.get("ID") is not None}
+    бренды_id = sorted({b for з in заказы for b in ссылки_элементов(з.get(BRANDS))}, key=int)
+    бренды = {}
+    for i in range(0, len(бренды_id), 50):
+        часть = [int(x) for x in бренды_id[i:i + 50]]
+        res = client.call("crm.item.list", {"entityTypeId": BRAND_ENTITY, "filter": {"@id": часть},
+                                            "select": ["id", "title"], "start": -1}) or {}
+        for it in (res.get("items") if isinstance(res, dict) else None) or []:
+            бренды[str(it.get("id"))] = (it.get("title") or "").strip() or f"бренд #{it.get('id')}"
+    print(f"брендов в заказах: {len(бренды_id)}, названий найдено: {len(бренды)}; "
+          "подписей списков: " + ", ".join(f"{k[-6:]} {len(v)}" for k, v in списки.items()))
 
     нужные_сделки = {номер(к.get("parentId2")) for к in запросы} | {номер(з.get("parentId2")) for з in заказы}
     нужные_сделки.discard(None)
@@ -359,11 +437,13 @@ def читать_портал(webhook):
         except (TypeError, ValueError, ZeroDivisionError):
             pass
 
-    зонд = поля_заказа(client, заказы)
+    # Зонд полей — по запросу (DEALS_PROBE=1): первый замер его уже снял.
+    зонд = поля_заказа(client, заказы) if os.environ.get("DEALS_PROBE") == "1" else []
     print(сводка_нагрузки())
     return dict(сделки={str(k): v for k, v in сделки.items()}, запросы=запросы, заказы=заказы,
                 строки=строки, компании=компании, стадии=стадии, курсы=курсы,
-                база_валюты=база, поля_кп=поля_кп), зонд
+                база_валюты=база, поля_кп=поля_кп,
+                справочники={"lists": списки, "brands": бренды}), зонд
 
 
 def _публикатор():
@@ -388,7 +468,8 @@ def main(argv=None):
         print("снимок: " + ", ".join(f"{k} {v}" for k, v in t.items()))
         исходы = collections.Counter(o["outcome"] for o in снимок["orders"])
         print("заказы по исходу: " + ", ".join(f"{k} {v}" for k, v in sorted(исходы.items())))
-        print("зонд полей СП-172 (код · тип · заполнено · название), заполненные:")
+        if зонд:
+            print("зонд полей СП-172 (код · тип · заполнено · название), заполненные:")
         for код, назв, тип, n in sorted(зонд, key=lambda x: -x[3]):
             if n:
                 print(f"  {код} · {тип} · {n} · {назв}")

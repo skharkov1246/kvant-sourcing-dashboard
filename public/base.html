@@ -55,7 +55,7 @@ h2{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
     <a class="tile" href="/brands"><span class="n">Бренды и коды</span><span class="d">Сколько кодов в базе и с какой ценой; бренд → поставщики → цены по коду.</span><span class="m" data-m="brands"></span></a>
     <a class="tile" href="/counters"><span class="n">Счётчики</span><span class="d">Сколько кодов выведено на рынок и по скольким лежит цена; динамика по замерам.</span><span class="m" data-m="counters"></span></a>
     <a class="tile" href="/library" id="t-library" hidden><span class="n">Библиотека оборудования</span><span class="d">Машины, узлы, запчасти, проверенные материалы.</span></a>
-    <a class="tile" href="/reports#preset=orders_by_supplier"><span class="n">Сделки, запросы и заказы</span><span class="d">Запросы поставщикам и заказы поставщикам по сделкам — подлинная история закупки: у кого, что и почём покупали.</span><span class="m" data-m="deals"></span></a>
+    <a class="tile" href="/reports#preset=orders_by_supplier"><span class="n">Сделки, запросы и заказы</span><span class="d">Запросы и заказы поставщикам по сделкам — подлинная история закупки: у кого, когда, на какую сумму и в срок ли отгрузили.</span><span class="m" data-m="deals"></span></a>
     <a class="tile" href="/reports"><span class="n">Конструктор отчётов</span><span class="d">Любой срез: выберите набор, поля, фильтры и группировку; выгрузка в CSV и печать в PDF.</span></a>
   </div>
 
@@ -76,7 +76,8 @@ h2{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
     ["pairs_top", "Бренд × поставщик", "кто по какому бренду даёт цены"],
     ["funnel", "Поставщики: запрос → КП → заказ", "кому писали, кто прислал КП и у кого заказали"],
     ["orders_by_supplier", "Закупка по поставщикам", "заказы поставщикам по сделкам: сумма, сделок, последний заказ"],
-    ["purchase_history", "История закупки по позициям", "строки заказов: что, у кого, почём и когда покупали"],
+    ["supplier_reliability", "Надёжность поставщиков", "доля отгрузок в срок и средняя задержка по факту отгрузки"],
+    ["late_orders", "Опоздания к сроку клиента", "заказы, доставленные клиенту позже обещанного, и чья задержка"],
     ["deals_no_order", "КП есть, заказа нет", "сделки, где поставщики прислали КП, а заказа поставщику нет"],
   ];
   var p = document.getElementById("presets");
