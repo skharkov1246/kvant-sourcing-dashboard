@@ -54,7 +54,9 @@ def вход(**над):
         заказы=[
             {"id": 50, "title": "PO-1", "parentId2": 10, "companyId": 700, "opportunity": 800,
              "currencyId": "USD", "stageId": "DT172_26:PREPARATION", "createdTime": "2025-05-01T00:00:00+03:00",
-             m.DL_CUSTOMER: "2025-09-30T03:00:00+03:00"},
+             m.DL_CUSTOMER: "2025-09-30T03:00:00+03:00", m.SHIP_PLAN: "2025-06-01", m.SHIP_FACT: "2025-06-20T00:00:00+03:00",
+             m.CUST_FACT: "2025-10-05", m.SUP_TYPE: "41", m.SCHEME: ["7", "8"], m.BRANDS: ["T b0_12", "DYNAMIC_176_13", "0"],
+             m.ORDER_NO: " PO-0001 ", m.PAID_SUP: 60, m.FIRST_PAY: "30", m.PAY_TERM: "2025-07-01T00:00:00+03:00"},
             {"id": 51, "title": "PO-2", "parentId2": 99, "companyId": 703, "opportunity": None,
              "stageId": "DT172_26:FAIL"},
         ],
@@ -67,6 +69,8 @@ def вход(**над):
         курсы={"EUR": 1.0, "USD": 0.9},
         база_валюты="EUR",
         поля_кп=ПОЛЯ_КП,
+        справочники={"lists": {m.SUP_TYPE: {"41": "Производитель"}, m.SCHEME: {"7": "EXW", "8": "Агент"}},
+                     "brands": {"12": "Vydumka"}},
         сейчас=datetime(2026, 10, 2, tzinfo=timezone.utc),
     )
     база.update(над)
@@ -80,7 +84,7 @@ def test_деньги_только_в_разделе_money():
     for сумма in ("1000.5", "600.5", "800", "120", "50.5"):
         assert сумма not in текст, сумма
     assert с["money"]["deals"]["10"] == [1000.5, "EUR", 400.0, 600.5, "EUR"]
-    assert с["money"]["orders"] == {"50": [800.0, "USD"]}       # пустая сумма не выдумывается
+    assert с["money"]["orders"] == {"50": [800.0, "USD", 60.0, None, 30.0, "2025-07-01"]}   # пустая сумма не выдумывается
 
 
 def test_поставщик_запроса_и_нулевой_номер():
@@ -103,6 +107,18 @@ def test_заказы_и_потерянная_сделка():
     assert с["totals"]["orders_live"] == 1
     assert с["totals"]["lost_deal_links"] == 1   # заказ 51 → сделка 99, которой нет в выборке
     assert {d["id"] for d in с["deals"]} == {"10", "11"}
+
+
+def test_факт_исполнения_списки_и_бренды():
+    с = m.собрать(**вход())
+    o = {x["id"]: x for x in с["orders"]}["50"]
+    assert (o["ship_plan"], o["ship_fact"], o["cust_fact"]) == ("2025-06-01", "2025-06-20", "2025-10-05")
+    assert o["sup_type"] == "Производитель" and o["scheme"] == "EXW, Агент"
+    assert o["brands"] == ["Vydumka", "бренд #13"], "«0» — не бренд; неизвестный — номером, а не пропуском"
+    assert o["number"] == "PO-0001"
+    без_денег = json.dumps({k: v for k, v in с.items() if k != "money"}, ensure_ascii=False)
+    assert "60" not in без_денег.replace("2025-06", ""), "процент оплаты — деньги, только в money"
+    assert с["totals"]["orders_ship_fact"] == 1 and с["totals"]["orders_with_brands"] == 1
 
 
 def test_строки_и_цены_одним_порядком():

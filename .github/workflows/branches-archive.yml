@@ -1,0 +1,83 @@
+name: Ветки claude/* — архивная метка и удаление
+
+# Распоряжение владельца 02.10.2026: «ветки удаляй, но перепроверь». Влитые в
+# main ветки агентов висят в списке и прячут те немногие, где лежит невлитая
+# работа (CLAUDE.md, «Начало сессии», п. 3).
+#
+# ЗНАНИЯ НЕ ТЕРЯЮТСЯ. Перед удалением на верхушку ветки ставится метка
+# archive/claude/<имя>; метка указывает на ту же правку навсегда, ветка
+# поднимается из неё одной командой:
+#   git push origin refs/tags/archive/claude/<имя>:refs/heads/claude/<имя>
+# Удаление идёт ТОЛЬКО после того, как метка прочитана обратно с GitHub и
+# указывает на ту же правку.
+#
+# ЧТО ПРОВЕРЯЕТ САМ ПРОГОН (вторая проверка поверх ручной): ветка — claude/*,
+# не main и не рабочая ветка сессии; печатает, входит ли верхушка в main. Решение
+# «ветка влита» — за тем, кто составил список (две разные проверки: построчно и
+# по голове влитого PR); прогон его не подменяет, но страхует меткой.
+#
+# ПО УМОЛЧАНИЮ ВХОЛОСТУЮ: печатает план, ничего не ставит и не удаляет.
+on:
+  workflow_dispatch:
+    inputs:
+      branches:
+        description: "Имена веток без префикса claude/, через пробел"
+        required: true
+      apply:
+        description: "Поставить метки и удалить ветки (иначе вхолостую)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: branches-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Метки и удаление
+        env:
+          BRANCHES: ${{ inputs.branches }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch -q origin '+refs/heads/claude/*:refs/remotes/origin/claude/*' '+refs/tags/archive/*:refs/tags/archive/*'
+          ok=0; skip=0
+          for name in $BRANCHES; do
+            case "$name" in
+              ""|main|stoic-cori-l6dbso|*[!A-Za-z0-9._-]*) echo "::warning::пропуск «$name»: имя не годится"; skip=$((skip+1)); continue ;;
+            esac
+            ref="origin/claude/$name"
+            if ! tip=$(git rev-parse -q --verify "$ref"); then
+              echo "::warning::нет ветки claude/$name — пропуск"; skip=$((skip+1)); continue
+            fi
+            if git merge-base --is-ancestor "$tip" origin/main; then in_main="верхушка в main"; else in_main="верхушка не в main (влита сжатием)"; fi
+            echo "claude/$name → ${tip:0:10} · $in_main"
+            [ "$APPLY" = "true" ] || continue
+            tag="archive/claude/$name"
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null && [ "$(git rev-parse "refs/tags/$tag^{commit}")" != "$tip" ]; then
+              echo "::error::метка $tag уже есть и указывает на другую правку — ветку не трогаю"; skip=$((skip+1)); continue
+            fi
+            git tag -f "$tag" "$tip" >/dev/null
+            git push -q origin "refs/tags/$tag"
+            # Читаем метку обратно с GitHub: удаляем, только если она там и та же.
+            remote=$(git ls-remote origin "refs/tags/$tag" | cut -f1)
+            if [ "$remote" != "$tip" ]; then
+              echo "::error::метка $tag на GitHub не подтвердилась — ветку не трогаю"; skip=$((skip+1)); continue
+            fi
+            git push -q origin --delete "claude/$name"
+            ok=$((ok+1))
+          done
+          echo "итог: обработано $ok, пропущено $skip, режим apply=$APPLY"
+          [ "$skip" -eq 0 ] || exit 1

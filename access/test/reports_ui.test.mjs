@@ -150,3 +150,22 @@ test("группа по закрытым деньгам — «закрыто», 
   const res = R.построить(st.ds, R.НАБОРЫ[st.ds].разобрать(d), st);
   assert.equal(res.rows[0]["sum:sum_base"], "закрыто");
 });
+
+test("срок исполнения: задержка отгрузки, опоздание к клиенту, доля в срок", () => {
+  const s = сделки(ДЕНЬГИ);
+  s.orders[0] = { ...s.orders[0], ship_plan: "2025-06-01", ship_fact: "2025-06-11", deadline: "2025-09-30", cust_fact: "2025-10-05" };
+  s.orders.push({ id: "52", deal: "11", supplier: "700", outcome: "P", ship_plan: "2025-07-10", ship_fact: "2025-07-08" },
+    { id: "53", deal: "11", supplier: "700", outcome: "P", ship_plan: "2025-08-01" });
+  const d = { deals: s };
+  const зак = R.НАБОРЫ.orders.разобрать(d);
+  assert.deepEqual([зак[0].ship_delay, зак[0].late_cust], [10, 5]);
+  assert.equal(зак[3].ship_delay, null, "нет факта — нет задержки, а не ноль");
+  const альфа = R.НАБОРЫ.supplier_funnel.разобрать(d).find((r) => r.supplier === "Альфа");
+  assert.deepEqual([альфа.shipped, альфа.on_time, альфа.on_time_share, альфа.delay_avg, альфа.delay_max], [2, 1, 50, 4, 10]);
+  for (const k of ["supplier_reliability", "late_orders"]) {
+    const st = R.изАдреса("#preset=" + k);
+    assert.ok(st && R.НАБОРЫ[st.ds], k);
+  }
+  const st = R.изАдреса("#preset=late_orders");
+  assert.deepEqual(R.построить(st.ds, R.НАБОРЫ[st.ds].разобрать(d), st).rows.map((r) => r.id), ["50"]);
+});

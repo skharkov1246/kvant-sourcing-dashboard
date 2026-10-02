@@ -181,9 +181,18 @@
       title: "Заказы поставщикам",
       fields: [["id", "Заказ №"], ["title", "Заказ"], ["deal", "Сделка №"], ["deal_title", "Сделка"],
         ["customer", "Заказчик"], ["supplier", "Поставщик"], ["stage", "Стадия"], ["outcome", "Исход"],
+        ["number", "Номер заказа"], ["sup_type", "Тип поставщика"], ["scheme", "Схема поставки"],
+        ["direction", "Направление поставки"], ["brands", "Бренды"],
         ["created", "Создан"], ["deadline", "Срок клиенту"], ["prod_end", "Конец производства (план)"],
-        ["inbound", "Поступление (план)"], ["lines", "Строк"], ["sum", "Сумма закупки"], ["cur", "Валюта"],
-        ["sum_base", "Сумма в базовой валюте"]],
+        ["ship_plan", "Отгрузка поставщика, план"], ["ship_fact", "Отгрузка поставщика, факт"],
+        ["ship_delay", "Задержка отгрузки поставщика, дн."],
+        ["inbound", "Поступление (план)"], ["inbound_fact", "Поступление, факт"],
+        ["cust_plan", "Доставка клиенту, план"], ["cust_fact", "Доставка клиенту, факт"],
+        ["late_cust", "Опоздание к сроку клиента, дн."], ["utd", "УПД подписан"],
+        ["lines", "Строк"], ["sum", "Сумма закупки"], ["cur", "Валюта"],
+        ["sum_base", "Сумма в базовой валюте"], ["paid_sup", "Оплачено поставщику, %"],
+        ["paid_agent", "Оплачено агенту, %"], ["first_pay", "Доля первичной оплаты, %"],
+        ["pay_term", "Плановый срок оплаты"]],
       разобрать: function (d) {
         var x = связиСделок(d.deals);
         return (x.s.orders || []).map(function (o) {
@@ -191,9 +200,16 @@
           var м = x.деньги ? (x.деньги.orders || {})[o.id] || [] : null;
           return { id: o.id, title: o.title, deal: o.deal, deal_title: дл.title, customer: x.имя(дл.customer),
             supplier: x.имя(o.supplier), stage: x.стадия("order", o.stage), outcome: ИСХОД[o.outcome] || "",
-            created: o.created, deadline: o.deadline, prod_end: o.prod_end, inbound: o.inbound,
+            number: o.number, sup_type: o.sup_type, scheme: o.scheme, direction: o.direction,
+            brands: (o.brands || []).join(", "),
+            created: o.created, deadline: o.deadline, prod_end: o.prod_end,
+            ship_plan: o.ship_plan, ship_fact: o.ship_fact, ship_delay: дней(o.ship_plan, o.ship_fact),
+            inbound: o.inbound, inbound_fact: o.inbound_fact, cust_plan: o.cust_plan, cust_fact: o.cust_fact,
+            late_cust: дней(o.deadline, o.cust_fact), utd: o.utd,
             lines: (x.строкиЗаказа[o.id] || []).length,
-            sum: м ? м[0] : ЗАКРЫТО, cur: м ? м[1] : ЗАКРЫТО, sum_base: x.деньги ? x.вБазе(o.id) : ЗАКРЫТО };
+            sum: м ? м[0] : ЗАКРЫТО, cur: м ? м[1] : ЗАКРЫТО, sum_base: x.деньги ? x.вБазе(o.id) : ЗАКРЫТО,
+            paid_sup: м ? м[2] : ЗАКРЫТО, paid_agent: м ? м[3] : ЗАКРЫТО,
+            first_pay: м ? м[4] : ЗАКРЫТО, pay_term: м ? м[5] : ЗАКРЫТО };
         });
       },
       need: ["deals"],
@@ -227,12 +243,14 @@
       fields: [["supplier", "Поставщик"], ["rfq", "Запросов"], ["quote", "С КП"], ["deals_asked", "Сделок спрошено"],
         ["orders", "Заказов"], ["orders_live", "Заказов не проиграно"], ["deals_ordered", "Сделок с заказом"],
         ["won_of_asked", "Сделок: спросили и заказали"], ["buy_base", "Закупка, в базовой валюте"],
+        ["shipped", "Отгрузок с фактом и планом"], ["on_time", "Отгружено в срок"], ["on_time_share", "Доля в срок, %"],
+        ["delay_avg", "Средняя задержка отгрузки, дн."], ["delay_max", "Наибольшая задержка, дн."],
         ["last_order", "Последний заказ"]],
       разобрать: function (d) {
         var x = связиСделок(d.deals), по = {};
         var строка = function (k) {
           return по[k] || (по[k] = { supplier: x.имя(k), rfq: 0, quote: 0, da: {}, orders: 0, orders_live: 0,
-            заказы_: {}, buy: x.деньги ? 0 : ЗАКРЫТО, last_order: null });
+            заказы_: {}, buy: x.деньги ? 0 : ЗАКРЫТО, last_order: null, задержки: [] });
         };
         (x.s.rfq || []).forEach(function (r) {
           if (!r.supplier) return;
@@ -244,6 +262,8 @@
           if (o.outcome !== "F") с.orders_live++;
           if (o.deal) с.заказы_[o.deal] = 1;
           if (o.created && (!с.last_order || o.created > с.last_order)) с.last_order = o.created;
+          var з = дней(o.ship_plan, o.ship_fact);
+          if (з != null) с.задержки.push(з);
           if (x.деньги && o.outcome !== "F") { var e = x.вБазе(o.id); if (e != null) с.buy += e; }
         });
         return Object.keys(по).map(function (k) {
@@ -251,7 +271,13 @@
           return { supplier: с.supplier, rfq: с.rfq, quote: с.quote, deals_asked: да_.length, orders: с.orders,
             orders_live: с.orders_live, deals_ordered: до_.length,
             won_of_asked: до_.filter(function (z) { return с.da[z]; }).length,
-            buy_base: с.buy, last_order: с.last_order };
+            buy_base: с.buy, last_order: с.last_order,
+            // Срок меряется по заказам, где есть и план, и факт отгрузки: без
+            // пары доля «в срок» была бы выдумкой. Задержка ≤ 0 — в срок.
+            shipped: с.задержки.length, on_time: с.задержки.filter(function (d) { return d <= 0; }).length,
+            on_time_share: с.задержки.length ? Math.round(100 * с.задержки.filter(function (d) { return d <= 0; }).length / с.задержки.length) : null,
+            delay_avg: с.задержки.length ? Math.round(10 * с.задержки.reduce(function (a, b) { return a + b; }, 0) / с.задержки.length) / 10 : null,
+            delay_max: с.задержки.length ? Math.max.apply(null, с.задержки) : null };
         });
       },
       need: ["deals"],
@@ -259,6 +285,12 @@
   };
 
   var ЗАКРЫТО = "закрыто";
+  // Разница двух дат ГГГГ-ММ-ДД в днях (факт − план); нет любой — нет разницы.
+  var дней = function (план, факт) {
+    if (!план || !факт) return null;
+    var a = Date.parse(план + "T00:00:00Z"), b = Date.parse(факт + "T00:00:00Z");
+    return isNaN(a) || isNaN(b) ? null : Math.round((b - a) / 86400000);
+  };
   var ИСХОД = { S: "успех", F: "проигрыш", P: "в работе" };
   var уникальных = function (rows, k) {
     var s = {}; rows.forEach(function (r) { if (r[k]) s[r[k]] = 1; }); return Object.keys(s).length;
@@ -447,7 +479,14 @@
       sort: "__count", dir: "desc" },
     brands_priced: { ds: "brands", sort: "priced", dir: "desc", cols: ["name", "any", "priced", "asked", "sups", "deals"] },
     pairs_top: { ds: "pairs", sort: "priced", dir: "desc" },
-    funnel: { ds: "supplier_funnel", sort: "orders", dir: "desc" },
+    funnel: { ds: "supplier_funnel", sort: "orders", dir: "desc",
+      cols: ["supplier", "rfq", "quote", "deals_asked", "orders", "orders_live", "won_of_asked", "buy_base", "last_order"] },
+    supplier_reliability: { ds: "supplier_funnel", filters: [{ col: "shipped", op: "ge", val: "3" }],
+      sort: "on_time_share", dir: "asc",
+      cols: ["supplier", "orders", "shipped", "on_time", "on_time_share", "delay_avg", "delay_max", "buy_base", "last_order"] },
+    late_orders: { ds: "orders", filters: [{ col: "late_cust", op: "gt", val: "0" }], sort: "late_cust", dir: "desc",
+      cols: ["id", "number", "deal_title", "customer", "supplier", "deadline", "cust_fact", "late_cust",
+        "ship_plan", "ship_fact", "ship_delay", "stage"] },
     orders_by_supplier: { ds: "orders", filters: [{ col: "outcome", op: "ne", val: "проигрыш" }], group: "supplier",
       aggs: [{ fn: "sum", col: "sum_base" }, { fn: "distinct", col: "deal" }, { fn: "max", col: "created" }],
       sort: "sum:sum_base", dir: "desc" },
