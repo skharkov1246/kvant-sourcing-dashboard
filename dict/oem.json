@@ -1,8 +1,8 @@
 {
   "note": "Производители: ключ nkey(name) и все написания, найденные в базах. Разные написания одной компании собраны под одним ключом — это и есть то, чего сегодня нет ни в одном подпроекте. Поле kind — вид записи: бренд, указание (к закупке), несколько (брендов в одной записи), описание (бренд с пояснением), номер (детали вместо имени). Бренд позиции даёт только вид «бренд»; у «несколько» и «описание» бренды — в поле brands, неразложенные части — в unresolved; kind_why — почему вид такой (library/oem_kind.py). У записи вида «бренд», сведённой со справочником рядов, role — «бренд» (марка на шильдике) или «владелец» (холдинг), owner — ключ или имя компании-владельца, owner_since — год, former_owners — бывшие владельцы, brand_key — ключ справочника, если он другой (library/brand_owner.py).",
-  "count": 306,
+  "count": 309,
   "by_kind": {
-    "бренд": 236,
+    "бренд": 239,
     "указание": 31,
     "несколько": 22,
     "описание": 15,
@@ -4602,6 +4602,27 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "guascor",
+      "name": "Guascor",
+      "kind": "бренд",
+      "spellings": [
+        {
+          "spelling": "Guascor",
+          "where": "gpu/data/models.json:oems[].name"
+        }
+      ],
+      "n_spellings": 1,
+      "role": "бренд",
+      "owner": "Mutares SE & Co. KGaA",
+      "owner_since": 2022,
+      "former_owners": [
+        "siemensdemagdelavalturbomachinery",
+        "siemens",
+        "siemensenergy"
+      ],
+      "brand_key": "guascorsiemensenergy"
+    },
+    {
       "oem_key": "guascorsiemensenergy",
       "name": "Guascor (Siemens Energy)",
       "kind": "бренд",
@@ -4716,6 +4737,21 @@
         }
       ],
       "n_spellings": 1
+    },
+    {
+      "oem_key": "mtu",
+      "name": "MTU",
+      "kind": "бренд",
+      "spellings": [
+        {
+          "spelling": "MTU",
+          "where": "gpu/data/models.json:oems[].name"
+        }
+      ],
+      "n_spellings": 1,
+      "role": "бренд",
+      "owner": "rollsroycepowersystems",
+      "brand_key": "mturollsroycepowersystems"
     },
     {
       "oem_key": "mturollsroycepowersystems",
@@ -5111,6 +5147,25 @@
         }
       ],
       "n_spellings": 1
+    },
+    {
+      "oem_key": "waukesha",
+      "name": "Waukesha",
+      "kind": "бренд",
+      "spellings": [
+        {
+          "spelling": "Waukesha",
+          "where": "gpu/data/models.json:oems[].name"
+        }
+      ],
+      "n_spellings": 1,
+      "role": "бренд",
+      "owner": "innio",
+      "owner_since": 2018,
+      "former_owners": [
+        "generalelectric"
+      ],
+      "brand_key": "waukeshainnio"
     },
     {
       "oem_key": "weidmller",
