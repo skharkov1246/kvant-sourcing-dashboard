@@ -745,3 +745,34 @@ test("главная: два входа — управление компани�
   const guest = await (await call(env, "/", GUEST)).text();
   assert.doesNotMatch(guest, /href="\/base"/);
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// СДЕЛКИ, ЗАПРОСЫ И ЗАКАЗЫ ПОСТАВЩИКАМ (deals:v1, 02.10.2026). Строки — по праву
+// suppliers; все суммы лежат в разделе money и закрываются правом suppliers_fin.
+test("сделки и заказы: строки по праву suppliers, деньги — только с suppliers_fin", async () => {
+  const env = envFor();
+  const снимок = { version: 1, published_at: "2026-10-02T02:30:00Z",
+    deals: [{ id: "10", title: "Учебная сделка", customer: "500" }],
+    orders: [{ id: "50", deal: "10", supplier: "700" }],
+    lines: [{ order: "50", name: "Учебная позиция", qty: 2 }],
+    companies: { "500": "Учебный заказчик", "700": "Учебный завод" },
+    money: { deals: { "10": [1000, "EUR", 400, 600, "EUR"] }, orders: { "50": [800, "USD"] },
+      lines: [[100, 120, 20, "USD"]] }, totals: { deals: 1, orders: 1, lines: 1 } };
+  env.ACL.box.set("deals:v1", JSON.stringify(снимок));
+
+  assert.equal((await call(env, "/api/deals", null)).status, 403);
+  assert.equal((await call(env, "/api/deals", GUEST)).status, 403);
+  const reader = await (await call(env, "/api/deals", READER)).json();
+  assert.equal(reader.orders[0].supplier, "700");
+  assert.equal(reader.lines[0].name, "Учебная позиция");
+  assert.deepEqual(reader.money, { закрыто: "suppliers_fin" });
+  assert.doesNotMatch(JSON.stringify(reader), /800|1000/);
+  const fin = await (await call(env, "/api/deals", FINANCE)).json();
+  assert.deepEqual(fin.money.orders["50"], [800, "USD"]);
+  // Снимка нет — пустой ответ, а не 503: публикатор ещё не отработал.
+  env.ACL.box.delete("deals:v1");
+  const пусто = await call(env, "/api/deals", READER);
+  assert.equal(пусто.status, 200);
+  assert.deepEqual((await пусто.json()).orders, []);
+  assert.equal((await call(env, "/api/deals", READER, { method: "POST" })).status, 405);
+});
