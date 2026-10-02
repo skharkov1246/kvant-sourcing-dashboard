@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Схема поставщиков в рабочей базе
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
@@ -115,7 +115,7 @@ jobs:
         if: matrix.shard >= fromJSON(inputs.shards)
         run: echo "часть ${{ matrix.shard }} не нужна при ${{ inputs.shards }} частях"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         if: matrix.shard < fromJSON(inputs.shards)
       - uses: actions/setup-python@v6
         if: matrix.shard < fromJSON(inputs.shards)
