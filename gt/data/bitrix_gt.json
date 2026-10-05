@@ -1,8 +1,58 @@
 {
- "updated": "2026-10-01",
+ "updated": "2026-10-05",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "23742",
+   "title": "32616420401 Поставка запасных частей для вспомогательного оборудования ГТУ типа V64.3A для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-02",
+   "rfqs": []
+  },
+  {
+   "id": "23740",
+   "title": "ЗП6092651  32616420181 Поставка запасных частей для камеры сгорания ГТУ типа V64.3A для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-02",
+   "rfqs": []
+  },
+  {
+   "id": "23726",
+   "title": "32616425581 Поставка некапитальных запасных частей для ГТУ типа V64.3A для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-01",
+   "rfqs": []
+  },
+  {
+   "id": "23724",
+   "title": "32616425803 Поставка запасных частей для топливо-регулирующих клапанов ГТУ типа V64.3A  для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-01",
+   "rfqs": []
+  },
+  {
+   "id": "23714",
+   "title": " КЛП-587061 Выполнение работ/оказание услуг: Капитальный ремонт нагрузочного редуктора тип TX56/1CV, заводской номер №10049, производства «Flender Graffenstaden», ГТУ-2 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-01",
+   "rfqs": []
+  },
   {
    "id": "23472",
    "title": "375-671 Штифт пружинный на ГТД Centaur-40 Казань",
@@ -2092,6 +2142,17 @@
      "models": [
       "Centaur 40"
      ]
+    },
+    {
+     "id": "48256",
+     "title": "IMMI Centaure 40S",
+     "created": "2026-10-02",
+     "supplier": "IMMI Turbines",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
     }
    ]
   },
@@ -2698,7 +2759,7 @@
     {
      "id": "25422",
      "title": "Фильтры Siemens в EU Automation (UAE)",
-     "created": "2025-12-15",
+     "created": "2025-12-16",
      "supplier": "EU Automation (UAE)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2788,7 +2849,7 @@
     {
      "id": "26030",
      "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
-     "created": "2026-01-08",
+     "created": "2026-01-09",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -3040,7 +3101,7 @@
     {
      "id": "24010",
      "title": "Pepple+Fuchs в Kempston Controls LLC",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Kempston Controls LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -3051,7 +3112,7 @@
     {
      "id": "24012",
      "title": "Pepple+Fuchs в Gahangan",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Gahangan",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -5823,7 +5884,7 @@
     {
      "id": "10108",
      "title": "Requests #10108",
-     "created": "2024-12-17",
+     "created": "2024-12-18",
      "supplier": "RTP power",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -8133,7 +8194,7 @@
    "suppliers": [
     {
      "name": "IMMI Turbines",
-     "n": 1
+     "n": 2
     },
     {
      "name": "KTM Services FZE",
