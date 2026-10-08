@@ -27,7 +27,7 @@ concurrency:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -41,4 +41,10 @@ jobs:
           YADISK_TOKEN: ${{ secrets.YADISK_TOKEN }}
           BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
           PROBE_SCRIPT: ${{ inputs.script || 'bitrix_probe.py' }}
+          # Один процесс в общей очереди, с запасом: рядом может идти пересборка
+          # дашборда (её группа своя). probe_conversion.py — ~20–30 мин при 1/с;
+          # ставить вне 01:00–05:30 UTC и не на :07, проверив, что очередь пуста.
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+          BITRIX_WAIT_BUDGET: "900"
         run: python "scripts/$PROBE_SCRIPT"
