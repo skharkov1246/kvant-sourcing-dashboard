@@ -13,10 +13,16 @@ on:
         description: "Какой зонд запустить"
         type: choice
         default: bitrix_probe.py
-        options: [bitrix_probe.py, probe_mail_files.py]
+        options: [bitrix_probe.py, probe_mail_files.py, probe_conversion.py]
 
 permissions:
   contents: read
+
+concurrency:
+  # Общая очередь чтения портала (CLAUDE.md, «Битрикс не перегружать»): зонд
+  # читает Битрикс так же, как остальные прогоны, и стоит с ними в одной группе.
+  group: bitrix-portal
+  cancel-in-progress: false
 
 jobs:
   probe:
