@@ -30,6 +30,7 @@ import contracts as contracts_mod
 import metrics as metrics_mod
 import people as people_mod
 import period as period_mod
+import presale as presale_mod
 import reps as reps_mod
 from bitrix_client import BitrixClient, без_вебхука
 
@@ -125,17 +126,54 @@ def _attach_suppliers(client: BitrixClient, rfqs: list[dict]) -> None:
         r["_supplier"] = name_of(r)
 
 
-def _names_and_since(client: BitrixClient):
-    names: dict[str, str] = {}
-    since: dict[str, str] = {}
-    for u in client.list_paged("user.get", {}):
-        uid = str(u["ID"])
-        names[uid] = " ".join(x for x in [u.get("LAST_NAME"), u.get("NAME")] if x).strip() or f"user#{uid}"
-        raw = u.get("UF_EMPLOYMENT_DATE") or u.get("DATE_REGISTER")
-        d = period_mod.parse_dt(raw) if raw else None
-        if d:
-            since[uid] = f"{period_mod._MON[d.month]}'{str(d.year)[2:]}"
-    return names, since
+def _people(client: BitrixClient) -> dict[str, dict]:
+    """Справочник людей портала: действующие И ушедшие.
+
+    `user.get` без фильтра отдаёт только действующих. Пока справочник брался одним
+    таким вызовом, уволенный сорсер выпадал из отдела целиком: его запросы уходили в
+    графу «вне отдела», имя — в заглушку «user#N», а подразделение — в «не указано»
+    (и сам он попадал в кандидаты в служебные записи). Ушедших добираем вторым
+    вызовом с ACTIVE=N — ровно тем же, что вкладки ролей (people.roster), поэтому
+    портал второй раз его не считает: ответ общий для снимка живой сверки.
+
+    {uid: {name, active, depts, hired, last}}: hired — дата приёма
+    (UF_EMPLOYMENT_DATE, иначе дата регистрации), last — последний вход в портал
+    (LAST_LOGIN). Даты увольнения REST не отдаёт; у отключённой записи последний
+    вход — ближайшая к ней дата, и она показывается с оговоркой.
+    """
+    out: dict[str, dict] = {}
+    for params, active in (({}, True), ({"ADMIN_MODE": True, "FILTER": {"ACTIVE": "N"}}, False)):
+        try:
+            rows = client.list_paged("user.get", params)
+        except Exception as e:                                # noqa: BLE001
+            if active:
+                raise
+            # без ушедших расчёт остаётся прежним, а не падает
+            print(f"  ⚠ ушедшие сотрудники не прочитаны: {type(e).__name__}: {без_вебхука(e)}")
+            rows = []
+        for u in rows:
+            uid = str(u.get("ID") or "")
+            if not uid or uid in out:
+                continue
+            act = u.get("ACTIVE")
+            dd = u.get("UF_DEPARTMENT") or []
+            out[uid] = {
+                "name": " ".join(x for x in [u.get("LAST_NAME"), u.get("NAME")] if x).strip() or f"user#{uid}",
+                "active": (str(act).lower() in ("y", "true", "1")) if act is not None else active,
+                "depts": [str(x) for x in (dd if isinstance(dd, list) else [dd]) if str(x)],
+                "hired": _date_of(u.get("UF_EMPLOYMENT_DATE")) or _date_of(u.get("DATE_REGISTER")),
+                "last": _date_of(u.get("LAST_LOGIN")),
+            }
+    return out
+
+
+def _date_of(raw):
+    """Дата из поля пользователя. Часть полей портал отдаёт пустым объектом {}."""
+    return period_mod.parse_dt(raw) if isinstance(raw, str) and raw else None
+
+
+def _since_label(d) -> str:
+    return f"{period_mod._MON[d.month]}'{str(d.year)[2:]}" if d else ""
 
 
 SPA_NEW_STAGE = "DT166_24:NEW"
@@ -248,14 +286,15 @@ def _send_stats(acts: list[dict], rfqs: list[dict], sourcer_rows: list[dict],
             by_user[u].append(r)
 
     rows = []
-    for s in sourcer_rows:  # уже блок A, отсортирован по объёму
+    for s in sourcer_rows:  # уже блок A: действующие по темпу, затем ушедшие
         items = by_user.get(s["id"], [])
         total = len(items)
         sent = sum(1 for r in items if counts.get(str(r["id"])))
         fake = sum(1 for r in items if r.get("stageId") != SPA_NEW_STAGE and not counts.get(str(r["id"])))
         followup = sum(1 for r in items if counts.get(str(r["id"]), 0) >= 2)
         rows.append({
-            "id": s["id"], "n": s["n"], "total": total, "sent": sent, "nosend": total - sent,
+            "id": s["id"], "n": s["n"], "act": s.get("act", True),
+            "total": total, "sent": sent, "nosend": total - sent,
             "sentPct": round(sent / total * 100) if total else 0,
             "fake": fake, "fuPct": round(followup / sent * 100) if sent else 0,
         })
@@ -318,7 +357,15 @@ def run(args) -> int:
 
     print("• Справочники: отдел 172, пользователи, воронки, стадии сделок…")
     dept_a_ids = client.dept_member_ids(config.DEPT_SOURCING_ID)
-    names, since = _names_and_since(client)
+    roster = _people(client)
+    names = {u: x["name"] for u, x in roster.items()}
+    since = {u: _since_label(x["hired"]) for u, x in roster.items() if x["hired"]}
+    # Ушедшие из отдела остаются в отделе: их запросы — работа сорсинга, а не
+    # «вне отдела». Признак — подразделение в карточке отключённой записи.
+    _dept_tree = client.dept_tree_ids(config.DEPT_SOURCING_ID)
+    _left_dept = {u for u, x in roster.items()
+                  if not x["active"] and set(x["depts"]) & _dept_tree and u not in dept_a_ids}
+    dept_a_ids |= _left_dept
     category_names = client.categories()
     deal_stage_names = client.stages()
 
@@ -340,7 +387,10 @@ def run(args) -> int:
     # В публичный журнал имя идёт ТОЛЬКО если оно само называет запись
     # служебной. Запись, заданная номером, может носить личное имя сотрудника —
     # с #400 по #402 так в журнал деплоя попадало имя человека (правило 17).
-    service_ids = config.service_accounts(names)
+    # Служебные — только среди действующих записей, как и до справочника ушедших:
+    # отключённая запись с «служебным» именем карточек больше не заводит, а её
+    # прошлые карточки не должны молча сменить исполнителя.
+    service_ids = config.service_accounts({u: x["name"] for u, x in roster.items() if x["active"]})
     if service_ids:
         print("  служебные записи: " + ", ".join(
             f"#{u} {names.get(u, '')}" if config.SERVICE_NAME_RE.search(names.get(u, ''))
@@ -363,6 +413,31 @@ def run(args) -> int:
         print(f"  поле сорсера сделки {_f} «{_sourcer_labels.get(_f, '?')}»: "
               f"заполнено у {_filled} из {len(deal_index)} сделок")
 
+    # Запасной признак ушедшего сорсера: если портал при увольнении снимает
+    # подразделение, отключённая запись без подразделения, названная в сделке
+    # «Сорсером», — бывший сорсер. Поле ведёт только в отдел (замер 23.09.2026).
+    _by_field = set()
+    for _f, *_rest in config.DEAL_SOURCER_FIELDS:
+        if _rest[1:] and _rest[1] is False:
+            continue
+        for d in deal_index.values():
+            v = d.get(_f)
+            for u in (v if isinstance(v, list) else [v]):
+                u = str(u or "")
+                x = roster.get(u)
+                if x and not x["active"] and not x["depts"] and u not in dept_a_ids:
+                    _by_field.add(u)
+    dept_a_ids |= _by_field
+    # Окно работы каждого человека отдела: с приёма, по последний вход у ушедших.
+    staff = {u: {"active": roster[u]["active"], "hired": roster[u]["hired"],
+                 "left": None if roster[u]["active"] else roster[u]["last"]}
+             for u in dept_a_ids if u in roster}
+    _gone = sum(1 for x in staff.values() if not x["active"])
+    print(f"  состав отдела: действующих {len(staff) - _gone}, ушедших {_gone} "
+          f"(по подразделению {len(_left_dept)}, по полю «Сорсер» сделки {len(_by_field)}); "
+          f"без даты приёма {sum(1 for x in staff.values() if not x['hired'])}, "
+          f"ушедших без даты последнего входа {sum(1 for x in staff.values() if not x['active'] and not x['left'])}")
+
     print("• Сделки периода (все воронки) для покрытия…")
     period_deals = client.deals_in_period(p.start_iso, p.end_iso, select=[
         "ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE",
@@ -384,13 +459,24 @@ def run(args) -> int:
              if not _inb else ""))
 
     print("• Расчёт метрик…")
+    # Подразделения ушедших: справочник портала знает только действующих, и
+    # карточки уволенного шли с подписью «подразделение не указано» — а сам он
+    # по этой подписи попадал в кандидаты в служебные записи.
+    _dep_names = {str(d.get("ID")): str(d.get("NAME") or "") for d in client.departments()}
+    user_depts = dict(client.user_dept_names())
+    for u, x in roster.items():
+        if not x["active"] and not user_depts.get(u):
+            got = [_dep_names[d] for d in x["depts"] if _dep_names.get(d)]
+            if got:
+                user_depts[u] = got[0]
     m = metrics_mod.build(
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
-        client.user_dept_names(),
+        user_depts,
         service_ids,
         _inb,
         config.DEAL_SOURCER_FIELDS,
+        staff=staff,
     )
     _o = m["origin"]["summary"]
     # Раскладка авторства — в журнал каждым прогоном: по ней видно день ко дню,
@@ -413,8 +499,32 @@ def run(args) -> int:
         print(f"  кандидатов в служебные записи: {_o['candidates']} "
               f"(порог {_o['candidateFloor']} карточек) — см. вкладку «Кто заводит запросы»")
 
+    _k = m["kpi"]
+    print(f"  сорсеров с запросами: действующих {_k['staffActive']}, ушедших {_k['staffGone']}; "
+          f"у ушедших открытых карточек {_k['goneOpen']}, легло после ухода {_k['goneAfter']}")
     _sanity_gates(p, rfqs, period_deals, dept_a_ids, m.get("sourcersA") or [],
                   skip=bool(args.allow_empty or args.max_deals))
+
+    # Воронка пресейла: сделки, которые ведёт сорсинг до ТКП. Стадии — из общего
+    # справочника (тот же вызов, что client.stages), запросы — уже выгруженные rfqs;
+    # новое чтение портала одно — сами сделки воронки (их около сотни).
+    try:
+        _ps = presale_mod.find_category(category_names) or presale_mod.find_category(
+            people_mod.deal_categories(client))
+        if _ps:
+            _pdeals = client.list_deals_fast(filter={"CATEGORY_ID": int(_ps[0])}, select=presale_mod.DEAL_SELECT)
+            m["presale"] = presale_mod.compute(
+                cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
+                rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids)
+            _h = m["presale"]["head"]
+            print(f"• Воронка пресейла #{_ps[0]}: сделок {_h['total']}, открыто {_h['open']}, отказ {_h['lost']}, "
+                  f"выиграно {_h['won']}; с запросом {_h['withRfqPct']} %, запросов {_h['rfq']}; "
+                  f"без сорсера {_h['noSrc']}, без запросов {_h['noRfq']}, стоят > {_h['staleDays']} дн {_h['stale']}, "
+                  f"ведёт ушедший {_h['gone']}")
+        else:
+            print("• Воронка пресейла: воронки с таким именем в портале нет")
+    except Exception as e:                                   # noqa: BLE001
+        print(f"  ⚠ воронка пресейла пропущена: {type(e).__name__}: {без_вебхука(e)}")
 
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
@@ -634,8 +744,14 @@ def run(args) -> int:
     contracts_data = None
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
-        contracts_data = contracts_mod.compute(client, as_of=p.end)
+        contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster)
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
+        _g, _sp = contracts_data.get("gone") or {}, contracts_data.get("speed") or {}
+        # только счётчики: суммы сделок в публичный журнал не идут (правило 17)
+        print(f"  ведёт уволенный: открытых сделок {_g.get('deals', 0)} (ответственный {_g.get('byManager', 0)}, "
+              f"ОСС {_g.get('byOss', 0)}), живых заказов {_g.get('orders', 0)}, с просрочкой {_g.get('late', 0)}, "
+              f"уволенных {_g.get('people', 0)}; нормы стадий по {_sp.get('benchDays')} дн: "
+              f"{_sp.get('benchRecent', 0)} стадий, медиана цикла заказа {_sp.get('medCycle')} дн")
     except Exception as e:
         print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}: {e}")
 
@@ -706,7 +822,7 @@ def _print_summary(m: dict) -> None:
         chk = s["closed"]
         agg = s["kp"] + s["refusedCol"] + s["noAnswer"]
         ok = "✓" if chk == agg else f"⚠ closed={chk}≠{agg}"
-        print(f"  {s['n']:28} c={s['c']:4} closed={s['closed']:3} КП={s['kp']:3} отказ={s['refusedCol']:3} молч={s['noAnswer']:3} ТКП={s['tkpP']:3}% ср.срок={s['avgDays']} {ok}")
+        print(f"  {s['n']:28}{'' if s.get('act', True) else ' (ушёл)'} темп={s.get('perDay')}/раб.дн c={s['c']:4} closed={s['closed']:3} КП={s['kp']:3} отказ={s['refusedCol']:3} молч={s['noAnswer']:3} ТКП={s['tkpP']:3}% ср.срок={s['avgDays']} {ok}")
 
 
 def main() -> int:

@@ -17,6 +17,12 @@ SYSTEM = """Ты — аналитик отдела поиска поставщи
 конверсия по стадиям (КП/выбран, отказ, «молчание» — нет ответа в срок), средний срок до \
 закрытия, доводимость до ТКП, покрытие сделок сорсингом. Блок A — отдел Гринёва (172).
 
+Состав отдела меняется: людей принимают и увольняют. У каждого сорсера своё окно \
+работы внутри периода (from–to, wd рабочих дней); act=false — ушёл. Сравнивай людей по \
+темпу (perDay — запросов в рабочий день своего окна, perDay4 — за последние 4 недели), \
+а не по итогу c: итог растёт со стажем. Ушедших не ставь в рейтинг, их открытые \
+карточки — работа на переназначение.
+
 Методологическая рамка КВАНТ: глубина проработки = переговорная сила; ценно широкое \
 покрытие сделок запросами (ценовая конкуренция), низкое «молчание», доведение до ТКП.
 
@@ -41,13 +47,28 @@ def rule_based(m: dict) -> dict[str, str]:
     out = {"load": "", "conversion": "", "coverage": ""}
 
     if src:
-        lead = src[0]
-        out["load"] = (
+        # лидер — по темпу среди действующих, а не по итогу с начала сорсинга:
+        # итог растёт со стажем, и новичок при любой работе стоял бы последним
+        act = [s for s in src if s.get("act", True)] or src
+        lead = act[0]
+        темп = (f"{lead['perDay4']} запр. в раб. день за 4 недели" if lead.get("perDay4") is not None
+                else f"{lead.get('perDay', 0)} запр. в раб. день")
+        parts = [
             f"За период — <b>{k['total']}</b> запросов от <b>{k['respCount']}</b> ответственных; "
             f"отдел Гринёва — <b>{k['deptA']}</b>, вне отдела — <b>{k['outside']}</b>. "
-            f"Лидер по объёму — <b>{lead['n']}</b> ({lead['c']} RFQ). "
+            f"Лидер по темпу — <b>{lead['n']}</b> ({темп}). "
             f"Ещё в работе <b>{k['inWorkPct']}%</b> ({k['openCount']})."
-        )
+        ]
+        новички = [s["n"] for s in act if s.get("short")]
+        if новички:
+            parts.append(f"Меньше четырёх рабочих недель в окне: {', '.join(новички[:3])} — темп ещё неустойчив.")
+        if k.get("staffGone"):
+            parts.append(f"<span class=\"flag\">Ушли из отдела {k['staffGone']} чел.: открытых карточек за ними "
+                         f"{k.get('goneOpen', 0)}</span> — переназначить действующим.")
+        if k.get("goneAfter"):
+            parts.append(f"<span class=\"flag\">{k['goneAfter']} карточек легли на ушедших уже после ухода</span> — "
+                         f"в сделках не сменён «Сорсер».")
+        out["load"] = " ".join(parts)
         # конверсия: худший по «молчанию», лучший по КП
         with_closed = [s for s in src if s["closed"] >= 5]
         worst_nr = _top(with_closed, "noAnswer", 1)
@@ -97,7 +118,8 @@ def _llm(m: dict, settings) -> dict[str, str] | None:
         "kpi": m["kpi"],
         "weekly": m["weekly"],
         "sourcersA": [
-            {kk: s[kk] for kk in ("n", "c", "wk", "closed", "kp", "refusedCol", "noAnswer", "avgDays", "tkpP")}
+            {kk: s.get(kk) for kk in ("n", "act", "from", "to", "wd", "c", "perDay", "perDay4", "wk",
+                                      "closed", "kp", "refusedCol", "noAnswer", "avgDays", "tkpP")}
             for s in m["sourcersA"]
         ],
         "chain": m["chain"],

@@ -5,10 +5,11 @@
 """
 from __future__ import annotations
 
+import datetime as dt
 from collections import Counter, defaultdict
 from statistics import mean
 
-from period import Period, parse_dt
+from period import Period, parse_dt, workdays
 from stages import BUCKETS, CLOSED, classify_stage, deal_reached_tkp
 
 
@@ -41,6 +42,8 @@ def build(
     service_ids: set[str] | None = None,
     inbound_mail: list[dict] | None = None,
     deal_sourcer_fields: tuple = (),
+    *,
+    staff: dict[str, dict] | None = None,
 ) -> dict:
     weeks = period.weeks
     n_weeks = len(weeks)
@@ -144,6 +147,60 @@ def build(
             return "tkp"
         return "early"
 
+    # ---- ОКНО РАБОТЫ ЧЕЛОВЕКА
+    # Людей принимают и увольняют, а период начинается с запуска сорсинга. Пока
+    # темп считался делением на ВСЕ дни периода, принятый в августе делил свои
+    # запросы на дни с мая и выглядел вдвое слабее, а уволенный вовсе выпадал из
+    # отдела. Теперь у каждого своё окно внутри периода:
+    #   начало — дата приёма (UF_EMPLOYMENT_DATE, иначе регистрация), но не
+    #            позже его первой карточки: карточка раньше «приёма» значит, что
+    #            дата в портале не та (перевод из другого отдела, перерегистрация);
+    #   конец  — у ушедшего позднейшее из «последний вход в портал» и «последняя
+    #            карточка, заведённая им самим» (даты увольнения REST не отдаёт);
+    #            у действующего — конец периода.
+    # Темп = запросы в окне ÷ рабочие дни окна (Пн–Пт). «Сейчас» — то же за
+    # последние 28 дней периода: одно окно для всех, кто работал весь этот срок.
+    # Карточки, легшие на ушедшего ПОСЛЕ его ухода (робот находит его в поле
+    # «Сорсер» сделки), остаются в его итоге — это работа отдела, — но в темп не
+    # идут и считаются отдельно: такие сделки надо переписать на действующего.
+    staff = staff or {}
+    recent_from = max(period.start, period.end - dt.timedelta(days=27))
+    ОКНО_КОРОТКОЕ = 20        # рабочих дней: меньше четырёх недель — темп неустойчив
+
+    def window(uid: str, items: list[dict]) -> tuple[dt.date, dt.date, bool, bool]:
+        """(начало, конец, действующий, конец оценён по карточкам).
+
+        Конец ушедшего — позднейшее из «последний вход в портал» и «последняя
+        карточка, которую он завёл сам». Последний вход — это последняя
+        авторизация, а не последний рабочий день: с запомненным входом она
+        отстаёт на недели, и тогда его настоящая работа выглядела бы как
+        карточки «после ухода». Заведённая им карточка — бесспорный след
+        присутствия; «двигал стадию» таким следом не считается: стадию двигают
+        и роботы портала от имени ответственного.
+
+        Ушедший до начала периода получает пустое окно (конец раньше начала):
+        все его карточки периода — «после ухода»."""
+        st = staff.get(uid) or {}
+        active = st.get("active", True)
+        dates = sorted(d for r in items if (d := parse_dt(r.get("createdTime", ""))))
+        a = period.start
+        if st.get("hired") and st["hired"] > a:
+            a = st["hired"]
+        if dates and dates[0] < a:
+            a = dates[0]
+        b, est = period.end, False
+        if not active:
+            own = [d for r in items if str(r.get("createdBy") or "") == uid
+                   and (d := parse_dt(r.get("createdTime", "")))]
+            login = st.get("left")
+            left = max([d for d in (login, max(own) if own else None) if d], default=None)
+            est = bool(own) and (not login or max(own) > login)
+            if left is None:
+                left, est = (dates[-1] if dates else None), True
+            if left and left < b:
+                b = left
+        return a, b, active, est
+
     # ---- per-sourcer (блок A)
     sourcers_a: list[dict] = []
     for uid in dept_a_ids:
@@ -162,6 +219,15 @@ def build(
             if wi is not None:
                 wk[wi] += 1
         tkp = sum(1 for r in items if deal_state(r.get("parentId2")) == "tkp")
+        w_from, w_to, active, est = window(uid, items)
+        made = [parse_dt(r.get("createdTime", "")) for r in items]
+        in_win = sum(1 for d in made if d and w_from <= d <= w_to)
+        after_left = sum(1 for d in made if d and d > w_to) if not active else 0
+        wd = workdays(w_from, w_to)
+        # «сейчас» есть только у действующего: ушедший в рейтинг не входит
+        r_from, r_to = max(recent_from, w_from), w_to
+        wd4 = workdays(r_from, r_to) if active and r_from <= r_to else 0
+        c4 = sum(1 for d in made if d and r_from <= d <= r_to) if wd4 else 0
         details = []
         for r in items:
             wi = period.week_index(parse_dt(r.get("createdTime", "")))
@@ -176,13 +242,23 @@ def build(
             })
         by_supplier = [{"sup": s, "n": n} for s, n in Counter(d["sup"] for d in details).most_common()]
         nsup = sum(1 for x in by_supplier if x["sup"] not in ("—", "", None))
-        sourcers_a.append({
+        row = {
             "nsup": nsup,
             "id": uid,
             "n": names.get(uid, f"user#{uid}"),
             "since": since.get(uid, ""),
+            "act": active,
+            # окно работы внутри периода (ISO); недели вне окна вёрстка гасит,
+            # а не рисует нулями
+            "from": w_from.isoformat(),
+            "to": w_to.isoformat(),
+            "wd": wd,
+            "short": wd < ОКНО_КОРОТКОЕ,
             "c": c,
-            "perDay": _round(c / period.days) if period.days else 0,
+            # запросов в рабочий день СВОЕГО окна, а не всего периода
+            "perDay": _round(in_win / wd) if wd else 0,
+            "c4": c4,
+            "perDay4": _round(c4 / wd4) if wd4 else None,
             "wk": wk,
             "buckets": buckets,
             "closed": closed,
@@ -198,8 +274,23 @@ def build(
             "tkpP": _pct(tkp, c),
             "details": details,
             "bySupplier": by_supplier,
-        })
-    sourcers_a.sort(key=lambda s: s["c"], reverse=True)
+        }
+        if not active:
+            # открытые карточки ушедшего никто не ведёт — их надо переназначить
+            row["open"] = c - closed
+            if est:
+                row["toEst"] = True
+            if after_left:
+                row["afterLeft"] = after_left
+        sourcers_a.append(row)
+    # Рейтинг — по темпу, а не по накопленному итогу с начала сорсинга: итог
+    # растёт со стажем и ставит новичка последним при любой работе. Сначала
+    # действующие по темпу последних 4 недель, затем по темпу своего окна;
+    # ушедшие — отдельной группой в конце, по объёму.
+    sourcers_a.sort(key=lambda s: (not s["act"],
+                                   -(s["perDay4"] or 0) if s["act"] else 0,
+                                   -s["perDay"] if s["act"] else 0,
+                                   -s["c"]))
 
     # ---- разнообразие поставщиков (блок A): топ запрошенных + общий охват
     sup_a = Counter()
@@ -266,8 +357,11 @@ def build(
                     a += 1
                 else:
                     b += 1
+        # сорсеров в отделе на этой неделе — по окнам работы: рост или падение
+        # запросов отдела читается вместе с наймом и уходом людей
+        hc = sum(1 for s in sourcers_a if s["from"] <= w.end.isoformat() and s["to"] >= w.start.isoformat())
         weekly.append({"w": w.label, "d": w.days, "A": a, "B": b,
-                       "kp": kp_got[i], "kpa": kp_taken[i], "inb": kp_mail[i]})
+                       "kp": kp_got[i], "kpa": kp_taken[i], "inb": kp_mail[i], "hc": hc})
 
     total = len(rfqs)
     a_total = sum(1 for r in rfqs if r["_owner"] in dept_a_ids)
@@ -567,6 +661,12 @@ def build(
             "closedCountA": closed_a,
             "kpPctOfClosedA": _pct(kp_a, closed_a),
             "tkpPct": _pct(tkp_all, total),
+            # состав отдела в периоде: кто работает сейчас, кто ушёл и что после
+            # ушедших осталось открытым
+            "staffActive": sum(1 for s in sourcers_a if s["act"]),
+            "staffGone": sum(1 for s in sourcers_a if not s["act"]),
+            "goneOpen": sum(s.get("open", 0) for s in sourcers_a),
+            "goneAfter": sum(s.get("afterLeft", 0) for s in sourcers_a),
         },
         "weekly": weekly,
         "sourcersA": sourcers_a,
