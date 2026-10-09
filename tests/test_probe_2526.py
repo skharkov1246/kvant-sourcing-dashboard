@@ -274,7 +274,11 @@ def test_проверка_заказов_вне_воронки():
     assert п["flagged"] == 4
     assert dict(п["parents"]) == {"воронка 2": 3, "карточка реализации": 1}
     assert dict(п["ratio"])["больше ×10"] == 1 and dict(п["ratio"])["сумма сделки пуста"] == 1
-    assert п["share_total"] == pc.доля(1240, 1770) and п["top1"] is None, "меньше 5 заказов — доля крупнейшего скрыта"
+    assert п["share_total"] == pc.доля(1240, 1770) and "top1" not in п, "доля одного заказа в журнал не идёт"
+    assert п["half_n"] == 1
+    assert п["cur_pairs"] == [("RUB→EUR", 1)] and п["cur_share"] == pc.доля(1100, 1240)
+    assert dict(п["deal_ratio"]) == {"больше ×10": 1, "×1–3": 1, "сумма сделки пуста": 1}
+    assert п["deal_over"] == 2 and п["deal_over_budget"] == 1, "два заказа по 50 вместе больше продажи 80"
     assert п["nn_share_wo_flagged"] == pc.доля(30, 530)
 
 
@@ -300,3 +304,17 @@ def test_ткп_года_закрыты_и_карточки_реализации
     assert (з["n"], з["c"], з["open"], з["lost"]) == (3, 0, 2, 1)
     assert з["conv_closed"] == 0 and з["open_nn"] == 1 and з["open_any"] >= 1
     assert з["conv_with_open_twins"] == 33
+
+
+def test_номер_нн_нормализуется_и_контроль():
+    for t_ in ("НН-500 Учебный", "HH-500", "нн 500", "НН–0500", "12. НН -500"):
+        assert m.НН_НОМЕР.findall(t_) == ["500"], t_
+    assert m.НН_НОМЕР.findall("Тоннаж 500") == []
+    строки = [
+        {"id": "1", "realization_only": False, "nn": ["500"], "cls": "contract"},
+        {"id": "2", "realization_only": False, "nn": ["501"], "cls": "open"},
+        {"id": "3", "realization_only": True, "nn": ["500"], "cls": "contract"},
+        {"id": "4", "realization_only": True, "nn": ["999"], "cls": "contract"},
+    ]
+    к = m.контроль_номеров(строки, {"500", "999"})
+    assert к["cards"] == 2 and к["cards_matched"] == 1 and к["presale_matched"] == [("contract", 1)]
