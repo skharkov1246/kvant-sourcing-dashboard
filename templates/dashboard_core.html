@@ -129,6 +129,19 @@
 
   .spark{display:flex;gap:3px;align-items:flex-end;height:26px}
   .spark i{width:8px;background:var(--a);border-radius:2px 2px 0 0;opacity:.85}
+  /* неделя вне окна работы человека: до приёма или после ухода — не ноль, а «не работал» */
+  .spark i.off{height:2px!important;background:none;border-top:2px dotted var(--ip);opacity:1}
+  .spark i.aft{background:var(--nr)}
+  /* состав отдела: ушёл / новичок, темп и окно работы */
+  .gone,.newb{display:inline-block;margin-left:7px;padding:0 6px;border-radius:5px;font:600 10.5px var(--mono);vertical-align:1px}
+  .gone{color:var(--warn);border:1px solid rgba(229,99,77,.45)}
+  .newb{color:var(--ok);border:1px solid rgba(78,201,138,.45)}
+  .sub2{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px;line-height:1.45}
+  .sub2 .up{color:var(--ok)}.sub2 .dn{color:var(--warn)}
+  .rowsep{margin:8px 0 0 33px;padding-top:10px;border-top:1px dashed var(--line);font-size:12px;color:var(--mut)}
+  .row.isgone .fill{opacity:.45}
+  #rowsA .top{gap:8px}#rowsA .nm{min-width:0}#rowsA .ct{white-space:nowrap}
+  .wklbl i{display:block;font-style:normal;color:var(--dim);font-size:10px}
 
   footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:11.5px;line-height:1.7}
   footer b{color:var(--mut)}
@@ -484,17 +497,18 @@
       <b>Принято в работу</b> — карточки в стадии «КП получено»: предложение не просто пришло, а принято сорсером. Разрыв между двумя последними столбцами и есть мера того, сколько КП лежит неразобранными.<br>
       Оба последних столбца датированы по <b>последнему движению карточки</b>: ни у файла, ни у стадии отдельной даты выдача не отдаёт. Для карточки, которая после получения КП больше не двигалась, это и есть неделя получения; для остальных — неделя последнего движения.</div>
       <div class="wkchart" id="wkchart"></div>
-      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>Получено КП</span><span><i class="sw" style="background:var(--ok2)"></i>Принято в работу</span></div>
+      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>Получено КП</span><span><i class="sw" style="background:var(--ok2)"></i>Принято в работу</span><span>под неделей — сорсеров в отделе</span></div>
     </section>
     <section class="card">
-      <h2><span class="tag a">БЛОК A</span> Нагрузка по сорсерам <span class="subtotal">итого <b id="loadTotal"></b></span></h2>
+      <h2><span class="tag a">БЛОК A</span> Темп сорсеров <span class="subtotal">итого <b id="loadTotal"></b></span></h2>
+      <div class="note">Крупная цифра — запросов в <b>рабочий день за последние 4 недели</b>: одно окно для всех, кто работал весь этот срок. Ниже — окно работы человека внутри периода (с приёма; у ушедших — по последний вход в портал), итог Σ и средний темп этого окна; ▲▼ — последние 4 недели против среднего. Итог с начала сорсинга растёт со стажем, поэтому людей сравниваем по темпу.</div>
       <div class="rows" id="rowsA"></div>
     </section>
   </div>
   <div>
     <section class="card">
       <h2>Темп каждого по неделям</h2>
-      <div class="note">Спарклайны по неделям — кто разгоняется, а кто проседает.</div>
+      <div class="note">Спарклайны по неделям — кто разгоняется, а кто проседает. Пунктир — человек ещё не работал или уже ушёл; красный столбец — карточки, легшие на ушедшего после ухода.</div>
       <table><thead><tr><th>Сорсер</th><th>недели</th><th class="r">Σ</th></tr></thead><tbody id="tbSpark"></tbody></table>
     </section>
     <section class="card">
@@ -679,6 +693,12 @@ const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
 const NS = "http://www.w3.org/2000/svg";
 const _esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// окно работы сорсера: ISO-дата → «дд.мм», номер недели периода (Пн–Вс, первая неделя обрезана началом)
+const _dm=s=>s?`${s.slice(8,10)}.${s.slice(5,7)}`:'';
+const _mon=s=>{const d=new Date(s.slice(0,10)+'T00:00:00Z');return Math.round(d.getTime()/864e5)-(d.getUTCDay()+6)%7;};
+const _wi=s=>(s&&M.period&&M.period.start)?Math.round((_mon(s)-_mon(M.period.start))/7):null;
+const _gone=r=>!!r&&r.act===false;
+const _tag=r=>_gone(r)?`<span class="gone" title="Ушёл из отдела. Дата — ${r.toEst?'последняя своя карточка: последнего входа в портал у записи нет':'последний вход в портал: даты увольнения Bitrix не отдаёт'}">ушёл ${_dm(r.to)}${r.toEst?'*':''}</span>`:'';
 
 // ---- subline + KPIs
 document.getElementById('subline').innerHTML =
@@ -708,16 +728,34 @@ document.getElementById('wkchart').innerHTML=weekTot.map(w=>{
   +`\nКонтроль: входящих писем на карточках за неделю ${w.inb||0}.`;
  const kpaTip=`Принято в работу: ${kpa} карточек в стадии «КП получено».`
   +(kp?`\nПолучено КП за ту же неделю: ${kp} — разрыв показывает, сколько предложений не разобрано.`:'');
- return `<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}" title="Запросы отдела: ${w.A}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}" title="Запросы вне отдела: ${w.B}"><span>${w.B}</span></div><div class="wkbar k" data-h="${kp/wkMax*100}" title="${kpTip}"><span>${kp}</span></div><div class="wkbar ka" data-h="${kpa/wkMax*100}" title="${kpaTip}"><span>${kpa}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}</div></div>`;}).join('');
+ return `<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}" title="Запросы отдела: ${w.A}${w.hc?` · сорсеров ${w.hc}, на одного ${(w.A/w.hc).toFixed(1)}`:''}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}" title="Запросы вне отдела: ${w.B}"><span>${w.B}</span></div><div class="wkbar k" data-h="${kp/wkMax*100}" title="${kpTip}"><span>${kp}</span></div><div class="wkbar ka" data-h="${kpa/wkMax*100}" title="${kpaTip}"><span>${kpa}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}${w.hc?`<i title="Сорсеров в отделе на этой неделе (по окнам работы). На одного: ${(w.A/w.hc).toFixed(1)} запр.">${w.hc} чел.</i>`:''}</div></div>`;}).join('');
 
 // ---- block A load
 document.getElementById('loadTotal').textContent=A.reduce((s,r)=>s+r.c,0);
-const maxA=Math.max(1,...A.map(r=>r.c));
-document.getElementById('rowsA').innerHTML=A.map((r,i)=>`<div class="row clickrow" data-uid="${r.id}"><div class="rk">${i+1}</div><div><div class="top"><div class="nm">${_esc(r.n)}${r.since?`<small>с ${r.since}</small>`:''}</div><div class="ct">${r.c}<small>${r.perDay}/дн</small></div></div><div class="track"><div class="fill fillA" data-w="${(r.c/maxA*100).toFixed(1)}" style="width:0%"></div></div></div></div>`).join('');
+{
+  // действующие — по темпу последних 4 недель; ушедшие — отдельной группой без места в рейтинге
+  const ACT=A.filter(r=>!_gone(r)), GONE=A.filter(_gone);
+  const pace=r=>_gone(r)?(r.perDay||0):(r.perDay4!=null?r.perDay4:(r.perDay||0));
+  const maxP=Math.max(0.1,...A.map(pace));
+  const trend=r=>{if(r.perDay4==null)return '';const d=r.perDay4-(r.perDay||0);return d>0.2?' <span class="up">▲</span>':(d<-0.2?' <span class="dn">▼</span>':'');};
+  const row=(r,i)=>`<div class="row clickrow${_gone(r)?' isgone':''}" data-uid="${r.id}"><div class="rk">${i==null?'':i+1}</div><div>`
+   +`<div class="top"><div class="nm">${_esc(r.n)}${_tag(r)}${r.short&&!_gone(r)?'<span class="newb" title="В окне меньше четырёх рабочих недель — темп ещё неустойчив">новичок</span>':''}${r.since?`<small>с ${r.since}</small>`:''}</div>`
+   +`<div class="ct" title="${_gone(r)?'Средний темп окна работы':'Запросов в рабочий день за последние 4 недели'}">${pace(r)}<small>/раб.дн</small></div></div>`
+   +`<div class="track"><div class="fill fillA" data-w="${(pace(r)/maxP*100).toFixed(1)}" style="width:0%"></div></div>`
+   +`<div class="sub2">Σ ${r.c} · ${_gone(r)&&r.wd===0?'ушёл до начала периода':`окно ${_dm(r.from)}–${_dm(r.to)}, ${r.wd!=null?r.wd:'—'} раб.дн · в среднем ${r.perDay}/дн${trend(r)}`}`
+   +`${_gone(r)&&r.open?` · <span class="dn">открыто ${r.open}</span>`:''}${r.afterLeft?` · <span class="dn">после ухода ${r.afterLeft}</span>`:''}</div></div></div>`;
+  let h=ACT.map((r,i)=>row(r,i)).join('');
+  if(GONE.length) h+=`<div class="rowsep">Ушли из отдела — ${GONE.length} чел.: открытых карточек ${k.goneOpen||0}${k.goneAfter?`, легло после ухода ${k.goneAfter}`:''} — переназначить действующим${k.goneAfter?' и сменить «Сорсера» в сделках':''}</div>`+GONE.map(r=>row(r,null)).join('');
+  document.getElementById('rowsA').innerHTML=h;
+}
 
 // ---- spark table
 const spMax=Math.max(1,...A.flatMap(r=>r.wk));
-document.getElementById('tbSpark').innerHTML=A.map(r=>`<tr class="clickrow" data-uid="${r.id}"><td><div class="who" style="font-size:12.5px">${_esc(r.n)}</div></td><td><div class="spark">${r.wk.map(v=>`<i style="height:${Math.max(1,v/spMax*26)}px" title="${v}"></i>`).join('')}</div></td><td class="num r">${r.c}</td></tr>`).join('');
+document.getElementById('tbSpark').innerHTML=A.map(r=>{const a=_wi(r.from),b=_wi(r.to);
+ const bars=r.wk.map((v,j)=>{const off=(a!=null&&j<a)||(b!=null&&j>b);
+  if(off&&!v)return `<i class="off" title="${a!=null&&j<a?'ещё не работал':'уже ушёл'}"></i>`;
+  return `<i${off?' class="aft"':''} style="height:${Math.max(1,v/spMax*26)}px" title="${v}${off?' — после ухода':''}"></i>`;}).join('');
+ return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who" style="font-size:12.5px">${_esc(r.n)}${_tag(r)}</div></td><td><div class="spark">${bars}</div></td><td class="num r">${r.c}</td></tr>`;}).join('');
 
 // ---- conversion
 document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>(v/r.c*100);
@@ -726,7 +764,7 @@ document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=
  const pc=v=>r.closed?` <small class="dimv">${Math.round(v/r.closed*100)}%</small>`:'';
  const cell=(v,clz)=> v>0?`<span class="${clz}">${v}</span>${pc(v)}`:`<span class="dimv">0</span>`;
  const out=b.sent+b.dialog+b.selected+b.refused+b.no_answer+b.other;
- return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td>`
+ return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}${_tag(r)}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td>`
  + `<td class="num r ${(r.quotes||0)>r.kp?'':'dimv'}" title="Карточек с файлом КП от поставщика: ${r.quotes||0}${(r.quotes||0)>r.kp?`, из них не переведено в «КП получено» ${(r.quotes||0)-r.kp}`:''}">${r.quotes||0}</td>`
  + `<td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
 const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,q:t.q+(r.quotes||0),ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,q:0,ref:0,nr:0});
@@ -734,7 +772,7 @@ document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var
 
 // ---- отправлено vs создано (+ фейк)
 if (M.send && M.send.rows){
-  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake>=5?'nrc':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
+  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}${_gone(r)?'<span class="gone">ушёл</span>':''}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake>=5?'nrc':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
 }
 // ---- разнообразие поставщиков (пай-чарт + поставщиков на сорсера)
 {
@@ -750,7 +788,7 @@ if (M.send && M.send.rows){
   } else if(pie){ pie.innerHTML='<div class="note">нет данных по поставщикам</div>'; }
   const ps=document.getElementById('supPerSorcer');
   if(ps){const mx=Math.max(1,...A.map(s=>s.nsup||0));
-    ps.innerHTML=A.slice().sort((a,b)=>(b.nsup||0)-(a.nsup||0)).map(s=>`<div class="ownrow clickrow" data-uid="${s.id}"><div class="onm who" style="min-width:160px;flex-shrink:0">${_esc(s.n)}</div><div class="obar"><i style="width:${((s.nsup||0)/mx*100).toFixed(0)}%"></i></div><div class="ocnt">${s.nsup||0} <span class="dimv">пост. / ${s.c} зап.</span></div></div>`).join('');
+    ps.innerHTML=A.slice().sort((a,b)=>(b.nsup||0)-(a.nsup||0)).map(s=>`<div class="ownrow clickrow" data-uid="${s.id}"><div class="onm who" style="min-width:160px;flex-shrink:0">${_esc(s.n)}${_tag(s)}</div><div class="obar"><i style="width:${((s.nsup||0)/mx*100).toFixed(0)}%"></i></div><div class="ocnt">${s.nsup||0} <span class="dimv">пост. / ${s.c} зап.</span></div></div>`).join('');
   }
   if(M.send&&M.send.totals){const ts=M.send.totals;
   document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${ts.sent}</td><td class="r num nrc">${ts.nosend}</td><td class="r num">${ts.sentPct}%</td><td class="r num nrc">${ts.fake}</td><td class="r"></td></tr>`;}
@@ -758,7 +796,7 @@ if (M.send && M.send.rows){
 
 // ---- tkp list
 const tkpMax=Math.max(1,...A.map(r=>r.tkpP));
-document.getElementById('tkpList').innerHTML=[...A].sort((a,b)=>b.tkpP-a.tkpP).map(r=>`<div class="blrow"><div class="blt"><span>${_esc(r.n)} <span class="dimv mono">${r.tkp} из ${r.c}</span></span><b style="color:var(--a2)">${r.tkpP}%</b></div><div class="bltrack"><i style="width:0%;background:linear-gradient(90deg,var(--a),var(--a2))" data-w="${r.tkpP/tkpMax*100}"></i></div></div>`).join('');
+document.getElementById('tkpList').innerHTML=[...A].sort((a,b)=>b.tkpP-a.tkpP).map(r=>`<div class="blrow"><div class="blt"><span>${_esc(r.n)}${_tag(r)} <span class="dimv mono">${r.tkp} из ${r.c}</span></span><b style="color:var(--a2)">${r.tkpP}%</b></div><div class="bltrack"><i style="width:0%;background:linear-gradient(90deg,var(--a),var(--a2))" data-w="${r.tkpP/tkpMax*100}"></i></div></div>`).join('');
 
 // ---- donut helper
 function donut(el,parts,top,bot){let off=0;parts.forEach(p=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',21);c.setAttribute('cy',21);c.setAttribute('r',15.915);c.setAttribute('fill','transparent');c.setAttribute('stroke',cs.getPropertyValue(p.col).trim());c.setAttribute('stroke-width',5);c.setAttribute('stroke-dasharray',`${p.pct} ${100-p.pct}`);c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 21 21)');el.appendChild(c);off+=p.pct;});
@@ -915,7 +953,7 @@ document.getElementById('insCov').innerHTML=INS.coverage||'<span class="dimv">�
 
 // ---- footer
 document.getElementById('footer').innerHTML=
- `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде, группировка по «ответственному». Блок A — отдел 172 (Гринёв) и подчинённые; блок B — все прочие. «КП/выбран» = Selected + «КП получено»; «Отказ» = «Отказ в КП» + прочие закрытые; «Молчание» = «Ответ не получен в срок». «Ср. срок» = createdTime→movedTime по закрытым. Цепочка до сделки — через <span class="mono">parentId2</span>; «ТКП выдано+» = стадия сделки в исполнении/выиграна. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
+ `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде; исполнитель — ответственный карточки, у карточек робота — «Сорсер» сделки и следы человека. Блок A — отдел 172 (Гринёв) и подчинённые, <b>включая ушедших</b>: их запросы — работа отдела; блок B — все прочие. <b>Темп</b> — запросов в рабочий день (Пн–Пт, праздники не вычитаются) своего окна работы: с даты приёма (не позже первой карточки), у ушедших — по последний вход в портал (* — по последней своей карточке). Рейтинг — по темпу последних 4 недель. «КП/выбран» = Selected + «КП получено»; «Отказ» = «Отказ в КП» + прочие закрытые; «Молчание» = «Ответ не получен в срок». «Ср. срок» = createdTime→movedTime по закрытым. Цепочка до сделки — через <span class="mono">parentId2</span>; «ТКП выдано+» = стадия сделки в исполнении/выиграна. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
  `<b>Данные:</b> live-выгрузка из kvantpro.bitrix24.ru · ${M.period.label}.`;
 
 // ---- дрилл-даун по сорсеру: кому и какие запросы он отправлял
@@ -928,7 +966,9 @@ const _wk=i=>(i>=0&&M.weekly[i])?`${M.weekly[i].w} (${M.weekly[i].d})`:'—';
 function openDrw(uid){
   const s=_byId[String(uid)];if(!s)return;
   document.getElementById('drwName').textContent=s.n;
-  document.getElementById('drwSub').textContent=`${s.c} запросов · ${s.perDay}/дн · до ТКП ${s.tkpP}%`;
+  document.getElementById('drwSub').textContent=`${s.c} запросов · ${s.perDay} в раб. день (окно ${_dm(s.from)}–${_dm(s.to)}, ${s.wd} раб.дн)`
+    +(s.perDay4!=null?` · за 4 недели ${s.perDay4}/дн`:'')+` · до ТКП ${s.tkpP}%`
+    +(_gone(s)?` · ушёл ${_dm(s.to)}${s.toEst?'*':''}, открыто ${s.open||0}${s.afterLeft?`, после ухода ${s.afterLeft}`:''}`:'');
   const b=s.buckets||{};
   const tot=SBUCK.reduce((a,[k])=>a+(b[k]||0),0)||1;
   const sup=s.bySupplier||[];

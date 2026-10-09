@@ -92,6 +92,18 @@ def parse_dt(value: str) -> dt.date | None:
         return None
 
 
+def workdays(a: dt.date, b: dt.date) -> int:
+    """Рабочих дней (Пн–Пт) в отрезке [a, b] включительно; праздники не вычитаются.
+
+    Темп человека меряется по ЕГО рабочим дням в окне, а не по календарю всего
+    периода: иначе принятый в августе делит свои запросы на дни с мая и выглядит
+    вдвое слабее, а ушедший — делит на дни, когда его уже не было."""
+    if b < a:
+        return 0
+    full, rest = divmod((b - a).days + 1, 7)
+    return full * 5 + sum(1 for i in range(rest) if (a.weekday() + i) % 7 < 5)
+
+
 def _weeks(start: dt.date, end: dt.date) -> list[Week]:
     weeks: list[Week] = []
     cur = start

@@ -681,18 +681,24 @@ class BitrixClient:
             self._departments = self.list_paged("department.get", {})
         return self._departments
 
-    def dept_member_ids(self, dept_id: int | str, *, include_children: bool = True) -> set[str]:
-        """ID пользователей отдела (по UF_DEPARTMENT), включая дочерние отделы."""
+    def dept_tree_ids(self, dept_id: int | str) -> set[str]:
+        """Отдел и все его дочерние подразделения."""
         deps = self.departments()
         ids = {str(dept_id)}
-        if include_children:
-            changed = True
-            while changed:
-                changed = False
-                for d in deps:
-                    if str(d.get("PARENT")) in ids and str(d["ID"]) not in ids:
-                        ids.add(str(d["ID"]))
-                        changed = True
+        changed = True
+        while changed:
+            changed = False
+            for d in deps:
+                if str(d.get("PARENT")) in ids and str(d["ID"]) not in ids:
+                    ids.add(str(d["ID"]))
+                    changed = True
+        return ids
+
+    def dept_member_ids(self, dept_id: int | str, *, include_children: bool = True) -> set[str]:
+        """ID ДЕЙСТВУЮЩИХ пользователей отдела (по UF_DEPARTMENT), включая дочерние
+        отделы. `user.get` без фильтра ACTIVE отдаёт только действующих — ушедших
+        добирает main._staff."""
+        ids = self.dept_tree_ids(dept_id) if include_children else {str(dept_id)}
         members: set[str] = set()
         for did in ids:
             for u in self.list_paged("user.get", {"FILTER": {"UF_DEPARTMENT": int(did)}}):

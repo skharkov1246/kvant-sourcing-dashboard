@@ -148,6 +148,12 @@ def make_dataset(n_rfq: int = 240, n_deals: int = 120, seed: int = 7) -> dict:
         "inbound_mail": inbound,
         "dept_a_ids": set(DEPT_A), "names": dict(NAMES),
         "since": {u: "2025-01-01" for u in users},
+        # состав отдела во времени: «79» ушёл в середине июля, но робот по полю
+        # «Сорсер» сделки продолжает класть на него карточки — так в портале
+        # выглядит уволенный, которого не сняли со сделок
+        "staff": {**{u: {"active": True, "hired": dt.date(2025, 1, 1), "left": None}
+                     for u in sorted(DEPT_A)},
+                  "79": {"active": False, "hired": dt.date(2025, 1, 1), "left": dt.date(2026, 7, 10)}},
         "user_depts": dict(USER_DEPTS),
         "service_ids": set(SERVICE_IDS),
         "deal_stage_names": {s: s.split(":")[-1].title() for s in deal_stages},
@@ -163,7 +169,7 @@ def build_metrics(**kw) -> dict:
                              d["dept_a_ids"], d["names"], d["since"],
                              d["deal_stage_names"], d["category_names"], d["user_depts"],
                              d.get("service_ids"), d.get("inbound_mail"),
-                             DEAL_SOURCER_FIELDS)
+                             DEAL_SOURCER_FIELDS, staff=d.get("staff"))
 
 
 # ------------------------------------------------------------------ коммерсанты
