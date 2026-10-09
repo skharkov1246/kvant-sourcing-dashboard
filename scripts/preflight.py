@@ -147,6 +147,12 @@ def main() -> int:
         ("разметка узлов не хуже порога",
          [py, "scripts/library_units_check.py", "--min-precision", "84",
           "--min-coverage", "78"], None),
+        # Разбор обозначения машины (вид, направление, модели) против ручного
+        # эталона data/machine_truth.json. От него зависит клетка «Машина»
+        # счётчика цепочки, по которой выбирается следующая работа.
+        ("разбор обозначений машин не хуже порога",
+         [py, "scripts/machine_segment_check.py", "--min-precision", "97",
+          "--min-coverage", "99"], None),
     ]
     if not a.quick:
         steps.append(("smoke-сборка дашборда", [py, "-"], SMOKE))

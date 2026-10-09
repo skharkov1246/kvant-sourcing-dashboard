@@ -80,6 +80,32 @@ def nkey(name: str) -> str:
     return re.sub(r"[^a-z0-9а-я]+", "", s)[:40]
 
 
+def mkey_model(name: str) -> str:
+    """Ключ модели машины: без марки изготовителя и без знаков.
+
+    Два источника называют одни и те же турбины по-разному: `gt/data/models.json`
+    пишет «SGT-300», реестр `dict/machine.json` — «Rolls-Royce RR Olympus» с
+    маркой впереди. Марка снимается закрытым списком, иначе одна машина попадёт
+    в клетку дважды.
+    """
+    import re
+    s = str(name or "").lower().replace("ё", "е")
+    s = re.sub(r"\b(rolls-?royce|rr|solar|siemens|ge|general electric|dresser-?rand|"
+               r"alstom|innio|mitsubishi|hitachi|kawasaki|man|abb)\b", " ", s)
+    return re.sub(r"[^a-z0-9а-я]+", "", s)
+
+
+# ПОЧЕМУ БЛИЗКИЕ ОБОЗНАЧЕНИЯ НЕ СКЛЕИВАЮТСЯ. Соблазн велик: «RB211» и «RB211-535»
+# выглядят как одна турбина, записанная с точностью до исполнения и без неё.
+# 09.10.2026 я такую склейку по вхождению написал и проверил, что она делает:
+# из 15 склеек шесть оказались РАЗНЫМИ машинами — SGT-100 и SGT-100-2S (одновальная
+# и двухвальная), Taurus 70 и Taurus 70MD, Charmec 1605 B и 1605 BE. Отличить
+# исполнение от написания по тексту ключа нельзя: «st14» → «st14old» — одна машина,
+# «taurus70» → «taurus70md» — две. Поэтому клетка считает РАЗНЫЕ обозначения после
+# снятия марки, и близкие исполнения идут отдельными машинами. Это known-overcount,
+# и он назван: завысить клетку на исполнение честнее, чем потерять машину.
+
+
 # Партномера по направлениям. Берутся из ЯВНЫХ полей номера, а не угадываются
 # регулярным выражением по тексту: иначе в номера попадают обозначения машин
 # (QSV91G) и марки материалов. Считаются уникальные номера, а не строки — по той
@@ -206,29 +232,63 @@ def counts() -> dict:
             cell["src"].append(src)
 
     # ── ГТУ
+    # КЛЕТКА «МАШИНА» СЧИТАЕТ РАЗНЫЕ МАШИНЫ, А НЕ ЗАПИСИ ДВУХ ИСТОЧНИКОВ.
+    # 09.10.2026: `gt/data/models.json` давала 27 моделей, реестр `dict/machine.json`
+    # — 39, клетка показывала 66, но 13 машин были в обоих и считались дважды.
+    # Поэтому имена машин собираются во МНОЖЕСТВО по направлению, и только потом
+    # превращаются в число.
+    маш_имена: dict[tuple[str, str], set[str]] = {}
+    маш_src: dict[str, list[str]] = {}
+
+    def машины(seg: str, имена, src: str, draft: bool = False) -> None:
+        ключи = {mkey_model(x) for x in имена if mkey_model(x)}
+        if not ключи:
+            return
+        маш_имена.setdefault((seg, "draft" if draft else "n"), set()).update(ключи)
+        маш_src.setdefault(seg, [])
+        if src not in маш_src[seg]:
+            маш_src[seg].append(src)
+
     gm = load("gt/data/models.json", {})
-    put("gtu", "machine", sum(n(f.get("models")) for f in gm.get("families", [])), "gt/data/models.json")
+    машины("gtu", [м if isinstance(м, str) else (м.get("name") or м.get("model"))
+                   for f in gm.get("families", []) for м in (f.get("models") or [])],
+            "gt/data/models.json")
+    # РЕЕСТР МАШИН — ПО ВСЕМ НАПРАВЛЕНИЯМ, А НЕ ТОЛЬКО ПО ГТУ. До 09.10.2026
+    # отсюда бралось одно направление, и клетка «Машина» у насосов,
+    # электротехники и КИПиА стояла в нуле, хотя обозначения этих машин в базе
+    # запчастей есть: 18 насосов, 11 электрических машин, 15 приборов.
+    # Запись с пометкой «черновик» — машина, у которой в обозначении не названа
+    # модель («Электродвигатель», «Датчик температуры»): она идёт в черновик,
+    # а не в заполненное. Правило разбора — library/machine_kind.py, точность
+    # мерит scripts/machine_segment_check.py по эталону data/machine_truth.json.
     mach = load("dict/machine.json", {})
-    put("gtu", "machine", sum(1 for m in mach.get("records", []) if m.get("segment") == "gtu"),
-        "dict/machine.json")
+    for сег in [s for s, _ in SEGMENTS]:
+        свои = [m for m in mach.get("records", []) if m.get("segment") == сег]
+        машины(сег, [m["name"] for m in свои if not m.get("черновик")], "dict/machine.json")
+        машины(сег, [m["name"] for m in свои if m.get("черновик")], "dict/machine.json",
+               draft=True)
     gp = load("gt/data/parts.json", {})
     put("gtu", "node", n(gp.get("systems")), "gt/data/parts.json")
 
     # ── ГПУ
-    put("gpu", "machine", n(load("gpu/data/machines.json", {}).get("machines")), "gpu/data/machines.json")
+    машины("gpu", [f"{m.get('oem', '')} {m.get('model', '')}".strip()
+                   for m in load("gpu/data/machines.json", {}).get("machines", [])],
+            "gpu/data/machines.json")
     put("gpu", "node", n(load("gpu/data/parts.json", {}).get("systems")), "gpu/data/parts.json")
 
     # ── ГШО
     tel = load("zip/data/telsmith_3858.json", {})
-    put("gsho", "machine", 1 if tel.get("machine") else 0, "zip/data/telsmith_3858.json")
-    put("gsho", "machine", n(load("zip/data/machines.json", {}).get("machines")), "zip/data/machines.json")
+    машины("gsho", [(tel.get("machine") or {}).get("name")], "zip/data/telsmith_3858.json")
+    машины("gsho", [m.get("name") for m in load("zip/data/machines.json", {}).get("machines", [])],
+            "zip/data/machines.json")
     put("gsho", "node", n({r.get("node") for r in tel.get("catalog", []) if r.get("node")}), "zip/data/telsmith_3858.json")
     mat = load("zip/data/material_strategy.json", [])
     put("gsho", "repair", n([x for x in (mat or []) if isinstance(x, dict)]), "zip/data/material_strategy.json")
     # досье машины Caterpillar R1700G: паспорт, узлы, перечень деталей, исполнители ремонта
     r17 = load("zip/data/r1700.json", {})
     src17 = "zip/data/r1700.json"
-    put("gsho", "machine", 1 if (r17.get("variants") or r17.get("specs")) else 0, src17)
+    машины("gsho", [в.get("model") for в in (r17.get("variants") or [])] or
+                   ([(r17.get("machine") or {}).get("name")] if r17.get("specs") else []), src17)
     put("gsho", "node", n({x.get("node") for x in r17.get("parts", []) if x.get("node")}), src17)
     put("gsho", "part", n(r17.get("parts")), src17)
     # «Исполнитель» — утверждение о компании, а не защита строки, поэтому список
@@ -304,6 +364,24 @@ def counts() -> dict:
         src_recip = ["zip/data/recip_recon.json"]
         c["recip"]["maker"]["n"] = len(comp)
         c["recip"]["maker"]["src"] = src_recip
+
+    # КЛЕТКИ «МАШИНА» — ИЗ МНОЖЕСТВ ИМЁН, одним проходом: разные обозначения после
+    # снятия марки (см. mkey_model и примечание о склейке выше). Черновик
+    # считается только по тем машинам, которых нет среди названных моделью.
+    for сег, _т in SEGMENTS:
+        названы = маш_имена.get((сег, "n"), set())
+        черновик = маш_имена.get((сег, "draft"), set()) - названы
+        источники = маш_src.get(сег, [])
+        if not источники:
+            continue
+        put(сег, "machine", len(названы), источники[0])
+        if черновик:
+            put(сег, "machine", len(черновик), источники[0], draft=True)
+        # Остальные файлы записываются в клетку прямо: put вносит источник
+        # только вместе с числом, а число у клетки одно на все файлы.
+        for рел in источники[1:]:
+            if (названы or черновик) and рел not in c[сег]["machine"]["src"]:
+                c[сег]["machine"]["src"].append(рел)
 
     # ── диагностика: признак и дефект. Единственные два звена, пустые везде.
     # Привязка к направлению по области разведки, плюс два узла-исключения:
@@ -471,15 +549,18 @@ def counts() -> dict:
     # поэтому рёбра считаются общим фондом и в клетки направлений не идут)
     ch = load("dict/chain.json", {})
     mach = load("dict/machine.json", {})
-    other = [m for m in mach.get("records", []) if m.get("segment") == "other"]
+    other = [m for m in mach.get("records", []) if m.get("segment") == "вне"]
     common = {"chain_edges": n(ch.get("records")), "chain_makers": ch.get("makers", 0),
               "oem_keys": load("dict/oem.json", {}).get("count", 0),
               "machines_total": mach.get("count", 0),
               "machines_foreign_segment": len(other),
               "machines_foreign_note": "Машины, найденные внутри базы ГТУ, но относящиеся к "
-                                       "направлению, которого у нас нет: буровое и нефтепромысловое "
-                                       "оборудование — насосы, превенторы, цементировочные агрегаты, "
-                                       "верхние приводы. Кандидат в новое направление портала."}
+                                       "направлению, которого у портала нет: буровое и "
+                                       "нефтепромысловое (превенторы, лебёдки, верхние приводы, "
+                                       "цементировочные агрегаты, ситогидроциклонные установки), "
+                                       "портовое, котельное. Насосы и электрические машины здесь "
+                                       "больше не числятся — у них появились свои направления "
+                                       "(09.10.2026). Кандидат в новое направление портала."}
     return c, common
 
 
