@@ -249,3 +249,54 @@ def test_технические_воронки_и_прогон():
     вход = (wf.get("on") or wf[True])["workflow_dispatch"]["inputs"]["script"]
     assert "probe_2526.py" in вход["options"]
     assert wf["concurrency"]["group"] == "bitrix-portal"
+
+
+def _заказ(**к):
+    база = {"deal": "1", "sem": "S", "supplier": "700", "eur": 100.0, "seg_company": True, "seg_funnel": False,
+            "cur": "EUR", "deal_cur": "EUR", "deal_eur": 200.0, "budget_eur": None, "parent": "воронка 2"}
+    база.update(к)
+    return база
+
+
+def test_проверка_заказов_вне_воронки():
+    год = [
+        _заказ(deal="1", eur=1100.0, deal_eur=100.0, cur="RUB", deal_cur="EUR"),   # ×11 и чужая валюта
+        _заказ(deal="2", supplier="701", eur=50.0, deal_eur=80.0),
+        _заказ(deal="2", supplier="701", eur=50.0, deal_eur=80.0),                   # дубль
+        _заказ(deal="3", eur=40.0, deal_eur=None, parent="карточка реализации", budget_eur=30.0),
+        _заказ(deal="4", eur=30.0, seg_funnel=True),                                 # в воронке клиента
+        _заказ(deal="5", eur=500.0, seg_company=False),                              # не Норникель
+        _заказ(deal="6", eur=999.0, sem="F"),                                        # провален
+    ]
+    п = m.проверка_заказов(год)
+    assert п["n"] == 4 and п["nn_n"] == 5 and п["deals"] == 3
+    assert п["cur_mismatch"] == 1 and п["over3"] == 1 and п["dupes"] == 2 and п["over_budget"] == 1
+    assert п["flagged"] == 4
+    assert dict(п["parents"]) == {"воронка 2": 3, "карточка реализации": 1}
+    assert dict(п["ratio"])["больше ×10"] == 1 and dict(п["ratio"])["сумма сделки пуста"] == 1
+    assert п["share_total"] == pc.доля(1240, 1770) and п["top1"] is None, "меньше 5 заказов — доля крупнейшего скрыта"
+    assert п["nn_share_wo_flagged"] == pc.доля(30, 530)
+
+
+def test_ткп_года_закрыты_и_карточки_реализации():
+    мета = dict(МЕТА)
+    сделки = [
+        сделка(20, "C8:Q", "8", title="НН-500 Учебный клапан", company="500"),         # висит, выигран карточкой
+        сделка(21, "C8:Q", "8", title="НН-501 Учебный фильтр", company="500"),         # висит
+        сделка(22, "C8:PRICE", "8", "F", title="НН-502 Учебный шкив", company="500"),  # проигран
+        сделка(23, "EXECUTING", "0", title="12. НН-500 Учебный клапан", company="500", created="2025-04-01"),
+    ]
+    история = {"20": [("C8:NEW", t("2025-02-01")), ("C8:Q", t("2025-02-10"))],
+               "21": [("C8:NEW", t("2025-02-01")), ("C8:Q", t("2025-02-10"))],
+               "22": [("C8:NEW", t("2025-02-01")), ("C8:Q", t("2025-02-10")), ("C8:PRICE", t("2025-03-01"))],
+               "23": [("NEW", t("2025-04-01")), ("EXECUTING", t("2025-04-02"))]}
+    холдинг = {d["ID"]: "Норникель" for d in сделки}
+    строки = pc.классифицировать(сделки, история, мета, [], холдинг, СЕГОДНЯ, {})
+    m.разметить(строки, сделки, история, мета, [], {}, {"8"}, set(), {}, в_евро, СЕГОДНЯ)
+    pc.найти_выигрыши_новой_карточкой(строки)
+    номера = {n for r in строки if r["realization_only"] for n in r["nn"]}
+    assert номера == {"500"}
+    з = m.свод_закрытого_года([r for r in строки if r["cohort"] == "2025"], номера)
+    assert (з["n"], з["c"], з["open"], з["lost"]) == (3, 0, 2, 1)
+    assert з["conv_closed"] == 0 and з["open_nn"] == 1 and з["open_any"] >= 1
+    assert з["conv_with_open_twins"] == 33

@@ -91,6 +91,7 @@ ORDER_SELECT = ["id", "stageId", "categoryId", "createdTime", "parentId2", "comp
 БЮДЖЕТНЫЙ = re.compile(r"бюджетирован|мониторинг\s+цен", re.I)
 РАСЦЕНКА = re.compile(r"запрос\w*\s+расцен", re.I)
 НН = re.compile(r"(?<![А-Яа-яЁёA-Za-z])НН-\s?\d")
+НН_НОМЕР = re.compile(r"(?<![А-Яа-яЁёA-Za-z])НН-\s?(\d+)")
 ТИП_ОБЩИЙ = re.compile(r"(?:производител|трейдер|дилер|дистрибьютор|официальн|посредник|агент|склад|прям)"
                        r"(?:ь|я|и|ей|ы|ов|а|ой|ая|ое|ые|ый|ий|ск(?:ий|ая|ое|ие|ой))?"
                        r"|manufacturers?|traders?|dealers?|distributors?|official|direct|agents?|stock(?:ist)?", re.I)
@@ -164,6 +165,7 @@ def разметить(строки, сделки, история, мета, з�
         r["seg_company"] = r["holding"] == HOLDING
         r["seg_funnel"] = r["origin"] in клиентские_воронки
         r["seg_nn"] = bool(НН.search(str(д.get("TITLE") or "")))
+        r["nn"] = sorted(set(НН_НОМЕР.findall(str(д.get("TITLE") or ""))))
         r["seg_kam"] = r["id"] in кам_сделки
         опорная = r["offer_date"] or r["created"]
         r["ripe"] = bool(опорная) and (сегодня - dt.date.fromisoformat(опорная)).days > STUCK_DAYS
@@ -263,7 +265,8 @@ def _дн(a, b):
         return None
 
 
-def разметить_заказы(заказы, семантика, сделки_все, холдинг_сделки, строки_по_id, клиентские_воронки, в_евро):
+def разметить_заказы(заказы, семантика, сделки_все, холдинг_сделки, строки_по_id, клиентские_воронки, в_евро,
+                     бюджет=None):
     """Заказы СП-172 → строка на заказ с датами по Москве, исходом и сегментом
     родительской сделки. Чистая функция.
 
@@ -275,9 +278,17 @@ def разметить_заказы(заказы, семантика, сделк
         if d != "0" and t and сем_заказа(о.get("stageId"), семантика) != "F" and (d not in первый_живой or t < первый_живой[d]):
             первый_живой[d] = t
     out = []
+    бюджет = бюджет or {}
     for о in заказы:
         d = str(о.get("parentId2") or "0")
         r = строки_по_id.get(d)
+        дл = сделки_все.get(d) or {}
+        if r:
+            родитель = "карточка реализации" if r["realization_only"] else f"воронка {r['origin']}"
+        elif дл:
+            родитель = f"сделка до {pc.SINCE[:7]}, сейчас воронка {str(дл.get('CATEGORY_ID') or '0')}"
+        else:
+            родитель = "без сделки"
         out.append({
             "deal": d if d != "0" else None,
             "year": (pc.дата_мск(о.get("createdTime")) or "")[:4],
@@ -299,8 +310,110 @@ def разметить_заказы(заказы, семантика, сделк
             "orphan": d == "0" or d not in сделки_все,
             "offer_date": r["offer_date"] if r else None,
             "kat0_date": (r["contract_date"] if r and r["signals"].get("кат0") else None),
+            "cur": str(о.get("currencyId") or "") or None,
+            "deal_cur": str(дл.get("CURRENCY_ID") or "") or None,
+            "deal_eur": в_евро(дл.get("OPPORTUNITY"), дл.get("CURRENCY_ID")) if дл else None,
+            "budget_eur": бюджет.get(d),
+            "parent": родитель,
         })
     return out
+
+
+def проверка_заказов(год_все, сегодня=None):
+    """Заказы Норникеля (по компании) одного года ВНЕ клиентской воронки: признаки
+    ошибки ввода и откуда они. Только счётчики и доли (журнал публичный).
+
+    Признаки: закупка больше продажи сделки в 3+ раза; валюта заказа не та, что у
+    сделки; закупка больше выручки бюджета сделки; сумма больше OUTLIER_EUR; дубль
+    (та же сделка, поставщик и сумма); суммы нет."""
+    живые = [о for о in год_все if о["sem"] != "F"]
+    нн = [о for о in живые if о["seg_company"]]
+    вне = [о for о in нн if not о["seg_funnel"]]
+    всего = sum(о["eur"] or 0 for о in живые)
+    всего_нн = sum(о["eur"] or 0 for о in нн)
+    сумма_вне = sum(о["eur"] or 0 for о in вне)
+
+    def отношение(о):
+        if not о["eur"] or not о["deal_eur"]:
+            return "сумма сделки пуста" if о["eur"] else "суммы заказа нет"
+        x = о["eur"] / о["deal_eur"]
+        return "закупка ≤ продажи" if x <= 1 else ("до ×3" if x <= 3 else ("×3–10" if x <= 10 else "больше ×10"))
+    ключи = collections.Counter((о["deal"], о["supplier"], round(о["eur"] or 0)) for о in вне if о["eur"])
+    дубль = [о for о in вне if о["eur"] and ключи[(о["deal"], о["supplier"], round(о["eur"]))] > 1]
+    валюта = [о for о in вне if о["cur"] and о["deal_cur"] and о["cur"] != о["deal_cur"]]
+    больше3 = [о for о in вне if о["eur"] and о["deal_eur"] and о["eur"] > 3 * о["deal_eur"]]
+    больше_бюджета = [о for о in вне if о["eur"] and о["budget_eur"] and о["eur"] > о["budget_eur"]]
+    выброс = [о for о in вне if о["eur"] and о["eur"] > OUTLIER_EUR]
+    помечены = {id(о) for о in больше3 + валюта + больше_бюджета + выброс + дубль}
+    сумма_пом = sum(о["eur"] or 0 for о in вне if id(о) in помечены)
+    по_сумме = sorted((о["eur"] or 0 for о in вне), reverse=True)
+    топ_нн = sorted(нн, key=lambda о: -(о["eur"] or 0))[:10]
+    return {
+        "n": len(вне), "deals": len({о["deal"] for о in вне}), "nn_n": len(нн),
+        "share_total": pc.доля(сумма_вне, всего), "share_nn": pc.доля(сумма_вне, всего_нн),
+        "parents": collections.Counter(о["parent"] for о in вне).most_common(),
+        "ratio": collections.Counter(отношение(о) for о in вне).most_common(),
+        "cur_mismatch": len(валюта), "over3": len(больше3), "over_budget": len(больше_бюджета),
+        "budget_known": sum(1 for о in вне if о["budget_eur"]), "outlier": len(выброс), "dupes": len(дубль),
+        "flagged": len(помечены),
+        "nn_share_wo_flagged": pc.доля(всего_нн - сумма_пом, всего - сумма_пом),
+        "outside_share_wo_flagged": pc.доля(сумма_вне - сумма_пом, всего - сумма_пом),
+        "top1": pc.доля(по_сумме[0], сумма_вне) if len(по_сумме) >= MIN_VALUE_N else None,
+        "top3": pc.доля(sum(по_сумме[:3]), сумма_вне) if len(по_сумме) >= MIN_VALUE_N else None,
+        "top10_nn_outside": sum(1 for о in топ_нн if not о["seg_funnel"]),
+        "top10_nn_share": pc.доля(sum(о["eur"] or 0 for о in топ_нн), всего_нн) if len(нн) >= 10 else None,
+        "sem": collections.Counter(о["sem"] for о in вне).most_common(),
+    }
+
+
+def строка_проверки(год, п):
+    return (
+        f"  {год}: заказов Норникеля {п['nn_n']}, из них вне клиентской воронки {п['n']} по сделкам {п['deals']};"
+        f" их доля в закупке года {_п(п['share_total'])}, в закупке Норникеля {_п(п['share_nn'])};"
+        f" 1 крупнейший — {_п(п['top1'])}, 3 крупнейших — {_п(п['top3'])} суммы этих заказов"
+        f" | 10 крупнейших заказов Норникеля — {_п(п['top10_nn_share'])} его закупки, из них вне воронки {п['top10_nn_outside']}\n"
+        f"    откуда: " + "; ".join(f"{k} {v}" for k, v in п["parents"]) + "\n"
+        f"    закупка к продаже сделки: " + "; ".join(f"{k} {v}" for k, v in п["ratio"]) + "\n"
+        f"    признаки ошибки: валюта заказа ≠ валюте сделки {п['cur_mismatch']}; закупка > продажи ×3 {п['over3']};"
+        f" закупка > выручки бюджета {п['over_budget']} (бюджет есть у {п['budget_known']}); больше"
+        f" {OUTLIER_EUR / 1e6:g} млн € {п['outlier']}; дублей {п['dupes']}; помечено всего {п['flagged']}"
+        f" | без помеченных: доля Норникеля в закупке года {_п(п['nn_share_wo_flagged'])},"
+        f" вне воронки {_п(п['outside_share_wo_flagged'])} | исход: " + ", ".join(f"{k} {v}" for k, v in п["sem"]))
+
+
+def свод_закрытого_года(rows, номера_реализации):
+    """ТКП года считаются закрытыми: открытые — проигрыш. Рядом — сколько открытых
+    и проигранных на деле выиграны отдельной карточкой реализации: по номеру «НН-»
+    (тот же номер в названии карточки реализации) и по v4 (та же компания, карточка
+    в пределах TWIN_DAYS после ТКП)."""
+    o1 = [r for r in rows if r["o0"] and r["o1"]]
+    к = [r for r in o1 if r["cls"] == "contract"]
+    откр = [r for r in o1 if r["cls"] == "open"]
+    проигр = [r for r in o1 if r["cls"] == "lost"]
+
+    def по_номеру(xs):
+        return [r for r in xs if set(r.get("nn") or ()) & номера_реализации]
+    оно, пно = по_номеру(откр), по_номеру(проигр)
+    о4, п4 = [r for r in откр if r.get("twin_of")], [r for r in проигр if r.get("twin_of")]
+    оба = {r["id"] for r in оно} | {r["id"] for r in о4}
+    return {
+        "n": len(o1), "c": len(к), "open": len(откр), "lost": len(проигр),
+        "conv_closed": pc.доля(len(к), len(o1)),
+        "open_nn": len(оно), "lost_nn": len(пно), "open_v4": len(о4), "lost_v4": len(п4),
+        "open_both": len({r["id"] for r in оно} & {r["id"] for r in о4}), "open_any": len(оба),
+        "conv_with_open_twins": pc.доля(len(к) + len(оба), len(o1)),
+        "conv_with_all_twins": pc.доля(len(к) + len(оба | {r["id"] for r in пно} | {r["id"] for r in п4}), len(o1)),
+        "open_with_nn": sum(1 for r in откр if r.get("nn")),
+    }
+
+
+def строка_закрытого(имя, з):
+    return (f"  {имя}: ТКП {з['n']} → контрактов {з['c']}, проиграно {з['lost']}, открыто → проигрыш {з['open']};"
+            f" КОНВЕРСИЯ {_п(з['conv_closed'], з['n'])} | открытых с номером НН- {з['open_with_nn']};"
+            f" выиграны отдельной карточкой реализации: по номеру НН- {з['open_nn']}, по компании и сроку {з['open_v4']},"
+            f" обоими {з['open_both']}, хотя бы одним {з['open_any']} → конверсия {_п(з['conv_with_open_twins'], з['n'])}"
+            f" | среди проигранных такая карточка: по номеру {з['lost_nn']}, по компании и сроку {з['lost_v4']}"
+            f" → с ними {_п(з['conv_with_all_twins'], з['n'])}")
 
 
 def свод_заказов(xs, все_года, сегодня, подписи_типов=None):
@@ -475,6 +588,17 @@ def отчёт(строки, заказы_разм, мета, сегодня, п
                         ("Все заказы", все)):
             print(строка_заказов(имя, свод_заказов(xs, все, сегодня, подписи_типов)))
 
+    if YEARS:
+        год0 = YEARS[0]
+        номера = {n for r in строки if r["realization_only"] for n in (r.get("nn") or ())}
+        print(f"\nТКП {год0} СЧИТАЮТСЯ ЗАКРЫТЫМИ (открытые — проигрыш; карточек реализации с номером НН- {len(номера)})")
+        for имя, rows in сегменты([r for r in строки if r["cohort"] == год0]):
+            print(строка_закрытого(имя, свод_закрытого_года(rows, номера)))
+
+    print("\nЗАКАЗЫ НОРНИКЕЛЯ ВНЕ КЛИЕНТСКОЙ ВОРОНКИ — ПРОВЕРКА")
+    for год in YEARS:
+        print(строка_проверки(год, проверка_заказов([о for о in заказы_разм if о["year"] == год])))
+
     print("\nКОНТРАКТЫ БЕЗ ЖИВОГО ЗАКАЗА (строгие; когорта)")
     for год in YEARS:
         for имя, rows in сегменты([r for r in строки if r["cohort"] == год and r["o0"]])[:1] + \
@@ -565,7 +689,7 @@ def main() -> int:
     вне = sorted({str(о.get("parentId2")) for о in сырые
                   if str(о.get("parentId2") or "0") != "0" and str(о.get("parentId2")) not in по_выборке}, key=int)
     старые = client.deals_by_ids(вне, select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID",
-                                              "COMPANY_ID", "DATE_CREATE"])
+                                              "COMPANY_ID", "DATE_CREATE", "OPPORTUNITY", "CURRENCY_ID"])
     print(f"родительских сделок заказов вне выборки: {len(вне)}, получено {len(старые)}")
 
     все_сделки = {str(д["ID"]): д for д in сделки} | старые
@@ -637,8 +761,10 @@ def main() -> int:
     заказы_v4 = [о for о in сырые if not str(о.get("stageId", "")).endswith(":FAIL")]
     строки = pc.классифицировать(сделки, история, мета, заказы_v4, холдинг, сегодня, деньги_сделок)
     разметить(строки, сделки, история, мета, сырые, семантика, клиентские, кам_сделки, бюджет, в_евро, сегодня, техн)
+    пар = pc.найти_выигрыши_новой_карточкой(строки)
+    print(f"карточек только реализации с найденной предпродажной парой (компания и срок): {пар}")
     по_id = {r["id"]: r for r in строки}
-    заказы_разм = разметить_заказы(сырые, семантика, все_сделки, холдинг, по_id, клиентские, в_евро)
+    заказы_разм = разметить_заказы(сырые, семантика, все_сделки, холдинг, по_id, клиентские, в_евро, бюджет)
 
     try:
         поля = (client.call("crm.item.fields", {"entityTypeId": ORDER_ENTITY}) or {}).get("fields") or {}
