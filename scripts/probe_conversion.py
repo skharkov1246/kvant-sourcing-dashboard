@@ -3,48 +3,48 @@
 
 Вопрос владельца 08.10.2026: «какое количество контрактов мы получаем относительно
 того количества предложений, которые мы выдаём» — по Норникелю и в сравнении.
+Версия 3: по разбору двух проверок и первого прогона 08.10.2026.
 
 МОДЕЛЬ — ТА ЖЕ, ЧТО У history.py И reps.py (проверено на портале 08.09.2026):
-  • ВОРОНКА сделки — та, где она ЗАВЕДЕНА: первая стадия в истории. Победа в этом
-    портале — переезд карточки в воронку реализации (кат. 0) с тем же ID, поэтому
-    по текущей воронке выигранные тендеры «пропадают» из своей воронки.
+  • ВОРОНКА сделки — первая НЕНУЛЕВАЯ воронка в истории стадий. Кат. 0 — и воронка
+    реализации, и воронка по умолчанию: карточка, заведённая в кат. 0 и перенесённая
+    в предпродажу, — предпродажная сделка, а не «только реализация».
   • КОНТРАКТ — сделка не проиграна (STAGE_SEMANTIC_ID ≠ F) и хотя бы одно из:
-    переезд в кат. 0 по истории; непроигранный заказ поставщику СП-172; номер
-    реализации в названии («871. …»); семантика S — как reps.classify. Дата
-    контракта — первый вход в кат. 0, иначе первый заказ поставщику.
-  • ВЫДАННОЕ ПРЕДЛОЖЕНИЕ — по ИСТОРИИ стадий (проигранная после ТКП сделка сейчас
-    стоит в стадии отказа, и по текущей стадии её в знаменателе не было бы):
-      – стадия-предложение вне кат. 0 (reps._QUOTE_RE или stages.deal_reached_tkp:
-        «ТКП выдан/отправлен», «Тендерное предложение выдано», «Quotation issued»)
-        — даёт факт и дату;
-      – стадия «дальше предложения»: кат. 0, успех, отгрузка, проигрыш с именем,
-        которое означает поданное предложение («Не прошли по цене», «проиграли»)
-        — даёт факт без даты.
-  • СДЕЛКИ ТОЛЬКО РЕАЛИЗАЦИИ (заведены сразу в кат. 0, предпродажи в этой карточке
-    нет) в конверсию не входят и считаются отдельно.
-  • КОНВЕРСИЯ — в трёх видах, потому что одна цифра врёт:
-      – по всем: контракты / все выданные предложения;
-      – зрелая: без живых сделок моложе STUCK_DAYS (120 дн., history.py) — им
-        ещё рано решаться;
-      – среди решённых: контракты / (контракты + проиграно + «тихие потери» —
-        живые старше 120 дн.: по history.py практически потеряны).
-    Контракт без отметки предложения в истории в знаменатель не идёт; счётчик
-    таких печатается — это пробел данных, а не отдельный путь.
-  • ХОЛДИНГ — kam.client_dir (разметка вкладки КАМ) плюс широкий шаблон юрлиц
-    группы, которых разметка КАМ не знает. Вторая, независимая разметка — по КАМ
-    сделки (поле «КАМ», иначе ответственный) из отдела 110.
-  Одна сделка — одно предложение: редакции ТКП в одной сделке знаменатель не
-  размножают.
+    вход в кат. 0 ПОСЛЕ предпродажной воронки; непроигранный заказ поставщику СП-172;
+    номер реализации в названии («871. …»); семантика S — как reps.classify.
+  • ВЫДАННОЕ ПРЕДЛОЖЕНИЕ — по истории стадий:
+      – «с датой»: стадия, чьё имя говорит, что предложение выдано или отправлено
+        («ТКП выдано/отправлено», «Тендерное предложение выдано», «Quotation issued»,
+        «КП отправлено», «Заявка подана»). «ТКП готово», «Отправка ТКП»,
+        «Подготовка ТКП», сбор КП у поставщиков — ещё не выдано; суффикс EXECUTING
+        сам по себе не засчитывается;
+      – «без даты»: кат. 0 после предпродажи, успех, переторжка и торги, отгрузка,
+        проигрыш с именем «не прошли по цене / по технике», «не выиграли».
+  • ГЛАВНАЯ КОНВЕРСИЯ — СИММЕТРИЧНАЯ: в числителе и знаменателе только сделки с
+    датированной стадией предложения. Выигрыш без отметки предложения доказывает
+    предложение переездом в кат. 0, а такой же проигрыш — ничем, и широкая
+    конверсия (с отметками «без даты») поэтому завышена; она печатается рядом.
+  • ЗРЕЛАЯ — те же сделки, но предложение выдано раньше, чем STUCK_DAYS назад:
+    исход у них успел определиться (медиана предложение→контракт печатается рядом).
+  • ВЫИГРЫШ НОВОЙ КАРТОЧКОЙ. До 2025 г. реализацию заводили отдельной карточкой в
+    кат. 0, а предпродажная оставалась открытой: первый прогон дал 0 контрактов
+    Норникеля за 2024 г. и 61 карточку «только реализации». Такой карточке ищется
+    предпродажная сделка той же компании с предложением, выданным не позже её
+    создания и не раньше чем за 180 дней; найденные печатаются как вероятные
+    выигрыши — оценка, а не факт.
+  • ХОЛДИНГ — kam.client_dir плюс шаблон юрлиц группы, которых разметка КАМ не
+    знает (только для названий, которые разметка КАМ не отнесла к другому холдингу).
+    Вторая разметка — по КАМ сделки (поле «КАМ», иначе ответственный) из отдела 110.
 
 ЧТО В ЖУРНАЛ. Репозиторий публичный (CLAUDE.md, правило 17; распоряжение 30.09):
-счётчики, доли, медианы дней, названия холдингов разметки КАМ и юрлиц группы;
-названия воронок и стадий — с маской слов из названий компаний-клиентов. Ни сумм,
-ни сделок, ни людей.
+счётчики, доли, медианы и названия холдингов разметки КАМ. Названия компаний не
+печатаются вовсе; в названиях воронок и стадий остаются только слова, которые
+встречаются в стадиях трёх и более воронок (общая лексика процесса), прочие слова —
+«…». Ни сумм, ни сделок, ни людей. Падение — тип ошибки и места в коде.
 
 НАГРУЗКА (навык bitrix-ingest): сделки — по ключу >ID; компании — пачками по 50;
 история стадий — пачками по 50 сделок (OWNER_ID массивом) со сверкой с total и
-проверкой, что фильтр сработал; заказы СП-172 — по ключу со сверкой с total.
-Оценка запросов и времени — до обхода, сводка нагрузки — в конце.
+проверкой фильтра; заказы СП-172 — по ключу со сверкой с total. Около 900 запросов.
 """
 from __future__ import annotations
 
@@ -63,15 +63,25 @@ SINCE = os.environ.get("CONV_SINCE", "2024-06-01T00:00:00")   # глубина, 
 HOLDING = "Норникель"
 DEPT_HOLDING = "110"           # kam.CLIENT_GROUPS: «Норникель»
 ORDER_ENTITY = 172
-STUCK_DAYS = 120               # history.STUCK_DAYS: порог «тихой потери»
+STUCK_DAYS = 120               # history.STUCK_DAYS
+TWIN_DAYS = 180                # окно поиска предпродажной сделки для карточки реализации
+MIN_N = 30                     # меньше — доля печатается с пометкой «мало данных»
 MSK = ZoneInfo("Europe/Moscow")
-# Юрлица группы, которых нет в kam.CLIENT_HOLDINGS (общий модуль здесь не трогаем).
-ГРУППА_ШИРЕ = re.compile(r"норникел|nornickel|гипроникел|\bнтэк\b|медвежий\s*ручей|таймырск\w*\s*топлив|"
-                         r"норметимпэкс|заполярн\w*\s*(филиал|транспорт)", re.I)
-# Проигрыш, который означает: предложение подано и не выиграло.
-ПРОИГРЫШ_ПОСЛЕ_ПРЕДЛОЖЕНИЯ = re.compile(r"не\s*прошл\w*\s*по\s*(цен|тех|срок)|проигра|выбрал\w*\s*друг|"
-                                        r"цена\s*выше|победил\w*\s*друг", re.I)
+
+ГРУППА_ШИРЕ = re.compile(r"норникел|nornickel|гипроникел|норильско[-\s]*таймырск|норметимпэкс", re.I)
+ПРЕДЛОЖЕНИЕ = re.compile(
+    r"ТКП\s*(выда|отправл|соглас)|тендерн\w*\s+предложен\w*\s+выда|quotation\s+issued|"
+    r"(?<![А-Яа-яЁё])КП\s*(отправл|выда|направл)|коммерческ\w*\s+предложен\w*\s+(выда|отправл|направл)|"
+    r"предложени\w*\s+(направл|отправл)\w*\s+клиент|заявк\w*\s+подан", re.I)
+ЕЩЁ_НЕ_ВЫДАНО = re.compile(r"ТКП\s*готов|отправка\s+ТКП|подготовк\w*\s+ТКП|сбор\s+КП|поиск\s|не\s*выда|"
+                           r"не\s*ответ|не\s*присл|закрыл\s+выдачу|неинтересно", re.I)
+ПОСЛЕ_ПРЕДЛОЖЕНИЯ = re.compile(r"переторжк|(?<![А-Яа-яЁё])торги(?![А-Яа-яЁё])|ожидаем\w*\s+решени", re.I)
+ПРОИГРЫШ_ПОСЛЕ_ПРЕДЛОЖЕНИЯ = re.compile(
+    r"не\s*прошл\w*\s*по\s*(цен|тех|срок)|проигра|не\s*выигра|выбрал\w*\s*друг|победител|победил\w*\s*друг|"
+    r"цена\s*выше", re.I)
 ПОСЛЕ_РЕАЛИЗАЦИИ = re.compile(r"ОТГРУ|ДОСТАВ|ПРОИЗВОДСТВО\s*ЗАВЕРШЕНО|ПОДГОТОВКА\s*К\s*ОТГРУЗКЕ", re.I)
+ОБЩИЕ_СЛОВА = {"общая", "тендеры", "тендер", "запросы", "запрос", "пресейл", "реклама", "адаптационная",
+               "реализация", "сделки", "сделка", "ткп", "кп", "клиент", "клиентом", "заказчик"}
 
 
 def номер_реализации(title) -> int:
@@ -103,8 +113,6 @@ def дата_мск(s) -> str | None:
 def вид_стадии(stage_id, meta) -> tuple[str, str]:
     """Стадия → (вид, правило): 'offer' — предложение выдано (даёт дату), 'beyond' —
     дальше предложения (факт без даты), 'none'. Правило — константа кода."""
-    from reps import _QUOTE_RE
-    from stages import _TKP_NEG, deal_reached_tkp
     м = meta.get(stage_id) or {}
     имя, sem = str(м.get("name") or ""), str(м.get("sem") or "").upper()
     if воронка_стадии(stage_id) == "0":
@@ -117,12 +125,14 @@ def вид_стадии(stage_id, meta) -> tuple[str, str]:
         return "none", "проигрыш"
     if ПОСЛЕ_РЕАЛИЗАЦИИ.search(имя):
         return "beyond", "отгрузка/производство"
-    if any(n in имя.upper() for n in _TKP_NEG):
-        return "none", "не выдано"
-    if _QUOTE_RE.search(имя) and not str(stage_id).endswith(":EXECUTING"):
+    if ЕЩЁ_НЕ_ВЫДАНО.search(имя):
+        return "none", "ещё не выдано"
+    if ПРЕДЛОЖЕНИЕ.search(имя):
         return "offer", "имя: предложение выдано"
-    if deal_reached_tkp(str(stage_id), sem, имя):
-        return "offer", "имя или суффикс: ТКП выдано"
+    if ПОСЛЕ_ПРЕДЛОЖЕНИЯ.search(имя):
+        return "beyond", "торги/ожидание решения"
+    if str(stage_id).endswith(":EXECUTING"):
+        return "none", "до предложения (суффикс EXECUTING не засчитан)"
     return "none", "до предложения"
 
 
@@ -130,8 +140,19 @@ def медиана(xs):
     return round(statistics.median(xs)) if xs else None
 
 
+def перцентиль(xs, p):
+    if not xs:
+        return None
+    v = sorted(xs)
+    return v[min(len(v) - 1, int(round(p / 100 * (len(v) - 1))))]
+
+
 def доля(a, b):
     return round(100 * a / b) if b else None
+
+
+def _дата(s):
+    return dt.date.fromisoformat(s) if s else None
 
 
 def классифицировать(сделки, история, мета, заказы, холдинг_сделки, сегодня):
@@ -150,13 +171,21 @@ def классифицировать(сделки, история, мета, з�
     for д in сделки:
         did = str(д["ID"])
         ряд = sorted(история.get(did, []), key=lambda r: str(r[1]))
-        origin = воронка_стадии(ряд[0][0]) if ряд else str(д.get("CATEGORY_ID") or "0")
-        в_кат0 = next((дата_мск(t) for s, t in ряд if воронка_стадии(s) == "0"), None) if origin != "0" else None
+        ненулевые = [(s, t) for s, t in ряд if воронка_стадии(s) != "0"]
+        if ненулевые:
+            origin = воронка_стадии(ненулевые[0][0])
+            после = str(ненулевые[0][1])
+            в_кат0 = next((дата_мск(t) for s, t in ряд if воронка_стадии(s) == "0" and str(t) > после), None)
+        else:
+            origin = "0" if ряд or str(д.get("CATEGORY_ID") or "0") == "0" else str(д.get("CATEGORY_ID"))
+            в_кат0 = None
         sem = str(д.get("STAGE_SEMANTIC_ID") or "").upper()
         сигналы = {"кат0": bool(в_кат0), "заказ": did in первый_заказ,
                    "номер": номер_реализации(д.get("TITLE")) > 0, "успех": sem == "S"}
         cls = "lost" if sem == "F" else ("contract" if any(сигналы.values()) else "open")
-        виды = [(вид_стадии(s, мета)[0], дата_мск(t)) for s, t in ряд]
+        виды = [(вид_стадии(s, мета)[0], дата_мск(t)) for s, t in ряд if воронка_стадии(s) != "0"]
+        if в_кат0:
+            виды.append(("beyond", в_кат0))
         дата_предложения = min((t for v, t in виды if v == "offer" and t), default=None)
         if дата_предложения:
             откуда = "history"
@@ -169,84 +198,124 @@ def классифицировать(сделки, история, мета, з�
         дата_контракта = (в_кат0 or первый_заказ.get(did)) if cls == "contract" else None
         создана = дата_мск(д.get("DATE_CREATE"))
         опорная = дата_предложения or создана
-        возраст = (сегодня - dt.date.fromisoformat(опорная)).days if опорная else None
+        возраст = (сегодня - _дата(опорная)).days if опорная else None
         out.append({
-            "id": did, "holding": холдинг_сделки.get(did) or "Без клиента", "origin": origin,
+            "id": did, "company": str(д.get("COMPANY_ID") or "0"),
+            "holding": холдинг_сделки.get(did) or "Без клиента", "origin": origin,
             "realization_only": origin == "0", "cls": cls, "signals": сигналы,
-            "offer": откуда in ("history", "beyond"), "offer_from": откуда,
-            "offer_date": дата_предложения, "contract_date": дата_контракта, "created": создана,
-            "cohort": (дата_предложения or дата_контракта or создана or "")[:4] or "?",
+            "offer": откуда in ("history", "beyond"), "offer_dated": откуда == "history",
+            "offer_from": откуда, "offer_date": дата_предложения, "contract_date": дата_контракта,
+            "created": создана, "cohort": (опорная or "")[:4] or "?",
+            "mature": откуда == "history" and возраст is not None and возраст > STUCK_DAYS,
             "stuck": cls == "open" and возраст is not None and возраст > STUCK_DAYS,
             "young": cls == "open" and (возраст is None or возраст <= STUCK_DAYS),
+            "twin_of": None,
         })
     return out
+
+
+def найти_выигрыши_новой_карточкой(строки):
+    """Карточке «только реализации» — предпродажная сделка той же компании, не
+    контракт, с датированным предложением за 0…TWIN_DAYS дней до её создания.
+    Помечает найденную предпродажную сделку полем twin_of. → число пар."""
+    по_компании = collections.defaultdict(list)
+    for r in строки:
+        if not r["realization_only"] and r["offer_dated"] and r["cls"] != "contract" and r["company"] != "0":
+            по_компании[r["company"]].append(r)
+    for сп in по_компании.values():
+        сп.sort(key=lambda r: r["offer_date"])
+    пар = 0
+    for real in sorted((r for r in строки if r["realization_only"] and r["company"] != "0"),
+                       key=lambda r: r["created"] or ""):
+        c = _дата(real["created"])
+        if not c:
+            continue
+        кандидаты = [r for r in по_компании.get(real["company"], [])
+                     if r["twin_of"] is None and 0 <= (c - _дата(r["offer_date"])).days <= TWIN_DAYS]
+        if кандидаты:
+            кандидаты[-1]["twin_of"] = real["id"]        # ближайшее по времени предложение
+            пар += 1
+    return пар
 
 
 def свод(строки):
     """Строки одной выборки → счётчики конверсии предложение → контракт."""
     база = [r for r in строки if not r["realization_only"]]
-    п = [r for r in база if r["offer"]]
-    к = [r for r in п if r["cls"] == "contract"]
-    л = [r for r in п if r["cls"] == "lost"]
-    тихие = [r for r in п if r["stuck"]]
-    молодые = [r for r in п if r["young"]]
+    д = [r for r in база if r["offer_dated"]]                    # симметричная база
+    дк = [r for r in д if r["cls"] == "contract"]
+    дл = [r for r in д if r["cls"] == "lost"]
+    шир = [r for r in база if r["offer"]]
+    шк = [r for r in шир if r["cls"] == "contract"]
+    зр = [r for r in д if r["mature"]]
+    зк = [r for r in зр if r["cls"] == "contract"]
+    близнецы = [r for r in д if r["twin_of"]]
     дни = []
-    for r in к:
-        if r["offer_date"] and r["contract_date"]:
-            a, b = dt.date.fromisoformat(r["offer_date"]), dt.date.fromisoformat(r["contract_date"])
-            if b >= a:
-                дни.append((b - a).days)
+    for r in дк:
+        a, b = _дата(r["offer_date"]), _дата(r["contract_date"])
+        if a and b and b >= a:
+            дни.append((b - a).days)
+    без_даты = [r for r in шир if r["offer_from"] == "beyond"]
     return {
-        "deals": len(база), "offers": len(п), "contracts": len(к), "lost": len(л),
-        "stuck": len(тихие), "young": len(молодые),
-        "conv": доля(len(к), len(п)),
-        "conv_mature": доля(len(к), len(п) - len(молодые)),
-        "conv_decided": доля(len(к), len(к) + len(л) + len(тихие)),
+        "offers": len(д), "contracts": len(дк), "lost": len(дл),
+        "stuck": sum(1 for r in д if r["stuck"]), "young": sum(1 for r in д if r["young"]),
+        "conv": доля(len(дк), len(д)),
+        "conv_mature": доля(len(зк), len(зр)), "mature_n": len(зр),
+        "conv_twins": доля(len(дк) + len(близнецы), len(д)), "twins": len(близнецы),
+        "offers_wide": len(шир), "contracts_wide": len(шк), "conv_wide": доля(len(шк), len(шир)),
+        "undated_won": sum(1 for r in без_даты if r["cls"] == "contract"),
+        "undated_lost": sum(1 for r in без_даты if r["cls"] == "lost"),
         "contracts_only": sum(1 for r in база if r["cls"] == "contract" and r["offer_from"] == "contract_only"),
-        "offers_undated": sum(1 for r in п if r["offer_from"] == "beyond"),
         "realization_only": sum(1 for r in строки if r["realization_only"]),
-        "days_median": медиана(дни), "days_n": len(дни),
+        "days_median": медиана(дни), "days_p90": перцентиль(дни, 90), "days_n": len(дни),
     }
 
 
 def строка_свода(имя, с):
-    def f(v):
-        return "—" if v is None else f"{v}%"
-    dm = "—" if с["days_median"] is None else f"{с['days_median']} дн. (по {с['days_n']})"
-    return (f"  {str(имя)[:30]:30} предложений {с['offers']:5} · контрактов {с['contracts']:4}"
-            f" · проиграно {с['lost']:4} · тихих потерь {с['stuck']:4} · молодых {с['young']:4}"
-            f" | конверсия {f(с['conv']):>4} · зрелая {f(с['conv_mature']):>4}"
-            f" · среди решённых {f(с['conv_decided']):>4} | предложение→контракт {dm}"
-            f" | контрактов без отметки предложения {с['contracts_only']},"
-            f" предложений без даты {с['offers_undated']}, сделок только реализации {с['realization_only']}")
+    def f(v, n):
+        if v is None:
+            return "—"
+        return f"{v}%" + (" (мало данных)" if n < MIN_N else "")
+    dm = "—" if с["days_median"] is None else f"медиана {с['days_median']} / 90% {с['days_p90']} дн. (по {с['days_n']})"
+    return (f"  {str(имя)[:30]:30} ПРЕДЛОЖЕНИЙ {с['offers']:5} · КОНТРАКТОВ {с['contracts']:4} · КОНВЕРСИЯ {f(с['conv'], с['offers'])}"
+            f" | проиграно {с['lost']} · тихих потерь {с['stuck']} · молодых {с['young']}"
+            f" | зрелая {f(с['conv_mature'], с['mature_n'])} (по {с['mature_n']})"
+            f" | с выигрышами новой карточкой {f(с['conv_twins'], с['offers'])} (+{с['twins']})"
+            f" | широкая {f(с['conv_wide'], с['offers_wide'])} ({с['contracts_wide']}/{с['offers_wide']}; без даты: "
+            f"выигр. {с['undated_won']}, проигр. {с['undated_lost']})"
+            f" | предложение→контракт {dm} | контрактов без отметки {с['contracts_only']},"
+            f" карточек только реализации {с['realization_only']}")
 
 
-def слова_клиентов(компании):
-    """Основы слов из названий компаний-клиентов — для маски в названиях воронок и
-    стадий. Основа — первые 5 букв: ловит склонения («Полюс» → «Полюсу»)."""
-    стоп = {"ооо", "оао", "зао", "пао", "llc", "ltd", "филиал", "компания", "завод", "group", "общество",
-            "клиент", "сервис", "групп", "холдинг", "торгов", "промышл"}
-    основы = set()
-    for n in компании.values():
-        for w in re.findall(r"[A-Za-zА-Яа-яЁё]{4,}", str(n)):
-            w = w.lower()
-            if any(w.startswith(x) for x in стоп):
-                continue
-            основы.add(w[:5])
-    return sorted(основы, key=len, reverse=True)
+def общая_лексика(мета):
+    """Слова, встречающиеся в названиях стадий трёх и более воронок: язык процесса,
+    а не названия клиентов и не фамилии."""
+    где = collections.defaultdict(set)
+    for sid, m in мета.items():
+        for w in re.findall(r"[A-Za-zА-Яа-яЁё]+", str(m.get("name") or "")):
+            где[w.lower()].add(воронка_стадии(sid))
+    return {w for w, cats in где.items() if len(cats) >= 3} | ОБЩИЕ_СЛОВА
 
 
-def маска(текст, основы):
-    out = str(текст or "")
-    for w in основы:
-        out = re.sub(rf"(?<![A-Za-zА-Яа-яЁё]){re.escape(w)}[A-Za-zА-Яа-яЁё]*", "‹клиент›", out, flags=re.I)
-    return out
+def обезличить(текст, лексика):
+    """Слова вне общей лексики → «…»; цифры и знаки остаются."""
+    return re.sub(r"[A-Za-zА-Яа-яЁё]+", lambda m: m.group(0) if m.group(0).lower() in лексика else "…",
+                  str(текст or ""))
 
 
-def отчёт(строки, история, кам_сделки, мета, cats, слова):
+def имя_воронки(cat, cats, лексика):
+    имя = str(cats.get(cat) or "")
+    слова = re.findall(r"[A-Za-zА-Яа-яЁё]+", имя)
+    if слова and all(w.lower() in лексика for w in слова):
+        return f"воронка {cat} «{имя}»"
+    return f"воронка {cat}"
+
+
+def отчёт(строки, история, кам_сделки, мета, cats):
     import kam
+    лексика = общая_лексика(мета)
     print(f"\nВЫБОРКА: сделки, созданные с {SINCE[:10]}; одна сделка — одно предложение; год — по дате "
-          f"предложения (иначе контракта, иначе создания); {SINCE[:4]} — неполный год")
+          f"предложения, иначе создания; {SINCE[:4]} — неполный год. КОНВЕРСИЯ — симметричная (только сделки "
+          f"с датированной стадией предложения); зрелая — предложения старше {STUCK_DAYS} дн.")
 
     прошли = collections.Counter()
     for ряд in история.values():
@@ -257,19 +326,20 @@ def отчёт(строки, история, кам_сделки, мета, cats
         if прошли.get(sid):
             v, why = вид_стадии(sid, мета)
             по_воронке[воронка_стадии(sid)].append(
-                (int(m.get("sort") or 0), f"{маска(m.get('name') or sid, слова)} [{v} · {why} · {прошли[sid]}]"))
-    print("\nКлассификация стадий (стадия [вид · правило · сделок прошло]) — проверить глазами:")
+                (int(m.get("sort") or 0), f"{sid} {обезличить(m.get('name'), лексика)} [{v} · {why} · {прошли[sid]}]"))
+    чужие = sorted(s for s in прошли if s not in мета)
+    print("\nКлассификация стадий (ID имя [вид · правило · сделок прошло]):")
     for cat in sorted(по_воронке, key=int):
-        print(f"  {маска(cats.get(cat, 'воронка ' + cat), слова)}: "
-              + "; ".join(t for _, t in sorted(по_воронке[cat])))
+        print(f"  {имя_воронки(cat, cats, лексика)}: " + "; ".join(t for _, t in sorted(по_воронке[cat])))
+    if чужие:
+        print(f"  стадий в истории без справочника (удалены): {len(чужие)}, сделок через них "
+              f"{sum(прошли[s] for s in чужие)} — считаются «до предложения»")
 
     print("\nКОНВЕРСИЯ ПРЕДЛОЖЕНИЕ → КОНТРАКТ")
     print(строка_свода("Все клиенты", свод(строки)))
     hn = [r for r in строки if r["holding"] == HOLDING]
     print(строка_свода(HOLDING, свод(hn)))
 
-    # Имена в журнал — только холдингов разметки КАМ: для прочих client_dir отдаёт
-    # сырое название компании-клиента, а это клиентские данные в публичном журнале.
     известные = {имя for _, имя in kam.CLIENT_HOLDINGS} | {"Без клиента"}
     по_холдингу = collections.defaultdict(list)
     for r in строки:
@@ -289,13 +359,18 @@ def отчёт(строки, история, кам_сделки, мета, cats
     print(f"\n{HOLDING} — по воронке, где сделка заведена:")
     for cat in sorted({r["origin"] for r in hn}, key=lambda x: -свод([r for r in hn if r["origin"] == x])["offers"]):
         с = свод([r for r in hn if r["origin"] == cat])
-        if с["offers"]:
-            print(строка_свода(маска(cats.get(cat, "воронка " + cat), слова), с))
+        if с["offers"] or с["offers_wide"]:
+            print(строка_свода(имя_воронки(cat, cats, лексика), с))
 
-    к = [r for r in hn if r["cls"] == "contract" and not r["realization_only"]]
-    print(f"\n{HOLDING} — чем подтверждён контракт (у одного контракта может быть несколько признаков): "
-          + ", ".join(f"{s} {sum(1 for r in к if r['signals'][s])}" for s in ("кат0", "заказ", "номер", "успех"))
-          + f"; без переезда в кат. 0: {sum(1 for r in к if not r['signals']['кат0'])}")
+    for заголовок, выборка in ((HOLDING, hn), ("Все клиенты", строки)):
+        к = [r for r in выборка if r["cls"] == "contract" and not r["realization_only"]]
+        только_р = [r for r in выборка if r["realization_only"]]
+        print(f"\n{заголовок} — признаки контракта: " + ", ".join(
+            f"{s} {sum(1 for r in к if r['signals'][s])}" for s in ("кат0", "заказ", "номер", "успех"))
+            + f"; без переезда в кат. 0 {sum(1 for r in к if not r['signals']['кат0'])}"
+            + f". Карточек только реализации {len(только_р)}: с заказом/номером "
+            + f"{sum(1 for r in только_р if r['signals']['заказ'] or r['signals']['номер'])}, проиграно "
+            + f"{sum(1 for r in только_р if r['cls'] == 'lost')}; найдено предпродажных пар {sum(1 for r in выборка if r['twin_of'])}")
 
     по_каму = [r for r in строки if r["id"] in кам_сделки]
     общие = {r["id"] for r in hn} & кам_сделки
@@ -318,11 +393,13 @@ def читать_историю(client, ids):
             data = client.call_envelope("crm.stagehistory.list", {
                 "entityTypeId": 2, "filter": {"OWNER_ID": часть},
                 "select": ["ID", "OWNER_ID", "CREATED_TIME", "STAGE_ID"],
-                "order": {"ID": "ASC"}, "start": start})
-            res = (data or {}).get("result") or {}
+                "order": {"ID": "ASC"}, "start": start}) or {}
+            res = data.get("result") or {}
             items = (res.get("items") if isinstance(res, dict) else res) or []
             if total is None:
-                total = int((data or {}).get("total") or 0)
+                if "total" not in data:
+                    return история, "в ответе истории стадий нет total — полноту не проверить"
+                total = int(data.get("total") or 0)
                 if ({str(x.get("OWNER_ID")) for x in items} - свои) or total > 50 * 80:
                     return история, "фильтр OWNER_ID массивом не сработал — обход остановлен"
             got += len(items)
@@ -330,11 +407,11 @@ def читать_историю(client, ids):
                 o, s = str(x.get("OWNER_ID")), str(x.get("STAGE_ID") or "")
                 if o in свои and s and all(s != st for st, _ in история.get(o, [])):
                     история.setdefault(o, []).append((s, str(x.get("CREATED_TIME") or "")))
-            nxt = (data or {}).get("next")
+            nxt = data.get("next")
             if not nxt or not items:
                 break
             start = nxt
-        if got < (total or 0):
+        if got < total:
             return история, f"история стадий неполна в пачке {i // 50 + 1}: {got} из {total}"
     return история, None
 
@@ -346,18 +423,18 @@ def main() -> int:
     from bitrix_client import BitrixClient, бюджет_портала, сводка_нагрузки
 
     client = BitrixClient(config.Settings.load().bitrix_webhook_url)
-    env = client.call_envelope("crm.deal.list", {"filter": {">=DATE_CREATE": SINCE}, "select": ["ID"], "start": 0})
-    всего = int((env or {}).get("total") or 0)
+    env = client.call_envelope("crm.deal.list", {"filter": {">=DATE_CREATE": SINCE}, "select": ["ID"], "start": 0}) or {}
+    всего = int(env.get("total") or 0)
     env = client.call_envelope("crm.item.list", {"entityTypeId": ORDER_ENTITY, "filter": {},
-                                                 "select": ["id"], "start": 0})
-    ждём_заказов = int((env or {}).get("total") or 0)
+                                                 "select": ["id"], "start": 0}) or {}
+    ждём_заказов = int(env.get("total") or 0)
     if всего <= 0 or ждём_заказов <= 0:
         print(f"::error::не получено число сделок ({всего}) или заказов ({ждём_заказов}) — полноту не проверить")
         return 1
     rps, par = бюджет_портала()
     n = 2 + всего // 50 + 1 + всего // 150 + (всего // 50 + 1) * 6 + ждём_заказов // 50 + 1 + 60
     print(f"ожидается: сделок с {SINCE[:10]} — {всего}, заказов поставщикам — {ждём_заказов}; "
-          f"оценка ≈ {n} запросов, ≈ {n * par / rps / 60:.0f} мин при {rps:g}/с")
+          f"оценка ≈ {n} запросов, ≈ {n * par / rps / 60:.0f} мин при {rps:g}/с без учёта задержек сети")
 
     сделки = client.list_deals_fast(filter={">=DATE_CREATE": SINCE}, select=[
         "ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE",
@@ -367,25 +444,39 @@ def main() -> int:
         print("::error::обход сделок оборвался — итог был бы неполным")
         return 1
 
-    компании = client.companies_by_ids({str(д.get("COMPANY_ID")) for д in сделки
-                                        if str(д.get("COMPANY_ID") or "0") != "0"})
+    нужны = {str(д.get("COMPANY_ID")) for д in сделки if str(д.get("COMPANY_ID") or "0") != "0"}
+    компании = client.companies_by_ids(нужны)
+    print(f"компаний у сделок: запрошено {len(нужны)}, получено {len(компании)}; сделок с компанией, "
+          f"которую портал не вернул: {sum(1 for д in сделки if str(д.get('COMPANY_ID') or '0') in нужны - set(компании))}")
+
+    известные = {имя for _, имя in kam.CLIENT_HOLDINGS}
 
     def холдинг_компании(cid):
         if not cid or cid == "0":
             return "Без клиента"
         имя = компании.get(cid, "")
         h = kam.client_dir(имя)
-        return HOLDING if (h == HOLDING or ГРУППА_ШИРЕ.search(имя)) else h
+        if h not in известные and ГРУППА_ШИРЕ.search(имя):
+            return HOLDING
+        return h
     холдинг = {str(д["ID"]): холдинг_компании(str(д.get("COMPANY_ID") or "0")) for д in сделки}
     по_разметке = sum(1 for n in компании.values() if kam.client_dir(n) == HOLDING)
-    шире = sorted(n for n in компании.values() if kam.client_dir(n) != HOLDING and ГРУППА_ШИРЕ.search(n))
-    print(f"компаний у сделок: {len(компании)}; юрлиц {HOLDING}: по разметке КАМ {по_разметке}, "
-          f"добавлено шаблоном группы {len(шире)}" + (": " + "; ".join(шире) if шире else ""))
+    шире = sum(1 for n in компании.values() if kam.client_dir(n) not in известные and ГРУППА_ШИРЕ.search(n))
+    print(f"юрлиц {HOLDING}: по разметке КАМ {по_разметке}, добавлено шаблоном группы {шире} (названия не печатаются)")
 
     состав = people.roster(client)
+    if not состав:
+        print("::error::состав портала (user.get) не получен — проверку по КАМ не сделать")
+        return 1
     отдел = {uid for uid, p in состав.items() if DEPT_HOLDING in (p.get("depts") or [])}
-    кам_сделки = {str(д["ID"]) for д in сделки
-                  if str(д.get(people.KAM_F) or д.get(people.KAM_OLD) or д.get("ASSIGNED_BY_ID") or "") in отдел}
+
+    def кам_сделки_(д):
+        for f in (people.KAM_F, people.KAM_OLD, "ASSIGNED_BY_ID"):
+            u = people._uid(д.get(f))
+            if u:
+                return u
+        return ""
+    кам_сделки = {str(д["ID"]) for д in сделки if кам_сделки_(д) in отдел}
     print(f"отдел {DEPT_HOLDING}: сотрудников (вкл. уволенных) {len(отдел)}, сделок по КАМ {len(кам_сделки)}")
 
     мета = client.deal_stage_meta()
@@ -395,7 +486,11 @@ def main() -> int:
     if ошибка:
         print(f"::error::{ошибка}")
         return 1
-    print(f"история стадий: сделок с записями {len(история)} из {len(сделки)}")
+    без = len(сделки) - len(история)
+    print(f"история стадий: сделок с записями {len(история)} из {len(сделки)}, без записей {без}")
+    if без > len(сделки) // 100:
+        print("::error::без истории стадий больше 1 % сделок — итог был бы неполным")
+        return 1
 
     сырые = client.list_items(ORDER_ENTITY, filter={}, select=["id", "stageId", "createdTime", "parentId2"])
     if len(сырые) < ждём_заказов:
@@ -405,7 +500,9 @@ def main() -> int:
     print(f"заказов поставщикам: {len(сырые)}, непроигранных {len(заказы)}")
 
     строки = классифицировать(сделки, история, мета, заказы, холдинг, dt.datetime.now(MSK).date())
-    отчёт(строки, история, кам_сделки, мета, cats, слова_клиентов(компании))
+    пар = найти_выигрыши_новой_карточкой(строки)
+    print(f"карточек только реализации с найденной предпродажной парой: {пар}")
+    отчёт(строки, история, кам_сделки, мета, cats)
     print(сводка_нагрузки())
     return 0
 
