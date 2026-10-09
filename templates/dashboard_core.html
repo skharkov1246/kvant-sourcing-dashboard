@@ -142,6 +142,12 @@
   .row.isgone .fill{opacity:.45}
   #rowsA .top{gap:8px}#rowsA .nm{min-width:0}#rowsA .ct{white-space:nowrap}
   .wklbl i{display:block;font-style:normal;color:var(--dim);font-size:10px}
+  /* воронка пресейла */
+  .psflag{display:inline-block;margin:0 4px 2px 0;padding:0 6px;border-radius:5px;font:600 10.5px var(--mono);border:1px solid rgba(229,99,77,.45);color:var(--warn);white-space:nowrap}
+  .psflag.soft{border-color:var(--line);color:var(--mut)}
+  .pswrap{overflow-x:auto}
+  .pswrap table{min-width:640px}
+  #psSec a{color:var(--a2);text-decoration:none}#psSec a:hover{text-decoration:underline}
 
   footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:11.5px;line-height:1.7}
   footer b{color:var(--mut)}
@@ -517,7 +523,12 @@
   </div>
 </div>
 
-<div class="secttl"><b>2</b> · Конверсия по стадиям</div>
+<div id="psWrap" hidden>
+<div class="secttl"><b>2</b> · Воронка пресейла</div>
+<section class="card" id="psSec"></section>
+</div>
+
+<div class="secttl"><b>3</b> · Конверсия по стадиям</div>
 <section class="card">
   <h2><span class="tag a">БЛОК A</span> Структура запросов по стадиям + результат</h2>
   <div class="note">Цветная полоса — все запросы сорсера по стадиям. Закрытые раскладываются на <span class="q">КП/выбран</span> + <span style="color:var(--a2)">отказ</span> + <span class="nrc">молчание</span>. «Ср. срок» — дней от создания до смены стадии у закрытых. «Файл КП» — карточки, куда поставщик приложил предложение; «✓ КП» — стадия «КП получено». Разрыв между ними — предложения, которые пришли, но в работу не приняты.</div>
@@ -533,7 +544,7 @@
   <div class="insight" style="margin-top:16px"><h3>Конверсия и скорость</h3><div id="insConv"></div></div>
 </section>
 
-<div class="secttl"><b>3</b> · Цепочка «запрос → сделка»</div>
+<div class="secttl"><b>4</b> · Цепочка «запрос → сделка»</div>
 <div class="grid">
   <div>
     <section class="card">
@@ -554,7 +565,7 @@
   </div>
 </div>
 
-<div class="secttl"><b>4</b> · Кто заводит запросы</div>
+<div class="secttl"><b>5</b> · Кто заводит запросы</div>
 <div class="kpis" id="kpisOrigin" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px"></div>
 <div class="grid">
   <div>
@@ -600,7 +611,7 @@
   </div>
 </div>
 
-<div class="secttl"><b>5</b> · Покрытие сделок сорсингом</div>
+<div class="secttl"><b>6</b> · Покрытие сделок сорсингом</div>
 <div class="kpis" id="kpisCov" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px"></div>
 <div class="grid">
   <div>
@@ -631,7 +642,7 @@
   <div id="covWeeklyBody" style="margin-top:6px"></div>
 </section>
 
-<div class="secttl"><b>6</b> · Реально отправлено vs создано (+ фейк-отправки)</div>
+<div class="secttl"><b>7</b> · Реально отправлено vs создано (+ фейк-отправки)</div>
 <section class="card">
   <h2><span class="tag a">БЛОК A</span> Письмо действительно ушло поставщику?</h2>
   <div class="note">«С письмом» = на карточке есть исходящее CRM-письмо (факт отправки). «Без письма» — карточка создана, но письма через систему не было. «Фейк» = карточка двинута из «Новый», но письма нет. «Дожим%» = доля карточек с ≥2 письмами.</div>
@@ -642,7 +653,7 @@
   </table>
 </section>
 
-<div class="secttl"><b>7</b> · Разнообразие поставщиков</div>
+<div class="secttl"><b>8</b> · Разнообразие поставщиков</div>
 <div class="grid">
   <section class="card"><h2>Основные запрошенные поставщики</h2><div class="note">Доля запросов (СП-166, блок A) по поставщикам — насколько диверсифицирована база. Наведи на сектор — имя и число запросов.</div><div class="pie" id="supPie"></div></section>
   <section class="card"><h2>Поставщиков на сорсера</h2><div class="note">Сколько РАЗНЫХ поставщиков запрашивает каждый — ширина воронки поиска. Клик — кому и что слал.</div><div id="supPerSorcer" class="ownlist"></div></section>
@@ -793,6 +804,50 @@ if (M.send && M.send.rows){
   if(M.send&&M.send.totals){const ts=M.send.totals;
   document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${ts.sent}</td><td class="r num nrc">${ts.nosend}</td><td class="r num">${ts.sentPct}%</td><td class="r num nrc">${ts.fake}</td><td class="r"></td></tr>`;}
 }
+
+
+// ---- воронка пресейла: сделки, которые сорсинг ведёт до ТКП
+(function renderPresale(){
+  const P=M.presale; if(!P||!P.head) return;
+  document.getElementById('psWrap').hidden=false;
+  const H=P.head, el=document.getElementById('psSec');
+  const url=id=>`https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
+  const FL={gone:['ушёл сорсер',''],nosrc:['нет сорсера',''],norfq:['нет запросов',''],stale:['стоит','']};
+  const flag=(f,r)=>`<span class="psflag">${f==='stale'?`стоит ${r.days} дн`:FL[f][0]}</span>`;
+  const kp=(lbl,val,meta,clz)=>`<div class="kpi ${clz||''}"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
+  let h=`<h2>Воронка «${_esc(P.name)}» <span class="subtotal">сделок <b>${H.total}</b></span></h2>`
+   +`<div class="note">Сделки, которые сорсинг ведёт от запроса заказчика до готовой экономики и ТКП: назначение сорсера → проработка ТЗ → поиск поставщиков и сбор КП → анализ и сравнение → экономика. Запросы поставщикам (СП-166) — под этими сделками. Сумма в сделке появляется после сравнения предложений, поэтому заполнена у ${H.sumPct}%.</div>`
+   +`<div class="kpis" style="grid-template-columns:repeat(6,1fr);margin-top:12px">`
+   +kp('Открыто',H.open,`за 4 недели заведено ${H.new28}`,'')
+   +kp('С запросом поставщику',H.withRfqPct+'%',`${H.withRfq} сделок · ${H.rfq} запросов · медиана ${H.rfqMed??'—'} на сделку`,'ok')
+   +kp('До первого запроса',H.lagMed!=null?H.lagMed+' дн':'—',`робот завёл ${H.robotRfqPct}% запросов`,'')
+   +kp('Без сорсера',H.noSrc,`«Сорсер» заполнен у ${H.srcPct}% сделок`,H.noSrc?'warn':'')
+   +kp('Без запросов',H.noRfq,`открыты ${H.noRfqDays}+ дн, ни одного запроса`,H.noRfq?'warn':'')
+   +kp('Стоят',H.stale,`в стадии дольше ${H.staleDays} дн`,H.stale?'warn':'')
+   +`</div>`;
+  // стадии и исходы
+  const proc=P.stages.filter(s=>s.sem!=='F'&&s.sem!=='S'), mx=Math.max(1,...proc.map(s=>s.n));
+  const won=P.stages.filter(s=>s.sem==='S').reduce((a,s)=>a+s.n,0);
+  const lmx=Math.max(1,...(P.lost||[]).map(x=>x.n));
+  h+=`<div class="grid" style="margin-top:14px"><section class="card"><h2>Где стоят сделки</h2><div class="note">Рабочие стадии по порядку: сколько сделок и сколько дней они в стадии (медиана · максимум).</div><div class="barlist">`
+   +proc.map(s=>`<div class="blrow"><div class="blt"><span>${_esc(s.name)} <span class="dimv mono">${s.n?`${s.med??'—'} · ${s.max??'—'} дн`:''}</span>${s.stale?` <span class="psflag">${s.stale} стоят</span>`:''}</span><b>${s.n}</b></div><div class="bltrack"><i style="width:${(s.n/mx*100).toFixed(0)}%"></i></div></div>`).join('')
+   +`</div><div class="note" style="margin-top:8px">Выиграно: <b>${won}</b> · закрыто отказом: <b>${H.lost}</b>${H.otherStage?` · вне справочника стадий: ${H.otherStage}`:''}</div></section>`
+   +`<section class="card"><h2>Почему отказ</h2><div class="note">Стадия отказа — единственная причина, которую портал хранит машинно.</div><div class="barlist">`
+   +((P.lost||[]).map(x=>`<div class="blrow"><div class="blt"><span>${_esc(x.name)}</span><b class="nrc">${x.n}</b></div><div class="bltrack"><i style="width:${(x.n/lmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('')||'<div class="dimv">отказов нет</div>')
+   +`</div><div class="note" style="margin-top:10px">Заведено по неделям (Пн–Вс): ${(P.weeks||[]).map(w=>`${_dm(w.from)} <b>${w.n}</b>${w.lost?` <span class="nrc">−${w.lost}</span>`:''}`).join(' · ')}</div></section></div>`;
+  // по сорсеру сделки
+  h+=`<h2 style="margin-top:16px">По сорсеру сделки</h2><div class="note">Кто записан «Сорсером» в сделке пресейла: что открыто, сколько запросов ушло поставщикам и сколько КП пришло файлом.</div>`
+   +`<div class="pswrap"><table><thead><tr><th>Сорсер</th><th class="r">Открыто</th><th class="r">Отказ</th><th class="r">Выиграно</th><th class="r">Запросов</th><th class="r">Файлов КП</th><th class="r">Без запросов</th><th class="r">Стоят</th></tr></thead><tbody>`
+   +(P.bySourcer||[]).map(a=>`<tr><td><div class="who">${_esc(a.n)}${a.gone?'<span class="gone">ушёл</span>':''}</div></td><td class="num r">${a.open}</td><td class="num r dimv">${a.lost}</td><td class="num r">${a.won}</td><td class="num r">${a.rfq}</td><td class="num r">${a.quotes}</td><td class="num r ${a.norfq?'nrc':'dimv'}">${a.norfq}</td><td class="num r ${a.stale?'nrc':'dimv'}">${a.stale}</td></tr>`).join('')
+   +`</tbody></table></div>`;
+  // что делать
+  const act=P.act||[];
+  h+=`<h2 style="margin-top:16px">Требует действия <span class="subtotal">сделок <b>${act.length}</b></span></h2><div class="note">Сначала — ушедший сорсер и сделки без сорсера (назначить), затем сделки без единого запроса поставщикам, затем застрявшие. Клик — сделка в Битриксе.</div>`
+   +(act.length?`<div class="pswrap"><table><thead><tr><th>Сделка</th><th>Стадия</th><th class="r">Дней в стадии</th><th>Сорсер</th><th class="r">Запросов</th><th>Что не так</th></tr></thead><tbody>`
+   +act.map(r=>`<tr><td><a href="${url(r.id)}" target="_blank" rel="noopener">${_esc(r.t)}</a><div class="dep">заведена ${_dm(r.created)} · ${r.age} дн назад${r.kam?` · КАМ ${_esc(r.kam)}`:''}</div></td><td>${_esc(r.stageName)}</td><td class="num r">${r.days??'—'}</td><td>${r.src?_esc(r.src):'<span class="dimv">—</span>'}</td><td class="num r">${r.rfq}</td><td>${r.flags.map(f=>flag(f,r)).join('')}</td></tr>`).join('')
+   +`</tbody></table></div>`:'<div class="dimv">открытых сделок с проблемами нет</div>');
+  el.innerHTML=h;
+})();
 
 // ---- tkp list
 const tkpMax=Math.max(1,...A.map(r=>r.tkpP));

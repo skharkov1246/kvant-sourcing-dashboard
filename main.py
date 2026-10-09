@@ -30,6 +30,7 @@ import contracts as contracts_mod
 import metrics as metrics_mod
 import people as people_mod
 import period as period_mod
+import presale as presale_mod
 import reps as reps_mod
 from bitrix_client import BitrixClient, без_вебхука
 
@@ -503,6 +504,27 @@ def run(args) -> int:
           f"у ушедших открытых карточек {_k['goneOpen']}, легло после ухода {_k['goneAfter']}")
     _sanity_gates(p, rfqs, period_deals, dept_a_ids, m.get("sourcersA") or [],
                   skip=bool(args.allow_empty or args.max_deals))
+
+    # Воронка пресейла: сделки, которые ведёт сорсинг до ТКП. Стадии — из общего
+    # справочника (тот же вызов, что client.stages), запросы — уже выгруженные rfqs;
+    # новое чтение портала одно — сами сделки воронки (их около сотни).
+    try:
+        _ps = presale_mod.find_category(category_names) or presale_mod.find_category(
+            people_mod.deal_categories(client))
+        if _ps:
+            _pdeals = client.list_deals_fast(filter={"CATEGORY_ID": int(_ps[0])}, select=presale_mod.DEAL_SELECT)
+            m["presale"] = presale_mod.compute(
+                cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
+                rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids)
+            _h = m["presale"]["head"]
+            print(f"• Воронка пресейла #{_ps[0]}: сделок {_h['total']}, открыто {_h['open']}, отказ {_h['lost']}, "
+                  f"выиграно {_h['won']}; с запросом {_h['withRfqPct']} %, запросов {_h['rfq']}; "
+                  f"без сорсера {_h['noSrc']}, без запросов {_h['noRfq']}, стоят > {_h['staleDays']} дн {_h['stale']}, "
+                  f"ведёт ушедший {_h['gone']}")
+        else:
+            print("• Воронка пресейла: воронки с таким именем в портале нет")
+    except Exception as e:                                   # noqa: BLE001
+        print(f"  ⚠ воронка пресейла пропущена: {type(e).__name__}: {без_вебхука(e)}")
 
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
