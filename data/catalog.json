@@ -3022,6 +3022,7 @@
         "gpu/tools/build_targets.py",
         "scripts/budget_snapshot.py",
         "scripts/preflight.py",
+        "scripts/probe_conversion.py",
         "templates/dashboard_core.html"
       ]
     },
@@ -3076,7 +3077,7 @@
       ],
       "last_change": "2026-10-09",
       "last_author": "Claude",
-      "last_commit": "0f248dc0",
+      "last_commit": "cbe9fac8",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7482,7 +7483,7 @@
       },
       "last_change": "2026-10-09",
       "last_author": "Claude",
-      "last_commit": "0f248dc0",
+      "last_commit": "cbe9fac8",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",

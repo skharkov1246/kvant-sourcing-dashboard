@@ -92,7 +92,13 @@ def _load_budget_plans() -> tuple[dict[int, dict], dict[str, dict], str]:
 
 SLOW_MIN_DAYS = 7        # порог замедленности не бывает ниже недели
 SLOW_MULT = 2.0          # … и не ниже 2× медианы по стадии
-HIST_SINCE = "2024-06-01T00:00:00"  # глубина истории стадий (бенчмарки + таймлайны)
+HIST_SINCE = "2024-06-01T00:00:00"  # глубина истории стадий (таймлайны сделок и заказов)
+# Бенчмарки стадий («сколько обычно длится стадия», порог замедленности, медиана цикла)
+# считаются по последним 12 месяцам, а не по всей истории с 2024 года: команда и процесс
+# меняются — люди приходят и уходят, — и медиана двухлетней давности мерит не нынешний
+# отдел. Стадия, по которой за год меньше BENCH_MIN переходов, берёт всю историю.
+BENCH_DAYS = 365
+BENCH_MIN = 5
 
 
 def _regno(*titles) -> int:
@@ -170,9 +176,26 @@ def _parse_econ_money(raw, rate) -> float:
         return 0.0
 
 
-def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
+def compute(client: BitrixClient, *, as_of: dt.date | None = None,
+            people: dict[str, dict] | None = None) -> dict:
+    """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
+    уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
+    сделки и заказы не были видны как работа без хозяина."""
     today = as_of or dt.date.today()
     now_iso = period_mod.now(_MSK).isoformat()
+    people = people or {}
+    gone_ids = {u for u, x in people.items() if not x.get("active", True)}
+
+    def who(v) -> tuple[str, bool]:
+        """(подпись, ушёл ли). Поле «сотрудник» бывает списком — берём первого."""
+        if isinstance(v, (list, tuple)):
+            v = next((x for x in v if str(x or "") not in ("", "0")), "")
+        u = str(v or "")
+        if u in ("", "0", "None"):
+            return "", False
+        if u in gone_ids:
+            return f"{people[u].get('name') or 'user#' + u} (уволен)", True
+        return client.user_name(u), False
     curlist = client.call("crm.currency.list", {}) or []
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
     def eur(o, cu): return float(o or 0) * rate.get(cu, 1.0)
@@ -222,14 +245,21 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     dproc = client.deal_stages_process(0)                  # только рабочие: без успеха и проигрышей
     dorder = {sid: i for i, sid in enumerate(dproc)}
     ostages: dict[str, str] = {}                           # стадии всех воронок СП-172
-    ocat_ids = sorted({int(o.get("categoryId") or 0) for o in orders if o.get("categoryId")} | {26})
+    # воронки заказов — по префиксу стадии «DT172_<воронка>:…»: categoryId в выборке
+    # нет, и прежде здесь всегда оставалась одна воронка 26 — стадии заказов других
+    # воронок показывались сырыми кодами
+    ocat_ids = sorted({int(m.group(1)) for o in orders
+                       if (m := re.match(r"DT172_(\d+):", str(o.get("stageId") or "")))} | {26})
     for cid in ocat_ids:
         try:
             ostages.update(client.spa_stages(172, cid))
         except Exception:
             pass
-    dhist = client.stage_history(2, category_id=0, since=HIST_SINCE)
-    ohist = client.stage_history(172, since=HIST_SINCE)
+    dlast: dict[str, tuple[str, str]] = {}                 # последний переход = вход в текущую стадию
+    olast: dict[str, tuple[str, str]] = {}
+    dhist = client.stage_history(2, category_id=0, since=HIST_SINCE, last=dlast)
+    ohist = client.stage_history(172, since=HIST_SINCE, last=olast)
+    bench_from = (period_mod.now(_MSK) - dt.timedelta(days=BENCH_DAYS)).isoformat()
 
     def _stage_name(sid: str, cat=None) -> str:
         if sid in dstages:
@@ -237,20 +267,24 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         return ostages.get(sid) or sid
 
     # 5. бенчмарки: медианная длительность каждой стадии ЗАКАЗОВ (по истории переходов)
-    odur: dict[str, list[float]] = defaultdict(list)
-    for oid, entries in ohist.items():
-        for (s1, t1), (_s2, t2) in zip(entries, entries[1:]):
-            d = _days_between(t1, t2)
-            if d is not None:
-                odur[s1].append(d)
+    #    — за последние BENCH_DAYS; стадия с редкими переходами берёт всю историю
+    def _durations(hist: dict) -> tuple[dict, dict]:
+        recent: dict[str, list[float]] = defaultdict(list)
+        full: dict[str, list[float]] = defaultdict(list)
+        for entries in hist.values():
+            for (s1, t1), (_s2, t2) in zip(entries, entries[1:]):
+                d = _days_between(t1, t2)
+                if d is None:
+                    continue
+                full[s1].append(d)
+                if str(t1) >= bench_from:
+                    recent[s1].append(d)
+        return {s: (recent[s] if len(recent.get(s, ())) >= BENCH_MIN else v) for s, v in full.items()}, recent
+
+    odur, odur_recent = _durations(ohist)
     omed = {s: round(_median(v) or 0, 1) for s, v in odur.items() if v}
     # …и стадий СДЕЛОК в кат.0
-    ddur: dict[str, list[float]] = defaultdict(list)
-    for did_h, entries in dhist.items():
-        for (s1, t1), (_s2, t2) in zip(entries, entries[1:]):
-            d = _days_between(t1, t2)
-            if d is not None:
-                ddur[s1].append(d)
+    ddur, ddur_recent = _durations(dhist)
     dmed = {s: round(_median(v) or 0, 1) for s, v in ddur.items() if v}
 
     def _slow_threshold(stage_id: str, med: dict) -> float:
@@ -341,8 +375,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         cur_stage = str(d.get("STAGE_ID") or "")
         stage_days = None
         if tl:
-            # возраст ТЕКУЩЕЙ стадии — от последнего входа
-            stage_days = round(_days_between(tl[-1][1], now_iso) or 0, 1)
+            # возраст ТЕКУЩЕЙ стадии — от последнего перехода, если он и есть вход в
+            # неё; первые входы врут, когда сделка вернулась в стадию, где уже была
+            _ls = dlast.get(did)
+            stage_days = round(_days_between(_ls[1] if _ls and _ls[0] == cur_stage else tl[-1][1],
+                                             now_iso) or 0, 1)
         done = sem == "S" or (bool(ords) and all(str(o.get("stageId", "")).endswith(":SUCCESS") for o in ords))
         closed = sem in ("S", "F")
 
@@ -363,7 +400,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             osid = str(o.get("stageId") or "")
             olive = not (osid.endswith(":SUCCESS") or osid.endswith(":FAIL"))
             otl = ohist.get(str(o.get("id")), [])
-            oin = otl[-1][1] if otl else str(o.get("movedTime") or o.get("createdTime") or "")
+            _ol = olast.get(str(o.get("id")))
+            # вход в ТЕКУЩУЮ стадию: последний переход истории, иначе время последнего
+            # движения карточки; первый вход в последнюю новую стадию — не то же самое
+            oin = (_ol[1] if _ol and _ol[0] == osid
+                   else str(o.get("movedTime") or (otl[-1][1] if otl else "") or o.get("createdTime") or ""))
             odays = round(_days_between(oin, now_iso) or 0, 1) if oin else None
             othr = _slow_threshold(osid, omed)
             oslow = bool(olive and odays is not None and odays > othr)
@@ -407,7 +448,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
                 "lossEur": round(o_rev * dl_days / 365 * CAP_RATE) if olate else 0,
                 "burnDay": round(o_rev * CAP_RATE / 365, 1) if olive else 0,
                 "city": str(o.get(CITY_F) or ""),
-                "oss": client.user_name(o.get(OSS_F)) if o.get(OSS_F) else "",
+                "oss": who(o.get(OSS_F))[0],
+                "ossGone": who(o.get(OSS_F))[1],
                 "prodEnd": pend.strftime("%d.%m.%Y") if pend else "",
                 # план производства заканчивается позже обещания клиенту — план сам себе противоречит
                 "prodAfterDl": bool(pend and dl and pend > dl),
@@ -472,9 +514,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "econRest": _money(_parse_econ_money(d.get(ECON_REST), rate)) if d.get(ECON_REST) else "",
             "norders": len(ords), "suppliers": ", ".join(suppliers)[:70],
             # разрезы, которые ведёт снабжение: ответственный сделки, схема поставки, город
-            "manager": client.user_name(d.get("ASSIGNED_BY_ID")) or "—",
+            "manager": who(d.get("ASSIGNED_BY_ID"))[0] or "—",
             "oss": (", ".join(sorted({o["oss"] for o in ords_det if o["oss"]}))[:60]
-                    or client.user_name(d.get(OSS_DEAL)) or "—"),
+                    or who(d.get(OSS_DEAL))[0] or "—"),
+            # сделку или её живые заказы ведёт уволенный: работа без хозяина
+            "managerGone": who(d.get("ASSIGNED_BY_ID"))[1],
+            "ossGone": (any(o["ossGone"] for o in ords_det if o["live"])
+                        or (not any(o["oss"] for o in ords_det) and who(d.get(OSS_DEAL))[1])),
             "cities": ", ".join(sorted({o["city"] for o in ords_det if o["city"]}))[:50],
             "done": done, "closed": closed, "lost": sem == "F",
             "inCat0": in_cat0,
@@ -520,11 +566,15 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     slow_rows = [r for r in live_rows if r["slow"]]
 
     # 7. скорость: сводные метрики
-    cycle_days = []                     # полный цикл заказа: создание → SUCCESS
+    # полный цикл заказа: создание карточки → SUCCESS, по заказам, закрытым за последние
+    # BENCH_DAYS. Начало — дата создания карточки: у заказа, начатого до HIST_SINCE,
+    # первая запись истории обрезана, и цикл выходил короче настоящего
+    o_created = {str(o.get("id")): str(o.get("createdTime") or "") for o in orders}
+    cycle_days = []
     for oid, entries in ohist.items():
         succ = next((t for s, t in entries if s.endswith(":SUCCESS")), None)
-        if succ and entries:
-            d0 = _days_between(entries[0][1], succ)
+        if succ and entries and str(succ) >= bench_from:
+            d0 = _days_between(o_created.get(oid) or entries[0][1], succ)
             if d0 is not None:
                 cycle_days.append(d0)
     lag_vals = [r["firstLag"] for r in rows if r["firstLag"] is not None and r["norders"] > 0]
@@ -667,7 +717,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     # разрезы просрочки: по ответственному сделки и по схеме поставки
     def _cut(keyfn) -> list:
         agg: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0])   # [просроч. заказов, сделок, € , всего живых заказов]
+        worst: dict[str, dict] = {}                                  # главная просроченная сделка человека
         for r in live_rows:
+            mine = set()
             for o in r["orders"]:
                 if not o["live"]:
                     continue
@@ -676,14 +728,37 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
                 if o["late"]:
                     agg[k][0] += 1
                     agg[k][2] += o["buyRaw"]
-            if r["late"]:
-                agg[keyfn(r, r["orders"][0]) if r["orders"] else "—"][1] += 1
+                    mine.add(k)
+            # просроченная сделка засчитывается каждому, у кого в ней просрочен заказ,
+            # а не только хозяину первого заказа
+            for k in mine:
+                agg[k][1] += 1
+                w = worst.get(k)
+                if w is None or (r["lateDays"] or 0) > (w["days"] or 0):
+                    worst[k] = {"seq": r["seq"], "deal": r["deal"], "customer": r["customer"],
+                                "days": r["lateDays"]}
         out = [{"name": k, "lateOrders": v[0], "lateDeals": v[1], "buy": round(v[2]),
                 "buyLbl": _money(v[2]), "liveOrders": v[3],
-                "pct": round(v[0] / v[3] * 100) if v[3] else 0}
+                "pct": round(v[0] / v[3] * 100) if v[3] else 0,
+                "gone": k.endswith("(уволен)"), "top": worst.get(k)}
                for k, v in agg.items() if v[0]]
         out.sort(key=lambda x: -x["lateOrders"])
         return out[:12]
+
+    # ЖИВАЯ РАБОТА УВОЛЕННЫХ: сделку ведёт ушедший ответственный или её живые заказы —
+    # ушедший ОСС. Это не просрочка, а работа без хозяина: её переназначают.
+    gone_rows = [r for r in live_rows if r["managerGone"] or r["ossGone"]]
+    gone = {
+        "deals": len(gone_rows),
+        "byManager": sum(1 for r in gone_rows if r["managerGone"]),
+        "byOss": sum(1 for r in gone_rows if r["ossGone"]),
+        "orders": sum(1 for r in gone_rows for o in r["orders"] if o["live"]),
+        "late": sum(1 for r in gone_rows if r["late"]),
+        "sale": _money(sum(r["saleEur"] for r in gone_rows)),
+        "saleNum": round(sum(r["saleEur"] for r in gone_rows)),
+        "people": len({r["manager"] for r in gone_rows if r["managerGone"]}
+                      | {o["oss"] for r in gone_rows for o in r["orders"] if o["live"] and o["ossGone"]}),
+    }
 
     deadlines = {
         "lateDeals": len(late_rows), "lateOrders": late_orders_n,
@@ -806,7 +881,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "orderBench": bench,          # медианы стадий заказов («где копится время»)
             "dealBench": dbench,          # медианы стадий сделки в кат.0
             "slowMin": SLOW_MIN_DAYS, "slowMult": SLOW_MULT,
+            # окно бенчмарков и сколько стадий посчитано по нему, а не по всей истории
+            "benchDays": BENCH_DAYS,
+            "benchRecent": sum(1 for v in odur_recent.values() if len(v) >= BENCH_MIN)
+                           + sum(1 for v in ddur_recent.values() if len(v) >= BENCH_MIN),
         },
+        "gone": gone,
         "orphan": {"n": len(orphan), "buy": _money(orphan_buy)},
         "suppliers": {
             "label": f"на {today.strftime('%d.%m.%Y')}",

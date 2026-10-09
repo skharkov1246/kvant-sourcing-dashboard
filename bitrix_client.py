@@ -551,10 +551,16 @@ class BitrixClient:
         return first
 
     def stage_history(self, entity_type_id: int, *, category_id: int | None = None,
-                      since: str | None = None) -> dict[str, list[tuple[str, str]]]:
+                      since: str | None = None,
+                      last: dict | None = None) -> dict[str, list[tuple[str, str]]]:
         """Полная история стадий: {OWNER_ID: [(STAGE_ID, CREATED_TIME), …]} — ПЕРВЫЙ вход
         в каждую стадию, с полным временем (ISO), в хронологическом порядке.
-        Для замера скорости переходов (сделки кат.0, заказы СП-172 и т.п.)."""
+        Для замера скорости переходов (сделки кат.0, заказы СП-172 и т.п.).
+
+        `last`, если передан, заполняется ПОСЛЕДНИМ переходом каждой записи
+        {OWNER_ID: (STAGE_ID, CREATED_TIME)} — входом в текущую стадию. Первых входов
+        для возраста стадии мало: запись, вернувшаяся в стадию, где уже была,
+        считала бы возраст от первого визита (или от входа в другую стадию)."""
         params: dict = {
             "entityTypeId": entity_type_id,
             "select": ["OWNER_ID", "CREATED_TIME", "STAGE_ID"],
@@ -580,6 +586,8 @@ class BitrixClient:
                 st = str(x.get("STAGE_ID") or "")
                 if not oid or not st:
                     continue
+                if last is not None:                         # ASC → последний переход побеждает
+                    last[oid] = (st, str(x.get("CREATED_TIME") or ""))
                 if st not in seen.setdefault(oid, set()):   # ASC → первый встреченный вход в стадию
                     seen[oid].add(st)
                     hist.setdefault(oid, []).append((st, str(x.get("CREATED_TIME") or "")))
@@ -681,18 +689,24 @@ class BitrixClient:
             self._departments = self.list_paged("department.get", {})
         return self._departments
 
-    def dept_member_ids(self, dept_id: int | str, *, include_children: bool = True) -> set[str]:
-        """ID пользователей отдела (по UF_DEPARTMENT), включая дочерние отделы."""
+    def dept_tree_ids(self, dept_id: int | str) -> set[str]:
+        """Отдел и все его дочерние подразделения."""
         deps = self.departments()
         ids = {str(dept_id)}
-        if include_children:
-            changed = True
-            while changed:
-                changed = False
-                for d in deps:
-                    if str(d.get("PARENT")) in ids and str(d["ID"]) not in ids:
-                        ids.add(str(d["ID"]))
-                        changed = True
+        changed = True
+        while changed:
+            changed = False
+            for d in deps:
+                if str(d.get("PARENT")) in ids and str(d["ID"]) not in ids:
+                    ids.add(str(d["ID"]))
+                    changed = True
+        return ids
+
+    def dept_member_ids(self, dept_id: int | str, *, include_children: bool = True) -> set[str]:
+        """ID ДЕЙСТВУЮЩИХ пользователей отдела (по UF_DEPARTMENT), включая дочерние
+        отделы. `user.get` без фильтра ACTIVE отдаёт только действующих — ушедших
+        добирает main._staff."""
+        ids = self.dept_tree_ids(dept_id) if include_children else {str(dept_id)}
         members: set[str] = set()
         for did in ids:
             for u in self.list_paged("user.get", {"FILTER": {"UF_DEPARTMENT": int(did)}}):

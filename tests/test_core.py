@@ -87,9 +87,114 @@ def test_доли_в_разумных_границах(metrics):
         assert 0 <= val <= 100, f"{name} = {val} вне диапазона 0..100"
 
 
-def test_нагрузка_сорсеров_отсортирована_по_убыванию(metrics):
-    counts = [r["c"] for r in metrics["sourcersA"]]
-    assert counts == sorted(counts, reverse=True)
+def test_рейтинг_сорсеров_по_темпу_а_ушедшие_в_конце(metrics):
+    """Рейтинг — по темпу последних четырёх недель, а не по итогу с начала
+    сорсинга: итог растёт со стажем. Ушедшие — отдельной группой в конце."""
+    rows = metrics["sourcersA"]
+    флаги = [r["act"] for r in rows]
+    assert флаги == sorted(флаги, reverse=True), "ушедшие стоят после действующих"
+    темп = [r["perDay4"] or 0 for r in rows if r["act"]]
+    assert темп == sorted(темп, reverse=True)
+    assert not all(r["act"] for r in rows), "в синтетике есть ушедший"
+    # синтетический ушедший уходит внутри последних 4 недель — темпа «сейчас» у него нет
+    assert all(r["perDay4"] is None for r in rows if not r["act"])
+
+
+# ------------------------------------------------------------------ окно работы человека
+def test_рабочие_дни_считаются_без_выходных():
+    пн = dt.date(2026, 6, 1)
+    assert period_mod.workdays(пн, пн + dt.timedelta(days=6)) == 5
+    assert period_mod.workdays(пн + dt.timedelta(days=5), пн + dt.timedelta(days=6)) == 0
+    assert period_mod.workdays(пн, пн + dt.timedelta(days=13)) == 10
+    assert period_mod.workdays(пн + dt.timedelta(days=2), пн + dt.timedelta(days=8)) == 5
+    assert period_mod.workdays(пн, пн - dt.timedelta(days=1)) == 0
+
+
+def _карточка(i: int, uid: str, день: dt.date, стадия: str = "DT166_24:NEW", **kw) -> dict:
+    return {"id": i, "assignedById": uid, "createdBy": uid, "movedBy": uid, "updatedBy": uid,
+            "lastActivityBy": uid, "stageId": стадия, "categoryId": 24, "title": f"Запрос {i}",
+            "createdTime": день.isoformat() + "T10:00:00+03:00",
+            "movedTime": день.isoformat() + "T12:00:00+03:00", "parentId2": None, **kw}
+
+
+def _окно(карточки: list[dict], staff: dict) -> dict:
+    import metrics as metrics_mod
+    p = fixture.make_period("2026-05-04", "2026-07-31")          # с понедельника
+    m = metrics_mod.build(p, карточки, {}, [], {"1", "2"}, {"1": "Старожил", "2": "Новичок"},
+                          {}, {}, {}, staff=staff)
+    return m
+
+
+def test_новичок_делит_запросы_на_свои_рабочие_дни_а_не_на_весь_период():
+    приём = dt.date(2026, 7, 13)                                # понедельник
+    карточки = [_карточка(i, "2", приём + dt.timedelta(days=i % 5)) for i in range(40)]
+    карточки += [_карточка(100 + i, "1", dt.date(2026, 5, 4) + dt.timedelta(days=i)) for i in range(40)]
+    m = _окно(карточки, {"1": {"active": True, "hired": dt.date(2024, 1, 1)},
+                         "2": {"active": True, "hired": приём}})
+    н = next(r for r in m["sourcersA"] if r["id"] == "2")
+    рд = period_mod.workdays(приём, dt.date(2026, 7, 31))
+    assert н["from"] == приём.isoformat() and н["wd"] == рд
+    assert н["perDay"] == round(40 / рд, 1), "темп по своему окну"
+    assert н["perDay"] > round(40 / period_mod.workdays(dt.date(2026, 5, 4), dt.date(2026, 7, 31)), 1)
+    assert н["short"] is True, "в окне меньше четырёх рабочих недель"
+    # численность по неделям: до приёма новичка в отделе один человек
+    assert m["weekly"][0]["hc"] == 1 and m["weekly"][-1]["hc"] == 2
+
+
+def test_окно_не_начинается_позже_первой_карточки():
+    """Карточка раньше даты приёма — значит, дата в портале не та (перевод из
+    другого отдела): окно начинается с первой карточки, а не с «приёма»."""
+    карточки = [_карточка(i, "2", dt.date(2026, 6, 1) + dt.timedelta(days=i)) for i in range(5)]
+    m = _окно(карточки, {"2": {"active": True, "hired": dt.date(2026, 7, 1)}})
+    assert m["sourcersA"][0]["from"] == "2026-06-01"
+
+
+def test_ушедший_остаётся_в_отделе_и_не_делит_на_дни_после_ухода():
+    ушёл = dt.date(2026, 6, 12)                                  # пятница
+    до = [_карточка(i, "1", dt.date(2026, 5, 4) + dt.timedelta(days=i)) for i in range(30)]
+    # после ухода карточки на него кладёт не он сам: заводит и двигает другая запись
+    чужой = {"createdBy": "99", "movedBy": "99", "updatedBy": "99", "lastActivityBy": "99"}
+    после = [_карточка(100 + i, "1", ушёл + dt.timedelta(days=3 + i), **чужой) for i in range(4)]
+    m = _окно(до + после, {"1": {"active": False, "hired": dt.date(2024, 1, 1), "left": ушёл}})
+    у = m["sourcersA"][0]
+    assert у["act"] is False and у["to"] == ушёл.isoformat()
+    assert у["afterLeft"] == 4, "карточки после ухода — отдельным счётом"
+    assert у["perDay"] == round(30 / period_mod.workdays(dt.date(2026, 5, 4), ушёл), 1)
+    assert у["perDay4"] is None, "темпа «сейчас» у ушедшего нет"
+    assert у["open"] == 34, "все карточки в стадии «Новый» — открыты и ничьи"
+    k = m["kpi"]
+    assert (k["staffActive"], k["staffGone"], k["goneOpen"], k["goneAfter"]) == (0, 1, 34, 4)
+    # ушедший в отделе: его работа не уходит в «вне отдела»
+    assert k["deptA"] == 34 and k["outside"] == 0
+    assert sum(у["wk"]) == у["c"] == 34
+
+
+def test_устаревший_последний_вход_не_отрезает_собственную_работу():
+    """Последний вход — последняя авторизация, а не последний рабочий день: при
+    запомненном входе он отстаёт на недели. Заведённые самим человеком карточки
+    позже этой даты — его работа, а не «после ухода»."""
+    вход = dt.date(2026, 5, 15)
+    свои = [_карточка(i, "1", dt.date(2026, 5, 4) + dt.timedelta(days=i)) for i in range(30)]
+    m = _окно(свои, {"1": {"active": False, "hired": None, "left": вход}})
+    у = m["sourcersA"][0]
+    assert у["to"] == "2026-06-02" and у["toEst"] is True
+    assert "afterLeft" not in у
+
+
+def test_ушедший_до_начала_периода_получает_пустое_окно():
+    чужой = {"createdBy": "99", "movedBy": "99", "updatedBy": "99", "lastActivityBy": "99"}
+    карточки = [_карточка(i, "1", dt.date(2026, 6, 1) + dt.timedelta(days=i), **чужой) for i in range(3)]
+    m = _окно(карточки, {"1": {"active": False, "hired": None, "left": dt.date(2026, 3, 1)}})
+    у = m["sourcersA"][0]
+    assert у["wd"] == 0 and у["perDay"] == 0 and у["afterLeft"] == 3
+    assert all(w["hc"] == 0 for w in m["weekly"]), "в численность отдела не входит"
+
+
+def test_дата_ухода_без_последнего_входа_оценивается_по_своим_карточкам():
+    свои = [_карточка(i, "1", dt.date(2026, 5, 4) + dt.timedelta(days=i)) for i in range(10)]
+    m = _окно(свои, {"1": {"active": False, "hired": None, "left": None}})
+    у = m["sourcersA"][0]
+    assert у["toEst"] is True and у["to"] == "2026-05-13"
 
 
 def test_пустой_период_не_роняет_расчёт():
