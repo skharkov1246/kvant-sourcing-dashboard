@@ -77,8 +77,6 @@ TECH_CATS = frozenset({"6", "22", "24", "26", "28"})   # people.TECH_CATS (св�
 ПОЛЯ_КП = {"UF_CRM_1585568303498": "Offer from us", "UF_CRM_1733957302549": "Result, ТКП",
            "UF_CRM_1783934184627": "Образец ТКП"}
 ПОЛЕ_RESULT = "UF_CRM_1780061070"           # «Result file», направление не установлено
-ECON_PAID = "UF_CRM_1713874110281"          # «Оплачено» (publish_deals.py)
-ECON_REST = "UF_CRM_1713874579940"          # «Остаток к оплате»
 
 # Поля заказа СП-172 (publish_deals.py, зонд полей 02.10.2026).
 DL_CUSTOMER = "ufCrm20_1728900218435"       # «Date of deadline to customer»
@@ -93,8 +91,9 @@ ORDER_SELECT = ["id", "stageId", "categoryId", "createdTime", "parentId2", "comp
 БЮДЖЕТНЫЙ = re.compile(r"бюджетирован|мониторинг\s+цен", re.I)
 РАСЦЕНКА = re.compile(r"запрос\w*\s+расцен", re.I)
 НН = re.compile(r"(?<![А-Яа-яЁёA-Za-z])НН-\s?\d")
-ТИП_ОБЩИЙ = re.compile(r"производител|трейдер|дилер|дистрибьют|официальн|посредник|агент|склад|прям|"
-                       r"manufactur|trader|dealer|distribut|official|direct|agent|stock", re.I)
+ТИП_ОБЩИЙ = re.compile(r"(?:производител|трейдер|дилер|дистрибьютор|официальн|посредник|агент|склад|прям)"
+                       r"(?:ь|я|и|ей|ы|ов|а|ой|ая|ое|ые|ый|ий|ск(?:ий|ая|ое|ие|ой))?"
+                       r"|manufacturers?|traders?|dealers?|distributors?|official|direct|agents?|stock(?:ist)?", re.I)
 ТИП_СЛУЖЕБНЫЕ = {"и", "или", "не", "без", "с", "прочее", "другое", "other", "and", "or"}
 
 
@@ -102,7 +101,7 @@ def тип_общий(v) -> bool:
     """Подпись типа поставщика печатается, только если каждое слово в ней — общее
     слово процесса: «Официальный дистрибьютор» — да, с названием бренда — нет."""
     слова = re.findall(r"[A-Za-zА-Яа-яЁё]+", str(v or ""))
-    return bool(слова) and all(ТИП_ОБЩИЙ.search(w) or w.lower() in ТИП_СЛУЖЕБНЫЕ for w in слова)
+    return bool(слова) and all(ТИП_ОБЩИЙ.fullmatch(w) or w.lower() in ТИП_СЛУЖЕБНЫЕ for w in слова)
 
 
 def файлы(v) -> set[str]:
@@ -123,19 +122,6 @@ def файлы(v) -> set[str]:
     if isinstance(v, int) or (isinstance(v, str) and v.strip().isdigit()):
         return {str(v).strip()}
     return set()
-
-
-def деньги(v) -> tuple[float | None, str | None]:
-    """«400|EUR» → (400.0, 'EUR'); число → (число, None)."""
-    if v in (None, "", False):
-        return None, None
-    s = str(v)
-    сумма, _, вал = s.partition("|")
-    try:
-        x = float(сумма.replace(",", ".").strip())
-    except ValueError:
-        return None, None
-    return (x if x > 0 else None), (вал.strip() or None)
 
 
 def сем_заказа(stage, семантика) -> str:
@@ -164,8 +150,10 @@ def разметить(строки, сделки, история, мета, з�
             ф |= файлы(д.get(поле))
         r["files"], r["o2"] = len(ф), bool(ф)
         r["result_file"] = bool(файлы(д.get(ПОЛЕ_RESULT)))
-        r["offer_entries"] = sum(1 for s, _ in ряд
-                                 if pc.воронка_стадии(s) != "0" and pc.вид_стадии(s, мета)[0] == "offer")
+        # Повторное ТКП — возврат в стадию «выдано» после ухода из неё (переторжка,
+        # ревизия), а не проход двух разных стадий «выдано» подряд.
+        виды = [pc.вид_стадии(s, мета)[0] == "offer" for s, _ in ряд if pc.воронка_стадии(s) != "0"]
+        r["offer_entries"] = sum(1 for i, v in enumerate(виды) if v and (i == 0 or not виды[i - 1]))
         sem = str(д.get("STAGE_SEMANTIC_ID") or "").upper()
         кат = str(д.get("CATEGORY_ID") or "0")
         r["live_order"] = r["id"] in живой
@@ -181,15 +169,11 @@ def разметить(строки, сделки, история, мета, з�
         r["ripe"] = bool(опорная) and (сегодня - dt.date.fromisoformat(опорная)).days > STUCK_DAYS
         v = r.get("amount")
         r["v_offer"] = v if v and 0 < v <= OUTLIER_EUR else None
-        эк = 0.0
-        for поле in (ECON_PAID, ECON_REST):
-            x, вал = деньги(д.get(поле))
-            if x:
-                эк += в_евро(x, вал or д.get("CURRENCY_ID")) or 0.0
+        # Стоимость контракта: выручка бюджета без НДС, иначе сумма сделки (как v4).
+        # Поля «Оплачено» / «Остаток к оплате» сюда не идут: чья это оплата — наша
+        # поставщику или заказчика нам — не установлено (DECISIONS.md, Р-2).
         if бюджет.get(r["id"]):
             r["v_contract"], r["v_src"] = бюджет[r["id"]], "бюджет"
-        elif эк > 0:
-            r["v_contract"], r["v_src"] = эк, "экономика"
         elif r["v_offer"]:
             r["v_contract"], r["v_src"] = r["v_offer"], "сумма сделки"
         else:
@@ -211,7 +195,9 @@ def свод_определений(rows):
     o1 = [r for r in o0 if r["o1"]]
     o2 = [r for r in o0 if r["o2"]]
     lost = [r for r in o0 if r["cls"] == "lost"]
-    до = [r for r in lost if not r["o1"] and not r["o2"]]
+    # «до ТКП» — ни стадии «выдано», ни файла, ни признака v4 «после предложения»
+    # (переторжка, «не прошли по цене»): такие — проигрыш после предложения без даты.
+    до = [r for r in lost if not (r["o1"] or r["o2"] or r["offer"])]
     к4 = [r for r in o0 if r["cls"] == "contract"]
     return {
         "O0": _счёт(o0), "O1": _счёт(o1), "O2": _счёт(o2),
@@ -222,6 +208,7 @@ def свод_определений(rows):
         "O12ripe": _счёт([r for r in o0 if (r["o1"] or r["o2"]) and r["ripe"]]),
         "lost": len(lost), "lost_after": sum(1 for r in lost if r["o1"]),
         "lost_file_only": sum(1 for r in lost if r["o2"] and not r["o1"]), "lost_before": len(до),
+        "lost_undated": sum(1 for r in lost if r["offer"] and not (r["o1"] or r["o2"])),
         "lost_before_budget": sum(1 for r in до if r["budget"]),
         "lost_before_reasons": collections.Counter(r["lost_stage"] for r in до).most_common(4),
         "budget": sum(1 for r in o0 if r["budget"]), "budget_o1": sum(1 for r in o1 if r["budget"]),
@@ -249,18 +236,20 @@ def свод_суммы(rows, база="O1"):
         ys = [r for r in xs if r["cls"] == cls]
         return pc.доля(sum(1 for r in ys if r["v_offer"]), len(ys))
 
-    def д(a):
-        return pc.доля(a, всего) if len(к) >= MIN_VALUE_N else None
+    # Доля по сумме печатается, только если и взятых, и невзятых не меньше
+    # MIN_VALUE_N: иначе дополнение к доле — деньги одной сделки.
+    def д(a, взятых=len(к)):
+        return pc.доля(a, всего) if взятых >= MIN_VALUE_N and len(с) - взятых >= MIN_VALUE_N else None
     return {
         "n": len(xs), "with": len(с), "k": len(к), "ks": len(кс),
         "conv": д(sum(r["v_offer"] for r in к)),
-        "conv_s": pc.доля(sum(r["v_offer"] for r in кс), всего) if len(кс) >= MIN_VALUE_N else None,
+        "conv_s": д(sum(r["v_offer"] for r in кс), len(кс)),
         "conv_casc": д(sum(r["v_contract"] or 0 for r in к)),
         "src": collections.Counter(r["v_src"] for r in к),
         "fill_c": заполн("contract"), "fill_l": заполн("lost"), "fill_o": заполн("open"),
         "won_vs_lost": (round(statistics.median([r["v_offer"] for r in к]) /
                               statistics.median([r["v_offer"] for r in п]), 2)
-                        if len(к) >= MIN_VALUE_N and п else None),
+                        if len(к) >= MIN_VALUE_N and len(п) >= MIN_VALUE_N else None),
     }
 
 
@@ -276,7 +265,15 @@ def _дн(a, b):
 
 def разметить_заказы(заказы, семантика, сделки_все, холдинг_сделки, строки_по_id, клиентские_воронки, в_евро):
     """Заказы СП-172 → строка на заказ с датами по Москве, исходом и сегментом
-    родительской сделки. Чистая функция."""
+    родительской сделки. Чистая функция.
+
+    first_live — дата ПЕРВОГО живого заказа сделки по всем годам: «ТКП → первый
+    заказ» считается в году этого заказа, а не по первому заказу внутри года."""
+    первый_живой: dict[str, str] = {}
+    for о in заказы:
+        d, t = str(о.get("parentId2") or "0"), pc.дата_мск(о.get("createdTime"))
+        if d != "0" and t and сем_заказа(о.get("stageId"), семантика) != "F" and (d not in первый_живой or t < первый_живой[d]):
+            первый_живой[d] = t
     out = []
     for о in заказы:
         d = str(о.get("parentId2") or "0")
@@ -296,6 +293,8 @@ def разметить_заказы(заказы, семантика, сделк
             "sup_type": str(о.get(SUP_TYPE) or "") or None,
             "seg_company": холдинг_сделки.get(d) == HOLDING,
             "seg_funnel": bool(r) and r["origin"] in клиентские_воронки,
+            "seg_nn": bool(НН.search(str((сделки_все.get(d) or {}).get("TITLE") or ""))),
+            "first_live": первый_живой.get(d),
             "outside": d != "0" and d not in строки_по_id and d in сделки_все,
             "orphan": d == "0" or d not in сделки_все,
             "offer_date": r["offer_date"] if r else None,
@@ -330,7 +329,7 @@ def свод_заказов(xs, все_года, сегодня, подписи_
         return v if тип_общий(v) and len(v) <= 40 else f"тип #{k}"
     первый = {}
     for о in живые:
-        if о["deal"] and о["created"] and (о["deal"] not in первый or о["created"] < первый[о["deal"]][0]):
+        if о["deal"] and о["created"] and о["created"] == о.get("first_live") and о["deal"] not in первый:
             первый[о["deal"]] = (о["created"], о["offer_date"], о["kat0_date"])
     return {
         "n": len(xs), "S": sum(1 for о in xs if о["sem"] == "S"), "P": sum(1 for о in xs if о["sem"] == "P"),
@@ -376,6 +375,7 @@ def строка_определений(имя, с):
         f" строгих {_п(o12['conv_s'], o12['n'])}, зрелые {_п(с['O12ripe']['conv'], с['O12ripe']['n'])}"
         f" | стадия без файла {с['O1only']['n']}\n"
         f"    проиграно {с['lost']}: после стадии ТКП {с['lost_after']}, с файлом без стадии {с['lost_file_only']},"
+        f" после предложения без даты (переторжка, «не прошли по цене») {с['lost_undated']},"
         f" до ТКП {с['lost_before']} (из них бюджетных {с['lost_before_budget']})"
         f" | бюджетных запросов {с['budget']} (среди O1 {с['budget_o1']})"
         f" | повторных ТКП (≥2 входа в стадию) {с['multi']} | файлов КП на сделку медиана {с['files_med']} / 90% {с['files_p90']}"
@@ -470,7 +470,8 @@ def отчёт(строки, заказы_разм, мета, сегодня, п
         print(f"\n— {год}")
         for имя, xs in ((f"{HOLDING} (компания)", [о for о in все if о["seg_company"]]),
                         (f"{HOLDING} (воронка клиента)", [о for о in все if о["seg_funnel"]]),
-                        ("Прочие клиенты", [о for о in все if not о["seg_company"]]),
+                        ("Прочие клиенты (без Норникеля)",
+                         [о for о in все if not (о["seg_company"] or о["seg_funnel"] or о["seg_nn"]) and not о["orphan"]]),
                         ("Все заказы", все)):
             print(строка_заказов(имя, свод_заказов(xs, все, сегодня, подписи_типов)))
 
@@ -499,9 +500,9 @@ def нативные_документы(client):
     генератора у сделок — по одному запросу; ошибка → тип ошибки."""
     out = []
     for имя, метод, params in (
-            ("предложений Битрикса (entityTypeId 7)", "crm.item.list",
+            (f"предложений Битрикса (entityTypeId 7) с {YEARS[0]}-01-01", "crm.item.list",
              {"entityTypeId": 7, "filter": {">=createdTime": f"{YEARS[0]}-01-01T00:00:00"}, "select": ["id"], "start": 0}),
-            ("документов генератора у сделок", "crm.documentgenerator.document.list",
+            ("документов генератора у сделок за всё время", "crm.documentgenerator.document.list",
              {"filter": {"entityTypeId": 2}, "select": ["id"], "start": 0})):
         try:
             env = client.call_envelope(метод, params) or {}
@@ -540,7 +541,7 @@ def main() -> int:
     сделки = client.list_deals_fast(filter={">=DATE_CREATE": SINCE}, select=[
         "ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE",
         "COMPANY_ID", "ASSIGNED_BY_ID", people.KAM_F, people.KAM_OLD, "OPPORTUNITY", "CURRENCY_ID",
-        ECON_PAID, ECON_REST, ПОЛЕ_RESULT, *ПОЛЯ_КП])
+        ПОЛЕ_RESULT, *ПОЛЯ_КП])
     print(f"прочитано сделок: {len(сделки)} из {всего}")
     if len(сделки) < всего:
         print("::error::обход сделок оборвался — итог был бы неполным")
@@ -639,7 +640,11 @@ def main() -> int:
     по_id = {r["id"]: r for r in строки}
     заказы_разм = разметить_заказы(сырые, семантика, все_сделки, холдинг, по_id, клиентские, в_евро)
 
-    поля = (client.call("crm.item.fields", {"entityTypeId": ORDER_ENTITY}) or {}).get("fields") or {}
+    try:
+        поля = (client.call("crm.item.fields", {"entityTypeId": ORDER_ENTITY}) or {}).get("fields") or {}
+    except Exception as e:  # noqa: BLE001 — подписи необязательны, отчёт важнее
+        print(f"подписи типов поставщика недоступны ({type(e).__name__})")
+        поля = {}
     подписи = {str(i.get("ID")): i.get("VALUE") for i in ((поля.get(SUP_TYPE) or {}).get("items") or [])
                if i.get("ID") is not None}
     отчёт(строки, заказы_разм, мета, сегодня, подписи, клиентские)
