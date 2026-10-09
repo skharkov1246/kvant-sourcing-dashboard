@@ -1,15 +1,342 @@
 {
- "updated": "2026-10-01",
+ "updated": "2026-10-08",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "23868",
+   "title": "ЗП610450 Выполнение работ по техническому перевооружению газогенератора газотурбинного двигателя SIEMENS SGT-200-1S (DLE) TORNADO 6,75МВт.",
+   "models": [
+    "SGT-200"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-07",
+   "rfqs": []
+  },
+  {
+   "id": "23854",
+   "title": "381-515 Закупка Датчик температуры на SGT-700 г.Казань",
+   "models": [
+    "SGT-700"
+   ],
+   "stage": "C2:4",
+   "created": "2026-10-06",
+   "rfqs": [
+    {
+     "id": "49388",
+     "title": "TURBGEAR (Saudi Arabia) датчик ыпе-700",
+     "created": "2026-10-07",
+     "supplier": "TURBGEAR",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-700"
+     ]
+    },
+    {
+     "id": "49390",
+     "title": "TK Shipcare (Польша) датчик SGT-700",
+     "created": "2026-10-07",
+     "supplier": "TK Shipcare",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-700"
+     ]
+    },
+    {
+     "id": "49392",
+     "title": "Simpex (India) датчик sgt-700",
+     "created": "2026-10-07",
+     "supplier": "Simpex Engineering India Pvt. Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-700"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "23742",
+   "title": "32616420401 Поставка запасных частей для вспомогательного оборудования ГТУ типа V64.3A для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\" (клапаны Neles, НМЦ: 7 736 350.00 RUB)",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-02",
+   "rfqs": []
+  },
+  {
+   "id": "23740",
+   "title": "ЗП6092651  32616420181 Поставка запасных частей для камеры сгорания ГТУ типа V64.3A для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\" (НМЦ: 120 125 702.00 RUB)",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:4",
+   "created": "2026-10-02",
+   "rfqs": [
+    {
+     "id": "49250",
+     "title": "WTT 156 поз. Ansaldo на закупку зип+кап",
+     "created": "2026-10-06",
+     "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49828",
+     "title": "MD&A  Spain 20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "Mechanical Dynamics & Analysis LLC.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49832",
+     "title": "C*Blade S.p.A. 20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "C*Blade S.p.A.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49836",
+     "title": "Pietro Rosa T.B.M. S.p.A.  20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "Pietro Rosa T.B.M. S.p.A.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49840",
+     "title": "Allied Dynamics Corp. USA Ansaldo 20 поз. кап+зип",
+     "created": "2026-10-07",
+     "supplier": "Allied Dynamics Corp.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49842",
+     "title": "Allied Dynamics Corp. USA Ansaldo 20 поз. кап+зип",
+     "created": "2026-10-07",
+     "supplier": "Allied Dynamics Corp.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49844",
+     "title": "Hanwha Power  USA 20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "Hanwha Power US, LLC",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49848",
+     "title": "GLF Turbine S.r.l. 20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "GLF Turbine",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49854",
+     "title": "Wuxi Turbine Blade Co., Ltd Ansaldo 4 поз. кап",
+     "created": "2026-10-07",
+     "supplier": "Wuxi Turbine Blade Co., Ltd. (WTB)",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "23726",
+   "title": "32616425581 Поставка некапитальных запасных частей для ГТУ типа V64.3A для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\" (НМЦ: 22 078 127.00 RUB)",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:4",
+   "created": "2026-10-01",
+   "rfqs": [
+    {
+     "id": "49248",
+     "title": "WTT 156 поз. Ansaldo на закупку зип+кап",
+     "created": "2026-10-06",
+     "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49814",
+     "title": "ILT Tecnologie S.r.l. 20 поз. крепежа",
+     "created": "2026-10-07",
+     "supplier": "ILT Tecnologie S.r.l.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49830",
+     "title": "MD&A  Spain 20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "Mechanical Dynamics & Analysis LLC.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49834",
+     "title": "C*Blade S.p.A. 20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "C*Blade S.p.A.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49838",
+     "title": "Pietro Rosa T.B.M. S.p.A.  20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "Pietro Rosa T.B.M. S.p.A.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49846",
+     "title": "Hanwha Power  USA 20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "Hanwha Power US, LLC",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49850",
+     "title": "GLF Turbine S.r.l. 20 поз. кап+зип Ansaldo",
+     "created": "2026-10-07",
+     "supplier": "GLF Turbine",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "49856",
+     "title": "GT Solution S.r.l. Ansaldo 20 поз. зип",
+     "created": "2026-10-07",
+     "supplier": "GT SOLUTION SRL",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "23724",
+   "title": "32616425803 Поставка запасных частей для топливо-регулирующих клапанов ГТУ типа V64.3A  для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\" (клапаны PRUSS, НМЦ: 27 970 680.00 RUB)",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-01",
+   "rfqs": []
+  },
+  {
+   "id": "23714",
+   "title": " КЛП-587061 Выполнение работ/оказание услуг: Капитальный ремонт нагрузочного редуктора тип TX56/1CV, заводской номер №10049, производства «Flender Graffenstaden», ГТУ-2 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:EXECUTING",
+   "created": "2026-10-01",
+   "rfqs": [
+    {
+     "id": "48872",
+     "title": "Подшипники в GTW BEARINGS S.R.O.",
+     "created": "2026-10-05",
+     "supplier": "GTW BEARINGS S.R.O.",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "48874",
+     "title": "Подшипники Каземе в PowerGen",
+     "created": "2026-10-05",
+     "supplier": "POWERGEN SOLUTIONS FZE LLC",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "48876",
+     "title": "Валы в Casagrande Ingranaggi S.r.l.",
+     "created": "2026-10-05",
+     "supplier": "Casagrande Ingranaggi S.r.l.",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
   {
    "id": "23472",
    "title": "375-671 Штифт пружинный на ГТД Centaur-40 Казань",
    "models": [
     "Centaur 40"
    ],
-   "stage": "C2:4",
+   "stage": "C2:2",
    "created": "2026-09-18",
    "rfqs": [
     {
@@ -1104,7 +1431,7 @@
    "models": [
     "ГТУ (модель уточнить)"
    ],
-   "stage": "C2:17",
+   "stage": "C2:LOSE",
    "created": "2026-05-15",
    "rfqs": [
     {
@@ -2092,6 +2419,17 @@
      "models": [
       "Centaur 40"
      ]
+    },
+    {
+     "id": "48256",
+     "title": "IMMI Centaure 40S",
+     "created": "2026-10-02",
+     "supplier": "IMMI Turbines",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
     }
    ]
   },
@@ -2698,7 +3036,7 @@
     {
      "id": "25422",
      "title": "Фильтры Siemens в EU Automation (UAE)",
-     "created": "2025-12-15",
+     "created": "2025-12-16",
      "supplier": "EU Automation (UAE)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2788,7 +3126,7 @@
     {
      "id": "26030",
      "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
-     "created": "2026-01-08",
+     "created": "2026-01-09",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -3040,7 +3378,7 @@
     {
      "id": "24010",
      "title": "Pepple+Fuchs в Kempston Controls LLC",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Kempston Controls LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -3051,7 +3389,7 @@
     {
      "id": "24012",
      "title": "Pepple+Fuchs в Gahangan",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Gahangan",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -5823,7 +6161,7 @@
     {
      "id": "10108",
      "title": "Requests #10108",
-     "created": "2024-12-17",
+     "created": "2024-12-18",
      "supplier": "RTP power",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -8133,7 +8471,7 @@
    "suppliers": [
     {
      "name": "IMMI Turbines",
-     "n": 1
+     "n": 2
     },
     {
      "name": "KTM Services FZE",
@@ -8870,6 +9208,18 @@
      "n": 2
     },
     {
+     "name": "TURBGEAR",
+     "n": 1
+    },
+    {
+     "name": "TK Shipcare",
+     "n": 1
+    },
+    {
+     "name": "Simpex Engineering India Pvt. Ltd",
+     "n": 1
+    },
+    {
      "name": "zhzngt.com",
      "n": 1
     },
@@ -9291,6 +9641,46 @@
    "model": "V64.3A (AE64.3A)",
    "suppliers": [
     {
+     "name": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "n": 2
+    },
+    {
+     "name": "Mechanical Dynamics & Analysis LLC.",
+     "n": 2
+    },
+    {
+     "name": "C*Blade S.p.A.",
+     "n": 2
+    },
+    {
+     "name": "Pietro Rosa T.B.M. S.p.A.",
+     "n": 2
+    },
+    {
+     "name": "Allied Dynamics Corp.",
+     "n": 2
+    },
+    {
+     "name": "Hanwha Power US, LLC",
+     "n": 2
+    },
+    {
+     "name": "GLF Turbine",
+     "n": 2
+    },
+    {
+     "name": "Wuxi Turbine Blade Co., Ltd. (WTB)",
+     "n": 1
+    },
+    {
+     "name": "ILT Tecnologie S.r.l.",
+     "n": 1
+    },
+    {
+     "name": "GT SOLUTION SRL",
+     "n": 1
+    },
+    {
      "name": "Progetti Europa & Global S.p.A. (PEG)",
      "n": 1
     },
@@ -9354,6 +9744,18 @@
     {
      "name": "Shanxi Runsheng Import and Export Co., Ltd",
      "n": 2
+    },
+    {
+     "name": "GTW BEARINGS S.R.O.",
+     "n": 1
+    },
+    {
+     "name": "POWERGEN SOLUTIONS FZE LLC",
+     "n": 1
+    },
+    {
+     "name": "Casagrande Ingranaggi S.r.l.",
+     "n": 1
     },
     {
      "name": "Greenray Turbine Solutions Ltd",
