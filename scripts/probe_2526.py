@@ -91,7 +91,9 @@ ORDER_SELECT = ["id", "stageId", "categoryId", "createdTime", "parentId2", "comp
 БЮДЖЕТНЫЙ = re.compile(r"бюджетирован|мониторинг\s+цен", re.I)
 РАСЦЕНКА = re.compile(r"запрос\w*\s+расцен", re.I)
 НН = re.compile(r"(?<![А-Яа-яЁёA-Za-z])НН-\s?\d")
-НН_НОМЕР = re.compile(r"(?<![А-Яа-яЁёA-Za-z])НН-\s?(\d+)")
+# Номер заявки «НН-<n>»: кириллица или латиница, любой регистр, дефис или тире или
+# пробел, ведущие нули отбрасываются (разбор 09.10.2026: «HH-500», «НН 500» не ловились).
+НН_НОМЕР = re.compile(r"(?<![А-Яа-яЁёA-Za-z])[НнHh][НнHh]\s*[-–—]?\s*0*(\d+)")
 ТИП_ОБЩИЙ = re.compile(r"(?:производител|трейдер|дилер|дистрибьютор|официальн|посредник|агент|склад|прям)"
                        r"(?:ь|я|и|ей|ы|ов|а|ой|ая|ое|ые|ый|ий|ск(?:ий|ая|ое|ие|ой))?"
                        r"|manufacturers?|traders?|dealers?|distributors?|official|direct|agents?|stock(?:ist)?", re.I)
@@ -333,33 +335,64 @@ def проверка_заказов(год_все, сегодня=None):
     всего_нн = sum(о["eur"] or 0 for о in нн)
     сумма_вне = sum(о["eur"] or 0 for о in вне)
 
+    def корзина(x):
+        return ("меньше ×0,1" if x < 0.1 else "×0,1–0,9" if x < 0.9 else "×0,9–1" if x <= 1
+                else "×1–3" if x <= 3 else "×3–10" if x <= 10 else "больше ×10")
+
     def отношение(о):
         if not о["eur"] or not о["deal_eur"]:
             return "сумма сделки пуста" if о["eur"] else "суммы заказа нет"
-        x = о["eur"] / о["deal_eur"]
-        return "закупка ≤ продажи" if x <= 1 else ("до ×3" if x <= 3 else ("×3–10" if x <= 10 else "больше ×10"))
+        return корзина(о["eur"] / о["deal_eur"])
     ключи = collections.Counter((о["deal"], о["supplier"], round(о["eur"] or 0)) for о in вне if о["eur"])
     дубль = [о for о in вне if о["eur"] and ключи[(о["deal"], о["supplier"], round(о["eur"]))] > 1]
     валюта = [о for о in вне if о["cur"] and о["deal_cur"] and о["cur"] != о["deal_cur"]]
     больше3 = [о for о in вне if о["eur"] and о["deal_eur"] and о["eur"] > 3 * о["deal_eur"]]
+    меньше01 = [о for о in вне if о["eur"] and о["deal_eur"] and о["eur"] < 0.1 * о["deal_eur"]]
     больше_бюджета = [о for о in вне if о["eur"] and о["budget_eur"] and о["eur"] > о["budget_eur"]]
     выброс = [о for о in вне if о["eur"] and о["eur"] > OUTLIER_EUR]
-    помечены = {id(о) for о in больше3 + валюта + больше_бюджета + выброс + дубль}
+    # Сделка целиком: сумма ВСЕХ живых заказов сделки за год против её продажи —
+    # поштучная проверка не видит, что три заказа вместе больше сделки.
+    по_сделке: dict = collections.defaultdict(float)
+    for о in живые:
+        if о["deal"] and о["eur"]:
+            по_сделке[о["deal"]] += о["eur"]
+    продажа = {о["deal"]: о["deal_eur"] for о in вне if о["deal"]}
+    бюджет_сд = {о["deal"]: о["budget_eur"] for о in вне if о["deal"] and о["budget_eur"]}
+    сделки_вне = sorted({о["deal"] for о in вне if о["deal"]})
+    сделка_больше = {d for d in сделки_вне if продажа.get(d) and по_сделке[d] > продажа[d]}
+    сделка_бюджет_больше = {d for d in сделки_вне if бюджет_сд.get(d) and по_сделке[d] > бюджет_сд[d]}
+    помечены = {id(о) for о in больше3 + меньше01 + больше_бюджета + выброс + дубль}
+    помечены |= {id(о) for о in вне if о["deal"] in сделка_больше | сделка_бюджет_больше}
     сумма_пом = sum(о["eur"] or 0 for о in вне if id(о) in помечены)
+    сумма_вал = sum(о["eur"] or 0 for о in валюта)
     по_сумме = sorted((о["eur"] or 0 for о in вне), reverse=True)
+    половина, накоплено = 0, 0.0
+    for x in по_сумме:
+        if накоплено >= сумма_вне / 2:
+            break
+        накоплено += x
+        половина += 1
     топ_нн = sorted(нн, key=lambda о: -(о["eur"] or 0))[:10]
     return {
         "n": len(вне), "deals": len({о["deal"] for о in вне}), "nn_n": len(нн),
         "share_total": pc.доля(сумма_вне, всего), "share_nn": pc.доля(сумма_вне, всего_нн),
         "parents": collections.Counter(о["parent"] for о in вне).most_common(),
         "ratio": collections.Counter(отношение(о) for о in вне).most_common(),
-        "cur_mismatch": len(валюта), "over3": len(больше3), "over_budget": len(больше_бюджета),
+        "cur_mismatch": len(валюта), "over3": len(больше3), "under01": len(меньше01), "over_budget": len(больше_бюджета),
+        "cur_pairs": collections.Counter(f"{о['cur']}→{о['deal_cur']}" for о in валюта).most_common(),
+        "cur_pair_ratio": collections.Counter(отношение(о) for о in валюта).most_common(),
+        "cur_budget_ok": sum(1 for о in валюта if о["eur"] and о["budget_eur"] and о["eur"] <= о["budget_eur"]),
+        "cur_share": pc.доля(сумма_вал, сумма_вне),
+        "budget_ratio": collections.Counter(корзина(о["eur"] / о["budget_eur"]) for о in вне
+                                            if о["eur"] and о["budget_eur"]).most_common(),
+        "deal_ratio": collections.Counter(корзина(по_сделке[d] / продажа[d]) if продажа.get(d) else "сумма сделки пуста"
+                                          for d in сделки_вне).most_common(),
+        "deal_over": len(сделка_больше), "deal_over_budget": len(сделка_бюджет_больше),
         "budget_known": sum(1 for о in вне if о["budget_eur"]), "outlier": len(выброс), "dupes": len(дубль),
         "flagged": len(помечены),
         "nn_share_wo_flagged": pc.доля(всего_нн - сумма_пом, всего - сумма_пом),
         "outside_share_wo_flagged": pc.доля(сумма_вне - сумма_пом, всего - сумма_пом),
-        "top1": pc.доля(по_сумме[0], сумма_вне) if len(по_сумме) >= MIN_VALUE_N else None,
-        "top3": pc.доля(sum(по_сумме[:3]), сумма_вне) if len(по_сумме) >= MIN_VALUE_N else None,
+        "half_n": половина,
         "top10_nn_outside": sum(1 for о in топ_нн if not о["seg_funnel"]),
         "top10_nn_share": pc.доля(sum(о["eur"] or 0 for о in топ_нн), всего_нн) if len(нн) >= 10 else None,
         "sem": collections.Counter(о["sem"] for о in вне).most_common(),
@@ -370,13 +403,19 @@ def строка_проверки(год, п):
     return (
         f"  {год}: заказов Норникеля {п['nn_n']}, из них вне клиентской воронки {п['n']} по сделкам {п['deals']};"
         f" их доля в закупке года {_п(п['share_total'])}, в закупке Норникеля {_п(п['share_nn'])};"
-        f" 1 крупнейший — {_п(п['top1'])}, 3 крупнейших — {_п(п['top3'])} суммы этих заказов"
+        f" половину их суммы дают {п['half_n']} заказа(ов)"
         f" | 10 крупнейших заказов Норникеля — {_п(п['top10_nn_share'])} его закупки, из них вне воронки {п['top10_nn_outside']}\n"
         f"    откуда: " + "; ".join(f"{k} {v}" for k, v in п["parents"]) + "\n"
-        f"    закупка к продаже сделки: " + "; ".join(f"{k} {v}" for k, v in п["ratio"]) + "\n"
-        f"    признаки ошибки: валюта заказа ≠ валюте сделки {п['cur_mismatch']}; закупка > продажи ×3 {п['over3']};"
-        f" закупка > выручки бюджета {п['over_budget']} (бюджет есть у {п['budget_known']}); больше"
-        f" {OUTLIER_EUR / 1e6:g} млн € {п['outlier']}; дублей {п['dupes']}; помечено всего {п['flagged']}"
+        f"    заказ к продаже своей сделки: " + "; ".join(f"{k} {v}" for k, v in п["ratio"])
+        + " | все живые заказы сделки за год к её продаже (по сделкам): " + "; ".join(f"{k} {v}" for k, v in п["deal_ratio"])
+        + f"; сделок, где заказы больше продажи, {п['deal_over']}, больше выручки бюджета {п['deal_over_budget']}\n"
+        f"    заказ к выручке бюджета сделки (бюджет у {п['budget_known']}): " + "; ".join(f"{k} {v}" for k, v in п["budget_ratio"]) + "\n"
+        f"    валюта заказа ≠ валюте сделки {п['cur_mismatch']} ({_п(п['cur_share'])} суммы): "
+        + "; ".join(f"{k} {v}" for k, v in п["cur_pairs"]) + " | их заказ к продаже: "
+        + "; ".join(f"{k} {v}" for k, v in п["cur_pair_ratio"]) + f" | из них не больше выручки бюджета {п['cur_budget_ok']}\n"
+        f"    признаки ошибки: заказ > продажи ×3 {п['over3']}; заказ < продажи ×0,1 {п['under01']}; заказ > выручки бюджета"
+        f" {п['over_budget']}; больше {OUTLIER_EUR / 1e6:g} млн € {п['outlier']}; дублей {п['dupes']}; помечено всего"
+        f" {п['flagged']} (валюта сама по себе не признак)"
         f" | без помеченных: доля Норникеля в закупке года {_п(п['nn_share_wo_flagged'])},"
         f" вне воронки {_п(п['outside_share_wo_flagged'])} | исход: " + ", ".join(f"{k} {v}" for k, v in п["sem"]))
 
@@ -404,6 +443,21 @@ def свод_закрытого_года(rows, номера_реализации
         "conv_with_open_twins": pc.доля(len(к) + len(оба), len(o1)),
         "conv_with_all_twins": pc.доля(len(к) + len(оба | {r["id"] for r in пно} | {r["id"] for r in п4}), len(o1)),
         "open_with_nn": sum(1 for r in откр if r.get("nn")),
+    }
+
+
+def контроль_номеров(строки, номера_реализации):
+    """Положительный контроль сопоставления по номеру «НН-»: находит ли номер карточки
+    реализации хоть какую-то предпродажную сделку (любого исхода). Если и здесь ноль —
+    в карточке реализации другой номер, и ноль по открытым ТКП ничего не доказывает."""
+    пред = [r for r in строки if not r["realization_only"] and r.get("nn")]
+    номера_пред = {n for r in пред for n in r["nn"]}
+    карточки = [r for r in строки if r["realization_only"] and r.get("nn")]
+    return {
+        "cards": len(карточки), "card_numbers": len(номера_реализации),
+        "cards_matched": sum(1 for r in карточки if set(r["nn"]) & номера_пред),
+        "presale_with_nn": len(пред),
+        "presale_matched": collections.Counter(r["cls"] for r in пред if set(r["nn"]) & номера_реализации).most_common(),
     }
 
 
@@ -591,7 +645,11 @@ def отчёт(строки, заказы_разм, мета, сегодня, п
     if YEARS:
         год0 = YEARS[0]
         номера = {n for r in строки if r["realization_only"] for n in (r.get("nn") or ())}
-        print(f"\nТКП {год0} СЧИТАЮТСЯ ЗАКРЫТЫМИ (открытые — проигрыш; карточек реализации с номером НН- {len(номера)})")
+        к = контроль_номеров(строки, номера)
+        print(f"\nТКП {год0} СЧИТАЮТСЯ ЗАКРЫТЫМИ (открытые — проигрыш)")
+        print(f"  контроль по номеру НН-: карточек реализации с номером {к['cards']} (разных номеров {к['card_numbers']}),"
+              f" из них номер есть у предпродажной сделки выборки {к['cards_matched']}; предпродажных сделок с номером"
+              f" {к['presale_with_nn']}, совпали с карточкой: " + (", ".join(f"{a} {b}" for a, b in к["presale_matched"]) or "0"))
         for имя, rows in сегменты([r for r in строки if r["cohort"] == год0]):
             print(строка_закрытого(имя, свод_закрытого_года(rows, номера)))
 
