@@ -129,6 +129,25 @@
 
   .spark{display:flex;gap:3px;align-items:flex-end;height:26px}
   .spark i{width:8px;background:var(--a);border-radius:2px 2px 0 0;opacity:.85}
+  /* неделя вне окна работы человека: до приёма или после ухода — не ноль, а «не работал» */
+  .spark i.off{height:2px!important;background:none;border-top:2px dotted var(--ip);opacity:1}
+  .spark i.aft{background:var(--nr)}
+  /* состав отдела: ушёл / новичок, темп и окно работы */
+  .gone,.newb{display:inline-block;margin-left:7px;padding:0 6px;border-radius:5px;font:600 10.5px var(--mono);vertical-align:1px}
+  .gone{color:var(--warn);border:1px solid rgba(229,99,77,.45)}
+  .newb{color:var(--ok);border:1px solid rgba(78,201,138,.45)}
+  .sub2{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px;line-height:1.45}
+  .sub2 .up{color:var(--ok)}.sub2 .dn{color:var(--warn)}
+  .rowsep{margin:8px 0 0 33px;padding-top:10px;border-top:1px dashed var(--line);font-size:12px;color:var(--mut)}
+  .row.isgone .fill{opacity:.45}
+  #rowsA .top{gap:8px}#rowsA .nm{min-width:0}#rowsA .ct{white-space:nowrap}
+  .wklbl i{display:block;font-style:normal;color:var(--dim);font-size:10px}
+  /* воронка пресейла */
+  .psflag{display:inline-block;margin:0 4px 2px 0;padding:0 6px;border-radius:5px;font:600 10.5px var(--mono);border:1px solid rgba(229,99,77,.45);color:var(--warn);white-space:nowrap}
+  .psflag.soft{border-color:var(--line);color:var(--mut)}
+  .pswrap{overflow-x:auto}
+  .pswrap table{min-width:640px}
+  #psSec a{color:var(--a2);text-decoration:none}#psSec a:hover{text-decoration:underline}
 
   footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:11.5px;line-height:1.7}
   footer b{color:var(--mut)}
@@ -484,17 +503,18 @@
       <b>Принято в работу</b> — карточки в стадии «КП получено»: предложение не просто пришло, а принято сорсером. Разрыв между двумя последними столбцами и есть мера того, сколько КП лежит неразобранными.<br>
       Оба последних столбца датированы по <b>последнему движению карточки</b>: ни у файла, ни у стадии отдельной даты выдача не отдаёт. Для карточки, которая после получения КП больше не двигалась, это и есть неделя получения; для остальных — неделя последнего движения.</div>
       <div class="wkchart" id="wkchart"></div>
-      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>Получено КП</span><span><i class="sw" style="background:var(--ok2)"></i>Принято в работу</span></div>
+      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>Получено КП</span><span><i class="sw" style="background:var(--ok2)"></i>Принято в работу</span><span>под неделей — сорсеров в отделе</span></div>
     </section>
     <section class="card">
-      <h2><span class="tag a">БЛОК A</span> Нагрузка по сорсерам <span class="subtotal">итого <b id="loadTotal"></b></span></h2>
+      <h2><span class="tag a">БЛОК A</span> Темп сорсеров <span class="subtotal">итого <b id="loadTotal"></b></span></h2>
+      <div class="note">Крупная цифра — запросов в <b>рабочий день за последние 4 недели</b>: одно окно для всех, кто работал весь этот срок. Ниже — окно работы человека внутри периода (с приёма; у ушедших — по последний вход в портал), итог Σ и средний темп этого окна; ▲▼ — последние 4 недели против среднего. Итог с начала сорсинга растёт со стажем, поэтому людей сравниваем по темпу.</div>
       <div class="rows" id="rowsA"></div>
     </section>
   </div>
   <div>
     <section class="card">
       <h2>Темп каждого по неделям</h2>
-      <div class="note">Спарклайны по неделям — кто разгоняется, а кто проседает.</div>
+      <div class="note">Спарклайны по неделям — кто разгоняется, а кто проседает. Пунктир — человек ещё не работал или уже ушёл; красный столбец — карточки, легшие на ушедшего после ухода.</div>
       <table><thead><tr><th>Сорсер</th><th>недели</th><th class="r">Σ</th></tr></thead><tbody id="tbSpark"></tbody></table>
     </section>
     <section class="card">
@@ -503,7 +523,12 @@
   </div>
 </div>
 
-<div class="secttl"><b>2</b> · Конверсия по стадиям</div>
+<div id="psWrap" hidden>
+<div class="secttl"><b>2</b> · Воронка пресейла</div>
+<section class="card" id="psSec"></section>
+</div>
+
+<div class="secttl"><b>3</b> · Конверсия по стадиям</div>
 <section class="card">
   <h2><span class="tag a">БЛОК A</span> Структура запросов по стадиям + результат</h2>
   <div class="note">Цветная полоса — все запросы сорсера по стадиям. Закрытые раскладываются на <span class="q">КП/выбран</span> + <span style="color:var(--a2)">отказ</span> + <span class="nrc">молчание</span>. «Ср. срок» — дней от создания до смены стадии у закрытых. «Файл КП» — карточки, куда поставщик приложил предложение; «✓ КП» — стадия «КП получено». Разрыв между ними — предложения, которые пришли, но в работу не приняты.</div>
@@ -519,7 +544,7 @@
   <div class="insight" style="margin-top:16px"><h3>Конверсия и скорость</h3><div id="insConv"></div></div>
 </section>
 
-<div class="secttl"><b>3</b> · Цепочка «запрос → сделка»</div>
+<div class="secttl"><b>4</b> · Цепочка «запрос → сделка»</div>
 <div class="grid">
   <div>
     <section class="card">
@@ -540,7 +565,7 @@
   </div>
 </div>
 
-<div class="secttl"><b>4</b> · Кто заводит запросы</div>
+<div class="secttl"><b>5</b> · Кто заводит запросы</div>
 <div class="kpis" id="kpisOrigin" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px"></div>
 <div class="grid">
   <div>
@@ -586,7 +611,7 @@
   </div>
 </div>
 
-<div class="secttl"><b>5</b> · Покрытие сделок сорсингом</div>
+<div class="secttl"><b>6</b> · Покрытие сделок сорсингом</div>
 <div class="kpis" id="kpisCov" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px"></div>
 <div class="grid">
   <div>
@@ -617,7 +642,7 @@
   <div id="covWeeklyBody" style="margin-top:6px"></div>
 </section>
 
-<div class="secttl"><b>6</b> · Реально отправлено vs создано (+ фейк-отправки)</div>
+<div class="secttl"><b>7</b> · Реально отправлено vs создано (+ фейк-отправки)</div>
 <section class="card">
   <h2><span class="tag a">БЛОК A</span> Письмо действительно ушло поставщику?</h2>
   <div class="note">«С письмом» = на карточке есть исходящее CRM-письмо (факт отправки). «Без письма» — карточка создана, но письма через систему не было. «Фейк» = карточка двинута из «Новый», но письма нет. «Дожим%» = доля карточек с ≥2 письмами.</div>
@@ -628,7 +653,7 @@
   </table>
 </section>
 
-<div class="secttl"><b>7</b> · Разнообразие поставщиков</div>
+<div class="secttl"><b>8</b> · Разнообразие поставщиков</div>
 <div class="grid">
   <section class="card"><h2>Основные запрошенные поставщики</h2><div class="note">Доля запросов (СП-166, блок A) по поставщикам — насколько диверсифицирована база. Наведи на сектор — имя и число запросов.</div><div class="pie" id="supPie"></div></section>
   <section class="card"><h2>Поставщиков на сорсера</h2><div class="note">Сколько РАЗНЫХ поставщиков запрашивает каждый — ширина воронки поиска. Клик — кому и что слал.</div><div id="supPerSorcer" class="ownlist"></div></section>
@@ -679,6 +704,12 @@ const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
 const NS = "http://www.w3.org/2000/svg";
 const _esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// окно работы сорсера: ISO-дата → «дд.мм», номер недели периода (Пн–Вс, первая неделя обрезана началом)
+const _dm=s=>s?`${s.slice(8,10)}.${s.slice(5,7)}`:'';
+const _mon=s=>{const d=new Date(s.slice(0,10)+'T00:00:00Z');return Math.round(d.getTime()/864e5)-(d.getUTCDay()+6)%7;};
+const _wi=s=>(s&&M.period&&M.period.start)?Math.round((_mon(s)-_mon(M.period.start))/7):null;
+const _gone=r=>!!r&&r.act===false;
+const _tag=r=>_gone(r)?`<span class="gone" title="Ушёл из отдела. Дата — ${r.toEst?'последняя своя карточка: последнего входа в портал у записи нет':'последний вход в портал: даты увольнения Bitrix не отдаёт'}">ушёл ${_dm(r.to)}${r.toEst?'*':''}</span>`:'';
 
 // ---- subline + KPIs
 document.getElementById('subline').innerHTML =
@@ -708,16 +739,34 @@ document.getElementById('wkchart').innerHTML=weekTot.map(w=>{
   +`\nКонтроль: входящих писем на карточках за неделю ${w.inb||0}.`;
  const kpaTip=`Принято в работу: ${kpa} карточек в стадии «КП получено».`
   +(kp?`\nПолучено КП за ту же неделю: ${kp} — разрыв показывает, сколько предложений не разобрано.`:'');
- return `<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}" title="Запросы отдела: ${w.A}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}" title="Запросы вне отдела: ${w.B}"><span>${w.B}</span></div><div class="wkbar k" data-h="${kp/wkMax*100}" title="${kpTip}"><span>${kp}</span></div><div class="wkbar ka" data-h="${kpa/wkMax*100}" title="${kpaTip}"><span>${kpa}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}</div></div>`;}).join('');
+ return `<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}" title="Запросы отдела: ${w.A}${w.hc?` · сорсеров ${w.hc}, на одного ${(w.A/w.hc).toFixed(1)}`:''}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}" title="Запросы вне отдела: ${w.B}"><span>${w.B}</span></div><div class="wkbar k" data-h="${kp/wkMax*100}" title="${kpTip}"><span>${kp}</span></div><div class="wkbar ka" data-h="${kpa/wkMax*100}" title="${kpaTip}"><span>${kpa}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}${w.hc?`<i title="Сорсеров в отделе на этой неделе (по окнам работы). На одного: ${(w.A/w.hc).toFixed(1)} запр.">${w.hc} чел.</i>`:''}</div></div>`;}).join('');
 
 // ---- block A load
 document.getElementById('loadTotal').textContent=A.reduce((s,r)=>s+r.c,0);
-const maxA=Math.max(1,...A.map(r=>r.c));
-document.getElementById('rowsA').innerHTML=A.map((r,i)=>`<div class="row clickrow" data-uid="${r.id}"><div class="rk">${i+1}</div><div><div class="top"><div class="nm">${_esc(r.n)}${r.since?`<small>с ${r.since}</small>`:''}</div><div class="ct">${r.c}<small>${r.perDay}/дн</small></div></div><div class="track"><div class="fill fillA" data-w="${(r.c/maxA*100).toFixed(1)}" style="width:0%"></div></div></div></div>`).join('');
+{
+  // действующие — по темпу последних 4 недель; ушедшие — отдельной группой без места в рейтинге
+  const ACT=A.filter(r=>!_gone(r)), GONE=A.filter(_gone);
+  const pace=r=>_gone(r)?(r.perDay||0):(r.perDay4!=null?r.perDay4:(r.perDay||0));
+  const maxP=Math.max(0.1,...A.map(pace));
+  const trend=r=>{if(r.perDay4==null)return '';const d=r.perDay4-(r.perDay||0);return d>0.2?' <span class="up">▲</span>':(d<-0.2?' <span class="dn">▼</span>':'');};
+  const row=(r,i)=>`<div class="row clickrow${_gone(r)?' isgone':''}" data-uid="${r.id}"><div class="rk">${i==null?'':i+1}</div><div>`
+   +`<div class="top"><div class="nm">${_esc(r.n)}${_tag(r)}${r.short&&!_gone(r)?'<span class="newb" title="В окне меньше четырёх рабочих недель — темп ещё неустойчив">новичок</span>':''}${r.since?`<small>с ${r.since}</small>`:''}</div>`
+   +`<div class="ct" title="${_gone(r)?'Средний темп окна работы':'Запросов в рабочий день за последние 4 недели'}">${pace(r)}<small>/раб.дн</small></div></div>`
+   +`<div class="track"><div class="fill fillA" data-w="${(pace(r)/maxP*100).toFixed(1)}" style="width:0%"></div></div>`
+   +`<div class="sub2">Σ ${r.c} · ${_gone(r)&&r.wd===0?'ушёл до начала периода':`окно ${_dm(r.from)}–${_dm(r.to)}, ${r.wd!=null?r.wd:'—'} раб.дн · в среднем ${r.perDay}/дн${trend(r)}`}`
+   +`${_gone(r)&&r.open?` · <span class="dn">открыто ${r.open}</span>`:''}${r.afterLeft?` · <span class="dn">после ухода ${r.afterLeft}</span>`:''}</div></div></div>`;
+  let h=ACT.map((r,i)=>row(r,i)).join('');
+  if(GONE.length) h+=`<div class="rowsep">Ушли из отдела — ${GONE.length} чел.: открытых карточек ${k.goneOpen||0}${k.goneAfter?`, легло после ухода ${k.goneAfter}`:''} — переназначить действующим${k.goneAfter?' и сменить «Сорсера» в сделках':''}</div>`+GONE.map(r=>row(r,null)).join('');
+  document.getElementById('rowsA').innerHTML=h;
+}
 
 // ---- spark table
 const spMax=Math.max(1,...A.flatMap(r=>r.wk));
-document.getElementById('tbSpark').innerHTML=A.map(r=>`<tr class="clickrow" data-uid="${r.id}"><td><div class="who" style="font-size:12.5px">${_esc(r.n)}</div></td><td><div class="spark">${r.wk.map(v=>`<i style="height:${Math.max(1,v/spMax*26)}px" title="${v}"></i>`).join('')}</div></td><td class="num r">${r.c}</td></tr>`).join('');
+document.getElementById('tbSpark').innerHTML=A.map(r=>{const a=_wi(r.from),b=_wi(r.to);
+ const bars=r.wk.map((v,j)=>{const off=(a!=null&&j<a)||(b!=null&&j>b);
+  if(off&&!v)return `<i class="off" title="${a!=null&&j<a?'ещё не работал':'уже ушёл'}"></i>`;
+  return `<i${off?' class="aft"':''} style="height:${Math.max(1,v/spMax*26)}px" title="${v}${off?' — после ухода':''}"></i>`;}).join('');
+ return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who" style="font-size:12.5px">${_esc(r.n)}${_tag(r)}</div></td><td><div class="spark">${bars}</div></td><td class="num r">${r.c}</td></tr>`;}).join('');
 
 // ---- conversion
 document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>(v/r.c*100);
@@ -726,7 +775,7 @@ document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=
  const pc=v=>r.closed?` <small class="dimv">${Math.round(v/r.closed*100)}%</small>`:'';
  const cell=(v,clz)=> v>0?`<span class="${clz}">${v}</span>${pc(v)}`:`<span class="dimv">0</span>`;
  const out=b.sent+b.dialog+b.selected+b.refused+b.no_answer+b.other;
- return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td>`
+ return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}${_tag(r)}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td>`
  + `<td class="num r ${(r.quotes||0)>r.kp?'':'dimv'}" title="Карточек с файлом КП от поставщика: ${r.quotes||0}${(r.quotes||0)>r.kp?`, из них не переведено в «КП получено» ${(r.quotes||0)-r.kp}`:''}">${r.quotes||0}</td>`
  + `<td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
 const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,q:t.q+(r.quotes||0),ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,q:0,ref:0,nr:0});
@@ -734,7 +783,7 @@ document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var
 
 // ---- отправлено vs создано (+ фейк)
 if (M.send && M.send.rows){
-  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake>=5?'nrc':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
+  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}${_gone(r)?'<span class="gone">ушёл</span>':''}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake>=5?'nrc':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
 }
 // ---- разнообразие поставщиков (пай-чарт + поставщиков на сорсера)
 {
@@ -750,15 +799,59 @@ if (M.send && M.send.rows){
   } else if(pie){ pie.innerHTML='<div class="note">нет данных по поставщикам</div>'; }
   const ps=document.getElementById('supPerSorcer');
   if(ps){const mx=Math.max(1,...A.map(s=>s.nsup||0));
-    ps.innerHTML=A.slice().sort((a,b)=>(b.nsup||0)-(a.nsup||0)).map(s=>`<div class="ownrow clickrow" data-uid="${s.id}"><div class="onm who" style="min-width:160px;flex-shrink:0">${_esc(s.n)}</div><div class="obar"><i style="width:${((s.nsup||0)/mx*100).toFixed(0)}%"></i></div><div class="ocnt">${s.nsup||0} <span class="dimv">пост. / ${s.c} зап.</span></div></div>`).join('');
+    ps.innerHTML=A.slice().sort((a,b)=>(b.nsup||0)-(a.nsup||0)).map(s=>`<div class="ownrow clickrow" data-uid="${s.id}"><div class="onm who" style="min-width:160px;flex-shrink:0">${_esc(s.n)}${_tag(s)}</div><div class="obar"><i style="width:${((s.nsup||0)/mx*100).toFixed(0)}%"></i></div><div class="ocnt">${s.nsup||0} <span class="dimv">пост. / ${s.c} зап.</span></div></div>`).join('');
   }
   if(M.send&&M.send.totals){const ts=M.send.totals;
   document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${ts.sent}</td><td class="r num nrc">${ts.nosend}</td><td class="r num">${ts.sentPct}%</td><td class="r num nrc">${ts.fake}</td><td class="r"></td></tr>`;}
 }
 
+
+// ---- воронка пресейла: сделки, которые сорсинг ведёт до ТКП
+(function renderPresale(){
+  const P=M.presale; if(!P||!P.head) return;
+  document.getElementById('psWrap').hidden=false;
+  const H=P.head, el=document.getElementById('psSec');
+  const url=id=>`https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
+  const FL={gone:['ушёл сорсер',''],nosrc:['нет сорсера',''],norfq:['нет запросов',''],stale:['стоит','']};
+  const flag=(f,r)=>`<span class="psflag">${f==='stale'?`стоит ${r.days} дн`:FL[f][0]}</span>`;
+  const kp=(lbl,val,meta,clz)=>`<div class="kpi ${clz||''}"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
+  let h=`<h2>Воронка «${_esc(P.name)}» <span class="subtotal">сделок <b>${H.total}</b></span></h2>`
+   +`<div class="note">Сделки, которые сорсинг ведёт от запроса заказчика до готовой экономики и ТКП: назначение сорсера → проработка ТЗ → поиск поставщиков и сбор КП → анализ и сравнение → экономика. Запросы поставщикам (СП-166) — под этими сделками. Сумма в сделке появляется после сравнения предложений, поэтому заполнена у ${H.sumPct}%.</div>`
+   +`<div class="kpis" style="grid-template-columns:repeat(6,1fr);margin-top:12px">`
+   +kp('Открыто',H.open,`за 4 недели заведено ${H.new28}`,'')
+   +kp('С запросом поставщику',H.withRfqPct+'%',`${H.withRfq} сделок · ${H.rfq} запросов · медиана ${H.rfqMed??'—'} на сделку`,'ok')
+   +kp('До первого запроса',H.lagMed!=null?H.lagMed+' дн':'—',`робот завёл ${H.robotRfqPct}% запросов`,'')
+   +kp('Без сорсера',H.noSrc,`«Сорсер» заполнен у ${H.srcPct}% сделок`,H.noSrc?'warn':'')
+   +kp('Без запросов',H.noRfq,`открыты ${H.noRfqDays}+ дн, ни одного запроса`,H.noRfq?'warn':'')
+   +kp('Стоят',H.stale,`в стадии дольше ${H.staleDays} дн`,H.stale?'warn':'')
+   +`</div>`;
+  // стадии и исходы
+  const proc=P.stages.filter(s=>s.sem!=='F'&&s.sem!=='S'), mx=Math.max(1,...proc.map(s=>s.n));
+  const won=P.stages.filter(s=>s.sem==='S').reduce((a,s)=>a+s.n,0);
+  const lmx=Math.max(1,...(P.lost||[]).map(x=>x.n));
+  h+=`<div class="grid" style="margin-top:14px"><section class="card"><h2>Где стоят сделки</h2><div class="note">Рабочие стадии по порядку: сколько сделок и сколько дней они в стадии (медиана · максимум).</div><div class="barlist">`
+   +proc.map(s=>`<div class="blrow"><div class="blt"><span>${_esc(s.name)} <span class="dimv mono">${s.n?`${s.med??'—'} · ${s.max??'—'} дн`:''}</span>${s.stale?` <span class="psflag">${s.stale} стоят</span>`:''}</span><b>${s.n}</b></div><div class="bltrack"><i style="width:${(s.n/mx*100).toFixed(0)}%"></i></div></div>`).join('')
+   +`</div><div class="note" style="margin-top:8px">Выиграно: <b>${won}</b> · закрыто отказом: <b>${H.lost}</b>${H.otherStage?` · вне справочника стадий: ${H.otherStage}`:''}</div></section>`
+   +`<section class="card"><h2>Почему отказ</h2><div class="note">Стадия отказа — единственная причина, которую портал хранит машинно.</div><div class="barlist">`
+   +((P.lost||[]).map(x=>`<div class="blrow"><div class="blt"><span>${_esc(x.name)}</span><b class="nrc">${x.n}</b></div><div class="bltrack"><i style="width:${(x.n/lmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('')||'<div class="dimv">отказов нет</div>')
+   +`</div><div class="note" style="margin-top:10px">Заведено по неделям (Пн–Вс): ${(P.weeks||[]).map(w=>`${_dm(w.from)} <b>${w.n}</b>${w.lost?` <span class="nrc">−${w.lost}</span>`:''}`).join(' · ')}</div></section></div>`;
+  // по сорсеру сделки
+  h+=`<h2 style="margin-top:16px">По сорсеру сделки</h2><div class="note">Кто записан «Сорсером» в сделке пресейла: что открыто, сколько запросов ушло поставщикам и сколько КП пришло файлом.</div>`
+   +`<div class="pswrap"><table><thead><tr><th>Сорсер</th><th class="r">Открыто</th><th class="r">Отказ</th><th class="r">Выиграно</th><th class="r">Запросов</th><th class="r">Файлов КП</th><th class="r">Без запросов</th><th class="r">Стоят</th></tr></thead><tbody>`
+   +(P.bySourcer||[]).map(a=>`<tr><td><div class="who">${_esc(a.n)}${a.gone?'<span class="gone">ушёл</span>':''}</div></td><td class="num r">${a.open}</td><td class="num r dimv">${a.lost}</td><td class="num r">${a.won}</td><td class="num r">${a.rfq}</td><td class="num r">${a.quotes}</td><td class="num r ${a.norfq?'nrc':'dimv'}">${a.norfq}</td><td class="num r ${a.stale?'nrc':'dimv'}">${a.stale}</td></tr>`).join('')
+   +`</tbody></table></div>`;
+  // что делать
+  const act=P.act||[];
+  h+=`<h2 style="margin-top:16px">Требует действия <span class="subtotal">сделок <b>${act.length}</b></span></h2><div class="note">Сначала — ушедший сорсер и сделки без сорсера (назначить), затем сделки без единого запроса поставщикам, затем застрявшие. Клик — сделка в Битриксе.</div>`
+   +(act.length?`<div class="pswrap"><table><thead><tr><th>Сделка</th><th>Стадия</th><th class="r">Дней в стадии</th><th>Сорсер</th><th class="r">Запросов</th><th>Что не так</th></tr></thead><tbody>`
+   +act.map(r=>`<tr><td><a href="${url(r.id)}" target="_blank" rel="noopener">${_esc(r.t)}</a><div class="dep">заведена ${_dm(r.created)} · ${r.age} дн назад${r.kam?` · КАМ ${_esc(r.kam)}`:''}</div></td><td>${_esc(r.stageName)}</td><td class="num r">${r.days??'—'}</td><td>${r.src?_esc(r.src):'<span class="dimv">—</span>'}</td><td class="num r">${r.rfq}</td><td>${r.flags.map(f=>flag(f,r)).join('')}</td></tr>`).join('')
+   +`</tbody></table></div>`:'<div class="dimv">открытых сделок с проблемами нет</div>');
+  el.innerHTML=h;
+})();
+
 // ---- tkp list
 const tkpMax=Math.max(1,...A.map(r=>r.tkpP));
-document.getElementById('tkpList').innerHTML=[...A].sort((a,b)=>b.tkpP-a.tkpP).map(r=>`<div class="blrow"><div class="blt"><span>${_esc(r.n)} <span class="dimv mono">${r.tkp} из ${r.c}</span></span><b style="color:var(--a2)">${r.tkpP}%</b></div><div class="bltrack"><i style="width:0%;background:linear-gradient(90deg,var(--a),var(--a2))" data-w="${r.tkpP/tkpMax*100}"></i></div></div>`).join('');
+document.getElementById('tkpList').innerHTML=[...A].sort((a,b)=>b.tkpP-a.tkpP).map(r=>`<div class="blrow"><div class="blt"><span>${_esc(r.n)}${_tag(r)} <span class="dimv mono">${r.tkp} из ${r.c}</span></span><b style="color:var(--a2)">${r.tkpP}%</b></div><div class="bltrack"><i style="width:0%;background:linear-gradient(90deg,var(--a),var(--a2))" data-w="${r.tkpP/tkpMax*100}"></i></div></div>`).join('');
 
 // ---- donut helper
 function donut(el,parts,top,bot){let off=0;parts.forEach(p=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',21);c.setAttribute('cy',21);c.setAttribute('r',15.915);c.setAttribute('fill','transparent');c.setAttribute('stroke',cs.getPropertyValue(p.col).trim());c.setAttribute('stroke-width',5);c.setAttribute('stroke-dasharray',`${p.pct} ${100-p.pct}`);c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 21 21)');el.appendChild(c);off+=p.pct;});
@@ -915,7 +1008,7 @@ document.getElementById('insCov').innerHTML=INS.coverage||'<span class="dimv">�
 
 // ---- footer
 document.getElementById('footer').innerHTML=
- `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде, группировка по «ответственному». Блок A — отдел 172 (Гринёв) и подчинённые; блок B — все прочие. «КП/выбран» = Selected + «КП получено»; «Отказ» = «Отказ в КП» + прочие закрытые; «Молчание» = «Ответ не получен в срок». «Ср. срок» = createdTime→movedTime по закрытым. Цепочка до сделки — через <span class="mono">parentId2</span>; «ТКП выдано+» = стадия сделки в исполнении/выиграна. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
+ `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде; исполнитель — ответственный карточки, у карточек робота — «Сорсер» сделки и следы человека. Блок A — отдел 172 (Гринёв) и подчинённые, <b>включая ушедших</b>: их запросы — работа отдела; блок B — все прочие. <b>Темп</b> — запросов в рабочий день (Пн–Пт, праздники не вычитаются) своего окна работы: с даты приёма (не позже первой карточки), у ушедших — по последний вход в портал (* — по последней своей карточке). Рейтинг — по темпу последних 4 недель. «КП/выбран» = Selected + «КП получено»; «Отказ» = «Отказ в КП» + прочие закрытые; «Молчание» = «Ответ не получен в срок». «Ср. срок» = createdTime→movedTime по закрытым. Цепочка до сделки — через <span class="mono">parentId2</span>; «ТКП выдано+» = стадия сделки в исполнении/выиграна. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
  `<b>Данные:</b> live-выгрузка из kvantpro.bitrix24.ru · ${M.period.label}.`;
 
 // ---- дрилл-даун по сорсеру: кому и какие запросы он отправлял
@@ -928,7 +1021,9 @@ const _wk=i=>(i>=0&&M.weekly[i])?`${M.weekly[i].w} (${M.weekly[i].d})`:'—';
 function openDrw(uid){
   const s=_byId[String(uid)];if(!s)return;
   document.getElementById('drwName').textContent=s.n;
-  document.getElementById('drwSub').textContent=`${s.c} запросов · ${s.perDay}/дн · до ТКП ${s.tkpP}%`;
+  document.getElementById('drwSub').textContent=`${s.c} запросов · ${s.perDay} в раб. день (окно ${_dm(s.from)}–${_dm(s.to)}, ${s.wd} раб.дн)`
+    +(s.perDay4!=null?` · за 4 недели ${s.perDay4}/дн`:'')+` · до ТКП ${s.tkpP}%`
+    +(_gone(s)?` · ушёл ${_dm(s.to)}${s.toEst?'*':''}, открыто ${s.open||0}${s.afterLeft?`, после ухода ${s.afterLeft}`:''}`:'');
   const b=s.buckets||{};
   const tot=SBUCK.reduce((a,[k])=>a+(b[k]||0),0)||1;
   const sup=s.bySupplier||[];
@@ -1624,10 +1719,13 @@ function renderContracts(){
   const nSlow=live.filter(r=>r.slow).length, nLate=live.filter(r=>r.late).length,
         nNoEcon=live.filter(r=>r.noEcon).length, nNoDl=live.filter(r=>r.noDl>0).length,
         nGross=live.filter(r=>r.grossSusp).length,
+        nGone=live.filter(r=>r.managerGone||r.ossGone).length,
         nDone=R.filter(r=>r.done||r.closed).length;
+  const GN=X.gone||{};
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (${X.orphan.buy})`:'';
   const bl=(items,color)=>{const mx=Math.max(1,...items.map(b=>b.med));return items.map(b=>`<div class="blrow"><div class="blt"><span>${_esc(_stShort(b.name))} <span class="dimv mono">n=${b.n}</span></span><b>${b.med} дн</b></div><div class="bltrack"><i style="width:${(b.med/mx*100).toFixed(0)}%;background:${color}"></i></div>${b.over?`<div class="dep" style="margin-top:2px"><span class="nrc">⚠ ${b.over} из ${b.live||'?'} тянутся дольше нормы</span> · в среднем на <b class="mono">+${b.lostAvg} дн</b></div>`:(b.live?`<div class="dep" style="margin-top:2px">сейчас в стадии: ${b.live} · все в норме</div>`:'')}</div>`).join('');};
-  const cut=items=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(m.name)} <span class="dimv mono">${m.liveOrders} живых</span></span><b class="nrc">${m.lateOrders} · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join(''):'<div class="dimv">нет данных</div>';
+  // по человеку: сколько просрочено из его живых заказов и с какой сделки начинать
+  const cut=items=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(String(m.name).replace(/ \(уволен\)$/,''))}${m.gone?' <span class="gone">уволен — переназначить</span>':''} <span class="dimv mono">${m.lateOrders} из ${m.liveOrders} живых · ${m.pct}%</span></span><b class="nrc">${m.lateDeals||0} сд. · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div>${m.top?`<div class="sub2">начать с №${m.top.seq||'—'}${m.top.customer&&m.top.customer!=='—'?' '+_esc(m.top.customer):''}: просрочка ${m.top.days} дн</div>`:''}</div>`).join(''):'<div class="dimv">нет данных</div>';
 
   // ---------- шапка ----------
   const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную: 1 USD = ${fx.usdRub} ₽). Отчётность с другим курсом разойдётся системно.</span>`:'';
@@ -1645,11 +1743,12 @@ function renderContracts(){
 
   // ---------- 2. ТРЕБУЕТ РЕШЕНИЯ: плитки-фильтры ----------
   h+=`<div class="secttl"><b>·</b> Требует решения${qmark('ct.act')}</div>`
-   +`<div class="kpis" id="ctAct" style="grid-template-columns:repeat(4,1fr)">`
+   +`<div class="kpis" id="ctAct" style="grid-template-columns:repeat(${nGone?5:4},1fr)">`
    +`<div class="actile bad" data-m="late" tabindex="0"><div class="t">🚩 Просрочен дедлайн</div><div class="v">${nLate}</div><div class="m">сделок · заказов ${dl.lateOrders||0} · потери ${H.loss}</div></div>`
    +`<div class="actile warn" data-m="slow" tabindex="0"><div class="t">⏳ Замедлено</div><div class="v">${nSlow}</div><div class="m">стадия тянется дольше нормы</div></div>`
    +`<div class="actile amb" data-m="nodl" tabindex="0"><div class="t">❓ Без плановой даты</div><div class="v">${nNoDl}</div><div class="m">сделок · заказов ${dl.noDl||0} вне контроля срока</div></div>`
    +`<div class="actile amb" data-m="noecon" tabindex="0"><div class="t">📄 Нет экономики</div><div class="v">${nNoEcon}</div><div class="m">ни файла, ни money-полей в сделке</div></div>`
+   +(nGone?`<div class="actile bad" data-m="gone" tabindex="0"><div class="t">👤 Ведёт уволенный</div><div class="v">${nGone}</div><div class="m">сделок на ${GN.sale||'—'} · живых заказов ${GN.orders||0}${GN.late?` · просрочено ${GN.late}`:''} — переназначить</div></div>`:'')
    +`</div>`
    +`<div class="note" style="margin-top:6px">Клик по плитке — список этих сделок в таблице ниже.</div>`;
 
@@ -1681,15 +1780,15 @@ function renderContracts(){
     h+=`<div class="secttl"><b>·</b> Где стоит процесс${qmark('ct.funnel')}</div><div class="grid">`
      +`<section class="card"><h2>Воронка реализации</h2><div class="note">Открытые сделки по стадиям в порядке движения. Длина полосы — деньги на стадии, красная часть — деньги сделок с сорванным сроком. «Типично» — медианное время стадии по истории переходов.</div><div class="fnl">${fnl||'<div class="dimv">нет открытых сделок</div>'}</div></section>`
      +`<section class="card"><h2>Узкие места закупки</h2><div class="note">Стадии заказов СП-172 по типичной длительности — где в норме уходит больше всего времени. Под баром: сколько заказов там сейчас и сколько тянутся дольше нормы (порог 2× медианы, мин. 7 дн).</div><div class="barlist">${bl(sp.orderBench||[],'linear-gradient(90deg,var(--b),var(--b2))')}</div>`
-     +`<div class="note" style="margin-top:10px">Медиана полного цикла заказа: <b>${sp.medCycle!=null?sp.medCycle+' дн':'—'}</b> · медианный лаг до первого заказа: <b>${sp.medLag!=null?sp.medLag+' дн':'—'}</b>.</div></section></div>`;
+     +`<div class="note" style="margin-top:10px">Медиана полного цикла заказа: <b>${sp.medCycle!=null?sp.medCycle+' дн':'—'}</b> · медианный лаг до первого заказа: <b>${sp.medLag!=null?sp.medLag+' дн':'—'}</b>.${sp.benchDays?` Нормы стадий и цикл — по последним ${sp.benchDays} дням: команда и процесс меняются, двухлетняя медиана мерит не нынешний отдел; стадия с редкими переходами берёт всю историю.`:''}</div></section></div>`;
   }
 
   // ---------- 5. РАЗБОРЫ (свёрнуто) ----------
   const dp=dl.depth||{}, mxd=Math.max(1,...Object.values(dp));
   const depthBars=[['<30','до 30 дн'],['30-90','30–90 дн'],['90-180','90–180 дн'],['>180','больше 180 дн']]
     .map(([k,lb])=>`<div class="blrow"><div class="blt"><span>${lb}</span><b>${dp[k]||0}</b></div><div class="bltrack"><i style="width:${((dp[k]||0)/mxd*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('');
-  h+=`<details class="sect"><summary>Кто срывает сроки — по менеджеру и ОСС</summary><div class="in">`
-   +`<div class="note">Просроченных заказов и закупка под ними; полоса — доля просроченных от всех живых заказов этого человека.</div>`
+  h+=`<details class="sect"><summary>Кто срывает сроки — по менеджеру и ОСС${(dl.byManager||[]).concat(dl.byOss||[]).some(m=>m.gone)?' · есть уволенные':''}</summary><div class="in">`
+   +`<div class="note">Просроченных заказов из живых у человека, сделок с просрочкой и закупка под ними; полоса — доля просроченных. Под строкой — сделка с самой глубокой просрочкой: с неё начинать. Уволенные помечены — их сделки переназначить.</div>`
    +`<div class="barlist">${cut(dl.byManager)}</div>`
    +`<div class="note" style="margin-top:10px">ОСС (сопровождение сделки):</div><div class="barlist">${cut(dl.byOss)}</div>`
    +`</div></details>`
@@ -1706,7 +1805,7 @@ function renderContracts(){
   // ---------- 6. ТАБЛИЦА ----------
   h+=`<div class="secttl" id="ctSect"><b>·</b> Все сделки в реализации <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
    +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · поставщик · менеджер · ОСС · город…">`
-   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="gross"><i class="dot snr"></i>Занижена закупка <b>${nGross}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
+   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="gross"><i class="dot snr"></i>Занижена закупка <b>${nGross}</b></span>${nGone?`<span class="stchip" data-m="gone"><i class="dot snr"></i>Ведёт уволенный <b>${nGone}</b></span>`:''}<span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
    +`<section class="card"><div class="note">«Стадия · дней» — где сделка сейчас и сколько дней в этой стадии (краснеет при превышении нормы). «Дедлайн клиенту» — обещанная заказчику дата: 🚩 с глубиной просрочки либо ближайший срок. «Закупка» — Σ заказов СП-172, иначе из экономики проекта. «Валовая маржа» = продажа − закупка: логистика, таможня, пошлины и НДС в неё НЕ входят. Красная строка — требует внимания. Клик по строке — вся сделка целиком; по заголовку — сортировка.</div><div class="note tsnote">На узком экране таблица прокручивается вбок; часть колонок скрыта — все цифры есть в карточке сделки.</div><div class="tscroll"><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></div></section>`;
   el.innerHTML=h;
 
@@ -1754,6 +1853,7 @@ function renderContracts(){
     else if(mode==='late')r=r.filter(x=>x.late&&!x.closed);
     else if(mode==='nodl')r=r.filter(x=>x.noDl>0&&!x.closed);
     else if(mode==='gross')r=r.filter(x=>x.grossSusp);
+    else if(mode==='gone')r=r.filter(x=>(x.managerGone||x.ossGone)&&!x.closed);
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')+' '+(x.manager||'')+' '+(x.oss||'')+' '+(x.cities||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;
