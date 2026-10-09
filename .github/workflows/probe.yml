@@ -13,7 +13,7 @@ on:
         description: "Какой зонд запустить"
         type: choice
         default: bitrix_probe.py
-        options: [bitrix_probe.py, probe_mail_files.py, probe_conversion.py, probe_presale.py]
+        options: [bitrix_probe.py, probe_mail_files.py, probe_conversion.py, probe_presale.py, probe_2526.py]
 
 permissions:
   contents: read
@@ -42,7 +42,7 @@ jobs:
           BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
           PROBE_SCRIPT: ${{ inputs.script || 'bitrix_probe.py' }}
           # Один процесс в общей очереди, с запасом: рядом может идти пересборка
-          # дашборда (её группа своя). probe_conversion.py — ~45 мин при 1/с (≈900 запросов);
+          # дашборда (её группа своя). probe_conversion.py и probe_2526.py — ~20–45 мин при 1/с (≈950 запросов);
           # ставить вне 01:00–05:30 UTC и не на :07, проверив, что очередь пуста.
           BITRIX_RPS: "1.0"
           BITRIX_PARALLEL: "1"
