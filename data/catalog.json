@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 317,
-    "total_bytes": 127626736,
+    "total_bytes": 127639368,
     "by_sensitivity": {
       "внутреннее": 195,
       "конфиденциально": 69,
@@ -913,7 +913,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 1758255,
+      "bytes": 1770887,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -926,9 +926,9 @@
         "key": "assessment",
         "records": 15
       },
-      "last_change": "2026-10-01",
+      "last_change": "2026-10-02",
       "last_author": "github-actions[bot]",
-      "last_commit": "4e5b6dda",
+      "last_commit": "9af96779",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2977,6 +2977,7 @@
         "gpu/tools/build_targets.py",
         "scripts/budget_snapshot.py",
         "scripts/preflight.py",
+        "scripts/probe_conversion.py",
         "templates/dashboard_core.html"
       ]
     },
@@ -3030,8 +3031,8 @@
         "data/brand_research/vibrometermeggitt.json"
       ],
       "last_change": "2026-10-02",
-      "last_author": "Claude",
-      "last_commit": "dad8a4f2",
+      "last_author": "skharkov1246",
+      "last_commit": "7ea7152c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3510,8 +3511,8 @@
         ]
       },
       "last_change": "2026-10-02",
-      "last_author": "Claude",
-      "last_commit": "dad8a4f2",
+      "last_author": "skharkov1246",
+      "last_commit": "7ea7152c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3636,8 +3637,8 @@
         "records": 3
       },
       "last_change": "2026-10-02",
-      "last_author": "Claude",
-      "last_commit": "dad8a4f2",
+      "last_author": "skharkov1246",
+      "last_commit": "7ea7152c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6002,8 +6003,8 @@
         ]
       },
       "last_change": "2026-10-02",
-      "last_author": "Claude",
-      "last_commit": "dad8a4f2",
+      "last_author": "skharkov1246",
+      "last_commit": "7ea7152c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -11358,9 +11359,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-25",
+      "last_change": "2026-10-02",
       "last_author": "skharkov1246",
-      "last_commit": "fb810117",
+      "last_commit": "7ea7152c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -12155,8 +12156,8 @@
         ]
       },
       "last_change": "2026-10-02",
-      "last_author": "Claude",
-      "last_commit": "dad8a4f2",
+      "last_author": "skharkov1246",
+      "last_commit": "7ea7152c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
