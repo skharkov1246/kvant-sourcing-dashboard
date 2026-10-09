@@ -44,6 +44,7 @@ import datetime as dt
 import re
 from collections import Counter, defaultdict
 
+import presale as presale_mod
 from bitrix_client import BitrixClient
 
 YEAR_START = "2026-01-01T00:00:00"
@@ -487,7 +488,7 @@ def _blank() -> dict:
     return {"open": 0, "presale": 0, "presaleSum": 0.0, "real": 0, "realSum": 0.0, "buy": 0.0,
             "late": 0, "lateSum": 0.0, "stale": 0, "dead": 0, "noAmt": 0, "noComp": 0,
             "neg": 0, "clean": 0, "created": 0, "won": 0, "wonSum": 0.0, "lost": 0, "lostSum": 0.0,
-            "byField": 0, "big": 0, "bigSum": 0.0, "ages": []}
+            "byField": 0, "big": 0, "bigSum": 0.0, "ages": [], "inSrc": 0}
 
 
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
@@ -502,6 +503,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     dept_parent = {str(d["ID"]): str(d.get("PARENT") or "") for d in _deps_raw}
     cats = deal_categories(client)
     stage_meta = client.deal_stage_meta()
+    # Воронка пресейла: сделка КАМа, но пока мяч у сорсинга (назначение сорсера,
+    # поиск поставщиков, КП, экономика), это не нагрузка КАМа и не его «косяки» —
+    # сумма у пресейла появляется только после сравнения КП (решение владельца
+    # 09.10.2026, «на ком мяч»). Такие сделки идут отдельным счётом «в пресейле у
+    # сорсинга»; сделки с мячом у КАМа считаются как обычно.
+    _ps = presale_mod.find_category(cats)
+    presale_cid = _ps[0] if _ps else ""
+    in_src: list[dict] = []
     catname = lambda c: cats.get(str(c), f"воронка #{c}")
 
     curlist = client.call("crm.currency.list", {}) or []
@@ -585,6 +594,26 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         if cat in TECH_CATS:
             tech += 1
             continue
+        if presale_cid and cat == presale_cid:
+            _sm = stage_meta.get(str(d.get("STAGE_ID") or "")) or {}
+            if presale_mod.ball_of(_sm.get("name", ""), _sm.get("sem", "P")) in presale_mod.SOURCING_BALL:
+                _k, _ = attribute(d, "kam")
+                _p, _ = attribute(d, "prod")
+                for _role, _u in (("kam", _k), ("prod", _p)):
+                    if _u:
+                        agg[(_role, _u)]["inSrc"] += 1
+                _amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+                in_src.append({
+                    "id": str(d["ID"]), "t": (d.get("TITLE") or f"Сделка #{d['ID']}")[:90],
+                    "kam": _k, "prod": _p, "own": str(d.get("ASSIGNED_BY_ID") or ""),
+                    "ownLive": bool(people.get(str(d.get("ASSIGNED_BY_ID") or ""), {}).get("active")),
+                    "cat": catname(cat), "catId": cat, "stage": _sm.get("name", str(d.get("STAGE_ID") or "")),
+                    "amt": _money(_amt), "raw": round(_amt), "state": "src",
+                    "idle": _days_since(d.get("MOVED_TIME") or d.get("LAST_ACTIVITY_TIME"), today),
+                    "noAmt": False, "noComp": False, "neg": False, "big": False,
+                    "date": str(d.get("DATE_CREATE", ""))[:10], "plan": True,
+                })
+                continue
         did = str(d["ID"])
         amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
         buy = buy_by_deal.get(did, 0.0)
@@ -717,6 +746,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "cleanPct": (round(a["clean"] / a["open"] * 100) if a["open"] else None),
             "medIdle": (ages[len(ages) // 2] if ages else None),
             "loadRaw": round(a["presaleSum"] + a["realSum"]),
+            # только у тех, у кого такие сделки есть: у строк уволенных владельцев
+            # (orphan) счёт не ведётся, и поле из одних нулей там лишнее
+            **({"inSrc": a["inSrc"]} if a["inSrc"] else {}),
         }
 
     def block(role: str) -> dict:
@@ -788,6 +820,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "perPersonSum": (_money((tot["presaleSum"] + tot["realSum"]) / n) if n else "—"),
                 "medianDeals": (opens[len(opens) // 2] if opens else 0),
                 "maxDeals": (opens[-1] if opens else 0),
+                "inSrc": tot["inSrc"],
             },
         }
 
@@ -813,7 +846,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     live_open = len(details)
     nobody = [d for d in details if not d["kam"] and not d["prod"] and d["ownLive"]]
     recon = {
-        "openTotal": live_open, "tech": tech,
+        "openTotal": live_open, "tech": tech, "inSrc": len(in_src),
         "kam": kam["totals"]["open"], "prod": prod["totals"]["open"],
         "both": sum(1 for d in details if d["kam"] and d["prod"]),
         "none": len(nobody), "noneSum": _money(sum(d["raw"] for d in nobody)),
@@ -838,6 +871,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "orphan": orphan, "recon": recon, "staff": staff, "hygiene": hyg,
         "headless": gaps_all, "promise": _promise_stats(promise),
         "deals": details,
+        # сделки пресейла, где мяч у сорсинга: КАМу видно, что его клиент в работе
+        "inSrc": in_src,
+        "presaleCat": catname(presale_cid) if presale_cid else "",
         "params": {"stale": STALE_DAYS, "dead": DEAD_DAYS, "mult": OUTLIER_MULT,
                    "medAmt": _money(med_amt), "bigCut": _money(big_cut)},
     }
