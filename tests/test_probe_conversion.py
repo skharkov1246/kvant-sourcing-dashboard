@@ -176,3 +176,26 @@ def test_журнал_без_клиентов_и_людей(capsys):
     assert "Учебный Клиент" not in out and "Прочие клиенты" in out
     assert "Вымысл" not in out and "Иванов" not in out, "слова вне общей лексики — «…»"
     assert "воронка 8 «Тендеры»" in out and "воронка 2:" in out
+
+
+def test_по_сумме_и_строкам_случай_владельца(capsys):
+    """КП на 1000 строк и 1 000 000 €, контракт взят на 2 строки: по числу сделок это
+    «выигрыш», по сумме — почти ноль. Сумма сделки в карточке осталась суммой КП —
+    это видно по отношению «сумма сделки / выручка бюджета»."""
+    rows = [
+        {"id": "1", "realization_only": False, "offer_dated": True, "cls": "contract", "amount": 1_000_000},
+        {"id": "2", "realization_only": False, "offer_dated": True, "cls": "lost", "amount": 300_000},
+        {"id": "3", "realization_only": False, "offer_dated": True, "cls": "lost", "amount": 200_000},
+        {"id": "4", "realization_only": False, "offer_dated": True, "cls": "open", "amount": 25_000_000},  # выброс
+        {"id": "5", "realization_only": False, "offer_dated": False, "cls": "lost", "amount": 900_000},   # не в базе
+    ]
+    д = m.свод_денег(rows, закупка={"1": 1_500}, бюджет={"1": 2_000}, товарные={"1": 1000, "2": 400, "3": 600})
+    assert д["conv_value"] == 67                       # 1 000 000 / 1 500 000 — сумма сделки не исправлена
+    assert д["conv_value_budget"] == 0                 # 2 000 / 1 500 000 — по выручке бюджета
+    assert д["deal_to_budget_med"] == 500.0 and д["deal_over_2x_budget"] == 1
+    assert д["deal_to_purchase_med"] == 666.67 and д["deal_over_3x_purchase"] == 1
+    assert д["outliers"] == 1 and д["with_amount"] == 3
+    assert д["conv_rows"] == 50                        # 1000 / 2000 строк
+    print(m.строка_денег("Норникель", д))
+    out = capsys.readouterr().out
+    assert "1000000" not in out.replace(" ", "") and "1 500 000" not in out, "сумм в журнале нет — только доли"

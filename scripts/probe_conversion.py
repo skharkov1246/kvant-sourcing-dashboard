@@ -64,6 +64,7 @@ HOLDING = "Норникель"
 DEPT_HOLDING = "110"           # kam.CLIENT_GROUPS: «Норникель»
 ORDER_ENTITY = 172
 STUCK_DAYS = 120               # history.STUCK_DAYS
+OUTLIER_EUR = 20_000_000       # history.OUTLIER_EUR: выше — почти всегда ошибка ввода
 TWIN_DAYS = 180                # окно поиска предпродажной сделки для карточки реализации
 MIN_N = 30                     # меньше — доля печатается с пометкой «мало данных»
 MSK = ZoneInfo("Europe/Moscow")
@@ -155,7 +156,7 @@ def _дата(s):
     return dt.date.fromisoformat(s) if s else None
 
 
-def классифицировать(сделки, история, мета, заказы, холдинг_сделки, сегодня):
+def классифицировать(сделки, история, мета, заказы, холдинг_сделки, сегодня, деньги_сделок=None):
     """Сделки → строка на сделку. Чистая функция.
 
     история — {deal_id: [(stage_id, iso_time), …]} первых входов в стадию;
@@ -210,6 +211,7 @@ def классифицировать(сделки, история, мета, з�
             "stuck": cls == "open" and возраст is not None and возраст > STUCK_DAYS,
             "young": cls == "open" and (возраст is None or возраст <= STUCK_DAYS),
             "twin_of": None,
+            "amount": деньги_сделок.get(did) if деньги_сделок else None,
         })
     return out
 
@@ -270,6 +272,61 @@ def свод(строки):
     }
 
 
+def свод_денег(строки, закупка, бюджет, товарные):
+    """Конверсия ПО СУММЕ и по строкам, только доли и отношения (журнал публичный).
+
+    закупка — {deal_id: Σ заказов поставщикам, €}; бюджет — {deal_id: выручка без НДС, €};
+    товарные — {deal_id: число товарных строк сделки}. База — сделки с датированным
+    предложением (как у симметричной конверсии); суммы выше OUTLIER_EUR — ошибки ввода.
+    """
+    база = [r for r in строки if not r["realization_only"] and r["offer_dated"]]
+    с_суммой = [r for r in база if r.get("amount") and 0 < r["amount"] <= OUTLIER_EUR]
+    выбросов = sum(1 for r in база if r.get("amount") and r["amount"] > OUTLIER_EUR)
+    к = [r for r in с_суммой if r["cls"] == "contract"]
+    п = [r for r in с_суммой if r["cls"] == "lost"]
+    всего = sum(r["amount"] for r in с_суммой)
+    взято = sum(r["amount"] for r in к)
+    # контракт по выручке бюджета, где бюджет есть, иначе — по сумме сделки
+    взято_б = sum(бюджет.get(r["id"]) or r["amount"] for r in к)
+    к_б = [r for r in к if бюджет.get(r["id"])]
+    к_з = [r for r in к if закупка.get(r["id"])]
+    отн_б = sorted(r["amount"] / бюджет[r["id"]] for r in к_б)
+    отн_з = sorted(r["amount"] / закупка[r["id"]] for r in к_з)
+    стр = [r for r in база if товарные.get(r["id"])]
+    стр_к = [r for r in стр if r["cls"] == "contract"]
+    def мед(xs):
+        return round(statistics.median(xs), 2) if xs else None
+    return {
+        "n": len(база), "with_amount": len(с_суммой), "outliers": выбросов,
+        "conv_value": доля(взято, всего), "conv_value_budget": доля(взято_б, всего),
+        "won_vs_lost_size": (round(statistics.median([r["amount"] for r in к]) /
+                                   statistics.median([r["amount"] for r in п]), 2) if к and п else None),
+        "share_top10": доля(sum(sorted((r["amount"] for r in с_суммой), reverse=True)[:max(1, len(с_суммой) // 10)]), всего),
+        "budget_n": len(к_б), "deal_to_budget_med": мед(отн_б),
+        "deal_over_2x_budget": sum(1 for x in отн_б if x > 2), "deal_under_half_budget": sum(1 for x in отн_б if x < 0.5),
+        "purchase_n": len(к_з), "deal_to_purchase_med": мед(отн_з), "deal_over_3x_purchase": sum(1 for x in отн_з if x > 3),
+        "rows_n": len(стр), "rows_contracts": len(стр_к),
+        "conv_rows": доля(sum(товарные[r["id"]] for r in стр_к), sum(товарные[r["id"]] for r in стр)),
+        "rows_med_won": мед([товарные[r["id"]] for r in стр_к]),
+        "rows_med_lost": мед([товарные[r["id"]] for r in стр if r["cls"] == "lost"]),
+    }
+
+
+def строка_денег(имя, д):
+    def f(v, n=None):
+        return "—" if v is None else (f"{v}%" + (" (мало данных)" if n is not None and n < MIN_N else ""))
+    return (f"  {str(имя)[:30]:30} ПО СУММЕ {f(д['conv_value'], д['with_amount'])}"
+            f" · по сумме с выручкой бюджета вместо суммы сделки {f(д['conv_value_budget'])}"
+            f" | сумма есть у {д['with_amount']} из {д['n']} (выбросов > {OUTLIER_EUR / 1e6:g} млн € {д['outliers']})"
+            f" | выигранная/проигранная по медиане суммы ×{д['won_vs_lost_size']}"
+            f" · 10 % крупнейших предложений = {f(д['share_top10'])} всей суммы"
+            f" | у контрактов сумма сделки / выручка бюджета: медиана ×{д['deal_to_budget_med']} (по {д['budget_n']};"
+            f" больше ×2 у {д['deal_over_2x_budget']}, меньше ×0,5 у {д['deal_under_half_budget']})"
+            f" · сумма сделки / закупка: медиана ×{д['deal_to_purchase_med']} (по {д['purchase_n']}; больше ×3 у {д['deal_over_3x_purchase']})"
+            f" | ПО СТРОКАМ {f(д['conv_rows'], д['rows_n'])} (товарные строки есть у {д['rows_n']} предложений,"
+            f" {д['rows_contracts']} контрактов; медиана строк: выигр. {д['rows_med_won']}, проигр. {д['rows_med_lost']})")
+
+
 def строка_свода(имя, с):
     def f(v, n):
         if v is None:
@@ -310,7 +367,7 @@ def имя_воронки(cat, cats, лексика):
     return f"воронка {cat}"
 
 
-def отчёт(строки, история, кам_сделки, мета, cats):
+def отчёт(строки, история, кам_сделки, мета, cats, закупка=None, бюджет=None, товарные=None):
     import kam
     лексика = общая_лексика(мета)
     print(f"\nВЫБОРКА: сделки, созданные с {SINCE[:10]}; одна сделка — одно предложение; год — по дате "
@@ -356,6 +413,22 @@ def отчёт(строки, история, кам_сделки, мета, cats
         if sum(свод([r for r in выборка if r["cohort"] == г])["offers"] for г in годы) != свод(выборка)["offers"]:
             raise RuntimeError("годы не сходятся с итогом")
 
+    if закупка is not None:
+        import kam as _kam
+        print("\nКОНВЕРСИЯ ПО СУММЕ И ПО СТРОКАМ (доли и отношения; сумм в журнале нет)")
+        hn_ = [r for r in строки if r["holding"] == HOLDING]
+        print(строка_денег("Все клиенты", свод_денег(строки, закупка, бюджет, товарные)))
+        print(строка_денег(HOLDING, свод_денег(hn_, закупка, бюджет, товарные)))
+        изв = {имя for _, имя in _kam.CLIENT_HOLDINGS}
+        for h in sorted(изв - {HOLDING}):
+            вы = [r for r in строки if r["holding"] == h]
+            if вы:
+                print(строка_денег(h, свод_денег(вы, закупка, бюджет, товарные)))
+        for заголовок, выборка in ((HOLDING, hn_), ("Все клиенты", строки)):
+            print(f"{заголовок} — по сумме, по году:")
+            for год in sorted({r["cohort"] for r in выборка}):
+                print(строка_денег(год, свод_денег([r for r in выборка if r["cohort"] == год], закупка, бюджет, товарные)))
+
     print(f"\n{HOLDING} — по воронке, где сделка заведена:")
     for cat in sorted({r["origin"] for r in hn}, key=lambda x: -свод([r for r in hn if r["origin"] == x])["offers"]):
         с = свод([r for r in hn if r["origin"] == cat])
@@ -380,6 +453,39 @@ def отчёт(строки, история, кам_сделки, мета, cats
           f"{sum(1 for r in по_каму if r['holding'] not in (HOLDING, 'Без клиента'))}")
     print(строка_свода(f"{HOLDING} (по КАМ)", свод(по_каму)))
     print(строка_свода(f"{HOLDING} (обе разметки)", свод([r for r in hn if r["id"] in общие])))
+
+
+def читать_бюджеты(в_евро):
+    """Выручка без НДС из снимка бюджетов сделок (data/budget_snapshot.json, суммы в
+    рублях; пишет бот scripts/budget_snapshot.py) → {deal_id: €}."""
+    import json
+    p = Path(__file__).resolve().parents[1] / "data" / "budget_snapshot.json"
+    try:
+        снимок = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    out = {}
+    for b in снимок.get("budgets") or []:
+        m = re.search(r"/deal/details/(\d+)", str(b.get("deal_url") or ""))
+        v = в_евро(b.get("revenue_net"), "RUB")
+        if m and v:
+            out[m.group(1)] = v
+    return out
+
+
+def товарные_строки(client, ids):
+    """Число товарных строк сделок пакетом batch по 50 команд → {deal_id: строк}."""
+    from urllib import parse
+    out: dict[str, int] = {}
+    for i in range(0, len(ids), 50):
+        часть = ids[i:i + 50]
+        cmd = {f"d{d}": "crm.deal.productrows.get?" + parse.urlencode({"id": d}) for d in часть}
+        res = client.call("batch", {"halt": 0, "cmd": cmd}) or {}
+        рез = res.get("result") or {}
+        for d in часть:
+            ряды = рез.get(f"d{d}") if isinstance(рез, dict) else None
+            out[d] = len(ряды) if isinstance(ряды, list) else 0
+    return out
 
 
 def читать_историю(client, ids):
@@ -438,7 +544,7 @@ def main() -> int:
 
     сделки = client.list_deals_fast(filter={">=DATE_CREATE": SINCE}, select=[
         "ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE",
-        "COMPANY_ID", "ASSIGNED_BY_ID", people.KAM_F, people.KAM_OLD])
+        "COMPANY_ID", "ASSIGNED_BY_ID", people.KAM_F, people.KAM_OLD, "OPPORTUNITY", "CURRENCY_ID"])
     print(f"прочитано сделок: {len(сделки)} из {всего}")
     if len(сделки) < всего:
         print("::error::обход сделок оборвался — итог был бы неполным")
@@ -492,17 +598,46 @@ def main() -> int:
         print("::error::без истории стадий больше 1 % сделок — итог был бы неполным")
         return 1
 
-    сырые = client.list_items(ORDER_ENTITY, filter={}, select=["id", "stageId", "createdTime", "parentId2"])
+    сырые = client.list_items(ORDER_ENTITY, filter={}, select=["id", "stageId", "createdTime", "parentId2",
+                                                                "opportunity", "currencyId"])
     if len(сырые) < ждём_заказов:
         print(f"::error::заказы СП-172 прочитаны не все: {len(сырые)} из {ждём_заказов}")
         return 1
     заказы = [о for о in сырые if not str(о.get("stageId", "")).endswith(":FAIL")]
     print(f"заказов поставщикам: {len(сырые)}, непроигранных {len(заказы)}")
 
-    строки = классифицировать(сделки, история, мета, заказы, холдинг, dt.datetime.now(MSK).date())
+    валюты = client.call("crm.currency.list", {}) or []
+    курс = {}
+    for x in валюты:
+        try:
+            курс[x.get("CURRENCY")] = float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)
+        except (TypeError, ValueError, ZeroDivisionError):
+            pass
+    база_валюта = next((x.get("CURRENCY") for x in валюты if x.get("BASE") == "Y"), "EUR")
+
+    def в_евро(сумма, валюта):
+        try:
+            v = float(сумма or 0)
+        except (TypeError, ValueError):
+            return None
+        k = 1.0 if (валюта or база_валюта) == база_валюта else курс.get(валюта)
+        return v * k if (k and v > 0) else None
+    деньги_сделок = {str(д["ID"]): в_евро(д.get("OPPORTUNITY"), д.get("CURRENCY_ID")) for д in сделки}
+    закупка: dict[str, float] = collections.defaultdict(float)
+    for о in заказы:
+        v = в_евро(о.get("opportunity"), о.get("currencyId"))
+        if v and str(о.get("parentId2") or "0") != "0":
+            закупка[str(о.get("parentId2"))] += v
+    бюджет = читать_бюджеты(в_евро)
+    print(f"курсы валют: {len(курс)}, база {база_валюта}; бюджетов сделок с выручкой: {len(бюджет)}")
+
+    строки = классифицировать(сделки, история, мета, заказы, холдинг, dt.datetime.now(MSK).date(), деньги_сделок)
     пар = найти_выигрыши_новой_карточкой(строки)
     print(f"карточек только реализации с найденной предпродажной парой: {пар}")
-    отчёт(строки, история, кам_сделки, мета, cats)
+    предложения = [r["id"] for r in строки if r["offer_dated"] and not r["realization_only"]]
+    товарные = товарные_строки(client, предложения)
+    print(f"товарные строки: прочитано по {len(предложения)} сделкам с предложением, есть у {sum(1 for v in товарные.values() if v)}")
+    отчёт(строки, история, кам_сделки, мета, cats, dict(закупка), бюджет, товарные)
     print(сводка_нагрузки())
     return 0
 
