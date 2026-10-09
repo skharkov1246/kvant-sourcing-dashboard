@@ -37,9 +37,42 @@ import config
 
 PRESALE_RE = re.compile(r"пре\s*-?\s*сейл|presale|pre\s*-?\s*sale|предпродаж", re.I)
 SOURCER_F = config.DEAL_SOURCER_FIELDS[0][0]     # «Сорсер» сделки
+HEAD_F = config.DEAL_SOURCER_FIELDS[1][0]        # «Head of sourcing departement» — заполнен у 100 %
 KAM_F = "UF_CRM_1740390857"                      # «КАМ»
 DEAL_SELECT = ["ID", "TITLE", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE", "MOVED_TIME",
-               "ASSIGNED_BY_ID", "CREATED_BY_ID", "COMPANY_ID", "OPPORTUNITY", SOURCER_F, KAM_F]
+               "ASSIGNED_BY_ID", "CREATED_BY_ID", "COMPANY_ID", "OPPORTUNITY", SOURCER_F, HEAD_F, KAM_F]
+
+# НА КОМ МЯЧ (решение владельца 09.10.2026): сделка пресейла — сделка КАМа, но по
+# стадии видно, кто делает следующий шаг: руководитель сорсинга (назначить сорсера),
+# сорсер (ТЗ, поиск, КП, экономика), КАМ (подача, тендер, решение заказчика) или
+# реализация (выиграна). Таблицей, а не ветвлениями (правило 4): правка разметки —
+# одна строка. Ищется по имени стадии, первое совпадение побеждает. Стадия, не
+# попавшая ни в одно правило, — «не размечена» и видна счётчиком: молча на КАМа
+# она не ложится. Две стадии размечены без подтверждения владельца: «Новый запрос»
+# (руководитель сорсинга) и «Техническая часть | Квалификация» (КАМ).
+BALL_RULES = (
+    (r"новый запрос|назначени\w* сорсер", "head"),
+    (r"проработк|поиск поставщ|сбор кп|анализ кп|фиксаци\w* поставщ|сравнени\w* предлож|расч[её]т эп|доработк", "src"),
+    (r"экономика готова|можно подавать|техническ\w* част|квалификац|тендерн|переторжк|торги"
+     r"|ожидаем решени|сорсинг заверш|согласовани\w* финальн", "kam"),
+)
+_BALL = [(re.compile(rx, re.I), who) for rx, who in BALL_RULES]
+BALL_LABEL = {"head": "руководитель сорсинга", "src": "сорсер", "kam": "КАМ", "real": "реализация",
+              "?": "стадия не размечена", "": "закрыта"}
+SOURCING_BALL = ("head", "src")
+
+
+def ball_of(stage_name: str, sem: str = "P") -> str:
+    """Чей ход по стадии: head | src | kam | real | ? (не размечена) | '' (закрыта отказом)."""
+    sem = (sem or "P").upper()
+    if sem == "S":
+        return "real"
+    if sem == "F":
+        return ""
+    for rx, who in _BALL:
+        if rx.search(stage_name or ""):
+            return who
+    return "?"
 # Пороги — по первому месяцу воронки (медиана «Поиска поставщиков» 11 дней, прочих
 # рабочих стадий 3–7): две недели без смены стадии — уже не поиск, а простой.
 ЗАСТОЙ_ДНЕЙ = 14
@@ -114,23 +147,33 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         firsts = [t for r in mine if (t := _date(r.get("createdTime")))]
         src_uid = _uid(d.get(SOURCER_F))
         src, src_gone = person(src_uid)
-        kam, _ = person(_uid(d.get(KAM_F)))
+        kam_uid = _uid(d.get(KAM_F)) or _uid(d.get("ASSIGNED_BY_ID"))
+        kam, kam_gone = person(kam_uid)
+        head, head_gone = person(_uid(d.get(HEAD_F)))
         open_ = sem == "P"
+        stage_name = (stage_meta.get(sid) or {}).get("name") or sid
+        ball = ball_of(stage_name, sem)
+        # кто держит мяч поимённо: сорсер без назначенного сорсера — руководитель
+        who, who_gone = {"head": (head, head_gone), "kam": (kam, kam_gone),
+                         "src": (src, src_gone) if src_uid else (head, head_gone)}.get(ball, ("", False))
         age = (today - created).days if created else None
         flags = []
-        if open_ and not src_uid:
+        on_src = ball in SOURCING_BALL
+        # действия сорсинга — только пока мяч у сорсинга; у КАМа — только застой
+        if open_ and on_src and not src_uid:
             flags.append("nosrc")
-        if open_ and src_gone:
+        if open_ and on_src and src_gone:
             flags.append("gone")
-        if open_ and not mine and age is not None and age >= БЕЗ_ЗАПРОСА_ДНЕЙ:
+        if open_ and on_src and not mine and age is not None and age >= БЕЗ_ЗАПРОСА_ДНЕЙ:
             flags.append("norfq")
         days = (today - moved).days if moved else None
         if open_ and days is not None and days > ЗАСТОЙ_ДНЕЙ:
             flags.append("stale")
         rows.append({
             "id": did, "t": str(d.get("TITLE") or f"Сделка #{did}")[:90],
-            "stage": sid, "stageName": (stage_meta.get(sid) or {}).get("name") or sid,
+            "stage": sid, "stageName": stage_name,
             "sem": sem, "open": open_, "days": days, "age": age,
+            "ball": ball, "who": who, "whoGone": who_gone,
             "created": created.isoformat() if created else "",
             "src": src, "srcId": src_uid, "srcGone": src_gone, "kam": kam,
             "rfq": len(mine), "quotes": sum(1 for r in mine if r.get("_hasQuote")),
@@ -146,6 +189,7 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
     for sid, m in stages:
         here = [r for r in rows if r["stage"] == sid]
         st_rows.append({"id": sid, "name": m.get("name") or sid, "sem": m.get("sem", "P"), "n": len(here),
+                        "ball": ball_of(m.get("name") or sid, m.get("sem", "P")),
                         "med": _median([r["days"] for r in here]),
                         "max": max((r["days"] for r in here if r["days"] is not None), default=None),
                         "stale": sum(1 for r in here if "stale" in r["flags"])})
@@ -207,6 +251,11 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "sumPct": _pct(sum(1 for r in rows if r["sum"]), len(rows)),
             "srcPct": _pct(sum(1 for r in rows if r["srcId"]), len(rows)),
             "otherStage": чужие,
+            # на ком мяч по открытым сделкам
+            "ballHead": sum(1 for r in open_rows if r["ball"] == "head"),
+            "ballSrc": sum(1 for r in open_rows if r["ball"] == "src"),
+            "ballKam": sum(1 for r in open_rows if r["ball"] == "kam"),
+            "ballUnknown": sum(1 for r in open_rows if r["ball"] == "?"),
             "staleDays": ЗАСТОЙ_ДНЕЙ, "noRfqDays": БЕЗ_ЗАПРОСА_ДНЕЙ,
         },
         "stages": st_rows,

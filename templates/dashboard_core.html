@@ -814,6 +814,7 @@ if (M.send && M.send.rows){
   const url=id=>`https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
   const FL={gone:['ушёл сорсер',''],nosrc:['нет сорсера',''],norfq:['нет запросов',''],stale:['стоит','']};
   const flag=(f,r)=>`<span class="psflag">${f==='stale'?`стоит ${r.days} дн`:FL[f][0]}</span>`;
+  const BL={head:'руководитель сорсинга',src:'сорсер',kam:'КАМ',real:'реализация','?':'не размечена','':'закрыта'};
   const kp=(lbl,val,meta,clz)=>`<div class="kpi ${clz||''}"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
   let h=`<h2>Воронка «${_esc(P.name)}» <span class="subtotal">сделок <b>${H.total}</b></span></h2>`
    +`<div class="note">Сделки, которые сорсинг ведёт от запроса заказчика до готовой экономики и ТКП: назначение сорсера → проработка ТЗ → поиск поставщиков и сбор КП → анализ и сравнение → экономика. Запросы поставщикам (СП-166) — под этими сделками. Сумма в сделке появляется после сравнения предложений, поэтому заполнена у ${H.sumPct}%.</div>`
@@ -824,13 +825,14 @@ if (M.send && M.send.rows){
    +kp('Без сорсера',H.noSrc,`«Сорсер» заполнен у ${H.srcPct}% сделок`,H.noSrc?'warn':'')
    +kp('Без запросов',H.noRfq,`открыты ${H.noRfqDays}+ дн, ни одного запроса`,H.noRfq?'warn':'')
    +kp('Стоят',H.stale,`в стадии дольше ${H.staleDays} дн`,H.stale?'warn':'')
-   +`</div>`;
+   +`</div>`
+   +`<div class="note" style="margin-top:8px">На ком мяч по открытым сделкам: руководитель сорсинга (назначить сорсера) <b>${H.ballHead||0}</b> · сорсеры <b>${H.ballSrc||0}</b> · КАМы <b>${H.ballKam||0}</b>${H.ballUnknown?` · <span class="nrc">стадия не размечена ${H.ballUnknown}</span>`:''}. Сделка остаётся за КАМом; пока мяч у сорсинга, она не входит в нагрузку КАМа.</div>`;
   // стадии и исходы
   const proc=P.stages.filter(s=>s.sem!=='F'&&s.sem!=='S'), mx=Math.max(1,...proc.map(s=>s.n));
   const won=P.stages.filter(s=>s.sem==='S').reduce((a,s)=>a+s.n,0);
   const lmx=Math.max(1,...(P.lost||[]).map(x=>x.n));
   h+=`<div class="grid" style="margin-top:14px"><section class="card"><h2>Где стоят сделки</h2><div class="note">Рабочие стадии по порядку: сколько сделок и сколько дней они в стадии (медиана · максимум).</div><div class="barlist">`
-   +proc.map(s=>`<div class="blrow"><div class="blt"><span>${_esc(s.name)} <span class="dimv mono">${s.n?`${s.med??'—'} · ${s.max??'—'} дн`:''}</span>${s.stale?` <span class="psflag">${s.stale} стоят</span>`:''}</span><b>${s.n}</b></div><div class="bltrack"><i style="width:${(s.n/mx*100).toFixed(0)}%"></i></div></div>`).join('')
+   +proc.map(s=>`<div class="blrow"><div class="blt"><span>${_esc(s.name)} <span class="dimv">· мяч: ${BL[s.ball]||''}</span> <span class="dimv mono">${s.n?`${s.med??'—'} · ${s.max??'—'} дн`:''}</span>${s.stale?` <span class="psflag">${s.stale} стоят</span>`:''}</span><b>${s.n}</b></div><div class="bltrack"><i style="width:${(s.n/mx*100).toFixed(0)}%"></i></div></div>`).join('')
    +`</div><div class="note" style="margin-top:8px">Выиграно: <b>${won}</b> · закрыто отказом: <b>${H.lost}</b>${H.otherStage?` · вне справочника стадий: ${H.otherStage}`:''}</div></section>`
    +`<section class="card"><h2>Почему отказ</h2><div class="note">Стадия отказа — единственная причина, которую портал хранит машинно.</div><div class="barlist">`
    +((P.lost||[]).map(x=>`<div class="blrow"><div class="blt"><span>${_esc(x.name)}</span><b class="nrc">${x.n}</b></div><div class="bltrack"><i style="width:${(x.n/lmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('')||'<div class="dimv">отказов нет</div>')
@@ -842,9 +844,9 @@ if (M.send && M.send.rows){
    +`</tbody></table></div>`;
   // что делать
   const act=P.act||[];
-  h+=`<h2 style="margin-top:16px">Требует действия <span class="subtotal">сделок <b>${act.length}</b></span></h2><div class="note">Сначала — ушедший сорсер и сделки без сорсера (назначить), затем сделки без единого запроса поставщикам, затем застрявшие. Клик — сделка в Битриксе.</div>`
-   +(act.length?`<div class="pswrap"><table><thead><tr><th>Сделка</th><th>Стадия</th><th class="r">Дней в стадии</th><th>Сорсер</th><th class="r">Запросов</th><th>Что не так</th></tr></thead><tbody>`
-   +act.map(r=>`<tr><td><a href="${url(r.id)}" target="_blank" rel="noopener">${_esc(r.t)}</a><div class="dep">заведена ${_dm(r.created)} · ${r.age} дн назад${r.kam?` · КАМ ${_esc(r.kam)}`:''}</div></td><td>${_esc(r.stageName)}</td><td class="num r">${r.days??'—'}</td><td>${r.src?_esc(r.src):'<span class="dimv">—</span>'}</td><td class="num r">${r.rfq}</td><td>${r.flags.map(f=>flag(f,r)).join('')}</td></tr>`).join('')
+  h+=`<h2 style="margin-top:16px">Требует действия <span class="subtotal">сделок <b>${act.length}</b></span></h2><div class="note">Сначала — ушедший сорсер и сделки без сорсера (назначить), затем сделки без единого запроса поставщикам, затем застрявшие. Признаки сорсинга ставятся, только пока мяч у сорсинга; у сделок с мячом у КАМа — только застой. Клик — сделка в Битриксе.</div>`
+   +(act.length?`<div class="pswrap"><table><thead><tr><th>Сделка</th><th>Стадия</th><th class="r">Дней в стадии</th><th>Мяч у</th><th class="r">Запросов</th><th>Что не так</th></tr></thead><tbody>`
+   +act.map(r=>`<tr><td><a href="${url(r.id)}" target="_blank" rel="noopener">${_esc(r.t)}</a><div class="dep">заведена ${_dm(r.created)} · ${r.age} дн назад${r.kam?` · КАМ ${_esc(r.kam)}`:''}</div></td><td>${_esc(r.stageName)}</td><td class="num r">${r.days??'—'}</td><td>${BL[r.ball]||''}${r.who?`: ${_esc(r.who)}`:''}${r.whoGone?' <span class="gone">ушёл</span>':''}</td><td class="num r">${r.rfq}</td><td>${r.flags.map(f=>flag(f,r)).join('')}</td></tr>`).join('')
    +`</tbody></table></div>`:'<div class="dimv">открытых сделок с проблемами нет</div>');
   el.innerHTML=h;
 })();
@@ -2011,7 +2013,7 @@ function renderPeople(P,role,elId,opt){
   const totLoad=R.people.reduce((a,p)=>a+p.loadRaw,0)||1;
   const KPI=[
     ['Людей в роли',String(T.people),`из ${S.active||0} действующих в портале · уволенных ${S.fired||0}`,'','staff'],
-    ['Сделок в работе',String(T.open),`${T.perPersonDeals} на человека · медиана ${T.medianDeals} · максимум ${T.maxDeals}`,'','all'],
+    ['Сделок в работе',String(T.open),`${T.perPersonDeals} на человека · медиана ${T.medianDeals} · максимум ${T.maxDeals}`+(T.inSrc?` · ещё ${T.inSrc} в пресейле, мяч у сорсинга`:''),'','all'],
     ['В проработке',T.presaleSum,`${T.presale} сделок · торг не выигран`+(T.big?` · ${T.bigShare}% суммы держат ${T.big} карточек-выбросов, без них портфель роли ${T.cleanSum}`:''),'ok','presale'],
     ['В реализации',T.realSum,`${T.real} сделок · маржа ${T.margin} (${T.marginPct}%)`,'ok','real'],
     ['Просрочено клиенту',String(T.late),`Σ ${T.lateSum} · дедлайн заказа прошёл`,T.late?'warn':'ok','late'],
@@ -2037,7 +2039,7 @@ function renderPeople(P,role,elId,opt){
     +SC.map(m=>`<tr><td>${_esc(m.lbl)}</td><td class="num r"><b>${m.val}</b></td><td class="num r dimv">${m.op} ${m.norm}</td><td class="num r" style="color:${m.ok?'var(--ok)':'var(--nr)'}">${m.ok?'да':'нет'}</td></tr>`).join('')
     +`</tbody></table></section>`;
   h+=`<div class="secttl"><b>2</b> · Загрузка по людям${qmark('p.load')}</div><section class="card"><h2>Кто сколько ведёт</h2>`
-    +`<div class="note">${o.attr} ${o.roleNote} «В проработке» — торг не выигран; «в реализации» — воронка «Реализация» или есть живой заказ поставщику. Суммы — продажа, к базовой € по курсам Bitrix (базовая валюта портала — EUR, проверено). Медианная открытая сделка — ${PR.medAmt}; карточки дороже ${PR.bigCut} (${PR.mult} медиан) помечены как выбросы: сумму в них нужно проверить, прежде чем верить итогу.</div>`
+    +`<div class="note">${o.attr} ${o.roleNote}${P.presaleCat?` Сделки воронки «${_esc(P.presaleCat)}» считаются по тому, на ком мяч: пока он у сорсинга (назначение сорсера, поиск поставщиков, КП, расчёт экономики), сделка не входит в нагрузку и «косяки» — она в строке «в пресейле у сорсинга»; с мячом у ${o.unit==='КАМ'?'КАМа':'роли'} (экономика готова, подача, тендер, решение заказчика) — считается как обычно.`:''} «В проработке» — торг не выигран; «в реализации» — воронка «Реализация» или есть живой заказ поставщику. Суммы — продажа, к базовой € по курсам Bitrix (базовая валюта портала — EUR, проверено). Медианная открытая сделка — ${PR.medAmt}; карточки дороже ${PR.bigCut} (${PR.mult} медиан) помечены как выбросы: сумму в них нужно проверить, прежде чем верить итогу.</div>`
     +`<div class="statleg" id="pSort${role}" style="margin:0 0 8px"><span class="dimv" style="margin-right:6px">сортировка:</span>`
     +[['load','по деньгам'],['open','по числу сделок'],['real','по реализации'],['late','по просрочке'],['flaws','по косякам']]
       .map((s,i)=>`<span class="stchip${i===0?' on':''}" data-sort="${s[0]}">${s[1]}</span>`).join('')+`</div>`
@@ -2098,7 +2100,7 @@ function renderPeople(P,role,elId,opt){
     +`<div class="srccmp"><span class="sl">Закреплено за ролью</span><div class="sb"><i style="width:${_pshare(T.open,RC.openTotal||1)}%"></i></div><span class="sv">${T.open}</span><span class="sd mid">из ${RC.openTotal||0} открытых сделок портала</span></div>`
     +`<div class="srccmp"><span class="sl">Из них полем в карточке</span><div class="sb"><i style="width:${_pshare(T.byField,T.open||1)}%"></i></div><span class="sv">${T.byField}</span><span class="sd dim">остальное — по ответственному</span></div>`
     +`<div class="srccmp"><span class="sl">Роль не закреплена</span><div class="sb"><i style="width:${_pshare(R.uncovered.n,RC.openTotal||1)}%;background:var(--a)"></i></div><span class="sv">${R.uncovered.n}</span><span class="sd dim">Σ ${R.uncovered.sum}</span></div>`
-    +`<div class="note" style="margin-top:8px">Сверка портфеля: всего открытых <b>${RC.openTotal||0}</b> · за КАМами <b>${RC.kam||0}</b> · за продукт-оунерами <b>${RC.prod||0}</b> · и там, и там <b>${RC.both||0}</b> · ни за кем <b>${RC.none||0}</b> (${RC.noneSum||'€0'}) · на уволенных <b>${RC.orphan||0}</b>. Роли пересекаются: на одной сделке бывает и КАМ, и продукт-оунер, поэтому сходится не сумма, а покрытие. Технические воронки (тест, адаптация, реклама) исключены: ${RC.tech||0} карточек.</div>`
+    +`<div class="note" style="margin-top:8px">Сверка портфеля: всего открытых <b>${RC.openTotal||0}</b> · за КАМами <b>${RC.kam||0}</b> · за продукт-оунерами <b>${RC.prod||0}</b> · и там, и там <b>${RC.both||0}</b> · ни за кем <b>${RC.none||0}</b> (${RC.noneSum||'€0'}) · на уволенных <b>${RC.orphan||0}</b>${RC.inSrc?` · в пресейле, мяч у сорсинга <b>${RC.inSrc}</b> (в счёт ролей не входят)`:''}. Роли пересекаются: на одной сделке бывает и КАМ, и продукт-оунер, поэтому сходится не сумма, а покрытие. Технические воронки (тест, адаптация, реклама) исключены: ${RC.tech||0} карточек.</div>`
     +(OR.rows.length?`<h2 style="margin-top:14px">Сделки уволенных — их сегодня не ведёт никто</h2><table><thead><tr><th>Бывший сотрудник</th><th class="r">открытых</th><th class="r">в реализации</th><th class="r">Σ проработка</th><th class="r">Σ реализация</th><th class="r">просроч.</th><th class="r">стоит ${PR.stale}+</th></tr></thead><tbody>`
       +OR.rows.map(p=>`<tr class="drill" data-pown="${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div><div class="dep">${_esc(p.pos)}</div></td><td class="num r">${p.open}</td><td class="num r" style="color:var(--ok2)">${p.real}</td><td class="num r">${p.presaleSum}</td><td class="num r">${p.realSum}</td><td class="num r" style="color:var(--nr)">${p.late}</td><td class="num r" style="color:var(--a)">${p.stale}</td></tr>`).join('')
       +`</tbody></table><div class="note" style="margin-top:8px">Из ${OR.n} бесхозных сделок за действующим КАМом или продукт-оунером закреплено ${RC.orphanCovered||0} — по ним есть кому продолжить; остальные нужно переназначить.</div>`:'')
@@ -2111,7 +2113,7 @@ function renderPeople(P,role,elId,opt){
   const body=el.querySelector('#pBody'+role);
   const draw=key=>{
     const rows=R.people.slice().sort((a,b)=>SORT[key](a)-SORT[key](b));
-    body.innerHTML=rows.map(p=>`<tr class="drill" data-puid="${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}${p.active?'':' <span class="pill" style="color:var(--nr)">уволен</span>'}</div><div class="dep">${_esc(p.pos)} · ${_esc(p.dept)} <span class="dimv">роль по: ${_esc(p.why)}${p.boss&&p.boss!=='—'?' · руководитель: '+_esc(p.boss):''}</span></div></td>`
+    body.innerHTML=rows.map(p=>`<tr class="drill" data-puid="${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}${p.active?'':' <span class="pill" style="color:var(--nr)">уволен</span>'}${p.inSrc?` <span class="pill drill" data-psrc="${_esc(p.uid)}" title="Сделки пресейла этого человека, где мяч сейчас у сорсинга">в пресейле у сорсинга ${p.inSrc}</span>`:''}</div><div class="dep">${_esc(p.pos)} · ${_esc(p.dept)} <span class="dimv">роль по: ${_esc(p.why)}${p.boss&&p.boss!=='—'?' · руководитель: '+_esc(p.boss):''}</span></div></td>`
       +`<td class="num r">${p.presale}</td><td class="num r">${p.presaleSum}</td>`
       +`<td class="num r" style="color:var(--ok2)">${p.real}</td><td class="num r">${p.realSum}</td>`
       +`<td class="num r" style="color:${p.marginRaw<0?'var(--nr)':'var(--ok)'}">${p.margin}${p.marginPct==null?'':` <small class="dimv">${p.marginPct}%</small>`}</td>`
@@ -2127,6 +2129,9 @@ function renderPeople(P,role,elId,opt){
   const roleDeals=D.filter(d=>mine(d));
   el.addEventListener('click',ev=>{
     if(ev.target.closest('.qq'))return;
+    const ps=ev.target.closest('[data-psrc]');
+    if(ps){const uid=ps.dataset.psrc,per=(R.people||[]).find(x=>x.uid===uid)||{};
+      openPeopleDeals((P.inSrc||[]).filter(d=>mine(d)===uid),per.name||uid,'Пресейл · мяч у сорсинга');return;}
     const p=ev.target.closest('[data-puid]'),k=ev.target.closest('[data-pk]'),c=ev.target.closest('[data-pcat]'),ow=ev.target.closest('[data-pown]'),fx=ev.target.closest('[data-pfix]');
     if(fx){const [uid,kind]=fx.dataset.pfix.split('|'),f=FIXK.find(x=>x[0]===kind),per=(R.people||[]).find(x=>x.uid===uid)||{};
       openPeopleDeals(D.filter(d=>mine(d)===uid&&f[2](d)),per.name||uid,'Что исправить · '+f[1]);return;}
