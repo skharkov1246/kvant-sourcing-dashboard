@@ -1664,10 +1664,13 @@ function renderContracts(){
   const nSlow=live.filter(r=>r.slow).length, nLate=live.filter(r=>r.late).length,
         nNoEcon=live.filter(r=>r.noEcon).length, nNoDl=live.filter(r=>r.noDl>0).length,
         nGross=live.filter(r=>r.grossSusp).length,
+        nGone=live.filter(r=>r.managerGone||r.ossGone).length,
         nDone=R.filter(r=>r.done||r.closed).length;
+  const GN=X.gone||{};
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (${X.orphan.buy})`:'';
   const bl=(items,color)=>{const mx=Math.max(1,...items.map(b=>b.med));return items.map(b=>`<div class="blrow"><div class="blt"><span>${_esc(_stShort(b.name))} <span class="dimv mono">n=${b.n}</span></span><b>${b.med} дн</b></div><div class="bltrack"><i style="width:${(b.med/mx*100).toFixed(0)}%;background:${color}"></i></div>${b.over?`<div class="dep" style="margin-top:2px"><span class="nrc">⚠ ${b.over} из ${b.live||'?'} тянутся дольше нормы</span> · в среднем на <b class="mono">+${b.lostAvg} дн</b></div>`:(b.live?`<div class="dep" style="margin-top:2px">сейчас в стадии: ${b.live} · все в норме</div>`:'')}</div>`).join('');};
-  const cut=items=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(m.name)} <span class="dimv mono">${m.liveOrders} живых</span></span><b class="nrc">${m.lateOrders} · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join(''):'<div class="dimv">нет данных</div>';
+  // по человеку: сколько просрочено из его живых заказов и с какой сделки начинать
+  const cut=items=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(String(m.name).replace(/ \(уволен\)$/,''))}${m.gone?' <span class="gone">уволен — переназначить</span>':''} <span class="dimv mono">${m.lateOrders} из ${m.liveOrders} живых · ${m.pct}%</span></span><b class="nrc">${m.lateDeals||0} сд. · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div>${m.top?`<div class="sub2">начать с №${m.top.seq||'—'}${m.top.customer&&m.top.customer!=='—'?' '+_esc(m.top.customer):''}: просрочка ${m.top.days} дн</div>`:''}</div>`).join(''):'<div class="dimv">нет данных</div>';
 
   // ---------- шапка ----------
   const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную: 1 USD = ${fx.usdRub} ₽). Отчётность с другим курсом разойдётся системно.</span>`:'';
@@ -1685,11 +1688,12 @@ function renderContracts(){
 
   // ---------- 2. ТРЕБУЕТ РЕШЕНИЯ: плитки-фильтры ----------
   h+=`<div class="secttl"><b>·</b> Требует решения${qmark('ct.act')}</div>`
-   +`<div class="kpis" id="ctAct" style="grid-template-columns:repeat(4,1fr)">`
+   +`<div class="kpis" id="ctAct" style="grid-template-columns:repeat(${nGone?5:4},1fr)">`
    +`<div class="actile bad" data-m="late" tabindex="0"><div class="t">🚩 Просрочен дедлайн</div><div class="v">${nLate}</div><div class="m">сделок · заказов ${dl.lateOrders||0} · потери ${H.loss}</div></div>`
    +`<div class="actile warn" data-m="slow" tabindex="0"><div class="t">⏳ Замедлено</div><div class="v">${nSlow}</div><div class="m">стадия тянется дольше нормы</div></div>`
    +`<div class="actile amb" data-m="nodl" tabindex="0"><div class="t">❓ Без плановой даты</div><div class="v">${nNoDl}</div><div class="m">сделок · заказов ${dl.noDl||0} вне контроля срока</div></div>`
    +`<div class="actile amb" data-m="noecon" tabindex="0"><div class="t">📄 Нет экономики</div><div class="v">${nNoEcon}</div><div class="m">ни файла, ни money-полей в сделке</div></div>`
+   +(nGone?`<div class="actile bad" data-m="gone" tabindex="0"><div class="t">👤 Ведёт уволенный</div><div class="v">${nGone}</div><div class="m">сделок на ${GN.sale||'—'} · живых заказов ${GN.orders||0}${GN.late?` · просрочено ${GN.late}`:''} — переназначить</div></div>`:'')
    +`</div>`
    +`<div class="note" style="margin-top:6px">Клик по плитке — список этих сделок в таблице ниже.</div>`;
 
@@ -1721,15 +1725,15 @@ function renderContracts(){
     h+=`<div class="secttl"><b>·</b> Где стоит процесс${qmark('ct.funnel')}</div><div class="grid">`
      +`<section class="card"><h2>Воронка реализации</h2><div class="note">Открытые сделки по стадиям в порядке движения. Длина полосы — деньги на стадии, красная часть — деньги сделок с сорванным сроком. «Типично» — медианное время стадии по истории переходов.</div><div class="fnl">${fnl||'<div class="dimv">нет открытых сделок</div>'}</div></section>`
      +`<section class="card"><h2>Узкие места закупки</h2><div class="note">Стадии заказов СП-172 по типичной длительности — где в норме уходит больше всего времени. Под баром: сколько заказов там сейчас и сколько тянутся дольше нормы (порог 2× медианы, мин. 7 дн).</div><div class="barlist">${bl(sp.orderBench||[],'linear-gradient(90deg,var(--b),var(--b2))')}</div>`
-     +`<div class="note" style="margin-top:10px">Медиана полного цикла заказа: <b>${sp.medCycle!=null?sp.medCycle+' дн':'—'}</b> · медианный лаг до первого заказа: <b>${sp.medLag!=null?sp.medLag+' дн':'—'}</b>.</div></section></div>`;
+     +`<div class="note" style="margin-top:10px">Медиана полного цикла заказа: <b>${sp.medCycle!=null?sp.medCycle+' дн':'—'}</b> · медианный лаг до первого заказа: <b>${sp.medLag!=null?sp.medLag+' дн':'—'}</b>.${sp.benchDays?` Нормы стадий и цикл — по последним ${sp.benchDays} дням: команда и процесс меняются, двухлетняя медиана мерит не нынешний отдел; стадия с редкими переходами берёт всю историю.`:''}</div></section></div>`;
   }
 
   // ---------- 5. РАЗБОРЫ (свёрнуто) ----------
   const dp=dl.depth||{}, mxd=Math.max(1,...Object.values(dp));
   const depthBars=[['<30','до 30 дн'],['30-90','30–90 дн'],['90-180','90–180 дн'],['>180','больше 180 дн']]
     .map(([k,lb])=>`<div class="blrow"><div class="blt"><span>${lb}</span><b>${dp[k]||0}</b></div><div class="bltrack"><i style="width:${((dp[k]||0)/mxd*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('');
-  h+=`<details class="sect"><summary>Кто срывает сроки — по менеджеру и ОСС</summary><div class="in">`
-   +`<div class="note">Просроченных заказов и закупка под ними; полоса — доля просроченных от всех живых заказов этого человека.</div>`
+  h+=`<details class="sect"><summary>Кто срывает сроки — по менеджеру и ОСС${(dl.byManager||[]).concat(dl.byOss||[]).some(m=>m.gone)?' · есть уволенные':''}</summary><div class="in">`
+   +`<div class="note">Просроченных заказов из живых у человека, сделок с просрочкой и закупка под ними; полоса — доля просроченных. Под строкой — сделка с самой глубокой просрочкой: с неё начинать. Уволенные помечены — их сделки переназначить.</div>`
    +`<div class="barlist">${cut(dl.byManager)}</div>`
    +`<div class="note" style="margin-top:10px">ОСС (сопровождение сделки):</div><div class="barlist">${cut(dl.byOss)}</div>`
    +`</div></details>`
@@ -1746,7 +1750,7 @@ function renderContracts(){
   // ---------- 6. ТАБЛИЦА ----------
   h+=`<div class="secttl" id="ctSect"><b>·</b> Все сделки в реализации <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
    +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · поставщик · менеджер · ОСС · город…">`
-   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="gross"><i class="dot snr"></i>Занижена закупка <b>${nGross}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
+   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="gross"><i class="dot snr"></i>Занижена закупка <b>${nGross}</b></span>${nGone?`<span class="stchip" data-m="gone"><i class="dot snr"></i>Ведёт уволенный <b>${nGone}</b></span>`:''}<span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
    +`<section class="card"><div class="note">«Стадия · дней» — где сделка сейчас и сколько дней в этой стадии (краснеет при превышении нормы). «Дедлайн клиенту» — обещанная заказчику дата: 🚩 с глубиной просрочки либо ближайший срок. «Закупка» — Σ заказов СП-172, иначе из экономики проекта. «Валовая маржа» = продажа − закупка: логистика, таможня, пошлины и НДС в неё НЕ входят. Красная строка — требует внимания. Клик по строке — вся сделка целиком; по заголовку — сортировка.</div><div class="note tsnote">На узком экране таблица прокручивается вбок; часть колонок скрыта — все цифры есть в карточке сделки.</div><div class="tscroll"><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></div></section>`;
   el.innerHTML=h;
 
@@ -1794,6 +1798,7 @@ function renderContracts(){
     else if(mode==='late')r=r.filter(x=>x.late&&!x.closed);
     else if(mode==='nodl')r=r.filter(x=>x.noDl>0&&!x.closed);
     else if(mode==='gross')r=r.filter(x=>x.grossSusp);
+    else if(mode==='gone')r=r.filter(x=>(x.managerGone||x.ossGone)&&!x.closed);
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')+' '+(x.manager||'')+' '+(x.oss||'')+' '+(x.cities||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;

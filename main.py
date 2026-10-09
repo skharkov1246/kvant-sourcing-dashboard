@@ -722,8 +722,14 @@ def run(args) -> int:
     contracts_data = None
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
-        contracts_data = contracts_mod.compute(client, as_of=p.end)
+        contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster)
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
+        _g, _sp = contracts_data.get("gone") or {}, contracts_data.get("speed") or {}
+        # только счётчики: суммы сделок в публичный журнал не идут (правило 17)
+        print(f"  ведёт уволенный: открытых сделок {_g.get('deals', 0)} (ответственный {_g.get('byManager', 0)}, "
+              f"ОСС {_g.get('byOss', 0)}), живых заказов {_g.get('orders', 0)}, с просрочкой {_g.get('late', 0)}, "
+              f"уволенных {_g.get('people', 0)}; нормы стадий по {_sp.get('benchDays')} дн: "
+              f"{_sp.get('benchRecent', 0)} стадий, медиана цикла заказа {_sp.get('medCycle')} дн")
     except Exception as e:
         print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}: {e}")
 
