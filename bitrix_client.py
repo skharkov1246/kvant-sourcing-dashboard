@@ -703,9 +703,9 @@ class BitrixClient:
         return ids
 
     def dept_member_ids(self, dept_id: int | str, *, include_children: bool = True) -> set[str]:
-        """ID ДЕЙСТВУЮЩИХ пользователей отдела (по UF_DEPARTMENT), включая дочерние
-        отделы. `user.get` без фильтра ACTIVE отдаёт только действующих — ушедших
-        добирает main._staff."""
+        """ID пользователей отдела (по UF_DEPARTMENT), включая дочерние отделы.
+        Замер 09.10.2026: выгрузка по подразделению отдаёт и отключённых записей —
+        кто из них ушёл, решает справочник main._people (признак ACTIVE)."""
         ids = self.dept_tree_ids(dept_id) if include_children else {str(dept_id)}
         members: set[str] = set()
         for did in ids:
