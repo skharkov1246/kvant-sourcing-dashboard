@@ -608,9 +608,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                     "kam": _k, "prod": _p, "own": str(d.get("ASSIGNED_BY_ID") or ""),
                     "ownLive": bool(people.get(str(d.get("ASSIGNED_BY_ID") or ""), {}).get("active")),
                     "cat": catname(cat), "catId": cat, "stage": _sm.get("name", str(d.get("STAGE_ID") or "")),
-                    "amt": _money(_amt), "raw": round(_amt), "buyRaw": 0, "state": "src",
+                    "amt": _money(_amt), "raw": round(_amt), "state": "src",
                     "idle": _days_since(d.get("MOVED_TIME") or d.get("LAST_ACTIVITY_TIME"), today),
-                    "late": 0, "noAmt": False, "noComp": False, "neg": False, "big": False,
+                    "noAmt": False, "noComp": False, "neg": False, "big": False,
                     "date": str(d.get("DATE_CREATE", ""))[:10], "plan": True,
                 })
                 continue
@@ -746,7 +746,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "cleanPct": (round(a["clean"] / a["open"] * 100) if a["open"] else None),
             "medIdle": (ages[len(ages) // 2] if ages else None),
             "loadRaw": round(a["presaleSum"] + a["realSum"]),
-            "inSrc": a["inSrc"],
+            # только у тех, у кого такие сделки есть: у строк уволенных владельцев
+            # (orphan) счёт не ведётся, и поле из одних нулей там лишнее
+            **({"inSrc": a["inSrc"]} if a["inSrc"] else {}),
         }
 
     def block(role: str) -> dict:
