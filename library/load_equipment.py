@@ -113,7 +113,10 @@ def build_models() -> tuple[dict[str, dict], dict[str, str]]:
         key = add(имя, family=None, source="реестр машин (dict/machine.json)")
         if not key:
             continue
-        models[key]["segment_id"] = r.get("segment") if r.get("segment") != "other" else None
+        # «вне» — машина без направления портала (буровое, судовое, котельное);
+        # до 09.10.2026 тот же смысл носило «other». Направлением она не является.
+        models[key]["segment_id"] = (r.get("segment")
+                                     if r.get("segment") not in ("other", "вне") else None)
         models[key]["kind"] = r.get("kind")
         for написание in (r.get("spellings") or []):
             models[key]["aliases"].add(str(написание)[:120])

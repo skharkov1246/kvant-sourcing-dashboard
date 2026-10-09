@@ -37,7 +37,7 @@ if str(ROOT) not in sys.path:
 
 # Вид записи словаря брендов — одно правило со сверкой ревизии (scripts/portal_audit.py,
 # проверки d.*): признаки и закрытые списки живут в library/oem_kind.py.
-from library import oem_kind  # noqa: E402
+from library import machine_kind, oem_kind  # noqa: E402
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Нормализация. Сегодня в репозитории пять несовместимых реализаций нормализации
@@ -291,35 +291,25 @@ def build_system() -> dict:
 # других сегментов (буровые насосы, превенторы). Классификатор разводит их по
 # видам явно; вид «не определено» сохраняется как видимый хвост для разбора,
 # а не подмешивается к машинам.
-MACH_NOTE = re.compile(r"\s*\((сток|общая|sepoc|по документу|унифиц\w*|разные|все)[^)]*\)\s*", re.I)
-MACH_BUCKET = re.compile(r"^(solar|ge|siemens|rolls-?royce)(\s+(пакет|compressor|общая|сток))?$", re.I)
-# Замыкающего \b в семействах нет намеренно: он не срабатывает внутри
-# обозначения — в LM2500 граница после «LM2» не наступает, и правило молча
-# переставало ловить самую массовую машину базы.
-MACH_GT = re.compile(r"\b(lms\d|lm\d|sgt|taurus|centaur|mars|titan|saturn|avon|olympus|spey|"
-                     r"proteus|tyne|coberra|rb\d|frame\s*\d|ms\d{4}|tb\d{4}|gt\d{1,2}|"
-                     r"v\d{2}\.|трент|trent)", re.I)
-MACH_OTHER = re.compile(r"насос|превентор|вентилятор|компрессор|лебёдк|лебедк|станц|опреснит|"
-                        r"агрегат|привод|установк", re.I)
-MACH_PART = re.compile(r"кольц|шкаф|клапан|фильтр|прокладк|болт|гайк|датчик|труб|подшипник|"
-                       r"уплотн|шланг|кабель|реле|модуль|плат|блок|комплект|втулк|диск|лопат|"
-                       r"форсунк|свеч|щуп|масл|смазк|выкл\.|автомат", re.I)
+#
+# ПРАВИЛО ОДНО И ЖИВЁТ В library/machine_kind.py. Здесь только перевод его
+# ответа в виды счётчика `pn_db_kinds`: держать разбор обозначения в двух
+# местах — мина, они разъезжаются (LESSONS, «одно правило в двух местах»).
+# Точность и охват правила меряет scripts/machine_segment_check.py по ручному
+# эталону data/machine_truth.json.
 
 
 def mach_kind(name: str) -> tuple[str, str]:
-    """Вид обозначения и его основа без пометки источника."""
-    stem = MACH_NOTE.sub(" ", str(name or "")).strip(" ,")
+    """Вид обозначения для счётчика и его основа без пометки источника."""
+    stem = machine_kind.основа(name)
     if not stem:
         return "empty", ""
-    if MACH_BUCKET.match(stem):
-        return "bucket", stem
-    if MACH_GT.search(stem):
-        return "turbine", stem
-    if MACH_OTHER.search(stem):
-        return "other_machine", stem
-    if MACH_PART.search(stem):
+    р = machine_kind.разобрать(name)
+    if р.вид in ("машина", "черновик"):
+        return ("turbine" if р.направление == "gtu" else "other_machine"), stem
+    if р.вид == "не машина":
         return "part", stem
-    return "unknown", stem
+    return ("bucket" if machine_kind.БРЕНД_ОДИН.match(stem) else "unknown"), stem
 
 
 def mkey(name: str) -> str:
@@ -330,15 +320,24 @@ def build_machine() -> dict:
     """Реестр машин по направлениям: из базы PN (ГТУ) и из реестра ГШО."""
     recs: dict[str, dict] = {}
 
-    def add(name, seg, kind, src, parts=1):
+    def add(name, seg, kind, src, parts=1, draft=False, spelling=None):
         k = mkey(name)
         if not k or len(k) < 2:
             return
         r = recs.setdefault(k, {"machine_key": k, "name": name, "segment": seg, "kind": kind,
                                 "spellings": [], "parts": 0, "sources": []})
         r["parts"] += parts
-        if name not in r["spellings"]:
-            r["spellings"].append(name)
+        # ЧЕРНОВИК СНИМАЕТСЯ, А НЕ СТАВИТСЯ: если та же машина названа хоть раз
+        # с моделью, запись перестаёт быть черновиком. Обратное неверно —
+        # «Saturn» рядом с «Saturn 20» модель не отменяет.
+        if draft:
+            r.setdefault("черновик", True)
+        else:
+            r.pop("черновик", None)
+        for написание in (name, spelling):
+            т = str(написание or "").strip()
+            if т and т not in r["spellings"]:
+                r["spellings"].append(т)
         if src not in r["sources"]:
             r["sources"].append(src)
 
@@ -346,8 +345,16 @@ def build_machine() -> dict:
     for row in load("gt/data/pn_db.json", {}).get("rows", []):
         kind, stem = mach_kind(row.get("mach"))
         counts[kind] = counts.get(kind, 0) + 1
-        if kind in ("turbine", "other_machine"):
-            add(stem, "gtu" if kind == "turbine" else "other", kind, "gt/data/pn_db.json")
+        if kind not in ("turbine", "other_machine"):
+            continue
+        р = machine_kind.разобрать(row.get("mach"))
+        # СОСТАВНОЕ ОБОЗНАЧЕНИЕ РАЗБИРАЕТСЯ НА МАШИНЫ. «Taurus 70 и Taurus 70MD
+        # (унифицированнные)» — это две машины, а не машина с таким именем:
+        # прежде такие строки давали отдельную запись реестра на каждое
+        # написание, и 39 настоящих моделей ГТУ выглядели как 80.
+        for модель in (р.модели or (stem,)):
+            add(модель, р.направление, kind, "gt/data/pn_db.json",
+                draft=(р.вид == "черновик"), spelling=stem)
 
     for m in load("zip/data/machines.json", {}).get("machines", []):
         add(m["name"], "gsho", "mining_machine", "zip/data/machines.json", m.get("parts", 1))

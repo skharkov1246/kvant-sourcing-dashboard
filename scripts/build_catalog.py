@@ -63,7 +63,33 @@ def sh(*args: str) -> str:
         return ""
 
 
-def git_meta(rel: str) -> dict:
+ПОЛЯ_ПОДПИСИ = ("last_change", "last_author", "last_commit", "updated_by")
+
+
+def мелкий_клон() -> bool:
+    """Клон обрезан по глубине — `git log` по файлу отдаёт границу обрезки.
+
+    09.10.2026: в каталоге на main у ВСЕХ 317 наборов стоял один и тот же
+    коммит 709cb3e с автором github-actions[bot] — ночной прогон собирает
+    каталог в клоне глубины 1, и `git log -1 -- <файл>` честно отдаёт ему
+    единственное, что он видит. Подпись «кто последний менял набор» при этом
+    врёт по всем наборам сразу, а не по одному. Проверка --check это терпела
+    (поля подписи исключены из сравнения), и ошибка жила молча.
+    """
+    return sh("git", "rev-parse", "--is-shallow-repository").strip() == "true"
+
+
+def git_meta(rel: str, прежнее: dict | None = None) -> dict:
+    """Подпись набора: когда и кем менялся. В мелком клоне НЕ ПЕРЕПИСЫВАЕТСЯ.
+
+    Прежнее значение надёжнее нового, посчитанного по обрезанной истории:
+    лучше подпись вчерашнего дня, чем подпись границы обрезки по всем наборам.
+    """
+    if МЕЛКИЙ[0]:
+        if прежнее and any(прежнее.get(k) for k in ПОЛЯ_ПОДПИСИ):
+            return {k: прежнее.get(k) for k in ПОЛЯ_ПОДПИСИ}
+        return {"last_change": None, "last_author": None, "last_commit": None,
+                "updated_by": "не определено (клон обрезан по глубине)"}
     line = sh("git", "log", "-1", "--format=%ad|%an|%h", "--date=short", "--", rel)
     if not line or "|" not in line:
         return {"last_change": None, "last_author": None, "last_commit": None, "updated_by": "неизвестно"}
@@ -71,6 +97,10 @@ def git_meta(rel: str) -> dict:
     bot = "bot" in author.lower() or "actions" in author.lower()
     return {"last_change": date, "last_author": author, "last_commit": sha,
             "updated_by": "бот (workflow)" if bot else "человек/агент"}
+
+
+#: Считается один раз: вызов git на каждый из трёхсот наборов не нужен.
+МЕЛКИЙ: list[bool] = [False]
 
 
 def describe_json(path: Path) -> dict:
@@ -130,6 +160,18 @@ def build() -> dict:
     code_files = [f for f in tracked if f.suffix in CODE_EXT and f.exists()
                   and "public/index.html" not in str(f) and f.stat().st_size < 3_000_000]
     notes = json.loads(NOTES.read_text(encoding="utf-8")) if NOTES.exists() else {}
+    МЕЛКИЙ[0] = мелкий_клон()
+    if МЕЛКИЙ[0]:
+        print("клон обрезан по глубине: подпись наборов (кто и когда менял) берётся "
+              "из прежнего каталога, а не из git — иначе она соврёт по всем наборам",
+              file=sys.stderr)
+    прежний = {}
+    if OUT.exists():
+        try:
+            прежний = {d["path"]: d for d in
+                       json.loads(OUT.read_text(encoding="utf-8")).get("datasets", [])}
+        except Exception:
+            прежний = {}
 
     datasets = []
     for dirname, subproject in DATA_DIRS.items():
@@ -154,7 +196,7 @@ def build() -> dict:
                 "note": notes.get(rel, ""),
             }
             entry.update(describe_json(path) if path.suffix == ".json" else {"format": path.suffix.lstrip(".")})
-            entry.update(git_meta(rel))
+            entry.update(git_meta(rel, прежний.get(rel)))
             entry["sensitivity"] = sensitivity(path, size)
             entry["referenced_by"] = consumers(rel, code_files)
             datasets.append(entry)
