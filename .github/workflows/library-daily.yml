@@ -105,7 +105,7 @@ jobs:
       MAIL_DAILY_LIMIT: ${{ inputs.mail_limit || '1000' }}
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -269,7 +269,7 @@ jobs:
       DEALS_NIGHTLY: apply
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
