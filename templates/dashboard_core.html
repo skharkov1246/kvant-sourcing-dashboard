@@ -483,7 +483,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="reps">Коммерсанты</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="suppliers">Поставщики</button><button class="tab" data-tab="cohorts">Когорты</button><button class="tab" data-tab="advisor">Советы знатока</button><button class="tab" data-tab="premia">Премии</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="reps">Коммерсанты</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="suppliers">Поставщики</button><button class="tab" data-tab="cohorts">Когорты</button><button class="tab" data-tab="advisor">Советы знатока</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -673,7 +673,6 @@
 <div id="tab-cohorts" hidden></div>
 <div id="tab-reps" hidden></div>
 <div id="tab-advisor" hidden></div>
-<div id="tab-premia" hidden></div>
 
 <div class="ovl" id="ovl"></div>
 <aside class="drw" id="drw" aria-hidden="true">
@@ -692,7 +691,6 @@ window.__PRODUCT__ = __PRODUCT_JSON__;
 window.__CONTRACTS__ = __CONTRACTS_JSON__;
 window.__REPS__ = __REPS_JSON__;
 window.__ADVISOR__ = __ADVISOR_JSON__;
-window.__PREMIA__ = __PREMIA_JSON__;
 const M = window.__DATA__ || {}, INS = window.__INSIGHTS__ || {};
 // Защита от неполной выгрузки: недостающие блоки заменяем пустыми. Раньше одно
 // отсутствующее поле (например weekly) роняло весь скрипт и гасило все 9 вкладок.
@@ -2153,101 +2151,6 @@ function renderPeople(P,role,elId,opt){
     }
   });
 }
-// BEGIN premiaCore — этот блок целиком уходит и в офлайн-страницу вкладки (dashboard.render_premia_page)
-// ---- «Премии»: прогноз по положению о мотивации команды КАМа, ред. 2 (premia.py).
-// Строка сделки хранит пул при К = 1: при К ≤ 1,25 предел 25 % не достигается, поэтому
-// премия линейна по К и пересчитывается в браузере, когда пользователь меняет К.
-function renderPremia(){
-  const X=window.__PREMIA__, el=document.getElementById('tab-premia'); if(!el) return;
-  if(!X||!Array.isArray(X.deals)){ el.innerHTML='<div class="note" style="padding:20px 0">Нет данных: премии считаются по открытым сделкам вкладки «Коммерсанты» — в этой сборке их нет.</div>'; return; }
-  const P=X.params||{}, N=X.names||{}, D=X.deals, T=X.totals||{};
-  const fr=v=>{const a=Math.abs(v),s=v<0?'−':'';return a>=1e6?s+(a/1e6).toFixed(2).replace('.',',')+' млн ₽':a>=1e3?s+Math.round(a/1e3)+' тыс. ₽':s+Math.round(a)+' ₽';};
-  const pc=v=>(v*100).toFixed(1).replace('.',',')+' %';
-  const nm=u=>u?((N[u]&&N[u][0])||('user#'+u)):'Роль не закреплена';
-  const live=u=>!u||!N[u]||N[u][1];
-  const ROLE={ex:'исполнитель',kam:'КАМ',po:'продукт-оунер'};
-  const SRC=P.srcLabel||{};
-  let K=+P.k||0.6, mode='all', who='', q='', withBig=false, shown=200;
-  try{ const s=parseFloat(localStorage.getItem('premiaK')); if(s>=P.kMin&&s<=P.kMax) K=s; }catch(e){}
-  const win=(P.winRate!=null)?P.winRate/100:null;
-  const inSum=r=>withBig||r.fl.indexOf('big')<0;
-
-  let h=`<header><div class="eyebrow">Квант · премии</div><h1>Премии по сделкам — прогноз по положению ред. 2</h1>`
-   +`<div class="sub"><span>Источник: <b>Bitrix24 · открытые сделки всех воронок, заказы поставщикам, книги бюджетов</b></span><span>Состояние: <b>${_esc(X.label)}</b></span><span>Курс: <b>1 € = ${String(P.eurRub).replace('.',',')} ₽</b></span></div></header>`;
-  h+=`<div class="ctools" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">`
-   +`<label for="prK" style="font-size:13px;color:var(--mut)">К компании</label><input id="prK" class="search" type="number" min="${P.kMin}" max="${P.kMax}" step="0.05" value="${K.toFixed(2)}" style="width:90px">`
-   +`<span style="font-size:12.5px;color:var(--mut)">публикует финансовый директор; до публикации — минимум ${String(P.k).replace('.',',')}</span></div>`;
-  h+=`<div class="kpis" id="prKpi" style="grid-template-columns:repeat(4,1fr);margin-top:14px"></div>`;
-  h+=`<div class="secttl"><b>1</b> · Кто сколько получит</div><section class="card"><div class="note">Премия до НДФЛ при текущем К. «В реализации» начисляется пропорционально оплате заказчика; «в проработке» — если сделка будет выиграна по нынешней сумме${win!=null?`, «ожидаемо» — с учётом доли выигрыша 2026 г. (${Math.round(win*100)} %)`:''}. Клик по строке — сделки этого человека.</div>`
-   +`<div style="overflow-x:auto"><table><thead><tr><th>Кто</th><th>Роли</th><th class="r">Сделок</th><th class="r">В реализации</th><th class="r">В проработке</th><th class="r">Ожидаемо</th></tr></thead><tbody id="prPeople"></tbody></table></div></section>`;
-  h+=`<div class="secttl"><b>2</b> · Сделки <span id="prCount" class="dimv" style="font-weight:400"></span></div>`
-   +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="prSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: название · № сделки · воронка · стадия · ФИО">`
-   +`<div class="statleg" style="margin:0" id="prChips"><span class="stchip on" data-m="all">Все <b>${T.deals||0}</b></span><span class="stchip" data-m="r">В реализации <b>${T.real||0}</b></span><span class="stchip" data-m="p">В проработке <b>${T.presale||0}</b></span><span class="stchip" data-m="low">Ниже ×${String(P.priceMin).replace('.',',')} <b>${T.low||0}</b></span><span class="stchip" data-m="neg">Убыточные <b>${T.neg||0}</b></span></div>`
-   +`<label style="font-size:12.5px;color:var(--mut);display:flex;gap:6px;align-items:center"><input type="checkbox" id="prBig"> карточки-выбросы в итогах (${T.big||0})</label></div>`
-   +`<div id="prWho" style="margin-top:6px;font-size:12.5px;color:var(--mut)"></div>`
-   +`<section class="card"><div style="overflow-x:auto"><table><thead><tr><th>Сделка</th><th class="r">Выручка</th><th class="r">ПЗ</th><th class="r">×ПЗ</th><th class="r">Результат</th><th class="r">Пул</th><th>Кому</th></tr></thead><tbody id="prBody"></tbody></table></div>`
-   +`<div style="margin-top:10px"><button class="stchip" id="prMore" type="button">Показать ещё</button></div></section>`;
-  h+=`<details class="sect"><summary>Как считается прогноз и чего в нём нет</summary><div class="in"><div class="note">`
-   +`<b>Результат сделки</b> = выручка − ПЗ − финансирование ${pc(P.fin)} выручки − платёжный агент ${pc(P.pa)} оплаты поставщику − поправка ${pc(P.plug)} выручки. `
-   +`ПЗ берётся каскадом: заказы поставщикам × ${(1+P.pzOver).toFixed(2).replace('.',',')} → прямые затраты книги бюджета → экономика проекта → оценка по медианному коэффициенту ×${String(P.coefMed).replace('.',',')} (пометка «оценка»). `
-   +`Поправка — агентское и затраты, которых нет ни в Битриксе, ни в книгах: по ${P.calibN} сделкам в реализации с известной закупкой результат по данным Битрикса — ${P.rhoBitrix!=null?pc(P.rhoBitrix):'—'} выручки, по калибровке положения (60 сделок квартала, 1С) — ${pc(P.rhoTarget)}; разница вычитается из каждой сделки пропорционально выручке.<br>`
-   +`<b>Пул</b> = ${Math.round(P.rate*100)} % результата × К: исполнителю ${Math.round(P.ex*100)} %, ЛПР ${Math.round(P.lpr*100)} %. Ниже ×${String(P.priceMin).replace('.',',')} к ПЗ — пул 0 (согласований в Битриксе нет). Убыточная сделка — часть ЛПР отрицательная, исполнителю 0.<br>`
-   +`<b>Допущения до новых полей карточки:</b> исполнитель — «Ответственный» сделки; КАМ — поле «КАМ»; продукт-оунер в поле при КАМе — эксперт (20 % части ЛПР), без КАМа — завёл сделку (80 %); новизна (× 1,3) и распределение решений между ЗКД, КД и старшим КАМом не учитываются — по умолчанию все решения у КАМа. Точный расчёт сделки — в инструменте «Премия по сделке» по данным калькулятора маржи.</div></div></details>`;
-  el.innerHTML=h;
-
-  const amt=(r,s)=>r.p1*K*s;
-  function people(){
-    const by={};
-    for(const r of D){ if(!inSum(r)) continue;
-      for(const [u,role,s] of r.parts){ const b=by[u]||(by[u]={u,roles:{},n:0,real:0,pre:0}); b.roles[role]=1; b.n++;
-        if(r.st==='r') b.real+=amt(r,s); else b.pre+=amt(r,s); } }
-    return Object.values(by).sort((a,b)=>(b.real+b.pre)-(a.real+a.pre));
-  }
-  function kpis(){
-    let real=0,pre=0,nr=0,np=0;
-    for(const r of D){ if(!inSum(r)) continue; if(r.st==='r'){real+=r.p1*K;nr++;} else {pre+=r.p1*K;np++;} }
-    document.getElementById('prKpi').innerHTML=
-      `<div class="kpi ok"><div class="lbl">В реализации</div><div class="val ok">${fr(real)}</div><div class="meta">${nr} сделок · начисляется по оплате</div></div>`
-     +`<div class="kpi amber"><div class="lbl">В проработке — по воронке</div><div class="val amber">${fr(pre)}</div><div class="meta">${np} сделок, если все будут выиграны</div></div>`
-     +`<div class="kpi teal"><div class="lbl">В проработке — ожидаемо</div><div class="val teal">${win!=null?fr(pre*win):'—'}</div><div class="meta">${win!=null?'доля выигрыша 2026 г. — '+Math.round(win*100)+' %':'доля выигрыша не посчитана'}</div></div>`
-     +`<div class="kpi"><div class="lbl">Поправка на агентское</div><div class="val">${pc(P.plug)}</div><div class="meta">выручки · по ${P.calibN} сделкам с закупкой</div></div>`;
-    const tb=document.getElementById('prPeople');
-    tb.innerHTML=people().map(b=>`<tr class="drill" data-u="${_esc(b.u)}" style="cursor:pointer"><td><div class="who">${_esc(nm(b.u))}${live(b.u)?'':' <span class="dimv">· уволен</span>'}</div></td><td class="dep">${Object.keys(b.roles).map(x=>ROLE[x]).join(', ')}</td><td class="r mono">${b.n}</td><td class="r mono"${b.real<0?' style="color:var(--nr)"':''}>${fr(b.real)}</td><td class="r mono">${fr(b.pre)}</td><td class="r mono">${win!=null?fr(b.pre*win):'—'}</td></tr>`).join('')
-      ||'<tr><td colspan="6" class="dimv">Нет данных</td></tr>';
-    tb.querySelectorAll('tr[data-u]').forEach(tr=>tr.addEventListener('click',()=>{ who=tr.dataset.u; shown=200; rows(); document.getElementById('prBody').scrollIntoView({block:'start'}); }));
-  }
-  function rows(){
-    let r=D;
-    if(mode==='r'||mode==='p') r=r.filter(x=>x.st===mode);
-    else if(mode==='low') r=r.filter(x=>x.fl.indexOf('low')>=0);
-    else if(mode==='neg') r=r.filter(x=>x.fl.indexOf('neg')>=0);
-    if(who!==null&&who!=='') r=r.filter(x=>x.parts.some(p=>p[0]===who));
-    if(q){ const s=q.toLowerCase(); r=r.filter(x=>(x.t+' '+x.id+' '+x.cat+' '+x.stage+' '+x.parts.map(p=>nm(p[0])).join(' ')).toLowerCase().includes(s)); }
-    r=r.slice().sort((a,b)=>b.p1-a.p1);
-    document.getElementById('prCount').textContent=`(${Math.min(shown,r.length)} из ${r.length})`;
-    document.getElementById('prWho').innerHTML=who?`Сделки: <b>${_esc(nm(who))}</b> · <a href="#" id="prAll">показать всех</a>`:'';
-    const a=document.getElementById('prAll'); if(a) a.addEventListener('click',e=>{e.preventDefault();who='';rows();});
-    const tag=x=>{const t=[];if(x.src==='est')t.push('<span class="srcb none">оценка</span>');else t.push(`<span class="srcb econ">${_esc(SRC[x.src]||x.src)}</span>`);
-      if(x.fl.indexOf('big')>=0)t.push('<span class="srcb disc">сумму проверить</span>');return t.join(' ');};
-    document.getElementById('prBody').innerHTML=r.slice(0,shown).map(x=>{
-      const parts=x.parts.map(([u,role,s])=>`<div class="dep">${ROLE[role]}: <span class="nmx">${_esc(nm(u))}</span> — ${fr(amt(x,s))}</div>`).join('');
-      const cf=(x.fl.indexOf('low')>=0||x.fl.indexOf('anom')>=0)?'color:var(--nr)':'';
-      return `<tr><td><div class="who"><a href="https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(x.id)}/" target="_blank" rel="noopener" style="color:var(--b2)">${_esc(x.t)}</a></div><div class="dep">${_esc(x.cat)} · ${_esc(x.stage)} · ${x.st==='r'?'в реализации':'в проработке'}</div></td>`
-       +`<td class="r mono">${fr(x.rev)}</td><td class="r mono">${fr(x.pz)}<div>${tag(x)}</div></td><td class="r mono" style="${cf}">×${x.coef.toFixed(2).replace('.',',')}</td>`
-       +`<td class="r mono"${x.res<0?' style="color:var(--nr)"':''}>${fr(x.res)}</td><td class="r mono"${x.p1<0?' style="color:var(--nr)"':''}><b>${fr(x.p1*K)}</b></td><td>${parts}</td></tr>`;
-    }).join('')||'<tr><td colspan="7" class="dimv">Нет сделок под этот отбор</td></tr>';
-    document.getElementById('prMore').style.display=r.length<=shown?'none':'';
-  }
-  document.getElementById('prK').addEventListener('input',e=>{ const v=parseFloat(String(e.target.value).replace(',','.'));
-    if(v>=P.kMin&&v<=P.kMax){ K=v; try{localStorage.setItem('premiaK',String(v));}catch(_){} kpis(); rows(); } });
-  document.getElementById('prSearch').addEventListener('input',e=>{ q=e.target.value.trim(); shown=200; rows(); });
-  document.getElementById('prChips').addEventListener('click',e=>{ const c=e.target.closest('.stchip'); if(!c) return;
-    mode=c.dataset.m; document.querySelectorAll('#prChips .stchip').forEach(x=>x.classList.toggle('on',x===c)); shown=200; rows(); });
-  document.getElementById('prBig').addEventListener('change',e=>{ withBig=e.target.checked; kpis(); rows(); });
-  document.getElementById('prMore').addEventListener('click',()=>{ shown+=200; rows(); });
-  kpis(); rows();
-}
-// END premiaCore
 // ---- ленивый рендер вкладок: тяжёлые вкладки строятся при первом открытии,
 // первый рендер страницы делает только «Сорсинг» (виден по умолчанию)
 const LAZY={
@@ -2258,7 +2161,6 @@ const LAZY={
   reps:()=>renderReps(window.__REPS__),
   contracts:renderContracts,
   suppliers:renderSuppliers,
-  premia:renderPremia,
 };
 const _lazyDone={};
 function ensureTab(t){
@@ -2313,7 +2215,7 @@ window.__RENDER_OK__=1;
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
     const t=b.dataset.tab;
     try{ if(window.ensureTab) window.ensureTab(t); }catch(e){ console.error(e); }
-    ['sourcing','company','reps','eng','contracts','suppliers','cohorts','advisor','premia']
+    ['sourcing','company','reps','eng','contracts','suppliers','cohorts','advisor']
       .forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
     window.scrollTo(0,0);
   }));
