@@ -27,11 +27,11 @@ function kv() {
   };
 }
 
-test("роль по умолчанию даёт сотруднику всё, гость не получает ничего", () => {
+test("роль по умолчанию даёт сотруднику всё, кроме премий, гость не получает ничего", () => {
   const acl = defaultAcl();
   const r = rightsFor(acl, "ivanov@kvantpro.com", {});
   assert.deepEqual(r.sites, SITE_IDS);
-  assert.deepEqual(r.tabs, TAB_IDS);
+  assert.deepEqual(r.tabs, TAB_IDS.filter((t) => t !== "premia"));   // премии — поимённо
   assert.equal(r.admin, false);
 
   acl.users["guest@kvantpro.com"] = { role: "guest", sites: [], tabs: [], note: "", seen: 1 };
@@ -366,4 +366,25 @@ test("панель показывает и принимает все завед�
   assert.match(w, /rights: RIGHTS\.map/, "справочник прав не уходит в панель — галочек не будет");
   assert.match(w, /boxes\(document\.getElementById\('drt'\)/, "права человека не заполняются");
   assert.match(w, /u\.rights = pick\(b\.rights, RIGHT_IDS\)/, "сервер не принимает права человека");
+});
+
+test("премии — личные деньги: вкладка не входит в роли по умолчанию, данные вырезаются", () => {
+  const acl = defaultAcl();
+  assert.ok(TAB_IDS.includes("premia"), "вкладки «Премии» нет в списке");
+  for (const role of ["head", "employee", "sourcing", "kam", "engineer", "guest"]) {
+    assert.ok(!acl.roles[role].tabs.includes("premia"), `роль ${role} по умолчанию видит премии`);
+  }
+  assert.ok(acl.roles.owner.tabs.includes("premia"), "владелец не видит премии");
+  // владелец из ADMIN_EMAILS видит всё всегда, сотрудник по умолчанию — нет
+  assert.ok(rightsFor(acl, "stepan@kvantpro.com", {}).tabs.includes("premia"));
+  assert.ok(!rightsFor(acl, "ivanov@kvantpro.com", {}).tabs.includes("premia"));
+  // точечная выдача человеку — финдиректору или КД — открывает вкладку
+  acl.users["fd@kvantpro.com"] = { role: "employee", sites: [], tabs: ["premia"], note: "", seen: 1 };
+  assert.ok(rightsFor(acl, "fd@kvantpro.com", {}).tabs.includes("premia"));
+  // без вкладки данные премий вырезаны на сервере
+  let html = fs.readFileSync(path.join(ROOT, "templates/dashboard_core.html"), "utf8");
+  for (const p of PAYLOADS) html = html.replace(`__${p}_JSON__`, `["MOCK-${p}"]`);
+  const out = cutDashboard(html, rightsFor(acl, "ivanov@kvantpro.com", {}).tabs);
+  assert.ok(!out.includes("MOCK-PREMIA"), "данные премий утекли сотруднику");
+  assert.doesNotMatch(out, /data-tab="premia"/, "кнопка «Премии» осталась у сотрудника");
 });

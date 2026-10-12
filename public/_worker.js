@@ -80,6 +80,9 @@ const TABS = [
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
   { id: "cohorts", name: "Когорты", pay: ["COMPANY"] },
   { id: "advisor", name: "Советы знатока", pay: ["ADVISOR"] },
+  // Премии — личные деньги людей по каждой сделке. В роли по умолчанию не входят:
+  // видит владелец, остальным вкладка выдаётся поимённо в /admin (финдиректор, КД).
+  { id: "premia", name: "Премии", pay: ["PREMIA"], def: false },
 ];
 // ТОНКИЕ ПРАВА РАЗДЕЛА «ПОСТАВЩИКИ». Третья ось рядом с сайтами и вкладками, и
 // заводится она потому, что ни одна из двух не подходит: сайт — всё или ничего,
@@ -103,9 +106,10 @@ const RIGHTS = [
 const RIGHT_IDS = RIGHTS.map((r) => r.id);
 const DEFAULT_RIGHTS = RIGHTS.filter((r) => r.def).map((r) => r.id);
 
-const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR"];
+const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR", "PREMIA"];
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
+const DEFAULT_TABS = TABS.filter((t) => t.def !== false).map((t) => t.id);
 
 // Роли по умолчанию. Владелец правит их в админке; здесь — состояние при первом запуске.
 function defaultAcl() {
@@ -117,9 +121,9 @@ function defaultAcl() {
       // а admin обходит проверку всё равно, и притворяться иначе незачем.
       owner: { name: "Владелец", admin: true, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
         rights: RIGHT_IDS.slice() },
-      head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
+      head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: DEFAULT_TABS.slice(),
         rights: DEFAULT_RIGHTS.slice() },
-      employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice(),
+      employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: DEFAULT_TABS.slice(),
         rights: DEFAULT_RIGHTS.slice() },
       sourcing: { name: "Сорсинг", admin: false,
         sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"],
