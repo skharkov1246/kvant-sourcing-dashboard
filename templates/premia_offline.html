@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0e1116">
+<meta name="robots" content="noindex, nofollow">
+<title>Премии по сделкам · КВАНТ</title>
+__STYLE__
+<style>
+  .offbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:0 0 18px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--mut)}
+  .offbar b{color:var(--ink)}
+</style>
+</head>
+<body>
+<!-- Офлайн-страница вкладки «Премии» (dashboard.render_premia_page). На портале её режет
+     гейт, как дашборд: без вкладки «Премии» в правах массив __PREMIA__ заменяется пустышкой.
+     Кнопка сохраняет страницу одним файлом: он открывается в браузере без сети. -->
+<div class="offbar" id="offbar"><span>Офлайн-копия вкладки «Премии» · состояние <b id="offWhen"></b></span><button class="stchip" id="offSave" type="button">Скачать файл</button></div>
+<div id="tab-premia"></div>
+<script>
+const gen=new Date("__GENERATED_AT__");
+window.__PREMIA__ = __PREMIA_JSON__;
+</script>
+<script>
+const _esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+__PREMIA_CORE__
+(function(){
+  // исходник снимается до отрисовки: сохранённый файл откроется пустым каркасом и отрисуется сам
+  const src='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  const X=window.__PREMIA__, el=document.getElementById('tab-premia'), save=document.getElementById('offSave');
+  // style.display, а не hidden: display из стилей .offbar и .stchip перебивает атрибут
+  if(!X||!Array.isArray(X.deals)){
+    document.getElementById('offbar').style.display='none';
+    el.innerHTML='<div class="note" style="padding:20px 0">Нет доступа: вкладка «Премии» вам не выдана.</div>';
+    return;
+  }
+  document.getElementById('offWhen').textContent=X.label||'';
+  if(location.protocol==='file:') save.style.display='none';   // это уже сохранённая копия
+  save.addEventListener('click',()=>{
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([src],{type:'text/html;charset=utf-8'}));
+    a.download='Премии_'+gen.toISOString().slice(0,10)+'.html';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1000);
+  });
+  renderPremia();
+})();
+</script>
+</body>
+</html>

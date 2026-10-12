@@ -388,3 +388,17 @@ test("премии — личные деньги: вкладка не входи
   assert.ok(!out.includes("MOCK-PREMIA"), "данные премий утекли сотруднику");
   assert.doesNotMatch(out, /data-tab="premia"/, "кнопка «Премии» осталась у сотрудника");
 });
+
+test("офлайн-страница премий режется так же, как дашборд, и не будит пересборку", () => {
+  const acl = defaultAcl();
+  let html = fs.readFileSync(path.join(ROOT, "templates/premia_offline.html"), "utf8");
+  html = html.replace("__STYLE__", "<style></style>").replace("__PREMIA_CORE__", "")
+    .replace("__GENERATED_AT__", "2026-10-12T11:00:00+03:00").replace("__PREMIA_JSON__", '["MOCK-PREMIA"]');
+  // без отметки времени гейт сочтёт страницу устаревшей и на каждое открытие закажет пересборку
+  assert.match(html, /gen=new Date\("[^"]+"\)/);
+  const emp = cutDashboard(html, rightsFor(acl, "ivanov@kvantpro.com", {}).tabs);
+  assert.ok(!emp.includes("MOCK-PREMIA"), "данные премий утекли сотруднику с офлайн-страницы");
+  assert.ok(emp.includes("function __kvNoData"), "пустышка не вставлена — страница упадёт на чтении данных");
+  const own = cutDashboard(html, rightsFor(acl, "stepan@kvantpro.com", {}).tabs);
+  assert.ok(own.includes("MOCK-PREMIA"), "владелец не получил данных на офлайн-странице");
+});

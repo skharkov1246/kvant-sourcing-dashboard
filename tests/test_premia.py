@@ -160,3 +160,46 @@ def test_синтетика_дашборда_даёт_непустую_вкла�
     out = fixture.build_premia()
     assert out and out["deals"] and out["names"]
     assert out["totals"]["real"] >= 1 and out["totals"]["presale"] >= 1
+
+
+# ---------------------------------------------------------------- вкладка скрыта, офлайн-страница
+# Тот же узор, которым гейт (aclCore.cutDashboard) вырезает массив у того, кому вкладка не выдана.
+CUT = r"window\.__PREMIA__ *= *[\s\S]*?;\n"
+
+
+def _собрать(tmp_path, premia):
+    import dashboard
+    from tests import fixture
+    out = dashboard.write(fixture.build_metrics(), {"source": "rules", "items": []},
+                          tmp_path / "dashboard_x.html", premia=premia)
+    return out.read_text(encoding="utf-8"), tmp_path / "premia_dashboard_x.html"
+
+
+def test_вкладка_скрыта_в_дашборде_нет_ни_кнопки_ни_данных(tmp_path):
+    import dashboard
+    from tests import fixture
+    assert dashboard.PREMIA_TAB is False
+    html, _ = _собрать(tmp_path, fixture.build_premia())
+    assert 'data-tab="premia"' not in html and 'id="tab-premia"' not in html
+    assert "window.__PREMIA__ = null;" in html
+
+
+def test_офлайн_страница_несёт_только_премии_и_режется_гейтом(tmp_path):
+    import re
+
+    from tests import fixture
+    data = fixture.build_premia()
+    _, page = _собрать(tmp_path, data)
+    html = page.read_text(encoding="utf-8")
+    assert "function renderPremia()" in html and re.search(r'gen=new Date\("[^"]+"\)', html)
+    for other in ("__DATA__", "__COMPANY__", "__PEOPLE__", "__REPS__", "__CONTRACTS__", "__KAM__"):
+        assert f"window.{other}" not in html, other
+    assert len(re.findall(CUT, html)) == 1
+    deal_title = data["deals"][0]["t"]
+    assert deal_title in html
+    assert deal_title not in re.sub(CUT, "window.__PREMIA__ = __kvNoData();\n", html, count=1)
+
+
+def test_без_данных_премий_офлайн_страница_не_пишется(tmp_path):
+    _, page = _собрать(tmp_path, None)
+    assert not page.exists()
