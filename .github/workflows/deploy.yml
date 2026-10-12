@@ -36,6 +36,8 @@ on:
       - "insights.py"
       - "stages.py"
       - "period.py"
+      - "premia.py"
+      - "presale.py"
       - "requirements.txt"
       - "templates/**"          # вёрстка дашборда
       - "public/**"             # то, что уезжает на Cloudflare Pages, включая гейт

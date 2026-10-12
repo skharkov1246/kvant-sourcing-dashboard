@@ -39,6 +39,8 @@ on:
       - reps.py
       - advisor.py
       - insights.py
+      - premia.py
+      - presale.py
       - scripts/live_check.py
       - .github/workflows/live-check.yml
   workflow_dispatch:
