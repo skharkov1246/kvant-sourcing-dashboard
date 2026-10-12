@@ -2153,12 +2153,13 @@ function renderPeople(P,role,elId,opt){
     }
   });
 }
+// BEGIN premiaCore — этот блок целиком уходит и в офлайн-страницу вкладки (dashboard.render_premia_page)
 // ---- «Премии»: прогноз по положению о мотивации команды КАМа, ред. 2 (premia.py).
 // Строка сделки хранит пул при К = 1: при К ≤ 1,25 предел 25 % не достигается, поэтому
 // премия линейна по К и пересчитывается в браузере, когда пользователь меняет К.
 function renderPremia(){
   const X=window.__PREMIA__, el=document.getElementById('tab-premia'); if(!el) return;
-  if(!X||!X.deals){ el.innerHTML='<div class="note" style="padding:20px 0">Нет данных: премии считаются по открытым сделкам вкладки «Коммерсанты» — в этой сборке их нет.</div>'; return; }
+  if(!X||!Array.isArray(X.deals)){ el.innerHTML='<div class="note" style="padding:20px 0">Нет данных: премии считаются по открытым сделкам вкладки «Коммерсанты» — в этой сборке их нет.</div>'; return; }
   const P=X.params||{}, N=X.names||{}, D=X.deals, T=X.totals||{};
   const fr=v=>{const a=Math.abs(v),s=v<0?'−':'';return a>=1e6?s+(a/1e6).toFixed(2).replace('.',',')+' млн ₽':a>=1e3?s+Math.round(a/1e3)+' тыс. ₽':s+Math.round(a)+' ₽';};
   const pc=v=>(v*100).toFixed(1).replace('.',',')+' %';
@@ -2246,6 +2247,7 @@ function renderPremia(){
   document.getElementById('prMore').addEventListener('click',()=>{ shown+=200; rows(); });
   kpis(); rows();
 }
+// END premiaCore
 // ---- ленивый рендер вкладок: тяжёлые вкладки строятся при первом открытии,
 // первый рендер страницы делает только «Сорсинг» (виден по умолчанию)
 const LAZY={

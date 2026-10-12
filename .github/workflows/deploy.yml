@@ -142,6 +142,10 @@ jobs:
           latest="$(ls -t reports/dashboard_*.html | head -1)"
           cp "$latest" public/index.html
           echo "index.html ← $latest ($(wc -c < public/index.html) байт)"
+          # вкладка «Премии» скрыта из дашборда (dashboard.PREMIA_TAB) — её страница
+          # отдельно; данные в ней гейт оставляет только тем, кому выдана вкладка
+          prem="$(ls -t reports/premia_dashboard_*.html 2>/dev/null | head -1 || true)"
+          if [ -n "$prem" ]; then cp "$prem" public/premia.html; echo "premia.html ← $prem"; fi
 
       # Барьер перед деплоем: незаменённые плейсхолдеры, пустые KPI, JS-ошибки рендера.
       # Если проверка не прошла — деплой не выполняется и на сайте остаётся
