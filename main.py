@@ -29,6 +29,7 @@ import kam as kam_mod
 import contracts as contracts_mod
 import metrics as metrics_mod
 import people as people_mod
+import premia as premia_mod
 import period as period_mod
 import presale as presale_mod
 import reps as reps_mod
@@ -633,6 +634,7 @@ def run(args) -> int:
 
     company_data = kam_data = eng_data = prod_data = reps_data = people_data = None
     deals_ytd = orders_ytd = orders_all = deal_owner = deal_sale = None
+    _rate = {}            # курсы Битрикса к базе €; пусто — если общий пул не собрался
     # --- общий пул сделок/заказов YTD (нужен Пульсу + отраслевым вкладкам) ---
     try:
         print("• Общий пул сделок/заказов (YTD)…")
@@ -766,6 +768,25 @@ def run(args) -> int:
     except Exception as e:
         print(f"  ⚠ вкладка «Коммерсанты» пропущена: {type(e).__name__}: {e}")
 
+    premia_data = None
+    try:
+        print("• Премии по сделкам (положение ред. 2)…")
+        _eur_rub = (1 / _rate["RUB"]) if _rate.get("RUB") else None   # иначе — курс из «Реализации»
+        premia_data = premia_mod.compute(people_data, contracts_data, eur_rub=_eur_rub)
+        # В журнал — только счётчики (правило 17): журнал публичный, а поправка
+        # и суммы — сведения о марже и премиях. Их видно только на вкладке.
+        if premia_data:
+            _pt = premia_data["totals"]; _ps = _pt["src"]
+            print(f"  премии: сделок с прогнозом {_pt['deals']} (реализация {_pt['real']}, "
+                  f"проработка {_pt['presale']}); ПЗ: заказы {_ps.get('orders', 0)}, книга {_ps.get('book', 0)}, "
+                  f"экономика {_ps.get('econ', 0)}, оценка {_ps.get('est', 0)}; ниже ×1,17 — {_pt['low']}, "
+                  f"убыточных — {_pt['neg']}, выбросов — {_pt['big']}; "
+                  f"калибровка по {premia_data['params']['calibN']} сделкам")
+        else:
+            print("  премии: не посчитаны — нет открытых сделок или курса рубля")
+    except Exception as e:
+        print(f"  премии: вкладка пропущена — {type(e).__name__}")   # только класс ошибки: журнал публичный
+
     advisor_data = None
     if deals_ytd is not None:
         try:
@@ -786,7 +807,7 @@ def run(args) -> int:
         Path(args.data_json).write_text(json.dumps({
             "company": company_data, "kam": kam_data, "eng": eng_data, "prod": prod_data,
             "contracts": contracts_data, "reps": reps_data, "advisor": advisor_data,
-            "people": people_data, "_portal": client.snapshot_stats(),
+            "people": people_data, "premia": premia_data, "_portal": client.snapshot_stats(),
         }, ensure_ascii=False, default=str), encoding="utf-8")
         print(f"  ✓ вкладки для сверки: {args.data_json}")
     _print_snapshot(client)
@@ -794,7 +815,8 @@ def run(args) -> int:
     html_path = out_dir / f"dashboard_{slug}.html"
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
                     company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
-                    contracts=contracts_data, reps=reps_data, advisor=advisor_data, people=people_data)
+                    contracts=contracts_data, reps=reps_data, advisor=advisor_data, people=people_data,
+                    premia=premia_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:

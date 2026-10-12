@@ -131,7 +131,7 @@ jobs:
           python -c "import config; print(','.join(sorted(getattr(config, 'SERVICE_ACCOUNT_IDS', set()))))" \
             > /tmp/service-base.txt 2>/dev/null || echo "" > /tmp/service-base.txt
           # в журнал — только агрегаты из белого списка (правило 17)
-          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки|снимок портала:" \
+          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки|снимок портала:|^  премии:" \
             /tmp/base.log || true
           if [ "$rc" -ne 0 ]; then
             # Прод не собрался: правку всё равно проверяем саму по себе, а
@@ -149,7 +149,7 @@ jobs:
           BITRIX_SNAPSHOT_MODE=replay python main.py --no-llm --period "$PERIOD" --as-of "$ASOF" \
             --out /tmp/out-head --data-json /tmp/out-head/modules.json > /tmp/head.log 2>&1
           rc=$?
-          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки|снимок портала:" \
+          grep -E "^  RFQ:|авторов карточек:|служебные записи: [0-9]|чем определён:|поле сорсера сделки|снимок портала:|^  премии:" \
             /tmp/head.log || true
           if [ "$rc" -ne 0 ]; then
             echo "::error::расчёт правки упал (код $rc): $(grep -oE '✗ (Ошибка: [A-Za-z]+|данные Bitrix не прошли проверку достаточности)' /tmp/head.log | tail -1)"

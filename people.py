@@ -865,12 +865,18 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                   details=details, kam=kam, prod=prod, orphan=orphan, recon=recon,
                   field_use=field_use, close_future=close_future)
 
+    # имена всех, кто стоит на открытых сделках (КАМ, продукт-оунер, исполнитель): вкладке
+    # «Премии» нужен и исполнитель, а он часто вне обеих ролей — в строках ролей его нет
+    on_deals = {u for d in details for u in (d["kam"], d["prod"], d["own"]) if u}
+    names = {u: [people.get(u, {}).get("name") or f"user#{u}", bool(people.get(u, {}).get("active"))]
+             for u in sorted(on_deals)}
+
     return {
         "label": f"на {today.strftime('%d.%m.%Y')}",
         "roles": {"kam": kam, "prod": prod},
         "orphan": orphan, "recon": recon, "staff": staff, "hygiene": hyg,
         "headless": gaps_all, "promise": _promise_stats(promise),
-        "deals": details,
+        "deals": details, "names": names,
         # сделки пресейла, где мяч у сорсинга: КАМу видно, что его клиент в работе
         "inSrc": in_src,
         "presaleCat": catname(presale_cid) if presale_cid else "",

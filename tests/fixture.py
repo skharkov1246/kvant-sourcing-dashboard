@@ -305,6 +305,13 @@ def build_people(**kw) -> dict:
                               created=CREATED, orders=ORDERS, **kw)
 
 
+def build_premia(**kw) -> dict:
+    """Синтетика «Коммерсантов» → настоящий premia.compute → данные вкладки «Премии».
+    Курс придуман: 1 € = 100 ₽ (рубли в синтетике — только масштаб)."""
+    import premia as premia_mod
+    return premia_mod.compute(build_people(), None, eur_rub=100.0, **kw)
+
+
 def build_reps(**kw) -> dict:
     """Синтетика → настоящий reps.compute → данные вкладки «Коммерсанты»."""
     import reps as reps_mod
