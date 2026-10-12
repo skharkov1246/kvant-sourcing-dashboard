@@ -773,15 +773,19 @@ def run(args) -> int:
         print("• Премии по сделкам (положение ред. 2)…")
         _eur_rub = (1 / _rate["RUB"]) if _rate.get("RUB") else None   # иначе — курс из «Реализации»
         premia_data = premia_mod.compute(people_data, contracts_data, eur_rub=_eur_rub)
+        # В журнал — только счётчики (правило 17): журнал публичный, а поправка
+        # и суммы — сведения о марже и премиях. Их видно только на вкладке.
         if premia_data:
-            _pt = premia_data["totals"]; _pp = premia_data["params"]
-            print(f"  ✓ сделок с прогнозом: {_pt['deals']} (реализация {_pt['real']}, проработка {_pt['presale']}); "
-                  f"ПЗ по источникам: {_pt['src']}; поправка {_pp['plug']:.1%} выручки "
-                  f"по {_pp['calibN']} сделкам с закупкой")
+            _pt = premia_data["totals"]; _ps = _pt["src"]
+            print(f"  премии: сделок с прогнозом {_pt['deals']} (реализация {_pt['real']}, "
+                  f"проработка {_pt['presale']}); ПЗ: заказы {_ps.get('orders', 0)}, книга {_ps.get('book', 0)}, "
+                  f"экономика {_ps.get('econ', 0)}, оценка {_ps.get('est', 0)}; ниже ×1,17 — {_pt['low']}, "
+                  f"убыточных — {_pt['neg']}, выбросов — {_pt['big']}; "
+                  f"калибровка по {premia_data['params']['calibN']} сделкам")
         else:
-            print("  ⚠ премии не посчитаны: нет открытых сделок или курса рубля")
+            print("  премии: не посчитаны — нет открытых сделок или курса рубля")
     except Exception as e:
-        print(f"  ⚠ вкладка «Премии» пропущена: {type(e).__name__}: {e}")
+        print(f"  премии: вкладка пропущена — {type(e).__name__}")   # только класс ошибки: журнал публичный
 
     advisor_data = None
     if deals_ytd is not None:
