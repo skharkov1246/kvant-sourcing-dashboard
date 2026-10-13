@@ -1,0 +1,79 @@
+name: Премии — файлы владельцу в Telegram
+
+# Решение владельца 12–13.10.2026: «Премии» сняты с портала, а файл для пересылки
+# нужен. Прогон собирает данные так же, как пересборка дашборда (main.py), делает два
+# файла — PDF для чтения и HTML с изменяемым К (scripts/premia_files.py) — и отправляет
+# их ботом оповещений портала в личную переписку получателя (scripts/premia_telegram.py).
+#
+# Публичность. Репозиторий открыт, журнал Actions тоже. На сайт ничего не выкладывается,
+# артефактов нет: файлы живут на раннере до конца прогона. Вывод main.py пишется в файл,
+# в журнал — только строка-счётчик «премии:». Имя получателя передаётся хешем.
+on:
+  workflow_dispatch:
+    inputs:
+      to_sha256:
+        description: "SHA-256 имени получателя в Telegram (строчными, без @)"
+        required: true
+      k:
+        description: "К компании для PDF (в HTML его меняют сами)"
+        default: "0.60"
+
+permissions:
+  contents: read
+
+concurrency:
+  # общая очередь чтения портала (CLAUDE.md, «Битрикс не перегружать»), как у зондов
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        # psycopg2 — для publish_suppliers, чей клиент KV читает настройки бота
+        run: pip install -r requirements.txt pdfminer.six psycopg2-binary==2.9.10
+
+      - name: Данные — как пересборка дашборда
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
+          # рядом может идти пересборка дашборда (её очередь своя) — с запасом, как зонды
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+        run: |
+          set -uo pipefail
+          mkdir -p /tmp/premia
+          python main.py --no-llm --out /tmp/premia/reports --data-json /tmp/premia/modules.json \
+            > /tmp/premia/build.log 2>&1
+          code=$?
+          grep -E '^  премии:' /tmp/premia/build.log || true
+          [ "$code" -eq 0 ] || { echo "сборка данных упала: код $code"; exit 1; }
+
+      - name: Файлы — PDF и HTML
+        env:
+          K: ${{ inputs.k }}
+        run: |
+          set -euo pipefail
+          python scripts/premia_files.py --data /tmp/premia/modules.json --out /tmp/premia/out --k "$K"
+          google-chrome --headless --disable-gpu --no-sandbox --no-pdf-header-footer \
+            --run-all-compositor-stages-before-draw --virtual-time-budget=60000 \
+            --print-to-pdf=/tmp/premia/out/premia.pdf file:///tmp/premia/out/doc.html > /dev/null 2>&1
+          # проверка PDF: ничего не обрезано, ни одна сделка не потеряна (docs/ПРАВИЛА-PDF.md);
+          # её вывод — только счётчики и номера сделок
+          python scripts/pdf_check.py /tmp/premia/out/premia.pdf --expect-file /tmp/premia/out/ids.txt
+
+      - name: Отправка в Telegram
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TO_SHA256: ${{ inputs.to_sha256 }}
+        run: python scripts/premia_telegram.py --to-sha256 "$TO_SHA256" /tmp/premia/out/premia.pdf /tmp/premia/out/premia.html
