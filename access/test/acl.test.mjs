@@ -27,11 +27,11 @@ function kv() {
   };
 }
 
-test("роль по умолчанию даёт сотруднику всё, кроме премий, гость не получает ничего", () => {
+test("роль по умолчанию даёт сотруднику всё, гость не получает ничего", () => {
   const acl = defaultAcl();
   const r = rightsFor(acl, "ivanov@kvantpro.com", {});
   assert.deepEqual(r.sites, SITE_IDS);
-  assert.deepEqual(r.tabs, TAB_IDS.filter((t) => t !== "premia"));   // премии — поимённо
+  assert.deepEqual(r.tabs, TAB_IDS);
   assert.equal(r.admin, false);
 
   acl.users["guest@kvantpro.com"] = { role: "guest", sites: [], tabs: [], note: "", seen: 1 };
@@ -368,37 +368,13 @@ test("панель показывает и принимает все завед�
   assert.match(w, /u\.rights = pick\(b\.rights, RIGHT_IDS\)/, "сервер не принимает права человека");
 });
 
-test("премии — личные деньги: вкладка не входит в роли по умолчанию, данные вырезаются", () => {
+test("премии сняты с портала: ни вкладки, ни массива, старая выдача ничего не открывает", () => {
+  // решение владельца 12.10.2026; вернуть — только по его новому решению
+  assert.ok(!TAB_IDS.includes("premia"), "вкладка «Премии» снова в списке прав");
+  assert.ok(!PAYLOADS.includes("PREMIA"), "массив премий снова в списке данных страницы");
+  const html = fs.readFileSync(path.join(ROOT, "templates/dashboard_core.html"), "utf8");
+  assert.doesNotMatch(html, /premia|PREMIA/, "в шаблоне дашборда остались премии");
   const acl = defaultAcl();
-  assert.ok(TAB_IDS.includes("premia"), "вкладки «Премии» нет в списке");
-  for (const role of ["head", "employee", "sourcing", "kam", "engineer", "guest"]) {
-    assert.ok(!acl.roles[role].tabs.includes("premia"), `роль ${role} по умолчанию видит премии`);
-  }
-  assert.ok(acl.roles.owner.tabs.includes("premia"), "владелец не видит премии");
-  // владелец из ADMIN_EMAILS видит всё всегда, сотрудник по умолчанию — нет
-  assert.ok(rightsFor(acl, "stepan@kvantpro.com", {}).tabs.includes("premia"));
-  assert.ok(!rightsFor(acl, "ivanov@kvantpro.com", {}).tabs.includes("premia"));
-  // точечная выдача человеку — финдиректору или КД — открывает вкладку
   acl.users["fd@kvantpro.com"] = { role: "employee", sites: [], tabs: ["premia"], note: "", seen: 1 };
-  assert.ok(rightsFor(acl, "fd@kvantpro.com", {}).tabs.includes("premia"));
-  // без вкладки данные премий вырезаны на сервере
-  let html = fs.readFileSync(path.join(ROOT, "templates/dashboard_core.html"), "utf8");
-  for (const p of PAYLOADS) html = html.replace(`__${p}_JSON__`, `["MOCK-${p}"]`);
-  const out = cutDashboard(html, rightsFor(acl, "ivanov@kvantpro.com", {}).tabs);
-  assert.ok(!out.includes("MOCK-PREMIA"), "данные премий утекли сотруднику");
-  assert.doesNotMatch(out, /data-tab="premia"/, "кнопка «Премии» осталась у сотрудника");
-});
-
-test("офлайн-страница премий режется так же, как дашборд, и не будит пересборку", () => {
-  const acl = defaultAcl();
-  let html = fs.readFileSync(path.join(ROOT, "templates/premia_offline.html"), "utf8");
-  html = html.replace("__STYLE__", "<style></style>").replace("__PREMIA_CORE__", "")
-    .replace("__GENERATED_AT__", "2026-10-12T11:00:00+03:00").replace("__PREMIA_JSON__", '["MOCK-PREMIA"]');
-  // без отметки времени гейт сочтёт страницу устаревшей и на каждое открытие закажет пересборку
-  assert.match(html, /gen=new Date\("[^"]+"\)/);
-  const emp = cutDashboard(html, rightsFor(acl, "ivanov@kvantpro.com", {}).tabs);
-  assert.ok(!emp.includes("MOCK-PREMIA"), "данные премий утекли сотруднику с офлайн-страницы");
-  assert.ok(emp.includes("function __kvNoData"), "пустышка не вставлена — страница упадёт на чтении данных");
-  const own = cutDashboard(html, rightsFor(acl, "stepan@kvantpro.com", {}).tabs);
-  assert.ok(own.includes("MOCK-PREMIA"), "владелец не получил данных на офлайн-странице");
+  assert.ok(!rightsFor(normalizeAcl(acl), "fd@kvantpro.com", {}).tabs.includes("premia"));
 });

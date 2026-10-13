@@ -80,9 +80,8 @@ const TABS = [
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
   { id: "cohorts", name: "Когорты", pay: ["COMPANY"] },
   { id: "advisor", name: "Советы знатока", pay: ["ADVISOR"] },
-  // Премии — личные деньги людей по каждой сделке. В роли по умолчанию не входят:
-  // видит владелец, остальным вкладка выдаётся поимённо в /admin (финдиректор, КД).
-  { id: "premia", name: "Премии", pay: ["PREMIA"], def: false },
+  // «Премии» сняты с портала по решению владельца 12.10.2026: ни вкладки, ни массива
+  // данных в странице (вкладка до снятия — PR #508).
 ];
 // ТОНКИЕ ПРАВА РАЗДЕЛА «ПОСТАВЩИКИ». Третья ось рядом с сайтами и вкладками, и
 // заводится она потому, что ни одна из двух не подходит: сайт — всё или ничего,
@@ -106,7 +105,7 @@ const RIGHTS = [
 const RIGHT_IDS = RIGHTS.map((r) => r.id);
 const DEFAULT_RIGHTS = RIGHTS.filter((r) => r.def).map((r) => r.id);
 
-const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR", "PREMIA"];
+const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR"];
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
 const DEFAULT_TABS = TABS.filter((t) => t.def !== false).map((t) => t.id);
