@@ -42,7 +42,7 @@ jobs:
     env:
       LIBRARY_SQL_TEST_DSN: postgresql://postgres:synthetic-library-ci@127.0.0.1:5432/library_sql_test
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0          # нужен для сравнения с base-веткой
 
