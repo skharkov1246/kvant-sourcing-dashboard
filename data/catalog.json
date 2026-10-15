@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 318,
-    "total_bytes": 127734587,
+    "total_bytes": 127733987,
     "by_sensitivity": {
       "внутреннее": 196,
       "конфиденциально": 69,
@@ -913,7 +913,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 1780661,
+      "bytes": 1778374,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -2787,6 +2787,51 @@
       ]
     },
     {
+      "path": "gt/data/bitrix_gt.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 257561,
+      "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "deals",
+        "live",
+        "offers",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "deals",
+        "records": 229,
+        "record_keys": [
+          "created",
+          "id",
+          "models",
+          "rfqs",
+          "stage",
+          "title"
+        ]
+      },
+      "last_change": "2026-10-08",
+      "last_author": "github-actions[bot]",
+      "last_commit": "8f3b2167",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/gt-bitrix.yml",
+        "gt/build.py",
+        "gt/public/ansaldo.html",
+        "gt/tools/bitrix_gt.py",
+        "gt/tools/drop_ru.py",
+        "scripts/build_index.py",
+        "scripts/preflight.py",
+        "tests/test_dataset_has_reader.py"
+      ]
+    },
+    {
       "path": "zip/data/telsmith_nodrawings.json",
       "subproject": "база ЗИП",
       "bytes": 257274,
@@ -2820,51 +2865,6 @@
       },
       "referenced_by": [
         "zip/tools/build_telsmith_page.py"
-      ]
-    },
-    {
-      "path": "gt/data/bitrix_gt.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 255874,
-      "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "deals",
-        "live",
-        "offers",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "deals",
-        "records": 227,
-        "record_keys": [
-          "created",
-          "id",
-          "models",
-          "rfqs",
-          "stage",
-          "title"
-        ]
-      },
-      "last_change": "2026-10-08",
-      "last_author": "github-actions[bot]",
-      "last_commit": "8f3b2167",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        ".github/workflows/gt-bitrix.yml",
-        "gt/build.py",
-        "gt/public/ansaldo.html",
-        "gt/tools/bitrix_gt.py",
-        "gt/tools/drop_ru.py",
-        "scripts/build_index.py",
-        "scripts/preflight.py",
-        "tests/test_dataset_has_reader.py"
       ]
     },
     {

@@ -1,17 +1,61 @@
 {
- "updated": "2026-10-12",
+ "updated": "2026-10-15",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "23974",
+   "title": "Запрос на лопатки 1-й ступени SGT-700 ООО \"СКИМ\" (коллега Кирша)",
+   "models": [
+    "SGT-700"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2026-10-13",
+   "rfqs": [
+    {
+     "id": "50982",
+     "title": "WTT лопатки SGT-700",
+     "created": "2026-10-13",
+     "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-700"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "23972",
+   "title": "3.2.109 Тендер №3.2.109 \"Выполнение работ по технической поддержке и проведению 4-х инспекций уровня \"А\" и 1-й инспекции уровня \"D\" на ГТУ №№ 1-5 SGT-600 Siemens Энергоцентра-125 МВт \"Южное Хыльчую\" в 2027 году\"",
+   "models": [
+    "SGT-600"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-13",
+   "rfqs": []
+  },
   {
    "id": "23868",
    "title": "ЗП610450 Выполнение работ по техническому перевооружению газогенератора газотурбинного двигателя SIEMENS SGT-200-1S (DLE) TORNADO 6,75МВт.",
    "models": [
     "SGT-200"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:13",
    "created": "2026-10-07",
-   "rfqs": []
+   "rfqs": [
+    {
+     "id": "50980",
+     "title": "КЭР субподряд",
+     "created": "2026-10-13",
+     "supplier": "ООО \"КЭР-ГЕНЕРАЦИЯ\"",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-200"
+     ]
+    }
+   ]
   },
   {
    "id": "23854",
@@ -104,7 +148,7 @@
      "title": "RFQ Novaut",
      "created": "2026-10-08",
      "supplier": "Novaut",
-     "stage": "Отказ в КП",
+     "stage": "In Correspondance",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -159,7 +203,7 @@
      "title": "rfq Shanghai Bogvik Wear Material",
      "created": "2026-10-08",
      "supplier": "Shanghai Bogvik Wear Material Co., ltd",
-     "stage": "In Correspondance",
+     "stage": "Unread Messages",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -434,7 +478,7 @@
      "title": "rfq Orbital Vana",
      "created": "2026-10-09",
      "supplier": "Orbital Vana",
-     "stage": "New Request",
+     "stage": "Отказ в КП",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -445,7 +489,7 @@
      "title": "rfq Adoset",
      "created": "2026-10-09",
      "supplier": "Adoset",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -456,7 +500,7 @@
      "title": "rfq Beijing Agend",
      "created": "2026-10-09",
      "supplier": "Beijing Agend",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -467,7 +511,7 @@
      "title": "rfq ABSR Engineers",
      "created": "2026-10-09",
      "supplier": "ABSR Engineers & Services Pvt. Ltd.",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -478,7 +522,7 @@
      "title": "rfq Alpha Group",
      "created": "2026-10-09",
      "supplier": "Alpha Group",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -489,7 +533,7 @@
      "title": "rfq M Power Engineering",
      "created": "2026-10-09",
      "supplier": "M Power Engineering",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -500,7 +544,7 @@
      "title": "rfq Xiangshu Eurtrade",
      "created": "2026-10-09",
      "supplier": "Xiangshu Eurtrade",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -511,7 +555,7 @@
      "title": "rfq ANATCO",
      "created": "2026-10-09",
      "supplier": "AL NOOR ALAILI TRADING CO. LLC",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -522,7 +566,7 @@
      "title": "rfq Harkesh Rubber",
      "created": "2026-10-09",
      "supplier": "Harkesh Rubber LLP",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -533,7 +577,7 @@
      "title": "rfq Xiamen Wanshuang",
      "created": "2026-10-09",
      "supplier": "Xiamen Wanshuang",
-     "stage": "New Request",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -544,7 +588,7 @@
      "title": "rfq Shanghai Huanyao",
      "created": "2026-10-09",
      "supplier": "Shanghai Huanyao",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -555,7 +599,7 @@
      "title": "rfq Theta Tech",
      "created": "2026-10-09",
      "supplier": "Theta Tech International Trading Ltd",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -566,7 +610,7 @@
      "title": "rfq Gas Turbine Valves",
      "created": "2026-10-09",
      "supplier": "Gas Turbine Valves",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -577,7 +621,7 @@
      "title": "rfq Ada Vana",
      "created": "2026-10-09",
      "supplier": "Al Zerwa Trading Co LLC",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -588,7 +632,7 @@
      "title": "rfq SATATURK",
      "created": "2026-10-09",
      "supplier": "Sataturk",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -599,7 +643,7 @@
      "title": "rfq Akvemtek",
      "created": "2026-10-09",
      "supplier": "Akvemtek",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -610,7 +654,7 @@
      "title": "rfq Beijing Handelsen",
      "created": "2026-10-09",
      "supplier": "Beijing Handelsen International Trade",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -621,7 +665,7 @@
      "title": "rfq Hangzhou Gas Turbine Parts\t",
      "created": "2026-10-09",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -632,7 +676,7 @@
      "title": "rfq Tech-Land",
      "created": "2026-10-09",
      "supplier": "Tech-Land",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -643,7 +687,7 @@
      "title": "rfq Gedik Termo Vana",
      "created": "2026-10-09",
      "supplier": "Gedik Termo Vana",
-     "stage": "New Request",
+     "stage": "Request Sent",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -784,7 +828,7 @@
      "title": "RFQ_Spare Parts for Dresser",
      "created": "2026-09-18",
      "supplier": "Sulzer Turbo Services Venlo B.V.",
-     "stage": "Unread Messages",
+     "stage": "Отказ в КП",
      "sourcer": "Ksenia Odegova",
      "models": [
       "ГТУ (модель уточнить)"
@@ -1236,7 +1280,7 @@
    "models": [
     "Titan 250"
    ],
-   "stage": "C30:EXECUTING",
+   "stage": "C30:APOLOGY",
    "created": "2026-07-03",
    "rfqs": [
     {
@@ -1324,7 +1368,7 @@
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": "C30:EXECUTING",
+   "stage": "C30:APOLOGY",
    "created": "2026-07-02",
    "rfqs": [
     {
@@ -3401,7 +3445,7 @@
     {
      "id": "25422",
      "title": "Фильтры Siemens в EU Automation (UAE)",
-     "created": "2025-12-16",
+     "created": "2025-12-15",
      "supplier": "EU Automation (UAE)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -3491,7 +3535,7 @@
     {
      "id": "26030",
      "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
-     "created": "2026-01-09",
+     "created": "2026-01-08",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -3743,7 +3787,7 @@
     {
      "id": "24010",
      "title": "Pepple+Fuchs в Kempston Controls LLC",
-     "created": "2025-11-19",
+     "created": "2025-11-18",
      "supplier": "Kempston Controls LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -3754,7 +3798,7 @@
     {
      "id": "24012",
      "title": "Pepple+Fuchs в Gahangan",
-     "created": "2025-11-19",
+     "created": "2025-11-18",
      "supplier": "Gahangan",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -5497,7 +5541,7 @@
      "title": "Инспекция B . Пулково. Бюджет.Безад ",
      "created": "2025-03-09",
      "supplier": "[Dont trust]  ASH presicion",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Ruslan Sitdikov",
      "models": [
       "SGT-100"
@@ -6526,7 +6570,7 @@
     {
      "id": "10108",
      "title": "Requests #10108",
-     "created": "2024-12-18",
+     "created": "2024-12-17",
      "supplier": "RTP power",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -8791,7 +8835,7 @@
      "title": "воспламенители . Ash precsion ",
      "created": "2025-02-12",
      "supplier": "[Dont trust]  ASH presicion",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Ruslan Sitdikov",
      "models": [
       "SGT-400"
@@ -9297,6 +9341,10 @@
      "n": 2
     },
     {
+     "name": "ООО \"КЭР-ГЕНЕРАЦИЯ\"",
+     "n": 1
+    },
+    {
      "name": "WRIKU INTERNATIONAL BUSINESS CO LTD",
      "n": 1
     },
@@ -9571,6 +9619,10 @@
     {
      "name": "Nikan Industrial Turbine Co. (NITCO)",
      "n": 2
+    },
+    {
+     "name": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
+     "n": 1
     },
     {
      "name": "TURBGEAR",
