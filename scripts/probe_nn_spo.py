@@ -1,0 +1,591 @@
+#!/usr/bin/env python3
+"""Зонд v52 «Норникель: номенклатура самоходного подземного оборудования по кварталам».
+
+Вопрос владельца 15.10.2026 (разбор справки для заказчика): подтвердить или
+опровергнуть данными портала, что со II кв. 2026 г. по номенклатуре Департамента
+самоходного подземного оборудования упали заявки, приглашения к закупочным
+процедурам и контракты, — и отделить это от остального Норникеля. Справка
+утверждает «с апреля 2026 г. ни одного нового договора» и «в процедуры не
+приглашают»; до отправки это надо проверить по своим данным.
+
+СЕГМЕНТ «СПО» — две разметки рядом (поля «подразделение заказчика» портал не хранит):
+  • ТЕМА — по названию сделки: номенклатура самоходной подземной техники (ТЕМА_СПО);
+    электродвигатели и прочее стационарное — не СПО (НЕ_СПО);
+  • КОНТАКТ — по должности основного контакта сделки (crm.contact POST): слова
+    подразделения (КОНТАКТ_СПО).
+  Печатаются обе и объединение; «прочий Норникель» — без обеих.
+ВИД ЗАЯВКИ — по названию: приглашение к закупочной процедуре, запрос ТКП/КП/цен,
+аварийная или срочная, расценка/бюджет/прейскурант, прочее (порядок значим).
+ЮРЛИЦО — метки сегментов ЗФ (ПАО и Заполярный филиал), КГМК, МР, ГРКБ, прочие
+юрлица группы. Названия компаний в журнал не идут.
+
+МОДЕЛЬ СДЕЛКИ — probe_conversion.классифицировать + probe_2526.разметить +
+probe_pace.даты_закрытия (заявка, ТКП «выдано» по истории стадий, контракт v4,
+проигрыш с причиной по имени стадии). До 2025 г. реализацию заводили отдельной
+карточкой — поэтому рядом «карточки реализации» (кат. 0 сразу) по кварталу
+создания и ЖИВЫЕ ЗАКАЗЫ СП-172 по кварталу создания заказа: это поставка по
+факту, независимо от того, как вели воронку.
+
+ЧАТЫ СДЕЛОК (просьба владельца 15.10.2026 «чаты сделок тоже изучи») — сообщения
+чатов сделок группы (im.chat.get и im.dialog.messages.get пакетом batch по 50; у
+сделок СПО — вглубь до CHAT_PAGES страниц по 50). Текст размечается классами
+ТЕМЫ_ЧАТА (гарантия, приёмка, дефект, вскрытие, замена за наш счёт, акт, прямой
+выбор, марка конкурента, отмена закупки, …); в журнал — только число сообщений
+и сделок каждого класса по кварталу сообщения. Сам текст из прогона не выходит.
+
+ЧТО В ЖУРНАЛ. Репозиторий публичный (CLAUDE.md, правило 5; распоряжение 30.09):
+счётчики по кварталам и месяцам, доли, месяц последнего события сегмента, метки
+юрлиц. Ни сумм, ни названий компаний, поставщиков и брендов, ни ID и названий
+сделок, ни имён и должностей людей.
+
+НАГРУЗКА (навык bitrix-ingest): сделки с SINCE — по ключу >ID; компании — по 50;
+контакты сделок группы — по 50; история стадий — только сделки группы, пачками
+по 50 со сверкой с total; заказы СП-172 — по ключу со сверкой. Оценка печатается
+до чтения; ≈ 15–25 мин при 1/с.
+"""
+from __future__ import annotations
+
+import collections
+import datetime as dt
+import importlib.util
+import os
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+# Глубина — с 2023 г.: справке нужна база «до смены руководителя», а не только
+# 2025–2026. Задаётся до загрузки probe_conversion (он читает CONV_SINCE при импорте).
+os.environ.setdefault("CONV_SINCE", "2023-01-01T00:00:00")
+
+
+def _модуль(имя, файл):
+    spec = importlib.util.spec_from_file_location(имя, ROOT / "scripts" / файл)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+pace = _модуль("kvant_probe_pace_v52", "probe_pace.py")
+p26 = pace.p26
+pc = pace.pc
+
+ПЕРЕЛОМ = os.environ.get("SPO_BREAK", "2026-04")     # с какого месяца «после»
+
+ТЕМА_СПО = re.compile(
+    r"ПДМ|ШАС|СБУ|(?<![А-Яа-яЁё])СДО(?![А-Яа-яЁё])|самоходн|ГШО|подземн|анкероуст|бурильн|буров\w*\s+установ|погрузочно-доставочн"
+    r"|шахтн\w*\s+(?:самосвал|погрузчик|техник)|негабарит|скейлер|торкрет|зарядн\w*\s+машин"
+    r"|Sandvik|Сандвик|Tamrock|Epiroc|Эпирок|Boltec|Scooptram|Minetruck|Simba|Boomer|Normet|Нормет"
+    r"|Paus|GHH|XCMG|Stellar|Стеллар|Caterpillar|(?<![A-Za-z])CAT(?![A-Za-z])|R1700|R2900"
+    r"|Cummins|Камминс|QSX|QSB|Deutz|Дойц|ДВС|(?<!электро)двигател|Dana|Spicer|Kessler|LGMRT"
+    r"|гидромолот|(?<![А-Яа-яЁё])фар[аы]",
+    re.I)
+НЕ_СПО = re.compile(r"электродвигател|электромотор|насос|компрессор|теплообмен|футеровк|флотац|мельниц", re.I)
+КОНТАКТ_СПО = re.compile(r"самоходн|(?<![А-Яа-яЁё])Д?СПО(?![А-Яа-яЁё])|подземн\w*\s+оборуд|горно-?шахтн|ГШО", re.I)
+
+ВИДЫ = (   # вид заявки по названию; порядок значим
+    ("приглашение к процедуре", re.compile(r"приглашени|закупочн\w*\s+процедур|конкурентн|тендер|лот(?![А-Яа-яЁё])", re.I)),
+    ("аварийная/срочная", re.compile(r"аварийн|срочн", re.I)),
+    ("расценка/бюджет", re.compile(r"расценк|бюджет|прейскурант|мониторинг|предварительн|проработк", re.I)),
+    ("запрос ТКП/цен", re.compile(r"запрос|ТКП|(?<![А-Яа-яЁё])КП(?![А-Яа-яЁё])|RFQ|цен", re.I)),
+)
+ЮРЛИЦА = (   # метка юрлица группы по названию компании; порядок значим
+    ("КГМК", re.compile(r"кольск", re.I)),
+    ("МР", re.compile(r"медвеж", re.I)),
+    ("ГРКБ", re.compile(r"быстрин", re.I)),
+    ("ЗФ", re.compile(r"заполярн|норильский\s+никель|норникел", re.I)),
+)
+СЕГМЕНТЫ = ("СПО (тема или контакт)", "СПО по теме", "СПО по контакту", "прочий Норникель")
+CHAT_PAGES = int(os.environ.get("SPO_CHAT_PAGES", "6"))   # страниц по 50 сообщений вглубь у сделок СПО
+ТЕМЫ_ЧАТА = (   # класс сообщения чата; одно сообщение может попасть в несколько
+    ("гарантия/рекламация", re.compile(r"гаранти|рекламац|претензи", re.I)),
+    ("приёмка/отказ в приёмке", re.compile(r"при[её]мк|не\s+прим[еу]т|отказ\w*\s+(?:от|в)\s+при[её]м|забрак|возврат", re.I)),
+    ("дефект", re.compile(r"коррози|подтек|подтёк|(?<![А-Яа-яЁё])теч[ьи](?![А-Яа-яЁё])|разрушен|трещин|сухар|шильд"
+                          r"|блок\w*\s+управлен|эмульси|задир", re.I)),
+    ("вскрытие/«б/у»", re.compile(r"вскры|(?<![А-Яа-яЁё])б/у|бывш\w*\s+в\s+употреб", re.I)),
+    ("замена или ремонт за наш счёт", re.compile(r"за\s+(?:наш|свой)\s+сч|безвозмездн|бесплатн\w*\s+(?:замен|ремонт)", re.I)),
+    ("акт/осмотр/заключение", re.compile(r"акт\w*\s+(?:осмотр|рекламац|несоответ|дефект)|совместн\w*\s+осмотр|экспертиз"
+                                         r"|заключени\w*\s+(?:производ|завод|изготов)", re.I)),
+    ("прямой выбор/единственный", re.compile(r"единствен\w*\s+(?:поставщ|источник)|без\s+конкурс|неконкурентн"
+                                            r"|прям\w*\s+(?:закуп|выбор)", re.I)),
+    ("марка конкурента", re.compile(r"stellar|стеллар", re.I)),
+    ("китайская техника", re.compile(r"xcmg|хсмг|китайск\w*\s+(?:техник|машин|ПДМ)", re.I)),
+    ("отмена/перенос закупки", re.compile(r"отмен\w*\s+закуп|закупк\w*\s+отмен|потребност\w*\s+(?:отпал|нет)"
+                                          r"|перен[её]с\w*\s+закуп", re.I)),
+    ("штраф/неустойка", re.compile(r"штраф|неустойк|(?<![А-Яа-яЁё])пени(?![А-Яа-яЁё])", re.I)),
+    ("смена руководителя у заказчика", re.compile(r"нов\w*\s+(?:руководител|начальник|директор)"
+                                                  r"|смен\w*\s+(?:руковод|начальник)", re.I)),
+    ("сервисный договор", re.compile(r"сервисн\w*\s+(?:договор|контракт)|договор\w*\s+на\s+сервис", re.I)),
+    ("склад-магазин/консигнация", re.compile(r"склад[\s-]*магазин|(?<![А-Яа-яЁё])ИСМ(?![А-Яа-яЁё])|консигнац", re.I)),
+)
+
+
+# ----------------------------------------------------------------------------- разметка
+
+def тема_спо(title) -> bool:
+    t = str(title or "")
+    return bool(ТЕМА_СПО.search(t)) and not (НЕ_СПО.search(t) and not re.search(
+        r"ПДМ|ШАС|СБУ|самоходн|ГШО|Sandvik|Epiroc|Normet|XCMG", t, re.I))
+
+
+def контакт_спо(post) -> bool:
+    return bool(КОНТАКТ_СПО.search(str(post or "")))
+
+
+def вид_заявки(title) -> str:
+    t = str(title or "")
+    for вид, rx in ВИДЫ:
+        if rx.search(t):
+            return вид
+    return "прочее"
+
+
+def юрлицо(имя) -> str:
+    for метка, rx in ЮРЛИЦА:
+        if rx.search(str(имя or "")):
+            return метка
+    return "прочие юрлица группы"
+
+
+def квартал_даты(iso) -> str | None:
+    м = pace.месяц(iso)
+    return pace.квартал(м) if м else None
+
+
+def кварталы(с: str, по: str) -> list[str]:
+    """'2023-01'…'2026-10' → ['2023-Q1', …, '2026-Q4'] без повторов."""
+    out: list[str] = []
+    for м in pace.месяцы(с, по):
+        q = pace.квартал(м)
+        if q not in out:
+            out.append(q)
+    return out
+
+
+def разметить_спо(строки, сделки, должности, компании):
+    """Строкам группы — сегменты СПО, вид заявки и юрлицо. Чистая функция.
+
+    должности — {contact_id: POST}; компании — {company_id: название}."""
+    по_id = {str(д["ID"]): д for д in сделки}
+    for r in строки:
+        д = по_id[r["id"]]
+        r["spo_title"] = тема_спо(д.get("TITLE"))
+        r["spo_contact"] = контакт_спо(должности.get(str(д.get("CONTACT_ID") or "0")))
+        r["has_contact"] = str(д.get("CONTACT_ID") or "0") in должности
+        r["has_post"] = bool(str(должности.get(str(д.get("CONTACT_ID") or "0")) or "").strip())
+        r["kind"] = вид_заявки(д.get("TITLE"))
+        r["entity"] = юрлицо(компании.get(r["company"], ""))
+    return строки
+
+
+def в_сегменте(r, сегмент) -> bool:
+    if сегмент == "СПО по теме":
+        return r["spo_title"]
+    if сегмент == "СПО по контакту":
+        return r["spo_contact"]
+    if сегмент == "СПО (тема или контакт)":
+        return r["spo_title"] or r["spo_contact"]
+    return not (r["spo_title"] or r["spo_contact"])
+
+
+def ряд(строки, заказы_разм, кв, сегмент):
+    """{квартал: счётчики} одного сегмента. Чистая функция.
+
+    Заявка — по кварталу создания (предпродажа без технических воронок); ТКП —
+    по первому входу в «выдано»; контракт — по дате контракта v4; карточка
+    реализации — кат. 0 сразу, по созданию; заказ — живой заказ СП-172 сделки
+    сегмента, по созданию заказа; проигрыш — по дате закрытия."""
+    out = {q: collections.Counter() for q in кв}
+    xs = [r for r in строки if в_сегменте(r, сегмент)]
+    ids = {r["id"] for r in xs}
+    for r in xs:
+        q = квартал_даты(r["created"])
+        if r["o0"] and q in out:
+            out[q]["заявки"] += 1
+            out[q]["вид: " + r["kind"]] += 1
+            if r["cls"] == "open":
+                out[q]["открыто сейчас"] += 1
+        if r["realization_only"] and q in out:
+            out[q]["карточки реализации"] += 1
+        q = квартал_даты(r["offer_date"]) if (r["o0"] and r["o1"]) else None
+        if q in out:
+            out[q]["ТКП выдано"] += 1
+        q = квартал_даты(r["contract_date"]) if (r["o0"] and r["cls"] == "contract") else None
+        if q in out:
+            out[q]["контракты"] += 1
+        q = квартал_даты(r.get("lost_date")) if r["o0"] else None
+        if q in out:
+            out[q]["проиграно"] += 1
+            if r["o1"] or r["o2"] or r["offer"]:
+                out[q]["проиграно после ТКП"] += 1
+            out[q]["причина: " + (r.get("lost_reason") or "прочее")] += 1
+    for о in заказы_разм:
+        if о["deal"] in ids and о["sem"] != "F":
+            q = квартал_даты(о["created"])
+            if q in out:
+                out[q]["живые заказы СП-172"] += 1
+    return out
+
+
+def месяцы_ряда(строки, заказы_разм, мес, сегмент):
+    """То же помесячно (для 2026 г.): заявки, приглашения, ТКП, контракты, проигрыши, заказы."""
+    out = {м: collections.Counter() for м in мес}
+    xs = [r for r in строки if в_сегменте(r, сегмент)]
+    ids = {r["id"] for r in xs}
+    for r in xs:
+        if not r["o0"]:
+            continue
+        м = pace.месяц(r["created"])
+        if м in out:
+            out[м]["заявки"] += 1
+            out[м]["приглашения"] += r["kind"] == "приглашение к процедуре"
+        м = pace.месяц(r["offer_date"]) if r["o1"] else None
+        if м in out:
+            out[м]["ТКП"] += 1
+        м = pace.месяц(r["contract_date"]) if r["cls"] == "contract" else None
+        if м in out:
+            out[м]["контракты"] += 1
+        м = pace.месяц(r.get("lost_date"))
+        if м in out:
+            out[м]["проиграно"] += 1
+    for о in заказы_разм:
+        if о["deal"] in ids and о["sem"] != "F" and pace.месяц(о["created"]) in out:
+            out[pace.месяц(о["created"])]["заказы"] += 1
+    return out
+
+
+def последние(строки, заказы_разм, сегмент):
+    """Месяц последнего события сегмента: заявки, приглашения, ТКП, контракта, живого заказа."""
+    все = [r for r in строки if в_сегменте(r, сегмент)]
+    xs = [r for r in все if r["o0"]]
+    ids = {r["id"] for r in все}
+
+    def макс(vals):
+        vals = [v for v in vals if v]
+        return max(vals)[:7] if vals else "—"
+    return {
+        "заявка": макс(r["created"] for r in xs),
+        "приглашение": макс(r["created"] for r in xs if r["kind"] == "приглашение к процедуре"),
+        "ТКП": макс(r["offer_date"] for r in xs if r["o1"]),
+        "контракт": макс(r["contract_date"] for r in xs if r["cls"] == "contract"),
+        "карточка реализации": макс(r["created"] for r in все if r["realization_only"]),
+        "живой заказ": макс(о["created"] for о in заказы_разм if о["deal"] in ids and о["sem"] != "F"),
+    }
+
+
+def сдвиг(м: str, k: int) -> str:
+    """'2026-04', -12 → '2025-04'."""
+    i = int(м[:4]) * 12 + int(м[5:7]) - 1 + k
+    return f"{i // 12:04d}-{i % 12 + 1:02d}"
+
+
+def до_после(строки, сегмент, сегодня_м, перелом=ПЕРЕЛОМ):
+    """«После» перелома против 12 месяцев до него и тех же месяцев годом раньше —
+    в расчёте на месяц: заявки, приглашения, ТКП, контракты. Чистая функция."""
+    n = len(pace.месяцы(перелом, сегодня_м))
+    окна = {"после": (перелом, сдвиг(сегодня_м, 1), n),
+            "12 мес до": (сдвиг(перелом, -12), перелом, 12),
+            "те же месяцы годом раньше": (сдвиг(перелом, -12), сдвиг(сегодня_м, -11), n)}
+    xs = [r for r in строки if в_сегменте(r, сегмент) and r["o0"]]
+    out = {}
+    for имя, (a, b, k) in окна.items():
+        def w(iso, a=a, b=b):
+            return bool(iso) and a <= iso[:7] < b
+        out[имя] = (k, {"заявки": sum(1 for r in xs if w(r["created"])),
+                        "приглашения": sum(1 for r in xs if w(r["created"]) and r["kind"] == "приглашение к процедуре"),
+                        "ТКП": sum(1 for r in xs if r["o1"] and w(r["offer_date"])),
+                        "контракты": sum(1 for r in xs if r["cls"] == "contract" and w(r["contract_date"]))})
+    return out
+
+
+def классы_текста(текст) -> set[str]:
+    t = str(текст or "")
+    return {класс for класс, rx in ТЕМЫ_ЧАТА if rx.search(t)}
+
+
+def ряд_чатов(чаты, строки, кв, сегмент):
+    """Сообщения чатов сделок сегмента → {квартал: счётчики}. Чистая функция.
+
+    чаты — {deal_id: [(дата ISO, текст), …]}; квартал — по дате сообщения.
+    «сделок: класс» — разных сделок с хотя бы одним сообщением класса в квартале."""
+    out = {q: collections.Counter() for q in кв}
+    сделки_кв = {q: collections.defaultdict(set) for q in кв}
+    ids = {r["id"] for r in строки if в_сегменте(r, сегмент)}
+    for d, сообщения in чаты.items():
+        if d not in ids:
+            continue
+        for дата, текст in сообщения:
+            q = квартал_даты(дата)
+            if q not in out:
+                continue
+            out[q]["сообщений"] += 1
+            сделки_кв[q]["с чатом"].add(d)
+            for класс in классы_текста(текст):
+                out[q][класс] += 1
+                сделки_кв[q][класс].add(d)
+    for q in кв:
+        for класс, мн in сделки_кв[q].items():
+            out[q]["сделок: " + класс] = len(мн)
+    return out
+
+
+# ----------------------------------------------------------------------------- печать
+
+КЛЮЧИ = ("заявки", "вид: приглашение к процедуре", "вид: запрос ТКП/цен", "вид: аварийная/срочная",
+         "вид: расценка/бюджет", "вид: прочее", "ТКП выдано", "контракты", "карточки реализации",
+         "живые заказы СП-172", "проиграно", "проиграно после ТКП", "открыто сейчас")
+
+
+def отчёт_чатов(чаты, строки, кв, сводка):
+    print(f"\nЧАТЫ СДЕЛОК ГРУППЫ: {сводка}")
+    классы = [к for к, _ in ТЕМЫ_ЧАТА]
+    for сегмент in (СЕГМЕНТЫ[0], СЕГМЕНТЫ[3]):
+        р = ряд_чатов(чаты, строки, кв, сегмент)
+        print(f"\nЧАТЫ — {сегмент}: сообщений класса (сделок с классом) по кварталу сообщения")
+        print("  квартал | сообщений (сделок с чатом) | " + " | ".join(классы))
+        for q in кв:
+            o = р[q]
+            if not o.get("сообщений"):
+                continue
+            print(f"  {q} | {o['сообщений']} ({o.get('сделок: с чатом', 0)}) | "
+                  + " | ".join(f"{o.get(к, 0)} ({o.get('сделок: ' + к, 0)})" for к in классы))
+
+
+def отчёт(строки, заказы_разм, кв, мес26, шапка, сегодня_м):
+    print("\n" + шапка)
+    группа = строки
+    сп_т = sum(1 for r in группа if r["spo_title"])
+    сп_к = sum(1 for r in группа if r["spo_contact"])
+    оба = sum(1 for r in группа if r["spo_title"] and r["spo_contact"])
+    print(f"РАЗМЕТКА СПО: сделок группы {len(группа)}; по теме {сп_т}; по контакту {сп_к}; обе {оба}; "
+          f"с контактом {sum(1 for r in группа if r['has_contact'])}, с должностью {sum(1 for r in группа if r['has_post'])}")
+    юр = collections.Counter(r["entity"] for r in группа if r["o0"])
+    юр_спо = collections.Counter(r["entity"] for r in группа if r["o0"] and (r["spo_title"] or r["spo_contact"]))
+    print("ЮРЛИЦА (заявки всего / из них СПО): " + "; ".join(f"{k} {v}/{юр_спо.get(k, 0)}" for k, v in юр.most_common()))
+    причины = sorted({k for q in кв for k in ряд(строки, заказы_разм, кв, СЕГМЕНТЫ[0])[q] if k.startswith("причина: ")})
+    for сегмент in СЕГМЕНТЫ:
+        р = ряд(строки, заказы_разм, кв, сегмент)
+        print(f"\nКВАРТАЛЫ — {сегмент}")
+        print("  квартал | " + " | ".join(КЛЮЧИ))
+        for q in кв:
+            print(f"  {q} | " + " | ".join(str(р[q].get(k, 0)) for k in КЛЮЧИ))
+        if причины:
+            print("  причины проигрыша по кварталу закрытия: квартал | " + " | ".join(p[9:] for p in причины))
+            for q in кв:
+                if any(р[q].get(p) for p in причины):
+                    print(f"  {q} | " + " | ".join(str(р[q].get(p, 0)) for p in причины))
+        п = последние(строки, заказы_разм, сегмент)
+        print("  последнее событие (месяц): " + "; ".join(f"{k} {v}" for k, v in п.items()))
+        dp = до_после(строки, сегмент, сегодня_м)
+        print(f"  до/после {ПЕРЕЛОМ} (в месяц): " + "; ".join(
+            f"{имя} [{n} мес] " + ", ".join(f"{k} {round(v / n, 1) if n else '—'}" for k, v in с.items())
+            for имя, (n, с) in dp.items()))
+    for сегмент in (СЕГМЕНТЫ[0], СЕГМЕНТЫ[3]):
+        м = месяцы_ряда(строки, заказы_разм, мес26, сегмент)
+        print(f"\nМЕСЯЦЫ {мес26[0][:4]} — {сегмент}")
+        print("  месяц | заявки | приглашения | ТКП | контракты | проиграно | заказы")
+        for x in мес26:
+            o = м[x]
+            print(f"  {x} | {o['заявки']} | {o['приглашения']} | {o['ТКП']} | {o['контракты']} | {o['проиграно']} | {o['заказы']}")
+    print("\nСПО ПО ЮРЛИЦАМ (заявки / контракты по кварталу)")
+    метки = [k for k, _ in юр_спо.most_common()]
+    print("  квартал | " + " | ".join(метки))
+    for q in кв:
+        ячейки = []
+        for метка in метки:
+            xs = [r for r in строки if (r["spo_title"] or r["spo_contact"]) and r["o0"] and r["entity"] == метка]
+            з = sum(1 for r in xs if квартал_даты(r["created"]) == q)
+            к = sum(1 for r in xs if r["cls"] == "contract" and квартал_даты(r["contract_date"]) == q)
+            ячейки.append(f"{з}/{к}")
+        print(f"  {q} | " + " | ".join(ячейки))
+    print("\nКОГОРТЫ ТКП СПО (квартал выдачи → исход к сегодняшнему дню)")
+    print("  квартал | ТКП | контрактов | проиграно | открыто | конверсия %")
+    for q in кв:
+        xs = [r for r in строки if (r["spo_title"] or r["spo_contact"]) and r["o0"] and r["o1"]
+              and квартал_даты(r["offer_date"]) == q]
+        c = sum(1 for r in xs if r["cls"] == "contract")
+        print(f"  {q} | {len(xs)} | {c} | {sum(1 for r in xs if r['cls'] == 'lost')} | "
+              f"{sum(1 for r in xs if r['cls'] == 'open')} | {pc.доля(c, len(xs))}")
+
+
+# ----------------------------------------------------------------------------- чтение
+
+def должности_контактов(client, ids) -> dict[str, str]:
+    """{contact_id: POST} пачками по 50 (start=-1, без подсчёта total)."""
+    clean = sorted({int(i) for i in ids if str(i).isdigit() and str(i) != "0"})
+    out: dict[str, str] = {}
+    for i in range(0, len(clean), 50):
+        часть = clean[i:i + 50]
+        res = client.call("crm.contact.list", {"filter": {"@ID": часть}, "select": ["ID", "POST"], "start": -1}) or []
+        for c in res:
+            out[str(c["ID"])] = str(c.get("POST") or "")
+    return out
+
+
+def _сообщения(v):
+    items = (v or {}).get("messages") if isinstance(v, dict) else None
+    out = []
+    for m in items or []:
+        if str(m.get("author_id") or "0") in ("0", "", "-1"):
+            continue                                   # системные записи и боты
+        t = str(m.get("text") or "").strip()
+        if t:
+            out.append((str(m.get("id") or ""), pc.дата_мск(m.get("date")), t))
+    return out
+
+
+def читать_чаты(client, ids, вглубь, страниц=CHAT_PAGES):
+    """Чаты сделок пакетом batch по 50: id чата, затем последние 50 сообщений;
+    сделкам из «вглубь» — ещё до «страниц» страниц по LAST_ID. → ({deal: [(дата, текст)]}, сводка)."""
+    from urllib import parse
+    чат: dict[str, str] = {}
+    for i in range(0, len(ids), 50):
+        часть = ids[i:i + 50]
+        cmd = {f"c{d}": "im.chat.get?" + parse.urlencode({"ENTITY_TYPE": "CRM", "ENTITY_ID": f"DEAL|{d}"}) for d in часть}
+        рез = (client.call("batch", {"halt": 0, "cmd": cmd}) or {}).get("result") or {}
+        for d in часть:
+            v = рез.get(f"c{d}") if isinstance(рез, dict) else None
+            cid = (v or {}).get("ID") or (v or {}).get("id") if isinstance(v, dict) else None
+            if cid:
+                чат[d] = str(cid)
+    сообщ: dict[str, list] = {}
+    хвост: dict[str, str] = {}
+    очередь = [(d, None) for d in чат]
+    for страница in range(страниц + 1):
+        if not очередь:
+            break
+        for i in range(0, len(очередь), 50):
+            часть = очередь[i:i + 50]
+            cmd = {}
+            for d, last in часть:
+                q = {"DIALOG_ID": f"chat{чат[d]}", "LIMIT": 50}
+                if last:
+                    q["LAST_ID"] = last
+                cmd[f"m{d}"] = "im.dialog.messages.get?" + parse.urlencode(q)
+            рез = (client.call("batch", {"halt": 0, "cmd": cmd}) or {}).get("result") or {}
+            for d, _ in часть:
+                v = рез.get(f"m{d}") if isinstance(рез, dict) else None
+                ms = _сообщения(v)
+                сообщ.setdefault(d, []).extend((дата, t) for _, дата, t in ms if дата)
+                raw = (v or {}).get("messages") if isinstance(v, dict) else None
+                ids_raw = [int(m.get("id")) for m in (raw or []) if str(m.get("id") or "").isdigit()]
+                if len(raw or []) >= 50 and ids_raw and d in вглубь:
+                    хвост[d] = str(min(ids_raw))
+                else:
+                    хвост.pop(d, None)
+        очередь = [(d, хвост[d]) for d in list(хвост)] if страница < страниц else []
+        хвост = {}
+    сводка = (f"сделок {len(ids)}, с чатом {len(чат)}, сообщений людей {sum(len(v) for v in сообщ.values())}, "
+              f"вглубь до {страниц} стр. у {len(вглубь)} сделок СПО")
+    return сообщ, сводка
+
+
+def main() -> int:
+    import config
+    import kam
+    import people
+    from bitrix_client import BitrixClient, бюджет_портала, сводка_нагрузки
+
+    техн = frozenset(people.TECH_CATS)
+    client = BitrixClient(config.Settings.load().bitrix_webhook_url)
+    SINCE = pc.SINCE
+    сегодня = dt.datetime.now(pc.MSK).date()
+    кв = кварталы(SINCE[:7], сегодня.isoformat()[:7])
+    мес26 = pace.месяцы(f"{сегодня.year}-01", сегодня.isoformat()[:7])
+
+    env = client.call_envelope("crm.deal.list", {"filter": {">=DATE_CREATE": SINCE}, "select": ["ID"], "start": 0}) or {}
+    всего = int(env.get("total") or 0)
+    env = client.call_envelope("crm.item.list", {"entityTypeId": p26.ORDER_ENTITY, "filter": {}, "select": ["id"], "start": 0}) or {}
+    ждём_заказов = int(env.get("total") or 0)
+    if всего <= 0 or ждём_заказов <= 0:
+        print(f"::error::не получено число сделок ({всего}) или заказов ({ждём_заказов}) — полноту не проверить")
+        return 1
+    rps, par = бюджет_портала()
+    n = 2 + всего // 50 + 1 + всего // 150 + (всего // 150 + 1) * 6 + всего // 200 + ждём_заказов // 50 + 40
+    n += (всего // 150 + 1) * 2 + CHAT_PAGES * 4               # чаты: id и сообщения пакетами по 50
+    print(f"зонд v52 · {сегодня} · кварталов {len(кв)} ({кв[0]} … {кв[-1]}) · перелом {ПЕРЕЛОМ} · ожидается: "
+          f"сделок с {SINCE[:10]} — {всего}, заказов — {ждём_заказов}; оценка ≈ {n} запросов, "
+          f"≈ {n * par / rps / 60:.0f} мин при {rps:g}/с (история и контакты — только сделки группы)")
+
+    сделки_все = client.list_deals_fast(filter={">=DATE_CREATE": SINCE}, select=[
+        "ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE", "COMPANY_ID",
+        "CONTACT_ID", "ASSIGNED_BY_ID", "OPPORTUNITY", "CURRENCY_ID", *p26.ПОЛЯ_КП])
+    print(f"прочитано сделок: {len(сделки_все)} из {всего}")
+    if len(сделки_все) < всего:
+        print("::error::обход сделок оборвался — итог был бы неполным")
+        return 1
+
+    нужны = {str(д.get("COMPANY_ID")) for д in сделки_все if str(д.get("COMPANY_ID") or "0") != "0"}
+    компании = client.companies_by_ids(нужны)
+    известные = {имя for _, имя in kam.CLIENT_HOLDINGS}
+
+    def холдинг_компании(cid):
+        if not cid or cid == "0":
+            return "Без клиента"
+        имя = компании.get(cid, "")
+        h = kam.client_dir(имя)
+        return pc.HOLDING if h not in известные and pc.ГРУППА_ШИРЕ.search(имя) else h
+    холдинг = {str(д["ID"]): холдинг_компании(str(д.get("COMPANY_ID") or "0")) for д in сделки_все}
+    сделки = [д for д in сделки_все if холдинг[str(д["ID"])] == pc.HOLDING]
+    print(f"компаний у сделок: запрошено {len(нужны)}, получено {len(компании)}; сделок группы {pc.HOLDING}: {len(сделки)}")
+    if not сделки:
+        print("::error::сделок группы не найдено — разметка холдинга не сработала")
+        return 1
+
+    сырые = client.list_items(p26.ORDER_ENTITY, filter={}, select=p26.ORDER_SELECT)
+    if len(сырые) < ждём_заказов:
+        print(f"::error::заказы СП-172 прочитаны не все: {len(сырые)} из {ждём_заказов}")
+        return 1
+    семантика, _ = p26.семантика_заказов(client, {str(о.get("categoryId")) for о in сырые if о.get("categoryId")})
+
+    мета = client.deal_stage_meta()
+    cats = client.categories()
+    клиентские = {c for c, имя in cats.items() if kam.client_dir(str(имя)) == pc.HOLDING or pc.ГРУППА_ШИРЕ.search(str(имя))}
+
+    история, ошибка = pc.читать_историю(client, [str(д["ID"]) for д in сделки])
+    if ошибка:
+        print(f"::error::{ошибка}")
+        return 1
+    без = len(сделки) - len(история)
+    print(f"история стадий: сделок группы с записями {len(история)} из {len(сделки)}")
+    if без > len(сделки) // 100:
+        print("::error::без истории стадий больше 1 % сделок группы — итог был бы неполным")
+        return 1
+
+    контакты = {str(д.get("CONTACT_ID")) for д in сделки if str(д.get("CONTACT_ID") or "0") != "0"}
+    должности = должности_контактов(client, контакты)
+    print(f"контактов у сделок группы: запрошено {len(контакты)}, получено {len(должности)}, "
+          f"с должностью {sum(1 for v in должности.values() if v.strip())}")
+
+    заказы_v4 = [о for о in сырые if not str(о.get("stageId", "")).endswith(":FAIL")]
+    строки = pc.классифицировать(сделки, история, мета, заказы_v4, холдинг, сегодня, None)
+    p26.разметить(строки, сделки, история, мета, сырые, семантика, клиентские, set(), {}, lambda *_: None, сегодня, техн)
+    pace.даты_закрытия(строки, сделки, история, мета)
+    разметить_спо(строки, сделки, должности, компании)
+    по_всем = {str(д["ID"]): д for д in сделки_все}
+    заказы_разм = p26.разметить_заказы(сырые, семантика, по_всем, холдинг, {r["id"]: r for r in строки},
+                                       клиентские, lambda *_: None, {})
+    отчёт(строки, заказы_разм, кв, мес26, f"НОРНИКЕЛЬ ПО НОМЕНКЛАТУРЕ СПО · сделки с {SINCE[:10]} · {сегодня}",
+          сегодня.isoformat()[:7])
+    спо = {r["id"] for r in строки if r["spo_title"] or r["spo_contact"]}
+    чаты, сводка_чатов = читать_чаты(client, [r["id"] for r in строки], спо)
+    отчёт_чатов(чаты, строки, кв, сводка_чатов)
+    print(сводка_нагрузки())
+    return 0
+
+
+if __name__ == "__main__":
+    # Трассировка с содержимым сделки в публичный журнал не уходит (как в v4).
+    try:
+        raise SystemExit(main())
+    except SystemExit:
+        raise
+    except Exception as e:  # noqa: BLE001
+        места = []
+        tb = e.__traceback__
+        while tb:
+            места.append(f"{Path(tb.tb_frame.f_code.co_filename).name}:{tb.tb_lineno}")
+            tb = tb.tb_next
+        print(f"::error::зонд упал: {type(e).__name__} · " + " → ".join(места[-4:]))
+        raise SystemExit(1)
