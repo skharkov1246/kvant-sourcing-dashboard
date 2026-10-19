@@ -44,6 +44,7 @@ BUDGET_LINK = "UF_CRM_1577100780"       # «Transaction budget + product conditi
 # выгрузки «Контроль дедлайнов» — коллеги контролируют именно его)
 DL_CUSTOMER = "ufCrm20_1728900218435"   # «Date of deadline to customer» — обещано клиенту
 PROD_END = "ufCrm20_1724941935"         # «Production end date, budget» — плановый конец производства
+PROD_START = "ufCrm20_1724941908"       # «Production start date, budget» — обязательна при размещении
 INBOUND_PLAN = "ufCrm20_1709294315471"  # «Inbound Delivery Date, planned» — плановое поступление
 CITY_F = "ufCrm20_1742552190053"        # «Город доставки заказчику по бюджету»
 OSS_F = "ufCrm20_1723236618"            # «Deal support specialist» — ОСС заказа (совпал 73/74)
@@ -67,6 +68,7 @@ PROD_CONF = "ufCrm20_1723236426"        # «Production confirmation» — фай
 PROD_CONF_NF = "ufCrm20_1723372033545"  # «Production confirmation, no file» — флажок
 SCHEME_F = "ufCrm20_1724941500"         # «Схема поставки»
 
+PAID_RX = re.compile(r"оплата\s+получена", re.I)   # стадия «Оплата получена | Закрытие сделки»
 CAP_RATE = 0.20          # стоимость денег, годовых: по чему считаем упущенную доходность
                          # от поздней отгрузки (решение владельца)
 
@@ -244,7 +246,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                                                         CITY_F, OSS_F, SHIP_PLAN, SHIP_FACT, INB_FACT,
                                                         DEL_PLAN, DEL_BUDGET, DEL_FACT, UTD_DATE, UTD_FILE,
                                                         PAY_PLAN, CLIENT_PO, SUP_PAID, PROD_CONF,
-                                                        PROD_CONF_NF, SCHEME_F])
+                                                        PROD_CONF_NF, SCHEME_F, PROD_START])
     # стадии всех воронок СП-172 с семантикой: провал — по семантике стадии, а не по
     # суффиксу «:FAIL» (свои стадии провала UC_* с семантикой F считались живыми);
     # воронки — по префиксу стадии «DT172_<воронка>:…» (categoryId в выборке нет)
@@ -296,6 +298,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     dstages = client.deal_stages_cat(0)                    # все стадии — для подписей
     dproc = client.deal_stages_process(0)                  # только рабочие: без успеха и проигрышей
     dorder = {sid: i for i, sid in enumerate(dproc)}
+    paid_stages = {sid for sid, nm in dstages.items() if PAID_RX.search(str(nm or ""))}
     dlast: dict[str, tuple[str, str]] = {}                 # последний переход = вход в текущую стадию
     olast: dict[str, tuple[str, str]] = {}
     dhist = client.stage_history(2, category_id=0, since=HIST_SINCE, last=dlast)
@@ -421,8 +424,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             _ls = dlast.get(did)
             stage_days = round(_days_between(_ls[1] if _ls and _ls[0] == cur_stage else tl[-1][1],
                                              now_iso) or 0, 1)
-        done = sem == "S" or (bool(ords) and all(_osem(o.get("stageId")) == "S" for o in ords))
-        closed = sem in ("S", "F")
+        # «Оплата получена | Закрытие сделки» — успех (решение владельца 19.10.2026, п. 5):
+        # работа и оплата закончены, сделка не «в работе», хотя стадия не финальная
+        paid = in_cat0 and cur_stage in paid_stages and sem not in ("S", "F")
+        done = sem == "S" or paid or (bool(ords) and all(_osem(o.get("stageId")) == "S" for o in ords))
+        closed = sem in ("S", "F") or paid
 
         # --- заказы: стадия, возраст стадии, дедлайн клиенту, замедленность
         ords_det = []
@@ -573,7 +579,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "ossGone": (any(o["ossGone"] for o in ords_det if o["live"])
                         or (not any(o["oss"] for o in ords_det) and who(d.get(OSS_DEAL))[1])),
             "cities": ", ".join(sorted({o["city"] for o in ords_det if o["city"]}))[:50],
-            "done": done, "closed": closed, "lost": sem == "F",
+            "done": done, "closed": closed, "lost": sem == "F", "paidStage": paid,
             "inCat0": in_cat0,
             "stage": cur_stage,
             "stageName": _stage_name(cur_stage) if in_cat0 else "вне воронки",
@@ -658,16 +664,19 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         except (TypeError, ValueError):
             paid = 0.0
         _who = who(o.get(OSS_F))
+        _resp = who(o.get("assignedById"))
         moved = _pdate(o.get("movedTime"))
         did = str(o.get("parentId2") or "")
         life_orders.append({
             "id": str(o.get("id")), "deal": did, "seq": seq_by_deal.get(did) or _regno(o.get("title")),
             "title": str(o.get("title") or "")[:70], "sup": supl.get(str(o.get("companyId"))) or "",
             "oss": _who[0], "ossGone": _who[1],
+            # Responsible person заказа — хозяин исполнения (решение владельца 19.10.2026, п. 1)
+            "resp": _resp[0],
             "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
             "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
             "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
-            "prodEnd": _pdate(o.get(PROD_END)),
+            "prodEnd": _pdate(o.get(PROD_END)), "prodStart": _pdate(o.get(PROD_START)),
             "inbFact": _pdate(o.get(INB_FACT)),
             "delPlan": _pdate(o.get(DEL_PLAN)), "delBudget": _pdate(o.get(DEL_BUDGET)),
             "delFact": _pdate(o.get(DEL_FACT)),
@@ -984,6 +993,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "slow": len(slow_rows), "lateDeals": len(late_rows),
             # чат сделки: сколько кандидатов в «подвисшие» проверено и что нашли
             "chat": chat_sum, "chatQuietDays": chat_activity.QUIET_DAYS,
+            # сделки на «Оплата получена | Закрытие сделки» — успех, не «в работе»
+            "paidStage": sum(1 for r in rows if r.get("paidStage")),
             # план по бюджетам сделок (снимок Google Drive)
             "planMd": _money(plan_md_live), "planMdNum": round(plan_md_live),
             "planMdPct": round(plan_md_live / plan_sale_live * 100) if plan_sale_live else 0,

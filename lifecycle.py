@@ -47,12 +47,17 @@ EXC = {
     "planAfterDl": (5, "план доставки позже срока клиента", "предупредить клиента или сменить маршрут"),
     "unpaid": (6, "доставлено, срок оплаты клиента прошёл, платежа нет", "напомнить клиенту, при задержке — претензия"),
     "noUtd": (7, f"доставлено больше {UTD_GRACE} дн. назад, УПД нет", "получить подписанный УПД"),
-    "dealOpen": (8, "все заказы закрыты, сделка открыта", "закрыть сделку"),
-    "noOrder": (9, "в реализации больше недели без заказа поставщику", "разместить заказ"),
-    "gone": (10, "ведёт уволенный", "переназначить"),
-    "noDl": (11, "нет срока клиента", "внести срок из договора"),
-    "noFact": (12, "заказ закрыт без даты доставки клиенту", "внести фактическую дату доставки"),
+    "noPayPlan": (8, "доставлено, нет планового срока оплаты", "внести срок оплаты из договора"),
+    "dealOpen": (9, "все заказы закрыты, сделка открыта", "закрыть сделку"),
+    "noOrder": (10, "в реализации больше недели без заказа поставщику", "разместить заказ"),
+    "gone": (11, "ведёт уволенный", "переназначить"),
+    "noDl": (12, "нет срока клиента", "внести срок из договора"),
+    "noPlanDates": (13, "не заполнены даты размещения", "внести даты производства и доставки клиенту по бюджету"),
+    "noFact": (14, "заказ закрыт без даты доставки клиенту", "внести фактическую дату доставки"),
 }
+# обязательные даты размещения (решение владельца 19.10.2026, п. 9)
+PLAN_DATES = (("prodStart", "начало производства"), ("prodEnd", "конец производства"),
+              ("delBudget", "доставка клиенту"))
 
 
 def _add_months(d: dt.date, m: int) -> dt.date:
@@ -180,6 +185,8 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None) -> list
             out.append(("shipSlip", (today - sp).days))
         if not dl and not fact:
             out.append(("noDl", None))
+        if any(not o.get(k) for k, _ in PLAN_DATES):
+            out.append(("noPlanDates", None))
         # закрытие — только у живого заказа и только за CLOSE_DAYS: закрытый заказ
         # закрытие прошёл, а старые доставки без файла платёжки — пробел учёта до
         # появления поля, а не долг клиента
@@ -191,6 +198,8 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None) -> list
                 due = o.get("payPlan") or (fact + dt.timedelta(days=PAY_GRACE))
                 if due < today:
                     out.append(("unpaid", (today - due).days))
+            if not o.get("payPlan"):
+                out.append(("noPayPlan", since))
     elif o.get("success") and o.get("closedRecent") and not fact:
         out.append(("noFact", None))
     return out
@@ -204,17 +213,18 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     deal_by = {d["deal"]: d for d in deals}
     queue: list[dict] = []
     counts: Counter = Counter()
-    ph: dict[str, dict] = {k: {"n": 0, "late": 0, "risk": 0, "orders": 0} for k, _ in PHASES}
+    ph: dict[str, dict] = {k: {"n": 0, "late": 0, "risk": 0, "orders": 0, "over": 0} for k, _ in PHASES}
     ph_deals: dict[str, set] = defaultdict(set)
 
     def _nm(v) -> str:
         return v if v not in (None, "", "—") else ""
 
     def owner(o: dict, d: dict | None) -> str:
-        """ОСС заказа → ОСС сделки (поле сделки, не склейка ОСС всех заказов) →
-        ответственный сделки."""
+        """Ответственный заказа (Responsible person — хозяин исполнения, решение владельца
+        19.10.2026, п. 1) → ОСС заказа → ОСС сделки (поле сделки) → ответственный сделки."""
         d = d or {}
-        return _nm(o.get("oss")) or _nm(d.get("ossDeal")) or _nm(d.get("manager")) or "—"
+        return (_nm(o.get("resp")) or _nm(o.get("oss")) or _nm(d.get("ossDeal"))
+                or _nm(d.get("manager")) or "—")
 
     def gone(name: str) -> bool:
         return name.endswith("(уволен)")      # contracts.who подписывает ушедших так
@@ -222,9 +232,24 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     lead, sup_rel = speeds(orders, today)
     med = {k: _median(v) for k, v in lead.items()}
     sup_slip = {k: _median(v) for k, v in sup_rel.items() if len(v) >= SUP_MIN}
+    # нормы звеньев — 75-й процентиль за год (решение владельца 19.10.2026, п. 4)
+    norm_ship = _p75(lead.get("toShip", []))
+    _tr, _lm = _p75(lead.get("transit", [])), _p75(lead.get("lastMile", []))
+    norm_path = _tr + _lm if _tr is not None and _lm is not None else None
+
+    def over_norm(o: dict, p: str) -> bool:
+        if not o.get("live"):
+            return False
+        if p in ("place", "make") and norm_ship is not None and o.get("created"):
+            return (today - o["created"]).days > norm_ship
+        base = o.get("shipFact") or o.get("inbFact")
+        if p == "move" and norm_path is not None and base:
+            return (today - base).days > norm_path
+        return False
     # вселенная — та же, что у таблицы сделок: заказы известных сделок, без
     # проигранных; у закрытой (выигранной) сделки сроки заказов уже не отклонения
-    СРОКИ = {"late", "risk", "forecast", "shipSlip", "planAfterDl", "noDl"}
+    СРОКИ = {"late", "risk", "forecast", "shipSlip", "planAfterDl", "noDl", "noPlanDates"}
+    ОПЛАТА = {"unpaid", "noPayPlan"}       # у закрытой выигранной сделки оплата получена
     in_scope = []
     for o in orders:
         d = deal_by.get(o.get("deal"))
@@ -235,16 +260,19 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         fc = forecast(o, today, med, sup_slip)
         exc = order_exceptions(o, today, fc)
         if d.get("closed"):
-            exc = [(c, n) for c, n in exc if c not in СРОКИ]
-        in_tile = p in ph and (o.get("live") or p == "warranty")
+            exc = [(c, n) for c, n in exc if c not in СРОКИ | ОПЛАТА]
+        in_tile = p in ph and (o.get("live") or p == "warranty") and not (d.get("closed") and o.get("live"))
         if in_tile:
             ph[p]["orders"] += 1
             ph_deals[p].add(o.get("deal"))
             ph[p]["late"] += any(c == "late" for c, _ in exc)
             ph[p]["risk"] += any(c in ("risk", "forecast") for c, _ in exc)
+            ph[p]["over"] += over_norm(o, p)
         for code, days in exc:
             counts[code] += 1
             sev, what, act = EXC[code]
+            if code == "noPlanDates":
+                what = what + ": " + ", ".join(nm for k, nm in PLAN_DATES if not o.get(k))
             w = owner(o, d)
             queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
                           "who": w, "whoGone": gone(w),
@@ -303,6 +331,19 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             if dl and (today - f).days <= 90:
                 last90[0] += 1
                 last90[1] += f <= dl
+    # «в срок» по сделке: все её заказы доставлены не позже срока (решение владельца
+    # 19.10.2026, п. 3); сделка — в окне 90 дней по последней доставке
+    по_сделке: dict[str, list] = defaultdict(list)
+    for o, d in in_scope:
+        по_сделке[o.get("deal")].append(o)
+    deals90 = [0, 0]
+    for did, os_ in по_сделке.items():
+        if not os_ or not all(o.get("delFact") and o.get("dl") for o in os_):
+            continue
+        last = max(o["delFact"] for o in os_)
+        if 0 <= (today - last).days <= 90:
+            deals90[0] += 1
+            deals90[1] += all(o["delFact"] <= o["dl"] for o in os_)
     otd_rows = [{"m": m.strftime("%m.%Y"), "n": v[0], "ontime": v[1],
                  "pct": round(v[1] / v[0] * 100) if v[0] else None,
                  "medLate": _median(v[2])} for m, v in otd.items()]
@@ -344,7 +385,10 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         "counts": dict(counts),
         "labels": {k: v[1] for k, v in EXC.items()},
         "otd": {"months": otd_rows, "last90": {"n": last90[0], "ontime": last90[1],
-                                               "pct": round(last90[1] / last90[0] * 100) if last90[0] else None}},
+                                               "pct": round(last90[1] / last90[0] * 100) if last90[0] else None},
+                "deals90": {"n": deals90[0], "ontime": deals90[1],
+                            "pct": round(deals90[1] / deals90[0] * 100) if deals90[0] else None}},
+        "norms": {"toShip": norm_ship, "path": norm_path},
         "lead": lead_out,
         "suppliers": suppliers[:20],
         "supAll": sup_all,          # по каждому поставщику — для вкладки «Поставщики»

@@ -45,6 +45,10 @@ class Портал:
             {"ID": "2", "TITLE": "902. Компрессор", "OPPORTUNITY": "50000", "CURRENCY_ID": "EUR",
              "COMPANY_ID": "", "STAGE_ID": "C0:PURCHASE", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
              "DATE_CREATE": _t(100), "ASSIGNED_BY_ID": "10", "UF_CRM_1734380921": "502"},
+            # оплата получена, сделка не закрыта — по решению владельца это успех
+            {"ID": "3", "TITLE": "903. Клапан", "OPPORTUNITY": "20000", "CURRENCY_ID": "EUR",
+             "COMPANY_ID": "", "STAGE_ID": "C0:PAID", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
+             "DATE_CREATE": _t(300), "ASSIGNED_BY_ID": "10"},
         ]
         self.orders = [
             # заказ в воронке 30: стадия должна получить имя, а не остаться кодом
@@ -95,10 +99,11 @@ class Портал:
         return {}
 
     def deal_stages_cat(self, cid=0):
-        return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка", "C0:WON": "Успех"}
+        return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка",
+                "C0:PAID": "Оплата получена | Закрытие сделки", "C0:WON": "Успех"}
 
     def deal_stages_process(self, cid=0):
-        return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка"}
+        return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка", "C0:PAID": "Оплата получена | Закрытие сделки"}
 
     def spa_stage_meta(self, entity, cid):
         return {f"DT172_{cid}:NEW": {"name": f"Новый ({cid})", "sem": "P"},
@@ -212,3 +217,10 @@ def test_подвисла_только_если_в_чате_тихо(сообщ�
     тихо = "в чате тихо" in r["why"] or "в чате людей не было" in r["why"]
     assert тихо is подвисла and ("в чате работа" in r["why"]) is (not подвисла)
     assert ct["head"]["chat"]["checked"] == 1
+
+
+def test_оплата_получена_это_успех(ct):
+    """Решение владельца 19.10.2026, п. 5: стадия «Оплата получена | Закрытие сделки» — успех."""
+    r = _row(ct, "3")
+    assert r["paidStage"] and r["closed"] and r["done"] and not r["lost"] and not r["slow"]
+    assert ct["head"]["paidStage"] == 1 and ct["head"]["live"] == 2

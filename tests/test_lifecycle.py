@@ -20,9 +20,13 @@ def д(s: str) -> dt.date:
     return dt.date.fromisoformat(s)
 
 
+# обязательные даты размещения заполнены — иначе каждый заказ корпуса давал бы «noPlanDates»
+ДАТЫ = {"prodStart": dt.date(2026, 5, 1), "prodEnd": dt.date(2026, 7, 1), "delBudget": dt.date(2026, 9, 1)}
+
+
 def заказ(**kw) -> dict:
     o = {"id": "1", "deal": "100", "seq": 900, "title": "900/1. Насос", "sup": "Поставщик А", "oss": "Ольга (ОСС)",
-         "live": True, "success": False}
+         "live": True, "success": False, **ДАТЫ}
     o.update(kw)
     return o
 
@@ -141,3 +145,47 @@ def test_надёжность_поставщика_к_бюджетной_дат�
                     prodEnd=д("2026-08-20")) for i in range(3)]
     lead, sup = lc.speeds(заказы, СЕГОДНЯ)
     assert sup["Поставщик В"] == [21, 21, 21] and lead["shipSlip"] == [21, 21, 21]
+
+
+
+def test_решения_владельца_хозяин_поля_сделка_в_срок_нормы():
+    """Решения владельца 19.10.2026: хозяин — ответственный заказа (п. 1); сделка в срок —
+    все заказы к сроку (п. 3); норма звена — 75-й процентиль (п. 4); обязательные даты
+    размещения и плановый срок оплаты при доставке (п. 9)."""
+    # п. 9: нет дат размещения — пункт с перечнем; доставлен без планового срока оплаты — пункт
+    o = заказ(prodStart=None, delBudget=None, dl=д("2026-12-01"))
+    assert ("noPlanDates", None) in lc.order_exceptions(o, СЕГОДНЯ)
+    assert ("noPayPlan", 9) in lc.order_exceptions(заказ(delFact=д("2026-10-10"), utd=True, clientPaid=True), СЕГОДНЯ)
+    заказы = [
+        o,
+        # сделка 101: два заказа, оба к сроку — сделка в срок
+        заказ(id="2", deal="101", live=False, success=True, dl=д("2026-09-30"), delFact=д("2026-09-20"),
+              created=д("2026-06-01"), shipFact=д("2026-08-01"), inbFact=д("2026-08-10"), utd=True, clientPaid=True,
+              payPlan=д("2026-10-20")),
+        заказ(id="3", deal="101", live=False, success=True, dl=д("2026-09-30"), delFact=д("2026-09-25"),
+              created=д("2026-06-01"), shipFact=д("2026-08-01"), inbFact=д("2026-08-10"), utd=True, clientPaid=True,
+              payPlan=д("2026-10-20")),
+        # сделка 102: один заказ опоздал — сделка не в срок, хотя другой к сроку
+        заказ(id="4", deal="102", live=False, success=True, dl=д("2026-09-01"), delFact=д("2026-09-11"),
+              created=д("2026-06-01"), shipFact=д("2026-08-01"), inbFact=д("2026-08-10"), utd=True, clientPaid=True,
+              payPlan=д("2026-10-20")),
+        заказ(id="5", deal="102", live=False, success=True, dl=д("2026-09-30"), delFact=д("2026-09-20"),
+              created=д("2026-06-01"), shipFact=д("2026-08-01"), inbFact=д("2026-08-10"), utd=True, clientPaid=True,
+              payPlan=д("2026-10-20")),
+        # живой заказ в производстве 200 дней при норме 61 — сверх нормы; хозяин — ответственный заказа
+        заказ(id="6", deal="103", resp="Роман (ответственный заказа)", created=д("2026-04-02"), supPaidPct=50,
+              dl=д("2027-03-01")),
+    ]
+    сделки = [{"deal": d, "seq": 900 + i, "closed": False} for i, d in enumerate(("100", "101", "102", "103"))]
+    life = lc.build(заказы, сделки, СЕГОДНЯ)
+    assert life["otd"]["deals90"] == {"n": 2, "ontime": 1, "pct": 50}
+    assert life["otd"]["last90"]["n"] == 4 and life["otd"]["last90"]["ontime"] == 3
+    assert life["norms"]["toShip"] == 61
+    ф = {p["key"]: p for p in life["phases"]}
+    assert ф["make"]["over"] == 1
+    assert {p["who"] for p in life["people"]} >= {"Роман (ответственный заказа)"}
+    q = next(x for x in life["queue"] if x["code"] == "noPlanDates")
+    assert q["what"].endswith("начало производства, доставка клиенту") and q["who"] == "Ольга (ОСС)"
+    # закрытая выигранная сделка: ни сроков, ни оплаты в очереди
+    life2 = lc.build([заказ(dl=д("2026-10-01"), prodStart=None)], [{"deal": "100", "seq": 900, "closed": True}], СЕГОДНЯ)
+    assert life2["counts"] == {}
