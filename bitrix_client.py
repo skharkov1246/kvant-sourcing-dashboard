@@ -727,6 +727,23 @@ class BitrixClient:
                                  "sem": str(s.get("SEMANTICS") or "P").upper()[:1] or "P"}
         return m
 
+    def spa_semantics(self, entity_type_id: int, items: Iterable[dict]) -> dict[str, str]:
+        """{stageId: 'S'|'F'|'P'} по всем воронкам смарт-процесса, встреченным в items
+        (воронка — из префикса стадии «DT<тип>_<воронка>:…»). Справочник читается
+        один раз на воронку за сборку."""
+        cache = self.__dict__.setdefault("_spa_sem", {})
+        out: dict[str, str] = {}
+        for cid in sorted({int(m.group(1)) for it in items
+                           if (m := re.match(rf"DT{entity_type_id}_(\d+):", str(it.get("stageId") or "")))}):
+            key = (int(entity_type_id), cid)
+            if key not in cache:
+                try:
+                    cache[key] = {sid: v["sem"] for sid, v in self.spa_stage_meta(entity_type_id, cid).items()}
+                except Exception:   # справочник не прочитан — для этой воронки остаётся суффикс
+                    cache[key] = {}
+            out.update(cache[key])
+        return out
+
     # ----------------------------------------------------------------- departments
     def departments(self) -> list[dict]:
         if self._departments is None:
@@ -907,3 +924,24 @@ class BitrixClient:
 
     def warm_reference_caches(self) -> None:
         self.users(); self.categories(); self.stages(); self.userfields()
+
+
+def lost_stage(client, entity_type_id: int, items: Iterable[dict]):
+    """Проверка «стадия — провал» для записей смарт-процесса: по семантике стадии (F),
+    а не по суффиксу «:FAIL» — свои стадии провала UC_* иначе считались живыми
+    (заказы, которые уже не исполняются, шли в закупку, маржу и просрочку).
+    Стадия вне справочника (или клиент без него) — по суффиксу, как раньше."""
+    items = list(items)
+    sem = client.spa_semantics(entity_type_id, items) if hasattr(client, "spa_semantics") else {}
+
+    def lost(stage: Any) -> bool:
+        s = str(stage or "")
+        return sem[s] == "F" if s in sem else s.endswith(":FAIL")
+    return lost
+
+
+def drop_lost(client, entity_type_id: int, items: Iterable[dict]) -> list[dict]:
+    """Записи без проигранных (см. lost_stage)."""
+    items = list(items)
+    lost = lost_stage(client, entity_type_id, items)
+    return [it for it in items if not lost(it.get("stageId"))]

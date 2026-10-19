@@ -33,7 +33,7 @@ import premia as premia_mod
 import period as period_mod
 import presale as presale_mod
 import reps as reps_mod
-from bitrix_client import BitrixClient, без_вебхука
+from bitrix_client import BitrixClient, drop_lost, без_вебхука
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
               # следы живого человека на карточке робота: кто двигал стадию,
@@ -653,7 +653,7 @@ def run(args) -> int:
     try:
         print("• Общий пул сделок/заказов (YTD)…")
         _t = time.time()
-        ys = "2026-01-01T00:00:00"
+        ys = company_mod.YEAR_START      # с 01.01 этого года (был зашит 2026)
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
             select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID",
                     "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID", "MOVED_TIME", "LAST_ACTIVITY_TIME"]
@@ -661,14 +661,15 @@ def run(args) -> int:
         # заказы СП-172 тянем ОДИН раз с 2025 и со сроком клиенту: тот же список нужен
         # и вкладкам ролей (просрочка), и «Коммерсантам». Раньше каждая вкладка ходила
         # за ними отдельно — три выгрузки одного и того же на каждую сборку.
-        orders_all = client.list_items(172, filter={">=createdTime": "2025-01-01T00:00:00"},
+        orders_all = client.list_items(172, filter={">=createdTime": company_mod.COHORT_START},
             select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2",
-                    "assignedById", people_mod.DL_CUSTOMER])
-        # заказы СП-172: исключаем проигранные (…:FAIL) — это не контрактная выручка
-        orders_ytd = [o for o in orders_all
-                      if not str(o.get("stageId", "")).endswith(":FAIL")
-                      and str(o.get("createdTime", ""))[:4] >= "2026"]
-        print(f"  заказов СП-172 с 2025: {len(orders_all)}, из них непроигранных в 2026: {len(orders_ytd)}")
+                    "assignedById", people_mod.DL_CUSTOMER, people_mod.DEL_FACT])
+        # заказы СП-172: исключаем проигранные — это не контрактная выручка; провал — по
+        # семантике стадии (свои стадии провала UC_* по суффиксу «:FAIL» считались живыми)
+        orders_ytd = [o for o in drop_lost(client, 172, orders_all)
+                      if str(o.get("createdTime", ""))[:4] >= ys[:4]]
+        print(f"  заказов СП-172 с {company_mod.COHORT_START[:4]}: {len(orders_all)}, "
+              f"из них непроигранных в {ys[:4]}: {len(orders_ytd)}")
         # курсы → база € (для продаж сделок)
         _cur = client.call("crm.currency.list", {}) or []
         _rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in _cur}

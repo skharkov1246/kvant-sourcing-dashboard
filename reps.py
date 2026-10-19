@@ -27,9 +27,9 @@ from collections import Counter, defaultdict
 
 import people as people_mod
 import period as period_mod
-from bitrix_client import BitrixClient
+from bitrix_client import BitrixClient, drop_lost
 
-YEAR_START = "2026-01-01T00:00:00"   # работаем только в этом году
+YEAR_START = f"{dt.date.today().year}-01-01T00:00:00"   # работаем только в этом году (был зашит 2026)
 
 # на вкладку попадает коммерсант, у которого есть хотя бы столько сделок этого года:
 # нулевые карточки людей, за которыми числится одна случайная сделка, только шумят.
@@ -336,8 +336,9 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
     # заказы поставщикам: закупка, признак контракта и СРОК, обещанный клиенту
     orders = orders_src if orders_src is not None else client.list_items(
         172, filter={">=createdTime": YEAR_START},
-        select=["id", "stageId", "opportunity", "currencyId", "parentId2", people_mod.DL_CUSTOMER])
-    orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
+        select=["id", "stageId", "opportunity", "currencyId", "parentId2", people_mod.DL_CUSTOMER,
+                people_mod.DEL_FACT])
+    orders = drop_lost(client, 172, orders)
     order_parents = {str(o.get("parentId2")) for o in orders if o.get("parentId2")}
     buy_by_deal = defaultdict(float)
     late_deals: dict[str, int] = {}     # сделка → на сколько дней просрочено обещание клиенту
@@ -349,7 +350,8 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
         if str(o.get("stageId", "")).endswith(":SUCCESS"):
             continue                    # заказ исполнен — обещание закрыто
         dl = str(o.get(people_mod.DL_CUSTOMER) or "")[:10]
-        if dl and dl < today_iso:
+        # доставлен, но не закрыт — закрытие (УПД, оплата), а не сорванное обещание
+        if dl and dl < today_iso and not o.get(people_mod.DEL_FACT):
             try:
                 days = (today - dt.date.fromisoformat(dl)).days
             except ValueError:
@@ -388,7 +390,8 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
         lvlcnt = Counter()      # сколько на каждом уровне (текущем)
         passed = Counter()      # сколько ДОСТИГЛО уровня k (level>=k)
         lost = 0
-        open_sum = sales = buy = 0.0
+        open_sum = sales = buy = sales_b = 0.0     # sales_b — продажи с внесённой закупкой
+        no_buy = 0
         real_n = open_n = 0
         overdue_n = 0; overdue_sum = 0.0; stuck_n = 0
         ttw = []
@@ -418,6 +421,10 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
                     passed[k] += 1
             if realized:
                 real_n += 1; sales += amt; buy += buy_by_deal.get(did, 0.0)
+                if buy_by_deal.get(did, 0.0) > 0:
+                    sales_b += amt
+                else:
+                    no_buy += 1
                 rd = realize_date.get(did); dc = str(d.get("DATE_CREATE", ""))[:10]
                 if rd and dc:
                     try:
@@ -441,7 +448,7 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
                 "c": "", "o": label,
             })
         closed_won_lost = real_n + lost
-        margin = sales - buy
+        margin = sales_b - buy      # маржа — только по сделкам с закупкой (без неё была бы 100 %)
         # воронка контрольных точек: «Создано» = весь приток; дальше — достигло уровня k (живые)
         base = created or 1
         funnel = [{"k": 0, "name": CHECKPOINTS[0], "n": created, "pct": 100}]
@@ -469,7 +476,7 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
                 "real": real_n, "conv": round(real_n / created * 100) if created else 0,
                 "sales": _money(sales), "salesRaw": round(sales),
                 "margin": _money(margin), "marginRaw": round(margin),
-                "marginPct": round(margin / sales * 100) if sales else 0,
+                "marginPct": round(margin / sales_b * 100) if sales_b else 0, "noBuy": no_buy,
                 "avgCheck": _money(sales / real_n if real_n else 0),
                 "lost": lost, "winRate": round(real_n / closed_won_lost * 100) if closed_won_lost else 0,
                 "ttwMed": _pctile(ttw, 50), "ttwP90": _pctile(ttw, 90), "ttwN": len(ttw),
