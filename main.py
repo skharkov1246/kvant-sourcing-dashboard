@@ -62,22 +62,16 @@ def _deal_field_labels(client: BitrixClient, codes) -> dict[str, str]:
 
 
 def _has_quote_file(item: dict) -> bool:
-    """Есть ли в карточке файл КП со стороны поставщика.
+    """Засчитанное КП: файл в поле «Offer from supplier» карточки запроса.
 
-    Поле приходит списком, словарём или пустым, а у пустого встречается и
-    строка, и пустой список — поэтому проверяется истинность значения, а не
-    его тип. Наш исходящий «Request file» в этот список не входит: считать его
-    за полученное КП значит объявить прокотированным то, что мы сами и
-    отправили.
+    Правило владельца 19.10.2026: засчитывается только файл в этом поле; КП в
+    почте, в сделке или в чате сделки для системы не существует. Поле приходит
+    списком, словарём или пустым, а у пустого встречается и строка, и пустой
+    список — поэтому проверяется истинность значения, а не его тип. Наш
+    исходящий «Request file» сюда не входит: это мы отправили, а не нам.
     """
-    for f in config.RFQ_QUOTE_FIELDS:
-        v = item.get(f)
-        if isinstance(v, list):
-            if any(v):
-                return True
-        elif v:
-            return True
-    return False
+    v = item.get(config.RFQ_OFFER_FIELD)
+    return any(v) if isinstance(v, list) else bool(v)
 
 
 def _crm_ref_ids(val):
@@ -442,6 +436,25 @@ def run(args) -> int:
           f"без даты приёма {sum(1 for x in staff.values() if not x['hired'])}, "
           f"ушедших без даты последнего входа {sum(1 for x in staff.values() if not x['active'] and not x['left'])}")
 
+    # Правило 19.10.2026, п. 10: «Экономика готова» = «Да» — только когда ни один
+    # запрос сделки не стоит на Price at Work и хотя бы один стоит на Selected.
+    # Сделок с «Да» единицы (зонд v52: 5), их запросы читаются за всё время.
+    econ = None
+    try:
+        _econ_deals = client.list_deals_fast(
+            filter={config.ECON_READY_FIELD: config.ECON_READY_YES},
+            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "ASSIGNED_BY_ID"])
+        _econ_deals = [d for d in _econ_deals if str(d.get("CATEGORY_ID") or "0") not in people_mod.TECH_CATS]
+        _econ_ids = sorted({str(d["ID"]) for d in _econ_deals}, key=int)
+        _econ_rfqs = client.list_items(
+            config.SPA_ENTITY_TYPE_ID,
+            filter={"categoryId": config.SPA_CATEGORY_ID, "@parentId2": _econ_ids},
+            select=["id", "stageId", "parentId2"]) if _econ_ids else []
+        econ = (_econ_deals, _econ_rfqs)
+        print(f"  «Экономика готова» = «Да»: сделок {len(_econ_deals)}, их запросов {len(_econ_rfqs)}")
+    except Exception as e:                                    # noqa: BLE001
+        print(f"  ⚠ проверка «Экономика готова» пропущена: {type(e).__name__}: {без_вебхука(e)}")
+
     print("• Сделки периода (все воронки) для покрытия…")
     period_deals = client.deals_in_period(p.start_iso, p.end_iso, select=[
         "ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE",
@@ -481,6 +494,7 @@ def run(args) -> int:
         _inb,
         config.DEAL_SOURCER_FIELDS,
         staff=staff,
+        econ=econ,
     )
     _o = m["origin"]["summary"]
     # Раскладка авторства — в журнал каждым прогоном: по ней видно день ко дню,
@@ -838,7 +852,7 @@ def _print_summary(m: dict) -> None:
     k = m["kpi"]
     print("\n── СВОДКА ─────────────────────────────")
     print(f"Всего RFQ: {k['total']}  (A={k['deptA']} / B={k['outside']}),  ответственных: {k['respCount']}")
-    print(f"В работе: {k['openCount']} ({k['inWorkPct']}%)  ·  КП из закрытых (A): {k['kpPctOfClosedA']}%  ·  до ТКП: {k['tkpPct']}%")
+    print(f"В работе: {k['openCount']} ({k['inWorkPct']}%)  ·  КП засчитано (A): {k['kpCountA']} ({k['kpPctA']}% запросов) · с КП из закрытых: {k['kpPctOfClosedA']}%  ·  до ТКП: {k['tkpPct']}%")
     print(f"Цепочка: ранние {m['chain']['early']} / ТКП {m['chain']['tkp']} / проигр. {m['chain']['lost']}")
     cov = m["coverage"]
     print(f"Покрытие сделок: {cov['withReq']}/{cov['deals']} ({cov['covPct']}%), ср. поставщиков {cov['avgSuppliers']}")

@@ -607,16 +607,17 @@ def test_кп_считаются_по_файлу_поставщика_а_не_п
     assert sum(w["kp"] for w in m["weekly"]) == ждём
 
 
-def test_кп_принято_в_работу_считается_по_стадии_и_неделе_перевода():
-    """Другой факт, чем наличие файла: карточку перевели в «КП получено»."""
+def test_кп_с_итогом_считается_по_стадии_и_неделе_перевода():
+    """Другой факт, чем наличие файла: КП получил итог (правило 19.10.2026, п. 9) —
+    Selected или «не выбран» (Not Selected, не прошли по цене, не подошло по технике)."""
     import stages as st
     from tests import fixture
     d = fixture.make_dataset()
     m = fixture.build_metrics()
     ждём = sum(1 for r in d["rfqs"]
-               if st.classify_stage(r.get("stageId", "")) == "selected"
+               if st.classify_stage(r.get("stageId", "")) in ("selected", "notsel")
                and d["period"].week_index(period_mod.parse_dt(r.get("movedTime") or "")) is not None)
-    assert ждём > 0, "в синтетике есть карточки в стадии «КП получено»"
+    assert ждём > 0, "в синтетике есть карточки с итогом КП"
     assert sum(w["kpa"] for w in m["weekly"]) == ждём
 
 
@@ -652,10 +653,13 @@ def test_файл_кп_отличается_от_нашего_исходящег
     import main as main_mod
     наш = "ufCrm18_1727423346"
     assert наш not in config_mod.RFQ_QUOTE_FIELDS
-    поле_кп = "ufCrm18_1700698211875"
+    поле_кп = config_mod.RFQ_OFFER_FIELD
+    assert поле_кп == "ufCrm18_1731179998", "засчитывается только «Offer from supplier» (правило 19.10.2026)"
     assert main_mod._has_quote_file({поле_кп: [{"id": 1}]}) is True
     assert main_mod._has_quote_file({поле_кп: {"id": 1}}) is True
     assert main_mod._has_quote_file({наш: [{"id": 1}]}) is False
+    # архивное поле «КП поставщика» КП больше не засчитывает (п. 1 правил)
+    assert main_mod._has_quote_file({"ufCrm18_1700698211875": [{"id": 1}]}) is False
     for пусто in ([], "", None, [None]):
         assert main_mod._has_quote_file({поле_кп: пусто}) is False, пусто
 

@@ -14,7 +14,9 @@ SYSTEM = """Ты — аналитик отдела поиска поставщи
 Контекст. Сорсеры ведут «Запросы поставщикам» (RFQ) в Bitrix24: создают карточку, \
 отправляют запрос поставщику, ведут переписку, получают КП (коммерческое предложение), \
 доводят до клиентской сделки и стадии «ТКП выдано». Метрики: объём RFQ, недельная динамика, \
-конверсия по стадиям (КП/выбран, отказ, «молчание» — нет ответа в срок), средний срок до \
+конверсия по стадиям (КП засчитывается только файлом в «Offer from supplier»; Price at Work — КП без итога; \
+Selected — выбран; «не выбран» — Not Selected, не прошли по цене, не подошло по технике; отказ; «молчание» — \
+нет ответа в срок; правила отметки КП владельца от 19.10.2026 и их нарушения), средний срок до \
 закрытия, доводимость до ТКП, покрытие сделок сорсингом. Блок A — отдел Гринёва (172).
 
 Состав отдела меняется: людей принимают и увольняют. У каждого сорсера своё окно \
@@ -72,11 +74,18 @@ def rule_based(m: dict) -> dict[str, str]:
         # конверсия: худший по «молчанию», лучший по КП
         with_closed = [s for s in src if s["closed"] >= 5]
         worst_nr = _top(with_closed, "noAnswer", 1)
-        best_kp = sorted(with_closed, key=lambda s: (s["kp"] / s["closed"] if s["closed"] else 0), reverse=True)[:1]
-        parts = [f"Из закрытых КП/выбран — <b>{k['kpPctOfClosedA']}%</b> (по {k['closedCountA']} закрытым блока A)."]
+        best_kp = sorted([s for s in src if s["c"] >= 20], key=lambda s: s["quotes"] / s["c"], reverse=True)[:1]
+        parts = [f"КП засчитано (файл в запросе) — <b>{k.get('kpCountA', 0)}</b>, это <b>{k.get('kpPctA', 0)}%</b> "
+                 f"запросов отдела; из закрытых с КП — <b>{k['kpPctOfClosedA']}%</b> (по {k['closedCountA']} закрытым)."]
         if best_kp:
             s = best_kp[0]
-            parts.append(f"<span class=\"good\">Лучшая конверсия в КП — {s['n']}</span> ({s['kp']}/{s['closed']}).")
+            parts.append(f"<span class=\"good\">Больше всего КП на запрос — {s['n']}</span> ({s['quotes']}/{s['c']}).")
+        kr = m.get("kpRules") or {}
+        if kr.get("cards"):
+            t = kr.get("total") or {}
+            parts.append(f"<span class=\"flag\">Правила отметки КП нарушены в {kr['cards']} карточках</span>: "
+                         f"Price at Work без итога дольше {kr.get('staleDays', 14)} дн. — {t.get('pawStale', 0)}, "
+                         f"стадия КП без файла — {t.get('noFile', 0)}, файл без перевода стадии — {t.get('fileNoStage', 0)}.")
         if worst_nr and worst_nr[0]["noAnswer"] > 0:
             s = worst_nr[0]
             parts.append(f"<span class=\"flag\">Больше всего «молчания» у {s['n']}</span> — {s['noAnswer']} без ответа в срок.")
