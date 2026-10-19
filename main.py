@@ -763,8 +763,12 @@ def run(args) -> int:
     contracts_data = None
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
-        contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster)
+        contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids)
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
+        _ch = (contracts_data.get("head") or {}).get("chat") or {}
+        print(f"  чаты сделок с простоем по стадии: активных {_ch.get('active', 0)} (не подвисли), "
+              f"тихих {_ch.get('quiet', 0)}, не прочитано {_ch.get('unread', 0)} (нет доступа {_ch.get('denied', 0)}), "
+              f"сверх бюджета или стоп по лимиту {_ch.get('skipped', 0)}")
         _g, _sp = contracts_data.get("gone") or {}, contracts_data.get("speed") or {}
         # только счётчики: суммы сделок в публичный журнал не идут (правило 17)
         print(f"  ведёт уволенный: открытых сделок {_g.get('deals', 0)} (ответственный {_g.get('byManager', 0)}, "

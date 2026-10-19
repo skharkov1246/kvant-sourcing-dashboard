@@ -677,10 +677,16 @@ class BitrixClient:
 
     def spa_stages(self, entity_type_id: int, category_id: int) -> dict[str, str]:
         """{stageId: name} для воронки смарт-процесса."""
+        return {k: v["name"] for k, v in self.spa_stage_meta(entity_type_id, category_id).items()}
+
+    def spa_stage_meta(self, entity_type_id: int, category_id: int) -> dict[str, dict]:
+        """{stageId: {name, sem}} для воронки смарт-процесса; sem — 'S' успех, 'F' провал,
+        'P' в работе. Провал по суффиксу «:FAIL» пропускал свои стадии провала (UC_* с F)."""
         ent = f"DYNAMIC_{entity_type_id}_STAGE_{category_id}"
-        m: dict[str, str] = {}
+        m: dict[str, dict] = {}
         for s in self.list_paged("crm.status.list", {"filter": {"ENTITY_ID": ent}, "order": {"SORT": "ASC"}}):
-            m[s["STATUS_ID"]] = s.get("NAME") or s["STATUS_ID"]
+            m[s["STATUS_ID"]] = {"name": s.get("NAME") or s["STATUS_ID"],
+                                 "sem": str(s.get("SEMANTICS") or "P").upper()[:1] or "P"}
         return m
 
     # ----------------------------------------------------------------- departments

@@ -67,7 +67,7 @@ const TABS = [
   // (у ролей один начальник). Поэтому «Коммерсанты» читают и состав ролей (PEOPLE),
   // и направления по клиентам (KAM), и продуктовые линии (PRODUCT).
   { id: "eng", name: "Инжиниринг", pay: ["ENG"] },
-  { id: "reps", name: "Коммерсанты", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"] },
+  { id: "reps", name: "КАМ и продукт-оунеры", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"] },
   { id: "contracts", name: "Реализация", pay: ["CONTRACTS"] },
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
   { id: "cohorts", name: "Когорты", pay: ["COMPANY"] },

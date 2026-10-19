@@ -316,6 +316,11 @@
   .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer;white-space:nowrap;flex:none;transition:color .12s,border-color .12s}
   .tab:hover{color:var(--ink);border-color:var(--a)}
   .tab.act{color:#0e1116;background:var(--a2);border-color:var(--a2);font-weight:700}
+  /* четыре функции управления — крупно; остальное — после «ещё» (решение владельца 19.10.2026) */
+  .tabsep{align-self:center;flex:none;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:0 0 0 12px;margin-left:4px;border-left:1px solid var(--line)}
+  .tabsep:last-child{display:none}
+  .tab.minor{font-size:11px;padding:6px 11px;opacity:.78}
+  .tab.minor.act{opacity:1}
   .flow{display:flex;gap:10px;margin-top:12px}
   .flowbox{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
   .flowbox .n{font-family:'Archivo';font-weight:800;font-size:22px}.flowbox .l{font-size:11px;color:var(--mut);margin-top:3px}
@@ -412,6 +417,20 @@
   .actile .m{font-size:10.5px;color:var(--dim);margin-top:3px}
   .actile .t::after{content:" ›";color:var(--a)}
 
+  /* ---- пульт реализации: фазы заказа, очередь «что делать», доставка в срок ---- */
+  .lfph{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+  @media(max-width:900px){.lfph{grid-template-columns:repeat(2,1fr)}}
+  .lft{width:100%;border-collapse:collapse}
+  .lft th{text-align:left;font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);font-weight:600;padding:0 6px 8px}
+  .lft td{padding:7px 6px;border-top:1px solid var(--line);vertical-align:top;font-size:12.5px}
+  .lft .r{text-align:right}
+  .lft tr.drill{cursor:pointer}.lft tr.drill:hover td{background:var(--panel2)}
+  .lft .hot{color:var(--nr);font-weight:600}
+  .otd{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:end;height:130px;margin-top:10px}
+  .otd .c{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:10px;color:var(--dim);gap:2px;min-width:0}
+  .otd .c i{display:block;width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--ok),var(--a2))}
+  .otd .c i.low{background:linear-gradient(180deg,var(--nr),var(--a2))}
+  .otd .c .mono{font-size:9.5px}
   /* ---- воронка реализации ---- */
   .fnl{display:flex;flex-direction:column;gap:10px}
   .fnr{display:grid;grid-template-columns:minmax(150px,270px) 1fr;gap:12px;align-items:center}
@@ -492,7 +511,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="reps">Коммерсанты</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="suppliers">Поставщики</button><button class="tab" data-tab="cohorts">Когорты</button><button class="tab" data-tab="advisor">Советы знатока</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="reps">КАМ и продукт-оунеры</button><button class="tab" data-tab="company">Пульс компании</button><span class="tabsep">ещё</span><button class="tab minor" data-tab="suppliers">Поставщики</button><button class="tab minor" data-tab="cohorts">Когорты</button><button class="tab minor" data-tab="advisor">Советы знатока</button><button class="tab minor" data-tab="eng">Инжиниринг</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -1332,7 +1351,9 @@ const METH={
   'ct.three':{t:'Экономика сделки',what:'Как из суммы контракта получается плановая прибыль, и что об этой сделке думают три разные системы.',src:'БИТРИКС — сумма сделки и Σ заказов поставщикам СП-172. ЭКОНОМИКА ПРОЕКТА — money-поля сделки («Cost (rub)»). БЮДЖЕТ СДЕЛКИ — лист «Бюджет» из книги в Google Drive (снимок в репозитории).',formula:'ЦЕПОЧКА: продали за (выручка бюджета, иначе сумма сделки) − закупка у поставщика − всё остальное (международная логистика, таможня, прочие прямые расходы) = плановая прибыль. Битрикс и экономика проекта дают только ВАЛОВЫЙ заработок — продажа минус закупка, без косвенных затрат; бюджет даёт полный. В колонке таблицы показывается прибыль по сделке, а если её в книге нет — операционная.',note:'КРАСНАЯ РАМКА — когда плановая прибыль не выдерживает проверки на разумность: она отрицательная, либо рентабельность меньше половины нормы, заданной в самом бюджете, либо наоборот выше 60% — такое обычно означает ошибку в книге. Рядом всегда написана причина. Валовая маржа сохранена рядом с плановой намеренно: разница между ними и есть цена логистики, таможни и накладных.'},
   'ct.margin':{t:'Почему это ВАЛОВАЯ маржа, а не прибыль',what:'Показатель считается как продажа − закупка. Это спред до затрат на доведение товара до клиента, а не заработок сделки.',src:'Продажа — сумма сделки в Битриксе. Закупка — Σ заказов поставщикам СП-172, при их отсутствии — money-поля сделки из экономики проекта.',formula:'ВАЛОВАЯ МАРЖА = продажа − закупка. В неё НЕ входят: доставка до РФ и по РФ, таможенные платежи и сборы, сертификация, НДС, агентское вознаграждение, страхование, хранение.',note:'Почему не считаем чистую: (1) в файле «Экономика проекта» затрат нет вообще — это калькулятор наценки, оффер поставщика × коэффициент = наше КП; (2) поля затрат в заказах СП-172 («Стоимость доставки до РФ», «ТП, таможенные сборы, сертификаты, ТО», «НДС») заведены, но заполнены у 2 заказов из 1136 — среди живых ни у одного; (3) поле «Margin» на сделке пустое у всех 916 сделок, «Cost (rub)» заполнено у 619, но в медиане равно закупке, то есть логистику не включает. Полная себестоимость есть только в бюджете сделки — и она теперь читается: см. соседний показатель «План МД по бюджетам» (снимок бюджетов из папки Google Drive). ВАЖНО: продажа берётся как есть из Битрикса; если сумма сделки указана с НДС, а закупка без — валовая маржа завышена ещё и на ставку налога.'},
   'ct.plan':{t:'План МД по бюджетам сделок',what:'Плановый маржинальный доход из «Бюджета сделки» — книги, которую сорсер заполняет по каждой сделке (папка на Google Drive). В отличие от валовой маржи здесь учтена ПОЛНАЯ плановая себестоимость.',src:'Лист «Бюджет» книги: блок «Показатели» (суммы в ₽, переведены в € по курсу Битрикса). Связь со сделкой — по ссылке на Битрикс в шапке книги, без угадывания по названию. Снимок папки собирается скриптом scripts/budget_snapshot.py и лежит в data/budget_snapshot.json.',formula:'ПЛАН МД = выручка − прямые переменные затраты (закуп, международная логистика, таможенная пошлина и сбор, НДС в ФТС, СВХ, брокер). В карточке сделки дополнительно: ПЛАН ПРИБЫЛЬ = МД − премии, страховые взносы, сертификаты, прочие расходы − стоимость денег. KPI суммирует МД по открытым сделкам с внятным бюджетом.',note:'⚠ «не бьётся» — плановая выручка бюджета расходится с суммой сделки в Битриксе больше чем в 4 раза (книга-заготовка или устаревшая) — такие сделки в сумму KPI не входят. Снимок обновляется не сам: дата — в строке фактов под KPI. Суммы книг в рублях; пересчёт в € добавляет расхождение на разницу курсов.'},
-  'ct.act':{t:'Требует решения',what:'Четыре очага проблем в воронке реализации. Плитка кликабельна — открывает эти сделки в таблице ниже.',src:'Открытые сделки воронки кат.0 и их живые заказы СП-172.',formula:'ПРОСРОЧЕН ДЕДЛАЙН — есть живой заказ, у которого дата «Date of deadline to customer» уже прошла. ЗАМЕДЛЕНО — сделка или её заказ сидят в стадии дольше нормы (2× медианы стадии, минимум 7 дн). БЕЗ ПЛАНОВОЙ ДАТЫ — у живых заказов не заполнена дата клиенту, срок не контролируется вообще. НЕТ ЭКОНОМИКИ — в сделке нет ни ссылки на файл экономики, ни money-полей.',note:'Числа в плитках — СДЕЛКИ, в подписи под ними — заказы. Одна сделка может попасть сразу в несколько плиток.'},
+  'ct.life':{t:'Пульт: от размещения до гарантии',what:'Где сейчас каждый заказ поставщику и сколько из них с сорванным сроком или под риском. Фаза — по фактам в карточке заказа, а не по названию стадии.',src:'Заказы СП-172: «Оплачено поставщику, %», «Production confirmation», «Supplier Shipment Date, actual», «Inbound Delivery Date, actual», «Customer delivery date, actual», УПД (дата или файл), «Payment Order (client)».',formula:'РАЗМЕЩЕНИЕ — нет ни оплаты поставщику, ни подтверждения производства. ПРОИЗВОДСТВО — оплата или подтверждение есть, поставщик не отгрузил. В ПУТИ — поставщик отгрузил, клиенту не доставлено. ЗАКРЫТИЕ — доставлено, нет УПД или платёжки клиента. ГАРАНТИЯ — доставлено, УПД и платёж есть, срок гарантии идёт. СДЕЛКИ В СРОК — доля сделок, у которых ВСЕ заказы доставлены не позже «Date of deadline to customer» (решение владельца 19.10.2026), по последней доставке за 90 дней; рядом — доля заказов.',note:'Клик по фазе — её пункты в очереди «Что делать сегодня». Гарантия 12 мес. от доставки — допущение до решения владельца.'},
+  'ct.queue':{t:'Что делать сегодня',what:'Все отклонения по заказам и сделкам реализации — у каждого хозяин и действие. Сверху — самое срочное.',src:'Те же заказы СП-172 и сделки воронки реализации.',formula:'Порядок: срок сорван → под риском (до срока ≤ 14 дн., поставщик не отгрузил) → прогноз доставки позже срока (позднейшая из дат: плановая отгрузка или бюджетный конец производства + обычное опоздание этого поставщика; плюс медианы пути и последней мили) → плановая отгрузка прошла без факта → план доставки позже срока → срок оплаты клиента прошёл без платёжки → нет УПД через 14 дн. после доставки → все заказы закрыты, сделка открыта → нет заказа неделю → ведёт уволенный → нет срока клиента → заказ закрыт без даты доставки. Хозяин — ответственный заказа (Responsible person), иначе ОСС заказа, ОСС сделки, ответственный сделки (решение владельца 19.10.2026); КАМ клиента (поле «КАМ») — в копии по срокам и оплате. Обязательные поля (решение владельца): при размещении — начало и конец производства и доставка клиенту по бюджету, при доставке — факт, подписанный УПД, плановый срок оплаты. Закрытие (УПД, оплата) — только у живых заказов, доставленных за год.',note:'Клик по строке — карточка сделки. Фильтр по ОСС или КАМу — для планёрки с каждым.'},
+  'ct.act':{t:'Требует решения',what:'Четыре очага проблем в воронке реализации. Плитка кликабельна — открывает эти сделки в таблице ниже.',src:'Открытые сделки воронки кат.0 и их живые заказы СП-172.',formula:'ПРОСРОЧЕН ДЕДЛАЙН — есть живой заказ, у которого дата «Date of deadline to customer» уже прошла. ЗАМЕДЛЕНО (подвисла) — сделка или её заказ сидят в стадии дольше нормы (2× медианы стадии, минимум 7 дн) И в чате сделки неделю не писал ни один человек (решение владельца 19.10.2026: подвисшей сделка считается только после проверки чата). Писали в чате — не подвисла; чат не прочитан — простой не подтверждён и в плитку не идёт. БЕЗ ПЛАНОВОЙ ДАТЫ — у живых заказов не заполнена дата клиенту, срок не контролируется вообще. НЕТ ЭКОНОМИКИ — в сделке нет ни ссылки на файл экономики, ни money-полей.',note:'Числа в плитках — СДЕЛКИ, в подписи под ними — заказы. Одна сделка может попасть сразу в несколько плиток.'},
   'ct.gross':{t:'Занижена закупка',what:'Сделки, где валовая маржа неправдоподобно высока — обычно потому, что заведены не все заказы поставщикам.',src:'Сделки с закупкой, собранной из заказов СП-172 (не из money-полей), с суммой больше €1000.',formula:'Порог берётся от самих данных: max(65%, 1,5 × медианной валовой маржи по таким сделкам). Всё, что выше, помечается флагом «мало заказов?».',note:'Это подозрение, а не диагноз: бывают сделки с реально высокой маржой. Но чаще это значит, что часть заказов поставщикам ещё не заведена — тогда закупка занижена, а прибыль в отчёте завышена. Проверять надо в карточке: сколько заказов у сделки и покрывают ли они всю поставку.'},
   'ct.funnel':{t:'Воронка реализации',what:'Где физически стоят открытые сделки и сколько денег стоит на каждой стадии.',src:'Стадии воронки кат.0 в порядке движения (crm.status.list) + история переходов (crm.stagehistory).',formula:'Длина полосы — Σ сумм открытых сделок на стадии относительно самой «денежной» стадии. Красная часть полосы — деньги сделок, у которых сорван срок клиенту. «Типично N дн» — медианная длительность стадии по истории переходов: половина сделок проходит её быстрее.',note:'Показаны только открытые сделки в воронке реализации. Стадии без сделок не выводятся.'},
   'ct.speed':{t:'Скорость реализации',what:'Сколько времени сделки и заказы проводят в каждой стадии — где процесс буксует.',src:'crm.stagehistory.list: первый вход в каждую стадию (сделки воронки кат.0 и заказы СП-172), с полным временем.',formula:'Длительность стадии = время до следующего первого входа. Медианы по всем прохождениям (n — сколько раз стадию проходили). «Цикл заказа» = создание → закрытие (SUCCESS). «Лаг первого заказа» = вход сделки в воронку реализации → создание первого заказа СП-172.',note:'Бары — МЕДИАННОЕ время стадии (типичная длительность, «где копится время»), а не превышение норматива. Норматив-порог = max(2×медиана, 7 дн) и используется для подсветки замедленных. Медианы устойчивы к выбросам; редкие стадии (n<5) в графики не попадают.'},
@@ -1778,6 +1799,7 @@ function renderContracts(){
         nNoEcon=live.filter(r=>r.noEcon).length, nNoDl=live.filter(r=>r.noDl>0).length,
         nGross=live.filter(r=>r.grossSusp).length,
         nGone=live.filter(r=>r.managerGone||r.ossGone).length,
+        nChatU=live.filter(r=>r.chatUnverified).length,
         nDone=R.filter(r=>r.done||r.closed).length;
   const GN=X.gone||{};
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (${X.orphan.buy})`:'';
@@ -1787,7 +1809,47 @@ function renderContracts(){
 
   // ---------- шапка ----------
   const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную: 1 USD = ${fx.usdRub} ₽). Отчётность с другим курсом разойдётся системно.</span>`:'';
-  let h=`<header><div class="eyebrow">Квант · реализация</div><h1>Сделки в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${fxNote}</div></header>`;
+  let h=`<header><div class="eyebrow">Квант · реализация</div><h1>Пульт реализации</h1><div class="sub"><span>От выигрыша до гарантии: заказ поставщику → производство → доставка клиенту → УПД и оплата → гарантия</span><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${H.paidStage?`<span>Успех — и стадия «Оплата получена | Закрытие сделки»: <b>${H.paidStage}</b> сделок не в работе</span>`:''}${fxNote}</div></header>`;
+
+  // ---------- 0. ПУЛЬТ: жизненный цикл заказа (lifecycle.py) ----------
+  const L=X.life||null;
+  const kp=(lbl,val,meta,clz)=>`<div class="kpi ${clz||''}"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
+  if(L){
+    const C=L.counts||{}, o90=(L.otd||{}).last90||{}, d90=(L.otd||{}).deals90||{}, RU=L.rules||{}, Q=L.queue||[], LB=L.labels||{};
+    h+=`<div class="secttl"><b>·</b> Где заказы: от размещения до гарантии${qmark('ct.life')}</div>`
+     +`<div class="lfph" id="lfPh">`+(L.phases||[]).map(p=>`<div class="actile${p.late?' bad':(p.risk?' warn':'')}" data-ph="${p.key}" tabindex="0"><div class="t">${_esc(p.name)}</div><div class="v">${p.orders}</div><div class="m">заказов · сделок ${p.n}${p.late?` · 🚩 ${p.late}`:''}${p.risk?` · ⚠ ${p.risk}`:''}${p.over?` · сверх нормы ${p.over}`:''}</div></div>`).join('')+`</div>`
+     +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">`
+     +kp('Сделки в срок',d90.pct!=null?d90.pct+'%':'—',`${d90.ontime||0} из ${d90.n||0} сделок за 90 дн.: все заказы к сроку · заказов ${o90.pct!=null?o90.pct+'%':'—'}`,(d90.pct!=null&&d90.pct<80)?'warn':'ok')
+     +kp('Срок клиента сорван',C.late||0,'заказов не доставлено к сроку',C.late?'warn':'ok')
+     +kp('Под риском',(C.risk||0)+(C.forecast||0),`≤ ${RU.riskDays} дн. без отгрузки: ${C.risk||0} · прогноз позже срока: ${C.forecast||0}`,(C.risk||C.forecast)?'warn':'')
+     +kp('Поставщик опаздывает',C.shipSlip||0,'плановая отгрузка прошла без факта',C.shipSlip?'warn':'')
+     +kp('Ждут УПД',C.noUtd||0,`доставлено больше ${RU.utdGrace} дн. назад`,C.noUtd?'warn':'')
+     +kp('Ждут оплату клиента',C.unpaid||0,'срок оплаты прошёл, платёжки нет',C.unpaid?'warn':'')
+     +`</div>`;
+    const codes=Object.keys(LB).filter(k=>C[k]);
+    h+=`<div class="secttl" id="lfQs"><b>·</b> Что делать сегодня <span id="lfQn" class="dimv" style="font-weight:400"></span>${qmark('ct.queue')}</div>`
+     +`<section class="card"><div class="statleg" style="margin:0 0 8px" id="lfChips"><span class="stchip on" data-c="">Все <b>${Q.length}</b></span>${codes.map(k=>`<span class="stchip" data-c="${k}">${_esc(LB[k])} <b>${C[k]}</b></span>`).join('')}</div>`
+     +`<div style="margin-bottom:6px"><select id="lfWho" class="search" style="min-width:220px;max-width:100%"><option value="">Все: ОСС и КАМы</option>${[...new Set(Q.map(x=>x.who).concat(Q.map(x=>x.kam).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'ru')).map(w=>`<option value="${_esc(w)}">${_esc(w)}</option>`).join('')}</select></div>`
+     +`<div class="twrap"><table class="lft"><thead><tr><th>Что случилось</th><th>№ · заказчик</th><th>Заказ · поставщик</th><th>Хозяин</th><th class="r">Дней</th><th>Что сделать</th></tr></thead><tbody id="lfQb"></tbody></table></div><div id="lfMore"></div></section>`;
+    const M=(L.otd||{}).months||[], LD=L.lead||{};
+    const otdBars=M.map(m=>`<div class="c" title="${m.m}: в срок ${m.ontime} из ${m.n}${m.medLate!=null?` · медиана опоздания ${Math.round(m.medLate)} дн`:''}"><span class="mono">${m.pct!=null?m.pct+'%':'—'}</span><i class="${m.pct!=null&&m.pct<80?'low':''}" style="height:${m.pct!=null?Math.max(3,m.pct*0.8):0}%"></i><span>${m.m.slice(0,2)}</span></div>`).join('');
+    const mxL=Math.max(1,...['toShip','transit','lastMile','total'].map(k=>(LD[k]||{}).p75||0));
+    const ld=(k,nm)=>LD[k]&&LD[k].n?`<div class="srccmp"><span class="sl">${nm}</span><div class="sb"><i style="width:${Math.min(100,(LD[k].med||0)/mxL*100).toFixed(0)}%"></i></div><span class="sv"><b>${Math.round(LD[k].med)}</b> дн</span><span class="sd dim">75 %: ${Math.round(LD[k].p75)} · ${LD[k].n}</span></div>`:'';
+    h+=`<div class="grid"><section class="card"><h2>Доставка в срок по месяцам</h2><div class="note">Доля заказов, доставленных не позже срока клиента, по месяцу фактической доставки. Красный — ниже 80 %. Наведите на столбец — сколько заказов.</div><div class="otd">${otdBars}</div></section>`
+     +`<section class="card"><h2>Сколько идёт заказ</h2><div class="note">Медиана и 75-й процентиль, дней, по заказам, доставленным за год. Норма звена — 75-й процентиль (решение владельца 19.10.2026), пересмотр раз в квартал; «сверх нормы» на плитках фаз — живые заказы дольше нормы.</div>${ld('toShip','Заказ → отгрузка поставщика')}${ld('transit','Отгрузка → склад')}${ld('lastMile','Склад → клиент')}${ld('total','Весь путь: заказ → клиент')}`
+     +`${LD.shipSlip&&LD.shipSlip.n?`<div class="note" style="margin-top:8px">Отгрузка поставщика против бюджетного срока окончания производства: медиана <b>${LD.shipSlip.med>0?'+':''}${Math.round(LD.shipSlip.med)} дн</b>, 75 % — ${LD.shipSlip.p75>0?'+':''}${Math.round(LD.shipSlip.p75)} дн (${LD.shipSlip.n} отгрузок).</div>`:''}</section></div>`;
+    const P=L.people||[], S=L.suppliers||[], W=L.warranty||{};
+    h+=`<div class="grid"><section class="card"><h2>Хозяева процесса</h2><div class="note">Живые заказы, пункты «что делать», из них сорванный срок, доставка в срок за 90 дней. Клик — пункты этого человека.</div><div class="twrap"><table class="lft"><thead><tr><th>Кто</th><th class="r">Живых</th><th class="r">Пунктов</th><th class="r">🚩</th><th class="r">В срок, 90 дн</th></tr></thead><tbody>`
+     +(P.map(p=>`<tr class="drill" data-who="${_esc(p.who)}"><td>${_esc(String(p.who).replace(/ \(уволен\)$/,''))}${p.gone?' <span class="gone">уволен</span>':''}</td><td class="r mono">${p.live}</td><td class="r mono">${p.exc}</td><td class="r mono${p.late?' hot':''}">${p.late||''}</td><td class="r mono">${p.pct90!=null?p.pct90+'% <span class="dimv">('+p.n90+')</span>':'—'}</td></tr>`).join('')||'<tr><td colspan="5" class="dimv">нет данных</td></tr>')
+     +`</tbody></table></div></section>`
+     +`<section class="card"><h2>Надёжность поставщиков</h2><div class="note">Отгрузка поставщика к бюджетному сроку окончания производства за год (нет бюджетной даты — к плановой отгрузке), от ${RU.supMin||3} отгрузок. Плановую отгрузку в карточке переписывают под факт, поэтому мерим к бюджету. Сверху — наименее надёжные.</div><div class="twrap"><table class="lft"><thead><tr><th>Поставщик</th><th class="r">Отгрузок</th><th class="r">Вовремя</th><th class="r">Сдвиг</th></tr></thead><tbody>`
+     +(S.map(s=>`<tr><td>${_esc(s.sup)}</td><td class="r mono">${s.n}</td><td class="r mono${s.pct<70?' hot':''}">${s.pct}%</td><td class="r mono">${s.medSlip!=null?(s.medSlip>0?'+':'')+Math.round(s.medSlip)+' дн':'—'}</td></tr>`).join('')||'<tr><td colspan="4" class="dimv">мало отгрузок с планом и фактом</td></tr>')
+     +`</tbody></table></div></section></div>`
+     +`<section class="card" style="margin-top:12px"><h2>Гарантия</h2><div class="kprule"><div class="cell"><b>${W.active||0}</b><span>заказов в гарантии</span></div><div class="cell${W.ending30?' bad':''}"><b>${W.ending30||0}</b><span>гарантия кончается в 30 дней</span></div><div class="cell bad"><b>—</b><span>рекламации: в портале не ведутся</span></div></div>`
+     +`<div class="note">Срок гарантии — из договора, без договора — из Purchase order (решение владельца 19.10.2026). Пока договоры и PO не читаются, считаем ${W.months} мес. от доставки клиенту — это допущение. Рекламаций и актов о дефектах в портале нет — гарантийные случаи не видны.</div></section>`;
+  }
+
+  h+=`<div class="secttl"><b>·</b> Деньги и экономика</div>`;
 
   // ---------- 1. ИТОГ: четыре числа, ради которых открывают вкладку ----------
   h+=`<div class="kpis" style="grid-template-columns:repeat(5,1fr)">`
@@ -1803,7 +1865,7 @@ function renderContracts(){
   h+=`<div class="secttl"><b>·</b> Требует решения${qmark('ct.act')}</div>`
    +`<div class="kpis" id="ctAct" style="grid-template-columns:repeat(${nGone?5:4},1fr)">`
    +`<div class="actile bad" data-m="late" tabindex="0"><div class="t">🚩 Просрочен дедлайн</div><div class="v">${nLate}</div><div class="m">сделок · заказов ${dl.lateOrders||0} · потери ${H.loss}</div></div>`
-   +`<div class="actile warn" data-m="slow" tabindex="0"><div class="t">⏳ Замедлено</div><div class="v">${nSlow}</div><div class="m">стадия тянется дольше нормы</div></div>`
+   +`<div class="actile warn" data-m="slow" tabindex="0"><div class="t">⏳ Замедлено</div><div class="v">${nSlow}</div><div class="m">стадия дольше нормы и в чате тихо ${H.chatQuietDays||7}+ дн.${(H.chat||{}).active?` · ещё ${(H.chat||{}).active} — работа в чате`:''}${((H.chat||{}).unread||0)+((H.chat||{}).skipped||0)?` · чат не проверен: ${((H.chat||{}).unread||0)+((H.chat||{}).skipped||0)}`:''}</div></div>`
    +`<div class="actile amb" data-m="nodl" tabindex="0"><div class="t">❓ Без плановой даты</div><div class="v">${nNoDl}</div><div class="m">сделок · заказов ${dl.noDl||0} вне контроля срока</div></div>`
    +`<div class="actile amb" data-m="noecon" tabindex="0"><div class="t">📄 Нет экономики</div><div class="v">${nNoEcon}</div><div class="m">ни файла, ни money-полей в сделке</div></div>`
    +(nGone?`<div class="actile bad" data-m="gone" tabindex="0"><div class="t">👤 Ведёт уволенный</div><div class="v">${nGone}</div><div class="m">сделок на ${GN.sale||'—'} · живых заказов ${GN.orders||0}${GN.late?` · просрочено ${GN.late}`:''} — переназначить</div></div>`:'')
@@ -1863,7 +1925,7 @@ function renderContracts(){
   // ---------- 6. ТАБЛИЦА ----------
   h+=`<div class="secttl" id="ctSect"><b>·</b> Все сделки в реализации <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
    +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · поставщик · менеджер · ОСС · город…">`
-   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="gross"><i class="dot snr"></i>Занижена закупка <b>${nGross}</b></span>${nGone?`<span class="stchip" data-m="gone"><i class="dot snr"></i>Ведёт уволенный <b>${nGone}</b></span>`:''}<span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
+   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span>${nChatU?`<span class="stchip" data-m="chatu">Простой, чат не проверен <b>${nChatU}</b></span>`:''}<span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="gross"><i class="dot snr"></i>Занижена закупка <b>${nGross}</b></span>${nGone?`<span class="stchip" data-m="gone"><i class="dot snr"></i>Ведёт уволенный <b>${nGone}</b></span>`:''}<span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
    +`<section class="card"><div class="note">«Стадия · дней» — где сделка сейчас и сколько дней в этой стадии (краснеет при превышении нормы). «Дедлайн клиенту» — обещанная заказчику дата: 🚩 с глубиной просрочки либо ближайший срок. «Закупка» — Σ заказов СП-172, иначе из экономики проекта. «Валовая маржа» = продажа − закупка: логистика, таможня, пошлины и НДС в неё НЕ входят. Красная строка — требует внимания. Клик по строке — вся сделка целиком; по заголовку — сортировка.</div><div class="note tsnote">На узком экране таблица прокручивается вбок; часть колонок скрыта — все цифры есть в карточке сделки.</div><div class="tscroll"><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></div></section>`;
   el.innerHTML=h;
 
@@ -1912,6 +1974,7 @@ function renderContracts(){
     else if(mode==='nodl')r=r.filter(x=>x.noDl>0&&!x.closed);
     else if(mode==='gross')r=r.filter(x=>x.grossSusp);
     else if(mode==='gone')r=r.filter(x=>(x.managerGone||x.ossGone)&&!x.closed);
+    else if(mode==='chatu')r=r.filter(x=>x.chatUnverified&&!x.closed);
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')+' '+(x.manager||'')+' '+(x.oss||'')+' '+(x.cities||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;
@@ -1924,6 +1987,30 @@ function renderContracts(){
       +`<td class="r">${pcell(x)}</td></tr>`).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
+
+  // ---------- пульт: очередь «что делать», фильтры по коду, фазе и хозяину ----------
+  if(L){
+    let qc='', qw='', qp='', qall=false;
+    const Q=L.queue||[];
+    const qrows=()=>{
+      const r=Q.filter(x=>(!qc||x.code===qc)&&(!qw||x.who===qw||x.kam===qw)&&(!qp||x.phase===qp));
+      document.getElementById('lfQn').textContent=`(${r.length} из ${Q.length})`;
+      const shown=qall?r:r.slice(0,40);
+      document.getElementById('lfQb').innerHTML=shown.map(x=>`<tr class="drill" data-ct="${x.deal}"><td class="${x.sev<=2?'hot':''}">${_esc(x.what)}</td><td><b class="mono">№${x.seq||'—'}</b><div class="dep">${_esc(x.customer)}</div></td><td><div class="dep">${_esc(x.title||'')}</div><div class="dep">${_esc(x.sup||'')}${x.dl?' · срок '+x.dl:''}${x.fc&&x.code==='forecast'?' · прогноз '+x.fc:''}</div></td><td>${_esc(String(x.who).replace(/ \(уволен\)$/,''))}${x.whoGone?' <span class="gone">уволен</span>':''}${x.kam&&x.kam!==x.who&&['late','unpaid','forecast','planAfterDl'].includes(x.code)?`<div class="dep">КАМ: ${_esc(x.kam)}</div>`:''}</td><td class="r mono">${x.days!=null?x.days:''}</td><td>${_esc(x.act)}</td></tr>`).join('')||'<tr><td colspan="6" class="dimv" style="padding:14px">пусто — всё по правилам</td></tr>';
+      document.getElementById('lfMore').innerHTML=(!qall&&r.length>40)?`<span class="stchip" id="lfAll" tabindex="0" style="margin-top:8px;display:inline-block">Показать все ${r.length}</span>`:'';
+    };
+    qrows();
+    const goQ=()=>document.getElementById('lfQs').scrollIntoView({behavior:'smooth',block:'start'});
+    document.getElementById('lfChips').addEventListener('click',e=>{const c=e.target.closest('.stchip'); if(!c)return; qc=c.dataset.c; document.querySelectorAll('#lfChips .stchip').forEach(x=>x.classList.toggle('on',x===c)); qrows();});
+    document.getElementById('lfWho').addEventListener('change',e=>{qw=e.target.value; qrows();});
+    const phPick=c=>{qp=qp===c.dataset.ph?'':c.dataset.ph; document.querySelectorAll('#lfPh .actile').forEach(x=>x.classList.toggle('on',x.dataset.ph===qp)); qrows(); goQ();};
+    document.getElementById('lfPh').addEventListener('click',e=>{const c=e.target.closest('.actile'); if(c)phPick(c);});
+    document.getElementById('lfPh').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return; const c=e.target.closest('.actile'); if(!c)return; e.preventDefault(); phPick(c);});
+    document.getElementById('lfMore').addEventListener('click',e=>{if(e.target.id==='lfAll'){qall=true; qrows();}});
+    document.getElementById('lfMore').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.id==='lfAll'){e.preventDefault(); qall=true; qrows();}});
+    document.getElementById('lfQb').addEventListener('click',e=>{const tr=e.target.closest('tr[data-ct]'); if(!tr)return; const x=byDeal[tr.dataset.ct]; if(x)openContract(x);});
+    el.querySelectorAll('tr[data-who]').forEach(tr=>tr.addEventListener('click',()=>{qw=tr.dataset.who; document.getElementById('lfWho').value=qw; qrows(); goQ();}));
+  }
 
   // ---------- фильтр: плитки и чипы — один механизм ----------
   function setMode(m,scroll){
@@ -1967,20 +2054,22 @@ function renderSuppliers(){
   const X=(window.__CONTRACTS__&&window.__CONTRACTS__.suppliers), el=document.getElementById('tab-suppliers'); if(!el) return;
   if(!X||!X.rows){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по поставщикам</div>'; return; }
   let sortKey='buy', sortDir=-1, q='';
-  const NUM={buy:1,share:1,norders:1,ncontracts:1,nclients:1};
-  const COLS=[['name','Поставщик','l'],['buy','Оборот (закупка)','r'],['share','Доля','r'],['norders','Заказов','r'],['nclients','Клиентов','r'],['last','Посл. заказ','l']];
+  const NUM={buy:1,share:1,norders:1,ncontracts:1,nclients:1,otPct:1};
+  const COLS=[['name','Поставщик','l'],['buy','Оборот (закупка)','r'],['otPct','Отгрузка в срок','r'],['share','Доля','r'],['norders','Заказов','r'],['nclients','Клиентов','r'],['last','Посл. заказ','l']];
   el.innerHTML=`<header><div class="eyebrow">Квант · снабжение</div><h1>Поставщики по обороту</h1><div class="sub"><span>Источник: <b>Bitrix24 · Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b> · обновление каждые 2ч</span><span class="dimv">Оборот = Σ наших закупок у поставщика</span></div></header>`
     +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">${X.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`
     +`<div class="secttl"><b>·</b> Наши поставщики <span id="spCount" class="dimv" style="font-weight:400"></span></div>`
     +`<div class="ctools"><input id="spSearch" class="search" placeholder="Поиск: поставщик · клиент…"></div>`
-    +`<section class="card"><div class="note">«Оборот» — Σ наших закупок у поставщика (€, заказы СП-172, без проигранных). «Доля» — от всего объёма закупок. Клик по заголовку — сортировка. Наведи на строку — клиенты.</div><table class="ctab"><thead id="spHead"></thead><tbody id="spBody"></tbody></table></section>`;
+    +`<section class="card"><div class="note">«Оборот» — Σ наших закупок у поставщика (€, заказы СП-172, без проигранных). «Доля» — от всего объёма закупок. «Отгрузка в срок» — доля отгрузок поставщика не позже бюджетного срока окончания производства за год (плановую отгрузку в карточке переписывают под факт), под ней — сколько отгрузок и медианный сдвиг: опора для выбора поставщика в сорсинге. Клик по заголовку — сортировка. Наведи на строку — клиенты.</div><table class="ctab"><thead id="spHead"></thead><tbody id="spBody"></tbody></table></section>`;
   const head=()=>{document.getElementById('spHead').innerHTML='<tr><th class="r" style="width:42px">№</th>'+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
   function rows(){
     let r=X.rows;
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.name||'')+' '+(x.clients||'')).toLowerCase().includes(s));}
-    r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
+    // «Отгрузка в срок» без данных — всегда в конце списка, в обе стороны сортировки
+    r=r.slice().sort((a,b)=>{ if(sortKey==='otPct'&&(a.otPct==null||b.otPct==null)) return (a.otPct==null)-(b.otPct==null);
+      return NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir; });
     document.getElementById('spCount').textContent=`(${r.length} из ${X.rows.length})`;
-    document.getElementById('spBody').innerHTML=r.map((x,i)=>`<tr><td class="r dimv mono">${i+1}</td><td><div class="who">${_esc(x.name)}</div>${x.clients?`<div class="dep">для: ${_esc(x.clients)}</div>`:''}</td><td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div><div class="dep">${x.curs?_esc(x.curs):''}</div></td><td class="r mono">${x.share}%</td><td class="r mono">${x.norders}</td><td class="r mono">${x.nclients}</td><td class="dep">${x.last||'—'}</td></tr>`).join('')||'<tr><td colspan="8" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+    document.getElementById('spBody').innerHTML=r.map((x,i)=>`<tr><td class="r dimv mono">${i+1}</td><td><div class="who">${_esc(x.name)}</div>${x.clients?`<div class="dep">для: ${_esc(x.clients)}</div>`:''}</td><td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div><div class="dep">${x.curs?_esc(x.curs):''}</div></td><td class="r"><div class="mono${x.otPct!=null&&x.otPct<70?' nrc':''}">${x.otPct!=null?x.otPct+'%':'—'}</div><div class="dep">${x.otN?x.otN+' отгр.'+(x.otPct==null?' · мало для оценки':(x.otSlip?` · ${x.otSlip>0?'+':''}${Math.round(x.otSlip)} дн`:'')):''}</div></td><td class="r mono">${x.share}%</td><td class="r mono">${x.norders}</td><td class="r mono">${x.nclients}</td><td class="dep">${x.last||'—'}</td></tr>`).join('')||'<tr><td colspan="8" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
   document.getElementById('spSearch').addEventListener('input',e=>{q=e.target.value; rows();});
