@@ -460,12 +460,52 @@ def сторона_по_подписи(текст: str | None) -> str | None:
     return "customer" if з else "supplier"
 
 
-def сторона_по_компании(карточка: dict, сделка: dict) -> str | None:
-    """Компания карточки — компания сделки: договор с заказчиком; другая — с поставщиком."""
+def сторона_по_компании(карточка: dict, сделка: dict, поставщики: set[int] | None = None) -> str | None:
+    """Компания карточки — компания сделки: договор с заказчиком; поставщик одного из
+    заказов СП-172 этой сделки — с поставщиком; любая другая (дочка клиента, логист,
+    второе юрлицо холдинга) о стороне не говорит. Без списка поставщиков (поставщики
+    None) — прежнее правило «другая — поставщик»: холостой прогон 19.10 показал, что
+    так спорными выходят 41 % документов (21 из 51) и гейт стороны встаёт."""
     к, с = _номер(карточка.get("companyId")), _номер(сделка.get("COMPANY_ID"))
     if not к or not с:
         return None
-    return "customer" if к == с else "supplier"
+    if к == с:
+        return "customer"
+    if поставщики is None:
+        return "supplier"
+    return "supplier" if к in поставщики else None
+
+
+def чья_компания(карточка: dict, сделка: dict, поставщики: set[int]) -> str:
+    """Чья компания стоит в карточке — для счёта в журнале: deal / supplier / other / none."""
+    к, с = _номер(карточка.get("companyId")), _номер(сделка.get("COMPANY_ID"))
+    if not к:
+        return "none"
+    if к == с:
+        return "deal"
+    return "supplier" if к in поставщики else "other"
+
+
+def поставщики_сделок(портал, номера_сделок: list[int]) -> dict[int, set[int]]:
+    """{сделка: компании её заказов СП-172} — пачками по 50 сделок, по ключу (>id)."""
+    out: dict[int, set[int]] = {n: set() for n in номера_сделок}
+    for i in range(0, len(номера_сделок), 50):
+        пачка = номера_сделок[i:i + 50]
+        после = 0
+        while True:
+            ответ = портал.вызов("crm.item.list", {
+                "entityTypeId": 172, "order": {"id": "ASC"},
+                "filter": {"@parentId2": пачка, ">id": после},
+                "select": ["id", "parentId2", "companyId"], "start": -1}) or {}
+            записи = (ответ.get("result") or {}).get("items") or []
+            for з in записи:
+                сд, к = _номер(з.get("parentId2")), _номер(з.get("companyId"))
+                if сд in out and к:
+                    out[сд].add(к)
+            if len(записи) < 50:
+                break
+            после = int(записи[-1]["id"])
+    return out
 
 
 def файлы_карточки(карточка: dict, тип: int) -> tuple[str | None, list[dict]]:
@@ -494,6 +534,7 @@ class Документ:
     side_company: str | None
     file_field: str | None
     files: list[dict] = field(default_factory=list)
+    company_rel: str = ""                       # чья компания в карточке: deal / supplier / other / none
 
 
 @dataclass
@@ -514,6 +555,7 @@ def отобрать(портал, сколько: int) -> Отбор:
     нет_полей: list[str] = []
     if not номера:
         return Отбор(сделки, документы, нет_полей)
+    поставщики = поставщики_сделок(портал, номера)
     for тип in (СП_РАЗОВЫЙ, СП_РАМОЧНЫЙ):
         поля = поля_типа(портал, тип)
         for код in ("parentId2", *ПОЛЯ_ФАЙЛА[тип], *ПОЛЯ_ПОДПИСЕЙ[тип]):
@@ -535,8 +577,9 @@ def отобрать(портал, сколько: int) -> Отбор:
                 deal_id=сделка_id, card_entity=тип, card_id=карт_id, order_id=_номер(к.get("parentId172")),
                 side=с, side_source=откуда, template=шаблон, doc_type=вид,
                 side_template=сторона_по_подписи(шаблон) or сторона_по_подписи(вид),
-                side_company=сторона_по_компании(к, по_номеру[сделка_id]),
-                file_field=поле, files=файлы))
+                side_company=сторона_по_компании(к, по_номеру[сделка_id], поставщики.get(сделка_id, set())),
+                file_field=поле, files=файлы,
+                company_rel=чья_компания(к, по_номеру[сделка_id], поставщики.get(сделка_id, set()))))
     for дд in документы.values():
         # Порядок свода условий: разовый договор раньше рамочного, новый раньше старого.
         дд.sort(key=lambda д: (д.card_entity != СП_РАЗОВЫЙ, -д.card_id))
@@ -902,6 +945,16 @@ def сверка_сторон(документы: list[Документ]) -> lis
                    f"не сказано {с['молчит']}")
     # Предсказание гейта до денег: те же способы у документов с файлом — то, что
     # live будет читать. Модель добавит свой голос, но эти уже не изменятся.
+    # чья компания стоит в карточке — разбор правила стороны (холостой прогон 19.10:
+    # 41 % спорных при правиле «не компания сделки — поставщик»)
+    чья = Counter(д.company_rel or "none" for д in документы)
+    out.append(f"компания карточки: компания сделки {чья['deal']} · поставщик заказов сделки {чья['supplier']} · "
+               f"другая (о стороне не говорит) {чья['other']} · не указана {чья['none']}")
+    спор = Counter((д.side, д.side_company) for д in документы if д.side_company and д.side_company != д.side)
+    if спор:
+        out.append("расхождения связь → компания: " + " · ".join(
+            f"{'заказчик' if a == 'customer' else 'поставщик'} → {'заказчик' if b == 'customer' else 'поставщик'} {n}"
+            for (a, b), n in sorted(спор.items())))
     с_файлом = [д for д in документы if д.files]
     сказано = [д for д in с_файлом if д.side_company]
     спорных = [д for д in сказано if д.side_company != д.side]
