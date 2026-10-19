@@ -1,7 +1,10 @@
 name: Daily chat snapshot
 
 # Суточный скан чатов сделок (тяжёлый: сотни запросов) — РАЗ В СУТКИ, не при каждой пересборке.
-# Пишет data/chat_snapshot.json (реакция коммерсантов; среднее за неделю собирает дашборд).
+# Снимок в двух частях (19.10.2026, chat_scan.py): data/chat_snapshot.json — только числа
+# по сотрудникам (среднее за неделю собирает дашборд); «ждут ответа» с названиями сделок
+# и оценки сотрудников — в KV Cloudflare, ключ chat:v1. Сначала пишется и сверяется KV,
+# потом файл; не записался KV — файл не трогается. В журнал — только числа (правило 17).
 # Надёжный триггер — repository_dispatch {"event_type":"scan"} от Cloudflare-планировщика в 00:00 МСК;
 # cron — резерв. AI-оценку (вовлечённость/проф.) НЕ трогает (её ставит Opus отдельно).
 on:
@@ -9,7 +12,12 @@ on:
     types: [scan]
   schedule:
     - cron: "0 21 * * *"      # 00:00 МСК (резерв; GitHub-крон может опаздывать)
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Вхолостую: скан и счётчики, без записи в KV и без коммита"
+        type: boolean
+        default: false
 
 permissions:
   contents: write             # коммитим обновлённый снимок
@@ -75,7 +83,14 @@ jobs:
       - name: Скан чатов сделок → снимок
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
-        run: python chat_scan.py
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DRY: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "${DRY:-false}" = "true" ]; then args+=(--dry-run); fi
+          python chat_scan.py "${args[@]}"
       - name: Коммит снимка
         run: |
           set -euo pipefail
@@ -84,7 +99,16 @@ jobs:
           git add data/chat_snapshot.json
           if git diff --cached --quiet; then
             echo "снимок без изменений"
-          else
-            git commit -m "chore: суточный снимок чатов сделок ($(date -u +%F))"
-            git push
+            exit 0
           fi
+          git commit -m "chore: суточный снимок чатов сделок ($(date -u +%F))"
+          # Перенос закрытых полей в KV меняет форму снимка (ключи верхнего уровня,
+          # главная коллекция, чувствительность), и build_catalog --check краснел бы
+          # в гейте каждого PR. Каталог — вторым коммитом (CLAUDE.md, правило 6);
+          # при обычном суточном снимке форма та же и шаг ничего не делает.
+          if ! python scripts/build_catalog.py --check; then
+            python scripts/build_catalog.py
+            git add data/catalog.json
+            git diff --cached --quiet || git commit -m "chore: каталог данных после снимка чатов ($(date -u +%F))"
+          fi
+          git push

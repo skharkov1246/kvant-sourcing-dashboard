@@ -38,6 +38,7 @@ on:
       - "period.py"
       - "premia.py"
       - "presale.py"
+      - "chat_scan.py"          # шаг «Закрытая часть снимка чатов» запускает его при сборке
       - "requirements.txt"
       - "templates/**"          # вёрстка дашборда
       - "public/**"             # то, что уезжает на Cloudflare Pages, включая гейт
@@ -122,9 +123,23 @@ jobs:
       - name: Установка зависимостей
         run: pip install -r requirements.txt
 
+      # Закрытая часть снимка чатов («ждут ответа» с названиями сделок, оценки
+      # сотрудников) лежит в KV chat:v1, а не в публичном data/chat_snapshot.json
+      # (chat_scan.py). Читается в файл на раннере и отдаётся сборке путём;
+      # в журнал — только счётчики. Нет ключа или доступа — вкладка «Коммерсанты»
+      # соберётся на числах, без списка «ждут ответа» и оценок; деплой не падает.
+      - name: Закрытая часть снимка чатов (KV chat:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python chat_scan.py --fetch-private "$RUNNER_TEMP/chat_private.json" \
+            || echo "::warning::закрытая часть снимка чатов не прочитана — «Коммерсанты» без списка «ждут ответа» и оценок"
+
       - name: Генерация дашборда (окно 01.05.2026 → сегодня)
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          CHAT_PRIVATE_PATH: ${{ runner.temp }}/chat_private.json
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Идентификаторы служебных учётных записей портала через запятую
           # (Settings → Secrets and variables → Actions → Variables). Их карточки

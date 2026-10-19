@@ -115,7 +115,8 @@
     {
       "path": "data/chat_snapshot.json",
       "written_by": ".github/workflows/scan.yml",
-      "cadence": "раз в сутки"
+      "cadence": "раз в сутки",
+      "private_part": "KV Cloudflare chat:v1 — «ждут ответа» с названиями сделок и оценки сотрудников (chat_scan.py)"
     },
     {
       "path": "gt/data/bitrix_gt.json",
