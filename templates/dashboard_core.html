@@ -749,7 +749,7 @@ const kpis=[
  ['teal','Вне отдела',k.outside,pctOf(k.outside,k.total)+'% · блок B','teal'],
  ['ip','Ещё в работе',k.inWorkPct+'%',k.openCount+' открыто',''],
  ['ok','КП засчитано',k.kpCountA??0,(k.kpPctA??0)+'% запросов отдела · файл в запросе','ok'],
- [(k.violCards?'warn':''),'Нарушения правил КП',k.violCards??0,'карточек · раздел 3',(k.violCards?'warn':'')],
+ [(k.violCards?'warn':''),'Нарушения правил КП',k.violCards??0,'карточек периода · «Отметка КП по правилам»',(k.violCards?'warn':'')],
  ['amber','Дошло до ТКП',k.tkpPct+'%','сделка ТКП выдано+','amber'],
 ];
 document.getElementById('kpis').innerHTML=kpis.map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
