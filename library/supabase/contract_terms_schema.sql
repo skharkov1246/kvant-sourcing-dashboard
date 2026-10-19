@@ -1,0 +1,145 @@
+-- УСЛОВИЯ ДОГОВОРОВ И ФЛАГИ СВЕРКИ «ЗАКАЗЧИК ↔ ПОСТАВЩИК» — закрытые таблицы.
+--
+-- Пилот (решение владельца 19.10.2026): 30 последних сделок реализации, бюджет
+-- модели 10 USD на прогон, запуск только вручную — прогон «Договоры — чтение
+-- условий (пилот)» (.github/workflows/contract-terms.yml, scripts/contract_terms.py).
+-- Условия договоров — коммерческие сведения: строки только здесь, браузеру (anon,
+-- authenticated) не выдаются; на дашборд — отдельной правкой и только праву
+-- «Поставщики: договоры и деньги». В репозитории — только эта схема и код.
+--
+--   contract_terms       одна строка — один файл договора одной карточки
+--                        (СП-1174 разовый договор / спецификация / ДС, СП-1192
+--                        рамочный). Карточка без файла и файл, который не
+--                        прочитан, — тоже строка: status говорит, прочитан ли он
+--                        и если нет — почему (правило 15, статус не врёт):
+--                          ok        прочитан моделью в этом прогоне;
+--                          reused    условия того же файла (sha256), прочитанного
+--                                    раньше той же моделью и версией, — модель
+--                                    второй раз не оплачивается;
+--                          no_file   в карточке нет файла договора;
+--                          download  файл не скачался (причина — note);
+--                          format, limit, budget, model, parse, api — отказ
+--                                    чтения по классу (budget — бюджет прогона
+--                                    кончился раньше, чем дошла очередь).
+--                        terms — что извлекла модель по contract_b2b.TERMS_SCHEMA,
+--                        evidence — поле → {quote, page}: почему получилось
+--                        значение (правило 16). side — сторона по связи карточки
+--                        (parentId172 — заказ поставщику — значит договор с
+--                        поставщиком), side_source — откуда она; сторона по
+--                        модели — terms->>'side'.
+--   contract_b2b_flags   флаг риска (contract_b2b.flags) по паре «условия
+--                        заказчика сделки ↔ условия поставщика заказа order_id».
+--
+-- Каждая строка с ключом прогона run_id (правило 6): откат —
+--   delete from contract_b2b_flags where run_id = '…';
+--   delete from contract_terms     where run_id = '…';
+-- Деньги — numeric (DATA_MODEL.md), версия правила — method_ver.
+--
+-- Повторяемость (правило 21): create … if not exists; колонки, добавленные позже, —
+-- add column if not exists; проверки — drop/add по имени В СВОЕЙ ТАБЛИЦЕ. Схема —
+-- из search_path, а не public: тест применяет файл в своей схеме. Роли платформы —
+-- только через проверку наличия (правило 20). Применяется прогоном «ZIP base —
+-- apply DB migrations» (zip-db.yml); писать в таблицы — только service_role.
+
+set statement_timeout = '5min';
+set lock_timeout      = '10s';   -- правило 12: ALTER TABLE без него встаёт в очередь
+
+create table if not exists contract_terms (
+  run_id      text        not null,
+  method_ver  text        not null,
+  deal_id     bigint      not null,
+  card_entity integer     not null,
+  card_id     bigint      not null,
+  order_id    bigint,
+  side        text,
+  side_source text,
+  template    text,
+  doc_type    text,
+  file_field  text,
+  file_id     text        not null default '',
+  sha256      text,
+  pages       integer,
+  note        text,
+  status      text        not null,
+  model       text,
+  terms       jsonb,
+  evidence    jsonb,
+  usd         numeric(12, 6) not null default 0,
+  created_at  timestamptz not null default now(),
+  primary key (run_id, card_entity, card_id, file_id)
+);
+
+create table if not exists contract_b2b_flags (
+  run_id     text        not null,
+  method_ver text        not null,
+  deal_id    bigint      not null,
+  order_id   bigint,
+  code       text        not null,
+  days       integer,
+  created_at timestamptz not null default now()
+);
+
+-- «create table if not exists» существующую таблицу не меняет (правило 21):
+-- колонки, добавленные позже первой версии, — отдельными операторами здесь.
+
+alter table contract_terms drop constraint if exists contract_terms_status_chk;
+alter table contract_terms add constraint contract_terms_status_chk
+  check (status in ('ok', 'reused', 'no_file', 'download', 'format', 'limit', 'budget',
+                    'model', 'parse', 'api'));
+alter table contract_terms drop constraint if exists contract_terms_side_chk;
+alter table contract_terms add constraint contract_terms_side_chk
+  check (side is null or side in ('customer', 'supplier'));
+alter table contract_terms drop constraint if exists contract_terms_entity_chk;
+alter table contract_terms add constraint contract_terms_entity_chk
+  check (card_entity in (1174, 1192));
+-- Прочитанный файл несёт условия, непрочитанный — нет: иначе строка со статусом
+-- отказа выглядела бы прочитанной.
+alter table contract_terms drop constraint if exists contract_terms_terms_chk;
+alter table contract_terms add constraint contract_terms_terms_chk
+  check ((status in ('ok', 'reused')) = (terms is not null));
+alter table contract_terms drop constraint if exists contract_terms_usd_chk;
+alter table contract_terms add constraint contract_terms_usd_chk check (usd >= 0);
+
+alter table contract_b2b_flags drop constraint if exists contract_b2b_flags_code_chk;
+alter table contract_b2b_flags add constraint contract_b2b_flags_code_chk
+  check (code ~ '^[A-Za-z]+$');
+
+create index if not exists contract_terms_run  on contract_terms (run_id);
+create index if not exists contract_terms_deal on contract_terms (deal_id);
+-- Повтор чтения по тому же файлу берётся отсюда (status = ok), а не из модели.
+create index if not exists contract_terms_sha  on contract_terms (sha256, model, method_ver)
+  where status = 'ok';
+-- Флаг пары — один на прогон: повтор записи того же прогона не задваивает.
+create unique index if not exists contract_b2b_flags_key
+  on contract_b2b_flags (run_id, deal_id, coalesce(order_id, 0), code);
+create index if not exists contract_b2b_flags_deal on contract_b2b_flags (deal_id);
+
+create or replace function ct_роли_которые_есть(имена text[]) returns text as $$
+  select string_agg(quote_ident(r.rolname), ', ')
+    from pg_roles r where r.rolname = any (имена);
+$$ language sql stable;
+
+-- Строки коммерческие: браузеру их не выдаёт ни одна роль, читает и пишет только
+-- service_role (прогон с секретом). RLS включена и принудительна: даже владелец
+-- таблицы без политики не видит строк через API.
+do $$
+declare n text;
+declare сх text := current_schema();
+declare кому text := ct_роли_которые_есть(array['anon', 'authenticated']);
+declare служебная text := ct_роли_которые_есть(array['service_role']);
+begin
+  foreach n in array array['contract_terms', 'contract_b2b_flags'] loop
+    execute format('comment on table %I.%I is %L', сх, n, 'contract_terms_schema:v1');
+    execute format('alter table %I.%I enable row level security', сх, n);
+    execute format('alter table %I.%I force  row level security', сх, n);
+    execute format('revoke all on table %I.%I from public', сх, n);
+    if кому is not null then
+      execute format('revoke all on table %I.%I from %s', сх, n, кому);
+    end if;
+    if служебная is not null then
+      execute format('grant select, insert, update, delete on table %I.%I to %s',
+                     сх, n, служебная);
+    end if;
+  end loop;
+  execute format('revoke all on function %I.ct_роли_которые_есть(text[]) from public', сх);
+end $$;
