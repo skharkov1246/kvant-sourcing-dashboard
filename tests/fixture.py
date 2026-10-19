@@ -169,7 +169,19 @@ def build_metrics(**kw) -> dict:
                              d["dept_a_ids"], d["names"], d["since"],
                              d["deal_stage_names"], d["category_names"], d["user_depts"],
                              d.get("service_ids"), d.get("inbound_mail"),
-                             DEAL_SOURCER_FIELDS, staff=d.get("staff"))
+                             DEAL_SOURCER_FIELDS, staff=d.get("staff"), econ=ECON)
+
+
+# Сделки с «Экономика готова» = «Да» и их запросы (правило 19.10.2026, п. 10): одна
+# по правилу, две — с нарушением. Придуманы (CLAUDE.md, правило 18).
+ECON = (
+    [{"ID": 7001, "TITLE": "Насос дозирующий — спецификация", "ASSIGNED_BY_ID": "101", "STAGE_SEMANTIC_ID": "P"},
+     {"ID": 7002, "TITLE": "Уплотнения компрессора", "ASSIGNED_BY_ID": "102", "STAGE_SEMANTIC_ID": "P"},
+     {"ID": 7003, "TITLE": "Фильтроэлементы", "ASSIGNED_BY_ID": "101", "STAGE_SEMANTIC_ID": "F"}],
+    [{"parentId2": 7001, "stageId": "DT166_24:SUCCESS"}, {"parentId2": 7001, "stageId": "DT166_24:FAIL"},
+     {"parentId2": 7002, "stageId": "DT166_24:UC_H49RUE"}, {"parentId2": 7002, "stageId": "DT166_24:SUCCESS"},
+     {"parentId2": 7003, "stageId": "DT166_24:UC_H49RUE"}],
+)
 
 
 # ------------------------------------------------------------------ коммерсанты

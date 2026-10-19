@@ -36,6 +36,7 @@
   .sub b{color:var(--ink);font-weight:600}
 
   .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-bottom:14px}
+  #kpis{grid-template-columns:repeat(7,1fr)}
   .kpi{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 14px;position:relative;overflow:hidden}
   .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dim)}
   .kpi.amber::before{background:var(--a)}.kpi.teal::before{background:var(--b)}.kpi.ok::before{background:var(--ok)}.kpi.warn::before{background:var(--warn)}.kpi.ip::before{background:var(--ip)}
@@ -77,7 +78,7 @@
 
   .stack{display:flex;height:13px;border-radius:5px;overflow:hidden;background:var(--panel2)}
   .stack i{height:100%;transition:width .8s cubic-bezier(.2,.7,.2,1)}
-  .snew{background:var(--new)}.ssent{background:var(--b)}.sdlg{background:var(--b2)}.ssel{background:var(--ok)}.sref{background:var(--a)}.snr{background:var(--nr)}.soth{background:#566}
+  .snew{background:var(--new)}.ssent{background:var(--b)}.sdlg{background:var(--b2)}.spaw{background:var(--a2)}.ssel{background:var(--ok)}.snot{background:var(--ok2)}.sref{background:var(--a)}.snr{background:var(--nr)}.soth{background:#566}
   .legendrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:11px;color:var(--mut)}
   .legendrow span{display:flex;align-items:center;gap:5px}.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
 
@@ -264,6 +265,7 @@
   .req .pill.p-refused{color:var(--a);background:rgba(245,165,36,.12)}
   .req .pill.p-no_answer{color:var(--nr);background:rgba(229,72,77,.12)}
   .req .pill.p-dialog{color:var(--b2)}.req .pill.p-sent{color:var(--b)}.req .pill.p-new{color:var(--new)}
+  .req .pill.p-paw{color:var(--a2);background:rgba(255,207,107,.12)}.req .pill.p-notsel{color:var(--ok2)}
   /* легенда-фильтр статусов в дровере сорсера */
   tr.clickrow .stack{cursor:pointer}
   .statleg{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
@@ -272,7 +274,14 @@
   .stchip.on{background:rgba(245,165,36,.12);border-color:var(--a);color:var(--ink)}
   .stchip b{font-family:var(--mono);color:var(--ink);margin-left:1px}
   .stchip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-  .dot.snew{background:var(--new)}.dot.ssent{background:var(--b)}.dot.sdlg{background:var(--b2)}.dot.ssel{background:var(--ok)}.dot.sref{background:var(--a)}.dot.snr{background:var(--nr)}.dot.soth{background:#566}
+  .dot.snew{background:var(--new)}.dot.ssent{background:var(--b)}.dot.sdlg{background:var(--b2)}.dot.spaw{background:var(--a2)}.dot.ssel{background:var(--ok)}.dot.snot{background:var(--ok2)}.dot.sref{background:var(--a)}.dot.snr{background:var(--nr)}.dot.soth{background:#566}
+  .kprule{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0 14px}
+  .kprule .cell{border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .kprule .cell b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+  .kprule .cell span{font-size:11.5px;color:var(--mut)}
+  .kprule .cell.bad b{color:var(--warn)}
+  .rules{margin:6px 0 0 18px;padding:0;font-size:12px;line-height:1.5;color:var(--mut)}
+  .twrap{overflow-x:auto}
   /* тумблеры сортировки в дроверах */
   .sortbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0 10px}
   .sortbar .sortlab{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-right:2px}
@@ -435,7 +444,7 @@
 
   /* ---- адаптив: планшет → мобилка (в конце файла — перекрывает базовые правила) ---- */
   @media(max-width:1024px){
-    .kpis{grid-template-columns:repeat(3,1fr)}
+    .kpis,#kpis{grid-template-columns:repeat(3,1fr)}
   }
   @media(max-width:880px){
     .grid{grid-template-columns:1fr}
@@ -499,11 +508,11 @@
     <section class="card">
       <h2>Динамика по неделям <span class="subtotal">запросы и КП</span></h2>
       <div class="note">Карточки RFQ по дате создания, по неделям (Пн–Вс) — <b>последние 7 недель</b>. Отдел Гринёва (A) против «вне отдела» (B).<br>
-      <b>Получено КП</b> — карточки с файлом КП со стороны поставщика («КП поставщика», «Offer from supplier» и родственные поля). Считается по файлу, а не по письму: входящих писем на карточках запросов за отчётное окно ноль — ответы поставщиков письмами в карточку не попадают. Наш исходящий «Request file» в счёт не идёт. Цена, присланная в теле письма без файла, сюда не попадёт.<br>
-      <b>Принято в работу</b> — карточки в стадии «КП получено»: предложение не просто пришло, а принято сорсером. Разрыв между двумя последними столбцами и есть мера того, сколько КП лежит неразобранными.<br>
+      <b>КП засчитано</b> — карточки с файлом в поле «Offer from supplier». По правилам 19.10.2026 это единственный способ, которым система узнаёт о КП: КП в почте, в сделке или в чате сделки не засчитывается; цену из текста письма сохраняют в PDF или скриншотом и прикладывают туда же. Наш исходящий «Request file» в счёт не идёт.<br>
+      <b>КП с итогом</b> — карточки на Selected или «не выбран» (Not Selected, «Не прошли по цене», «Не подошло по технике»). Разрыв между двумя последними столбцами — КП без итога: стоят на Price at Work.<br>
       Оба последних столбца датированы по <b>последнему движению карточки</b>: ни у файла, ни у стадии отдельной даты выдача не отдаёт. Для карточки, которая после получения КП больше не двигалась, это и есть неделя получения; для остальных — неделя последнего движения.</div>
       <div class="wkchart" id="wkchart"></div>
-      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>Получено КП</span><span><i class="sw" style="background:var(--ok2)"></i>Принято в работу</span><span>под неделей — сорсеров в отделе</span></div>
+      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span><span><i class="sw" style="background:var(--ok)"></i>КП засчитано</span><span><i class="sw" style="background:var(--ok2)"></i>КП с итогом</span><span>под неделей — сорсеров в отделе</span></div>
     </section>
     <section class="card">
       <h2><span class="tag a">БЛОК A</span> Темп сорсеров <span class="subtotal">итого <b id="loadTotal"></b></span></h2>
@@ -531,17 +540,33 @@
 <div class="secttl"><b>3</b> · Конверсия по стадиям</div>
 <section class="card">
   <h2><span class="tag a">БЛОК A</span> Структура запросов по стадиям + результат</h2>
-  <div class="note">Цветная полоса — все запросы сорсера по стадиям. Закрытые раскладываются на <span class="q">КП/выбран</span> + <span style="color:var(--a2)">отказ</span> + <span class="nrc">молчание</span>. «Ср. срок» — дней от создания до смены стадии у закрытых. «Файл КП» — карточки, куда поставщик приложил предложение; «✓ КП» — стадия «КП получено». Разрыв между ними — предложения, которые пришли, но в работу не приняты.</div>
+  <div class="note">Стадии — по правилам отметки КП от 19.10.2026. <b>КП засчитано</b> — файл в «Offer from supplier»: по нему считаются норматив по КП, эффективность отдела и KPI сорсера. <b>Price at Work</b> — КП получено, итога нет; каждому такому запросу нужен итог. <b>Selected</b> — поставщика выбрали; <b>не выбран</b> — Not Selected, «Не прошли по цене», «Не подошло по технике»: КП было, выбрали другого. Ответ без цены — переписка, не КП. «Ср. срок» — дней от создания до смены стадии у закрытых.</div>
   <div class="legendrow">
-    <span><i class="sw snew"></i>Новый</span><span><i class="sw ssent"></i>Отправлен</span><span><i class="sw sdlg"></i>Переписка/цена</span>
-    <span><i class="sw ssel"></i>КП/выбран</span><span><i class="sw sref"></i>Отказ</span><span><i class="sw snr"></i>Молчание</span><span><i class="sw soth"></i>Прочее</span>
+    <span><i class="sw snew"></i>Новый</span><span><i class="sw ssent"></i>Отправлен</span><span><i class="sw sdlg"></i>Переписка без цены</span>
+    <span><i class="sw spaw"></i>Price at Work</span><span><i class="sw ssel"></i>Selected</span><span><i class="sw snot"></i>Не выбран</span><span><i class="sw sref"></i>Отказ</span><span><i class="sw snr"></i>Молчание</span><span><i class="sw soth"></i>Прочее</span>
   </div>
-  <table>
-    <thead><tr><th>Сорсер</th><th style="width:200px">Стадии (доля от всех)</th><th class="r">Закрыто</th><th class="r">Файл КП</th><th class="r">✓ КП</th><th class="r">↩ Отказ</th><th class="r">✕ Молчание</th><th class="r">Ср. срок</th></tr></thead>
+  <div class="twrap"><table>
+    <thead><tr><th>Сорсер</th><th style="width:200px">Стадии (доля от всех)</th><th class="r" title="Файл в «Offer from supplier»: засчитанные КП">КП засчитано</th><th class="r" title="КП получено, итога нет">Price at Work</th><th class="r">Selected</th><th class="r" title="Not Selected, «Не прошли по цене», «Не подошло по технике»">Не выбран</th><th class="r">↩ Отказ</th><th class="r">✕ Молчание</th><th class="r" title="Карточки с нарушением правил отметки КП">Нарушения</th><th class="r">Ср. срок</th></tr></thead>
     <tbody id="tbConv"></tbody>
     <tfoot id="tfConv"></tfoot>
-  </table>
+  </table></div>
   <div class="insight" style="margin-top:16px"><h3>Конверсия и скорость</h3><div id="insConv"></div></div>
+</section>
+<section class="card" id="kpRules">
+  <h2>Отметка КП по правилам <span class="subtotal">с 19.10.2026</span></h2>
+  <div class="note">Отметка КП в карточке запроса — единственный способ, которым система узнаёт о предложении поставщика: по ней считаются норматив по КП, эффективность отдела и KPI сорсера, и только приложенные к запросу КП видит ИИ-сравнение. Ниже — карточки периода, где правило нарушено. Клик по строке открывает запросы сорсера.
+    <ol class="rules">
+      <li>КП — файлом в поле «Offer from supplier» запроса этого поставщика (раздел «result»). В сделку или чат сделки — можно продублировать, но не вместо запроса.</li>
+      <li>В день получения КП запрос переводится на <b>Price at Work</b>.</li>
+      <li>Цена в тексте письма, звонок, личная почта — сохранить в PDF или скриншот и приложить туда же.</li>
+      <li>Новая версия КП — добавить файл в тот же запрос, старый не удалять.</li>
+      <li>Ответ без цены — In Correspondance; отказ — «Отказ в КП»; 10 рабочих дней без ответа после повторного письма и звонка — «Ответ не получен (в срок)».</li>
+      <li>Запросы робота ищутся на вкладке Requests в карточке сделки; ответ поставщика, которому запрос не отправляли, — запрос вручную и КП к нему.</li>
+      <li>Итог каждому запросу на Price at Work: Selected, Not Selected, «Не прошли по цене», «Не подошло по технике»; сделку проиграли или отменили до расчёта ЭП — оставшиеся запросы с КП на Not Selected. Стадию «КП получено» не использовать.</li>
+      <li>«Экономика готова» = «Да» — только когда ни один запрос сделки не стоит на Price at Work и хотя бы один стоит на Selected.</li>
+    </ol>
+  </div>
+  <div id="kpRulesBody"><div class="dimv">Загружаю…</div></div>
 </section>
 
 <div class="secttl"><b>4</b> · Цепочка «запрос → сделка»</div>
@@ -723,7 +748,8 @@ const kpis=[
  ['amber','Отдел Гринёва',k.deptA,pctOf(k.deptA,k.total)+'% · блок A','amber'],
  ['teal','Вне отдела',k.outside,pctOf(k.outside,k.total)+'% · блок B','teal'],
  ['ip','Ещё в работе',k.inWorkPct+'%',k.openCount+' открыто',''],
- ['ok','КП / выбран*',k.kpPctOfClosedA+'%','из '+k.closedCountA+' закрытых (A)','ok'],
+ ['ok','КП засчитано',k.kpCountA??0,(k.kpPctA??0)+'% запросов отдела · файл в запросе','ok'],
+ [(k.violCards?'warn':''),'Нарушения правил КП',k.violCards??0,'карточек · раздел 3',(k.violCards?'warn':'')],
  ['amber','Дошло до ТКП',k.tkpPct+'%','сделка ТКП выдано+','amber'],
 ];
 document.getElementById('kpis').innerHTML=kpis.map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
@@ -735,10 +761,10 @@ const weekTot=M.weekly.slice(-7);
 const wkMax=Math.max(1,...weekTot.flatMap(w=>[w.A,w.B,w.kp||0,w.kpa||0]));
 document.getElementById('wkchart').innerHTML=weekTot.map(w=>{
  const kp=w.kp||0, kpa=w.kpa||0;
- const kpTip=`Получено КП: ${kp} карточек с файлом КП поставщика (неделя последнего движения карточки).`
+ const kpTip=`КП засчитано: ${kp} карточек с файлом в «Offer from supplier» (неделя последнего движения карточки).`
   +`\nКонтроль: входящих писем на карточках за неделю ${w.inb||0}.`;
- const kpaTip=`Принято в работу: ${kpa} карточек в стадии «КП получено».`
-  +(kp?`\nПолучено КП за ту же неделю: ${kp} — разрыв показывает, сколько предложений не разобрано.`:'');
+ const kpaTip=`КП с итогом: ${kpa} карточек на Selected или «не выбран».`
+  +(kp?`\nКП засчитано за ту же неделю: ${kp} — разрыв показывает КП без итога (Price at Work).`:'');
  return `<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}" title="Запросы отдела: ${w.A}${w.hc?` · сорсеров ${w.hc}, на одного ${(w.A/w.hc).toFixed(1)}`:''}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}" title="Запросы вне отдела: ${w.B}"><span>${w.B}</span></div><div class="wkbar k" data-h="${kp/wkMax*100}" title="${kpTip}"><span>${kp}</span></div><div class="wkbar ka" data-h="${kpa/wkMax*100}" title="${kpaTip}"><span>${kpa}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}${w.hc?`<i title="Сорсеров в отделе на этой неделе (по окнам работы). На одного: ${(w.A/w.hc).toFixed(1)} запр.">${w.hc} чел.</i>`:''}</div></div>`;}).join('');
 
 // ---- block A load
@@ -769,17 +795,44 @@ document.getElementById('tbSpark').innerHTML=A.map(r=>{const a=_wi(r.from),b=_wi
  return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who" style="font-size:12.5px">${_esc(r.n)}${_tag(r)}</div></td><td><div class="spark">${bars}</div></td><td class="num r">${r.c}</td></tr>`;}).join('');
 
 // ---- conversion
-document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>(v/r.c*100);
- const stack=`<div class="stack"><i class="snew" style="width:${p(b.new)}%"></i><i class="ssent" style="width:${p(b.sent)}%"></i><i class="sdlg" style="width:${p(b.dialog)}%"></i><i class="ssel" style="width:${p(b.selected)}%"></i><i class="sref" style="width:${p(b.refused)}%"></i><i class="snr" style="width:${p(b.no_answer)}%"></i><i class="soth" style="width:${p(b.other)}%"></i></div>`;
+const KPB=[['new','snew'],['sent','ssent'],['dialog','sdlg'],['paw','spaw'],['selected','ssel'],['notsel','snot'],['refused','sref'],['no_answer','snr'],['other','soth']];
+const KPV=M.kpRules||{}, KPL=KPV.labels||{};
+const _violTip=v=>Object.entries(v||{}).map(([k,n])=>`${KPL[k]||k}: ${n}`).join('\n');
+document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>((v||0)/r.c*100);
+ const stack=`<div class="stack">${KPB.map(([k,cl])=>b[k]?`<i class="${cl}" style="width:${p(b[k])}%"></i>`:'').join('')}</div>`;
  const sp=r.avgDays<2?'f':(r.avgDays<6?'m':'s');
- const pc=v=>r.closed?` <small class="dimv">${Math.round(v/r.closed*100)}%</small>`:'';
- const cell=(v,clz)=> v>0?`<span class="${clz}">${v}</span>${pc(v)}`:`<span class="dimv">0</span>`;
- const out=b.sent+b.dialog+b.selected+b.refused+b.no_answer+b.other;
- return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}${_tag(r)}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td>`
- + `<td class="num r ${(r.quotes||0)>r.kp?'':'dimv'}" title="Карточек с файлом КП от поставщика: ${r.quotes||0}${(r.quotes||0)>r.kp?`, из них не переведено в «КП получено» ${(r.quotes||0)-r.kp}`:''}">${r.quotes||0}</td>`
- + `<td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
-const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,q:t.q+(r.quotes||0),ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,q:0,ref:0,nr:0});
-document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td></td><td class="r num">${tot.closed} / ${tot.c}</td><td class="r num">${tot.q}</td><td class="r num q">${tot.kp}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r"></td></tr>`;
+ const pc=v=>r.c?` <small class="dimv">${Math.round(v/r.c*100)}%</small>`:'';
+ const n=(v,clz)=> v>0?`<span class="${clz||''}">${v}</span>`:`<span class="dimv">0</span>`;
+ const q=r.quotes||0, vn=r.violN||0;
+ return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}${_tag(r)}</div><div class="dep">${r.c} запр. · закрыто ${r.closed}</div></td><td>${stack}</td>`
+ + `<td class="num r" title="Файл в «Offer from supplier»: ${q} из ${r.c} запросов">${n(q,'q')}${q?pc(q):''}</td>`
+ + `<td class="num r">${n(b.paw||0)}</td><td class="num r">${n(b.selected||0,'q')}</td><td class="num r">${n(b.notsel||0)}</td>`
+ + `<td class="num r">${n(r.refusedCol)}</td><td class="num r">${n(r.noAnswer,'nrc')}</td>`
+ + `<td class="num r" title="${_esc(_violTip(r.viol))}">${n(vn,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
+const tot=A.reduce((t,r)=>({c:t.c+r.c,q:t.q+(r.quotes||0),paw:t.paw+(r.buckets.paw||0),sel:t.sel+(r.buckets.selected||0),ns:t.ns+(r.buckets.notsel||0),ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer,v:t.v+(r.violN||0)}),{c:0,q:0,paw:0,sel:0,ns:0,ref:0,nr:0,v:0});
+document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b><div class="dep">${tot.c} запр.</div></td><td></td><td class="r num q">${tot.q} <small class="dimv">${pctOf(tot.q,tot.c)}%</small></td><td class="r num">${tot.paw}</td><td class="r num q">${tot.sel}</td><td class="r num">${tot.ns}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r num nrc">${tot.v}</td><td class="r"></td></tr>`;
+
+// ---- правила отметки КП: нарушения и «Экономика готова»
+(function(){
+ const box=document.getElementById('kpRulesBody'); if(!box) return;
+ if(!M.kpRules){ box.innerHTML='<div class="dimv">Нет данных: сборка не посчитала правила отметки КП.</div>'; return; }
+ const t=KPV.total||{}, fl=['pawStale','noFile','fileNoStage','fileClosed','legacy'];
+ let h=`<div class="kprule">`+fl.map(k=>`<div class="cell${t[k]?' bad':''}"><b>${t[k]||0}</b><span>${_esc(KPL[k]||k)}</span></div>`).join('')+`</div>`;
+ const rows=A.filter(r=>r.violN).sort((a,b)=>b.violN-a.violN);
+ if(rows.length){
+  h+=`<div class="twrap"><table><thead><tr><th>Сорсер</th>${fl.map(k=>`<th class="r">${_esc(KPL[k]||k)}</th>`).join('')}<th class="r">Карточек</th></tr></thead><tbody>`
+   +rows.map(r=>`<tr class="clickrow" data-uid="${r.id}" data-viol="1"><td><div class="who">${_esc(r.n)}${_tag(r)}</div></td>${fl.map(k=>`<td class="num r">${(r.viol||{})[k]?`<span class="nrc">${r.viol[k]}</span>`:'<span class="dimv">0</span>'}</td>`).join('')}<td class="num r"><b>${r.violN}</b></td></tr>`).join('')
+   +(KPV.outsideCards?`<tr><td><div class="who">Вне отдела</div></td>${fl.map(k=>`<td class="num r">${(KPV.outside||{})[k]||0}</td>`).join('')}<td class="num r"><b>${KPV.outsideCards}</b></td></tr>`:'')
+   +`</tbody></table></div>`;
+ } else h+=`<div class="dimv">Нарушений нет.</div>`;
+ const e=KPV.econ;
+ if(e){
+  h+=`<h3 style="margin:16px 0 6px;font-size:13px">«Экономика готова» = «Да»: ${e.yes} сделок, по правилу — ${e.ok}, с нарушением — <span class="${e.bad?'nrc':''}">${e.bad}</span></h3>`;
+  if(e.rows&&e.rows.length) h+=`<div class="twrap"><table><thead><tr><th>Сделка</th><th>Ответственный</th><th class="r">Запросов</th><th class="r">Price at Work</th><th class="r">Selected</th><th>Что не так</th></tr></thead><tbody>`
+   +e.rows.map(x=>`<tr><td><a href="https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(x.id)}/" target="_blank" rel="noopener">${_esc(x.t)}</a>${x.sem==='F'?' <span class="dimv">(проиграна)</span>':x.sem==='S'?' <span class="dimv">(выиграна)</span>':''}</td><td>${_esc(x.own)}</td><td class="num r">${x.n}</td><td class="num r">${x.paw?`<span class="nrc">${x.paw}</span>`:0}</td><td class="num r">${x.sel}</td><td>${x.why.map(_esc).join('; ')}</td></tr>`).join('')+`</tbody></table></div>`;
+ } else h+=`<div class="dimv" style="margin-top:10px">Проверка «Экономика готова» в этой сборке не выполнялась.</div>`;
+ box.innerHTML=h;
+})();
 
 // ---- отправлено vs создано (+ фейк)
 if (M.send && M.send.rows){
@@ -1010,17 +1063,17 @@ document.getElementById('insCov').innerHTML=INS.coverage||'<span class="dimv">�
 
 // ---- footer
 document.getElementById('footer').innerHTML=
- `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде; исполнитель — ответственный карточки, у карточек робота — «Сорсер» сделки и следы человека. Блок A — отдел 172 (Гринёв) и подчинённые, <b>включая ушедших</b>: их запросы — работа отдела; блок B — все прочие. <b>Темп</b> — запросов в рабочий день (Пн–Пт, праздники не вычитаются) своего окна работы: с даты приёма (не позже первой карточки), у ушедших — по последний вход в портал (* — по последней своей карточке). Рейтинг — по темпу последних 4 недель. «КП/выбран» = Selected + «КП получено»; «Отказ» = «Отказ в КП» + прочие закрытые; «Молчание» = «Ответ не получен в срок». «Ср. срок» = createdTime→movedTime по закрытым. Цепочка до сделки — через <span class="mono">parentId2</span>; «ТКП выдано+» = стадия сделки в исполнении/выиграна. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
+ `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде; исполнитель — ответственный карточки, у карточек робота — «Сорсер» сделки и следы человека. Блок A — отдел 172 (Гринёв) и подчинённые, <b>включая ушедших</b>: их запросы — работа отдела; блок B — все прочие. <b>Темп</b> — запросов в рабочий день (Пн–Пт, праздники не вычитаются) своего окна работы: с даты приёма (не позже первой карточки), у ушедших — по последний вход в портал (* — по последней своей карточке). Рейтинг — по темпу последних 4 недель. Стадии — по правилам отметки КП 19.10.2026: «КП засчитано» — файл в «Offer from supplier»; Price at Work — КП без итога (сюда же отменённая «КП получено»); Selected — выбран; «Не выбран» = Not Selected + «Не прошли по цене» + «Не подошло по технике»; переписка — Unread Messages и In Correspondance (ответ без цены); «Отказ» = «Отказ в КП»; «Молчание» = «Ответ не получен (в срок)». Нарушения — стадия КП без файла, файл без перевода стадии, файл при отказе или молчании, Price at Work без итога дольше 14 дней, стадия «КП получено». «Ср. срок» = createdTime→movedTime по закрытым. Цепочка до сделки — через <span class="mono">parentId2</span>; «ТКП выдано+» = стадия сделки в исполнении/выиграна. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
  `<b>Данные:</b> live-выгрузка из kvantpro.bitrix24.ru · ${M.period.label}.`;
 
 // ---- дрилл-даун по сорсеру: кому и какие запросы он отправлял
-const STG={new:'Новый',sent:'Отправлен',dialog:'Переписка/цена',selected:'КП/выбран',refused:'Отказ',no_answer:'Молчание',other:'Прочее'};
-const SBUCK=[['new','snew'],['sent','ssent'],['dialog','sdlg'],['selected','ssel'],['refused','sref'],['no_answer','snr'],['other','soth']];
+const STG={new:'Новый',sent:'Отправлен',dialog:'Переписка без цены',paw:'Price at Work',selected:'Selected',notsel:'Не выбран',refused:'Отказ',no_answer:'Молчание',other:'Прочее'};
+const SBUCK=KPB;
 const SORD={new:0,sent:1,dialog:2,selected:3,refused:4,no_answer:5,other:6};
 const _byId=Object.fromEntries(A.map(s=>[String(s.id),s]));
 const _ovl=document.getElementById('ovl'),_drw=document.getElementById('drw');
 const _wk=i=>(i>=0&&M.weekly[i])?`${M.weekly[i].w} (${M.weekly[i].d})`:'—';
-function openDrw(uid){
+function openDrw(uid,startFilter){
   const s=_byId[String(uid)];if(!s)return;
   document.getElementById('drwName').textContent=s.n;
   document.getElementById('drwSub').textContent=`${s.c} запросов · ${s.perDay} в раб. день (окно ${_dm(s.from)}–${_dm(s.to)}, ${s.wd} раб.дн)`
@@ -1035,14 +1088,16 @@ function openDrw(uid){
   function render(filter){
     let h=`<div class="h">Распределение по статусам · клик — фильтр</div>`;
     h+=`<div class="stack" style="height:16px;margin:2px 0 9px">`+SBUCK.map(([k,cl])=>b[k]?`<i class="${cl}" style="width:${(b[k]/tot*100).toFixed(1)}%" title="${STG[k]}: ${b[k]}"></i>`:'').join('')+`</div>`;
-    h+=`<div class="statleg"><span class="stchip${filter?'':' on'}" data-st="">Все <b>${allDet.length}</b></span>`+SBUCK.filter(([k])=>b[k]).map(([k,cl])=>`<span class="stchip${filter===k?' on':''}" data-st="${k}"><i class="dot ${cl}"></i>${STG[k]} <b>${b[k]}</b></span>`).join('')+`</div>`;
+    const nv=allDet.filter(d=>d.fl&&d.fl.length).length;
+    h+=`<div class="statleg"><span class="stchip${filter?'':' on'}" data-st="">Все <b>${allDet.length}</b></span>`+SBUCK.filter(([k])=>b[k]).map(([k,cl])=>`<span class="stchip${filter===k?' on':''}" data-st="${k}"><i class="dot ${cl}"></i>${STG[k]} <b>${b[k]}</b></span>`).join('')
+      +(nv?`<span class="stchip${filter==='viol'?' on':''}" data-st="viol"><i class="dot snr"></i>Нарушения правил КП <b>${nv}</b></span>`:'')+`</div>`;
     if(sup.length){
       h+=`<div class="h">По поставщикам (${sup.length})</div>`;
       h+=sup.slice(0,12).map(x=>`<div class="suprow"><span>${_esc(x.sup)}</span><b>${x.n}</b></div>`).join('');
       if(sup.length>12)h+=`<div class="suprow"><span class="dimv">…ещё ${sup.length-12}</span><b></b></div>`;
     }
-    const det=filter?allDet.filter(d=>d.st===filter):allDet;
-    h+=`<div class="h">Отправки — новые сверху (${det.length}${filter?' · '+STG[filter]:''})</div>`;
+    const det=filter==='viol'?allDet.filter(d=>d.fl&&d.fl.length):(filter?allDet.filter(d=>d.st===filter):allDet);
+    h+=`<div class="h">Отправки — новые сверху (${det.length}${filter?' · '+(filter==='viol'?'нарушения правил КП':STG[filter]):''})</div>`;
     h+=det.map(d=>{
       const subj=_esc(d.mailSubj||d.subj||'—');
       const to=_esc(d.to||d.sup||'—');
@@ -1052,12 +1107,13 @@ function openDrw(uid){
       const nmail=(d.mailN>1)?`<span class="mn">📧 ${d.mailN} писем</span>`:((d.mailN===0)?'<span class="nomail">без письма</span>':'');
       return `<div class="req"><div class="subj">${clip}<span class="txt">${subj}</span></div>`
         +`<div class="to">Кому: <b>${to}</b></div>${prev}`
-        +`<div class="rm"><span class="pill p-${d.st}">${STG[d.st]||d.st}</span>${nmail}<span class="dt">${when}</span></div></div>`;
+        +`<div class="rm"><span class="pill p-${d.st}">${STG[d.st]||d.st}</span>${nmail}<span class="dt">${when}</span></div>`
+        +(d.fl&&d.fl.length?`<div class="rm"><span class="nrc">⚠ ${d.fl.map(f=>_esc(KPL[f]||f)).join(' · ')}</span></div>`:'')+`</div>`;
     }).join('')||'<div class="dimv">нет запросов в этом статусе</div>';
     body.innerHTML=h;
     body.querySelectorAll('.stchip').forEach(c=>c.addEventListener('click',()=>render(c.dataset.st||null)));
   }
-  render(null);
+  render(startFilter||null);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
 function closeDrw(){_ovl.classList.remove('on');_drw.classList.remove('on');_drw.setAttribute('aria-hidden','true');}
@@ -1067,7 +1123,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrw();});
 // делегирование: один обработчик на документ вместо слушателя на каждой строке
 document.addEventListener('click',e=>{
   if(e.target.closest('.qq'))return;
-  const n=e.target.closest('[data-uid]'); if(n) openDrw(n.dataset.uid);
+  const n=e.target.closest('[data-uid]'); if(n) openDrw(n.dataset.uid, n.dataset.viol?'viol':null);
 });
 
 // ---- вкладка «Пульс компании»
@@ -1215,7 +1271,7 @@ function openUncovered(rows,subLbl){
 // ---- методика «как считается»: реестр + бейджи «?» + дровер
 const METH={
   's.kpi':{t:'Сводные показатели сорсинга',what:'Верхняя панель вкладки «Сорсинг».',src:'crm.item.list — СП-166 «Запросы поставщикам» (entityTypeId 166, cat 24) + crm.deal.list.',filt:'createdTime в окне периода; пол — 01.01.2026.',formula:'Всего RFQ = блок A (отдел сорсинга, dept 172) + блок B (остальные ответственные). % в работе = open÷всего. % КП = SELECTED÷закрытых. % до ТКП = доля RFQ, чья сделка-родитель достигла «ТКП выдано+».'},
-  's.load':{t:'Нагрузка и недельная динамика',what:'Сколько запросов ведёт каждый сорсер и как идёт поток по неделям.',src:'crm.item.list (СП-166), группировка по assignedById.',formula:'Нагрузка = число RFQ на сорсера; темп/день = RFQ ÷ число дней периода. Недели Пн–Вс, показываются последние 7; A = отдел сорсинга (dept 172), B = остальные. Получено КП = карточки СП-166 с файлом КП со стороны поставщика (закрытый список полей, наш «Request file» исключён), неделя по movedTime. Принято в работу = карточки в стадии «КП получено», неделя по movedTime. Входящие письма на карточках — контрольное число в подсказке: их ноль, ответы поставщиков приходят файлами.'},
+  's.load':{t:'Нагрузка и недельная динамика',what:'Сколько запросов ведёт каждый сорсер и как идёт поток по неделям.',src:'crm.item.list (СП-166), группировка по assignedById.',formula:'Нагрузка = число RFQ на сорсера; темп/день = RFQ ÷ число дней периода. Недели Пн–Вс, показываются последние 7; A = отдел сорсинга (dept 172), B = остальные. КП засчитано = карточки СП-166 с файлом в «Offer from supplier» (правило 19.10.2026; наш «Request file» исключён), неделя по movedTime. КП с итогом = карточки на Selected или «не выбран» (Not Selected, «Не прошли по цене», «Не подошло по технике»), неделя по movedTime. Входящие письма на карточках — контрольное число в подсказке: их ноль, ответы поставщиков приходят файлами.'},
   's.conv':{t:'Конверсия по стадиям',what:'Куда дошли запросы каждого сорсера.',src:'stageId СП-166 → 7 бакетов.',formula:'open = NEW+SENT+DIALOG; closed = SELECTED+REFUSED+NO_ANSWER+OTHER. КП = SELECTED; Отказ = REFUSED+OTHER; Молчание = NO_ANSWER. Ср. срок = среднее (movedTime − createdTime) по закрытым, дней.'},
   's.tkp':{t:'Цепочка «запрос → сделка»',what:'Доля запросов, чья клиентская сделка дошла до коммерческого предложения и далее.',src:'parentId2 RFQ → crm.deal.list (стадия сделки).',formula:'RFQ засчитан, если у сделки-родителя STAGE_SEMANTIC_ID = S (выиграна) либо стадия из набора «ТКП выдано+».',note:'Эвристика по именам стадий; набор сверяется с воронками — возможна небольшая погрешность.'},
   's.cov':{t:'Покрытие сделок сорсингом',what:'Подключён ли сорсинг там, где запрос РЕАЛЬНО ожидается. «Покрытие» = доля таких сделок с ≥1 запросом поставщику.',src:'crm.deal.list (созданные в окне) ↔ обратная связь parentId2 из СП-166.',formula:'Знаменатель — только сделки, где запрос ОЖИДАЕТСЯ: живые (статус ≠ проиграно/отказ/отмена) И уже оценённые (сумма > 0), кроме сделок-RFQ самого сорсинга и тестовых. Покрытие = из них с ≥1 запросом ÷ все такие. «Без запроса» — настоящие пропуски (клик — список).',note:'НЕ считаются пропуском (запрос не требуется на этом этапе): €0 — ещё не оценили; бюджетные оценки (БО) — заложить бюджет, реальный заказ придёт отдельной сделкой; «экономически неинтересно/отмена/ошибка» — отказались; RFQ-сделки сорсинга. Поэтому покрытие реальных сделок ≈ 98%, а не «70%».'},

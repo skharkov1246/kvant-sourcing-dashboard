@@ -1,44 +1,61 @@
 """Классификация стадий смарт-процесса 166 и определение «ТКП выдано+» для сделок.
 
-Бакеты RFQ (как в легенде дашборда):
-  new      — Новый (не отправлен)        DT166_24:NEW
-  sent     — Отправлен поставщику        DT166_24:PREPARATION
-  dialog   — Переписка/цена              UC_61BSRU / UC_GFJ5A8 / UC_H49RUE
-  selected — КП получено / выбран        SUCCESS, :1
-  refused  — Отказ в КП                  :2
-  no_answer— Нет ответа в срок           :3
-  other    — Прочее                      FAIL, :4, :5
+Корзины запроса — по правилам владельца 19.10.2026 («Как отмечать полученные КП»).
+Коды и имена стадий — зонд v52 (19.10.2026), воронка 24:
+
+  new       — New Request                               NEW
+  sent      — Request Sent                              PREPARATION
+  dialog    — Unread Messages, In Correspondance        UC_61BSRU, UC_GFJ5A8
+              (ответ без цены — ещё не КП)
+  paw       — Price at Work: КП получено, итога нет     UC_H49RUE
+              и устаревшая «КП получено» (:1) — её      :1
+              правило отменило, итог ей тоже нужен
+  selected  — Selected: поставщика выбрали              SUCCESS
+  notsel    — КП есть, выбран другой: Not Selected,     FAIL, :5, :4
+              «Не прошли по цене», «Не подошло по технике»
+  refused   — Отказ в КП                                :2
+  no_answer — Ответ не получен (в срок)                 :3
+  other     — стадия, которой нет в таблице (новая в портале)
+
+До 19.10.2026 Price at Work числилась перепиской, а Not Selected и обе стадии
+«не подошло» — в «прочем» рядом с отказами: полученное КП, не выбранное по цене,
+засчитывалось сорсеру отказом.
 """
 from __future__ import annotations
 
 # порядок важен для стопки и легенды
-BUCKETS = ["new", "sent", "dialog", "selected", "refused", "no_answer", "other"]
+BUCKETS = ["new", "sent", "dialog", "paw", "selected", "notsel", "refused", "no_answer", "other"]
 BUCKET_LABELS = {
     "new": "Новый (не отправлен)",
     "sent": "Отправлен поставщику",
-    "dialog": "Переписка/цена",
-    "selected": "КП получено/выбран",
+    "dialog": "Переписка без цены",
+    "paw": "Price at Work — КП без итога",
+    "selected": "Selected — выбран",
+    "notsel": "КП есть, не выбран",
     "refused": "Отказ в КП",
     "no_answer": "Нет ответа в срок",
     "other": "Прочее",
 }
-OPEN = {"new", "sent", "dialog"}        # «в работе»
-CLOSED = {"selected", "refused", "no_answer", "other"}
+OPEN = {"new", "sent", "dialog", "paw"}        # «в работе»: у Price at Work итога ещё нет
+CLOSED = {"selected", "notsel", "refused", "no_answer", "other"}
+KP_STAGES = {"paw", "selected", "notsel"}      # стадии, где КП обязано лежать файлом
+BEFORE_KP = {"new", "sent", "dialog"}          # стадии до КП
 
 _SPA_STAGE_BUCKET = {
     "DT166_24:NEW": "new",
     "DT166_24:PREPARATION": "sent",
     "DT166_24:UC_61BSRU": "dialog",
     "DT166_24:UC_GFJ5A8": "dialog",
-    "DT166_24:UC_H49RUE": "dialog",
+    "DT166_24:UC_H49RUE": "paw",
     "DT166_24:SUCCESS": "selected",
-    "DT166_24:1": "selected",
+    "DT166_24:FAIL": "notsel",
+    "DT166_24:1": "paw",
     "DT166_24:2": "refused",
     "DT166_24:3": "no_answer",
-    "DT166_24:FAIL": "other",
-    "DT166_24:4": "other",
-    "DT166_24:5": "other",
+    "DT166_24:4": "notsel",
+    "DT166_24:5": "notsel",
 }
+LEGACY_KP_STAGE = "DT166_24:1"                 # «КП получено» — отменена правилом 19.10.2026
 
 
 def classify_stage(stage_id: str) -> str:
@@ -49,8 +66,12 @@ def classify_stage(stage_id: str) -> str:
         return "new"
     if suf == "PREPARATION":
         return "sent"
-    if suf in ("SUCCESS", "1"):
+    if suf == "SUCCESS":
         return "selected"
+    if suf == "1":
+        return "paw"
+    if suf in ("FAIL", "4", "5"):
+        return "notsel"
     if suf == "2":
         return "refused"
     if suf == "3":

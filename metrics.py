@@ -9,8 +9,12 @@ import datetime as dt
 from collections import Counter, defaultdict
 from statistics import mean
 
+import kprules
 from period import Period, parse_dt, workdays
 from stages import BUCKETS, CLOSED, classify_stage, deal_reached_tkp
+
+KP_RULES_SINCE = "2026-10-19"      # config.KP_RULES_SINCE (правила отметки КП)
+PAW_STALE_DAYS = 14                # config.PAW_STALE_DAYS
 
 
 def _round(x: float, n: int = 1) -> float:
@@ -44,6 +48,7 @@ def build(
     deal_sourcer_fields: tuple = (),
     *,
     staff: dict[str, dict] | None = None,
+    econ: tuple[list[dict], list[dict]] | None = None,
 ) -> dict:
     weeks = period.weeks
     n_weeks = len(weeks)
@@ -229,8 +234,13 @@ def build(
         wd4 = workdays(r_from, r_to) if active and r_from <= r_to else 0
         c4 = sum(1 for d in made if d and r_from <= d <= r_to) if wd4 else 0
         details = []
+        viol: Counter = Counter()
+        viol_cards = 0
         for r in items:
             wi = period.week_index(parse_dt(r.get("createdTime", "")))
+            fl = kprules.card_flags(r, period.end, PAW_STALE_DAYS)
+            viol.update(fl)
+            viol_cards += bool(fl)
             details.append({
                 "id": str(r.get("id")),
                 "subj": (r.get("title") or "—")[:90],
@@ -239,6 +249,8 @@ def build(
                 "wk": wi if wi is not None else -1,
                 "dt": (r.get("createdTime") or "")[:10],
                 "dtx": (r.get("createdTime") or ""),   # полная метка для хронологической сортировки
+                # нарушения правил отметки КП — только где есть (пустой список не везём)
+                **({"fl": fl} if fl else {}),
             })
         by_supplier = [{"sup": s, "n": n} for s, n in Counter(d["sup"] for d in details).most_common()]
         nsup = sum(1 for x in by_supplier if x["sup"] not in ("—", "", None))
@@ -262,11 +274,13 @@ def build(
             "wk": wk,
             "buckets": buckets,
             "closed": closed,
-            "kp": buckets["selected"],
-            # файл КП поставщика в карточке: предложение пришло. Стоит рядом со
-            # стадией «КП получено», потому что разрыв между ними и есть то,
-            # что лежит неразобранным лично у этого сорсера.
+            # Правила 19.10.2026. «quotes» — засчитанные КП: файл в «Offer from
+            # supplier» (норматив по КП и KPI считаются по нему). «kp» — закрытые
+            # с КП: Selected и «КП есть, не выбран» (Not Selected, не прошли по
+            # цене, не подошло по технике). До 19.10 «kp» был только Selected и
+            # «КП получено», а не выбранные по цене шли в «отказ».
             "quotes": sum(1 for r in items if r.get("_hasQuote")),
+            "kp": buckets["selected"] + buckets["notsel"],
             "refusedCol": buckets["refused"] + buckets["other"],
             "noAnswer": buckets["no_answer"],
             "avgDays": _round(mean(durs)) if durs else 0,
@@ -274,6 +288,9 @@ def build(
             "tkpP": _pct(tkp, c),
             "details": details,
             "bySupplier": by_supplier,
+            # нарушения правил отметки КП: только ненулевые коды (kprules.FLAGS)
+            "viol": dict(viol),
+            "violN": viol_cards,
         }
         if not active:
             # открытые карточки ушедшего никто не ведёт — их надо переназначить
@@ -323,9 +340,9 @@ def build(
     # получения КП больше не двигалась, это и есть неделя получения; для
     # остальных — неделя последнего движения. Оговорка стоит рядом с графиком.
     #
-    # Второй столбец — карточки в стадии «КП получено»: предложение не просто
-    # пришло, а принято сорсером в работу. Разрыв между столбцами и есть мера
-    # того, сколько КП лежит неразобранными.
+    # Второй столбец — КП с итогом (правило 19.10.2026, п. 9): карточки на
+    # Selected или «КП есть, не выбран». Разрыв между столбцами — КП, которым
+    # итог ещё не поставлен (Price at Work) или которые не отмечены стадией.
     kp_got = [0] * n_weeks
     kp_taken = [0] * n_weeks
     for r in rfqs:
@@ -334,7 +351,7 @@ def build(
             continue
         if r.get("_hasQuote"):
             kp_got[wi] += 1
-        if classify_stage(r.get("stageId", "")) == "selected":
+        if classify_stage(r.get("stageId", "")) in ("selected", "notsel"):
             kp_taken[wi] += 1
 
     # Контрольное число: входящие письма на карточках за ту же неделю. Сейчас
@@ -371,6 +388,29 @@ def build(
     # блок A агрегаты для KPI
     closed_a = sum(s["closed"] for s in sourcers_a)
     kp_a = sum(s["kp"] for s in sourcers_a)
+    quotes_a = sum(s["quotes"] for s in sourcers_a)
+    c_a = sum(s["c"] for s in sourcers_a)
+
+    # ---- правила отметки КП (19.10.2026): нарушения по всем карточкам периода
+    # и проверка сделок с «Экономика готова» = «Да»
+    viol_all, viol_cards = kprules.count_flags(rfqs, period.end, PAW_STALE_DAYS)
+    viol_out, viol_out_cards = kprules.count_flags(
+        [r for r in rfqs if r["_owner"] not in dept_a_ids], period.end, PAW_STALE_DAYS)
+    econ_res = kprules.econ_check(*econ) if econ else None
+    if econ_res:
+        for row in econ_res["rows"]:
+            row["own"] = names.get(row["own"], f"user#{row['own']}") if row["own"] else "—"
+    kp_rules = {
+        "since": KP_RULES_SINCE,
+        "staleDays": PAW_STALE_DAYS,
+        "labels": kprules.FLAG_LABELS,
+        "total": dict(viol_all),
+        "cards": viol_cards,
+        "outside": dict(viol_out),
+        "outsideCards": viol_out_cards,
+        "paw": sum(1 for r in rfqs if classify_stage(r.get("stageId", "")) == "paw"),
+        **({"econ": econ_res} if econ_res else {}),
+    }
 
     # ---- цепочка: исход связанных сделок (по всем RFQ) + воронки
     chain = Counter(deal_state(r.get("parentId2")) for r in rfqs)
@@ -659,7 +699,12 @@ def build(
             "openCount": open_all,
             "inWorkPct": _pct(open_all, total),
             "closedCountA": closed_a,
+            # закрытые с КП (Selected + не выбран) из закрытых, блок A
             "kpPctOfClosedA": _pct(kp_a, closed_a),
+            # засчитанные КП (файл в Offer from supplier) и их доля в запросах отдела
+            "kpCountA": quotes_a,
+            "kpPctA": _pct(quotes_a, c_a),
+            "violCards": viol_cards,
             "tkpPct": _pct(tkp_all, total),
             # состав отдела в периоде: кто работает сейчас, кто ушёл и что после
             # ушедших осталось открытым
@@ -669,6 +714,7 @@ def build(
             "goneAfter": sum(s.get("afterLeft", 0) for s in sourcers_a),
         },
         "weekly": weekly,
+        "kpRules": kp_rules,
         "sourcersA": sourcers_a,
         "supplierMix": supplier_mix,
         "chain": {
