@@ -408,7 +408,8 @@ class ContractsStub:
             self.deals.append({"ID": did, "TITLE": f"{950 + i}. Поставка узла {i}", "OPPORTUNITY": str(20_000 + 3_000 * i),
                                "CURRENCY_ID": "EUR", "COMPANY_ID": str(300 + i % 7), "STAGE_ID": st,
                                "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(200 - i * 5),
-                               "ASSIGNED_BY_ID": str(10 + i % 3), ct.OSS_DEAL: [str(20 + i % 4)]})
+                               "ASSIGNED_BY_ID": str(10 + i % 3), ct.OSS_DEAL: [str(20 + i % 4)],
+                               ct.KAM_F: str(10 + (i + 1) % 3)})
             self.hist[2].append((did, st, t(30 + i)))
             for j in range(1 + i % 3):
                 oid += 1

@@ -47,6 +47,8 @@ INBOUND_PLAN = "ufCrm20_1709294315471"  # «Inbound Delivery Date, planned» —
 CITY_F = "ufCrm20_1742552190053"        # «Город доставки заказчику по бюджету»
 OSS_F = "ufCrm20_1723236618"            # «Deal support specialist» — ОСС заказа (совпал 73/74)
 OSS_DEAL = "UF_CRM_1715604558"          # «Сопровождение сделки» — тот же человек на сделке (74/74)
+KAM_F = "UF_CRM_1740390857"             # «КАМ» — КАМ клиента (people.py); ответственный сделки — не он
+KAM_OLD = "UF_CRM_1736926032"           # «KAM (старое)» — запасное, как в people.py
 # факты исполнения заказа (зонд v49: заполнены у 85–100 % заказов, прошедших точку) —
 # жизненный цикл «размещение → производство → в пути → закрытие → гарантия» (lifecycle.py)
 SHIP_PLAN = "ufCrm20_1723235828"        # «Supplier Shipment Date, planned»
@@ -275,7 +277,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
     # 3. вселенная: сделки ВОРОНКИ РЕАЛИЗАЦИИ (кат.0) + родители заказов вне её
     DSEL = ["ID", "TITLE", "OPPORTUNITY", "CURRENCY_ID", "COMPANY_ID", "STAGE_ID",
-            "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE", "ASSIGNED_BY_ID", OSS_DEAL,
+            "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE", "ASSIGNED_BY_ID", OSS_DEAL, KAM_F, KAM_OLD,
             BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK,
             BUDGET_LINK]
     plan_by_seq, plan_by_id, plan_asof = _load_budget_plans()
@@ -560,6 +562,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # ОСС из поля сделки — хозяин пунктов очереди уровня сделки (lifecycle);
             # «oss» выше — склейка ОСС всех заказов, для таблицы
             "ossDeal": who(d.get(OSS_DEAL))[0],
+            # КАМ клиента — из поля «КАМ» (запасное — старое поле), не ответственный сделки
+            "kam": who(d.get(KAM_F) or d.get(KAM_OLD))[0],
             # сделку или её живые заказы ведёт уволенный: работа без хозяина
             "managerGone": who(d.get("ASSIGNED_BY_ID"))[1],
             "ossGone": (any(o["ossGone"] for o in ords_det if o["live"])
