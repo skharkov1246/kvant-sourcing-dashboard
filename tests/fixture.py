@@ -319,6 +319,7 @@ def build_people(*, kam_queue: bool = True, **kw) -> dict:
                            created=CREATED, orders=ORDERS, **kw)
     if kam_queue:
         P["kamQueue"] = build_kam_queue()
+        P["poLines"] = build_presale()["poLines"]
     return P
 
 
@@ -558,8 +559,20 @@ def ps_deals() -> list[dict]:
              chat_activity.CHAT_FIELD: chat}
         if kam:
             x[presale.KAM_F] = kam
+        # линии продукт-оунеров: категория оборудования (у 8002 — две) и Product leader
+        x[presale.CAT_F] = PS_CATS.get(did, [])
+        if did in PS_PO:
+            x[presale.PO_F] = PS_PO[did]
         out.append(x)
     return out
+
+
+#: «Категория оборудования» сделок пресейла: 8002 — две категории, 8008 — не указана,
+#: 8009 — значение, удалённое из справочника (77)
+PS_CATS = {"8001": ["1"], "8002": ["1", "2"], "8003": ["2"], "8004": ["1"], "8005": ["3"],
+           "8006": ["3"], "8007": ["1"], "8009": ["77"]}
+PS_CAT_LABELS = {"1": "Насосы", "2": "Компрессоры и ГТУ", "3": "ЗИП"}
+PS_PO = {"8001": "12", "8002": "12", "8003": "11", "8005": "10"}
 
 
 class PresaleChats:
@@ -586,7 +599,8 @@ def build_presale(*, chat: bool = True) -> dict:
     import presale
     reader = chat_activity.Reader(PresaleChats(), set()) if chat else None
     return presale.compute(cid="32", cat_name="Пресейл", deals=ps_deals(), stage_meta=ps_stage_meta(),
-                           rfqs=[], people=CT_PEOPLE, names={}, today=CT_TODAY, chat_reader=reader)
+                           rfqs=[], people=CT_PEOPLE, names={}, today=CT_TODAY, chat_reader=reader,
+                           cat_labels=PS_CAT_LABELS)
 
 
 def build_kam_queue() -> dict:

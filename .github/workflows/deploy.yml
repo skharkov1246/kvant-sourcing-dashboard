@@ -129,6 +129,8 @@ jobs:
       - name: Генерация дашборда (окно 01.05.2026 → сегодня)
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          # вебхук владельца — только чтение чатов сделок (решение 19.10.2026); нет — читает вебхук сборки
+          BITRIX_CHAT_WEBHOOK_URL: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Идентификаторы служебных учётных записей портала через запятую
           # (Settings → Secrets and variables → Actions → Variables). Их карточки

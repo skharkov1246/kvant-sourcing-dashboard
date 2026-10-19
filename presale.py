@@ -55,9 +55,14 @@ PRESALE_RE = re.compile(r"пре\s*-?\s*сейл|presale|pre\s*-?\s*sale|пре�
 SOURCER_F = config.DEAL_SOURCER_FIELDS[0][0]     # «Сорсер» сделки
 HEAD_F = config.DEAL_SOURCER_FIELDS[1][0]        # «Head of sourcing departement» — заполнен у 100 %
 KAM_F = "UF_CRM_1740390857"                      # «КАМ»
+# Линия продукт-оунера — «Категория оборудования» сделки (решение владельца 19.10.2026);
+# зонд v55: в воронке «Пресейл» заполнена у 96 % открытых, в реализации — у 2 %.
+CAT_F = "UF_CRM_1781862699536"                   # «Категория оборудования» (список, множественный)
+PO_F = "UF_CRM_1779187425"                       # «Product leader»
 DEAL_SELECT = ["ID", "TITLE", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE", "MOVED_TIME",
                "ASSIGNED_BY_ID", "CREATED_BY_ID", "COMPANY_ID", "OPPORTUNITY", SOURCER_F, HEAD_F, KAM_F,
-               chat_activity.CHAT_FIELD]
+               chat_activity.CHAT_FIELD, CAT_F, PO_F]
+CAT_NONE = "категория не указана"
 KAM_NONE = "КАМ не указан"
 
 # НА КОМ МЯЧ (решение владельца 09.10.2026): сделка пресейла — сделка КАМа, но по
@@ -132,10 +137,57 @@ def _pct(a: int, b: int) -> int:
     return round(a / b * 100) if b else 0
 
 
+def _cats(v, labels: dict[str, str]) -> list[str]:
+    """Значение поля-списка → подписи категорий; удалённое из справочника значение —
+    «значение #id» (видно, что разметить заново), пусто — []."""
+    ids = v if isinstance(v, list) else [v]
+    out = []
+    for x in ids:
+        s = str(x or "").strip()
+        if s and s != "0":
+            lbl = labels.get(s) or f"значение #{s}"
+            if lbl not in out:
+                out.append(lbl)
+    return out
+
+
+def po_lines(rows: list[dict]) -> dict:
+    """Линии продукт-оунеров по «Категории оборудования» сделок пресейла.
+    Сделка с несколькими категориями входит в каждую (итог по линиям больше числа
+    сделок — так и подписано). «Стоят» — простой, подтверждённый тишиной в чате."""
+    lines: dict[str, dict] = {}
+    for r in rows:
+        for c in (r.get("cats") or [CAT_NONE]):
+            a = lines.setdefault(c, {"cat": c, "n": 0, "open": 0, "won": 0, "lost": 0, "stale": 0,
+                                     "ballKam": 0, "ballSrc": 0, "noPo": 0, "_po": defaultdict(int)})
+            a["n"] += 1
+            if r["open"]:
+                a["open"] += 1
+                a["stale"] += "stale" in r["flags"]
+                a["ballKam"] += r["ball"] == "kam"
+                a["ballSrc"] += r["ball"] in SOURCING_BALL
+                if r.get("poId"):
+                    a["_po"][r["po"] + (" (уволен)" if r.get("poGone") else "")] += 1
+                else:
+                    a["noPo"] += 1
+            else:
+                a["won" if r["sem"] == "S" else "lost"] += 1
+    out = []
+    for a in lines.values():
+        po = a.pop("_po")
+        a["pos"] = [{"name": k, "n": v} for k, v in sorted(po.items(), key=lambda kv: -kv[1])]
+        out.append(a)
+    out.sort(key=lambda a: (a["cat"] == CAT_NONE, -a["open"], -a["n"]))
+    with_cat = sum(1 for r in rows if r.get("cats"))
+    return {"lines": out, "deals": len(rows), "withCat": with_cat, "withCatPct": _pct(with_cat, len(rows)),
+            "multi": sum(1 for r in rows if len(r.get("cats") or []) > 1)}
+
+
 def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str, dict],
             rfqs: list[dict], people: dict[str, dict] | None, names: dict[str, str],
             today: dt.date, service_ids: set[str] | None = None,
-            chat_reader: chat_activity.Reader | None = None) -> dict:
+            chat_reader: chat_activity.Reader | None = None,
+            cat_labels: dict[str, str] | None = None) -> dict:
     """chat_reader — общий на сборку читатель чатов: простой по стадии проверяется
     чатом сделки (золотое правило, см. шапку). None — без чата, как до 19.10.2026."""
     people = people or {}
@@ -172,6 +224,9 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         kam_uid = _uid(d.get(KAM_F))
         kam, kam_gone = person(kam_uid)
         head, head_gone = person(_uid(d.get(HEAD_F)))
+        po_uid = _uid(d.get(PO_F))
+        po, po_gone = person(po_uid)
+        cats = _cats(d.get(CAT_F), cat_labels or {})
         open_ = sem == "P"
         stage_name = (stage_meta.get(sid) or {}).get("name") or sid
         ball = ball_of(stage_name, sem)
@@ -204,6 +259,7 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "sum": float(d.get("OPPORTUNITY") or 0) > 0,
             "company": str(d.get("COMPANY_ID") or "0") not in ("", "0"),
             "flags": flags, "chat": None,
+            "cats": cats, "po": po, "poId": po_uid, "poGone": po_gone,
             "_chat": chat_activity.chat_id(d),
         })
 
@@ -309,6 +365,7 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "staleDays": ЗАСТОЙ_ДНЕЙ, "noRfqDays": БЕЗ_ЗАПРОСА_ДНЕЙ,
         },
         "stages": st_rows,
+        "poLines": po_lines(rows),
         "lost": lost,
         "weeks": weeks,
         "bySourcer": by_src,

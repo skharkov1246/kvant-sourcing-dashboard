@@ -531,15 +531,28 @@ def run(args) -> int:
     # Сделки читаются здесь, а блок считается после реализации: простой по стадии
     # подтверждает чат сделки (золотое правило 19.10.2026), а бюджет чтения чатов
     # один на сборку — первой его тратит реализация (там деньги), пресейл — остатком.
-    chat_reader = chat_activity.Reader(client, service_ids)
+    # Чаты сделок читаются от имени владельца (решение 19.10.2026): вебхук сборки не
+    # участник чатов (сборка 19.10: из 129 чатов с простоем 123 — отказ в доступе).
+    # Свой вебхук — секрет BITRIX_CHAT_WEBHOOK_URL, только чтение; темп портала общий.
+    # Нет секрета — читает вебхук сборки, как раньше.
+    _chat_url = (os.getenv("BITRIX_CHAT_WEBHOOK_URL") or "").strip()
+    if _chat_url and not (_chat_url.startswith("https://") and "/rest/" in _chat_url):
+        print("  ⚠ BITRIX_CHAT_WEBHOOK_URL не похож на вебхук — чаты читает вебхук сборки")
+        _chat_url = ""
+    chat_reader = chat_activity.Reader(client.with_webhook(_chat_url) if _chat_url else client, service_ids)
+    print(f"• Чаты сделок читает {'вебхук владельца' if _chat_url else 'вебхук сборки'}")
     _presale_in: dict | None = None
     try:
         _ps = presale_mod.find_category(category_names) or presale_mod.find_category(
             people_mod.deal_categories(client))
         if _ps:
             _pdeals = client.list_deals_fast(filter={"CATEGORY_ID": int(_ps[0])}, select=presale_mod.DEAL_SELECT)
+            # подписи «Категории оборудования» — справочник поля (линии продукт-оунеров)
+            _cat_labels = {str(k): str(v) for k, v in
+                           ((client.userfields().get(presale_mod.CAT_F) or {}).get("enum") or {}).items()}
             _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
-                               rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids)
+                               rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids,
+                               cat_labels=_cat_labels)
         else:
             print("• Воронка пресейла: воронки с таким именем в портале нет")
     except Exception as e:                                   # noqa: BLE001
@@ -811,6 +824,12 @@ def run(args) -> int:
     # закрытие реализации, сделки без КАМа. Едет в данных вкладки «КАМ и продукт-оунеры»
     # (people → раздел «КАМы») и вместе с ними — в живую сверку (modules.json, «people»).
     if people_data is not None:
+        # линии продукт-оунеров (пресейл по «Категории оборудования») — в данные вкладки
+        _pl = (m.get("presale") or {}).get("poLines")
+        if _pl:
+            people_data["poLines"] = _pl
+            print(f"  линии продукт-оунеров: {len(_pl['lines'])} категорий, сделок с категорией "
+                  f"{_pl['withCat']} из {_pl['deals']} ({_pl['withCatPct']} %)")
         try:
             people_data["kamQueue"] = kamqueue_mod.build(
                 m.get("presale"), (contracts_data or {}).get("life"), (contracts_data or {}).get("rows"),

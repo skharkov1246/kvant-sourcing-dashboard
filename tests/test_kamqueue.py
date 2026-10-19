@@ -23,16 +23,16 @@ from tests import fixture  # noqa: E402
 СЕГОДНЯ = dt.date(2026, 10, 19)
 
 
-def test_пороги_мяча_у_кама_таблицей_и_предложены():
+def test_пороги_мяча_у_кама_таблицей_и_утверждены():
     assert kq.ball_rule("Экономика готова | Можно подавать")[0] == 3
     assert kq.ball_rule("Техническая часть | Квалификация")[0] == 7
     assert kq.ball_rule("Тендерное предложение выдано | Работаем с клиентом по тендеру")[0] == 7
     assert kq.ball_rule("Переторжка | Торги")[0] == 7
     assert kq.ball_rule("Сорсинг завершен / Ожидаем решение заказчика")[0] == 14
     assert kq.ball_rule("Стадия, которой нет в таблице") == kq.BALL_KAM_DEFAULT
-    assert kq.BALL_KAM_DEFAULT[0] == 7 and kq.PROPOSED is True
+    assert kq.BALL_KAM_DEFAULT[0] == 7 and kq.PROPOSED is False
     r = kq.build(None, None, None, СЕГОДНЯ)["rules"]
-    assert r["proposed"] is True and r["ballKam"][-1]["label"] == "прочие стадии"
+    assert r["proposed"] is False and r["ballKam"][-1]["label"] == "прочие стадии"
 
 
 def _deal(did, *, kam="10", closed=False, sale=50_000, orders=()):
