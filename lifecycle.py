@@ -26,6 +26,7 @@ RISK_DAYS = 14          # до срока клиента меньше двух �
 UTD_GRACE = 14          # УПД после доставки ждём две недели
 PAY_GRACE = 30          # без планового срока оплаты: платёж клиента ждём 30 дней после доставки
 WARRANTY_MONTHS = 12    # допущение до решения владельца: 12 мес. от доставки клиенту
+CLOSE_DAYS = 365        # УПД и оплату клиента ждём по доставкам за год, как зонд v53
 OTD_MONTHS = 12         # история «доставлено в срок» — помесячно за год
 SUP_MIN = 3             # поставщик в рейтинге надёжности — от 3 отгрузок с планом и фактом
 
@@ -80,11 +81,15 @@ def _p75(xs: list) -> float | None:
 
 
 def phase(o: dict, today: dt.date, warranty_months: int = WARRANTY_MONTHS) -> str:
-    """Фаза заказа по фактам. o — заказ, приведённый к фактам (поля ниже)."""
+    """Фаза заказа по фактам. o — заказ, приведённый к фактам (поля ниже). Заказ,
+    закрытый успехом, закрытие прошёл, даже если УПД или платёжки нет файлом:
+    платёжка клиента стала полем только в июле 2025, старые заказы её не имеют."""
     if o.get("delFact"):
-        if not o.get("utd") or not o.get("clientPaid"):
+        if o.get("live") and (not o.get("utd") or not o.get("clientPaid")):
             return "close"
         return "warranty" if _add_months(o["delFact"], warranty_months) >= today else "done"
+    if o.get("success"):
+        return "done"                     # закрыт без даты доставки: гарантию не от чего считать
     if o.get("shipFact") or o.get("inbFact"):
         return "move"
     if (o.get("supPaidPct") or 0) > 0 or o.get("prodConf"):
@@ -135,6 +140,10 @@ def forecast(o: dict, today: dt.date, med: dict, sup_slip: dict) -> dt.date | No
             base = o["created"] + dt.timedelta(days=med["toShip"])
         else:
             return None
+        # не отгружен: путь к клиенту не начнётся раньше сегодняшнего дня — иначе
+        # прошедшая плановая отгрузка тянула прогноз назад и сигнал молчал там,
+        # где он нужнее всего
+        base = max(base, today)
     if rest is None:
         return None
     return max(today, base + dt.timedelta(days=round(rest)))
@@ -145,11 +154,12 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None) -> list
     fc — прогноз доставки (forecast): позже срока клиента — ранний сигнал."""
     out: list[tuple[str, int | None]] = []
     dl, fact = o.get("dl"), o.get("delFact")
+    shipped = o.get("shipFact") or o.get("inbFact")      # пришёл на склад — значит, отгружен
     if o.get("live"):
         if dl and not fact:
             if dl < today:
                 out.append(("late", (today - dl).days))
-            elif (dl - today).days <= RISK_DAYS and not o.get("shipFact"):
+            elif (dl - today).days <= RISK_DAYS and not shipped:
                 out.append(("risk", (dl - today).days))
             elif fc and fc > dl:
                 out.append(("forecast", (fc - dl).days))
@@ -157,19 +167,22 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None) -> list
             if plan and plan > dl and dl >= today:
                 out.append(("planAfterDl", (plan - dl).days))
         sp = o.get("shipPlan")
-        if sp and not o.get("shipFact") and not fact and sp < today:
+        if sp and not shipped and not fact and sp < today:
             out.append(("shipSlip", (today - sp).days))
         if not dl and not fact:
             out.append(("noDl", None))
-    if fact:
-        since = (today - fact).days
-        if not o.get("utd") and since > UTD_GRACE:
-            out.append(("noUtd", since))
-        if not o.get("clientPaid"):
-            due = o.get("payPlan") or (fact + dt.timedelta(days=PAY_GRACE))
-            if due < today:
-                out.append(("unpaid", (today - due).days))
-    elif o.get("success") and o.get("closedRecent"):
+        # закрытие — только у живого заказа и только за CLOSE_DAYS: закрытый заказ
+        # закрытие прошёл, а старые доставки без файла платёжки — пробел учёта до
+        # появления поля, а не долг клиента
+        if fact and (today - fact).days <= CLOSE_DAYS:
+            since = (today - fact).days
+            if not o.get("utd") and since > UTD_GRACE:
+                out.append(("noUtd", since))
+            if not o.get("clientPaid"):
+                due = o.get("payPlan") or (fact + dt.timedelta(days=PAY_GRACE))
+                if due < today:
+                    out.append(("unpaid", (today - due).days))
+    elif o.get("success") and o.get("closedRecent") and not fact:
         out.append(("noFact", None))
     return out
 
@@ -185,37 +198,55 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     ph: dict[str, dict] = {k: {"n": 0, "late": 0, "risk": 0, "orders": 0} for k, _ in PHASES}
     ph_deals: dict[str, set] = defaultdict(set)
 
+    def _nm(v) -> str:
+        return v if v not in (None, "", "—") else ""
+
     def owner(o: dict, d: dict | None) -> str:
-        return o.get("oss") or (d or {}).get("oss") or (d or {}).get("manager") or "—"
+        """ОСС заказа → ОСС сделки (поле сделки, не склейка ОСС всех заказов) →
+        ответственный сделки."""
+        d = d or {}
+        return _nm(o.get("oss")) or _nm(d.get("ossDeal")) or _nm(d.get("manager")) or "—"
+
+    def gone(name: str) -> bool:
+        return name.endswith("(уволен)")      # contracts.who подписывает ушедших так
 
     lead, sup_rel = speeds(orders, today)
     med = {k: _median(v) for k, v in lead.items()}
     sup_slip = {k: _median(v) for k, v in sup_rel.items() if len(v) >= SUP_MIN}
+    # вселенная — та же, что у таблицы сделок: заказы известных сделок, без
+    # проигранных; у закрытой (выигранной) сделки сроки заказов уже не отклонения
+    СРОКИ = {"late", "risk", "forecast", "shipSlip", "planAfterDl", "noDl"}
+    in_scope = []
     for o in orders:
         d = deal_by.get(o.get("deal"))
-        if d and d.get("lost"):
+        if not d or d.get("lost"):
             continue
+        in_scope.append((o, d))
         p = phase(o, today, warranty_months)
         fc = forecast(o, today, med, sup_slip)
         exc = order_exceptions(o, today, fc)
-        if p in ph and (o.get("live") or p in ("close", "warranty")):
+        if d.get("closed"):
+            exc = [(c, n) for c, n in exc if c not in СРОКИ]
+        in_tile = p in ph and (o.get("live") or p == "warranty")
+        if in_tile:
             ph[p]["orders"] += 1
             ph_deals[p].add(o.get("deal"))
             ph[p]["late"] += any(c == "late" for c, _ in exc)
-            ph[p]["risk"] += any(c == "risk" for c, _ in exc)
+            ph[p]["risk"] += any(c in ("risk", "forecast") for c, _ in exc)
         for code, days in exc:
             counts[code] += 1
             sev, what, act = EXC[code]
+            w = owner(o, d)
             queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
-                          "who": owner(o, d), "whoGone": bool(o.get("ossGone")),
+                          "who": w, "whoGone": gone(w),
                           "deal": o.get("deal"), "seq": (d or {}).get("seq") or o.get("seq") or 0,
                           "customer": (d or {}).get("customer") or "—", "order": o.get("id"),
                           "title": o.get("title") or "", "sup": o.get("sup") or "—",
                           "dl": o["dl"].strftime("%d.%m.%Y") if o.get("dl") else "",
                           "fc": fc.strftime("%d.%m.%Y") if fc else "",
                           # КАМ сделки — в копию: оплата клиента и перенос срока — его разговор с клиентом
-                          "kam": (d or {}).get("manager") or "",
-                          "phase": p})
+                          "kam": _nm(d.get("manager")),
+                          "phase": p if in_tile else ""})
     for k in ph:
         ph[k]["n"] = len(ph_deals[k])
 
@@ -233,12 +264,12 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             codes.append(("noOrder", round(d["firstLag"])))
         if d.get("managerGone") or d.get("ossGone"):
             codes.append(("gone", None))
+        w = _nm(d.get("ossDeal")) or _nm(d.get("manager")) or "—"
         for code, days in codes:
             counts[code] += 1
             sev, what, act = EXC[code]
             queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
-                          "who": d.get("oss") if d.get("oss") not in (None, "", "—") else d.get("manager") or "—",
-                          "whoGone": bool(d.get("managerGone") or d.get("ossGone")),
+                          "who": w, "whoGone": gone(w), "kam": _nm(d.get("manager")),
                           "deal": d["deal"], "seq": d.get("seq") or 0, "customer": d.get("customer") or "—",
                           "order": "", "title": d.get("title") or "", "sup": "", "dl": "", "phase": ""})
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
@@ -274,14 +305,10 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     suppliers.sort(key=lambda x: (x["pct"], -(x["medSlip"] or 0)))
 
     # хозяева: живые заказы, исключения и доставка в срок за 90 дней
-    people: dict[str, dict] = defaultdict(lambda: {"live": 0, "exc": 0, "late": 0, "n90": 0, "ok90": 0, "gone": False})
-    for o in orders:
-        d = deal_by.get(o.get("deal"))
-        if d and d.get("lost"):
-            continue
+    people: dict[str, dict] = defaultdict(lambda: {"live": 0, "exc": 0, "late": 0, "n90": 0, "ok90": 0})
+    for o, d in in_scope:
         w = owner(o, d)
         p = people[w]
-        p["gone"] = p["gone"] or bool(o.get("ossGone"))
         p["live"] += bool(o.get("live"))
         f, dl = o.get("delFact"), o.get("dl")
         if f and dl and 0 <= (today - f).days <= 90:
@@ -290,15 +317,16 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     for q in queue:
         people[q["who"]]["exc"] += 1
         people[q["who"]]["late"] += q["code"] == "late"
-    people_rows = sorted(({"who": k, **v, "pct90": round(v["ok90"] / v["n90"] * 100) if v["n90"] else None}
+    people_rows = sorted(({"who": k, **v, "gone": gone(k),
+                           "pct90": round(v["ok90"] / v["n90"] * 100) if v["n90"] else None}
                           for k, v in people.items() if v["live"] or v["exc"]),
                          key=lambda x: (-x["exc"], -x["live"]))
 
-    warranty = {"months": warranty_months, "assumed": True,
-                "active": sum(1 for o in orders if o.get("delFact")
-                              and _add_months(o["delFact"], warranty_months) >= today),
-                "ending30": sum(1 for o in orders if o.get("delFact")
-                                and today <= _add_months(o["delFact"], warranty_months) <= today + dt.timedelta(days=30)),
+    # гарантия — тот же набор, что плитка фазы «Гарантия»
+    in_w = [o for o, _ in in_scope if phase(o, today, warranty_months) == "warranty"]
+    warranty = {"months": warranty_months, "assumed": True, "active": len(in_w),
+                "ending30": sum(1 for o in in_w
+                                if _add_months(o["delFact"], warranty_months) <= today + dt.timedelta(days=30)),
                 "claims": None}
     return {
         "asOf": today.strftime("%d.%m.%Y"),

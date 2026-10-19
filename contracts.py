@@ -557,6 +557,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "manager": who(d.get("ASSIGNED_BY_ID"))[0] or "—",
             "oss": (", ".join(sorted({o["oss"] for o in ords_det if o["oss"]}))[:60]
                     or who(d.get(OSS_DEAL))[0] or "—"),
+            # ОСС из поля сделки — хозяин пунктов очереди уровня сделки (lifecycle);
+            # «oss» выше — склейка ОСС всех заказов, для таблицы
+            "ossDeal": who(d.get(OSS_DEAL))[0],
             # сделку или её живые заказы ведёт уволенный: работа без хозяина
             "managerGone": who(d.get("ASSIGNED_BY_ID"))[1],
             "ossGone": (any(o["ossGone"] for o in ords_det if o["live"])
@@ -913,8 +916,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "last": a["last"], "curs": ", ".join(sorted(a["curs"])),
         # отгрузка к своей же плановой дате за год (lifecycle): выбор поставщика
         # сорсингом опирается на то, как он реально отгружает
+        # доля «в срок» — от SUP_MIN отгрузок, как в рейтинге пульта: 0 % из одной
+        # отгрузки на день позже — не оценка поставщика
         "otN": (life["supAll"].get(supl.get(sid) or "") or {}).get("n", 0),
-        "otPct": (life["supAll"].get(supl.get(sid) or "") or {}).get("pct"),
+        "otPct": ((life["supAll"].get(supl.get(sid) or "") or {}).get("pct")
+                  if (life["supAll"].get(supl.get(sid) or "") or {}).get("n", 0) >= lifecycle.SUP_MIN else None),
         "otSlip": (life["supAll"].get(supl.get(sid) or "") or {}).get("medSlip"),
     } for sid, a in sup_agg.items()), key=lambda r: -r["buy"])
     top10 = sum(r["buy"] for r in sup_rows[:10])

@@ -41,6 +41,8 @@ on:
       - insights.py
       - premia.py
       - presale.py
+      - kprules.py
+      - lifecycle.py
       - scripts/live_check.py
       - .github/workflows/live-check.yml
   workflow_dispatch:

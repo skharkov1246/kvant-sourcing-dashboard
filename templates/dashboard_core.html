@@ -1828,7 +1828,7 @@ function renderContracts(){
     const codes=Object.keys(LB).filter(k=>C[k]);
     h+=`<div class="secttl" id="lfQs"><b>·</b> Что делать сегодня <span id="lfQn" class="dimv" style="font-weight:400"></span>${qmark('ct.queue')}</div>`
      +`<section class="card"><div class="statleg" style="margin:0 0 8px" id="lfChips"><span class="stchip on" data-c="">Все <b>${Q.length}</b></span>${codes.map(k=>`<span class="stchip" data-c="${k}">${_esc(LB[k])} <b>${C[k]}</b></span>`).join('')}</div>`
-     +`<div style="margin-bottom:6px"><select id="lfWho" class="search" style="min-width:220px;max-width:100%"><option value="">Все: ОСС и КАМы</option>${[...new Set(Q.map(x=>x.who).concat(Q.map(x=>x.kam).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'ru')).map(w=>`<option>${_esc(w)}</option>`).join('')}</select></div>`
+     +`<div style="margin-bottom:6px"><select id="lfWho" class="search" style="min-width:220px;max-width:100%"><option value="">Все: ОСС и КАМы</option>${[...new Set(Q.map(x=>x.who).concat(Q.map(x=>x.kam).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'ru')).map(w=>`<option value="${_esc(w)}">${_esc(w)}</option>`).join('')}</select></div>`
      +`<div class="twrap"><table class="lft"><thead><tr><th>Что случилось</th><th>№ · заказчик</th><th>Заказ · поставщик</th><th>Хозяин</th><th class="r">Дней</th><th>Что сделать</th></tr></thead><tbody id="lfQb"></tbody></table></div><div id="lfMore"></div></section>`;
     const M=(L.otd||{}).months||[], LD=L.lead||{};
     const otdBars=M.map(m=>`<div class="c" title="${m.m}: в срок ${m.ontime} из ${m.n}${m.medLate!=null?` · медиана опоздания ${Math.round(m.medLate)} дн`:''}"><span class="mono">${m.pct!=null?m.pct+'%':'—'}</span><i class="${m.pct!=null&&m.pct<80?'low':''}" style="height:${m.pct!=null?Math.max(3,m.pct*0.8):0}%"></i><span>${m.m.slice(0,2)}</span></div>`).join('');
@@ -2005,6 +2005,7 @@ function renderContracts(){
     document.getElementById('lfPh').addEventListener('click',e=>{const c=e.target.closest('.actile'); if(c)phPick(c);});
     document.getElementById('lfPh').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return; const c=e.target.closest('.actile'); if(!c)return; e.preventDefault(); phPick(c);});
     document.getElementById('lfMore').addEventListener('click',e=>{if(e.target.id==='lfAll'){qall=true; qrows();}});
+    document.getElementById('lfMore').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.id==='lfAll'){e.preventDefault(); qall=true; qrows();}});
     document.getElementById('lfQb').addEventListener('click',e=>{const tr=e.target.closest('tr[data-ct]'); if(!tr)return; const x=byDeal[tr.dataset.ct]; if(x)openContract(x);});
     el.querySelectorAll('tr[data-who]').forEach(tr=>tr.addEventListener('click',()=>{qw=tr.dataset.who; document.getElementById('lfWho').value=qw; qrows(); goQ();}));
   }
@@ -2062,9 +2063,11 @@ function renderSuppliers(){
   function rows(){
     let r=X.rows;
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.name||'')+' '+(x.clients||'')).toLowerCase().includes(s));}
-    r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
+    // «Отгрузка в срок» без данных — всегда в конце списка, в обе стороны сортировки
+    r=r.slice().sort((a,b)=>{ if(sortKey==='otPct'&&(a.otPct==null||b.otPct==null)) return (a.otPct==null)-(b.otPct==null);
+      return NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir; });
     document.getElementById('spCount').textContent=`(${r.length} из ${X.rows.length})`;
-    document.getElementById('spBody').innerHTML=r.map((x,i)=>`<tr><td class="r dimv mono">${i+1}</td><td><div class="who">${_esc(x.name)}</div>${x.clients?`<div class="dep">для: ${_esc(x.clients)}</div>`:''}</td><td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div><div class="dep">${x.curs?_esc(x.curs):''}</div></td><td class="r"><div class="mono${x.otPct!=null&&x.otPct<70?' nrc':''}">${x.otPct!=null?x.otPct+'%':'—'}</div><div class="dep">${x.otN?x.otN+' отгр.'+(x.otSlip?` · ${x.otSlip>0?'+':''}${Math.round(x.otSlip)} дн`:''):''}</div></td><td class="r mono">${x.share}%</td><td class="r mono">${x.norders}</td><td class="r mono">${x.nclients}</td><td class="dep">${x.last||'—'}</td></tr>`).join('')||'<tr><td colspan="8" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+    document.getElementById('spBody').innerHTML=r.map((x,i)=>`<tr><td class="r dimv mono">${i+1}</td><td><div class="who">${_esc(x.name)}</div>${x.clients?`<div class="dep">для: ${_esc(x.clients)}</div>`:''}</td><td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div><div class="dep">${x.curs?_esc(x.curs):''}</div></td><td class="r"><div class="mono${x.otPct!=null&&x.otPct<70?' nrc':''}">${x.otPct!=null?x.otPct+'%':'—'}</div><div class="dep">${x.otN?x.otN+' отгр.'+(x.otPct==null?' · мало для оценки':(x.otSlip?` · ${x.otSlip>0?'+':''}${Math.round(x.otSlip)} дн`:'')):''}</div></td><td class="r mono">${x.share}%</td><td class="r mono">${x.norders}</td><td class="r mono">${x.nclients}</td><td class="dep">${x.last||'—'}</td></tr>`).join('')||'<tr><td colspan="8" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
   document.getElementById('spSearch').addEventListener('input',e=>{q=e.target.value; rows();});
