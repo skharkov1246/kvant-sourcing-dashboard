@@ -254,8 +254,13 @@ def _with_tabs_opened(path: Path) -> Path:
     html = path.read_text(encoding="utf-8", errors="replace")
     if "</body>" not in html:
         return path
+    # Раздел «КАМы» вкладки «КАМ и продукт-оунеры» — подменю, а не вкладка: он
+    # рисуется по клику (renderPeople с очередью КАМа). Открываем и его — иначе
+    # ошибка в очереди КАМа доезжала бы до прода, а вкладка числилась бы целой.
     inject = ("<script>try{[%s].forEach(function(t){try{window.ensureTab&&window.ensureTab(t)}"
-              "catch(e){console.error('вкладка '+t+': '+e)}})}catch(e){console.error('ensureTab: '+e)}</script>"
+              "catch(e){console.error('вкладка '+t+': '+e)}})}catch(e){console.error('ensureTab: '+e)}"
+              "try{var b=document.querySelector('#tab-reps [data-r=\"role:kam\"]');if(b)b.click()}"
+              "catch(e){console.error('раздел КАМы: '+e)}</script>"
               % ",".join(f"'{t}'" for t in LAZY_TABS))
     tmp = path.parent / (path.stem + ".tabs.html")
     tmp.write_text(html.replace("</body>", inject + "</body>", 1), encoding="utf-8")

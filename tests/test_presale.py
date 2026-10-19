@@ -97,3 +97,11 @@ def test_по_сорсеру_и_ушедший():
     assert by["Иванов И."]["open"] == 1 and by["Иванов И."]["lost"] == 1 and by["Иванов И."]["norfq"] == 1
     assert by["сорсер не назначен"]["open"] == 1
     assert _ps()["bySourcer"][-1]["id"] == "", "строка «не назначен» — последней"
+
+
+def test_кам_только_из_поля_и_открытые_полным_списком():
+    """КАМ сделки — поле «КАМ»; ответственный — исполнитель (сорсер или коммерсант), не КАМ."""
+    ps = _ps()
+    assert all(r["kamId"] == "" and r["kam"] == presale.KAM_NONE for r in ps["openDeals"])
+    assert {r["id"] for r in ps["openDeals"]} == {"1", "2", "3"}
+    assert ps["head"]["chatGate"] is False and ps["head"]["staleStage"] == ps["head"]["stale"]

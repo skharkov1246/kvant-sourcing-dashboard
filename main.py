@@ -21,11 +21,13 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import advisor as advisor_mod
+import chat_activity
 import company as company_mod
 import config
 import dashboard
 import insights as insights_mod
 import kam as kam_mod
+import kamqueue as kamqueue_mod
 import contracts as contracts_mod
 import metrics as metrics_mod
 import people as people_mod
@@ -525,24 +527,41 @@ def run(args) -> int:
 
     # Воронка пресейла: сделки, которые ведёт сорсинг до ТКП. Стадии — из общего
     # справочника (тот же вызов, что client.stages), запросы — уже выгруженные rfqs;
-    # новое чтение портала одно — сами сделки воронки (их около сотни).
+    # новое чтение портала — сами сделки воронки (их около сотни) и чаты застоявшихся.
+    # Сделки читаются здесь, а блок считается после реализации: простой по стадии
+    # подтверждает чат сделки (золотое правило 19.10.2026), а бюджет чтения чатов
+    # один на сборку — первой его тратит реализация (там деньги), пресейл — остатком.
+    chat_reader = chat_activity.Reader(client, service_ids)
+    _presale_in: dict | None = None
     try:
         _ps = presale_mod.find_category(category_names) or presale_mod.find_category(
             people_mod.deal_categories(client))
         if _ps:
             _pdeals = client.list_deals_fast(filter={"CATEGORY_ID": int(_ps[0])}, select=presale_mod.DEAL_SELECT)
-            m["presale"] = presale_mod.compute(
-                cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
-                rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids)
-            _h = m["presale"]["head"]
-            print(f"• Воронка пресейла #{_ps[0]}: сделок {_h['total']}, открыто {_h['open']}, отказ {_h['lost']}, "
-                  f"выиграно {_h['won']}; с запросом {_h['withRfqPct']} %, запросов {_h['rfq']}; "
-                  f"без сорсера {_h['noSrc']}, без запросов {_h['noRfq']}, стоят > {_h['staleDays']} дн {_h['stale']}, "
-                  f"ведёт ушедший {_h['gone']}")
+            _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
+                               rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids)
         else:
             print("• Воронка пресейла: воронки с таким именем в портале нет")
     except Exception as e:                                   # noqa: BLE001
         print(f"  ⚠ воронка пресейла пропущена: {type(e).__name__}: {без_вебхука(e)}")
+
+    def _presale() -> None:
+        """Блок пресейла с проверкой простоя чатом — общим читателем сборки."""
+        if not _presale_in:
+            return
+        try:
+            m["presale"] = presale_mod.compute(**_presale_in, chat_reader=chat_reader)
+            _h = m["presale"]["head"]
+            print(f"• Воронка пресейла #{_presale_in['cid']}: сделок {_h['total']}, открыто {_h['open']}, "
+                  f"отказ {_h['lost']}, выиграно {_h['won']}; с запросом {_h['withRfqPct']} %, запросов {_h['rfq']}; "
+                  f"без сорсера {_h['noSrc']}, без запросов {_h['noRfq']}, ведёт ушедший {_h['gone']}; "
+                  f"в стадии > {_h['staleDays']} дн {_h['staleStage']}: стоят (чат подтвердил) {_h['stale']}, "
+                  f"в чате работа {_h['staleChat']}, чат не проверен {_h['staleUnverified']}")
+            _cs = chat_reader.stats()
+            print(f"  чаты сделок за сборку: прочитано {_cs['reads']} из бюджета {_cs['budget']}"
+                  f"{'; чтение остановлено лимитом портала' if _cs['stopped'] else ''}")
+        except Exception as e:                               # noqa: BLE001
+            print(f"  ⚠ воронка пресейла пропущена: {type(e).__name__}: {без_вебхука(e)}")
 
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
@@ -633,10 +652,14 @@ def run(args) -> int:
     slug = (args.period or f"{p.start}_{p.end}").replace(":", "_")
     (out_dir).mkdir(parents=True, exist_ok=True)
     metrics_path = out_dir / f"metrics_{slug}.json"
-    metrics_path.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"  ✓ метрики: {metrics_path}")
+
+    def _write_metrics() -> None:
+        metrics_path.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"  ✓ метрики: {metrics_path}")
 
     if args.dry_run:
+        _presale()                 # реализации в этом режиме нет: бюджет чатов — пресейлу
+        _write_metrics()
         if not args.no_summary:
             _print_summary(m)
         _print_snapshot(client)
@@ -764,7 +787,8 @@ def run(args) -> int:
     contracts_data = None
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
-        contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids)
+        contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
+                                               chat_reader=chat_reader)
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
         _ch = (contracts_data.get("head") or {}).get("chat") or {}
         print(f"  чаты сделок с простоем по стадии: активных {_ch.get('active', 0)} (не подвисли), "
@@ -778,6 +802,26 @@ def run(args) -> int:
               f"{_sp.get('benchRecent', 0)} стадий, медиана цикла заказа {_sp.get('medCycle')} дн")
     except Exception as e:
         print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}: {e}")
+
+    # пресейл — после реализации: чаты сделок читает тот же читатель, остатком бюджета
+    _presale()
+    _write_metrics()
+
+    # Очередь КАМа «что делать сегодня» (kamqueue.py): пресейл с мячом у КАМа, сроки и
+    # закрытие реализации, сделки без КАМа. Едет в данных вкладки «КАМ и продукт-оунеры»
+    # (people → раздел «КАМы») и вместе с ними — в живую сверку (modules.json, «people»).
+    if people_data is not None:
+        try:
+            people_data["kamQueue"] = kamqueue_mod.build(
+                m.get("presale"), (contracts_data or {}).get("life"), (contracts_data or {}).get("rows"),
+                p.end, people=roster)
+            _kq = people_data["kamQueue"]["head"]
+            # только счётчики: имена и суммы в публичный журнал не идут (правило 17)
+            print(f"  очередь КАМа: пунктов {_kq['n']} у {_kq['kams']} КАМов — мяч у КАМа сверх порога "
+                  f"{_kq['ballKam']}, срок клиента ≤ 14 дн. {_kq['soon']}, не оплачено {_kq['unpaid']}, "
+                  f"без КАМа {_kq['noKam']}; снято живым чатом {_kq['chatActive']}")
+        except Exception as e:                               # noqa: BLE001
+            print(f"  ⚠ очередь КАМа пропущена: {type(e).__name__}")
 
     try:
         print("• Коммерсанты (персональные дашборды + контрольные точки)…")

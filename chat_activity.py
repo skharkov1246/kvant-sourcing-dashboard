@@ -12,6 +12,10 @@ MAX_CHATS на сборку, сначала самые денежные. Чел�
   unread  — чат не прочитан (нет доступа у вебхука, ошибка): подвисшей не считаем,
             помечаем «чат не проверен»;
   skipped — не хватило бюджета чтения: так же, как unread.
+
+Бюджет — один на сборку (Reader): main.py заводит одного читателя и отдаёт его
+сначала реализации (contracts.py), потом пресейлу (presale.py). Пресейл читает
+остатком, и стоп по лимиту портала, случившийся у реализации, действует и на него.
 """
 from __future__ import annotations
 
@@ -55,53 +59,86 @@ def classify(last: dt.date | None, today: dt.date, readable: bool) -> str:
     return "quiet"
 
 
+class Reader:
+    """Один бюджет чтения чатов на сборку — общий для всех, кто спрашивает.
+
+    Вкладки читают чаты по очереди: сначала реализация (там деньги), потом пресейл
+    остатком бюджета. Бюджет — число ЗАПРОСОВ к порталу (сделка без id чата его не
+    тратит), а первый лимит портала останавливает чтение для всех следующих вызовов:
+    иначе пресейл после стопа реализации снова упирался бы в тот же лимит.
+    Сделка, уже прочитанная в этой сборке, второй раз портал не спрашивает."""
+
+    def __init__(self, client, service_ids: set[str] | None = None, budget: int = MAX_CHATS):
+        self.client = client
+        self.service_ids = {str(s) for s in (service_ids or set())}
+        self.budget = budget
+        self.reads = 0                    # запросов к порталу за сборку
+        self.stopped = False              # портал упёрся в лимит — дальше не читаем никому
+        self._seen: dict[str, dict] = {}
+
+    @property
+    def left(self) -> int:
+        return max(0, self.budget - self.reads)
+
+    def stats(self) -> dict:
+        """Для журнала: только счётчики."""
+        return {"reads": self.reads, "budget": self.budget, "left": self.left, "stopped": self.stopped}
+
+    def check(self, candidates: list[tuple[str, str, float]], today: dt.date) -> dict[str, dict]:
+        """candidates — [(id сделки, id чата, вес для порядка)] → {id сделки: {status, last, days}}.
+        Сначала — самые тяжёлые (по весу); сверх остатка бюджета — skipped."""
+        out: dict[str, dict] = {}
+        # чтение чатов — необязательная часть сборки: на лимите портала ждём не дольше
+        # минуты (у клиента по умолчанию — до 30 мин на вызов), потом останавливаемся
+        бюджет_было = getattr(self.client, "limit_wait_budget", None)
+        if бюджет_было is not None:
+            self.client.limit_wait_budget = min(бюджет_было, LIMIT_WAIT_S)
+        try:
+            self._check(candidates, today, out)
+        finally:
+            if бюджет_было is not None:
+                self.client.limit_wait_budget = бюджет_было
+        return out
+
+    def _check(self, candidates, today, out) -> None:
+        for did, cid, _w in sorted(candidates, key=lambda x: -(x[2] or 0)):
+            if did in self._seen:
+                out[did] = dict(self._seen[did])
+                continue
+            if not cid:
+                out[did] = {"status": "unread", "last": "", "days": None, "why": "nochat"}
+                continue
+            if self.reads >= self.budget or self.stopped:
+                out[did] = {"status": "skipped", "last": "", "days": None}
+                continue
+            self.reads += 1
+            try:
+                r = self.client.call("im.dialog.messages.get", {"DIALOG_ID": f"chat{cid}", "LIMIT": MESSAGES},
+                                     retries=1)
+            except Exception as e:            # нет доступа у вебхука, лимит, сбой
+                r = None
+                if type(e).__name__ == "BitrixLimitError":
+                    # одиночный вызов на лимите ждёт до бюджета ожидания клиента (30 мин):
+                    # 400 чатов так пережили бы сборку — первый лимит останавливает чтение
+                    self.stopped = True
+                elif "ACCESS" in str(e).upper():
+                    out[did] = self._seen[did] = {"status": "unread", "last": "", "days": None, "why": "denied"}
+                    continue
+            # прочитан — только настоящий ответ со списком сообщений: пустой ответ не «тишина»
+            readable = isinstance(r, dict) and isinstance(r.get("messages"), list)
+            msgs = r["messages"] if readable else []
+            last = last_human(msgs, self.service_ids) if readable else None   # максимум даты: порядок не задан
+            out[did] = {"status": classify(last, today, readable),
+                        "last": last.strftime("%d.%m.%Y") if last else "",
+                        "days": (today - last).days if last else None}
+            if readable:
+                self._seen[did] = dict(out[did])
+
+
 def check(client, candidates: list[tuple[str, str, float]], today: dt.date,
           service_ids: set[str] | None = None, budget: int = MAX_CHATS) -> dict[str, dict]:
-    """candidates — [(id сделки, id чата, вес для порядка)] → {id сделки: {status, last, days}}.
-    Сначала — самые тяжёлые (по весу); сверх бюджета — skipped."""
-    service_ids = {str(s) for s in (service_ids or set())}
-    out: dict[str, dict] = {}
-    # чтение чатов — необязательная часть сборки: на лимите портала ждём не дольше
-    # минуты (у клиента по умолчанию — до 30 мин на вызов), потом останавливаемся
-    бюджет_было = getattr(client, "limit_wait_budget", None)
-    if бюджет_было is not None:
-        client.limit_wait_budget = min(бюджет_было, LIMIT_WAIT_S)
-    try:
-        return _check(client, candidates, today, service_ids, budget, out)
-    finally:
-        if бюджет_было is not None:
-            client.limit_wait_budget = бюджет_было
-
-
-def _check(client, candidates, today, service_ids, budget, out) -> dict[str, dict]:
-    стоп = False                          # портал упёрся в лимит — дальше не читаем
-    for i, (did, cid, _w) in enumerate(sorted(candidates, key=lambda x: -(x[2] or 0))):
-        if not cid:
-            out[did] = {"status": "unread", "last": "", "days": None, "why": "nochat"}
-            continue
-        if i >= budget or стоп:
-            out[did] = {"status": "skipped", "last": "", "days": None}
-            continue
-        try:
-            r = client.call("im.dialog.messages.get", {"DIALOG_ID": f"chat{cid}", "LIMIT": MESSAGES},
-                            retries=1)
-        except Exception as e:            # нет доступа у вебхука, лимит, сбой
-            r = None
-            if type(e).__name__ == "BitrixLimitError":
-                # одиночный вызов на лимите ждёт до бюджета ожидания клиента (30 мин):
-                # 400 чатов так пережили бы сборку — первый лимит останавливает чтение
-                стоп = True
-            elif "ACCESS" in str(e).upper():
-                out[did] = {"status": "unread", "last": "", "days": None, "why": "denied"}
-                continue
-        # прочитан — только настоящий ответ со списком сообщений: пустой ответ не «тишина»
-        readable = isinstance(r, dict) and isinstance(r.get("messages"), list)
-        msgs = r["messages"] if readable else []
-        last = last_human(msgs, service_ids) if readable else None   # максимум даты: порядок ответа не задан
-        out[did] = {"status": classify(last, today, readable),
-                    "last": last.strftime("%d.%m.%Y") if last else "",
-                    "days": (today - last).days if last else None}
-    return out
+    """Разовая проверка со своим бюджетом — то же, что Reader(...).check(...)."""
+    return Reader(client, service_ids, budget).check(candidates, today)
 
 
 def summary(res: dict[str, dict]) -> dict:

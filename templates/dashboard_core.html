@@ -350,6 +350,9 @@
   .srccmp.used .sb i{background:linear-gradient(90deg,var(--a),var(--a2))}
   .srccmp .sv{font-family:var(--mono);text-align:right;white-space:nowrap}
   .srccmp .sd{font-family:var(--mono);text-align:right;font-size:11px;white-space:nowrap}
+  /* разделы роли (КАМы, продукт-оунеры): пояснение справа длинное — переносится, а не
+     раздвигает страницу вбок на планшете и ноутбуке */
+  .pfit .srccmp .sd{white-space:normal;overflow-wrap:anywhere;min-width:0}
   .sd.ok{color:var(--ok)} .sd.mid{color:var(--a2)} .sd.bad{color:var(--nr)} .sd.dim{color:var(--dim)}
   .srcb.chk{color:var(--ok);background:rgba(63,167,102,.13)}
 
@@ -884,8 +887,15 @@ if (M.send && M.send.rows){
   document.getElementById('psWrap').hidden=false;
   const H=P.head, el=document.getElementById('psSec');
   const url=id=>`https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
-  const FL={gone:['ушёл сорсер',''],nosrc:['нет сорсера',''],norfq:['нет запросов',''],stale:['стоит','']};
-  const flag=(f,r)=>`<span class="psflag">${f==='stale'?`стоит ${r.days} дн`:FL[f][0]}</span>`;
+  const FL={gone:['ушёл сорсер',''],nosrc:['нет сорсера',''],norfq:['нет запросов',''],stale:['стоит',''],
+            staleChat:['в чате работа','soft'],staleUnverified:['чат не проверен','soft']};
+  // золотое правило чата: «стоит» — только при тишине в чате; работа в чате и
+  // непрочитанный чат — серые пометки, а не красный флаг
+  const flag=(f,r)=>{const c=r.chat||{}, F=FL[f]||[f,''];
+    const t=f==='stale'?`стоит ${r.days} дн${c.status==='quiet'?(c.days!=null?` · в чате тихо ${c.days} дн`:' · в чате людей не было'):''}`
+      :f==='staleChat'?`стоит ${r.days} дн · в чате работа ${c.days!=null?c.days+' дн назад':''}`
+      :f==='staleUnverified'?`стоит ${r.days} дн · чат не проверен`:F[0];
+    return `<span class="psflag${F[1]?' '+F[1]:''}">${t}</span>`;};
   const BL={head:'руководитель сорсинга',src:'сорсер',kam:'КАМ',real:'реализация','?':'не размечена','':'закрыта'};
   const kp=(lbl,val,meta,clz)=>`<div class="kpi ${clz||''}"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
   let h=`<h2>Воронка «${_esc(P.name)}» <span class="subtotal">сделок <b>${H.total}</b></span></h2>`
@@ -896,8 +906,9 @@ if (M.send && M.send.rows){
    +kp('До первого запроса',H.lagMed!=null?H.lagMed+' дн':'—',`робот завёл ${H.robotRfqPct}% запросов`,'')
    +kp('Без сорсера',H.noSrc,`«Сорсер» заполнен у ${H.srcPct}% сделок`,H.noSrc?'warn':'')
    +kp('Без запросов',H.noRfq,`открыты ${H.noRfqDays}+ дн, ни одного запроса`,H.noRfq?'warn':'')
-   +kp('Стоят',H.stale,`в стадии дольше ${H.staleDays} дн`,H.stale?'warn':'')
+   +kp('Стоят',H.stale,H.chatGate?`в стадии дольше ${H.staleDays} дн, чат подтвердил · в чате работа ${H.staleChat||0} · чат не проверен ${H.staleUnverified||0}`:`в стадии дольше ${H.staleDays} дн`,H.stale?'warn':'')
    +`</div>`
+   +(H.chatGate?`<div class="note" style="margin-top:8px">Простой по стадии проверен чатом сделки (как в реализации, решение владельца 19.10.2026): в стадии дольше ${H.staleDays} дн — <b>${H.staleStage??(H.stale+(H.staleChat||0)+(H.staleUnverified||0))}</b>; из них стоят (чат подтвердил) <b>${H.stale}</b> · в чате работа <b>${H.staleChat||0}</b> · чат не проверен <b class="dimv">${H.staleUnverified||0}</b>. «В чате работа» — человек писал за последнюю неделю; «не проверен» — чат не прочитан (нет доступа, лимит портала, бюджет чтения), такая сделка видна в списке серой пометкой и в «стоят» не входит.</div>`:'')
    +`<div class="note" style="margin-top:8px">На ком мяч по открытым сделкам: руководитель сорсинга (назначить сорсера) <b>${H.ballHead||0}</b> · сорсеры <b>${H.ballSrc||0}</b> · КАМы <b>${H.ballKam||0}</b>${H.ballUnknown?` · <span class="nrc">стадия не размечена ${H.ballUnknown}</span>`:''}. Сделка остаётся за КАМом; пока мяч у сорсинга, она не входит в нагрузку КАМа.</div>`;
   // стадии и исходы
   const proc=P.stages.filter(s=>s.sem!=='F'&&s.sem!=='S'), mx=Math.max(1,...proc.map(s=>s.n));
@@ -916,9 +927,9 @@ if (M.send && M.send.rows){
    +`</tbody></table></div>`;
   // что делать
   const act=P.act||[];
-  h+=`<h2 style="margin-top:16px">Требует действия <span class="subtotal">сделок <b>${act.length}</b></span></h2><div class="note">Сначала — ушедший сорсер и сделки без сорсера (назначить), затем сделки без единого запроса поставщикам, затем застрявшие. Признаки сорсинга ставятся, только пока мяч у сорсинга; у сделок с мячом у КАМа — только застой. Клик — сделка в Битриксе.</div>`
+  h+=`<h2 style="margin-top:16px">Требует действия <span class="subtotal">сделок <b>${act.length}</b></span></h2><div class="note">Сначала — ушедший сорсер и сделки без сорсера (назначить), затем сделки без единого запроса поставщикам, затем застрявшие. Признаки сорсинга ставятся, только пока мяч у сорсинга; у сделок с мячом у КАМа — только застой. ${H.chatGate?'Застой — только при тишине в чате сделки: где в чате идёт работа, сделки в списке нет (если с ней больше нечего делать); чат не проверен — серая пометка. ':''}КАМ — только из поля «КАМ» сделки. Клик — сделка в Битриксе.</div>`
    +(act.length?`<div class="pswrap"><table><thead><tr><th>Сделка</th><th>Стадия</th><th class="r">Дней в стадии</th><th>Мяч у</th><th class="r">Запросов</th><th>Что не так</th></tr></thead><tbody>`
-   +act.map(r=>`<tr><td><a href="${url(r.id)}" target="_blank" rel="noopener">${_esc(r.t)}</a><div class="dep">заведена ${_dm(r.created)} · ${r.age} дн назад${r.kam?` · КАМ ${_esc(r.kam)}`:''}</div></td><td>${_esc(r.stageName)}</td><td class="num r">${r.days??'—'}</td><td>${BL[r.ball]||''}${r.who?`: ${_esc(r.who)}`:''}${r.whoGone?' <span class="gone">ушёл</span>':''}</td><td class="num r">${r.rfq}</td><td>${r.flags.map(f=>flag(f,r)).join('')}</td></tr>`).join('')
+   +act.map(r=>`<tr><td><a href="${url(r.id)}" target="_blank" rel="noopener">${_esc(r.t)}</a><div class="dep">заведена ${_dm(r.created)} · ${r.age} дн назад · ${r.kamId?`КАМ ${_esc(r.kam)}`:(r.kamId===''?'<span class="nrc">КАМ не указан</span>':(r.kam?`КАМ ${_esc(r.kam)}`:''))}</div></td><td>${_esc(r.stageName)}</td><td class="num r">${r.days??'—'}</td><td>${BL[r.ball]||''}${r.who?`: ${_esc(r.who)}`:''}${r.whoGone?' <span class="gone">ушёл</span>':''}</td><td class="num r">${r.rfq}</td><td>${r.flags.map(f=>flag(f,r)).join('')}</td></tr>`).join('')
    +`</tbody></table></div>`:'<div class="dimv">открытых сделок с проблемами нет</div>');
   el.innerHTML=h;
 })();
@@ -1335,6 +1346,7 @@ const METH={
   'd.groups':{t:'Продажи → закупка → маржа',what:'Главная таблица направления по группам отделов.',src:'crm.deal.list (ASSIGNED_BY_ID ∈ UF_DEPARTMENT группы) + Заказы поставщикам СП-172.',formula:'СП-172 = заказы ПОСТАВЩИКАМ (opportunity = закупка). Продажа = сумма родительской сделки. Контракт = сделка с ≥1 заказом. Колонки: сделок (YTD), пайплайн (Σ открытых продаж €), контрактов, продажи (Σ сумм сделок-контрактов €), закупка (Σ заказов €), маржа = продажи − закупка.',note:'Привязка к группе — через владельца сделки-родителя. Клик по строке — сделки и заказы группы.'},
   'd.rev':{t:'Выручка по группам',what:'Ранжирование групп по продажам (выручке).',formula:'Σ сумм сделок-контрактов группы (€); длина бара — относительно максимума в наборе.',note:'Клик — сделки и заказы группы.'},
   'p.kpi':{t:'Загрузка коммерческой роли',what:'Верхняя панель вкладок «КАМы» и «Продукт-оунеры»: сколько людей, сколько на них сделок и денег прямо сейчас.',src:'user.get (состав и признак ACTIVE) + crm.deal.list (открытые сделки, STAGE_SEMANTIC_ID=P) + Заказы поставщикам СП-172.',filt:'Технические воронки (тестовые, адаптационная, реклама) исключены. Сделки уволенных в роли не считаются — они в блоке «бесхозные».',formula:'«В проработке» = открытая сделка вне воронки реализации и без живого заказа. «В реализации» = воронка «Реализация» (кат.0) либо есть непроигранный заказ поставщику. Маржа = продажа − Σ заказов. Суммы к базовой € по курсам Bitrix.',note:'Один человек может вести и проработку, и реализацию; роли КАМ и продукт-оунер пересекаются на одной сделке — это норма, поэтому суммы вкладок не складываются.'},
+  'p.kamq':{t:'Что делать сегодня — КАМ',what:'Очередь КАМа: у каждого пункта КАМ, сделка, сколько дней и что сделать. Сверху — самое срочное: сорванный срок клиента, риск срока, прогноз позже срока, мяч у КАМа сверх порога, план доставки позже срока, неоплата, УПД; внизу — сделки без КАМа.',src:'Пресейл — сделки воронки «Пресейл» (стадия, дней в стадии, поле «КАМ», чат сделки). Реализация — очередь пульта реализации (заказы поставщикам СП-172 и сделки воронки реализации); сумма сделки — из «Реализации».',filt:'КАМ — только поле сделки «КАМ»: ответственный сделки — исполнитель, а не КАМ. Пункты реализации без КАМа не дублируются: такая сделка — один пункт «без КАМа» на руководителя КАМ. Сделка пресейла, у которой в чате за неделю писал человек, в очередь не идёт (золотое правило чата, 19.10.2026).',formula:'Мяч у КАМа — по стадии (таблица presale.BALL_RULES); порог дней в стадии: «Экономика готова | Можно подавать» 3, техническая часть и квалификация 7, тендер и переторжка 7, «Ожидаем решение заказчика» 14, согласование спецификации и прочие 7 — предложено, не утверждено. Срок сорван, риск, прогноз, план после срока, неоплата, УПД — по правилам пульта реализации; пункты одной сделки одного вида сведены в один (дней — наибольшее). Неоплата по давности: 1–30, 31–90, 90+ дн. «Срок клиента ≤ 14 дн.» — живые недоставленные заказы со сроком клиента от сегодня до 14 дней.',note:'Перенос срока — только письменно и с внесением новой даты в заказ: иначе сделка остаётся просроченной. Дату оплаты КАМ получает у клиента, ведёт оплату ответственный заказа.'},
   'p.promise':{t:'Обещания клиенту',what:'Сколько живых заказов поставщикам имеют срок клиенту и сколько из них сорвано.',src:'Смарт-процесс «Заказы поставщикам» (СП-172), поле «Date of deadline to deliver to customer» + стадия заказа.',formula:'Живой заказ — не проигран и не исполнен. «Со сроком» — дата заполнена; «сорван» — дата прошла, заказ ещё в работе. Медиана и максимум считаются только по сорванным.',note:'Заказ без срока — не «в порядке», а неизмеримый: просрочка сделки считается ИЗ заказа, и при пустом сроке сделка выглядит благополучной, хотя обещание по ней просто не записано. Поэтому «без срока» стоит рядом с «сорвано», а не прячется в знаменателе.'},
   'p.heads':{t:'Отделы без руководителя',what:'Где в структуре не заполнено поле «Руководитель» и кого можно назначить.',src:'department.get (поле UF_HEAD) + user.get: состав отдела, должность, дата приёма (UF_EMPLOYMENT_DATE).',formula:'Кандидат — тот, у кого должность руководительская (Head of…, Chief…, Директор, Руководитель, Начальник); при равенстве — кто дольше в компании. Показываются до четырёх человек отдела, чтобы выбор был виден целиком.',note:'Портал не назначает руководителя и не пишет ничего в Bitrix — это предложение к подтверждению. Отдел без действующих сотрудников помечен отдельно: там вопрос не к кадрам, а к структуре — такой узел либо наполняют, либо закрывают.'},
   'p.hyg':{t:'Гигиена Bitrix',what:'Состояние справочников и заполнения карточек — то, от чего зависит, считается ли управленческая цифра вообще.',src:'department.get (руководители отделов), user.get (состав и ACTIVE), crm.deal.list (открытые сделки без технических воронок): поля «КАМ», «Product leader», CLOSEDATE, OPPORTUNITY, COMPANY_ID, MOVED_TIME.',formula:'Каждая строка — факт против предложенной нормы. Проценты считаются от открытых сделок вне технических воронок. «Старых ролевых полей в ходу» — сколько из трёх устаревших полей-дублей ещё встречаются заполненными.',note:'Это не оценка людей: все строки чинятся настройкой портала и регламентом заполнения, а не работой коммерсантов. Нормы предложены мной и не утверждены владельцем. Замер 17.09.2026: 13 отделов из 48 без руководителя, плановая дата закрытия в будущем лишь у 2 % открытых карточек, 55 % открытых карточек без суммы или без клиента.'},
@@ -2149,6 +2161,74 @@ function openPeopleDeals(list,title,sub){
   ]);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
+// ---- очередь КАМа «что делать сегодня» (kamqueue.py): раздел «КАМы» вкладки
+// «КАМ и продукт-оунеры». Устроена как очередь реализации (lfQb): плитки, чипы по
+// виду, фильтр по КАМу, строки «что случилось — что сделать», первые 40 и «показать все».
+function _kqHtml(K,pid){
+  const H=K.head||{}, C=K.counts||{}, LB=K.labels||{}, Q=K.queue||[], U=K.upcoming14||[], RU=K.rules||{};
+  const kp=(code,lbl,val,meta,clz)=>`<div class="kpi ${clz||''} drill" data-kq="${code}" tabindex="0" role="button"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
+  const codes=Object.keys(LB).filter(k=>C[k]);
+  const opts=(K.byKam||[]).map(r=>`<option value="${_esc(r.id||'~')}">${_esc(r.name)}${r.gone?' (уволен)':''} — ${r.n||0}${r.soon?' · сроки '+r.soon:''}</option>`).join('');
+  const bk=(K.byKam||[]).filter(r=>r.n||r.soon);
+  const BR=(RU.ballKam||[]).map(x=>`${_esc(x.label||'прочие стадии')} — ${x.days} дн`).join(' · ');
+  return `<div class="secttl" id="${pid}s"><b>·</b> Что делать сегодня — КАМ <span id="${pid}n" class="dimv" style="font-weight:400"></span>${qmark('p.kamq')}</div>`
+   +`<section class="card"><div class="kpis" style="grid-template-columns:repeat(4,1fr)">`
+   +kp('ballKam','Мяч у КАМа сверх порога',H.ballKam||0,'пресейл: подача, тендер, решение заказчика стоят дольше порога',H.ballKam?'warn':'ok')
+   +kp('soon',`Срок клиента ≤ ${RU.soonDays||14} дн.`,H.soon||0,'живые заказы: сверить с ОСС и подтвердить клиенту','')
+   +kp('unpaid','Не оплачено',H.unpaid||0,'доставлено, срок оплаты клиента прошёл',H.unpaid?'warn':'ok')
+   +kp('noKam','Без КАМа',H.noKam||0,'открытые сделки без поля «КАМ» — назначить',H.noKam?'warn':'ok')
+   +`</div><div class="note">Пункты пресейла — мяч у КАМа (по стадии) и сделка стоит дольше порога; реализации — срок клиента, оплата и УПД, где разговор с клиентом ведёт КАМ (один пункт на сделку и вид). Пороги <b>предложены, не утверждены</b>: ${BR}.${H.chatActive?` Снято живым чатом сделки: <b>${H.chatActive}</b> — там идёт работа.`:''} Клик по плитке или чипу — фильтр; по строке реализации — карточка сделки.</div>`
+   +`<div class="statleg" style="margin:0 0 8px" id="${pid}c"><span class="stchip on" data-c="" tabindex="0">Все <b>${Q.length}</b></span>${codes.map(k=>`<span class="stchip" data-c="${k}" tabindex="0">${_esc(LB[k])} <b>${C[k]}</b></span>`).join('')}${U.length?`<span class="stchip" data-c="soon" tabindex="0">Срок клиента ≤ ${RU.soonDays||14} дн. <b>${U.length}</b></span>`:''}</div>`
+   +`<div style="margin-bottom:6px"><label class="dimv" for="${pid}w" style="font-size:11px;margin-right:6px">КАМ</label><select id="${pid}w" class="search" style="min-width:200px;max-width:100%"><option value="*">Все КАМы</option>${opts}</select></div>`
+   +`<div class="twrap"><table class="lft"><thead><tr><th>Что случилось</th><th>№ · клиент</th><th>КАМ</th><th class="r">Дней</th><th class="r">Сумма сделки</th><th>Что сделать</th></tr></thead><tbody id="${pid}b"></tbody></table></div><div id="${pid}m"></div>`
+   +(bk.length?`<h2 style="margin-top:14px">По КАМам</h2><div class="note">Пункты очереди по видам, неоплата по давности (1–30 / 31–90 / 90+ дн.), сроки клиента в ближайшие ${RU.soonDays||14} дн. Клик по строке — пункты этого КАМа.</div><div class="twrap"><table class="lft"><thead><tr><th>КАМ</th><th class="r">Пунктов</th><th class="r">Мяч у КАМа</th><th class="r">Срок сорван</th><th class="r">Не оплачено 1–30 / 31–90 / 90+</th><th class="r">Сроки ≤ ${RU.soonDays||14} дн.</th><th class="r">Сумма сделок</th></tr></thead><tbody>`
+     +bk.map(r=>`<tr class="drill" data-kw="${_esc(r.id||'~')}"><td>${_esc(r.name)}${r.gone?' <span class="gone">уволен</span>':''}</td><td class="r mono">${r.n||0}</td><td class="r mono">${r.ballKam||''}</td><td class="r mono${r.late?' hot':''}">${r.late||''}</td><td class="r mono">${r.unpaid?`${r.unpaid30||0} / ${r.unpaid90||0} / <span class="${r.unpaid90p?'nrc':''}">${r.unpaid90p||0}</span>`:''}</td><td class="r mono">${r.soon||''}</td><td class="r mono">${r.money?_fmtE(r.money):''}</td></tr>`).join('')
+     +`</tbody></table></div>`:'')
+   +`</section>`;
+}
+function _kqWire(el,K,pid){
+  const Q=K.queue||[], U=K.upcoming14||[];
+  const url=id=>`https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
+  let qc='', qw='*', qall=false;
+  const key=x=>x.kamId||'~';
+  const soonRow=u=>({code:'soon',sev:9,what:u.left?`срок клиента через ${u.left} дн.`:'срок клиента сегодня',
+    act:'сверить с ОСС готовность и подтвердить клиенту дату',days:u.left,kam:u.kam,kamId:u.kamId,kamGone:u.kamGone,
+    deal:u.deal,src:'real',seq:u.seq,customer:u.customer,title:u.title,moneyLbl:u.moneyLbl,dl:u.dl,sup:u.sup});
+  const who=x=>`${_esc(x.kam||'—')}${x.kamGone?' <span class="gone">уволен</span>':''}`;
+  const deal=x=>x.src==='presale'
+    ?`<a href="${url(x.deal)}" target="_blank" rel="noopener">${_esc(x.title||('Сделка #'+x.deal))}</a><div class="dep">пресейл${x.stage?' · '+_esc(x.stage):''}</div>`
+    :`<b class="mono">№${x.seq||'—'}</b><div class="dep">${_esc(x.customer||'—')}</div><div class="dep">${_esc(x.title||'')}</div>`;
+  const what=x=>`${_esc(x.what)}${x.code==='ballKam'&&x.thr?`<div class="dep">порог ${x.thr} дн.</div>`:''}${x.chat?`<div class="dep">${_esc(x.chat)}</div>`:''}${x.code==='noKam'&&x.stage&&x.src==='real'?`<div class="dep">стадия: ${_esc(x.stage)}</div>`:''}`;
+  const act=x=>`${_esc(x.act)}${x.owner?`<div class="dep">ответственный заказа: ${_esc(x.owner)}</div>`:''}${x.orders>1?`<div class="dep">заказов: ${x.orders}</div>`:''}${x.dl?`<div class="dep">срок клиента ${x.dl}${x.sup?' · '+_esc(x.sup):''}</div>`:''}`;
+  const draw=()=>{
+    const src=qc==='soon'?U.map(soonRow):Q;
+    const r=src.filter(x=>(!qc||qc==='soon'||x.code===qc)&&(qw==='*'||key(x)===qw));
+    el.querySelector('#'+pid+'n').textContent=`(${r.length} из ${src.length})`;
+    const shown=qall?r:r.slice(0,40);
+    el.querySelector('#'+pid+'b').innerHTML=shown.map(x=>`<tr${x.src==='real'?` class="drill" data-ct="${_esc(x.deal)}"`:''}><td class="${x.sev<=2?'hot':''}">${what(x)}</td><td>${deal(x)}</td><td>${who(x)}</td><td class="r mono">${x.days!=null?x.days:''}</td><td class="r mono">${x.moneyLbl||'—'}</td><td>${act(x)}</td></tr>`).join('')
+      ||'<tr><td colspan="6" class="dimv" style="padding:14px">пусто — по этому фильтру делать нечего</td></tr>';
+    el.querySelector('#'+pid+'m').innerHTML=(!qall&&r.length>40)?`<span class="stchip" data-all="1" tabindex="0" style="margin-top:8px;display:inline-block">Показать все ${r.length}</span>`:'';
+  };
+  const pick=c=>{qc=c; qall=false; el.querySelectorAll('#'+pid+'c .stchip').forEach(x=>x.classList.toggle('on',x.dataset.c===c)); draw();};
+  const goQ=()=>{const t=el.querySelector('#'+pid+'s'); if(t)t.scrollIntoView({behavior:'smooth',block:'start'});};
+  const onKey=(e,f)=>{if(e.key!=='Enter'&&e.key!==' ')return; e.preventDefault(); f();};
+  draw();
+  const chips=el.querySelector('#'+pid+'c');
+  chips.addEventListener('click',e=>{const c=e.target.closest('.stchip'); if(c)pick(c.dataset.c);});
+  chips.addEventListener('keydown',e=>{const c=e.target.closest('.stchip'); if(c)onKey(e,()=>pick(c.dataset.c));});
+  el.querySelectorAll('[data-kq]').forEach(t=>{const f=()=>{pick(t.dataset.kq===qc?'':t.dataset.kq); goQ();};
+    t.addEventListener('click',e=>{if(e.target.closest('.qq'))return; f();}); t.addEventListener('keydown',e=>onKey(e,f));});
+  el.querySelector('#'+pid+'w').addEventListener('change',e=>{qw=e.target.value; qall=false; draw();});
+  const more=el.querySelector('#'+pid+'m');
+  more.addEventListener('click',e=>{if(e.target.closest('[data-all]')){qall=true; draw();}});
+  more.addEventListener('keydown',e=>{if(e.target.closest('[data-all]'))onKey(e,()=>{qall=true; draw();});});
+  el.querySelector('#'+pid+'b').addEventListener('click',e=>{
+    if(e.target.closest('a'))return;
+    const tr=e.target.closest('tr[data-ct]'); if(!tr)return;
+    const X=window.__CONTRACTS__, x=X&&(X.rows||[]).find(r=>String(r.deal)===tr.dataset.ct);
+    if(x&&typeof openContract==='function')openContract(x);});
+  el.querySelectorAll('tr[data-kw]').forEach(tr=>tr.addEventListener('click',()=>{qw=tr.dataset.kw; el.querySelector('#'+pid+'w').value=qw; qall=false; draw(); goQ();}));
+}
 function renderPeople(P,role,elId,opt){
   opt=opt||{};
   const el=document.getElementById(elId); if(!el) return;
@@ -2164,7 +2244,10 @@ function renderPeople(P,role,elId,opt){
     ['Просрочено клиенту',String(T.late),`Σ ${T.lateSum} · дедлайн заказа прошёл`,T.late?'warn':'ok','late'],
     ['Без движения '+PR.stale+'+ дн',String(T.stale),`из них ${T.dead} стоят дольше ${PR.dead} дн`,T.stale?'amber':'ok','stale'],
   ];
+  const KQ=(role==='kam'&&P.kamQueue)?P.kamQueue:null, kqId=elId+'-kq';
   let h=opt.noHead?'':`<header><div class="eyebrow">${o.eyebrow}</div><h1>${o.title}</h1><div class="sub"><span>Состав: <b>Bitrix24, ${P.label}</b></span><span>Действующих: <b>${S.active||0}</b> · уволенных: <b>${S.fired||0}</b></span><span class="dimv">↳ клик по человеку, карточке или признаку — список сделок</span></div></header>`;
+  // раздел «КАМы» открывается тем, что сделать сегодня, — до загрузки и косяков
+  if(KQ) h+=_kqHtml(KQ,kqId);
   h+=`<div class="kpis" style="grid-template-columns:repeat(3,1fr)">${KPI.map(k=>`<div class="kpi ${k[3]} drill" data-pk="${k[4]}"><div class="lbl">${k[0]}</div><div class="val ${k[3]}">${k[1]}</div><div class="meta">${k[2]}</div>${qmark('p.kpi')}</div>`).join('')}</div>`;
   // 1 — загрузка по людям
   const HD=R.head||{}, SC=R.headScore||[], GAPS=R.headGaps||[];
@@ -2200,7 +2283,7 @@ function renderPeople(P,role,elId,opt){
     +R.stages.map(s=>`<tr><td>${_esc(s.stage)}</td><td class="dep">${_esc(s.cat)}</td><td class="num r">${s.n}</td></tr>`).join('')
     +`</tbody></table></section>`;
   // 3 — результат года и ожидание
-  h+=`<div class="secttl"><b>4</b> · Результат года и чего ждать${qmark('p.result')}</div><section class="card">`
+  h+=`<div class="secttl"><b>4</b> · Результат года и чего ждать${qmark('p.result')}</div><section class="card pfit">`
     +`<div class="pcards"><div class="pcard"><div class="pv">${T.created}</div><div class="pl">создано сделок с 01.01</div></div>`
     +`<div class="pcard"><div class="pv" style="color:var(--ok)">${T.won}</div><div class="pl">выиграно · ${T.wonSum}</div></div>`
     +`<div class="pcard"><div class="pv" style="color:var(--nr)">${T.lost}</div><div class="pl">проиграно</div></div>`
@@ -2241,7 +2324,7 @@ function renderPeople(P,role,elId,opt){
   }
   // 5 — покрытие ролью и бесхозные
   const OR=P.orphan||{rows:[],n:0};
-  h+=`<div class="secttl"><b>6</b> · Кто закреплён, а кто нет${qmark('p.cover')}</div><section class="card">`
+  h+=`<div class="secttl"><b>6</b> · Кто закреплён, а кто нет${qmark('p.cover')}</div><section class="card pfit">`
     +`<div class="srccmp"><span class="sl">Закреплено за ролью</span><div class="sb"><i style="width:${_pshare(T.open,RC.openTotal||1)}%"></i></div><span class="sv">${T.open}</span><span class="sd mid">из ${RC.openTotal||0} открытых сделок портала</span></div>`
     +`<div class="srccmp"><span class="sl">Из них полем в карточке</span><div class="sb"><i style="width:${_pshare(T.byField,T.open||1)}%"></i></div><span class="sv">${T.byField}</span><span class="sd dim">остальное — по ответственному</span></div>`
     +`<div class="srccmp"><span class="sl">Роль не закреплена</span><div class="sb"><i style="width:${_pshare(R.uncovered.n,RC.openTotal||1)}%;background:var(--a)"></i></div><span class="sv">${R.uncovered.n}</span><span class="sd dim">Σ ${R.uncovered.sum}</span></div>`
@@ -2253,6 +2336,7 @@ function renderPeople(P,role,elId,opt){
   h+=`<div id="${elId}-dirs"></div>`;
   h+=`<footer>${o.title} · Bitrix24, состав из user.get (ACTIVE), сделки crm.deal.list, заказы СП-172 · ${P.label}. Просрочка — дедлайн клиенту на заказе поставщику (поле сделки CLOSEDATE в портале не план: у всех открытых сделок она в прошлом). Застой — по дате смены стадии (MOVED_TIME). Суммы к базовой € по курсам Bitrix.</footer>`;
   el.innerHTML=h;
+  if(KQ) _kqWire(el,KQ,kqId);
   // --- тело таблицы людей + сортировка
   const SORT={load:p=>-p.loadRaw,open:p=>-p.open,real:p=>-p.realRaw,late:p=>-p.late,flaws:p=>-p.flaws};
   const body=el.querySelector('#pBody'+role);

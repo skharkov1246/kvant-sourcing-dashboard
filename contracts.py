@@ -206,10 +206,13 @@ def _parse_econ_money(raw, rate) -> float:
 
 
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
-            people: dict[str, dict] | None = None, service_ids: set[str] | None = None) -> dict:
+            people: dict[str, dict] | None = None, service_ids: set[str] | None = None,
+            chat_reader: chat_activity.Reader | None = None) -> dict:
     """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
     уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
-    сделки и заказы не были видны как работа без хозяина."""
+    сделки и заказы не были видны как работа без хозяина.
+    chat_reader — общий на сборку читатель чатов (main.py: реализация читает первой,
+    пресейл — остатком бюджета); None — свой бюджет, как раньше."""
     today = as_of or dt.date.today()
     now_iso = period_mod.now(_MSK).isoformat()
     people = people or {}
@@ -225,6 +228,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         if u in gone_ids:
             return f"{people[u].get('name') or 'user#' + u} (уволен)", True
         return client.user_name(u), False
+    def uid_of(v) -> str:
+        """id сотрудника из поля-«сотрудник» (бывает списком) — ключ человека без подписи."""
+        if isinstance(v, (list, tuple)):
+            v = next((x for x in v if str(x or "") not in ("", "0")), "")
+        u = str(v or "")
+        return "" if u in ("", "0", "None") else u
     curlist = client.call("crm.currency.list", {}) or []
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
     def eur(o, cu): return float(o or 0) * rate.get(cu, 1.0)
@@ -574,6 +583,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "ossDeal": who(d.get(OSS_DEAL))[0],
             # КАМ клиента — из поля «КАМ» (запасное — старое поле), не ответственный сделки
             "kam": who(d.get(KAM_F) or d.get(KAM_OLD))[0],
+            # id КАМа — ключ очереди КАМа (kamqueue.py): подписи реализации и пресейла
+            # берутся из разных справочников и по имени не сводятся
+            "kamId": uid_of(d.get(KAM_F) or d.get(KAM_OLD)),
             # сделку или её живые заказы ведёт уволенный: работа без хозяина
             "managerGone": who(d.get("ASSIGNED_BY_ID"))[1],
             "ossGone": (any(o["ossGone"] for o in ords_det if o["live"])
@@ -624,7 +636,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # снимается, если в чате сделки за неделю писал человек; не прочитали чат —
     # простой не подтверждён и в замедленные не идёт
     cands = [(r["deal"], r["_chat"], r["saleEur"]) for r in rows if not r["closed"] and r["stuck"]]
-    chat = chat_activity.check(client, cands, today, service_ids)
+    chat = (chat_reader.check(cands, today) if chat_reader is not None
+            else chat_activity.check(client, cands, today, service_ids))
     for r in rows:
         r.pop("_chat", None)
         ch = chat.get(r["deal"])

@@ -39,7 +39,9 @@ sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **
 sys.path.insert(0, ".")
 import dashboard
 from tests import fixture
-dashboard.write(fixture.build_metrics(), {"source": "rules", "items": []},
+m = fixture.build_metrics()
+m["presale"] = fixture.build_presale()     # блок пресейла с корзинами чата
+dashboard.write(m, {"source": "rules", "items": []},
                 "smoke/index.html", people=fixture.build_people(),
                 reps=fixture.build_reps(), advisor=fixture.build_advisor(),
                 contracts=fixture.build_contracts())
