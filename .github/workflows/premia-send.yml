@@ -42,6 +42,14 @@ jobs:
         # psycopg2 — для publish_suppliers, чей клиент KV читает настройки бота
         run: pip install -r requirements.txt pdfminer.six psycopg2-binary==2.9.10
 
+      # бот и получатель — до часовой сборки данных: не настроено — стоп за секунды
+      - name: Получатель в Telegram
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TO_SHA256: ${{ inputs.to_sha256 }}
+        run: python scripts/premia_telegram.py --check --to-sha256 "$TO_SHA256"
+
       - name: Данные — как пересборка дашборда
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}

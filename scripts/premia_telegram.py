@@ -74,8 +74,13 @@ def find_chat(token: str, stored: str | None, to_sha256: str) -> str | None:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Файлы «Премий» владельцу в Telegram")
     ap.add_argument("--to-sha256", required=True, help="SHA-256 имени получателя (строчными, без @)")
-    ap.add_argument("files", nargs="+")
+    # Проверка до часовой сборки данных: бот настроен и получатель найден. Иначе
+    # прогон 19.10.2026 час собирал данные и только потом узнал, что бота нет.
+    ap.add_argument("--check", action="store_true", help="только проверить бота и получателя, без отправки")
+    ap.add_argument("files", nargs="*")
     a = ap.parse_args(argv)
+    if not a.check and not a.files:
+        ap.error("нужны файлы для отправки или --check")
     try:
         cf = NotifyReader(os.environ.get("CLOUDFLARE_ACCOUNT_ID"), os.environ.get("CLOUDFLARE_API_TOKEN"))
         raw = cf.get(cf.namespace(), NOTIFY_KEY)
@@ -90,6 +95,9 @@ def main(argv=None) -> int:
             print("получатель не найден или не совпал: напишите боту /start из нужного аккаунта "
                   "и запустите прогон снова")
             return 3
+        if a.check:
+            print("бот настроен, получатель найден")
+            return 0
         day = dt.date.today().isoformat()
         for f in a.files:
             p = Path(f)

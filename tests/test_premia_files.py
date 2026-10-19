@@ -122,6 +122,32 @@ def test_нужного_человека_нет_нигде_отправки_не
     assert tg.find_chat("t", "7", H) is None
 
 
+def test_проверка_до_сборки_находит_получателя_и_ничего_не_шлёт(monkeypatch, capsys):
+    class Ready:
+        def __init__(self, *a):
+            pass
+
+        def namespace(self):
+            return "ns"
+
+        def get(self, ns, key):
+            return b'{"tgToken": "t", "tgChat": "42"}'
+
+    def fake(token, method, **kw):
+        assert method != "sendDocument", "проверка не должна ничего отправлять"
+        return {"type": "private", "username": "owner_test", "id": 42}
+
+    monkeypatch.setattr(tg, "NotifyReader", Ready)
+    monkeypatch.setattr(tg, "_call", fake)
+    assert tg.main(["--check", "--to-sha256", H]) == 0
+    assert "получатель найден" in capsys.readouterr().out
+
+
+def test_без_файлов_и_без_проверки_прогон_не_стартует():
+    with pytest.raises(SystemExit):
+        tg.main(["--to-sha256", H])
+
+
 def test_бот_не_настроен_ничего_не_уходит(monkeypatch, tmp_path, capsys):
     class Empty:
         def __init__(self, *a):
