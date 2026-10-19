@@ -142,7 +142,10 @@ test("дашборд режется по правам: чужих данных �
   // владельца, а не утечка: кому продуктовый разрез показывать нельзя, тому не выдаётся
   // вкладка «Коммерсанты» целиком.
   assert.ok(html.includes("MOCK-PRODUCT") && html.includes("MOCK-PEOPLE"), "разрез ролей должен быть доступен");
-  for (const p of ["ENG", "ADVISOR", "CONTRACTS", "DATA", "INSIGHTS"]) {
+  // Решение владельца 19.10.2026: роли «КАМ» выдана «Реализация» — строка
+  // реализации в очереди КАМа открывает карточку сделки (вместе с маржой).
+  assert.ok(html.includes("MOCK-CONTRACTS"), "КАМу выдана «Реализация»");
+  for (const p of ["ENG", "ADVISOR", "DATA", "INSIGHTS"]) {
     assert.ok(!html.includes(`MOCK-${p}`), `данные ${p} утекли КАМу`);
   }
   assert.doesNotMatch(html, /data-tab="advisor"/);

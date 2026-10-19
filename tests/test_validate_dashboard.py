@@ -104,6 +104,32 @@ def test_сломанная_вкладка_ловится_и_называетс�
     assert any("reps" in e for e in errors)
 
 
+def test_метка_ошибки_раздела_камы_в_dom_роняет_проверку(tmp_path, monkeypatch):
+    """Chromium 141 пишет console.error как INFO:CONSOLE — шаблон журнала его не видит.
+    Вставленная проверка раздела «КАМы» оставляет метку в DOM; по ней и падаем."""
+    bad = ('<html><body><div id="tab-sourcing">ок</div><div id="tab-company"></div>'
+           + "<span>наполнитель</span>" * 4000
+           + f'<div {vd.KV_FAIL}="">раздел КАМы: кнопка роли не найдена</div></body></html>')
+    _fake_runs(monkeypatch, lambda p: (bad, '[1:INFO:CONSOLE:1] "раздел КАМы: кнопка роли не найдена"'))
+    errors, warns = [], []
+    vd.check_browser(_page(tmp_path), errors, warns)
+    assert any("кнопка роли не найдена" in e for e in errors)
+
+
+def test_вставка_открывает_раздел_камы_и_не_молчит(tmp_path):
+    page = vd._with_tabs_opened(_page(tmp_path))
+    try:
+        js = page.read_text(encoding="utf-8")
+    finally:
+        page.unlink()
+    assert 'data-r="role:kam"' in js and "b.click()" in js
+    assert vd.KAM_QUEUE_BODY in js and "кнопка роли не найдена" in js and "не отрисовалась" in js
+    # текст метки — в исходнике скрипта, а скрипты из DOM вырезаются: сама вставка не роняет
+    errors: list[str] = []
+    vd._check_tabs_dom(js.replace("</body>", "<span>ок</span></body>"), errors)
+    assert not errors
+
+
 def test_временный_файл_с_вкладками_не_остаётся_на_диске(tmp_path, monkeypatch):
     _fake_runs(monkeypatch, lambda p: (PAGE * 40, ""))
     page = _page(tmp_path)

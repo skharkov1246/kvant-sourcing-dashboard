@@ -21,11 +21,13 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import advisor as advisor_mod
+import chat_activity
 import company as company_mod
 import config
 import dashboard
 import insights as insights_mod
 import kam as kam_mod
+import kamqueue as kamqueue_mod
 import contracts as contracts_mod
 import metrics as metrics_mod
 import people as people_mod
@@ -33,7 +35,7 @@ import premia as premia_mod
 import period as period_mod
 import presale as presale_mod
 import reps as reps_mod
-from bitrix_client import BitrixClient, без_вебхука
+from bitrix_client import BitrixClient, chat_webhook_url, drop_lost, без_вебхука
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
               # следы живого человека на карточке робота: кто двигал стадию,
@@ -525,24 +527,59 @@ def run(args) -> int:
 
     # Воронка пресейла: сделки, которые ведёт сорсинг до ТКП. Стадии — из общего
     # справочника (тот же вызов, что client.stages), запросы — уже выгруженные rfqs;
-    # новое чтение портала одно — сами сделки воронки (их около сотни).
+    # новое чтение портала — сами сделки воронки (их около сотни) и чаты застоявшихся.
+    # Сделки читаются здесь, а блок считается после реализации: простой по стадии
+    # подтверждает чат сделки (золотое правило 19.10.2026), а бюджет чтения чатов
+    # один на сборку — первой его тратит реализация (там деньги), пресейл — остатком.
+    # Чаты сделок читаются от имени владельца (решение 19.10.2026): вебхук сборки не
+    # участник чатов (сборка 19.10: из 129 чатов с простоем 123 — отказ в доступе).
+    # Свой вебхук — секрет BITRIX_CHAT_WEBHOOK_URL, только чтение; темп портала общий.
+    # Нет секрета — читает вебхук сборки, как раньше.
+    _chat_url = chat_webhook_url()
+    chat_reader = chat_activity.Reader(client.with_webhook(_chat_url) if _chat_url else client, service_ids)
+    print(f"• Чаты сделок читает {'вебхук владельца' if _chat_url else 'вебхук сборки'}")
+    _presale_in: dict | None = None
     try:
         _ps = presale_mod.find_category(category_names) or presale_mod.find_category(
             people_mod.deal_categories(client))
         if _ps:
             _pdeals = client.list_deals_fast(filter={"CATEGORY_ID": int(_ps[0])}, select=presale_mod.DEAL_SELECT)
-            m["presale"] = presale_mod.compute(
-                cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
-                rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids)
-            _h = m["presale"]["head"]
-            print(f"• Воронка пресейла #{_ps[0]}: сделок {_h['total']}, открыто {_h['open']}, отказ {_h['lost']}, "
-                  f"выиграно {_h['won']}; с запросом {_h['withRfqPct']} %, запросов {_h['rfq']}; "
-                  f"без сорсера {_h['noSrc']}, без запросов {_h['noRfq']}, стоят > {_h['staleDays']} дн {_h['stale']}, "
-                  f"ведёт ушедший {_h['gone']}")
+            # подписи «Категории оборудования» — справочник поля (линии продукт-оунеров);
+            # не прочитан — только оформление: «значение #id», блок пресейла остаётся
+            try:
+                _cat_labels = {str(k): str(v) for k, v in
+                               ((client.userfields().get(presale_mod.CAT_F) or {}).get("enum") or {}).items()}
+            except Exception as e:                       # noqa: BLE001
+                print(f"  ⚠ подписи «Категории оборудования» не прочитаны: {type(e).__name__}")
+                _cat_labels = {}
+            _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
+                               rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids,
+                               cat_labels=_cat_labels)
         else:
             print("• Воронка пресейла: воронки с таким именем в портале нет")
     except Exception as e:                                   # noqa: BLE001
         print(f"  ⚠ воронка пресейла пропущена: {type(e).__name__}: {без_вебхука(e)}")
+
+    def _presale() -> None:
+        """Блок пресейла с проверкой простоя чатом — общим читателем сборки."""
+        if not _presale_in:
+            return
+        try:
+            # чаты читаются и у сделок с мячом у КАМа сверх порога очереди КАМа (3–7 дн.):
+            # золотое правило снимает и пункт «мяч у КАМа», а простой пресейла — от 14 дн.
+            m["presale"] = presale_mod.compute(**_presale_in, chat_reader=chat_reader,
+                                               chat_also=kamqueue_mod.chat_wanted)
+            _h = m["presale"]["head"]
+            print(f"• Воронка пресейла #{_presale_in['cid']}: сделок {_h['total']}, открыто {_h['open']}, "
+                  f"отказ {_h['lost']}, выиграно {_h['won']}; с запросом {_h['withRfqPct']} %, запросов {_h['rfq']}; "
+                  f"без сорсера {_h['noSrc']}, без запросов {_h['noRfq']}, ведёт ушедший {_h['gone']}; "
+                  f"в стадии > {_h['staleDays']} дн {_h['staleStage']}: стоят (чат подтвердил) {_h['stale']}, "
+                  f"в чате работа {_h['staleChat']}, чат не проверен {_h['staleUnverified']}")
+            _cs = chat_reader.stats()
+            print(f"  чаты сделок за сборку: прочитано {_cs['reads']} из бюджета {_cs['budget']}"
+                  f"{'; чтение остановлено лимитом портала' if _cs['stopped'] else ''}")
+        except Exception as e:                               # noqa: BLE001
+            print(f"  ⚠ воронка пресейла пропущена: {type(e).__name__}: {без_вебхука(e)}")
 
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(_acts, rfqs, m["sourcersA"], dept_a_ids)
@@ -633,10 +670,14 @@ def run(args) -> int:
     slug = (args.period or f"{p.start}_{p.end}").replace(":", "_")
     (out_dir).mkdir(parents=True, exist_ok=True)
     metrics_path = out_dir / f"metrics_{slug}.json"
-    metrics_path.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"  ✓ метрики: {metrics_path}")
+
+    def _write_metrics() -> None:
+        metrics_path.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"  ✓ метрики: {metrics_path}")
 
     if args.dry_run:
+        _presale()                 # реализации в этом режиме нет: бюджет чатов — пресейлу
+        _write_metrics()
         if not args.no_summary:
             _print_summary(m)
         _print_snapshot(client)
@@ -653,7 +694,7 @@ def run(args) -> int:
     try:
         print("• Общий пул сделок/заказов (YTD)…")
         _t = time.time()
-        ys = "2026-01-01T00:00:00"
+        ys = period_mod.year_start(p.end)   # с 01.01 года отчёта (был зашит 2026)
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
             select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID",
                     "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID", "MOVED_TIME", "LAST_ACTIVITY_TIME"]
@@ -661,14 +702,20 @@ def run(args) -> int:
         # заказы СП-172 тянем ОДИН раз с 2025 и со сроком клиенту: тот же список нужен
         # и вкладкам ролей (просрочка), и «Коммерсантам». Раньше каждая вкладка ходила
         # за ними отдельно — три выгрузки одного и того же на каждую сборку.
-        orders_all = client.list_items(172, filter={">=createdTime": "2025-01-01T00:00:00"},
+        orders_all = client.list_items(172, filter={">=createdTime": people_mod.ORDERS_SINCE},
             select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2",
-                    "assignedById", people_mod.DL_CUSTOMER])
-        # заказы СП-172: исключаем проигранные (…:FAIL) — это не контрактная выручка
-        orders_ytd = [o for o in orders_all
-                      if not str(o.get("stageId", "")).endswith(":FAIL")
-                      and str(o.get("createdTime", ""))[:4] >= "2026"]
-        print(f"  заказов СП-172 с 2025: {len(orders_all)}, из них непроигранных в 2026: {len(orders_ytd)}")
+                    "assignedById", people_mod.DL_CUSTOMER, people_mod.DEL_FACT])
+        # заказы СП-172: исключаем проигранные — это не контрактная выручка; провал — по
+        # семантике стадии (свои стадии провала UC_* по суффиксу «:FAIL» считались живыми)
+        orders_ytd = [o for o in drop_lost(client, 172, orders_all)
+                      if str(o.get("createdTime", ""))[:4] >= ys[:4]]
+        # справочник стадий не прочитан — провал по суффиксу «:FAIL», как до 19.10: видно в журнале
+        _без_справочника = sum(1 for v in getattr(client, "_spa_sem", {}).values() if not v)
+        if _без_справочника:
+            print(f"  ⚠ справочник стадий СП-172 не прочитан для {_без_справочника} воронок — "
+                  "провал заказа там по суффиксу «:FAIL»")
+        print(f"  заказов СП-172 с {people_mod.ORDERS_SINCE[:4]}: {len(orders_all)}, "
+              f"из них непроигранных в {ys[:4]}: {len(orders_ytd)}")
         # курсы → база € (для продаж сделок)
         _cur = client.call("crm.currency.list", {}) or []
         _rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in _cur}
@@ -763,7 +810,8 @@ def run(args) -> int:
     contracts_data = None
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
-        contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids)
+        contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
+                                               chat_reader=chat_reader)
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
         _ch = (contracts_data.get("head") or {}).get("chat") or {}
         print(f"  чаты сделок с простоем по стадии: активных {_ch.get('active', 0)} (не подвисли), "
@@ -777,6 +825,32 @@ def run(args) -> int:
               f"{_sp.get('benchRecent', 0)} стадий, медиана цикла заказа {_sp.get('medCycle')} дн")
     except Exception as e:
         print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}: {e}")
+
+    # пресейл — после реализации: чаты сделок читает тот же читатель, остатком бюджета
+    _presale()
+    _write_metrics()
+
+    # Очередь КАМа «что делать сегодня» (kamqueue.py): пресейл с мячом у КАМа, сроки и
+    # закрытие реализации, сделки без КАМа. Едет в данных вкладки «КАМ и продукт-оунеры»
+    # (people → раздел «КАМы») и вместе с ними — в живую сверку (modules.json, «people»).
+    if people_data is not None:
+        # линии продукт-оунеров (пресейл по «Категории оборудования») — в данные вкладки
+        _pl = (m.get("presale") or {}).get("poLines")
+        if _pl:
+            people_data["poLines"] = _pl
+            print(f"  линии продукт-оунеров: {len(_pl['lines'])} категорий, сделок с категорией "
+                  f"{_pl['withCat']} из {_pl['deals']} ({_pl['withCatPct']} %)")
+        try:
+            people_data["kamQueue"] = kamqueue_mod.build(
+                m.get("presale"), (contracts_data or {}).get("life"), (contracts_data or {}).get("rows"),
+                p.end, people=roster)
+            _kq = people_data["kamQueue"]["head"]
+            # только счётчики: имена и суммы в публичный журнал не идут (правило 17)
+            print(f"  очередь КАМа: пунктов {_kq['n']} у {_kq['kams']} КАМов — мяч у КАМа сверх порога "
+                  f"{_kq['ballKam']}, срок клиента ≤ 14 дн. {_kq['soon']}, не оплачено {_kq['unpaid']}, "
+                  f"без КАМа {_kq['noKam']}; снято живым чатом {_kq['chatActive']}")
+        except Exception as e:                               # noqa: BLE001
+            print(f"  ⚠ очередь КАМа пропущена: {type(e).__name__}")
 
     try:
         print("• Коммерсанты (персональные дашборды + контрольные точки)…")

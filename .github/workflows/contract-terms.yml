@@ -1,0 +1,100 @@
+name: Договоры — чтение условий (пилот)
+
+# Пилот чтения договоров (решение владельца 19.10.2026): последние сделки
+# реализации (по умолчанию 30), бюджет модели на прогон (по умолчанию 10 USD),
+# ТОЛЬКО ручной запуск. Скрипт — scripts/contract_terms.py, навык contract-review.
+#
+#   mode dry  (по умолчанию) — отбор сделок и карточек договоров (СП-1174, СП-1192),
+#             счёт карточек, файлов и сторон, оценка страниц и денег. Модель не
+#             зовётся, файлы не качаются, база не трогается; секреты модели и базы
+#             в шаг не передаются вовсе.
+#   mode live — закачка файлов → модель извлекает условия с цитатой и страницей →
+#             строки в закрытую базу (contract_terms, contract_b2b_flags; схема —
+#             library/supabase/contract_terms_schema.sql, применяет zip-db.yml).
+#
+# Порядок: сначала dry, по его оценке — live. Журнал публичный: в нём только
+# агрегаты (CLAUDE.md, правило 17) — ни номеров сделок, ни названий, ни цитат, ни
+# условий. Ни артефактов, ни кэша: файлы договоров и ответы модели не покидают
+# раннер, кроме строк в закрытой базе.
+on:
+  workflow_dispatch:
+    inputs:
+      deals:
+        description: "Сколько последних не проигранных сделок реализации читать (1–200)"
+        default: "30"
+      budget_usd:
+        description: "Бюджет модели на прогон, USD: потолок цены следующего файла не помещается — чтение останавливается"
+        default: "10"
+      mode:
+        description: "dry — счёт и оценка; live — закачка, модель, запись в базу"
+        type: choice
+        default: dry
+        options: [dry, live]
+
+permissions:
+  contents: read
+
+concurrency:
+  # Общая очередь чтения портала (CLAUDE.md, «Битрикс не перегружать»): прогон
+  # читает Битрикс и качает файлы — стоит в одной группе с зондами и разбором.
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  terms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Установка зависимостей
+        # openpyxl, xlrd и psycopg2 тянет indexer (закачка файлов тем же путём, что
+        # у разбора), pypdf — счёт страниц PDF в read_llm, pillow — сканы TIFF/BMP
+        # и тяжёлые фото в PNG (без него такой файл — статус format, а сделка без
+        # флагов). Прогон держит ключ модели и строку базы — pillow прибит версией.
+        run: pip install --quiet --disable-pip-version-check -r requirements.txt
+             psycopg2-binary==2.9.10 pillow==12.3.0 openpyxl xlrd pypdf pytest pyyaml
+
+      - name: Проверки конвейера (без сети)
+        # Правила отбора, стороны, бюджета и журнала — до первого запроса к порталу
+        # и до первого оплаченного вызова модели.
+        run: python -m pytest tests/test_contract_terms.py -q
+
+      - name: Чтение договоров
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
+          # Ключ модели и строка базы — только в live: холостому прогону они не нужны.
+          ANTHROPIC_API_KEY: ${{ inputs.mode == 'live' && secrets.ANTHROPIC_API_KEY || '' }}
+          SUPABASE_DB_URL: ${{ inputs.mode == 'live' && secrets.SUPABASE_DB_URL || '' }}
+          MODE: ${{ inputs.mode }}
+          DEALS: ${{ inputs.deals }}
+          BUDGET_USD: ${{ inputs.budget_usd }}
+          RUN_ID: ct-${{ github.run_id }}-${{ github.run_attempt }}
+          # Один процесс в общей очереди, с запасом: рядом может идти пересборка
+          # дашборда (её группа своя). ≈ 3 запроса на отбор + по одному на 50
+          # карточек; в live — плюс по запросу на файл (~60–90 на 30 сделок).
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+          BITRIX_WAIT_BUDGET: "900"
+          # Предел страниц (и кадров скана), которые модель читает в одном файле.
+          # Файл длиннее модели НЕ отдаётся (статус limit, сделка без флагов):
+          # условия из части договора дали бы ложные флаги. 100 — модель по умолчанию
+          # (окно 1 млн токенов) берёт до 600 страниц PDF; потолок цены такого
+          # файла до вызова ≈ $3,4 — бюджет проверяется перед каждым вызовом.
+          LLM_READ_MAX_PAGES: "100"
+          # Одна попытка вызова: оборванная посреди потока могла быть оплачена, а
+          # бюджет проверяется перед вызовом. Непрочитанное дочитает следующий
+          # прогон, прочитанное возьмёт из базы даром (sha256).
+          LLM_READ_RETRIES: "1"
+          # Один вызов — не дольше 5 минут: срок прогона (--deadline-min 40) плюс
+          # одна закачка и один вызов помещаются в timeout-minutes job.
+          LLM_READ_TIMEOUT: "300"
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python scripts/contract_terms.py --mode "$MODE" --deals "$DEALS" --budget "$BUDGET_USD"
+             --deadline-min 40

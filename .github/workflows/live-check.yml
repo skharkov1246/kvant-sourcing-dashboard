@@ -44,6 +44,7 @@ on:
       - kprules.py
       - lifecycle.py
       - chat_activity.py
+      - kamqueue.py
       - scripts/live_check.py
       - .github/workflows/live-check.yml
   workflow_dispatch:
@@ -72,6 +73,8 @@ jobs:
     timeout-minutes: 90
     env:
       BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+      # вебхук владельца — только чтение чатов сделок; в обеих сборках один и тот же
+      BITRIX_CHAT_WEBHOOK_URL: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL }}
       SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
       # порядок обхода множеств одинаков в обеих сборках
       PYTHONHASHSEED: "0"
@@ -86,6 +89,11 @@ jobs:
           restpath="/${url#*://*/}"
           [ -n "$token" ] && echo "::add-mask::$token"
           [ -n "$restpath" ] && echo "::add-mask::$restpath"
+          if [ -n "${BITRIX_CHAT_WEBHOOK_URL:-}" ]; then
+            curl_="${BITRIX_CHAT_WEBHOOK_URL%/}"
+            echo "::add-mask::${curl_##*/}"
+            echo "::add-mask::/${curl_#*://*/}"
+          fi
           echo "токен вебхука замаскирован"
 
       - uses: actions/checkout@v5

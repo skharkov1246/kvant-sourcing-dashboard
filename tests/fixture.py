@@ -311,10 +311,16 @@ class PeopleStub:
 
 
 
-def build_people(**kw) -> dict:
-    """Синтетика → настоящий people.compute → данные вкладок той же формы, что в проде."""
-    return people_mod.compute(PeopleStub(), as_of=PEOPLE_TODAY, open_deals=OPEN_DEALS,
-                              created=CREATED, orders=ORDERS, **kw)
+def build_people(*, kam_queue: bool = True, **kw) -> dict:
+    """Синтетика → настоящий people.compute → данные вкладок той же формы, что в проде.
+    kam_queue — приложить очередь КАМа (как main.py после реализации и пресейла):
+    smoke-сборка рисует раздел «КАМы» с данными."""
+    P = people_mod.compute(PeopleStub(), as_of=PEOPLE_TODAY, open_deals=OPEN_DEALS,
+                           created=CREATED, orders=ORDERS, **kw)
+    if kam_queue:
+        P["kamQueue"] = build_kam_queue()
+        P["poLines"] = build_presale()["poLines"]
+    return P
 
 
 def build_premia(**kw) -> dict:
@@ -409,7 +415,9 @@ class ContractsStub:
                                "CURRENCY_ID": "EUR", "COMPANY_ID": str(300 + i % 7), "STAGE_ID": st,
                                "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(200 - i * 5),
                                "ASSIGNED_BY_ID": str(10 + i % 3), ct.OSS_DEAL: [str(20 + i % 4)],
-                               ct.KAM_F: str(10 + (i + 1) % 3), "UF_CRM_1734380921": str(9000 + i)})
+                               "UF_CRM_1734380921": str(9000 + i),
+                               # у последней сделки поле «КАМ» пусто — пункт «назначить КАМа»
+                               **({ct.KAM_F: str(10 + (i + 1) % 3)} if i < 23 else {})})
             self.hist[2].append((did, st, t(30 + i)))
             for j in range(1 + i % 3):
                 oid += 1
@@ -504,3 +512,102 @@ def build_contracts(**kw) -> dict:
             os.environ.pop("KVANT_NOW", None)
         else:
             os.environ["KVANT_NOW"] = old
+
+
+# ── «Пресейл» для очереди КАМа и золотого правила чата. Стадии — имена воронки
+# «Пресейл» (зонд v48), даты — от CT_TODAY; сделки, люди и чаты придуманы.
+PS_STAGES = {
+    "C32:NEW": ("Новый запрос", "P", 10),
+    "C32:SEARCH": ("Поиск поставщиков и сбор КП", "P", 40),
+    "C32:READY": ("Экономика готова | Можно подавать", "P", 70),
+    "C32:TENDER": ("Тендерное предложение выдано | Работаем с клиентом по тендеру", "P", 80),
+    "C32:WAIT": ("Сорсинг завершен / Ожидаем решение заказчика", "P", 90),
+    "C32:WON": ("Сделка выиграна", "S", 100),
+    "C32:LOSE": ("Экономически не интересно", "F", 110),
+}
+# КАМы — те же люди, что в «Реализации» (ContractsStub.user_name): очередь сводит их по id
+CT_PEOPLE = {"10": {"name": "Анна (КАМ)", "active": True}, "11": {"name": "Борис (КАМ)", "active": True},
+             "12": {"name": "Вера (КАМ)", "active": True}}
+
+
+def ps_stage_meta() -> dict:
+    return {sid: {"name": n, "sem": sem, "sort": so, "cat": "32"} for sid, (n, sem, so) in PS_STAGES.items()}
+
+
+def ps_deals() -> list[dict]:
+    """(id, стадия, дней в стадии, КАМ, чат) — что из этого ждёт очередь КАМа, см. tests/test_kamqueue.py."""
+    import chat_activity
+    import presale
+
+    def d(days: int) -> str:
+        return (CT_TODAY - dt.timedelta(days=days)).isoformat() + "T10:00:00+03:00"
+    rows = [
+        ("8001", "C32:READY", 5, "10", "8801"),     # мяч у КАМа 5 дн. > 3 — подать ТКП
+        ("8002", "C32:READY", 2, "11", "8802"),     # 2 дн. ≤ 3 — ещё не пункт
+        ("8003", "C32:TENDER", 20, "12", "8803"),   # стоит 20 дн., в чате тихо — пункт
+        ("8004", "C32:WAIT", 25, "10", "8804"),     # стоит 25 дн., в чате работа — не пункт
+        ("8005", "C32:WAIT", 10, "11", "8805"),     # 10 дн. ≤ 14 — ещё не пункт
+        ("8006", "C32:SEARCH", 30, "", "8806"),     # без КАМа, чат недоступен
+        ("8007", "C32:SEARCH", 16, "12", ""),       # нет id чата — не проверен
+        ("8008", "C32:NEW", 1, "", "8808"),         # без КАМа, ответственный — КАМ: не подставляется
+        ("8009", "C32:LOSE", 40, "10", "8809"),     # закрыта отказом
+    ]
+    out = []
+    for did, st, days, kam, chat in rows:
+        x = {"ID": did, "TITLE": f"Запрос на узел {did}", "STAGE_ID": st, "STAGE_SEMANTIC_ID": PS_STAGES[st][1],
+             "DATE_CREATE": d(days + 3), "MOVED_TIME": d(days), "ASSIGNED_BY_ID": "10",
+             chat_activity.CHAT_FIELD: chat}
+        if kam:
+            x[presale.KAM_F] = kam
+        # линии продукт-оунеров: категория оборудования (у 8002 — две) и Product leader
+        x[presale.CAT_F] = PS_CATS.get(did, [])
+        if did in PS_PO:
+            x[presale.PO_F] = PS_PO[did]
+        out.append(x)
+    return out
+
+
+#: «Категория оборудования» сделок пресейла: 8002 — две категории, 8008 — не указана,
+#: 8009 — значение, удалённое из справочника (77)
+PS_CATS = {"8001": ["1"], "8002": ["1", "2"], "8003": ["2"], "8004": ["1"], "8005": ["3"],
+           "8006": ["3"], "8007": ["1"], "8009": ["77"]}
+PS_CAT_LABELS = {"1": "Насосы", "2": "Компрессоры и ГТУ", "3": "ЗИП"}
+PS_PO = {"8001": "12", "8002": "12", "8003": "11", "8005": "10"}
+
+
+class PresaleChats:
+    """im.dialog.messages.get по чатам ps_deals: 8803 — человек писал месяц назад,
+    8804 — вчера, 8806 — нет доступа у вебхука, прочие — тишина."""
+
+    def __init__(self):
+        self.calls = 0
+
+    def call(self, method, params=None, **kw):
+        assert method == "im.dialog.messages.get"
+        self.calls += 1
+        n = str(params["DIALOG_ID"]).removeprefix("chat")
+        if n == "8806":
+            raise RuntimeError("ACCESS_DENIED")
+        days = {"8803": 30, "8804": 1}.get(n)
+        msgs = [{"author_id": 21, "date": (CT_TODAY - dt.timedelta(days=days)).isoformat()}] if days else []
+        return {"messages": msgs}
+
+
+def build_presale(*, chat: bool = True) -> dict:
+    """Синтетика → настоящий presale.compute с общим читателем чатов и чтением чатов
+    кандидатов «мяч у КАМа» (kamqueue.chat_wanted) — как main.py."""
+    import chat_activity
+    import kamqueue
+    import presale
+    reader = chat_activity.Reader(PresaleChats(), set()) if chat else None
+    return presale.compute(cid="32", cat_name="Пресейл", deals=ps_deals(), stage_meta=ps_stage_meta(),
+                           rfqs=[], people=CT_PEOPLE, names={}, today=CT_TODAY, chat_reader=reader,
+                           cat_labels=PS_CAT_LABELS,
+                           chat_also=kamqueue.chat_wanted)
+
+
+def build_kam_queue() -> dict:
+    """Пресейл + «Реализация» → настоящий kamqueue.build → очередь раздела «КАМы»."""
+    import kamqueue
+    ct = build_contracts()
+    return kamqueue.build(build_presale(), ct["life"], ct["rows"], CT_TODAY, people=CT_PEOPLE)

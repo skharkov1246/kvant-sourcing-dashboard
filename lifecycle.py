@@ -282,7 +282,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                           "dl": o["dl"].strftime("%d.%m.%Y") if o.get("dl") else "",
                           "fc": fc.strftime("%d.%m.%Y") if fc else "",
                           # КАМ клиента (поле «КАМ») — в копию: оплата и перенос срока — его разговор с клиентом
-                          "kam": _nm(d.get("kam")),
+                          "kam": _nm(d.get("kam")), "kamId": _nm(d.get("kamId")),
                           "phase": p if in_tile else ""})
     for k in ph:
         ph[k]["n"] = len(ph_deals[k])
@@ -307,6 +307,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             sev, what, act = EXC[code]
             queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
                           "who": w, "whoGone": gone(w), "kam": _nm(d.get("kam")),
+                          "kamId": _nm(d.get("kamId")),
                           "deal": d["deal"], "seq": d.get("seq") or 0, "customer": d.get("customer") or "—",
                           "order": "", "title": d.get("title") or "", "sup": "", "dl": "", "phase": ""})
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))

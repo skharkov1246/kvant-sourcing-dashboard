@@ -1,0 +1,146 @@
+name: Чат сделки — оценка хода моделью (пилот, тень)
+
+# Решение владельца 19.10.2026: по новым сообщениям чата открытых сделок
+# реализации и пресейла модель ставит сделке оценку (идёт / ждёт / стоит, куда
+# движется, риск, на ком мяч, ближайший срок). Бюджет — 5 долларов в день, итог —
+# в закрытую базу. Сутки — по Москве: каждый вызов модели, удачный или нет, пишется
+# в deal_chat_spend, и прогон берёт себе не больше остатка суток; budget_usd больше
+# пяти не принимается — два прогона в день предел не удвоят. ПИЛОТ В ТЕНИ: оценки только копятся в таблицах
+# library/supabase/deal_chat_schema.sql, дашборд их не показывает. Правила
+# отбора, подготовки и проверки ответа — в шапке scripts/chat_context.py.
+#
+# РЕЖИМЫ. dry (по умолчанию) — модель не вызывается вовсе: счёт сделок-кандидатов,
+# чатов с новыми сообщениями людей и оценка токенов и долларов; база открывается
+# только на чтение (курсор «что уже оценено»), без секрета базы — всё считается
+# новым. live — сначала проверки на чистой одноразовой базе, потом схема в
+# рабочей базе, потом чтение, оценка и запись. Курсор сдвигается только вместе с
+# записанной оценкой, одной транзакцией.
+#
+# ПОРТАЛ. Очередь bitrix-portal — общая с прочими чтениями портала; бюджет 1
+# запрос/с (рядом может идти пересборка дашборда, как у зондов); один запрос на
+# чат; первый отказ по лимиту останавливает чтение.
+#
+# ЧАСТИ (правило дробления 22.09.2026) — вход parts: 10, 25 или 50. Сделки
+# выгружаются из портала один раз, первые limit чатов очереди режутся на смежные
+# отрезки, и части идут ПОДРЯД в одном процессе (как library-deal-links), поэтому
+# BITRIX_PARALLEL=1, а бюджет и суточный остаток — общие. Каждая оценка пишется
+# своей транзакцией: оборванная часть уносит только несделанное, следующий прогон
+# начнёт с него — очередь «давно не читанные первыми».
+#
+# СРОК. Через 45 минут скрипт сам перестаёт читать и звать модель и печатает итог —
+# раньше, чем timeout-minutes снимет шаг вместе с журналом расхода.
+#
+# В ЖУРНАЛ — ТОЛЬКО АГРЕГАТЫ (правило 17): ни текста сообщений, ни имён, ни
+# номеров сделок и чатов. Артефактов и кэша нет: текст чатов живёт в памяти
+# процесса до конца шага. Только ручной запуск — расписание решает владелец.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry — счёт и оценка расхода без модели; live — оценка и запись в базу"
+        type: choice
+        options: [dry, live]
+        default: dry
+      budget_usd:
+        description: "Предел расхода на модель за прогон, долларов (0…5; и не больше остатка суток по Москве)"
+        default: "5"
+      limit:
+        description: "Сколько чатов сделок прочитать (1…400)"
+        default: "100"
+      parts:
+        # Распоряжение владельца 22.09.2026: «всегда дели минимум на 10». Меньше
+        # десяти здесь не бывает — список начинается с 10.
+        description: "На сколько частей делить очередь прогона"
+        type: choice
+        options: ["10", "25", "50"]
+        default: "10"
+
+permissions:
+  contents: read
+
+concurrency:
+  # общая очередь чтения портала (CLAUDE.md, «Битрикс не перегружать»)
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  context:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Установка зависимостей
+        # anthropic — в requirements.txt (версия закреплена); psycopg2 — курсор и
+        # запись; pytest — проверкам на чистой базе перед записью
+        run: pip install --quiet -r requirements.txt pytest psycopg2-binary==2.9.10
+
+      - name: Проверка входов и секретов
+        env:
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          # ключ модели — только в live: холостой прогон его не видит и в проверке
+          A: ${{ inputs.mode == 'live' && secrets.ANTHROPIC_API_KEY || '' }}
+          S: ${{ secrets.SUPABASE_DB_URL }}
+          MODE: ${{ inputs.mode }}
+          BUDGET: ${{ inputs.budget_usd }}
+          LIMIT: ${{ inputs.limit }}
+        run: |
+          set -euo pipefail
+          [[ "$BUDGET" =~ ^[0-9]+([.][0-9]+)?$ ]] || { echo "::error::budget_usd — не число"; exit 1; }
+          awk -v b="$BUDGET" 'BEGIN { exit !(b + 0 <= 5) }' \
+            || { echo "::error::budget_usd больше 5 — предел владельца 5 долларов в сутки"; exit 1; }
+          [[ "$LIMIT" =~ ^[0-9]+$ ]] || { echo "::error::limit — не целое"; exit 1; }
+          [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          if [ "$MODE" = live ]; then
+            [ -n "${A:-}" ] || { echo "::error::нет секрета ANTHROPIC_API_KEY — оценка моделью невозможна"; exit 1; }
+            [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — оценки некуда писать"; exit 1; }
+          fi
+          echo "режим $MODE, бюджет $BUDGET, чатов не больше $LIMIT, частей ${{ inputs.parts }}"
+
+      # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная
+      # проверка — не пройденная проверка. База в локали UTF-8 (правило 21а).
+      - name: Проверки на чистой базе
+        if: inputs.mode == 'live'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
+          sudo pg_ctlcluster "$(pg_lsclusters -h | awk 'NR==1{print $1}')" main start
+          sudo -u postgres psql -q -c "alter user postgres password 'ci'"
+          sudo -u postgres createdb -T template0 --locale=C.UTF-8 --encoding=UTF8 library_sql_test
+          LIBRARY_SQL_TEST_DSN="postgresql://postgres:ci@127.0.0.1:5432/library_sql_test" \
+            python -m pytest tests/test_chat_context.py tests/test_chat_context_sql.py -q
+
+      # Схема перед записью: файл идемпотентен и ни от чего не зависит.
+      - name: Схема в рабочей базе
+        if: inputs.mode == 'live'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if ! command -v psql >/dev/null; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          fi
+          psql "$SUPABASE_DB_URL" -q -v ON_ERROR_STOP=1 -f library/supabase/deal_chat_schema.sql
+
+      - name: Оценка
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          # вебхук владельца — только чтение чатов сделок (решение 19.10.2026)
+          BITRIX_CHAT_WEBHOOK_URL: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          # ключ модели — только в live: холостому прогону он не нужен
+          ANTHROPIC_API_KEY: ${{ inputs.mode == 'live' && secrets.ANTHROPIC_API_KEY || '' }}
+          SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+          # попытка — в ключе: откат повторного запуска не трогает оценки первой попытки
+          RUN_ID: chat-ctx-${{ github.run_id }}-${{ github.run_attempt }}
+          MODE: ${{ inputs.mode }}
+          BUDGET: ${{ inputs.budget_usd }}
+          LIMIT: ${{ inputs.limit }}
+          PARTS: ${{ inputs.parts }}
+        run: python scripts/chat_context.py --mode "$MODE" --budget "$BUDGET" --limit "$LIMIT" --parts "$PARTS"

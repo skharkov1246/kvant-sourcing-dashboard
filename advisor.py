@@ -17,11 +17,13 @@ from __future__ import annotations
 import datetime as dt
 from collections import Counter, defaultdict
 
+from bitrix_client import drop_lost
+from period import year_start
 from company import _money, _regno, _pctile
 from stages import deal_reached_tkp
 
-YEAR_START = "2026-01-01"
-PREV_START = "2025-01-01"
+YEAR_START = f"{dt.date.today().year}-01-01"        # этот год (был зашит 2026)
+PREV_START = f"{dt.date.today().year - 1}-01-01"
 TKP_PROB_CAP = 60          # потолок вероятности для «ТКП выдано+», %
 TKP_PROB_MULT = 3.0        # множитель базовой конверсии для ТКП+
 COVERAGE_NORM = 3.0        # здоровое покрытие: пайплайн ≥ 3 мес среднего факта
@@ -39,6 +41,8 @@ def compute(client, *, as_of: dt.date | None = None,
             deal_sale: dict | None = None, realize_date: dict | None = None,
             deal_stage_names: dict | None = None, category_names: dict | None = None) -> dict:
     today = as_of or dt.date.today()
+    # год отчёта — от as_of, а не от часов машины (ревью 19.10.2026)
+    YEAR_START, PREV_START = year_start(today)[:10], year_start(today, 1)[:10]
     realize_date = realize_date or {}
     deal_stage_names = deal_stage_names or {}
     category_names = category_names or {}
@@ -54,7 +58,7 @@ def compute(client, *, as_of: dt.date | None = None,
     if orders is None:
         orders = client.list_items(172, filter={">=createdTime": YEAR_START + "T00:00:00"},
             select=["id", "stageId", "opportunity", "currencyId", "parentId2"])
-        orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
+        orders = drop_lost(client, 172, orders)
     if deal_sale is None:
         deal_sale = {str(d["ID"]): eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) for d in deals}
     order_parents = {str(o.get("parentId2")) for o in orders if o.get("parentId2")}
@@ -144,7 +148,7 @@ def compute(client, *, as_of: dt.date | None = None,
         if cls_of(d) != "real":
             continue
         rm = str(realize_date.get(did, ""))[:7]
-        if rm.startswith("2026"):
+        if rm.startswith(YEAR_START[:4]):
             real_by_mon[rm] += deal_sale.get(did, 0.0)
     full_months = [m for m in real_by_mon if m < today.strftime("%Y-%m")]
     avg_real = (sum(real_by_mon[m] for m in full_months) / len(full_months)) if full_months else 0.0
@@ -275,7 +279,7 @@ def compute(client, *, as_of: dt.date | None = None,
             + (" — высокая зависимость, диверсифицировать." if top5_share > 50 else " — приемлемо.")
             + f" Повторные клиенты — {repeat_share}% выручки.")
     if silent:
-        say("bad", f"<b>Замолчали.</b> {len(silent)} клиентов с выручкой-2025 без единой сделки в 2026 "
+        say("bad", f"<b>Замолчали.</b> {len(silent)} клиентов с выручкой-{today.year - 1} без единой сделки в {today.year} "
                    f"(крупнейший — {silent[0]['name']}, {silent[0]['revLbl']}). Передать КАМам на реактивацию.")
     nd = len(open_no_date)
     if nd:
@@ -294,7 +298,7 @@ def compute(client, *, as_of: dt.date | None = None,
              "clz": "warn" if top5_share > 50 else "ok"},
             {"lbl": "Повторная выручка", "val": f"{repeat_share}%", "meta": f"новые клиенты {100 - repeat_share}%", "clz": "teal"},
             {"lbl": "Проиграно", "val": _money(lost_sum), "meta": f"{len(lost)} сделок", "clz": "warn"},
-            {"lbl": "Замолчавших клиентов", "val": str(len(silent)), "meta": f"выручка-2025 ≥ {_money(SILENT_MIN_EUR)}",
+            {"lbl": "Замолчавших клиентов", "val": str(len(silent)), "meta": f"выручка-{today.year - 1} ≥ {_money(SILENT_MIN_EUR)}",
              "clz": "warn" if silent else "ok"},
         ],
         "forecast": {"pBase": p_base, "pTkp": p_tkp, "openN": len(open_deals),

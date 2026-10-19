@@ -26,21 +26,50 @@
 
 ЧТО ДЕЛАТЬ (то, ради чего блок): сделки без назначенного сорсера, сделки без
 единого запроса поставщикам, застрявшие в стадии и те, что ведёт ушедший сорсер.
+
+ЗОЛОТОЕ ПРАВИЛО ЧАТА (решение владельца 19.10.2026, как в реализации): сделка
+«стоит» — только если и в её чате тихо. Простой по стадии (> ЗАСТОЙ_ДНЕЙ) — лишь
+кандидат; чат сделки читает общий на сборку читатель (chat_activity.Reader, после
+реализации — остатком бюджета):
+  тихо        → «stale»: стоит, чат подтвердил;
+  человек писал за неделю → «staleChat»: в чате идёт работа, действия не требует;
+  чат не прочитан или не хватило бюджета → «staleUnverified»: серая корзина,
+                сделка видна, но в «стоят» не входит.
+Сверка: стоят по стадии = stale + staleChat + staleUnverified (head.staleStage).
+Без читателя (chat_reader=None) — прежнее поведение: все простои «stale».
+Ещё кандидаты чтения — chat_also (правило вызывающего): очередь КАМа ставит пункт
+«мяч у КАМа» уже после 3–7 дней в стадии, раньше ЗАСТОЙ_ДНЕЙ, и золотое правило
+действует и там. Такой сделке пишется chat, а флаги не меняются: простоя по стадии
+у неё нет. Порядок общий — дольше всех стоящие первыми, так что простой по стадии
+(> ЗАСТОЙ_ДНЕЙ) бюджет получает раньше.
+
+КАМ СДЕЛКИ — только из поля «КАМ» (KAM_F). Ответственный сделки — исполнитель
+(сорсер или коммерсант, зонд v48: 53 % / 46 %), а не КАМ: подставлять его вместо
+пустого поля значило приписать КАМу чужую сделку. Пусто — «КАМ не указан».
 """
 from __future__ import annotations
 
 import datetime as dt
 import re
 from collections import defaultdict
+from typing import Callable
 
+import chat_activity
 import config
 
 PRESALE_RE = re.compile(r"пре\s*-?\s*сейл|presale|pre\s*-?\s*sale|предпродаж", re.I)
 SOURCER_F = config.DEAL_SOURCER_FIELDS[0][0]     # «Сорсер» сделки
 HEAD_F = config.DEAL_SOURCER_FIELDS[1][0]        # «Head of sourcing departement» — заполнен у 100 %
 KAM_F = "UF_CRM_1740390857"                      # «КАМ»
+# Линия продукт-оунера — «Категория оборудования» сделки (решение владельца 19.10.2026);
+# зонд v55: в воронке «Пресейл» заполнена у 96 % открытых, в реализации — у 2 %.
+CAT_F = "UF_CRM_1781862699536"                   # «Категория оборудования» (список, множественный)
+PO_F = "UF_CRM_1779187425"                       # «Product leader»
 DEAL_SELECT = ["ID", "TITLE", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE", "MOVED_TIME",
-               "ASSIGNED_BY_ID", "CREATED_BY_ID", "COMPANY_ID", "OPPORTUNITY", SOURCER_F, HEAD_F, KAM_F]
+               "ASSIGNED_BY_ID", "CREATED_BY_ID", "COMPANY_ID", "OPPORTUNITY", SOURCER_F, HEAD_F, KAM_F,
+               chat_activity.CHAT_FIELD, CAT_F, PO_F]
+CAT_NONE = "категория не указана"
+KAM_NONE = "КАМ не указан"
 
 # НА КОМ МЯЧ (решение владельца 09.10.2026): сделка пресейла — сделка КАМа, но по
 # стадии видно, кто делает следующий шаг: руководитель сорсинга (назначить сорсера),
@@ -114,9 +143,65 @@ def _pct(a: int, b: int) -> int:
     return round(a / b * 100) if b else 0
 
 
+def _cats(v, labels: dict[str, str]) -> list[str]:
+    """Значение поля-списка → подписи категорий; удалённое из справочника значение —
+    «значение #id» (видно, что разметить заново), пусто — []."""
+    ids = v if isinstance(v, list) else [v]
+    out = []
+    for x in ids:
+        s = str(x or "").strip()
+        if s and s != "0":
+            lbl = labels.get(s) or f"значение #{s}"
+            if lbl not in out:
+                out.append(lbl)
+    return out
+
+
+def po_lines(rows: list[dict]) -> dict:
+    """Линии продукт-оунеров по «Категории оборудования» сделок пресейла.
+    Сделка с несколькими категориями входит в каждую (итог по линиям больше числа
+    сделок — так и подписано). «Стоят» — простой, подтверждённый тишиной в чате."""
+    lines: dict[str, dict] = {}
+    for r in rows:
+        for c in (r.get("cats") or [CAT_NONE]):
+            # «выиграно» не считается: выигранная сделка пресейла уходит в сделку
+            # реализации, стадии успеха в пресейле не ставят (живая сверка 19.10:
+            # 0 из 20 линий) — колонка из одних нулей только путала бы
+            a = lines.setdefault(c, {"cat": c, "n": 0, "open": 0, "lost": 0, "stale": 0,
+                                     "ballKam": 0, "ballSrc": 0, "noPo": 0, "_po": defaultdict(int)})
+            a["n"] += 1
+            if r["open"]:
+                a["open"] += 1
+                a["stale"] += "stale" in r["flags"]
+                a["ballKam"] += r["ball"] == "kam"
+                a["ballSrc"] += r["ball"] in SOURCING_BALL
+                if r.get("poId"):
+                    a["_po"][r["po"] + (" (уволен)" if r.get("poGone") else "")] += 1
+                else:
+                    a["noPo"] += 1
+            else:
+                a["lost"] += r["sem"] == "F"
+    out = []
+    for a in lines.values():
+        po = a.pop("_po")
+        a["pos"] = [{"name": k, "n": v} for k, v in sorted(po.items(), key=lambda kv: -kv[1])]
+        out.append(a)
+    out.sort(key=lambda a: (a["cat"] == CAT_NONE, -a["open"], -a["n"]))
+    with_cat = sum(1 for r in rows if r.get("cats"))
+    return {"lines": out, "deals": len(rows), "withCat": with_cat, "withCatPct": _pct(with_cat, len(rows)),
+            "multi": sum(1 for r in rows if len(r.get("cats") or []) > 1)}
+
+
 def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str, dict],
             rfqs: list[dict], people: dict[str, dict] | None, names: dict[str, str],
-            today: dt.date, service_ids: set[str] | None = None) -> dict:
+            today: dt.date, service_ids: set[str] | None = None,
+            chat_reader: chat_activity.Reader | None = None,
+            cat_labels: dict[str, str] | None = None,
+            chat_also: Callable[[dict], bool] | None = None) -> dict:
+    """chat_reader — общий на сборку читатель чатов: простой по стадии проверяется
+    чатом сделки (золотое правило, см. шапку). None — без чата, как до 19.10.2026.
+    chat_also(строка) — открытые сделки, чей чат прочитать сверх простоя по стадии
+    (очередь КАМа: kamqueue.chat_wanted); флагов им не меняет, только пишет chat."""
     people = people or {}
     service = set(service_ids or ())
     stages = sorted(((sid, m) for sid, m in stage_meta.items() if str(m.get("cat")) == str(cid)),
@@ -147,14 +232,18 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
         firsts = [t for r in mine if (t := _date(r.get("createdTime")))]
         src_uid = _uid(d.get(SOURCER_F))
         src, src_gone = person(src_uid)
-        kam_uid = _uid(d.get(KAM_F)) or _uid(d.get("ASSIGNED_BY_ID"))
+        # КАМ — только поле «КАМ»: ответственный сделки — исполнитель, а не КАМ
+        kam_uid = _uid(d.get(KAM_F))
         kam, kam_gone = person(kam_uid)
         head, head_gone = person(_uid(d.get(HEAD_F)))
+        po_uid = _uid(d.get(PO_F))
+        po, po_gone = person(po_uid)
+        cats = _cats(d.get(CAT_F), cat_labels or {})
         open_ = sem == "P"
         stage_name = (stage_meta.get(sid) or {}).get("name") or sid
         ball = ball_of(stage_name, sem)
         # кто держит мяч поимённо: сорсер без назначенного сорсера — руководитель
-        who, who_gone = {"head": (head, head_gone), "kam": (kam, kam_gone),
+        who, who_gone = {"head": (head, head_gone), "kam": (kam, kam_gone) if kam_uid else (KAM_NONE, False),
                          "src": (src, src_gone) if src_uid else (head, head_gone)}.get(ball, ("", False))
         age = (today - created).days if created else None
         flags = []
@@ -175,13 +264,36 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "sem": sem, "open": open_, "days": days, "age": age,
             "ball": ball, "who": who, "whoGone": who_gone,
             "created": created.isoformat() if created else "",
-            "src": src, "srcId": src_uid, "srcGone": src_gone, "kam": kam,
+            "src": src, "srcId": src_uid, "srcGone": src_gone,
+            "kam": kam or KAM_NONE, "kamId": kam_uid, "kamGone": kam_gone,
             "rfq": len(mine), "quotes": sum(1 for r in mine if r.get("_hasQuote")),
             "lag": (min(firsts) - created).days if firsts and created else None,
             "sum": float(d.get("OPPORTUNITY") or 0) > 0,
             "company": str(d.get("COMPANY_ID") or "0") not in ("", "0"),
-            "flags": flags,
+            "flags": flags, "chat": None,
+            "cats": cats, "po": po, "poId": po_uid, "poGone": po_gone,
+            "_chat": chat_activity.chat_id(d),
         })
+
+    # ЗОЛОТОЕ ПРАВИЛО ЧАТА: простой по стадии подтверждает только тишина в чате.
+    # Порядок чтения — дольше всех стоящие первыми: сумма у пресейла заполнена у 4 %
+    # сделок, весом по деньгам здесь не упорядочить.
+    stale_stage = sum(1 for r in rows if "stale" in r["flags"])
+    if chat_reader is not None:
+        cands = [(r["id"], r["_chat"], float(r["days"] or 0)) for r in rows
+                 if "stale" in r["flags"] or (chat_also is not None and r["open"] and chat_also(r))]
+        res = chat_reader.check(cands, today) if cands else {}
+        for r in rows:
+            ch = res.get(r["id"])
+            if not ch:
+                continue
+            r["chat"] = {k: ch.get(k) for k in ("status", "days", "last")}
+            if "stale" not in r["flags"] or ch["status"] == "quiet":
+                continue
+            нов = "staleChat" if ch["status"] == "active" else "staleUnverified"
+            r["flags"] = [нов if f == "stale" else f for f in r["flags"]]
+    for r in rows:
+        r.pop("_chat", None)
 
     open_rows = [r for r in rows if r["open"]]
     # стадии: рабочие по порядку воронки, затем исходы
@@ -222,8 +334,10 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
     by_src = sorted(agg.values(), key=lambda a: (a["id"] == "", -a["open"], -a["rfq"]))
 
     with_rfq = [r for r in rows if r["rfq"]]
-    act = [r for r in open_rows if r["flags"]]
-    order = {"gone": 0, "nosrc": 1, "norfq": 2, "stale": 3}
+    # «в чате идёт работа» — не действие: такая сделка в списке, только если с ней
+    # есть что делать ещё (нет сорсера, нет запросов)
+    act = [r for r in open_rows if any(f != "staleChat" for f in r["flags"])]
+    order = {"gone": 0, "nosrc": 1, "norfq": 2, "stale": 3, "staleUnverified": 4, "staleChat": 5}
     act.sort(key=lambda r: (min(order[f] for f in r["flags"]), -(r["days"] or 0)))
     lost = [{"name": s["name"], "n": s["n"]} for s in st_rows if s["sem"] == "F" and s["n"]]
     lost.sort(key=lambda x: -x["n"])
@@ -248,6 +362,11 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "gone": sum(1 for r in open_rows if "gone" in r["flags"]),
             "noRfq": sum(1 for r in open_rows if "norfq" in r["flags"]),
             "stale": sum(1 for r in open_rows if "stale" in r["flags"]),
+            # золотое правило чата: стоят по стадии = тихо + работа в чате + не проверен
+            "staleChat": sum(1 for r in open_rows if "staleChat" in r["flags"]),
+            "staleUnverified": sum(1 for r in open_rows if "staleUnverified" in r["flags"]),
+            "staleStage": stale_stage,
+            "chatGate": chat_reader is not None,
             "sumPct": _pct(sum(1 for r in rows if r["sum"]), len(rows)),
             "srcPct": _pct(sum(1 for r in rows if r["srcId"]), len(rows)),
             "otherStage": чужие,
@@ -259,8 +378,15 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "staleDays": ЗАСТОЙ_ДНЕЙ, "noRfqDays": БЕЗ_ЗАПРОСА_ДНЕЙ,
         },
         "stages": st_rows,
+        "poLines": po_lines(rows),
         "lost": lost,
         "weeks": weeks,
         "bySourcer": by_src,
+        # таблица «Требует действия» на вкладке «Сорсинг» — первые 60 (вес страницы)
         "act": act[:60],
+        # все открытые сделки, без обрезки: очередь КАМа (kamqueue.py) берёт отсюда
+        # мяч у КАМа и сделки без КАМа — по обрезанному «act» часть их терялась
+        "openDeals": [{k: r[k] for k in ("id", "t", "stage", "stageName", "days", "ball", "who",
+                                         "kam", "kamId", "kamGone", "flags", "chat", "created")}
+                      for r in sorted(open_rows, key=lambda r: -(r["days"] or 0))],
     }

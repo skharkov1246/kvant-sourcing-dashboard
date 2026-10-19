@@ -45,9 +45,12 @@ import re
 from collections import Counter, defaultdict
 
 import presale as presale_mod
-from bitrix_client import BitrixClient
+from bitrix_client import BitrixClient, lost_stage
+from period import year_start
 
-YEAR_START = "2026-01-01T00:00:00"
+YEAR_START = f"{dt.date.today().year}-01-01T00:00:00"   # с 01.01 этого года (был зашит 2026)
+# заказы — с начала учёта в СП-172, а не скользящим окном: живой заказ позапрошлого
+# года у открытой сделки не должен выпадать из просрочки (ревью 19.10.2026)
 ORDERS_SINCE = "2025-01-01T00:00:00"
 REALIZE_CAT = "0"             # воронка «Реализация»
 OUTLIER_MULT = 50             # сумма ≥ стольких медиан — карточка-выброс, сумму надо проверить
@@ -63,6 +66,7 @@ PROD_OLD = "UF_CRM_1776169499"     # «Product leader (заменить на м�
 PROD_HEAD = "UF_CRM_1789481932"    # «Руководитель продуктового направления»
 DEAL_FIELDS = [KAM_F, KAM_OLD, PROD_F, PROD_OLD, PROD_HEAD]
 DL_CUSTOMER = "ufCrm20_1728900218435"   # дедлайн клиенту на заказе СП-172
+DEL_FACT = "ufCrm20_1723236501"         # «Customer delivery date, actual»: доставлен — срок не сорван
 
 DEAL_SELECT = ["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY",
                "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "MOVED_TIME", "LAST_ACTIVITY_TIME",
@@ -485,7 +489,10 @@ def _boss_of(uid: str, person: dict, people: dict[str, dict], dept_head: dict[st
 
 
 def _blank() -> dict:
+    # realSumB — продажи только тех сделок реализации, где закупка внесена: маржа по ним;
+    # без закупки маржа сделки — вся её сумма (100 %), это пробел учёта, а не заработок
     return {"open": 0, "presale": 0, "presaleSum": 0.0, "real": 0, "realSum": 0.0, "buy": 0.0,
+            "realSumB": 0.0, "noBuy": 0,
             "late": 0, "lateSum": 0.0, "stale": 0, "dead": 0, "noAmt": 0, "noComp": 0,
             "neg": 0, "clean": 0, "created": 0, "won": 0, "wonSum": 0.0, "lost": 0, "lostSum": 0.0,
             "byField": 0, "big": 0, "bigSum": 0.0, "ages": [], "inSrc": 0}
@@ -495,6 +502,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             open_deals: list[dict] | None = None, created: list[dict] | None = None,
             orders: list[dict] | None = None) -> dict:
     today = as_of or dt.date.today()
+    YEAR_START = year_start(today)       # год отчёта — от as_of, а не от часов машины
     today_iso = today.isoformat()
     people = roster(client)
     _deps_raw = client.list_paged("department.get", {})
@@ -524,7 +532,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     if orders is None:
         orders = client.list_items(172, filter={">=createdTime": ORDERS_SINCE},
                                    select=["id", "stageId", "opportunity", "currencyId",
-                                           "parentId2", "assignedById", DL_CUSTOMER])
+                                           "parentId2", "assignedById", DL_CUSTOMER, DEL_FACT])
 
     # --- заказы поставщикам: закупка на сделку, живой заказ, просроченное обещание клиенту
     buy_by_deal: dict[str, float] = defaultdict(float)
@@ -534,10 +542,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # обещание клиенту меряется по самому заказу, а не по сделке: срок стоит там.
     # Заказ без срока — не «в порядке», а неизмеримый: просрочку по нему никто не увидит.
     promise = {"live": 0, "withDl": 0, "noDl": 0, "late": 0, "days": []}
+    lost = lost_stage(client, 172, orders)      # провал — по семантике стадии, не по «:FAIL»
     for o in orders:
         did = str(o.get("parentId2") or "")
         stage = str(o.get("stageId") or "")
-        if not did or stage.endswith(":FAIL"):
+        if not did or lost(stage):
             continue
         buy_by_deal[did] += eur(o.get("opportunity"), o.get("currencyId"))
         order_deals.add(did)
@@ -547,7 +556,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         dl = str(o.get(DL_CUSTOMER) or "")[:10]
         promise["live"] += 1
         promise["withDl" if len(dl) == 10 else "noDl"] += 1
-        if len(dl) == 10 and dl < today_iso:
+        # доставленный, но не закрытый заказ — закрытие (УПД, оплата), а не сорванный срок
+        if len(dl) == 10 and dl < today_iso and not o.get(DEL_FACT):
             days = (today - dt.date.fromisoformat(dl)).days
             late_deals[did] = max(days, late_deals.get(did, 0))
             promise["late"] += 1
@@ -645,6 +655,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 bucket["ages"].append(idle)
             if in_real:
                 bucket["real"] += 1; bucket["realSum"] += amt; bucket["buy"] += buy
+                if buy > 0:
+                    bucket["realSumB"] += amt
+                else:
+                    bucket["noBuy"] += 1
             else:
                 bucket["presale"] += 1; bucket["presaleSum"] += amt
             if late_days:
@@ -720,7 +734,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
     def row(uid: str, a: dict) -> dict:
         p = people.get(uid, {"name": f"user#{uid}", "pos": "", "depts": [], "active": False})
-        margin = a["realSum"] - a["buy"]
+        margin = a["realSumB"] - a["buy"]          # только сделки с внесённой закупкой
         wl = a["won"] + a["lost"]
         ages = sorted(a["ages"])
         return {
@@ -733,7 +747,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "real": a["real"], "realSum": _money(a["realSum"]), "realRaw": round(a["realSum"]),
             "buy": _money(a["buy"]), "buyRaw": round(a["buy"]),
             "margin": _money(margin), "marginRaw": round(margin),
-            "marginPct": (round(margin / a["realSum"] * 100) if a["realSum"] else None),
+            "marginPct": (round(margin / a["realSumB"] * 100) if a["realSumB"] else None),
+            "noBuy": a["noBuy"],
             "created": a["created"], "won": a["won"], "wonSum": _money(a["wonSum"]),
             "lost": a["lost"], "winRate": (round(a["won"] / wl * 100) if wl else None),
             "late": a["late"], "lateSum": _money(a["lateSum"]),
@@ -763,7 +778,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                     tot["ages"] += v
                 else:
                     tot[k] += v
-        margin = tot["realSum"] - tot["buy"]
+        margin = tot["realSumB"] - tot["buy"]
         wl = tot["won"] + tot["lost"]
         winrate = round(tot["won"] / wl * 100) if wl else 0
         weighted = tot["presaleSum"] * winrate / 100
@@ -802,7 +817,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "presaleRaw": round(tot["presaleSum"]),
                 "real": tot["real"], "realSum": _money(tot["realSum"]), "realRaw": round(tot["realSum"]),
                 "buy": _money(tot["buy"]), "margin": _money(margin),
-                "marginPct": (round(margin / tot["realSum"] * 100) if tot["realSum"] else 0),
+                "marginPct": (round(margin / tot["realSumB"] * 100) if tot["realSumB"] else 0),
+                "noBuy": tot["noBuy"],
                 "created": tot["created"], "won": tot["won"], "wonSum": _money(tot["wonSum"]),
                 "lost": tot["lost"], "winRate": winrate,
                 "weighted": _money(weighted), "weightedRaw": round(weighted),

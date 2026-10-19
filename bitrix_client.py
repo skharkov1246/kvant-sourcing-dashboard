@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import atexit
+import copy
 import hashlib
 import json
 import os
@@ -199,6 +200,16 @@ class BitrixLimitError(BitrixError):
     """Портал держал лимит дольше бюджета ожидания."""
 
 
+class _Темп:
+    """Темп запросов к порталу: замок, отметка последнего запроса, замедление."""
+    __slots__ = ("lock", "last_call", "замедление")
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.last_call = 0.0
+        self.замедление = 1.0
+
+
 class BitrixClient:
     def __init__(self, webhook_url: str, *, timeout: int = 30, min_interval: float | None = None,
                  retries: int | None = None, backoff_base: float = 0.5, backoff_max: float = 32.0):
@@ -218,10 +229,11 @@ class BitrixClient:
         # Замедление после отказа по лимиту: пауза между запросами умножается,
         # затем плавно возвращается. Так два прогона, случайно сошедшиеся на
         # портале, сами расходятся по бюджету, не зная друг о друге.
-        self._замедление = 1.0
+        # Темп — общий объект: клиент под другим вебхуком (with_webhook) делит его с
+        # исходным, и вместе они не превышают бюджет портала.
+        self._темп = _Темп()
+        self._lock = self._темп.lock
         self._session = requests.Session()
-        self._lock = threading.Lock()
-        self._last_call = 0.0
         # ленивые кэши
         self._users: dict[str, str] | None = None
         self._stages: dict[str, str] | None = None
@@ -237,7 +249,59 @@ class BitrixClient:
         # и считается: по счётчику видно, была ли сверка точной.
         self.snapshot_dir = os.getenv("BITRIX_SNAPSHOT_DIR") or ""
         self.snapshot_mode = (os.getenv("BITRIX_SNAPSHOT_MODE") or "").strip().lower()
-        self.snapshot_saved = self.snapshot_hits = self.snapshot_misses = 0
+        # счётчики снимка — общий словарь: клиент под вебхуком владельца (with_webhook)
+        # пишет в те же счётчики, и сверка видит его промахи (ревью 19.10.2026)
+        self._снимок_сч = {"saved": 0, "hits": 0, "misses": 0}
+
+    @property
+    def _замедление(self) -> float:
+        return self._темп.замедление
+
+    @_замедление.setter
+    def _замедление(self, v: float) -> None:
+        self._темп.замедление = v
+
+    @property
+    def _last_call(self) -> float:
+        return self._темп.last_call
+
+    @_last_call.setter
+    def _last_call(self, v: float) -> None:
+        self._темп.last_call = v
+
+    @property
+    def snapshot_saved(self) -> int:
+        return self._снимок_сч["saved"]
+
+    @snapshot_saved.setter
+    def snapshot_saved(self, v: int) -> None:
+        self._снимок_сч["saved"] = v
+
+    @property
+    def snapshot_hits(self) -> int:
+        return self._снимок_сч["hits"]
+
+    @snapshot_hits.setter
+    def snapshot_hits(self, v: int) -> None:
+        self._снимок_сч["hits"] = v
+
+    @property
+    def snapshot_misses(self) -> int:
+        return self._снимок_сч["misses"]
+
+    @snapshot_misses.setter
+    def snapshot_misses(self, v: int) -> None:
+        self._снимок_сч["misses"] = v
+
+    def with_webhook(self, webhook_url: str) -> "BitrixClient":
+        """Тот же портал под другим вебхуком — чтение чатов сделок от имени владельца
+        (решение 19.10.2026: вебхук сборки не участник чатов, 123 из 129 — отказ).
+        Темп и снимок живой сверки общие с исходным клиентом, свои — адрес, сессия
+        и ленивые кэши (справочники читаются исходным клиентом)."""
+        other = copy.copy(self)
+        other.base = webhook_url.rstrip("/") + "/"
+        other._session = requests.Session()
+        return other
 
     def snapshot_stats(self) -> dict:
         return {"mode": self.snapshot_mode if self.snapshot_dir else "",
@@ -689,6 +753,23 @@ class BitrixClient:
                                  "sem": str(s.get("SEMANTICS") or "P").upper()[:1] or "P"}
         return m
 
+    def spa_semantics(self, entity_type_id: int, items: Iterable[dict]) -> dict[str, str]:
+        """{stageId: 'S'|'F'|'P'} по всем воронкам смарт-процесса, встреченным в items
+        (воронка — из префикса стадии «DT<тип>_<воронка>:…»). Справочник читается
+        один раз на воронку за сборку."""
+        cache = self.__dict__.setdefault("_spa_sem", {})
+        out: dict[str, str] = {}
+        for cid in sorted({int(m.group(1)) for it in items
+                           if (m := re.match(rf"DT{entity_type_id}_(\d+):", str(it.get("stageId") or "")))}):
+            key = (int(entity_type_id), cid)
+            if key not in cache:
+                try:
+                    cache[key] = {sid: v["sem"] for sid, v in self.spa_stage_meta(entity_type_id, cid).items()}
+                except Exception:   # справочник не прочитан — для этой воронки остаётся суффикс
+                    cache[key] = {}
+            out.update(cache[key])
+        return out
+
     # ----------------------------------------------------------------- departments
     def departments(self) -> list[dict]:
         if self._departments is None:
@@ -869,3 +950,36 @@ class BitrixClient:
 
     def warm_reference_caches(self) -> None:
         self.users(); self.categories(); self.stages(); self.userfields()
+
+
+def lost_stage(client, entity_type_id: int, items: Iterable[dict]):
+    """Проверка «стадия — провал» для записей смарт-процесса: по семантике стадии (F),
+    а не по суффиксу «:FAIL» — свои стадии провала UC_* иначе считались живыми
+    (заказы, которые уже не исполняются, шли в закупку, маржу и просрочку).
+    Стадия вне справочника (или клиент без него) — по суффиксу, как раньше."""
+    items = list(items)
+    sem = client.spa_semantics(entity_type_id, items) if hasattr(client, "spa_semantics") else {}
+
+    def lost(stage: Any) -> bool:
+        s = str(stage or "")
+        return sem[s] == "F" if s in sem else s.endswith(":FAIL")
+    return lost
+
+
+def drop_lost(client, entity_type_id: int, items: Iterable[dict]) -> list[dict]:
+    """Записи без проигранных (см. lost_stage)."""
+    items = list(items)
+    lost = lost_stage(client, entity_type_id, items)
+    return [it for it in items if not lost(it.get("stageId"))]
+
+
+def chat_webhook_url() -> str:
+    """Вебхук владельца для чтения чатов сделок (секрет BITRIX_CHAT_WEBHOOK_URL, решение
+    19.10.2026): только https с путём /rest/; иначе — пусто (читает вебхук сборки) и
+    предупреждение без адреса. Одна проверка для сборки и пилота чатов."""
+    u = (os.getenv("BITRIX_CHAT_WEBHOOK_URL") or "").strip()
+    if u and not (u.startswith("https://") and "/rest/" in u):
+        print("  ⚠ BITRIX_CHAT_WEBHOOK_URL не похож на вебхук — чаты читает вебхук сборки", flush=True)
+        return ""
+    return u
+

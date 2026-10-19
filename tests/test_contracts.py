@@ -219,6 +219,24 @@ def test_подвисла_только_если_в_чате_тихо(сообщ�
     assert ct["head"]["chat"]["checked"] == 1
 
 
+def test_чаты_читает_общий_читатель_сборки():
+    """main.py отдаёт реализации общий читатель чатов: её запросы списываются с бюджета
+    сборки, пресейлу остаётся остаток (chat_activity.Reader)."""
+    import os
+
+    import chat_activity
+    os.environ["KVANT_NOW"] = СЕЙЧАС
+    try:
+        п = Портал()
+        читатель = chat_activity.Reader(п, {"542"})
+        ct = contracts_mod.compute(п, as_of=dt.date(2026, 10, 9), people={}, chat_reader=читатель)
+    finally:
+        os.environ.pop("KVANT_NOW", None)
+    прочитано = sum(1 for r in ct["rows"] if r["chat"] and r["chat"].get("why") != "nochat")
+    assert прочитано >= 1 and читатель.reads == прочитано
+    assert all("kamId" in r for r in ct["rows"]), "id КАМа — ключ очереди КАМа"
+
+
 def test_оплата_получена_это_успех(ct):
     """Решение владельца 19.10.2026, п. 5: стадия «Оплата получена | Закрытие сделки» — успех."""
     r = _row(ct, "3")
