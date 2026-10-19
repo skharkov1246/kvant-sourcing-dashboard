@@ -34,14 +34,21 @@ class Портал:
 
     def __init__(self):
         self.users = {"10": "Вера Астахова (KAM)", "11": "Пётр Вьюгин (OSS)"}
+        # чат сделки 1: человек писал вчера; чат сделки 2 — только служебная запись #542
+        self.chats = {"chat501": [{"author_id": 11, "date": _t(1)}],
+                      "chat502": [{"author_id": 542, "date": _t(1)}, {"author_id": 0, "date": _t(0)}]}
         self.deals = [
             # сделка ведёт ушедший ответственный №20; вернулась в «Закупку» после «Поставки»
             {"ID": "1", "TITLE": "901. Насос", "OPPORTUNITY": "100000", "CURRENCY_ID": "EUR",
              "COMPANY_ID": "", "STAGE_ID": "C0:PURCHASE", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
-             "DATE_CREATE": _t(200), "ASSIGNED_BY_ID": "20"},
+             "DATE_CREATE": _t(200), "ASSIGNED_BY_ID": "20", "UF_CRM_1734380921": "501"},
             {"ID": "2", "TITLE": "902. Компрессор", "OPPORTUNITY": "50000", "CURRENCY_ID": "EUR",
              "COMPANY_ID": "", "STAGE_ID": "C0:PURCHASE", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
-             "DATE_CREATE": _t(100), "ASSIGNED_BY_ID": "10"},
+             "DATE_CREATE": _t(100), "ASSIGNED_BY_ID": "10", "UF_CRM_1734380921": "502"},
+            # оплата получена, сделка не закрыта — по решению владельца это успех
+            {"ID": "3", "TITLE": "903. Клапан", "OPPORTUNITY": "20000", "CURRENCY_ID": "EUR",
+             "COMPANY_ID": "", "STAGE_ID": "C0:PAID", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
+             "DATE_CREATE": _t(300), "ASSIGNED_BY_ID": "10"},
         ]
         self.orders = [
             # заказ в воронке 30: стадия должна получить имя, а не остаться кодом
@@ -51,6 +58,14 @@ class Портал:
             {"id": 502, "title": "902/1. Компрессор", "companyId": "", "parentId2": 2, "opportunity": 30000,
              "currencyId": "EUR", "stageId": "DT172_26:PREPARATION", "createdTime": _t(90),
              "movedTime": _t(10), DL: _t(-30)[:10], OSS: "11"},
+            # своя стадия провала (UC_*, семантика F): заказ не живой и не в расчёте
+            {"id": 503, "title": "902/2. Компрессор", "companyId": "", "parentId2": 2, "opportunity": 5000,
+             "currencyId": "EUR", "stageId": "DT172_26:UC_LOST", "createdTime": _t(80),
+             "movedTime": _t(20), DL: _t(30)[:10], OSS: "11"},
+            # доставлен клиенту 25 дней назад, заказ не закрыт: это закрытие, а не просрочка
+            {"id": 504, "title": "902/3. Компрессор", "companyId": "", "parentId2": 2, "opportunity": 5000,
+             "currencyId": "EUR", "stageId": "DT172_26:PREPARATION", "createdTime": _t(80),
+             "movedTime": _t(20), DL: _t(20)[:10], OSS: "11", contracts_mod.DEL_FACT: _t(25)[:10]},
         ]
         # история сделки 1: Закупка (120 дн назад) → Поставка (60) → снова Закупка (5)
         self.hist = {
@@ -60,7 +75,11 @@ class Портал:
                   ("502", "DT172_26:PREPARATION", _t(10))],
         }
 
-    def call(self, method, params=None):
+    def call(self, method, params=None, **kw):
+        if method == "im.dialog.messages.get":
+            return {"messages": self.chats.get(params["DIALOG_ID"], [])}
+        if method == "crm.item.fields":
+            return {"fields": {contracts_mod.SCHEME_F: {"items": [{"ID": "7", "VALUE": "Через агента"}]}}}
         assert method == "crm.currency.list"
         return [{"CURRENCY": "EUR", "AMOUNT": "1", "AMOUNT_CNT": "1", "BASE": "Y", "DATE_UPDATE": "2026-10-01"},
                 {"CURRENCY": "RUB", "AMOUNT": "0.01", "AMOUNT_CNT": "1", "DATE_UPDATE": "2026-10-01"},
@@ -80,13 +99,16 @@ class Портал:
         return {}
 
     def deal_stages_cat(self, cid=0):
-        return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка", "C0:WON": "Успех"}
+        return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка",
+                "C0:PAID": "Оплата получена | Закрытие сделки", "C0:WON": "Успех"}
 
     def deal_stages_process(self, cid=0):
-        return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка"}
+        return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка", "C0:PAID": "Оплата получена | Закрытие сделки"}
 
-    def spa_stages(self, entity, cid):
-        return {f"DT172_{cid}:NEW": f"Новый ({cid})", f"DT172_{cid}:PREPARATION": f"Подготовка ({cid})"}
+    def spa_stage_meta(self, entity, cid):
+        return {f"DT172_{cid}:NEW": {"name": f"Новый ({cid})", "sem": "P"},
+                f"DT172_{cid}:PREPARATION": {"name": f"Подготовка ({cid})", "sem": "P"},
+                f"DT172_{cid}:UC_LOST": {"name": f"Отменён ({cid})", "sem": "F"}}
 
     def stage_history(self, entity, *, category_id=None, since=None, last=None):
         out = {}
@@ -109,7 +131,7 @@ def ct():
         люди = {"10": {"name": "Астахова Вера", "active": True},
                 "20": {"name": "Донцов Юрий", "active": False},
                 "21": {"name": "Ежова Лада", "active": False}}
-        return contracts_mod.compute(Портал(), as_of=dt.date(2026, 10, 9), people=люди)
+        return contracts_mod.compute(Портал(), as_of=dt.date(2026, 10, 9), people=люди, service_ids={"542"})
     finally:
         os.environ.pop("KVANT_NOW", None)
 
@@ -154,3 +176,51 @@ def test_разрез_по_людям_помечает_уволенного_и_�
 
 def test_окно_бенчмарков_задано(ct):
     assert ct["speed"]["benchDays"] == contracts_mod.BENCH_DAYS
+
+
+def test_провал_по_семантике_и_доставленный_не_просрочен(ct):
+    r = _row(ct, "2")
+    ids = {o["id"] for o in r["orders"]}
+    assert "503" not in ids, "своя стадия провала UC_* с семантикой F выпадает, как и :FAIL"
+    o504 = next(o for o in r["orders"] if o["id"] == "504")
+    assert o504["late"] is False and o504["delivered"] and r["late"] is False
+
+
+def test_жизненный_цикл_на_вкладке(ct):
+    life = ct["life"]
+    assert {p["key"] for p in life["phases"]} == {"place", "make", "move", "close", "warranty"}
+    assert life["counts"].get("noUtd") == 1 and life["counts"].get("late") == 1
+    q = next(x for x in life["queue"] if x["code"] == "noUtd")
+    assert q["order"] == "504" and q["seq"] == 902
+
+
+
+@pytest.mark.parametrize("сообщения, подвисла", [
+    ([{"author_id": 11, "date": _t(1)}], False),                                          # человек писал вчера
+    ([{"author_id": 542, "date": _t(1)}, {"author_id": 0, "date": _t(0)}], True),         # служебная и система
+    ([{"author_id": 11, "date": _t(30)}], True),                                          # человек — месяц назад
+])
+def test_подвисла_только_если_в_чате_тихо(сообщения, подвисла):
+    """Решение владельца 19.10.2026: простой по стадии снимает живой чат сделки.
+    Сделка 2 стоит в стадии 50 дней (порог 2× медианы), срок клиента не сорван."""
+    import os
+    os.environ["KVANT_NOW"] = СЕЙЧАС
+    try:
+        п = Портал()
+        п.chats = {"chat502": сообщения}
+        ct = contracts_mod.compute(п, as_of=dt.date(2026, 10, 9), people={}, service_ids={"542"})
+    finally:
+        os.environ.pop("KVANT_NOW", None)
+    r = _row(ct, "2")
+    assert r["chat"] is not None and r["late"] is False
+    assert r["stuck"] is подвисла and r["slow"] is подвисла
+    тихо = "в чате тихо" in r["why"] or "в чате людей не было" in r["why"]
+    assert тихо is подвисла and ("в чате работа" in r["why"]) is (not подвисла)
+    assert ct["head"]["chat"]["checked"] == 1
+
+
+def test_оплата_получена_это_успех(ct):
+    """Решение владельца 19.10.2026, п. 5: стадия «Оплата получена | Закрытие сделки» — успех."""
+    r = _row(ct, "3")
+    assert r["paidStage"] and r["closed"] and r["done"] and not r["lost"] and not r["slow"]
+    assert ct["head"]["paidStage"] == 1 and ct["head"]["live"] == 2

@@ -19,8 +19,8 @@ ROOT = Path(__file__).resolve().parent.parent
 НЕ_РАСЧЁТ = {"dashboard.py"}
 
 
-def _свои_модули_main() -> set[str]:
-    дерево = ast.parse((ROOT / "main.py").read_text(encoding="utf-8"))
+def _импорты(файл: Path) -> set[str]:
+    дерево = ast.parse(файл.read_text(encoding="utf-8"))
     имена = set()
     for узел in ast.walk(дерево):
         if isinstance(узел, ast.Import):
@@ -28,6 +28,22 @@ def _свои_модули_main() -> set[str]:
         elif isinstance(узел, ast.ImportFrom) and узел.module and узел.level == 0:
             имена.add(узел.module.split(".")[0])
     return {f"{и}.py" for и in имена if (ROOT / f"{и}.py").is_file()}
+
+
+def _свои_модули_main() -> set[str]:
+    """Свои модули сборки — по импортам main.py ТРАНЗИТИВНО: kprules.py (#517) и
+    lifecycle.py вошли в сборку через metrics.py и contracts.py, а не через main.py,
+    и прямой разбор их не видел."""
+    видели: set[str] = set()
+    очередь = ["main.py"]
+    while очередь:
+        f = очередь.pop()
+        for м in _импорты(ROOT / f):
+            if м not in видели:
+                видели.add(м)
+                очередь.append(м)
+    видели.discard("main.py")
+    return видели
 
 
 def _пути(workflow: str, событие: str) -> set[str]:
@@ -38,7 +54,7 @@ def _пути(workflow: str, событие: str) -> set[str]:
 
 def test_свои_модули_находятся_разбором_импортов():
     модули = _свои_модули_main()
-    assert {"people.py", "premia.py", "presale.py", "dashboard.py"} <= модули
+    assert {"people.py", "premia.py", "presale.py", "dashboard.py", "kprules.py", "lifecycle.py"} <= модули
     assert "json.py" not in модули
 
 

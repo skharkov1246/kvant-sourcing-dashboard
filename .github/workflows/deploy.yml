@@ -38,6 +38,9 @@ on:
       - "period.py"
       - "premia.py"
       - "presale.py"
+      - "kprules.py"
+      - "lifecycle.py"
+      - "chat_activity.py"
       - "chat_scan.py"          # шаг «Закрытая часть снимка чатов» запускает его при сборке
       - "requirements.txt"
       - "templates/**"          # вёрстка дашборда
