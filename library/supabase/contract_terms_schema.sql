@@ -18,15 +18,23 @@
 --                                    второй раз не оплачивается;
 --                          no_file   в карточке нет файла договора;
 --                          download  файл не скачался (причина — note);
---                          format, limit, budget, model, parse, api — отказ
---                                    чтения по классу (budget — бюджет прогона
---                                    кончился раньше, чем дошла очередь).
+--                          limit     файл больше предела чтения (страниц, кадров,
+--                                    знаков) — модели не отдавался: условия из
+--                                    части договора дали бы ложные флаги;
+--                          budget    бюджет прогона кончился раньше, чем дошла
+--                                    очередь;
+--                          time      срок прогона вышел раньше, чем дошла очередь;
+--                          format, model, parse, api — отказ чтения по классу.
 --                        terms — что извлекла модель по contract_b2b.TERMS_SCHEMA,
 --                        evidence — поле → {quote, page}: почему получилось
---                        значение (правило 16). side — сторона по связи карточки
+--                        значение (правило 16); dropped — поля, у которых модель
+--                        дала значение без цитаты и оно снято («не доказано», а
+--                        не «в договоре нет»). side — сторона по связи карточки
 --                        (parentId172 — заказ поставщику — значит договор с
---                        поставщиком), side_source — откуда она; сторона по
---                        модели — terms->>'side'.
+--                        поставщиком), side_source — откуда она; независимые
+--                        способы: side_template (подпись «Чей шаблон» / «Тип
+--                        документа»), side_company (компания карточки против
+--                        компании сделки), terms->>'side' (модель).
 --   contract_b2b_flags   флаг риска (contract_b2b.flags) по паре «условия
 --                        заказчика сделки ↔ условия поставщика заказа order_id».
 --
@@ -53,6 +61,8 @@ create table if not exists contract_terms (
   order_id    bigint,
   side        text,
   side_source text,
+  side_template text,
+  side_company  text,
   template    text,
   doc_type    text,
   file_field  text,
@@ -64,6 +74,7 @@ create table if not exists contract_terms (
   model       text,
   terms       jsonb,
   evidence    jsonb,
+  dropped     jsonb,
   usd         numeric(12, 6) not null default 0,
   created_at  timestamptz not null default now(),
   primary key (run_id, card_entity, card_id, file_id)
@@ -85,10 +96,12 @@ create table if not exists contract_b2b_flags (
 alter table contract_terms drop constraint if exists contract_terms_status_chk;
 alter table contract_terms add constraint contract_terms_status_chk
   check (status in ('ok', 'reused', 'no_file', 'download', 'format', 'limit', 'budget',
-                    'model', 'parse', 'api'));
+                    'time', 'model', 'parse', 'api'));
 alter table contract_terms drop constraint if exists contract_terms_side_chk;
 alter table contract_terms add constraint contract_terms_side_chk
-  check (side is null or side in ('customer', 'supplier'));
+  check ((side is null or side in ('customer', 'supplier'))
+         and (side_template is null or side_template in ('customer', 'supplier'))
+         and (side_company is null or side_company in ('customer', 'supplier')));
 alter table contract_terms drop constraint if exists contract_terms_entity_chk;
 alter table contract_terms add constraint contract_terms_entity_chk
   check (card_entity in (1174, 1192));
@@ -107,6 +120,8 @@ alter table contract_b2b_flags add constraint contract_b2b_flags_code_chk
 create index if not exists contract_terms_run  on contract_terms (run_id);
 create index if not exists contract_terms_deal on contract_terms (deal_id);
 -- Повтор чтения по тому же файлу берётся отсюда (status = ok), а не из модели.
+-- method_ver несёт отпечаток подсказки и схемы ответа (scripts/contract_terms.py,
+-- версия_метода): правка правил извлечения сама делает старые ответы чужими.
 create index if not exists contract_terms_sha  on contract_terms (sha256, model, method_ver)
   where status = 'ok';
 -- Флаг пары — один на прогон: повтор записи того же прогона не задваивает.

@@ -63,13 +63,16 @@ def _одно(conn, sql, *p):
 
 def _строка(run_id: str, card_id: int, *, status="ok", sha="a" * 64, side="customer", order=None) -> dict:
     прочитан = status in ("ok", "reused")
-    return {"run_id": run_id, "method_ver": "contract_terms:v1", "deal_id": 9900001, "card_entity": 1174,
+    import contract_terms as ct
+    return {"run_id": run_id, "method_ver": ct.METHOD_VER, "deal_id": 9900001, "card_entity": 1174,
             "card_id": card_id, "order_id": order, "side": side,
-            "side_source": "order_link" if order else "deal_link", "template": "Шаблон ВЫДУМКА",
+            "side_source": "order_link" if order else "deal_link", "side_template": None, "side_company": side,
+            "template": "Шаблон ВЫДУМКА",
             "doc_type": None, "file_field": "ufCrm80_1763638685405", "file_id": f"fid-{card_id}",
             "sha256": sha, "pages": 3, "note": None, "status": status, "model": "claude-opus-5-5",
             "terms": {"side": side, "deliveryDays": 120, "documents": ["паспорт ВЫДУМКА"]} if прочитан else None,
             "evidence": {"deliveryDays": {"quote": "ЦИТАТА-ВЫДУМКА", "page": 2}} if прочитан else None,
+            "dropped": ["penaltyCapPct"] if прочитан else None,
             "usd": 0.125 if status == "ok" else 0.0}
 
 
@@ -84,14 +87,20 @@ def test_схема_rls_запись_повтор_и_откат(conn):
         строки = [_строка("ct-t1", 1), _строка("ct-t1", 2, side="supplier", order=9700001, sha="b" * 64),
                   _строка("ct-t1", 3, status="no_file", sha=None)]
         строки[2]["file_id"] = ""
+        # срок прогона и предел чтения — свои статусы, без условий
+        строки += [_строка("ct-t1", 4, status="time", sha=None), _строка("ct-t1", 5, status="limit", sha="d" * 64)]
         флаги = [{"deal_id": 9900001, "order_id": 9700001, "code": "lateByDesign", "days": 9},
                  {"deal_id": 9900001, "order_id": 9700001, "code": "basisGap", "days": None}]
         for _ in range(2):                         # повтор того же прогона не задваивает
             база.записать_условия(строки)
             база.записать_флаги(флаги, "ct-t1")
-        assert база.итог("ct-t1") == (3, 2, 0.25)
+        assert база.итог("ct-t1") == (5, 2, 0.25)
         кэш = база.из_кэша("a" * 64, "claude-opus-5-5")
         assert кэш["terms"]["deliveryDays"] == 120 and кэш["evidence"]["deliveryDays"]["page"] == 2
+        assert кэш["dropped"] == ["penaltyCapPct"], "снятые поля повтора — как у первого чтения"
+        assert база.из_кэша("d" * 64, "claude-opus-5-5") is None, "непрочитанный (limit) файл — не повтор"
+        assert _одно(conn, "select side_company from contract_terms where run_id = 'ct-t1' and card_id = 2") \
+            == ("supplier",)
         assert база.из_кэша("a" * 64, "claude-sonnet-5-5") is None, "условия другой модели — не повтор"
         assert база.из_кэша("c" * 64, "claude-opus-5-5") is None
 
@@ -122,6 +131,10 @@ def test_статус_и_условия_согласованы(conn):
         неизвестный["status"] = "maybe"
         with pytest.raises(psycopg2.errors.CheckViolation):
             база.записать_условия([неизвестный])
+        чужая_сторона = _строка("ct-t3", 4, status="no_file")
+        чужая_сторона["side_company"] = "trader"
+        with pytest.raises(psycopg2.errors.CheckViolation):
+            база.записать_условия([чужая_сторона])
         assert база.итог("ct-t3")[0] == 0
     finally:
         база.закрыть()
