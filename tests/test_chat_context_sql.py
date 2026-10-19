@@ -8,6 +8,11 @@
     чтение без оценки двигает очередь, но не курсор;
   · оценки только дописываются: правка и удаление запрещены, откат — пометкой,
     и помеченная оценка уходит из вида последней;
+  · неудача вызова: расход и очередь с серией неудач — одной транзакцией, курсор
+    оценки стоит; записанная оценка серию обнуляет;
+  · расход только дописывается, сумма за сутки — с полуночи по Москве; исход и
+    класс брака — только из списков Python;
+  · откат по гейту качества: оценки прогона помечены, курсоры — как до прогона;
   · текст в оценку не пролезает ни лишним ключом, ни значением вне списка.
 
 Работает при поднятой базе (LIBRARY_SQL_TEST_DSN). Корпус придуман (правило 18).
@@ -146,28 +151,44 @@ def _курсор(hi=12, chat="7001", когда=T0) -> dict:
             "checked_at": когда}
 
 
+def _трата(deal="5001", run="chat-ctx-t1", когда=T0, usd=0.0108, outcome="записано", defect=None,
+           api_status=None, estimated=False) -> dict:
+    return {"at": когда, "run_id": run, "part": 1, "deal_id": deal, "model": "claude-opus-5-5",
+            "outcome": outcome, "defect": defect, "api_status": api_status, "tokens_in": 1200,
+            "tokens_out": 300, "usd": usd, "estimated": estimated}
+
+
+def _неудача(deal="5001", chat="7001", когда=T0, run="chat-ctx-t1") -> dict:
+    return {"deal_id": deal, "chat_id": chat, "last_human_at": когда - dt.timedelta(hours=2),
+            "checked_at": когда, "run_id": run}
+
+
 def test_оценка_и_курсор_одной_транзакцией(conn):
     store = cc.База(_соединение(), только_чтение=False)
     try:
         assert store.состояние() == {}
-        store.записать_оценку(_строка(), _курсор())
+        store.записать_оценку(_строка(), _курсор(), _трата())
         s = store.состояние()["5001"]
-        assert s["last_msg_id"] == 12 and s["chat_id"] == "7001"
+        assert s["last_msg_id"] == 12 and s["chat_id"] == "7001" and s["fail_streak"] == 0
         assert _одно(conn, "select confidence::text, usd::text, run_id from deal_chat_ctx") == (
             "0.7", "0.010800", "chat-ctx-t1"), "уверенность — из оценки, а не отдельным значением"
+        assert _одно(conn, "select count(*), sum(usd)::text from deal_chat_spend") == (1, "0.010800")
 
         # оценка не прошла проверку базы (текст лишним ключом) — курсор стоит
         плохая = _годная([15])
         плохая["note"] = "клиент обещал оплатить"
         import psycopg2
         with pytest.raises(psycopg2.errors.CheckViolation):
-            store.записать_оценку(_строка(lo=13, hi=15, v=плохая, run="chat-ctx-t2"), _курсор(15))
+            store.записать_оценку(_строка(lo=13, hi=15, v=плохая, run="chat-ctx-t2"), _курсор(15),
+                                  _трата(run="chat-ctx-t2"))
         assert store.состояние()["5001"]["last_msg_id"] == 12
         assert _одно(conn, "select count(*) from deal_chat_ctx") == (1,)
+        assert _одно(conn, "select count(*) from deal_chat_spend") == (1,), "расход — в той же транзакции"
 
         # доказательство вне оценённого отрезка — тоже отказ базы
         with pytest.raises(psycopg2.errors.CheckViolation):
-            store.записать_оценку(_строка(lo=13, hi=15, v=_годная([12]), run="chat-ctx-t2"), _курсор(15))
+            store.записать_оценку(_строка(lo=13, hi=15, v=_годная([12]), run="chat-ctx-t2"), _курсор(15),
+                                  _трата(run="chat-ctx-t2"))
         assert store.состояние()["5001"]["last_msg_id"] == 12
 
         # чтение без оценки: очередь двигается, курсор оценки — нет
@@ -181,7 +202,8 @@ def test_оценка_и_курсор_одной_транзакцией(conn):
         assert store.состояние()["5002"]["last_msg_id"] == 0
 
         # курсор не уходит назад
-        store.записать_оценку(_строка(lo=5, hi=8, v=_годная([8]), run="chat-ctx-t4"), _курсор(8))
+        store.записать_оценку(_строка(lo=5, hi=8, v=_годная([8]), run="chat-ctx-t4"), _курсор(8),
+                              _трата(run="chat-ctx-t4"))
         assert store.состояние()["5001"]["last_msg_id"] == 12
     finally:
         store.conn.close()
@@ -190,9 +212,9 @@ def test_оценка_и_курсор_одной_транзакцией(conn):
 def test_оценки_только_дописываются_и_откат_пометкой(conn):
     store = cc.База(_соединение(), только_чтение=False)
     try:
-        store.записать_оценку(_строка(run="chat-ctx-t1"), _курсор())
+        store.записать_оценку(_строка(run="chat-ctx-t1"), _курсор(), _трата())
         store.записать_оценку(_строка(lo=13, hi=14, v=_годная([14], state="стоит"), run="chat-ctx-t2",
-                                      когда=T0 + dt.timedelta(hours=1)), _курсор(14))
+                                      когда=T0 + dt.timedelta(hours=1)), _курсор(14), _трата(run="chat-ctx-t2"))
         assert _одно(conn, "select state, due_date from deal_chat_ctx_latest where deal_id = 5001") == ("стоит", None)
         assert store.прошлые(["5001"])["5001"]["verdict"]["state"] == "стоит"
     finally:
@@ -213,12 +235,141 @@ def test_оценки_только_дописываются_и_откат_пом
     assert _одно(conn, "select count(*) from deal_chat_ctx") == (2,), "помечено, а не удалено"
 
 
+def test_неудача_двигает_очередь_и_серию_но_не_курсор(conn):
+    store = cc.База(_соединение(), только_чтение=False)
+    try:
+        store.записать_оценку(_строка(), _курсор(), _трата())
+        позже = T0 + dt.timedelta(days=1)
+        for i in range(1, 3):
+            store.записать_неудачу(_трата(outcome="брак", defect="evidence", run="chat-ctx-t2"),
+                                   _неудача(когда=позже, run="chat-ctx-t2"))
+            s = store.состояние()["5001"]
+            assert (s["fail_streak"], s["last_msg_id"], s["checked_at"]) == (i, 12, позже)
+        assert _одно(conn, "select run_id from deal_chat_state") == ("chat-ctx-t1",), \
+            "ключ прогона у курсора — того, кто сдвинул курсор оценки"
+        # новая сделка, сразу неудача — строка с курсором 0 и серией 1
+        store.записать_неудачу(_трата(deal="5002", outcome="отказ", run="chat-ctx-t2"),
+                               _неудача(deal="5002", chat="7002", run="chat-ctx-t2"))
+        assert (store.состояние()["5002"]["last_msg_id"], store.состояние()["5002"]["fail_streak"]) == (0, 1)
+        # сбой связи — только расход, очередь не трогается
+        store.записать_неудачу(_трата(deal="5003", outcome="сбой_api", usd=0.2, estimated=True,
+                                      run="chat-ctx-t2"), None)
+        assert "5003" not in store.состояние()
+        # записанная оценка обнуляет серию
+        store.записать_оценку(_строка(lo=13, hi=14, v=_годная([14]), run="chat-ctx-t3"), _курсор(14),
+                              _трата(run="chat-ctx-t3"))
+        assert store.состояние()["5001"]["fail_streak"] == 0
+        assert _одно(conn, "select count(*), count(*) filter (where estimated) from deal_chat_spend") == (6, 1)
+    finally:
+        store.conn.close()
+
+
+def test_расход_только_дописывается_и_сутки_по_москве(conn):
+    store = cc.База(_соединение(), только_чтение=False)
+    полночь = dt.datetime(2026, 10, 19, 0, 0, tzinfo=cc._MSK)        # 18.10 21:00 UTC
+    try:
+        for когда, usd in ((полночь - dt.timedelta(seconds=1), 3.0), (полночь, 1.25),
+                           (полночь + dt.timedelta(hours=20), 0.5)):
+            store.записать_неудачу(_трата(когда=когда, usd=usd, outcome="брак", defect="не JSON"), None)
+        assert store.потрачено_с(полночь) == pytest.approx(1.75), "вчерашнее по Москве не в счёт"
+        assert store.потрачено_с(cc.начало_суток(полночь + dt.timedelta(hours=1))) == pytest.approx(1.75)
+    finally:
+        store.conn.close()
+    import psycopg2
+    with conn.cursor() as c:
+        for sql in ("update deal_chat_spend set usd = 0", "delete from deal_chat_spend",
+                    "truncate deal_chat_spend"):
+            with pytest.raises(psycopg2.errors.RaiseException):
+                c.execute(sql)
+    assert _одно(conn, "select count(*) from deal_chat_spend") == (3,)
+
+
+def test_исход_и_брак_расхода_python_и_база_согласны(conn):
+    import psycopg2
+    годные = [("записано", None), ("отказ", None), ("сбой_api", None), ("сбой_записи", None)]
+    годные += [("брак", x) for x in cc.КЛАССЫ_БРАКА]
+    плохие = [("брак", None), ("записано", "evidence"), ("сбой_api", "клиент молчит"), ("брак", "клиент молчит"),
+              ("ответ модели", None), ("брак", "отказ модели")]
+    with conn.cursor() as c:
+        for i, (исход, брак) in enumerate(годные + плохие):
+            ожидается = (исход, брак) in годные
+            assert ожидается == (исход in cc.ИСХОДЫ and (исход == "брак") == (брак is not None)
+                                 and (брак is None or брак in cc.КЛАССЫ_БРАКА))
+            sql = ("insert into deal_chat_spend (run_id, part, deal_id, model, outcome, defect) "
+                   "values ('chat-ctx-t1', 1, %s, 'claude-opus-5-5', %s, %s)")
+            if ожидается:
+                c.execute(sql, (6000 + i, исход, брак))
+            else:
+                with pytest.raises(psycopg2.errors.CheckViolation):
+                    c.execute(sql, (6000 + i, исход, брак))
+        for плохая in ("insert into deal_chat_spend (run_id, part, deal_id, model, outcome) "
+                       "values ('chat-ctx-t1', 0, 1, 'claude-opus-5-5', 'отказ')",
+                       "insert into deal_chat_spend (run_id, part, deal_id, model, outcome) "
+                       "values ('chat-ctx-t1', 1, 1, 'Модель с текстом', 'отказ')",
+                       "insert into deal_chat_spend (run_id, part, deal_id, model, outcome, usd) "
+                       "values ('chat-ctx-t1', 1, 1, 'claude-opus-5-5', 'отказ', -1)"):
+            with pytest.raises(psycopg2.errors.CheckViolation):
+                c.execute(плохая)
+
+
+def test_откат_гейта_помечает_оценки_и_возвращает_курсоры(conn):
+    store = cc.База(_соединение(), только_чтение=False)
+    try:
+        store.записать_оценку(_строка(run="chat-ctx-t1"), _курсор(), _трата())
+        до = store.состояние()
+        позже = T0 + dt.timedelta(days=1)
+        # прогон t2: новая оценка старой сделки и первая — новой
+        store.записать_оценку(_строка(lo=13, hi=14, v=_годная([14], state="стоит"), run="chat-ctx-t2",
+                                      когда=позже), _курсор(14, когда=позже), _трата(run="chat-ctx-t2"))
+        store.записать_оценку(_строка(deal="5002", lo=20, hi=21, v=_годная([21]), run="chat-ctx-t2",
+                                      когда=позже), _курсор(21, chat="7002", когда=позже),
+                              _трата(deal="5002", run="chat-ctx-t2"))
+        assert store.аннулировать("chat-ctx-t2", {"5001": до["5001"], "5002": None}) == 2
+        после = store.состояние()
+        assert после == до, "курсоры — ровно как до прогона, созданные прогоном строки сняты"
+        assert _одно(conn, "select state, msg_to_id from deal_chat_ctx_latest where deal_id = 5001") == ("идёт", 12)
+        assert _одно(conn, "select count(*) from deal_chat_ctx_latest where deal_id = 5002") == (0,)
+        assert _одно(conn, "select count(*), count(voided_at) from deal_chat_ctx") == (3, 2)
+        assert _одно(conn, "select count(*) from deal_chat_spend where run_id = 'chat-ctx-t2'") == (2,), \
+            "расход откатом не снимается"
+        assert store.аннулировать("chat-ctx-t2", {}) == 0, "повторный откат ничего не меняет"
+    finally:
+        store.conn.close()
+
+
+def test_прогон_целиком_на_базе_ломающиеся_чаты_и_откат(conn):
+    """Тот же сценарий, что в tests/test_chat_context.py, но запись — в настоящую базу."""
+    from tests.test_chat_context import СЕГОДНЯ, Выборочная, _много_чатов
+    store = cc.База(_соединение(), только_чтение=False)
+    try:
+        итоги = []
+        for run in ("chat-ctx-r1", "chat-ctx-r2"):
+            портал = _много_чатов(2)
+            счёт = cc.Counter()
+            канд, service = cc.собрать(портал, счёт)
+            итоги.append(cc.обработать(портал, store, канд, service, режим="live", лимит=100, бюджет=5.0,
+                                       сегодня=СЕГОДНЯ, run_id=run, клиент_модели=Выборочная(),
+                                       итог=cc.Итог("live", счёт=счёт), частей=10))
+        первый, второй = итоги
+        assert первый.код == 1 and первый.счёт["аннулировано"] == 3
+        assert второй.код == 0 and второй.счёт["записано"] == 6 and второй.счёт["брак_повторный"] == 2
+        assert _одно(conn, "select count(*), count(voided_at) from deal_chat_ctx") == (9, 3)
+        assert _одно(conn, "select count(*) from deal_chat_ctx_latest") == (6,)
+        assert _одно(conn, "select count(*), max(fail_streak) from deal_chat_state where fail_streak > 0") == (2, 2)
+        assert _одно(conn, "select count(*), count(distinct part) > 1 from deal_chat_spend") == (5 + 8, True)
+        assert _одно(conn, "select count(*) from deal_chat_state where last_msg_id > 0") == (6,)
+    finally:
+        store.conn.close()
+
+
 def test_холостой_без_схемы_и_только_чтение(conn):
     with conn.cursor() as c:
         c.execute("drop table deal_chat_state cascade")
+        c.execute("drop table deal_chat_spend cascade")
     store = cc.База(_соединение(только_чтение=True), только_чтение=True)
     try:
-        assert store.состояние() == {} and store.схема is False
+        assert store.потрачено_с(T0) == 0.0 and store.схема is False
+        assert store.состояние() == {}
         assert store.прошлые(["5001"]) == {}
     finally:
         store.conn.close()
@@ -243,8 +394,9 @@ def test_доступ_только_сервисному_ключу():
         c.execute("""select relname, relrowsecurity, relforcerowsecurity from pg_class
                       where relnamespace = %s::regnamespace and relname like 'deal_chat_%%' and relkind = 'r'
                       order by relname""", (СХЕМА,))
-        assert c.fetchall() == [("deal_chat_ctx", True, True), ("deal_chat_state", True, True)]
-        for таблица in ("deal_chat_ctx", "deal_chat_state", "deal_chat_ctx_latest"):
+        assert c.fetchall() == [("deal_chat_ctx", True, True), ("deal_chat_spend", True, True),
+                                ("deal_chat_state", True, True)]
+        for таблица in ("deal_chat_ctx", "deal_chat_state", "deal_chat_spend", "deal_chat_ctx_latest"):
             имя = f"{СХЕМА}.{таблица}"
             for р in ("anon", "authenticated"):
                 c.execute("select has_table_privilege(%s, %s, 'select')", (р, имя))
@@ -256,6 +408,13 @@ def test_доступ_только_сервисному_ключу():
             assert c.fetchone()[0]
         c.execute("select has_table_privilege('service_role', %s, 'delete')", (f"{СХЕМА}.deal_chat_ctx",))
         assert not c.fetchone()[0], "оценки сервисный ключ не удаляет"
+        c.execute("select has_table_privilege('service_role', %s, 'insert'), "
+                  "has_table_privilege('service_role', %s, 'update'), "
+                  "has_table_privilege('service_role', %s, 'delete'), "
+                  "has_sequence_privilege('service_role', %s, 'usage'), "
+                  "has_sequence_privilege('anon', %s, 'usage')",
+                  (f"{СХЕМА}.deal_chat_spend",) * 3 + (f"{СХЕМА}.deal_chat_spend_id_seq",) * 2)
+        assert c.fetchone() == (True, False, False, True, False), "расход: только чтение и вставка"
         c.execute("select has_column_privilege('service_role', %s, 'voided_at', 'update'), "
                   "has_column_privilege('service_role', %s, 'verdict', 'update')",
                   (f"{СХЕМА}.deal_chat_ctx", f"{СХЕМА}.deal_chat_ctx"))
