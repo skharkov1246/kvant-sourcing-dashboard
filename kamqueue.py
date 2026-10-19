@@ -8,8 +8,11 @@
   • реализация (lifecycle.build → queue): пункты по срокам и закрытию, у которых
     разговор с клиентом ведёт КАМ — late, risk, forecast, planAfterDl, unpaid, noUtd;
     пункты одной сделки одного вида сводятся в один (заказов несколько — разговор один);
-  • открытые сделки реализации и пресейла без поля «КАМ» — noKam: хозяин пункта
-    руководитель КАМ, действие «назначить КАМа».
+  • сделки без поля «КАМ» — noKam: хозяин пункта руководитель КАМ, действие
+    «назначить КАМа». Это открытые сделки реализации и пресейла и любая сделка
+    реализации (в том числе закрытая — без УПД) с пунктом для КАМа. Сигналы, которые
+    без КАМа некому отдать (срок сорван, неоплата, мяч у КАМа сверх порога), не
+    теряются: они — в пункте noKam (also), и важность пункта — по самому важному из них.
 Рядом — сроки клиента в ближайшие 14 дней (upcoming14): не отклонение, а то, что
 КАМу пора сверить с ОСС и подтвердить клиенту.
 
@@ -19,7 +22,9 @@
 
 ЗОЛОТОЕ ПРАВИЛО ЧАТА (19.10.2026): сделка пресейла, у которой простой по стадии
 снят живым чатом (presale: chat.status = active), в очередь не идёт — с ней идёт
-работа. Чат не проверен — пункт остаётся с пометкой.
+работа. Чат не проверен — пункт остаётся с пометкой. Порог мяча у КАМа (3–7 дн.)
+меньше простоя пресейла (14 дн.), поэтому чаты таких сделок пресейл читает отдельно —
+по правилу chat_wanted (main.py передаёт его в presale.compute, бюджет общий).
 
 КЛЮЧ КАМа — id из поля «КАМ» (contracts.rows.kamId, presale.openDeals.kamId): подписи
 реализации («Имя Фамилия (должность)») и пресейла («Фамилия Имя») из разных
@@ -87,6 +92,13 @@ def ball_rule(stage_name: str) -> tuple[int, str]:
     return BALL_KAM_DEFAULT
 
 
+def chat_wanted(r: dict) -> bool:
+    """Строка presale.compute, чей чат прочитать для очереди: мяч у КАМа и сделка стоит
+    в стадии дольше порога — кандидат в ballKam (с КАМом или без него)."""
+    days = r.get("days")
+    return r.get("ball") == "kam" and days is not None and days > ball_rule(r.get("stageName") or "")[0]
+
+
 def _date(s) -> dt.date | None:
     s = str(s or "")
     try:
@@ -96,8 +108,11 @@ def _date(s) -> dt.date | None:
         return None
 
 
-def _chat_note(ch: dict | None) -> str:
-    ch = ch or {}
+def _chat_note(ch: dict | None, *, gate: bool = False) -> str:
+    """Пометка о чате. gate — чат решает, пункт ли это (мяч у КАМа): тогда и не
+    прочитанный чат (нет читателя, сделка не попала в чтение) — «чат не проверен»."""
+    if not ch:
+        return "чат не проверен" if gate else ""
     st = ch.get("status")
     if st == "quiet":
         return f"в чате тихо {ch['days']} дн." if ch.get("days") is not None else "в чате людей не было"
@@ -143,12 +158,27 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
 
     queue: list[dict] = []
     chat_active = 0
+    # Сигналы сделок без КАМа: {сделка: {вид: сигнал}}. Пункт с хозяином-КАМом такой
+    # сделке не поставить, но и терять сигнал нельзя: сорванный срок без КАМа срочнее,
+    # а не тише. Сигналы едут в пункт noKam (also), важность — по самому важному.
+    orphan: dict[str, dict[str, dict]] = defaultdict(dict)
+    orphan_x: dict[str, dict] = {}            # пункт реализации — подписи сделки, которой нет в rows
+
+    def signal(did, code: str, days, **kw) -> None:
+        """Сигнал сделки без КАМа: по виду — один, дней — наибольшее, заказы — счётом."""
+        sig = orphan[str(did)]
+        o = sig.get(code)
+        if o is None:
+            o = sig[code] = {"code": code, "what": CODES[code][1], "days": days, "orders": 0}
+        o["orders"] += 1
+        if (days or 0) >= (o["days"] or 0):
+            o.update(days=days, **kw)
 
     def add(code: str, act: str, *, uid: str, kam: str, gone: bool, deal: str, days, src: str,
-            title: str, seq=0, customer: str = "", extra: dict | None = None) -> None:
-        sev, what = CODES[code]
+            title: str, seq=0, customer: str = "", extra: dict | None = None, sev: int | None = None) -> None:
+        sev0, what = CODES[code]
         m, ml = money(deal)
-        queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
+        queue.append({"code": code, "sev": sev0 if sev is None else sev, "what": what, "act": act, "days": days,
                       "kamId": uid if code != "noKam" else "", "kam": kam if code != "noKam" else HEAD,
                       "kamGone": bool(gone) and code != "noKam", "deal": str(deal), "src": src,
                       "customer": customer or "", "title": title or "",
@@ -156,36 +186,64 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
                       # № реализации есть только у сделок реализации
                       **({"seq": seq} if seq else {})})
 
-    # 1. пресейл: мяч у КАМа сверх порога; сделки без КАМа
     no_kam: set[str] = set()
+
+    def add_no_kam(did: str, *, src: str, days, title: str, seq=0, customer: str = "",
+                   extra: dict | None = None) -> None:
+        """Один пункт «назначить КАМа» на сделку; сигналы сделки — в also, по важности."""
+        did = str(did)
+        no_kam.add(did)
+        also = sorted(orphan.pop(did, {}).values(), key=lambda a: (CODES[a["code"]][0], -(a["days"] or 0)))
+        ex = dict(extra or {})
+        sev = None
+        if also:
+            for a in also:
+                if a["orders"] <= 1:
+                    a.pop("orders")
+            ex["also"] = also
+            sev = CODES[also[0]["code"]][0]
+            days = also[0]["days"]            # место в очереди — по самому важному сигналу
+            if also[0].get("owner"):
+                ex["owner"] = also[0]["owner"]
+        add("noKam", "назначить КАМа", uid="", kam="", gone=False, deal=did, days=days, src=src,
+            title=title, seq=seq, customer=customer, extra=ex, sev=sev)
+
+    # 1. пресейл: мяч у КАМа сверх порога; сделки без КАМа
+    ps_none: list[dict] = []
     for d in (presale_data or {}).get("openDeals") or []:
         uid = str(d.get("kamId") or "")
-        kam, gone = label(uid, d.get("kam") if uid else "")
         days = d.get("days")
-        if not uid:
-            no_kam.add(str(d["id"]))
-            add("noKam", "назначить КАМа", uid="", kam="", gone=False, deal=d["id"], days=days, src="presale",
-                title=d.get("t") or "", extra={"stage": d.get("stageName") or "", "chat": _chat_note(d.get("chat"))})
-            continue
-        if d.get("ball") != "kam" or days is None:
-            continue
+        over = chat_wanted(d)
         thr, act = ball_rule(d.get("stageName") or "")
-        if days <= thr:
-            continue
-        if (d.get("chat") or {}).get("status") == "active":
+        if over and (d.get("chat") or {}).get("status") == "active":
             chat_active += 1                  # золотое правило: в чате идёт работа
+            over = False
+        if not uid:
+            ps_none.append(d)
+            if over:
+                signal(d["id"], "ballKam", days, thr=thr)
             continue
+        if not over:
+            continue
+        kam, gone = label(uid, d.get("kam"))
         add("ballKam", act, uid=uid, kam=kam, gone=gone, deal=d["id"], days=days, src="presale",
             title=d.get("t") or "",
-            extra={"stage": d.get("stageName") or "", "thr": thr, "chat": _chat_note(d.get("chat"))})
+            extra={"stage": d.get("stageName") or "", "thr": thr, "chat": _chat_note(d.get("chat"), gate=True)})
 
     # 2. реализация: пункты по срокам и закрытию — один на сделку и вид
     agg: dict[tuple[str, str], dict] = {}
     for x in (life or {}).get("queue") or []:
         code = x.get("code")
         uid = str(x.get("kamId") or "")
-        if code not in REAL_ACT or not uid:
-            continue                          # без КАМа сделка придёт пунктом noKam
+        if code not in REAL_ACT:
+            continue
+        if not uid:
+            # без КАМа разговор с клиентом вести некому: сигнал — в пункт noKam сделки
+            did = str(x.get("deal"))
+            orphan_x.setdefault(did, x)
+            signal(did, code, x.get("days"), dl=x.get("dl") or "",
+                   owner=str(x.get("who") or "").replace(" (уволен)", ""))
+            continue
         k = (str(x.get("deal")), code)
         a = agg.get(k)
         if a is None:
@@ -205,17 +263,29 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
                    # хозяин заказа (ответственный, ОСС) — с кем КАМ сверяет срок и оплату
                    "owner": str(x.get("who") or "").replace(" (уволен)", "")})
 
-    # 3. реализация: открытые сделки без КАМа
+    # 3. сделки без КАМа: пресейл; открытые сделки реализации; сделки реализации с
+    #    сигналом для КАМа — и закрытые (УПД не получен), их в открытых нет
+    for d in ps_none:
+        # мяч у КАМа сверх порога — чат решает, сигнал ли это: непрочитанный помечается
+        gate = "ballKam" in orphan.get(str(d["id"]), {})
+        add_no_kam(d["id"], src="presale", days=d.get("days"), title=d.get("t") or "",
+                   extra={"stage": d.get("stageName") or "", "chat": _chat_note(d.get("chat"), gate=gate)})
+
+    def real_no_kam(did: str, r: dict, x: dict) -> None:
+        sd = r.get("stageDays")
+        add_no_kam(did, src="real", days=round(sd) if isinstance(sd, (int, float)) else None,
+                   title=r.get("title") or x.get("title") or "", seq=r.get("seq") or x.get("seq") or 0,
+                   customer=r.get("customer") or x.get("customer") or "",
+                   extra={"stage": r.get("stageName") or "",
+                          **({"stageDays": round(sd)} if isinstance(sd, (int, float)) else {})})
+
     for r in rows:
         did = str(r.get("deal"))
         if r.get("kamId") or did in no_kam:
             continue
-        no_kam.add(did)
-        sd = r.get("stageDays")
-        add("noKam", "назначить КАМа", uid="", kam="", gone=False, deal=did,
-            days=round(sd) if isinstance(sd, (int, float)) else None,
-            src="real", title=r.get("title") or "", seq=r.get("seq") or 0, customer=r.get("customer") or "",
-            extra={"stage": r.get("stageName") or ""})
+        real_no_kam(did, r, orphan_x.get(did) or {})
+    for did in [d for d in orphan if d not in no_kam]:
+        real_no_kam(did, by_deal.get(did) or {}, orphan_x.get(did) or {})
 
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -(q["money"] or 0), str(q["deal"])))
 

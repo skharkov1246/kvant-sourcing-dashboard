@@ -594,13 +594,16 @@ class PresaleChats:
 
 
 def build_presale(*, chat: bool = True) -> dict:
-    """Синтетика → настоящий presale.compute с общим читателем чатов (как main.py)."""
+    """Синтетика → настоящий presale.compute с общим читателем чатов и чтением чатов
+    кандидатов «мяч у КАМа» (kamqueue.chat_wanted) — как main.py."""
     import chat_activity
+    import kamqueue
     import presale
     reader = chat_activity.Reader(PresaleChats(), set()) if chat else None
     return presale.compute(cid="32", cat_name="Пресейл", deals=ps_deals(), stage_meta=ps_stage_meta(),
                            rfqs=[], people=CT_PEOPLE, names={}, today=CT_TODAY, chat_reader=reader,
-                           cat_labels=PS_CAT_LABELS)
+                           cat_labels=PS_CAT_LABELS,
+                           chat_also=kamqueue.chat_wanted)
 
 
 def build_kam_queue() -> dict:

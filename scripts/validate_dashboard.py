@@ -245,6 +245,10 @@ def check_browser(path: Path, errors: list[str], warns: list[str], notes: list[s
 # рендер только видимой вкладки «Сорсинг», а поломка в «КАМах» или «Реализации»
 # доезжала до прода незамеченной. Здесь все вкладки принудительно открываются.
 LAZY_TABS = ["company", "reps", "eng", "contracts", "suppliers", "cohorts", "advisor"]
+# тело таблицы очереди КАМа: renderPeople(PP,'kam','repsRole') → _kqHtml(…,'repsRole-kq') → «…b»
+KAM_QUEUE_BODY = "repsRole-kqb"
+KV_FAIL = "data-kv-fail"          # метка ошибки вставленной проверки в DOM
+_KV_FAIL_RE = re.compile(r"<div %s=\"\"[^>]*>([^<]*)</div>" % KV_FAIL)
 _TAB_FAIL = "Вкладка не отрисовалась"
 
 
@@ -257,11 +261,25 @@ def _with_tabs_opened(path: Path) -> Path:
     # Раздел «КАМы» вкладки «КАМ и продукт-оунеры» — подменю, а не вкладка: он
     # рисуется по клику (renderPeople с очередью КАМа). Открываем и его — иначе
     # ошибка в очереди КАМа доезжала бы до прода, а вкладка числилась бы целой.
-    inject = ("<script>try{[%s].forEach(function(t){try{window.ensureTab&&window.ensureTab(t)}"
-              "catch(e){console.error('вкладка '+t+': '+e)}})}catch(e){console.error('ensureTab: '+e)}"
-              "try{var b=document.querySelector('#tab-reps [data-r=\"role:kam\"]');if(b)b.click()}"
-              "catch(e){console.error('раздел КАМы: '+e)}</script>"
-              % ",".join(f"'{t}'" for t in LAZY_TABS))
+    # Молча пройти нельзя: есть данные ролей и меню вкладки, а кнопки «КАМы» нет
+    # (сменилась разметка или id роли) — ошибка; есть очередь КАМа, а после клика её
+    # таблицы нет — ошибка. Нет данных людей или коммерсантов — раздел и не рисуется,
+    # это деградация, о которой вкладка пишет сама, а не поломка шаблона.
+    #
+    # Ошибки вставки — меткой в DOM (KV_FAIL), а не только console.error: Chromium 141
+    # пишет console.error в журнал как INFO:CONSOLE, и шаблон ERROR:CONSOLE его не
+    # видит (проверено 19.10.2026 — сломанная кнопка роли проходила проверку).
+    inject = ("<script>function kvFail(m){try{console.error(m);var d=document.createElement('div');"
+              "d.setAttribute('%s','');d.textContent=m;document.body.appendChild(d)}catch(e){}}"
+              "try{[%s].forEach(function(t){try{window.ensureTab&&window.ensureTab(t)}"
+              "catch(e){kvFail('вкладка '+t+': '+e)}})}catch(e){kvFail('ensureTab: '+e)}"
+              "try{var P=window.__PEOPLE__,b=document.querySelector('#tab-reps [data-r=\"role:kam\"]');"
+              "if(b){b.click();if(P&&P.kamQueue&&!document.getElementById('%s'))"
+              "kvFail('раздел КАМы: очередь КАМа не отрисовалась')}"
+              "else if(P&&P.roles&&document.querySelector('#tab-reps .subnav'))"
+              "kvFail('раздел КАМы: кнопка роли не найдена')}"
+              "catch(e){kvFail('раздел КАМы: '+e)}</script>"
+              % (KV_FAIL, ",".join(f"'{t}'" for t in LAZY_TABS), KAM_QUEUE_BODY))
     tmp = path.parent / (path.stem + ".tabs.html")
     tmp.write_text(html.replace("</body>", inject + "</body>", 1), encoding="utf-8")
     return tmp
@@ -272,6 +290,9 @@ def _check_tabs_dom(dom: str, errors: list[str]) -> None:
     # текст-маркер есть и в исходнике обработчика ensureTab, поэтому ищем его
     # только в разметке: скрипты из DOM вырезаем
     body = re.sub(r"(?is)<script[^>]*>.*?</script>", " ", dom)
+    fails = _KV_FAIL_RE.findall(body)
+    if fails:
+        errors.append("проверка открытых вкладок: " + " | ".join(f[:160] for f in fails[:3]))
     if _TAB_FAIL not in body:
         return
     broken = []

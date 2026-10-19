@@ -50,7 +50,7 @@ def _q(code, deal, days, *, kam="10", who="Глеб (ОСС)", dl=""):
 def test_пункты_реализации_по_одному_на_сделку_и_вид():
     life = {"queue": [_q("late", "6001", 5), _q("late", "6001", 12), _q("unpaid", "6001", 40),
                       _q("shipSlip", "6001", 3),                    # не КАМу — ведёт ОСС
-                      _q("late", "6002", 9, kam="")]}               # без КАМа — придёт пунктом noKam
+                      _q("late", "6002", 9, kam="")]}               # без КАМа — сигнал в пункте noKam
     rows = [_deal("6001"), _deal("6002", kam="")]
     Q = kq.build(None, life, rows, СЕГОДНЯ)
     by = {(x["deal"], x["code"]): x for x in Q["queue"]}
@@ -62,8 +62,82 @@ def test_пункты_реализации_по_одному_на_сделку_�
     assert by[("6001", "unpaid")]["act"] == "получить у клиента дату оплаты — ведёт ответственный заказа"
     assert by[("6001", "unpaid")]["owner"] == "Глеб (ОСС)"
     нет = by[("6002", "noKam")]
-    assert нет["kam"] == kq.HEAD and нет["act"] == "назначить КАМа" and нет["days"] == 12
-    assert [x["code"] for x in Q["queue"]] == ["late", "unpaid", "noKam"], "сначала сорванный срок"
+    assert нет["kam"] == kq.HEAD and нет["act"] == "назначить КАМа" and нет["stageDays"] == 12
+    assert [x["code"] for x in Q["queue"]] == ["late", "noKam", "unpaid"], \
+        "сначала сорванный срок — и у сделки без КАМа тоже"
+
+
+def test_без_кама_сорванный_срок_не_тонет_внизу():
+    """Открытая сделка без КАМа с сорванным сроком: пункт noKam с важностью «срок сорван»,
+    дни — сигнала, сигнал — строкой пункта; вниз очереди он не уходит."""
+    life = {"queue": [_q("late", "6002", 9, kam=""), _q("late", "6002", 4, kam=""),
+                      _q("unpaid", "6002", 40, kam=""), _q("noUtd", "6001", 30)]}
+    Q = kq.build(None, life, [_deal("6001"), _deal("6002", kam="")], СЕГОДНЯ)
+    нет = next(x for x in Q["queue"] if x["code"] == "noKam")
+    assert нет["deal"] == "6002" and нет["sev"] == kq.CODES["late"][0] and нет["days"] == 9
+    assert [(a["code"], a["days"]) for a in нет["also"]] == [("late", 9), ("unpaid", 40)], "по важности"
+    assert нет["also"][0]["orders"] == 2 and "orders" not in нет["also"][1], "заказы — счётом, один не пишется"
+    assert нет["owner"] == "Глеб (ОСС)" and нет["kam"] == kq.HEAD and нет["kamId"] == ""
+    assert Q["queue"][0] is нет, "сорванный срок без КАМа — наверху, раньше УПД с КАМом"
+    assert sum(1 for x in Q["queue"] if x["deal"] == "6002") == 1, "один пункт на сделку без КАМа"
+
+
+def test_закрытая_сделка_без_кама_без_упд_не_пропадает():
+    """lifecycle держит noUtd и у закрытых сделок; без КАМа она — пункт noKam, а не ничто."""
+    life = {"queue": [_q("noUtd", "6003", 20, kam="")]}
+    Q = kq.build(None, life, [_deal("6003", kam="", closed=True)], СЕГОДНЯ)
+    assert [(x["code"], x["deal"]) for x in Q["queue"]] == [("noKam", "6003")]
+    нет = Q["queue"][0]
+    assert нет["sev"] == kq.CODES["noUtd"][0] and нет["days"] == 20
+    assert [a["code"] for a in нет["also"]] == ["noUtd"] and нет["seq"] == 3 and нет["title"] == "Сделка 6003"
+    # сделки нет в строках «Реализации» — подписи из самого пункта
+    Q2 = kq.build(None, life, [], СЕГОДНЯ)
+    assert Q2["queue"][0]["customer"] == "Заказчик 6003" and Q2["queue"][0]["title"] == "6003/1"
+    assert Q2["head"]["noKam"] == 1 and Q2["head"]["n"] == 1
+
+
+def _ps_open(did, stage, days, *, kam="10", chat=None, ball="kam"):
+    return {"id": did, "t": f"Узел {did}", "stage": "C32:X", "stageName": stage, "days": days, "ball": ball,
+            "who": "", "kam": "Анна (КАМ)" if kam else "КАМ не указан", "kamId": kam, "kamGone": False,
+            "flags": [], "chat": chat, "created": ""}
+
+
+def test_мяч_у_кама_без_прочитанного_чата_помечен():
+    """Чат не читался (нет читателя или сделка не попала в чтение) — пункт с пометкой."""
+    ps = {"openDeals": [_ps_open("8001", "Экономика готова | Можно подавать", 5)]}
+    x = kq.build(ps, None, None, СЕГОДНЯ)["queue"][0]
+    assert x["code"] == "ballKam" and x["chat"] == "чат не проверен"
+    ps = {"openDeals": [_ps_open("8001", "Экономика готова | Можно подавать", 5,
+                                 chat={"status": "skipped", "days": None, "last": ""})]}
+    assert kq.build(ps, None, None, СЕГОДНЯ)["queue"][0]["chat"] == "чат не проверен"
+
+
+def test_без_кама_мяч_у_кама_сверх_порога_сигналом_и_по_золотому_правилу():
+    тихо = {"status": "quiet", "days": 20, "last": ""}
+    живо = {"status": "active", "days": 1, "last": ""}
+    ps = {"openDeals": [_ps_open("8101", "Экономика готова | Можно подавать", 6, kam="", chat=тихо),
+                        _ps_open("8102", "Экономика готова | Можно подавать", 6, kam="", chat=живо),
+                        _ps_open("8103", "Экономика готова | Можно подавать", 2, kam=""),
+                        _ps_open("8104", "Поиск поставщиков", 30, kam="", ball="src")]}
+    Q = kq.build(ps, None, None, СЕГОДНЯ)
+    by = {x["deal"]: x for x in Q["queue"]}
+    assert {x["code"] for x in Q["queue"]} == {"noKam"} and set(by) == {"8101", "8102", "8103", "8104"}
+    assert by["8101"]["sev"] == kq.CODES["ballKam"][0] and by["8101"]["also"][0]["thr"] == 3
+    assert by["8101"]["chat"] == "в чате тихо 20 дн."
+    assert "also" not in by["8102"] and by["8102"]["sev"] == kq.CODES["noKam"][0], "в чате работа — сигнала нет"
+    assert "also" not in by["8103"] and "also" not in by["8104"], "в пороге / мяч не у КАМа"
+    assert by["8104"]["chat"] == "", "мяч не у КАМа — чат пункта не решает"
+    assert Q["head"]["chatActive"] == 1
+    assert Q["queue"][0]["deal"] == "8101"
+
+
+def test_правило_чтения_чата_для_очереди():
+    assert kq.chat_wanted(_ps_open("1", "Экономика готова | Можно подавать", 4))
+    assert not kq.chat_wanted(_ps_open("1", "Экономика готова | Можно подавать", 3)), "порог — включительно"
+    assert not kq.chat_wanted(_ps_open("1", "Сорсинг завершен / Ожидаем решение заказчика", 14))
+    assert kq.chat_wanted(_ps_open("1", "Сорсинг завершен / Ожидаем решение заказчика", 15))
+    assert not kq.chat_wanted(_ps_open("1", "Поиск поставщиков", 40, ball="src"))
+    assert not kq.chat_wanted(_ps_open("1", "Экономика готова | Можно подавать", None))
 
 
 @pytest.mark.parametrize("дней, корзина", [(1, "unpaid30"), (30, "unpaid30"), (31, "unpaid90"),
@@ -104,6 +178,8 @@ def test_мяч_у_кама_по_порогу_и_золотому_правилу
     assert set(ball) == {"8001", "8003"}, "8002 и 8005 — в пороге, 8004 — в чате идёт работа"
     assert ball["8001"]["thr"] == 3 and ball["8001"]["act"].startswith("подать ТКП")
     assert ball["8003"]["chat"] == "в чате тихо 30 дн."
+    # 5 дн. в «Экономика готова» — меньше простоя пресейла (14), но чат прочитан для очереди
+    assert ball["8001"]["chat"] == "в чате людей не было"
     assert Q["head"]["chatActive"] == 1
 
 
@@ -112,6 +188,9 @@ def test_без_кама_реализация_и_пресейл(Q):
     assert set(нет) == {"8006", "8008", "6023"}, "ответственный сделки (8008) КАМом не считается"
     assert {x["kam"] for x in нет.values()} == {kq.HEAD} and {x["kamId"] for x in нет.values()} == {""}
     assert нет["8006"]["src"] == "presale" and нет["6023"]["src"] == "real"
+    # у 6023 есть пункты для КАМа — без КАМа они сигналами пункта noKam, а не потеряны
+    assert {a["code"] for a in нет["6023"].get("also", [])} == {"unpaid", "noUtd"}
+    assert нет["6023"]["sev"] == kq.CODES["unpaid"][0]
 
 
 def test_сводка_сходится(Q):

@@ -563,7 +563,10 @@ def run(args) -> int:
         if not _presale_in:
             return
         try:
-            m["presale"] = presale_mod.compute(**_presale_in, chat_reader=chat_reader)
+            # чаты читаются и у сделок с мячом у КАМа сверх порога очереди КАМа (3–7 дн.):
+            # золотое правило снимает и пункт «мяч у КАМа», а простой пресейла — от 14 дн.
+            m["presale"] = presale_mod.compute(**_presale_in, chat_reader=chat_reader,
+                                               chat_also=kamqueue_mod.chat_wanted)
             _h = m["presale"]["head"]
             print(f"• Воронка пресейла #{_presale_in['cid']}: сделок {_h['total']}, открыто {_h['open']}, "
                   f"отказ {_h['lost']}, выиграно {_h['won']}; с запросом {_h['withRfqPct']} %, запросов {_h['rfq']}; "

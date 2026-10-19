@@ -37,6 +37,11 @@
                 сделка видна, но в «стоят» не входит.
 Сверка: стоят по стадии = stale + staleChat + staleUnverified (head.staleStage).
 Без читателя (chat_reader=None) — прежнее поведение: все простои «stale».
+Ещё кандидаты чтения — chat_also (правило вызывающего): очередь КАМа ставит пункт
+«мяч у КАМа» уже после 3–7 дней в стадии, раньше ЗАСТОЙ_ДНЕЙ, и золотое правило
+действует и там. Такой сделке пишется chat, а флаги не меняются: простоя по стадии
+у неё нет. Порядок общий — дольше всех стоящие первыми, так что простой по стадии
+(> ЗАСТОЙ_ДНЕЙ) бюджет получает раньше.
 
 КАМ СДЕЛКИ — только из поля «КАМ» (KAM_F). Ответственный сделки — исполнитель
 (сорсер или коммерсант, зонд v48: 53 % / 46 %), а не КАМ: подставлять его вместо
@@ -47,6 +52,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 from collections import defaultdict
+from typing import Callable
 
 import chat_activity
 import config
@@ -187,9 +193,12 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             rfqs: list[dict], people: dict[str, dict] | None, names: dict[str, str],
             today: dt.date, service_ids: set[str] | None = None,
             chat_reader: chat_activity.Reader | None = None,
-            cat_labels: dict[str, str] | None = None) -> dict:
+            cat_labels: dict[str, str] | None = None,
+            chat_also: Callable[[dict], bool] | None = None) -> dict:
     """chat_reader — общий на сборку читатель чатов: простой по стадии проверяется
-    чатом сделки (золотое правило, см. шапку). None — без чата, как до 19.10.2026."""
+    чатом сделки (золотое правило, см. шапку). None — без чата, как до 19.10.2026.
+    chat_also(строка) — открытые сделки, чей чат прочитать сверх простоя по стадии
+    (очередь КАМа: kamqueue.chat_wanted); флагов им не меняет, только пишет chat."""
     people = people or {}
     service = set(service_ids or ())
     stages = sorted(((sid, m) for sid, m in stage_meta.items() if str(m.get("cat")) == str(cid)),
@@ -268,14 +277,15 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
     # сделок, весом по деньгам здесь не упорядочить.
     stale_stage = sum(1 for r in rows if "stale" in r["flags"])
     if chat_reader is not None:
-        cands = [(r["id"], r["_chat"], float(r["days"] or 0)) for r in rows if "stale" in r["flags"]]
+        cands = [(r["id"], r["_chat"], float(r["days"] or 0)) for r in rows
+                 if "stale" in r["flags"] or (chat_also is not None and r["open"] and chat_also(r))]
         res = chat_reader.check(cands, today) if cands else {}
         for r in rows:
             ch = res.get(r["id"])
-            if not ch or "stale" not in r["flags"]:
+            if not ch:
                 continue
             r["chat"] = {k: ch.get(k) for k in ("status", "days", "last")}
-            if ch["status"] == "quiet":
+            if "stale" not in r["flags"] or ch["status"] == "quiet":
                 continue
             нов = "staleChat" if ch["status"] == "active" else "staleUnverified"
             r["flags"] = [нов if f == "stale" else f for f in r["flags"]]

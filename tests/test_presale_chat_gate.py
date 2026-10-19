@@ -161,3 +161,39 @@ def test_синтетика_smoke_сходится():
     h = fixture.build_presale()["head"]
     assert h["staleStage"] == h["stale"] + h["staleChat"] + h["staleUnverified"]
     assert h["stale"] and h["staleChat"] and h["staleUnverified"], "smoke рисует все три корзины"
+
+
+def test_чаты_кандидатов_очереди_кама_читаются_флаги_не_меняются():
+    """chat_also: сделка с мячом у КАМа сверх порога очереди (5 дн. > 3) — меньше простоя
+    пресейла (14), но её чат читается: золотое правило снимает и пункт «мяч у КАМа»."""
+    import kamqueue
+    стадии = dict(СТАДИИ, **{"C32:READY": {"name": "Экономика готова | Можно подавать", "sem": "P",
+                                           "sort": 70, "cat": "32"}})
+    сделки = [dict(сделка("21", 5, чат="121", кам="50"), STAGE_ID="C32:READY"),     # 5 > 3 — читать
+              dict(сделка("22", 2, чат="122", кам="50"), STAGE_ID="C32:READY"),     # 2 ≤ 3 — не читать
+              сделка("23", 30, чат="123", кам="51")]                                # простой по стадии
+    портал = Чаты({"121": 1, "123": 40})
+
+    def ps(reader):
+        return presale.compute(cid="32", cat_name="Пресейл", deals=сделки, stage_meta=стадии, rfqs=[],
+                               people=ЛЮДИ, names={}, today=СЕГОДНЯ, chat_reader=reader,
+                               chat_also=kamqueue.chat_wanted)
+    out = ps(chat_activity.Reader(портал, set()))
+    r = {x["id"]: x for x in out["openDeals"]}
+    assert sorted(портал.вызовы) == ["121", "123"], "в пороге (22) чат не читается"
+    assert r["21"]["chat"]["status"] == "active" and r["21"]["flags"] == [], "флагов простоя не добавляет"
+    assert r["22"]["chat"] is None
+    assert r["23"]["flags"] == ["stale"] and r["23"]["chat"]["status"] == "quiet"
+    h = out["head"]
+    assert (h["stale"], h["staleChat"], h["staleUnverified"], h["staleStage"]) == (1, 0, 0, 1), \
+        "сверка простоя по стадии не тронута"
+    # бюджет на один запрос: простой по стадии (дольше стоит) читается первым
+    портал2 = Чаты({"121": 1, "123": 40})
+    out2 = ps(chat_activity.Reader(портал2, set(), budget=1))
+    r2 = {x["id"]: x for x in out2["openDeals"]}
+    assert портал2.вызовы == ["123"] and r2["21"]["chat"]["status"] == "skipped"
+    q2 = {x["deal"]: x for x in kamqueue.build(out2, None, None, СЕГОДНЯ)["queue"] if x["code"] == "ballKam"}
+    assert q2["21"]["chat"] == "чат не проверен" and q2["23"]["chat"] == "в чате тихо 40 дн."
+    # без читателя — ничего не читается, пункт помечен
+    q = kamqueue.build(ps(None), None, None, СЕГОДНЯ)["queue"]
+    assert {x["deal"]: x["chat"] for x in q if x["code"] == "ballKam"}["21"] == "чат не проверен"
