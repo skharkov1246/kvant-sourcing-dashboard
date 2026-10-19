@@ -5,10 +5,10 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 318,
-    "total_bytes": 127708273,
+    "total_bytes": 126518743,
     "by_sensitivity": {
-      "внутреннее": 196,
-      "конфиденциально": 69,
+      "внутреннее": 197,
+      "конфиденциально": 68,
       "публикуемо": 53
     },
     "by_subproject": {
@@ -911,45 +911,6 @@
       ]
     },
     {
-      "path": "data/chat_snapshot.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 1750529,
-      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. С 19.10.2026 в файле только числа по сотрудникам (uid Битрикса); список «ждут ответа» с названиями сделок и LLM-оценки — в KV Cloudflare, ключ chat:v1. До первого прогона после переноса файл ещё прежней схемы.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "assessment",
-        "days",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "assessment",
-        "records": 15
-      },
-      "last_change": "2026-10-18",
-      "last_author": "github-actions[bot]",
-      "last_commit": "642cd5aa",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "оценки и данные сотрудников"
-        ]
-      },
-      "referenced_by": [
-        ".github/workflows/deploy.yml",
-        ".github/workflows/gate.yml",
-        ".github/workflows/scan.yml",
-        "chat_scan.py",
-        "gpu/tools/bitrix_gpu.py",
-        "reps.py",
-        "scripts/budget_snapshot.py",
-        "scripts/preflight.py",
-        "tests/test_chat_snapshot_split.py",
-        "zip/tools/r1700_bitrix.py"
-      ]
-    },
-    {
       "path": "gt/data/dossiers.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 1619895,
@@ -1698,6 +1659,44 @@
         "library/load_crossrefs.py",
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py"
+      ]
+    },
+    {
+      "path": "data/chat_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 560999,
+      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. С 19.10.2026 в файле только числа по сотрудникам (uid Битрикса); список «ждут ответа» с названиями сделок и LLM-оценки — в KV Cloudflare, ключ chat:v1. До первого прогона после переноса файл ещё прежней схемы.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "days",
+        "private",
+        "schema",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "days",
+        "records": 14
+      },
+      "last_change": "2026-10-18",
+      "last_author": "github-actions[bot]",
+      "last_commit": "642cd5aa",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/deploy.yml",
+        ".github/workflows/gate.yml",
+        ".github/workflows/scan.yml",
+        "chat_scan.py",
+        "gpu/tools/bitrix_gpu.py",
+        "reps.py",
+        "scripts/budget_snapshot.py",
+        "scripts/preflight.py",
+        "tests/test_chat_snapshot_split.py",
+        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
