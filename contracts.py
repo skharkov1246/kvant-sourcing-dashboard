@@ -21,6 +21,7 @@ import pathlib
 import re
 from collections import defaultdict
 
+import chat_activity
 import lifecycle
 import period as period_mod
 from bitrix_client import BitrixClient
@@ -203,7 +204,7 @@ def _parse_econ_money(raw, rate) -> float:
 
 
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
-            people: dict[str, dict] | None = None) -> dict:
+            people: dict[str, dict] | None = None, service_ids: set[str] | None = None) -> dict:
     """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
     уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
     сделки и заказы не были видны как работа без хозяина."""
@@ -278,6 +279,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # 3. вселенная: сделки ВОРОНКИ РЕАЛИЗАЦИИ (кат.0) + родители заказов вне её
     DSEL = ["ID", "TITLE", "OPPORTUNITY", "CURRENCY_ID", "COMPANY_ID", "STAGE_ID",
             "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE", "ASSIGNED_BY_ID", OSS_DEAL, KAM_F, KAM_OLD,
+            chat_activity.CHAT_FIELD,
             BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK,
             BUDGET_LINK]
     plan_by_seq, plan_by_id, plan_asof = _load_budget_plans()
@@ -514,7 +516,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         no_orders_slow = bool(not closed and in_cat0 and not ords
                               and first_lag is not None and first_lag > SLOW_MIN_DAYS)
         late = bool(not closed and late_orders)
-        slow = slow_deal or slow_orders > 0 or no_orders_slow or late
+        # простой по стадии — только кандидат: «подвисла» решает чат сделки (ниже)
+        stuck = bool(slow_deal or slow_orders > 0 or no_orders_slow)
+        slow = stuck or late
         why = []
         if late:
             why.append(f"просрочено обещание клиенту: {late_orders} заказ(ов), макс. {worst_late} дн")
@@ -574,7 +578,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "stage": cur_stage,
             "stageName": _stage_name(cur_stage) if in_cat0 else "вне воронки",
             "stageDays": stage_days, "stageThr": round(dthr, 1),
-            "slow": slow, "why": " · ".join(why),
+            "slow": slow, "why": " · ".join(why), "stuck": stuck,
+            "_chat": chat_activity.chat_id(d),
             # дедлайн клиенту (поле «Date of deadline to customer» заказов СП-172)
             "late": late, "lateN": late_orders, "lateDays": worst_late,
             "lateBuy": round(late_buy), "lateBuyLbl": _money(late_buy),
@@ -609,6 +614,28 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                          f"похоже, заведены не все заказы поставщикам "
                          f"(сейчас {r['norders']})") if r["grossSusp"] else ""
 
+    # ПОДВИСЛА — только после чата (решение владельца 19.10.2026): простой по стадии
+    # снимается, если в чате сделки за неделю писал человек; не прочитали чат —
+    # простой не подтверждён и в замедленные не идёт
+    cands = [(r["deal"], r["_chat"], r["saleEur"]) for r in rows if not r["closed"] and r["stuck"]]
+    chat = chat_activity.check(client, cands, today, service_ids)
+    for r in rows:
+        r.pop("_chat", None)
+        ch = chat.get(r["deal"])
+        if not ch:
+            r["chat"] = None
+            continue
+        r["chat"] = ch
+        if ch["status"] == "quiet":
+            r["why"] += (" · " if r["why"] else "") + (f"в чате тихо {ch['days']} дн." if ch["days"] is not None
+                                                        else "в чате людей не было")
+        else:
+            r["stuck"] = False
+            r["slow"] = bool(r["late"])
+            note = (f"в чате работа: последнее сообщение {ch['days']} дн. назад — не подвисла"
+                    if ch["status"] == "active" else "чат не проверен — простой не подтверждён")
+            r["why"] += (" · " if r["why"] else "") + note
+    chat_sum = chat_activity.summary(chat)
     live_rows = [r for r in rows if not r["closed"]]
     slow_rows = [r for r in live_rows if r["slow"]]
 
@@ -640,6 +667,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
             "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
             "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
+            "prodEnd": _pdate(o.get(PROD_END)),
             "inbFact": _pdate(o.get(INB_FACT)),
             "delPlan": _pdate(o.get(DEL_PLAN)), "delBudget": _pdate(o.get(DEL_BUDGET)),
             "delFact": _pdate(o.get(DEL_FACT)),
@@ -954,6 +982,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "grossThr": gross_thr, "grossMed": round(med_gross or 0),
             "grossSusp": sum(1 for r in live_rows if r["grossSusp"]),
             "slow": len(slow_rows), "lateDeals": len(late_rows),
+            # чат сделки: сколько кандидатов в «подвисшие» проверено и что нашли
+            "chat": chat_sum, "chatQuietDays": chat_activity.QUIET_DAYS,
             # план по бюджетам сделок (снимок Google Drive)
             "planMd": _money(plan_md_live), "planMdNum": round(plan_md_live),
             "planMdPct": round(plan_md_live / plan_sale_live * 100) if plan_sale_live else 0,

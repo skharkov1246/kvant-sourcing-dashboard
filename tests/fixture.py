@@ -409,7 +409,7 @@ class ContractsStub:
                                "CURRENCY_ID": "EUR", "COMPANY_ID": str(300 + i % 7), "STAGE_ID": st,
                                "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(200 - i * 5),
                                "ASSIGNED_BY_ID": str(10 + i % 3), ct.OSS_DEAL: [str(20 + i % 4)],
-                               ct.KAM_F: str(10 + (i + 1) % 3)})
+                               ct.KAM_F: str(10 + (i + 1) % 3), "UF_CRM_1734380921": str(9000 + i)})
             self.hist[2].append((did, st, t(30 + i)))
             for j in range(1 + i % 3):
                 oid += 1
@@ -441,6 +441,13 @@ class ContractsStub:
     def call(self, method, params=None):
         if method == "crm.item.fields":
             return {"fields": {}}
+        if method == "im.dialog.messages.get":
+            # чётные чаты — человек писал вчера, нечётные — месяц назад, кратные 5 — нет доступа
+            n = int(str(params["DIALOG_ID"]).removeprefix("chat")) - 9000
+            if n % 5 == 0:
+                raise RuntimeError("ACCESS_DENIED")
+            days = 1 if n % 2 == 0 else 30
+            return {"messages": [{"author_id": 20, "date": (CT_TODAY - dt.timedelta(days=days)).isoformat()}]}
         return [{"CURRENCY": "EUR", "AMOUNT": "1", "AMOUNT_CNT": "1", "BASE": "Y", "DATE_UPDATE": "2026-10-01"},
                 {"CURRENCY": "RUB", "AMOUNT": "0.01", "AMOUNT_CNT": "1", "DATE_UPDATE": "2026-10-01"},
                 {"CURRENCY": "USD", "AMOUNT": "0.9", "AMOUNT_CNT": "1", "DATE_UPDATE": "2026-10-01"}]

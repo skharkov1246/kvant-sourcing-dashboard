@@ -40,6 +40,7 @@ on:
       - "presale.py"
       - "kprules.py"
       - "lifecycle.py"
+      - "chat_activity.py"
       - "requirements.txt"
       - "templates/**"          # вёрстка дашборда
       - "public/**"             # то, что уезжает на Cloudflare Pages, включая гейт

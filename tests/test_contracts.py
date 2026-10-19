@@ -34,14 +34,17 @@ class Портал:
 
     def __init__(self):
         self.users = {"10": "Вера Астахова (KAM)", "11": "Пётр Вьюгин (OSS)"}
+        # чат сделки 1: человек писал вчера; чат сделки 2 — только служебная запись #542
+        self.chats = {"chat501": [{"author_id": 11, "date": _t(1)}],
+                      "chat502": [{"author_id": 542, "date": _t(1)}, {"author_id": 0, "date": _t(0)}]}
         self.deals = [
             # сделка ведёт ушедший ответственный №20; вернулась в «Закупку» после «Поставки»
             {"ID": "1", "TITLE": "901. Насос", "OPPORTUNITY": "100000", "CURRENCY_ID": "EUR",
              "COMPANY_ID": "", "STAGE_ID": "C0:PURCHASE", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
-             "DATE_CREATE": _t(200), "ASSIGNED_BY_ID": "20"},
+             "DATE_CREATE": _t(200), "ASSIGNED_BY_ID": "20", "UF_CRM_1734380921": "501"},
             {"ID": "2", "TITLE": "902. Компрессор", "OPPORTUNITY": "50000", "CURRENCY_ID": "EUR",
              "COMPANY_ID": "", "STAGE_ID": "C0:PURCHASE", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
-             "DATE_CREATE": _t(100), "ASSIGNED_BY_ID": "10"},
+             "DATE_CREATE": _t(100), "ASSIGNED_BY_ID": "10", "UF_CRM_1734380921": "502"},
         ]
         self.orders = [
             # заказ в воронке 30: стадия должна получить имя, а не остаться кодом
@@ -69,6 +72,8 @@ class Портал:
         }
 
     def call(self, method, params=None):
+        if method == "im.dialog.messages.get":
+            return {"messages": self.chats.get(params["DIALOG_ID"], [])}
         if method == "crm.item.fields":
             return {"fields": {contracts_mod.SCHEME_F: {"items": [{"ID": "7", "VALUE": "Через агента"}]}}}
         assert method == "crm.currency.list"
@@ -121,7 +126,7 @@ def ct():
         люди = {"10": {"name": "Астахова Вера", "active": True},
                 "20": {"name": "Донцов Юрий", "active": False},
                 "21": {"name": "Ежова Лада", "active": False}}
-        return contracts_mod.compute(Портал(), as_of=dt.date(2026, 10, 9), people=люди)
+        return contracts_mod.compute(Портал(), as_of=dt.date(2026, 10, 9), people=люди, service_ids={"542"})
     finally:
         os.environ.pop("KVANT_NOW", None)
 
@@ -182,3 +187,28 @@ def test_жизненный_цикл_на_вкладке(ct):
     assert life["counts"].get("noUtd") == 1 and life["counts"].get("late") == 1
     q = next(x for x in life["queue"] if x["code"] == "noUtd")
     assert q["order"] == "504" and q["seq"] == 902
+
+
+
+@pytest.mark.parametrize("сообщения, подвисла", [
+    ([{"author_id": 11, "date": _t(1)}], False),                                          # человек писал вчера
+    ([{"author_id": 542, "date": _t(1)}, {"author_id": 0, "date": _t(0)}], True),         # служебная и система
+    ([{"author_id": 11, "date": _t(30)}], True),                                          # человек — месяц назад
+])
+def test_подвисла_только_если_в_чате_тихо(сообщения, подвисла):
+    """Решение владельца 19.10.2026: простой по стадии снимает живой чат сделки.
+    Сделка 2 стоит в стадии 50 дней (порог 2× медианы), срок клиента не сорван."""
+    import os
+    os.environ["KVANT_NOW"] = СЕЙЧАС
+    try:
+        п = Портал()
+        п.chats = {"chat502": сообщения}
+        ct = contracts_mod.compute(п, as_of=dt.date(2026, 10, 9), people={}, service_ids={"542"})
+    finally:
+        os.environ.pop("KVANT_NOW", None)
+    r = _row(ct, "2")
+    assert r["chat"] is not None and r["late"] is False
+    assert r["stuck"] is подвисла and r["slow"] is подвисла
+    тихо = "в чате тихо" in r["why"] or "в чате людей не было" in r["why"]
+    assert тихо is подвисла and ("в чате работа" in r["why"]) is (not подвисла)
+    assert ct["head"]["chat"]["checked"] == 1

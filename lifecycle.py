@@ -99,7 +99,10 @@ def phase(o: dict, today: dt.date, warranty_months: int = WARRANTY_MONTHS) -> st
 
 def speeds(orders: list[dict], today: dt.date) -> tuple[dict, dict]:
     """По заказам, доставленным и отгруженным за год: длительности звеньев (дн.) и
-    сдвиг отгрузки каждого поставщика против его плановой даты (дн.)."""
+    сдвиг отгрузки каждого поставщика (дн.) против БЮДЖЕТНОГО срока окончания
+    производства. Плановую дату отгрузки переписывают под факт (зонд v53: медиана
+    и 75 % сдвига к ней — 0 дн.), с ней поставщик всегда «в срок»; бюджетную дату
+    не трогают (доставка к бюджету: медиана +30 дн.). Нет бюджетной — плановая."""
     lead: dict[str, list] = defaultdict(list)
     sup_rel: dict[str, list] = defaultdict(list)
     for o in orders:
@@ -114,7 +117,7 @@ def speeds(orders: list[dict], today: dt.date) -> tuple[dict, dict]:
                 lead["transit"].append((i_ - s).days)
             if i_ and f >= i_:
                 lead["lastMile"].append((f - i_).days)
-        s, sp = o.get("shipFact"), o.get("shipPlan")
+        s, sp = o.get("shipFact"), o.get("prodEnd") or o.get("shipPlan")
         if s and sp and (today - s).days <= 365 and o.get("sup"):
             sup_rel[o["sup"]].append((s - sp).days)
             lead["shipSlip"].append((s - sp).days)
@@ -123,8 +126,9 @@ def speeds(orders: list[dict], today: dt.date) -> tuple[dict, dict]:
 
 def forecast(o: dict, today: dt.date, med: dict, sup_slip: dict) -> dt.date | None:
     """Прогноз доставки клиенту живого заказа: от последнего факта (приход на склад,
-    отгрузка) или от плановой отгрузки, сдвинутой на обычное опоздание ЭТОГО
-    поставщика, плюс медианы оставшихся звеньев. None — не из чего считать."""
+    отгрузка) или — не отгружен — от позднейшей из дат: плановая отгрузка, бюджетный
+    конец производства + обычное опоздание ЭТОГО поставщика, сегодня; плюс медианы
+    оставшихся звеньев. None — не из чего считать."""
     if not o.get("live") or o.get("delFact"):
         return None
     tr, lm = med.get("transit"), med.get("lastMile")
@@ -134,12 +138,17 @@ def forecast(o: dict, today: dt.date, med: dict, sup_slip: dict) -> dt.date | No
         base, rest = o["shipFact"], (tr + lm if tr is not None and lm is not None else None)
     else:
         rest = tr + lm if tr is not None and lm is not None else None
+        кандидаты = []
         if o.get("shipPlan"):
-            base = o["shipPlan"] + dt.timedelta(days=max(0.0, sup_slip.get(o.get("sup") or "", 0.0) or 0.0))
-        elif o.get("created") and med.get("toShip") is not None:
-            base = o["created"] + dt.timedelta(days=med["toShip"])
-        else:
+            кандидаты.append(o["shipPlan"])
+        if o.get("prodEnd"):
+            кандидаты.append(o["prodEnd"] + dt.timedelta(
+                days=max(0.0, sup_slip.get(o.get("sup") or "", 0.0) or 0.0)))
+        if not кандидаты and o.get("created") and med.get("toShip") is not None:
+            кандидаты.append(o["created"] + dt.timedelta(days=med["toShip"]))
+        if not кандидаты:
             return None
+        base = max(кандидаты)
         # не отгружен: путь к клиенту не начнётся раньше сегодняшнего дня — иначе
         # прошедшая плановая отгрузка тянула прогноз назад и сигнал молчал там,
         # где он нужнее всего

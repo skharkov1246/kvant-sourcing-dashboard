@@ -43,6 +43,7 @@ on:
       - presale.py
       - kprules.py
       - lifecycle.py
+      - chat_activity.py
       - scripts/live_check.py
       - .github/workflows/live-check.yml
   workflow_dispatch:
