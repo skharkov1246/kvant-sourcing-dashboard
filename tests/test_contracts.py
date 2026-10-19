@@ -51,6 +51,14 @@ class Портал:
             {"id": 502, "title": "902/1. Компрессор", "companyId": "", "parentId2": 2, "opportunity": 30000,
              "currencyId": "EUR", "stageId": "DT172_26:PREPARATION", "createdTime": _t(90),
              "movedTime": _t(10), DL: _t(-30)[:10], OSS: "11"},
+            # своя стадия провала (UC_*, семантика F): заказ не живой и не в расчёте
+            {"id": 503, "title": "902/2. Компрессор", "companyId": "", "parentId2": 2, "opportunity": 5000,
+             "currencyId": "EUR", "stageId": "DT172_26:UC_LOST", "createdTime": _t(80),
+             "movedTime": _t(20), DL: _t(30)[:10], OSS: "11"},
+            # доставлен клиенту 25 дней назад, заказ не закрыт: это закрытие, а не просрочка
+            {"id": 504, "title": "902/3. Компрессор", "companyId": "", "parentId2": 2, "opportunity": 5000,
+             "currencyId": "EUR", "stageId": "DT172_26:PREPARATION", "createdTime": _t(80),
+             "movedTime": _t(20), DL: _t(20)[:10], OSS: "11", contracts_mod.DEL_FACT: _t(25)[:10]},
         ]
         # история сделки 1: Закупка (120 дн назад) → Поставка (60) → снова Закупка (5)
         self.hist = {
@@ -61,6 +69,8 @@ class Портал:
         }
 
     def call(self, method, params=None):
+        if method == "crm.item.fields":
+            return {"fields": {contracts_mod.SCHEME_F: {"items": [{"ID": "7", "VALUE": "Через агента"}]}}}
         assert method == "crm.currency.list"
         return [{"CURRENCY": "EUR", "AMOUNT": "1", "AMOUNT_CNT": "1", "BASE": "Y", "DATE_UPDATE": "2026-10-01"},
                 {"CURRENCY": "RUB", "AMOUNT": "0.01", "AMOUNT_CNT": "1", "DATE_UPDATE": "2026-10-01"},
@@ -85,8 +95,10 @@ class Портал:
     def deal_stages_process(self, cid=0):
         return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка"}
 
-    def spa_stages(self, entity, cid):
-        return {f"DT172_{cid}:NEW": f"Новый ({cid})", f"DT172_{cid}:PREPARATION": f"Подготовка ({cid})"}
+    def spa_stage_meta(self, entity, cid):
+        return {f"DT172_{cid}:NEW": {"name": f"Новый ({cid})", "sem": "P"},
+                f"DT172_{cid}:PREPARATION": {"name": f"Подготовка ({cid})", "sem": "P"},
+                f"DT172_{cid}:UC_LOST": {"name": f"Отменён ({cid})", "sem": "F"}}
 
     def stage_history(self, entity, *, category_id=None, since=None, last=None):
         out = {}
@@ -154,3 +166,19 @@ def test_разрез_по_людям_помечает_уволенного_и_�
 
 def test_окно_бенчмарков_задано(ct):
     assert ct["speed"]["benchDays"] == contracts_mod.BENCH_DAYS
+
+
+def test_провал_по_семантике_и_доставленный_не_просрочен(ct):
+    r = _row(ct, "2")
+    ids = {o["id"] for o in r["orders"]}
+    assert "503" not in ids, "своя стадия провала UC_* с семантикой F выпадает, как и :FAIL"
+    o504 = next(o for o in r["orders"] if o["id"] == "504")
+    assert o504["late"] is False and o504["delivered"] and r["late"] is False
+
+
+def test_жизненный_цикл_на_вкладке(ct):
+    life = ct["life"]
+    assert {p["key"] for p in life["phases"]} == {"place", "make", "move", "close", "warranty"}
+    assert life["counts"].get("noUtd") == 1 and life["counts"].get("late") == 1
+    q = next(x for x in life["queue"] if x["code"] == "noUtd")
+    assert q["order"] == "504" and q["seq"] == 902

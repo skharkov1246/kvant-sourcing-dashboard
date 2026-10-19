@@ -41,7 +41,8 @@ import dashboard
 from tests import fixture
 dashboard.write(fixture.build_metrics(), {"source": "rules", "items": []},
                 "smoke/index.html", people=fixture.build_people(),
-                reps=fixture.build_reps(), advisor=fixture.build_advisor())
+                reps=fixture.build_reps(), advisor=fixture.build_advisor(),
+                contracts=fixture.build_contracts())
 """
 BOT_FILES = ("data/chat_snapshot.json", "data/budget_snapshot.json", "gt/data/bitrix_gt.json")
 

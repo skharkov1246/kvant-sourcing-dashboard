@@ -377,3 +377,122 @@ def build_advisor(**kw) -> dict:
     return advisor_mod.compute(AdvisorStub(), as_of=ADV_TODAY, deals=ADV_DEALS, orders=[],
                                realize_date=ADV_REALIZE, deal_stage_names=ADV_STAGES,
                                category_names=ADV_CATS, **kw)
+
+
+# ── «Реализация»: придуманный портал для contracts.compute (сделки воронки 0 + заказы
+# СП-172 во всех фазах жизненного цикла). Даты — от CT_NOW, суммы и названия придуманы.
+CT_NOW = "2026-10-19T12:00:00+03:00"
+CT_TODAY = dt.date(2026, 10, 19)
+
+
+class ContractsStub:
+    """Ровно те методы клиента, которые зовёт contracts.compute."""
+
+    def __init__(self):
+        import contracts as ct
+        rnd = random.Random(17)
+        now = dt.datetime.fromisoformat(CT_NOW)
+
+        def t(days_ago: float) -> str:
+            return (now - dt.timedelta(days=days_ago)).isoformat()
+
+        def d(days_ago: int) -> str:
+            return (CT_TODAY - dt.timedelta(days=days_ago)).isoformat()
+
+        self.deals, self.orders, self.hist = [], [], {2: [], 172: []}
+        stages = ["C0:NEW", "C0:PREPARATION", "C0:EXECUTING", "C0:FINAL_INVOICE"]
+        oid = 7000
+        for i in range(24):
+            did = str(6000 + i)
+            st = stages[i % len(stages)]
+            self.deals.append({"ID": did, "TITLE": f"{950 + i}. Поставка узла {i}", "OPPORTUNITY": str(20_000 + 3_000 * i),
+                               "CURRENCY_ID": "EUR", "COMPANY_ID": str(300 + i % 7), "STAGE_ID": st,
+                               "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(200 - i * 5),
+                               "ASSIGNED_BY_ID": str(10 + i % 3), ct.OSS_DEAL: [str(20 + i % 4)]})
+            self.hist[2].append((did, st, t(30 + i)))
+            for j in range(1 + i % 3):
+                oid += 1
+                age = 40 + rnd.randint(0, 200)
+                o = {"id": oid, "title": f"{950 + i}/{j + 1}. Узел {i}", "companyId": str(400 + (i + j) % 9),
+                     "parentId2": int(did), "opportunity": 5_000 + rnd.randint(0, 20_000), "currencyId": "EUR",
+                     "stageId": "DT172_26:PREPARATION", "createdTime": t(age), "movedTime": t(rnd.randint(1, 30)),
+                     ct.OSS_F: str(20 + (i + j) % 4), ct.DL_CUSTOMER: d(rnd.randint(-60, 40))}
+                kind = (i * 3 + j) % 6
+                if kind >= 1:
+                    o[ct.SUP_PAID] = 100 if kind >= 2 else 30
+                if kind >= 2:
+                    o[ct.SHIP_PLAN] = d(age - 30)
+                    if kind >= 3 or rnd.random() < 0.5:
+                        o[ct.SHIP_FACT] = d(age - 30 - rnd.randint(-5, 15))
+                if kind >= 3:
+                    o[ct.INB_FACT] = d(max(0, age - 60))
+                if kind >= 4:
+                    o[ct.DEL_FACT] = d(max(0, age - 75))
+                    o[ct.PAY_PLAN] = d(max(0, age - 105))
+                if kind == 5:
+                    o[ct.UTD_DATE] = d(max(0, age - 77))
+                    o[ct.CLIENT_PO] = [{"id": 1}]
+                    o["stageId"] = "DT172_26:SUCCESS"
+                self.orders.append(o)
+                self.hist[172].append((str(oid), "DT172_26:NEW", t(age)))
+                self.hist[172].append((str(oid), o["stageId"], t(rnd.randint(1, 30))))
+
+    def call(self, method, params=None):
+        if method == "crm.item.fields":
+            return {"fields": {}}
+        return [{"CURRENCY": "EUR", "AMOUNT": "1", "AMOUNT_CNT": "1", "BASE": "Y", "DATE_UPDATE": "2026-10-01"},
+                {"CURRENCY": "RUB", "AMOUNT": "0.01", "AMOUNT_CNT": "1", "DATE_UPDATE": "2026-10-01"},
+                {"CURRENCY": "USD", "AMOUNT": "0.9", "AMOUNT_CNT": "1", "DATE_UPDATE": "2026-10-01"}]
+
+    def list_items(self, entity, *, filter=None, select=None, max_items=None):
+        return [dict(o) for o in self.orders]
+
+    def companies_by_ids(self, ids):
+        return {str(c): f"Компания {c}" for c in ids}
+
+    def list_deals_fast(self, *, filter=None, select=None, **kw):
+        return [dict(x) for x in self.deals]
+
+    def deals_by_ids(self, ids, *, select=None):
+        return {}
+
+    def deal_stages_cat(self, cid=0):
+        return {"C0:NEW": "Договор на подписании", "C0:PREPARATION": "Оплата поставщикам",
+                "C0:EXECUTING": "Производство", "C0:FINAL_INVOICE": "Доставка клиенту", "C0:WON": "Сделка успешна"}
+
+    def deal_stages_process(self, cid=0):
+        return {k: v for k, v in self.deal_stages_cat().items() if k != "C0:WON"}
+
+    def spa_stage_meta(self, entity, cid):
+        return {f"DT172_{cid}:NEW": {"name": "Новый заказ", "sem": "P"},
+                f"DT172_{cid}:PREPARATION": {"name": "Производство заказа", "sem": "P"},
+                f"DT172_{cid}:SUCCESS": {"name": "Заказ закрыт", "sem": "S"}}
+
+    def stage_history(self, entity, *, category_id=None, since=None, last=None):
+        out: dict = {}
+        for oid, st, ts in self.hist[entity]:
+            if last is not None:
+                last[oid] = (st, ts)
+            if st not in {s for s, _ in out.get(oid, [])}:
+                out.setdefault(oid, []).append((st, ts))
+        return out
+
+    def user_name(self, uid):
+        return {"10": "Анна (КАМ)", "11": "Борис (КАМ)", "12": "Вера (КАМ)", "20": "Глеб (ОСС)",
+                "21": "Дина (ОСС)", "22": "Егор (ОСС)", "23": "Жанна (ОСС)"}.get(str(uid), f"user#{uid}")
+
+
+def build_contracts(**kw) -> dict:
+    """Синтетика → настоящий contracts.compute → данные вкладки «Реализация»."""
+    import os
+
+    import contracts as contracts_mod
+    old = os.environ.get("KVANT_NOW")
+    os.environ["KVANT_NOW"] = CT_NOW
+    try:
+        return contracts_mod.compute(ContractsStub(), as_of=CT_TODAY, people={}, **kw)
+    finally:
+        if old is None:
+            os.environ.pop("KVANT_NOW", None)
+        else:
+            os.environ["KVANT_NOW"] = old

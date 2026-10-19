@@ -21,6 +21,7 @@ import pathlib
 import re
 from collections import defaultdict
 
+import lifecycle
 import period as period_mod
 from bitrix_client import BitrixClient
 
@@ -46,6 +47,22 @@ INBOUND_PLAN = "ufCrm20_1709294315471"  # «Inbound Delivery Date, planned» —
 CITY_F = "ufCrm20_1742552190053"        # «Город доставки заказчику по бюджету»
 OSS_F = "ufCrm20_1723236618"            # «Deal support specialist» — ОСС заказа (совпал 73/74)
 OSS_DEAL = "UF_CRM_1715604558"          # «Сопровождение сделки» — тот же человек на сделке (74/74)
+# факты исполнения заказа (зонд v49: заполнены у 85–100 % заказов, прошедших точку) —
+# жизненный цикл «размещение → производство → в пути → закрытие → гарантия» (lifecycle.py)
+SHIP_PLAN = "ufCrm20_1723235828"        # «Supplier Shipment Date, planned»
+SHIP_FACT = "ufCrm20_1723236324"        # «Supplier Shipment Date, actual»
+INB_FACT = "ufCrm20_1723236306"         # «Inbound Delivery Date, actual» — пришло на склад
+DEL_PLAN = "ufCrm20_1723236261"         # «Customer delivery date, planned»
+DEL_BUDGET = "ufCrm20_1724942005"       # «Customer delivery date, budget»
+DEL_FACT = "ufCrm20_1723236501"         # «Customer delivery date, actual» — доставлено клиенту
+UTD_DATE = "ufCrm20_1723236848"         # «Date of signing of the Universal Transfer Document (UTD)»
+UTD_FILE = "ufCrm20_1749654314976"      # «Universal Transfer Document (UTD)» — файл
+PAY_PLAN = "ufCrm20_1723236853"         # «Planned payment term» — когда клиент должен заплатить
+CLIENT_PO = "ufCrm20_1751555578101"     # «Payment Order (client)» — платёжка клиента, файл
+SUP_PAID = "ufCrm20_1755759056275"      # «Оплачено поставщику, %»
+PROD_CONF = "ufCrm20_1723236426"        # «Production confirmation» — файл
+PROD_CONF_NF = "ufCrm20_1723372033545"  # «Production confirmation, no file» — флажок
+SCHEME_F = "ufCrm20_1724941500"         # «Схема поставки»
 
 CAP_RATE = 0.20          # стоимость денег, годовых: по чему считаем упущенную доходность
                          # от поздней отгрузки (решение владельца)
@@ -156,6 +173,13 @@ def _pdate(v) -> dt.date | None:
         return None
 
 
+def _has(v) -> bool:
+    """Файл, флажок или дата в поле карточки есть."""
+    if isinstance(v, (list, tuple)):
+        return any(_has(x) for x in v)
+    return v not in (None, "", 0, "0", False, "N", {})
+
+
 def _median(vals: list) -> float | None:
     sv = sorted(v for v in vals if v is not None)
     if not sv:
@@ -214,8 +238,32 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                                                         "createdTime", "movedTime",
                                                         "assignedById",
                                                         DL_CUSTOMER, PROD_END, INBOUND_PLAN,
-                                                        CITY_F, OSS_F])
-    orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
+                                                        CITY_F, OSS_F, SHIP_PLAN, SHIP_FACT, INB_FACT,
+                                                        DEL_PLAN, DEL_BUDGET, DEL_FACT, UTD_DATE, UTD_FILE,
+                                                        PAY_PLAN, CLIENT_PO, SUP_PAID, PROD_CONF,
+                                                        PROD_CONF_NF, SCHEME_F])
+    # стадии всех воронок СП-172 с семантикой: провал — по семантике стадии, а не по
+    # суффиксу «:FAIL» (свои стадии провала UC_* с семантикой F считались живыми);
+    # воронки — по префиксу стадии «DT172_<воронка>:…» (categoryId в выборке нет)
+    ostages: dict[str, str] = {}
+    osem: dict[str, str] = {}
+    ocat_ids = sorted({int(m.group(1)) for o in orders
+                       if (m := re.match(r"DT172_(\d+):", str(o.get("stageId") or "")))} | {26})
+    for cid in ocat_ids:
+        try:
+            for sid, m in client.spa_stage_meta(172, cid).items():
+                ostages[sid] = m["name"]
+                osem[sid] = m["sem"]
+        except Exception:
+            pass
+
+    def _osem(sid: str) -> str:
+        sid = str(sid or "")
+        if sid in osem:
+            return osem[sid]
+        return "S" if sid.endswith(":SUCCESS") else "F" if sid.endswith(":FAIL") else "P"
+
+    orders = [o for o in orders if _osem(o.get("stageId")) != "F"]
     supl = client.companies_by_ids({str(o["companyId"]) for o in orders if o.get("companyId")})
 
     # 2. группировка заказов по сделке
@@ -244,17 +292,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     dstages = client.deal_stages_cat(0)                    # все стадии — для подписей
     dproc = client.deal_stages_process(0)                  # только рабочие: без успеха и проигрышей
     dorder = {sid: i for i, sid in enumerate(dproc)}
-    ostages: dict[str, str] = {}                           # стадии всех воронок СП-172
-    # воронки заказов — по префиксу стадии «DT172_<воронка>:…»: categoryId в выборке
-    # нет, и прежде здесь всегда оставалась одна воронка 26 — стадии заказов других
-    # воронок показывались сырыми кодами
-    ocat_ids = sorted({int(m.group(1)) for o in orders
-                       if (m := re.match(r"DT172_(\d+):", str(o.get("stageId") or "")))} | {26})
-    for cid in ocat_ids:
-        try:
-            ostages.update(client.spa_stages(172, cid))
-        except Exception:
-            pass
     dlast: dict[str, tuple[str, str]] = {}                 # последний переход = вход в текущую стадию
     olast: dict[str, tuple[str, str]] = {}
     dhist = client.stage_history(2, category_id=0, since=HIST_SINCE, last=dlast)
@@ -380,7 +417,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             _ls = dlast.get(did)
             stage_days = round(_days_between(_ls[1] if _ls and _ls[0] == cur_stage else tl[-1][1],
                                              now_iso) or 0, 1)
-        done = sem == "S" or (bool(ords) and all(str(o.get("stageId", "")).endswith(":SUCCESS") for o in ords))
+        done = sem == "S" or (bool(ords) and all(_osem(o.get("stageId")) == "S" for o in ords))
         closed = sem in ("S", "F")
 
         # --- заказы: стадия, возраст стадии, дедлайн клиенту, замедленность
@@ -395,10 +432,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         late_rev_days = 0.0        # €×дни выручки — база расчёта упущенной доходности
         no_dl = 0                  # живых заказов без плановой даты клиенту
         first_order_ts = min((str(o.get("createdTime") or "") for o in ords), default="")
-        n_live_ords = sum(1 for o in ords if not str(o.get("stageId", "")).endswith((":SUCCESS", ":FAIL")))
+        n_live_ords = sum(1 for o in ords if _osem(o.get("stageId")) == "P")
         for o in ords:
             osid = str(o.get("stageId") or "")
-            olive = not (osid.endswith(":SUCCESS") or osid.endswith(":FAIL"))
+            olive = _osem(osid) == "P"
             otl = ohist.get(str(o.get("id")), [])
             _ol = olast.get(str(o.get("id")))
             # вход в ТЕКУЩУЮ стадию: последний переход истории, иначе время последнего
@@ -413,7 +450,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # обещание клиенту: та же дата, по которой снабжение ведёт «Контроль дедлайнов»
             dl = _pdate(o.get(DL_CUSTOMER))
             dl_days = (today - dl).days if dl else None       # >0 — просрочено, <0 — есть запас
-            olate = bool(olive and dl_days is not None and dl_days > 0)
+            # доставлено клиенту, а заказ не закрыт — это закрытие (УПД, оплата), не просрочка
+            delivered = _pdate(o.get(DEL_FACT))
+            olate = bool(olive and dl_days is not None and dl_days > 0 and not delivered)
             obuy = eur(o.get("opportunity"), o.get("currencyId"))
             # стоимость отгрузки этого заказа: доля сделки пропорционально закупке
             # (как в экономике проекта); если сумм закупки нет — поровну между живыми
@@ -432,7 +471,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 if obuy <= 0:
                     late_nosum += 1
                 worst_late = dl_days if worst_late is None else max(worst_late, dl_days)
-            if olive and not dl:
+            if olive and not dl and not delivered:
                 no_dl += 1
             pend = _pdate(o.get(PROD_END))
             ords_det.append({
@@ -455,6 +494,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "prodAfterDl": bool(pend and dl and pend > dl),
                 "inb": (_pdate(o.get(INBOUND_PLAN)).strftime("%d.%m.%Y")
                         if _pdate(o.get(INBOUND_PLAN)) else ""),
+                "delivered": delivered.strftime("%d.%m.%Y") if delivered else "",
             })
         ords_det.sort(key=lambda x: (not x["live"], -(x["dlDays"] if x["dlDays"] is not None else -9999),
                                      -(x["days"] or 0)))
@@ -565,6 +605,44 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     live_rows = [r for r in rows if not r["closed"]]
     slow_rows = [r for r in live_rows if r["slow"]]
 
+    # ЖИЗНЕННЫЙ ЦИКЛ: заказы, приведённые к фактам, → фазы, очередь «что делать»,
+    # доставка в срок, сроки звеньев, надёжность поставщиков (lifecycle.py)
+    try:
+        _ofields = (client.call("crm.item.fields", {"entityTypeId": 172}) or {}).get("fields") or {}
+    except Exception:
+        _ofields = {}
+    schemes = {str(i.get("ID")): str(i.get("VALUE") or "")
+               for i in ((_ofields.get(SCHEME_F) or {}).get("items") or [])}
+    seq_by_deal = {r["deal"]: r["seq"] for r in rows}
+    recent_from = today - dt.timedelta(days=BENCH_DAYS)
+    life_orders = []
+    for o in orders:
+        osid = str(o.get("stageId") or "")
+        sm = _osem(osid)
+        try:
+            paid = float(o.get(SUP_PAID) or 0)
+        except (TypeError, ValueError):
+            paid = 0.0
+        _who = who(o.get(OSS_F))
+        moved = _pdate(o.get("movedTime"))
+        did = str(o.get("parentId2") or "")
+        life_orders.append({
+            "id": str(o.get("id")), "deal": did, "seq": seq_by_deal.get(did) or _regno(o.get("title")),
+            "title": str(o.get("title") or "")[:70], "sup": supl.get(str(o.get("companyId"))) or "",
+            "oss": _who[0], "ossGone": _who[1],
+            "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
+            "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
+            "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
+            "inbFact": _pdate(o.get(INB_FACT)),
+            "delPlan": _pdate(o.get(DEL_PLAN)), "delBudget": _pdate(o.get(DEL_BUDGET)),
+            "delFact": _pdate(o.get(DEL_FACT)),
+            "utd": bool(_pdate(o.get(UTD_DATE)) or _has(o.get(UTD_FILE))),
+            "payPlan": _pdate(o.get(PAY_PLAN)), "clientPaid": _has(o.get(CLIENT_PO)),
+            "supPaidPct": paid, "prodConf": _has(o.get(PROD_CONF)) or _has(o.get(PROD_CONF_NF)),
+            "scheme": schemes.get(str(o.get(SCHEME_F) or ""), ""),
+        })
+    life = lifecycle.build(life_orders, rows, today)
+
     # 7. скорость: сводные метрики
     # полный цикл заказа: создание карточки → SUCCESS, по заказам, закрытым за последние
     # BENCH_DAYS. Начало — дата создания карточки: у заказа, начатого до HIST_SINCE,
@@ -572,7 +650,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     o_created = {str(o.get("id")): str(o.get("createdTime") or "") for o in orders}
     cycle_days = []
     for oid, entries in ohist.items():
-        succ = next((t for s, t in entries if s.endswith(":SUCCESS")), None)
+        succ = next((t for s, t in entries if _osem(s) == "S"), None)
         if succ and entries and str(succ) >= bench_from:
             d0 = _days_between(o_created.get(oid) or entries[0][1], succ)
             if d0 is not None:
@@ -609,7 +687,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     bench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(odur[s]),
               **_now_stats(s, o_now)}
              for s, m in sorted(omed.items(), key=lambda kv: -kv[1])
-             if len(odur[s]) >= 5 and not (s.endswith(":FAIL"))][:14]
+             if len(odur[s]) >= 5 and _osem(s) != "F"][:14]
     dbench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(ddur[s]),
                **_now_stats(s, d_now)}
               for s, m in dmed.items() if len(ddur[s]) >= 5 and s in dproc]
@@ -833,6 +911,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "clients": ", ".join(sorted(a["clients"]))[:80],
         "avg": _money(a["buy"] / a["norders"] if a["norders"] else 0),
         "last": a["last"], "curs": ", ".join(sorted(a["curs"])),
+        # отгрузка к своей же плановой дате за год (lifecycle): выбор поставщика
+        # сорсингом опирается на то, как он реально отгружает
+        "otN": (life["supAll"].get(supl.get(sid) or "") or {}).get("n", 0),
+        "otPct": (life["supAll"].get(supl.get(sid) or "") or {}).get("pct"),
+        "otSlip": (life["supAll"].get(supl.get(sid) or "") or {}).get("medSlip"),
     } for sid, a in sup_agg.items()), key=lambda r: -r["buy"])
     top10 = sum(r["buy"] for r in sup_rows[:10])
     sup_kpis = [
@@ -887,6 +970,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                            + sum(1 for v in ddur_recent.values() if len(v) >= BENCH_MIN),
         },
         "gone": gone,
+        "life": life,
         "orphan": {"n": len(orphan), "buy": _money(orphan_buy)},
         "suppliers": {
             "label": f"на {today.strftime('%d.%m.%Y')}",

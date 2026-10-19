@@ -81,7 +81,7 @@ test("полный цикл: заявка → письмо владельцу �
   const ownerMail = (await outbox("skharkov@gmail.com")).at(-1);
   assert.ok(ownerMail, "письмо владельцу не отправлено");
   assert.match(ownerMail.html, /Реализация/);
-  assert.match(ownerMail.html, /Коммерсанты/);
+  assert.match(ownerMail.html, /КАМ и продукт-оунеры/);
   const review = pathOf(linkOf(ownerMail, "/access/review"));
   assert.ok(review, "в письме владельцу нет ссылки подтверждения");
 
