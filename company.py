@@ -18,6 +18,7 @@ from collections import Counter, defaultdict
 
 import config
 from bitrix_client import BitrixClient, drop_lost
+from period import year_start
 
 YEAR_START = f"{dt.date.today().year}-01-01T00:00:00"   # с 01.01 этого года (был зашит 2026)
 DL_CUSTOMER = "ufCrm20_1728900218435"   # срок клиенту на заказе СП-172 (как people.DL_CUSTOMER)
@@ -77,6 +78,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             created: list[dict] | None = None, orders: list[dict] | None = None,
             deal_sale: dict | None = None, realize_date: dict | None = None) -> dict:
     today = as_of or dt.date.today()
+    # год отчёта — от as_of, а не от часов машины (ревью 19.10.2026)
+    YEAR_START, COHORT_START = year_start(today), year_start(today, 1)
     months = [f"{today.year}-{m:02d}" for m in range(1, today.month + 1)]
     cur_part = today.strftime("%Y-%m")
     today_iso = today.isoformat()
@@ -278,7 +281,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # coh_parents идентично order_parents (их заказы все ≥2026), поэтому cls совпадает.
     coh_details = deal_details + [_coh_detail(d) for d in pre_created]
 
+    # salesB / noBuy — маржа когорты, как во всех вкладках, только по контрактам с
+    # внесённой закупкой (без неё маржа контракта — вся его сумма)
     def _cblank(): return {"created": 0, "real": 0, "lost": 0, "early": 0, "sales": 0.0, "buy": 0.0,
+                           "salesB": 0.0, "noBuy": 0,
                            "ttr": [], "csum": 0.0, "esum": 0.0, "lsum": 0.0}
     coh_q = defaultdict(_cblank); coh_m = defaultdict(_cblank)
     rfq_ttr_all = []  # создание сделки → первый ЗАПРОС поставщикам (СП-166) — метрика сорсинга (по всем сделкам с запросом)
@@ -310,6 +316,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             c["created"] += 1; c[cls] += 1; c["csum"] += d["raw"]  # csum — сумма ВСЕХ созданных
             if cls == "real":
                 c["sales"] += d["raw"]; c["buy"] += coh_buy.get(did, 0.0)
+                if coh_buy.get(did, 0.0) > 0:
+                    c["salesB"] += d["raw"]
+                else:
+                    c["noBuy"] += 1
                 if win_days is not None:
                     c["ttr"].append(win_days)
             elif cls == "early":
@@ -324,7 +334,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     def _coh_rows(agg, lblfn):
         out = []
         for k in sorted(agg):
-            c = agg[k]; sales = c["sales"]; margin = sales - c["buy"]; cr = c["created"]
+            c = agg[k]; sales = c["sales"]; margin = c["salesB"] - c["buy"]; cr = c["created"]
             csum = c["csum"]
             out.append({
                 "key": k, "label": lblfn(k), "created": cr, "real": c["real"], "lost": c["lost"], "early": c["early"],
@@ -332,7 +342,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "lostPct": round(c["lost"] / cr * 100) if cr else 0,
                 "earlyPct": round(c["early"] / cr * 100) if cr else 0,
                 "sales": _money(sales), "salesRaw": round(sales), "buy": _money(c["buy"]),
-                "margin": _money(margin), "marginRaw": round(margin),
+                "margin": _money(margin), "marginRaw": round(margin), "noBuy": c["noBuy"],
                 "ttr": (round(sum(c["ttr"]) / len(c["ttr"])) if c["ttr"] else None),
                 # измерение ПО СУММЕ (€): доля суммы созданных сделок по исходам — корреляция со штучной
                 "createdSum": _money(csum), "createdSumRaw": round(csum),
@@ -343,7 +353,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             })
         return out
     cohorts = {
-        "label": f"01.01.2025 – {today.strftime('%d.%m.%Y')}",
+        "label": f"01.01.{today.year - 1} – {today.strftime('%d.%m.%Y')}",
         "quarters": _coh_rows(coh_q, lambda k: k.replace("-Q", " · Q")),
         "months": _coh_rows(coh_m, lambda k: f"{MLBL[int(k[5:7])]} {k[:4]}"),
         "deals": coh_details,

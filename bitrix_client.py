@@ -249,7 +249,9 @@ class BitrixClient:
         # и считается: по счётчику видно, была ли сверка точной.
         self.snapshot_dir = os.getenv("BITRIX_SNAPSHOT_DIR") or ""
         self.snapshot_mode = (os.getenv("BITRIX_SNAPSHOT_MODE") or "").strip().lower()
-        self.snapshot_saved = self.snapshot_hits = self.snapshot_misses = 0
+        # счётчики снимка — общий словарь: клиент под вебхуком владельца (with_webhook)
+        # пишет в те же счётчики, и сверка видит его промахи (ревью 19.10.2026)
+        self._снимок_сч = {"saved": 0, "hits": 0, "misses": 0}
 
     @property
     def _замедление(self) -> float:
@@ -266,6 +268,30 @@ class BitrixClient:
     @_last_call.setter
     def _last_call(self, v: float) -> None:
         self._темп.last_call = v
+
+    @property
+    def snapshot_saved(self) -> int:
+        return self._снимок_сч["saved"]
+
+    @snapshot_saved.setter
+    def snapshot_saved(self, v: int) -> None:
+        self._снимок_сч["saved"] = v
+
+    @property
+    def snapshot_hits(self) -> int:
+        return self._снимок_сч["hits"]
+
+    @snapshot_hits.setter
+    def snapshot_hits(self, v: int) -> None:
+        self._снимок_сч["hits"] = v
+
+    @property
+    def snapshot_misses(self) -> int:
+        return self._снимок_сч["misses"]
+
+    @snapshot_misses.setter
+    def snapshot_misses(self, v: int) -> None:
+        self._снимок_сч["misses"] = v
 
     def with_webhook(self, webhook_url: str) -> "BitrixClient":
         """Тот же портал под другим вебхуком — чтение чатов сделок от имени владельца

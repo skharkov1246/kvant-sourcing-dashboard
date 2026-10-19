@@ -12,6 +12,7 @@ import re
 from collections import defaultdict
 
 from bitrix_client import BitrixClient, drop_lost
+from period import year_start
 
 YEAR_START = f"{dt.date.today().year}-01-01T00:00:00"   # с 01.01 этого года (был зашит 2026)
 
@@ -77,6 +78,7 @@ def compute_set(client: BitrixClient, groups: dict[str, str] | None, *, as_of: d
     #   • по КЛИЕНТУ сделки (deal_group: deal_id→направление) — для КАМ (передаётся из main).
     by_client = deal_group is not None
     today = as_of or dt.date.today()
+    YEAR_START = year_start(today)       # год отчёта — от as_of, а не от часов машины
     curlist = client.call("crm.currency.list", {}) or []
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
     def eur(o, cu): return float(o or 0) * rate.get(cu, 1.0)

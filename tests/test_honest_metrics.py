@@ -132,3 +132,30 @@ def test_год_не_зашит():
     for m in (company_mod, kam_mod, reps_mod, people_mod):
         assert m.YEAR_START.startswith(год + "-01-01"), m.__name__
     assert company_mod.COHORT_START.startswith(str(int(год) - 1))
+
+
+class FiltersStub(CompanyStub):
+    """Запоминает фильтры выгрузок: по ним видно, какой год взят."""
+
+    def __init__(self):
+        self.filters = []
+
+    def list_deals_fast(self, filter=None, **kw):
+        self.filters.append(dict(filter or {}))
+        return []
+
+    def list_items(self, entity, filter=None, **kw):
+        self.filters.append(dict(filter or {}))
+        return []
+
+
+def test_год_отчёта_от_as_of_а_не_от_часов_машины():
+    """Отчёт за прошлый период берёт свой год (ревью 19.10.2026)."""
+    прошлый = dt.date(2025, 6, 30)
+    for считать in (lambda c: kam_mod.compute_set(c, None, as_of=прошлый, deal_group={}),
+                    lambda c: company_mod.compute(c, as_of=прошлый)):
+        c = FiltersStub()
+        считать(c)
+        начала = {v for f in c.filters for k, v in f.items() if k.startswith(">=")}
+        assert "2025-01-01T00:00:00" in начала and not any(v.startswith("2026") for v in начала), начала
+

@@ -18,6 +18,7 @@ import datetime as dt
 from collections import Counter, defaultdict
 
 from bitrix_client import drop_lost
+from period import year_start
 from company import _money, _regno, _pctile
 from stages import deal_reached_tkp
 
@@ -40,6 +41,8 @@ def compute(client, *, as_of: dt.date | None = None,
             deal_sale: dict | None = None, realize_date: dict | None = None,
             deal_stage_names: dict | None = None, category_names: dict | None = None) -> dict:
     today = as_of or dt.date.today()
+    # год отчёта — от as_of, а не от часов машины (ревью 19.10.2026)
+    YEAR_START, PREV_START = year_start(today)[:10], year_start(today, 1)[:10]
     realize_date = realize_date or {}
     deal_stage_names = deal_stage_names or {}
     category_names = category_names or {}
@@ -276,7 +279,7 @@ def compute(client, *, as_of: dt.date | None = None,
             + (" — высокая зависимость, диверсифицировать." if top5_share > 50 else " — приемлемо.")
             + f" Повторные клиенты — {repeat_share}% выручки.")
     if silent:
-        say("bad", f"<b>Замолчали.</b> {len(silent)} клиентов с выручкой-2025 без единой сделки в 2026 "
+        say("bad", f"<b>Замолчали.</b> {len(silent)} клиентов с выручкой-{today.year - 1} без единой сделки в {today.year} "
                    f"(крупнейший — {silent[0]['name']}, {silent[0]['revLbl']}). Передать КАМам на реактивацию.")
     nd = len(open_no_date)
     if nd:
@@ -295,7 +298,7 @@ def compute(client, *, as_of: dt.date | None = None,
              "clz": "warn" if top5_share > 50 else "ok"},
             {"lbl": "Повторная выручка", "val": f"{repeat_share}%", "meta": f"новые клиенты {100 - repeat_share}%", "clz": "teal"},
             {"lbl": "Проиграно", "val": _money(lost_sum), "meta": f"{len(lost)} сделок", "clz": "warn"},
-            {"lbl": "Замолчавших клиентов", "val": str(len(silent)), "meta": f"выручка-2025 ≥ {_money(SILENT_MIN_EUR)}",
+            {"lbl": "Замолчавших клиентов", "val": str(len(silent)), "meta": f"выручка-{today.year - 1} ≥ {_money(SILENT_MIN_EUR)}",
              "clz": "warn" if silent else "ok"},
         ],
         "forecast": {"pBase": p_base, "pTkp": p_tkp, "openN": len(open_deals),

@@ -31,3 +31,14 @@ def test_запрос_второго_вебхука_уходит_по_его_а�
     c._session.post = lambda url, **kw: адреса.append("НЕ ТОТ") or Ответ()
     assert o.call("im.dialog.messages.get", {"DIALOG_ID": "chat1", "LIMIT": 50}) == {"messages": []}
     assert len(адреса) == 1 and адреса[0].startswith("https://portal.example/rest/7/bbb/im.dialog.messages")
+
+
+def test_счётчики_снимка_общие_у_двух_вебхуков():
+    """Промах снимка у вебхука владельца виден в сводке сборки: иначе живая сверка
+    сочла бы себя точной, хотя чаты читались мимо снимка (ревью 19.10.2026)."""
+    c = BitrixClient("https://portal.example/rest/1/aaa", min_interval=0.0)
+    o = c.with_webhook("https://portal.example/rest/7/bbb")
+    o.snapshot_misses += 3
+    o.snapshot_hits += 1
+    assert c.snapshot_stats()["misses"] == 3 and c.snapshot_stats()["hits"] == 1
+

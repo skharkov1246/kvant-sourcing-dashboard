@@ -216,6 +216,7 @@ def scan_chat_reaction(client, *, as_of=None, collect_samples=False):
     """Суточный скан чатов сделок → реакция по сотрудникам (+ выборка текста для AI-оценки).
     Возвращает (react_dict, rep_ids, unames). Стадия сделки — упрощённо: кат.0/№ → 'real', иначе 'presale'."""
     today = as_of or dt.date.today()
+    YEAR_START = period_mod.year_start(today)   # год отчёта — от as_of, а не от часов машины
     unames = client.users()
     ppl, role_of, live = rep_roster(client)
     rep_ids = {_label(ppl[u]["name"], u): u for u in live}
@@ -320,6 +321,7 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
             created: list[dict] | None = None, orders_src: list[dict] | None = None) -> dict:
     today = as_of or dt.date.today()
     today_iso = today.isoformat()
+    YEAR_START = period_mod.year_start(today)   # год отчёта — от as_of, а не от часов машины
     unames = client.users()
 
     # состав — из Bitrix: действующие сотрудники коммерческих ролей
@@ -525,7 +527,7 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
     return {
         "reps": reps_out,
         "labels": [r["label"] for r in reps_out],
-        "window": f"01.01.2026 – {today.strftime('%d.%m.%Y')}",
+        "window": f"01.01.{today.year} – {today.strftime('%d.%m.%Y')}",
         "slaMin": REACT_SLA_MIN,
         "reactDays": REACT_DAYS,
     }

@@ -692,7 +692,7 @@ def run(args) -> int:
     try:
         print("• Общий пул сделок/заказов (YTD)…")
         _t = time.time()
-        ys = company_mod.YEAR_START      # с 01.01 этого года (был зашит 2026)
+        ys = period_mod.year_start(p.end)   # с 01.01 года отчёта (был зашит 2026)
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
             select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID",
                     "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID", "MOVED_TIME", "LAST_ACTIVITY_TIME"]
@@ -700,14 +700,14 @@ def run(args) -> int:
         # заказы СП-172 тянем ОДИН раз с 2025 и со сроком клиенту: тот же список нужен
         # и вкладкам ролей (просрочка), и «Коммерсантам». Раньше каждая вкладка ходила
         # за ними отдельно — три выгрузки одного и того же на каждую сборку.
-        orders_all = client.list_items(172, filter={">=createdTime": company_mod.COHORT_START},
+        orders_all = client.list_items(172, filter={">=createdTime": people_mod.ORDERS_SINCE},
             select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2",
                     "assignedById", people_mod.DL_CUSTOMER, people_mod.DEL_FACT])
         # заказы СП-172: исключаем проигранные — это не контрактная выручка; провал — по
         # семантике стадии (свои стадии провала UC_* по суффиксу «:FAIL» считались живыми)
         orders_ytd = [o for o in drop_lost(client, 172, orders_all)
                       if str(o.get("createdTime", ""))[:4] >= ys[:4]]
-        print(f"  заказов СП-172 с {company_mod.COHORT_START[:4]}: {len(orders_all)}, "
+        print(f"  заказов СП-172 с {people_mod.ORDERS_SINCE[:4]}: {len(orders_all)}, "
               f"из них непроигранных в {ys[:4]}: {len(orders_ytd)}")
         # курсы → база € (для продаж сделок)
         _cur = client.call("crm.currency.list", {}) or []

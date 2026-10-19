@@ -46,9 +46,12 @@ from collections import Counter, defaultdict
 
 import presale as presale_mod
 from bitrix_client import BitrixClient, lost_stage
+from period import year_start
 
 YEAR_START = f"{dt.date.today().year}-01-01T00:00:00"   # с 01.01 этого года (был зашит 2026)
-ORDERS_SINCE = f"{dt.date.today().year - 1}-01-01T00:00:00"
+# заказы — с начала учёта в СП-172, а не скользящим окном: живой заказ позапрошлого
+# года у открытой сделки не должен выпадать из просрочки (ревью 19.10.2026)
+ORDERS_SINCE = "2025-01-01T00:00:00"
 REALIZE_CAT = "0"             # воронка «Реализация»
 OUTLIER_MULT = 50             # сумма ≥ стольких медиан — карточка-выброс, сумму надо проверить
 STALE_DAYS = 90               # без смены стадии дольше — застой
@@ -499,6 +502,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             open_deals: list[dict] | None = None, created: list[dict] | None = None,
             orders: list[dict] | None = None) -> dict:
     today = as_of or dt.date.today()
+    YEAR_START = year_start(today)       # год отчёта — от as_of, а не от часов машины
     today_iso = today.isoformat()
     people = roster(client)
     _deps_raw = client.list_paged("department.get", {})

@@ -140,3 +140,9 @@ def parse_period(spec: str | None, *, as_of: dt.date | None = None) -> Period:
     if end < start:
         end = start
     return Period(start=start, end=end, weeks=_weeks(start, end))
+
+
+def year_start(d: dt.date, back: int = 0) -> str:
+    """Начало года даты отчёта (as_of), а не часов машины: отчёт за прошлый период
+    должен брать свой год. back=1 — начало прошлого года."""
+    return f"{d.year - back}-01-01T00:00:00"
