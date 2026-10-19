@@ -16,7 +16,8 @@
   офлайн  — если вебхука нет. Поднимает те же факты из уже лежащих в репозитории
             снимков: zip/data/positions.json (поля bitrix_status, bitrix_sold,
             bitrix_price_history), zip/data/price_records.json, supplier_crm.json,
-            data/chat_snapshot.json (только наименования сделок).
+            data/chat_snapshot.json (только наименования сделок; с 19.10.2026 их в
+            публичном снимке нет — они в KV chat:v1, и офлайн-режим их не находит).
 
 Запуск:
     python zip/tools/r1700_bitrix.py             # авто: живой, если есть вебхук

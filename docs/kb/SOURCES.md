@@ -8,7 +8,7 @@
 | Bitrix24, сделки | заявки, КАМ, продукт-оунер, суммы | `main.py`, `library/increment.py` |
 | вложения карточек и сделок | КП поставщиков, наши КП, спецификации → `lib_demand` | `library/indexer.py` (`library-index`, `library-daily`) |
 | письма Bitrix | вложения и цены писем | `library/mail_source.py` (`library-mail`, пятая часть ёмкости) |
-| чаты сделок | суточный снимок | `chat_scan.py` (`scan`, бот-файл `data/chat_snapshot.json`) |
+| чаты сделок | суточный снимок | `chat_scan.py` (`scan`, бот-файл `data/chat_snapshot.json` — только числа; «ждут ответа» и оценки — KV `chat:v1`) |
 | таможенные декларации | импорт по кодам ГШО | `zip-customs` |
 | индексы цен МВФ | инфляция по валютам | `library-cpi` |
 | прайс-бук КП v1.0 (разбор моделью, передан владельцем 01.10.2026) | 3 423 КП из поля «Offer from supplier», 63 564 строки; эталон для нашего разборщика и второй источник цены | `library/load_pricebook.py` → закрытые `pb_kp_headers`, `pb_kp_lines` (`library/supabase/pricebook_schema.sql`); файлы — только у владельца |

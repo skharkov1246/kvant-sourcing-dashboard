@@ -206,6 +206,10 @@ def _react_stats(client, rep_ids, *, as_of=None, deal_owner=None, deal_stage=Non
 _SNAP_PATH = __import__("os").path.join(__import__("os").path.dirname(__file__), "data", "chat_snapshot.json")
 _REACT_NUM = ["mentions", "self", "coll", "none", "medMin", "withinSla", "w30", "w120", "w1440",
               "handledPct", "waitN", "waitGt1d", "waitGt3d", "waitMaxDays", "activeChats", "lastPostDays"]
+# Публичный снимок (data/chat_snapshot.json) держит по сотруднику за день только эти
+# числа — для дня целиком и для разрезов presale/real. Список «ждут ответа» с названиями
+# сделок и оценки сотрудников — в закрытой части, KV chat:v1 (chat_scan.py).
+REACT_PUBLIC = _REACT_NUM + ["answeredSelf"]
 
 
 def scan_chat_reaction(client, *, as_of=None, collect_samples=False):
@@ -232,19 +236,41 @@ def scan_chat_reaction(client, *, as_of=None, collect_samples=False):
     return react, rep_ids, unames
 
 
-def _load_react_snapshot(uids) -> dict:
-    """Читает data/chat_snapshot.json: усредняет реакцию за последнюю неделю, «висит» — из последнего дня,
-    плюс AI-оценка. Дашборд использует это вместо тяжёлого скана при каждой пересборке."""
+def _load_chat_private() -> dict:
+    """Закрытая часть снимка чатов: файл, который сборка дашборда кладёт из KV chat:v1
+    перед расчётом (deploy.yml → chat_scan.py --fetch-private), путь — CHAT_PRIVATE_PATH.
+    Нет файла — пусто: вкладка соберётся на числах, без списка «ждут ответа» и оценок."""
     import json
+    import os
+    path = os.environ.get("CHAT_PRIVATE_PATH")
+    if not path:
+        return {}
     try:
-        snap = json.loads(open(_SNAP_PATH, encoding="utf-8").read())
+        priv = json.loads(open(path, encoding="utf-8").read())
     except Exception:
         return {}
-    days = snap.get("days", {}); assess = snap.get("assessment", {})
+    return priv if isinstance(priv, dict) and priv.get("version") == 1 else {}
+
+
+def _load_react_snapshot(uids, *, private: dict | None = None, path: str | None = None) -> dict:
+    """Читает data/chat_snapshot.json: усредняет реакцию за последнюю неделю, «висит» — из последнего дня,
+    плюс AI-оценка. Дашборд использует это вместо тяжёлого скана при каждой пересборке.
+    Список «ждут ответа» и оценка — из закрытой части (KV chat:v1); пока перенос не прошёл,
+    они ещё лежат в публичном файле прежней схемы и читаются оттуда."""
+    import json
+    try:
+        snap = json.loads(open(path or _SNAP_PATH, encoding="utf-8").read())
+    except Exception:
+        return {}
+    priv = _load_chat_private() if private is None else private
+    pdays = priv.get("days") or {}
+    days = snap.get("days", {})
+    assess = {**(snap.get("assessment") or {}), **(priv.get("assessment") or {})}
     daykeys = sorted(days)[-7:]
     out = {}
     for uid in (str(u) for u in uids):
-        recs = [days[d][uid] for d in daykeys if isinstance(days.get(d), dict) and days[d].get(uid)]
+        dated = [(d, days[d][uid]) for d in daykeys if isinstance(days.get(d), dict) and days[d].get(uid)]
+        recs = [r for _d, r in dated]
         if not recs:
             out[uid] = {"assessment": assess.get(uid), "days": 0}
             continue
@@ -258,8 +284,9 @@ def _load_react_snapshot(uids) -> dict:
         for k in ("waitMaxDays", "lastPostDays"):
             if avg.get(k) is not None:
                 avg[k] = round(avg[k], 1)
-        latest = recs[-1]
-        avg["waiting"] = latest.get("waiting", [])
+        latest_day, latest = dated[-1]
+        pw = ((pdays.get(latest_day) or {}).get(uid) or {}).get("waiting")
+        avg["waiting"] = pw if pw is not None else latest.get("waiting", [])
         avg["presale"] = latest.get("presale", {})
         avg["real"] = latest.get("real", {})
         avg["days"] = len(recs)
