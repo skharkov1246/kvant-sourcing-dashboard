@@ -93,16 +93,16 @@ def main() -> int:
 
     sel = ["ID", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE", КАТЕГОРИЯ, PO]
     открытые = client.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "P"}, select=sel)
-    воронки = client.categories()
     print(f"\nОТКРЫТЫЕ СДЕЛКИ: {len(открытые)}")
     for строка in сводка(открытые, подписи):
         print(строка)
     по_вор = collections.defaultdict(list)
     for d in открытые:
         по_вор[str(d.get("CATEGORY_ID") or "0")].append(d)
+    # воронки — номерами: названия воронок здесь — имена клиентов и людей (журнал публичный)
     print("  по воронкам (заполнено категорией):")
     for cid, ds in sorted(по_вор.items(), key=lambda x: -len(x[1])):
-        print(f"    {воронки.get(cid, 'кат.' + cid)}: "
+        print(f"    кат. {cid}: "
               f"{доля(sum(1 for d in ds if значения(d.get(КАТЕГОРИЯ))), len(ds))}")
 
     print("\nОТКРЫТАЯ РЕАЛИЗАЦИЯ (кат. 0):")
