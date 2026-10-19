@@ -1,8 +1,18 @@
 {
- "updated": "2026-10-15",
+ "updated": "2026-10-19",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "24004",
+   "title": "ГТУ ТЭС-200, ПРУ (Пермь)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C32:3",
+   "created": "2026-10-15",
+   "rfqs": []
+  },
   {
    "id": "23974",
    "title": "Запрос на лопатки 1-й ступени SGT-700 ООО \"СКИМ\" (коллега Кирша)",
@@ -93,7 +103,7 @@
      "title": "Simpex (India) датчик sgt-700",
      "created": "2026-10-07",
      "supplier": "Simpex Engineering India Pvt. Ltd",
-     "stage": "Request Sent",
+     "stage": "In Correspondance",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "SGT-700"
@@ -203,7 +213,7 @@
      "title": "rfq Shanghai Bogvik Wear Material",
      "created": "2026-10-08",
      "supplier": "Shanghai Bogvik Wear Material Co., ltd",
-     "stage": "Unread Messages",
+     "stage": "In Correspondance",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -252,6 +262,61 @@
      "models": [
       "V64.3A (AE64.3A)"
      ]
+    },
+    {
+     "id": "51510",
+     "title": "rfq China Power Contractor",
+     "created": "2026-10-15",
+     "supplier": "China Power Contractor",
+     "stage": "Request Sent",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "51522",
+     "title": "rfq Xiangjing (Shanghai) M&E Technology Co., Ltd.",
+     "created": "2026-10-15",
+     "supplier": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "51524",
+     "title": "rfq Sichuan Focus Science and Technology Co., Ltd",
+     "created": "2026-10-15",
+     "supplier": "Sichuan Focus Science and Technology Co., Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "51526",
+     "title": "rfq Cascade Automation",
+     "created": "2026-10-15",
+     "supplier": "Cascade Automation Inc.",
+     "stage": "Request Sent",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "51528",
+     "title": "rfq Valmet Flow Control",
+     "created": "2026-10-15",
+     "supplier": "Valmet Flow Control (Jiaxing) Co., Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
     }
    ]
   },
@@ -269,7 +334,7 @@
      "title": "WTT 156 поз. Ansaldo на закупку зип+кап",
      "created": "2026-10-06",
      "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
-     "stage": "Request Sent",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -313,7 +378,7 @@
      "title": "Allied Dynamics Corp. USA Ansaldo 20 поз. кап+зип",
      "created": "2026-10-07",
      "supplier": "Allied Dynamics Corp.",
-     "stage": "Request Sent",
+     "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -324,7 +389,7 @@
      "title": "Allied Dynamics Corp. USA Ansaldo 20 поз. кап+зип",
      "created": "2026-10-07",
      "supplier": "Allied Dynamics Corp.",
-     "stage": "Request Sent",
+     "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -379,7 +444,7 @@
      "title": "WTT 156 поз. Ansaldo на закупку зип+кап",
      "created": "2026-10-06",
      "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
-     "stage": "Request Sent",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -456,7 +521,7 @@
      "title": "GT Solution S.r.l. Ansaldo 20 поз. зип",
      "created": "2026-10-07",
      "supplier": "GT SOLUTION SRL",
-     "stage": "Request Sent",
+     "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -533,7 +598,7 @@
      "title": "rfq M Power Engineering",
      "created": "2026-10-09",
      "supplier": "M Power Engineering",
-     "stage": "Request Sent",
+     "stage": "In Correspondance",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -610,7 +675,7 @@
      "title": "rfq Gas Turbine Valves",
      "created": "2026-10-09",
      "supplier": "Gas Turbine Valves",
-     "stage": "Request Sent",
+     "stage": "In Correspondance",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -1002,7 +1067,7 @@
      "title": "GTF26 HW (China)",
      "created": "2026-08-19",
      "supplier": "Liaoning Hanwen Power Technology Co. Ltd.",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "GE 9F/9FA"
@@ -3445,7 +3510,7 @@
     {
      "id": "25422",
      "title": "Фильтры Siemens в EU Automation (UAE)",
-     "created": "2025-12-15",
+     "created": "2025-12-16",
      "supplier": "EU Automation (UAE)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -3535,7 +3600,7 @@
     {
      "id": "26030",
      "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
-     "created": "2026-01-08",
+     "created": "2026-01-09",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -3787,7 +3852,7 @@
     {
      "id": "24010",
      "title": "Pepple+Fuchs в Kempston Controls LLC",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Kempston Controls LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -3798,7 +3863,7 @@
     {
      "id": "24012",
      "title": "Pepple+Fuchs в Gahangan",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Gahangan",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -4948,7 +5013,7 @@
      "title": "tks pro 8поз. Mars 100 ПНОС",
      "created": "2026-08-17",
      "supplier": "TKS PRO GmbH",
-     "stage": "In Correspondance",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Mars 100"
@@ -4959,7 +5024,7 @@
      "title": "bowzon 8 позиций марс 100",
      "created": "2026-09-17",
      "supplier": "Bowzon Turbine",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Solar (модель уточнить)"
@@ -5533,7 +5598,7 @@
    "models": [
     "SGT-100"
    ],
-   "stage": "C4:PREPARATION",
+   "stage": "C4:5",
    "created": "2025-03-06",
    "rfqs": [
     {
@@ -6570,7 +6635,7 @@
     {
      "id": "10108",
      "title": "Requests #10108",
-     "created": "2024-12-17",
+     "created": "2024-12-18",
      "supplier": "RTP power",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -7548,16 +7613,6 @@
    ]
   },
   {
-   "id": "10374",
-   "title": "ООО \"ГАЗПРОМНЕФТЬ - ЗАПОЛЯРЬЕ\". потребность  SGT-400",
-   "models": [
-    "SGT-400"
-   ],
-   "stage": "C4:NEW",
-   "created": "2024-10-29",
-   "rfqs": []
-  },
-  {
    "id": "10348",
    "title": "5381279 Поставка фильтра комплексной воздухоочистительной установки (КВОУ) ГТУ Ansaldo V64.3A",
    "models": [
@@ -8329,7 +8384,7 @@
    "models": [
     "SGT-600"
    ],
-   "stage": "C4:PREPAYMENT_INVOICE",
+   "stage": "C4:11",
    "created": "2024-02-15",
    "rfqs": []
   },
@@ -8708,7 +8763,7 @@
    "models": [
     "SGT-100"
    ],
-   "stage": "C4:PREPARATION",
+   "stage": "C4:2",
    "created": "2023-10-03",
    "rfqs": [
     {
@@ -10135,6 +10190,26 @@
     },
     {
      "name": "Wuxi CTENO Actuators Manufacture Co. Ltd",
+     "n": 1
+    },
+    {
+     "name": "China Power Contractor",
+     "n": 1
+    },
+    {
+     "name": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
+     "n": 1
+    },
+    {
+     "name": "Sichuan Focus Science and Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Cascade Automation Inc.",
+     "n": 1
+    },
+    {
+     "name": "Valmet Flow Control (Jiaxing) Co., Ltd.",
      "n": 1
     },
     {
