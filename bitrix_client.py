@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import atexit
+import copy
 import hashlib
 import json
 import os
@@ -199,6 +200,16 @@ class BitrixLimitError(BitrixError):
     """Портал держал лимит дольше бюджета ожидания."""
 
 
+class _Темп:
+    """Темп запросов к порталу: замок, отметка последнего запроса, замедление."""
+    __slots__ = ("lock", "last_call", "замедление")
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.last_call = 0.0
+        self.замедление = 1.0
+
+
 class BitrixClient:
     def __init__(self, webhook_url: str, *, timeout: int = 30, min_interval: float | None = None,
                  retries: int | None = None, backoff_base: float = 0.5, backoff_max: float = 32.0):
@@ -218,10 +229,11 @@ class BitrixClient:
         # Замедление после отказа по лимиту: пауза между запросами умножается,
         # затем плавно возвращается. Так два прогона, случайно сошедшиеся на
         # портале, сами расходятся по бюджету, не зная друг о друге.
-        self._замедление = 1.0
+        # Темп — общий объект: клиент под другим вебхуком (with_webhook) делит его с
+        # исходным, и вместе они не превышают бюджет портала.
+        self._темп = _Темп()
+        self._lock = self._темп.lock
         self._session = requests.Session()
-        self._lock = threading.Lock()
-        self._last_call = 0.0
         # ленивые кэши
         self._users: dict[str, str] | None = None
         self._stages: dict[str, str] | None = None
@@ -238,6 +250,32 @@ class BitrixClient:
         self.snapshot_dir = os.getenv("BITRIX_SNAPSHOT_DIR") or ""
         self.snapshot_mode = (os.getenv("BITRIX_SNAPSHOT_MODE") or "").strip().lower()
         self.snapshot_saved = self.snapshot_hits = self.snapshot_misses = 0
+
+    @property
+    def _замедление(self) -> float:
+        return self._темп.замедление
+
+    @_замедление.setter
+    def _замедление(self, v: float) -> None:
+        self._темп.замедление = v
+
+    @property
+    def _last_call(self) -> float:
+        return self._темп.last_call
+
+    @_last_call.setter
+    def _last_call(self, v: float) -> None:
+        self._темп.last_call = v
+
+    def with_webhook(self, webhook_url: str) -> "BitrixClient":
+        """Тот же портал под другим вебхуком — чтение чатов сделок от имени владельца
+        (решение 19.10.2026: вебхук сборки не участник чатов, 123 из 129 — отказ).
+        Темп и снимок живой сверки общие с исходным клиентом, свои — адрес, сессия
+        и ленивые кэши (справочники читаются исходным клиентом)."""
+        other = copy.copy(self)
+        other.base = webhook_url.rstrip("/") + "/"
+        other._session = requests.Session()
+        return other
 
     def snapshot_stats(self) -> dict:
         return {"mode": self.snapshot_mode if self.snapshot_dir else "",
