@@ -971,3 +971,15 @@ def drop_lost(client, entity_type_id: int, items: Iterable[dict]) -> list[dict]:
     items = list(items)
     lost = lost_stage(client, entity_type_id, items)
     return [it for it in items if not lost(it.get("stageId"))]
+
+
+def chat_webhook_url() -> str:
+    """Вебхук владельца для чтения чатов сделок (секрет BITRIX_CHAT_WEBHOOK_URL, решение
+    19.10.2026): только https с путём /rest/; иначе — пусто (читает вебхук сборки) и
+    предупреждение без адреса. Одна проверка для сборки и пилота чатов."""
+    u = (os.getenv("BITRIX_CHAT_WEBHOOK_URL") or "").strip()
+    if u and not (u.startswith("https://") and "/rest/" in u):
+        print("  ⚠ BITRIX_CHAT_WEBHOOK_URL не похож на вебхук — чаты читает вебхук сборки", flush=True)
+        return ""
+    return u
+

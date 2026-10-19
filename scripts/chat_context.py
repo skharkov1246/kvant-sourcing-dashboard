@@ -232,15 +232,24 @@ _ЧАТ = re.compile(r"\[CHAT=[^\]]*\].*?\[/CHAT\]", re.I | re.S)
 _ССЫЛКА_BB = re.compile(r"\[URL(?:=[^\]]*)?\].*?\[/URL\]", re.I | re.S)
 _ДИСК = re.compile(r"\[DISK=[^\]]*\]", re.I)
 _ТЕГ = re.compile(r"\[/?[A-Z]+(?:=[^\]]*)?\]", re.I)
-_URL = re.compile(r"(?:https?://|www\.)\S+", re.I)
+_URL = re.compile(r"(?:https?://|www\.)\S+"
+                  # и без схемы: wa.me/…, t.me/…, домен.ru/… (ревью 19.10.2026)
+                  r"|\b(?:[\w-]+\.)+(?:ru|рф|su|com|net|org|me|io|cn|de|by|kz|ua|uz)\b(?:/\S*)?", re.I)
 _ПОЧТА = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]*[a-z]{2,}", re.I)
 # телефоны — тот же образец, что ищет scripts/kb_check.py: даты «2026-10-19» он не берёт
-_ТЕЛЕФОН = re.compile(r"(?<![\w/.-])(?:\+7|8)[\s(-]*\d{3}[\s)-]*\d{3}[\s-]?\d{2}[\s-]?\d{2}(?!\d)"
-                      r"|(?<![\w/.-])\+\d{1,3}[\s(-]+\d{2,4}[\s)-]+\d{3}[\s-]?\d{2,4}(?!\d)")
+# Телефоны шире образца kb_check (ревью 19.10.2026): «тел.8…», «7…» без плюса,
+# зарубежные номера целиком; даты и суммы с разделителями-точками не берутся
+# (первая ветка начинается с 7/8 и требует 11 цифр). Лишняя маска безопаснее
+# пропущенного номера.
+_ТЕЛЕФОН = re.compile(r"(?<![\w+])(?:\+?7|8)[\s(.-]*\d{3}[\s).-]*\d{3}[\s.-]?\d{2}[\s.-]?\d{2}(?!\d)"
+                      r"|(?<![\w+])\+\d{1,3}(?:[\s().-]*\d){6,12}(?!\d)")
 # Цитата чата Битрикс24 — черта из дефисов, под ней строка «Имя Фамилия [дата время]»,
 # цитируемый текст и снова черта. Имя автора цитаты модели не нужно: шапка — [цитата].
 _ЦИТАТА_ПОД_ЧЕРТОЙ = re.compile(r"(?m)^[ \t]*-{10,}[ \t]*\r?\n[ \t]*[^\n]{0,120}?\[[^\]\n]{1,40}\][ \t]*$")
-_ЦИТАТА_ШАПКА = re.compile(r"(?m)^[ \t]*[^\n\[\]]{1,120}\[\d{1,2}\.\d{1,2}\.\d{2,4}[^\]\n]{0,20}\][ \t]*$")
+# Шапка без черты — только «Имя Фамилия [дата время]»: два-три слова с заглавной и
+# время в скобках; строка «Срок отгрузки [24.10.2026]» — не цитата (ревью 19.10.2026)
+_ЦИТАТА_ШАПКА = re.compile(r"(?m)^[ \t]*(?:[А-ЯЁA-Z][\w'’-]*[ \t]+){1,2}[А-ЯЁA-Z][\w'’-]*[ \t]*"
+                           r"\[\d{1,2}\.\d{1,2}\.\d{2,4}[ ,]+\d{1,2}:\d{2}(?::\d{2})?\][ \t]*$")
 _ЧЕРТА = re.compile(r"-{10,}")
 
 
@@ -324,8 +333,15 @@ def _автор(m: dict) -> str:
 
 
 def человек(m: dict, service_ids: set[str]) -> bool:
+    """Живая реплика человека: автор > 0 не из служебных; удалённое сообщение и
+    сообщение без текста и без файла — не реплика (модель не зовётся на «(пусто)»)."""
     a = _автор(m).strip()
-    return a.isdigit() and int(a) > 0 and str(int(a)) not in service_ids
+    if not (a.isdigit() and int(a) > 0 and str(int(a)) not in service_ids):
+        return False
+    p = m.get("params") if isinstance(m.get("params"), dict) else {}
+    if str(p.get("IS_DELETED") or "").upper() == "Y":
+        return False
+    return bool(str(m.get("text") or m.get("TEXT") or "").strip() or p.get("FILE_ID") or m.get("files"))
 
 
 def _когда(m: dict) -> dt.datetime | None:
@@ -572,7 +588,9 @@ class Память:
         n = 0
         now = dt.datetime.now(dt.timezone.utc)
         for r in self.ctx:
-            if r["run_id"] == run_id and not r.get("voided_at"):
+            # только сделки, чьи курсоры откат возвращает: иначе снялись бы оценки,
+            # курсоры которых уже ушли вперёд
+            if r["run_id"] == run_id and not r.get("voided_at") and str(r["deal_id"]) in прежние:
                 r["voided_at"] = now
                 n += 1
         for deal, было in прежние.items():
@@ -723,8 +741,10 @@ class База:
         assert not self.только_чтение
         with self.conn:
             with self.conn.cursor() as c:
-                c.execute("update deal_chat_ctx set voided_at = now() where run_id = %s and voided_at is null",
-                          (run_id,))
+                # только сделки, чьи курсоры откат возвращает
+                c.execute("update deal_chat_ctx set voided_at = now() "
+                          "where run_id = %s and voided_at is null and deal_id = any(%s)",
+                          (run_id, [int(d) for d in прежние]))
                 n = c.rowcount
                 for deal, было in прежние.items():
                     if было is None:
@@ -1303,7 +1323,8 @@ def main(argv: list[str] | None = None, *, client=None, store=None, клиент
     # Чаты — от имени владельца (решение 19.10.2026): вебхук сборки не участник чатов
     # (сборка 19.10: из 129 чатов с простоем 123 — отказ). Вебхук владельца — только
     # чтение чатов, темп портала общий; сделки и справочники читает вебхук сборки.
-    чат_url = os.environ.get("BITRIX_CHAT_WEBHOOK_URL", "").strip()
+    from bitrix_client import chat_webhook_url
+    чат_url = chat_webhook_url()
     чат_клиент = client.with_webhook(чат_url) if чат_url and hasattr(client, "with_webhook") else client
     print(f"чаты читает {'вебхук владельца' if чат_клиент is not client else 'вебхук сборки'}")
 

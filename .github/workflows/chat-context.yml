@@ -82,7 +82,8 @@ jobs:
       - name: Проверка входов и секретов
         env:
           B: ${{ secrets.BITRIX_WEBHOOK_URL }}
-          A: ${{ secrets.ANTHROPIC_API_KEY }}
+          # ключ модели — только в live: холостой прогон его не видит и в проверке
+          A: ${{ inputs.mode == 'live' && secrets.ANTHROPIC_API_KEY || '' }}
           S: ${{ secrets.SUPABASE_DB_URL }}
           MODE: ${{ inputs.mode }}
           BUDGET: ${{ inputs.budget_usd }}
@@ -136,7 +137,8 @@ jobs:
           SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
           BITRIX_RPS: "1.0"
           BITRIX_PARALLEL: "1"
-          RUN_ID: chat-ctx-${{ github.run_id }}
+          # попытка — в ключе: откат повторного запуска не трогает оценки первой попытки
+          RUN_ID: chat-ctx-${{ github.run_id }}-${{ github.run_attempt }}
           MODE: ${{ inputs.mode }}
           BUDGET: ${{ inputs.budget_usd }}
           LIMIT: ${{ inputs.limit }}

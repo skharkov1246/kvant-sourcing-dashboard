@@ -35,7 +35,7 @@ import premia as premia_mod
 import period as period_mod
 import presale as presale_mod
 import reps as reps_mod
-from bitrix_client import BitrixClient, drop_lost, без_вебхука
+from bitrix_client import BitrixClient, chat_webhook_url, drop_lost, без_вебхука
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
               # следы живого человека на карточке робота: кто двигал стадию,
@@ -535,10 +535,7 @@ def run(args) -> int:
     # участник чатов (сборка 19.10: из 129 чатов с простоем 123 — отказ в доступе).
     # Свой вебхук — секрет BITRIX_CHAT_WEBHOOK_URL, только чтение; темп портала общий.
     # Нет секрета — читает вебхук сборки, как раньше.
-    _chat_url = (os.getenv("BITRIX_CHAT_WEBHOOK_URL") or "").strip()
-    if _chat_url and not (_chat_url.startswith("https://") and "/rest/" in _chat_url):
-        print("  ⚠ BITRIX_CHAT_WEBHOOK_URL не похож на вебхук — чаты читает вебхук сборки")
-        _chat_url = ""
+    _chat_url = chat_webhook_url()
     chat_reader = chat_activity.Reader(client.with_webhook(_chat_url) if _chat_url else client, service_ids)
     print(f"• Чаты сделок читает {'вебхук владельца' if _chat_url else 'вебхук сборки'}")
     _presale_in: dict | None = None
@@ -547,9 +544,14 @@ def run(args) -> int:
             people_mod.deal_categories(client))
         if _ps:
             _pdeals = client.list_deals_fast(filter={"CATEGORY_ID": int(_ps[0])}, select=presale_mod.DEAL_SELECT)
-            # подписи «Категории оборудования» — справочник поля (линии продукт-оунеров)
-            _cat_labels = {str(k): str(v) for k, v in
-                           ((client.userfields().get(presale_mod.CAT_F) or {}).get("enum") or {}).items()}
+            # подписи «Категории оборудования» — справочник поля (линии продукт-оунеров);
+            # не прочитан — только оформление: «значение #id», блок пресейла остаётся
+            try:
+                _cat_labels = {str(k): str(v) for k, v in
+                               ((client.userfields().get(presale_mod.CAT_F) or {}).get("enum") or {}).items()}
+            except Exception as e:                       # noqa: BLE001
+                print(f"  ⚠ подписи «Категории оборудования» не прочитаны: {type(e).__name__}")
+                _cat_labels = {}
             _presale_in = dict(cid=_ps[0], cat_name=_ps[1], deals=_pdeals, stage_meta=client.deal_stage_meta(),
                                rfqs=rfqs, people=roster, names=names, today=p.end, service_ids=service_ids,
                                cat_labels=_cat_labels)
@@ -707,6 +709,11 @@ def run(args) -> int:
         # семантике стадии (свои стадии провала UC_* по суффиксу «:FAIL» считались живыми)
         orders_ytd = [o for o in drop_lost(client, 172, orders_all)
                       if str(o.get("createdTime", ""))[:4] >= ys[:4]]
+        # справочник стадий не прочитан — провал по суффиксу «:FAIL», как до 19.10: видно в журнале
+        _без_справочника = sum(1 for v in getattr(client, "_spa_sem", {}).values() if not v)
+        if _без_справочника:
+            print(f"  ⚠ справочник стадий СП-172 не прочитан для {_без_справочника} воронок — "
+                  "провал заказа там по суффиксу «:FAIL»")
         print(f"  заказов СП-172 с {people_mod.ORDERS_SINCE[:4]}: {len(orders_all)}, "
               f"из них непроигранных в {ys[:4]}: {len(orders_ytd)}")
         # курсы → база € (для продаж сделок)

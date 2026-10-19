@@ -1447,7 +1447,8 @@ function renderDir(D, elId, opt){
   const el=document.getElementById(elId); if(!el) return;
   if(!D){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных</div>'; return; }
   const t=D.totals;
-  const mcol=x=>{const c=x.marginRaw<0?'var(--nr)':'var(--ok)';const p=x.marginPct==null?'':` <small class="dimv">${x.marginPct}%</small>`;return `<span style="color:${c}">${x.margin}</span>${p}`;};
+  // маржа — только по контрактам с закупкой; контракты без неё — счётчиком, а не «€0»
+  const mcol=x=>{const c=x.marginRaw<0?'var(--nr)':'var(--ok)';const p=x.marginPct==null?'':` <small class="dimv">${x.marginPct}%</small>`;const nb=x.noBuy?`<div class="dimv" style="font-size:11px">без закупки ${x.noBuy}</div>`:'';return (x.marginPct==null&&x.noBuy?'<span class="dimv">—</span>':`<span style="color:${c}">${x.margin}</span>${p}`)+nb;};
   const row=r=>`<tr class="drill" data-drill="grp:${_esc(r.group)}"><td><div class="who">${_esc(r.group)}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.contracts}</td><td class="num r">${r.sales}</td><td class="num r" style="color:var(--a)">${r.buy}</td><td class="num r">${mcol(r)}</td></tr>`;
   const rmx=Math.max(1,...D.byRevenue.map(x=>x.v));
   const _n=i=>String((opt.base||0)+i);

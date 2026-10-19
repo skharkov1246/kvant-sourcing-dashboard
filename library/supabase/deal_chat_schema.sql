@@ -188,6 +188,9 @@ create table if not exists deal_chat_state (
   method_ver    text        not null,
   fail_streak   integer     not null default 0    -- вызовов подряд без годной оценки; 0 — после записанной
 );
+-- create table if not exists таблицу не меняет (правило 21): колонка, добавленная
+-- после первой редакции файла, — отдельным alter, до ограничений ниже
+alter table deal_chat_state add column if not exists fail_streak integer not null default 0;
 
 create table if not exists deal_chat_ctx (
   id            bigserial   primary key,
