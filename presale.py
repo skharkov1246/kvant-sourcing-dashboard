@@ -164,7 +164,10 @@ def po_lines(rows: list[dict]) -> dict:
     lines: dict[str, dict] = {}
     for r in rows:
         for c in (r.get("cats") or [CAT_NONE]):
-            a = lines.setdefault(c, {"cat": c, "n": 0, "open": 0, "won": 0, "lost": 0, "stale": 0,
+            # «выиграно» не считается: выигранная сделка пресейла уходит в сделку
+            # реализации, стадии успеха в пресейле не ставят (живая сверка 19.10:
+            # 0 из 20 линий) — колонка из одних нулей только путала бы
+            a = lines.setdefault(c, {"cat": c, "n": 0, "open": 0, "lost": 0, "stale": 0,
                                      "ballKam": 0, "ballSrc": 0, "noPo": 0, "_po": defaultdict(int)})
             a["n"] += 1
             if r["open"]:
@@ -177,7 +180,7 @@ def po_lines(rows: list[dict]) -> dict:
                 else:
                     a["noPo"] += 1
             else:
-                a["won" if r["sem"] == "S" else "lost"] += 1
+                a["lost"] += r["sem"] == "F"
     out = []
     for a in lines.values():
         po = a.pop("_po")
