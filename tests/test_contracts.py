@@ -75,7 +75,7 @@ class Портал:
                   ("502", "DT172_26:PREPARATION", _t(10))],
         }
 
-    def call(self, method, params=None):
+    def call(self, method, params=None, **kw):
         if method == "im.dialog.messages.get":
             return {"messages": self.chats.get(params["DIALOG_ID"], [])}
         if method == "crm.item.fields":

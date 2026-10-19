@@ -638,6 +638,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         else:
             r["stuck"] = False
             r["slow"] = bool(r["late"])
+            # «не проверено» — не «всё хорошо»: серая корзина, сделка видна отдельным фильтром
+            r["chatUnverified"] = ch["status"] in ("unread", "skipped")
             note = (f"в чате работа: последнее сообщение {ch['days']} дн. назад — не подвисла"
                     if ch["status"] == "active" else "чат не проверен — простой не подтверждён")
             r["why"] += (" · " if r["why"] else "") + note

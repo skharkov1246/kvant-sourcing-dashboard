@@ -16,7 +16,7 @@ class Чаты:
     def __init__(self, ответы):
         self.ответы, self.вызовы = ответы, 0
 
-    def call(self, method, params):
+    def call(self, method, params, **kw):
         assert method == "im.dialog.messages.get"
         self.вызовы += 1
         r = self.ответы[params["DIALOG_ID"]]
@@ -49,4 +49,23 @@ def test_проверка_бюджет_и_нечитаемый_ответ():
     assert res["d3"]["status"] == "unread" and res["d4"]["status"] == "unread", "ошибка и пустой ответ — не «тишина»"
     assert res["d5"]["status"] == "unread", "нет id чата — не проверен"
     assert res["d6"]["status"] == "skipped" and к.вызовы == 4
-    assert ca.summary(res) == {"active": 1, "quiet": 1, "unread": 3, "skipped": 1, "checked": 2}
+    assert ca.summary(res) == {"active": 1, "quiet": 1, "unread": 3, "skipped": 1, "denied": 1, "checked": 2}
+
+
+class BitrixLimitError(RuntimeError):
+    """Как bitrix_client.BitrixLimitError — шлюз узнаёт её по имени класса."""
+
+
+def test_лимит_портала_останавливает_чтение_и_нет_доступа_отдельно():
+    к = Чаты({"chat1": BitrixLimitError("QUERY_LIMIT_EXCEEDED"), "chat2": {"messages": []},
+              "chat3": RuntimeError("im.dialog.messages.get: ACCESS_ERROR нет доступа")})
+    к.limit_wait_budget = 1800.0
+    res = ca.check(к, [("d1", "1", 100), ("d2", "2", 90)], СЕГОДНЯ, set())
+    assert res["d1"]["status"] == "unread" and res["d2"]["status"] == "skipped" and к.вызовы == 1
+    assert к.limit_wait_budget == 1800.0, "бюджет ожидания клиента восстановлен"
+    res = ca.check(к, [("d3", "3", 1)], СЕГОДНЯ, set())
+    assert res["d3"] == {"status": "unread", "last": "", "days": None, "why": "denied"}
+    assert ca.summary(res)["denied"] == 1
+    # порядок сообщений не задан: берём самое позднее сообщение человека
+    msgs = [{"author_id": 3, "date": "2026-10-01"}, {"author_id": 3, "date": "2026-10-15"}, {"author_id": 3, "date": "2026-09-01"}]
+    assert ca.last_human(msgs, set()) == dt.date(2026, 10, 15)

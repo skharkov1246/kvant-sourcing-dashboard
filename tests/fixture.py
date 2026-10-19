@@ -438,7 +438,7 @@ class ContractsStub:
                 self.hist[172].append((str(oid), "DT172_26:NEW", t(age)))
                 self.hist[172].append((str(oid), o["stageId"], t(rnd.randint(1, 30))))
 
-    def call(self, method, params=None):
+    def call(self, method, params=None, **kw):
         if method == "crm.item.fields":
             return {"fields": {}}
         if method == "im.dialog.messages.get":
