@@ -128,7 +128,7 @@ function defaultAcl() {
         sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"],
         rights: DEFAULT_RIGHTS.slice() },
       kam: { name: "КАМ", admin: false,
-        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "reps", "cohorts"],
+        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "reps", "contracts", "cohorts"],
         rights: DEFAULT_RIGHTS.slice() },
       engineer: { name: "Инженер", admin: false,
         sites: ["zip", "gt", "gpu", "knowledge", "ove", "gidromet", "gok"], tabs: [],
