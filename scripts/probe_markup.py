@@ -117,6 +117,13 @@ YEN_CLUES = {
 }
 
 
+ВАЛЮТНОЕ_СЛОВО = re.compile(r"\bRMB\b|\bCNY\b|\bJPY\b|人民币|円|元|currency|货币|币种|"
+                            r"\bYEN\b|\bYUAN\b|total\s+amount|grand\s+total", re.I)
+ЖЕТОНЫ = {"RMB": r"\bRMB\b", "CNY": r"\bCNY\b", "人民币": "人民币", "元": "元", "YUAN": r"\bYUAN\b",
+          "CHINA": r"\bCHINA\b", "+86": r"\+86", "JPY": r"\bJPY\b", "円": "円", "YEN": r"\bYEN\b",
+          "JAPAN": r"\bJAPAN\b", "+81": r"\+81", "USD": r"\bUSD\b", "$": r"\$"}
+
+
 def ключ(pn: str) -> str:
     from pnkey import key
     return key(pn)
@@ -301,9 +308,21 @@ def способ_а(rates: dict, yen: str) -> tuple[dict, dict, dict]:
                         for _s, _i, cells in rows)
         класс = ("наше ТКП (по имени файла)" if НАШЕ_ТКП.search(fname)
                  else c["direction"])
+        # Строки файла, где названа валюта: печатаются только сами валютные
+        # слова строки и есть ли в ней ¥ — ни цен, ни названий (в такой строке
+        # бывают реквизиты поставщика).
+        маска = []
+        if "¥" in text:
+            for _s, _i, cells in rows:
+                t = " ".join(str(x) for x in cells if x not in (None, ""))
+                слова = ВАЛЮТНОЕ_СЛОВО.findall(t)
+                if слова:
+                    маска.append(f"{' · '.join(слова)}{' · знак ¥ в строке' if '¥' in t else ''}")
         files.append({"file_name": fname, "origin": c["origin"], "field": c["field_name"],
                       "direction": c["direction"], "класс": класс, "prices": pr,
-                      "fcur": fcur[0] or "не установлена",
+                      "fcur": fcur[0] or "не установлена", "маска": маска,
+                      "жетоны": ({t: len(re.findall(rx, text, re.I)) for t, rx in ЖЕТОНЫ.items()}
+                                 if "¥" in text else None),
                       "улики": ({v: len(rx.findall(text)) for v, rx in YEN_CLUES.items()}
                                 | {"знаков ¥": text.count("¥")}) if "¥" in text else None})
     if отказ:
@@ -312,6 +331,8 @@ def способ_а(rates: dict, yen: str) -> tuple[dict, dict, dict]:
     for f in files:
         if f["класс"].startswith("наше ТКП"):
             print(f"  наше ТКП: {f['origin']} · поле «{f['field']}» · {f['file_name']}")
+
+    проверка_масштаба(files, rates, tt)
 
     keys = {ключ(pn): [] for _g, pn, _q in LINES}
     for i, (_g, pn, _q) in enumerate(LINES):
@@ -403,6 +424,64 @@ def способ_а(rates: dict, yen: str) -> tuple[dict, dict, dict]:
     print("ТО ЖЕ, ступени «арифметика», иначе «колонка»")
     отношения("  ", наше12[0], вход12[0])
     return вход12[0], наше12[0], {}
+
+
+def проверка_масштаба(files: list, rates: dict, tt) -> None:
+    """Юань или иена: масштаб цен файла против открытых вилок и справочного каталога.
+
+    Берутся ВСЕ строки файла с ценой по арифметике, а не только строки объёма:
+    вопрос о валюте — свойство файла, и на сотне строк он решается надёжнее,
+    чем на семнадцати. Наружу — медиана отношения и доля в разумных пределах.
+    """
+    вилка = {}
+    for r in json.loads((ROOT / "gt/data/ship_lukoil.json").read_text(encoding="utf-8"))["rows"]:
+        if r.get("usd_lo") and r.get("usd_hi"):
+            вилка[ключ(r["pn"])] = (float(r["usd_lo"]) + float(r["usd_hi"])) / 2
+    for k, v in вилки().items():
+        вилка.setdefault(k, v)
+    каталог: dict[str, float] = {}
+    dsn = (os.getenv("SUPABASE_DB_URL") or "").strip()
+    for f in files:
+        if not f.get("жетоны"):
+            continue
+        арифм, _why = tt.extract({"files": [f]}, yen="")
+        ед = defaultdict(list)
+        for r in арифм:
+            ед[r["key"]].append(float(r["unit"]))
+        print(f"\nПРОВЕРКА ВАЛЮТЫ · {f['file_name']} · {f['origin']}")
+        print(f"  слова о валюте (счётом): {f['жетоны']}")
+        print(f"  строк файла, где названа валюта: {len(f['маска'])}; валютные слова в них:")
+        for t in list(dict.fromkeys(f["маска"]))[:12]:
+            print(f"    | {t}")
+        print(f"  номеров с ценой по арифметике: {len(ед)}")
+        if dsn and ед and not каталог:
+            try:
+                import psycopg2
+                conn = psycopg2.connect(dsn, connect_timeout=20,
+                                        options="-c statement_timeout=300000")
+                conn.set_session(readonly=True)
+                with conn.cursor() as cur:
+                    cur.execute("""select lib_pn_key(part_number), min(price)::float
+                                     from lib_prices
+                                    where feed = 'каталог ЗИП' and upper(coalesce(currency, '')) = 'USD'
+                                      and price > 0 and lib_pn_key(part_number) = any(%s)
+                                    group by 1""", ([k.lower() for k in ед],))
+                    каталог.update({k.upper(): v for k, v in cur.fetchall()})
+                conn.close()
+            except Exception as e:                           # noqa: BLE001
+                print(f"  каталог ЗИП не прочитан: {type(e).__name__}")
+        for имя, база in (("середина открытой вилки (gt/data/ship_lukoil.json, rfq_prices.json)", вилка),
+                          ("каталог ЗИП (закрытая база, USD)", каталог)):
+            for вар in ("CNY", "JPY"):
+                rel = [min(v) * rates[вар] / rates["USD"] / база[k] for k, v in ед.items()
+                       if k in база and база[k] > 0]
+                if len(rel) < MIN_LINES:
+                    print(f"  против: {имя} · ¥={вар}: номеров {len(rel)} — мало")
+                    continue
+                доля = sum(1 for x in rel if 0.25 <= x <= 4) / len(rel)
+                print(f"  против: {имя} · ¥={вар}: номеров {len(rel)} · медиана {statistics.median(rel):.2f}"
+                      f" · квартили {statistics.quantiles(rel, n=4)[0]:.2f}…{statistics.quantiles(rel, n=4)[2]:.2f}"
+                      f" · в пределах ×4 от базы {доля:.0%}")
 
 
 def способ_б(rates: dict, yen: str) -> None:
