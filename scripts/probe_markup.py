@@ -18,23 +18,25 @@ Taurus 60S/70), где цена КВАНТ минимальная. Коэффи�
      gt/tools/bitrix_tkp.py. Цена принимается двумя ступенями: «арифметика» —
      строка сама подтвердила единица × количество = итог (gt/tools/tkp_tables.py);
      «колонка» — значение из колонки цены по заголовку, без арифметики.
-     В закупку идёт только направление «входящее»; «неизвестно» (в том числе
-     Result file сделки) считается отдельно и в сумму не входит.
-  Б. Закрытая база: lib_prices_live, закупочные потоки, по ключу номера.
+     Наше ТКП, положенное в поле входящих, отделяется по имени файла (НАШЕ_ТКП):
+     прогон 39432926797 без этого взял его за предложение поставщика. Оно же
+     служит нашей стороной: отношение «наше ТКП / входящее КП» считается по
+     строкам внутри прогона, наружу — только статистика отношений.
+  Б. Закрытая база: lib_prices_live по ключу номера; входящие КП («разбор КП»,
+     «письмо поставщика») отдельно от справочного «каталога ЗИП».
 По строке берётся НАИМЕНЬШАЯ цена в рублях: вопрос «сколько мы зарабатываем на
 лучшем входящем предложении».
 
-ЗНАК ¥. В предложении по SGT-400 цены в ¥, а ¥ — это и юань, и иена (курсы
-различаются в 22,8 раза). Молча выбрать нельзя: зонд считает оба варианта и
-печатает улики из текста файла счётом (коды валют, страна, телефонный код), плюс
-медиану отношения цены к нашей открытой вилке (gt/data/rfq_prices.json) по каждому
-варианту.
+ЗНАК ¥. ¥ — это и юань, и иена (курсы различаются в 22,8 раза). В QT 127 код CNY
+назван 7 раз, JPY — ни разу (прогон 39432926797), поэтому ¥ читается как CNY;
+вход PROBE_YEN меняет решение, улики печатаются по каждому файлу.
 
-ЧТО В ЖУРНАЛ. По группе: сколько строк покрыто ценой и какие номера (номер —
-обозначение изготовителя, он уже лежит в gt/data/rfq_demand.json); сумма закупки
-в рублях по курсу ЦБ, округлённая до трёх значащих цифр, — только если в группе
-покрыто не меньше трёх строк (иначе сумма одной строки и есть её цена); валюты,
-базис и даты — счётом. НЕ идут: цена строки, итог строки, поставщик поимённо.
+ЧТО В ЖУРНАЛ. По файлу и по группе: сколько строк с ценой и какие номера (номер —
+обозначение изготовителя, он уже лежит в gt/data/rfq_demand.json); сумма в рублях
+по курсу ЦБ, округлённая до трёх значащих цифр, — только по корзине не меньше
+трёх строк (иначе сумма одной строки и есть её цена); отношения наших цен к
+закупке — медианой, квартилями и корзинами; валюты, базис и даты — счётом. НЕ
+идут: цена строки, итог строки, поставщик поимённо.
 
 НАГРУЗКА НА ПОРТАЛ: поля сделки и СП-166 (2 вызова), записи СП-166 сделки
 (1–4 страницы), комментарии таймлайна (1), сделка (1), скачивание вложений
@@ -192,43 +194,70 @@ def разбиение(покрыто: dict[str, set]) -> list[tuple[str, list[s
     return out
 
 
-def печать_способа(имя: str, выбор: dict, rates: dict, ист_курса: str) -> None:
-    """выбор: индекс строки → {"rub": {вариант ¥: рубли за единицу}, ...}."""
-    print(f"\n=== СПОСОБ {имя} ===")
-    for вариант in ("CNY", "JPY"):
-        покрыто: dict[str, set] = defaultdict(set)
-        сумма: dict[str, float] = defaultdict(float)
-        for i, v in выбор.items():
-            rub = v["rub"].get(вариант)
-            if rub is None:
-                continue
-            g, pn, qty = LINES[i]
-            покрыто[g].add(i)
-            сумма[g] += rub * qty
-        всего = sum(len(s) for s in покрыто.values())
-        print(f"\n  вариант знака ¥ = {вариант} · курс {ист_курса} · строк с ценой: {всего} из {len(LINES)}")
-        if всего < MIN_LINES:
-            print("  покрытых строк меньше трёх — суммы не печатаются")
+def сумма_по_группам(отступ: str, цена: dict[int, float], валюта: dict[int, str] | None = None,
+                     пометка: str = "закупка") -> float:
+    """Суммы по группам строк. цена: индекс строки → рублей за единицу.
+
+    Сумма печатается только по корзине, где не меньше MIN_LINES строк, — иначе
+    это цена строки. В валюте источника — только если корзина одновалютная.
+    """
+    покрыто: dict[str, set] = defaultdict(set)
+    for i in цена:
+        покрыто[LINES[i][0]].add(i)
+    всего = len(цена)
+    if всего < MIN_LINES:
+        print(f"{отступ}строк {всего} — меньше трёх, суммы не печатаются")
+        return 0.0
+    итог = 0.0
+    for label, gs in разбиение(покрыто):
+        idx = sorted(i for g in gs for i in покрыто[g])
+        s = sum(цена[i] * LINES[i][2] for i in idx)
+        итог += s
+        вал = {валюта[i] for i in idx} if валюта else set()
+        хвост = f" · валюта источника {next(iter(вал))}" if len(вал) == 1 else (
+            f" · валюты {sorted(вал)}" if вал else "")
+        print(f"{отступ}[{label}] строк {len(idx)} · {пометка} ≈ {знач3(s)} ₽{хвост}")
+        print(f"{отступ}    строки: {', '.join(f'L{i + 1:02d}={LINES[i][1]}' for i in idx)}")
+    print(f"{отступ}ИТОГО строк {всего}: {пометка} ≈ {знач3(итог)} ₽")
+    return итог
+
+
+def отношения(отступ: str, наше: dict[int, float], закупка: dict[int, float]) -> None:
+    """Наша цена / цена закупки по строкам, где есть обе, — только статистикой."""
+    общие = sorted(set(наше) & set(закупка))
+    if len(общие) < MIN_LINES:
+        print(f"{отступ}строк с обеими ценами {len(общие)} — меньше трёх, не печатается")
+        return
+    for сег, gs in (("все", set(GROUPS)), ("Siemens", {"G1", "G2", "G3", "G4"}),
+                    ("Solar", {"G5", "G6"})):
+        idx = [i for i in общие if LINES[i][0] in gs]
+        if len(idx) < MIN_LINES:
+            if idx:
+                print(f"{отступ}{сег}: строк {len(idx)} — меньше трёх")
             continue
-        итог = 0.0
-        for label, gs in разбиение(покрыто):
-            idx = sorted(i for g in gs for i in покрыто[g])
-            s = sum(сумма[g] for g in gs)
-            итог += s
-            print(f"  [{label}] строк {len(idx)} · закупка ≈ {знач3(s)} ₽ без НДС")
-            print(f"      строки: {', '.join(f'L{i + 1:02d}={LINES[i][1]}' for i in idx)}")
-        print(f"  ИТОГО по покрытым строкам: закупка ≈ {знач3(итог)} ₽")
-        for g in GROUPS:
-            if not покрыто.get(g):
-                print(f"  {g}: строк с ценой 0 из {sum(1 for x in LINES if x[0] == g)}")
+        r = sorted(наше[i] / закупка[i] for i in idx)
+        k = (sum(наше[i] * LINES[i][2] for i in idx)
+             / sum(закупка[i] * LINES[i][2] for i in idx))
+        q = statistics.quantiles(r, n=4) if len(r) >= 4 else [r[0], statistics.median(r), r[-1]]
+        корз = Counter("<1,0" if x < 1 else "1,0–1,3" if x < 1.3 else "1,3–1,6" if x < 1.6
+                       else "1,6–2,0" if x < 2 else "2,0–3,0" if x < 3 else "≥3,0" for x in r)
+        print(f"{отступ}{сег}: строк {len(idx)} · К по сумме {k:.2f} · медиана {statistics.median(r):.2f}"
+              f" · квартили {q[0]:.2f}…{q[-1]:.2f} · по корзинам {dict(sorted(корз.items()))}")
 
 
-# ---------------------------------------------------------------- способ А: Битрикс
-def способ_а(rates: dict) -> dict:
+# Наше ТКП, положенное в поле входящих: первый прогон (39432926797) взял его за
+# предложение поставщика. Признак — слово «ТКП» и заказчик в имени файла; список
+# классификации печатается целиком, чтобы ошибку было видно.
+НАШЕ_ТКП = re.compile(r"(?<![А-Яа-яA-Za-z])(ТКП|TKP)(?![А-Яа-яA-Za-z]).*(ЛУКОЙЛ|LUKOIL|ЭНЕРГОСЕТ)",
+                      re.I)
+
+
+def способ_а(rates: dict, yen: str) -> tuple[dict, dict, dict]:
+    """Вложения сделки. Возвращает (входящее, наше ТКП, сведения о файлах)."""
     wh = (os.getenv("BITRIX_WEBHOOK_URL") or "").strip()
     if not wh:
         print("нет BITRIX_WEBHOOK_URL — способ А пропущен")
-        return {}
+        return {}, {}, {}
     import bitrix_tkp as bt
     import tkp_tables as tt
     from bitrix_client import BitrixClient
@@ -256,7 +285,7 @@ def способ_а(rates: dict) -> dict:
           f"{len(todo)} (предел {MAX_FILES}); по направлению "
           f"{dict(Counter(c['direction'] for c in todo))}")
 
-    files, улики = [], {}
+    files = []
     отказ = Counter()
     for c in todo[:MAX_FILES]:
         body, how, name = bt.take(bx, c)
@@ -264,110 +293,123 @@ def способ_а(rates: dict) -> dict:
             отказ[how[:40]] += 1
             continue
         fname = c.get("file_name") or name or ""
-        rows, how_parsed = bt.parse(fname, body)
+        rows, _how = bt.parse(fname, body)
         hdr = bt.header_map(rows) if rows else {}
         fcur = bt.file_currency(rows) if rows else ("", "")
         pr = bt.price_rows(rows, hdr, fcur) if rows else []
         text = " ".join(" ".join(str(x) for x in cells if x not in (None, ""))
                         for _s, _i, cells in rows)
-        if "¥" in text:
-            улики[f'{c["origin"]} · {fname}'] = {
-                v: len(rx.findall(text)) for v, rx in YEN_CLUES.items()} | {
-                "знаков ¥": text.count("¥"), "валюта файла": fcur[0] or "не установлена"}
-        files.append({"file_name": fname, "origin": c["origin"], "direction": c["direction"],
-                      "prices": pr})
+        класс = ("наше ТКП (по имени файла)" if НАШЕ_ТКП.search(fname)
+                 else c["direction"])
+        files.append({"file_name": fname, "origin": c["origin"], "field": c["field_name"],
+                      "direction": c["direction"], "класс": класс, "prices": pr,
+                      "fcur": fcur[0] or "не установлена",
+                      "улики": ({v: len(rx.findall(text)) for v, rx in YEN_CLUES.items()}
+                                | {"знаков ¥": text.count("¥")}) if "¥" in text else None})
     if отказ:
         print(f"не скачано: {dict(отказ)}")
-    print(f"разобрано файлов: {len(files)}")
-    for f, u in улики.items():
-        print(f"  улики знака ¥ · {f}: {u}")
-
-    арифм, why = tt.extract({"files": files}, yen="")
-    keys = {ключ(pn) for _g, pn, _q in LINES}
-    по_ключу_ар: dict[str, list] = defaultdict(list)
-    for r in арифм:
-        if r["key"] in keys:
-            по_ключу_ар[r["key"]].append(r)
-    по_ключу_кол: dict[str, list] = defaultdict(list)
+    print(f"разобрано файлов: {len(files)}; классы {dict(Counter(f['класс'] for f in files))}")
     for f in files:
+        if f["класс"].startswith("наше ТКП"):
+            print(f"  наше ТКП: {f['origin']} · поле «{f['field']}» · {f['file_name']}")
+
+    keys = {ключ(pn): [] for _g, pn, _q in LINES}
+    for i, (_g, pn, _q) in enumerate(LINES):
+        keys[ключ(pn)].append(i)
+    # Предложения по строке: (файл, ступень, валюта, единица, количество в файле).
+    предл: dict[int, list] = defaultdict(list)
+    for n, f in enumerate(files):
+        арифм, _why = tt.extract({"files": [f]}, yen="")
+        взято = set()
+        for r in арифм:
+            for i in keys.get(r["key"], []):
+                предл[i].append({"f": n, "ступень": "арифметика", "cur": str(r["currency"]),
+                                 "unit": float(r["unit"]), "qty": r.get("qty_in_file") or 0})
+                взято.add(i)
         for p in f["prices"]:
             if not p.get("is_price"):
                 continue
             pn = p.get("pn") if tt.looks_like_pn(p.get("pn")) else tt.pn_from_row(p.get("raw"))
-            k = ключ(pn) if pn else ""
-            if k in keys:
-                cur = str(p.get("currency") or "")
-                if cur.startswith("¥"):
-                    cur = "¥"
-                по_ключу_кол[k].append({"unit": float(p["price"]), "currency": cur,
-                                        "direction": f["direction"], "file": f["file_name"]})
+            for i in keys.get(ключ(pn) if pn else "", []):
+                if i in взято:
+                    continue
+                предл[i].append({"f": n, "ступень": "колонка", "cur": str(p.get("currency") or ""),
+                                 "unit": float(p["price"]), "qty": 0})
 
-    def выбрать(источник: dict, ступень: str) -> dict:
-        out, напр, вал, файлы, кол_ок = {}, Counter(), Counter(), Counter(), Counter()
-        for i, (_g, pn, qty) in enumerate(LINES):
-            k = ключ(pn)
-            offers = [o for o in источник.get(k, []) if o["direction"] == "входящее"]
-            напр.update({o["direction"] for o in источник.get(k, [])})
-            if not offers:
-                continue
-            rub = {}
-            for вар in ("CNY", "JPY"):
-                vals = [в_рубли(float(o["unit"]), str(o["currency"]), rates, вар) for o in offers]
-                vals = [v for v in vals if v]
-                if vals:
-                    rub[вар] = min(vals)
-            if rub:
-                out[i] = {"rub": rub}
-                вал.update({str(o["currency"])[:12] for o in offers})
-                файлы.update({o["file"] for o in offers})
-                if ступень == "арифметика":
-                    кол_ок["в КП количество ≥ нашего" if max(o.get("qty_in_file") or 0
-                           for o in offers) >= qty else "в КП количество меньше нашего"] += 1
-        print(f"\n  ступень «{ступень}»: строк с ценой {len(out)} из {len(LINES)}; "
-              f"направления у найденных номеров {dict(напр)}; валюты {dict(вал)}; "
-              f"файлов-источников {len(файлы)}: {sorted(файлы)}")
-        if кол_ок:
-            print(f"  количество в КП против нашего: {dict(кол_ок)}")
-        return out
-
-    print("\nСПОСОБ А — вложения сделки, разбор строк")
-    print(f"  отказы арифметики по всем файлам: {dict(why.most_common(6))}")
-    a1 = выбрать(по_ключу_ар, "арифметика")
-    a2 = выбрать(по_ключу_кол, "колонка")
-    # Объединение ступеней: арифметика сильнее, колонка — только где арифметики нет.
-    a12 = dict(a2)
-    a12.update(a1)
-    # Неизвестное направление — отдельно и только счётом.
-    неизв = {ключ(pn) for _g, pn, _q in LINES
-             if any(o["direction"] == "неизвестно"
-                    for o in по_ключу_ар.get(ключ(pn), []) + по_ключу_кол.get(ключ(pn), []))}
-    print(f"  номеров объёма с ценой в файлах направления «неизвестно»: {len(неизв)} "
-          f"(в закупку не идут)")
-    наша = {ключ(pn) for _g, pn, _q in LINES
-            if any(o["direction"] == "наша цена"
-                   for o in по_ключу_ар.get(ключ(pn), []) + по_ключу_кол.get(ключ(pn), []))}
-    print(f"  номеров объёма с ценой в файлах «наша цена»: {len(наша)}")
-
-    # Правдоподобие варианта ¥: цена против середины открытой вилки, медиана.
     band = вилки()
-    for вар in ("CNY", "JPY"):
-        rel = []
-        for i, v in a12.items():
+
+    def руб(o) -> float | None:
+        return в_рубли(o["unit"], o["cur"], rates, yen)
+
+    print("\nФАЙЛЫ, ГДЕ НАШЛИСЬ НОМЕРА ОБЪЁМА")
+    for n, f in enumerate(files):
+        мои = {i: [o for o in os_ if o["f"] == n] for i, os_ in предл.items()}
+        мои = {i: os_ for i, os_ in мои.items() if os_}
+        if not мои:
+            continue
+        print(f"\n  {f['file_name']} · {f['origin']} · поле «{f['field']}» · класс «{f['класс']}» · "
+              f"валюта файла {f['fcur']}" + (f" · улики ¥ {f['улики']}" if f["улики"] else ""))
+        ступ = Counter(o["ступень"] for os_ in мои.values() for o in os_)
+        вал = Counter(o["cur"][:14] for os_ in мои.values() for o in os_)
+        неод = sum(1 for os_ in мои.values() for o in os_ if len({round(x["unit"], 2) for x in os_}) > 1)
+        подозр = Counter()
+        цена, валюта = {}, {}
+        for i, os_ in мои.items():
+            vals = [(руб(o), o) for o in os_]
+            vals = [(v, o) for v, o in vals if v]
+            if not vals:
+                continue
+            v, o = min(vals, key=lambda t: t[0])
+            цена[i], валюта[i] = v, o["cur"][:14]
             b = band.get(ключ(LINES[i][1]))
-            if b and вар in v["rub"]:
-                rel.append(v["rub"][вар] / rates["USD"] / b)
-        if rel:
-            print(f"  ¥={вар}: цена / середина нашей вилки — медиана {statistics.median(rel):.2f} "
-                  f"по {len(rel)} строкам")
-    return {"А1 (арифметика)": a1, "А1+А2 (арифметика, иначе колонка)": a12}
+            if b:
+                rel = v / rates["USD"] / b
+                подозр["ниже 5 % вилки" if rel < 0.05 else "выше 20 вилок" if rel > 20
+                       else "в разумных пределах"] += 1
+            else:
+                подозр["вилки нет"] += 1
+        print(f"    строк {len(мои)} · ступени {dict(ступ)} · валюты {dict(вал)} · "
+              f"строк с разными значениями в файле {неод} · против вилки {dict(подозр)}")
+        сумма_по_группам("    ", цена, валюта,
+                         "наша цена" if f["класс"].startswith("наше ТКП") else "закупка")
+
+    def лучшее(классы: set, ступени: set) -> tuple[dict, dict]:
+        цена, валюта = {}, {}
+        for i, os_ in предл.items():
+            vals = [(руб(o), o) for o in os_
+                    if files[o["f"]]["класс"] in классы and o["ступень"] in ступени]
+            vals = [(v, o) for v, o in vals if v]
+            if vals:
+                v, o = min(vals, key=lambda t: t[0])
+                цена[i], валюта[i] = v, o["cur"][:14]
+        return цена, валюта
+
+    вход1 = лучшее({"входящее"}, {"арифметика"})
+    вход12 = лучшее({"входящее"}, {"арифметика", "колонка"})
+    наше1 = лучшее({"наше ТКП (по имени файла)"}, {"арифметика"})
+    наше12 = лучшее({"наше ТКП (по имени файла)"}, {"арифметика", "колонка"})
+    print("\nСПОСОБ А · ВХОДЯЩИЕ КП (наше ТКП исключено), наименьшая цена по строке")
+    print("  ступень «арифметика»:")
+    сумма_по_группам("    ", *вход1)
+    print("  ступени «арифметика», иначе «колонка»:")
+    сумма_по_группам("    ", *вход12)
+    print("\nСПОСОБ А · НАШЕ ТКП ИЗ БИТРИКСА (для сверки с таблицей заказчика)")
+    print("  ступень «арифметика»:")
+    сумма_по_группам("    ", *наше1, пометка="наша цена")
+    print("  ступени «арифметика», иначе «колонка»:")
+    сумма_по_группам("    ", *наше12, пометка="наша цена")
+    print("\nОТНОШЕНИЕ «НАШЕ ТКП / ВХОДЯЩЕЕ КП» ПО СТРОКАМ (обе цены по арифметике строки)")
+    отношения("  ", наше1[0], вход1[0])
+    print("ТО ЖЕ, ступени «арифметика», иначе «колонка»")
+    отношения("  ", наше12[0], вход12[0])
+    return вход12[0], наше12[0], {}
 
 
-# ---------------------------------------------------------------- способ Б: база
-def способ_б(rates: dict) -> dict:
+def способ_б(rates: dict, yen: str) -> None:
     dsn = (os.getenv("SUPABASE_DB_URL") or "").strip()
     if not dsn:
         print("нет SUPABASE_DB_URL — способ Б пропущен")
-        return {}
+        return
     import psycopg2
     keys = sorted({ключ(pn).lower() for _g, pn, _q in LINES})
     conn = psycopg2.connect(dsn, connect_timeout=20,
@@ -394,66 +436,47 @@ def способ_б(rates: dict) -> dict:
     conn.close()
     print(f"\nСПОСОБ Б — закрытая база ({rel}): строк цены по номерам объёма {len(rows)}; "
           f"карточек СП-166 сделки {DEAL} в базе {len(карточки)}")
-    print(f"  потоки {dict(Counter(r[6] for r in rows))}")
-    print(f"  валюты {dict(Counter(r[2] or '(нет)' for r in rows))}")
-    print(f"  базис {dict(Counter(r[3] or '(нет)' for r in rows))}")
-    даты = sorted(r[4] for r in rows if r[4])
-    if даты:
-        print(f"  даты цен: {даты[0]} … {даты[-1]}; старше 180 дней на сегодня: "
-              f"{sum(1 for d in даты if (date.today() - d).days > 180)} из {len(даты)}")
-    print(f"  поставщиков (счётом): {len({r[7] for r in rows if r[7]})}")
-
-    def выбрать(only_deal: bool) -> dict:
-        out = {}
+    поток_кп = {"разбор КП", "письмо поставщика"}
+    for имя, отбор in (("входящие КП (разбор КП, письмо поставщика)", lambda r: r[6] in поток_кп),
+                       ("входящие КП по этой сделке", lambda r: r[6] in поток_кп and (
+                           r[5] in карточки or r[5] == str(DEAL))),
+                       ("справочно: каталог ЗИП", lambda r: r[6] == "каталог ЗИП")):
+        sel = [r for r in rows if отбор(r)]
+        print(f"\n  {имя}: строк цены {len(sel)} · валюты {dict(Counter(r[2] or '(нет)' for r in sel))}"
+              f" · базис {dict(Counter(r[3] or '(нет)' for r in sel))}")
+        даты = sorted(r[4] for r in sel if r[4])
+        if даты:
+            print(f"    даты цен {даты[0]} … {даты[-1]}; старше 180 дней: "
+                  f"{sum(1 for d in даты if (date.today() - d).days > 180)} из {len(даты)}")
+        цена, валюта = {}, {}
         for i, (_g, pn, _q) in enumerate(LINES):
-            k = ключ(pn).lower()
-            offers = [r for r in rows if r[0] == k
-                      and (not only_deal or r[5] in карточки or r[5] == str(DEAL))]
-            rub = {}
-            for вар in ("CNY", "JPY"):
-                vals = [в_рубли(r[1], r[2], rates, вар) for r in offers]
-                vals = [v for v in vals if v]
-                if vals:
-                    rub[вар] = min(vals)
-            if rub:
-                out[i] = {"rub": rub}
-        return out
-    return {"Б1 (предложения по этой сделке)": выбрать(True),
-            "Б2 (все предложения в базе)": выбрать(False)}
+            vals = [(в_рубли(r[1], r[2], rates, yen), r[2]) for r in sel if r[0] == ключ(pn).lower()]
+            vals = [(v, c) for v, c in vals if v]
+            if vals:
+                цена[i], валюта[i] = min(vals)
+        сумма_по_группам("    ", цена, валюта,
+                         "каталожная цена" if "каталог" in имя else "закупка")
 
 
 def main() -> int:
     print(f"ОБЪЁМ: {len(LINES)} строк, {len({ключ(p) for _g, p, _q in LINES})} номеров; "
-          f"сделка {DEAL}. Наших цен в зонде нет; закупка — суммами по группам.")
+          f"сделка {DEAL}. Наших цен в зонде нет; суммы — по группам не меньше трёх строк.")
     for g, name in GROUPS.items():
         print(f"  {g}: {name} — строк {sum(1 for x in LINES if x[0] == g)}")
     rates, ист = курсы_цб(date.today())
+    # Знак ¥: в QT 127 код CNY назван 7 раз, JPY — ни разу (прогон 39432926797),
+    # первый проход тоже установил валюту файла CNY. Вход YEN меняет решение.
+    yen = os.environ.get("PROBE_YEN", "CNY").upper()
     print(f"курс: {ист}; USD {rates.get('USD', 0):.4f} · CNY {rates.get('CNY', 0):.4f} · "
-          f"JPY {rates.get('JPY', 0):.5f} · EUR {rates.get('EUR', 0):.4f} ₽")
-    итоги = {}
+          f"JPY {rates.get('JPY', 0):.5f} · EUR {rates.get('EUR', 0):.4f} ₽; знак ¥ читается как {yen}")
     try:
-        итоги.update(способ_а(rates))
+        способ_а(rates, yen)
     except Exception as e:                                   # noqa: BLE001
         print(f"способ А упал: {type(e).__name__}: {str(e)[:200]}")
     try:
-        итоги.update(способ_б(rates))
+        способ_б(rates, yen)
     except Exception as e:                                   # noqa: BLE001
         print(f"способ Б упал: {type(e).__name__}: {str(e)[:200]}")
-    for имя, выбор in итоги.items():
-        печать_способа(имя, выбор, rates, ист)
-    # Сверка способов: на скольких строках оба нашли цену и совпали ли они.
-    names = list(итоги)
-    for a in range(len(names)):
-        for b in range(a + 1, len(names)):
-            x, y = итоги[names[a]], итоги[names[b]]
-            общие = set(x) & set(y)
-            for вар in ("CNY", "JPY"):
-                пары = [(x[i]["rub"].get(вар), y[i]["rub"].get(вар)) for i in общие]
-                пары = [(p, q) for p, q in пары if p and q]
-                if пары:
-                    равны = sum(1 for p, q in пары if abs(p - q) <= 0.01 * max(p, q))
-                    print(f"сверка {names[a]} ↔ {names[b]} (¥={вар}): общих строк {len(пары)}, "
-                          f"совпали в пределах 1 % — {равны}")
     return 0
 
 
