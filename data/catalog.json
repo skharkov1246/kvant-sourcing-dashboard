@@ -1439,7 +1439,8 @@
         "gt/tools/ship_merge.py",
         "gt/tools/ship_priced.py",
         "gt/tools/ship_report.py",
-        "library/load_parts.py"
+        "library/load_parts.py",
+        "scripts/probe_markup.py"
       ]
     },
     {
@@ -2829,6 +2830,7 @@
         "gt/tools/drop_ru.py",
         "scripts/build_index.py",
         "scripts/preflight.py",
+        "scripts/probe_markup.py",
         "tests/test_dataset_has_reader.py"
       ]
     },

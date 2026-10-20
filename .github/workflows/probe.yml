@@ -13,7 +13,7 @@ on:
         description: "Какой зонд запустить"
         type: choice
         default: bitrix_probe.py
-        options: [bitrix_probe.py, probe_mail_files.py, probe_conversion.py, probe_presale.py, probe_2526.py, probe_fields.py, probe_pace.py, probe_won.py, probe_kp_rules.py, probe_realization.py, probe_contracts.py, probe_category.py]
+        options: [bitrix_probe.py, probe_mail_files.py, probe_conversion.py, probe_presale.py, probe_2526.py, probe_fields.py, probe_pace.py, probe_won.py, probe_kp_rules.py, probe_realization.py, probe_contracts.py, probe_category.py, probe_markup.py]
 
 permissions:
   contents: read
@@ -34,12 +34,15 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt openpyxl
+      # pypdf, xlrd — разбор вложений (probe_markup.py); psycopg2 — чтение закрытой базы.
+      - run: pip install -r requirements.txt openpyxl pypdf xlrd psycopg2-binary
       - name: Зонд
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           YADISK_TOKEN: ${{ secrets.YADISK_TOKEN }}
           BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
+          # Только probe_markup.py: чтение lib_prices_live, в журнал — суммы по группам строк.
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           PROBE_SCRIPT: ${{ inputs.script || 'bitrix_probe.py' }}
           # Один процесс в общей очереди, с запасом: рядом может идти пересборка
           # дашборда (её группа своя). probe_conversion.py, probe_2526.py и probe_pace.py — ~20–45 мин при 1/с (≈950–1300 запросов);
