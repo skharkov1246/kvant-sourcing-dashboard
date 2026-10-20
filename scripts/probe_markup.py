@@ -61,6 +61,12 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "gt/tools"))
 
 DEAL = int(os.environ.get("PROBE_DEAL", "22566"))
+# Запросы IMMI Turbines по другим сделкам (снимок gt/data/bitrix_gt.json): вопрос
+# владельца 20.10.2026 «а как же предложение IMMI?» — их КП по Solar могут
+# закрывать строки объёма, хотя лежат не в сделке 22566. Сделка → карточки СП-166.
+IMMI = {23472: [46150], 22242: [38994], 21850: [37810], 21338: [35976], 21120: [35236],
+        20380: [32348], 19542: [48256], 18860: [27206], 18020: [24654], 17952: [25064],
+        17776: [23556], 17272: [22098], 17196: [21862], 15846: [18936], 15222: [17490]}
 MAX_FILES = int(os.environ.get("PROBE_MAX_FILES", "150"))
 MIN_LINES = 3          # меньше трёх покрытых строк — сумма группы не печатается
 
@@ -280,6 +286,18 @@ def способ_а(rates: dict, yen: str) -> tuple[dict, dict, dict]:
     cands = bt.from_deal(bx, DEAL, ff)
     rq, n_rfq = bt.from_rfq(bx, DEAL, rf)
     cands += rq + bt.from_timeline(bx, DEAL)
+    карт_immi = {f"СП-166 {c}" for cs in IMMI.values() for c in cs}
+    n_immi = 0
+    for did in IMMI:
+        try:
+            got, _n = bt.from_rfq(bx, did, rf)
+        except Exception as e:                               # noqa: BLE001
+            print(f"сделка {did}: СП-166 не прочитались ({type(e).__name__})")
+            continue
+        got = [c for c in got if c["origin"] in карт_immi]
+        n_immi += len(got)
+        cands += got
+    print(f"вложений в карточках IMMI по {len(IMMI)} сделкам: {n_immi}")
     seen, uniq = set(), []
     for c in cands:
         k = c["file_id"] or c["url"][:120]
@@ -329,6 +347,10 @@ def способ_а(rates: dict, yen: str) -> tuple[dict, dict, dict]:
         print(f"не скачано: {dict(отказ)}")
     print(f"разобрано файлов: {len(files)}; классы {dict(Counter(f['класс'] for f in files))}")
     for f in files:
+        if f["origin"] in карт_immi:
+            цены = [p for p in f["prices"] if p.get("is_price")]
+            print(f"  IMMI: {f['origin']} · {f['file_name']} · валюта {f['fcur']} · строк с ценой по "
+                  f"колонке {len(цены)}, из них 0,00 — {sum(1 for p in цены if not p.get('price'))}")
         if f["класс"].startswith("наше ТКП"):
             print(f"  наше ТКП: {f['origin']} · поле «{f['field']}» · {f['file_name']}")
 
@@ -389,6 +411,8 @@ def способ_а(rates: dict, yen: str) -> tuple[dict, dict, dict]:
                        else "в разумных пределах"] += 1
             else:
                 подозр["вилки нет"] += 1
+        нули = sum(1 for os_ in мои.values() for o in os_ if not o["unit"])
+        print(f"    цена 0,00 у {нули} значений из {sum(len(x) for x in мои.values())}")
         print(f"    строк {len(мои)} · ступени {dict(ступ)} · валюты {dict(вал)} · "
               f"строк с разными значениями в файле {неод} · против вилки {dict(подозр)}")
         сумма_по_группам("    ", цена, валюта,
