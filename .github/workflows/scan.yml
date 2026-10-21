@@ -108,7 +108,10 @@ jobs:
           # при обычном суточном снимке форма та же и шаг ничего не делает.
           if ! python scripts/build_catalog.py --check; then
             python scripts/build_catalog.py
-            git add data/catalog.json
+            # Блок каталога в docs/kb/INDEX.md собирается из data/catalog.json: без
+            # пересборки гейт «База знаний» краснеет на main и в каждом PR (20.10.2026).
+            python scripts/kb_check.py --fix || echo "::warning::база знаний: замечания помимо блока каталога"
+            git add data/catalog.json docs/kb/INDEX.md
             git diff --cached --quiet || git commit -m "chore: каталог данных после снимка чатов ($(date -u +%F))"
           fi
           git push
