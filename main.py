@@ -35,7 +35,7 @@ import premia as premia_mod
 import period as period_mod
 import presale as presale_mod
 import reps as reps_mod
-from bitrix_client import BitrixClient, chat_webhook_url, drop_lost, без_вебхука
+from bitrix_client import BitrixClient, chat_reader_client, drop_lost, без_вебхука
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
               # следы живого человека на карточке робота: кто двигал стадию,
@@ -535,9 +535,11 @@ def run(args) -> int:
     # участник чатов (сборка 19.10: из 129 чатов с простоем 123 — отказ в доступе).
     # Свой вебхук — секрет BITRIX_CHAT_WEBHOOK_URL, только чтение; темп портала общий.
     # Нет секрета — читает вебхук сборки, как раньше.
-    _chat_url = chat_webhook_url()
-    chat_reader = chat_activity.Reader(client.with_webhook(_chat_url) if _chat_url else client, service_ids)
-    print(f"• Чаты сделок читает {'вебхук владельца' if _chat_url else 'вебхук сборки'}")
+    # Второй вебхук — руководителя реализации (решение 22.10.2026): владелец не участник
+    # большинства чатов реализации, а добавить в чат может только участник.
+    _chat_client, _chat_who = chat_reader_client(client)
+    chat_reader = chat_activity.Reader(_chat_client, service_ids)
+    print(f"• Чаты сделок читает {_chat_who}")
     _presale_in: dict | None = None
     try:
         _ps = presale_mod.find_category(category_names) or presale_mod.find_category(
@@ -578,6 +580,9 @@ def run(args) -> int:
             _cs = chat_reader.stats()
             print(f"  чаты сделок за сборку: прочитано {_cs['reads']} из бюджета {_cs['budget']}"
                   f"{'; чтение остановлено лимитом портала' if _cs['stopped'] else ''}")
+            if hasattr(_chat_client, "по_вебхуку"):
+                print("  чаты ответил вебхук: " + " · ".join(
+                    f"{п} {н}" for п, н in zip(_chat_client.подписи, _chat_client.по_вебхуку)))
         except Exception as e:                               # noqa: BLE001
             print(f"  ⚠ воронка пресейла пропущена: {type(e).__name__}: {без_вебхука(e)}")
 

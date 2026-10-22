@@ -131,6 +131,8 @@ jobs:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           # вебхук владельца — только чтение чатов сделок (решение 19.10.2026)
           BITRIX_CHAT_WEBHOOK_URL: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL }}
+          # второй читатель чатов — руководитель реализации (решение 22.10.2026)
+          BITRIX_CHAT_WEBHOOK_URL_2: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL_2 }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           # ключ модели — только в live: холостому прогону он не нужен
           ANTHROPIC_API_KEY: ${{ inputs.mode == 'live' && secrets.ANTHROPIC_API_KEY || '' }}

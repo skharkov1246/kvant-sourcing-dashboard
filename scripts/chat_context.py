@@ -1323,10 +1323,9 @@ def main(argv: list[str] | None = None, *, client=None, store=None, клиент
     # Чаты — от имени владельца (решение 19.10.2026): вебхук сборки не участник чатов
     # (сборка 19.10: из 129 чатов с простоем 123 — отказ). Вебхук владельца — только
     # чтение чатов, темп портала общий; сделки и справочники читает вебхук сборки.
-    from bitrix_client import chat_webhook_url
-    чат_url = chat_webhook_url()
-    чат_клиент = client.with_webhook(чат_url) if чат_url and hasattr(client, "with_webhook") else client
-    print(f"чаты читает {'вебхук владельца' if чат_клиент is not client else 'вебхук сборки'}")
+    from bitrix_client import chat_reader_client
+    чат_клиент, кто_читает = chat_reader_client(client)
+    print(f"чаты читает {кто_читает}")
 
     try:
         канд, service_ids = собрать(client, итог.счёт)
