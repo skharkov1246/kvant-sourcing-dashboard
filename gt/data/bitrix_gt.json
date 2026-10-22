@@ -1,8 +1,28 @@
 {
- "updated": "2026-10-19",
+ "updated": "2026-10-22",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "24138",
+   "title": "5588099 Поставка запасных частей для ГИ ГТУ ЭБ-2 ТТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-21",
+   "rfqs": []
+  },
+  {
+   "id": "24060",
+   "title": "У-131-26 Услуги по выполнению капитального ремонта газотурбинного двигателя в кол-ве 3-х единиц",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-19",
+   "rfqs": []
+  },
   {
    "id": "24004",
    "title": "ГТУ ТЭС-200, ПРУ (Пермь)",
@@ -19,7 +39,7 @@
    "models": [
     "SGT-700"
    ],
-   "stage": "C4:PREPARATION",
+   "stage": "C4:EXECUTING",
    "created": "2026-10-13",
    "rfqs": [
     {
@@ -27,7 +47,7 @@
      "title": "WTT лопатки SGT-700",
      "created": "2026-10-13",
      "supplier": "Wuxi Heyi Power System Co., Ltd. (Wuxi Weishi Turbine Technology Co., Ltd. головная)",
-     "stage": "Request Sent",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "SGT-700"
@@ -73,7 +93,7 @@
    "models": [
     "SGT-700"
    ],
-   "stage": "C2:4",
+   "stage": "C2:NEW",
    "created": "2026-10-06",
    "rfqs": [
     {
@@ -367,7 +387,7 @@
      "title": "Pietro Rosa T.B.M. S.p.A.  20 поз. кап+зип Ansaldo",
      "created": "2026-10-07",
      "supplier": "Pietro Rosa T.B.M. S.p.A.",
-     "stage": "Request Sent",
+     "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -436,7 +456,7 @@
    "models": [
     "V64.3A (AE64.3A)"
    ],
-   "stage": "C2:4",
+   "stage": "C2:PREPARATION",
    "created": "2026-10-01",
    "rfqs": [
     {
@@ -757,16 +777,71 @@
      "models": [
       "V64.3A (AE64.3A)"
      ]
+    },
+    {
+     "id": "52300",
+     "title": "RFQ Waldemar Pruss Armaturenfabrik GmbH",
+     "created": "2026-10-20",
+     "supplier": "Waldemar Pruss Armaturenfabrik GmbH",
+     "stage": "Request Sent",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "52302",
+     "title": "RFQ Thinkfon",
+     "created": "2026-10-20",
+     "supplier": "Thinkfon Industrial",
+     "stage": "New Request",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "52304",
+     "title": "RFQ Tianjin Xina",
+     "created": "2026-10-20",
+     "supplier": "Tianjin Xina Intelligent Technology Co., Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "52484",
+     "title": "rfq Gerhard Industry",
+     "created": "2026-10-21",
+     "supplier": "Gerhard Industry",
+     "stage": "In Correspondance",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
+    },
+    {
+     "id": "52492",
+     "title": "RFQ Orbital Vana",
+     "created": "2026-10-21",
+     "supplier": "Orbital Vana",
+     "stage": "New Request",
+     "sourcer": "Karina Khalilova",
+     "models": [
+      "V64.3A (AE64.3A)"
+     ]
     }
    ]
   },
   {
    "id": "23714",
-   "title": " КЛП-587061 Выполнение работ/оказание услуг: Капитальный ремонт нагрузочного редуктора тип TX56/1CV, заводской номер №10049, производства «Flender Graffenstaden», ГТУ-2 ООО «ПЭСТ»",
+   "title": "967.  КЛП-587061 Выполнение работ/оказание услуг: Капитальный ремонт нагрузочного редуктора тип TX56/1CV, заводской номер №10049, производства «Flender Graffenstaden», ГТУ-2 ООО «ПЭСТ»",
    "models": [
     "ГТУ (модель уточнить)"
    ],
-   "stage": "C2:EXECUTING",
+   "stage": "NEW",
    "created": "2026-10-01",
    "rfqs": [
     {
@@ -774,7 +849,7 @@
      "title": "Подшипники в GTW BEARINGS S.R.O.",
      "created": "2026-10-05",
      "supplier": "GTW BEARINGS S.R.O.",
-     "stage": "In Correspondance",
+     "stage": "Selected",
      "sourcer": "Daria Lysenko",
      "models": [
       "ГТУ (модель уточнить)"
@@ -785,7 +860,7 @@
      "title": "Подшипники Каземе в PowerGen",
      "created": "2026-10-05",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
-     "stage": "Price at Work",
+     "stage": "Selected",
      "sourcer": "Daria Lysenko",
      "models": [
       "ГТУ (модель уточнить)"
@@ -796,7 +871,7 @@
      "title": "Валы в Casagrande Ingranaggi S.r.l.",
      "created": "2026-10-05",
      "supplier": "Casagrande Ingranaggi S.r.l.",
-     "stage": "Price at Work",
+     "stage": "Selected",
      "sourcer": "Daria Lysenko",
      "models": [
       "ГТУ (модель уточнить)"
@@ -3142,7 +3217,7 @@
    "models": [
     "SGT-200"
    ],
-   "stage": "C4:PREPARATION",
+   "stage": "C4:5",
    "created": "2026-02-11",
    "rfqs": [
     {
@@ -10141,6 +10216,10 @@
      "n": 2
     },
     {
+     "name": "Orbital Vana",
+     "n": 2
+    },
+    {
      "name": "JAES SRL",
      "n": 1
     },
@@ -10225,10 +10304,6 @@
      "n": 1
     },
     {
-     "name": "Orbital Vana",
-     "n": 1
-    },
-    {
      "name": "Adoset",
      "n": 1
     },
@@ -10302,6 +10377,22 @@
     },
     {
      "name": "Gedik Termo Vana",
+     "n": 1
+    },
+    {
+     "name": "Waldemar Pruss Armaturenfabrik GmbH",
+     "n": 1
+    },
+    {
+     "name": "Thinkfon Industrial",
+     "n": 1
+    },
+    {
+     "name": "Tianjin Xina Intelligent Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Gerhard Industry",
      "n": 1
     },
     {
