@@ -79,12 +79,14 @@ jobs:
           set -euo pipefail
           python scripts/build_catalog.py
           python scripts/build_index.py
+          # блок каталога в docs/kb/INDEX.md — из data/catalog.json (гейт «База знаний»)
+          python scripts/kb_check.py --fix || echo "::warning::база знаний: замечания помимо блока каталога"
       - name: Коммит, если есть изменения
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add gt/data/bitrix_gt.json gt/public/ data/catalog.json data/index.json
+          git add gt/data/bitrix_gt.json gt/public/ data/catalog.json data/index.json docs/kb/INDEX.md
           if git diff --cached --quiet; then
             echo "запросы Bitrix без изменений — деплой не нужен"
           else
