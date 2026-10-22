@@ -29,11 +29,14 @@ class BitrixLimitError(RuntimeError):
 class Владелец:
     """Вебхук владельца: scope, чтение чатов, добавление в чат сделки."""
 
-    def __init__(self, права=("im", "imopenlines"), доступ=(), добавить="ok", лимит_на=None):
+    def __init__(self, права=("im", "imopenlines"), доступ=(), добавить="ok", лимит_на=None,
+                 чат_добавить="ACCESS_DENIED_EXTEND", хозяин=4410):
         self.права = list(права)
         self.доступ = set(доступ)
         self.добавить = добавить
+        self.чат_добавить = чат_добавить
         self.лимит_на = лимит_на
+        self.хозяин = хозяин
         self.вызовы: list[tuple[str, dict]] = []
 
     def call(self, method, params, **kw):
@@ -47,6 +50,15 @@ class Владелец:
             if чат not in self.доступ:
                 raise RuntimeError("im.dialog.messages.get: ACCESS_ERROR You do not have access to this chat")
             return {"messages": [{"id": i} for i in range(min(params["LIMIT"], 3))]}
+        if method == "im.dialog.get":
+            return {"type": "chat", "entity_type": "", "owner": self.хозяин,
+                    "permissions": {"manage_users_add": "member"}}
+        if method == "im.chat.user.add":
+            assert params["USERS"] == [ВЛАДЕЛЕЦ] and params["HIDE_HISTORY"] == "N"
+            if self.чат_добавить == "ok":
+                self.доступ.add(str(params["CHAT_ID"]))
+                return True
+            raise RuntimeError(f"im.chat.user.add: {self.чат_добавить} описание")
         if method == "imopenlines.crm.chat.user.add":
             assert params["CRM_ENTITY_TYPE"] == "deal" and params["USER_ID"] == ВЛАДЕЛЕЦ
             if self.добавить == "ok":
@@ -117,7 +129,29 @@ def test_пробные_добавления_не_удались_стоп():
     текст = "\n".join(журнал)
     assert код == 1 and "::error::остановлено: пробные добавления не удались" in текст
     assert len([м for м, _ in владелец.вызовы if м == "imopenlines.crm.chat.user.add"]) == cj.ПРОБА
-    assert "отказы: чат не привязан к сделке в CRM 3" in текст and "не дошли 3" in текст
+    assert "отказы: чат не CRM, im.chat.user.add: нет доступа к сделке или чату 3" in текст
+    assert "не дошли 3" in текст
+
+
+def test_чат_не_crm_запасной_путь_добавляет():
+    владелец = Владелец(добавить="CHAT_NOT_IN_CRM", чат_добавить="ok", доступ={tcc.ЧАТ_Р})
+    журнал, печать = _журнал()
+    код = cj.прогон("live", 300, 10, сборка=tcc.Портал({}), владелец_клиент=владелец, владелец=ВЛАДЕЛЕЦ,
+                    печать=печать)
+    текст = "\n".join(журнал)
+    assert код == 0 and "добавлено 1 из 1 · после добавления читается 1" in текст
+    assert [п["CHAT_ID"] for м, п in владелец.вызовы if м == "im.chat.user.add"] == [int(tcc.ЧАТ_Р2)]
+
+
+def test_разбор_чатов_только_счёт():
+    владелец = Владелец(права=("im",), доступ={tcc.ЧАТ_Р, tcc.ЧАТ_Р2}, хозяин=ВЛАДЕЛЕЦ)
+    журнал, печать = _журнал()
+    cj.прогон("dry", 300, 10, сборка=tcc.Портал({}), владелец_клиент=владелец, владелец=ВЛАДЕЛЕЦ,
+              сборка_uid=5550001, печать=печать)
+    текст = "\n".join(журнал)
+    assert "разбор чатов с доступом (2): привязка — chat 2 · добавлять участников может — member 2" in текст
+    assert "владелец чата: один и тот же у 2 из 2 · это вы — да · это пользователь вебхука сборки — нет" in текст
+    assert str(ВЛАДЕЛЕЦ) not in текст and "5550001" not in текст
 
 
 def test_лимит_портала_останавливает():
