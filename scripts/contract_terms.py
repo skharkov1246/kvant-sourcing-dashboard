@@ -1304,7 +1304,7 @@ def main(argv: list[str] | None = None) -> int:
         нет = база.нет_таблиц()
         if нет:
             print(f"::error::в базе нет таблиц или колонок {', '.join(нет)}: примените library/supabase/"
-                  "contract_terms_schema.sql прогоном «ZIP base — apply DB migrations» (zip-db.yml)")
+                  "contract_terms_schema.sql (шаг «Схема в рабочей базе» прогона live или zip-db.yml)")
             база.закрыть()
             return 2
     try:

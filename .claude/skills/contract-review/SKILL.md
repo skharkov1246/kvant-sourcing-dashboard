@@ -103,9 +103,9 @@ penaltyNoCap, warrantyGap, warrantyStart, claimGap, docsGap, fxGap, cisg. Пут
 скрипт `scripts/contract_terms.py`, очередь `bitrix-portal`):
 
 1. **Схема** — `library/supabase/contract_terms_schema.sql` (таблицы `contract_terms`,
-   `contract_b2b_flags`; RLS, только `service_role`). Применяет прогон «ZIP base —
-   apply DB migrations» (`zip-db.yml`) после мержа; без схемы live останавливается
-   до первой закачки и называет недостающие таблицы.
+   `contract_b2b_flags`; RLS, только `service_role`). Live применяет её сам перед
+   записью (после SQL-тестов на чистой базе; файл идемпотентен); без таблиц или
+   колонок live останавливается до первой закачки и называет недостающие.
 2. **Сначала `mode = dry`**: сделки, карточки СП-1174 и СП-1192, файлы, что скажет
    о стороне компания карточки (саму сторону dry не знает — её назовёт модель),
    связь и подпись «Чей шаблон» — справочно, разбор связи против компании, оценка денег по допущению о страницах для выбранной модели и для
