@@ -350,7 +350,10 @@ def build():
     def deal_rows(rows, kind):
         out = ""
         for r in rows:
-            dl = "".join(f'<div class="mut">{e(x.get("date"))} · {e(x.get("deal"))} · '
+            # сделка — номером (названий в данных нет, 22.10.2026), ссылкой в карточку Битрикса
+            dl = "".join(f'<div class="mut">{e(x.get("date"))} · '
+                         f'<a href="https://kvantpro.bitrix24.ru/crm/deal/details/{e(x.get("deal"))}/" '
+                         f'target="_blank" rel="noopener">сделка #{e(x.get("deal"))}</a> · '
                          f'{e(x.get("client"))} · {e(x.get("status"))}</div>'
                          for x in r.get("deals") or [])
             out += (f'<div class="card"><b>{e(r.get("pn"))} · {e(r.get("name"))}</b> '

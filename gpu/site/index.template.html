@@ -1941,8 +1941,10 @@ function fillSelect(sel, values, allLabel) {
 (function () {
   $("#bx-src").textContent = BITRIX.source;
   $("#bx-caveat").innerHTML = (BITRIX.live ? "<b>Живая выгрузка.</b> " : "<b>Сид, не живая выгрузка.</b> ") + esc(BITRIX.caveat || "");
+  // в репозитории сид без названий сделок (публичный, 22.10.2026) — номер ведёт в карточку
+  const dealUrl = id => `https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
   $("#bx-deals").innerHTML = (BITRIX.deals || []).map(d => `<div class="card">
-    <h4>#${esc(d.id)} — ${esc(d.title)}</h4>
+    <h4><a href="${dealUrl(d.id)}" target="_blank" rel="noopener">#${esc(d.id)}</a>${d.title ? " — " + esc(d.title) : ""}</h4>
     <div class="mut">${esc(d.created)} ${d.stage ? "· " + esc(d.stage) : ""} ${d.sourcer ? "· " + esc(d.sourcer) : ""}</div>
     <div style="margin:5px 0">${(d.models || []).map(m => `<span class="tag">${esc(m)}</span>`).join("")}</div>
     ${d.note ? `<div class="note">${esc(d.note)}</div>` : ""}
@@ -1951,7 +1953,7 @@ function fillSelect(sel, values, allLabel) {
         <td>${esc(r.sourcer)}</td><td>${esc(r.created)}</td></tr>`).join("")}</tbody></table></div>` : ""}
   </div>`).join("");
   $("#bx-adj").innerHTML = (BITRIX.adjacent || []).map(a => `<div class="card">
-    <h4>${esc(a.title)}</h4>
+    <h4>${a.title ? esc(a.title) : "Сделка № " + esc(a.id)}</h4>
     <div class="mut">${esc(a.customer || "")} ${a.status ? "· " + esc(a.status) : ""}</div>
     ${a.revenue_rub ? `<p>выручка ${num(Math.round(a.revenue_rub))} ₽ · закупка ${num(Math.round(a.purchase_rub))} ₽ ·
       маржа ${(a.margin_pct * 100).toFixed(1)} % при норме ${(a.margin_norm * 100).toFixed(0)} %</p>` : ""}
