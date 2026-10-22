@@ -1,0 +1,65 @@
+name: Чаты реализации — владелец в участниках
+
+# Решение владельца 22.10.2026: портал добавляет владельца в чаты открытых сделок
+# реализации — иначе вебхук владельца (BITRIX_CHAT_WEBHOOK_URL) их не читает
+# (холостой прогон чатов 22.10: ни один чат реализации не прочитан). Скрипт —
+# scripts/chat_join.py. ТОЛЬКО ручной запуск.
+#
+#   mode dry  (по умолчанию) — сколько чатов без доступа и хватит ли прав вебхука;
+#             в портал ничего не пишется.
+#   mode live — добавление владельца (imopenlines.crm.chat.user.add) туда, где
+#             доступа нет; нужно право вебхука «Открытые линии (imopenlines)».
+#             Первые добавления пробные: ни одно не удалось — стоп.
+#
+# Журнал публичный: только агрегаты (CLAUDE.md, правило 17).
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry — счёт и права; live — добавление в чаты"
+        type: choice
+        default: dry
+        options: [dry, live]
+      limit:
+        description: "Сколько чатов взять в очередь (1–500)"
+        default: "300"
+      parts:
+        description: "На сколько частей делить очередь"
+        type: choice
+        default: "10"
+        options: ["10", "25", "50"]
+
+permissions:
+  contents: read
+
+concurrency:
+  # общая очередь чтения портала (CLAUDE.md, «Битрикс не перегружать»)
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  join:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Установка зависимостей
+        run: pip install --quiet --disable-pip-version-check -r requirements.txt pytest psycopg2-binary==2.9.10
+      - name: Проверки без сети
+        run: python -m pytest tests/test_chat_join.py -q
+      - name: Чаты реализации
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          # вебхук владельца: чтение чатов и добавление владельца в чат сделки
+          BITRIX_CHAT_WEBHOOK_URL: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL }}
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+          MODE: ${{ inputs.mode }}
+          LIMIT: ${{ inputs.limit }}
+          PARTS: ${{ inputs.parts }}
+        run: python scripts/chat_join.py --mode "$MODE" --limit "$LIMIT" --parts "$PARTS"
