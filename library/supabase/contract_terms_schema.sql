@@ -95,6 +95,15 @@ create table if not exists contract_b2b_flags (
 -- «create table if not exists» существующую таблицу не меняет (правило 21):
 -- колонки, добавленные позже первой версии, — отдельными операторами здесь.
 alter table contract_terms add column if not exists side_link text;   -- 22.10.2026
+-- Строки версии до 22.10.2026: сторона — по связи карточки (side_source order_link /
+-- deal_link). Связь переезжает в side_link, сторона — из ответа модели (только у
+-- прочитанных), как пишет нынешний код; иначе новая проверка стороны не встанет.
+-- Повтор — без изменений: условие по старым side_source.
+update contract_terms
+   set side_link   = coalesce(side_link, side),
+       side        = case when terms->>'side' in ('customer', 'supplier') then terms->>'side' end,
+       side_source = case when terms->>'side' in ('customer', 'supplier') then 'model' end
+ where side_source in ('order_link', 'deal_link');
 
 alter table contract_terms drop constraint if exists contract_terms_status_chk;
 alter table contract_terms add constraint contract_terms_status_chk

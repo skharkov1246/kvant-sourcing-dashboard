@@ -151,6 +151,42 @@ def test_статус_и_условия_согласованы(conn):
         база.закрыть()
 
 
+def test_схема_поверх_прежней_версии_переносит_сторону(conn):
+    """Таблица версии до 22.10.2026 (сторона — по связи, без side_link) со строками:
+    схема встаёт поверх, связь переезжает в side_link, сторона — из ответа модели."""
+    import contract_terms as ct
+    текст = (ROOT / "library" / "supabase" / "contract_terms_schema.sql").read_text(encoding="utf-8")
+    создать = текст[текст.index("create table if not exists contract_terms ("):]
+    создать = создать[:создать.index(");") + 2]
+    assert "side_link" not in создать, "колонка прежней версии добавляется alter'ом, а не в create"
+    with conn.cursor() as c:
+        c.execute(f"drop schema {СХЕМА} cascade")
+        c.execute(f"create schema {СХЕМА}")
+        c.execute(создать)
+        for card, status, side, источник, terms in (
+                (1, "no_file", "customer", "deal_link", None),
+                (2, "ok", "supplier", "order_link", '{"side": "customer", "deliveryDays": 120}'),
+                (3, "ok", "customer", "deal_link", '{"side": null}')):
+            c.execute("insert into contract_terms (run_id, method_ver, deal_id, card_entity, card_id, side, "
+                      "side_source, file_id, status, terms) values ('ct-old', 'v', 9900001, 1174, %s, %s, %s, "
+                      "%s, %s, %s)", (card, side, источник, f"fid-{card}", status, terms))
+        for _ in range(2):
+            _применить(c, "contract_terms_schema.sql")
+        c.execute("select card_id, side, side_source, side_link from contract_terms order by card_id")
+        assert c.fetchall() == [(1, None, None, "customer"), (2, "customer", "model", "supplier"),
+                                (3, None, None, "customer")]
+        c.execute("select count(*) from pg_constraint where conname = 'contract_terms_side_chk'")
+        assert c.fetchone()[0] == 1
+    база = ct.База(DSN, схема=СХЕМА)
+    try:
+        assert база.нет_таблиц() == []
+        with база.с, база.с.cursor() as c:
+            c.execute("alter table contract_terms drop column side_link")
+        assert база.нет_таблиц() == ["contract_terms.side_link"], "колонка — до оплаченного чтения"
+    finally:
+        база.закрыть()
+
+
 def test_без_схемы_прогон_называет_недостающие_таблицы(conn):
     import contract_terms as ct
     база = ct.База(DSN, схема=ПУСТАЯ)
