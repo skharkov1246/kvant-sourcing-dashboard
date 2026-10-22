@@ -29,12 +29,14 @@
 --                        evidence — поле → {quote, page}: почему получилось
 --                        значение (правило 16); dropped — поля, у которых модель
 --                        дала значение без цитаты и оно снято («не доказано», а
---                        не «в договоре нет»). side — сторона по связи карточки
---                        (parentId172 — заказ поставщику — значит договор с
---                        поставщиком), side_source — откуда она; независимые
---                        способы: side_template (подпись «Чей шаблон» / «Тип
---                        документа»), side_company (компания карточки против
---                        компании сделки), terms->>'side' (модель).
+--                        не «в договоре нет»). side — сторона документа, её
+--                        называет модель (решение владельца 22.10.2026),
+--                        side_source — 'model'; у непрочитанного и у документа,
+--                        где модель стороны не назвала, — null. side_company —
+--                        сверка (компания карточки против компании сделки и
+--                        заказов СП-172); справочно: side_link — сторона по
+--                        связи карточки (parentId172 — заказ поставщику),
+--                        side_template — подпись «Чей шаблон» / «Тип документа».
 --   contract_b2b_flags   флаг риска (contract_b2b.flags) по паре «условия
 --                        заказчика сделки ↔ условия поставщика заказа order_id».
 --
@@ -92,6 +94,16 @@ create table if not exists contract_b2b_flags (
 
 -- «create table if not exists» существующую таблицу не меняет (правило 21):
 -- колонки, добавленные позже первой версии, — отдельными операторами здесь.
+alter table contract_terms add column if not exists side_link text;   -- 22.10.2026
+-- Строки версии до 22.10.2026: сторона — по связи карточки (side_source order_link /
+-- deal_link). Связь переезжает в side_link, сторона — из ответа модели (только у
+-- прочитанных), как пишет нынешний код; иначе новая проверка стороны не встанет.
+-- Повтор — без изменений: условие по старым side_source.
+update contract_terms
+   set side_link   = coalesce(side_link, side),
+       side        = case when terms->>'side' in ('customer', 'supplier') then terms->>'side' end,
+       side_source = case when terms->>'side' in ('customer', 'supplier') then 'model' end
+ where side_source in ('order_link', 'deal_link');
 
 alter table contract_terms drop constraint if exists contract_terms_status_chk;
 alter table contract_terms add constraint contract_terms_status_chk
@@ -100,6 +112,9 @@ alter table contract_terms add constraint contract_terms_status_chk
 alter table contract_terms drop constraint if exists contract_terms_side_chk;
 alter table contract_terms add constraint contract_terms_side_chk
   check ((side is null or side in ('customer', 'supplier'))
+         and (side_link is null or side_link in ('customer', 'supplier'))
+         and (side_source is null or side_source = 'model')
+         and ((side is null) = (side_source is null))
          and (side_template is null or side_template in ('customer', 'supplier'))
          and (side_company is null or side_company in ('customer', 'supplier')));
 alter table contract_terms drop constraint if exists contract_terms_entity_chk;

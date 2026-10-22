@@ -10,7 +10,8 @@ name: Договоры — чтение условий (пилот)
 #             в шаг не передаются вовсе.
 #   mode live — закачка файлов → модель извлекает условия с цитатой и страницей →
 #             строки в закрытую базу (contract_terms, contract_b2b_flags; схема —
-#             library/supabase/contract_terms_schema.sql, применяет zip-db.yml).
+#             library/supabase/contract_terms_schema.sql, live применяет её сам
+#             после проверок на чистой базе).
 #
 # Порядок: сначала dry, по его оценке — live. Журнал публичный: в нём только
 # агрегаты (CLAUDE.md, правило 17) — ни номеров сделок, ни названий, ни цитат, ни
@@ -64,6 +65,29 @@ jobs:
         # Правила отбора, стороны, бюджета и журнала — до первого запроса к порталу
         # и до первого оплаченного вызова модели.
         run: python -m pytest tests/test_contract_terms.py -q
+
+      # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная проверка —
+      # не пройденная. База в локали UTF-8 (правило 21а).
+      - name: Проверки на чистой базе
+        if: inputs.mode == 'live'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
+          sudo pg_ctlcluster "$(pg_lsclusters -h | awk 'NR==1{print $1}')" main start
+          sudo -u postgres psql -q -c "alter user postgres password 'ci'"
+          sudo -u postgres createdb -T template0 --locale=C.UTF-8 --encoding=UTF8 library_sql_test
+          LIBRARY_SQL_TEST_DSN="postgresql://postgres:ci@127.0.0.1:5432/library_sql_test" \
+            python -m pytest tests/test_contract_terms_sql.py -q
+
+      # Схема перед записью: файл идемпотентен (правило 21) и ни от чего не зависит;
+      # общий прогон миграций (zip-db.yml) для пилота не нужен.
+      - name: Схема в рабочей базе
+        if: inputs.mode == 'live'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          psql "$SUPABASE_DB_URL" -q -v ON_ERROR_STOP=1 -f library/supabase/contract_terms_schema.sql
 
       - name: Чтение договоров
         env:

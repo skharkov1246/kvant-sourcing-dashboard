@@ -64,9 +64,11 @@ def _одно(conn, sql, *p):
 def _строка(run_id: str, card_id: int, *, status="ok", sha="a" * 64, side="customer", order=None) -> dict:
     прочитан = status in ("ok", "reused")
     import contract_terms as ct
+    # сторона — по модели: у непрочитанного её нет; связь — справочно
     return {"run_id": run_id, "method_ver": ct.METHOD_VER, "deal_id": 9900001, "card_entity": 1174,
-            "card_id": card_id, "order_id": order, "side": side,
-            "side_source": "order_link" if order else "deal_link", "side_template": None, "side_company": side,
+            "card_id": card_id, "order_id": order, "side": side if прочитан else None,
+            "side_source": "model" if прочитан else None, "side_link": "supplier" if order else "customer",
+            "side_template": None, "side_company": side,
             "template": "Шаблон ВЫДУМКА",
             "doc_type": None, "file_field": "ufCrm80_1763638685405", "file_id": f"fid-{card_id}",
             "sha256": sha, "pages": 3, "note": None, "status": status, "model": "claude-opus-5-5",
@@ -99,8 +101,10 @@ def test_схема_rls_запись_повтор_и_откат(conn):
         assert кэш["terms"]["deliveryDays"] == 120 and кэш["evidence"]["deliveryDays"]["page"] == 2
         assert кэш["dropped"] == ["penaltyCapPct"], "снятые поля повтора — как у первого чтения"
         assert база.из_кэша("d" * 64, "claude-opus-5-5") is None, "непрочитанный (limit) файл — не повтор"
-        assert _одно(conn, "select side_company from contract_terms where run_id = 'ct-t1' and card_id = 2") \
-            == ("supplier",)
+        assert _одно(conn, "select side, side_source, side_link, side_company from contract_terms "
+                           "where run_id = 'ct-t1' and card_id = 2") == ("supplier", "model", "supplier", "supplier")
+        assert _одно(conn, "select side, side_source, side_link from contract_terms "
+                           "where run_id = 'ct-t1' and card_id = 3") == (None, None, "customer")
         assert база.из_кэша("a" * 64, "claude-sonnet-5-5") is None, "условия другой модели — не повтор"
         assert база.из_кэша("c" * 64, "claude-opus-5-5") is None
 
@@ -133,9 +137,52 @@ def test_статус_и_условия_согласованы(conn):
             база.записать_условия([неизвестный])
         чужая_сторона = _строка("ct-t3", 4, status="no_file")
         чужая_сторона["side_company"] = "trader"
-        with pytest.raises(psycopg2.errors.CheckViolation):
-            база.записать_условия([чужая_сторона])
+        чужая_связь = _строка("ct-t3", 5, status="no_file")
+        чужая_связь["side_link"] = "trader"
+        сторона_без_модели = _строка("ct-t3", 6)
+        сторона_без_модели["side_source"] = None            # сторона есть, а откуда — не сказано
+        модель_без_стороны = _строка("ct-t3", 7)
+        модель_без_стороны["side"] = None                    # «по модели», а стороны нет
+        for r in (чужая_сторона, чужая_связь, сторона_без_модели, модель_без_стороны):
+            with pytest.raises(psycopg2.errors.CheckViolation):
+                база.записать_условия([r])
         assert база.итог("ct-t3")[0] == 0
+    finally:
+        база.закрыть()
+
+
+def test_схема_поверх_прежней_версии_переносит_сторону(conn):
+    """Таблица версии до 22.10.2026 (сторона — по связи, без side_link) со строками:
+    схема встаёт поверх, связь переезжает в side_link, сторона — из ответа модели."""
+    import contract_terms as ct
+    текст = (ROOT / "library" / "supabase" / "contract_terms_schema.sql").read_text(encoding="utf-8")
+    создать = текст[текст.index("create table if not exists contract_terms ("):]
+    создать = создать[:создать.index(");") + 2]
+    assert "side_link" not in создать, "колонка прежней версии добавляется alter'ом, а не в create"
+    with conn.cursor() as c:
+        c.execute(f"drop schema {СХЕМА} cascade")
+        c.execute(f"create schema {СХЕМА}")
+        c.execute(создать)
+        for card, status, side, источник, terms in (
+                (1, "no_file", "customer", "deal_link", None),
+                (2, "ok", "supplier", "order_link", '{"side": "customer", "deliveryDays": 120}'),
+                (3, "ok", "customer", "deal_link", '{"side": null}')):
+            c.execute("insert into contract_terms (run_id, method_ver, deal_id, card_entity, card_id, side, "
+                      "side_source, file_id, status, terms) values ('ct-old', 'v', 9900001, 1174, %s, %s, %s, "
+                      "%s, %s, %s)", (card, side, источник, f"fid-{card}", status, terms))
+        for _ in range(2):
+            _применить(c, "contract_terms_schema.sql")
+        c.execute("select card_id, side, side_source, side_link from contract_terms order by card_id")
+        assert c.fetchall() == [(1, None, None, "customer"), (2, "customer", "model", "supplier"),
+                                (3, None, None, "customer")]
+        c.execute("select count(*) from pg_constraint where conname = 'contract_terms_side_chk'")
+        assert c.fetchone()[0] == 1
+    база = ct.База(DSN, схема=СХЕМА)
+    try:
+        assert база.нет_таблиц() == []
+        with база.с, база.с.cursor() as c:
+            c.execute("alter table contract_terms drop column side_link")
+        assert база.нет_таблиц() == ["contract_terms.side_link"], "колонка — до оплаченного чтения"
     finally:
         база.закрыть()
 
