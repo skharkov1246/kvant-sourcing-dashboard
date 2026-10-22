@@ -147,8 +147,32 @@ class Поток:
         return self.ответ
 
 
+def записи(у: dict) -> str:
+    """Условия в удобном тестам виде (поле → значение, evidence — список {field,
+    quote, page}) → ответ модели в формате схемы: {side, items: [{field, value,
+    quote, page}]}. Значение без цитаты — запись с пустой цитатой; цитата к пустому
+    полю — запись с пустым значением."""
+    items = []
+    цитаты: dict = {}
+    for e in у.get("evidence") or []:
+        цитаты.setdefault(e["field"], []).append(e)
+    for к, v in у.items():
+        if к in ("side", "evidence") or v is None or v == []:
+            continue
+        e = (цитаты.get(к) or [{"quote": "", "page": 0}])[0]
+        значения = v if isinstance(v, list) else [v]
+        for зн in значения:
+            текст = ("true" if зн else "false") if isinstance(зн, bool) else str(зн)
+            items.append({"field": к, "value": текст, "quote": e["quote"], "page": e.get("page") or 0})
+    for к, ее in цитаты.items():
+        if у.get(к) in (None, []):
+            items += [{"field": к, "value": "", "quote": e["quote"], "page": e.get("page") or 0} for e in ее]
+    return json.dumps({"side": у.get("side") or "unknown", "items": items}, ensure_ascii=False)
+
+
 def ответ(данные, вход: int = 10_000, выход: int = 2_000, стоп: str = "end_turn"):
-    текст = данные if isinstance(данные, str) else json.dumps(данные, ensure_ascii=False)
+    текст = данные if isinstance(данные, str) else (
+        записи(данные) if "evidence" in данные else json.dumps(данные, ensure_ascii=False))
     return SimpleNamespace(
         content=[SimpleNamespace(type="thinking", thinking=""), SimpleNamespace(type="text", text=текст)],
         stop_reason=стоп,
@@ -314,9 +338,11 @@ def test_нет_поля_у_типа_называется_а_не_молчит()
 
 
 # --------------------------------------------------------------------------- схема и ответ
-def test_строгая_схема_из_terms_schema_в_пределах_строгого_режима():
+def test_строгая_схема_без_необязательных_и_объединений():
+    """Живой прогон 22.10: схема с двадцатью необязательными условиями собиралась 180 с
+    и падала «Schema is too complex» на каждом файле. Теперь ни одного
+    необязательного поля и ни одного объединения типов."""
     с = ct.СХЕМА_ОТВЕТА
-    assert set(с["properties"]) == set(ct.contract_b2b.TERMS_SCHEMA["properties"])
     счёт = {"необязательных": 0, "объединений": 0}
 
     def обойти(узел, путь="$"):
@@ -335,18 +361,36 @@ def test_строгая_схема_из_terms_schema_в_пределах_стр�
             for i, v in enumerate(узел):
                 обойти(v, f"{путь}[{i}]")
     обойти(с)
-    # пределы считаются по всем строгим схемам запроса — у нас она одна
-    assert счёт["необязательных"] <= ct.ПРЕДЕЛ_НЕОБЯЗАТЕЛЬНЫХ, счёт
-    assert счёт["объединений"] <= ct.ПРЕДЕЛ_ОБЪЕДИНЕНИЙ, счёт
-    assert {"documents", "evidence"} <= set(с["required"]) and "side" not in с["required"]
-    поля = с["properties"]["evidence"]["items"]["properties"]["field"]["enum"]
-    assert "side" not in поля and set(поля) == set(ct.поля_условий()) - {"side"}
-    assert с["properties"]["side"]["enum"] == ["customer", "supplier"]
+    assert счёт == {"необязательных": 0, "объединений": 0}, счёт
+    поля = с["properties"]["items"]["items"]["properties"]["field"]["enum"]
+    # перечень полей — из TERMS_SCHEMA: новое поле там появится и здесь, и в подсказке
+    assert set(поля) == set(ct.поля_условий()) - {"side"}
+    assert all(f"- {к} (" in ct.СИСТЕМА for к in поля)
+    assert с["properties"]["side"]["enum"] == ["customer", "supplier", "unknown"]
+
+
+def test_значения_записей_приводятся_к_типу_поля():
+    items = [{"field": "deliveryDays", "value": "120", "quote": "ц1", "page": 2},
+             {"field": "deliveryDays", "value": "90", "quote": "ц2", "page": 3},       # повтор — первая
+             {"field": "penaltyPctDay", "value": "0,1 %", "quote": "ц3", "page": 0},
+             {"field": "fxFixed", "value": "true", "quote": "ц4", "page": 1},
+             {"field": "claimDays", "value": "тридцать", "quote": "ц5", "page": 1},   # не число — снято
+             {"field": "penaltyCapPct", "value": "null", "quote": "ц6", "page": 1},   # «нет» словами
+             {"field": "documents", "value": "паспорт", "quote": "ц7", "page": 4},
+             {"field": "documents", "value": "сертификат ТР ТС", "quote": "ц8", "page": 4},
+             {"field": "side", "value": "supplier", "quote": "ц9", "page": 1}]       # side — не запись
+    у, док, снято = ct.разобрать_ответ(json.dumps({"side": "unknown", "items": items}, ensure_ascii=False))
+    assert у["deliveryDays"] == 120 and док["deliveryDays"] == {"quote": "ц1", "page": 2}
+    assert у["penaltyPctDay"] == pytest.approx(0.1) and док["penaltyPctDay"]["page"] is None
+    assert у["fxFixed"] is True and у["side"] is None
+    assert у["claimDays"] is None and снято == ["claimDays"]
+    assert у["penaltyCapPct"] is None and "penaltyCapPct" not in снято
+    assert у["documents"] == ["паспорт", "сертификат ТР ТС"] and док["documents"]["quote"] == "ц7"
 
 
 def test_пропущенное_поле_читается_как_null():
-    условия, доказательства, снято = ct.разобрать_ответ(json.dumps(
-        {"documents": [], "evidence": [], "deliveryDays": 30}, ensure_ascii=False))
+    условия, доказательства, снято = ct.разобрать_ответ(записи(
+        {"documents": [], "evidence": [], "deliveryDays": 30}))
     assert условия["side"] is None and условия["incoterms"] is None
     assert условия["deliveryDays"] is None and снято == ["deliveryDays"]          # без цитаты — снят
     assert доказательства == {}
@@ -356,7 +400,7 @@ def test_значение_без_цитаты_снимается():
     у = условия_заказчика()
     у["law"] = "ПРАВО-ВЫДУМКА"                        # без записи в evidence
     у["evidence"].append({"field": "currency", "quote": "в рублях", "page": 2})   # цитата к пустому полю
-    условия, доказательства, снято = ct.разобрать_ответ(json.dumps(у, ensure_ascii=False))
+    условия, доказательства, снято = ct.разобрать_ответ(записи(у))
     assert снято == ["law"] and условия["law"] is None
     assert условия["deliveryDays"] == 120 and условия["side"] == "customer"
     assert доказательства["deliveryDays"] == {"quote": ЦИТАТА_ЗАКАЗЧИКА, "page": 3}
@@ -420,8 +464,8 @@ def _строка(связь: str, terms: dict | None, *, status="ok", order=Non
 
 
 def test_строки_и_флаги_сделки():
-    у_з, _, _ = ct.разобрать_ответ(json.dumps(условия_заказчика(), ensure_ascii=False))
-    у_п, _, _ = ct.разобрать_ответ(json.dumps(условия_поставщика(), ensure_ascii=False))
+    у_з, _, _ = ct.разобрать_ответ(записи(условия_заказчика()))
+    у_п, _, _ = ct.разобрать_ответ(записи(условия_поставщика()))
     з = _строка("customer", у_з, card=1)
     п = _строка("supplier", у_п, card=2, order=ЗАКАЗ)
     assert з["status"] == "ok" and з["terms"]["deliveryDays"] == 120 and з["model"] == "claude-opus-5-5"
@@ -500,7 +544,7 @@ def test_живой_прогон_пишет_в_базу_а_в_журнал_то�
 def test_повтор_файла_берётся_из_базы_даром(capsys):
     import hashlib
     sha = hashlib.sha256(ФАЙЛЫ["fid-заказчик"]).hexdigest()
-    у, док, _ = ct.разобрать_ответ(json.dumps(условия_заказчика(), ensure_ascii=False))
+    у, док, _ = ct.разобрать_ответ(записи(условия_заказчика()))
     база = База(кэш={sha: {"terms": у, "evidence": док, "pages": 3, "note": None}})
     клиент = Клиент()
     ct.прогон("live", 3, 10.0, "claude-opus-5-5", портал=Портал(ФАЙЛЫ), run_id="ct-проба",
@@ -583,7 +627,7 @@ def test_схема_подключена_к_миграциям():
 
 # --------------------------------------------------------------------------- правки по разбору (19.10.2026)
 def _условия(данные: dict) -> tuple[dict, list[str]]:
-    у, _док, снято = ct.разобрать_ответ(json.dumps(данные, ensure_ascii=False))
+    у, _док, снято = ct.разобрать_ответ(записи(данные))
     return у, снято
 
 
@@ -771,7 +815,7 @@ def test_версия_метода_выведена_из_подсказки_и_�
     assert ct.версия_метода(просьба=ct.ПРОСЬБА + " ") != ct.METHOD_VER
     assert ct.версия_метода(усилие="medium") != ct.METHOD_VER
     схема = json.loads(json.dumps(ct.СХЕМА_ОТВЕТА))
-    схема["properties"]["deliveryDays"]["description"] = "ВЫДУМКА"
+    схема["properties"]["items"]["description"] = "ВЫДУМКА"
     assert ct.версия_метода(схема=схема) != ct.METHOD_VER
     # строка и ключ повтора несут полную версию
     assert _строка("customer", None, status="no_file")["method_ver"] == ct.METHOD_VER
@@ -893,3 +937,19 @@ def test_причины_отказов_агрегатом_без_номеров(
     assert п["api: сбой сети (APITimeoutError), попыток 1"] == 2
     assert п["api: API отказал (400): файл … слишком большой"] == 1
     assert п["format: без заметки"] == 1 and sum(п.values()) == 4, "срок и прочитанное — не отказы"
+
+
+def test_отказ_схемы_останавливает_чтение_после_первого_вызова():
+    """Живой прогон 22.10: «Schema is too complex» на каждом из 14 файлов по 3 минуты.
+    Отказ запросу целиком не лечится следующим файлом — модель больше не зовётся."""
+    class Отказ400(Exception):
+        status_code = 400
+        body = {"error": {"message": "Schema is too complex for compilation."}}
+
+    def отказ(_т):
+        raise Отказ400()
+    клиент = Клиент(отказ)
+    читатель = ct.Читатель("claude-opus-5-5", 10.0, клиент=клиент)
+    итоги = [читатель.прочитать(pdf_на(1)) for _ in range(3)]
+    assert [и["status"] for и in итоги] == ["api"] * 3 and "too complex" in итоги[-1]["note"]
+    assert len(клиент.messages.запросы) == 1
