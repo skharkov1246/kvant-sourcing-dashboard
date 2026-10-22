@@ -64,9 +64,11 @@ def _одно(conn, sql, *p):
 def _строка(run_id: str, card_id: int, *, status="ok", sha="a" * 64, side="customer", order=None) -> dict:
     прочитан = status in ("ok", "reused")
     import contract_terms as ct
+    # сторона — по модели: у непрочитанного её нет; связь — справочно
     return {"run_id": run_id, "method_ver": ct.METHOD_VER, "deal_id": 9900001, "card_entity": 1174,
-            "card_id": card_id, "order_id": order, "side": side,
-            "side_source": "order_link" if order else "deal_link", "side_template": None, "side_company": side,
+            "card_id": card_id, "order_id": order, "side": side if прочитан else None,
+            "side_source": "model" if прочитан else None, "side_link": "supplier" if order else "customer",
+            "side_template": None, "side_company": side,
             "template": "Шаблон ВЫДУМКА",
             "doc_type": None, "file_field": "ufCrm80_1763638685405", "file_id": f"fid-{card_id}",
             "sha256": sha, "pages": 3, "note": None, "status": status, "model": "claude-opus-5-5",
@@ -99,8 +101,10 @@ def test_схема_rls_запись_повтор_и_откат(conn):
         assert кэш["terms"]["deliveryDays"] == 120 and кэш["evidence"]["deliveryDays"]["page"] == 2
         assert кэш["dropped"] == ["penaltyCapPct"], "снятые поля повтора — как у первого чтения"
         assert база.из_кэша("d" * 64, "claude-opus-5-5") is None, "непрочитанный (limit) файл — не повтор"
-        assert _одно(conn, "select side_company from contract_terms where run_id = 'ct-t1' and card_id = 2") \
-            == ("supplier",)
+        assert _одно(conn, "select side, side_source, side_link, side_company from contract_terms "
+                           "where run_id = 'ct-t1' and card_id = 2") == ("supplier", "model", "supplier", "supplier")
+        assert _одно(conn, "select side, side_source, side_link from contract_terms "
+                           "where run_id = 'ct-t1' and card_id = 3") == (None, None, "customer")
         assert база.из_кэша("a" * 64, "claude-sonnet-5-5") is None, "условия другой модели — не повтор"
         assert база.из_кэша("c" * 64, "claude-opus-5-5") is None
 
@@ -133,8 +137,15 @@ def test_статус_и_условия_согласованы(conn):
             база.записать_условия([неизвестный])
         чужая_сторона = _строка("ct-t3", 4, status="no_file")
         чужая_сторона["side_company"] = "trader"
-        with pytest.raises(psycopg2.errors.CheckViolation):
-            база.записать_условия([чужая_сторона])
+        чужая_связь = _строка("ct-t3", 5, status="no_file")
+        чужая_связь["side_link"] = "trader"
+        сторона_без_модели = _строка("ct-t3", 6)
+        сторона_без_модели["side_source"] = None            # сторона есть, а откуда — не сказано
+        модель_без_стороны = _строка("ct-t3", 7)
+        модель_без_стороны["side"] = None                    # «по модели», а стороны нет
+        for r in (чужая_сторона, чужая_связь, сторона_без_модели, модель_без_стороны):
+            with pytest.raises(psycopg2.errors.CheckViolation):
+                база.записать_условия([r])
         assert база.итог("ct-t3")[0] == 0
     finally:
         база.закрыть()
