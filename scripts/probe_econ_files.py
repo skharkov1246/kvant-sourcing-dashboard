@@ -38,7 +38,7 @@ import config  # noqa: E402
 import contracts as ct  # noqa: E402
 from bitrix_client import BitrixClient  # noqa: E402
 
-МАКС = int(os.environ.get("ECON_PROBE_MAX", "5"))   # владелец 23.10: не больше 30 файлов в день
+МАКС = int(os.environ.get("ECON_PROBE_MAX", "10"))   # владелец 23.10: не больше 30 файлов в день
 API = "https://cloud-api.yandex.net/v1/disk/public/resources"
 ПОДПИСИ = {
     "выручка": re.compile(r"выручк|продаж|revenue|sales", re.I),
@@ -175,6 +175,86 @@ def таблицы_диска(ключ: str, макс: int = 20000) -> dict[str,
     return по_имени
 
 
+ОБЩЕЕ = re.compile(
+    r"цен|стоим|итог|сумм|курс|ндс|кол-?в|\bед\.?|наимен|поставщ|логист|достав|тамож|пошлин|марж|наценк|прибыл|"
+    r"коэф|%|валют|евро|руб|\b(usd|eur|cny|rub|aed|exw|fca|dap|ddp|cip|cpt)\b|ткп|\bкп\b|срок|\bвес|объ[её]м|расход|"
+    r"комисс|банк|страх|итерац|верс|дата|№|номер|артикул|\bкод|позиц|бренд|производ|склад|упаков|сертиф|себест|"
+    r"закуп|продаж|оплат|аванс|отсроч|ставк|клиент|заказчик|total|price|cost|qty|amount|margin|rate|incoterms|базис",
+    re.I)
+СКЕЛЕТ = {"файлов": 0, "листов": collections.Counter(), "активный": collections.Counter(), "скрытых": collections.Counter(),
+          "имена": collections.Counter(), "подписи": collections.Counter(), "формулы": collections.Counter()}
+
+
+def _норм(t: str) -> str:
+    t = re.sub(r"\s+", " ", str(t)).strip()
+    return re.sub(r"\d+([.,]\d+)?", "N", t)[:70]
+
+
+def скелет(b: bytes) -> None:
+    """Подписи и формулы шаблона по листам — для понимания логики файла. Каждый файл даёт
+    множество (лист, ячейка, текст); печатается только то, что повторяется в 5+ файлах и
+    похоже на заголовок шаблона (ОБЩЕЕ). Числа в формулах — «N», имена листов — «Лk»."""
+    import openpyxl
+    try:
+        wf = openpyxl.load_workbook(io.BytesIO(b), data_only=False)
+    except Exception:
+        return
+    СКЕЛЕТ["файлов"] += 1
+    n = len(wf.sheetnames)
+    СКЕЛЕТ["листов"][n] += 1
+    акт = wf.sheetnames.index(wf.active.title) + 1 if wf.active is not None else 0
+    СКЕЛЕТ["активный"]["последний" if акт == n else f"{акт} из {n}"] += 1
+    СКЕЛЕТ["скрытых"][sum(1 for ws in wf.worksheets if ws.sheet_state != "visible")] += 1
+    имя_в_номер = {nm: f"Л{i}" for i, nm in enumerate(wf.sheetnames, 1)}
+    подписи, формулы, имена = set(), set(), set()
+    for i, ws in enumerate(wf.worksheets, 1):
+        имена.add((i, _норм(ws.title) if ОБЩЕЕ.search(ws.title) else "…"))
+        for row in ws.iter_rows(max_row=300, max_col=40):
+            for c in row:
+                v = c.value
+                if isinstance(v, str) and v.startswith("="):
+                    f = v
+                    for nm, k in sorted(имя_в_номер.items(), key=lambda x: -len(x[0])):
+                        f = f.replace(f"'{nm}'!", f"{k}!").replace(f"{nm}!", f"{k}!")
+                    f = re.sub(r"'[^']*'!", "Л?!", f)
+                    # числа-константы (наценка, ставки) — «N»; номера строк в ссылках (D25, $D$25) не трогаем
+                    f = re.sub(r"(?<![A-Za-zЛ$\d.])\d+(?:\.\d+)?", "N", f)
+                    формулы.add((i, c.coordinate, f[:90]))
+                elif isinstance(v, str) and ОБЩЕЕ.search(v) and len(v.strip()) <= 70:
+                    подписи.add((i, c.coordinate, _норм(v)))
+    for x in подписи:
+        СКЕЛЕТ["подписи"][x] += 1
+    for x in формулы:
+        СКЕЛЕТ["формулы"][x] += 1
+    for x in имена:
+        СКЕЛЕТ["имена"][x] += 1
+
+
+def печать_скелета(порог: int = 5) -> None:
+    S = СКЕЛЕТ
+    if not S["файлов"]:
+        return
+    print(f"\nСКЕЛЕТ ШАБЛОНА по {S['файлов']} файлам (печатается то, что есть в {порог}+ файлах)")
+    print("  листов: " + " · ".join(f"{k}: {v}" for k, v in sorted(S["листов"].items())))
+    print("  активный лист при открытии: " + " · ".join(f"{k}: {v}" for k, v in S["активный"].most_common()))
+    print("  скрытых листов: " + " · ".join(f"{k}: {v}" for k, v in sorted(S["скрытых"].items())))
+    for (i, nm), v in sorted(S["имена"].items()):
+        if v >= порог:
+            print(f"  лист {i}: имя «{nm}» в {v} файлах")
+    def ключ(x):
+        (i, ref, _t), _v = x
+        m = re.match(r"([A-Z]+)(\d+)", ref)
+        return (i, int(m.group(2)) if m else 0, m.group(1) if m else ref)
+    for что in ("подписи", "формулы"):
+        rows = sorted(((k, v) for k, v in S[что].items() if v >= порог), key=ключ)
+        print(f"  {что}: {len(rows)}")
+        по_листу = collections.Counter()
+        for (i, ref, t), v in rows:
+            по_листу[i] += 1
+            if по_листу[i] <= 90:
+                print(f"    Л{i} {ref}: {t}  [{v}]")
+
+
 def разобрать_xlsx(b: bytes, сч: collections.Counter) -> None:
     """Шаблон расчёта: какие слова словаря есть в файле и стоит ли рядом число.
     В журнал — только слово словаря, номер листа и счёт; ни значений, ни имён листов."""
@@ -299,6 +379,7 @@ def main() -> int:
                     сч["xlsx: не скачался"] += 1
                     continue
                 разобрать_xlsx(b, сч)
+                скелет(b)
                 continue
             if части[0] == "edit" and путь.startswith("disk/"):
                 путь = путь[len("disk/"):]
@@ -374,6 +455,7 @@ def main() -> int:
     print("коды ответов Диска: " + " · ".join(f"{k} {v}" for k, v in sorted(КОДЫ.items())))
     for k, v in sorted(сч.items()):
         print(f"  {k}: {v}")
+    печать_скелета()
     return 0
 
 
