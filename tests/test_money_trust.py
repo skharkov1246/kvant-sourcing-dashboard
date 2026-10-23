@@ -115,3 +115,12 @@ def test_надёжность_поставщика_только_к_бюджет�
 def test_подписи_оплаты_и_удп_говорят_что_известно():
     assert "платёжки клиента в заказе нет" in lifecycle.EXC["unpaid"][1]
     assert "УПД в заказе нет" in lifecycle.EXC["noUtd"][1]
+
+
+def test_нет_суммы_сделки_не_ноль_евро():
+    stub = fixture.ContractsStub()
+    stub.deals[2]["OPPORTUNITY"] = "0"
+    data = _compute(stub)
+    r = _row(data, stub.deals[2]["ID"])
+    assert r["saleLbl"] == "суммы нет" and r["marginEur"] is None
+    assert data["head"]["nNoSale"] >= 1

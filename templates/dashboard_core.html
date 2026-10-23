@@ -1896,7 +1896,7 @@ function renderContracts(){
   // ---------- 1. ИТОГ: четыре числа, ради которых открывают вкладку ----------
   // «Потери от просрочки» — оценка с допущениями: в итоговом ряду её нет (правило:
   // экстраполяция — не в заголовок), она в «Деньгах во времени» с оговоркой
-  const notIn=[H.nFx?`${H.nFx} — валюта без курса в Битриксе (${_esc((H.fxCodes||[]).join(', '))})`:'',H.nBuySusp?`${H.nBuySusp} — закупка несоизмерима с продажей`:''].filter(Boolean);
+  const notIn=[H.nFx?`${H.nFx} — валюта без курса в Битриксе (${_esc((H.fxCodes||[]).join(', '))})`:'',H.nBuySusp?`${H.nBuySusp} — закупка несоизмерима с продажей`:'',H.nNoSale?`${H.nNoSale} — суммы сделки в Битриксе нет`:''].filter(Boolean);
   h+=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)">`
    +`<div class="kpi ok"><div class="lbl">Σ продажи</div><div class="val ok">${H.sale}</div><div class="meta">открытые сделки, €${notIn.length?` · не вошли: ${notIn.join('; ')}`:''}</div></div>`
    +`<div class="kpi"><div class="lbl">Σ валовая маржа${qmark('ct.margin')}</div><div class="val ${(H.marginNum||0)<0?'warn':''}">${H.margin}</div><div class="meta">${H.marginPct}% · до логистики, таможни и НДС</div></div>`

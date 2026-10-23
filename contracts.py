@@ -595,7 +595,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "deal": did, "seq": seq, "entered": entered,
             "customer": clients.get(str(d.get("COMPANY_ID"))) or "—",
             "title": (dtitle or f"Сделка #{did}")[:90],
-            "saleEur": round(sale), "saleLbl": _money(sale) if sale_known else "курса нет",
+            # суммы в сделке нет — «суммы нет», а не «€0» (правило Р-2: ноль ≠ неизвестно)
+            "saleEur": round(sale),
+            "saleLbl": ("курса нет" if not sale_known else _money(sale) if sale else "суммы нет"),
             # валюты без курса в справочнике Битрикса (сделка, заказы, поля экономики):
             # такие суммы не пересчитываются и в итоги не идут
             "fxMissing": fx_miss, "saleKnown": sale_known, "buySusp": buy_susp,
@@ -839,6 +841,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     n_econ = sum(1 for r in live_rows if r["buySrc"] == "econ" and not r["buySusp"])
     n_nobuy = sum(1 for r in live_rows if r["buySrc"] == "none")
     n_fx = sum(1 for r in live_rows if r["fxMissing"])
+    n_nosale = sum(1 for r in live_rows if r["saleKnown"] and not r["saleEur"])
     n_buy_susp = sum(1 for r in live_rows if r["buySusp"])
     fx_codes = sorted({c for r in live_rows for c in r["fxMissing"]})
     orphan_buy = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orphan)
@@ -1058,6 +1061,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "nEcon": n_econ, "nNoBuy": n_nobuy,
             # не вошли в итоги: сумма в валюте без курса; закупка несоизмерима с продажей
             "nFx": n_fx, "fxCodes": fx_codes, "nBuySusp": n_buy_susp, "sumsOver": "live",
+            "nNoSale": n_nosale,      # открытых сделок без суммы в Битриксе
             "medCycle": round(med_cycle) if med_cycle else None,
             "medLag": round(med_lag, 1) if med_lag is not None else None,
             "loss": _money(loss_total), "burnDay": _money(burn_day),
