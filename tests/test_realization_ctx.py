@@ -73,7 +73,7 @@ class База:
 def _чат(deal, **kw):
     r = {"deal": deal, "checked": T, "human": T - dt.timedelta(days=1), "at": T, "state": "ждёт_нас",
          "direction": "стоит", "risk": "высокий", "ball": "кам", "reply": True, "due": dt.date(2026, 10, 25),
-         "dueKind": "отгрузка", "kinds": ["срок"], "blocker": {"kind": "ответ", "on_role": "кам"}}
+         "dueKind": "отгрузка", "kinds": ["срок"], "blocker": {"kind": "ответ", "on_role": "кам"}, "conf": 0.75}
     r.update(kw)
     return r
 
@@ -100,7 +100,7 @@ def test_свод_по_форме_и_без_условий():
     разбор = dealctx.clean(свод)
     assert разбор["bad"] == 0
     assert свод["chats"]["11"]["blocker"] == {"kind": "ответ", "on": "кам"}
-    assert свод["chats"]["11"]["due"] == "2026-10-25"
+    assert свод["chats"]["11"]["due"] == "2026-10-25" and свод["chats"]["11"]["conf"] == 0.75
     assert свод["chats"]["12"]["at"] is None
     assert свод["contracts"]["101"]["outcome"] == "пара"
     assert {f["code"] for f in свод["contracts"]["101"]["flags"]} == {f["code"] for f in флаги}
@@ -258,6 +258,7 @@ def test_на_настоящей_базе(conn):
     ч = свод["chats"]
     assert ч["11"]["state"] == "стоит" and ч["11"]["kinds"] == ["срок", "оплата"] and ч["11"]["due"] == "2026-10-20"
     assert ч["11"]["blocker"] == {"kind": "поставка", "on": "поставщик"} and ч["11"]["reply"] is False
+    assert ч["11"]["conf"] == 0.8, "уверенность — из вычисляемой колонки базы"
     assert ч["12"]["at"] is None and ч["12"]["human"] is None
     # свежесть — по удачному чтению: у 11 read_at пуст (строка до 23.10) — время оценки,
     # а не checked_at, который двигает и неудачное чтение

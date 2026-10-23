@@ -53,7 +53,7 @@ def test_пишут_но_ход_за_нами_стоит_или_откат_по�
         stuck, note, priv, src = dealctx.decide(ACTIVE, _a(**kw), TODAY)
         assert (stuck, src) == (True, "model"), kw
         assert why in priv and "по оценке чата 19.10" in priv
-        assert note == dealctx.PUBLIC_STUCK, "для всех — без оценки модели"
+        assert note == dealctx.PUBLIC_STUCK_MODEL, "для всех — откуда решение, без самой оценки"
 
 
 def test_ждём_вторую_сторону_до_срока_не_подвисла():
@@ -120,8 +120,9 @@ def test_ключ_не_по_форме_отбрасывается_и_счита�
     raw["chats"]["6102"] = dict(raw["chats"]["6002"], due="25.10.2026")       # дата не ISO
     raw["contracts"]["6103"] = dict(raw["contracts"]["6001"], outcome="почти")
     raw["contracts"]["6104"] = dict(raw["contracts"]["6001"], flags=[{"code": "rm -rf"}])
+    raw["chats"]["6105"] = dict(raw["chats"]["6002"], conf=1.7)                # уверенность вне 0…1
     ctx = dealctx.clean(raw)
-    assert ctx["bad"] == 6
+    assert ctx["bad"] == 7
     assert "6100" not in ctx["chats"] and "6002" in ctx["chats"] and "6103" not in ctx["contracts"]
     assert dealctx.clean({"version": 2}) is None and dealctx.clean([]) is None
 
@@ -184,7 +185,7 @@ def test_вкладка_со_сводом():
     assert rows["6010"]["stuck"] and "по чтению 19.10: в чате тихо 20 дн." in d["6010"]["why"]
     # строки сделок видят все с вкладкой: в них нет ни оценки модели, ни данных прогона оценки
     for x in ct["rows"]:
-        for слово in ("оценке", "ждём", "по чтению", "ход за нами", "никто не двигает", "откат"):
+        for слово in ("по оценке чата", "ждём", "по чтению", "ход за нами", "никто не двигает", "откат"):
             assert слово not in x["why"], (x["deal"], слово)
     assert not rows["6012"]["stuck"], "оценка до новой переписки — не основание"
     assert rows["6000"]["chatUnverified"] is True
@@ -198,13 +199,15 @@ def test_вкладка_со_сводом():
     reply = dc["queue"][0]
     assert reply["who"] == rows["6006"]["ossDeal"] and reply["days"] == 4
     assert dc["queue"][3]["who"] == dealctx.CONTRACT_HEAD and dc["queue"][3]["act"].endswith("пени, документы")
-    assert dc["queue"][4]["what"] == "нет договора заказчика и поставщика"
     assert dc["counts"] == {"chatReply": 1, "chatRisk": 1, "chatDue": 1, "contractRisk": 1, "contractMissing": 2}
     assert d["6001"]["contract"]["flags"][0]["text"] == dealctx.contract_b2b.FLAG_TEXT["penaltyUncovered"]
     assert d["6003"]["contract"]["missing"] == ["supplier"]
     assert d["6011"]["contract"]["outcome"] == "разошлось" and d["6011"]["contract"]["flags"] == []
     assert d["6004"]["chat"]["blocker"] == "поставка · на стороне: поставщик"
     assert d["6014"]["chat"]["cur"] is False
+    assert d["6002"]["chat"]["conf"] == 80, "уверенность модели — рядом с оценкой"
+    assert d["6007"]["contract"]["missing"] == ["customer", "supplier"]
+    assert dc["queue"][4]["what"] == "договор заказчика и поставщика не найден в карточках сделки"
     # «что делать первым» — самое важное из обеих очередей
     for did, rec in d.items():
         if "todo" in rec:

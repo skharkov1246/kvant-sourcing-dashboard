@@ -107,11 +107,11 @@ class База:
         rows = self._все(f"""
             select coalesce(s.deal_id, l.deal_id), {прочитан}, s.last_human_at,
                    l.assessed_at, l.state, l.direction, l.risk, l.ball_role, l.reply_expected,
-                   l.due_date, l.due_kind, l.verdict->'risk_kinds', l.verdict->'blocker'
+                   l.due_date, l.due_kind, l.verdict->'risk_kinds', l.verdict->'blocker', l.confidence
               from deal_chat_state s
               full outer join deal_chat_ctx_latest l on l.deal_id = s.deal_id""")
         ключи = ("deal", "checked", "human", "at", "state", "direction", "risk", "ball", "reply",
-                 "due", "dueKind", "kinds", "blocker")
+                 "due", "dueKind", "kinds", "blocker", "conf")
         return [dict(zip(ключи, r)) for r in rows]
 
     def договоры(self) -> tuple[list[dict], list[dict], list[dict]]:
@@ -179,7 +179,9 @@ def свод_чатов(строки: list[dict]) -> dict[str, dict]:
                      reply=r["reply"], kinds=list(r.get("kinds") or []),
                      due=r["due"].isoformat() if r.get("due") else None,
                      dueKind=r.get("dueKind") if r.get("due") else None,
-                     blocker={"kind": b.get("kind"), "on": b.get("on_role")} if isinstance(b, dict) else None)
+                     blocker={"kind": b.get("kind"), "on": b.get("on_role")} if isinstance(b, dict) else None,
+                     # уверенность модели в оценке — показывается рядом: это оценка, а не факт
+                     conf=round(float(r["conf"]), 2) if r.get("conf") is not None else None)
         out[str(int(r["deal"]))] = x
     return out
 

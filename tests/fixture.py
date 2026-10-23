@@ -527,7 +527,7 @@ def realctx_raw() -> dict:
           reply=False, due=None, due_kind=None, blocker=None, at=0.3, human=1.0, checked=0.3):
         return {"checked": t(checked), "human": t(human) if human is not None else None, "at": t(at),
                 "state": state, "direction": direction, "risk": risk, "kinds": list(kinds), "ball": ball,
-                "reply": reply, "due": due, "dueKind": due_kind if due else None, "blocker": blocker}
+                "reply": reply, "due": due, "dueKind": due_kind if due else None, "blocker": blocker, "conf": 0.8}
     d = lambda days: (CT_TODAY + dt.timedelta(days=days)).isoformat()
     chats = {
         # мяч у КАМа, ждут ответа с субботы: будних часов 12 — ещё не пункт очереди

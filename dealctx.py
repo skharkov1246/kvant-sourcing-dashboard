@@ -70,6 +70,9 @@ ROLE_LBL = {"кам": "КАМ", "сорсер": "сорсер", "руковод�
             "клиент": "клиент", "поставщик": "поставщик", "перевозчик": "перевозчик", "неясно": "неясно"}
 DUE_ACC = {"отгрузка": "отгрузку", "доставка": "доставку", "оплата": "оплату", "документы": "документы",
            "ответ": "ответ", "подача": "подачу", "встреча": "встречу", "другое": "срок"}
+# «Не найден», а не «нет»: договор ищется только в карточках СП-1174/1192, связанных со
+# сделкой (зонд v54: связана лишь часть договоров) — его может не быть в портале, а не у сделки
+SIDE_MISSING = "договор {whose} не найден в карточках сделки"
 # короткие подписи флагов сверки для «что сделать»; полный текст — contract_b2b.FLAG_TEXT
 FLAG_SHORT = {"lateByDesign": "срок", "thinBuffer": "запас по сроку", "basisGap": "базис",
               "cashGap": "оплата", "penaltyUncovered": "пени", "penaltyNoCap": "потолок пеней",
@@ -85,7 +88,7 @@ EXC = {
     "chatRisk": (2.5, "высокий риск по чату", "разобрать риск"),
     "chatDue": (3.5, "срок из чата прошёл", "подтвердить у второй стороны"),
     "contractRisk": (5.5, "договоры: риск сверки заказчик ↔ поставщик", "допсоглашение с поставщиком"),
-    "contractMissing": (12.5, "нет договора одной из сторон", "загрузить файл договора в карточку"),
+    "contractMissing": (12.5, "договор стороны не найден в карточках", "найти договор и загрузить файл в карточку"),
 }
 
 
@@ -150,9 +153,12 @@ def _chat(v) -> dict | None:
     due = _day(v.get("due")) if v.get("due") is not None else None
     if v.get("due") is not None and (due is None or v.get("dueKind") not in DUE_KINDS):
         return None
+    conf = v.get("conf")
+    if conf is not None and not (isinstance(conf, (int, float)) and not isinstance(conf, bool) and 0 <= conf <= 1):
+        return None
     out.update(state=v["state"], direction=v["direction"], risk=v["risk"], kinds=list(kinds)[:3],
                ball=v["ball"], reply=v["reply"], due=due, dueKind=v.get("dueKind") if due else None,
-               blocker=blocker)
+               blocker=blocker, conf=conf)
     return out
 
 
@@ -223,7 +229,9 @@ def stall_reason(a: dict | None) -> str:
     return ""
 
 
-PUBLIC_STUCK = "простой подтверждён проверкой чата"
+# Для всех — откуда решение, без самой оценки: модель — это оценка, а не факт
+PUBLIC_STUCK = "простой подтверждён чтением чата"
+PUBLIC_STUCK_MODEL = "простой — по оценке переписки моделью"
 
 
 def decide(ch: dict, a: dict | None, today: dt.date) -> tuple[bool | None, str, str, str]:
@@ -241,7 +249,7 @@ def decide(ch: dict, a: dict | None, today: dt.date) -> tuple[bool | None, str, 
     why = stall_reason(cur)
     if st == "active":
         if why:
-            return True, PUBLIC_STUCK, f"в чате пишут, но по оценке чата {_dm(cur['at'])}: {why}", "model"
+            return True, PUBLIC_STUCK_MODEL, f"в чате пишут, но по оценке чата {_dm(cur['at'])}: {why}", "model"
         note = f"в чате работа: последнее сообщение {ch['days']} дн. назад — не подвисла"
         priv = note
         if cur and cur["state"] in WAIT and cur.get("due") and cur["due"] >= today:
@@ -255,7 +263,7 @@ def decide(ch: dict, a: dict | None, today: dt.date) -> tuple[bool | None, str, 
             return True, PUBLIC_STUCK, (f"по чтению {_dm(a['checked'])}: в чате тихо {(today - hd).days} дн." if hd
                                         else f"по чтению {_dm(a['checked'])}: в чате людей не было"), "ctxQuiet"
         if why:
-            return True, PUBLIC_STUCK, f"по оценке чата {_dm(cur['at'])}: {why}", "model"
+            return True, PUBLIC_STUCK_MODEL, f"по оценке чата {_dm(cur['at'])}: {why}", "model"
         return False, "в чате работа — не подвисла", f"по чтению {_dm(a['checked'])}: в чате работа — не подвисла", \
             "ctxActive"
     note = "чат не проверен — простой не подтверждён"
@@ -324,6 +332,8 @@ def _chat_cell(a: dict, cur: dict | None, r: dict, now: dt.datetime) -> dict:
         "duePassed": bool(due and due < today),
         "blocker": f"{b['kind']} · на стороне: {ROLE_LBL[b['on']]}" if b else "",
         "human": a["human"].strftime("%d.%m.%Y") if a["human"] else "",
+        # уверенность модели, % — оценка переписки, а не факт; нет — не показывается
+        "conf": round(a["conf"] * 100) if a.get("conf") is not None else None,
     }
 
 
@@ -403,8 +413,8 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
                 if need:
                     whose = " и ".join(SIDE_LBL[s] for s in need)
                     queue.append(_item("contractMissing", r, _nm(r.get("manager")) or _owner(r),
-                                       what=f"нет договора {whose}",
-                                       act=f"загрузить файл договора {whose} в карточку"))
+                                       what=SIDE_MISSING.format(whose=whose),
+                                       act=f"найти договор {whose} и загрузить файл в карточку"))
         if rec:
             deals[did] = rec
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
