@@ -189,3 +189,34 @@ def test_решения_владельца_хозяин_поля_сделка_в
     # закрытая выигранная сделка: ни сроков, ни оплаты в очереди
     life2 = lc.build([заказ(dl=д("2026-10-01"), prodStart=None)], [{"deal": "100", "seq": 900, "closed": True}], СЕГОДНЯ)
     assert life2["counts"] == {}
+
+
+def test_ведёт_уволенный_и_ответственный_заказа():
+    """Ревизия 23.10.2026: пункт «ведёт уволенный» — и по ответственному живого заказа
+    (respGone строки сделки), в пункте названо, кто ушёл; закрытая сделка — без пункта."""
+    сделки = [{"deal": "100", "seq": 900, "closed": False, "respGone": True, "ossDeal": "Дина (ОСС)"},
+              {"deal": "101", "seq": 901, "closed": False, "managerGone": True, "ossGone": True,
+               "manager": "Пётр (уволен)"},
+              {"deal": "102", "seq": 902, "closed": True, "respGone": True},
+              {"deal": "103", "seq": 903, "closed": False}]
+    заказы = [заказ(id=str(i), deal=d, dl=д("2026-12-01")) for i, d in enumerate(("100", "101", "102", "103"))]
+    life = lc.build(заказы, сделки, СЕГОДНЯ)
+    g = {q["deal"]: q for q in life["queue"] if q["code"] == "gone"}
+    assert set(g) == {"100", "101"} and life["counts"]["gone"] == 2
+    assert g["100"]["what"] == "ведёт уволенный: ответственный заказа" and g["100"]["who"] == "Дина (ОСС)"
+    assert g["101"]["what"] == "ведёт уволенный: ответственный сделки, ОСС" and g["101"]["whoGone"] is True
+    assert life["labels"]["gone"] == "ведёт уволенный", "подпись фильтра — без перечня"
+
+
+def test_доставлено_по_стадии_без_даты_не_просрочка():
+    """Заказ закрыт успехом (семантика S), срок клиента прошёл, даты доставки нет: не
+    «срок сорван», а «внести фактическую дату доставки»; в плитки фаз и в «в срок» не идёт."""
+    o = заказ(live=False, success=True, closedRecent=True, dl=д("2026-09-01"))
+    assert lc.order_exceptions(o, СЕГОДНЯ) == [("noFact", None)]
+    assert lc.phase(o, СЕГОДНЯ) == "done"
+    life = lc.build([o], [{"deal": "100", "seq": 900, "closed": False}], СЕГОДНЯ)
+    assert "late" not in life["counts"] and life["counts"]["noFact"] == 1
+    assert all(p["late"] == 0 and p["orders"] == 0 for p in life["phases"])
+    assert life["otd"]["last90"]["n"] == 0 and life["otd"]["deals90"]["n"] == 0
+    # живой заказ без даты доставки при прошедшем сроке — просрочка, как и была
+    assert ("late", 48) in lc.order_exceptions(заказ(dl=д("2026-09-01")), СЕГОДНЯ)

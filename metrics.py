@@ -10,7 +10,9 @@ from collections import Counter, defaultdict
 from statistics import mean
 
 import kprules
+from people import TECH_CATS
 from period import Period, parse_dt, workdays
+from period import now as _now
 from stages import BUCKETS, CLOSED, classify_stage, deal_reached_tkp
 
 KP_RULES_SINCE = "2026-10-19"      # config.KP_RULES_SINCE (правила отметки КП)
@@ -30,6 +32,35 @@ def _days(created: str, moved: str) -> int | None:
     if not a or not b:
         return None
     return max((b - a).days, 0)
+
+
+def req_expected(d: dict) -> bool:
+    """Ожидается ли у сделки периода запрос поставщику — знаменатель покрытия.
+
+    Одна точка правды для metrics.build и main.py (список непокрытых и недельная
+    динамика): две копии предиката правились бы порознь (правило 14).
+
+    Запрос ожидается у живой сделки с суммой (сумма > 0, статус ≠ F), если это
+    не сделка-RFQ самого сорсинга (тайтл с «RFQ»), не тестовая и не из
+    технической воронки (people.TECH_CATS: реклама, тестовые, адаптационная).
+    €0 и отказы — «запрос не требуется (пока)», а не пропуск. Бюджетные оценки
+    отдельно не исключаются: признака у сделки нет.
+
+    Оговорка, которую несёт подпись на странице: в пресейле сумма ставится
+    после сравнения КП (presale.py), поэтому его сделки входят в знаменатель
+    почти только после сорсинга, и покрытие пресейла завышено."""
+    t = str(d.get("TITLE") or "")
+    if float(d.get("OPPORTUNITY") or 0) <= 0:
+        return False
+    if (d.get("STAGE_SEMANTIC_ID") or "").upper() == "F":
+        return False
+    if str(d.get("CATEGORY_ID") or "0") in TECH_CATS:
+        return False
+    if t.strip().upper().startswith("RFQ"):
+        return False
+    if "test" in t.lower() or "тест" in t.lower():
+        return False
+    return True
 
 
 def build(
@@ -169,7 +200,13 @@ def build(
     # «Сорсер» сделки), остаются в его итоге — это работа отдела, — но в темп не
     # идут и считаются отдельно: такие сделки надо переписать на действующего.
     staff = staff or {}
-    recent_from = max(period.start, period.end - dt.timedelta(days=27))
+    # Сегодняшний день ещё идёт: сборка в 9 утра делила бы запросы четырёх недель
+    # на 20 рабочих дней, из которых последний прожит на треть, — темп занижен
+    # до 5 %. Окно «сейчас» закрывается вчерашним днём и остаётся длиной 28 дней.
+    # Сборка за прошлый период (конец раньше сегодня) не меняется.
+    today = _now().date()
+    pace_end = today - dt.timedelta(days=1) if period.end >= today else period.end
+    recent_from = max(period.start, pace_end - dt.timedelta(days=27))
     ОКНО_КОРОТКОЕ = 20        # рабочих дней: меньше четырёх недель — темп неустойчив
 
     def window(uid: str, items: list[dict]) -> tuple[dt.date, dt.date, bool, bool]:
@@ -226,21 +263,36 @@ def build(
         tkp = sum(1 for r in items if deal_state(r.get("parentId2")) == "tkp")
         w_from, w_to, active, est = window(uid, items)
         made = [parse_dt(r.get("createdTime", "")) for r in items]
-        in_win = sum(1 for d in made if d and w_from <= d <= w_to)
+        # темп окна у действующего — тоже по вчерашний день (pace_end): стрелка
+        # ▲▼ сравнивает его с темпом «за 4 недели», и разные концы окон дали бы
+        # ложный ▲ при ровной работе
+        p_to = min(w_to, pace_end) if active else w_to
+        in_win = sum(1 for d in made if d and w_from <= d <= p_to)
+        wdp = workdays(w_from, p_to)
         after_left = sum(1 for d in made if d and d > w_to) if not active else 0
         wd = workdays(w_from, w_to)
         # «сейчас» есть только у действующего: ушедший в рейтинг не входит
-        r_from, r_to = max(recent_from, w_from), w_to
+        r_from, r_to = max(recent_from, w_from), min(w_to, pace_end)
         wd4 = workdays(r_from, r_to) if active and r_from <= r_to else 0
         c4 = sum(1 for d in made if d and r_from <= d <= r_to) if wd4 else 0
+        # из них карточек служебной записи (робот пресейла), отнесённых человеку
+        # по полю «Сорсер» сделки или следу: темп с роботом и без него — разный труд
+        robot4 = sum(1 for r in items
+                     if (str(r.get("createdBy") or "") in service or str(r.get("assignedById") or "") in service)
+                     and (d := parse_dt(r.get("createdTime", ""))) and r_from <= d <= r_to) if wd4 else 0
         details = []
         viol: Counter = Counter()
         viol_cards = 0
+        viol_pre = 0
         for r in items:
             wi = period.week_index(parse_dt(r.get("createdTime", "")))
-            fl = kprules.card_flags(r, period.end, PAW_STALE_DAYS)
+            # «до правил» (наследие и льготный срок) — список на доразметку,
+            # нарушением не считается (kprules.split_flags). Карточка в счёте
+            # «до правил» — только без нарушений: иначе она стояла бы в обоих
+            fl, flp = kprules.split_flags(r, period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
             viol.update(fl)
             viol_cards += bool(fl)
+            viol_pre += bool(flp) and not fl
             details.append({
                 "id": str(r.get("id")),
                 "subj": (r.get("title") or "—")[:90],
@@ -249,8 +301,10 @@ def build(
                 "wk": wi if wi is not None else -1,
                 "dt": (r.get("createdTime") or "")[:10],
                 "dtx": (r.get("createdTime") or ""),   # полная метка для хронологической сортировки
-                # нарушения правил отметки КП — только где есть (пустой список не везём)
+                # нарушения правил отметки КП — только где есть (пустой список не везём);
+                # признаки «до правил» (наследие, льготный срок) — отдельным полем «flp»
                 **({"fl": fl} if fl else {}),
+                **({"flp": flp} if flp else {}),
             })
         by_supplier = [{"sup": s, "n": n} for s, n in Counter(d["sup"] for d in details).most_common()]
         nsup = sum(1 for x in by_supplier if x["sup"] not in ("—", "", None))
@@ -267,10 +321,13 @@ def build(
             "wd": wd,
             "short": wd < ОКНО_КОРОТКОЕ,
             "c": c,
-            # запросов в рабочий день СВОЕГО окна, а не всего периода
-            "perDay": _round(in_win / wd) if wd else 0,
+            # запросов в рабочий день СВОЕГО окна, а не всего периода (у действующего —
+            # по вчерашний день, как и perDay4); рабочих дней в окне нет (первый
+            # день работы, ушёл до начала периода) — темп не измерен: None, «—»
+            "perDay": _round(in_win / wdp) if wdp else None,
             "c4": c4,
             "perDay4": _round(c4 / wd4) if wd4 else None,
+            "robot4": robot4,
             "wk": wk,
             "buckets": buckets,
             "closed": closed,
@@ -283,15 +340,24 @@ def build(
             "kp": buckets["selected"] + buckets["notsel"],
             "refusedCol": buckets["refused"] + buckets["other"],
             "noAnswer": buckets["no_answer"],
-            "avgDays": _round(mean(durs)) if durs else 0,
+            # нет закрытых — срока нет: None, а не 0 («самый быстрый»)
+            "avgDays": _round(mean(durs)) if durs else None,
             "tkp": tkp,
             "tkpP": _pct(tkp, c),
             "details": details,
             "bySupplier": by_supplier,
-            # нарушения правил отметки КП: только ненулевые коды (kprules.FLAGS)
+            # нарушения правил отметки КП: только ненулевые коды (kprules.FLAGS),
+            # без признаков «до правил» (kprules.split_flags); карточек только
+            # с такими признаками, без нарушений, — violPre
             "viol": dict(viol),
             "violN": viol_cards,
+            "violPre": viol_pre,
         }
+        if active:
+            # окно, по которому посчитан perDay (по вчерашний день): подпись темпа
+            # на странице показывает его, а не окно работы целиком
+            row["pto"] = p_to.isoformat()
+            row["wdp"] = wdp
         if not active:
             # открытые карточки ушедшего никто не ведёт — их надо переназначить
             row["open"] = c - closed
@@ -306,7 +372,7 @@ def build(
     # ушедшие — отдельной группой в конце, по объёму.
     sourcers_a.sort(key=lambda s: (not s["act"],
                                    -(s["perDay4"] or 0) if s["act"] else 0,
-                                   -s["perDay"] if s["act"] else 0,
+                                   -(s["perDay"] or 0) if s["act"] else 0,
                                    -s["c"]))
 
     # ---- разнообразие поставщиков (блок A): топ запрошенных + общий охват
@@ -341,8 +407,11 @@ def build(
     # остальных — неделя последнего движения. Оговорка стоит рядом с графиком.
     #
     # Второй столбец — КП с итогом (правило 19.10.2026, п. 9): карточки на
-    # Selected или «КП есть, не выбран». Разрыв между столбцами — КП, которым
-    # итог ещё не поставлен (Price at Work) или которые не отмечены стадией.
+    # Selected или «КП есть, не выбран». Это НЕЗАВИСИМЫЕ счёты: «с итогом» —
+    # по стадии, файл не проверяется; «засчитано» — по файлу при любой стадии.
+    # Разница столбцов не равна числу КП без итога: Selected без файла её
+    # уменьшают, файл на стадии до КП или при отказе — увеличивают; она бывает
+    # и отрицательной.
     kp_got = [0] * n_weeks
     kp_taken = [0] * n_weeks
     for r in rfqs:
@@ -377,11 +446,29 @@ def build(
         # сорсеров в отделе на этой неделе — по окнам работы: рост или падение
         # запросов отдела читается вместе с наймом и уходом людей
         hc = sum(1 for s in sourcers_a if s["from"] <= w.end.isoformat() and s["to"] >= w.start.isoformat())
-        weekly.append({"w": w.label, "d": w.days, "A": a, "B": b,
-                       "kp": kp_got[i], "kpa": kp_taken[i], "inb": kp_mail[i], "hc": hc})
+        row = {"w": w.label, "d": w.days, "A": a, "B": b,
+               "kp": kp_got[i], "kpa": kp_taken[i], "inb": kp_mail[i], "hc": hc}
+        # Неделя бывает неполной: первая обрезана началом периода (01.05.2026 —
+        # пятница, один рабочий день), последняя — концом периода или ещё идёт.
+        # Без пометки короткий столбец читается как обвал. part — сколько рабочих
+        # дней недели (из пяти) прожито целиком; cur — неделя ещё идёт. Неделя,
+        # где не хватает только выходных, полной считается.
+        cur = w.end >= today
+        done = workdays(w.start, min(w.end, today - dt.timedelta(days=1)) if cur else w.end)
+        if done < 5:
+            row["part"] = done
+            if cur:
+                row["cur"] = True
+        weekly.append(row)
 
     total = len(rfqs)
     a_total = sum(1 for r in rfqs if r["_owner"] in dept_a_ids)
+    # Блок B = всего − A, и в него попадают карточки без исполнителя: «сорсер в
+    # сделке не указан» (сделка отдела, сорсер не назначен — решение владельца
+    # 23.09.2026: запрос ничей) и «не определён» (ни сделки, ни следа человека).
+    # Это не чужая работа: число называется рядом с B, чтобы его не читали как
+    # запросы других подразделений.
+    unresolved_by = Counter(r["_ownerBy"] for r in rfqs if not r["_owner"])
     open_all = sum(1 for r in rfqs if classify_stage(r.get("stageId", "")) not in CLOSED)
     closed_all = total - open_all
 
@@ -391,11 +478,16 @@ def build(
     quotes_a = sum(s["quotes"] for s in sourcers_a)
     c_a = sum(s["c"] for s in sourcers_a)
 
-    # ---- правила отметки КП (19.10.2026): нарушения по всем карточкам периода
-    # и проверка сделок с «Экономика готова» = «Да»
-    viol_all, viol_cards = kprules.count_flags(rfqs, period.end, PAW_STALE_DAYS)
+    # ---- правила отметки КП (19.10.2026): нарушения карточек периода без признаков
+    # «до правил» (наследие и льготный срок, kprules.split_flags) — те отдельным
+    # счётом. И проверка сделок с «Экономика готова» = «Да»
+    viol_all, viol_cards = kprules.count_flags(rfqs, period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
     viol_out, viol_out_cards = kprules.count_flags(
-        [r for r in rfqs if r["_owner"] not in dept_a_ids], period.end, PAW_STALE_DAYS)
+        [r for r in rfqs if r["_owner"] not in dept_a_ids], period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
+    viol_pre, viol_pre_cards = kprules.count_before(rfqs, period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
+    _vo_pre, viol_out_pre_cards = kprules.count_before(
+        [r for r in rfqs if r["_owner"] not in dept_a_ids], period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
+    grace = kprules.grace_until(KP_RULES_SINCE, PAW_STALE_DAYS)
     econ_res = kprules.econ_check(*econ) if econ else None
     if econ_res:
         for row in econ_res["rows"]:
@@ -408,6 +500,14 @@ def build(
         "cards": viol_cards,
         "outside": dict(viol_out),
         "outsideCards": viol_out_cards,
+        "outsidePreCards": viol_out_pre_cards,
+        # «до правил»: наследие и льготный срок, нарушением не считаются;
+        # карточек — только без нарушений
+        "pre": dict(viol_pre),
+        "preCards": viol_pre_cards,
+        # последний день льготного срока: с следующего дня Price at Work без итога
+        # и файл без перевода стадии — нарушения
+        "graceUntil": grace.isoformat(),
         "paw": sum(1 for r in rfqs if classify_stage(r.get("stageId", "")) == "paw"),
         **({"econ": econ_res} if econ_res else {}),
     }
@@ -426,32 +526,22 @@ def build(
     tkp_all = chain.get("tkp", 0)
 
     # ---- покрытие сделок периода сорсингом
-    # Запрос ОЖИДАЕТСЯ только у живых оценённых сделок: есть сумма (оценили) и сделка не закрыта-минус
-    # (не отказ/отмена/проигрыш, статус ≠ F), и это не сделка-RFQ самого сорсинга (тайтл с «RFQ»).
-    # €0 (ещё не оценили) / бюджетные оценки / отказы — это «запрос не требуется (пока)», а не пропуск.
-    def _req_expected(d):
-        t = str(d.get("TITLE") or "")
-        if float(d.get("OPPORTUNITY") or 0) <= 0:
-            return False
-        if (d.get("STAGE_SEMANTIC_ID") or "").upper() == "F":
-            return False
-        if t.strip().upper().startswith("RFQ"):
-            return False
-        if "test" in t.lower() or "тест" in t.lower():
-            return False
-        return True
+    # Знаменатель — сделки, где запрос ожидается: req_expected (одна точка правды
+    # с main.py). «Глубина» ниже — число КАРТОЧЕК СП-166 на сделку, а не разных
+    # поставщиков: карточка — пара «поставщик × позиция», повторный запрос тому
+    # же поставщику — ещё одна карточка.
     rfq_by_deal: Counter = Counter(str(r.get("parentId2")) for r in rfqs if r.get("parentId2"))
-    expected = [d for d in period_deals if _req_expected(d)]
+    expected = [d for d in period_deals if req_expected(d)]
     period_ids = [str(d["ID"]) for d in expected]
     covered = [did for did in period_ids if rfq_by_deal.get(did, 0) > 0]
     n_deals = len(period_ids)
     with_req = len(covered)
 
     def hbucket(n: int) -> str:
-        return "1 пост." if n == 1 else "2–3" if n <= 3 else "4–5" if n <= 5 else "6+"
+        return "1 запрос" if n == 1 else "2–3" if n <= 3 else "4–5" if n <= 5 else "6+"
 
     hist_c = Counter(hbucket(rfq_by_deal[d]) for d in covered)
-    hist = [{"l": l, "v": hist_c.get(l, 0)} for l in ("1 пост.", "2–3", "4–5", "6+")]
+    hist = [{"l": l, "v": hist_c.get(l, 0)} for l in ("1 запрос", "2–3", "4–5", "6+")]
 
     by_cat = defaultdict(lambda: {"deals": 0, "withReq": 0, "reqs": 0})
     for d in expected:
@@ -695,6 +785,9 @@ def build(
             "total": total,
             "deptA": a_total,
             "outside": total - a_total,
+            # из них без исполнителя (входят в «вне отдела»), с разбором по звену
+            "unresolved": sum(unresolved_by.values()),
+            "unresolvedBy": dict(unresolved_by),
             "respCount": len({r["_owner"] for r in rfqs if r["_owner"]}),
             "openCount": open_all,
             "inWorkPct": _pct(open_all, total),

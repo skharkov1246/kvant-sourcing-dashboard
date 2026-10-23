@@ -67,21 +67,59 @@ def раскрыть(url: str) -> str:
         return ""
 
 
-def получить(url: str, timeout: int = 30) -> bytes | None:
+КОДЫ: collections.Counter = collections.Counter()
+
+
+def получить(url: str, timeout: int = 30, ключ: str = "") -> bytes | None:
+    """Тело ответа или None; код ответа — в КОДЫ (только счёт, без адресов)."""
+    h = {"User-Agent": "kvant-probe"}
+    if ключ:
+        h["Authorization"] = f"OAuth {ключ}"
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kvant-probe"}),
-                                    timeout=timeout) as r:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=timeout) as r:
+            КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {r.status}"] += 1
             return r.read(30 * 1024 * 1024)
-    except Exception:
+    except urllib.error.HTTPError as e:
+        # имя ошибки API (FieldValidationError и т. п.) — без описания: в нём бывает сам ключ
+        try:
+            имя = str(json.loads(e.read(4096) or b"{}").get("error") or "")[:40]
+        except Exception:
+            имя = ""
+        КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {e.code}{' ' + имя if имя else ''}"] += 1
         return None
+    except Exception as e:
+        КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {type(e).__name__}"] += 1
+        return None
+
+
+def ключ_и_путь(public_url: str) -> tuple[str, str]:
+    """https://disk.yandex.ru/d/<id>/<файл> → («…/d/<id>», «/<файл>»): API ждёт ссылку на
+    общую папку и путь внутри неё отдельно (иначе 400 DiskPublicKeyFormatError)."""
+    u = urllib.parse.urlparse(public_url)
+    части = [x for x in u.path.split("/") if x]
+    if len(части) > 2 and части[0] in ("d", "i"):
+        return (f"{u.scheme}://{u.netloc}/{части[0]}/{части[1]}",
+                "/" + "/".join(urllib.parse.unquote(x) for x in части[2:]))
+    return public_url, ""
 
 
 def ресурс(public_url: str) -> dict | None:
-    raw = получить(f"{API}?public_key={urllib.parse.quote(public_url, safe='')}&limit=200")
-    try:
-        return json.loads(raw) if raw else None
-    except json.JSONDecodeError:
-        return None
+    """Публичный ресурс Диска: сначала без ключа, не вышло — с ключом прогона (YADISK_TOKEN)."""
+    pk, путь = ключ_и_путь(public_url)
+    адрес = (f"{API}?public_key={urllib.parse.quote(pk, safe='')}&limit=200"
+             + (f"&path={urllib.parse.quote(путь, safe='')}" if путь else ""))
+    for ключ in ("", os.environ.get("YADISK_TOKEN", "").strip()):
+        if ключ is None:
+            continue
+        raw = получить(адрес, ключ=ключ)
+        if raw:
+            try:
+                return json.loads(raw)
+            except json.JSONDecodeError:
+                return None
+        if not os.environ.get("YADISK_TOKEN", "").strip():
+            break
+    return None
 
 
 def разобрать_xlsx(b: bytes, сч: collections.Counter) -> None:
@@ -128,13 +166,46 @@ def main() -> int:
             цель = (q.get("url") or [""])[0]
             сч["через страницу проверки ссылок Яндекса"] += 1
         host = urllib.parse.urlparse(цель).netloc
+        # форма адреса — без самого адреса: сколько частей пути, есть ли запрос и пробелы
+        пу = urllib.parse.urlparse(цель)
+        # первые части пути — только служебные слова Диска, остальное «…»
+        СЛОВА = {"d", "i", "client", "disk", "edit", "public", "docs", "mail", "recent", "shared"}
+        части = [x for x in пу.path.split("/") if x]
+        сч["вид пути: /" + "/".join(x if x in СЛОВА else "…" for x in части[:2])] += 1
+        сч[f"форма: частей пути {len(части)}"
+           f"{' · с запросом' if пу.query else ''}{' · пробел' if ' ' in цель.strip() else ''}"
+           f"{' · хвост-пробел' if цель != цель.strip() else ''}"] += 1
+        цель = цель.strip()
         вид = ("Диск: файл" if "disk.yandex" in host and "/i/" in цель else
                "Диск: папка или файл (/d/)" if "disk.yandex" in host else
                "не раскрылась" if not цель else f"другое: {host}")
         сч[f"ссылка → {вид}"] += 1
         if "disk.yandex" not in host:
             continue
-        р = ресурс(цель)
+        личный = части[:2] == ["client", "disk"] or части[:1] == ["edit"]
+        if личный:
+            # ссылка на личный Диск (открывается только вошедшему в аккаунт):
+            # читается ключом прогона по пути disk:/…, если ключ от того же аккаунта
+            # /client/disk/<папка>/<файл> и /edit/disk/disk%2F<папка>%2F<файл>: путь от корня Диска
+            путь = "/".join(urllib.parse.unquote(x) for x in части[2:])
+            if части[0] == "edit" and путь.startswith("disk/"):
+                путь = путь[len("disk/"):]
+            тк = os.environ.get("YADISK_TOKEN", "").strip()
+            if not тк:
+                сч["личный Диск: ключа нет"] += 1
+                continue
+            raw = получить(f"https://cloud-api.yandex.net/v1/disk/resources?path={urllib.parse.quote('disk:/' + путь.lstrip('/'), safe='')}&limit=200", ключ=тк)
+            time.sleep(0.5)
+            if not raw:
+                сч["личный Диск: ключ не читает путь"] += 1
+                continue
+            сч["личный Диск: ключ читает путь"] += 1
+            try:
+                р = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+        else:
+            р = ресурс(цель)
         time.sleep(0.5)
         if not р or "type" not in р:
             сч["Диск: публичный ресурс недоступен без ключа"] += 1
@@ -153,13 +224,24 @@ def main() -> int:
         if not файл or not str(файл.get("name", "")).lower().endswith((".xlsx", ".xlsm")):
             continue
         href = файл.get("file")
-        b = получить(href) if href else None
+        if not href and not личный:
+            pk, путь = ключ_и_путь(цель)
+            raw = получить(f"{API}/download?public_key={urllib.parse.quote(pk, safe='')}"
+                           + (f"&path={urllib.parse.quote(путь, safe='')}" if путь else ""))
+            try:
+                href = json.loads(raw).get("href") if raw else None
+            except json.JSONDecodeError:
+                href = None
+        b = (получить(href, ключ=os.environ.get("YADISK_TOKEN", "").strip() if личный else "")
+             if href else None)
         time.sleep(0.5)
         if not b:
             сч["xlsx: не скачался"] += 1
             continue
         разобрать_xlsx(b, сч)
-    print(f"выборка: {len(выборка)} последних сделок со ссылкой")
+    print(f"выборка: {len(выборка)} последних сделок со ссылкой; ключ Диска в прогоне: "
+          f"{'есть' if os.environ.get('YADISK_TOKEN', '').strip() else 'нет'}")
+    print("коды ответов Диска: " + " · ".join(f"{k} {v}" for k, v in sorted(КОДЫ.items())))
     for k, v in sorted(сч.items()):
         print(f"  {k}: {v}")
     return 0

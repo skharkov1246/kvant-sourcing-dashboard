@@ -37,11 +37,16 @@ import period as period_mod
 import presale as presale_mod
 import reps as reps_mod
 from bitrix_client import BitrixClient, chat_reader_client, drop_lost, без_вебхука
+from stages import classify_stage
 
 RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
               # следы живого человека на карточке робота: кто двигал стадию,
               # кто менял, кто последним отметился в таймлайне
               "movedBy", "updatedBy", "lastActivityBy",
+              # когда и кто менял карточку последним (updatedBy — строкой выше):
+              # «файл при отказе или молчании» — наследие до правил 19.10, если
+              # карточку с тех пор не меняли или менял не её сорсер (kprules)
+              "updatedTime",
               "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact",
               # файлы КП со стороны поставщика: по ним считается «получено КП».
               # Маска "*" файловых полей не возвращает — только поимённо.
@@ -285,12 +290,26 @@ def _send_stats(acts: list[dict], rfqs: list[dict], sourcer_rows: list[dict],
         if u in dept_a_ids:
             by_user[u].append(r)
 
+    # «Двинута без письма в CRM» (прежде «фейк»): карточка вышла из «Новый», а
+    # исходящего CRM-письма на ней нет. Не считаются карточки, где реакция
+    # поставщика записана иначе: файл КП приложен, или стадия фиксирует ответ —
+    # переписка без цены, Price at Work, Selected, не выбран, отказ. «Ответ не
+    # получен» ответа как раз не фиксирует и остаётся в счёте: ни письма в CRM,
+    # ни ответа. Письма из личной почты система не видит: входящих на карточках
+    # ноль (замер 23.09.2026).
+    КОНТАКТ_ДОКАЗАН = {"dialog", "paw", "selected", "notsel", "refused"}
+
+    def _без_письма(r: dict) -> bool:
+        return (r.get("stageId") != SPA_NEW_STAGE and not counts.get(str(r["id"]))
+                and not r.get("_hasQuote")
+                and classify_stage(str(r.get("stageId") or "")) not in КОНТАКТ_ДОКАЗАН)
+
     rows = []
     for s in sourcer_rows:  # уже блок A: действующие по темпу, затем ушедшие
         items = by_user.get(s["id"], [])
         total = len(items)
         sent = sum(1 for r in items if counts.get(str(r["id"])))
-        fake = sum(1 for r in items if r.get("stageId") != SPA_NEW_STAGE and not counts.get(str(r["id"])))
+        fake = sum(1 for r in items if _без_письма(r))
         followup = sum(1 for r in items if counts.get(str(r["id"]), 0) >= 2)
         rows.append({
             "id": s["id"], "n": s["n"], "act": s.get("act", True),
@@ -607,14 +626,11 @@ def run(args) -> int:
                 _mail_cards += 1
     print(f"  писем привязано к карточкам: {_mail_cards}")
 
-    # список непокрытых сделок: только там, где запрос ОЖИДАЕТСЯ — живые оценённые сделки
-    # (есть сумма, статус ≠ F, не сделка-RFQ сорсинга). €0/БО/отказы/отмены — «запрос не требуется».
-    # (предикат должен совпадать с metrics._req_expected)
-    _exp = lambda d: (float(d.get("OPPORTUNITY") or 0) > 0
-                      and (d.get("STAGE_SEMANTIC_ID") or "").upper() != "F"
-                      and not str(d.get("TITLE") or "").strip().upper().startswith("RFQ")
-                      and "test" not in str(d.get("TITLE") or "").lower()
-                      and "тест" not in str(d.get("TITLE") or "").lower())
+    # список непокрытых сделок: только там, где запрос ОЖИДАЕТСЯ — живые сделки с суммой
+    # (статус ≠ F, не сделка-RFQ сорсинга, не тестовая и не техническая воронка). €0 и
+    # отказы — «запрос не требуется». Предикат один на оба места — metrics.req_expected
+    # (правило 14: копии правились бы порознь).
+    _exp = metrics_mod.req_expected
     try:
         _rfqpar = {str(r.get("parentId2")) for r in rfqs if r.get("parentId2")}
         _unc = [d for d in period_deals if str(d["ID"]) not in _rfqpar and _exp(d)]
@@ -847,7 +863,8 @@ def run(args) -> int:
         _g, _sp = contracts_data.get("gone") or {}, contracts_data.get("speed") or {}
         # только счётчики: суммы сделок в публичный журнал не идут (правило 17)
         print(f"  ведёт уволенный: открытых сделок {_g.get('deals', 0)} (ответственный {_g.get('byManager', 0)}, "
-              f"ОСС {_g.get('byOss', 0)}), живых заказов {_g.get('orders', 0)}, с просрочкой {_g.get('late', 0)}, "
+              f"ОСС {_g.get('byOss', 0)}, ответственный заказа {_g.get('byResp', 0)}), "
+              f"живых заказов {_g.get('orders', 0)}, с просрочкой {_g.get('late', 0)}, "
               f"уволенных {_g.get('people', 0)}; нормы стадий по {_sp.get('benchDays')} дн: "
               f"{_sp.get('benchRecent', 0)} стадий, медиана цикла заказа {_sp.get('medCycle')} дн")
     except Exception as e:
@@ -959,10 +976,10 @@ def _print_summary(m: dict) -> None:
     k = m["kpi"]
     print("\n── СВОДКА ─────────────────────────────")
     print(f"Всего RFQ: {k['total']}  (A={k['deptA']} / B={k['outside']}),  ответственных: {k['respCount']}")
-    print(f"В работе: {k['openCount']} ({k['inWorkPct']}%)  ·  КП засчитано (A): {k['kpCountA']} ({k['kpPctA']}% запросов) · с КП из закрытых: {k['kpPctOfClosedA']}%  ·  до ТКП: {k['tkpPct']}%")
+    print(f"В работе: {k['openCount']} ({k['inWorkPct']}%)  ·  КП засчитано (A): {k['kpCountA']} ({k['kpPctA']}% запросов) · с КП из закрытых: {k['kpPctOfClosedA']}%  ·  до ТКП (на странице скрыто — по текущей стадии сделки): {k['tkpPct']}%")
     print(f"Цепочка: ранние {m['chain']['early']} / ТКП {m['chain']['tkp']} / проигр. {m['chain']['lost']}")
     cov = m["coverage"]
-    print(f"Покрытие сделок: {cov['withReq']}/{cov['deals']} ({cov['covPct']}%), ср. поставщиков {cov['avgSuppliers']}")
+    print(f"Покрытие сделок: {cov['withReq']}/{cov['deals']} ({cov['covPct']}%), ср. запросов на сделку {cov['avgSuppliers']}")
     print("\nБлок A по сорсерам:")
     for s in m["sourcersA"]:
         chk = s["closed"]

@@ -242,3 +242,78 @@ def test_оплата_получена_это_успех(ct):
     r = _row(ct, "3")
     assert r["paidStage"] and r["closed"] and r["done"] and not r["lost"] and not r["slow"]
     assert ct["head"]["paidStage"] == 1 and ct["head"]["live"] == 2
+
+
+def _посчитать(п, люди=None):
+    import os
+    os.environ["KVANT_NOW"] = СЕЙЧАС
+    try:
+        return contracts_mod.compute(п, as_of=dt.date(2026, 10, 9), people=люди or {}, service_ids={"542"})
+    finally:
+        os.environ.pop("KVANT_NOW", None)
+
+
+ЛЮДИ = {"10": {"name": "Астахова Вера", "active": True},
+        "20": {"name": "Донцов Юрий", "active": False},
+        "21": {"name": "Ежова Лада", "active": False},
+        "22": {"name": "Жаров Олег", "active": False}}
+
+
+def test_уволенный_ответственный_заказа_ведёт_уволенный():
+    """Ревизия 23.10.2026: «Ведёт уволенный» проверял ответственного сделки и ОСС, но не
+    ответственного заказа (Responsible person, assignedById СП-172) — хозяина исполнения.
+    Сделка 2: ответственный сделки и ОСС действуют, ответственный живого заказа 502 уволен."""
+    п = Портал()
+    п.orders[1]["assignedById"] = "22"          # 502 — живой
+    ct = _посчитать(п, ЛЮДИ)
+    r = _row(ct, "2")
+    assert (r["managerGone"], r["ossGone"], r["respGone"]) == (False, False, True)
+    o502 = next(o for o in r["orders"] if o["id"] == "502")
+    assert o502["respGone"] is True and "resp" not in o502, "в строку — только признак, без подписи"
+    g = ct["gone"]
+    assert (g["deals"], g["byManager"], g["byOss"], g["byResp"], g["people"]) == (2, 1, 1, 1, 3)
+    # «живых заказов — переназначить»: все живые заказы сделки с уволенным ответственным
+    # и только заказ с уволенным ответственным в другой сделке — не все её заказы
+    ждут = sum(1 for r in ct["rows"] if r["deal"] == "1" for o in r["orders"] if o["live"]) + 1
+    assert g["orders"] == ждут, (g["orders"], ждут)
+    gone = {q["deal"]: q for q in ct["life"]["queue"] if q["code"] == "gone"}
+    assert set(gone) == {"1", "2"} and ct["life"]["counts"]["gone"] == 2
+    assert gone["2"]["what"] == "ведёт уволенный: ответственный заказа"
+    assert gone["1"]["what"] == "ведёт уволенный: ответственный сделки, ОСС"
+    # пункты заказа 502 — на уволенном хозяине, с пометкой (подпись справочника людей)
+    q502 = [q for q in ct["life"]["queue"] if q["order"] == "502"]
+    assert q502 and all(q["who"] == "Жаров Олег (уволен)" and q["whoGone"] for q in q502)
+
+
+def test_уволенный_ответственный_закрытого_заказа_не_в_счёт():
+    """Признак — только у живого заказа: исполненный (успех) и проигранный заказ никто
+    не ведёт, переназначать нечего. Действующий ответственный — не уволенный."""
+    п = Портал()
+    п.orders[2]["assignedById"] = "22"          # 503 — своя стадия провала
+    п.orders[3]["assignedById"] = "22"          # 504 — закрыт успехом
+    п.orders[3]["stageId"] = "DT172_26:SUCCESS"
+    п.orders[1]["assignedById"] = "10"          # 502 — живой, ответственный действует
+    ct = _посчитать(п, ЛЮДИ)
+    r = _row(ct, "2")
+    assert r["respGone"] is False and not any(o["respGone"] for o in r["orders"] if o["live"])
+    assert next(o for o in r["orders"] if o["id"] == "504")["respGone"] is True, "у заказа — как есть, как ossGone"
+    assert ct["gone"]["deals"] == 1 and ct["gone"]["byResp"] == 0
+    assert {q["deal"] for q in ct["life"]["queue"] if q["code"] == "gone"} == {"1"}
+
+
+def test_доставлено_по_стадии_без_даты_не_просрочка():
+    """Заказ в стадии успеха (семантика S) без «Customer delivery date, actual» при
+    прошедшем сроке клиента: не просрочка — ни у заказа, ни у сделки, ни в очереди; пункт —
+    «внести фактическую дату доставки» (noFact). Стадию «доставлено» с семантикой P по
+    имени не угадываем: имена стадий у воронок свои."""
+    п = Портал()
+    п.orders.append({"id": 505, "title": "902/4. Компрессор", "companyId": "", "parentId2": 2,
+                     "opportunity": 5000, "currencyId": "EUR", "stageId": "DT172_26:SUCCESS",
+                     "createdTime": _t(80), "movedTime": _t(5), DL: _t(15)[:10], OSS: "11"})
+    ct = _посчитать(п)
+    r = _row(ct, "2")
+    o505 = next(o for o in r["orders"] if o["id"] == "505")
+    assert o505["live"] is False and o505["late"] is False and r["late"] is False
+    life = ct["life"]
+    assert life["counts"].get("late") == 1, "просрочка — только заказ 501 сделки 1"
+    assert [q["code"] for q in life["queue"] if q["order"] == "505"] == ["noFact"]
