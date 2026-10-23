@@ -122,6 +122,27 @@ def ресурс(public_url: str) -> dict | None:
     return None
 
 
+def таблицы_диска(ключ: str, макс: int = 20000) -> dict[str, list[dict]]:
+    """Все таблицы на Диске ключа (включая принятые общие папки): имя файла → ресурсы.
+    Файл из ссылки сотрудника лежит у получателя по другому пути — ищем по имени."""
+    по_имени: dict[str, list[dict]] = collections.defaultdict(list)
+    смещение = 0
+    while смещение < макс:
+        raw = получить("https://cloud-api.yandex.net/v1/disk/resources/files?media_type=spreadsheet"
+                       f"&limit=1000&offset={смещение}&fields=items.name,items.path,items.file,items.modified",
+                       ключ=ключ)
+        if not raw:
+            break
+        items = json.loads(raw).get("items") or []
+        for x in items:
+            по_имени[str(x.get("name", "")).lower()].append(x)
+        if len(items) < 1000:
+            break
+        смещение += 1000
+        time.sleep(0.5)
+    return по_имени
+
+
 def разобрать_xlsx(b: bytes, сч: collections.Counter) -> None:
     import openpyxl
     try:
@@ -156,6 +177,9 @@ def main() -> int:
 
     выборка = sorted(со_ссылкой, key=lambda d: str(d.get("DATE_CREATE") or ""), reverse=True)[:МАКС]
     сч: collections.Counter = collections.Counter()
+    тк_диска = os.environ.get("YADISK_TOKEN", "").strip()
+    по_имени = таблицы_диска(тк_диска) if тк_диска else {}
+    print(f"таблиц на Диске ключа: {sum(len(v) for v in по_имени.values())}")
     for d in выборка:
         url = str(d[ct.ECON_LINK]).strip()
         цель = раскрыть(url) if "clck.ru" in url else url
@@ -196,10 +220,28 @@ def main() -> int:
                 continue
             raw = получить(f"https://cloud-api.yandex.net/v1/disk/resources?path={urllib.parse.quote('disk:/' + путь.lstrip('/'), safe='')}&limit=200", ключ=тк)
             time.sleep(0.5)
+            как = "полный путь" if raw else ""
+            куски = путь.strip("/").split("/")
+            for i in range(1, len(куски) - 1):
+                if raw:
+                    break
+                # общая папка у получателя лежит в корне под своим именем: хвост пути
+                raw = получить("https://cloud-api.yandex.net/v1/disk/resources?path="
+                               + urllib.parse.quote("disk:/" + "/".join(куски[i:]), safe="") + "&limit=200", ключ=тк)
+                как = "хвост пути" if raw else ""
+                time.sleep(0.3)
             if not raw:
-                сч["личный Диск: ключ не читает путь"] += 1
+                кандидаты = по_имени.get(куски[-1].lower(), [])
+                if len(кандидаты) == 1:
+                    raw, как = json.dumps(dict(кандидаты[0], type="file")).encode(), "имя файла"
+                elif кандидаты:
+                    # одноимённых несколько — берём свежий, считаем отдельно
+                    свежий = max(кандидаты, key=lambda x: x.get("modified", ""))
+                    raw, как = json.dumps(dict(свежий, type="file")).encode(), "имя файла (из нескольких)"
+            if not raw:
+                сч["личный Диск: не найден ни по пути, ни по имени"] += 1
                 continue
-            сч["личный Диск: ключ читает путь"] += 1
+            сч[f"личный Диск: найден — {как}"] += 1
             try:
                 р = json.loads(raw)
             except json.JSONDecodeError:
