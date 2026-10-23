@@ -32,13 +32,17 @@ export const TABS = [
   // ролей, и направления по клиентам, и продуктовые линии.
   { id: "reps",      title: "КАМ и продукт-оунеры",pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"],
     note: "внутри обе роли: КАМы и продукт-оунеры — выдача открывает оба разреза" },
-  { id: "contracts", title: "Реализация",        pay: ["CONTRACTS"], share: "suppliers" },
+  { id: "contracts", title: "Реализация",        pay: ["CONTRACTS", "DEALCTX"], share: "suppliers" },
   { id: "suppliers", title: "Поставщики",        pay: ["CONTRACTS"], share: "contracts" },
   { id: "cohorts",   title: "Когорты",           pay: ["COMPANY"],   share: "company" },
   { id: "advisor",   title: "Советы знатока",    pay: ["ADVISOR"] },
 ];
 export const TAB_IDS = TABS.map((t) => t.id);
-const ALL_PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR"];
+// DEALCTX — закрытая часть «Реализации»: на проде её оставляет право «договоры и
+// деньги» (access/acl.js, RIGHT_PAYLOADS); тонких прав в контуре нет — только админу
+const ADMIN_PAYLOADS = new Set(["DEALCTX"]);
+const ALL_PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR",
+  "DEALCTX"];
 const TITLE = Object.fromEntries(TABS.map((t) => [t.id, t.title]));
 
 const SESSION_DAYS = 30;       // срок сессионной куки
@@ -259,9 +263,9 @@ export function applyAcl(html, tabs, who) {
   //    сводится к пустой строке/нулю при выводе, поэтому страница остаётся живой без данных.
   const need = new Set();
   for (const t of TABS) if (allow.has(t.id)) for (const p of t.pay) need.add(p);
-  const cut = ALL_PAYLOADS.filter((p) => !need.has(p));
+  const cut = ALL_PAYLOADS.filter((p) => !need.has(p) || (ADMIN_PAYLOADS.has(p) && !who.admin));
   for (const p of cut) {
-    html = html.replace(new RegExp(`window\\.__${p}__ *= *[\\s\\S]*?;\\n`), `window.__${p}__ = __kvNoData();\n`);
+    html = html.replace(new RegExp(`^window\\.__${p}__ *=[^\\n]*;$`, "gm"), `window.__${p}__ = __kvNoData();`);
   }
   if (cut.length) html = html.replace("<body>", "<body>\n" + NO_DATA_STUB);
   // 4) «Сорсинг» — единственная вкладка со статической разметкой: если её нет, прячем панель

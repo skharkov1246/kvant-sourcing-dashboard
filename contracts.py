@@ -19,9 +19,10 @@ import datetime as dt
 import json
 import pathlib
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 import chat_activity
+import dealctx
 import lifecycle
 import period as period_mod
 from bitrix_client import BitrixClient
@@ -194,25 +195,49 @@ def _median(vals: list) -> float | None:
 
 
 def _parse_econ_money(raw, rate) -> float:
-    """Bitrix money-поле '1234.56|RUB' → €. 0 если пусто/мусор."""
+    """Bitrix money-поле '1234.56|RUB' → €. 0 если пусто/мусор или курса валюты нет в
+    справочнике Битрикса: до 23.10.2026 такая валюта считалась 1:1 к базовой."""
     s = str(raw or "")
     if "|" not in s:
         return 0.0
     amt, cur = s.split("|", 1)
+    if cur and cur not in rate:
+        return 0.0
     try:
         return float(amt or 0) * rate.get(cur, 1.0)
     except ValueError:
         return 0.0
 
 
+def _econ_cur(raw) -> str:
+    """Валюта money-поля «сумма|ВАЛЮТА» с ненулевой суммой; иначе пусто."""
+    s = str(raw or "")
+    if "|" not in s:
+        return ""
+    amt, cur = s.split("|", 1)
+    try:
+        return cur if float(amt or 0) else ""
+    except ValueError:
+        return ""
+
+
+#: Закупка несоизмерима с продажей — данные полей, а не сделка: в разы больше или
+#: почти ноль. Числом не показывается и в итоги не идёт (случай 23.10.2026: продажа
+#: €107K, закупка €645K из полей экономики при «поставка ~30к, закуп ~15к»).
+BUY_SANE = (0.03, 3.0)
+
+
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             people: dict[str, dict] | None = None, service_ids: set[str] | None = None,
-            chat_reader: chat_activity.Reader | None = None) -> dict:
+            chat_reader: chat_activity.Reader | None = None,
+            ctx_chats: dict[str, dict] | None = None) -> dict:
     """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
     уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
     сделки и заказы не были видны как работа без хозяина.
     chat_reader — общий на сборку читатель чатов (main.py: реализация читает первой,
-    пресейл — остатком бюджета); None — свой бюджет, как раньше."""
+    пресейл — остатком бюджета); None — свой бюджет, как раньше.
+    ctx_chats — чаты сделок из закрытого свода (dealctx.load()["chats"]): оценка хода
+    моделью и последнее чтение прогоном оценки; None — «подвисла» как до 23.10.2026."""
     today = as_of or dt.date.today()
     now_iso = period_mod.now(_MSK).isoformat()
     people = people or {}
@@ -355,19 +380,35 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         if in_cat0 and not ords and seq == 0 and not d.get("OPPORTUNITY"):
             continue                      # пустышки без номера/сумм/заказов
 
-        sale = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+        # Валюта без курса в справочнике Битрикса — сумма НЕИЗВЕСТНА, а не 1:1 к базовой
+        # (так до 23.10.2026 было: 107 тыс. AED показывались как €107K)
+        sale_cur = str(d.get("CURRENCY_ID") or "")
+        fx_miss = sorted({c for c in [sale_cur] + [str(o.get("currencyId") or "") for o in ords
+                                                   if float(o.get("opportunity") or 0)]
+                          + [_econ_cur(d.get(BUY_ECON_RUB)), _econ_cur(d.get(BUY_ECON_VAL))]
+                          if c and c not in rate})
+        sale_known = not (sale_cur and sale_cur not in rate)
+        sale = eur(d.get("OPPORTUNITY"), sale_cur) if sale_known else 0.0
+        orders_known = all(not float(o.get("opportunity") or 0) or not o.get("currencyId")
+                           or str(o.get("currencyId")) in rate for o in ords)
         # --- каскад закупки: заказы → экономика (money-поля) → нет данных
-        buy_orders = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in ords)
+        buy_orders = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in ords) if orders_known else 0.0
         buy_econ = _parse_econ_money(d.get(BUY_ECON_RUB), rate) or _parse_econ_money(d.get(BUY_ECON_VAL), rate)
-        if buy_orders > 0:
+        if not orders_known:
+            buy, buy_src = 0.0, "fx"          # заказ в валюте без курса: закупка неизвестна
+        elif buy_orders > 0:
             buy, buy_src = buy_orders, "orders"
         elif buy_econ > 0:
             buy, buy_src = buy_econ, "econ"
+        elif any(_econ_cur(d.get(f)) and _econ_cur(d.get(f)) not in rate for f in (BUY_ECON_RUB, BUY_ECON_VAL)):
+            buy, buy_src = 0.0, "fx"
         else:
             buy, buy_src = 0.0, "none"
+        # закупка несоизмерима с продажей — показывается текстом, в маржу и итоги не идёт
+        buy_susp = bool(sale > 0 and buy > 0 and not BUY_SANE[0] <= buy / sale <= BUY_SANE[1])
         discrep = (buy_orders > 0 and buy_econ > 0
                    and abs(buy_orders - buy_econ) / max(buy_orders, buy_econ) > 0.2)
-        margin = (sale - buy) if (sale and buy_src != "none") else None
+        margin = (sale - buy) if (sale and buy_src in ("orders", "econ") and not buy_susp) else None
         # красный флаг: экономики проекта нет ни ссылкой на файл, ни money-полями
         econ_link = str(d.get(ECON_LINK) or "").strip()
         no_econ = not econ_link and buy_econ <= 0
@@ -474,10 +515,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             olate = bool(olive and dl_days is not None and dl_days > 0 and not delivered)
             obuy = eur(o.get("opportunity"), o.get("currencyId"))
             # стоимость отгрузки этого заказа: доля сделки пропорционально закупке
-            # (как в экономике проекта); если сумм закупки нет — поровну между живыми
-            if buy_orders > 0 and obuy > 0:
-                o_rev = sale * (obuy / buy_orders)
-            elif n_live_ords:
+            # (как в экономике проекта); если сумм закупки нет НИ У ОДНОГО заказа — поровну
+            # между живыми. Заказ без суммы при суммах у других доли не получает: доли
+            # заказов с суммой уже дают 100 % сделки (до 23.10.2026 выходило до 200 %)
+            if buy_orders > 0:
+                o_rev = sale * (obuy / buy_orders) if obuy > 0 else 0.0
+            elif n_live_ords and olive:
                 o_rev = sale / n_live_ords
             else:
                 o_rev = 0.0
@@ -552,9 +595,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "deal": did, "seq": seq, "entered": entered,
             "customer": clients.get(str(d.get("COMPANY_ID"))) or "—",
             "title": (dtitle or f"Сделка #{did}")[:90],
-            "saleEur": round(sale), "saleLbl": _money(sale),
+            # суммы в сделке нет — «суммы нет», а не «€0» (правило Р-2: ноль ≠ неизвестно)
+            "saleEur": round(sale),
+            "saleLbl": ("курса нет" if not sale_known else _money(sale) if sale else "суммы нет"),
+            # валюты без курса в справочнике Битрикса (сделка, заказы, поля экономики):
+            # такие суммы не пересчитываются и в итоги не идут
+            "fxMissing": fx_miss, "saleKnown": sale_known, "buySusp": buy_susp,
             "saleOrig": _orig(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")), "saleCur": d.get("CURRENCY_ID") or "",
-            "buyEur": round(buy), "buyLbl": _money(buy) if buy_src != "none" else "—",
+            "buyEur": round(buy),
+            "buyLbl": ("курса нет" if buy_src == "fx" else "не сходится" if buy_susp
+                       else _money(buy) if buy_src != "none" else "—"),
             "buySrc": buy_src, "buyOrdersEur": round(buy_orders), "buyEconEur": round(buy_econ),
             "discrep": discrep, "econLink": bool(econ_link), "noEcon": no_econ,
             "hasBudget": str(d.get(BUDGET_LINK) or "").startswith("http"),
@@ -634,10 +684,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
     # ПОДВИСЛА — только после чата (решение владельца 19.10.2026): простой по стадии
     # снимается, если в чате сделки за неделю писал человек; не прочитали чат —
-    # простой не подтверждён и в замедленные не идёт
+    # простой не подтверждён и в замедленные не идёт. С 23.10.2026 решает и оценка
+    # хода по чату (dealctx.decide): пишут, но ход за нами, стоит или откат — подвисла;
+    # чат сборка не прочла, а прогон оценки читал его недавно — решает он
     cands = [(r["deal"], r["_chat"], r["saleEur"]) for r in rows if not r["closed"] and r["stuck"]]
     chat = (chat_reader.check(cands, today) if chat_reader is not None
             else chat_activity.check(client, cands, today, service_ids))
+    chat_by: Counter = Counter()
     for r in rows:
         r.pop("_chat", None)
         ch = chat.get(r["deal"])
@@ -645,17 +698,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             r["chat"] = None
             continue
         r["chat"] = ch
-        if ch["status"] == "quiet":
-            r["why"] += (" · " if r["why"] else "") + (f"в чате тихо {ch['days']} дн." if ch["days"] is not None
-                                                        else "в чате людей не было")
-        else:
+        stuck, note, _подробно, src = dealctx.decide(ch, (ctx_chats or {}).get(str(r["deal"])), today)
+        chat_by[src] += 1
+        if not stuck:
             r["stuck"] = False
             r["slow"] = bool(r["late"])
             # «не проверено» — не «всё хорошо»: серая корзина, сделка видна отдельным фильтром
-            r["chatUnverified"] = ch["status"] in ("unread", "skipped")
-            note = (f"в чате работа: последнее сообщение {ch['days']} дн. назад — не подвисла"
-                    if ch["status"] == "active" else "чат не проверен — простой не подтверждён")
-            r["why"] += (" · " if r["why"] else "") + note
+            r["chatUnverified"] = stuck is None
+        r["why"] += (" · " if r["why"] else "") + note
     chat_sum = chat_activity.summary(chat)
     live_rows = [r for r in rows if not r["closed"]]
     slow_rows = [r for r in live_rows if r["slow"]]
@@ -780,12 +830,20 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                        "nowMed": round(_median(a["days"]) or 0, 1)})
 
     maxseq = max((r["seq"] for r in rows), default=0)
-    sale_sum = sum(r["saleEur"] for r in rows)
-    buy_sum = sum(r["buyEur"] for r in rows)
-    margin_sum = sum(r["marginEur"] for r in rows if r["marginEur"] is not None)
-    sale_m = sum(r["saleEur"] for r in rows if r["marginEur"] is not None)
-    n_econ = sum(1 for r in rows if r["buySrc"] == "econ")
-    n_nobuy = sum(1 for r in rows if r["buySrc"] == "none")
+    # Итоги — по ОТКРЫТЫМ сделкам (до 23.10.2026 — по всем, с проигранными и закрытыми
+    # за всю историю): «Σ продажи» стоит рядом с «В работе» и читается как портфель.
+    # Сумма в валюте без курса и закупка, несоизмеримая с продажей, в итоги не идут —
+    # их число показывается рядом.
+    sale_sum = sum(r["saleEur"] for r in live_rows if r["saleKnown"])
+    buy_sum = sum(r["buyEur"] for r in live_rows if r["buySrc"] in ("orders", "econ") and not r["buySusp"])
+    margin_sum = sum(r["marginEur"] for r in live_rows if r["marginEur"] is not None)
+    sale_m = sum(r["saleEur"] for r in live_rows if r["marginEur"] is not None)
+    n_econ = sum(1 for r in live_rows if r["buySrc"] == "econ" and not r["buySusp"])
+    n_nobuy = sum(1 for r in live_rows if r["buySrc"] == "none")
+    n_fx = sum(1 for r in live_rows if r["fxMissing"])
+    n_nosale = sum(1 for r in live_rows if r["saleKnown"] and not r["saleEur"])
+    n_buy_susp = sum(1 for r in live_rows if r["buySusp"])
+    fx_codes = sorted({c for r in live_rows for c in r["fxMissing"]})
     orphan_buy = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orphan)
     n_contracts = sum(1 for r in rows if r["norders"] > 0)
     n_budget = sum(1 for r in rows if r["hasBudget"])
@@ -794,7 +852,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # --- плановая экономика по бюджетам: суммы по ОТКРЫТЫМ сделкам с внятным бюджетом ---
     plan_live_rows = [r for r in live_rows if r["planMdEur"] is not None and not r["planSusp"]]
     plan_md_live = sum(r["planMdEur"] for r in plan_live_rows)
-    plan_sale_live = sum(r["saleEur"] for r in plan_live_rows)
+    # процент МД — от выручки бюджета, а не от суммы сделки в Битриксе: у сделки она
+    # бывает нулевой или в валюте без курса, и процент завышался
+    plan_sale_live = sum(r["planRevEur"] for r in plan_live_rows if r["planRevEur"])
     plan_profit_live = sum(r["planProfitEur"] for r in plan_live_rows if r["planProfitEur"] is not None)
     n_plan = sum(1 for r in rows if r["planMdEur"] is not None)
     n_plan_live = sum(1 for r in live_rows if r["planMdEur"] is not None)
@@ -919,7 +979,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     kpis = [
         ("Последний №", str(maxseq), "макс. номер в реализации", "ok"),
         ("Контрактов", str(n_contracts), f"сделок с заказами · всего в воронке {len(rows)}", ""),
-        ("Σ продажи", _money(sale_sum), "сумма сделок (выручка), €", "ok"),
+        ("Σ продажи", _money(sale_sum), "открытые сделки (выручка), €", "ok"),
         ("Σ закупки", _money(buy_sum),
          f"заказы {len(rows)-n_econ-n_nobuy} · из экономики {n_econ} · нет данных {n_nobuy}", "amber"),
         ("Σ валовая маржа", _money(margin_sum),
@@ -999,6 +1059,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "live": len(live_rows), "total": len(rows), "maxseq": maxseq,
             "contracts": n_contracts, "buy": _money(buy_sum),
             "nEcon": n_econ, "nNoBuy": n_nobuy,
+            # не вошли в итоги: сумма в валюте без курса; закупка несоизмерима с продажей
+            "nFx": n_fx, "fxCodes": fx_codes, "nBuySusp": n_buy_susp, "sumsOver": "live",
+            "nNoSale": n_nosale,      # открытых сделок без суммы в Битриксе
             "medCycle": round(med_cycle) if med_cycle else None,
             "medLag": round(med_lag, 1) if med_lag is not None else None,
             "loss": _money(loss_total), "burnDay": _money(burn_day),
@@ -1008,6 +1071,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "slow": len(slow_rows), "lateDeals": len(late_rows),
             # чат сделки: сколько кандидатов в «подвисшие» проверено и что нашли
             "chat": chat_sum, "chatQuietDays": chat_activity.QUIET_DAYS,
+            # чем решено по кандидатам (dealctx.decide): quiet, active, unverified — как
+            # раньше; model — по оценке хода, ctxQuiet и ctxActive — по чтению прогона оценки
+            "chatBy": dict(chat_by),
             # сделки на «Оплата получена | Закрытие сделки» — успех, не «в работе»
             "paidStage": sum(1 for r in rows if r.get("paidStage")),
             # план по бюджетам сделок (снимок Google Drive)

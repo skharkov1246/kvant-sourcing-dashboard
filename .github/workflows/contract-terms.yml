@@ -1,8 +1,16 @@
 name: Договоры — чтение условий (пилот)
 
-# Пилот чтения договоров (решение владельца 19.10.2026): последние сделки
-# реализации (по умолчанию 30), бюджет модели на прогон (по умолчанию 10 USD),
-# ТОЛЬКО ручной запуск. Скрипт — scripts/contract_terms.py, навык contract-review.
+# Чтение договоров (решение владельца 19.10.2026): последние сделки реализации (по
+# умолчанию 30), бюджет модели на прогон (по умолчанию 10 USD). Скрипт —
+# scripts/contract_terms.py, навык contract-review.
+#
+# РАСПИСАНИЕ (решение владельца 23.10.2026): раз в неделю, в воскресенье 05:07 UTC
+# (08:07 МСК) — repository_dispatch «contract-terms» от Cloudflare-планировщика
+# (scheduler/worker.js). У dispatch нет входов: live, все открытые сделки реализации
+# (до 400), бюджет 10 USD, срок чтения 150 минут. Прочитанный раньше файл (тот же
+# sha256) модели второй раз не отдаётся — платятся только новые и изменённые; что не
+# уложилось в бюджет или срок, дочитает следующая неделя. После записи свод по
+# сделкам уходит в закрытый ключ KV realctx:v1 — его показывает вкладка «Реализация».
 #
 #   mode dry  (по умолчанию) — отбор сделок и карточек договоров (СП-1174, СП-1192),
 #             счёт карточек, файлов и сторон, оценка страниц и денег. Модель не
@@ -18,10 +26,12 @@ name: Договоры — чтение условий (пилот)
 # условий. Ни артефактов, ни кэша: файлы договоров и ответы модели не покидают
 # раннер, кроме строк в закрытой базе.
 on:
+  repository_dispatch:
+    types: [contract-terms]
   workflow_dispatch:
     inputs:
       deals:
-        description: "Сколько последних не проигранных сделок реализации читать (1–200)"
+        description: "Сколько последних не проигранных сделок реализации читать (1–400)"
         default: "30"
       budget_usd:
         description: "Бюджет модели на прогон, USD: потолок цены следующего файла не помещается — чтение останавливается"
@@ -31,6 +41,10 @@ on:
         type: choice
         default: dry
         options: [dry, live]
+      open:
+        description: "Только открытые сделки реализации (как недельный прогон)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -44,7 +58,15 @@ concurrency:
 jobs:
   terms:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # недельный прогон читает до 150 минут (срок чтения), ручной — 40
+    timeout-minutes: 180
+    env:
+      # недельный запуск (dispatch) входов не несёт — его значения здесь
+      MODE: ${{ github.event_name == 'repository_dispatch' && 'live' || inputs.mode }}
+      DEALS: ${{ github.event_name == 'repository_dispatch' && '400' || inputs.deals }}
+      BUDGET_USD: ${{ github.event_name == 'repository_dispatch' && '10' || inputs.budget_usd }}
+      OPEN: ${{ (github.event_name == 'repository_dispatch' || inputs.open) && '--open' || '' }}
+      DEADLINE_MIN: ${{ github.event_name == 'repository_dispatch' && '150' || '40' }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -69,7 +91,7 @@ jobs:
       # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная проверка —
       # не пройденная. База в локали UTF-8 (правило 21а).
       - name: Проверки на чистой базе
-        if: inputs.mode == 'live'
+        if: env.MODE == 'live'
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
@@ -82,7 +104,7 @@ jobs:
       # Схема перед записью: файл идемпотентен (правило 21) и ни от чего не зависит;
       # общий прогон миграций (zip-db.yml) для пилота не нужен.
       - name: Схема в рабочей базе
-        if: inputs.mode == 'live'
+        if: env.MODE == 'live'
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
@@ -94,11 +116,8 @@ jobs:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
           # Ключ модели и строка базы — только в live: холостому прогону они не нужны.
-          ANTHROPIC_API_KEY: ${{ inputs.mode == 'live' && secrets.ANTHROPIC_API_KEY || '' }}
-          SUPABASE_DB_URL: ${{ inputs.mode == 'live' && secrets.SUPABASE_DB_URL || '' }}
-          MODE: ${{ inputs.mode }}
-          DEALS: ${{ inputs.deals }}
-          BUDGET_USD: ${{ inputs.budget_usd }}
+          ANTHROPIC_API_KEY: ${{ (github.event_name == 'repository_dispatch' || inputs.mode == 'live') && secrets.ANTHROPIC_API_KEY || '' }}
+          SUPABASE_DB_URL: ${{ (github.event_name == 'repository_dispatch' || inputs.mode == 'live') && secrets.SUPABASE_DB_URL || '' }}
           RUN_ID: ct-${{ github.run_id }}-${{ github.run_attempt }}
           # Один процесс в общей очереди, с запасом: рядом может идти пересборка
           # дашборда (её группа своя). ≈ 3 запроса на отбор + по одному на 50
@@ -116,9 +135,20 @@ jobs:
           # бюджет проверяется перед вызовом. Непрочитанное дочитает следующий
           # прогон, прочитанное возьмёт из базы даром (sha256).
           LLM_READ_RETRIES: "1"
-          # Один вызов — не дольше 5 минут: срок прогона (--deadline-min 40) плюс
+          # Один вызов — не дольше 5 минут: срок прогона (--deadline-min 40, недельный 150) плюс
           # одна закачка и один вызов помещаются в timeout-minutes job.
           LLM_READ_TIMEOUT: "300"
           PYTHONDONTWRITEBYTECODE: "1"
         run: python scripts/contract_terms.py --mode "$MODE" --deals "$DEALS" --budget "$BUDGET_USD"
-             --deadline-min 40
+             --deadline-min "$DEADLINE_MIN" $OPEN
+
+      # Свод по сделкам → закрытый ключ KV realctx:v1 для вкладки «Реализация».
+      # И при красном гейте стороны: исходы такого прогона не пишутся, свод берёт
+      # последний прошедший. В журнал — только счётчики.
+      - name: Свод чатов и договоров в закрытый ключ
+        if: ${{ !cancelled() && env.MODE == 'live' }}
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python scripts/realization_ctx.py --publish

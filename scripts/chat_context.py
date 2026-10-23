@@ -552,7 +552,7 @@ class Память:
         self.spend.append(dict(трата))
         s = self.state.get(строка["deal_id"]) or {"last_msg_id": 0, "last_human_at": None,
                                                   "run_id": строка["run_id"], "fail_streak": 0}
-        s.update(chat_id=курсор["chat_id"], checked_at=курсор["checked_at"],
+        s.update(chat_id=курсор["chat_id"], checked_at=курсор["checked_at"], read_at=курсор["checked_at"],
                  last_msg_id=max(s.get("last_msg_id") or 0, курсор["last_msg_id"]),
                  last_human_at=_позже(s.get("last_human_at"), курсор["last_human_at"]),
                  run_id=строка["run_id"], method_ver=строка["method_ver"], fail_streak=0)
@@ -566,23 +566,25 @@ class Память:
         if s is None:
             self.state[курсор["deal_id"]] = {
                 "chat_id": курсор["chat_id"], "last_msg_id": 0, "last_human_at": курсор["last_human_at"],
-                "checked_at": курсор["checked_at"], "run_id": курсор["run_id"], "method_ver": METHOD_VER,
-                "fail_streak": 1}
+                "checked_at": курсор["checked_at"], "read_at": курсор["checked_at"], "run_id": курсор["run_id"],
+                "method_ver": METHOD_VER, "fail_streak": 1}
             return
-        s.update(chat_id=курсор["chat_id"], checked_at=курсор["checked_at"],
+        s.update(chat_id=курсор["chat_id"], checked_at=курсор["checked_at"], read_at=курсор["checked_at"],
                  last_human_at=_позже(s.get("last_human_at"), курсор["last_human_at"]),
                  fail_streak=int(s.get("fail_streak") or 0) + 1)
 
     def отметить_чтение(self, deal_id: str, chat_id: str, last_human_at, checked_at,
-                        run_id: str) -> None:
+                        run_id: str, прочитан: bool = True) -> None:
         s = self.state.get(deal_id)
         if s is None:
             self.state[deal_id] = {"chat_id": chat_id, "last_msg_id": 0, "last_human_at": last_human_at,
-                                   "checked_at": checked_at, "run_id": run_id, "method_ver": METHOD_VER,
-                                   "fail_streak": 0}
+                                   "checked_at": checked_at, "read_at": checked_at if прочитан else None,
+                                   "run_id": run_id, "method_ver": METHOD_VER, "fail_streak": 0}
             return
         s.update(chat_id=chat_id, checked_at=checked_at,
                  last_human_at=_позже(s.get("last_human_at"), last_human_at))
+        if прочитан:
+            s["read_at"] = checked_at
 
     def аннулировать(self, run_id: str, прежние: dict[str, dict | None]) -> int:
         n = 0
@@ -638,10 +640,10 @@ class База:
 
     def состояние(self) -> dict[str, dict]:
         rows = self._прочитать("select deal_id, chat_id, last_msg_id, last_human_at, checked_at, run_id, "
-                               "method_ver, fail_streak from deal_chat_state")
+                               "method_ver, fail_streak, read_at from deal_chat_state")
         return {str(r[0]): {"chat_id": str(r[1]), "last_msg_id": int(r[2]), "last_human_at": r[3],
                             "checked_at": r[4], "run_id": r[5], "method_ver": r[6],
-                            "fail_streak": int(r[7])} for r in rows or []}
+                            "fail_streak": int(r[7]), "read_at": r[8]} for r in rows or []}
 
     def потрачено_с(self, момент: dt.datetime) -> float:
         rows = self._прочитать("select coalesce(sum(usd), 0)::float8 from deal_chat_spend where at >= %s",
@@ -682,19 +684,20 @@ class База:
                            строка["tokens_out"], round(строка["usd"], 6), строка["run_id"]))
                 c.execute("""
                     insert into deal_chat_state as s (deal_id, chat_id, last_msg_id, last_human_at,
-                                                      checked_at, run_id, method_ver, fail_streak)
-                    values (%s, %s, %s, %s, %s, %s, %s, 0)
+                                                      checked_at, run_id, method_ver, fail_streak, read_at)
+                    values (%s, %s, %s, %s, %s, %s, %s, 0, %s)
                     on conflict (deal_id) do update set
                       chat_id = excluded.chat_id,
                       last_msg_id = greatest(s.last_msg_id, excluded.last_msg_id),
                       last_human_at = greatest(s.last_human_at, excluded.last_human_at),
                       checked_at = excluded.checked_at,
+                      read_at = excluded.read_at,
                       run_id = excluded.run_id,
                       method_ver = excluded.method_ver,
                       fail_streak = 0""",
                           (int(строка["deal_id"]), int(курсор["chat_id"]), курсор["last_msg_id"],
                            курсор["last_human_at"], курсор["checked_at"], строка["run_id"],
-                           строка["method_ver"]))
+                           строка["method_ver"], курсор["checked_at"]))
                 c.execute(_ВСТАВКА_РАСХОДА, _расход_значения(трата))
 
     def записать_неудачу(self, трата: dict, курсор: dict | None) -> None:
@@ -707,32 +710,37 @@ class База:
                 if курсор is not None:
                     c.execute("""
                         insert into deal_chat_state as s (deal_id, chat_id, last_msg_id, last_human_at,
-                                                          checked_at, run_id, method_ver, fail_streak)
-                        values (%s, %s, 0, %s, %s, %s, %s, 1)
+                                                          checked_at, run_id, method_ver, fail_streak, read_at)
+                        values (%s, %s, 0, %s, %s, %s, %s, 1, %s)
                         on conflict (deal_id) do update set
                           chat_id = excluded.chat_id,
                           last_human_at = greatest(s.last_human_at, excluded.last_human_at),
                           checked_at = excluded.checked_at,
+                          read_at = excluded.read_at,
                           fail_streak = s.fail_streak + 1""",
                               (int(курсор["deal_id"]), int(курсор["chat_id"]), курсор["last_human_at"],
-                               курсор["checked_at"], курсор["run_id"], METHOD_VER))
+                               курсор["checked_at"], курсор["run_id"], METHOD_VER, курсор["checked_at"]))
 
     def отметить_чтение(self, deal_id: str, chat_id: str, last_human_at, checked_at,
-                        run_id: str) -> None:
+                        run_id: str, прочитан: bool = True) -> None:
         """Чат прочитан, оценивать нечего: курсор оценки не трогается, сдвигается
-        только очередь чтения (checked_at). Ключ прогона — у новой строки."""
+        только очередь чтения (checked_at). Ключ прогона — у новой строки.
+        прочитан=False — чтение не удалось (нет доступа, сбой): очередь сдвигается,
+        а отметка удачного чтения (read_at) — нет."""
         assert not self.только_чтение
         with self.conn:
             with self.conn.cursor() as c:
                 c.execute("""
                     insert into deal_chat_state as s (deal_id, chat_id, last_msg_id, last_human_at,
-                                                      checked_at, run_id, method_ver)
-                    values (%s, %s, 0, %s, %s, %s, %s)
+                                                      checked_at, run_id, method_ver, read_at)
+                    values (%s, %s, 0, %s, %s, %s, %s, %s)
                     on conflict (deal_id) do update set
                       chat_id = excluded.chat_id,
                       last_human_at = greatest(s.last_human_at, excluded.last_human_at),
-                      checked_at = excluded.checked_at""",
-                          (int(deal_id), int(chat_id), last_human_at, checked_at, run_id, METHOD_VER))
+                      checked_at = excluded.checked_at,
+                      read_at = coalesce(excluded.read_at, s.read_at)""",
+                          (int(deal_id), int(chat_id), last_human_at, checked_at, run_id, METHOD_VER,
+                           checked_at if прочитан else None))
 
     def аннулировать(self, run_id: str, прежние: dict[str, dict | None]) -> int:
         """Откат прогона, не прошедшего гейт качества, — одной транзакцией: его
@@ -753,11 +761,12 @@ class База:
                     else:
                         c.execute("""
                             update deal_chat_state set chat_id = %s, last_msg_id = %s, last_human_at = %s,
-                                   checked_at = %s, run_id = %s, method_ver = %s, fail_streak = %s
+                                   checked_at = %s, run_id = %s, method_ver = %s, fail_streak = %s,
+                                   read_at = %s
                              where deal_id = %s""",
                                   (int(было["chat_id"]), int(было["last_msg_id"]), было["last_human_at"],
                                    было["checked_at"], было["run_id"], было["method_ver"],
-                                   int(было.get("fail_streak") or 0), int(deal)))
+                                   int(было.get("fail_streak") or 0), было.get("read_at"), int(deal)))
         return n
 
 
@@ -1041,8 +1050,8 @@ class _Прогон:
             return
         if статус != "ok":
             сч["нет_доступа" if статус == "denied" else "сбой_чтения"] += 1
-            if self.live:                            # очередь сдвигается, курсор — нет
-                self._запись(self.store.отметить_чтение, к.deal, к.chat, None, now, self.run_id)
+            if self.live:                            # очередь сдвигается, курсор и read_at — нет
+                self._запись(self.store.отметить_чтение, к.deal, к.chat, None, now, self.run_id, False)
             return
         было = self.состояние.get(к.deal)
         курсор = int((было or {}).get("last_msg_id") or 0)

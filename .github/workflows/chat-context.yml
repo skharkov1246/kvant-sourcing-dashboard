@@ -5,9 +5,11 @@ name: Чат сделки — оценка хода моделью (пилот, 
 # движется, риск, на ком мяч, ближайший срок). Бюджет — 5 долларов в день, итог —
 # в закрытую базу. Сутки — по Москве: каждый вызов модели, удачный или нет, пишется
 # в deal_chat_spend, и прогон берёт себе не больше остатка суток; budget_usd больше
-# пяти не принимается — два прогона в день предел не удвоят. ПИЛОТ В ТЕНИ: оценки только копятся в таблицах
-# library/supabase/deal_chat_schema.sql, дашборд их не показывает. Правила
-# отбора, подготовки и проверки ответа — в шапке scripts/chat_context.py.
+# пяти не принимается — два прогона в день предел не удвоят. Оценки — в таблицах
+# library/supabase/deal_chat_schema.sql; после записи свод по сделкам уходит в
+# закрытый ключ KV realctx:v1 (scripts/realization_ctx.py), и вкладка «Реализация»
+# показывает его (решение владельца 23.10.2026). Правила отбора, подготовки и
+# проверки ответа — в шапке scripts/chat_context.py.
 #
 # РЕЖИМЫ. dry (по умолчанию) — модель не вызывается вовсе: счёт сделок-кандидатов,
 # чатов с новыми сообщениями людей и оценка токенов и долларов; база открывается
@@ -32,8 +34,14 @@ name: Чат сделки — оценка хода моделью (пилот, 
 #
 # В ЖУРНАЛ — ТОЛЬКО АГРЕГАТЫ (правило 17): ни текста сообщений, ни имён, ни
 # номеров сделок и чатов. Артефактов и кэша нет: текст чатов живёт в памяти
-# процесса до конца шага. Только ручной запуск — расписание решает владелец.
+# процесса до конца шага.
+#
+# РАСПИСАНИЕ (решение владельца 23.10.2026): каждую ночь в 04:07 UTC (07:07 МСК) —
+# repository_dispatch «chat-context» от Cloudflare-планировщика (scheduler/worker.js).
+# У dispatch нет входов: режим live, бюджет 5, чатов 400, частей 10 (env задания).
 on:
+  repository_dispatch:
+    types: [chat-context]
   workflow_dispatch:
     inputs:
       mode:
@@ -67,6 +75,12 @@ jobs:
   context:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      # ночной запуск (dispatch) входов не несёт — его значения здесь
+      MODE: ${{ github.event_name == 'repository_dispatch' && 'live' || inputs.mode }}
+      BUDGET: ${{ github.event_name == 'repository_dispatch' && '5' || inputs.budget_usd }}
+      LIMIT: ${{ github.event_name == 'repository_dispatch' && '400' || inputs.limit }}
+      PARTS: ${{ github.event_name == 'repository_dispatch' && '10' || inputs.parts }}
     steps:
       - uses: actions/checkout@v5
 
@@ -76,18 +90,17 @@ jobs:
 
       - name: Установка зависимостей
         # anthropic — в requirements.txt (версия закреплена); psycopg2 — курсор и
-        # запись; pytest — проверкам на чистой базе перед записью
-        run: pip install --quiet -r requirements.txt pytest psycopg2-binary==2.9.10
+        # запись; pytest — проверкам на чистой базе перед записью; openpyxl, xlrd, pypdf,
+        # pyyaml, pillow — свод для вкладки пересчитывает исход договоров тем же кодом,
+        # что прогон чтения (scripts/contract_terms.py), и его зависимости — те же
+        run: pip install --quiet -r requirements.txt pytest psycopg2-binary==2.9.10 openpyxl xlrd pypdf pyyaml pillow==12.3.0
 
       - name: Проверка входов и секретов
         env:
           B: ${{ secrets.BITRIX_WEBHOOK_URL }}
           # ключ модели — только в live: холостой прогон его не видит и в проверке
-          A: ${{ inputs.mode == 'live' && secrets.ANTHROPIC_API_KEY || '' }}
+          A: ${{ (github.event_name == 'repository_dispatch' || inputs.mode == 'live') && secrets.ANTHROPIC_API_KEY || '' }}
           S: ${{ secrets.SUPABASE_DB_URL }}
-          MODE: ${{ inputs.mode }}
-          BUDGET: ${{ inputs.budget_usd }}
-          LIMIT: ${{ inputs.limit }}
         run: |
           set -euo pipefail
           [[ "$BUDGET" =~ ^[0-9]+([.][0-9]+)?$ ]] || { echo "::error::budget_usd — не число"; exit 1; }
@@ -99,12 +112,12 @@ jobs:
             [ -n "${A:-}" ] || { echo "::error::нет секрета ANTHROPIC_API_KEY — оценка моделью невозможна"; exit 1; }
             [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — оценки некуда писать"; exit 1; }
           fi
-          echo "режим $MODE, бюджет $BUDGET, чатов не больше $LIMIT, частей ${{ inputs.parts }}"
+          echo "режим $MODE, бюджет $BUDGET, чатов не больше $LIMIT, частей $PARTS"
 
       # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная
       # проверка — не пройденная проверка. База в локали UTF-8 (правило 21а).
       - name: Проверки на чистой базе
-        if: inputs.mode == 'live'
+        if: env.MODE == 'live'
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
@@ -116,7 +129,7 @@ jobs:
 
       # Схема перед записью: файл идемпотентен и ни от чего не зависит.
       - name: Схема в рабочей базе
-        if: inputs.mode == 'live'
+        if: env.MODE == 'live'
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
@@ -135,14 +148,21 @@ jobs:
           BITRIX_CHAT_WEBHOOK_URL_2: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL_2 }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           # ключ модели — только в live: холостому прогону он не нужен
-          ANTHROPIC_API_KEY: ${{ inputs.mode == 'live' && secrets.ANTHROPIC_API_KEY || '' }}
+          ANTHROPIC_API_KEY: ${{ (github.event_name == 'repository_dispatch' || inputs.mode == 'live') && secrets.ANTHROPIC_API_KEY || '' }}
           SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
           BITRIX_RPS: "1.0"
           BITRIX_PARALLEL: "1"
           # попытка — в ключе: откат повторного запуска не трогает оценки первой попытки
           RUN_ID: chat-ctx-${{ github.run_id }}-${{ github.run_attempt }}
-          MODE: ${{ inputs.mode }}
-          BUDGET: ${{ inputs.budget_usd }}
-          LIMIT: ${{ inputs.limit }}
-          PARTS: ${{ inputs.parts }}
         run: python scripts/chat_context.py --mode "$MODE" --budget "$BUDGET" --limit "$LIMIT" --parts "$PARTS"
+
+      # Свод по сделкам → закрытый ключ KV realctx:v1 для вкладки «Реализация». И после
+      # неудачной оценки: свод читает только непомеченные оценки, а договоры в нём —
+      # из своей таблицы. В журнал — только счётчики.
+      - name: Свод чатов и договоров в закрытый ключ
+        if: ${{ !cancelled() && env.MODE == 'live' }}
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python scripts/realization_ctx.py --publish

@@ -25,6 +25,7 @@ import chat_activity
 import company as company_mod
 import config
 import dashboard
+import dealctx as dealctx_mod
 import insights as insights_mod
 import kam as kam_mod
 import kamqueue as kamqueue_mod
@@ -813,11 +814,32 @@ def run(args) -> int:
         print(f"  ⚠ вкладки «КАМы»/«Продукт-оунеры» пропущены: {type(e).__name__}: {e}")
 
     contracts_data = None
+    dealctx_data = None
+    # закрытый свод оценок чатов и разбора договоров (решение владельца 23.10.2026):
+    # файл из KV realctx:v1, который кладёт сборка (deploy.yml); нет — вкладка как раньше
+    real_ctx = dealctx_mod.load()
+    if real_ctx is not None:
+        print(f"• Свод чатов и договоров: чатов {len(real_ctx['chats'])}, сделок с договорами "
+              f"{len(real_ctx['contracts'])}, отброшено записей не по форме {real_ctx['bad']}")
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
         contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
-                                               chat_reader=chat_reader)
+                                               chat_reader=chat_reader,
+                                               ctx_chats=real_ctx["chats"] if real_ctx else None)
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
+        _hc, dealctx_data = dealctx_mod.build(contracts_data["rows"], contracts_data.get("life"), real_ctx,
+                                              period_mod.now(dealctx_mod.MSK), today=p.end)
+        if _hc is not None:
+            contracts_data["head"]["ctx"] = _hc
+            _c, _k = _hc["chat"], _hc["contract"]
+            # только счётчики (правило 17)
+            print(f"  чаты и договоры открытых сделок ({_hc['open']}): оценка чата текущая у {_c['cur']} "
+                  f"(есть у {_c['seen']}), ждут нашего ответа {_c['reply']} (дольше суток {_c['replyLate']}), "
+                  f"высокий риск {_c['high']}, срок из чата прошёл {_c['dueLate']}; договоры разобраны у "
+                  f"{_k['seen']}: с риском сверки {_k['risk']} (флагов {_k['flags']}), без пары {_k['nopair']}, "
+                  f"не дочитаны {_k['unread']}; пунктов очереди {len(dealctx_data['queue'])}")
+        print(f"  «подвисла» по чату решено: " + ", ".join(
+            f"{k} {v}" for k, v in sorted((contracts_data["head"].get("chatBy") or {}).items())))
         _ch = (contracts_data.get("head") or {}).get("chat") or {}
         print(f"  чаты сделок с простоем по стадии: активных {_ch.get('active', 0)} (не подвисли), "
               f"тихих {_ch.get('quiet', 0)}, не прочитано {_ch.get('unread', 0)} (нет доступа {_ch.get('denied', 0)}), "
@@ -829,7 +851,8 @@ def run(args) -> int:
               f"уволенных {_g.get('people', 0)}; нормы стадий по {_sp.get('benchDays')} дн: "
               f"{_sp.get('benchRecent', 0)} стадий, медиана цикла заказа {_sp.get('medCycle')} дн")
     except Exception as e:
-        print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}: {e}")
+        # только класс ошибки: в тексте бывают номера сделок, а журнал публичный
+        print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}")
 
     # пресейл — после реализации: чаты сделок читает тот же читатель, остатком бюджета
     _presale()
@@ -904,7 +927,8 @@ def run(args) -> int:
         Path(args.data_json).write_text(json.dumps({
             "company": company_data, "kam": kam_data, "eng": eng_data, "prod": prod_data,
             "contracts": contracts_data, "reps": reps_data, "advisor": advisor_data,
-            "people": people_data, "premia": premia_data, "_portal": client.snapshot_stats(),
+            "people": people_data, "premia": premia_data, "dealctx": dealctx_data,
+            "_portal": client.snapshot_stats(),
         }, ensure_ascii=False, default=str), encoding="utf-8")
         print(f"  ✓ вкладки для сверки: {args.data_json}")
     _print_snapshot(client)
@@ -913,7 +937,7 @@ def run(args) -> int:
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
                     company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
                     contracts=contracts_data, reps=reps_data, advisor=advisor_data, people=people_data,
-                    premia=premia_data)
+                    premia=premia_data, dealctx=dealctx_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:

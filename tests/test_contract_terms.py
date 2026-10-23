@@ -243,11 +243,15 @@ class База:
     def записать_условия(self, строки):
         self.условия += строки
 
-    def записать_флаги(self, флаги, run_id):
+    def записать_итог(self, флаги, исходы, run_id):
         self.флаги += флаги
+        self.исходы = dict(исходы)
 
     def итог(self, run_id):
         return len(self.условия), len(self.флаги), sum(r["usd"] for r in self.условия)
+
+    def итог_сделок(self, run_id):
+        return len(getattr(self, "исходы", {}))
 
 
 def pdf_на(страниц: int) -> bytes:
@@ -586,36 +590,49 @@ def test_оценка_денег_растёт_со_страницами():
 
 
 # --------------------------------------------------------------------------- прогон Actions
-def test_прогон_только_ручной_в_очереди_портала_без_артефактов():
+def test_прогон_ручной_и_недельный_в_очереди_портала_без_артефактов():
+    import re
     import yaml
     путь = ROOT / ".github" / "workflows" / "contract-terms.yml"
     текст = путь.read_text(encoding="utf-8")
     wf = yaml.safe_load(текст)
     on = wf.get("on", wf.get(True))
-    assert set(on) == {"workflow_dispatch"}, "только ручной запуск (решение владельца 19.10.2026)"
+    # ручной запуск и недельный от планировщика (решение владельца 23.10.2026); крона GitHub нет
+    assert set(on) == {"workflow_dispatch", "repository_dispatch"}
+    assert on["repository_dispatch"]["types"] == ["contract-terms"]
     входы = on["workflow_dispatch"]["inputs"]
     assert входы["deals"]["default"] == "30" and входы["budget_usd"]["default"] == "10"
     assert входы["mode"]["default"] == "dry" and входы["mode"]["options"] == ["dry", "live"]
     assert wf["concurrency"]["group"] == "bitrix-portal"
     for запрет in ("upload-artifact", "actions/cache", "cache:"):
         assert запрет not in текст, запрет
-    шаг = wf["jobs"]["terms"]["steps"][-1]
-    assert шаг["run"].startswith("python scripts/contract_terms.py")
+    job = wf["jobs"]["terms"]
+    # недельный: live, все открытые (до предела скрипта), бюджет 10, срок 150 мин
+    je = job["env"]
+    assert "'live'" in je["MODE"] and "'400'" in je["DEALS"] and "'10'" in je["BUDGET_USD"]
+    assert "'--open'" in je["OPEN"] and "'150'" in je["DEADLINE_MIN"] and "'40'" in je["DEADLINE_MIN"]
+    assert int(re.search(r"'(\d+)'", je["DEALS"]).group(1)) <= ct.СДЕЛОК_МАКС
+    шаг = next(ш for ш in job["steps"] if str(ш.get("run", "")).startswith("python scripts/contract_terms.py"))
     env = шаг["env"]
     for секрет in ("BITRIX_WEBHOOK_URL", "BITRIX_FILES_WEBHOOK_URL", "ANTHROPIC_API_KEY", "SUPABASE_DB_URL"):
         assert f"secrets.{секрет}" in env[секрет], секрет
-    assert "inputs.mode == 'live'" in env["ANTHROPIC_API_KEY"] and "inputs.mode == 'live'" in env["SUPABASE_DB_URL"]
+    for секрет in ("ANTHROPIC_API_KEY", "SUPABASE_DB_URL"):
+        assert "inputs.mode == 'live'" in env[секрет] and "repository_dispatch" in env[секрет], секрет
     assert float(env["BITRIX_RPS"]) <= 2 and env["BITRIX_PARALLEL"] == "1"
     assert env["RUN_ID"].startswith("ct-")
+    assert '--deadline-min "$DEADLINE_MIN"' in шаг["run"] and "$OPEN" in шаг["run"]
     # обрезанный файл модели не отдаётся — предел страниц не меньше длинного договора
     assert int(env["LLM_READ_MAX_PAGES"]) >= 100
     # одна попытка вызова: оборванная могла быть оплачена, бюджет — перед вызовом
     assert env["LLM_READ_RETRIES"] == "1" and int(env["LLM_READ_TIMEOUT"]) <= 300
-    # срок прогона короче таймаута job с запасом на одну закачку, вызов и запись
-    срок = int(шаг["run"].split("--deadline-min")[1].split()[0])
-    assert срок * 60 + 2 * int(env["LLM_READ_TIMEOUT"]) < wf["jobs"]["terms"]["timeout-minutes"] * 60
-    установка = next(ш["run"] for ш in wf["jobs"]["terms"]["steps"] if "pip install" in str(ш.get("run")))
+    # срок прогона (самый длинный — недельный) короче таймаута job с запасом на закачку, вызов и запись
+    assert 150 * 60 + 2 * int(env["LLM_READ_TIMEOUT"]) < job["timeout-minutes"] * 60
+    установка = next(ш["run"] for ш in job["steps"] if "pip install" in str(ш.get("run")))
     assert "pillow" in установка, "без Pillow сканы TIFF — статус format, сделка без флагов"
+    # после чтения — свод в закрытый ключ, только в live
+    свод = job["steps"][-1]
+    assert свод["run"] == "python scripts/realization_ctx.py --publish" and "env.MODE == 'live'" in свод["if"]
+    assert "!cancelled()" in свод["if"]
 
 
 def test_схема_подключена_к_миграциям():
@@ -953,3 +970,38 @@ def test_отказ_схемы_останавливает_чтение_посл�
     итоги = [читатель.прочитать(pdf_на(1)) for _ in range(3)]
     assert [и["status"] for и in итоги] == ["api"] * 3 and "too complex" in итоги[-1]["note"]
     assert len(клиент.messages.запросы) == 1
+
+
+def test_список_исходов_в_схеме_как_в_коде():
+    """Исход разбора сделки (contract_deal_outcome, 23.10.2026): список в проверке базы —
+    дословно contract_terms.ИСХОДЫ, а исходы флаги_сделки — из него."""
+    import re
+    import contract_terms as ct
+    текст = (ROOT / "library" / "supabase" / "contract_terms_schema.sql").read_text(encoding="utf-8")
+    блок = текст[текст.index("add constraint contract_deal_outcome_chk"):]
+    блок = блок[:блок.index(";")]
+    assert tuple(re.findall(r"'([^']+)'", блок)) == ct.ИСХОДЫ
+    src = (ROOT / "scripts" / "contract_terms.py").read_text(encoding="utf-8")
+    тело = src[src.index("def флаги_сделки"):src.index("# --------------------------------------------------------------------------- база")]
+    for исход in re.findall(r'return \[\], "([^"]+)"', тело) + ["пара"]:
+        assert исход in ct.ИСХОДЫ, исход
+
+
+def test_открытые_сделки_выбираются_фильтром_портала():
+    """--open (недельный прогон по расписанию): фильтр портала — открытые сделки
+    реализации, и он проверяется ещё раз на ответе."""
+    import contract_terms as ct
+    запросы = []
+
+    class Портал:
+        def вызов(self, метод, параметры):
+            запросы.append(параметры["filter"])
+            return {"result": [
+                {"ID": "11", "DATE_CREATE": "2026-10-01", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0"},
+                {"ID": "12", "DATE_CREATE": "2026-10-02", "STAGE_SEMANTIC_ID": "S", "CATEGORY_ID": "0"},
+                {"ID": "13", "DATE_CREATE": "2026-10-03", "STAGE_SEMANTIC_ID": "F", "CATEGORY_ID": "0"}]}
+
+    assert [d["ID"] for d in ct.выбрать_сделки(Портал(), 5, открытые=True)] == ["11"]
+    assert запросы[-1] == {"CATEGORY_ID": ct.КАТЕГОРИЯ_РЕАЛИЗАЦИИ, "STAGE_SEMANTIC_ID": "P"}
+    assert [d["ID"] for d in ct.выбрать_сделки(Портал(), 5)] == ["12", "11"]
+    assert запросы[-1] == {"CATEGORY_ID": ct.КАТЕГОРИЯ_РЕАЛИЗАЦИИ, "!STAGE_SEMANTIC_ID": "F"}
