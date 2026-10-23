@@ -80,7 +80,12 @@ def получить(url: str, timeout: int = 30, ключ: str = "") -> bytes |
             КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {r.status}"] += 1
             return r.read(30 * 1024 * 1024)
     except urllib.error.HTTPError as e:
-        КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {e.code}"] += 1
+        # имя ошибки API (FieldValidationError и т. п.) — без описания: в нём бывает сам ключ
+        try:
+            имя = str(json.loads(e.read(4096) or b"{}").get("error") or "")[:40]
+        except Exception:
+            имя = ""
+        КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {e.code}{' ' + имя if имя else ''}"] += 1
         return None
     except Exception as e:
         КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {type(e).__name__}"] += 1
@@ -148,6 +153,12 @@ def main() -> int:
             цель = (q.get("url") or [""])[0]
             сч["через страницу проверки ссылок Яндекса"] += 1
         host = urllib.parse.urlparse(цель).netloc
+        # форма адреса — без самого адреса: сколько частей пути, есть ли запрос и пробелы
+        пу = urllib.parse.urlparse(цель)
+        сч[f"форма: частей пути {len([x for x in пу.path.split('/') if x])}"
+           f"{' · с запросом' if пу.query else ''}{' · пробел' if ' ' in цель.strip() else ''}"
+           f"{' · хвост-пробел' if цель != цель.strip() else ''}"] += 1
+        цель = цель.strip()
         вид = ("Диск: файл" if "disk.yandex" in host and "/i/" in цель else
                "Диск: папка или файл (/d/)" if "disk.yandex" in host else
                "не раскрылась" if not цель else f"другое: {host}")
