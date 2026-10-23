@@ -46,6 +46,31 @@ API = "https://cloud-api.yandex.net/v1/disk/public/resources"
     "маржа": re.compile(r"марж|\bМД\b|margin|прибыл", re.I),
     "итого": re.compile(r"итого|total", re.I),
 }
+СЛОВАРЬ = {k: re.compile(v, re.I) for k, v in {
+    # продажа
+    "стоимость для заказчика": r"стоимост\w* для заказчик|цена для заказчик|для клиента",
+    "цена продажи": r"цен\w* продаж|сумм\w* продаж|selling|sale price|sales price",
+    "контракт/договор": r"сумм\w* (контракт|договор)|стоимост\w* (контракт|договор)|цен\w* (контракт|договор)|contract",
+    "ТКП/КП": r"\bТКП\b|\bКП\b|коммерческ\w* предлож",
+    "с НДС / без НДС": r"с ндс|без ндс|ндс",
+    "выручка/доход": r"выручк|доход|revenue",
+    # закупка
+    "закупка/себестоимость": r"закуп|себестоим",
+    "поставщик": r"поставщик|supplier|vendor",
+    "cost/purchase": r"\bcost\b|purchase",
+    "EXW/FCA/DAP": r"\b(EXW|FCA|DAP|DDP|CIF|CPT)\b",
+    # маржа
+    "маржа/МД": r"марж|\bМД\b|margin",
+    "прибыль": r"прибыл|profit",
+    "наценка": r"наценк|markup|mark-up",
+    "рентабельность": r"рентаб",
+    # прочее
+    "логистика": r"логист|доставк|freight|транспорт",
+    "таможня/пошлина": r"тамож|пошлин|customs|duty",
+    "курс валюты": r"курс|exchange rate",
+    "итого": r"итого|total",
+    "итерация/версия": r"итерац|верси|финал|final",
+}.items()}
 ИТЕРАЦИЯ = re.compile(r"\bv\d+\b|итерац|финал|final|верс", re.I)
 
 
@@ -151,6 +176,8 @@ def таблицы_диска(ключ: str, макс: int = 20000) -> dict[str,
 
 
 def разобрать_xlsx(b: bytes, сч: collections.Counter) -> None:
+    """Шаблон расчёта: какие слова словаря есть в файле и стоит ли рядом число.
+    В журнал — только слово словаря, номер листа и счёт; ни значений, ни имён листов."""
     import openpyxl
     try:
         wb = openpyxl.load_workbook(io.BytesIO(b), read_only=True, data_only=True)
@@ -159,17 +186,24 @@ def разобрать_xlsx(b: bytes, сч: collections.Counter) -> None:
         return
     сч["xlsx: открылся"] += 1
     сч[f"листов: {min(len(wb.sheetnames), 10)}{'+' if len(wb.sheetnames) >= 10 else ''}"] += 1
-    нашлось = set()
-    for ws in wb.worksheets[:6]:
-        for row in ws.iter_rows(max_row=200, max_col=12, values_only=True):
-            for v in row:
-                if isinstance(v, str):
-                    for k, rx in ПОДПИСИ.items():
-                        if rx.search(v):
-                            нашлось.add(k)
-    for k in ПОДПИСИ:
-        сч[f"подпись «{k}»: {'есть' if k in нашлось else 'нет'}"] += 1
-
+    нашлось: dict[str, set] = collections.defaultdict(set)
+    с_числом: set[str] = set()
+    for лист, ws in enumerate(wb.worksheets[:10], 1):
+        for row in ws.iter_rows(max_row=400, max_col=30, values_only=True):
+            row = list(row)
+            for i, v in enumerate(row):
+                if not isinstance(v, str):
+                    continue
+                for слово, rx in СЛОВАРЬ.items():
+                    if rx.search(v):
+                        нашлось[слово].add(лист)
+                        if any(isinstance(x, (int, float)) and not isinstance(x, bool) and abs(x) > 0
+                               for x in row[i + 1:i + 8]):
+                            с_числом.add(слово)
+    for слово in СЛОВАРЬ:
+        if слово in нашлось:
+            сч[f"слово «{слово}»: есть (листы {','.join(map(str, sorted(нашлось[слово])))})"
+               f"{' · число справа' if слово in с_числом else ''}"] += 1
 
 def main() -> int:
     client = BitrixClient(config.Settings.load().bitrix_webhook_url)
