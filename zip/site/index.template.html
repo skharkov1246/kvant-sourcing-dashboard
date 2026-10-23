@@ -340,7 +340,7 @@ function bitrixBox(d){
   const h=d.bitrix_price_history; if(!Array.isArray(h)||!h.length)return"";
   const cls=s=>/контракт/.test(s)?"b-h":/проигр/.test(s)?"b-l":"b-m";
   return `<div class="bx"><b>📋 Битрикс — упоминания в сделках (${h.length}):</b>`+
-    h.map(x=>`<div class="dl mut">• ${esc(x.deal)}${x.client?` — <b>${esc(x.client)}</b>`:""}${x.status?`<span class="st ${cls(x.status)}">${esc(x.status)}</span>`:""}${x.date?` <span style="font-size:10px">${esc(x.date)}</span>`:""}</div>`).join("")+`</div>`;
+    h.map(x=>`<div class="dl mut">• ${/^\d+$/.test(x.deal||"")?`<a href="https://kvantpro.bitrix24.ru/crm/deal/details/${x.deal}/" target="_blank" rel="noopener">сделка #${x.deal}</a>`:esc(x.deal)}${x.client?` — <b>${esc(x.client)}</b>`:""}${x.status?`<span class="st ${cls(x.status)}">${esc(x.status)}</span>`:""}${x.date?` <span style="font-size:10px">${esc(x.date)}</span>`:""}</div>`).join("")+`</div>`;
 }
 function hsBench(d){
   const b=CUSTOMS&&CUSTOMS.by_hs4;if(!b)return"";

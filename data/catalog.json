@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 318,
-    "total_bytes": 126521067,
+    "total_bytes": 126498734,
     "by_sensitivity": {
       "внутреннее": 197,
       "конфиденциально": 68,
@@ -625,7 +625,7 @@
     {
       "path": "zip/data/r1700.json",
       "subproject": "база ЗИП",
-      "bytes": 2956228,
+      "bytes": 2954429,
       "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
       "format": "json",
       "shape": "объект",
@@ -664,9 +664,9 @@
           "pn_norm"
         ]
       },
-      "last_change": "2026-09-17",
-      "last_author": "skharkov1246",
-      "last_commit": "51e0bc51",
+      "last_change": "2026-10-22",
+      "last_author": "Claude",
+      "last_commit": "b2bbadbe",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -678,6 +678,7 @@
       "referenced_by": [
         "gt/tools/build_faults.py",
         "scripts/build_chain_coverage.py",
+        "tests/test_deal_titles_public.py",
         "tests/test_faults_slices.py",
         "tests/test_r1700_dossier.py",
         "zip/tools/build_r1700.py",
@@ -1189,7 +1190,7 @@
     {
       "path": "zip/data/positions.json",
       "subproject": "база ЗИП",
-      "bytes": 1064958,
+      "bytes": 1045905,
       "note": "",
       "format": "json",
       "shape": "список",
@@ -1224,9 +1225,9 @@
         "target_equipment",
         "updated_at"
       ],
-      "last_change": "2026-07-02",
+      "last_change": "2026-10-22",
       "last_author": "Claude",
-      "last_commit": "1a0bf54b",
+      "last_commit": "b2bbadbe",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1240,9 +1241,9 @@
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "scripts/publish_library_v2.py",
+        "tests/test_deal_titles_public.py",
         "tests/test_publish_library_v2.py",
-        "zip/build.py",
-        "zip/customs/glbs_pull.mjs"
+        "zip/build.py"
       ]
     },
     {
@@ -1678,9 +1679,9 @@
         "key": "days",
         "records": 14
       },
-      "last_change": "2026-10-18",
+      "last_change": "2026-10-21",
       "last_author": "github-actions[bot]",
-      "last_commit": "642cd5aa",
+      "last_commit": "43e93d0b",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -1695,8 +1696,7 @@
         "reps.py",
         "scripts/budget_snapshot.py",
         "scripts/preflight.py",
-        "tests/test_chat_snapshot_split.py",
-        "zip/tools/r1700_bitrix.py"
+        "tests/test_chat_snapshot_split.py"
       ]
     },
     {
@@ -2775,9 +2775,9 @@
           "title"
         ]
       },
-      "last_change": "2026-10-19",
+      "last_change": "2026-10-22",
       "last_author": "github-actions[bot]",
-      "last_commit": "519d66b4",
+      "last_commit": "1899fec5",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -3077,8 +3077,8 @@
         "data/brand_research/vibrometermeggitt.json"
       ],
       "last_change": "2026-10-19",
-      "last_author": "Claude",
-      "last_commit": "26aabec6",
+      "last_author": "skharkov1246",
+      "last_commit": "93b831b4",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5526,59 +5526,6 @@
       "referenced_by": []
     },
     {
-      "path": "zip/data/r1700_bitrix.json",
-      "subproject": "база ЗИП",
-      "bytes": 102456,
-      "note": "Факты сделок Битрикса по Caterpillar: какие позиции продавали, какие квотировали, с какими исходами и ценами. Только машинные поля — без переписки, ФИО и личных контактов. Строит zip/tools/r1700_bitrix.py: живой режим по BITRIX_WEBHOOK_URL, иначе по снимкам репозитория.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "built_by",
-        "crm",
-        "deal_titles",
-        "live",
-        "note",
-        "portal",
-        "prices",
-        "quoted",
-        "schema",
-        "sold",
-        "stats",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "prices",
-        "records": 175,
-        "record_keys": [
-          "confidence",
-          "country",
-          "currency",
-          "machine",
-          "name",
-          "note",
-          "pn",
-          "position_id",
-          "seller",
-          "source",
-          "unit_price",
-          "url",
-          "year"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "3b643031",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "zip/tools/r1700_bitrix.py",
-        "zip/tools/r1700_dossier.py"
-      ]
-    },
-    {
       "path": "zip/data/r1700_recon/wheels.json",
       "subproject": "база ЗИП",
       "bytes": 102396,
@@ -5620,6 +5567,59 @@
         "markers": []
       },
       "referenced_by": []
+    },
+    {
+      "path": "zip/data/r1700_bitrix.json",
+      "subproject": "база ЗИП",
+      "bytes": 101409,
+      "note": "Факты сделок Битрикса по Caterpillar: какие позиции продавали, какие квотировали, с какими исходами и ценами. Только машинные поля — без переписки, ФИО и личных контактов. Строит zip/tools/r1700_bitrix.py: живой режим по BITRIX_WEBHOOK_URL, иначе по снимкам репозитория.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "built_by",
+        "crm",
+        "live",
+        "note",
+        "portal",
+        "prices",
+        "quoted",
+        "schema",
+        "sold",
+        "stats",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "prices",
+        "records": 175,
+        "record_keys": [
+          "confidence",
+          "country",
+          "currency",
+          "machine",
+          "name",
+          "note",
+          "pn",
+          "position_id",
+          "seller",
+          "source",
+          "unit_price",
+          "url",
+          "year"
+        ]
+      },
+      "last_change": "2026-10-22",
+      "last_author": "Claude",
+      "last_commit": "b2bbadbe",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "tests/test_deal_titles_public.py",
+        "zip/tools/r1700_bitrix.py",
+        "zip/tools/r1700_dossier.py"
+      ]
     },
     {
       "path": "zip/data/perf_test_requests.json",
@@ -11580,7 +11580,7 @@
     {
       "path": "gpu/data/fleet.json",
       "subproject": "ГПУ-библиотека",
-      "bytes": 19970,
+      "bytes": 19884,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -11607,9 +11607,9 @@
           "status"
         ]
       },
-      "last_change": "2026-09-01",
-      "last_author": "skharkov1246",
-      "last_commit": "e94cc481",
+      "last_change": "2026-10-22",
+      "last_author": "Claude",
+      "last_commit": "b2bbadbe",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -12199,9 +12199,9 @@
           "suppliers"
         ]
       },
-      "last_change": "2026-10-02",
-      "last_author": "skharkov1246",
-      "last_commit": "7ea7152c",
+      "last_change": "2026-10-22",
+      "last_author": "Claude",
+      "last_commit": "b2bbadbe",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -13187,55 +13187,6 @@
       ]
     },
     {
-      "path": "gpu/data/bitrix_gpu.json",
-      "subproject": "ГПУ-библиотека",
-      "bytes": 4642,
-      "note": "Выгрузка запросов по ГПУ из Bitrix. Обновляется в gpu-deploy.yml; при недоступности портала используется закоммиченный сид.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "adjacent",
-        "by_supplier",
-        "caveat",
-        "deals",
-        "history_note",
-        "live",
-        "offers",
-        "pool",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "deals",
-        "records": 4,
-        "record_keys": [
-          "created",
-          "id",
-          "models",
-          "note",
-          "rfqs",
-          "sourcer",
-          "stage",
-          "title"
-        ]
-      },
-      "last_change": "2026-09-01",
-      "last_author": "skharkov1246",
-      "last_commit": "e94cc481",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "выручка и маржа сделок"
-        ]
-      },
-      "referenced_by": [
-        ".github/workflows/gpu-deploy.yml",
-        "gpu/build.py",
-        "gpu/tools/bitrix_gpu.py"
-      ]
-    },
-    {
       "path": "gt/data/ship_source_control.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 4617,
@@ -13354,6 +13305,55 @@
         "library/load_suppliers.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
+      ]
+    },
+    {
+      "path": "gpu/data/bitrix_gpu.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 4294,
+      "note": "Выгрузка запросов по ГПУ из Bitrix. Обновляется в gpu-deploy.yml; при недоступности портала используется закоммиченный сид.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "adjacent",
+        "by_supplier",
+        "caveat",
+        "deals",
+        "history_note",
+        "live",
+        "offers",
+        "pool",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "deals",
+        "records": 4,
+        "record_keys": [
+          "created",
+          "id",
+          "models",
+          "note",
+          "rfqs",
+          "sourcer",
+          "stage"
+        ]
+      },
+      "last_change": "2026-10-22",
+      "last_author": "Claude",
+      "last_commit": "b2bbadbe",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "выручка и маржа сделок"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/gpu-deploy.yml",
+        "gpu/build.py",
+        "gpu/tools/bitrix_gpu.py",
+        "tests/test_deal_titles_public.py"
       ]
     },
     {

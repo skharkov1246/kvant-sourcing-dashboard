@@ -15,9 +15,11 @@
             без ФИО, без личных контактов (правило 17 CLAUDE.md).
   офлайн  — если вебхука нет. Поднимает те же факты из уже лежащих в репозитории
             снимков: zip/data/positions.json (поля bitrix_status, bitrix_sold,
-            bitrix_price_history), zip/data/price_records.json, supplier_crm.json,
-            data/chat_snapshot.json (только наименования сделок; с 19.10.2026 их в
-            публичном снимке нет — они в KV chat:v1, и офлайн-режим их не находит).
+            bitrix_price_history), zip/data/price_records.json, supplier_crm.json.
+
+НАЗВАНИЙ СДЕЛОК В ФАЙЛЕ НЕТ (решение владельца 22.10.2026): репозиторий публичный,
+а название сделки — это предмет и заказчик. Сделка — только номером в Битриксе
+(deal_ref), по нему сайт ведёт в карточку; название видно там, за входом в портал.
 
 Запуск:
     python zip/tools/r1700_bitrix.py             # авто: живой, если есть вебхук
@@ -49,6 +51,13 @@ def hit(text: str) -> bool:
     return bool(PAT.search(t) or PAT_CAT.search(t))
 
 
+def deal_ref(v) -> str:
+    """«8502 419. Название (270)» → «8502»: номер сделки в Битриксе, без названия.
+    Значение без номера в начале — пустая строка: название без номера не нужно."""
+    m = re.match(r"\s*(\d+)(?!\S)", str(v or ""))
+    return m.group(1) if m else ""
+
+
 def load(path: Path, default=None):
     if not path.exists():
         return default
@@ -78,7 +87,7 @@ def from_positions() -> tuple[list, list]:
             "price_min": p.get("price_min"), "price_max": p.get("price_max"),
             "price_cur": p.get("price_cur"), "price_src": p.get("price_src"),
             "qty_quarter": p.get("qty_quarter"),
-            "deals": [{"date": h.get("date"), "deal": h.get("deal"), "client": h.get("client"),
+            "deals": [{"date": h.get("date"), "deal": deal_ref(h.get("deal")), "client": h.get("client"),
                        "status": h.get("status")} for h in (p.get("bitrix_price_history") or [])],
         }
         (sold if st == "продавали" else quoted).append(row)
@@ -114,32 +123,6 @@ def from_crm() -> list:
             continue
         out.append({k: s.get(k) for k in ("name", "country", "kind", "status", "site", "email", "note")
                     if s.get(k)})
-    return out
-
-
-def from_chats() -> list:
-    """Живые сделки с упоминанием Caterpillar — только наименование сделки и её номер.
-
-    Из снимка чатов берём исключительно корпоративные поля: номер сделки и её
-    название. Ни сотрудников, ни текста переписки — в публичном репозитории им не место.
-    """
-    d = load(REPO / "data" / "chat_snapshot.json", {}) or {}
-    seen, out = set(), []
-    for _day, emps in (d.get("days") or {}).items():
-        if not isinstance(emps, dict):
-            continue
-        for _emp, v in emps.items():
-            if not isinstance(v, dict):
-                continue
-            for w in v.get("waiting") or []:
-                t = str(w.get("t") or "")
-                if not hit(t):
-                    continue
-                key = (w.get("deal"), t)
-                if key in seen:
-                    continue
-                seen.add(key)
-                out.append({"deal": w.get("deal"), "title": t})
     return out
 
 
@@ -197,7 +180,7 @@ def live() -> dict | None:
             if not hit(d.get("TITLE")):
                 continue
             st = stages.get(d.get("STAGE_ID")) or {}
-            res["deals"].append({"id": d.get("ID"), "title": d.get("TITLE"),
+            res["deals"].append({"id": d.get("ID"),
                                  "stage": st.get("name") or d.get("STAGE_ID"), "sem": st.get("sem"),
                                  "sum": d.get("OPPORTUNITY"), "cur": d.get("CURRENCY_ID"),
                                  "created": str(d.get("DATE_CREATE") or "")[:10], "word": w})
@@ -230,7 +213,6 @@ def build(force_offline: bool = False) -> dict:
     sold, quoted = from_positions()
     prices = from_prices()
     crm = from_crm()
-    chats = from_chats()
     lv = None if force_offline else live()
 
     out = {
@@ -244,7 +226,6 @@ def build(force_offline: bool = False) -> dict:
         "quoted": quoted,
         "prices": prices,
         "crm": crm,
-        "deal_titles": chats,
         "portal": lv or {},
         "stats": {
             "sold": len(sold), "quoted": len(quoted),
@@ -254,7 +235,7 @@ def build(force_offline: bool = False) -> dict:
             "price_sources": dict(Counter(r["source"] for r in prices)),
             "clients": dict(Counter(d["client"] for r in sold + quoted for d in r["deals"] if d.get("client"))),
             "deal_outcomes": dict(Counter(d["status"] for r in sold + quoted for d in r["deals"] if d.get("status"))),
-            "crm": len(crm), "deal_titles": len(chats),
+            "crm": len(crm),
             "portal_spa": len((lv or {}).get("spa") or []),
             "portal_deals": len((lv or {}).get("deals") or []),
             "portal_products": len((lv or {}).get("products") or []),
