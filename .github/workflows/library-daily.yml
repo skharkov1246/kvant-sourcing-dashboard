@@ -104,7 +104,7 @@ jobs:
       MAIL_FIRST_DAYS: ${{ inputs.mail_days || '7' }}
       MAIL_DAILY_LIMIT: ${{ inputs.mail_limit || '1000' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -268,7 +268,7 @@ jobs:
       BITRIX_PARALLEL: "1"
       DEALS_NIGHTLY: apply
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
