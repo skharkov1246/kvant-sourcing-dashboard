@@ -964,18 +964,26 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # ушедший ОСС или ушедший ответственный заказа (Responsible person). Это не просрочка,
     # а работа без хозяина: её переназначают.
     gone_rows = [r for r in live_rows if r["managerGone"] or r["ossGone"] or r["respGone"]]
+
+    def _gone_o(r, o):
+        # заказ ждёт переназначения: уволен ответственный сделки (ведёт всё), ОСС или
+        # ответственный этого заказа, или ОСС из поля сделки, когда у заказов своего нет
+        return o["live"] and (r["managerGone"] or o["ossGone"] or o["respGone"]
+                              or (r["ossGone"] and not any(x["oss"] for x in r["orders"])))
     gone = {
         "deals": len(gone_rows),
         "byManager": sum(1 for r in gone_rows if r["managerGone"]),
         "byOss": sum(1 for r in gone_rows if r["ossGone"]),
         "byResp": sum(1 for r in gone_rows if r["respGone"]),
-        "orders": sum(1 for r in gone_rows for o in r["orders"] if o["live"]),
-        "late": sum(1 for r in gone_rows if r["late"]),
+        "orders": sum(1 for r in gone_rows for o in r["orders"] if _gone_o(r, o)),
+        "late": sum(1 for r in gone_rows if any(_gone_o(r, o) and o.get("late") for o in r["orders"])),
         "sale": _money(sum(r["saleEur"] for r in gone_rows)),
         "saleNum": round(sum(r["saleEur"] for r in gone_rows)),
         "people": len({r["manager"] for r in gone_rows if r["managerGone"]}
                       | {o["oss"] for r in gone_rows for o in r["orders"] if o["live"] and o["ossGone"]}
-                      | {w for r in gone_rows for w in resp_gone_by.get(r["deal"], ())}),
+                      | {w for r in gone_rows for w in resp_gone_by.get(r["deal"], ())}
+                      | {r["ossDeal"] for r in gone_rows if r["ossGone"] and r["ossDeal"]
+                         and not any(o["oss"] for o in r["orders"])}),
     }
 
     deadlines = {

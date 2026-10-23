@@ -15,27 +15,33 @@
   pawStale    — Price at Work дольше PAW_STALE_DAYS без итога (п. 9);
   legacy      — стадия «КП получено», которую правило отменило (п. 9).
 
-Нарушение или наследие до правил (split_flags). «До правил» — только то, что
-застыло до 19.10.2026 и после правил не могло случиться заново; признак, который
-продолжает копиться под правилами, — нарушение:
-  noFile      — до правил, если карточка ЗАКРЫТА (Selected, не выбран) и
-                закрыта раньше 19.10 (movedTime); на Price at Work файл
-                приложить можно и сейчас — нарушение;
-  legacy      — до правил, если на «КП получено» перевели раньше 19.10 (как в
-                зонде v52, scripts/probe_kp_rules.py);
+Нарушение или «до правил» (split_flags). «До правил» — два разных случая:
+застывшее наследие и льготный срок.
+  Наследие — то, что сложилось до 19.10.2026 и под правилами заново не случится:
+  noFile      — карточка ЗАКРЫТА (Selected, не выбран) раньше 19.10 (movedTime);
+                на Price at Work файл приложить можно и сейчас — нарушение;
+  legacy      — на «КП получено» перевели раньше 19.10 (как в зонде v52,
+                scripts/probe_kp_rules.py);
+  fileClosed  — файл при отказе или молчании: карточку не меняли с 19.10
+                (updatedTime раньше даты) или последним после 19.10 её менял не
+                её сорсер (updatedBy ≠ исполнитель) — переназначение, о котором
+                просит сам дашборд, не делает чужое наследие нарушением нового
+                исполнителя.
+  Льготный срок — то, что исправляется сейчас, одним действием сорсера: по
+  правилам у него на это PAW_STALE_DAYS дней с 19.10 (grace_until):
   pawStale    — часы считаются от max(movedTime, 19.10): нарушение, когда и
-                под правилами прошло больше PAW_STALE_DAYS; раньше — до правил.
-                Иначе карточка, поставленная на Price at Work 15.10, не стала бы
-                нарушением никогда, хотя стоит без итога и под правилами;
-  fileNoStage, fileClosed — файл прикладывают без смены стадии, поэтому
-                movedTime о времени файла ничего не говорит. До правил — только
-                если карточку не меняли с 19.10 вовсе (updatedTime раньше даты:
-                файл приложен не позже); нет updatedTime — нарушение.
-Наследие нарушением не вменяется, но остаётся списком на доразметку
-(count_before).
+                под правилами прошло больше PAW_STALE_DAYS;
+  fileNoStage — карточка открыта, перевести стадию можно сейчас; когда приложен
+                файл, по выдаче не установить, поэтому до конца льготного срока
+                — «до правил», после — нарушение (updatedTime не используется:
+                любую правку карточки, хоть переназначение, он считал бы файлом).
+«До правил» нарушением не вменяется, но остаётся списком на доразметку
+(count_before). Карточка считается «до правил», только если нарушений у неё
+нет: иначе одна и та же карточка стояла бы и в нарушениях, и «вне нарушений».
 """
 from __future__ import annotations
 
+import datetime as dt
 from collections import Counter
 
 from period import parse_dt
@@ -76,6 +82,13 @@ def _date(since):
     return parse_dt(since) if isinstance(since, str) else since
 
 
+def grace_until(since, stale_days: int):
+    """Последний день льготного срока: since + stale_days. С следующего дня
+    Price at Work без итога и файл без перевода стадии — нарушения."""
+    since_d = _date(since) if since else None
+    return since_d + dt.timedelta(days=stale_days) if since_d else None
+
+
 def before_rules(r: dict, since) -> bool:
     """Стадию карточки в последний раз меняли до даты правил (since — date или ISO).
 
@@ -89,7 +102,7 @@ def before_rules(r: dict, since) -> bool:
 
 
 def split_flags(r: dict, as_of, stale_days: int, since=None) -> tuple[list[str], list[str]]:
-    """(нарушения, наследие до правил) одной карточки — правила в шапке модуля.
+    """(нарушения, «до правил») одной карточки — правила в шапке модуля.
 
     Без since всё — нарушения, как до разделения."""
     fl = card_flags(r, as_of, stale_days)
@@ -98,19 +111,24 @@ def split_flags(r: dict, as_of, stale_days: int, since=None) -> tuple[list[str],
         return fl, []
     b = classify_stage(str(r.get("stageId") or ""))
     moved_before = before_rules(r, since_d)
+    льгота = (as_of - since_d).days <= stale_days          # льготный срок ещё идёт
     updated = parse_dt(r.get("updatedTime") or "")
+    кто = str(r.get("updatedBy") or "")
+    чей = str(r.get("_owner") or "")
     viol, pre = [], []
     for f in fl:
         if f == "noFile":
-            застыло = moved_before and b != "paw"            # закрыта до правил
+            до = moved_before and b != "paw"                # закрыта до правил
         elif f == "legacy":
-            застыло = moved_before
+            до = moved_before
         elif f == "pawStale":
             # часы под правилами: от max(перевод на Price at Work, дата правил)
-            застыло = moved_before and (as_of - since_d).days <= stale_days
-        else:                                                # fileNoStage, fileClosed
-            застыло = bool(updated and updated < since_d)
-        (pre if застыло else viol).append(f)
+            до = moved_before and льгота
+        elif f == "fileNoStage":
+            до = льгота
+        else:                                               # fileClosed
+            до = bool(updated and updated < since_d) or bool(кто and чей and кто != чей)
+        (pre if до else viol).append(f)
     return viol, pre
 
 
@@ -128,14 +146,14 @@ def count_flags(items: list[dict], as_of, stale_days: int, since=None) -> tuple[
 
 
 def count_before(items: list[dict], as_of, stale_days: int, since) -> tuple[Counter, int]:
-    """Наследие до правил: признаки, застывшие до since. Нарушением не считается —
-    это список на доразметку."""
+    """«До правил» (наследие и льготный срок): признаки по коду — все, карточки —
+    только без нарушений. Нарушением не считается — это список на доразметку."""
     c: Counter = Counter()
     cards = 0
     for r in items:
-        _fl, pre = split_flags(r, as_of, stale_days, since)
+        fl, pre = split_flags(r, as_of, stale_days, since)
         c.update(pre)
-        cards += bool(pre)
+        cards += bool(pre) and not fl
     return c, cards
 
 

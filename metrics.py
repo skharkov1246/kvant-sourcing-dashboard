@@ -286,12 +286,13 @@ def build(
         viol_pre = 0
         for r in items:
             wi = period.week_index(parse_dt(r.get("createdTime", "")))
-            # признак, застывший до правил, — наследие: остаётся списком на
-            # доразметку, нарушением не считается (kprules.split_flags)
+            # «до правил» (наследие и льготный срок) — список на доразметку,
+            # нарушением не считается (kprules.split_flags). Карточка в счёте
+            # «до правил» — только без нарушений: иначе она стояла бы в обоих
             fl, flp = kprules.split_flags(r, period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
             viol.update(fl)
             viol_cards += bool(fl)
-            viol_pre += bool(flp)
+            viol_pre += bool(flp) and not fl
             details.append({
                 "id": str(r.get("id")),
                 "subj": (r.get("title") or "—")[:90],
@@ -301,7 +302,7 @@ def build(
                 "dt": (r.get("createdTime") or "")[:10],
                 "dtx": (r.get("createdTime") or ""),   # полная метка для хронологической сортировки
                 # нарушения правил отметки КП — только где есть (пустой список не везём);
-                # признаки, застывшие до правил, — отдельным полем «flp»
+                # признаки «до правил» (наследие, льготный срок) — отдельным полем «flp»
                 **({"fl": fl} if fl else {}),
                 **({"flp": flp} if flp else {}),
             })
@@ -321,8 +322,9 @@ def build(
             "short": wd < ОКНО_КОРОТКОЕ,
             "c": c,
             # запросов в рабочий день СВОЕГО окна, а не всего периода (у действующего —
-            # по вчерашний день, как и perDay4)
-            "perDay": _round(in_win / wdp) if wdp else 0,
+            # по вчерашний день, как и perDay4); рабочих дней в окне нет (первый
+            # день работы, ушёл до начала периода) — темп не измерен: None, «—»
+            "perDay": _round(in_win / wdp) if wdp else None,
             "c4": c4,
             "perDay4": _round(c4 / wd4) if wd4 else None,
             "robot4": robot4,
@@ -345,12 +347,17 @@ def build(
             "details": details,
             "bySupplier": by_supplier,
             # нарушения правил отметки КП: только ненулевые коды (kprules.FLAGS),
-            # без признаков, застывших до правил (kprules.split_flags);
-            # карточек с такими признаками — violPre
+            # без признаков «до правил» (kprules.split_flags); карточек только
+            # с такими признаками, без нарушений, — violPre
             "viol": dict(viol),
             "violN": viol_cards,
             "violPre": viol_pre,
         }
+        if active:
+            # окно, по которому посчитан perDay (по вчерашний день): подпись темпа
+            # на странице показывает его, а не окно работы целиком
+            row["pto"] = p_to.isoformat()
+            row["wdp"] = wdp
         if not active:
             # открытые карточки ушедшего никто не ведёт — их надо переназначить
             row["open"] = c - closed
@@ -365,7 +372,7 @@ def build(
     # ушедшие — отдельной группой в конце, по объёму.
     sourcers_a.sort(key=lambda s: (not s["act"],
                                    -(s["perDay4"] or 0) if s["act"] else 0,
-                                   -s["perDay"] if s["act"] else 0,
+                                   -(s["perDay"] or 0) if s["act"] else 0,
                                    -s["c"]))
 
     # ---- разнообразие поставщиков (блок A): топ запрошенных + общий охват
@@ -471,13 +478,16 @@ def build(
     quotes_a = sum(s["quotes"] for s in sourcers_a)
     c_a = sum(s["c"] for s in sourcers_a)
 
-    # ---- правила отметки КП (19.10.2026): нарушения карточек периода без признаков,
-    # застывших до правил (kprules.split_flags), — те отдельным счётом «наследие до
-    # правил». И проверка сделок с «Экономика готова» = «Да»
+    # ---- правила отметки КП (19.10.2026): нарушения карточек периода без признаков
+    # «до правил» (наследие и льготный срок, kprules.split_flags) — те отдельным
+    # счётом. И проверка сделок с «Экономика готова» = «Да»
     viol_all, viol_cards = kprules.count_flags(rfqs, period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
     viol_out, viol_out_cards = kprules.count_flags(
         [r for r in rfqs if r["_owner"] not in dept_a_ids], period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
     viol_pre, viol_pre_cards = kprules.count_before(rfqs, period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
+    _vo_pre, viol_out_pre_cards = kprules.count_before(
+        [r for r in rfqs if r["_owner"] not in dept_a_ids], period.end, PAW_STALE_DAYS, KP_RULES_SINCE)
+    grace = kprules.grace_until(KP_RULES_SINCE, PAW_STALE_DAYS)
     econ_res = kprules.econ_check(*econ) if econ else None
     if econ_res:
         for row in econ_res["rows"]:
@@ -490,9 +500,14 @@ def build(
         "cards": viol_cards,
         "outside": dict(viol_out),
         "outsideCards": viol_out_cards,
-        # наследие до правил: признаки, застывшие до 19.10, нарушением не считаются
+        "outsidePreCards": viol_out_pre_cards,
+        # «до правил»: наследие и льготный срок, нарушением не считаются;
+        # карточек — только без нарушений
         "pre": dict(viol_pre),
         "preCards": viol_pre_cards,
+        # последний день льготного срока: с следующего дня Price at Work без итога
+        # и файл без перевода стадии — нарушения
+        "graceUntil": grace.isoformat(),
         "paw": sum(1 for r in rfqs if classify_stage(r.get("stageId", "")) == "paw"),
         **({"econ": econ_res} if econ_res else {}),
     }

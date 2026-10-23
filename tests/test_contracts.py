@@ -272,6 +272,10 @@ def test_уволенный_ответственный_заказа_ведёт_�
     assert o502["respGone"] is True and "resp" not in o502, "в строку — только признак, без подписи"
     g = ct["gone"]
     assert (g["deals"], g["byManager"], g["byOss"], g["byResp"], g["people"]) == (2, 1, 1, 1, 3)
+    # «живых заказов — переназначить»: все живые заказы сделки с уволенным ответственным
+    # и только заказ с уволенным ответственным в другой сделке — не все её заказы
+    ждут = sum(1 for r in ct["rows"] if r["deal"] == "1" for o in r["orders"] if o["live"]) + 1
+    assert g["orders"] == ждут, (g["orders"], ждут)
     gone = {q["deal"]: q for q in ct["life"]["queue"] if q["code"] == "gone"}
     assert set(gone) == {"1", "2"} and ct["life"]["counts"]["gone"] == 2
     assert gone["2"]["what"] == "ведёт уволенный: ответственный заказа"

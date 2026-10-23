@@ -186,7 +186,7 @@ def test_ушедший_до_начала_периода_получает_пус
     карточки = [_карточка(i, "1", dt.date(2026, 6, 1) + dt.timedelta(days=i), **чужой) for i in range(3)]
     m = _окно(карточки, {"1": {"active": False, "hired": None, "left": dt.date(2026, 3, 1)}})
     у = m["sourcersA"][0]
-    assert у["wd"] == 0 and у["perDay"] == 0 and у["afterLeft"] == 3
+    assert у["wd"] == 0 and у["perDay"] is None and у["afterLeft"] == 3, "темп не измерен — None, а не 0"
     assert all(w["hc"] == 0 for w in m["weekly"]), "в численность отдела не входит"
 
 

@@ -44,27 +44,52 @@ def _сборка(карточки: list[dict], начало: str, конец: s
 
 # ── правила отметки КП: до правил — только застывшее до 19.10.2026 ───────────
 
-def test_до_правил_только_застывшее_остальное_нарушение():
+def test_до_правил_наследие_и_льготный_срок_остальное_нарушение():
     после = _к(1, dt.date(2026, 10, 1), "DT166_24:UC_H49RUE", moved=dt.date(2026, 10, 20))   # PaW без файла
     до = _к(2, dt.date(2026, 9, 1), "DT166_24:UC_H49RUE", moved=dt.date(2026, 9, 20))       # PaW без файла с 20.09
     чисто = _к(3, dt.date(2026, 10, 2), "DT166_24:SUCCESS", moved=dt.date(2026, 10, 21), _hasQuote=True)
     закрыта = _к(4, dt.date(2026, 9, 2), "DT166_24:SUCCESS", moved=dt.date(2026, 10, 1))     # Selected без файла
     файл = _к(5, dt.date(2026, 10, 5), "DT166_24:PREPARATION", moved=dt.date(2026, 10, 12), _hasQuote=True,
-              updatedTime="2026-10-21T10:00:00+03:00")                                       # файл после правил
+              updatedTime="2026-10-21T10:00:00+03:00")                                       # файл без стадии
     m = _сборка([после, до, чисто, закрыта, файл], "2026-09-01", "2026-10-23")
     s = m["sourcersA"][0]
-    assert (s["violN"], s["viol"], s["violPre"]) == (3, {"noFile": 2, "fileNoStage": 1}, 2), (
-        "открытая Price at Work без файла и файл после 19.10 — нарушения; закрытая до правил — наследие")
+    assert (s["violN"], s["viol"], s["violPre"]) == (2, {"noFile": 2}, 2), (
+        "открытая Price at Work без файла — нарушение; закрытая до правил — наследие; файл без перевода "
+        "стадии — льготный срок; карточка 2 с нарушением в «до правил» не считается")
     det = {d["id"]: d for d in s["details"]}
     assert det["1"]["fl"] == ["noFile"] and "flp" not in det["1"]
     assert det["2"]["fl"] == ["noFile"] and det["2"]["flp"] == ["pawStale"], (
-        "под правилами прошло 4 дня из 14 — простой пока наследие, файл приложить можно и сейчас")
+        "под правилами прошло 4 дня из 14 — простой ещё в льготном сроке, файл приложить можно и сейчас")
     assert det["4"]["flp"] == ["noFile"] and "fl" not in det["4"]
-    assert det["5"]["fl"] == ["fileNoStage"]
+    assert det["5"]["flp"] == ["fileNoStage"] and "fl" not in det["5"]
     kr = m["kpRules"]
-    assert (kr["cards"], kr["total"]) == (3, {"noFile": 2, "fileNoStage": 1})
-    assert (kr["preCards"], kr["pre"]) == (2, {"noFile": 1, "pawStale": 1})
-    assert m["kpi"]["violCards"] == 3
+    assert (kr["cards"], kr["total"]) == (2, {"noFile": 2})
+    assert (kr["preCards"], kr["pre"]) == (2, {"noFile": 1, "pawStale": 1, "fileNoStage": 1}), (
+        "по кодам — все признаки, по карточкам — только без нарушений")
+    assert m["kpi"]["violCards"] == 2
+    assert kr["graceUntil"] == "2026-11-02"
+
+
+def test_льготный_срок_назван_датой():
+    import insights
+    m = _сборка([_к(2, dt.date(2026, 9, 1), "DT166_24:UC_H49RUE", moved=dt.date(2026, 9, 20), _hasQuote=True)],
+                "2026-09-01", "2026-10-23")
+    out = insights.rule_based(m)["conversion"]
+    assert "станут нарушениями с 03.11.2026" in out
+    assert "застыв" not in out
+    m = _сборка([_к(2, dt.date(2026, 9, 1), "DT166_24:UC_H49RUE", moved=dt.date(2026, 9, 20), _hasQuote=True)],
+                "2026-09-01", "2026-11-05")
+    assert "станут нарушениями" not in insights.rule_based(m)["conversion"], "срок прошёл — не обещаем"
+    t = (ROOT / "templates" / "dashboard_core.html").read_text(encoding="utf-8")
+    assert 'id="kpGrace"' in t and "GRACE_TXT" in t and "застыв" not in t
+
+
+def test_вне_отдела_до_правил_отдельным_числом():
+    чужая = dict(_к(7, dt.date(2026, 9, 2), "DT166_24:SUCCESS", moved=dt.date(2026, 10, 1)),
+                 assignedById="9", createdBy="9", movedBy="9", updatedBy="9", lastActivityBy="9")
+    m = _сборка([_к(1, dt.date(2026, 10, 1)), чужая], "2026-09-01", "2026-10-23")
+    kr = m["kpRules"]
+    assert (kr["outsideCards"], kr["outsidePreCards"]) == (0, 1), "строка «Вне отдела» — и при одном «до правил»"
 
 
 def test_price_at_work_до_правил_становится_нарушением_через_14_дней(monkeypatch):
@@ -200,6 +225,29 @@ def test_ровный_темп_без_ложной_стрелки(monkeypatch):
     m = _сборка(новичок + старожил, "2026-09-01", "2026-10-23", staff=staff)
     темп = {s["id"]: (s["perDay"], s["perDay4"]) for s in m["sourcersA"]}
     assert темп["2"] == (4.0, 4.0) and темп["1"] == (6.0, 6.0), темп
+    # подпись темпа показывает окно, по которому он посчитан: по вчерашний день
+    s1 = next(s for s in m["sourcersA"] if s["id"] == "1")
+    assert (s1["to"], s1["pto"], s1["wdp"]) == ("2026-10-23", "2026-10-22", period_mod.workdays(
+        dt.date(2026, 9, 1), dt.date(2026, 10, 22)))
+    assert s1["wd"] == period_mod.workdays(dt.date(2026, 9, 1), dt.date(2026, 10, 23)), "окно работы — как было"
+
+
+def test_первый_день_окна_темп_не_измерен(monkeypatch):
+    """Принят сегодня: рабочих дней в окне темпа нет — темп None («—»), а не 0, и
+    рейтинг, сортировка и тексты на этом не падают."""
+    import insights
+    monkeypatch.setenv("KVANT_NOW", "2026-10-23T09:00:00+03:00")
+    сегодня = dt.date(2026, 10, 23)
+    новый = [dict(_к(10 + i, сегодня), assignedById="2", createdBy="2") for i in range(3)]
+    staff = {"1": {"active": True, "hired": dt.date(2024, 1, 1)}, "2": {"active": True, "hired": сегодня}}
+    m = _сборка(новый + [_к(1, dt.date(2026, 10, 20))], "2026-09-01", "2026-10-23", staff=staff)
+    н = next(s for s in m["sourcersA"] if s["id"] == "2")
+    assert (н["perDay"], н["perDay4"], н["wdp"]) == (None, None, 0)
+    assert [s["id"] for s in m["sourcersA"]] == ["1", "2"]
+    m["sourcersA"] = [н]                                   # новичок — «лидер» единственным
+    assert "— запр. в раб. день" in insights.rule_based(m)["load"]
+    t = (ROOT / "templates" / "dashboard_core.html").read_text(encoding="utf-8")
+    assert "первый день, темп ещё не измерен" in t and "r.perDay??null" in t
 
 
 # ── пресейл: «первые 60 из N», без «Выиграно» ────────────────────────────────
@@ -216,11 +264,15 @@ def test_пресейл_сообщает_полное_число_до_обрез
 def test_шаблон_не_показывает_скрытое():
     t = (ROOT / "templates" / "dashboard_core.html").read_text(encoding="utf-8")
     сорсинг = t[t.index("function renderPresale"):t.index("function openDrw")]
-    for нет in ("Выиграно</th>", "Выиграно: <b>", "tkpList", "donutChain", "${c.tkpPct}%",
-                "${r.tkpP}%", "фейк", "Ср. постав.", "≈ 98"):
+    for нет in ("Выиграно</th>", "Выиграно: <b>", "tkpList", "donutChain", "${c.tkpPct}%", "${r.tkpP}%"):
         assert нет not in сорсинг, нет
+    # подписи, которые жили в статичной разметке и в других местах шаблона, — по всему файлу
+    for нет in ("фейк", "Ср. постав.", "≈ 98", "поставщиков/сделку", "до ТКП ${s.tkpP}%"):
+        assert нет not in t, нет
     assert "actN" in сорсинг and "показаны первые" in сорсинг
-    assert "до ТКП ${s.tkpP}%" not in t and "≈ 98%" not in t
+    # «до правил» в карточке сорсера — только карточки без нарушений
+    assert "const _onlyPre=d=>!!(d.flp&&d.flp.length)&&!(d.fl&&d.fl.length);" in t
+    assert t.count("allDet.filter(_onlyPre)") == 2
 
 
 # ── тексты по правилам не называют скрытую долю ТКП ──────────────────────────
@@ -278,7 +330,11 @@ def test_доля_реакции_не_стоит_рядом_с_нулём(tmp_pa
 
 def test_нет_снимка_чатов_не_ноль_процентов():
     t = (ROOT / "templates" / "dashboard_core.html").read_text(encoding="utf-8")
-    assert "нет данных скана" in t
+    assert "нет данных скана" in t and "const noScan=!rr.days;" in t
+    for поле in ("🔴 Висит на нём',noScan?'—'", "'Медиана реакции',noScan?'—'", "Вовлечённость: ${noScan?",
+                 "return noScan?", "if(!rr.days)return '<td class=\"num r dimv\""):
+        assert поле in t, поле
+    assert "rr.medMin!=null&&rr.medMin<=sla?'ok':'warn'" not in t, "цвет медианы — только когда она есть"
     import reps
     исходник = inspect.getsource(reps.compute)
     assert '"handledPct": None' in исходник and '"withinSla": None' in исходник

@@ -186,9 +186,10 @@ def main() -> int:
         if личный:
             # ссылка на личный Диск (открывается только вошедшему в аккаунт):
             # читается ключом прогона по пути disk:/…, если ключ от того же аккаунта
-            путь = "/".join(urllib.parse.unquote(x) for x in (части[2:] if части[0] == "client" else части[1:]))
-            if части[0] == "edit":
-                путь = путь.split("/", 1)[-1] if путь.startswith("disk/") else путь
+            # /client/disk/<папка>/<файл> и /edit/disk/disk%2F<папка>%2F<файл>: путь от корня Диска
+            путь = "/".join(urllib.parse.unquote(x) for x in части[2:])
+            if части[0] == "edit" and путь.startswith("disk/"):
+                путь = путь[len("disk/"):]
             тк = os.environ.get("YADISK_TOKEN", "").strip()
             if not тк:
                 сч["личный Диск: ключа нет"] += 1
