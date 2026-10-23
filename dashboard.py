@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 from pathlib import Path
 
 from config import BASE_DIR
@@ -126,23 +127,32 @@ def _pack_metrics(metrics: dict) -> dict:
 def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company: dict | None = None,
            kam: dict | None = None, eng: dict | None = None, prod: dict | None = None,
            contracts: dict | None = None, reps: dict | None = None, advisor: dict | None = None,
-           people: dict | None = None, premia: dict | None = None) -> str:
+           people: dict | None = None, premia: dict | None = None, dealctx: dict | None = None) -> str:
     # premia принимается и не выводится: «Премии» сняты с портала по решению владельца
     # 12.10.2026 — ни вкладки, ни массива в странице. Расчёт premia.py остаётся в сборке
     # (main.py, живая сверка); вкладка до снятия — в истории, PR #508.
     del premia
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace("__TITLE__", title)
-    html = html.replace("__DATA_JSON__", _json_for_script(_pack_metrics(metrics)))
-    html = html.replace("__INSIGHTS_JSON__", _json_for_script(insights))
-    html = html.replace("__COMPANY_JSON__", _json_for_script(_pack_company(company)) if company else "null")
-    html = html.replace("__KAM_JSON__", _json_for_script(kam) if kam else "null")
-    html = html.replace("__PEOPLE_JSON__", _json_for_script(people) if people else "null")
-    html = html.replace("__ENG_JSON__", _json_for_script(eng) if eng else "null")
-    html = html.replace("__PRODUCT_JSON__", _json_for_script(prod) if prod else "null")
-    html = html.replace("__CONTRACTS_JSON__", _json_for_script(contracts) if contracts else "null")
-    html = html.replace("__REPS_JSON__", _json_for_script(reps) if reps else "null")
-    html = html.replace("__ADVISOR_JSON__", _json_for_script(advisor) if advisor else "null")
+    # Все массивы — ОДНИМ проходом по шаблону: при подстановке по очереди текст из данных
+    # (название сделки «__DEALCTX_JSON__» в CONTRACTS) подменялся бы следующим массивом —
+    # закрытая часть «Реализации» (dealctx.py) уехала бы в общий массив вкладки.
+    вставки = {
+        "__DATA_JSON__": _json_for_script(_pack_metrics(metrics)),
+        "__INSIGHTS_JSON__": _json_for_script(insights),
+        "__COMPANY_JSON__": _json_for_script(_pack_company(company)) if company else "null",
+        "__KAM_JSON__": _json_for_script(kam) if kam else "null",
+        "__PEOPLE_JSON__": _json_for_script(people) if people else "null",
+        "__ENG_JSON__": _json_for_script(eng) if eng else "null",
+        "__PRODUCT_JSON__": _json_for_script(prod) if prod else "null",
+        "__CONTRACTS_JSON__": _json_for_script(contracts) if contracts else "null",
+        "__REPS_JSON__": _json_for_script(reps) if reps else "null",
+        "__ADVISOR_JSON__": _json_for_script(advisor) if advisor else "null",
+        # закрытая часть «Реализации» (чаты и договоры по сделкам, dealctx.py): отдельный
+        # массив — воркер вырезает его всем, у кого нет права «договоры и деньги»
+        "__DEALCTX_JSON__": _json_for_script(dealctx) if dealctx else "null",
+    }
+    html = re.sub("|".join(map(re.escape, вставки)), lambda m: вставки[m.group(0)], html)
     gen, nxt = _update_stamps()
     html = html.replace("__GENERATED_AT__", gen)
     html = html.replace("__NEXT_UPDATE__", nxt)
@@ -153,10 +163,10 @@ def write(metrics: dict, insights: dict, out_path: str | Path, *, title: str = D
           company: dict | None = None, kam: dict | None = None,
           eng: dict | None = None, prod: dict | None = None, contracts: dict | None = None,
           reps: dict | None = None, advisor: dict | None = None, people: dict | None = None,
-          premia: dict | None = None) -> Path:
+          premia: dict | None = None, dealctx: dict | None = None) -> Path:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render(metrics, insights, title=title, company=company, kam=kam, eng=eng, prod=prod,
                           contracts=contracts, reps=reps, advisor=advisor, people=people,
-                          premia=premia), encoding="utf-8")
+                          premia=premia, dealctx=dealctx), encoding="utf-8")
     return out

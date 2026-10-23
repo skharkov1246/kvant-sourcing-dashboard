@@ -191,6 +191,9 @@ create table if not exists deal_chat_state (
 -- create table if not exists таблицу не меняет (правило 21): колонка, добавленная
 -- после первой редакции файла, — отдельным alter, до ограничений ниже
 alter table deal_chat_state add column if not exists fail_streak integer not null default 0;
+-- последнее УДАЧНОЕ чтение чата (23.10.2026): checked_at сдвигает и неудача (очередь),
+-- а вкладке «Реализация» (scripts/realization_ctx.py) нужно знать, когда чат правда читали
+alter table deal_chat_state add column if not exists read_at timestamptz;
 
 create table if not exists deal_chat_ctx (
   id            bigserial   primary key,

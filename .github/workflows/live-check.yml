@@ -44,6 +44,8 @@ on:
       - kprules.py
       - lifecycle.py
       - chat_activity.py
+      - dealctx.py
+      - contract_b2b.py
       - kamqueue.py
       - scripts/live_check.py
       - .github/workflows/live-check.yml

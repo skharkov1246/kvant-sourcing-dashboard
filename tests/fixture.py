@@ -514,6 +514,58 @@ def build_contracts(**kw) -> dict:
             os.environ["KVANT_NOW"] = old
 
 
+def realctx_raw() -> dict:
+    """Свод из ключа realctx:v1 для сделок ContractsStub (dealctx.py): оценки чатов и
+    исходы договоров придуманы. Чаты стаба: i % 5 == 0 — нет доступа у сборки, чётные —
+    человек писал вчера, нечётные — месяц назад."""
+    now = dt.datetime.fromisoformat(CT_NOW)
+
+    def t(days: float) -> str:
+        return (now - dt.timedelta(days=days)).isoformat()
+
+    def v(state="идёт", direction="вперёд", risk="средний", kinds=("срок",), ball="сопровождение",
+          reply=False, due=None, due_kind=None, blocker=None, at=0.3, human=1.0, checked=0.3):
+        return {"checked": t(checked), "human": t(human) if human is not None else None, "at": t(at),
+                "state": state, "direction": direction, "risk": risk, "kinds": list(kinds), "ball": ball,
+                "reply": reply, "due": due, "dueKind": due_kind if due else None, "blocker": blocker}
+    d = lambda days: (CT_TODAY + dt.timedelta(days=days)).isoformat()
+    chats = {
+        # мяч у КАМа, ждут ответа с субботы: будних часов 12 — ещё не пункт очереди
+        "6002": v(state="ждёт_нас", ball="кам", reply=True, human=2.5),
+        "6004": v(state="ждёт_поставщика", due=d(6), due_kind="отгрузка",
+                  blocker={"kind": "поставка", "on": "поставщик"}),
+        "6005": v(human=2.0),                                                     # сборке недоступен, работа идёт
+        "6006": v(reply=True, ball="сопровождение", human=4.0),                 # с четверга: 48 будних часов
+        "6008": v(state="стоит", direction="назад", risk="высокий", kinds=("срок", "оплата"),
+                  due=d(-5), due_kind="оплата"),
+        "6010": {"checked": t(0.3), "human": t(20.0), "at": None},             # прочитан, людей 20 дн. нет
+        "6012": v(state="стоит", at=3.0, human=1.0),                              # после оценки писал человек
+        "6014": v(risk="высокий", kinds=("отказ_клиента",), checked=12.0, at=12.0, human=13.0),  # давно не читан
+    }
+    contracts = {
+        "6001": {"at": t(1), "outcome": "пара", "read": {"customer": 1, "supplier": 1},
+                 "flags": [{"code": "penaltyUncovered", "order": 7002, "days": None},
+                           {"code": "docsGap", "order": 7002, "days": None}]},
+        "6003": {"at": t(1), "outcome": "нет пары", "read": {"customer": 1, "supplier": 0}, "flags": []},
+        "6007": {"at": t(1), "outcome": "нет договоров", "read": {"customer": 0, "supplier": 0}, "flags": []},
+        "6009": {"at": t(1), "outcome": "недочитана", "read": {"customer": 1, "supplier": 0}, "flags": []},
+        "6011": {"at": t(1), "outcome": "разошлось", "read": {"customer": 1, "supplier": 1}, "flags": []},
+        "6013": {"at": t(1), "outcome": "пара", "read": {"customer": 1, "supplier": 2}, "flags": []},
+    }
+    return {"version": 1, "at": t(0.2), "chats": chats, "contracts": contracts}
+
+
+def build_realization() -> dict:
+    """«Реализация» со сводом чатов и договоров — как main.py: contracts.compute с чатами
+    свода, затем dealctx.build. → {"contracts": …, "dealctx": …} для dashboard.write."""
+    import dealctx
+    ctx = dealctx.clean(realctx_raw())
+    ct = build_contracts(ctx_chats=ctx["chats"])
+    head, payload = dealctx.build(ct["rows"], ct.get("life"), ctx, dt.datetime.fromisoformat(CT_NOW), today=CT_TODAY)
+    ct["head"]["ctx"] = head
+    return {"contracts": ct, "dealctx": payload}
+
+
 # ── «Пресейл» для очереди КАМа и золотого правила чата. Стадии — имена воронки
 # «Пресейл» (зонд v48), даты — от CT_TODAY; сделки, люди и чаты придуманы.
 PS_STAGES = {

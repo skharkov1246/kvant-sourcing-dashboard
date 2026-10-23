@@ -17,7 +17,10 @@
       файл (по сделке, с ключом прогона) → флаги по сделке → запись в базу.
 
 ОТБОР. Сделки — последние по DATE_CREATE НЕ проигранные (STAGE_SEMANTIC_ID ≠ F)
-сделки воронки реализации (CATEGORY_ID 0). Карточки — СП-1174 «2025 — разовый
+сделки воронки реализации (CATEGORY_ID 0); с --open — только открытые (STAGE_SEMANTIC_ID
+= P): так читает недельный прогон по расписанию (решение владельца 23.10.2026), исход
+по сделке пишется в contract_deal_outcome, вкладка «Реализация» показывает его через
+закрытый ключ realctx:v1 (scripts/realization_ctx.py). Карточки — СП-1174 «2025 — разовый
 договор / спецификация / ДС» и СП-1192 «2026 — рамочный договор / ген.
 соглашение» с parentId2 из этих сделок.
 
@@ -119,7 +122,9 @@ import read_llm  # noqa: E402  (подготовка документа, цен�
 ПОЛЯ_ПОДПИСЕЙ = {СП_РАЗОВЫЙ: (ПОЛЕ_ШАБЛОН, ПОЛЕ_ТИП), СП_РАМОЧНЫЙ: ()}
 
 СДЕЛОК_ПО_УМОЛЧАНИЮ = 30
-СДЕЛОК_МАКС = 200
+#: Недельный прогон по расписанию (решение владельца 23.10.2026) читает все открытые
+#: сделки реализации (--open): их больше двухсот.
+СДЕЛОК_МАКС = 400
 БЮДЖЕТ_ПО_УМОЛЧАНИЮ = 10.0
 #: Модель по умолчанию — старшая из таблицы цен read_llm. Дешевле — решение
 #: владельца, а не кода: другая модель задаётся входом, dry печатает оценку и для неё.
@@ -420,25 +425,30 @@ def _номер(v) -> int | None:
     return n if n > 0 else None
 
 
-def выбрать_сделки(портал, сколько: int) -> list[dict]:
-    """Последние по DATE_CREATE не проигранные сделки реализации.
+def выбрать_сделки(портал, сколько: int, открытые: bool = False) -> list[dict]:
+    """Последние по DATE_CREATE не проигранные сделки реализации; открытые=True —
+    только открытые (недельный прогон по расписанию, решение владельца 23.10.2026:
+    вкладка «Реализация» показывает договоры открытых сделок).
 
     Список — смещением по страницам, но не дальше нужного: при 30 сделках это ОДИН
     запрос. Фильтр портала проверяется ещё раз здесь: проигранная сделка, попавшая
     в выборку, тратила бы деньги модели на договоры, которых уже нет."""
     сделки: dict[int, dict] = {}
     старт = 0
+    фильтр = ({"CATEGORY_ID": КАТЕГОРИЯ_РЕАЛИЗАЦИИ, "STAGE_SEMANTIC_ID": "P"} if открытые
+              else {"CATEGORY_ID": КАТЕГОРИЯ_РЕАЛИЗАЦИИ, "!STAGE_SEMANTIC_ID": "F"})
     while len(сделки) < сколько:
         ответ = портал.вызов("crm.deal.list", {
-            "filter": {"CATEGORY_ID": КАТЕГОРИЯ_РЕАЛИЗАЦИИ, "!STAGE_SEMANTIC_ID": "F"},
+            "filter": фильтр,
             "order": {"DATE_CREATE": "DESC", "ID": "DESC"},
             "select": ["ID", "DATE_CREATE", "COMPANY_ID", "STAGE_SEMANTIC_ID", "CATEGORY_ID"],
             "start": старт}) or {}
         часть = ответ.get("result") or []
         for d in часть:
             n = _номер(d.get("ID"))
+            сем = str(d.get("STAGE_SEMANTIC_ID") or "").upper()
             if (n and str(d.get("CATEGORY_ID", КАТЕГОРИЯ_РЕАЛИЗАЦИИ)) == str(КАТЕГОРИЯ_РЕАЛИЗАЦИИ)
-                    and str(d.get("STAGE_SEMANTIC_ID") or "").upper() != "F"):
+                    and сем != "F" and (not открытые or сем == "P")):
                 сделки[n] = d
         следующая = ответ.get("next")
         if not часть or not следующая:
@@ -612,13 +622,22 @@ def откуда_компания(карточка: dict, сделка: dict, з
     return "other", раньше
 
 
+def порядок_файла(file_id: str) -> tuple[int, str]:
+    """Новый файл раньше старого: номер файла поля больше — файл новее. Тот же порядок
+    восстанавливает по строкам базы выгрузка для вкладки (scripts/realization_ctx.py:
+    length(file_id) desc, file_id desc) — свод условий берёт первое заполненное."""
+    return len(file_id), file_id
+
+
 def файлы_карточки(карточка: dict, тип: int) -> tuple[str | None, list[dict]]:
-    """(поле, файлы) первого непустого поля по приоритету ПОЛЯ_ФАЙЛА."""
+    """(поле, файлы) первого непустого поля по приоритету ПОЛЯ_ФАЙЛА; файлы — новый раньше
+    старого (порядок_файла), а не в порядке ответа портала."""
     for поле in ПОЛЯ_ФАЙЛА[тип]:
         v = карточка.get(поле)
         файлы = [x for x in (v if isinstance(v, list) else [v])
                  if isinstance(x, dict) and (x.get("id") or x.get("urlMachine") or x.get("url"))]
         if файлы:
+            файлы.sort(key=lambda x: порядок_файла(str(x.get("id") or "")), reverse=True)
             return поле, файлы
     return None, []
 
@@ -654,8 +673,8 @@ class Отбор:
         return [д for дд in self.документы.values() for д in дд]
 
 
-def отобрать(портал, сколько: int) -> Отбор:
-    сделки = выбрать_сделки(портал, сколько)
+def отобрать(портал, сколько: int, открытые: bool = False) -> Отбор:
+    сделки = выбрать_сделки(портал, сколько, открытые)
     по_номеру = {int(d["ID"]): d for d in сделки}
     номера = list(по_номеру)
     документы: dict[int, list[Документ]] = {n: [] for n in номера}
@@ -933,6 +952,10 @@ def свести(строки: list[dict]) -> dict:
 
 
 НЕ_ПРОЧИТАН = ("budget", "time", "download", "format", "limit", "model", "parse", "api")
+#: Исход разбора договоров сделки — флаги_сделки и «нет договоров» (у сделки нет ни
+#: одной карточки договора). Пишется в contract_deal_outcome вместе с флагами: по нему
+#: вкладка «Реализация» отличает «договоров нет» от «сделку не читали».
+ИСХОДЫ = ("пара", "недочитана", "без стороны", "спорная", "поставщик без заказа", "нет пары", "нет договоров")
 
 
 def снятые_поля(строки: list[dict], свод: dict) -> set[str]:
@@ -1007,9 +1030,11 @@ class База:
         вызова: таблица прежней версии без side_link упала бы на вставке уже после
         чтения."""
         with self.с, self.с.cursor() as c:
-            c.execute("select to_regclass('contract_terms') is null, to_regclass('contract_b2b_flags') is null")
-            нет_условий, нет_флагов = c.fetchone()
-            нет = [имя for имя, н in (("contract_terms", нет_условий), ("contract_b2b_flags", нет_флагов)) if н]
+            c.execute("select to_regclass('contract_terms') is null, to_regclass('contract_b2b_flags') is null, "
+                      "to_regclass('contract_deal_outcome') is null")
+            нет_условий, нет_флагов, нет_исходов = c.fetchone()
+            нет = [имя for имя, н in (("contract_terms", нет_условий), ("contract_b2b_flags", нет_флагов),
+                                      ("contract_deal_outcome", нет_исходов)) if н]
             if not нет_условий:
                 c.execute("select array_agg(attname::text) from pg_attribute "
                           "where attrelid = to_regclass('contract_terms') and attnum > 0 and not attisdropped")
@@ -1047,14 +1072,30 @@ class База:
                        for к in self.КОЛОНКИ) for r in строки])
 
     def записать_флаги(self, флаги: list[dict], run_id: str) -> None:
+        self.записать_итог(флаги, {}, run_id)
+
+    def записать_итог(self, флаги: list[dict], исходы: dict[int, str], run_id: str) -> None:
+        """Флаги и исход по каждой сделке — одной транзакцией: исход «пара» без своих
+        флагов вкладка прочла бы как «рисков сверки нет»."""
         import psycopg2.extras
-        if not флаги:
+        if not флаги and not исходы:
             return
         with self.с, self.с.cursor() as c:
-            psycopg2.extras.execute_values(
-                c, "insert into contract_b2b_flags (run_id, method_ver, deal_id, order_id, code, days) "
-                   "values %s on conflict do nothing",
-                [(run_id, METHOD_VER, f["deal_id"], f["order_id"], f["code"], f["days"]) for f in флаги])
+            if флаги:
+                psycopg2.extras.execute_values(
+                    c, "insert into contract_b2b_flags (run_id, method_ver, deal_id, order_id, code, days) "
+                       "values %s on conflict do nothing",
+                    [(run_id, METHOD_VER, f["deal_id"], f["order_id"], f["code"], f["days"]) for f in флаги])
+            if исходы:
+                psycopg2.extras.execute_values(
+                    c, "insert into contract_deal_outcome (run_id, method_ver, deal_id, outcome) "
+                       "values %s on conflict do nothing",
+                    [(run_id, METHOD_VER, int(д), и) for д, и in sorted(исходы.items())])
+
+    def итог_сделок(self, run_id: str) -> int:
+        with self.с, self.с.cursor() as c:
+            c.execute("select count(*) from contract_deal_outcome where run_id = %s", (run_id,))
+            return int(c.fetchone()[0])
 
     def итог(self, run_id: str) -> tuple[int, int, float]:
         """Сколько записано — запросом по ключу прогона: rowcount у execute_values —
@@ -1238,14 +1279,14 @@ def причины_отказов(строки: list[dict]) -> Counter:
 
 def прогон(режим: str, сделок: int, бюджет: float, модель: str, *, портал, run_id: str,
            читатель: Читатель | None = None, база=None, печать=print,
-           срок_мин: float | None = None, часы=time.monotonic) -> int:
+           срок_мин: float | None = None, часы=time.monotonic, открытые: bool = False) -> int:
     """Весь прогон. Портал, читатель, база и часы подставляются (тесты); печать —
     только агрегаты. срок_мин — сколько минут от начала прогона ещё начинать
     закачку и чтение файла; дальше файлы пишутся статусом time."""
     срок = часы() + срок_мин * 60 if срок_мин else None
-    печать(f"договоры · режим {режим} · сделок до {сделок} · модель {модель} · бюджет ${бюджет:.2f} · "
-           f"ключ прогона {run_id}" + (f" · срок {срок_мин:g} мин" if срок_мин else ""))
-    отбор = отобрать(портал, сделок)
+    печать(f"договоры · режим {режим} · сделок до {сделок}{' (открытые)' if открытые else ''} · модель {модель} · "
+           f"бюджет ${бюджет:.2f} · ключ прогона {run_id}" + (f" · срок {срок_мин:g} мин" if срок_мин else ""))
+    отбор = отобрать(портал, сделок, открытые)
     for s in журнал_отбора(отбор):
         печать(s)
     файлов = sum(len(д.files) for д in отбор.все())
@@ -1262,6 +1303,7 @@ def прогон(режим: str, сделок: int, бюджет: float, мод
     снятые_флаги: Counter = Counter()
     все_строки: list[dict] = []
     все_флаги: list[dict] = []
+    исход_сделки: dict[int, str] = {}
     прочитано: dict[str, dict] = {}            # sha256 → итог чтения в этом прогоне
     по_сроку = False
     for сделка in отбор.сделки:
@@ -1272,10 +1314,6 @@ def прогон(режим: str, сделок: int, бюджет: float, мод
                 строки_сделки.append(строка(run_id, модель, д, status="no_file"))
                 continue
             for fo in д.files:
-                if читатель.стоп:
-                    строки_сделки.append(строка(run_id, модель, д, fo, status="budget",
-                                                итог={"note": "бюджет прогона исчерпан раньше"}))
-                    continue
                 if срок is not None and (по_сроку or часы() > срок):
                     # Срок прогона вышел: job не убьют таймаутом посреди записи, а
                     # флаги и итог по уже прочитанному дойдут до базы и журнала.
@@ -1295,6 +1333,12 @@ def прогон(режим: str, сделок: int, бюджет: float, мод
                     строки_сделки.append(строка(run_id, модель, д, fo, status="reused", sha256=sha, итог={
                         **готово, "usd": 0.0, "note": f"условия того же файла (sha256) из {откуда}"}))
                     continue
+                # бюджет кончился — новый файл не читается, но прочитанный раньше (тот же
+                # sha256) выше взят даром: недельный прогон не теряет готовые сделки
+                if читатель.стоп:
+                    строки_сделки.append(строка(run_id, модель, д, fo, status="budget", sha256=sha,
+                                                итог={"note": "бюджет прогона исчерпан раньше"}))
+                    continue
                 итог = читатель.прочитать(b, None)
                 if итог["status"] == "ok":
                     прочитано[sha] = итог
@@ -1303,6 +1347,7 @@ def прогон(режим: str, сделок: int, бюджет: float, мод
             статусы[r["status"]] += 1
         флаги, исход = флаги_сделки(строки_сделки, снятые_флаги) if строки_сделки else ([], "нет договоров")
         исходы[исход] += 1
+        исход_сделки[int(сделка["ID"])] = исход
         все_флаги += флаги
         все_строки += строки_сделки
         if база is not None:
@@ -1333,9 +1378,12 @@ def прогон(режим: str, сделок: int, бюджет: float, мод
            f" · сделок с флагами {len({f['deal_id'] for f in все_флаги})}")
     if база is not None:
         if гейт:
-            база.записать_флаги(все_флаги, run_id)
+            # исходы — только вместе с флагами: прогон, не прошедший гейт стороны,
+            # вкладке не источник (scripts/realization_ctx.py берёт последний исход)
+            база.записать_итог(все_флаги, исход_сделки, run_id)
         строк, флагов, usd = база.итог(run_id)
-        печать(f"в базе по ключу прогона: строк условий {строк}, флагов {флагов}, ${usd:.2f}")
+        печать(f"в базе по ключу прогона: строк условий {строк}, флагов {флагов}, "
+               f"исходов сделок {база.итог_сделок(run_id)}, ${usd:.2f}")
     return 0 if гейт else 1
 
 
@@ -1347,6 +1395,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Пилот чтения договоров (только агрегаты в журнал)")
     ap.add_argument("--mode", choices=("dry", "live"), default=os.environ.get("CONTRACT_TERMS_MODE") or "dry")
     ap.add_argument("--deals", type=int, default=СДЕЛОК_ПО_УМОЛЧАНИЮ)
+    ap.add_argument("--open", action="store_true",
+                    help="только открытые сделки реализации (недельный прогон по расписанию)")
     ap.add_argument("--budget", type=float, default=БЮДЖЕТ_ПО_УМОЛЧАНИЮ)
     ap.add_argument("--model", default=(os.environ.get("CONTRACT_TERMS_MODEL") or МОДЕЛЬ_ПО_УМОЛЧАНИЮ).strip())
     ap.add_argument("--deadline-min", type=float, default=СРОК_МИН_ПО_УМОЛЧАНИЮ,
@@ -1388,7 +1438,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
     try:
         return прогон(a.mode, a.deals, a.budget, a.model, портал=Портал(), run_id=_ключ_прогона(), база=база,
-                      срок_мин=a.deadline_min or None)
+                      срок_мин=a.deadline_min or None, открытые=a.open)
     finally:
         if база is not None:
             база.закрыть()

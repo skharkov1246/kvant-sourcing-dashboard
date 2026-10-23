@@ -68,7 +68,8 @@ const TABS = [
   // и направления по клиентам (KAM), и продуктовые линии (PRODUCT).
   { id: "eng", name: "Инжиниринг", pay: ["ENG"] },
   { id: "reps", name: "КАМ и продукт-оунеры", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"] },
-  { id: "contracts", name: "Реализация", pay: ["CONTRACTS"] },
+  // DEALCTX — закрытая часть «Реализации»: кроме вкладки нужно право (RIGHT_PAYLOADS)
+  { id: "contracts", name: "Реализация", pay: ["CONTRACTS", "DEALCTX"] },
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
   { id: "cohorts", name: "Когорты", pay: ["COMPANY"] },
   { id: "advisor", name: "Советы знатока", pay: ["ADVISOR"] },
@@ -90,14 +91,20 @@ const RIGHTS = [
   { id: "suppliers_pii", def: false, name: "Поставщики: контакты",
     note: "ФИО, должность, почта, телефон, каналы связи. Выдаётся поимённо" },
   { id: "suppliers_fin", def: false, name: "Поставщики: договоры и деньги",
-    note: "условия оплаты, отсрочка, лимиты, суммы закупок. Выдаётся поимённо" },
+    note: "условия оплаты, отсрочка, лимиты, суммы закупок; в «Реализации» — оценки чатов и договоры по сделкам. Выдаётся поимённо" },
   { id: "suppliers_edit", def: false, name: "Поставщики: правка",
     note: "слияние и разделение сущностей, решения в очереди проверки" },
 ];
 const RIGHT_IDS = RIGHTS.map((r) => r.id);
 const DEFAULT_RIGHTS = RIGHTS.filter((r) => r.def).map((r) => r.id);
 
-const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR"];
+const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR",
+  "DEALCTX"];
+// Массивы, которым мало вкладки: остаются в странице только у админа и у того, кому
+// выдано право. DEALCTX — оценки чатов и разбор договоров по сделкам «Реализации»
+// (dealctx.py): условия договоров — только праву «Поставщики: договоры и деньги»
+// (решение владельца 19.10.2026). Без права вкладка показывает только числа плиток.
+const RIGHT_PAYLOADS = { DEALCTX: "suppliers_fin" };
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
 const DEFAULT_TABS = TABS.filter((t) => t.def !== false).map((t) => t.id);
@@ -321,8 +328,11 @@ const NO_DATA_STUB = '<script>function __kvNoData(){return new Proxy(function(){
   'apply:function(){return __kvNoData()},' +
   'construct:function(){return __kvNoData()}})}</script>';
 
-function cutDashboard(html, allowedTabs) {
+// fine — права вошедшего (rightsFor): { admin, rights }. Нет — тонких прав нет, и
+// массивы из RIGHT_PAYLOADS вырезаются.
+function cutDashboard(html, allowedTabs, fine) {
   const allow = new Set(allowedTabs);
+  const has = (r) => !!(fine && (fine.admin || (fine.rights || []).includes(r)));
   let out = html;
   // кнопки чужих вкладок
   out = out.replace(/<button class="tab[^"]*" data-tab="([a-z]+)"[^>]*>[\s\S]*?<\/button>/g,
@@ -333,11 +343,15 @@ function cutDashboard(html, allowedTabs) {
     out = out.replace(new RegExp(`<div id="tab-${t}" hidden></div>`), "");
   }
   // массивы данных: остаётся только то, что просит хотя бы одна доступная вкладка
+  // и, если массив требует права, — у кого это право есть
   const need = new Set();
   for (const t of TABS) if (allow.has(t.id)) for (const p of t.pay) need.add(p);
-  const cut = PAYLOADS.filter((p) => !need.has(p));
+  const cut = PAYLOADS.filter((p) => !need.has(p) || (RIGHT_PAYLOADS[p] && !has(RIGHT_PAYLOADS[p])));
+  // Строка массива — целиком, с начала строки до конца: JSON массива однострочный
+  // (dashboard._json_for_script), а без привязки к началу строки текст из данных вида
+  // «window.__X__ = …;» в названии сделки сдвигал вырезку и оставлял настоящий массив.
   for (const p of cut) {
-    out = out.replace(new RegExp(`window\\.__${p}__ *= *[\\s\\S]*?;\\n`), `window.__${p}__ = __kvNoData();\n`);
+    out = out.replace(new RegExp(`^window\\.__${p}__ *=[^\\n]*;$`, "gm"), `window.__${p}__ = __kvNoData();`);
   }
   if (cut.length) out = out.replace("<body>", "<body>\n" + NO_DATA_STUB);
   // «Сорсинг» — единственная вкладка со статической разметкой: прячем и открываем первую доступную
@@ -350,7 +364,7 @@ function cutDashboard(html, allowedTabs) {
 // END aclCore
 
 export {
-  SITES, GROUPS, TABS, SITE_IDS, TAB_IDS, PAYLOADS, ACL_KEY, ACL_VERSION,
+  SITES, GROUPS, TABS, SITE_IDS, TAB_IDS, PAYLOADS, RIGHT_PAYLOADS, ACL_KEY, ACL_VERSION,
   defaultAcl, normalizeAcl, normEmail, aclStore, loadAcl, saveAcl, rightsFor,
   touchUser, loadSeen, cutDashboard,
 };

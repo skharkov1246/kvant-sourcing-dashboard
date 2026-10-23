@@ -119,6 +119,35 @@ def test_схема_rls_запись_повтор_и_откат(conn):
         база.закрыть()
 
 
+def test_исход_сделки_пишется_с_флагами_и_проверяется_базой(conn):
+    """Исход разбора по сделке (с 23.10.2026) — одной транзакцией с флагами; повтор
+    прогона не задваивает; значение не из списка база не принимает."""
+    import psycopg2
+    import contract_terms as ct
+    for таблица in ("contract_deal_outcome",):
+        assert _одно(conn, "select relrowsecurity, relforcerowsecurity from pg_class where oid = %s::regclass",
+                     таблица) == (True, True), таблица
+    база = ct.База(DSN, схема=СХЕМА)
+    try:
+        флаги = [{"deal_id": 9900011, "order_id": 9700011, "code": "penaltyUncovered", "days": None}]
+        исходы = {9900011: "пара", 9900012: "нет договоров", 9900013: "нет пары"}
+        for _ in range(2):
+            база.записать_итог(флаги, исходы, "ct-o1")
+        assert база.итог_сделок("ct-o1") == 3
+        assert база.итог("ct-o1")[1] == 1
+        assert _одно(conn, "select outcome from contract_deal_outcome where run_id = 'ct-o1' "
+                           "and deal_id = 9900012") == ("нет договоров",)
+        with pytest.raises(psycopg2.errors.CheckViolation):
+            база.записать_итог([], {9900014: "почти пара"}, "ct-o2")
+        # сбой исхода откатывает и флаги той же записи: исход «пара» без флагов не останется
+        with pytest.raises(psycopg2.errors.CheckViolation):
+            база.записать_итог([{"deal_id": 9900015, "order_id": None, "code": "cisg", "days": None}],
+                               {9900015: "пара", 9900016: "что-то"}, "ct-o3")
+        assert база.итог("ct-o3")[1] == 0 and база.итог_сделок("ct-o3") == 0
+    finally:
+        база.закрыть()
+
+
 def test_статус_и_условия_согласованы(conn):
     import psycopg2
     import contract_terms as ct
@@ -191,6 +220,6 @@ def test_без_схемы_прогон_называет_недостающие_
     import contract_terms as ct
     база = ct.База(DSN, схема=ПУСТАЯ)
     try:
-        assert база.нет_таблиц() == ["contract_terms", "contract_b2b_flags"]
+        assert база.нет_таблиц() == ["contract_terms", "contract_b2b_flags", "contract_deal_outcome"]
     finally:
         база.закрыть()

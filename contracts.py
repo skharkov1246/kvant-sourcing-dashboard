@@ -19,9 +19,10 @@ import datetime as dt
 import json
 import pathlib
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 import chat_activity
+import dealctx
 import lifecycle
 import period as period_mod
 from bitrix_client import BitrixClient
@@ -207,12 +208,15 @@ def _parse_econ_money(raw, rate) -> float:
 
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             people: dict[str, dict] | None = None, service_ids: set[str] | None = None,
-            chat_reader: chat_activity.Reader | None = None) -> dict:
+            chat_reader: chat_activity.Reader | None = None,
+            ctx_chats: dict[str, dict] | None = None) -> dict:
     """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
     уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
     сделки и заказы не были видны как работа без хозяина.
     chat_reader — общий на сборку читатель чатов (main.py: реализация читает первой,
-    пресейл — остатком бюджета); None — свой бюджет, как раньше."""
+    пресейл — остатком бюджета); None — свой бюджет, как раньше.
+    ctx_chats — чаты сделок из закрытого свода (dealctx.load()["chats"]): оценка хода
+    моделью и последнее чтение прогоном оценки; None — «подвисла» как до 23.10.2026."""
     today = as_of or dt.date.today()
     now_iso = period_mod.now(_MSK).isoformat()
     people = people or {}
@@ -634,10 +638,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
     # ПОДВИСЛА — только после чата (решение владельца 19.10.2026): простой по стадии
     # снимается, если в чате сделки за неделю писал человек; не прочитали чат —
-    # простой не подтверждён и в замедленные не идёт
+    # простой не подтверждён и в замедленные не идёт. С 23.10.2026 решает и оценка
+    # хода по чату (dealctx.decide): пишут, но ход за нами, стоит или откат — подвисла;
+    # чат сборка не прочла, а прогон оценки читал его недавно — решает он
     cands = [(r["deal"], r["_chat"], r["saleEur"]) for r in rows if not r["closed"] and r["stuck"]]
     chat = (chat_reader.check(cands, today) if chat_reader is not None
             else chat_activity.check(client, cands, today, service_ids))
+    chat_by: Counter = Counter()
     for r in rows:
         r.pop("_chat", None)
         ch = chat.get(r["deal"])
@@ -645,17 +652,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             r["chat"] = None
             continue
         r["chat"] = ch
-        if ch["status"] == "quiet":
-            r["why"] += (" · " if r["why"] else "") + (f"в чате тихо {ch['days']} дн." if ch["days"] is not None
-                                                        else "в чате людей не было")
-        else:
+        stuck, note, _подробно, src = dealctx.decide(ch, (ctx_chats or {}).get(str(r["deal"])), today)
+        chat_by[src] += 1
+        if not stuck:
             r["stuck"] = False
             r["slow"] = bool(r["late"])
             # «не проверено» — не «всё хорошо»: серая корзина, сделка видна отдельным фильтром
-            r["chatUnverified"] = ch["status"] in ("unread", "skipped")
-            note = (f"в чате работа: последнее сообщение {ch['days']} дн. назад — не подвисла"
-                    if ch["status"] == "active" else "чат не проверен — простой не подтверждён")
-            r["why"] += (" · " if r["why"] else "") + note
+            r["chatUnverified"] = stuck is None
+        r["why"] += (" · " if r["why"] else "") + note
     chat_sum = chat_activity.summary(chat)
     live_rows = [r for r in rows if not r["closed"]]
     slow_rows = [r for r in live_rows if r["slow"]]
@@ -1008,6 +1012,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "slow": len(slow_rows), "lateDeals": len(late_rows),
             # чат сделки: сколько кандидатов в «подвисшие» проверено и что нашли
             "chat": chat_sum, "chatQuietDays": chat_activity.QUIET_DAYS,
+            # чем решено по кандидатам (dealctx.decide): quiet, active, unverified — как
+            # раньше; model — по оценке хода, ctxQuiet и ctxActive — по чтению прогона оценки
+            "chatBy": dict(chat_by),
             # сделки на «Оплата получена | Закрытие сделки» — успех, не «в работе»
             "paidStage": sum(1 for r in rows if r.get("paidStage")),
             # план по бюджетам сделок (снимок Google Drive)

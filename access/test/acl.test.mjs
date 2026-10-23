@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   SITE_IDS, TAB_IDS, PAYLOADS, ACL_KEY,
-  defaultAcl, normalizeAcl, rightsFor, loadAcl, saveAcl, touchUser, loadSeen, cutDashboard,
+  defaultAcl, normalizeAcl, rightsFor, loadAcl, saveAcl, touchUser, loadSeen, cutDashboard, RIGHT_PAYLOADS,
 } from "../acl.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -189,11 +189,41 @@ test("одна вкладка: чужие кнопки, панели и данн
   assert.match(out, /\.tabs \.tab'\);if\(b\)b\.click\(\)/, "нет открытия первой доступной вкладки");
 });
 
+test("текст в данных не сдвигает вырезку: закрытый массив режется целиком", () => {
+  // название сделки в Битриксе вида «window.__DEALCTX__ = x;» (оно попадает в CONTRACTS)
+  // раньше сдвигало ленивую вырезку, и настоящий массив DEALCTX оставался в странице
+  const html = page().replace(`window.__CONTRACTS__ = ["MOCK-CONTRACTS"];`,
+    `window.__CONTRACTS__ = ["MOCK-CONTRACTS","window.__DEALCTX__ = x;\\nwindow.__DEALCTX__ = y;"];`);
+  const out = cutDashboard(html, ["contracts"], { admin: false, rights: ["suppliers"] });
+  assert.ok(!out.includes("MOCK-DEALCTX"), "закрытый массив утёк");
+  assert.ok(out.includes("MOCK-CONTRACTS"), "общий массив вкладки цел");
+  assert.match(out, /^window\.__DEALCTX__ = __kvNoData\(\);$/m);
+});
+
 test("полные права: страница не тронута", () => {
   const html = page();
-  const out = cutDashboard(html, TAB_IDS);
+  const out = cutDashboard(html, TAB_IDS, { admin: true, rights: [] });
   assert.equal(out, html, "при полных правах резка не должна ничего менять");
   for (const p of PAYLOADS) assert.ok(out.includes(`MOCK-${p}`));
+});
+
+test("закрытая часть «Реализации» — только праву «договоры и деньги» и админу", () => {
+  // оценки чатов и разбор договоров по сделкам (dealctx.py): вкладки мало
+  assert.equal(RIGHT_PAYLOADS.DEALCTX, "suppliers_fin");
+  const без = cutDashboard(page(), ["contracts"], { admin: false, rights: ["suppliers"] });
+  assert.ok(без.includes("MOCK-CONTRACTS"), "числа вкладки должны остаться");
+  assert.ok(!без.includes("MOCK-DEALCTX"), "закрытая часть утекла без права");
+  assert.match(без, /window\.__DEALCTX__ = __kvNoData\(\);/);
+  const безПрав = cutDashboard(page(), ["contracts"]);
+  assert.ok(!безПрав.includes("MOCK-DEALCTX"), "без сведений о правах — режется");
+  const с = cutDashboard(page(), ["contracts"], { admin: false, rights: ["suppliers", "suppliers_fin"] });
+  assert.ok(с.includes("MOCK-DEALCTX") && с.includes("MOCK-CONTRACTS"));
+  const админ = cutDashboard(page(), ["contracts"], { admin: true, rights: [] });
+  assert.ok(админ.includes("MOCK-DEALCTX"));
+  // право без вкладки ничего не открывает
+  const безВкладки = cutDashboard(page(), ["suppliers"], { admin: false, rights: ["suppliers_fin"] });
+  assert.ok(!безВкладки.includes("MOCK-DEALCTX"));
+  assert.ok(безВкладки.includes("MOCK-CONTRACTS"));
 });
 
 test("пустые права: данных не остаётся вовсе", () => {

@@ -39,8 +39,15 @@
 --                        side_template — подпись «Чей шаблон» / «Тип документа».
 --   contract_b2b_flags   флаг риска (contract_b2b.flags) по паре «условия
 --                        заказчика сделки ↔ условия поставщика заказа order_id».
+--   contract_deal_outcome исход разбора договоров сделки в прогоне (с 23.10.2026):
+--                        пара / недочитана / без стороны / спорная / поставщик без
+--                        заказа / нет пары / нет договоров. Пишется одной транзакцией
+--                        с флагами и только у прогона, прошедшего гейт стороны: по
+--                        нему вкладка «Реализация» отличает «договоров нет» и «рисков
+--                        нет» от «сделку не читали» (scripts/realization_ctx.py).
 --
 -- Каждая строка с ключом прогона run_id (правило 6): откат —
+--   delete from contract_deal_outcome where run_id = '…';
 --   delete from contract_b2b_flags where run_id = '…';
 --   delete from contract_terms     where run_id = '…';
 -- Деньги — numeric (DATA_MODEL.md), версия правила — method_ver.
@@ -92,6 +99,15 @@ create table if not exists contract_b2b_flags (
   created_at timestamptz not null default now()
 );
 
+create table if not exists contract_deal_outcome (
+  run_id     text        not null,
+  method_ver text        not null,
+  deal_id    bigint      not null,
+  outcome    text        not null,
+  created_at timestamptz not null default now(),
+  primary key (run_id, deal_id)
+);
+
 -- «create table if not exists» существующую таблицу не меняет (правило 21):
 -- колонки, добавленные позже первой версии, — отдельными операторами здесь.
 alter table contract_terms add column if not exists side_link text;   -- 22.10.2026
@@ -128,6 +144,13 @@ alter table contract_terms add constraint contract_terms_terms_chk
 alter table contract_terms drop constraint if exists contract_terms_usd_chk;
 alter table contract_terms add constraint contract_terms_usd_chk check (usd >= 0);
 
+-- Список — дословно contract_terms.ИСХОДЫ (сверяет tests/test_contract_terms_sql.py).
+alter table contract_deal_outcome drop constraint if exists contract_deal_outcome_chk;
+alter table contract_deal_outcome add constraint contract_deal_outcome_chk
+  check (outcome in ('пара', 'недочитана', 'без стороны', 'спорная', 'поставщик без заказа',
+                     'нет пары', 'нет договоров')
+         and deal_id > 0);
+
 alter table contract_b2b_flags drop constraint if exists contract_b2b_flags_code_chk;
 alter table contract_b2b_flags add constraint contract_b2b_flags_code_chk
   check (code ~ '^[A-Za-z]+$');
@@ -143,6 +166,8 @@ create index if not exists contract_terms_sha  on contract_terms (sha256, model,
 create unique index if not exists contract_b2b_flags_key
   on contract_b2b_flags (run_id, deal_id, coalesce(order_id, 0), code);
 create index if not exists contract_b2b_flags_deal on contract_b2b_flags (deal_id);
+-- последний исход сделки — по нему читает свод для вкладки
+create index if not exists contract_deal_outcome_deal on contract_deal_outcome (deal_id, created_at desc);
 
 create or replace function ct_роли_которые_есть(имена text[]) returns text as $$
   select string_agg(quote_ident(r.rolname), ', ')
@@ -158,7 +183,7 @@ declare сх text := current_schema();
 declare кому text := ct_роли_которые_есть(array['anon', 'authenticated']);
 declare служебная text := ct_роли_которые_есть(array['service_role']);
 begin
-  foreach n in array array['contract_terms', 'contract_b2b_flags'] loop
+  foreach n in array array['contract_terms', 'contract_b2b_flags', 'contract_deal_outcome'] loop
     execute format('comment on table %I.%I is %L', сх, n, 'contract_terms_schema:v1');
     execute format('alter table %I.%I enable row level security', сх, n);
     execute format('alter table %I.%I force  row level security', сх, n);

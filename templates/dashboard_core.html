@@ -419,6 +419,9 @@
   .actile.bad .v{color:var(--nr)} .actile.warn .v{color:var(--warn)} .actile.amb .v{color:var(--a2)}
   .actile .m{font-size:10.5px;color:var(--dim);margin-top:3px}
   .actile .t::after{content:" ›";color:var(--a)}
+  /* плитка только с числом (нет права открыть сделки): не кнопка */
+  .actile.static{cursor:default} .actile.static:hover{border-color:var(--line);transform:none}
+  .actile.static .t::after{content:""}
 
   /* ---- пульт реализации: фазы заказа, очередь «что делать», доставка в срок ---- */
   .lfph{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
@@ -738,6 +741,7 @@ window.__PRODUCT__ = __PRODUCT_JSON__;
 window.__CONTRACTS__ = __CONTRACTS_JSON__;
 window.__REPS__ = __REPS_JSON__;
 window.__ADVISOR__ = __ADVISOR_JSON__;
+window.__DEALCTX__ = __DEALCTX_JSON__;
 const M = window.__DATA__ || {}, INS = window.__INSIGHTS__ || {};
 // Защита от неполной выгрузки: недостающие блоки заменяем пустыми. Раньше одно
 // отсутствующее поле (например weekly) роняло весь скрипт и гасило все 9 вкладок.
@@ -1366,7 +1370,8 @@ const METH={
   'ct.plan':{t:'План МД по бюджетам сделок',what:'Плановый маржинальный доход из «Бюджета сделки» — книги, которую сорсер заполняет по каждой сделке (папка на Google Drive). В отличие от валовой маржи здесь учтена ПОЛНАЯ плановая себестоимость.',src:'Лист «Бюджет» книги: блок «Показатели» (суммы в ₽, переведены в € по курсу Битрикса). Связь со сделкой — по ссылке на Битрикс в шапке книги, без угадывания по названию. Снимок папки собирается скриптом scripts/budget_snapshot.py и лежит в data/budget_snapshot.json.',formula:'ПЛАН МД = выручка − прямые переменные затраты (закуп, международная логистика, таможенная пошлина и сбор, НДС в ФТС, СВХ, брокер). В карточке сделки дополнительно: ПЛАН ПРИБЫЛЬ = МД − премии, страховые взносы, сертификаты, прочие расходы − стоимость денег. KPI суммирует МД по открытым сделкам с внятным бюджетом.',note:'⚠ «не бьётся» — плановая выручка бюджета расходится с суммой сделки в Битриксе больше чем в 4 раза (книга-заготовка или устаревшая) — такие сделки в сумму KPI не входят. Снимок обновляется не сам: дата — в строке фактов под KPI. Суммы книг в рублях; пересчёт в € добавляет расхождение на разницу курсов.'},
   'ct.life':{t:'Пульт: от размещения до гарантии',what:'Где сейчас каждый заказ поставщику и сколько из них с сорванным сроком или под риском. Фаза — по фактам в карточке заказа, а не по названию стадии.',src:'Заказы СП-172: «Оплачено поставщику, %», «Production confirmation», «Supplier Shipment Date, actual», «Inbound Delivery Date, actual», «Customer delivery date, actual», УПД (дата или файл), «Payment Order (client)».',formula:'РАЗМЕЩЕНИЕ — нет ни оплаты поставщику, ни подтверждения производства. ПРОИЗВОДСТВО — оплата или подтверждение есть, поставщик не отгрузил. В ПУТИ — поставщик отгрузил, клиенту не доставлено. ЗАКРЫТИЕ — доставлено, нет УПД или платёжки клиента. ГАРАНТИЯ — доставлено, УПД и платёж есть, срок гарантии идёт. СДЕЛКИ В СРОК — доля сделок, у которых ВСЕ заказы доставлены не позже «Date of deadline to customer» (решение владельца 19.10.2026), по последней доставке за 90 дней; рядом — доля заказов.',note:'Клик по фазе — её пункты в очереди «Что делать сегодня». Гарантия 12 мес. от доставки — допущение до решения владельца.'},
   'ct.queue':{t:'Что делать сегодня',what:'Все отклонения по заказам и сделкам реализации — у каждого хозяин и действие. Сверху — самое срочное.',src:'Те же заказы СП-172 и сделки воронки реализации.',formula:'Порядок: срок сорван → под риском (до срока ≤ 14 дн., поставщик не отгрузил) → прогноз доставки позже срока (позднейшая из дат: плановая отгрузка или бюджетный конец производства + обычное опоздание этого поставщика; плюс медианы пути и последней мили) → плановая отгрузка прошла без факта → план доставки позже срока → срок оплаты клиента прошёл без платёжки → нет УПД через 14 дн. после доставки → все заказы закрыты, сделка открыта → нет заказа неделю → ведёт уволенный → нет срока клиента → заказ закрыт без даты доставки. Хозяин — ответственный заказа (Responsible person), иначе ОСС заказа, ОСС сделки, ответственный сделки (решение владельца 19.10.2026); КАМ клиента (поле «КАМ») — в копии по срокам и оплате. Обязательные поля (решение владельца): при размещении — начало и конец производства и доставка клиенту по бюджету, при доставке — факт, подписанный УПД, плановый срок оплаты. Закрытие (УПД, оплата) — только у живых заказов, доставленных за год.',note:'Клик по строке — карточка сделки. Фильтр по ОСС или КАМу — для планёрки с каждым.'},
-  'ct.act':{t:'Требует решения',what:'Четыре очага проблем в воронке реализации. Плитка кликабельна — открывает эти сделки в таблице ниже.',src:'Открытые сделки воронки кат.0 и их живые заказы СП-172.',formula:'ПРОСРОЧЕН ДЕДЛАЙН — есть живой заказ, у которого дата «Date of deadline to customer» уже прошла. ЗАМЕДЛЕНО (подвисла) — сделка или её заказ сидят в стадии дольше нормы (2× медианы стадии, минимум 7 дн) И в чате сделки неделю не писал ни один человек (решение владельца 19.10.2026: подвисшей сделка считается только после проверки чата). Писали в чате — не подвисла; чат не прочитан — простой не подтверждён и в плитку не идёт. БЕЗ ПЛАНОВОЙ ДАТЫ — у живых заказов не заполнена дата клиенту, срок не контролируется вообще. НЕТ ЭКОНОМИКИ — в сделке нет ни ссылки на файл экономики, ни money-полей.',note:'Числа в плитках — СДЕЛКИ, в подписи под ними — заказы. Одна сделка может попасть сразу в несколько плиток.'},
+  'ct.ctx':{t:'Чаты и договоры',what:'Что говорит переписка по сделке и что нашла сверка договоров с заказчиком и с поставщиком. Плитки — для всех с вкладкой; сделки, колонки «Чат» и «Договор» и пункты очереди — только праву «Поставщики: договоры и деньги».',src:'Ночной прогон оценки чатов моделью (только новые сообщения, до 5 долларов в сутки) и недельное чтение договоров открытых сделок; итог — в закрытой базе, во вкладку — свод по сделкам.',formula:'ЖДУТ НАШЕГО ОТВЕТА — по текущей оценке к нам обратились и ответа в чате нет; пункт очереди — если ждут дольше 24 будних часов (праздники не учитываются), хозяин — человек сделки по роли, на ком мяч. РИСК ПО ЧАТУ ВЫСОКИЙ — оценка модели; пункт — сопровождению, КАМ в копии. СРОК ИЗ ЧАТА ПРОШЁЛ — срок, названный в переписке (отгрузка, доставка, оплата, документы), прошёл не больше 60 дней назад. ДОГОВОР: РИСКИ — сделки с флагом сверки заказчик ↔ поставщик (пени, гарантия, базис, оплата, документы, срок, валюта); пункт — руководителю реализации. БЕЗ ПАРЫ — нет прочитанного договора одной из сторон; пункт — ответственному сделки: договор заказчика — всегда, поставщика — когда заказ размещён. Текущая оценка — прогон оценки читал чат не раньше 7 дней назад и после оценки человек в чате не писал.',note:'Покрытие под плитками: оценка есть не у всех сделок (часть чатов недоступна вебхукам), договоры читаются по неделе. Флаг сверки и исход разбора пересчитываются при выгрузке; не сошлось — «сверка разошлась», флаги не показываются.'},
+  'ct.act':{t:'Требует решения',what:'Четыре очага проблем в воронке реализации. Плитка кликабельна — открывает эти сделки в таблице ниже.',src:'Открытые сделки воронки кат.0 и их живые заказы СП-172.',formula:'ПРОСРОЧЕН ДЕДЛАЙН — есть живой заказ, у которого дата «Date of deadline to customer» уже прошла. ЗАМЕДЛЕНО (подвисла) — сделка или её заказ сидят в стадии дольше нормы (2× медианы стадии, минимум 7 дн) И в чате сделки неделю не писал ни один человек (решение владельца 19.10.2026: подвисшей сделка считается только после проверки чата). Писали в чате — не подвисла; чат не прочитан — простой не подтверждён и в плитку не идёт. С 23.10.2026 решает и оценка хода по чату: пишут, но ход за нами, никто не двигает или откат — подвисла; ждём поставщика или клиента до срока — не подвисла; чат не прочла сборка, а ночной прогон оценки читал его за последние 7 дней — решает он. Оценка, после которой в чате писал человек, не учитывается. БЕЗ ПЛАНОВОЙ ДАТЫ — у живых заказов не заполнена дата клиенту, срок не контролируется вообще. НЕТ ЭКОНОМИКИ — в сделке нет ни ссылки на файл экономики, ни money-полей.',note:'Числа в плитках — СДЕЛКИ, в подписи под ними — заказы. Одна сделка может попасть сразу в несколько плиток.'},
   'ct.gross':{t:'Занижена закупка',what:'Сделки, где валовая маржа неправдоподобно высока — обычно потому, что заведены не все заказы поставщикам.',src:'Сделки с закупкой, собранной из заказов СП-172 (не из money-полей), с суммой больше €1000.',formula:'Порог берётся от самих данных: max(65%, 1,5 × медианной валовой маржи по таким сделкам). Всё, что выше, помечается флагом «мало заказов?».',note:'Это подозрение, а не диагноз: бывают сделки с реально высокой маржой. Но чаще это значит, что часть заказов поставщикам ещё не заведена — тогда закупка занижена, а прибыль в отчёте завышена. Проверять надо в карточке: сколько заказов у сделки и покрывают ли они всю поставку.'},
   'ct.funnel':{t:'Воронка реализации',what:'Где физически стоят открытые сделки и сколько денег стоит на каждой стадии.',src:'Стадии воронки кат.0 в порядке движения (crm.status.list) + история переходов (crm.stagehistory).',formula:'Длина полосы — Σ сумм открытых сделок на стадии относительно самой «денежной» стадии. Красная часть полосы — деньги сделок, у которых сорван срок клиенту. «Типично N дн» — медианная длительность стадии по истории переходов: половина сделок проходит её быстрее.',note:'Показаны только открытые сделки в воронке реализации. Стадии без сделок не выводятся.'},
   'ct.speed':{t:'Скорость реализации',what:'Сколько времени сделки и заказы проводят в каждой стадии — где процесс буксует.',src:'crm.stagehistory.list: первый вход в каждую стадию (сделки воронки кат.0 и заказы СП-172), с полным временем.',formula:'Длительность стадии = время до следующего первого входа. Медианы по всем прохождениям (n — сколько раз стадию проходили). «Цикл заказа» = создание → закрытие (SUCCESS). «Лаг первого заказа» = вход сделки в воронку реализации → создание первого заказа СП-172.',note:'Бары — МЕДИАННОЕ время стадии (типичная длительность, «где копится время»), а не превышение норматива. Норматив-порог = max(2×медиана, 7 дн) и используется для подсветки замедленных. Медианы устойчивы к выбросам; редкие стадии (n<5) в графики не попадают.'},
@@ -1696,6 +1701,17 @@ function openContract(x){
     +(x.firstLag!=null?` · первый заказ через <b>${x.firstLag} дн</b>`:'')
     +(x.slow?`<br><span class="flag">⚠ ${_esc(x.why)}</span>`:'')
     +`</div>`;
+  // чат и договор сделки — закрытая часть (право «договоры и деньги»)
+  const DCx=_dcData(), dcx=DCx?(DCx.deals[String(x.deal)]||null):null;
+  if(dcx&&(dcx.chat||dcx.contract||dcx.todo)){
+    h+=`<div class="h">Чат и договор</div><div class="mrow-like" style="font-size:12.5px;line-height:1.7">`
+      +(dcx.why?`Чат и простой: ${_esc(dcx.why)}<br>`:'')
+      +(dcx.todo?`Что делать первым: <b>${_esc(String(dcx.todo.who).replace(/ \(уволен\)$/,''))}</b> — ${_esc(dcx.todo.act)} <span class="dimv">(${_esc(dcx.todo.what)})</span><br>`:'')
+      +(dcx.chat?`Чат: ${_dcChatHtml(dcx.chat)}`:'')
+      +(dcx.contract?`Договоры (разбор ${_esc(dcx.contract.at.slice(0,5))}): ${_dcContractHtml(dcx.contract)}`
+        +((dcx.contract.flags||[]).length?`<ul style="margin:4px 0 0 16px;padding:0">${dcx.contract.flags.map(f=>`<li>${_esc(f.text)}${f.days!=null?` <span class="dimv">(${f.days} дн)</span>`:''}</li>`).join('')}</ul>`:''):'')
+      +`</div>`;
+  }
   // таймлайн стадий сделки
   if((x.timeline||[]).length){
     h+=`<div class="h">Путь по стадиям воронки</div>`;
@@ -1815,6 +1831,9 @@ function renderContracts(){
         nGone=live.filter(r=>r.managerGone||r.ossGone).length,
         nChatU=live.filter(r=>r.chatUnverified).length,
         nDone=R.filter(r=>r.done||r.closed).length;
+  // чаты и договоры (dealctx.py): числа плиток — всем с вкладкой, сделки — только праву
+  const DC=_dcData(), HX=H.ctx||null, DD=(DC&&DC.deals)||{};
+  const dcOf=x=>DD[String(x.deal)]||{};
   const GN=X.gone||{};
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (${X.orphan.buy})`:'';
   const bl=(items,color)=>{const mx=Math.max(1,...items.map(b=>b.med));return items.map(b=>`<div class="blrow"><div class="blt"><span>${_esc(_stShort(b.name))} <span class="dimv mono">n=${b.n}</span></span><b>${b.med} дн</b></div><div class="bltrack"><i style="width:${(b.med/mx*100).toFixed(0)}%;background:${color}"></i></div>${b.over?`<div class="dep" style="margin-top:2px"><span class="nrc">⚠ ${b.over} из ${b.live||'?'} тянутся дольше нормы</span> · в среднем на <b class="mono">+${b.lostAvg} дн</b></div>`:(b.live?`<div class="dep" style="margin-top:2px">сейчас в стадии: ${b.live} · все в норме</div>`:'')}</div>`).join('');};
@@ -1829,7 +1848,10 @@ function renderContracts(){
   const L=X.life||null;
   const kp=(lbl,val,meta,clz)=>`<div class="kpi ${clz||''}"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
   if(L){
-    const C=L.counts||{}, o90=(L.otd||{}).last90||{}, d90=(L.otd||{}).deals90||{}, RU=L.rules||{}, Q=L.queue||[], LB=L.labels||{};
+    const o90=(L.otd||{}).last90||{}, d90=(L.otd||{}).deals90||{}, RU=L.rules||{};
+    // очередь — пункты lifecycle и, у права «договоры и деньги», пункты чатов и договоров
+    const C=Object.assign({},L.counts||{},DC?DC.counts:{}), LB=Object.assign({},L.labels||{},DC?DC.labels:{});
+    const Q=(L.queue||[]).concat(DC?DC.queue:[]).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
     h+=`<div class="secttl"><b>·</b> Где заказы: от размещения до гарантии${qmark('ct.life')}</div>`
      +`<div class="lfph" id="lfPh">`+(L.phases||[]).map(p=>`<div class="actile${p.late?' bad':(p.risk?' warn':'')}" data-ph="${p.key}" tabindex="0"><div class="t">${_esc(p.name)}</div><div class="v">${p.orders}</div><div class="m">заказов · сделок ${p.n}${p.late?` · 🚩 ${p.late}`:''}${p.risk?` · ⚠ ${p.risk}`:''}${p.over?` · сверх нормы ${p.over}`:''}</div></div>`).join('')+`</div>`
      +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">`
@@ -1879,12 +1901,23 @@ function renderContracts(){
   h+=`<div class="secttl"><b>·</b> Требует решения${qmark('ct.act')}</div>`
    +`<div class="kpis" id="ctAct" style="grid-template-columns:repeat(${nGone?5:4},1fr)">`
    +`<div class="actile bad" data-m="late" tabindex="0"><div class="t">🚩 Просрочен дедлайн</div><div class="v">${nLate}</div><div class="m">сделок · заказов ${dl.lateOrders||0} · потери ${H.loss}</div></div>`
-   +`<div class="actile warn" data-m="slow" tabindex="0"><div class="t">⏳ Замедлено</div><div class="v">${nSlow}</div><div class="m">стадия дольше нормы и в чате тихо ${H.chatQuietDays||7}+ дн.${(H.chat||{}).active?` · ещё ${(H.chat||{}).active} — работа в чате`:''}${((H.chat||{}).unread||0)+((H.chat||{}).skipped||0)?` · чат не проверен: ${((H.chat||{}).unread||0)+((H.chat||{}).skipped||0)}`:''}</div></div>`
+   +`<div class="actile warn" data-m="slow" tabindex="0"><div class="t">⏳ Замедлено</div><div class="v">${nSlow}</div><div class="m">стадия дольше нормы и в чате тихо ${H.chatQuietDays||7}+ дн.${(()=>{const B=H.chatBy, C=H.chat||{}; const act=B?(B.active||0)+(B.ctxActive||0):(C.active||0), unv=B?(B.unverified||0):(C.unread||0)+(C.skipped||0); return (act?` · ещё ${act} — работа в чате`:'')+(unv?` · чат не проверен: ${unv}`:'')+(B&&B.model?` · подтверждено проверкой чата: ${B.model}`:'');})()}</div></div>`
    +`<div class="actile amb" data-m="nodl" tabindex="0"><div class="t">❓ Без плановой даты</div><div class="v">${nNoDl}</div><div class="m">сделок · заказов ${dl.noDl||0} вне контроля срока</div></div>`
    +`<div class="actile amb" data-m="noecon" tabindex="0"><div class="t">📄 Нет экономики</div><div class="v">${nNoEcon}</div><div class="m">ни файла, ни money-полей в сделке</div></div>`
    +(nGone?`<div class="actile bad" data-m="gone" tabindex="0"><div class="t">👤 Ведёт уволенный</div><div class="v">${nGone}</div><div class="m">сделок на ${GN.sale||'—'} · живых заказов ${GN.orders||0}${GN.late?` · просрочено ${GN.late}`:''} — переназначить</div></div>`:'')
    +`</div>`
    +`<div class="note" style="margin-top:6px">Клик по плитке — список этих сделок в таблице ниже.</div>`;
+  // ---------- 2а. ЧАТЫ И ДОГОВОРЫ (dealctx.py, решение владельца 23.10.2026) ----------
+  if(HX){
+    const hc=HX.chat||{}, hk=HX.contract||{}, ti=DC?' tabindex="0"':'', st=DC?'':' static';
+    h+=`<div class="secttl"><b>·</b> Чаты и договоры${qmark('ct.ctx')}</div>`
+     +`<div class="kpis" id="ctCtx" style="grid-template-columns:repeat(3,1fr)">`
+     +`<div class="actile${hc.reply?' warn':''}${st}" data-m="ctxReply"${ti}><div class="t">💬 Ждут нашего ответа</div><div class="v">${hc.reply||0}</div><div class="m">в чате обратились к нам, ответа нет${hc.replyLate?` · дольше ${(HX.rules||{}).replyHours||24} ч: ${hc.replyLate}`:''}</div></div>`
+     +`<div class="actile${hc.high?' bad':''}${st}" data-m="ctxHigh"${ti}><div class="t">⚠ Риск по чату: высокий</div><div class="v">${hc.high||0}</div><div class="m">по оценке переписки${hc.dueLate?` · срок из чата прошёл: ${hc.dueLate}`:''}</div></div>`
+     +`<div class="actile${hk.risk?' bad':(hk.nopair?' amb':'')}${st}" data-m="ctxContract"${ti}><div class="t">📑 Договор: риски</div><div class="v">${hk.risk||0}</div><div class="m">расхождение заказчик ↔ поставщик (флагов ${hk.flags||0}) · без пары: ${hk.nopair||0}</div></div>`
+     +`</div>`
+     +`<div class="note" style="margin-top:6px">Покрытие: оценка чата текущая у <b>${hc.cur||0}</b> из ${HX.open} открытых сделок (есть у ${hc.seen||0}); договоры разобраны у <b>${hk.seen||0}</b> из ${HX.open}${hk.unread?`, не дочитаны ${hk.unread}`:''}. Свод на ${_esc(HX.at||'—')}. Пустая плитка при малом покрытии — не «всё хорошо».${DC?' Клик по плитке — эти сделки в таблице ниже.':' Сделки, колонки «Чат» и «Договор» и пункты очереди — у права «Поставщики: договоры и деньги».'}</div>`;
+  }
 
   // ---------- 3. ДЕНЬГИ ВО ВРЕМЕНИ: что отгружать и во что обходится ожидание ----------
   h+=`<div class="secttl"><b>·</b> Деньги во времени${qmark('ct.cost')}</div><div class="grid">`
@@ -1944,7 +1977,11 @@ function renderContracts(){
   el.innerHTML=h;
 
   // ---------- рендер таблицы ----------
-  const head=()=>{document.getElementById('ctHead').innerHTML=`<tr><th class="r sortable${sortKey==='seq'?' on':''}" data-sk="seq" style="width:48px">№${sortKey==='seq'?(sortDir<0?' ▾':' ▴'):''}</th>`+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
+  // колонка чата и договора и строка «что делать» — только когда есть закрытая часть
+  // (право «договоры и деньги»); одна колонка, а не три: таблица и так широкая
+  const XCOLS=DC?['Чат · договор']:[];
+  const head=()=>{document.getElementById('ctHead').innerHTML=`<tr><th class="r sortable${sortKey==='seq'?' on':''}" data-sk="seq" style="width:48px">№${sortKey==='seq'?(sortDir<0?' ▾':' ▴'):''}</th>`+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+XCOLS.map(t=>`<th>${t}</th>`).join('')+'</tr>';};
+  const tdline=x=>{const t=DC&&!x.closed?dcOf(x).todo:null; return t?`<div class="dep" style="color:var(--a2)">→ ${_esc(String(t.who).replace(/ \(уволен\)$/,''))}: ${_esc(t.act)}</div>`:'';};
   const mcell=x=>{const cl=(x.marginEur||0)<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${x.marginEur==null?'color:var(--dim)':cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
   const pcell=x=>{
     const gross=x.marginEur==null?'':`<div class="dep">валовая ${x.marginLbl}${x.marginPct!=null?` · ${x.marginPct}%`:''}`
@@ -1989,28 +2026,33 @@ function renderContracts(){
     else if(mode==='gross')r=r.filter(x=>x.grossSusp);
     else if(mode==='gone')r=r.filter(x=>(x.managerGone||x.ossGone)&&!x.closed);
     else if(mode==='chatu')r=r.filter(x=>x.chatUnverified&&!x.closed);
+    else if(mode==='ctxReply')r=r.filter(x=>!x.closed&&(c=>c&&c.cur&&c.reply)(dcOf(x).chat));
+    else if(mode==='ctxHigh')r=r.filter(x=>!x.closed&&(c=>c&&c.cur&&c.risk==='высокий')(dcOf(x).chat));
+    else if(mode==='ctxContract')r=r.filter(x=>!x.closed&&(k=>k&&((k.flags||[]).length||(k.missing||[]).length))(dcOf(x).contract));
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')+' '+(x.manager||'')+' '+(x.oss||'')+' '+(x.cities||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;
     document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${(x.late||x.slow)&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div>`
-      +`<div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
+      +`<div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div>${tdline(x)}</td>`
       +`<td>${scell(x)}</td>`
       +`<td>${dcell(x)}</td>`
       +`<td class="r"><div class="amt1">${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig):''}</div></td>`
       +`<td class="r">${bcell(x)}</td>`
-      +`<td class="r">${pcell(x)}</td></tr>`).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+      +`<td class="r">${pcell(x)}</td>`
+      +(DC?`<td style="min-width:190px">${_dcChatHtml(dcOf(x).chat)}${_dcContractHtml(dcOf(x).contract)}</td>`:'')
+      +`</tr>`).join('')||`<tr><td colspan="${7+XCOLS.length}" class="dimv" style="padding:14px">ничего не найдено</td></tr>`;
   }
   head(); rows();
 
   // ---------- пульт: очередь «что делать», фильтры по коду, фазе и хозяину ----------
   if(L){
     let qc='', qw='', qp='', qall=false;
-    const Q=L.queue||[];
+    const Q=(L.queue||[]).concat(DC?DC.queue:[]).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
     const qrows=()=>{
       const r=Q.filter(x=>(!qc||x.code===qc)&&(!qw||x.who===qw||x.kam===qw)&&(!qp||x.phase===qp));
       document.getElementById('lfQn').textContent=`(${r.length} из ${Q.length})`;
       const shown=qall?r:r.slice(0,40);
-      document.getElementById('lfQb').innerHTML=shown.map(x=>`<tr class="drill" data-ct="${x.deal}"><td class="${x.sev<=2?'hot':''}">${_esc(x.what)}</td><td><b class="mono">№${x.seq||'—'}</b><div class="dep">${_esc(x.customer)}</div></td><td><div class="dep">${_esc(x.title||'')}</div><div class="dep">${_esc(x.sup||'')}${x.dl?' · срок '+x.dl:''}${x.fc&&x.code==='forecast'?' · прогноз '+x.fc:''}</div></td><td>${_esc(String(x.who).replace(/ \(уволен\)$/,''))}${x.whoGone?' <span class="gone">уволен</span>':''}${x.kam&&x.kam!==x.who&&['late','unpaid','forecast','planAfterDl'].includes(x.code)?`<div class="dep">КАМ: ${_esc(x.kam)}</div>`:''}</td><td class="r mono">${x.days!=null?x.days:''}</td><td>${_esc(x.act)}</td></tr>`).join('')||'<tr><td colspan="6" class="dimv" style="padding:14px">пусто — всё по правилам</td></tr>';
+      document.getElementById('lfQb').innerHTML=shown.map(x=>`<tr class="drill" data-ct="${x.deal}"><td class="${x.sev<=2?'hot':''}">${_esc(x.what)}</td><td><b class="mono">№${x.seq||'—'}</b><div class="dep">${_esc(x.customer)}</div></td><td><div class="dep">${_esc(x.title||'')}</div><div class="dep">${_esc(x.sup||'')}${x.dl?' · срок '+x.dl:''}${x.fc&&x.code==='forecast'?' · прогноз '+x.fc:''}</div></td><td>${_esc(String(x.who).replace(/ \(уволен\)$/,''))}${x.whoGone?' <span class="gone">уволен</span>':''}${x.kam&&x.kam!==x.who&&['late','unpaid','forecast','planAfterDl','chatRisk','chatDue'].includes(x.code)?`<div class="dep">КАМ: ${_esc(x.kam)}</div>`:''}</td><td class="r mono">${x.days!=null?x.days:''}</td><td>${_esc(x.act)}</td></tr>`).join('')||'<tr><td colspan="6" class="dimv" style="padding:14px">пусто — всё по правилам</td></tr>';
       document.getElementById('lfMore').innerHTML=(!qall&&r.length>40)?`<span class="stchip" id="lfAll" tabindex="0" style="margin-top:8px;display:inline-block">Показать все ${r.length}</span>`:'';
     };
     qrows();
@@ -2030,7 +2072,7 @@ function renderContracts(){
   function setMode(m,scroll){
     mode=m;
     document.querySelectorAll('#ctChips .stchip').forEach(x=>x.classList.toggle('on',x.dataset.m===m));
-    document.querySelectorAll('#ctAct .actile').forEach(x=>x.classList.toggle('on',x.dataset.m===m));
+    document.querySelectorAll('#ctAct .actile, #ctCtx .actile').forEach(x=>x.classList.toggle('on',x.dataset.m===m));
     rows();
     if(scroll)document.getElementById('ctSect').scrollIntoView({behavior:'smooth',block:'start'});
   }
@@ -2038,6 +2080,11 @@ function renderContracts(){
   document.getElementById('ctChips').addEventListener('click',e=>{const c=e.target.closest('.stchip'); if(c)setMode(c.dataset.m,false);});
   document.getElementById('ctAct').addEventListener('click',e=>{const c=e.target.closest('.actile'); if(!c)return; setMode(mode===c.dataset.m?'all':c.dataset.m,true);});
   document.getElementById('ctAct').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return; const c=e.target.closest('.actile'); if(!c)return; e.preventDefault(); setMode(mode===c.dataset.m?'all':c.dataset.m,true);});
+  const ctx=document.getElementById('ctCtx');
+  if(ctx&&DC){
+    ctx.addEventListener('click',e=>{const c=e.target.closest('.actile'); if(!c)return; setMode(mode===c.dataset.m?'all':c.dataset.m,true);});
+    ctx.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return; const c=e.target.closest('.actile'); if(!c)return; e.preventDefault(); setMode(mode===c.dataset.m?'all':c.dataset.m,true);});
+  }
   document.getElementById('ctBody').addEventListener('click',e=>{const tr=e.target.closest('tr[data-ct]'); if(!tr)return; const x=byDeal[tr.dataset.ct]; if(x)openContract(x);});
   document.getElementById('ctHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
 
@@ -2182,6 +2229,24 @@ function _plHtml(L){
 // и карточку сделки открыть не из чего. Признак наличия — настоящий массив rows;
 // без него № реализации — ссылка на сделку в Bitrix, как у пресейла.
 function _kqHasCt(){const X=window.__CONTRACTS__; return !!(X&&Array.isArray(X.rows));}
+// Закрытая часть «Реализации» (dealctx.py: оценки чатов и разбор договоров по сделкам).
+// Без права «Поставщики: договоры и деньги» воркер подставляет пустышку-заглушку —
+// она истинна, поэтому проверяется форма, а не наличие.
+function _dcData(){const D=window.__DEALCTX__; return (D&&Array.isArray(D.queue)&&D.deals&&typeof D.deals==='object'&&!Array.isArray(D.deals))?D:null;}
+const _DC_OUT={'пара':'договоры сверены','недочитана':'договор не дочитан','без стороны':'сторона документа не определена','спорная':'сторона документа спорная','поставщик без заказа':'договор поставщика без заказа','нет пары':'нет пары','нет договоров':'договоров нет','разошлось':'сверка разошлась — разбор'};
+const _dcSide=s=>s==='customer'?'заказчика':'поставщика';
+function _dcChatHtml(c){
+  if(!c)return '<div class="dep dimv">нет оценки</div>';
+  const due=c.due?`${c.duePassed?'<span class="nrc">':''}срок: ${_esc(c.dueKind||'')} ${c.due.slice(0,5)}${c.duePassed?' — прошёл</span>':''}`:'';
+  const bits=[c.ballWho||c.ball?`мяч: ${_esc(c.ballWho||c.ball)}`:'',c.reply?`<span class="nrc">ждут ответа${c.replyH!=null?' '+c.replyH+' ч':''}</span>`:'',due,c.blocker?_esc(c.blocker):'',(c.kinds||[]).length?'риск: '+_esc(c.kinds.join(', ')):''].filter(Boolean);
+  return `<div class="stgcell"><b${c.risk==='высокий'?' class="nrc"':''}>${_esc(c.state)}</b>${c.dir==='назад'?' <span class="nrc">↩ откат</span>':''}${c.risk==='высокий'?' <span class="nrc">риск высокий</span>':''}<div class="dep">${bits.join(' · ')}</div><div class="dep dimv">оценка ${_esc(c.at.slice(0,5))}${c.cur?'':' · устарела'}</div></div>`;
+}
+function _dcContractHtml(k){
+  if(!k)return '<div class="dep dimv">не разбирался</div>';
+  if((k.flags||[]).length)return `<div class="stgcell"><b class="nrc">риски: ${k.flags.length}</b><div class="dep">${k.flags.map(f=>`<span title="${_esc(f.text)}">${_esc(f.short)}</span>`).join(', ')}</div></div>`;
+  if((k.missing||[]).length)return `<div class="stgcell"><b class="nrc">нет договора ${k.missing.map(_dcSide).join(' и ')}</b></div>`;
+  return `<div class="dep">${_esc(_DC_OUT[k.outcome]||k.outcome)}${k.outcome==='пара'?' · рисков сверки нет':''}</div>`;
+}
 function _kqHtml(K,pid){
   const H=K.head||{}, C=K.counts||{}, LB=K.labels||{}, Q=K.queue||[], U=K.upcoming14||[], RU=K.rules||{};
   const kp=(code,lbl,val,meta,clz)=>`<div class="kpi ${clz||''} drill" data-kq="${code}" tabindex="0" role="button"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;

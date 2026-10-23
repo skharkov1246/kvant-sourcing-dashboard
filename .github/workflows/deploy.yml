@@ -41,6 +41,8 @@ on:
       - "kprules.py"
       - "lifecycle.py"
       - "chat_activity.py"
+      - "dealctx.py"            # чаты и договоры во вкладке «Реализация» (23.10.2026)
+      - "contract_b2b.py"       # тексты флагов сверки договоров — их читает dealctx.py
       - "kamqueue.py"
       - "chat_scan.py"          # шаг «Закрытая часть снимка чатов» запускает его при сборке
       - "requirements.txt"
@@ -140,6 +142,18 @@ jobs:
           python chat_scan.py --fetch-private "$RUNNER_TEMP/chat_private.json" \
             || echo "::warning::закрытая часть снимка чатов не прочитана — «Коммерсанты» без списка «ждут ответа» и оценок"
 
+      # Свод оценок чатов и разбора договоров по сделкам (решение владельца 23.10.2026)
+      # лежит в KV realctx:v1: его пишут ночная оценка чатов и недельное чтение договоров
+      # (scripts/realization_ctx.py --publish). Читается в файл на раннере (realization_ctx_kv.py); в журнал —
+      # только счётчики. Нет ключа — «Реализация» соберётся без чатов и договоров.
+      - name: Свод чатов и договоров (KV realctx:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python scripts/realization_ctx_kv.py "$RUNNER_TEMP/realctx.json" \
+            || echo "::warning::свод чатов и договоров не прочитан — «Реализация» без чатов и договоров"
+
       - name: Генерация дашборда (окно 01.05.2026 → сегодня)
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
@@ -148,6 +162,7 @@ jobs:
           # второй читатель чатов — руководитель реализации (решение 22.10.2026)
           BITRIX_CHAT_WEBHOOK_URL_2: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL_2 }}
           CHAT_PRIVATE_PATH: ${{ runner.temp }}/chat_private.json
+          REALCTX_PATH: ${{ runner.temp }}/realctx.json
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Идентификаторы служебных учётных записей портала через запятую
           # (Settings → Secrets and variables → Actions → Variables). Их карточки
