@@ -92,9 +92,22 @@ def получить(url: str, timeout: int = 30, ключ: str = "") -> bytes |
         return None
 
 
+def ключ_и_путь(public_url: str) -> tuple[str, str]:
+    """https://disk.yandex.ru/d/<id>/<файл> → («…/d/<id>», «/<файл>»): API ждёт ссылку на
+    общую папку и путь внутри неё отдельно (иначе 400 DiskPublicKeyFormatError)."""
+    u = urllib.parse.urlparse(public_url)
+    части = [x for x in u.path.split("/") if x]
+    if len(части) > 2 and части[0] in ("d", "i"):
+        return (f"{u.scheme}://{u.netloc}/{части[0]}/{части[1]}",
+                "/" + "/".join(urllib.parse.unquote(x) for x in части[2:]))
+    return public_url, ""
+
+
 def ресурс(public_url: str) -> dict | None:
     """Публичный ресурс Диска: сначала без ключа, не вышло — с ключом прогона (YADISK_TOKEN)."""
-    адрес = f"{API}?public_key={urllib.parse.quote(public_url, safe='')}&limit=200"
+    pk, путь = ключ_и_путь(public_url)
+    адрес = (f"{API}?public_key={urllib.parse.quote(pk, safe='')}&limit=200"
+             + (f"&path={urllib.parse.quote(путь, safe='')}" if путь else ""))
     for ключ in ("", os.environ.get("YADISK_TOKEN", "").strip()):
         if ключ is None:
             continue
@@ -184,6 +197,14 @@ def main() -> int:
         if not файл or not str(файл.get("name", "")).lower().endswith((".xlsx", ".xlsm")):
             continue
         href = файл.get("file")
+        if not href:
+            pk, путь = ключ_и_путь(цель)
+            raw = получить(f"{API}/download?public_key={urllib.parse.quote(pk, safe='')}"
+                           + (f"&path={urllib.parse.quote(путь, safe='')}" if путь else ""))
+            try:
+                href = json.loads(raw).get("href") if raw else None
+            except json.JSONDecodeError:
+                href = None
         b = получить(href) if href else None
         time.sleep(0.5)
         if not b:
