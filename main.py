@@ -863,7 +863,8 @@ def run(args) -> int:
         _g, _sp = contracts_data.get("gone") or {}, contracts_data.get("speed") or {}
         # только счётчики: суммы сделок в публичный журнал не идут (правило 17)
         print(f"  ведёт уволенный: открытых сделок {_g.get('deals', 0)} (ответственный {_g.get('byManager', 0)}, "
-              f"ОСС {_g.get('byOss', 0)}), живых заказов {_g.get('orders', 0)}, с просрочкой {_g.get('late', 0)}, "
+              f"ОСС {_g.get('byOss', 0)}, ответственный заказа {_g.get('byResp', 0)}), "
+              f"живых заказов {_g.get('orders', 0)}, с просрочкой {_g.get('late', 0)}, "
               f"уволенных {_g.get('people', 0)}; нормы стадий по {_sp.get('benchDays')} дн: "
               f"{_sp.get('benchRecent', 0)} стадий, медиана цикла заказа {_sp.get('medCycle')} дн")
     except Exception as e:

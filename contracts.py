@@ -493,6 +493,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         no_dl = 0                  # живых заказов без плановой даты клиенту
         first_order_ts = min((str(o.get("createdTime") or "") for o in ords), default="")
         n_live_ords = sum(1 for o in ords if _osem(o.get("stageId")) == "P")
+        resp_gone = set()          # уволенные ответственные живых заказов (Responsible person)
         for o in ords:
             osid = str(o.get("stageId") or "")
             olive = _osem(osid) == "P"
@@ -535,6 +536,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 worst_late = dl_days if worst_late is None else max(worst_late, dl_days)
             if olive and not dl and not delivered:
                 no_dl += 1
+            # ответственный заказа (Responsible person, assignedById СП-172) — хозяин исполнения
+            # (решение владельца 19.10.2026, п. 1): уволен — живой заказ ведёт никто. Признак —
+            # тот же справочник людей, что у ответственного сделки и ОСС (who)
+            o_resp, o_resp_gone = who(o.get("assignedById"))
+            if olive and o_resp_gone:
+                resp_gone.add(o_resp)
             pend = _pdate(o.get(PROD_END))
             ords_det.append({
                 "id": str(o.get("id")), "title": str(o.get("title") or "")[:70],
@@ -551,6 +558,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "city": str(o.get(CITY_F) or ""),
                 "oss": who(o.get(OSS_F))[0],
                 "ossGone": who(o.get(OSS_F))[1],
+                # подпись ответственного заказа в строку не идёт: только признак ухода
+                "respGone": o_resp_gone,
                 "prodEnd": pend.strftime("%d.%m.%Y") if pend else "",
                 # план производства заканчивается позже обещания клиенту — план сам себе противоречит
                 "prodAfterDl": bool(pend and dl and pend > dl),
@@ -640,6 +649,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "managerGone": who(d.get("ASSIGNED_BY_ID"))[1],
             "ossGone": (any(o["ossGone"] for o in ords_det if o["live"])
                         or (not any(o["oss"] for o in ords_det) and who(d.get(OSS_DEAL))[1])),
+            # ответственный хотя бы одного живого заказа уволен (до 23.10.2026 не проверялся)
+            "respGone": bool(resp_gone),
+            "_respGone": resp_gone,
             "cities": ", ".join(sorted({o["city"] for o in ords_det if o["city"]}))[:50],
             "done": done, "closed": closed, "lost": sem == "F", "paidStage": paid,
             "inCat0": in_cat0,
@@ -695,6 +707,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     chat = (chat_reader.check(cands, today) if chat_reader is not None
             else chat_activity.check(client, cands, today, service_ids))
     chat_by: Counter = Counter()
+    resp_gone_by = {r["deal"]: r.pop("_respGone", set()) for r in rows}
     for r in rows:
         r.pop("_chat", None)
         ch = chat.get(r["deal"])
@@ -947,19 +960,22 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         out.sort(key=lambda x: -x["lateOrders"])
         return out[:12]
 
-    # ЖИВАЯ РАБОТА УВОЛЕННЫХ: сделку ведёт ушедший ответственный или её живые заказы —
-    # ушедший ОСС. Это не просрочка, а работа без хозяина: её переназначают.
-    gone_rows = [r for r in live_rows if r["managerGone"] or r["ossGone"]]
+    # ЖИВАЯ РАБОТА УВОЛЕННЫХ: сделку ведёт ушедший ответственный, её живые заказы —
+    # ушедший ОСС или ушедший ответственный заказа (Responsible person). Это не просрочка,
+    # а работа без хозяина: её переназначают.
+    gone_rows = [r for r in live_rows if r["managerGone"] or r["ossGone"] or r["respGone"]]
     gone = {
         "deals": len(gone_rows),
         "byManager": sum(1 for r in gone_rows if r["managerGone"]),
         "byOss": sum(1 for r in gone_rows if r["ossGone"]),
+        "byResp": sum(1 for r in gone_rows if r["respGone"]),
         "orders": sum(1 for r in gone_rows for o in r["orders"] if o["live"]),
         "late": sum(1 for r in gone_rows if r["late"]),
         "sale": _money(sum(r["saleEur"] for r in gone_rows)),
         "saleNum": round(sum(r["saleEur"] for r in gone_rows)),
         "people": len({r["manager"] for r in gone_rows if r["managerGone"]}
-                      | {o["oss"] for r in gone_rows for o in r["orders"] if o["live"] and o["ossGone"]}),
+                      | {o["oss"] for r in gone_rows for o in r["orders"] if o["live"] and o["ossGone"]}
+                      | {w for r in gone_rows for w in resp_gone_by.get(r["deal"], ())}),
     }
 
     deadlines = {

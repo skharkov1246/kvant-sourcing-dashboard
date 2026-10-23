@@ -61,6 +61,9 @@ EXC = {
 # обязательные даты размещения (решение владельца 19.10.2026, п. 9)
 PLAN_DATES = (("prodStart", "начало производства"), ("prodEnd", "конец производства"),
               ("delBudget", "доставка клиенту"))
+# кто из хозяев сделки уволен — признаки строки сделки contracts.py (справочник людей)
+GONE_ROLES = (("managerGone", "ответственный сделки"), ("ossGone", "ОСС"),
+              ("respGone", "ответственный заказа"))
 
 
 def _add_months(d: dt.date, m: int) -> dt.date:
@@ -214,7 +217,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
           warranty_months: int = WARRANTY_MONTHS) -> dict:
     """orders — заказы, приведённые к фактам; deals — строки сделок contracts.py
     (deal, seq, customer, closed, done, norders, firstLag, managerGone, ossGone,
-    manager, oss). → раздел «life» вкладки «Реализация»."""
+    respGone, manager, oss). → раздел «life» вкладки «Реализация»."""
     deal_by = {d["deal"]: d for d in deals}
     queue: list[dict] = []
     counts: Counter = Counter()
@@ -304,12 +307,16 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             codes.append(("dealOpen", None))
         if d.get("inCat0", True) and not os_ and (d.get("firstLag") or 0) > 7:
             codes.append(("noOrder", round(d["firstLag"])))
-        if d.get("managerGone") or d.get("ossGone"):
+        # ведёт уволенный: ответственный сделки, ОСС или ответственный живого заказа
+        ушли = [nm for k, nm in GONE_ROLES if d.get(k)]
+        if ушли:
             codes.append(("gone", None))
         w = _nm(d.get("ossDeal")) or _nm(d.get("manager")) or "—"
         for code, days in codes:
             counts[code] += 1
             sev, what, act = EXC[code]
+            if code == "gone":
+                what = what + ": " + ", ".join(ушли)
             queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
                           "who": w, "whoGone": gone(w), "kam": _nm(d.get("kam")),
                           "kamId": _nm(d.get("kamId")),
