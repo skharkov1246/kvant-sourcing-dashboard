@@ -177,10 +177,12 @@ def таблицы_диска(ключ: str, макс: int = 20000) -> dict[str,
 
 ОБЩЕЕ = re.compile(
     r"цен|стоим|итог|сумм|курс|ндс|кол-?в|\bед\.?|наимен|поставщ|логист|достав|тамож|пошлин|марж|наценк|прибыл|"
-    r"коэф|%|валют|евро|руб|\b(usd|eur|cny|rub|aed|exw|fca|dap|ddp|cip|cpt)\b|ткп|\bкп\b|срок|\bвес|объ[её]м|расход|"
+    r"коэф|%|валют|евро|\bруб(\b|л)|\b(usd|eur|cny|rub|aed|exw|fca|dap|ddp|cip|cpt)\b|ткп|\bкп\b|срок|\bвес|объ[её]м|расход|"
     r"комисс|банк|страх|итерац|верс|дата|№|номер|артикул|\bкод|позиц|бренд|производ|склад|упаков|сертиф|себест|"
     r"закуп|продаж|оплат|аванс|отсроч|ставк|клиент|заказчик|total|price|cost|qty|amount|margin|rate|incoterms|базис",
     re.I)
+# личное в подписях шаблона (блок подписи, реквизиты): почта, телефон, ссылка, ФИО — не печатать
+ЛИЧНОЕ = re.compile(r"@|https?://|www\.|\+?\d[\d\s()-]{6,}|[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+(вич|вна|ич|на)\b")
 СКЕЛЕТ = {"файлов": 0, "листов": collections.Counter(), "активный": collections.Counter(), "скрытых": collections.Counter(),
           "имена": collections.Counter(), "подписи": collections.Counter(), "формулы": collections.Counter()}
 
@@ -220,7 +222,7 @@ def скелет(b: bytes) -> None:
                     # числа-константы (наценка, ставки) — «N»; номера строк в ссылках (D25, $D$25) не трогаем
                     f = re.sub(r"(?<![A-Za-zЛ$\d.])\d+(?:\.\d+)?", "N", f)
                     формулы.add((i, c.coordinate, f[:90]))
-                elif isinstance(v, str) and ОБЩЕЕ.search(v) and len(v.strip()) <= 70:
+                elif isinstance(v, str) and ОБЩЕЕ.search(v) and len(v.strip()) <= 70 and not ЛИЧНОЕ.search(v):
                     подписи.add((i, c.coordinate, _норм(v)))
     for x in подписи:
         СКЕЛЕТ["подписи"][x] += 1
