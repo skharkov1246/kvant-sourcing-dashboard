@@ -66,6 +66,12 @@ def main() -> int:
     print(f"базовая валюта портала: {база}; валют в справочнике: {len(курс)} — {', '.join(sorted(курс))}")
     даты = sorted({str(x.get("DATE_UPDATE") or "")[:10] for x in курсы_список if x.get("DATE_UPDATE")})
     print(f"даты курсов: от {даты[0] if даты else '—'} до {даты[-1] if даты else '—'}")
+    # курс каждой валюты к базовой и дата правки — настройка портала, не данные клиентов;
+    # «единиц за 1 базовую» читается проще, чем доли
+    for x in sorted(курсы_список, key=lambda x: str(x.get("CURRENCY"))):
+        к = курс.get(x.get("CURRENCY")) or 0
+        print(f"  {x.get('CURRENCY')}: 1 {база} = {1 / к:.4g} {x.get('CURRENCY')}" if к else
+              f"  {x.get('CURRENCY')}: курс 0", f"· правлен {str(x.get('DATE_UPDATE') or '—')[:10]}")
 
     sel = ["ID", "OPPORTUNITY", "CURRENCY_ID", "STAGE_SEMANTIC_ID", "CATEGORY_ID",
            ct.BUY_ECON_RUB, ct.BUY_ECON_VAL, ct.ECON_LINK]
