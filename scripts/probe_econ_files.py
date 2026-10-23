@@ -168,7 +168,11 @@ def main() -> int:
         host = urllib.parse.urlparse(цель).netloc
         # форма адреса — без самого адреса: сколько частей пути, есть ли запрос и пробелы
         пу = urllib.parse.urlparse(цель)
-        сч[f"форма: частей пути {len([x for x in пу.path.split('/') if x])}"
+        # первые части пути — только служебные слова Диска, остальное «…»
+        СЛОВА = {"d", "i", "client", "disk", "edit", "public", "docs", "mail", "recent", "shared"}
+        части = [x for x in пу.path.split("/") if x]
+        сч["вид пути: /" + "/".join(x if x in СЛОВА else "…" for x in части[:2])] += 1
+        сч[f"форма: частей пути {len(части)}"
            f"{' · с запросом' if пу.query else ''}{' · пробел' if ' ' in цель.strip() else ''}"
            f"{' · хвост-пробел' if цель != цель.strip() else ''}"] += 1
         цель = цель.strip()
@@ -178,7 +182,29 @@ def main() -> int:
         сч[f"ссылка → {вид}"] += 1
         if "disk.yandex" not in host:
             continue
-        р = ресурс(цель)
+        личный = части[:2] == ["client", "disk"] or части[:1] == ["edit"]
+        if личный:
+            # ссылка на личный Диск (открывается только вошедшему в аккаунт):
+            # читается ключом прогона по пути disk:/…, если ключ от того же аккаунта
+            путь = "/".join(urllib.parse.unquote(x) for x in (части[2:] if части[0] == "client" else части[1:]))
+            if части[0] == "edit":
+                путь = путь.split("/", 1)[-1] if путь.startswith("disk/") else путь
+            тк = os.environ.get("YADISK_TOKEN", "").strip()
+            if not тк:
+                сч["личный Диск: ключа нет"] += 1
+                continue
+            raw = получить(f"https://cloud-api.yandex.net/v1/disk/resources?path={urllib.parse.quote('disk:/' + путь.lstrip('/'), safe='')}&limit=200", ключ=тк)
+            time.sleep(0.5)
+            if not raw:
+                сч["личный Диск: ключ не читает путь"] += 1
+                continue
+            сч["личный Диск: ключ читает путь"] += 1
+            try:
+                р = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+        else:
+            р = ресурс(цель)
         time.sleep(0.5)
         if not р or "type" not in р:
             сч["Диск: публичный ресурс недоступен без ключа"] += 1
@@ -197,7 +223,7 @@ def main() -> int:
         if not файл or not str(файл.get("name", "")).lower().endswith((".xlsx", ".xlsm")):
             continue
         href = файл.get("file")
-        if not href:
+        if not href and not личный:
             pk, путь = ключ_и_путь(цель)
             raw = получить(f"{API}/download?public_key={urllib.parse.quote(pk, safe='')}"
                            + (f"&path={urllib.parse.quote(путь, safe='')}" if путь else ""))
@@ -205,7 +231,8 @@ def main() -> int:
                 href = json.loads(raw).get("href") if raw else None
             except json.JSONDecodeError:
                 href = None
-        b = получить(href) if href else None
+        b = (получить(href, ключ=os.environ.get("YADISK_TOKEN", "").strip() if личный else "")
+             if href else None)
         time.sleep(0.5)
         if not b:
             сч["xlsx: не скачался"] += 1
