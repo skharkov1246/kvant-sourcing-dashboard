@@ -67,21 +67,41 @@ def раскрыть(url: str) -> str:
         return ""
 
 
-def получить(url: str, timeout: int = 30) -> bytes | None:
+КОДЫ: collections.Counter = collections.Counter()
+
+
+def получить(url: str, timeout: int = 30, ключ: str = "") -> bytes | None:
+    """Тело ответа или None; код ответа — в КОДЫ (только счёт, без адресов)."""
+    h = {"User-Agent": "kvant-probe"}
+    if ключ:
+        h["Authorization"] = f"OAuth {ключ}"
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "kvant-probe"}),
-                                    timeout=timeout) as r:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=timeout) as r:
+            КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {r.status}"] += 1
             return r.read(30 * 1024 * 1024)
-    except Exception:
+    except urllib.error.HTTPError as e:
+        КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {e.code}"] += 1
+        return None
+    except Exception as e:
+        КОДЫ[f"{'с ключом' if ключ else 'без ключа'}: {type(e).__name__}"] += 1
         return None
 
 
 def ресурс(public_url: str) -> dict | None:
-    raw = получить(f"{API}?public_key={urllib.parse.quote(public_url, safe='')}&limit=200")
-    try:
-        return json.loads(raw) if raw else None
-    except json.JSONDecodeError:
-        return None
+    """Публичный ресурс Диска: сначала без ключа, не вышло — с ключом прогона (YADISK_TOKEN)."""
+    адрес = f"{API}?public_key={urllib.parse.quote(public_url, safe='')}&limit=200"
+    for ключ in ("", os.environ.get("YADISK_TOKEN", "").strip()):
+        if ключ is None:
+            continue
+        raw = получить(адрес, ключ=ключ)
+        if raw:
+            try:
+                return json.loads(raw)
+            except json.JSONDecodeError:
+                return None
+        if not os.environ.get("YADISK_TOKEN", "").strip():
+            break
+    return None
 
 
 def разобрать_xlsx(b: bytes, сч: collections.Counter) -> None:
@@ -159,7 +179,9 @@ def main() -> int:
             сч["xlsx: не скачался"] += 1
             continue
         разобрать_xlsx(b, сч)
-    print(f"выборка: {len(выборка)} последних сделок со ссылкой")
+    print(f"выборка: {len(выборка)} последних сделок со ссылкой; ключ Диска в прогоне: "
+          f"{'есть' if os.environ.get('YADISK_TOKEN', '').strip() else 'нет'}")
+    print("коды ответов Диска: " + " · ".join(f"{k} {v}" for k, v in sorted(КОДЫ.items())))
     for k, v in sorted(сч.items()):
         print(f"  {k}: {v}")
     return 0
