@@ -973,13 +973,68 @@ def drop_lost(client, entity_type_id: int, items: Iterable[dict]) -> list[dict]:
     return [it for it in items if not lost(it.get("stageId"))]
 
 
+def _вебхук_из(имя: str) -> str:
+    u = (os.getenv(имя) or "").strip()
+    if u and not (u.startswith("https://") and "/rest/" in u):
+        print(f"  ⚠ {имя} не похож на вебхук — пропущен", flush=True)
+        return ""
+    return u
+
+
 def chat_webhook_url() -> str:
     """Вебхук владельца для чтения чатов сделок (секрет BITRIX_CHAT_WEBHOOK_URL, решение
     19.10.2026): только https с путём /rest/; иначе — пусто (читает вебхук сборки) и
     предупреждение без адреса. Одна проверка для сборки и пилота чатов."""
-    u = (os.getenv("BITRIX_CHAT_WEBHOOK_URL") or "").strip()
-    if u and not (u.startswith("https://") and "/rest/" in u):
-        print("  ⚠ BITRIX_CHAT_WEBHOOK_URL не похож на вебхук — чаты читает вебхук сборки", flush=True)
-        return ""
-    return u
+    return _вебхук_из("BITRIX_CHAT_WEBHOOK_URL")
+
+
+#: Вебхуки чтения чатов сделок по очереди (решения владельца 19.10 и 22.10.2026):
+#: владелец, затем руководитель реализации — во внутренний чат сделки вебхук
+#: читает, только если его хозяин участник, а добавить в чат может только участник
+#: (живые пробы 22.10: из 221 чата реализации владелец читает 8).
+ЧАТ_ВЕБХУКИ = (("BITRIX_CHAT_WEBHOOK_URL", "владельца"), ("BITRIX_CHAT_WEBHOOK_URL_2", "руководителя реализации"))
+
+
+class ЧтениеЧатов:
+    """Чтение чатов по очереди вебхуков: первый отказ в доступе — к следующему. Темп
+    портала общий (клиенты — with_webhook исходного). по_вебхуку — сколько вызовов
+    ответил каждый; лимит ожидания ставится всем сразу."""
+
+    def __init__(self, клиенты: list, подписи: list[str]):
+        self.клиенты, self.подписи = list(клиенты), list(подписи)
+        self.по_вебхуку = [0] * len(self.клиенты)
+
+    @property
+    def limit_wait_budget(self):
+        return self.клиенты[0].limit_wait_budget
+
+    @limit_wait_budget.setter
+    def limit_wait_budget(self, v) -> None:
+        for к in self.клиенты:
+            к.limit_wait_budget = v
+
+    def call(self, method: str, params: dict | None = None, **kw) -> Any:
+        for i, к in enumerate(self.клиенты):
+            try:
+                r = к.call(method, params, **kw)
+            except Exception as e:                    # noqa: BLE001
+                if i + 1 < len(self.клиенты) and "ACCESS" in str(e).upper():
+                    continue                          # не участник чата — следующий вебхук
+                raise
+            self.по_вебхуку[i] += 1
+            return r
+        raise BitrixError(f"{method}: вебхуков чтения чатов нет")
+
+
+def chat_reader_client(client) -> tuple[Any, str]:
+    """(клиент чтения чатов, подпись для журнала): заданные вебхуки ЧАТ_ВЕБХУКИ по
+    очереди; ни одного — вебхук сборки, как раньше."""
+    пары = [(_вебхук_из(имя), подпись) for имя, подпись in ЧАТ_ВЕБХУКИ]
+    пары = [(u, подпись) for u, подпись in пары if u]
+    if not пары or not hasattr(client, "with_webhook"):
+        return client, "вебхук сборки"
+    if len(пары) == 1:
+        return client.with_webhook(пары[0][0]), f"вебхук {пары[0][1]}"
+    return (ЧтениеЧатов([client.with_webhook(u) for u, _ in пары], [п for _, п in пары]),
+            "вебхуки " + " → ".join(п for _, п in пары))
 

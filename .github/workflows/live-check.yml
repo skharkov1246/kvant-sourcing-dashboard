@@ -75,6 +75,8 @@ jobs:
       BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
       # вебхук владельца — только чтение чатов сделок; в обеих сборках один и тот же
       BITRIX_CHAT_WEBHOOK_URL: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL }}
+      # второй читатель чатов — руководитель реализации (решение 22.10.2026)
+      BITRIX_CHAT_WEBHOOK_URL_2: ${{ secrets.BITRIX_CHAT_WEBHOOK_URL_2 }}
       SERVICE_ACCOUNT_IDS: ${{ vars.SERVICE_ACCOUNT_IDS }}
       # порядок обхода множеств одинаков в обеих сборках
       PYTHONHASHSEED: "0"
@@ -89,11 +91,12 @@ jobs:
           restpath="/${url#*://*/}"
           [ -n "$token" ] && echo "::add-mask::$token"
           [ -n "$restpath" ] && echo "::add-mask::$restpath"
-          if [ -n "${BITRIX_CHAT_WEBHOOK_URL:-}" ]; then
-            curl_="${BITRIX_CHAT_WEBHOOK_URL%/}"
+          for u in "${BITRIX_CHAT_WEBHOOK_URL:-}" "${BITRIX_CHAT_WEBHOOK_URL_2:-}"; do
+            [ -n "$u" ] || continue
+            curl_="${u%/}"
             echo "::add-mask::${curl_##*/}"
             echo "::add-mask::/${curl_#*://*/}"
-          fi
+          done
           echo "токен вебхука замаскирован"
 
       - uses: actions/checkout@v5

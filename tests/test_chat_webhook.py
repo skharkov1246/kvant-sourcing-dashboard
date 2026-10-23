@@ -42,3 +42,52 @@ def test_счётчики_снимка_общие_у_двух_вебхуков()
     o.snapshot_hits += 1
     assert c.snapshot_stats()["misses"] == 3 and c.snapshot_stats()["hits"] == 1
 
+
+
+def test_второй_вебхук_читает_где_первому_отказ(monkeypatch):
+    """Решение 22.10.2026: владелец не участник большинства чатов реализации — где ему
+    отказ в доступе, читает вебхук руководителя реализации; темп портала общий."""
+    from bitrix_client import ЧтениеЧатов, chat_reader_client
+    monkeypatch.setenv("BITRIX_CHAT_WEBHOOK_URL", "https://portal.example/rest/7/bbb")
+    monkeypatch.setenv("BITRIX_CHAT_WEBHOOK_URL_2", "https://portal.example/rest/9/ccc")
+    c = BitrixClient("https://portal.example/rest/1/aaa", min_interval=0.0)
+    чтение, кто = chat_reader_client(c)
+    assert isinstance(чтение, ЧтениеЧатов) and кто == "вебхуки владельца → руководителя реализации"
+    владелец, руководитель = чтение.клиенты
+    assert владелец._lock is c._lock and руководитель._lock is c._lock
+
+    def отказ(*_a, **_k):
+        raise RuntimeError("im.dialog.messages.get: ACCESS_ERROR You do not have access")
+    владелец.call = отказ
+    руководитель.call = lambda method, params=None, **kw: {"messages": [{"id": 1}]}
+    assert чтение.call("im.dialog.messages.get", {"DIALOG_ID": "chat5"}) == {"messages": [{"id": 1}]}
+    assert чтение.по_вебхуку == [0, 1]
+    # отказ последнего — наружу: chat_activity считает его «нет доступа»
+    руководитель.call = отказ
+    try:
+        чтение.call("im.dialog.messages.get", {"DIALOG_ID": "chat6"})
+        raise AssertionError("отказ последнего вебхука проглочен")
+    except RuntimeError as e:
+        assert "ACCESS" in str(e)
+    # не отказ в доступе (лимит, сеть) — следующий вебхук не зовётся
+    владелец.call = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("QUERY_LIMIT_EXCEEDED"))
+    руководитель.call = lambda *a, **k: (_ for _ in ()).throw(AssertionError("второй позван зря"))
+    try:
+        чтение.call("im.dialog.messages.get", {"DIALOG_ID": "chat7"})
+    except RuntimeError as e:
+        assert "QUERY_LIMIT" in str(e)
+    чтение.limit_wait_budget = 60
+    assert владелец.limit_wait_budget == 60 and руководитель.limit_wait_budget == 60
+
+
+def test_один_или_ни_одного_вебхука_чатов(monkeypatch):
+    from bitrix_client import chat_reader_client
+    c = BitrixClient("https://portal.example/rest/1/aaa", min_interval=0.0)
+    monkeypatch.delenv("BITRIX_CHAT_WEBHOOK_URL", raising=False)
+    monkeypatch.delenv("BITRIX_CHAT_WEBHOOK_URL_2", raising=False)
+    assert chat_reader_client(c) == (c, "вебхук сборки")
+    monkeypatch.setenv("BITRIX_CHAT_WEBHOOK_URL_2", "https://portal.example/rest/9/ccc")
+    клиент, кто = chat_reader_client(c)
+    assert кто == "вебхук руководителя реализации" and клиент.base == "https://portal.example/rest/9/ccc/"
+    monkeypatch.setenv("BITRIX_CHAT_WEBHOOK_URL_2", "не-вебхук")
+    assert chat_reader_client(c)[1] == "вебхук сборки"
