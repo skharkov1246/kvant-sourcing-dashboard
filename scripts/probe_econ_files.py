@@ -122,6 +122,11 @@ def main() -> int:
         url = str(d[ct.ECON_LINK]).strip()
         цель = раскрыть(url) if "clck.ru" in url else url
         time.sleep(0.5)
+        # clck.ru ведёт через страницу проверки ссылок Яндекса: адрес — в параметре url
+        if "sba.yandex" in urllib.parse.urlparse(цель).netloc:
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(цель).query)
+            цель = (q.get("url") or [""])[0]
+            сч["через страницу проверки ссылок Яндекса"] += 1
         host = urllib.parse.urlparse(цель).netloc
         вид = ("Диск: файл" if "disk.yandex" in host and "/i/" in цель else
                "Диск: папка или файл (/d/)" if "disk.yandex" in host else
