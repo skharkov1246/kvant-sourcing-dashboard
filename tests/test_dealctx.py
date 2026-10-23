@@ -197,6 +197,7 @@ def test_вкладка_со_сводом():
     assert q == [("chatReply", "6006"), ("chatRisk", "6008"), ("chatDue", "6008"), ("contractRisk", "6001"),
                  ("contractMissing", "6007"), ("contractMissing", "6003")]
     reply = dc["queue"][0]
+    assert reply["what"].endswith("оценка модели, уверенность 80 %"), "пункт по чату — оценка, а не факт"
     assert reply["who"] == rows["6006"]["ossDeal"] and reply["days"] == 4
     assert dc["queue"][3]["who"] == dealctx.CONTRACT_HEAD and dc["queue"][3]["act"].endswith("пени, документы")
     assert dc["counts"] == {"chatReply": 1, "chatRisk": 1, "chatDue": 1, "contractRisk": 1, "contractMissing": 2}

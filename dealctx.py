@@ -309,9 +309,14 @@ def _owner(r: dict) -> str:
     return _nm(r.get("ossDeal")) or _nm(r.get("manager")) or "—"
 
 
-def _item(code: str, r: dict, who: str, act: str = "", days: int | None = None, what: str = "") -> dict:
+def _item(code: str, r: dict, who: str, act: str = "", days: int | None = None, what: str = "",
+          conf: float | None = None) -> dict:
     sev, what0, act0 = EXC[code]
-    return {"code": code, "sev": sev, "what": what or what0, "act": act or act0, "days": days,
+    what = what or what0
+    if code.startswith("chat"):
+        # пункт по чату — оценка модели, а не факт: уверенность — в самом пункте
+        what += " — оценка модели" + (f", уверенность {round(conf * 100)} %" if conf is not None else "")
+    return {"code": code, "sev": sev, "what": what, "act": act or act0, "days": days,
             "who": who, "whoGone": _gone(who), "kam": _nm(r.get("kam")), "kamId": _nm(r.get("kamId")),
             "deal": r["deal"], "seq": r.get("seq") or 0, "customer": r.get("customer") or "—",
             "order": "", "title": r.get("title") or "", "sup": "", "dl": "", "phase": ""}
@@ -382,18 +387,20 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
                     h = work_hours(cur["human"], now) if cur["human"] else None
                     if h is not None and h > REPLY_HOURS:
                         n["replyLate"] += 1
-                        queue.append(_item("chatReply", r, who, days=(today - cur["human"].date()).days))
+                        queue.append(_item("chatReply", r, who, days=(today - cur["human"].date()).days,
+                                           conf=cur.get("conf")))
                 if cur["risk"] == "высокий":
                     n["high"] += 1
                     kinds = ", ".join(k.replace("_", " ") for k in cur["kinds"])
-                    queue.append(_item("chatRisk", r, _owner(r), act="разобрать риск" + (f": {kinds}" if kinds else "")))
+                    queue.append(_item("chatRisk", r, _owner(r), act="разобрать риск" + (f": {kinds}" if kinds else ""),
+                                       conf=cur.get("conf")))
                 due = cur.get("due")
                 if due and due < today and (today - due).days <= DUE_MAX_DAYS:
                     n["dueLate"] += 1
                     queue.append(_item("chatDue", r, _nm(r.get("ossDeal")) or _nm(r.get("oss")) or _owner(r),
                                        act=f"подтвердить {DUE_ACC[cur['dueKind']]} у второй стороны "
                                            f"(срок был {due.strftime('%d.%m')})",
-                                       days=(today - due).days))
+                                       days=(today - due).days, conf=cur.get("conf")))
         c = cons.get(did)
         if c:
             n["contractSeen"] += 1
