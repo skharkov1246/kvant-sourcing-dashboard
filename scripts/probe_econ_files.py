@@ -38,7 +38,7 @@ import config  # noqa: E402
 import contracts as ct  # noqa: E402
 from bitrix_client import BitrixClient  # noqa: E402
 
-МАКС = int(os.environ.get("ECON_PROBE_MAX", "40"))
+МАКС = int(os.environ.get("ECON_PROBE_MAX", "5"))   # владелец 23.10: не больше 30 файлов в день
 API = "https://cloud-api.yandex.net/v1/disk/public/resources"
 ПОДПИСИ = {
     "выручка": re.compile(r"выручк|продаж|revenue|sales", re.I),
@@ -122,6 +122,13 @@ def ресурс(public_url: str) -> dict | None:
     return None
 
 
+def общий_диск(путь: str) -> tuple[str, str] | None:
+    """Путь файла на общем диске Яндекс 360 → (метка, путь внутри диска) или None.
+    Принимает «vd/<метка>/disk/<путь>», «vd/<метка>/<путь>» и «vd:<метка>:disk:/<путь>»."""
+    м = re.match(r"^vd[:/]([A-Za-z0-9_-]+)[:/](?:disk:?/)?(.*)$", путь.strip("/"))
+    return (м.group(1), м.group(2)) if м else None
+
+
 def таблицы_диска(ключ: str, макс: int = 20000) -> dict[str, list[dict]]:
     """Все таблицы на Диске ключа (включая принятые общие папки): имя файла → ресурсы.
     Файл из ссылки сотрудника лежит у получателя по другому пути — ищем по имени."""
@@ -177,7 +184,7 @@ def main() -> int:
 
     # где лежат файлы экономики: верхние папки путей по всем ссылкам — только счёт, без имён
     верх: collections.Counter = collections.Counter()
-    for d in со_ссылкой:
+    for d in (со_ссылкой if os.environ.get("ECON_PROBE_ALL") else []):
         u = str(d[ct.ECON_LINK]).strip()
         ц = раскрыть(u) if "clck.ru" in u else u
         if "sba.yandex" in urllib.parse.urlparse(ц).netloc:
@@ -191,8 +198,9 @@ def main() -> int:
         time.sleep(0.3)
     всего = sum(верх.values())
     доли = [n for _k, n in верх.most_common()]
-    print(f"файлы экономики: ссылок {всего}; разных папок (2 уровня от корня) {len(верх)}; "
-          f"в самой частой {доли[0] if доли else 0}, в 3 частых {sum(доли[:3])}, в 10 частых {sum(доли[:10])}")
+    if всего:
+        print(f"файлы экономики: ссылок {всего}; разных папок (2 уровня от корня) {len(верх)}; "
+              f"в самой частой {доли[0] if доли else 0}, в 3 частых {sum(доли[:3])}, в 10 частых {sum(доли[:10])}")
     выборка = sorted(со_ссылкой, key=lambda d: str(d.get("DATE_CREATE") or ""), reverse=True)[:МАКС]
     сч: collections.Counter = collections.Counter()
     тк_диска = os.environ.get("YADISK_TOKEN", "").strip()
@@ -230,6 +238,34 @@ def main() -> int:
             # читается ключом прогона по пути disk:/…, если ключ от того же аккаунта
             # /client/disk/<папка>/<файл> и /edit/disk/disk%2F<папка>%2F<файл>: путь от корня Диска
             путь = "/".join(urllib.parse.unquote(x) for x in части[2:])
+            # первые слова пути — только служебные (disk, vd), прочее «…»
+            сч["начало пути: " + "/".join(x if x in ("disk", "vd", "client", "edit") else "…"
+                                          for x in путь.split("/")[:2])] += 1
+            об = общий_диск(путь)
+            if об:
+                # общий диск организации: свой метод API (virtual-disks), путь vd:<метка>:disk:/…
+                if not тк_диска:
+                    сч["общий диск: ключа нет"] += 1
+                    continue
+                vd = f"vd:{об[0]}:disk:/{об[1]}"
+                raw = получить("https://cloud-api.yandex.net/v1/disk/virtual-disks/resources/download?path="
+                               + urllib.parse.quote(vd, safe=""), ключ=тк_диска)
+                time.sleep(1.0)
+                href = json.loads(raw).get("href") if raw else None
+                if not href:
+                    сч["общий диск: ссылка на скачивание не получена"] += 1
+                    continue
+                сч["общий диск: ссылка на скачивание получена"] += 1
+                if not об[1].lower().endswith((".xlsx", ".xlsm")):
+                    сч[f"общий диск: файл не xlsx ({об[1].rsplit('.', 1)[-1].lower()[:5] if '.' in об[1] else 'без расширения'})"] += 1
+                    continue
+                b = получить(href, ключ=тк_диска)
+                time.sleep(1.0)
+                if not b:
+                    сч["xlsx: не скачался"] += 1
+                    continue
+                разобрать_xlsx(b, сч)
+                continue
             if части[0] == "edit" and путь.startswith("disk/"):
                 путь = путь[len("disk/"):]
             тк = os.environ.get("YADISK_TOKEN", "").strip()
