@@ -107,6 +107,8 @@ def ball_of(stage_name: str, sem: str = "P") -> str:
 ЗАСТОЙ_ДНЕЙ = 14
 # первый запрос поставщику уходит в среднем через 2 дня после сделки
 БЕЗ_ЗАПРОСА_ДНЕЙ = 3
+# строк «Требует действия» на странице (вес страницы); полное число — head.actN
+ACT_SHOWN = 60
 
 
 def find_category(category_names: dict[str, str]) -> tuple[str, str] | None:
@@ -376,14 +378,18 @@ def compute(*, cid: str, cat_name: str, deals: list[dict], stage_meta: dict[str,
             "ballKam": sum(1 for r in open_rows if r["ball"] == "kam"),
             "ballUnknown": sum(1 for r in open_rows if r["ball"] == "?"),
             "staleDays": ЗАСТОЙ_ДНЕЙ, "noRfqDays": БЕЗ_ЗАПРОСА_ДНЕЙ,
+            # полная длина списка «Требует действия» — до обрезки «act» до 60:
+            # заголовок по обрезанному списку показывал 60 при любом числе сверх
+            "actN": len(act),
         },
         "stages": st_rows,
         "poLines": po_lines(rows),
         "lost": lost,
         "weeks": weeks,
         "bySourcer": by_src,
-        # таблица «Требует действия» на вкладке «Сорсинг» — первые 60 (вес страницы)
-        "act": act[:60],
+        # таблица «Требует действия» на вкладке «Сорсинг» — первые ACT_SHOWN (вес
+        # страницы); сколько всего — head.actN
+        "act": act[:ACT_SHOWN],
         # все открытые сделки, без обрезки: очередь КАМа (kamqueue.py) берёт отсюда
         # мяч у КАМа и сделки без КАМа — по обрезанному «act» часть их терялась
         "openDeals": [{k: r[k] for k in ("id", "t", "stage", "stageName", "days", "ball", "who",

@@ -210,6 +210,17 @@ _REACT_NUM = ["mentions", "self", "coll", "none", "medMin", "withinSla", "w30", 
 # числа — для дня целиком и для разрезов presale/real. Список «ждут ответа» с названиями
 # сделок и оценки сотрудников — в закрытой части, KV chat:v1 (chat_scan.py).
 REACT_PUBLIC = _REACT_NUM + ["answeredSelf"]
+# Знаменатель суточной доли: без него доля дня — не 0, а «нет данных», и в
+# недельное среднее день не входит. «self» = число его ответов (= answeredSelf,
+# но есть и в записях старой схемы). Счётчики, которые стоят рядом с долей
+# («сам+коллега из N», «из N его ответов», исход упоминаний), усредняются по тем
+# же дням, что и доля: иначе рядом с «100 %» стояло бы «из 0».
+_REACT_GATE = {"handledPct": "mentions", "mentions": "mentions", "self": "mentions", "coll": "mentions",
+               "none": "mentions",
+               "withinSla": "self", "w30": "self", "w120": "self", "w1440": "self", "medMin": "self",
+               "answeredSelf": "self"}
+# счётчик без дней со знаменателем — измеренный ноль, а не «нет данных»
+_REACT_COUNTS = {"mentions", "self", "coll", "none", "answeredSelf"}
 
 
 def scan_chat_reaction(client, *, as_of=None, collect_samples=False):
@@ -276,10 +287,16 @@ def _load_react_snapshot(uids, *, private: dict | None = None, path: str | None 
             out[uid] = {"assessment": assess.get(uid), "days": 0}
             continue
         avg = {}
-        for k in _REACT_NUM:
-            vals = [r[k] for r in recs if r.get(k) is not None]
-            avg[k] = (sum(vals) / len(vals)) if vals else None
-        for k in _REACT_NUM:  # счётчики/проценты — целыми, кроме дробных дней
+        for k in _REACT_NUM + ["answeredSelf"]:
+            # Доля имеет смысл только в день, где был её знаменатель: «закрыто» —
+            # при упоминаниях, «в срок» и распределение ответов — при его
+            # собственных ответах. Суточная запись без них несёт 0, и этот 0
+            # тянул недельное среднее вниз (43 % вместо 75–100 % у человека со
+            # смешанной неделей). Дней со знаменателем нет — доли нет: None, «—».
+            keep = _REACT_GATE.get(k)
+            vals = [r[k] for r in recs if r.get(k) is not None and (not keep or (r.get(keep) or 0) > 0)]
+            avg[k] = (sum(vals) / len(vals)) if vals else (0 if k in _REACT_COUNTS else None)
+        for k in _REACT_NUM + ["answeredSelf"]:  # счётчики/проценты — целыми, кроме дробных дней
             if avg.get(k) is not None and k not in ("waitMaxDays", "lastPostDays"):
                 avg[k] = round(avg[k])
         for k in ("waitMaxDays", "lastPostDays"):
@@ -514,10 +531,12 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
             },
             "funnel": funnel,
             "bymon": bymon,
+            # снимка чатов нет — доли неизвестны (None, «нет данных скана»), а не 0 %
             "react": react.get(uid, {"mentions": 0, "self": 0, "coll": 0, "none": 0, "medMin": None,
-                                     "withinSla": 0, "w30": 0, "w120": 0, "w1440": 0, "handledPct": 0,
+                                     "withinSla": None, "w30": None, "w120": None, "w1440": None,
+                                     "handledPct": None,
                                      "waiting": [], "waitN": 0, "waitGt1d": 0, "waitGt3d": 0, "waitMaxDays": 0,
-                                     "activeChats": 0, "lastPostDays": None,
+                                     "activeChats": 0, "lastPostDays": None, "days": 0,
                                      "presale": {}, "real": {}}),
             "deals": sorted(detail, key=lambda r: -r["raw"]),
         })

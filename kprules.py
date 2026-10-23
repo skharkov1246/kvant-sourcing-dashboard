@@ -14,6 +14,25 @@
   fileClosed  — файл КП приложен, а стадия «Отказ в КП» или «Ответ не получен»;
   pawStale    — Price at Work дольше PAW_STALE_DAYS без итога (п. 9);
   legacy      — стадия «КП получено», которую правило отменило (п. 9).
+
+Нарушение или наследие до правил (split_flags). «До правил» — только то, что
+застыло до 19.10.2026 и после правил не могло случиться заново; признак, который
+продолжает копиться под правилами, — нарушение:
+  noFile      — до правил, если карточка ЗАКРЫТА (Selected, не выбран) и
+                закрыта раньше 19.10 (movedTime); на Price at Work файл
+                приложить можно и сейчас — нарушение;
+  legacy      — до правил, если на «КП получено» перевели раньше 19.10 (как в
+                зонде v52, scripts/probe_kp_rules.py);
+  pawStale    — часы считаются от max(movedTime, 19.10): нарушение, когда и
+                под правилами прошло больше PAW_STALE_DAYS; раньше — до правил.
+                Иначе карточка, поставленная на Price at Work 15.10, не стала бы
+                нарушением никогда, хотя стоит без итога и под правилами;
+  fileNoStage, fileClosed — файл прикладывают без смены стадии, поэтому
+                movedTime о времени файла ничего не говорит. До правил — только
+                если карточку не меняли с 19.10 вовсе (updatedTime раньше даты:
+                файл приложен не позже); нет updatedTime — нарушение.
+Наследие нарушением не вменяется, но остаётся списком на доразметку
+(count_before).
 """
 from __future__ import annotations
 
@@ -53,14 +72,70 @@ def card_flags(r: dict, as_of, stale_days: int) -> list[str]:
     return out
 
 
-def count_flags(items: list[dict], as_of, stale_days: int) -> tuple[Counter, int]:
-    """(нарушения по коду, карточек хотя бы с одним нарушением)."""
+def _date(since):
+    return parse_dt(since) if isinstance(since, str) else since
+
+
+def before_rules(r: dict, since) -> bool:
+    """Стадию карточки в последний раз меняли до даты правил (since — date или ISO).
+
+    Дата — movedTime, без неё — createdTime. Нет ни той ни другой — карточка
+    считается по правилам, как было до этого разделения."""
+    since_d = _date(since) if since else None
+    if not since_d:
+        return False
+    moved = parse_dt(r.get("movedTime") or "") or parse_dt(r.get("createdTime") or "")
+    return bool(moved and moved < since_d)
+
+
+def split_flags(r: dict, as_of, stale_days: int, since=None) -> tuple[list[str], list[str]]:
+    """(нарушения, наследие до правил) одной карточки — правила в шапке модуля.
+
+    Без since всё — нарушения, как до разделения."""
+    fl = card_flags(r, as_of, stale_days)
+    since_d = _date(since) if since else None
+    if not fl or not since_d:
+        return fl, []
+    b = classify_stage(str(r.get("stageId") or ""))
+    moved_before = before_rules(r, since_d)
+    updated = parse_dt(r.get("updatedTime") or "")
+    viol, pre = [], []
+    for f in fl:
+        if f == "noFile":
+            застыло = moved_before and b != "paw"            # закрыта до правил
+        elif f == "legacy":
+            застыло = moved_before
+        elif f == "pawStale":
+            # часы под правилами: от max(перевод на Price at Work, дата правил)
+            застыло = moved_before and (as_of - since_d).days <= stale_days
+        else:                                                # fileNoStage, fileClosed
+            застыло = bool(updated and updated < since_d)
+        (pre if застыло else viol).append(f)
+    return viol, pre
+
+
+def count_flags(items: list[dict], as_of, stale_days: int, since=None) -> tuple[Counter, int]:
+    """(нарушения по коду, карточек хотя бы с одним нарушением).
+
+    С since — без наследия до правил: его считает count_before."""
     c: Counter = Counter()
     cards = 0
     for r in items:
-        fl = card_flags(r, as_of, stale_days)
+        fl, _pre = split_flags(r, as_of, stale_days, since)
         c.update(fl)
         cards += bool(fl)
+    return c, cards
+
+
+def count_before(items: list[dict], as_of, stale_days: int, since) -> tuple[Counter, int]:
+    """Наследие до правил: признаки, застывшие до since. Нарушением не считается —
+    это список на доразметку."""
+    c: Counter = Counter()
+    cards = 0
+    for r in items:
+        _fl, pre = split_flags(r, as_of, stale_days, since)
+        c.update(pre)
+        cards += bool(pre)
     return c, cards
 
 

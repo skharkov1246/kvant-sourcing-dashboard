@@ -681,6 +681,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         r["grossWhy"] = (f"валовая {r['marginPct']}% при типичной {round(med_gross or 0)}% — "
                          f"похоже, заведены не все заказы поставщикам "
                          f"(сейчас {r['norders']})") if r["grossSusp"] else ""
+        # маржа при неполной закупке завышена — числом не показываем и в итог не берём
+        # (ревизия 23.10.2026: у трети сделок с заказами закупка меньше 30 % продажи)
+        if r["grossSusp"]:
+            r["marginEur"], r["marginPct"], r["marginLbl"] = None, None, "закупка неполная?"
 
     # ПОДВИСЛА — только после чата (решение владельца 19.10.2026): простой по стадии
     # снимается, если в чате сделки за неделю писал человек; не прочитали чат —
@@ -836,6 +840,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # их число показывается рядом.
     sale_sum = sum(r["saleEur"] for r in live_rows if r["saleKnown"])
     buy_sum = sum(r["buyEur"] for r in live_rows if r["buySrc"] in ("orders", "econ") and not r["buySusp"])
+    # маржа — только где и продажа, и закупка достоверны: без «не сходится» и «закупка неполная?»
     margin_sum = sum(r["marginEur"] for r in live_rows if r["marginEur"] is not None)
     sale_m = sum(r["saleEur"] for r in live_rows if r["marginEur"] is not None)
     n_econ = sum(1 for r in live_rows if r["buySrc"] == "econ" and not r["buySusp"])
