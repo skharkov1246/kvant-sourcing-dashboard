@@ -175,6 +175,24 @@ def main() -> int:
     домены = collections.Counter(urllib.parse.urlparse(str(d[ct.ECON_LINK]).strip()).netloc for d in со_ссылкой)
     print("домен ссылки: " + " · ".join(f"{k} {v}" for k, v in домены.most_common(8)))
 
+    # где лежат файлы экономики: верхние папки путей по всем ссылкам — только счёт, без имён
+    верх: collections.Counter = collections.Counter()
+    for d in со_ссылкой:
+        u = str(d[ct.ECON_LINK]).strip()
+        ц = раскрыть(u) if "clck.ru" in u else u
+        if "sba.yandex" in urllib.parse.urlparse(ц).netloc:
+            ц = (urllib.parse.parse_qs(urllib.parse.urlparse(ц).query).get("url") or [""])[0]
+        ч = [x for x in urllib.parse.urlparse(ц).path.split("/") if x]
+        if ч[:2] == ["edit", "disk"] and len(ч) > 2:
+            пп = urllib.parse.unquote(ч[2]).split("/")
+            верх["/".join(пп[1:3] if пп[:1] == ["disk"] else пп[:2])] += 1
+        else:
+            верх["(не /edit/disk)"] += 1
+        time.sleep(0.3)
+    всего = sum(верх.values())
+    доли = [n for _k, n in верх.most_common()]
+    print(f"файлы экономики: ссылок {всего}; разных папок (2 уровня от корня) {len(верх)}; "
+          f"в самой частой {доли[0] if доли else 0}, в 3 частых {sum(доли[:3])}, в 10 частых {sum(доли[:10])}")
     выборка = sorted(со_ссылкой, key=lambda d: str(d.get("DATE_CREATE") or ""), reverse=True)[:МАКС]
     сч: collections.Counter = collections.Counter()
     тк_диска = os.environ.get("YADISK_TOKEN", "").strip()
