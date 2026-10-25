@@ -220,3 +220,34 @@ def test_доставлено_по_стадии_без_даты_не_проср�
     assert life["otd"]["last90"]["n"] == 0 and life["otd"]["deals90"]["n"] == 0
     # живой заказ без даты доставки при прошедшем сроке — просрочка, как и была
     assert ("late", 48) in lc.order_exceptions(заказ(dl=д("2026-09-01")), СЕГОДНЯ)
+
+
+def test_даты_доставки_нет_берётся_дата_упд():
+    """Решение владельца 25.10.2026: «доставлено, даты доставки нет» — прежде чем ставить
+    пункт, искать УПД и брать дату доставки из него. Доставка в срок — только по факту."""
+    закрыт = заказ(live=False, success=True, closedRecent=True, dl=д("2026-09-01"),
+                   utdDate=д("2026-09-05"), utd=True)
+    assert lc.order_exceptions(закрыт, СЕГОДНЯ) == [], "дата УПД есть — пункта «нет даты доставки» нет"
+    assert lc.delivered(закрыт) == д("2026-09-05")
+    assert lc.phase(закрыт, СЕГОДНЯ) == "warranty", "гарантия — от даты УПД"
+    # живой заказ: срок прошёл, факта нет, УПД подписан — доставлен, это закрытие, не просрочка
+    живой = заказ(dl=д("2026-09-01"), utdDate=д("2026-09-20"), utd=True, payPlan=д("2026-10-30"))
+    исключения = lc.order_exceptions(живой, СЕГОДНЯ)
+    assert not any(c in ("late", "risk", "forecast", "noDl") for c, _ in исключения)
+    assert lc.phase(живой, СЕГОДНЯ) == "close", "без платёжки клиента — закрытие"
+    assert lc.forecast(живой, СЕГОДНЯ, {"transit": 10, "lastMile": 5}, {}) is None
+    # факт есть — он главнее даты УПД
+    assert lc.delivered(заказ(delFact=д("2026-09-10"), utdDate=д("2026-09-20"))) == д("2026-09-10")
+    life = lc.build([закрыт, {**живой, "id": "2"}], [{"deal": "100", "seq": 900, "closed": False}], СЕГОДНЯ)
+    assert life["byUtd"] == 2 and "noFact" not in life["counts"] and "late" not in life["counts"]
+    # доставка в срок и хозяева за 90 дней — только по факту: подпись УПД бывает позже приёмки
+    assert life["otd"]["last90"]["n"] == 0 and life["otd"]["deals90"]["n"] == 0
+
+
+def test_пункт_очереди_помечен_по_упд():
+    живой = заказ(dl=д("2026-09-01"), utdDate=д("2026-09-20"), utd=False)
+    life = lc.build([живой], [{"deal": "100", "seq": 900, "closed": False}], СЕГОДНЯ)
+    assert life["queue"] and all(q["byUtd"] for q in life["queue"])
+    сфактом = заказ(dl=д("2026-09-01"), delFact=д("2026-09-10"))
+    life = lc.build([сфактом], [{"deal": "100", "seq": 900, "closed": False}], СЕГОДНЯ)
+    assert life["queue"] and not any(q["byUtd"] for q in life["queue"])

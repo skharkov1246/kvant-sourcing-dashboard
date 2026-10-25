@@ -64,23 +64,66 @@ def test_поле_экономики_в_валюте_без_курса():
 def test_несоизмеримая_закупка_текстом_и_не_в_итогах():
     stub = fixture.ContractsStub()
     did = stub.deals[1]["ID"]
-    # заказы без сумм — закупка из полей экономики, вшестеро больше продажи
-    for o in stub.orders:
-        if str(o["parentId2"]) == did:
-            o["opportunity"] = 0
-    stub.deals[1][ct.BUY_ECON_RUB] = f"{float(stub.deals[1]['OPPORTUNITY']) * 6 / 0.01:.0f}|RUB"
+    # закупка по заказам вшестеро больше продажи
+    ords = [o for o in stub.orders if str(o["parentId2"]) == did]
+    for o in ords:
+        o["opportunity"] = 0
+    ords[0]["opportunity"] = float(stub.deals[1]["OPPORTUNITY"]) * 6
+    ords[0]["currencyId"] = stub.deals[1]["CURRENCY_ID"]
     data = _compute(stub)
     r = _row(data, did)
-    assert r["buySrc"] == "econ" and r["buySusp"] is True
+    assert r["buySrc"] == "orders" and r["buySusp"] is True
     assert r["buyLbl"] == "не сходится" and r["marginEur"] is None
     assert data["head"]["nBuySusp"] >= 1
     live = [x for x in data["rows"] if not x["closed"] and not x["seg"]]
-    ожидание = sum(x["buyEur"] for x in live if x["buySrc"] in ("orders", "econ") and not x["buySusp"])
+    ожидание = sum(x["buyEur"] for x in live if x["marginEur"] is not None)
     assert ct._money(ожидание) == data["head"]["buy"]
     # в пределах — число, как раньше
-    stub.deals[1][ct.BUY_ECON_RUB] = f"{float(stub.deals[1]['OPPORTUNITY']) * 0.5 / 0.01:.0f}|RUB"
+    ords[0]["opportunity"] = float(stub.deals[1]["OPPORTUNITY"]) * 0.5
     r = _row(_compute(stub), did)
     assert r["buySusp"] is False and r["buyLbl"].startswith("€") and r["marginEur"] is not None
+
+
+def test_поля_экономики_не_закупка_а_сверка():
+    """Ревизия денег 25.10.2026: «Cost (rub)» / «Offer sum» — только сверка (discrep): у
+    сделки без сумм заказов закупки нет, маржи нет, в Σ закупки она не идёт."""
+    stub = fixture.ContractsStub()
+    did = stub.deals[1]["ID"]
+    for o in stub.orders:
+        if str(o["parentId2"]) == did:
+            o["opportunity"] = 0
+    stub.deals[1][ct.BUY_ECON_RUB] = f"{float(stub.deals[1]['OPPORTUNITY']) * 0.5 / 0.01:.0f}|RUB"
+    data = _compute(stub)
+    r = _row(data, did)
+    assert r["buySrc"] == "none" and r["buyEur"] == 0 and r["marginEur"] is None
+    assert r["buyEconEur"] > 0, "поле экономики остаётся в строке — для сверки"
+    assert data["head"]["nNoBuy"] >= 1 and "nEcon" not in data["head"]
+    # поле экономики в валюте без курса — не «валюта без курса» сделки: в Σ продажи она идёт
+    stub.deals[1][ct.BUY_ECON_RUB] = "645000|XYZ"
+    d2 = _compute(stub)
+    r2 = _row(d2, did)
+    assert r2["fxMissing"] == [] and r2["saleKnown"] is True
+    assert d2["head"]["nFx"] == data["head"]["nFx"]
+
+
+def test_итоги_закупки_и_маржи_на_одном_множестве():
+    """Σ продажи сделок с маржой − Σ закупки = Σ маржи — до евро (до 25.10.2026 Σ закупки
+    шла по своему множеству, и разность не давала маржу)."""
+    stub = fixture.ContractsStub()
+    # закупка без продажи: до правки она входила в Σ закупки, но не в Σ маржи
+    stub.deals[2]["OPPORTUNITY"] = "0"
+    data = _compute(stub)
+    # основной вид и отдельное направление — каждый по своим открытым сделкам
+    for h, seg in ((data["head"], False), (data["sep"]["head"], True)):
+        live = [r for r in data["rows"] if not r["closed"] and bool(r["seg"]) == seg]
+        m = [r for r in live if r["marginEur"] is not None]
+        assert m and h["nM"] == len(m)
+        assert h["saleMNum"] - h["buyNum"] == h["marginNum"], h
+        assert all(r["saleEur"] - r["buyEur"] == r["marginEur"] for r in m)
+    r = _row(data, stub.deals[2]["ID"])
+    assert r["marginEur"] is None
+    live = [x for x in data["rows"] if not x["closed"] and not x["seg"]]
+    assert data["head"]["buyNum"] == sum(x["buyEur"] for x in live if x["marginEur"] is not None)
 
 
 def test_выручка_не_разносится_больше_суммы_сделки():
@@ -188,3 +231,114 @@ def test_ведёт_уволенный_плитка_фильтр_и_свод_с�
     assert "r.filter(x=>(x.managerGone||x.ossGone||x.respGone)&&!x.closed)" in вкладка
     # без уволенных — как было: признака нет ни у одной сделки
     assert not any(r["respGone"] for r in _compute(fixture.ContractsStub())["rows"])
+
+
+def test_дата_упд_только_прошедшая():
+    сегодня = dt.date(2026, 10, 19)
+    assert ct._utd_date({ct.UTD_DATE: "2026-10-01T03:00:00+03:00"}, сегодня) == dt.date(2026, 10, 1)
+    assert ct._utd_date({ct.UTD_DATE: "2026-11-01"}, сегодня) is None, "будущая дата — опечатка, не доставка"
+    assert ct._utd_date({}, сегодня) is None
+
+
+def _econ(sale_eur: float, buy_eur: float, **kw) -> dict:
+    import dealctx
+    raw = {"at": "2026-10-17T10:00:00+03:00", "sale": sale_eur, "cur": "EUR", "saleEur": sale_eur,
+           "buyEur": buy_eur, "markup": round(sale_eur / buy_eur - 1, 6), "rebid": False, "items": 3, "fx": {}}
+    raw.update(kw)
+    return dealctx.clean({"version": dealctx.VERSION, "econ": {"1": raw}})["econ"]["1"]
+
+
+def _compute_econ(stub, ctx_econ: dict) -> dict:
+    old = os.environ.get("KVANT_NOW")
+    os.environ["KVANT_NOW"] = fixture.CT_NOW
+    try:
+        return ct.compute(stub, as_of=fixture.CT_TODAY, people={}, ctx_econ=ctx_econ)
+    finally:
+        if old is None:
+            os.environ.pop("KVANT_NOW", None)
+        else:
+            os.environ["KVANT_NOW"] = old
+
+
+def test_сверенный_файл_экономики_первым():
+    """Решение владельца 25.10.2026: продажа и закупка из сверенного файла — первыми;
+    «Сумма» Битрикса — рядом, для сверки; маржа — продажа файла − закупка файла."""
+    stub = fixture.ContractsStub()
+    d = stub.deals[1]
+    did = d["ID"]
+    base = _row(_compute(stub), did)
+    data = _compute_econ(stub, {did: _econ(31_000.0, 15_000.0)})
+    r = _row(data, did)
+    assert r["saleSrc"] == "file" and r["saleEur"] == 31_000 and r["econAt"] == "17.10.2026"
+    assert r["buySrc"] == "file" and r["buyEur"] == 15_000 and r["marginEur"] == 16_000
+    assert r["saleBitrixEur"] == base["saleEur"], "«Сумма» Битрикса остаётся рядом"
+    assert r["noEcon"] is False, "сверенный файл есть — «экономика не заведена» не флаг"
+    assert r["buyOrdersEur"] == base["buyOrdersEur"], "заказы остаются сверкой"
+    assert data["head"]["nFile"] == 1 and data["head"]["saleMNum"] - data["head"]["buyNum"] == data["head"]["marginNum"]
+    others = [x for x in data["rows"] if x["deal"] != did]
+    assert all(x["saleSrc"] == "bitrix" for x in others)
+    # без свода — как до 25.10.2026
+    assert _row(_compute(stub), did)["saleSrc"] == "bitrix"
+
+
+def test_файл_после_правки_суммы_не_первый():
+    """«Сумму» меняли после чтения файла (сверка на день чтения другая) — файл могли обновить
+    вместе с ней: до перечтения продажа — Битрикс (dealctx.econ_stale)."""
+    stub = fixture.ContractsStub()
+    d = stub.deals[1]
+    did, amt = d["ID"], float(d["OPPORTUNITY"])
+    свежий = _econ(amt, amt / 2, ratio=1.0)                     # на день чтения «Сумма» = файл
+    assert _row(_compute_econ(stub, {did: свежий}), did)["saleSrc"] == "file"
+    устарел = _econ(amt * 1.5, amt / 2, ratio=1.0)              # сегодня «Сумма» / файл = 0,67, а было 1,0
+    r = _row(_compute_econ(stub, {did: устарел}), did)
+    assert r["saleSrc"] == "bitrix" and r["saleEur"] == round(amt)
+
+
+def test_файл_даёт_продажу_при_валюте_без_курса():
+    stub = fixture.ContractsStub()
+    stub.deals[0]["CURRENCY_ID"] = "AED"
+    did = stub.deals[0]["ID"]
+    data = _compute_econ(stub, {did: _econ(26_000.0, 15_000.0)})
+    r = _row(data, did)
+    assert r["saleKnown"] is True and r["saleSrc"] == "file" and r["saleEur"] == 26_000
+    assert data["head"]["nFx"] == 0
+
+
+def test_файл_против_заказов_расхождение():
+    """У сделки с закупкой из файла «источники расходятся» — файл против заказов."""
+    stub = fixture.ContractsStub()
+    d = stub.deals[1]
+    did = d["ID"]
+    orders = _row(_compute(stub), did)["buyOrdersEur"]
+    assert orders > 0
+    r = _row(_compute_econ(stub, {did: _econ(orders * 4.0, orders * 2.0)}), did)
+    assert r["buySrc"] == "file" and r["discrep"] is True
+    r = _row(_compute_econ(stub, {did: _econ(orders * 2.0, orders * 1.05)}), did)
+    assert r["discrep"] is False
+
+
+def test_премии_берут_закупку_файла():
+    import premia
+    crow = {"buySrc": "file", "buyEur": 6000, "buyEconEur": 9000}
+    pz, pay, src = premia._cost({"buyRaw": 0}, crow, 100.0)
+    assert src == "file" and pay == 600_000.0 and abs(pz - 660_000.0) < 1e-6
+    assert premia._cost({"buyRaw": 50}, crow, 100.0)[2] == "orders", "заказы — первыми"
+
+
+def test_подписи_итогов_по_источникам():
+    """Σ закупки называет, сколько сделок по файлу; коды валют «не вошли» — только у суммы
+    сделки; «Сумма» Битрикса рядом с файлом при пустой сумме — None, а не 0."""
+    stub = fixture.ContractsStub()
+    d1, d2 = stub.deals[1], stub.deals[2]
+    d2["OPPORTUNITY"] = "0"
+    data = _compute_econ(stub, {d1["ID"]: _econ(31_000.0, 15_000.0), d2["ID"]: _econ(20_000.0, 9_000.0)})
+    h = data["head"]
+    assert h["nMFile"] == 2 and h["fxCodes"] == [] and h["buyFxCodes"] == []
+    kpi = next(k for k in data["kpis"] if k["lbl"] == "Σ закупки")
+    assert "файл экономики 2" in kpi["meta"]
+    assert _row(data, d2["ID"])["saleBitrixEur"] is None
+    # валюта заказа без курса — в кодах закупки, не в кодах продажи
+    o = next(o for o in stub.orders if str(o["parentId2"]) == stub.deals[3]["ID"])
+    o["currencyId"] = "XYZ"
+    h2 = _compute(stub)["head"]
+    assert h2["fxCodes"] == [] and h2["buyFxCodes"] == ["XYZ"] and h2["nBuyFx"] == 1

@@ -610,11 +610,11 @@ def realctx_raw() -> dict:
 
 
 def build_realization() -> dict:
-    """«Реализация» со сводом чатов и договоров — как main.py: contracts.compute с чатами
-    свода, затем dealctx.build. → {"contracts": …, "dealctx": …} для dashboard.write."""
+    """«Реализация» со сводом чатов и договоров — как main.py: contracts.compute с чатами и
+    финальной экономикой свода, затем dealctx.build. → {"contracts": …, "dealctx": …} для dashboard.write."""
     import dealctx
     ctx = dealctx.clean(realctx_raw())
-    ct = build_contracts(ctx_chats=ctx["chats"])
+    ct = build_contracts(ctx_chats=ctx["chats"], ctx_econ=ctx["econ"])
     import contracts as contracts_mod
     head, payload = dealctx.build(ct["rows"], contracts_mod.life_all(ct), ctx, dt.datetime.fromisoformat(CT_NOW),
                                   today=CT_TODAY)

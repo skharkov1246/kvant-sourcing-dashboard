@@ -328,6 +328,17 @@ def econ_changed(ratio, note, before, before_note) -> bool:
     return abs(ratio - before) > 1e-4 * max(1.0, before)
 
 
+def econ_stale(e: dict, ratio, note) -> bool:
+    """Сверка «Суммы» с файлом сегодня (econ_ratio) не та, что на день чтения (econ_changed):
+    «Сумму» меняли после чтения, файл могли обновить вместе с ней — до перечтения файлу не
+    верим. Сверки сегодня нет (ratio None), на день чтения суммы не было («суммы нет») или
+    ключ до 25.10.2026 без сверки на день чтения — не устаревание. Одно правило у карточки
+    (_econ_cell) и у продажи «Реализации» (contracts.compute: файл первым)."""
+    return (ratio is not None and "ratioAtRead" in e
+            and not (e["ratioAtRead"] is None and e.get("noteAtRead") == ECON_NO_SUM)
+            and econ_changed(ratio, note, e["ratioAtRead"], e.get("noteAtRead")))
+
+
 def econ_ratio(amount, deal_cur: str, e: dict, tax=None) -> tuple[float | None, str]:
     """«Сумма» сделки без НДС в валюте подачи / продажа файла без НДС — или (None, почему не
     сверить).
@@ -545,9 +556,7 @@ def _econ_cell(e: dict, r: dict) -> dict:
         ratio, note = None, ""
     else:
         ratio, note = econ_ratio(amt, r.get("saleCur") or "", e, tax=tax)
-    if (ratio is not None and "ratioAtRead" in e
-            and not (e["ratioAtRead"] is None and e.get("noteAtRead") == ECON_NO_SUM)
-            and econ_changed(ratio, note, e["ratioAtRead"], e.get("noteAtRead"))):
+    if econ_stale(e, ratio, note):
         ratio, note = None, ECON_CHANGED
     verdict = (econ_verdict(ratio, tax_empty=not _num(tax), sale=e["sale"], kp_sale=e.get("kpSale"))
                if ratio is not None else "")

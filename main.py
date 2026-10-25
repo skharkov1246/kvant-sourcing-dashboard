@@ -842,8 +842,10 @@ def run(args) -> int:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
         contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
                                                chat_reader=chat_reader,
-                                               ctx_chats=real_ctx["chats"] if real_ctx else None)
-        print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
+                                               ctx_chats=real_ctx["chats"] if real_ctx else None,
+                                               ctx_econ=real_ctx["econ"] if real_ctx else None)
+        print(f"  ✓ контрактов: {len(contracts_data['rows'])}; продажа из сверенного файла экономики у "
+              f"{contracts_data['head'].get('nFile', 0)} открытых")
         # «что делать первым» — по общей очереди обоих видов (contracts.life_all); плитки
         # отдельного направления — в его вид (решение владельца 25.10.2026)
         _hc, dealctx_data = dealctx_mod.build(contracts_data["rows"], contracts_mod.life_all(contracts_data),
@@ -934,7 +936,7 @@ def run(args) -> int:
         if premia_data:
             _pt = premia_data["totals"]; _ps = _pt["src"]
             print(f"  премии: сделок с прогнозом {_pt['deals']} (реализация {_pt['real']}, "
-                  f"проработка {_pt['presale']}); ПЗ: заказы {_ps.get('orders', 0)}, книга {_ps.get('book', 0)}, "
+                  f"проработка {_pt['presale']}); ПЗ: заказы {_ps.get('orders', 0)}, файл {_ps.get('file', 0)}, книга {_ps.get('book', 0)}, "
                   f"экономика {_ps.get('econ', 0)}, оценка {_ps.get('est', 0)}; ниже ×1,17 — {_pt['low']}, "
                   f"убыточных — {_pt['neg']}, выбросов — {_pt['big']}; "
                   f"калибровка по {premia_data['params']['calibN']} сделкам")

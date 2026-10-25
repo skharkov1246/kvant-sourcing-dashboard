@@ -10,6 +10,7 @@
 РЕЗУЛЬТАТ СДЕЛКИ — оценка до калькулятора маржи финдиректора:
   • ПЗ — каскад источников, и источник хранится в строке (правило 16):
       заказы СП-172 × 1,10 (медиана доп. затрат на логистику, таможню и приёмку) →
+      закупка сверенного файла экономики × 1,10 →
       прямые затраты книги бюджета → «Cost» экономики проекта × 1,10 →
       оценка по медианному коэффициенту «продажа / ПЗ» сделок с известной закупкой;
   • результат = выручка − ПЗ − финансирование 5 % выручки − платёжный агент 2 % оплаты
@@ -48,7 +49,7 @@ PRICE_MIN = 1.17       # минимум финдиректора: коэффиц
 COEF_OK = (0.9, 4.0)   # вне этого коридора ПЗ, скорее всего, внесена не полностью
 PO_INIT, PO_EXPERT = 0.80, 0.20
 
-SRC_LABEL = {"orders": "заказы поставщикам", "book": "книга бюджета",
+SRC_LABEL = {"orders": "заказы поставщикам", "file": "файл экономики", "book": "книга бюджета",
              "econ": "экономика проекта", "est": "оценка"}
 
 
@@ -66,13 +67,20 @@ def _cost(d: dict, crow: dict | None, eur_rub: float) -> tuple[float, float, str
     if buy > 0:
         return buy * (1 + PZ_OVER), buy, "orders"
     if crow:
+        # закупка из сверенного файла экономики (contracts: файл первым, решение 25.10.2026) —
+        # оффер поставщика, как и заказы: × (1 + PZ_OVER)
+        fbuy = float(crow.get("buyEur") or 0) * eur_rub
+        if crow.get("buySrc") == "file" and fbuy > 0:
+            return fbuy * (1 + PZ_OVER), fbuy, "file"
         pb = crow.get("planBreak") or {}
         direct = abs(float(pb.get("direct") or 0)) * eur_rub
         if direct > 0 and not crow.get("planSusp"):
             purchase = abs(float(pb.get("buy") or 0)) * eur_rub
             return direct, (purchase or direct / (1 + PZ_OVER)), "book"
+        # «Cost» экономики — только оценка прогноза, когда у заказов нет сумм: в «Реализации»
+        # с 25.10.2026 это не закупка (buySrc «none»), а сверка; коридор COEF_OK — ниже
         econ = float(crow.get("buyEconEur") or 0) * eur_rub
-        if crow.get("buySrc") == "econ" and econ > 0:
+        if crow.get("buySrc") == "none" and econ > 0:
             return econ * (1 + PZ_OVER), econ, "econ"
     return 0.0, 0.0, ""
 
