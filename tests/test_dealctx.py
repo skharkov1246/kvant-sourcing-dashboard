@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+import contracts  # noqa: E402
 import dealctx  # noqa: E402
 from tests import fixture  # noqa: E402
 
@@ -192,7 +193,10 @@ def test_вкладка_со_сводом():
     assert not rows["6012"]["stuck"], "оценка до новой переписки — не основание"
     assert rows["6000"]["chatUnverified"] is True
     h = ct["head"]["ctx"]
-    assert h["open"] == len([x for x in ct["rows"] if not x["closed"]])
+    # плитки основного вида — без отдельного направления (решение владельца 25.10.2026)
+    assert h["open"] == len([x for x in ct["rows"] if not x["closed"] and not x["seg"]])
+    assert "sep" not in h and ct["sep"]["head"]["ctx"]["open"] == len(
+        [x for x in ct["rows"] if not x["closed"] and x["seg"]])
     assert h["chat"] == {"seen": 7, "cur": 5, "reply": 2, "replyLate": 1, "high": 1, "dueLate": 1}
     assert h["contract"] == {"seen": 6, "risk": 1, "flags": 2, "nopair": 2, "pair": 2, "unread": 1}
     q = [(x["code"], x["deal"]) for x in dc["queue"]]
@@ -211,12 +215,37 @@ def test_вкладка_со_сводом():
     assert d["6014"]["chat"]["cur"] is False
     assert d["6002"]["chat"]["conf"] == 80, "уверенность модели — рядом с оценкой"
     assert d["6007"]["contract"]["missing"] == ["customer", "supplier"]
-    assert dc["queue"][6]["what"] == "договор заказчика и поставщика не найден в карточках сделки"
-    # «что делать первым» — самое важное из обеих очередей
+    assert any(q["what"] == "договор заказчика и поставщика не найден в карточках сделки" for q in dc["queue"])
+    # «что делать первым» — самое важное из обеих очередей обоих видов вкладки
     for did, rec in d.items():
         if "todo" in rec:
-            все = [x for x in ct["life"]["queue"] + dc["queue"] if str(x["deal"]) == did]
+            все = [x for x in contracts.life_all(ct)["queue"] + dc["queue"] if str(x["deal"]) == did]
             assert rec["todo"]["code"] == min(все, key=lambda x: (x["sev"], -(x["days"] or 0)))["code"]
+
+
+def test_пункты_направления_в_его_очереди():
+    """Решение владельца 25.10.2026: чат и договор сделки отдельного направления — пункты
+    его очереди (seg) и его плитки (head["sep"]); счётчики и плитки основного вида — как
+    без них. «Что делать первым» у сделки направления — из её же очереди."""
+    raw = fixture.realctx_raw()
+    base = dict(raw["chats"]["6008"])
+    raw["chats"]["6101"] = dict(base)          # высокий риск, срок из чата прошёл
+    raw["contracts"]["6100"] = {"at": raw["at"], "outcome": "нет договоров",
+                                "read": {"customer": 0, "supplier": 0}, "flags": []}
+    ctx = dealctx.clean(raw)
+    ct = fixture.build_contracts(ctx_chats=ctx["chats"])
+    head, dc = dealctx.build(ct["rows"], contracts.life_all(ct), ctx, NOW, today=fixture.CT_TODAY)
+    сеп = [q for q in dc["queue"] if q["seg"]]
+    assert {(q["code"], q["deal"]) for q in сеп} == {("chatRisk", "6101"), ("chatDue", "6101"),
+                                                    ("contractMissing", "6100")}
+    assert all(q["seg"] == fixture.CT_SEP_CAT for q in сеп)
+    assert dc["counts"] == {"chatReply": 1, "chatRisk": 1, "chatDue": 1, "contractRisk": 1, "contractMissing": 2,
+                            "econGap": 2}
+    assert dc["sepCounts"] == {"chatRisk": 1, "chatDue": 1, "contractMissing": 1}
+    assert head["chat"]["high"] == 1 and head["sep"]["chat"]["high"] == 1
+    assert head["sep"]["open"] == 2 and head["sep"]["contract"]["seen"] == 1
+    # главное по сделке направления — сорванный срок клиента её заказа (очередь lifecycle)
+    assert dc["deals"]["6101"]["todo"]["code"] == "late"
 
 
 def test_в_закрытой_части_нет_текста_чатов_и_условий():

@@ -47,9 +47,10 @@ def test_валюта_без_курса_не_один_к_одному():
     assert r["saleKnown"] is False and r["saleEur"] == 0 and r["saleLbl"] == "курса нет"
     assert r["fxMissing"] == ["AED"] and r["marginEur"] is None
     assert data["head"]["nFx"] == 1 and data["head"]["fxCodes"] == ["AED"]
-    # в итоги не вошла: Σ продажи меньше прежней ровно на сумму этой сделки (она открыта)
+    # в итоги не вошла: Σ продажи меньше прежней ровно на сумму этой сделки (она открыта);
+    # итоги — основного вида, без отдельного направления (решение владельца 25.10.2026)
     b = _row(base, stub.deals[0]["ID"])
-    live_sum = sum(x["saleEur"] for x in base["rows"] if not x["closed"])
+    live_sum = sum(x["saleEur"] for x in base["rows"] if not x["closed"] and not x["seg"])
     assert ct._money(live_sum - b["saleEur"]) == data["head"]["sale"]
 
 
@@ -73,7 +74,7 @@ def test_несоизмеримая_закупка_текстом_и_не_в_и�
     assert r["buySrc"] == "econ" and r["buySusp"] is True
     assert r["buyLbl"] == "не сходится" and r["marginEur"] is None
     assert data["head"]["nBuySusp"] >= 1
-    live = [x for x in data["rows"] if not x["closed"]]
+    live = [x for x in data["rows"] if not x["closed"] and not x["seg"]]
     ожидание = sum(x["buyEur"] for x in live if x["buySrc"] in ("orders", "econ") and not x["buySusp"])
     assert ct._money(ожидание) == data["head"]["buy"]
     # в пределах — число, как раньше
@@ -101,8 +102,11 @@ def test_выручка_не_разносится_больше_суммы_сде
 
 def test_итоги_по_открытым_сделкам():
     data = _compute(fixture.ContractsStub())
-    live = [r for r in data["rows"] if not r["closed"]]
+    live = [r for r in data["rows"] if not r["closed"] and not r["seg"]]
     assert ct._money(sum(r["saleEur"] for r in live if r["saleKnown"])) == data["head"]["sale"]
+    # отдельное направление — свои итоги по своим открытым сделкам
+    sep = [r for r in data["rows"] if not r["closed"] and r["seg"]]
+    assert sep and ct._money(sum(r["saleEur"] for r in sep if r["saleKnown"])) == data["sep"]["head"]["sale"]
     assert data["head"]["sumsOver"] == "live"
 
 
@@ -141,7 +145,7 @@ def test_маржа_при_неполной_закупке_текстом_и_н�
     data = _compute(stub)
     r = _row(data, did)
     assert r["grossSusp"] is True and r["marginEur"] is None and r["marginLbl"] == "закупка неполная?"
-    live = [x for x in data["rows"] if not x["closed"]]
+    live = [x for x in data["rows"] if not x["closed"] and not x["seg"]]
     assert ct._money(sum(x["marginEur"] for x in live if x["marginEur"] is not None)) == data["head"]["margin"]
     assert data["head"]["grossSusp"] >= 1
 

@@ -470,6 +470,15 @@
   /* ---- доступность: видимый фокус с клавиатуры ---- */
   .actile:focus-visible,details.sect>summary:focus-visible,.tab:focus-visible,.snb:focus-visible,.sortt:focus-visible,.stchip:focus-visible,.qq:focus-visible,.drw .x:focus-visible{outline:2px solid var(--a);outline-offset:2px}
   .search:focus-visible{outline:2px solid var(--a);outline-offset:1px}
+  /* «Реализация»: вкладка отдельного направления (решение владельца 25.10.2026) */
+  .ctsub{margin:0 0 14px}
+  .ctsub .snb{min-height:32px;max-width:100%;white-space:normal;text-align:left}
+  .ctsubn{font-weight:400;opacity:.85}
+  [role=tabpanel]:focus-visible{outline:2px solid var(--a);outline-offset:4px;border-radius:6px}
+  .ctsepnote{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--b);border-radius:10px;padding:10px 14px;margin:0 0 16px;color:var(--mut);font-size:13px;line-height:1.5}
+  .ctsepnote b{color:var(--ink)}
+  .ctsepnote a{color:var(--b2);text-decoration:underline;text-underline-offset:2px}
+  .ctsepnote a:focus-visible{outline:2px solid var(--a);outline-offset:2px;border-radius:3px}
 
   /* ---- адаптив: планшет → мобилка (в конце файла — перекрывает базовые правила) ---- */
   @media(max-width:1024px){
@@ -1868,9 +1877,71 @@ function openContract(x){
   document.getElementById('drwBody').innerHTML=h;
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
+// «2 сделки», «5 сделок»: число и слово в нужной форме
+const _ctN=(n,one,few,many)=>{const m=n%10,h=n%100;return n+' '+(m===1&&h!==11?one:(m>=2&&m<=4&&(h<12||h>14)?few:many));};
+// Шапка «Реализации» — общая для основного вида и вкладки отдельного направления.
+function _ctHeader(X,paid){
+  const fx=X.fx||{};
+  const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную${fx.usdRub!=null?`: 1 USD = ${fx.usdRub} ₽`:''}). Отчётность с другим курсом разойдётся системно.</span>`:'';
+  return `<header><div class="eyebrow">Квант · реализация</div><h1>Пульт реализации</h1><div class="sub"><span>От выигрыша до гарантии: заказ поставщику → производство → доставка клиенту → УПД и оплата → гарантия</span><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${paid?`<span>Успех — и стадия «Оплата получена | Закрытие сделки»: <b>${paid}</b> сделок не в работе</span>`:''}${fxNote}</div></header>`;
+}
+// Вкладка «Реализация». Отдельное направление (решение владельца 25.10.2026: сложности
+// известны, ими занимаются, ежедневного внимания руководителя реализации не требуют) — своя
+// вкладка внутри «Реализации»: те же таблица, плитки и очередь, только по его сделкам.
+// Основной вид его сделок не показывает ни в очереди, ни в плитках, ни в итогах. Имя
+// вкладки — имя воронки из портала (head.sep.name), адрес — #contracts/main, #contracts/sep.
 function renderContracts(){
-  const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
-  if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
+  const X0=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
+  if(!X0||!Array.isArray(X0.rows)){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
+  const H0=X0.head||{}, SH=H0.sep&&typeof H0.sep.name==='string'?H0.sep:null;
+  const SV=SH&&X0.sep&&X0.sep.head&&X0.sep.life?X0.sep:null;
+  const views={main:Object.assign({},X0,{rows:X0.rows.filter(r=>!r.seg),seg:null,sepHead:SV?SH:null})};
+  if(SV) views.sep=Object.assign({},X0,SV,{rows:X0.rows.filter(r=>r.seg),seg:SH.cat,sepHead:SH,orphan:null});
+  const paid=(H0.paidStage||0)+(SV?(SV.head.paidStage||0):0);
+  const draw=(k,panel)=>{
+    try{ _ctPanel(views[k],panel); }
+    catch(err){                             // сломанный вид не гасит переключатель и соседний вид
+      console.error('Реализация, вид '+k+':',err);
+      panel.innerHTML='<section class="card"><div class="secttl">Вкладка не отрисовалась</div>'
+        +'<div class="note">Данные для этого раздела неполные или повреждены. Техническая причина: '+_esc(String(err&&err.message||err))+'</div></section>';
+    }
+  };
+  if(!SV){ el.innerHTML=_ctHeader(X0,paid)+'<div id="ctPanel-main"></div>'; draw('main',document.getElementById('ctPanel-main')); return; }
+  el.innerHTML=_ctHeader(X0,paid)
+    +`<div class="subnav ctsub" role="tablist" aria-label="Разделы реализации" id="ctTabs">`
+    +`<button type="button" class="snb on" role="tab" id="ctTab-main" data-sub="main" aria-selected="true" aria-controls="ctPanel-main" tabindex="0">Основное</button>`
+    +`<button type="button" class="snb" role="tab" id="ctTab-sep" data-sub="sep" aria-selected="false" aria-controls="ctPanel-sep" tabindex="-1">${_esc(SH.name)} <span class="ctsubn">(${SH.live})</span></button></div>`
+    +`<div role="tabpanel" id="ctPanel-main" aria-labelledby="ctTab-main" tabindex="0"></div>`
+    +`<div role="tabpanel" id="ctPanel-sep" aria-labelledby="ctTab-sep" tabindex="0" hidden></div>`;
+  const tabs=[...el.querySelectorAll('#ctTabs [role=tab]')];
+  let cur='';
+  // виды рисуются по одному: id элементов вида (очередь, таблица, плитки) одни на оба —
+  // невидимая панель пустеет
+  const pick=(k,opt)=>{
+    if(!views[k]) k='main';
+    if(k===cur) return;
+    cur=k;
+    tabs.forEach(b=>{const on=b.dataset.sub===k; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); b.tabIndex=on?0:-1;});
+    Object.keys(views).forEach(n=>{const p=document.getElementById('ctPanel-'+n); p.hidden=n!==k; if(n!==k) p.innerHTML='';});
+    draw(k,document.getElementById('ctPanel-'+k));
+    if(opt&&opt.addr){ try{ history.replaceState(null,'','#contracts/'+k); }catch(e){} }
+    if(opt&&opt.focus){ const b=tabs.find(x=>x.dataset.sub===k); if(b) b.focus(); }
+  };
+  const fromHash=()=>{const m=/^#contracts\/(\w+)/.exec(location.hash||''); return m&&views[m[1]]?m[1]:'main';};
+  document.getElementById('ctTabs').addEventListener('click',e=>{const b=e.target.closest('[role=tab]'); if(b) pick(b.dataset.sub,{addr:1});});
+  document.getElementById('ctTabs').addEventListener('keydown',e=>{
+    const i=tabs.findIndex(b=>b.dataset.sub===cur); let j=-1;
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') j=(i+1)%tabs.length;
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp') j=(i-1+tabs.length)%tabs.length;
+    else if(e.key==='Home') j=0; else if(e.key==='End') j=tabs.length-1;
+    if(j<0) return; e.preventDefault(); pick(tabs[j].dataset.sub,{addr:1,focus:1});
+  });
+  // ссылка из пометки основного вида — та же вкладка, с фокусом на ней
+  el.addEventListener('click',e=>{const a=e.target.closest('[data-ctgo]'); if(!a) return; e.preventDefault(); pick(a.dataset.ctgo,{addr:1,focus:1}); window.scrollTo(0,0);});
+  window.addEventListener('hashchange',()=>{ if(/^#contracts\//.test(location.hash||'')) pick(fromHash()); });
+  pick(fromHash());
+}
+function _ctPanel(X,el){
   let sortKey='seq', sortDir=-1, q='', mode='all';
   const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,planMdEur:1,planProfitEur:1,stageDays:1,lateDays:1,lossEur:1};
   const COLS=[['customer','Заказчик · контракт','l'],['stageDays','Стадия · дней','l'],['lateDays','Дедлайн клиенту','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['planProfitEur','Прибыль: план / валовая','r']];
@@ -1887,6 +1958,9 @@ function renderContracts(){
         nDone=R.filter(r=>r.done||r.closed).length;
   // чаты и договоры (dealctx.py): числа плиток — всем с вкладкой, сделки — только праву
   const DC=_dcData(), HX=H.ctx||null, DD=(DC&&DC.deals)||{};
+  // пункты чатов и договоров — своего вида: у отдельного направления — помеченные seg
+  const DQ=DC?(DC.queue||[]).filter(x=>!!x.seg===!!X.seg):[], DCC={};
+  DQ.forEach(x=>{DCC[x.code]=(DCC[x.code]||0)+1;});
   const dcOf=x=>DD[String(x.deal)]||{};
   const GN=X.gone||{};
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (${X.orphan.buy})`:'';
@@ -1895,8 +1969,11 @@ function renderContracts(){
   const cut=items=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(String(m.name).replace(/ \(уволен\)$/,''))}${m.gone?' <span class="gone">уволен — переназначить</span>':''} <span class="dimv mono">${m.lateOrders} из ${m.liveOrders} живых · ${m.pct}%</span></span><b class="nrc">${m.lateDeals||0} сд. · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div>${m.top?`<div class="sub2">начать с №${m.top.seq||'—'}${m.top.customer&&m.top.customer!=='—'?' '+_esc(m.top.customer):''}: просрочка ${m.top.days} дн</div>`:''}</div>`).join(''):'<div class="dimv">нет данных</div>';
 
   // ---------- шапка ----------
-  const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную${fx.usdRub!=null?`: 1 USD = ${fx.usdRub} ₽`:''}). Отчётность с другим курсом разойдётся системно.</span>`:'';
-  let h=`<header><div class="eyebrow">Квант · реализация</div><h1>Пульт реализации</h1><div class="sub"><span>От выигрыша до гарантии: заказ поставщику → производство → доставка клиенту → УПД и оплата → гарантия</span><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${H.paidStage?`<span>Успех — и стадия «Оплата получена | Закрытие сделки»: <b>${H.paidStage}</b> сделок не в работе</span>`:''}${fxNote}</div></header>`;
+  // отдельное направление: в основном виде — одна строка со ссылкой, на его вкладке — что в ней
+  const SP=X.sepHead||null;
+  let h=!SP?'':(X.seg
+    ?`<div class="note ctsepnote">Сделки направления <b>${_esc(SP.name)}</b>: его воронка и сделки реализации тех же компаний (${_ctN(SP.companies||0,'компания','компании','компаний')}). Очередь, плитки и итоги — только по ним. Нормы сроков звеньев и надёжность поставщиков — общие, по всем заказам.</div>`
+    :`<div class="note ctsepnote">Направление <b>${_esc(SP.name)}</b> — на своей вкладке: ${_ctN(SP.live||0,'сделка','сделки','сделок')} в работе. Сложности известны, ими занимаются — в очередь, плитки и итоги ниже они не входят. <a href="#contracts/sep" data-ctgo="sep">Открыть вкладку направления</a></div>`);
 
   // ---------- 0. ПУЛЬТ: жизненный цикл заказа (lifecycle.py) ----------
   const L=X.life||null;
@@ -1904,8 +1981,8 @@ function renderContracts(){
   if(L){
     const o90=(L.otd||{}).last90||{}, d90=(L.otd||{}).deals90||{}, RU=L.rules||{};
     // очередь — пункты lifecycle и, у права «договоры и деньги», пункты чатов и договоров
-    const C=Object.assign({},L.counts||{},DC?DC.counts:{}), LB=Object.assign({},L.labels||{},DC?DC.labels:{});
-    const Q=(L.queue||[]).concat(DC?DC.queue:[]).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
+    const C=Object.assign({},L.counts||{},DCC), LB=Object.assign({},L.labels||{},DC?DC.labels:{});
+    const Q=(L.queue||[]).concat(DQ).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
     h+=`<div class="secttl"><b>·</b> Где заказы: от размещения до гарантии${qmark('ct.life')}</div>`
      +`<div class="lfph" id="lfPh">`+(L.phases||[]).map(p=>`<div class="actile${p.late?' bad':(p.risk?' warn':'')}" data-ph="${p.key}" tabindex="0"><div class="t">${_esc(p.name)}</div><div class="v">${p.orders}</div><div class="m">заказов · сделок ${p.n}${p.late?` · 🚩 ${p.late}`:''}${p.risk?` · ⚠ ${p.risk}`:''}${p.over?` · сверх нормы ${p.over}`:''}</div></div>`).join('')+`</div>`
      +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">`
@@ -2110,7 +2187,7 @@ function renderContracts(){
   // ---------- пульт: очередь «что делать», фильтры по коду, фазе и хозяину ----------
   if(L){
     let qc='', qw='', qp='', qall=false;
-    const Q=(L.queue||[]).concat(DC?DC.queue:[]).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
+    const Q=(L.queue||[]).concat(DQ).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
     const qrows=()=>{
       const r=Q.filter(x=>(!qc||x.code===qc)&&(!qw||x.who===qw||x.kam===qw)&&(!qp||x.phase===qp));
       document.getElementById('lfQn').textContent=`(${r.length} из ${Q.length})`;
@@ -2580,11 +2657,17 @@ window.__RENDER_OK__=1;
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
     const t=b.dataset.tab;
+    // адрес вкладки «Реализации» (#contracts/…) живёт, пока открыта она
+    if(t!=='contracts'&&/^#contracts/.test(location.hash||'')){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
     try{ if(window.ensureTab) window.ensureTab(t); }catch(e){ console.error(e); }
     ['sourcing','company','reps','eng','contracts','suppliers','cohorts','advisor']
       .forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
     window.scrollTo(0,0);
   }));
+  // адрес #contracts/… — сразу «Реализация» (вкладка внутри неё — по тому же адресу).
+  // Кнопка ищется по dataset, а не строкой разметки: тесты доступа ищут её разметку в
+  // странице как признак невырезанной вкладки
+  if(/^#contracts(\/|$)/.test(location.hash||'')){ const b=[...document.querySelectorAll('.tab')].find(x=>x.dataset.tab==='contracts'); if(b) b.click(); }
   // основной скрипт выставляет флаг в самом конце; его отсутствие = рендер оборвался
   if(!window.__RENDER_OK__){
     const host=document.getElementById('tab-sourcing')||document.body;

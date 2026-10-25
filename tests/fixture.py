@@ -389,6 +389,11 @@ def build_advisor(**kw) -> dict:
 # СП-172 во всех фазах жизненного цикла). Даты — от CT_NOW, суммы и названия придуманы.
 CT_NOW = "2026-10-19T12:00:00+03:00"
 CT_TODAY = dt.date(2026, 10, 19)
+# Отдельное направление (contracts.ОТДЕЛЬНЫЕ_ВОРОНКИ, решение владельца 25.10.2026): своя
+# воронка сделок клиента и сделки реализации той же компании. Имя воронки придумано.
+CT_SEP_CAT = "16"
+CT_SEP_NAME = "Залив"
+CT_SEP_CO = "390"
 
 
 class ContractsStub:
@@ -445,6 +450,35 @@ class ContractsStub:
                 self.orders.append(o)
                 self.hist[172].append((str(oid), "DT172_26:NEW", t(age)))
                 self.hist[172].append((str(oid), o["stageId"], t(rnd.randint(1, 30))))
+        # отдельное направление: 6100 — сделка его воронки с заказом (в реализации числится
+        # «вне воронки»), 6102 — его же сделка без заказов (не во вселенной вкладки, но её
+        # компания — компания направления), 6101 — сделка реализации той же компании 390
+        # с сорванным сроком клиента. Сделки других компаний остаются в основном виде.
+        self.other = [
+            {"ID": "6100", "TITLE": "980. Поставка насосов направления", "OPPORTUNITY": "90000",
+             "CURRENCY_ID": "EUR", "COMPANY_ID": CT_SEP_CO, "STAGE_ID": f"C{CT_SEP_CAT}:EXECUTING",
+             "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": CT_SEP_CAT, "DATE_CREATE": t(150),
+             "ASSIGNED_BY_ID": "10", ct.OSS_DEAL: ["21"], ct.KAM_F: "10"},
+            {"ID": "6102", "TITLE": "Запрос направления", "OPPORTUNITY": "0", "CURRENCY_ID": "EUR",
+             "COMPANY_ID": CT_SEP_CO, "STAGE_ID": f"C{CT_SEP_CAT}:NEW", "STAGE_SEMANTIC_ID": "P",
+             "CATEGORY_ID": CT_SEP_CAT, "DATE_CREATE": t(20), "ASSIGNED_BY_ID": "10"},
+        ]
+        self.deals.append({"ID": "6101", "TITLE": "981. Поставка клапанов направления", "OPPORTUNITY": "60000",
+                           "CURRENCY_ID": "EUR", "COMPANY_ID": CT_SEP_CO, "STAGE_ID": "C0:EXECUTING",
+                           "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(120),
+                           "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["22"], ct.KAM_F: "10"})
+        self.hist[2].append(("6101", "C0:EXECUTING", t(40)))
+        for did, seq, j, dl_ago, extra in (
+                ("6101", 981, 1, 20, {}),                                    # срок прошёл 20 дн. назад
+                ("6101", 981, 2, -50, {ct.SUP_PAID: 100}),                   # в производстве, срок впереди
+                ("6100", 980, 1, -10, {ct.SUP_PAID: 30})):                   # ≤ 14 дн. до срока, не отгружен
+            oid += 1
+            self.orders.append({"id": oid, "title": f"{seq}/{j}. Узел направления", "companyId": "405",
+                                "parentId2": int(did), "opportunity": 15_000, "currencyId": "EUR",
+                                "stageId": "DT172_26:PREPARATION", "createdTime": t(100), "movedTime": t(10),
+                                ct.OSS_F: "22", ct.DL_CUSTOMER: d(dl_ago), **extra})
+            self.hist[172].append((str(oid), "DT172_26:NEW", t(100)))
+            self.hist[172].append((str(oid), "DT172_26:PREPARATION", t(10)))
 
     def call(self, method, params=None, **kw):
         if method == "crm.item.fields":
@@ -467,10 +501,15 @@ class ContractsStub:
         return {str(c): f"Компания {c}" for c in ids}
 
     def list_deals_fast(self, *, filter=None, select=None, **kw):
-        return [dict(x) for x in self.deals]
+        cat = str((filter or {}).get("CATEGORY_ID", 0))
+        return [dict(x) for x in self.deals + self.other if str(x["CATEGORY_ID"]) == cat]
 
     def deals_by_ids(self, ids, *, select=None):
-        return {}
+        want = {str(i) for i in ids}
+        return {x["ID"]: dict(x) for x in self.other if x["ID"] in want}
+
+    def categories(self):
+        return {"0": "Реализация", CT_SEP_CAT: CT_SEP_NAME}
 
     def deal_stages_cat(self, cid=0):
         return {"C0:NEW": "Договор на подписании", "C0:PREPARATION": "Оплата поставщикам",
@@ -574,8 +613,13 @@ def build_realization() -> dict:
     import dealctx
     ctx = dealctx.clean(realctx_raw())
     ct = build_contracts(ctx_chats=ctx["chats"])
-    head, payload = dealctx.build(ct["rows"], ct.get("life"), ctx, dt.datetime.fromisoformat(CT_NOW), today=CT_TODAY)
+    import contracts as contracts_mod
+    head, payload = dealctx.build(ct["rows"], contracts_mod.life_all(ct), ctx, dt.datetime.fromisoformat(CT_NOW),
+                                  today=CT_TODAY)
+    sep = head.pop("sep", None)
     ct["head"]["ctx"] = head
+    if sep is not None and ct.get("sep"):
+        ct["sep"]["head"]["ctx"] = sep
     return {"contracts": ct, "dealctx": payload}
 
 
@@ -673,6 +717,7 @@ def build_presale(*, chat: bool = True) -> dict:
 
 def build_kam_queue() -> dict:
     """Пресейл + «Реализация» → настоящий kamqueue.build → очередь раздела «КАМы»."""
+    import contracts
     import kamqueue
     ct = build_contracts()
-    return kamqueue.build(build_presale(), ct["life"], ct["rows"], CT_TODAY, people=CT_PEOPLE)
+    return kamqueue.build(build_presale(), contracts.life_all(ct), ct["rows"], CT_TODAY, people=CT_PEOPLE)

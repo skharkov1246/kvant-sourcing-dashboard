@@ -488,7 +488,9 @@ def _item(code: str, r: dict, who: str, act: str = "", days: int | None = None, 
     return {"code": code, "sev": sev, "what": what, "act": act or act0, "days": days,
             "who": who, "whoGone": _gone(who), "kam": _nm(r.get("kam")), "kamId": _nm(r.get("kamId")),
             "deal": r["deal"], "seq": r.get("seq") or 0, "customer": r.get("customer") or "—",
-            "order": "", "title": r.get("title") or "", "sup": "", "dl": "", "phase": ""}
+            "order": "", "title": r.get("title") or "", "sup": "", "dl": "", "phase": "",
+            # отдельное направление (contracts.ОТДЕЛЬНЫЕ_ВОРОНКИ): пункт — в его очереди
+            "seg": r.get("seg")}
 
 
 def _chat_cell(a: dict, cur: dict | None, r: dict, now: dt.datetime) -> dict:
@@ -566,9 +568,14 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
           now: dt.datetime, today: dt.date | None = None) -> tuple[dict | None, dict | None]:
     """→ (числа плиток для head, закрытая часть DEALCTX). Без свода — (None, None).
 
-    rows — строки сделок contracts.compute (после decide), life — его раздел «life»;
+    rows — строки сделок contracts.compute (после decide), life — его раздел «life» вместе
+    с очередью отдельных направлений (contracts.life_all): «что делать первым» по сделке;
     today — тот же день, что у contracts.compute (as_of): иначе строка и ячейка одной
-    сделки судили бы свежесть по разным дням."""
+    сделки судили бы свежесть по разным дням.
+
+    Отдельное направление (строка с seg, решение владельца 25.10.2026) считается в свои
+    плитки — head["sep"] — и свои счётчики очереди (sepCounts): в плитки и счётчики
+    основного вида его сделки не входят. Пункты очереди помечены seg."""
     if ctx is None:
         return None, None
     now = now.astimezone(MSK)
@@ -577,10 +584,11 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
     chats, cons, econ = ctx["chats"], ctx["contracts"], ctx.get("econ") or {}
     deals: dict[str, dict] = {}
     queue: list[dict] = []
-    n: Counter = Counter()
+    by_seg: dict[bool, Counter] = {False: Counter(), True: Counter()}     # основной вид / направление
     for r in live:
         did = str(r["deal"])
         rec: dict = {}
+        n = by_seg[bool(r.get("seg"))]
         a = chats.get(did)
         if r.get("chat"):
             # подробное «почему подвисла / не подвисла» — только здесь, под правом
@@ -663,20 +671,27 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
     for did, f in first.items():
         deals.setdefault(did, {})["todo"] = f
     at = ctx.get("at")
-    head = {
-        "open": len(live), "at": at.strftime("%d.%m.%Y %H:%M") if at else "",
-        "chat": {"seen": n["chatSeen"], "cur": n["chatCur"], "reply": n["reply"], "replyLate": n["replyLate"],
-                 "high": n["high"], "dueLate": n["dueLate"]},
-        "contract": {"seen": n["contractSeen"], "risk": n["risk"], "flags": n["flags"], "nopair": n["nopair"],
-                     "pair": n["outcome:пара"], "unread": n["outcome:недочитана"]},
-        # финальная экономика из файла — только счёт сделок: числа файла — в DEALCTX
-        "econ": {"seen": n["econSeen"], "gap": n["econGap"], "otherCur": n["econOther"],
-                 "noSum": n["econNoSum"], "vat": n["econVat"], "changed": n["econChanged"],
-                 "preRebid": n["econPreRebid"]},
-        "rules": {"freshDays": FRESH_DAYS, "replyHours": REPLY_HOURS, "dueMaxDays": DUE_MAX_DAYS,
-                  "econGapPct": round(ECON_GAP * 100)},
-    }
+
+    def _head(n: Counter, open_n: int) -> dict:
+        return {
+            "open": open_n, "at": at.strftime("%d.%m.%Y %H:%M") if at else "",
+            "chat": {"seen": n["chatSeen"], "cur": n["chatCur"], "reply": n["reply"], "replyLate": n["replyLate"],
+                     "high": n["high"], "dueLate": n["dueLate"]},
+            "contract": {"seen": n["contractSeen"], "risk": n["risk"], "flags": n["flags"], "nopair": n["nopair"],
+                         "pair": n["outcome:пара"], "unread": n["outcome:недочитана"]},
+            # финальная экономика из файла — только счёт сделок: числа файла — в DEALCTX
+            "econ": {"seen": n["econSeen"], "gap": n["econGap"], "otherCur": n["econOther"],
+                     "noSum": n["econNoSum"], "vat": n["econVat"], "changed": n["econChanged"],
+                     "preRebid": n["econPreRebid"]},
+            "rules": {"freshDays": FRESH_DAYS, "replyHours": REPLY_HOURS, "dueMaxDays": DUE_MAX_DAYS,
+                      "econGapPct": round(ECON_GAP * 100)},
+        }
+    n_sep = sum(1 for r in live if r.get("seg"))
+    head = _head(by_seg[False], len(live) - n_sep)
+    if n_sep:
+        head["sep"] = _head(by_seg[True], n_sep)
     payload = {"at": head["at"], "deals": deals, "queue": queue,
                "labels": {k: v[1] for k, v in EXC.items()},
-               "counts": dict(Counter(q["code"] for q in queue))}
+               "counts": dict(Counter(q["code"] for q in queue if not q.get("seg"))),
+               "sepCounts": dict(Counter(q["code"] for q in queue if q.get("seg")))}
     return head, payload

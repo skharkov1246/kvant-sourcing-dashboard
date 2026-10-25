@@ -214,10 +214,16 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None) -> list
 
 
 def build(orders: list[dict], deals: list[dict], today: dt.date,
-          warranty_months: int = WARRANTY_MONTHS) -> dict:
+          warranty_months: int = WARRANTY_MONTHS, *, measure: list[dict] | None = None) -> dict:
     """orders — заказы, приведённые к фактам; deals — строки сделок contracts.py
     (deal, seq, customer, closed, done, norders, firstLag, managerGone, ossGone,
-    respGone, manager, oss). → раздел «life» вкладки «Реализация»."""
+    respGone, manager, oss). → раздел «life» вкладки «Реализация».
+
+    measure — заказы, по которым МЕРЯЮТСЯ нормы: сроки звеньев (медиана, 75 %), обычное
+    опоздание и надёжность поставщиков. None — те же orders. Вид вкладки (основной или
+    отдельного направления, решение владельца 25.10.2026) передаёт сюда ВСЕ заказы: норма
+    звена и надёжность поставщика — свойства поставщиков и процесса, а не вида; очередь,
+    фазы, доставка в срок, хозяева и гарантия считаются по orders и deals вида."""
     deal_by = {d["deal"]: d for d in deals}
     queue: list[dict] = []
     counts: Counter = Counter()
@@ -237,7 +243,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     def gone(name: str) -> bool:
         return name.endswith("(уволен)")      # contracts.who подписывает ушедших так
 
-    lead, sup_rel = speeds(orders, today)
+    lead, sup_rel = speeds(orders if measure is None else measure, today)
     med = {k: _median(v) for k, v in lead.items()}
     sup_slip = {k: _median(v) for k, v in sup_rel.items() if len(v) >= SUP_MIN}
     # нормы звеньев — 75-й процентиль за год (решение владельца 19.10.2026, п. 4)

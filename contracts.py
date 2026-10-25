@@ -70,6 +70,14 @@ PROD_CONF_NF = "ufCrm20_1723372033545"  # «Production confirmation, no file» �
 SCHEME_F = "ufCrm20_1724941500"         # «Схема поставки»
 
 PAID_RX = re.compile(r"оплата\s+получена", re.I)   # стадия «Оплата получена | Закрытие сделки»
+# Отдельные направления (решение владельца 25.10.2026): сложности их сделок известны, ими
+# занимаются, ежедневного внимания руководителя реализации они не требуют. Сделка — в
+# направлении, если она в его воронке сделок или её компания — компания сделок этой
+# воронки (сделки реализации того же клиента). Такие сделки идут на свою вкладку
+# «Реализации», а в очередь «что делать», плитки и итоги основного вида не попадают.
+# Задано НОМЕРОМ воронки сделок: имя вкладки — имя воронки из портала (client.categories()),
+# в коде его нет (репозиторий публичный).
+ОТДЕЛЬНЫЕ_ВОРОНКИ = (16,)
 CAP_RATE = 0.20          # стоимость денег, годовых: по чему считаем упущенную доходность
                          # от поздней отгрузки (решение владельца)
 
@@ -339,6 +347,24 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     if extra_ids:
         deals.update(client.deals_by_ids(extra_ids, select=DSEL))
     clients = client.companies_by_ids({str(d.get("COMPANY_ID")) for d in deals.values() if d.get("COMPANY_ID")})
+    # 3а. отдельные направления: компании сделок их воронок — один обход на воронку
+    # (только ID и компания; у направления десятки сделок, не тысячи)
+    sep_cats = {str(c) for c in ОТДЕЛЬНЫЕ_ВОРОНКИ}
+    sep_company: dict[str, str] = {}               # COMPANY_ID → номер воронки направления
+    for cid in ОТДЕЛЬНЫЕ_ВОРОНКИ:
+        for x in client.list_deals_fast(filter={"CATEGORY_ID": cid}, select=["ID", "CATEGORY_ID", "COMPANY_ID"]):
+            if str(x.get("CATEGORY_ID") or cid) != str(cid):
+                continue
+            co = str(x.get("COMPANY_ID") or "")
+            if co not in ("", "0"):
+                sep_company.setdefault(co, str(cid))
+
+    def _segment(d: dict) -> str | None:
+        """Номер воронки отдельного направления сделки; None — основной вид."""
+        cat = str(d.get("CATEGORY_ID") or "0")
+        if cat in sep_cats:
+            return cat
+        return sep_company.get(str(d.get("COMPANY_ID") or ""))
 
     # 4. справочники стадий + история стадий (полное время первого входа)
     dstages = client.deal_stages_cat(0)                    # все стадии — для подписей
@@ -671,6 +697,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "cities": ", ".join(sorted({o["city"] for o in ords_det if o["city"]}))[:50],
             "done": done, "closed": closed, "lost": sem == "F", "paidStage": paid,
             "inCat0": in_cat0,
+            # отдельное направление (ОТДЕЛЬНЫЕ_ВОРОНКИ): номер его воронки; None — основной вид
+            "seg": _segment(d),
             "stage": cur_stage,
             "stageName": _stage_name(cur_stage) if in_cat0 else "вне воронки",
             "stageDays": stage_days, "stageThr": round(dthr, 1),
@@ -722,7 +750,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     cands = [(r["deal"], r["_chat"], r["saleEur"]) for r in rows if not r["closed"] and r["stuck"]]
     chat = (chat_reader.check(cands, today) if chat_reader is not None
             else chat_activity.check(client, cands, today, service_ids))
-    chat_by: Counter = Counter()
+    chat_src: dict[str, str] = {}          # чем решено по кандидату (dealctx.decide) — по сделке
     resp_gone_by = {r["deal"]: r.pop("_respGone", set()) for r in rows}
     for r in rows:
         r.pop("_chat", None)
@@ -732,16 +760,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             continue
         r["chat"] = ch
         stuck, note, _подробно, src = dealctx.decide(ch, (ctx_chats or {}).get(str(r["deal"])), today)
-        chat_by[src] += 1
+        chat_src[r["deal"]] = src
         if not stuck:
             r["stuck"] = False
             r["slow"] = bool(r["late"])
             # «не проверено» — не «всё хорошо»: серая корзина, сделка видна отдельным фильтром
             r["chatUnverified"] = stuck is None
         r["why"] += (" · " if r["why"] else "") + note
-    chat_sum = chat_activity.summary(chat)
-    live_rows = [r for r in rows if not r["closed"]]
-    slow_rows = [r for r in live_rows if r["slow"]]
 
     # ЖИЗНЕННЫЙ ЦИКЛ: заказы, приведённые к фактам, → фазы, очередь «что делать»,
     # доставка в срок, сроки звеньев, надёжность поставщиков (lifecycle.py)
@@ -783,7 +808,17 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "supPaidPct": paid, "prodConf": _has(o.get(PROD_CONF)) or _has(o.get(PROD_CONF_NF)),
             "scheme": schemes.get(str(o.get(SCHEME_F) or ""), ""),
         })
-    life = lifecycle.build(life_orders, rows, today)
+    # Вид вкладки: основной и отдельного направления (решение владельца 25.10.2026). Очередь,
+    # фазы, доставка в срок, хозяева и гарантия — по заказам и сделкам вида; нормы звеньев,
+    # обычное опоздание и надёжность поставщиков меряются по ВСЕМ заказам (measure):
+    # это свойства поставщиков и процесса, а не вида — и прогноз у заказа один в обоих видах
+    sep_ids = {r["deal"] for r in rows if r["seg"]}
+    main_rows = [r for r in rows if not r["seg"]]
+    sep_rows = [r for r in rows if r["seg"]]
+    life = lifecycle.build([o for o in life_orders if o["deal"] not in sep_ids], main_rows, today,
+                           measure=life_orders)
+    life_sep = (lifecycle.build([o for o in life_orders if o["deal"] in sep_ids], sep_rows, today,
+                                measure=life_orders) if sep_rows else None)
 
     # 7. скорость: сводные метрики
     # полный цикл заказа: создание карточки → SUCCESS, по заказам, закрытым за последние
@@ -801,249 +836,334 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     med_cycle = _median(cycle_days)
     med_lag = _median(lag_vals)
 
-    # текущая просрочка по стадиям: сколько живых сидит в стадии, сколько из них за порогом
-    # и сколько дней в среднем теряется сверх порога
-    o_now: dict[str, list] = defaultdict(lambda: [0, 0, 0.0])   # stage → [в стадии, просрочено, Σ дней сверх порога]
-    d_now: dict[str, list] = defaultdict(lambda: [0, 0, 0.0])
-    for r in rows:
-        if not r["closed"] and r["inCat0"] and r["stageDays"] is not None:
-            a = d_now[r["stage"]]
-            a[0] += 1
-            if r["stageDays"] > r["stageThr"]:
-                a[1] += 1
-                a[2] += r["stageDays"] - r["stageThr"]
-        for o in r["orders"]:
-            if o["live"] and o["days"] is not None:
-                a = o_now[o["stage"]]
-                a[0] += 1
-                if o["days"] > o["thr"]:
-                    a[1] += 1
-                    a[2] += o["days"] - o["thr"]
-
-    def _now_stats(s: str, now: dict) -> dict:
-        live_n, over_n, lost = now.get(s, [0, 0, 0.0])
-        return {"live": live_n, "over": over_n,
-                "lostAvg": round(lost / over_n, 1) if over_n else 0}
-
-    # бенчмарки стадий заказов для графика «где копится время» (только осмысленные стадии)
-    bench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(odur[s]),
-              **_now_stats(s, o_now)}
-             for s, m in sorted(omed.items(), key=lambda kv: -kv[1])
-             if len(odur[s]) >= 5 and _osem(s) != "F"][:14]
-    dbench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(ddur[s]),
-               **_now_stats(s, d_now)}
-              for s, m in dmed.items() if len(ddur[s]) >= 5 and s in dproc]
-    dbench.sort(key=lambda x: dorder.get(x["stage"], 99))
-
-    # --- ВОРОНКА: где стоят открытые сделки, на какие деньги и сколько с сорванным сроком ---
-    fn_agg: dict[str, dict] = defaultdict(lambda: {"n": 0, "sale": 0.0, "late": 0,
-                                                   "lateSale": 0.0, "slow": 0, "days": []})
-    for r in live_rows:
-        if not r["inCat0"]:
-            continue
-        a = fn_agg[r["stage"]]
-        a["n"] += 1
-        a["sale"] += r["saleEur"]
-        if r["late"]:
-            a["late"] += 1
-            a["lateSale"] += r["saleEur"]
-        if r["slow"]:
-            a["slow"] += 1
-        if r["stageDays"] is not None:
-            a["days"].append(r["stageDays"])
-    funnel = []
-    for sid, nm in dproc.items():                   # только рабочие стадии, по порядку воронки
-        a = fn_agg.get(sid)
-        if not a or not a["n"]:
-            continue
-        funnel.append({"stage": sid, "name": nm, "n": a["n"],
-                       "sale": round(a["sale"]), "saleLbl": _money(a["sale"]),
-                       "late": a["late"], "lateSale": round(a["lateSale"]),
-                       "slow": a["slow"], "med": dmed.get(sid, 0),
-                       "nowMed": round(_median(a["days"]) or 0, 1)})
-
     maxseq = max((r["seq"] for r in rows), default=0)
-    # Итоги — по ОТКРЫТЫМ сделкам (до 23.10.2026 — по всем, с проигранными и закрытыми
-    # за всю историю): «Σ продажи» стоит рядом с «В работе» и читается как портфель.
-    # Сумма в валюте без курса и закупка, несоизмеримая с продажей, в итоги не идут —
-    # их число показывается рядом.
-    sale_sum = sum(r["saleEur"] for r in live_rows if r["saleKnown"])
-    buy_sum = sum(r["buyEur"] for r in live_rows if r["buySrc"] in ("orders", "econ") and not r["buySusp"])
-    # маржа — только где и продажа, и закупка достоверны: без «не сходится» и «закупка неполная?»
-    margin_sum = sum(r["marginEur"] for r in live_rows if r["marginEur"] is not None)
-    sale_m = sum(r["saleEur"] for r in live_rows if r["marginEur"] is not None)
-    n_econ = sum(1 for r in live_rows if r["buySrc"] == "econ" and not r["buySusp"])
-    n_nobuy = sum(1 for r in live_rows if r["buySrc"] == "none")
-    n_fx = sum(1 for r in live_rows if r["fxMissing"])
-    n_nosale = sum(1 for r in live_rows if r["saleKnown"] and not r["saleEur"])
-    n_buy_susp = sum(1 for r in live_rows if r["buySusp"])
-    fx_codes = sorted({c for r in live_rows for c in r["fxMissing"]})
     orphan_buy = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orphan)
-    n_contracts = sum(1 for r in rows if r["norders"] > 0)
-    n_budget = sum(1 for r in rows if r["hasBudget"])
-    n_budget_live = sum(1 for r in live_rows if r["hasBudget"])
 
-    # --- плановая экономика по бюджетам: суммы по ОТКРЫТЫМ сделкам с внятным бюджетом ---
-    plan_live_rows = [r for r in live_rows if r["planMdEur"] is not None and not r["planSusp"]]
-    plan_md_live = sum(r["planMdEur"] for r in plan_live_rows)
-    # процент МД — от выручки бюджета, а не от суммы сделки в Битриксе: у сделки она
-    # бывает нулевой или в валюте без курса, и процент завышался
-    plan_sale_live = sum(r["planRevEur"] for r in plan_live_rows if r["planRevEur"])
-    plan_profit_live = sum(r["planProfitEur"] for r in plan_live_rows if r["planProfitEur"] is not None)
-    n_plan = sum(1 for r in rows if r["planMdEur"] is not None)
-    n_plan_live = sum(1 for r in live_rows if r["planMdEur"] is not None)
-    n_plan_susp = sum(1 for r in live_rows if r["planMdEur"] is not None and r["planSusp"])
-    n_plan_neg = sum(1 for r in plan_live_rows if r["planMdEur"] < 0)
+    def _view(rows_v: list[dict], life_v: dict | None) -> dict:
+        """Сводка вида вкладки по его сделкам rows_v: всё, что просит внимания или
+        суммирует портфель, — плитки, итоги, воронка, сроки клиента, работа уволенных,
+        чаты кандидатов в «подвисшие», сейчас в стадии и сверх нормы. Нормы стадий
+        (медианы dmed, omed), медиана цикла и лага, порог валовой маржи — по всем
+        сделкам и заказам: это мерило, а не портфель."""
+        live_rows = [r for r in rows_v if not r["closed"]]
+        slow_rows = [r for r in live_rows if r["slow"]]
+        ids_v = {r["deal"] for r in rows_v}
+        chat_sum = chat_activity.summary({k: v for k, v in chat.items() if k in ids_v})
+        chat_by = Counter(src for k, src in chat_src.items() if k in ids_v)
 
-    # --- дедлайны клиенту: сводка по живым заказам (то же поле, что в «Контроле дедлайнов») ---
-    late_rows = [r for r in live_rows if r["late"]]
-    late_buy_sum = sum(r["lateBuy"] for r in late_rows)
-    late_orders_n = sum(r["lateN"] for r in late_rows)
-    nodl_orders_n = sum(r["noDl"] for r in live_rows)
-    live_orders_n = sum(1 for r in live_rows for o in r["orders"] if o["live"])
-    depth = {"<30": 0, "30-90": 0, "90-180": 0, ">180": 0}
-    for r in live_rows:
-        for o in r["orders"]:
-            if o["late"]:
-                dd = o["dlDays"]
-                depth["<30" if dd < 30 else "30-90" if dd < 90 else "90-180" if dd < 180 else ">180"] += 1
-    prod_after = sum(1 for r in live_rows for o in r["orders"] if o["live"] and o["prodAfterDl"])
-
-    # --- ЦЕНА ПРОСРОЧКИ В ДЕНЬГАХ ---
-    # 1) евро-дни: сколько денег закупки и сколько дней сверх обещания клиенту они висят.
-    #    Это база: умножив на годовую ставку/365, получаем стоимость замороженного капитала.
-    # 2) выручка и маржа сделок, где есть хоть один просроченный заказ — деньги, которые
-    #    должны были закрыться, но ещё не закрылись (риск, а не потеря).
-    money_days = sum(r["lateMoneyDays"] for r in late_rows)
-    # ПОТЕРИ НА ИНВЕСТИЦИЯХ: стоимость отгрузки, которую клиент оплатил бы раньше,
-    # умноженная на дни задержки и на ставку — упущенная доходность (методика владельца)
-    rev_days = sum(r["lateRevDays"] for r in late_rows)
-    loss_total = rev_days / 365 * CAP_RATE
-    late_rev_total = sum(r["lateRev"] for r in late_rows)
-    burn_day = late_rev_total * CAP_RATE / 365          # сгорает за каждый следующий день простоя
-    # что отгружать первым: заказы с наибольшей ценой одного дня задержки
-    ship_first = []
-    for r in live_rows:
-        for o in r["orders"]:
-            if o["live"] and o["burnDay"] > 0:
-                ship_first.append({
-                    "seq": r["seq"], "deal": r["deal"], "customer": r["customer"],
-                    "title": o["title"], "sup": o["sup"], "stageName": o["stageName"],
-                    "dl": o["dl"], "dlDays": o["dlDays"], "late": o["late"],
-                    "revLbl": o["revLbl"], "burnDay": o["burnDay"],
-                    "lossLbl": _money(o["lossEur"]), "lossEur": o["lossEur"]})
-    ship_first.sort(key=lambda x: -x["burnDay"])
-    ship_first = ship_first[:12]
-    late_nosum_n = sum(r["lateNoSum"] for r in late_rows)
-    rev_at_risk = sum(r["saleEur"] for r in late_rows)
-    margin_at_risk = sum(r["marginEur"] for r in late_rows if r["marginEur"] is not None)
-    avg_late = round(money_days / late_buy_sum, 1) if late_buy_sum else 0   # средневзвеш. просрочка, дн
-    # топ сделок по евро-дням — где деньги стоят дольше и больше всего
-    top_cost = sorted(late_rows, key=lambda r: -r["lateMoneyDays"])[:10]
-    cost_top = [{"deal": r["deal"], "seq": r["seq"], "customer": r["customer"],
-                 "days": r["lateDays"], "buyLbl": r["lateBuyLbl"], "buy": r["lateBuy"],
-                 "moneyDays": r["lateMoneyDays"], "saleLbl": r["saleLbl"],
-                 "manager": r["manager"], "oss": r["oss"]} for r in top_cost]
-
-    # разрезы просрочки: по ответственному сделки и по схеме поставки
-    def _cut(keyfn) -> list:
-        agg: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0])   # [просроч. заказов, сделок, € , всего живых заказов]
-        worst: dict[str, dict] = {}                                  # главная просроченная сделка человека
-        for r in live_rows:
-            mine = set()
+        # текущая просрочка по стадиям: сколько живых сидит в стадии, сколько из них за порогом
+        # и сколько дней в среднем теряется сверх порога
+        o_now: dict[str, list] = defaultdict(lambda: [0, 0, 0.0])   # stage → [в стадии, просрочено, Σ дней сверх порога]
+        d_now: dict[str, list] = defaultdict(lambda: [0, 0, 0.0])
+        for r in rows_v:
+            if not r["closed"] and r["inCat0"] and r["stageDays"] is not None:
+                a = d_now[r["stage"]]
+                a[0] += 1
+                if r["stageDays"] > r["stageThr"]:
+                    a[1] += 1
+                    a[2] += r["stageDays"] - r["stageThr"]
             for o in r["orders"]:
-                if not o["live"]:
-                    continue
-                k = keyfn(r, o) or "—"
-                agg[k][3] += 1
+                if o["live"] and o["days"] is not None:
+                    a = o_now[o["stage"]]
+                    a[0] += 1
+                    if o["days"] > o["thr"]:
+                        a[1] += 1
+                        a[2] += o["days"] - o["thr"]
+
+        def _now_stats(s: str, now: dict) -> dict:
+            live_n, over_n, lost = now.get(s, [0, 0, 0.0])
+            return {"live": live_n, "over": over_n,
+                    "lostAvg": round(lost / over_n, 1) if over_n else 0}
+
+        # бенчмарки стадий заказов для графика «где копится время» (только осмысленные стадии)
+        bench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(odur[s]),
+                  **_now_stats(s, o_now)}
+                 for s, m in sorted(omed.items(), key=lambda kv: -kv[1])
+                 if len(odur[s]) >= 5 and _osem(s) != "F"][:14]
+        dbench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(ddur[s]),
+                   **_now_stats(s, d_now)}
+                  for s, m in dmed.items() if len(ddur[s]) >= 5 and s in dproc]
+        dbench.sort(key=lambda x: dorder.get(x["stage"], 99))
+
+        # --- ВОРОНКА: где стоят открытые сделки, на какие деньги и сколько с сорванным сроком ---
+        fn_agg: dict[str, dict] = defaultdict(lambda: {"n": 0, "sale": 0.0, "late": 0,
+                                                       "lateSale": 0.0, "slow": 0, "days": []})
+        for r in live_rows:
+            if not r["inCat0"]:
+                continue
+            a = fn_agg[r["stage"]]
+            a["n"] += 1
+            a["sale"] += r["saleEur"]
+            if r["late"]:
+                a["late"] += 1
+                a["lateSale"] += r["saleEur"]
+            if r["slow"]:
+                a["slow"] += 1
+            if r["stageDays"] is not None:
+                a["days"].append(r["stageDays"])
+        funnel = []
+        for sid, nm in dproc.items():                   # только рабочие стадии, по порядку воронки
+            a = fn_agg.get(sid)
+            if not a or not a["n"]:
+                continue
+            funnel.append({"stage": sid, "name": nm, "n": a["n"],
+                           "sale": round(a["sale"]), "saleLbl": _money(a["sale"]),
+                           "late": a["late"], "lateSale": round(a["lateSale"]),
+                           "slow": a["slow"], "med": dmed.get(sid, 0),
+                           "nowMed": round(_median(a["days"]) or 0, 1)})
+
+        # Итоги — по ОТКРЫТЫМ сделкам (до 23.10.2026 — по всем, с проигранными и закрытыми
+        # за всю историю): «Σ продажи» стоит рядом с «В работе» и читается как портфель.
+        # Сумма в валюте без курса и закупка, несоизмеримая с продажей, в итоги не идут —
+        # их число показывается рядом.
+        sale_sum = sum(r["saleEur"] for r in live_rows if r["saleKnown"])
+        buy_sum = sum(r["buyEur"] for r in live_rows if r["buySrc"] in ("orders", "econ") and not r["buySusp"])
+        # маржа — только где и продажа, и закупка достоверны: без «не сходится» и «закупка неполная?»
+        margin_sum = sum(r["marginEur"] for r in live_rows if r["marginEur"] is not None)
+        sale_m = sum(r["saleEur"] for r in live_rows if r["marginEur"] is not None)
+        n_econ = sum(1 for r in live_rows if r["buySrc"] == "econ" and not r["buySusp"])
+        n_nobuy = sum(1 for r in live_rows if r["buySrc"] == "none")
+        n_fx = sum(1 for r in live_rows if r["fxMissing"])
+        n_nosale = sum(1 for r in live_rows if r["saleKnown"] and not r["saleEur"])
+        n_buy_susp = sum(1 for r in live_rows if r["buySusp"])
+        fx_codes = sorted({c for r in live_rows for c in r["fxMissing"]})
+        n_contracts = sum(1 for r in rows_v if r["norders"] > 0)
+        n_budget = sum(1 for r in rows_v if r["hasBudget"])
+        n_budget_live = sum(1 for r in live_rows if r["hasBudget"])
+
+        # --- плановая экономика по бюджетам: суммы по ОТКРЫТЫМ сделкам с внятным бюджетом ---
+        plan_live_rows = [r for r in live_rows if r["planMdEur"] is not None and not r["planSusp"]]
+        plan_md_live = sum(r["planMdEur"] for r in plan_live_rows)
+        # процент МД — от выручки бюджета, а не от суммы сделки в Битриксе: у сделки она
+        # бывает нулевой или в валюте без курса, и процент завышался
+        plan_sale_live = sum(r["planRevEur"] for r in plan_live_rows if r["planRevEur"])
+        plan_profit_live = sum(r["planProfitEur"] for r in plan_live_rows if r["planProfitEur"] is not None)
+        n_plan = sum(1 for r in rows_v if r["planMdEur"] is not None)
+        n_plan_live = sum(1 for r in live_rows if r["planMdEur"] is not None)
+        n_plan_susp = sum(1 for r in live_rows if r["planMdEur"] is not None and r["planSusp"])
+        n_plan_neg = sum(1 for r in plan_live_rows if r["planMdEur"] < 0)
+
+        # --- дедлайны клиенту: сводка по живым заказам (то же поле, что в «Контроле дедлайнов») ---
+        late_rows = [r for r in live_rows if r["late"]]
+        late_buy_sum = sum(r["lateBuy"] for r in late_rows)
+        late_orders_n = sum(r["lateN"] for r in late_rows)
+        nodl_orders_n = sum(r["noDl"] for r in live_rows)
+        live_orders_n = sum(1 for r in live_rows for o in r["orders"] if o["live"])
+        depth = {"<30": 0, "30-90": 0, "90-180": 0, ">180": 0}
+        for r in live_rows:
+            for o in r["orders"]:
                 if o["late"]:
-                    agg[k][0] += 1
-                    agg[k][2] += o["buyRaw"]
-                    mine.add(k)
-            # просроченная сделка засчитывается каждому, у кого в ней просрочен заказ,
-            # а не только хозяину первого заказа
-            for k in mine:
-                agg[k][1] += 1
-                w = worst.get(k)
-                if w is None or (r["lateDays"] or 0) > (w["days"] or 0):
-                    worst[k] = {"seq": r["seq"], "deal": r["deal"], "customer": r["customer"],
-                                "days": r["lateDays"]}
-        out = [{"name": k, "lateOrders": v[0], "lateDeals": v[1], "buy": round(v[2]),
-                "buyLbl": _money(v[2]), "liveOrders": v[3],
-                "pct": round(v[0] / v[3] * 100) if v[3] else 0,
-                "gone": k.endswith("(уволен)"), "top": worst.get(k)}
-               for k, v in agg.items() if v[0]]
-        out.sort(key=lambda x: -x["lateOrders"])
-        return out[:12]
+                    dd = o["dlDays"]
+                    depth["<30" if dd < 30 else "30-90" if dd < 90 else "90-180" if dd < 180 else ">180"] += 1
+        prod_after = sum(1 for r in live_rows for o in r["orders"] if o["live"] and o["prodAfterDl"])
 
-    # ЖИВАЯ РАБОТА УВОЛЕННЫХ: сделку ведёт ушедший ответственный, её живые заказы —
-    # ушедший ОСС или ушедший ответственный заказа (Responsible person). Это не просрочка,
-    # а работа без хозяина: её переназначают.
-    gone_rows = [r for r in live_rows if r["managerGone"] or r["ossGone"] or r["respGone"]]
+        # --- ЦЕНА ПРОСРОЧКИ В ДЕНЬГАХ ---
+        # 1) евро-дни: сколько денег закупки и сколько дней сверх обещания клиенту они висят.
+        #    Это база: умножив на годовую ставку/365, получаем стоимость замороженного капитала.
+        # 2) выручка и маржа сделок, где есть хоть один просроченный заказ — деньги, которые
+        #    должны были закрыться, но ещё не закрылись (риск, а не потеря).
+        money_days = sum(r["lateMoneyDays"] for r in late_rows)
+        # ПОТЕРИ НА ИНВЕСТИЦИЯХ: стоимость отгрузки, которую клиент оплатил бы раньше,
+        # умноженная на дни задержки и на ставку — упущенная доходность (методика владельца)
+        rev_days = sum(r["lateRevDays"] for r in late_rows)
+        loss_total = rev_days / 365 * CAP_RATE
+        late_rev_total = sum(r["lateRev"] for r in late_rows)
+        burn_day = late_rev_total * CAP_RATE / 365          # сгорает за каждый следующий день простоя
+        # что отгружать первым: заказы с наибольшей ценой одного дня задержки
+        ship_first = []
+        for r in live_rows:
+            for o in r["orders"]:
+                if o["live"] and o["burnDay"] > 0:
+                    ship_first.append({
+                        "seq": r["seq"], "deal": r["deal"], "customer": r["customer"],
+                        "title": o["title"], "sup": o["sup"], "stageName": o["stageName"],
+                        "dl": o["dl"], "dlDays": o["dlDays"], "late": o["late"],
+                        "revLbl": o["revLbl"], "burnDay": o["burnDay"],
+                        "lossLbl": _money(o["lossEur"]), "lossEur": o["lossEur"]})
+        ship_first.sort(key=lambda x: -x["burnDay"])
+        ship_first = ship_first[:12]
+        late_nosum_n = sum(r["lateNoSum"] for r in late_rows)
+        rev_at_risk = sum(r["saleEur"] for r in late_rows)
+        margin_at_risk = sum(r["marginEur"] for r in late_rows if r["marginEur"] is not None)
+        avg_late = round(money_days / late_buy_sum, 1) if late_buy_sum else 0   # средневзвеш. просрочка, дн
+        # топ сделок по евро-дням — где деньги стоят дольше и больше всего
+        top_cost = sorted(late_rows, key=lambda r: -r["lateMoneyDays"])[:10]
+        cost_top = [{"deal": r["deal"], "seq": r["seq"], "customer": r["customer"],
+                     "days": r["lateDays"], "buyLbl": r["lateBuyLbl"], "buy": r["lateBuy"],
+                     "moneyDays": r["lateMoneyDays"], "saleLbl": r["saleLbl"],
+                     "manager": r["manager"], "oss": r["oss"]} for r in top_cost]
 
-    def _gone_o(r, o):
-        # заказ ждёт переназначения: уволен ответственный сделки (ведёт всё), ОСС или
-        # ответственный этого заказа, или ОСС из поля сделки, когда у заказов своего нет
-        return o["live"] and (r["managerGone"] or o["ossGone"] or o["respGone"]
-                              or (r["ossGone"] and not any(x["oss"] for x in r["orders"])))
-    gone = {
-        "deals": len(gone_rows),
-        "byManager": sum(1 for r in gone_rows if r["managerGone"]),
-        "byOss": sum(1 for r in gone_rows if r["ossGone"]),
-        "byResp": sum(1 for r in gone_rows if r["respGone"]),
-        "orders": sum(1 for r in gone_rows for o in r["orders"] if _gone_o(r, o)),
-        "late": sum(1 for r in gone_rows if any(_gone_o(r, o) and o.get("late") for o in r["orders"])),
-        "sale": _money(sum(r["saleEur"] for r in gone_rows)),
-        "saleNum": round(sum(r["saleEur"] for r in gone_rows)),
-        "people": len({r["manager"] for r in gone_rows if r["managerGone"]}
-                      | {o["oss"] for r in gone_rows for o in r["orders"] if o["live"] and o["ossGone"]}
-                      | {w for r in gone_rows for w in resp_gone_by.get(r["deal"], ())}
-                      | {r["ossDeal"] for r in gone_rows if r["ossGone"] and r["ossDeal"]
-                         and not any(o["oss"] for o in r["orders"])}),
-    }
+        # разрезы просрочки: по ответственному сделки и по схеме поставки
+        def _cut(keyfn) -> list:
+            agg: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0])   # [просроч. заказов, сделок, € , всего живых заказов]
+            worst: dict[str, dict] = {}                                  # главная просроченная сделка человека
+            for r in live_rows:
+                mine = set()
+                for o in r["orders"]:
+                    if not o["live"]:
+                        continue
+                    k = keyfn(r, o) or "—"
+                    agg[k][3] += 1
+                    if o["late"]:
+                        agg[k][0] += 1
+                        agg[k][2] += o["buyRaw"]
+                        mine.add(k)
+                # просроченная сделка засчитывается каждому, у кого в ней просрочен заказ,
+                # а не только хозяину первого заказа
+                for k in mine:
+                    agg[k][1] += 1
+                    w = worst.get(k)
+                    if w is None or (r["lateDays"] or 0) > (w["days"] or 0):
+                        worst[k] = {"seq": r["seq"], "deal": r["deal"], "customer": r["customer"],
+                                    "days": r["lateDays"]}
+            out = [{"name": k, "lateOrders": v[0], "lateDeals": v[1], "buy": round(v[2]),
+                    "buyLbl": _money(v[2]), "liveOrders": v[3],
+                    "pct": round(v[0] / v[3] * 100) if v[3] else 0,
+                    "gone": k.endswith("(уволен)"), "top": worst.get(k)}
+                   for k, v in agg.items() if v[0]]
+            out.sort(key=lambda x: -x["lateOrders"])
+            return out[:12]
 
-    deadlines = {
-        "lateDeals": len(late_rows), "lateOrders": late_orders_n,
-        "lateBuy": _money(late_buy_sum), "lateBuyNum": round(late_buy_sum), "depth": depth,
-        "noDl": nodl_orders_n, "liveOrders": live_orders_n,
-        "prodAfterDl": prod_after,
-        "field": "Date of deadline to customer",
-        "moneyDays": round(money_days), "avgLate": avg_late,
-        "rate": round(CAP_RATE * 100),
-        "revDays": round(rev_days), "lateRev": _money(late_rev_total),
-        "loss": _money(loss_total), "lossNum": round(loss_total),
-        "burnDay": _money(burn_day), "burnDayNum": round(burn_day),
-        "shipFirst": ship_first,
-        "revAtRisk": _money(rev_at_risk), "marginAtRisk": _money(margin_at_risk),
-        "lateNoSum": late_nosum_n, "costTop": cost_top,
-        "byManager": _cut(lambda r, o: r["manager"]),
-        "byOss": _cut(lambda r, o: o.get("oss") or r["oss"]),
-    }
+        # ЖИВАЯ РАБОТА УВОЛЕННЫХ: сделку ведёт ушедший ответственный, её живые заказы —
+        # ушедший ОСС или ушедший ответственный заказа (Responsible person). Это не просрочка,
+        # а работа без хозяина: её переназначают.
+        gone_rows = [r for r in live_rows if r["managerGone"] or r["ossGone"] or r["respGone"]]
 
-    # аддитивно: все прежние KPI сохранены, новые добавлены следом
-    kpis = [
-        ("Последний №", str(maxseq), "макс. номер в реализации", "ok"),
-        ("Контрактов", str(n_contracts), f"сделок с заказами · всего в воронке {len(rows)}", ""),
-        ("Σ продажи", _money(sale_sum), "открытые сделки (выручка), €", "ok"),
-        ("Σ закупки", _money(buy_sum),
-         f"заказы {len(rows)-n_econ-n_nobuy} · из экономики {n_econ} · нет данных {n_nobuy}", "amber"),
-        ("Σ валовая маржа", _money(margin_sum),
-         "продажа − закупка · БЕЗ логистики, таможни и НДС", "ok" if margin_sum >= 0 else "warn"),
-        ("Ср. маржа", f"{round(margin_sum/sale_m*100) if sale_m else 0}%", "по сумме, валовая", ""),
-        ("📋 План МД по бюджетам", _money(plan_md_live),
-         f"{round(plan_md_live/plan_sale_live*100) if plan_sale_live else 0}% · "
-         f"{len(plan_live_rows)} из {len(live_rows)} открытых · ПОСЛЕ логистики, таможни и НДС",
-         "ok" if plan_md_live >= 0 else "warn"),
-        ("В работе", f"{len(live_rows)}", "открытых сделок в воронке", ""),
-        ("⚠ Замедлено", str(len(slow_rows)),
-         f"{round(len(slow_rows)/len(live_rows)*100) if live_rows else 0}% открытых", "warn" if slow_rows else "ok"),
-        ("Медиана цикла заказа", f"{round(med_cycle) if med_cycle else '—'} дн", "создание → закрытие заказа", ""),
-        ("🚩 Просрочен дедлайн", str(len(late_rows)),
-         f"сделок · заказов {late_orders_n} · закупка {_money(late_buy_sum)}", "warn" if late_rows else "ok"),
-        ("💸 Потери от просрочки", _money(loss_total),
-         f"упущенная доходность при {round(CAP_RATE*100)}% годовых · сгорает {_money(burn_day)}/день",
-         "warn" if loss_total else "ok"),
-    ]
+        def _gone_o(r, o):
+            # заказ ждёт переназначения: уволен ответственный сделки (ведёт всё), ОСС или
+            # ответственный этого заказа, или ОСС из поля сделки, когда у заказов своего нет
+            return o["live"] and (r["managerGone"] or o["ossGone"] or o["respGone"]
+                                  or (r["ossGone"] and not any(x["oss"] for x in r["orders"])))
+        gone = {
+            "deals": len(gone_rows),
+            "byManager": sum(1 for r in gone_rows if r["managerGone"]),
+            "byOss": sum(1 for r in gone_rows if r["ossGone"]),
+            "byResp": sum(1 for r in gone_rows if r["respGone"]),
+            "orders": sum(1 for r in gone_rows for o in r["orders"] if _gone_o(r, o)),
+            "late": sum(1 for r in gone_rows if any(_gone_o(r, o) and o.get("late") for o in r["orders"])),
+            "sale": _money(sum(r["saleEur"] for r in gone_rows)),
+            "saleNum": round(sum(r["saleEur"] for r in gone_rows)),
+            "people": len({r["manager"] for r in gone_rows if r["managerGone"]}
+                          | {o["oss"] for r in gone_rows for o in r["orders"] if o["live"] and o["ossGone"]}
+                          | {w for r in gone_rows for w in resp_gone_by.get(r["deal"], ())}
+                          | {r["ossDeal"] for r in gone_rows if r["ossGone"] and r["ossDeal"]
+                             and not any(o["oss"] for o in r["orders"])}),
+        }
+
+        deadlines = {
+            "lateDeals": len(late_rows), "lateOrders": late_orders_n,
+            "lateBuy": _money(late_buy_sum), "lateBuyNum": round(late_buy_sum), "depth": depth,
+            "noDl": nodl_orders_n, "liveOrders": live_orders_n,
+            "prodAfterDl": prod_after,
+            "field": "Date of deadline to customer",
+            "moneyDays": round(money_days), "avgLate": avg_late,
+            "rate": round(CAP_RATE * 100),
+            "revDays": round(rev_days), "lateRev": _money(late_rev_total),
+            "loss": _money(loss_total), "lossNum": round(loss_total),
+            "burnDay": _money(burn_day), "burnDayNum": round(burn_day),
+            "shipFirst": ship_first,
+            "revAtRisk": _money(rev_at_risk), "marginAtRisk": _money(margin_at_risk),
+            "lateNoSum": late_nosum_n, "costTop": cost_top,
+            "byManager": _cut(lambda r, o: r["manager"]),
+            "byOss": _cut(lambda r, o: o.get("oss") or r["oss"]),
+        }
+
+        # аддитивно: все прежние KPI сохранены, новые добавлены следом
+        kpis = [
+            ("Последний №", str(maxseq), "макс. номер в реализации", "ok"),
+            ("Контрактов", str(n_contracts), f"сделок с заказами · всего в воронке {len(rows_v)}", ""),
+            ("Σ продажи", _money(sale_sum), "открытые сделки (выручка), €", "ok"),
+            ("Σ закупки", _money(buy_sum),
+             f"заказы {len(rows_v)-n_econ-n_nobuy} · из экономики {n_econ} · нет данных {n_nobuy}", "amber"),
+            ("Σ валовая маржа", _money(margin_sum),
+             "продажа − закупка · БЕЗ логистики, таможни и НДС", "ok" if margin_sum >= 0 else "warn"),
+            ("Ср. маржа", f"{round(margin_sum/sale_m*100) if sale_m else 0}%", "по сумме, валовая", ""),
+            ("📋 План МД по бюджетам", _money(plan_md_live),
+             f"{round(plan_md_live/plan_sale_live*100) if plan_sale_live else 0}% · "
+             f"{len(plan_live_rows)} из {len(live_rows)} открытых · ПОСЛЕ логистики, таможни и НДС",
+             "ok" if plan_md_live >= 0 else "warn"),
+            ("В работе", f"{len(live_rows)}", "открытых сделок в воронке", ""),
+            ("⚠ Замедлено", str(len(slow_rows)),
+             f"{round(len(slow_rows)/len(live_rows)*100) if live_rows else 0}% открытых", "warn" if slow_rows else "ok"),
+            ("Медиана цикла заказа", f"{round(med_cycle) if med_cycle else '—'} дн", "создание → закрытие заказа", ""),
+            ("🚩 Просрочен дедлайн", str(len(late_rows)),
+             f"сделок · заказов {late_orders_n} · закупка {_money(late_buy_sum)}", "warn" if late_rows else "ok"),
+            ("💸 Потери от просрочки", _money(loss_total),
+             f"упущенная доходность при {round(CAP_RATE*100)}% годовых · сгорает {_money(burn_day)}/день",
+             "warn" if loss_total else "ok"),
+        ]
+
+        return {
+            "funnel": funnel,
+            # сводка для верхнего блока — чтобы вёрстка не разбирала подписи KPI строками
+            "head": {
+                "sale": _money(sale_sum), "margin": _money(margin_sum), "marginNum": round(margin_sum),
+                "marginPct": round(margin_sum / sale_m * 100) if sale_m else 0,
+                "live": len(live_rows), "total": len(rows_v), "maxseq": maxseq,
+                "contracts": n_contracts, "buy": _money(buy_sum),
+                "nEcon": n_econ, "nNoBuy": n_nobuy,
+                # не вошли в итоги: сумма в валюте без курса; закупка несоизмерима с продажей
+                "nFx": n_fx, "fxCodes": fx_codes, "nBuySusp": n_buy_susp, "sumsOver": "live",
+                "nNoSale": n_nosale,      # открытых сделок без суммы в Битриксе
+                "medCycle": round(med_cycle) if med_cycle else None,
+                "medLag": round(med_lag, 1) if med_lag is not None else None,
+                "loss": _money(loss_total), "burnDay": _money(burn_day),
+                "budget": n_budget, "budgetLive": n_budget_live,
+                "grossThr": gross_thr, "grossMed": round(med_gross or 0),
+                "grossSusp": sum(1 for r in live_rows if r["grossSusp"]),
+                "slow": len(slow_rows), "lateDeals": len(late_rows),
+                # чат сделки: сколько кандидатов в «подвисшие» проверено и что нашли
+                "chat": chat_sum, "chatQuietDays": chat_activity.QUIET_DAYS,
+                # чем решено по кандидатам (dealctx.decide): quiet, active, unverified — как
+                # раньше; model — по оценке хода, ctxQuiet и ctxActive — по чтению прогона оценки
+                "chatBy": dict(chat_by),
+                # сделки на «Оплата получена | Закрытие сделки» — успех, не «в работе»
+                "paidStage": sum(1 for r in rows_v if r.get("paidStage")),
+                # план по бюджетам сделок (снимок Google Drive)
+                "planMd": _money(plan_md_live), "planMdNum": round(plan_md_live),
+                "planMdPct": round(plan_md_live / plan_sale_live * 100) if plan_sale_live else 0,
+                "planProfit": _money(plan_profit_live), "planProfitNum": round(plan_profit_live),
+                "planN": len(plan_live_rows), "planLive": n_plan_live, "planTotal": n_plan,
+                "planSusp": n_plan_susp, "planNeg": n_plan_neg, "planAsOf": plan_asof,
+            },
+            "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in kpis],
+            "deadlines": deadlines,
+            "speed": {
+                "medCycle": round(med_cycle, 1) if med_cycle else None,
+                "medLag": round(med_lag, 1) if med_lag is not None else None,
+                "orderBench": bench,          # медианы стадий заказов («где копится время»)
+                "dealBench": dbench,          # медианы стадий сделки в кат.0
+                "slowMin": SLOW_MIN_DAYS, "slowMult": SLOW_MULT,
+                # окно бенчмарков и сколько стадий посчитано по нему, а не по всей истории
+                "benchDays": BENCH_DAYS,
+                "benchRecent": sum(1 for v in odur_recent.values() if len(v) >= BENCH_MIN)
+                               + sum(1 for v in ddur_recent.values() if len(v) >= BENCH_MIN),
+            },
+            "gone": gone,
+            "life": life_v,
+        }
+
+    main_view = _view(main_rows, life)
+    sep_view = _view(sep_rows, life_sep) if sep_rows else None
+    if sep_view is not None:
+        sep_head = sep_view["head"]
+        cats = sorted({r["seg"] for r in sep_rows})
+        try:
+            cat_names = client.categories()
+        except Exception:                    # noqa: BLE001 — подпись, без неё вид тот же
+            cat_names = {}
+        sep_late = (life_sep or {}).get("counts", {}).get("late", 0)
+        # сводка направления для шапки основного вида и подписи его вкладки: имя — имя
+        # воронки из портала; числа — те же правила, что у основного вида
+        main_view["head"]["sep"] = {
+            "cat": cats[0], "cats": cats,
+            "name": ", ".join(str(cat_names.get(c) or f"воронка {c}") for c in cats),
+            "deals": len(sep_rows), "live": sep_head["live"],
+            "orders": sum(1 for r in sep_rows if not r["closed"] for o in r["orders"] if o["live"]),
+            "late": sep_late, "lateDeals": sep_head["lateDeals"],
+            "queue": len((life_sep or {}).get("queue") or []),
+            "sale": sep_head["sale"], "companies": len({c for c, k in sep_company.items() if k in cats}),
+        }
 
     # --- агрегация по ПОСТАВЩИКАМ (без изменений) ---
     sup_agg: dict[str, dict] = defaultdict(lambda: {"buy": 0.0, "norders": 0, "deals": set(),
@@ -1095,59 +1215,22 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     ]
     return {
         "label": f"на {today.strftime('%d.%m.%Y')}",
+        # все сделки вкладки — и основного вида, и отдельных направлений (признак seg):
+        # премии, очередь КАМа и письма о новых сделках читают их все
         "rows": rows,
-        "funnel": funnel,
-        # сводка для верхнего блока — чтобы вёрстка не разбирала подписи KPI строками
-        "head": {
-            "sale": _money(sale_sum), "margin": _money(margin_sum), "marginNum": round(margin_sum),
-            "marginPct": round(margin_sum / sale_m * 100) if sale_m else 0,
-            "live": len(live_rows), "total": len(rows), "maxseq": maxseq,
-            "contracts": n_contracts, "buy": _money(buy_sum),
-            "nEcon": n_econ, "nNoBuy": n_nobuy,
-            # не вошли в итоги: сумма в валюте без курса; закупка несоизмерима с продажей
-            "nFx": n_fx, "fxCodes": fx_codes, "nBuySusp": n_buy_susp, "sumsOver": "live",
-            "nNoSale": n_nosale,      # открытых сделок без суммы в Битриксе
-            "medCycle": round(med_cycle) if med_cycle else None,
-            "medLag": round(med_lag, 1) if med_lag is not None else None,
-            "loss": _money(loss_total), "burnDay": _money(burn_day),
-            "budget": n_budget, "budgetLive": n_budget_live,
-            "grossThr": gross_thr, "grossMed": round(med_gross or 0),
-            "grossSusp": sum(1 for r in live_rows if r["grossSusp"]),
-            "slow": len(slow_rows), "lateDeals": len(late_rows),
-            # чат сделки: сколько кандидатов в «подвисшие» проверено и что нашли
-            "chat": chat_sum, "chatQuietDays": chat_activity.QUIET_DAYS,
-            # чем решено по кандидатам (dealctx.decide): quiet, active, unverified — как
-            # раньше; model — по оценке хода, ctxQuiet и ctxActive — по чтению прогона оценки
-            "chatBy": dict(chat_by),
-            # сделки на «Оплата получена | Закрытие сделки» — успех, не «в работе»
-            "paidStage": sum(1 for r in rows if r.get("paidStage")),
-            # план по бюджетам сделок (снимок Google Drive)
-            "planMd": _money(plan_md_live), "planMdNum": round(plan_md_live),
-            "planMdPct": round(plan_md_live / plan_sale_live * 100) if plan_sale_live else 0,
-            "planProfit": _money(plan_profit_live), "planProfitNum": round(plan_profit_live),
-            "planN": len(plan_live_rows), "planLive": n_plan_live, "planTotal": n_plan,
-            "planSusp": n_plan_susp, "planNeg": n_plan_neg, "planAsOf": plan_asof,
-        },
-        "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in kpis],
-        "deadlines": deadlines,
+        **{k: main_view[k] for k in ("funnel", "head", "kpis", "deadlines")},
         # курсы Битрикса заданы вручную; показываем дату, чтобы расхождение с другой
         # отчётностью было объяснимо (см. сверку с «Контролем дедлайнов»)
         "fx": {"asOf": rate_asof, "base": base_cur,
                "usdRub": round(rate.get("USD", 0) / rate["RUB"], 2) if rate.get("RUB") else None,
                "eurUsd": round(rate.get("EUR", 0) / rate["USD"], 4) if rate.get("USD") else None},
-        "speed": {
-            "medCycle": round(med_cycle, 1) if med_cycle else None,
-            "medLag": round(med_lag, 1) if med_lag is not None else None,
-            "orderBench": bench,          # медианы стадий заказов («где копится время»)
-            "dealBench": dbench,          # медианы стадий сделки в кат.0
-            "slowMin": SLOW_MIN_DAYS, "slowMult": SLOW_MULT,
-            # окно бенчмарков и сколько стадий посчитано по нему, а не по всей истории
-            "benchDays": BENCH_DAYS,
-            "benchRecent": sum(1 for v in odur_recent.values() if len(v) >= BENCH_MIN)
-                           + sum(1 for v in ddur_recent.values() if len(v) >= BENCH_MIN),
-        },
-        "gone": gone,
+        "speed": main_view["speed"],
+        "gone": main_view["gone"],
         "life": life,
+        # вид отдельного направления (решение владельца 25.10.2026): те же разделы по его
+        # сделкам; сводка для шапки и подписи вкладки — head["sep"]
+        "sep": ({k: sep_view[k] for k in ("funnel", "head", "kpis", "deadlines", "speed", "gone", "life")}
+                if sep_view is not None else None),
         "orphan": {"n": len(orphan), "buy": _money(orphan_buy)},
         "suppliers": {
             "label": f"на {today.strftime('%d.%m.%Y')}",
@@ -1155,3 +1238,21 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in sup_kpis],
         },
     }
+
+
+def life_all(data: dict | None) -> dict | None:
+    """Раздел «life» основного вида вместе с очередью отдельных направлений — для тех, кто
+    смотрит не вкладку, а людей и сделки: очередь КАМа (kamqueue.py) — его клиент тот же,
+    разговор о сроке и оплате никуда не делся; «что делать первым» по сделке (dealctx).
+    Пункты те же, что до 25.10.2026 в одной очереди: нормы обоих видов — по всем заказам."""
+    if not data or data.get("life") is None:
+        return None
+    life = data["life"]
+    sep_life = (data.get("sep") or {}).get("life")
+    if not sep_life:
+        return life
+    queue = sorted(list(life.get("queue") or []) + list(sep_life.get("queue") or []),
+                   key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
+    counts = Counter(life.get("counts") or {})
+    counts.update(sep_life.get("counts") or {})
+    return {**life, "queue": queue, "counts": dict(counts)}
