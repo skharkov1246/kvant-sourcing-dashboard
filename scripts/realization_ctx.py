@@ -13,9 +13,10 @@
              в нём последний раз писал человек (human), последняя непомеченная оценка
              (deal_chat_ctx_latest): состояние, направление, риск, виды риска, мяч,
              ждут ли ответа, срок из переписки и что держит.
-  contracts  по сделке — последний прогон чтения договоров, прошедший гейт стороны:
-             исход разбора (contract_deal_outcome), сколько документов каждой стороны
-             прочитано и коды флагов сверки (contract_b2b_flags).
+  contracts  по сделке — последний прогон чтения договоров, прошедший гейт стороны
+             («недочитана» — прежним полным разбором, если документы те же:
+             выбор_прогона): исход разбора (contract_deal_outcome), сколько документов
+             каждой стороны прочитано и коды флагов сверки (contract_b2b_flags).
   econ       по сделке — финальная экономика из файла «Экономика проекта» (решение
              владельца 23.10.2026, scripts/econ_files.py): последнее чтение сделки
              (econ_file_latest), и только если оно «сверено» — продажа в валюте подачи и
@@ -73,13 +74,35 @@ ECON_VERIFIED = "сверено"
 #: 1192 и 175), новая карточка, длинный и больший номер файла раньше. Сверяет тест.
 ПОРЯДОК_СТРОК_SQL = ("array_position(array[1174, 132, 172, 1192, 175], card_entity), card_id desc, "
                      "length(file_id) desc, file_id desc")
-#: Исходы, которые не затирают прежний полный разбор (выбор прогона по сделке).
+#: Исходы неполного разбора: прежним полным разбором (выбор_прогона) заменяется только
+#: «недочитана» — и только если документы те же; «не читается» (файла нет у портала,
+#: формат, предел чтения) следующий прогон не вылечит — показывается всегда.
 НЕ_ЗАТИРАЮТ = ("недочитана", "не читается")
-НЕ_ЗАТИРАЮТ_SQL = "(" + ", ".join(f"'{и}'" for и in НЕ_ЗАТИРАЮТ) + ")"
-#: Записанный исход ↔ пересчёт, которые сходятся: до 25.10.2026 «не читается» (закачка,
-#: формат, предел) записывалось как «недочитана» — пересчёт нынешним кодом точнее, и
-#: вкладка показывает его, а не «разошлось».
+#: Записанный исход ↔ пересчёт, которые сходятся: до 25.10.2026 «не читается» (файла нет
+#: у портала, формат, предел) записывалось как «недочитана» — пересчёт нынешним кодом
+#: точнее, и вкладка показывает его, а не «разошлось».
 СХОДЯТСЯ = {("недочитана", "не читается")}
+
+
+def выбор_прогона(исходы: list[dict], файлы: dict[tuple[int, str], frozenset]) -> dict:
+    """Прогон, чей разбор сделки показывает вкладка. исходы — записанные исходы сделки от
+    нового к старому; файлы — {(сделка, прогон): файлы документов (вид, карточка, файл)}.
+
+    Последний исход — кроме «недочитана», которую заменяет последний полный разбор, если
+    у него ровно те же файлы: прогон дошёл до срока или бюджета, а документы с прошлого
+    чтения не менялись (недельный прогон читает от новых сделок, старые обрываются
+    сроком). Нашёлся новый документ (рамочный, Purchase order, прежний процесс) или
+    пропал прежний — прежний разбор собран не из того набора, и его флаги соврали бы:
+    показывается «недочитана». «Не читается» не заменяется: само оно не пройдёт, нужен
+    человек, а прежние флаги без нечитаемого файла — неполные."""
+    последний = исходы[0]
+    if последний["outcome"] != "недочитана":
+        return последний
+    полный = next((x for x in исходы if x["outcome"] not in НЕ_ЗАТИРАЮТ), None)
+    if полный is None:
+        return последний
+    свои = файлы.get((последний["deal"], последний["run"]), frozenset())
+    return полный if свои == файлы.get((полный["deal"], полный["run"]), frozenset()) else последний
 
 
 def _ct():
@@ -147,14 +170,27 @@ class База:
             return [], [], []
         выбор: dict[int, dict] = {}
         if self.есть("contract_deal_outcome"):
-            # «недочитана» (бюджет, срок, временный отказ) и «не читается» (закачка,
-            # формат, предел чтения) не затирают прежний полный разбор: берётся последний
-            # исход, кроме этих двух, а если других нет — последний из них
-            for deal, run, исход, at, вер in self._все(f"""
-                    select distinct on (deal_id) deal_id, run_id, outcome, created_at, method_ver
+            # последний исход сделки; «недочитана» — прежним полным разбором с теми же
+            # файлами (выбор_прогона): файлы обоих прогонов — вторым запросом, только
+            # у таких сделок
+            по_сделке: dict[int, list[dict]] = defaultdict(list)
+            for deal, run, исход, at, вер in self._все("""
+                    select deal_id, run_id, outcome, created_at, method_ver
                       from contract_deal_outcome
-                     order by deal_id, (outcome in {НЕ_ЗАТИРАЮТ_SQL}), created_at desc, run_id desc"""):
-                выбор[int(deal)] = {"deal": int(deal), "run": run, "outcome": исход, "at": at, "ver": вер}
+                     order by deal_id, created_at desc, run_id desc"""):
+                по_сделке[int(deal)].append({"deal": int(deal), "run": run, "outcome": исход, "at": at, "ver": вер})
+            сверить = [(x["deal"], x["run"]) for rr in по_сделке.values() if rr[0]["outcome"] == "недочитана"
+                       for x in (rr[0], next((y for y in rr if y["outcome"] not in НЕ_ЗАТИРАЮТ), None)) if x]
+            файлы: dict[tuple[int, str], set] = defaultdict(set)
+            if сверить:
+                for deal, run, вид, карточка, файл in self._все(
+                        "select deal_id, run_id, card_entity, card_id, file_id from contract_terms "
+                        "where (deal_id, run_id) in (select * from unnest(%s::bigint[], %s::text[])) "
+                        "and status <> 'no_file'", ([d for d, _r in сверить], [r for _d, r in сверить])):
+                    файлы[(int(deal), run)].add((int(вид), int(карточка), str(файл)))
+            замороженные = {к: frozenset(v) for к, v in файлы.items()}
+            for deal, rr in по_сделке.items():
+                выбор[deal] = выбор_прогона(rr, замороженные)
             прежние = """
                 select distinct on (t.deal_id) t.deal_id, t.run_id, t.created_at, t.method_ver
                   from contract_terms t
@@ -179,14 +215,16 @@ class База:
         # ПОРЯДОК_ВИДОВ и порядок_строки, сверяет тест): спецификации, Purchase order,
         # рамочные; новая карточка и новый файл раньше. Разойдись он — пересчёт свёл бы
         # условия в другом порядке и назвал бы сделку «разошлось».
+        # link_source — флаги по отсутствию у заказа, где у поставщика только Purchase order;
+        # note — статус строк до 25.10.2026 по нынешним правилам (contract_terms.уточнить_статус)
         строки = self._все(f"""
             select deal_id, run_id, card_entity, card_id, file_id, order_id, side, side_company, side_link,
-                   side_template, status, terms, dropped
+                   side_template, status, terms, dropped, link_source, note
               from contract_terms where {пары}
              order by deal_id, {ПОРЯДОК_СТРОК_SQL}""",
                             (сделки, прогоны))
         ключи = ("deal_id", "run_id", "card_entity", "card_id", "file_id", "order_id", "side", "side_company",
-                 "side_link", "side_template", "status", "terms", "dropped")
+                 "side_link", "side_template", "status", "terms", "dropped", "link_source", "note")
         флаги = self._все(f"select deal_id, run_id, order_id, code, days from contract_b2b_flags where {пары}",
                           (сделки, прогоны))
         return (list(выбор.values()), [dict(zip(ключи, r)) for r in строки],
@@ -249,7 +287,9 @@ def свод_договоров(выбор: list[dict], строки: list[dict]
     out, n = {}, Counter()
     for v in выбор:
         key = (v["deal"], v["run"])
-        rs = по_паре.get(key, [])
+        # статус строк до 25.10.2026 — по нынешним правилам: временный отказ закачки тогда
+        # писался download, и пересчёт назвал бы сделку «не читается»
+        rs = [{**r, "status": ct.уточнить_статус(r["status"], r.get("note"))} for r in по_паре.get(key, [])]
         записано = флаги_пары.get(key, [])
         флаги_пересчёт, исход_пересчёт = ct.флаги_сделки(rs) if rs else ([], "нет договоров")
         исход = v["outcome"] or исход_пересчёт
@@ -267,8 +307,10 @@ def свод_договоров(выбор: list[dict], строки: list[dict]
             if v["outcome"] and v.get("ver") == ct.METHOD_VER:
                 n["разошлось_текущий"] += 1
             исход = "разошлось"
-        прочитано = Counter(r["side"] for r in rs
-                            if r["status"] in ct.ПРОЧИТАН and r.get("terms") and r.get("side") in ("customer", "supplier"))
+        # документ — файл карточки: рамочный над спецификациями двух заказов — одна строка счёта
+        прочитано = Counter(сторона for (_в, _к, _ф, сторона) in {
+            (r["card_entity"], r["card_id"], r.get("file_id"), r["side"]) for r in rs
+            if r["status"] in ct.ПРОЧИТАН and r.get("terms") and r.get("side") in ("customer", "supplier")})
         out[str(v["deal"])] = {
             "at": _iso(v["at"]), "outcome": исход,
             "read": {"customer": прочитано["customer"], "supplier": прочитано["supplier"]},

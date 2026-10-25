@@ -8,9 +8,11 @@
   · прочитанная строка без условий и непрочитанная с условиями не встают;
   · откат по ключу прогона снимает ровно свои строки;
   · с 25.10.2026: прежние СП-132/175 и Purchase order (172) принимаются, откуда документ
-    (link_source) — из списка кода; рамочный у двух сделок одного прогона — строка у
-    каждой (ключ с deal_id), и ключ прежней версии пересобирается без потерь;
-    исход «не читается» принимается.
+    (link_source) — из списка кода; рамочный у двух сделок и у двух заказов одной
+    сделки — строка у каждой пары (ключ с deal_id и order_key), и ключ прежних версий
+    пересобирается без потерь; исход «не читается» и статус fetch (временный отказ
+    закачки) принимаются; прочитанные файлы (после бюджета) — запросом по модели и
+    версии.
 
 Работает при поднятой базе (LIBRARY_SQL_TEST_DSN). Корпус придуман (правило 18).
 """
@@ -111,6 +113,9 @@ def test_схема_rls_запись_повтор_и_откат(conn):
                            "where run_id = 'ct-t1' and card_id = 3") == (None, None, "customer")
         assert база.из_кэша("a" * 64, "claude-sonnet-5-5") is None, "условия другой модели — не повтор"
         assert база.из_кэша("c" * 64, "claude-opus-5-5") is None
+        # после бюджета прогон качает только читанные раньше этой моделью и версией файлы
+        assert база.прочитанные_файлы("claude-opus-5-5") == {(1174, 1, "fid-1"), (1174, 2, "fid-2")}
+        assert база.прочитанные_файлы("claude-sonnet-5-5") == set()
 
         # второй прогон: свои строки, откат первого их не трогает
         база.записать_условия([_строка("ct-t2", 1, status="reused")])
@@ -249,6 +254,18 @@ def test_новые_источники_и_рамочный_у_двух_сдел�
         assert база.итог("ct-n1")[0] == 5, "рамочный второй сделки снят ключом без deal_id"
         assert _одно(conn, "select count(distinct deal_id) from contract_terms where run_id = 'ct-n1' "
                            "and card_entity = 175") == (2,)
+        # рамочный поставщика над спецификациями двух заказов сделки — строка на заказ;
+        # временный отказ закачки — свой статус
+        по_заказам = []
+        for заказ in (9700001, 9700002):
+            r = _строка("ct-n3", 14, status="fetch", sha=None, side="supplier", order=заказ)
+            r.update(card_entity=175, link_source="framework", note="urlMachine: сеть: ReadTimeout")
+            по_заказам.append(r)
+        for _ in range(2):
+            база.записать_условия(по_заказам)
+        assert база.итог("ct-n3")[0] == 2, "рамочный второго заказа снят ключом без order_key"
+        assert _одно(conn, "select array_agg(order_key order by order_key) from contract_terms "
+                           "where run_id = 'ct-n3'") == ([9700001, 9700002],)
         чужой = _строка("ct-n2", 1, status="no_file", sha=None)
         чужой["link_source"] = "by_company"
         неизвестный_тип = _строка("ct-n2", 2, status="no_file", sha=None)
@@ -285,15 +302,17 @@ def test_ключ_прежней_версии_пересобирается_с_с
         c.execute("""select array_agg(a.attname::text order by a.attnum) from pg_constraint k
                        join pg_attribute a on a.attrelid = k.conrelid and a.attnum = any (k.conkey)
                       where k.conrelid = 'contract_terms'::regclass and k.contype = 'p'""")
-        assert sorted(c.fetchone()[0]) == sorted(["run_id", "deal_id", "card_entity", "card_id", "file_id"])
-        c.execute("select count(*) from contract_terms where run_id = 'ct-old'")
-        assert c.fetchone()[0] == 2
+        assert sorted(c.fetchone()[0]) == sorted(["run_id", "deal_id", "card_entity", "card_id", "file_id",
+                                                  "order_key"])
+        c.execute("select count(*), count(*) filter (where order_key = 0) from contract_terms where run_id = 'ct-old'")
+        assert c.fetchone() == (2, 2)
     база = ct.База(DSN, схема=СХЕМА)
     try:
         assert база.нет_таблиц() == []
-        with база.с, база.с.cursor() as c:
-            c.execute("alter table contract_terms drop constraint contract_terms_pkey")
-            c.execute("alter table contract_terms add primary key (run_id, card_entity, card_id, file_id)")
-        assert база.нет_таблиц() == ["contract_terms.primary key (deal_id)"]
+        for прежний in ("run_id, card_entity, card_id, file_id", "run_id, deal_id, card_entity, card_id, file_id"):
+            with база.с, база.с.cursor() as c:
+                c.execute("alter table contract_terms drop constraint if exists contract_terms_pkey")
+                c.execute(f"alter table contract_terms add constraint contract_terms_pkey primary key ({прежний})")
+            assert база.нет_таблиц() == ["contract_terms.primary key (deal_id, order_key)"], прежний
     finally:
         база.закрыть()
