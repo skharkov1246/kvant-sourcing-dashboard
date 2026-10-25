@@ -370,6 +370,34 @@ def test_ключ_свой_и_единственный():
     assert "realctx" not in src, "воркер портала ключ не читает: свод уходит только в сборку"
 
 
+def test_колонки_выгрузки_по_схеме_договоров():
+    """Первый живой прогон экономики 25.10.2026 упал на UndefinedColumn: у рабочей базы схема
+    договоров до v2. Нет необязательной колонки — null вместо неё и её имя журналу."""
+    все = set(rc.КОЛОНКИ_УСЛОВИЙ) | {"order_key"}
+    выбор, нет = rc.колонки_выгрузки(все)
+    assert нет == [] and "null" not in выбор and выбор.split(", ") == list(rc.КОЛОНКИ_УСЛОВИЙ)
+    выбор, нет = rc.колонки_выгрузки(все - {"link_source", "order_key", "side_link"})
+    assert нет == ["side_link", "link_source", "order_key"]
+    assert "null as link_source" in выбор and "null as side_link" in выбор
+    assert len(выбор.split(", ")) == len(rc.КОЛОНКИ_УСЛОВИЙ), "порядок и число колонок — как у ключей строки"
+    # обязательные — как есть: без ключа строки свод не собрать, пусть скажет база
+    выбор, нет = rc.колонки_выгрузки(все - {"status"})
+    assert "null as status" not in выбор and "status" not in нет
+
+
+def test_схема_договоров_старая_одной_строкой_журнала():
+    б = База(чаты=[_чат(11)])
+    б.нет_колонок = ["link_source", "order_key"]
+    журнал: list[str] = []
+    assert rc.publish(б, Store(), dry=True, ct=ct, печать=журнал.append) == 0
+    assert [x for x in журнал if "схема договоров старая" in x] == [
+        "  схема договоров старая: колонки link_source, order_key нет — в своде они пустые, пока прогон чтения "
+        "договоров не применит library/supabase/contract_terms_schema.sql"]
+    журнал.clear()
+    assert rc.publish(База(чаты=[_чат(11)]), Store(), dry=True, ct=ct, печать=журнал.append) == 0
+    assert not any("схема договоров" in x for x in журнал), "схема новая — строки нет"
+
+
 # ── настоящая база ────────────────────────────────────────────────────────────
 
 DSN = os.environ.get("LIBRARY_SQL_TEST_DSN")
@@ -545,6 +573,42 @@ def test_выгрузка_по_настоящей_базе_в_порядке_п�
     assert у_201 == ожидаемо == [(1174, 2, "10"), (1174, 2, "9"), (132, 8, "1"), (172, 51, "1"), (172, 50, "99"),
                                  (1192, 3, "7"), (175, 9, "5")]
     assert [(x["card_entity"], x["card_id"]) for x in выгружено if x["deal_id"] == 202] == [(175, 9)]
+
+
+def test_свод_по_схеме_договоров_до_v2(conn):
+    """Первый живой прогон экономики 25.10.2026: у рабочей базы схема договоров до v2 (нет
+    link_source и order_key, ключ без заказа) — свод экономики не падает на UndefinedColumn:
+    колонки пустые, исход и флаги пересчитываются, журнал говорит одной строкой, каких нет."""
+    c = conn.cursor()
+    c.execute(f"set search_path to {СХЕМА}")
+    c.execute("alter table contract_terms drop constraint contract_terms_link_chk")
+    c.execute("alter table contract_terms drop column link_source")
+    c.execute("alter table contract_terms drop column order_key cascade")       # с ключом строки
+    c.execute("alter table contract_terms add primary key (run_id, deal_id, card_entity, card_id, file_id)")
+    строки, флаги = _пара(deal=301, run="ct-v1")
+    for r in строки:
+        r.update(method_ver=ct.METHOD_VER, side_source="model", template=None, doc_type=None, file_field="f",
+                 sha256=None, pages=None, note=None, model="claude-x", evidence=None, usd=0)
+    база_записи = ct.База(DSN, схема=СХЕМА)
+    try:
+        # прогон чтения прежней версии link_source не писал
+        база_записи.КОЛОНКИ = tuple(к for к in ct.База.КОЛОНКИ if к != "link_source")
+        база_записи.записать_условия(строки)
+        база_записи.записать_итог(флаги, {301: "пара"}, "ct-v1")
+    finally:
+        база_записи.закрыть()
+    база = rc.База(DSN, схема=СХЕМА)
+    try:
+        s = Store()
+        журнал: list[str] = []
+        assert rc.publish(база, s, dry=False, ct=ct, печать=журнал.append) == 0
+        _выбор, выгружено, _флаги = база.договоры()
+    finally:
+        база.закрыть()
+    assert {x["link_source"] for x in выгружено} == {None}
+    д = json.loads(s.raw)["contracts"]
+    assert д["301"]["outcome"] == "пара" and len(д["301"]["flags"]) == len(флаги)
+    assert sum(1 for x in журнал if x.startswith("  схема договоров старая: колонки link_source, order_key нет")) == 1
 
 
 # ── расписание и прогоны (решение владельца 23.10.2026) ─────────────────────────

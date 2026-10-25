@@ -39,6 +39,12 @@
 не прошла — сделка без экономики, шаг кончается кодом 1 после записи. Готовый свод перед
 записью проходит разбор dealctx.clean: запись не по форме — стоп, ключ не трогается.
 
+СХЕМА ДОГОВОРОВ. Свод строят и прогон чтения договоров, и прогон экономики (econ-files.yml),
+который схему договоров не применяет. У базы, где её ещё нет в версии v2 (25.10.2026:
+link_source, order_key), необязательные колонки contract_terms берутся пустыми
+(колонки_выгрузки, один запрос к pg_attribute), а журнал говорит одной строкой, каких нет:
+первый живой прогон экономики падал здесь на UndefinedColumn.
+
 ЗАПИСЬ. KV → перечитать и сверить (как chat_scan). В журнал — только счётчики (правило 17).
 
     python scripts/realization_ctx.py --publish     # база → KV (SUPABASE_DB_URL, CLOUDFLARE_*)
@@ -82,6 +88,25 @@ ECON_VERIFIED = "сверено"
 #: у портала, формат, предел) записывалось как «недочитана» — пересчёт нынешним кодом
 #: точнее, и вкладка показывает его, а не «разошлось».
 СХОДЯТСЯ = {("недочитана", "не читается")}
+#: Колонки contract_terms в выгрузке строк: ключ строки и статус — обязательны, прочие
+#: берутся пустыми (null), если их нет. Схему договоров v2 (25.10.2026: link_source,
+#: order_key) применяет прогон чтения договоров (contract-terms.yml); прогон экономики
+#: (econ-files.yml) строит этот же свод и до неё падал на UndefinedColumn. У строк до
+#: 25.10.2026 link_source и так пуст — пересчёт флагов это знает.
+КОЛОНКИ_УСЛОВИЙ = ("deal_id", "run_id", "card_entity", "card_id", "file_id", "order_id", "side", "side_company",
+                   "side_link", "side_template", "status", "terms", "dropped", "link_source", "note")
+ОБЯЗАТЕЛЬНЫЕ_УСЛОВИЙ = ("deal_id", "run_id", "card_entity", "card_id", "file_id", "status")
+#: Признак схемы договоров v2 сверх выгружаемых колонок: ключ строки с заказом.
+СХЕМА_ДОГОВОРОВ_V2 = ("link_source", "order_key")
+
+
+def колонки_выгрузки(есть: set[str]) -> tuple[str, list[str]]:
+    """Колонки contract_terms, что есть у базы → (список select, колонки схемы v2 и выгрузки,
+    которых нет: журналу). Обязательной нет — select её как есть: пусть база скажет."""
+    выбор = ", ".join(к if к in есть or к in ОБЯЗАТЕЛЬНЫЕ_УСЛОВИЙ else f"null as {к}" for к in КОЛОНКИ_УСЛОВИЙ)
+    нет = [к for к in dict.fromkeys((*КОЛОНКИ_УСЛОВИЙ, *СХЕМА_ДОГОВОРОВ_V2))
+           if к not in есть and к not in ОБЯЗАТЕЛЬНЫЕ_УСЛОВИЙ]
+    return выбор, нет
 
 
 def выбор_прогона(исходы: list[dict], файлы: dict[tuple[int, str], frozenset]) -> dict:
@@ -132,6 +157,15 @@ class База:
             опции += f" -c search_path={схема}"
         self.с = psycopg2.connect(dsn, options=опции)
         self.с.set_session(readonly=True)
+        #: колонки contract_terms, которых нет у базы (схема договоров до v2) — журналу
+        self.нет_колонок: list[str] = []
+
+    def колонки(self, таблица: str) -> set[str]:
+        """Колонки таблицы из search_path — один запрос к pg_attribute."""
+        with self.с, self.с.cursor() as c:
+            c.execute("select attname from pg_attribute where attrelid = to_regclass(%s) and attnum > 0 "
+                      "and not attisdropped", (таблица,))
+            return {str(r[0]) for r in c.fetchall()}
 
     def есть(self, *таблицы: str) -> bool:
         with self.с, self.с.cursor() as c:
@@ -168,6 +202,8 @@ class База:
         """(выбор прогона по сделке, строки условий выбранных пар, флаги выбранных пар)."""
         if not self.есть("contract_terms", "contract_b2b_flags"):
             return [], [], []
+        # схема договоров до v2 (нет link_source и др.) — колонки пустыми, а не UndefinedColumn
+        выбор_колонок, self.нет_колонок = колонки_выгрузки(self.колонки("contract_terms"))
         выбор: dict[int, dict] = {}
         if self.есть("contract_deal_outcome"):
             # последний исход сделки; «недочитана» — прежним полным разбором с теми же
@@ -218,13 +254,11 @@ class База:
         # link_source — флаги по отсутствию у заказа, где у поставщика только Purchase order;
         # note — статус строк до 25.10.2026 по нынешним правилам (contract_terms.уточнить_статус)
         строки = self._все(f"""
-            select deal_id, run_id, card_entity, card_id, file_id, order_id, side, side_company, side_link,
-                   side_template, status, terms, dropped, link_source, note
+            select {выбор_колонок}
               from contract_terms where {пары}
              order by deal_id, {ПОРЯДОК_СТРОК_SQL}""",
                             (сделки, прогоны))
-        ключи = ("deal_id", "run_id", "card_entity", "card_id", "file_id", "order_id", "side", "side_company",
-                 "side_link", "side_template", "status", "terms", "dropped", "link_source", "note")
+        ключи = КОЛОНКИ_УСЛОВИЙ
         флаги = self._все(f"select deal_id, run_id, order_id, code, days from contract_b2b_flags where {пары}",
                           (сделки, прогоны))
         return (list(выбор.values()), [dict(zip(ключи, r)) for r in строки],
@@ -405,6 +439,10 @@ def publish(база, store, *, dry: bool, ct=None, печать=print) -> int:
     печать(f"• Свод чатов и договоров для вкладки «Реализация» ({KV_KEY})")
     for s in журнал(n, raw):
         печать(s)
+    нет = getattr(база, "нет_колонок", None)
+    if нет:
+        печать(f"  схема договоров старая: колонки {', '.join(нет)} нет — в своде они пустые, пока прогон чтения "
+               "договоров не применит library/supabase/contract_terms_schema.sql")
     if dry:
         печать("  вхолостую: ключ не записан")
     else:
