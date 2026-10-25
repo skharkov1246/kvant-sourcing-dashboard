@@ -14,6 +14,10 @@ on:
         type: choice
         default: bitrix_probe.py
         options: [bitrix_probe.py, probe_mail_files.py, probe_conversion.py, probe_presale.py, probe_2526.py, probe_fields.py, probe_pace.py, probe_won.py, probe_kp_rules.py, probe_realization.py, probe_contracts.py, probe_category.py, probe_money.py, probe_econ_files.py, probe_contract_gaps.py, probe_real_segments.py]
+      limit:
+        description: "Размер выборки (только для зондов, которые его читают; пусто — по умолчанию)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -41,6 +45,8 @@ jobs:
           YADISK_TOKEN: ${{ secrets.YADISK_TOKEN }}
           BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
           PROBE_SCRIPT: ${{ inputs.script || 'bitrix_probe.py' }}
+          # размер выборки для зондов, которые его читают (probe_contract_gaps.py); пусто — свой по умолчанию
+          PROBE_LIMIT: ${{ inputs.limit || '' }}
           # Один процесс в общей очереди, с запасом: рядом может идти пересборка
           # дашборда (её группа своя). probe_conversion.py, probe_2526.py и probe_pace.py — ~20–45 мин при 1/с (≈950–1300 запросов);
           # ставить вне 01:00–05:30 UTC и не на :07, проверив, что очередь пуста.

@@ -30,7 +30,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-N = int(os.environ.get("CONTRACT_GAPS_DEALS", "50"))
+N = int(os.environ.get("PROBE_LIMIT") or os.environ.get("CONTRACT_GAPS_DEALS") or "50")
 ОЧЕРЕДЬ = 400                           # недельный прогон: до 400 открытых сделок
 ПРОЧИТАНО_25_10 = 215                   # ok 168 + reused 47 в прогоне 25.10.2026
 CHAT_FIELD = "UF_CRM_1734380921"        # «ID чата по сделке» (chat_activity.CHAT_FIELD)
@@ -117,7 +117,8 @@ def main() -> int:
 
     # 3. сделки пресейла с тем же «ID чата»
     пресейл: dict[int, int] = {}             # сделка пресейла → сделка реализации
-    с_чатом = [d for d in мои if str(d.get(CHAT_FIELD) or "").strip()]
+    # по запросу на сделку; 25.10.2026 у 50 новейших не нашлось ни одной — на больших выборках не ищем
+    с_чатом = [d for d in мои if str(d.get(CHAT_FIELD) or "").strip()] if len(мои) <= 60 else []
     for d in с_чатом:
         for x in client.call("crm.deal.list", {"filter": {CHAT_FIELD: str(d[CHAT_FIELD]).strip(), "!CATEGORY_ID": 0},
                                                 "select": ["ID", "CATEGORY_ID"]}) or []:
