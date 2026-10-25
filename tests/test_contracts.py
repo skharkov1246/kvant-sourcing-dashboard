@@ -93,7 +93,8 @@ class Портал:
         return {}
 
     def list_deals_fast(self, *, filter=None, select=None, **kw):
-        return [dict(d) for d in self.deals]
+        # как живой Битрикс: только выбранные поля — поле, забытое в select, в расчёт не придёт
+        return [{k: d[k] for k in select if k in d} if select else dict(d) for d in self.deals]
 
     def deals_by_ids(self, ids, *, select=None):
         return {}

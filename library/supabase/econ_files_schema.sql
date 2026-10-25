@@ -23,8 +23,10 @@
 --     позиций, чем проверено (totals_dev, coef_median, bad_lines — правило 16), курсы
 --     файла (fx: единиц валюты подачи за 1 единицу валюты) и сверка с «Суммой» сделки
 --     (bitrix_ratio = «Сумма» без НДС, OPPORTUNITY − TAX_VALUE, в валюте подачи / продажа
---     файла без НДС). Числа (продажа, закупка, наценка) — только у «сверено»: у прочих
---     статусов их нет (econ_file_reads_num_chk). Только дописывается; откат прогона —
+--     файла без НДС). У переторжки — ещё продажа «Нашего КП» в валюте подачи (kp_sale_sub):
+--     «Сумма» сделки, оставленная по ней, — пункт очереди. Числа (продажа, закупка, наценка,
+--     продажа КП) — только у «сверено»: у прочих статусов их нет (econ_file_reads_num_chk).
+--     Только дописывается; откат прогона —
 --     пометкой voided_at (правило 5), одной на строку:
 --         update econ_file_reads set voided_at = now() where run_id = '<ключ>';
 --   econ_file_runs — прогоны, прошедшие гейт сумм (passed_at), со счётом своих строк на
@@ -33,9 +35,11 @@
 --   econ_file_take_slot(run_id, deal_id, предел) — взять попытку суток (true) или нет.
 --   econ_file_latest — последнее непомеченное чтение сделки из прошедших гейт прогонов,
 --     кроме сбоев доставки и нашего кода («ссылка не раскрылась», «не скачался», «сбой
---     чтения»): сбой сети или разбора не стирает прочитанного.
+--     чтения»): сбой сети или разбора не стирает прочитанного. Очередь прогона тоже
+--     считает чтением только строки прошедших гейт прогонов (econ_files.База.прочитано).
 --
--- ИДЕМПОТЕНТНО (правило 21): create … if not exists, ограничения — сносом и созданием,
+-- ИДЕМПОТЕНТНО (правило 21): create … if not exists, новые колонки — add column if not
+-- exists (create table if not exists таблицу не меняет), ограничения — сносом и созданием,
 -- функции — create or replace, вид — сносом перед созданием. Роли Supabase — только
 -- через проверку наличия (правило 20). Схема — из search_path. Применение — Actions →
 -- «ZIP base — apply DB migrations» (zip-db.yml) и сам прогон econ-files.yml перед
@@ -76,8 +80,9 @@ create table if not exists econ_file_reads (
   why          text,                             -- где сломалось: ячейка шаблона или проверка
   voided_at    timestamptz                       -- откат: пометка, а не удаление (правило 5)
 );
+-- вторая ревизия 25.10.2026: у переторжки — продажа «Нашего КП» в валюте подачи (AG2)
+alter table econ_file_reads add column if not exists kp_sale_sub numeric;
 
--- курсы файла: объект «код валюты → положительное число», и ничего больше
 create table if not exists econ_file_runs (
   run_id     text        primary key,
   passed_at  timestamptz not null default now(),
@@ -86,6 +91,7 @@ create table if not exists econ_file_runs (
   verified_n integer     not null                -- из них «сверено»
 );
 
+-- курсы файла: объект «код валюты → положительное число», и ничего больше
 create or replace function econ_fx_ok(v jsonb) returns boolean
 language plpgsql immutable as $$
 declare
@@ -141,7 +147,7 @@ begin
   alter table econ_file_reads add constraint econ_file_reads_num_chk
     check ((items is null or items >= 0) and bad_lines >= 0
            and (totals_dev is null or totals_dev >= 0)
-           and (status = 'сверено' or num_nulls(sale_sub, sale_eur, purchase_eur, markup) = 4));
+           and (status = 'сверено' or num_nulls(sale_sub, sale_eur, purchase_eur, markup, kp_sale_sub) = 5));
   -- Сверенная строка несёт все числа, и они согласованы: продажа не ниже закупки,
   -- наценка — из них же, позиции есть, сбоев нет. Иначе публиковать нечего.
   alter table econ_file_reads drop constraint if exists econ_file_reads_verified_chk;
@@ -153,7 +159,9 @@ begin
            and sale_sub > 0 and purchase_eur > 0
            and sale_eur >= purchase_eur and rebid is not null and items > 0 and bad_lines = 0
            and totals_dev <= 0.005 and coef_median between 1 and 5
-           and abs(markup - (sale_eur / purchase_eur - 1)) <= 0.00001));
+           and abs(markup - (sale_eur / purchase_eur - 1)) <= 0.00001
+           -- продажа «Нашего КП» — только у переторжки; у строк до 25.10.2026 её нет вовсе
+           and (kp_sale_sub is null or (rebid and kp_sale_sub > 0))));
   alter table econ_file_runs drop constraint if exists econ_file_runs_chk;
   alter table econ_file_runs add constraint econ_file_runs_chk
     check (run_id ~ '^[A-Za-z0-9._-]{1,80}$' and method_ver ~ '^[a-z0-9_.:-]{1,60}$'
@@ -243,7 +251,7 @@ drop view if exists econ_file_latest;
 create view econ_file_latest with (security_invoker = true) as
 select distinct on (r.deal_id)
        r.deal_id, r.read_at, r.status, r.sub_cur, r.sale_sub, r.sale_eur, r.purchase_eur, r.markup,
-       r.rebid, r.items, r.fx, r.deal_cur, r.bitrix_ratio, r.bitrix_note, r.method_ver, r.run_id
+       r.rebid, r.items, r.fx, r.deal_cur, r.bitrix_ratio, r.bitrix_note, r.kp_sale_sub, r.method_ver, r.run_id
   from econ_file_reads r
   join econ_file_runs g on g.run_id = r.run_id
  where r.voided_at is null

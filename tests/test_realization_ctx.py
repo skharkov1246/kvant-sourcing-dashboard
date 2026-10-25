@@ -187,7 +187,7 @@ def test_экономика_в_своде_только_сверенная():
     свод = json.loads(s.raw)
     assert свод["econ"]["201"] == {"at": T.isoformat(), "sale": 2_600_000.0, "cur": "RUB", "saleEur": 26_000.0,
                                    "buyEur": 20_000.0, "markup": 0.3, "rebid": True, "items": 3, "fx": {"EUR": 100.0},
-                                   "ratio": None, "note": None}
+                                   "kpSale": None, "ratio": None, "note": None}
     assert dealctx.clean(свод)["econ"]["201"]["sale"] == 2_600_000.0
     assert any("финальная экономика: сделок со сверенным файлом 1 (переторжка 1)" in x for x in журнал)
     assert not any("2600000" in x or "201" in x for x in журнал), "в журнал — только счётчики"
@@ -205,6 +205,20 @@ def test_экономика_сверка_с_суммой_на_день_чтен�
     assert (свод["econ"]["202"]["ratio"], свод["econ"]["202"]["note"]) == (None, "суммы нет")
     разбор = dealctx.clean(свод)
     assert разбор["bad"] == 0 and разбор["econ"]["201"]["ratioAtRead"] == 1.05
+
+
+def test_экономика_продажа_кп_у_переторжки_в_своде():
+    """Вторая ревизия, 2б: у переторжки — продажа «Нашего КП» (kpSale); у прочих её нет, а
+    продажа КП без переторжки или не число — не прошла вторую сверку."""
+    from decimal import Decimal
+    база = База(экономика=[_эк(201, rebid=True, kpSale=Decimal("3000000.00")), _эк(202, kpSale=3_000_000),
+                           _эк(203, rebid=True, kpSale=-5)])
+    s = Store()
+    журнал: list[str] = []
+    assert rc.publish(база, s, dry=False, ct=ct, печать=журнал.append) == 1
+    свод = json.loads(s.raw)
+    assert set(свод["econ"]) == {"201"} and свод["econ"]["201"]["kpSale"] == 3_000_000.0
+    assert dealctx.clean(свод)["econ"]["201"]["kpSale"] == 3_000_000.0
 
 
 def test_свод_экономики_читает_только_вид_прошедших_гейт():
@@ -316,9 +330,10 @@ def test_на_настоящей_базе(conn):
     try:
         общее = {"method_ver": ef.METHOD_VER, "file_key": "f" * 64, "sub_cur": "EUR", "items": 2, "bad_lines": 0,
                  "fx": {"EUR": 1.0}, "deal_cur": "EUR", "bitrix_note": None, "coef_median": 1.4, "totals_dev": 0,
-                 "why": None}
+                 "why": None, "kp_sale_sub": None}
         эк.записать({**общее, "run_id": "ef-1", "deal_id": 11, "status": "сверено", "sale_sub": 14_000,
-                     "sale_eur": 14_000, "purchase_eur": 10_000, "markup": 0.4, "rebid": True, "bitrix_ratio": 1})
+                     "sale_eur": 14_000, "purchase_eur": 10_000, "markup": 0.4, "rebid": True, "bitrix_ratio": 1,
+                     "kp_sale_sub": 16_000})
         эк.записать({**общее, "run_id": "ef-1", "deal_id": 12, "status": "шаблон другой", "sale_sub": None,
                      "sale_eur": None, "purchase_eur": None, "markup": None, "rebid": None, "bitrix_ratio": None,
                      "fx": None, "coef_median": None, "totals_dev": None})
@@ -338,6 +353,7 @@ def test_на_настоящей_базе(conn):
     свод = json.loads(s.raw)
     assert dealctx.clean(свод)["bad"] == 0
     assert set(свод["econ"]) == {"11"} and свод["econ"]["11"]["markup"] == 0.4 and свод["econ"]["11"]["rebid"]
+    assert свод["econ"]["11"]["kpSale"] == 16_000.0, "продажа «Нашего КП» — из вида"
     ч = свод["chats"]
     assert ч["11"]["state"] == "стоит" and ч["11"]["kinds"] == ["срок", "оплата"] and ч["11"]["due"] == "2026-10-20"
     assert ч["11"]["blocker"] == {"kind": "поставка", "on": "поставщик"} and ч["11"]["reply"] is False

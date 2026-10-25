@@ -19,8 +19,9 @@
   econ       по сделке — финальная экономика из файла «Экономика проекта» (решение
              владельца 23.10.2026, scripts/econ_files.py): последнее чтение сделки
              (econ_file_latest), и только если оно «сверено» — продажа в валюте подачи и
-             в €, закупка в €, наценка над поставщиком, переторжка, позиций, курсы файла и
-             сверка с «Суммой» на день чтения (ratio, note: по ней сборка видит, что «Сумму»
+             в €, закупка в €, наценка над поставщиком, переторжка (у неё — и продажа
+             «Нашего КП», kpSale: «Сумма», оставленная по ней, — пункт), позиций, курсы файла
+             и сверка с «Суммой» на день чтения (ratio, note: по ней сборка видит, что «Сумму»
              меняли после чтения). Вид берёт только прогоны, прошедшие гейт сумм
              (econ_file_runs): упавший или снятый прогон в свод не попадает — ни здесь, ни в
              ночном своде chat-context.yml. Ни пути, ни имени файла. Ключ закрытый; на
@@ -181,11 +182,17 @@ class База:
         считается (вид econ_file_latest)."""
         if not self.есть("econ_file_latest"):
             return []
+        # вид до второй ревизии (25.10.2026) — без продажи «Нашего КП»: свод не падает, пока
+        # схема не применена заново (econ-files.yml или zip-db.yml)
+        with self.с, self.с.cursor() as c:
+            c.execute("select count(*) from pg_attribute where attrelid = to_regclass('econ_file_latest') "
+                      "and attname = 'kp_sale_sub' and not attisdropped")
+            кп = "kp_sale_sub" if c.fetchone()[0] == 1 else "null::numeric"
         ключи = ("deal", "at", "status", "cur", "sale", "saleEur", "buyEur", "markup", "rebid", "items", "fx",
-                 "ratio", "note")
-        rows = self._все("""
+                 "ratio", "note", "kpSale")
+        rows = self._все(f"""
             select deal_id, read_at, status, sub_cur, sale_sub, sale_eur, purchase_eur, markup, rebid, items, fx,
-                   bitrix_ratio, bitrix_note
+                   bitrix_ratio, bitrix_note, {кп}
               from econ_file_latest where status = %s""", (ECON_VERIFIED,))
         return [dict(zip(ключи, r)) for r in rows]
 
@@ -262,6 +269,9 @@ def сверить_экономику(r: dict) -> bool:
         if r.get("status") != ECON_VERIFIED or not all(pos(r.get(k)) for k in ("sale", "saleEur", "buyEur", "items")):
             return False
         se, buy, mk = float(r["saleEur"]), float(r["buyEur"]), r.get("markup")
+        # продажа «Нашего КП» — только у переторжки и только положительная
+        if r.get("kpSale") is not None and (r.get("rebid") is not True or not pos(r["kpSale"])):
+            return False
         return (se >= buy and mk is not None and abs(float(mk) - (se / buy - 1)) <= 1e-4
                 and isinstance(r.get("rebid"), bool) and isinstance(r.get("cur"), str))
     except (TypeError, ValueError):
@@ -282,6 +292,7 @@ def свод_экономики(строки: list[dict]) -> tuple[dict, Counter
             "saleEur": round(float(r["saleEur"]), 2), "buyEur": round(float(r["buyEur"]), 2),
             "markup": round(float(r["markup"]), 6), "rebid": bool(r["rebid"]), "items": int(r["items"]),
             "fx": {str(k): float(v) for k, v in fx.items()},
+            "kpSale": round(float(r["kpSale"]), 2) if r.get("kpSale") is not None else None,
             # сверка с «Суммой» на день чтения — сборке, чтобы видеть «Сумму», изменённую позже
             "ratio": round(float(r["ratio"]), 6) if r.get("ratio") is not None else None,
             "note": r.get("note") or None}
