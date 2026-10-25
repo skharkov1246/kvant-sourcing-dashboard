@@ -148,6 +148,10 @@ test("дашборд режется по правам: чужих данных �
   for (const p of ["ENG", "ADVISOR", "DATA", "INSIGHTS"]) {
     assert.ok(!html.includes(`MOCK-${p}`), `данные ${p} утекли КАМу`);
   }
+  // «Доход» (решение владельца 25.10.2026): счёт и действия — роли с вкладкой, деньги —
+  // только праву «Деньги КАМов», которого у роли «КАМ» по умолчанию нет
+  assert.ok(html.includes("MOCK-KAMINC_HEAD"), "счёт «Дохода» должен быть доступен");
+  assert.ok(!html.includes('MOCK-KAMINC"'), "деньги «Дохода» утекли КАМу без права");
   assert.doesNotMatch(html, /data-tab="advisor"/);
   assert.ok(html.includes("← Портал КВАНТ"), "нет возврата на портал");
 });

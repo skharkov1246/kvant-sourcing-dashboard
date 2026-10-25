@@ -96,7 +96,7 @@ sys.path.insert(0, str(ROOT))
 
 РАЗДЕЛЫ_АТРИБУЦИИ = frozenset({"kpi", "weekly", "sourcersa", "origin"})
 НЕ_СРАВНИВАТЬ = frozenset({"period", "_portal"})
-ВКЛАДКИ = ("company", "kam", "eng", "prod", "contracts", "reps", "advisor", "people")
+ВКЛАДКИ = ("company", "kam", "eng", "prod", "contracts", "reps", "advisor", "people", "kaminc")
 ЗАГЛУШКА_ИМЕНИ = re.compile(r"^user#\d+$")
 НЕ_ОПРЕДЕЛЁН = "исполнитель не определён"      # строка разреза origin.byOwnerDept
 ГЛАВНЫЕ_ИНВАРИАНТЫ = ("отдел + вне отдела = всего", "сумма по сорсерам = отдел")
@@ -352,6 +352,19 @@ def инварианты(m: dict) -> list[tuple[str, bool, str]]:
         s = sum(int(пс.get(к) or 0) for к in ("stale", "staleChat", "staleUnverified"))
         out.append(("пресейл: стоят по стадии = тихо + работа в чате + чат не проверен",
                     s == int(пс["staleStage"]), f"{s} против {пс['staleStage']}"))
+    # «Доход» вкладки «Key-аккаунты и продукты» (kaminc.py): каждая сделка — ровно в одной
+    # строке каждого разреза, поэтому строки складываются в итог; к получению = Σ по срокам;
+    # сверка денег (по сделкам = по людям через доли) сошлась. Только счётчики — евро нет
+    ki = (m.get("kaminc") or {}).get("head") or {}
+    if ki.get("tot") and isinstance(ki.get("cuts"), dict):
+        t = ki["tot"]
+        for cut, rows in sorted(ki["cuts"].items()):
+            bad = [f for f in ("k1", "due", "k4", "pipe", "quiet") if sum(int(x.get(f) or 0) for x in rows) != int(t.get(f) or 0)]
+            out.append((f"доход: Σ строк разреза «{cut}» = итог", not bad, "не сходится: " + ", ".join(bad) if bad else "сходится"))
+        s = sum(int(v or 0) for v in (t.get("dueB") or {}).values())
+        out.append(("доход: к получению = Σ по срокам оплаты", s == int(t.get("due") or 0), f"{s} против {t.get('due')}"))
+        out.append(("доход: сверка денег по сделкам и по людям", bool((ki.get("money") or {}).get("ok")),
+                    "не сошлась — деньги не опубликованы" if not (ki.get("money") or {}).get("ok") else "сошлась"))
     return out
 
 
@@ -396,8 +409,8 @@ def сверить(до: dict | None, после: dict, заявка: Заявк
         провал(f"строка заявки не разобрана: «{строка[:120]}»")
 
     # 1. инварианты
-    inv1 = инварианты(после)
-    inv0 = {имя: ok for имя, ok, _ in инварианты(до)} if до is not None else {}
+    inv1 = инварианты(_сборка(после, модули_после))
+    inv0 = {имя: ok for имя, ok, _ in инварианты(_сборка(до, модули_до))} if до is not None else {}
     сломано = 0
     for имя, ok, пояснение in inv1:
         if ok:
@@ -534,7 +547,9 @@ def _поля(итог: list, д0: dict, д1: dict, заявка: Заявка, 
     for у, v in т1.values():
         if _число(v):
             узоры1[у].append(v)
-    корни0 = {_корень(у) for у, _ in т0.values()}
+    # раздел, которого в проде нет вовсе (вкладка None — например, новая вкладка в первом
+    # прогоне), «новыми нулевыми полями» не судится: новое там всё, сравнивать не с чем
+    корни0 = {_корень(у) for у, v in т0.values() if v is not None}
 
     # 5. ненулевое не стало пустым; новое поле не пришло пустым
     пустых = 0

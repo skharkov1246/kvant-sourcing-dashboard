@@ -57,7 +57,7 @@ def test_pdf_в_стиле_ведомости_без_выделений(data):
 def test_суммы_людей_сходятся_с_пулом_сделок_при_к(data):
     for k in (0.6, 1.2):
         ppl = premia_files.people(data, k)
-        total = sum(b["real"] + b["pre"] for b in ppl)
+        total = sum(b["paid"] + b["real"] + b["pre"] for b in ppl)
         pool = sum(d["p1"] * k for d in data["deals"] if "big" not in d["fl"])
         assert total == pytest.approx(pool, abs=1.0)
 

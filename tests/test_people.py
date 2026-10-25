@@ -113,12 +113,20 @@ def test_победа_это_перевод_в_реализацию_а_не_се
     assert t["won"] == 2 and t["lost"] == 1
 
 
-def test_итоги_роли_считают_конверсию_и_взвешенный_пайплайн_отдельно():
+def test_итоги_роли_считают_конверсию_без_взвешенного_пайплайна():
     t = build()["roles"]["kam"]["totals"]
     assert t["winRate"] == round(t["won"] / (t["won"] + t["lost"]) * 100)
-    # взвешенный пайплайн — оценка: проработка, умноженная на конверсию роли
-    assert t["weightedRaw"] == round(t["presaleRaw"] * t["winRate"] / 100)
-    assert t["realRaw"] != t["weightedRaw"]        # факт и оценка — разные числа
+    # «Взвешенный пайплайн» (проработка × годовой процент выигрышей роли) снят 25.10.2026:
+    # процент по штукам умножался на деньги без стадии и срока — пайплайн на вкладке «Доход»
+    assert "weighted" not in t and "weightedRaw" not in t
+
+
+def test_сделка_несёт_сырьё_дохода_для_kaminc():
+    D = {d["id"]: d for d in build()["deals"]}
+    # 101: КАМ полем, клиент 100; 105: КАМ по владельцу (прокси); 103: Product leader полем
+    assert D["101"]["kamSrc"] == "поле" and D["101"]["comp"] == "100"
+    assert D["105"]["kamSrc"] == "владелец"
+    assert D["103"]["pl"] == "2" and D["103"]["line"] == []
 
 
 # ------------------------------------------------------------------ форма payload
@@ -128,7 +136,7 @@ def test_итоги_роли_считают_конверсию_и_взвешен
 PAYLOAD_KEYS = {"label", "roles", "orphan", "recon", "staff", "deals", "params"}
 PARAM_KEYS = {"stale", "dead", "mult", "medAmt", "bigCut"}
 TOTAL_KEYS = {"people", "open", "byField", "presale", "presaleSum", "real", "realSum", "buy",
-              "margin", "marginPct", "created", "won", "wonSum", "lost", "winRate", "weighted",
+              "margin", "marginPct", "created", "won", "wonSum", "lost", "winRate",
               "late", "lateSum", "stale", "dead", "noAmt", "noComp", "neg", "big", "bigSum",
               "bigShare", "flaws", "cleanPct", "perPersonDeals", "medianDeals", "maxDeals"}
 ROW_KEYS = {"uid", "name", "pos", "dept", "active", "why", "open", "presale", "presaleSum",

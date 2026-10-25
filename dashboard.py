@@ -124,10 +124,16 @@ def _pack_metrics(metrics: dict) -> dict:
 
 
 
+def _pack_kaminc(head: dict) -> dict:
+    """Сделки «Дохода» (тысячи одинаковых записей) — упакованным списком, как сорсеры."""
+    return dict(head, deals=_pack_records(head.get("deals") or []))
+
+
 def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company: dict | None = None,
            kam: dict | None = None, eng: dict | None = None, prod: dict | None = None,
            contracts: dict | None = None, reps: dict | None = None, advisor: dict | None = None,
-           people: dict | None = None, premia: dict | None = None, dealctx: dict | None = None) -> str:
+           people: dict | None = None, premia: dict | None = None, dealctx: dict | None = None,
+           kaminc: dict | None = None) -> str:
     # premia принимается и не выводится: «Премии» сняты с портала по решению владельца
     # 12.10.2026 — ни вкладки, ни массива в странице. Расчёт premia.py остаётся в сборке
     # (main.py, живая сверка); вкладка до снятия — в истории, PR #508.
@@ -151,6 +157,11 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
         # закрытая часть «Реализации» (чаты и договоры по сделкам, dealctx.py): отдельный
         # массив — воркер вырезает его всем, у кого нет права «договоры и деньги»
         "__DEALCTX_JSON__": _json_for_script(dealctx) if dealctx else "null",
+        # «Доход» вкладки «Key-аккаунты и продукты» (kaminc.py): открытая часть — счёт, даты,
+        # стадии, действия — всем, у кого вкладка; деньги — отдельным массивом, воркер
+        # оставляет его только праву «Деньги КАМов» (решение владельца 25.10.2026)
+        "__KAMINC_HEAD_JSON__": _json_for_script(_pack_kaminc(kaminc["head"])) if kaminc else "null",
+        "__KAMINC_JSON__": _json_for_script(kaminc["money"]) if kaminc and kaminc.get("money") else "null",
     }
     html = re.sub("|".join(map(re.escape, вставки)), lambda m: вставки[m.group(0)], html)
     gen, nxt = _update_stamps()
@@ -163,10 +174,10 @@ def write(metrics: dict, insights: dict, out_path: str | Path, *, title: str = D
           company: dict | None = None, kam: dict | None = None,
           eng: dict | None = None, prod: dict | None = None, contracts: dict | None = None,
           reps: dict | None = None, advisor: dict | None = None, people: dict | None = None,
-          premia: dict | None = None, dealctx: dict | None = None) -> Path:
+          premia: dict | None = None, dealctx: dict | None = None, kaminc: dict | None = None) -> Path:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render(metrics, insights, title=title, company=company, kam=kam, eng=eng, prod=prod,
                           contracts=contracts, reps=reps, advisor=advisor, people=people,
-                          premia=premia, dealctx=dealctx), encoding="utf-8")
+                          premia=premia, dealctx=dealctx, kaminc=kaminc), encoding="utf-8")
     return out

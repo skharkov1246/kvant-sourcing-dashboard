@@ -284,6 +284,13 @@ def _with_tabs_opened(path: Path) -> Path:
               "d.setAttribute('%s','');d.textContent=m;document.body.appendChild(d)}catch(e){}}"
               "try{[%s].forEach(function(t){try{window.ensureTab&&window.ensureTab(t)}"
               "catch(e){kvFail('вкладка '+t+': '+e)}})}catch(e){kvFail('ensureTab: '+e)}"
+              # «Доход» (kaminc.py) открывается первым разделом «Key-аккаунтов и продуктов»:
+              # есть его данные — должны быть кнопка раздела с role=tab и таблица разреза
+              "try{var KH=window.__KAMINC_HEAD__;if(KH&&KH.cuts&&KH.tot){"
+              "if(!document.querySelector('#tab-reps [role=\"tab\"][data-r=\"income\"]'))"
+              "kvFail('Доход: нет кнопки раздела');"
+              "else if(!document.getElementById('incCutBody'))kvFail('Доход: разрез не отрисовался')}}"
+              "catch(e){kvFail('Доход: '+e)}"
               "try{var P=window.__PEOPLE__,b=document.querySelector('#tab-reps [data-r=\"role:kam\"]');"
               "if(b){b.click();if(P&&P.kamQueue&&!document.getElementById('%s'))"
               "kvFail('раздел КАМы: очередь КАМа не отрисовалась')}"

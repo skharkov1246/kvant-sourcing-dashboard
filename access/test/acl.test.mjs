@@ -176,12 +176,14 @@ test("шаблон и модуль согласованы: все вкладки
 test("одна вкладка: чужие кнопки, панели и данные вырезаны", () => {
   // «Коммерсанты» читают четыре массива: свой REPS плюс состав ролей и оба разреза,
   // которые раньше были отдельными вкладками. Всё остальное обязано быть вырезано.
-  const MINE = ["REPS", "PEOPLE", "KAM", "PRODUCT"];
+  // KAMINC_HEAD — счёт и действия «Дохода»; деньги «Дохода» (KAMINC) — только по праву
+  const MINE = ["REPS", "PEOPLE", "KAM", "PRODUCT", "KAMINC_HEAD"];
   const out = cutDashboard(page(), ["reps"]);
   assert.match(out, /data-tab="reps"/);
   for (const t of TAB_IDS) if (t !== "reps") assert.doesNotMatch(out, new RegExp(`data-tab="${t}"`), `осталась кнопка ${t}`);
   for (const p of MINE) assert.match(out, new RegExp(`window\\.__${p}__ = \\["MOCK-${p}"\\]`), `данные ${p} должны остаться`);
-  for (const p of PAYLOADS) if (!MINE.includes(p)) assert.ok(!out.includes(`MOCK-${p}`), `данные ${p} утекли в страницу`);
+  // метка с кавычкой: MOCK-KAMINC — начало MOCK-KAMINC_HEAD, а тот должен остаться
+  for (const p of PAYLOADS) if (!MINE.includes(p)) assert.ok(!out.includes(`MOCK-${p}"`), `данные ${p} утекли в страницу`);
   for (const p of PAYLOADS) if (!MINE.includes(p)) assert.match(out, new RegExp(`window\\.__${p}__ = __kvNoData\\(\\);`), `${p} не заменён пустышкой`);
   assert.ok(out.includes("function __kvNoData()"), "пустышка не подставлена");
   assert.doesNotMatch(out, /<div id="tab-company" hidden><\/div>/, "осталась панель чужой вкладки");
@@ -224,6 +226,30 @@ test("закрытая часть «Реализации» — только пр
   const безВкладки = cutDashboard(page(), ["suppliers"], { admin: false, rights: ["suppliers_fin"] });
   assert.ok(!безВкладки.includes("MOCK-DEALCTX"));
   assert.ok(безВкладки.includes("MOCK-CONTRACTS"));
+});
+
+test("деньги «Дохода» — только праву «Деньги КАМов» и админу, счёт — всем с вкладкой", () => {
+  // решение владельца 25.10.2026: продажа, результат и часть по положению — отдельным
+  // массивом; без права вкладка показывает счёт, даты и действия без евро
+  assert.equal(RIGHT_PAYLOADS.KAMINC, "kam_money");
+  const без = cutDashboard(page(), ["reps"], { admin: false, rights: ["suppliers", "suppliers_fin"] });
+  assert.ok(без.includes("MOCK-KAMINC_HEAD"), "счёт «Дохода» должен остаться");
+  assert.ok(!без.includes("MOCK-KAMINC\""), "деньги «Дохода» утекли без права");
+  assert.match(без, /^window\.__KAMINC__ = __kvNoData\(\);$/m);
+  const с = cutDashboard(page(), ["reps"], { admin: false, rights: ["kam_money"] });
+  assert.ok(с.includes("MOCK-KAMINC\"") && с.includes("MOCK-KAMINC_HEAD"));
+  const админ = cutDashboard(page(), ["reps"], { admin: true, rights: [] });
+  assert.ok(админ.includes("MOCK-KAMINC\""));
+  // право без вкладки ничего не открывает
+  const безВкладки = cutDashboard(page(), ["contracts"], { admin: false, rights: ["kam_money"] });
+  assert.ok(!безВкладки.includes("MOCK-KAMINC"));
+});
+
+test("деньги КАМов не входят ни в одну роль по умолчанию", () => {
+  for (const [id, r] of Object.entries(defaultAcl().roles)) {
+    if (r.admin) continue;
+    assert.ok(!r.rights.includes("kam_money"), `роль ${id} получила деньги КАМов по умолчанию`);
+  }
 });
 
 test("пустые права: данных не остаётся вовсе", () => {
@@ -362,7 +388,7 @@ test("админ видит полный набор тонких прав", () =
   });
   // Он их обходит на проверке всё равно; показывать урезанный набор — врать.
   assert.deepEqual(rightsFor(acl, "b@kvantpro.com", {}).rights,
-    ["suppliers", "suppliers_pii", "suppliers_fin", "suppliers_edit"]);
+    ["suppliers", "suppliers_pii", "suppliers_fin", "suppliers_edit", "kam_money"]);
   assert.deepEqual(rightsFor(acl, "g@kvantpro.com", {}).rights, []);
 });
 

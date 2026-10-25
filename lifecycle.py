@@ -182,6 +182,49 @@ def forecast(o: dict, today: dt.date, med: dict, sup_slip: dict) -> dt.date | No
     return max(today, base + dt.timedelta(days=round(rest)))
 
 
+# источник ожидаемой даты оплаты клиента (pay_eta): код → подпись (правило 16 — почему так)
+PAY_SRC = {
+    "plan": "плановый срок оплаты заказа",
+    "factDays": "доставлено + отсрочка оплаты из сделки",
+    "fcDays": "прогноз доставки + отсрочка оплаты из сделки",
+    "factGrace": f"доставлено + {PAY_GRACE} дн. (отсрочки в сделке нет)",
+    "fcGrace": f"прогноз доставки + {PAY_GRACE} дн. (отсрочки в сделке нет)",
+    "none": "нет ни срока оплаты, ни доставки, ни прогноза",
+    "noLive": "живых заказов нет",
+    "po": "платёжка клиента во всех живых заказах, стадия не «Оплата получена»",
+}
+
+
+def pay_eta(orders: list[dict], pay_days: int | None, today: dt.date, med: dict,
+            sup_slip: dict) -> tuple[dt.date | None, str]:
+    """Когда клиент заплатит по сделке — по самому позднему из её живых неоплаченных
+    заказов: ① плановый срок оплаты заказа → ② доставка (факт, иначе прогноз forecast) +
+    отсрочка оплаты сделки → ③ доставка + PAY_GRACE → ④ без даты. Медианами срок не
+    достраивается: дата без опоры — не дата. Хоть один живой неоплаченный заказ без даты —
+    у сделки даты нет (последний платёж неизвестен). → (дата, код PAY_SRC)."""
+    live = [o for o in orders if o.get("live")]
+    if not live:
+        return None, "noLive"
+    due = [o for o in live if not o.get("clientPaid")]
+    if not due:
+        return None, "po"
+    best: tuple[dt.date, str] | None = None
+    for o in due:
+        if o.get("payPlan"):
+            d, src = o["payPlan"], "plan"
+        else:
+            base, kind = (o["delFact"], "fact") if o.get("delFact") else (forecast(o, today, med, sup_slip), "fc")
+            if base is None:
+                return None, "none"
+            if pay_days is not None:
+                d, src = base + dt.timedelta(days=pay_days), kind + "Days"
+            else:
+                d, src = base + dt.timedelta(days=PAY_GRACE), kind + "Grace"
+        if best is None or d > best[0]:
+            best = (d, src)
+    return best if best else (None, "none")
+
+
 def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None) -> list[tuple[str, int | None]]:
     """[(код, дней)] — исключения одного заказа. Закрытый провалом заказ сюда не попадает.
     fc — прогноз доставки (forecast): позже срока клиента — ранний сигнал."""
@@ -343,6 +386,17 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                           "order": "", "title": d.get("title") or "", "sup": "", "dl": "", "phase": ""})
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
 
+    # оплата клиента по сделке (доход КАМов и продуктов, kaminc.py): ожидаемая дата и её
+    # источник, платёжки клиента файлом — по непроигранным заказам. В страницу не идёт:
+    # main.py забирает раздел после расчёта дохода
+    pay: dict[str, dict] = {}
+    for d in deals:
+        os_ = [o for o in by_deal_orders.get(d["deal"], []) if o.get("live") or o.get("success")]
+        eta, src = pay_eta(os_, d.get("payDays"), today, med, sup_slip)
+        pay[d["deal"]] = {"eta": eta.isoformat() if eta else "", "src": src,
+                          "orders": len(os_), "po": sum(1 for o in os_ if o.get("clientPaid")),
+                          "delivered": any(o.get("delFact") for o in os_ if o.get("live"))}
+
     # доставлено в срок: помесячно по месяцу фактической доставки клиенту
     m0 = dt.date(today.year, today.month, 1)
     months = []
@@ -429,4 +483,5 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         "people": people_rows[:20],
         "warranty": warranty,
         "rules": {"riskDays": RISK_DAYS, "utdGrace": UTD_GRACE, "payGrace": PAY_GRACE, "supMin": SUP_MIN},
+        "pay": pay,
     }

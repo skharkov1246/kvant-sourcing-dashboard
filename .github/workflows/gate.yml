@@ -105,6 +105,7 @@ jobs:
           dashboard.write(m, {"source": "rules", "items": []}, "smoke/index.html",
                           people=fixture.build_people(), reps=fixture.build_reps(),
                           advisor=fixture.build_advisor(), premia=fixture.build_premia(),
+                          kaminc=fixture.build_kaminc(),     # «Доход» вкладки «Key-аккаунты и продукты»
                           **fixture.build_realization())     # «Реализация» со сводом чатов и договоров
           print("собрано smoke/index.html")
           PY

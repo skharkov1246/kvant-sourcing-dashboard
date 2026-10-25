@@ -475,6 +475,16 @@
   .ctsub .snb{min-height:32px;max-width:100%;white-space:normal;text-align:left}
   .ctsubn{font-weight:400;opacity:.85}
   [role=tabpanel]:focus-visible{outline:2px solid var(--a);outline-offset:4px;border-radius:6px}
+  /* «Доход» вкладки «Key-аккаунты и продукты» (kaminc.py) */
+  .inckpis{grid-template-columns:repeat(3,1fr)}
+  .inckpis .kpi .val{font-size:clamp(17px,2.4vw,22px)}
+  .inckpis .kpi .meta{line-height:1.45}
+  .inccut tr.on td{background:var(--panel2)}
+  .incladder th,.incladder td{white-space:nowrap}
+  .inchow{margin:6px 0 12px 18px;color:var(--mut);font-size:13px;line-height:1.55}
+  .inchow li{margin:3px 0}
+  #tab-reps h2{font-size:14px;margin:12px 0 4px}
+  .inckpis .val .dimv{font-size:12px;font-weight:400;font-family:'IBM Plex Sans',system-ui,sans-serif}
   .ctsepnote{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--b);border-radius:10px;padding:10px 14px;margin:0 0 16px;color:var(--mut);font-size:13px;line-height:1.5}
   .ctsepnote b{color:var(--ink)}
   .ctsepnote a{color:var(--b2);text-decoration:underline;text-underline-offset:2px}
@@ -530,7 +540,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="reps">КАМ и продукт-оунеры</button><button class="tab" data-tab="company">Пульс компании</button><span class="tabsep">ещё</span><button class="tab minor" data-tab="suppliers">Поставщики</button><button class="tab minor" data-tab="cohorts">Когорты</button><button class="tab minor" data-tab="advisor">Советы знатока</button><button class="tab minor" data-tab="eng">Инжиниринг</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="reps">Key-аккаунты и продукты</button><button class="tab" data-tab="company">Пульс компании</button><span class="tabsep">ещё</span><button class="tab minor" data-tab="suppliers">Поставщики</button><button class="tab minor" data-tab="cohorts">Когорты</button><button class="tab minor" data-tab="advisor">Советы знатока</button><button class="tab minor" data-tab="eng">Инжиниринг</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -756,6 +766,8 @@ window.__CONTRACTS__ = __CONTRACTS_JSON__;
 window.__REPS__ = __REPS_JSON__;
 window.__ADVISOR__ = __ADVISOR_JSON__;
 window.__DEALCTX__ = __DEALCTX_JSON__;
+window.__KAMINC_HEAD__ = __KAMINC_HEAD_JSON__;
+window.__KAMINC__ = __KAMINC_JSON__;
 const M = window.__DATA__ || {}, INS = window.__INSIGHTS__ || {};
 // Защита от неполной выгрузки: недостающие блоки заменяем пустыми. Раньше одно
 // отсутствующее поле (например weekly) роняло весь скрипт и гасило все 9 вкладок.
@@ -1388,6 +1400,7 @@ const METH={
   'd.groups':{t:'Продажи → закупка → маржа',what:'Главная таблица направления по группам отделов.',src:'crm.deal.list (ASSIGNED_BY_ID ∈ UF_DEPARTMENT группы) + Заказы поставщикам СП-172.',formula:'СП-172 = заказы ПОСТАВЩИКАМ (opportunity = закупка). Продажа = сумма родительской сделки. Контракт = сделка с ≥1 заказом. Колонки: сделок (YTD), пайплайн (Σ открытых продаж €), контрактов, продажи (Σ сумм сделок-контрактов €), закупка (Σ заказов €), маржа = продажи − закупка.',note:'Привязка к группе — через владельца сделки-родителя. Клик по строке — сделки и заказы группы.'},
   'd.rev':{t:'Выручка по группам',what:'Ранжирование групп по продажам (выручке).',formula:'Σ сумм сделок-контрактов группы (€); длина бара — относительно максимума в наборе.',note:'Клик — сделки и заказы группы.'},
   'p.kpi':{t:'Загрузка коммерческой роли',what:'Верхняя панель вкладок «КАМы» и «Продукт-оунеры»: сколько людей, сколько на них сделок и денег прямо сейчас.',src:'user.get (состав и признак ACTIVE) + crm.deal.list (открытые сделки, STAGE_SEMANTIC_ID=P) + Заказы поставщикам СП-172.',filt:'Технические воронки (тестовые, адаптационная, реклама) исключены. Сделки уволенных в роли не считаются — они в блоке «бесхозные».',formula:'«В проработке» = открытая сделка вне воронки реализации и без живого заказа. «В реализации» = воронка «Реализация» (кат.0) либо есть непроигранный заказ поставщику. Маржа = продажа − Σ заказов. Суммы к базовой € по курсам Bitrix.',note:'Один человек может вести и проработку, и реализацию; роли КАМ и продукт-оунер пересекаются на одной сделке — это норма, поэтому суммы вкладок не складываются.'},
+  'i.income':{t:'Доход: где формируется и когда придёт',what:'Ключевые клиенты и продукты: что уже получено (K1), что придёт по выигранным сделкам реализации и когда (K2), что под угрозой (K3), выигрыши квартала (K4), пайплайн невыигранных по классу стадии (K5), сколько сделок в цифрах (K6); своя часть по положению (K7) — в закрытой части.',src:'Сделки воронки реализации и их заказы поставщикам (СП-172) — вкладка «Реализация»; открытые сделки остальных воронок и «Пресейл» — состав коммерсантов; очередь КАМа. Деньги — только у сделок, «Сумма» которых сверена файлом «Экономика проекта» (решение владельца 25.10.2026).',filt:'Получено — стадия «Оплата получена | Закрытие сделки»: дата — день сборки минус дни в стадии; подтверждено платёжкой — платёжка клиента во всех непроигранных заказах. К получению — открытые выигранные сделки по дате ожидаемой оплаты: плановый срок оплаты заказа → доставка (факт или прогноз) + отсрочка оплаты из сделки → доставка + 30 дн. → без даты; медианами дата не достраивается. Тихие потери — больше 120 дн. без смены стадии и без людей в чате, вне пайплайна.',formula:'R — результат по нормативу положения ред. 2: продажа − ПЗ − 5 % продажи − 2 % оплаты поставщику − поправка × продажа; ПЗ — закупка из файла или заказов × 1,10, иначе прямые затраты книги бюджета. Поправка — из калибровки премий, только если она по 30 сделкам и больше. Сумма в плитке — только если сверенных файлом сделок блока не меньше 70 %, иначе «в цифрах n из N».',note:'Человеку сделка засчитывается целиком по каждой его роли (КАМ, продукт-оунер), роли подписаны; итог компании — по сделкам, суммы разных ролей не складываются. Деньги видит только право «Деньги КАМов».'},
   'p.polines':{t:'Линии продукт-оунеров',what:'Сделки воронки «Пресейл» по категориям оборудования: сколько в работе и проиграно, где стоят и у кого мяч, кто продукт-оунер. Выигрыш здесь не виден: выигранная сделка уходит в сделку реализации, в которую категория пока не переносится.',src:'Сделки воронки «Пресейл»: поле «Категория оборудования» (список, можно несколько значений), поле «Product leader», стадия, чат сделки.',formula:'Сделка с несколькими категориями входит в каждую линию. «Стоят» — простой по стадии дольше 14 дн., подтверждённый тишиной в чате сделки. «Мяч у КАМа» и «у сорсинга» — по стадии (таблица presale.BALL_RULES). «Без PO» — открытые сделки линии без поля «Product leader».',note:'Замер 19.10.2026 (зонд v55): категория заполнена у 96 % открытых сделок «Пресейла» и у 2 % открытой реализации; в справочнике есть дубли («Насосы» и «Насосное оборудование», «КИП и датчики» и «КИПиА» и др.) — их сводит администратор Битрикса, после этого линии станут точнее.'},
   'p.kamq':{t:'Что делать сегодня — КАМ',what:'Очередь КАМа: у каждого пункта КАМ, сделка, сколько дней и что сделать. Сверху — самое срочное: сорванный срок клиента, риск срока, прогноз позже срока, мяч у КАМа сверх порога, план доставки позже срока, неоплата, УПД; внизу — сделки без КАМа.',src:'Пресейл — сделки воронки «Пресейл» (стадия, дней в стадии, поле «КАМ», чат сделки). Реализация — очередь пульта реализации (заказы поставщикам СП-172 и сделки воронки реализации); сумма сделки — из «Реализации».',filt:'КАМ — только поле сделки «КАМ»: ответственный сделки — исполнитель, а не КАМ. Пункты реализации без КАМа не дублируются: такая сделка — один пункт «без КАМа» на руководителя КАМ, и её сигналы (срок сорван, неоплата, УПД, мяч у КАМа сверх порога) — строками в этом пункте; место в очереди и «Дней» — по самому важному из них. Пункт ставится и закрытой сделке реализации без КАМа, если у неё есть такой сигнал (например, нет УПД). Сделка пресейла, у которой в чате за неделю писал человек, в очередь не идёт (золотое правило чата, 19.10.2026): чат читается у каждой сделки с мячом у КАМа сверх порога; не прочитан (нет доступа, кончился бюджет чтения) — пункт остаётся с пометкой «чат не проверен».',formula:'Мяч у КАМа — по стадии (таблица presale.BALL_RULES); порог дней в стадии: «Экономика готова | Можно подавать» 3, техническая часть и квалификация 7, тендер и переторжка 7, «Ожидаем решение заказчика» 14, согласование спецификации и прочие 7 — утверждены владельцем 19.10.2026. Срок сорван, риск, прогноз, план после срока, неоплата, УПД — по правилам пульта реализации; пункты одной сделки одного вида сведены в один (дней — наибольшее). Неоплата по давности: 1–30, 31–90, 90+ дн. «Срок клиента ≤ 14 дн.» — живые недоставленные заказы со сроком клиента от сегодня до 14 дней.',note:'Перенос срока — только письменно и с внесением новой даты в заказ: иначе сделка остаётся просроченной. Дату оплаты КАМ получает у клиента, ведёт оплату ответственный заказа.'},
   'p.promise':{t:'Обещания клиенту',what:'Сколько живых заказов поставщикам имеют срок клиенту и сколько из них сорвано.',src:'Смарт-процесс «Заказы поставщикам» (СП-172), поле «Date of deadline to deliver to customer» + стадия заказа.',formula:'Живой заказ — не проигран и не исполнен. «Со сроком» — дата заполнена; «сорван» — дата прошла, заказ ещё в работе. Медиана и максимум считаются только по сорванным.',note:'Заказ без срока — не «в порядке», а неизмеримый: просрочка сделки считается ИЗ заказа, и при пустом сроке сделка выглядит благополучной, хотя обещание по ней просто не записано. Поэтому «без срока» стоит рядом с «сорвано», а не прячется в знаменателе.'},
@@ -1396,7 +1409,7 @@ const METH={
   'p.head':{t:'Руководитель роли и состояние участка',what:'Кто отвечает за роль и как участок выглядит против норм.',src:'department.get: поле «Руководитель» (UF_HEAD) отделов, где работают люди роли, и подъём по дереву отделов до вышестоящего.',formula:'Руководитель ищется каскадом: общий руководитель отделов роли → руководитель вышестоящего отдела → должность вида «Head of…/Директор/Руководитель» в том же отделе. «Подтверждён» — только когда у ВСЕХ отделов роли заполнен руководитель и найденный сам не входит в роль; иначе это прокси, и отделы с пустым полем названы поимённо.',note:'Замер 17.09.2026: в портале руководителя роли нет ни у КАМов, ни у продукт-оунеров — каждый «Head of …» возглавляет свою группу, а у зонтичного отдела продуктовых направлений поле пустое. Нормы в таблице предложены мной и не утверждены владельцем.'},
   'p.load':{t:'Загрузка по людям',what:'Кто сколько ведёт: сделки, деньги, просрочка, косяки — по каждому человеку роли.',src:'Поле сделки «КАМ» (UF_CRM_1740390857) или «Product leader» (UF_CRM_1779187425); где пусто — ответственный за сделку, если он сам этой роли.',formula:'«Доля» = (проработка + реализация) этого человека ÷ сумма по роли. «Косяки» = сделки хотя бы с одним признаком из раздела 4.',note:'Ответственный (ASSIGNED_BY_ID) — исполнитель, а не КАМ: из 1 812 сделок с заполненным полем «КАМ» он отличается от КАМа у 1 601. Поэтому нагрузка коммерсанта считается по полю роли, а не по владельцу карточки.'},
   'p.funnel':{t:'Где стоят сделки',what:'Разрез портфеля роли по воронкам и стадиям Bitrix.',src:'CATEGORY_ID и STAGE_ID открытых сделок + справочник стадий (crm.status.list).',formula:'Число сделок и Σ продаж по каждой воронке; стадии — топ-20 по числу сделок.'},
-  'p.result':{t:'Результат года и ожидание',what:'Что роль сделала с 01.01 и сколько денег ждать дальше.',src:'crm.deal.list по дате создания с 01.01.2026 (STAGE_SEMANTIC_ID: S — выиграна, F — проиграна).',formula:'win-rate = выиграно ÷ (выиграно + проиграно). «Законтрактовано» = Σ открытых сделок в реализации (факт). «Взвешенный пайплайн» = Σ проработки × win-rate роли (оценка).',note:'Складывать эти два числа нельзя: первое — факт по сделкам, которые уже в реализации, второе — вероятностная оценка. В заголовок отчёта идёт только факт.'},
+  'p.result':{t:'Результат года и ожидание',what:'Что роль сделала с 01.01 и сколько денег ждать дальше.',src:'crm.deal.list по дате создания с 01.01.2026 (STAGE_SEMANTIC_ID: S — выиграна, F — проиграна).',formula:'win-rate = выиграно ÷ (выиграно + проиграно). «Законтрактовано» = Σ открытых сделок в реализации по «Сумме» Битрикса.',note:'«Взвешенный пайплайн» (проработка × win-rate роли) снят 25.10.2026: процент по штукам умножался на деньги, одна ставка на все стадии. Доход по срокам и пайплайн невыигранных по классу стадии — подменю «Доход».'},
   'p.fix':{t:'Кому что исправить',what:'Тот же список косяков, но разложенный по людям: не «в роли 1 400 плохих карточек», а «у этого человека 96, и вот они».',src:'Открытые сделки роли (атрибуция полем карточки, затем владельцем) + поля OPPORTUNITY, COMPANY_ID, CLOSEDATE, MOVED_TIME и дедлайн клиенту на заказе СП-172.',formula:'Карточка попадает в столбец, если у неё нет суммы, нет клиента, плановая дата не в будущем, стадия не менялась дольше 180 дней или сорван срок клиенту. Один и тот же документ может стоять в нескольких столбцах; «всего» считает карточки, а не отметки.',note:'Строка — это поручение, а не оценка человека: три четверти попаданий сюда чинятся заполнением полей за минуту. Люди без единой проблемной карточки в таблицу не выводятся.'},
   'p.flaws':{t:'Косяки и риски',what:'Что мешает верить портфелю роли и где рвётся обязательство перед клиентом.',src:'Дедлайн клиенту на заказе СП-172 (Date of deadline to customer), MOVED_TIME сделки, суммы и привязка компании.',formula:'Просрочка = дата обещания клиенту прошла, заказ не закрыт. Застой = стадия не менялась дольше 90 дней, брошено — дольше 180. Плюс сделки без суммы, без клиента, с продажей ниже закупки и карточки-выбросы: сумма ≥ 50 медиан открытой сделки (порог берётся от самих данных, а не назначается).',note:'Поле CLOSEDATE под просрочку не годится: оно заполнено у всех 2 695 открытых сделок, у 2 624 — прошедшей датой, а будущая дата лишь у 71 (2,6 %). Это автопростановка, а не план. Выбросы по сумме важны отдельно: базовая валюта портала — EUR и пересчёт верен, но медианная открытая сделка около €100 тыс., а десяток карточек несёт сотни миллионов — пока их не проверили, итог пайплайна не факт.'},
   'p.cover':{t:'Покрытие ролью и бесхозные сделки',what:'Сколько портфеля закреплено за людьми, сколько ни за кем и сколько висит на уволенных.',src:'Поля роли на карточке + user.get (ACTIVE).',formula:'«Закреплено» = сделки с определённым человеком роли. «Ни за кем» = ни КАМа, ни продукт-оунера при действующем ответственном. «На уволенных» = открытые сделки, чей ответственный отключён в Bitrix.',note:'Роли пересекаются, поэтому сходится не сумма (КАМ + продукт-оунер ≠ всего), а покрытие: закреплено / ни за кем / на уволенных.'},
@@ -1547,20 +1560,197 @@ function renderCohorts(C){
     else if(mn){ const mk=mn.dataset.m; openDeals(D.filter(d=>d.mon===mk),'Когорта по месяцу','Создано в месяце'); }
   });
 }
+// ---- «Доход» вкладки «Key-аккаунты и продукты» (kaminc.py, решения владельца 25.10.2026):
+// где формируется доход ключевых клиентов и продуктов и когда он придёт. Открытая часть
+// (__KAMINC_HEAD__) — счёт, даты, стадии, действия; деньги (__KAMINC__) воркер оставляет
+// только праву «Деньги КАМов». Без права там пустышка-заглушка: она истинна, поэтому
+// проверяется форма массива, а не наличие.
+function _incMoney(){const M=window.__KAMINC__; return (M&&M.tot&&typeof M.tot==='object'&&M.cuts&&typeof M.cuts==='object'&&!Array.isArray(M.cuts)&&M.deals&&typeof M.deals==='object'&&!Array.isArray(M.deals))?M:null;}
+function _incHead(){const H=window.__KAMINC_HEAD__; return (H&&H.tot&&typeof H.tot==='object'&&H.cuts&&typeof H.cuts==='object'&&Array.isArray(H.cuts.kam))?H:null;}
+const _INC_B={paidQ:'получено в квартале',paidOld:'оплачено раньше, сделка не закрыта',paidNoDate:'оплачено, дата не известна',due:'к получению',closed:'закрыта',pipe:'пайплайн',quiet:'тихая потеря'};
+const _INC_DB={overdue:'срок оплаты прошёл',q0:'этот квартал',q1:'следующий квартал',later:'позже',none:'без даты'};
+const _INC_CUT=[['kam','КАМ'],['po','Продукт-оунер'],['hold','Холдинг'],['line','Линия']];
+function renderIncome(host){
+  const el=typeof host==='string'?document.getElementById(host):host; if(!el) return;
+  el.innerHTML='<section class="card"><div class="note">Загружаю…</div></section>';
+  const H=_incHead();
+  if(!H){ el.innerHTML='<section class="card"><div class="secttl">Нет данных</div><div class="note">Доход в этой сборке не посчитан. Он собирается из вкладки «Реализация» (сделки воронки реализации и их заказы поставщикам), открытых сделок коммерсантов, «Пресейла» и очереди КАМа — если «Реализация» не собралась, «Дохода» нет.</div></section>'; return; }
+  try{ _incDraw(el,H,_incMoney()); }
+  catch(err){ console.error('Доход:',err); el.innerHTML='<section class="card"><div class="secttl">Не удалось загрузить</div><div class="note">Данные «Дохода» неполные или повреждены — остальные разделы вкладки работают. Причина: '+_esc(String(err&&err.message||err))+'</div></section>'; }
+}
+function _incDraw(el,H,M){
+  const T=H.tot, TR=H.trust||{}, RU=H.rules||{}, LB=H.labels||{}, NM=H.names||{}, D=_unpack(H.deals);
+  const COV=(RU.cover||70)/100, MOK=!!(H.money&&H.money.ok);
+  const byId=Object.fromEntries(D.map(d=>[d.id,d]));
+  const pct=(a,b)=>b?Math.round(a/b*100):0;
+  // сумма — только при доле сделок с деньгами не ниже порога (K6); иначе «в цифрах n из N»
+  const money=(v,k,n)=>{
+    if(!n) return '<span class="dimv">—</span>';
+    if(!M) return MOK?'<span class="dimv">сумма — по праву «Деньги КАМов»</span>':'<span class="dimv">деньги не опубликованы: сверка не сошлась</span>';
+    if(k/n<COV) return `<span class="dimv">в цифрах ${k} из ${n}</span>`;
+    return _fmtE(v)+(k<n?` <span class="dimv">по ${k} из ${n}</span>`:'');
+  };
+  const nm=(cut,k)=>{const r=(H.cuts[cut]||[]).find(x=>x.key===k); return r?r.name:(NM[k]?NM[k][0]:k);};
+  const MC=M?M.cuts:{}, MT=M?M.tot:{};
+  const q=H.quarter||{}, qn=H.next||{};
+  const tile=(lbl,val,meta,clz,k)=>`<div class="kpi ${clz||''}${k?' drill':''}"${k?` data-ib="${k}" tabindex="0" role="button"`:''}><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
+  const pc=T.pipeC||{}, SC=LB.stage||{};
+  const reasons=Object.entries(TR.reasons||{}).filter(([k])=>k!=='ok').map(([k,v])=>`${_esc((LB.why||{})[k]||k)} — ${v}`).join(' · ');
+  let h=`<div class="secttl"><b>·</b> Доход: где формируется и когда придёт${qmark('i.income')}</div>`
+   +`<div class="ctsepnote">В цифрах <b>${TR.nA||0} из ${TR.n||0}</b> выигранных сделок (${TR.pct==null?'—':TR.pct+' %'}): деньги — только у сделок, «Сумма» которых сверена файлом экономики. ${reasons?'Без денег: '+reasons+'. ':''}Курс Битрикса на ${_esc(TR.fxAsOf||'—')} · сборка ${_esc(H.asOf)} · поправка результата ${TR.calibOk?'по '+TR.calibN+' сделкам':'<b>не откалибрована</b> (меньше '+(RU.calibMin||30)+' сделок) — результата нет'}.${H.money&&!H.money.ok?' <b>Сверка денег не сошлась</b> ('+_esc((H.money.fail||[]).join('; '))+') — деньги этой сборки не опубликованы.':''} План по людям: <b>не задан</b> — вводит владелец в «Доступах» (этап 2).</div>`;
+  if(!M) h+=`<div class="dimv" style="font-size:12.5px;margin:0 0 8px">${MOK?'Суммы и результат — по праву «Деньги КАМов»: здесь — число сделок.':'Деньги этой сборки не опубликованы: сверка не сошлась. Здесь — число сделок.'}</div>`;
+  h+=`<div class="kpis inckpis">`
+   +tile('K1 · Получено',M?money(MT.k1R,T.k1R,T.k1):String(T.k1),`${_esc(q.label||'')}: оплачено ${T.k1} сделок, платёжкой подтверждено ${T.k1po} из ${T.k1}${T.k1old?` · оплачено раньше, сделка не закрыта — ${T.k1old}`:''}`,'ok','paidQ')
+   +tile('K2 · К получению',M?money(MT.dueR,T.dueR,T.due):String(T.due),`${T.due} выигранных: ${_esc(q.label||'')} — ${(T.dueB||{}).q0||0}, ${_esc(qn.label||'')} — ${(T.dueB||{}).q1||0}, позже — ${(T.dueB||{}).later||0}, без даты — ${(T.dueB||{}).none||0}${(T.dueB||{}).overdue?`, срок оплаты прошёл — ${T.dueB.overdue}`:''}`,'','due')
+   +tile('K3 · Под угрозой',`${T.k3c} · ${T.k3r}`,`задержано клиентом (не оплачено, нет УПД) · срок под риском — не складываются${M?`<br>${money(MT.k3cR,T.k3cR,T.k3c)} · ${money(MT.k3rR,T.k3rR,T.k3r)}`:''}`,(T.k3c||T.k3r)?'warn':'ok','risk')
+   +tile('K4 · Выигрыши квартала',String(T.k4),`с датой выигрыша в ${_esc(q.label||'')}${M?` · продажа ${money(MT.k4S,T.k4A,T.k4)}`:''}`,'','won')
+   +tile('K5 · Пайплайн невыигранных',String(T.pipe),`${(LB.stage?Object.keys(SC):[]).map(k=>`${_esc(SC[k])} ${pc[k]||0}`).join(' · ')} · тихие потери — ${T.quiet} (вне пайплайна) · сумм нет: сделки пайплайна файлом не сверены`,'','pipe')
+   +tile('K6 · В цифрах',TR.pct==null?'—':TR.pct+' %',`сверено файлом ${TR.nA||0} из ${TR.n||0}; результат есть у ${TR.nR||0}; сумма в плитке — от ${RU.cover||70} % сделок блока`,TR.pct!=null&&TR.pct>=(RU.cover||70)?'ok':'amber','')
+   +`</div>`;
+  // лестница по месяцам: 3 назад (получено), 12 вперёд (к получению)
+  const LD=H.ladder||[], ML=M?Object.fromEntries((M.ladder||[]).map(x=>[x.m,x])):{};
+  const lm=k=>({later:'позже',overdue:'срок прошёл',none:'без даты'}[k]||k);
+  h+=`<div class="secttl"><b>·</b> По месяцам: получено и к получению</div><section class="card"><div class="note">Получено — по месяцу входа в стадию «Оплата получена» (3 месяца назад); к получению — по месяцу ожидаемой оплаты. «Без даты» — у сделки нет ни планового срока оплаты, ни доставки, ни прогноза доставки: дата не достраивается.</div>`
+   +`<div class="twrap"><table class="lft incladder"><thead><tr><th>месяц</th>${LD.map(x=>`<th class="r">${_esc(lm(x.m))}</th>`).join('')}</tr></thead><tbody>`
+   +`<tr><td>получено, сделок</td>${LD.map(x=>`<td class="r mono">${x.paid||''}</td>`).join('')}</tr>`
+   +`<tr><td>к получению, сделок</td>${LD.map(x=>`<td class="r mono${x.m==='overdue'&&x.due?' hot':''}">${x.due||''}</td>`).join('')}</tr>`
+   +(M?`<tr><td>результат</td>${LD.map(x=>{const m=ML[x.m]||{},n=(x.paid||0)+(x.due||0),k=(m.paidN||0)+(m.dueN||0);return `<td class="r mono">${n?(k/n>=COV?_fmtE((m.paidR||0)+(m.dueR||0)):`<span class="dimv">${k}/${n}</span>`):''}</td>`;}).join('')}</tr>`:'')
+   +`</tbody></table></div></section>`;
+  // где формируется доход
+  h+=`<div class="secttl"><b>·</b> Где формируется доход</div><section class="card">`
+   +`<div class="subnav inccut" role="group" aria-label="Разрез">${_INC_CUT.map(([k,l])=>`<button type="button" class="snb" data-ic="${k}" aria-pressed="false">${l}</button>`).join('')}</div>`
+   +`<div class="note" id="incCutNote"></div><div class="twrap"><table class="lft inccut"><thead id="incCutHead"></thead><tbody id="incCutBody"></tbody></table></div></section>`;
+  // что открыть или сдвинуть
+  const AK=Object.keys(H.actions||{});
+  const aopt=AK.map(k=>[k,k?(NM[k]?NM[k][0]+(NM[k][1]?'':' (уволен)'):k):'без человека: руководителю']).sort((a,b)=>(a[0]===''?1:0)-(b[0]===''?1:0)||a[1].localeCompare(b[1],'ru'));
+  h+=`<div class="secttl"><b>·</b> Что открыть или сдвинуть</div><section class="card"><div class="note">До ${RU.actionsMax||15} пунктов на человека: очередь КАМа и пробелы денег — сверить «Сумму» с файлом, завести заказ или его сумму, внести плановый срок оплаты, назначить КАМа, проставить категорию и Product leader. Сначала — сделки с известным результатом${M?' («на кону» — результат сделки)':''}, пункты без числа — последними.</div>`
+   +`<label class="dimv" for="incWho" style="font-size:11px;margin-right:6px">Кто</label><select id="incWho" class="search" style="min-width:220px;max-width:100%">${aopt.map(([k,l])=>`<option value="${_esc(k||'~')}">${_esc(l)} — ${(H.actions[k]||{}).n||0}</option>`).join('')}</select>`
+   +`<div id="incK7"></div><div class="twrap"><table class="lft"><thead><tr><th>Что случилось</th><th>Сделка</th><th class="r">Дней</th>${M?'<th class="r">На кону</th>':''}<th>Что сделать</th></tr></thead><tbody id="incActs"></tbody></table></div></section>`;
+  h+=`<div class="secttl"><b>·</b> Сделки <span id="incDealsN" class="dimv" style="font-weight:400"></span></div><section class="card"><div class="note" id="incDealsNote"></div><div class="twrap"><table class="lft incdeals"><thead><tr><th>Сделка</th><th>Холдинг · линия</th><th>КАМ · продукт-оунер</th><th>Где</th><th>Оплата</th><th>Класс</th>${M?'<th class="r">Продажа</th><th class="r">Результат</th>':''}</tr></thead><tbody id="incDeals"></tbody></table></div><div id="incMore"></div></section>`;
+  el.innerHTML=h;
+
+  let cut='kam', row=null, bf='', all=false;
+  const url=id=>`https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(id)}/`;
+  // № реализации — только если его нет в начале названия («964. Поставка…»)
+  const seqTag=x=>x.seq&&String(x.t||'').indexOf(x.seq+'.')!==0?`<b class="mono">№${x.seq}</b> `:'';
+  const keyOf=(d,c)=>c==='kam'?d.kam:c==='po'?d.po:c==='hold'?d.h:d.ln;
+  const drawCut=()=>{
+    el.querySelectorAll('[data-ic]').forEach(b=>{const on=b.dataset.ic===cut; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');});
+    const R=H.cuts[cut]||[], MR=MC[cut]||{};
+    el.querySelector('#incCutNote').innerHTML=`Каждая сделка — ровно в одной строке разреза, поэтому строки складываются в итог; отдельные строки — «${cut==='kam'?'КАМ не указан':cut==='po'?'Product leader не указан':cut==='line'?'линия не указана':'без клиента'}»${cut==='kam'||cut==='po'?' и «не закреплено (уволен)»':''}${cut==='hold'?' и «прочие клиенты» (вне первых 15)':''}. ${cut==='kam'?'КАМ — поле «КАМ», иначе ответственный, если по должности он КАМ (прокси).':cut==='po'?'Продукт-оунер — поле «Product leader».':cut==='line'?'Линия — «Категория оборудования» сделки; у сделок реализации она почти пуста — проставить её — пункт продукт-оунеру.':'Холдинг — по названию клиента (шаблоны направлений КАМ).'} Клик по строке — её сделки и пункты.`;
+    el.querySelector('#incCutHead').innerHTML=`<tr><th>${_esc((_INC_CUT.find(x=>x[0]===cut)||[])[1]||'')}</th><th class="r">Получено</th><th class="r">К получению: ${_esc(q.label||'')} / ${_esc(qn.label||'')} / позже / без даты</th><th class="r">Под угрозой: клиент · срок</th><th class="r">Выигрыши</th><th class="r">Пайплайн</th><th class="r">Тихие</th><th class="r">В цифрах</th></tr>`;
+    const cell=(n,v,k,extra)=>`${n||'<span class="dimv">0</span>'}${M&&n?`<div class="dep">${money(v,k,n)}</div>`:''}${extra||''}`;
+    el.querySelector('#incCutBody').innerHTML=R.map(x=>{const m=MR[x.key]||{},B=x.dueB||{};
+      return `<tr class="drill${row===x.key?' on':''}" data-ik="${_esc(x.key)}" tabindex="0"><td>${_esc(x.name)}${x.gone?' <span class="gone">уволен</span>':''}</td>`
+        +`<td class="r mono">${cell(x.k1,m.k1R,x.k1R,x.k1old?`<div class="dep">раньше ${x.k1old}</div>`:'')}</td>`
+        +`<td class="r mono">${x.due?`${(B.q0||0)+(B.overdue||0)} / ${B.q1||0} / ${B.later||0} / ${B.none||0}`:'<span class="dimv">0</span>'}${M&&x.due?`<div class="dep">${money(m.dueR,x.dueR,x.due)}</div>`:''}</td>`
+        +`<td class="r mono${x.k3c||x.k3r?' hot':''}">${x.k3c||x.k3r?`${x.k3c} · ${x.k3r}`:''}</td><td class="r mono">${x.k4||''}</td>`
+        +`<td class="r mono">${x.pipe||''}</td><td class="r mono">${x.quiet||''}</td><td class="r mono">${x.n?`${x.nA} из ${x.n}`:''}</td></tr>`;}).join('')
+      ||'<tr><td colspan="8" class="dimv" style="padding:14px">Нет данных: ни одной сделки в разрезе</td></tr>';
+  };
+  const drawActs=()=>{
+    const sel=el.querySelector('#incWho'); if(!sel) return;
+    const k=sel.value==='~'?'':sel.value, A=(H.actions||{})[k]||{items:[],n:0};
+    const K7=M&&M.k7&&M.k7[k];
+    el.querySelector('#incK7').innerHTML=M?(K7?`<div class="note" style="margin-top:8px">K7 · своя часть по положению при К = ${String(M.k||RU.k).replace('.',',')}: получено в квартале <b>${_fmtE(K7.paidQ)}</b>, к получению <b>${_fmtE(K7.due)}</b> (из них в этом квартале ${_fmtE(K7.dueQ0)}) — по ${K7.n} сделкам с результатом; роли: ${K7.roles.map(r=>({kam:'КАМ',po:'продукт-оунер',ex:'исполнитель'}[r]||r)).join(', ')}. Видно только праву «Деньги КАМов».</div>`:'<div class="note" style="margin-top:8px">K7 · своя часть по положению: у человека нет сделок с известным результатом.</div>'):'';
+    el.querySelector('#incActs').innerHTML=A.items.map(x=>{const d=byId[x.deal]||{},md=M&&M.deals[x.deal];
+      return `<tr><td>${_esc(x.what)}${x.who?`<div class="dep">ведёт: ${_esc(x.who)}</div>`:''}</td><td><a href="${url(x.deal)}" target="_blank" rel="noopener">${seqTag(x)}${_esc(x.t||('Сделка #'+x.deal))}</a>${d.h?`<div class="dep">${_esc(d.h)}</div>`:''}</td><td class="r mono">${x.days!=null?x.days:''}</td>${M?`<td class="r mono">${md&&md.r!=null?_fmtE(md.r):''}</td>`:''}<td>${_esc(x.act)}</td></tr>`;}).join('')
+      ||`<tr><td colspan="${M?5:4}" class="dimv" style="padding:14px">Нет данных: пунктов у человека нет</td></tr>`;
+    if(A.n>A.items.length) el.querySelector('#incActs').insertAdjacentHTML('beforeend',`<tr><td colspan="${M?5:4}" class="dimv">ещё ${A.n-A.items.length} — после этих</td></tr>`);
+  };
+  const drawDeals=()=>{
+    let r=D.filter(d=>d.b!=='closed'||d.wq);
+    if(row!==null) r=r.filter(d=>keyOf(d,cut)===row);
+    if(bf==='paidQ') r=r.filter(d=>d.b==='paidQ'); else if(bf==='due') r=r.filter(d=>d.b==='due');
+    else if(bf==='risk') r=r.filter(d=>(d.risk||[]).length); else if(bf==='won') r=r.filter(d=>d.wq);
+    else if(bf==='pipe') r=r.filter(d=>d.b==='pipe');
+    const ord={paidQ:0,due:1,paidOld:2,paidNoDate:3,closed:4,pipe:5,quiet:6};
+    r=r.slice().sort((a,b)=>(ord[a.b]-ord[b.b])||((a.cls==='A'?0:1)-(b.cls==='A'?0:1))||String(a.eta||'').localeCompare(String(b.eta||'')));
+    el.querySelector('#incDealsN').textContent=`(${r.length})`;
+    el.querySelector('#incDealsNote').innerHTML=(row!==null?`Строка «${_esc(nm(cut,row))}». `:'Все строки. ')+(bf?`Отбор: ${_esc({paidQ:'получено в квартале',due:'к получению',risk:'под угрозой',won:'выигрыши квартала',pipe:'пайплайн'}[bf])}. `:'')+'Клик по плитке K1–K5 — отбор, по строке разреза — её сделки; повторный клик снимает.';
+    const shown=all?r:r.slice(0,100);
+    el.querySelector('#incDeals').innerHTML=shown.map(d=>{const md=M&&M.deals[d.id];
+      const where=d.k==='r'?`${_esc(_INC_B[d.b]||d.b)}${d.st?`<div class="dep">${_esc(d.st)}${d.sd!=null?` · ${d.sd} дн.`:''}</div>`:''}${(d.risk||[]).length?`<div class="dep nrc">${d.risk.map(c=>_esc((LB.risk||{})[c]||c)).join('; ')}</div>`:''}`
+        :`${_esc(_INC_B[d.b]||d.b)} · ${_esc((SC||{})[d.cs]||'')}<div class="dep">${_esc(d.f||'')}${d.st?' · '+_esc(d.st):''}${d.sd!=null?` · ${d.sd} дн.`:''}</div>`;
+      const pay=d.b==='due'?`${d.eta?_esc(d.eta):'<span class="dimv">без даты</span>'}<div class="dep">${_esc((LB.paySrc||{})[d.es]||d.es||'')}</div>`
+        :d.paid?`оплачено ${_esc(d.paid)}<div class="dep">${d.po1?'платёжкой подтверждено':'не подтверждено платёжкой'}</div>`:(d.won?`выиграна ${_esc(d.won)}`:'');
+      const role=x=>x==='-'?'не закреплено':x?((NM[x]||[x])[0]):'';
+      return `<tr><td><a href="${url(d.id)}" target="_blank" rel="noopener">${seqTag(d)}${_esc(d.t||('Сделка #'+d.id))}</a></td>`
+        +`<td>${_esc(d.h)}<div class="dep">${_esc(d.ln)}</div></td>`
+        +`<td>${_esc(role(d.kam)||'КАМ не указан')}${d.kamS==='прокси'?' <span class="dimv">прокси</span>':''}<div class="dep">${_esc(role(d.po)||'Product leader не указан')}</div></td>`
+        +`<td>${where}</td><td>${pay}</td>`
+        +`<td>${d.cls==='A'?'<b>A</b> · сверено файлом':`<span class="dimv">C · ${_esc((LB.why||{})[d.why]||d.why||'')}</span>`}${d.cls==='A'&&!d.rk?`<div class="dep">${_esc((LB.why||{})[d.why]||'')}</div>`:''}</td>`
+        +(M?`<td class="r mono">${md?_fmtE(md.s):''}</td><td class="r mono">${md&&md.r!=null?_fmtE(md.r):''}</td>`:'')+`</tr>`;}).join('')
+      ||`<tr><td colspan="${M?8:6}" class="dimv" style="padding:14px">Нет данных: по этому отбору сделок нет</td></tr>`;
+    el.querySelector('#incMore').innerHTML=(!all&&r.length>100)?`<span class="stchip" data-iall="1" tabindex="0" role="button" style="margin-top:8px;display:inline-block">Показать все ${r.length}</span>`:'';
+  };
+  drawCut(); drawActs(); drawDeals();
+  const onKey=(e,f)=>{if(e.key!=='Enter'&&e.key!==' ')return; e.preventDefault(); f();};
+  el.querySelectorAll('[data-ic]').forEach(b=>b.addEventListener('click',()=>{cut=b.dataset.ic; row=null; all=false; drawCut(); drawDeals();}));
+  const body=el.querySelector('#incCutBody');
+  const pickRow=tr=>{const k=tr.dataset.ik; row=row===k?null:k; all=false; drawCut(); drawDeals();
+    if(row!==null&&(cut==='kam'||cut==='po')){const s=el.querySelector('#incWho'), v=row||'~'; if([...s.options].some(o=>o.value===v)){s.value=v; drawActs();}}};
+  body.addEventListener('click',e=>{const tr=e.target.closest('tr[data-ik]'); if(tr) pickRow(tr);});
+  body.addEventListener('keydown',e=>{const tr=e.target.closest('tr[data-ik]'); if(tr) onKey(e,()=>pickRow(tr));});
+  el.querySelectorAll('[data-ib]').forEach(t=>{const f=()=>{bf=bf===t.dataset.ib?'':t.dataset.ib; all=false; drawDeals();};
+    t.addEventListener('click',e=>{if(e.target.closest('.qq'))return; f();}); t.addEventListener('keydown',e=>onKey(e,f));});
+  el.querySelector('#incWho').addEventListener('change',drawActs);
+  const more=el.querySelector('#incMore');
+  more.addEventListener('click',e=>{if(e.target.closest('[data-iall]')){all=true; drawDeals();}});
+  more.addEventListener('keydown',e=>{if(e.target.closest('[data-iall]'))onKey(e,()=>{all=true; drawDeals();});});
+}
+// «Как считается» — правила «Дохода» словами, из того же расчёта (kaminc.py)
+function incomeHow(){
+  const H=_incHead(), RU=(H&&H.rules)||{}, LB=(H&&H.labels)||{};
+  const li=a=>'<ul class="inchow">'+a.map(x=>`<li>${x}</li>`).join('')+'</ul>';
+  return `<div class="secttl"><b>·</b> Как считается «Доход»</div><section class="card"><div class="note">Решения владельца 25.10.2026. Числа и правила — те же, что в расчёте (kaminc.py); пороги — таблицей в коде.</div>`
+   +`<h2>Единицы</h2>`+li([
+     'Деньги — только у сделок, «Сумма» которых сверена файлом «Экономика проекта» (класс A). Остальные (класс C) — число, причина, хозяин и действие, без евро.',
+     `Сумма в плитке — только если сверенных сделок блока не меньше ${RU.cover||70} %, иначе «в цифрах n из N». По сделке класса A значение видно всегда — праву «Деньги КАМов».`,
+     'R — результат по нормативу положения ред. 2 (не прибыль): продажа − ПЗ − 5 % продажи − 2 % оплаты поставщику − поправка × продажа. ПЗ — закупка из файла или заказов поставщикам × 1,10, иначе прямые затраты книги бюджета. Поправка — из калибровки премий, только если калибровка по '+(RU.calibMin||30)+' сделкам и больше.',
+     `K7 — своя часть по положению: доля пула (исполнитель 7/20, ЛПР 13/20; КАМ и продукт-оунер — 80/20) × ${Math.round((RU.rate||0.2)*100)} % R × К (${String(RU.k||0.6).replace('.',',')} до публикации К финдиректором); ниже ×${String(RU.priceMin||1.17).replace('.',',')} к ПЗ — 0. Пока серверного фильтра «только своё» нет (этап 2), K7 видит только право «Деньги КАМов».`])
+   +`<h2>KPI</h2>`+li([
+     'K1 «Получено» — сделки в стадии «Оплата получена | Закрытие сделки», вошедшие в неё в этом квартале: дата — день сборки минус дни в стадии. Подтверждено платёжкой — платёжка клиента во всех непроигранных заказах сделки, иначе «не подтверждено платёжкой». Оплаченные раньше, но не закрытые — отдельной строкой, ни в K1, ни в K2.',
+     `K2 «К получению» — открытые выигранные сделки реализации по дате ожидаемой оплаты, по самому позднему живому неоплаченному заказу: плановый срок оплаты заказа → доставка (факт или прогноз) + отсрочка оплаты из сделки → доставка + ${RU.payGrace||30} дн. → «без даты». Медианами дата не достраивается.`,
+     'K3 «Под угрозой» — два вида, не складываются: задержано клиентом (доставлено, срок оплаты прошёл без платёжки; нет УПД) и срок под риском (срок клиента сорван, риск, прогноз позже срока, план доставки позже срока). Хозяин — ответственный заказа, КАМ — в копии.',
+     'K4 «Выигрыши квартала» — дата «ТКП согласован (конкурс выигран)», иначе первый вход в воронку реализации, иначе первый заказ; источник даты — в сделке.',
+     `K5 «Пайплайн невыигранных» — открытые сделки вне реализации по классу стадии: ${Object.values(LB.stage||{}).join(' · ')}. «Пресейл» — по таблицам мяча и порогов КАМа, прочие воронки — по именам стадий зонда конверсии. Тихие потери — больше ${RU.quietDays||120} дн. без смены стадии и без людей в чате: вне пайплайна. Вероятность по стадии — этап 2 (зонд истории стадий).`,
+     'K6 «В цифрах» — доля выигранных сделок со сверенной файлом «Суммой», в каждом блоке и у каждого человека.'])
+   +`<h2>Чья сделка</h2>`+li([
+     'Одно правило: КАМ — поле «КАМ» (запасное «KAM (старое)»), иначе ответственный, если по должности он КАМ (подпись «прокси»), иначе «КАМ не указан». Уволенный в поле — «не закреплено» и пункт «переназначить КАМа».',
+     'Продукт-оунер — поле «Product leader». Линия — «Категория оборудования» сделки, без прокси по отделу; нет — «линия не указана» и пункт продукт-оунеру «проставить категорию». У сделки с несколькими категориями — первая.',
+     'Человеку сделка засчитывается целиком по каждой его роли; итог компании — по сделкам, суммы разных ролей не складываются.'])
+   +`<h2>Проверка</h2>`+li(['Σ R по сделкам = Σ по людям через доли пула (вместе с «не закреплено») с точностью до €1; Σ строк каждого разреза = итог — по числу и по деньгам. Любое расхождение — деньги в этой сборке не публикуются.'])
+   +`<h2>Что сделать администратору Bitrix</h2>`+li([
+     'Робот при переводе сделки в воронку реализации копирует из «Пресейла» «Категорию оборудования» и «Product leader»; категория обязательна.',
+     'Плановый срок оплаты на заказе — обязателен на стадии доставки (решено 19.10.2026).',
+     '«Ожидаемая дата решения заказчика» — обязательна на стадиях КАМа; «Кто завёл сделку» — при создании (п. 6.4 положения).'])
+   +`<h2>Этап 2</h2>`+li(['План по людям — по результату за квартал, вводит владелец в «Доступах» (закрытое хранилище); сейчас «план не задан».','Личный вид: каждый видит только свою часть — серверный фильтр по связке «почта → сотрудник Битрикса».','Вероятность по классу стадии из истории стадий (зрелые когорты с 08.2025) — диапазоном под заголовком K5.','КАМ живых заказов как запасной источник КАМа сделки.'])
+   +`</section>`;
+}
 // ---- вкладка «Коммерсанты»: персональные дашборды + контрольные точки
 function renderReps(R){
   const el=document.getElementById('tab-reps'); if(!el) return;
-  if(!R||!R.reps||!R.reps.length){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по коммерсантам</div>'; return; }
-  const reps=R.reps; let sel='all';
+  const INC=!!_incHead();
+  if((!R||!R.reps||!R.reps.length)&&!INC){ el.innerHTML='<section class="card"><div class="secttl">Нет данных</div><div class="note">Нет ни дохода, ни данных по коммерсантам: они собираются из сделок Bitrix24 и состава портала — в этой сборке не собрались.</div></section>'; return; }
+  const reps=(R&&R.reps)||[];
   const byUid=u=>reps.find(r=>r.uid===u);
   // КАМы и продукт-оунеры — не отдельные вкладки: начальник у них один, и разрез
-  // должен читаться в одном месте. Роли живут здесь же, подменю.
+  // должен читаться в одном месте. Роли живут здесь же, подменю. «Доход» — первым
+  // (решение владельца 25.10.2026), «Как считается» — его правила словами.
   const PP=window.__PEOPLE__;
   const ROLES=(PP&&PP.roles)?[['role:kam','КАМы'],['role:prod','Продукт-оунеры']]:[];
-  const navHtml=()=>`<div class="subnav"><button class="snb${sel==='all'?' on':''}" data-r="all">Сводка</button>`
-    +ROLES.map(r=>`<button class="snb${sel===r[0]?' on':''}" data-r="${r[0]}">${r[1]}</button>`).join('')
-    +reps.map(r=>`<button class="snb${sel===r.uid?' on':''}" data-r="${r.uid}">${_esc(r.label)}</button>`).join('')+`</div>`;
+  const SUBS=[...(INC?[['income','Доход']]:[]),...(reps.length?[['all','Люди']]:[]),...ROLES,...(INC?[['how','Как считается']]:[]),
+    ...reps.map(r=>[r.uid,r.label])];
+  const okSub=k=>SUBS.some(x=>x[0]===k);
+  // адрес раздела: #reps/<раздел> (portal-ui §3) — на него можно вернуться
+  const fromHash=()=>{const m=/^#reps\/(.+)$/.exec(location.hash||''); const k=m?decodeURIComponent(m[1]):''; return okSub(k)?k:'';};
+  let sel=fromHash()||SUBS[0][0];
+  const tid=k=>'repsTab-'+String(k).replace(/[^\w-]/g,'_');
+  const navHtml=()=>`<div class="subnav" role="tablist" aria-label="Разделы вкладки" id="repsTabs">`
+    +SUBS.map(([k,l])=>`<button type="button" class="snb${sel===k?' on':''}" role="tab" id="${tid(k)}" data-r="${_esc(k)}" aria-selected="${sel===k?'true':'false'}" aria-controls="repsPanel" tabindex="${sel===k?0:-1}">${_esc(l)}</button>`).join('')+`</div>`;
   function overview(){
+    if(!reps.length) return '<section class="card"><div class="secttl">Нет данных</div><div class="note">Люди коммерческого блока не посчитаны: личные дашборды собираются из сделок этого года и состава портала.</div></section>';
     const sla=(R.slaMin||120), slaH=Math.round(sla/60*10)/10;
     const head=`<tr><th>Сотрудник</th><th class="r">создано</th><th class="r">в реализ.</th><th class="r">конв</th><th class="r">продажи</th><th class="r">win-rate</th><th class="r">реакция</th><th class="r">в срок</th><th class="r">закрыто</th><th class="r">🔴 висит</th><th class="r">посл.актив</th></tr>`;
     const rcol=rr=>{const m=rr.medMin; if(m==null)return '<td class="num r dimv">—</td>'; const c=m<=sla?'var(--ok)':(m<=sla*3?'var(--amber)':'var(--nr)'); return `<td class="num r" style="color:${c}">${_rt(m)}</td>`;};
@@ -1691,11 +1881,25 @@ function renderReps(R){
     return h;
   }
   function draw(){
-    let h=`<header><div class="eyebrow">Квант · коммерческий блок</div><h1>Коммерсанты: КАМы и продукт-оунеры</h1><div class="sub"><span>Портфель: <b>${R.window}</b></span>${PP?`<span>Состав Bitrix: <b>${(PP.staff||{}).active||0}</b> действующих, <b>${(PP.staff||{}).fired||0}</b> уволенных</span>`:''}<span class="dimv">Роль — разрез участка целиком, фамилия — личный дашборд.</span></div></header>`;
+    let h=`<header><div class="eyebrow">Квант · коммерческий блок</div><h1>Key-аккаунты и продукты</h1><div class="sub">${R&&R.window?`<span>Портфель: <b>${R.window}</b></span>`:''}${PP?`<span>Состав Bitrix: <b>${(PP.staff||{}).active||0}</b> действующих, <b>${(PP.staff||{}).fired||0}</b> уволенных</span>`:''}<span class="dimv">Роль — разрез участка целиком, фамилия — личный дашборд.</span></div></header>`;
     const isRole=sel.indexOf('role:')===0;
-    h+=navHtml()+(sel==='all'?overview():(isRole?`<div id="repsRole"></div>`:detail(byUid(sel))));
+    el.dataset.repsub=sel;                  // базовый слой вернёт адрес при возврате на вкладку
+    h+=navHtml()+`<div role="tabpanel" id="repsPanel" aria-labelledby="${tid(sel)}" tabindex="0">`
+      +(sel==='income'?`<div id="repsIncome"></div>`:sel==='how'?incomeHow():sel==='all'?overview():(isRole?`<div id="repsRole"></div>`:detail(byUid(sel))))+`</div>`;
     el.innerHTML=h;
-    el.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',()=>{sel=b.dataset.r;draw();window.scrollTo(0,0);}));
+    if(sel==='income') renderIncome('repsIncome');
+    const go=(k,focus)=>{if(!okSub(k)||k===sel)return; sel=k; try{history.replaceState(null,'','#reps/'+encodeURIComponent(k));}catch(e){}
+      draw(); if(focus){const b=document.getElementById(tid(k)); if(b)b.focus();} else window.scrollTo(0,0);};
+    const tabs=[...el.querySelectorAll('#repsTabs [role=tab]')];
+    tabs.forEach(b=>b.addEventListener('click',()=>go(b.dataset.r)));
+    el.querySelector('#repsTabs').addEventListener('keydown',e=>{
+      const i=tabs.findIndex(b=>b.dataset.r===sel); let j=-1;
+      if(e.key==='ArrowRight'||e.key==='ArrowDown') j=(i+1)%tabs.length;
+      else if(e.key==='ArrowLeft'||e.key==='ArrowUp') j=(i-1+tabs.length)%tabs.length;
+      else if(e.key==='Home') j=0; else if(e.key==='End') j=tabs.length-1;
+      if(j<0) return; e.preventDefault(); go(tabs[j].dataset.r,1);
+    });
+    el.querySelectorAll('#repsPanel [data-r]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.r)));
     el.querySelectorAll('[data-hyg]').forEach(n=>n.addEventListener('click',()=>{
       const k=n.dataset.hyg, f=HYGF[k], row=(PP.hygiene||[]).find(x=>x.k===k);
       if(f&&PP.deals)openPeopleDeals(PP.deals.filter(f),row?row.lbl:'Гигиена','Гигиена Bitrix · что чинить');}));
@@ -1715,6 +1919,7 @@ function renderReps(R){
         openDeals(list,title,'Контрольная точка'); }));
     }
   }
+  window.addEventListener('hashchange',()=>{const k=fromHash(); if(k&&k!==sel){sel=k; draw();}});
   draw();
 }
 // ---- вкладка «Контракты»: один список заказов СП-172 с поиском и сортировкой
@@ -2550,8 +2755,7 @@ function renderPeople(P,role,elId,opt){
     +`<div class="pcard"><div class="pv" style="color:var(--nr)">${T.lost}</div><div class="pl">проиграно</div></div>`
     +`<div class="pcard"><div class="pv">${T.winRate}%</div><div class="pl">win-rate роли</div></div></div>`
     +`<div class="srccmp"><span class="sl">Законтрактовано, ещё не сдано</span><div class="sb"><i style="width:100%"></i></div><span class="sv">${T.realSum}</span><span class="sd mid">факт: ${T.real} сделок в реализации</span></div>`
-    +`<div class="srccmp"><span class="sl">Взвешенный пайплайн</span><div class="sb"><i style="width:${Math.min(100,T.presaleRaw?T.weightedRaw/T.presaleRaw*100:0).toFixed(0)}%"></i></div><span class="sv">${T.weighted}</span><span class="sd dim">оценка: ${T.presaleSum} × win-rate ${T.winRate}%</span></div>`
-    +`<div class="note">Два числа НЕ складываются. Первое — факт: сделки уже в реализации, деньги ожидаются по ним. Второе — оценка: проработка, умноженная на конверсию роли; в отчёт владельцу оно идёт только с этой оговоркой.</div></section>`;
+    +`<div class="note">Сумма — «Сумма» сделок Битрикса, не сверенная с файлом экономики. Сколько и когда принесут сделки — подменю «Доход»: там деньги только по сделкам, сверенным файлом экономики, а пайплайн невыигранных — по классу стадии. «Взвешенный пайплайн» (проработка × win-rate роли) снят 25.10.2026: процент по штукам умножался на деньги, без стадии и срока.</div></section>`;
   // 4 — косяки
   const FL=[['late','Просрочен дедлайн клиенту',T.late,'nr'],['stale','Стоит дольше '+PR.stale+' дн',T.stale,'a'],
             ['dead','Брошено: дольше '+PR.dead+' дн',T.dead,'nr'],['noAmt','Без суммы',T.noAmt,'a'],
@@ -2715,6 +2919,12 @@ window.__RENDER_OK__=1;
       const ce=document.getElementById('tab-'+t), sub=ce&&ce.dataset.ctsub;
       if(sub){ try{ history.replaceState(null,'','#contracts/'+sub); }catch(e){} }
     }
+    // то же у «Key-аккаунтов и продуктов»: адрес #reps/<раздел> живёт, пока открыта вкладка
+    if(t!=='reps'&&/^#reps/.test(h)){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+    else if(t==='reps'&&!/^#reps/.test(h)){
+      const re=document.getElementById('tab-reps'), sub=re&&re.dataset.repsub;
+      if(sub){ try{ history.replaceState(null,'','#reps/'+encodeURIComponent(sub)); }catch(e){} }
+    }
     try{ if(window.ensureTab) window.ensureTab(t); }catch(e){ console.error(e); }
     ['sourcing','company','reps','eng','contracts','suppliers','cohorts','advisor']
       .forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
@@ -2726,6 +2936,10 @@ window.__RENDER_OK__=1;
   const toContracts=()=>{ if(!/^#contracts(\/|$)/.test(location.hash||'')) return; const b=ctBtn(); if(b&&!b.classList.contains('act')) b.click(); };
   window.addEventListener('hashchange',toContracts);
   toContracts();
+  const repsBtn=()=>[...document.querySelectorAll('.tab')].find(x=>x.dataset.tab==='reps');
+  const toReps=()=>{ if(!/^#reps(\/|$)/.test(location.hash||'')) return; const b=repsBtn(); if(b&&!b.classList.contains('act')) b.click(); };
+  window.addEventListener('hashchange',toReps);
+  toReps();
   // основной скрипт выставляет флаг в самом конце; его отсутствие = рендер оборвался
   if(!window.__RENDER_OK__){
     const host=document.getElementById('tab-sourcing')||document.body;

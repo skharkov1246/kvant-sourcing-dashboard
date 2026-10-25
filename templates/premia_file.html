@@ -43,10 +43,10 @@ function renderPremia(){
    +`<span style="font-size:12.5px;color:var(--mut)">публикует финансовый директор; до публикации — минимум ${String(P.k).replace('.',',')}</span></div>`;
   h+=`<div class="kpis" id="prKpi" style="grid-template-columns:repeat(4,1fr);margin-top:14px"></div>`;
   h+=`<div class="secttl"><b>1</b> · Кто сколько получит</div><section class="card"><div class="note">Премия до НДФЛ при текущем К. «В реализации» начисляется пропорционально оплате заказчика; «в проработке» — если сделка будет выиграна по нынешней сумме${win!=null?`, «ожидаемо» — с учётом доли выигрыша 2026 г. (${Math.round(win*100)} %)`:''}. Клик по строке — сделки этого человека.</div>`
-   +`<div style="overflow-x:auto"><table><thead><tr><th>Кто</th><th>Роли</th><th class="r">Сделок</th><th class="r">В реализации</th><th class="r">В проработке</th><th class="r">Ожидаемо</th></tr></thead><tbody id="prPeople"></tbody></table></div></section>`;
+   +`<div style="overflow-x:auto"><table><thead><tr><th>Кто</th><th>Роли</th><th class="r">Сделок</th><th class="r">Оплачено</th><th class="r">В реализации</th><th class="r">В проработке</th><th class="r">Ожидаемо</th></tr></thead><tbody id="prPeople"></tbody></table></div></section>`;
   h+=`<div class="secttl"><b>2</b> · Сделки <span id="prCount" class="dimv" style="font-weight:400"></span></div>`
    +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="prSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: название · № сделки · воронка · стадия · ФИО">`
-   +`<div class="statleg" style="margin:0" id="prChips"><span class="stchip on" data-m="all">Все <b>${T.deals||0}</b></span><span class="stchip" data-m="r">В реализации <b>${T.real||0}</b></span><span class="stchip" data-m="p">В проработке <b>${T.presale||0}</b></span><span class="stchip" data-m="low">Ниже ×${String(P.priceMin).replace('.',',')} <b>${T.low||0}</b></span><span class="stchip" data-m="neg">Убыточные <b>${T.neg||0}</b></span></div>`
+   +`<div class="statleg" style="margin:0" id="prChips"><span class="stchip on" data-m="all">Все <b>${T.deals||0}</b></span><span class="stchip" data-m="d">Оплачено <b>${T.paid||0}</b></span><span class="stchip" data-m="r">В реализации <b>${T.real||0}</b></span><span class="stchip" data-m="p">В проработке <b>${T.presale||0}</b></span><span class="stchip" data-m="low">Ниже ×${String(P.priceMin).replace('.',',')} <b>${T.low||0}</b></span><span class="stchip" data-m="neg">Убыточные <b>${T.neg||0}</b></span></div>`
    +`<label style="font-size:12.5px;color:var(--mut);display:flex;gap:6px;align-items:center"><input type="checkbox" id="prBig"> карточки-выбросы в итогах (${T.big||0})</label></div>`
    +`<div id="prWho" style="margin-top:6px;font-size:12.5px;color:var(--mut)"></div>`
    +`<section class="card"><div style="overflow-x:auto"><table><thead><tr><th>Сделка</th><th class="r">Выручка</th><th class="r">ПЗ</th><th class="r">×ПЗ</th><th class="r">Результат</th><th class="r">Пул</th><th>Кому</th></tr></thead><tbody id="prBody"></tbody></table></div>`
@@ -63,26 +63,26 @@ function renderPremia(){
   function people(){
     const by={};
     for(const r of D){ if(!inSum(r)) continue;
-      for(const [u,role,s] of r.parts){ const b=by[u]||(by[u]={u,roles:{},n:0,real:0,pre:0}); b.roles[role]=1; b.n++;
-        if(r.st==='r') b.real+=amt(r,s); else b.pre+=amt(r,s); } }
-    return Object.values(by).sort((a,b)=>(b.real+b.pre)-(a.real+a.pre));
+      for(const [u,role,s] of r.parts){ const b=by[u]||(by[u]={u,roles:{},n:0,real:0,paid:0,pre:0}); b.roles[role]=1; b.n++;
+        if(r.st==='r') b.real+=amt(r,s); else if(r.st==='d') b.paid+=amt(r,s); else b.pre+=amt(r,s); } }
+    return Object.values(by).sort((a,b)=>(b.paid+b.real+b.pre)-(a.paid+a.real+a.pre));
   }
   function kpis(){
-    let real=0,pre=0,nr=0,np=0;
-    for(const r of D){ if(!inSum(r)) continue; if(r.st==='r'){real+=r.p1*K;nr++;} else {pre+=r.p1*K;np++;} }
+    let real=0,pre=0,paid=0,nr=0,np=0,nd=0;
+    for(const r of D){ if(!inSum(r)) continue; if(r.st==='r'){real+=r.p1*K;nr++;} else if(r.st==='d'){paid+=r.p1*K;nd++;} else {pre+=r.p1*K;np++;} }
     document.getElementById('prKpi').innerHTML=
-      `<div class="kpi ok"><div class="lbl">В реализации</div><div class="val ok">${fr(real)}</div><div class="meta">${nr} сделок · начисляется по оплате</div></div>`
+      `<div class="kpi ok"><div class="lbl">В реализации</div><div class="val ok">${fr(real)}</div><div class="meta">${nr} сделок · начисляется по оплате · оплачено ещё ${nd} сделок на ${fr(paid)}</div></div>`
      +`<div class="kpi amber"><div class="lbl">В проработке — по воронке</div><div class="val amber">${fr(pre)}</div><div class="meta">${np} сделок, если все будут выиграны</div></div>`
      +`<div class="kpi teal"><div class="lbl">В проработке — ожидаемо</div><div class="val teal">${win!=null?fr(pre*win):'—'}</div><div class="meta">${win!=null?'доля выигрыша 2026 г. — '+Math.round(win*100)+' %':'доля выигрыша не посчитана'}</div></div>`
      +`<div class="kpi"><div class="lbl">Поправка на агентское</div><div class="val">${pc(P.plug)}</div><div class="meta">выручки · по ${P.calibN} сделкам с закупкой</div></div>`;
     const tb=document.getElementById('prPeople');
-    tb.innerHTML=people().map(b=>`<tr class="drill" data-u="${_esc(b.u)}" style="cursor:pointer"><td><div class="who">${_esc(nm(b.u))}${live(b.u)?'':' <span class="dimv">· уволен</span>'}</div></td><td class="dep">${Object.keys(b.roles).map(x=>ROLE[x]).join(', ')}</td><td class="r mono">${b.n}</td><td class="r mono"${b.real<0?' style="color:var(--nr)"':''}>${fr(b.real)}</td><td class="r mono">${fr(b.pre)}</td><td class="r mono">${win!=null?fr(b.pre*win):'—'}</td></tr>`).join('')
-      ||'<tr><td colspan="6" class="dimv">Нет данных</td></tr>';
+    tb.innerHTML=people().map(b=>`<tr class="drill" data-u="${_esc(b.u)}" style="cursor:pointer"><td><div class="who">${_esc(nm(b.u))}${live(b.u)?'':' <span class="dimv">· уволен</span>'}</div></td><td class="dep">${Object.keys(b.roles).map(x=>ROLE[x]).join(', ')}</td><td class="r mono">${b.n}</td><td class="r mono">${fr(b.paid)}</td><td class="r mono"${b.real<0?' style="color:var(--nr)"':''}>${fr(b.real)}</td><td class="r mono">${fr(b.pre)}</td><td class="r mono">${win!=null?fr(b.pre*win):'—'}</td></tr>`).join('')
+      ||'<tr><td colspan="7" class="dimv">Нет данных</td></tr>';
     tb.querySelectorAll('tr[data-u]').forEach(tr=>tr.addEventListener('click',()=>{ who=tr.dataset.u; shown=200; rows(); document.getElementById('prBody').scrollIntoView({block:'start'}); }));
   }
   function rows(){
     let r=D;
-    if(mode==='r'||mode==='p') r=r.filter(x=>x.st===mode);
+    if(mode==='r'||mode==='p'||mode==='d') r=r.filter(x=>x.st===mode);
     else if(mode==='low') r=r.filter(x=>x.fl.indexOf('low')>=0);
     else if(mode==='neg') r=r.filter(x=>x.fl.indexOf('neg')>=0);
     if(who!==null&&who!=='') r=r.filter(x=>x.parts.some(p=>p[0]===who));
@@ -96,7 +96,7 @@ function renderPremia(){
     document.getElementById('prBody').innerHTML=r.slice(0,shown).map(x=>{
       const parts=x.parts.map(([u,role,s])=>`<div class="dep">${ROLE[role]}: <span class="nmx">${_esc(nm(u))}</span> — ${fr(amt(x,s))}</div>`).join('');
       const cf=(x.fl.indexOf('low')>=0||x.fl.indexOf('anom')>=0)?'color:var(--nr)':'';
-      return `<tr><td><div class="who"><a href="https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(x.id)}/" target="_blank" rel="noopener" style="color:var(--b2)">${_esc(x.t)}</a></div><div class="dep">${_esc(x.cat)} · ${_esc(x.stage)} · ${x.st==='r'?'в реализации':'в проработке'}</div></td>`
+      return `<tr><td><div class="who"><a href="https://kvantpro.bitrix24.ru/crm/deal/details/${encodeURIComponent(x.id)}/" target="_blank" rel="noopener" style="color:var(--b2)">${_esc(x.t)}</a></div><div class="dep">${_esc(x.cat)} · ${_esc(x.stage)} · ${x.st==='r'?'в реализации':x.st==='d'?'оплачено':'в проработке'}</div></td>`
        +`<td class="r mono">${fr(x.rev)}</td><td class="r mono">${fr(x.pz)}<div>${tag(x)}</div></td><td class="r mono" style="${cf}">×${x.coef.toFixed(2).replace('.',',')}</td>`
        +`<td class="r mono"${x.res<0?' style="color:var(--nr)"':''}>${fr(x.res)}</td><td class="r mono"${x.p1<0?' style="color:var(--nr)"':''}><b>${fr(x.p1*K)}</b></td><td>${parts}</td></tr>`;
     }).join('')||'<tr><td colspan="7" class="dimv">Нет сделок под этот отбор</td></tr>';

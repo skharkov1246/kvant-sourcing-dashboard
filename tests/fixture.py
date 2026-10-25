@@ -723,3 +723,34 @@ def build_kam_queue() -> dict:
     import kamqueue
     ct = build_contracts()
     return kamqueue.build(build_presale(), contracts.life_all(ct), ct["rows"], CT_TODAY, people=CT_PEOPLE)
+
+
+def build_kaminc(*, money: bool = True) -> dict:
+    """«Доход» (kaminc.py) на синтетике «Реализации», «Коммерсантов» и «Пресейла» — как main.py.
+    «Файл экономики первым» (contracts.compute, параллельная правка) стаб «Реализации» ещё не
+    пишет: здесь saleSrc и buySrc проставлены явно — у трёх сделок из четырёх «Сумма» сверена
+    файлом, закупка из файла (70 % продажи). Четыре сделки — в стадии «Оплата получена»: две
+    вошли в неё в этом квартале, две — раньше; у двух дата выигрыша в квартале. Product leader
+    и «Категория оборудования» сделок реализации — придуманные строки «Коммерсантов» (их
+    корпус другой, номера сделок не совпадают). money=False — без калибровки поправки: R нет."""
+    import kaminc
+    ct = build_contracts()
+    for i, r in enumerate(sorted(ct["rows"], key=lambda r: r["deal"])):
+        if i % 4 == 3:
+            r["saleSrc"] = "bitrix"
+        else:
+            r["saleSrc"], r["buySrc"], r["buyEur"] = "file", "file", round(r["saleEur"] * 0.7)
+        if i in (0, 5, 10, 15):
+            r.update(paidStage=True, closed=True, stageName="Оплата получена | Закрытие сделки",
+                     stageDays=8 if i < 10 else 140)
+        if i in (2, 7):
+            r["wonAt"] = (CT_TODAY - dt.timedelta(days=9)).strftime("%d.%m.%Y")
+    P = build_people()
+    for i, r in enumerate(ct["rows"][:14]):
+        P["deals"].append({"id": r["deal"], "t": r["title"], "state": "real", "kam": r.get("kamId") or "",
+                           "kamSrc": "поле" if r.get("kamId") else "", "own": "20",
+                           "pl": "12" if i % 3 else "11", "line": [] if i % 5 == 4 else [str(1 + i % 3)]})
+    return kaminc.compute(ct, P, today=CT_TODAY, presale=build_presale(), kamq=P["kamQueue"],
+                          calib={"plug": 0.05, "calibN": 40} if money else None,
+                          cat_labels=PS_CAT_LABELS, roster=CT_PEOPLE,
+                          companies={"100": "ПАО «Северный синтез»"})
