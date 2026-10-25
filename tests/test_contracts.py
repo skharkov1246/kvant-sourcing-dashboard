@@ -462,13 +462,27 @@ def test_обход_направления_один_запрос():
     assert stub.обходы[1][1] == ["ID", "CATEGORY_ID", "COMPANY_ID"]
 
 
-def test_без_сделок_направления_вида_нет():
-    """Сделок направления нет — вкладка как до 25.10.2026: ни sep, ни подписи вкладки."""
+def test_без_сделок_направления_вкладка_с_нулями():
+    """Сделок направления во вселенной вкладки нет (закрылись, ушли) — вида нет, но сводка
+    направления есть, с нулями: вкладка остаётся и говорит «Нет данных» (portal-ui §2),
+    а не пропадает молча. Компания направления — по сделке его воронки без заказов."""
     from tests import fixture
     stub = fixture.ContractsStub()
     stub.deals = [d for d in stub.deals if d["ID"] != "6101"]
-    stub.other = []
+    stub.other = [x for x in stub.other if x["ID"] != "6100"]        # осталась 6102 без заказов
     stub.orders = [o for o in stub.orders if str(o["parentId2"]) not in ("6100", "6101")]
     data = _реализация(stub)
+    assert data["sep"] is None and all(r["seg"] is None for r in data["rows"])
+    h = data["head"]["sep"]
+    assert (h["cat"], h["name"]) == (fixture.CT_SEP_CAT, fixture.CT_SEP_NAME), "имя — из портала и без сделок"
+    assert (h["deals"], h["live"], h["orders"], h["late"], h["lateDeals"], h["queue"], h["companies"]) == \
+        (0, 0, 0, 0, 0, 0, 1)
+    assert h["sale"] == contracts_mod._money(0)
+
+
+def test_без_направлений_сводки_нет(monkeypatch):
+    """Направления не заданы (ОТДЕЛЬНЫЕ_ВОРОНКИ пуст) — вкладка как до 25.10.2026: ни вида,
+    ни сводки, ни переключателя."""
+    data = _реализация(без_направлений=True, monkeypatch=monkeypatch)
     assert data["sep"] is None and "sep" not in data["head"]
     assert all(r["seg"] is None for r in data["rows"])

@@ -1885,6 +1885,15 @@ function _ctHeader(X,paid){
   const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную${fx.usdRub!=null?`: 1 USD = ${fx.usdRub} ₽`:''}). Отчётность с другим курсом разойдётся системно.</span>`:'';
   return `<header><div class="eyebrow">Квант · реализация</div><h1>Пульт реализации</h1><div class="sub"><span>От выигрыша до гарантии: заказ поставщику → производство → доставка клиенту → УПД и оплата → гарантия</span><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${paid?`<span>Успех — и стадия «Оплата получена | Закрытие сделки»: <b>${paid}</b> сделок не в работе</span>`:''}${fxNote}</div></header>`;
 }
+// Вкладка направления без его сделок: «Нет данных» + чего нет и откуда придёт (portal-ui §2)
+function _ctSepEmpty(SH,X){
+  const nm=_esc(SH.name);
+  return `<section class="card ctsepempty"><div class="secttl">Нет данных</div><div class="note">`
+    +`Нет сделок направления <b>${nm}</b> ${_esc(X.label||'')}: ни сделок воронки «${nm}» с заказами поставщикам, `
+    +`ни сделок реализации её компаний (${_ctN(SH.companies||0,'компания','компании','компаний')}). `
+    +`Источник — Bitrix24: сделка воронки «${nm}» появится здесь, когда к ней будет заказ поставщику (СП-172); `
+    +`сделка реализации компании направления — с входа в воронку реализации.</div></section>`;
+}
 // Вкладка «Реализация». Отдельное направление (решение владельца 25.10.2026: сложности
 // известны, ими занимаются, ежедневного внимания руководителя реализации не требуют) — своя
 // вкладка внутри «Реализации»: те же таблица, плитки и очередь, только по его сделкам.
@@ -1895,10 +1904,13 @@ function renderContracts(){
   if(!X0||!Array.isArray(X0.rows)){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
   const H0=X0.head||{}, SH=H0.sep&&typeof H0.sep.name==='string'?H0.sep:null;
   const SV=SH&&X0.sep&&X0.sep.head&&X0.sep.life?X0.sep:null;
-  const views={main:Object.assign({},X0,{rows:X0.rows.filter(r=>!r.seg),seg:null,sepHead:SV?SH:null})};
-  if(SV) views.sep=Object.assign({},X0,SV,{rows:X0.rows.filter(r=>r.seg),seg:SH.cat,sepHead:SH,orphan:null});
+  const views={main:Object.assign({},X0,{rows:X0.rows.filter(r=>!r.seg),seg:null,sepHead:SH})};
+  // сводка направления есть, а его вида нет — сделок направления сейчас нет: вкладка
+  // остаётся и говорит «Нет данных» (portal-ui §2), а не пропадает молча
+  if(SH) views.sep=SV?Object.assign({},X0,SV,{rows:X0.rows.filter(r=>r.seg),seg:SH.cat,sepHead:SH,orphan:null}):{empty:1};
   const paid=(H0.paidStage||0)+(SV?(SV.head.paidStage||0):0);
   const draw=(k,panel)=>{
+    if(views[k].empty){ panel.innerHTML=_ctSepEmpty(SH,X0); return; }
     try{ _ctPanel(views[k],panel); }
     catch(err){                             // сломанный вид не гасит переключатель и соседний вид
       console.error('Реализация, вид '+k+':',err);
@@ -1906,7 +1918,12 @@ function renderContracts(){
         +'<div class="note">Данные для этого раздела неполные или повреждены. Техническая причина: '+_esc(String(err&&err.message||err))+'</div></section>';
     }
   };
-  if(!SV){ el.innerHTML=_ctHeader(X0,paid)+'<div id="ctPanel-main"></div>'; draw('main',document.getElementById('ctPanel-main')); return; }
+  if(!SH){
+    // направлений нет — без переключателя; адрес вкладки внутри «Реализации» не держим
+    if(/^#contracts\/./.test(location.hash||'')){ try{ history.replaceState(null,'','#contracts'); }catch(e){} }
+    delete el.dataset.ctsub;
+    el.innerHTML=_ctHeader(X0,paid)+'<div id="ctPanel-main"></div>'; draw('main',document.getElementById('ctPanel-main')); return;
+  }
   el.innerHTML=_ctHeader(X0,paid)
     +`<div class="subnav ctsub" role="tablist" aria-label="Разделы реализации" id="ctTabs">`
     +`<button type="button" class="snb on" role="tab" id="ctTab-main" data-sub="main" aria-selected="true" aria-controls="ctPanel-main" tabindex="0">Основное</button>`
@@ -1921,6 +1938,7 @@ function renderContracts(){
     if(!views[k]) k='main';
     if(k===cur) return;
     cur=k;
+    el.dataset.ctsub=k;                     // базовый слой вернёт адрес при возврате в «Реализацию»
     tabs.forEach(b=>{const on=b.dataset.sub===k; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); b.tabIndex=on?0:-1;});
     Object.keys(views).forEach(n=>{const p=document.getElementById('ctPanel-'+n); p.hidden=n!==k; if(n!==k) p.innerHTML='';});
     draw(k,document.getElementById('ctPanel-'+k));
@@ -1973,7 +1991,9 @@ function _ctPanel(X,el){
   const SP=X.sepHead||null;
   let h=!SP?'':(X.seg
     ?`<div class="note ctsepnote">Сделки направления <b>${_esc(SP.name)}</b>: его воронка и сделки реализации тех же компаний (${_ctN(SP.companies||0,'компания','компании','компаний')}). Очередь, плитки и итоги — только по ним. Нормы сроков звеньев и надёжность поставщиков — общие, по всем заказам.</div>`
-    :`<div class="note ctsepnote">Направление <b>${_esc(SP.name)}</b> — на своей вкладке: ${_ctN(SP.live||0,'сделка','сделки','сделок')} в работе. Сложности известны, ими занимаются — в очередь, плитки и итоги ниже они не входят. <a href="#contracts/sep" data-ctgo="sep">Открыть вкладку направления</a></div>`);
+    :(SP.deals
+      ?`<div class="note ctsepnote">Направление <b>${_esc(SP.name)}</b> — на своей вкладке: ${_ctN(SP.live||0,'сделка','сделки','сделок')} в работе. Сложности известны, ими занимаются — в очередь, плитки и итоги ниже они не входят. <a href="#contracts/sep" data-ctgo="sep">Открыть вкладку направления</a></div>`
+      :`<div class="note ctsepnote">Направление <b>${_esc(SP.name)}</b> — на своей вкладке; сделок на ней сейчас нет. <a href="#contracts/sep" data-ctgo="sep">Открыть вкладку направления</a></div>`));
 
   // ---------- 0. ПУЛЬТ: жизненный цикл заказа (lifecycle.py) ----------
   const L=X.life||null;
@@ -2654,20 +2674,31 @@ window.__RENDER_OK__=1;
 <script>
 (function(){
   const _esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  // Кнопка «Реализации» ищется по dataset, а не строкой разметки: тесты доступа ищут её
+  // разметку в странице как признак невырезанной вкладки
+  const ctBtn=()=>[...document.querySelectorAll('.tab')].find(x=>x.dataset.tab==='contracts');
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
-    const t=b.dataset.tab;
+    const t=b.dataset.tab, h=location.hash||'';
     // адрес вкладки «Реализации» (#contracts/…) живёт, пока открыта она
-    if(t!=='contracts'&&/^#contracts/.test(location.hash||'')){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+    if(t!=='contracts'&&/^#contracts/.test(h)){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+    // возврат в «Реализацию» — адрес той вкладки внутри неё, что была открыта (renderContracts
+    // помнит её в data-ctsub); пришли по адресу #contracts/… — он главнее
+    else if(t==='contracts'&&!/^#contracts/.test(h)){
+      const ce=document.getElementById('tab-'+t), sub=ce&&ce.dataset.ctsub;
+      if(sub){ try{ history.replaceState(null,'','#contracts/'+sub); }catch(e){} }
+    }
     try{ if(window.ensureTab) window.ensureTab(t); }catch(e){ console.error(e); }
     ['sourcing','company','reps','eng','contracts','suppliers','cohorts','advisor']
       .forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
     window.scrollTo(0,0);
   }));
-  // адрес #contracts/… — сразу «Реализация» (вкладка внутри неё — по тому же адресу).
-  // Кнопка ищется по dataset, а не строкой разметки: тесты доступа ищут её разметку в
-  // странице как признак невырезанной вкладки
-  if(/^#contracts(\/|$)/.test(location.hash||'')){ const b=[...document.querySelectorAll('.tab')].find(x=>x.dataset.tab==='contracts'); if(b) b.click(); }
+  // адрес #contracts/… — сразу «Реализация» (вкладка внутри неё — по тому же адресу): и при
+  // загрузке, и на уже открытой странице (ссылку вставили в ту же вкладку браузера).
+  // Вкладку внутри «Реализации» выбирает её собственный обработчик hashchange
+  const toContracts=()=>{ if(!/^#contracts(\/|$)/.test(location.hash||'')) return; const b=ctBtn(); if(b&&!b.classList.contains('act')) b.click(); };
+  window.addEventListener('hashchange',toContracts);
+  toContracts();
   // основной скрипт выставляет флаг в самом конце; его отсутствие = рендер оборвался
   if(!window.__RENDER_OK__){
     const host=document.getElementById('tab-sourcing')||document.body;

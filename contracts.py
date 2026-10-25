@@ -1145,24 +1145,27 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
     main_view = _view(main_rows, life)
     sep_view = _view(sep_rows, life_sep) if sep_rows else None
-    if sep_view is not None:
-        sep_head = sep_view["head"]
-        cats = sorted({r["seg"] for r in sep_rows})
+    if sep_cats:
+        # сводка направления для шапки основного вида и подписи его вкладки: имя — имя
+        # воронки из портала; числа — те же правила, что у основного вида. Сделок
+        # направления нет (закрылись, ушли из вселенной вкладки) — сводка всё равно есть,
+        # с нулями: вкладка остаётся и говорит «Нет данных», а не пропадает молча (portal-ui §2)
+        sep_head = sep_view["head"] if sep_view is not None else {}
+        cats = sorted(sep_cats, key=int)
         try:
             cat_names = client.categories()
         except Exception:                    # noqa: BLE001 — подпись, без неё вид тот же
             cat_names = {}
         sep_late = (life_sep or {}).get("counts", {}).get("late", 0)
-        # сводка направления для шапки основного вида и подписи его вкладки: имя — имя
-        # воронки из портала; числа — те же правила, что у основного вида
         main_view["head"]["sep"] = {
             "cat": cats[0], "cats": cats,
             "name": ", ".join(str(cat_names.get(c) or f"воронка {c}") for c in cats),
-            "deals": len(sep_rows), "live": sep_head["live"],
+            "deals": len(sep_rows), "live": sep_head.get("live", 0),
             "orders": sum(1 for r in sep_rows if not r["closed"] for o in r["orders"] if o["live"]),
-            "late": sep_late, "lateDeals": sep_head["lateDeals"],
+            "late": sep_late, "lateDeals": sep_head.get("lateDeals", 0),
             "queue": len((life_sep or {}).get("queue") or []),
-            "sale": sep_head["sale"], "companies": len({c for c, k in sep_company.items() if k in cats}),
+            "sale": sep_head.get("sale", _money(0)),
+            "companies": len({c for c, k in sep_company.items() if k in cats}),
         }
 
     # --- агрегация по ПОСТАВЩИКАМ (без изменений) ---
