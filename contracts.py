@@ -145,12 +145,14 @@ def _money(v: float) -> str:
     return f"{sign}€{a}"
 
 
-def _amount(v) -> float:
+def _amount(v) -> float | None:
+    """Поле суммы Битрикса → число; пусто — 0 (сверка скажет «суммы нет»), не число — None:
+    нечитаемая сумма не «0» (правило Р-2: ноль ≠ неизвестно)."""
     try:
         x = float(v or 0)
     except (TypeError, ValueError):
-        return 0.0
-    return round(x, 2) if x == x and abs(x) != float("inf") else 0.0
+        return None
+    return round(x, 2) if x == x and abs(x) != float("inf") else None
 
 
 def _orig(v, cur: str) -> str:
@@ -325,7 +327,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE", "ASSIGNED_BY_ID", OSS_DEAL, KAM_F, KAM_OLD,
             chat_activity.CHAT_FIELD,
             BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK,
-            BUDGET_LINK]
+            BUDGET_LINK,
+            # НДС в «Сумме»: сверка с финальной экономикой файла — без НДС (dealctx.econ_ratio)
+            "TAX_VALUE"]
     plan_by_seq, plan_by_id, plan_asof = _load_budget_plans()
     rub = rate.get("RUB", 0.0)                 # ₽ → € по курсу Битрикса (суммы бюджетов в ₽)
 
@@ -619,9 +623,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # такие суммы не пересчитываются и в итоги не идут
             "fxMissing": fx_miss, "saleKnown": sale_known, "buySusp": buy_susp,
             "saleOrig": _orig(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")), "saleCur": d.get("CURRENCY_ID") or "",
-            # «Сумма» в валюте сделки, числом (то же, что saleOrig): её сверяет с финальной
-            # экономикой файла dealctx.econ_ratio (решение владельца 23.10.2026)
-            "saleAmt": _amount(d.get("OPPORTUNITY")),
+            # «Сумма» в валюте сделки, числом (то же, что saleOrig), и НДС в ней (TAX_VALUE):
+            # dealctx.econ_ratio сверяет «Сумму» без НДС с финальной экономикой файла
+            # (решение владельца 23.10.2026); не число — None, сверки нет
+            "saleAmt": _amount(d.get("OPPORTUNITY")), "saleTax": _amount(d.get("TAX_VALUE")),
             "buyEur": round(buy),
             "buyLbl": ("курса нет" if buy_src == "fx" else "не сходится" if buy_susp
                        else _money(buy) if buy_src != "none" else "—"),

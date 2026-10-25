@@ -3,8 +3,11 @@
   · ссылка clck.ru → страница проверки ссылок → путь общего диска → путь API Диска;
   · очередь: ни разу не читанные от новых сделок, затем давние чтения от давних;
   · предел суток — из базы: каждая попытка, удачная или нет; пауза между файлами;
-  · строка: ключ прогона, sha256 пути вместо пути, сверка с «Суммой» сделки;
+  · строка: ключ прогона, sha256 пути вместо пути, сверка с «Суммой» сделки без НДС;
+  · несверенный файл чисел не несёт; сбой одной сделки прогон не роняет (ревизия 25.10);
   · гейты: «шаблон другой» у большинства — стоп; суммы далеко — прогон помечает себя;
+    прошёл гейт — прогон записан в econ_file_runs (без этого его строк во вкладке нет);
+  · «≈ с НДС» — отдельным счётом, не расхождение;
   · холостой прогон не трогает ни Диск, ни базу;
   · в журнале только счётчики: ни номеров сделок, ни путей, ни сумм, ни ключа;
   · прогон Actions и планировщик.
@@ -32,6 +35,8 @@ import contracts  # noqa: E402
 import econ_files as ef  # noqa: E402
 import econ_template as et  # noqa: E402
 from tests.test_econ_template import ПОЗИЦИИ, книга  # noqa: E402
+
+ПРОДАЖА_EUR = 2 * 1400 + 5 * 320 + 4500                # продажа придуманной книги ПОЗИЦИИ, € без НДС
 
 СЕЙЧАС = dt.datetime(2026, 10, 25, 19, 7, tzinfo=dt.timezone.utc)
 МЕТКА = "a1b2c3d4e5f6"                                 # придуманная метка общего диска
@@ -88,6 +93,7 @@ class Портал:
     def list_deals_fast(self, *, filter=None, select=None, **kw):
         self.вызовы += 1
         assert contracts.ECON_LINK in select and "OPPORTUNITY" in select and "CURRENCY_ID" in select
+        assert "TAX_VALUE" in select, "сверка с файлом — без НДС"
         return [dict(d) for d in self.сделки]
 
 
@@ -100,6 +106,7 @@ class База:
         self.строки: list[dict] = []
         self.попытки: list[int] = []
         self.помечено: set[str] = set()
+        self.прошли: list[str] = []
 
     def прочитано(self):
         return dict(self._прочитано)
@@ -123,14 +130,21 @@ class База:
         self.помечено.add(run_id)
         return sum(1 for r in self.строки if r["run_id"] == run_id)
 
+    def отметить_прогон(self, run_id):
+        assert run_id not in self.помечено, "помеченный прогон гейт не прошёл"
+        self.прошли.append(run_id)
+        свои = [r for r in self.строки if r["run_id"] == run_id]
+        return len(свои), sum(1 for r in свои if r["status"] == et.СВЕРЕНО)
+
     def итог(self, run_id):
         return Counter(r["status"] for r in self.строки if r["run_id"] == run_id and run_id not in self.помечено)
 
 
-def _сделка(i: int, *, ссылка: str | None = "", дней: int = 0, сумма="20000", валюта="EUR", стадия="C0:EXECUTING"):
+def _сделка(i: int, *, ссылка: str | None = "", дней: int = 0, сумма="20000", валюта="EUR", стадия="C0:EXECUTING",
+            налог="0"):
     return {"ID": str(8000 + i), "DATE_CREATE": (СЕЙЧАС - dt.timedelta(days=дней)).isoformat(),
             "STAGE_ID": стадия, "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "OPPORTUNITY": сумма,
-            "CURRENCY_ID": валюта,
+            "TAX_VALUE": налог, "CURRENCY_ID": валюта,
             contracts.ECON_LINK: f"https://clck.ru/ВЫДУМКА{i}" if ссылка == "" else ссылка}
 
 
@@ -221,6 +235,19 @@ def test_кандидаты_открытые_со_ссылкой():
     канд = ef.кандидаты(сделки, Портал([]).deal_stage_meta(), счёт)
     assert [d["ID"] for d in канд] == ["8000"]
     assert счёт["открытых"] == 3 and счёт["закрыта"] == 2 and счёт["без ссылки"] == 2
+    assert счёт["ссылка clck.ru"] == 1
+
+
+def test_вид_ссылки_без_домена():
+    """Ревизия: ссылка на портал клиента в журнале — его имя; печатается вид, не домен."""
+    assert [ef.вид_ссылки(x) for x in ("https://clck.ru/ВЫДУМКА", _ссылка_диска(ПУТЬ), "https://disk.yandex.com/d/x",
+                                        "https://portal.client-vydumka.example/doc", "https://[битая", "")] == \
+        ["clck.ru", "disk.yandex", "disk.yandex", "другой", "другой", "другой"]
+    сделки, диск = _мир(2)
+    сделки.append(_сделка(5, ссылка="https://portal.client-vydumka.example/doc/1.xlsx"))
+    код, журнал, _ = _прогон(сделки, диск, База())
+    assert код == 0 and any("вид ссылки: clck.ru 2 · другой 1" in s for s in журнал)
+    assert "client-vydumka" not in "\n".join(журнал)
 
 
 def test_нарезка_на_части_смежными_отрезками():
@@ -244,21 +271,25 @@ def test_живой_прогон_пишет_строки_с_ключом_и_бе
     assert r["sale_sub"] > 0 and r["purchase_eur"] == 6000.0 and r["rebid"] is False and r["sub_cur"] == "RUB"
     # «Сумма» 20 000 € против продажи файла в рублях — по курсу самого файла
     assert r["deal_cur"] == "EUR" and r["bitrix_ratio"] == pytest.approx(20_000 / r["sale_eur"], rel=1e-5)
-    assert база.строки[1]["bitrix_ratio"] == 0
+    # суммы нет — сверять не с чем, а не «расходится на 100 %»
+    assert база.строки[1]["bitrix_ratio"] is None and база.строки[1]["bitrix_note"] == "суммы нет"
     текст = json.dumps(база.строки, ensure_ascii=False)
     assert "Сделка 0" not in текст and МЕТКА not in текст, "пути и метки диска в базе нет"
     # пауза между файлами — не меньше двух секунд, первый — без паузы
     assert len(сон) == 2 and all(с >= ef.ПАУЗА_С for с in сон)
     _журнал_чист(журнал, сделки)
     assert any(s.startswith("файлы: сверено 3") for s in журнал)
-    assert any("в сделке суммы нет 1" in s for s in журнал)
+    assert any("суммы нет 1" in s for s in журнал if s.startswith("сверенные против"))
+    # гейт пройден — решение в базе: строки прогона видит вкладка
+    assert база.прошли == ["ef-test-1"] and any(s.startswith("гейт пройден") for s in журнал)
+    assert any("вид ссылки: clck.ru 3" in s for s in журнал)
 
 
 def _журнал_чист(журнал: list[str], сделки: list[dict]) -> None:
     текст = "\n".join(журнал)
     for d in сделки:
         assert d["ID"] not in текст, "номера сделок в журнал не идут"
-    for слово in ("Сделка ", МЕТКА, "clck.ru/", "sba.yandex", "disk.yandex", "6000", "наценк", "OAuth"):
+    for слово in ("Сделка ", МЕТКА, "clck.ru/", "sba.yandex", "disk.yandex.ru/", "6000", "наценк", "OAuth"):
         assert слово not in текст, слово
     assert not re.search(r"\d{4,}\.\d", текст), "сумм в журнале нет"
 
@@ -319,6 +350,87 @@ def test_статусы_файла_в_строке():
     assert r["bitrix_ratio"] is None and r["fx"] is None and r["file_key"]
 
 
+def test_несверенный_файл_чисел_не_несёт():
+    """Ревизия, дефект 3: «скидка» 15 вместо 15 % — продажа отрицательна; в строке ни продажи,
+    ни закупки, ни наценки (иначе ограничение базы роняло прогон и обходило гейт сумм)."""
+    тело = книга([dict(p, AK=15) for p in ПОЗИЦИИ], переторжка=True)
+    сделки, диск = _мир(3, тело=тело)
+    база = База()
+    код, журнал, _ = _прогон(сделки, диск, база)
+    assert код == 0 and [r["status"] for r in база.строки] == [et.НЕПРАВДОПОДОБНО] * 3
+    for r in база.строки:
+        assert (r["sale_sub"], r["sale_eur"], r["purchase_eur"], r["markup"], r["fx"], r["bitrix_ratio"]) == \
+            (None,) * 6
+        assert r["why"] == "проверка 2" and r["totals_dev"] is not None, "чем проверено — остаётся (правило 16)"
+
+
+class ОтказБазы(Exception):
+    """Подпорка ошибки базы (CheckViolation и т. п.)."""
+
+
+def test_сбой_одной_сделки_не_роняет_прогон_и_не_держит_очередь(monkeypatch):
+    сделки, диск = _мир(4)
+
+    class Капризная(База):
+        def записать(self, r):
+            if r["deal_id"] == 8001 and r["status"] != ef.СБОЙ:
+                raise ОтказБазы("значения строки — в журнал не идут")
+            super().записать(r)
+    разобрать = et.разобрать
+    вызовы = [0]
+
+    def ломается_на_третьем(b):
+        вызовы[0] += 1
+        if вызовы[0] == 3:
+            raise ZeroDivisionError("разбор")
+        return разобрать(b)
+    monkeypatch.setattr(ef.et, "разобрать", ломается_на_третьем)
+    база = Капризная()
+    код, журнал, _ = _прогон(сделки, диск, база)
+    assert код == 0 and len(база.строки) == 4 and база.прошли == ["ef-test-1"]
+    assert [r["status"] for r in база.строки] == [et.СВЕРЕНО, ef.СБОЙ, ef.СБОЙ, et.СВЕРЕНО]
+    сбой = база.строки[1]
+    assert сбой["file_key"] and сбой["sale_eur"] is None and сбой["bitrix_ratio"] is None
+    предупреждение = next(s for s in журнал if s.startswith("::warning::сбои чтения"))
+    assert "запись: ОтказБазы 1" in предупреждение and "чтение: ZeroDivisionError 1" in предупреждение
+    assert "значения строки" not in "\n".join(журнал), "текст ошибки в журнал не идёт"
+    # сбой — тоже чтение: в следующую ночь сделка не первая
+    q = ef.очередь(ef.кандидаты(сделки, Портал([]).deal_stage_meta(), Counter()),
+                   {r["deal_id"]: СЕЙЧАС for r in база.строки}, СЕЙЧАС + dt.timedelta(days=1))
+    assert q == []
+
+
+def test_база_не_принимает_и_сбой_стоп_без_отметки_гейта():
+    сделки, диск = _мир(3)
+
+    class Мёртвая(База):
+        def записать(self, r):
+            raise ОтказБазы("нет связи")
+    база = Мёртвая()
+    код, журнал, _ = _прогон(сделки, диск, база)
+    assert код == 1 and база.прошли == [] and база.попытки == [8000]
+    assert any(s.startswith("::error::база не приняла строку сбоя") for s in журнал)
+
+
+def test_сумма_без_ндс_и_счёт_похожих_на_ндс():
+    """«Сумма» сделки — с НДС: TAX_VALUE вычитается; налога нет, а отношение ×1,22 или ×1,20
+    — «≈ с НДС», отдельным счётом, не расхождение (ревизия, дефект 4)."""
+    с_ндс = round(ПРОДАЖА_EUR * 1.22)
+    сделки, диск = _мир(6, сумма=str(с_ндс))
+    сделки[0]["TAX_VALUE"] = str(с_ндс - ПРОДАЖА_EUR)                 # НДС указан — сходится
+    сделки[1]["OPPORTUNITY"] = str(round(ПРОДАЖА_EUR * 1.2))           # 20 %
+    сделки[2]["OPPORTUNITY"] = str(round(ПРОДАЖА_EUR * 1.4))           # не НДС — расхождение
+    база = База()
+    код, журнал, _ = _прогон(сделки, диск, база)
+    assert код == 0
+    отн = [r["bitrix_ratio"] for r in база.строки]
+    assert отн[0] == pytest.approx(1.0) and отн[1] == pytest.approx(1.2, abs=1e-4)
+    assert отн[2] == pytest.approx(1.4, abs=1e-4) and отн[3] == pytest.approx(1.22, abs=1e-4)
+    сверка = next(s for s in журнал if s.startswith("сверенные против"))
+    assert f"{ef.НДС_СЧЁТ} 4" in сверка and "расходится больше 10% 1" in сверка and "сходится (±10%) 1" in сверка
+    assert ef.сверка_с_суммой(база.строки)[ef.НДС_СЧЁТ] == 4
+
+
 def test_гейт_шаблона_останавливает_чтение():
     сделки, диск = _мир(8, тело=книга(ПОЗИЦИИ, заголовки={"AN": "Итого"}))
     база = База()
@@ -335,13 +447,14 @@ def test_гейт_сумм_помечает_прогон():
     база = База()
     код, журнал, _ = _прогон(сделки, диск, база)
     assert код == 1 and "ef-test-1" in база.помечено
+    assert база.прошли == [], "гейт не пройден — прогона в econ_file_runs нет"
     assert any(s.startswith("::error::гейт сумм") for s in журнал)
     assert any("сверено 0" in s for s in журнал if s.startswith("в базе по ключу прогона"))
     # сделки без суммы — не довод против разбора
     сделки, диск = _мир(6, сумма="0")
     база = База()
     код, _журнал, _ = _прогон(сделки, диск, база)
-    assert код == 0 and not база.помечено
+    assert код == 0 and not база.помечено and база.прошли == ["ef-test-1"]
 
 
 def test_холостой_прогон_не_трогает_диск_и_базу():
@@ -379,7 +492,11 @@ def test_статусы_совпадают_с_базой():
     блок = re.search(r"econ_file_reads_status_chk\s+check \(status in \((.*?)\)\);", sql, re.S).group(1)
     assert tuple(re.findall(r"'([^']+)'", блок)) == ef.СТАТУСЫ
     вид = re.search(r"status not in \((.*?)\)", sql).group(1)
-    assert set(re.findall(r"'([^']+)'", вид)) == {ef.НЕ_РАСКРЫЛАСЬ, ef.НЕ_СКАЧАЛСЯ}
+    assert set(re.findall(r"'([^']+)'", вид)) == set(ef.НЕ_ЧТЕНИЕ) == {ef.НЕ_РАСКРЫЛАСЬ, ef.НЕ_СКАЧАЛСЯ, ef.СБОЙ}
+    # вид — только строки прогонов, прошедших гейт; суммы — только у «сверено»
+    тело_вида = sql[sql.index("create view econ_file_latest"):]
+    assert "join econ_file_runs g on g.run_id = r.run_id" in тело_вида[:тело_вида.index(";")]
+    assert "status = 'сверено' or num_nulls(sale_sub, sale_eur, purchase_eur, markup) = 4" in sql
     assert re.search(r"предел constant integer := (\d+);", sql).group(1) == str(ef.ПРЕДЕЛ_СУТОК)
     assert "valuta" not in sql and "'валюта сделки другая'" in sql
     import dealctx

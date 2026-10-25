@@ -11,7 +11,7 @@
 -- ПУТИ ФАЙЛА, ИМЕНИ, ССЫЛКИ ЗДЕСЬ НЕТ. file_key — sha256 пути файла внутри общего диска:
 -- по нему видно «тот же файл прочитан снова», а сам путь не восстановить.
 --
--- ДВЕ ТАБЛИЦЫ, ФУНКЦИЯ И ВИД.
+-- ТРИ ТАБЛИЦЫ, ФУНКЦИЯ И ВИД.
 --   econ_file_attempts — каждая попытка скачать файл, удачная или нет; только
 --     дописывается и не помечается: попытка потрачена. Предел суток по Москве
 --     (30 файлов) держит econ_file_take_slot: под замком считает попытки суток и
@@ -22,12 +22,18 @@
 --     закупка − 1 — НЕ маржа: логистика и таможня внутри коэффициента), переторжка,
 --     позиций, чем проверено (totals_dev, coef_median, bad_lines — правило 16), курсы
 --     файла (fx: единиц валюты подачи за 1 единицу валюты) и сверка с «Суммой» сделки
---     (bitrix_ratio = сумма сделки в валюте подачи / продажа файла). Только дописывается;
---     откат прогона — пометкой voided_at (правило 5), одной на строку:
+--     (bitrix_ratio = «Сумма» без НДС, OPPORTUNITY − TAX_VALUE, в валюте подачи / продажа
+--     файла без НДС). Числа (продажа, закупка, наценка) — только у «сверено»: у прочих
+--     статусов их нет (econ_file_reads_num_chk). Только дописывается; откат прогона —
+--     пометкой voided_at (правило 5), одной на строку:
 --         update econ_file_reads set voided_at = now() where run_id = '<ключ>';
+--   econ_file_runs — прогоны, прошедшие гейт сумм (passed_at), со счётом своих строк на
+--     тот миг. Пишет прогон после гейта; только дописывается. Прогон упал, его сняли или
+--     он не дошёл до гейта — строки в базе есть, но вкладка их не видит.
 --   econ_file_take_slot(run_id, deal_id, предел) — взять попытку суток (true) или нет.
---   econ_file_latest — последнее непомеченное чтение сделки, кроме сбоев доставки
---     («ссылка не раскрылась», «не скачался»): сбой сети не стирает прочитанного.
+--   econ_file_latest — последнее непомеченное чтение сделки из прошедших гейт прогонов,
+--     кроме сбоев доставки и нашего кода («ссылка не раскрылась», «не скачался», «сбой
+--     чтения»): сбой сети или разбора не стирает прочитанного.
 --
 -- ИДЕМПОТЕНТНО (правило 21): create … if not exists, ограничения — сносом и созданием,
 -- функции — create or replace, вид — сносом перед созданием. Роли Supabase — только
@@ -65,13 +71,21 @@ create table if not exists econ_file_reads (
   bad_lines    integer     not null default 0,   -- позиций с «нет курса» или ошибкой
   fx           jsonb,                            -- {валюта: единиц валюты подачи за 1}
   deal_cur     text,                             -- валюта «Суммы» сделки при чтении
-  bitrix_ratio numeric,                          -- сумма сделки в валюте подачи / продажа файла
+  bitrix_ratio numeric,                          -- «Сумма» без НДС в валюте подачи / продажа файла
   bitrix_note  text,                             -- почему сверки с суммой нет
   why          text,                             -- где сломалось: ячейка шаблона или проверка
   voided_at    timestamptz                       -- откат: пометка, а не удаление (правило 5)
 );
 
 -- курсы файла: объект «код валюты → положительное число», и ничего больше
+create table if not exists econ_file_runs (
+  run_id     text        primary key,
+  passed_at  timestamptz not null default now(),
+  method_ver text        not null,
+  rows_n     integer     not null,               -- непомеченных строк прогона на миг гейта
+  verified_n integer     not null                -- из них «сверено»
+);
+
 create or replace function econ_fx_ok(v jsonb) returns boolean
 language plpgsql immutable as $$
 declare
@@ -112,7 +126,7 @@ begin
     check (status in ('сверено', 'не открылся', 'шаблон другой', 'валюта подачи не распознана',
                       'нет сохранённых значений', 'нет позиций', 'нет курса или ошибка',
                       'переторжка заполнена не везде', 'итоги не сходятся', 'неправдоподобно',
-                      'ссылка не раскрылась', 'не общий диск', 'не xlsx', 'не скачался'));
+                      'ссылка не раскрылась', 'не общий диск', 'не xlsx', 'не скачался', 'сбой чтения'));
   alter table econ_file_reads drop constraint if exists econ_file_reads_note_chk;
   alter table econ_file_reads add constraint econ_file_reads_note_chk
     check ((bitrix_note is null or bitrix_note in ('валюта сделки другая', 'суммы нет'))
@@ -120,12 +134,14 @@ begin
            and (bitrix_ratio is null or bitrix_ratio >= 0));
   alter table econ_file_reads drop constraint if exists econ_file_reads_fx_chk;
   alter table econ_file_reads add constraint econ_file_reads_fx_chk check (econ_fx_ok(fx));
+  -- Суммы — только у сверенной строки: у несверенной их нет вовсе (их положительность и
+  -- согласованность — в econ_file_reads_verified_chk). Отрицательная «продажа»
+  -- неправдоподобного файла не встаёт в базу и не роняет прогон.
   alter table econ_file_reads drop constraint if exists econ_file_reads_num_chk;
   alter table econ_file_reads add constraint econ_file_reads_num_chk
     check ((items is null or items >= 0) and bad_lines >= 0
-           and (sale_sub is null or sale_sub >= 0) and (sale_eur is null or sale_eur >= 0)
-           and (purchase_eur is null or purchase_eur >= 0)
-           and (totals_dev is null or totals_dev >= 0));
+           and (totals_dev is null or totals_dev >= 0)
+           and (status = 'сверено' or num_nulls(sale_sub, sale_eur, purchase_eur, markup) = 4));
   -- Сверенная строка несёт все числа, и они согласованы: продажа не ниже закупки,
   -- наценка — из них же, позиции есть, сбоев нет. Иначе публиковать нечего.
   alter table econ_file_reads drop constraint if exists econ_file_reads_verified_chk;
@@ -138,6 +154,10 @@ begin
            and sale_eur >= purchase_eur and rebid is not null and items > 0 and bad_lines = 0
            and totals_dev <= 0.005 and coef_median between 1 and 5
            and abs(markup - (sale_eur / purchase_eur - 1)) <= 0.00001));
+  alter table econ_file_runs drop constraint if exists econ_file_runs_chk;
+  alter table econ_file_runs add constraint econ_file_runs_chk
+    check (run_id ~ '^[A-Za-z0-9._-]{1,80}$' and method_ver ~ '^[a-z0-9_.:-]{1,60}$'
+           and rows_n >= 0 and verified_n between 0 and rows_n);
 end $$;
 
 -- одно чтение сделки на прогон: повтор записи того же прогона не задваивает
@@ -175,6 +195,21 @@ begin
   raise exception 'econ_file_attempts только дописывается: попытка не правится и не удаляется';
 end $$;
 
+-- Решение гейта — тоже: прогон, прошедший гейт, не «распроходит»; снять его строки с
+-- вкладки — пометкой voided_at в econ_file_reads.
+create or replace function econ_file_runs_append_only() returns trigger
+language plpgsql as $$
+begin
+  raise exception 'econ_file_runs только дописывается: решение гейта не правится; откат — voided_at у строк';
+end $$;
+
+drop trigger if exists econ_file_runs_append_only on econ_file_runs;
+create trigger econ_file_runs_append_only before update or delete on econ_file_runs
+  for each row execute function econ_file_runs_append_only();
+drop trigger if exists econ_file_runs_no_truncate on econ_file_runs;
+create trigger econ_file_runs_no_truncate before truncate on econ_file_runs
+  for each statement execute function econ_file_runs_append_only();
+
 drop trigger if exists econ_file_attempts_append_only on econ_file_attempts;
 create trigger econ_file_attempts_append_only before update or delete on econ_file_attempts
   for each row execute function econ_file_attempts_append_only();
@@ -202,15 +237,17 @@ begin
   return true;
 end $$;
 
--- Снос перед созданием: «create or replace view» не меняет состав колонок.
+-- Снос перед созданием: «create or replace view» не меняет состав колонок. Только строки
+-- прогонов, прошедших гейт (econ_file_runs): упавший или снятый прогон вкладке не виден.
 drop view if exists econ_file_latest;
 create view econ_file_latest with (security_invoker = true) as
 select distinct on (r.deal_id)
        r.deal_id, r.read_at, r.status, r.sub_cur, r.sale_sub, r.sale_eur, r.purchase_eur, r.markup,
        r.rebid, r.items, r.fx, r.deal_cur, r.bitrix_ratio, r.bitrix_note, r.method_ver, r.run_id
   from econ_file_reads r
+  join econ_file_runs g on g.run_id = r.run_id
  where r.voided_at is null
-   and r.status not in ('ссылка не раскрылась', 'не скачался')
+   and r.status not in ('ссылка не раскрылась', 'не скачался', 'сбой чтения')
  order by r.deal_id, r.read_at desc, r.id desc;
 
 create or replace function econ_роли_которые_есть(имена text[]) returns text as $$
@@ -219,7 +256,7 @@ create or replace function econ_роли_которые_есть(имена text
 $$ language sql stable;
 
 -- Доступ: RLS плюс FORCE, ничего у PUBLIC, anon и authenticated; сервисному ключу —
--- чтение и вставка, у чтений — ещё пометка отката.
+-- чтение и вставка, у чтений — ещё пометка отката. У econ_file_runs последовательности нет.
 do $$
 declare
   сх        text := current_schema();
@@ -227,7 +264,7 @@ declare
   служебная text := econ_роли_которые_есть(array['service_role']);
   n         text;
 begin
-  foreach n in array array['econ_file_attempts', 'econ_file_reads'] loop
+  foreach n in array array['econ_file_attempts', 'econ_file_reads', 'econ_file_runs'] loop
     execute format('comment on table %I.%I is %L', сх, n, 'econ_files_schema:v1');
     execute format('alter table %I.%I enable row level security', сх, n);
     execute format('alter table %I.%I force  row level security', сх, n);
@@ -253,6 +290,7 @@ begin
     execute format('grant select, insert on table %I.econ_file_reads to %s', сх, служебная);
     execute format('grant update (voided_at) on table %I.econ_file_reads to %s', сх, служебная);
     execute format('grant usage, select on sequence %I.econ_file_reads_id_seq to %s', сх, служебная);
+    execute format('grant select, insert on table %I.econ_file_runs to %s', сх, служебная);
     execute format('grant select on %I.econ_file_latest to %s', сх, служебная);
     execute format('grant execute on function %I.econ_file_take_slot(text, bigint, integer) to %s',
                    сх, служебная);

@@ -186,10 +186,37 @@ def test_экономика_в_своде_только_сверенная():
     assert rc.publish(база, s, dry=False, ct=ct, печать=журнал.append) == 0
     свод = json.loads(s.raw)
     assert свод["econ"]["201"] == {"at": T.isoformat(), "sale": 2_600_000.0, "cur": "RUB", "saleEur": 26_000.0,
-                                   "buyEur": 20_000.0, "markup": 0.3, "rebid": True, "items": 3, "fx": {"EUR": 100.0}}
+                                   "buyEur": 20_000.0, "markup": 0.3, "rebid": True, "items": 3, "fx": {"EUR": 100.0},
+                                   "ratio": None, "note": None}
     assert dealctx.clean(свод)["econ"]["201"]["sale"] == 2_600_000.0
     assert any("финальная экономика: сделок со сверенным файлом 1 (переторжка 1)" in x for x in журнал)
     assert not any("2600000" in x or "201" in x for x in журнал), "в журнал — только счётчики"
+
+
+def test_экономика_сверка_с_суммой_на_день_чтения_в_своде():
+    """Отношение «Сумма» / продажа на день чтения — в своде: по нему сборка видит «Сумму»,
+    изменённую после чтения файла (минорное ревизии)."""
+    from decimal import Decimal
+    база = База(экономика=[_эк(201, ratio=Decimal("1.050000")), _эк(202, ratio=None, note="суммы нет")])
+    s = Store()
+    assert rc.publish(база, s, dry=False, ct=ct, печать=lambda x: None) == 0
+    свод = json.loads(s.raw)
+    assert (свод["econ"]["201"]["ratio"], свод["econ"]["201"]["note"]) == (1.05, None)
+    assert (свод["econ"]["202"]["ratio"], свод["econ"]["202"]["note"]) == (None, "суммы нет")
+    разбор = dealctx.clean(свод)
+    assert разбор["bad"] == 0 and разбор["econ"]["201"]["ratioAtRead"] == 1.05
+
+
+def test_свод_экономики_читает_только_вид_прошедших_гейт():
+    """Ревизия, дефект 3: свод (и ночной chat-context.yml) берёт экономику только из вида
+    econ_file_latest, а вид — только строки прогонов из econ_file_runs."""
+    src = (ROOT / "scripts" / "realization_ctx.py").read_text(encoding="utf-8")
+    assert "from econ_file_latest" in src and "from econ_file_reads" not in src
+    sql = (ROOT / "library" / "supabase" / "econ_files_schema.sql").read_text(encoding="utf-8")
+    вид = sql[sql.index("create view econ_file_latest"):]
+    assert "join econ_file_runs g on g.run_id = r.run_id" in вид[:вид.index(";")]
+    шаг = _wf("chat-context.yml")["jobs"]["context"]["steps"][-1]
+    assert шаг["run"] == "python scripts/realization_ctx.py --publish"
 
 
 def test_экономика_не_прошла_вторую_сверку():
@@ -295,6 +322,10 @@ def test_на_настоящей_базе(conn):
         эк.записать({**общее, "run_id": "ef-1", "deal_id": 12, "status": "шаблон другой", "sale_sub": None,
                      "sale_eur": None, "purchase_eur": None, "markup": None, "rebid": None, "bitrix_ratio": None,
                      "fx": None, "coef_median": None, "totals_dev": None})
+        assert эк.отметить_прогон("ef-1") == (2, 1)
+        # позже прогон, который упал до гейта: его более новое чтение 11 вкладке не видно
+        эк.записать({**общее, "run_id": "ef-2", "deal_id": 11, "status": "сверено", "sale_sub": 15_000,
+                     "sale_eur": 15_000, "purchase_eur": 10_000, "markup": 0.5, "rebid": False, "bitrix_ratio": 1})
     finally:
         эк.закрыть()
     база = rc.База(DSN, схема=СХЕМА)

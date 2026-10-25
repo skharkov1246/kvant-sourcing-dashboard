@@ -28,8 +28,12 @@ realctx:v1 (scripts/realization_ctx.py --publish); сборка дашборда
      scripts/econ_files.py → econ_file_reads → свод econ): только сверенные файлы. В
      карточке сделки — продажа в валюте подачи, закупка в €, «наценка над поставщиком»
      (не маржа: логистика и таможня внутри коэффициента), дата чтения, переторжка. «Сумма»
-     сделки сверяется с продажей файла в валюте подачи (econ_ratio) на день сборки: больше
-     ECON_GAP — пункт очереди ответственному сделки. Числа файла — только в DEALCTX.
+     сделки без НДС (OPPORTUNITY − TAX_VALUE) сверяется с продажей файла без НДС в валюте
+     подачи (econ_ratio) на день сборки: больше ECON_GAP — пункт очереди ответственному
+     сделки. Не пункт: суммы в сделке нет («суммы нет» — внести её решит владелец),
+     отношение около 1,20 или 1,22 («≈ с НДС»: «Сумма» с НДС при пустом налоге — до
+     решения владельца), «Сумма» менялась после чтения файла (отношение сборки не то, что
+     записал прогон чтения: сверка — после перечтения). Числа файла — только в DEALCTX.
 
 Пороги — таблицей (CLAUDE.md, правило 4). Текста чатов и договоров здесь нет: в ключе
 только номера сделок, даты и значения из закрытых списков.
@@ -52,6 +56,12 @@ REPLY_HOURS = 24        # «ждут ответа дольше рабочего 
 DUE_MAX_DAYS = 60       # срок из чата, прошедший давнее, — история, а не пункт очереди
 ECON_GAP = 0.10         # «Сумма» сделки и продажа файла расходятся больше — пункт очереди
 ECON_OTHER_CUR = "валюта сделки другая"   # в файле нет курса валюты сделки — не сверить
+ECON_NO_SUM = "суммы нет"                 # «Суммы» в сделке нет — не сверить, а не «расходится на 100 %»
+ECON_CHANGED = "сумма менялась после чтения файла"   # сверка — после перечтения файла
+# «Сумма» с НДС при нетто-продаже файла: ставки 20 % и 22 % (с 2026 г.), ±1 п.п. — «≈ с
+# НДС», не расхождение до решения владельца (прогон чтения считает такие отдельно)
+ECON_VAT = (1.20, 1.22)
+ECON_VAT_TOL = 0.01
 MSK = dt.timezone(dt.timedelta(hours=3))
 
 # Закрытые списки оценки — дословно как в scripts/chat_context.py (сверяет тест).
@@ -202,8 +212,14 @@ def _pos(v) -> float | None:
 def _econ(v) -> dict | None:
     """Финальная экономика сделки из ключа — только сверенный файл (scripts/realization_ctx.py
     берёт лишь статус «сверено»): числа положительны, продажа не ниже закупки, наценка
-    согласована с ними, курсы — «код валюты → число»."""
+    согласована с ними, курсы — «код валюты → число». ratio и note — сверка с «Суммой» на
+    день чтения (econ_file_reads.bitrix_ratio, bitrix_note); в ключе до 25.10.2026 их нет."""
     if not isinstance(v, dict):
+        return None
+    ratio, note = v.get("ratio"), v.get("note")
+    if (ratio is not None and (isinstance(ratio, bool) or not isinstance(ratio, (int, float))
+                               or not math.isfinite(ratio) or ratio < 0)) \
+            or note not in (None, ECON_OTHER_CUR, ECON_NO_SUM):
         return None
     at, sale, se, buy = _ts(v.get("at")), _pos(v.get("sale")), _pos(v.get("saleEur")), _pos(v.get("buyEur"))
     cur, mk, items, fx = v.get("cur"), v.get("markup"), _int(v.get("items")), v.get("fx") or {}
@@ -213,8 +229,11 @@ def _econ(v) -> dict | None:
             or not math.isfinite(mk) or abs(mk - (se / buy - 1)) > 1e-4 or not isinstance(fx, dict)
             or any(not (isinstance(k, str) and _CUR.match(k)) or _pos(x) is None for k, x in fx.items())):
         return None
-    return {"at": at, "sale": sale, "cur": cur, "saleEur": se, "buyEur": buy, "markup": float(mk),
-            "rebid": v["rebid"], "items": items, "fx": {k: float(x) for k, x in fx.items()}}
+    out = {"at": at, "sale": sale, "cur": cur, "saleEur": se, "buyEur": buy, "markup": float(mk),
+           "rebid": v["rebid"], "items": items, "fx": {k: float(x) for k, x in fx.items()}}
+    if "ratio" in v:
+        out["ratioAtRead"] = float(ratio) if ratio is not None else None
+    return out
 
 
 def clean(raw) -> dict | None:
@@ -234,23 +253,49 @@ def clean(raw) -> dict | None:
     return {"at": _ts(raw.get("at")), "chats": chats, "contracts": contracts, "econ": econ, "bad": bad}
 
 
-def econ_ratio(amount, deal_cur: str, e: dict) -> tuple[float | None, str]:
-    """«Сумма» сделки в валюте подачи / продажа файла — или (None, почему не сверить).
+def _num(v) -> float | None:
+    """Поле суммы Битрикса (строка или число) → число; пусто — 0; не число — None."""
+    if v is None or (isinstance(v, str) and not v.strip()):
+        return 0.0
+    if isinstance(v, bool):
+        return None
+    try:
+        x = float(v)
+    except (TypeError, ValueError):
+        return None
+    return x if math.isfinite(x) else None
 
-    Сравнение — в валюте подачи (решение владельца 23.10.2026). Валюта сделки — валюта
+
+def econ_vat(ratio) -> bool:
+    """Отношение «Сумма» / продажа файла — около 1,20 или 1,22: «Сумма» с НДС."""
+    return (isinstance(ratio, (int, float)) and not isinstance(ratio, bool) and math.isfinite(ratio)
+            and any(abs(round(ratio, 6) - v) <= ECON_VAT_TOL + 1e-9 for v in ECON_VAT))
+
+
+def econ_ratio(amount, deal_cur: str, e: dict, tax=None) -> tuple[float | None, str]:
+    """«Сумма» сделки без НДС в валюте подачи / продажа файла без НДС — или (None, почему не
+    сверить).
+
+    Сравнение — в валюте подачи (решение владельца 23.10.2026) и без НДС (правило «сравниваем
+    без НДС»): «Сумма» — OPPORTUNITY − TAX_VALUE (tax; пусто — 0). Валюта сделки — валюта
     подачи: как есть; евро — по курсу самого файла (продажа в валюте подачи / продажа в €);
     другая — по курсам файла (e["fx"]: единиц валюты подачи за 1 единицу); курса нет —
-    «валюта сделки другая». Суммы в сделке нет — 0: «Сумму» нужно внести, это тоже
-    расхождение. Тот же расчёт делает прогон чтения (scripts/econ_files.py) на день чтения."""
+    «валюта сделки другая». Суммы в сделке нет (пусто или 0) — «суммы нет»: сверять не с
+    чем, это не «расходится на 100 %». Сумма или налог не число, налог отрицателен или не
+    меньше суммы — сверки нет. Тот же расчёт делает прогон чтения (scripts/econ_files.py)
+    на день чтения."""
     sale = _pos(e.get("sale"))
     if sale is None:
         return None, ""
-    try:
-        amount = float(amount or 0)
-    except (TypeError, ValueError):
+    a = _num(amount)
+    if a is None:
         return None, ""
-    if not math.isfinite(amount) or amount <= 0:
-        return 0.0, ""
+    if a <= 0:
+        return None, ECON_NO_SUM
+    t = _num(tax)
+    if t is None or t < 0 or t >= a:
+        return None, ""
+    amount = a - t
     cur = str(deal_cur or "").upper()
     fx = e.get("fx") or {}
     if cur and cur == e.get("cur"):
@@ -420,16 +465,36 @@ def _amt(v: float) -> str:
     return f"{round(v):,}".replace(",", "\u00a0")
 
 
+def _gap_pct(d: float) -> float:
+    """Расхождение в процентах с одним знаком — в сторону от порога: 10,04 % (пункт: «больше
+    10 %») не печатается «10 %» — это «10,1 %», а 9,96 % (не пункт) — «9,9 %»."""
+    x = round(d * 1000, 6)
+    return (math.ceil(x) if d > ECON_GAP else math.floor(x)) / 10
+
+
+def gap_text(pct: float) -> str:
+    return f"{pct:.1f}".replace(".", ",")
+
+
 def _econ_cell(e: dict, r: dict) -> dict:
     """Финальная экономика в карточке сделки. Сумма сделки неизвестна сборке (строка без
-    saleAmt) — сверки нет, а не «расходится на 100 %»."""
-    ratio, note = (econ_ratio(r["saleAmt"], r.get("saleCur") or "", e) if r.get("saleAmt") is not None
+    saleAmt или она не число) — сверки нет, а не «расходится на 100 %». «Сумма» менялась
+    после чтения файла (отношение не то, что записал прогон чтения) — тоже: файл могли
+    обновить вместе с ней, сверка — после перечтения."""
+    amt = r.get("saleAmt")
+    ratio, note = (econ_ratio(amt, r.get("saleCur") or "", e, tax=r.get("saleTax")) if amt is not None
                    else (None, ""))
+    if ratio is not None and "ratioAtRead" in e:
+        before = e["ratioAtRead"]
+        if before is None or abs(ratio - before) > 1e-4 * max(1.0, before):
+            ratio, note = None, ECON_CHANGED
+    # порог — по округлённой доле: 10 % ровно не пункт и при шуме плавающей точки
+    d = round(abs(ratio - 1), 6) if ratio is not None else None
+    vat = d is not None and d > ECON_GAP and econ_vat(ratio)
     return {"at": e["at"].strftime("%d.%m.%Y"), "sale": f"{_amt(e['sale'])}\u00a0{e['cur']}", "cur": e["cur"],
             "buy": f"€{_amt(e['buyEur'])}", "markup": round(e["markup"] * 100, 1), "rebid": e["rebid"],
-            "items": e["items"], "gap": round(abs(ratio - 1) * 100) if ratio is not None else None,
-            # порог — по округлённой доле: 10 % ровно не пункт и при шуме плавающей точки
-            "gapNote": note, "over": ratio is not None and round(abs(ratio - 1), 6) > ECON_GAP}
+            "items": e["items"], "gap": _gap_pct(d) if d is not None else None,
+            "gapNote": note, "vat": vat, "over": d is not None and d > ECON_GAP and not vat}
 
 
 def _contract_cell(c: dict) -> dict:
@@ -518,11 +583,15 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
             cell = _econ_cell(e, r)
             rec["econ"] = cell
             n["econOther"] += cell["gapNote"] == ECON_OTHER_CUR
+            n["econNoSum"] += cell["gapNote"] == ECON_NO_SUM
+            n["econChanged"] += cell["gapNote"] == ECON_CHANGED
+            n["econVat"] += cell["vat"]
             if cell["over"]:
                 n["econGap"] += 1
                 # хозяин «Суммы» — ответственный сделки
                 queue.append(_item("econGap", r, _nm(r.get("manager")) or _owner(r),
-                                   what=f"Сумма сделки расходится с финальной экономикой на {cell['gap']} %"))
+                                   what="Сумма сделки расходится с финальной экономикой на "
+                                        f"{gap_text(cell['gap'])} %"))
         if rec:
             deals[did] = rec
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
@@ -543,7 +612,8 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
         "contract": {"seen": n["contractSeen"], "risk": n["risk"], "flags": n["flags"], "nopair": n["nopair"],
                      "pair": n["outcome:пара"], "unread": n["outcome:недочитана"]},
         # финальная экономика из файла — только счёт сделок: числа файла — в DEALCTX
-        "econ": {"seen": n["econSeen"], "gap": n["econGap"], "otherCur": n["econOther"]},
+        "econ": {"seen": n["econSeen"], "gap": n["econGap"], "otherCur": n["econOther"],
+                 "noSum": n["econNoSum"], "vat": n["econVat"], "changed": n["econChanged"]},
         "rules": {"freshDays": FRESH_DAYS, "replyHours": REPLY_HOURS, "dueMaxDays": DUE_MAX_DAYS,
                   "econGapPct": round(ECON_GAP * 100)},
     }

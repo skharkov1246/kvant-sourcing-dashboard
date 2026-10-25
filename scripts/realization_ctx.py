@@ -19,8 +19,12 @@
   econ       по сделке — финальная экономика из файла «Экономика проекта» (решение
              владельца 23.10.2026, scripts/econ_files.py): последнее чтение сделки
              (econ_file_latest), и только если оно «сверено» — продажа в валюте подачи и
-             в €, закупка в €, наценка над поставщиком, переторжка, позиций, курсы файла.
-             Ни пути, ни имени файла. Ключ закрытый; на странице числа — только в DEALCTX.
+             в €, закупка в €, наценка над поставщиком, переторжка, позиций, курсы файла и
+             сверка с «Суммой» на день чтения (ratio, note: по ней сборка видит, что «Сумму»
+             меняли после чтения). Вид берёт только прогоны, прошедшие гейт сумм
+             (econ_file_runs): упавший или снятый прогон в свод не попадает — ни здесь, ни в
+             ночном своде chat-context.yml. Ни пути, ни имени файла. Ключ закрытый; на
+             странице числа — только в DEALCTX.
 Ни текста чатов, ни условий договоров, ни цитат.
 
 ДВЕ ПРОВЕРКИ (распоряжение 26.09.2026). Исход и флаги пишет прогон чтения; здесь они
@@ -172,13 +176,16 @@ class База:
                  for r in флаги])
 
     def экономика(self) -> list[dict]:
-        """Последнее чтение файла экономики каждой сделки — только сверенное. Чтение со
-        сбоем доставки (сеть) последним не считается (вид econ_file_latest)."""
+        """Последнее чтение файла экономики каждой сделки — только сверенное и только из
+        прогона, прошедшего гейт сумм. Чтение со сбоем доставки или разбора последним не
+        считается (вид econ_file_latest)."""
         if not self.есть("econ_file_latest"):
             return []
-        ключи = ("deal", "at", "status", "cur", "sale", "saleEur", "buyEur", "markup", "rebid", "items", "fx")
+        ключи = ("deal", "at", "status", "cur", "sale", "saleEur", "buyEur", "markup", "rebid", "items", "fx",
+                 "ratio", "note")
         rows = self._все("""
-            select deal_id, read_at, status, sub_cur, sale_sub, sale_eur, purchase_eur, markup, rebid, items, fx
+            select deal_id, read_at, status, sub_cur, sale_sub, sale_eur, purchase_eur, markup, rebid, items, fx,
+                   bitrix_ratio, bitrix_note
               from econ_file_latest where status = %s""", (ECON_VERIFIED,))
         return [dict(zip(ключи, r)) for r in rows]
 
@@ -274,7 +281,10 @@ def свод_экономики(строки: list[dict]) -> tuple[dict, Counter
             "at": _iso(r["at"]), "sale": round(float(r["sale"]), 2), "cur": r["cur"],
             "saleEur": round(float(r["saleEur"]), 2), "buyEur": round(float(r["buyEur"]), 2),
             "markup": round(float(r["markup"]), 6), "rebid": bool(r["rebid"]), "items": int(r["items"]),
-            "fx": {str(k): float(v) for k, v in fx.items()}}
+            "fx": {str(k): float(v) for k, v in fx.items()},
+            # сверка с «Суммой» на день чтения — сборке, чтобы видеть «Сумму», изменённую позже
+            "ratio": round(float(r["ratio"]), 6) if r.get("ratio") is not None else None,
+            "note": r.get("note") or None}
         n["экономика: переторжка"] += bool(r["rebid"])
     return out, n
 

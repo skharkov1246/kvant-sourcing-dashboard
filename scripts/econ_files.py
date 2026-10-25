@@ -6,8 +6,10 @@
 проекта» на общем диске Яндекс 360 (ключ Диска аккаунта компании), 30 файлов в день, по
 одному, от новых сделок к старым; читается по шаблону, без модели (scripts/econ_template.py).
 Продажа — переторжка, если её столбцы заполнены, иначе «Наше КП»; закупка — оффер
-поставщика в евро по курсам файла; «Сумма» сделки сверяется с файлом в валюте подачи;
-наценка показывается как «наценка над поставщиком», не как маржа. Путь к файлу проверен
+поставщика в евро по курсам файла; «Сумма» сделки сверяется с файлом в валюте подачи и
+без НДС (OPPORTUNITY − TAX_VALUE против нетто-продажи файла; отношение около 1,20 или 1,22
+— «≈ с НДС», отдельным счётом, не расхождение: до решения владельца); наценка
+показывается как «наценка над поставщиком», не как маржа. Путь к файлу проверен
 зондом v56 (scripts/probe_econ_files.py), код ссылки — оттуда же.
 
 РЕЖИМЫ
@@ -38,17 +40,26 @@ virtual-disks/resources/download?path=vd:<метка>:disk:/<путь внутр
 отрезков (10, 25 или 50) и идут подряд в одном процессе; каждая строка — своя транзакция.
 Портал читается один раз, до частей (два запроса: стадии и сделки).
 
-ДВЕ ПРОВЕРКИ ФАЙЛА — в econ_template; число пишется в строку и публикуется только у
-статуса «сверено». ГЕЙТЫ ПРОГОНА (правило «сначала меряют, потом применяют»):
+ДВЕ ПРОВЕРКИ ФАЙЛА — в econ_template; числа (продажа, закупка, наценка) пишутся в строку
+только у статуса «сверено» — у прочих их нет и в базе (ограничение econ_file_reads_num_chk).
+Сбой чтения или записи одной сделки (исключение разбора, отказ базы принять строку) прогон
+не роняет: у сделки пишется строка «сбой чтения» без чисел — попытка потрачена, сделка
+уходит в конец очереди и не держит её каждую ночь. База не принимает и её — стоп, код 1.
+ГЕЙТЫ ПРОГОНА (правило «сначала меряют, потом применяют»):
   • «шаблон другой» у больше ГЕЙТ_ШАБЛОН_ДОЛЯ открытых файлов (от ГЕЙТ_ОТ) — шаблон
     сменился: чтение останавливается (предел суток не тратится впустую), код 1;
   • у сверенных строк медиана |сумма сделки / продажа файла − 1| больше ГЕЙТ_СУММЫ (от
     ГЕЙТ_ОТ, сделки без суммы не в счёт) — разбор, скорее всего, берёт не тот столбец или
     не ту валюту: прогон сам помечает свои строки (voided_at), код 1.
+РЕШЕНИЕ ГЕЙТА — В БАЗЕ: гейт сумм пройден — прогон пишет себя в econ_file_runs (passed_at),
+и только строки таких прогонов видит вид econ_file_latest, а с ним свод для вкладки (и
+ночной свод chat-context.yml). Прогон упал, его сняли или он не дошёл до гейта — его строк
+во вкладке нет, хотя они и не помечены.
 
 В ЖУРНАЛ — ТОЛЬКО АГРЕГАТЫ (CLAUDE.md, правило 17): ни номеров сделок, ни ссылок,
 путей, меток диска, имён файлов, ни сумм и наценок — только счётчики по статусам и
-по расхождению с суммой сделки. Ошибка — классом, без текста.
+по расхождению с суммой сделки; ссылки — видом (clck.ru, disk.yandex, другой), без домена:
+ссылка на портал клиента — его имя. Ошибка — классом, без текста.
 
     python scripts/econ_files.py                     # dry, до 30 сделок
     python scripts/econ_files.py --mode live --limit 30 --parts 10
@@ -78,7 +89,7 @@ import contracts  # noqa: E402  (поле ссылки ECON_LINK, стадия �
 import dealctx  # noqa: E402  (сверка «Суммы» сделки с файлом — та же, что у сборки)
 import econ_template as et  # noqa: E402
 
-METHOD_VER = f"econ_files:v1.{et.ВЕРСИЯ}"
+METHOD_VER = f"econ_files:v2.{et.ВЕРСИЯ}"
 КАТЕГОРИЯ_РЕАЛИЗАЦИИ = 0
 ПРЕДЕЛ_СУТОК = 30             # решение владельца 23.10.2026: не больше 30 файлов в сутки по Москве
 ПОВТОР_ДНЕЙ = 14              # читанное раньше — перечитать не чаще
@@ -98,13 +109,30 @@ API_СКАЧАТЬ = "https://cloud-api.yandex.net/v1/disk/virtual-disks/resourc
 НЕ_ОБЩИЙ = "не общий диск"
 НЕ_XLSX = "не xlsx"
 НЕ_СКАЧАЛСЯ = "не скачался"
-СТАТУСЫ = et.СТАТУСЫ_ФАЙЛА + (НЕ_РАСКРЫЛАСЬ, НЕ_ОБЩИЙ, НЕ_XLSX, НЕ_СКАЧАЛСЯ)
+СБОЙ = "сбой чтения"          # исключение разбора или отказ базы принять строку — наш сбой, не файла
+СТАТУСЫ = et.СТАТУСЫ_ФАЙЛА + (НЕ_РАСКРЫЛАСЬ, НЕ_ОБЩИЙ, НЕ_XLSX, НЕ_СКАЧАЛСЯ, СБОЙ)
+#: сбои, которые не заменяют прежнего чтения в econ_file_latest (сеть, наш код)
+НЕ_ЧТЕНИЕ = (НЕ_РАСКРЫЛАСЬ, НЕ_СКАЧАЛСЯ, СБОЙ)
 
+# TAX_VALUE — НДС в «Сумме»: сверка с файлом — без НДС (OPPORTUNITY − TAX_VALUE)
 ПОЛЯ_СДЕЛКИ = ["ID", "DATE_CREATE", "STAGE_ID", "STAGE_SEMANTIC_ID", "CATEGORY_ID", "OPPORTUNITY",
-               "CURRENCY_ID", contracts.ECON_LINK]
+               "TAX_VALUE", "CURRENCY_ID", contracts.ECON_LINK]
 
 
 # --------------------------------------------------------------------------- портал
+def вид_ссылки(ссылка: str) -> str:
+    """Вид ссылки для журнала — без домена: ссылка на портал клиента в журнале — его имя."""
+    try:
+        хост = (urllib.parse.urlparse(ссылка).hostname or "").lower()
+    except ValueError:
+        return "другой"
+    if хост == "clck.ru" or хост.endswith(".clck.ru"):
+        return "clck.ru"
+    if хост.startswith("disk.yandex.") or ".disk.yandex." in хост:
+        return "disk.yandex"
+    return "другой"
+
+
 def кандидаты(сделки: list[dict], стадии: dict[str, dict], счёт: Counter) -> list[dict]:
     """Открытые сделки реализации со ссылкой на файл. Открытость — по семантике стадии
     из справочника (запасной — поле сделки); «Оплата получена» — успех, не читается."""
@@ -122,7 +150,7 @@ def кандидаты(сделки: list[dict], стадии: dict[str, dict], 
         if not ссылка.lower().startswith("http"):
             счёт["без ссылки"] += 1
             continue
-        счёт["домен " + (urllib.parse.urlparse(ссылка).netloc.lower() or "?")] += 1
+        счёт["ссылка " + вид_ссылки(ссылка)] += 1
         out.append(d)
     return out
 
@@ -266,27 +294,29 @@ def ключ_файла(внутри: str | None) -> str | None:
 
 
 # --------------------------------------------------------------------------- строка
-def _сумма(d: dict) -> float:
-    try:
-        return float(d.get("OPPORTUNITY") or 0)
-    except (TypeError, ValueError):
-        return 0.0
-
-
 def строка(run_id: str, сделка: dict, статус: str, file_key: str | None, итог: et.Итог | None = None) -> dict:
-    """Строка econ_file_reads. Сверка с «Суммой» сделки — только у сверенного файла."""
+    """Строка econ_file_reads. Числа файла и сверка с «Суммой» сделки (без НДС: OPPORTUNITY −
+    TAX_VALUE) — только у сверенного файла: несверенный числа не несёт (дефект 3 ревизии —
+    отрицательная «продажа» неправдоподобного файла роняла запись)."""
     и = итог or et.Итог(статус)
+    свер = статус == et.СВЕРЕНО and и.сверено
     deal_cur = et.валюта(str(сделка.get("CURRENCY_ID") or "")) or None
     ratio, note = None, None
-    if и.сверено:
-        r, why = dealctx.econ_ratio(_сумма(сделка), deal_cur or "",
-                                    {"sale": и.sale_sub, "cur": и.sub_cur, "saleEur": и.sale_eur, "fx": и.fx})
+    if свер:
+        r, why = dealctx.econ_ratio(сделка.get("OPPORTUNITY"), deal_cur or "",
+                                    {"sale": и.sale_sub, "cur": и.sub_cur, "saleEur": и.sale_eur, "fx": и.fx},
+                                    tax=сделка.get("TAX_VALUE"))
         ratio, note = (round(r, 6) if r is not None else None), (why or None)
+
+    def число(v):
+        return v if свер else None
     return {"run_id": run_id, "method_ver": METHOD_VER, "deal_id": int(сделка["ID"]), "file_key": file_key,
-            "status": статус, "sub_cur": и.sub_cur, "sale_sub": и.sale_sub, "sale_eur": и.sale_eur,
-            "purchase_eur": и.purchase_eur, "markup": и.markup, "rebid": и.rebid, "items": и.items or None,
+            "status": статус, "sub_cur": и.sub_cur, "sale_sub": число(и.sale_sub), "sale_eur": число(и.sale_eur),
+            "purchase_eur": число(и.purchase_eur), "markup": число(и.markup), "rebid": и.rebid,
+            "items": и.items or None,
             "coef_median": и.coef_median, "totals_dev": и.totals_dev, "bad_lines": и.bad_lines,
-            "fx": и.fx or None, "deal_cur": deal_cur, "bitrix_ratio": ratio, "bitrix_note": note,
+            "fx": (и.fx or None) if свер else None, "deal_cur": deal_cur, "bitrix_ratio": ratio,
+            "bitrix_note": note,
             "why": и.why or None}
 
 
@@ -327,8 +357,10 @@ class База:
 
     def нет_таблиц(self) -> list[str]:
         r = self._одно("select to_regclass('econ_file_reads') is null, to_regclass('econ_file_attempts') is null, "
+                       "to_regclass('econ_file_runs') is null, "
                        "to_regprocedure('econ_file_take_slot(text, bigint, integer)') is null")
-        return [имя for имя, нет in zip(("econ_file_reads", "econ_file_attempts", "econ_file_take_slot"), r) if нет]
+        return [имя for имя, нет in zip(("econ_file_reads", "econ_file_attempts", "econ_file_runs",
+                                         "econ_file_take_slot"), r) if нет]
 
     def прочитано(self) -> dict[int, dt.datetime]:
         """Последнее непомеченное чтение каждой сделки (и неудачное — тоже чтение)."""
@@ -359,6 +391,18 @@ class База:
                       (run_id,))
             return c.rowcount
 
+    def отметить_прогон(self, run_id: str) -> tuple[int, int]:
+        """Гейт пройден: прогон — в econ_file_runs, его строки видит econ_file_latest. Счёт
+        строк — запросом к базе (правило 2). → (строк, сверено)."""
+        with self.с, self.с.cursor() as c:
+            c.execute("insert into econ_file_runs (run_id, method_ver, rows_n, verified_n) "
+                      "select %s, %s, count(*), count(*) filter (where status = 'сверено') "
+                      "  from econ_file_reads where run_id = %s and voided_at is null "
+                      "on conflict (run_id) do nothing", (run_id, METHOD_VER, run_id))
+            c.execute("select rows_n, verified_n from econ_file_runs where run_id = %s", (run_id,))
+            строк, сверено = c.fetchone()
+            return int(строк), int(сверено)
+
     def итог(self, run_id: str) -> Counter:
         """Что записано — запросом по ключу прогона (правило 2), без помеченных."""
         with self.с, self.с.cursor() as c:
@@ -375,18 +419,23 @@ def _доля(a: int, b: int) -> str:
     return f"{a} из {b} ({100 * a / b:.0f} %)" if b else "0 из 0"
 
 
+НДС_СЧЁТ = "≈ с НДС (×1,20 или ×1,22)"
+
+
 def сверка_с_суммой(строки: list[dict]) -> Counter:
-    """Сверенные файлы против «Суммы» сделки — только счётчики."""
+    """Сверенные файлы против «Суммы» сделки без НДС — только счётчики. «≈ с НДС» — отдельно:
+    замер, сколько сделок держат «Сумму» с НДС при пустом TAX_VALUE (до решения владельца
+    это не расхождение)."""
     n: Counter = Counter()
     for r in строки:
         if r["status"] != et.СВЕРЕНО:
             continue
         if r["bitrix_ratio"] is None:
             n[r["bitrix_note"] or "не сверена"] += 1
-        elif r["bitrix_ratio"] == 0:
-            n["в сделке суммы нет"] += 1
         elif round(abs(r["bitrix_ratio"] - 1), 6) <= dealctx.ECON_GAP:
             n[f"сходится (±{dealctx.ECON_GAP:.0%})"] += 1
+        elif dealctx.econ_vat(r["bitrix_ratio"]):
+            n[НДС_СЧЁТ] += 1
         else:
             n[f"расходится больше {dealctx.ECON_GAP:.0%}"] += 1
     return n
@@ -396,7 +445,7 @@ def гейт_сумм(строки: list[dict]) -> tuple[bool, str]:
     """Разбор берёт не тот столбец или не ту валюту, если у большинства сверенных файлов
     сумма сделки далеко от продажи файла. Сделки без суммы — не довод."""
     откл = [abs(r["bitrix_ratio"] - 1) for r in строки
-            if r["status"] == et.СВЕРЕНО and r["bitrix_ratio"] not in (None, 0)]
+            if r["status"] == et.СВЕРЕНО and r["bitrix_ratio"] is not None]
     if len(откл) < ГЕЙТ_ОТ:
         return True, f"гейт сумм: сверенных с суммой {len(откл)} — меньше {ГЕЙТ_ОТ}, не судим"
     м = statistics.median(откл)
@@ -411,9 +460,9 @@ def прогон(режим: str, лимит: int, частей: int, *, пор�
     печать(f"финальная экономика · режим {режим} · сделок до {лимит} · частей {частей} · ключ прогона {run_id}")
     счёт: Counter = Counter()
     канд = выбрать(портал, счёт)
-    домены = " · ".join(f"{к.removeprefix('домен ')} {v}" for к, v in счёт.most_common() if к.startswith("домен "))
+    виды = " · ".join(f"{к.removeprefix('ссылка ')} {v}" for к, v in счёт.most_common() if к.startswith("ссылка "))
     печать(f"сделки: открытых реализации {счёт['открытых']} (закрытых в выдаче {счёт['закрыта']}); "
-           f"со ссылкой «Экономика проекта» {_доля(len(канд), счёт['открытых'])}; домен ссылки: {домены or 'нет'}")
+           f"со ссылкой «Экономика проекта» {_доля(len(канд), счёт['открытых'])}; вид ссылки: {виды or 'нет'}")
     прочитано = база.прочитано() if база is not None else {}
     q = очередь(канд, прочитано, сейчас, счёт)
     взято = база.взято_сегодня() if база is not None else 0
@@ -428,6 +477,7 @@ def прогон(режим: str, лимит: int, частей: int, *, пор�
 
     строки: list[dict] = []
     статусы: Counter = Counter()
+    сбои: Counter = Counter()
     открыто = шаблон_другой = 0
     стоп = ""
     срок = часы() + СРОК_МИН * 60
@@ -447,9 +497,25 @@ def прогон(режим: str, лимит: int, частей: int, *, пор�
             # пауза — от конца прошлого файла: долгая закачка паузу не съедает
             if последний is not None:
                 спать(max(0.0, ПАУЗА_С - (часы() - последний)))
-            r = прочитать_сделку(run_id, сделка, диск)
+            # сбой одной сделки не роняет прогон и не держит очередь (дефект 3 ревизии): у неё
+            # строка «сбой чтения» без чисел — попытка потрачена, сделка уходит в конец очереди
+            try:
+                r = прочитать_сделку(run_id, сделка, диск)
+            except Exception as e:                               # noqa: BLE001 — класс, без текста
+                сбои[f"чтение: {type(e).__name__}"] += 1
+                r = строка(run_id, сделка, СБОЙ, None)
             последний = часы()
-            база.записать(r)
+            try:
+                база.записать(r)
+            except Exception as e:                               # noqa: BLE001
+                сбои[f"запись: {type(e).__name__}"] += 1
+                r = строка(run_id, сделка, СБОЙ, r.get("file_key"))
+                try:
+                    база.записать(r)
+                except Exception as e2:                          # noqa: BLE001
+                    сбои[f"запись сбоя: {type(e2).__name__}"] += 1
+                    стоп = "база"
+                    break
             строки.append(r)
             статусы[r["status"]] += 1
             в_части[r["status"]] += 1
@@ -473,6 +539,13 @@ def прогон(режим: str, лимит: int, частей: int, *, пор�
         печать(f"сверенные: переторжка {sum(1 for r in свер if r['rebid'])} из {len(свер)}")
     if диск is not None and getattr(диск, "коды", None):
         печать("коды ответов: " + " · ".join(f"{к} {v}" for к, v in sorted(диск.коды.items())))
+    if сбои:
+        печать(f"::warning::сбои чтения (у сделки строка «{СБОЙ}», без чисел): "
+               + " · ".join(f"{к} {v}" for к, v in sorted(сбои.items())))
+    if стоп == "база":
+        # база не принимает и строку сбоя: гейт не судит, в econ_file_runs прогон не попадёт
+        печать("::error::база не приняла строку сбоя — чтение остановлено; строки прогона во вкладку не пойдут")
+        return 1
     код = 0
     if стоп == "шаблон":
         печать(f"::error::«шаблон другой» у {_доля(шаблон_другой, открыто)} открытых файлов — шаблон сменился, "
@@ -486,6 +559,11 @@ def прогон(режим: str, лимит: int, частей: int, *, пор�
         снято = база.пометить_прогон(run_id)
         печать(f"::error::{журнал_гейта} — прогон пометил свои строки ({снято}), во вкладку они не попадут")
         код = 1
+    else:
+        # решение гейта — в базе: только строки прошедших прогонов видит econ_file_latest
+        строк, сверено = база.отметить_прогон(run_id)
+        печать(f"гейт пройден — прогон записан в econ_file_runs (строк {строк}, сверено {сверено}): "
+               "его строки пойдут во вкладку")
     итог = база.итог(run_id)
     печать(f"в базе по ключу прогона (без помеченных): строк {sum(итог.values())}, сверено {итог[et.СВЕРЕНО]}")
     return код

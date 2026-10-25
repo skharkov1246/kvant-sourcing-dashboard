@@ -241,9 +241,13 @@ def test_экономика_в_ключе_только_по_форме():
         "1": _e(), "2": _e(saleEur=10_000.0, markup=-0.5),          # продажа ниже закупки
         "3": _e(markup=0.9),                                         # наценка не из своих чисел
         "4": _e(cur="руб"), "5": _e(fx={"EUR": "сто"}), "6": _e(sale=float("nan")),
-        "7": _e(items=0), "8": _e(rebid="нет"), "x": _e()}}
+        "7": _e(items=0), "8": _e(rebid="нет"), "x": _e(),
+        "9": _e(ratio="сто"), "10": _e(ratio=-1.0), "11": _e(note="что-то"),
+        "12": _e(ratio=1.05, note=None), "13": _e(ratio=None, note="суммы нет")}}
     ctx = dealctx.clean(raw)
-    assert set(ctx["econ"]) == {"1"} and ctx["bad"] == 8
+    assert set(ctx["econ"]) == {"1", "12", "13"} and ctx["bad"] == 11
+    assert ctx["econ"]["12"]["ratioAtRead"] == 1.05 and ctx["econ"]["13"]["ratioAtRead"] is None
+    assert "ratioAtRead" not in ctx["econ"]["1"], "ключ до 25.10.2026 — без сверки на день чтения"
     assert ctx["econ"]["1"]["fx"] == {"EUR": 100.0, "USD": 92.0}
     # ключ до 23.10.2026 — без раздела econ: вкладка как была
     assert dealctx.clean({"version": 1, "chats": {}, "contracts": {}})["econ"] == {}
@@ -257,8 +261,24 @@ def test_сверка_суммы_в_валюте_подачи():
     r, _ = dealctx.econ_ratio(28_000, "USD", e)          # по курсам файла
     assert r == pytest.approx(28_000 * 92 / 2_600_000)
     assert dealctx.econ_ratio(1000, "CNY", e) == (None, dealctx.ECON_OTHER_CUR)
-    assert dealctx.econ_ratio(0, "RUB", e) == (0.0, ""), "суммы нет — расхождение на 100 %"
-    assert dealctx.econ_ratio(None, "", e) == (0.0, "")
+    # суммы нет — сверять не с чем (ревизия, дефект 5): не «расходится на 100 %»
+    assert dealctx.econ_ratio(0, "RUB", e) == (None, dealctx.ECON_NO_SUM)
+    assert dealctx.econ_ratio(None, "", e) == (None, dealctx.ECON_NO_SUM)
+    assert dealctx.econ_ratio("", "CNY", e) == (None, dealctx.ECON_NO_SUM), "суммы нет — раньше валюты"
+    assert dealctx.econ_ratio("много", "RUB", e) == (None, "") and dealctx.econ_ratio(float("nan"), "RUB", e) == (None, "")
+
+
+def test_сверка_суммы_без_ндс():
+    """Ревизия, дефект 4: «Сумма» с НДС против нетто-продажи файла — OPPORTUNITY − TAX_VALUE."""
+    e = dealctx.clean({"version": 1, "econ": {"1": _e()}})["econ"]["1"]
+    assert dealctx.econ_ratio(3_172_000, "RUB", e, tax=572_000) == (1.0, "")
+    assert dealctx.econ_ratio("3172000", "RUB", e, tax="572000.00") == (1.0, ""), "поля Битрикса — строками"
+    r, _ = dealctx.econ_ratio(3_172_000, "RUB", e, tax="")              # налога нет — «Сумма» как есть
+    assert r == pytest.approx(1.22) and dealctx.econ_vat(r)
+    for налог in ("много", -1, 3_172_000):                              # не число, отрицателен, не меньше суммы
+        assert dealctx.econ_ratio(3_172_000, "RUB", e, tax=налог) == (None, "")
+    assert [dealctx.econ_vat(x) for x in (1.2, 1.209, 1.22, 1.23, 1.19, 1.215, 1.1, 1.25, None, True)] == \
+        [True, True, True, True, True, True, False, False, False, False]
 
 
 def test_экономика_в_карточке_и_пункт_очереди():
@@ -268,22 +288,26 @@ def test_экономика_в_карточке_и_пункт_очереди():
     d = dc["deals"]
     e = d["6010"]["econ"]
     assert e == {"at": "17.10.2026", "sale": "80\u00a0000\u00a0EUR", "cur": "EUR", "buy": "€60\u00a0000", "markup": 33.3,
-                 "rebid": False, "items": 9, "gap": 38, "gapNote": "", "over": True}
+                 "rebid": False, "items": 9, "gap": 37.5, "gapNote": "", "vat": False, "over": True}
     assert rows["6010"]["saleAmt"] == 50_000.0 and rows["6010"]["saleCur"] == "EUR"
+    assert rows["6010"]["saleTax"] == 0.0, "НДС в «Сумме» — из TAX_VALUE; в стабе его нет"
     assert d["6005"]["econ"]["rebid"] is True and d["6005"]["econ"]["gap"] == 0
     assert d["6006"]["econ"]["gap"] == 5 and d["6006"]["econ"]["over"] is False
     gap = [x for x in dc["queue"] if x["code"] == "econGap"]
     assert [x["deal"] for x in gap] == ["6010", "6003"]
-    assert gap[0]["what"] == "Сумма сделки расходится с финальной экономикой на 38 %"
+    assert gap[0]["what"] == "Сумма сделки расходится с финальной экономикой на 37,5 %"
+    assert gap[1]["what"].endswith("на 17,2 %"), "29 000 против 35 000 — 17,14 %: вверх, от порога"
     assert gap[0]["act"] == "обновить «Сумму» сделки по финальному расчёту"
     assert gap[0]["who"] == rows["6010"]["manager"], "хозяин — ответственный сделки"
     h = ct["head"]["ctx"]
-    assert h["econ"] == {"seen": 5, "gap": 2, "otherCur": 0} and h["rules"]["econGapPct"] == 10
+    assert h["econ"] == {"seen": 5, "gap": 2, "otherCur": 0, "noSum": 0, "vat": 0, "changed": 0}
+    assert h["rules"]["econGapPct"] == 10
     # числа файла — только в закрытой части: ни в шапке, ни в строках сделок
     открыто = json.dumps({"head": ct["head"], "rows": ct["rows"]}, ensure_ascii=False)
     for слово in ("80\u00a0000\u00a0EUR", "€60\u00a0000", "наценк", "markup", "rebid"):
         assert слово not in открыто
-    assert all("econ" not in x for x in ct["rows"]) and set(h["econ"]) == {"seen", "gap", "otherCur"}
+    assert all("econ" not in x for x in ct["rows"])
+    assert set(h["econ"]) == {"seen", "gap", "otherCur", "noSum", "vat", "changed"}
 
 
 def test_экономика_валюта_сделки_другая_без_пункта():
@@ -293,9 +317,12 @@ def test_экономика_валюта_сделки_другая_без_пун
     head, payload = dealctx.build([row], None, ctx, NOW, today=TODAY)
     assert payload["deals"]["1"]["econ"]["gapNote"] == dealctx.ECON_OTHER_CUR
     assert payload["deals"]["1"]["econ"]["gap"] is None and payload["queue"] == []
-    assert head["econ"] == {"seen": 1, "gap": 0, "otherCur": 1}
-    # сборка не знает суммы сделки (строка без saleAmt) — не «расходится на 100 %»
+    assert head["econ"] == {"seen": 1, "gap": 0, "otherCur": 1, "noSum": 0, "vat": 0, "changed": 0}
+    # сборка не знает суммы сделки (строка без saleAmt или она не число) — не «расходится на 100 %»
     row.pop("saleAmt")
+    _h, payload = dealctx.build([row], None, ctx, NOW, today=TODAY)
+    assert payload["deals"]["1"]["econ"]["gap"] is None and payload["queue"] == []
+    row.update(saleAmt=None)
     _h, payload = dealctx.build([row], None, ctx, NOW, today=TODAY)
     assert payload["deals"]["1"]["econ"]["gap"] is None and payload["queue"] == []
     # граница порога: 10 % — ещё не пункт
@@ -305,6 +332,60 @@ def test_экономика_валюта_сделки_другая_без_пун
     row.update(saleAmt=2_870_000.0)
     _h, payload = dealctx.build([row], None, ctx, NOW, today=TODAY)
     assert [q["code"] for q in payload["queue"]] == ["econGap"]
+
+
+def _одна(row_kw: dict, **e_kw):
+    ctx = dealctx.clean({"version": 1, "chats": {}, "contracts": {}, "econ": {"1": _e(**e_kw)}})
+    row = {"deal": "1", "seq": 5, "closed": False, "manager": "Ответственный ВЫДУМКА", "saleCur": "RUB",
+           "customer": "—", "title": ""} | row_kw
+    return dealctx.build([row], None, ctx, NOW, today=TODAY)
+
+
+def test_экономика_суммы_нет_не_пункт():
+    """Ревизия, дефект 5: «Суммы» в сделке нет — не «расходится на 100 %»."""
+    head, payload = _одна({"saleAmt": 0.0})
+    cell = payload["deals"]["1"]["econ"]
+    assert cell["gap"] is None and cell["over"] is False and cell["gapNote"] == dealctx.ECON_NO_SUM
+    assert payload["queue"] == [] and head["econ"]["noSum"] == 1 and head["econ"]["gap"] == 0
+
+
+def test_экономика_расхождение_одним_знаком_от_порога():
+    """10,04 % — пункт («больше 10 %»), и печатается он не «10 %»."""
+    _h, payload = _одна({"saleAmt": 2_861_040.0})                      # 2 600 000 × 1,1004
+    cell = payload["deals"]["1"]["econ"]
+    assert cell["over"] is True and cell["gap"] == 10.1
+    assert payload["queue"][0]["what"] == "Сумма сделки расходится с финальной экономикой на 10,1 %"
+    _h, payload = _одна({"saleAmt": 2_858_960.0})                      # 9,96 % — не пункт, и не «10 %»
+    assert payload["deals"]["1"]["econ"]["gap"] == 9.9 and payload["queue"] == []
+
+
+def test_экономика_похоже_на_ндс_не_пункт():
+    head, payload = _одна({"saleAmt": 3_172_000.0})                    # × 1,22 к нетто-продаже файла
+    cell = payload["deals"]["1"]["econ"]
+    assert cell["vat"] is True and cell["over"] is False and cell["gap"] == 22.0
+    assert payload["queue"] == [] and head["econ"]["vat"] == 1 and head["econ"]["gap"] == 0
+    # НДС указан в сделке — вычитается, и всё сходится
+    head, payload = _одна({"saleAmt": 3_172_000.0, "saleTax": 572_000.0})
+    assert payload["deals"]["1"]["econ"]["gap"] == 0 and head["econ"]["vat"] == 0
+    # 40 % — не НДС: пункт
+    _h, payload = _одна({"saleAmt": 3_640_000.0})
+    assert [q["code"] for q in payload["queue"]] == ["econGap"]
+
+
+def test_экономика_сумма_менялась_после_чтения_не_пункт():
+    """Минорное ревизии: файл обновили и «Сумму» по нему — до перечтения пункта нет."""
+    # на день чтения «Сумма» сходилась, теперь — нет: менялась после чтения
+    head, payload = _одна({"saleAmt": 3_000_000.0}, ratio=1.0)
+    cell = payload["deals"]["1"]["econ"]
+    assert cell["gapNote"] == dealctx.ECON_CHANGED and cell["gap"] is None and cell["over"] is False
+    assert payload["queue"] == [] and head["econ"]["changed"] == 1
+    # на день чтения суммы не было, теперь есть — тоже менялась
+    _h, payload = _одна({"saleAmt": 3_000_000.0}, ratio=None, note="суммы нет")
+    assert payload["deals"]["1"]["econ"]["gapNote"] == dealctx.ECON_CHANGED and payload["queue"] == []
+    # та же «Сумма», что на день чтения, и она расходится — пункт
+    _h, payload = _одна({"saleAmt": 3_900_000.0}, ratio=1.5)
+    assert [q["code"] for q in payload["queue"]] == ["econGap"]
+    assert payload["deals"]["1"]["econ"]["gapNote"] == ""
 
 
 def test_статус_сверено_как_у_шаблона():

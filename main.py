@@ -855,7 +855,9 @@ def run(args) -> int:
                   f"высокий риск {_c['high']}, срок из чата прошёл {_c['dueLate']}; договоры разобраны у "
                   f"{_k['seen']}: с риском сверки {_k['risk']} (флагов {_k['flags']}), без пары {_k['nopair']}, "
                   f"не дочитаны {_k['unread']}; финальная экономика сверена у {_hc['econ']['seen']} "
-                  f"(сумма сделки расходится у {_hc['econ']['gap']}, валюта другая у {_hc['econ']['otherCur']}); "
+                  f"(сумма сделки расходится у {_hc['econ']['gap']}, похожа на сумму с НДС у {_hc['econ']['vat']}, "
+                  f"суммы нет у {_hc['econ']['noSum']}, менялась после чтения у {_hc['econ']['changed']}, "
+                  f"валюта другая у {_hc['econ']['otherCur']}); "
                   f"пунктов очереди {len(dealctx_data['queue'])}")
         print(f"  «подвисла» по чату решено: " + ", ".join(
             f"{k} {v}" for k, v in sorted((contracts_data["head"].get("chatBy") or {}).items())))

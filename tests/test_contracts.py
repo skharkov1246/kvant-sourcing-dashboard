@@ -317,3 +317,20 @@ def test_доставлено_по_стадии_без_даты_не_проср�
     life = ct["life"]
     assert life["counts"].get("late") == 1, "просрочка — только заказ 501 сделки 1"
     assert [q["code"] for q in life["queue"] if q["order"] == "505"] == ["noFact"]
+
+
+def test_сумма_и_ндс_сделки_для_сверки_с_файлом():
+    """Ревизия 25.10.2026 (дефекты 4 и 5): «Сумма» и НДС в ней — числом для сверки с
+    финальной экономикой файла; нечитаемая — None, а не 0 («суммы нет» ≠ «не прочитали»).
+    Итоги вкладки считают сумму как прежде: для читаемых чисел ничего не меняется."""
+    assert contracts_mod._amount("1500.5") == 1500.5 and contracts_mod._amount(1500) == 1500.0
+    assert contracts_mod._amount(None) == 0.0 and contracts_mod._amount("") == 0.0
+    assert contracts_mod._amount("много") is None and contracts_mod._amount(float("nan")) is None
+    assert contracts_mod._amount(float("inf")) is None
+    п = Портал()
+    до = _посчитать(Портал())
+    п.deals[0]["TAX_VALUE"] = "18032.79"                  # придуманный НДС в «Сумме»
+    ct = _посчитать(п)
+    r1, r2 = _row(ct, "1"), _row(ct, "2")
+    assert (r1["saleAmt"], r1["saleTax"]) == (100_000.0, 18_032.79) and (r2["saleAmt"], r2["saleTax"]) == (50_000.0, 0.0)
+    assert [x["saleEur"] for x in ct["rows"]] == [x["saleEur"] for x in до["rows"]], "итоги — как были"
