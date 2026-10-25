@@ -39,6 +39,15 @@
 не прошла — сделка без экономики, шаг кончается кодом 1 после записи. Готовый свод перед
 записью проходит разбор dealctx.clean: запись не по форме — стоп, ключ не трогается.
 
+СХЕМА ДОГОВОРОВ. Свод строят и прогон чтения договоров, и прогон экономики (econ-files.yml),
+который схему договоров не применяет. У базы, где её ещё нет в версии v2 (25.10.2026:
+link_source, order_key), колонка v2 из выгрузки (link_source) берётся пустой
+(колонки_выгрузки, один запрос к pg_attribute), а журнал говорит одной строкой, каких нет:
+первый живой прогон экономики падал здесь на UndefinedColumn. Пустой — только она: у строк
+до v2 link_source пуст и так. Нет колонки схемы старше (side_link, 22.10.2026) — стоп
+CONTRACT_SCHEMA_TOO_OLD: в side тогда сторона по связи карточки без переноса, и флаги сочли
+бы её стороной, названной моделью.
+
 ЗАПИСЬ. KV → перечитать и сверить (как chat_scan). В журнал — только счётчики (правило 17).
 
     python scripts/realization_ctx.py --publish     # база → KV (SUPABASE_DB_URL, CLOUDFLARE_*)
@@ -82,6 +91,26 @@ ECON_VERIFIED = "сверено"
 #: у портала, формат, предел) записывалось как «недочитана» — пересчёт нынешним кодом
 #: точнее, и вкладка показывает его, а не «разошлось».
 СХОДЯТСЯ = {("недочитана", "не читается")}
+#: Колонки contract_terms в выгрузке строк. Схему договоров v2 (25.10.2026: link_source,
+#: order_key) применяет прогон чтения договоров (contract-terms.yml); прогон экономики
+#: (econ-files.yml) строит этот же свод и до неё падал на UndefinedColumn. У строк до
+#: 25.10.2026 link_source и так пуст — пересчёт флагов это знает, и только колонки v2
+#: берутся пустыми (null), если их нет.
+КОЛОНКИ_УСЛОВИЙ = ("deal_id", "run_id", "card_entity", "card_id", "file_id", "order_id", "side", "side_company",
+                   "side_link", "side_template", "status", "terms", "dropped", "link_source", "note")
+#: Колонки схемы договоров v2: link_source — в выгрузке, order_key — ключ строки с заказом.
+СХЕМА_ДОГОВОРОВ_V2 = ("link_source", "order_key")
+
+
+def колонки_выгрузки(есть: set[str]) -> tuple[str, list[str], list[str]]:
+    """Колонки contract_terms, что есть у базы → (список select; колонки v2, которых нет, —
+    журналу; колонки выгрузки старше v2, которых нет). Пустой (null) берётся только колонка
+    v2: без колонки старше (side_link, 22.10.2026) значения прочих — прежнего смысла (side —
+    сторона по связи карточки, а не названная моделью), и свод по ним был бы ложным."""
+    выбор = ", ".join(f"null as {к}" if к not in есть and к in СХЕМА_ДОГОВОРОВ_V2 else к for к in КОЛОНКИ_УСЛОВИЙ)
+    нет = [к for к in СХЕМА_ДОГОВОРОВ_V2 if к not in есть]
+    старше = [к for к in КОЛОНКИ_УСЛОВИЙ if к not in есть and к not in СХЕМА_ДОГОВОРОВ_V2]
+    return выбор, нет, старше
 
 
 def выбор_прогона(исходы: list[dict], файлы: dict[tuple[int, str], frozenset]) -> dict:
@@ -132,6 +161,15 @@ class База:
             опции += f" -c search_path={схема}"
         self.с = psycopg2.connect(dsn, options=опции)
         self.с.set_session(readonly=True)
+        #: колонки contract_terms, которых нет у базы (схема договоров до v2) — журналу
+        self.нет_колонок: list[str] = []
+
+    def колонки(self, таблица: str) -> set[str]:
+        """Колонки таблицы из search_path — один запрос к pg_attribute."""
+        with self.с, self.с.cursor() as c:
+            c.execute("select attname from pg_attribute where attrelid = to_regclass(%s) and attnum > 0 "
+                      "and not attisdropped", (таблица,))
+            return {str(r[0]) for r in c.fetchall()}
 
     def есть(self, *таблицы: str) -> bool:
         with self.с, self.с.cursor() as c:
@@ -168,6 +206,11 @@ class База:
         """(выбор прогона по сделке, строки условий выбранных пар, флаги выбранных пар)."""
         if not self.есть("contract_terms", "contract_b2b_flags"):
             return [], [], []
+        # схема договоров до v2 (нет link_source) — колонка пустой, а не UndefinedColumn; схема
+        # старше (нет side_link) — стоп: имена колонок — из постоянного списка, не из базы
+        выбор_колонок, self.нет_колонок, старше = колонки_выгрузки(self.колонки("contract_terms"))
+        if старше:
+            raise CtxError(f"CONTRACT_SCHEMA_TOO_OLD:{','.join(старше)}")
         выбор: dict[int, dict] = {}
         if self.есть("contract_deal_outcome"):
             # последний исход сделки; «недочитана» — прежним полным разбором с теми же
@@ -218,13 +261,11 @@ class База:
         # link_source — флаги по отсутствию у заказа, где у поставщика только Purchase order;
         # note — статус строк до 25.10.2026 по нынешним правилам (contract_terms.уточнить_статус)
         строки = self._все(f"""
-            select deal_id, run_id, card_entity, card_id, file_id, order_id, side, side_company, side_link,
-                   side_template, status, terms, dropped, link_source, note
+            select {выбор_колонок}
               from contract_terms where {пары}
              order by deal_id, {ПОРЯДОК_СТРОК_SQL}""",
                             (сделки, прогоны))
-        ключи = ("deal_id", "run_id", "card_entity", "card_id", "file_id", "order_id", "side", "side_company",
-                 "side_link", "side_template", "status", "terms", "dropped", "link_source", "note")
+        ключи = КОЛОНКИ_УСЛОВИЙ
         флаги = self._все(f"select deal_id, run_id, order_id, code, days from contract_b2b_flags where {пары}",
                           (сделки, прогоны))
         return (list(выбор.values()), [dict(zip(ключи, r)) for r in строки],
@@ -405,6 +446,10 @@ def publish(база, store, *, dry: bool, ct=None, печать=print) -> int:
     печать(f"• Свод чатов и договоров для вкладки «Реализация» ({KV_KEY})")
     for s in журнал(n, raw):
         печать(s)
+    нет = getattr(база, "нет_колонок", None)
+    if нет:
+        печать(f"  схема договоров старая: колонки {', '.join(нет)} нет — в своде они пустые, пока прогон чтения "
+               "договоров не применит library/supabase/contract_terms_schema.sql")
     if dry:
         печать("  вхолостую: ключ не записан")
     else:

@@ -134,15 +134,18 @@ def названия(client, ids) -> dict[int, str]:
     return out
 
 
-def реквизиты(client, ids) -> dict[int, list[dict]]:
-    """Реквизиты компаний пачками по @ENTITY_ID, дочитка по «>ID» без смещения."""
+def реквизиты(client, ids, поля=ПОЛЯ_РЕКВИЗИТОВ) -> dict[int, list[dict]]:
+    """Реквизиты компаний пачками по @ENTITY_ID, дочитка по «>ID» без смещения.
+    поля — что выбрать (зонд v59 берёт PRESET_ID: страну покупателя); ID и
+    ENTITY_ID нужны самой дочитке и добавляются всегда."""
     out: dict[int, list[dict]] = collections.defaultdict(list)
+    выбор = list(dict.fromkeys(("ID", "ENTITY_ID", *поля)))
     for пачка in пачки(ids):
         после = 0
         while True:
             res = client.call("crm.requisite.list", {
                 "filter": {"ENTITY_TYPE_ID": ТИП_КОМПАНИЯ, "@ENTITY_ID": пачка, ">ID": после},
-                "select": list(ПОЛЯ_РЕКВИЗИТОВ), "order": {"ID": "ASC"}, "start": -1}) or []
+                "select": выбор, "order": {"ID": "ASC"}, "start": -1}) or []
             for r in res:
                 сырой = str(r.get("ENTITY_ID") or "")
                 if сырой.isdigit():
