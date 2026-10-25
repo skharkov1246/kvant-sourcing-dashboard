@@ -76,7 +76,7 @@ def pz_of(buy: float, crow: dict | None, *, econ: bool = True) -> tuple[float, f
         # закупка из сверенного файла экономики (contracts: файл первым, решение 25.10.2026) —
         # оффер поставщика, как и заказы: × (1 + PZ_OVER)
         fbuy = float(crow.get("buyEur") or 0)
-        if crow.get("buySrc") == "file" and fbuy > 0:
+        if crow.get("buySrc") == "file" and fbuy > 0 and not crow.get("buySusp"):
             return fbuy * (1 + PZ_OVER), fbuy, "file"
         pb = crow.get("planBreak") or {}
         direct = abs(float(pb.get("direct") or 0))
