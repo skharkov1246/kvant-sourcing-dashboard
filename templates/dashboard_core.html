@@ -1792,7 +1792,7 @@ function openContract(x){
   // всё, что не закуп: логистика, таможня, прочие прямые
   const eBuy=B?(B.buy!=null?Math.abs(B.buy):null):((x.buySrc==='orders'||x.buySrc==='file')&&!x.buySusp&&x.buyEur?x.buyEur:null);
   const eRest=(B&&B.direct!=null)?Math.abs(B.direct)+Math.abs(B.other||0)-Math.abs(B.buy||0):null;
-  const MK=x.buySrc==='file'&&!_dcData();     // наценка по файлу без права — не показывается
+  const MK=x.buySrc==='file'&&!_dcData();     // маржа по файлу без права «договоры и деньги» — не показывается
   const GM=(B||MK)?null:x.marginEur;
   h+=`<div class="h">Экономика сделки${qmark('ct.three')}</div>`;
   const FS=x.saleSrc==='file';
@@ -1808,7 +1808,7 @@ function openContract(x){
     +`<div class="arw">=</div>`
     +`<div class="cstep res${ebad?' bad':''}"><div class="cl">плановая прибыль</div><div class="cv">${PF!=null?_fmtE(PF):'—'}${pct!=null?` <span style="font-size:11px;font-weight:400">${Math.round(pct*100)}%</span>`:''}</div></div>`
     :`<div class="arw">=</div>`
-    +`<div class="cstep res"><div class="cl">${x.buySrc==='file'?'наценка над поставщиком':'валовая маржа'}</div><div class="cv">${GM!=null?_fmtE(GM):MK?'—':_esc(x.marginLbl||'—')}${GM!=null&&x.marginPct!=null?` <span style="font-size:11px;font-weight:400">${x.marginPct}%</span>`:''}</div></div>`)
+    +`<div class="cstep res"><div class="cl">${x.buySrc==='file'?'валовая маржа (файл)':'валовая маржа'}</div><div class="cv">${GM!=null?_fmtE(GM):MK?'—':_esc(x.marginLbl||'—')}${GM!=null&&x.marginPct!=null?` <span style="font-size:11px;font-weight:400">${x.marginPct}%</span>`:''}</div></div>`)
     +`</div>`;
   if(ebad) h+=`<div class="ewarn">⚠ ${ewhy}</div>`;
   else if(norm&&pct!=null) h+=`<div class="note">Норма по бюджету — ${Math.round(norm*100)}%, факт плана ${Math.round(pct*100)}%.</div>`;
@@ -1827,7 +1827,7 @@ function openContract(x){
   h+=`<div class="thr thead"><span class="tl">источник</span><span class="tv">выручка</span><span class="tv">себестоимость</span><span class="tv">заработок</span></div>`;
   const SB=FS?x.saleBitrixEur:x.saleEur;
   if(FS) h+=line('Файл экономики (сверен)', x.saleEur||null, x.buyEur||null,
-          (x.marginEur!=null&&!MK)?x.marginEur:null, MK?'наценка — с правом «договоры и деньги»':'над поставщиком', 'best');
+          (x.marginEur!=null&&!MK)?x.marginEur:null, MK?'маржа — с правом «договоры и деньги»':'валовая (файл)', 'best');
   h+=line('Битрикс: сделка и заказы', SB||null, x.buyOrdersEur||null,
           (SB&&x.buyOrdersEur&&!(x.buySusp&&x.buySrc==='orders'))?SB-x.buyOrdersEur:null, 'валовая', '');
   h+=line('Money-поля экономики (только сверка)', null, x.buyEconEur||null,
@@ -2152,12 +2152,13 @@ function _ctPanel(X,el){
   const XCOLS=DC?['Чат · договор']:[];
   const head=()=>{document.getElementById('ctHead').innerHTML=`<tr><th class="r sortable${sortKey==='seq'?' on':''}" data-sk="seq" style="width:48px">№${sortKey==='seq'?(sortDir<0?' ▾':' ▴'):''}</th>`+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+XCOLS.map(t=>`<th>${t}</th>`).join('')+'</tr>';};
   const tdline=x=>{const t=DC&&!x.closed?dcOf(x).todo:null; return t?`<div class="dep" style="color:var(--a2)">→ ${_esc(String(t.who).replace(/ \(уволен\)$/,''))}: ${_esc(t.act)}</div>`:'';};
-  // наценка над поставщиком по файлу — показатель права «договоры и деньги» (решение владельца
-  // 25.10.2026): без него — ни суммой, ни процентом; признак права — закрытая часть на странице
+  // маржа по файлу (продажа файла − закупка файла) — показатель права «договоры и деньги»
+  // (решение владельца 25.10.2026: наценка над поставщиком — только с ним): без права — ни
+  // суммой, ни процентом; признак права — закрытая часть на странице (воркер вырезает её)
   const mkHide=x=>x.buySrc==='file'&&!_dcData();
   const mcell=x=>{if(mkHide(x))return `<div class="mono" style="color:var(--dim)">—</div><div class="dep">по файлу: с правом «договоры и деньги»</div>`;const cl=(x.marginEur||0)<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${x.marginEur==null?'color:var(--dim)':cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
   const pcell=x=>{
-    const gross=(x.marginEur==null||mkHide(x))?'':`<div class="dep">${x.buySrc==='file'?'наценка':'валовая'} ${x.marginLbl}${x.marginPct!=null?` · ${x.marginPct}%`:''}`
+    const gross=(x.marginEur==null||mkHide(x))?'':`<div class="dep">${x.buySrc==='file'?'валовая (файл)':'валовая'} ${x.marginLbl}${x.marginPct!=null?` · ${x.marginPct}%`:''}`
       +(x.grossSusp?' <span class="srcb disc" title="'+_esc(x.grossWhy)+'">⚠ мало заказов?</span>':'')+`</div>`;
     if(x.planProfitEur==null&&x.planMdEur==null)
       return `<div class="mono" style="color:var(--dim)">${x.hasBudget?'бюджет не прочитан':'нет бюджета'}</div>`+gross;

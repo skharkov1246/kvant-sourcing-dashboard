@@ -302,3 +302,24 @@ def test_файл_даёт_продажу_при_валюте_без_курса(
     r = _row(data, did)
     assert r["saleKnown"] is True and r["saleSrc"] == "file" and r["saleEur"] == 26_000
     assert data["head"]["nFx"] == 0
+
+
+def test_файл_против_заказов_расхождение():
+    """У сделки с закупкой из файла «источники расходятся» — файл против заказов."""
+    stub = fixture.ContractsStub()
+    d = stub.deals[1]
+    did = d["ID"]
+    orders = _row(_compute(stub), did)["buyOrdersEur"]
+    assert orders > 0
+    r = _row(_compute_econ(stub, {did: _econ(orders * 4.0, orders * 2.0)}), did)
+    assert r["buySrc"] == "file" and r["discrep"] is True
+    r = _row(_compute_econ(stub, {did: _econ(orders * 2.0, orders * 1.05)}), did)
+    assert r["discrep"] is False
+
+
+def test_премии_берут_закупку_файла():
+    import premia
+    crow = {"buySrc": "file", "buyEur": 6000, "buyEconEur": 9000}
+    pz, pay, src = premia._cost({"buyRaw": 0}, crow, 100.0)
+    assert src == "file" and pay == 600_000.0 and abs(pz - 660_000.0) < 1e-6
+    assert premia._cost({"buyRaw": 50}, crow, 100.0)[2] == "orders", "заказы — первыми"

@@ -474,8 +474,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             sale_src = "bitrix"
         # закупка несоизмерима с продажей — показывается текстом, в маржу и итоги не идёт
         buy_susp = bool(sale > 0 and buy > 0 and not BUY_SANE[0] <= buy / sale <= BUY_SANE[1])
-        discrep = (buy_orders > 0 and buy_econ > 0
-                   and abs(buy_orders - buy_econ) / max(buy_orders, buy_econ) > 0.2)
+        # источники закупки расходятся больше чем на 20 %: у файла — файл против заказов, иначе
+        # заказы против money-полей (ячейка закупки показывает второй источник рядом)
+        _alt = buy_orders if buy_src == "file" else buy_econ
+        _main = buy if buy_src == "file" else buy_orders
+        discrep = (_main > 0 and _alt > 0 and abs(_main - _alt) / max(_main, _alt) > 0.2)
         margin = (sale - buy) if (sale and buy_src in ("orders", "file") and not buy_susp) else None
         # красный флаг: экономики проекта нет ни ссылкой на файл, ни money-полями
         econ_link = str(d.get(ECON_LINK) or "").strip()
