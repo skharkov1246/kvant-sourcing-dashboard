@@ -48,8 +48,13 @@
 --                        дала значение без цитаты и оно снято («не доказано», а
 --                        не «в договоре нет»). side — сторона документа, её
 --                        называет модель (решение владельца 22.10.2026),
---                        side_source — 'model'; у непрочитанного и у документа,
---                        где модель стороны не назвала, — null. side_company —
+--                        side_source — 'model'; модель не назвала — сторона по
+--                        карточке (решение владельца 25.10.2026), side_source
+--                        'card', side = side_company; у непрочитанного и у
+--                        документа, о стороне которого не сказали ни модель, ни
+--                        компания, — null. Пересчёт без модели (contract_terms.py
+--                        --mode reflag) пишет копии строк прежнего прогона со
+--                        своим ключом и статусом reused. side_company —
 --                        сверка (компания карточки против компании сделки и
 --                        заказов СП-172); справочно: side_link — сторона по
 --                        связи карточки (parentId172 — заказ поставщику),
@@ -152,12 +157,19 @@ alter table contract_terms drop constraint if exists contract_terms_status_chk;
 alter table contract_terms add constraint contract_terms_status_chk
   check (status in ('ok', 'reused', 'no_file', 'download', 'fetch', 'format', 'limit', 'budget',
                     'time', 'model', 'parse', 'api'));
+-- side_source (25.10.2026, решение владельца): 'model' — сторону назвала модель; 'card' —
+-- модель не назвала, сторона по компании карточки («сторона по карточке»: компания сделки —
+-- заказчик, компания заказа СП-172 сделки и Purchase order заказа — поставщик), и тогда
+-- side обязана совпасть с side_company. Список — дословно contract_terms.ИСТОЧНИКИ_СТОРОНЫ
+-- (сверяет tests/test_contract_terms.py). Строки прежних версий ('model' или null) проходят
+-- проверку как были. Повтор — тот же drop/add по имени (правило 21).
 alter table contract_terms drop constraint if exists contract_terms_side_chk;
 alter table contract_terms add constraint contract_terms_side_chk
   check ((side is null or side in ('customer', 'supplier'))
          and (side_link is null or side_link in ('customer', 'supplier'))
-         and (side_source is null or side_source = 'model')
+         and (side_source is null or side_source in ('model', 'card'))
          and ((side is null) = (side_source is null))
+         and (side_source is distinct from 'card' or side = side_company)
          and (side_template is null or side_template in ('customer', 'supplier'))
          and (side_company is null or side_company in ('customer', 'supplier')));
 -- С 25.10.2026 рамочный — документ каждой сделки, под которой стоит его спецификация, и

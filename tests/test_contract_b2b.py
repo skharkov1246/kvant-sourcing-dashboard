@@ -37,3 +37,46 @@ def test_чистая_пара_без_флагов_и_тонкий_запас():
     assert коды(b2b.flags({"deliveryDays": 140}, {"deliveryDays": 120}, logistics_days=19)) == {"thinBuffer": 1}
     # пустые условия — ни одного выдуманного флага
     assert b2b.flags({}, {}) == []
+
+
+# --------------------------------------------------------------------------- флаги, которые не ставились (25.10.2026)
+# Живой прогон ct-40206159351-1: lateByDesign, thinBuffer, claimGap, fxGap — по 0 при 69
+# сделках с парой. Причины в правилах: срок датой не сравнивался вовсе, «шеф-монтаж»
+# через дефис не совпадал с «шефмонтаж», рублёвая цена без оговорки о курсе не давала
+# fxFixed. Корпус придуман.
+def test_срок_датой_сравнивается_с_датой():
+    заказчик = {"deliveryDate": "2026-12-01"}
+    assert коды(b2b.flags(заказчик, {"deliveryDate": "2026-11-20"}, logistics_days=19)) == {"lateByDesign": 8}
+    assert коды(b2b.flags(заказчик, {"deliveryDate": "2026-11-08"}, logistics_days=19)) == {"thinBuffer": 4}
+    assert b2b.flags(заказчик, {"deliveryDate": "2026-10-01"}, logistics_days=19) == []
+    # дни против даты без даты отсчёта не сравниваются — запас не выдумывается
+    assert b2b.flags({"deliveryDays": 30}, {"deliveryDate": "2026-11-20"}) == []
+    assert b2b.запас_по_сроку({"deliveryDays": 30}, {"deliveryDate": "2026-11-20"}, 19) == (None, "дни против даты")
+    assert b2b.запас_по_сроку({}, {"deliveryDays": 10}, 19) == (None, "нет срока")
+    # дни у обеих — главнее дат
+    assert b2b.запас_по_сроку({"deliveryDays": 120, "deliveryDate": "2026-01-01"},
+                              {"deliveryDays": 110, "deliveryDate": "2026-12-31"}, 19) == (-9, "дни")
+    # не дата — не срок
+    assert b2b.flags({"deliveryDate": "до конца года"}, {"deliveryDate": "2026-11-20"}) == []
+
+
+def test_поздняя_приёмка_в_любом_написании_и_срок_претензий():
+    поставщик = {"claimDays": 30}
+    for приёмка in ("по качеству при шеф-монтаже", "Шеф монтаж оборудования", "после пуско-наладочных работ",
+                    "при вводе в эксплуатацию", "по качеству при шефмонтаже"):
+        assert коды(b2b.flags({"acceptance": приёмка}, поставщик)) == {"claimGap": 30}, приёмка
+    assert b2b.flags({"acceptance": "по количеству мест при поставке"}, поставщик) == []
+    assert b2b.flags({"acceptance": "при шеф-монтаже"}, {}) == [], "без срока претензий поставщику флага нет"
+    # срок претензий заказчика к нам длиннее нашего к поставщику
+    assert коды(b2b.flags({"claimDays": 90}, {"claimDays": 30})) == {"claimGap": 60}
+    assert b2b.flags({"claimDays": 30}, {"claimDays": 30}) == []
+
+
+def test_рублёвая_цена_заказчика_при_валюте_поставщика():
+    assert коды(b2b.flags({"currency": "RUB"}, {"currency": "EUR"})) == {"fxGap": None}
+    assert коды(b2b.flags({"fxFixed": True}, {"currency": "CNY"})) == {"fxGap": None}
+    # прямо сказано «курс не фиксирован» — флага нет; у поставщика рубли или валюты нет — нет
+    assert b2b.flags({"currency": "RUB", "fxFixed": False}, {"currency": "EUR"}) == []
+    assert b2b.flags({"currency": "RUB"}, {"currency": "RUB"}) == []
+    assert b2b.flags({"currency": "RUB"}, {}) == []
+    assert b2b.flags({"currency": "EUR"}, {"currency": "EUR"}) == []

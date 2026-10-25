@@ -28,7 +28,16 @@ name: Договоры — чтение условий (пилот)
 #   mode live — закачка файлов → модель извлекает условия с цитатой и страницей →
 #             строки в закрытую базу (contract_terms, contract_b2b_flags; схема —
 #             library/supabase/contract_terms_schema.sql, live применяет её сам
-#             после проверок на чистой базе).
+#             после проверок на чистой базе). PDF больше LLM_READ_MAX_MB или длиннее
+#             LLM_READ_MAX_PAGES читается по частям (25.10.2026).
+#   mode reflag — пересчёт исходов и флагов по уже извлечённым условиям нынешними
+#             правилами (сторона по карточке — решение владельца 25.10.2026; правила
+#             сверки), без модели и без портала: секреты модели и портала в шаг не
+#             передаются. Без apply — холостой счёт (база только читается); с apply —
+#             копии строк разбора сделок, у которых исход или флаги меняются, с ключом
+#             прогона ctr-…, исходы и флаги одной транзакцией со второй проверкой
+#             (пересчёт из базы), затем свод в закрытый ключ. Прежние строки не удаляются;
+#             откат — delete … where run_id = 'ctr-…' в трёх таблицах.
 #
 # Порядок: сначала dry, по его оценке — live. Журнал публичный: в нём только
 # агрегаты (CLAUDE.md, правило 17) — ни номеров сделок, ни названий, ни цитат, ни
@@ -49,7 +58,11 @@ on:
         description: "dry — счёт и оценка; live — закачка, модель, запись в базу"
         type: choice
         default: dry
-        options: [dry, live]
+        options: [dry, live, reflag]
+      apply:
+        description: "Только для reflag: записать пересчёт в базу и свод (без — холостой счёт)"
+        type: boolean
+        default: false
       open:
         description: "Только открытые сделки реализации (как недельный прогон)"
         type: boolean
@@ -79,6 +92,8 @@ jobs:
       BUDGET_USD: ${{ github.event_name == 'repository_dispatch' && '10' || inputs.budget_usd }}
       OPEN: ${{ (github.event_name == 'repository_dispatch' || inputs.open) && '--open' || '' }}
       DEADLINE_MIN: ${{ github.event_name == 'repository_dispatch' && '150' || inputs.deadline_min || '40' }}
+      # пересчёт без модели пишет в базу только с apply
+      APPLY: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'reflag' && inputs.apply && '--apply' || '' }}
     steps:
       # Входы ручного запуска — до установки и до первого запроса к порталу. Срок считается
       # от начала чтения, не job: до него установка, проверки и чистая база (5–6 минут),
@@ -117,7 +132,7 @@ jobs:
       # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная проверка —
       # не пройденная. База в локали UTF-8 (правило 21а).
       - name: Проверки на чистой базе
-        if: env.MODE == 'live'
+        if: env.MODE == 'live' || env.APPLY != ''
         run: |
           set -euo pipefail
           sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
@@ -130,7 +145,7 @@ jobs:
       # Схема перед записью: файл идемпотентен (правило 21) и ни от чего не зависит;
       # общий прогон миграций (zip-db.yml) для пилота не нужен.
       - name: Схема в рабочей базе
-        if: env.MODE == 'live'
+        if: env.MODE == 'live' || env.APPLY != ''
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
@@ -139,12 +154,15 @@ jobs:
 
       - name: Чтение договоров
         env:
-          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
-          BITRIX_FILES_WEBHOOK_URL: ${{ secrets.BITRIX_FILES_WEBHOOK_URL }}
-          # Ключ модели и строка базы — только в live: холостому прогону они не нужны.
+          # Пересчёту (reflag) портал не нужен: вебхуков у него нет.
+          BITRIX_WEBHOOK_URL: ${{ inputs.mode != 'reflag' && secrets.BITRIX_WEBHOOK_URL || '' }}
+          BITRIX_FILES_WEBHOOK_URL: ${{ inputs.mode != 'reflag' && secrets.BITRIX_FILES_WEBHOOK_URL || '' }}
+          # Ключ модели — только в live; строка базы — в live и в пересчёте (он читает строки
+          # условий): холостому прогону они не нужны.
           ANTHROPIC_API_KEY: ${{ (github.event_name == 'repository_dispatch' || inputs.mode == 'live') && secrets.ANTHROPIC_API_KEY || '' }}
-          SUPABASE_DB_URL: ${{ (github.event_name == 'repository_dispatch' || inputs.mode == 'live') && secrets.SUPABASE_DB_URL || '' }}
-          RUN_ID: ct-${{ github.run_id }}-${{ github.run_attempt }}
+          SUPABASE_DB_URL: ${{ (github.event_name == 'repository_dispatch' || inputs.mode == 'live' || inputs.mode == 'reflag') && secrets.SUPABASE_DB_URL || '' }}
+          # ключ пересчёта — ctr-…: его строки отличимы от чтения моделью и откатываются отдельно
+          RUN_ID: ${{ env.MODE == 'reflag' && 'ctr' || 'ct' }}-${{ github.run_id }}-${{ github.run_attempt }}
           # Один процесс в общей очереди, с запасом: рядом может идти пересборка
           # дашборда (её группа своя). Отбор: поля пяти типов, справочник стадий
           # заказов (запрос на воронку) и по запросу на 50 сделок, заказов или
@@ -170,13 +188,13 @@ jobs:
           LLM_READ_TIMEOUT: "300"
           PYTHONDONTWRITEBYTECODE: "1"
         run: python scripts/contract_terms.py --mode "$MODE" --deals "$DEALS" --budget "$BUDGET_USD"
-             --deadline-min "$DEADLINE_MIN" $OPEN
+             --deadline-min "$DEADLINE_MIN" $OPEN $APPLY
 
       # Свод по сделкам → закрытый ключ KV realctx:v1 для вкладки «Реализация».
       # И при красном гейте стороны: исходы такого прогона не пишутся, свод берёт
       # последний прошедший. В журнал — только счётчики.
       - name: Свод чатов и договоров в закрытый ключ
-        if: ${{ !cancelled() && env.MODE == 'live' }}
+        if: ${{ !cancelled() && (env.MODE == 'live' || env.APPLY != '') }}
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

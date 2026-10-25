@@ -16,6 +16,8 @@
 """
 from __future__ import annotations
 
+from datetime import date
+
 TERMS_SCHEMA = {
     "type": "object",
     "properties": {
@@ -61,13 +63,55 @@ FLAG_TEXT = {
     "warrantyStart": "гарантия заказчику от ввода, у поставщика — от отгрузки или поставки",
     "claimGap": "приёмка у заказчика позже срока претензий к поставщику",
     "docsGap": "заказчик требует документы, которых поставщик не обязан дать",
-    "fxGap": "заказчику цена в рублях по фиксированному курсу, поставщику — в валюте",
+    "fxGap": "заказчику цена в рублях или по фиксированному курсу, поставщику — в валюте: курс на нас",
     "cisg": "с иностранным поставщиком Венская конвенция не исключена",
 }
 
 
+#: Приёмка у заказчика, которая наступает через месяцы после поставки: при шефмонтаже,
+#: монтаже, пусконаладке, вводе в эксплуатацию. Сверка — по слитному написанию (без
+#: дефисов и пробелов): до 25.10.2026 искалось только «шефмонтаж», а в договорах пишут
+#: «шеф-монтаж» и «шеф монтаж» — флаг claimGap не ставился ни разу (живой прогон
+#: 25.10.2026: 0 при 69 сделках с парой).
+ПОЗДНЯЯ_ПРИЁМКА = ("шефмонтаж", "примонтаж", "послемонтаж", "пусконалад", "вэксплуатац",
+                   "commissioning", "installation", "startup")
+#: Валюта цены, при которой курс на нас не ложится: рубли.
+РУБЛИ = ("RUB", "RUR", "РУБ")
+
+
 def _n(v):
-    return v if isinstance(v, (int, float)) else None
+    return v if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+
+def _дата(v) -> date | None:
+    """Срок датой (ГГГГ-ММ-ДД, как просит подсказка) → дата; иное — None."""
+    try:
+        return date.fromisoformat(str(v or "").strip()[:10])
+    except ValueError:
+        return None
+
+
+def запас_по_сроку(customer: dict, supplier: dict, путь: float) -> tuple[float | None, str]:
+    """(запас в днях между сроком заказчика и сроком поставщика с путём, чем сравнили).
+
+    Сравнимы только сроки одного рода: оба в днях («N дней от …») или оба датой. До
+    25.10.2026 сравнивались только дни, а срок датой (deliveryDate — частый у Purchase
+    order и у спецификаций «до 31.12») не читался вовсе. Дни против даты без даты
+    отсчёта (подписание, аванс) не сравниваются: её в условиях нет — запас не
+    выдумывается. → (None, «дни против даты» / «нет срока»)."""
+    c_days, s_days = _n(customer.get("deliveryDays")), _n(supplier.get("deliveryDays"))
+    if c_days is not None and s_days is not None:
+        return c_days - (s_days + путь), "дни"
+    c_date, s_date = _дата(customer.get("deliveryDate")), _дата(supplier.get("deliveryDate"))
+    if c_date and s_date:
+        return (c_date - s_date).days - путь, "даты"
+    есть_c = c_days is not None or c_date is not None
+    есть_s = s_days is not None or s_date is not None
+    return None, ("дни против даты" if есть_c and есть_s else "нет срока")
+
+
+def _слитно(v) -> str:
+    return "".join(ch for ch in str(v or "").lower() if ch.isalnum())
 
 
 def flags(customer: dict, supplier: dict, *, logistics_days: float | None = None) -> list[dict]:
@@ -78,9 +122,8 @@ def flags(customer: dict, supplier: dict, *, logistics_days: float | None = None
         out.append({"code": code, "text": FLAG_TEXT[code], **kw})
 
     путь = ЛОГИСТИКА_ДНИ if logistics_days is None else logistics_days
-    c_days, s_days = _n(customer.get("deliveryDays")), _n(supplier.get("deliveryDays"))
-    if c_days is not None and s_days is not None:
-        запас = c_days - (s_days + путь)
+    запас, _как = запас_по_сроку(customer, supplier, путь)
+    if запас is not None:
         if запас < 0:
             add("lateByDesign", days=round(-запас))
         elif запас < ЗАПАС_ДНИ:
@@ -102,13 +145,27 @@ def flags(customer: dict, supplier: dict, *, logistics_days: float | None = None
     cwf, swf = str(customer.get("warrantyFrom") or ""), str(supplier.get("warrantyFrom") or "")
     if "ввод" in cwf.lower() and swf and "ввод" not in swf.lower():
         add("warrantyStart")
-    if "шефмонтаж" in str(customer.get("acceptance") or "").lower() and _n(supplier.get("claimDays")) is not None:
-        add("claimGap", days=supplier["claimDays"])
+    # Приёмка: у заказчика поздняя (монтаж, ввод) при сроке претензий поставщику — или срок
+    # претензий заказчика к нам длиннее нашего к поставщику: дефект предъявят, когда
+    # поставщик уже не отвечает (ГК РФ ст. 477, 483).
+    cc, sc = _n(customer.get("claimDays")), _n(supplier.get("claimDays"))
+    приёмка = _слитно(customer.get("acceptance"))
+    if sc is not None and any(м in приёмка for м in ПОЗДНЯЯ_ПРИЁМКА):
+        add("claimGap", days=round(sc))
+    elif cc is not None and sc is not None and cc > sc:
+        add("claimGap", days=round(cc - sc))
     нужны = {d.strip().lower() for d in customer.get("documents") or [] if d}
     дадут = {d.strip().lower() for d in supplier.get("documents") or [] if d}
     if нужны - дадут:
         add("docsGap")
-    if customer.get("fxFixed") and str(supplier.get("currency") or "").upper() not in ("", "RUB"):
+    # Валюта: у заказчика цена в рублях (или в рублях по курсу, зафиксированному договором),
+    # у поставщика — в валюте: курс между оплатами на нас. До 25.10.2026 флаг ждал только
+    # fxFixed = true, а подсказка ставит его лишь при прямой оговорке о фиксированном
+    # курсе: обычная рублёвая цена давала currency RUB без fxFixed — флаг не ставился ни
+    # разу. Прямо сказано «курс не фиксирован» (fxFixed = false) — флага нет.
+    в_рублях = str(customer.get("currency") or "").upper() in РУБЛИ and customer.get("fxFixed") is not False
+    валюта_поставщика = str(supplier.get("currency") or "").upper()
+    if (customer.get("fxFixed") is True or в_рублях) and валюта_поставщика not in ("", *РУБЛИ):
         add("fxGap")
     if supplier.get("cisgExcluded") is False:
         add("cisg")
