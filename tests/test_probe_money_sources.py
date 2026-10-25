@@ -8,7 +8,11 @@
    «неоднозначно», когда подошло несколько; ×1000; часть; больше.
 5. Дата курса — каскад владельца 25.10 по Москве.
 6. Ряды ЦБ: курс раньше первой записи — None; номинал учтён; код ряда — ParentCode.
-7. Сверка итогов: нынешние правила дают невязку, одно множество — ноль.
+7. Сверка итогов: нынешние правила дают невязку; тень сверяется по всем своим строкам.
+8. Ревью v59: закупка бюджета со знаком минус — по модулю; выигрыш у сделки, заведённой
+   в кат. 0, — не первый вход; бюджет — и по номеру заказа; близнецы — в окне дат и в
+   смете; счета СП-137 — оплаченные отдельно, всё или ничего, на дату заведения; валюта
+   money-поля — только кодом; воронка 16 — номером; зеркало ЦБ — когда cbr.ru молчит.
 
 Корпус придуман (правило 18): числа и номера нарочно особые.
 """
@@ -43,7 +47,7 @@ D = dt.date
 НОМЕРА = ("7654321", "7654322", "7654323", "7654324", "7654325", "7654326", "7654327", "7654390",
           "7654391", "7654399", "7650001", "7650002", "7650003", "7650101", "7655001", "7655002",
           "7655003", "7655004", "7655005", "7656001", "7656002", "7657001", "7657002", "7657003",
-          "1239876543")                                              # придуманный ИНН с верной суммой
+          "7657004", "1239876543")                                              # придуманный ИНН с верной суммой
 
 
 def t(s):
@@ -78,9 +82,11 @@ def сделка(i, stage, sem, cur, opp, company, **к):
     сделка("7654322", "NEW", "P", "RUB", "8642097.53", "7650001", title="901. Учебная поставка",
            **{m.TKP_FINAL: t("2026-02-10")}),
     # U2 — «Оплата получена», без «ТКП согласован»: дата — последнее КП до кат. 0
-    сделка("7654323", "UC_PAID", "P", "USD", "2718281.83", "7650003"),
+    # заведена в кат. 0 (вход в день создания), переведена в пресейл, выиграна обратно (ревью v59)
+    сделка("7654323", "UC_PAID", "P", "USD", "2718281.83", "7650003", created="2024-12-01"),
     # U3 — успех полгода назад
-    сделка("7654324", "WON", "S", "EUR", "1618033.99", "7650003", moved="2026-06-01",
+    # «ТКП согласован» в день создания — счётчик «похоже на умолчание»
+    сделка("7654324", "WON", "S", "EUR", "1618033.99", "7650003", moved="2026-06-01", created="2026-02-28",
            **{m.TKP_FINAL: t("2026-03-01")}),
     # успех давно — только счётчик
     сделка("7654325", "WON", "S", "EUR", "1414213.56", "7650003", moved="2024-01-10"),
@@ -95,6 +101,7 @@ def сделка(i, stage, sem, cur, opp, company, **к):
     сделка("7654399", "C22:NEW", "P", "EUR", "6180339.89", "7650003", cat="22"),
 ]
 ИСТОРИЯ = [
+    {"ID": 0, "OWNER_ID": "7654323", "STAGE_ID": "NEW", "CREATED_TIME": t("2024-12-01")},
     {"ID": 1, "OWNER_ID": "7654323", "STAGE_ID": "C2:UC_TKP", "CREATED_TIME": t("2024-12-20")},
     {"ID": 2, "OWNER_ID": "7654323", "STAGE_ID": "C2:UC_TKP", "CREATED_TIME": t("2025-01-15")},
     {"ID": 3, "OWNER_ID": "7654323", "STAGE_ID": "NEW", "CREATED_TIME": t("2025-02-01")},
@@ -105,10 +112,10 @@ def сделка(i, stage, sem, cur, opp, company, **к):
     {"ID": 8, "OWNER_ID": "7654327", "STAGE_ID": "NEW", "CREATED_TIME": t("2025-10-01")},
 ]
 ЗАКАЗЫ = [
-    {"id": 7655001, "parentId2": 7654322, m.ORDER_DEAL_ID: "7654322", "opportunity": 3141592.65, "currencyId": "RUB",
+    {"id": 7655001, "title": "901/1. Учебный заказ", "parentId2": 7654322, m.ORDER_DEAL_ID: "7654322", "opportunity": 3141592.65, "currencyId": "RUB",
      "stageId": "DT172_26:NEW", "createdTime": t("2026-03-01"), "companyId": 7650101, ct.SUP_PAID: 50,
      ct.DL_CUSTOMER: "2026-05-01"},
-    {"id": 7655002, "parentId2": 7654321, m.ORDER_DEAL_ID: "7654321", "opportunity": 1202056.9, "currencyId": "AED",
+    {"id": 7655002, "title": "Учебный заказ", "parentId2": 7654321, m.ORDER_DEAL_ID: "7654321", "opportunity": 1202056.9, "currencyId": "AED",
      "stageId": "DT172_26:NEW", "createdTime": t("2025-06-01"), "companyId": 7650101},
     {"id": 7655003, "parentId2": 7654321, m.ORDER_DEAL_ID: "7654321", "opportunity": 0, "currencyId": "EUR",
      "stageId": "DT172_26:NEW", "createdTime": t("2025-06-02"), "companyId": 7650101},
@@ -148,9 +155,13 @@ def сделка(i, stage, sem, cur, opp, company, **к):
     {"id": 7657003, "parentId2": 0, "parentId172": 7655001, "stageId": "DT137_34:NEW", "createdTime": t("2026-03-07"),
      m.INV_RUB: 2236067.97, m.INV_DATE: "2026-03-07", m.INV_PAYER: 1, m.INV_PAYEE: "ООО Бета",
      m.INV_DEALS: ["D_7654322", "D_7654321"]},
+    # в работе: в «оплаченные и в работе», не в «оплаченные»; «Дата счета» далеко от заведения
+    {"id": 7657004, "parentId2": 7654322, "stageId": "DT137_34:NEW", "createdTime": t("2026-03-08"),
+     m.INV_RUB: 1732050.81, m.INV_DATE: "2026-05-08", m.INV_PAYER: 1, m.INV_PAYEE: "ООО Поставщик Альфа"},
 ]
-БЮДЖЕТЫ = ({901: {"revenue": 8642097.53, "revenue_net": 8642097.53 / 1.22, "purchase": 3141592.65,
-                  "purchase_net": 3141592.65 / 1.22, "drive_id": "книга-1", "modified": "2026-01-01"}}, {}, "2026-08-06")
+# закупка в книге — расход со знаком минус, как в data/budget_snapshot.json (233 из 236 книг)
+БЮДЖЕТЫ = ({901: {"revenue": 8642097.53, "revenue_net": 8642097.53 / 1.22, "purchase": -3141592.65,
+                  "purchase_net": -3141592.65 / 1.22, "drive_id": "книга-1", "modified": "2026-01-01"}}, {}, "2026-08-06")
 
 
 class Фейк:
@@ -158,6 +169,8 @@ class Фейк:
 
     def __init__(self, падать_на=None):
         self.падать_на = падать_на
+        self.фильтры_сделок: list[dict] = []
+        self.истории: list[dict] = []
 
     def _сделки(self, f):
         out = []
@@ -173,6 +186,10 @@ class Фейк:
             if "@ID" in f and int(d["ID"]) not in f["@ID"]:
                 continue
             if ">ID" in f and int(d["ID"]) <= int(f[">ID"]):
+                continue
+            if ">=DATE_CREATE" in f and d["DATE_CREATE"][:10] < f[">=DATE_CREATE"][:10]:
+                continue
+            if "<=DATE_CREATE" in f and d["DATE_CREATE"][:10] > f["<=DATE_CREATE"][:10]:
                 continue
             out.append(d)
         return out
@@ -235,6 +252,7 @@ class Фейк:
             r = self._items(params["entityTypeId"], f)
             return {"result": {"items": r}, "total": len(r)}
         if method == "crm.stagehistory.list":
+            self.истории.append(f)
             r = [x for x in ИСТОРИЯ if int(x["OWNER_ID"]) in f["OWNER_ID"]
                  and ("STAGE_ID" not in f or x["STAGE_ID"] in f["STAGE_ID"])
                  and ("CATEGORY_ID" not in f or m.pc.воронка_стадии(x["STAGE_ID"]) == str(f["CATEGORY_ID"]))]
@@ -245,8 +263,10 @@ class Фейк:
             raise m.bc.BitrixError("crm.invoice.list: ERROR_METHOD_NOT_FOUND")
         raise AssertionError(f"неожиданный метод {method}")
 
-    def list_deals_fast(self, *, filter=None, select=None):
-        return self._сделки(filter or {})
+    def list_deals_fast(self, *, filter=None, select=None, max_items=None):
+        self.фильтры_сделок.append(dict(filter or {}, max_items=max_items))
+        r = self._сделки(filter or {})
+        return r[:max_items] if max_items else r
 
     def list_items(self, entity, *, filter=None, select=None):
         return self._items(entity, filter or {})
@@ -275,6 +295,10 @@ def портал(monkeypatch):
     коды = {"R01239": "EUR", "R01230": "AED", "R01235": "USD"}
     monkeypatch.setattr(fx, "cbr_series", lambda sid, d1, d2, timeout=60: list(РЯДЫ[коды[sid]]))
     monkeypatch.setattr(fx, "ecb_history", lambda timeout=60: {"USD": [(D(2026, 1, 5), 1.15)]})
+
+    def зеркала_нет(timeout=30, fetch=None):
+        raise ConnectionError("https://www.cbr-xml-daily.ru — 7654321")
+    monkeypatch.setattr(fx, "cbr_mirror_codes", зеркала_нет)
     monkeypatch.setattr(ct, "_load_budget_plans", lambda: БЮДЖЕТЫ)
     monkeypatch.delenv("PROBE_PARTS", raising=False)
 
@@ -291,7 +315,8 @@ def без_утечек(out: str) -> None:
             assert s not in out, (x, s)
     for n in НОМЕРА:
         assert n not in out, n
-    for слово in ("Учебная", "Альфа", "Бета", "Квант", "Customer", "покупателю", "текст ошибки"):
+    for слово in ("Учебн", "Альфа", "Бета", "Квант", "Омега", "Customer", "покупателю", "текст ошибки", "Basra",
+                  "cbr.ru", "cbr-xml", "http"):
         assert слово not in out, слово
 
 
@@ -307,7 +332,7 @@ def test_журнал_без_номеров_и_сумм(портал, capsys):
     assert код == 0
     assert "частей прочитано 5 из 5" in out
     assert "U1 3 · U2 1 · U3 1" in out                         # Basra и старый успех — вне выборки
-    assert "Basra (воронка 16 и её компании, вне сравнений): U1 1" in out
+    assert "воронка 16 и её компании (отдельный сегмент, вне сравнений): U1 1" in out
     # дата курса: поле, последнее КП до кат. 0, близнец
     assert "ТКП согласован 3 · последнее КП до выигрыша 1 · КП близнеца в пресейле 1" in out
     # гипотеза владельца: число в AED под валютой EUR — одна сделка, по спецификации
@@ -323,7 +348,18 @@ def test_журнал_без_номеров_и_сумм(портал, capsys):
     assert "старые счета crm.invoice: недоступно (BitrixError)" in out
     # тень каскада: «Сумма» в AED уходит из итога «под сомнением»; одно множество — без невязки
     assert "продажа: Битрикс по ЦБ 2 · под сомнением 1" in out
-    assert "тень: одно множество 1 сделок для всех трёх Σ; невязка +0.0 %" in out
+    # сверка тени — по всем её строкам: продажа без закупки даёт невязку, а не ноль по построению
+    assert ("сверка итогов тени (те же множества): в Σ продажи 2, в Σ закупки 1, в Σ маржи 1; "
+            "продажа∩закупка 1, во всех трёх 1; невязка +98.2 %") in out
+    # закупка бюджета — по модулю: пара заказы/бюджет не в «ноль/минус», разрезы C21/D23 не пусты
+    assert "BO_kp–BBud_gross (заказы против бюджета с НДС): обе есть 1 (U1 1) · ≤5 % 1" in out
+    assert "закупка в книге со знаком: минус 1 (берётся по модулю" in out
+    assert "по валюте заказов (C21): RUB: n 1" in out
+    # счета СП-137: оплаченные и в работе — к заказам, только оплаченные — к доле «Оплачено»
+    assert "BPaid–BO (счета СП-137 оплаченные и в работе против заказов): обе есть 1 (U1 1) · 5–10 % 1" in out
+    assert "BPaid_done–BOpaid (оплаченные счета СП-137 против заказов × «Оплачено поставщику, %»): обе есть 1" in out
+    assert "оплачен (S) 1" in out and "в работе (P) 1" in out and "«Дата счета» дальше 7 дн. от заведения 1" in out
+    assert "из них в день создания сделки (±1 дн., похоже на умолчание) 1 из 3" in out
     assert "по воронке заказов (D23): воронка 26: n 1" in out
     assert "НАГРУЗКА ПО БЛОКАМ" in out
 
@@ -392,10 +428,24 @@ def test_дата_курса_каскад_владельца():
     assert m.дата_ткп(с_полем, [], None, None) == (D(2025, 5, 21), "ТКП согласован")   # по Москве
     без = {"DATE_CREATE": t("2025-01-01")}
     кп = [D(2025, 1, 10), D(2025, 2, 1), D(2025, 4, 1)]
-    assert m.дата_ткп(без, кп, D(2025, 3, 1), None) == (D(2025, 2, 1), "последнее КП до выигрыша")
+    assert m.дата_ткп(без, кп, [D(2025, 3, 1), D(2025, 5, 1)], None) == (D(2025, 2, 1), "последнее КП до выигрыша")
     assert m.дата_ткп(без, [], None, D(2024, 12, 1)) == (D(2024, 12, 1), "КП близнеца в пресейле")
-    assert m.дата_ткп(без, [], D(2025, 3, 1), None) == (D(2025, 3, 1), "вход в кат. 0")
+    assert m.дата_ткп(без, [], [D(2025, 3, 1), D(2025, 6, 1)], None) == (D(2025, 3, 1), "вход в кат. 0")
     assert m.дата_ткп(без, [], None, None) == (D(2025, 1, 1), "создание сделки")
+
+
+def test_выигрыш_у_сделки_заведённой_в_кат0():
+    """Заведена в кат. 0, ушла в пресейл, выиграна обратно: первый вход в кат. 0 — создание,
+    а не выигрыш; КП до настоящего выигрыша не отбрасываются (ревью v59)."""
+    без = {"DATE_CREATE": t("2024-12-01")}
+    кп = [D(2024, 12, 20), D(2025, 1, 15), D(2025, 3, 1)]          # 03-01 — ревизия после выигрыша
+    входы = [D(2024, 12, 1), D(2025, 2, 1), D(2025, 2, 10)]
+    assert m.выигрыш(кп, входы) == D(2025, 2, 1)
+    assert m.дата_ткп(без, кп, входы, None) == (D(2025, 1, 15), "последнее КП до выигрыша")
+    assert m.выигрыш([], входы) == D(2025, 2, 10)
+    assert m.выигрыш(кп, None) is None
+    # все входы в кат. 0 раньше первого КП — выигрыш последний вход, КП после него не берутся
+    assert m.дата_ткп(без, [D(2025, 4, 1)], [D(2025, 1, 1), D(2025, 2, 1)], None) == (D(2025, 1, 1), "вход в кат. 0")
     assert m.окно_дат(D(2025, 5, 1), [D(2025, 1, 10), D(2025, 6, 1)], D(2025, 2, 1)) == (D(2025, 1, 10), D(2025, 5, 1))
 
 
@@ -527,3 +577,142 @@ def test_части_не_меньше_десяти(monkeypatch, capsys):
     monkeypatch.setenv("PROBE_PARTS", "25")
     assert m._частей() == 25
     assert re.search(r"меньше 10", capsys.readouterr().out)
+
+
+# ── ревью v59 ───────────────────────────────────────────────────────────────
+
+def test_закупка_бюджета_по_модулю_и_оплаты_всё_или_ничего():
+    assert m.закупка_бюджета({"purchase_net": -1000.0}, "purchase_net") == 1000.0
+    assert m.закупка_бюджета({"purchase": 0}, "purchase") is None
+    assert m.закупка_бюджета(None, "purchase") is None
+    К = fx.CbrRates({"EUR": [(D(2026, 1, 1), 100.0)]})
+    assert m.сумма_оплат(К, [(1000.0, D(2026, 2, 1), "S"), (500.0, D(2026, 3, 1), "P")]) == pytest.approx(15.0)
+    # курса нет хоть у одного — суммы нет, а не тихий недосчёт
+    assert m.сумма_оплат(К, [(1000.0, D(2026, 2, 1), "S"), (500.0, D(2025, 3, 1), "P")]) is None
+    assert m.сумма_оплат(К, [(1000.0, None, "S")]) is None
+    assert m.сумма_оплат(К, []) is None
+
+
+def test_бюджет_и_по_номеру_первого_заказа(monkeypatch):
+    """Номер только в названии заказа — бюджет привязан, как в contracts.compute (:377)."""
+    книга = {"revenue": 10.0, "purchase": -5.0, "drive_id": "к"}
+    monkeypatch.setattr(ct, "_load_budget_plans", lambda: ({902: книга}, {}, "2026-08-06"))
+    п = m.Прогон(None, СЕГОДНЯ)
+    п.прочитанные = {"1", "2"}
+    п.сделки = {"1": {"TITLE": "Поставка без номера"}, "2": {"TITLE": "Ещё без номера"}}
+    п.ctx["заказы"]["1"] = [{"title": "902/1. Заказ"}, {"title": "777/1. Чужой"}]
+    m.шаг_бюджеты(п)
+    assert п.ctx["бюджет"] == {"1": книга}
+    assert п.знак_закупки == {"минус": 1}
+
+
+def test_близнецы_в_окне_дат_и_в_смете(портал, monkeypatch, capsys):
+    ф = Фейк()
+    m.main(ф, СЕГОДНЯ)
+    capsys.readouterr()
+    f = next(x for x in ф.фильтры_сделок if "@COMPANY_ID" in x)
+    # карточка без КП создана 2025-10-01: пресейл не раньше 2 × TWIN_DAYS до неё и не позже её
+    assert f[">=DATE_CREATE"] == (D(2025, 10, 1) - dt.timedelta(days=2 * m.pc.TWIN_DAYS)).isoformat()
+    assert f["<=DATE_CREATE"] == "2025-10-02" and f["max_items"] == m.БЛИЗНЕЦОВ_МАКС
+    assert any(x.get("OWNER_ID") == [7654390] for x in ф.истории)      # история близнеца читалась
+    # смета не пускает историю близнецов — история пресейла не читается вовсе
+    monkeypatch.setattr(m.Учёт, "можно", lambda self, имя, оценка: имя != "история близнецов")
+    ф = Фейк()
+    m.main(ф, СЕГОДНЯ)
+    out = capsys.readouterr().out
+    assert not any(x.get("OWNER_ID") == [7654390] for x in ф.истории)
+    assert "близнец найден 0" in out and "КП близнеца в пресейле" not in out
+
+
+def test_счета_137_на_дату_заведения(портал, capsys):
+    """«₽ по ЦБ» посчитан на дату заведения процесса — делится на EUR той же даты, а не
+    «Дата счета»; семантика сохраняется для «только оплаченных» (ревью v59)."""
+    п = m.Прогон(Фейк(), СЕГОДНЯ)
+    п.заказы_все, п.ждём_137, п.прочитанные = ЗАКАЗЫ, len(СЧЕТА), {"7654322"}
+    m.шаг_счета_137(п)
+    capsys.readouterr()
+    assert sorted(п.ctx["оплаты"]["7654322"]) == [(1570796.33, D(2026, 3, 5), "S"), (1732050.81, D(2026, 3, 8), "P")]
+
+
+def test_валюта_поля_только_кодом(портал, monkeypatch, capsys):
+    """Текст после «|» в money-поле не уходит в журнал — только счётчик (ревью приватности v59)."""
+    monkeypatch.setitem(СДЕЛКИ[1], ct.BUY_ECON_VAL, "123.0|ООО Омега 7654321")
+    monkeypatch.setitem(СПЕЦ[1174][0], "currencyId", "ооо омега")
+    m.main(Фейк(), СЕГОДНЯ)
+    out = capsys.readouterr().out
+    без_утечек(out)
+    assert "ОМЕГА" not in out.upper()
+    assert "нестандартных кодов валют в суммах выборки: 2" in out
+    assert m.код_валюты(" eur ") == "EUR" and m.код_валюты("EURO") is None and m.код_валюты("Е1R") is None
+    assert m.вал_подпись("") == "пусто" and m.вал_подпись("ООО 1") == "нестандартный код"
+
+
+def _ответ_зеркала(q: dt.date) -> bytes:
+    import json
+    return json.dumps({"Date": f"{q.isoformat()}T11:30:00+03:00", "Valute": {
+        "EUR": {"CharCode": "EUR", "Nominal": 1, "Value": 100.0},
+        "USD": {"CharCode": "USD", "Nominal": 1, "Value": 100 / 1.15},
+        "AED": {"CharCode": "AED", "Nominal": 10, "Value": 10 * 100 / 4.1}}}).encode()
+
+
+def _зеркало(url: str):
+    if url == fx.CBR_MIRROR_LATEST:
+        return 200, _ответ_зеркала(СЕГОДНЯ)
+    y, mo, d = (int(x) for x in re.search(r"archive/(\d{4})/(\d{2})/(\d{2})/", url).groups())
+    q = dt.date(y, mo, d)
+    return (404, b"") if q.weekday() >= 5 else (200, _ответ_зеркала(q))
+
+
+def test_зеркало_цб_шаг_назад_номинал_и_предел(monkeypatch):
+    adr = fx.parse_cbr_mirror_day(_ответ_зеркала(D(2026, 10, 23)))
+    assert adr[0] == D(2026, 10, 23) and adr[1]["AED"] == pytest.approx(100 / 4.1)   # номинал 10 учтён
+    запросы = []
+
+    def get(url):
+        запросы.append(url)
+        return _зеркало(url)
+    # воскресенье 25.10 → 404, суббота 24.10 → 404, пятница 23.10 — курс; повтор пятницы — из кеша
+    ряды, стат = fx.cbr_mirror_series({D(2026, 10, 25), D(2026, 10, 23)}, {"EUR", "AED", "RUB"}, pause=0, fetch=get)
+    assert стат == {"запросов": 3, "дат": 2, "без курса": 0, "обрезано": 0} and len(запросы) == 3
+    К = fx.CbrRates(ряды)
+    assert К.cross("AED", "EUR", D(2026, 10, 25)) == pytest.approx(4.1)
+    assert К.days("EUR") == [D(2026, 10, 23)]
+    # предел запросов: старые даты остаются без курса, счётчиком
+    _р, стат = fx.cbr_mirror_series({D(2026, 10, 21), D(2026, 10, 22), D(2026, 10, 23)}, {"EUR"},
+                                     max_requests=2, pause=0, fetch=_зеркало)
+    assert (стат["запросов"], стат["обрезано"]) == (2, 1)
+    # 429 — подождать и повторить, а не потерять всё зеркало
+    ответы = iter([(429, b""), (200, _ответ_зеркала(D(2026, 10, 23)))])
+    monkeypatch.setattr(fx.time, "sleep", lambda s: None)
+    ряды, стат = fx.cbr_mirror_series({D(2026, 10, 23)}, {"EUR"}, pause=0, fetch=lambda u: next(ответы))
+    assert стат["запросов"] == 2 and ряды["EUR"] == [(D(2026, 10, 23), 100.0)]
+    assert fx.cbr_mirror_codes(fetch=_зеркало) >= {"EUR", "AED", "RUB"}
+    with pytest.raises(ConnectionError):
+        fx.cbr_mirror_codes(fetch=lambda u: (403, b""))
+
+
+def test_цб_недоступен_зеркало_доступно(портал, monkeypatch, capsys):
+    def нет(timeout=60):
+        raise ConnectionError("https://www.cbr.ru — 7654321")
+    monkeypatch.setattr(fx, "cbr_codes", нет)
+    monkeypatch.setattr(fx, "cbr_mirror_codes", lambda timeout=30, fetch=None: {"EUR", "USD", "AED", "RUB"})
+    monkeypatch.setattr(fx, "_mirror_get", lambda url, timeout: _зеркало(url))
+    monkeypatch.setattr(fx.time, "sleep", lambda s: None)
+    код = m.main(Фейк(), СЕГОДНЯ)
+    out = capsys.readouterr().out
+    без_утечек(out)
+    assert out.splitlines()[0].startswith("ЦБ РФ недоступен с раннера (ConnectionError) — курсы берутся с зеркала")
+    assert "1:1 не подставляется" in out.splitlines()[0]
+    assert "курсы ЦБ по зеркалу: нужных дат" in out and "€ — ЦБ на дату ТКП (зеркало)" in out
+    assert "SB–SC (Сумма: курс Битрикса против ЦБ на дату ТКП): обе есть 5" in out
+    assert код == 0
+    # справочник cbr.ru ответил, а ряд EUR — нет: тоже зеркало, а не 1:1
+    monkeypatch.setattr(fx, "cbr_codes", lambda timeout=60: {"EUR": "R01239", "AED": "R01230", "USD": "R01235"})
+
+    def ряда_нет(sid, d1, d2, timeout=60):
+        raise ConnectionError("7654321")
+    monkeypatch.setattr(fx, "cbr_series", ряда_нет)
+    m.main(Фейк(), СЕГОДНЯ)
+    out = capsys.readouterr().out
+    без_утечек(out)
+    assert "ряд ЦБ EUR не получен (AED — ConnectionError" in out and "€ — ЦБ на дату ТКП (зеркало)" in out

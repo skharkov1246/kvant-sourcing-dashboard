@@ -19,8 +19,10 @@ from __future__ import annotations
 import bisect
 import csv
 import io
+import json
 import re
 import sqlite3
+import time
 import xml.etree.ElementTree as ET
 import zipfile
 from datetime import date, datetime
@@ -195,6 +197,10 @@ class CbrRates:
     def codes(self) -> set[str]:
         return set(self._days) | {"RUB"}
 
+    def days(self, code: str) -> list[date]:
+        """Даты записей ряда (у зеркала — только прочитанные даты)."""
+        return list(self._days.get(str(code or "").upper()) or [])
+
     def value(self, code: str | None, day: date) -> float | None:
         """Рублей за одну единицу валюты на дату."""
         code = str(code or "").upper()
@@ -256,3 +262,105 @@ def parse_ecb_history(content: bytes) -> dict[str, list[tuple[date, float]]]:
     for v in out.values():
         v.sort()
     return out
+
+
+# ── резерв: зеркало cbr-xml-daily.ru (критика v59, A12) ──────────────────────
+#
+# Если www.cbr.ru не отвечает адресам раннера GitHub, курсы ЦБ берутся с зеркала.
+# Рядов за период у зеркала нет — только архив по дням, один запрос на дату; на
+# нерабочий день архив отвечает 404, и берётся шаг назад (до MIRROR_STEP_BACK дней).
+# Поэтому запрашиваются только НУЖНЫЕ даты, от новых к старым, с пределом запросов:
+# курс на дату тогда тот же, что дал бы ряд, а окно курса между датами строится
+# только по прочитанным датам (уже, чем по ряду, — это печатается рядом).
+
+CBR_MIRROR_LATEST = "https://www.cbr-xml-daily.ru/daily_json.js"
+CBR_MIRROR_DAY = "https://www.cbr-xml-daily.ru/archive/{y:04d}/{m:02d}/{d:02d}/daily_json.js"
+MIRROR_STEP_BACK = 10
+MIRROR_RETRY_WAIT = (2.0, 5.0, 15.0)
+
+
+def parse_cbr_mirror_day(content: bytes) -> tuple[date | None, dict[str, float]]:
+    """daily_json.js зеркала → (дата курса, {ISO-код: рублей за ОДНУ единицу})."""
+    data = json.loads(content.decode("utf-8", "ignore"))
+    try:
+        day = date.fromisoformat(str(data.get("Date") or "")[:10])
+    except ValueError:
+        day = None
+    out: dict[str, float] = {}
+    for code, v in (data.get("Valute") or {}).items():
+        if not isinstance(v, dict):
+            continue
+        val, nom = _num(v.get("Value")), _num(v.get("Nominal"))
+        if val and nom and val > 0:
+            out[str(v.get("CharCode") or code).strip().upper()] = val / nom
+    return day, out
+
+
+def _mirror_get(url: str, timeout: int) -> tuple[int, bytes]:
+    r = requests.get(url, timeout=timeout)
+    return r.status_code, (r.content if r.status_code == 200 else b"")
+
+
+def cbr_mirror_codes(timeout: int = 30, fetch=None) -> set[str]:
+    """Проверка зеркала одним запросом: ISO-коды последнего курса (пусто — исключение)."""
+    status, body = (fetch or (lambda u: _mirror_get(u, timeout)))(CBR_MIRROR_LATEST)
+    if status != 200:
+        raise ConnectionError(f"зеркало ответило {status}")
+    _d, rates = parse_cbr_mirror_day(body)
+    if not rates:
+        raise ValueError("в ответе зеркала нет курсов")
+    return set(rates) | {"RUB"}
+
+
+def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.25,
+                      timeout: int = 30, fetch=None) -> tuple[dict[str, list[tuple[date, float]]], dict]:
+    """Ряды «рублей за ОДНУ единицу» по зеркалу только на нужные даты.
+
+    days — нужные даты; codes — ISO-коды. Даты идут от новых к старым: при пределе
+    запросов без курса остаются самые старые. → (ряды для CbrRates, учёт {запросов,
+    дат, без курса, обрезано}). Курс записывается под датой самого курса, но не
+    позже запрошенной: так «последняя запись не позже даты» в CbrRates даёт ровно
+    курс на эту дату."""
+    get = fetch or (lambda u: _mirror_get(u, timeout))
+    want = {str(c).upper() for c in codes} - {"RUB"}
+    cache: dict[date, tuple[date, dict[str, float]] | None] = {}
+    series: dict[str, dict[date, float]] = {c: {} for c in want}
+    stat = {"запросов": 0, "дат": 0, "без курса": 0, "обрезано": 0}
+    for day in sorted(set(days), reverse=True):
+        stat["дат"] += 1
+        found = False
+        for k in range(MIRROR_STEP_BACK + 1):
+            q = date.fromordinal(day.toordinal() - k)
+            if q not in cache:
+                if stat["запросов"] >= max_requests:
+                    stat["обрезано"] += 1
+                    found = None
+                    break
+                if stat["запросов"] and pause:
+                    time.sleep(pause)
+                stat["запросов"] += 1
+                url = CBR_MIRROR_DAY.format(y=q.year, m=q.month, d=q.day)
+                status, body = get(url)
+                for wait in MIRROR_RETRY_WAIT:          # 429 и 5xx — подождать, не падать
+                    if status != 429 and status < 500:
+                        break
+                    time.sleep(wait)
+                    stat["запросов"] += 1
+                    status, body = get(url)
+                if status == 200:
+                    eff, rates = parse_cbr_mirror_day(body)
+                    cache[q] = (min(eff, q) if eff else q, rates) if rates else None
+                elif status == 404:
+                    cache[q] = None
+                else:
+                    raise ConnectionError(f"зеркало ответило {status}")
+            hit = cache[q]
+            if hit:
+                eff, rates = hit
+                for c in want & set(rates):
+                    series[c][eff] = rates[c]
+                found = True
+                break
+        if found is False:
+            stat["без курса"] += 1
+    return {c: sorted(v.items()) for c, v in series.items() if v}, stat
