@@ -68,6 +68,18 @@ MSK = dealctx.MSK
 #: Статус сверенного файла экономики — scripts/econ_template.СВЕРЕНО (сверяет тест):
 #: модуль шаблона тянет openpyxl, своду он не нужен.
 ECON_VERIFIED = "сверено"
+#: Порядок строк сделки в выгрузке — как contract_terms.порядок_строки: вид документа по
+#: contract_terms.ПОРЯДОК_ВИДОВ (спецификации 1174 и 132, Purchase order 172, рамочные
+#: 1192 и 175), новая карточка, длинный и больший номер файла раньше. Сверяет тест.
+ПОРЯДОК_СТРОК_SQL = ("array_position(array[1174, 132, 172, 1192, 175], card_entity), card_id desc, "
+                     "length(file_id) desc, file_id desc")
+#: Исходы, которые не затирают прежний полный разбор (выбор прогона по сделке).
+НЕ_ЗАТИРАЮТ = ("недочитана", "не читается")
+НЕ_ЗАТИРАЮТ_SQL = "(" + ", ".join(f"'{и}'" for и in НЕ_ЗАТИРАЮТ) + ")"
+#: Записанный исход ↔ пересчёт, которые сходятся: до 25.10.2026 «не читается» (закачка,
+#: формат, предел) записывалось как «недочитана» — пересчёт нынешним кодом точнее, и
+#: вкладка показывает его, а не «разошлось».
+СХОДЯТСЯ = {("недочитана", "не читается")}
 
 
 def _ct():
@@ -135,12 +147,13 @@ class База:
             return [], [], []
         выбор: dict[int, dict] = {}
         if self.есть("contract_deal_outcome"):
-            # «недочитана» (бюджет, срок, закачка) не затирает прежний полный разбор:
-            # берётся последний исход, кроме «недочитана», а если других нет — он
-            for deal, run, исход, at, вер in self._все("""
+            # «недочитана» (бюджет, срок, временный отказ) и «не читается» (закачка,
+            # формат, предел чтения) не затирают прежний полный разбор: берётся последний
+            # исход, кроме этих двух, а если других нет — последний из них
+            for deal, run, исход, at, вер in self._все(f"""
                     select distinct on (deal_id) deal_id, run_id, outcome, created_at, method_ver
                       from contract_deal_outcome
-                     order by deal_id, (outcome = 'недочитана'), created_at desc, run_id desc"""):
+                     order by deal_id, (outcome in {НЕ_ЗАТИРАЮТ_SQL}), created_at desc, run_id desc"""):
                 выбор[int(deal)] = {"deal": int(deal), "run": run, "outcome": исход, "at": at, "ver": вер}
             прежние = """
                 select distinct on (t.deal_id) t.deal_id, t.run_id, t.created_at, t.method_ver
@@ -162,11 +175,15 @@ class База:
         сделки = [v["deal"] for v in выбор.values()]
         прогоны = [v["run"] for v in выбор.values()]
         пары = "(deal_id, run_id) in (select * from unnest(%s::bigint[], %s::text[]))"
+        # порядок строк сделки — порядок свода условий прогона чтения (contract_terms.
+        # ПОРЯДОК_ВИДОВ и порядок_строки, сверяет тест): спецификации, Purchase order,
+        # рамочные; новая карточка и новый файл раньше. Разойдись он — пересчёт свёл бы
+        # условия в другом порядке и назвал бы сделку «разошлось».
         строки = self._все(f"""
             select deal_id, run_id, card_entity, card_id, file_id, order_id, side, side_company, side_link,
                    side_template, status, terms, dropped
               from contract_terms where {пары}
-             order by deal_id, (card_entity <> 1174), card_id desc, length(file_id) desc, file_id desc""",
+             order by deal_id, {ПОРЯДОК_СТРОК_SQL}""",
                             (сделки, прогоны))
         ключи = ("deal_id", "run_id", "card_entity", "card_id", "file_id", "order_id", "side", "side_company",
                  "side_link", "side_template", "status", "terms", "dropped")
@@ -236,6 +253,8 @@ def свод_договоров(выбор: list[dict], строки: list[dict]
         записано = флаги_пары.get(key, [])
         флаги_пересчёт, исход_пересчёт = ct.флаги_сделки(rs) if rs else ([], "нет договоров")
         исход = v["outcome"] or исход_пересчёт
+        if (исход, исход_пересчёт) in СХОДЯТСЯ:
+            исход = исход_пересчёт
         n["итог" if v["outcome"] else "пересчёт"] += 1
         сошлось = (исход == исход_пересчёт
                    and (not записано or исход == "пара")

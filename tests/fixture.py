@@ -590,6 +590,8 @@ def realctx_raw() -> dict:
         "6009": {"at": t(1), "outcome": "недочитана", "read": {"customer": 1, "supplier": 0}, "flags": []},
         "6011": {"at": t(1), "outcome": "разошлось", "read": {"customer": 1, "supplier": 1}, "flags": []},
         "6013": {"at": t(1), "outcome": "пара", "read": {"customer": 1, "supplier": 2}, "flags": []},
+        # файл договора не скачивается (или формат, или длиннее предела) — перезалить
+        "6015": {"at": t(1), "outcome": "не читается", "read": {"customer": 1, "supplier": 0}, "flags": []},
     }
 
     # финальная экономика из файла (scripts/econ_files.py): «Сумма» сделок стаба —

@@ -7,9 +7,20 @@
 -- authenticated) не выдаются; на дашборд — отдельной правкой и только праву
 -- «Поставщики: договоры и деньги». В репозитории — только эта схема и код.
 --
---   contract_terms       одна строка — один файл договора одной карточки
---                        (СП-1174 разовый договор / спецификация / ДС, СП-1192
---                        рамочный). Карточка без файла и файл, который не
+--   contract_terms       одна строка — один файл документа одной сделки: карточки
+--                        договора (СП-1174 разовый договор / спецификация / ДС,
+--                        СП-1192 рамочный, прежние СП-132 разовый / ДС /
+--                        спецификация и СП-175 рамочный / ген. соглашение) или
+--                        Purchase order заказа СП-172 (card_entity 172, card_id —
+--                        номер заказа). Рамочный под спецификациями нескольких
+--                        сделок — строка у каждой сделки (ключ с deal_id, с
+--                        25.10.2026). link_source — откуда документ у сделки:
+--                        deal_link / order_link — карточка связана со сделкой (без
+--                        связи с заказом и с ней), order_only — только с её заказом,
+--                        framework — рамочный над спецификацией сделки,
+--                        purchase_order — файл самого заказа без документа
+--                        поставщика (scripts/contract_terms.py, ИСТОЧНИКИ).
+--                        Карточка без файла и файл, который не
 --                        прочитан, — тоже строка: status говорит, прочитан ли он
 --                        и если нет — почему (правило 15, статус не врёт):
 --                          ok        прочитан моделью в этом прогоне;
@@ -40,8 +51,11 @@
 --   contract_b2b_flags   флаг риска (contract_b2b.flags) по паре «условия
 --                        заказчика сделки ↔ условия поставщика заказа order_id».
 --   contract_deal_outcome исход разбора договоров сделки в прогоне (с 23.10.2026):
---                        пара / недочитана / без стороны / спорная / поставщик без
---                        заказа / нет пары / нет договоров. Пишется одной транзакцией
+--                        пара / недочитана / не читается / без стороны / спорная /
+--                        поставщик без заказа / нет пары / нет договоров
+--                        («недочитана» — файл ещё не прочитан: бюджет, срок,
+--                        временный отказ; «не читается» — закачка, формат, предел
+--                        чтения: нужен человек). Пишется одной транзакцией
 --                        с флагами и только у прогона, прошедшего гейт стороны: по
 --                        нему вкладка «Реализация» отличает «договоров нет» и «рисков
 --                        нет» от «сделку не читали» (scripts/realization_ctx.py).
@@ -86,7 +100,7 @@ create table if not exists contract_terms (
   dropped     jsonb,
   usd         numeric(12, 6) not null default 0,
   created_at  timestamptz not null default now(),
-  primary key (run_id, card_entity, card_id, file_id)
+  primary key (run_id, deal_id, card_entity, card_id, file_id)
 );
 
 create table if not exists contract_b2b_flags (
@@ -111,6 +125,7 @@ create table if not exists contract_deal_outcome (
 -- «create table if not exists» существующую таблицу не меняет (правило 21):
 -- колонки, добавленные позже первой версии, — отдельными операторами здесь.
 alter table contract_terms add column if not exists side_link text;   -- 22.10.2026
+alter table contract_terms add column if not exists link_source text; -- 25.10.2026
 -- Строки версии до 22.10.2026: сторона — по связи карточки (side_source order_link /
 -- deal_link). Связь переезжает в side_link, сторона — из ответа модели (только у
 -- прочитанных), как пишет нынешний код; иначе новая проверка стороны не встанет.
@@ -133,9 +148,41 @@ alter table contract_terms add constraint contract_terms_side_chk
          and ((side is null) = (side_source is null))
          and (side_template is null or side_template in ('customer', 'supplier'))
          and (side_company is null or side_company in ('customer', 'supplier')));
+-- С 25.10.2026 рамочный — документ каждой сделки, под которой стоит его спецификация:
+-- одна карточка и файл в прогоне — строка на сделку. Ключ прежней версии (без deal_id)
+-- молча снял бы строки второй сделки (on conflict do nothing) — он пересобирается с
+-- deal_id; строки прежней версии уникальны и по новому ключу (в нём на колонку больше).
+-- Повтор — без изменений: ключ уже с deal_id.
+do $$
+declare сх text := current_schema();
+declare имя text;
+declare со_сделкой boolean;
+begin
+  select k.conname, coalesce(bool_or(a.attname = 'deal_id'), false)
+    into имя, со_сделкой
+    from pg_constraint k
+    join pg_attribute a on a.attrelid = k.conrelid and a.attnum = any (k.conkey)
+   where k.conrelid = format('%I.contract_terms', сх)::regclass and k.contype = 'p'
+   group by k.conname;
+  if имя is null or not со_сделкой then
+    if имя is not null then
+      execute format('alter table %I.contract_terms drop constraint %I', сх, имя);
+    end if;
+    execute format('alter table %I.contract_terms add constraint contract_terms_pkey '
+                   'primary key (run_id, deal_id, card_entity, card_id, file_id)', сх);
+  end if;
+end $$;
+
+-- 132, 175 — прежние смарт-процессы договоров, 172 — Purchase order заказа (25.10.2026)
 alter table contract_terms drop constraint if exists contract_terms_entity_chk;
 alter table contract_terms add constraint contract_terms_entity_chk
-  check (card_entity in (1174, 1192));
+  check (card_entity in (1174, 1192, 132, 175, 172));
+-- Список — дословно contract_terms.ИСТОЧНИКИ (сверяет tests/test_contract_terms.py);
+-- у строк до 25.10.2026 — null.
+alter table contract_terms drop constraint if exists contract_terms_link_chk;
+alter table contract_terms add constraint contract_terms_link_chk
+  check (link_source is null
+         or link_source in ('deal_link', 'order_link', 'order_only', 'framework', 'purchase_order'));
 -- Прочитанный файл несёт условия, непрочитанный — нет: иначе строка со статусом
 -- отказа выглядела бы прочитанной.
 alter table contract_terms drop constraint if exists contract_terms_terms_chk;
@@ -147,8 +194,8 @@ alter table contract_terms add constraint contract_terms_usd_chk check (usd >= 0
 -- Список — дословно contract_terms.ИСХОДЫ (сверяет tests/test_contract_terms_sql.py).
 alter table contract_deal_outcome drop constraint if exists contract_deal_outcome_chk;
 alter table contract_deal_outcome add constraint contract_deal_outcome_chk
-  check (outcome in ('пара', 'недочитана', 'без стороны', 'спорная', 'поставщик без заказа',
-                     'нет пары', 'нет договоров')
+  check (outcome in ('пара', 'недочитана', 'не читается', 'без стороны', 'спорная',
+                     'поставщик без заказа', 'нет пары', 'нет договоров')
          and deal_id > 0);
 
 alter table contract_b2b_flags drop constraint if exists contract_b2b_flags_code_chk;

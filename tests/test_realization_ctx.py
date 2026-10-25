@@ -153,6 +153,44 @@ def test_расхождение_с_пересчётом_помечается_и_
         assert any(x.startswith("::warning::договоры: у 1 сделок прежних") for x in журнал)
 
 
+def test_прежняя_недочитана_с_нечитаемым_файлом_сходится_с_пересчётом():
+    """До 25.10.2026 «не читается» (закачка, формат, предел) писалось «недочитана»:
+    пересчёт нынешним кодом точнее — вкладка показывает его, а не «разошлось», и шаг
+    не краснеет. Обратного схождения нет."""
+    V = ct.METHOD_VER
+    строки = [_строка(101, "ct-2", 1, "customer", terms=ЗАКАЗЧИК), _строка(101, "ct-2", 2, "supplier", status="download")]
+    база = База(выбор=[{"deal": 101, "run": "ct-2", "outcome": "недочитана", "at": T, "ver": V}], строки=строки)
+    s = Store()
+    assert rc.publish(база, s, dry=False, ct=ct, печать=lambda x: None) == 0
+    assert json.loads(s.raw)["contracts"]["101"]["outcome"] == "не читается"
+    недочит = [_строка(101, "ct-2", 1, "customer", terms=ЗАКАЗЧИК), _строка(101, "ct-2", 2, "supplier", status="budget")]
+    база = База(выбор=[{"deal": 101, "run": "ct-2", "outcome": "не читается", "at": T, "ver": V}], строки=недочит)
+    s = Store()
+    assert rc.publish(база, s, dry=False, ct=ct, печать=lambda x: None) == 1
+    assert json.loads(s.raw)["contracts"]["101"]["outcome"] == "разошлось"
+
+
+def test_порядок_строк_выгрузки_как_у_прогона_чтения():
+    """Свод условий берёт первое заполненное: пересчёт в выгрузке обязан видеть строки
+    сделки в том же порядке, что прогон чтения (contract_terms.ПОРЯДОК_ВИДОВ,
+    порядок_строки), иначе назвал бы сделку «разошлось»."""
+    import re
+    m = re.fullmatch(r"array_position\(array\[([\d, ]+)\], card_entity\), (.+)", rc.ПОРЯДОК_СТРОК_SQL)
+    assert m and tuple(int(x) for x in m.group(1).split(",")) == ct.ПОРЯДОК_ВИДОВ
+    assert m.group(2) == "card_id desc, length(file_id) desc, file_id desc"
+    src = (ROOT / "scripts" / "realization_ctx.py").read_text(encoding="utf-8")
+    assert "order by deal_id, {ПОРЯДОК_СТРОК_SQL}" in src
+    assert "(card_entity <> 1174)" not in src, "прежний порядок «разовый раньше рамочного» не знает 132/172/175"
+    # Python: ключ порядка документов и строк один
+    строки = [{"card_entity": e, "card_id": c, "file_id": f} for e, c, f in (
+        (175, 9, "5"), (1192, 3, "7"), (172, 50, "99"), (132, 8, "1"), (1174, 2, "10"), (1174, 2, "9"),
+        (1174, 4, ""), (172, 51, "1"))]
+    assert [(r["card_entity"], r["card_id"], r["file_id"]) for r in sorted(строки, key=ct.порядок_строки)] == [
+        (1174, 4, ""), (1174, 2, "10"), (1174, 2, "9"), (132, 8, "1"), (172, 51, "1"), (172, 50, "99"),
+        (1192, 3, "7"), (175, 9, "5")]
+    assert rc.НЕ_ЗАТИРАЮТ == ("недочитана", "не читается") and set(rc.НЕ_ЗАТИРАЮТ) <= set(ct.ИСХОДЫ)
+
+
 def test_прежний_прогон_без_исхода_берётся_пересчётом():
     строки, флаги = _пара(run="ct-old")
     база = База(выбор=[{"deal": 101, "run": "ct-old", "outcome": None, "at": T}], строки=строки, флаги=флаги)
@@ -315,13 +353,22 @@ def test_на_настоящей_базе(conn):
         for r in строки_старые + строки_новые:
             r.update(method_ver=ct.METHOD_VER, side_source="model" if r["side"] else None, template=None,
                      doc_type=None, file_field="f", sha256=None, pages=None, note=None, model="claude-x",
-                     evidence=None, usd=0)
+                     evidence=None, usd=0, link_source="deal_link")
         база_записи.записать_условия(строки_старые)
         база_записи.записать_флаги(флаги_старые, "ct-old")
         база_записи.записать_условия(строки_новые)
         база_записи.записать_итог([], {102: "нет пары", 103: "нет договоров"}, "ct-new")
-        # позже прогон, где сделке 102 не хватило бюджета: «недочитана» не затирает разбор
+        # позже прогон, где сделке 102 не хватило бюджета: «недочитана» не затирает разбор,
+        # и «не читается» (файл не скачался) — тоже
         база_записи.записать_итог([], {102: "недочитана"}, "ct-newer")
+        # у сделки 104 только эти два: берётся последний из них («не читается», файл не скачан)
+        for run, статус in (("ct-newest", "budget"), ("ct-newest-2", "download")):
+            r = _строка(104, run, 7, "supplier", status=статус, order=77)
+            r.update(method_ver=ct.METHOD_VER, side_source=None, template=None, doc_type=None, file_field="f",
+                     sha256=None, pages=None, note=None, model=None, evidence=None, usd=0, link_source="order_only")
+            база_записи.записать_условия([r])
+        база_записи.записать_итог([], {102: "не читается", 104: "недочитана"}, "ct-newest")
+        база_записи.записать_итог([], {104: "не читается"}, "ct-newest-2")
     finally:
         база_записи.закрыть()
     # финальная экономика: сверенная строка и строка со сбоем шаблона
@@ -367,7 +414,44 @@ def test_на_настоящей_базе(conn):
     assert д["102"] == {"at": д["102"]["at"], "outcome": "нет пары", "read": {"customer": 1, "supplier": 0},
                         "flags": []}
     assert д["103"]["outcome"] == "нет договоров"
-    assert any("исход прогона 2, пересчёт прежних 1" in x for x in журнал)
+    assert д["104"]["outcome"] == "не читается" and д["104"]["read"] == {"customer": 0, "supplier": 0}
+    assert any("исход прогона 3, пересчёт прежних 1" in x for x in журнал)
+
+
+def test_выгрузка_по_настоящей_базе_в_порядке_прогона_чтения(conn):
+    """Строки одной сделки, записанные вперемешку, выгрузка отдаёт в порядке
+    contract_terms.порядок_строки — тем же, в котором их сводил прогон чтения; рамочный
+    у двух сделок одного прогона — строка у каждой (ключ с deal_id)."""
+    import random
+    def r(deal, entity, card, fid, side="customer", order=None):
+        x = _строка(deal, "ct-ord", card, side, order=order, terms={"deliveryDays": card % 97})
+        x.update(card_entity=entity, file_id=fid, method_ver=ct.METHOD_VER, side_source="model", template=None,
+                 doc_type=None, file_field="f", sha256=None, pages=None, note=None, model="claude-x",
+                 evidence=None, usd=0, link_source="deal_link")
+        return x
+    строки = [r(201, 175, 9, "5"), r(201, 1192, 3, "7"), r(201, 172, 50, "99", "supplier", 50),
+              r(201, 132, 8, "1"), r(201, 1174, 2, "10"), r(201, 1174, 2, "9"), r(201, 172, 51, "1", "supplier", 51),
+              r(202, 175, 9, "5")]
+    строки[-1]["link_source"] = "framework"
+    random.Random(5).shuffle(строки)
+    база_записи = ct.База(DSN, схема=СХЕМА)
+    try:
+        база_записи.записать_условия(строки)
+        база_записи.записать_итог([], {201: "пара", 202: "нет пары"}, "ct-ord")
+        assert база_записи.итог("ct-ord")[0] == len(строки), "рамочный второй сделки снят ключом без deal_id"
+    finally:
+        база_записи.закрыть()
+    база = rc.База(DSN, схема=СХЕМА)
+    try:
+        _выбор, выгружено, _флаги = база.договоры()
+    finally:
+        база.закрыть()
+    у_201 = [(x["card_entity"], x["card_id"], x["file_id"]) for x in выгружено if x["deal_id"] == 201]
+    ожидаемо = [(x["card_entity"], x["card_id"], x["file_id"])
+                for x in sorted((x for x in строки if x["deal_id"] == 201), key=ct.порядок_строки)]
+    assert у_201 == ожидаемо == [(1174, 2, "10"), (1174, 2, "9"), (132, 8, "1"), (172, 51, "1"), (172, 50, "99"),
+                                 (1192, 3, "7"), (175, 9, "5")]
+    assert [(x["card_entity"], x["card_id"]) for x in выгружено if x["deal_id"] == 202] == [(175, 9)]
 
 
 # ── расписание и прогоны (решение владельца 23.10.2026) ─────────────────────────

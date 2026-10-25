@@ -148,6 +148,18 @@ def test_списки_как_в_прогонах():
     assert set(dealctx.ROLE_LBL) == set(cc.РОЛИ) and set(dealctx.DUE_ACC) == set(cc.ВИДЫ_СРОКА)
 
 
+def test_у_каждого_исхода_есть_подпись_во_вкладке():
+    """Исход разбора без подписи вкладка показала бы кодом — «не читается» (25.10.2026)
+    и любой следующий должен прийти в _DC_OUT шаблона вместе со списком."""
+    import re
+    шаблон = (ROOT / "templates" / "dashboard_core.html").read_text(encoding="utf-8")
+    тело = re.search(r"const _DC_OUT=\{(.*?)\};", шаблон).group(1)
+    подписи = dict(re.findall(r"'([^']+)':'([^']+)'", тело))
+    assert set(подписи) == set(dealctx.OUTCOMES), set(dealctx.OUTCOMES) ^ set(подписи)
+    assert подписи["не читается"] == "файл договора не читается — перезалить"
+    assert dealctx.UNREADABLE in dealctx.OUTCOMES
+
+
 def test_нет_файла_нет_свода(tmp_path, monkeypatch):
     monkeypatch.delenv("REALCTX_PATH", raising=False)
     assert dealctx.load() is None
@@ -198,16 +210,23 @@ def test_вкладка_со_сводом():
     assert "sep" not in h and ct["sep"]["head"]["ctx"]["open"] == len(
         [x for x in ct["rows"] if not x["closed"] and x["seg"]])
     assert h["chat"] == {"seen": 7, "cur": 5, "reply": 2, "replyLate": 1, "high": 1, "dueLate": 1}
-    assert h["contract"] == {"seen": 6, "risk": 1, "flags": 2, "nopair": 2, "pair": 2, "unread": 1}
+    assert h["contract"] == {"seen": 7, "risk": 1, "flags": 2, "nopair": 2, "pair": 2, "unread": 1, "unreadable": 1}
     q = [(x["code"], x["deal"]) for x in dc["queue"]]
     assert q == [("chatReply", "6006"), ("chatRisk", "6008"), ("chatDue", "6008"), ("contractRisk", "6001"),
-                 ("econGap", "6010"), ("econGap", "6003"), ("contractMissing", "6007"), ("contractMissing", "6003")]
+                 ("econGap", "6010"), ("econGap", "6003"), ("contractMissing", "6007"), ("contractMissing", "6003"),
+                 ("contractUnreadable", "6015")]
     reply = dc["queue"][0]
     assert reply["what"].endswith("оценка модели, уверенность 80 %"), "пункт по чату — оценка, а не факт"
     assert reply["who"] == rows["6006"]["ossDeal"] and reply["days"] == 4
     assert dc["queue"][3]["who"] == dealctx.CONTRACT_HEAD and dc["queue"][3]["act"].endswith("пени, документы")
     assert dc["counts"] == {"chatReply": 1, "chatRisk": 1, "chatDue": 1, "contractRisk": 1, "contractMissing": 2,
-                            "econGap": 2}
+                            "econGap": 2, "contractUnreadable": 1}
+    # файл договора не читается — пункт ответственному сделки (как «договор не найден»):
+    # следующий прогон это не вылечит, файл надо перезалить
+    нечит = next(q for q in dc["queue"] if q["code"] == "contractUnreadable")
+    assert нечит["who"] == rows["6015"]["manager"] and нечит["what"] == "файл договора не читается"
+    assert нечит["act"].startswith("перезалить файл договора")
+    assert d["6015"]["contract"]["outcome"] == "не читается" and d["6015"]["contract"]["missing"] == []
     assert d["6001"]["contract"]["flags"][0]["text"] == dealctx.contract_b2b.FLAG_TEXT["penaltyUncovered"]
     assert d["6003"]["contract"]["missing"] == ["supplier"]
     assert d["6011"]["contract"]["outcome"] == "разошлось" and d["6011"]["contract"]["flags"] == []
@@ -215,7 +234,8 @@ def test_вкладка_со_сводом():
     assert d["6014"]["chat"]["cur"] is False
     assert d["6002"]["chat"]["conf"] == 80, "уверенность модели — рядом с оценкой"
     assert d["6007"]["contract"]["missing"] == ["customer", "supplier"]
-    assert any(q["what"] == "договор заказчика и поставщика не найден в карточках сделки" for q in dc["queue"])
+    assert any(q["what"] == ("договор заказчика и поставщика не найден: ни в карточках договоров сделки "
+                             "и её заказов, ни в Purchase order") for q in dc["queue"])
     # «что делать первым» — самое важное из обеих очередей обоих видов вкладки
     for did, rec in d.items():
         if "todo" in rec:
@@ -240,7 +260,7 @@ def test_пункты_направления_в_его_очереди():
                                                     ("contractMissing", "6100")}
     assert all(q["seg"] == fixture.CT_SEP_CAT for q in сеп)
     assert dc["counts"] == {"chatReply": 1, "chatRisk": 1, "chatDue": 1, "contractRisk": 1, "contractMissing": 2,
-                            "econGap": 2}
+                            "econGap": 2, "contractUnreadable": 1}
     assert dc["sepCounts"] == {"chatRisk": 1, "chatDue": 1, "contractMissing": 1}
     assert head["chat"]["high"] == 1 and head["sep"]["chat"]["high"] == 1
     assert head["sep"]["open"] == 2 and head["sep"]["contract"]["seen"] == 1
