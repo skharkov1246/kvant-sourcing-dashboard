@@ -91,14 +91,25 @@ def _p75(xs: list) -> float | None:
     return float(s[min(len(s) - 1, int(round(0.75 * (len(s) - 1))))]) if s else None
 
 
+def delivered(o: dict) -> dt.date | None:
+    """Дата доставки клиенту для фазы и очереди: факт («Customer delivery date, actual»), а
+    без него — дата подписания УПД (utdDate, только прошедшая): решение владельца 25.10.2026
+    — «доставлено, даты доставки нет»: прежде чем ставить пункт, искать УПД и брать дату из
+    него с пометкой «по УПД». Доставка в срок, нормы звеньев и хозяева за 90 дней меряются
+    только по факту: подпись УПД бывает позже приёмки, и срок по ней выходил бы сорванным."""
+    return o.get("delFact") or o.get("utdDate")
+
+
 def phase(o: dict, today: dt.date, warranty_months: int = WARRANTY_MONTHS) -> str:
     """Фаза заказа по фактам. o — заказ, приведённый к фактам (поля ниже). Заказ,
     закрытый успехом, закрытие прошёл, даже если УПД или платёжки нет файлом:
-    платёжка клиента стала полем только в июле 2025, старые заказы её не имеют."""
-    if o.get("delFact"):
+    платёжка клиента стала полем только в июле 2025, старые заказы её не имеют. Даты
+    доставки нет, а УПД подписан — доставлен по дате УПД (delivered)."""
+    f = delivered(o)
+    if f:
         if o.get("live") and (not o.get("utd") or not o.get("clientPaid")):
             return "close"
-        return "warranty" if _add_months(o["delFact"], warranty_months) >= today else "done"
+        return "warranty" if _add_months(f, warranty_months) >= today else "done"
     if o.get("success"):
         return "done"                     # закрыт без даты доставки: гарантию не от чего считать
     if o.get("shipFact") or o.get("inbFact"):
@@ -142,7 +153,7 @@ def forecast(o: dict, today: dt.date, med: dict, sup_slip: dict) -> dt.date | No
     отгрузка) или — не отгружен — от позднейшей из дат: плановая отгрузка, бюджетный
     конец производства + обычное опоздание ЭТОГО поставщика, сегодня; плюс медианы
     оставшихся звеньев. None — не из чего считать."""
-    if not o.get("live") or o.get("delFact"):
+    if not o.get("live") or delivered(o):
         return None
     tr, lm = med.get("transit"), med.get("lastMile")
     if o.get("inbFact"):
@@ -175,7 +186,7 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None) -> list
     """[(код, дней)] — исключения одного заказа. Закрытый провалом заказ сюда не попадает.
     fc — прогноз доставки (forecast): позже срока клиента — ранний сигнал."""
     out: list[tuple[str, int | None]] = []
-    dl, fact = o.get("dl"), o.get("delFact")
+    dl, fact = o.get("dl"), delivered(o)                  # без факта — по УПД (решение 25.10.2026)
     shipped = o.get("shipFact") or o.get("inbFact")      # пришёл на склад — значит, отгружен
     if o.get("live"):
         if dl and not fact:
@@ -395,7 +406,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     in_w = [o for o, _ in in_scope if phase(o, today, warranty_months) == "warranty"]
     warranty = {"months": warranty_months, "assumed": True, "active": len(in_w),
                 "ending30": sum(1 for o in in_w
-                                if _add_months(o["delFact"], warranty_months) <= today + dt.timedelta(days=30)),
+                                if _add_months(delivered(o), warranty_months) <= today + dt.timedelta(days=30)),
                 "claims": None}
     return {
         "asOf": today.strftime("%d.%m.%Y"),
@@ -408,6 +419,8 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                 "deals90": {"n": deals90[0], "ontime": deals90[1],
                             "pct": round(deals90[1] / deals90[0] * 100) if deals90[0] else None}},
         "norms": {"toShip": norm_ship, "path": norm_path},
+        # заказов вида, у которых даты доставки нет и она взята из подписи УПД (delivered)
+        "byUtd": sum(1 for o, _ in in_scope if not o.get("delFact") and o.get("utdDate")),
         "lead": lead_out,
         "suppliers": suppliers[:20],
         "supAll": sup_all,          # по каждому поставщику — для вкладки «Поставщики»

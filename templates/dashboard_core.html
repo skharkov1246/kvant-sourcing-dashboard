@@ -2042,7 +2042,7 @@ function _ctPanel(X,el){
      +(S.map(s=>`<tr><td>${_esc(s.sup)}</td><td class="r mono">${s.n}</td><td class="r mono${s.pct<70?' hot':''}">${s.pct}%</td><td class="r mono">${s.medSlip!=null?(s.medSlip>0?'+':'')+Math.round(s.medSlip)+' дн':'—'}</td></tr>`).join('')||'<tr><td colspan="4" class="dimv">мало отгрузок с планом и фактом</td></tr>')
      +`</tbody></table></div></section></div>`
      +`<section class="card" style="margin-top:12px"><h2>Гарантия</h2><div class="kprule"><div class="cell"><b>${W.active||0}</b><span>заказов в гарантии</span></div><div class="cell"><b>${W.ending30||0}</b><span>кончается в 30 дней — при допущении ${W.months} мес.</span></div><div class="cell"><b>—</b><span>рекламации: в портале не ведутся</span></div></div>`
-     +`<div class="note">Срок гарантии — из договора, без договора — из Purchase order (решение владельца 19.10.2026). Пока договоры и PO не читаются, считаем ${W.months} мес. от доставки клиенту — это допущение. Рекламаций и актов о дефектах в портале нет — гарантийные случаи не видны.</div></section>`;
+     +`<div class="note">Срок гарантии — из договора, без договора — из Purchase order (решение владельца 19.10.2026). Пока договоры и PO не читаются, считаем ${W.months} мес. от доставки клиенту — это допущение. Рекламаций и актов о дефектах в портале нет — гарантийные случаи не видны.${L.byUtd?` Даты доставки нет у ${L.byUtd} заказов — для фазы и очереди взята дата подписания УПД (решение владельца 25.10.2026); доставка в срок по ним не считается.`:''}</div></section>`;
   }
 
   h+=`<div class="secttl"><b>·</b> Деньги и экономика</div>`;

@@ -248,6 +248,14 @@ def _econ_cur(raw) -> str:
 BUY_SANE = (0.03, 3.0)
 
 
+def _utd_date(o: dict, today: dt.date) -> dt.date | None:
+    """Дата подписания УПД заказа, если она уже прошла: замена даты доставки, когда факта
+    нет (решение владельца 25.10.2026, lifecycle.delivered). Будущая дата — опечатка, не
+    доставка."""
+    d = _pdate(o.get(UTD_DATE))
+    return d if d and d <= today else None
+
+
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             people: dict[str, dict] | None = None, service_ids: set[str] | None = None,
             chat_reader: chat_activity.Reader | None = None,
@@ -550,8 +558,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # обещание клиенту: та же дата, по которой снабжение ведёт «Контроль дедлайнов»
             dl = _pdate(o.get(DL_CUSTOMER))
             dl_days = (today - dl).days if dl else None       # >0 — просрочено, <0 — есть запас
-            # доставлено клиенту, а заказ не закрыт — это закрытие (УПД, оплата), не просрочка
+            # доставлено клиенту, а заказ не закрыт — это закрытие (УПД, оплата), не просрочка;
+            # даты доставки нет, а УПД подписан — доставлен по дате УПД (решение 25.10.2026)
             delivered = _pdate(o.get(DEL_FACT))
+            del_utd = None if delivered else _utd_date(o, today)
+            delivered = delivered or del_utd
             olate = bool(olive and dl_days is not None and dl_days > 0 and not delivered)
             obuy = eur(o.get("opportunity"), o.get("currencyId"))
             # стоимость отгрузки этого заказа: доля сделки пропорционально закупке
@@ -605,6 +616,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "inb": (_pdate(o.get(INBOUND_PLAN)).strftime("%d.%m.%Y")
                         if _pdate(o.get(INBOUND_PLAN)) else ""),
                 "delivered": delivered.strftime("%d.%m.%Y") if delivered else "",
+                "delUtd": bool(del_utd),            # дата доставки — по подписи УПД
             })
         ords_det.sort(key=lambda x: (not x["live"], -(x["dlDays"] if x["dlDays"] is not None else -9999),
                                      -(x["days"] or 0)))
@@ -806,6 +818,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "inbFact": _pdate(o.get(INB_FACT)),
             "delPlan": _pdate(o.get(DEL_PLAN)), "delBudget": _pdate(o.get(DEL_BUDGET)),
             "delFact": _pdate(o.get(DEL_FACT)),
+            # дата подписания УПД — дата доставки, когда факта нет (lifecycle.delivered)
+            "utdDate": _utd_date(o, today),
             "utd": bool(_pdate(o.get(UTD_DATE)) or _has(o.get(UTD_FILE))),
             "payPlan": _pdate(o.get(PAY_PLAN)), "clientPaid": _has(o.get(CLIENT_PO)),
             "supPaidPct": paid, "prodConf": _has(o.get(PROD_CONF)) or _has(o.get(PROD_CONF_NF)),

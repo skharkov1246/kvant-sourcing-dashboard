@@ -231,3 +231,10 @@ def test_ведёт_уволенный_плитка_фильтр_и_свод_с�
     assert "r.filter(x=>(x.managerGone||x.ossGone||x.respGone)&&!x.closed)" in вкладка
     # без уволенных — как было: признака нет ни у одной сделки
     assert not any(r["respGone"] for r in _compute(fixture.ContractsStub())["rows"])
+
+
+def test_дата_упд_только_прошедшая():
+    сегодня = dt.date(2026, 10, 19)
+    assert ct._utd_date({ct.UTD_DATE: "2026-10-01T03:00:00+03:00"}, сегодня) == dt.date(2026, 10, 1)
+    assert ct._utd_date({ct.UTD_DATE: "2026-11-01"}, сегодня) is None, "будущая дата — опечатка, не доставка"
+    assert ct._utd_date({}, сегодня) is None
