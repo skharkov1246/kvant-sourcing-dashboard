@@ -477,10 +477,11 @@ def читать_бюджеты(в_евро):
     return out
 
 
-def товарные_строки(client, ids):
-    """Число товарных строк сделок пакетом batch по 50 команд → {deal_id: строк}."""
+def строки_сделок(client, ids):
+    """Товарные строки сделок пакетом batch по 50 команд → {deal_id: [строки]}
+    (зонд v59 берёт и суммы строк — без НДС и с НДС)."""
     from urllib import parse
-    out: dict[str, int] = {}
+    out: dict[str, list] = {}
     for i in range(0, len(ids), 50):
         часть = ids[i:i + 50]
         cmd = {f"d{d}": "crm.deal.productrows.get?" + parse.urlencode({"id": d}) for d in часть}
@@ -488,20 +489,36 @@ def товарные_строки(client, ids):
         рез = res.get("result") or {}
         for d in часть:
             ряды = рез.get(f"d{d}") if isinstance(рез, dict) else None
-            out[d] = len(ряды) if isinstance(ряды, list) else 0
+            out[d] = ряды if isinstance(ряды, list) else []
     return out
 
 
-def читать_историю(client, ids):
-    """История стадий пачками по 50 сделок, со сверкой с total. → (история, ошибка)."""
+def товарные_строки(client, ids):
+    """Число товарных строк сделок пакетом batch по 50 команд → {deal_id: строк}."""
+    return {d: len(ряды) for d, ряды in строки_сделок(client, ids).items()}
+
+
+def читать_историю(client, ids, стадии=None, категория=None):
+    """История стадий пачками по 50 сделок, со сверкой с total. → (история, ошибка).
+
+    стадии — только входы в эти стадии (STAGE_ID массивом), категория — только
+    входы в стадии этой воронки (CATEGORY_ID): зонд v59 берёт так входы в стадию
+    предложения и в кат. 0, не читая всю историю. Сработал ли фильтр, проверяется
+    по ответу, как и фильтр OWNER_ID. Без них — все входы, как прежде."""
     история: dict[str, list] = {}
+    стадии = {str(s) for s in стадии} if стадии else None
     for i in range(0, len(ids), 50):
         часть = [int(x) for x in ids[i:i + 50]]
         свои = {str(x) for x in часть}
+        фильтр: dict = {"OWNER_ID": часть}
+        if стадии:
+            фильтр["STAGE_ID"] = sorted(стадии)
+        if категория is not None:
+            фильтр["CATEGORY_ID"] = int(категория)
         start, total, got = 0, None, 0
         while True:
             data = client.call_envelope("crm.stagehistory.list", {
-                "entityTypeId": 2, "filter": {"OWNER_ID": часть},
+                "entityTypeId": 2, "filter": фильтр,
                 "select": ["ID", "OWNER_ID", "CREATED_TIME", "STAGE_ID"],
                 "order": {"ID": "ASC"}, "start": start}) or {}
             res = data.get("result") or {}
@@ -512,6 +529,11 @@ def читать_историю(client, ids):
                 total = int(data.get("total") or 0)
                 if ({str(x.get("OWNER_ID")) for x in items} - свои) or total > 50 * 80:
                     return история, "фильтр OWNER_ID массивом не сработал — обход остановлен"
+            if стадии and any(str(x.get("STAGE_ID") or "") not in стадии for x in items):
+                return история, "фильтр STAGE_ID массивом не сработал — обход остановлен"
+            if категория is not None and any(воронка_стадии(x.get("STAGE_ID")) != str(int(категория))
+                                             for x in items):
+                return история, "фильтр CATEGORY_ID не сработал — обход остановлен"
             got += len(items)
             for x in items:
                 o, s = str(x.get("OWNER_ID")), str(x.get("STAGE_ID") or "")
