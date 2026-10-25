@@ -1,0 +1,134 @@
+name: Финальная экономика — чтение файлов «Экономика проекта»
+
+# Решение владельца 23.10.2026: финальная экономика открытой сделки реализации — из
+# файла «Экономика проекта» на общем диске Яндекс 360 (ключ Диска аккаунта компании),
+# 30 файлов в день, по одному, от новых сделок к старым; читается по шаблону, без
+# модели. Скрипт — scripts/econ_files.py, шаблон — scripts/econ_template.py, схема —
+# library/supabase/econ_files_schema.sql, навык realization-control.
+#
+# РАСПИСАНИЕ: каждую ночь в 22:07 UTC (01:07 МСК) — repository_dispatch «econ-files» от
+# Cloudflare-планировщика (scheduler/worker.js). У dispatch нет входов: live, 30 файлов,
+# 10 частей. После записи свод по сделкам уходит в закрытый ключ KV realctx:v1, его
+# показывает вкладка «Реализация» (пересборка 00:07 UTC) — только праву «Поставщики:
+# договоры и деньги».
+#
+#   mode dry  (по умолчанию) — сделки из портала, очередь и остаток предела суток (база
+#             только на чтение). Ни одного запроса к Диску; ключ Диска в шаг не передаётся.
+#   mode live — проверки на чистой базе, схема в рабочей базе, чтение файлов, запись,
+#             свод в закрытый ключ.
+#
+# ПРЕДЕЛ — 30 файлов за сутки по Москве, каждая попытка, удачная или нет; держит его
+# база (econ_file_take_slot под замком), поэтому ни повторный запуск, ни ручной рядом с
+# ночным его не удвоят. limit больше 30 скрипт не принимает.
+#
+# ЧАСТИ (распоряжение 22.09.2026) — вход parts: 10, 25 или 50. Портал читается один раз
+# (стадии и сделки), очередь режется на смежные отрезки, части идут подряд в одном
+# процессе; каждая строка — своя транзакция.
+#
+# В ЖУРНАЛ — ТОЛЬКО АГРЕГАТЫ (правило 17): ни номеров сделок, ни ссылок, путей, имён
+# файлов, ни сумм и наценок. Артефактов и кэша нет: файлы живут в памяти процесса до
+# конца шага, строки — только в закрытой базе.
+on:
+  repository_dispatch:
+    types: [econ-files]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry — очередь и предел без Диска; live — чтение файлов и запись в базу"
+        type: choice
+        options: [dry, live]
+        default: dry
+      limit:
+        description: "Сколько файлов прочитать (1…30; и не больше остатка суток по Москве)"
+        default: "30"
+      parts:
+        # Распоряжение владельца 22.09.2026: «всегда дели минимум на 10».
+        description: "На сколько частей делить очередь прогона"
+        type: choice
+        options: ["10", "25", "50"]
+        default: "10"
+
+permissions:
+  contents: read
+
+concurrency:
+  # общая очередь чтения портала (CLAUDE.md, «Битрикс не перегружать»)
+  group: bitrix-portal
+  cancel-in-progress: false
+
+jobs:
+  econ:
+    runs-on: ubuntu-latest
+    # чтение — не дольше 20 минут (econ_files.СРОК_МИН), остальное — проверки и свод
+    timeout-minutes: 40
+    env:
+      # ночной запуск (dispatch) входов не несёт — его значения здесь
+      MODE: ${{ github.event_name == 'repository_dispatch' && 'live' || inputs.mode }}
+      LIMIT: ${{ github.event_name == 'repository_dispatch' && '30' || inputs.limit }}
+      PARTS: ${{ github.event_name == 'repository_dispatch' && '10' || inputs.parts }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Установка зависимостей
+        # openpyxl — шаблон файла; psycopg2 — предел суток и запись; pytest и pyyaml —
+        # проверки; xlrd, pypdf, pillow — свод для вкладки пересчитывает исход договоров
+        # тем же кодом, что прогон чтения договоров (scripts/contract_terms.py)
+        run: pip install --quiet --disable-pip-version-check -r requirements.txt
+             psycopg2-binary==2.9.10 pillow==12.3.0 openpyxl xlrd pypdf pyyaml pytest
+
+      - name: Проверки (без сети)
+        # Шаблон, очередь, предел, гейты и журнал — до первого запроса к порталу и Диску.
+        run: python -m pytest tests/test_econ_template.py tests/test_econ_files.py -q
+
+      # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная проверка — не
+      # пройденная. База в локали UTF-8 (правило 21а).
+      - name: Проверки на чистой базе
+        if: env.MODE == 'live'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql postgresql-client
+          sudo pg_ctlcluster "$(pg_lsclusters -h | awk 'NR==1{print $1}')" main start
+          sudo -u postgres psql -q -c "alter user postgres password 'ci'"
+          sudo -u postgres createdb -T template0 --locale=C.UTF-8 --encoding=UTF8 library_sql_test
+          LIBRARY_SQL_TEST_DSN="postgresql://postgres:ci@127.0.0.1:5432/library_sql_test" \
+            python -m pytest tests/test_econ_files_sql.py -q
+
+      # Схема перед записью: файл идемпотентен (правило 21) и ни от чего не зависит.
+      - name: Схема в рабочей базе
+        if: env.MODE == 'live'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          psql "$SUPABASE_DB_URL" -q -v ON_ERROR_STOP=1 -f library/supabase/econ_files_schema.sql
+
+      - name: Чтение файлов
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          # dry открывает базу только на чтение (очередь и остаток суток)
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          # ключ Диска — только в live: холостой прогон Диск не спрашивает
+          YADISK_TOKEN: ${{ (github.event_name == 'repository_dispatch' || inputs.mode == 'live') && secrets.YADISK_TOKEN || '' }}
+          # попытка — в ключе: откат повторного запуска не трогает строки первой попытки
+          RUN_ID: ef-${{ github.run_id }}-${{ github.run_attempt }}
+          # два запроса к порталу на весь прогон (стадии и сделки), один процесс
+          BITRIX_RPS: "1.0"
+          BITRIX_PARALLEL: "1"
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python scripts/econ_files.py --mode "$MODE" --limit "$LIMIT" --parts "$PARTS"
+
+      # Свод по сделкам → закрытый ключ KV realctx:v1 для вкладки «Реализация». И после
+      # красного гейта: свод берёт только непомеченные сверенные строки. В журнал —
+      # только счётчики.
+      - name: Свод чатов, договоров и экономики в закрытый ключ
+        if: ${{ !cancelled() && env.MODE == 'live' }}
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python scripts/realization_ctx.py --publish

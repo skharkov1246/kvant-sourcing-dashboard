@@ -16,6 +16,11 @@
   contracts  по сделке — последний прогон чтения договоров, прошедший гейт стороны:
              исход разбора (contract_deal_outcome), сколько документов каждой стороны
              прочитано и коды флагов сверки (contract_b2b_flags).
+  econ       по сделке — финальная экономика из файла «Экономика проекта» (решение
+             владельца 23.10.2026, scripts/econ_files.py): последнее чтение сделки
+             (econ_file_latest), и только если оно «сверено» — продажа в валюте подачи и
+             в €, закупка в €, наценка над поставщиком, переторжка, позиций, курсы файла.
+             Ни пути, ни имени файла. Ключ закрытый; на странице числа — только в DEALCTX.
 Ни текста чатов, ни условий договоров, ни цитат.
 
 ДВЕ ПРОВЕРКИ (распоряжение 26.09.2026). Исход и флаги пишет прогон чтения; здесь они
@@ -23,8 +28,10 @@
 Не сошлось — сделка уходит с исходом «разошлось» и без флагов, а шаг кончается кодом 1
 ПОСЛЕ записи остального: вкладка не покажет непроверенного, а журнал позовёт разбор.
 Строки прогона до 23.10.2026 (исходов тогда не писали) берутся пересчётом — только у
-прогона, записавшего флаги (значит, гейт стороны пройден). Готовый свод перед записью
-проходит разбор dealctx.clean: запись не по форме — стоп, ключ не трогается.
+прогона, записавшего флаги (значит, гейт стороны пройден). Экономику файла база отбирает
+по статусу и проверяет ограничением строки, здесь — второй раз (сверить_экономику):
+не прошла — сделка без экономики, шаг кончается кодом 1 после записи. Готовый свод перед
+записью проходит разбор dealctx.clean: запись не по форме — стоп, ключ не трогается.
 
 ЗАПИСЬ. KV → перечитать и сверить (как chat_scan). В журнал — только счётчики (правило 17).
 
@@ -53,6 +60,9 @@ from realization_ctx_kv import KV_KEY, CtxError, KVStore, fetch, kv_store, _kv  
 
 MAX_BYTES = 8 * 1024 * 1024
 MSK = dealctx.MSK
+#: Статус сверенного файла экономики — scripts/econ_template.СВЕРЕНО (сверяет тест):
+#: модуль шаблона тянет openpyxl, своду он не нужен.
+ECON_VERIFIED = "сверено"
 
 
 def _ct():
@@ -161,6 +171,17 @@ class База:
                 [{"deal_id": int(r[0]), "run_id": r[1], "order_id": r[2], "code": r[3], "days": r[4]}
                  for r in флаги])
 
+    def экономика(self) -> list[dict]:
+        """Последнее чтение файла экономики каждой сделки — только сверенное. Чтение со
+        сбоем доставки (сеть) последним не считается (вид econ_file_latest)."""
+        if not self.есть("econ_file_latest"):
+            return []
+        ключи = ("deal", "at", "status", "cur", "sale", "saleEur", "buyEur", "markup", "rebid", "items", "fx")
+        rows = self._все("""
+            select deal_id, read_at, status, sub_cur, sale_sub, sale_eur, purchase_eur, markup, rebid, items, fx
+              from econ_file_latest where status = %s""", (ECON_VERIFIED,))
+        return [dict(zip(ключи, r)) for r in rows]
+
     def закрыть(self) -> None:
         self.с.close()
 
@@ -226,14 +247,48 @@ def свод_договоров(выбор: list[dict], строки: list[dict]
     return out, n
 
 
+def сверить_экономику(r: dict) -> bool:
+    """Второй способ после базы: статус, числа положительны и согласованы между собой."""
+    def pos(x) -> bool:
+        return x is not None and not isinstance(x, bool) and float(x) > 0
+    try:
+        if r.get("status") != ECON_VERIFIED or not all(pos(r.get(k)) for k in ("sale", "saleEur", "buyEur", "items")):
+            return False
+        se, buy, mk = float(r["saleEur"]), float(r["buyEur"]), r.get("markup")
+        return (se >= buy and mk is not None and abs(float(mk) - (se / buy - 1)) <= 1e-4
+                and isinstance(r.get("rebid"), bool) and isinstance(r.get("cur"), str))
+    except (TypeError, ValueError):
+        return False
+
+
+def свод_экономики(строки: list[dict]) -> tuple[dict, Counter]:
+    out, n = {}, Counter()
+    for r in строки:
+        if r.get("deal") is None:
+            continue
+        if not сверить_экономику(r):
+            n["экономика: не прошла сверку"] += 1
+            continue
+        fx = r.get("fx") if isinstance(r.get("fx"), dict) else {}
+        out[str(int(r["deal"]))] = {
+            "at": _iso(r["at"]), "sale": round(float(r["sale"]), 2), "cur": r["cur"],
+            "saleEur": round(float(r["saleEur"]), 2), "buyEur": round(float(r["buyEur"]), 2),
+            "markup": round(float(r["markup"]), 6), "rebid": bool(r["rebid"]), "items": int(r["items"]),
+            "fx": {str(k): float(v) for k, v in fx.items()}}
+        n["экономика: переторжка"] += bool(r["rebid"])
+    return out, n
+
+
 def собрать(база, ct=None, сейчас: dt.datetime | None = None) -> tuple[dict, Counter]:
     ct = ct or _ct()
     чаты = свод_чатов(база.чаты())
     выбор, строки, флаги = база.договоры()
     договоры, n = свод_договоров(выбор, строки, флаги, ct)
+    экономика, n_эк = свод_экономики(база.экономика())
+    n.update(n_эк)
     свод = {"version": dealctx.VERSION,
             "at": (сейчас or dt.datetime.now(MSK)).astimezone(MSK).isoformat(timespec="seconds"),
-            "chats": чаты, "contracts": договоры}
+            "chats": чаты, "contracts": договоры, "econ": экономика}
     # второй разбор — тем же кодом, что читает сборка: запись не по форме не уйдёт в ключ
     разбор = dealctx.clean(json.loads(json.dumps(свод, ensure_ascii=False)))
     if разбор is None or разбор["bad"]:
@@ -242,6 +297,7 @@ def собрать(база, ct=None, сейчас: dt.datetime | None = None) -
     n["оценок"] = sum(1 for x in чаты.values() if x.get("at"))
     n["сделок с договорами"] = len(договоры)
     n["флагов"] = sum(len(x["flags"]) for x in договоры.values())
+    n["экономика"] = len(экономика)
     return свод, n
 
 
@@ -250,6 +306,8 @@ def журнал(n: Counter, raw: bytes) -> list[str]:
     return [f"  чаты: {n['чатов']} (с оценкой {n['оценок']})",
             f"  договоры: сделок {n['сделок с договорами']} (исход прогона {n['итог']}, пересчёт прежних "
             f"{n['пересчёт']}); исходы: {исходы or 'нет'}; флагов {n['флагов']}",
+            f"  финальная экономика: сделок со сверенным файлом {n['экономика']} (переторжка "
+            f"{n['экономика: переторжка']}); не прошли вторую сверку {n['экономика: не прошла сверку']}",
             f"  размер свода {len(raw)} Б"]
 
 
@@ -270,9 +328,14 @@ def publish(база, store, *, dry: bool, ct=None, печать=print) -> int:
     else:
         _kv(store.put, raw)
         печать(f"  ✓ KV {KV_KEY} записан и сверен чтением")
+    if n["экономика: не прошла сверку"]:
+        печать(f"::error::финальная экономика: у {n['экономика: не прошла сверку']} сделок строка базы «сверено» "
+               "не прошла вторую сверку — во вкладку они не попали, нужен разбор")
     if n["разошлось_текущий"]:
         печать(f"::error::договоры: у {n['разошлось_текущий']} сделок исход или флаги прогона не сошлись с "
                "пересчётом — во вкладке они «сверка разошлась», нужен разбор")
+        return 1
+    if n["экономика: не прошла сверку"]:
         return 1
     if n["разошлось"]:
         печать(f"::warning::договоры: у {n['разошлось']} сделок прежних прогонов (до 23.10 или прежних правил) "

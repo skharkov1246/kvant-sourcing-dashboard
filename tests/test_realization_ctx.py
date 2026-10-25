@@ -6,6 +6,7 @@
   · прогон до 23.10.2026 (без исхода) — пересчётом;
   · запись не по форме — стоп, ключ не тронут;
   · в ключе нет условий договоров и цитат;
+  · финальная экономика — только сверенные файлы, второй сверкой; не прошла — код 1;
   · на настоящей базе — запросы к обеим схемам (при LIBRARY_SQL_TEST_DSN).
 
 Корпус придуман (CLAUDE.md, правило 18).
@@ -59,15 +60,19 @@ class Store:
 class База:
     """Подпорка закрытой базы: чаты и выбор прогонов — как вернули бы запросы."""
 
-    def __init__(self, чаты=None, выбор=None, строки=None, флаги=None):
+    def __init__(self, чаты=None, выбор=None, строки=None, флаги=None, экономика=None):
         self._чаты, self._выбор = чаты or [], выбор or []
         self._строки, self._флаги = строки or [], флаги or []
+        self._экономика = экономика or []
 
     def чаты(self):
         return self._чаты
 
     def договоры(self):
         return self._выбор, self._строки, self._флаги
+
+    def экономика(self):
+        return self._экономика
 
 
 def _чат(deal, **kw):
@@ -165,6 +170,38 @@ def test_запись_не_по_форме_ключ_не_трогает():
     assert s.raw == b"old" and s.puts == 0
 
 
+def _эк(deal, **kw):
+    r = {"deal": deal, "at": T, "status": "сверено", "cur": "RUB", "sale": 2_600_000, "saleEur": 26_000,
+         "buyEur": 20_000, "markup": 0.3, "rebid": False, "items": 3, "fx": {"EUR": 100.0}}
+    r.update(kw)
+    return r
+
+
+def test_экономика_в_своде_только_сверенная():
+    from decimal import Decimal
+    # из базы числа приходят numeric → Decimal
+    база = База(экономика=[_эк(201, sale=Decimal("2600000.00"), markup=Decimal("0.300000"), rebid=True)])
+    s = Store()
+    журнал: list[str] = []
+    assert rc.publish(база, s, dry=False, ct=ct, печать=журнал.append) == 0
+    свод = json.loads(s.raw)
+    assert свод["econ"]["201"] == {"at": T.isoformat(), "sale": 2_600_000.0, "cur": "RUB", "saleEur": 26_000.0,
+                                   "buyEur": 20_000.0, "markup": 0.3, "rebid": True, "items": 3, "fx": {"EUR": 100.0}}
+    assert dealctx.clean(свод)["econ"]["201"]["sale"] == 2_600_000.0
+    assert any("финальная экономика: сделок со сверенным файлом 1 (переторжка 1)" in x for x in журнал)
+    assert not any("2600000" in x or "201" in x for x in журнал), "в журнал — только счётчики"
+
+
+def test_экономика_не_прошла_вторую_сверку():
+    плохие = [_эк(202, markup=0.9), _эк(203, saleEur=10_000), _эк(204, status="итоги не сходятся"),
+              _эк(205, buyEur=None)]
+    s = Store()
+    журнал: list[str] = []
+    assert rc.publish(База(экономика=[_эк(201)] + плохие), s, dry=False, ct=ct, печать=журнал.append) == 1
+    assert set(json.loads(s.raw)["econ"]) == {"201"}, "ключ записан, непроверенного в нём нет"
+    assert any(x.startswith("::error::финальная экономика: у 4 сделок") for x in журнал)
+
+
 def test_вхолостую_ключ_не_пишется():
     s = Store()
     assert rc.publish(База(чаты=[_чат(11)]), s, dry=True, ct=ct, печать=lambda x: None) == 0
@@ -205,7 +242,7 @@ def conn():
     c.execute(f"drop schema if exists {СХЕМА} cascade")
     c.execute(f"create schema {СХЕМА}")
     c.execute(f"set search_path to {СХЕМА}")
-    for имя in ("deal_chat_schema.sql", "contract_terms_schema.sql"):
+    for имя in ("deal_chat_schema.sql", "contract_terms_schema.sql", "econ_files_schema.sql"):
         for оператор in операторы((ROOT / "library" / "supabase" / имя).read_text(encoding="utf-8")):
             c.execute(оператор)
     try:
@@ -246,6 +283,20 @@ def test_на_настоящей_базе(conn):
         база_записи.записать_итог([], {102: "недочитана"}, "ct-newer")
     finally:
         база_записи.закрыть()
+    # финальная экономика: сверенная строка и строка со сбоем шаблона
+    import econ_files as ef
+    эк = ef.База(DSN, схема=СХЕМА)
+    try:
+        общее = {"method_ver": ef.METHOD_VER, "file_key": "f" * 64, "sub_cur": "EUR", "items": 2, "bad_lines": 0,
+                 "fx": {"EUR": 1.0}, "deal_cur": "EUR", "bitrix_note": None, "coef_median": 1.4, "totals_dev": 0,
+                 "why": None}
+        эк.записать({**общее, "run_id": "ef-1", "deal_id": 11, "status": "сверено", "sale_sub": 14_000,
+                     "sale_eur": 14_000, "purchase_eur": 10_000, "markup": 0.4, "rebid": True, "bitrix_ratio": 1})
+        эк.записать({**общее, "run_id": "ef-1", "deal_id": 12, "status": "шаблон другой", "sale_sub": None,
+                     "sale_eur": None, "purchase_eur": None, "markup": None, "rebid": None, "bitrix_ratio": None,
+                     "fx": None, "coef_median": None, "totals_dev": None})
+    finally:
+        эк.закрыть()
     база = rc.База(DSN, схема=СХЕМА)
     try:
         s = Store()
@@ -255,6 +306,7 @@ def test_на_настоящей_базе(conn):
         база.закрыть()
     свод = json.loads(s.raw)
     assert dealctx.clean(свод)["bad"] == 0
+    assert set(свод["econ"]) == {"11"} and свод["econ"]["11"]["markup"] == 0.4 and свод["econ"]["11"]["rebid"]
     ч = свод["chats"]
     assert ч["11"]["state"] == "стоит" and ч["11"]["kinds"] == ["срок", "оплата"] and ч["11"]["due"] == "2026-10-20"
     assert ч["11"]["blocker"] == {"kind": "поставка", "on": "поставщик"} and ч["11"]["reply"] is False
@@ -299,6 +351,16 @@ def test_планировщик_зовёт_оба_прогона():
     src = (ROOT / "scheduler" / "worker.js").read_text(encoding="utf-8")
     assert 'if (h === 4) дела.push("chat-context");' in src
     assert 'if (h === 5 && wd === 0) дела.push("contract-terms");' in src
+    assert 'if (h === 22) дела.push("econ-files");' in src
+
+
+def test_все_прогоны_свода_ставят_одно_и_то_же():
+    """Свод пишут три прогона (чаты, договоры, экономика) — у всех шаг свода последний,
+    только в live и после неудачи тоже."""
+    for имя, работа in (("chat-context.yml", "context"), ("contract-terms.yml", "terms"), ("econ-files.yml", "econ")):
+        свод = _wf(имя)["jobs"][работа]["steps"][-1]
+        assert свод["run"] == "python scripts/realization_ctx.py --publish", имя
+        assert "env.MODE == 'live'" in свод["if"] and "!cancelled()" in свод["if"], имя
 
 
 def test_сборка_читает_свод_а_сверка_правки_ключей_не_получает():

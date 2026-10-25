@@ -9,6 +9,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -195,12 +197,13 @@ def test_вкладка_со_сводом():
     assert h["contract"] == {"seen": 6, "risk": 1, "flags": 2, "nopair": 2, "pair": 2, "unread": 1}
     q = [(x["code"], x["deal"]) for x in dc["queue"]]
     assert q == [("chatReply", "6006"), ("chatRisk", "6008"), ("chatDue", "6008"), ("contractRisk", "6001"),
-                 ("contractMissing", "6007"), ("contractMissing", "6003")]
+                 ("econGap", "6010"), ("econGap", "6003"), ("contractMissing", "6007"), ("contractMissing", "6003")]
     reply = dc["queue"][0]
     assert reply["what"].endswith("оценка модели, уверенность 80 %"), "пункт по чату — оценка, а не факт"
     assert reply["who"] == rows["6006"]["ossDeal"] and reply["days"] == 4
     assert dc["queue"][3]["who"] == dealctx.CONTRACT_HEAD and dc["queue"][3]["act"].endswith("пени, документы")
-    assert dc["counts"] == {"chatReply": 1, "chatRisk": 1, "chatDue": 1, "contractRisk": 1, "contractMissing": 2}
+    assert dc["counts"] == {"chatReply": 1, "chatRisk": 1, "chatDue": 1, "contractRisk": 1, "contractMissing": 2,
+                            "econGap": 2}
     assert d["6001"]["contract"]["flags"][0]["text"] == dealctx.contract_b2b.FLAG_TEXT["penaltyUncovered"]
     assert d["6003"]["contract"]["missing"] == ["supplier"]
     assert d["6011"]["contract"]["outcome"] == "разошлось" and d["6011"]["contract"]["flags"] == []
@@ -208,7 +211,7 @@ def test_вкладка_со_сводом():
     assert d["6014"]["chat"]["cur"] is False
     assert d["6002"]["chat"]["conf"] == 80, "уверенность модели — рядом с оценкой"
     assert d["6007"]["contract"]["missing"] == ["customer", "supplier"]
-    assert dc["queue"][4]["what"] == "договор заказчика и поставщика не найден в карточках сделки"
+    assert dc["queue"][6]["what"] == "договор заказчика и поставщика не найден в карточках сделки"
     # «что делать первым» — самое важное из обеих очередей
     for did, rec in d.items():
         if "todo" in rec:
@@ -222,3 +225,89 @@ def test_в_закрытой_части_нет_текста_чатов_и_усл
     s = json.dumps(dc, ensure_ascii=False)
     for слово in ("ЦИТАТА", "quote", "terms", "evidence"):
         assert слово not in s
+
+
+# ── финальная экономика из файла (решение владельца 23.10.2026) ──────────────────
+
+def _e(**kw) -> dict:
+    raw = {"at": NOW.isoformat(), "sale": 2_600_000.0, "cur": "RUB", "saleEur": 26_000.0, "buyEur": 20_000.0,
+           "markup": 0.3, "rebid": False, "items": 3, "fx": {"EUR": 100.0, "USD": 92.0}}
+    raw.update(kw)
+    return raw
+
+
+def test_экономика_в_ключе_только_по_форме():
+    raw = {"version": 1, "chats": {}, "contracts": {}, "econ": {
+        "1": _e(), "2": _e(saleEur=10_000.0, markup=-0.5),          # продажа ниже закупки
+        "3": _e(markup=0.9),                                         # наценка не из своих чисел
+        "4": _e(cur="руб"), "5": _e(fx={"EUR": "сто"}), "6": _e(sale=float("nan")),
+        "7": _e(items=0), "8": _e(rebid="нет"), "x": _e()}}
+    ctx = dealctx.clean(raw)
+    assert set(ctx["econ"]) == {"1"} and ctx["bad"] == 8
+    assert ctx["econ"]["1"]["fx"] == {"EUR": 100.0, "USD": 92.0}
+    # ключ до 23.10.2026 — без раздела econ: вкладка как была
+    assert dealctx.clean({"version": 1, "chats": {}, "contracts": {}})["econ"] == {}
+
+
+def test_сверка_суммы_в_валюте_подачи():
+    e = dealctx.clean({"version": 1, "econ": {"1": _e()}})["econ"]["1"]
+    assert dealctx.econ_ratio(2_600_000, "RUB", e) == (1.0, "")
+    r, _ = dealctx.econ_ratio(20_000, "EUR", e)          # по курсу самого файла: 100 ₽ за €
+    assert r == pytest.approx(2_000_000 / 2_600_000)
+    r, _ = dealctx.econ_ratio(28_000, "USD", e)          # по курсам файла
+    assert r == pytest.approx(28_000 * 92 / 2_600_000)
+    assert dealctx.econ_ratio(1000, "CNY", e) == (None, dealctx.ECON_OTHER_CUR)
+    assert dealctx.econ_ratio(0, "RUB", e) == (0.0, ""), "суммы нет — расхождение на 100 %"
+    assert dealctx.econ_ratio(None, "", e) == (0.0, "")
+
+
+def test_экономика_в_карточке_и_пункт_очереди():
+    r = fixture.build_realization()
+    ct, dc = r["contracts"], r["dealctx"]
+    rows = {x["deal"]: x for x in ct["rows"]}
+    d = dc["deals"]
+    e = d["6010"]["econ"]
+    assert e == {"at": "17.10.2026", "sale": "80\u00a0000\u00a0EUR", "cur": "EUR", "buy": "€60\u00a0000", "markup": 33.3,
+                 "rebid": False, "items": 9, "gap": 38, "gapNote": "", "over": True}
+    assert rows["6010"]["saleAmt"] == 50_000.0 and rows["6010"]["saleCur"] == "EUR"
+    assert d["6005"]["econ"]["rebid"] is True and d["6005"]["econ"]["gap"] == 0
+    assert d["6006"]["econ"]["gap"] == 5 and d["6006"]["econ"]["over"] is False
+    gap = [x for x in dc["queue"] if x["code"] == "econGap"]
+    assert [x["deal"] for x in gap] == ["6010", "6003"]
+    assert gap[0]["what"] == "Сумма сделки расходится с финальной экономикой на 38 %"
+    assert gap[0]["act"] == "обновить «Сумму» сделки по финальному расчёту"
+    assert gap[0]["who"] == rows["6010"]["manager"], "хозяин — ответственный сделки"
+    h = ct["head"]["ctx"]
+    assert h["econ"] == {"seen": 5, "gap": 2, "otherCur": 0} and h["rules"]["econGapPct"] == 10
+    # числа файла — только в закрытой части: ни в шапке, ни в строках сделок
+    открыто = json.dumps({"head": ct["head"], "rows": ct["rows"]}, ensure_ascii=False)
+    for слово in ("80\u00a0000\u00a0EUR", "€60\u00a0000", "наценк", "markup", "rebid"):
+        assert слово not in открыто
+    assert all("econ" not in x for x in ct["rows"]) and set(h["econ"]) == {"seen", "gap", "otherCur"}
+
+
+def test_экономика_валюта_сделки_другая_без_пункта():
+    ctx = dealctx.clean({"version": 1, "chats": {}, "contracts": {}, "econ": {"1": _e()}})
+    row = {"deal": "1", "seq": 5, "closed": False, "manager": "Ответственный ВЫДУМКА", "saleAmt": 1000.0,
+           "saleCur": "CNY", "customer": "—", "title": ""}
+    head, payload = dealctx.build([row], None, ctx, NOW, today=TODAY)
+    assert payload["deals"]["1"]["econ"]["gapNote"] == dealctx.ECON_OTHER_CUR
+    assert payload["deals"]["1"]["econ"]["gap"] is None and payload["queue"] == []
+    assert head["econ"] == {"seen": 1, "gap": 0, "otherCur": 1}
+    # сборка не знает суммы сделки (строка без saleAmt) — не «расходится на 100 %»
+    row.pop("saleAmt")
+    _h, payload = dealctx.build([row], None, ctx, NOW, today=TODAY)
+    assert payload["deals"]["1"]["econ"]["gap"] is None and payload["queue"] == []
+    # граница порога: 10 % — ещё не пункт
+    row.update(saleAmt=2_860_000.0, saleCur="RUB")
+    _h, payload = dealctx.build([row], None, ctx, NOW, today=TODAY)
+    assert payload["deals"]["1"]["econ"]["gap"] == 10 and payload["queue"] == []
+    row.update(saleAmt=2_870_000.0)
+    _h, payload = dealctx.build([row], None, ctx, NOW, today=TODAY)
+    assert [q["code"] for q in payload["queue"]] == ["econGap"]
+
+
+def test_статус_сверено_как_у_шаблона():
+    import econ_template
+    import realization_ctx
+    assert realization_ctx.ECON_VERIFIED == econ_template.СВЕРЕНО

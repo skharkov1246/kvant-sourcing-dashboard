@@ -836,7 +836,8 @@ def run(args) -> int:
     real_ctx = dealctx_mod.load()
     if real_ctx is not None:
         print(f"• Свод чатов и договоров: чатов {len(real_ctx['chats'])}, сделок с договорами "
-              f"{len(real_ctx['contracts'])}, отброшено записей не по форме {real_ctx['bad']}")
+              f"{len(real_ctx['contracts'])}, с финальной экономикой {len(real_ctx['econ'])}, "
+              f"отброшено записей не по форме {real_ctx['bad']}")
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
         contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
@@ -853,7 +854,9 @@ def run(args) -> int:
                   f"(есть у {_c['seen']}), ждут нашего ответа {_c['reply']} (дольше суток {_c['replyLate']}), "
                   f"высокий риск {_c['high']}, срок из чата прошёл {_c['dueLate']}; договоры разобраны у "
                   f"{_k['seen']}: с риском сверки {_k['risk']} (флагов {_k['flags']}), без пары {_k['nopair']}, "
-                  f"не дочитаны {_k['unread']}; пунктов очереди {len(dealctx_data['queue'])}")
+                  f"не дочитаны {_k['unread']}; финальная экономика сверена у {_hc['econ']['seen']} "
+                  f"(сумма сделки расходится у {_hc['econ']['gap']}, валюта другая у {_hc['econ']['otherCur']}); "
+                  f"пунктов очереди {len(dealctx_data['queue'])}")
         print(f"  «подвисла» по чату решено: " + ", ".join(
             f"{k} {v}" for k, v in sorted((contracts_data["head"].get("chatBy") or {}).items())))
         _ch = (contracts_data.get("head") or {}).get("chat") or {}

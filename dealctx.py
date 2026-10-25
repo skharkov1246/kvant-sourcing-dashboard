@@ -24,6 +24,12 @@ realctx:v1 (scripts/realization_ctx.py --publish); сборка дашборда
      делать первым; пункты очереди. Уходит отдельным массивом страницы DEALCTX: воркер
      оставляет его только праву «Поставщики: договоры и деньги» и админу
      (access/acl.js, RIGHT_PAYLOADS; решение владельца 19.10.2026).
+  4. Финальная экономика из файла «Экономика проекта» (решение владельца 23.10.2026;
+     scripts/econ_files.py → econ_file_reads → свод econ): только сверенные файлы. В
+     карточке сделки — продажа в валюте подачи, закупка в €, «наценка над поставщиком»
+     (не маржа: логистика и таможня внутри коэффициента), дата чтения, переторжка. «Сумма»
+     сделки сверяется с продажей файла в валюте подачи (econ_ratio) на день сборки: больше
+     ECON_GAP — пункт очереди ответственному сделки. Числа файла — только в DEALCTX.
 
 Пороги — таблицей (CLAUDE.md, правило 4). Текста чатов и договоров здесь нет: в ключе
 только номера сделок, даты и значения из закрытых списков.
@@ -32,7 +38,9 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import math
 import os
+import re
 from collections import Counter
 
 import chat_activity
@@ -42,6 +50,8 @@ VERSION = 1
 FRESH_DAYS = 7          # прогон оценки читал чат не раньше — иначе его данные не основание
 REPLY_HOURS = 24        # «ждут ответа дольше рабочего дня»: часы будних дней с сообщения
 DUE_MAX_DAYS = 60       # срок из чата, прошедший давнее, — история, а не пункт очереди
+ECON_GAP = 0.10         # «Сумма» сделки и продажа файла расходятся больше — пункт очереди
+ECON_OTHER_CUR = "валюта сделки другая"   # в файле нет курса валюты сделки — не сверить
 MSK = dt.timezone(dt.timedelta(hours=3))
 
 # Закрытые списки оценки — дословно как в scripts/chat_context.py (сверяет тест).
@@ -89,6 +99,9 @@ EXC = {
     "chatDue": (3.5, "срок из чата прошёл", "подтвердить у второй стороны"),
     "contractRisk": (5.5, "договоры: риск сверки заказчик ↔ поставщик", "допсоглашение с поставщиком"),
     "contractMissing": (12.5, "договор стороны не найден в карточках", "найти договор и загрузить файл в карточку"),
+    # сверка данных, а не срыв срока: рядом с «внести срок оплаты» (lifecycle noPayPlan)
+    # подпись чипа — со строчной, как у соседних; текст пункта — словами решения владельца
+    "econGap": (8.5, "сумма сделки расходится с финальной экономикой", "обновить «Сумму» сделки по финальному расчёту"),
 }
 
 
@@ -176,19 +189,79 @@ def _contract(v) -> dict | None:
             "flags": flags if v["outcome"] == "пара" else []}
 
 
+_CUR = re.compile(r"^[A-Z]{3}$")
+
+
+def _pos(v) -> float | None:
+    """Конечное положительное число или None."""
+    if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v <= 0:
+        return None
+    return float(v)
+
+
+def _econ(v) -> dict | None:
+    """Финальная экономика сделки из ключа — только сверенный файл (scripts/realization_ctx.py
+    берёт лишь статус «сверено»): числа положительны, продажа не ниже закупки, наценка
+    согласована с ними, курсы — «код валюты → число»."""
+    if not isinstance(v, dict):
+        return None
+    at, sale, se, buy = _ts(v.get("at")), _pos(v.get("sale")), _pos(v.get("saleEur")), _pos(v.get("buyEur"))
+    cur, mk, items, fx = v.get("cur"), v.get("markup"), _int(v.get("items")), v.get("fx") or {}
+    if (at is None or sale is None or se is None or buy is None or se < buy
+            or not (isinstance(cur, str) and _CUR.match(cur)) or not isinstance(v.get("rebid"), bool)
+            or not items or items <= 0 or isinstance(mk, bool) or not isinstance(mk, (int, float))
+            or not math.isfinite(mk) or abs(mk - (se / buy - 1)) > 1e-4 or not isinstance(fx, dict)
+            or any(not (isinstance(k, str) and _CUR.match(k)) or _pos(x) is None for k, x in fx.items())):
+        return None
+    return {"at": at, "sale": sale, "cur": cur, "saleEur": se, "buyEur": buy, "markup": float(mk),
+            "rebid": v["rebid"], "items": items, "fx": {k: float(x) for k, x in fx.items()}}
+
+
 def clean(raw) -> dict | None:
-    """Ключ — данные, а не код: запись не по форме отбрасывается и считается (bad)."""
+    """Ключ — данные, а не код: запись не по форме отбрасывается и считается (bad).
+    Раздела econ в ключе до 23.10.2026 нет — пустой словарь."""
     if not isinstance(raw, dict) or raw.get("version") != VERSION:
         return None
-    chats, contracts, bad = {}, {}, 0
-    for src, dst, fn in ((raw.get("chats"), chats, _chat), (raw.get("contracts"), contracts, _contract)):
+    chats, contracts, econ, bad = {}, {}, {}, 0
+    for src, dst, fn in ((raw.get("chats"), chats, _chat), (raw.get("contracts"), contracts, _contract),
+                         (raw.get("econ"), econ, _econ)):
         for k, v in (src or {}).items() if isinstance(src, dict) else ():
             x = fn(v)
             if x is None or not str(k).isdigit():
                 bad += 1
                 continue
             dst[str(k)] = x
-    return {"at": _ts(raw.get("at")), "chats": chats, "contracts": contracts, "bad": bad}
+    return {"at": _ts(raw.get("at")), "chats": chats, "contracts": contracts, "econ": econ, "bad": bad}
+
+
+def econ_ratio(amount, deal_cur: str, e: dict) -> tuple[float | None, str]:
+    """«Сумма» сделки в валюте подачи / продажа файла — или (None, почему не сверить).
+
+    Сравнение — в валюте подачи (решение владельца 23.10.2026). Валюта сделки — валюта
+    подачи: как есть; евро — по курсу самого файла (продажа в валюте подачи / продажа в €);
+    другая — по курсам файла (e["fx"]: единиц валюты подачи за 1 единицу); курса нет —
+    «валюта сделки другая». Суммы в сделке нет — 0: «Сумму» нужно внести, это тоже
+    расхождение. Тот же расчёт делает прогон чтения (scripts/econ_files.py) на день чтения."""
+    sale = _pos(e.get("sale"))
+    if sale is None:
+        return None, ""
+    try:
+        amount = float(amount or 0)
+    except (TypeError, ValueError):
+        return None, ""
+    if not math.isfinite(amount) or amount <= 0:
+        return 0.0, ""
+    cur = str(deal_cur or "").upper()
+    fx = e.get("fx") or {}
+    if cur and cur == e.get("cur"):
+        k = 1.0
+    elif cur == "EUR" and _pos(e.get("saleEur")):
+        k = sale / e["saleEur"]
+    elif cur and _pos(fx.get(cur)):
+        k = fx[cur]
+    else:
+        return None, ECON_OTHER_CUR
+    return amount * k / sale, ""
 
 
 # ── правила ───────────────────────────────────────────────────────────────────
@@ -342,6 +415,23 @@ def _chat_cell(a: dict, cur: dict | None, r: dict, now: dt.datetime) -> dict:
     }
 
 
+def _amt(v: float) -> str:
+    """Сумма с неразрывными пробелами между разрядами: в узкой карточке число не рвётся."""
+    return f"{round(v):,}".replace(",", "\u00a0")
+
+
+def _econ_cell(e: dict, r: dict) -> dict:
+    """Финальная экономика в карточке сделки. Сумма сделки неизвестна сборке (строка без
+    saleAmt) — сверки нет, а не «расходится на 100 %»."""
+    ratio, note = (econ_ratio(r["saleAmt"], r.get("saleCur") or "", e) if r.get("saleAmt") is not None
+                   else (None, ""))
+    return {"at": e["at"].strftime("%d.%m.%Y"), "sale": f"{_amt(e['sale'])}\u00a0{e['cur']}", "cur": e["cur"],
+            "buy": f"€{_amt(e['buyEur'])}", "markup": round(e["markup"] * 100, 1), "rebid": e["rebid"],
+            "items": e["items"], "gap": round(abs(ratio - 1) * 100) if ratio is not None else None,
+            # порог — по округлённой доле: 10 % ровно не пункт и при шуме плавающей точки
+            "gapNote": note, "over": ratio is not None and round(abs(ratio - 1), 6) > ECON_GAP}
+
+
 def _contract_cell(c: dict) -> dict:
     missing = [s for s in SIDE_LBL if not c["read"][s]] if c["outcome"] in NO_PAIR else []
     return {"at": c["at"].strftime("%d.%m.%Y"), "outcome": c["outcome"], "missing": missing,
@@ -363,7 +453,7 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
     now = now.astimezone(MSK)
     today = today or now.date()
     live = [r for r in rows if not r.get("closed")]
-    chats, cons = ctx["chats"], ctx["contracts"]
+    chats, cons, econ = ctx["chats"], ctx["contracts"], ctx.get("econ") or {}
     deals: dict[str, dict] = {}
     queue: list[dict] = []
     n: Counter = Counter()
@@ -422,6 +512,17 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
                     queue.append(_item("contractMissing", r, _nm(r.get("manager")) or _owner(r),
                                        what=SIDE_MISSING.format(whose=whose),
                                        act=f"найти договор {whose} и загрузить файл в карточку"))
+        e = econ.get(did)
+        if e:
+            n["econSeen"] += 1
+            cell = _econ_cell(e, r)
+            rec["econ"] = cell
+            n["econOther"] += cell["gapNote"] == ECON_OTHER_CUR
+            if cell["over"]:
+                n["econGap"] += 1
+                # хозяин «Суммы» — ответственный сделки
+                queue.append(_item("econGap", r, _nm(r.get("manager")) or _owner(r),
+                                   what=f"Сумма сделки расходится с финальной экономикой на {cell['gap']} %"))
         if rec:
             deals[did] = rec
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
@@ -441,7 +542,10 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
                  "high": n["high"], "dueLate": n["dueLate"]},
         "contract": {"seen": n["contractSeen"], "risk": n["risk"], "flags": n["flags"], "nopair": n["nopair"],
                      "pair": n["outcome:пара"], "unread": n["outcome:недочитана"]},
-        "rules": {"freshDays": FRESH_DAYS, "replyHours": REPLY_HOURS, "dueMaxDays": DUE_MAX_DAYS},
+        # финальная экономика из файла — только счёт сделок: числа файла — в DEALCTX
+        "econ": {"seen": n["econSeen"], "gap": n["econGap"], "otherCur": n["econOther"]},
+        "rules": {"freshDays": FRESH_DAYS, "replyHours": REPLY_HOURS, "dueMaxDays": DUE_MAX_DAYS,
+                  "econGapPct": round(ECON_GAP * 100)},
     }
     payload = {"at": head["at"], "deals": deals, "queue": queue,
                "labels": {k: v[1] for k, v in EXC.items()},

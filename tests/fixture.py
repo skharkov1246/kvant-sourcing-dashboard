@@ -552,7 +552,20 @@ def realctx_raw() -> dict:
         "6011": {"at": t(1), "outcome": "разошлось", "read": {"customer": 1, "supplier": 1}, "flags": []},
         "6013": {"at": t(1), "outcome": "пара", "read": {"customer": 1, "supplier": 2}, "flags": []},
     }
-    return {"version": 1, "at": t(0.2), "chats": chats, "contracts": contracts}
+
+    # финальная экономика из файла (scripts/econ_files.py): «Сумма» сделок стаба —
+    # 20 000 + 3 000·i €, валюта сделки EUR
+    def e(sale, cur, sale_eur, buy_eur, rebid=False, items=4, fx=None):
+        return {"at": t(2), "sale": sale, "cur": cur, "saleEur": sale_eur, "buyEur": buy_eur,
+                "markup": round(sale_eur / buy_eur - 1, 6), "rebid": rebid, "items": items, "fx": fx or {}}
+    econ = {
+        "6001": e(23_000.0, "EUR", 23_000.0, 17_000.0),                           # сходится
+        "6003": e(35_000.0, "EUR", 35_000.0, 26_000.0),                           # 29 000 против 35 000 — 17 %
+        "6005": e(3_500_000.0, "RUB", 35_000.0, 25_000.0, rebid=True, fx={"EUR": 100.0}),   # сходится
+        "6006": e(4_000_000.0, "RUB", 40_000.0, 30_000.0),                       # 5 % — в пределах
+        "6010": e(80_000.0, "EUR", 80_000.0, 60_000.0, items=9),                 # 50 000 против 80 000
+    }
+    return {"version": 1, "at": t(0.2), "chats": chats, "contracts": contracts, "econ": econ}
 
 
 def build_realization() -> dict:

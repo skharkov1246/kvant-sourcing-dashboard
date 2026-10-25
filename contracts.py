@@ -145,6 +145,14 @@ def _money(v: float) -> str:
     return f"{sign}€{a}"
 
 
+def _amount(v) -> float:
+    try:
+        x = float(v or 0)
+    except (TypeError, ValueError):
+        return 0.0
+    return round(x, 2) if x == x and abs(x) != float("inf") else 0.0
+
+
 def _orig(v, cur: str) -> str:
     v = round(float(v or 0))
     s = f"{v:,}".replace(",", " ")
@@ -611,6 +619,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # такие суммы не пересчитываются и в итоги не идут
             "fxMissing": fx_miss, "saleKnown": sale_known, "buySusp": buy_susp,
             "saleOrig": _orig(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")), "saleCur": d.get("CURRENCY_ID") or "",
+            # «Сумма» в валюте сделки, числом (то же, что saleOrig): её сверяет с финальной
+            # экономикой файла dealctx.econ_ratio (решение владельца 23.10.2026)
+            "saleAmt": _amount(d.get("OPPORTUNITY")),
             "buyEur": round(buy),
             "buyLbl": ("курса нет" if buy_src == "fx" else "не сходится" if buy_susp
                        else _money(buy) if buy_src != "none" else "—"),

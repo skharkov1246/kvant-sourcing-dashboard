@@ -1742,6 +1742,19 @@ function openContract(x){
         +((dcx.contract.flags||[]).length?`<ul style="margin:4px 0 0 16px;padding:0">${dcx.contract.flags.map(f=>`<li>${_esc(f.text)}${f.days!=null?` <span class="dimv">(${f.days} дн)</span>`:''}</li>`).join('')}</ul>`:''):'')
       +`</div>`;
   }
+  // финальная экономика из файла «Экономика проекта» (dealctx.py, решение владельца 23.10.2026):
+  // только сверенный файл и только праву «договоры и деньги»; наценка — над поставщиком, не маржа
+  if(dcx&&dcx.econ){
+    const E=dcx.econ, pc=v=>String(v).replace('.',',');
+    h+=`<div class="h">Финальная экономика (файл)</div><div class="mrow-like" style="font-size:12.5px;line-height:1.7">`
+      +`продажа <b>${_esc(E.sale)}</b> <span class="dimv">(валюта подачи)</span> · закупка <b>${_esc(E.buy)}</b> · `
+      +`<span title="продажа / закупка − 1. Не маржа: логистика и таможня — внутри коэффициента">наценка над поставщиком <b>${pc(E.markup)}&nbsp;%</b></span>, `
+      +`прочитан ${_esc(E.at.slice(0,5))}, переторжка ${E.rebid?'да':'нет'}<br>`
+      +(E.gap!=null?(E.over?`<span class="nrc">Сумма сделки расходится с финальной экономикой на ${E.gap}&nbsp;%</span> — обновить «Сумму» сделки по финальному расчёту`
+                           :`<span class="dimv">«Сумма» сделки сходится с файлом (расхождение ${E.gap}&nbsp;%)</span>`)
+                  :(E.gapNote?`<span class="dimv">${_esc(E.gapNote)} — «Сумма» сделки с файлом не сверена</span>`:''))
+      +`</div>`;
+  }
   // таймлайн стадий сделки
   if((x.timeline||[]).length){
     h+=`<div class="h">Путь по стадиям воронки</div>`;
@@ -1956,7 +1969,7 @@ function renderContracts(){
      +`<div class="actile${hc.high?' bad':''}${st}" data-m="ctxHigh"${ti}><div class="t">⚠ Риск по чату: высокий</div><div class="v">${hc.cur?(hc.high||0):'—'}</div><div class="m">${hc.cur?`по оценке модели${hc.dueLate?` · срок из чата прошёл: ${hc.dueLate}`:''}`:'нет текущих оценок чатов'}</div></div>`
      +`<div class="actile${hk.risk?' bad':(hk.nopair?' amb':'')}${st}" data-m="ctxContract"${ti}><div class="t">📑 Договор: риски</div><div class="v">${hk.seen?(hk.risk||0):'—'}</div><div class="m">${hk.seen?`расхождение заказчик ↔ поставщик (флагов ${hk.flags||0}) · пары нет: ${hk.nopair||0}`:'договоры этих сделок не разобраны'}</div></div>`
      +`</div>`
-     +`<div class="note" style="margin-top:6px">Покрытие: оценка чата текущая у <b>${hc.cur||0}</b> из ${HX.open} открытых сделок (есть у ${hc.seen||0}); договоры разобраны у <b>${hk.seen||0}</b> из ${HX.open}${hk.unread?`, не дочитаны ${hk.unread}`:''}. Свод на ${_esc(HX.at||'—')}. Пустая плитка при малом покрытии — не «всё хорошо».${DC?' Клик по плитке — эти сделки в таблице ниже.':' Сделки, колонки «Чат» и «Договор» и пункты очереди — у права «Поставщики: договоры и деньги».'}</div>`;
+     +`<div class="note" style="margin-top:6px">Покрытие: оценка чата текущая у <b>${hc.cur||0}</b> из ${HX.open} открытых сделок (есть у ${hc.seen||0}); договоры разобраны у <b>${hk.seen||0}</b> из ${HX.open}${hk.unread?`, не дочитаны ${hk.unread}`:''}${HX.econ&&HX.econ.seen?`; финальная экономика (файл) сверена у <b>${HX.econ.seen}</b>${HX.econ.gap?`, «Сумма» сделки расходится больше ${(HX.rules||{}).econGapPct||10} % у ${HX.econ.gap}`:''}`:''}. Свод на ${_esc(HX.at||'—')}. Пустая плитка при малом покрытии — не «всё хорошо».${DC?' Клик по плитке — эти сделки в таблице ниже.':' Сделки, колонки «Чат» и «Договор» и пункты очереди — у права «Поставщики: договоры и деньги».'}</div>`;
   }
 
   // ---------- 3. ДЕНЬГИ ВО ВРЕМЕНИ: что отгружать и во что обходится ожидание ----------

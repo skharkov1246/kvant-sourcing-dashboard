@@ -91,7 +91,8 @@ def fetch(path: Path, store, печать=print) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(raw)
     печать(f"свод чатов и договоров прочитан: чатов {len(разбор['chats'])}, сделок с договорами "
-           f"{len(разбор['contracts'])}, записей не по форме {разбор['bad']}")
+           f"{len(разбор['contracts'])}, с финальной экономикой {len(разбор['econ'])}, "
+           f"записей не по форме {разбор['bad']}")
     return 0
 
 
