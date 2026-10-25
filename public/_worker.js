@@ -2013,8 +2013,11 @@ function adminPage(acl, me, env, seen, notify) {
   // карточки ролей
   const roleCards = roleIds.map((id) => {
     const r = acl.roles[id];
-    const chk = (arr, list, kind) => list.map((x) =>
-      `<label class="chk"><input type="checkbox" data-role="${ESC(id)}" data-kind="${kind}" value="${ESC(x.id)}"${arr.includes(x.id) ? " checked" : ""}><span>${ESC(x.name)}</span></label>`).join("");
+    // off(x) — почему галочку этой роли поставить нельзя (пусто — можно)
+    const chk = (arr, list, kind, off) => list.map((x) => {
+      const why = off ? off(x) : "";
+      return `<label class="chk"${why ? ` title="${ESC(why)}"` : ""}><input type="checkbox" data-role="${ESC(id)}" data-kind="${kind}" value="${ESC(x.id)}"${arr.includes(x.id) ? " checked" : ""}${why ? " disabled" : ""}><span>${ESC(x.name)}</span></label>`;
+    }).join("");
     // сайты — теми же разделами, что на портале: спецпроекты выдаются одним блоком
     const siteChk = (arr) => GROUPS.map((g) => {
       const own = SITES.filter((x) => x.group === g.id);
@@ -2027,7 +2030,7 @@ function adminPage(acl, me, env, seen, notify) {
         <span class="dim">${users.filter(([, u]) => u.role === id).length} чел.</span></div>
       <div class="grp"><div class="gt">Сайты</div>${siteChk(r.sites)}</div>
       <div class="grp"><div class="gt">Вкладки дашборда</div><div class="chks">${chk(r.tabs, TABS, "tab")}</div></div>
-      <div class="grp"><div class="gt">Тонкие права: «Поставщики» и деньги КАМов</div><div class="chks">${chk(r.rights || [], RIGHTS, "right")}</div>
+      <div class="grp"><div class="gt">Тонкие права: «Поставщики» и деньги КАМов</div><div class="chks">${chk(r.rights || [], RIGHTS, "right", (x) => (x.id === "kam_money" && !kamMoneyRoleOk(id, r) ? KAM_MONEY_ROLE_NOTE : ""))}</div>
         <div class="note">Контакты, договоры, деньги КАМов и правка не выдаются роли — только человеку поимённо.</div></div>
     </div>`;
   }).join("");
@@ -2128,7 +2131,7 @@ ${noStore ? `<div class="card warn"><b>Учёт входов не ведётся
   <h3 id="dt"></h3><div class="dim" id="dr"></div>
   <div class="grp"><div class="gt">Дополнительно к роли — сайты</div><div class="chks" id="ds"></div></div>
   <div class="grp"><div class="gt">Дополнительно к роли — вкладки</div><div class="chks" id="dtb"></div></div>
-  <div class="grp"><div class="gt">Дополнительно к роли — раздел «Поставщики»</div><div class="chks" id="drt"></div>
+  <div class="grp"><div class="gt">Дополнительно к роли — тонкие права: «Поставщики» и «Деньги КАМов»</div><div class="chks" id="drt"></div>
     <div class="note">Контакты и деньги выдаются здесь, поимённо: в роли их нет ни у кого.</div></div>
   <div class="grp"><div class="gt">Заметка</div><input type="text" id="dn" style="width:100%" maxlength="200" placeholder="например: подрядчик, до конца проекта"></div>
   <div class="row"><button class="go" id="dsave">Сохранить</button><button class="go gh" id="dcancel">Отмена</button>
@@ -2239,6 +2242,15 @@ ${style}</style></head><body>${body}<script>${script}</script></body></html>`,
 }
 
 // приём правок из админки
+// «Деньги КАМов» роли — только админской и «Руководителю» (решение владельца 25.10.2026:
+// всё — владельцу и руководителям). Пока нет серверного фильтра «только своё» (этап 2),
+// это право у роли «КАМ» показало бы каждому КАМу чужие результат и часть по положению;
+// людям оно выдаётся поимённо
+const KAM_MONEY_ROLE_NOTE = "«Деньги КАМов» роли — только руководителю: до фильтра «только своё» (этап 2) право у роли показало бы каждому её человеку чужие деньги; человеку — поимённо";
+function kamMoneyRoleOk(id, role) {
+  return !!(role && role.admin) || id === "head";
+}
+
 async function adminApi(request, env, acl) {
   const json = (o, s = 200) => new Response(JSON.stringify(o),
     { status: s, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
@@ -2289,9 +2301,12 @@ async function adminApi(request, env, acl) {
     u.note = String(b.note || "").slice(0, 200);
   } else if (b.op === "role_rights") {
     if (!acl.roles[b.role]) return json({ ok: false, error: "no_role" }, 400);
+    const rights = pick(b.rights, RIGHT_IDS);
+    if (rights.includes("kam_money") && !kamMoneyRoleOk(b.role, acl.roles[b.role]))
+      return json({ ok: false, error: "kam_money_role", note: KAM_MONEY_ROLE_NOTE }, 400);
     acl.roles[b.role].sites = pick(b.sites, SITE_IDS);
     acl.roles[b.role].tabs = pick(b.tabs, TAB_IDS);
-    acl.roles[b.role].rights = pick(b.rights, RIGHT_IDS);
+    acl.roles[b.role].rights = rights;
   } else if (b.op === "default_role") {
     if (!acl.roles[b.role]) return json({ ok: false, error: "no_role" }, 400);
     acl.defaultRole = b.role;

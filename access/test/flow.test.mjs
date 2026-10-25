@@ -224,6 +224,18 @@ test("applyAcl: пары вкладок делят один массив дан�
   assert.ok(!all.includes("__kvNoData"), 'при полном доступе пустышка не нужна');
 });
 
+test("applyAcl: деньги «Дохода» и закрытая часть «Реализации» в контуре — только админу", () => {
+  // тонких прав в контуре нет: KAMINC (право «Деньги КАМов») и DEALCTX («договоры и деньги»)
+  // — ADMIN_PAYLOADS; счёт «Дохода» и общий массив «Реализации» — всем с вкладкой
+  const html = ["<body>", 'window.__KAMINC_HEAD__ = ["MOCK-KAMINC_HEAD"];', 'window.__KAMINC__ = ["MOCK-KAMINC"];',
+    'window.__DEALCTX__ = ["MOCK-DEALCTX"];', 'window.__CONTRACTS__ = ["MOCK-CONTRACTS"];', "</body>"].join("\n");
+  const emp = applyAcl(html, ["reps", "contracts"], { email: "a@b.ru", admin: false });
+  assert.ok(emp.includes("MOCK-KAMINC_HEAD") && emp.includes("MOCK-CONTRACTS"));
+  assert.ok(!emp.includes('MOCK-KAMINC"') && !emp.includes("MOCK-DEALCTX"), "закрытые массивы утекли не админу");
+  const adm = applyAcl(html, ["reps", "contracts"], { email: "o@b.ru", admin: true });
+  assert.ok(adm.includes('MOCK-KAMINC"') && adm.includes("MOCK-DEALCTX"));
+});
+
 test("панель «Сорсинг» прячется, если вкладка не выдана", () => {
   const html = fs.readFileSync(path.join(assetsDir, "index.html"), "utf8");
   const cut = applyAcl(html, ["reps"], { email: "a@b.ru", admin: false });

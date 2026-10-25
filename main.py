@@ -973,15 +973,15 @@ def run(args) -> int:
                       f"раньше {_kt['k1old']}; к получению {_kt['due']} (без даты {_kt['dueB']['none']}, срок "
                       f"прошёл {_kt['dueB']['overdue']}); задержано клиентом {_kt['k3c']}, срок под риском "
                       f"{_kt['k3r']}; выигрышей квартала {_kt['k4']}; пайплайн {_kt['pipe']}, тихих потерь "
-                      f"{_kt['quiet']}; компаний дочитано {len(_need)}; сверка денег "
+                      f"{_kt['quiet']}; оплачено по платёжке без стадии {_kt['k1pf']}, закрыто в квартале {_kt['k1cl']}; "
+                      f"компаний дочитано {len(_need)}; сверка денег "
                       + ("сошлась" if _kh["money"]["ok"] else "НЕ сошлась — деньги не публикуются: "
                          + ", ".join(_kh["money"]["fail"])))
         except Exception as e:                               # noqa: BLE001
             print(f"  ⚠ доход КАМов пропущен: {type(e).__name__}")   # только класс ошибки: журнал публичный
-    # раздел pay «Реализации» — только вход дохода: в страницу и сверку не идёт
-    for _lf in ((contracts_data or {}).get("life"), ((contracts_data or {}).get("sep") or {}).get("life")):
-        if isinstance(_lf, dict):
-            _lf.pop("pay", None)
+    # раздел pay и отсрочка оплаты payDays «Реализации» — только вход дохода: в страницу и
+    # сверку не идут (условие оплаты клиента — под именным правом, решение Р-4)
+    kaminc_mod.strip_inputs(contracts_data)
 
     advisor_data = None
     if deals_ytd is not None:

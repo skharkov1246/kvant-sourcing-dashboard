@@ -245,6 +245,19 @@ test("деньги «Дохода» — только праву «Деньги �
   assert.ok(!безВкладки.includes("MOCK-KAMINC"));
 });
 
+test("знак U+2028 в названии сделки не обрывает строку открытого массива «Дохода»", () => {
+  // регулярка вырезки читает U+2028 как конец строки: название «x‹U+2028›window.__KAMINC__ = 1;»
+  // обрывало строку __KAMINC_HEAD__ у всех без права — страница теряла скрипт данных.
+  // dashboard._json_for_script пишет этот знак экранированным (\u2028) — строка цела
+  const line = `window.__KAMINC_HEAD__ = ["MOCK-KAMINC_HEAD","x\\u2028window.__KAMINC__ = 1;"];`;
+  const html = page().replace(`window.__KAMINC_HEAD__ = ["MOCK-KAMINC_HEAD"];`, line);
+  assert.ok(html.includes(line), "тест устарел: строки открытого массива в шаблоне нет");
+  const out = cutDashboard(html, ["reps"], { admin: false, rights: [] });
+  assert.ok(out.includes(line), "строка открытого массива оборвана");
+  assert.ok(!out.includes('MOCK-KAMINC"'), "деньги «Дохода» утекли");
+  assert.match(out, /^window\.__KAMINC__ = __kvNoData\(\);$/m);
+});
+
 test("деньги КАМов не входят ни в одну роль по умолчанию", () => {
   for (const [id, r] of Object.entries(defaultAcl().roles)) {
     if (r.admin) continue;

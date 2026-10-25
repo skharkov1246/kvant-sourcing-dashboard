@@ -484,7 +484,9 @@
   .inchow{margin:6px 0 12px 18px;color:var(--mut);font-size:13px;line-height:1.55}
   .inchow li{margin:3px 0}
   #tab-reps h2{font-size:14px;margin:12px 0 4px}
-  .inckpis .val .dimv{font-size:12px;font-weight:400;font-family:'IBM Plex Sans',system-ui,sans-serif}
+  .inckpis .val .dimv{font-size:14px;font-weight:400;font-family:'IBM Plex Sans',system-ui,sans-serif}
+  /* отбор плиткой K1–K5 виден на самой плитке (portal-ui: состояние нажатой кнопки) */
+  .inckpis .kpi.drill.on{outline:2px solid var(--a2);outline-offset:-2px;background:var(--panel2)}
   .ctsepnote{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--b);border-radius:10px;padding:10px 14px;margin:0 0 16px;color:var(--mut);font-size:13px;line-height:1.5}
   .ctsepnote b{color:var(--ink)}
   .ctsepnote a{color:var(--b2);text-decoration:underline;text-underline-offset:2px}
@@ -1323,16 +1325,22 @@ const DEALCOLS=[
   {k:'own',lbl:'менеджер',get:d=>d.o||'',txt:true},
   {k:'cls',lbl:'статус',get:d=>_STORD[d.cls]!=null?_STORD[d.cls]:9},
 ];
+// Массивы вкладки «Key-аккаунты и продукты» (PEOPLE, KAM, PRODUCT, REPS) приходят без денег
+// (dashboard.TAB_MONEY_KEYS, решение владельца 25.10.2026): у списка без сумм нет ни Σ, ни
+// столбца «сумма» — пустая сумма читалась бы как «€0»
+const _hasMoney=list=>(list||[]).some(d=>typeof d.raw==='number');
+const _INC_NOMONEY='Сумм здесь нет: деньги на вкладке — только у сделок, сверенных файлом экономики, в подменю «Доход» (решение владельца 25.10.2026).';
+const _noAmtCols=(cols,on)=>on?cols:cols.filter(c=>c.k!=='amt').map((c,i)=>i===0?Object.assign({},c,{def:true}):Object.assign({},c,{def:false}));
 function openDeals(list,title,sub){
   list=(list||[]).slice();
-  const sum=list.reduce((a,d)=>a+(d.raw||0),0);
+  const sum=list.reduce((a,d)=>a+(d.raw||0),0), $=_hasMoney(list);
   const cnt={early:0,real:0,lost:0}; list.forEach(d=>{if(cnt[d.cls]!=null)cnt[d.cls]++;});
   document.getElementById('drwName').textContent=title;
-  document.getElementById('drwSub').textContent=`${sub} · ${(window.__COMPANY__&&window.__COMPANY__.label)||''} · сделок ${list.length} · Σ ${_fmtE(sum)}`;
+  document.getElementById('drwSub').textContent=`${sub} · ${(window.__COMPANY__&&window.__COMPANY__.label)||''} · сделок ${list.length}${$?` · Σ ${_fmtE(sum)}`:''}`;
   const chip=k=>cnt[k]?`<span class="stchip"><i class="dot" style="background:${CLS[k][1]}"></i>${CLS[k][0]} <b>${cnt[k]}</b></span>`:'';
   const head=(cnt.early||cnt.real||cnt.lost)?`<div class="statleg" style="margin-bottom:8px">${chip('early')}${chip('real')}${chip('lost')}</div>`:'';
-  const rowFn=d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${CLS[d.cls]?CLS[d.cls][1]:'var(--mut)'}">${CLS[d.cls]?CLS[d.cls][0]:(d.sem||'')}</span><span class="pill">${_esc(d.c)}</span><span>${_esc(d.o)}</span>${d.date?`<span class="dt">${d.date}</span>`:''}${d.ovd?'<span class="pill" style="color:var(--nr)">просрочена</span>':''}<span class="amt">${d.amt}</span></div></div>`;
-  _drwSortable(head,[{key:'d',h:'Сделки',items:list,cols:DEALCOLS,rowFn,empty:'нет сделок'}]);
+  const rowFn=d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${CLS[d.cls]?CLS[d.cls][1]:'var(--mut)'}">${CLS[d.cls]?CLS[d.cls][0]:(d.sem||'')}</span><span class="pill">${_esc(d.c)}</span><span>${_esc(d.o)}</span>${d.date?`<span class="dt">${d.date}</span>`:''}${d.ovd?'<span class="pill" style="color:var(--nr)">просрочена</span>':''}${$?`<span class="amt">${d.amt}</span>`:''}</div></div>`;
+  _drwSortable(head,[{key:'d',h:'Сделки',items:list,cols:_noAmtCols(DEALCOLS,$),rowFn,empty:'нет сделок'}]);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
 // ---- список сделок без запросов поставщикам (покрытие сорсинга)
@@ -1483,19 +1491,20 @@ function openDir(D,opt,spec){
   }
   document.getElementById('drwName').textContent=title;
   document.getElementById('drwSub').textContent=`${sub} · ${D.label} · сделок ${deals.length} · закупок ${orders.length}`;
+  const $=_hasMoney(deals.concat(orders));
   const showOwn=kind!=='own';
   const own=x=>showOwn?`<span>${_esc(x.own)}</span>`:'';
-  const orow=o=>`<div class="req"><div class="rt">${_esc(o.t)}</div><div class="rm"><span class="pill">${o.closed?'исполнен':'в работе'}</span>${own(o)}${o.date?`<span class="dt">${o.date}</span>`:''}<span class="amt">${o.amt}</span></div></div>`;
+  const orow=o=>`<div class="req"><div class="rt">${_esc(o.t)}</div><div class="rm"><span class="pill">${o.closed?'исполнен':'в работе'}</span>${own(o)}${o.date?`<span class="dt">${o.date}</span>`:''}${$?`<span class="amt">${o.amt}</span>`:''}</div></div>`;
   const DCL={early:['ранний','var(--b2)'],real:['в реализации','var(--ok)'],lost:['проигран','var(--nr)']};
   const _dord={lost:0,early:1,real:2};
-  const drow=d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${DCL[d.cls]?DCL[d.cls][1]:'var(--mut)'}">${DCL[d.cls]?DCL[d.cls][0]:(d.open?'в работе':'закрыта')}</span>${own(d)}${d.date?`<span class="dt">${d.date}</span>`:''}<span class="amt">${d.amt}</span></div></div>`;
+  const drow=d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${DCL[d.cls]?DCL[d.cls][1]:'var(--mut)'}">${DCL[d.cls]?DCL[d.cls][0]:(d.open?'в работе':'закрыта')}</span>${own(d)}${d.date?`<span class="dt">${d.date}</span>`:''}${$?`<span class="amt">${d.amt}</span>`:''}</div></div>`;
   const ownCol=k=>showOwn?[{k:'own',lbl:'менеджер',get:x=>x.own||'',txt:true}]:[];
-  const ocols=[{k:'amt',lbl:'сумма',get:o=>o.raw||0,def:true},{k:'date',lbl:'дата',get:o=>o.date||'',txt:true},{k:'st',lbl:'статус',get:o=>o.closed?1:0}].concat(ownCol());
-  const dcols=[{k:'amt',lbl:'сумма',get:d=>d.raw||0,def:true},{k:'date',lbl:'дата',get:d=>d.date||'',txt:true},{k:'seq',lbl:'№',get:d=>d.seq||0},{k:'cls',lbl:'статус',get:d=>_dord[d.cls]!=null?_dord[d.cls]:9}].concat(ownCol());
+  const ocols=_noAmtCols([{k:'amt',lbl:'сумма',get:o=>o.raw||0,def:true},{k:'date',lbl:'дата',get:o=>o.date||'',txt:true},{k:'st',lbl:'статус',get:o=>o.closed?1:0}].concat(ownCol()),$);
+  const dcols=_noAmtCols([{k:'amt',lbl:'сумма',get:d=>d.raw||0,def:true},{k:'date',lbl:'дата',get:d=>d.date||'',txt:true},{k:'seq',lbl:'№',get:d=>d.seq||0},{k:'cls',lbl:'статус',get:d=>_dord[d.cls]!=null?_dord[d.cls]:9}].concat(ownCol()),$);
   const oSum=orders.reduce((a,o)=>a+(o.raw||0),0), pl=deals.filter(d=>d.open).reduce((a,d)=>a+(d.raw||0),0);
   _drwSortable('',[
-    {key:'o',h:'Заказы поставщикам',hx:` · закупка Σ ${_fmtE(oSum)}`,items:orders,cols:ocols,rowFn:orow,cap:300,empty:'нет заказов'},
-    {key:'d',h:'Сделки',hx:` · пайплайн ${_fmtE(pl)}`,items:deals,cols:dcols,rowFn:drow,cap:300,empty:'нет сделок'},
+    {key:'o',h:'Заказы поставщикам',hx:$?` · закупка Σ ${_fmtE(oSum)}`:'',items:orders,cols:ocols,rowFn:orow,cap:300,empty:'нет заказов'},
+    {key:'d',h:'Сделки',hx:$?` · пайплайн ${_fmtE(pl)}`:'',items:deals,cols:dcols,rowFn:drow,cap:300,empty:'нет сделок'},
   ]);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
@@ -1503,6 +1512,9 @@ function renderDir(D, elId, opt){
   const el=document.getElementById(elId); if(!el) return;
   if(!D){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных</div>'; return; }
   const t=D.totals;
+  // без денег (массивы вкладки «Key-аккаунты и продукты», решение владельца 25.10.2026) —
+  // только счёт: сделок, в работе, контрактов, конверсия; деньги — в «Доходе»
+  if(t&&t.sales==null){ _dirCounts(D,el,opt); return; }
   // маржа — только по контрактам с закупкой; контракты без неё — счётчиком, а не «€0»
   const mcol=x=>{const c=x.marginRaw<0?'var(--nr)':'var(--ok)';const p=x.marginPct==null?'':` <small class="dimv">${x.marginPct}%</small>`;const nb=x.noBuy?`<div class="dimv" style="font-size:11px">без закупки ${x.noBuy}</div>`:'';return (x.marginPct==null&&x.noBuy?'<span class="dimv">—</span>':`<span style="color:${c}">${x.margin}</span>${p}`)+nb;};
   const row=r=>`<tr class="drill" data-drill="grp:${_esc(r.group)}"><td><div class="who">${_esc(r.group)}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.contracts}</td><td class="num r">${r.sales}</td><td class="num r" style="color:var(--a)">${r.buy}</td><td class="num r">${mcol(r)}</td></tr>`;
@@ -1516,6 +1528,19 @@ function renderDir(D, elId, opt){
     h+=`<div class="secttl"><b>${_n(3)}</b> · До человека${qmark('d.people')}</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">контрактов</th><th class="r">продажи</th><th class="r">закупка</th><th class="r">маржа</th></tr></thead><tbody>`+D.people.map(p=>`<tr class="drill" data-drill="own:${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div></td><td class="dep">${_esc(p.grp)}</td><td class="num r">${p.deals}</td><td class="num r" style="color:var(--ok2)">${p.contracts}</td><td class="num r">${p.sales}</td><td class="num r" style="color:var(--a)">${p.buy}</td><td class="num r">${mcol(p)}</td></tr>`).join('')+`</tbody></table></section>`;
   }
   h+=`<footer>${opt.title} · Bitrix24 (сделки + Заказы поставщикам СП-172) · ${D.label}. Продажи — Σ сумм сделок-контрактов; закупка — Σ заказов поставщикам (СП-172); маржа = продажи − закупка. Суммы к базовой € по курсам Bitrix; привязка заказа к группе — через владельца сделки-родителя.</footer>`;
+  el.innerHTML=h;
+  el.querySelectorAll('[data-drill]').forEach(n=>n.addEventListener('click',ev=>{ if(ev.target.closest('.qq'))return; openDir(D,opt,n.dataset.drill); }));
+}
+function _dirCounts(D,el,opt){
+  const t=D.totals||{}, _n=i=>String((opt.base||0)+i);
+  const row=r=>`<tr class="drill" data-drill="grp:${_esc(r.group)}"><td><div class="who">${_esc(r.group)}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.open}</td><td class="num r" style="color:var(--ok2)">${r.contracts}</td><td class="num r">${r.conv}%</td><td class="num r">${r.noBuy||''}</td></tr>`;
+  let h=`<div class="kpis" style="grid-template-columns:repeat(3,1fr)">${(D.kpis||[]).filter(p=>p.val!=null).map(p=>`<div class="kpi ${p.clz}${p.drill?' drill':''}"${p.drill?` data-drill="kpi:${p.drill}"`:''}><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta||''}</div>${qmark('d.kpi')}</div>`).join('')}</div>`;
+  h+=`<div class="secttl"><b>${_n(1)}</b> · ${_esc(opt.sec1.replace(/ \(деньги [^)]*\)/,''))}${qmark('d.groups')}</div><section class="card"><div class="note">«Сделок» — создано с начала года; «в работе» — открытые; «контрактов» — сделок с заказами поставщикам; «без закупки» — контракты без заказа поставщику. ${_INC_NOMONEY}</div>`
+    +`<div class="twrap"><table><thead><tr><th>${opt.unit}</th><th class="r">сделок</th><th class="r">в работе</th><th class="r">контрактов</th><th class="r">конв.</th><th class="r">без закупки</th></tr></thead><tbody>${(D.rows||[]).map(row).join('')||'<tr><td colspan="6" class="dimv" style="padding:14px">Нет данных: ни одной сделки</td></tr>'}</tbody>`
+    +`<tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td><td class="r num">${t.deals||0}</td><td class="r num">${t.open||0}</td><td class="r num" style="color:var(--ok2)">${t.contracts||0}</td><td class="r num">${t.conv||0}%</td><td class="r num">${t.noBuy||''}</td></tr></tfoot></table></div></section>`;
+  if(D.people&&D.people.length){
+    h+=`<div class="secttl"><b>${_n(2)}</b> · До человека${qmark('d.people')}</div><section class="card"><div class="twrap"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">контрактов</th></tr></thead><tbody>`+D.people.map(p=>`<tr class="drill" data-drill="own:${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div></td><td class="dep">${_esc(p.grp)}</td><td class="num r">${p.deals}</td><td class="num r" style="color:var(--ok2)">${p.contracts}</td></tr>`).join('')+`</tbody></table></div></section>`;
+  }
   el.innerHTML=h;
   el.querySelectorAll('[data-drill]').forEach(n=>n.addEventListener('click',ev=>{ if(ev.target.closest('.qq'))return; openDir(D,opt,n.dataset.drill); }));
 }
@@ -1567,9 +1592,13 @@ function renderCohorts(C){
 // проверяется форма массива, а не наличие.
 function _incMoney(){const M=window.__KAMINC__; return (M&&M.tot&&typeof M.tot==='object'&&M.cuts&&typeof M.cuts==='object'&&!Array.isArray(M.cuts)&&M.deals&&typeof M.deals==='object'&&!Array.isArray(M.deals))?M:null;}
 function _incHead(){const H=window.__KAMINC_HEAD__; return (H&&H.tot&&typeof H.tot==='object'&&H.cuts&&typeof H.cuts==='object'&&Array.isArray(H.cuts.kam))?H:null;}
-const _INC_B={paidQ:'получено в квартале',paidOld:'оплачено раньше, сделка не закрыта',paidNoDate:'оплачено, дата не известна',due:'к получению',closed:'закрыта',pipe:'пайплайн',quiet:'тихая потеря'};
+const _INC_B={paidQ:'получено в квартале',paidOld:'оплачено раньше, сделка не закрыта',paidNoDate:'оплачено, дата не известна',paidFile:'оплачено по платёжке, стадия не переведена',due:'к получению',closed:'закрыта',pipe:'пайплайн',quiet:'тихая потеря'};
 const _INC_DB={overdue:'срок оплаты прошёл',q0:'этот квартал',q1:'следующий квартал',later:'позже',none:'без даты'};
 const _INC_CUT=[['kam','КАМ'],['po','Продукт-оунер'],['hold','Холдинг'],['line','Линия']];
+const _INC_WS={tkp:'по «ТКП согласован»',cat0:'по входу в реализацию',order:'по первому заказу'};
+const _INC_ROLE={kam:'КАМ',po:'продукт-оунер',ex:'исполнитель'};
+// у класса A без результата — почему (класс C — почему нет денег вообще)
+const _INC_C=['noFile','noSale'], _INC_AR=['noPz','calib'];
 function renderIncome(host){
   const el=typeof host==='string'?document.getElementById(host):host; if(!el) return;
   el.innerHTML='<section class="card"><div class="note">Загружаю…</div></section>';
@@ -1582,51 +1611,66 @@ function _incDraw(el,H,M){
   const T=H.tot, TR=H.trust||{}, RU=H.rules||{}, LB=H.labels||{}, NM=H.names||{}, D=_unpack(H.deals);
   const COV=(RU.cover||70)/100, MOK=!!(H.money&&H.money.ok);
   const byId=Object.fromEntries(D.map(d=>[d.id,d]));
-  const pct=(a,b)=>b?Math.round(a/b*100):0;
-  // сумма — только при доле сделок с деньгами не ниже порога (K6); иначе «в цифрах n из N»
-  const money=(v,k,n)=>{
+  const sd=n=>_ctN(n||0,'сделка','сделки','сделок'), sdG=n=>_ctN(n||0,'сделке','сделкам','сделкам');
+  const why=k=>_esc((LB.why||{})[k]||k);
+  // Сумма в плитке и ячейке (решение 25.10, п. 7): A — сделок, сверенных файлом, R — с
+  // посчитанным результатом, n — всего в блоке. «В цифрах A из n» — только доля сверенных;
+  // сверено достаточно, а результата у большинства нет — так и сказано, без суммы
+  const money=(v,A,R,n)=>{
     if(!n) return '<span class="dimv">—</span>';
     if(!M) return MOK?'<span class="dimv">сумма — по праву «Деньги КАМов»</span>':'<span class="dimv">деньги не опубликованы: сверка не сошлась</span>';
-    if(k/n<COV) return `<span class="dimv">в цифрах ${k} из ${n}</span>`;
-    return _fmtE(v)+(k<n?` <span class="dimv">по ${k} из ${n}</span>`:'');
+    if(A/n<COV) return `<span class="dimv">в цифрах ${A} из ${n}</span>`;
+    if(R/n<COV) return `<span class="dimv">результат посчитан у ${R} из ${n}: ${TR.calibOk?'нет закупки — ПЗ не посчитать':'поправка не откалибрована'}</span>`;
+    return _fmtE(v)+(R<n?` <span class="dimv">по ${R} из ${n}</span>`:'');
   };
   const nm=(cut,k)=>{const r=(H.cuts[cut]||[]).find(x=>x.key===k); return r?r.name:(NM[k]?NM[k][0]:k);};
-  const MC=M?M.cuts:{}, MT=M?M.tot:{};
+  // деньги разрезов — списком строк с ключом (как открытые строки)
+  const MC=M?Object.fromEntries(Object.entries(M.cuts||{}).map(([c,L])=>[c,Object.fromEntries((Array.isArray(L)?L:[]).map(x=>[x.key,x]))])):{}, MT=M?M.tot:{};
   const q=H.quarter||{}, qn=H.next||{};
-  const tile=(lbl,val,meta,clz,k)=>`<div class="kpi ${clz||''}${k?' drill':''}"${k?` data-ib="${k}" tabindex="0" role="button"`:''}><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
+  const tile=(lbl,val,meta,clz,k)=>`<div class="kpi ${clz||''}${k?' drill':''}"${k?` data-ib="${k}" tabindex="0" role="button" aria-pressed="false"`:''}><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
   const pc=T.pipeC||{}, SC=LB.stage||{};
-  const reasons=Object.entries(TR.reasons||{}).filter(([k])=>k!=='ok').map(([k,v])=>`${_esc((LB.why||{})[k]||k)} — ${v}`).join(' · ');
+  const RS=TR.reasons||{}, rsum=a=>a.reduce((s,k)=>s+(RS[k]||0),0);
+  const rlist=a=>a.filter(k=>RS[k]).map(k=>`${why(k)} — ${RS[k]}`).join(' · ');
+  const nC=rsum(_INC_C), nAR=rsum(_INC_AR);
   let h=`<div class="secttl"><b>·</b> Доход: где формируется и когда придёт${qmark('i.income')}</div>`
-   +`<div class="ctsepnote">В цифрах <b>${TR.nA||0} из ${TR.n||0}</b> выигранных сделок (${TR.pct==null?'—':TR.pct+' %'}): деньги — только у сделок, «Сумма» которых сверена файлом экономики. ${reasons?'Без денег: '+reasons+'. ':''}Курс Битрикса на ${_esc(TR.fxAsOf||'—')} · сборка ${_esc(H.asOf)} · поправка результата ${TR.calibOk?'по '+TR.calibN+' сделкам':'<b>не откалибрована</b> (меньше '+(RU.calibMin||30)+' сделок) — результата нет'}.${H.money&&!H.money.ok?' <b>Сверка денег не сошлась</b> ('+_esc((H.money.fail||[]).join('; '))+') — деньги этой сборки не опубликованы.':''} План по людям: <b>не задан</b> — вводит владелец в «Доступах» (этап 2).</div>`;
+   +`<div class="ctsepnote">В цифрах <b>${TR.nA||0} из ${TR.n||0}</b> выигранных сделок (${TR.pct==null?'—':TR.pct+' %'}) — получено в квартале и к получению: деньги только у сделок, «Сумма» которых сверена файлом экономики.`
+   +`${nC?` Без денег (класс C) — ${sd(nC)}: ${rlist(_INC_C)}.`:''}${nAR?` Сумма есть, результата нет — ${sd(nAR)}: ${rlist(_INC_AR)}.`:''}`
+   +` Курс Битрикса на ${_esc(TR.fxAsOf||'—')} · сборка ${_esc(H.asOf)} · поправка результата ${TR.calibOk?'по '+TR.calibN+' сделкам':'<b>не откалибрована</b> (меньше '+(RU.calibMin||30)+' сделок) — результата нет'}.`
+   +`${TR.poLow?` <b>«Получено» по стадии подтверждено платёжкой у ${T.k1po} из ${T.k1}</b> — меньше ${TR.poMin||50} %: стадию ставят раньше, чем прикладывают платёжку, или платёжку не прикладывают.`:''}`
+   +`${H.money&&!H.money.ok?' <b>Сверка денег не сошлась</b> ('+_esc((H.money.fail||[]).join('; '))+') — деньги этой сборки не опубликованы.':''} План по людям: <b>не задан</b> — вводит владелец в «Доступах» (этап 2).</div>`;
   if(!M) h+=`<div class="dimv" style="font-size:12.5px;margin:0 0 8px">${MOK?'Суммы и результат — по праву «Деньги КАМов»: здесь — число сделок.':'Деньги этой сборки не опубликованы: сверка не сошлась. Здесь — число сделок.'}</div>`;
+  const B=T.dueB||{};
   h+=`<div class="kpis inckpis">`
-   +tile('K1 · Получено',M?money(MT.k1R,T.k1R,T.k1):String(T.k1),`${_esc(q.label||'')}: оплачено ${T.k1} сделок, платёжкой подтверждено ${T.k1po} из ${T.k1}${T.k1old?` · оплачено раньше, сделка не закрыта — ${T.k1old}`:''}`,'ok','paidQ')
-   +tile('K2 · К получению',M?money(MT.dueR,T.dueR,T.due):String(T.due),`${T.due} выигранных: ${_esc(q.label||'')} — ${(T.dueB||{}).q0||0}, ${_esc(qn.label||'')} — ${(T.dueB||{}).q1||0}, позже — ${(T.dueB||{}).later||0}, без даты — ${(T.dueB||{}).none||0}${(T.dueB||{}).overdue?`, срок оплаты прошёл — ${T.dueB.overdue}`:''}`,'','due')
-   +tile('K3 · Под угрозой',`${T.k3c} · ${T.k3r}`,`задержано клиентом (не оплачено, нет УПД) · срок под риском — не складываются${M?`<br>${money(MT.k3cR,T.k3cR,T.k3c)} · ${money(MT.k3rR,T.k3rR,T.k3r)}`:''}`,(T.k3c||T.k3r)?'warn':'ok','risk')
-   +tile('K4 · Выигрыши квартала',String(T.k4),`с датой выигрыша в ${_esc(q.label||'')}${M?` · продажа ${money(MT.k4S,T.k4A,T.k4)}`:''}`,'','won')
-   +tile('K5 · Пайплайн невыигранных',String(T.pipe),`${(LB.stage?Object.keys(SC):[]).map(k=>`${_esc(SC[k])} ${pc[k]||0}`).join(' · ')} · тихие потери — ${T.quiet} (вне пайплайна) · сумм нет: сделки пайплайна файлом не сверены`,'','pipe')
+   +tile('K1 · Получено',M?money(MT.k1R,T.k1A,T.k1R,T.k1):String(T.k1),`${_esc(q.label||'')}, нарастающим: ${sd(T.k1)}${T.k1cl?`, из них уже закрыто — ${T.k1cl}`:''}; платёжкой подтверждено ${T.k1po} из ${T.k1}${T.k1old?` · оплачено раньше, сделка не закрыта — ${T.k1old}`:''}${T.k1pf?` · оплачено по платёжке, стадия не переведена — ${T.k1pf} (ни в K1, ни в K2)`:''}`,'ok','paidQ')
+   +tile('K2 · К получению',M?money(MT.dueR,T.dueA,T.dueR,T.due):String(T.due),`выигранных — ${T.due}: ${_esc(q.label||'')} — ${B.q0||0}, ${_esc(qn.label||'')} — ${B.q1||0}, позже — ${B.later||0}, без даты — ${B.none||0}${B.overdue?`, срок оплаты прошёл — ${B.overdue}`:''}`,'','due')
+   +tile('K3 · Под угрозой',`${T.k3c} · ${T.k3r}`,`задержано клиентом (не оплачено, нет УПД) · срок под риском — не складываются${M?`<br>${money(MT.k3cR,T.k3cA,T.k3cR,T.k3c)} · ${money(MT.k3rR,T.k3rA,T.k3rR,T.k3r)}`:''}`,(T.k3c||T.k3r)?'warn':'ok','risk')
+   +tile('K4 · Выигрыши квартала',String(T.k4),`с датой выигрыша в ${_esc(q.label||'')}${M?` · продажа ${money(MT.k4S,T.k4A,T.k4A,T.k4)}`:''}`,'','won')
+   +tile('K5 · Пайплайн невыигранных',String(T.pipe),`${Object.keys(SC).map(k=>`${_esc(SC[k])} ${pc[k]||0}`).join(' · ')} · тихие потери — ${T.quiet} (вне пайплайна) · сумм нет: сделки пайплайна файлом не сверены`,'','pipe')
    +tile('K6 · В цифрах',TR.pct==null?'—':TR.pct+' %',`сверено файлом ${TR.nA||0} из ${TR.n||0}; результат есть у ${TR.nR||0}; сумма в плитке — от ${RU.cover||70} % сделок блока`,TR.pct!=null&&TR.pct>=(RU.cover||70)?'ok':'amber','')
    +`</div>`;
-  // лестница по месяцам: 3 назад (получено), 12 вперёд (к получению)
+  // лестница по месяцам: «срок прошёл» и «без даты» — первыми, затем 3 месяца назад (получено) и 12 вперёд
   const LD=H.ladder||[], ML=M?Object.fromEntries((M.ladder||[]).map(x=>[x.m,x])):{};
   const lm=k=>({later:'позже',overdue:'срок прошёл',none:'без даты'}[k]||k);
-  h+=`<div class="secttl"><b>·</b> По месяцам: получено и к получению</div><section class="card"><div class="note">Получено — по месяцу входа в стадию «Оплата получена» (3 месяца назад); к получению — по месяцу ожидаемой оплаты. «Без даты» — у сделки нет ни планового срока оплаты, ни доставки, ни прогноза доставки: дата не достраивается.</div>`
+  h+=`<div class="secttl"><b>·</b> По месяцам: получено и к получению</div><section class="card"><div class="note">Получено — по месяцу входа в стадию «Оплата получена» (3 месяца назад); к получению — по месяцу ожидаемой оплаты. «Без даты» — у сделки нет ни планового срока оплаты, ни доставки, ни даты заказа, от которой считать прогноз доставки. Прогноз доставки — от даты заказа плюс медианы звеньев пути, и источник это говорит.</div>`
    +`<div class="twrap"><table class="lft incladder"><thead><tr><th>месяц</th>${LD.map(x=>`<th class="r">${_esc(lm(x.m))}</th>`).join('')}</tr></thead><tbody>`
    +`<tr><td>получено, сделок</td>${LD.map(x=>`<td class="r mono">${x.paid||''}</td>`).join('')}</tr>`
    +`<tr><td>к получению, сделок</td>${LD.map(x=>`<td class="r mono${x.m==='overdue'&&x.due?' hot':''}">${x.due||''}</td>`).join('')}</tr>`
-   +(M?`<tr><td>результат</td>${LD.map(x=>{const m=ML[x.m]||{},n=(x.paid||0)+(x.due||0),k=(m.paidN||0)+(m.dueN||0);return `<td class="r mono">${n?(k/n>=COV?_fmtE((m.paidR||0)+(m.dueR||0)):`<span class="dimv">${k}/${n}</span>`):''}</td>`;}).join('')}</tr>`:'')
+   +(M?`<tr><td>результат</td>${LD.map(x=>{const m=ML[x.m]||{},n=(x.paid||0)+(x.due||0);return `<td class="r mono">${n?money((m.paidR||0)+(m.dueR||0),(x.paidA||0)+(x.dueA||0),(m.paidN||0)+(m.dueN||0),n):''}</td>`;}).join('')}</tr>`:'')
    +`</tbody></table></div></section>`;
   // где формируется доход
   h+=`<div class="secttl"><b>·</b> Где формируется доход</div><section class="card">`
    +`<div class="subnav inccut" role="group" aria-label="Разрез">${_INC_CUT.map(([k,l])=>`<button type="button" class="snb" data-ic="${k}" aria-pressed="false">${l}</button>`).join('')}</div>`
    +`<div class="note" id="incCutNote"></div><div class="twrap"><table class="lft inccut"><thead id="incCutHead"></thead><tbody id="incCutBody"></tbody></table></div></section>`;
-  // что открыть или сдвинуть
-  const AK=Object.keys(H.actions||{});
-  const aopt=AK.map(k=>[k,k?(NM[k]?NM[k][0]+(NM[k][1]?'':' (уволен)'):k):'без человека: руководителю']).sort((a,b)=>(a[0]===''?1:0)-(b[0]===''?1:0)||a[1].localeCompare(b[1],'ru'));
-  h+=`<div class="secttl"><b>·</b> Что открыть или сдвинуть</div><section class="card"><div class="note">До ${RU.actionsMax||15} пунктов на человека: очередь КАМа и пробелы денег — сверить «Сумму» с файлом, завести заказ или его сумму, внести плановый срок оплаты, назначить КАМа, проставить категорию и Product leader. Сначала — сделки с известным результатом${M?' («на кону» — результат сделки)':''}, пункты без числа — последними.</div>`
+  // что открыть или сдвинуть; K7 — у каждого, у кого он посчитан, а не только у тех, у кого есть пункты
+  const AK=[...new Set(Object.keys(H.actions||{}).concat(M&&M.k7?Object.keys(M.k7):[]))];
+  const who0=k=>k?(NM[k]?NM[k][0]+(NM[k][1]?'':' (уволен)'):'сотрудник #'+k):'не закреплено (уволен / роль не указана) — руководителю';
+  // сначала люди с пунктами, «не закреплено» — последним
+  const an=k=>((H.actions||{})[k]||{}).n||0;
+  const aopt=AK.map(k=>[k,who0(k)]).sort((a,b)=>(a[0]===''?1:0)-(b[0]===''?1:0)||(an(a[0])?0:1)-(an(b[0])?0:1)||a[1].localeCompare(b[1],'ru'));
+  h+=`<div class="secttl"><b>·</b> Что открыть или сдвинуть</div><section class="card"><div class="note">До ${RU.actionsMax||15} пунктов на человека: очередь КАМа и пробелы денег — сверить «Сумму» с файлом, завести заказ или его сумму, внести плановый срок оплаты, перевести оплаченную по платёжке сделку в «Оплата получена», назначить КАМа, проставить категорию и Product leader. Сначала — сделки с известным результатом${M?' («на кону» — результат сделки)':''}, пункты без числа — последними.</div>`
    +`<label class="dimv" for="incWho" style="font-size:11px;margin-right:6px">Кто</label><select id="incWho" class="search" style="min-width:220px;max-width:100%">${aopt.map(([k,l])=>`<option value="${_esc(k||'~')}">${_esc(l)} — ${(H.actions[k]||{}).n||0}</option>`).join('')}</select>`
    +`<div id="incK7"></div><div class="twrap"><table class="lft"><thead><tr><th>Что случилось</th><th>Сделка</th><th class="r">Дней</th>${M?'<th class="r">На кону</th>':''}<th>Что сделать</th></tr></thead><tbody id="incActs"></tbody></table></div></section>`;
-  h+=`<div class="secttl"><b>·</b> Сделки <span id="incDealsN" class="dimv" style="font-weight:400"></span></div><section class="card"><div class="note" id="incDealsNote"></div><div class="twrap"><table class="lft incdeals"><thead><tr><th>Сделка</th><th>Холдинг · линия</th><th>КАМ · продукт-оунер</th><th>Где</th><th>Оплата</th><th>Класс</th>${M?'<th class="r">Продажа</th><th class="r">Результат</th>':''}</tr></thead><tbody id="incDeals"></tbody></table></div><div id="incMore"></div></section>`;
+  h+=`<div class="secttl" id="incDealsS"><b>·</b> Сделки <span id="incDealsN" class="dimv" style="font-weight:400"></span></div><section class="card"><div class="note" id="incDealsNote"></div><div class="twrap"><table class="lft incdeals"><thead><tr><th>Сделка</th><th>Холдинг · линия</th><th>КАМ · продукт-оунер</th><th>Где</th><th>Оплата</th><th>Класс</th>${M?'<th class="r">Продажа</th><th class="r">Результат</th>':''}</tr></thead><tbody id="incDeals"></tbody></table></div><div id="incMore"></div></section>`;
   el.innerHTML=h;
 
   let cut='kam', row=null, bf='', all=false;
@@ -1634,16 +1678,16 @@ function _incDraw(el,H,M){
   // № реализации — только если его нет в начале названия («964. Поставка…»)
   const seqTag=x=>x.seq&&String(x.t||'').indexOf(x.seq+'.')!==0?`<b class="mono">№${x.seq}</b> `:'';
   const keyOf=(d,c)=>c==='kam'?d.kam:c==='po'?d.po:c==='hold'?d.h:d.ln;
+  const toDeals=()=>{const t=el.querySelector('#incDealsS'); if(t&&t.scrollIntoView) t.scrollIntoView({behavior:'smooth',block:'start'});};
   const drawCut=()=>{
     el.querySelectorAll('[data-ic]').forEach(b=>{const on=b.dataset.ic===cut; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');});
     const R=H.cuts[cut]||[], MR=MC[cut]||{};
     el.querySelector('#incCutNote').innerHTML=`Каждая сделка — ровно в одной строке разреза, поэтому строки складываются в итог; отдельные строки — «${cut==='kam'?'КАМ не указан':cut==='po'?'Product leader не указан':cut==='line'?'линия не указана':'без клиента'}»${cut==='kam'||cut==='po'?' и «не закреплено (уволен)»':''}${cut==='hold'?' и «прочие клиенты» (вне первых 15)':''}. ${cut==='kam'?'КАМ — поле «КАМ», иначе ответственный, если по должности он КАМ (прокси).':cut==='po'?'Продукт-оунер — поле «Product leader».':cut==='line'?'Линия — «Категория оборудования» сделки; у сделок реализации она почти пуста — проставить её — пункт продукт-оунеру.':'Холдинг — по названию клиента (шаблоны направлений КАМ).'} Клик по строке — её сделки и пункты.`;
-    el.querySelector('#incCutHead').innerHTML=`<tr><th>${_esc((_INC_CUT.find(x=>x[0]===cut)||[])[1]||'')}</th><th class="r">Получено</th><th class="r">К получению: ${_esc(q.label||'')} / ${_esc(qn.label||'')} / позже / без даты</th><th class="r">Под угрозой: клиент · срок</th><th class="r">Выигрыши</th><th class="r">Пайплайн</th><th class="r">Тихие</th><th class="r">В цифрах</th></tr>`;
-    const cell=(n,v,k,extra)=>`${n||'<span class="dimv">0</span>'}${M&&n?`<div class="dep">${money(v,k,n)}</div>`:''}${extra||''}`;
-    el.querySelector('#incCutBody').innerHTML=R.map(x=>{const m=MR[x.key]||{},B=x.dueB||{};
-      return `<tr class="drill${row===x.key?' on':''}" data-ik="${_esc(x.key)}" tabindex="0"><td>${_esc(x.name)}${x.gone?' <span class="gone">уволен</span>':''}</td>`
-        +`<td class="r mono">${cell(x.k1,m.k1R,x.k1R,x.k1old?`<div class="dep">раньше ${x.k1old}</div>`:'')}</td>`
-        +`<td class="r mono">${x.due?`${(B.q0||0)+(B.overdue||0)} / ${B.q1||0} / ${B.later||0} / ${B.none||0}`:'<span class="dimv">0</span>'}${M&&x.due?`<div class="dep">${money(m.dueR,x.dueR,x.due)}</div>`:''}</td>`
+    el.querySelector('#incCutHead').innerHTML=`<tr><th>${_esc((_INC_CUT.find(x=>x[0]===cut)||[])[1]||'')}</th><th class="r">Получено</th><th class="r">К получению: срок прошёл / ${_esc(q.label||'')} / ${_esc(qn.label||'')} / позже / без даты</th><th class="r">Под угрозой: клиент · срок</th><th class="r">Выигрыши</th><th class="r">Пайплайн</th><th class="r">Тихие</th><th class="r">В цифрах</th></tr>`;
+    el.querySelector('#incCutBody').innerHTML=R.map(x=>{const m=MR[x.key]||{},BX=x.dueB||{};
+      return `<tr class="drill${row===x.key?' on':''}" data-ik="${_esc(x.key)}" tabindex="0" aria-current="${row===x.key?'true':'false'}"><td>${_esc(x.name)}${x.gone?' <span class="gone">уволен</span>':''}</td>`
+        +`<td class="r mono">${x.k1||'<span class="dimv">0</span>'}${M&&x.k1?`<div class="dep">${money(m.k1R,x.k1A,x.k1R,x.k1)}</div>`:''}${x.k1old?`<div class="dep">раньше ${x.k1old}</div>`:''}</td>`
+        +`<td class="r mono">${x.due?`<span class="${BX.overdue?'nrc':''}">${BX.overdue||0}</span> / ${BX.q0||0} / ${BX.q1||0} / ${BX.later||0} / ${BX.none||0}`:'<span class="dimv">0</span>'}${M&&x.due?`<div class="dep">${money(m.dueR,x.dueA,x.dueR,x.due)}</div>`:''}</td>`
         +`<td class="r mono${x.k3c||x.k3r?' hot':''}">${x.k3c||x.k3r?`${x.k3c} · ${x.k3r}`:''}</td><td class="r mono">${x.k4||''}</td>`
         +`<td class="r mono">${x.pipe||''}</td><td class="r mono">${x.quiet||''}</td><td class="r mono">${x.n?`${x.nA} из ${x.n}`:''}</td></tr>`;}).join('')
       ||'<tr><td colspan="8" class="dimv" style="padding:14px">Нет данных: ни одной сделки в разрезе</td></tr>';
@@ -1652,7 +1696,8 @@ function _incDraw(el,H,M){
     const sel=el.querySelector('#incWho'); if(!sel) return;
     const k=sel.value==='~'?'':sel.value, A=(H.actions||{})[k]||{items:[],n:0};
     const K7=M&&M.k7&&M.k7[k];
-    el.querySelector('#incK7').innerHTML=M?(K7?`<div class="note" style="margin-top:8px">K7 · своя часть по положению при К = ${String(M.k||RU.k).replace('.',',')}: получено в квартале <b>${_fmtE(K7.paidQ)}</b>, к получению <b>${_fmtE(K7.due)}</b> (из них в этом квартале ${_fmtE(K7.dueQ0)}) — по ${K7.n} сделкам с результатом; роли: ${K7.roles.map(r=>({kam:'КАМ',po:'продукт-оунер',ex:'исполнитель'}[r]||r)).join(', ')}. Видно только праву «Деньги КАМов».</div>`:'<div class="note" style="margin-top:8px">K7 · своя часть по положению: у человека нет сделок с известным результатом.</div>'):'';
+    el.querySelector('#incK7').innerHTML=!M?'':(!K7?'<div class="note" style="margin-top:8px">K7 · своя часть по положению: у человека нет сделок, полученных в квартале или к получению.</div>'
+      :`<div class="note" style="margin-top:8px">${k?'K7 · своя часть по положению':'K7 · часть пула без человека (не закреплено: уволен или роль не указана) — не чья-то своя часть'} при К = ${String(M.k||RU.k).replace('.',',')}: получено в квартале <b>${money(K7.paidQ,K7.nA,K7.nR,K7.n)}</b>, к получению <b>${money(K7.due,K7.nA,K7.nR,K7.n)}</b>${K7.dueQ0?` (из них в этом квартале ${money(K7.dueQ0,K7.nA,K7.nR,K7.n)})`:''} — по ${sdG(K7.n)}, сверено файлом ${K7.nA}, с результатом ${K7.nR}${k?`; роли: ${K7.roles.map(r=>_INC_ROLE[r]||r).join(', ')}`:''}. Видно только праву «Деньги КАМов».</div>`);
     el.querySelector('#incActs').innerHTML=A.items.map(x=>{const d=byId[x.deal]||{},md=M&&M.deals[x.deal];
       return `<tr><td>${_esc(x.what)}${x.who?`<div class="dep">ведёт: ${_esc(x.who)}</div>`:''}</td><td><a href="${url(x.deal)}" target="_blank" rel="noopener">${seqTag(x)}${_esc(x.t||('Сделка #'+x.deal))}</a>${d.h?`<div class="dep">${_esc(d.h)}</div>`:''}</td><td class="r mono">${x.days!=null?x.days:''}</td>${M?`<td class="r mono">${md&&md.r!=null?_fmtE(md.r):''}</td>`:''}<td>${_esc(x.act)}</td></tr>`;}).join('')
       ||`<tr><td colspan="${M?5:4}" class="dimv" style="padding:14px">Нет данных: пунктов у человека нет</td></tr>`;
@@ -1664,35 +1709,40 @@ function _incDraw(el,H,M){
     if(bf==='paidQ') r=r.filter(d=>d.b==='paidQ'); else if(bf==='due') r=r.filter(d=>d.b==='due');
     else if(bf==='risk') r=r.filter(d=>(d.risk||[]).length); else if(bf==='won') r=r.filter(d=>d.wq);
     else if(bf==='pipe') r=r.filter(d=>d.b==='pipe');
-    const ord={paidQ:0,due:1,paidOld:2,paidNoDate:3,closed:4,pipe:5,quiet:6};
-    r=r.slice().sort((a,b)=>(ord[a.b]-ord[b.b])||((a.cls==='A'?0:1)-(b.cls==='A'?0:1))||String(a.eta||'').localeCompare(String(b.eta||'')));
+    const ord={paidQ:0,due:1,paidFile:2,paidOld:3,paidNoDate:4,closed:5,pipe:6,quiet:7};
+    r=r.slice().sort((a,b)=>((ord[a.b]??9)-(ord[b.b]??9))||((a.cls==='A'?0:1)-(b.cls==='A'?0:1))||String(a.eta||'').localeCompare(String(b.eta||'')));
     el.querySelector('#incDealsN').textContent=`(${r.length})`;
     el.querySelector('#incDealsNote').innerHTML=(row!==null?`Строка «${_esc(nm(cut,row))}». `:'Все строки. ')+(bf?`Отбор: ${_esc({paidQ:'получено в квартале',due:'к получению',risk:'под угрозой',won:'выигрыши квартала',pipe:'пайплайн'}[bf])}. `:'')+'Клик по плитке K1–K5 — отбор, по строке разреза — её сделки; повторный клик снимает.';
     const shown=all?r:r.slice(0,100);
     el.querySelector('#incDeals').innerHTML=shown.map(d=>{const md=M&&M.deals[d.id];
       const where=d.k==='r'?`${_esc(_INC_B[d.b]||d.b)}${d.st?`<div class="dep">${_esc(d.st)}${d.sd!=null?` · ${d.sd} дн.`:''}</div>`:''}${(d.risk||[]).length?`<div class="dep nrc">${d.risk.map(c=>_esc((LB.risk||{})[c]||c)).join('; ')}</div>`:''}`
         :`${_esc(_INC_B[d.b]||d.b)} · ${_esc((SC||{})[d.cs]||'')}<div class="dep">${_esc(d.f||'')}${d.st?' · '+_esc(d.st):''}${d.sd!=null?` · ${d.sd} дн.`:''}</div>`;
-      const pay=d.b==='due'?`${d.eta?_esc(d.eta):'<span class="dimv">без даты</span>'}<div class="dep">${_esc((LB.paySrc||{})[d.es]||d.es||'')}</div>`
-        :d.paid?`оплачено ${_esc(d.paid)}<div class="dep">${d.po1?'платёжкой подтверждено':'не подтверждено платёжкой'}</div>`:(d.won?`выиграна ${_esc(d.won)}`:'');
+      const won=d.won?`<div class="dep">выиграна ${_esc(d.won)}${_INC_WS[d.ws]?' · '+_esc(_INC_WS[d.ws]):''}</div>`:'';
+      const pay=(d.b==='due'?`${d.eta?_esc(d.eta):'<span class="dimv">без даты</span>'}<div class="dep">${_esc((LB.paySrc||{})[d.es]||d.es||'')}</div>`
+        :d.b==='paidFile'?`<span class="dimv">оплачено по платёжке</span><div class="dep">стадия не «Оплата получена» — перевести</div>`
+        :d.paid?`оплачено ${_esc(d.paid)}${d.cl?' · закрыта':''}<div class="dep">${d.po1?'платёжкой подтверждено':'не подтверждено платёжкой'}</div>`:'')+won;
       const role=x=>x==='-'?'не закреплено':x?((NM[x]||[x])[0]):'';
       return `<tr><td><a href="${url(d.id)}" target="_blank" rel="noopener">${seqTag(d)}${_esc(d.t||('Сделка #'+d.id))}</a></td>`
         +`<td>${_esc(d.h)}<div class="dep">${_esc(d.ln)}</div></td>`
         +`<td>${_esc(role(d.kam)||'КАМ не указан')}${d.kamS==='прокси'?' <span class="dimv">прокси</span>':''}<div class="dep">${_esc(role(d.po)||'Product leader не указан')}</div></td>`
         +`<td>${where}</td><td>${pay}</td>`
-        +`<td>${d.cls==='A'?'<b>A</b> · сверено файлом':`<span class="dimv">C · ${_esc((LB.why||{})[d.why]||d.why||'')}</span>`}${d.cls==='A'&&!d.rk?`<div class="dep">${_esc((LB.why||{})[d.why]||'')}</div>`:''}</td>`
+        +`<td>${d.cls==='A'?'<b>A</b> · сверено файлом':`<span class="dimv">C · ${why(d.why||'')}</span>`}${d.cls==='A'&&!d.rk?`<div class="dep">результата нет: ${why(d.why||'')}</div>`:''}</td>`
         +(M?`<td class="r mono">${md?_fmtE(md.s):''}</td><td class="r mono">${md&&md.r!=null?_fmtE(md.r):''}</td>`:'')+`</tr>`;}).join('')
       ||`<tr><td colspan="${M?8:6}" class="dimv" style="padding:14px">Нет данных: по этому отбору сделок нет</td></tr>`;
     el.querySelector('#incMore').innerHTML=(!all&&r.length>100)?`<span class="stchip" data-iall="1" tabindex="0" role="button" style="margin-top:8px;display:inline-block">Показать все ${r.length}</span>`:'';
   };
+  // отбор плиткой виден на самой плитке (aria-pressed, подсветка)
+  const drawTiles=()=>el.querySelectorAll('[data-ib]').forEach(t=>{const on=t.dataset.ib===bf; t.classList.toggle('on',on); t.setAttribute('aria-pressed',on?'true':'false');});
   drawCut(); drawActs(); drawDeals();
   const onKey=(e,f)=>{if(e.key!=='Enter'&&e.key!==' ')return; e.preventDefault(); f();};
   el.querySelectorAll('[data-ic]').forEach(b=>b.addEventListener('click',()=>{cut=b.dataset.ic; row=null; all=false; drawCut(); drawDeals();}));
   const body=el.querySelector('#incCutBody');
   const pickRow=tr=>{const k=tr.dataset.ik; row=row===k?null:k; all=false; drawCut(); drawDeals();
-    if(row!==null&&(cut==='kam'||cut==='po')){const s=el.querySelector('#incWho'), v=row||'~'; if([...s.options].some(o=>o.value===v)){s.value=v; drawActs();}}};
+    if(row!==null&&(cut==='kam'||cut==='po')){const s=el.querySelector('#incWho'), v=row||'~'; if([...s.options].some(o=>o.value===v)){s.value=v; drawActs();}}
+    if(row!==null) toDeals();};
   body.addEventListener('click',e=>{const tr=e.target.closest('tr[data-ik]'); if(tr) pickRow(tr);});
   body.addEventListener('keydown',e=>{const tr=e.target.closest('tr[data-ik]'); if(tr) onKey(e,()=>pickRow(tr));});
-  el.querySelectorAll('[data-ib]').forEach(t=>{const f=()=>{bf=bf===t.dataset.ib?'':t.dataset.ib; all=false; drawDeals();};
+  el.querySelectorAll('[data-ib]').forEach(t=>{const f=()=>{bf=bf===t.dataset.ib?'':t.dataset.ib; all=false; drawTiles(); drawDeals(); if(bf) toDeals();};
     t.addEventListener('click',e=>{if(e.target.closest('.qq'))return; f();}); t.addEventListener('keydown',e=>onKey(e,f));});
   el.querySelector('#incWho').addEventListener('change',drawActs);
   const more=el.querySelector('#incMore');
@@ -1703,24 +1753,26 @@ function _incDraw(el,H,M){
 function incomeHow(){
   const H=_incHead(), RU=(H&&H.rules)||{}, LB=(H&&H.labels)||{};
   const li=a=>'<ul class="inchow">'+a.map(x=>`<li>${x}</li>`).join('')+'</ul>';
-  return `<div class="secttl"><b>·</b> Как считается «Доход»</div><section class="card"><div class="note">Решения владельца 25.10.2026. Числа и правила — те же, что в расчёте (kaminc.py); пороги — таблицей в коде.</div>`
+  return `<div class="secttl"><b>·</b> Как считается «Доход»</div><section class="card"><div class="note">Решения владельца 25.10.2026. Числа и правила — те же, что в расчёте (kaminc.py); пороги — таблицей в коде.${H?'':' <b>В этой сборке «Доход» не посчитан</b> — правила ниже, чисел нет.'}</div>`
    +`<h2>Единицы</h2>`+li([
-     'Деньги — только у сделок, «Сумма» которых сверена файлом «Экономика проекта» (класс A). Остальные (класс C) — число, причина, хозяин и действие, без евро.',
-     `Сумма в плитке — только если сверенных сделок блока не меньше ${RU.cover||70} %, иначе «в цифрах n из N». По сделке класса A значение видно всегда — праву «Деньги КАМов».`,
+     'Деньги на вкладке — только у сделок, «Сумма» которых сверена файлом «Экономика проекта» (класс A). Остальные (класс C) — число, причина, хозяин и действие, без евро. Разделы «КАМы», «Продукт-оунеры», «Люди» и личные карточки считаются по «Сумме» Битрикса — поэтому сумм в них нет, только счёт.',
+     `Сумма в плитке и ячейке — только если сверенных файлом сделок блока не меньше ${RU.cover||70} %, иначе «в цифрах n из N»; сверено достаточно, а результат посчитан меньше чем у ${RU.cover||70} % — «результат посчитан у n из N» и причина, без суммы. По сделке класса A значение видно всегда — праву «Деньги КАМов».`,
+     'Право «Деньги КАМов» закрывает на этой вкладке продажу сверенных сделок, результат по нормативу, коэффициент и K7. Вкладка «Реализация» показывает продажу и закупку по своему правилу (решение владельца 25.10.2026: сверенный файл экономики — всем с вкладкой); по ним и публичным нормативам положения результат можно оценить грубо.',
      'R — результат по нормативу положения ред. 2 (не прибыль): продажа − ПЗ − 5 % продажи − 2 % оплаты поставщику − поправка × продажа. ПЗ — закупка из файла или заказов поставщикам × 1,10, иначе прямые затраты книги бюджета. Поправка — из калибровки премий, только если калибровка по '+(RU.calibMin||30)+' сделкам и больше.',
-     `K7 — своя часть по положению: доля пула (исполнитель 7/20, ЛПР 13/20; КАМ и продукт-оунер — 80/20) × ${Math.round((RU.rate||0.2)*100)} % R × К (${String(RU.k||0.6).replace('.',',')} до публикации К финдиректором); ниже ×${String(RU.priceMin||1.17).replace('.',',')} к ПЗ — 0. Пока серверного фильтра «только своё» нет (этап 2), K7 видит только право «Деньги КАМов».`])
+     `K7 — своя часть по положению: доля пула (исполнитель 7/20, ЛПР 13/20; КАМ и продукт-оунер — 80/20) × ${Math.round((RU.rate||0.2)*100)} % R × К (${String(RU.k||0.6).replace('.',',')} до публикации К финдиректором); ниже ×${String(RU.priceMin||1.17).replace('.',',')} к ПЗ — 0. Доли — по настоящим держателям ролей; доля уволенного — «не закреплено», правило 80/20 от этого не меняется. Тот же порог ${RU.cover||70} % — от сделок человека по любой его роли. Пока серверного фильтра «только своё» нет (этап 2), K7 видит только право «Деньги КАМов».`])
    +`<h2>KPI</h2>`+li([
-     'K1 «Получено» — сделки в стадии «Оплата получена | Закрытие сделки», вошедшие в неё в этом квартале: дата — день сборки минус дни в стадии. Подтверждено платёжкой — платёжка клиента во всех непроигранных заказах сделки, иначе «не подтверждено платёжкой». Оплаченные раньше, но не закрытые — отдельной строкой, ни в K1, ни в K2.',
-     `K2 «К получению» — открытые выигранные сделки реализации по дате ожидаемой оплаты, по самому позднему живому неоплаченному заказу: плановый срок оплаты заказа → доставка (факт или прогноз) + отсрочка оплаты из сделки → доставка + ${RU.payGrace||30} дн. → «без даты». Медианами дата не достраивается.`,
+     'K1 «Получено» — нарастающим за квартал: сделки, вошедшие в стадию «Оплата получена | Закрытие сделки» в этом квартале, в том числе уже закрытые (дата — вход в «Оплата получена» по пути стадий, иначе вход в финальную стадию). Дата — день сборки минус дни в стадии. Подтверждено платёжкой — платёжка клиента во всех непроигранных заказах сделки, иначе «не подтверждено платёжкой»; подтверждено меньше чем у '+((H&&H.trust&&H.trust.poMin)||50)+' % — пометка в строке доверия. Оплаченные раньше, но не закрытые — отдельной строкой, ни в K1, ни в K2.',
+     'Платёжка клиента во всех заказах, а стадия не «Оплата получена» — «оплачено по платёжке, стадия не переведена»: ни в K1 (K1 — по стадии), ни в K2 (не «к получению»), пункт — перевести стадию.',
+     `K2 «К получению» — открытые выигранные сделки реализации по дате ожидаемой оплаты, по самому позднему живому неоплаченному заказу: плановый срок оплаты заказа → доставка (факт или прогноз) + отсрочка оплаты из сделки → доставка + ${RU.payGrace||30} дн. → «без даты». Прогноз доставки — от даты самого заказа (приход на склад, отгрузка — факт или план, конец производства) плюс медианы звеньев пути; у заказа без такой даты прогноза из одних медиан нет — «без даты».`,
      'K3 «Под угрозой» — два вида, не складываются: задержано клиентом (доставлено, срок оплаты прошёл без платёжки; нет УПД) и срок под риском (срок клиента сорван, риск, прогноз позже срока, план доставки позже срока). Хозяин — ответственный заказа, КАМ — в копии.',
-     'K4 «Выигрыши квартала» — дата «ТКП согласован (конкурс выигран)», иначе первый вход в воронку реализации, иначе первый заказ; источник даты — в сделке.',
-     `K5 «Пайплайн невыигранных» — открытые сделки вне реализации по классу стадии: ${Object.values(LB.stage||{}).join(' · ')}. «Пресейл» — по таблицам мяча и порогов КАМа, прочие воронки — по именам стадий зонда конверсии. Тихие потери — больше ${RU.quietDays||120} дн. без смены стадии и без людей в чате: вне пайплайна. Вероятность по стадии — этап 2 (зонд истории стадий).`,
-     'K6 «В цифрах» — доля выигранных сделок со сверенной файлом «Суммой», в каждом блоке и у каждого человека.'])
+     'K4 «Выигрыши квартала» — дата «ТКП согласован (конкурс выигран)», иначе первый вход в воронку реализации, иначе первый заказ; источник даты — в строке сделки.',
+     `K5 «Пайплайн невыигранных» — открытые сделки вне реализации по классу стадии: ${Object.values(LB.stage||{}).join(' · ')}. «Пресейл» — по таблицам мяча и порогов КАМа, прочие воронки — по именам стадий зонда конверсии. Тихие потери — больше ${RU.quietDays||120} дн. без смены стадии, у сделок «Пресейла» — и без людей в чате (статус чата портал читает только у «Пресейла»): вне пайплайна. Вероятность по стадии — этап 2 (зонд истории стадий).`,
+     'K6 «В цифрах» — доля выигранных сделок K1 и K2 со сверенной файлом «Суммой», в каждом блоке и у каждого человека. Причины без денег в строке доверия складываются в N − n.'])
    +`<h2>Чья сделка</h2>`+li([
      'Одно правило: КАМ — поле «КАМ» (запасное «KAM (старое)»), иначе ответственный, если по должности он КАМ (подпись «прокси»), иначе «КАМ не указан». Уволенный в поле — «не закреплено» и пункт «переназначить КАМа».',
      'Продукт-оунер — поле «Product leader». Линия — «Категория оборудования» сделки, без прокси по отделу; нет — «линия не указана» и пункт продукт-оунеру «проставить категорию». У сделки с несколькими категориями — первая.',
      'Человеку сделка засчитывается целиком по каждой его роли; итог компании — по сделкам, суммы разных ролей не складываются.'])
-   +`<h2>Проверка</h2>`+li(['Σ R по сделкам = Σ по людям через доли пула (вместе с «не закреплено») с точностью до €1; Σ строк каждого разреза = итог — по числу и по деньгам. Любое расхождение — деньги в этой сборке не публикуются.'])
+   +`<h2>Проверка</h2>`+li(['Деньги сборки публикуются, только если сошлись все проверки, посчитанные разными путями: Σ R по сделкам = Σ по людям через доли пула (вместе с «не закреплено») с точностью до €1; Σ частей людей K7 = Σ пулов сделок; итоги плиток = Σ опубликованных значений сделок по корзине; счёт плиток = число сделок списка по корзине; Σ строк каждого разреза = итог — по числу и по деньгам.','«Получено» по стадии против «получено» по платёжкам — пометкой, не гейтом: файл платёжки в заказе прикладывают не всегда.'])
    +`<h2>Что сделать администратору Bitrix</h2>`+li([
      'Робот при переводе сделки в воронку реализации копирует из «Пресейла» «Категорию оборудования» и «Product leader»; категория обязательна.',
      'Плановый срок оплаты на заказе — обязателен на стадии доставки (решено 19.10.2026).',
@@ -1731,8 +1783,8 @@ function incomeHow(){
 // ---- вкладка «Коммерсанты»: персональные дашборды + контрольные точки
 function renderReps(R){
   const el=document.getElementById('tab-reps'); if(!el) return;
-  const INC=!!_incHead();
-  if((!R||!R.reps||!R.reps.length)&&!INC){ el.innerHTML='<section class="card"><div class="secttl">Нет данных</div><div class="note">Нет ни дохода, ни данных по коммерсантам: они собираются из сделок Bitrix24 и состава портала — в этой сборке не собрались.</div></section>'; return; }
+  // «Доход» и «Как считается» есть всегда: без расчёта дохода «Доход» говорит «Нет данных»
+  // и почему (portal-ui §2), а не пропадает из подменю
   const reps=(R&&R.reps)||[];
   const byUid=u=>reps.find(r=>r.uid===u);
   // КАМы и продукт-оунеры — не отдельные вкладки: начальник у них один, и разрез
@@ -1740,8 +1792,10 @@ function renderReps(R){
   // (решение владельца 25.10.2026), «Как считается» — его правила словами.
   const PP=window.__PEOPLE__;
   const ROLES=(PP&&PP.roles)?[['role:kam','КАМы'],['role:prod','Продукт-оунеры']]:[];
-  const SUBS=[...(INC?[['income','Доход']]:[]),...(reps.length?[['all','Люди']]:[]),...ROLES,...(INC?[['how','Как считается']]:[]),
-    ...reps.map(r=>[r.uid,r.label])];
+  // порядок — по дизайну «Дохода»: Доход · КАМы · Продукт-оунеры · Люди (сводка и личные
+  // карточки) · Как считается
+  const SUBS=[['income','Доход'],...ROLES,...(reps.length?[['all','Люди']]:[]),
+    ...reps.map(r=>[r.uid,r.label]),['how','Как считается']];
   const okSub=k=>SUBS.some(x=>x[0]===k);
   // адрес раздела: #reps/<раздел> (portal-ui §3) — на него можно вернуться
   const fromHash=()=>{const m=/^#reps\/(.+)$/.exec(location.hash||''); const k=m?decodeURIComponent(m[1]):''; return okSub(k)?k:'';};
@@ -1752,11 +1806,11 @@ function renderReps(R){
   function overview(){
     if(!reps.length) return '<section class="card"><div class="secttl">Нет данных</div><div class="note">Люди коммерческого блока не посчитаны: личные дашборды собираются из сделок этого года и состава портала.</div></section>';
     const sla=(R.slaMin||120), slaH=Math.round(sla/60*10)/10;
-    const head=`<tr><th>Сотрудник</th><th class="r">создано</th><th class="r">в реализ.</th><th class="r">конв</th><th class="r">продажи</th><th class="r">win-rate</th><th class="r">реакция</th><th class="r">в срок</th><th class="r">закрыто</th><th class="r">🔴 висит</th><th class="r">посл.актив</th></tr>`;
+    const head=`<tr><th>Сотрудник</th><th class="r">создано</th><th class="r">в реализ.</th><th class="r">конв</th><th class="r">win-rate</th><th class="r">реакция</th><th class="r">в срок</th><th class="r">закрыто</th><th class="r">🔴 висит</th><th class="r">посл.актив</th></tr>`;
     const rcol=rr=>{const m=rr.medMin; if(m==null)return '<td class="num r dimv">—</td>'; const c=m<=sla?'var(--ok)':(m<=sla*3?'var(--amber)':'var(--nr)'); return `<td class="num r" style="color:${c}">${_rt(m)}</td>`;};
     const wcol=rr=>{if(!rr.days)return '<td class="num r dimv" title="нет данных скана">—</td>';const n=rr.waitN||0,g=rr.waitGt1d||0; const c=g>0?'var(--nr)':(n>0?'var(--amber)':'var(--mut)'); const sub=g?` <span class="dimv">(${g}>сут)</span>`:''; return `<td class="num r" style="color:${c}" title="макс ${rr.waitMaxDays||0} дн">${n}${sub}</td>`;};
     const acol=rr=>{const d=rr.lastPostDays; if(d==null)return '<td class="num r dimv">—</td>'; const c=d>3?'var(--nr)':(d>1?'var(--amber)':'var(--ok)'); return `<td class="num r" style="color:${c}">${d} дн</td>`;};
-    const rows=reps.map(r=>{const k=r.kpis, rr=r.react||{}, as=rr.assessment;return `<tr class="drill" data-r="${r.uid}"><td><div class="who">${_esc(r.label)} <span class="dimv" style="font-weight:400">${_esc(r.role||'')}</span></div><div class="dep">${_esc(r.pos||r.name)}</div>${as?`<div class="dep" style="color:var(--a2)">Opus: вовл ${as.eng} · проф ${as.prof}</div>`:''}</td><td class="num r">${k.created}</td><td class="num r" style="color:var(--ok)">${k.real}</td><td class="num r">${k.conv}%</td><td class="num r">${k.sales}</td><td class="num r"><b>${k.winRate}%</b></td>${rcol(rr)}<td class="num r">${rr.days&&rr.withinSla!=null?rr.withinSla+'%':'<span class="dimv">—</span>'}</td><td class="num r">${rr.days&&rr.handledPct!=null?rr.handledPct+'%':'<span class="dimv">—</span>'}</td>${wcol(rr)}${acol(rr)}</tr>`;}).join('');
+    const rows=reps.map(r=>{const k=r.kpis, rr=r.react||{}, as=rr.assessment;return `<tr class="drill" data-r="${r.uid}"><td><div class="who">${_esc(r.label)} <span class="dimv" style="font-weight:400">${_esc(r.role||'')}</span></div><div class="dep">${_esc(r.pos||r.name)}</div>${as?`<div class="dep" style="color:var(--a2)">Opus: вовл ${as.eng} · проф ${as.prof}</div>`:''}</td><td class="num r">${k.created}</td><td class="num r" style="color:var(--ok)">${k.real}</td><td class="num r">${k.conv}%</td><td class="num r"><b>${k.winRate}%</b></td>${rcol(rr)}<td class="num r">${rr.days&&rr.withinSla!=null?rr.withinSla+'%':'<span class="dimv">—</span>'}</td><td class="num r">${rr.days&&rr.handledPct!=null?rr.handledPct+'%':'<span class="dimv">—</span>'}</td>${wcol(rr)}${acol(rr)}</tr>`;}).join('');
     // строки гигиены, за которыми стоит список сделок, — кликабельны: диагноз без
     // перечня карточек остаётся диагнозом, а работать надо по списку
     const HYGF={noRole:d=>!d.kam&&!d.prod&&d.ownLive, onFired:d=>!d.ownLive,
@@ -1801,18 +1855,17 @@ function renderReps(R){
       const RL=[['kam','КАМы'],['prod','Продукт-оунеры']].map(z=>[z[0],z[1],PP.roles[z[0]]]).filter(z=>z[2]);
       const row=(lbl,fn)=>`<tr><td>${lbl}</td>`+RL.map(z=>`<td class="num r">${fn(z[2].totals,z[2])}</td>`).join('')+`</tr>`;
       cmp=`<div class="secttl"><b>·</b> Две роли рядом${qmark('p.kpi')}</div><section class="card">`
-        +`<div class="note">Один участок — одна строка. Клик по названию роли в подменю открывает её целиком: руководитель, люди, воронки, косяки.</div>`
+        +`<div class="note">Один участок — одна строка. Клик по названию роли в подменю открывает её целиком: руководитель, люди, воронки, косяки. ${_INC_NOMONEY}</div>`
         +`<table><thead><tr><th>Показатель</th>`+RL.map(z=>`<th class="r">${z[1]}</th>`).join('')+`</tr></thead><tbody>`
         +row('людей в роли',(t)=>t.people)
         +row('без единой сделки',(t,b)=>(b.idlePeople||[]).length)
         +row('сделок в работе',(t)=>t.open)
-        +row('в проработке',(t)=>`${t.presale} · ${t.presaleSum}`)
-        +row('в реализации',(t)=>`${t.real} · ${t.realSum}`)
-        +row('маржа реализации',(t)=>`${t.margin} <small class="dimv">${t.marginPct}%</small>`)
+        +row('в проработке',(t)=>t.presale)
+        +row('в реализации',(t)=>t.real)
         +row('win-rate года',(t)=>`${t.winRate}%`)
-        +row('просрочено клиенту',(t)=>`${t.late} · ${t.lateSum}`)
+        +row('просрочено клиенту',(t)=>t.late)
         +row('без движения 90+ дн',(t)=>t.stale)
-        +row('портфель без карточек-выбросов',(t)=>`${t.cleanSum} <small class="dimv">выбросов ${t.big}, в них ${t.bigShare}%</small>`)
+        +row('карточек-выбросов по сумме',(t)=>t.big)
         +row('чистых карточек',(t)=>t.cleanPct==null?'—':t.cleanPct+'%')
         +row('закреплено полем карточки',(t)=>t.open?Math.round(t.byField/t.open*100)+'%':'—')
         +row('руководитель',(t,b)=>(b.head&&b.head.name)?(_esc(b.head.name)+(b.head.confirmed?'':' <span class="dimv">прокси</span>')):'<span class="dimv">не определён</span>')
@@ -1825,10 +1878,10 @@ function renderReps(R){
     const card=(lbl,val,meta,clz)=>`<div class="kpi ${clz||''}"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
     let h=`<div class="secttl"><b>·</b> ${_esc(r.label)} — карточка эффективности${qmark('r.kpi')}</div>`;
     h+=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)">`
-      +card('Активных сделок',k.open,'пайплайн '+k.openSum,'')
+      +card('Активных сделок',k.open,'в работе — без сумм: деньги в «Доходе»','')
       +card('В реализации',k.real,'конв '+k.conv+'% от созданных','ok')
-      +card('Продажи',k.sales,'маржа '+k.margin+' ('+k.marginPct+'%)'+(k.noBuy?' · без закупки '+k.noBuy:''),'ok')
-      +card('Win-rate',k.winRate+'%','ср. чек '+k.avgCheck,'')+`</div>`;
+      +card('Без закупки',k.noBuy||0,'сделок реализации без заказа поставщику',k.noBuy?'warn':'')
+      +card('Win-rate',k.winRate+'%','по числу сделок','')+`</div>`;
     h+=`<div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-top:10px">`
       +card('Создано (с 2025)',k.created,'весь портфель','')
       +card('Проиграно',k.lost,'закрыто без сделки','warn')
@@ -2569,10 +2622,10 @@ function _pflag(n,cls){return n?`<span style="color:var(--${cls})">${n}</span>`:
 // список сделок человека/среза — в выдвижной панели
 function openPeopleDeals(list,title,sub){
   list=(list||[]).slice();
-  const sum=list.reduce((a,d)=>a+(d.raw||0),0);
+  const sum=list.reduce((a,d)=>a+(d.raw||0),0), $=_hasMoney(list);
   const real=list.filter(d=>d.state==='real'), pre=list.filter(d=>d.state!=='real');
   document.getElementById('drwName').textContent=title;
-  document.getElementById('drwSub').textContent=`${sub} · сделок ${list.length} · Σ ${_fmtE(sum)}`;
+  document.getElementById('drwSub').textContent=`${sub} · сделок ${list.length}${$?` · Σ ${_fmtE(sum)}`:' · суммы — в «Доходе», только сверенные файлом'}`;
   const badge=d=>[
     d.late?`<span class="pill" style="color:var(--nr)">просрочка ${d.late} дн</span>`:'',
     (d.idle!=null&&d.idle>90)?`<span class="pill" style="color:var(--a)">без движения ${d.idle} дн</span>`:'',
@@ -2580,13 +2633,14 @@ function openPeopleDeals(list,title,sub){
     d.noComp?'<span class="pill" style="color:var(--a)">без клиента</span>':'',
     d.neg?'<span class="pill" style="color:var(--nr)">маржа в минус</span>':'',
     d.big?'<span class="pill" style="color:var(--a)">сумма-выброс</span>':''].join('');
-  const rowFn=d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${_esc(d.cat)}</span><span>${_esc(d.stage)}</span>${badge(d)}${d.date?`<span class="dt">${d.date}</span>`:''}<span class="amt">${d.amt}</span></div></div>`;
-  const cols=[{k:'amt',lbl:'сумма',get:d=>d.raw||0,def:true},{k:'idle',lbl:'без движения',get:d=>d.idle||0},
+  const rowFn=d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${_esc(d.cat)}</span><span>${_esc(d.stage)}</span>${badge(d)}${d.date?`<span class="dt">${d.date}</span>`:''}${$?`<span class="amt">${d.amt}</span>`:''}</div></div>`;
+  const cols=_noAmtCols([{k:'amt',lbl:'сумма',get:d=>d.raw||0,def:true},{k:'idle',lbl:'без движения',get:d=>d.idle||0},
               {k:'late',lbl:'просрочка',get:d=>d.late||0},{k:'date',lbl:'создана',get:d=>d.date||'',txt:true},
-              {k:'cat',lbl:'воронка',get:d=>d.cat||'',txt:true}];
+              {k:'cat',lbl:'воронка',get:d=>d.cat||'',txt:true}],$);
+  const hx=a=>$?` · Σ ${_fmtE(a.reduce((x,d)=>x+(d.raw||0),0))}`:'';
   _drwSortable('',[
-    {key:'r',h:'В реализации',hx:` · Σ ${_fmtE(real.reduce((a,d)=>a+(d.raw||0),0))}`,items:real,cols,rowFn,cap:300,empty:'нет сделок в реализации'},
-    {key:'p',h:'В проработке',hx:` · Σ ${_fmtE(pre.reduce((a,d)=>a+(d.raw||0),0))}`,items:pre,cols,rowFn,cap:300,empty:'нет сделок в проработке'},
+    {key:'r',h:'В реализации',hx:hx(real),items:real,cols,rowFn,cap:300,empty:'нет сделок в реализации'},
+    {key:'p',h:'В проработке',hx:hx(pre),items:pre,cols,rowFn,cap:300,empty:'нет сделок в проработке'},
   ]);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
@@ -2644,9 +2698,10 @@ function _kqHtml(K,pid){
    +`</div><div class="note">Пункты пресейла — мяч у КАМа (по стадии) и сделка стоит дольше порога; реализации — срок клиента, оплата и УПД, где разговор с клиентом ведёт КАМ (один пункт на сделку и вид). Пороги${RU.proposed?' <b>предложены, не утверждены</b>':' утверждены владельцем 19.10.2026'}: ${BR}.${H.chatActive?` Снято живым чатом сделки: <b>${H.chatActive}</b> — там идёт работа.`:''} Клик по плитке или чипу — фильтр; ${_kqHasCt()?'по строке реализации — карточка сделки':'№ реализации — ссылка на сделку в Bitrix'}.</div>`
    +`<div class="statleg" style="margin:0 0 8px" id="${pid}c"><span class="stchip on" data-c="" tabindex="0">Все <b>${Q.length}</b></span>${codes.map(k=>`<span class="stchip" data-c="${k}" tabindex="0">${_esc(LB[k])} <b>${C[k]}</b></span>`).join('')}${U.length?`<span class="stchip" data-c="soon" tabindex="0">Срок клиента ≤ ${RU.soonDays||14} дн. <b>${U.length}</b></span>`:''}</div>`
    +`<div style="margin-bottom:6px"><label class="dimv" for="${pid}w" style="font-size:11px;margin-right:6px">КАМ</label><select id="${pid}w" class="search" style="min-width:200px;max-width:100%"><option value="*">Все КАМы</option>${opts}</select></div>`
-   +`<div class="twrap"><table class="lft"><thead><tr><th>Что случилось</th><th>№ · клиент</th><th>КАМ</th><th class="r">Дней</th><th class="r">Сумма сделки</th><th>Что сделать</th></tr></thead><tbody id="${pid}b"></tbody></table></div><div id="${pid}m"></div>`
-   +(bk.length?`<h2 style="margin-top:14px">По КАМам</h2><div class="note">Пункты очереди по видам, неоплата по давности (1–30 / 31–90 / 90+ дн.), сроки клиента в ближайшие ${RU.soonDays||14} дн. Клик по строке — пункты этого КАМа.</div><div class="twrap"><table class="lft"><thead><tr><th>КАМ</th><th class="r">Пунктов</th><th class="r">Мяч у КАМа</th><th class="r">Срок сорван</th><th class="r">Не оплачено 1–30 / 31–90 / 90+</th><th class="r">Сроки ≤ ${RU.soonDays||14} дн.</th><th class="r">Сумма сделок</th></tr></thead><tbody>`
-     +bk.map(r=>`<tr class="drill" data-kw="${_esc(r.id||'~')}"><td>${_esc(r.name)}${r.gone?' <span class="gone">уволен</span>':''}</td><td class="r mono">${r.n||0}</td><td class="r mono">${r.ballKam||''}</td><td class="r mono${r.late?' hot':''}">${r.late||''}</td><td class="r mono">${r.unpaid?`${r.unpaid30||0} / ${r.unpaid90||0} / <span class="${r.unpaid90p?'nrc':''}">${r.unpaid90p||0}</span>`:''}</td><td class="r mono">${r.soon||''}</td><td class="r mono">${r.money?_fmtE(r.money):''}</td></tr>`).join('')
+   +`<div class="twrap"><table class="lft"><thead><tr><th>Что случилось</th><th>№ · клиент</th><th>КАМ</th><th class="r">Дней</th>${_incMoney()?'<th class="r">Продажа (сверено файлом)</th>':''}<th>Что сделать</th></tr></thead><tbody id="${pid}b"></tbody></table></div><div id="${pid}m"></div>`
+   +`<div class="note" style="margin-top:6px">${_incMoney()?'Продажа — только у сделок, «Сумма» которых сверена файлом экономики (право «Деньги КАМов»); у остальных пусто.':_INC_NOMONEY}</div>`
+   +(bk.length?`<h2 style="margin-top:14px">По КАМам</h2><div class="note">Пункты очереди по видам, неоплата по давности (1–30 / 31–90 / 90+ дн.), сроки клиента в ближайшие ${RU.soonDays||14} дн. Клик по строке — пункты этого КАМа.</div><div class="twrap"><table class="lft"><thead><tr><th>КАМ</th><th class="r">Пунктов</th><th class="r">Мяч у КАМа</th><th class="r">Срок сорван</th><th class="r">Не оплачено 1–30 / 31–90 / 90+</th><th class="r">Сроки ≤ ${RU.soonDays||14} дн.</th></tr></thead><tbody>`
+     +bk.map(r=>`<tr class="drill" data-kw="${_esc(r.id||'~')}"><td>${_esc(r.name)}${r.gone?' <span class="gone">уволен</span>':''}</td><td class="r mono">${r.n||0}</td><td class="r mono">${r.ballKam||''}</td><td class="r mono${r.late?' hot':''}">${r.late||''}</td><td class="r mono">${r.unpaid?`${r.unpaid30||0} / ${r.unpaid90||0} / <span class="${r.unpaid90p?'nrc':''}">${r.unpaid90p||0}</span>`:''}</td><td class="r mono">${r.soon||''}</td></tr>`).join('')
      +`</tbody></table></div>`:'')
    +`</section>`;
 }
@@ -2657,7 +2712,9 @@ function _kqWire(el,K,pid){
   const key=x=>x.kamId||'~';
   const soonRow=u=>({code:'soon',sev:9,what:u.left?`срок клиента через ${u.left} дн.`:'срок клиента сегодня',
     act:'сверить с ОСС готовность и подтвердить клиенту дату',days:u.left,kam:u.kam,kamId:u.kamId,kamGone:u.kamGone,
-    deal:u.deal,src:'real',seq:u.seq,customer:u.customer,title:u.title,moneyLbl:u.moneyLbl,dl:u.dl,sup:u.sup});
+    deal:u.deal,src:'real',seq:u.seq,customer:u.customer,title:u.title,dl:u.dl,sup:u.sup});
+  // продажа — из закрытого массива «Дохода»: только сверенные файлом экономики (класс A)
+  const IM=_incMoney(), sale=x=>{const m=IM&&IM.deals[String(x.deal)]; return m&&m.s?_fmtE(m.s):'';};
   const who=x=>`${_esc(x.kam||'—')}${x.kamGone?' <span class="gone">уволен</span>':''}`;
   const deal=x=>x.src==='presale'
     ?`<a href="${url(x.deal)}" target="_blank" rel="noopener">${_esc(x.title||('Сделка #'+x.deal))}</a><div class="dep">пресейл${x.stage?' · '+_esc(x.stage):''}</div>`
@@ -2669,8 +2726,8 @@ function _kqWire(el,K,pid){
     const r=src.filter(x=>(!qc||qc==='soon'||x.code===qc)&&(qw==='*'||key(x)===qw));
     el.querySelector('#'+pid+'n').textContent=`(${r.length} из ${src.length})`;
     const shown=qall?r:r.slice(0,40);
-    el.querySelector('#'+pid+'b').innerHTML=shown.map(x=>`<tr${x.src==='real'&&ct?` class="drill" data-ct="${_esc(x.deal)}"`:''}><td class="${x.sev<=2?'hot':''}">${what(x)}</td><td>${deal(x)}</td><td>${who(x)}</td><td class="r mono">${x.days!=null?x.days:''}</td><td class="r mono">${x.moneyLbl||'—'}</td><td>${act(x)}</td></tr>`).join('')
-      ||'<tr><td colspan="6" class="dimv" style="padding:14px">пусто — по этому фильтру делать нечего</td></tr>';
+    el.querySelector('#'+pid+'b').innerHTML=shown.map(x=>`<tr${x.src==='real'&&ct?` class="drill" data-ct="${_esc(x.deal)}"`:''}><td class="${x.sev<=2?'hot':''}">${what(x)}</td><td>${deal(x)}</td><td>${who(x)}</td><td class="r mono">${x.days!=null?x.days:''}</td>${IM?`<td class="r mono">${sale(x)}</td>`:''}<td>${act(x)}</td></tr>`).join('')
+      ||`<tr><td colspan="${IM?6:5}" class="dimv" style="padding:14px">пусто — по этому фильтру делать нечего</td></tr>`;
     el.querySelector('#'+pid+'m').innerHTML=(!qall&&r.length>40)?`<span class="stchip" data-all="1" tabindex="0" style="margin-top:8px;display:inline-block">Показать все ${r.length}</span>`:'';
   };
   const pick=c=>{qc=c; qall=false; el.querySelectorAll('#'+pid+'c .stchip').forEach(x=>x.classList.toggle('on',x.dataset.c===c)); draw();};
@@ -2699,13 +2756,13 @@ function renderPeople(P,role,elId,opt){
   if(!P||!P.roles||!P.roles[role]){ el.innerHTML='<section class="card"><div class="note">Состав коммерсантов не загрузился — вкладка пуста. Остальные вкладки работают.</div></section>'; return; }
   const R=P.roles[role],T=R.totals,o=_PROLE[role],D=P.deals||[],S=P.staff||{},RC=P.recon||{},PR=Object.assign({stale:90,dead:180,mult:50,medAmt:'—',bigCut:'—'},P.params||{});
   const mine=d=>role==='kam'?d.kam:d.prod;
-  const totLoad=R.people.reduce((a,p)=>a+p.loadRaw,0)||1;
+  // деньги ролей сюда не приходят (dashboard.TAB_MONEY_KEYS): сделки — числом, суммы — в «Доходе»
   const KPI=[
     ['Людей в роли',String(T.people),`из ${S.active||0} действующих в портале · уволенных ${S.fired||0}`,'','staff'],
     ['Сделок в работе',String(T.open),`${T.perPersonDeals} на человека · медиана ${T.medianDeals} · максимум ${T.maxDeals}`+(T.inSrc?` · ещё ${T.inSrc} в пресейле, мяч у сорсинга`:''),'','all'],
-    ['В проработке',T.presaleSum,`${T.presale} сделок · торг не выигран`+(T.big?` · ${T.bigShare}% суммы держат ${T.big} карточек-выбросов, без них портфель роли ${T.cleanSum}`:''),'ok','presale'],
-    ['В реализации',T.realSum,`${T.real} сделок · маржа ${T.margin} (${T.marginPct}%)${T.noBuy?` · без закупки ${T.noBuy}`:''}`,'ok','real'],
-    ['Просрочено клиенту',String(T.late),`Σ ${T.lateSum} · дедлайн заказа прошёл`,T.late?'warn':'ok','late'],
+    ['В проработке',String(T.presale),'торг не выигран'+(T.big?` · карточек-выбросов по сумме ${T.big} — сумму в них проверить`:''),'ok','presale'],
+    ['В реализации',String(T.real),`воронка «Реализация» или живой заказ поставщику${T.noBuy?` · без закупки ${T.noBuy}`:''}`,'ok','real'],
+    ['Просрочено клиенту',String(T.late),'дедлайн заказа прошёл',T.late?'warn':'ok','late'],
     ['Без движения '+PR.stale+'+ дн',String(T.stale),`из них ${T.dead} стоят дольше ${PR.dead} дн`,T.stale?'amber':'ok','stale'],
   ];
   const KQ=(role==='kam'&&P.kamQueue)?P.kamQueue:null, kqId=elId+'-kq';
@@ -2733,29 +2790,29 @@ function renderPeople(P,role,elId,opt){
     +SC.map(m=>`<tr><td>${_esc(m.lbl)}</td><td class="num r"><b>${m.val}</b></td><td class="num r dimv">${m.op} ${m.norm}</td><td class="num r" style="color:${m.ok?'var(--ok)':'var(--nr)'}">${m.ok?'да':'нет'}</td></tr>`).join('')
     +`</tbody></table></section>`;
   h+=`<div class="secttl"><b>2</b> · Загрузка по людям${qmark('p.load')}</div><section class="card"><h2>Кто сколько ведёт</h2>`
-    +`<div class="note">${o.attr} ${o.roleNote}${P.presaleCat?` Сделки воронки «${_esc(P.presaleCat)}» считаются по тому, на ком мяч: пока он у сорсинга (назначение сорсера, поиск поставщиков, КП, расчёт экономики), сделка не входит в нагрузку и «косяки» — она в строке «в пресейле у сорсинга»; с мячом у ${o.unit==='КАМ'?'КАМа':'роли'} (экономика готова, подача, тендер, решение заказчика) — считается как обычно.`:''} «В проработке» — торг не выигран; «в реализации» — воронка «Реализация» или есть живой заказ поставщику. Суммы — продажа, к базовой € по курсам Bitrix (базовая валюта портала — EUR, проверено). Медианная открытая сделка — ${PR.medAmt}; карточки дороже ${PR.bigCut} (${PR.mult} медиан) помечены как выбросы: сумму в них нужно проверить, прежде чем верить итогу.</div>`
+    +`<div class="note">${o.attr} ${o.roleNote}${P.presaleCat?` Сделки воронки «${_esc(P.presaleCat)}» считаются по тому, на ком мяч: пока он у сорсинга (назначение сорсера, поиск поставщиков, КП, расчёт экономики), сделка не входит в нагрузку и «косяки» — она в строке «в пресейле у сорсинга»; с мячом у ${o.unit==='КАМ'?'КАМа':'роли'} (экономика готова, подача, тендер, решение заказчика) — считается как обычно.`:''} «В проработке» — торг не выигран; «в реализации» — воронка «Реализация» или есть живой заказ поставщику. Карточки дороже ${PR.mult} медиан открытой сделки помечены как выбросы: сумму в них нужно проверить. ${_INC_NOMONEY}</div>`
     +`<div class="statleg" id="pSort${role}" style="margin:0 0 8px"><span class="dimv" style="margin-right:6px">сортировка:</span>`
-    +[['load','по деньгам'],['open','по числу сделок'],['real','по реализации'],['late','по просрочке'],['flaws','по косякам']]
+    +[['open','по числу сделок'],['real','по реализации'],['late','по просрочке'],['flaws','по косякам']]
       .map((s,i)=>`<span class="stchip${i===0?' on':''}" data-sort="${s[0]}">${s[1]}</span>`).join('')+`</div>`
-    +`<table><thead><tr><th>Сотрудник</th><th class="r">в проработке</th><th class="r">Σ €</th><th class="r">в реализации</th><th class="r">Σ €</th><th class="r">маржа</th><th class="r">просроч.</th><th class="r">стоит ${PR.stale}+</th><th class="r">косяки</th><th class="r">доля</th></tr></thead><tbody id="pBody${role}"></tbody>`
-    +`<tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b> <span class="dimv">${T.people} чел.</span></td><td class="num r">${T.presale}</td><td class="num r">${T.presaleSum}</td><td class="num r" style="color:var(--ok2)">${T.real}</td><td class="num r">${T.realSum}</td><td class="num r" style="color:var(--ok)">${T.margin}</td><td class="num r" style="color:var(--nr)">${T.late}</td><td class="num r" style="color:var(--a)">${T.stale}</td><td class="num r">${T.flaws}</td><td class="num r">100%</td></tr></tfoot></table>`
+    +`<div class="twrap"><table><thead><tr><th>Сотрудник</th><th class="r">в работе</th><th class="r">в проработке</th><th class="r">в реализации</th><th class="r">просроч.</th><th class="r">стоит ${PR.stale}+</th><th class="r">косяки</th><th class="r">доля сделок</th></tr></thead><tbody id="pBody${role}"></tbody>`
+    +`<tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b> <span class="dimv">${T.people} чел.</span></td><td class="num r">${T.open}</td><td class="num r">${T.presale}</td><td class="num r" style="color:var(--ok2)">${T.real}</td><td class="num r" style="color:var(--nr)">${T.late}</td><td class="num r" style="color:var(--a)">${T.stale}</td><td class="num r">${T.flaws}</td><td class="num r">100%</td></tr></tfoot></table></div>`
     +(R.idlePeople&&R.idlePeople.length?`<div class="note" style="margin-top:10px">Без единой сделки в роли: <b>${R.idlePeople.length}</b> — ${R.idlePeople.map(p=>_esc(p.name)).join(', ')}. Это либо новый человек, либо работа записана на кого-то другого.</div>`:'')
     +`</section>`;
   // 2 — воронки и стадии
   const fmax=Math.max(1,...R.funnels.map(f=>f.n));
   h+=`<div class="secttl"><b>3</b> · Где стоят сделки${qmark('p.funnel')}</div><section class="card"><h2>Воронки</h2><div class="barlist">`
-    +R.funnels.map(f=>`<div class="blrow drill" data-pcat="${_esc(f.catId)}"><div class="blt"><span>${_esc(f.cat)}</span><b>${f.n} <span class="dimv">${f.sum}</span></b></div><div class="bltrack"><i style="width:${(f.n/fmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--a2),var(--ok))"></i></div></div>`).join('')
+    +R.funnels.map(f=>`<div class="blrow drill" data-pcat="${_esc(f.catId)}"><div class="blt"><span>${_esc(f.cat)}</span><b>${f.n}</b></div><div class="bltrack"><i style="width:${(f.n/fmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--a2),var(--ok))"></i></div></div>`).join('')
     +`</div><h2 style="margin-top:14px">Стадии — топ-20</h2><table><thead><tr><th>Стадия</th><th>воронка</th><th class="r">сделок</th></tr></thead><tbody>`
     +R.stages.map(s=>`<tr><td>${_esc(s.stage)}</td><td class="dep">${_esc(s.cat)}</td><td class="num r">${s.n}</td></tr>`).join('')
     +`</tbody></table></section>`;
   // 3 — результат года и ожидание
   h+=`<div class="secttl"><b>4</b> · Результат года и чего ждать${qmark('p.result')}</div><section class="card pfit">`
     +`<div class="pcards"><div class="pcard"><div class="pv">${T.created}</div><div class="pl">создано сделок с 01.01</div></div>`
-    +`<div class="pcard"><div class="pv" style="color:var(--ok)">${T.won}</div><div class="pl">выиграно · ${T.wonSum}</div></div>`
+    +`<div class="pcard"><div class="pv" style="color:var(--ok)">${T.won}</div><div class="pl">выиграно</div></div>`
     +`<div class="pcard"><div class="pv" style="color:var(--nr)">${T.lost}</div><div class="pl">проиграно</div></div>`
     +`<div class="pcard"><div class="pv">${T.winRate}%</div><div class="pl">win-rate роли</div></div></div>`
-    +`<div class="srccmp"><span class="sl">Законтрактовано, ещё не сдано</span><div class="sb"><i style="width:100%"></i></div><span class="sv">${T.realSum}</span><span class="sd mid">факт: ${T.real} сделок в реализации</span></div>`
-    +`<div class="note">Сумма — «Сумма» сделок Битрикса, не сверенная с файлом экономики. Сколько и когда принесут сделки — подменю «Доход»: там деньги только по сделкам, сверенным файлом экономики, а пайплайн невыигранных — по классу стадии. «Взвешенный пайплайн» (проработка × win-rate роли) снят 25.10.2026: процент по штукам умножался на деньги, без стадии и срока.</div></section>`;
+    +`<div class="srccmp"><span class="sl">Законтрактовано, ещё не сдано</span><div class="sb"><i style="width:100%"></i></div><span class="sv">${T.real}</span><span class="sd mid">сделок в реализации</span></div>`
+    +`<div class="note">Сколько и когда принесут сделки — подменю «Доход»: деньги там только по сделкам, «Сумма» которых сверена файлом экономики, а пайплайн невыигранных — по классу стадии. «Взвешенный пайплайн» (проработка × win-rate роли) снят 25.10.2026: процент по штукам умножался на деньги, без стадии и срока.</div></section>`;
   // 4 — косяки
   const FL=[['late','Просрочен дедлайн клиенту',T.late,'nr'],['stale','Стоит дольше '+PR.stale+' дн',T.stale,'a'],
             ['dead','Брошено: дольше '+PR.dead+' дн',T.dead,'nr'],['noAmt','Без суммы',T.noAmt,'a'],
@@ -2792,29 +2849,29 @@ function renderPeople(P,role,elId,opt){
   h+=`<div class="secttl"><b>6</b> · Кто закреплён, а кто нет${qmark('p.cover')}</div><section class="card pfit">`
     +`<div class="srccmp"><span class="sl">Закреплено за ролью</span><div class="sb"><i style="width:${_pshare(T.open,RC.openTotal||1)}%"></i></div><span class="sv">${T.open}</span><span class="sd mid">из ${RC.openTotal||0} открытых сделок портала</span></div>`
     +`<div class="srccmp"><span class="sl">Из них полем в карточке</span><div class="sb"><i style="width:${_pshare(T.byField,T.open||1)}%"></i></div><span class="sv">${T.byField}</span><span class="sd dim">остальное — по ответственному</span></div>`
-    +`<div class="srccmp"><span class="sl">Роль не закреплена</span><div class="sb"><i style="width:${_pshare(R.uncovered.n,RC.openTotal||1)}%;background:var(--a)"></i></div><span class="sv">${R.uncovered.n}</span><span class="sd dim">Σ ${R.uncovered.sum}</span></div>`
-    +`<div class="note" style="margin-top:8px">Сверка портфеля: всего открытых <b>${RC.openTotal||0}</b> · за КАМами <b>${RC.kam||0}</b> · за продукт-оунерами <b>${RC.prod||0}</b> · и там, и там <b>${RC.both||0}</b> · ни за кем <b>${RC.none||0}</b> (${RC.noneSum||'€0'}) · на уволенных <b>${RC.orphan||0}</b>${RC.inSrc?` · в пресейле, мяч у сорсинга <b>${RC.inSrc}</b> (в счёт ролей не входят)`:''}. Роли пересекаются: на одной сделке бывает и КАМ, и продукт-оунер, поэтому сходится не сумма, а покрытие. Технические воронки (тест, адаптация, реклама) исключены: ${RC.tech||0} карточек.</div>`
-    +(OR.rows.length?`<h2 style="margin-top:14px">Сделки уволенных — их сегодня не ведёт никто</h2><table><thead><tr><th>Бывший сотрудник</th><th class="r">открытых</th><th class="r">в реализации</th><th class="r">Σ проработка</th><th class="r">Σ реализация</th><th class="r">просроч.</th><th class="r">стоит ${PR.stale}+</th></tr></thead><tbody>`
-      +OR.rows.map(p=>`<tr class="drill" data-pown="${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div><div class="dep">${_esc(p.pos)}</div></td><td class="num r">${p.open}</td><td class="num r" style="color:var(--ok2)">${p.real}</td><td class="num r">${p.presaleSum}</td><td class="num r">${p.realSum}</td><td class="num r" style="color:var(--nr)">${p.late}</td><td class="num r" style="color:var(--a)">${p.stale}</td></tr>`).join('')
+    +`<div class="srccmp"><span class="sl">Роль не закреплена</span><div class="sb"><i style="width:${_pshare(R.uncovered.n,RC.openTotal||1)}%;background:var(--a)"></i></div><span class="sv">${R.uncovered.n}</span><span class="sd dim">ни КАМа, ни продукт-оунера</span></div>`
+    +`<div class="note" style="margin-top:8px">Сверка портфеля: всего открытых <b>${RC.openTotal||0}</b> · за КАМами <b>${RC.kam||0}</b> · за продукт-оунерами <b>${RC.prod||0}</b> · и там, и там <b>${RC.both||0}</b> · ни за кем <b>${RC.none||0}</b> · на уволенных <b>${RC.orphan||0}</b>${RC.inSrc?` · в пресейле, мяч у сорсинга <b>${RC.inSrc}</b> (в счёт ролей не входят)`:''}. Роли пересекаются: на одной сделке бывает и КАМ, и продукт-оунер, поэтому сходится не сумма, а покрытие. Технические воронки (тест, адаптация, реклама) исключены: ${RC.tech||0} карточек.</div>`
+    +(OR.rows.length?`<h2 style="margin-top:14px">Сделки уволенных — их сегодня не ведёт никто</h2><table><thead><tr><th>Бывший сотрудник</th><th class="r">открытых</th><th class="r">в реализации</th><th class="r">просроч.</th><th class="r">стоит ${PR.stale}+</th></tr></thead><tbody>`
+      +OR.rows.map(p=>`<tr class="drill" data-pown="${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div><div class="dep">${_esc(p.pos)}</div></td><td class="num r">${p.open}</td><td class="num r" style="color:var(--ok2)">${p.real}</td><td class="num r" style="color:var(--nr)">${p.late}</td><td class="num r" style="color:var(--a)">${p.stale}</td></tr>`).join('')
       +`</tbody></table><div class="note" style="margin-top:8px">Из ${OR.n} бесхозных сделок за действующим КАМом или продукт-оунером закреплено ${RC.orphanCovered||0} — по ним есть кому продолжить; остальные нужно переназначить.</div>`:'')
     +`</section>`;
   h+=`<div id="${elId}-dirs"></div>`;
-  h+=`<footer>${o.title} · Bitrix24, состав из user.get (ACTIVE), сделки crm.deal.list, заказы СП-172 · ${P.label}. Просрочка — дедлайн клиенту на заказе поставщику (поле сделки CLOSEDATE в портале не план: у всех открытых сделок она в прошлом). Застой — по дате смены стадии (MOVED_TIME). Суммы к базовой € по курсам Bitrix.</footer>`;
+  h+=`<footer>${o.title} · Bitrix24, состав из user.get (ACTIVE), сделки crm.deal.list, заказы СП-172 · ${P.label}. Просрочка — дедлайн клиенту на заказе поставщику (поле сделки CLOSEDATE в портале не план: у всех открытых сделок она в прошлом). Застой — по дате смены стадии (MOVED_TIME). Деньги — в подменю «Доход», только по сделкам, сверенным файлом экономики.</footer>`;
   el.innerHTML=h;
   if(KQ) _kqWire(el,KQ,kqId);
   // --- тело таблицы людей + сортировка
-  const SORT={load:p=>-p.loadRaw,open:p=>-p.open,real:p=>-p.realRaw,late:p=>-p.late,flaws:p=>-p.flaws};
+  const totOpen=R.people.reduce((a,p)=>a+(p.open||0),0)||1;
+  const SORT={open:p=>-p.open,real:p=>-p.real,late:p=>-p.late,flaws:p=>-p.flaws};
   const body=el.querySelector('#pBody'+role);
   const draw=key=>{
     const rows=R.people.slice().sort((a,b)=>SORT[key](a)-SORT[key](b));
     body.innerHTML=rows.map(p=>`<tr class="drill" data-puid="${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}${p.active?'':' <span class="pill" style="color:var(--nr)">уволен</span>'}${p.inSrc?` <span class="pill drill" data-psrc="${_esc(p.uid)}" title="Сделки пресейла этого человека, где мяч сейчас у сорсинга">в пресейле у сорсинга ${p.inSrc}</span>`:''}</div><div class="dep">${_esc(p.pos)} · ${_esc(p.dept)} <span class="dimv">роль по: ${_esc(p.why)}${p.boss&&p.boss!=='—'?' · руководитель: '+_esc(p.boss):''}</span></div></td>`
-      +`<td class="num r">${p.presale}</td><td class="num r">${p.presaleSum}</td>`
-      +`<td class="num r" style="color:var(--ok2)">${p.real}</td><td class="num r">${p.realSum}</td>`
-      +`<td class="num r" style="color:${p.marginRaw<0?'var(--nr)':'var(--ok)'}">${p.margin}${p.marginPct==null?'':` <small class="dimv">${p.marginPct}%</small>`}</td>`
+      +`<td class="num r">${p.open}</td><td class="num r">${p.presale}</td>`
+      +`<td class="num r" style="color:var(--ok2)">${p.real}</td>`
       +`<td class="num r">${_pflag(p.late,'nr')}</td><td class="num r">${_pflag(p.stale,'a')}</td><td class="num r">${_pflag(p.flaws,'a')}</td>`
-      +`<td class="num r">${_pshare(p.loadRaw,totLoad)}%</td></tr>`).join('')||'<tr><td colspan="10" class="dimv">нет людей с сделками в этой роли</td></tr>';
+      +`<td class="num r">${_pshare(p.open||0,totOpen)}%</td></tr>`).join('')||'<tr><td colspan="8" class="dimv">нет людей с сделками в этой роли</td></tr>';
   };
-  draw('load');
+  draw('open');
   el.querySelectorAll('#pSort'+role+' .stchip').forEach(c=>c.addEventListener('click',()=>{
     el.querySelectorAll('#pSort'+role+' .stchip').forEach(x=>x.classList.toggle('on',x===c));
     draw(c.dataset.sort);
@@ -2921,11 +2978,13 @@ window.__RENDER_OK__=1;
     }
     // то же у «Key-аккаунтов и продуктов»: адрес #reps/<раздел> живёт, пока открыта вкладка
     if(t!=='reps'&&/^#reps/.test(h)){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
-    else if(t==='reps'&&!/^#reps/.test(h)){
+    try{ if(window.ensureTab) window.ensureTab(t); }catch(e){ console.error(e); }
+    // раздел вкладки известен только после её ленивого рендера — поэтому адрес ставится после
+    // ensureTab: и при первом входе на вкладку обновление страницы вернёт в тот же раздел
+    if(t==='reps'&&!/^#reps/.test(location.hash||'')){
       const re=document.getElementById('tab-reps'), sub=re&&re.dataset.repsub;
       if(sub){ try{ history.replaceState(null,'','#reps/'+encodeURIComponent(sub)); }catch(e){} }
     }
-    try{ if(window.ensureTab) window.ensureTab(t); }catch(e){ console.error(e); }
     ['sourcing','company','reps','eng','contracts','suppliers','cohorts','advisor']
       .forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
     window.scrollTo(0,0);

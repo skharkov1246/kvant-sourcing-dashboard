@@ -29,7 +29,44 @@ def _json_for_script(obj) -> str:
     # безопасно вставлять в <script>: нейтрализуем закрывающий тег.
     # separators без пробелов: json.dumps по умолчанию ставит «, » и «: », а на странице
     # в 10 МБ это около мегабайта пробелов — десятая часть веса, отданная ни за что.
-    return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    # U+2028 и U+2029 — экранируем: регулярка воркера, вырезающая закрытые массивы, читает
+    # их как конец строки, и название сделки с таким знаком обрывало бы строку массива —
+    # а с ней и весь скрипт данных страницы
+    return (json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+            .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029"))
+
+
+# Вкладка «Key-аккаунты и продукты»: деньги — только у сделок, сверенных файлом экономики
+# (решение владельца 25.10.2026, DECISIONS: «Деньги на вкладке … — только у сделок,
+# сверенных файлом экономики; остальные — счётом, причиной и действием»), и только
+# закрытым массивом «Дохода». Массивы ролей, направлений и личных дашбордов (PEOPLE, KAM,
+# PRODUCT, REPS) считаются по «Сумме» Битрикса — поэтому в страницу они идут без денег:
+# без сумм, подписей сумм, маржи и её доли. Расчёт (people.py, kam.py, reps.py) не
+# меняется: те же числа читают живая сверка и премии. Список ключей — по модулям этих
+# массивов; строка с «€» вне текстовых полей (название, имя, стадия) — тоже деньги.
+TAB_MONEY_KEYS = frozenset({
+    "raw", "buyRaw", "bigRaw", "cleanRaw", "marginRaw", "presaleRaw", "realRaw", "salesRaw", "salesBRaw",
+    "openSumRaw", "overdueRaw", "loadRaw", "loadClean", "loadCleanLbl", "money", "moneyLbl", "amt", "sum",
+    "buy", "margin", "marginPct", "sales", "salesB", "pipeline", "wonSum", "realSum", "realSumB", "presaleSum",
+    "lateSum", "bigSum", "bigShare", "cleanSum", "perPersonSum", "overdueSum", "orphanSum", "openSum",
+    "noneSum", "lostSum", "medAmt", "bigCut", "avgCheck", "byRevenue",
+})
+TAB_TEXT_KEYS = frozenset({"t", "title", "name", "label", "lbl", "customer", "pos", "dept", "group", "grp",
+                           "cat", "stage", "what", "act", "why", "how", "own", "kam", "boss", "comment"})
+
+
+def _no_money(obj, key: str = ""):
+    """Копия массива вкладки без денег (TAB_MONEY_KEYS и строки с «€» вне TAB_TEXT_KEYS)."""
+    if isinstance(obj, dict):
+        out = {}
+        for k, v in obj.items():
+            if k in TAB_MONEY_KEYS or (isinstance(v, str) and "€" in v and k not in TAB_TEXT_KEYS):
+                continue
+            out[k] = _no_money(v, k)
+        return out
+    if isinstance(obj, list):
+        return [_no_money(v, key) for v in obj]
+    return obj
 
 
 # Самые тяжёлые массивы страницы — списки одинаковых записей. Замер живой страницы
@@ -147,12 +184,13 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
         "__DATA_JSON__": _json_for_script(_pack_metrics(metrics)),
         "__INSIGHTS_JSON__": _json_for_script(insights),
         "__COMPANY_JSON__": _json_for_script(_pack_company(company)) if company else "null",
-        "__KAM_JSON__": _json_for_script(kam) if kam else "null",
-        "__PEOPLE_JSON__": _json_for_script(people) if people else "null",
+        # массивы вкладки «Key-аккаунты и продукты» — без денег (TAB_MONEY_KEYS)
+        "__KAM_JSON__": _json_for_script(_no_money(kam)) if kam else "null",
+        "__PEOPLE_JSON__": _json_for_script(_no_money(people)) if people else "null",
         "__ENG_JSON__": _json_for_script(eng) if eng else "null",
-        "__PRODUCT_JSON__": _json_for_script(prod) if prod else "null",
+        "__PRODUCT_JSON__": _json_for_script(_no_money(prod)) if prod else "null",
         "__CONTRACTS_JSON__": _json_for_script(contracts) if contracts else "null",
-        "__REPS_JSON__": _json_for_script(reps) if reps else "null",
+        "__REPS_JSON__": _json_for_script(_no_money(reps)) if reps else "null",
         "__ADVISOR_JSON__": _json_for_script(advisor) if advisor else "null",
         # закрытая часть «Реализации» (чаты и договоры по сделкам, dealctx.py): отдельный
         # массив — воркер вырезает его всем, у кого нет права «договоры и деньги»

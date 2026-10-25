@@ -212,6 +212,16 @@ test("владелец меняет роль, точечные права и р�
   await post({ op: "role_rights", role: "guest", sites: ["gpu"], tabs: ["eng"] });
   assert.deepEqual((await loadAcl(env)).roles.guest.tabs, ["eng"]);
 
+  // «Деньги КАМов» роли — только руководителю (до фильтра «только своё», этап 2): у роли
+  // «КАМ» право показало бы каждому КАМу чужие деньги
+  const kamBefore = (await loadAcl(env)).roles.kam.rights;
+  const bad = await post({ op: "role_rights", role: "kam", sites: [], tabs: ["reps"], rights: ["kam_money"] });
+  assert.equal(bad.status, 400);
+  assert.equal((await bad.json()).error, "kam_money_role");
+  assert.deepEqual((await loadAcl(env)).roles.kam.rights, kamBefore, "отказ не должен ничего записать");
+  assert.equal((await (await post({ op: "role_rights", role: "head", sites: [], tabs: ["reps"], rights: ["kam_money"] })).json()).ok, true);
+  assert.deepEqual((await loadAcl(env)).roles.head.rights, ["kam_money"]);
+
   await post({ op: "default_role", role: "guest" });
   assert.equal((await loadAcl(env)).defaultRole, "guest");
 

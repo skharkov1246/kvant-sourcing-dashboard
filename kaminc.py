@@ -11,8 +11,11 @@
     saleSrc == "file" (класс A). Остальные — класс C: число, причина, хозяин, действие,
     без евро. saleSrc нет (до «файла экономики первым» в contracts.compute) — "bitrix";
   • «Получено» (K1) — стадия «Оплата получена | Закрытие сделки» (contracts.PAID_RX,
-    paidStage); дата — день сборки минус дни в стадии; нет платёжки клиента во всех
-    непроигранных заказах — «не подтверждено платёжкой»;
+    paidStage); дата — день сборки минус дни в стадии; нарастающим за квартал: закрытая
+    потом сделка из K1 не уходит (дата — вход в «Оплата получена» по пути стадий); нет
+    платёжки клиента во всех непроигранных заказах — «не подтверждено платёжкой».
+    Платёжка во всех заказах без перевода стадии — «оплачено по платёжке» (paidFile): ни в
+    K1, ни в K2, пункт «перевести стадию»;
   • сумма в денежной плитке — только при доле класса A не ниже COVER_MIN (70 %) сделок
     блока, иначе «в цифрах n из N»; по сделке значение класса A показывается всегда;
   • все деньги — отдельным массивом (compute → money), его воркер оставляет только праву
@@ -39,10 +42,12 @@ KPI (дизайн «Доход», 25.10.2026): K1 получено · K2 к по
 стадии (тихие потери — вне пайплайна) · K6 в цифрах · K7 моя часть по положению
 (только в закрытом массиве).
 
-ДВОЙНАЯ ПРОВЕРКА (правило 26.09.2026). Σ R по сделкам = Σ по людям через доли пула
-(вместе с «не закреплено») с точностью до €1; Σ по строкам каждого разреза (с «без
-КАМа», «не закреплено», «линия не указана») = итог — по числу сделок и по деньгам.
-Любое расхождение — деньги в этой сборке не публикуются (money = None).
+ДВОЙНАЯ ПРОВЕРКА (правило 26.09.2026) — разными путями: Σ R по сделкам = Σ по людям
+через доли пула (вместе с «не закреплено») с точностью до €1; Σ частей K7 = Σ пулов;
+итоги плиток = Σ опубликованных значений сделок по корзине; счёт плиток = число сделок
+списка; Σ по строкам каждого разреза (с «без КАМа», «не закреплено», «линия не указана»)
+= итог — по числу сделок и по деньгам. Любое расхождение — деньги в этой сборке не
+публикуются (money = None). K1 по стадии против K1 по платёжкам — пометка (poLow).
 """
 from __future__ import annotations
 
@@ -50,6 +55,7 @@ import datetime as dt
 import re
 from collections import Counter, defaultdict
 
+import contracts as contracts_mod
 import history
 import kam as kam_mod
 import kamqueue
@@ -63,7 +69,9 @@ QUIET_DAYS = history.STUCK_DAYS   # «тихая потеря»: больше 12
 ACTIONS_MAX = 15          # пунктов «что открыть или сдвинуть» на человека
 LADDER_BACK, LADDER_FWD = 3, 12   # лестница по месяцам: 3 назад (получено), 12 вперёд (к получению)
 HOLDINGS_TOP = 15         # холдингов в разрезе; остальные — «прочие клиенты»
-TOL_EUR = 1.0             # допуск двойной проверки денег
+TOL_EUR = 1.0             # допуск двойной проверки денег (на сделку: суммы — из округлённых до €1)
+PO_CONFIRM_MIN = 0.50     # K1 по стадии против K1 по платёжкам: ниже этой доли — пометка (не гейт: файл
+                          # платёжки в заказе заполняют не всегда, гейт снимал бы деньги каждой сборки)
 
 KAM_NONE = kamqueue.KAM_NONE
 GONE = "не закреплено (уволен)"
@@ -209,13 +217,24 @@ def trust(row: dict, calib: dict | None) -> tuple[str, float | None, float | Non
     return "A", sale, premia.result_of(sale, pz, pay, float(calib.get("plug") or 0)), round(sale / pz, 3), ""
 
 
+def paid_entry(row: dict) -> dt.date | None:
+    """Последний вход сделки в «Оплата получена | Закрытие сделки» по пути стадий
+    (contracts.rows → timeline). Имя стадии — по contracts.PAID_RX, той же регулярке, что
+    ставит paidStage (правило 14). None — в стадии сделка не была."""
+    at = None
+    for t in row.get("timeline") or []:
+        if contracts_mod.PAID_RX.search(str(t.get("name") or "")):
+            at = _date(t.get("at")) or at
+    return at
+
+
 def _blank() -> dict:
     """Счёт строки разреза (открытая часть). xA — сделок класса A, xR — с известным R:
     по ним K6 решает, показывать ли сумму плитки (COVER_MIN)."""
-    return {"k1": 0, "k1A": 0, "k1R": 0, "k1po": 0, "k1old": 0, "k1nd": 0,
+    return {"k1": 0, "k1A": 0, "k1R": 0, "k1po": 0, "k1cl": 0, "k1old": 0, "k1nd": 0, "k1pf": 0,
             "due": 0, "dueA": 0, "dueR": 0,
             "dueB": {"overdue": 0, "q0": 0, "q1": 0, "later": 0, "none": 0},
-            "k3c": 0, "k3cR": 0, "k3r": 0, "k3rR": 0, "k4": 0, "k4A": 0,
+            "k3c": 0, "k3cA": 0, "k3cR": 0, "k3r": 0, "k3rA": 0, "k3rR": 0, "k4": 0, "k4A": 0,
             "pipe": 0, "pipeC": {k: 0 for k, _ in STAGE_CLASSES}, "quiet": 0,
             "n": 0, "nA": 0, "nR": 0}
 
@@ -288,21 +307,32 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
         eta = _date(pi.get("eta"))
         won = _date(r.get("wonAt"))
         sd = r.get("stageDays")
+        po_ok = bool(pi.get("orders")) and pi.get("po") == pi.get("orders")
+        entry = today - dt.timedelta(days=round(sd)) if isinstance(sd, (int, float)) else None
+        closed_q = False
         if r.get("paidStage"):
-            paid_at = today - dt.timedelta(days=round(sd)) if isinstance(sd, (int, float)) else None
+            paid_at = entry
             b = "paidQ" if paid_at and paid_at >= q0s else ("paidOld" if paid_at else "paidNoDate")
-            po_ok = bool(pi.get("orders")) and pi.get("po") == pi.get("orders")
         elif r.get("closed"):
-            paid_at, po_ok = None, False
-            b = "closed"
+            # закрыта успехом: K1 — нарастающим за квартал (решение 25.10, п. 3), поэтому
+            # сделка, вошедшая в «Оплата получена» в квартале и потом закрытая, из K1 не
+            # уходит. Дата — вход в «Оплата получена» по пути стадий, иначе вход в финальную
+            paid_at = paid_entry(r) or entry
+            closed_q = bool(paid_at and paid_at >= q0s)
+            b = "paidQ" if closed_q else "closed"
+        elif pi.get("src") == "po" or (pi.get("src") == "noLive" and po_ok):
+            # платёжка клиента во всех заказах, стадия не переведена: деньги, скорее всего,
+            # пришли — ни в K1 (K1 — по стадии), ни в K2 (не «к получению»); пункт — перевести
+            paid_at = None
+            b = "paidFile"
         else:
-            paid_at, po_ok = None, False
+            paid_at = None
             b = "due"
         win_q = bool(won and q0s <= won <= today)
         if b == "closed" and not win_q:
             continue                         # закрытая успехом давно — не доход периода
         cls, sale, res, coef, why = trust(r, calib)
-        if b != "closed":
+        if b in ("paidQ", "due"):           # те же сделки, что в n и nA строки доверия
             reasons[why or "ok"] += 1
         due_b = ""
         if b == "due":
@@ -315,14 +345,14 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
                "st": str(r.get("stageName") or "")[:40], "sd": round(sd) if isinstance(sd, (int, float)) else None,
                "won": _fmt(won), "ws": r.get("wonSrc") or "", "wq": win_q,
                "eta": _fmt(eta) if b == "due" else "", "es": pi.get("src") or "", "db": due_b,
-               "paid": _fmt(paid_at), "po1": po_ok,
+               "paid": _fmt(paid_at), "po1": po_ok, "cl": closed_q,
                "risk": sorted(c for c in cs if c in DELAY_CODES + RISK_CODES) if b == "due" else [],
                "cls": cls, "why": why, "rk": res is not None, "seg": bool(r.get("seg")),
                "_r": r, "_pi": pi}
         deals.append(rec)
         if cls == "A":
-            money_deals[did] = {"s": round(sale), "r": round(res) if res is not None else None,
-                                "c": coef}
+            # коэффициент к ПЗ в массив не идёт: с продажей он дал бы закупку — нужен он только K7
+            money_deals[did] = {"s": round(sale), "r": round(res) if res is not None else None}
             rec["_res"], rec["_sale"], rec["_coef"] = res, sale, coef
 
     # 2. невыигранные: открытые сделки вне реализации (people.deals) и пресейл у сорсинга
@@ -365,7 +395,8 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
     agg: dict[str, dict[str, dict]] = {c: defaultdict(_blank) for c in cut_keys}
     magg: dict[str, dict[str, dict]] = {c: defaultdict(_mblank) for c in cut_keys}
     tot, mtot = _blank(), _mblank()
-    ladder: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0.0, 0, 0])   # [получено, к получению, R…, nR…]
+    # [получено, к получению, R получено, R к получению, nR…, nA…] — по nA ячейка решает о сумме (COVER_MIN)
+    ladder: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0.0, 0, 0, 0, 0])
     m_from, m_to = _month(today, -LADDER_BACK), _month(today, LADDER_FWD)
 
     def put(a: dict, m: dict, d: dict) -> None:
@@ -378,6 +409,7 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
                 a["k1A"] += isA
                 a["k1R"] += hasR
                 a["k1po"] += d["po1"]
+                a["k1cl"] += d["cl"]
                 a["n"] += 1
                 a["nA"] += isA
                 a["nR"] += hasR
@@ -400,8 +432,10 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
             dl = any(c in DELAY_CODES for c in d["risk"])
             rk = any(c in RISK_CODES for c in d["risk"])
             a["k3c"] += dl
+            a["k3cA"] += dl and isA
             a["k3cR"] += dl and hasR
             a["k3r"] += rk
+            a["k3rA"] += rk and isA
             a["k3rR"] += rk and hasR
             if sale is not None:
                 m["dueS"] += sale
@@ -410,6 +444,8 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
                 m["dueBR"][d["db"]] += res
                 m["k3cR"] += res if dl else 0.0
                 m["k3rR"] += res if rk else 0.0
+        elif b == "paidFile":
+            a["k1pf"] += 1                   # только счёт: ни в K1, ни в K2
         elif b == "pipe":
             a["pipe"] += 1
             a["pipeC"][d["cs"]] += 1
@@ -432,6 +468,7 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
             if m_from <= pm < _month(today, 1):
                 L = ladder[pm.strftime("%m.%Y")]
                 L[0] += 1
+                L[6] += d["cls"] == "A"
                 if res is not None:
                     L[2] += res
                     L[4] += 1
@@ -442,11 +479,13 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
                 key = "later"
             L = ladder[key]
             L[1] += 1
+            L[7] += d["cls"] == "A"
             if res is not None:
                 L[3] += res
                 L[5] += 1
     months = [_month(today, i) for i in range(-LADDER_BACK, LADDER_FWD)]
-    lad_keys = [m.strftime("%m.%Y") for m in months] + ["later", "overdue", "none"]
+    # «срок прошёл» и «без даты» — первыми: это то, что надо делать, и на узком экране они видны
+    lad_keys = ["overdue", "none"] + [m.strftime("%m.%Y") for m in months] + ["later"]
 
     def nm(cut: str, key: str) -> tuple[str, bool]:
         if cut in ("kam", "po"):
@@ -471,25 +510,48 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
         rows.sort(key=lambda x: (x["key"] in ("", GONE_KEY, LINE_NONE, HOLD_NONE, HOLD_OTHER),
                                  -(x["due"] + x["k1"]), -x["pipe"], x["name"]))
         cuts[c] = rows
-        mcuts[c] = {key: _round_m(m) for key, m in magg[c].items()}
+        # списком, как открытые строки: ключ строки — имя клиента или линии, а ключи словаря
+        # живая сверка печатает в «образцах» (журнал публичный)
+        mcuts[c] = [{"key": key, **_round_m(m)} for key, m in magg[c].items()]
 
-    # 4. двойная проверка: по сделкам = по людям через доли; Σ строк разреза = итог
+    # 4. двойная проверка (правило 26.09.2026) — разными путями, а не одним put():
+    #    ① Σ R по сделкам = Σ по людям через доли пула (с «не закреплено»);
+    #    ② K7: Σ частей людей = Σ пулов сделок × К;
+    #    ③ итог плиток = Σ по опубликованным значениям сделок, сгруппированным по корзине;
+    #    ④ счёт плиток = число сделок списка по корзине;
+    #    ⑤ Σ строк каждого разреза = итог — по числу и по деньгам.
+    #    K1 по стадии против K1 по платёжкам — пометка (PO_CONFIRM_MIN), не гейт.
     checks = []
     with_r = [d for d in deals if d.get("_res") is not None and d["b"] in ("paidQ", "due")]
     total_r = sum(d["_res"] for d in with_r)
-    k7: dict[str, dict] = defaultdict(lambda: {"paidQ": 0.0, "due": 0.0, "dueQ0": 0.0, "n": 0, "roles": set()})
-    by_people = 0.0
+
+    def _k7() -> dict:
+        return {"paidQ": 0.0, "due": 0.0, "dueQ0": 0.0, "ids": set(), "idsA": set(), "idsR": set(), "roles": set()}
+
+    k7: dict[str, dict] = defaultdict(_k7)
+    # знаменатель K7 у человека — все его сделки K1 и K2 по любой роли (правило 70 %, п. 7)
+    for d in deals:
+        if d["b"] not in ("paidQ", "due"):
+            continue
+        for role, uid in (("kam", d["kam"]), ("po", d["po"]), ("ex", d["ex"])):
+            x = k7["" if uid in ("", GONE_KEY) else uid]
+            x["ids"].add(d["id"])
+            x["roles"].add(role)
+            if d["cls"] == "A":
+                x["idsA"].add(d["id"])
+            if d.get("_res") is not None:
+                x["idsR"].add(d["id"])
+    by_people = pools = 0.0
     for d in with_r:
         res, coef = d["_res"], d["_coef"] or 0.0
-        neg = res <= 0
-        role_d = {"kam": "" if d["kam"] == GONE_KEY else d["kam"], "prod": "" if d["po"] == GONE_KEY else d["po"],
-                  "own": d["ex"]}
         pool = premia.pool_of(res, coef) * premia.K_DEFAULT
-        for uid, role, share in premia._parts(role_d, neg):
+        pools += pool
+        # доли — по настоящим держателям ролей: уволенный КАМ — всё ещё КАМ сделки, и правило
+        # «PO при КАМе — эксперт 20 %» не переключается на «PO завёл сделку 80 %»; его доля —
+        # «не закреплено» уже после раскладки
+        for uid, _role, share in premia._parts({"kam": d["kam"], "prod": d["po"], "own": d["ex"]}, res <= 0):
             by_people += res * share
-            x = k7[uid]
-            x["n"] += 1
-            x["roles"].add(role)
+            x = k7["" if uid in ("", GONE_KEY) else uid]
             if d["b"] == "paidQ":
                 x["paidQ"] += pool * share
             else:
@@ -498,12 +560,24 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
                     x["dueQ0"] += pool * share
     checks.append({"name": "Σ R по сделкам = Σ по людям через доли", "ok": abs(total_r - by_people) <= TOL_EUR,
                    "n": len(with_r)})
+    k7_sum = sum(x["paidQ"] + x["due"] for x in k7.values())
+    checks.append({"name": "K7: Σ частей людей = Σ пулов сделок", "ok": abs(k7_sum - pools) <= TOL_EUR * max(1, len(with_r)),
+                   "n": len(with_r)})
+    for f, bk in (("k1R", "paidQ"), ("dueR", "due")):
+        per = [round(d["_res"]) for d in with_r if d["b"] == bk]
+        checks.append({"name": f"итог «{f}» = Σ по сделкам корзины", "n": len(per),
+                       "ok": abs(sum(per) - round(mtot[f])) <= TOL_EUR * max(1, len(per))})
+    by_b = Counter(d["b"] for d in deals)
+    n_ok = (by_b["paidQ"], by_b["due"], by_b["pipe"], by_b["quiet"], by_b["paidFile"]) == (
+        tot["k1"], tot["due"], tot["pipe"], tot["quiet"], tot["k1pf"])
+    checks.append({"name": "счёт плиток = число сделок по корзинам", "ok": n_ok, "n": len(deals)})
     for c in cut_keys:
-        n_ok = all(sum(x[f] for x in cuts[c]) == tot[f] for f in ("k1", "due", "k4", "pipe", "quiet", "n"))
-        m_ok = all(abs(sum(m[f] for m in mcuts[c].values()) - round(mtot[f])) <= TOL_EUR * max(1, len(mcuts[c]))
+        n_ok = all(sum(x[f] for x in cuts[c]) == tot[f] for f in ("k1", "due", "k4", "pipe", "quiet", "n", "k1pf"))
+        m_ok = all(abs(sum(m[f] for m in mcuts[c]) - round(mtot[f])) <= TOL_EUR * max(1, len(mcuts[c]))
                    for f in ("k1R", "dueR", "k4S"))
         checks.append({"name": f"Σ строк разреза «{c}» = итог", "ok": n_ok and m_ok, "n": len(cuts[c])})
     money_ok = all(x["ok"] for x in checks)
+    po_low = bool(tot["k1"]) and tot["k1po"] / tot["k1"] < PO_CONFIRM_MIN
 
     # 5. что открыть или сдвинуть: очередь КАМа + пробелы денег; до ACTIONS_MAX на человека
     acts: dict[str, list] = defaultdict(list)
@@ -532,8 +606,6 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
                 todo.append(("noBuy", kam_key, owner))
             if pi.get("delivered") and pi.get("src") != "plan":
                 todo.append(("noPayPlan", kam_key, owner))
-            if pi.get("src") == "po":
-                todo.append(("moveStage", kam_key, r.get("manager") or ""))
             if d["kam"] == GONE_KEY:
                 todo.append(("goneKam", "", "руководитель КАМ"))
             if not d["lnS"]:
@@ -543,8 +615,11 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
             for code, key, who in todo:
                 gap(code, d, key, who)
                 gaps[code] += 1
-        elif d["b"] in ("paidQ", "paidOld") and not d["po1"]:
-            gap("paidNoPo", d, kam_key, owner)
+        elif d["b"] == "paidFile":
+            gap("moveStage", d, kam_key, r.get("manager") or "")
+            gaps["moveStage"] += 1
+        elif d["b"] in ("paidQ", "paidOld") and not d["po1"] and not d["cl"]:
+            gap("paidNoPo", d, kam_key, owner)      # закрытая сделка — не пункт: работа по ней кончена
             gaps["paidNoPo"] += 1
     actions = {}
     for key, items in acts.items():
@@ -563,8 +638,10 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
         "tot": tot,
         "trust": {"n": n_all, "nA": tot["nA"], "nR": tot["nR"], "pct": cover(n_all, tot["nA"]),
                   "reasons": dict(reasons), "fxAsOf": (contracts.get("fx") or {}).get("asOf") or "",
+                  "poLow": po_low, "poMin": round(PO_CONFIRM_MIN * 100),
                   "calibN": int((calib or {}).get("calibN") or 0), "calibOk": int((calib or {}).get("calibN") or 0) >= CALIB_MIN},
-        "ladder": [{"m": k, "paid": ladder[k][0], "due": ladder[k][1]} for k in lad_keys],
+        "ladder": [{"m": k, "paid": ladder[k][0], "due": ladder[k][1], "paidA": ladder[k][6], "dueA": ladder[k][7]}
+                   for k in lad_keys],
         "cuts": cuts,
         "deals": deals,
         "actions": actions,
@@ -591,7 +668,8 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
                     "dueR": round(ladder[k][3]), "dueN": ladder[k][5]} for k in lad_keys],
         # K7 — только своё, после серверного фильтра (этап 2); до него — владельцу
         "k7": {u: {"paidQ": round(x["paidQ"]), "due": round(x["due"]), "dueQ0": round(x["dueQ0"]),
-                   "n": x["n"], "roles": sorted(x["roles"])} for u, x in k7.items()},
+                   "n": len(x["ids"]), "nA": len(x["idsA"]), "nR": len(x["idsR"]), "roles": sorted(x["roles"])}
+               for u, x in k7.items()},
         "k": premia.K_DEFAULT,
     }
     return {"head": head, "money": money}
@@ -600,3 +678,19 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
 def _round_m(m: dict) -> dict:
     return {k: ({kk: round(vv) for kk, vv in v.items()} if isinstance(v, dict) else
                 (round(v) if isinstance(v, float) else v)) for k, v in m.items()}
+
+
+def strip_inputs(contracts: dict | None) -> None:
+    """Убрать из «Реализации» то, что нужно только расчёту дохода: раздел pay (ожидаемая
+    дата оплаты клиента) и отсрочку оплаты клиента payDays у строк. Массив «Реализации»
+    открыт всем с вкладками «Реализация» и «Поставщики», а условие оплаты — сведения под
+    именным правом (решение Р-4, 19.10.2026). Вызывается в main.py после compute()."""
+    if not isinstance(contracts, dict):
+        return
+    for lf in (contracts.get("life"), (contracts.get("sep") or {}).get("life")):
+        if isinstance(lf, dict):
+            lf.pop("pay", None)
+    for rows in (contracts.get("rows"), (contracts.get("sep") or {}).get("rows")):
+        for r in rows if isinstance(rows, list) else []:
+            if isinstance(r, dict):
+                r.pop("payDays", None)

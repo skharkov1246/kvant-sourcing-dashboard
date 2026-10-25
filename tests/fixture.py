@@ -730,7 +730,8 @@ def build_kaminc(*, money: bool = True) -> dict:
     «Файл экономики первым» (contracts.compute, параллельная правка) стаб «Реализации» ещё не
     пишет: здесь saleSrc и buySrc проставлены явно — у трёх сделок из четырёх «Сумма» сверена
     файлом, закупка из файла (70 % продажи). Четыре сделки — в стадии «Оплата получена»: две
-    вошли в неё в этом квартале, две — раньше; у двух дата выигрыша в квартале. Product leader
+    вошли в неё в этом квартале, две — раньше; ещё одна закрыта успехом в квартале, у одной
+    платёжка клиента во всех заказах без перевода стадии; у двух дата выигрыша в квартале. Product leader
     и «Категория оборудования» сделок реализации — придуманные строки «Коммерсантов» (их
     корпус другой, номера сделок не совпадают). money=False — без калибровки поправки: R нет."""
     import kaminc
@@ -745,6 +746,14 @@ def build_kaminc(*, money: bool = True) -> dict:
                      stageDays=8 if i < 10 else 140)
         if i in (2, 7):
             r["wonAt"] = (CT_TODAY - dt.timedelta(days=9)).strftime("%d.%m.%Y")
+        if i == 1:      # закрыта успехом в квартале: в «Оплата получена» вошла 12 дн. назад — K1 нарастающим
+            paid_at = (CT_TODAY - dt.timedelta(days=12)).isoformat()
+            r.update(closed=True, stageName="Сделка успешна", stageDays=3,
+                     timeline=list(r.get("timeline") or []) + [{"name": "Оплата получена | Закрытие сделки",
+                                                                 "at": paid_at + " 10:00"}])
+        if i == 6:      # платёжка клиента во всех заказах, стадия не переведена
+            ct["life"].setdefault("pay", {})[str(r["deal"])] = {"eta": "", "src": "po", "orders": 1, "po": 1,
+                                                                "delivered": True}
     P = build_people()
     for i, r in enumerate(ct["rows"][:14]):
         P["deals"].append({"id": r["deal"], "t": r["title"], "state": "real", "kam": r.get("kamId") or "",
