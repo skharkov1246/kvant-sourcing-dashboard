@@ -38,7 +38,7 @@ import config  # noqa: E402
 import contracts as ct  # noqa: E402
 from bitrix_client import BitrixClient  # noqa: E402
 
-МАКС = int(os.environ.get("ECON_PROBE_MAX", "40"))
+МАКС = int(os.environ.get("ECON_PROBE_MAX", "10"))   # владелец 23.10: не больше 30 файлов в день
 API = "https://cloud-api.yandex.net/v1/disk/public/resources"
 ПОДПИСИ = {
     "выручка": re.compile(r"выручк|продаж|revenue|sales", re.I),
@@ -46,6 +46,31 @@ API = "https://cloud-api.yandex.net/v1/disk/public/resources"
     "маржа": re.compile(r"марж|\bМД\b|margin|прибыл", re.I),
     "итого": re.compile(r"итого|total", re.I),
 }
+СЛОВАРЬ = {k: re.compile(v, re.I) for k, v in {
+    # продажа
+    "стоимость для заказчика": r"стоимост\w* для заказчик|цена для заказчик|для клиента",
+    "цена продажи": r"цен\w* продаж|сумм\w* продаж|selling|sale price|sales price",
+    "контракт/договор": r"сумм\w* (контракт|договор)|стоимост\w* (контракт|договор)|цен\w* (контракт|договор)|contract",
+    "ТКП/КП": r"\bТКП\b|\bКП\b|коммерческ\w* предлож",
+    "с НДС / без НДС": r"с ндс|без ндс|ндс",
+    "выручка/доход": r"выручк|доход|revenue",
+    # закупка
+    "закупка/себестоимость": r"закуп|себестоим",
+    "поставщик": r"поставщик|supplier|vendor",
+    "cost/purchase": r"\bcost\b|purchase",
+    "EXW/FCA/DAP": r"\b(EXW|FCA|DAP|DDP|CIF|CPT)\b",
+    # маржа
+    "маржа/МД": r"марж|\bМД\b|margin",
+    "прибыль": r"прибыл|profit",
+    "наценка": r"наценк|markup|mark-up",
+    "рентабельность": r"рентаб",
+    # прочее
+    "логистика": r"логист|доставк|freight|транспорт",
+    "таможня/пошлина": r"тамож|пошлин|customs|duty",
+    "курс валюты": r"курс|exchange rate",
+    "итого": r"итого|total",
+    "итерация/версия": r"итерац|верси|финал|final",
+}.items()}
 ИТЕРАЦИЯ = re.compile(r"\bv\d+\b|итерац|финал|final|верс", re.I)
 
 
@@ -122,7 +147,119 @@ def ресурс(public_url: str) -> dict | None:
     return None
 
 
+def общий_диск(путь: str) -> tuple[str, str] | None:
+    """Путь файла на общем диске Яндекс 360 → (метка, путь внутри диска) или None.
+    Принимает «vd/<метка>/disk/<путь>», «vd/<метка>/<путь>» и «vd:<метка>:disk:/<путь>»."""
+    м = re.match(r"^vd[:/]([A-Za-z0-9_-]+)[:/](?:disk:?/)?(.*)$", путь.strip("/"))
+    return (м.group(1), м.group(2)) if м else None
+
+
+def таблицы_диска(ключ: str, макс: int = 20000) -> dict[str, list[dict]]:
+    """Все таблицы на Диске ключа (включая принятые общие папки): имя файла → ресурсы.
+    Файл из ссылки сотрудника лежит у получателя по другому пути — ищем по имени."""
+    по_имени: dict[str, list[dict]] = collections.defaultdict(list)
+    смещение = 0
+    while смещение < макс:
+        raw = получить("https://cloud-api.yandex.net/v1/disk/resources/files?media_type=spreadsheet"
+                       f"&limit=1000&offset={смещение}&fields=items.name,items.path,items.file,items.modified",
+                       ключ=ключ)
+        if not raw:
+            break
+        items = json.loads(raw).get("items") or []
+        for x in items:
+            по_имени[str(x.get("name", "")).lower()].append(x)
+        if len(items) < 1000:
+            break
+        смещение += 1000
+        time.sleep(0.5)
+    return по_имени
+
+
+ОБЩЕЕ = re.compile(
+    r"цен|стоим|итог|сумм|курс|ндс|кол-?в|\bед\.?|наимен|поставщ|логист|достав|тамож|пошлин|марж|наценк|прибыл|"
+    r"коэф|%|валют|евро|\bруб(\b|л)|\b(usd|eur|cny|rub|aed|exw|fca|dap|ddp|cip|cpt)\b|ткп|\bкп\b|срок|\bвес|объ[её]м|расход|"
+    r"комисс|банк|страх|итерац|верс|дата|№|номер|артикул|\bкод|позиц|бренд|производ|склад|упаков|сертиф|себест|"
+    r"закуп|продаж|оплат|аванс|отсроч|ставк|клиент|заказчик|total|price|cost|qty|amount|margin|rate|incoterms|базис",
+    re.I)
+# личное в подписях шаблона (блок подписи, реквизиты): почта, телефон, ссылка, ФИО — не печатать
+ЛИЧНОЕ = re.compile(r"@|https?://|www\.|\+?\d[\d\s()-]{6,}|[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+(вич|вна|ич|на)\b")
+СКЕЛЕТ = {"файлов": 0, "листов": collections.Counter(), "активный": collections.Counter(), "скрытых": collections.Counter(),
+          "имена": collections.Counter(), "подписи": collections.Counter(), "формулы": collections.Counter()}
+
+
+def _норм(t: str) -> str:
+    t = re.sub(r"\s+", " ", str(t)).strip()
+    return re.sub(r"\d+([.,]\d+)?", "N", t)[:70]
+
+
+def скелет(b: bytes) -> None:
+    """Подписи и формулы шаблона по листам — для понимания логики файла. Каждый файл даёт
+    множество (лист, ячейка, текст); печатается только то, что повторяется в 5+ файлах и
+    похоже на заголовок шаблона (ОБЩЕЕ). Числа в формулах — «N», имена листов — «Лk»."""
+    import openpyxl
+    try:
+        wf = openpyxl.load_workbook(io.BytesIO(b), data_only=False)
+    except Exception:
+        return
+    СКЕЛЕТ["файлов"] += 1
+    n = len(wf.sheetnames)
+    СКЕЛЕТ["листов"][n] += 1
+    акт = wf.sheetnames.index(wf.active.title) + 1 if wf.active is not None else 0
+    СКЕЛЕТ["активный"]["последний" if акт == n else f"{акт} из {n}"] += 1
+    СКЕЛЕТ["скрытых"][sum(1 for ws in wf.worksheets if ws.sheet_state != "visible")] += 1
+    имя_в_номер = {nm: f"Л{i}" for i, nm in enumerate(wf.sheetnames, 1)}
+    подписи, формулы, имена = set(), set(), set()
+    for i, ws in enumerate(wf.worksheets, 1):
+        имена.add((i, _норм(ws.title) if ОБЩЕЕ.search(ws.title) else "…"))
+        for row in ws.iter_rows(max_row=300, max_col=40):
+            for c in row:
+                v = c.value
+                if isinstance(v, str) and v.startswith("="):
+                    f = v
+                    for nm, k in sorted(имя_в_номер.items(), key=lambda x: -len(x[0])):
+                        f = f.replace(f"'{nm}'!", f"{k}!").replace(f"{nm}!", f"{k}!")
+                    f = re.sub(r"'[^']*'!", "Л?!", f)
+                    # числа-константы (наценка, ставки) — «N»; номера строк в ссылках (D25, $D$25) не трогаем
+                    f = re.sub(r"(?<![A-Za-zЛ$\d.])\d+(?:\.\d+)?", "N", f)
+                    формулы.add((i, c.coordinate, f[:90]))
+                elif isinstance(v, str) and ОБЩЕЕ.search(v) and len(v.strip()) <= 70 and not ЛИЧНОЕ.search(v):
+                    подписи.add((i, c.coordinate, _норм(v)))
+    for x in подписи:
+        СКЕЛЕТ["подписи"][x] += 1
+    for x in формулы:
+        СКЕЛЕТ["формулы"][x] += 1
+    for x in имена:
+        СКЕЛЕТ["имена"][x] += 1
+
+
+def печать_скелета(порог: int = 5) -> None:
+    S = СКЕЛЕТ
+    if not S["файлов"]:
+        return
+    print(f"\nСКЕЛЕТ ШАБЛОНА по {S['файлов']} файлам (печатается то, что есть в {порог}+ файлах)")
+    print("  листов: " + " · ".join(f"{k}: {v}" for k, v in sorted(S["листов"].items())))
+    print("  активный лист при открытии: " + " · ".join(f"{k}: {v}" for k, v in S["активный"].most_common()))
+    print("  скрытых листов: " + " · ".join(f"{k}: {v}" for k, v in sorted(S["скрытых"].items())))
+    for (i, nm), v in sorted(S["имена"].items()):
+        if v >= порог:
+            print(f"  лист {i}: имя «{nm}» в {v} файлах")
+    def ключ(x):
+        (i, ref, _t), _v = x
+        m = re.match(r"([A-Z]+)(\d+)", ref)
+        return (i, int(m.group(2)) if m else 0, m.group(1) if m else ref)
+    for что in ("подписи", "формулы"):
+        rows = sorted(((k, v) for k, v in S[что].items() if v >= порог), key=ключ)
+        print(f"  {что}: {len(rows)}")
+        по_листу = collections.Counter()
+        for (i, ref, t), v in rows:
+            по_листу[i] += 1
+            if по_листу[i] <= 90:
+                print(f"    Л{i} {ref}: {t}  [{v}]")
+
+
 def разобрать_xlsx(b: bytes, сч: collections.Counter) -> None:
+    """Шаблон расчёта: какие слова словаря есть в файле и стоит ли рядом число.
+    В журнал — только слово словаря, номер листа и счёт; ни значений, ни имён листов."""
     import openpyxl
     try:
         wb = openpyxl.load_workbook(io.BytesIO(b), read_only=True, data_only=True)
@@ -131,17 +268,24 @@ def разобрать_xlsx(b: bytes, сч: collections.Counter) -> None:
         return
     сч["xlsx: открылся"] += 1
     сч[f"листов: {min(len(wb.sheetnames), 10)}{'+' if len(wb.sheetnames) >= 10 else ''}"] += 1
-    нашлось = set()
-    for ws in wb.worksheets[:6]:
-        for row in ws.iter_rows(max_row=200, max_col=12, values_only=True):
-            for v in row:
-                if isinstance(v, str):
-                    for k, rx in ПОДПИСИ.items():
-                        if rx.search(v):
-                            нашлось.add(k)
-    for k in ПОДПИСИ:
-        сч[f"подпись «{k}»: {'есть' if k in нашлось else 'нет'}"] += 1
-
+    нашлось: dict[str, set] = collections.defaultdict(set)
+    с_числом: set[str] = set()
+    for лист, ws in enumerate(wb.worksheets[:10], 1):
+        for row in ws.iter_rows(max_row=400, max_col=30, values_only=True):
+            row = list(row)
+            for i, v in enumerate(row):
+                if not isinstance(v, str):
+                    continue
+                for слово, rx in СЛОВАРЬ.items():
+                    if rx.search(v):
+                        нашлось[слово].add(лист)
+                        if any(isinstance(x, (int, float)) and not isinstance(x, bool) and abs(x) > 0
+                               for x in row[i + 1:i + 8]):
+                            с_числом.add(слово)
+    for слово in СЛОВАРЬ:
+        if слово in нашлось:
+            сч[f"слово «{слово}»: есть (листы {','.join(map(str, sorted(нашлось[слово])))})"
+               f"{' · число справа' if слово in с_числом else ''}"] += 1
 
 def main() -> int:
     client = BitrixClient(config.Settings.load().bitrix_webhook_url)
@@ -154,8 +298,30 @@ def main() -> int:
     домены = collections.Counter(urllib.parse.urlparse(str(d[ct.ECON_LINK]).strip()).netloc for d in со_ссылкой)
     print("домен ссылки: " + " · ".join(f"{k} {v}" for k, v in домены.most_common(8)))
 
+    # где лежат файлы экономики: верхние папки путей по всем ссылкам — только счёт, без имён
+    верх: collections.Counter = collections.Counter()
+    for d in (со_ссылкой if os.environ.get("ECON_PROBE_ALL") else []):
+        u = str(d[ct.ECON_LINK]).strip()
+        ц = раскрыть(u) if "clck.ru" in u else u
+        if "sba.yandex" in urllib.parse.urlparse(ц).netloc:
+            ц = (urllib.parse.parse_qs(urllib.parse.urlparse(ц).query).get("url") or [""])[0]
+        ч = [x for x in urllib.parse.urlparse(ц).path.split("/") if x]
+        if ч[:2] == ["edit", "disk"] and len(ч) > 2:
+            пп = urllib.parse.unquote(ч[2]).split("/")
+            верх["/".join(пп[1:3] if пп[:1] == ["disk"] else пп[:2])] += 1
+        else:
+            верх["(не /edit/disk)"] += 1
+        time.sleep(0.3)
+    всего = sum(верх.values())
+    доли = [n for _k, n in верх.most_common()]
+    if всего:
+        print(f"файлы экономики: ссылок {всего}; разных папок (2 уровня от корня) {len(верх)}; "
+              f"в самой частой {доли[0] if доли else 0}, в 3 частых {sum(доли[:3])}, в 10 частых {sum(доли[:10])}")
     выборка = sorted(со_ссылкой, key=lambda d: str(d.get("DATE_CREATE") or ""), reverse=True)[:МАКС]
     сч: collections.Counter = collections.Counter()
+    тк_диска = os.environ.get("YADISK_TOKEN", "").strip()
+    по_имени = таблицы_диска(тк_диска) if тк_диска else {}
+    print(f"таблиц на Диске ключа: {sum(len(v) for v in по_имени.values())}")
     for d in выборка:
         url = str(d[ct.ECON_LINK]).strip()
         цель = раскрыть(url) if "clck.ru" in url else url
@@ -188,6 +354,35 @@ def main() -> int:
             # читается ключом прогона по пути disk:/…, если ключ от того же аккаунта
             # /client/disk/<папка>/<файл> и /edit/disk/disk%2F<папка>%2F<файл>: путь от корня Диска
             путь = "/".join(urllib.parse.unquote(x) for x in части[2:])
+            # первые слова пути — только служебные (disk, vd), прочее «…»
+            сч["начало пути: " + "/".join(x if x in ("disk", "vd", "client", "edit") else "…"
+                                          for x in путь.split("/")[:2])] += 1
+            об = общий_диск(путь)
+            if об:
+                # общий диск организации: свой метод API (virtual-disks), путь vd:<метка>:disk:/…
+                if not тк_диска:
+                    сч["общий диск: ключа нет"] += 1
+                    continue
+                vd = f"vd:{об[0]}:disk:/{об[1]}"
+                raw = получить("https://cloud-api.yandex.net/v1/disk/virtual-disks/resources/download?path="
+                               + urllib.parse.quote(vd, safe=""), ключ=тк_диска)
+                time.sleep(1.0)
+                href = json.loads(raw).get("href") if raw else None
+                if not href:
+                    сч["общий диск: ссылка на скачивание не получена"] += 1
+                    continue
+                сч["общий диск: ссылка на скачивание получена"] += 1
+                if not об[1].lower().endswith((".xlsx", ".xlsm")):
+                    сч[f"общий диск: файл не xlsx ({об[1].rsplit('.', 1)[-1].lower()[:5] if '.' in об[1] else 'без расширения'})"] += 1
+                    continue
+                b = получить(href, ключ=тк_диска)
+                time.sleep(1.0)
+                if not b:
+                    сч["xlsx: не скачался"] += 1
+                    continue
+                разобрать_xlsx(b, сч)
+                скелет(b)
+                continue
             if части[0] == "edit" and путь.startswith("disk/"):
                 путь = путь[len("disk/"):]
             тк = os.environ.get("YADISK_TOKEN", "").strip()
@@ -196,10 +391,28 @@ def main() -> int:
                 continue
             raw = получить(f"https://cloud-api.yandex.net/v1/disk/resources?path={urllib.parse.quote('disk:/' + путь.lstrip('/'), safe='')}&limit=200", ключ=тк)
             time.sleep(0.5)
+            как = "полный путь" if raw else ""
+            куски = путь.strip("/").split("/")
+            for i in range(1, len(куски) - 1):
+                if raw:
+                    break
+                # общая папка у получателя лежит в корне под своим именем: хвост пути
+                raw = получить("https://cloud-api.yandex.net/v1/disk/resources?path="
+                               + urllib.parse.quote("disk:/" + "/".join(куски[i:]), safe="") + "&limit=200", ключ=тк)
+                как = "хвост пути" if raw else ""
+                time.sleep(0.3)
             if not raw:
-                сч["личный Диск: ключ не читает путь"] += 1
+                кандидаты = по_имени.get(куски[-1].lower(), [])
+                if len(кандидаты) == 1:
+                    raw, как = json.dumps(dict(кандидаты[0], type="file")).encode(), "имя файла"
+                elif кандидаты:
+                    # одноимённых несколько — берём свежий, считаем отдельно
+                    свежий = max(кандидаты, key=lambda x: x.get("modified", ""))
+                    raw, как = json.dumps(dict(свежий, type="file")).encode(), "имя файла (из нескольких)"
+            if not raw:
+                сч["личный Диск: не найден ни по пути, ни по имени"] += 1
                 continue
-            сч["личный Диск: ключ читает путь"] += 1
+            сч[f"личный Диск: найден — {как}"] += 1
             try:
                 р = json.loads(raw)
             except json.JSONDecodeError:
@@ -244,6 +457,7 @@ def main() -> int:
     print("коды ответов Диска: " + " · ".join(f"{k} {v}" for k, v in sorted(КОДЫ.items())))
     for k, v in sorted(сч.items()):
         print(f"  {k}: {v}")
+    печать_скелета()
     return 0
 
 
