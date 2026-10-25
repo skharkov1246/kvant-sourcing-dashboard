@@ -64,23 +64,66 @@ def test_поле_экономики_в_валюте_без_курса():
 def test_несоизмеримая_закупка_текстом_и_не_в_итогах():
     stub = fixture.ContractsStub()
     did = stub.deals[1]["ID"]
-    # заказы без сумм — закупка из полей экономики, вшестеро больше продажи
-    for o in stub.orders:
-        if str(o["parentId2"]) == did:
-            o["opportunity"] = 0
-    stub.deals[1][ct.BUY_ECON_RUB] = f"{float(stub.deals[1]['OPPORTUNITY']) * 6 / 0.01:.0f}|RUB"
+    # закупка по заказам вшестеро больше продажи
+    ords = [o for o in stub.orders if str(o["parentId2"]) == did]
+    for o in ords:
+        o["opportunity"] = 0
+    ords[0]["opportunity"] = float(stub.deals[1]["OPPORTUNITY"]) * 6
+    ords[0]["currencyId"] = stub.deals[1]["CURRENCY_ID"]
     data = _compute(stub)
     r = _row(data, did)
-    assert r["buySrc"] == "econ" and r["buySusp"] is True
+    assert r["buySrc"] == "orders" and r["buySusp"] is True
     assert r["buyLbl"] == "не сходится" and r["marginEur"] is None
     assert data["head"]["nBuySusp"] >= 1
     live = [x for x in data["rows"] if not x["closed"] and not x["seg"]]
-    ожидание = sum(x["buyEur"] for x in live if x["buySrc"] in ("orders", "econ") and not x["buySusp"])
+    ожидание = sum(x["buyEur"] for x in live if x["marginEur"] is not None)
     assert ct._money(ожидание) == data["head"]["buy"]
     # в пределах — число, как раньше
-    stub.deals[1][ct.BUY_ECON_RUB] = f"{float(stub.deals[1]['OPPORTUNITY']) * 0.5 / 0.01:.0f}|RUB"
+    ords[0]["opportunity"] = float(stub.deals[1]["OPPORTUNITY"]) * 0.5
     r = _row(_compute(stub), did)
     assert r["buySusp"] is False and r["buyLbl"].startswith("€") and r["marginEur"] is not None
+
+
+def test_поля_экономики_не_закупка_а_сверка():
+    """Ревизия денег 25.10.2026: «Cost (rub)» / «Offer sum» — только сверка (discrep): у
+    сделки без сумм заказов закупки нет, маржи нет, в Σ закупки она не идёт."""
+    stub = fixture.ContractsStub()
+    did = stub.deals[1]["ID"]
+    for o in stub.orders:
+        if str(o["parentId2"]) == did:
+            o["opportunity"] = 0
+    stub.deals[1][ct.BUY_ECON_RUB] = f"{float(stub.deals[1]['OPPORTUNITY']) * 0.5 / 0.01:.0f}|RUB"
+    data = _compute(stub)
+    r = _row(data, did)
+    assert r["buySrc"] == "none" and r["buyEur"] == 0 and r["marginEur"] is None
+    assert r["buyEconEur"] > 0, "поле экономики остаётся в строке — для сверки"
+    assert data["head"]["nNoBuy"] >= 1 and "nEcon" not in data["head"]
+    # поле экономики в валюте без курса — не «валюта без курса» сделки: в Σ продажи она идёт
+    stub.deals[1][ct.BUY_ECON_RUB] = "645000|XYZ"
+    d2 = _compute(stub)
+    r2 = _row(d2, did)
+    assert r2["fxMissing"] == [] and r2["saleKnown"] is True
+    assert d2["head"]["nFx"] == data["head"]["nFx"]
+
+
+def test_итоги_закупки_и_маржи_на_одном_множестве():
+    """Σ продажи сделок с маржой − Σ закупки = Σ маржи — до евро (до 25.10.2026 Σ закупки
+    шла по своему множеству, и разность не давала маржу)."""
+    stub = fixture.ContractsStub()
+    # закупка без продажи: до правки она входила в Σ закупки, но не в Σ маржи
+    stub.deals[2]["OPPORTUNITY"] = "0"
+    data = _compute(stub)
+    # основной вид и отдельное направление — каждый по своим открытым сделкам
+    for h, seg in ((data["head"], False), (data["sep"]["head"], True)):
+        live = [r for r in data["rows"] if not r["closed"] and bool(r["seg"]) == seg]
+        m = [r for r in live if r["marginEur"] is not None]
+        assert m and h["nM"] == len(m)
+        assert h["saleMNum"] - h["buyNum"] == h["marginNum"], h
+        assert all(r["saleEur"] - r["buyEur"] == r["marginEur"] for r in m)
+    r = _row(data, stub.deals[2]["ID"])
+    assert r["marginEur"] is None
+    live = [x for x in data["rows"] if not x["closed"] and not x["seg"]]
+    assert data["head"]["buyNum"] == sum(x["buyEur"] for x in live if x["marginEur"] is not None)
 
 
 def test_выручка_не_разносится_больше_суммы_сделки():

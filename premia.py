@@ -71,8 +71,10 @@ def _cost(d: dict, crow: dict | None, eur_rub: float) -> tuple[float, float, str
         if direct > 0 and not crow.get("planSusp"):
             purchase = abs(float(pb.get("buy") or 0)) * eur_rub
             return direct, (purchase or direct / (1 + PZ_OVER)), "book"
+        # «Cost» экономики — только оценка прогноза, когда у заказов нет сумм: в «Реализации»
+        # с 25.10.2026 это не закупка (buySrc «none»), а сверка; коридор COEF_OK — ниже
         econ = float(crow.get("buyEconEur") or 0) * eur_rub
-        if crow.get("buySrc") == "econ" and econ > 0:
+        if crow.get("buySrc") == "none" and econ > 0:
             return econ * (1 + PZ_OVER), econ, "econ"
     return 0.0, 0.0, ""
 
