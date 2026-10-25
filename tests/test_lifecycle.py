@@ -242,3 +242,12 @@ def test_даты_доставки_нет_берётся_дата_упд():
     assert life["byUtd"] == 2 and "noFact" not in life["counts"] and "late" not in life["counts"]
     # доставка в срок и хозяева за 90 дней — только по факту: подпись УПД бывает позже приёмки
     assert life["otd"]["last90"]["n"] == 0 and life["otd"]["deals90"]["n"] == 0
+
+
+def test_пункт_очереди_помечен_по_упд():
+    живой = заказ(dl=д("2026-09-01"), utdDate=д("2026-09-20"), utd=False)
+    life = lc.build([живой], [{"deal": "100", "seq": 900, "closed": False}], СЕГОДНЯ)
+    assert life["queue"] and all(q["byUtd"] for q in life["queue"])
+    сфактом = заказ(dl=д("2026-09-01"), delFact=д("2026-09-10"))
+    life = lc.build([сфактом], [{"deal": "100", "seq": 900, "closed": False}], СЕГОДНЯ)
+    assert life["queue"] and not any(q["byUtd"] for q in life["queue"])

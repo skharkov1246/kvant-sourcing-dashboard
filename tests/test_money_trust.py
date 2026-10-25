@@ -323,3 +323,22 @@ def test_премии_берут_закупку_файла():
     pz, pay, src = premia._cost({"buyRaw": 0}, crow, 100.0)
     assert src == "file" and pay == 600_000.0 and abs(pz - 660_000.0) < 1e-6
     assert premia._cost({"buyRaw": 50}, crow, 100.0)[2] == "orders", "заказы — первыми"
+
+
+def test_подписи_итогов_по_источникам():
+    """Σ закупки называет, сколько сделок по файлу; коды валют «не вошли» — только у суммы
+    сделки; «Сумма» Битрикса рядом с файлом при пустой сумме — None, а не 0."""
+    stub = fixture.ContractsStub()
+    d1, d2 = stub.deals[1], stub.deals[2]
+    d2["OPPORTUNITY"] = "0"
+    data = _compute_econ(stub, {d1["ID"]: _econ(31_000.0, 15_000.0), d2["ID"]: _econ(20_000.0, 9_000.0)})
+    h = data["head"]
+    assert h["nMFile"] == 2 and h["fxCodes"] == [] and h["buyFxCodes"] == []
+    kpi = next(k for k in data["kpis"] if k["lbl"] == "Σ закупки")
+    assert "файл экономики 2" in kpi["meta"]
+    assert _row(data, d2["ID"])["saleBitrixEur"] is None
+    # валюта заказа без курса — в кодах закупки, не в кодах продажи
+    o = next(o for o in stub.orders if str(o["parentId2"]) == stub.deals[3]["ID"])
+    o["currencyId"] = "XYZ"
+    h2 = _compute(stub)["head"]
+    assert h2["fxCodes"] == [] and h2["buyFxCodes"] == ["XYZ"] and h2["nBuyFx"] == 1

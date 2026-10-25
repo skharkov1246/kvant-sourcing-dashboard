@@ -459,7 +459,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             buy, buy_src = 0.0, "none"
         # --- финальная экономика сверенного файла — первой (решение владельца 25.10.2026):
         # продажа и закупка в евро по курсам файла; «Сумма» и заказы остаются сверкой
-        sale_bx = round(sale) if sale_known else None
+        sale_bx = round(sale) if (sale_known and sale) else None     # нет суммы — не «€0»
         e = (ctx_econ or {}).get(did)
         if e:
             _amt, _tax = _amount(d.get("OPPORTUNITY")), _amount(d.get("TAX_VALUE"))
@@ -978,7 +978,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # продажа и закупка из сверенного файла экономики (решение владельца 25.10.2026)
         n_file = sum(1 for r in live_rows if r["saleSrc"] == "file")
         n_buy_susp = sum(1 for r in live_rows if r["buySusp"])
-        fx_codes = sorted({c for r in live_rows for c in r["fxMissing"]})
+        fx_codes = sorted({r["saleCur"] for r in live_rows if not r["saleKnown"] and r["saleCur"]})
+        buy_fx_codes = sorted({c for r in live_rows if r["saleKnown"] and r["buySrc"] == "fx"
+                               for c in r["fxMissing"]})
+        n_m_file = sum(1 for r in m_rows if r["buySrc"] == "file")
         n_contracts = sum(1 for r in rows_v if r["norders"] > 0)
         n_budget = sum(1 for r in rows_v if r["hasBudget"])
         n_budget_live = sum(1 for r in live_rows if r["hasBudget"])
@@ -1126,7 +1129,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             ("Контрактов", str(n_contracts), f"сделок с заказами · всего в воронке {len(rows_v)}", ""),
             ("Σ продажи", _money(sale_sum), "открытые сделки (выручка), €", "ok"),
             ("Σ закупки", _money(buy_sum),
-             f"заказы СП-172 · сделок с маржой {len(m_rows)} · без закупки {n_nobuy}", "amber"),
+             f"сделок с маржой {len(m_rows)}: файл экономики {n_m_file} · заказы СП-172 {len(m_rows) - n_m_file}"
+             f" · без закупки {n_nobuy}", "amber"),
             ("Σ валовая маржа", _money(margin_sum),
              "продажа − закупка · БЕЗ логистики, таможни и НДС", "ok" if margin_sum >= 0 else "warn"),
             ("Ср. маржа", f"{round(margin_sum/sale_m*100) if sale_m else 0}%", "по сумме, валовая", ""),
@@ -1155,7 +1159,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "contracts": n_contracts, "buy": _money(buy_sum), "buyNum": round(buy_sum),
                 # множество Σ закупки и Σ маржи: сделок и их продажа (saleM − buy = margin)
                 "nM": len(m_rows), "saleM": _money(sale_m), "saleMNum": round(sale_m),
-                "nNoBuy": n_nobuy, "nBuyFx": n_buy_fx,
+                "nNoBuy": n_nobuy, "nBuyFx": n_buy_fx, "buyFxCodes": buy_fx_codes,
+                "nMFile": n_m_file,       # из них закупка из сверенного файла экономики
                 # не вошли в итоги: сумма в валюте без курса; закупка несоизмерима с продажей
                 "nFx": n_fx, "fxCodes": fx_codes, "nBuySusp": n_buy_susp, "sumsOver": "live",
                 "nNoSale": n_nosale,      # открытых сделок без суммы в Битриксе

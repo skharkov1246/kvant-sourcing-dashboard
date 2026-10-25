@@ -308,6 +308,8 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                           "fc": fc.strftime("%d.%m.%Y") if fc else "",
                           # КАМ клиента (поле «КАМ») — в копию: оплата и перенос срока — его разговор с клиентом
                           "kam": _nm(d.get("kam")), "kamId": _nm(d.get("kamId")),
+                          # дата доставки взята из подписи УПД (delivered) — пометка «по УПД»
+                          "byUtd": bool(not o.get("delFact") and o.get("utdDate")),
                           "phase": p if in_tile else ""})
     for k in ph:
         ph[k]["n"] = len(ph_deals[k])
