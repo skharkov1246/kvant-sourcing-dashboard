@@ -238,3 +238,67 @@ def test_дата_упд_только_прошедшая():
     assert ct._utd_date({ct.UTD_DATE: "2026-10-01T03:00:00+03:00"}, сегодня) == dt.date(2026, 10, 1)
     assert ct._utd_date({ct.UTD_DATE: "2026-11-01"}, сегодня) is None, "будущая дата — опечатка, не доставка"
     assert ct._utd_date({}, сегодня) is None
+
+
+def _econ(sale_eur: float, buy_eur: float, **kw) -> dict:
+    import dealctx
+    raw = {"at": "2026-10-17T10:00:00+03:00", "sale": sale_eur, "cur": "EUR", "saleEur": sale_eur,
+           "buyEur": buy_eur, "markup": round(sale_eur / buy_eur - 1, 6), "rebid": False, "items": 3, "fx": {}}
+    raw.update(kw)
+    return dealctx.clean({"version": dealctx.VERSION, "econ": {"1": raw}})["econ"]["1"]
+
+
+def _compute_econ(stub, ctx_econ: dict) -> dict:
+    old = os.environ.get("KVANT_NOW")
+    os.environ["KVANT_NOW"] = fixture.CT_NOW
+    try:
+        return ct.compute(stub, as_of=fixture.CT_TODAY, people={}, ctx_econ=ctx_econ)
+    finally:
+        if old is None:
+            os.environ.pop("KVANT_NOW", None)
+        else:
+            os.environ["KVANT_NOW"] = old
+
+
+def test_сверенный_файл_экономики_первым():
+    """Решение владельца 25.10.2026: продажа и закупка из сверенного файла — первыми;
+    «Сумма» Битрикса — рядом, для сверки; маржа — продажа файла − закупка файла."""
+    stub = fixture.ContractsStub()
+    d = stub.deals[1]
+    did = d["ID"]
+    base = _row(_compute(stub), did)
+    data = _compute_econ(stub, {did: _econ(31_000.0, 15_000.0)})
+    r = _row(data, did)
+    assert r["saleSrc"] == "file" and r["saleEur"] == 31_000 and r["econAt"] == "17.10.2026"
+    assert r["buySrc"] == "file" and r["buyEur"] == 15_000 and r["marginEur"] == 16_000
+    assert r["saleBitrixEur"] == base["saleEur"], "«Сумма» Битрикса остаётся рядом"
+    assert r["noEcon"] is False, "сверенный файл есть — «экономика не заведена» не флаг"
+    assert r["buyOrdersEur"] == base["buyOrdersEur"], "заказы остаются сверкой"
+    assert data["head"]["nFile"] == 1 and data["head"]["saleMNum"] - data["head"]["buyNum"] == data["head"]["marginNum"]
+    others = [x for x in data["rows"] if x["deal"] != did]
+    assert all(x["saleSrc"] == "bitrix" for x in others)
+    # без свода — как до 25.10.2026
+    assert _row(_compute(stub), did)["saleSrc"] == "bitrix"
+
+
+def test_файл_после_правки_суммы_не_первый():
+    """«Сумму» меняли после чтения файла (сверка на день чтения другая) — файл могли обновить
+    вместе с ней: до перечтения продажа — Битрикс (dealctx.econ_stale)."""
+    stub = fixture.ContractsStub()
+    d = stub.deals[1]
+    did, amt = d["ID"], float(d["OPPORTUNITY"])
+    свежий = _econ(amt, amt / 2, ratio=1.0)                     # на день чтения «Сумма» = файл
+    assert _row(_compute_econ(stub, {did: свежий}), did)["saleSrc"] == "file"
+    устарел = _econ(amt * 1.5, amt / 2, ratio=1.0)              # сегодня «Сумма» / файл = 0,67, а было 1,0
+    r = _row(_compute_econ(stub, {did: устарел}), did)
+    assert r["saleSrc"] == "bitrix" and r["saleEur"] == round(amt)
+
+
+def test_файл_даёт_продажу_при_валюте_без_курса():
+    stub = fixture.ContractsStub()
+    stub.deals[0]["CURRENCY_ID"] = "AED"
+    did = stub.deals[0]["ID"]
+    data = _compute_econ(stub, {did: _econ(26_000.0, 15_000.0)})
+    r = _row(data, did)
+    assert r["saleKnown"] is True and r["saleSrc"] == "file" and r["saleEur"] == 26_000
+    assert data["head"]["nFx"] == 0

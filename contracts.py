@@ -6,6 +6,9 @@
 Модель данных Bitrix:
   • СП-172 «Заказы» = заказы ПОСТАВЩИКАМ → их opportunity = ЗАКУПКА, companyId = поставщик.
   • Продажа клиенту и сам клиент — на родительской СДЕЛКЕ (parentId2).
+  • ФИНАЛЬНАЯ ЭКОНОМИКА: сверенный файл «Экономика проекта» (свод dealctx, ctx_econ) — первым:
+    продажа и закупка в евро по курсам файла; «Сумма» и заказы — сверка (решение владельца
+    25.10.2026). «Сумму» меняли после чтения файла — до перечтения Битрикс (dealctx.econ_stale).
   • ЗАКУПКА — Σ заказов СП-172, иначе «нет данных». Money-поля сделки из экономики проекта
     («Cost (rub)» / «Offer sum … of selected supplier», см. BUY_*) — только сверка (discrep):
     итерация расчёта в них не проверена (ревизия 25.10.2026). Маржа считается ТОЛЬКО при
@@ -259,14 +262,17 @@ def _utd_date(o: dict, today: dt.date) -> dt.date | None:
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             people: dict[str, dict] | None = None, service_ids: set[str] | None = None,
             chat_reader: chat_activity.Reader | None = None,
-            ctx_chats: dict[str, dict] | None = None) -> dict:
+            ctx_chats: dict[str, dict] | None = None,
+            ctx_econ: dict[str, dict] | None = None) -> dict:
     """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
     уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
     сделки и заказы не были видны как работа без хозяина.
     chat_reader — общий на сборку читатель чатов (main.py: реализация читает первой,
     пресейл — остатком бюджета); None — свой бюджет, как раньше.
     ctx_chats — чаты сделок из закрытого свода (dealctx.load()["chats"]): оценка хода
-    моделью и последнее чтение прогоном оценки; None — «подвисла» как до 23.10.2026."""
+    моделью и последнее чтение прогоном оценки; None — «подвисла» как до 23.10.2026.
+    ctx_econ — финальная экономика из того же свода (dealctx.load()["econ"], только сверенные
+    файлы): продажа и закупка из файла — первыми; None — как до 25.10.2026."""
     today = as_of or dt.date.today()
     now_iso = period_mod.now(_MSK).isoformat()
     people = people or {}
@@ -451,14 +457,29 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             buy, buy_src = buy_orders, "orders"
         else:
             buy, buy_src = 0.0, "none"
+        # --- финальная экономика сверенного файла — первой (решение владельца 25.10.2026):
+        # продажа и закупка в евро по курсам файла; «Сумма» и заказы остаются сверкой
+        sale_bx = round(sale) if sale_known else None
+        e = (ctx_econ or {}).get(did)
+        if e:
+            _amt, _tax = _amount(d.get("OPPORTUNITY")), _amount(d.get("TAX_VALUE"))
+            _r, _n = (dealctx.econ_ratio(_amt, sale_cur, e, tax=_tax) if _amt is not None and _tax is not None
+                      else (None, ""))
+            if dealctx.econ_stale(e, _r, _n):
+                e = None                       # «Сумму» меняли после чтения — до перечтения Битрикс
+        if e:
+            sale, sale_known, sale_src = e["saleEur"], True, "file"
+            buy, buy_src = e["buyEur"], "file"
+        else:
+            sale_src = "bitrix"
         # закупка несоизмерима с продажей — показывается текстом, в маржу и итоги не идёт
         buy_susp = bool(sale > 0 and buy > 0 and not BUY_SANE[0] <= buy / sale <= BUY_SANE[1])
         discrep = (buy_orders > 0 and buy_econ > 0
                    and abs(buy_orders - buy_econ) / max(buy_orders, buy_econ) > 0.2)
-        margin = (sale - buy) if (sale and buy_src == "orders" and not buy_susp) else None
+        margin = (sale - buy) if (sale and buy_src in ("orders", "file") and not buy_susp) else None
         # красный флаг: экономики проекта нет ни ссылкой на файл, ни money-полями
         econ_link = str(d.get(ECON_LINK) or "").strip()
-        no_econ = not econ_link and buy_econ <= 0
+        no_econ = not econ_link and buy_econ <= 0 and sale_src != "file"
 
         # --- плановая экономика из бюджета сделки (снимок Google Drive, суммы в ₽) ---
         plan = (plan_by_seq.get(seq) if seq else None) or plan_by_id.get(did)
@@ -658,6 +679,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # суммы в сделке нет — «суммы нет», а не «€0» (правило Р-2: ноль ≠ неизвестно)
             "saleEur": round(sale),
             "saleLbl": ("курса нет" if not sale_known else _money(sale) if sale else "суммы нет"),
+            # откуда продажа: сверенный файл экономики (дата чтения) или «Сумма» Битрикса; у
+            # файла «Сумма» в евро — рядом, для сверки
+            "saleSrc": sale_src, "econAt": e["at"].strftime("%d.%m.%Y") if e else "",
+            "saleBitrixEur": sale_bx,
             # валюты без курса в справочнике Битрикса (сделка, заказы, поля экономики):
             # такие суммы не пересчитываются и в итоги не идут
             "fxMissing": fx_miss, "saleKnown": sale_known, "buySusp": buy_susp,
@@ -947,6 +972,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         n_fx = sum(1 for r in live_rows if not r["saleKnown"])
         n_buy_fx = sum(1 for r in live_rows if r["saleKnown"] and r["buySrc"] == "fx")
         n_nosale = sum(1 for r in live_rows if r["saleKnown"] and not r["saleEur"])
+        # продажа и закупка из сверенного файла экономики (решение владельца 25.10.2026)
+        n_file = sum(1 for r in live_rows if r["saleSrc"] == "file")
         n_buy_susp = sum(1 for r in live_rows if r["buySusp"])
         fx_codes = sorted({c for r in live_rows for c in r["fxMissing"]})
         n_contracts = sum(1 for r in rows_v if r["norders"] > 0)
@@ -1129,6 +1156,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 # не вошли в итоги: сумма в валюте без курса; закупка несоизмерима с продажей
                 "nFx": n_fx, "fxCodes": fx_codes, "nBuySusp": n_buy_susp, "sumsOver": "live",
                 "nNoSale": n_nosale,      # открытых сделок без суммы в Битриксе
+                "nFile": n_file,          # открытых сделок с продажей из сверенного файла
                 "medCycle": round(med_cycle) if med_cycle else None,
                 "medLag": round(med_lag, 1) if med_lag is not None else None,
                 "loss": _money(loss_total), "burnDay": _money(burn_day),

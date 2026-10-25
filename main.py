@@ -842,8 +842,10 @@ def run(args) -> int:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
         contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
                                                chat_reader=chat_reader,
-                                               ctx_chats=real_ctx["chats"] if real_ctx else None)
-        print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
+                                               ctx_chats=real_ctx["chats"] if real_ctx else None,
+                                               ctx_econ=real_ctx["econ"] if real_ctx else None)
+        print(f"  ✓ контрактов: {len(contracts_data['rows'])}; продажа из сверенного файла экономики у "
+              f"{contracts_data['head'].get('nFile', 0)} открытых")
         # «что делать первым» — по общей очереди обоих видов (contracts.life_all); плитки
         # отдельного направления — в его вид (решение владельца 25.10.2026)
         _hc, dealctx_data = dealctx_mod.build(contracts_data["rows"], contracts_mod.life_all(contracts_data),

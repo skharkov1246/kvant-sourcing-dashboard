@@ -1790,23 +1790,24 @@ function openContract(x){
     else if(pct!=null&&pct>0.6){ebad=true;ewhy=`рентабельность ${Math.round(pct*100)}% — неправдоподобно высокая, проверьте бюджет`;}
   }
   // всё, что не закуп: логистика, таможня, прочие прямые
-  const eBuy=B?(B.buy!=null?Math.abs(B.buy):null):(x.buySrc==='orders'&&!x.buySusp&&x.buyEur?x.buyEur:null);
+  const eBuy=B?(B.buy!=null?Math.abs(B.buy):null):((x.buySrc==='orders'||x.buySrc==='file')&&!x.buySusp&&x.buyEur?x.buyEur:null);
   const eRest=(B&&B.direct!=null)?Math.abs(B.direct)+Math.abs(B.other||0)-Math.abs(B.buy||0):null;
   const GM=B?null:x.marginEur;
   h+=`<div class="h">Экономика сделки${qmark('ct.three')}</div>`;
-  h+=`<div class="note">Продажа в Битриксе (как в таблице): <b>${x.saleLbl||'—'}</b>${B&&B.rev?` · цепочка ниже — по бюджету сделки${x.planMod?' от '+_esc(String(x.planMod).slice(0,10).split('-').reverse().join('.')):''}`:' · цепочка ниже — по Битриксу: сделка и заказы'}</div>`;
+  const FS=x.saleSrc==='file';
+  h+=`<div class="note">Продажа (как в таблице): <b>${x.saleLbl||'—'}</b> — ${FS?`сверенный файл экономики, прочитан ${_esc(x.econAt||'')}${x.saleBitrixEur!=null?` («Сумма» в Битриксе ${_fmtE(x.saleBitrixEur)})`:''}`:'«Сумма» сделки в Битриксе'}${B&&B.rev?` · цепочка ниже — по бюджету сделки${x.planMod?' от '+_esc(String(x.planMod).slice(0,10).split('-').reverse().join('.')):''}`:FS?' · цепочка ниже — по файлу':' · цепочка ниже — по Битриксу: сделка и заказы'}</div>`;
   h+=`<div class="ecard${ebad?' bad':''}">`;
   // цепочка: продали → минус закуп → минус прочие → плановая прибыль
   h+=`<div class="chain">`
-    +`<div class="cstep"><div class="cl">${B?'выручка по бюджету':'продали за (Битрикс)'}</div><div class="cv">${RV?_fmtE(RV):'—'}</div></div>`
+    +`<div class="cstep"><div class="cl">${B?'выручка по бюджету':FS?'продали за (файл)':'продали за (Битрикс)'}</div><div class="cv">${RV?_fmtE(RV):'—'}</div></div>`
     +`<div class="arw">→</div>`
-    +`<div class="cstep minus"><div class="cl">− закупка${B?'':' (заказы)'}</div><div class="cv">${eBuy!=null?_fmtE(eBuy):'—'}</div></div>`
+    +`<div class="cstep minus"><div class="cl">− закупка${B?'':x.buySrc==='file'?' (файл)':' (заказы)'}</div><div class="cv">${eBuy!=null?_fmtE(eBuy):'—'}</div></div>`
     +(B?`<div class="arw">→</div>`
     +`<div class="cstep minus"><div class="cl">− логистика, таможня, прочее</div><div class="cv">${eRest!=null?_fmtE(eRest):'—'}</div></div>`
     +`<div class="arw">=</div>`
     +`<div class="cstep res${ebad?' bad':''}"><div class="cl">плановая прибыль</div><div class="cv">${PF!=null?_fmtE(PF):'—'}${pct!=null?` <span style="font-size:11px;font-weight:400">${Math.round(pct*100)}%</span>`:''}</div></div>`
     :`<div class="arw">=</div>`
-    +`<div class="cstep res"><div class="cl">валовая маржа</div><div class="cv">${GM!=null?_fmtE(GM):_esc(x.marginLbl||'—')}${GM!=null&&x.marginPct!=null?` <span style="font-size:11px;font-weight:400">${x.marginPct}%</span>`:''}</div></div>`)
+    +`<div class="cstep res"><div class="cl">${x.buySrc==='file'?'наценка над поставщиком':'валовая маржа'}</div><div class="cv">${GM!=null?_fmtE(GM):_esc(x.marginLbl||'—')}${GM!=null&&x.marginPct!=null?` <span style="font-size:11px;font-weight:400">${x.marginPct}%</span>`:''}</div></div>`)
     +`</div>`;
   if(ebad) h+=`<div class="ewarn">⚠ ${ewhy}</div>`;
   else if(norm&&pct!=null) h+=`<div class="note">Норма по бюджету — ${Math.round(norm*100)}%, факт плана ${Math.round(pct*100)}%.</div>`;
@@ -1823,8 +1824,11 @@ function openContract(x){
       +`<span class="tv">${cost==null?'<span class="dimv">—</span>':_fmtE(cost)}</span>`
       +`<span class="tv">${pv}${pc}</span></div>`;};
   h+=`<div class="thr thead"><span class="tl">источник</span><span class="tv">выручка</span><span class="tv">себестоимость</span><span class="tv">заработок</span></div>`;
-  h+=line('Битрикс: сделка и заказы', x.saleEur||null, x.buyOrdersEur||null,
-          (x.saleEur&&x.buyOrdersEur&&!(x.buySusp&&x.buySrc==='orders'))?x.saleEur-x.buyOrdersEur:null, 'валовая', '');
+  const SB=FS?x.saleBitrixEur:x.saleEur;
+  if(FS) h+=line('Файл экономики (сверен)', x.saleEur||null, x.buyEur||null,
+          x.marginEur!=null?x.marginEur:null, 'над поставщиком', 'best');
+  h+=line('Битрикс: сделка и заказы', SB||null, x.buyOrdersEur||null,
+          (SB&&x.buyOrdersEur&&!(x.buySusp&&x.buySrc==='orders'))?SB-x.buyOrdersEur:null, 'валовая', '');
   h+=line('Money-поля экономики (только сверка)', null, x.buyEconEur||null,
           null, 'сверка', '');
   h+=line('Бюджет сделки', B0?B0.rev:null, B0&&B0.direct!=null?Math.abs(B0.direct):null,
@@ -1837,8 +1841,8 @@ function openContract(x){
 
   // --- откуда взялась закупка
   // источника «файл экономики» в сборке нет — строки о нём нет (ревизия 23.10.2026)
-  const srcLbl={orders:'по заказам СП-172',fx:'курса валюты нет',none:'заказов с суммой нет'};
-  const srcs=[['orders','Σ заказов СП-172',x.buyOrdersEur],['econ','Money-поля сделки (сверка)',x.buyEconEur]];
+  const srcLbl={file:'из сверенного файла экономики',orders:'по заказам СП-172',fx:'курса валюты нет',none:'заказов с суммой нет'};
+  const srcs=[...(x.buySrc==='file'?[['file','Файл экономики (сверен)',x.buyEur]]:[]),['orders','Σ заказов СП-172',x.buyOrdersEur],['econ','Money-поля сделки (сверка)',x.buyEconEur]];
   const avail=srcs.filter(s=>s[2]>0), mx=Math.max(1,...avail.map(s=>s[2]));
   const used=x.buyEur||0;
   if(avail.length){
@@ -2054,7 +2058,7 @@ function _ctPanel(X,el){
   // в Σ маржи (и Σ закупки) — только сделки с достоверной закупкой: что не вошло — счётом
   const mNotIn=[H.nNoBuy?`${H.nNoBuy} без закупки`:'',H.nBuyFx?`${H.nBuyFx} — закупка в валюте без курса`:'',H.nBuySusp?`${H.nBuySusp} — закупка несоизмерима с продажей`:'',H.grossSusp?`${H.grossSusp} — закупка неполная`:''].filter(Boolean);
   h+=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)">`
-   +`<div class="kpi ok"><div class="lbl">Σ продажи</div><div class="val ok">${H.sale}</div><div class="meta">открытые сделки, €${notIn.length?` · не вошли: ${notIn.join('; ')}`:''}</div></div>`
+   +`<div class="kpi ok"><div class="lbl">Σ продажи</div><div class="val ok">${H.sale}</div><div class="meta">открытые сделки, €${H.nFile?` · по сверенному файлу экономики ${H.nFile}, остальные — «Сумма» Битрикса`:''}${notIn.length?` · не вошли: ${notIn.join('; ')}`:''}</div></div>`
    +`<div class="kpi"><div class="lbl">Σ валовая маржа${qmark('ct.margin')}</div><div class="val ${(H.marginNum||0)<0?'warn':''}">${H.margin}</div><div class="meta">${H.marginPct}% · ${H.nM!=null?`${H.nM} сделок: продажа ${H.saleM} − закупка ${H.buy}`:''} · до логистики, таможни и НДС${mNotIn.length?` · не вошли: ${mNotIn.join('; ')}`:''}</div></div>`
    +`<div class="kpi"><div class="lbl">📋 План МД по бюджетам${qmark('ct.plan')}</div><div class="val ${(H.planMdNum||0)<0?'warn':''}">${H.planN?H.planMd:'—'}</div><div class="meta">${H.planN?`${H.planMdPct}% выручки бюджетов · ${H.planN} из ${H.live} открытых`:'бюджеты не прочитаны'} · снимок бюджетов <b>${_esc(H.planAsOf||'—')}</b> — не обновляется сам</div></div>`
    +`<div class="kpi"><div class="lbl">В работе</div><div class="val">${H.live}</div><div class="meta">открытых сделок · всего в воронке ${H.total}</div></div>`
@@ -2207,7 +2211,7 @@ function _ctPanel(X,el){
       +`<div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div>${tdline(x)}</td>`
       +`<td>${scell(x)}</td>`
       +`<td>${dcell(x)}</td>`
-      +`<td class="r"><div class="amt1"${x.saleKnown===false?' style="color:var(--dim)"':''}>${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig)+(x.saleKnown===false?' — в € не пересчитать':''):''}</div></td>`
+      +`<td class="r"><div class="amt1"${x.saleKnown===false?' style="color:var(--dim)"':''}>${x.saleLbl}</div><div class="dep">${x.saleSrc==='file'?`<span class="srcb chk">файл · ${_esc(String(x.econAt||'').slice(0,5))}</span>`:x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig)+(x.saleKnown===false?' — в € не пересчитать':''):''}</div></td>`
       +`<td class="r">${bcell(x)}</td>`
       +`<td class="r">${pcell(x)}</td>`
       +(DC?`<td style="min-width:190px">${_dcChatHtml(dcOf(x).chat)}${_dcContractHtml(dcOf(x).contract)}</td>`:'')
