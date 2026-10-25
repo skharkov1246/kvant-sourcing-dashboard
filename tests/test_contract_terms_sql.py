@@ -6,7 +6,13 @@
     прогона; повтор того же прогона не задваивает; итог — запросом по ключу;
   · повтор чтения файла (sha256, модель, версия) находится в базе;
   · прочитанная строка без условий и непрочитанная с условиями не встают;
-  · откат по ключу прогона снимает ровно свои строки.
+  · откат по ключу прогона снимает ровно свои строки;
+  · с 25.10.2026: прежние СП-132/175 и Purchase order (172) принимаются, откуда документ
+    (link_source) — из списка кода; рамочный у двух сделок и у двух заказов одной
+    сделки — строка у каждой пары (ключ с deal_id и order_key), и ключ прежних версий
+    пересобирается без потерь; исход «не читается» и статус fetch (временный отказ
+    закачки) принимаются; прочитанные файлы (после бюджета) — запросом по модели и
+    версии.
 
 Работает при поднятой базе (LIBRARY_SQL_TEST_DSN). Корпус придуман (правило 18).
 """
@@ -68,7 +74,7 @@ def _строка(run_id: str, card_id: int, *, status="ok", sha="a" * 64, side=
     return {"run_id": run_id, "method_ver": ct.METHOD_VER, "deal_id": 9900001, "card_entity": 1174,
             "card_id": card_id, "order_id": order, "side": side if прочитан else None,
             "side_source": "model" if прочитан else None, "side_link": "supplier" if order else "customer",
-            "side_template": None, "side_company": side,
+            "side_template": None, "side_company": side, "link_source": "order_link" if order else "deal_link",
             "template": "Шаблон ВЫДУМКА",
             "doc_type": None, "file_field": "ufCrm80_1763638685405", "file_id": f"fid-{card_id}",
             "sha256": sha, "pages": 3, "note": None, "status": status, "model": "claude-opus-5-5",
@@ -107,6 +113,9 @@ def test_схема_rls_запись_повтор_и_откат(conn):
                            "where run_id = 'ct-t1' and card_id = 3") == (None, None, "customer")
         assert база.из_кэша("a" * 64, "claude-sonnet-5-5") is None, "условия другой модели — не повтор"
         assert база.из_кэша("c" * 64, "claude-opus-5-5") is None
+        # после бюджета прогон качает только читанные раньше этой моделью и версией файлы
+        assert база.прочитанные_файлы("claude-opus-5-5") == {(1174, 1, "fid-1"), (1174, 2, "fid-2")}
+        assert база.прочитанные_файлы("claude-sonnet-5-5") == set()
 
         # второй прогон: свои строки, откат первого их не трогает
         база.записать_условия([_строка("ct-t2", 1, status="reused")])
@@ -221,5 +230,89 @@ def test_без_схемы_прогон_называет_недостающие_
     база = ct.База(DSN, схема=ПУСТАЯ)
     try:
         assert база.нет_таблиц() == ["contract_terms", "contract_b2b_flags", "contract_deal_outcome"]
+    finally:
+        база.закрыть()
+
+
+def test_новые_источники_и_рамочный_у_двух_сделок(conn):
+    """Прежние СП-132/175 и Purchase order (172) принимаются; откуда документ — из списка
+    кода; рамочный у двух сделок одного прогона — строка у каждой; «не читается» —
+    исход из списка."""
+    import psycopg2
+    import contract_terms as ct
+    база = ct.База(DSN, схема=СХЕМА)
+    try:
+        строки = []
+        for card, entity, источник, deal in ((11, 132, "deal_link", 9900001), (12, 175, "framework", 9900001),
+                                              (12, 175, "framework", 9900002), (9700001, 172, "purchase_order", 9900002),
+                                              (13, 1192, "order_only", 9900002)):
+            r = _строка("ct-n1", card, status="no_file", sha=None)
+            r.update(card_entity=entity, link_source=источник, deal_id=deal, file_id=f"fid-{card}")
+            строки.append(r)
+        for _ in range(2):
+            база.записать_условия(строки)
+        assert база.итог("ct-n1")[0] == 5, "рамочный второй сделки снят ключом без deal_id"
+        assert _одно(conn, "select count(distinct deal_id) from contract_terms where run_id = 'ct-n1' "
+                           "and card_entity = 175") == (2,)
+        # рамочный поставщика над спецификациями двух заказов сделки — строка на заказ;
+        # временный отказ закачки — свой статус
+        по_заказам = []
+        for заказ in (9700001, 9700002):
+            r = _строка("ct-n3", 14, status="fetch", sha=None, side="supplier", order=заказ)
+            r.update(card_entity=175, link_source="framework", note="urlMachine: сеть: ReadTimeout")
+            по_заказам.append(r)
+        for _ in range(2):
+            база.записать_условия(по_заказам)
+        assert база.итог("ct-n3")[0] == 2, "рамочный второго заказа снят ключом без order_key"
+        assert _одно(conn, "select array_agg(order_key order by order_key) from contract_terms "
+                           "where run_id = 'ct-n3'") == ([9700001, 9700002],)
+        чужой = _строка("ct-n2", 1, status="no_file", sha=None)
+        чужой["link_source"] = "by_company"
+        неизвестный_тип = _строка("ct-n2", 2, status="no_file", sha=None)
+        неизвестный_тип["card_entity"] = 166
+        for r in (чужой, неизвестный_тип):
+            with pytest.raises(psycopg2.errors.CheckViolation):
+                база.записать_условия([r])
+        база.записать_итог([], {9900001: "не читается", 9900002: "недочитана"}, "ct-n1")
+        assert база.итог_сделок("ct-n1") == 2
+    finally:
+        база.закрыть()
+
+
+def test_ключ_прежней_версии_пересобирается_с_сделкой(conn):
+    """Таблица версии до 25.10.2026 — ключ (run_id, card_entity, card_id, file_id): схема
+    поверх пересобирает его с deal_id, строки целы; повтор — без изменений; пока ключ
+    прежний, прогон называет это до оплаченного чтения."""
+    import contract_terms as ct
+    текст = (ROOT / "library" / "supabase" / "contract_terms_schema.sql").read_text(encoding="utf-8")
+    создать = текст[текст.index("create table if not exists contract_terms ("):]
+    создать = создать[:создать.index(");") + 2]
+    прежний = создать.replace("primary key (run_id, deal_id, card_entity, card_id, file_id)",
+                              "primary key (run_id, card_entity, card_id, file_id)")
+    assert прежний != создать
+    with conn.cursor() as c:
+        c.execute(f"drop schema {СХЕМА} cascade")
+        c.execute(f"create schema {СХЕМА}")
+        c.execute(прежний)
+        c.execute("insert into contract_terms (run_id, method_ver, deal_id, card_entity, card_id, file_id, status) "
+                  "values ('ct-old', 'v', 9900001, 1174, 1, 'fid-1', 'no_file'), "
+                  "('ct-old', 'v', 9900002, 1192, 2, 'fid-2', 'no_file')")
+        for _ in range(2):
+            _применить(c, "contract_terms_schema.sql")
+        c.execute("""select array_agg(a.attname::text order by a.attnum) from pg_constraint k
+                       join pg_attribute a on a.attrelid = k.conrelid and a.attnum = any (k.conkey)
+                      where k.conrelid = 'contract_terms'::regclass and k.contype = 'p'""")
+        assert sorted(c.fetchone()[0]) == sorted(["run_id", "deal_id", "card_entity", "card_id", "file_id",
+                                                  "order_key"])
+        c.execute("select count(*), count(*) filter (where order_key = 0) from contract_terms where run_id = 'ct-old'")
+        assert c.fetchone() == (2, 2)
+    база = ct.База(DSN, схема=СХЕМА)
+    try:
+        assert база.нет_таблиц() == []
+        for прежний in ("run_id, card_entity, card_id, file_id", "run_id, deal_id, card_entity, card_id, file_id"):
+            with база.с, база.с.cursor() as c:
+                c.execute("alter table contract_terms drop constraint if exists contract_terms_pkey")
+                c.execute(f"alter table contract_terms add constraint contract_terms_pkey primary key ({прежний})")
+            assert база.нет_таблиц() == ["contract_terms.primary key (deal_id, order_key)"], прежний
     finally:
         база.закрыть()

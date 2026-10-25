@@ -93,7 +93,8 @@ class Портал:
         return {}
 
     def list_deals_fast(self, *, filter=None, select=None, **kw):
-        return [dict(d) for d in self.deals]
+        # как живой Битрикс: только выбранные поля — поле, забытое в select, в расчёт не придёт
+        return [{k: d[k] for k in select if k in d} if select else dict(d) for d in self.deals]
 
     def deals_by_ids(self, ids, *, select=None):
         return {}
@@ -317,3 +318,171 @@ def test_доставлено_по_стадии_без_даты_не_проср�
     life = ct["life"]
     assert life["counts"].get("late") == 1, "просрочка — только заказ 501 сделки 1"
     assert [q["code"] for q in life["queue"] if q["order"] == "505"] == ["noFact"]
+
+
+def test_сумма_и_ндс_сделки_для_сверки_с_файлом():
+    """Ревизия 25.10.2026 (дефекты 4 и 5): «Сумма» и НДС в ней — числом для сверки с
+    финальной экономикой файла; нечитаемая — None, а не 0 («суммы нет» ≠ «не прочитали»).
+    Итоги вкладки считают сумму как прежде: для читаемых чисел ничего не меняется."""
+    assert contracts_mod._amount("1500.5") == 1500.5 and contracts_mod._amount(1500) == 1500.0
+    assert contracts_mod._amount(None) == 0.0 and contracts_mod._amount("") == 0.0
+    assert contracts_mod._amount("много") is None and contracts_mod._amount(float("nan")) is None
+    assert contracts_mod._amount(float("inf")) is None
+    п = Портал()
+    до = _посчитать(Портал())
+    п.deals[0]["TAX_VALUE"] = "18032.79"                  # придуманный НДС в «Сумме»
+    ct = _посчитать(п)
+    r1, r2 = _row(ct, "1"), _row(ct, "2")
+    assert (r1["saleAmt"], r1["saleTax"]) == (100_000.0, 18_032.79) and (r2["saleAmt"], r2["saleTax"]) == (50_000.0, 0.0)
+    assert [x["saleEur"] for x in ct["rows"]] == [x["saleEur"] for x in до["rows"]], "итоги — как были"
+
+
+# ── отдельное направление (решение владельца 25.10.2026) ──────────────────────
+# Корпус — fixture.ContractsStub: 6100 — сделка воронки направления с заказом, 6101 —
+# сделка реализации той же компании, прочие — другие клиенты. Имена придуманы (правило 18).
+
+def _стаб_со_счётом():
+    """ContractsStub, который запоминает, какие обходы сделок у него спросили."""
+    from tests import fixture
+    stub = fixture.ContractsStub()
+    stub.обходы = []
+    orig = stub.list_deals_fast
+
+    def list_deals_fast(*, filter=None, select=None, **kw):
+        stub.обходы.append((dict(filter or {}), list(select or [])))
+        return orig(filter=filter, select=select, **kw)
+    stub.list_deals_fast = list_deals_fast
+    return stub
+
+
+def _реализация(stub=None, *, без_направлений=False, monkeypatch=None):
+    import os
+
+    from tests import fixture
+    if без_направлений:
+        monkeypatch.setattr(contracts_mod, "ОТДЕЛЬНЫЕ_ВОРОНКИ", ())
+    os.environ["KVANT_NOW"] = fixture.CT_NOW
+    try:
+        return contracts_mod.compute(stub or fixture.ContractsStub(), as_of=fixture.CT_TODAY, people={})
+    finally:
+        os.environ.pop("KVANT_NOW", None)
+
+
+@pytest.fixture(scope="module")
+def сеп():
+    return _реализация()
+
+
+def test_направление_по_воронке_и_по_компании(сеп):
+    from tests import fixture
+    seg = {r["deal"]: r["seg"] for r in сеп["rows"]}
+    assert seg["6100"] == fixture.CT_SEP_CAT, "сделка воронки направления"
+    assert seg["6101"] == fixture.CT_SEP_CAT, "сделка реализации той же компании"
+    другие = [r for r in сеп["rows"] if r["deal"] not in ("6100", "6101")]
+    assert другие and all(r["seg"] is None for r in другие), "сделки других клиентов — в основном виде"
+    assert "6102" not in seg, "сделка воронки без заказов во вселенную вкладки не входит"
+    h = сеп["head"]["sep"]
+    assert h["cat"] == fixture.CT_SEP_CAT and h["name"] == fixture.CT_SEP_NAME, "имя — из портала, не из кода"
+    assert (h["deals"], h["live"], h["orders"], h["late"], h["lateDeals"], h["companies"]) == (2, 2, 3, 1, 1, 1)
+
+
+def test_основной_вид_без_направления(сеп):
+    сеп_ids = {"6100", "6101"}
+    life, sl = сеп["life"], сеп["sep"]["life"]
+    assert not {q["deal"] for q in life["queue"]} & сеп_ids, "очередь руководителя — без направления"
+    assert {q["deal"] for q in sl["queue"]} == сеп_ids, "у направления — своя очередь"
+    assert {(q["deal"], q["code"]) for q in sl["queue"]} >= {("6101", "late"), ("6100", "risk")}
+    # плитки, итоги, воронка и сроки клиента — по сделкам основного вида
+    main = [r for r in сеп["rows"] if not r["seg"]]
+    live = [r for r in main if not r["closed"]]
+    h = сеп["head"]
+    assert (h["live"], h["total"]) == (len(live), len(main))
+    assert h["lateDeals"] == sum(1 for r in live if r["late"]) == сеп["deadlines"]["lateDeals"]
+    assert сеп["deadlines"]["liveOrders"] == sum(1 for r in live for o in r["orders"] if o["live"])
+    assert sum(f["n"] for f in сеп["funnel"]) == sum(1 for r in live if r["inCat0"])
+    assert sum(p["orders"] for p in sl["phases"]) == 3 and sum(p["orders"] for p in life["phases"]) > 0
+    assert life["counts"].get("late") == sum(1 for q in life["queue"] if q["code"] == "late")
+    assert сеп["sep"]["head"]["live"] == 2 and сеп["sep"]["deadlines"]["lateDeals"] == 1
+    # нагрузка людей — по живым заказам сделок вида
+    assert sum(p["live"] for p in life["people"]) == sum(1 for r in main for o in r["orders"] if o["live"])
+    assert sum(p["live"] for p in sl["people"]) == 3
+
+
+def test_нормы_и_поставщики_по_всем_заказам(сеп, monkeypatch):
+    """Норма звена, обычное опоздание и надёжность поставщика — мерило, а не портфель:
+    в обоих видах те же, что без разделения."""
+    без = _реализация(без_направлений=True, monkeypatch=monkeypatch)
+    for k in ("lead", "norms", "suppliers", "supAll"):
+        assert сеп["life"][k] == сеп["sep"]["life"][k] == без["life"][k], k
+    assert сеп["speed"]["medCycle"] == без["speed"]["medCycle"]
+    assert сеп["head"]["grossThr"] == без["head"]["grossThr"]
+    assert [b["med"] for b in сеп["speed"]["orderBench"]] == [b["med"] for b in без["speed"]["orderBench"]]
+    assert сеп["suppliers"]["rows"] == без["suppliers"]["rows"], "вкладка «Поставщики» не меняется"
+
+
+def test_сумма_видов_не_теряет_ни_пункта(сеп, monkeypatch):
+    """Сумма прячет потерю: пункты обеих очередей — ровно прежняя одна очередь (её же
+    читает очередь КАМа), итоги видов складываются в прежние."""
+    без = _реализация(без_направлений=True, monkeypatch=monkeypatch)
+    assert без.get("sep") is None and all(r["seg"] is None for r in без["rows"])
+
+    def ключ(q):
+        return (q["code"], q["deal"], q["order"], q["days"], q["who"], q["phase"])
+    вместе = contracts_mod.life_all(сеп)
+    assert sorted(map(ключ, вместе["queue"])) == sorted(map(ключ, без["life"]["queue"]))
+    assert [q["code"] for q in вместе["queue"]] == [q["code"] for q in без["life"]["queue"]]
+    assert вместе["counts"] == без["life"]["counts"]
+    for k in ("live", "total", "lateDeals", "slow", "contracts", "paidStage", "nNoBuy", "grossSusp"):
+        assert сеп["head"][k] + сеп["sep"]["head"][k] == без["head"][k], k
+    for k in ("lateOrders", "liveOrders", "noDl"):
+        assert сеп["deadlines"][k] + сеп["sep"]["deadlines"][k] == без["deadlines"][k], k
+    assert len(сеп["rows"]) == len(без["rows"]), "строки таблицы — все, с признаком вида"
+
+
+def test_очередь_кама_не_меняется(сеп, monkeypatch):
+    """Очередь КАМа (kamqueue.py) читает обе очереди: направление снято только с
+    ежедневной очереди руководителя реализации."""
+    import kamqueue
+    from tests import fixture
+    без = _реализация(без_направлений=True, monkeypatch=monkeypatch)
+    ps = fixture.build_presale()
+    a = kamqueue.build(ps, contracts_mod.life_all(сеп), сеп["rows"], fixture.CT_TODAY, people=fixture.CT_PEOPLE)
+    b = kamqueue.build(ps, без["life"], без["rows"], fixture.CT_TODAY, people=fixture.CT_PEOPLE)
+    assert a == b
+    assert any(x["deal"] == "6101" for x in a["queue"]), "сделка направления — в очереди КАМа"
+
+
+def test_обход_направления_один_запрос():
+    """Бюджет портала (правило 24.09.2026): +1 обход на воронку направления — только ID,
+    воронка и компания; имя — из справочника воронок (кэш клиента)."""
+    stub = _стаб_со_счётом()
+    _реализация(stub)
+    assert [f for f, _ in stub.обходы] == [{"CATEGORY_ID": 0}] + [
+        {"CATEGORY_ID": c} for c in contracts_mod.ОТДЕЛЬНЫЕ_ВОРОНКИ]
+    assert stub.обходы[1][1] == ["ID", "CATEGORY_ID", "COMPANY_ID"]
+
+
+def test_без_сделок_направления_вкладка_с_нулями():
+    """Сделок направления во вселенной вкладки нет (закрылись, ушли) — вида нет, но сводка
+    направления есть, с нулями: вкладка остаётся и говорит «Нет данных» (portal-ui §2),
+    а не пропадает молча. Компания направления — по сделке его воронки без заказов."""
+    from tests import fixture
+    stub = fixture.ContractsStub()
+    stub.deals = [d for d in stub.deals if d["ID"] != "6101"]
+    stub.other = [x for x in stub.other if x["ID"] != "6100"]        # осталась 6102 без заказов
+    stub.orders = [o for o in stub.orders if str(o["parentId2"]) not in ("6100", "6101")]
+    data = _реализация(stub)
+    assert data["sep"] is None and all(r["seg"] is None for r in data["rows"])
+    h = data["head"]["sep"]
+    assert (h["cat"], h["name"]) == (fixture.CT_SEP_CAT, fixture.CT_SEP_NAME), "имя — из портала и без сделок"
+    assert (h["deals"], h["live"], h["orders"], h["late"], h["lateDeals"], h["queue"], h["companies"]) == \
+        (0, 0, 0, 0, 0, 0, 1)
+    assert h["sale"] == contracts_mod._money(0)
+
+
+def test_без_направлений_сводки_нет(monkeypatch):
+    """Направления не заданы (ОТДЕЛЬНЫЕ_ВОРОНКИ пуст) — вкладка как до 25.10.2026: ни вида,
+    ни сводки, ни переключателя."""
+    data = _реализация(без_направлений=True, monkeypatch=monkeypatch)
+    assert data["sep"] is None and "sep" not in data["head"]
+    assert all(r["seg"] is None for r in data["rows"])

@@ -470,6 +470,15 @@
   /* ---- доступность: видимый фокус с клавиатуры ---- */
   .actile:focus-visible,details.sect>summary:focus-visible,.tab:focus-visible,.snb:focus-visible,.sortt:focus-visible,.stchip:focus-visible,.qq:focus-visible,.drw .x:focus-visible{outline:2px solid var(--a);outline-offset:2px}
   .search:focus-visible{outline:2px solid var(--a);outline-offset:1px}
+  /* «Реализация»: вкладка отдельного направления (решение владельца 25.10.2026) */
+  .ctsub{margin:0 0 14px}
+  .ctsub .snb{min-height:32px;max-width:100%;white-space:normal;text-align:left}
+  .ctsubn{font-weight:400;opacity:.85}
+  [role=tabpanel]:focus-visible{outline:2px solid var(--a);outline-offset:4px;border-radius:6px}
+  .ctsepnote{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--b);border-radius:10px;padding:10px 14px;margin:0 0 16px;color:var(--mut);font-size:13px;line-height:1.5}
+  .ctsepnote b{color:var(--ink)}
+  .ctsepnote a{color:var(--b2);text-decoration:underline;text-underline-offset:2px}
+  .ctsepnote a:focus-visible{outline:2px solid var(--a);outline-offset:2px;border-radius:3px}
 
   /* ---- адаптив: планшет → мобилка (в конце файла — перекрывает базовые правила) ---- */
   @media(max-width:1024px){
@@ -1397,7 +1406,7 @@ const METH={
   'ct.plan':{t:'План МД по бюджетам сделок',what:'Плановый маржинальный доход из «Бюджета сделки» — книги, которую сорсер заполняет по каждой сделке (папка на Google Drive). В отличие от валовой маржи здесь учтена ПОЛНАЯ плановая себестоимость.',src:'Лист «Бюджет» книги: блок «Показатели» (суммы в ₽, переведены в € по курсу Битрикса). Связь со сделкой — по номеру сделки из названия книги, иначе по ссылке на Битрикс в шапке. Книга, чья выручка расходится с суммой сделки больше чем вчетверо, числом не показывается. Процент — от выручки бюджетов. Снимок не обновляется сам — дата снимка рядом с числом. Снимок папки собирается скриптом scripts/budget_snapshot.py и лежит в data/budget_snapshot.json.',formula:'ПЛАН МД = выручка − прямые переменные затраты (закуп, международная логистика, таможенная пошлина и сбор, НДС в ФТС, СВХ, брокер). В карточке сделки дополнительно: ПЛАН ПРИБЫЛЬ = МД − премии, страховые взносы, сертификаты, прочие расходы − стоимость денег. KPI суммирует МД по открытым сделкам с внятным бюджетом.',note:'⚠ «не бьётся» — плановая выручка бюджета расходится с суммой сделки в Битриксе больше чем в 4 раза (книга-заготовка или устаревшая) — такие сделки в сумму KPI не входят. Снимок обновляется не сам: дата — в строке фактов под KPI. Суммы книг в рублях; пересчёт в € добавляет расхождение на разницу курсов.'},
   'ct.life':{t:'Пульт: от размещения до гарантии',what:'Где сейчас каждый заказ поставщику и сколько из них с сорванным сроком или под риском. Фаза — по фактам в карточке заказа, а не по названию стадии.',src:'Заказы СП-172: «Оплачено поставщику, %», «Production confirmation», «Supplier Shipment Date, actual», «Inbound Delivery Date, actual», «Customer delivery date, actual», УПД (дата или файл), «Payment Order (client)».',formula:'РАЗМЕЩЕНИЕ — нет ни оплаты поставщику, ни подтверждения производства. ПРОИЗВОДСТВО — оплата или подтверждение есть, поставщик не отгрузил. В ПУТИ — поставщик отгрузил, клиенту не доставлено. ЗАКРЫТИЕ — доставлено, нет УПД или платёжки клиента. ГАРАНТИЯ — доставлено, УПД и платёж есть, срок гарантии идёт. СДЕЛКИ В СРОК — доля сделок, у которых ВСЕ заказы доставлены не позже «Date of deadline to customer» (решение владельца 19.10.2026), по последней доставке за 90 дней; рядом — доля заказов.',note:'Клик по фазе — её пункты в очереди «Что делать сегодня». Гарантия 12 мес. от доставки — допущение до решения владельца.'},
   'ct.queue':{t:'Что делать сегодня',what:'Все отклонения по заказам и сделкам реализации — у каждого хозяин и действие. Сверху — самое срочное.',src:'Те же заказы СП-172 и сделки воронки реализации.',formula:'Порядок: срок сорван → под риском (до срока ≤ 14 дн., поставщик не отгрузил) → прогноз доставки позже срока (позднейшая из дат: плановая отгрузка или бюджетный конец производства + обычное опоздание этого поставщика; плюс медианы пути и последней мили) → плановая отгрузка прошла без факта → план доставки позже срока → срок оплаты клиента прошёл без платёжки → нет УПД через 14 дн. после доставки → все заказы закрыты, сделка открыта → нет заказа неделю → ведёт уволенный (ответственный сделки, ОСС или ответственный живого заказа) → нет срока клиента → заказ закрыт без даты доставки. Хозяин — ответственный заказа (Responsible person), иначе ОСС заказа, ОСС сделки, ответственный сделки (решение владельца 19.10.2026); КАМ клиента (поле «КАМ») — в копии по срокам и оплате. Обязательные поля (решение владельца): при размещении — начало и конец производства и доставка клиенту по бюджету, при доставке — факт, подписанный УПД, плановый срок оплаты. Закрытие (УПД, оплата) — только у живых заказов, доставленных за год.',note:'Клик по строке — карточка сделки. Фильтр по ОСС или КАМу — для планёрки с каждым.'},
-  'ct.ctx':{t:'Чаты и договоры',what:'Что говорит переписка по сделке и что нашла сверка договоров с заказчиком и с поставщиком. Плитки — для всех с вкладкой; сделки, колонки «Чат» и «Договор» и пункты очереди — только праву «Поставщики: договоры и деньги».',src:'Ночной прогон оценки чатов моделью (только новые сообщения, до 5 долларов в сутки) и недельное чтение договоров открытых сделок; итог — в закрытой базе, во вкладку — свод по сделкам.',formula:'Всё про чат — ОЦЕНКА МОДЕЛИ по переписке, а не факт: уверенность модели — в ячейке сделки. ЖДУТ НАШЕГО ОТВЕТА — по текущей оценке к нам обратились и ответа в чате нет; пункт очереди — если ждут дольше 24 будних часов (праздники не учитываются), хозяин — человек сделки по роли, на ком мяч. РИСК ПО ЧАТУ ВЫСОКИЙ — оценка модели; пункт — сопровождению, КАМ в копии. СРОК ИЗ ЧАТА ПРОШЁЛ — срок, названный в переписке (отгрузка, доставка, оплата, документы), прошёл не больше 60 дней назад. ДОГОВОР: РИСКИ — сделки с флагом сверки заказчик ↔ поставщик (пени, гарантия, базис, оплата, документы, срок, валюта); пункт — руководителю реализации. ПАРЫ НЕТ — договор одной из сторон не найден в карточках договоров, связанных со сделкой (договор может быть в портале без связи со сделкой — тогда его надо связать); пункт — ответственному сделки: договор заказчика — всегда, поставщика — когда заказ размещён. Текущая оценка — прогон оценки читал чат не раньше 7 дней назад и после оценки человек в чате не писал.',note:'Покрытие под плитками: оценка есть не у всех сделок (часть чатов недоступна вебхукам), договоры читаются по неделе. Флаг сверки и исход разбора пересчитываются при выгрузке; не сошлось — «сверка разошлась», флаги не показываются. Нет текущих оценок или разобранных договоров — в плитке «—», а не 0.'},
+  'ct.ctx':{t:'Чаты и договоры',what:'Что говорит переписка по сделке и что нашла сверка договоров с заказчиком и с поставщиком. Плитки — для всех с вкладкой; сделки, колонки «Чат» и «Договор» и пункты очереди — только праву «Поставщики: договоры и деньги».',src:'Ночной прогон оценки чатов моделью (только новые сообщения, до 5 долларов в сутки) и недельное чтение договоров открытых сделок; итог — в закрытой базе, во вкладку — свод по сделкам.',formula:'Всё про чат — ОЦЕНКА МОДЕЛИ по переписке, а не факт: уверенность модели — в ячейке сделки. ЖДУТ НАШЕГО ОТВЕТА — по текущей оценке к нам обратились и ответа в чате нет; пункт очереди — если ждут дольше 24 будних часов (праздники не учитываются), хозяин — человек сделки по роли, на ком мяч. РИСК ПО ЧАТУ ВЫСОКИЙ — оценка модели; пункт — сопровождению, КАМ в копии. СРОК ИЗ ЧАТА ПРОШЁЛ — срок, названный в переписке (отгрузка, доставка, оплата, документы), прошёл не больше 60 дней назад. ДОГОВОР: РИСКИ — сделки с флагом сверки заказчик ↔ поставщик (пени, гарантия, базис, оплата, документы, срок, валюта); пункт — руководителю реализации. ПАРЫ НЕТ — договор одной из сторон не найден: ни в карточках договоров (новых и прежних смарт-процессов), связанных со сделкой или с её заказом, ни в рамочных над её спецификациями, ни в Purchase order заказа (договор может быть в портале без связи — тогда его надо связать); пункт — ответственному сделки: договор заказчика — всегда, поставщика — когда заказ размещён. ФАЙЛ НЕ ЧИТАЕТСЯ — файла договора нет у портала (ссылка мертва или файл пуст), его формат не читается или он длиннее предела чтения: следующий прогон это не вылечит (сбой сети или лимит портала — не это: такой договор «не дочитан» и дочитается сам), файл надо перезалить (целиком, без пароля; длинный — частями); пункт — ответственному сделки. Текущая оценка — прогон оценки читал чат не раньше 7 дней назад и после оценки человек в чате не писал.',note:'Покрытие под плитками: оценка есть не у всех сделок (часть чатов недоступна вебхукам), договоры читаются по неделе. Флаг сверки и исход разбора пересчитываются при выгрузке; не сошлось — «сверка разошлась», флаги не показываются. Нет текущих оценок или разобранных договоров — в плитке «—», а не 0.'},
   'ct.act':{t:'Требует решения',what:'Четыре очага проблем в воронке реализации. Плитка кликабельна — открывает эти сделки в таблице ниже.',src:'Открытые сделки воронки кат.0 и их живые заказы СП-172.',formula:'ПРОСРОЧЕН ДЕДЛАЙН — есть живой заказ, у которого дата «Date of deadline to customer» уже прошла. ЗАМЕДЛЕНО (подвисла) — только подтверждённый простой, без просрочки (она — своя плитка 🚩): сделка или её заказ сидят в стадии дольше нормы (2× медианы стадии, минимум 7 дн) И в чате сделки неделю не писал ни один человек (решение владельца 19.10.2026: подвисшей сделка считается только после проверки чата). Писали в чате — не подвисла; чат не прочитан — простой не подтверждён и в плитку не идёт. С 23.10.2026 решает и оценка хода по чату: пишут, но ход за нами, никто не двигает или откат — подвисла; ждём поставщика или клиента до срока — не подвисла; чат не прочла сборка, а ночной прогон оценки читал его за последние 7 дней — решает он. Оценка, после которой в чате писал человек, не учитывается. БЕЗ ПЛАНОВОЙ ДАТЫ — у живых заказов не заполнена дата клиенту, срок не контролируется вообще. НЕТ ЭКОНОМИКИ — в сделке нет ни ссылки на файл экономики, ни money-полей. ВЕДЁТ УВОЛЕННЫЙ — открытая сделка, у которой отключён в Bitrix ответственный сделки, ОСС живого заказа (без ОСС у заказов — ОСС сделки) или ответственный живого заказа (Responsible person); плитка видна, только когда такие сделки есть.',note:'Числа в плитках — СДЕЛКИ, в подписи под ними — заказы. Одна сделка может попасть сразу в несколько плиток.'},
   'ct.gross':{t:'Занижена закупка',what:'Сделки, где валовая маржа неправдоподобно высока — обычно потому, что заведены не все заказы поставщикам.',src:'Сделки с закупкой, собранной из заказов СП-172 (не из money-полей), с суммой больше €1000.',formula:'Порог берётся от самих данных: max(65%, 1,5 × медианной валовой маржи по таким сделкам). Всё, что выше, помечается флагом «мало заказов?».',note:'Это подозрение, а не диагноз: бывают сделки с реально высокой маржой. Но чаще это значит, что часть заказов поставщикам ещё не заведена — тогда закупка занижена, а прибыль в отчёте завышена. Проверять надо в карточке: сколько заказов у сделки и покрывают ли они всю поставку.'},
   'ct.funnel':{t:'Воронка реализации',what:'Где физически стоят открытые сделки и сколько денег стоит на каждой стадии.',src:'Стадии воронки кат.0 в порядке движения (crm.status.list) + история переходов (crm.stagehistory).',formula:'Длина полосы — Σ сумм открытых сделок на стадии относительно самой «денежной» стадии. Красная часть полосы — деньги сделок, у которых сорван срок клиенту. «Типично N дн» — медианная длительность стадии по истории переходов: половина сделок проходит её быстрее.',note:'Показаны только открытые сделки в воронке реализации. Стадии без сделок не выводятся.'},
@@ -1742,6 +1751,23 @@ function openContract(x){
         +((dcx.contract.flags||[]).length?`<ul style="margin:4px 0 0 16px;padding:0">${dcx.contract.flags.map(f=>`<li>${_esc(f.text)}${f.days!=null?` <span class="dimv">(${f.days} дн)</span>`:''}</li>`).join('')}</ul>`:''):'')
       +`</div>`;
   }
+  // финальная экономика из файла «Экономика проекта» (dealctx.py, решение владельца 23.10.2026):
+  // только сверенный файл и только праву «договоры и деньги»; наценка — над поставщиком, не маржа
+  if(dcx&&dcx.econ){
+    const E=dcx.econ, pc=v=>String(v).replace('.',',');
+    h+=`<div class="h">Финальная экономика (файл)</div><div class="mrow-like" style="font-size:12.5px;line-height:1.7">`
+      +`продажа <b>${_esc(E.sale)}</b> <span class="dimv">(валюта подачи)</span> · закупка <b>${_esc(E.buy)}</b> · `
+      +`<span title="продажа / закупка − 1. Не маржа: логистика и таможня — внутри коэффициента">наценка над поставщиком <b>${pc(E.markup)}&nbsp;%</b></span>, `
+      +`прочитан ${_esc(E.at.slice(0,5))}, переторжка ${E.rebid?'да':'нет'}<br>`
+      // сверка без НДС; «≈ с НДС» (отношение около 1,20 или 1,22 при пустом налоге) — не пункт до
+      // решения владельца; «Сумма» = «Наше КП» файла с переторжкой — пункт при любом расхождении
+      +(E.gap!=null?(E.preRebid?`<span class="nrc">Сумма сделки — продажа «Нашего КП» до переторжки: расходится с финальной экономикой на ${pc(E.gap)}&nbsp;%</span> — обновить «Сумму» сделки по переторжке`
+                     :E.over?`<span class="nrc">Сумма сделки расходится с финальной экономикой на ${pc(E.gap)}&nbsp;%</span> — обновить «Сумму» сделки по финальному расчёту`
+                     :E.vat?`<span class="dimv">«Сумма» сделки похожа на сумму с НДС (налог в сделке не указан; больше продажи файла без НДС на ${pc(E.gap)}&nbsp;%) — не пункт до решения владельца</span>`
+                           :`<span class="dimv">«Сумма» сделки без НДС сходится с файлом (расхождение ${pc(E.gap)}&nbsp;%)</span>`)
+                  :(E.gapNote?`<span class="dimv">${_esc(E.gapNote)} — «Сумма» сделки с файлом не сверена</span>`:''))
+      +`</div>`;
+  }
   // таймлайн стадий сделки
   if((x.timeline||[]).length){
     h+=`<div class="h">Путь по стадиям воронки</div>`;
@@ -1851,9 +1877,89 @@ function openContract(x){
   document.getElementById('drwBody').innerHTML=h;
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
+// «2 сделки», «5 сделок»: число и слово в нужной форме
+const _ctN=(n,one,few,many)=>{const m=n%10,h=n%100;return n+' '+(m===1&&h!==11?one:(m>=2&&m<=4&&(h<12||h>14)?few:many));};
+// Шапка «Реализации» — общая для основного вида и вкладки отдельного направления.
+function _ctHeader(X,paid){
+  const fx=X.fx||{};
+  const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную${fx.usdRub!=null?`: 1 USD = ${fx.usdRub} ₽`:''}). Отчётность с другим курсом разойдётся системно.</span>`:'';
+  return `<header><div class="eyebrow">Квант · реализация</div><h1>Пульт реализации</h1><div class="sub"><span>От выигрыша до гарантии: заказ поставщику → производство → доставка клиенту → УПД и оплата → гарантия</span><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${paid?`<span>Успех — и стадия «Оплата получена | Закрытие сделки»: <b>${paid}</b> сделок не в работе</span>`:''}${fxNote}</div></header>`;
+}
+// Вкладка направления без его сделок: «Нет данных» + чего нет и откуда придёт (portal-ui §2)
+function _ctSepEmpty(SH,X){
+  const nm=_esc(SH.name);
+  return `<section class="card ctsepempty"><div class="secttl">Нет данных</div><div class="note">`
+    +`Нет сделок направления <b>${nm}</b> ${_esc(X.label||'')}: ни сделок воронки «${nm}» с заказами поставщикам, `
+    +`ни сделок реализации её компаний (${_ctN(SH.companies||0,'компания','компании','компаний')}). `
+    +`Источник — Bitrix24: сделка воронки «${nm}» появится здесь, когда к ней будет заказ поставщику (СП-172); `
+    +`сделка реализации компании направления — с входа в воронку реализации.</div></section>`;
+}
+// Вкладка «Реализация». Отдельное направление (решение владельца 25.10.2026: сложности
+// известны, ими занимаются, ежедневного внимания руководителя реализации не требуют) — своя
+// вкладка внутри «Реализации»: те же таблица, плитки и очередь, только по его сделкам.
+// Основной вид его сделок не показывает ни в очереди, ни в плитках, ни в итогах. Имя
+// вкладки — имя воронки из портала (head.sep.name), адрес — #contracts/main, #contracts/sep.
 function renderContracts(){
-  const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
-  if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
+  const X0=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
+  if(!X0||!Array.isArray(X0.rows)){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
+  const H0=X0.head||{}, SH=H0.sep&&typeof H0.sep.name==='string'?H0.sep:null;
+  const SV=SH&&X0.sep&&X0.sep.head&&X0.sep.life?X0.sep:null;
+  const views={main:Object.assign({},X0,{rows:X0.rows.filter(r=>!r.seg),seg:null,sepHead:SH})};
+  // сводка направления есть, а его вида нет — сделок направления сейчас нет: вкладка
+  // остаётся и говорит «Нет данных» (portal-ui §2), а не пропадает молча
+  if(SH) views.sep=SV?Object.assign({},X0,SV,{rows:X0.rows.filter(r=>r.seg),seg:SH.cat,sepHead:SH,orphan:null}):{empty:1};
+  const paid=(H0.paidStage||0)+(SV?(SV.head.paidStage||0):0);
+  const draw=(k,panel)=>{
+    if(views[k].empty){ panel.innerHTML=_ctSepEmpty(SH,X0); return; }
+    try{ _ctPanel(views[k],panel); }
+    catch(err){                             // сломанный вид не гасит переключатель и соседний вид
+      console.error('Реализация, вид '+k+':',err);
+      panel.innerHTML='<section class="card"><div class="secttl">Вкладка не отрисовалась</div>'
+        +'<div class="note">Данные для этого раздела неполные или повреждены. Техническая причина: '+_esc(String(err&&err.message||err))+'</div></section>';
+    }
+  };
+  if(!SH){
+    // направлений нет — без переключателя; адрес вкладки внутри «Реализации» не держим
+    if(/^#contracts\/./.test(location.hash||'')){ try{ history.replaceState(null,'','#contracts'); }catch(e){} }
+    delete el.dataset.ctsub;
+    el.innerHTML=_ctHeader(X0,paid)+'<div id="ctPanel-main"></div>'; draw('main',document.getElementById('ctPanel-main')); return;
+  }
+  el.innerHTML=_ctHeader(X0,paid)
+    +`<div class="subnav ctsub" role="tablist" aria-label="Разделы реализации" id="ctTabs">`
+    +`<button type="button" class="snb on" role="tab" id="ctTab-main" data-sub="main" aria-selected="true" aria-controls="ctPanel-main" tabindex="0">Основное</button>`
+    +`<button type="button" class="snb" role="tab" id="ctTab-sep" data-sub="sep" aria-selected="false" aria-controls="ctPanel-sep" tabindex="-1">${_esc(SH.name)} <span class="ctsubn">(${SH.live})</span></button></div>`
+    +`<div role="tabpanel" id="ctPanel-main" aria-labelledby="ctTab-main" tabindex="0"></div>`
+    +`<div role="tabpanel" id="ctPanel-sep" aria-labelledby="ctTab-sep" tabindex="0" hidden></div>`;
+  const tabs=[...el.querySelectorAll('#ctTabs [role=tab]')];
+  let cur='';
+  // виды рисуются по одному: id элементов вида (очередь, таблица, плитки) одни на оба —
+  // невидимая панель пустеет
+  const pick=(k,opt)=>{
+    if(!views[k]) k='main';
+    if(k===cur) return;
+    cur=k;
+    el.dataset.ctsub=k;                     // базовый слой вернёт адрес при возврате в «Реализацию»
+    tabs.forEach(b=>{const on=b.dataset.sub===k; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); b.tabIndex=on?0:-1;});
+    Object.keys(views).forEach(n=>{const p=document.getElementById('ctPanel-'+n); p.hidden=n!==k; if(n!==k) p.innerHTML='';});
+    draw(k,document.getElementById('ctPanel-'+k));
+    if(opt&&opt.addr){ try{ history.replaceState(null,'','#contracts/'+k); }catch(e){} }
+    if(opt&&opt.focus){ const b=tabs.find(x=>x.dataset.sub===k); if(b) b.focus(); }
+  };
+  const fromHash=()=>{const m=/^#contracts\/(\w+)/.exec(location.hash||''); return m&&views[m[1]]?m[1]:'main';};
+  document.getElementById('ctTabs').addEventListener('click',e=>{const b=e.target.closest('[role=tab]'); if(b) pick(b.dataset.sub,{addr:1});});
+  document.getElementById('ctTabs').addEventListener('keydown',e=>{
+    const i=tabs.findIndex(b=>b.dataset.sub===cur); let j=-1;
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') j=(i+1)%tabs.length;
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp') j=(i-1+tabs.length)%tabs.length;
+    else if(e.key==='Home') j=0; else if(e.key==='End') j=tabs.length-1;
+    if(j<0) return; e.preventDefault(); pick(tabs[j].dataset.sub,{addr:1,focus:1});
+  });
+  // ссылка из пометки основного вида — та же вкладка, с фокусом на ней
+  el.addEventListener('click',e=>{const a=e.target.closest('[data-ctgo]'); if(!a) return; e.preventDefault(); pick(a.dataset.ctgo,{addr:1,focus:1}); window.scrollTo(0,0);});
+  window.addEventListener('hashchange',()=>{ if(/^#contracts\//.test(location.hash||'')) pick(fromHash()); });
+  pick(fromHash());
+}
+function _ctPanel(X,el){
   let sortKey='seq', sortDir=-1, q='', mode='all';
   const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,planMdEur:1,planProfitEur:1,stageDays:1,lateDays:1,lossEur:1};
   const COLS=[['customer','Заказчик · контракт','l'],['stageDays','Стадия · дней','l'],['lateDays','Дедлайн клиенту','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['planProfitEur','Прибыль: план / валовая','r']];
@@ -1870,6 +1976,9 @@ function renderContracts(){
         nDone=R.filter(r=>r.done||r.closed).length;
   // чаты и договоры (dealctx.py): числа плиток — всем с вкладкой, сделки — только праву
   const DC=_dcData(), HX=H.ctx||null, DD=(DC&&DC.deals)||{};
+  // пункты чатов и договоров — своего вида: у отдельного направления — помеченные seg
+  const DQ=DC?(DC.queue||[]).filter(x=>!!x.seg===!!X.seg):[], DCC={};
+  DQ.forEach(x=>{DCC[x.code]=(DCC[x.code]||0)+1;});
   const dcOf=x=>DD[String(x.deal)]||{};
   const GN=X.gone||{};
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (${X.orphan.buy})`:'';
@@ -1878,8 +1987,13 @@ function renderContracts(){
   const cut=items=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(String(m.name).replace(/ \(уволен\)$/,''))}${m.gone?' <span class="gone">уволен — переназначить</span>':''} <span class="dimv mono">${m.lateOrders} из ${m.liveOrders} живых · ${m.pct}%</span></span><b class="nrc">${m.lateDeals||0} сд. · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div>${m.top?`<div class="sub2">начать с №${m.top.seq||'—'}${m.top.customer&&m.top.customer!=='—'?' '+_esc(m.top.customer):''}: просрочка ${m.top.days} дн</div>`:''}</div>`).join(''):'<div class="dimv">нет данных</div>';
 
   // ---------- шапка ----------
-  const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную${fx.usdRub!=null?`: 1 USD = ${fx.usdRub} ₽`:''}). Отчётность с другим курсом разойдётся системно.</span>`:'';
-  let h=`<header><div class="eyebrow">Квант · реализация</div><h1>Пульт реализации</h1><div class="sub"><span>От выигрыша до гарантии: заказ поставщику → производство → доставка клиенту → УПД и оплата → гарантия</span><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${H.paidStage?`<span>Успех — и стадия «Оплата получена | Закрытие сделки»: <b>${H.paidStage}</b> сделок не в работе</span>`:''}${fxNote}</div></header>`;
+  // отдельное направление: в основном виде — одна строка со ссылкой, на его вкладке — что в ней
+  const SP=X.sepHead||null;
+  let h=!SP?'':(X.seg
+    ?`<div class="note ctsepnote">Сделки направления <b>${_esc(SP.name)}</b>: его воронка и сделки реализации тех же компаний (${_ctN(SP.companies||0,'компания','компании','компаний')}). Очередь, плитки и итоги — только по ним. Нормы сроков звеньев и надёжность поставщиков — общие, по всем заказам.</div>`
+    :(SP.deals
+      ?`<div class="note ctsepnote">Направление <b>${_esc(SP.name)}</b> — на своей вкладке: ${_ctN(SP.live||0,'сделка','сделки','сделок')} в работе. Сложности известны, ими занимаются — в очередь, плитки и итоги ниже они не входят. <a href="#contracts/sep" data-ctgo="sep">Открыть вкладку направления</a></div>`
+      :`<div class="note ctsepnote">Направление <b>${_esc(SP.name)}</b> — на своей вкладке; сделок на ней сейчас нет. <a href="#contracts/sep" data-ctgo="sep">Открыть вкладку направления</a></div>`));
 
   // ---------- 0. ПУЛЬТ: жизненный цикл заказа (lifecycle.py) ----------
   const L=X.life||null;
@@ -1887,8 +2001,8 @@ function renderContracts(){
   if(L){
     const o90=(L.otd||{}).last90||{}, d90=(L.otd||{}).deals90||{}, RU=L.rules||{};
     // очередь — пункты lifecycle и, у права «договоры и деньги», пункты чатов и договоров
-    const C=Object.assign({},L.counts||{},DC?DC.counts:{}), LB=Object.assign({},L.labels||{},DC?DC.labels:{});
-    const Q=(L.queue||[]).concat(DC?DC.queue:[]).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
+    const C=Object.assign({},L.counts||{},DCC), LB=Object.assign({},L.labels||{},DC?DC.labels:{});
+    const Q=(L.queue||[]).concat(DQ).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
     h+=`<div class="secttl"><b>·</b> Где заказы: от размещения до гарантии${qmark('ct.life')}</div>`
      +`<div class="lfph" id="lfPh">`+(L.phases||[]).map(p=>`<div class="actile${p.late?' bad':(p.risk?' warn':'')}" data-ph="${p.key}" tabindex="0"><div class="t">${_esc(p.name)}</div><div class="v">${p.orders}</div><div class="m">заказов · сделок ${p.n}${p.late?` · 🚩 ${p.late}`:''}${p.risk?` · ⚠ ${p.risk}`:''}${p.over?` · сверх нормы ${p.over}`:''}</div></div>`).join('')+`</div>`
      +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">`
@@ -1956,7 +2070,7 @@ function renderContracts(){
      +`<div class="actile${hc.high?' bad':''}${st}" data-m="ctxHigh"${ti}><div class="t">⚠ Риск по чату: высокий</div><div class="v">${hc.cur?(hc.high||0):'—'}</div><div class="m">${hc.cur?`по оценке модели${hc.dueLate?` · срок из чата прошёл: ${hc.dueLate}`:''}`:'нет текущих оценок чатов'}</div></div>`
      +`<div class="actile${hk.risk?' bad':(hk.nopair?' amb':'')}${st}" data-m="ctxContract"${ti}><div class="t">📑 Договор: риски</div><div class="v">${hk.seen?(hk.risk||0):'—'}</div><div class="m">${hk.seen?`расхождение заказчик ↔ поставщик (флагов ${hk.flags||0}) · пары нет: ${hk.nopair||0}`:'договоры этих сделок не разобраны'}</div></div>`
      +`</div>`
-     +`<div class="note" style="margin-top:6px">Покрытие: оценка чата текущая у <b>${hc.cur||0}</b> из ${HX.open} открытых сделок (есть у ${hc.seen||0}); договоры разобраны у <b>${hk.seen||0}</b> из ${HX.open}${hk.unread?`, не дочитаны ${hk.unread}`:''}. Свод на ${_esc(HX.at||'—')}. Пустая плитка при малом покрытии — не «всё хорошо».${DC?' Клик по плитке — эти сделки в таблице ниже.':' Сделки, колонки «Чат» и «Договор» и пункты очереди — у права «Поставщики: договоры и деньги».'}</div>`;
+     +`<div class="note" style="margin-top:6px">Покрытие: оценка чата текущая у <b>${hc.cur||0}</b> из ${HX.open} открытых сделок (есть у ${hc.seen||0}); договоры разобраны у <b>${hk.seen||0}</b> из ${HX.open}${hk.unread?`, не дочитаны ${hk.unread}`:''}${hk.unreadable?`, файл не читается ${hk.unreadable}`:''}${HX.econ&&HX.econ.seen?`; финальная экономика (файл) сверена у <b>${HX.econ.seen}</b>${HX.econ.gap?`, «Сумма» сделки расходится больше ${(HX.rules||{}).econGapPct||10} % у ${HX.econ.gap}`:''}${HX.econ.vat?`, похожа на сумму с НДС у ${HX.econ.vat}`:''}`:''}. Свод на ${_esc(HX.at||'—')}. Пустая плитка при малом покрытии — не «всё хорошо».${DC?' Клик по плитке — эти сделки в таблице ниже.':' Сделки, колонки «Чат» и «Договор» и пункты очереди — у права «Поставщики: договоры и деньги».'}</div>`;
   }
 
   // ---------- 3. ДЕНЬГИ ВО ВРЕМЕНИ: что отгружать и во что обходится ожидание ----------
@@ -2093,7 +2207,7 @@ function renderContracts(){
   // ---------- пульт: очередь «что делать», фильтры по коду, фазе и хозяину ----------
   if(L){
     let qc='', qw='', qp='', qall=false;
-    const Q=(L.queue||[]).concat(DC?DC.queue:[]).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
+    const Q=(L.queue||[]).concat(DQ).sort((a,b)=>(a.sev-b.sev)||((b.days||0)-(a.days||0))||((b.seq||0)-(a.seq||0)));
     const qrows=()=>{
       const r=Q.filter(x=>(!qc||x.code===qc)&&(!qw||x.who===qw||x.kam===qw)&&(!qp||x.phase===qp));
       document.getElementById('lfQn').textContent=`(${r.length} из ${Q.length})`;
@@ -2268,7 +2382,7 @@ function _kqHasCt(){const X=window.__CONTRACTS__; return !!(X&&Array.isArray(X.r
 // Без права «Поставщики: договоры и деньги» воркер подставляет пустышку-заглушку —
 // она истинна, поэтому проверяется форма, а не наличие.
 function _dcData(){const D=window.__DEALCTX__; return (D&&Array.isArray(D.queue)&&D.deals&&typeof D.deals==='object'&&!Array.isArray(D.deals))?D:null;}
-const _DC_OUT={'пара':'договоры сверены','недочитана':'договор не дочитан','без стороны':'сторона документа не определена','спорная':'сторона документа спорная','поставщик без заказа':'договор поставщика без заказа','нет пары':'пары нет','нет договоров':'договоры не найдены в карточках','разошлось':'сверка разошлась — разбор'};
+const _DC_OUT={'пара':'договоры сверены','недочитана':'договор не дочитан','не читается':'файл договора не читается — перезалить','без стороны':'сторона документа не определена','спорная':'сторона документа спорная','поставщик без заказа':'договор поставщика без заказа','нет пары':'пары нет','нет договоров':'договоры не найдены ни в карточках сделки и заказов, ни в Purchase order','разошлось':'сверка разошлась — разбор'};
 const _dcSide=s=>s==='customer'?'заказчика':'поставщика';
 function _dcChatHtml(c){
   if(!c)return '<div class="dep dimv">нет оценки</div>';
@@ -2279,7 +2393,8 @@ function _dcChatHtml(c){
 function _dcContractHtml(k){
   if(!k)return '<div class="dep dimv">не разбирался</div>';
   if((k.flags||[]).length)return `<div class="stgcell"><b class="nrc">риски: ${k.flags.length}</b><div class="dep">${k.flags.map(f=>`<span title="${_esc(f.text)}">${_esc(f.short)}</span>`).join(', ')}</div></div>`;
-  if((k.missing||[]).length)return `<div class="stgcell"><b class="nrc">договор ${k.missing.map(_dcSide).join(' и ')} не найден</b><div class="dep dimv">в карточках договоров сделки</div></div>`;
+  if((k.missing||[]).length)return `<div class="stgcell"><b class="nrc">договор ${k.missing.map(_dcSide).join(' и ')} не найден</b><div class="dep dimv">ни в карточках договоров сделки и её заказов, ни в Purchase order</div></div>`;
+  if(k.outcome==='не читается')return `<div class="stgcell"><b class="nrc">${_esc(_DC_OUT[k.outcome])}</b></div>`;
   return `<div class="dep">${_esc(_DC_OUT[k.outcome]||k.outcome)}${k.outcome==='пара'?' · рисков сверки нет':''}</div>`;
 }
 function _kqHtml(K,pid){
@@ -2560,14 +2675,31 @@ window.__RENDER_OK__=1;
 <script>
 (function(){
   const _esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  // Кнопка «Реализации» ищется по dataset, а не строкой разметки: тесты доступа ищут её
+  // разметку в странице как признак невырезанной вкладки
+  const ctBtn=()=>[...document.querySelectorAll('.tab')].find(x=>x.dataset.tab==='contracts');
   document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
-    const t=b.dataset.tab;
+    const t=b.dataset.tab, h=location.hash||'';
+    // адрес вкладки «Реализации» (#contracts/…) живёт, пока открыта она
+    if(t!=='contracts'&&/^#contracts/.test(h)){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+    // возврат в «Реализацию» — адрес той вкладки внутри неё, что была открыта (renderContracts
+    // помнит её в data-ctsub); пришли по адресу #contracts/… — он главнее
+    else if(t==='contracts'&&!/^#contracts/.test(h)){
+      const ce=document.getElementById('tab-'+t), sub=ce&&ce.dataset.ctsub;
+      if(sub){ try{ history.replaceState(null,'','#contracts/'+sub); }catch(e){} }
+    }
     try{ if(window.ensureTab) window.ensureTab(t); }catch(e){ console.error(e); }
     ['sourcing','company','reps','eng','contracts','suppliers','cohorts','advisor']
       .forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
     window.scrollTo(0,0);
   }));
+  // адрес #contracts/… — сразу «Реализация» (вкладка внутри неё — по тому же адресу): и при
+  // загрузке, и на уже открытой странице (ссылку вставили в ту же вкладку браузера).
+  // Вкладку внутри «Реализации» выбирает её собственный обработчик hashchange
+  const toContracts=()=>{ if(!/^#contracts(\/|$)/.test(location.hash||'')) return; const b=ctBtn(); if(b&&!b.classList.contains('act')) b.click(); };
+  window.addEventListener('hashchange',toContracts);
+  toContracts();
   // основной скрипт выставляет флаг в самом конце; его отсутствие = рендер оборвался
   if(!window.__RENDER_OK__){
     const host=document.getElementById('tab-sourcing')||document.body;

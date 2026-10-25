@@ -836,24 +836,35 @@ def run(args) -> int:
     real_ctx = dealctx_mod.load()
     if real_ctx is not None:
         print(f"• Свод чатов и договоров: чатов {len(real_ctx['chats'])}, сделок с договорами "
-              f"{len(real_ctx['contracts'])}, отброшено записей не по форме {real_ctx['bad']}")
+              f"{len(real_ctx['contracts'])}, с финальной экономикой {len(real_ctx['econ'])}, "
+              f"отброшено записей не по форме {real_ctx['bad']}")
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
         contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
                                                chat_reader=chat_reader,
                                                ctx_chats=real_ctx["chats"] if real_ctx else None)
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
-        _hc, dealctx_data = dealctx_mod.build(contracts_data["rows"], contracts_data.get("life"), real_ctx,
-                                              period_mod.now(dealctx_mod.MSK), today=p.end)
+        # «что делать первым» — по общей очереди обоих видов (contracts.life_all); плитки
+        # отдельного направления — в его вид (решение владельца 25.10.2026)
+        _hc, dealctx_data = dealctx_mod.build(contracts_data["rows"], contracts_mod.life_all(contracts_data),
+                                              real_ctx, period_mod.now(dealctx_mod.MSK), today=p.end)
         if _hc is not None:
+            _hc_sep = _hc.pop("sep", None)
             contracts_data["head"]["ctx"] = _hc
+            if _hc_sep is not None and contracts_data.get("sep"):
+                contracts_data["sep"]["head"]["ctx"] = _hc_sep
             _c, _k = _hc["chat"], _hc["contract"]
             # только счётчики (правило 17)
             print(f"  чаты и договоры открытых сделок ({_hc['open']}): оценка чата текущая у {_c['cur']} "
                   f"(есть у {_c['seen']}), ждут нашего ответа {_c['reply']} (дольше суток {_c['replyLate']}), "
                   f"высокий риск {_c['high']}, срок из чата прошёл {_c['dueLate']}; договоры разобраны у "
                   f"{_k['seen']}: с риском сверки {_k['risk']} (флагов {_k['flags']}), без пары {_k['nopair']}, "
-                  f"не дочитаны {_k['unread']}; пунктов очереди {len(dealctx_data['queue'])}")
+                  f"не дочитаны {_k['unread']}; финальная экономика сверена у {_hc['econ']['seen']} "
+                  f"(сумма сделки расходится у {_hc['econ']['gap']}, из них «Наше КП» до переторжки у "
+                  f"{_hc['econ']['preRebid']}, похожа на сумму с НДС у {_hc['econ']['vat']}, "
+                  f"суммы нет у {_hc['econ']['noSum']}, менялась после чтения у {_hc['econ']['changed']}, "
+                  f"валюта другая у {_hc['econ']['otherCur']}); "
+                  f"пунктов очереди {len(dealctx_data['queue'])}")
         print(f"  «подвисла» по чату решено: " + ", ".join(
             f"{k} {v}" for k, v in sorted((contracts_data["head"].get("chatBy") or {}).items())))
         _ch = (contracts_data.get("head") or {}).get("chat") or {}
@@ -867,6 +878,12 @@ def run(args) -> int:
               f"живых заказов {_g.get('orders', 0)}, с просрочкой {_g.get('late', 0)}, "
               f"уволенных {_g.get('people', 0)}; нормы стадий по {_sp.get('benchDays')} дн: "
               f"{_sp.get('benchRecent', 0)} стадий, медиана цикла заказа {_sp.get('medCycle')} дн")
+        _sep = (contracts_data.get("head") or {}).get("sep")
+        if _sep:
+            # только счётчики и номер воронки: имя направления — имя клиента (правило 17)
+            print(f"  отдельное направление (воронка {_sep['cat']}): компаний {_sep['companies']}, сделок "
+                  f"{_sep['deals']}, открытых {_sep['live']}, живых заказов {_sep['orders']}, срок клиента "
+                  f"сорван {_sep['late']}, пунктов очереди {_sep['queue']} — вне основного вида")
     except Exception as e:
         # только класс ошибки: в тексте бывают номера сделок, а журнал публичный
         print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}")
@@ -886,8 +903,10 @@ def run(args) -> int:
             print(f"  линии продукт-оунеров: {len(_pl['lines'])} категорий, сделок с категорией "
                   f"{_pl['withCat']} из {_pl['deals']} ({_pl['withCatPct']} %)")
         try:
+            # очередь КАМа — по сделкам обоих видов «Реализации»: отдельное направление
+            # снято только с ежедневной очереди руководителя реализации (25.10.2026)
             people_data["kamQueue"] = kamqueue_mod.build(
-                m.get("presale"), (contracts_data or {}).get("life"), (contracts_data or {}).get("rows"),
+                m.get("presale"), contracts_mod.life_all(contracts_data), (contracts_data or {}).get("rows"),
                 p.end, people=roster)
             _kq = people_data["kamQueue"]["head"]
             # только счётчики: имена и суммы в публичный журнал не идут (правило 17)

@@ -130,6 +130,23 @@ def test_вставка_открывает_раздел_камы_и_не_мол�
     assert not errors
 
 
+def test_вставка_проверяет_вкладку_направления_и_её_адрес(tmp_path):
+    """«Реализация», отдельное направление (25.10.2026): гейт открывает его вкладку (или
+    блок «Нет данных», если сделок нет), возвращается в основной вид и проверяет адрес —
+    #contracts/sep на открытой странице и возврат на вкладку после «Сорсинга»."""
+    page = vd._with_tabs_opened(_page(tmp_path))
+    try:
+        js = page.read_text(encoding="utf-8")
+    finally:
+        page.unlink()
+    assert vd.CT_SEP_BODY in js and vd.CT_SEP_EMPTY in js and vd.CT_MAIN_BODY in js
+    assert "HashChangeEvent('hashchange')" in js and "потерян её адрес" in js
+    assert js.rstrip().endswith("SO.click()}}catch(e){kvFail('Реализация, адрес вкладки: '+e)}</script></body></html>")
+    errors: list[str] = []
+    vd._check_tabs_dom(js.replace("</body>", "<span>ок</span></body>"), errors)
+    assert not errors
+
+
 def test_временный_файл_с_вкладками_не_остаётся_на_диске(tmp_path, monkeypatch):
     _fake_runs(monkeypatch, lambda p: (PAGE * 40, ""))
     page = _page(tmp_path)
