@@ -372,17 +372,41 @@ def test_ключ_свой_и_единственный():
 
 def test_колонки_выгрузки_по_схеме_договоров():
     """Первый живой прогон экономики 25.10.2026 упал на UndefinedColumn: у рабочей базы схема
-    договоров до v2. Нет необязательной колонки — null вместо неё и её имя журналу."""
+    договоров до v2. Нет колонки v2 — null вместо неё и её имя журналу; колонки старше v2 —
+    как есть, и их имена — стопу (ревизия: side_link пустым дал бы ложные флаги)."""
     все = set(rc.КОЛОНКИ_УСЛОВИЙ) | {"order_key"}
-    выбор, нет = rc.колонки_выгрузки(все)
-    assert нет == [] and "null" not in выбор and выбор.split(", ") == list(rc.КОЛОНКИ_УСЛОВИЙ)
-    выбор, нет = rc.колонки_выгрузки(все - {"link_source", "order_key", "side_link"})
-    assert нет == ["side_link", "link_source", "order_key"]
-    assert "null as link_source" in выбор and "null as side_link" in выбор
+    выбор, нет, старше = rc.колонки_выгрузки(все)
+    assert нет == старше == [] and "null" not in выбор and выбор.split(", ") == list(rc.КОЛОНКИ_УСЛОВИЙ)
+    выбор, нет, старше = rc.колонки_выгрузки(все - {"link_source", "order_key"})
+    assert (нет, старше) == (["link_source", "order_key"], [])
+    assert "null as link_source" in выбор and выбор.count("null") == 1
     assert len(выбор.split(", ")) == len(rc.КОЛОНКИ_УСЛОВИЙ), "порядок и число колонок — как у ключей строки"
-    # обязательные — как есть: без ключа строки свод не собрать, пусть скажет база
-    выбор, нет = rc.колонки_выгрузки(все - {"status"})
-    assert "null as status" not in выбор and "status" not in нет
+    # схема до 22.10.2026 (нет side_link) и без ключа строки — не пустыми: стоп
+    for без in ({"side_link"}, {"status"}, {"note"}):
+        выбор, нет, старше = rc.колонки_выгрузки(все - без - {"link_source", "order_key"})
+        assert старше == sorted(без) and нет == ["link_source", "order_key"]
+        assert f"null as {next(iter(без))}" not in выбор
+    assert set(rc.СХЕМА_ДОГОВОРОВ_V2) & set(rc.КОЛОНКИ_УСЛОВИЙ) == {"link_source"}
+
+
+def test_схема_договоров_старше_v2_стоп():
+    """Нет side_link (схема до 22.10.2026) — свод не собирается: CONTRACT_SCHEMA_TOO_OLD с
+    именами колонок из постоянного списка, а не флаги по стороне прежнего смысла."""
+    class Б(rc.База):
+        def __init__(self, колонки):
+            self._колонки = колонки
+
+        def есть(self, *таблицы):
+            return True
+
+        def колонки(self, таблица):
+            return self._колонки
+
+        def _все(self, sql, p=()):
+            raise AssertionError("до запроса строк не доходит")
+
+    with pytest.raises(rc.CtxError, match="^CONTRACT_SCHEMA_TOO_OLD:side_link$"):
+        Б(set(rc.КОЛОНКИ_УСЛОВИЙ) - {"side_link", "link_source"}).договоры()
 
 
 def test_схема_договоров_старая_одной_строкой_журнала():
@@ -609,6 +633,24 @@ def test_свод_по_схеме_договоров_до_v2(conn):
     д = json.loads(s.raw)["contracts"]
     assert д["301"]["outcome"] == "пара" and len(д["301"]["flags"]) == len(флаги)
     assert sum(1 for x in журнал if x.startswith("  схема договоров старая: колонки link_source, order_key нет")) == 1
+
+
+def test_свод_по_схеме_договоров_до_22_10_стоп(conn):
+    """Схема договоров старше (нет и side_link, 22.10.2026) — side там прежнего смысла: свод
+    не собирается и ключ не пишется (CONTRACT_SCHEMA_TOO_OLD), а не флаги по ложной стороне."""
+    c = conn.cursor()
+    c.execute(f"set search_path to {СХЕМА}")
+    c.execute("alter table contract_terms drop constraint contract_terms_link_chk")
+    c.execute("alter table contract_terms drop column link_source")
+    c.execute("alter table contract_terms drop column side_link")
+    база = rc.База(DSN, схема=СХЕМА)
+    try:
+        s = Store()
+        with pytest.raises(rc.CtxError, match="^CONTRACT_SCHEMA_TOO_OLD:side_link$"):
+            rc.publish(база, s, dry=False, ct=ct, печать=lambda _s: None)
+        assert s.raw is None, "ключ не записан"
+    finally:
+        база.закрыть()
 
 
 # ── расписание и прогоны (решение владельца 23.10.2026) ─────────────────────────
