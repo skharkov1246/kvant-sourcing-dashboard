@@ -16,6 +16,9 @@
 """
 from __future__ import annotations
 
+import re
+from datetime import date
+
 TERMS_SCHEMA = {
     "type": "object",
     "properties": {
@@ -61,13 +64,91 @@ FLAG_TEXT = {
     "warrantyStart": "гарантия заказчику от ввода, у поставщика — от отгрузки или поставки",
     "claimGap": "приёмка у заказчика позже срока претензий к поставщику",
     "docsGap": "заказчик требует документы, которых поставщик не обязан дать",
-    "fxGap": "заказчику цена в рублях по фиксированному курсу, поставщику — в валюте",
+    "fxGap": "заказчику цена в рублях или по фиксированному курсу, поставщику — в валюте: курс на нас",
     "cisg": "с иностранным поставщиком Венская конвенция не исключена",
 }
 
 
+#: Приёмка у заказчика, которая наступает через месяцы после поставки: при шефмонтаже,
+#: монтаже, пусконаладке, вводе в эксплуатацию. До 25.10.2026 искалось только слитное
+#: «шефмонтаж», а в договорах пишут «шеф-монтаж» и «шеф монтаж» — флаг claimGap не
+#: ставился ни разу (живой прогон 25.10.2026: 0 при 69 сделках с парой). Сверка — по
+#: тексту, где дефисы и тире стали пробелами (поздняя_приёмка): «шеф-монтаж», «шеф монтаж»
+#: и «шефмонтаж» — одно. Английские слова — только вместе с событием («upon / after
+#: commissioning»): голое «installation» стоит и в «acceptance before installation».
+#: Признак начинается с начала слова (\b): без границы «on» находилось внутри «destination»,
+#: а «в эксплуатац» — в «эксплуатационной документации» (ревью 26.10.2026).
+ПОЗДНЯЯ_ПРИЁМКА = (r"\bшеф ?монтаж", r"\b(?:при|после) монтаж", r"\bпуско ?налад", r"\bв эксплуатацию\b",
+                   r"\b(?:upon|after|following|on) (?:the )?(?:successful )?(?:commissioning|installation|start ?up)\b")
+#: Отрицание ПЕРЕД признаком — приёмка не поздняя: «без шеф-монтажа», «до ввода в
+#: эксплуатацию», «excluding installation». Окно — ОКНО_ОТРИЦАНИЯ слов до признака.
+ОТРИЦАНИЯ = frozenset({"без", "не", "до", "кроме", "исключая", "not", "no", "excluding", "except", "without",
+                       "before", "prior"})
+ОКНО_ОТРИЦАНИЯ = 2
+#: ПОСЛЕ признака отрицают только явные формы исключения: «шеф-монтаж не входит», «… не
+#: предусмотрен», «… по отдельному договору», «installation not included». Отдельные «не»,
+#: «до», «no» после события — это срок, а не исключение: «при шеф-монтаже, но не позднее
+#: 6 месяцев», «при вводе в эксплуатацию, до 12 месяцев», «upon commissioning but no later
+#: than 180 days» — обычная формула поздней приёмки (ревью 26.10.2026: такие строки теряли
+#: флаг). До двух слов между признаком и исключением («шеф-монтаж оборудования не входит»).
+ИСКЛЮЧЕНИЕ_ПОСЛЕ = re.compile(
+    r"^(?:\w+ ){0,2}(?:не (?:входит|входят|включ\w*|предусмотрен\w*|требуется|производится|осуществляется"
+    r"|выполняется)|отсутству\w*|по отдельному договору|отдельным договором|not (?:included|required|applicable)"
+    r"|is not (?:included|required)|excluded|by separate)")
+#: Валюта цены, при которой курс на нас не ложится: рубли.
+РУБЛИ = ("RUB", "RUR", "РУБ")
+
+
 def _n(v):
-    return v if isinstance(v, (int, float)) else None
+    return v if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+
+def _дата(v) -> date | None:
+    """Срок датой (ГГГГ-ММ-ДД, как просит подсказка) → дата; иное — None."""
+    try:
+        return date.fromisoformat(str(v or "").strip()[:10])
+    except ValueError:
+        return None
+
+
+def запас_по_сроку(customer: dict, supplier: dict, путь: float) -> tuple[float | None, str]:
+    """(запас в днях между сроком заказчика и сроком поставщика с путём, чем сравнили).
+
+    Сравнимы только сроки одного рода: оба в днях («N дней от …») или оба датой. До
+    25.10.2026 сравнивались только дни, а срок датой (deliveryDate — частый у Purchase
+    order и у спецификаций «до 31.12») не читался вовсе. Дни против даты без даты
+    отсчёта (подписание, аванс) не сравниваются: её в условиях нет — запас не
+    выдумывается. → (None, «дни против даты» / «нет срока»)."""
+    c_days, s_days = _n(customer.get("deliveryDays")), _n(supplier.get("deliveryDays"))
+    if c_days is not None and s_days is not None:
+        return c_days - (s_days + путь), "дни"
+    c_date, s_date = _дата(customer.get("deliveryDate")), _дата(supplier.get("deliveryDate"))
+    if c_date and s_date:
+        return (c_date - s_date).days - путь, "даты"
+    есть_c = c_days is not None or c_date is not None
+    есть_s = s_days is not None or s_date is not None
+    return None, ("дни против даты" if есть_c and есть_s else "нет срока")
+
+
+def _слова(v) -> str:
+    """Текст → строчные слова через пробел: дефисы, тире и знаки — пробелы."""
+    return " ".join(re.sub(r"[^\w]+", " ", str(v or "").lower().replace("ё", "е")).split())
+
+
+def поздняя_приёмка(acceptance) -> bool:
+    """Порядок приёмки заказчика называет позднее событие (ПОЗДНЯЯ_ПРИЁМКА), перед ним нет
+    отрицания (ОТРИЦАНИЯ в ОКНО_ОТРИЦАНИЯ слов), а после — явного исключения
+    (ИСКЛЮЧЕНИЕ_ПОСЛЕ): «без шеф-монтажа» и «installation not included» — не поздняя
+    приёмка, «при шеф-монтаже, но не позднее 6 месяцев» — поздняя."""
+    s = _слова(acceptance)
+    for образец in ПОЗДНЯЯ_ПРИЁМКА:
+        for m in re.finditer(образец.replace("ё", "е"), s):
+            до = s[:m.start()].split()[-ОКНО_ОТРИЦАНИЯ:]
+            хвост = s[m.end():]
+            после = хвост.split()[0 if хвост[:1] in ("", " ") else 1:]   # признак кончился внутри слова
+            if not ОТРИЦАНИЯ & set(до) and not ИСКЛЮЧЕНИЕ_ПОСЛЕ.match(" ".join(после[:6])):
+                return True
+    return False
 
 
 def flags(customer: dict, supplier: dict, *, logistics_days: float | None = None) -> list[dict]:
@@ -78,9 +159,8 @@ def flags(customer: dict, supplier: dict, *, logistics_days: float | None = None
         out.append({"code": code, "text": FLAG_TEXT[code], **kw})
 
     путь = ЛОГИСТИКА_ДНИ if logistics_days is None else logistics_days
-    c_days, s_days = _n(customer.get("deliveryDays")), _n(supplier.get("deliveryDays"))
-    if c_days is not None and s_days is not None:
-        запас = c_days - (s_days + путь)
+    запас, _как = запас_по_сроку(customer, supplier, путь)
+    if запас is not None:
         if запас < 0:
             add("lateByDesign", days=round(-запас))
         elif запас < ЗАПАС_ДНИ:
@@ -102,13 +182,27 @@ def flags(customer: dict, supplier: dict, *, logistics_days: float | None = None
     cwf, swf = str(customer.get("warrantyFrom") or ""), str(supplier.get("warrantyFrom") or "")
     if "ввод" in cwf.lower() and swf and "ввод" not in swf.lower():
         add("warrantyStart")
-    if "шефмонтаж" in str(customer.get("acceptance") or "").lower() and _n(supplier.get("claimDays")) is not None:
-        add("claimGap", days=supplier["claimDays"])
+    # Приёмка: у заказчика поздняя (монтаж, ввод) при сроке претензий поставщику — или срок
+    # претензий заказчика к нам кончается позже нашего к поставщику: дефект предъявят, когда
+    # поставщик уже не отвечает (ГК РФ ст. 477, 483). Срок заказчика считается от поставки
+    # ему — на путь позже поставки нам, как у lateByDesign.
+    cc, sc = _n(customer.get("claimDays")), _n(supplier.get("claimDays"))
+    if sc is not None and поздняя_приёмка(customer.get("acceptance")):
+        add("claimGap", days=round(sc))
+    elif cc is not None and sc is not None and cc + путь > sc:
+        add("claimGap", days=round(cc + путь - sc))
     нужны = {d.strip().lower() for d in customer.get("documents") or [] if d}
     дадут = {d.strip().lower() for d in supplier.get("documents") or [] if d}
     if нужны - дадут:
         add("docsGap")
-    if customer.get("fxFixed") and str(supplier.get("currency") or "").upper() not in ("", "RUB"):
+    # Валюта: у заказчика цена в рублях (или в рублях по курсу, зафиксированному договором),
+    # у поставщика — в валюте: курс между оплатами на нас. До 25.10.2026 флаг ждал только
+    # fxFixed = true, а подсказка ставит его лишь при прямой оговорке о фиксированном
+    # курсе: обычная рублёвая цена давала currency RUB без fxFixed — флаг не ставился ни
+    # разу. Прямо сказано «курс не фиксирован» (fxFixed = false) — флага нет.
+    в_рублях = str(customer.get("currency") or "").upper() in РУБЛИ and customer.get("fxFixed") is not False
+    валюта_поставщика = str(supplier.get("currency") or "").upper()
+    if (customer.get("fxFixed") is True or в_рублях) and валюта_поставщика not in ("", *РУБЛИ):
         add("fxGap")
     if supplier.get("cisgExcluded") is False:
         add("cisg")

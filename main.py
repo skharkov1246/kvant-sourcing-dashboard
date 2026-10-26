@@ -846,9 +846,12 @@ def run(args) -> int:
         contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
                                                chat_reader=chat_reader,
                                                ctx_chats=real_ctx["chats"] if real_ctx else None,
-                                               ctx_econ=real_ctx["econ"] if real_ctx else None)
+                                               ctx_econ=real_ctx["econ"] if real_ctx else None,
+                                               fx_loader=_cbr_loader(),
+                                               stage_meta=(_presale_in or {}).get("stage_meta"))
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}; продажа из сверенного файла экономики у "
               f"{contracts_data['head'].get('nFile', 0)} открытых")
+        _print_fx(contracts_data.get("fx") or {})
         # «что делать первым» — по общей очереди обоих видов (contracts.life_all); плитки
         # отдельного направления — в его вид (решение владельца 25.10.2026)
         _hc, dealctx_data = dealctx_mod.build(contracts_data["rows"], contracts_mod.life_all(contracts_data),
@@ -1020,6 +1023,47 @@ def run(args) -> int:
     if args.open:
         webbrowser.open(html_path.resolve().as_uri())
     return 0
+
+
+def _cbr_loader():
+    """Курсы ЦБ РФ для «Реализации» (решение владельца 25.10.2026): ряды cbr.ru, резерв —
+    зеркало; KVANT_FX=bitrix — без сети, по справочнику Битрикса (с плашкой во вкладке)."""
+    if os.environ.get("KVANT_FX", "").strip().lower() == "bitrix":
+        return None
+    from base import fx as fx_mod
+    return lambda codes, days, today: fx_mod.load_cbr(codes, days, today=today)
+
+
+def _print_fx(fx: dict) -> None:
+    """Курсы «Реализации» — в журнал только источник, коды, счётчики и даты (правило 17)."""
+    fb = fx.get("fallback")
+    print(f"  курсы: {fx.get('src')} · запросов курсов {fx.get('requests', 0)} · период {fx.get('lo') or '—'}–"
+          f"{fx.get('hi') or '—'}" + (f" · нет у ЦБ: {', '.join(fx['noCode'])}" if fx.get("noCode") else "")
+          + (f" · ряд не получен: {', '.join(fx['failed'])}" if fx.get("failed") else "")
+          + (f" · ряд с зеркала: {', '.join(fx['patched'])}" if fx.get("patched") else "")
+          + f" · без курса на свою дату сделок {fx.get('noRate', 0)}"
+          + (" · время на курсы вышло" if fx.get("timeUp") else "")
+          + (f" · зеркало: недочитано дат {fx.get('mirrorCut', 0)}, сбоев {fx.get('mirrorErr', 0)}"
+             if fx.get("mirrorCut") or fx.get("mirrorErr") else "")
+          + (f" · дат-опечаток {fx['badDays']}" if fx.get("badDays") else "")
+          + (f" · книг бюджета без курса {fx['nPlanNoRate']}" if fx.get("nPlanNoRate") else ""))
+    if fb:
+        print(f"::warning::курсы Битрикса ({fb.get('why')}{', ' + fb['err'] if fb.get('err') else ''}): "
+              f"сделок по ручным курсам {fb.get('n', 0)}")
+    pt = fx.get("partial")
+    if pt:
+        print(f"::warning::ряд ЦБ не получен: {', '.join(pt.get('codes') or [])} — сделок по курсу Битрикса "
+              f"{pt.get('n', 0)}, без суммы {pt.get('lost', 0)}")
+    cl = fx.get("calls") or {}
+    print("  дата КП: " + ", ".join(f"{k} {v}" for k, v in sorted((fx.get("kpSrc") or {}).items()))
+          + f"; «ТКП согласован» в день создания без КП в истории {fx.get('nTkpAtCreate', 0)}; история КП у "
+          f"{fx.get('nOffers', 0)} из {fx.get('nNeedOffer', 0)}" + (f" ({fx['kpErr']})" if fx.get("kpErr") else ""))
+    print("  НДС: " + ", ".join(f"{k} {v}" for k, v in sorted((fx.get("vat") or {}).items()))
+          + "; снят у покупателей: " + ", ".join(f"{k} {v}" for k, v in sorted((fx.get("vatBuyer") or {}).items()))
+          + f"; реквизиты прочитаны у {fx.get('nCountry', 0)} из {fx.get('nBuyers', 0)} компаний"
+          + (f" (сбой {fx['reqErr']})" if fx.get("reqErr") else "")
+          + (f"; отдельные направления без реквизитов — как иностранные {fx['nVatNoreqSep']}" if fx.get("nVatNoreqSep") else ""))
+    print(f"  портал на деньги: история КП и кат. 0 — запросов {cl.get('hist', 0)}, реквизиты — {cl.get('req', 0)}")
 
 
 def _print_snapshot(client) -> None:

@@ -46,6 +46,12 @@ on:
       - "kamqueue.py"
       - "kaminc.py"
       - "history.py"
+      # «Реализация» в € по ЦБ на дату КП (26.10.2026): курсы и правила зонда v59 — импортом
+      - "base/fx.py"
+      - "scripts/probe_money_sources.py"
+      - "scripts/probe_conversion.py"
+      - "scripts/probe_money.py"
+      - "library/company_names.py"
       - "chat_scan.py"          # шаг «Закрытая часть снимка чатов» запускает его при сборке
       - "requirements.txt"
       - "templates/**"          # вёрстка дашборда
