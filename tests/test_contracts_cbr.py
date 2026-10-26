@@ -202,11 +202,15 @@ def test_ндс_рф_без_реквизитов_и_иностранный():
         r = _row(data, d["ID"])
         by_co.setdefault(d["COMPANY_ID"], set()).add((r["vatRule"], r["vatBuyer"]))
         kp = _day(r["kpDate"])
-        k = 1.0 if d["COMPANY_ID"] == fixture.CT_FOREIGN_CO else (1.22 if kp >= D(2026, 1, 1) else 1.20)
+        # иностранный покупатель и сделка направления без реквизитов (решение 26.10) — как есть
+        k = (1.0 if d["COMPANY_ID"] == fixture.CT_FOREIGN_CO or (r["seg"] and r["vatBuyer"] == "noreq")
+             else (1.22 if kp >= D(2026, 1, 1) else 1.20))
         assert r["saleEur"] == round(float(d["OPPORTUNITY"]) * _eur_per(d["CURRENCY_ID"], kp) / k)
     assert by_co[fixture.CT_FOREIGN_CO] == {("foreign", "foreign")}
     assert by_co["300"] == {("gross", "ru")} and by_co["302"] == {("gross", "noreq")}
-    assert data["fx"]["vat"]["foreign"] == 3 and data["fx"]["nCountry"] == 3
+    n_sep = sum(1 for r in data["rows"] if r["seg"] and r["vatBuyer"] == "noreq" and r["vatRule"] == "foreign")
+    assert n_sep, "в корпусе нужна сделка направления без реквизитов"
+    assert data["fx"]["vat"]["foreign"] == 3 + n_sep and data["fx"]["nCountry"] == 3
 
 
 def test_ндс_20_и_22_по_дате_итогового_ткп():
@@ -227,7 +231,11 @@ def test_реквизиты_не_прочитаны_ндс_снят_у_всех_
         return orig(method, params, **kw)
     stub.call = call
     data = _compute(stub)
-    assert data["fx"]["reqErr"] == "RuntimeError" and data["fx"]["vat"].get("foreign", 0) == 0
+    # реквизитов нет ни у кого: основной вид — как РФ, сделки направления — как иностранные
+    # (решение 26.10.2026)
+    n_sep = sum(1 for r in data["rows"] if r["seg"] and r["vatRule"] != "none")
+    assert data["fx"]["reqErr"] == "RuntimeError" and data["fx"]["vat"].get("foreign", 0) == n_sep
+    assert all(r["vatRule"] in ("gross", "none", "net") for r in data["rows"] if not r["seg"])
 
 
 def test_продажа_файла_не_трогается():
@@ -509,12 +517,24 @@ def test_заказ_без_сделки_без_курса_счётом():
     assert data["orphan"]["noRate"] == 1
 
 
-def test_отдельное_направление_без_реквизитов_счётом():
-    """Басра (воронка 16): покупатель без реквизитов — по решению 26.10 НДС снят; счёт для
-    вопроса владельцу (покупатель там, вероятно, иностранный)."""
+def test_отдельное_направление_без_реквизитов_как_иностранный():
+    """Басра (воронка 16) и сделки тех же компаний: покупатель без реквизитов — иностранный,
+    «Сумма» как есть (решение владельца 26.10.2026); счёт таких сделок — в fx."""
     data = _compute()
-    sep = [r for r in data["rows"] if r["seg"] and r["vatBx"] == "gross" and r["vatBuyer"] == "noreq"]
-    assert sep and data["fx"]["nVatNoreqSep"] == len(sep)
+    sep = [r for r in data["rows"] if r["seg"] and r["vatBuyer"] == "noreq" and r["vatBx"] != "none"]
+    assert sep, "в корпусе нужна сделка направления без реквизитов"
+    assert all(r["vatBx"] == "foreign" and r["vatK"] == 1.0 for r in sep)
+    assert data["fx"]["nVatNoreqSep"] == len(sep)
+    # основной вид: без реквизитов — как РФ, НДС снят
+    main = [r for r in data["rows"] if not r["seg"] and r["vatBuyer"] == "noreq" and r["vatBx"] != "none"]
+    assert all(r["vatBx"] == "gross" for r in main)
+
+
+def test_правило_ндс_направления():
+    z = ct._зонд()
+    assert ct._vat(None, D(2026, 3, 1), z=z, sep=True) == ("foreign", 1.0)
+    assert ct._vat("РФ", D(2026, 3, 1), z=z, sep=True) == ("gross", 1.22), "реквизиты РФ — правило общее"
+    assert ct._vat("не РФ", D(2026, 3, 1), z=z, sep=True) == ("foreign", 1.0)
 
 
 def test_портал_на_деньги_считается():

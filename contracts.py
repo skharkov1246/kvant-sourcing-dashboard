@@ -402,11 +402,14 @@ def _kp_date(d: dict, offers: list[dt.date], cat0: list[dt.date], *, z=None,
     return day, _KP_SRC.get(src, "created") if day else "today"
 
 
-def _vat(buyer: str | None, kp_day: dt.date | None, *, z=None) -> tuple[str, float]:
+def _vat(buyer: str | None, kp_day: dt.date | None, *, z=None, sep: bool = False) -> tuple[str, float]:
     """Правило НДС продажи без сверенного файла (решение владельца 26.10.2026) → (vatRule,
     делитель). buyer — страна покупателя по реквизитам: «РФ», «не РФ», None — реквизитов нет
-    (как РФ). Ставка — по дате итогового ТКП: 1,20 до 2026 года, 1,22 с него."""
-    if buyer == "не РФ":
+    (как РФ). Ставка — по дате итогового ТКП: 1,20 до 2026 года, 1,22 с него.
+    sep — сделка отдельного направления (Басра, воронка 16, и сделки тех же компаний): без
+    реквизитов покупатель там иностранный, «Сумма» как есть; реквизиты РФ — правило общее
+    (решение владельца 26.10.2026)."""
+    if buyer == "не РФ" or (sep and buyer is None):
         return "foreign", 1.0
     z = z or _зонд()
     return "gross", z.ставки_ндс(kp_day)[0] if kp_day else z.СТАВКИ_НДС[0]
@@ -725,7 +728,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         sale_gross = (K.eur(d.get("OPPORTUNITY"), sale_cur, kp_day) or 0.0) if sale_known else 0.0
         # НДС по правилу 26.10.2026: покупатель из РФ или без реквизитов — ÷ ставку на дату ТКП
         vat_buyer = country.get(str(d.get("COMPANY_ID") or ""))
-        vat_rule, vat_k = _vat(vat_buyer, kp_day, z=z)
+        vat_rule, vat_k = _vat(vat_buyer, kp_day, z=z, sep=bool(_segment(d)))
         if not sale_gross:
             vat_rule, vat_k = "none", 1.0
         sale = sale_gross / vat_k
@@ -1685,9 +1688,9 @@ def _fx_head(K: Курсы, rate_asof: str, base_cur: str, today: dt.date, info:
         "mirrorErr": int((info.get("mirror") or {}).get("ошибок") or 0),
         # книга бюджета есть, курса ЦБ на её дату нет — план не пересчитан (счётом)
         "nPlanNoRate": int(kw.get("n_plan_norate") or 0),
-        # НДС снят по правилу «без реквизитов» у сделок отдельных направлений (Басра, воронка 16):
-        # покупатель там, вероятно, иностранный — вопрос владельцу, до решения правило как есть
-        "nVatNoreqSep": sum(1 for r in rows if r.get("seg") and r.get("vatBx") == "gross"
+        # отдельные направления (Басра, воронка 16): покупатель без реквизитов — иностранный,
+        # «Сумма» как есть (решение владельца 26.10.2026) — счётом
+        "nVatNoreqSep": sum(1 for r in rows if r.get("seg") and r.get("vatBx") == "foreign"
                             and r.get("vatBuyer") == "noreq"),
         # запросов к порталу у новых чтений: история КП и кат. 0, реквизиты покупателей
         "calls": dict(kw.get("calls") or {}),

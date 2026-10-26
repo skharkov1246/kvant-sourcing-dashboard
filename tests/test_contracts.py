@@ -408,9 +408,20 @@ def test_основной_вид_без_направления(сеп):
     assert sum(p["live"] for p in sl["people"]) == 3
 
 
-def test_нормы_и_поставщики_по_всем_заказам(сеп, monkeypatch):
+def _ндс_без_правила_направления(monkeypatch):
+    """НДС направления (решение 26.10.2026: покупатель без реквизитов — иностранный) меняет
+    продажу сделок направления НАМЕРЕННО, и сравнение «с разделением / без» по деньгам
+    расходится. Инварианты разделения проверяются с этим правилом, выключенным в обоих
+    прогонах; само правило — tests/test_contracts_cbr.py."""
+    orig = contracts_mod._vat
+    monkeypatch.setattr(contracts_mod, "_vat", lambda b, k, *, z=None, sep=False: orig(b, k, z=z))
+
+
+def test_нормы_и_поставщики_по_всем_заказам(monkeypatch):
     """Норма звена, обычное опоздание и надёжность поставщика — мерило, а не портфель:
     в обоих видах те же, что без разделения."""
+    _ндс_без_правила_направления(monkeypatch)
+    сеп = _реализация()
     без = _реализация(без_направлений=True, monkeypatch=monkeypatch)
     for k in ("lead", "norms", "suppliers", "supAll"):
         assert сеп["life"][k] == сеп["sep"]["life"][k] == без["life"][k], k
@@ -439,11 +450,13 @@ def test_сумма_видов_не_теряет_ни_пункта(сеп, monke
     assert len(сеп["rows"]) == len(без["rows"]), "строки таблицы — все, с признаком вида"
 
 
-def test_очередь_кама_не_меняется(сеп, monkeypatch):
+def test_очередь_кама_не_меняется(monkeypatch):
     """Очередь КАМа (kamqueue.py) читает обе очереди: направление снято только с
     ежедневной очереди руководителя реализации."""
     import kamqueue
     from tests import fixture
+    _ндс_без_правила_направления(monkeypatch)
+    сеп = _реализация()
     без = _реализация(без_направлений=True, monkeypatch=monkeypatch)
     ps = fixture.build_presale()
     a = kamqueue.build(ps, contracts_mod.life_all(сеп), сеп["rows"], fixture.CT_TODAY, people=fixture.CT_PEOPLE)

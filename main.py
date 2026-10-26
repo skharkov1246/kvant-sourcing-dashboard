@@ -1062,7 +1062,7 @@ def _print_fx(fx: dict) -> None:
           + "; снят у покупателей: " + ", ".join(f"{k} {v}" for k, v in sorted((fx.get("vatBuyer") or {}).items()))
           + f"; реквизиты прочитаны у {fx.get('nCountry', 0)} из {fx.get('nBuyers', 0)} компаний"
           + (f" (сбой {fx['reqErr']})" if fx.get("reqErr") else "")
-          + (f"; отдельные направления без реквизитов {fx['nVatNoreqSep']}" if fx.get("nVatNoreqSep") else ""))
+          + (f"; отдельные направления без реквизитов — как иностранные {fx['nVatNoreqSep']}" if fx.get("nVatNoreqSep") else ""))
     print(f"  портал на деньги: история КП и кат. 0 — запросов {cl.get('hist', 0)}, реквизиты — {cl.get('req', 0)}")
 
 
