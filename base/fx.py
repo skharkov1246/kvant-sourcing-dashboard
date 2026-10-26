@@ -189,7 +189,13 @@ class CbrRates:
     начинается за 30 дней до самой ранней нужной даты (критика v59, A11), и
     пробел в начале значит, что курса правда нет. RUB — 1 рубль за рубль."""
 
-    def __init__(self, series: dict[str, list[tuple[date, float]]]):
+    def __init__(self, series: dict[str, list[tuple[date, float]]],
+                 holes: dict[str, set[date]] | None = None):
+        """holes — {код: даты}, на которые курса НЕТ, хотя ряд их «покрывает»: даты зеркала со
+        сбоем, обрезанные временем или без курса. Ряд зеркала — только прочитанные даты, и
+        «последняя запись не позже даты» отдала бы за такую дату курс другой, более ранней
+        прочитанной даты (ревью 26.10.2026: курс на месяцы старше без пометки)."""
+        self._holes = {str(c).upper(): set(v) for c, v in (holes or {}).items()}
         self._days: dict[str, list[date]] = {}
         self._vals: dict[str, list[float]] = {}
         for code, rows in series.items():
@@ -210,7 +216,7 @@ class CbrRates:
         if code == "RUB":
             return 1.0
         days = self._days.get(code)
-        if not days:
+        if not days or day in self._holes.get(code, ()):
             return None
         i = bisect.bisect_right(days, day) - 1
         return self._vals[code][i] if i >= 0 else None
@@ -317,7 +323,7 @@ def cbr_mirror_codes(timeout: int = 30, fetch=None) -> set[str]:
 
 def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.25,
                       timeout: int = 30, fetch=None, on_error: str = "raise",
-                      deadline=None) -> tuple[dict[str, list[tuple[date, float]]], dict]:
+                      deadline=None, holes: set | None = None) -> tuple[dict[str, list[tuple[date, float]]], dict]:
     """Ряды «рублей за ОДНУ единицу» по зеркалу только на нужные даты.
 
     days — нужные даты; codes — ISO-коды. Даты идут от новых к старым: при пределе
@@ -328,7 +334,9 @@ def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.
 
     on_error — «raise» (зонд v59: сбой зеркала — исключение) или «skip» (сборка: дата со
     сбоем остаётся без курса и считается в «ошибок», прочитанные даты не теряются).
-    deadline — () → True, когда время сборки на курсы вышло: оставшиеся даты — «обрезано»."""
+    deadline — () → True, когда время сборки на курсы вышло: оставшиеся даты — «обрезано».
+    holes — множество, куда пишутся нужные даты без курса (сбой, обрезано, без курса):
+    CbrRates(holes=…) не отдаст за них курс соседней прочитанной даты."""
     get = fetch or (lambda u: _mirror_get(u, timeout))
     want = {str(c).upper() for c in codes} - {"RUB"}
     cache: dict[date, tuple[date, dict[str, float]] | None] = {}
@@ -343,6 +351,8 @@ def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.
                 if stat["запросов"] >= max_requests or (deadline and deadline()):
                     stat["обрезано"] += 1
                     found = None
+                    if holes is not None:
+                        holes.add(day)
                     break
                 if stat["запросов"] and pause:
                     time.sleep(pause)
@@ -365,6 +375,8 @@ def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.
                         raise
                     stat["ошибок"] += 1                 # дата без курса, прочие даты остаются
                     found = None
+                    if holes is not None:
+                        holes.add(day)
                     break
                 if status == 200:
                     eff, rates = parse_cbr_mirror_day(body)
@@ -380,6 +392,8 @@ def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.
                 break
         if found is False:
             stat["без курса"] += 1
+            if holes is not None:
+                holes.add(day)
     return {c: sorted(v.items()) for c, v in series.items() if v}, stat
 
 
@@ -515,9 +529,10 @@ def load_cbr(codes, days, *, today: date, fetch=None, mirror_fetch=None,
             if miss and not time_up():
                 # ряд одной валюты не получен — её курс на нужные даты с зеркала, остальное с cbr.ru
                 try:
+                    mholes: set = set()
                     mser, stat = cbr_mirror_series(set(ds), set(miss), max_requests=mirror_max,
                                                    pause=mirror_pause, fetch=mget, on_error="skip",
-                                                   deadline=time_up)
+                                                   deadline=time_up, holes=mholes)
                     info["requests"] += stat["запросов"]
                     info["mirror"] = stat
                     info["patched"] = sorted(c for c in miss if mser.get(c))
@@ -526,7 +541,8 @@ def load_cbr(codes, days, *, today: date, fetch=None, mirror_fetch=None,
                 except Exception as e:  # noqa: BLE001 — зеркало не помогло: валюта остаётся в failed
                     info["mirrorWhy"] = type(e).__name__
             info["timeUp"] = info["timeUp"] or time_up()
-            return CbrRates(series), info
+            # даты зеркала без курса — дыры только у валют, взятых с зеркала
+            return CbrRates(series, holes={c: mholes for c in info["patched"]} if info["patched"] else None), info
         # cbr.ru не дал ряда к евро — зеркало на нужные даты и сегодня
         if time_up():
             info["timeUp"] = True
@@ -534,8 +550,10 @@ def load_cbr(codes, days, *, today: date, fetch=None, mirror_fetch=None,
             return None, info
         try:
             cbr_mirror_codes(fetch=mget)
+            mholes = set()
             mser, stat = cbr_mirror_series(set(ds) | {today}, set(want), max_requests=mirror_max,
-                                           pause=mirror_pause, fetch=mget, on_error="skip", deadline=time_up)
+                                           pause=mirror_pause, fetch=mget, on_error="skip", deadline=time_up,
+                                           holes=mholes)
             info["requests"] += 1 + stat["запросов"]
             info["mirror"] = stat
         except Exception as e:  # noqa: BLE001 — зеркало тоже недоступно: курсов ЦБ нет
@@ -549,7 +567,7 @@ def load_cbr(codes, days, *, today: date, fetch=None, mirror_fetch=None,
         info["src"] = "mirror"
         info["noCode"] = sorted(c for c in want if c not in mser)
         info["failed"] = []
-        return CbrRates(mser), info
+        return CbrRates(mser, holes={c: mholes for c in want}), info
     finally:
         if sess is not None:
             sess.close()

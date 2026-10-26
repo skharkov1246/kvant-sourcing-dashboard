@@ -221,7 +221,9 @@ def test_ндс_20_и_22_по_дате_итогового_ткп():
     assert ct._vat("не РФ", D(2026, 3, 1), z=z) == ("foreign", 1.0)
 
 
-def test_реквизиты_не_прочитаны_ндс_снят_у_всех_и_сказано():
+def test_реквизиты_не_прочитаны_ндс_снят_у_всех_кроме_направления():
+    """Реквизиты не прочитаны: основной вид — как РФ, НДС снят; отдельное направление —
+    как иностранные (решение 26.10.2026), плашка шапки называет это исключение."""
     stub = fixture.ContractsStub()
     orig = stub.call
 
@@ -683,3 +685,45 @@ def test_журнал_частичного_сбоя_и_доход_подпись
     assert "портал на деньги:" in out and "€" not in out
     assert kaminc._fx_lbl(data["fx"]).startswith("продажа и закупка — по курсам сверенного файла")
     assert kaminc._fx_lbl(_compute(fx_loader=None)["fx"]).startswith("курсы Битрикса")
+
+
+def test_зеркало_дата_со_сбоем_без_курса_а_не_курс_соседней():
+    """Ревью 26.10.2026: дата зеркала со сбоем между двумя прочитанными не берёт курс более
+    ранней прочитанной даты (ряд зеркала — только прочитанные даты): курса нет, сумма
+    неизвестна, как обещает плашка."""
+    import json as _json
+    T, N, M, O = D(2026, 10, 23), D(2026, 10, 22), D(2026, 6, 10), D(2025, 1, 15)
+    R = {N: 95.0, M: 90.0, O: 105.0, T: 95.5}
+
+    def cbr(_u):
+        raise ConnectionError("down")
+
+    def mir(u):
+        if u == fx.CBR_MIRROR_LATEST:
+            return 200, _json.dumps({"Date": "2026-10-23", "Valute": {
+                "EUR": {"CharCode": "EUR", "Nominal": 1, "Value": 95.5}}}).encode()
+        y, m, d = map(int, u.split("/archive/")[1].split("/")[:3])
+        d = D(y, m, d)
+        if d == M:
+            raise TimeoutError("read timed out")
+        if d in R:
+            return 200, _json.dumps({"Date": d.isoformat(), "Valute": {
+                "EUR": {"CharCode": "EUR", "Nominal": 1, "Value": R[d]}}}).encode()
+        return 404, b""
+    K, info = fx.load_cbr({"EUR"}, [N, M, O], today=T, fetch=cbr, mirror_fetch=mir, mirror_pause=0)
+    assert info["src"] == "mirror" and info["mirror"]["ошибок"] == 1
+    assert K.value("EUR", M) is None, "курс 15.01.2025 за 10.06.2026 — подмена"
+    assert K.value("EUR", N) == 95.0 and K.value("EUR", O) == 105.0
+
+
+def test_добор_валюты_с_зеркала_дыра_только_у_неё():
+    """Путь «ряд одной валюты не получен»: дыра зеркала — только у добранной валюты;
+    евро с cbr.ru на ту же дату остаётся."""
+    holes = set()
+    ряды, стат = fx.cbr_mirror_series({D(2026, 10, 14)}, {"EUR"}, pause=0,
+                                      fetch=lambda u: (_ for _ in ()).throw(TimeoutError("x")),
+                                      on_error="skip", holes=holes)
+    assert holes == {D(2026, 10, 14)} and стат["ошибок"] == 1 and not ряды
+    K = fx.CbrRates({"EUR": [(D(2026, 10, 1), 90.0)], "USD": [(D(2026, 10, 1), 80.0)]},
+                    holes={"USD": holes})
+    assert K.value("USD", D(2026, 10, 14)) is None and K.value("EUR", D(2026, 10, 14)) == 90.0
