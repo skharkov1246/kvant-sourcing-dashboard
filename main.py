@@ -850,10 +850,16 @@ def run(args) -> int:
                                                chat_reader=chat_reader,
                                                ctx_chats=real_ctx["chats"] if real_ctx else None,
                                                ctx_econ=real_ctx["econ"] if real_ctx else None,
+                                               ctx_contracts=real_ctx["contracts"] if real_ctx else None,
                                                # справочник отделов уже прочитан (кэш клиента):
                                                # отдел ОРК и его руководитель — без нового запроса
                                                departments=client.departments())
         ork_month_data = contracts_data.pop("orkMonth", None)
+        _ork_head = contracts_data.pop("_orkHead", "") or ""
+        # календарь РФ кончается — сроки менеджера следующего года не посчитать: громко заранее
+        if (p.end.year + 1) not in period_mod.workcal_years():
+            print(f"  ⚠ производственного календаря на {p.end.year + 1} год нет в data/workcal_ru.json: "
+                  f"с 1 января сроки регламента ОРК не посчитаются (без подмены на Пн–Пт) — внести календарь")
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}; продажа из сверенного файла экономики у "
               f"{contracts_data['head'].get('nFile', 0)} открытых")
         # регламент ОРК — только счётчики (правило 17): сколько живых заказов легло на шаг,
@@ -872,7 +878,8 @@ def run(args) -> int:
         # «что делать первым» — по общей очереди обоих видов (contracts.life_all); плитки
         # отдельного направления — в его вид (решение владельца 25.10.2026)
         _hc, dealctx_data = dealctx_mod.build(contracts_data["rows"], contracts_mod.life_all(contracts_data),
-                                              real_ctx, period_mod.now(dealctx_mod.MSK), today=p.end)
+                                              real_ctx, period_mod.now(dealctx_mod.MSK), today=p.end,
+                                              ork_head=_ork_head)
         if _hc is not None:
             _hc_sep = _hc.pop("sep", None)
             contracts_data["head"]["ctx"] = _hc

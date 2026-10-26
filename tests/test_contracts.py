@@ -453,9 +453,8 @@ def test_основной_вид_без_направления(сеп):
     assert sum(p["orders"] for p in sl["phases"]) == 3 and sum(p["orders"] for p in life["phases"]) > 0
     assert life["counts"].get("late") == sum(1 for q in life["queue"] if q["code"] == "late")
     assert сеп["sep"]["head"]["live"] == 2 and сеп["sep"]["deadlines"]["lateDeals"] == 1
-    # нагрузка людей — по живым заказам сделок вида
-    assert sum(p["live"] for p in life["people"]) == sum(1 for r in main for o in r["orders"] if o["live"])
-    assert sum(p["live"] for p in sl["people"]) == 3
+    # нагрузка людей поимённо в открытые данные вкладки не идёт (решение 26.10.2026, п. 3)
+    assert "people" not in life and "people" not in sl
 
 
 def test_нормы_и_поставщики_по_всем_заказам(сеп, monkeypatch):

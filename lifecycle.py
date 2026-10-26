@@ -56,8 +56,9 @@ EXC = {
     "planAfterDl": (5, "план доставки позже срока клиента", "предупредить клиента или сменить маршрут"),
     # «платежа нет» и «УПД нет» — в карточке заказа нет файла: оплату в деньгах портал не
     # видит (решение Р-2), подпись говорит ровно то, что известно
+    # долг клиента урегулирует КАМ, ОСС в копии (решение владельца 26.10.2026, п. 4)
     "unpaid": (6, "доставлено, срок оплаты клиента прошёл, платёжки клиента в заказе нет",
-               "проверить оплату; пришла — приложить платёжку, нет — напомнить клиенту"),
+               "урегулировать долг: получить у клиента оплату или дату оплаты; пришла — приложить платёжку"),
     "noUtd": (7, f"доставлено {UTD_WD + 1}+ р.д. назад, УПД в заказе нет", "получить подписанный УПД и приложить; на 11-й р.д. — эскалация КАМу"),
     "noPayPlan": (8, "доставлено, нет планового срока оплаты", "внести срок оплаты из договора"),
     "dealOpen": (9, "все заказы закрыты, сделка открыта", "закрыть сделку"),
@@ -75,8 +76,8 @@ EXC = {
     "s3Over": (5, f"PO/OC, спецификация и предоплата дольше {ork.NORM_WD[5]} р.д.", "довести PO, OC, спецификацию и предоплату"),
     "s6Over": (5, f"подготовка к отгрузке дольше {ork.NORM_WD[8]} р.д.", "собрать отгрузочные документы и передать логистике"),
     # оплата поставщику без договора с заказчиком (Рег. 2.4, 7.6.4): сделка ни разу не была на
-    # стадии «Договор с заказчиком подписан» или дальше
-    "payNoContract": (3, "оплачено поставщику, договор с заказчиком по стадии не подписан", "проверить договор заказчика; без него оплату не проводить"),
+    # стадии «Договор с заказчиком подписан» или дальше, и договора заказчика нет в разборе договоров
+    "payNoContract": (3, "оплачено поставщику, договор с заказчиком не подписан по стадии и не найден", "проверить договор заказчика; без него оплату не проводить"),
 }
 # обязательные даты размещения (решение владельца 19.10.2026, п. 9)
 PLAN_DATES = (("prodStart", "начало производства"), ("prodEnd", "конец производства"),
@@ -351,7 +352,7 @@ def _deal_item(code: str, sev: int, what: str, act: str, days, d: dict, own: dic
 
 def build(orders: list[dict], deals: list[dict], today: dt.date,
           warranty_months: int = WARRANTY_MONTHS, *, measure: list[dict] | None = None,
-          ork_head: str = "") -> dict:
+          ork_head: str = "", cust_contract: set | None = None) -> dict:
     """orders — заказы, приведённые к фактам; deals — строки сделок contracts.py
     (deal, seq, customer, closed, done, norders, cat0At, managerGone, ossGone,
     respGone, manager, oss, ossDeal, orkResp, kam, dealStepMax, paidStage). → раздел
@@ -362,6 +363,9 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     «Ответственный за реализацию» (orkResp), иначе «не назначен»; руководитель ОРК —
     ork_head (руководитель отдела по справочнику), иначе подпись роли; КАМ — поле сделки;
     ОСС — ОСС заказа, иначе сделки; логистика — подпись роли.
+
+    cust_contract — сделки, у которых договор заказчика найден в разборе договоров
+    (dealctx.customer_contract_deals): им payNoContract не ставится, как бы ни отстала стадия.
 
     measure — заказы, по которым МЕРЯЮТСЯ нормы: сроки звеньев (медиана, 75 %), обычное
     опоздание и надёжность поставщиков. None — те же orders. Вид вкладки (основной или
@@ -387,13 +391,8 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         """Шаг, роль, исполнитель и копия пункта (ork.ITEM): who — хозяин пункта."""
         ow = ork.item_owner(code, _step_now(o) if o else None, ppl(o, d))
         return {"step": ow["step"], "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
-                "who": ow["who"], "whoGone": gone(ow["who"]), "executor": ow["who"],
+                "who": ow["who"], "whoGone": gone(ow["who"]),
                 "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}
-
-    def owner(o: dict, d: dict | None) -> str:
-        """Исполнитель текущего шага заказа — для «хозяев процесса»."""
-        st = _step_now(o)
-        return ork.owner(st, ppl(o, d))["who"] if st else "—"
 
     def gone(name: str) -> bool:
         return name.endswith("(уволен)")      # contracts.who подписывает ушедших так
@@ -433,6 +432,9 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         exc = order_exceptions(o, today, fc, nocal=nocal)
         if d.get("closed"):
             exc = [(c, n) for c, n in exc if c not in СРОКИ | ОПЛАТА]
+        # приёмка — от входа сделки в «Реализацию» (Рег. 3.3): сделка вне воронки — не приёмка
+        if not d.get("inCat0", True):
+            exc = [(c, n) for c, n in exc if c != "s1Over"]
         in_tile = p in ph and (o.get("live") or p == "warranty") and not (d.get("closed") and o.get("live"))
         if in_tile:
             ph[p]["orders"] += 1
@@ -488,8 +490,10 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             elif wd > ORDER_WD:
                 codes.append(("noOrder", wd))
         # оплачено поставщику, а сделка ни разу не была на шаге «договор с заказчиком
-        # подписан» (шаг 4) или дальше — по всем переходам сделки (dealStepMax)
+        # подписан» (шаг 4) или дальше — по всем переходам сделки (dealStepMax) — и договора
+        # заказчика нет в разборе договоров (cust_contract): стадия сделки отстаёт от дела
         if (d.get("dealStepMax") is not None and d["dealStepMax"] < 4
+                and str(d["deal"]) not in (cust_contract or set())
                 and any(o.get("live") and (o.get("supPaidPct") or 0) > 0 for o in os_)):
             codes.append(("payNoContract", None))
         # ведёт уволенный: ответственный сделки, ОСС или ответственный живого заказа
@@ -558,23 +562,9 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     suppliers = [{"sup": k, **v} for k, v in sup_all.items() if v["n"] >= SUP_MIN]
     suppliers.sort(key=lambda x: (x["pct"], -(x["medSlip"] or 0)))
 
-    # хозяева: живые заказы, исключения и доставка в срок за 90 дней
-    people: dict[str, dict] = defaultdict(lambda: {"live": 0, "exc": 0, "late": 0, "n90": 0, "ok90": 0})
-    for o, d in in_scope:
-        w = owner(o, d)
-        p = people[w]
-        p["live"] += bool(o.get("live"))
-        f, dl = o.get("delFact"), o.get("dl")
-        if f and dl and 0 <= (today - f).days <= 90:
-            p["n90"] += 1
-            p["ok90"] += f <= dl
-    for q in queue:
-        people[q["who"]]["exc"] += 1
-        people[q["who"]]["late"] += q["code"] == "late"
-    people_rows = sorted(({"who": k, **v, "gone": gone(k),
-                           "pct90": round(v["ok90"] / v["n90"] * 100) if v["n90"] else None}
-                          for k, v in people.items() if v["live"] or v["exc"]),
-                         key=lambda x: (-x["exc"], -x["live"]))
+    # «хозяева процесса» поимённо (живые заказы, доставка в срок за 90 дней) с 26.10.2026 в
+    # страницу не идут: доставка в срок — результат поставщика и логистики, не менеджера (Ан.
+    # §4), а нагрузка менеджера поимённо — только под правом руководителей ОРК (решение п. 3)
 
     # гарантия — тот же набор, что плитка фазы «Гарантия»
     in_w = [o for o, _ in in_scope if phase(o, today, warranty_months) == "warranty"]
@@ -598,7 +588,6 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         "lead": lead_out,
         "suppliers": suppliers[:20],
         "supAll": sup_all,          # по каждому поставщику — для вкладки «Поставщики»
-        "people": people_rows[:20],
         "warranty": warranty,
         "rules": {"riskDays": RISK_DAYS, "utdWd": UTD_WD, "orderWd": ORDER_WD, "payGrace": PAY_GRACE,
                   "supMin": SUP_MIN, "norms": dict(ork.NORM_WD), "noPause": ork.NO_PAUSE,

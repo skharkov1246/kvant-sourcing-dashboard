@@ -87,10 +87,15 @@ def test_сегменты_по_переходам():
 
 
 def test_пропущенная_стадия_не_теряет_сегмент():
-    # «Заказ направлен» пропущен: S1 кончается входом сразу на шаг 5, S2 — нулевой
+    # «Заказ направлен» пропущен: S1 кончается входом сразу на шаг 5, S2 — нулевой и помечен
+    # «шаг пропущен» (Рег. 6.13–6.14, Ан. S2): в своевременность он не идёт
     tr = [("S:NEW", t("09-01")), ("S:PO", t("09-03")), ("S:PAY", t("09-10"))]
     s = ork.segments(tr, ИМЕНА)["segs"]
     assert s["S1"]["wd"] == 2 and s["S2"]["wd"] == 0 and s["S3"]["wd"] == 5
+    assert s["S2"]["skip"] is True and not s["S1"]["skip"] and not s["S3"]["skip"]
+    import orkview
+    m1 = orkview._timeliness([s["S2"]], "S2")
+    assert m1["skipped"] == 1 and m1["k"] == 0 and m1["state"] == "nodata", "пропуск — не «в норме за 0 р.д.»"
 
 
 def test_возврат_в_стадию():
@@ -235,3 +240,26 @@ def test_календарь_покрывает_историю():
     # история стадий — с 2024-06-01 (contracts.HIST_SINCE) по следующий год
     years = period_mod.workcal_years()
     assert all(y in years for y in range(2024, 2027 + 1))
+
+
+def test_ожидание_оплаты_с_упд_шаг_13_не_гигиена():
+    """«Ожидание оплаты» — шаги 12 и 13 (STAGE_SPAN): с подписанным УПД живой заказ на шаге
+    13, и это не «стадия позади фактов» — закрывать заказ до оплаты клиента не надо."""
+    сегодня = D(2026, 10, 26)
+    o = {"stage": "Ожидание оплаты", "delFact": D(2026, 10, 1), "utd": True}
+    assert ork.step_of(o["stage"], o) == 13
+    assert not ork.hygiene(o, сегодня)["behind"] and not ork.hygiene(o, сегодня)["exclude"]
+    позади = {"stage": "Заказ получен клиентом", "delFact": D(2026, 10, 1), "utd": True}
+    assert ork.hygiene(позади, сегодня)["behind"], "до «Ожидания оплаты» с УПД — стадия отстала"
+
+
+def test_пункты_чатов_и_договоров_по_таблице():
+    ppl = {"orkMgr": "Илья (ОРК)", "kam": "Анна (КАМ)", "orkHead": "Роза (рук. ОРК)", "ossDeal": "Ольга (ОСС)"}
+    assert ork.item_owner("chatDue", 7, ppl, key="chatDue:оплата")["who"] == "Анна (КАМ)"
+    assert ork.item_owner("chatDue", 7, ppl, key="chatDue:отгрузка")["who"] == "Илья (ОРК)"
+    other = ork.item_owner("chatDue", 7, ppl, key="chatDue:встреча")
+    assert (other["role"], other["step"], other["copy"]) == ("orkMgr", 7, "Анна (КАМ)")
+    assert ork.item_owner("contractRisk", 5, ppl)["who"] == "Роза (рук. ОРК)"
+    both = ork.item_owner("contractMissing", 5, ppl, key="contractMissing:both")
+    assert (both["role"], both["copyRole"], both["step"]) == ("kam", "orkMgr", 2)
+    assert all("oss" not in (r, c) for k, (_s, r, c) in ork.ITEM.items() if k.startswith("chat"))

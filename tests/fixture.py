@@ -696,17 +696,23 @@ class ContractsStub:
 
 
 def build_contracts(**kw) -> dict:
-    """Синтетика → настоящий contracts.compute → данные вкладки «Реализация»."""
+    """Синтетика → настоящий contracts.compute → данные вкладки «Реализация». Руководителя
+    ОРК (служебный ключ «_orkHead») main.py забирает до записи страницы — здесь так же;
+    keep_head=True — оставить (build_realization передаёт его в dealctx.build)."""
     import os
 
     import contracts as contracts_mod
+    keep_head = kw.pop("keep_head", False)
     old = os.environ.get("KVANT_NOW")
     os.environ["KVANT_NOW"] = CT_NOW
     try:
         stub = ContractsStub()
         kw.setdefault("people", CT_ROSTER)
         kw.setdefault("departments", stub.departments())
-        return contracts_mod.compute(stub, as_of=CT_TODAY, **kw)
+        ct = contracts_mod.compute(stub, as_of=CT_TODAY, **kw)
+        if not keep_head:
+            ct.pop("_orkHead", None)
+        return ct
     finally:
         if old is None:
             os.environ.pop("KVANT_NOW", None)
@@ -776,11 +782,13 @@ def build_realization() -> dict:
     для dashboard.write."""
     import dealctx
     ctx = dealctx.clean(realctx_raw())
-    ct = build_contracts(ctx_chats=ctx["chats"], ctx_econ=ctx["econ"])
+    ct = build_contracts(ctx_chats=ctx["chats"], ctx_econ=ctx["econ"], ctx_contracts=ctx["contracts"],
+                         keep_head=True)
     ork_month = ct.pop("orkMonth", None)  # как main.py: поимённое — не в данные вкладки, своим массивом
+    ork_head = ct.pop("_orkHead", "")
     import contracts as contracts_mod
     head, payload = dealctx.build(ct["rows"], contracts_mod.life_all(ct), ctx, dt.datetime.fromisoformat(CT_NOW),
-                                  today=CT_TODAY)
+                                  today=CT_TODAY, ork_head=ork_head)
     sep = head.pop("sep", None)
     ct["head"]["ctx"] = head
     if sep is not None and ct.get("sep"):

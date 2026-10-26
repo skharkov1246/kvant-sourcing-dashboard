@@ -218,13 +218,16 @@ def test_вкладка_со_сводом():
     reply = dc["queue"][0]
     assert reply["what"].endswith("оценка модели, уверенность 80 %"), "пункт по чату — оценка, а не факт"
     assert reply["who"] == rows["6006"]["ossDeal"] and reply["days"] == 4
-    assert dc["queue"][3]["who"] == dealctx.CONTRACT_HEAD and dc["queue"][3]["act"].endswith("пени, документы")
+    # риск сверки договоров — руководитель ОРК по справочнику отделов (ork.ITEM, решение 26.10.2026, п. 1)
+    assert dc["queue"][3]["role"] == "orkHead" and dc["queue"][3]["who"] == "Роза (рук. ОРК)"
+    assert dc["queue"][3]["act"].endswith("пени, документы")
     assert dc["counts"] == {"chatReply": 1, "chatRisk": 1, "chatDue": 1, "contractRisk": 1, "contractMissing": 2,
                             "econGap": 2, "contractUnreadable": 1}
-    # файл договора не читается — пункт ответственному сделки (как «договор не найден»):
-    # следующий прогон это не вылечит, файл надо перезалить
+    # файл договора не читается — пункт ответственному сделки: следующий прогон это не
+    # вылечит, файл надо перезалить; роль — «ответственный сделки» (регламент пункт не описывает)
     нечит = next(q for q in dc["queue"] if q["code"] == "contractUnreadable")
     assert нечит["who"] == rows["6015"]["manager"] and нечит["what"] == "файл договора не читается"
+    assert нечит["role"] == "dealResp" and нечит["roleName"] == "ответственный сделки"
     assert нечит["act"].startswith("перезалить файл договора")
     assert d["6015"]["contract"]["outcome"] == "не читается" and d["6015"]["contract"]["missing"] == []
     assert d["6001"]["contract"]["flags"][0]["text"] == dealctx.contract_b2b.FLAG_TEXT["penaltyUncovered"]
@@ -519,3 +522,33 @@ def test_статус_сверено_как_у_шаблона():
     import econ_template
     import realization_ctx
     assert realization_ctx.ECON_VERIFIED == econ_template.СВЕРЕНО
+
+
+def test_хозяин_пунктов_чатов_и_договоров_по_регламенту():
+    """Решение владельца 26.10.2026, п. 1; дизайн: срок и риск из чата — «сигнал из чата, не
+    эскалация», ОСС их не получает (Рег. 1.11): отгрузка и документы — менеджеру ОРК, доставка и
+    оплата — КАМу; договор заказчика не найден — КАМ, поставщика — менеджер ОРК. У каждого
+    пункта — шаг и роль: отбор очереди «Недели» по роли и шагу их не теряет."""
+    r = fixture.build_realization()
+    dc = r["dealctx"]
+    rows = {x["deal"]: x for x in r["contracts"]["rows"]}
+    for q in dc["queue"]:
+        assert q["role"] and q["roleName"], q["code"]
+        if q["code"] in ("chatDue", "chatRisk"):
+            assert q["role"] != "oss" and q["copyRole"] != "oss" and q["signal"] == dealctx.SIGNAL
+    due = next(q for q in dc["queue"] if q["code"] == "chatDue")          # срок оплаты из чата
+    assert due["role"] == "kam" and due["who"] == rows[due["deal"]]["kam"] and due["step"] == 13
+    risk = next(q for q in dc["queue"] if q["code"] == "chatRisk")
+    assert risk["role"] == "orkMgr" and risk["copyRole"] == "kam" and risk["escalateTo"] == rows[risk["deal"]]["kam"]
+    miss = {q["deal"]: q for q in dc["queue"] if q["code"] == "contractMissing"}
+    assert miss["6007"]["role"] == "kam" and miss["6007"]["copyRole"] == "orkMgr", "обеих сторон нет"
+    assert miss["6003"]["role"] == "orkMgr" and miss["6003"]["step"] == 4, "нет договора поставщика"
+    # вид срока из чата — по таблице ork.ITEM
+    for kind, role in (("отгрузка", "orkMgr"), ("документы", "orkMgr"), ("доставка", "kam"),
+                       ("оплата", "kam"), ("встреча", "orkMgr")):
+        ow = dealctx._reg("chatDue", {"kam": "К", "stepCell": {"step": 7}}, {"kam": "К"}, key=f"chatDue:{kind}")
+        assert ow["role"] == role, kind
+    # очередь «Недели» = очередь регламента + эти пункты: роль есть у каждого
+    life = r["contracts"]["life"]
+    week_q = list(life["queue"]) + [q for q in dc["queue"] if not q.get("seg")]
+    assert all(q.get("role") for q in week_q)

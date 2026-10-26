@@ -585,7 +585,9 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
         acts[str(q.get("kamId") or "")].append({
             "code": q.get("code"), "sev": q.get("sev", 9), "what": q.get("what") or "", "act": q.get("act") or "",
             "deal": str(q.get("deal")), "seq": q.get("seq") or 0, "t": str(q.get("title") or "")[:70],
-            "days": q.get("days"), "who": q.get("owner") or "", "src": "kam"})
+            "days": q.get("days"), "who": q.get("owner") or "", "src": "kam",
+            # дни рабочие (р.д.) у сроков регламента ОРК (kamqueue inWd), иначе календарные
+            **({"wd": True} if q.get("inWd") else {})})
     by_id = {d["id"]: d for d in deals if d["k"] == "r"}
 
     def gap(code: str, d: dict, key: str, who: str = "") -> None:

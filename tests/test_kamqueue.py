@@ -235,3 +235,19 @@ def test_кам_хозяин_или_в_копии_по_регламенту():
     assert by["late"]["kamCopy"] is True and by["unpaid"]["kamCopy"] is False
     assert by["s1Over"]["act"] == "ответить руководителю ОРК по приёмке сделки" and by["late"]["step"] == 4
     assert Q["rules"]["utdWd"] == 10
+    # хозяин — по регламенту, а не «ответственный заказа»: роль хозяина и «вы — хозяин»
+    assert by["unpaid"]["kamOwner"] is True and by["late"]["kamOwner"] is False
+
+
+def test_кам_видит_роль_хозяина_и_рабочие_дни():
+    """Решение 26.10.2026, пп. 1–2: у пункта реализации — подпись роли хозяина по регламенту и
+    единица дней (р.д. у сроков регламента, иначе календарные)."""
+    q = {**_q("noUtd", "6001", 14), "role": "orkMgr", "roleName": "менеджер ОРК", "copyRole": "kam",
+         "who": "Илья (ОРК)", "inWd": True, "step": 12}
+    q2 = {**_q("late", "6001", 9), "role": "orkMgr", "roleName": "менеджер ОРК", "copyRole": "kam",
+          "who": "Илья (ОРК)", "step": 7}
+    Q = kq.build(None, {"queue": [q, q2]}, [_deal("6001")], СЕГОДНЯ)
+    by = {x["code"]: x for x in Q["queue"]}
+    assert (by["noUtd"]["owner"], by["noUtd"]["ownerRole"], by["noUtd"]["inWd"], by["noUtd"]["kamCopy"]) == (
+        "Илья (ОРК)", "менеджер ОРК", True, True)
+    assert by["late"]["inWd"] is False

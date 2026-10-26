@@ -118,6 +118,10 @@ STAGE_STEP = {
         "Оплата получена | Закрытие сделки": 13,
     },
 }
+# стадия, которая покрывает несколько шагов: (шаг по стадии, наибольший шаг стадии).
+# «Ожидание оплаты» — шаг 12 без УПД и шаг 13 с УПД (живой заказ на шаге 13 только в ней:
+# «Закрытие заказа» — успех); УПД подписан — стадия не «позади фактов»
+STAGE_SPAN = {"order": {"Ожидание оплаты": 13}}
 # нижняя граница шага по фактам: (поля, хоть одно заполнено → шаг не ниже)
 FACT_FLOOR = (
     (("supPaidPct", "prodConf"), 6),           # оплата поставщику или подтверждение производства
@@ -195,6 +199,7 @@ GATES = {
     "abandoned_wd": 60,          # > 60 р.д. на шаге с нормой ≤ 2 — «брошенная карточка»
     "abandoned_norm_max": 2,
     "n_count": 1,                # счёт живых пунктов «сейчас» — не выборка: n-ворот у него нет
+    "n_managers_min": 3,         # M3 без права: среднее меньше чем по трём менеджерам — не показываем
 }
 GATES_NOTE = "пороги — предложение, ждут решения владельца"
 STATES = ("show", "prelim", "nodata", "hidden")
@@ -215,6 +220,7 @@ def norm_name(name) -> str:
 _STAGE_IDX = {kind: {norm_name(k): v for k, v in m.items()} for kind, m in STAGE_STEP.items()}
 _STAGE_HEAD = {kind: {norm_name(k).split(" | ")[0]: v for k, v in m.items()}
                for kind, m in STAGE_STEP.items()}
+_STAGE_SPAN = {kind: {norm_name(k): v for k, v in m.items()} for kind, m in STAGE_SPAN.items()}
 
 
 def stage_step(stage_name, kind: str = "order") -> int | None:
@@ -317,9 +323,12 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
     заказа, вход сделки в кат. 0)); без него — первый переход. facts — {delFact, utdRaw}:
     даты доставки и подписания УПД (сырые, без подстановки) для S9 и S10.
 
-    → {"segs": {S: {start, end, wd, cd, norm, inNorm, ret, burst}}, "open": {S, start} | None,
+    → {"segs": {S: {start, end, wd, cd, norm, inNorm, neg, ret, burst, burstEnd, skip}}, "open": {S, start} | None,
        "returns": n, "returnPairs": [(шаг из, шаг в)], "burst": bool, "unknown": n,
-       "noCalendar": bool}. wd — рабочие дни (None — года нет в календаре), cd — календарные."""
+       "noCalendar": bool}. wd — рабочие дни (None — года нет в календаре), cd — календарные.
+    skip — шаг пропущен: начало и конец сегмента дал один переход (стадия перепрыгнула шаг,
+    Рег. 6.13–6.14; Ан. S2 — рамочный договор уже есть). Такой сегмент не «в норме за 0 р.д.»:
+    в своевременность и сроки он не идёт, а считается отдельно."""
     tr = _sorted_tr(transitions)
     steps = [stage_step(names.get(s, s)) for s, _ in tr]
     unknown = sum(1 for x in steps if x is None)
@@ -364,6 +373,8 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
             "neg": tb < ta,                           # конец раньше начала — порядок меток нарушен
             "ret": any(ta < r <= tb for r in ret_times),
             "burst": (ia in in_burst) or (ib in in_burst),
+            "burstEnd": ib in in_burst,               # конец сегмента прокликан «пачкой» (Q1 — вход в «Заказ готов»)
+            "skip": ia is not None and ia == ib,
         }
     return {"segs": segs, "open": open_seg, "returns": returns, "returnPairs": pairs,
             "burst": bool(in_burst), "unknown": unknown, "noCalendar": no_cal}
@@ -468,7 +479,8 @@ def hygiene(order: dict, today: dt.date, workdays_fn=period_mod.workdays_ru) -> 
     нормы» и сегментов не идут. → {behind, abandoned, unknown, exclude, why}."""
     base = stage_step(order.get("stage"))
     floor = fact_floor(order)
-    behind = base is not None and base < floor
+    top = _STAGE_SPAN["order"].get(norm_name(order.get("stage")), base) if base is not None else None
+    behind = base is not None and top < floor
     abandoned = False
     why = []
     if base is None:
@@ -593,17 +605,37 @@ ITEM = {
     "noDl": (1, "orkHead", "kam"),
     "noPlanDates": (6, "oss", None),
     "noFact": (11, "log", None),
+    # чаты и договоры (dealctx): «сигнал из чата, не эскалация»; ОСС их не получает — со
+    # сторонами не говорит (Рег. 1.11). Срок из чата — по виду срока: отгрузка и документы —
+    # менеджеру ОРК, доставка и оплата — КАМу; прочие сроки — менеджеру ОРК, КАМ в копии
+    "chatDue": (None, "orkMgr", "kam"),
+    "chatDue:отгрузка": (9, "orkMgr", "kam"),
+    "chatDue:документы": (12, "orkMgr", "kam"),
+    "chatDue:доставка": (10, "kam", None),
+    "chatDue:оплата": (13, "kam", None),
+    "chatRisk": (None, "orkMgr", "kam"),
+    # договор стороны не найден: заказчика — КАМ (шаги 2–3), поставщика — менеджер ОРК (шаг 4)
+    "contractMissing:customer": (2, "kam", None),
+    "contractMissing:supplier": (4, "orkMgr", None),
+    "contractMissing:both": (2, "kam", "orkMgr"),
+    # сверка договоров заказчик ↔ поставщик — допсоглашение с поставщиком: руководитель ОРК
+    "contractRisk": (4, "orkHead", None),
 }
+# роли пунктов, которых регламент не описывает (чаты, договоры, экономика — dealctx): хозяин —
+# человек сделки, подпись роли — для отбора очереди по роли
+ROLES_EXTRA = {"dealResp": "ответственный сделки", "src": "сорсинг"}
 # «сверх нормы» шага → код пункта (шаг 12 — noUtd по факту доставки, не по стадии)
 OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over"}
 
 
-def item_owner(code: str, step_now: int | None, people: dict) -> dict:
-    """Хозяин пункта очереди по таблице ITEM: {step, role, who, copy, copyRole}. Код не из
-    таблицы — исполнитель текущего шага и его эскалация."""
-    st, role, copy = ITEM.get(code, (None, None, _ESC_STEP))
+def item_owner(code: str, step_now: int | None, people: dict, *, key: str | None = None) -> dict:
+    """Хозяин пункта очереди по таблице ITEM: {step, role, who, copy, copyRole}. key —
+    строка ITEM с уточнением (вид срока из чата, сторона договора), нет её — по коду. Код не
+    из таблицы — исполнитель текущего шага и его эскалация."""
+    k = key if key in ITEM else code
+    st, role, copy = ITEM.get(k, (None, None, _ESC_STEP))
     step = st if st is not None else step_now
-    out = owner(step, people, role=role, esc=copy if code in ITEM else _ESC_STEP)
+    out = owner(step, people, role=role, esc=copy if k in ITEM else _ESC_STEP)
     return {"step": step, **out}
 
 

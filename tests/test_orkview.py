@@ -74,7 +74,7 @@ def test_неделя_все_блоки_с_данными(ct):
     assert t["W4"]["state"] == "nodata" and t["W4"]["value"] is None and "Эскалация" in t["W4"]["need"]
     # W2 — только шаги ОРК и УПД; счёт — тот же, что пункты очереди
     c = ct["life"]["counts"]
-    assert t["W2"]["value"] == sum(len({q["order"] for q in ct["life"]["queue"] if q["code"] == k})
+    assert t["W2"]["value"] == sum(len({q["order"] for q in ct["life"]["queue"] if q["code"] == k and q.get("w2")})
                                    for k in ("s1Over", "s2Over", "s3Over", "s6Over", "noUtd"))
     assert set(t["W2"]["byStep"]) == {1, 4, 5, 8, 12} and t["W2"]["label"].endswith(ork.NO_PAUSE)
     assert t["W1"]["noOrder"] == c.get("noOrder", 0) >= 1
@@ -99,7 +99,10 @@ def test_месяц_квартал_и_как_считается(ct):
     assert all(r["M1"][k]["state"] != "show" for r in rows for k in r["M1"])
     assert any(r["M2"]["state"] in ("show", "prelim") for r in rows)
     assert all(r["otd"]["label"] == "результат поставщика и логистики" for r in rows)
-    assert o["month"]["M3"]["state"] == "show" and o["month"]["M3"]["label"] == "без поправки на сложность"
+    M3 = o["month"]["M3"]
+    assert M3["label"] == "без поправки на сложность"
+    # менеджеров ОРК в корпусе меньше трёх: среднее — нагрузка человека, без права не показываем
+    assert M3["managers"] < ork.GATES["n_managers_min"] and M3["state"] == "hidden" and M3["value"] is None
     assert len(o["month"]["an4"]) == len(ork.AN4_NODATA) and {x["state"] for x in o["month"]["an4"]} == {"nodata"}
     q = o["quarter"]
     assert any(x["Q1"]["state"] in ("show", "prelim") for x in q["quarters"])
@@ -220,3 +223,121 @@ def test_первичный_срок_поставщика_план_равен_ф
     assert q["state"] == "hidden" and q["value"] is None and q["planEqFact"] == 0.4
     q2 = orkview._quarter_view(late, СЕГОДНЯ)["quarters"][0]["Q1"]
     assert (q2["state"], q2["value"], q2["n"]) == ("show", 0, 6)
+
+
+# ── одна совокупность у «сейчас», «сверх нормы» и W2 ──────────────────────────────────────
+class _ОплаченоБезУпд(fixture.ContractsStub):
+    """Придуманный корпус: сделка «Оплата получена» (закрыта) с тремя живыми заказами,
+    доставленными 45 дн. назад без УПД, и два живых заказа открытой сделки, доставленных без
+    УПД, — в стадиях «Заказ отгружен» и «Заказ получен клиентом»."""
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct_
+        now = dt.datetime.fromisoformat(fixture.CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()            # noqa: E731
+        d = lambda a: (fixture.CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        self.deals.append({"ID": "6900", "TITLE": "990. Оплачено, заказ не закрыт", "OPPORTUNITY": "1000",
+                           "CURRENCY_ID": "EUR", "COMPANY_ID": "301", "STAGE_ID": "C0:PAID", "STAGE_SEMANTIC_ID": "P",
+                           "CATEGORY_ID": "0", "DATE_CREATE": t(200), "ASSIGNED_BY_ID": "10", ct_.OSS_DEAL: ["21"],
+                           ct_.KAM_F: "11"})
+        self.deals.append({"ID": "6901", "TITLE": "991. Доставлено без УПД", "OPPORTUNITY": "1000",
+                           "CURRENCY_ID": "EUR", "COMPANY_ID": "301", "STAGE_ID": "C0:DELIVERED",
+                           "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(200), "ASSIGNED_BY_ID": "10",
+                           ct_.OSS_DEAL: ["21"], ct_.KAM_F: "11"})
+        self.hist[2] += [("6900", "C0:NEW", t(200)), ("6900", "C0:PAID", t(10)),
+                         ("6901", "C0:NEW", t(200)), ("6901", "C0:DELIVERED", t(30))]
+        plan = [("6900", 99000, "WAITPAY"), ("6900", 99001, "WAITPAY"), ("6900", 99002, "WAITPAY"),
+                ("6901", 99100, "TRUCK"), ("6901", 99101, "GOT")]
+        for deal, oid, stage in plan:
+            self.orders.append({"id": oid, "title": f"{deal}/{oid}. Узел", "companyId": "401",
+                                "parentId2": int(deal), "opportunity": 100, "currencyId": "EUR",
+                                "stageId": f"DT172_26:{stage}", "createdTime": t(150), "movedTime": t(40),
+                                ct_.OSS_F: "21", ct_.DL_CUSTOMER: d(30), ct_.DEL_FACT: d(45), ct_.SUP_PAID: 100,
+                                "assignedById": "31"})
+            path = ("NEW", "SENT", "PO", "PAY", "PREPARATION", "READY", "SHIPPREP", "TRUCK", "GOT", "WAITPAY")
+            for k, st in enumerate(path[:path.index(stage) + 1]):
+                self.hist[172].append((str(oid), f"DT172_26:{st}", t(150 - 12 * k)))
+
+
+def _инварианты(view: dict) -> None:
+    w = view["ork"]["week"]
+    for r in w["ledger"]:
+        if r["over"] is not None:
+            assert r["over"] <= r["now"], (r["no"], r["over"], r["now"])
+    W2 = w["tiles"]["W2"]
+    assert W2["value"] <= (W2["n"] or 0), W2
+    assert sum(r["now"] for r in w["ledger"]) + w["unknown"] == w["live"]
+    assert sum(m["n"] for m in w["overByWho"]) == W2["value"], "поимённо — тот же счёт, что у W2"
+
+
+def test_сверх_нормы_не_больше_сейчас(ct):
+    _инварианты(ct)
+    _инварианты(ct["sep"])
+    stub = _ОплаченоБезУпд()
+    data, _o = _orders(stub)
+    _инварианты(data)
+    q = data["life"]["queue"]
+    paid = [x for x in q if x["code"] == "noUtd" and str(x["order"]).startswith("9900")]
+    assert len(paid) == 3 and not any(x.get("w2") for x in paid), "закрытая сделка — в очереди, не в W2"
+    led = {r["no"]: r for r in data["ork"]["week"]["ledger"]}
+    # доставлено без УПД — шаг 12 ведомости, а не 11 («Заказ получен клиентом»)
+    assert led[11]["now"] == sum(1 for r in data["rows"] if not r["closed"] for o in r["orders"]
+                                 if o["live"] and o["step"] == 11 and not o["delivered"])
+    assert any(x.get("w2") for x in q if str(x["order"]) in ("99100", "99101"))
+
+
+def test_гигиена_не_назначен_в_счёте(ct):
+    """«Менеджер ОРК не назначен» — гигиена, но в счёте «сверх нормы» есть (решение п. 1):
+    в «не идут в счёт» — только стадия позади фактов, брошенная и стадия не из таблицы."""
+    h = ct["ork"]["week"]["hygiene"]
+    assert h["excluded"] == sum(1 for x in h["items"] if set(x["kinds"]) & {"behind", "abandoned", "unknown"})
+    assert h["noMgrOnly"] > 0 and all(not x["excl"] for x in h["items"] if x["kinds"] == ["noMgr"])
+    nm = next((m for m in ct["ork"]["week"]["overByWho"] if m["who"] == "не назначен"), None)
+    assert nm and nm["n"] > 0, "не назначенные — в «сверх нормы по менеджерам»"
+    assert all("live" not in m for m in ct["ork"]["week"]["overByWho"]), "нагрузка поимённо — под правом"
+
+
+def test_контрольные_точки_у_заказов_шагов_6_7(ct):
+    w = ct["ork"]["week"]
+    W5 = w["tiles"]["W5"]
+    assert W5["value"] == len(w["checkpoints"]) and (W5["n"] or 0) > 0
+    rows = {o["id"]: o for r in ct["rows"] for o in r["orders"]}
+    assert all(rows[str(c["order"])]["step"] in (6, 7) for c in w["checkpoints"])
+
+
+def test_q1_пачка_не_первичный_срок():
+    """Придуманный корпус: 10 заказов поставщика «П-1», вход в «Заказ готов» прокликан пачкой
+    через 40 дн. после бюджетного конца производства — не «0 % в срок», а «не показываем»."""
+    names = {"NEW": "Заказ создан", "SENT": "Заказ направлен", "PO": "Сформирован РО/Подготовка описаний",
+             "PAY": "Оплата поставщику / агенту", "PROD": "Производство заказа", "READY": "Заказ готов",
+             "SHIP": "Подготовка к отгрузке", "TRUCK": "Подготовка груза/Поиск транспорта",
+             "GOT": "Заказ получен клиентом", "CLOSE": "Закрытие заказа"}
+    msk = dt.timezone(dt.timedelta(hours=3))
+    orders = []
+    for k in range(10):
+        tr = [("NEW", "2026-04-01T10:00:00+03:00"), ("SENT", "2026-04-02T10:00:00+03:00"),
+              ("PO", "2026-04-06T10:00:00+03:00"), ("PAY", "2026-04-10T10:00:00+03:00"),
+              ("PROD", "2026-04-13T10:00:00+03:00")]
+        base = dt.datetime(2026, 8, 19, 10, 0, tzinfo=msk)
+        tr += [(st, (base + dt.timedelta(seconds=20 * i)).isoformat())
+               for i, st in enumerate(("READY", "SHIP", "TRUCK", "GOT", "CLOSE"))]
+        orders.append({"id": str(k), "sup": "П-1", "prodEnd": dt.date(2026, 7, 10), "created": dt.date(2026, 4, 1),
+                       "_reach": ork.reach_times(tr, names), "_segs": ork.segments(tr, names)})
+    q = orkview._quarter_view(orders, dt.date(2026, 10, 26))
+    q3 = next(x for x in q["quarters"] if x["q"] == "3 кв. 2026")
+    assert q3["Q1"]["state"] == "hidden" and q3["Q1"]["value"] is None and q3["Q1"]["burstN"] == 10
+    assert [(r["sup"], r["state"], r["value"]) for r in q3["suppliers"]] == [("П-1", "hidden", None)]
+    assert q["Q2"]["S5"]["state"] == "hidden", "Q2: «пачек» больше порога — не показываем"
+    # та же готовность без пачки — в счёте
+    for o in orders:
+        o["_segs"]["segs"]["S5"]["burstEnd"] = False
+    q3 = next(x for x in orkview._quarter_view(orders, dt.date(2026, 10, 26))["quarters"] if x["q"] == "3 кв. 2026")
+    assert q3["Q1"]["n"] == 10 and q3["Q1"]["value"] == 0
+
+
+def test_менеджер_за_прошлый_месяц():
+    """Поимённо — текущий и прошлый полный месяц (в начале месяца у текущего отрезков нет)."""
+    _d, _o = _orders()
+    mp = _d["orkMonth"]["main"]
+    assert mp and all("prev" in m and "M1" in m["prev"] and m["prev"]["m"] for m in mp)

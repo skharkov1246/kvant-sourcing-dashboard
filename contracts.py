@@ -291,6 +291,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             chat_reader: chat_activity.Reader | None = None,
             ctx_chats: dict[str, dict] | None = None,
             ctx_econ: dict[str, dict] | None = None,
+            ctx_contracts: dict[str, dict] | None = None,
             departments: list[dict] | None = None) -> dict:
     """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
     уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
@@ -301,6 +302,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     моделью и последнее чтение прогоном оценки; None — «подвисла» как до 23.10.2026.
     ctx_econ — финальная экономика из того же свода (dealctx.load()["econ"], только сверенные
     файлы): продажа и закупка из файла — первыми; None — как до 25.10.2026.
+    ctx_contracts — разбор договоров из того же свода (dealctx.load()["contracts"]): договор
+    заказчика найден — пункта «оплачено поставщику без договора с заказчиком» нет, даже если
+    стадия сделки отстала (дизайн, шаг 5); None — только по стадии.
     departments — уже прочитанный справочник отделов (BitrixClient.departments(), кэш сборки):
     отдел ОРК и его руководитель (people.ork_department) — хозяева пунктов по регламенту ОРК
     (решение владельца 26.10.2026, п. 1); None — менеджер ОРК только из поля сделки,
@@ -1026,8 +1030,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     sep_rows = [r for r in rows if r["seg"]]
     main_orders = [o for o in life_orders if o["deal"] not in sep_ids]
     sep_orders = [o for o in life_orders if o["deal"] in sep_ids]
-    life = lifecycle.build(main_orders, main_rows, today, measure=life_orders, ork_head=ork_head)
-    life_sep = (lifecycle.build(sep_orders, sep_rows, today, measure=life_orders, ork_head=ork_head)
+    cust_contract = dealctx.customer_contract_deals(ctx_contracts)
+    life = lifecycle.build(main_orders, main_rows, today, measure=life_orders, ork_head=ork_head,
+                           cust_contract=cust_contract)
+    life_sep = (lifecycle.build(sep_orders, sep_rows, today, measure=life_orders, ork_head=ork_head,
+                                cust_contract=cust_contract)
                 if sep_rows else None)
 
     # 7. скорость: сводные метрики
@@ -1479,7 +1486,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "life": life,
         # вид отдельного направления (решение владельца 25.10.2026): те же разделы по его
         # сделкам; сводка для шапки и подписи вкладки — head["sep"]
-        "sep": ({k: sep_view[k] for k in ("funnel", "head", "kpis", "deadlines", "speed", "gone", "life", "ork")}
+        # «Квартал» мерится по ВСЕМ заказам — у направления он тот же, что у основного вида: в
+        # данные вида не копируется (страница берёт его из основного, quarterFrom)
+        "sep": ({**{k: sep_view[k] for k in ("funnel", "head", "kpis", "deadlines", "speed", "gone", "life")},
+                 "ork": ({**sep_view["ork"], "quarter": None, "quarterFrom": "main"} if sep_view.get("ork")
+                         else sep_view.get("ork"))}
                 if sep_view is not None else None),
         # регламент ОРК основного вида (вид направления — sep.ork)
         "ork": main_view["ork"],
@@ -1487,6 +1498,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # забирает раздел до записи страницы — в страницу только своим массивом под правом
         # руководителей ОРК, во «вкладку для всех» не идёт
         "orkMonth": ork_month,
+        # руководитель ОРК по справочнику отделов — хозяин пунктов dealctx (main.py забирает)
+        "_orkHead": ork_head,
         "orphan": {"n": len(orphan), "buy": _money(orphan_buy)},
         "suppliers": {
             "label": f"на {today.strftime('%d.%m.%Y')}",

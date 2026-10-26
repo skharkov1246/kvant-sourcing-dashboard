@@ -286,10 +286,15 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
             title=(by_deal.get(did) or {}).get("title") or x.get("title") or "",
             seq=x.get("seq") or 0, customer=x.get("customer") or "",
             extra={"orders": a["orders"], "dl": x.get("dl") or "",
-                   # хозяин пункта по регламенту — с кем КАМ сверяет срок и оплату; КАМ в копии
+                   # хозяин пункта по регламенту (решение 26.10.2026, п. 1) — с кем КАМ сверяет срок и
+                   # оплату, и его роль; КАМ хозяин (kamOwner) — пункт ведёт он сам; КАМ в копии
                    # (kamCopy) — пункт ведёт хозяин, КАМ держит разговор с клиентом
                    "owner": str(x.get("who") or "").replace(" (уволен)", ""),
+                   "ownerRole": x.get("roleName") or "",
+                   "kamOwner": x.get("role") == "kam",
                    "kamCopy": x.get("copyRole") == "kam" and x.get("role") != "kam",
+                   # дни рабочие (р.д., календарь РФ, «без пауз») у сроков регламента, иначе календарные
+                   "inWd": bool(x.get("inWd")),
                    **({"step": x["step"]} if x.get("step") else {})})
 
     # 3. сделки без КАМа: пресейл; открытые сделки реализации; сделки реализации с
