@@ -228,6 +228,33 @@ def test_подвисла_только_если_в_чате_тихо(сообщ�
     assert ct["head"]["chat"]["checked"] == 1
 
 
+def test_сумма_прячет_потерю_замедлено_хуже_и_лучше_счётом(monkeypatch):
+    """«Замедлено» по норме шага (решение 26.10.2026, п. 2) против прежних 2× медианы — у
+    скольких сделок картина стала хуже и у скольких лучше, счётом (CLAUDE.md, «сумма прячет
+    потерю»). Сделка 2: заказ 502 восемь дней на шаге 5 — 6 р.д. при норме 9, прежде (порог
+    7 дн.) — замедлена: лучше. Сделка 4: заказ 505 три дня на шаге 1 — 3 р.д. при норме 1,
+    прежде (меньше недели) — нет: хуже."""
+    monkeypatch.setenv("KVANT_NOW", СЕЙЧАС)
+    п = Портал()
+    п.orders = [o for o in п.orders if o["id"] != 504]          # 504 держал бы сделку 2 «по-старому»
+    п.deals.append({"ID": "4", "TITLE": "904. Редуктор", "OPPORTUNITY": "10000", "CURRENCY_ID": "EUR",
+                    "COMPANY_ID": "", "STAGE_ID": "C0:PURCHASE", "STAGE_SEMANTIC_ID": "P",
+                    "CATEGORY_ID": "0", "DATE_CREATE": _t(4), "ASSIGNED_BY_ID": "10"})
+    п.orders.append({"id": 505, "title": "904/1. Редуктор", "companyId": "", "parentId2": 4,
+                     "opportunity": 6000, "currencyId": "EUR", "stageId": "DT172_26:NEW",
+                     "createdTime": _t(3), "movedTime": _t(3), DL: _t(-60)[:10], OSS: "11"})
+    п.hist = {2: [("1", "C0:PURCHASE", _t(120)), ("1", "C0:DELIVERY", _t(60)), ("1", "C0:PURCHASE", _t(5)),
+                  ("2", "C0:PURCHASE", _t(5)), ("4", "C0:PURCHASE", _t(3))],
+              172: [("501", "DT172_30:NEW", _t(150)), ("501", "DT172_30:PREPARATION", _t(3)),
+                    ("502", "DT172_26:PREPARATION", _t(8)), ("505", "DT172_26:NEW", _t(3))]}
+    ct = contracts_mod.compute(п, as_of=dt.date(2026, 10, 9), people={}, service_ids={"542"})
+    c = ct["ork"]["slowCmp"]
+    assert c == {"old": 1, "new": 1, "worse": 1, "better": 1}, c
+    # кандидат — до чата; «подвисла» по-прежнему решает чат (у сделки 4 чата нет — не проверено)
+    assert "сверх нормы шага" in _row(ct, "4")["why"] and not _row(ct, "4")["stuck"]
+    assert "сверх нормы шага" not in _row(ct, "2")["why"] and not _row(ct, "2")["stuck"]
+
+
 def test_чаты_читает_общий_читатель_сборки():
     """main.py отдаёт реализации общий читатель чатов: её запросы списываются с бюджета
     сборки, пресейлу остаётся остаток (chat_activity.Reader)."""
