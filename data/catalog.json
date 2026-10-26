@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 318,
-    "total_bytes": 126497203,
+    "total_bytes": 126497098,
     "by_sensitivity": {
       "внутреннее": 197,
       "конфиденциально": 68,
@@ -1665,7 +1665,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 559562,
+      "bytes": 558776,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. С 19.10.2026 в файле только числа по сотрудникам (uid Битрикса); список «ждут ответа» с названиями сделок и LLM-оценки — в KV Cloudflare, ключ chat:v1. До первого прогона после переноса файл ещё прежней схемы.",
       "format": "json",
       "shape": "объект",
@@ -2752,7 +2752,7 @@
     {
       "path": "gt/data/bitrix_gt.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 261674,
+      "bytes": 262355,
       "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
       "format": "json",
       "shape": "объект",
@@ -2765,7 +2765,7 @@
       ],
       "main_collection": {
         "key": "deals",
-        "records": 231,
+        "records": 232,
         "record_keys": [
           "created",
           "id",

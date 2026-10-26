@@ -1,8 +1,18 @@
 {
- "updated": "2026-10-22",
+ "updated": "2026-10-26",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "24166",
+   "title": "388-306 Закупка ГТД Centaur-40 г.Казань",
+   "models": [
+    "Centaur 40"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-10-23",
+   "rfqs": []
+  },
   {
    "id": "24138",
    "title": "5588099 Поставка запасных частей для ГИ ГТУ ЭБ-2 ТТЭЦ-1 ПАО \"Форвард Энерго\"",
@@ -61,7 +71,7 @@
    "models": [
     "SGT-600"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:2",
    "created": "2026-10-13",
    "rfqs": []
   },
@@ -93,7 +103,7 @@
    "models": [
     "SGT-700"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:4",
    "created": "2026-10-06",
    "rfqs": [
     {
@@ -137,7 +147,7 @@
    "models": [
     "V64.3A (AE64.3A)"
    ],
-   "stage": "C2:4",
+   "stage": "C2:PREPARATION",
    "created": "2026-10-02",
    "rfqs": [
     {
@@ -145,7 +155,7 @@
      "title": "RFQ JAES SRL",
      "created": "2026-10-08",
      "supplier": "JAES SRL",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -156,7 +166,7 @@
      "title": "RFQ Can-Am Machinery",
      "created": "2026-10-08",
      "supplier": "Can-Am Machinery",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -178,7 +188,7 @@
      "title": "RFQ Novaut",
      "created": "2026-10-08",
      "supplier": "Novaut",
-     "stage": "In Correspondance",
+     "stage": "Отказ в КП",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -189,7 +199,7 @@
      "title": "RFQ Industrial-Stores",
      "created": "2026-10-08",
      "supplier": "Industrial-Stores",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -200,7 +210,7 @@
      "title": "RFQ Valvetech LLC",
      "created": "2026-10-08",
      "supplier": "ValveTech LLC",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -211,7 +221,7 @@
      "title": "rfq Hubei Jomay Automation",
      "created": "2026-10-08",
      "supplier": "Hubei Jomay Automation Co.,Ltd",
-     "stage": "Request Sent",
+     "stage": "Price at Work",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -222,7 +232,7 @@
      "title": "rfq Sunbelt Supply",
      "created": "2026-10-08",
      "supplier": "Sunbelt Supply (Shanghai) Co., Ltd",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -233,7 +243,7 @@
      "title": "rfq Shanghai Bogvik Wear Material",
      "created": "2026-10-08",
      "supplier": "Shanghai Bogvik Wear Material Co., ltd",
-     "stage": "In Correspondance",
+     "stage": "Не подошло по технике",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -244,7 +254,7 @@
      "title": "rfq Shanghai GDOO Mining Technology",
      "created": "2026-10-08",
      "supplier": "ShangHai GDOO Mining Technology Limited (Ricky)",
-     "stage": "New Request",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -255,7 +265,7 @@
      "title": "rfq Sinco Machinery",
      "created": "2026-10-08",
      "supplier": "Sinco Machinery Co., Ltd.",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -266,7 +276,7 @@
      "title": "rfq baoman Industrial Technology",
      "created": "2026-10-08",
      "supplier": "Baoman Industrial Technology (Chengdu) Co., Ltd",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -277,7 +287,7 @@
      "title": "rfq Wuxi CTENO Actuators Manufacture",
      "created": "2026-10-08",
      "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -288,7 +298,7 @@
      "title": "rfq China Power Contractor",
      "created": "2026-10-15",
      "supplier": "China Power Contractor",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -299,7 +309,7 @@
      "title": "rfq Xiangjing (Shanghai) M&E Technology Co., Ltd.",
      "created": "2026-10-15",
      "supplier": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -310,7 +320,7 @@
      "title": "rfq Sichuan Focus Science and Technology Co., Ltd",
      "created": "2026-10-15",
      "supplier": "Sichuan Focus Science and Technology Co., Ltd.",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -321,7 +331,7 @@
      "title": "rfq Cascade Automation",
      "created": "2026-10-15",
      "supplier": "Cascade Automation Inc.",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -332,7 +342,7 @@
      "title": "rfq Valmet Flow Control",
      "created": "2026-10-15",
      "supplier": "Valmet Flow Control (Jiaxing) Co., Ltd.",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Karina Khalilova",
      "models": [
       "V64.3A (AE64.3A)"
@@ -346,7 +356,7 @@
    "models": [
     "V64.3A (AE64.3A)"
    ],
-   "stage": "C2:4",
+   "stage": "C2:10",
    "created": "2026-10-02",
    "rfqs": [
     {
@@ -847,7 +857,7 @@
     {
      "id": "48872",
      "title": "Подшипники в GTW BEARINGS S.R.O.",
-     "created": "2026-10-05",
+     "created": "2026-10-06",
      "supplier": "GTW BEARINGS S.R.O.",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -858,7 +868,7 @@
     {
      "id": "48874",
      "title": "Подшипники Каземе в PowerGen",
-     "created": "2026-10-05",
+     "created": "2026-10-06",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -869,7 +879,7 @@
     {
      "id": "48876",
      "title": "Валы в Casagrande Ingranaggi S.r.l.",
-     "created": "2026-10-05",
+     "created": "2026-10-06",
      "supplier": "Casagrande Ingranaggi S.r.l.",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -7869,7 +7879,7 @@
     {
      "id": "6206",
      "title": "Requests #6206",
-     "created": "2024-09-01",
+     "created": "2024-09-02",
      "supplier": "tec-group",
      "stage": "Price at Work",
      "sourcer": "Ruslan Sitdikov",
