@@ -67,9 +67,18 @@ def test_поздняя_приёмка_в_любом_написании_и_ср�
         assert коды(b2b.flags({"acceptance": приёмка}, поставщик)) == {"claimGap": 30}, приёмка
     assert b2b.flags({"acceptance": "по количеству мест при поставке"}, поставщик) == []
     assert b2b.flags({"acceptance": "при шеф-монтаже"}, {}) == [], "без срока претензий поставщику флага нет"
-    # срок претензий заказчика к нам длиннее нашего к поставщику
-    assert коды(b2b.flags({"claimDays": 90}, {"claimDays": 30})) == {"claimGap": 60}
-    assert b2b.flags({"claimDays": 30}, {"claimDays": 30}) == []
+    # отрицание рядом с признаком и голое английское слово — не поздняя приёмка
+    for приёмка in ("без шеф-монтажа", "шеф-монтаж не входит в поставку", "installation not included",
+                    "acceptance before installation", "до ввода в эксплуатацию", "excluding commissioning"):
+        assert b2b.flags({"acceptance": приёмка}, поставщик) == [], приёмка
+    for приёмка in ("acceptance upon commissioning", "after successful installation", "при монтаже"):
+        assert коды(b2b.flags({"acceptance": приёмка}, поставщик)) == {"claimGap": 30}, приёмка
+    # срок претензий заказчика к нам кончается позже нашего к поставщику: срок заказчика —
+    # от поставки ему, на путь позже поставки нам (как у lateByDesign)
+    assert коды(b2b.flags({"claimDays": 90}, {"claimDays": 30}, logistics_days=19)) == {"claimGap": 79}
+    assert коды(b2b.flags({"claimDays": 30}, {"claimDays": 30}, logistics_days=19)) == {"claimGap": 19}
+    assert b2b.flags({"claimDays": 30}, {"claimDays": 30}, logistics_days=0) == []
+    assert b2b.flags({"claimDays": 10}, {"claimDays": 30}, logistics_days=19) == []
 
 
 def test_рублёвая_цена_заказчика_при_валюте_поставщика():

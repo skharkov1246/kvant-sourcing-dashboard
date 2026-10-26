@@ -646,7 +646,9 @@ def test_прогон_ручной_и_недельный_в_очереди_по�
     assert входы["deals"]["default"] == "30" and входы["budget_usd"]["default"] == "10"
     assert входы["mode"]["default"] == "dry" and входы["mode"]["options"] == ["dry", "live", "reflag"]
     # пересчёт без модели пишет только с apply (по умолчанию — холостой)
-    assert входы["apply"]["default"] is False and "inputs.apply" in wf["jobs"]["terms"]["env"]["APPLY"]
+    assert входы["apply"]["default"] is False and "inputs.apply" in wf["jobs"]["terms"]["env"]["APPLY_FLAG"]
+    # не APPLY: загрузчики проекта читают любой непустой APPLY как «писать»
+    assert "APPLY" not in wf["jobs"]["terms"]["env"]
     assert wf["concurrency"]["group"] == "bitrix-portal"
     for запрет in ("upload-artifact", "actions/cache", "cache:"):
         assert запрет not in текст, запрет
@@ -663,6 +665,9 @@ def test_прогон_ручной_и_недельный_в_очереди_по�
     assert проверка["name"] == "Проверка входов" and f"d > {ct.СРОК_МИН_МАКС}" in проверка["run"]
     assert "d < 1" in проверка["run"], "0 у скрипта — «без срока»: в job его не пропускать"
     assert "${{" not in проверка["run"], "вход — через env, не подстановкой в текст скрипта"
+    # apply у dry и live молча проигнорирован не будет
+    assert "inputs.apply" in проверка["env"]["APPLY_IN"] and '"$MODE" != "reflag"' in проверка["run"]
+    assert "apply — только для mode reflag" in проверка["run"]
     assert ct.СРОК_МИН_МАКС * 60 + 300 < job["timeout-minutes"] * 60
     assert int(re.search(r"'(\d+)'", je["DEALS"]).group(1)) <= ct.СДЕЛОК_МАКС
     шаг = next(ш for ш in job["steps"] if str(ш.get("run", "")).startswith("python scripts/contract_terms.py"))
@@ -677,7 +682,7 @@ def test_прогон_ручной_и_недельный_в_очереди_по�
     assert "inputs.mode == 'reflag'" not in env["ANTHROPIC_API_KEY"]
     for секрет in ("BITRIX_WEBHOOK_URL", "BITRIX_FILES_WEBHOOK_URL"):
         assert "inputs.mode != 'reflag'" in env[секрет], секрет
-    assert "$APPLY" in шаг["run"]
+    assert "$APPLY_FLAG" in шаг["run"]
     assert '--deadline-min "$DEADLINE_MIN"' in шаг["run"] and "$OPEN" in шаг["run"]
     # обрезанный файл модели не отдаётся — предел страниц не меньше длинного договора
     assert int(env["LLM_READ_MAX_PAGES"]) >= 100
@@ -1022,10 +1027,17 @@ def test_причины_отказов_агрегатом_без_номеров(
               {"status": "api", "note": "API отказал (400): файл 9812345 слишком большой"},
               {"status": "time", "note": "срок прогона вышел"}, {"status": "ok", "note": None},
               {"status": "format", "note": None}]
+    # у каждого файла свои страницы и мегабайты — причина без чисел: счёт по причине
+    строки += [{"status": "limit", "note": "не читался: PDF на 230 стр. больше предела чтения по частям 200 стр."},
+               {"status": "limit", "note": "не читался: PDF на 412 стр. больше предела чтения по частям 200 стр."},
+               {"status": "limit", "note": "не читался: по частям нужно до $5.33, предел файла $3.50"}]
     п = ct.причины_отказов(строки)
-    assert п["api: сбой сети (APITimeoutError), попыток 1"] == 2
-    assert п["api: API отказал (400): файл … слишком большой"] == 1
-    assert п["format: без заметки"] == 1 and sum(п.values()) == 4, "срок и прочитанное — не отказы"
+    assert п["api: сбой сети (APITimeoutError), попыток N"] == 2
+    assert п["api: API отказал (N): файл N слишком большой"] == 1
+    assert п["limit: не читался: PDF на N стр. больше предела чтения по частям N стр."] == 2
+    assert п["limit: не читался: по частям нужно до $N, предел файла $N"] == 1
+    assert п["format: без заметки"] == 1 and sum(п.values()) == 7, "срок и прочитанное — не отказы"
+    assert not any(ch.isdigit() for к in п for ch in к)
 
 
 def test_отказ_схемы_останавливает_чтение_после_первого_вызова():
@@ -1490,7 +1502,7 @@ def test_временный_отказ_закачки_недочитана_а_н
     # корпус спорный по сторонам (гейт прогона красный) — исход сделки по её строкам
     for сделка in (СДЕЛКА_НОВАЯ, СДЕЛКА_ВТОРАЯ):
         assert ct.флаги_сделки([r for r in база.условия if r["deal_id"] == сделка]) == ([], "недочитана"), сделка
-    assert "сделки: недочитана 2" in журнал and "fetch 2" in журнал and "fetch: urlMachine: код 503" in журнал
+    assert "сделки: недочитана 2" in журнал and "fetch 2" in журнал and "fetch: urlMachine: код N" in журнал
     # прежний download — по заметке: временный — «недочитана», 404 — «не читается»
     assert ct.уточнить_статус("download", "urlMachine: сеть: ConnectionError") == "fetch"
     assert ct.уточнить_статус("download", "urlMachine: код 404") == "download"
@@ -1650,7 +1662,12 @@ def test_источники_стороны_в_схеме_как_в_коде():
     блок = блок[:блок.index(";")]
     источники = re.search(r"side_source in \(([^)]*)\)", блок).group(1)
     assert set(re.findall(r"'([^']+)'", источники)) == set(ct.ИСТОЧНИКИ_СТОРОНЫ)
-    assert "side_source is distinct from 'card' or side = side_company" in блок
+    # при пустом side_company «side = side_company» — null, и null проверка пропустила бы
+    assert "(side_company is not null and side is not distinct from side_company)" in " ".join(блок.split())
+    assert "side = side_company" not in блок
+    # снос и новая проверка — одной командой: снос без новой при lock_timeout не остаётся
+    assert "drop constraint if exists contract_terms_side_chk,\n  add constraint contract_terms_side_chk" in текст
+    assert ";\nalter table contract_terms add constraint" not in текст
 
 
 def test_версия_сверки_отдельна_от_версии_чтения():
@@ -1662,9 +1679,9 @@ def test_версия_сверки_отдельна_от_версии_чтени
 
 # --------------------------------------------------------------------------- PDF по частям (25.10.2026)
 def pdf_с_текстом(страниц: int, *, текст: str | None = "Page text of the contract", добавка: int = 0,
-                  большая: int | None = None) -> bytes:
-    """Выдуманный PDF: на странице текстовый слой (Helvetica) и комментарий-набивка
-    добавка байт; у страницы большая — вдесятеро больше."""
+                  большая: int | None = None, повтор: int = 12) -> bytes:
+    """Выдуманный PDF: на странице текстовый слой (Helvetica, текст повтор раз) и
+    комментарий-набивка добавка байт; у страницы большая — вдесятеро больше."""
     from pypdf import PdfWriter
     from pypdf.generic import DictionaryObject, NameObject, StreamObject
     писатель = PdfWriter()
@@ -1674,7 +1691,7 @@ def pdf_с_текстом(страниц: int, *, текст: str | None = "Page
                                   NameObject("/BaseFont"): NameObject("/Helvetica")})
         стр[NameObject("/Resources")] = DictionaryObject(
             {NameObject("/Font"): DictionaryObject({NameObject("/F1"): писатель._add_object(шрифт)})})
-        тело = (f"BT /F1 9 Tf 30 800 Td ({(текст + ' ') * 12}{i + 1}) Tj ET\n".encode("latin-1") if текст else b"")
+        тело = (f"BT /F1 9 Tf 30 800 Td ({(текст + ' ') * повтор}{i + 1}) Tj ET\n".encode("latin-1") if текст else b"")
         тело += b"%" + b"x" * (добавка * (10 if большая == i + 1 else 1)) + b"\n"
         поток = StreamObject()
         поток.set_data(тело)
@@ -1720,7 +1737,7 @@ def test_части_pdf_меньше_пределов_и_подряд(monkeypatc
 def test_части_pdf_страница_больше_предела(monkeypatch):
     """Страница больше предела сама: читается текстовым слоем; слоя нет (скан) — limit."""
     monkeypatch.setenv("LLM_READ_MAX_MB", "0.02")
-    b = pdf_с_текстом(3, добавка=3000, большая=2)
+    b = pdf_с_текстом(3, добавка=3000, большая=2, повтор=30)
     части = ct.части_pdf(b)
     виды = [(ч.первая, ч.последняя, ч.вид) for ч in части]
     assert (2, 2, "text") in виды and виды[0] == (1, 1, "pdf") and виды[-1] == (3, 3, "pdf")
@@ -1729,6 +1746,9 @@ def test_части_pdf_страница_больше_предела(monkeypatch
     with pytest.raises(rl._Отказ) as о:
         ct.части_pdf(pdf_с_текстом(3, текст=None, добавка=3000, большая=2))
     assert о.value.класс == "предел" and "страница 2" in о.value.причина
+    # слой со штампа или колонтитула (сотни знаков, не страница договора) — не прочтение
+    with pytest.raises(rl._Отказ):
+        ct.части_pdf(pdf_с_текстом(3, текст="Stamp", добавка=3000, большая=2, повтор=30))
     # частей больше предела — limit, как прежде
     monkeypatch.setenv("LLM_READ_MAX_PAGES", "1")
     monkeypatch.setattr(ct, "ЧАСТЕЙ_МАКС", 2)
@@ -1837,6 +1857,167 @@ def test_живой_прогон_читает_большой_pdf_по_частя
         assert слово not in журнал, f"в журнал попало «{слово}»"
 
 
+def test_части_да_нет_не_решаются_первой_частью(monkeypatch):
+    """cisgExcluded: часть со сторонами без раздела о праве отвечает «нет», часть с
+    оговоркой — «да»: «да» главнее, флага cisg нет. Прочие «да/нет», где части разошлись,
+    — не доказаны (сняты), и флаг по отсутствию (fxGap по fxFixed) не ставится."""
+    monkeypatch.setenv("LLM_READ_MAX_PAGES", "2")
+    ответы = {
+        1: {"side": "supplier", "items": [
+            {"field": "cisgExcluded", "value": "false", "quote": "ЦИТАТА-ВЫДУМКА seller abroad", "page": 1},
+            {"field": "fxFixed", "value": "true", "quote": "ЦИТАТА-ВЫДУМКА курс", "page": 1},
+            {"field": "currency", "value": "EUR", "quote": "ЦИТАТА-ВЫДУМКА EUR", "page": 1}]},
+        2: {"side": "unknown", "items": [
+            {"field": "fxFixed", "value": "false", "quote": "ЦИТАТА-ВЫДУМКА курс на дату оплаты", "page": 1}]},
+        3: {"side": "unknown", "items": [
+            {"field": "cisgExcluded", "value": "true", "quote": "ЦИТАТА-ВЫДУМКА CISG shall not apply", "page": 1}]},
+    }
+    итог = ct.Читатель("claude-opus-5-5", 10.0, клиент=ЧастиКлиент(ответы)).прочитать(pdf_на(5))
+    у = итог["terms"]
+    assert итог["status"] == "ok" and у["cisgExcluded"] is True and итог["evidence"]["cisgExcluded"]["page"] == 5
+    assert у["fxFixed"] is None and "fxFixed" in итог["dropped"] and "не доказано" in итог["note"]
+    assert "cisg" not in {f["code"] for f in ct.contract_b2b.flags({"currency": "RUB"}, у)}
+    # обе части «нет» — нет и есть (флаг ставится, как у чтения целиком)
+    ответы[3]["items"][0]["value"] = "false"
+    у = ct.Читатель("claude-opus-5-5", 10.0, клиент=ЧастиКлиент(ответы)).прочитать(pdf_на(5))["terms"]
+    assert у["cisgExcluded"] is False
+
+
+def test_части_с_разными_сторонами_без_стороны_и_от_карточки(monkeypatch):
+    """Части назвали разные стороны — модель назвала сторону, и не одну: решение
+    25.10.2026 («модель не назвала») не применяется — документ без стороны, как спорный."""
+    monkeypatch.setenv("LLM_READ_MAX_PAGES", "2")
+    ответы = _ответы_договора()
+    ответы[3]["side"] = "supplier"
+    итог = ct.Читатель("claude-opus-5-5", 10.0, клиент=ЧастиКлиент(ответы)).прочитать(pdf_на(5))
+    assert итог["terms"]["side"] is None and итог["terms"][ct.СПОР_ЧАСТЕЙ] is True
+    assert ct.сторона_строки(итог["terms"], "supplier") == (None, None)
+    у_з, _ = _условия(условия_заказчика())
+    з = _строка("customer", у_з, card=1)
+    п = _строка("supplier", итог["terms"], card=2, order=ЗАКАЗ, компания="supplier")
+    assert (п["side"], п["side_source"]) == (None, None)
+    assert ct.флаги_сделки([з, п]) == ([], "без стороны")
+    # ответ модели целиком этих ключей не несёт (строгая схема) — сторона как была
+    assert ct.разобрать_ответ(json.dumps({"side": "customer", "items": []}))[0].get(ct.СПОР_ЧАСТЕЙ) is None
+
+
+def test_пометка_части_без_страниц_исходника(monkeypatch):
+    """Страницы исходника в пометке подтолкнули бы модель назвать page по ним — а сводка
+    ждёт номер внутри части."""
+    monkeypatch.setenv("LLM_READ_MAX_PAGES", "2")
+    клиент = ЧастиКлиент(_ответы_договора())
+    ct.Читатель("claude-opus-5-5", 10.0, клиент=клиент).прочитать(pdf_на(5))
+    пометки = [бл["text"] for з in клиент.запросы for бл in з["messages"][0]["content"]
+               if бл["type"] == "text" and бл["text"].startswith("Это часть")]
+    assert len(пометки) == 3 and all("из 5" not in x and "–" not in x for x in пометки)
+    assert all("внутри этой части, начиная с 1" in x for x in пометки)
+
+
+def test_дорогой_файл_по_частям_limit_без_остановки_прогона(monkeypatch):
+    """Потолок цены всех частей выше ПОТОЛОК_ПО_ЧАСТЯМ_USD — limit, и прогон идёт дальше:
+    недельный прогон ($10) не встаёт каждую неделю на одном томе."""
+    monkeypatch.setenv("LLM_READ_MAX_PAGES", "2")
+    _, оценка, _ = ct.Читатель("claude-opus-5-5", 10.0).запрос(pdf_на(2), None)
+    monkeypatch.setattr(ct, "ПОТОЛОК_ПО_ЧАСТЯМ_USD", оценка["потолок"] * 2.5)
+    клиент = ЧастиКлиент(_ответы_договора())
+    читатель = ct.Читатель("claude-opus-5-5", 100.0, клиент=клиент)
+    итог = читатель.прочитать(pdf_на(5))
+    assert итог["status"] == "limit" and клиент.запросы == [] and not читатель.стоп
+    assert "предел файла" in итог["note"] and читатель.обрезано == 1
+    assert читатель.прочитать(pdf_на(4))["status"] == "ok", "следующий файл в пределе читается"
+
+
+def test_сбой_pypdf_при_делении_не_роняет_прогон(monkeypatch):
+    """Сбой pypdf при записи части или обходе страниц — limit файла, а не исключение,
+    которое оборвало бы прогон до записи исходов."""
+    monkeypatch.setenv("LLM_READ_MAX_PAGES", "2")
+    исходная = ct._pdf_страниц
+
+    def ломается(стр):
+        if len(стр) > 1:
+            raise RecursionError("выдумка")
+        return исходная(стр)
+    monkeypatch.setattr(ct, "_pdf_страниц", ломается)
+    with pytest.raises(rl._Отказ) as о:
+        ct.части_pdf(pdf_на(5))
+    assert о.value.класс == "предел" and "RecursionError" in о.value.причина
+    читатель = ct.Читатель("claude-opus-5-5", 10.0, клиент=ЧастиКлиент(_ответы_договора()))
+    итог = читатель.прочитать(pdf_на(5))
+    assert итог["status"] == "limit" and "RecursionError" in итог["note"] and "выдумка" not in итог["note"]
+    monkeypatch.setattr(ct, "части_pdf", lambda b: (_ for _ in ()).throw(KeyError("выдумка")))
+    итог = читатель.прочитать(pdf_на(5))
+    assert итог["status"] == "limit" and "KeyError" in итог["note"] and читатель.обрезано == 2
+
+
+def test_части_больше_предела_обрываются_сразу(monkeypatch):
+    """Частей больше ЧАСТЕЙ_МАКС — отказ на первой лишней, без записи остальных."""
+    monkeypatch.setenv("LLM_READ_MAX_PAGES", "1")
+    monkeypatch.setattr(ct, "ЧАСТЕЙ_МАКС", 2)
+    записано = []
+    исходная = ct._pdf_страниц
+
+    def считать(стр):
+        записано.append(len(стр))
+        return исходная(стр)
+    b = pdf_на(9)
+    monkeypatch.setattr(ct, "_pdf_страниц", считать)
+    with pytest.raises(rl._Отказ):
+        ct.части_pdf(b)
+    # 9 страниц поодиночке — оценка размеров, затем части: третья — уже лишняя, дальше не пишутся
+    assert записано == [1] * (9 + ct.ЧАСТЕЙ_МАКС + 1)
+
+
+def test_срок_вышел_посреди_файла_по_частям_в_журнале(capsys):
+    """Файл по частям вернул time последним — журнал всё равно говорит «остановлено сроком»."""
+    class Читатель(ct.Читатель):
+        def прочитать(self, b, подвид=None, успеть=None):
+            return {"status": "time", "pages": 5, "usd": 0.1, "note": "срок прогона вышел на части 2 из 3"}
+    база = База()
+    ct.прогон("live", 3, 10.0, "claude-opus-5-5", портал=Портал(ФАЙЛЫ), run_id="ct-проба",
+              читатель=Читатель("claude-opus-5-5", 10.0, клиент=Клиент()), база=база)
+    assert "остановлено сроком" in _журнал(capsys)
+
+
+def test_сомнения_стороны_по_карточке_только_счётом(capsys):
+    """Где сторона по компании может ошибиться: компания сделки — и поставщик её заказа;
+    компания поставщика другого заказа сделки. Только счёт в журнале, сторону не меняет."""
+    def д(**kw):
+        base = dict(deal_id=СДЕЛКА_НОВАЯ, card_entity=ct.СП_РАЗОВЫЙ, card_id=1, order_id=None, side_link=None,
+                    link_source="deal_link", template=None, doc_type=None, side_template=None, side_company=None,
+                    file_field=ФИН_1174, files=[файл("fid-1")])
+        return ct.Документ(**{**base, **kw})
+    сделка = {"ID": str(СДЕЛКА_НОВАЯ), "COMPANY_ID": str(КОМПАНИЯ_ЗАКАЗЧИКА)}
+    заказы = {ЗАКАЗ: {"deal": СДЕЛКА_НОВАЯ, "company": КОМПАНИЯ_ПОСТАВЩИКА},
+              ЗАКАЗ + 1: {"deal": СДЕЛКА_НОВАЯ, "company": КОМПАНИЯ_ЗАКАЗЧИКА}}
+    поставщики = {КОМПАНИЯ_ПОСТАВЩИКА, КОМПАНИЯ_ЗАКАЗЧИКА, 9600077}
+    assert ct.сомнение_карточки(д(company_id=КОМПАНИЯ_ЗАКАЗЧИКА, side_company="customer"), сделка, заказы,
+                                поставщики) == "client_is_supplier"
+    assert ct.сомнение_карточки(д(company_id=9600077, side_company="supplier", order_id=ЗАКАЗ), сделка, заказы,
+                                поставщики) == "other_order"
+    assert ct.сомнение_карточки(д(company_id=КОМПАНИЯ_ПОСТАВЩИКА, side_company="supplier", order_id=ЗАКАЗ), сделка,
+                                заказы, поставщики) == ""
+    assert ct.сомнение_карточки(д(company_id=КОМПАНИЯ_ЗАКАЗЧИКА, side_company="customer"), сделка, заказы,
+                                {КОМПАНИЯ_ПОСТАВЩИКА}) == ""
+    assert ct.сомнение_карточки(д(card_entity=ct.СП_ЗАКАЗ, company_id=9600077, side_company="supplier",
+                                  order_id=ЗАКАЗ, link_source="purchase_order"), сделка, заказы, поставщики) == ""
+    # журнал холостого — у документов с файлом; живого — у строк по карточке
+    отбор = ct.отобрать(Портал(), 2)
+    журнал = "\n".join(ct.сверка_сторон(отбор.все()))
+    assert ("сторона по компании под сомнением (если модель её не назовёт, решение 25.10.2026): компания сделки — "
+            "и поставщик её заказа 0 · компания поставщика другого заказа сделки 0") in журнал
+    сомн = д(company_id=КОМПАНИЯ_ЗАКАЗЧИКА, side_company="customer", card_doubt="client_is_supplier")
+    отбор = ct.Отбор([сделка], {СДЕЛКА_НОВАЯ: [сомн]}, [])
+    у_з, _ = _условия(условия_заказчика())
+    r = ct.строка("ct-проба", "claude-opus-5-5", сомн, сомн.files[0], status="ok",
+                  итог={"terms": {**у_з, "side": None}, "evidence": {}, "dropped": []})
+    assert r["side_source"] == "card"
+    строка_ = ct.сомнения_по_карточке(отбор, [r, {**r, "side_source": "model"}])
+    assert строка_ == ("сторона по карточке под сомнением (1 документов по карточке): компания сделки — и поставщик "
+                       "её заказа 1 · компания поставщика другого заказа сделки 0")
+    for слово in ЗАПРЕТНОЕ:
+        assert слово not in строка_ + журнал
+
+
 # --------------------------------------------------------------------------- пересчёт без модели (25.10.2026)
 def _строка_базы(deal: int, run: str, card: int, *, terms=None, status="ok", side=None, side_company=None,
                  order=None, entity=ct.СП_РАЗОВЫЙ, link="deal_link") -> dict:
@@ -1864,8 +2045,11 @@ class БазаПересчёта:
         из_базы: dict = {}
         for r in строки:
             из_базы.setdefault((r["deal_id"], r["run_id"]), []).append(r)
-        флаги_базы = [{"deal_id": f["deal_id"], "order_id": f["order_id"], "code": f["code"]} for f in флаги]
-        if self.сверка_ломается:
+        флаги_базы = [{"deal_id": f["deal_id"], "order_id": f["order_id"], "code": f["code"], "days": f["days"]}
+                      for f in флаги]
+        if self.сверка_ломается == "дни":
+            флаги_базы = [{**f, "days": (f["days"] or 0) + 1} for f in флаги_базы]
+        elif self.сверка_ломается:
             флаги_базы = флаги_базы[1:]
         расхождения = сверить(из_базы, флаги_базы, dict(исходы))
         if расхождения:
@@ -1880,7 +2064,7 @@ class БазаПересчёта:
         return len(self.записано["исходы"])
 
 
-def _корпус_пересчёта():
+def _корпус_пересчёта(с_расхождением: bool = True):
     у_з, _ = _условия(условия_заказчика())
     у_п, _ = _условия(условия_поставщика())
     молчит_п = {**у_п, "side": None}
@@ -1899,7 +2083,10 @@ def _корпус_пересчёта():
     выбор = [{"deal": 101, "run": "ct-1", "outcome": "без стороны", "ver": ct.ВЕРСИЯ_ИСХОДА},
              {"deal": 102, "run": "ct-1", "outcome": "пара", "ver": ct.ВЕРСИЯ_ИСХОДА},
              {"deal": 103, "run": "ct-1", "outcome": "пара", "ver": ct.ВЕРСИЯ_ИСХОДА}]
-    return выбор, {(101, "ct-1"): a, (102, "ct-1"): b, (103, "ct-1"): c}, {(102, "ct-1"): флаги_b}
+    строки = {(101, "ct-1"): a, (102, "ct-1"): b, (103, "ct-1"): c}
+    if not с_расхождением:
+        выбор, строки = выбор[:2], {к: v for к, v in строки.items() if к[0] != 103}
+    return выбор, строки, {(102, "ct-1"): флаги_b}
 
 
 def test_пересчёт_холостой_по_умолчанию_и_только_счёт():
@@ -1910,14 +2097,15 @@ def test_пересчёт_холостой_по_умолчанию_и_тольк
     assert база.записано is None
     текст = "\n".join(журнал)
     assert "сделок, у которых пересчёт меняет исход или флаги: 1 — без стороны → пара 1" in текст
-    assert "не повторил записанный исход: 1" in текст
+    assert "не повторил записанный исход без причины в правиле стороны: 1 — пара → недочитана 1" in текст
+    assert "запись (apply) откажет" in текст
     assert "сторона по карточке (модель не назвала; решение владельца 25.10.2026): 1 документов" in текст
     for слово in ("101", "102", "103", "ct-1", "fid-", "ЦИТАТА-ВЫДУМКА", ПУНКТ, "ВЫДУМГРАД"):
         assert слово not in текст, f"в журнал попало «{слово}»"
 
 
 def test_пересчёт_пишет_копии_с_новым_ключом_и_второй_проверкой():
-    выбор, строки, флаги = _корпус_пересчёта()
+    выбор, строки, флаги = _корпус_пересчёта(с_расхождением=False)
     база = БазаПересчёта(выбор, строки, флаги)
     журнал: list[str] = []
     assert ct.пересчёт(база, "ctr-проба", применить=True, печать=журнал.append) == 0
@@ -1943,11 +2131,13 @@ def test_пересчёт_пишет_копии_с_новым_ключом_и_в
 
 
 def test_пересчёт_откатывается_при_расхождении_и_красном_гейте():
-    выбор, строки, флаги = _корпус_пересчёта()
-    база = БазаПересчёта(выбор, строки, флаги, сверка_ломается=True)
-    журнал: list[str] = []
-    assert ct.пересчёт(база, "ctr-проба", применить=True, печать=журнал.append) == 1
-    assert база.записано is None and any("запись откатана целиком" in s for s in журнал)
+    выбор, строки, флаги = _корпус_пересчёта(с_расхождением=False)
+    for ломка in (True, "дни"):
+        # вторая проверка сверяет флаги вместе с днями: неверные дни в базе — откат
+        база = БазаПересчёта(выбор, строки, флаги, сверка_ломается=ломка)
+        журнал: list[str] = []
+        assert ct.пересчёт(база, "ctr-проба", применить=True, печать=журнал.append) == 1, ломка
+        assert база.записано is None and any("запись откатана целиком" in s for s in журнал)
     # модель почти не называет сторону — гейт красный, ничего не пишется
     у_з, _ = _условия(условия_заказчика())
     молчат = {(201, "ct-1"): [_строка_базы(201, "ct-1", 1, terms={**у_з, "side": None}, side_company="customer"),
@@ -1957,6 +2147,48 @@ def test_пересчёт_откатывается_при_расхождении
     журнал = []
     assert ct.пересчёт(база, "ctr-проба", применить=True, печать=журнал.append) == 1 and база.записано is None
     assert any("гейт стороны не пройден" in s for s in журнал)
+
+
+def test_пересчёт_не_пишет_ничего_при_сделке_без_причины():
+    """Расхождение — остановка и разбор: сделка, чей записанный исход прежнее правило
+    стороны не повторило, останавливает запись целиком, а не только свою."""
+    выбор, строки, флаги = _корпус_пересчёта()
+    база = БазаПересчёта(выбор, строки, флаги)
+    журнал: list[str] = []
+    assert ct.пересчёт(база, "ctr-проба", применить=True, печать=журнал.append) == 1
+    assert база.записано is None
+    assert any(s.startswith("::error::") and "пара → недочитана 1" in s and "не записан" in s for s in журнал)
+
+
+def test_пересчёт_меняет_разбор_когда_сменились_только_дни():
+    """Правка правил, меняющая только дни флага, — тоже новый разбор: флаги сравниваются
+    с днями (целыми, как в колонке days)."""
+    выбор, строки, флаги = _корпус_пересчёта(с_расхождением=False)
+    флаги = {к: [{**f, "days": (f["days"] or 0) + 5.0} for f in v] for к, v in флаги.items()}
+    база = БазаПересчёта(выбор, строки, флаги)
+    журнал: list[str] = []
+    assert ct.пересчёт(база, "ctr-проба", применить=True, печать=журнал.append) == 0
+    assert set(база.записано["исходы"]) == {101, 102}
+    assert any("флагов, у которых сменились дни: " in s and not s.endswith(": 0") for s in журнал)
+    # дни тем же числом, но дробью из базы — не изменение
+    выбор, строки, флаги = _корпус_пересчёта(с_расхождением=False)
+    флаги = {к: [{**f, "days": None if f["days"] is None else float(f["days"])} for f in v] for к, v in флаги.items()}
+    база = БазаПересчёта(выбор, строки, флаги)
+    assert ct.пересчёт(база, "ctr-проба", применить=True, печать=lambda _s: None) == 0
+    assert set(база.записано["исходы"]) == {101}
+
+
+def test_копия_строки_не_режет_заметку_закачки():
+    """По заметке download заново решается статус («код 404» — не читается, сеть —
+    недочитана): пометка пересчёта не должна её обрезать."""
+    r = _строка_базы(101, "ct-1", 1, status="download")
+    r["note"] = "x" * 380 + " urlMachine: код 404"
+    копия = ct.копия_строки(r, "ctr-проба")
+    assert копия["note"] == r["note"] and копия["status"] == "download"
+    r["note"] = "urlMachine: код 404"
+    копия = ct.копия_строки(r, "ctr-проба")
+    assert копия["note"] == "пересчёт без модели из ct-1; urlMachine: код 404"
+    assert ct.уточнить_статус(копия["status"], копия["note"]) == "download"
 
 
 def test_журнал_пар_считает_поля_флагов_срока_приёмки_валюты():
@@ -1973,6 +2205,13 @@ def test_журнал_пар_считает_поля_флагов_срока_п�
     assert "дни против даты (без даты отсчёта не сравнить) 1" in текст
     assert "приёмка у заказчика поздняя (монтаж, пусконаладка, ввод): 1" in текст
     assert "валюта заказчика: рубли 1" in текст and "поставщика: рубли 0, валюта 1" in текст
+    # рублёвая пара против валюты: что сказано о курсе (fxGap ставится при true и при пустом)
+    assert "заказчик в рублях, поставщик в валюте (1): fxFixed true 0 · false 0 · не сказано 1 · снято 0" in текст
+    for курс, снято_ in ((True, ()), (False, ()), (None, ("fxFixed",))):
+        ct.флаги_сделки([_строка("customer", {**у_з, "currency": "RUB", "fxFixed": курс}, card=1, снято=снято_),
+                         _строка("supplier", {**у_п, "currency": "CNY"}, card=2, order=ЗАКАЗ)], пары=пары)
+    assert ("заказчик в рублях, поставщик в валюте (4): fxFixed true 1 · false 1 · не сказано 1 · снято 1"
+            in "\n".join(ct.журнал_пар(пары)))
     assert ct.журнал_пар([]) == []
     for слово in ("ПРИЁМКА-ВЫДУМКА", "2026-12-01", ПУНКТ):
         assert слово not in текст
@@ -1987,8 +2226,9 @@ def test_главный_вход_пересчёта_без_портала_и_м�
     вызовы = []
 
     class Б:
-        def __init__(self, dsn):
+        def __init__(self, dsn, только_чтение=False):
             вызовы.append(dsn)
+            вызовы.append(("только чтение", только_чтение))
 
         def нет_таблиц(self):
             return []
@@ -1997,6 +2237,20 @@ def test_главный_вход_пересчёта_без_портала_и_м�
             вызовы.append("закрыта")
     monkeypatch.setenv("SUPABASE_DB_URL", "postgresql://выдумка.invalid/db")
     monkeypatch.setattr(ct, "База", Б)
-    monkeypatch.setattr(ct, "пересчёт", lambda база, run_id, *, применить, печать=print: 7 if применить else 5)
+    ключи = []
+
+    def пересчёт(база, run_id, *, применить, печать=print):
+        ключи.append(run_id)
+        return 7 if применить else 5
+    monkeypatch.setattr(ct, "пересчёт", пересчёт)
+    monkeypatch.delenv("RUN_ID", raising=False)
     assert ct.main(["--mode", "reflag"]) == 5 and ct.main(["--mode", "reflag", "--apply"]) == 7
     assert вызовы.count("закрыта") == 2
+    # холостой — база только на чтение, запись — на запись
+    assert [x for x in вызовы if isinstance(x, tuple)] == [("только чтение", True), ("только чтение", False)]
+    # ключ пересчёта без RUN_ID — ctr-…; запись с ключом чтения (ct-…) не начинается
+    assert all(к.startswith("ctr-") for к in ключи)
+    monkeypatch.setenv("RUN_ID", "ct-777-1")
+    assert ct.main(["--mode", "reflag", "--apply"]) == 2 and len(ключи) == 2
+    assert "должен начинаться с ctr-" in _журнал(capsys)
+    assert ct.main(["--mode", "reflag"]) == 5, "холостому ключ не важен: он не пишет"

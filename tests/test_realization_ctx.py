@@ -387,6 +387,24 @@ def test_колонки_выгрузки_по_схеме_договоров():
         assert старше == sorted(без) and нет == ["link_source", "order_key"]
         assert f"null as {next(iter(без))}" not in выбор
     assert set(rc.СХЕМА_ДОГОВОРОВ_V2) & set(rc.КОЛОНКИ_УСЛОВИЙ) == {"link_source"}
+    # side_source (25.10.2026: сторона по карточке) — в выгрузке; без колонки — пустой
+    # (сторона модели, как у строк до 25.10.2026), а не стоп
+    assert "side_source" in rc.КОЛОНКИ_УСЛОВИЙ
+    выбор, нет, старше = rc.колонки_выгрузки(все - {"side_source"})
+    assert "null as side_source" in выбор and нет == ["side_source"] and старше == []
+
+
+def test_свод_по_карточке_гейт_меряет_модель():
+    """Строка «по карточке» в своде — не сторона модели: пересчёт для вкладки читает
+    side_source и сверяет её так же, как прогон (contract_terms.сторона_модели)."""
+    строки, флаги = _пара()
+    for r in строки:
+        r.setdefault("side_source", "model")
+    поставщик = next(r for r in строки if r["side"] == "supplier")
+    поставщик.update(side_source="card", side_company="supplier", terms={**поставщик["terms"], "side": None})
+    флаги_пересчёта, исход = ct.флаги_сделки(строки)
+    assert исход == "пара" and not ct.сторона_спорная(поставщик) and ct.сторона_модели(поставщик) is None
+    assert {f["code"] for f in флаги_пересчёта} == {f["code"] for f in флаги}
 
 
 def test_схема_договоров_старше_v2_стоп():

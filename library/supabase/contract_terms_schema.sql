@@ -75,7 +75,12 @@
 --   delete from contract_deal_outcome where run_id = '…';
 --   delete from contract_b2b_flags where run_id = '…';
 --   delete from contract_terms     where run_id = '…';
--- Деньги — numeric (DATA_MODEL.md), версия правила — method_ver.
+-- Деньги — numeric (DATA_MODEL.md), версия правила — method_ver. С 25.10.2026 версии две:
+-- contract_terms.method_ver — версия чтения (METHOD_VER: подсказка, схема ответа; ключ
+-- повтора по sha256), contract_deal_outcome.method_ver и contract_b2b_flags.method_ver —
+-- версия разбора METHOD_VER+сверка:<отпечаток правил> (ВЕРСИЯ_ИСХОДА: правила стороны и
+-- сверки): правка правил не делает прочитанное чужим — для неё пересчёт без модели
+-- (--mode reflag, ключ ctr-…).
 --
 -- Повторяемость (правило 21): create … if not exists; колонки, добавленные позже, —
 -- add column if not exists; проверки — drop/add по имени В СВОЕЙ ТАБЛИЦЕ. Схема —
@@ -153,8 +158,11 @@ update contract_terms
        side_source = case when terms->>'side' in ('customer', 'supplier') then 'model' end
  where side_source in ('order_link', 'deal_link');
 
-alter table contract_terms drop constraint if exists contract_terms_status_chk;
-alter table contract_terms add constraint contract_terms_status_chk
+-- Снос и новая проверка — ОДНОЙ командой: одна блокировка, всё или ничего. Двумя командами
+-- (psql — транзакция на команду) снос мог пройти, а новая проверка — упереться в lock_timeout,
+-- и таблица осталась бы вовсе без проверки.
+alter table contract_terms drop constraint if exists contract_terms_status_chk,
+  add constraint contract_terms_status_chk
   check (status in ('ok', 'reused', 'no_file', 'download', 'fetch', 'format', 'limit', 'budget',
                     'time', 'model', 'parse', 'api'));
 -- side_source (25.10.2026, решение владельца): 'model' — сторону назвала модель; 'card' —
@@ -162,14 +170,17 @@ alter table contract_terms add constraint contract_terms_status_chk
 -- заказчик, компания заказа СП-172 сделки и Purchase order заказа — поставщик), и тогда
 -- side обязана совпасть с side_company. Список — дословно contract_terms.ИСТОЧНИКИ_СТОРОНЫ
 -- (сверяет tests/test_contract_terms.py). Строки прежних версий ('model' или null) проходят
--- проверку как были. Повтор — тот же drop/add по имени (правило 21).
-alter table contract_terms drop constraint if exists contract_terms_side_chk;
-alter table contract_terms add constraint contract_terms_side_chk
+-- проверку как были. 'card' при пустом side_company не проходит: «side = side_company» при
+-- null — null, а null проверка пропускает — отсюда «is not distinct from» и side_company
+-- not null. Повтор — тот же drop/add по имени (правило 21), одной командой (как выше).
+alter table contract_terms drop constraint if exists contract_terms_side_chk,
+  add constraint contract_terms_side_chk
   check ((side is null or side in ('customer', 'supplier'))
          and (side_link is null or side_link in ('customer', 'supplier'))
          and (side_source is null or side_source in ('model', 'card'))
          and ((side is null) = (side_source is null))
-         and (side_source is distinct from 'card' or side = side_company)
+         and (side_source is distinct from 'card'
+              or (side_company is not null and side is not distinct from side_company))
          and (side_template is null or side_template in ('customer', 'supplier'))
          and (side_company is null or side_company in ('customer', 'supplier')));
 -- С 25.10.2026 рамочный — документ каждой сделки, под которой стоит его спецификация, и
@@ -198,32 +209,32 @@ begin
 end $$;
 
 -- 132, 175 — прежние смарт-процессы договоров, 172 — Purchase order заказа (25.10.2026)
-alter table contract_terms drop constraint if exists contract_terms_entity_chk;
-alter table contract_terms add constraint contract_terms_entity_chk
+alter table contract_terms drop constraint if exists contract_terms_entity_chk,
+  add constraint contract_terms_entity_chk
   check (card_entity in (1174, 1192, 132, 175, 172));
 -- Список — дословно contract_terms.ИСТОЧНИКИ (сверяет tests/test_contract_terms.py);
 -- у строк до 25.10.2026 — null.
-alter table contract_terms drop constraint if exists contract_terms_link_chk;
-alter table contract_terms add constraint contract_terms_link_chk
+alter table contract_terms drop constraint if exists contract_terms_link_chk,
+  add constraint contract_terms_link_chk
   check (link_source is null
          or link_source in ('deal_link', 'order_link', 'order_only', 'framework', 'purchase_order'));
 -- Прочитанный файл несёт условия, непрочитанный — нет: иначе строка со статусом
 -- отказа выглядела бы прочитанной.
-alter table contract_terms drop constraint if exists contract_terms_terms_chk;
-alter table contract_terms add constraint contract_terms_terms_chk
+alter table contract_terms drop constraint if exists contract_terms_terms_chk,
+  add constraint contract_terms_terms_chk
   check ((status in ('ok', 'reused')) = (terms is not null));
-alter table contract_terms drop constraint if exists contract_terms_usd_chk;
-alter table contract_terms add constraint contract_terms_usd_chk check (usd >= 0);
+alter table contract_terms drop constraint if exists contract_terms_usd_chk,
+  add constraint contract_terms_usd_chk check (usd >= 0);
 
 -- Список — дословно contract_terms.ИСХОДЫ (сверяет tests/test_contract_terms_sql.py).
-alter table contract_deal_outcome drop constraint if exists contract_deal_outcome_chk;
-alter table contract_deal_outcome add constraint contract_deal_outcome_chk
+alter table contract_deal_outcome drop constraint if exists contract_deal_outcome_chk,
+  add constraint contract_deal_outcome_chk
   check (outcome in ('пара', 'недочитана', 'не читается', 'без стороны', 'спорная',
                      'поставщик без заказа', 'нет пары', 'нет договоров')
          and deal_id > 0);
 
-alter table contract_b2b_flags drop constraint if exists contract_b2b_flags_code_chk;
-alter table contract_b2b_flags add constraint contract_b2b_flags_code_chk
+alter table contract_b2b_flags drop constraint if exists contract_b2b_flags_code_chk,
+  add constraint contract_b2b_flags_code_chk
   check (code ~ '^[A-Za-z]+$');
 
 create index if not exists contract_terms_run  on contract_terms (run_id);

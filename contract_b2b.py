@@ -16,6 +16,7 @@
 """
 from __future__ import annotations
 
+import re
 from datetime import date
 
 TERMS_SCHEMA = {
@@ -69,12 +70,20 @@ FLAG_TEXT = {
 
 
 #: Приёмка у заказчика, которая наступает через месяцы после поставки: при шефмонтаже,
-#: монтаже, пусконаладке, вводе в эксплуатацию. Сверка — по слитному написанию (без
-#: дефисов и пробелов): до 25.10.2026 искалось только «шефмонтаж», а в договорах пишут
-#: «шеф-монтаж» и «шеф монтаж» — флаг claimGap не ставился ни разу (живой прогон
-#: 25.10.2026: 0 при 69 сделках с парой).
-ПОЗДНЯЯ_ПРИЁМКА = ("шефмонтаж", "примонтаж", "послемонтаж", "пусконалад", "вэксплуатац",
-                   "commissioning", "installation", "startup")
+#: монтаже, пусконаладке, вводе в эксплуатацию. До 25.10.2026 искалось только слитное
+#: «шефмонтаж», а в договорах пишут «шеф-монтаж» и «шеф монтаж» — флаг claimGap не
+#: ставился ни разу (живой прогон 25.10.2026: 0 при 69 сделках с парой). Сверка — по
+#: тексту, где дефисы и тире стали пробелами (поздняя_приёмка): «шеф-монтаж», «шеф монтаж»
+#: и «шефмонтаж» — одно. Английские слова — только вместе с событием («upon / after
+#: commissioning»): голое «installation» стоит и в «acceptance before installation».
+ПОЗДНЯЯ_ПРИЁМКА = (r"шеф ?монтаж", r"(?:при|после) монтаж", r"пуско ?налад", r"в эксплуатац",
+                   r"(?:upon|after|following|on) (?:the )?(?:successful )?(?:commissioning|installation|start ?up)")
+#: Отрицание рядом с признаком — приёмка не поздняя: «без шеф-монтажа», «до ввода в
+#: эксплуатацию», «шеф-монтаж не входит», «excluding installation». Окно — ОКНО_ОТРИЦАНИЯ
+#: слов до признака и после него.
+ОТРИЦАНИЯ = frozenset({"без", "не", "до", "кроме", "исключая", "not", "no", "excluding", "except", "without",
+                       "before", "prior"})
+ОКНО_ОТРИЦАНИЯ = 2
 #: Валюта цены, при которой курс на нас не ложится: рубли.
 РУБЛИ = ("RUB", "RUR", "РУБ")
 
@@ -110,8 +119,24 @@ def запас_по_сроку(customer: dict, supplier: dict, путь: float) 
     return None, ("дни против даты" if есть_c and есть_s else "нет срока")
 
 
-def _слитно(v) -> str:
-    return "".join(ch for ch in str(v or "").lower() if ch.isalnum())
+def _слова(v) -> str:
+    """Текст → строчные слова через пробел: дефисы, тире и знаки — пробелы."""
+    return " ".join(re.sub(r"[^\w]+", " ", str(v or "").lower().replace("ё", "е")).split())
+
+
+def поздняя_приёмка(acceptance) -> bool:
+    """Порядок приёмки заказчика называет позднее событие (ПОЗДНЯЯ_ПРИЁМКА), и рядом с ним
+    нет отрицания (ОТРИЦАНИЯ в ОКНО_ОТРИЦАНИЯ слов до или после): «без шеф-монтажа» и
+    «installation not included» — не поздняя приёмка."""
+    s = _слова(acceptance)
+    for образец in ПОЗДНЯЯ_ПРИЁМКА:
+        for m in re.finditer(образец.replace("ё", "е"), s):
+            до = s[:m.start()].split()[-ОКНО_ОТРИЦАНИЯ:]
+            хвост = s[m.end():]
+            после = хвост.split()[0 if хвост[:1] in ("", " ") else 1:]   # признак кончился внутри слова
+            if not ОТРИЦАНИЯ & {*до, *после[:ОКНО_ОТРИЦАНИЯ]}:
+                return True
+    return False
 
 
 def flags(customer: dict, supplier: dict, *, logistics_days: float | None = None) -> list[dict]:
@@ -146,14 +171,14 @@ def flags(customer: dict, supplier: dict, *, logistics_days: float | None = None
     if "ввод" in cwf.lower() and swf and "ввод" not in swf.lower():
         add("warrantyStart")
     # Приёмка: у заказчика поздняя (монтаж, ввод) при сроке претензий поставщику — или срок
-    # претензий заказчика к нам длиннее нашего к поставщику: дефект предъявят, когда
-    # поставщик уже не отвечает (ГК РФ ст. 477, 483).
+    # претензий заказчика к нам кончается позже нашего к поставщику: дефект предъявят, когда
+    # поставщик уже не отвечает (ГК РФ ст. 477, 483). Срок заказчика считается от поставки
+    # ему — на путь позже поставки нам, как у lateByDesign.
     cc, sc = _n(customer.get("claimDays")), _n(supplier.get("claimDays"))
-    приёмка = _слитно(customer.get("acceptance"))
-    if sc is not None and any(м in приёмка for м in ПОЗДНЯЯ_ПРИЁМКА):
+    if sc is not None and поздняя_приёмка(customer.get("acceptance")):
         add("claimGap", days=round(sc))
-    elif cc is not None and sc is not None and cc > sc:
-        add("claimGap", days=round(cc - sc))
+    elif cc is not None and sc is not None and cc + путь > sc:
+        add("claimGap", days=round(cc + путь - sc))
     нужны = {d.strip().lower() for d in customer.get("documents") or [] if d}
     дадут = {d.strip().lower() for d in supplier.get("documents") or [] if d}
     if нужны - дадут:

@@ -335,7 +335,11 @@ def test_сторона_по_карточке_принимается_тольк�
         не_та.update(side_source="card", side_company="customer")       # по карточке, а не как карточка
         чужой = _строка("ct-c1", 4)
         чужой["side_source"] = "guess"
-        for r in (не_та, чужой):
+        # по карточке без компании карточки: «side = side_company» при null — null, и
+        # проверка пропустила бы строку
+        без_компании = _строка("ct-c1", 5, side="customer")
+        без_компании.update(side_source="card", side_company=None)
+        for r in (не_та, чужой, без_компании):
             with pytest.raises(psycopg2.errors.CheckViolation):
                 база.записать_условия([r])
         assert база.итог("ct-c1")[0] == 2
@@ -383,6 +387,7 @@ def test_пересчёт_на_настоящей_базе_пишет_копии
             выбор, строки, флаги = чтение.договоры()
         finally:
             чтение.закрыть()
+        assert {r["side_source"] for r in строки if r["card_id"] == 12} == {"card"}, "свод читает side_source"
         свод, n = rc.свод_договоров(выбор, строки, флаги, ct)
         assert свод["9900021"]["outcome"] == "пара" and n["разошлось"] == 0
         assert {f["code"] for f in свод["9900021"]["flags"]} >= {"lateByDesign"}
@@ -410,5 +415,47 @@ def test_пересчёт_откатывается_если_вторая_про�
         assert ct.пересчёт(база, "ctr-p3", применить=True, печать=печать.append) == 1
         assert база.итог("ctr-p3") == (0, 0, 0.0) and база.итог_сделок("ctr-p3") == 0
         assert any("запись откатана целиком" in s for s in печать)
+    finally:
+        база.закрыть()
+
+
+def test_пересчёт_берёт_и_разбор_без_исхода(conn):
+    """Вкладка показывает и прогоны до 23.10.2026 — с флагами, без строки исхода; пересчёт
+    берёт их тем же правилом (исход None), а не пропускает."""
+    import contract_terms as ct
+    база = ct.База(DSN, схема=СХЕМА)
+    try:
+        _разбор_без_стороны(база, ct, "ct-p4", 9900041)
+        with conn.cursor() as c:
+            c.execute("delete from contract_deal_outcome where run_id = 'ct-p4'")
+            # прогон до 23.10: флаг есть у прогона, исхода нет
+            c.execute("insert into contract_b2b_flags (run_id, method_ver, deal_id, order_id, code, days) "
+                      "values ('ct-p4', 'v0', 9900041, 9700012, 'docsGap', null)")
+        выбор, строки, _ф = база.разборы()
+        assert [(v["deal"], v["run"], v["outcome"]) for v in выбор] == [(9900041, "ct-p4", None)]
+        assert len(строки[(9900041, "ct-p4")]) == 2
+        печать: list[str] = []
+        assert ct.пересчёт(база, "ctr-p4", применить=True, печать=печать.append) == 0
+        assert база.итог_сделок("ctr-p4") == 1 and база.итог("ctr-p4")[0] == 2
+    finally:
+        база.закрыть()
+
+
+def test_холостой_пересчёт_открывает_базу_только_на_чтение(conn):
+    """Холостой пересчёт только читает — и база сама отказывает записи."""
+    import psycopg2
+    import contract_terms as ct
+    пишущая = ct.База(DSN, схема=СХЕМА)
+    try:
+        _разбор_без_стороны(пишущая, ct, "ct-p5", 9900051)
+    finally:
+        пишущая.закрыть()
+    база = ct.База(DSN, схема=СХЕМА, только_чтение=True)
+    try:
+        печать: list[str] = []
+        assert ct.пересчёт(база, "ctr-p5", применить=False, печать=печать.append) == 0
+        assert any("строк со стороной у непрочитанного файла (замер перед проверкой схемы): 0" in x for x in печать)
+        with pytest.raises(psycopg2.errors.ReadOnlySqlTransaction):
+            база.записать_условия([_строка("ctr-p5", 99)])
     finally:
         база.закрыть()
