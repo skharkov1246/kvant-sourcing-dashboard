@@ -736,15 +736,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             odays = round(_days_between(oin, now_iso) or 0, 1) if oin else None
             othr = _slow_threshold(osid, omed)
             slow_old += bool(olive and odays is not None and odays > othr)
-            # замедлен — сверх нормы шага регламента (решение 26.10.2026, п. 2), а не 2× медианы;
-            # «гигиена» (стадия позади фактов, брошенная карточка) в счёт не идёт
+            # замедлен — сверх нормы шага регламента (решение 26.10.2026, п. 2), а не 2× медианы.
+            # ork.judged — одно правило с очередью, ведомостью и W2: шаг ork.step_now
+            # (доставлено без УПД — шаг 12), гигиена и приёмка вне «Реализации» в счёт не идут
             lo = lo_by_id[str(o.get("id"))]
-            ov = ork.overrun(lo, today)
+            ov = ork.judged(lo, today, in_cat0=in_cat0)
             ostep = ov["step"]
             lo["kamDeal"] = d_people["kam"]
             lo["own"] = own = ork.owner(ostep, {**d_people, "orkMgr": lo["orkMgr"], "ossOrder": lo["oss"]}) \
                 if ostep else {"role": "", "who": "", "copy": "", "copyRole": ""}
-            oslow = bool(olive and ov["over"] and not ork.hygiene(lo, today)["exclude"])
+            oslow = bool(olive and ov["over"])
             if oslow:
                 slow_orders += 1
             # обещание клиенту: та же дата, по которой снабжение ведёт «Контроль дедлайнов»
@@ -813,6 +814,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "step": ostep, "stepRole": own["role"], "stepWho": own["who"],
                 "stepWd": ov["wd"] if olive else None, "stepNorm": ov["norm"],
                 "stepOver": ov["over"] if olive else None,
+                # норма по регламенту, которую портал не меряет (шаг 6 — «нет данных»), и почему
+                # срок не в счёте (гигиена, приёмка вне «Реализации», срок не посчитать)
+                "stepNormDoc": ov["normDoc"], "stepNormState": ov["normState"],
+                "stepHyg": bool(olive and ov["hyg"] and ov["norm"] is not None),
+                "stepWhy": ov["why"] if olive else "",
             })
         ords_det.sort(key=lambda x: (not x["live"], -(x["dlDays"] if x["dlDays"] is not None else -9999),
                                      -(x["days"] or 0)))
@@ -858,18 +864,28 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         won_d = _pdate(d.get(WON_F))
         won_src = "tkp" if won_d else ("cat0" if entered_real else ("order" if entered else ""))
         won_d = won_d or _pdate(entered)
-        # ячейка «шаг · исполнитель · р.д./норма»: самый ранний шаг среди живых заказов (там
-        # сделка и стоит); сделка без заказа — приёмка (шаг 1) от входа в реализацию
+        # ячейка «шаг · исполнитель · р.д./норма»: заказ сверх нормы своего шага — первым
+        # (почему строка «замедлена»), иначе самый ранний шаг среди живых заказов (там сделка и
+        # стоит); сделка без заказа — приёмка (шаг 1) от входа в реализацию; «Оплата получена»,
+        # сделка не закрыта — шаг 13, ОСС закрывает сделку (решение 26.10.2026, п. 4)
         d_step = _dstep(cur_stage) if in_cat0 else None
         _live_st = [x for x in ords_det if x["live"] and x["step"]]
-        if _live_st and not closed:
-            c = min(_live_st, key=lambda x: (x["step"], not x["stepOver"]))
+        if paid:
+            _o = ork.owner(13, d_people)
+            step_cell = {"step": 13, "role": _o["role"], "who": _o["who"], "wd": None, "norm": None,
+                         "over": None, "normDoc": "", "normState": "none", "hyg": False, "why": "",
+                         "label": "закрыть сделку"}
+        elif _live_st and not closed:
+            c = min(_live_st, key=lambda x: (not x["stepOver"], x["step"]))
             step_cell = {"step": c["step"], "role": c["stepRole"], "who": c["stepWho"], "wd": c["stepWd"],
-                         "norm": c["stepNorm"], "over": c["stepOver"], "label": ork.NO_PAUSE}
+                         "norm": c["stepNorm"], "over": c["stepOver"], "normDoc": c["stepNormDoc"],
+                         "normState": c["stepNormState"], "hyg": c["stepHyg"], "why": c["stepWhy"],
+                         "label": ork.NO_PAUSE}
         elif not closed and in_cat0 and not ords:
             _h = ork.owner(1, d_people)
             step_cell = {"step": 1, "role": _h["role"], "who": _h["who"], "wd": no_order_wd,
                          "norm": ork.NORM_WD[1], "over": no_orders_slow if no_order_wd is not None else None,
+                         "normDoc": ork.NORM_DOC[1][0], "normState": "norm", "hyg": False, "why": "",
                          "label": ork.NO_PAUSE}
         else:
             step_cell = None
@@ -1030,7 +1046,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     sep_rows = [r for r in rows if r["seg"]]
     main_orders = [o for o in life_orders if o["deal"] not in sep_ids]
     sep_orders = [o for o in life_orders if o["deal"] in sep_ids]
-    cust_contract = dealctx.customer_contract_deals(ctx_contracts)
+    # разбор договоров не загружен — None: «договор не найден» не проверялся (пункт так и пишет)
+    cust_contract = dealctx.customer_contract_deals(ctx_contracts) if ctx_contracts is not None else None
     life = lifecycle.build(main_orders, main_rows, today, measure=life_orders, ork_head=ork_head,
                            cust_contract=cust_contract)
     life_sep = (lifecycle.build(sep_orders, sep_rows, today, measure=life_orders, ork_head=ork_head,

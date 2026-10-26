@@ -387,6 +387,12 @@ def test_оплата_без_договора_договор_заказчика_
     assert any(x["code"] == "payNoContract" for x in lc.build(заказы, сделки, СЕГОДНЯ)["queue"])
     life = lc.build(заказы, сделки, СЕГОДНЯ, cust_contract={"301"})
     assert not any(x["code"] == "payNoContract" for x in life["queue"]), "договор заказчика найден"
+    # разбор договоров не загружен (None) — «не найден» не проверялось: пункт так и пишет
+    q = next(x for x in lc.build(заказы, сделки, СЕГОДНЯ)["queue"] if x["code"] == "payNoContract")
+    assert "не проверено" in q["what"]
+    q = next(x for x in lc.build(заказы, сделки, СЕГОДНЯ, cust_contract=set())["queue"]
+             if x["code"] == "payNoContract")
+    assert "не найден" in q["what"] and "не проверено" not in q["what"]
 
 
 def test_приёмка_только_у_сделок_реализации():

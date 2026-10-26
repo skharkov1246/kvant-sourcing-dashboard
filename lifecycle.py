@@ -18,7 +18,9 @@
 хозяин и действие. Хозяин — ИСПОЛНИТЕЛЬ ШАГА по регламенту (решение владельца 26.10.2026,
 п. 1; ork.ITEM, ork.item_owner), при эскалации КАМ — в копии (escalateTo). Сроки менеджера
 — нормы регламента в рабочих днях по календарю РФ (ork.NORM_WD, period.workdays_ru), «без
-пауз»: s1Over, s2Over, s3Over, s6Over и noUtd (≥ 11 р.д. от доставки по сырым датам).
+пауз»: s1Over, s2Over, s3Over, s6Over и noUtd (≥ 11 р.д. от доставки по сырым датам) — одно
+правило с таблицей сделок, ведомостью и W2 (ork.judged: шаг ork.step_now, гигиена, приёмка
+только у сделок «Реализации»).
 """
 from __future__ import annotations
 
@@ -33,7 +35,7 @@ UTD_WD = ork.NORM_WD[12]   # УПД — 10 р.д. от доставки клие
 ORDER_WD = ork.NORM_WD[1]  # приёмка — 1 р.д.: сделка в реализации дольше без заказа — пункт
 PAY_GRACE = 30          # без планового срока оплаты: платёж клиента ждём 30 дней после доставки
 WARRANTY_MONTHS = 12    # допущение до решения владельца: 12 мес. от доставки клиенту
-CLOSE_DAYS = 365        # УПД и оплату клиента ждём по доставкам за год, как зонд v53
+CLOSE_DAYS = ork.CLOSE_DAYS   # УПД и оплату клиента ждём по доставкам за год, как зонд v53
 OTD_MONTHS = 12         # история «доставлено в срок» — помесячно за год
 SUP_MIN = 3             # поставщик в рейтинге надёжности — от 3 отгрузок с планом и фактом
 
@@ -52,14 +54,15 @@ EXC = {
     "forecast": (3, "прогноз доставки позже срока клиента", "ускорить сейчас: поставщик, маршрут; предупредить клиента"),
     # производство: бюджетный конец прошёл, заказ ни разу не входил в «Заказ готов» или дальше
     # (по всем переходам) — отклонение шага 7; плановую отгрузку переписывают под факт (§8)
-    "prodDev": (4, "срок конца производства прошёл, заказ не готов", "запросить у поставщика статус и новую дату, предупредить КАМа"),
+    "prodDev": (4, "срок конца производства прошёл, заказ не готов", "запросить у поставщика статус и новую дату; эскалировать руководителю ОРК и КАМу (Рег. 9.2.5)"),
     "planAfterDl": (5, "план доставки позже срока клиента", "предупредить клиента или сменить маршрут"),
     # «платежа нет» и «УПД нет» — в карточке заказа нет файла: оплату в деньгах портал не
     # видит (решение Р-2), подпись говорит ровно то, что известно
     # долг клиента урегулирует КАМ, ОСС в копии (решение владельца 26.10.2026, п. 4)
     "unpaid": (6, "доставлено, срок оплаты клиента прошёл, платёжки клиента в заказе нет",
                "урегулировать долг: получить у клиента оплату или дату оплаты; пришла — приложить платёжку"),
-    "noUtd": (7, f"доставлено {UTD_WD + 1}+ р.д. назад, УПД в заказе нет", "получить подписанный УПД и приложить; на 11-й р.д. — эскалация КАМу"),
+    # пункт — с 11-го р.д. (Рег. 14.3.1–14.3.2): запросить у ОСС статус УПД и эскалировать КАМу
+    "noUtd": (7, f"доставлено {UTD_WD + 1}+ р.д. назад, УПД в заказе нет", "запросить у ОСС статус УПД и эскалировать КАМу; получен — приложить"),
     "noPayPlan": (8, "доставлено, нет планового срока оплаты", "внести срок оплаты из договора"),
     "dealOpen": (9, "все заказы закрыты, сделка открыта", "закрыть сделку"),
     # «Оплата получена», а сделка не закрыта (решение 26.10.2026, п. 4): успех в доставке в
@@ -256,17 +259,18 @@ def pay_eta(orders: list[dict], pay_days: int | None, today: dt.date, med: dict,
 
 
 def _step_now(o: dict) -> int | None:
-    """Текущий шаг заказа: по стадии, не ниже фактов; стадии нет (заказ собран не из
-    портала) — по фактам; стадия не из таблицы — None."""
-    return ork.step_of(o.get("stage"), o) if o.get("stage") else ork.fact_floor(o)
+    """Текущий шаг заказа — ork.step_now (одно правило для всей вкладки): по стадии, не ниже
+    фактов; доставлено без УПД — шаг 12; стадии нет — по фактам; не из таблицы — None."""
+    return ork.step_now(o)
 
 
 def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None, *,
-                     nocal: Counter | None = None) -> list[tuple[str, int | None]]:
+                     nocal: Counter | None = None, in_cat0: bool = True) -> list[tuple[str, int | None]]:
     """[(код, дней)] — исключения одного заказа. Закрытый провалом заказ сюда не попадает.
     fc — прогноз доставки (forecast): позже срока клиента — ранний сигнал. Дни у
     s1Over…s6Over и noUtd — РАБОЧИЕ (календарь РФ), у прочих — календарные. Года нет в
-    календаре — пункта по сроку менеджера нет, счёт — в nocal (ноль за неизвестное не ставим)."""
+    календаре — пункта по сроку менеджера нет, счёт — в nocal (ноль за неизвестное не ставим).
+    in_cat0 — сделка в воронке «Реализация»: вне её приёмки (s1Over) нет."""
     out: list[tuple[str, int | None]] = []
     dl, fact = o.get("dl"), delivered(o)                  # без факта — по УПД (решение 25.10.2026)
     shipped = o.get("shipFact") or o.get("inbFact")      # пришёл на склад — значит, отгружен
@@ -291,31 +295,23 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None, *,
             out.append(("noDl", None))
         if any(not o.get(k) for k, _ in PLAN_DATES):
             out.append(("noPlanDates", None))
-        # сверх нормы шага регламента (ork.OVER_CODE): только у заказа со стадией из портала;
-        # «гигиена» (стадия позади фактов, брошенная карточка) в счёт не идёт
-        if o.get("stage"):
-            ov = ork.overrun(o, today)
-            code = ork.OVER_CODE.get(ov["step"])
-            if code and ov["over"] is None and ov["why"] == "год без производственного календаря" \
-                    and nocal is not None:
-                nocal[code] += 1
-            if code and ov["over"] and not ork.hygiene(o, today)["exclude"]:
-                out.append((code, ov["wd"]))
+        # сверх нормы шага регламента (ork.OVER_CODE, шаг 12 — noUtd): ork.judged — то же
+        # правило, что у таблицы сделок, ведомости и W2. Шаги 1, 4, 5, 8 — только со стадией из
+        # портала; шаг 12 — 10 р.д. от СЫРОЙ даты доставки (delFact), на 11-й р.д. — пункт (Рег.
+        # 14.2.5, 14.3.1). Гигиена (стадия позади фактов, брошенная карточка, доставка старше
+        # CLOSE_DAYS без УПД) в счёт не идёт
+        ov = ork.judged(o, today, in_cat0=in_cat0)
+        code = ork.OVER_CODE.get(ov["step"])
+        if code and ov["termUnknown"] and ov["why"] == "год без производственного календаря" \
+                and nocal is not None:
+            nocal[code] += 1
+        if code and ov["over"]:
+            out.append((code, ov["wd"]))
         # закрытие — только у живого заказа и только за CLOSE_DAYS: закрытый заказ
         # закрытие прошёл, а старые доставки без файла платёжки — пробел учёта до
         # появления поля, а не долг клиента
         if fact and (today - fact).days <= CLOSE_DAYS:
             since = (today - fact).days
-            # УПД: 10 р.д. от доставки клиенту по СЫРОЙ дате доставки (delFact), а не по
-            # подставленной дате УПД; на 11-й р.д. — пункт (Рег. 14.2.5, 14.3.1)
-            df = o.get("delFact")
-            if df and not o.get("utd"):
-                wd = period_mod.workdays_ru(df, today)
-                if wd is None:
-                    if nocal is not None:
-                        nocal["noUtd"] += 1
-                elif wd > UTD_WD:
-                    out.append(("noUtd", wd))
             if not o.get("clientPaid"):
                 due = o.get("payPlan") or (fact + dt.timedelta(days=PAY_GRACE))
                 if due < today:
@@ -414,8 +410,8 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         регламент не нормирует — их «сверх нормы» нет."""
         if not o.get("live") or not o.get("stage"):
             return False
-        ov = ork.overrun(o, today)
-        return bool(ov["over"]) and ov["step"] in ork.OVER_CODE and not ork.hygiene(o, today)["exclude"]
+        ov = ork.judged(o, today, in_cat0=(deal_by.get(o.get("deal")) or {}).get("inCat0", True))
+        return bool(ov["over"]) and ov["step"] in ork.OVER_CODE
     # вселенная — та же, что у таблицы сделок: заказы известных сделок, без
     # проигранных; у закрытой (выигранной) сделки сроки заказов уже не отклонения
     СРОКИ = {"late", "risk", "forecast", "prodDev", "planAfterDl", "noDl", "noPlanDates",
@@ -429,12 +425,10 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
         in_scope.append((o, d))
         p = phase(o, today, warranty_months)
         fc = forecast(o, today, med, sup_slip)
-        exc = order_exceptions(o, today, fc, nocal=nocal)
+        # приёмка — от входа сделки в «Реализацию» (Рег. 3.3): сделка вне воронки — не приёмка
+        exc = order_exceptions(o, today, fc, nocal=nocal, in_cat0=d.get("inCat0", True))
         if d.get("closed"):
             exc = [(c, n) for c, n in exc if c not in СРОКИ | ОПЛАТА]
-        # приёмка — от входа сделки в «Реализацию» (Рег. 3.3): сделка вне воронки — не приёмка
-        if not d.get("inCat0", True):
-            exc = [(c, n) for c, n in exc if c != "s1Over"]
         in_tile = p in ph and (o.get("live") or p == "warranty") and not (d.get("closed") and o.get("live"))
         if in_tile:
             ph[p]["orders"] += 1
@@ -450,7 +444,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
                           **item(code, o, d),
                           # р.д. — у сроков менеджера по календарю РФ, «без пауз»
-                          "inWd": code in ork.OVER_CODE.values() or code == "noUtd",
+                          "inWd": code in ork.OVER_CODE.values(),
                           "deal": o.get("deal"), "seq": (d or {}).get("seq") or o.get("seq") or 0,
                           "customer": (d or {}).get("customer") or "—", "order": o.get("id"),
                           "title": o.get("title") or "", "sup": o.get("sup") or "—",
@@ -505,6 +499,9 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             sev, what, act = EXC[code]
             if code == "gone":
                 what = what + ": " + ", ".join(ушли)
+            if code == "payNoContract" and cust_contract is None:
+                # разбор договоров не загружен: «не найден» не проверялось — так и пишем
+                what = "оплачено поставщику, договор с заказчиком не подписан по стадии; разбор договоров не загружен — не проверено"
             queue.append(_deal_item(code, sev, what, act, days, d, item(code, None, d)))
     queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
 

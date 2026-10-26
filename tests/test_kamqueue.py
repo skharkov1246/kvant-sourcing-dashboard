@@ -251,3 +251,12 @@ def test_кам_видит_роль_хозяина_и_рабочие_дни():
     assert (by["noUtd"]["owner"], by["noUtd"]["ownerRole"], by["noUtd"]["inWd"], by["noUtd"]["kamCopy"]) == (
         "Илья (ОРК)", "менеджер ОРК", True, True)
     assert by["late"]["inWd"] is False
+
+
+def test_сделка_без_кама_дни_сигнала_рабочие():
+    """Пункт noKam берёт дни самого важного сигнала — и их единицу: у сроков регламента ОРК
+    (noUtd, s1Over…) дни рабочие (inWd), а не календарные."""
+    life = {"queue": [{**_q("noUtd", "6003", 20, kam=""), "inWd": True}]}
+    нет = kq.build(None, life, [_deal("6003", kam="", closed=True)], СЕГОДНЯ)["queue"][0]
+    assert нет["code"] == "noKam" and нет["days"] == 20 and нет["inWd"] is True
+    assert нет["also"][0]["inWd"] is True

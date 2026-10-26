@@ -95,9 +95,14 @@ def test_месяц_квартал_и_как_считается(ct):
     o = ct["ork"]
     rows = o["month"]["rows"]
     assert len(rows) == ork.MONTHS_BACK
-    assert any(r["M1"]["mgr"]["state"] == "prelim" for r in rows), "M1 — не выше «предварительно» до v60"
+    # в корпусе за отрезками S2/S3/S6 и артефактами — один ответственный: показатель отдела
+    # раскрыл бы человека (решение п. 3) — не показываем, ни значения, ни k
+    assert any(r["M1"]["mgr"]["state"] == "hidden" and "раскрыл бы человека" in r["M1"]["mgr"]["why"] for r in rows)
     assert all(r["M1"][k]["state"] != "show" for r in rows for k in r["M1"])
-    assert any(r["M2"]["state"] in ("show", "prelim") for r in rows)
+    assert all("k" not in r["M1"][c] for r in rows for c in ("S2", "S3", "S6", "mgr")
+               if r["M1"][c]["state"] == "hidden")
+    assert any(r["M2"]["state"] == "hidden" and "have" not in r["M2"] for r in rows)
+    assert any(r["M1"]["S1"]["state"] == "prelim" for r in rows), "S1 — руководитель ОРК, без ворот людей"
     assert all(r["otd"]["label"] == "результат поставщика и логистики" for r in rows)
     M3 = o["month"]["M3"]
     assert M3["label"] == "без поправки на сложность"
@@ -154,7 +159,7 @@ def test_сырые_переходы_в_страницу_не_идут(ct):
     o = next(o for r in ct["rows"] for o in r["orders"] if o["live"] and o["step"])
     assert {"step", "stepRole", "stepWho", "stepWd", "stepNorm", "stepOver"} <= set(o)
     cells = [r["stepCell"] for r in ct["rows"] if r.get("stepCell")]
-    assert cells and all(c["label"] == ork.NO_PAUSE for c in cells)
+    assert cells and all(c["label"] in (ork.NO_PAUSE, "закрыть сделку") for c in cells)
     assert len(json.dumps(ct["ork"], ensure_ascii=False)) < 120_000
 
 
@@ -291,7 +296,8 @@ def test_гигиена_не_назначен_в_счёте(ct):
     """«Менеджер ОРК не назначен» — гигиена, но в счёте «сверх нормы» есть (решение п. 1):
     в «не идут в счёт» — только стадия позади фактов, брошенная и стадия не из таблицы."""
     h = ct["ork"]["week"]["hygiene"]
-    assert h["excluded"] == sum(1 for x in h["items"] if set(x["kinds"]) & {"behind", "abandoned", "unknown"})
+    assert h["excluded"] == sum(1 for x in h["items"] if x["excl"])
+    assert all(set(x["kinds"]) & {"behind", "abandoned", "old", "unknown"} for x in h["items"] if x["excl"])
     assert h["noMgrOnly"] > 0 and all(not x["excl"] for x in h["items"] if x["kinds"] == ["noMgr"])
     nm = next((m for m in ct["ork"]["week"]["overByWho"] if m["who"] == "не назначен"), None)
     assert nm and nm["n"] > 0, "не назначенные — в «сверх нормы по менеджерам»"
@@ -341,3 +347,135 @@ def test_менеджер_за_прошлый_месяц():
     _d, _o = _orders()
     mp = _d["orkMonth"]["main"]
     assert mp and all("prev" in m and "M1" in m["prev"] and m["prev"]["m"] for m in mp)
+
+
+# ── ревизия 2: одно правило шага 12, гигиена старой доставки, неизвестные стадии ─────────
+class _Шаг12(fixture.ContractsStub):
+    """Придуманный корпус: три открытые сделки по одному живому заказу без УПД — «Заказ получен
+    клиентом» и «Ожидание оплаты», доставлены 20 р.д. назад (21.09.2026), и «Ожидание оплаты»,
+    доставлен 400 дн. назад."""
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct_
+        now = dt.datetime.fromisoformat(fixture.CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()            # noqa: E731
+        d = lambda a: (fixture.CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        for deal, oid, stage, ago in (("6910", 99200, "GOT", 28), ("6911", 99201, "WAITPAY", 28),
+                                      ("6912", 99202, "WAITPAY", 400)):
+            self.deals.append({"ID": deal, "TITLE": f"99{deal[-1]}. Доставлено без УПД", "OPPORTUNITY": "1000",
+                               "CURRENCY_ID": "EUR", "COMPANY_ID": "301", "STAGE_ID": "C0:DELIVERED",
+                               "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(500),
+                               "ASSIGNED_BY_ID": "10", ct_.OSS_DEAL: ["21"], ct_.KAM_F: "11"})
+            self.hist[2] += [(deal, "C0:NEW", t(500)), (deal, "C0:DELIVERED", t(ago))]
+            self.orders.append({"id": oid, "title": f"{deal}/1. Узел", "companyId": "401", "parentId2": int(deal),
+                                "opportunity": 100, "currencyId": "EUR", "stageId": f"DT172_26:{stage}",
+                                "createdTime": t(480), "movedTime": t(ago - 1), ct_.OSS_F: "21",
+                                ct_.DL_CUSTOMER: d(ago - 5), ct_.DEL_FACT: d(ago), ct_.SUP_PAID: 100,
+                                ct_.SHIP_FACT: d(ago + 20), ct_.PROD_START: d(470), ct_.PROD_END: d(ago + 30),
+                                ct_.DEL_BUDGET: d(ago - 5), ct_.PAY_PLAN: d(ago - 60), "assignedById": "31"})
+            self.hist[172] += [(str(oid), "DT172_26:NEW", t(480)), (str(oid), f"DT172_26:{stage}", t(ago - 1))]
+
+
+def test_шаг_12_один_во_всех_подвкладках():
+    """«Заказ получен клиентом» и «Ожидание оплаты», доставлены 20 р.д. назад без УПД: один шаг
+    12, исполнитель менеджер ОРК, 20 / 10 р.д. сверх нормы — в заказе, ячейке сделки,
+    «Замедлено», очереди (noUtd в W2) и ведомости. Доставка 400 дн. назад — гигиена «старая
+    доставка без УПД»: ни «сверх нормы», ни «в норме», ни «Замедлено», ни в n W2."""
+    data, _o = _orders(_Шаг12())
+    rows = {r["deal"]: r for r in data["rows"]}
+    q = data["life"]["queue"]
+    for deal, oid in (("6910", "99200"), ("6911", "99201")):
+        r = rows[deal]
+        o = r["orders"][0]
+        assert (o["step"], o["stepRole"], o["stepWd"], o["stepNorm"], o["stepOver"]) == (12, "orkMgr", 20, 10, True)
+        c = r["stepCell"]
+        assert (c["step"], c["role"], c["wd"], c["norm"], c["over"]) == (12, "orkMgr", 20, 10, True), deal
+        # кандидат в «Замедлено» (подтверждает чат) — одинаково для обеих стадий
+        assert "сверх нормы шага: 1 заказ" in r["why"], (deal, r["why"])
+        qq = [x for x in q if x["order"] == oid and x["code"] == "noUtd"]
+        assert qq and qq[0]["w2"] and qq[0]["step"] == 12 and qq[0]["role"] == "orkMgr" and qq[0]["days"] == 20
+    old = rows["6912"]
+    oo = old["orders"][0]
+    assert oo["step"] == 12 and oo["stepOver"] is None and oo["stepHyg"] and "старая доставка" in oo["stepWhy"]
+    assert "сверх нормы шага" not in old["why"] and old["stepCell"]["hyg"] and old["stepCell"]["over"] is None
+    assert not [x for x in q if x["order"] == "99202" and x["code"] == "noUtd"]
+    w = data["ork"]["week"]
+    led = {r["no"]: r for r in w["ledger"]}
+    W2 = w["tiles"]["W2"]
+    assert W2["byStep"][12] == led[12]["over"] == sum(1 for x in q if x["code"] == "noUtd" and x.get("w2"))
+    assert led[12]["notCounted"] >= 1 and W2["excluded"] >= 1
+    hy = next(x for x in w["hygiene"]["items"] if x["order"] == "99202")
+    assert "old" in hy["kinds"] and hy["excl"]
+    _инварианты(data)
+
+
+def test_ячейка_сделки_сверх_нормы_первым_и_оплата_получена(ct):
+    """Ячейка «шаг · исполнитель · р.д./норма»: есть заказ сверх нормы — он (почему строка
+    замедлена); «Оплата получена», сделка не закрыта — шаг 13, ОСС «закрыть сделку» (п. 4)."""
+    for r in ct["rows"]:
+        if any(o["live"] and o["stepOver"] for o in r["orders"]) and not r["closed"]:
+            assert r["stepCell"]["over"] is True, r["deal"]
+    paid = [r for r in ct["rows"] if r["paidStage"]]
+    assert paid and all(r["stepCell"] and (r["stepCell"]["step"], r["stepCell"]["role"], r["stepCell"]["label"])
+                        == (13, "oss", "закрыть сделку") for r in paid)
+
+
+def _синт(i, stage, **kw):
+    o = {"id": str(i), "deal": "D1", "seq": 1, "title": f"o{i}", "sup": "S", "live": True, "success": False,
+         "stage": stage, "stageSince": "2026-10-01T10:00:00+03:00", "stepSince": "2026-10-01T10:00:00+03:00",
+         "t0": "2026-09-01T10:00:00+03:00", "created": dt.date(2026, 9, 1), "dl": dt.date(2026, 12, 1),
+         "prodStart": dt.date(2026, 9, 5), "prodEnd": dt.date(2026, 11, 20), "delBudget": dt.date(2026, 11, 25),
+         "utd": False, "supPaidPct": 0, "art": {}, "_reach": {}, "_segs": {}, "orkMgr": "М", "respOrk": True}
+    o.update(kw)
+    return o
+
+
+_СДЕЛКИ = [{"deal": "D1", "seq": 1, "customer": "К", "closed": False, "lost": False, "inCat0": True, "norders": 2,
+            "cat0At": "2026-09-01T10:00:00+03:00", "kam": "К", "kamId": "1", "orkResp": "", "ossDeal": "О",
+            "dealStepMax": 9}]
+
+
+def test_неизвестные_стадии_не_ноль():
+    """Стадии переименованы в портале (не из таблицы шагов): W1, W2, W5 — «Нет данных», а не
+    «0 · сейчас на шагах никого»; почти все неизвестны — покрытие падает, «не показываем»."""
+    import lifecycle
+    T = dt.date(2026, 10, 26)
+    orders = [_синт(i, "Новая стадия X") for i in range(10)]
+    life = lifecycle.build(orders, _СДЕЛКИ, T)
+    v, _ = orkview.build(orders, _СДЕЛКИ, life["queue"], T)
+    t = v["week"]["tiles"]
+    for k in ("W1", "W2", "W5"):
+        assert t[k]["state"] == "nodata" and t[k]["value"] is None and "STAGE_STEP" in t[k]["need"], (k, t[k])
+    orders = [_синт(i, "Новая стадия X") for i in range(8)] + [
+        _синт(100 + i, "Подготовка спецификации и инвойса", stepSince="2026-10-22T10:00:00+03:00") for i in range(2)]
+    life = lifecycle.build(orders, _СДЕЛКИ, T)
+    v, _ = orkview.build(orders, _СДЕЛКИ, life["queue"], T)
+    W2 = v["week"]["tiles"]["W2"]
+    assert W2["n"] == 10 and W2["state"] == "hidden" and W2["value"] is None and "покрытие 20 %" in W2["why"]
+
+
+def test_скрытая_ячейка_без_k():
+    """«Не показываем» не читается как «k из n»: у hidden нет ни value, ни k."""
+    hid = orkview._timeliness([_seg(1)] * 9 + [_seg(1, burst=True)] * 3, "S2")
+    assert hid["state"] == "hidden" and hid["value"] is None and "k" not in hid
+    ret = orkview._timeliness([{**_seg(1), "ret": True}] * 4, "S2")
+    assert ret["state"] == "hidden" and "возврат" in ret["why"]
+
+
+def test_месяц_отдела_по_людям():
+    """M1/M2 отдела за одним-двумя ответственными — показатель человека: без права не
+    показываем (решение п. 3); за тремя — показываем (предварительно до v60)."""
+    T = dt.date(2026, 10, 26)
+    def era(i, who):
+        seg = {**_seg(1, end="2026-10-10T10:00:00+03:00"), "skip": False}
+        return {"id": str(i), "created": dt.date(2026, 9, 1), "resp": who, "orkMgr": who, "respOrk": True,
+                "stage": "Оплата поставщику / агенту", "_segs": {"segs": {"S2": seg}},
+                "_reach": {5: "2026-10-10T10:00:00+03:00", 6: "2026-10-10T10:00:00+03:00"}, "art": {"po": True}}
+    один, _ = orkview._month([era(i, "Илья") for i in range(12)], [], T, None, {})
+    s2 = один["rows"][0]["M1"]["S2"]
+    assert s2["state"] == "hidden" and "k" not in s2 and s2["value"] is None and "раскрыл бы человека" in s2["why"]
+    assert один["rows"][0]["M2"]["state"] == "hidden" and "have" not in один["rows"][0]["M2"]
+    трое, _ = orkview._month([era(i, ("Илья", "Пётр", "Олег")[i % 3]) for i in range(12)], [], T, None, {})
+    s2 = трое["rows"][0]["M1"]["S2"]
+    assert s2["state"] == "prelim" and s2["value"] == 100 and s2["k"] == 12 and s2["people"] == 3

@@ -872,7 +872,10 @@ def run(args) -> int:
               f"сроков без календаря {sum((_lc.get('noCalendar') or {}).values())}; сверх нормы (W2) "
               f"{((_wk.get('tiles') or {}).get('W2') or {}).get('value')}, гигиена "
               f"{(_wk.get('hygiene') or {}).get('n', 0)}; руководитель ОРК в справочнике "
-              f"{'есть' if _tr.get('orkHead') else 'нет'}; «Замедлено» до чата: было {_cmp.get('old', 0)}, "
+              f"{'есть' if _tr.get('orkHead') else 'нет'}; ответственный из ОРК у {_tr.get('respOrk', 0)} "
+              f"живых заказов, менеджер ОРК не назначен у "
+              f"{((_wk.get('hygiene') or {}).get('by') or {}).get('noMgr', 0)}, старых доставок без УПД "
+              f"{_tr.get('oldNoUtd', 0)}; «Замедлено» до чата: было {_cmp.get('old', 0)}, "
               f"стало {_cmp.get('new', 0)} (хуже у {_cmp.get('worse', 0)}, лучше у {_cmp.get('better', 0)}); "
               f"менеджеров ОРК в «Месяце» {len((ork_month_data or {}).get('main') or [])}")
         # «что делать первым» — по общей очереди обоих видов (contracts.life_all); плитки

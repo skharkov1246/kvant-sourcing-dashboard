@@ -40,10 +40,11 @@ OWNER_RULE = "step"          # хозяин пункта — исполните�
 NO_PAUSE = "без пауз"        # паузы срока менеджера в Битриксе не ведутся (W4 — нет данных)
 
 # --- 13 шагов регламента -----------------------------------------------------------------
-# no, name, role — исполнитель; also — кто ещё участвует; norm — норма шага в рабочих днях
-# (None — не нормируется регламентом или решением владельца); seg — сегмент «Системы
-# аналитики», который меряет шаг; waits — смежник, от которого шаг зависит; esc — кому
-# эскалирует исполнитель (в копии пункта очереди).
+# no, name, role — исполнитель; also — кто ещё участвует; norm — норма шага в рабочих днях,
+# которую портал меряет (None — не меряет); seg — сегмент «Системы аналитики», который меряет
+# шаг; waits — смежник, от которого шаг зависит; esc — кому эскалирует исполнитель (в копии
+# пункта очереди). Норма по документу — NORM_DOC: регламент её задаёт, но портал её не
+# меряет («нет данных», шаг 6) — это не «не нормируется».
 STEPS = (
     {"no": 1, "name": "Приёмка сделки", "role": "orkHead", "also": (), "norm": 1, "seg": "S1",
      "waits": "kam", "esc": "kam"},
@@ -72,6 +73,18 @@ STEPS = (
     {"no": 13, "name": "Контроль закрытия", "role": "oss", "also": ("kam",), "norm": None,
      "seg": "S10", "waits": "kam", "esc": "kam"},
 )
+# норма по регламенту (правило 4 — таблица): шаг → (подпись нормы, состояние, чего нет).
+# norm — портал меряет; nodata — регламент задаёт норму, а данных нет (Рег. 8.2.6, Ан. S4:
+# шаг 6 — 1–2 р.д. после OC и оплаты; даты OC (4 %) и оплаты поставщику в заказе нет); none —
+# регламент или решение владельца нормы не задают (2–3, 7, 9–11, 13: медиана и P80 или шаг
+# смежника)
+NORM_DOC = {
+    1: ("1 р.д.", "norm", ""), 2: ("", "none", ""), 3: ("", "none", ""), 4: ("2 р.д.", "norm", ""),
+    5: ("≤ 9 р.д.", "norm", ""),
+    6: ("1–2 р.д.", "nodata", "даты Order confirmation и оплаты поставщику в заказе"),
+    7: ("", "none", ""), 8: ("2 р.д.", "norm", ""), 9: ("", "none", ""), 10: ("", "none", ""),
+    11: ("", "none", ""), 12: ("10 р.д.", "norm", ""), 13: ("", "none", ""),
+}
 STEP = {s["no"]: s for s in STEPS}
 NORM_WD = {s["no"]: s["norm"] for s in STEPS if s["norm"] is not None}
 # исполнитель шага (решение 26.10.2026, п. 1): шаг → роль хозяина пункта очереди
@@ -152,7 +165,8 @@ BURST = {"n": 3, "sec": 300}           # «пачка»: 3 и больше пе�
 # key — признак в заказе contracts.life_orders; need — с какого шага поле уже обязано быть
 # (заказ прошёл шаг поля); since — дата создания поля по его коду: заказ, прошедший шаг
 # раньше, поле не обязан; cond — требуется только при условии (импорт — после сверки
-# «импорт/РФ», предоплата — при доле первичной оплаты > 0).
+# «импорт/РФ»; prepay — при доле первичной оплаты > 0; paid — оплата поставщику была;
+# closed — заказ закрыт успехом).
 ARTIFACTS = (
     {"key": "dl", "name": "срок клиента", "field": "ufCrm20_1728900218435", "step": 1, "need": 2,
      "since": "2024-10-14", "cond": None},
@@ -165,7 +179,7 @@ ARTIFACTS = (
     {"key": "proforma", "name": "проформа / счёт", "field": "ufCrm20_1787562201347", "step": 5,
      "need": 6, "since": "2026-08-24", "cond": "prepay"},
     {"key": "supPayDoc", "name": "платёжка поставщику", "field": "ufCrm20_1731178548", "step": 6,
-     "need": 7, "since": "2024-11-09", "cond": "prepay"},
+     "need": 7, "since": "2024-11-09", "cond": "paid"},
     {"key": "prodConf", "name": "подтверждение производства", "field": "ufCrm20_1723236426", "step": 6,
      "need": 7, "since": "2024-08-09", "cond": None},
     {"key": "planDates", "name": "плановые даты производства", "field": "ufCrm20_1724941935", "step": 6,
@@ -182,6 +196,10 @@ ARTIFACTS = (
      "need": 12, "since": "2024-08-09", "cond": None},
     {"key": "utd", "name": "подписанный УПД", "field": "ufCrm20_1723236848", "step": 12, "need": 13,
      "since": "2024-08-09", "cond": None},
+    # платёжка клиента (шаг 13, Рег. 15): требуется у закрытого успехом заказа — живой на шаге
+    # 13 оплату ещё ждёт
+    {"key": "clientPo", "name": "платёжка клиента", "field": "ufCrm20_1751555578101", "step": 13,
+     "need": 13, "since": "2025-07-03", "cond": "closed"},
 )
 
 # --- ворота доверия (контракт показателя) — до решения владельца ---------------------------
@@ -198,11 +216,13 @@ GATES = {
     "plan_eq_fact_max": 0.30,    # «план = факт» > 30 % — первичный срок поставщика не показываем
     "abandoned_wd": 60,          # > 60 р.д. на шаге с нормой ≤ 2 — «брошенная карточка»
     "abandoned_norm_max": 2,
+    "agree_pairs_min": 10,       # совпадение опор меряется от 10 пар; меньше — ворота не применяются
     "n_count": 1,                # счёт живых пунктов «сейчас» — не выборка: n-ворот у него нет
     "n_managers_min": 3,         # M3 без права: среднее меньше чем по трём менеджерам — не показываем
 }
 GATES_NOTE = "пороги — предложение, ждут решения владельца"
 STATES = ("show", "prelim", "nodata", "hidden")
+CLOSE_DAYS = 365             # УПД и оплату клиента ждём по доставкам за год (как зонд v53); старше — гигиена
 CHECKPOINT = {"half": 0.5, "before_days": 14, "long_days": 30}   # контрольные точки шага 7
 
 # латиница-двойник → кириллица: «Сформирован PO» и «Сформирован РО» — одна стадия
@@ -253,6 +273,22 @@ def step_of(stage_name, facts: dict | None = None, *, kind: str = "order",
             unknown[norm_name(stage_name) or "—"] += 1
         return None
     return max(base, fact_floor(facts))
+
+
+def step_now(order: dict, *, unknown: Counter | None = None) -> int | None:
+    """Шаг живого заказа — ОДИН для ведомости, W2, очереди, таблицы сделок, карточки заказа,
+    «Замедлено» и хозяина пункта: по стадии и фактам (step_of; стадии нет — по фактам).
+    Доставлено клиенту, УПД нет — шаг 12 (УПД, менеджер ОРК; срок — от факта доставки,
+    Рег. 14.2.5), даже если стадия — «Заказ получен клиентом» (шаг 11) или ниже, и даже
+    если стадии нет в таблице шагов: срок шага 12 стадии не требует. Стадия не из таблицы и
+    доставки нет — None (имя — в `unknown`)."""
+    if order.get("stage"):
+        st = step_of(order.get("stage"), order, unknown=unknown)
+    else:
+        st = fact_floor(order)
+    if (st is None or st == 11) and order.get("delFact") and not order.get("utd"):
+        return 12
+    return st
 
 
 # --- сегменты по полной истории переходов --------------------------------------------------
@@ -408,16 +444,20 @@ def _d(v) -> dt.date | None:
     return t.astimezone(period_mod.MSK).date() if t else None
 
 
-def overrun(order: dict, today: dt.date, workdays_fn=period_mod.workdays_ru) -> dict:
+def overrun(order: dict, today: dt.date, workdays_fn=None) -> dict:
     """Срок шага живого заказа против нормы регламента (р.д., «без пауз»).
 
     order: stage (имя стадии), stepSince (вход в шаг, ork.step_since; без него —
     stageSince, вход в текущую стадию), t0 (начало приёмки) и факты (supPaidPct, prodConf,
-    shipFact, inbFact, delFact, utd). Шаг 1 меряется от t0, шаг 12 — от доставки клиенту.
-    → {step, role, norm, wd, over, by, since, label, why}; over None — нормы нет или
-    срок не посчитать (why)."""
-    step = step_of(order.get("stage"), order)
+    shipFact, inbFact, delFact, utd). Шаг — step_now; шаг 1 меряется от t0, шаг 12 — от
+    доставки клиенту. Без стадии меряется только шаг 12 (срок — от факта, стадия не нужна).
+    → {step, role, norm, normDoc, normState, wd, over, by, since, label, why}; over None —
+    нормы нет, портал её не меряет (normState nodata) или срок не посчитать (why)."""
+    fn = workdays_fn or period_mod.workdays_ru
+    step = step_now(order)
+    doc = NORM_DOC.get(step, ("", "none", ""))
     out = {"step": step, "role": EXECUTOR.get(step) if step else None, "norm": None, "wd": None,
+           "normDoc": doc[0], "normState": doc[1],
            "over": None, "by": None, "since": "", "label": NO_PAUSE, "why": ""}
     if step is None:
         out["why"] = "стадия не из таблицы шагов"
@@ -425,25 +465,54 @@ def overrun(order: dict, today: dt.date, workdays_fn=period_mod.workdays_ru) -> 
     norm = NORM_WD.get(step)
     out["norm"] = norm
     if norm is None:
-        out["why"] = "шаг не нормируется"
+        out["why"] = (f"норма {doc[0]} — нет данных: {doc[2]}" if doc[1] == "nodata"
+                      else "шаг не нормируется")
         return out
     if step == 12:
         since = _d(order.get("delFact"))
+    elif not order.get("stage"):
+        out["why"] = "стадии нет — срок шага не посчитать"
+        return out
     elif step == 1:
         since = _d(order.get("t0")) or _d(order.get("stepSince")) or _d(order.get("stageSince"))
     else:
         since = _d(order.get("stepSince")) or _d(order.get("stageSince"))
     if since is None:
-        out["why"] = "нет даты входа в шаг"
+        out["why"] = "нет факта доставки" if step == 12 else "нет даты входа в шаг"
         return out
     out["since"] = since.isoformat()
-    wd = workdays_fn(since, today)
+    wd = fn(since, today)
     if wd is None:
         out["why"] = "год без производственного календаря"
         return out
     out["wd"] = wd
     out["over"] = wd > norm
     out["by"] = wd - norm
+    return out
+
+
+def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=None) -> dict:
+    """«Сверх нормы» живого заказа — ОДНО правило для таблицы сделок, карточки, «Замедлено»,
+    очереди (s1Over…s6Over, noUtd), ведомости и W2: overrun, а в счёт не идут гигиена
+    карточки (hygiene: стадия позади фактов, брошенная, старая доставка без УПД) и приёмка
+    заказа сделки вне воронки «Реализация» (Рег. 3.3).
+
+    → overrun + {rawOver — over до отбора, hyg, hygWhy, counted — в счёте «сверх нормы»
+    (over True/False), termUnknown — шаг с нормой в счёте, а срок не посчитать}."""
+    ov = overrun(order, today, workdays_fn)
+    hy = hygiene(order, today, workdays_fn)
+    out = {**ov, "rawOver": ov["over"], "hyg": bool(hy["exclude"]), "hygWhy": hy["why"],
+           "counted": False, "termUnknown": False}
+    if ov["norm"] is None:
+        return out
+    if ov["step"] == 1 and not in_cat0:
+        out.update(over=None, why="приёмка — только у сделок воронки «Реализация»")
+        return out
+    if hy["exclude"]:
+        out.update(over=None, why="гигиена карточки: " + hy["why"])
+        return out
+    out["counted"] = ov["over"] is not None
+    out["termUnknown"] = ov["over"] is None
     return out
 
 
@@ -472,18 +541,24 @@ def checkpoints(order: dict, week) -> list[dict]:
 
 
 # --- гигиена карточки ----------------------------------------------------------------------
-def hygiene(order: dict, today: dt.date, workdays_fn=period_mod.workdays_ru) -> dict:
+def hygiene(order: dict, today: dt.date, workdays_fn=None) -> dict:
     """Карточка, которой нельзя верить в счёте: стадия позади фактов (оплачено, а стадия до
-    шага 6; отгружено, а стадия до 9; доставлено, а до 11) или > 60 р.д. на шаге с нормой
-    ≤ 2 — «брошенная карточка». Такие заказы уходят в блок «гигиена» и в счёт «сверх
-    нормы» и сегментов не идут. → {behind, abandoned, unknown, exclude, why}."""
+    шага 6; отгружено, а стадия до 9; доставлено, а до 11), > 60 р.д. на шаге с нормой ≤ 2 —
+    «брошенная карточка», доставлено больше CLOSE_DAYS дней назад без УПД — «старая доставка
+    без УПД» (пробел учёта, а не срок менеджера). Такие заказы уходят в блок «гигиена» и в
+    счёт «сверх нормы» и сегментов не идут. Срок УПД (шаг 12) идёт от факта доставки:
+    отставшая стадия его не портит — у шага 12 исключает только старая доставка.
+    Вход в шаг раньше первого года календаря — нижняя граница р.д. от 1 января этого года.
+    → {behind, abandoned, old, unknown, exclude, why}."""
+    fn = workdays_fn or period_mod.workdays_ru
     base = stage_step(order.get("stage"))
     floor = fact_floor(order)
+    now = step_now(order)
     top = _STAGE_SPAN["order"].get(norm_name(order.get("stage")), base) if base is not None else None
     behind = base is not None and top < floor
-    abandoned = False
+    abandoned = old = False
     why = []
-    if base is None:
+    if base is None and order.get("stage"):
         why.append("стадия не из таблицы шагов")
     if behind:
         why.append(f"стадия — шаг {base}, по фактам — не ниже {floor}")
@@ -491,12 +566,24 @@ def hygiene(order: dict, today: dt.date, workdays_fn=period_mod.workdays_ru) -> 
     if norm is not None and norm <= GATES["abandoned_norm_max"] and not behind:
         since = (_d(order.get("t0")) if base == 1 else None) or _d(order.get("stepSince")) \
             or _d(order.get("stageSince"))
-        wd = workdays_fn(since, today) if since else None
+        wd = fn(since, today) if since else None
+        if wd is None and since:
+            years = period_mod.workcal_years()
+            y0 = min(years) if years else None
+            if y0 and since.year < y0:
+                lo = fn(dt.date(y0, 1, 1), today)     # нижняя граница: календаря на год входа нет
+                wd = lo if lo is not None and lo > GATES["abandoned_wd"] else None
         if wd is not None and wd > GATES["abandoned_wd"]:
             abandoned = True
             why.append(f"{wd} р.д. на шаге {base} при норме {norm}")
-    return {"behind": behind, "abandoned": abandoned, "unknown": base is None,
-            "exclude": behind or abandoned, "why": "; ".join(why)}
+    df = _d(order.get("delFact"))
+    if now == 12 and df and (today - df).days > CLOSE_DAYS:
+        old = True
+        why.append(f"старая доставка без УПД: {(today - df).days} дн. назад (> {CLOSE_DAYS})")
+    exclude = old or ((behind or abandoned) and now != 12)
+    return {"behind": behind, "abandoned": abandoned, "old": old,
+            "unknown": base is None and bool(order.get("stage")),
+            "exclude": exclude, "why": "; ".join(why)}
 
 
 # --- контракт показателя -------------------------------------------------------------------
@@ -585,11 +672,13 @@ def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
 # заказ без заказа и оплату без договора разбирает руководитель ОРК; даты размещения вносит
 # ОСС (Рег. 8.2.3), ТН — логистика. При эскалации КАМ — в копии.
 ITEM = {
+    # срок клиента и производство — шаг заказа сейчас (step_now: тот же, что в ведомости и
+    # отборе по шагу), хозяин — менеджер ОРК двигает поставку, КАМ в копии (срок с клиентом)
     "late": (None, "orkMgr", "kam"),
-    "risk": (7, "orkMgr", "kam"),
+    "risk": (None, "orkMgr", "kam"),
     "forecast": (None, "orkMgr", "kam"),
-    "prodDev": (7, "orkMgr", "kam"),
-    "planAfterDl": (6, "orkMgr", "kam"),
+    "prodDev": (None, "orkMgr", "kam"),
+    "planAfterDl": (None, "orkMgr", "kam"),
     "unpaid": (13, "kam", "oss"),
     "noUtd": (12, "orkMgr", "kam"),
     "noPayPlan": (13, "oss", "kam"),
@@ -624,8 +713,8 @@ ITEM = {
 # роли пунктов, которых регламент не описывает (чаты, договоры, экономика — dealctx): хозяин —
 # человек сделки, подпись роли — для отбора очереди по роли
 ROLES_EXTRA = {"dealResp": "ответственный сделки", "src": "сорсинг"}
-# «сверх нормы» шага → код пункта (шаг 12 — noUtd по факту доставки, не по стадии)
-OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over"}
+# «сверх нормы» шага → код пункта (шаг 12 — noUtd: срок от факта доставки, не от стадии)
+OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over", 12: "noUtd"}
 
 
 def item_owner(code: str, step_now: int | None, people: dict, *, key: str | None = None) -> dict:
@@ -677,7 +766,13 @@ def art_required(o: dict, a: dict, reach: dict | None = None) -> bool:
         return False
     if a["cond"] == "import":
         return False
-    if a["cond"] == "prepay" and not ((o.get("prepayShare") or 0) > 0 or (o.get("supPaidPct") or 0) > 0):
+    # проформа — только при предоплате по «Доле первичной оплаты»: доли нет — не требуем
+    # (оплата после отгрузки — не предоплата); платёжка поставщику — когда оплата была
+    if a["cond"] == "prepay" and not (o.get("prepayShare") or 0) > 0:
+        return False
+    if a["cond"] == "paid" and not ((o.get("prepayShare") or 0) > 0 or (o.get("supPaidPct") or 0) > 0):
+        return False
+    if a["cond"] == "closed" and not o.get("success"):
         return False
     since = dt.date.fromisoformat(a["since"])
     at = _d((reach or {}).get(a["need"])) or _d(o.get("created"))

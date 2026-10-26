@@ -42,7 +42,8 @@ def test_таблица_шагов_полна():
     # все 18 стадий заказа покрыты, и ни одна не ведёт на шаг вне 1–13
     assert len(ork.STAGE_STEP["order"]) >= 18
     assert all(1 <= v <= 13 for m in ork.STAGE_STEP.values() for v in m.values())
-    assert all(a["need"] > a["step"] for a in ork.ARTIFACTS)
+    # поле обязано быть после шага; платёжка клиента (шаг 13) — у закрытого заказа
+    assert all(a["need"] > a["step"] or a["cond"] == "closed" for a in ork.ARTIFACTS)
 
 
 def test_стадия_в_шаг_пробелы_регистр_двойники():
@@ -263,3 +264,63 @@ def test_пункты_чатов_и_договоров_по_таблице():
     both = ork.item_owner("contractMissing", 5, ppl, key="contractMissing:both")
     assert (both["role"], both["copyRole"], both["step"]) == ("kam", "orkMgr", 2)
     assert all("oss" not in (r, c) for k, (_s, r, c) in ork.ITEM.items() if k.startswith("chat"))
+
+
+# ── одно правило шага 12 и «сверх нормы» (ревизия 2) ───────────────────────────────────────
+def test_доставлено_без_упд_шаг_12_при_любой_стадии():
+    """«Заказ получен клиентом», «Заказ отгружен» и «Ожидание оплаты» с фактом доставки и без
+    УПД — один шаг 12, один исполнитель (менеджер ОРК) и один срок от доставки: 20 р.д. против
+    10 — сверх нормы; УПД есть — шаг 13."""
+    сегодня = D(2026, 10, 19)
+    for стадия in ("Заказ получен клиентом", "Заказ отгружен", "Ожидание оплаты", "Стадия, которой нет"):
+        o = {"stage": стадия, "delFact": D(2026, 9, 21), "utd": False, "stageSince": t("10-01")}
+        assert ork.step_now(o) == 12, стадия
+        v = ork.judged(o, сегодня)
+        assert (v["step"], v["role"], v["norm"], v["wd"], v["over"], v["counted"]) == (
+            12, "orkMgr", 10, 20, True, True), стадия
+        assert ork.owner(v["step"], {"orkMgr": "Илья (ОРК)", "kam": "Анна (КАМ)"})["who"] == "Илья (ОРК)"
+    assert ork.step_now({"stage": "Заказ получен клиентом", "delFact": D(2026, 9, 21), "utd": True}) == 13
+    assert ork.step_now({"stage": "Заказ получен клиентом"}) == 11, "без доставки — шаг стадии"
+    assert ork.step_now({"delFact": D(2026, 9, 21)}) == 12, "стадии нет — по фактам"
+
+
+def test_старая_доставка_без_упд_гигиена_а_не_в_норме():
+    """Доставлено больше CLOSE_DAYS дней назад, УПД нет: не «в норме» и не «сверх нормы», а
+    гигиена «старая доставка без УПД» — вне счёта (одно правило с окном очереди)."""
+    сегодня = D(2026, 10, 26)
+    o = {"stage": "Ожидание оплаты", "delFact": сегодня - dt.timedelta(days=400), "utd": False}
+    h = ork.hygiene(o, сегодня)
+    assert h["old"] and h["exclude"] and "старая доставка без УПД" in h["why"]
+    v = ork.judged(o, сегодня)
+    assert v["rawOver"] is True and v["over"] is None and v["hyg"] and not v["counted"]
+    свежий = {**o, "delFact": сегодня - dt.timedelta(days=30)}
+    assert ork.judged(свежий, сегодня)["over"] is True and not ork.hygiene(свежий, сегодня)["old"]
+    # стадия позади фактов срок УПД не портит: он от факта доставки
+    позади = {"stage": "Заказ создан", "delFact": сегодня - dt.timedelta(days=30), "utd": False}
+    assert ork.hygiene(позади, сегодня)["behind"] and ork.judged(позади, сегодня)["over"] is True
+
+
+def test_приёмка_вне_реализации_не_в_счёте():
+    v = ork.judged({"stage": "Заказ создан", "t0": D(2026, 9, 1)}, D(2026, 10, 1), in_cat0=False)
+    assert v["rawOver"] is True and v["over"] is None and not v["counted"] and "Реализация" in v["why"]
+    assert ork.judged({"stage": "Заказ создан", "t0": D(2026, 9, 28)}, D(2026, 10, 1))["over"] is True
+
+
+def test_норма_шага_6_нет_данных_а_не_не_нормируется():
+    """Рег. 8.2.6 и Ан. S4: шаг 6 — 1–2 р.д. после OC и оплаты; дат в заказе нет — «нет
+    данных». «Не нормируется» — только шаги 2–3, 7, 9–11, 13."""
+    assert ork.NORM_DOC[6][:2] == ("1–2 р.д.", "nodata") and "Order confirmation" in ork.NORM_DOC[6][2]
+    assert {n for n, v in ork.NORM_DOC.items() if v[1] == "none"} == {2, 3, 7, 9, 10, 11, 13}
+    assert {n for n, v in ork.NORM_DOC.items() if v[1] == "norm"} == set(ork.NORM_WD)
+    v = ork.overrun({"stage": "Оплата поставщику / агенту", "stageSince": t("09-01")}, D(2026, 9, 18))
+    assert v["step"] == 6 and v["over"] is None and v["normState"] == "nodata" and "нет данных" in v["why"]
+    assert ork.overrun({"stage": "Производство заказа"}, D(2026, 9, 18))["why"] == "шаг не нормируется"
+
+
+def test_брошенная_до_календаря():
+    """Вход в шаг раньше первого года календаря — нижняя граница р.д. от 1 января: «брошенная»,
+    а не «срок неизвестен»."""
+    y0 = min(__import__("period").workcal_years())
+    o = {"stage": "Заказ направлен", "stepSince": f"{y0 - 1}-06-01T10:00:00+03:00"}
+    h = ork.hygiene(o, D(y0, 12, 1))
+    assert h["abandoned"] and h["exclude"]

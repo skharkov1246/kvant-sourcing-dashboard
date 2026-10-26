@@ -229,6 +229,7 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
             ex["also"] = also
             sev = CODES[also[0]["code"]][0]
             days = also[0]["days"]            # место в очереди — по самому важному сигналу
+            ex["inWd"] = bool(also[0].get("inWd"))   # его дни — рабочие у сроков регламента ОРК
             if also[0].get("owner"):
                 ex["owner"] = also[0]["owner"]
         add("noKam", "назначить КАМа", uid="", kam="", gone=False, deal=did, days=days, src=src,
@@ -268,7 +269,7 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
             did = str(x.get("deal"))
             orphan_x.setdefault(did, x)
             signal(did, code, x.get("days"), dl=x.get("dl") or "",
-                   owner=str(x.get("who") or "").replace(" (уволен)", ""))
+                   owner=str(x.get("who") or "").replace(" (уволен)", ""), inWd=bool(x.get("inWd")))
             continue
         k = (str(x.get("deal")), code)
         a = agg.get(k)
