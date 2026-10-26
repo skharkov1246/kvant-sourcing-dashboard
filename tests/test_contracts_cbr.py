@@ -362,10 +362,20 @@ def test_справочник_стадий_сборки_не_перечитыв�
     assert data["fx"]["nOffers"] == 6 and not data["fx"]["kpErr"]
 
 
-def test_зонд_не_ставит_scripts_в_начало_пути():
+def test_зонд_не_ставит_scripts_в_начало_пути(monkeypatch):
+    """Путь до вызова — без scripts/, модуль зонда не импортирован: после вызова scripts/
+    не первым. Состояние готовит сам тест: другие тесты набора ставят scripts/ в начало
+    общего пути, и проверка по нему зависела от порядка тестов."""
     import sys
+    monkeypatch.setattr(sys, "path", [p for p in sys.path if not p.rstrip("/").endswith("scripts")])
+    for m in [m for m in sys.modules if m.startswith("probe_")]:
+        monkeypatch.delitem(sys.modules, m)
+    before = list(sys.path)
     ct._зонд()
-    assert not sys.path[0].endswith("scripts"), "scripts/ затенил бы модули корня в сборке"
+    assert not sys.path[0].rstrip("/").endswith("scripts"), "scripts/ затенил бы модули корня в сборке"
+    # модули зонда вставляют свои пути в начало: после вызова начало пути — прежнее,
+    # новое (корень, scripts/) — только в конце
+    assert sys.path[:len(before)] == before
 
 
 def test_поставщик_без_курса_на_дату_заказа_счётом():
