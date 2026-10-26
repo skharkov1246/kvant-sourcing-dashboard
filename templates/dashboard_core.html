@@ -1635,7 +1635,7 @@ function _incDraw(el,H,M){
   let h=`<div class="secttl"><b>·</b> Доход: где формируется и когда придёт${qmark('i.income')}</div>`
    +`<div class="ctsepnote">В цифрах <b>${TR.nA||0} из ${TR.n||0}</b> выигранных сделок (${TR.pct==null?'—':TR.pct+' %'}) — получено в квартале и к получению: деньги только у сделок, «Сумма» которых сверена файлом экономики.`
    +`${nC?` Без денег (класс C) — ${sd(nC)}: ${rlist(_INC_C)}.`:''}${nAR?` Сумма есть, результата нет — ${sd(nAR)}: ${rlist(_INC_AR)}.`:''}`
-   +` Курс Битрикса на ${_esc(TR.fxAsOf||'—')} · сборка ${_esc(H.asOf)} · поправка результата ${TR.calibOk?'по '+TR.calibN+' сделкам':'<b>не откалибрована</b> (меньше '+(RU.calibMin||30)+' сделок) — результата нет'}.`
+   +` Курсы: ${_esc(TR.fxLbl||('Битрикса на '+(TR.fxAsOf||'—')))} · сборка ${_esc(H.asOf)} · поправка результата ${TR.calibOk?'по '+TR.calibN+' сделкам':'<b>не откалибрована</b> (меньше '+(RU.calibMin||30)+' сделок) — результата нет'}.`
    +`${TR.poLow?` <b>«Получено» по стадии подтверждено платёжкой у ${T.k1po} из ${T.k1}</b> — меньше ${TR.poMin||50} %: стадию ставят раньше, чем прикладывают платёжку, или платёжку не прикладывают.`:''}`
    +`${H.money&&!H.money.ok?' <b>Сверка денег не сошлась</b> ('+_esc((H.money.fail||[]).join('; '))+') — деньги этой сборки не опубликованы.':''} План по людям: <b>не задан</b> — вводит владелец в «Доступах» (этап 2).</div>`;
   if(!M) h+=`<div class="dimv" style="font-size:12.5px;margin:0 0 8px">${MOK?'Суммы и результат — по праву «Деньги КАМов»: здесь — число сделок.':'Деньги этой сборки не опубликованы: сверка не сошлась. Здесь — число сделок.'}</div>`;
@@ -2056,7 +2056,7 @@ function openContract(x){
   const GM=(B||MK)?null:x.marginEur;
   h+=`<div class="h">Экономика сделки${qmark('ct.three')}</div>`;
   const FS=x.saleSrc==='file';
-  h+=`<div class="note">Продажа (как в таблице): <b>${x.saleLbl||'—'}</b> — ${FS?`сверенный файл экономики, прочитан ${_esc(x.econAt||'')}${x.saleBitrixEur?` («Сумма» в Битриксе ${_fmtE(x.saleBitrixEur)})`:' (суммы в Битриксе нет)'}`:'«Сумма» сделки в Битриксе'}${B&&B.rev?` · цепочка ниже — по бюджету сделки${x.planMod?' от '+_esc(String(x.planMod).slice(0,10).split('-').reverse().join('.')):''}`:FS?' · цепочка ниже — по файлу':' · цепочка ниже — по Битриксу: сделка и заказы'}</div>`;
+  h+=`<div class="note">Продажа (как в таблице): <b>${x.saleLbl||'—'}</b> — ${FS?`сверенный файл экономики, прочитан ${_esc(x.econAt||'')}${x.saleBitrixEur?` («Сумма» в Битриксе ${_fmtE(x.saleBitrixEur)}: ${_ctFxRow(x)})`:' (суммы в Битриксе нет)'}`:'«Сумма» сделки в Битриксе: '+_ctFxRow(x)}${B&&B.rev?` · цепочка ниже — по бюджету сделки${x.planMod?' от '+_esc(String(x.planMod).slice(0,10).split('-').reverse().join('.')):''}`:FS?' · цепочка ниже — по файлу':' · цепочка ниже — по Битриксу: сделка и заказы'}</div>`;
   h+=`<div class="ecard${ebad?' bad':''}">`;
   // цепочка: продали → минус закуп → минус прочие → плановая прибыль
   h+=`<div class="chain">`
@@ -2158,9 +2158,20 @@ function openContract(x){
 // «2 сделки», «5 сделок»: число и слово в нужной форме
 const _ctN=(n,one,few,many)=>{const m=n%10,h=n%100;return n+' '+(m===1&&h!==11?one:(m>=2&&m<=4&&(h<12||h>14)?few:many));};
 // Шапка «Реализации» — общая для основного вида и вкладки отдельного направления.
+// Курс и НДС строки «Реализации» (решения владельца 25 и 26.10.2026): чем пересчитана «Сумма»
+const _CT_KPSRC={tkp:'«ТКП согласован»',offer:'последнее КП до выигрыша',cat0:'вход в реализацию',created:'создание сделки',today:'дата сборки'};
+function _ctFxRow(x){
+  const k=x.vatK?String(Number(x.vatK).toFixed(2)).replace('.',','):'';
+  const vb=x.vatBx||x.vatRule;
+  return `в € по ${x.rateSrc==='cbr'?'ЦБ РФ':'курсу Битрикса'}${x.kpDate?' на '+_esc(x.kpDate):''}${x.kpSrc?' ('+_esc(_CT_KPSRC[x.kpSrc]||x.kpSrc)+')':''}`
+    +(vb==='gross'?`, без НДС по правилу (÷${k||'1,20'})`:vb==='foreign'?', покупатель не из РФ — как есть':'');
+}
 function _ctHeader(X,paid){
   const fx=X.fx||{};
-  const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную${fx.usdRub!=null?`: 1 USD = ${fx.usdRub} ₽`:''}). Отчётность с другим курсом разойдётся системно.</span>`:'';
+  // ЦБ не получен — плашкой и счётом, а не молча (решение владельца 25.10.2026)
+  const fxNote=!fx.src?(fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b>.</span>`:'')
+    :fx.src==='bitrix'?`<span class="warn" role="status"><b>⚠ ${_esc(fx.lbl||'курсы Битрикса (ЦБ недоступен)')}</b>${fx.fallback?` — ${_ctN(fx.fallback.n||0,'сделка пересчитана','сделки пересчитаны','сделок пересчитаны')} по ручным курсам`:''}${fx.usdRub!=null?` (1 USD = ${fx.usdRub} ₽)`:''}; по решению 25.10.2026 курс — ЦБ РФ на дату КП, эта сборка его не получила.</span>`
+    :`<span class="dimv">Деньги — в € по курсу <b>${_esc(fx.lbl||'ЦБ РФ')}</b>${fx.cbrUsdRub!=null?` · сегодня 1 USD = ${fx.cbrUsdRub} ₽`:''}; продажа без файла экономики — без НДС по правилу (÷1,20 при ТКП до 2026, ÷1,22 с 2026, иностранный покупатель — как есть)${fx.noRate?` · без курса на свою дату — ${_ctN(fx.noRate,'сделка','сделки','сделок')}`:''}${fx.reqErr?' · страна покупателя не прочитана: НДС снят у всех':''}.</span>`;
   return `<header><div class="eyebrow">Квант · реализация</div><h1>Пульт реализации</h1><div class="sub"><span>От выигрыша до гарантии: заказ поставщику → производство → доставка клиенту → УПД и оплата → гарантия</span><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${paid?`<span>Успех — и стадия «Оплата получена | Закрытие сделки»: <b>${paid}</b> сделок не в работе</span>`:''}${fxNote}</div></header>`;
 }
 // Вкладка направления без его сделок: «Нет данных» + чего нет и откуда придёт (portal-ui §2)
@@ -2446,7 +2457,7 @@ function _ctPanel(X,el){
     return `<div class="stgcell"><b>${x.dlNext}</b><div class="dep">в срок${x.noDl?' · без даты: '+x.noDl:''}</div></div>`;};
   const bcell=x=>{
     // валюта без курса и несоизмеримая закупка — текстом, а не числом (ревизия 23.10.2026)
-    if(x.buySrc==='fx')return `<div class="mono" style="color:var(--dim)">курса нет</div><div class="dep">сумма в ${_esc((x.fxMissing||[]).join(', '))} — курса нет в Битриксе</div>`;
+    if(x.buySrc==='fx')return `<div class="mono" style="color:var(--dim)">курса нет</div><div class="dep">сумма в ${_esc((x.fxMissing||[]).join(', '))} — курса нет ${x.rateSrc==='cbr'?'у ЦБ на дату':'в Битриксе'}</div>`;
     if(x.buySusp)return `<div class="mono nrc">не сходится</div><div class="dep">закупка несоизмерима с суммой сделки — проверить суммы заказов и «Сумму»; в итоги не вошла</div>`;
     const b=`<div class="mono" style="color:${x.buySrc==='none'?'var(--dim)':'var(--a)'}">${x.buyLbl}</div>`;
     // если альтернативный источник не бьётся с масштабом сделки (больше 3× суммы или
@@ -2480,7 +2491,7 @@ function _ctPanel(X,el){
       +`<div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div>${tdline(x)}</td>`
       +`<td>${scell(x)}</td>`
       +`<td>${dcell(x)}</td>`
-      +`<td class="r"><div class="amt1"${x.saleKnown===false?' style="color:var(--dim)"':''}>${x.saleLbl}</div><div class="dep">${x.saleSrc==='file'?`<span class="srcb chk">файл · ${_esc(String(x.econAt||'').slice(0,5))}</span>`:x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig)+(x.saleKnown===false?' — в € не пересчитать':''):''}</div></td>`
+      +`<td class="r"><div class="amt1"${x.saleKnown===false?' style="color:var(--dim)"':''}>${x.saleLbl}</div><div class="dep">${x.saleSrc==='file'?`<span class="srcb chk">файл · ${_esc(String(x.econAt||'').slice(0,5))}</span>`:(x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig)+(x.saleKnown===false?' — в € не пересчитать':''):'')+(x.vatRule==='gross'?`${x.saleCur&&x.saleCur!=='EUR'?' · ':''}без НДС по правилу`:'')}</div></td>`
       +`<td class="r">${bcell(x)}</td>`
       +`<td class="r">${pcell(x)}</td>`
       +(DC?`<td style="min-width:190px">${_dcChatHtml(dcOf(x).chat)}${_dcContractHtml(dcOf(x).contract)}</td>`:'')

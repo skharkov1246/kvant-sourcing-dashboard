@@ -394,6 +394,51 @@ CT_TODAY = dt.date(2026, 10, 19)
 CT_SEP_CAT = "16"
 CT_SEP_NAME = "Залив"
 CT_SEP_CO = "390"
+# Страна покупателя по реквизитам (НДС по правилу 26.10.2026): компания 306 — иностранная
+# (шаблон реквизита не российский), 300 и 301 — российские, прочие — без реквизитов.
+CT_FOREIGN_CO = "306"
+CT_RU_CO = ("300", "301")
+# Стадия пресейла «предложение выдано» (probe_conversion.вид_стадии == "offer") — для даты КП
+CT_OFFER_STAGE = "C2:UC_KP"
+# Придуманные ряды ЦБ «рублей за единицу» (номинал 1 у евро и доллара, 10 у юаня): курс евро
+# растёт на 0,02 ₽ в день от CT_CBR_FROM, по выходным записей нет — как у ЦБ.
+CT_CBR_FROM = dt.date(2024, 1, 1)
+CT_CBR = {"EUR": ("R01239", 1, 95.0), "USD": ("R01235", 1, 88.0), "CNY": ("R01375", 10, 120.0)}
+
+
+def ct_cbr_value(code: str, day: dt.date) -> float:
+    """Рублей за ОДНУ единицу на дату по придуманному ряду (то, что даст VunitRate)."""
+    _sid, nom, base = CT_CBR[code]
+    return round((base + 0.02 * (day - CT_CBR_FROM).days) / nom, 4)
+
+
+def ct_cbr_fetch(url: str) -> bytes:
+    """Придуманный cbr.ru: справочник XML_valFull и ряды XML_dynamic (VunitRate, номинал)."""
+    from urllib.parse import parse_qs, urlparse
+    if "XML_valFull" in url:
+        items = "".join(f'<Item ID="{sid}"><ISO_Char_Code>{c}</ISO_Char_Code><ParentCode>{sid}</ParentCode></Item>'
+                        for c, (sid, _n, _b) in CT_CBR.items())
+        return f'<?xml version="1.0"?><Valuta name="Foreign Currency Market Lib">{items}</Valuta>'.encode()
+    q = parse_qs(urlparse(url).query)
+    a = dt.datetime.strptime(q["date_req1"][0], "%d/%m/%Y").date()
+    b = dt.datetime.strptime(q["date_req2"][0], "%d/%m/%Y").date()
+    code = next(c for c, (sid, _n, _b) in CT_CBR.items() if sid == q["VAL_NM_RQ"][0])
+    nom = CT_CBR[code][1]
+    recs, day = [], max(a, CT_CBR_FROM)
+    while day <= b:
+        if day.weekday() < 5:
+            v = ct_cbr_value(code, day)
+            recs.append(f'<Record Date="{day.strftime("%d.%m.%Y")}" Id="{q["VAL_NM_RQ"][0]}"><Nominal>{nom}</Nominal>'
+                        f'<Value>{str(round(v * nom, 4)).replace(".", ",")}</Value>'
+                        f'<VunitRate>{str(v).replace(".", ",")}</VunitRate></Record>')
+        day += dt.timedelta(days=1)
+    return f'<?xml version="1.0"?><ValCurs ID="{q["VAL_NM_RQ"][0]}">{"".join(recs)}</ValCurs>'.encode()
+
+
+def ct_fx_loader(codes, days, today):
+    """Загрузчик курсов «Реализации» на придуманном cbr.ru — без сети (base.fx.load_cbr)."""
+    from base import fx
+    return fx.load_cbr(codes, days, today=today, fetch=ct_cbr_fetch)
 
 
 class ContractsStub:
@@ -411,6 +456,7 @@ class ContractsStub:
             return (CT_TODAY - dt.timedelta(days=days_ago)).isoformat()
 
         self.deals, self.orders, self.hist = [], [], {2: [], 172: []}
+        self.offer_hist: list[tuple[str, str, str]] = []
         stages = ["C0:NEW", "C0:PREPARATION", "C0:EXECUTING", "C0:FINAL_INVOICE"]
         oid = 7000
         for i in range(24):
@@ -423,6 +469,14 @@ class ContractsStub:
                                "UF_CRM_1734380921": str(9000 + i),
                                # у последней сделки поле «КАМ» пусто — пункт «назначить КАМа»
                                **({ct.KAM_F: str(10 + (i + 1) % 3)} if i < 23 else {})})
+            # дата КП: i % 4 == 1 — «ТКП согласован» в 2025 году (НДС 20 %); i % 4 == 2 — «ТКП
+            # согласован» в день создания, а КП в истории за 12 дн. до неё (берётся КП); прочие —
+            # без поля: вход в кат. 0
+            if i % 4 == 1:
+                self.deals[-1][ct.WON_F] = d(330)
+            elif i % 4 == 2:
+                self.deals[-1][ct.WON_F] = self.deals[-1]["DATE_CREATE"][:10]
+                self.offer_hist.append((did, CT_OFFER_STAGE, t(200 - i * 5 + 12)))
             self.hist[2].append((did, st, t(30 + i)))
             for j in range(1 + i % 3):
                 oid += 1
@@ -483,6 +537,14 @@ class ContractsStub:
     def call(self, method, params=None, **kw):
         if method == "crm.item.fields":
             return {"fields": {}}
+        if method == "crm.requisite.preset.list":
+            return [{"ID": "1", "COUNTRY_ID": "1"}, {"ID": "2", "COUNTRY_ID": "122"}]
+        if method == "crm.requisite.list":
+            f = (params or {}).get("filter") or {}
+            ids = {str(x) for x in f.get("@ENTITY_ID") or []}
+            rq = [{"ID": str(800 + int(c)), "ENTITY_ID": c, "PRESET_ID": "1" if c in CT_RU_CO else "2",
+                   "RQ_INN": ""} for c in sorted(CT_RU_CO + (CT_FOREIGN_CO,)) if c in ids]
+            return [r for r in rq if int(r["ID"]) > int(f.get(">ID") or 0)]
         if method == "im.dialog.messages.get":
             # чётные чаты — человек писал вчера, нечётные — месяц назад, кратные 5 — нет доступа
             n = int(str(params["DIALOG_ID"]).removeprefix("chat")) - 9000
@@ -507,6 +569,23 @@ class ContractsStub:
     def deals_by_ids(self, ids, *, select=None):
         want = {str(i) for i in ids}
         return {x["ID"]: dict(x) for x in self.other if x["ID"] in want}
+
+    def deal_stage_meta(self):
+        m = {sid: {"name": nm, "sem": "S" if sid == "C0:WON" else "P", "sort": 10 * i, "cat": "0"}
+             for i, (sid, nm) in enumerate(self.deal_stages_cat().items())}
+        m[CT_OFFER_STAGE] = {"name": "КП отправлено клиенту", "sem": "P", "sort": 30, "cat": "2"}
+        m["C2:NEW"] = {"name": "Новый запрос", "sem": "P", "sort": 10, "cat": "2"}
+        return m
+
+    def call_envelope(self, method, params=None, **kw):
+        """crm.stagehistory.list для истории входов в стадию предложения (contracts → зонд v59)."""
+        assert method == "crm.stagehistory.list"
+        f = (params or {}).get("filter") or {}
+        own = {str(x) for x in f.get("OWNER_ID") or []}
+        st = set(f.get("STAGE_ID") or [])
+        items = [{"ID": str(k), "OWNER_ID": o, "STAGE_ID": s_, "CREATED_TIME": ts}
+                 for k, (o, s_, ts) in enumerate(self.offer_hist) if o in own and (not st or s_ in st)]
+        return {"result": {"items": items}, "total": len(items)}
 
     def categories(self):
         return {"0": "Реализация", CT_SEP_CAT: CT_SEP_NAME}
@@ -545,6 +624,7 @@ def build_contracts(**kw) -> dict:
     old = os.environ.get("KVANT_NOW")
     os.environ["KVANT_NOW"] = CT_NOW
     try:
+        kw.setdefault("fx_loader", ct_fx_loader)
         return contracts_mod.compute(ContractsStub(), as_of=CT_TODAY, people={}, **kw)
     finally:
         if old is None:

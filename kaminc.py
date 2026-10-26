@@ -638,6 +638,8 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
         "tot": tot,
         "trust": {"n": n_all, "nA": tot["nA"], "nR": tot["nR"], "pct": cover(n_all, tot["nA"]),
                   "reasons": dict(reasons), "fxAsOf": (contracts.get("fx") or {}).get("asOf") or "",
+                  # источник курса «Реализации» (ЦБ на дату КП или курсы Битрикса с плашкой)
+                  "fxLbl": (contracts.get("fx") or {}).get("lbl") or "",
                   "poLow": po_low, "poMin": round(PO_CONFIRM_MIN * 100),
                   "calibN": int((calib or {}).get("calibN") or 0), "calibOk": int((calib or {}).get("calibN") or 0) >= CALIB_MIN},
         "ladder": [{"m": k, "paid": ladder[k][0], "due": ladder[k][1], "paidA": ladder[k][6], "dueA": ladder[k][7]}

@@ -25,7 +25,7 @@ import sqlite3
 import time
 import xml.etree.ElementTree as ET
 import zipfile
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import requests
 
@@ -127,13 +127,18 @@ def _num(s) -> float | None:
         return None
 
 
-def cbr_codes(timeout: int = 60) -> dict[str, str]:
+def _cbr_get(url: str, timeout: int) -> bytes:
+    r = requests.get(url, timeout=timeout)
+    r.raise_for_status()
+    return r.content
+
+
+def cbr_codes(timeout: int = 60, fetch=None) -> dict[str, str]:
     """ISO-код валюты → код ряда ЦБ (ParentCode) по справочнику XML_valFull.asp.
     При двух записях с одним ISO-кодом берётся та, у которой ID совпадает с
-    ParentCode (действующая), иначе первая."""
-    r = requests.get(CBR_LIB, timeout=timeout)
-    r.raise_for_status()
-    return parse_cbr_codes(r.content)
+    ParentCode (действующая), иначе первая. fetch — адрес → тело ответа (тесты
+    подставляют свой, в сеть не ходят); ошибка — исключением."""
+    return parse_cbr_codes((fetch or (lambda u: _cbr_get(u, timeout)))(CBR_LIB))
 
 
 def parse_cbr_codes(content: bytes) -> dict[str, str]:
@@ -150,15 +155,13 @@ def parse_cbr_codes(content: bytes) -> dict[str, str]:
     return out
 
 
-def cbr_series(series_id: str, d1: date, d2: date, timeout: int = 60) -> list[tuple[date, float]]:
+def cbr_series(series_id: str, d1: date, d2: date, timeout: int = 60, fetch=None) -> list[tuple[date, float]]:
     """Ряд «рублей за ОДНУ единицу валюты» за [d1, d2] одним запросом XML_dynamic.
 
     Берётся VunitRate (номинал уже учтён: у рупии он менялся 10 → 100); если его
     нет — Value / Nominal. Пустой ответ — пустой список, а не исключение."""
     url = CBR_DYN.format(a=d1.strftime("%d/%m/%Y"), b=d2.strftime("%d/%m/%Y"), sid=series_id)
-    r = requests.get(url, timeout=timeout)
-    r.raise_for_status()
-    return parse_cbr_series(r.content)
+    return parse_cbr_series((fetch or (lambda u: _cbr_get(u, timeout)))(url))
 
 
 def parse_cbr_series(content: bytes) -> list[tuple[date, float]]:
@@ -364,3 +367,102 @@ def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.
         if found is False:
             stat["без курса"] += 1
     return {c: sorted(v.items()) for c, v in series.items() if v}, stat
+
+
+# ── курсы ЦБ для сборки дашборда (решение владельца 25.10.2026: «Реализация» в евро
+# по ЦБ на дату КП) ────────────────────────────────────────────────────────────
+#
+# Порядок: ряды cbr.ru (справочник + один запрос на валюту за весь период) → зеркало
+# на нужные даты (запрос на дату, предел BUILD_MIRROR_MAX) → None: тогда вызывающий
+# берёт курсы Битрикса и говорит об этом плашкой, 1:1 не подставляется. Кеш на прогон —
+# по адресу запроса: вторая вкладка или повторный расчёт в сеть не ходят.
+
+#: запас ряда до самой ранней нужной даты: курс на дату — последняя запись не позже неё
+#: (выходные, праздники); тот же запас, что у зонда v59 (CBR_LEAD_DAYS)
+BUILD_LEAD_DAYS = 30
+#: предел запросов к зеркалу в сборке: при 0,25 с паузы — около 2,5 мин; без курса
+#: остаются самые старые даты (зеркало идёт от новых к старым)
+BUILD_MIRROR_MAX = 600
+_RUN_CACHE: dict = {}
+
+
+def _cbr_net(url: str) -> bytes:
+    """cbr.ru по сети — одна функция на прогон: по ней ключ кеша прогона."""
+    return _cbr_get(url, 60)
+
+
+def _cached(fetch, url: str):
+    key = (fetch, url)
+    if key not in _RUN_CACHE:
+        _RUN_CACHE[key] = fetch(url)
+    return _RUN_CACHE[key]
+
+
+def load_cbr(codes, days, *, today: date, fetch=None, mirror_fetch=None,
+             mirror_max: int = BUILD_MIRROR_MAX, mirror_pause: float = 0.25) -> tuple[CbrRates | None, dict]:
+    """Курсы ЦБ на нужные даты для сборки → (CbrRates или None, учёт).
+
+    codes — ISO-коды валют сумм (RUB и EUR добавляются сами), days — даты, на которые
+    нужен курс. fetch — адрес → тело ответа cbr.ru (ошибка — исключением); mirror_fetch —
+    адрес → (код ответа, тело) зеркала; по умолчанию — сеть. Учёт: src («cbr», «mirror»,
+    «» — ЦБ недоступен), requests (запросов в сеть, без попаданий в кеш прогона), noCode
+    (валют нет в справочнике ЦБ), failed (ряд не получен), why (тип ошибки), lo/hi —
+    период рядов. В учёте только коды валют и счётчики — журнал публичный."""
+    real = fetch or _cbr_net
+    calls = {"n": 0}
+
+    def get(url):
+        if (real, url) not in _RUN_CACHE:
+            calls["n"] += 1
+        return _cached(real, url)
+
+    want = sorted({str(c).upper() for c in codes if c} | {"EUR"} - {"RUB"})
+    ds = sorted({d for d in days if d})
+    info: dict = {"src": "", "requests": 0, "noCode": [], "failed": [], "why": "", "lo": None, "hi": today,
+                  "mirror": None}
+    if not ds:
+        ds = [today]
+    d1 = min(ds) - timedelta(days=BUILD_LEAD_DAYS)
+    info["lo"] = d1
+    series: dict[str, list[tuple[date, float]]] = {}
+    try:
+        sids = cbr_codes(fetch=get)
+        for c in want:
+            sid = sids.get(c)
+            if not sid:
+                info["noCode"].append(c)
+                continue
+            try:
+                rows = cbr_series(sid, d1, today, fetch=get)
+            except Exception as e:  # noqa: BLE001 — одна валюта без ряда, прочие считаются
+                info["failed"].append(c)
+                info["why"] = info["why"] or type(e).__name__
+                continue
+            if rows:
+                series[c] = rows
+            else:
+                info["failed"].append(c)
+    except Exception as e:  # noqa: BLE001 — справочник не получен: идём на зеркало
+        info["why"] = type(e).__name__
+    info["requests"] = calls["n"]
+    if series.get("EUR"):
+        info["src"] = "cbr"
+        return CbrRates(series), info
+    # cbr.ru не дал ряда к евро — зеркало на нужные даты и сегодня
+    mget = mirror_fetch or (lambda u: _mirror_get(u, 30))
+    try:
+        cbr_mirror_codes(fetch=mget)
+        mser, stat = cbr_mirror_series(set(ds) | {today}, set(want), max_requests=mirror_max,
+                                       pause=mirror_pause, fetch=mget)
+        info["requests"] += 1 + stat["запросов"]
+        info["mirror"] = stat
+    except Exception as e:  # noqa: BLE001 — зеркало тоже недоступно: курсов ЦБ нет
+        info["requests"] += 1
+        info["why"] = info["why"] or type(e).__name__
+        info["mirrorWhy"] = type(e).__name__
+        return None, info
+    if not mser.get("EUR"):
+        return None, info
+    info["src"] = "mirror"
+    info["noCode"] = sorted(c for c in want if c not in mser)
+    return CbrRates(mser), info
