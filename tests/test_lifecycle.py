@@ -47,18 +47,22 @@ def test_исключения_заказа():
     risk = lc.order_exceptions(заказ(dl=д("2026-10-25")), СЕГОДНЯ)
     assert ("risk", 6) in risk
     assert lc.order_exceptions(заказ(dl=д("2026-10-25"), shipFact=д("2026-10-15")), СЕГОДНЯ) == []
+    # бюджетный конец производства (01.07) прошёл, заказ не готов — prodDev (вместо прежнего
+    # shipSlip: плановую отгрузку переписывают под факт)
     slip = lc.order_exceptions(заказ(dl=д("2026-12-25"), shipPlan=д("2026-10-09"), delPlan=д("2027-01-10")), СЕГОДНЯ)
-    assert ("shipSlip", 10) in slip and ("planAfterDl", 16) in slip
+    assert ("prodDev", 110) in slip and ("planAfterDl", 16) in slip
+    assert not any(c == "shipSlip" for c, _ in slip)
     assert ("noDl", None) in lc.order_exceptions(заказ(), СЕГОДНЯ)
     # доставлено, но заказ не закрыт: не просрочка, а закрытие
     дост = lc.order_exceptions(заказ(dl=д("2026-09-01"), delFact=д("2026-09-10"), payPlan=д("2026-10-10")), СЕГОДНЯ)
-    assert ("noUtd", 39) in дост and ("unpaid", 9) in дост and not any(c == "late" for c, _ in дост)
+    # УПД — в рабочих днях от доставки: 10.09 → 19.10 — 27 р.д.
+    assert ("noUtd", 27) in дост and ("unpaid", 9) in дост and not any(c == "late" for c, _ in дост)
     assert lc.order_exceptions(заказ(live=False, success=True, closedRecent=True), СЕГОДНЯ) == [("noFact", None)]
 
 
 def test_очередь_сводка_и_доставка_в_срок():
     заказы = [
-        заказ(id="1", dl=д("2026-10-01"), supPaidPct=100),
+        заказ(id="1", dl=д("2026-10-01"), supPaidPct=100, orkMgr="Илья (ОРК)"),
         заказ(id="2", deal="101", seq=901, live=False, success=True, dl=д("2026-09-30"), delFact=д("2026-09-20"),
               created=д("2026-07-01"), shipPlan=д("2026-08-01"), shipFact=д("2026-08-05"), inbFact=д("2026-09-01"),
               utd=True, clientPaid=True),
@@ -73,14 +77,19 @@ def test_очередь_сводка_и_доставка_в_срок():
         {"deal": "101", "seq": 901, "customer": "Заказчик 2", "closed": False, "oss": "Ольга (ОСС)"},
         {"deal": "102", "seq": 902, "customer": "Заказчик 3", "closed": False, "oss": "—", "manager": "Иван (КАМ)"},
         {"deal": "103", "seq": 903, "customer": "Заказчик 4", "closed": False, "lost": True},
-        {"deal": "104", "seq": 904, "customer": "Заказчик 5", "closed": False, "firstLag": 12, "inCat0": True,
-         "managerGone": True, "manager": "Пётр (уволен)"},
+        {"deal": "104", "seq": 904, "customer": "Заказчик 5", "closed": False, "inCat0": True,
+         "cat0At": "2026-10-01T10:00:00+03:00", "managerGone": True, "manager": "Пётр (уволен)"},
     ]
     life = lc.build(заказы, сделки, СЕГОДНЯ)
     кк = life["counts"]
     assert кк["late"] == 1 and кк["dealOpen"] == 1 and кк["noOrder"] == 1 and кк["gone"] == 1
     assert "noDl" not in кк or кк["noDl"] == 1, "проигранная сделка 103 не даёт исключений"
-    assert life["queue"][0]["code"] == "late" and life["queue"][0]["who"] == "Ольга (ОСС)"
+    # хозяин — исполнитель шага (решение 26.10.2026, п. 1): срок сорван — менеджер ОРК
+    q0 = life["queue"][0]
+    assert q0["code"] == "late" and q0["who"] == "Илья (ОРК)" and q0["role"] == "orkMgr"
+    assert life["queue"][0]["escalateTo"] == "не назначен" and q0["copyRole"] == "kam", "КАМа в сделке нет"
+    no = next(q for q in life["queue"] if q["code"] == "noOrder")
+    assert no["days"] == 12 and no["role"] == "orkHead" and no["who"] == "руководитель ОРК", "12 р.д. без заказа"
     ф = {p["key"]: p for p in life["phases"]}
     assert ф["make"]["orders"] == 1 and ф["make"]["late"] == 1 and ф["move"]["orders"] == 1
     assert ф["warranty"]["orders"] == 2 and ф["warranty"]["n"] == 1
@@ -92,7 +101,8 @@ def test_очередь_сводка_и_доставка_в_срок():
     # поставщик в рейтинге — от трёх отгрузок с планом и фактом; здесь никого
     assert life["suppliers"] == []
     люди = {p["who"]: p for p in life["people"]}
-    assert люди["Ольга (ОСС)"]["n90"] == 2 and люди["Ольга (ОСС)"]["pct90"] == 50
+    # «хозяева процесса» — исполнитель текущего шага живого заказа: менеджер ОРК заказа 1
+    assert люди["Илья (ОРК)"]["live"] == 1 and люди["Илья (ОРК)"]["late"] == 1
     assert lc._add_months(д("2026-01-31"), 1) == д("2026-02-28")
 
 
@@ -134,9 +144,11 @@ def test_разбор_ревью_старые_доставки_прогноз_с
                "manager": "Пётр (ответственный)", "kam": "Анна (КАМ)", "closed": False},
               {"deal": "101", "seq": 901, "closed": True, "lost": False}]
     life = lc.build(заказы, сделки, СЕГОДНЯ)
-    assert life["counts"] == {"late": 1}
-    q = life["queue"][0]
-    assert q["who"] == "Дина (ОСС) (уволен)" and q["whoGone"] is True and q["kam"] == "Анна (КАМ)"
+    assert life["counts"] == {"late": 1, "prodDev": 1}
+    q = next(x for x in life["queue"] if x["code"] == "late")
+    # хозяин срока — менеджер ОРК (исполнитель шага), его нет — «не назначен»; КАМ — в копии
+    assert q["who"] == "не назначен" and q["whoGone"] is False and q["kam"] == "Анна (КАМ)"
+    assert q["escalateTo"] == "Анна (КАМ)" and q["step"] == 1, "шаг — текущий шаг заказа (по фактам — 1)"
 
 
 def test_надёжность_поставщика_к_бюджетной_дате_а_не_к_переписанному_плану():
@@ -182,8 +194,11 @@ def test_решения_владельца_хозяин_поля_сделка_в
     assert life["otd"]["last90"]["n"] == 4 and life["otd"]["last90"]["ontime"] == 3
     assert life["norms"]["toShip"] == 61
     ф = {p["key"]: p for p in life["phases"]}
-    assert ф["make"]["over"] == 1
-    assert {p["who"] for p in life["people"]} >= {"Роман (ответственный заказа)"}
+    # «сверх нормы» — по нормам регламента (решение 26.10.2026, п. 2): производство не
+    # нормируется, 200 дней от создания уже не «сверх нормы»; p75 — только справочно
+    assert ф["make"]["over"] == 0
+    # ответственный заказа не из отдела ОРК — не менеджер ОРК: исполнитель «не назначен»
+    assert {p["who"] for p in life["people"]} >= {"не назначен"}
     q = next(x for x in life["queue"] if x["code"] == "noPlanDates")
     assert q["what"].endswith("начало производства, доставка клиенту") and q["who"] == "Ольга (ОСС)"
     # закрытая выигранная сделка: ни сроков, ни оплаты в очереди
@@ -203,8 +218,11 @@ def test_ведёт_уволенный_и_ответственный_заказ�
     life = lc.build(заказы, сделки, СЕГОДНЯ)
     g = {q["deal"]: q for q in life["queue"] if q["code"] == "gone"}
     assert set(g) == {"100", "101"} and life["counts"]["gone"] == 2
-    assert g["100"]["what"] == "ведёт уволенный: ответственный заказа" and g["100"]["who"] == "Дина (ОСС)"
-    assert g["101"]["what"] == "ведёт уволенный: ответственный сделки, ОСС" and g["101"]["whoGone"] is True
+    # переназначает руководитель ОРК (шаг 1); его нет в справочнике — подпись роли
+    assert g["100"]["what"] == "ведёт уволенный: ответственный заказа" and g["100"]["who"] == "руководитель ОРК"
+    assert g["101"]["what"] == "ведёт уволенный: ответственный сделки, ОСС" and g["101"]["role"] == "orkHead"
+    q = next(x for x in lc.build(заказы, сделки, СЕГОДНЯ, ork_head="Роза (рук. ОРК)")["queue"] if x["code"] == "gone")
+    assert q["who"] == "Роза (рук. ОРК)"
     assert life["labels"]["gone"] == "ведёт уволенный", "подпись фильтра — без перечня"
 
 
@@ -251,3 +269,112 @@ def test_пункт_очереди_помечен_по_упд():
     сфактом = заказ(dl=д("2026-09-01"), delFact=д("2026-09-10"))
     life = lc.build([сфактом], [{"deal": "100", "seq": 900, "closed": False}], СЕГОДНЯ)
     assert life["queue"] and not any(q["byUtd"] for q in life["queue"])
+
+
+# ── регламент ОРК (решения владельца 26.10.2026): нормы в р.д., хозяин — исполнитель шага ──
+def test_нет_упд_с_11_рабочего_дня_по_сырой_дате_доставки():
+    """10 р.д. от доставки — ещё в норме, 11-й — пункт (Рег. 14.3.1). Дни — рабочие."""
+    в_норме = заказ(dl=д("2026-12-01"), delFact=д("2026-10-05"), payPlan=д("2026-12-01"))
+    assert not any(c == "noUtd" for c, _ in lc.order_exceptions(в_норме, СЕГОДНЯ)), "10 р.д. — норма"
+    сверх = заказ(dl=д("2026-12-01"), delFact=д("2026-10-02"), payPlan=д("2026-12-01"))
+    assert ("noUtd", 11) in lc.order_exceptions(сверх, СЕГОДНЯ)
+    # 11 р.д. — это всегда больше 14 календарных: новый счёт не шире прежнего (14 кал.)
+    for k in range(0, 60):
+        o = заказ(dl=д("2026-12-01"), delFact=СЕГОДНЯ - dt.timedelta(days=k), payPlan=д("2026-12-01"))
+        if any(c == "noUtd" for c, _ in lc.order_exceptions(o, СЕГОДНЯ)):
+            assert k > 14, k
+    # даты доставки нет, есть подставленная дата УПД: УПД подписан — пункта нет и быть не может
+    по_упд = заказ(dl=д("2026-12-01"), utdDate=д("2026-09-01"), utd=True, payPlan=д("2026-12-01"))
+    assert not any(c == "noUtd" for c, _ in lc.order_exceptions(по_упд, СЕГОДНЯ))
+
+
+def test_год_без_календаря_пункта_нет_и_счёт(monkeypatch):
+    """Года нет в календаре — срок менеджера не посчитать: пункта нет, счёт — в noCalendar,
+    без подмены на Пн–Пт (ноль за неизвестное не ставим)."""
+    import period
+    monkeypatch.setattr(period, "workdays_ru", lambda a, b: None)
+    o = заказ(dl=д("2026-12-01"), delFact=д("2026-09-01"), payPlan=д("2026-12-01"))
+    nocal = __import__("collections").Counter()
+    assert not any(c == "noUtd" for c, _ in lc.order_exceptions(o, СЕГОДНЯ, nocal=nocal))
+    assert nocal["noUtd"] == 1
+    life = lc.build([o], [{"deal": "100", "seq": 900, "closed": False}], СЕГОДНЯ)
+    assert life["noCalendar"] == {"noUtd": 1} and "noUtd" not in life["counts"]
+
+
+def test_нет_заказа_больше_1_рабочего_дня():
+    сделки = [{"deal": "200", "seq": 1, "closed": False, "inCat0": True, "cat0At": "2026-10-16T10:00:00+03:00"},
+              {"deal": "201", "seq": 2, "closed": False, "inCat0": True, "cat0At": "2026-10-15T10:00:00+03:00"},
+              {"deal": "202", "seq": 3, "closed": False, "inCat0": True, "cat0At": ""}]
+    life = lc.build([], сделки, СЕГОДНЯ)
+    q = {x["deal"]: x for x in life["queue"]}
+    assert set(q) == {"201"}, "пятница → понедельник — 1 р.д., норма; четверг → 2 р.д. — пункт; без даты — нет"
+    assert q["201"]["days"] == 2 and q["201"]["inWd"] is True and q["201"]["copyRole"] == "kam"
+
+
+def test_производство_не_готово_по_всем_переходам():
+    """prodDev: бюджетный конец прошёл, заказ ни разу не выходил на «Заказ готов» (шаг 8) —
+    по всем переходам (reachMax), не только по текущей стадии: вернувшийся назад заказ
+    производство уже прошёл."""
+    o = заказ(dl=д("2027-01-01"), prodEnd=д("2026-10-01"), stage="Производство заказа")
+    assert ("prodDev", 18) in lc.order_exceptions(o, СЕГОДНЯ)
+    assert not any(c == "prodDev" for c, _ in lc.order_exceptions({**o, "reachMax": 8}, СЕГОДНЯ))
+    assert not any(c == "prodDev" for c, _ in lc.order_exceptions({**o, "stage": "Заказ готов"}, СЕГОДНЯ))
+    assert not any(c == "prodDev" for c, _ in lc.order_exceptions({**o, "shipFact": д("2026-10-10")}, СЕГОДНЯ))
+
+
+def test_сверх_нормы_шага_по_стадии_и_гигиена():
+    """s2Over/s3Over/s6Over/s1Over — р.д. от входа в шаг больше нормы; карточка с фактами
+    впереди стадии и брошенная — не пункт, а гигиена."""
+    s2 = заказ(dl=д("2027-01-01"), stage="Заказ направлен", stepSince="2026-10-14T10:00:00+03:00")
+    assert ("s2Over", 3) in lc.order_exceptions(s2, СЕГОДНЯ)
+    assert not any(c == "s2Over" for c, _ in lc.order_exceptions({**s2, "stepSince": "2026-10-15T10:00:00+03:00"},
+                                                                  СЕГОДНЯ)), "2 р.д. — в норме"
+    s3 = заказ(dl=д("2027-01-01"), stage="Согласование спецификации и оплаты",
+               stepSince="2026-10-01T10:00:00+03:00", stageSince="2026-10-16T10:00:00+03:00")
+    assert ("s3Over", 12) in lc.order_exceptions(s3, СЕГОДНЯ), "шаг 5 — от входа в шаг, не в стадию"
+    позади = {**s2, "supPaidPct": 50}
+    assert not any(c == "s2Over" for c, _ in lc.order_exceptions(позади, СЕГОДНЯ)), "стадия позади фактов"
+    брошен = заказ(dl=д("2027-01-01"), stage="Заказ создан", t0="2026-01-10T10:00:00+03:00")
+    assert not any(c == "s1Over" for c, _ in lc.order_exceptions(брошен, СЕГОДНЯ)), "брошенная карточка"
+    s1 = {**брошен, "t0": "2026-10-14T10:00:00+03:00"}
+    life = lc.build([s1], [{"deal": "100", "seq": 900, "closed": False, "kam": "Анна (КАМ)"}], СЕГОДНЯ,
+                    ork_head="Роза (рук. ОРК)")
+    q = next(x for x in life["queue"] if x["code"] == "s1Over")
+    assert (q["days"], q["role"], q["who"], q["escalateTo"], q["inWd"]) == (3, "orkHead", "Роза (рук. ОРК)",
+                                                                           "Анна (КАМ)", True)
+
+
+def test_хозяин_по_таблице_пунктов():
+    """unpaid — КАМ, ОСС в копии (п. 4); noPayPlan — ОСС; noFact — логистика; noUtd —
+    менеджер ОРК заказа, КАМ в копии; без менеджера ОРК заказа — поле сделки."""
+    o = заказ(dl=д("2026-09-01"), delFact=д("2026-09-10"), oss="Ольга (ОСС)")
+    d = {"deal": "100", "seq": 900, "closed": False, "kam": "Анна (КАМ)", "kamId": "10", "orkResp": "Пётр (ОРК)"}
+    q = {x["code"]: x for x in lc.build([o], [d], СЕГОДНЯ)["queue"]}
+    assert (q["unpaid"]["role"], q["unpaid"]["who"], q["unpaid"]["escalateTo"]) == ("kam", "Анна (КАМ)", "Ольга (ОСС)")
+    assert (q["noPayPlan"]["role"], q["noPayPlan"]["who"]) == ("oss", "Ольга (ОСС)")
+    assert (q["noUtd"]["role"], q["noUtd"]["who"], q["noUtd"]["step"]) == ("orkMgr", "Пётр (ОРК)", 12)
+    q2 = {x["code"]: x for x in lc.build([{**o, "orkMgr": "Илья (ОРК)"}], [d], СЕГОДНЯ)["queue"]}
+    assert q2["noUtd"]["who"] == "Илья (ОРК)", "ответственный заказа из ОРК — первым"
+    закрыт = заказ(live=False, success=True, closedRecent=True)
+    q3 = next(x for x in lc.build([закрыт], [d], СЕГОДНЯ)["queue"] if x["code"] == "noFact")
+    assert (q3["role"], q3["who"]) == ("log", "логистика")
+
+
+def test_оплата_получена_сделка_не_закрыта_и_оплата_без_договора():
+    """Решение 26.10.2026, п. 4: «Оплата получена» — успех, но незакрытая сделка — пункт ОСС
+    dealClose; оплачено поставщику, а сделка ни разу не была на шаге «договор подписан» —
+    payNoContract руководителю ОРК, КАМ в копии."""
+    сделки = [{"deal": "300", "seq": 1, "closed": True, "paidStage": True, "stageDays": 40.4,
+               "ossDeal": "Ольга (ОСС)"},
+              {"deal": "301", "seq": 2, "closed": False, "dealStepMax": 2, "kam": "Анна (КАМ)"},
+              {"deal": "302", "seq": 3, "closed": False, "dealStepMax": 4}]
+    заказы = [заказ(id="1", deal="301", dl=д("2027-01-01"), supPaidPct=30),
+              заказ(id="2", deal="302", dl=д("2027-01-01"), supPaidPct=30)]
+    life = lc.build(заказы, сделки, СЕГОДНЯ)
+    q = {(x["code"], x["deal"]): x for x in life["queue"]}
+    dc = q[("dealClose", "300")]
+    assert (dc["role"], dc["who"], dc["days"]) == ("oss", "Ольга (ОСС)", 40)
+    pn = q[("payNoContract", "301")]
+    assert (pn["role"], pn["who"], pn["escalateTo"]) == ("orkHead", "руководитель ОРК", "Анна (КАМ)")
+    assert ("payNoContract", "302") not in q, "договор по стадии подписан"
+    assert life["counts"]["dealClose"] == 1

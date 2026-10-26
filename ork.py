@@ -194,6 +194,7 @@ GATES = {
     "plan_eq_fact_max": 0.30,    # «план = факт» > 30 % — первичный срок поставщика не показываем
     "abandoned_wd": 60,          # > 60 р.д. на шаге с нормой ≤ 2 — «брошенная карточка»
     "abandoned_norm_max": 2,
+    "n_count": 1,                # счёт живых пунктов «сейчас» — не выборка: n-ворот у него нет
 }
 GATES_NOTE = "пороги — предложение, ждут решения владельца"
 STATES = ("show", "prelim", "nodata", "hidden")
@@ -278,6 +279,34 @@ def bursts(times: list) -> set[int]:
     return out
 
 
+def _sorted_tr(transitions: list) -> list[tuple[str, dt.datetime]]:
+    return sorted(((s, _ts(t)) for s, t in transitions if _ts(t)), key=lambda x: x[1])
+
+
+def _reach(tr: list, steps: list) -> dict[int, tuple[dt.datetime, int]]:
+    """Шаг → (время первого выхода заказа на шаг не ниже этого, № перехода). Пропущенная
+    стадия не теряет шаг: выход сразу на 5 — это и выход на 2, 3 и 4."""
+    reach: dict[int, tuple[dt.datetime, int]] = {}
+    hi = 0
+    for i, ((_, t), st) in enumerate(zip(tr, steps)):
+        if st is None or st <= hi:
+            continue
+        for k in range(hi + 1, st + 1):
+            reach.setdefault(k, (t, i))
+        hi = st
+    if 1 not in reach and tr:
+        reach[1] = (tr[0][1], 0)
+    return reach
+
+
+def reach_times(transitions: list, names: dict) -> dict[int, str]:
+    """{шаг: ISO-время первого выхода на шаг не ниже} по всем переходам заказа — тот же
+    счёт, что у границ сегментов (segments)."""
+    tr = _sorted_tr(transitions)
+    steps = [stage_step(names.get(s, s)) for s, _ in tr]
+    return {k: t.isoformat() for k, (t, _i) in _reach(tr, steps).items()}
+
+
 def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru, *,
              t0=None, facts: dict | None = None) -> dict:
     """Переходы одного заказа [(STAGE_ID, CREATED_TIME), …] (все, с повторами, по времени)
@@ -291,7 +320,7 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
     → {"segs": {S: {start, end, wd, cd, norm, inNorm, ret, burst}}, "open": {S, start} | None,
        "returns": n, "returnPairs": [(шаг из, шаг в)], "burst": bool, "unknown": n,
        "noCalendar": bool}. wd — рабочие дни (None — года нет в календаре), cd — календарные."""
-    tr = sorted(((s, _ts(t)) for s, t in transitions if _ts(t)), key=lambda x: x[1])
+    tr = _sorted_tr(transitions)
     steps = [stage_step(names.get(s, s)) for s, _ in tr]
     unknown = sum(1 for x in steps if x is None)
     in_burst = bursts([t for _, t in tr])
@@ -305,16 +334,7 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
             pairs.append((prev, st))
             ret_times.append(t)
         prev = st
-    reach: dict[int, tuple[dt.datetime, int]] = {}    # шаг → (время первого выхода, № перехода)
-    hi = 0
-    for i, ((_, t), st) in enumerate(zip(tr, steps)):
-        if st is None or st <= hi:
-            continue
-        for k in range(hi + 1, st + 1):
-            reach.setdefault(k, (t, i))
-        hi = st
-    if 1 not in reach and tr:
-        reach[1] = (tr[0][1], 0)
+    reach = _reach(tr, steps)
     facts = facts or {}
     point = {"t0": (_ts(t0), None) if t0 else reach.get(1, (None, None)),
              "delFact": (_ts(facts.get("delFact")), None),
@@ -512,13 +532,15 @@ def metric_state(value, n: int | None, cover: float | None, gates: dict = GATES,
 _ESC_STEP = object()
 
 
-def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP) -> dict:
+def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP,
+          role: str | None = None) -> dict:
     """Хозяин пункта очереди — исполнитель шага. people — уже найденные люди заказа и
     сделки: orkMgr (ответственный заказа, если он из отдела ОРК), dealOrk (поле сделки
     «Ответственный за реализацию»), orkHead (руководитель отдела ОРК), kam, ossOrder,
     ossDeal. Долг клиента (debt) — КАМ, ОСС в копии. esc — роль в копии для пункта со своей
-    эскалацией (по умолчанию — STEP[шаг]['esc']). → {role, who, copy, copyRole}; who —
-    «не назначен», если человека роли нет (логистика — подпись роли)."""
+    эскалацией (по умолчанию — STEP[шаг]['esc']); role — роль хозяина, если пункт задаёт её
+    сам (ITEM), иначе исполнитель шага. → {role, who, copy, copyRole}; who — «не назначен»,
+    если человека роли нет (логистика — подпись роли)."""
     def nm(*keys):
         for k in keys:
             v = people.get(k)
@@ -535,10 +557,136 @@ def owner(step: int | None, people: dict, *, debt: bool = False, esc=_ESC_STEP) 
     if debt:
         role, copy_role = "kam", "oss"
     else:
-        role = EXECUTOR.get(step) if step else "orkHead"
+        role = role or (EXECUTOR.get(step) if step else "orkHead")
         copy_role = (STEP[step]["esc"] if step else None) if esc is _ESC_STEP else esc
         if copy_role == role:
             copy_role = None
     who = find[role]() or "не назначен"
     copy = (find[copy_role]() or "не назначен") if copy_role else ""
     return {"role": role, "who": who, "copy": copy, "copyRole": copy_role or ""}
+
+
+# --- пункт очереди → шаг, хозяин и копия (решение 26.10.2026, п. 1; правило 4) -------------
+# код → (шаг регламента, роль хозяина, роль в копии). Шаг None — текущий шаг заказа (срок
+# клиента сорван на любом шаге). Хозяин — исполнитель шага, кроме пунктов, которые
+# регламент отдаёт другой роли: долг клиента урегулирует КАМ, ОСС — в копии (п. 4); приёмку,
+# заказ без заказа и оплату без договора разбирает руководитель ОРК; даты размещения вносит
+# ОСС (Рег. 8.2.3), ТН — логистика. При эскалации КАМ — в копии.
+ITEM = {
+    "late": (None, "orkMgr", "kam"),
+    "risk": (7, "orkMgr", "kam"),
+    "forecast": (None, "orkMgr", "kam"),
+    "prodDev": (7, "orkMgr", "kam"),
+    "planAfterDl": (6, "orkMgr", "kam"),
+    "unpaid": (13, "kam", "oss"),
+    "noUtd": (12, "orkMgr", "kam"),
+    "noPayPlan": (13, "oss", "kam"),
+    "dealOpen": (13, "oss", None),
+    "dealClose": (13, "oss", None),
+    "noOrder": (1, "orkHead", "kam"),
+    "s1Over": (1, "orkHead", "kam"),
+    "s2Over": (4, "orkMgr", "orkHead"),
+    "s3Over": (5, "orkMgr", "orkHead"),
+    "s6Over": (8, "orkMgr", "orkHead"),
+    "payNoContract": (5, "orkHead", "kam"),
+    "gone": (1, "orkHead", None),
+    "noDl": (1, "orkHead", "kam"),
+    "noPlanDates": (6, "oss", None),
+    "noFact": (11, "log", None),
+}
+# «сверх нормы» шага → код пункта (шаг 12 — noUtd по факту доставки, не по стадии)
+OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over"}
+
+
+def item_owner(code: str, step_now: int | None, people: dict) -> dict:
+    """Хозяин пункта очереди по таблице ITEM: {step, role, who, copy, copyRole}. Код не из
+    таблицы — исполнитель текущего шага и его эскалация."""
+    st, role, copy = ITEM.get(code, (None, None, _ESC_STEP))
+    step = st if st is not None else step_now
+    out = owner(step, people, role=role, esc=copy if code in ITEM else _ESC_STEP)
+    return {"step": step, **out}
+
+
+def p80(xs: list) -> float | None:
+    """80-й процентиль «Системы аналитики»: s[⌈0,8·n⌉ − 1] по возрастанию."""
+    s = sorted(x for x in xs if x is not None)
+    if not s:
+        return None
+    k = -(-8 * len(s) // 10) - 1
+    return float(s[max(0, k)])
+
+
+def median(xs: list) -> float | None:
+    s = sorted(x for x in xs if x is not None)
+    if not s:
+        return None
+    n = len(s)
+    return float(s[n // 2]) if n % 2 else (s[n // 2 - 1] + s[n // 2]) / 2.0
+
+
+# --- окна показателей ------------------------------------------------------------------------
+ORK_SINCE = dt.date(2026, 8, 24)      # роботы ОРК и «менеджер ОРК = ответственный заказа» (решение п. 3)
+S1_ANCHOR_SINCE = dt.date(2026, 8, 28)  # вторая опора S1 — «Дата записи нового ответственного»
+PREPAY_SINCE = dt.date(2026, 4, 2)    # «Доля первичной оплаты, %» заведена
+PROBE_PENDING = {"M1": "v60"}         # показатель не выше «предварительно» до вердикта зонда
+WEEK_BACK_WD = 20                     # «в срок за 20 р.д.» под плиткой приёмки
+MONTHS_BACK = 3                       # «Месяц»: текущий и два прошлых
+LOAD_BAND = 0.25                      # загрузка менеджера — отклонение от среднего ≤ ±25 % (Ан. §4)
+YEAR_DAYS = 365                       # сроки S5/S7/S8 и цикла — по завершённым за год
+
+
+def art_required(o: dict, a: dict, reach: dict | None = None) -> bool:
+    """Обязан ли заказ иметь артефакт `a` (ARTIFACTS): заказ прошёл шаг need (по стадии и
+    фактам), прошёл его не раньше даты создания поля (reach — {шаг: ISO}, иначе дата
+    создания заказа), условие выполнено (импорт — до сверки «импорт/РФ» не требуется;
+    предоплата — доля первичной оплаты или оплачено поставщику > 0)."""
+    st = step_of(o.get("stage"), o) if o.get("stage") else fact_floor(o)
+    if st is None or st < a["need"]:
+        return False
+    if a["cond"] == "import":
+        return False
+    if a["cond"] == "prepay" and not ((o.get("prepayShare") or 0) > 0 or (o.get("supPaidPct") or 0) > 0):
+        return False
+    since = dt.date.fromisoformat(a["since"])
+    at = _d((reach or {}).get(a["need"])) or _d(o.get("created"))
+    return at is None or at >= since
+
+
+# --- чего в портале нет: показатели «Нет данных» с полем, которое их даст -------------------
+AN4_NODATA = (
+    ("«Чистая» длительность договора с поставщиком (S2 минус паузы)", "поле «Пауза срока менеджера»"),
+    ("Дисциплина статусов (шаг 7): запросы статуса и контрольные точки", "поле «Запрос статуса поставщику и ответ»"),
+    ("Скорость эскалации", "поле «Эскалация: дата, тип, причина, решение»"),
+    ("Раннее выявление отклонений", "поле «История планового срока готовности»"),
+    ("Скорость подготовки документов (шаг 8)", "даты запроса документов, сертификации и завершающей оплаты"),
+    ("Контроль УПД: эскалация на 11-й р.д. (шаг 12)", "поле «Эскалация: дата, тип, причина, решение»"),
+)
+SCORECARD = (
+    # блок, показатель, вес, есть ли данные (иначе — поле, которое их даст)
+    ("Срок", "Соблюдение первично подтверждённого срока", 25, ""),
+    ("Срок", "Стабильность срока (переносы)", 10, "поле «История планового срока готовности»"),
+    ("Отзывчивость", "Ответ на запрос статуса за 3 р.д.", 15, "поле «Запрос статуса поставщику и ответ»"),
+    ("Документы", "Комплект с первого раза", 15, "отметка повторного запроса документов"),
+    ("Качество", "Поставка без претензий", 20, "смарт-процесс «Рекламации»: тип и дата претензии"),
+    ("Дисциплина", "Договор и платежи", 15, "раунды разногласий, «другое юрлицо», дата OC"),
+)
+# заявка администратору Битрикса (Ан. §2.1–2.3): поля «добавить» — ничего не отправлено
+FIELDS_ADD = (
+    ("событие", "Эскалация: дата, тип, причина из справочника, дата и результат решения", "W4, скорость эскалации"),
+    ("событие", "Пауза срока менеджера: начало, конец, причина", "W4, «чистые» сроки S2"),
+    ("событие", "История планового срока готовности: дата, новая дата, причина", "стабильность срока, раннее выявление"),
+    ("событие", "Запрос статуса поставщику и его ответ: две даты", "дисциплина статусов, отзывчивость"),
+    ("событие", "Сканирование завершено (дата); скан ТН файлом; дата поступления оплаты клиента", "шаги 9, 11, 13"),
+    ("атрибут", "Категория оборудования на заказе, из справочника", "Q2 по категориям"),
+    ("атрибут", "Тип поставки «импорт / РФ» — явным полем", "Q2 по типу, OC обязателен при импорте"),
+    ("атрибут", "Страна происхождения товара", "Q2 по стране"),
+    ("атрибут", "Базис (Инкотермс) по заказу", "сроки логистики по базису"),
+    ("атрибут", "Флаги: в наличии, прямая отгрузка, перевод техдокументации, сертификаты своими силами", "сложность"),
+    ("атрибут", "Флаги: Сорсер подключён, другое юрлицо, Письмо о принадлежности", "сложность, дисциплина"),
+    ("атрибут", "Претензия: тип и дата (смарт-процесс «Рекламации»)", "качество в скоркарде"),
+    ("справочник", "Категории оборудования, 8–15 групп", "Q2"),
+    ("справочник", "Причины переноса срока", "стабильность срока"),
+    ("справочник", "Причины эскалации", "эскалации"),
+    ("справочник", "Типы претензий", "качество"),
+)
+FIELDS_TO = "администратор Битрикса"

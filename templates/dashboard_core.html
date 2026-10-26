@@ -2287,8 +2287,8 @@ function _ctPanel(X,el){
      +kp('Сделки в срок',d90.pct!=null?d90.pct+'%':'—',`${d90.ontime||0} из ${d90.n||0} сделок за 90 дн.: все заказы к сроку · заказов ${o90.pct!=null?o90.pct+'%':'—'} · к текущему сроку клиента: переносы срока портал не хранит — доля может быть завышена`,(d90.pct!=null&&d90.pct<80)?'warn':'ok')
      +kp('Срок клиента сорван',C.late||0,'заказов не доставлено к сроку',C.late?'warn':'ok')
      +kp('Под риском',(C.risk||0)+(C.forecast||0),`≤ ${RU.riskDays} дн. без отгрузки: ${C.risk||0} · прогноз позже срока: ${C.forecast||0}`,(C.risk||C.forecast)?'warn':'')
-     +kp('Поставщик опаздывает',C.shipSlip||0,'плановая отгрузка прошла без факта',C.shipSlip?'warn':'')
-     +kp('Нет УПД в заказе',C.noUtd||0,`доставлено больше ${RU.utdGrace} дн. назад, файла УПД в карточке нет`,C.noUtd?'warn':'')
+     +kp('Производство не готово',C.prodDev||0,'бюджетный конец производства прошёл, в «Заказ готов» заказ не входил',C.prodDev?'warn':'')
+     +kp('Нет УПД в заказе',C.noUtd||0,`доставлено ${(RU.utdWd||10)+1}+ р.д. назад (календарь РФ, без пауз), УПД в карточке нет`,C.noUtd?'warn':'')
      +kp('Нет платёжки клиента',C.unpaid||0,'срок оплаты прошёл, файла платёжки в заказе нет — оплату в деньгах портал не видит',C.unpaid?'warn':'')
      +`</div>`;
     const codes=Object.keys(LB).filter(k=>C[k]);
@@ -2301,7 +2301,7 @@ function _ctPanel(X,el){
     const mxL=Math.max(1,...['toShip','transit','lastMile','total'].map(k=>(LD[k]||{}).p75||0));
     const ld=(k,nm)=>LD[k]&&LD[k].n?`<div class="srccmp"><span class="sl">${nm}</span><div class="sb"><i style="width:${Math.min(100,(LD[k].med||0)/mxL*100).toFixed(0)}%"></i></div><span class="sv"><b>${Math.round(LD[k].med)}</b> дн</span><span class="sd dim">75 %: ${Math.round(LD[k].p75)} · ${LD[k].n}</span></div>`:'';
     h+=`<div class="grid"><section class="card"><h2>Доставка в срок по месяцам</h2><div class="note">Доля заказов, доставленных не позже срока клиента, по месяцу фактической доставки. Красный — ниже 80 %. Наведите на столбец — сколько заказов.</div><div class="otd">${otdBars}</div></section>`
-     +`<section class="card"><h2>Сколько идёт заказ</h2><div class="note">Медиана и 75-й процентиль, дней, по заказам, доставленным за год. Норма звена — 75-й процентиль (решение владельца 19.10.2026), пересмотр раз в квартал; «сверх нормы» на плитках фаз — живые заказы дольше нормы.</div>${ld('toShip','Заказ → отгрузка поставщика')}${ld('transit','Отгрузка → склад')}${ld('lastMile','Склад → клиент')}${ld('total','Весь путь: заказ → клиент')}`
+     +`<section class="card"><h2>Сколько идёт заказ</h2><div class="note">Медиана и 75-й процентиль, дней, по заказам, доставленным за год. 75-й процентиль звена — справочно. «Сверх нормы» на плитках фаз — по нормам регламента ОРК в рабочих днях (решение владельца 26.10.2026): приёмка 1, договор с поставщиком 2, PO/OC и предоплата 9, подготовка к отгрузке 2; производство и логистика не нормируются; без пауз.</div>${ld('toShip','Заказ → отгрузка поставщика')}${ld('transit','Отгрузка → склад')}${ld('lastMile','Склад → клиент')}${ld('total','Весь путь: заказ → клиент')}`
      +`${LD.shipSlip&&LD.shipSlip.n?`<div class="note" style="margin-top:8px">Отгрузка поставщика против бюджетного срока окончания производства: медиана <b>${LD.shipSlip.med>0?'+':''}${Math.round(LD.shipSlip.med)} дн</b>, 75 % — ${LD.shipSlip.p75>0?'+':''}${Math.round(LD.shipSlip.p75)} дн (${LD.shipSlip.n} отгрузок).</div>`:''}</section></div>`;
     const P=L.people||[], S=L.suppliers||[], W=L.warranty||{};
     h+=`<div class="grid"><section class="card"><h2>Хозяева процесса</h2><div class="note">Живые заказы, пункты «что делать», из них сорванный срок, доставка в срок за 90 дней. Клик — пункты этого человека.</div><div class="twrap"><table class="lft"><thead><tr><th>Кто</th><th class="r">Живых</th><th class="r">Пунктов</th><th class="r">🚩</th><th class="r">В срок, 90 дн</th></tr></thead><tbody>`

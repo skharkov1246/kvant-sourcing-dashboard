@@ -43,6 +43,9 @@ on:
       - presale.py
       - kprules.py
       - lifecycle.py
+      - ork.py
+      - orkview.py
+      - data/workcal_ru.json
       - chat_activity.py
       - dealctx.py
       - contract_b2b.py

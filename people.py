@@ -189,6 +189,30 @@ def resolve_role(person: dict, dept_names: dict[str, str]) -> tuple[str, str]:
     return "other", "не коммерческая роль"
 
 
+# отдел реализации контрактов (ОРК) — по названию отдела; дочерние отделы — тоже ОРК
+ORK_DEPT = re.compile(r"реализаци\w* контракт|\bОРК\b", re.I)
+
+
+def ork_department(departments: list[dict] | None) -> tuple[set[str], str]:
+    """(id отделов ОРК с дочерними, id руководителя ОРК) из уже прочитанного department.get
+    (BitrixClient.departments(), кэш сборки — нового запроса нет). Руководитель — UF_HEAD
+    верхнего отдела ОРК (его родитель не ОРК); нет — пусто: в очереди хозяином будет подпись
+    роли «руководитель ОРК» (решение владельца 26.10.2026, п. 1)."""
+    deps = {str(d.get("ID")): d for d in (departments or []) if d.get("ID") is not None}
+    ids = {i for i, d in deps.items() if ORK_DEPT.search(str(d.get("NAME") or ""))}
+    changed = True
+    while changed:
+        changed = False
+        for i, d in deps.items():
+            if i not in ids and str(d.get("PARENT") or "") in ids:
+                ids.add(i)
+                changed = True
+    tops = sorted((i for i in ids if str(deps[i].get("PARENT") or "") not in ids), key=int)
+    head = next((str(deps[i].get("UF_HEAD") or "") for i in tops
+                 if str(deps[i].get("UF_HEAD") or "") not in ("", "0")), "")
+    return ids, head
+
+
 def deal_categories(client: BitrixClient) -> dict[str, str]:
     """{id воронки: имя}. Берём crm.category.list: он знает настоящее имя воронки 0
     («Реализация»), тогда как crm.dealcategory.list её не возвращает вовсе и в

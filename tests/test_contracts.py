@@ -71,8 +71,9 @@ class Портал:
         self.hist = {
             2: [("1", "C0:PURCHASE", _t(120)), ("1", "C0:DELIVERY", _t(60)), ("1", "C0:PURCHASE", _t(5)),
                 ("2", "C0:PURCHASE", _t(50))],
+            # 502 — 20 дн. на шаге 5 (норма 9 р.д.): сверх нормы шага — кандидат в «Замедлено»
             172: [("501", "DT172_30:NEW", _t(150)), ("501", "DT172_30:PREPARATION", _t(3)),
-                  ("502", "DT172_26:PREPARATION", _t(10))],
+                  ("502", "DT172_26:PREPARATION", _t(20))],
         }
 
     def call(self, method, params=None, **kw):
@@ -107,15 +108,21 @@ class Портал:
         return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка", "C0:PAID": "Оплата получена | Закрытие сделки"}
 
     def spa_stage_meta(self, entity, cid):
+        if cid == 26:                       # воронка заказов — имена портала (шаги ork.STAGE_STEP)
+            return {"DT172_26:NEW": {"name": "Заказ создан", "sem": "P"},
+                    "DT172_26:PREPARATION": {"name": "Согласование спецификации и оплаты", "sem": "P"},
+                    "DT172_26:UC_LOST": {"name": "Отменён (26)", "sem": "F"}}
         return {f"DT172_{cid}:NEW": {"name": f"Новый ({cid})", "sem": "P"},
                 f"DT172_{cid}:PREPARATION": {"name": f"Подготовка ({cid})", "sem": "P"},
                 f"DT172_{cid}:UC_LOST": {"name": f"Отменён ({cid})", "sem": "F"}}
 
-    def stage_history(self, entity, *, category_id=None, since=None, last=None):
+    def stage_history(self, entity, *, category_id=None, since=None, last=None, transitions=None):
         out = {}
         for oid, st, t in self.hist[entity]:
             if last is not None:
                 last[oid] = (st, t)
+            if transitions is not None:
+                transitions.setdefault(oid, []).append((st, t))
             if st not in {s for s, _ in out.get(oid, [])}:
                 out.setdefault(oid, []).append((st, t))
         return out
@@ -203,7 +210,8 @@ def test_жизненный_цикл_на_вкладке(ct):
 ])
 def test_подвисла_только_если_в_чате_тихо(сообщения, подвисла):
     """Решение владельца 19.10.2026: простой по стадии снимает живой чат сделки.
-    Сделка 2 стоит в стадии 50 дней (порог 2× медианы), срок клиента не сорван."""
+    Сделка 2: заказ 502 — 20 дн. на шаге 5 при норме 9 р.д. (решение 26.10.2026, п. 2),
+    срок клиента не сорван."""
     import os
     os.environ["KVANT_NOW"] = СЕЙЧАС
     try:
@@ -281,9 +289,24 @@ def test_уволенный_ответственный_заказа_ведёт_�
     assert set(gone) == {"1", "2"} and ct["life"]["counts"]["gone"] == 2
     assert gone["2"]["what"] == "ведёт уволенный: ответственный заказа"
     assert gone["1"]["what"] == "ведёт уволенный: ответственный сделки, ОСС"
-    # пункты заказа 502 — на уволенном хозяине, с пометкой (подпись справочника людей)
-    q502 = [q for q in ct["life"]["queue"] if q["order"] == "502"]
-    assert q502 and all(q["who"] == "Жаров Олег (уволен)" and q["whoGone"] for q in q502)
+    # хозяин пунктов заказа 502 — исполнитель шага (решение 26.10.2026, п. 1): ответственный
+    # не из отдела ОРК (отделов нет) — менеджер ОРК «не назначен», даты размещения — ОСС
+    q502 = {q["code"]: q for q in ct["life"]["queue"] if q["order"] == "502"}
+    assert q502["s3Over"]["role"] == "orkMgr" and q502["s3Over"]["who"] == "не назначен"
+    assert q502["noPlanDates"]["who"] == "Пётр Вьюгин (OSS)"
+    # ответственный — из отдела ОРК: он и хозяин, уволен — с пометкой
+    отделы = [{"ID": "50", "NAME": "Отдел реализации контрактов", "PARENT": "1", "UF_HEAD": "10"}]
+    люди = {**ЛЮДИ, "22": {"name": "Жаров Олег", "active": False, "depts": ["50"]}}
+    import os
+    os.environ["KVANT_NOW"] = СЕЙЧАС
+    try:
+        ct2 = contracts_mod.compute(п, as_of=dt.date(2026, 10, 9), people=люди, service_ids={"542"},
+                                    departments=отделы)
+    finally:
+        os.environ.pop("KVANT_NOW", None)
+    s3 = next(q for q in ct2["life"]["queue"] if q["order"] == "502" and q["code"] == "s3Over")
+    # в копии — руководитель ОРК: руководитель отдела ОРК по справочнику отделов (UF_HEAD)
+    assert s3["who"] == "Жаров Олег (уволен)" and s3["whoGone"] and s3["escalateTo"] == "Вера Астахова (KAM)"
 
 
 def test_уволенный_ответственный_закрытого_заказа_не_в_счёт():

@@ -834,6 +834,9 @@ def run(args) -> int:
 
     contracts_data = None
     dealctx_data = None
+    # показатели менеджеров ОРК поимённо (решение владельца 26.10.2026, п. 3): в страницу —
+    # только своим массивом под правом руководителей ОРК, не в данные вкладки
+    ork_month_data = None
     # закрытый свод оценок чатов и разбора договоров (решение владельца 23.10.2026):
     # файл из KV realctx:v1, который кладёт сборка (deploy.yml); нет — вкладка как раньше
     real_ctx = dealctx_mod.load()
@@ -846,9 +849,26 @@ def run(args) -> int:
         contracts_data = contracts_mod.compute(client, as_of=p.end, people=roster, service_ids=service_ids,
                                                chat_reader=chat_reader,
                                                ctx_chats=real_ctx["chats"] if real_ctx else None,
-                                               ctx_econ=real_ctx["econ"] if real_ctx else None)
+                                               ctx_econ=real_ctx["econ"] if real_ctx else None,
+                                               # справочник отделов уже прочитан (кэш клиента):
+                                               # отдел ОРК и его руководитель — без нового запроса
+                                               departments=client.departments())
+        ork_month_data = contracts_data.pop("orkMonth", None)
         print(f"  ✓ контрактов: {len(contracts_data['rows'])}; продажа из сверенного файла экономики у "
               f"{contracts_data['head'].get('nFile', 0)} открытых")
+        # регламент ОРК — только счётчики (правило 17): сколько живых заказов легло на шаг,
+        # стадий не из таблицы, лет без календаря, сроков без календаря; «сумма прячет потерю»
+        _ok = contracts_data.get("ork") or {}
+        _tr, _wk = _ok.get("trust") or {}, _ok.get("week") or {}
+        _cmp, _lc = _ok.get("slowCmp") or {}, contracts_data.get("life") or {}
+        print(f"  регламент ОРК: живых заказов {_wk.get('live', 0)}, на шаге {_tr.get('mapped', 0)}, "
+              f"стадия не из таблицы {_tr.get('unknown', 0)}; лет без календаря {len(_tr.get('yearsNoCal') or [])}, "
+              f"сроков без календаря {sum((_lc.get('noCalendar') or {}).values())}; сверх нормы (W2) "
+              f"{((_wk.get('tiles') or {}).get('W2') or {}).get('value')}, гигиена "
+              f"{(_wk.get('hygiene') or {}).get('n', 0)}; руководитель ОРК в справочнике "
+              f"{'есть' if _tr.get('orkHead') else 'нет'}; «Замедлено» до чата: было {_cmp.get('old', 0)}, "
+              f"стало {_cmp.get('new', 0)} (хуже у {_cmp.get('worse', 0)}, лучше у {_cmp.get('better', 0)}); "
+              f"менеджеров ОРК в «Месяце» {len((ork_month_data or {}).get('main') or [])}")
         # «что делать первым» — по общей очереди обоих видов (contracts.life_all); плитки
         # отдельного направления — в его вид (решение владельца 25.10.2026)
         _hc, dealctx_data = dealctx_mod.build(contracts_data["rows"], contracts_mod.life_all(contracts_data),
