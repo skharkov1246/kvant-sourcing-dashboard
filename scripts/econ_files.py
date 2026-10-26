@@ -98,6 +98,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import warnings
 from collections import Counter
 from pathlib import Path
 
@@ -740,6 +741,9 @@ def main(argv: list[str] | None = None, **kw) -> int:
     ap.add_argument("--limit", type=int, default=ПРЕДЕЛ_СУТОК)
     ap.add_argument("--parts", type=int, default=ЧАСТИ[0])
     a = ap.parse_args(argv)
+    # предупреждения openpyxl печатают в stderr — публичный журнал — содержимое файла (число с
+    # форматом даты, имя листа); econ_template открывает книги без них, здесь — вторая преграда
+    warnings.filterwarnings("ignore", module="openpyxl")
     if not 1 <= a.limit <= ПРЕДЕЛ_СУТОК:
         print(f"::error::--limit вне 1…{ПРЕДЕЛ_СУТОК} (предел владельца — {ПРЕДЕЛ_СУТОК} файлов в сутки)")
         return 2

@@ -84,7 +84,7 @@ create table if not exists econ_file_reads (
 alter table econ_file_reads add column if not exists kp_sale_sub numeric;
 -- v5 шаблона, 26.10.2026 (правило 16 — храни, почему получилось значение): откуда валюта
 -- подачи (D4, D4 на месте при сдвинутых подписях или запасной путь: AE либо формула AF со строкой
--- Z:AA, с подписью итога AG2 или без), чем сверен её курс (строка Z:AA,
+-- Z:AA, подтверждённой подписью итога AG2 или строкой K:L), чем сверен её курс (строка Z:AA,
 -- строка K:L, подача в евро) и на сколько столбцов вправо сдвинут шаблон. Закрытые списки —
 -- econ_template.ИСТОЧНИКИ_ВАЛЮТЫ, ИСТОЧНИКИ_КУРСА, СДВИГИ (сверяет tests/test_econ_files_sql.py).
 -- У строк до v5 — пусто.
@@ -151,7 +151,7 @@ begin
   alter table econ_file_reads drop constraint if exists econ_file_reads_src_chk;
   alter table econ_file_reads add constraint econ_file_reads_src_chk
     check ((sub_cur_src is null or (sub_cur_src in ('D4', 'D4 вне сдвига', 'AE', 'AE и подпись AG2',
-                                                    'формула AF и Z:AA', 'формула AF, Z:AA и подпись AG2')
+                                                    'формула AF, Z:AA и K:L', 'формула AF, Z:AA и подпись AG2')
                                     and sub_cur is not null))
            and (rate_src is null or (rate_src in ('Z:AA', 'K:L', 'евро') and status = 'сверено'))
            and (col_shift is null or col_shift in (0, 1)));
