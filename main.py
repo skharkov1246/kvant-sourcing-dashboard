@@ -1034,7 +1034,9 @@ def run(args) -> int:
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
                     company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
                     contracts=contracts_data, reps=reps_data, advisor=advisor_data, people=people_data,
-                    premia=premia_data, dealctx=dealctx_data, kaminc=kaminc_data)
+                    premia=premia_data, dealctx=dealctx_data, kaminc=kaminc_data,
+                    # поимённо — своим массивом под правом руководителей (решение 26.10.2026, п. 3)
+                    ork_month=ork_month_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:

@@ -170,7 +170,7 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
            kam: dict | None = None, eng: dict | None = None, prod: dict | None = None,
            contracts: dict | None = None, reps: dict | None = None, advisor: dict | None = None,
            people: dict | None = None, premia: dict | None = None, dealctx: dict | None = None,
-           kaminc: dict | None = None) -> str:
+           kaminc: dict | None = None, ork_month: dict | None = None) -> str:
     # premia принимается и не выводится: «Премии» сняты с портала по решению владельца
     # 12.10.2026 — ни вкладки, ни массива в странице. Расчёт premia.py остаётся в сборке
     # (main.py, живая сверка); вкладка до снятия — в истории, PR #508.
@@ -200,6 +200,10 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
         # оставляет его только праву «Деньги КАМов» (решение владельца 25.10.2026)
         "__KAMINC_HEAD_JSON__": _json_for_script(_pack_kaminc(kaminc["head"])) if kaminc else "null",
         "__KAMINC_JSON__": _json_for_script(kaminc["money"]) if kaminc and kaminc.get("money") else "null",
+        # показатели менеджеров ОРК поимённо (подвкладка «Месяц» «Реализации», orkview.py):
+        # отдельный массив — воркер оставляет его только праву «Реализация: показатели
+        # менеджеров ОРК» (решение владельца 26.10.2026, п. 3); в CONTRACTS их нет
+        "__ORKMONTH_JSON__": _json_for_script(ork_month) if ork_month else "null",
     }
     html = re.sub("|".join(map(re.escape, вставки)), lambda m: вставки[m.group(0)], html)
     gen, nxt = _update_stamps()
@@ -212,10 +216,12 @@ def write(metrics: dict, insights: dict, out_path: str | Path, *, title: str = D
           company: dict | None = None, kam: dict | None = None,
           eng: dict | None = None, prod: dict | None = None, contracts: dict | None = None,
           reps: dict | None = None, advisor: dict | None = None, people: dict | None = None,
-          premia: dict | None = None, dealctx: dict | None = None, kaminc: dict | None = None) -> Path:
+          premia: dict | None = None, dealctx: dict | None = None, kaminc: dict | None = None,
+          ork_month: dict | None = None) -> Path:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render(metrics, insights, title=title, company=company, kam=kam, eng=eng, prod=prod,
                           contracts=contracts, reps=reps, advisor=advisor, people=people,
-                          premia=premia, dealctx=dealctx, kaminc=kaminc), encoding="utf-8")
+                          premia=premia, dealctx=dealctx, kaminc=kaminc, ork_month=ork_month),
+                   encoding="utf-8")
     return out

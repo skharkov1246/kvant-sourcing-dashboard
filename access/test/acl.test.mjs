@@ -258,6 +258,31 @@ test("знак U+2028 в названии сделки не обрывает с�
   assert.match(out, /^window\.__KAMINC__ = __kvNoData\(\);$/m);
 });
 
+test("показатели менеджеров ОРК поимённо — только праву «ork_heads» и админу, вкладка — всем с ней", () => {
+  // решение владельца 26.10.2026, п. 3: подвкладка «Месяц» по людям — руководителям и
+  // владельцу; без права «Реализация» остаётся целиком, кроме массива ORKMONTH
+  assert.equal(RIGHT_PAYLOADS.ORKMONTH, "ork_heads");
+  const без = cutDashboard(page(), ["contracts"], { admin: false, rights: ["suppliers", "suppliers_fin", "kam_money"] });
+  assert.ok(без.includes("MOCK-CONTRACTS") && без.includes("MOCK-DEALCTX"), "вкладка и закрытая часть по своему праву должны остаться");
+  assert.ok(!без.includes("MOCK-ORKMONTH"), "показатели менеджеров ОРК утекли без права");
+  assert.match(без, /^window\.__ORKMONTH__ = __kvNoData\(\);$/m);
+  const с = cutDashboard(page(), ["contracts"], { admin: false, rights: ["ork_heads"] });
+  assert.ok(с.includes("MOCK-ORKMONTH") && с.includes("MOCK-CONTRACTS"));
+  assert.ok(!с.includes("MOCK-DEALCTX"), "право «ork_heads» не открывает договоры и деньги");
+  const админ = cutDashboard(page(), ["contracts"], { admin: true, rights: [] });
+  assert.ok(админ.includes("MOCK-ORKMONTH"));
+  // право без вкладки ничего не открывает
+  const безВкладки = cutDashboard(page(), ["reps"], { admin: false, rights: ["ork_heads"] });
+  assert.ok(!безВкладки.includes("MOCK-ORKMONTH"));
+});
+
+test("показатели менеджеров ОРК не входят ни в одну роль по умолчанию", () => {
+  for (const [id, r] of Object.entries(defaultAcl().roles)) {
+    if (r.admin) continue;
+    assert.ok(!r.rights.includes("ork_heads"), `роль ${id} получила показатели менеджеров ОРК по умолчанию`);
+  }
+});
+
 test("деньги КАМов не входят ни в одну роль по умолчанию", () => {
   for (const [id, r] of Object.entries(defaultAcl().roles)) {
     if (r.admin) continue;
@@ -401,7 +426,7 @@ test("админ видит полный набор тонких прав", () =
   });
   // Он их обходит на проверке всё равно; показывать урезанный набор — врать.
   assert.deepEqual(rightsFor(acl, "b@kvantpro.com", {}).rights,
-    ["suppliers", "suppliers_pii", "suppliers_fin", "suppliers_edit", "kam_money"]);
+    ["suppliers", "suppliers_pii", "suppliers_fin", "suppliers_edit", "kam_money", "ork_heads"]);
   assert.deepEqual(rightsFor(acl, "g@kvantpro.com", {}).rights, []);
 });
 

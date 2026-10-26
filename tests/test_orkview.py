@@ -127,6 +127,22 @@ def test_показатели_менеджеров_отдельно_от_вкл�
     assert all(set(m) >= {"who", "live", "M1", "M2"} and "score" not in m for m in ct["orkMonth"]["main"])
 
 
+def test_страница_показатели_менеджеров_своим_массивом_под_правом():
+    """dashboard.render: поимённые показатели «Месяца» — строкой window.__ORKMONTH__ (воркер
+    вырезает её без права «ork_heads»), в window.__CONTRACTS__ их нет; без данных — null."""
+    import dashboard
+    r = fixture.build_realization()
+    assert r["ork_month"]["main"] and "orkMonth" not in r["contracts"]
+    html = dashboard.render({}, {}, contracts=r["contracts"], dealctx=r["dealctx"], ork_month=r["ork_month"])
+    lines = {ln.split(" = ", 1)[0]: ln for ln in html.splitlines() if ln.startswith("window.__")}
+    om = json.loads(lines["window.__ORKMONTH__"].split(" = ", 1)[1].rstrip(";"))
+    assert om == json.loads(json.dumps(r["ork_month"], ensure_ascii=False, default=str))
+    ct_line = lines["window.__CONTRACTS__"]
+    assert '"orkMonth"' not in ct_line and '"loadDev"' not in ct_line
+    пусто = dashboard.render({}, {}, contracts=r["contracts"])
+    assert "window.__ORKMONTH__ = null;" in пусто
+
+
 def test_сырые_переходы_в_страницу_не_идут(ct):
     """В страницу — только агрегаты и шаг живых заказов; переходы и сегменты остаются в расчёте."""
     s = json.dumps({k: v for k, v in ct.items() if k != "orkMonth"}, ensure_ascii=False, default=str)

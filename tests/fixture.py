@@ -772,11 +772,12 @@ def realctx_raw() -> dict:
 
 def build_realization() -> dict:
     """«Реализация» со сводом чатов и договоров — как main.py: contracts.compute с чатами и
-    финальной экономикой свода, затем dealctx.build. → {"contracts": …, "dealctx": …} для dashboard.write."""
+    финальной экономикой свода, затем dealctx.build. → {"contracts": …, "dealctx": …, "ork_month": …}
+    для dashboard.write."""
     import dealctx
     ctx = dealctx.clean(realctx_raw())
     ct = build_contracts(ctx_chats=ctx["chats"], ctx_econ=ctx["econ"])
-    ct.pop("orkMonth", None)              # как main.py: поимённое — не в данные вкладки
+    ork_month = ct.pop("orkMonth", None)  # как main.py: поимённое — не в данные вкладки, своим массивом
     import contracts as contracts_mod
     head, payload = dealctx.build(ct["rows"], contracts_mod.life_all(ct), ctx, dt.datetime.fromisoformat(CT_NOW),
                                   today=CT_TODAY)
@@ -784,7 +785,7 @@ def build_realization() -> dict:
     ct["head"]["ctx"] = head
     if sep is not None and ct.get("sep"):
         ct["sep"]["head"]["ctx"] = sep
-    return {"contracts": ct, "dealctx": payload}
+    return {"contracts": ct, "dealctx": payload, "ork_month": ork_month}
 
 
 # ── «Пресейл» для очереди КАМа и золотого правила чата. Стадии — имена воронки
