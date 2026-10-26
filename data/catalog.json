@@ -13574,7 +13574,9 @@
       "referenced_by": [
         ".github/workflows/deploy.yml",
         ".github/workflows/live-check.yml",
+        "main.py",
         "period.py",
+        "templates/dashboard_core.html",
         "tests/test_workcal.py"
       ]
     },
