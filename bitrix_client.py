@@ -616,7 +616,8 @@ class BitrixClient:
 
     def stage_history(self, entity_type_id: int, *, category_id: int | None = None,
                       since: str | None = None,
-                      last: dict | None = None) -> dict[str, list[tuple[str, str]]]:
+                      last: dict | None = None,
+                      transitions: dict | None = None) -> dict[str, list[tuple[str, str]]]:
         """Полная история стадий: {OWNER_ID: [(STAGE_ID, CREATED_TIME), …]} — ПЕРВЫЙ вход
         в каждую стадию, с полным временем (ISO), в хронологическом порядке.
         Для замера скорости переходов (сделки кат.0, заказы СП-172 и т.п.).
@@ -624,7 +625,12 @@ class BitrixClient:
         `last`, если передан, заполняется ПОСЛЕДНИМ переходом каждой записи
         {OWNER_ID: (STAGE_ID, CREATED_TIME)} — входом в текущую стадию. Первых входов
         для возраста стадии мало: запись, вернувшаяся в стадию, где уже была,
-        считала бы возраст от первого визита (или от входа в другую стадию)."""
+        считала бы возраст от первого визита (или от входа в другую стадию).
+
+        `transitions`, если передан, заполняется ВСЕМИ переходами каждой записи
+        {OWNER_ID: [(STAGE_ID, CREATED_TIME), …]} в порядке истории, с повторными входами:
+        сегменты регламента ОРК (ork.segments) считают возвраты и «пачки». Запросы и
+        листание те же — это тот же ответ, просто без отбрасывания повторов."""
         params: dict = {
             "entityTypeId": entity_type_id,
             "select": ["OWNER_ID", "CREATED_TIME", "STAGE_ID"],
@@ -652,6 +658,8 @@ class BitrixClient:
                     continue
                 if last is not None:                         # ASC → последний переход побеждает
                     last[oid] = (st, str(x.get("CREATED_TIME") or ""))
+                if transitions is not None:                  # все переходы, повторы входов тоже
+                    transitions.setdefault(oid, []).append((st, str(x.get("CREATED_TIME") or "")))
                 if st not in seen.setdefault(oid, set()):   # ASC → первый встреченный вход в стадию
                     seen[oid].add(st)
                     hist.setdefault(oid, []).append((st, str(x.get("CREATED_TIME") or "")))
