@@ -2254,3 +2254,15 @@ def test_главный_вход_пересчёта_без_портала_и_м�
     assert ct.main(["--mode", "reflag", "--apply"]) == 2 and len(ключи) == 2
     assert "должен начинаться с ctr-" in _журнал(capsys)
     assert ct.main(["--mode", "reflag"]) == 5, "холостому ключ не важен: он не пишет"
+
+
+def test_чтение_с_ключом_пересчёта_не_начинается(monkeypatch, capsys):
+    """Ключ ctr- — только у пересчёта без модели: откат пересчёта по ключу стёр бы строки
+    чтения с тем же префиксом (ревью 26.10.2026). Отказ — до базы и до портала."""
+    monkeypatch.setenv("BITRIX_WEBHOOK_URL", "https://example.invalid/rest/1/x/")
+    monkeypatch.setenv("RUN_ID", "ctr-777-1")
+    monkeypatch.setattr(ct, "Портал", lambda: (_ for _ in ()).throw(AssertionError("портал не нужен")))
+    monkeypatch.setattr(ct, "База", lambda *a, **k: (_ for _ in ()).throw(AssertionError("база не нужна")))
+    for режим in ("dry", "live"):
+        assert ct.main(["--mode", режим]) == 2, режим
+    assert "не может начинаться с ctr-" in capsys.readouterr().out

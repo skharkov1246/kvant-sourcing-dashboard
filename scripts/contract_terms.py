@@ -2711,6 +2711,13 @@ def main(argv: list[str] | None = None) -> int:
     if not os.environ.get("BITRIX_WEBHOOK_URL", "").strip():
         print("::error::нет BITRIX_WEBHOOK_URL")
         return 2
+    run_id = _ключ_прогона()
+    if run_id.startswith(КЛЮЧ_ПЕРЕСЧЁТА):
+        # ключ пересчёта у чтения: откат пересчёта (delete … where run_id = 'ctr-…') стёр бы и
+        # эти строки чтения (ревью 26.10.2026) — до базы и до портала
+        print(f"::error::ключ прогона чтения не может начинаться с {КЛЮЧ_ПЕРЕСЧЁТА}: так помечается только "
+              "пересчёт без модели")
+        return 2
     база = None
     if a.mode == "live":
         # Всё, без чего запись не состоится, проверяется ДО закачки и до первого
@@ -2734,7 +2741,7 @@ def main(argv: list[str] | None = None) -> int:
             база.закрыть()
             return 2
     try:
-        return прогон(a.mode, a.deals, a.budget, a.model, портал=Портал(), run_id=_ключ_прогона(), база=база,
+        return прогон(a.mode, a.deals, a.budget, a.model, портал=Портал(), run_id=run_id, база=база,
                       срок_мин=a.deadline_min or None, открытые=a.open)
     finally:
         if база is not None:
