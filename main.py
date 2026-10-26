@@ -1040,17 +1040,30 @@ def _print_fx(fx: dict) -> None:
     print(f"  курсы: {fx.get('src')} · запросов курсов {fx.get('requests', 0)} · период {fx.get('lo') or '—'}–"
           f"{fx.get('hi') or '—'}" + (f" · нет у ЦБ: {', '.join(fx['noCode'])}" if fx.get("noCode") else "")
           + (f" · ряд не получен: {', '.join(fx['failed'])}" if fx.get("failed") else "")
-          + f" · без курса на свою дату сделок {fx.get('noRate', 0)}")
+          + (f" · ряд с зеркала: {', '.join(fx['patched'])}" if fx.get("patched") else "")
+          + f" · без курса на свою дату сделок {fx.get('noRate', 0)}"
+          + (" · время на курсы вышло" if fx.get("timeUp") else "")
+          + (f" · зеркало: недочитано дат {fx.get('mirrorCut', 0)}, сбоев {fx.get('mirrorErr', 0)}"
+             if fx.get("mirrorCut") or fx.get("mirrorErr") else "")
+          + (f" · дат-опечаток {fx['badDays']}" if fx.get("badDays") else "")
+          + (f" · книг бюджета без курса {fx['nPlanNoRate']}" if fx.get("nPlanNoRate") else ""))
     if fb:
         print(f"::warning::курсы Битрикса ({fb.get('why')}{', ' + fb['err'] if fb.get('err') else ''}): "
               f"сделок по ручным курсам {fb.get('n', 0)}")
+    pt = fx.get("partial")
+    if pt:
+        print(f"::warning::ряд ЦБ не получен: {', '.join(pt.get('codes') or [])} — сделок по курсу Битрикса "
+              f"{pt.get('n', 0)}, без суммы {pt.get('lost', 0)}")
+    cl = fx.get("calls") or {}
     print("  дата КП: " + ", ".join(f"{k} {v}" for k, v in sorted((fx.get("kpSrc") or {}).items()))
           + f"; «ТКП согласован» в день создания без КП в истории {fx.get('nTkpAtCreate', 0)}; история КП у "
           f"{fx.get('nOffers', 0)} из {fx.get('nNeedOffer', 0)}" + (f" ({fx['kpErr']})" if fx.get("kpErr") else ""))
     print("  НДС: " + ", ".join(f"{k} {v}" for k, v in sorted((fx.get("vat") or {}).items()))
           + "; снят у покупателей: " + ", ".join(f"{k} {v}" for k, v in sorted((fx.get("vatBuyer") or {}).items()))
           + f"; реквизиты прочитаны у {fx.get('nCountry', 0)} из {fx.get('nBuyers', 0)} компаний"
-          + (f" (сбой {fx['reqErr']})" if fx.get("reqErr") else ""))
+          + (f" (сбой {fx['reqErr']})" if fx.get("reqErr") else "")
+          + (f"; отдельные направления без реквизитов {fx['nVatNoreqSep']}" if fx.get("nVatNoreqSep") else ""))
+    print(f"  портал на деньги: история КП и кат. 0 — запросов {cl.get('hist', 0)}, реквизиты — {cl.get('req', 0)}")
 
 
 def _print_snapshot(client) -> None:

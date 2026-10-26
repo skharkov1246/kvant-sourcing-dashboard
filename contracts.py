@@ -39,6 +39,7 @@ import dealctx
 import lifecycle
 import period as period_mod
 from base import fx as fx_mod
+import bitrix_client
 from bitrix_client import BitrixClient
 
 _SYM = {"EUR": "€", "USD": "$", "CNY": "¥", "RUB": "₽", "INR": "₹", "GBP": "£", "AED": "AED ", "JPY": "¥"}
@@ -320,11 +321,18 @@ def _to_eur(amount, cur, rates: dict) -> float | None:
 
 class Курсы:
     """€ за единицу валюты на дату: ряды ЦБ РФ (base.fx.CbrRates) или, если ЦБ и зеркало
-    недоступны, справочник Битрикса — один на все даты (запасной путь, с плашкой)."""
+    недоступны, справочник Битрикса — один на все даты (запасной путь, с плашкой).
 
-    def __init__(self, bitrix: dict[str, float], cbr: fx_mod.CbrRates | None, src: str = ""):
+    failed — валюты, ряд которых в этой сборке не получен ни с cbr.ru, ни с зеркала (при
+    годном евро): у них — курс Битрикса (patch, строка с rateSrc «bitrix» и плашка
+    «ряд ЦБ не получен»), а нет его и в Битриксе — сумма неизвестна, как прежде."""
+
+    def __init__(self, bitrix: dict[str, float], cbr: fx_mod.CbrRates | None, src: str = "",
+                 failed=()):
         self.bitrix, self.cbr = bitrix, cbr
         self.src = (src or "cbr") if cbr is not None else "bitrix"
+        self.failed = {str(c) for c in failed or ()} if cbr is not None else set()
+        self.patch = {c for c in self.failed if self.bitrix.get(c)}
         self._at: dict[dt.date, dict[str, float]] = {}
         self.days: set[dt.date] = set()
 
@@ -339,8 +347,17 @@ class Курсы:
                 k = self.cbr.cross(c, "EUR", day)          # единиц валюты за 1 €
                 if k:
                     out[c] = 1.0 / k
+            if out.get("EUR"):                             # ряд ЦБ на дату есть — дыры валют
+                for c in self.patch:                       # без ряда закрывает Битрикс
+                    out.setdefault(c, self.bitrix[c])
             self._at[day] = out
         return self._at[day]
+
+    def src_of(self, curs) -> str:
+        """Источник курса сумм в этих валютах: cbr или bitrix (ЦБ нет или ряд не получен)."""
+        if self.cbr is None or ({str(c) for c in curs if c} & self.patch):
+            return "bitrix"
+        return "cbr"
 
     def eur(self, amount, cur, day: dt.date | None) -> float | None:
         v = _to_eur(amount, cur, self.at(day))
@@ -349,16 +366,33 @@ class Курсы:
         return v
 
 
-def _kp_date(d: dict, offers: list[dt.date], cat0: list[dt.date], *, z=None) -> tuple[dt.date | None, str]:
+def _дата_или_нет(z, v) -> dt.date | None:
+    """Дата портала по Москве (зонд v59, _дата); метка с годом 1 при переводе часового пояса
+    даёт OverflowError — это опечатка, а не дата: None."""
+    try:
+        return z._дата(v)
+    except (OverflowError, ValueError):
+        return None
+
+
+def _kp_date(d: dict, offers: list[dt.date], cat0: list[dt.date], *, z=None,
+             today: dt.date | None = None) -> tuple[dt.date | None, str]:
     """Дата КП для курса (решения владельца 25.10.2026) → (дата, kpSrc).
 
     Порядок — зонд v59 (probe_money_sources.дата_ткп): «ТКП согласован» → последний вход в
     стадию предложения до выигрыша → первый вход в кат. 0 → DATE_CREATE. «ТКП согласован» в
     день создания сделки (±ТКП_У_СОЗДАНИЯ_ДН, у 75 из 532 — похоже на умолчание) уступает
-    входу в стадию предложения, если он есть. КП близнеца в пресейле сборка не ищет."""
+    входу в стадию предложения, если он есть. КП близнеца в пресейле сборка не ищет.
+    Дата вне base.fx.day_ok (опечатка года: «0024», «2205») — как пустая: следующая по порядку."""
     z = z or _зонд()
+    ok = (lambda x: fx_mod.day_ok(x, today)) if today else bool
+    for k in (WON_F, "DATE_CREATE"):
+        if d.get(k) and not ok(_дата_или_нет(z, d.get(k))):
+            d = {**d, k: None}
+    offers = [x for x in offers or [] if ok(x)]
+    cat0 = [x for x in cat0 or [] if ok(x)]
     f, c = z._дата(d.get(WON_F)), z._дата(d.get("DATE_CREATE"))
-    offers = sorted(offers or [])
+    offers = sorted(offers)
     if f and c and offers and abs((f - c).days) <= z.ТКП_У_СОЗДАНИЯ_ДН:
         w = z.выигрыш(offers, cat0 or None)
         до = [x for x in offers if not w or x <= w]
@@ -566,40 +600,65 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         return not (in_cat0 and not ords and seq == 0 and not d.get("OPPORTUNITY"))   # пустышки
 
     uni = {did: d for did, d in deals.items() if _in_universe(did, d)}
-    # входы в стадии кат. 0 (история с HIST_SINCE) — для выигрыша и запасной даты «вход в кат. 0»
-    cat0_days = {did: sorted({x for x in (z._дата(t) for _s, t in dhist.get(did, [])) if x}) for did in uni}
-
     def _tkp_at_create(d: dict) -> bool:
-        f, c = z._дата(d.get(WON_F)), z._дата(d.get("DATE_CREATE"))
+        f, c = _дата_или_нет(z, d.get(WON_F)), _дата_или_нет(z, d.get("DATE_CREATE"))
         return bool(f and c and abs((f - c).days) <= z.ТКП_У_СОЗДАНИЯ_ДН)
 
-    # входы в стадии «предложение выдано» (probe_conversion.вид_стадии) — только у сделок без
-    # «ТКП согласован» или с ним в день создания, кроме проигранных: пачка на 50 сделок
+    # Запасные даты КП — только у сделок без годного «ТКП согласован» или с ним в день создания
+    # (проигранные тоже: их «Сумма» в сводке ушедших). Одним чтением истории (пачка на 50 сделок,
+    # probe_conversion.читать_историю, как шаг «запасные даты» зонда v59) — ВСЕ входы в стадии
+    # «предложение выдано» (вид_стадии) и в стадии кат. 0, без отсечки по дате: dhist начинается
+    # с HIST_SINCE и хранит только первый вход в стадию — у сделки 2023 года «вход в кат. 0»
+    # оказался бы в 2024-м, а возврат в NEW при выигрыше терялся бы (ревью 26.10.2026).
+    def _tkp_ok(d: dict) -> bool:
+        return fx_mod.day_ok(_дата_или_нет(z, d.get(WON_F)), today)
+
     need_offer = sorted((did for did, d in uni.items()
-                         if (d.get("STAGE_SEMANTIC_ID") or "").upper() != "F" and str(did).isdigit()
-                         and (not z._дата(d.get(WON_F)) or _tkp_at_create(d))), key=int)
+                         if str(did).isdigit() and (not _tkp_ok(d) or _tkp_at_create(d))), key=int)
     offers: dict[str, list[dt.date]] = {}
+    cat0_full: dict[str, list[dt.date]] | None = None
     kp_err = ""
+    calls: dict[str, int] = {}
+    n0 = bitrix_client.запросов_портала()
     if need_offer:
         try:
             smeta = stage_meta or client.deal_stage_meta()
             offer_st = {sid for sid in smeta if z.pc.вид_стадии(sid, smeta)[0] == "offer"}
-            if offer_st:
-                ist, ош = z.pc.читать_историю(client, need_offer, стадии=offer_st)
-                if ош:                  # неполная история — не «последнее КП»: запасные даты
-                    kp_err = "история неполна"
-                else:
-                    for did, ряд in ist.items():
-                        ds = sorted({x for x in (z._дата(t) for _s, t in ряд) if x})
-                        if ds:
-                            offers[did] = ds
-            else:
+            cat0_st = set(dstages) | {sid for sid, m in smeta.items()
+                                      if str((m or {}).get("cat") or "") == "0"}
+            if not offer_st:
                 kp_err = "нет стадий предложения"
+            ist, ош = z.pc.читать_историю(client, need_offer, стадии=offer_st | cat0_st)
+            if ош:                  # неполная история — не «последнее КП»: запасные даты
+                kp_err = "история неполна"
+            else:
+                cat0_full = {}
+                for did, ряд in ist.items():
+                    of = sorted({x for x in (_дата_или_нет(z, t) for sid, t in ряд if sid in offer_st) if x})
+                    c0 = sorted({x for x in (_дата_или_нет(z, t) for sid, t in ряд
+                                             if sid in cat0_st and z.pc.воронка_стадии(sid) == "0") if x})
+                    if of:
+                        offers[did] = of
+                    if c0:
+                        cat0_full[did] = c0
         except Exception as e:  # noqa: BLE001 — без истории даты КП берутся запасные
             kp_err = type(e).__name__
+    calls["hist"] = bitrix_client.запросов_портала() - n0
+    hist_from = dt.date.fromisoformat(HIST_SINCE[:10])
+
+    def _cat0_of(did: str, d: dict) -> list[dt.date]:
+        """Входы в кат. 0: полная история; не прочитана — dhist (первые входы с HIST_SINCE),
+        но только у сделок, заведённых не раньше HIST_SINCE: у старших она обрезана."""
+        if cat0_full is not None:
+            return cat0_full.get(did, [])
+        c = _дата_или_нет(z, d.get("DATE_CREATE"))
+        if not c or c < hist_from:
+            return []
+        return sorted({x for x in (_дата_или_нет(z, t) for _s, t in dhist.get(did, [])) if x})
+
     kp_of: dict[str, tuple[dt.date, str]] = {}
     for did, d in uni.items():
-        day, src = _kp_date(d, offers.get(did, []), cat0_days.get(did, []), z=z)
+        day, src = _kp_date(d, offers.get(did, []), _cat0_of(did, d), z=z, today=today)
         kp_of[did] = (day or today, src)
     n_tkp_create = sum(1 for did, d in uni.items() if kp_of[did][1] == "tkp" and _tkp_at_create(d))
     # страна покупателя по реквизитам (зонд v59: РФ 86, без реквизитов 34 из 120 компаний)
@@ -607,6 +666,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                       key=lambda c: int(c) if c.isdigit() else 0)
     country: dict[str, str] = {}
     req_err = ""
+    n0 = bitrix_client.запросов_портала()
     if buyer_co:
         try:
             presets = {str(x.get("ID")): str(x.get("COUNTRY_ID") or "") for x in (
@@ -617,11 +677,15 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 presets)
         except Exception as e:  # noqa: BLE001 — страна не прочитана: НДС снимается у всех (как у РФ)
             country, req_err = {}, type(e).__name__
+    calls["req"] = bitrix_client.запросов_портала() - n0
     # курсы ЦБ: валюты сумм сделок и заказов; даты КП, заказов, книг бюджета и сегодня
     fx_codes_all = ({str(d.get("CURRENCY_ID") or "") for d in uni.values()}
                     | {str(o.get("currencyId") or "") for o in orders} | {"USD", "EUR"}) - {""}
-    fx_days = {k for k, _s in kp_of.values()} | {today}
-    fx_days |= {x for x in (z._дата(o.get("createdTime")) for o in orders) if x}
+    plan_day_default = _pdate(plan_asof) or today
+    # дата снимка бюджета — тоже: у книги без «изменена» курс на неё (на зеркале иначе взялся бы
+    # курс соседней прочитанной даты)
+    fx_days = {k for k, _s in kp_of.values()} | {today, plan_day_default}
+    fx_days |= {x for x in (_дата_или_нет(z, o.get("createdTime")) for o in orders) if x}
     fx_days |= {x for x in (_pdate(b.get("modified"))
                             for b in list(plan_by_seq.values()) + list(plan_by_id.values())) if x}
     cbr, fx_info, fx_why = None, {}, "ЦБ не запрашивался"
@@ -631,15 +695,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         except Exception as e:  # noqa: BLE001 — сбой загрузчика = ЦБ недоступен, не падение вкладки
             cbr, fx_info = None, {"why": type(e).__name__}
         fx_why = "ЦБ недоступен"
-    K = Курсы(rate, cbr, (fx_info or {}).get("src") or "")
-    plan_day_default = _pdate(plan_asof) or today
+    K = Курсы(rate, cbr, (fx_info or {}).get("src") or "", failed=(fx_info or {}).get("failed") or ())
 
     def o_day(o: dict, kp_day: dt.date) -> dt.date:
-        """Дата заказа для курса: создание заказа (по Москве); нет — дата КП сделки."""
-        return z._дата(o.get("createdTime")) or kp_day
+        """Дата заказа для курса: создание заказа (по Москве); нет или опечатка — дата КП сделки."""
+        x = _дата_или_нет(z, o.get("createdTime"))
+        return x if fx_mod.day_ok(x, today) else kp_day
 
     # 6. строки: одна строка = одна сделка воронки реализации (или с заказами)
     rows = []
+    n_plan_norate = 0
     for did, d in uni.items():
         ords = by_deal.get(did, [])
         in_cat0 = str(d.get("CATEGORY_ID") or "0") == "0"
@@ -713,8 +778,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         plan_psrc = None
         plan_break = None
         # ₽ бюджета → € по ЦБ на дату книги (изменена); нет даты — на дату снимка
-        plan_day = (_pdate(plan.get("modified")) or plan_day_default) if plan else None
+        plan_day = _pdate(plan.get("modified")) if plan else None
+        if plan and not fx_mod.day_ok(plan_day, today):
+            plan_day = plan_day_default
         rub = K.at(plan_day).get("RUB", 0.0) if plan else 0.0
+        if plan and not rub:
+            n_plan_norate += 1              # книга есть, курса на её дату нет: плана нет, счётом
         if rub and K.cbr is not None:
             K.days.add(plan_day)
         if plan and rub:
@@ -920,14 +989,23 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "saleBitrixEur": sale_bx,
             # курс и НДС (решения владельца 25 и 26.10.2026): источник курса «Суммы», дата КП и
             # откуда она, правило НДС и делитель (1,20 / 1,22; 1 — как есть), страна покупателя
-            "rateSrc": "cbr" if K.cbr is not None else "bitrix",
+            "rateSrc": K.src_of([sale_cur] + [str(o.get("currencyId") or "") for o in ords]),
             "kpDate": kp_day.strftime("%d.%m.%Y") if kp_day else "", "kpSrc": kp_src,
             "vatRule": vat_rule, "vatBx": vat_bx, "vatK": vat_k if vat_bx == "gross" else 1.0,
             "vatBuyer": ("ru" if vat_buyer == "РФ" else "foreign" if vat_buyer == "не РФ" else "noreq"),
             "planFxDay": plan_day.strftime("%d.%m.%Y") if (plan and plan_day) else "",
+            # ₽ за € того курса, которым пересчитаны книга бюджета (planFxDay) и «Сумма» (kpDate):
+            # премии возвращают € в ₽ ТЕМ ЖЕ курсом, а не курсом Битрикса (иначе ПЗ из книги
+            # сдвинулась бы на разницу курсов, ~12 %: ревью 26.10.2026)
+            "planEurRub": round(1 / rub, 6) if (plan and rub) else None,
+            "kpEurRub": round(1 / rate_s["RUB"], 6) if rate_s.get("RUB") else None,
             # валюты без курса в справочнике Битрикса (сделка, заказы, поля экономики):
             # такие суммы не пересчитываются и в итоги не идут
             "fxMissing": fx_miss, "saleKnown": sale_known, "buySusp": buy_susp,
+            # почему курса нет (только когда нет): bitrix — ЦБ не получен, в справочнике Битрикса
+            # валюты нет; series — ряд этой валюты в сборке не получен; date — у ЦБ на дату нет
+            **({"fxWhy": ("bitrix" if K.cbr is None else "series" if set(fx_miss) & K.failed else "date")}
+               if fx_miss else {}),
             "saleOrig": _orig(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")), "saleCur": d.get("CURRENCY_ID") or "",
             # «Сумма» в валюте сделки, числом (то же, что saleOrig), и НДС в ней (TAX_VALUE):
             # dealctx.econ_ratio сверяет «Сумму» без НДС с финальной экономикой файла
@@ -1127,7 +1205,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # (счёт рядом), а не 1:1 к базовой, как до 26.10.2026
     def _o_eur(o: dict) -> float | None:
         return K.eur(o.get("opportunity"), o.get("currencyId"), o_day(o, today))
-    orphan_buy = sum(v for v in (_o_eur(o) for o in orphan) if v)
+    orphan_eur = [_o_eur(o) for o in orphan]
+    orphan_buy = sum(v for v in orphan_eur if v)
+    orphan_norate = sum(1 for v in orphan_eur if v is None)
 
     def _view(rows_v: list[dict], life_v: dict | None) -> dict:
         """Сводка вида вкладки по его сделкам rows_v: всё, что просит внимания или
@@ -1529,7 +1609,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     ]
     fx_head = _fx_head(K, rate_asof, base_cur, today, fx_info, fx_why, rows,
                        kp_err=kp_err, req_err=req_err, n_need_offer=len(need_offer), n_offers=len(offers),
-                       n_tkp_create=n_tkp_create, n_buyers=len(buyer_co), n_country=len(country))
+                       n_tkp_create=n_tkp_create, n_buyers=len(buyer_co), n_country=len(country),
+                       calls=calls, n_plan_norate=n_plan_norate)
     return {
         "label": f"на {today.strftime('%d.%m.%Y')}",
         # все сделки вкладки — и основного вида, и отдельных направлений (признак seg):
@@ -1546,7 +1627,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         # сделкам; сводка для шапки и подписи вкладки — head["sep"]
         "sep": ({k: sep_view[k] for k in ("funnel", "head", "kpis", "deadlines", "speed", "gone", "life")}
                 if sep_view is not None else None),
-        "orphan": {"n": len(orphan), "buy": _money(orphan_buy)},
+        # заказов без курса на дату заказа — не в сумме, счётом (поле — только когда есть)
+        "orphan": {"n": len(orphan), "buy": _money(orphan_buy),
+                   **({"noRate": orphan_norate} if orphan_norate else {})},
         "suppliers": {
             "label": f"на {today.strftime('%d.%m.%Y')}",
             "rows": sup_rows,
@@ -1589,6 +1672,25 @@ def _fx_head(K: Курсы, rate_asof: str, base_cur: str, today: dt.date, info:
         "nNeedOffer": kw.get("n_need_offer", 0), "nOffers": kw.get("n_offers", 0),
         "nTkpAtCreate": kw.get("n_tkp_create", 0),
         "nBuyers": kw.get("n_buyers", 0), "nCountry": kw.get("n_country", 0),
+        # ряд валюты cbr.ru не отдал, взят с зеркала (patched); не получен нигде — по курсу
+        # Битрикса (partial.bx, строки rateSrc «bitrix») или сумма неизвестна (partial.lost)
+        "patched": sorted(info.get("patched") or []),
+        "partial": ({"codes": sorted(K.failed), "bx": sorted(K.patch),
+                     "n": sum(1 for r in rows if r.get("rateSrc") == "bitrix"),
+                     "lost": sum(1 for r in rows if set(r.get("fxMissing") or []) & K.failed)}
+                    if K.failed else None),
+        # время на курсы вышло / даты-опечатки / зеркало: недочитано и сбоев — счётчики
+        "timeUp": bool(info.get("timeUp")), "badDays": int(info.get("badDays") or 0),
+        "mirrorCut": int((info.get("mirror") or {}).get("обрезано") or 0),
+        "mirrorErr": int((info.get("mirror") or {}).get("ошибок") or 0),
+        # книга бюджета есть, курса ЦБ на её дату нет — план не пересчитан (счётом)
+        "nPlanNoRate": int(kw.get("n_plan_norate") or 0),
+        # НДС снят по правилу «без реквизитов» у сделок отдельных направлений (Басра, воронка 16):
+        # покупатель там, вероятно, иностранный — вопрос владельцу, до решения правило как есть
+        "nVatNoreqSep": sum(1 for r in rows if r.get("seg") and r.get("vatBx") == "gross"
+                            and r.get("vatBuyer") == "noreq"),
+        # запросов к порталу у новых чтений: история КП и кат. 0, реквизиты покупателей
+        "calls": dict(kw.get("calls") or {}),
     }
     if K.cbr is None:
         out["lbl"] = f"курсы Битрикса ({why}) от {rate_asof or '—'}"

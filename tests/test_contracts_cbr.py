@@ -385,3 +385,271 @@ def test_журнал_курсов_плашка_запасного_пути(monk
     out = capsys.readouterr().out
     assert f"::warning::курсы Битрикса (ЦБ не запрашивался): сделок по ручным курсам {len(data['rows'])}" in out
     assert "€" not in out and not any(r["deal"] in out for r in data["rows"])
+
+
+# ── ревью 26.10.2026: дата КП из полной истории, премии, сеть ─────────────────
+
+def test_старая_сделка_вход_в_кат0_из_полной_истории():
+    """dhist — с HIST_SINCE и только первые входы: у сделки 2023 года «вход в кат. 0» был бы
+    в 2024-м. Запасная дата берётся из полной истории (зонд v59, «запасные даты»)."""
+    stub = fixture.ContractsStub()
+    d = stub.deals[0]                                    # i=0: без «ТКП согласован»
+    did = d["ID"]
+    d["DATE_CREATE"] = "2023-03-10T10:00:00+03:00"
+    stub.hist[2] = [x for x in stub.hist[2] if x[0] != did] + [
+        (did, "C0:NEW", "2023-03-12T10:00:00+03:00"), (did, "C0:PREPARATION", "2024-07-15T10:00:00+03:00")]
+    r = _row(_compute(stub), did)
+    assert (r["kpSrc"], r["kpDate"]) == ("cat0", "12.03.2023"), "не 15.07.2024 из обрезанной истории"
+
+
+def test_старая_сделка_история_не_прочитана_дата_создания():
+    stub = fixture.ContractsStub()
+    d = stub.deals[0]
+    did = d["ID"]
+    d["DATE_CREATE"] = "2023-03-10T10:00:00+03:00"
+    stub.hist[2] = [x for x in stub.hist[2] if x[0] != did] + [(did, "C0:PREPARATION", "2024-07-15T10:00:00+03:00")]
+
+    def сбой(*a, **k):
+        raise RuntimeError("QUERY_LIMIT_EXCEEDED")
+    stub.call_envelope = сбой
+    data = _compute(stub)
+    r = _row(data, did)
+    assert (r["kpSrc"], r["kpDate"]) == ("created", "10.03.2023"), "обрезанная dhist у старой сделки не берётся"
+    # сделка не старше HIST_SINCE — dhist годится
+    assert _row(data, stub.deals[4]["ID"])["kpSrc"] == "cat0"
+
+
+def test_ткп_в_день_создания_возврат_в_new_при_выигрыше():
+    """Заведена в NEW, ушла в пресейл (КП 10.02 и 21.02), выиграна обратно в NEW 13.03: по
+    первым входам выигрыш терялся, и «ТКП согласован» в день создания оставался датой КП."""
+    stub = fixture.ContractsStub()
+    d = stub.deals[2]                                    # i=2: «ТКП согласован» в день создания
+    did = d["ID"]
+    d["DATE_CREATE"], d[ct.WON_F] = "2025-02-01T10:00:00+03:00", "2025-02-01"
+    stub.offer_hist = [x for x in stub.offer_hist if x[0] != did] + [
+        (did, fixture.CT_OFFER_STAGE, "2025-02-10T10:00:00+03:00"),
+        (did, fixture.CT_OFFER_STAGE, "2025-02-21T10:00:00+03:00")]
+    stub.hist[2] = [x for x in stub.hist[2] if x[0] != did] + [
+        (did, "C0:NEW", "2025-02-01T10:00:00+03:00"), (did, "C0:NEW", "2025-03-13T10:00:00+03:00")]
+    r = _row(_compute(stub), did)
+    assert (r["kpSrc"], r["kpDate"]) == ("offer", "21.02.2025")
+
+
+def test_проигранные_тоже_получают_запасную_дату():
+    stub = fixture.ContractsStub()
+    d = stub.deals[6]                                    # i=6: поле в день создания, КП в истории
+    d["STAGE_SEMANTIC_ID"], d["STAGE_ID"] = "F", "C0:LOSE"
+    r = _row(_compute(stub), d["ID"])
+    assert r["kpSrc"] == "offer"
+
+
+def test_опечатка_года_не_ломает_курсы():
+    stub = fixture.ContractsStub()
+    stub.deals[1][ct.WON_F] = "0024-05-01"               # год «24»: в запросе было бы «dd/mm/24»
+    stub.deals[5][ct.WON_F] = "0001-01-01T00:00:00+05:00"  # год 1: OverflowError при переводе пояса
+    seen = []
+
+    def loader(c, days, t):
+        seen.extend(days)
+        return fixture.ct_fx_loader(c, days, t)
+    data = _compute(stub, fx_loader=loader)
+    assert data["fx"]["src"] == "cbr", "не падение на курсы Битрикса"
+    for i in (1, 5):
+        r = _row(data, stub.deals[i]["ID"])
+        assert r["kpSrc"] != "tkp" and _day(r["kpDate"]).year >= 2024
+    assert all(x.year >= 1992 for x in seen)
+    k, info = fx.load_cbr({"USD"}, [D(24, 5, 1), D(2026, 2, 2)], today=D(2026, 10, 19), fetch=fixture.ct_cbr_fetch)
+    assert info["badDays"] == 1 and info["lo"] == D(2026, 2, 2) - dt.timedelta(days=fx.BUILD_LEAD_DAYS)
+
+
+def test_рубль_не_числится_без_ряда_цб():
+    _k, info = fx.load_cbr({"RUB", "USD"}, [D(2026, 2, 2)], today=D(2026, 10, 19), fetch=fixture.ct_cbr_fetch)
+    assert info["noCode"] == [] and "RUB" not in info["failed"]
+
+
+def test_премии_пз_книги_в_рублях_не_сдвигается(monkeypatch):
+    """ПЗ из книги: ₽ → € по ЦБ на дату книги, в премиях € → ₽ тем же курсом — ₽ книги, а не
+    ₽ × (курс Битрикса / курс ЦБ), ~12 % сдвига (ревью 26.10.2026)."""
+    import premia
+    plan = {"revenue": 1_500_000.0, "margin_income": 300_000.0, "direct_costs": -800_000.0,
+            "purchase": -700_000.0, "modified": "2025-06-04T10:00:00Z"}
+    monkeypatch.setattr(ct, "_load_budget_plans", lambda: ({950: plan}, {}, "2026-10-18T00:00:00Z"))
+    r = _row(_compute(), "6000")
+    assert r["planBreak"]["direct"] and not r["planSusp"]
+    bx_eur_rub = 100.0                                   # справочник Битрикса заглушки: 0,01 € за ₽
+    pz, pay, src = premia._cost({"buyRaw": 0}, r, bx_eur_rub)
+    assert src == "book" and pz == pytest.approx(800_000, rel=1e-4) and pay == pytest.approx(700_000, rel=1e-4)
+    # без полей курса (старая строка) — курс премий, как прежде
+    old = {k: v for k, v in r.items() if k not in ("planEurRub", "kpEurRub")}
+    assert premia._cost({"buyRaw": 0}, old, bx_eur_rub)[0] == pytest.approx(abs(r["planBreak"]["direct"]) * 100)
+
+
+def test_книга_без_даты_на_дату_снимка_и_счёт_без_курса(monkeypatch):
+    plan = {"revenue": 1_000_000.0, "margin_income": 100_000.0}       # «изменена» нет
+    monkeypatch.setattr(ct, "_load_budget_plans", lambda: ({950: plan}, {}, "2026-10-18T00:00:00Z"))
+    seen = []
+
+    def loader(c, days, t):
+        seen.extend(days)
+        return fixture.ct_fx_loader(c, days, t)
+    data = _compute(fx_loader=loader)
+    assert D(2026, 10, 18) in seen, "дата снимка бюджета — в нужных датах курса"
+    assert _row(data, "6000")["planFxDay"] == "18.10.2026" and data["fx"]["nPlanNoRate"] == 0
+    # курса на дату книги нет (раньше ряда) — план не пересчитан, счётом
+    plan["modified"] = "2023-01-10T10:00:00Z"
+    data = _compute()
+    assert _row(data, "6000")["planRevEur"] is None and data["fx"]["nPlanNoRate"] == 1
+
+
+def test_заказ_без_сделки_без_курса_счётом():
+    stub = fixture.ContractsStub()
+    o = dict(stub.orders[0], id=99001, parentId2=0, currencyId="XAU", opportunity=700)
+    stub.orders.append(o)
+    data = _compute(stub)
+    assert data["orphan"]["noRate"] == 1
+
+
+def test_отдельное_направление_без_реквизитов_счётом():
+    """Басра (воронка 16): покупатель без реквизитов — по решению 26.10 НДС снят; счёт для
+    вопроса владельцу (покупатель там, вероятно, иностранный)."""
+    data = _compute()
+    sep = [r for r in data["rows"] if r["seg"] and r["vatBx"] == "gross" and r["vatBuyer"] == "noreq"]
+    assert sep and data["fx"]["nVatNoreqSep"] == len(sep)
+
+
+def test_портал_на_деньги_считается():
+    f = _compute()["fx"]
+    assert set(f["calls"]) == {"hist", "req"}
+
+
+# ── курсы ЦБ: время, обрыв связи, частичный сбой ──────────────────────────────
+
+def _mirror_ok(url):
+    import json
+    if "archive" not in url:
+        return 200, json.dumps({"Date": "2026-10-19T11:30:00+03:00", "Valute": {"EUR": {
+            "CharCode": "EUR", "Nominal": 1, "Value": 100.0}}}).encode()
+    y, m, dd = (int(x) for x in url.split("/archive/")[1].split("/")[:3])
+    day = D(y, m, dd)
+    if day.weekday() >= 5:
+        return 404, b""
+    return 200, json.dumps({"Date": day.isoformat() + "T11:30:00+03:00", "Valute": {
+        "EUR": {"CharCode": "EUR", "Nominal": 1, "Value": 100.0},
+        "USD": {"CharCode": "USD", "Nominal": 1, "Value": 90.0}}}).encode()
+
+
+def test_время_на_курсы_ограничено():
+    """cbr.ru молчит, зеркало медленное: курсы — пока есть время, недочитанное — счётом, а
+    не 35 минут до снятия сборки."""
+    import requests
+    t = {"now": 0.0}
+
+    def нет(url):
+        t["now"] += 20.0                                 # тайм-аут соединения
+        raise requests.ConnectTimeout("cbr.ru")
+
+    def зеркало(url):
+        t["now"] += 30.0                                 # медленный ответ
+        return _mirror_ok(url)
+    days = [D(2026, 10, 5) + dt.timedelta(days=i) for i in range(10)]
+    k, info = fx.load_cbr({"USD"}, days, today=D(2026, 10, 19), fetch=нет, mirror_fetch=зеркало,
+                          mirror_pause=0, budget_s=150, clock=lambda: t["now"])
+    assert info["timeUp"] and info["mirror"]["обрезано"] > 0
+    assert t["now"] <= 150 + 30 + 1e-9, "после бюджета новых запросов нет"
+    assert k is not None and k.value("EUR", D(2026, 10, 19)) == 100.0, "прочитанное не теряется"
+
+
+def test_обрыв_связи_с_cbr_ru_сразу_на_зеркало():
+    import requests
+    calls = []
+
+    def fetch(url):
+        calls.append(url)
+        if "XML_valFull" in url:
+            return fixture.ct_cbr_fetch(url)
+        raise requests.ReadTimeout("cbr.ru")
+    k, info = fx.load_cbr({"USD", "CNY"}, [D(2026, 10, 14)], today=D(2026, 10, 19), fetch=fetch,
+                          mirror_fetch=_mirror_ok, mirror_pause=0)
+    assert len(calls) == 2, "после первого тайм-аута прочие ряды не ждут"
+    assert info["src"] == "mirror" and info["why"] == "ReadTimeout"
+    assert k.cross("USD", "EUR", D(2026, 10, 14)) == pytest.approx(100.0 / 90.0)
+
+
+def _fetch_without(code: str):
+    sid = fixture.CT_CBR[code][0]
+
+    def fetch(url):
+        if f"VAL_NM_RQ={sid}" in url:
+            raise ValueError("пустой ответ")
+        return fixture.ct_cbr_fetch(url)
+    return fetch
+
+
+def test_ряд_одной_валюты_добирается_с_зеркала():
+    k, info = fx.load_cbr({"USD"}, [D(2026, 10, 14)], today=D(2026, 10, 19), fetch=_fetch_without("USD"),
+                          mirror_fetch=_mirror_ok, mirror_pause=0)
+    assert info["src"] == "cbr" and info["patched"] == ["USD"] and info["failed"] == []
+    eur = fixture.ct_cbr_value("EUR", D(2026, 10, 14))
+    assert k.cross("USD", "EUR", D(2026, 10, 14)) == pytest.approx(eur / 90.0), "евро — cbr.ru, доллар — зеркало"
+
+
+def test_ряд_валюты_не_получен_курс_битрикса_с_плашкой():
+    stub = fixture.ContractsStub()
+    usd = [stub.deals[i]["ID"] for i in (0, 3)]
+    for i in (0, 3):
+        stub.deals[i]["CURRENCY_ID"] = "USD"
+    stub.deals[7]["CURRENCY_ID"] = "CNY"                 # у Битрикса заглушки юаня нет
+
+    def зеркало_нет(url):
+        return 404, b""
+    fetch = _fetch_without("USD")
+
+    def fetch2(url):
+        if f"VAL_NM_RQ={fixture.CT_CBR['CNY'][0]}" in url:
+            raise ValueError("пустой ответ")
+        return fetch(url)
+    data = _compute(stub, fx_loader=lambda c, d, t: fx.load_cbr(c, d, today=t, fetch=fetch2,
+                                                                 mirror_fetch=зеркало_нет, mirror_pause=0))
+    f = data["fx"]
+    assert f["src"] == "cbr" and f["partial"]["codes"] == ["CNY", "USD"] and f["partial"]["bx"] == ["USD"]
+    for did in usd:
+        r = _row(data, did)
+        assert r["rateSrc"] == "bitrix" and r["saleKnown"] and r["saleEur"] == round(
+            float(next(x for x in stub.deals if x["ID"] == did)["OPPORTUNITY"]) * 0.9 / r["vatK"])
+    r = _row(data, stub.deals[7]["ID"])
+    assert r["saleKnown"] is False and r["fxWhy"] == "series", "не «курса нет у ЦБ на дату»"
+    assert f["partial"]["n"] >= 2 and f["partial"]["lost"] >= 1
+    assert _row(data, stub.deals[1]["ID"])["rateSrc"] == "cbr"
+
+
+def test_зеркало_сбой_даты_не_теряет_прочие():
+    def get(url):
+        if "/2026/10/14/" in url:
+            return 500, b""
+        return _mirror_ok(url)
+    import base.fx as fxm
+    old = fxm.MIRROR_RETRY_WAIT
+    fxm.MIRROR_RETRY_WAIT = ()
+    try:
+        ряды, стат = fx.cbr_mirror_series({D(2026, 10, 14), D(2026, 10, 15)}, {"EUR"}, pause=0, fetch=get,
+                                          on_error="skip")
+        with pytest.raises(ConnectionError):
+            fx.cbr_mirror_series({D(2026, 10, 14)}, {"EUR"}, pause=0, fetch=get)   # зонд — как прежде
+    finally:
+        fxm.MIRROR_RETRY_WAIT = old
+    assert стат["ошибок"] == 1 and ряды["EUR"] == [(D(2026, 10, 15), 100.0)]
+
+
+def test_журнал_частичного_сбоя_и_доход_подпись(capsys):
+    import kaminc
+    import main
+    stub = fixture.ContractsStub()
+    stub.deals[0]["CURRENCY_ID"] = "USD"
+    data = _compute(stub, fx_loader=lambda c, d, t: fx.load_cbr(
+        c, d, today=t, fetch=_fetch_without("USD"), mirror_fetch=lambda u: (404, b""), mirror_pause=0))
+    main._print_fx(data["fx"])
+    out = capsys.readouterr().out
+    assert "::warning::ряд ЦБ не получен: USD — сделок по курсу Битрикса 1" in out
+    assert "портал на деньги:" in out and "€" not in out
+    assert kaminc._fx_lbl(data["fx"]).startswith("продажа и закупка — по курсам сверенного файла")
+    assert kaminc._fx_lbl(_compute(fx_loader=None)["fx"]).startswith("курсы Битрикса")

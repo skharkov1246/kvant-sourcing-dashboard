@@ -578,13 +578,15 @@ class ContractsStub:
         return m
 
     def call_envelope(self, method, params=None, **kw):
-        """crm.stagehistory.list для истории входов в стадию предложения (contracts → зонд v59)."""
+        """crm.stagehistory.list для дат КП (contracts → зонд v59): ВСЕ входы — в стадии
+        предложения (offer_hist) и в кат. 0 (hist[2], без отсечки HIST_SINCE)."""
         assert method == "crm.stagehistory.list"
         f = (params or {}).get("filter") or {}
         own = {str(x) for x in f.get("OWNER_ID") or []}
         st = set(f.get("STAGE_ID") or [])
         items = [{"ID": str(k), "OWNER_ID": o, "STAGE_ID": s_, "CREATED_TIME": ts}
-                 for k, (o, s_, ts) in enumerate(self.offer_hist) if o in own and (not st or s_ in st)]
+                 for k, (o, s_, ts) in enumerate(self.offer_hist + self.hist[2])
+                 if o in own and (not st or s_ in st)]
         return {"result": {"items": items}, "total": len(items)}
 
     def categories(self):
@@ -605,6 +607,8 @@ class ContractsStub:
     def stage_history(self, entity, *, category_id=None, since=None, last=None):
         out: dict = {}
         for oid, st, ts in self.hist[entity]:
+            if since and str(ts)[:10] < str(since)[:10]:
+                continue                    # как портал: история с отсечкой >=CREATED_TIME
             if last is not None:
                 last[oid] = (st, ts)
             if st not in {s for s, _ in out.get(oid, [])}:

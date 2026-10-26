@@ -246,6 +246,16 @@ def _mblank() -> dict:
             "k3cR": 0.0, "k3rR": 0.0, "k4S": 0.0}
 
 
+def _fx_lbl(fx: dict) -> str:
+    """Подпись курсов вкладки «Доход» (решение владельца 25.10.2026 — ЦБ на дату КП —
+    касается «Суммы» Битрикса, а деньги «Дохода» — из сверенного файла)."""
+    if not fx:
+        return ""
+    if fx.get("src") == "bitrix":
+        return str(fx.get("lbl") or "")
+    return "продажа и закупка — по курсам сверенного файла экономики; ПЗ из книги бюджета — ЦБ РФ на дату книги"
+
+
 def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
             presale: dict | None = None, kamq: dict | None = None, calib: dict | None = None,
             cat_labels: dict[str, str] | None = None, companies: dict[str, str] | None = None,
@@ -638,8 +648,10 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
         "tot": tot,
         "trust": {"n": n_all, "nA": tot["nA"], "nR": tot["nR"], "pct": cover(n_all, tot["nA"]),
                   "reasons": dict(reasons), "fxAsOf": (contracts.get("fx") or {}).get("asOf") or "",
-                  # источник курса «Реализации» (ЦБ на дату КП или курсы Битрикса с плашкой)
-                  "fxLbl": (contracts.get("fx") or {}).get("lbl") or "",
+                  # курсы денег «Дохода»: класс A — продажа и закупка сверенного файла по его же
+                  # курсам; ЦБ «Реализации» здесь только у ПЗ из книги бюджета. ЦБ не получен —
+                  # подпись запасного пути «Реализации» (курсы Битрикса), не молча
+                  "fxLbl": _fx_lbl(contracts.get("fx") or {}),
                   "poLow": po_low, "poMin": round(PO_CONFIRM_MIN * 100),
                   "calibN": int((calib or {}).get("calibN") or 0), "calibOk": int((calib or {}).get("calibN") or 0) >= CALIB_MIN},
         "ladder": [{"m": k, "paid": ladder[k][0], "due": ladder[k][1], "paidA": ladder[k][6], "dueA": ladder[k][7]}

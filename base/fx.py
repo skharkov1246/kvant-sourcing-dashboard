@@ -127,7 +127,7 @@ def _num(s) -> float | None:
         return None
 
 
-def _cbr_get(url: str, timeout: int) -> bytes:
+def _cbr_get(url: str, timeout) -> bytes:
     r = requests.get(url, timeout=timeout)
     r.raise_for_status()
     return r.content
@@ -299,8 +299,8 @@ def parse_cbr_mirror_day(content: bytes) -> tuple[date | None, dict[str, float]]
     return day, out
 
 
-def _mirror_get(url: str, timeout: int) -> tuple[int, bytes]:
-    r = requests.get(url, timeout=timeout)
+def _mirror_get(url: str, timeout, session=None) -> tuple[int, bytes]:
+    r = (session or requests).get(url, timeout=timeout)
     return r.status_code, (r.content if r.status_code == 200 else b"")
 
 
@@ -316,26 +316,31 @@ def cbr_mirror_codes(timeout: int = 30, fetch=None) -> set[str]:
 
 
 def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.25,
-                      timeout: int = 30, fetch=None) -> tuple[dict[str, list[tuple[date, float]]], dict]:
+                      timeout: int = 30, fetch=None, on_error: str = "raise",
+                      deadline=None) -> tuple[dict[str, list[tuple[date, float]]], dict]:
     """Ряды «рублей за ОДНУ единицу» по зеркалу только на нужные даты.
 
     days — нужные даты; codes — ISO-коды. Даты идут от новых к старым: при пределе
     запросов без курса остаются самые старые. → (ряды для CbrRates, учёт {запросов,
-    дат, без курса, обрезано}). Курс записывается под датой самого курса, но не
+    дат, без курса, обрезано, ошибок}). Курс записывается под датой самого курса, но не
     позже запрошенной: так «последняя запись не позже даты» в CbrRates даёт ровно
-    курс на эту дату."""
+    курс на эту дату.
+
+    on_error — «raise» (зонд v59: сбой зеркала — исключение) или «skip» (сборка: дата со
+    сбоем остаётся без курса и считается в «ошибок», прочитанные даты не теряются).
+    deadline — () → True, когда время сборки на курсы вышло: оставшиеся даты — «обрезано»."""
     get = fetch or (lambda u: _mirror_get(u, timeout))
     want = {str(c).upper() for c in codes} - {"RUB"}
     cache: dict[date, tuple[date, dict[str, float]] | None] = {}
     series: dict[str, dict[date, float]] = {c: {} for c in want}
-    stat = {"запросов": 0, "дат": 0, "без курса": 0, "обрезано": 0}
+    stat = {"запросов": 0, "дат": 0, "без курса": 0, "обрезано": 0, "ошибок": 0}
     for day in sorted(set(days), reverse=True):
         stat["дат"] += 1
         found = False
         for k in range(MIRROR_STEP_BACK + 1):
             q = date.fromordinal(day.toordinal() - k)
             if q not in cache:
-                if stat["запросов"] >= max_requests:
+                if stat["запросов"] >= max_requests or (deadline and deadline()):
                     stat["обрезано"] += 1
                     found = None
                     break
@@ -343,20 +348,29 @@ def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.
                     time.sleep(pause)
                 stat["запросов"] += 1
                 url = CBR_MIRROR_DAY.format(y=q.year, m=q.month, d=q.day)
-                status, body = get(url)
-                for wait in MIRROR_RETRY_WAIT:          # 429 и 5xx — подождать, не падать
-                    if status != 429 and status < 500:
-                        break
-                    time.sleep(wait)
-                    stat["запросов"] += 1
+                try:
                     status, body = get(url)
+                    for wait in MIRROR_RETRY_WAIT:      # 429 и 5xx — подождать, не падать
+                        if status != 429 and status < 500:
+                            break
+                        if deadline and deadline():
+                            break
+                        time.sleep(wait)
+                        stat["запросов"] += 1
+                        status, body = get(url)
+                    if status not in (200, 404):
+                        raise ConnectionError(f"зеркало ответило {status}")
+                except Exception:
+                    if on_error != "skip":
+                        raise
+                    stat["ошибок"] += 1                 # дата без курса, прочие даты остаются
+                    found = None
+                    break
                 if status == 200:
                     eff, rates = parse_cbr_mirror_day(body)
                     cache[q] = (min(eff, q) if eff else q, rates) if rates else None
-                elif status == 404:
-                    cache[q] = None
                 else:
-                    raise ConnectionError(f"зеркало ответило {status}")
+                    cache[q] = None
             hit = cache[q]
             if hit:
                 eff, rates = hit
@@ -374,21 +388,43 @@ def cbr_mirror_series(days, codes, *, max_requests: int = 900, pause: float = 0.
 #
 # Порядок: ряды cbr.ru (справочник + один запрос на валюту за весь период) → зеркало
 # на нужные даты (запрос на дату, предел BUILD_MIRROR_MAX) → None: тогда вызывающий
-# берёт курсы Битрикса и говорит об этом плашкой, 1:1 не подставляется. Кеш на прогон —
-# по адресу запроса: вторая вкладка или повторный расчёт в сеть не ходят.
+# берёт курсы Битрикса и говорит об этом плашкой, 1:1 не подставляется. Валюта, ряд
+# которой cbr.ru не отдал (при годном евро), добирается с зеркала на нужные даты; не
+# добралась — остаётся в failed (вызывающий говорит о ней плашкой). Кеш на прогон — по
+# адресу запроса: вторая вкладка или повторный расчёт в сеть не ходят.
+#
+# Время сборки ограничено (deploy.yml: 35 мин на всё): на курсы — BUILD_FX_BUDGET_S. Вышло —
+# недочитанные даты остаются без курса (счёт «обрезано»), прочитанное не теряется; первый
+# обрыв связи с cbr.ru (тайм-аут, отказ соединения) — сразу на зеркало, без ожидания по
+# каждой валюте.
 
 #: запас ряда до самой ранней нужной даты: курс на дату — последняя запись не позже неё
 #: (выходные, праздники); тот же запас, что у зонда v59 (CBR_LEAD_DAYS)
 BUILD_LEAD_DAYS = 30
-#: предел запросов к зеркалу в сборке: при 0,25 с паузы — около 2,5 мин; без курса
-#: остаются самые старые даты (зеркало идёт от новых к старым)
+#: предел запросов к зеркалу в сборке; без курса остаются самые старые даты (зеркало идёт
+#: от новых к старым). Время держит не он, а BUILD_FX_BUDGET_S
 BUILD_MIRROR_MAX = 600
+#: время на курсы в одной сборке, с: cbr.ru (6–8 запросов) укладывается в секунды; зеркало
+#: — запрос на дату, при 0,25 с паузы и ответе за 0,5 с около 320 дат
+BUILD_FX_BUDGET_S = 240.0
+#: тайм-ауты (соединение, чтение), с: cbr.ru отдаёт ряд за секунды, зеркало — день за доли
+CBR_TIMEOUT = (5, 20)
+MIRROR_TIMEOUT = (5, 15)
+#: даты вне [первый курс ЦБ к рублю 1992 г.; сегодня + год] — опечатка поля, а не дата курса:
+#: год «24» дал бы в запросе «dd/mm/24», год 1 — OverflowError и падение на курсы Битрикса
+DAY_MIN = date(1992, 7, 1)
+DAY_MAX_AHEAD = 366
 _RUN_CACHE: dict = {}
+
+
+def day_ok(d: date | None, today: date) -> bool:
+    """Дата годится для курса ЦБ: не раньше DAY_MIN и не дальше года вперёд."""
+    return bool(d) and DAY_MIN <= d <= today + timedelta(days=DAY_MAX_AHEAD)
 
 
 def _cbr_net(url: str) -> bytes:
     """cbr.ru по сети — одна функция на прогон: по ней ключ кеша прогона."""
-    return _cbr_get(url, 60)
+    return _cbr_get(url, CBR_TIMEOUT)
 
 
 def _cached(fetch, url: str):
@@ -398,28 +434,44 @@ def _cached(fetch, url: str):
     return _RUN_CACHE[key]
 
 
+def _merge(series: dict, extra: dict) -> dict:
+    out = {c: list(v) for c, v in series.items()}
+    for c, v in extra.items():
+        out[c] = sorted(set(out.get(c, [])) | set(v))
+    return out
+
+
 def load_cbr(codes, days, *, today: date, fetch=None, mirror_fetch=None,
-             mirror_max: int = BUILD_MIRROR_MAX, mirror_pause: float = 0.25) -> tuple[CbrRates | None, dict]:
+             mirror_max: int = BUILD_MIRROR_MAX, mirror_pause: float = 0.25,
+             budget_s: float = BUILD_FX_BUDGET_S, clock=time.monotonic) -> tuple[CbrRates | None, dict]:
     """Курсы ЦБ на нужные даты для сборки → (CbrRates или None, учёт).
 
     codes — ISO-коды валют сумм (RUB и EUR добавляются сами), days — даты, на которые
-    нужен курс. fetch — адрес → тело ответа cbr.ru (ошибка — исключением); mirror_fetch —
-    адрес → (код ответа, тело) зеркала; по умолчанию — сеть. Учёт: src («cbr», «mirror»,
-    «» — ЦБ недоступен), requests (запросов в сеть, без попаданий в кеш прогона), noCode
-    (валют нет в справочнике ЦБ), failed (ряд не получен), why (тип ошибки), lo/hi —
-    период рядов. В учёте только коды валют и счётчики — журнал публичный."""
+    нужен курс (даты вне day_ok отбрасываются и считаются в badDays). fetch — адрес → тело
+    ответа cbr.ru (ошибка — исключением); mirror_fetch — адрес → (код ответа, тело) зеркала;
+    по умолчанию — сеть. budget_s и clock — время на курсы (тесты подставляют свои часы).
+    Учёт: src («cbr», «mirror», «» — ЦБ недоступен), requests (запросов в сеть, без попаданий
+    в кеш прогона), noCode (валют нет в справочнике ЦБ), failed (ряд не получен ни с cbr.ru,
+    ни с зеркала), patched (ряд cbr.ru не получен, взят с зеркала), why (тип ошибки), lo/hi —
+    период рядов, timeUp — время вышло. В учёте только коды валют и счётчики — журнал
+    публичный."""
     real = fetch or _cbr_net
     calls = {"n": 0}
+    t0 = clock()
+
+    def time_up() -> bool:
+        return clock() - t0 >= budget_s
 
     def get(url):
         if (real, url) not in _RUN_CACHE:
             calls["n"] += 1
         return _cached(real, url)
 
-    want = sorted({str(c).upper() for c in codes if c} | {"EUR"} - {"RUB"})
-    ds = sorted({d for d in days if d})
-    info: dict = {"src": "", "requests": 0, "noCode": [], "failed": [], "why": "", "lo": None, "hi": today,
-                  "mirror": None}
+    want = sorted(({str(c).upper() for c in codes if c} | {"EUR"}) - {"RUB"})
+    ds_all = {d for d in days if d}
+    ds = sorted(d for d in ds_all if day_ok(d, today))
+    info: dict = {"src": "", "requests": 0, "noCode": [], "failed": [], "patched": [], "why": "", "lo": None,
+                  "hi": today, "mirror": None, "badDays": len(ds_all) - len(ds), "timeUp": False}
     if not ds:
         ds = [today]
     d1 = min(ds) - timedelta(days=BUILD_LEAD_DAYS)
@@ -427,13 +479,22 @@ def load_cbr(codes, days, *, today: date, fetch=None, mirror_fetch=None,
     series: dict[str, list[tuple[date, float]]] = {}
     try:
         sids = cbr_codes(fetch=get)
-        for c in want:
+        for n, c in enumerate(want):
             sid = sids.get(c)
             if not sid:
                 info["noCode"].append(c)
                 continue
+            if time_up():
+                info["timeUp"] = True
+                info["failed"] += [x for x in want[n:] if sids.get(x)]
+                break
             try:
                 rows = cbr_series(sid, d1, today, fetch=get)
+            except (requests.Timeout, requests.ConnectionError, ConnectionError) as e:
+                # связь с cbr.ru оборвалась — прочие валюты не ждут по тайм-ауту каждая
+                info["why"] = info["why"] or type(e).__name__
+                info["failed"] += [x for x in want[n:] if sids.get(x)]
+                break
             except Exception as e:  # noqa: BLE001 — одна валюта без ряда, прочие считаются
                 info["failed"].append(c)
                 info["why"] = info["why"] or type(e).__name__
@@ -443,26 +504,52 @@ def load_cbr(codes, days, *, today: date, fetch=None, mirror_fetch=None,
             else:
                 info["failed"].append(c)
     except Exception as e:  # noqa: BLE001 — справочник не получен: идём на зеркало
-        info["why"] = type(e).__name__
-    info["requests"] = calls["n"]
-    if series.get("EUR"):
-        info["src"] = "cbr"
-        return CbrRates(series), info
-    # cbr.ru не дал ряда к евро — зеркало на нужные даты и сегодня
-    mget = mirror_fetch or (lambda u: _mirror_get(u, 30))
-    try:
-        cbr_mirror_codes(fetch=mget)
-        mser, stat = cbr_mirror_series(set(ds) | {today}, set(want), max_requests=mirror_max,
-                                       pause=mirror_pause, fetch=mget)
-        info["requests"] += 1 + stat["запросов"]
-        info["mirror"] = stat
-    except Exception as e:  # noqa: BLE001 — зеркало тоже недоступно: курсов ЦБ нет
-        info["requests"] += 1
         info["why"] = info["why"] or type(e).__name__
-        info["mirrorWhy"] = type(e).__name__
-        return None, info
-    if not mser.get("EUR"):
-        return None, info
-    info["src"] = "mirror"
-    info["noCode"] = sorted(c for c in want if c not in mser)
-    return CbrRates(mser), info
+    info["requests"] = calls["n"]
+    sess = requests.Session() if mirror_fetch is None else None
+    mget = mirror_fetch or (lambda u: _mirror_get(u, MIRROR_TIMEOUT, sess))
+    try:
+        if series.get("EUR"):
+            info["src"] = "cbr"
+            miss = [c for c in info["failed"] if c != "EUR"]
+            if miss and not time_up():
+                # ряд одной валюты не получен — её курс на нужные даты с зеркала, остальное с cbr.ru
+                try:
+                    mser, stat = cbr_mirror_series(set(ds), set(miss), max_requests=mirror_max,
+                                                   pause=mirror_pause, fetch=mget, on_error="skip",
+                                                   deadline=time_up)
+                    info["requests"] += stat["запросов"]
+                    info["mirror"] = stat
+                    info["patched"] = sorted(c for c in miss if mser.get(c))
+                    series = _merge(series, {c: mser[c] for c in info["patched"]})
+                    info["failed"] = sorted(set(info["failed"]) - set(info["patched"]))
+                except Exception as e:  # noqa: BLE001 — зеркало не помогло: валюта остаётся в failed
+                    info["mirrorWhy"] = type(e).__name__
+            info["timeUp"] = info["timeUp"] or time_up()
+            return CbrRates(series), info
+        # cbr.ru не дал ряда к евро — зеркало на нужные даты и сегодня
+        if time_up():
+            info["timeUp"] = True
+            info["why"] = info["why"] or "время вышло"
+            return None, info
+        try:
+            cbr_mirror_codes(fetch=mget)
+            mser, stat = cbr_mirror_series(set(ds) | {today}, set(want), max_requests=mirror_max,
+                                           pause=mirror_pause, fetch=mget, on_error="skip", deadline=time_up)
+            info["requests"] += 1 + stat["запросов"]
+            info["mirror"] = stat
+        except Exception as e:  # noqa: BLE001 — зеркало тоже недоступно: курсов ЦБ нет
+            info["requests"] += 1
+            info["why"] = info["why"] or type(e).__name__
+            info["mirrorWhy"] = type(e).__name__
+            return None, info
+        info["timeUp"] = info["timeUp"] or time_up()
+        if not mser.get("EUR"):
+            return None, info
+        info["src"] = "mirror"
+        info["noCode"] = sorted(c for c in want if c not in mser)
+        info["failed"] = []
+        return CbrRates(mser), info
+    finally:
+        if sess is not None:
+            sess.close()
