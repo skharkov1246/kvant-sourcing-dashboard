@@ -30,7 +30,7 @@ export const TABS = [
   // КАМы и продукт-оунеры живут подменю внутри «Коммерсантов» — у ролей один
   // начальник, и разрез читается в одном месте. Поэтому вкладка просит и состав
   // ролей, и направления по клиентам, и продуктовые линии.
-  { id: "reps",      title: "КАМ и продукт-оунеры",pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"],
+  { id: "reps",      title: "Key-аккаунты и продукты", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT", "KAMINC_HEAD", "KAMINC"],
     note: "внутри обе роли: КАМы и продукт-оунеры — выдача открывает оба разреза" },
   { id: "contracts", title: "Реализация",        pay: ["CONTRACTS", "DEALCTX"], share: "suppliers" },
   { id: "suppliers", title: "Поставщики",        pay: ["CONTRACTS"], share: "contracts" },
@@ -40,9 +40,10 @@ export const TABS = [
 export const TAB_IDS = TABS.map((t) => t.id);
 // DEALCTX — закрытая часть «Реализации»: на проде её оставляет право «договоры и
 // деньги» (access/acl.js, RIGHT_PAYLOADS); тонких прав в контуре нет — только админу
-const ADMIN_PAYLOADS = new Set(["DEALCTX"]);
+// KAMINC — деньги «Дохода» вкладки «Key-аккаунты и продукты»: право «Деньги КАМов», здесь — админу
+const ADMIN_PAYLOADS = new Set(["DEALCTX", "KAMINC"]);
 const ALL_PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR",
-  "DEALCTX"];
+  "DEALCTX", "KAMINC_HEAD", "KAMINC"];
 const TITLE = Object.fromEntries(TABS.map((t) => [t.id, t.title]));
 
 const SESSION_DAYS = 30;       // срок сессионной куки

@@ -28,6 +28,7 @@ import dashboard
 import dealctx as dealctx_mod
 import insights as insights_mod
 import kam as kam_mod
+import kaminc as kaminc_mod
 import kamqueue as kamqueue_mod
 import contracts as contracts_mod
 import metrics as metrics_mod
@@ -712,6 +713,7 @@ def run(args) -> int:
     company_data = kam_data = eng_data = prod_data = reps_data = people_data = None
     deals_ytd = orders_ytd = orders_all = deal_owner = deal_sale = None
     _rate = {}            # курсы Битрикса к базе €; пусто — если общий пул не собрался
+    _pool_companies: dict[str, str] = {}   # названия компаний сделок пула — и для дохода (kaminc)
     # --- общий пул сделок/заказов YTD (нужен Пульсу + отраслевым вкладкам) ---
     try:
         print("• Общий пул сделок/заказов (YTD)…")
@@ -720,7 +722,7 @@ def run(args) -> int:
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
             select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID",
                     "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID", "MOVED_TIME", "LAST_ACTIVITY_TIME"]
-                   + people_mod.DEAL_FIELDS)
+                   + people_mod.DEAL_FIELDS + people_mod.INCOME_FIELDS)
         # заказы СП-172 тянем ОДИН раз с 2025 и со сроком клиенту: тот же список нужен
         # и вкладкам ролей (просрочка), и «Коммерсантам». Раньше каждая вкладка ходила
         # за ними отдельно — три выгрузки одного и того же на каждую сборку.
@@ -758,6 +760,7 @@ def run(args) -> int:
         # КАМ — по КЛИЕНТУ (холдингу), не по отделу: компания сделки → направление
         _comp_ids = {str(d.get("COMPANY_ID")) for d in deals_ytd if d.get("COMPANY_ID") and str(d.get("COMPANY_ID")) != "0"}
         _cnames = client.companies_by_ids(_comp_ids)
+        _pool_companies = _cnames
         deal_group = {str(d["ID"]): kam_mod.client_dir(_cnames.get(str(d.get("COMPANY_ID")), "")) for d in deals_ytd}
         print(f"  клиентских направлений КАМ: {len(set(deal_group.values()))}")
         print(f"  общий пул собран за {time.time() - _t:.0f} с")
@@ -945,6 +948,41 @@ def run(args) -> int:
     except Exception as e:
         print(f"  премии: вкладка пропущена — {type(e).__name__}")   # только класс ошибки: журнал публичный
 
+    # Доход КАМов и продуктов (kaminc.py, решения владельца 25.10.2026): после «Реализации»,
+    # пресейла, очереди КАМа и премий (поправка результата — из их калибровки). Деньги —
+    # отдельным массивом, его воркер оставляет только праву «Деньги КАМов».
+    kaminc_data = None
+    if contracts_data is not None:
+        try:
+            print("• Доход КАМов и продуктов…")
+            _comp = dict(_pool_companies)
+            _need = {str(d.get("comp")) for d in list((people_data or {}).get("deals") or [])
+                     + list((people_data or {}).get("inSrc") or [])
+                     if d.get("state") != "real" and str(d.get("comp") or "") not in ("", "0")} - set(_comp)
+            if _need:
+                _comp.update(client.companies_by_ids(_need))
+            kaminc_data = kaminc_mod.compute(
+                contracts_data, people_data, today=p.end, presale=m.get("presale"),
+                kamq=(people_data or {}).get("kamQueue"), calib=(premia_data or {}).get("params"),
+                cat_labels=(_presale_in or {}).get("cat_labels"), companies=_comp, roster=roster)
+            if kaminc_data:
+                _kt, _kh = kaminc_data["head"]["tot"], kaminc_data["head"]
+                # только счётчики и доли (правило 17): ни сумм, ни имён, ни номеров сделок
+                print(f"  доход: выигранных сделок {_kt['n']} (сверены файлом {_kt['nA']}, с результатом "
+                      f"{_kt['nR']}); получено в квартале {_kt['k1']} (платёжкой {_kt['k1po']}), оплачено "
+                      f"раньше {_kt['k1old']}; к получению {_kt['due']} (без даты {_kt['dueB']['none']}, срок "
+                      f"прошёл {_kt['dueB']['overdue']}); задержано клиентом {_kt['k3c']}, срок под риском "
+                      f"{_kt['k3r']}; выигрышей квартала {_kt['k4']}; пайплайн {_kt['pipe']}, тихих потерь "
+                      f"{_kt['quiet']}; оплачено по платёжке без стадии {_kt['k1pf']}, закрыто в квартале {_kt['k1cl']}; "
+                      f"компаний дочитано {len(_need)}; сверка денег "
+                      + ("сошлась" if _kh["money"]["ok"] else "НЕ сошлась — деньги не публикуются: "
+                         + ", ".join(_kh["money"]["fail"])))
+        except Exception as e:                               # noqa: BLE001
+            print(f"  ⚠ доход КАМов пропущен: {type(e).__name__}")   # только класс ошибки: журнал публичный
+    # раздел pay и отсрочка оплаты payDays «Реализации» — только вход дохода: в страницу и
+    # сверку не идут (условие оплаты клиента — под именным правом, решение Р-4)
+    kaminc_mod.strip_inputs(contracts_data)
+
     advisor_data = None
     if deals_ytd is not None:
         try:
@@ -966,6 +1004,7 @@ def run(args) -> int:
             "company": company_data, "kam": kam_data, "eng": eng_data, "prod": prod_data,
             "contracts": contracts_data, "reps": reps_data, "advisor": advisor_data,
             "people": people_data, "premia": premia_data, "dealctx": dealctx_data,
+            "kaminc": kaminc_data,
             "_portal": client.snapshot_stats(),
         }, ensure_ascii=False, default=str), encoding="utf-8")
         print(f"  ✓ вкладки для сверки: {args.data_json}")
@@ -975,7 +1014,7 @@ def run(args) -> int:
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
                     company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
                     contracts=contracts_data, reps=reps_data, advisor=advisor_data, people=people_data,
-                    premia=premia_data, dealctx=dealctx_data)
+                    premia=premia_data, dealctx=dealctx_data, kaminc=kaminc_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:

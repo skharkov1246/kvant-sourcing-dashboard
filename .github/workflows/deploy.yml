@@ -44,6 +44,8 @@ on:
       - "dealctx.py"            # чаты и договоры во вкладке «Реализация» (23.10.2026)
       - "contract_b2b.py"       # тексты флагов сверки договоров — их читает dealctx.py
       - "kamqueue.py"
+      - "kaminc.py"
+      - "history.py"
       - "chat_scan.py"          # шаг «Закрытая часть снимка чатов» запускает его при сборке
       - "requirements.txt"
       - "templates/**"          # вёрстка дашборда

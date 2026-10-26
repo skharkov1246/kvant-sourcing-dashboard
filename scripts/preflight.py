@@ -44,6 +44,7 @@ m["presale"] = fixture.build_presale()     # блок пресейла с кор
 dashboard.write(m, {"source": "rules", "items": []},
                 "smoke/index.html", people=fixture.build_people(),
                 reps=fixture.build_reps(), advisor=fixture.build_advisor(),
+                kaminc=fixture.build_kaminc(),     # «Доход» вкладки «Key-аккаунты и продукты»
                 **fixture.build_realization())     # «Реализация» со сводом чатов и договоров
 """
 BOT_FILES = ("data/chat_snapshot.json", "data/budget_snapshot.json", "gt/data/bitrix_gt.json")

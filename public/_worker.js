@@ -75,7 +75,10 @@ const TABS = [
   // (у ролей один начальник). Поэтому «Коммерсанты» читают и состав ролей (PEOPLE),
   // и направления по клиентам (KAM), и продуктовые линии (PRODUCT).
   { id: "eng", name: "Инжиниринг", pay: ["ENG"] },
-  { id: "reps", name: "КАМ и продукт-оунеры", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"] },
+  // «Key-аккаунты и продукты» (имя вкладки — решение владельца 25.10.2026; id прежний,
+  // выданные права не меняются). KAMINC_HEAD — счёт, даты и действия «Дохода» всем, у кого
+  // вкладка; KAMINC — деньги «Дохода»: кроме вкладки нужно право (RIGHT_PAYLOADS)
+  { id: "reps", name: "Key-аккаунты и продукты", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT", "KAMINC_HEAD", "KAMINC"] },
   // DEALCTX — закрытая часть «Реализации»: кроме вкладки нужно право (RIGHT_PAYLOADS)
   { id: "contracts", name: "Реализация", pay: ["CONTRACTS", "DEALCTX"] },
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
@@ -102,17 +105,23 @@ const RIGHTS = [
     note: "условия оплаты, отсрочка, лимиты, суммы закупок; в «Реализации» — оценки чатов и договоры по сделкам. Выдаётся поимённо" },
   { id: "suppliers_edit", def: false, name: "Поставщики: правка",
     note: "слияние и разделение сущностей, решения в очереди проверки" },
+  // деньги «Дохода» вкладки «Key-аккаунты и продукты» (решение владельца 25.10.2026): продажа,
+  // результат по нормативу и часть по положению — владельцу и руководителям; до серверного
+  // фильтра «только своё» (этап 2) людям не выдаётся. По умолчанию — никому
+  { id: "kam_money", def: false, name: "Деньги КАМов",
+    note: "«Доход» вкладки «Key-аккаунты и продукты»: продажа, результат по нормативу, часть по положению. Выдаётся поимённо" },
 ];
 const RIGHT_IDS = RIGHTS.map((r) => r.id);
 const DEFAULT_RIGHTS = RIGHTS.filter((r) => r.def).map((r) => r.id);
 
 const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR",
-  "DEALCTX"];
+  "DEALCTX", "KAMINC_HEAD", "KAMINC"];
 // Массивы, которым мало вкладки: остаются в странице только у админа и у того, кому
 // выдано право. DEALCTX — оценки чатов и разбор договоров по сделкам «Реализации»
 // (dealctx.py): условия договоров — только праву «Поставщики: договоры и деньги»
 // (решение владельца 19.10.2026). Без права вкладка показывает только числа плиток.
-const RIGHT_PAYLOADS = { DEALCTX: "suppliers_fin" };
+// KAMINC — деньги «Дохода» (kaminc.py): только праву «Деньги КАМов» (решение владельца 25.10.2026).
+const RIGHT_PAYLOADS = { DEALCTX: "suppliers_fin", KAMINC: "kam_money" };
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
 const DEFAULT_TABS = TABS.filter((t) => t.def !== false).map((t) => t.id);
@@ -2004,8 +2013,11 @@ function adminPage(acl, me, env, seen, notify) {
   // карточки ролей
   const roleCards = roleIds.map((id) => {
     const r = acl.roles[id];
-    const chk = (arr, list, kind) => list.map((x) =>
-      `<label class="chk"><input type="checkbox" data-role="${ESC(id)}" data-kind="${kind}" value="${ESC(x.id)}"${arr.includes(x.id) ? " checked" : ""}><span>${ESC(x.name)}</span></label>`).join("");
+    // off(x) — почему галочку этой роли поставить нельзя (пусто — можно)
+    const chk = (arr, list, kind, off) => list.map((x) => {
+      const why = off ? off(x) : "";
+      return `<label class="chk"${why ? ` title="${ESC(why)}"` : ""}><input type="checkbox" data-role="${ESC(id)}" data-kind="${kind}" value="${ESC(x.id)}"${arr.includes(x.id) ? " checked" : ""}${why ? " disabled" : ""}><span>${ESC(x.name)}</span></label>`;
+    }).join("");
     // сайты — теми же разделами, что на портале: спецпроекты выдаются одним блоком
     const siteChk = (arr) => GROUPS.map((g) => {
       const own = SITES.filter((x) => x.group === g.id);
@@ -2018,8 +2030,8 @@ function adminPage(acl, me, env, seen, notify) {
         <span class="dim">${users.filter(([, u]) => u.role === id).length} чел.</span></div>
       <div class="grp"><div class="gt">Сайты</div>${siteChk(r.sites)}</div>
       <div class="grp"><div class="gt">Вкладки дашборда</div><div class="chks">${chk(r.tabs, TABS, "tab")}</div></div>
-      <div class="grp"><div class="gt">Раздел «Поставщики»</div><div class="chks">${chk(r.rights || [], RIGHTS, "right")}</div>
-        <div class="note">Контакты, договоры и правка не выдаются роли — только человеку поимённо.</div></div>
+      <div class="grp"><div class="gt">Тонкие права: «Поставщики» и деньги КАМов</div><div class="chks">${chk(r.rights || [], RIGHTS, "right", (x) => (x.id === "kam_money" && !kamMoneyRoleOk(id, r) ? KAM_MONEY_ROLE_NOTE : ""))}</div>
+        <div class="note">Контакты, договоры, деньги КАМов и правка не выдаются роли — только человеку поимённо.</div></div>
     </div>`;
   }).join("");
 
@@ -2119,7 +2131,7 @@ ${noStore ? `<div class="card warn"><b>Учёт входов не ведётся
   <h3 id="dt"></h3><div class="dim" id="dr"></div>
   <div class="grp"><div class="gt">Дополнительно к роли — сайты</div><div class="chks" id="ds"></div></div>
   <div class="grp"><div class="gt">Дополнительно к роли — вкладки</div><div class="chks" id="dtb"></div></div>
-  <div class="grp"><div class="gt">Дополнительно к роли — раздел «Поставщики»</div><div class="chks" id="drt"></div>
+  <div class="grp"><div class="gt">Дополнительно к роли — тонкие права: «Поставщики» и «Деньги КАМов»</div><div class="chks" id="drt"></div>
     <div class="note">Контакты и деньги выдаются здесь, поимённо: в роли их нет ни у кого.</div></div>
   <div class="grp"><div class="gt">Заметка</div><input type="text" id="dn" style="width:100%" maxlength="200" placeholder="например: подрядчик, до конца проекта"></div>
   <div class="row"><button class="go" id="dsave">Сохранить</button><button class="go gh" id="dcancel">Отмена</button>
@@ -2230,6 +2242,15 @@ ${style}</style></head><body>${body}<script>${script}</script></body></html>`,
 }
 
 // приём правок из админки
+// «Деньги КАМов» роли — только админской и «Руководителю» (решение владельца 25.10.2026:
+// всё — владельцу и руководителям). Пока нет серверного фильтра «только своё» (этап 2),
+// это право у роли «КАМ» показало бы каждому КАМу чужие результат и часть по положению;
+// людям оно выдаётся поимённо
+const KAM_MONEY_ROLE_NOTE = "«Деньги КАМов» роли — только руководителю: до фильтра «только своё» (этап 2) право у роли показало бы каждому её человеку чужие деньги; человеку — поимённо";
+function kamMoneyRoleOk(id, role) {
+  return !!(role && role.admin) || id === "head";
+}
+
 async function adminApi(request, env, acl) {
   const json = (o, s = 200) => new Response(JSON.stringify(o),
     { status: s, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
@@ -2280,9 +2301,12 @@ async function adminApi(request, env, acl) {
     u.note = String(b.note || "").slice(0, 200);
   } else if (b.op === "role_rights") {
     if (!acl.roles[b.role]) return json({ ok: false, error: "no_role" }, 400);
+    const rights = pick(b.rights, RIGHT_IDS);
+    if (rights.includes("kam_money") && !kamMoneyRoleOk(b.role, acl.roles[b.role]))
+      return json({ ok: false, error: "kam_money_role", note: KAM_MONEY_ROLE_NOTE }, 400);
     acl.roles[b.role].sites = pick(b.sites, SITE_IDS);
     acl.roles[b.role].tabs = pick(b.tabs, TAB_IDS);
-    acl.roles[b.role].rights = pick(b.rights, RIGHT_IDS);
+    acl.roles[b.role].rights = rights;
   } else if (b.op === "default_role") {
     if (!acl.roles[b.role]) return json({ ok: false, error: "no_role" }, 400);
     acl.defaultRole = b.role;

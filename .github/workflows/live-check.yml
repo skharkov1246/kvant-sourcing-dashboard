@@ -47,6 +47,8 @@ on:
       - dealctx.py
       - contract_b2b.py
       - kamqueue.py
+      - kaminc.py
+      - history.py
       - scripts/live_check.py
       - .github/workflows/live-check.yml
   workflow_dispatch:

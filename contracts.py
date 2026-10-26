@@ -74,6 +74,11 @@ SUP_PAID = "ufCrm20_1755759056275"      # «Оплачено поставщик�
 PROD_CONF = "ufCrm20_1723236426"        # «Production confirmation» — файл
 PROD_CONF_NF = "ufCrm20_1723372033545"  # «Production confirmation, no file» — флажок
 SCHEME_F = "ufCrm20_1724941500"         # «Схема поставки»
+# доход КАМов и продуктов (kaminc.py): дата выигрыша и отсрочка оплаты клиента — поля сделки
+# (зонд v49: «ТКП согласован (конкурс выигран)» заполнено у 96 % открытых сделок реализации,
+# «Количество дней отсрочки платежа» — у 83–84 %)
+WON_F = "UF_CRM_1720337258485"          # «ТКП согласован (конкурс выигран)» — дата выигрыша
+PAY_DAYS_F = "UF_CRM_1727962588"        # «Количество дней отсрочки платежа» клиента
 
 PAID_RX = re.compile(r"оплата\s+получена", re.I)   # стадия «Оплата получена | Закрытие сделки»
 # Отдельные направления (решение владельца 25.10.2026): сложности их сделок известны, ими
@@ -201,6 +206,16 @@ def _pdate(v) -> dt.date | None:
         return dt.date.fromisoformat(s)
     except ValueError:
         return None
+
+
+def _pay_days(v) -> int | None:
+    """«Количество дней отсрочки платежа» → целое ≥ 0; пусто или не число — None
+    (неизвестно — не ноль: без отсрочки срок оплаты считается по PAY_GRACE)."""
+    try:
+        n = int(float(str(v).strip().replace(",", ".")))
+    except (TypeError, ValueError):
+        return None
+    return n if 0 <= n <= 720 else None
 
 
 def _has(v) -> bool:
@@ -354,7 +369,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK,
             BUDGET_LINK,
             # НДС в «Сумме»: сверка с финальной экономикой файла — без НДС (dealctx.econ_ratio)
-            "TAX_VALUE"]
+            "TAX_VALUE", WON_F, PAY_DAYS_F]
     plan_by_seq, plan_by_id, plan_asof = _load_budget_plans()
     rub = rate.get("RUB", 0.0)                 # ₽ → € по курсу Битрикса (суммы бюджетов в ₽)
 
@@ -675,6 +690,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         entered = (str(entered_real)[:10] if entered_real
                    else min((str(o.get("createdTime") or "")[:10] for o in ords if o.get("createdTime")), default=""))
         dtitle = d.get("TITLE") or (ords[0].get("title") if ords else "")
+        # дата выигрыша: «ТКП согласован» → первый вход в воронку реализации → первый заказ
+        # (источник — рядом, правило 16)
+        won_d = _pdate(d.get(WON_F))
+        won_src = "tkp" if won_d else ("cat0" if entered_real else ("order" if entered else ""))
+        won_d = won_d or _pdate(entered)
         rows.append({
             "deal": did, "seq": seq, "entered": entered,
             "customer": clients.get(str(d.get("COMPANY_ID"))) or "—",
@@ -762,6 +782,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "firstLag": first_lag,
             "timeline": timeline, "orders": ords_det,
             "hasSale": bool(d.get("OPPORTUNITY")),
+            "wonAt": won_d.strftime("%d.%m.%Y") if won_d else "", "wonSrc": won_src,
+            "payDays": _pay_days(d.get(PAY_DAYS_F)),
         })
     rows.sort(key=lambda r: -r["seq"])
 

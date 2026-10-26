@@ -67,7 +67,10 @@ const TABS = [
   // (у ролей один начальник). Поэтому «Коммерсанты» читают и состав ролей (PEOPLE),
   // и направления по клиентам (KAM), и продуктовые линии (PRODUCT).
   { id: "eng", name: "Инжиниринг", pay: ["ENG"] },
-  { id: "reps", name: "КАМ и продукт-оунеры", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"] },
+  // «Key-аккаунты и продукты» (имя вкладки — решение владельца 25.10.2026; id прежний,
+  // выданные права не меняются). KAMINC_HEAD — счёт, даты и действия «Дохода» всем, у кого
+  // вкладка; KAMINC — деньги «Дохода»: кроме вкладки нужно право (RIGHT_PAYLOADS)
+  { id: "reps", name: "Key-аккаунты и продукты", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT", "KAMINC_HEAD", "KAMINC"] },
   // DEALCTX — закрытая часть «Реализации»: кроме вкладки нужно право (RIGHT_PAYLOADS)
   { id: "contracts", name: "Реализация", pay: ["CONTRACTS", "DEALCTX"] },
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
@@ -94,17 +97,23 @@ const RIGHTS = [
     note: "условия оплаты, отсрочка, лимиты, суммы закупок; в «Реализации» — оценки чатов и договоры по сделкам. Выдаётся поимённо" },
   { id: "suppliers_edit", def: false, name: "Поставщики: правка",
     note: "слияние и разделение сущностей, решения в очереди проверки" },
+  // деньги «Дохода» вкладки «Key-аккаунты и продукты» (решение владельца 25.10.2026): продажа,
+  // результат по нормативу и часть по положению — владельцу и руководителям; до серверного
+  // фильтра «только своё» (этап 2) людям не выдаётся. По умолчанию — никому
+  { id: "kam_money", def: false, name: "Деньги КАМов",
+    note: "«Доход» вкладки «Key-аккаунты и продукты»: продажа, результат по нормативу, часть по положению. Выдаётся поимённо" },
 ];
 const RIGHT_IDS = RIGHTS.map((r) => r.id);
 const DEFAULT_RIGHTS = RIGHTS.filter((r) => r.def).map((r) => r.id);
 
 const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR",
-  "DEALCTX"];
+  "DEALCTX", "KAMINC_HEAD", "KAMINC"];
 // Массивы, которым мало вкладки: остаются в странице только у админа и у того, кому
 // выдано право. DEALCTX — оценки чатов и разбор договоров по сделкам «Реализации»
 // (dealctx.py): условия договоров — только праву «Поставщики: договоры и деньги»
 // (решение владельца 19.10.2026). Без права вкладка показывает только числа плиток.
-const RIGHT_PAYLOADS = { DEALCTX: "suppliers_fin" };
+// KAMINC — деньги «Дохода» (kaminc.py): только праву «Деньги КАМов» (решение владельца 25.10.2026).
+const RIGHT_PAYLOADS = { DEALCTX: "suppliers_fin", KAMINC: "kam_money" };
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
 const DEFAULT_TABS = TABS.filter((t) => t.def !== false).map((t) => t.id);

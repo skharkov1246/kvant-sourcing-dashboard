@@ -65,12 +65,16 @@ PROD_F = "UF_CRM_1779187425"       # «Product leader» — 10%
 PROD_OLD = "UF_CRM_1776169499"     # «Product leader (заменить на множ)»
 PROD_HEAD = "UF_CRM_1789481932"    # «Руководитель продуктового направления»
 DEAL_FIELDS = [KAM_F, KAM_OLD, PROD_F, PROD_OLD, PROD_HEAD]
+# линия продукт-оунера — «Категория оборудования» (решение владельца 19.10.2026): нужна доходу
+# вкладки (kaminc.py) и у сделок вне пресейла; в ролевые поля (гигиена, reps) не входит
+LINE_F = presale_mod.CAT_F
+INCOME_FIELDS = [LINE_F]
 DL_CUSTOMER = "ufCrm20_1728900218435"   # дедлайн клиенту на заказе СП-172
 DEL_FACT = "ufCrm20_1723236501"         # «Customer delivery date, actual»: доставлен — срок не сорван
 
 DEAL_SELECT = ["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY",
                "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "MOVED_TIME", "LAST_ACTIVITY_TIME",
-               "ASSIGNED_BY_ID", "COMPANY_ID"] + DEAL_FIELDS
+               "ASSIGNED_BY_ID", "COMPANY_ID"] + DEAL_FIELDS + INCOME_FIELDS
 
 # --- роль по ДОЛЖНОСТИ (Bitrix WORK_POSITION): проверяется первой, она точнее отдела
 POS_PROD = re.compile(r"product (owner|manager|leader|director)|head of (compressor|filtration|"
@@ -112,6 +116,20 @@ def _uid(v) -> str:
         v = v[0] if v else None
     s = str(v or "").strip()
     return s if s.isdigit() and s != "0" else ""
+
+
+def _line_ids(v) -> list[str]:
+    """«Категория оборудования» (список, множественный) → id значений строками."""
+    ids = v if isinstance(v, list) else [v]
+    return [str(x).strip() for x in ids if str(x or "").strip() not in ("", "0")]
+
+
+def _income_keys(d: dict, kam_src: str) -> dict:
+    """Поля сделки для дохода вкладки (kaminc.credit): клиент, линия, «Product leader» —
+    только поля «Product leader» (без руководителя направления и владельца) и чем
+    определён КАМ. Атрибуция дохода — одно правило в kaminc.py; здесь только сырьё."""
+    return {"comp": str(d.get("COMPANY_ID") or ""), "line": _line_ids(d.get(LINE_F)),
+            "pl": _uid(d.get(PROD_F)) or _uid(d.get(PROD_OLD)), "kamSrc": kam_src}
 
 
 def _days_since(stamp, today: dt.date) -> int | None:
@@ -607,7 +625,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         if presale_cid and cat == presale_cid:
             _sm = stage_meta.get(str(d.get("STAGE_ID") or "")) or {}
             if presale_mod.ball_of(_sm.get("name", ""), _sm.get("sem", "P")) in presale_mod.SOURCING_BALL:
-                _k, _ = attribute(d, "kam")
+                _k, _ks = attribute(d, "kam")
                 _p, _ = attribute(d, "prod")
                 for _role, _u in (("kam", _k), ("prod", _p)):
                     if _u:
@@ -622,6 +640,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                     "idle": _days_since(d.get("MOVED_TIME") or d.get("LAST_ACTIVITY_TIME"), today),
                     "noAmt": False, "noComp": False, "neg": False, "big": False,
                     "date": str(d.get("DATE_CREATE", ""))[:10], "plan": True,
+                    **_income_keys(d, _ks),
                 })
                 continue
         did = str(d["ID"])
@@ -697,6 +716,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "idle": idle, "late": late_days, "noAmt": no_amt, "noComp": no_comp, "neg": neg,
             "big": big, "date": str(d.get("DATE_CREATE", ""))[:10],
             "plan": cd > today_iso,
+            **_income_keys(d, kam_src),
         })
 
     # --- результат года: создано / выиграно / проиграно (когорта 2026).
@@ -781,7 +801,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         margin = tot["realSumB"] - tot["buy"]
         wl = tot["won"] + tot["lost"]
         winrate = round(tot["won"] / wl * 100) if wl else 0
-        weighted = tot["presaleSum"] * winrate / 100
+        # «Взвешенный пайплайн» (сумма проработки × годовой процент выигрышей роли) снят
+        # 25.10.2026: процент по штукам умножался на деньги, без стадии и срока, с выбросами.
+        # Пайплайн невыигранных — по классу стадии на вкладке «Доход» (kaminc.py)
         n = len([r for r in rows if r["active"]]) or len(rows)
         opens = sorted(r["open"] for r in rows)
         # активные в роли, на кого не записано ни одной сделки
@@ -821,7 +843,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "noBuy": tot["noBuy"],
                 "created": tot["created"], "won": tot["won"], "wonSum": _money(tot["wonSum"]),
                 "lost": tot["lost"], "winRate": winrate,
-                "weighted": _money(weighted), "weightedRaw": round(weighted),
                 "late": tot["late"], "lateSum": _money(tot["lateSum"]),
                 "stale": tot["stale"], "dead": tot["dead"], "noAmt": tot["noAmt"],
                 "noComp": tot["noComp"], "neg": tot["neg"],

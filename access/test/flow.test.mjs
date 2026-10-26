@@ -81,7 +81,7 @@ test("полный цикл: заявка → письмо владельцу �
   const ownerMail = (await outbox("skharkov@gmail.com")).at(-1);
   assert.ok(ownerMail, "письмо владельцу не отправлено");
   assert.match(ownerMail.html, /Реализация/);
-  assert.match(ownerMail.html, /КАМ и продукт-оунеры/);
+  assert.match(ownerMail.html, /Key-аккаунты и продукты/);
   const review = pathOf(linkOf(ownerMail, "/access/review"));
   assert.ok(review, "в письме владельцу нет ссылки подтверждения");
 
@@ -222,6 +222,18 @@ test("applyAcl: пары вкладок делят один массив дан�
   const all = applyAcl(html, TAB_IDS, { email: "own@kvant.ru", admin: true });
   for (const t of TAB_IDS) assert.match(all, new RegExp(`data-tab="${t}"`));
   assert.ok(!all.includes("__kvNoData"), 'при полном доступе пустышка не нужна');
+});
+
+test("applyAcl: деньги «Дохода» и закрытая часть «Реализации» в контуре — только админу", () => {
+  // тонких прав в контуре нет: KAMINC (право «Деньги КАМов») и DEALCTX («договоры и деньги»)
+  // — ADMIN_PAYLOADS; счёт «Дохода» и общий массив «Реализации» — всем с вкладкой
+  const html = ["<body>", 'window.__KAMINC_HEAD__ = ["MOCK-KAMINC_HEAD"];', 'window.__KAMINC__ = ["MOCK-KAMINC"];',
+    'window.__DEALCTX__ = ["MOCK-DEALCTX"];', 'window.__CONTRACTS__ = ["MOCK-CONTRACTS"];', "</body>"].join("\n");
+  const emp = applyAcl(html, ["reps", "contracts"], { email: "a@b.ru", admin: false });
+  assert.ok(emp.includes("MOCK-KAMINC_HEAD") && emp.includes("MOCK-CONTRACTS"));
+  assert.ok(!emp.includes('MOCK-KAMINC"') && !emp.includes("MOCK-DEALCTX"), "закрытые массивы утекли не админу");
+  const adm = applyAcl(html, ["reps", "contracts"], { email: "o@b.ru", admin: true });
+  assert.ok(adm.includes('MOCK-KAMINC"') && adm.includes("MOCK-DEALCTX"));
 });
 
 test("панель «Сорсинг» прячется, если вкладка не выдана", () => {

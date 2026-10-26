@@ -25,7 +25,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DASHBOARD = ROOT / "templates" / "dashboard_core.html"
 FILE_TEMPLATE = ROOT / "templates" / "premia_file.html"
 ROLE = {"ex": "исполнитель", "kam": "КАМ", "po": "продукт-оунер"}
-STATE = {"r": "в реализации", "p": "в проработке"}
+STATE = {"r": "в реализации", "d": "оплачено", "p": "в проработке"}
+BUCKET = {"r": "real", "d": "paid"}       # прочее — «в проработке»
 
 
 def _json_for_script(obj) -> str:
@@ -73,11 +74,11 @@ def people(premia: dict, k: float) -> list[dict]:
         if "big" in d["fl"]:
             continue
         for uid, role, share in d["parts"]:
-            b = by.setdefault(uid, {"uid": uid, "roles": set(), "n": 0, "real": 0.0, "pre": 0.0})
+            b = by.setdefault(uid, {"uid": uid, "roles": set(), "n": 0, "real": 0.0, "paid": 0.0, "pre": 0.0})
             b["roles"].add(role)
             b["n"] += 1
-            b["real" if d["st"] == "r" else "pre"] += d["p1"] * k * share
-    return sorted(by.values(), key=lambda b: -(b["real"] + b["pre"]))
+            b[BUCKET.get(d["st"], "pre")] += d["p1"] * k * share
+    return sorted(by.values(), key=lambda b: -(b["paid"] + b["real"] + b["pre"]))
 
 
 def doc_html(premia: dict, k: float) -> str:
@@ -85,18 +86,20 @@ def doc_html(premia: dict, k: float) -> str:
     P, N, T = premia["params"], premia.get("names") or {}, premia["totals"]
     E = html.escape
     win = (P.get("winRate") or 0) / 100 if P.get("winRate") is not None else None
-    rows_people, sum_real, sum_pre = [], 0.0, 0.0
+    rows_people, sum_real, sum_paid, sum_pre = [], 0.0, 0.0, 0.0
     for i, b in enumerate(people(premia, k), 1):
         sum_real += b["real"]
+        sum_paid += b["paid"]
         sum_pre += b["pre"]
         roles = ", ".join(ROLE[r] for r in ("kam", "po", "ex") if r in b["roles"])
         rows_people.append(
             f"<tr><td class='c'>{i}</td><td>{E(_name(N, b['uid']))}</td><td>{roles}</td>"
-            f"<td class='r'>{b['n']}</td><td class='r'>{_rub(b['real'])}</td>"
+            f"<td class='r'>{b['n']}</td><td class='r'>{_rub(b['paid'])}</td><td class='r'>{_rub(b['real'])}</td>"
             f"<td class='r'>{_rub(b['pre'])}</td>"
             f"<td class='r'>{_rub(b['pre'] * win) if win is not None else '—'}</td></tr>")
     rows_people.append(
-        f"<tr class='tot'><td></td><td>Итого</td><td></td><td></td><td class='r'>{_rub(sum_real)}</td>"
+        f"<tr class='tot'><td></td><td>Итого</td><td></td><td></td><td class='r'>{_rub(sum_paid)}</td>"
+        f"<td class='r'>{_rub(sum_real)}</td>"
         f"<td class='r'>{_rub(sum_pre)}</td><td class='r'>{_rub(sum_pre * win) if win is not None else '—'}</td></tr>")
 
     src = P.get("srcLabel") or {}
@@ -129,6 +132,7 @@ def doc_html(premia: dict, k: float) -> str:
         f"отрицательная, исполнителю ноль. Исполнитель — «Ответственный» сделки, КАМ — поле «КАМ», "
         f"продукт-оунер при КАМе — эксперт (20 % части ЛПР), без КАМа — завёл сделку (80 %); "
         f"новизна и распределение решений между ЗКД, КД и старшим КАМом не учитываются. "
+        f"«Оплачено» — сделки в стадии «Оплата получена | Закрытие сделки»: премия заработана. "
         f"«В реализации» начисляется пропорционально оплате заказчика, «в проработке» — если сделка "
         f"будет выиграна по нынешней сумме"
         + (f", «ожидаемо» — с учётом доли выигрыша {round(win * 100)} %" if win is not None else "")
@@ -162,12 +166,12 @@ table.t {{ width: 100%; border-collapse: collapse; table-layout: fixed; font-siz
 <p>{method}</p>
 <h2>2. Кто сколько получит при К = {_num(k)}, руб. до НДФЛ</h2>
 <table class="t"><thead><tr>
-<th style="width:5%">№</th><th style="width:27%">Сотрудник</th><th style="width:20%">Роли</th>
-<th style="width:8%">Сделок</th><th style="width:13%">В реализации</th><th style="width:14%">В проработке</th>
-<th style="width:13%">Ожидаемо</th></tr></thead><tbody>
+<th style="width:5%">№</th><th style="width:23%">Сотрудник</th><th style="width:16%">Роли</th>
+<th style="width:7%">Сделок</th><th style="width:12%">Оплачено</th><th style="width:12%">В реализации</th>
+<th style="width:13%">В проработке</th><th style="width:12%">Ожидаемо</th></tr></thead><tbody>
 {''.join(rows_people)}
 </tbody></table>
-<h2>3. Сделки, {T['deals']} (в реализации {T['real']}, в проработке {T['presale']}), суммы в руб.</h2>
+<h2>3. Сделки, {T['deals']} (оплачено {T.get('paid', 0)}, в реализации {T['real']}, в проработке {T['presale']}), суммы в руб.</h2>
 <table class="t"><thead><tr>
 <th style="width:7%">№ сделки</th><th style="width:24%">Сделка</th><th style="width:9%">Выручка</th>
 <th style="width:13%">ПЗ, источник</th><th style="width:5%">×ПЗ</th><th style="width:9%">Результат</th>
