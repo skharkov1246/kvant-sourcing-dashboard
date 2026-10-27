@@ -76,6 +76,10 @@ virtual-disks/resources/download?path=vd:<метка>:disk:/<путь внутр
 счёт по (статус, где, вид значения): вид — из закрытого списка econ_template.вид_значения
 (пусто, число, ошибка формулы, текст-валюта:<код>, длина текста корзиной, счёт слов словаря
 шаблона), сам текст ячейки и его слова в журнал не идут — в ячейках бывают имена клиентов.
+У нераспознанной D4 (v5) — признаки листа счётом по файлам (econ_template.зонд_валюты:
+адрес:код валюты, таблицы курсов, подписи итогов, AE, полосы курса итогов) и пути чтения
+счётом: откуда валюта подачи, чем сверен курс, сдвиг шаблона — те же закрытые списки, что
+пишутся в строку базы (sub_cur_src, rate_src, col_shift — правило 16).
 
     python scripts/econ_files.py                     # dry, до 30 сделок
     python scripts/econ_files.py --mode live --limit 30 --parts 10
@@ -94,6 +98,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import warnings
 from collections import Counter
 from pathlib import Path
 
@@ -381,8 +386,15 @@ def строка(run_id: str, сделка: dict, статус: str, file_key: s
             "fx": (и.fx or None) if свер else None, "deal_cur": deal_cur, "bitrix_ratio": ratio,
             "bitrix_note": note, "kp_sale_sub": число(и.kp_sale_sub) if и.rebid else None,
             "why": и.why or None, "tax_empty": not dealctx._num(сделка.get("TAX_VALUE")),
+            # v5 (правило 16 — храни, почему получилось значение): откуда валюта подачи, чем
+            # сверен её курс, на сколько столбцов сдвинут шаблон — закрытые списки шаблона
+            "sub_cur_src": и.sub_src if и.sub_cur and и.sub_src in et.ИСТОЧНИКИ_ВАЛЮТЫ else None,
+            "rate_src": и.rate_src if свер and и.rate_src in et.ИСТОЧНИКИ_КУРСА else None,
+            "col_shift": и.сдвиг if и.сдвиг in (0, *et.СДВИГИ) else None,
             # вид значения там, где не сошлось (econ_template.вид_значения) — только журналу
-            "shape": (и.вид or None) if not свер else None}
+            "shape": (и.вид or None) if not свер else None,
+            # признаки листа у нераспознанной D4 (econ_template.зонд_валюты) — только журналу
+            "probe": (list(и.зонд) or None) if not свер else None}
 
 
 def прочитать_сделку(run_id: str, сделка: dict, диск) -> dict:
@@ -404,7 +416,8 @@ class База:
 
     КОЛОНКИ = ("run_id", "method_ver", "deal_id", "file_key", "status", "sub_cur", "sale_sub", "sale_eur",
                "purchase_eur", "markup", "rebid", "items", "coef_median", "totals_dev", "bad_lines", "fx",
-               "deal_cur", "bitrix_ratio", "bitrix_note", "kp_sale_sub", "why")
+               "deal_cur", "bitrix_ratio", "bitrix_note", "kp_sale_sub", "why", "sub_cur_src", "rate_src",
+               "col_shift")
 
     def __init__(self, dsn: str, схема: str | None = None, только_чтение: bool = False):
         import psycopg2
@@ -543,6 +556,34 @@ def журнал_видов(строки: list[dict]) -> list[str]:
             + [f"  {с} · {г} · {в}: {v}" for (с, г, в), v in sorted(n.items(), key=lambda x: (-x[1], x[0]))])
 
 
+def журнал_зонда(строки: list[dict]) -> list[str]:
+    """Нераспознанная D4 — признаки листа счётом по файлам (econ_template.зонд_валюты: адрес:код,
+    таблицы курсов, подписи итогов, AE, полосы курса итогов). Признак — из адресов шаблона,
+    кодов КОДЫ_ВАЛЮТ и слов закрытого списка; признак у файла считается один раз."""
+    с_зондом = [r for r in строки if r.get("probe")]
+    if not с_зондом:
+        return []
+    n = Counter(п for r in с_зондом for п in dict.fromkeys(r["probe"]))
+    return ([f"D4 без валюты — признаки листа (файлов {len(с_зондом)}; признак: файлов; без текста ячеек и чисел):"]
+            + [f"  {п}: {v}" for п, v in sorted(n.items(), key=lambda x: (-x[1], x[0]))])
+
+
+def журнал_путей(строки: list[dict]) -> str:
+    """Откуда валюта подачи и курс, сдвиг шаблона — счётом (закрытые списки шаблона)."""
+    прочитано = [r for r in строки if r["status"] in et.СТАТУСЫ_ФАЙЛА]
+    свер = [r for r in прочитано if r["status"] == et.СВЕРЕНО]
+
+    def имя(ключ: str, v) -> str:
+        return ("без сдвига" if v == 0 else f"{v:+d}") if ключ == "col_shift" else str(v)
+
+    def счёт(ключ: str, rr: list[dict]) -> str:
+        c = Counter(имя(ключ, r.get(ключ)) for r in rr if r.get(ключ) is not None)
+        return " · ".join(f"{к} {v}" for к, v in sorted(c.items())) or "нет"
+    return (f"пути чтения: валюта подачи — {счёт('sub_cur_src', прочитано)} (у сверенных — "
+            f"{счёт('sub_cur_src', свер)}); курс подачи у сверенных — {счёт('rate_src', свер)}; "
+            f"сдвиг шаблона — {счёт('col_shift', прочитано)} (у сверенных — {счёт('col_shift', свер)})")
+
+
 def гейт_сумм(строки: list[dict]) -> tuple[bool, str]:
     """Разбор берёт не тот столбец или не ту валюту, если у большинства сверенных файлов
     сумма сделки далеко от продажи файла. Сделки без суммы — не довод."""
@@ -647,6 +688,10 @@ def прогон(режим: str, лимит: int, частей: int, *, пор�
         печать("где не сошлось: " + " · ".join(f"{к} {v}" for к, v in где.most_common()))
     for s in журнал_видов(строки):
         печать(s)
+    for s in журнал_зонда(строки):
+        печать(s)
+    if строки:
+        печать(журнал_путей(строки))
     печать("сверенные против «Суммы» сделки: " + (" · ".join(f"{к} {v}" for к, v in сверка_с_суммой(строки).items())
                                                  or "нет сверенных"))
     свер = [r for r in строки if r["status"] == et.СВЕРЕНО]
@@ -696,6 +741,9 @@ def main(argv: list[str] | None = None, **kw) -> int:
     ap.add_argument("--limit", type=int, default=ПРЕДЕЛ_СУТОК)
     ap.add_argument("--parts", type=int, default=ЧАСТИ[0])
     a = ap.parse_args(argv)
+    # предупреждения openpyxl печатают в stderr — публичный журнал — содержимое файла (число с
+    # форматом даты, имя листа); econ_template открывает книги без них, здесь — вторая преграда
+    warnings.filterwarnings("ignore", module="openpyxl")
     if not 1 <= a.limit <= ПРЕДЕЛ_СУТОК:
         print(f"::error::--limit вне 1…{ПРЕДЕЛ_СУТОК} (предел владельца — {ПРЕДЕЛ_СУТОК} файлов в сутки)")
         return 2

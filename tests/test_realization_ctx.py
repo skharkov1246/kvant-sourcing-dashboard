@@ -537,8 +537,11 @@ def test_на_настоящей_базе(conn):
     try:
         общее = {"method_ver": ef.METHOD_VER, "file_key": "f" * 64, "sub_cur": "EUR", "items": 2, "bad_lines": 0,
                  "fx": {"EUR": 1.0}, "deal_cur": "EUR", "bitrix_note": None, "coef_median": 1.4, "totals_dev": 0,
-                 "why": None, "kp_sale_sub": None}
-        эк.записать({**общее, "run_id": "ef-1", "deal_id": 11, "status": "сверено", "sale_sub": 14_000,
+                 "why": None, "kp_sale_sub": None,
+                 # пути чтения v5 (правило 16): валюта подачи из D4, без сдвига; курс сверен —
+                 # только у сверенной строки (econ_file_reads_src_chk)
+                 "sub_cur_src": "D4", "rate_src": None, "col_shift": 0}
+        эк.записать({**общее, "run_id": "ef-1", "deal_id": 11, "status": "сверено", "sale_sub": 14_000, "rate_src": "евро",
                      "sale_eur": 14_000, "purchase_eur": 10_000, "markup": 0.4, "rebid": True, "bitrix_ratio": 1,
                      "kp_sale_sub": 16_000})
         эк.записать({**общее, "run_id": "ef-1", "deal_id": 12, "status": "шаблон другой", "sale_sub": None,
@@ -546,7 +549,7 @@ def test_на_настоящей_базе(conn):
                      "fx": None, "coef_median": None, "totals_dev": None})
         assert эк.отметить_прогон("ef-1") == (2, 1)
         # позже прогон, который упал до гейта: его более новое чтение 11 вкладке не видно
-        эк.записать({**общее, "run_id": "ef-2", "deal_id": 11, "status": "сверено", "sale_sub": 15_000,
+        эк.записать({**общее, "run_id": "ef-2", "deal_id": 11, "status": "сверено", "sale_sub": 15_000, "rate_src": "евро",
                      "sale_eur": 15_000, "purchase_eur": 10_000, "markup": 0.5, "rebid": False, "bitrix_ratio": 1})
     finally:
         эк.закрыть()

@@ -82,6 +82,15 @@ create table if not exists econ_file_reads (
 );
 -- вторая ревизия 25.10.2026: у переторжки — продажа «Нашего КП» в валюте подачи (AG2)
 alter table econ_file_reads add column if not exists kp_sale_sub numeric;
+-- v5 шаблона, 26.10.2026 (правило 16 — храни, почему получилось значение): откуда валюта
+-- подачи (D4, D4 на месте при сдвинутых подписях или запасной путь: AE либо формула AF со строкой
+-- Z:AA, подтверждённой подписью итога AG2 или строкой K:L), чем сверен её курс (строка Z:AA,
+-- строка K:L, подача в евро) и на сколько столбцов вправо сдвинут шаблон. Закрытые списки —
+-- econ_template.ИСТОЧНИКИ_ВАЛЮТЫ, ИСТОЧНИКИ_КУРСА, СДВИГИ (сверяет tests/test_econ_files_sql.py).
+-- У строк до v5 — пусто.
+alter table econ_file_reads add column if not exists sub_cur_src text;
+alter table econ_file_reads add column if not exists rate_src text;
+alter table econ_file_reads add column if not exists col_shift smallint;
 
 create table if not exists econ_file_runs (
   run_id     text        primary key,
@@ -138,6 +147,14 @@ begin
     check ((bitrix_note is null or bitrix_note in ('валюта сделки другая', 'суммы нет'))
            and not (bitrix_note is not null and bitrix_ratio is not null)
            and (bitrix_ratio is null or bitrix_ratio >= 0));
+  -- пути чтения (v5): закрытые списки; курс сверен — только у сверенной строки
+  alter table econ_file_reads drop constraint if exists econ_file_reads_src_chk;
+  alter table econ_file_reads add constraint econ_file_reads_src_chk
+    check ((sub_cur_src is null or (sub_cur_src in ('D4', 'D4 вне сдвига', 'AE', 'AE и подпись AG2',
+                                                    'формула AF, Z:AA и K:L', 'формула AF, Z:AA и подпись AG2')
+                                    and sub_cur is not null))
+           and (rate_src is null or (rate_src in ('Z:AA', 'K:L', 'евро') and status = 'сверено'))
+           and (col_shift is null or col_shift in (0, 1)));
   alter table econ_file_reads drop constraint if exists econ_file_reads_fx_chk;
   alter table econ_file_reads add constraint econ_file_reads_fx_chk check (econ_fx_ok(fx));
   -- Суммы — только у сверенной строки: у несверенной их нет вовсе (их положительность и
@@ -251,7 +268,8 @@ drop view if exists econ_file_latest;
 create view econ_file_latest with (security_invoker = true) as
 select distinct on (r.deal_id)
        r.deal_id, r.read_at, r.status, r.sub_cur, r.sale_sub, r.sale_eur, r.purchase_eur, r.markup,
-       r.rebid, r.items, r.fx, r.deal_cur, r.bitrix_ratio, r.bitrix_note, r.kp_sale_sub, r.method_ver, r.run_id
+       r.rebid, r.items, r.fx, r.deal_cur, r.bitrix_ratio, r.bitrix_note, r.kp_sale_sub, r.method_ver, r.run_id,
+       r.sub_cur_src, r.rate_src, r.col_shift
   from econ_file_reads r
   join econ_file_runs g on g.run_id = r.run_id
  where r.voided_at is null
