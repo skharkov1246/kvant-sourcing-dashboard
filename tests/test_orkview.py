@@ -302,7 +302,9 @@ class _ОплаченоБезУпд(fixture.ContractsStub):
         self.hist[172] += [("99300", "DT172_26:NEW", t(150)), ("99300", "DT172_26:SUCCESS", t(15))]
 
 
-def _инварианты(view: dict) -> None:
+def _инварианты(view: dict, rows: list | None = None, sep: bool = False) -> None:
+    """rows — все сделки (они только у основного вида: data["rows"]); сверяются строки ЭТОГО вида:
+    у основного — без сегмента, у направления (sep=True) — с сегментом."""
     w = view["ork"]["week"]
     for r in w["ledger"]:
         if r["over"] is not None:
@@ -323,11 +325,13 @@ def _инварианты(view: dict) -> None:
     assert n == sum(1 for x in q if x.get("waitUtd")) == sum(1 for x in q if x["code"] == "noUtd")
     assert led[12]["over"] == 0 and all(r["waitUtd"] is None for r in w["ledger"] if r["no"] != 12)
     assert not [x for x in q if x.get("w2") and x.get("waitUtd")]
-    if "rows" in view:
-        live = [o for r in view["rows"] if not r["lost"] for o in r["orders"] if o["live"]]
+    rows = view.get("rows") if rows is None else rows
+    if rows is not None:
+        rows = [r for r in rows if bool(r["seg"]) == sep]
+        live = [o for r in rows if not r["lost"] for o in r["orders"] if o["live"]]
         assert n == sum(1 for o in live if o["stepWaitUtd"])
         assert not [o for o in live if o["stepWaitUtd"] and (o["stepOver"] or o["slow"] or o["step"] != 12)]
-        for r in view["rows"]:
+        for r in rows:
             c = r.get("stepCell") or {}
             assert not (c.get("waitUtd") and c.get("over")), r["deal"]
             if c.get("waitUtd"):
@@ -339,7 +343,7 @@ def _инварианты(view: dict) -> None:
 
 def test_сверх_нормы_не_больше_сейчас(ct):
     _инварианты(ct)
-    _инварианты(ct["sep"])
+    _инварианты(ct["sep"], ct["rows"], sep=True)
     stub = _ОплаченоБезУпд()
     data, _o = _orders(stub)
     _инварианты(data)
@@ -374,6 +378,37 @@ def test_сверх_нормы_не_больше_сейчас(ct):
     assert led[11]["now"] == sum(1 for r in data["rows"] if not r["closed"] for o in r["orders"]
                                  if o["live"] and o["step"] == 11 and not o["delivered"])
     assert any(x.get("waitUtd") for x in q if str(x["order"]) in ("99100", "99101"))
+
+
+def test_ждём_упд_направления_своим_видом():
+    """Решение владельца 27.10.2026, Б, у отдельного направления: заказ шага 12 сделки
+    реализации компании направления, 28 дн. без УПД, — «ждём УПД» вида направления, не
+    основного; строки таблицы сделок сверяются с видом по сегменту (rows — только у основного)."""
+    data = fixture.build_contracts(stub=fixture.Шаг12Направления(wait=True))
+    sep = data["sep"]
+    _инварианты(data)
+    _инварианты(sep, data["rows"], sep=True)
+    w = sep["ork"]["week"]
+    led = {r["no"]: r for r in w["ledger"]}
+    assert w["waitUtd"] == {**w["waitUtd"], "n": 1, "unknown": 0} and led[12]["waitUtd"] == 1
+    q = [x for x in sep["life"]["queue"] if x["order"] == "97808"]
+    assert [(x["role"], x.get("waitUtd"), x.get("w2")) for x in q if x["code"] == "noUtd"] == [("orkMgr", True, None)]
+    assert not [x for x in q if x.get("w2")]
+    assert not [x for x in data["life"]["queue"] if x["order"] == "97808"]
+    r = next(r for r in data["rows"] if r["deal"] == "7808")
+    assert r["seg"] and r["stepCell"]["waitUtd"] and not r["stepCell"]["over"] and not r["slow"]
+
+
+def test_срок_упд_неизвестен_не_ноль_ждём():
+    """Единственный заказ шага 12 вида — «Ожидание оплаты» без факта доставки: «ждём УПД» — 0
+    известных, срок неизвестен 1 (week.waitUtd.unknown), в год без календаря шаг 12 не
+    считается (trust.noCalendar — только шаги W2)."""
+    sep = fixture.build_contracts(stub=fixture.Шаг12Направления(wait=False))["sep"]
+    w = sep["ork"]["week"]
+    r12 = {r["no"]: r for r in w["ledger"]}[12]
+    assert (r12["now"], r12["over"], r12["waitUtd"], r12["overUnknown"], r12["notCounted"]) == (1, 0, 0, 1, 0)
+    assert w["waitUtd"]["n"] == 0 and w["waitUtd"]["unknown"] == 1
+    _инварианты(sep)
 
 
 def test_гигиена_не_назначен_в_счёте(ct):

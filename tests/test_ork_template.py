@@ -142,3 +142,34 @@ def test_ждём_упд_от_клиента_отдельно_от_сверх_н
     # итог столбцов: Σ «сверх нормы» = W2, Σ «ждём УПД» = n
     tot = f'<td class="r mono"><b>{w["tiles"]["W2"]["value"]}</b></td><td></td><td class="r mono"><b>{n}</b></td>'
     assert tot in out
+
+
+def test_ждём_упд_ноль_при_неизвестном_сроке_прочерк():
+    """Все заказы шага 12 вида — срок не посчитать (нет факта доставки): в «Сверх нормы»
+    ведомости — «—», а не «ждём УПД от клиента 0» (ноль за неизвестное, правило 15); рядом
+    «? N — срок неизвестен», в подписи W2 — «срок УПД неизвестен: N». Корпус —
+    fixture.Шаг12Направления через настоящий contracts.compute; затем тот же вывод на
+    ручной строке (waitUtd 0, overUnknown == now)."""
+    import re
+    data = fixture.build_contracts(stub=fixture.Шаг12Направления(wait=False))
+    sep = json.loads(json.dumps(data["sep"], ensure_ascii=False, default=str))
+    sep["dir"] = "sep"
+
+    def cell(view):
+        out = _render({"v": view}, None)["v"]["week"]
+        i = out.index('data-step="12"')
+        row = out[i:out.index("</tr>", i)]
+        return out, re.findall(r'<td class="r mono[^"]*">(.*?)</td>', row)[1]
+    out, c = cell(sep)
+    assert "ждём УПД от клиента 0" not in c and ">—</span>" in c and "? 1 — срок неизвестен" in c, c
+    assert "срок УПД неизвестен: 1" in out
+    # ручная строка: у шага 12 2 заказа, оба без срока, один «не в счёте» нет — тоже «—»
+    v = copy.deepcopy(sep)
+    r12 = next(r for r in v["ork"]["week"]["ledger"] if r["no"] == 12)
+    r12.update(now=2, over=0, waitUtd=0, overUnknown=2, notCounted=0)
+    _o, c = cell(v)
+    assert "ждём УПД от клиента 0" not in c and ">—</span>" in c, c
+    # известный ноль (срок есть, ждать нечего) — «ждём УПД от клиента 0», не прочерк
+    r12.update(now=2, over=0, waitUtd=0, overUnknown=1, notCounted=0)
+    _o, c = cell(v)
+    assert "ждём УПД от клиента 0" in c, c

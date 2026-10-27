@@ -233,6 +233,9 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             if q.get("order") in wait_ids[st]:
                 q["waitUtd"] = True
     wait_n = sum(len(ids) for ids in wait_ids.values())
+    # срок УПД не посчитать (нет факта доставки, года нет в календаре): в W2 шаг 12 не входит,
+    # покрытие W2 их не снижает — счёт рядом с «ждём УПД», а не ноль за неизвестное (правило 15)
+    wait_unknown = sum(1 for o in L if step[o["id"]] in ork.WAIT_CODE and ov[o["id"]]["termUnknown"])
 
     def not_counted(o) -> bool:
         """Шаг с нормой, а срок не в счёте: гигиена карточки или приёмка вне «Реализации»."""
@@ -416,7 +419,8 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             "overByWho": over_mgr, "risk": risk_list, "checkpoints": cps,
             # шаг 12 больше 10 р.д. без УПД — «ждём УПД от клиента»: не «сверх нормы» менеджера
             # (решение владельца 27.10.2026, Б); пункт noUtd — у менеджера ОРК, КАМ в копии
-            "waitUtd": {"n": wait_n, "label": ork.WAIT_UTD, "src": "noUtd", "norm": ork.NORM_WD[12]},
+            "waitUtd": {"n": wait_n, "unknown": wait_unknown, "label": ork.WAIT_UTD, "src": "noUtd",
+                        "norm": ork.NORM_WD[12]},
             "hygiene": {"n": len(hyg_items), "by": dict(hc), "excluded": hyg_excl, "byExcl": dict(hc_excl),
                         "noMgrOnly": sum(1 for x in hyg_items if x["kinds"] == ["noMgr"]), "items": hyg_items},
             "notChecked": "не проверяется: паузы и эскалации (полей нет), запросы статуса поставщику, "
@@ -443,7 +447,10 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
              "histSince": "2024-06-01", "note": "паузы и эскалации в Битриксе не ведутся — у сроков менеджера "
                                                 "подпись «без пауз»",
              "mapped": sum(1 for o in L if step[o["id"]] is not None), "unknown": unk_n,
-             "noCalendar": sum(1 for o in L if ov[o["id"]]["why"] == "год без производственного календаря"),
+             # сроки «сверх нормы» (шаги W2, ork.OVER_CODE), которые не посчитать: года нет в
+             # календаре; шаг 12 («ждём УПД») в W2 не входит — его неизвестные в week.waitUtd.unknown
+             "noCalendar": sum(1 for o in L if step[o["id"]] in ork.OVER_CODE
+                               and ov[o["id"]]["why"] == "год без производственного календаря"),
              "ownerRule": ork.OWNER_RULE, "orkHead": bool(ork_head),
              # ответственный живого заказа — из отдела ОРК по справочнику (people.ORK_DEPT): ноль —
              # название отдела не совпало, «менеджер ОРК не назначен» затопит очередь
@@ -744,7 +751,7 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
             f"Шаг 12 (УПД) — не в W2 и не в n (решение владельца 27.10.2026): р.д.(доставка, сегодня) > "
             f"{ork.NORM_WD[12]} и УПД нет — «{ork.WAIT_UTD}» отдельным столбцом (подпись УПД — за заказчиком), "
             f"пункт noUtd у менеджера ОРК с эскалацией КАМу; доставка старше {ork.CLOSE_DAYS} дн. без УПД — гигиена",
-            "crm.stagehistory; у шага 12 — Customer delivery date actual, UTD", t["W2"]),
+            "crm.stagehistory (W2); «ждём УПД» рядом с W2 — Customer delivery date actual, UTD", t["W2"]),
         row("W3", "Зона риска", "срок клиента прошёл / ≤ 14 дн. без отгрузки / прогноз позже срока",
             "Date of deadline to customer, Supplier Shipment Date", t["W3"]),
         row("W4", "Эскалации и паузы", "—", "нет полей", t["W4"]),

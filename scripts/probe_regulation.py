@@ -1250,11 +1250,18 @@ def _показатели(п: Прогон, строки: list[dict], гр: dict
           f"(> {ork.GATES['abandoned_wd']} р.д. на шаге с нормой ≤ {ork.GATES['abandoned_norm_max']}) "
           f"{sum(g['abandoned'] for g in гиг)}, стадия не из таблицы {sum(g['unknown'] for g in гиг)} — вне счёта W2")
     в_счёт = [r for r, g in zip(живые, гиг) if not g["exclude"]]
-    нормир = [x for x in (ork.overrun(r["ork"], п.сегодня) for r in в_счёт) if x["norm"] is not None]
+    нормир_все = [x for x in (ork.overrun(r["ork"], п.сегодня) for r in в_счёт) if x["norm"] is not None]
+    # W2 — только шаги ОРК (ork.OVER_CODE: 1, 4, 5, 8); шаг 12 больше нормы — «ждём УПД от
+    # клиента», не «сверх нормы» (решение владельца 27.10.2026, Б), счёт рядом. Отбор портала
+    # (ork.judged, приёмка вне «Реализации») зонд не повторяет — агрегат сырой
+    нормир = [x for x in нормир_все if x["step"] in ork.OVER_CODE]
+    ждём = [x for x in нормир_все if x["step"] in ork.WAIT_CODE]
     сверх = [x for x in нормир if x["over"]]
     по_шагам = collections.Counter("шаг " + str(x["step"]) for x in сверх)
-    print(f"  W2 сверх нормы ({ork.NO_PAUSE}): {len(сверх)} из {len(нормир)} на нормируемых шагах; по шагам: "
-          f"{счёт(по_шагам)}; срок не посчитать {sum(1 for x in нормир if x['over'] is None)}")
+    print(f"  W2 сверх нормы ({ork.NO_PAUSE}): {len(сверх)} из {len(нормир)} на шагах ОРК; по шагам: "
+          f"{счёт(по_шагам)}; срок не посчитать {sum(1 for x in нормир if x['over'] is None)}; "
+          f"ждём УПД от клиента (не в W2): {sum(1 for x in ждём if x['over'])} из {len(ждём)}, "
+          f"срок не посчитать {sum(1 for x in ждём if x['over'] is None)}")
     шаг1 = [x for x in нормир if x["step"] == 1]
     dl = [r for r in живые if _дн(r["o"].get(З["dl"]))]
     поздно = sum(1 for r in dl if not r["факты"]["delFact"] and _дн(r["o"].get(З["dl"])) < п.сегодня)

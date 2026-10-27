@@ -788,6 +788,35 @@ class ContractsStub:
                 **{u: p["name"] for u, p in CT_ROSTER.items()}}.get(str(uid), f"user#{uid}")
 
 
+class Шаг12Направления(ContractsStub):
+    """Придуманный корпус: у отдельного направления — сделка реализации (кат. 0) его компании с
+    одним живым заказом на шаге 12 (решение владельца 27.10.2026, Б). wait=True — «Заказ получен
+    клиентом», доставлен 28 дн. назад, УПД нет («ждём УПД от клиента»); wait=False —
+    «Ожидание оплаты» без факта доставки и без УПД (срок УПД не посчитать)."""
+
+    def __init__(self, *, wait: bool):
+        super().__init__()
+        import contracts as ct_
+        now = dt.datetime.fromisoformat(CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()      # noqa: E731
+        d = lambda a: (CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        stage = "GOT" if wait else "WAITPAY"
+        self.deals.append({"ID": "7808", "TITLE": "7808. Направление", "OPPORTUNITY": "1000",
+                           "CURRENCY_ID": "EUR", "COMPANY_ID": CT_SEP_CO, "STAGE_ID": "C0:FINAL_INVOICE",
+                           "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(300),
+                           "ASSIGNED_BY_ID": "10", ct_.OSS_DEAL: ["21"], ct_.KAM_F: "11"})
+        self.hist[2] += [("7808", "C0:NEW", t(300)), ("7808", "C0:FINAL_INVOICE", t(20))]
+        o = {"id": 97808, "title": "7808/1. Узел", "companyId": "401", "parentId2": 7808, "opportunity": 100,
+             "currencyId": "EUR", "stageId": f"DT172_26:{stage}", "createdTime": t(300), "movedTime": t(5),
+             ct_.OSS_F: "21", ct_.DL_CUSTOMER: d(-30), ct_.SUP_PAID: 100, ct_.SHIP_FACT: d(60),
+             "assignedById": "31"}
+        if wait:
+            o[ct_.DEL_FACT] = d(28)
+        self.orders.append(o)
+        for k, st in enumerate(CT_PATH[:CT_PATH.index(stage) + 1]):
+            self.hist[172].append(("97808", f"DT172_26:{st}", t(300 - 15 * k)))
+
+
 def build_contracts(**kw) -> dict:
     """Синтетика → настоящий contracts.compute → данные вкладки «Реализация». Руководителя
     ОРК (служебный ключ «_orkHead») main.py забирает до записи страницы — здесь так же;
@@ -799,7 +828,7 @@ def build_contracts(**kw) -> dict:
     old = os.environ.get("KVANT_NOW")
     os.environ["KVANT_NOW"] = CT_NOW
     try:
-        stub = ContractsStub()
+        stub = kw.pop("stub", None) or ContractsStub()
         kw.setdefault("people", CT_ROSTER)
         kw.setdefault("departments", stub.departments())
         kw.setdefault("fx_loader", ct_fx_loader)

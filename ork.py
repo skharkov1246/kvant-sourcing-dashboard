@@ -555,7 +555,10 @@ def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=Non
     out["counted"] = ov["over"] is not None
     out["termUnknown"] = ov["over"] is None
     if ov["step"] in WAIT_CODE and ov["over"]:
-        out.update(over=False, waitUtd=True)      # срок ждёт клиента, а не работу менеджера
+        # срок ждёт клиента, а не работу менеджера. rawOver (True) и by (wd − норма > 0) у такого
+        # заказа остаются — сырой счёт overrun; «сверх нормы» читать только по over, ни по rawOver,
+        # ни по by > 0 (решение владельца 27.10.2026, Б)
+        out.update(over=False, waitUtd=True)
     return out
 
 
