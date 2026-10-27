@@ -620,6 +620,16 @@ class ContractsStub:
                             ct.DL_CUSTOMER: d(90), ct.DEL_FACT: d(95), ct.UTD_DATE: d(90),
                             ct.CLIENT_PO: [{"id": 2}], ct.SUP_PAID: 100, "assignedById": "33"})
         path(oid, "SUCCESS", 280, 45)
+        # та же сделка «Оплата получена» (закрыта): живой заказ в «Ожидание оплаты», доставлен
+        # 30 дн. назад без УПД — шаг 12 менеджера ОРК сверх нормы (ведомость, W2 — closed12;
+        # ячейка «Шаг» таблицы сделок, карточка, очередь noUtd), ОСС — закрыть сделку
+        oid += 1
+        self.orders.append({"id": oid, "title": "930/2. Узел без УПД", "companyId": "401", "parentId2": 6030,
+                            "opportunity": 6_000, "currencyId": "EUR", "stageId": "DT172_26:WAITPAY",
+                            "createdTime": t(200), "movedTime": t(28), ct.OSS_F: "21",
+                            ct.DL_CUSTOMER: d(20), ct.DEL_FACT: d(30), ct.SUP_PAID: 100,
+                            ct.PAY_PLAN: d(5), "assignedById": "31"})
+        path(oid, "WAITPAY", 200, 28)
         special = (
             # стадия позади фактов: оплачено поставщику, а стадия — «Заказ направлен»
             ("SENT", 40, 5, {ct.SUP_PAID: 50}),

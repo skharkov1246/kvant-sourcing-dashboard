@@ -44,7 +44,9 @@ def _pct(k: int, n: int) -> int | None:
 
 
 # поля, по которым скрытое значение восстанавливается (k из n, «есть», среднее): у hidden их нет
-VALUE_KEYS = ("k", "have", "ontime", "meanP", "outBand", "med", "p80", "medW", "p80W")
+# слагаемые плиток-счётов (W1 orders + noOrder, W2 byStep, W3 by) — их сумма и есть значение
+VALUE_KEYS = ("k", "have", "ontime", "meanP", "outBand", "med", "p80", "medW", "p80W",
+              "orders", "noOrder", "byStep", "by")
 
 
 def _strip(out: dict) -> dict:
@@ -748,9 +750,10 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
     for o in U:
         if step[o["id"]] is not None:
             by_deal[o.get("deal")].append(step[o["id"]])
+    # стадия сделки позади заказов — по диапазону шагов стадии сделки (ork.DEAL_SPAN, Рег. 1.7),
+    # а не по одному её шагу: «Начато производство» при «Производство заказа» — норма (п. 8.1)
     for d in deals:
-        ds = d.get("dealStep")
-        if ds is not None and by_deal.get(d["deal"]) and ds < min(by_deal[d["deal"]]):
+        if by_deal.get(d["deal"]) and ork.deal_behind(d.get("dealStep"), by_deal[d["deal"]]):
             behind_deal += 1
     violations = {"returns": ret, "bursts": bur, "negative": neg,
                   "payNoContract": sum(1 for q in queue if q["code"] == "payNoContract"),

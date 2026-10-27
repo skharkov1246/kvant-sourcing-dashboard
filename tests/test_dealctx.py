@@ -548,6 +548,8 @@ def test_хозяин_пунктов_чатов_и_договоров_по_ре�
                        ("оплата", "kam"), ("встреча", "orkMgr")):
         ow = dealctx._reg("chatDue", {"kam": "К", "stepCell": {"step": 7}}, {"kam": "К"}, key=f"chatDue:{kind}")
         assert ow["role"] == role, kind
+        if kind == "документы":                  # отгрузочные или УПД — по шагу сделки, не догадкой
+            assert ow["step"] == 7
     # очередь «Недели» = очередь регламента + эти пункты: роль есть у каждого
     life = r["contracts"]["life"]
     week_q = list(life["queue"]) + [q for q in dc["queue"] if not q.get("seg")]

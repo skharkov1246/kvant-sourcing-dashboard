@@ -472,6 +472,11 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             for code, days in codes:
                 counts[code] += 1
                 sev, what, act = EXC[code]
+                # Рег. 15.6: сделка закрывается после исполнения обязательств — живые
+                # недоставленные заказы рядом с пунктом, а не молча (пункт остаётся: решение п. 4)
+                undel = sum(1 for o in os_ if o.get("live") and not o.get("delFact"))
+                if code == "dealClose" and undel:
+                    what = f"{what}; живых заказов не доставлено: {undel} — закрыть после исполнения (Рег. 15.6)"
                 queue.append(_deal_item(code, sev, what, act, days, d, item(code, None, d)))
             continue
         if os_ and all(o.get("success") for o in os_):

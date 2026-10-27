@@ -282,6 +282,11 @@ def test_доставлено_без_упд_шаг_12_при_любой_стад
     assert ork.step_now({"stage": "Заказ получен клиентом", "delFact": D(2026, 9, 21), "utd": True}) == 13
     assert ork.step_now({"stage": "Заказ получен клиентом"}) == 11, "без доставки — шаг стадии"
     assert ork.step_now({"delFact": D(2026, 9, 21)}) == 12, "стадии нет — по фактам"
+    # стадия не из таблицы: доставлено без УПД — шаг 12, имя в «не из таблицы» не идёт;
+    # без доставки — None и имя в счёте (week.unknownStages ≤ week.unknown)
+    unk = Counter()
+    assert ork.step_now({"stage": "Своя стадия", "delFact": D(2026, 9, 21)}, unknown=unk) == 12 and not unk
+    assert ork.step_now({"stage": "Своя стадия"}, unknown=unk) is None and sum(unk.values()) == 1
 
 
 def test_старая_доставка_без_упд_гигиена_а_не_в_норме():
