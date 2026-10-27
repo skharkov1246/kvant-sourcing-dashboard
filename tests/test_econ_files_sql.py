@@ -79,10 +79,10 @@ def _строка(прогон: str, deal: int, status: str = "сверено", 
          "sub_cur": "RUB", "sale_sub": 2_600_000.0, "sale_eur": 26_000.0, "purchase_eur": 20_000.0, "markup": 0.3,
          "rebid": False, "items": 3, "coef_median": 1.5, "totals_dev": 0.0, "bad_lines": 0,
          "fx": {"EUR": 100.0, "RUB": 1.0}, "deal_cur": "EUR", "bitrix_ratio": 1.0, "bitrix_note": None,
-         "kp_sale_sub": None, "why": None}
+         "kp_sale_sub": None, "why": None, "sub_cur_src": "D4", "rate_src": "Z:AA", "col_shift": 0}
     if status != "сверено":
         r.update(sale_sub=None, sale_eur=None, purchase_eur=None, markup=None, rebid=None, fx=None,
-                 bitrix_ratio=None, coef_median=None, totals_dev=None)
+                 bitrix_ratio=None, coef_median=None, totals_dev=None, rate_src=None)
     r.update(kw)
     return r
 
@@ -200,6 +200,10 @@ def test_запись_повтор_итог_и_откат(conn):
     {"kp_sale_sub": 3_000_000.0},                                        # продажа КП без переторжки
     {"rebid": True, "kp_sale_sub": -1.0},
     {"status": "неправдоподобно", "kp_sale_sub": 3_000_000.0},           # у несверенной сумм нет
+    # v5: пути чтения — закрытые списки; курс «сверен» — только у сверенной
+    {"sub_cur_src": "ячейка рядом"}, {"status": "шаблон другой", "sub_cur_src": "AE", "sub_cur": None},
+    {"rate_src": "ЦБ"},
+    {"status": "итоги не сходятся", "rate_src": "Z:AA"}, {"col_shift": 2}, {"col_shift": -1},
 ])
 def test_ограничения_строки(conn, правка):
     import psycopg2
@@ -220,6 +224,16 @@ def test_каждый_статус_python_база_принимает(conn):
         for i, где in enumerate(("G12", "AK11", "D4", "R1", "AK:AL", "позиции", "проверка 1", "проверка 2")):
             база.записать(_строка("ef-why", 400 + i, "шаблон другой", why=где))
         assert sum(база.итог("ef-st").values()) == len(ef.СТАТУСЫ)
+        # v5: каждый путь чтения Python база принимает (списки шаблона = список ограничения)
+        import econ_template as et
+        import itertools
+        for i, (src, курс, сдвиг) in enumerate(zip(et.ИСТОЧНИКИ_ВАЛЮТЫ, itertools.cycle(et.ИСТОЧНИКИ_КУРСА),
+                                                   itertools.cycle((0, *et.СДВИГИ)))):
+            база.записать(_строка("ef-src", 500 + i, sub_cur_src=src, rate_src=курс, col_shift=сдвиг))
+        assert sum(база.итог("ef-src").values()) == len(et.ИСТОЧНИКИ_ВАЛЮТЫ)
+        for i, курс in enumerate(et.ИСТОЧНИКИ_КУРСА):
+            база.записать(_строка("ef-rate", 600 + i, rate_src=курс))
+        assert sum(база.итог("ef-rate").values()) == len(et.ИСТОЧНИКИ_КУРСА)
     finally:
         база.закрыть()
 
@@ -315,6 +329,24 @@ def test_продажа_кп_переторжки_и_колонка_в_стар�
     finally:
         база.закрыть()
     assert _одно(conn, f"select kp_sale_sub from {СХЕМА}.econ_file_latest where deal_id = 801")[0] == 3_000_000
+
+
+def test_пути_чтения_в_таблице_до_v5(conn):
+    """Колонки путей чтения (v5) добавляет add column if not exists и в таблицу, созданную до
+    них (правило 21); вид последнего чтения их показывает."""
+    with conn.cursor() as c:
+        c.execute(f"set search_path to {СХЕМА}")
+        for к in ("sub_cur_src", "rate_src", "col_shift"):
+            c.execute(f"alter table econ_file_reads drop column {к} cascade")
+        _применить(c)
+    база = _база()
+    try:
+        база.записать(_строка("ef-p1", 851, sub_cur_src="AE", rate_src="K:L", col_shift=1))
+        база.отметить_прогон("ef-p1")
+    finally:
+        база.закрыть()
+    assert _одно(conn, f"select sub_cur_src, rate_src, col_shift from {СХЕМА}.econ_file_latest "
+                       "where deal_id = 851") == ("AE", "K:L", 1)
 
 
 def test_решение_гейта_только_дописывается(conn):
