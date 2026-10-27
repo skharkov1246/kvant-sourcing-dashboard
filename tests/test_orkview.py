@@ -93,7 +93,8 @@ def test_неделя_все_блоки_с_данными(ct):
 
 def test_месяц_квартал_и_как_считается(ct):
     o = ct["ork"]
-    rows = o["month"]["rows"]
+    mo = ct["orkMonth"]["main"]["month"]           # «Месяц» — под правом, не в разделе для всех
+    rows = mo["rows"]
     assert len(rows) == ork.MONTHS_BACK
     # в корпусе за отрезками S2/S3/S6 и артефактами — один ответственный: показатель отдела
     # раскрыл бы человека (решение п. 3) — не показываем, ни значения, ни k
@@ -104,11 +105,11 @@ def test_месяц_квартал_и_как_считается(ct):
     assert any(r["M2"]["state"] == "hidden" and "have" not in r["M2"] for r in rows)
     assert any(r["M1"]["S1"]["state"] == "prelim" for r in rows), "S1 — руководитель ОРК, без ворот людей"
     assert all(r["otd"]["label"] == "результат поставщика и логистики" for r in rows)
-    M3 = o["month"]["M3"]
+    M3 = mo["M3"]
     assert M3["label"] == "без поправки на сложность"
     # менеджеров ОРК в корпусе меньше трёх: среднее — нагрузка человека, без права не показываем
     assert M3["managers"] < ork.GATES["n_managers_min"] and M3["state"] == "hidden" and M3["value"] is None
-    assert len(o["month"]["an4"]) == len(ork.AN4_NODATA) and {x["state"] for x in o["month"]["an4"]} == {"nodata"}
+    assert len(mo["an4"]) == len(ork.AN4_NODATA) and {x["state"] for x in mo["an4"]} == {"nodata"}
     q = o["quarter"]
     assert any(x["Q1"]["state"] in ("show", "prelim") for x in q["quarters"])
     assert q["Q2"]["S5"]["state"] in ("show", "prelim") and q["Q2"]["S5"]["p80"] >= q["Q2"]["S5"]["med"]
@@ -118,6 +119,11 @@ def test_месяц_квартал_и_как_считается(ct):
     assert q["index"]["state"] == "hidden" and q["rating"]["state"] == "hidden"
     h = o["how"]
     assert {m["code"] for m in h["metrics"]} == {"W1", "W2", "W3", "W4", "W5", "M1", "M2", "M3", "Q1", "Q2", "Q3"}
+    # у M1–M3 в разделе для всех — формула и поля, вердикт и n — под правом
+    assert all(m["state"] == "right" and m["n"] is None and m["cover"] is None
+               for m in h["metrics"] if m["code"] in ("M1", "M2", "M3"))
+    assert [m["code"] for m in ct["orkMonth"]["main"]["how"]] == ["M1", "M2", "M3"]
+    assert all(m["state"] != "right" for m in ct["orkMonth"]["main"]["how"])
     assert len(h["fieldsAdd"]) == len(ork.FIELDS_ADD) and {f["to"] for f in h["fieldsAdd"]} == {ork.FIELDS_TO}
     assert h["gatesNote"] == ork.GATES_NOTE and h["violations"]["payNoContract"] >= 1
     assert h["violations"]["returns"] >= 1 and h["violations"]["bursts"] >= 1
@@ -127,12 +133,21 @@ def test_месяц_квартал_и_как_считается(ct):
 
 
 def test_показатели_менеджеров_отдельно_от_вкладки(ct):
-    """Решение владельца 26.10.2026, п. 3: поимённые показатели «Месяца» — отдельным
-    массивом (orkMonth), в разделе для всех с вкладкой их нет; рейтинга нет."""
-    assert ct["orkMonth"]["main"] and all("who" in m for m in ct["orkMonth"]["main"])
-    публичный = json.dumps(ct["ork"]["month"], ensure_ascii=False)
-    assert not any(m["who"] in публичный for m in ct["orkMonth"]["main"])
-    assert all(set(m) >= {"who", "live", "M1", "M2"} and "score" not in m for m in ct["orkMonth"]["main"])
+    """Решение владельца 26.10.2026, п. 3: «подвкладка «Месяц» — только руководителям и
+    владельцу». Весь «Месяц» — показатели отдела (S1 руководителя ОРК — один человек), M3 и
+    поимённо — отдельным массивом (orkMonth), в разделе для всех с вкладкой его нет; рейтинга нет."""
+    for key, view in (("main", ct["ork"]), ("sep", (ct.get("sep") or {}).get("ork"))):
+        if view is None:
+            continue
+        assert "month" not in view, key
+        mo = ct["orkMonth"][key]
+        assert set(mo) == {"month", "people", "how"} and mo["month"]["rows"], key
+    P = ct["orkMonth"]["main"]["people"]
+    assert P and all("who" in m for m in P)
+    assert all(set(m) >= {"who", "live", "M1", "M2"} and "score" not in m for m in P)
+    публичный = json.dumps({k: v for k, v in ct.items() if k != "orkMonth"}, ensure_ascii=False, default=str)
+    for слово in ('"loadDev"', '"an4"', '"outBand"', '"S2+S3+S6"'):
+        assert слово not in публичный, слово
 
 
 def test_страница_показатели_менеджеров_своим_массивом_под_правом():
@@ -140,13 +155,13 @@ def test_страница_показатели_менеджеров_своим_�
     вырезает её без права «ork_heads»), в window.__CONTRACTS__ их нет; без данных — null."""
     import dashboard
     r = fixture.build_realization()
-    assert r["ork_month"]["main"] and "orkMonth" not in r["contracts"]
+    assert r["ork_month"]["main"]["people"] and "orkMonth" not in r["contracts"]
     html = dashboard.render({}, {}, contracts=r["contracts"], dealctx=r["dealctx"], ork_month=r["ork_month"])
     lines = {ln.split(" = ", 1)[0]: ln for ln in html.splitlines() if ln.startswith("window.__")}
     om = json.loads(lines["window.__ORKMONTH__"].split(" = ", 1)[1].rstrip(";"))
     assert om == json.loads(json.dumps(r["ork_month"], ensure_ascii=False, default=str))
     ct_line = lines["window.__CONTRACTS__"]
-    assert '"orkMonth"' not in ct_line and '"loadDev"' not in ct_line
+    assert '"orkMonth"' not in ct_line and '"loadDev"' not in ct_line and '"an4"' not in ct_line
     пусто = dashboard.render({}, {}, contracts=r["contracts"])
     assert "window.__ORKMONTH__ = null;" in пусто
 
@@ -212,7 +227,10 @@ def test_пути_состояния_показателя():
     assert nocal["state"] == "nodata" and nocal["value"] is None
     # счёт «сейчас»: на шагах никого — известный ноль, не «нет данных»
     z = orkview._count(0, 0, None, src="x")
-    assert (z["state"], z["value"]) == ("show", 0)
+    assert (z["state"], z["value"]) == ("show", 0) and z["why"] == "сейчас на шагах никого"
+    # на шаге есть заказы, но все не в счёте — «в счёте никого; не в счёте 1», не «никого»
+    ze = orkview._count(0, 0, None, src="x", extra={"excluded": 1})
+    assert ze["value"] == 0 and "не в счёте 1" in ze["why"]
     assert orkview._count(3, 10, 0.4, src="x")["state"] == "hidden"
     assert orkview._probe_cap("M1", dict(show))["state"] == "prelim"
 
@@ -227,7 +245,11 @@ def test_первичный_срок_поставщика_план_равен_ф
     q = orkview._quarter_view(same + late, СЕГОДНЯ)["quarters"][0]["Q1"]
     assert q["state"] == "hidden" and q["value"] is None and q["planEqFact"] == 0.4
     q2 = orkview._quarter_view(late, СЕГОДНЯ)["quarters"][0]["Q1"]
-    assert (q2["state"], q2["value"], q2["n"]) == ("show", 0, 6)
+    # отдел целиком — общий показатель: n меньше n_min — «предварительно»; строка поставщика —
+    # ворота n_supplier_quarter (6 ≥ 5 — показываем)
+    assert (q2["state"], q2["value"], q2["n"]) == ("prelim", 0, 6) and "n = 6 < 30" in q2["why"]
+    sup = orkview._quarter_view(late, СЕГОДНЯ)["quarters"][0]["suppliers"][0]
+    assert (sup["state"], sup["n"]) == ("show", 6)
 
 
 # ── одна совокупность у «сейчас», «сверх нормы» и W2 ──────────────────────────────────────
@@ -284,8 +306,16 @@ def test_сверх_нормы_не_больше_сейчас(ct):
     _инварианты(data)
     q = data["life"]["queue"]
     paid = [x for x in q if x["code"] == "noUtd" and str(x["order"]).startswith("9900")]
-    assert len(paid) == 3 and not any(x.get("w2") for x in paid), "закрытая сделка — в очереди, не в W2"
+    # шаг 12 — на менеджере ОРК при любой стадии оплаты сделки: заказ сделки «Оплата получена»,
+    # доставленный без УПД, — и в очереди, и в W2 (одна совокупность шага 12, ревизия 4)
+    assert len(paid) == 3 and all(x.get("w2") for x in paid), "закрытая сделка: пункт noUtd — и в W2"
+    W2 = data["ork"]["week"]["tiles"]["W2"]
+    assert W2["byStep"][12] == sum(1 for x in q if x["code"] == "noUtd" and x.get("w2"))
+    assert W2["byStep"][12] == sum(1 for x in q if x["code"] == "noUtd" and x.get("step") == 12
+                                   and x["order"] in {str(o) for o in (99000, 99001, 99002, 99100, 99101)}
+                                   | {x2["order"] for x2 in q if x2.get("w2")})
     led = {r["no"]: r for r in data["ork"]["week"]["ledger"]}
+    assert led[12]["over"] == W2["byStep"][12] and data["ork"]["week"]["closed12"] == 3
     # доставлено без УПД — шаг 12 ведомости, а не 11 («Заказ получен клиентом»)
     assert led[11]["now"] == sum(1 for r in data["rows"] if not r["closed"] for o in r["orders"]
                                  if o["live"] and o["step"] == 11 and not o["delivered"])
@@ -345,7 +375,7 @@ def test_q1_пачка_не_первичный_срок():
 def test_менеджер_за_последний_полный_месяц():
     """Поимённо — главное последний ПОЛНЫЙ месяц; текущий (идёт, неполный) — рядом, cur."""
     _d, _o = _orders()
-    mp = _d["orkMonth"]["main"]
+    mp = _d["orkMonth"]["main"]["people"]
     assert mp and all(m["m"] == "09.2026" and "M1" in m and m["cur"]["m"] == "10.2026" and m["cur"]["partial"]
                       for m in mp)
     assert all("prev" not in m for m in mp)
@@ -499,7 +529,9 @@ def test_месяц_заголовок_последний_полный():
     rows = month["rows"]
     assert month["head"] == 1 and rows[1]["m"] == "09.2026" and not rows[1]["partial"]
     assert rows[0]["m"] == "10.2026" and rows[0]["partial"] is True
-    assert rows[1]["M1"]["S2"]["n"] == 9 and rows[0]["M1"]["S2"]["n"] == 2
+    assert rows[1]["M1"]["S2"]["n"] == 9
+    # октябрь — один человек: ячейка скрыта воротами людей, и n у неё не отдаётся
+    assert rows[0]["M1"]["S2"]["state"] == "hidden" and "n" not in rows[0]["M1"]["S2"]
     илья = next(m for m in mp if m["who"] == "Илья")
     assert илья["m"] == "09.2026" and илья["M1"]["S2"]["n"] == 3
     assert илья["cur"]["partial"] and илья["cur"]["M1"]["S2"]["n"] == 2
@@ -539,3 +571,78 @@ def test_шаг7_дольше_p80_сигнал_а_не_нарушение():
     lp0 = v0["week"]["longP80"]
     assert lp0["state"] == "nodata" and lp0["k"] is None and lp0["items"] == []
     assert next(r for r in v0["week"]["ledger"] if r["no"] == 7)["longP80"] is None
+
+
+# ── ревизия 4: шаг 12 закрытых сделок, вычитание в «Месяце», S1 вне «Реализации» ────────────
+def test_шаг12_закрытой_сделки_одна_совокупность():
+    """Живой заказ сделки «Оплата получена» (закрыта, не проиграна), доставленный без УПД, —
+    на шаге 12 у менеджера ОРК (Рег. 14.2.4–14.3.2): пункт noUtd в очереди, и он же — в W2,
+    ведомости (шаг 12) и «Сверх нормы по менеджерам». Счёт W2 по шагу 12 = пунктам noUtd."""
+    import lifecycle
+    T = dt.date(2026, 10, 19)
+    deals = [{**_СДЕЛКИ[0], "deal": "A", "seq": 1, "closed": True, "done": True, "paidStage": True, "norders": 1,
+              "stageDays": 40},
+             {**_СДЕЛКИ[0], "deal": "B", "seq": 2, "norders": 1}]
+    def dlv(i, deal):
+        return _синт(i, "Ожидание оплаты", deal=deal, delFact=dt.date(2026, 9, 1), shipFact=dt.date(2026, 7, 20),
+                     supPaidPct=100, stepSince="2026-09-01T10:00:00+03:00", orkMgr="Пётр", resp="Пётр")
+    orders = [dlv(1, "A"), dlv(2, "B")]
+    life = lifecycle.build(orders, deals, T)
+    no_utd = [q for q in life["queue"] if q["code"] == "noUtd"]
+    assert {q["deal"] for q in no_utd} == {"A", "B"}
+    v, _ = orkview.build(orders, deals, life["queue"], T)
+    W2 = v["week"]["tiles"]["W2"]
+    led12 = next(r for r in v["week"]["ledger"] if r["no"] == 12)
+    assert W2["byStep"][12] == len(no_utd) == led12["over"] == led12["now"] == 2
+    assert all(q.get("w2") for q in no_utd)
+    assert sum(m["byStep"].get("12", 0) for m in v["week"]["overByWho"]) == 2
+    assert v["week"]["closed12"] == 1 and v["week"]["live"] == 2
+    # прочие шаги закрытой сделки — не отклонения: W1 и шаги 1/4/5/8 их не видят
+    assert W2["byStep"][1] == W2["byStep"][5] == 0
+
+
+def test_месяц_вычитание_не_раскрывает_скрытую_ячейку():
+    """S2 — трое, S3 — один, S6 — трое: S3 скрыта воротами людей, и сумма S2+S3+S6 тоже (иначе
+    сумма − показанные = скрытая); у скрытой ячейки нет n, ended, people."""
+    T = dt.date(2026, 10, 26)
+    end = "2026-09-15T10:00:00+03:00"
+    def era(i, who, code):
+        seg = {**_seg(1, end=end), "skip": False}
+        return {"id": f"{code}{i}", "created": dt.date(2026, 9, 1), "resp": who, "orkMgr": who, "respOrk": True,
+                "stage": "Оплата поставщику / агенту", "_segs": {"segs": {code: seg}}, "_reach": {}, "art": {}}
+    orders = [era(i, w, "S2") for i, w in enumerate(("Анна", "Борис", "Вера"))]
+    orders += [era(9, "Анна", "S3")]
+    orders += [era(i, w, "S6") for i, w in enumerate(("Борис", "Вера", "Гриша"))]
+    month, _ = orkview._month(orders, [], T, None, {})
+    m = month["rows"][1]["M1"]
+    assert m["S2"]["state"] == "prelim" and m["S6"]["state"] == "prelim"
+    assert m["S3"]["state"] == "hidden" and not ({"n", "ended", "people", "k", "excluded", "skipped"} & set(m["S3"]))
+    assert m["mgr"]["state"] == "hidden" and m["mgr"]["value"] is None and "n" not in m["mgr"]
+    assert "вычитанием" in m["mgr"]["why"]
+
+
+def test_месяц_приёмка_вне_реализации_не_в_счёте():
+    """S1 сделки вне воронки «Реализация» не в счёте «Месяца» — как у ork.judged и W1."""
+    T = dt.date(2026, 10, 26)
+    def era(i, deal):
+        seg = {**_seg(5, end="2026-09-15T10:00:00+03:00", norm=1), "skip": False}
+        return {"id": str(i), "deal": deal, "created": dt.date(2026, 9, 1), "resp": "Р", "orkMgr": "Р",
+                "respOrk": True, "_segs": {"segs": {"S1": seg}}, "_reach": {}, "art": {}}
+    month, _ = orkview._month([era(1, "D1"), era(2, "D9")], [], T, None, {}, deal_ok_all={"D1": True, "D9": False})
+    assert month["rows"][1]["M1"]["S1"]["n"] == 1
+
+
+def test_первый_месяц_эпохи_неполный():
+    T = dt.date(2026, 10, 26)
+    month, _ = orkview._month([], [], T, None, {})
+    by = {r["m"]: r for r in month["rows"]}
+    assert by["08.2026"]["eraPartial"] is True and by["09.2026"]["eraPartial"] is False
+
+
+def test_год_без_календаря_приёмка_за_20_рд_нет_календаря():
+    """Сегодня в году без производственного календаря: «в срок за 20 р.д.» — «Нет данных: нет
+    календаря», а не «нет законченных приёмок»."""
+    T = dt.date(2099, 2, 1)
+    v, _ = orkview.build([], _СДЕЛКИ, [], T)
+    rec = v["week"]["tiles"]["W1"]["recent"]
+    assert rec["state"] == "nodata" and "календаря" in rec["need"]

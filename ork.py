@@ -768,7 +768,8 @@ def art_required(o: dict, a: dict, reach: dict | None = None) -> bool:
     (явного поля «импорт/РФ» нет, подписи «Направления поставки» не сверены — зонд v60), до
     сверки не требуется; проформа — при доле первичной оплаты > 0; платёжка поставщику —
     когда оплата была; платёжка клиента — у закрытого успехом."""
-    st = step_of(o.get("stage"), o) if o.get("stage") else fact_floor(o)
+    # шаг — ork.step_now, как у ведомости: доставленный без УПД при неизвестной стадии — шаг 12
+    st = step_now(o)
     if st is None or st < a["need"]:
         return False
     if a["cond"] == "import" and o.get("import") is not True:

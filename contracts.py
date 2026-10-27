@@ -1380,7 +1380,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     orphan_buy = sum(v for v in orphan_eur if v)
     orphan_norate = sum(1 for v in orphan_eur if v is None)
 
-    ork_month: dict[str, list] = {}         # показатели менеджеров ОРК поимённо — по виду
+    ork_month: dict[str, dict] = {}         # «Месяц» (отдел и поимённо) — по виду, под правом
 
     def _view(rows_v: list[dict], life_v: dict | None, orders_v: list[dict] | None = None,
               key: str = "main") -> dict:
@@ -1624,7 +1624,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                     "worse": sum(1 for r in _open if r["_stuckNew"] and not r["_stuckOld"]),
                     "better": sum(1 for r in _open if r["_stuckOld"] and not r["_stuckNew"])}
         # регламент ОРК: неделя, месяц, квартал, как считается (orkview.py); поимённые
-        # показатели менеджеров — отдельно (ork_month), в страницу только под правом
+        # «Месяц» (показатели отдела и менеджеров поимённо) — отдельно (ork_month), в страницу
+        # только под правом руководителей ОРК
         ork_v = None
         if life_v is not None and orders_v is not None:
             ork_v, ork_month[key] = orkview.build(orders_v, rows_v, life_v.get("queue") or [], today,
@@ -1795,9 +1796,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 if sep_view is not None else None),
         # регламент ОРК основного вида (вид направления — sep.ork)
         "ork": main_view["ork"],
-        # показатели менеджеров ОРК поимённо (решение владельца 26.10.2026, п. 3): main.py
-        # забирает раздел до записи страницы — в страницу только своим массивом под правом
-        # руководителей ОРК, во «вкладку для всех» не идёт
+        # «Месяц» — показатели отдела и менеджеров ОРК поимённо (решение владельца 26.10.2026,
+        # п. 3: подвкладка — только руководителям и владельцу): main.py забирает раздел до
+        # записи страницы — в страницу только своим массивом под правом руководителей ОРК
         "orkMonth": ork_month,
         # руководитель ОРК по справочнику отделов — хозяин пунктов dealctx (main.py забирает)
         "_orkHead": ork_head,

@@ -625,6 +625,11 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
             if not d["po"]:
                 todo.append(("noPo", "", "руководитель продуктов"))
             for code, key, who in todo:
+                # тот же пробел уже пришёл из очереди КАМа (noPayPlan — с хозяином по регламенту):
+                # второй пункт той же сделки у того же КАМа не ставим и в пробелы не считаем
+                if any(x["src"] == "kam" and x["code"] == code and x["deal"] == str(d["id"])
+                       for x in acts.get(key) or []):
+                    continue
                 gap(code, d, key, who)
                 gaps[code] += 1
         elif d["b"] == "paidFile":

@@ -15,8 +15,9 @@
             порядка; заполненность артефактов; поля «добавить» с адресатом.
 
 Каждая плитка и ячейка — ork.metric_state: {state: show | prelim | nodata | hidden, …};
-ноль за неизвестное не выдаётся. Показатели менеджеров ОРК поимённо («Месяц») — отдельным
-массивом (второй элемент ответа build): в страницу — только под правом руководителей.
+ноль за неизвестное не выдаётся. «Месяц» целиком (показатели отдела и менеджеров ОРК
+поимённо) — отдельным массивом (второй элемент ответа build): в страницу — только под
+правом руководителей ОРК (решение владельца 26.10.2026, п. 3).
 Сроки менеджера — «без пауз»: паузы в Битриксе не ведутся. Пороги ворот — ork.GATES,
 предложение до решения владельца.
 """
@@ -29,6 +30,9 @@ import ork
 import period as period_mod
 
 COUNT_GATES = ork.GATES      # счёт живых пунктов: n-ворота n_count = 1, покрытие — как у всех
+# показатели «Месяца» — под правом «Реализация: показатели менеджеров ОРК» (ork_heads)
+MONTH_CODES = ("M1", "M2", "M3")
+RIGHT_NOTE = "под правом «Реализация: показатели менеджеров ОРК» — подвкладка «Месяц»"
 
 
 def _d(v) -> dt.date | None:
@@ -70,9 +74,14 @@ def _count(value: int, n: int, cover: float | None, *, src: str, extra: dict | N
            unknown: int = 0) -> dict:
     """Плитка-счёт «сейчас»: на шагах никого (и стадий не из таблицы нет) — известный ноль.
     unknown — живые заказы со стадией не из таблицы шагов: они в n как «срок неизвестен» и
-    снижают покрытие; все заказы в n такие — «Нет данных», а не ноль за неизвестное."""
+    снижают покрытие; все заказы в n такие — «Нет данных», а не ноль за неизвестное. На шаге
+    есть заказы, но все не в счёте (excluded в extra: гигиена, приёмка вне «Реализации») —
+    «в счёте никого, не в счёте N», а не «на шагах никого»."""
     if not n:
-        out = {"state": "show", "value": 0, "n": 0, "cover": None, "why": "сейчас на шагах никого",
+        exc = (extra or {}).get("excluded") or 0
+        out = {"state": "show", "value": 0, "n": 0, "cover": None,
+               "why": (f"в счёте никого; не в счёте {exc} (гигиена карточки или сделка вне «Реализации»)"
+                       if exc else "сейчас на шагах никого"),
                "src": src, "need": ""}
         if extra:
             out.update(extra)
@@ -164,25 +173,34 @@ def _dist(segs: list[dict], *, n_key="n_min", src="", val=lambda s: s.get("cd"))
 
 def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.date, *,
           measure: list[dict] | None = None, otd: dict | None = None,
-          ork_head: str = "") -> tuple[dict, list[dict]]:
+          ork_head: str = "") -> tuple[dict, dict]:
     """orders — заказы вида (contracts.life_orders: stage, stepSince, t0, факты, _segs,
     _reach, art, orkMgr, respOrk, prepayShare, assignDate…); deals — строки сделок вида;
     queue — очередь lifecycle вида; measure — все заказы (мерило квартала: свойства
-    поставщиков и процесса, а не вида). → (раздел «ork», показатели менеджеров поимённо)."""
+    поставщиков и процесса, а не вида). → (раздел «ork» без «Месяца», «Месяц» под правом:
+    {month — показатели отдела, people — менеджеры ОРК поимённо, how — строки M1–M3 «Как
+    считается»})."""
     measure = orders if measure is None else measure
     deal_by = {d["deal"]: d for d in deals}
     U = [o for o in orders if o.get("live") and (d := deal_by.get(o.get("deal")))
          and not d.get("lost") and not d.get("closed")]
+    # шаг 12 (УПД) — на менеджере ОРК при любой стадии оплаты сделки (Рег. 14.2.4–14.3.2):
+    # живой заказ закрытой выигранной сделки (в том числе «Оплата получена»), доставленный без
+    # УПД, — в совокупности шага 12 (ведомость, W2, «Сверх нормы по менеджерам»), как в очереди
+    # (noUtd), очереди КАМа и карточке. Остальные шаги у закрытой сделки — уже не отклонения
+    C12 = [o for o in orders if o.get("live") and (d := deal_by.get(o.get("deal")))
+           and not d.get("lost") and d.get("closed") and ork.step_now(o) == 12]
     mon = today - dt.timedelta(days=today.weekday())
     sun = mon + dt.timedelta(days=6)
     unknown: Counter = Counter()
-    deal_ok = {o["id"]: (deal_by.get(o.get("deal")) or {}).get("inCat0", True) for o in U}
+    L = U + C12                             # совокупность ведомости: живые + шаг 12 закрытых
+    deal_ok = {o["id"]: (deal_by.get(o.get("deal")) or {}).get("inCat0", True) for o in L}
     # шаг — ork.step_now (доставлено без УПД — шаг 12), «сверх нормы» — ork.judged: одно правило
     # с таблицей сделок, карточкой, «Замедлено» и очередью (гигиена и приёмка вне «Реализации»
     # в счёт не идут). Одна совокупность у «сейчас», «сверх нормы» и W2
-    step = {o["id"]: ork.step_now(o, unknown=unknown) for o in U}
-    ov = {o["id"]: ork.judged(o, today, in_cat0=deal_ok[o["id"]]) for o in U}
-    hy = {o["id"]: ork.hygiene(o, today) for o in U}
+    step = {o["id"]: ork.step_now(o, unknown=unknown) for o in L}
+    ov = {o["id"]: ork.judged(o, today, in_cat0=deal_ok[o["id"]]) for o in L}
+    hy = {o["id"]: ork.hygiene(o, today) for o in L}
     unk = [o for o in U if step[o["id"]] is None]           # стадия не из таблицы шагов
     unk_n = len(unk)
     qcodes = Counter(q["code"] for q in queue)
@@ -195,7 +213,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # --- ведомость 13 шагов -----------------------------------------------------------------
     # «сверх нормы» шага — живые заказы вида на этом шаге с judged.over; пункт очереди того же
     # заказа (s1Over…s6Over, noUtd) ставит то же правило — помечаем его w2 (отбор плитки)
-    over_ids: dict[int, set] = {st: {o["id"] for o in U if step[o["id"]] == st and ov[o["id"]]["over"]}
+    over_ids: dict[int, set] = {st: {o["id"] for o in L if step[o["id"]] == st and ov[o["id"]]["over"]}
                                 for st in ork.NORM_WD}
     for st, code in ork.OVER_CODE.items():
         for q in q_by.get(code, []):
@@ -214,7 +232,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     ledger, adjacent = [], Counter()
     for s in ork.STEPS:
         no = s["no"]
-        here = [o for o in U if step[o["id"]] == no]
+        here = [o for o in L if step[o["id"]] == no]
         waits = s["role"] if s["role"] in ork.ADJACENT else (
             s["waits"] if s["norm"] is None and s["waits"] in ork.ADJACENT else None)
         req = miss = 0
@@ -252,15 +270,20 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     w1_n = len(s1_now) + len(no_order) + unk_n
     w1_v = len(over_ids[1]) + qcodes.get("noOrder", 0)
     # «в срок за 20 р.д.»: приёмка заказов вида, закончившаяся за последние 20 рабочих дней
+    # приёмка сделки вне воронки «Реализация» не в счёте (Рег. 3.3) — как у ork.judged и «Месяца»
     back = period_mod.add_workdays_ru(today, -ork.WEEK_BACK_WD)
+    in_cat = {d["deal"]: d.get("inCat0", True) for d in deals}
     s1_recent = [o["_segs"]["segs"]["S1"] for o in orders
-                 if (o.get("_segs") or {}).get("segs", {}).get("S1")
+                 if (o.get("_segs") or {}).get("segs", {}).get("S1") and in_cat.get(o.get("deal"), True)
                  and back and _end(o["_segs"]["segs"]["S1"]) and _end(o["_segs"]["segs"]["S1"]) > back]
     agree_s1, agree_n = _s1_agree(orders)
+    recent = (_timeliness(s1_recent, "S1", agree=agree_s1) if back else
+              _ms(None, 0, None, src="S1", need=f"нет производственного календаря на {today.year} год "
+                                                "(data/workcal_ru.json) — 20 р.д. назад не отсчитать"))
     W1 = _count(w1_v, w1_n, (s1_known + no_known) / w1_n if w1_n else None, src="s1Over + noOrder",
                 unknown=unk_n,
                 extra={"orders": len(over_ids[1]), "noOrder": qcodes.get("noOrder", 0),
-                       "label": ork.NO_PAUSE, "recent": _timeliness(s1_recent, "S1", agree=agree_s1),
+                       "label": ork.NO_PAUSE, "recent": recent,
                        "agree": agree_s1, "agreeN": agree_n,
                        "excluded": sum(1 for o in U if step[o["id"]] == 1 and not_counted(o))})
 
@@ -268,7 +291,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # n — заказы этих шагов в счёте (judged.counted) и со сроком, который не посчитать
     # (termUnknown: нет даты входа или факта доставки, года нет в календаре), плюс стадии не из
     # таблицы; гигиена и приёмка вне «Реализации» — рядом (excluded), не в n
-    w2_pop = [o for o in U if step[o["id"]] in ork.OVER_CODE
+    w2_pop = [o for o in L if step[o["id"]] in ork.OVER_CODE
               and (ov[o["id"]]["counted"] or ov[o["id"]]["termUnknown"])]
     w2_known = sum(1 for o in w2_pop if ov[o["id"]]["counted"])
     w2_n = len(w2_pop) + unk_n
@@ -276,7 +299,8 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     W2 = _count(sum(by_step.values()), w2_n, w2_known / w2_n if w2_n else None,
                 src="s1Over, s2Over, s3Over, s6Over, noUtd", unknown=unk_n,
                 extra={"byStep": by_step, "label": "по стадии, " + ork.NO_PAUSE,
-                       "excluded": sum(1 for o in U if step[o["id"]] in ork.OVER_CODE and not_counted(o))})
+                       "closed12": len(C12),
+                       "excluded": sum(1 for o in L if step[o["id"]] in ork.OVER_CODE and not_counted(o))})
 
     # --- W3 зона риска: срок клиента (результат поставщика и логистики) ---------------------
     undeliv = [o for o in U if not (o.get("delFact") or o.get("utdDate"))]
@@ -306,13 +330,16 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                         "date": p["date"], "who": (o.get("own") or {}).get("who") or ""})
     cps.sort(key=lambda x: (x["date"], x["kind"]))
     w5_n = len(prod) + unk_n
+    # prod — в производстве (шаги 6–7), без дат — у них точки неизвестны; стадии не из таблицы — отдельно
     W5 = _count(len(cps), w5_n, with_dates / w5_n if w5_n else None, src="ork.checkpoints", unknown=unk_n,
-                extra={"noStatus": "пройдена без запроса статуса — нет данных: поле «Запрос статуса поставщику»"})
+                extra={"noStatus": "пройдена без запроса статуса — нет данных: поле «Запрос статуса поставщику»",
+                       "prod": len(prod), "noDates": len(prod) - with_dates})
     if prod and not with_dates and W5["state"] != "nodata":
         # в производстве есть, плановых дат нет ни у кого — это «нет данных», а не «покрытие 0 %»
         W5 = _ms(None, 0, None, src="ork.checkpoints", need="нет плановых дат производства у заказов шагов "
                  "6–7 (Production start/end date, budget) — внести даты размещения (ОСС)",
-                 extra={"noStatus": W5.get("noStatus"), "unknown": unk_n, "prod": len(prod)})
+                 extra={"noStatus": W5.get("noStatus"), "unknown": unk_n, "prod": len(prod),
+                        "noDates": len(prod) - with_dates})
 
     # --- сверх нормы по исполнителям (W2 поимённо: срок менеджера — его работа) ---------------
     mgr: dict[str, dict] = {}
@@ -332,7 +359,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
 
     # --- гигиена карточек -------------------------------------------------------------------
     hyg_items, hc = [], Counter()
-    for o in U:
+    for o in L:
         h = hy[o["id"]]
         kinds = [k for k in ("behind", "abandoned", "old", "unknown") if h.get(k)]
         if (o.get("own") or {}).get("role") == "orkMgr" and (o.get("own") or {}).get("who") == "не назначен":
@@ -349,39 +376,58 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
     # доставка без УПД (шаг 12), стадия не из таблицы; «менеджер ОРК не назначен» в счёте ЕСТЬ —
     # назначить (решение п. 1)
     hyg_excl = sum(1 for x in hyg_items if x["excl"])
+    # «в счёт не идут: N (…)» — разбивка только по заказам вне счёта: доставленный без УПД с
+    # отставшей стадией (шаг 12) в счёте ЕСТЬ и в скобки не идёт
+    hc_excl = Counter(k for x in hyg_items if x["excl"] for k in x["kinds"])
 
     week = {"mon": mon.isoformat(), "sun": sun.isoformat(),
             "tiles": {"W1": W1, "W2": W2, "W3": W3, "W4": W4, "W5": W5},
             "ledger": ledger, "unknown": unk_n, "unknownStages": dict(unknown.most_common(20)),
-            "live": len(U), "dealsNoOrder": len(no_order),
+            # живые заказы ведомости: открытых сделок и шаг 12 закрытых (closed12 из них)
+            "live": len(L), "closed12": len(C12), "dealsNoOrder": len(no_order),
+            # из них дольше 1 р.д. — пункты noOrder (они в W1)
+            "dealsNoOrderOver": qcodes.get("noOrder", 0),
+            # «Оплата получена», сделка не закрыта — пункты dealClose (шаг 13, ОСС): сделки, не заказы
+            "dealClose": qcodes.get("dealClose", 0),
+            "orkHead": ork_head or "",
             "adjacent": {r: adjacent.get(r, 0) for r in ork.ADJACENT},
             "longP80": long_p80,
             "overByWho": over_mgr, "risk": risk_list, "checkpoints": cps,
-            "hygiene": {"n": len(hyg_items), "by": dict(hc), "excluded": hyg_excl,
+            "hygiene": {"n": len(hyg_items), "by": dict(hc), "excluded": hyg_excl, "byExcl": dict(hc_excl),
                         "noMgrOnly": sum(1 for x in hyg_items if x["kinds"] == ["noMgr"]), "items": hyg_items},
             "notChecked": "не проверяется: паузы и эскалации (полей нет), запросы статуса поставщику, "
                           "содержимое файлов (есть ли подпись), проверка контрагента (СП-1066 не читается)"}
 
-    month, month_people = _month(orders, U, today, otd, ov)
+    month, month_people = _month(orders, U, today, otd, ov, deal_ok_all={
+        d["deal"]: d.get("inCat0", True) for d in deals})
     how = _how(orders, U, deals, queue, week, month, quarter, today, step)
+    # «Месяц» целиком — под правом руководителей ОРК (решение владельца 26.10.2026, п. 3:
+    # «подвкладка «Месяц» — только руководителям и владельцу»): показатели отдела, ячейка S1
+    # (одна роль — один человек) и поимённо — во второй элемент ответа (массив ORKMONTH), в
+    # «Как считается» у M1–M3 — только формула и поля, вердикт и n — там же, под правом
+    m_rows = [m for m in how["metrics"] if m["code"] in MONTH_CODES]
+    how["metrics"] = [m if m["code"] not in MONTH_CODES else
+                      {**m, "state": "right", "why": RIGHT_NOTE, "n": None, "cover": None}
+                      for m in how["metrics"]]
     # годы сроков, которые считаются сейчас: от самой ранней даты входа в шаг живого заказа (и
     # факта доставки у шага 12) до сегодня — без подрезки снизу (правило 15)
-    used = [_d(ov[o["id"]]["since"]) for o in U if ov[o["id"]]["since"]]   # у шага 12 since — доставка
+    used = [_d(ov[o["id"]]["since"]) for o in L if ov[o["id"]]["since"]]   # у шага 12 since — доставка
     y0 = min((d.year for d in used if d), default=today.year)
     trust = {"calYears": list(period_mod.workcal_years()),
              "yearsNoCal": [y for y in range(y0, today.year + 1) if y not in period_mod.workcal_years()],
              "nextYearCal": (today.year + 1) in period_mod.workcal_years(),
              "histSince": "2024-06-01", "note": "паузы и эскалации в Битриксе не ведутся — у сроков менеджера "
                                                 "подпись «без пауз»",
-             "mapped": sum(1 for o in U if step[o["id"]] is not None), "unknown": unk_n,
-             "noCalendar": sum(1 for o in U if ov[o["id"]]["why"] == "год без производственного календаря"),
+             "mapped": sum(1 for o in L if step[o["id"]] is not None), "unknown": unk_n,
+             "noCalendar": sum(1 for o in L if ov[o["id"]]["why"] == "год без производственного календаря"),
              "ownerRule": ork.OWNER_RULE, "orkHead": bool(ork_head),
              # ответственный живого заказа — из отдела ОРК по справочнику (people.ORK_DEPT): ноль —
              # название отдела не совпало, «менеджер ОРК не назначен» затопит очередь
              "respOrk": sum(1 for o in U if o.get("respOrk")),
-             "oldNoUtd": sum(1 for o in U if hy[o["id"]].get("old"))}
-    return ({"asOf": today.isoformat(), "trust": trust, "week": week, "month": month, "quarter": quarter,
-             "how": how, "gatesNote": ork.GATES_NOTE}, month_people)
+             "oldNoUtd": sum(1 for o in L if hy[o["id"]].get("old"))}
+    return ({"asOf": today.isoformat(), "trust": trust, "week": week, "quarter": quarter,
+             "how": how, "gatesNote": ork.GATES_NOTE},
+            {"month": month, "people": month_people, "how": m_rows})
 
 
 def _long_p80(prod: list[dict], s5: dict, today: dt.date) -> dict:
@@ -438,19 +484,35 @@ def _person(o: dict) -> str:
     return "" if w in ("", "—", "не назначен") else str(w)
 
 
-def _people_gate(st: dict, who: set) -> dict:
-    """Показатель отдела по одному-двум людям — это показатель человека (решение п. 3: поимённо
-    — только под правом руководителей): людей за ячейкой меньше n_managers_min — не
-    показываем, значение и k не отдаём. «Нет данных» остаётся «нет данных»."""
-    st["people"] = len(who)
-    if st.get("state") != "nodata" and len(who) < ork.GATES["n_managers_min"]:
-        _hide(st, f"не показываем: ответственных заказа {len(who)} < {ork.GATES['n_managers_min']} — "
-                  "показатель раскрыл бы человека")
+# у ячейки, скрытой воротами людей, нет и чисел, из которых её восстановить вычитанием
+PEOPLE_KEYS = ("n", "ended", "excluded", "skipped", "people", "cover")
+
+
+def _people_hide(st: dict, why: str) -> dict:
+    _hide(st, why)
+    for k in PEOPLE_KEYS:
+        st.pop(k, None)
+    st["peopleGate"] = True
     return st
 
 
-def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, ov: dict):
-    """«Месяц»: M1–M3 по заказам ОРК-эпохи (созданы с ork.ORK_SINCE). Поимённо — отдельно."""
+def _people_gate(st: dict, who: set) -> dict:
+    """Показатель отдела по одному-двум людям — это показатель человека (решение п. 3: поимённо
+    — только под правом руководителей): людей за ячейкой меньше n_managers_min — не
+    показываем; значение, k, n и прочие счёты не отдаём. «Нет данных» остаётся «нет данных»."""
+    st["people"] = len(who)
+    if st.get("state") != "nodata" and len(who) < ork.GATES["n_managers_min"]:
+        _people_hide(st, f"не показываем: ответственных заказа {len(who)} < {ork.GATES['n_managers_min']} — "
+                         "показатель раскрыл бы человека")
+    return st
+
+
+def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, ov: dict, *,
+           deal_ok_all: dict | None = None):
+    """«Месяц»: M1–M3 по заказам ОРК-эпохи (созданы с ork.ORK_SINCE). Поимённо — отдельно.
+    deal_ok_all — сделка в воронке «Реализация»: приёмка (S1) сделки вне воронки не в счёте
+    (Рег. 3.3), как у ork.judged и W1."""
+    deal_ok_all = deal_ok_all or {}
     era = [o for o in orders if _d(o.get("created")) and _d(o["created"]) >= ork.ORK_SINCE]
     agree_s1, _n = _s1_agree(era)
     otd_by = {m["m"]: m for m in (otd or {}).get("months") or []}
@@ -466,6 +528,8 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
         for o in era:
             for code in ("S1", "S2", "S3", "S6"):
                 s = (o.get("_segs") or {}).get("segs", {}).get(code)
+                if code == "S1" and not deal_ok_all.get(o.get("deal"), True):
+                    continue                       # приёмка — только у сделок «Реализации»
                 if s and _end(s) and m0 <= _end(s) < m1:
                     by_seg[code].append(s)
                     if _person(o):
@@ -493,6 +557,11 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
         allm = [s for c in ("S2", "S3", "S6") for s in by_seg[c]]
         m1s["mgr"] = _people_gate(_probe_cap("M1", _timeliness(allm, "S2+S3+S6")),
                                   seg_who["S2"] | seg_who["S3"] | seg_who["S6"])
+        # сумма минус показанные = скрытая: хоть одна из S2/S3/S6 скрыта — скрыта и сумма
+        hid = [c for c in ("S2", "S3", "S6") if m1s[c].get("state") == "hidden"]
+        if hid and m1s["mgr"].get("state") != "hidden":
+            _people_hide(m1s["mgr"], f"не показываем: скрыта ячейка {', '.join(hid)} — сумма раскрыла бы "
+                                     "её вычитанием")
         m2 = _people_gate(_ms(_pct(have, req) if req else None, req, None, src="ork.ARTIFACTS",
                               extra={"have": have, "label": "файл есть, содержимое не проверено", "target": 95}),
                           art_who)
@@ -500,8 +569,10 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
         otd_st = _ms(o_m.get("pct"), o_m.get("n") or 0, None, src="life.otd",
                      extra={"ontime": o_m.get("ontime"), "label": "результат поставщика и логистики"})
         # текущий месяц идёт — неполный: заголовок «Месяца» — последний ПОЛНЫЙ месяц
+        # первый месяц эпохи ОРК (24.08 — середина месяца) неполный: в счёте только отрезки
+        # заказов, созданных с 24.08 и успевших закончиться, — сдвиг к «в норме»
         rows.append({"m": m0.strftime("%m.%Y"), "M1": m1s, "M2": m2, "otd": otd_st, "target": 95,
-                     "partial": mi == 0})
+                     "partial": mi == 0, "eraPartial": m0 < ork.ORK_SINCE < m1})
 
     # M3 загрузка: живые заказы ОРК-эпохи на менеджера ОРК против среднего по менеджерам
     live_era = [o for o in U if _d(o.get("created")) and _d(o["created"]) >= ork.ORK_SINCE]
@@ -581,7 +652,8 @@ def _quarter_view(measure: list[dict], today: dt.date) -> dict:
             sup[sk][1] += ready <= pe
         share_pef = pef / n if n else None
         share_bad = bad / (n + bad) if (n + bad) else None
-        st = _ms(_pct(ok, n) if n else None, n, None, n_key="n_supplier_quarter", plan_eq_fact=share_pef,
+        # отдел целиком — общий показатель (n_min); поставщик за квартал — n_supplier_quarter
+        st = _ms(_pct(ok, n) if n else None, n, None, n_key="n_min", plan_eq_fact=share_pef,
                  burst=share_bad, src="вход в «Заказ готов» против «Production end date, budget»",
                  extra={"k": ok, "stock": stock, "planEqFact": round(share_pef, 3) if share_pef is not None else None,
                         "burstN": bad, "target": 90, "weight": 25})

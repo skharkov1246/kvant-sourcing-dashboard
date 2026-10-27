@@ -96,7 +96,8 @@ sys.path.insert(0, str(ROOT))
 
 РАЗДЕЛЫ_АТРИБУЦИИ = frozenset({"kpi", "weekly", "sourcersa", "origin"})
 НЕ_СРАВНИВАТЬ = frozenset({"period", "_portal"})
-ВКЛАДКИ = ("company", "kam", "eng", "prod", "contracts", "reps", "advisor", "people", "kaminc")
+# orkMonth — «Месяц» «Реализации» (в странице — своим массивом под правом ork_heads)
+ВКЛАДКИ = ("company", "kam", "eng", "prod", "contracts", "reps", "advisor", "people", "kaminc", "orkMonth")
 ЗАГЛУШКА_ИМЕНИ = re.compile(r"^user#\d+$")
 НЕ_ОПРЕДЕЛЁН = "исполнитель не определён"      # строка разреза origin.byOwnerDept
 ГЛАВНЫЕ_ИНВАРИАНТЫ = ("отдел + вне отдела = всего", "сумма по сорсерам = отдел")

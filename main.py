@@ -834,8 +834,8 @@ def run(args) -> int:
 
     contracts_data = None
     dealctx_data = None
-    # показатели менеджеров ОРК поимённо (решение владельца 26.10.2026, п. 3): в страницу —
-    # только своим массивом под правом руководителей ОРК, не в данные вкладки
+    # «Месяц» — показатели отдела и менеджеров ОРК поимённо (решение владельца 26.10.2026,
+    # п. 3): в страницу — только своим массивом под правом руководителей ОРК, не в данные вкладки
     ork_month_data = None
     # закрытый свод оценок чатов и разбора договоров (решение владельца 23.10.2026):
     # файл из KV realctx:v1, который кладёт сборка (deploy.yml); нет — вкладка как раньше
@@ -879,7 +879,7 @@ def run(args) -> int:
               f"{((_wk.get('hygiene') or {}).get('by') or {}).get('noMgr', 0)}, старых доставок без УПД "
               f"{_tr.get('oldNoUtd', 0)}; «Замедлено» до чата: было {_cmp.get('old', 0)}, "
               f"стало {_cmp.get('new', 0)} (хуже у {_cmp.get('worse', 0)}, лучше у {_cmp.get('better', 0)}); "
-              f"менеджеров ОРК в «Месяце» {len((ork_month_data or {}).get('main') or [])}")
+              f"менеджеров ОРК в «Месяце» {len(((ork_month_data or {}).get('main') or {}).get('people') or [])}")
         _print_fx(contracts_data.get("fx") or {})
         # «что делать первым» — по общей очереди обоих видов (contracts.life_all); плитки
         # отдельного направления — в его вид (решение владельца 25.10.2026)
@@ -1038,6 +1038,9 @@ def run(args) -> int:
             "contracts": contracts_data, "reps": reps_data, "advisor": advisor_data,
             "people": people_data, "premia": premia_data, "dealctx": dealctx_data,
             "kaminc": kaminc_data,
+            # «Месяц» «Реализации» (под правом в странице) — живая сверка видит и его; ключ —
+            # как имя поля из кода (live_check._ПОЛЕ_КОДА), иначе раздел свернётся в {*}
+            "orkMonth": ork_month_data,
             "_portal": client.snapshot_stats(),
         }, ensure_ascii=False, default=str), encoding="utf-8")
         print(f"  ✓ вкладки для сверки: {args.data_json}")
