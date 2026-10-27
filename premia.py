@@ -106,9 +106,16 @@ def pool_of(result: float, coef: float) -> float:
 
 
 def _cost(d: dict, crow: dict | None, eur_rub: float) -> tuple[float, float, str]:
-    """(ПЗ ₽, оплата поставщику ₽, источник) без оценки по коэффициенту."""
+    """(ПЗ ₽, оплата поставщику ₽, источник) без оценки по коэффициенту.
+
+    ПЗ из книги бюджета и из «Cost» экономики «Реализация» перевела в € курсом ЦБ на дату
+    книги и на дату КП (решение владельца 25.10.2026): в ₽ они возвращаются ТЕМ ЖЕ курсом
+    (planEurRub, kpEurRub строки), иначе ₽ книги сдвинулись бы на разницу курсов ЦБ и
+    Битрикса (~12 %, ревью 26.10.2026). Прочие источники — курсом премий eur_rub, как прежде."""
     pz, pay, src = pz_of(float(d.get("buyRaw") or 0), crow)
-    return pz * eur_rub, pay * eur_rub, src
+    k = {"book": (crow or {}).get("planEurRub"), "econ": (crow or {}).get("kpEurRub")}.get(src)
+    r = float(k) if k else eur_rub
+    return pz * r, pay * r, src
 
 
 def _parts(d: dict, neg: bool) -> list[list]:

@@ -292,7 +292,8 @@ def test_файл_после_правки_суммы_не_первый():
     assert _row(_compute_econ(stub, {did: свежий}), did)["saleSrc"] == "file"
     устарел = _econ(amt * 1.5, amt / 2, ratio=1.0)              # сегодня «Сумма» / файл = 0,67, а было 1,0
     r = _row(_compute_econ(stub, {did: устарел}), did)
-    assert r["saleSrc"] == "bitrix" and r["saleEur"] == round(amt)
+    # «Сумма» Битрикса — без НДС по правилу 26.10.2026 (покупатель без реквизитов): ÷ ставку на дату ТКП
+    assert r["saleSrc"] == "bitrix" and r["vatRule"] == "gross" and r["saleEur"] == round(amt / r["vatK"])
 
 
 def test_файл_даёт_продажу_при_валюте_без_курса():

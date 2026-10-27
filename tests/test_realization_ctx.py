@@ -122,7 +122,7 @@ def test_свод_по_форме_и_без_условий():
 def test_расхождение_с_пересчётом_помечается_и_краснит_шаг():
     строки, флаги = _пара()
     # прогон записал «нет пары», а по строкам — пара
-    V = ct.METHOD_VER
+    V = ct.ВЕРСИЯ_ИСХОДА
     база = База(выбор=[{"deal": 101, "run": "ct-2", "outcome": "нет пары", "at": T, "ver": V}], строки=строки,
                 флаги=флаги)
     store = Store()
@@ -159,7 +159,7 @@ def test_прежняя_недочитана_с_нечитаемым_файло�
     «разошлось», и шаг не краснеет. Обратного схождения нет. Временный отказ закачки
     тогда тоже писался download: по заметке он и сейчас «недочитана», а не «не
     читается» с пунктом «перезалить файл»."""
-    V = ct.METHOD_VER
+    V = ct.ВЕРСИЯ_ИСХОДА
     строки = [_строка(101, "ct-2", 1, "customer", terms=ЗАКАЗЧИК), _строка(101, "ct-2", 2, "supplier", status="download")]
     строки[1]["note"] = "urlMachine: код 404"
     база = База(выбор=[{"deal": 101, "run": "ct-2", "outcome": "недочитана", "at": T, "ver": V}], строки=строки)
@@ -235,7 +235,7 @@ def test_purchase_order_в_пересчёте_как_у_прогона():
     флаги, исход = ct.флаги_сделки(строки)
     assert исход == "пара" and not {f["code"] for f in флаги} & {"penaltyUncovered", "docsGap"}
     флаги = [dict(f, run_id="ct-2") for f in флаги]
-    база = База(выбор=[{"deal": 101, "run": "ct-2", "outcome": "пара", "at": T, "ver": ct.METHOD_VER}],
+    база = База(выбор=[{"deal": 101, "run": "ct-2", "outcome": "пара", "at": T, "ver": ct.ВЕРСИЯ_ИСХОДА}],
                 строки=строки, флаги=флаги)
     s = Store()
     assert rc.publish(база, s, dry=False, ct=ct, печать=lambda x: None) == 0
@@ -251,7 +251,7 @@ def test_рамочный_двух_заказов_считается_один_р
         r.update(card_entity=175, link_source="framework")
     флаги, исход = ct.флаги_сделки(строки)
     assert исход == "пара" and {f["order_id"] for f in флаги} == {77, 78}
-    база = База(выбор=[{"deal": 101, "run": "ct-2", "outcome": "пара", "at": T, "ver": ct.METHOD_VER}],
+    база = База(выбор=[{"deal": 101, "run": "ct-2", "outcome": "пара", "at": T, "ver": ct.ВЕРСИЯ_ИСХОДА}],
                 строки=строки, флаги=[dict(f, run_id="ct-2") for f in флаги])
     s = Store()
     assert rc.publish(база, s, dry=False, ct=ct, печать=lambda x: None) == 0
@@ -387,6 +387,24 @@ def test_колонки_выгрузки_по_схеме_договоров():
         assert старше == sorted(без) and нет == ["link_source", "order_key"]
         assert f"null as {next(iter(без))}" not in выбор
     assert set(rc.СХЕМА_ДОГОВОРОВ_V2) & set(rc.КОЛОНКИ_УСЛОВИЙ) == {"link_source"}
+    # side_source (25.10.2026: сторона по карточке) — в выгрузке; без колонки — пустой
+    # (сторона модели, как у строк до 25.10.2026), а не стоп
+    assert "side_source" in rc.КОЛОНКИ_УСЛОВИЙ
+    выбор, нет, старше = rc.колонки_выгрузки(все - {"side_source"})
+    assert "null as side_source" in выбор and нет == ["side_source"] and старше == []
+
+
+def test_свод_по_карточке_гейт_меряет_модель():
+    """Строка «по карточке» в своде — не сторона модели: пересчёт для вкладки читает
+    side_source и сверяет её так же, как прогон (contract_terms.сторона_модели)."""
+    строки, флаги = _пара()
+    for r in строки:
+        r.setdefault("side_source", "model")
+    поставщик = next(r for r in строки if r["side"] == "supplier")
+    поставщик.update(side_source="card", side_company="supplier", terms={**поставщик["terms"], "side": None})
+    флаги_пересчёта, исход = ct.флаги_сделки(строки)
+    assert исход == "пара" and not ct.сторона_спорная(поставщик) and ct.сторона_модели(поставщик) is None
+    assert {f["code"] for f in флаги_пересчёта} == {f["code"] for f in флаги}
 
 
 def test_схема_договоров_старше_v2_стоп():
