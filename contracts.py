@@ -1031,7 +1031,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             lo["kamDeal"] = d_people["kam"]
             lo["own"] = own = ork.owner(ostep, {**d_people, "orkMgr": lo["orkMgr"], "ossOrder": lo["oss"]}) \
                 if ostep else {"role": "", "who": "", "copy": "", "copyRole": ""}
-            oslow = bool(olive and ov["over"])
+            # закрытая выигранная сделка (в том числе «Оплата получена») — в счёте только шаг 12
+            # (УПД, Рег. 14.2.4–14.3.2), проигранная — ничего: та же совокупность, что ведомость,
+            # W2 и очередь (C12 orkview, lifecycle). Остальные шаги закрытой сделки — не
+            # отклонения: ни красной строки заказа, ни «замедлена» в карточке
+            ojudge = bool(olive and (not closed or (ostep == 12 and sem != "F")))
+            oslow = bool(ojudge and ov["over"])
             if oslow:
                 slow_orders += 1
             # обещание клиенту: та же дата, по которой снабжение ведёт «Контроль дедлайнов»
@@ -1099,14 +1104,18 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 # шаг регламента ОРК · исполнитель · р.д. на шаге / норма («без пауз»)
                 "step": ostep, "stepRole": own["role"], "stepWho": own["who"],
                 "stepWd": ov["wd"] if olive else None, "stepNorm": ov["norm"],
-                "stepOver": ov["over"] if olive else None,
+                "stepOver": ov["over"] if ojudge else None,
                 # шаг 12 больше 10 р.д. без УПД — «ждём УПД от клиента», не «сверх нормы»
-                "stepWaitUtd": bool(olive and ov["waitUtd"]),
+                "stepWaitUtd": bool(ojudge and ov["waitUtd"]),
+                # шаг живого заказа закрытой сделки вне счёта (не шаг 12 выигранной) — подпись
+                # «сделка закрыта, не в счёте» вместо оценки срока
+                "stepClosed": bool(olive and not ojudge and ostep and ov["norm"] is not None),
                 # норма по регламенту, которую портал не меряет (шаг 6 — «нет данных»), и почему
                 # срок не в счёте (гигиена, приёмка вне «Реализации», срок не посчитать)
                 "stepNormDoc": ov["normDoc"], "stepNormState": ov["normState"],
-                "stepHyg": bool(olive and ov["hyg"] and ov["norm"] is not None),
-                "stepWhy": ov["why"] if olive else "",
+                "stepHyg": bool(ojudge and ov["hyg"] and ov["norm"] is not None),
+                "stepWhy": (("сделка закрыта: в счёте только шаг 12 (УПД)" if sem != "F" else "сделка проиграна")
+                            if (olive and not ojudge) else ov["why"] if olive else ""),
             })
         ords_det.sort(key=lambda x: (not x["live"], -(x["dlDays"] if x["dlDays"] is not None else -9999),
                                      -(x["days"] or 0)))
@@ -1166,24 +1175,26 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         _cand = ([x for x in _live_st if x["step"] == 12] if (closed and sem != "F")
                  else [] if closed else _live_st)
         _all_done = bool(not closed and ords and all(_osem(o.get("stageId")) == "S" for o in ords))
+        # оговорка к «закрыть сделку» (Рег. 15.6, 14.6): та же, что у пункта dealClose очереди
+        _close_note = lifecycle.close_note([lo_by_id[str(o.get("id"))] for o in ords]) if paid else ""
         if _cand and (any(x["stepOver"] or x["stepWaitUtd"] for x in _cand) or not paid):
             c = min(_cand, key=lambda x: (not x["stepOver"], not x["stepWaitUtd"], x["step"]))
             step_cell = {"step": c["step"], "role": c["stepRole"], "who": c["stepWho"], "wd": c["stepWd"],
                          "norm": c["stepNorm"], "over": c["stepOver"], "waitUtd": c["stepWaitUtd"],
                          "normDoc": c["stepNormDoc"],
                          "normState": c["stepNormState"], "hyg": c["stepHyg"], "why": c["stepWhy"],
-                         "label": ork.NO_PAUSE, "close": "paid" if paid else ""}
+                         "label": ork.NO_PAUSE, "close": "paid" if paid else "", "closeNote": _close_note}
         elif paid or _all_done:
             _o = ork.owner(13, d_people)
             step_cell = {"step": 13, "role": _o["role"], "who": _o["who"], "wd": None, "norm": None,
                          "over": None, "waitUtd": False, "normDoc": "", "normState": "none", "hyg": False, "why": "",
-                         "label": "закрыть сделку", "close": "paid" if paid else "open"}
+                         "label": "закрыть сделку", "close": "paid" if paid else "open", "closeNote": _close_note}
         elif not closed and in_cat0 and not ords:
             _h = ork.owner(1, d_people)
             step_cell = {"step": 1, "role": _h["role"], "who": _h["who"], "wd": no_order_wd,
                          "norm": ork.NORM_WD[1], "over": no_orders_slow if no_order_wd is not None else None, "waitUtd": False,
                          "normDoc": ork.NORM_DOC[1][0], "normState": "norm", "hyg": False, "why": "",
-                         "label": ork.NO_PAUSE, "close": ""}
+                         "label": ork.NO_PAUSE, "close": "", "closeNote": ""}
         else:
             step_cell = None
         _dmax = [x for x in (deal_step_max.get(did), d_step) if x is not None]

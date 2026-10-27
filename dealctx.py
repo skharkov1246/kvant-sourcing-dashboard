@@ -520,7 +520,13 @@ def _step_now(r: dict) -> int | None:
 def _reg(code: str, r: dict, ppl: dict, key: str | None = None) -> dict:
     """Хозяин пункта по регламенту (решение владельца 26.10.2026, п. 1; ork.ITEM): шаг, роль,
     исполнитель, копия."""
-    ow = ork.item_owner(code, _step_now(r), ppl, key=key)
+    st = _step_now(r)
+    # «документы» из чата у сделки на шаге 13 (оплата получена, закрыть сделку — ОСС): после
+    # доставки документы — УПД, шаг 12 менеджера ОРК (Рег. 14). ОСС пункт не получает: со
+    # сторонами не говорит (Рег. 1.11), а «подтвердить у второй стороны» — разговор
+    if key == "chatDue:документы" and st == 13:
+        st = 12
+    ow = ork.item_owner(code, st, ppl, key=key)
     return {"step": ow["step"], "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
             "who": ow["who"], "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}
 

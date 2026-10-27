@@ -552,6 +552,14 @@ def test_хозяин_пунктов_чатов_и_договоров_по_ре�
         assert ow["role"] == role, kind
         if kind == "документы":                  # отгрузочные или УПД — по шагу сделки, не догадкой
             assert ow["step"] == 7
+    # оплаченная сделка (ячейка — шаг 13, ОСС «закрыть сделку»): документы из чата — УПД, шаг 12
+    # менеджера ОРК, а не «шаг 13 · менеджер ОРК» (исполнитель шага 13 — ОСС, а ОСС пунктов
+    # чата не получает, Рег. 1.11)
+    ow = dealctx._reg("chatDue", {"kam": "К", "stepCell": {"step": 13, "role": "oss"}}, {"kam": "К"},
+                      key="chatDue:документы")
+    assert (ow["step"], ow["role"], ow["copyRole"]) == (12, "orkMgr", "kam")
+    ow = dealctx._reg("chatDue", {"kam": "К", "stepCell": {"step": 13}}, {"kam": "К"}, key="chatDue:оплата")
+    assert (ow["step"], ow["role"]) == (13, "kam")
     # очередь «Недели» = очередь регламента + эти пункты: роль есть у каждого
     life = r["contracts"]["life"]
     week_q = list(life["queue"]) + [q for q in dc["queue"] if not q.get("seg")]

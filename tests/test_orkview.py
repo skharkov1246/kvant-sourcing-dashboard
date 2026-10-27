@@ -371,7 +371,12 @@ def test_сверх_нормы_не_больше_сейчас(ct):
     assert (c["step"], c["role"], c["over"], c["waitUtd"], c["close"]) == (12, "orkMgr", False, True, "paid")
     assert (c["wd"], c["norm"], c["who"]) == (oo[0]["stepWd"], oo[0]["stepNorm"], oo[0]["stepWho"])
     assert any(x["code"] == "dealClose" and x["deal"] == "6900" for x in q)
+    # оговорка Рег. 15.6 (14.6) — одна у ячейки и пункта dealClose: три заказа доставлены без УПД
+    dc = next(x for x in q if x["code"] == "dealClose" and x["deal"] == "6900")
+    assert c["closeNote"] == "доставлено без УПД: 3 — закрыть после исполнения (Рег. 15.6, 14.6)"
+    assert dc["what"].endswith("; " + c["closeNote"])
     r = next(x for x in data["rows"] if x["deal"] == "6902")
+    assert r["stepCell"]["closeNote"] == ""
     assert (r["stepCell"]["step"], r["stepCell"]["role"], r["stepCell"]["close"]) == (13, "oss", "open")
     assert any(x["code"] == "dealOpen" and x["deal"] == "6902" for x in q)
     # доставлено без УПД — шаг 12 ведомости, а не 11 («Заказ получен клиентом»)
@@ -535,6 +540,61 @@ def test_шаг_12_один_во_всех_подвкладках():
     assert led[12]["notCounted"] >= 1
     hy = next(x for x in w["hygiene"]["items"] if x["order"] == "99202")
     assert "old" in hy["kinds"] and hy["excl"]
+    _инварианты(data)
+
+
+class _ЗакрытаяШаг5(fixture.ContractsStub):
+    """Придуманный корпус: живой заказ в «Подготовка спецификации и инвойса» (шаг 5, оплаты
+    поставщику нет) 35 дн. на шаге — у сделки «Оплата получена» (6920), выигранной (6921) и
+    открытой (6922, контроль)."""
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct_
+        now = dt.datetime.fromisoformat(fixture.CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()            # noqa: E731
+        d = lambda a: (fixture.CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        for deal, oid, stage, sem in (("6920", 99400, "C0:PAID", "P"), ("6921", 99401, "C0:WON", "S"),
+                                      ("6922", 99402, "C0:PREPARATION", "P")):
+            self.deals.append({"ID": deal, "TITLE": f"99{deal[-1]}. Шаг 5 у закрытой", "OPPORTUNITY": "1000",
+                               "CURRENCY_ID": "EUR", "COMPANY_ID": "301", "STAGE_ID": stage,
+                               "STAGE_SEMANTIC_ID": sem, "CATEGORY_ID": "0", "DATE_CREATE": t(220),
+                               "ASSIGNED_BY_ID": "10", ct_.OSS_DEAL: ["21"], ct_.KAM_F: "11"})
+            self.hist[2] += [(deal, "C0:NEW", t(220)), (deal, stage, t(12))]
+            self.orders.append({"id": oid, "title": f"{deal}/1. Узел", "companyId": "401", "parentId2": int(deal),
+                                "opportunity": 100, "currencyId": "EUR", "stageId": "DT172_26:SPEC",
+                                "createdTime": t(150), "movedTime": t(35), ct_.OSS_F: "21",
+                                ct_.DL_CUSTOMER: d(-60), ct_.SUP_PAID: 0, "assignedById": "31"})
+            path = fixture.CT_PATH[:fixture.CT_PATH.index("SPEC") + 1]
+            self.hist[172] += [(str(oid), f"DT172_26:{st}", t(150 - (115 if st == "SPEC" else 8 * k)))
+                               for k, st in enumerate(path)]
+
+
+def test_закрытая_сделка_шаг_не_12_не_сверх_нормы():
+    """Закрытая выигранная сделка и «Оплата получена»: живой заказ на шаге 5 дольше нормы — не
+    отклонение (в счёте у закрытой только шаг 12, C12): ни красной строки заказа, ни ⚠
+    «сверх нормы шага» в карточке, ни «замедлена» — как ячейка «Шаг», ведомость, W2 и очередь.
+    Открытая сделка с тем же заказом — сверх нормы везде."""
+    data, _o = _orders(_ЗакрытаяШаг5())
+    rows = {r["deal"]: r for r in data["rows"]}
+    q = data["life"]["queue"]
+    ctl = rows["6922"]
+    oc = ctl["orders"][0]
+    assert (oc["step"], oc["stepOver"], oc["slow"], oc["stepClosed"]) == (5, True, True, False)
+    assert "сверх нормы шага: 1 заказ" in ctl["why"] and ctl["stepCell"]["over"] is True
+    assert any(x["code"] == "s3Over" and x["order"] == "99402" for x in q)
+    for deal, cell in (("6920", (13, "oss")), ("6921", None)):
+        r = rows[deal]
+        o = r["orders"][0]
+        assert r["closed"] and o["live"] and o["step"] == 5 and o["stepWd"] > o["stepNorm"], deal
+        assert not o["slow"] and o["stepOver"] is None and not o["stepWaitUtd"] and o["stepClosed"], deal
+        assert "шаг 12" in o["stepWhy"], deal
+        assert not r["stuck"] and not r["slow"] and "сверх нормы шага" not in (r["why"] or ""), deal
+        c = r["stepCell"]
+        assert (c and (c["step"], c["role"])) == (cell or None), deal
+        assert not [x for x in q if x["order"] == o["id"] and x["code"].endswith("Over")], deal
+    # W2 — без заказов закрытых сделок вне шага 12
+    assert not [x for x in q if x.get("w2") and x["order"] in ("99400", "99401")]
     _инварианты(data)
 
 
@@ -763,7 +823,8 @@ def test_год_без_календаря_приёмка_за_20_рд_нет_к�
 
 def test_стадия_сделки_позади_заказов_по_диапазону_регламента():
     """Пары «стадия сделки — стадия заказа» из таблиц регламента (п. 8.1 шаг 6, 12.1 шаг 10,
-    14.1 шаг 12; п. 2.2–2.3 — шаги 4–5 до договора с заказчиком) — не нарушение порядка;
+    14.1 шаг 12 и шаг 13 с УПД, 13.1 с УПД; п. 2.2–2.3 — шаги 4–5 до договора с заказчиком) —
+    не нарушение порядка;
     «Договор с заказчиком подписан» при заказе на складе (шаг 9) — нарушение (ork.DEAL_SPAN,
     одно правило с зондом v60)."""
     T = dt.date(2026, 10, 19)
@@ -772,6 +833,12 @@ def test_стадия_сделки_позади_заказов_по_диапаз
               {"shipFact": dt.date(2026, 9, 1)}, 0),
              ("Доставка клиенту произведена | Ожидание оплаты", "Ожидание оплаты",
               {"delFact": dt.date(2026, 10, 14), "shipFact": dt.date(2026, 9, 1)}, 0),
+             # п. 14.1 и 13.1 с подписанным УПД: заказ на шаге 13, сделка ждёт денег клиента в
+             # своей стадии («Оплата получена» — только после оплаты, Рег. 15.5) — не позади
+             ("Доставка клиенту произведена | Ожидание оплаты", "Ожидание оплаты",
+              {"delFact": dt.date(2026, 9, 14), "shipFact": dt.date(2026, 9, 1), "utd": True}, 0),
+             ("Доставка клиенту произведена | Ожидание оплаты", "Заказ получен клиентом",
+              {"delFact": dt.date(2026, 9, 14), "shipFact": dt.date(2026, 9, 1), "utd": True}, 0),
              ("ТКП согласован (конкурс выигран) | Согласование договора/спецификации с заказчиком",
               "Подготовка спецификации и инвойса", {}, 0),
              ("Договор с заказчиком подписан | Согласование спецификаций/инвойсов с агентами/поставщиками",
@@ -782,6 +849,7 @@ def test_стадия_сделки_позади_заказов_по_диапаз
         v, _ = orkview.build(orders, deals, [], T)
         assert v["how"]["violations"]["dealBehindOrders"] == want, (dst, ost)
     assert ork.deal_behind(4, [9]) and not ork.deal_behind(2, [4, 5]) and not ork.deal_behind(6, [7])
+    assert not ork.deal_behind(11, [13]) and ork.deal_behind(9, [11])
     assert not ork.deal_behind(None, [9]) and not ork.deal_behind(4, [])
     # таблица покрывает каждый шаг стадии сделки STAGE_STEP, и шаг стадии внутри своего диапазона
     for st in set(ork.STAGE_STEP["deal"].values()):
@@ -802,3 +870,16 @@ def test_закрыть_сделку_при_недоставленных_зак�
     life = lifecycle.build([_синт(1, "Ожидание оплаты", deal="P", supPaidPct=100, delFact=T, utd=True)], deals, T)
     dc = [q for q in life["queue"] if q["code"] == "dealClose"]
     assert len(dc) == 1 and "не доставлено" not in dc[0]["what"]
+    # даты доставки нет, УПД подписан — доставлен по дате УПД (решение 25.10.2026, delivered):
+    # не «не доставлено», как и в карточке («по УПД»)
+    o = _синт(1, "Заказ получен клиентом", deal="P", supPaidPct=100, utd=True, utdDate=dt.date(2026, 9, 30))
+    assert lifecycle.delivered(o) == dt.date(2026, 9, 30) and not o.get("delFact")
+    dc = [q for q in lifecycle.build([o], deals, T)["queue"] if q["code"] == "dealClose"]
+    assert len(dc) == 1 and dc[0]["what"] == "оплата получена, сделка не закрыта"
+    # доставлен без УПД — шаг 12 не закончен (Рег. 14.6): в оговорке отдельно от недоставленных
+    os_ = [_синт(1, "Производство заказа", deal="P", supPaidPct=100),
+           _синт(2, "Заказ получен клиентом", deal="P", supPaidPct=100, delFact=dt.date(2026, 10, 1))]
+    dc = [q for q in lifecycle.build(os_, deals, T)["queue"] if q["code"] == "dealClose"]
+    assert len(dc) == 1 and "не доставлено: 1" in dc[0]["what"] and "без УПД: 1" in dc[0]["what"]
+    assert "15.6, 14.6" in dc[0]["what"]
+    assert lifecycle.close_note([_синт(3, "Закрытие заказа", live=False, success=True)]) == ""

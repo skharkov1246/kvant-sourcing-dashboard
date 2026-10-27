@@ -739,6 +739,14 @@ def шаг_смарт(п: Прогон) -> None:
 
 # ── запись заказа ───────────────────────────────────────────────────────────
 
+def шаг_заказа(stage: str, факты: dict, live: bool) -> int | None:
+    """Шаг заказа — одно правило с вкладкой: живой — ork.step_now (доставлен без УПД — шаг 12
+    и при стадии не из таблицы), закрытый — ork.step_of (по стадии и фактам)."""
+    if live:
+        return ork.step_now(dict(факты, stage=stage))
+    return ork.step_of(stage, факты)
+
+
 def запись(o: dict, п: Прогон) -> dict:
     """Заказ → всё, что зонду нужно о нём: шаг, факты, точки границ, сегменты, люди."""
     oid, did = str(o["id"]), str(o.get("parentId2") or "")
@@ -780,7 +788,8 @@ def запись(o: dict, п: Прогон) -> dict:
     return {
         "id": oid, "did": did, "sem": o.get("_sem") or "P", "live": (o.get("_sem") or "P") == "P",
         "создан": создан, "пг": полугодие(создан), "stage": stage,
-        "step": ork.step_of(stage, факты), "base": ork.stage_step(stage), "факты": факты,
+        "step": шаг_заказа(stage, факты, (o.get("_sem") or "P") == "P"), "base": ork.stage_step(stage),
+        "факты": факты,
         "reach": reach, "idx": idx, "seg": seg, "точки": точки, "ork": ord_ork,
         "напр": метка(З["dir"], o.get(З["dir"]), п.подписи.get(З["dir"], {})),
         "точка": метка(Д["endPoint"], сделка.get(Д["endPoint"]), п.подписи.get(Д["endPoint"], {})),
@@ -934,6 +943,27 @@ def отчёт_сегменты(п: Прогон, строки: list[dict], гр
     return итог
 
 
+def порядок_сделок(строки: list[dict]) -> tuple[int, int, int, int]:
+    """Стадия сделки против шагов её живых заказов (ork.DEAL_SPAN, одно правило с вкладкой):
+    (сделок с живыми заказами, стадия впереди всех заказов, позади, шаг не определить)."""
+    диап = диапазоны_сделки()
+    по_сделке: dict[str, list[dict]] = collections.defaultdict(list)
+    for r in строки:
+        if r["live"]:
+            по_сделке[r["did"]].append(r)
+    впереди = позади = без_шага = 0
+    for рр in по_сделке.values():
+        ds = ork.stage_step(рр[0]["dealStage"], "deal")
+        шаги = [r["step"] for r in рр if r["step"]]
+        if ds is None or not шаги:
+            без_шага += 1
+            continue
+        lo, _hi = диап[ds]
+        впереди += lo > max(шаги)
+        позади += ork.deal_behind(ds, шаги)          # одно правило с вкладкой (orkview)
+    return len(по_сделке), впереди, позади, без_шага
+
+
 def отчёт_порядок(строки: list[dict]) -> dict:
     """4. Порядок против регламента."""
     print("\n4. ПОРЯДОК ПРОТИВ РЕГЛАМЕНТА (доля заказов)")
@@ -969,22 +999,8 @@ def отчёт_порядок(строки: list[dict]) -> dict:
         тамож[r["напр"]][1] += r["таможня"]
     print("  «Таможня» по направлению поставки: " + "; ".join(
         f"{k}: прошли {v[1]} из {v[0]}" for k, v in sorted(тамож.items())))
-    диап = диапазоны_сделки()
-    по_сделке: dict[str, list[dict]] = collections.defaultdict(list)
-    for r in строки:
-        if r["live"]:
-            по_сделке[r["did"]].append(r)
-    впереди = позади = без_шага = 0
-    for рр in по_сделке.values():
-        ds = ork.stage_step(рр[0]["dealStage"], "deal")
-        шаги = [r["step"] for r in рр if r["step"]]
-        if ds is None or not шаги:
-            без_шага += 1
-            continue
-        lo, _hi = диап[ds]
-        впереди += lo > max(шаги)
-        позади += ork.deal_behind(ds, шаги)          # одно правило с вкладкой (orkview)
-    print(f"  сделки с живыми заказами {len(по_сделке)}: стадия сделки впереди всех заказов {впереди}, позади "
+    всего, впереди, позади, без_шага = порядок_сделок(строки)
+    print(f"  сделки с живыми заказами {всего}: стадия сделки впереди всех заказов {впереди}, позади "
           f"{позади}, шаг не определить {без_шага}")
     return {"burst": (пачки / len(с_историей)) if с_историей else None, "returns": len(возвраты)}
 

@@ -125,6 +125,22 @@ def delivered(o: dict) -> dt.date | None:
     return o.get("delFact") or o.get("utdDate")
 
 
+def close_note(orders) -> str:
+    """Оговорка к «закрыть сделку» (Рег. 15.6 — закрывать после исполнения обязательств):
+    живые заказы сделки, не доставленные клиенту (delivered: факт, а без него — дата УПД,
+    решение 25.10.2026), и доставленные без подписанного УПД (шаг 12 не закончен, Рег. 14.6).
+    Нет таких — пустая строка. Одна оговорка у пункта очереди и ячейки шага сделки."""
+    live = [o for o in orders if o.get("live")]
+    undel = sum(1 for o in live if not delivered(o))
+    noutd = sum(1 for o in live if delivered(o) and not o.get("utd"))
+    parts = ([f"живых заказов не доставлено: {undel}"] if undel else []) + (
+        [f"доставлено без УПД: {noutd}"] if noutd else [])
+    if not parts:
+        return ""
+    reg = "Рег. 15.6" + (", 14.6" if noutd else "")
+    return f"{', '.join(parts)} — закрыть после исполнения ({reg})"
+
+
 def phase(o: dict, today: dt.date, warranty_months: int = WARRANTY_MONTHS) -> str:
     """Фаза заказа по фактам. o — заказ, приведённый к фактам (поля ниже). Заказ,
     закрытый успехом, закрытие прошёл, даже если УПД или платёжки нет файлом:
@@ -475,10 +491,10 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                 counts[code] += 1
                 sev, what, act = EXC[code]
                 # Рег. 15.6: сделка закрывается после исполнения обязательств — живые
-                # недоставленные заказы рядом с пунктом, а не молча (пункт остаётся: решение п. 4)
-                undel = sum(1 for o in os_ if o.get("live") and not o.get("delFact"))
-                if code == "dealClose" and undel:
-                    what = f"{what}; живых заказов не доставлено: {undel} — закрыть после исполнения (Рег. 15.6)"
+                # неисполненные заказы рядом с пунктом, а не молча (пункт остаётся: решение п. 4)
+                note = close_note(os_)
+                if code == "dealClose" and note:
+                    what = f"{what}; {note}"
                 queue.append(_deal_item(code, sev, what, act, days, d, item(code, None, d)))
             continue
         if os_ and all(o.get("success") for o in os_):
