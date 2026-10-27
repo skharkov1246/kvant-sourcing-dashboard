@@ -270,14 +270,16 @@ def test_пункты_чатов_и_договоров_по_таблице():
 def test_доставлено_без_упд_шаг_12_при_любой_стадии():
     """«Заказ получен клиентом», «Заказ отгружен» и «Ожидание оплаты» с фактом доставки и без
     УПД — один шаг 12, один исполнитель (менеджер ОРК) и один срок от доставки: 20 р.д. против
-    10 — сверх нормы; УПД есть — шаг 13."""
+    10 — «ждём УПД от клиента», а не «сверх нормы» (решение владельца 27.10.2026, Б); УПД есть —
+    шаг 13."""
     сегодня = D(2026, 10, 19)
     for стадия in ("Заказ получен клиентом", "Заказ отгружен", "Ожидание оплаты", "Стадия, которой нет"):
         o = {"stage": стадия, "delFact": D(2026, 9, 21), "utd": False, "stageSince": t("10-01")}
         assert ork.step_now(o) == 12, стадия
         v = ork.judged(o, сегодня)
-        assert (v["step"], v["role"], v["norm"], v["wd"], v["over"], v["counted"]) == (
-            12, "orkMgr", 10, 20, True, True), стадия
+        assert (v["step"], v["role"], v["norm"], v["wd"], v["over"], v["waitUtd"], v["counted"]) == (
+            12, "orkMgr", 10, 20, False, True, True), стадия
+        assert v["rawOver"] is True, "срок от доставки прошёл — ждём клиента"
         assert ork.owner(v["step"], {"orkMgr": "Илья (ОРК)", "kam": "Анна (КАМ)"})["who"] == "Илья (ОРК)"
     assert ork.step_now({"stage": "Заказ получен клиентом", "delFact": D(2026, 9, 21), "utd": True}) == 13
     assert ork.step_now({"stage": "Заказ получен клиентом"}) == 11, "без доставки — шаг стадии"
@@ -297,12 +299,12 @@ def test_старая_доставка_без_упд_гигиена_а_не_в_�
     h = ork.hygiene(o, сегодня)
     assert h["old"] and h["exclude"] and "старая доставка без УПД" in h["why"]
     v = ork.judged(o, сегодня)
-    assert v["rawOver"] is True and v["over"] is None and v["hyg"] and not v["counted"]
+    assert v["rawOver"] is True and v["over"] is None and v["hyg"] and not v["counted"] and not v["waitUtd"]
     свежий = {**o, "delFact": сегодня - dt.timedelta(days=30)}
-    assert ork.judged(свежий, сегодня)["over"] is True and not ork.hygiene(свежий, сегодня)["old"]
+    assert ork.judged(свежий, сегодня)["waitUtd"] is True and not ork.hygiene(свежий, сегодня)["old"]
     # стадия позади фактов срок УПД не портит: он от факта доставки
     позади = {"stage": "Заказ создан", "delFact": сегодня - dt.timedelta(days=30), "utd": False}
-    assert ork.hygiene(позади, сегодня)["behind"] and ork.judged(позади, сегодня)["over"] is True
+    assert ork.hygiene(позади, сегодня)["behind"] and ork.judged(позади, сегодня)["waitUtd"] is True
 
 
 def test_приёмка_вне_реализации_не_в_счёте():
@@ -374,3 +376,20 @@ def test_ведомость_нет_артефактов_по_дате_поля()
     led5 = next(r for r in v["week"]["ledger"] if r["no"] == 5)
     # шаг 5: PO и спецификации — у обоих (поля 2024 г.), проформа — только у второго, OC — ни у кого
     assert (led5["artReq"], led5["artMiss"]) == (5, 5)
+
+
+# ── «ждём УПД от клиента» — не «сверх нормы» менеджера (решение владельца 27.10.2026, Б) ─────
+def test_ждём_упд_одно_правило_не_сверх_нормы():
+    """Шаг 12: до 10 р.д. от доставки — в норме (over False, waitUtd False); 11-й р.д. и дальше —
+    waitUtd, а over — False; шаги ОРК 1, 4, 5, 8 waitUtd не ставят. Коды пунктов: noUtd — в
+    WAIT_CODE и TERM_CODE, но не в OVER_CODE (W2, «Сверх нормы по менеджерам»)."""
+    сегодня = D(2026, 10, 19)
+    в_норме = ork.judged({"stage": "Ожидание оплаты", "delFact": D(2026, 10, 5), "utd": False}, сегодня)
+    assert (в_норме["step"], в_норме["wd"], в_норме["over"], в_норме["waitUtd"]) == (12, 10, False, False)
+    ждём = ork.judged({"stage": "Ожидание оплаты", "delFact": D(2026, 10, 2), "utd": False}, сегодня)
+    assert (ждём["wd"], ждём["over"], ждём["waitUtd"], ждём["counted"]) == (11, False, True, True)
+    шаг4 = ork.judged({"stage": "Заказ направлен", "stageSince": t("10-01")}, сегодня)
+    assert шаг4["over"] is True and шаг4["waitUtd"] is False
+    assert 12 not in ork.OVER_CODE and "noUtd" not in ork.OVER_CODE.values()
+    assert ork.WAIT_CODE == {12: "noUtd"} and ork.TERM_CODE[12] == "noUtd"
+    assert set(ork.TERM_CODE) == set(ork.OVER_CODE) | set(ork.WAIT_CODE)

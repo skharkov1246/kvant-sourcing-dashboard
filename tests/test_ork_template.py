@@ -124,3 +124,21 @@ def test_месяц_без_права_нет_доступа(built):
     с = _render({"main": ct}, built["ork_month"])["main"]
     assert "нет доступа" not in с["month"] and "M1 · " in с["month"] and "По менеджерам ОРК" in с["month"]
     assert "Своевременность шагов по месяцам" in с["month"]
+
+
+def test_ждём_упд_от_клиента_отдельно_от_сверх_нормы(built):
+    """Решение владельца 27.10.2026, Б: шаг 12 больше 10 р.д. без УПД — «ждём УПД от клиента»
+    в ведомости (вместо числа «сверх нормы») и своим столбцом у «Сверх нормы по менеджерам»;
+    в подписи W2 шага 12 нет. Числа — те же, что в данных недели (одно правило ork.judged)."""
+    ct = copy.deepcopy(built["contracts"])
+    w = ct["ork"]["week"]
+    n = w["waitUtd"]["n"]
+    assert n > 0 and w["ledger"][11]["no"] == 12 and w["ledger"][11]["waitUtd"] == n
+    out = _render({"main": ct}, built["ork_month"])["main"]["week"]
+    assert f"ждём УПД от клиента {n}</span>" in out, "ведомость, шаг 12"
+    assert "<th class=\"r\">Ждём УПД от клиента</th>" in out, "столбец по менеджерам"
+    assert f"ждём УПД от клиента (не в счёте): {n}" in out, "подпись W2"
+    assert "УПД (12):" not in out and "(эскалация УПД)" not in out
+    # итог столбцов: Σ «сверх нормы» = W2, Σ «ждём УПД» = n
+    tot = f'<td class="r mono"><b>{w["tiles"]["W2"]["value"]}</b></td><td></td><td class="r mono"><b>{n}</b></td>'
+    assert tot in out

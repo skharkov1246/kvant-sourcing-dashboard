@@ -196,7 +196,9 @@ def test_вкладка_со_сводом():
     assert rows["6002"]["stuck"] and "ход за нами" in d["6002"]["why"]
     assert rows["6008"]["stuck"] and "никто не двигает" in d["6008"]["why"]
     assert not rows["6004"]["stuck"] and d["6004"]["why"].endswith("ждём поставщика до 25.10")
-    assert not rows["6005"]["stuck"] and rows["6005"]["chatUnverified"] is False
+    assert not rows["6020"]["stuck"] and rows["6020"]["chatUnverified"] is False
+    # «ждём УПД от клиента» — не кандидат «Замедлено» (решение владельца 27.10.2026, Б)
+    assert not rows["6005"]["stuck"] and "сверх нормы шага" not in rows["6005"]["why"]
     assert rows["6010"]["stuck"] and "по чтению 19.10: в чате тихо 20 дн." in d["6010"]["why"]
     # строки сделок видят все с вкладкой: в них нет ни оценки модели, ни данных прогона оценки
     for x in ct["rows"]:

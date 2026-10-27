@@ -15,6 +15,9 @@ S1–S10, контракт показателя). Решения владель�
   4. «Оплата получена», а сделка не закрыта — пункт dealClose (ОСС); долг клиента —
      хозяин КАМ, ОСС в копии.
 
+Решение владельца 27.10.2026, Б: УПД дольше 10 р.д. от доставки — «ждём УПД от клиента»
+(judged.waitUtd, WAIT_CODE), а не «сверх нормы» менеджера ОРК (OVER_CODE — шаги 1, 4, 5, 8).
+
 Пороги доверия (GATES) — предложение, ждут решения владельца.
 """
 from __future__ import annotations
@@ -525,16 +528,22 @@ def overrun(order: dict, today: dt.date, workdays_fn=None) -> dict:
 
 def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=None) -> dict:
     """«Сверх нормы» живого заказа — ОДНО правило для таблицы сделок, карточки, «Замедлено»,
-    очереди (s1Over…s6Over, noUtd), ведомости и W2: overrun, а в счёт не идут гигиена
-    карточки (hygiene: стадия позади фактов, брошенная, старая доставка без УПД) и приёмка
-    заказа сделки вне воронки «Реализация» (Рег. 3.3).
+    очереди (s1Over…s6Over, noUtd), ведомости, «Сверх нормы по менеджерам» и W2: overrun, а в
+    счёт не идут гигиена карточки (hygiene: стадия позади фактов, брошенная, старая доставка
+    без УПД) и приёмка заказа сделки вне воронки «Реализация» (Рег. 3.3).
 
-    → overrun + {rawOver — over до отбора, hyg, hygWhy, counted — в счёте «сверх нормы»
-    (over True/False), termUnknown — шаг с нормой в счёте, а срок не посчитать}."""
+    Шаг 12 (УПД) — не «сверх нормы» менеджера (решение владельца 27.10.2026, Б): больше 10 р.д.
+    от доставки без УПД — waitUtd («ждём УПД от клиента»), over — False. Пункт noUtd очередь
+    ставит по waitUtd; W2, ведомость (столбец «сверх нормы»), «Сверх нормы по менеджерам» и
+    «Замедлено» — по over.
+
+    → overrun + {rawOver — over до отбора, hyg, hygWhy, counted — в счёте срока (over
+    True/False), termUnknown — шаг с нормой в счёте, а срок не посчитать, waitUtd — ждём УПД от
+    клиента}."""
     ov = overrun(order, today, workdays_fn)
     hy = hygiene(order, today, workdays_fn)
     out = {**ov, "rawOver": ov["over"], "hyg": bool(hy["exclude"]), "hygWhy": hy["why"],
-           "counted": False, "termUnknown": False}
+           "counted": False, "termUnknown": False, "waitUtd": False}
     if ov["norm"] is None:
         return out
     if ov["step"] == 1 and not in_cat0:
@@ -545,6 +554,8 @@ def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=Non
         return out
     out["counted"] = ov["over"] is not None
     out["termUnknown"] = ov["over"] is None
+    if ov["step"] in WAIT_CODE and ov["over"]:
+        out.update(over=False, waitUtd=True)      # срок ждёт клиента, а не работу менеджера
     return out
 
 
@@ -747,8 +758,17 @@ ITEM = {
 # роли пунктов, которых регламент не описывает (чаты, договоры, экономика — dealctx): хозяин —
 # человек сделки, подпись роли — для отбора очереди по роли
 ROLES_EXTRA = {"dealResp": "ответственный сделки", "src": "сорсинг"}
-# «сверх нормы» шага → код пункта (шаг 12 — noUtd: срок от факта доставки, не от стадии)
-OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over", 12: "noUtd"}
+# «сверх нормы» шага ОРК → код пункта (срок работы менеджера: W2, «Сверх нормы по менеджерам»,
+# ведомость, «Замедлено»)
+OVER_CODE = {1: "s1Over", 4: "s2Over", 5: "s3Over", 8: "s6Over"}
+# срок шага, который ждёт клиента, → код пункта (решение владельца 27.10.2026, Б): шаг 12 —
+# больше 10 р.д. от доставки без подписанного УПД — «ждём УПД от клиента» (подпись УПД — за
+# заказчиком, Рег. 14.2.2): пункт noUtd у менеджера ОРК с эскалацией КАМу на 11-й р.д. есть, а в
+# «сверх нормы» менеджера (W2, по менеджерам, ведомость, «Замедлено») он не идёт
+WAIT_CODE = {12: "noUtd"}
+WAIT_UTD = "ждём УПД от клиента"
+# все сроки шагов регламента в р.д. → код пункта очереди (inWd у пункта)
+TERM_CODE = {**OVER_CODE, **WAIT_CODE}
 
 
 def item_owner(code: str, step_now: int | None, people: dict, *, key: str | None = None) -> dict:

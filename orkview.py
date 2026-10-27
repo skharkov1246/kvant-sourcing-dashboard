@@ -188,8 +188,9 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
          and not d.get("lost") and not d.get("closed")]
     # шаг 12 (УПД) — на менеджере ОРК при любой стадии оплаты сделки (Рег. 14.2.4–14.3.2):
     # живой заказ закрытой выигранной сделки (в том числе «Оплата получена»), доставленный без
-    # УПД, — в совокупности шага 12 (ведомость, W2, «Сверх нормы по менеджерам»), как в очереди
-    # (noUtd), очереди КАМа и карточке. Остальные шаги у закрытой сделки — уже не отклонения
+    # УПД, — в совокупности шага 12 (ведомость, столбец «ждём УПД от клиента» у «Сверх нормы по
+    # менеджерам»), как в очереди (noUtd), очереди КАМа и карточке. Остальные шаги у закрытой
+    # сделки — уже не отклонения
     C12 = [o for o in orders if o.get("live") and (d := deal_by.get(o.get("deal")))
            and not d.get("lost") and d.get("closed") and ork.step_now(o) == 12]
     mon = today - dt.timedelta(days=today.weekday())
@@ -214,7 +215,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
 
     # --- ведомость 13 шагов -----------------------------------------------------------------
     # «сверх нормы» шага — живые заказы вида на этом шаге с judged.over; пункт очереди того же
-    # заказа (s1Over…s6Over, noUtd) ставит то же правило — помечаем его w2 (отбор плитки)
+    # заказа (s1Over…s6Over) ставит то же правило — помечаем его w2 (отбор плитки)
     over_ids: dict[int, set] = {st: {o["id"] for o in L if step[o["id"]] == st and ov[o["id"]]["over"]}
                                 for st in ork.NORM_WD}
     for st, code in ork.OVER_CODE.items():
@@ -222,6 +223,16 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             if q.get("order") in over_ids.get(st, set()):
                 q["w2"] = True                     # пункт в счёте W2 — отбор плитки
     over_by_step = Counter({st: len(ids) for st, ids in over_ids.items()})
+    # «ждём УПД от клиента» (решение владельца 27.10.2026, Б): шаг 12 больше 10 р.д. от доставки
+    # без УПД — judged.waitUtd; не «сверх нормы» менеджера (не в W2, не в столбце «сверх нормы»
+    # ведомости и по менеджерам); пункт noUtd того же заказа — waitUtd (свой столбец, отбор)
+    wait_ids: dict[int, set] = {st: {o["id"] for o in L if step[o["id"]] == st and ov[o["id"]]["waitUtd"]}
+                                for st in ork.WAIT_CODE}
+    for st, code in ork.WAIT_CODE.items():
+        for q in q_by.get(code, []):
+            if q.get("order") in wait_ids[st]:
+                q["waitUtd"] = True
+    wait_n = sum(len(ids) for ids in wait_ids.values())
 
     def not_counted(o) -> bool:
         """Шаг с нормой, а срок не в счёте: гигиена карточки или приёмка вне «Реализации»."""
@@ -253,6 +264,8 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                        "also": [ork.ROLES[r] for r in s["also"]], "norm": s["norm"], "now": len(here),
                        "normDoc": doc[0], "normState": doc[1], "normNeed": doc[2],
                        "over": over_by_step.get(no, 0) if normed else None,
+                       # шаг 12: срок ждёт клиента — «ждём УПД от клиента N», а не «сверх нормы»
+                       "waitUtd": len(wait_ids[no]) if no in wait_ids else None,
                        "overUnknown": sum(1 for o in here if ov[o["id"]]["termUnknown"]) if normed else None,
                        # на шаге, но не в счёте «сверх нормы»: гигиена, приёмка вне «Реализации»
                        "notCounted": sum(1 for o in here if not_counted(o)) if normed else None,
@@ -289,19 +302,19 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                        "agree": agree_s1, "agreeN": agree_n,
                        "excluded": sum(1 for o in U if step[o["id"]] == 1 and not_counted(o))})
 
-    # --- W2 сверх нормы: только шаги ОРК (1, 4, 5, 8) и УПД по факту доставки (12) ------------
+    # --- W2 сверх нормы: только шаги ОРК (1, 4, 5, 8) -----------------------------------------
     # n — заказы этих шагов в счёте (judged.counted) и со сроком, который не посчитать
-    # (termUnknown: нет даты входа или факта доставки, года нет в календаре), плюс стадии не из
-    # таблицы; гигиена и приёмка вне «Реализации» — рядом (excluded), не в n
+    # (termUnknown: нет даты входа, года нет в календаре), плюс стадии не из таблицы; гигиена и
+    # приёмка вне «Реализации» — рядом (excluded), не в n. Шаг 12 (УПД) — не в W2 и не в n:
+    # «ждём УПД от клиента» (решение владельца 27.10.2026, Б) — рядом, waitUtd
     w2_pop = [o for o in L if step[o["id"]] in ork.OVER_CODE
               and (ov[o["id"]]["counted"] or ov[o["id"]]["termUnknown"])]
     w2_known = sum(1 for o in w2_pop if ov[o["id"]]["counted"])
     w2_n = len(w2_pop) + unk_n
     by_step = {no: over_by_step.get(no, 0) for no in ork.OVER_CODE}
     W2 = _count(sum(by_step.values()), w2_n, w2_known / w2_n if w2_n else None,
-                src="s1Over, s2Over, s3Over, s6Over, noUtd", unknown=unk_n,
-                extra={"byStep": by_step, "label": "по стадии, " + ork.NO_PAUSE,
-                       "closed12": len(C12),
+                src="s1Over, s2Over, s3Over, s6Over", unknown=unk_n,
+                extra={"byStep": by_step, "label": "по стадии, " + ork.NO_PAUSE, "waitUtd": wait_n,
                        "excluded": sum(1 for o in L if step[o["id"]] in ork.OVER_CODE and not_counted(o))})
 
     # --- W3 зона риска: срок клиента (результат поставщика и логистики) ---------------------
@@ -344,16 +357,22 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                         "noDates": len(prod) - with_dates})
 
     # --- сверх нормы по исполнителям (W2 поимённо: срок менеджера — его работа) ---------------
+    # n — пункты сверх нормы (w2, тот же счёт, что у W2 и ведомости); waitUtd — свой столбец
+    # «ждём УПД от клиента» (пункты noUtd с waitUtd), в n не идёт (решение 27.10.2026, Б)
     mgr: dict[str, dict] = {}
-    for code in ork.OVER_CODE.values():
+    for code, flag in [(c, "w2") for c in ork.OVER_CODE.values()] + [(c, "waitUtd") for c in ork.WAIT_CODE.values()]:
         for q in q_by.get(code, []):
-            if not q.get("w2"):
-                continue                           # тот же счёт, что у W2 и ведомости
+            if not q.get(flag):
+                continue
             w = q.get("who") or "не назначен"
             m = mgr.setdefault(w, {"who": w, "gone": bool(q.get("whoGone")), "role": q.get("role") or "",
-                                   "roleName": q.get("roleName") or "", "n": 0, "byStep": Counter()})
-            m["n"] += 1
-            m["byStep"][q.get("step")] += 1
+                                   "roleName": q.get("roleName") or "", "n": 0, "waitUtd": 0,
+                                   "byStep": Counter()})
+            if flag == "w2":
+                m["n"] += 1
+                m["byStep"][q.get("step")] += 1
+            else:
+                m["waitUtd"] += 1
     # по алфавиту, а не по числу: рейтинга людей нет (решение п. 3 — «без сортировки по баллу»);
     # «не назначен» — последней строкой
     over_mgr = sorted(({**m, "byStep": {str(k): v for k, v in m["byStep"].items()}}
@@ -395,6 +414,9 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             "adjacent": {r: adjacent.get(r, 0) for r in ork.ADJACENT},
             "longP80": long_p80,
             "overByWho": over_mgr, "risk": risk_list, "checkpoints": cps,
+            # шаг 12 больше 10 р.д. без УПД — «ждём УПД от клиента»: не «сверх нормы» менеджера
+            # (решение владельца 27.10.2026, Б); пункт noUtd — у менеджера ОРК, КАМ в копии
+            "waitUtd": {"n": wait_n, "label": ork.WAIT_UTD, "src": "noUtd", "norm": ork.NORM_WD[12]},
             "hygiene": {"n": len(hyg_items), "by": dict(hc), "excluded": hyg_excl, "byExcl": dict(hc_excl),
                         "noMgrOnly": sum(1 for x in hyg_items if x["kinds"] == ["noMgr"]), "items": hyg_items},
             "notChecked": "не проверяется: паузы и эскалации (полей нет), запросы статуса поставщику, "
@@ -717,11 +739,12 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
         row("W1", "Приёмка (S1)", "живые заказы в «Заказ создан» с р.д.(t0, сегодня) > 1 + сделки без заказа > 1 р.д.; "
             "t0 = max(создание заказа, вход сделки в реализацию); брошенные карточки и сделки вне «Реализации» — "
             "не в счёте; стадия не из таблицы — в n как «срок неизвестен»", "createdTime, crm.stagehistory", t["W1"]),
-        row("W2", "Сверх нормы, только ОРК", "шаги 1, 4, 5, 8: р.д. от входа в шаг > нормы; шаг 12: р.д.(доставка, "
-            f"сегодня) > 10 и УПД нет (доставленный без УПД — шаг 12 при любой стадии); доставка старше "
-            f"{ork.CLOSE_DAYS} дн. без УПД, стадия позади фактов, брошенная карточка — гигиена, не в n; стадия не "
-            "из таблицы — в n как «срок неизвестен»; «без пауз»",
-            "crm.stagehistory, Customer delivery date actual, UTD", t["W2"]),
+        row("W2", "Сверх нормы, только ОРК", "шаги 1, 4, 5, 8: р.д. от входа в шаг > нормы; стадия позади фактов, "
+            "брошенная карточка — гигиена, не в n; стадия не из таблицы — в n как «срок неизвестен»; «без пауз». "
+            f"Шаг 12 (УПД) — не в W2 и не в n (решение владельца 27.10.2026): р.д.(доставка, сегодня) > "
+            f"{ork.NORM_WD[12]} и УПД нет — «{ork.WAIT_UTD}» отдельным столбцом (подпись УПД — за заказчиком), "
+            f"пункт noUtd у менеджера ОРК с эскалацией КАМу; доставка старше {ork.CLOSE_DAYS} дн. без УПД — гигиена",
+            "crm.stagehistory; у шага 12 — Customer delivery date actual, UTD", t["W2"]),
         row("W3", "Зона риска", "срок клиента прошёл / ≤ 14 дн. без отгрузки / прогноз позже срока",
             "Date of deadline to customer, Supplier Shipment Date", t["W3"]),
         row("W4", "Эскалации и паузы", "—", "нет полей", t["W4"]),

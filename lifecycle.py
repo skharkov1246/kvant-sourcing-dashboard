@@ -20,7 +20,8 @@
 — нормы регламента в рабочих днях по календарю РФ (ork.NORM_WD, period.workdays_ru), «без
 пауз»: s1Over, s2Over, s3Over, s6Over и noUtd (≥ 11 р.д. от доставки по сырым датам) — одно
 правило с таблицей сделок, ведомостью и W2 (ork.judged: шаг ork.step_now, гигиена, приёмка
-только у сделок «Реализации»).
+только у сделок «Реализации»). noUtd — «ждём УПД от клиента» (ork.judged.waitUtd, решение
+владельца 27.10.2026, Б): пункт у менеджера ОРК с эскалацией КАМу, но не «сверх нормы».
 """
 from __future__ import annotations
 
@@ -295,17 +296,17 @@ def order_exceptions(o: dict, today: dt.date, fc: dt.date | None = None, *,
             out.append(("noDl", None))
         if any(not o.get(k) for k, _ in PLAN_DATES):
             out.append(("noPlanDates", None))
-        # сверх нормы шага регламента (ork.OVER_CODE, шаг 12 — noUtd): ork.judged — то же
-        # правило, что у таблицы сделок, ведомости и W2. Шаги 1, 4, 5, 8 — только со стадией из
-        # портала; шаг 12 — 10 р.д. от СЫРОЙ даты доставки (delFact), на 11-й р.д. — пункт (Рег.
-        # 14.2.5, 14.3.1). Гигиена (стадия позади фактов, брошенная карточка, доставка старше
-        # CLOSE_DAYS без УПД) в счёт не идёт
+        # сверх нормы шага регламента (ork.OVER_CODE) и «ждём УПД от клиента» (ork.WAIT_CODE,
+        # шаг 12 — noUtd): ork.judged — то же правило, что у таблицы сделок, ведомости и W2.
+        # Шаги 1, 4, 5, 8 — только со стадией из портала; шаг 12 — 10 р.д. от СЫРОЙ даты
+        # доставки (delFact), на 11-й р.д. — пункт (Рег. 14.2.5, 14.3.1). Гигиена (стадия позади
+        # фактов, брошенная карточка, доставка старше CLOSE_DAYS без УПД) в счёт не идёт
         ov = ork.judged(o, today, in_cat0=in_cat0)
-        code = ork.OVER_CODE.get(ov["step"])
+        code = ork.TERM_CODE.get(ov["step"])
         if code and ov["termUnknown"] and ov["why"] == "год без производственного календаря" \
                 and nocal is not None:
             nocal[code] += 1
-        if code and ov["over"]:
+        if code and (ov["over"] or ov["waitUtd"]):
             out.append((code, ov["wd"]))
         # закрытие — только у живого заказа и только за CLOSE_DAYS: закрытый заказ
         # закрытие прошёл, а старые доставки без файла платёжки — пробел учёта до
@@ -407,7 +408,8 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
     def over_norm(o: dict, p: str) -> bool:
         """Сверх нормы шага регламента (решение 26.10.2026, п. 2: нормы регламента в р.д.
         вместо 75-го процентиля звена): шаги 1, 4, 5, 8 по стадии; производство и логистику
-        регламент не нормирует — их «сверх нормы» нет."""
+        регламент не нормирует — их «сверх нормы» нет; шаг 12 — «ждём УПД от клиента», не
+        «сверх нормы» (решение 27.10.2026, Б)."""
         if not o.get("live") or not o.get("stage"):
             return False
         ov = ork.judged(o, today, in_cat0=(deal_by.get(o.get("deal")) or {}).get("inCat0", True))
@@ -444,7 +446,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             queue.append({"code": code, "sev": sev, "what": what, "act": act, "days": days,
                           **item(code, o, d),
                           # р.д. — у сроков менеджера по календарю РФ, «без пауз»
-                          "inWd": code in ork.OVER_CODE.values(),
+                          "inWd": code in ork.TERM_CODE.values(),
                           "deal": o.get("deal"), "seq": (d or {}).get("seq") or o.get("seq") or 0,
                           "customer": (d or {}).get("customer") or "—", "order": o.get("id"),
                           "title": o.get("title") or "", "sup": o.get("sup") or "—",

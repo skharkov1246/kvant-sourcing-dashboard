@@ -74,11 +74,13 @@ def test_неделя_все_блоки_с_данными(ct):
     for k in ("W1", "W2", "W3", "W5"):
         assert t[k]["state"] in ("show", "prelim") and t[k]["value"] > 0, (k, t[k])
     assert t["W4"]["state"] == "nodata" and t["W4"]["value"] is None and "Эскалация" in t["W4"]["need"]
-    # W2 — только шаги ОРК и УПД; счёт — тот же, что пункты очереди
+    # W2 — только шаги ОРК (1, 4, 5, 8); УПД (шаг 12) — «ждём УПД от клиента», не в W2
+    # (решение владельца 27.10.2026, Б); счёт — тот же, что пункты очереди
     c = ct["life"]["counts"]
     assert t["W2"]["value"] == sum(len({q["order"] for q in ct["life"]["queue"] if q["code"] == k and q.get("w2")})
-                                   for k in ("s1Over", "s2Over", "s3Over", "s6Over", "noUtd"))
-    assert set(t["W2"]["byStep"]) == {1, 4, 5, 8, 12} and t["W2"]["label"].endswith(ork.NO_PAUSE)
+                                   for k in ("s1Over", "s2Over", "s3Over", "s6Over"))
+    assert set(t["W2"]["byStep"]) == {1, 4, 5, 8} and t["W2"]["label"].endswith(ork.NO_PAUSE)
+    assert "noUtd" not in t["W2"]["src"] and t["W2"]["waitUtd"] == w["waitUtd"]["n"] > 0
     assert t["W1"]["noOrder"] == c.get("noOrder", 0) >= 1
     assert t["W3"]["by"]["late"] == c["late"] and t["W3"]["label"] == "результат поставщика и логистики"
     led = {r["no"]: r for r in w["ledger"]}
@@ -309,6 +311,30 @@ def _инварианты(view: dict) -> None:
     assert W2["value"] <= (W2["n"] or 0), W2
     assert sum(r["now"] for r in w["ledger"]) + w["unknown"] == w["live"]
     assert sum(m["n"] for m in w["overByWho"]) == W2["value"], "поимённо — тот же счёт, что у W2"
+    # W2 = Σ «сверх нормы» по менеджерам = пункты очереди с w2 (решение 27.10.2026, Б: шаг 12 — нет)
+    q = view["life"]["queue"]
+    assert W2["value"] == len({x["order"] for x in q if x.get("w2")}) == sum(1 for x in q if x.get("w2"))
+    assert 12 not in W2["byStep"] and not [x for x in q if x["code"] == "noUtd" and x.get("w2")]
+    # «ждём УПД от клиента» — одно число у ведомости (шаг 12), столбца по менеджерам, плитки,
+    # очереди (noUtd с waitUtd) и заказов таблицы сделок (stepWaitUtd)
+    led = {r["no"]: r for r in w["ledger"]}
+    n = w["waitUtd"]["n"]
+    assert led[12]["waitUtd"] == n == W2["waitUtd"] == sum(m["waitUtd"] for m in w["overByWho"])
+    assert n == sum(1 for x in q if x.get("waitUtd")) == sum(1 for x in q if x["code"] == "noUtd")
+    assert led[12]["over"] == 0 and all(r["waitUtd"] is None for r in w["ledger"] if r["no"] != 12)
+    assert not [x for x in q if x.get("w2") and x.get("waitUtd")]
+    if "rows" in view:
+        live = [o for r in view["rows"] if not r["lost"] for o in r["orders"] if o["live"]]
+        assert n == sum(1 for o in live if o["stepWaitUtd"])
+        assert not [o for o in live if o["stepWaitUtd"] and (o["stepOver"] or o["slow"] or o["step"] != 12)]
+        for r in view["rows"]:
+            c = r.get("stepCell") or {}
+            assert not (c.get("waitUtd") and c.get("over")), r["deal"]
+            if c.get("waitUtd"):
+                assert c["step"] == 12 and c["role"] == "orkMgr", r["deal"]
+            # «ждём УПД» — не «Замедлено»: сверх нормы шага в «почему» — только заказы с stepOver
+            k = sum(1 for o in r["orders"] if o["live"] and o["stepOver"])
+            assert (f"сверх нормы шага: {k} заказ" in (r["why"] or "")) == bool(k), (r["deal"], r["why"])
 
 
 def test_сверх_нормы_не_больше_сейчас(ct):
@@ -320,26 +346,25 @@ def test_сверх_нормы_не_больше_сейчас(ct):
     q = data["life"]["queue"]
     paid = [x for x in q if x["code"] == "noUtd" and str(x["order"]).startswith("9900")]
     # шаг 12 — на менеджере ОРК при любой стадии оплаты сделки: заказ сделки «Оплата получена»,
-    # доставленный без УПД, — и в очереди, и в W2 (одна совокупность шага 12, ревизия 4)
-    assert len(paid) == 3 and all(x.get("w2") for x in paid), "закрытая сделка: пункт noUtd — и в W2"
-    W2 = data["ork"]["week"]["tiles"]["W2"]
-    assert W2["byStep"][12] == sum(1 for x in q if x["code"] == "noUtd" and x.get("w2"))
-    assert W2["byStep"][12] == sum(1 for x in q if x["code"] == "noUtd" and x.get("step") == 12
-                                   and x["order"] in {str(o) for o in (99000, 99001, 99002, 99100, 99101)}
-                                   | {x2["order"] for x2 in q if x2.get("w2")})
-    led = {r["no"]: r for r in data["ork"]["week"]["ledger"]}
-    # три заказа сделки 6900 и один — сделки 6030 корпуса (оплата получена, УПД нет)
-    assert led[12]["over"] == W2["byStep"][12] and data["ork"]["week"]["closed12"] == 4
+    # доставленный без УПД, — пункт noUtd в очереди и «ждём УПД от клиента» в ведомости, а не
+    # «сверх нормы» и не W2 (решение владельца 27.10.2026, Б)
+    assert len(paid) == 3 and all(x.get("waitUtd") and not x.get("w2") for x in paid), "закрытая сделка: ждём УПД"
     w = data["ork"]["week"]
+    W2 = w["tiles"]["W2"]
+    assert 12 not in W2["byStep"]
+    led = {r["no"]: r for r in w["ledger"]}
+    # три заказа сделки 6900 и один — сделки 6030 корпуса (оплата получена, УПД нет)
+    assert led[12]["waitUtd"] == sum(1 for x in q if x["code"] == "noUtd") >= 4 and led[12]["over"] == 0
+    assert w["closed12"] == 4
     assert w["live"] - w["closed12"] == data["deadlines"]["liveOrders"]
-    # ячейка «Шаг» сделки «Оплата получена» с заказом сверх нормы УПД — шаг 12 менеджера ОРК
-    # сверх нормы, как в карточке, W2 и ведомости (а не шаг 13 без отметки); сортировка — среди
-    # «сверх нормы»; закрыть сделку — второй строкой (пункт dealClose ОСС остаётся)
+    # ячейка «Шаг» сделки «Оплата получена» с заказом без УПД дольше 10 р.д. — шаг 12 менеджера
+    # ОРК «ждём УПД от клиента», как в карточке и ведомости (а не шаг 13 без отметки и не ⚠);
+    # закрыть сделку — второй строкой (пункт dealClose ОСС остаётся)
     r = next(x for x in data["rows"] if x["deal"] == "6900")
     c = r["stepCell"]
-    oo = [o for o in r["orders"] if o["live"] and o["stepOver"]]
-    assert oo and all((o["step"], o["stepRole"]) == (12, "orkMgr") for o in oo)
-    assert (c["step"], c["role"], c["over"], c["close"]) == (12, "orkMgr", True, "paid")
+    oo = [o for o in r["orders"] if o["live"] and o["stepWaitUtd"]]
+    assert oo and all((o["step"], o["stepRole"], o["stepOver"]) == (12, "orkMgr", False) for o in oo)
+    assert (c["step"], c["role"], c["over"], c["waitUtd"], c["close"]) == (12, "orkMgr", False, True, "paid")
     assert (c["wd"], c["norm"], c["who"]) == (oo[0]["stepWd"], oo[0]["stepNorm"], oo[0]["stepWho"])
     assert any(x["code"] == "dealClose" and x["deal"] == "6900" for x in q)
     r = next(x for x in data["rows"] if x["deal"] == "6902")
@@ -348,7 +373,7 @@ def test_сверх_нормы_не_больше_сейчас(ct):
     # доставлено без УПД — шаг 12 ведомости, а не 11 («Заказ получен клиентом»)
     assert led[11]["now"] == sum(1 for r in data["rows"] if not r["closed"] for o in r["orders"]
                                  if o["live"] and o["step"] == 11 and not o["delivered"])
-    assert any(x.get("w2") for x in q if str(x["order"]) in ("99100", "99101"))
+    assert any(x.get("waitUtd") for x in q if str(x["order"]) in ("99100", "99101"))
 
 
 def test_гигиена_не_назначен_в_счёте(ct):
@@ -440,32 +465,39 @@ class _Шаг12(fixture.ContractsStub):
 
 def test_шаг_12_один_во_всех_подвкладках():
     """«Заказ получен клиентом» и «Ожидание оплаты», доставлены 20 р.д. назад без УПД: один шаг
-    12, исполнитель менеджер ОРК, 20 / 10 р.д. сверх нормы — в заказе, ячейке сделки,
-    «Замедлено», очереди (noUtd в W2) и ведомости. Доставка 400 дн. назад — гигиена «старая
-    доставка без УПД»: ни «сверх нормы», ни «в норме», ни «Замедлено», ни в n W2."""
+    12, исполнитель менеджер ОРК, 20 р.д. при норме 10 — «ждём УПД от клиента» (решение
+    владельца 27.10.2026, Б) в заказе, ячейке сделки, очереди (noUtd, не W2) и ведомости; не
+    «сверх нормы» и не «Замедлено». Доставка 400 дн. назад — гигиена «старая доставка без УПД»:
+    ни «ждём УПД», ни «в норме», ни «Замедлено»."""
     data, _o = _orders(_Шаг12())
     rows = {r["deal"]: r for r in data["rows"]}
     q = data["life"]["queue"]
     for deal, oid in (("6910", "99200"), ("6911", "99201")):
         r = rows[deal]
         o = r["orders"][0]
-        assert (o["step"], o["stepRole"], o["stepWd"], o["stepNorm"], o["stepOver"]) == (12, "orkMgr", 20, 10, True)
+        assert (o["step"], o["stepRole"], o["stepWd"], o["stepNorm"], o["stepOver"], o["stepWaitUtd"]) == (
+            12, "orkMgr", 20, 10, False, True)
         c = r["stepCell"]
-        assert (c["step"], c["role"], c["wd"], c["norm"], c["over"]) == (12, "orkMgr", 20, 10, True), deal
-        # кандидат в «Замедлено» (подтверждает чат) — одинаково для обеих стадий
-        assert "сверх нормы шага: 1 заказ" in r["why"], (deal, r["why"])
+        assert (c["step"], c["role"], c["wd"], c["norm"], c["over"], c["waitUtd"]) == (
+            12, "orkMgr", 20, 10, False, True), deal
+        # не кандидат в «Замедлено»: ждём клиента, а не простой менеджера — для обеих стадий
+        assert "сверх нормы шага" not in r["why"] and not r["slow"] and not o["slow"], (deal, r["why"])
         qq = [x for x in q if x["order"] == oid and x["code"] == "noUtd"]
-        assert qq and qq[0]["w2"] and qq[0]["step"] == 12 and qq[0]["role"] == "orkMgr" and qq[0]["days"] == 20
+        assert qq and qq[0]["waitUtd"] and not qq[0].get("w2") and qq[0]["step"] == 12
+        assert (qq[0]["role"], qq[0]["days"], qq[0]["copyRole"]) == ("orkMgr", 20, "kam"), "эскалация КАМу"
     old = rows["6912"]
     oo = old["orders"][0]
     assert oo["step"] == 12 and oo["stepOver"] is None and oo["stepHyg"] and "старая доставка" in oo["stepWhy"]
+    assert not oo["stepWaitUtd"] and not old["stepCell"]["waitUtd"]
     assert "сверх нормы шага" not in old["why"] and old["stepCell"]["hyg"] and old["stepCell"]["over"] is None
     assert not [x for x in q if x["order"] == "99202" and x["code"] == "noUtd"]
     w = data["ork"]["week"]
     led = {r["no"]: r for r in w["ledger"]}
     W2 = w["tiles"]["W2"]
-    assert W2["byStep"][12] == led[12]["over"] == sum(1 for x in q if x["code"] == "noUtd" and x.get("w2"))
-    assert led[12]["notCounted"] >= 1 and W2["excluded"] >= 1
+    assert 12 not in W2["byStep"] and led[12]["over"] == 0
+    assert led[12]["waitUtd"] == w["waitUtd"]["n"] == sum(1 for x in q if x["code"] == "noUtd" and x.get("waitUtd"))
+    assert {x["order"] for x in q if x.get("waitUtd")} >= {"99200", "99201"}
+    assert led[12]["notCounted"] >= 1
     hy = next(x for x in w["hygiene"]["items"] if x["order"] == "99202")
     assert "old" in hy["kinds"] and hy["excl"]
     _инварианты(data)
@@ -481,13 +513,13 @@ def test_ячейка_сделки_сверх_нормы_первым_и_опл�
     assert paid
     for r in paid:
         c = r["stepCell"]
-        o12 = [o for o in r["orders"] if o["live"] and o["step"] == 12 and o["stepOver"]]
-        if o12:      # УПД сверх нормы — шаг 12 менеджера ОРК, как в карточке и W2 (сделка 6030)
-            assert (c["step"], c["role"], c["over"], c["wd"], c["close"]) == (12, "orkMgr", True,
-                                                                             o12[0]["stepWd"], "paid")
+        o12 = [o for o in r["orders"] if o["live"] and o["step"] == 12 and o["stepWaitUtd"]]
+        if o12:      # ждём УПД от клиента — шаг 12 менеджера ОРК, как в карточке и ведомости (сделка 6030)
+            assert (c["step"], c["role"], c["over"], c["waitUtd"], c["wd"], c["close"]) == (
+                12, "orkMgr", False, True, o12[0]["stepWd"], "paid")
         else:
             assert (c["step"], c["role"], c["label"], c["close"]) == (13, "oss", "закрыть сделку", "paid")
-    assert any(r["stepCell"]["step"] == 12 for r in paid), "корпус: «Оплата получена» с УПД сверх нормы"
+    assert any(r["stepCell"]["step"] == 12 for r in paid), "корпус: «Оплата получена», ждём УПД"
     # все заказы закрыты, сделка открыта (dealOpen) — шаг 13 ОСС, а не «—»
     for r in ct["rows"]:
         if not r["closed"] and r["orders"] and not any(o["live"] for o in r["orders"]) \
@@ -619,8 +651,9 @@ def test_шаг7_дольше_p80_сигнал_а_не_нарушение():
 # ── ревизия 4: шаг 12 закрытых сделок, вычитание в «Месяце», S1 вне «Реализации» ────────────
 def test_шаг12_закрытой_сделки_одна_совокупность():
     """Живой заказ сделки «Оплата получена» (закрыта, не проиграна), доставленный без УПД, —
-    на шаге 12 у менеджера ОРК (Рег. 14.2.4–14.3.2): пункт noUtd в очереди, и он же — в W2,
-    ведомости (шаг 12) и «Сверх нормы по менеджерам». Счёт W2 по шагу 12 = пунктам noUtd."""
+    на шаге 12 у менеджера ОРК (Рег. 14.2.4–14.3.2): пункт noUtd в очереди, и он же — «ждём УПД
+    от клиента» в ведомости (шаг 12) и в своём столбце «Сверх нормы по менеджерам»; в W2 и в
+    «сверх нормы» не идёт (решение владельца 27.10.2026, Б)."""
     import lifecycle
     T = dt.date(2026, 10, 19)
     deals = [{**_СДЕЛКИ[0], "deal": "A", "seq": 1, "closed": True, "done": True, "paidStage": True, "norders": 1,
@@ -636,9 +669,11 @@ def test_шаг12_закрытой_сделки_одна_совокупност�
     v, _ = orkview.build(orders, deals, life["queue"], T)
     W2 = v["week"]["tiles"]["W2"]
     led12 = next(r for r in v["week"]["ledger"] if r["no"] == 12)
-    assert W2["byStep"][12] == len(no_utd) == led12["over"] == led12["now"] == 2
-    assert all(q.get("w2") for q in no_utd)
-    assert sum(m["byStep"].get("12", 0) for m in v["week"]["overByWho"]) == 2
+    assert len(no_utd) == led12["waitUtd"] == led12["now"] == v["week"]["waitUtd"]["n"] == 2
+    assert led12["over"] == 0 and 12 not in W2["byStep"] and W2["value"] == 0
+    assert all(q.get("waitUtd") and not q.get("w2") for q in no_utd)
+    ow = v["week"]["overByWho"]
+    assert [(m["who"], m["n"], m["waitUtd"], m["byStep"]) for m in ow] == [("Пётр", 0, 2, {})]
     assert v["week"]["closed12"] == 1 and v["week"]["live"] == 2
     # прочие шаги закрытой сделки — не отклонения: W1 и шаги 1/4/5/8 их не видят
     assert W2["byStep"][1] == W2["byStep"][5] == 0
