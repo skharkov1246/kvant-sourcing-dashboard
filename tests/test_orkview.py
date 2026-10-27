@@ -342,11 +342,13 @@ def test_q1_пачка_не_первичный_срок():
     assert q3["Q1"]["n"] == 10 and q3["Q1"]["value"] == 0
 
 
-def test_менеджер_за_прошлый_месяц():
-    """Поимённо — текущий и прошлый полный месяц (в начале месяца у текущего отрезков нет)."""
+def test_менеджер_за_последний_полный_месяц():
+    """Поимённо — главное последний ПОЛНЫЙ месяц; текущий (идёт, неполный) — рядом, cur."""
     _d, _o = _orders()
     mp = _d["orkMonth"]["main"]
-    assert mp and all("prev" in m and "M1" in m["prev"] and m["prev"]["m"] for m in mp)
+    assert mp and all(m["m"] == "09.2026" and "M1" in m and m["cur"]["m"] == "10.2026" and m["cur"]["partial"]
+                      for m in mp)
+    assert all("prev" not in m for m in mp)
 
 
 # ── ревизия 2: одно правило шага 12, гигиена старой доставки, неизвестные стадии ─────────
@@ -479,3 +481,61 @@ def test_месяц_отдела_по_людям():
     трое, _ = orkview._month([era(i, ("Илья", "Пётр", "Олег")[i % 3]) for i in range(12)], [], T, None, {})
     s2 = трое["rows"][0]["M1"]["S2"]
     assert s2["state"] == "prelim" and s2["value"] == 100 and s2["k"] == 12 and s2["people"] == 3
+
+
+# ── ревизия 3: последний полный месяц, «дольше P80» шага 7 ────────────────────────────────
+def test_месяц_заголовок_последний_полный():
+    """Заголовок «Месяца» — последний полный месяц (head); текущий идёт — partial, рядом. У
+    менеджера отрезок сентября — в главном, октября — в «идёт, неполный»."""
+    T = dt.date(2026, 10, 26)
+
+    def era(i, who, end):
+        seg = {**_seg(1, end=end), "skip": False}
+        return {"id": str(i), "created": dt.date(2026, 8, 25), "resp": who, "orkMgr": who, "respOrk": True,
+                "stage": "Оплата поставщику / агенту", "_segs": {"segs": {"S2": seg}}, "_reach": {}, "art": {}}
+    orders = [era(i, ("Илья", "Пётр", "Олег")[i % 3], "2026-09-15T10:00:00+03:00") for i in range(9)]
+    orders += [era(100 + i, "Илья", "2026-10-15T10:00:00+03:00") for i in range(2)]
+    month, mp = orkview._month(orders, [], T, None, {})
+    rows = month["rows"]
+    assert month["head"] == 1 and rows[1]["m"] == "09.2026" and not rows[1]["partial"]
+    assert rows[0]["m"] == "10.2026" and rows[0]["partial"] is True
+    assert rows[1]["M1"]["S2"]["n"] == 9 and rows[0]["M1"]["S2"]["n"] == 2
+    илья = next(m for m in mp if m["who"] == "Илья")
+    assert илья["m"] == "09.2026" and илья["M1"]["S2"]["n"] == 3
+    assert илья["cur"]["partial"] and илья["cur"]["M1"]["S2"]["n"] == 2
+
+
+def _s5(i, cd, end="2026-09-01T10:00:00+03:00"):
+    return {"id": f"m{i}", "sup": "П", "created": dt.date(2025, 12, 1), "live": False,
+            "_segs": {"segs": {"S5": {"cd": cd, "end": end, "start": "2026-07-01T10:00:00+03:00",
+                                      "skip": False, "burst": False, "ret": False, "neg": False}}}}
+
+
+def test_шаг7_дольше_p80_сигнал_а_не_нарушение():
+    """Живой заказ в производстве дольше P80 S5 по всем заказам — сигнал ведомости и «Ждут
+    смежников» (мяч у поставщика), не «сверх нормы»: шаг 7 регламент не нормирует."""
+    import lifecycle
+    T = dt.date(2026, 10, 26)
+    measure = [_s5(i, 10 + i) for i in range(30)]          # P80 = s[⌈0,8·30⌉−1] = s[23] = 33
+    def prod(i, days, **kw):
+        at = (dt.datetime(2026, 10, 26, 10, tzinfo=dt.timezone(dt.timedelta(hours=3)))
+              - dt.timedelta(days=days)).isoformat()
+        return _синт(i, "Производство заказа", supPaidPct=100, _reach={7: at}, stepSince=at, **kw)
+    orders = [prod(1, 60), prod(2, 5), _синт(3, "Производство заказа", supPaidPct=100, stepSince="", stageSince="")]
+    life = lifecycle.build(orders, _СДЕЛКИ, T)
+    v, _ = orkview.build(orders, _СДЕЛКИ, life["queue"], T, measure=measure + orders)
+    lp = v["week"]["longP80"]
+    assert lp["state"] == "show" and lp["p80"] == 33 and lp["k"] == 1 and lp["n"] == 2 and lp["unknown"] == 1
+    assert [x["order"] for x in lp["items"]] == ["1"] and lp["items"][0]["days"] == 60
+    assert "не нарушение нормы" in lp["label"]
+    led7 = next(r for r in v["week"]["ledger"] if r["no"] == 7)
+    assert led7["longP80"] == 1 and led7["over"] is None and led7["waits"] == "sup"
+    assert all(r["longP80"] is None for r in v["week"]["ledger"] if r["no"] != 7)
+    # не в «сверх нормы»: W2 его не считает, пунктов s*Over у заказа нет
+    assert v["week"]["tiles"]["W2"]["value"] == 0
+    assert not [q for q in life["queue"] if q.get("order") == "1" and q["code"].endswith("Over")]
+    # P80 не посчитан — «Нет данных», а не ноль
+    v0, _ = orkview.build(orders, _СДЕЛКИ, life["queue"], T, measure=orders)
+    lp0 = v0["week"]["longP80"]
+    assert lp0["state"] == "nodata" and lp0["k"] is None and lp0["items"] == []
+    assert next(r for r in v0["week"]["ledger"] if r["no"] == 7)["longP80"] is None

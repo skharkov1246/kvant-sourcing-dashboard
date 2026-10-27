@@ -1547,37 +1547,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                      "moneyDays": r["lateMoneyDays"], "saleLbl": r["saleLbl"],
                      "manager": r["manager"], "oss": r["oss"]} for r in top_cost]
 
-        # разрезы просрочки: по ответственному сделки и по схеме поставки
-        def _cut(keyfn) -> list:
-            agg: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0])   # [просроч. заказов, сделок, € , всего живых заказов]
-            worst: dict[str, dict] = {}                                  # главная просроченная сделка человека
-            for r in live_rows:
-                mine = set()
-                for o in r["orders"]:
-                    if not o["live"]:
-                        continue
-                    k = keyfn(r, o) or "—"
-                    agg[k][3] += 1
-                    if o["late"]:
-                        agg[k][0] += 1
-                        agg[k][2] += o["buyRaw"]
-                        mine.add(k)
-                # просроченная сделка засчитывается каждому, у кого в ней просрочен заказ,
-                # а не только хозяину первого заказа
-                for k in mine:
-                    agg[k][1] += 1
-                    w = worst.get(k)
-                    if w is None or (r["lateDays"] or 0) > (w["days"] or 0):
-                        worst[k] = {"seq": r["seq"], "deal": r["deal"], "customer": r["customer"],
-                                    "days": r["lateDays"]}
-            out = [{"name": k, "lateOrders": v[0], "lateDeals": v[1], "buy": round(v[2]),
-                    "buyLbl": _money(v[2]), "liveOrders": v[3],
-                    "pct": round(v[0] / v[3] * 100) if v[3] else 0,
-                    "gone": k.endswith("(уволен)"), "top": worst.get(k)}
-                   for k, v in agg.items() if v[0]]
-            out.sort(key=lambda x: -x["lateOrders"])
-            return out[:12]
-
         # ЖИВАЯ РАБОТА УВОЛЕННЫХ: сделку ведёт ушедший ответственный, её живые заказы —
         # ушедший ОСС или ушедший ответственный заказа (Responsible person). Это не просрочка,
         # а работа без хозяина: её переназначают.
@@ -1618,8 +1587,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "shipFirst": ship_first,
             "revAtRisk": _money(rev_at_risk), "marginAtRisk": _money(margin_at_risk),
             "lateNoSum": late_nosum_n, "costTop": cost_top,
-            "byManager": _cut(lambda r, o: r["manager"]),
-            "byOss": _cut(lambda r, o: o.get("oss") or r["oss"]),
+            # разрезы просрочки по ответственному и ОСС (byManager, byOss) сняты 27.10.2026:
+            # страница их не рисовала — просрочку по людям показывает очередь по исполнителю шага
         }
 
         # аддитивно: все прежние KPI сохранены, новые добавлены следом

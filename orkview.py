@@ -208,6 +208,9 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
         v = ov[o["id"]]
         return v["norm"] is not None and not v["counted"] and not v["termUnknown"]
     reach_of = {o["id"]: o.get("_reach") or {} for o in orders}
+    # «Квартал» — раньше недели: P80 производства (S5) по ВСЕМ заказам — порог сигнала шага 7
+    quarter = _quarter_view(measure, today)
+    long_p80 = _long_p80([o for o in U if step[o["id"]] == 7], quarter["Q2"]["S5"], today)
     ledger, adjacent = [], Counter()
     for s in ork.STEPS:
         no = s["no"]
@@ -234,6 +237,9 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                        # на шаге, но не в счёте «сверх нормы»: гигиена, приёмка вне «Реализации»
                        "notCounted": sum(1 for o in here if not_counted(o)) if normed else None,
                        "artReq": req, "artMiss": miss, "waits": waits or "",
+                       # шаг 7 регламент не нормирует: «дольше P80 S5» — сигнал, не «сверх нормы»
+                       "longP80": (long_p80["k"] if long_p80["state"] in ("show", "prelim") else None)
+                       if no == 7 else None,
                        "waitsName": ork.ROLES.get(waits or "", ""), "seg": s["seg"] or ""})
 
     # --- W1 приёмка ------------------------------------------------------------------------
@@ -349,6 +355,7 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
             "ledger": ledger, "unknown": unk_n, "unknownStages": dict(unknown.most_common(20)),
             "live": len(U), "dealsNoOrder": len(no_order),
             "adjacent": {r: adjacent.get(r, 0) for r in ork.ADJACENT},
+            "longP80": long_p80,
             "overByWho": over_mgr, "risk": risk_list, "checkpoints": cps,
             "hygiene": {"n": len(hyg_items), "by": dict(hc), "excluded": hyg_excl,
                         "noMgrOnly": sum(1 for x in hyg_items if x["kinds"] == ["noMgr"]), "items": hyg_items},
@@ -356,7 +363,6 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
                           "содержимое файлов (есть ли подпись), проверка контрагента (СП-1066 не читается)"}
 
     month, month_people = _month(orders, U, today, otd, ov)
-    quarter = _quarter_view(measure, today)
     how = _how(orders, U, deals, queue, week, month, quarter, today, step)
     # годы сроков, которые считаются сейчас: от самой ранней даты входа в шаг живого заказа (и
     # факта доставки у шага 12) до сегодня — без подрезки снизу (правило 15)
@@ -376,6 +382,35 @@ def build(orders: list[dict], deals: list[dict], queue: list[dict], today: dt.da
              "oldNoUtd": sum(1 for o in U if hy[o["id"]].get("old"))}
     return ({"asOf": today.isoformat(), "trust": trust, "week": week, "month": month, "quarter": quarter,
              "how": how, "gatesNote": ork.GATES_NOTE}, month_people)
+
+
+def _long_p80(prod: list[dict], s5: dict, today: dt.date) -> dict:
+    """Шаг 7 (контроль производства) регламент не нормирует (медиана и P80): живой заказ в
+    производстве дольше P80 отрезка S5 по ВСЕМ заказам («Квартал», Q2) — сигнал в ведомость и
+    «Ждут смежников» (мяч у поставщика), а не нарушение нормы менеджера. Дней в производстве —
+    календарные от первого выхода на шаг 7 (как у S5), нет перехода — от входа в шаг.
+    P80 не показан (мало отрезков, «пачки») — «Нет данных», а не ноль."""
+    label = "дольше P80 производства (S5) — сигнал, не нарушение нормы: шаг 7 регламент не нормирует"
+    p8 = s5.get("p80") if s5.get("state") in ("show", "prelim") else None
+    if p8 is None:
+        return {"state": "nodata", "value": None, "k": None, "n": len(prod), "p80": None, "items": [],
+                "label": label, "src": "Q2 S5",
+                "why": "P80 производства не посчитан: " + (s5.get("why") or "нет законченных отрезков S5")}
+    items, unknown = [], 0
+    for o in prod:
+        start = _d((o.get("_reach") or {}).get(7)) or _d(o.get("stepSince")) or _d(o.get("stageSince"))
+        if start is None:
+            unknown += 1
+            continue
+        days = (today - start).days
+        if days > p8:
+            items.append({"deal": o.get("deal"), "seq": o.get("seq"), "order": o["id"], "days": days,
+                          "sup": o.get("sup") or "", "who": (o.get("own") or {}).get("who") or ""})
+    items.sort(key=lambda x: (-x["days"], x["order"]))
+    known = len(prod) - unknown
+    return {"state": s5["state"], "value": len(items), "k": len(items), "n": known, "unknown": unknown,
+            "p80": p8, "items": items, "label": label, "src": "Q2 S5",
+            "why": s5.get("why") or ""}
 
 
 def _s1_agree(orders: list[dict]) -> tuple[float | None, int]:
@@ -464,7 +499,9 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
         o_m = otd_by.get(m0.strftime("%m.%Y")) or {}
         otd_st = _ms(o_m.get("pct"), o_m.get("n") or 0, None, src="life.otd",
                      extra={"ontime": o_m.get("ontime"), "label": "результат поставщика и логистики"})
-        rows.append({"m": m0.strftime("%m.%Y"), "M1": m1s, "M2": m2, "otd": otd_st, "target": 95})
+        # текущий месяц идёт — неполный: заголовок «Месяца» — последний ПОЛНЫЙ месяц
+        rows.append({"m": m0.strftime("%m.%Y"), "M1": m1s, "M2": m2, "otd": otd_st, "target": 95,
+                     "partial": mi == 0})
 
     # M3 загрузка: живые заказы ОРК-эпохи на менеджера ОРК против среднего по менеджерам
     live_era = [o for o in U if _d(o.get("created")) and _d(o["created"]) >= ork.ORK_SINCE]
@@ -485,6 +522,8 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
         _hide(M3, f"не показываем: менеджеров ОРК {len(load)} < {ork.GATES['n_managers_min']} — "
                   "среднее раскрыло бы нагрузку человека")
     month = {"rows": rows, "M3": M3, "since": ork.ORK_SINCE.isoformat(), "target": 95,
+             # заголовок — последний полный месяц (rows[1]); текущий (rows[0]) — рядом, «идёт, неполный»
+             "head": 1 if len(rows) > 1 else 0,
              "note": "без поправки на сложность; рейтинга нет — только счёт",
              "an4": [{"name": n, "state": "nodata", "need": need} for n, need in ork.AN4_NODATA]}
     # поимённо — только руководителям ОРК и владельцу (решение 26.10.2026, п. 3)
@@ -498,12 +537,13 @@ def _month(orders: list[dict], U: list[dict], today: dt.date, otd: dict | None, 
     empty = {"segs": {}, "req": 0, "have": 0}
     mp = []
     for who in sorted(set(load) | {w for _mi, w in people}):
-        cur, prev = people.get((0, who)) or empty, people.get((1, who)) or empty
+        cur, full = people.get((0, who)) or empty, people.get((1, who)) or empty
         mp.append({"who": who, "gone": str(who).endswith("(уволен)"), "live": load.get(who, 0),
                    "loadDev": round(load.get(who, 0) / mean - 1, 2) if mean else None,
-                   **per_month(cur),
-                   # прошлый полный месяц — рядом: в начале месяца у текущего отрезков нет
-                   "prev": {"m": months[1].strftime("%m.%Y") if len(months) > 1 else "", **per_month(prev)}})
+                   # главное — последний полный месяц; текущий (идёт, неполный) — рядом
+                   "m": months[1].strftime("%m.%Y") if len(months) > 1 else "",
+                   **per_month(full),
+                   "cur": {"m": months[0].strftime("%m.%Y"), "partial": True, **per_month(cur)}})
     return month, mp
 
 
@@ -592,7 +632,7 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
     """«Как считается»: формулы, поля, вердикт ворот, n и покрытие; нарушения порядка;
     заполненность артефактов; поля «добавить» с адресатом."""
     t = week["tiles"]
-    m0 = month["rows"][0] if month["rows"] else {}
+    m0 = month["rows"][month.get("head", 0)] if month["rows"] else {}    # последний полный месяц
     q0 = quarter["quarters"][0] if quarter["quarters"] else {}
 
     def row(code, name, formula, fields, st):

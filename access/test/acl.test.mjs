@@ -472,3 +472,31 @@ test("премии сняты с портала: ни вкладки, ни ма�
   acl.users["fd@kvantpro.com"] = { role: "employee", sites: [], tabs: ["premia"], note: "", seen: 1 };
   assert.ok(!rightsFor(normalizeAcl(acl), "fd@kvantpro.com", {}).tabs.includes("premia"));
 });
+
+test("страница без «Сорсинга»: шапка правил КП не роняет скрипт на пустышке данных", async () => {
+  // воркер вырезал __DATA__ (вкладки «Сорсинг» нет) — M стал пустышкой __kvNoData. Раньше
+  // «graceUntil» пустышки давал Date.parse → NaN, toISOString падал «Invalid time value» и
+  // останавливал весь скрипт страницы: ни одна вкладка не поднималась (так было и на main)
+  const vm = await import("node:vm");
+  const tpl = fs.readFileSync(path.join(ROOT, "templates", "dashboard_core.html"), "utf8");
+  const block = tpl.match(/^const _dmy=[\s\S]*?^const GRACE_ON=.*$/m);
+  assert.ok(block, "в шаблоне нет блока льготного срока КП");
+  const cut = cutDashboard(`<body>\nwindow.__DATA__ = {"kpRules":{"graceUntil":"2026-11-02"}};\n</body>`, ["contracts"]);
+  const stub = cut.match(/<script>(function __kvNoData[\s\S]*?)<\/script>/);
+  assert.ok(stub && /window\.__DATA__ = __kvNoData\(\);/.test(cut), "__DATA__ не заменён пустышкой");
+  const run = (data) => {
+    const ctx = vm.createContext({ window: {} });
+    vm.runInContext(stub[1], ctx);
+    ctx.window.__DATA__ = data === "stub" ? vm.runInContext("__kvNoData()", ctx) : data;
+    return vm.runInContext(`const M = window.__DATA__ || {};\n${block[0]}\n({GRACE_TO, GRACE_FROM, GRACE_ON})`, ctx);
+  };
+  const empty = run("stub");
+  assert.equal(empty.GRACE_TO, "");
+  assert.equal(empty.GRACE_FROM, "");
+  assert.equal(empty.GRACE_ON, false);
+  const real = run({ kpRules: { graceUntil: "2026-11-02" }, period: { end: "2026-10-27" } });
+  assert.equal(real.GRACE_FROM, "03.11.2026");
+  assert.equal(real.GRACE_ON, true);
+  // не дата — без льготного срока, а не падение
+  assert.equal(run({ kpRules: { graceUntil: "скоро" } }).GRACE_FROM, "");
+});

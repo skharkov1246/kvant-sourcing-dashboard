@@ -324,3 +324,48 @@ def test_брошенная_до_календаря():
     o = {"stage": "Заказ направлен", "stepSince": f"{y0 - 1}-06-01T10:00:00+03:00"}
     h = ork.hygiene(o, D(y0, 12, 1))
     assert h["abandoned"] and h["exclude"]
+
+
+# ── артефакт требуется только у заказов, прошедших шаг после даты создания поля ─────────────
+def test_артефакт_только_после_даты_создания_поля():
+    a = {x["key"]: x for x in ork.ARTIFACTS}
+    pro, oc, po = a["proforma"], a["oc"], a["po"]            # поля проформы и OC — с 24.08.2026
+    base = {"stage": "Оплата поставщику / агенту", "prepayShare": 30, "created": D(2026, 6, 1)}
+    # шаг 6 пройден до создания поля — не требуется; после — требуется
+    assert not ork.art_required(base, pro, {6: "2026-08-20T10:00:00+03:00"})
+    assert ork.art_required(base, pro, {6: "2026-09-02T10:00:00+03:00"})
+    # перехода на шаг в истории нет: заказ старше поля — неизвестно, не требуем; моложе — требуем
+    assert not ork.art_required(base, pro, {})
+    assert ork.art_required({**base, "created": D(2026, 9, 1)}, pro, {})
+    assert not ork.art_required({**base, "created": None}, pro, {})
+    # шаг ещё не пройден — не требуется при любой дате
+    assert not ork.art_required({**base, "stage": "Согласование спецификации и оплаты"}, pro,
+                                {6: "2026-09-02T10:00:00+03:00"})
+    # OC — только у импорта: «импорт/РФ» не сверен — не требуется; импорт — требуется
+    assert not ork.art_required(base, oc, {6: "2026-09-02T10:00:00+03:00"})
+    assert not ork.art_required({**base, "import": False}, oc, {6: "2026-09-02T10:00:00+03:00"})
+    assert ork.art_required({**base, "import": True}, oc, {6: "2026-09-02T10:00:00+03:00"})
+    # старое поле (Purchase order, 2024) — у заказа, прошедшего шаг в 2025-м, требуется
+    assert ork.art_required(base, po, {6: "2025-03-01T10:00:00+03:00"})
+    assert not ork.art_required(base, po, {6: "2024-07-01T10:00:00+03:00"})
+
+
+def test_ведомость_нет_артефактов_по_дате_поля():
+    """Ведомость считает «Нет артефактов» тем же правилом: заказ, прошедший шаг 6 до создания
+    поля проформы, проформу не обязан."""
+    import lifecycle
+    import orkview
+    T = D(2026, 10, 26)
+    def o(i, at):
+        return {"id": str(i), "deal": "D1", "seq": 1, "live": True, "stage": "Производство заказа",
+                "stepSince": at, "stageSince": at, "t0": at, "created": D(2026, 6, 1), "supPaidPct": 100,
+                "prepayShare": 50, "utd": False, "art": {}, "_reach": {6: at, 7: at}, "_segs": {},
+                "orkMgr": "М", "respOrk": True}
+    orders = [o(1, "2026-08-10T10:00:00+03:00"), o(2, "2026-09-10T10:00:00+03:00")]
+    deals = [{"deal": "D1", "seq": 1, "customer": "К", "closed": False, "lost": False, "inCat0": True,
+              "norders": 2, "cat0At": "2026-06-01T10:00:00+03:00"}]
+    life = lifecycle.build(orders, deals, T)
+    v, _ = orkview.build(orders, deals, life["queue"], T)
+    led5 = next(r for r in v["week"]["ledger"] if r["no"] == 5)
+    # шаг 5: PO и спецификации — у обоих (поля 2024 г.), проформа — только у второго, OC — ни у кого
+    assert (led5["artReq"], led5["artMiss"]) == (5, 5)

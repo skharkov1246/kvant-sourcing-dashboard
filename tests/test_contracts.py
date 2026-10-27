@@ -175,11 +175,12 @@ def test_стадии_заказов_другой_воронки_получаю�
     assert _row(ct, "1")["orders"][0]["stageName"] == "Подготовка (30)"
 
 
-def test_разрез_по_людям_помечает_уволенного_и_называет_сделку(ct):
-    by = {m["name"]: m for m in ct["deadlines"]["byOss"]}
-    m = by["Ежова Лада (уволен)"]
-    assert m["gone"] is True and m["lateOrders"] == 1 and m["lateDeals"] == 1
-    assert m["top"]["seq"] == 901 and m["top"]["days"] == 40
+def test_разрезы_просрочки_по_людям_не_отправляются_а_просрочка_видна_в_очереди(ct):
+    # byManager / byOss страница не рисовала — сняты из данных (27.10.2026); просроченный
+    # заказ уволенного ОСС виден пунктом очереди «срок сорван» с хозяином и сроком
+    assert "byManager" not in ct["deadlines"] and "byOss" not in ct["deadlines"]
+    late = [q for q in ct["life"]["queue"] if q["code"] == "late" and q.get("seq") == 901]
+    assert late and late[0]["days"] == 40 and late[0].get("who")
 
 
 def test_окно_бенчмарков_задано(ct):
