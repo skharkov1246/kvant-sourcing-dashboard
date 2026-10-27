@@ -598,6 +598,64 @@ def test_закрытая_сделка_шаг_не_12_не_сверх_нормы
     _инварианты(data)
 
 
+class _ЗакрытаяСрок(fixture.ContractsStub):
+    """Придуманный корпус: живой заказ, срок клиента прошёл 15 дн. назад, не доставлен —
+    у сделки «Оплата получена» (6930) и открытой (6932, контроль); заказ в «Производство
+    заказа» (шаг 7, без нормы) у закрытой выигранной сделки (6931)."""
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct_
+        now = dt.datetime.fromisoformat(fixture.CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()            # noqa: E731
+        d = lambda a: (fixture.CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        for deal, oid, stage, sem, ost in (("6930", 99500, "C0:PAID", "P", "SPEC"),
+                                           ("6931", 99501, "C0:WON", "S", "PREPARATION"),
+                                           ("6932", 99502, "C0:PREPARATION", "P", "SPEC")):
+            self.deals.append({"ID": deal, "TITLE": f"99{deal[-1]}. Срок у закрытой", "OPPORTUNITY": "1000",
+                               "CURRENCY_ID": "EUR", "COMPANY_ID": "301", "STAGE_ID": stage,
+                               "STAGE_SEMANTIC_ID": sem, "CATEGORY_ID": "0", "DATE_CREATE": t(220),
+                               "ASSIGNED_BY_ID": "10", ct_.OSS_DEAL: ["21"], ct_.KAM_F: "11"})
+            self.hist[2] += [(deal, "C0:NEW", t(220)), (deal, stage, t(12))]
+            self.orders.append({"id": oid, "title": f"{deal}/1. Узел", "companyId": "401", "parentId2": int(deal),
+                                "opportunity": 100, "currencyId": "EUR", "stageId": f"DT172_26:{ost}",
+                                "createdTime": t(150), "movedTime": t(35), ct_.OSS_F: "21",
+                                ct_.DL_CUSTOMER: d(15), ct_.SUP_PAID: 0, "assignedById": "31"})
+            path = fixture.CT_PATH[:fixture.CT_PATH.index(ost) + 1]
+            self.hist[172] += [(str(oid), f"DT172_26:{st}", t(150 - (115 if st == ost else 8 * k)))
+                               for k, st in enumerate(path)]
+
+
+def test_закрытая_сделка_срок_клиента_не_в_счёте():
+    """Срок клиента у закрытой сделки — не просрочка ни в одном виде: строка (late), колонка
+    «Срок» (lateN), плашка заказа (late), очередь («late» — lifecycle) и итоги дедлайнов —
+    одна совокупность. Открытая сделка с тем же заказом — просрочена везде. Шаг без нормы у
+    закрытой сделки сохраняет своё «почему» («шаг не нормируется»), а не подпись про шаг 12."""
+    data, _o = _orders(_ЗакрытаяСрок())
+    rows = {r["deal"]: r for r in data["rows"]}
+    q = data["life"]["queue"]
+    ctl = rows["6932"]
+    assert ctl["late"] and ctl["lateN"] == 1 and ctl["lateDays"] == 15 and ctl["orders"][0]["late"]
+    assert any(x["code"] == "late" and x["order"] == "99502" for x in q)
+    for deal in ("6930", "6931"):
+        r = rows[deal]
+        o = r["orders"][0]
+        assert r["closed"] and o["live"] and o["dlDays"] == 15 and not o["delivered"], deal
+        assert not r["late"] and r["lateN"] == 0 and r["lateDays"] is None and not o["late"], deal
+        assert o["lossEur"] == 0 and "просрочено обещание" not in (r["why"] or ""), deal
+        assert not [x for x in q if x["order"] == o["id"] and x["code"] == "late"], deal
+    main = [r for r in data["rows"] if not r["seg"]]          # итоги дедлайнов — основного вида
+    assert data["deadlines"]["lateOrders"] == sum(r["lateN"] for r in main) \
+        == sum(1 for r in main if r["late"] for o in r["orders"] if o["late"])
+    assert all(not o["late"] for r in data["rows"] if r["closed"] for o in r["orders"])
+    o7 = rows["6931"]["orders"][0]
+    assert o7["step"] == 7 and o7["stepNorm"] is None and not o7["stepClosed"], o7
+    assert o7["stepWhy"] == "шаг не нормируется", o7["stepWhy"]
+    o5 = rows["6930"]["orders"][0]
+    assert o5["step"] == 5 and o5["stepClosed"] and "шаг 12" in o5["stepWhy"], o5
+    _инварианты(data)
+
+
 def test_ячейка_сделки_сверх_нормы_первым_и_оплата_получена(ct):
     """Ячейка «шаг · исполнитель · р.д./норма»: есть заказ сверх нормы — он (почему строка
     замедлена); «Оплата получена», сделка не закрыта — шаг 13, ОСС «закрыть сделку» (п. 4)."""

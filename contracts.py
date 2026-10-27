@@ -1037,6 +1037,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             # отклонения: ни красной строки заказа, ни «замедлена» в карточке
             ojudge = bool(olive and (not closed or (ostep == 12 and sem != "F")))
             oslow = bool(ojudge and ov["over"])
+            ostep_closed = bool(olive and not ojudge and ostep and ov["norm"] is not None)
             if oslow:
                 slow_orders += 1
             # обещание клиенту: та же дата, по которой снабжение ведёт «Контроль дедлайнов»
@@ -1047,7 +1048,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             delivered = _pdate(o.get(DEL_FACT))
             del_utd = None if delivered else _utd_date(o, today)
             delivered = delivered or del_utd
-            olate = bool(olive and dl_days is not None and dl_days > 0 and not delivered)
+            # срок клиента — только у открытой сделки: у закрытой просрочка не в счёте (как
+            # «late» в lifecycle и признак строки «late»), иначе 🚩 в колонке «Срок» и красная
+            # плашка заказа при строке «в срок»
+            olate = bool(olive and not closed and dl_days is not None and dl_days > 0 and not delivered)
             obuy = o_eur[str(o.get("id"))] or 0.0     # курса нет — закупка заказа неизвестна
             # стоимость отгрузки этого заказа: доля сделки пропорционально закупке
             # (как в экономике проекта); если сумм закупки нет НИ У ОДНОГО заказа — поровну
@@ -1109,13 +1113,15 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "stepWaitUtd": bool(ojudge and ov["waitUtd"]),
                 # шаг живого заказа закрытой сделки вне счёта (не шаг 12 выигранной) — подпись
                 # «сделка закрыта, не в счёте» вместо оценки срока
-                "stepClosed": bool(olive and not ojudge and ostep and ov["norm"] is not None),
+                "stepClosed": ostep_closed,
                 # норма по регламенту, которую портал не меряет (шаг 6 — «нет данных»), и почему
                 # срок не в счёте (гигиена, приёмка вне «Реализации», срок не посчитать)
                 "stepNormDoc": ov["normDoc"], "stepNormState": ov["normState"],
                 "stepHyg": bool(ojudge and ov["hyg"] and ov["norm"] is not None),
+                # подпись закрытой сделки — только там, где есть норма: у шага без нормы
+                # остаётся его собственное «почему» («шаг не нормируется», «нет данных»)
                 "stepWhy": (("сделка закрыта: в счёте только шаг 12 (УПД)" if sem != "F" else "сделка проиграна")
-                            if (olive and not ojudge) else ov["why"] if olive else ""),
+                            if ostep_closed else ov["why"] if olive else ""),
             })
         ords_det.sort(key=lambda x: (not x["live"], -(x["dlDays"] if x["dlDays"] is not None else -9999),
                                      -(x["days"] or 0)))

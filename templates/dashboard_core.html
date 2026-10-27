@@ -2066,7 +2066,7 @@ function openContract(x){
   h+=`<div class="mrow-like" style="font-size:12.5px;line-height:1.7">`
     +`Стадия: <b>${_esc(x.stageName||'—')}</b>${x.stageDays!=null?` — <span class="stgd">${x.stageDays} дн</span> <span class="dimv">(справочно: 2× медианы стадии — ${x.stageThr} дн; норма — регламент ОРК по шагу заказа)</span>`:''}<br>`
     +(x.lateN?`Дедлайн клиенту: <b class="nrc">🚩 просрочен на ${x.lateDays} дн</b> <span class="dimv">(заказов ${x.lateN}, закупка ${x.lateBuyLbl})</span><br>`
-      :(x.dlNext?`Дедлайн клиенту: <b>${x.dlNext}</b> <span class="dimv">— в срок</span><br>`:''))
+      :(x.dlNext?`Дедлайн клиенту: <b>${x.dlNext}</b> <span class="dimv">— ${x.closed?'сделка закрыта, срок не в счёте':'в срок'}</span><br>`:''))
     +(x.noDl?`<span class="dimv">без плановой даты клиенту: ${x.noDl} живых заказ(ов)</span><br>`:'')
     +(x.manager&&x.manager!=='—'?`Ответственный: <b>${_esc(x.manager)}</b>`+(x.oss&&x.oss!=='—'?` · ОСС: <b>${_esc(x.oss)}</b>`:'')+(x.cities?` <span class="dimv">· ${_esc(x.cities)}</span>`:'')+`<br>`:'')
     +`Вошла в реализацию: <b>${x.entered||'—'}</b>`
@@ -2221,7 +2221,7 @@ function openContract(x){
     // срок заказа — шаг регламента ОРК против его нормы (р.д., без пауз); дни в стадии — справочно
     +(o.days!=null?`<span class="dimv mono">${o.days} дн в стадии</span>`:'')
     +(o.live&&o.step?`<span class="${o.slow?'nrc':o.stepWaitUtd?'amb':''} mono"${o.stepWhy?` title="${_esc(o.stepWhy)}"`:''}>шаг ${o.step} · ${o.stepNorm!=null?(o.stepWaitUtd?`ждём УПД от клиента · ${o.stepWd} р.д. от доставки (норма ${o.stepNorm})`:`${o.stepWd!=null?o.stepWd:'—'} / ${o.stepNorm} р.д. · без пауз${o.stepHyg?' · гигиена, не в счёте':o.stepClosed?' · сделка закрыта, не в счёте':''}`):(o.stepNormState==='nodata'?`норма ${_esc(o.stepNormDoc||'')} — нет данных`:'не нормируется')}</span>`:'')
-    +(o.dl?`<span class="${o.late?'nrc':'dimv'} mono">дедлайн ${o.dl}${o.late?` · +${o.dlDays} дн`:''}</span>`:'<span class="dimv">дедлайна нет</span>')
+    +(o.dl?`<span class="${o.late?'nrc':'dimv'} mono">дедлайн ${o.dl}${o.late?` · +${o.dlDays} дн`:(x.closed&&o.live&&o.dlDays>0&&!o.delivered?' · сделка закрыта, не в счёте':'')}</span>`:'<span class="dimv">дедлайна нет</span>')
     +(o.delivered?`<span class="dimv mono">доставлен ${o.delivered}${o.delUtd?' · по УПД':''}</span>`:'')
     +(o.prodAfterDl?`<span class="srcb disc">пр-во до ${o.prodEnd} — позже дедлайна</span>`:'')
     +(o.live&&(o.respGone||o.ossGone)?`<span class="gone">${o.respGone&&o.ossGone?'ответственный и ОСС заказа уволены':(o.respGone?'ответственный заказа уволен':'ОСС заказа уволен')} — переназначить</span>`:'')
@@ -2911,6 +2911,8 @@ function _ctPanel(X,el,opt){
     const tail=c.label==='закрыть сделку'?'':` · ${_esc(c.label||'без пауз')}`;
     return `<div class="stgcell"><b>шаг ${c.step}</b> · ${_esc(RNM[c.role]||c.role||'')}<div class="dep">${_esc(String(c.who||'не назначен').replace(/ \(уволен\)$/,''))}</div><div class="dep"><span class="${c.over?'nrc':c.waitUtd?'amb':''}"${c.waitUtd?` title="норма ${c.norm} р.д. от доставки; подпись УПД — за заказчиком, не сверх нормы менеджера (решение владельца 27.10.2026); на 11-й р.д. — эскалация КАМу"`:c.why?` title="${_esc(c.why)}"`:''}>${wd}</span>${c.over?' ⚠':''}${tail}</div>${c.close==='paid'&&c.step!==13?`<div class="dep">и шаг 13 · ОСС: оплата получена — закрыть сделку</div>`:''}${c.closeNote?`<div class="dep amb">${_esc(c.closeNote)}</div>`:''}</div>`;};
   const dcell=x=>{
+    // закрытая сделка: срок клиента не в счёте (ни 🚩, ни «в срок», ни «нет плановой даты») — как строка и очередь
+    if(x.closed)return `<div class="dep">${x.dlNext?`срок ${x.dlNext} · сделка закрыта, не в счёте`:'закрыта'}</div>`;
     if(!x.lateN&&!x.dlNext)return `<div class="dep">${x.noDl?'<span class="nrc">нет плановой даты</span>':'—'}</div>`;
     if(x.lateN)return `<div class="stgcell"><b class="nrc">🚩 ${x.lateDays} дн</b><div class="dep">заказов ${x.lateN} · ${x.lateBuyLbl}${x.lossLbl&&x.lossLbl!=='€0'?` · −${x.lossLbl}`:''}</div></div>`;
     return `<div class="stgcell"><b>${x.dlNext}</b><div class="dep">в срок${x.noDl?' · без даты: '+x.noDl:''}</div></div>`;};
