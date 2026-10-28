@@ -71,8 +71,9 @@ class Портал:
         self.hist = {
             2: [("1", "C0:PURCHASE", _t(120)), ("1", "C0:DELIVERY", _t(60)), ("1", "C0:PURCHASE", _t(5)),
                 ("2", "C0:PURCHASE", _t(50))],
+            # 502 — 20 дн. на шаге 5 (норма 9 р.д.): сверх нормы шага — кандидат в «Замедлено»
             172: [("501", "DT172_30:NEW", _t(150)), ("501", "DT172_30:PREPARATION", _t(3)),
-                  ("502", "DT172_26:PREPARATION", _t(10))],
+                  ("502", "DT172_26:PREPARATION", _t(20))],
         }
 
     def call(self, method, params=None, **kw):
@@ -107,15 +108,21 @@ class Портал:
         return {"C0:PURCHASE": "Закупка", "C0:DELIVERY": "Поставка", "C0:PAID": "Оплата получена | Закрытие сделки"}
 
     def spa_stage_meta(self, entity, cid):
+        if cid == 26:                       # воронка заказов — имена портала (шаги ork.STAGE_STEP)
+            return {"DT172_26:NEW": {"name": "Заказ создан", "sem": "P"},
+                    "DT172_26:PREPARATION": {"name": "Согласование спецификации и оплаты", "sem": "P"},
+                    "DT172_26:UC_LOST": {"name": "Отменён (26)", "sem": "F"}}
         return {f"DT172_{cid}:NEW": {"name": f"Новый ({cid})", "sem": "P"},
                 f"DT172_{cid}:PREPARATION": {"name": f"Подготовка ({cid})", "sem": "P"},
                 f"DT172_{cid}:UC_LOST": {"name": f"Отменён ({cid})", "sem": "F"}}
 
-    def stage_history(self, entity, *, category_id=None, since=None, last=None):
+    def stage_history(self, entity, *, category_id=None, since=None, last=None, transitions=None):
         out = {}
         for oid, st, t in self.hist[entity]:
             if last is not None:
                 last[oid] = (st, t)
+            if transitions is not None:
+                transitions.setdefault(oid, []).append((st, t))
             if st not in {s for s, _ in out.get(oid, [])}:
                 out.setdefault(oid, []).append((st, t))
         return out
@@ -168,11 +175,12 @@ def test_стадии_заказов_другой_воронки_получаю�
     assert _row(ct, "1")["orders"][0]["stageName"] == "Подготовка (30)"
 
 
-def test_разрез_по_людям_помечает_уволенного_и_называет_сделку(ct):
-    by = {m["name"]: m for m in ct["deadlines"]["byOss"]}
-    m = by["Ежова Лада (уволен)"]
-    assert m["gone"] is True and m["lateOrders"] == 1 and m["lateDeals"] == 1
-    assert m["top"]["seq"] == 901 and m["top"]["days"] == 40
+def test_разрезы_просрочки_по_людям_не_отправляются_а_просрочка_видна_в_очереди(ct):
+    # byManager / byOss страница не рисовала — сняты из данных (27.10.2026); просроченный
+    # заказ уволенного ОСС виден пунктом очереди «срок сорван» с хозяином и сроком
+    assert "byManager" not in ct["deadlines"] and "byOss" not in ct["deadlines"]
+    late = [q for q in ct["life"]["queue"] if q["code"] == "late" and q.get("seq") == 901]
+    assert late and late[0]["days"] == 40 and late[0].get("who")
 
 
 def test_окно_бенчмарков_задано(ct):
@@ -203,7 +211,8 @@ def test_жизненный_цикл_на_вкладке(ct):
 ])
 def test_подвисла_только_если_в_чате_тихо(сообщения, подвисла):
     """Решение владельца 19.10.2026: простой по стадии снимает живой чат сделки.
-    Сделка 2 стоит в стадии 50 дней (порог 2× медианы), срок клиента не сорван."""
+    Сделка 2: заказ 502 — 20 дн. на шаге 5 при норме 9 р.д. (решение 26.10.2026, п. 2),
+    срок клиента не сорван."""
     import os
     os.environ["KVANT_NOW"] = СЕЙЧАС
     try:
@@ -218,6 +227,33 @@ def test_подвисла_только_если_в_чате_тихо(сообщ�
     тихо = "в чате тихо" in r["why"] or "в чате людей не было" in r["why"]
     assert тихо is подвисла and ("в чате работа" in r["why"]) is (not подвисла)
     assert ct["head"]["chat"]["checked"] == 1
+
+
+def test_сумма_прячет_потерю_замедлено_хуже_и_лучше_счётом(monkeypatch):
+    """«Замедлено» по норме шага (решение 26.10.2026, п. 2) против прежних 2× медианы — у
+    скольких сделок картина стала хуже и у скольких лучше, счётом (CLAUDE.md, «сумма прячет
+    потерю»). Сделка 2: заказ 502 восемь дней на шаге 5 — 6 р.д. при норме 9, прежде (порог
+    7 дн.) — замедлена: лучше. Сделка 4: заказ 505 три дня на шаге 1 — 3 р.д. при норме 1,
+    прежде (меньше недели) — нет: хуже."""
+    monkeypatch.setenv("KVANT_NOW", СЕЙЧАС)
+    п = Портал()
+    п.orders = [o for o in п.orders if o["id"] != 504]          # 504 держал бы сделку 2 «по-старому»
+    п.deals.append({"ID": "4", "TITLE": "904. Редуктор", "OPPORTUNITY": "10000", "CURRENCY_ID": "EUR",
+                    "COMPANY_ID": "", "STAGE_ID": "C0:PURCHASE", "STAGE_SEMANTIC_ID": "P",
+                    "CATEGORY_ID": "0", "DATE_CREATE": _t(4), "ASSIGNED_BY_ID": "10"})
+    п.orders.append({"id": 505, "title": "904/1. Редуктор", "companyId": "", "parentId2": 4,
+                     "opportunity": 6000, "currencyId": "EUR", "stageId": "DT172_26:NEW",
+                     "createdTime": _t(3), "movedTime": _t(3), DL: _t(-60)[:10], OSS: "11"})
+    п.hist = {2: [("1", "C0:PURCHASE", _t(120)), ("1", "C0:DELIVERY", _t(60)), ("1", "C0:PURCHASE", _t(5)),
+                  ("2", "C0:PURCHASE", _t(5)), ("4", "C0:PURCHASE", _t(3))],
+              172: [("501", "DT172_30:NEW", _t(150)), ("501", "DT172_30:PREPARATION", _t(3)),
+                    ("502", "DT172_26:PREPARATION", _t(8)), ("505", "DT172_26:NEW", _t(3))]}
+    ct = contracts_mod.compute(п, as_of=dt.date(2026, 10, 9), people={}, service_ids={"542"})
+    c = ct["ork"]["slowCmp"]
+    assert c == {"old": 1, "new": 1, "worse": 1, "better": 1}, c
+    # кандидат — до чата; «подвисла» по-прежнему решает чат (у сделки 4 чата нет — не проверено)
+    assert "сверх нормы шага" in _row(ct, "4")["why"] and not _row(ct, "4")["stuck"]
+    assert "сверх нормы шага" not in _row(ct, "2")["why"] and not _row(ct, "2")["stuck"]
 
 
 def test_чаты_читает_общий_читатель_сборки():
@@ -281,9 +317,24 @@ def test_уволенный_ответственный_заказа_ведёт_�
     assert set(gone) == {"1", "2"} and ct["life"]["counts"]["gone"] == 2
     assert gone["2"]["what"] == "ведёт уволенный: ответственный заказа"
     assert gone["1"]["what"] == "ведёт уволенный: ответственный сделки, ОСС"
-    # пункты заказа 502 — на уволенном хозяине, с пометкой (подпись справочника людей)
-    q502 = [q for q in ct["life"]["queue"] if q["order"] == "502"]
-    assert q502 and all(q["who"] == "Жаров Олег (уволен)" and q["whoGone"] for q in q502)
+    # хозяин пунктов заказа 502 — исполнитель шага (решение 26.10.2026, п. 1): ответственный
+    # не из отдела ОРК (отделов нет) — менеджер ОРК «не назначен», даты размещения — ОСС
+    q502 = {q["code"]: q for q in ct["life"]["queue"] if q["order"] == "502"}
+    assert q502["s3Over"]["role"] == "orkMgr" and q502["s3Over"]["who"] == "не назначен"
+    assert q502["noPlanDates"]["who"] == "Пётр Вьюгин (OSS)"
+    # ответственный — из отдела ОРК: он и хозяин, уволен — с пометкой
+    отделы = [{"ID": "50", "NAME": "Отдел реализации контрактов", "PARENT": "1", "UF_HEAD": "10"}]
+    люди = {**ЛЮДИ, "22": {"name": "Жаров Олег", "active": False, "depts": ["50"]}}
+    import os
+    os.environ["KVANT_NOW"] = СЕЙЧАС
+    try:
+        ct2 = contracts_mod.compute(п, as_of=dt.date(2026, 10, 9), people=люди, service_ids={"542"},
+                                    departments=отделы)
+    finally:
+        os.environ.pop("KVANT_NOW", None)
+    s3 = next(q for q in ct2["life"]["queue"] if q["order"] == "502" and q["code"] == "s3Over")
+    # в копии — руководитель ОРК: руководитель отдела ОРК по справочнику отделов (UF_HEAD)
+    assert s3["who"] == "Жаров Олег (уволен)" and s3["whoGone"] and s3["escalateTo"] == "Вера Астахова (KAM)"
 
 
 def test_уволенный_ответственный_закрытого_заказа_не_в_счёт():
@@ -403,9 +454,8 @@ def test_основной_вид_без_направления(сеп):
     assert sum(p["orders"] for p in sl["phases"]) == 3 and sum(p["orders"] for p in life["phases"]) > 0
     assert life["counts"].get("late") == sum(1 for q in life["queue"] if q["code"] == "late")
     assert сеп["sep"]["head"]["live"] == 2 and сеп["sep"]["deadlines"]["lateDeals"] == 1
-    # нагрузка людей — по живым заказам сделок вида
-    assert sum(p["live"] for p in life["people"]) == sum(1 for r in main for o in r["orders"] if o["live"])
-    assert sum(p["live"] for p in sl["people"]) == 3
+    # нагрузка людей поимённо в открытые данные вкладки не идёт (решение 26.10.2026, п. 3)
+    assert "people" not in life and "people" not in sl
 
 
 def _ндс_без_правила_направления(monkeypatch):

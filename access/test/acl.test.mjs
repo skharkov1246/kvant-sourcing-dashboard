@@ -258,6 +258,31 @@ test("знак U+2028 в названии сделки не обрывает с�
   assert.match(out, /^window\.__KAMINC__ = __kvNoData\(\);$/m);
 });
 
+test("показатели менеджеров ОРК поимённо — только праву «ork_heads» и админу, вкладка — всем с ней", () => {
+  // решение владельца 26.10.2026, п. 3: подвкладка «Месяц» по людям — руководителям и
+  // владельцу; без права «Реализация» остаётся целиком, кроме массива ORKMONTH
+  assert.equal(RIGHT_PAYLOADS.ORKMONTH, "ork_heads");
+  const без = cutDashboard(page(), ["contracts"], { admin: false, rights: ["suppliers", "suppliers_fin", "kam_money"] });
+  assert.ok(без.includes("MOCK-CONTRACTS") && без.includes("MOCK-DEALCTX"), "вкладка и закрытая часть по своему праву должны остаться");
+  assert.ok(!без.includes("MOCK-ORKMONTH"), "показатели менеджеров ОРК утекли без права");
+  assert.match(без, /^window\.__ORKMONTH__ = __kvNoData\(\);$/m);
+  const с = cutDashboard(page(), ["contracts"], { admin: false, rights: ["ork_heads"] });
+  assert.ok(с.includes("MOCK-ORKMONTH") && с.includes("MOCK-CONTRACTS"));
+  assert.ok(!с.includes("MOCK-DEALCTX"), "право «ork_heads» не открывает договоры и деньги");
+  const админ = cutDashboard(page(), ["contracts"], { admin: true, rights: [] });
+  assert.ok(админ.includes("MOCK-ORKMONTH"));
+  // право без вкладки ничего не открывает
+  const безВкладки = cutDashboard(page(), ["reps"], { admin: false, rights: ["ork_heads"] });
+  assert.ok(!безВкладки.includes("MOCK-ORKMONTH"));
+});
+
+test("показатели менеджеров ОРК не входят ни в одну роль по умолчанию", () => {
+  for (const [id, r] of Object.entries(defaultAcl().roles)) {
+    if (r.admin) continue;
+    assert.ok(!r.rights.includes("ork_heads"), `роль ${id} получила показатели менеджеров ОРК по умолчанию`);
+  }
+});
+
 test("деньги КАМов не входят ни в одну роль по умолчанию", () => {
   for (const [id, r] of Object.entries(defaultAcl().roles)) {
     if (r.admin) continue;
@@ -401,7 +426,7 @@ test("админ видит полный набор тонких прав", () =
   });
   // Он их обходит на проверке всё равно; показывать урезанный набор — врать.
   assert.deepEqual(rightsFor(acl, "b@kvantpro.com", {}).rights,
-    ["suppliers", "suppliers_pii", "suppliers_fin", "suppliers_edit", "kam_money"]);
+    ["suppliers", "suppliers_pii", "suppliers_fin", "suppliers_edit", "kam_money", "ork_heads"]);
   assert.deepEqual(rightsFor(acl, "g@kvantpro.com", {}).rights, []);
 });
 
@@ -446,4 +471,32 @@ test("премии сняты с портала: ни вкладки, ни ма�
   const acl = defaultAcl();
   acl.users["fd@kvantpro.com"] = { role: "employee", sites: [], tabs: ["premia"], note: "", seen: 1 };
   assert.ok(!rightsFor(normalizeAcl(acl), "fd@kvantpro.com", {}).tabs.includes("premia"));
+});
+
+test("страница без «Сорсинга»: шапка правил КП не роняет скрипт на пустышке данных", async () => {
+  // воркер вырезал __DATA__ (вкладки «Сорсинг» нет) — M стал пустышкой __kvNoData. Раньше
+  // «graceUntil» пустышки давал Date.parse → NaN, toISOString падал «Invalid time value» и
+  // останавливал весь скрипт страницы: ни одна вкладка не поднималась (так было и на main)
+  const vm = await import("node:vm");
+  const tpl = fs.readFileSync(path.join(ROOT, "templates", "dashboard_core.html"), "utf8");
+  const block = tpl.match(/^const _dmy=[\s\S]*?^const GRACE_ON=.*$/m);
+  assert.ok(block, "в шаблоне нет блока льготного срока КП");
+  const cut = cutDashboard(`<body>\nwindow.__DATA__ = {"kpRules":{"graceUntil":"2026-11-02"}};\n</body>`, ["contracts"]);
+  const stub = cut.match(/<script>(function __kvNoData[\s\S]*?)<\/script>/);
+  assert.ok(stub && /window\.__DATA__ = __kvNoData\(\);/.test(cut), "__DATA__ не заменён пустышкой");
+  const run = (data) => {
+    const ctx = vm.createContext({ window: {} });
+    vm.runInContext(stub[1], ctx);
+    ctx.window.__DATA__ = data === "stub" ? vm.runInContext("__kvNoData()", ctx) : data;
+    return vm.runInContext(`const M = window.__DATA__ || {};\n${block[0]}\n({GRACE_TO, GRACE_FROM, GRACE_ON})`, ctx);
+  };
+  const empty = run("stub");
+  assert.equal(empty.GRACE_TO, "");
+  assert.equal(empty.GRACE_FROM, "");
+  assert.equal(empty.GRACE_ON, false);
+  const real = run({ kpRules: { graceUntil: "2026-11-02" }, period: { end: "2026-10-27" } });
+  assert.equal(real.GRACE_FROM, "03.11.2026");
+  assert.equal(real.GRACE_ON, true);
+  // не дата — без льготного срока, а не падение
+  assert.equal(run({ kpRules: { graceUntil: "скоро" } }).GRACE_FROM, "");
 });

@@ -496,3 +496,19 @@ def test_страница_вкладки_без_денег_и_закрытый_�
     assert kp["rows"][0]["deals"] == 2 and [k["lbl"] for k in kp["kpis"] if "val" in k] == ["Сделок"]
     pp = json.loads(lines["window.__PEOPLE__"].split(" = ", 1)[1].rstrip(";"))
     assert pp["roles"]["kam"]["totals"]["open"] == people["roles"]["kam"]["totals"]["open"]
+
+
+def test_пробел_срока_оплаты_один_пункт_у_КАМа():
+    """Доставлено, «Планового срока оплаты» нет: пункт noPayPlan пришёл из очереди КАМа (хозяин
+    по регламенту — ОСС, КАМ в копии) — свой пробел «Дохода» по той же сделке не ставится и
+    в пробелы не считается; без пункта очереди — пробел «Дохода» один."""
+    ct, people, presale, kamq = corpus()
+    ct["life"]["pay"]["1003"].update(delivered=True, src="fcDays")
+    без = kaminc.compute(copy.deepcopy(ct), copy.deepcopy(people), today=TODAY, kamq=copy.deepcopy(kamq),
+                         calib=CALIB, roster=ROSTER)["head"]["actions"]["501"]["items"]
+    assert [(x["src"], x["deal"]) for x in без if x["code"] == "noPayPlan"] == [("inc", "1003")]
+    kamq["queue"].append({"code": "noPayPlan", "sev": 8, "kamId": "501", "deal": "1003", "title": "Поставка 1003",
+                          "what": "нет планового срока оплаты", "act": "сообщить ОСС срок оплаты", "days": 3})
+    A = kaminc.compute(ct, people, today=TODAY, kamq=kamq, calib=CALIB, roster=ROSTER)["head"]["actions"]["501"]
+    assert [(x["src"], x["deal"]) for x in A["items"] if x["code"] == "noPayPlan"] == [("kam", "1003")]
+    assert A["n"] == len(без)

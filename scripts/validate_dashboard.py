@@ -247,8 +247,12 @@ def check_browser(path: Path, errors: list[str], warns: list[str], notes: list[s
 LAZY_TABS = ["company", "reps", "eng", "contracts", "suppliers", "cohorts", "advisor"]
 # тело таблицы очереди КАМа: renderPeople(PP,'kam','repsRole') → _kqHtml(…,'repsRole-kq') → «…b»
 KAM_QUEUE_BODY = "repsRole-kqb"
-# таблица сделок «Реализации» в панели вида: renderContracts → _ctPanel(вид, #ctPanel-<вид>)
+# таблица сделок «Реализации» в панели вида: renderContracts → _ctPanel(вид, #ctPanel-<вид>) —
+# подвкладка «Сделки и деньги» (data-sub="main"); направление — второй ряд (data-dir)
 CT_SEP_BODY, CT_MAIN_BODY = "#ctPanel-sep #ctBody", "#ctPanel-main #ctBody"
+# подвкладки «Реализации» по регламенту ОРК (решения владельца 26.10.2026): каждая обязана
+# отрисоваться в обоих направлениях
+CT_SUBS = ("week", "month", "quarter", "main", "how")
 # вкладка направления без его сделок (сводка head.sep есть, вида sep нет) — «Нет данных»
 CT_SEP_EMPTY = "#ctPanel-sep .ctsepempty"
 KV_FAIL = "data-kv-fail"          # метка ошибки вставленной проверки в DOM
@@ -274,12 +278,14 @@ def _with_tabs_opened(path: Path) -> Path:
     # пишет console.error в журнал как INFO:CONSOLE, и шаблон ERROR:CONSOLE его не
     # видит (проверено 19.10.2026 — сломанная кнопка роли проходила проверку).
     #
-    # Вкладка отдельного направления «Реализации» (решение владельца 25.10.2026) — тоже
-    # по клику: виды рисуются по одному. Открываем её и возвращаемся в основной вид; оба
-    # должны дать таблицу сделок (у направления без сделок — блок «Нет данных»). Есть
-    # сводка направления, а переключателя нет — ошибка. Адрес вкладки (portal-ui §3):
-    # #contracts/sep на уже открытой странице открывает «Реализацию» на вкладке направления;
-    # уход на «Сорсинг» и возврат возвращают тот же адрес. В конце — снова «Сорсинг».
+    # «Реализация» (решения владельца 25.10 и 26.10.2026): подвкладки «Неделя», «Месяц»,
+    # «Квартал», «Сделки и деньги», «Как считается» и переключатель направления — по клику:
+    # виды рисуются по одному. Каждая подвкладка открывается в основном виде и в виде
+    # направления: панель не пуста и без «Вкладка не отрисовалась». «Сделки и деньги» обоих
+    # видов дают таблицу сделок (у направления без сделок — блок «Нет данных»). Есть сводка
+    # направления, а переключателя нет — ошибка. Адрес (portal-ui §3): прежний #contracts/sep
+    # на уже открытой странице открывает «Сделки и деньги» направления; уход на «Сорсинг» и
+    # возврат возвращают его адрес #contracts/main/sep. В конце — снова «Сорсинг».
     inject = ("<script>function kvFail(m){try{console.error(m);var d=document.createElement('div');"
               "d.setAttribute('%s','');d.textContent=m;document.body.appendChild(d)}catch(e){}}"
               "try{[%s].forEach(function(t){try{window.ensureTab&&window.ensureTab(t)}"
@@ -297,11 +303,17 @@ def _with_tabs_opened(path: Path) -> Path:
               "else if(P&&P.roles&&document.querySelector('#tab-reps .subnav'))"
               "kvFail('раздел КАМы: кнопка роли не найдена')}"
               "catch(e){kvFail('раздел КАМы: '+e)}"
-              "try{var CX=window.__CONTRACTS__,"
-              "ST=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"sep\"]');"
-              "if(ST){ST.click();if(!document.querySelector(CX&&CX.sep?'%s':'%s'))"
+              "try{var CX=window.__CONTRACTS__,CQ=function(x){return document.querySelector('#tab-contracts '+x)},"
+              "SB=function(k){return CQ('[role=\"tab\"][data-sub=\"'+k+'\"]')},"
+              "ALL=function(d){[%s].forEach(function(k){var b=SB(k);if(!b){kvFail('Реализация: нет подвкладки '+k);return}"
+              "b.click();var p=document.getElementById('ctPanel-'+d);"
+              "if(!p||p.hidden||!p.textContent.trim())kvFail('Реализация: подвкладка '+k+' ('+d+') пуста');"
+              "else if(p.textContent.indexOf('%s')>=0)kvFail('Реализация: подвкладка '+k+' ('+d+') не отрисовалась')})};"
+              "if(CX&&Array.isArray(CX.rows))ALL('main');"
+              "var ST=CQ('[role=\"tab\"][data-dir=\"sep\"]');"
+              "if(ST){ST.click();ALL('sep');SB('main').click();if(!document.querySelector(CX&&CX.sep?'%s':'%s'))"
               "kvFail('Реализация: вкладка отдельного направления не отрисовалась');"
-              "var MT=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');"
+              "var MT=CQ('[role=\"tab\"][data-dir=\"main\"]');"
               "if(MT)MT.click();if(!document.querySelector('%s'))"
               "kvFail('Реализация: основной вид после переключения не отрисовался')}"
               "else if(CX&&Array.isArray(CX.rows)&&CX.head&&CX.head.sep)"
@@ -309,17 +321,17 @@ def _with_tabs_opened(path: Path) -> Path:
               "catch(e){kvFail('Реализация, вкладки: '+e)}"
               "try{var TB=function(n){return [].slice.call(document.querySelectorAll('.tab'))"
               ".filter(function(x){return x.dataset.tab===n})[0]},CT=TB('contracts'),SO=TB('sourcing'),"
-              "SEL=function(){var x=document.querySelector('#tab-contracts [role=\"tab\"][aria-selected=\"true\"]');"
-              "return x&&x.dataset.sub};"
-              "if(CT&&SO&&document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"sep\"]')){"
+              "SEL=function(a){var x=document.querySelector('#tab-contracts [role=\"tab\"][data-'+a+'][aria-selected=\"true\"]');"
+              "return x&&x.dataset[a]};"
+              "if(CT&&SO&&document.querySelector('#tab-contracts [role=\"tab\"][data-dir=\"sep\"]')){"
               "history.replaceState(null,'','#contracts/sep');window.dispatchEvent(new HashChangeEvent('hashchange'));"
-              "if(!CT.classList.contains('act')||document.getElementById('tab-contracts').hidden||SEL()!=='sep')"
-              "kvFail('Реализация: адрес #contracts/sep на открытой странице не открыл вкладку направления');"
-              "SO.click();CT.click();if(location.hash!=='#contracts/sep')"
+              "if(!CT.classList.contains('act')||document.getElementById('tab-contracts').hidden||SEL('dir')!=='sep'||SEL('sub')!=='main')"
+              "kvFail('Реализация: адрес #contracts/sep на открытой странице не открыл «Сделки и деньги» направления');"
+              "SO.click();CT.click();if(location.hash!=='#contracts/main/sep')"
               "kvFail('Реализация: при возврате на вкладку потерян её адрес ('+location.hash+')');"
               "SO.click()}}catch(e){kvFail('Реализация, адрес вкладки: '+e)}</script>"
               % (KV_FAIL, ",".join(f"'{t}'" for t in LAZY_TABS), KAM_QUEUE_BODY,
-                 CT_SEP_BODY, CT_SEP_EMPTY, CT_MAIN_BODY))
+                 ",".join(f"'{t}'" for t in CT_SUBS), _TAB_FAIL, CT_SEP_BODY, CT_SEP_EMPTY, CT_MAIN_BODY))
     tmp = path.parent / (path.stem + ".tabs.html")
     tmp.write_text(html.replace("</body>", inject + "</body>", 1), encoding="utf-8")
     return tmp

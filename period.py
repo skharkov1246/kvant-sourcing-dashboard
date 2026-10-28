@@ -6,9 +6,12 @@
 from __future__ import annotations
 
 import datetime as dt
+import functools
+import json
 import os
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 from config import DEFAULT_PERIOD_ANCHOR, PERIOD_FLOOR
 
@@ -102,6 +105,114 @@ def workdays(a: dt.date, b: dt.date) -> int:
         return 0
     full, rest = divmod((b - a).days + 1, 7)
     return full * 5 + sum(1 for i in range(rest) if (a.weekday() + i) % 7 < 5)
+
+
+# --- производственный календарь РФ (нормы регламента ОРК — в рабочих днях) ---------------
+# data/workcal_ru.json: по годам — нерабочие Пн–Пт (праздники и переносы) и рабочие Сб/Вс;
+# числа рабочих дней по месяцам — из второго источника, сверяются со счётом при загрузке.
+# Года нет в файле — ответа нет (None): подмена на Пн–Пт дала бы «в норме» там, где
+# праздник съел срок, и наоборот (ворота доверия «год без календаря», ork.GATES).
+WORKCAL_PATH = Path(__file__).resolve().parent / "data" / "workcal_ru.json"
+MSK = dt.timezone(dt.timedelta(hours=3))
+
+
+@functools.lru_cache(maxsize=4)
+def _workcal(path: str = str(WORKCAL_PATH)) -> dict[int, tuple[frozenset, frozenset]]:
+    """{год: (нерабочие Пн–Пт, рабочие Сб/Вс)}. Файла нет — пусто: все ответы None.
+    Счёт по спискам разошёлся с числами второго источника — ValueError: календарь
+    с ошибкой хуже отсутствующего, сборка должна упасть, а не считать сроки криво."""
+    try:
+        raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    out: dict[int, tuple[frozenset, frozenset]] = {}
+    for y, v in (raw.get("years") or {}).items():
+        y = int(y)
+        off = frozenset(dt.date.fromisoformat(s) for s in v.get("off") or ())
+        work = frozenset(dt.date.fromisoformat(s) for s in v.get("work") or ())
+        if any(d.year != y or d.weekday() >= 5 for d in off) or \
+                any(d.year != y or d.weekday() < 5 for d in work):
+            raise ValueError(f"workcal_ru: {y}: день не того года или не того вида")
+        months = [0] * 12
+        d = dt.date(y, 1, 1)
+        while d.year == y:
+            if (d.weekday() < 5 and d not in off) or d in work:
+                months[d.month - 1] += 1
+            d += dt.timedelta(days=1)
+        if months != list(v.get("months") or ()) or sum(months) != v.get("total"):
+            raise ValueError(f"workcal_ru: {y}: счёт по спискам не сошёлся со вторым источником")
+        out[y] = (off, work)
+    return out
+
+
+def workcal_years() -> tuple[int, ...]:
+    """Годы, покрытые производственным календарём, по возрастанию."""
+    return tuple(sorted(_workcal()))
+
+
+def _msk_date(x) -> dt.date:
+    """Дата по Москве: datetime с поясом переводится в МСК, без пояса и date — как есть."""
+    if isinstance(x, dt.datetime):
+        return (x.astimezone(MSK) if x.tzinfo else x).date()
+    return x
+
+
+def is_workday_ru(d) -> bool | None:
+    """Рабочий ли день по производственному календарю РФ; None — года нет в календаре."""
+    d = _msk_date(d)
+    cal = _workcal().get(d.year)
+    if cal is None:
+        return None
+    off, work = cal
+    return d in work or (d.weekday() < 5 and d not in off)
+
+
+def workdays_ru(a, b) -> int | None:
+    """Рабочих дней d по календарю РФ при a < d ≤ b (даты по МСК): тот же день — 0,
+    «следующий рабочий» — 1; норма «1 р.д.» выполнена при результате ≤ 1.
+    a > b — то же число со знаком минус (порядок меток нарушен — видно по знаку).
+    None, если хоть один год из (a, b] не покрыт календарём — без подмены на Пн–Пт.
+    period.workdays (Пн–Пт на [a, b] включительно) — другая мера, её не трогаем."""
+    a, b = _msk_date(a), _msk_date(b)
+    if a == b:
+        return 0
+    if a > b:
+        n = workdays_ru(b, a)
+        return -n if n is not None else None
+    cal = _workcal()
+    if any(y not in cal for y in range((a + dt.timedelta(days=1)).year, b.year + 1)):
+        return None
+    full, rest = divmod((b - a).days, 7)
+    n = full * 5 + sum(1 for i in range(1, rest + 1) if (a.weekday() + i) % 7 < 5)
+    for y in range((a + dt.timedelta(days=1)).year, b.year + 1):
+        off, work = cal[y]
+        n -= sum(1 for d in off if a < d <= b)
+        n += sum(1 for d in work if a < d <= b)
+    return n
+
+
+def add_workdays_ru(a, n: int) -> dt.date | None:
+    """Дата d, для которой workdays_ru(a, d) == n: n > 0 — n-й рабочий день после a
+    (срок «10 р.д. от доставки» — add_workdays_ru(доставка, 10)); n == 0 — сама a;
+    n < 0 — день перед |n|-м рабочим днём, считая назад от a. None — дошли до года
+    без календаря."""
+    d = _msk_date(a)
+    step = 1 if n > 0 else -1
+    left = abs(n)
+    while left:
+        if step < 0:
+            w = is_workday_ru(d)
+            if w is None:
+                return None
+            left -= w
+            d -= dt.timedelta(days=1)
+        else:
+            d += dt.timedelta(days=1)
+            w = is_workday_ru(d)
+            if w is None:
+                return None
+            left -= w
+    return d
 
 
 def _weeks(start: dt.date, end: dt.date) -> list[Week]:

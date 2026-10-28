@@ -79,8 +79,9 @@ const TABS = [
   // выданные права не меняются). KAMINC_HEAD — счёт, даты и действия «Дохода» всем, у кого
   // вкладка; KAMINC — деньги «Дохода»: кроме вкладки нужно право (RIGHT_PAYLOADS)
   { id: "reps", name: "Key-аккаунты и продукты", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT", "KAMINC_HEAD", "KAMINC"] },
-  // DEALCTX — закрытая часть «Реализации»: кроме вкладки нужно право (RIGHT_PAYLOADS)
-  { id: "contracts", name: "Реализация", pay: ["CONTRACTS", "DEALCTX"] },
+  // DEALCTX — закрытая часть «Реализации», ORKMONTH — показатели менеджеров ОРК поимённо
+  // (подвкладка «Месяц»): кроме вкладки нужно право (RIGHT_PAYLOADS)
+  { id: "contracts", name: "Реализация", pay: ["CONTRACTS", "DEALCTX", "ORKMONTH"] },
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
   { id: "cohorts", name: "Когорты", pay: ["COMPANY"] },
   { id: "advisor", name: "Советы знатока", pay: ["ADVISOR"] },
@@ -110,18 +111,25 @@ const RIGHTS = [
   // фильтра «только своё» (этап 2) людям не выдаётся. По умолчанию — никому
   { id: "kam_money", def: false, name: "Деньги КАМов",
     note: "«Доход» вкладки «Key-аккаунты и продукты»: продажа, результат по нормативу, часть по положению. Выдаётся поимённо" },
+  // показатели менеджеров ОРК поимённо (подвкладка «Месяц» «Реализации», решение владельца
+  // 26.10.2026, п. 3): своевременность, полнота карточки и загрузка по человеку — только
+  // руководителям и владельцу; счёт, без денег и рейтинга. По умолчанию — никому
+  { id: "ork_heads", def: false, name: "Реализация: показатели менеджеров ОРК",
+    note: "подвкладка «Месяц» «Реализации»: своевременность шагов, полнота карточки и загрузка по каждому менеджеру ОРК. Руководителям и владельцу" },
 ];
 const RIGHT_IDS = RIGHTS.map((r) => r.id);
 const DEFAULT_RIGHTS = RIGHTS.filter((r) => r.def).map((r) => r.id);
 
 const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR",
-  "DEALCTX", "KAMINC_HEAD", "KAMINC"];
+  "DEALCTX", "KAMINC_HEAD", "KAMINC", "ORKMONTH"];
 // Массивы, которым мало вкладки: остаются в странице только у админа и у того, кому
 // выдано право. DEALCTX — оценки чатов и разбор договоров по сделкам «Реализации»
 // (dealctx.py): условия договоров — только праву «Поставщики: договоры и деньги»
 // (решение владельца 19.10.2026). Без права вкладка показывает только числа плиток.
 // KAMINC — деньги «Дохода» (kaminc.py): только праву «Деньги КАМов» (решение владельца 25.10.2026).
-const RIGHT_PAYLOADS = { DEALCTX: "suppliers_fin", KAMINC: "kam_money" };
+// ORKMONTH — показатели менеджеров ОРК поимённо (orkview.py): только праву «Реализация:
+// показатели менеджеров ОРК» (решение владельца 26.10.2026, п. 3).
+const RIGHT_PAYLOADS = { DEALCTX: "suppliers_fin", KAMINC: "kam_money", ORKMONTH: "ork_heads" };
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
 const DEFAULT_TABS = TABS.filter((t) => t.def !== false).map((t) => t.id);
@@ -2030,7 +2038,7 @@ function adminPage(acl, me, env, seen, notify) {
         <span class="dim">${users.filter(([, u]) => u.role === id).length} чел.</span></div>
       <div class="grp"><div class="gt">Сайты</div>${siteChk(r.sites)}</div>
       <div class="grp"><div class="gt">Вкладки дашборда</div><div class="chks">${chk(r.tabs, TABS, "tab")}</div></div>
-      <div class="grp"><div class="gt">Тонкие права: «Поставщики» и деньги КАМов</div><div class="chks">${chk(r.rights || [], RIGHTS, "right", (x) => (x.id === "kam_money" && !kamMoneyRoleOk(id, r) ? KAM_MONEY_ROLE_NOTE : ""))}</div>
+      <div class="grp"><div class="gt">Тонкие права: «Поставщики», деньги КАМов, показатели менеджеров ОРК</div><div class="chks">${chk(r.rights || [], RIGHTS, "right", (x) => (x.id === "kam_money" && !kamMoneyRoleOk(id, r) ? KAM_MONEY_ROLE_NOTE : (x.id === "ork_heads" && !kamMoneyRoleOk(id, r) ? ORK_HEADS_ROLE_NOTE : "")))}</div>
         <div class="note">Контакты, договоры, деньги КАМов и правка не выдаются роли — только человеку поимённо.</div></div>
     </div>`;
   }).join("");
@@ -2250,6 +2258,9 @@ const KAM_MONEY_ROLE_NOTE = "«Деньги КАМов» роли — тольк
 function kamMoneyRoleOk(id, role) {
   return !!(role && role.admin) || id === "head";
 }
+// показатели менеджеров ОРК поимённо (решение владельца 26.10.2026, п. 3) — роли только
+// руководителю: у роли сотрудников право показало бы каждому показатели коллег
+const ORK_HEADS_ROLE_NOTE = "«Реализация: показатели менеджеров ОРК» роли — только руководителю: у роли сотрудников право показало бы каждому показатели коллег; человеку — поимённо";
 
 async function adminApi(request, env, acl) {
   const json = (o, s = 200) => new Response(JSON.stringify(o),
@@ -2304,6 +2315,8 @@ async function adminApi(request, env, acl) {
     const rights = pick(b.rights, RIGHT_IDS);
     if (rights.includes("kam_money") && !kamMoneyRoleOk(b.role, acl.roles[b.role]))
       return json({ ok: false, error: "kam_money_role", note: KAM_MONEY_ROLE_NOTE }, 400);
+    if (rights.includes("ork_heads") && !kamMoneyRoleOk(b.role, acl.roles[b.role]))
+      return json({ ok: false, error: "ork_heads_role", note: ORK_HEADS_ROLE_NOTE }, 400);
     acl.roles[b.role].sites = pick(b.sites, SITE_IDS);
     acl.roles[b.role].tabs = pick(b.tabs, TAB_IDS);
     acl.roles[b.role].rights = rights;

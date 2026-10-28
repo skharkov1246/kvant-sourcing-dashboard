@@ -5,9 +5,12 @@
 из уже посчитанного — портал не читается, функции чистые:
   • пресейл (presale.compute → openDeals): мяч у КАМа (presale.BALL_RULES) и сделка
     стоит в стадии дольше порога — ballKam;
-  • реализация (lifecycle.build → queue): пункты по срокам и закрытию, у которых
-    разговор с клиентом ведёт КАМ — late, risk, forecast, planAfterDl, unpaid, noUtd;
-    пункты одной сделки одного вида сводятся в один (заказов несколько — разговор один);
+  • реализация (lifecycle.build → queue): пункты, где КАМ — хозяин или в копии по
+    регламенту ОРК (решение владельца 26.10.2026, п. 1: role / copyRole пункта = «kam»):
+    срок клиента (late, risk, forecast, prodDev, planAfterDl), долг клиента (unpaid — КАМ
+    хозяин, ОСС в копии, п. 4), УПД на 11-й р.д. (noUtd), приёмка и заказ (s1Over, noOrder,
+    noDl), оплата без договора (payNoContract), срок оплаты (noPayPlan); пункты одной сделки
+    одного вида сводятся в один (заказов несколько — разговор один);
   • сделки без поля «КАМ» — noKam: хозяин пункта руководитель КАМ, действие
     «назначить КАМа». Это открытые сделки реализации и пресейла и любая сделка
     реализации (в том числе закрытая — без УПД) с пунктом для КАМа. Сигналы, которые
@@ -67,21 +70,44 @@ REAL_ACT = {
     "late": NEW_DATE,
     "risk": "предупредить клиента о риске срока; если срок сдвигается — " + NEW_DATE,
     "forecast": NEW_DATE,
+    "prodDev": "предупредить клиента о риске срока; если срок сдвигается — " + NEW_DATE,
     "planAfterDl": NEW_DATE,
-    "unpaid": "получить у клиента дату оплаты — ведёт ответственный заказа",
+    # долг клиента урегулирует КАМ, ОСС в копии (решение владельца 26.10.2026, п. 4)
+    "unpaid": "урегулировать долг: получить у клиента оплату или дату оплаты",
     "noUtd": "получить подписанный УПД",
+    "noPayPlan": "сообщить ОСС срок оплаты клиента по договору",
+    "s1Over": "ответить руководителю ОРК по приёмке сделки",
+    "noOrder": "передать руководителю ОРК всё для приёмки и заказа поставщику",
+    "noDl": "дать срок клиента из договора",
+    "payNoContract": "довести подписание договора с заказчиком",
 }
 # код → (важность: меньше — важнее, что случилось)
 CODES = {
     "late": (1, lifecycle.EXC["late"][1]),
     "risk": (2, lifecycle.EXC["risk"][1]),
     "forecast": (3, lifecycle.EXC["forecast"][1]),
+    "prodDev": (3, lifecycle.EXC["prodDev"][1]),
+    "payNoContract": (3, lifecycle.EXC["payNoContract"][1]),
     "ballKam": (4, "мяч у КАМа, сделка стоит сверх порога"),
     "planAfterDl": (5, lifecycle.EXC["planAfterDl"][1]),
     "unpaid": (6, lifecycle.EXC["unpaid"][1]),
     "noUtd": (7, lifecycle.EXC["noUtd"][1]),
-    "noKam": (8, "в сделке не указан КАМ"),
+    "s1Over": (7, lifecycle.EXC["s1Over"][1]),
+    "noOrder": (7, lifecycle.EXC["noOrder"][1]),
+    "noPayPlan": (8, lifecycle.EXC["noPayPlan"][1]),
+    "noDl": (8, lifecycle.EXC["noDl"][1]),
+    "noKam": (9, "в сделке не указан КАМ"),
 }
+
+
+def kam_involved(x: dict) -> bool:
+    """Пункт реализации — для КАМа: он хозяин или в копии по регламенту ОРК (ork.item_owner).
+    Пункт без ролей (собран не lifecycle) — по таблице REAL_ACT, как до 26.10.2026."""
+    if x.get("code") not in REAL_ACT:
+        return False
+    if "role" in x or "copyRole" in x:
+        return "kam" in (x.get("role"), x.get("copyRole"))
+    return True
 
 
 def ball_rule(stage_name: str) -> tuple[int, str]:
@@ -203,6 +229,7 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
             ex["also"] = also
             sev = CODES[also[0]["code"]][0]
             days = also[0]["days"]            # место в очереди — по самому важному сигналу
+            ex["inWd"] = bool(also[0].get("inWd"))   # его дни — рабочие у сроков регламента ОРК
             if also[0].get("owner"):
                 ex["owner"] = also[0]["owner"]
         add("noKam", "назначить КАМа", uid="", kam="", gone=False, deal=did, days=days, src=src,
@@ -235,14 +262,14 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
     for x in (life or {}).get("queue") or []:
         code = x.get("code")
         uid = str(x.get("kamId") or "")
-        if code not in REAL_ACT:
+        if not kam_involved(x):
             continue
         if not uid:
             # без КАМа разговор с клиентом вести некому: сигнал — в пункт noKam сделки
             did = str(x.get("deal"))
             orphan_x.setdefault(did, x)
             signal(did, code, x.get("days"), dl=x.get("dl") or "",
-                   owner=str(x.get("who") or "").replace(" (уволен)", ""))
+                   owner=str(x.get("who") or "").replace(" (уволен)", ""), inWd=bool(x.get("inWd")))
             continue
         k = (str(x.get("deal")), code)
         a = agg.get(k)
@@ -260,8 +287,16 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
             title=(by_deal.get(did) or {}).get("title") or x.get("title") or "",
             seq=x.get("seq") or 0, customer=x.get("customer") or "",
             extra={"orders": a["orders"], "dl": x.get("dl") or "",
-                   # хозяин заказа (ответственный, ОСС) — с кем КАМ сверяет срок и оплату
-                   "owner": str(x.get("who") or "").replace(" (уволен)", "")})
+                   # хозяин пункта по регламенту (решение 26.10.2026, п. 1) — с кем КАМ сверяет срок и
+                   # оплату, и его роль; КАМ хозяин (kamOwner) — пункт ведёт он сам; КАМ в копии
+                   # (kamCopy) — пункт ведёт хозяин, КАМ держит разговор с клиентом
+                   "owner": str(x.get("who") or "").replace(" (уволен)", ""),
+                   "ownerRole": x.get("roleName") or "",
+                   "kamOwner": x.get("role") == "kam",
+                   "kamCopy": x.get("copyRole") == "kam" and x.get("role") != "kam",
+                   # дни рабочие (р.д., календарь РФ, «без пауз») у сроков регламента, иначе календарные
+                   "inWd": bool(x.get("inWd")),
+                   **({"step": x["step"]} if x.get("step") else {})})
 
     # 3. сделки без КАМа: пресейл; открытые сделки реализации; сделки реализации с
     #    сигналом для КАМа — и закрытые (УПД не получен), их в открытых нет
@@ -348,7 +383,7 @@ def build(presale_data: dict | None, life: dict | None, contract_rows: list[dict
         "byKam": by_kam,
         "upcoming14": upcoming,
         "rules": {"proposed": PROPOSED, "soonDays": SOON_DAYS, "riskDays": lifecycle.RISK_DAYS,
-                  "utdGrace": lifecycle.UTD_GRACE,
+                  "utdWd": lifecycle.UTD_WD,
                   "ballKam": [{"stage": rx, "label": lbl, "days": n, "act": act} for rx, lbl, n, act in BALL_KAM]
                              + [{"stage": "", "label": "прочие стадии", "days": BALL_KAM_DEFAULT[0],
                                  "act": BALL_KAM_DEFAULT[1]}],

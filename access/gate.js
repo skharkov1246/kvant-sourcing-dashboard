@@ -32,7 +32,7 @@ export const TABS = [
   // ролей, и направления по клиентам, и продуктовые линии.
   { id: "reps",      title: "Key-аккаунты и продукты", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT", "KAMINC_HEAD", "KAMINC"],
     note: "внутри обе роли: КАМы и продукт-оунеры — выдача открывает оба разреза" },
-  { id: "contracts", title: "Реализация",        pay: ["CONTRACTS", "DEALCTX"], share: "suppliers" },
+  { id: "contracts", title: "Реализация",        pay: ["CONTRACTS", "DEALCTX", "ORKMONTH"], share: "suppliers" },
   { id: "suppliers", title: "Поставщики",        pay: ["CONTRACTS"], share: "contracts" },
   { id: "cohorts",   title: "Когорты",           pay: ["COMPANY"],   share: "company" },
   { id: "advisor",   title: "Советы знатока",    pay: ["ADVISOR"] },
@@ -41,9 +41,11 @@ export const TAB_IDS = TABS.map((t) => t.id);
 // DEALCTX — закрытая часть «Реализации»: на проде её оставляет право «договоры и
 // деньги» (access/acl.js, RIGHT_PAYLOADS); тонких прав в контуре нет — только админу
 // KAMINC — деньги «Дохода» вкладки «Key-аккаунты и продукты»: право «Деньги КАМов», здесь — админу
-const ADMIN_PAYLOADS = new Set(["DEALCTX", "KAMINC"]);
+// ORKMONTH — показатели менеджеров ОРК поимённо («Месяц» «Реализации»): на проде право
+// «Реализация: показатели менеджеров ОРК» (решение владельца 26.10.2026, п. 3), здесь — админу
+const ADMIN_PAYLOADS = new Set(["DEALCTX", "KAMINC", "ORKMONTH"]);
 const ALL_PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR",
-  "DEALCTX", "KAMINC_HEAD", "KAMINC"];
+  "DEALCTX", "KAMINC_HEAD", "KAMINC", "ORKMONTH"];
 const TITLE = Object.fromEntries(TABS.map((t) => [t.id, t.title]));
 
 const SESSION_DAYS = 30;       // срок сессионной куки

@@ -49,7 +49,7 @@ def _q(code, deal, days, *, kam="10", who="Глеб (ОСС)", dl=""):
 
 def test_пункты_реализации_по_одному_на_сделку_и_вид():
     life = {"queue": [_q("late", "6001", 5), _q("late", "6001", 12), _q("unpaid", "6001", 40),
-                      _q("shipSlip", "6001", 3),                    # не КАМу — ведёт ОСС
+                      _q("noPlanDates", "6001", 3),                 # не КАМу — ведёт ОСС
                       _q("late", "6002", 9, kam="")]}               # без КАМа — сигнал в пункте noKam
     rows = [_deal("6001"), _deal("6002", kam="")]
     Q = kq.build(None, life, rows, СЕГОДНЯ)
@@ -59,7 +59,8 @@ def test_пункты_реализации_по_одному_на_сделку_�
     assert late["orders"] == 2 and late["days"] == 12, "дней — наибольшее по заказам"
     assert late["act"] == "письменно согласовать новый срок с клиентом и внести его"
     assert late["money"] == 50_000 and late["title"] == "Сделка 6001", "пункт про сделку: её сумма и название"
-    assert by[("6001", "unpaid")]["act"] == "получить у клиента дату оплаты — ведёт ответственный заказа"
+    # долг клиента урегулирует КАМ (решение владельца 26.10.2026, п. 4)
+    assert by[("6001", "unpaid")]["act"] == "урегулировать долг: получить у клиента оплату или дату оплаты"
     assert by[("6001", "unpaid")]["owner"] == "Глеб (ОСС)"
     нет = by[("6002", "noKam")]
     assert нет["kam"] == kq.HEAD and нет["act"] == "назначить КАМа" and нет["stageDays"] == 12
@@ -218,3 +219,44 @@ def test_очередь_едет_во_вкладку_людей():
     P = fixture.build_people()
     assert P["kamQueue"]["queue"], "smoke-сборка рисует раздел «КАМы» с данными"
     assert "kamQueue" not in fixture.build_people(kam_queue=False)
+
+
+def test_кам_хозяин_или_в_копии_по_регламенту():
+    """Решение владельца 26.10.2026, п. 1: КАМ получает пункты, где он хозяин (долг клиента)
+    или в копии (эскалации: срок клиента, УПД на 11-й р.д., приёмка); пункт менеджера ОРК без
+    КАМа в копии (договор с поставщиком) — не его."""
+    def x(code, role, copy):
+        return {**_q(code, "6001", 5), "role": role, "copyRole": copy, "step": 4}
+    life = {"queue": [x("late", "orkMgr", "kam"), x("s2Over", "orkMgr", "orkHead"), x("unpaid", "kam", "oss"),
+                      x("s1Over", "orkHead", "kam"), x("noDl", "orkHead", "kam"), x("noPlanDates", "oss", "")]}
+    Q = kq.build(None, life, [_deal("6001")], СЕГОДНЯ)
+    by = {q["code"]: q for q in Q["queue"]}
+    assert set(by) == {"late", "unpaid", "s1Over", "noDl"}
+    assert by["late"]["kamCopy"] is True and by["unpaid"]["kamCopy"] is False
+    assert by["s1Over"]["act"] == "ответить руководителю ОРК по приёмке сделки" and by["late"]["step"] == 4
+    assert Q["rules"]["utdWd"] == 10
+    # хозяин — по регламенту, а не «ответственный заказа»: роль хозяина и «вы — хозяин»
+    assert by["unpaid"]["kamOwner"] is True and by["late"]["kamOwner"] is False
+
+
+def test_кам_видит_роль_хозяина_и_рабочие_дни():
+    """Решение 26.10.2026, пп. 1–2: у пункта реализации — подпись роли хозяина по регламенту и
+    единица дней (р.д. у сроков регламента, иначе календарные)."""
+    q = {**_q("noUtd", "6001", 14), "role": "orkMgr", "roleName": "менеджер ОРК", "copyRole": "kam",
+         "who": "Илья (ОРК)", "inWd": True, "step": 12}
+    q2 = {**_q("late", "6001", 9), "role": "orkMgr", "roleName": "менеджер ОРК", "copyRole": "kam",
+          "who": "Илья (ОРК)", "step": 7}
+    Q = kq.build(None, {"queue": [q, q2]}, [_deal("6001")], СЕГОДНЯ)
+    by = {x["code"]: x for x in Q["queue"]}
+    assert (by["noUtd"]["owner"], by["noUtd"]["ownerRole"], by["noUtd"]["inWd"], by["noUtd"]["kamCopy"]) == (
+        "Илья (ОРК)", "менеджер ОРК", True, True)
+    assert by["late"]["inWd"] is False
+
+
+def test_сделка_без_кама_дни_сигнала_рабочие():
+    """Пункт noKam берёт дни самого важного сигнала — и их единицу: у сроков регламента ОРК
+    (noUtd, s1Over…) дни рабочие (inWd), а не календарные."""
+    life = {"queue": [{**_q("noUtd", "6003", 20, kam=""), "inWd": True}]}
+    нет = kq.build(None, life, [_deal("6003", kam="", closed=True)], СЕГОДНЯ)["queue"][0]
+    assert нет["code"] == "noKam" and нет["days"] == 20 and нет["inWd"] is True
+    assert нет["also"][0]["inWd"] is True

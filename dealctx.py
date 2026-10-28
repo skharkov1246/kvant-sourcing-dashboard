@@ -53,6 +53,7 @@ from collections import Counter
 
 import chat_activity
 import contract_b2b
+import ork
 
 VERSION = 1
 FRESH_DAYS = 7          # прогон оценки читал чат не раньше — иначе его данные не основание
@@ -112,7 +113,10 @@ FLAG_SHORT = {"lateByDesign": "срок", "thinBuffer": "запас по сро�
               "warrantyGap": "гарантия", "warrantyStart": "начало гарантии", "claimGap": "приёмка",
               "docsGap": "документы", "fxGap": "валюта", "cisg": "Венская конвенция"}
 SIDE_LBL = {"customer": "заказчика", "supplier": "поставщика"}
-CONTRACT_HEAD = "руководитель реализации"
+# роль из оценки чата («на ком мяч») → роль пункта очереди (ork.ROLES, ork.ROLES_EXTRA)
+CHAT_ROLE = {"кам": "kam", "сопровождение": "oss", "логист": "log", "ответственный": "dealResp",
+             "сорсер": "src", "руководитель_сорсинга": "src"}
+SIGNAL = "сигнал из чата, не эскалация"
 
 # Пункты очереди — в форме lifecycle.EXC: код → (важность, что случилось, что сделать).
 # Важность дробная: пункт встаёт между пунктами lifecycle по смыслу, порядок общий.
@@ -468,6 +472,13 @@ def work_hours(since: dt.datetime, now: dt.datetime) -> float:
     return total
 
 
+def customer_contract_deals(contracts: dict | None) -> set[str]:
+    """Сделки, у которых договор заказчика найден и прочитан (свод contracts, read.customer > 0):
+    оплата поставщику у них — не «без договора с заказчиком», даже если стадия отстала."""
+    return {str(did) for did, c in (contracts or {}).items()
+            if isinstance(c, dict) and ((c.get("read") or {}).get("customer") or 0) > 0}
+
+
 # ── сборка ─────────────────────────────────────────────────────────────────────
 
 def _nm(v) -> str:
@@ -489,20 +500,62 @@ def _person(r: dict, role: str) -> str:
     return ROLE_LBL.get(role, role)
 
 
-def _owner(r: dict) -> str:
-    """Хозяин уровня сделки — как в lifecycle: ОСС сделки, иначе ответственный."""
-    return _nm(r.get("ossDeal")) or _nm(r.get("manager")) or "—"
+def _people(r: dict, ork_head: str) -> dict:
+    """Люди сделки для ork.owner: менеджер ОРК — исполнитель шага живого заказа с ролью
+    «менеджер ОРК» (ответственный заказа из отдела ОРК, иначе поле сделки «Ответственный за
+    реализацию» — contracts.py), иначе поле сделки; руководитель ОРК — по справочнику отделов;
+    КАМ и ОСС — поля сделки."""
+    mgr = next((o.get("stepWho") for o in r.get("orders") or []
+                if o.get("live") and o.get("stepRole") == "orkMgr" and _nm(o.get("stepWho"))
+                and o.get("stepWho") != "не назначен"), "")
+    return {"orkMgr": _nm(mgr), "dealOrk": _nm(r.get("orkResp")), "orkHead": _nm(ork_head),
+            "kam": _nm(r.get("kam")), "ossOrder": "", "ossDeal": _nm(r.get("ossDeal"))}
 
 
-def _item(code: str, r: dict, who: str, act: str = "", days: int | None = None, what: str = "",
+def _step_now(r: dict) -> int | None:
+    """Шаг сделки: ячейка шага (самый ранний шаг живых заказов), иначе шаг по стадии сделки."""
+    return (r.get("stepCell") or {}).get("step") or r.get("dealStep")
+
+
+def _reg(code: str, r: dict, ppl: dict, key: str | None = None) -> dict:
+    """Хозяин пункта по регламенту (решение владельца 26.10.2026, п. 1; ork.ITEM): шаг, роль,
+    исполнитель, копия."""
+    st = _step_now(r)
+    # «документы» из чата у сделки на шаге 13 (оплата получена, закрыть сделку — ОСС): после
+    # доставки документы — УПД, шаг 12 менеджера ОРК (Рег. 14). ОСС пункт не получает: со
+    # сторонами не говорит (Рег. 1.11), а «подтвердить у второй стороны» — разговор
+    if key == "chatDue:документы" and st == 13:
+        st = 12
+    ow = ork.item_owner(code, st, ppl, key=key)
+    return {"step": ow["step"], "role": ow["role"], "roleName": ork.ROLES.get(ow["role"], ""),
+            "who": ow["who"], "escalateTo": ow["copy"], "copyRole": ow["copyRole"]}
+
+
+def _by_person(role: str, who: str, r: dict) -> dict:
+    """Пункт, которого регламент не описывает: хозяин — человек сделки по роли."""
+    return {"step": _step_now(r), "role": role,
+            "roleName": ork.ROLES.get(role) or ork.ROLES_EXTRA.get(role, ""),
+            "who": who or "не назначен", "escalateTo": "", "copyRole": ""}
+
+
+def _resp(r: dict) -> dict:
+    """Ответственный сделки — хозяин «Суммы» и файла договора в карточке сделки."""
+    return _by_person("dealResp", _nm(r.get("manager")), r)
+
+
+def _item(code: str, r: dict, own: dict, act: str = "", days: int | None = None, what: str = "",
           conf: float | None = None) -> dict:
+    """Пункт очереди; own — хозяин (_reg, _by_person): шаг, роль, исполнитель и копия."""
     sev, what0, act0 = EXC[code]
     what = what or what0
     if code.startswith("chat"):
         # пункт по чату — оценка модели, а не факт: уверенность — в самом пункте
         what += " — оценка модели" + (f", уверенность {round(conf * 100)} %" if conf is not None else "")
+    who = own["who"]
     return {"code": code, "sev": sev, "what": what, "act": act or act0, "days": days,
-            "who": who, "whoGone": _gone(who), "kam": _nm(r.get("kam")), "kamId": _nm(r.get("kamId")),
+            **own, "whoGone": _gone(who), "inWd": False,
+            **({"signal": SIGNAL} if code in ("chatDue", "chatRisk") else {}),
+            "kam": _nm(r.get("kam")), "kamId": _nm(r.get("kamId")),
             "deal": r["deal"], "seq": r.get("seq") or 0, "customer": r.get("customer") or "—",
             "order": "", "title": r.get("title") or "", "sup": "", "dl": "", "phase": "",
             # отдельное направление (contracts.ОТДЕЛЬНЫЕ_ВОРОНКИ): пункт — в его очереди
@@ -579,7 +632,7 @@ def _contract_cell(c: dict) -> dict:
 
 
 def build(rows: list[dict], life: dict | None, ctx: dict | None,
-          now: dt.datetime, today: dt.date | None = None) -> tuple[dict | None, dict | None]:
+          now: dt.datetime, today: dt.date | None = None, *, ork_head: str = "") -> tuple[dict | None, dict | None]:
     """→ (числа плиток для head, закрытая часть DEALCTX). Без свода — (None, None).
 
     rows — строки сделок contracts.compute (после decide), life — его раздел «life» вместе
@@ -589,7 +642,14 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
 
     Отдельное направление (строка с seg, решение владельца 25.10.2026) считается в свои
     плитки — head["sep"] — и свои счётчики очереди (sepCounts): в плитки и счётчики
-    основного вида его сделки не входят. Пункты очереди помечены seg."""
+    основного вида его сделки не входят. Пункты очереди помечены seg.
+
+    Хозяин пункта — по регламенту ОРК (решение владельца 26.10.2026, п. 1; ork.ITEM): срок из
+    чата — по виду (отгрузка и документы — менеджер ОРК, доставка и оплата — КАМ), риск по
+    чату — менеджер ОРК, КАМ в копии; ОСС их не получает (Рег. 1.11). Договор заказчика не
+    найден — КАМ, поставщика — менеджер ОРК; риск сверки договоров — руководитель ОРК
+    (ork_head — по справочнику отделов, иначе подпись роли). Ответ в чате — тот, на ком мяч по
+    оценке; «Сумма» и файл договора — ответственный сделки."""
     if ctx is None:
         return None, None
     now = now.astimezone(MSK)
@@ -602,6 +662,7 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
     for r in live:
         did = str(r["deal"])
         rec: dict = {}
+        ppl = _people(r, ork_head)
         n = by_seg[bool(r.get("seg"))]
         a = chats.get(did)
         if r.get("chat"):
@@ -616,21 +677,25 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
                 n["chatCur"] += 1
                 if cur["reply"]:
                     n["reply"] += 1
-                    who = _person(r, cur["ball"]) if cur["ball"] in OUR_ROLES else _owner(r)
+                    ball = cur["ball"]
+                    own = (_by_person(CHAT_ROLE[ball], _person(r, ball), r)
+                           if ball in OUR_ROLES and ball in CHAT_ROLE
+                           else _reg("chatRisk", r, ppl))      # мяч не определён — менеджер ОРК, КАМ в копии
                     h = work_hours(cur["human"], now) if cur["human"] else None
                     if h is not None and h > REPLY_HOURS:
                         n["replyLate"] += 1
-                        queue.append(_item("chatReply", r, who, days=(today - cur["human"].date()).days,
+                        queue.append(_item("chatReply", r, own, days=(today - cur["human"].date()).days,
                                            conf=cur.get("conf")))
                 if cur["risk"] == "высокий":
                     n["high"] += 1
                     kinds = ", ".join(k.replace("_", " ") for k in cur["kinds"])
-                    queue.append(_item("chatRisk", r, _owner(r), act="разобрать риск" + (f": {kinds}" if kinds else ""),
+                    queue.append(_item("chatRisk", r, _reg("chatRisk", r, ppl),
+                                       act="разобрать риск" + (f": {kinds}" if kinds else ""),
                                        conf=cur.get("conf")))
                 due = cur.get("due")
                 if due and due < today and (today - due).days <= DUE_MAX_DAYS:
                     n["dueLate"] += 1
-                    queue.append(_item("chatDue", r, _nm(r.get("ossDeal")) or _nm(r.get("oss")) or _owner(r),
+                    queue.append(_item("chatDue", r, _reg("chatDue", r, ppl, key=f"chatDue:{cur['dueKind']}"),
                                        act=f"подтвердить {DUE_ACC[cur['dueKind']]} у второй стороны "
                                            f"(срок был {due.strftime('%d.%m')})",
                                        days=(today - due).days, conf=cur.get("conf")))
@@ -644,19 +709,21 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
                 n["risk"] += 1
                 n["flags"] += len(cell["flags"])
                 shorts = list(dict.fromkeys(f["short"] for f in cell["flags"]))
-                queue.append(_item("contractRisk", r, CONTRACT_HEAD,
+                queue.append(_item("contractRisk", r, _reg("contractRisk", r, ppl),
                                    act="допсоглашение с поставщиком: " + ", ".join(shorts)))
             if c["outcome"] == UNREADABLE:
                 # файла нет у портала (404, пуст), формат не читается или длиннее предела чтения —
                 # следующий прогон не вылечит: перезалить — тому же, кто ищет договор
-                queue.append(_item("contractUnreadable", r, _nm(r.get("manager")) or _owner(r)))
+                queue.append(_item("contractUnreadable", r, _resp(r)))
             if cell["missing"]:
                 n["nopair"] += 1
                 # договор заказчика — с выигрыша сделки; поставщика — когда заказ размещён
                 need = [s for s in cell["missing"] if s == "customer" or (r.get("norders") or 0) > 0]
                 if need:
                     whose = " и ".join(SIDE_LBL[s] for s in need)
-                    queue.append(_item("contractMissing", r, _nm(r.get("manager")) or _owner(r),
+                    side = "both" if len(need) > 1 else need[0]
+                    queue.append(_item("contractMissing", r, _reg("contractMissing", r, ppl,
+                                                                  key=f"contractMissing:{side}"),
                                        what=SIDE_MISSING.format(whose=whose),
                                        act=f"найти договор {whose} и загрузить файл в карточку"))
         e = econ.get(did)
@@ -672,7 +739,7 @@ def build(rows: list[dict], life: dict | None, ctx: dict | None,
             if cell["over"]:
                 n["econGap"] += 1
                 # хозяин «Суммы» — ответственный сделки
-                queue.append(_item("econGap", r, _nm(r.get("manager")) or _owner(r),
+                queue.append(_item("econGap", r, _resp(r),
                                    what=("Сумма сделки — продажа «Нашего КП» до переторжки: расходится с "
                                          if cell["preRebid"] else "Сумма сделки расходится с ")
                                    + f"финальной экономикой на {gap_text(cell['gap'])} %"))

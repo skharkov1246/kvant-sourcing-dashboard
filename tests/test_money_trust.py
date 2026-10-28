@@ -219,7 +219,8 @@ def test_ведёт_уволенный_плитка_фильтр_и_свод_с�
     """Ответственный живого заказа уволен — сделка в «Ведёт уволенный»: свод, очередь,
     плитка и фильтр считают одно и то же."""
     stub = fixture.ContractsStub()
-    живой = next(o for o in stub.orders if o["stageId"].endswith(":PREPARATION"))
+    # живой заказ основного вида (сделки направления 6100–6102 — в своём виде)
+    живой = next(o for o in stub.orders if o["stageId"].endswith(":PREPARATION") and o["parentId2"] < 6100)
     живой["assignedById"] = "99"
     data = _compute(stub, people={"99": {"name": "Сотрудник 99", "active": False}})
     live = [r for r in data["rows"] if not r["closed"]]

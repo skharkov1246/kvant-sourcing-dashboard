@@ -272,3 +272,14 @@ test("аварийный вход по паролю вызывает 401, с п�
   const bad = await req("/access/basic", { basic: "kvant:wrong" });
   assert.equal(bad.status, 401);
 });
+
+test("applyAcl: показатели менеджеров ОРК поимённо в контуре — только админу", () => {
+  // ORKMONTH — «Месяц» «Реализации» по людям: на проде право ork_heads, в контуре тонких прав нет
+  const html = ["<body>", 'window.__CONTRACTS__ = ["MOCK-CONTRACTS"];', 'window.__ORKMONTH__ = ["MOCK-ORKMONTH"];',
+    "</body>"].join("\n");
+  const emp = applyAcl(html, ["contracts"], { email: "a@b.ru", admin: false });
+  assert.ok(emp.includes("MOCK-CONTRACTS") && !emp.includes("MOCK-ORKMONTH"), "поимённые показатели утекли не админу");
+  assert.match(emp, /window\.__ORKMONTH__ = __kvNoData\(\);/);
+  const adm = applyAcl(html, ["contracts"], { email: "o@b.ru", admin: true });
+  assert.ok(adm.includes("MOCK-ORKMONTH"));
+});

@@ -37,6 +37,9 @@ from collections import Counter, defaultdict
 import chat_activity
 import dealctx
 import lifecycle
+import ork
+import orkview
+import people as people_mod
 import period as period_mod
 from base import fx as fx_mod
 import bitrix_client
@@ -88,6 +91,15 @@ SCHEME_F = "ufCrm20_1724941500"         # «Схема поставки»
 # «Количество дней отсрочки платежа» — у 83–84 %)
 WON_F = "UF_CRM_1720337258485"          # «ТКП согласован (конкурс выигран)» — дата выигрыша
 PAY_DAYS_F = "UF_CRM_1727962588"        # «Количество дней отсрочки платежа» клиента
+# регламент ОРК (ork.py, решения владельца 26.10.2026): артефакты шагов (ork.ARTIFACTS — коды
+# полей там), КАМ и направление поставки заказа, вторая опора приёмки, доля первичной оплаты;
+# менеджер ОРК на сделке. Поля — в те же выборки, новых запросов нет
+KAM_ORDER = "ufCrm20_1781171449"        # «КАМ» на заказе (78 %, карта B §E) — сверка с полем сделки
+DIRECTION_F = "ufCrm20_1769424743906"   # «Направление поставки» (2 значения, подписи не сверены)
+ASSIGN_AT = "ufCrm20_1787924508120"     # «Дата записи нового ответственного» — вторая опора S1 (с 28.08.2026)
+PREPAY_F = "ufCrm20_1775138654290"      # «Доля первичной оплаты, %» (с 02.04.2026)
+ORK_RESP = "UF_CRM_1781858627"          # «Ответственный за реализацию» — менеджер ОРК на сделке (33 %)
+ART_FIELDS = sorted({a["field"] for a in ork.ARTIFACTS})
 
 PAID_RX = re.compile(r"оплата\s+получена", re.I)   # стадия «Оплата получена | Закрытие сделки»
 # Отдельные направления (решение владельца 25.10.2026): сложности их сделок известны, ими
@@ -428,6 +440,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             chat_reader: chat_activity.Reader | None = None,
             ctx_chats: dict[str, dict] | None = None,
             ctx_econ: dict[str, dict] | None = None,
+            ctx_contracts: dict[str, dict] | None = None,
+            departments: list[dict] | None = None,
             fx_loader=None, stage_meta: dict[str, dict] | None = None) -> dict:
     """people — справочник {uid: {name, active}} с ушедшими (main._people): без него
     уволенный ответственный или ОСС показывался заглушкой «user#N», а его живые
@@ -438,6 +452,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     моделью и последнее чтение прогоном оценки; None — «подвисла» как до 23.10.2026.
     ctx_econ — финальная экономика из того же свода (dealctx.load()["econ"], только сверенные
     файлы): продажа и закупка из файла — первыми; None — как до 25.10.2026.
+    ctx_contracts — разбор договоров из того же свода (dealctx.load()["contracts"]): договор
+    заказчика найден — пункта «оплачено поставщику без договора с заказчиком» нет, даже если
+    стадия сделки отстала (дизайн, шаг 5); None — только по стадии.
+    departments — уже прочитанный справочник отделов (BitrixClient.departments(), кэш сборки):
+    отдел ОРК и его руководитель (people.ork_department) — хозяева пунктов по регламенту ОРК
+    (решение владельца 26.10.2026, п. 1); None — менеджер ОРК только из поля сделки,
+    руководитель — подписью роли.
     fx_loader — (валюты, даты, today) → (base.fx.CbrRates | None, учёт): курсы ЦБ РФ на
     нужные даты (main.py — base.fx.load_cbr); None или ЦБ недоступен — курсы Битрикса с
     плашкой «курсы Битрикса (ЦБ недоступен)» и счётом в head «fx».
@@ -484,7 +505,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                                                         CITY_F, OSS_F, SHIP_PLAN, SHIP_FACT, INB_FACT,
                                                         DEL_PLAN, DEL_BUDGET, DEL_FACT, UTD_DATE, UTD_FILE,
                                                         PAY_PLAN, CLIENT_PO, SUP_PAID, PROD_CONF,
-                                                        PROD_CONF_NF, SCHEME_F, PROD_START])
+                                                        PROD_CONF_NF, SCHEME_F, PROD_START,
+                                                        KAM_ORDER, DIRECTION_F, ASSIGN_AT, PREPAY_F,
+                                                        *[f for f in ART_FIELDS if f not in (
+                                                            DL_CUSTOMER, PROD_END, DEL_FACT, UTD_DATE,
+                                                            PROD_CONF)]])
     # стадии всех воронок СП-172 с семантикой: провал — по семантике стадии, а не по
     # суффиксу «:FAIL» (свои стадии провала UC_* с семантикой F считались живыми);
     # воронки — по префиксу стадии «DT172_<воронка>:…» (categoryId в выборке нет)
@@ -523,7 +548,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK,
             BUDGET_LINK,
             # НДС в «Сумме»: сверка с финальной экономикой файла — без НДС (dealctx.econ_ratio)
-            "TAX_VALUE", WON_F, PAY_DAYS_F]
+            "TAX_VALUE", WON_F, PAY_DAYS_F, ORK_RESP]
     plan_by_seq, plan_by_id, plan_asof = _load_budget_plans()
 
     cat0 = client.list_deals_fast(filter={"CATEGORY_ID": 0}, select=DSEL)
@@ -558,8 +583,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     paid_stages = {sid for sid, nm in dstages.items() if PAID_RX.search(str(nm or ""))}
     dlast: dict[str, tuple[str, str]] = {}                 # последний переход = вход в текущую стадию
     olast: dict[str, tuple[str, str]] = {}
-    dhist = client.stage_history(2, category_id=0, since=HIST_SINCE, last=dlast)
-    ohist = client.stage_history(172, since=HIST_SINCE, last=olast)
+    # все переходы с повторными входами — сегменты S1–S10 регламента ОРК (ork.segments): тот
+    # же ответ тех же запросов, без отбрасывания повторов
+    dtrans: dict[str, list[tuple[str, str]]] = {}
+    otrans: dict[str, list[tuple[str, str]]] = {}
+    dhist = client.stage_history(2, category_id=0, since=HIST_SINCE, last=dlast, transitions=dtrans)
+    ohist = client.stage_history(172, since=HIST_SINCE, last=olast, transitions=otrans)
     bench_from = (period_mod.now(_MSK) - dt.timedelta(days=BENCH_DAYS)).isoformat()
 
     def _stage_name(sid: str, cat=None) -> str:
@@ -705,6 +734,118 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         x = _дата_или_нет(z, o.get("createdTime"))
         return x if fx_mod.day_ok(x, today) else kp_day
 
+
+    # 5б. ЖИЗНЕННЫЙ ЦИКЛ И РЕГЛАМЕНТ ОРК: заказы, приведённые к фактам, → фазы, очередь «что
+    # делать», доставка в срок, сроки звеньев, надёжность поставщиков (lifecycle.py); шаг
+    # регламента, вход в шаг, сегменты S1–S10 по всем переходам, артефакты (ork.py)
+    ork_ids, ork_head_uid = people_mod.ork_department(departments)
+    ork_head = who(ork_head_uid)[0] if ork_head_uid else ""
+
+    def is_ork(uid: str) -> bool:
+        """Сотрудник отдела ОРК (или его дочернего отдела) по справочнику людей."""
+        return bool(uid) and bool(set((people.get(uid) or {}).get("depts") or []) & ork_ids)
+
+    # вход сделки в реализацию (кат. 0) — первый переход её истории; шаг сделки по стадии
+    # (ork.STAGE_STEP["deal"]) и наибольший шаг по всем её переходам
+    deal_cat0 = {did: tl[0][1] for did, tl in dhist.items() if tl}
+
+    def _dstep(sid: str) -> int | None:
+        return ork.stage_step(dstages.get(sid) or "", "deal")
+    deal_step_max: dict[str, int] = {}
+    for did, tr in dtrans.items():
+        st = [x for x in (_dstep(sid) for sid, _ in tr) if x is not None]
+        if st:
+            deal_step_max[did] = max(st)
+
+    def _share(v) -> float | None:
+        """«Доля первичной оплаты, %» → число 0…100; пусто или не число — None (не 0)."""
+        if v in (None, ""):
+            return None
+        try:
+            x = float(str(v).replace(",", "."))
+        except (TypeError, ValueError):
+            return None
+        return x if 0 <= x <= 100 else None
+
+    def _t0(created: str, cat0: str) -> str:
+        """Начало приёмки: max(создание заказа, вход сделки в реализацию)."""
+        a, b = _parse_dt(created), _parse_dt(cat0)
+        if a and b:
+            return max(a, b).isoformat()
+        return (a or b).isoformat() if (a or b) else ""
+
+    try:
+        _ofields = (client.call("crm.item.fields", {"entityTypeId": 172}) or {}).get("fields") or {}
+    except Exception:
+        _ofields = {}
+    schemes = {str(i.get("ID")): str(i.get("VALUE") or "")
+               for i in ((_ofields.get(SCHEME_F) or {}).get("items") or [])}
+    recent_from = today - dt.timedelta(days=BENCH_DAYS)
+    life_orders = []
+    for o in orders:
+        osid = str(o.get("stageId") or "")
+        sm = _osem(osid)
+        oid = str(o.get("id"))
+        try:
+            paid = float(o.get(SUP_PAID) or 0)
+        except (TypeError, ValueError):
+            paid = 0.0
+        _who = who(o.get(OSS_F))
+        _resp = who(o.get("assignedById"))
+        moved = _pdate(o.get("movedTime"))
+        did = str(o.get("parentId2") or "")
+        # вход в ТЕКУЩУЮ стадию: последний переход истории, иначе время последнего движения
+        otl = ohist.get(oid, [])
+        _ol = olast.get(oid)
+        oin = (_ol[1] if _ol and _ol[0] == osid
+               else str(o.get("movedTime") or (otl[-1][1] if otl else "") or o.get("createdTime") or ""))
+        tr = otrans.get(oid) or []
+        # вход в шаг (шаг 5 — три стадии заказа): по всем переходам, если последний из них —
+        # вход в текущую стадию; иначе — вход в стадию
+        _since = ork.step_since(tr, ostages)[1] if (_ol and _ol[0] == osid and tr) else ""
+        t0 = _t0(str(o.get("createdTime") or ""), deal_cat0.get(did, ""))
+        utd_raw = _pdate(o.get(UTD_DATE))            # сырая дата УПД — без подстановки
+        _rs = [x for x in (ork.stage_step(ostages.get(sid, sid)) for sid, _ in tr) if x is not None]
+        lo = {
+            "id": oid, "deal": did, "seq": 0,
+            "title": str(o.get("title") or "")[:70], "sup": supl.get(str(o.get("companyId"))) or "",
+            "oss": _who[0], "ossGone": _who[1],
+            # Responsible person заказа; менеджер ОРК — он, если он из отдела ОРК (решение 26.10.2026)
+            "resp": _resp[0], "respOrk": is_ork(uid_of(o.get("assignedById"))),
+            "orkMgr": _resp[0] if is_ork(uid_of(o.get("assignedById"))) else "",
+            "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
+            "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
+            "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
+            "prodEnd": _pdate(o.get(PROD_END)), "prodStart": _pdate(o.get(PROD_START)),
+            "inbFact": _pdate(o.get(INB_FACT)),
+            "delPlan": _pdate(o.get(DEL_PLAN)), "delBudget": _pdate(o.get(DEL_BUDGET)),
+            "delFact": _pdate(o.get(DEL_FACT)),
+            # дата подписания УПД — дата доставки, когда факта нет (lifecycle.delivered)
+            "utdDate": _utd_date(o, today),
+            # сырая UTD_DATE (S9 и пункт noUtd — по ней, а не по подставленной дате)
+            "utdRaw": utd_raw,
+            "utd": bool(utd_raw or _has(o.get(UTD_FILE))),
+            "payPlan": _pdate(o.get(PAY_PLAN)), "clientPaid": _has(o.get(CLIENT_PO)),
+            "supPaidPct": paid, "prodConf": _has(o.get(PROD_CONF)) or _has(o.get(PROD_CONF_NF)),
+            "scheme": schemes.get(str(o.get(SCHEME_F) or ""), ""),
+            # регламент ОРК: стадия, вход в неё и в шаг, начало приёмки, вход сделки в реализацию
+            "stage": _stage_name(osid), "stageId": osid, "stageSince": oin, "stepSince": _since or oin,
+            "t0": t0, "dealCat0": deal_cat0.get(did, ""),
+            "reachMax": max(_rs) if _rs else None,
+            "kamOrder": who(o.get(KAM_ORDER))[0], "direction": str(o.get(DIRECTION_F) or ""),
+            "prepayShare": _share(o.get(PREPAY_F)), "assignDate": _pdate(o.get(ASSIGN_AT)),
+            # артефакты шагов (ork.ARTIFACTS): файл, флажок, дата есть — содержимое не проверено
+            "art": {a["key"]: _has(o.get(a["field"])) for a in ork.ARTIFACTS},
+            # только для расчёта (в страницу не идут): первый выход на шаги и сегменты S1–S10
+            "_reach": ork.reach_times(tr, ostages),
+            "_segs": ork.segments(tr, ostages, t0=t0 or None,
+                                  facts={"delFact": _pdate(o.get(DEL_FACT)), "utdRaw": utd_raw}),
+        }
+        a = lo["art"]
+        a["planDates"] = bool(lo["prodStart"] and lo["prodEnd"])
+        a["prodConf"], a["utd"], a["dl"] = lo["prodConf"], lo["utd"], bool(lo["dl"])
+        life_orders.append(lo)
+    lo_by_id = {lo["id"]: lo for lo in life_orders}
     # 6. строки: одна строка = одна сделка воронки реализации (или с заказами)
     rows = []
     n_plan_norate = 0
@@ -852,7 +993,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
         # --- заказы: стадия, возраст стадии, дедлайн клиенту, замедленность
         ords_det = []
-        slow_orders = 0
+        slow_orders = 0            # живых заказов сверх нормы шага регламента (р.д., «без пауз»)
+        slow_old = 0               # … и прежним порогом 2× медианы — только для сравнения
+        # люди сделки для хозяина шага (ork.owner): менеджер ОРК на сделке, КАМ, ОСС
+        d_people = {"dealOrk": who(d.get(ORK_RESP))[0], "orkHead": ork_head,
+                    "kam": who(d.get(KAM_F) or d.get(KAM_OLD))[0], "ossDeal": who(d.get(OSS_DEAL))[0]}
         late_orders = 0            # заказов с просроченным обещанием клиенту
         worst_late = None          # самая глубокая просрочка по сделке, дн
         late_buy = 0.0             # закупка под просроченными заказами, €
@@ -875,7 +1020,24 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                    else str(o.get("movedTime") or (otl[-1][1] if otl else "") or o.get("createdTime") or ""))
             odays = round(_days_between(oin, now_iso) or 0, 1) if oin else None
             othr = _slow_threshold(osid, omed)
-            oslow = bool(olive and odays is not None and odays > othr)
+            slow_old += bool(olive and odays is not None and odays > othr)
+            # замедлен — сверх нормы шага регламента (решение 26.10.2026, п. 2), а не 2× медианы.
+            # ork.judged — одно правило с очередью, ведомостью и W2: шаг ork.step_now
+            # (доставлено без УПД — шаг 12), гигиена и приёмка вне «Реализации» в счёт не идут;
+            # «ждём УПД от клиента» (waitUtd, решение 27.10.2026, Б) — не простой: не замедлен
+            lo = lo_by_id[str(o.get("id"))]
+            ov = ork.judged(lo, today, in_cat0=in_cat0)
+            ostep = ov["step"]
+            lo["kamDeal"] = d_people["kam"]
+            lo["own"] = own = ork.owner(ostep, {**d_people, "orkMgr": lo["orkMgr"], "ossOrder": lo["oss"]}) \
+                if ostep else {"role": "", "who": "", "copy": "", "copyRole": ""}
+            # закрытая выигранная сделка (в том числе «Оплата получена») — в счёте только шаг 12
+            # (УПД, Рег. 14.2.4–14.3.2), проигранная — ничего: та же совокупность, что ведомость,
+            # W2 и очередь (C12 orkview, lifecycle). Остальные шаги закрытой сделки — не
+            # отклонения: ни красной строки заказа, ни «замедлена» в карточке
+            ojudge = bool(olive and (not closed or (ostep == 12 and sem != "F")))
+            oslow = bool(ojudge and ov["over"])
+            ostep_closed = bool(olive and not ojudge and ostep and ov["norm"] is not None)
             if oslow:
                 slow_orders += 1
             # обещание клиенту: та же дата, по которой снабжение ведёт «Контроль дедлайнов»
@@ -886,7 +1048,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             delivered = _pdate(o.get(DEL_FACT))
             del_utd = None if delivered else _utd_date(o, today)
             delivered = delivered or del_utd
-            olate = bool(olive and dl_days is not None and dl_days > 0 and not delivered)
+            # срок клиента — только у открытой сделки: у закрытой просрочка не в счёте (как
+            # «late» в lifecycle и признак строки «late»), иначе 🚩 в колонке «Срок» и красная
+            # плашка заказа при строке «в срок»
+            olate = bool(olive and not closed and dl_days is not None and dl_days > 0 and not delivered)
             obuy = o_eur[str(o.get("id"))] or 0.0     # курса нет — закупка заказа неизвестна
             # стоимость отгрузки этого заказа: доля сделки пропорционально закупке
             # (как в экономике проекта); если сумм закупки нет НИ У ОДНОГО заказа — поровну
@@ -940,6 +1105,23 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                         if _pdate(o.get(INBOUND_PLAN)) else ""),
                 "delivered": delivered.strftime("%d.%m.%Y") if delivered else "",
                 "delUtd": bool(del_utd),            # дата доставки — по подписи УПД
+                # шаг регламента ОРК · исполнитель · р.д. на шаге / норма («без пауз»)
+                "step": ostep, "stepRole": own["role"], "stepWho": own["who"],
+                "stepWd": ov["wd"] if olive else None, "stepNorm": ov["norm"],
+                "stepOver": ov["over"] if ojudge else None,
+                # шаг 12 больше 10 р.д. без УПД — «ждём УПД от клиента», не «сверх нормы»
+                "stepWaitUtd": bool(ojudge and ov["waitUtd"]),
+                # шаг живого заказа закрытой сделки вне счёта (не шаг 12 выигранной) — подпись
+                # «сделка закрыта, не в счёте» вместо оценки срока
+                "stepClosed": ostep_closed,
+                # норма по регламенту, которую портал не меряет (шаг 6 — «нет данных»), и почему
+                # срок не в счёте (гигиена, приёмка вне «Реализации», срок не посчитать)
+                "stepNormDoc": ov["normDoc"], "stepNormState": ov["normState"],
+                "stepHyg": bool(ojudge and ov["hyg"] and ov["norm"] is not None),
+                # подпись закрытой сделки — только там, где есть норма: у шага без нормы
+                # остаётся его собственное «почему» («шаг не нормируется», «нет данных»)
+                "stepWhy": (("сделка закрыта: в счёте только шаг 12 (УПД)" if sem != "F" else "сделка проиграна")
+                            if ostep_closed else ov["why"] if olive else ""),
             })
         ords_det.sort(key=lambda x: (not x["live"], -(x["dlDays"] if x["dlDays"] is not None else -9999),
                                      -(x["days"] or 0)))
@@ -951,24 +1133,30 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         elif entered_real and not ords and not closed:
             first_lag = round(_days_between(entered_real, now_iso) or 0, 1)  # заказа ещё нет — лаг растёт
 
-        # --- замедленность сделки
+        # --- замедленность сделки: сверх нормы шага регламента ОРК (решение владельца
+        # 26.10.2026, п. 2) — живой заказ сверх нормы своего шага или сделка без заказа дольше
+        # нормы приёмки (1 р.д.). Стадия сделки отдельно не нормируется: единица исполнения —
+        # заказ (раздел 1 навыка), стадия сделки отстаёт от заказов
         dthr = _slow_threshold(cur_stage, dmed)
-        slow_deal = bool(not closed and in_cat0 and stage_days is not None and stage_days > dthr)
-        no_orders_slow = bool(not closed and in_cat0 and not ords
-                              and first_lag is not None and first_lag > SLOW_MIN_DAYS)
+        no_order_wd = (period_mod.workdays_ru(_pdate(entered_real), today)
+                       if (not closed and in_cat0 and not ords and entered_real) else None)
+        no_orders_slow = bool(no_order_wd is not None and no_order_wd > ork.NORM_WD[1])
         late = bool(not closed and late_orders)
         # простой по стадии — только кандидат: «подвисла» решает чат сделки (ниже)
-        stuck = bool(slow_deal or slow_orders > 0 or no_orders_slow)
+        stuck = bool(slow_orders > 0 or no_orders_slow)
+        # прежний кандидат (2× медианы, неделя без заказа) — для «сумма прячет потерю»
+        stuck_old = bool((not closed and in_cat0 and stage_days is not None and stage_days > dthr)
+                         or slow_old > 0
+                         or (not closed and in_cat0 and not ords and first_lag is not None
+                             and first_lag > SLOW_MIN_DAYS))
         slow = stuck or late
         why = []
         if late:
             why.append(f"просрочено обещание клиенту: {late_orders} заказ(ов), макс. {worst_late} дн")
-        if slow_deal:
-            why.append(f"стадия «{_stage_name(cur_stage)}» {stage_days} дн (порог {round(dthr, 1)})")
         if slow_orders:
-            why.append(f"замедленных заказов: {slow_orders}")
+            why.append(f"сверх нормы шага: {slow_orders} заказ(ов), {ork.NO_PAUSE}")
         if no_orders_slow:
-            why.append(f"нет ни одного заказа {first_lag} дн после входа в реализацию")
+            why.append(f"нет ни одного заказа {no_order_wd} р.д. после входа в реализацию")
 
         suppliers = sorted({supl.get(str(o.get("companyId"))) for o in ords if o.get("companyId")} - {None})
         entered = (str(entered_real)[:10] if entered_real
@@ -979,6 +1167,43 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         won_d = _pdate(d.get(WON_F))
         won_src = "tkp" if won_d else ("cat0" if entered_real else ("order" if entered else ""))
         won_d = won_d or _pdate(entered)
+        # ячейка «шаг · исполнитель · р.д./норма»: заказ сверх нормы своего шага — первым
+        # (почему строка «замедлена»), затем «ждём УПД от клиента» (шаг 12 больше 10 р.д. без
+        # УПД, решение 27.10.2026, Б — не сверх нормы), иначе самый ранний шаг среди живых
+        # заказов (там сделка и стоит); сделка без заказа — приёмка (шаг 1) от входа в
+        # реализацию. У закрытой выигранной сделки (в том числе «Оплата получена») в счёте только
+        # шаг 12 живых заказов (УПД, Рег. 14.2.4–14.3.2) — та же совокупность, что ведомость и
+        # очередь (C12 orkview): «ждём УПД» — первым, с пометкой «и закрыть сделку». Иначе
+        # «Оплата получена» или все заказы закрыты, а сделка открыта — шаг 13, ОСС закрывает
+        # сделку (решение 26.10.2026, п. 4; dealClose / dealOpen очереди)
+        d_step = _dstep(cur_stage) if in_cat0 else None
+        _live_st = [x for x in ords_det if x["live"] and x["step"]]
+        _cand = ([x for x in _live_st if x["step"] == 12] if (closed and sem != "F")
+                 else [] if closed else _live_st)
+        _all_done = bool(not closed and ords and all(_osem(o.get("stageId")) == "S" for o in ords))
+        # оговорка к «закрыть сделку» (Рег. 15.6, 14.6): та же, что у пункта dealClose очереди
+        _close_note = lifecycle.close_note([lo_by_id[str(o.get("id"))] for o in ords]) if paid else ""
+        if _cand and (any(x["stepOver"] or x["stepWaitUtd"] for x in _cand) or not paid):
+            c = min(_cand, key=lambda x: (not x["stepOver"], not x["stepWaitUtd"], x["step"]))
+            step_cell = {"step": c["step"], "role": c["stepRole"], "who": c["stepWho"], "wd": c["stepWd"],
+                         "norm": c["stepNorm"], "over": c["stepOver"], "waitUtd": c["stepWaitUtd"],
+                         "normDoc": c["stepNormDoc"],
+                         "normState": c["stepNormState"], "hyg": c["stepHyg"], "why": c["stepWhy"],
+                         "label": ork.NO_PAUSE, "close": "paid" if paid else "", "closeNote": _close_note}
+        elif paid or _all_done:
+            _o = ork.owner(13, d_people)
+            step_cell = {"step": 13, "role": _o["role"], "who": _o["who"], "wd": None, "norm": None,
+                         "over": None, "waitUtd": False, "normDoc": "", "normState": "none", "hyg": False, "why": "",
+                         "label": "закрыть сделку", "close": "paid" if paid else "open", "closeNote": _close_note}
+        elif not closed and in_cat0 and not ords:
+            _h = ork.owner(1, d_people)
+            step_cell = {"step": 1, "role": _h["role"], "who": _h["who"], "wd": no_order_wd,
+                         "norm": ork.NORM_WD[1], "over": no_orders_slow if no_order_wd is not None else None, "waitUtd": False,
+                         "normDoc": ork.NORM_DOC[1][0], "normState": "norm", "hyg": False, "why": "",
+                         "label": ork.NO_PAUSE, "close": "", "closeNote": ""}
+        else:
+            step_cell = None
+        _dmax = [x for x in (deal_step_max.get(did), d_step) if x is not None]
         rows.append({
             "deal": did, "seq": seq, "entered": entered,
             "customer": clients.get(str(d.get("COMPANY_ID"))) or "—",
@@ -1084,6 +1309,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "hasSale": bool(d.get("OPPORTUNITY")),
             "wonAt": won_d.strftime("%d.%m.%Y") if won_d else "", "wonSrc": won_src,
             "payDays": _pay_days(d.get(PAY_DAYS_F)),
+            # регламент ОРК: вход в реализацию, менеджер ОРК на сделке, шаг сделки по стадии и
+            # наибольший по всем переходам, ячейка шага для таблицы сделок
+            "cat0At": str(entered_real or ""), "orkResp": d_people["dealOrk"],
+            "dealStep": d_step, "dealStepMax": max(_dmax) if _dmax else None,
+            "stepCell": step_cell, "_stuckOld": stuck_old, "_stuckNew": stuck,
         })
     rows.sort(key=lambda r: -r["seq"])
 
@@ -1133,48 +1363,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             r["chatUnverified"] = stuck is None
         r["why"] += (" · " if r["why"] else "") + note
 
-    # ЖИЗНЕННЫЙ ЦИКЛ: заказы, приведённые к фактам, → фазы, очередь «что делать»,
-    # доставка в срок, сроки звеньев, надёжность поставщиков (lifecycle.py)
-    try:
-        _ofields = (client.call("crm.item.fields", {"entityTypeId": 172}) or {}).get("fields") or {}
-    except Exception:
-        _ofields = {}
-    schemes = {str(i.get("ID")): str(i.get("VALUE") or "")
-               for i in ((_ofields.get(SCHEME_F) or {}).get("items") or [])}
+    # № реализации заказа — по строке его сделки (заказ без сделки — по своему названию)
     seq_by_deal = {r["deal"]: r["seq"] for r in rows}
-    recent_from = today - dt.timedelta(days=BENCH_DAYS)
-    life_orders = []
-    for o in orders:
-        osid = str(o.get("stageId") or "")
-        sm = _osem(osid)
-        try:
-            paid = float(o.get(SUP_PAID) or 0)
-        except (TypeError, ValueError):
-            paid = 0.0
-        _who = who(o.get(OSS_F))
-        _resp = who(o.get("assignedById"))
-        moved = _pdate(o.get("movedTime"))
-        did = str(o.get("parentId2") or "")
-        life_orders.append({
-            "id": str(o.get("id")), "deal": did, "seq": seq_by_deal.get(did) or _regno(o.get("title")),
-            "title": str(o.get("title") or "")[:70], "sup": supl.get(str(o.get("companyId"))) or "",
-            "oss": _who[0], "ossGone": _who[1],
-            # Responsible person заказа — хозяин исполнения (решение владельца 19.10.2026, п. 1)
-            "resp": _resp[0],
-            "live": sm == "P", "success": sm == "S", "closedRecent": bool(sm == "S" and moved and moved >= recent_from),
-            "created": _pdate(o.get("createdTime")), "dl": _pdate(o.get(DL_CUSTOMER)),
-            "shipPlan": _pdate(o.get(SHIP_PLAN)), "shipFact": _pdate(o.get(SHIP_FACT)),
-            "prodEnd": _pdate(o.get(PROD_END)), "prodStart": _pdate(o.get(PROD_START)),
-            "inbFact": _pdate(o.get(INB_FACT)),
-            "delPlan": _pdate(o.get(DEL_PLAN)), "delBudget": _pdate(o.get(DEL_BUDGET)),
-            "delFact": _pdate(o.get(DEL_FACT)),
-            # дата подписания УПД — дата доставки, когда факта нет (lifecycle.delivered)
-            "utdDate": _utd_date(o, today),
-            "utd": bool(_pdate(o.get(UTD_DATE)) or _has(o.get(UTD_FILE))),
-            "payPlan": _pdate(o.get(PAY_PLAN)), "clientPaid": _has(o.get(CLIENT_PO)),
-            "supPaidPct": paid, "prodConf": _has(o.get(PROD_CONF)) or _has(o.get(PROD_CONF_NF)),
-            "scheme": schemes.get(str(o.get(SCHEME_F) or ""), ""),
-        })
+    for lo in life_orders:
+        lo["seq"] = seq_by_deal.get(lo["deal"]) or _regno(lo["title"])
     # Вид вкладки: основной и отдельного направления (решение владельца 25.10.2026). Очередь,
     # фазы, доставка в срок, хозяева и гарантия — по заказам и сделкам вида; нормы звеньев,
     # обычное опоздание и надёжность поставщиков меряются по ВСЕМ заказам (measure):
@@ -1182,10 +1374,15 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     sep_ids = {r["deal"] for r in rows if r["seg"]}
     main_rows = [r for r in rows if not r["seg"]]
     sep_rows = [r for r in rows if r["seg"]]
-    life = lifecycle.build([o for o in life_orders if o["deal"] not in sep_ids], main_rows, today,
-                           measure=life_orders)
-    life_sep = (lifecycle.build([o for o in life_orders if o["deal"] in sep_ids], sep_rows, today,
-                                measure=life_orders) if sep_rows else None)
+    main_orders = [o for o in life_orders if o["deal"] not in sep_ids]
+    sep_orders = [o for o in life_orders if o["deal"] in sep_ids]
+    # разбор договоров не загружен — None: «договор не найден» не проверялся (пункт так и пишет)
+    cust_contract = dealctx.customer_contract_deals(ctx_contracts) if ctx_contracts is not None else None
+    life = lifecycle.build(main_orders, main_rows, today, measure=life_orders, ork_head=ork_head,
+                           cust_contract=cust_contract)
+    life_sep = (lifecycle.build(sep_orders, sep_rows, today, measure=life_orders, ork_head=ork_head,
+                                cust_contract=cust_contract)
+                if sep_rows else None)
 
     # 7. скорость: сводные метрики
     # полный цикл заказа: создание карточки → SUCCESS, по заказам, закрытым за последние
@@ -1212,7 +1409,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     orphan_buy = sum(v for v in orphan_eur if v)
     orphan_norate = sum(1 for v in orphan_eur if v is None)
 
-    def _view(rows_v: list[dict], life_v: dict | None) -> dict:
+    ork_month: dict[str, dict] = {}         # «Месяц» (отдел и поимённо) — по виду, под правом
+
+    def _view(rows_v: list[dict], life_v: dict | None, orders_v: list[dict] | None = None,
+              key: str = "main") -> dict:
         """Сводка вида вкладки по его сделкам rows_v: всё, что просит внимания или
         суммирует портфель, — плитки, итоги, воронка, сроки клиента, работа уволенных,
         чаты кандидатов в «подвисшие», сейчас в стадии и сверх нормы. Нормы стадий
@@ -1376,37 +1576,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                      "moneyDays": r["lateMoneyDays"], "saleLbl": r["saleLbl"],
                      "manager": r["manager"], "oss": r["oss"]} for r in top_cost]
 
-        # разрезы просрочки: по ответственному сделки и по схеме поставки
-        def _cut(keyfn) -> list:
-            agg: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0])   # [просроч. заказов, сделок, € , всего живых заказов]
-            worst: dict[str, dict] = {}                                  # главная просроченная сделка человека
-            for r in live_rows:
-                mine = set()
-                for o in r["orders"]:
-                    if not o["live"]:
-                        continue
-                    k = keyfn(r, o) or "—"
-                    agg[k][3] += 1
-                    if o["late"]:
-                        agg[k][0] += 1
-                        agg[k][2] += o["buyRaw"]
-                        mine.add(k)
-                # просроченная сделка засчитывается каждому, у кого в ней просрочен заказ,
-                # а не только хозяину первого заказа
-                for k in mine:
-                    agg[k][1] += 1
-                    w = worst.get(k)
-                    if w is None or (r["lateDays"] or 0) > (w["days"] or 0):
-                        worst[k] = {"seq": r["seq"], "deal": r["deal"], "customer": r["customer"],
-                                    "days": r["lateDays"]}
-            out = [{"name": k, "lateOrders": v[0], "lateDeals": v[1], "buy": round(v[2]),
-                    "buyLbl": _money(v[2]), "liveOrders": v[3],
-                    "pct": round(v[0] / v[3] * 100) if v[3] else 0,
-                    "gone": k.endswith("(уволен)"), "top": worst.get(k)}
-                   for k, v in agg.items() if v[0]]
-            out.sort(key=lambda x: -x["lateOrders"])
-            return out[:12]
-
         # ЖИВАЯ РАБОТА УВОЛЕННЫХ: сделку ведёт ушедший ответственный, её живые заказы —
         # ушедший ОСС или ушедший ответственный заказа (Responsible person). Это не просрочка,
         # а работа без хозяина: её переназначают.
@@ -1447,8 +1616,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "shipFirst": ship_first,
             "revAtRisk": _money(rev_at_risk), "marginAtRisk": _money(margin_at_risk),
             "lateNoSum": late_nosum_n, "costTop": cost_top,
-            "byManager": _cut(lambda r, o: r["manager"]),
-            "byOss": _cut(lambda r, o: o.get("oss") or r["oss"]),
+            # разрезы просрочки по ответственному и ОСС (byManager, byOss) сняты 27.10.2026:
+            # страница их не рисовала — просрочку по людям показывает очередь по исполнителю шага
         }
 
         # аддитивно: все прежние KPI сохранены, новые добавлены следом
@@ -1476,6 +1645,22 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
              f"упущенная доходность при {round(CAP_RATE*100)}% годовых · сгорает {_money(burn_day)}/день",
              "warn" if loss_total else "ok"),
         ]
+
+        # «сумма прячет потерю»: кандидаты в «Замедлено» (до чата) по норме шага против прежних
+        # 2× медианы — у скольких открытых сделок картина стала хуже и у скольких лучше
+        _open = [r for r in live_rows if r["inCat0"]]
+        slow_cmp = {"old": sum(1 for r in _open if r["_stuckOld"]), "new": sum(1 for r in _open if r["_stuckNew"]),
+                    "worse": sum(1 for r in _open if r["_stuckNew"] and not r["_stuckOld"]),
+                    "better": sum(1 for r in _open if r["_stuckOld"] and not r["_stuckNew"])}
+        # регламент ОРК: неделя, месяц, квартал, как считается (orkview.py); поимённые
+        # «Месяц» (показатели отдела и менеджеров поимённо) — отдельно (ork_month), в страницу
+        # только под правом руководителей ОРК
+        ork_v = None
+        if life_v is not None and orders_v is not None:
+            ork_v, ork_month[key] = orkview.build(orders_v, rows_v, life_v.get("queue") or [], today,
+                                                  measure=life_orders, otd=life_v.get("otd"),
+                                                  ork_head=ork_head)
+            ork_v["slowCmp"] = slow_cmp
 
         return {
             "funnel": funnel,
@@ -1529,10 +1714,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             },
             "gone": gone,
             "life": life_v,
+            "ork": ork_v,
         }
 
-    main_view = _view(main_rows, life)
-    sep_view = _view(sep_rows, life_sep) if sep_rows else None
+    main_view = _view(main_rows, life, main_orders, "main")
+    sep_view = _view(sep_rows, life_sep, sep_orders, "sep") if sep_rows else None
+    for r in rows:                         # кандидаты «Замедлено» — только для сравнения выше
+        r.pop("_stuckOld", None)
+        r.pop("_stuckNew", None)
     if sep_cats:
         # сводка направления для шапки основного вида и подписи его вкладки: имя — имя
         # воронки из портала; числа — те же правила, что у основного вида. Сделок
@@ -1628,8 +1817,20 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "life": life,
         # вид отдельного направления (решение владельца 25.10.2026): те же разделы по его
         # сделкам; сводка для шапки и подписи вкладки — head["sep"]
-        "sep": ({k: sep_view[k] for k in ("funnel", "head", "kpis", "deadlines", "speed", "gone", "life")}
+        # «Квартал» мерится по ВСЕМ заказам — у направления он тот же, что у основного вида: в
+        # данные вида не копируется (страница берёт его из основного, quarterFrom)
+        "sep": ({**{k: sep_view[k] for k in ("funnel", "head", "kpis", "deadlines", "speed", "gone", "life")},
+                 "ork": ({**sep_view["ork"], "quarter": None, "quarterFrom": "main"} if sep_view.get("ork")
+                         else sep_view.get("ork"))}
                 if sep_view is not None else None),
+        # регламент ОРК основного вида (вид направления — sep.ork)
+        "ork": main_view["ork"],
+        # «Месяц» — показатели отдела и менеджеров ОРК поимённо (решение владельца 26.10.2026,
+        # п. 3: подвкладка — только руководителям и владельцу): main.py забирает раздел до
+        # записи страницы — в страницу только своим массивом под правом руководителей ОРК
+        "orkMonth": ork_month,
+        # руководитель ОРК по справочнику отделов — хозяин пунктов dealctx (main.py забирает)
+        "_orkHead": ork_head,
         # заказов без курса на дату заказа — не в сумме, счётом (поле — только когда есть)
         "orphan": {"n": len(orphan), "buy": _money(orphan_buy),
                    **({"noRate": orphan_norate} if orphan_norate else {})},

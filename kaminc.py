@@ -595,7 +595,9 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
         acts[str(q.get("kamId") or "")].append({
             "code": q.get("code"), "sev": q.get("sev", 9), "what": q.get("what") or "", "act": q.get("act") or "",
             "deal": str(q.get("deal")), "seq": q.get("seq") or 0, "t": str(q.get("title") or "")[:70],
-            "days": q.get("days"), "who": q.get("owner") or "", "src": "kam"})
+            "days": q.get("days"), "who": q.get("owner") or "", "src": "kam",
+            # дни рабочие (р.д.) у сроков регламента ОРК (kamqueue inWd), иначе календарные
+            **({"wd": True} if q.get("inWd") else {})})
     by_id = {d["id"]: d for d in deals if d["k"] == "r"}
 
     def gap(code: str, d: dict, key: str, who: str = "") -> None:
@@ -623,6 +625,11 @@ def compute(contracts: dict | None, people: dict | None, *, today: dt.date,
             if not d["po"]:
                 todo.append(("noPo", "", "руководитель продуктов"))
             for code, key, who in todo:
+                # тот же пробел уже пришёл из очереди КАМа (noPayPlan — с хозяином по регламенту):
+                # второй пункт той же сделки у того же КАМа не ставим и в пробелы не считаем
+                if any(x["src"] == "kam" and x["code"] == code and x["deal"] == str(d["id"])
+                       for x in acts.get(key) or []):
+                    continue
                 gap(code, d, key, who)
                 gaps[code] += 1
         elif d["b"] == "paidFile":

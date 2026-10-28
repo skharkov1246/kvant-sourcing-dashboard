@@ -152,6 +152,8 @@ test("дашборд режется по правам: чужих данных �
   // только праву «Деньги КАМов», которого у роли «КАМ» по умолчанию нет
   assert.ok(html.includes("MOCK-KAMINC_HEAD"), "счёт «Дохода» должен быть доступен");
   assert.ok(!html.includes('MOCK-KAMINC"'), "деньги «Дохода» утекли КАМу без права");
+  // показатели менеджеров ОРК поимённо — только праву «ork_heads» (решение 26.10.2026, п. 3)
+  assert.ok(!html.includes("MOCK-ORKMONTH"), "показатели менеджеров ОРК утекли КАМу без права");
   assert.doesNotMatch(html, /data-tab="advisor"/);
   assert.ok(html.includes("← Портал КВАНТ"), "нет возврата на портал");
 });
@@ -221,6 +223,14 @@ test("владелец меняет роль, точечные права и р�
   assert.deepEqual((await loadAcl(env)).roles.kam.rights, kamBefore, "отказ не должен ничего записать");
   assert.equal((await (await post({ op: "role_rights", role: "head", sites: [], tabs: ["reps"], rights: ["kam_money"] })).json()).ok, true);
   assert.deepEqual((await loadAcl(env)).roles.head.rights, ["kam_money"]);
+  // «Реализация: показатели менеджеров ОРК» роли — тоже только руководителю (решение 26.10.2026, п. 3)
+  const empBefore = (await loadAcl(env)).roles.kam.rights;
+  const badOrk = await post({ op: "role_rights", role: "kam", sites: [], tabs: ["contracts"], rights: ["ork_heads"] });
+  assert.equal(badOrk.status, 400);
+  assert.equal((await badOrk.json()).error, "ork_heads_role");
+  assert.deepEqual((await loadAcl(env)).roles.kam.rights, empBefore, "отказ не должен ничего записать");
+  assert.equal((await (await post({ op: "role_rights", role: "head", sites: [], tabs: ["contracts"], rights: ["kam_money", "ork_heads"] })).json()).ok, true);
+  assert.deepEqual((await loadAcl(env)).roles.head.rights, ["kam_money", "ork_heads"]);
 
   await post({ op: "default_role", role: "guest" });
   assert.equal((await loadAcl(env)).defaultRole, "guest");

@@ -394,6 +394,25 @@ CT_TODAY = dt.date(2026, 10, 19)
 CT_SEP_CAT = "16"
 CT_SEP_NAME = "Залив"
 CT_SEP_CO = "390"
+# Регламент ОРК (ork.py): стадии воронки заказов 26 — имена портала (зонд v53), путь заказа
+# по шагам; отдел ОРК и его руководитель — справочник отделов (department.get); люди ОРК —
+# ответственные заказов. Номера и имена придуманы.
+CT_OSTAGES = (("NEW", "Заказ создан"), ("SENT", "Заказ направлен"),
+              ("PO", "Сформирован РО/Подготовка описаний"), ("SPEC", "Подготовка спецификации и инвойса"),
+              ("AGREE", "Согласование спецификации и оплаты"), ("PAY", "Оплата поставщику / агенту"),
+              ("PREPARATION", "Производство заказа"), ("READY", "Заказ готов"),
+              ("SHIPPREP", "Подготовка к отгрузке"), ("WH", "Приемка на складе"),
+              ("TRUCK", "Подготовка груза/Поиск транспорта"), ("SHIPPED", "Заказ отгружен"),
+              ("GOT", "Заказ получен клиентом"), ("WAITPAY", "Ожидание оплаты"), ("SUCCESS", "Закрытие заказа"))
+CT_PATH = [k for k, _ in CT_OSTAGES]
+CT_DEPTS = [{"ID": "1", "NAME": "Компания", "PARENT": ""},
+            {"ID": "50", "NAME": "Отдел реализации контрактов", "PARENT": "1", "UF_HEAD": "30"},
+            {"ID": "51", "NAME": "Группа сопровождения заказов", "PARENT": "50"},
+            {"ID": "60", "NAME": "Отдел снабжения", "PARENT": "1", "UF_HEAD": "34"}]
+CT_ROSTER = {"30": {"name": "Роза (рук. ОРК)", "active": True, "depts": ["50"]},
+             "31": {"name": "Олег (ОРК)", "active": True, "depts": ["51"]},
+             "32": {"name": "Пётр (ОРК)", "active": True, "depts": ["50"]},
+             "33": {"name": "Сергей (снабжение)", "active": True, "depts": ["60"]}}
 # Страна покупателя по реквизитам (НДС по правилу 26.10.2026): компания 306 — иностранная
 # (шаблон реквизита не российский), 300 и 301 — российские, прочие — без реквизитов.
 CT_FOREIGN_CO = "306"
@@ -459,6 +478,26 @@ class ContractsStub:
         self.offer_hist: list[tuple[str, str, str]] = []
         stages = ["C0:NEW", "C0:PREPARATION", "C0:EXECUTING", "C0:FINAL_INVOICE"]
         oid = 7000
+        # поля регламента ОРК — своим генератором: прежние даты и суммы корпуса не сдвигаются
+        rnd2 = random.Random(29)
+
+        def path(oid_: int, target: str, age: float, last: float, *, ret=False, burst=False) -> None:
+            """Переходы заказа от «Заказ создан» до target: равномерно от создания до last
+            дней назад; ret — возврат на шаг и снова вперёд; burst — последние три перехода
+            за две минуты («пачка»)."""
+            k = CT_PATH.index(target)
+            seq_ = CT_PATH[:k + 1]
+            if ret and k >= 3:
+                seq_ = seq_[:-1] + [seq_[-3], seq_[-2], seq_[-1]]
+            n = len(seq_)
+            ts = [age - (age - last) * x / max(1, n - 1) for x in range(n)]
+            if burst and n >= 4:
+                ts[-3:] = [last + 2 / 1440, last + 1 / 1440, last]
+            for st, ago in zip(seq_, ts):
+                self.hist[172].append((str(oid_), f"DT172_26:{st}", t(ago)))
+            self._reach_sent[str(oid_)] = ts[1] if n > 1 else None
+
+        self._reach_sent: dict[str, float | None] = {}
         for i in range(24):
             did = str(6000 + i)
             st = stages[i % len(stages)]
@@ -477,7 +516,12 @@ class ContractsStub:
             elif i % 4 == 2:
                 self.deals[-1][ct.WON_F] = self.deals[-1]["DATE_CREATE"][:10]
                 self.offer_hist.append((did, CT_OFFER_STAGE, t(200 - i * 5 + 12)))
-            self.hist[2].append((did, st, t(30 + i)))
+            # вход в реализацию — при создании сделки; в текущую стадию — 30+ дн. назад
+            self.hist[2].append((did, "C0:NEW", t(200 - i * 5)))
+            if st != "C0:NEW":
+                self.hist[2].append((did, st, t(30 + i)))
+            if i % 5 == 0:                            # менеджер ОРК записан в сделке
+                self.deals[-1][ct.ORK_RESP] = "32"
             for j in range(1 + i % 3):
                 oid += 1
                 age = 40 + rnd.randint(0, 200)
@@ -501,9 +545,24 @@ class ContractsStub:
                     o[ct.UTD_DATE] = d(max(0, age - 77))
                     o[ct.CLIENT_PO] = [{"id": 1}]
                     o["stageId"] = "DT172_26:SUCCESS"
+                # стадия — по фазе (шаг регламента): размещение → 5/5/4, оплачено → 6/7,
+                # производство → 7/8 или отгружен → 9, склад → 9/10, доставлено → 12/11
+                v = (i + j) % 3
+                target = (["SPEC", "AGREE", "SENT"][v] if kind == 0
+                          else ["PAY", "PREPARATION"][v % 2] if kind == 1
+                          else ("SHIPPREP" if ct.SHIP_FACT in o else ["PREPARATION", "READY"][v % 2]) if kind == 2
+                          else ["WH", "TRUCK"][v % 2] if kind == 3
+                          else ["WAITPAY", "GOT"][v % 2] if kind == 4 else "SUCCESS")
+                o["stageId"] = f"DT172_26:{target}"
+                self._ork_fields(o, kind, age, d, rnd2, ct)
+                if ct.KAM_F in self.deals[-1]:                 # КАМ на заказе — тот же, что в сделке
+                    o[ct.KAM_ORDER] = self.deals[-1][ct.KAM_F]
                 self.orders.append(o)
-                self.hist[172].append((str(oid), "DT172_26:NEW", t(age)))
-                self.hist[172].append((str(oid), o["stageId"], t(rnd.randint(1, 30))))
+                path(oid, target, age, rnd.randint(1, 30), ret=(i + j) % 7 == 3, burst=(i + j) % 11 == 5)
+                if age < 56:                         # заказ ОРК-эпохи: «Дата записи нового ответственного»
+                    sent = self._reach_sent.get(str(oid))
+                    if sent is not None:
+                        o[ct.ASSIGN_AT] = d(round(sent) - rnd2.randint(0, 1))
         # отдельное направление: 6100 — сделка его воронки с заказом (в реализации числится
         # «вне воронки»), 6102 — его же сделка без заказов (не во вселенной вкладки, но её
         # компания — компания направления), 6101 — сделка реализации той же компании 390
@@ -533,6 +592,105 @@ class ContractsStub:
                                 ct.OSS_F: "22", ct.DL_CUSTOMER: d(dl_ago), **extra})
             self.hist[172].append((str(oid), "DT172_26:NEW", t(100)))
             self.hist[172].append((str(oid), "DT172_26:PREPARATION", t(10)))
+        # регламент ОРК: сделка «Оплата получена», но не закрыта (dealClose); сделки без
+        # заказа — 10 дн. в реализации (noOrder) и со вчерашнего дня (в норме); сделка с
+        # картами гигиены и контрольной точкой недели
+        self.deals += [
+            {"ID": "6030", "TITLE": "930. Поставка завершена", "OPPORTUNITY": "40000", "CURRENCY_ID": "EUR",
+             "COMPANY_ID": "301", "STAGE_ID": "C0:PAID", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
+             "DATE_CREATE": t(300), "ASSIGNED_BY_ID": "10", ct.OSS_DEAL: ["21"], ct.KAM_F: "11"},
+            {"ID": "6031", "TITLE": "931. Поставка без заказа", "OPPORTUNITY": "30000", "CURRENCY_ID": "EUR",
+             "COMPANY_ID": "302", "STAGE_ID": "C0:NEW", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
+             "DATE_CREATE": t(10), "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["22"], ct.KAM_F: "12"},
+            {"ID": "6032", "TITLE": "932. Поставка принята вчера", "OPPORTUNITY": "25000", "CURRENCY_ID": "EUR",
+             "COMPANY_ID": "303", "STAGE_ID": "C0:NEW", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
+             "DATE_CREATE": t(0.2), "ASSIGNED_BY_ID": "11", ct.OSS_DEAL: ["22"], ct.KAM_F: "12"},
+            {"ID": "6033", "TITLE": "933. Узлы гигиены", "OPPORTUNITY": "50000", "CURRENCY_ID": "EUR",
+             "COMPANY_ID": "304", "STAGE_ID": "C0:EXECUTING", "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0",
+             "DATE_CREATE": t(160), "ASSIGNED_BY_ID": "12", ct.OSS_DEAL: ["23"], ct.KAM_F: "10",
+             ct.ORK_RESP: "31"},
+        ]
+        self.hist[2] += [("6030", "C0:NEW", t(300)), ("6030", "C0:PAID", t(40)),
+                         ("6031", "C0:NEW", t(10)), ("6032", "C0:NEW", t(0.2)),
+                         ("6033", "C0:NEW", t(160)), ("6033", "C0:EXECUTING", t(60))]
+        oid += 1
+        self.orders.append({"id": oid, "title": "930/1. Узел", "companyId": "401", "parentId2": 6030,
+                            "opportunity": 12_000, "currencyId": "EUR", "stageId": "DT172_26:SUCCESS",
+                            "createdTime": t(280), "movedTime": t(45), ct.OSS_F: "21",
+                            ct.DL_CUSTOMER: d(90), ct.DEL_FACT: d(95), ct.UTD_DATE: d(90),
+                            ct.CLIENT_PO: [{"id": 2}], ct.SUP_PAID: 100, "assignedById": "33"})
+        path(oid, "SUCCESS", 280, 45)
+        # та же сделка «Оплата получена» (закрыта): живой заказ в «Ожидание оплаты», доставлен
+        # 30 дн. назад без УПД — шаг 12 менеджера ОРК сверх нормы (ведомость, W2 — closed12;
+        # ячейка «Шаг» таблицы сделок, карточка, очередь noUtd), ОСС — закрыть сделку
+        oid += 1
+        self.orders.append({"id": oid, "title": "930/2. Узел без УПД", "companyId": "401", "parentId2": 6030,
+                            "opportunity": 6_000, "currencyId": "EUR", "stageId": "DT172_26:WAITPAY",
+                            "createdTime": t(200), "movedTime": t(28), ct.OSS_F: "21",
+                            ct.DL_CUSTOMER: d(20), ct.DEL_FACT: d(30), ct.SUP_PAID: 100,
+                            ct.PAY_PLAN: d(5), "assignedById": "31"})
+        path(oid, "WAITPAY", 200, 28)
+        special = (
+            # стадия позади фактов: оплачено поставщику, а стадия — «Заказ направлен»
+            ("SENT", 40, 5, {ct.SUP_PAID: 50}),
+            # брошенная карточка: «Заказ создан» 150 дн. (норма 1 р.д.)
+            ("NEW", 150, 150, {}),
+            # приёмка сверх нормы: «Заказ создан» 5 дн. назад
+            ("NEW", 5, 5, {}),
+            # производство с контрольными точками этой недели: P50 — завтра, P14 — через 3 дня
+            ("PREPARATION", 45, 20, {ct.SUP_PAID: 100, ct.PROD_START: d(30), ct.PROD_END: d(-32),
+                                     ct.SHIP_PLAN: d(-17), ct.DEL_BUDGET: d(-60)}),
+            # срок конца производства прошёл, в «Заказ готов» заказ не входил
+            ("PREPARATION", 50, 25, {ct.SUP_PAID: 100, ct.PROD_START: d(45), ct.PROD_END: d(20),
+                                     ct.DEL_BUDGET: d(-20)}),
+        )
+        for k, (target, age, last, extra) in enumerate(special):
+            oid += 1
+            self.orders.append({"id": oid, "title": f"933/{k + 1}. Узел гигиены", "companyId": "402",
+                                "parentId2": 6033, "opportunity": 8_000, "currencyId": "EUR",
+                                "stageId": f"DT172_26:{target}", "createdTime": t(age), "movedTime": t(last),
+                                ct.OSS_F: "23", ct.DL_CUSTOMER: d(-90), "assignedById": "31", **extra})
+            path(oid, target, age, last)
+        # стадия не из таблицы шагов (своя стадия воронки) — шаг не угадываем
+        oid += 1
+        self.orders.append({"id": oid, "title": "933/9. Узел в архиве", "companyId": "402", "parentId2": 6033,
+                            "opportunity": 3_000, "currencyId": "EUR", "stageId": "DT172_26:UC_OLD",
+                            "createdTime": t(70), "movedTime": t(30), ct.OSS_F: "23", ct.DL_CUSTOMER: d(-30),
+                            "assignedById": "32"})
+        self.hist[172] += [(str(oid), "DT172_26:NEW", t(70)), (str(oid), "DT172_26:UC_OLD", t(30))]
+
+    @staticmethod
+    def _ork_fields(o: dict, kind: int, age: int, d, rnd2: random.Random, ct) -> None:
+        """Поля регламента ОРК заказа: ответственный (ОРК-эпоха — люди ОРК), даты размещения,
+        артефакты шагов, КАМ заказа, направление поставки, доля первичной оплаты."""
+        era = age < 56
+        o["assignedById"] = (("31", "32", "31", "32", "33")[rnd2.randint(0, 4)] if era
+                             else ("33", "32", "")[rnd2.randint(0, 2)])
+        if kind >= 1 and rnd2.random() < 0.8:
+            o[ct.PROD_START] = d(age - 10)
+            o[ct.PROD_END] = d(age - 60)
+            o[ct.DEL_BUDGET] = d(age - 100)
+        files = [{"id": 1}]
+        if kind >= 1 or rnd2.random() < 0.3:
+            if rnd2.random() < 0.9:
+                o["ufCrm20_1723385385957"] = files            # Purchase order
+            if rnd2.random() < 0.85:
+                o["ufCrm20_1723236635"] = ["https://disk.example/spec"]
+        if kind >= 1 and rnd2.random() < 0.8:
+            o["ufCrm20_1731178548"] = files                   # платёжка поставщику
+        if kind >= 1 and rnd2.random() < 0.5:
+            o["ufCrm20_1723236426"] = files                   # подтверждение производства
+        if kind >= 3:
+            for f in ("ufCrm20_1723236691", "ufCrm20_1723630327", "ufCrm20_1723236676", "ufCrm20_1725544786"):
+                if rnd2.random() < 0.6:
+                    o[f] = files if f != "ufCrm20_1725544786" else "склад поставщика"
+        o[ct.DIRECTION_F] = ("1001", "1002")[rnd2.randint(0, 1)]
+        if age < 200:
+            share = (100, 30, 50, None)[rnd2.randint(0, 3)]
+            if share is not None:
+                o[ct.PREPAY_F] = share
+                if era and share and rnd2.random() < 0.7:
+                    o["ufCrm20_1787562201347"] = files         # проформа
 
     def call(self, method, params=None, **kw):
         if method == "crm.item.fields":
@@ -593,43 +751,91 @@ class ContractsStub:
         return {"0": "Реализация", CT_SEP_CAT: CT_SEP_NAME}
 
     def deal_stages_cat(self, cid=0):
-        return {"C0:NEW": "Договор на подписании", "C0:PREPARATION": "Оплата поставщикам",
-                "C0:EXECUTING": "Производство", "C0:FINAL_INVOICE": "Доставка клиенту", "C0:WON": "Сделка успешна"}
+        # имена стадий воронки реализации — как в портале (зонд v49), шаги — ork.STAGE_STEP["deal"]
+        return {"C0:NEW": "ТКП согласован (конкурс выигран) | Согласование договора/спецификации с заказчиком",
+                "C0:PREPARATION": "Договор с заказчиком подписан | Согласование спецификаций/инвойсов с агентами/поставщиками",
+                "C0:EXECUTING": "Оплата товара произведена | Начато производство",
+                "C0:FINAL_INVOICE": "Доставка клиенту произведена | Ожидание оплаты",
+                "C0:PAID": "Оплата получена | Закрытие сделки", "C0:WON": "Сделка успешна"}
 
     def deal_stages_process(self, cid=0):
         return {k: v for k, v in self.deal_stages_cat().items() if k != "C0:WON"}
 
     def spa_stage_meta(self, entity, cid):
-        return {f"DT172_{cid}:NEW": {"name": "Новый заказ", "sem": "P"},
-                f"DT172_{cid}:PREPARATION": {"name": "Производство заказа", "sem": "P"},
-                f"DT172_{cid}:SUCCESS": {"name": "Заказ закрыт", "sem": "S"}}
+        meta = {f"DT172_{cid}:{k}": {"name": nm, "sem": "S" if k == "SUCCESS" else "P"} for k, nm in CT_OSTAGES}
+        meta[f"DT172_{cid}:UC_OLD"] = {"name": "Архив (старая стадия)", "sem": "P"}
+        return meta
 
-    def stage_history(self, entity, *, category_id=None, since=None, last=None):
+    def departments(self):
+        return [dict(x) for x in CT_DEPTS]
+
+    def stage_history(self, entity, *, category_id=None, since=None, last=None, transitions=None):
         out: dict = {}
         for oid, st, ts in self.hist[entity]:
             if since and str(ts)[:10] < str(since)[:10]:
                 continue                    # как портал: история с отсечкой >=CREATED_TIME
             if last is not None:
                 last[oid] = (st, ts)
+            if transitions is not None:
+                transitions.setdefault(oid, []).append((st, ts))
             if st not in {s for s, _ in out.get(oid, [])}:
                 out.setdefault(oid, []).append((st, ts))
         return out
 
     def user_name(self, uid):
         return {"10": "Анна (КАМ)", "11": "Борис (КАМ)", "12": "Вера (КАМ)", "20": "Глеб (ОСС)",
-                "21": "Дина (ОСС)", "22": "Егор (ОСС)", "23": "Жанна (ОСС)"}.get(str(uid), f"user#{uid}")
+                "21": "Дина (ОСС)", "22": "Егор (ОСС)", "23": "Жанна (ОСС)",
+                **{u: p["name"] for u, p in CT_ROSTER.items()}}.get(str(uid), f"user#{uid}")
+
+
+class Шаг12Направления(ContractsStub):
+    """Придуманный корпус: у отдельного направления — сделка реализации (кат. 0) его компании с
+    одним живым заказом на шаге 12 (решение владельца 27.10.2026, Б). wait=True — «Заказ получен
+    клиентом», доставлен 28 дн. назад, УПД нет («ждём УПД от клиента»); wait=False —
+    «Ожидание оплаты» без факта доставки и без УПД (срок УПД не посчитать)."""
+
+    def __init__(self, *, wait: bool):
+        super().__init__()
+        import contracts as ct_
+        now = dt.datetime.fromisoformat(CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()      # noqa: E731
+        d = lambda a: (CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        stage = "GOT" if wait else "WAITPAY"
+        self.deals.append({"ID": "7808", "TITLE": "7808. Направление", "OPPORTUNITY": "1000",
+                           "CURRENCY_ID": "EUR", "COMPANY_ID": CT_SEP_CO, "STAGE_ID": "C0:FINAL_INVOICE",
+                           "STAGE_SEMANTIC_ID": "P", "CATEGORY_ID": "0", "DATE_CREATE": t(300),
+                           "ASSIGNED_BY_ID": "10", ct_.OSS_DEAL: ["21"], ct_.KAM_F: "11"})
+        self.hist[2] += [("7808", "C0:NEW", t(300)), ("7808", "C0:FINAL_INVOICE", t(20))]
+        o = {"id": 97808, "title": "7808/1. Узел", "companyId": "401", "parentId2": 7808, "opportunity": 100,
+             "currencyId": "EUR", "stageId": f"DT172_26:{stage}", "createdTime": t(300), "movedTime": t(5),
+             ct_.OSS_F: "21", ct_.DL_CUSTOMER: d(-30), ct_.SUP_PAID: 100, ct_.SHIP_FACT: d(60),
+             "assignedById": "31"}
+        if wait:
+            o[ct_.DEL_FACT] = d(28)
+        self.orders.append(o)
+        for k, st in enumerate(CT_PATH[:CT_PATH.index(stage) + 1]):
+            self.hist[172].append(("97808", f"DT172_26:{st}", t(300 - 15 * k)))
 
 
 def build_contracts(**kw) -> dict:
-    """Синтетика → настоящий contracts.compute → данные вкладки «Реализация»."""
+    """Синтетика → настоящий contracts.compute → данные вкладки «Реализация». Руководителя
+    ОРК (служебный ключ «_orkHead») main.py забирает до записи страницы — здесь так же;
+    keep_head=True — оставить (build_realization передаёт его в dealctx.build)."""
     import os
 
     import contracts as contracts_mod
+    keep_head = kw.pop("keep_head", False)
     old = os.environ.get("KVANT_NOW")
     os.environ["KVANT_NOW"] = CT_NOW
     try:
+        stub = kw.pop("stub", None) or ContractsStub()
+        kw.setdefault("people", CT_ROSTER)
+        kw.setdefault("departments", stub.departments())
         kw.setdefault("fx_loader", ct_fx_loader)
-        return contracts_mod.compute(ContractsStub(), as_of=CT_TODAY, people={}, **kw)
+        ct = contracts_mod.compute(stub, as_of=CT_TODAY, **kw)
+        if not keep_head:
+            ct.pop("_orkHead", None)
+        return ct
     finally:
         if old is None:
             os.environ.pop("KVANT_NOW", None)
@@ -657,7 +863,9 @@ def realctx_raw() -> dict:
         "6002": v(state="ждёт_нас", ball="кам", reply=True, human=2.5),
         "6004": v(state="ждёт_поставщика", due=d(6), due_kind="отгрузка",
                   blocker={"kind": "поставка", "on": "поставщик"}),
-        "6005": v(human=2.0),                                                     # сборке недоступен, работа идёт
+        # сборке недоступен, работа идёт (кандидат «Замедлено» — шаг ОРК сверх нормы; у 6005 до
+        # 27.10.2026 было «ждём УПД от клиента», а это уже не простой — решение владельца, Б)
+        "6020": v(human=2.0),
         "6006": v(reply=True, ball="сопровождение", human=4.0),                 # с четверга: 48 будних часов
         "6008": v(state="стоит", direction="назад", risk="высокий", kinds=("срок", "оплата"),
                   due=d(-5), due_kind="оплата"),
@@ -695,18 +903,22 @@ def realctx_raw() -> dict:
 
 def build_realization() -> dict:
     """«Реализация» со сводом чатов и договоров — как main.py: contracts.compute с чатами и
-    финальной экономикой свода, затем dealctx.build. → {"contracts": …, "dealctx": …} для dashboard.write."""
+    финальной экономикой свода, затем dealctx.build. → {"contracts": …, "dealctx": …, "ork_month": …}
+    для dashboard.write."""
     import dealctx
     ctx = dealctx.clean(realctx_raw())
-    ct = build_contracts(ctx_chats=ctx["chats"], ctx_econ=ctx["econ"])
+    ct = build_contracts(ctx_chats=ctx["chats"], ctx_econ=ctx["econ"], ctx_contracts=ctx["contracts"],
+                         keep_head=True)
+    ork_month = ct.pop("orkMonth", None)  # как main.py: поимённое — не в данные вкладки, своим массивом
+    ork_head = ct.pop("_orkHead", "")
     import contracts as contracts_mod
     head, payload = dealctx.build(ct["rows"], contracts_mod.life_all(ct), ctx, dt.datetime.fromisoformat(CT_NOW),
-                                  today=CT_TODAY)
+                                  today=CT_TODAY, ork_head=ork_head)
     sep = head.pop("sep", None)
     ct["head"]["ctx"] = head
     if sep is not None and ct.get("sep"):
         ct["sep"]["head"]["ctx"] = sep
-    return {"contracts": ct, "dealctx": payload}
+    return {"contracts": ct, "dealctx": payload, "ork_month": ork_month}
 
 
 # ── «Пресейл» для очереди КАМа и золотого правила чата. Стадии — имена воронки

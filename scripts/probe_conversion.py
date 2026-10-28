@@ -498,8 +498,11 @@ def товарные_строки(client, ids):
     return {d: len(ряды) for d, ряды in строки_сделок(client, ids).items()}
 
 
-def читать_историю(client, ids, стадии=None, категория=None):
-    """История стадий пачками по 50 сделок, со сверкой с total. → (история, ошибка).
+def читать_историю(client, ids, стадии=None, категория=None, entity: int = 2):
+    """История стадий пачками по 50 записей, со сверкой с total. → (история, ошибка).
+
+    entity — entityTypeId: 2 сделки (по умолчанию), 172 заказы, 137 счета — зонд v60
+    читает тем же путём историю заказов и выборку счетов.
 
     стадии — только входы в эти стадии (STAGE_ID массивом), категория — только
     входы в стадии этой воронки (CATEGORY_ID): зонд v59 берёт так входы в стадию
@@ -518,7 +521,7 @@ def читать_историю(client, ids, стадии=None, категори
         start, total, got = 0, None, 0
         while True:
             data = client.call_envelope("crm.stagehistory.list", {
-                "entityTypeId": 2, "filter": фильтр,
+                "entityTypeId": int(entity), "filter": фильтр,
                 "select": ["ID", "OWNER_ID", "CREATED_TIME", "STAGE_ID"],
                 "order": {"ID": "ASC"}, "start": start}) or {}
             res = data.get("result") or {}
