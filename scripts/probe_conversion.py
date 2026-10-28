@@ -498,7 +498,7 @@ def товарные_строки(client, ids):
     return {d: len(ряды) for d, ряды in строки_сделок(client, ids).items()}
 
 
-def читать_историю(client, ids, стадии=None, категория=None, entity: int = 2):
+def читать_историю(client, ids, стадии=None, категория=None, entity: int = 2, сводка: dict | None = None):
     """История стадий пачками по 50 записей, со сверкой с total. → (история, ошибка).
 
     entity — entityTypeId: 2 сделки (по умолчанию), 172 заказы, 137 счета — зонд v60
@@ -507,9 +507,20 @@ def читать_историю(client, ids, стадии=None, категори
     стадии — только входы в эти стадии (STAGE_ID массивом), категория — только
     входы в стадии этой воронки (CATEGORY_ID): зонд v59 берёт так входы в стадию
     предложения и в кат. 0, не читая всю историю. Сработал ли фильтр, проверяется
-    по ответу, как и фильтр OWNER_ID. Без них — все входы, как прежде."""
+    по ответу, как и фильтр OWNER_ID. Без них — все входы, как прежде.
+
+    CATEGORY_ID записи истории — не воронка её стадии (зонд v60, прогон 40661587621:
+    части 2 и 4 из 10 упали на «фильтр CATEGORY_ID не сработал»): у сделки, сменившей
+    воронку, портал отдаёт по CATEGORY_ID = 0 и записи с «C2:…». Поэтому с категорией
+    в select идёт и CATEGORY_ID записи: запись чужой воронки, у которой CATEGORY_ID
+    равен запрошенному, — фильтр сработал, сделка переезжала; такая запись отбрасывается
+    и считается (сводка: {"чужие": записей, "сделок_чужих": сделок}). Остановка — когда
+    фильтр явно не сработал: CATEGORY_ID записи другой или его нет в ответе. Точный
+    выбор входов в стадии воронки — стадии= её STAGE_ID (contracts.py, зонд v60)."""
     история: dict[str, list] = {}
     стадии = {str(s) for s in стадии} if стадии else None
+    кат = str(int(категория)) if категория is not None else None
+    чужие: dict[str, int] = {}
     for i in range(0, len(ids), 50):
         часть = [int(x) for x in ids[i:i + 50]]
         свои = {str(x) for x in часть}
@@ -522,7 +533,7 @@ def читать_историю(client, ids, стадии=None, категори
         while True:
             data = client.call_envelope("crm.stagehistory.list", {
                 "entityTypeId": int(entity), "filter": фильтр,
-                "select": ["ID", "OWNER_ID", "CREATED_TIME", "STAGE_ID"],
+                "select": ["ID", "OWNER_ID", "CREATED_TIME", "STAGE_ID"] + (["CATEGORY_ID"] if кат else []),
                 "order": {"ID": "ASC"}, "start": start}) or {}
             res = data.get("result") or {}
             items = (res.get("items") if isinstance(res, dict) else res) or []
@@ -534,12 +545,15 @@ def читать_историю(client, ids, стадии=None, категори
                     return история, "фильтр OWNER_ID массивом не сработал — обход остановлен"
             if стадии and any(str(x.get("STAGE_ID") or "") not in стадии for x in items):
                 return история, "фильтр STAGE_ID массивом не сработал — обход остановлен"
-            if категория is not None and any(воронка_стадии(x.get("STAGE_ID")) != str(int(категория))
-                                             for x in items):
+            if кат is not None and any(воронка_стадии(x.get("STAGE_ID")) != кат
+                                       and str(x.get("CATEGORY_ID", "")) != кат for x in items):
                 return история, "фильтр CATEGORY_ID не сработал — обход остановлен"
             got += len(items)
             for x in items:
                 o, s = str(x.get("OWNER_ID")), str(x.get("STAGE_ID") or "")
+                if кат is not None and воронка_стадии(s) != кат:
+                    чужие[o] = чужие.get(o, 0) + 1     # сделка переезжала: вход не в эту воронку
+                    continue
                 t = str(x.get("CREATED_TIME") or "")
                 # Все входы, а не только первый в стадию: сделка, заведённая в кат. 0
                 # (NEW), переведённая в предпродажу и выигранная обратно в NEW, иначе
@@ -553,6 +567,9 @@ def читать_историю(client, ids, стадии=None, категори
             start = nxt
         if got < total:
             return история, f"история стадий неполна в пачке {i // 50 + 1}: {got} из {total}"
+    if сводка is not None:
+        сводка["чужие"] = сводка.get("чужие", 0) + sum(чужие.values())
+        сводка["сделок_чужих"] = сводка.get("сделок_чужих", 0) + len(чужие)
     return история, None
 
 
