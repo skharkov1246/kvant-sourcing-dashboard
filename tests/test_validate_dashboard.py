@@ -141,10 +141,39 @@ def test_вставка_проверяет_вкладку_направления
         page.unlink()
     assert vd.CT_SEP_BODY in js and vd.CT_SEP_EMPTY in js and vd.CT_MAIN_BODY in js
     assert "HashChangeEvent('hashchange')" in js and "потерян её адрес" in js
-    assert js.rstrip().endswith("SO.click()}}catch(e){kvFail('Реализация, адрес вкладки: '+e)}</script></body></html>")
+    assert js.rstrip().endswith("SO.click()}}catch(e){kvFail('Реализация, адрес вкладки: '+e)}"
+                                "XLC(document,'вся страница')</script></body></html>")
     errors: list[str] = []
     vd._check_tabs_dom(js.replace("</body>", "<span>ок</span></body>"), errors)
     assert not errors
+
+
+def test_вставка_проверяет_кнопки_excel_и_журнал_шагов(tmp_path):
+    """Выгрузка в Excel (просьба владельца 29.10.2026): гейт после каждой подвкладки «Реализации»
+    и по всей странице в конце ищет таблицы без кнопки «Excel» (метка data-xl-on и полоса .xlbar
+    над таблицей); при данных «Месяца» — журнал шагов со строками и своей кнопкой."""
+    page = vd._with_tabs_opened(_page(tmp_path))
+    try:
+        js = page.read_text(encoding="utf-8")
+    finally:
+        page.unlink()
+    assert "function XLC(r,w)" in js and "таблиц без кнопки выгрузки" in js and "кнопки над таблицей нет" in js
+    assert "XLC(p,'Реализация, '+k+' ('+d+')')" in js and "XLC(document,'вся страница')" in js
+    assert "журнал шагов «Месяца» не отрисовался" in js and "у журнала шагов нет кнопки Excel" in js
+    errors: list[str] = []
+    vd._check_tabs_dom(js.replace("</body>", "<span>ок</span></body>"), errors)
+    assert not errors
+
+
+def test_метка_таблицы_без_кнопки_excel_роняет_проверку(tmp_path, monkeypatch):
+    """Таблица без кнопки «Excel» — метка в DOM от вставленной проверки, и гейт падает с её текстом."""
+    bad = ('<html><body><div id="tab-sourcing">ок</div><div id="tab-company"></div>'
+           + "<span>наполнитель</span>" * 4000
+           + f'<div {vd.KV_FAIL}="">Excel, вся страница: таблиц без кнопки выгрузки 2</div></body></html>')
+    _fake_runs(monkeypatch, lambda p: (bad, ""))
+    errors, warns = [], []
+    vd.check_browser(_page(tmp_path), errors, warns)
+    assert any("таблиц без кнопки выгрузки 2" in e for e in errors)
 
 
 def test_временный_файл_с_вкладками_не_остаётся_на_диске(tmp_path, monkeypatch):

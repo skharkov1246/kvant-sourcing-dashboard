@@ -18,6 +18,17 @@ S1–S10, контракт показателя). Решения владель�
 Решение владельца 27.10.2026, Б: УПД дольше 10 р.д. от доставки — «ждём УПД от клиента»
 (judged.waitUtd, WAIT_CODE), а не «сверх нормы» менеджера ОРК (OVER_CODE — шаги 1, 4, 5, 8).
 
+Вопрос владельца 29.10.2026 «как считает срок»: приёмка (шаг 1, Рег. 3) — принять сделку и
+назначить менеджера ОРК. Она кончается РАНЬШЕ из двух: выход заказа на шаг ≥ 2 по стадии или
+«Дата записи нового ответственного» заказа (assignDate) — если она не раньше дня начала
+приёмки по МСК, не позже конца окна (contracts) и ответственный заказа из отдела ОРК (orkMgr):
+assign_at. После назначения идёт шаг 4 «Подготовка договора с поставщиком» (менеджер ОРК,
+2 р.д.), а стадия законно остаётся «Заказ создан» до направления заказа: это мягкая граница
+шага (ASSIGN_FLOOR) — её видят step_now, overrun, «брошенная карточка» на мягкой границе,
+полнота карточки (passed_at) и сегменты S1/S2, но не «стадия позади фактов» (hygiene.behind).
+Срок шага и откуда он меряется — clock: шаг 4 — от назначения, и после направления заказа
+(«Заказ направлен» — тот же шаг 4), возврат — от повторного входа.
+
 Пороги доверия (GATES) — предложение, ждут решения владельца.
 """
 from __future__ import annotations
@@ -175,10 +186,20 @@ FACT_FLOOR = (
     (("delFact",), 11),                        # доставлено клиенту
     (("utd",), 13),                            # УПД подписан (сырые UTD_DATE / файл) — шаг 12 пройден
 )
+# мягкая нижняя граница (вопрос владельца 29.10.2026): назначение менеджера ОРК записано
+# («Дата записи нового ответственного», contracts.ASSIGN_AT → assignDate заказа, assign_at) —
+# приёмка сделана, заказ на шаге 4 «Подготовка договора с поставщиком», хотя стадия ещё «Заказ
+# создан»: до направления заказа она так и стоит (Рег. 3.3, 6.1; «Заказ направлен» — шаг 4 у
+# заказа). Только у стадии шага 1 и только там, где меряется срок (step_now, overrun, clock,
+# брошенная карточка, сегменты S1/S2): в fact_floor её нет, «стадия позади фактов» её не видит —
+# стадия при назначении не отстала
+ASSIGN_FLOOR = 4
 
 # --- сегменты S1–S10 «Системы аналитики» ----------------------------------------------------
 # начало и конец — первый выход заказа на шаг не ниже указанного (по всем переходам);
-# "t0" — max(создание заказа, вход сделки в кат. 0); "delFact"/"utd" — даты фактов.
+# "t0" — max(создание заказа, вход сделки в кат. 0); "delFact"/"utd" — даты фактов. Выход на
+# шаги 2–4 — и назначение менеджера ОРК, если оно раньше выхода из «Заказ создан» по стадии
+# (ASSIGN_FLOOR, segments): конец S1 и начало S2 — раньше из двух (endBy / startBy).
 SEGMENTS = (
     ("S1", "Приёмка", "t0", 2, "orkHead"),
     ("S2", "Договор с поставщиком", 4, 5, "orkMgr"),
@@ -276,6 +297,23 @@ _STAGE_HEAD = {kind: {norm_name(k).split(" | ")[0]: v for k, v in m.items()}
 _STAGE_SPAN = {kind: {norm_name(k): v for k, v in m.items()} for kind, m in STAGE_SPAN.items()}
 
 
+# «900/1» в начале названия; дата («15/10/2025», «15/10.2025») — не номер заказа
+_ORDER_NO = re.compile(r"\s*(\d{1,4})\s*/\s*(\d{1,3})(?!\d|\s*[/.]\d)")
+
+
+def order_label(title, oid="") -> tuple[str, int | None]:
+    """Номер заказа, как его пишет портал: «900/1» — № сделки реализации и № заказа в начале
+    названия карточки СП-172 («900/1. …»; владелец 29.10.2026: «сделка одна — заказы разные
+    1/2/3»). Номера в названии нет (или в начале дата) — «id <id карточки>»: по нему заказ
+    находится в Битриксе. Номер сделки в названии не сверяется с № реализации (карточку могли
+    скопировать из другой сделки): несовпадение показывает страница — «№<№ сделки> · <номер>».
+    → (подпись, № заказа для сортировки; нет номера — None)."""
+    m = _ORDER_NO.match(str(title or ""))
+    if m:
+        return f"{int(m.group(1))}/{int(m.group(2))}", int(m.group(2))
+    return (f"id {oid}" if oid not in (None, "") else ""), None
+
+
 def stage_step(stage_name, kind: str = "order") -> int | None:
     """Шаг по одному имени стадии, без фактов; неизвестная стадия — None."""
     n = norm_name(stage_name)
@@ -308,15 +346,54 @@ def step_of(stage_name, facts: dict | None = None, *, kind: str = "order",
     return max(base, fact_floor(facts))
 
 
+def _start_day(order: dict) -> dt.date | None:
+    """День начала приёмки по МСК: t0 (max(создание заказа, вход сделки в реализацию)), без него
+    — день создания заказа."""
+    return _d(order.get("t0")) or _d(order.get("created"))
+
+
+def assign_at(order: dict) -> dt.date | None:
+    """Назначение менеджера ОРК, которому верим (вопрос владельца 29.10.2026): «Дата записи
+    нового ответственного» заказа (assignDate) не раньше дня начала приёмки (_start_day, МСК), и
+    ответственный заказа — из отдела ОРК (orkMgr, contracts: решение 26.10.2026). Раньше начала
+    — дата скопирована или устарела (assign_stale); ответственный не из ОРК — менеджер ОРК не
+    назначен, приёмка не сделана (assign_no_mgr): не в счёт, оба — счётом. Дата позже конца окна
+    отброшена при чтении (contracts: на конец окна назначения ещё не было). Дня начала нет —
+    None: сверить не с чем."""
+    a, s = _d(order.get("assignDate")), _start_day(order)
+    return a if a and s and a >= s and order.get("orkMgr") else None
+
+
+def assign_stale(order: dict) -> bool:
+    """«Дата записи нового ответственного» есть, но раньше дня начала приёмки — не в счёт (счёт)."""
+    a, s = _d(order.get("assignDate")), _start_day(order)
+    return bool(a and s and a < s)
+
+
+def assign_no_mgr(order: dict) -> bool:
+    """Дата записи есть и не раньше начала приёмки, а ответственный заказа не из отдела ОРК
+    (orkMgr пуст): назначения менеджера ОРК нет — не в счёт (счёт). Поле сделки «Ответственный
+    за реализацию» дату не даёт: она пишется при смене ответственного заказа."""
+    a, s = _d(order.get("assignDate")), _start_day(order)
+    return bool(a and s and a >= s and not order.get("orkMgr"))
+
+
 def step_now(order: dict, *, unknown: Counter | None = None) -> int | None:
     """Шаг живого заказа — ОДИН для ведомости, W2, очереди, таблицы сделок, карточки заказа,
     «Замедлено» и хозяина пункта: по стадии и фактам (step_of; стадии нет — по фактам).
     Доставлено клиенту, УПД нет — шаг 12 (УПД, менеджер ОРК; срок — от факта доставки,
     Рег. 14.2.5), даже если стадия — «Заказ получен клиентом» (шаг 11) или ниже, и даже
     если стадии нет в таблице шагов: срок шага 12 стадии не требует. Стадия не из таблицы и
-    доставки нет — None (имя — в `unknown`)."""
+    доставки нет — None (имя — в `unknown`).
+
+    Стадия шага 1 («Заказ создан»), факты шаг не подняли, а назначение менеджера ОРК записано
+    (assign_at) — шаг 4 «Подготовка договора с поставщиком» (мягкая граница ASSIGN_FLOOR, вопрос
+    владельца 29.10.2026): приёмка сделана, срок шага 4 — от назначения (clock), хозяин —
+    менеджер ОРК. Это не «стадия позади фактов»: до направления заказа стадия законно стоит."""
     if order.get("stage"):
         st = step_of(order.get("stage"), order)
+        if st == 1 and assign_at(order):
+            st = ASSIGN_FLOOR
     else:
         st = fact_floor(order)
     if (st is None or st == 11) and order.get("delFact") and not order.get("utd"):
@@ -380,7 +457,8 @@ def _reach(tr: list, steps: list) -> dict[int, tuple[dt.datetime, int]]:
 
 def reach_times(transitions: list, names: dict) -> dict[int, str]:
     """{шаг: ISO-время первого выхода на шаг не ниже} по всем переходам заказа — тот же
-    счёт, что у границ сегментов (segments)."""
+    счёт, что у границ сегментов (segments). Только переходы: назначение менеджера ОРК
+    (ASSIGN_FLOOR) сюда не входит — по нему clock узнаёт, что вход в шаг 4 по стадии первый."""
     tr = _sorted_tr(transitions)
     steps = [stage_step(names.get(s, s)) for s, _ in tr]
     return {k: t.isoformat() for k, (t, _i) in _reach(tr, steps).items()}
@@ -393,15 +471,29 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
 
     names — {STAGE_ID: имя стадии}. Граница сегмента — ПЕРВЫЙ выход заказа на шаг не ниже
     нужного (пропущенная стадия не теряет сегмент). t0 — начало приёмки (max(создание
-    заказа, вход сделки в кат. 0)); без него — первый переход. facts — {delFact, utdRaw}:
-    даты доставки и подписания УПД (сырые, без подстановки) для S9 и S10.
+    заказа, вход сделки в кат. 0)); без него — первый переход. facts — {delFact, utdRaw,
+    assignAt}: даты доставки и подписания УПД (сырые, без подстановки) для S9 и S10 и
+    «Дата записи нового ответственного» для S1 и S2.
 
-    → {"segs": {S: {start, end, wd, cd, norm, inNorm, neg, ret, burst, burstEnd, skip}}, "open": {S, start} | None,
-       "returns": n, "returnPairs": [(шаг из, шаг в)], "burst": bool, "unknown": n,
-       "noCalendar": bool}. wd — рабочие дни (None — года нет в календаре), cd — календарные.
-    skip — шаг пропущен: начало и конец сегмента дал один переход (стадия перепрыгнула шаг,
-    Рег. 6.13–6.14; Ан. S2 — рамочный договор уже есть). Такой сегмент не «в норме за 0 р.д.»:
-    в своевременность и сроки он не идёт, а считается отдельно."""
+    Приёмка (S1) кончается РАНЬШЕ из двух (вопрос владельца 29.10.2026): выход на шаг ≥ 2 по
+    стадии или назначение менеджера ОРК (assignAt) — оно же начало S2 (шаг 4 идёт с назначения,
+    стадия до направления заказа законно стоит в «Заказ создан»; ASSIGN_FLOOR). Назначение
+    раньше дня начала приёмки (МСК) — скопировано или устарело: не в счёт (assignIgnored). Р.д. —
+    по датам, как у всех сегментов; в один день со стадией граница — стадия (у перехода есть
+    время, у даты записи — только день; р.д. те же); дата без времени в день начала — не раньше
+    начала (конец не «раньше начала»).
+
+    → {"segs": {S: {start, end, wd, cd, norm, inNorm, neg, ret, burst, burstEnd, skip, startBy,
+       endBy}}, "open": {S, start} | None, "returns": n, "returnPairs": [(шаг из, шаг в)],
+       "burst": bool, "unknown": n, "noCalendar": bool, "assignUsed": bool, "assignIgnored": bool}.
+    wd — рабочие дни (None — года нет в календаре), cd — календарные. startBy / endBy — чем
+    дана граница: «стадия» (переход), «назначение» (assignAt), «начало приёмки» (t0), «факт»
+    (доставка, УПД). skip — шаг пропущен: начало и конец сегмента по СТАДИИ дал один переход
+    (стадия перепрыгнула шаг, Рег. 6.13–6.14; Ан. S2 — рамочный договор уже есть). Такой
+    сегмент не «в норме за 0 р.д.»: в своевременность и сроки он не идёт, а считается отдельно.
+    Назначение пропуск не отменяет: стадия прыгнула из «Заказ создан» сразу на шаг ≥ 5 — S2
+    пропущен и при начале с назначения (startBy «назначение», wd — от него; в своевременность
+    S2 не идёт, как и без назначения), — тот же счёт пропусков, что у зонда v60 (по переходам)."""
     tr = _sorted_tr(transitions)
     steps = [stage_step(names.get(s, s)) for s, _ in tr]
     unknown = sum(1 for x in steps if x is None)
@@ -421,9 +513,26 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
     point = {"t0": (_ts(t0), None) if t0 else reach.get(1, (None, None)),
              "delFact": (_ts(facts.get("delFact")), None),
              "utdRaw": (_ts(facts.get("utdRaw")), None)}
+    # назначение менеджера ОРК раньше выхода из «Заказ создан» (по дню МСК) — выход на шаги 2–4
+    soft: dict[int, tuple] = {}
+    asg, start = _ts(facts.get("assignAt")), point["t0"][0]
+    ignored = False
+    if asg is not None:
+        day = asg.astimezone(period_mod.MSK).date()
+        if start is None or day < start.astimezone(period_mod.MSK).date():
+            ignored = True
+        else:
+            asg = max(asg, start)
+            r2 = reach.get(2)
+            if r2 is None or day < r2[0].astimezone(period_mod.MSK).date():
+                soft = {k: (asg, None) for k in range(2, ASSIGN_FLOOR + 1)}
+    by_pt = {"t0": "начало приёмки", "delFact": "факт", "utdRaw": "факт"}
 
     def at(p):
-        return point[p] if isinstance(p, str) else reach.get(p, (None, None))
+        return point[p] if isinstance(p, str) else soft.get(p) or reach.get(p, (None, None))
+
+    def by(p) -> str:
+        return by_pt[p] if isinstance(p, str) else ("назначение" if p in soft else "стадия")
 
     segs: dict[str, dict] = {}
     open_seg = None
@@ -447,10 +556,14 @@ def segments(transitions: list, names: dict, workdays_fn=period_mod.workdays_ru,
             "ret": any(ta < r <= tb for r in ret_times),
             "burst": (ia in in_burst) or (ib in in_burst),
             "burstEnd": ib in in_burst,               # конец сегмента прокликан «пачкой» (Q1 — вход в «Заказ готов»)
-            "skip": ia is not None and ia == ib,
+            # пропуск — по переходам стадии (не по назначению): прыжок 1 → 5 пропускает S2 и
+            # тогда, когда S2 начат назначением
+            "skip": ib is not None and ib == (reach.get(a, (None, None))[1] if isinstance(a, int) else ia),
+            "startBy": by(a), "endBy": by(b),        # чем дана граница (правило 16)
         }
     return {"segs": segs, "open": open_seg, "returns": returns, "returnPairs": pairs,
-            "burst": bool(in_burst), "unknown": unknown, "noCalendar": no_cal}
+            "burst": bool(in_burst), "unknown": unknown, "noCalendar": no_cal,
+            "assignUsed": bool(soft), "assignIgnored": ignored}
 
 
 def step_since(transitions: list, names: dict) -> tuple[int | None, str]:
@@ -481,21 +594,63 @@ def _d(v) -> dt.date | None:
     return t.astimezone(period_mod.MSK).date() if t else None
 
 
+def _first_stay(order: dict, step: int) -> bool:
+    """Текущее пребывание на шаге — первое: вход в шаг (stepSince) и есть первый выход заказа
+    на этот шаг по переходам (_reach, ork.reach_times). Переходов нет — неизвестно: False."""
+    r = order.get("_reach") or {}
+    first = _ts(r.get(step) or r.get(str(step)))
+    entry = _ts(order.get("stepSince"))
+    return bool(first and entry and first == entry)
+
+
+def clock(order: dict, step: int | None) -> tuple[dt.date | None, str]:
+    """(день, от которого меряется срок шага живого заказа, чем он дан) — один у overrun,
+    очереди («с дд.мм» у пункта), карточки заказа и брошенной карточки (hygiene):
+      шаг 12 — от факта доставки клиенту («доставка», Рег. 14.2.5);
+      шаг 1 — от начала приёмки t0 («начало приёмки»), без t0 — от входа в шаг;
+      шаг 4 — от назначения менеджера ОРК («назначение», assign_at; вопрос владельца
+        29.10.2026), если стадия ещё шага 1 (мягкая граница ASSIGN_FLOOR) или заказ впервые
+        вышел на шаг 4 по стадии позже назначения: шаг 4 начался с назначения, и направление
+        заказа («Заказ направлен» — тот же шаг 4) счёт не обнуляет; возврат на шаг 4 — от
+        повторного входа, в том числе возврат в «Заказ создан» после шагов ≥ 2 (по переходам
+        _reach): от возврата, а назначение позже возврата — от него;
+      иначе — от входа в шаг по стадии (stepSince, без него — stageSince; «вход в шаг»)."""
+    entry = _d(order.get("stepSince")) or _d(order.get("stageSince"))
+    if step == 12:
+        return _d(order.get("delFact")), "доставка"
+    if step == 1:
+        t0 = _d(order.get("t0"))
+        return (t0, "начало приёмки") if t0 else (entry, "вход в шаг")
+    if step == ASSIGN_FLOOR:
+        a = assign_at(order)
+        if a and stage_step(order.get("stage")) == 1:
+            r = order.get("_reach") or {}
+            back = bool(r.get(2) or r.get("2"))       # стадия уже выходила на шаг ≥ 2 — возврат
+            if back and entry and entry >= a:
+                return entry, "вход в шаг"
+            return a, "назначение"
+        if a and entry and a < entry and _first_stay(order, ASSIGN_FLOOR):
+            return a, "назначение"
+    return entry, "вход в шаг"
+
+
 def overrun(order: dict, today: dt.date, workdays_fn=None) -> dict:
     """Срок шага живого заказа против нормы регламента (р.д., «без пауз»).
 
     order: stage (имя стадии), stepSince (вход в шаг, ork.step_since; без него —
-    stageSince, вход в текущую стадию), t0 (начало приёмки) и факты (supPaidPct, prodConf,
-    shipFact, inbFact, delFact, utd). Шаг — step_now; шаг 1 меряется от t0, шаг 12 — от
-    доставки клиенту. Без стадии меряется только шаг 12 (срок — от факта, стадия не нужна).
-    → {step, role, norm, normDoc, normState, wd, over, by, since, label, why}; over None —
-    нормы нет, портал её не меряет (normState nodata) или срок не посчитать (why)."""
+    stageSince, вход в текущую стадию), t0 (начало приёмки), assignDate (назначение менеджера
+    ОРК), _reach (первые выходы на шаги) и факты (supPaidPct, prodConf, shipFact, inbFact,
+    delFact, utd). Шаг — step_now; откуда меряется срок — clock: шаг 1 — от t0, шаг 4 — от
+    назначения (если приёмку закончило оно), шаг 12 — от доставки клиенту. Без стадии меряется
+    только шаг 12 (срок — от факта, стадия не нужна).
+    → {step, role, norm, normDoc, normState, wd, over, by, since, sinceBy, label, why}; over
+    None — нормы нет, портал её не меряет (normState nodata) или срок не посчитать (why)."""
     fn = workdays_fn or period_mod.workdays_ru
     step = step_now(order)
     doc = NORM_DOC.get(step, ("", "none", ""))
     out = {"step": step, "role": EXECUTOR.get(step) if step else None, "norm": None, "wd": None,
            "normDoc": doc[0], "normState": doc[1],
-           "over": None, "by": None, "since": "", "label": NO_PAUSE, "why": ""}
+           "over": None, "by": None, "since": "", "sinceBy": "", "label": NO_PAUSE, "why": ""}
     if step is None:
         out["why"] = "стадия не из таблицы шагов"
         return out
@@ -505,19 +660,14 @@ def overrun(order: dict, today: dt.date, workdays_fn=None) -> dict:
         out["why"] = (f"норма {doc[0]} — нет данных: {doc[2]}" if doc[1] == "nodata"
                       else "шаг не нормируется")
         return out
-    if step == 12:
-        since = _d(order.get("delFact"))
-    elif not order.get("stage"):
+    if step != 12 and not order.get("stage"):
         out["why"] = "стадии нет — срок шага не посчитать"
         return out
-    elif step == 1:
-        since = _d(order.get("t0")) or _d(order.get("stepSince")) or _d(order.get("stageSince"))
-    else:
-        since = _d(order.get("stepSince")) or _d(order.get("stageSince"))
+    since, since_by = clock(order, step)
     if since is None:
         out["why"] = "нет факта доставки" if step == 12 else "нет даты входа в шаг"
         return out
-    out["since"] = since.isoformat()
+    out["since"], out["sinceBy"] = since.isoformat(), since_by
     wd = fn(since, today)
     if wd is None:
         out["why"] = "год без производственного календаря"
@@ -533,6 +683,10 @@ def judged(order: dict, today: dt.date, *, in_cat0: bool = True, workdays_fn=Non
     очереди (s1Over…s6Over, noUtd), ведомости, «Сверх нормы по менеджерам» и W2: overrun, а в
     счёт не идут гигиена карточки (hygiene: стадия позади фактов, брошенная, старая доставка
     без УПД) и приёмка заказа сделки вне воронки «Реализация» (Рег. 3.3).
+
+    Приёмку вне «Реализации» не меряем, а шаг 4 — меряем у любой сделки, как у «Заказ
+    направлен»: заказ такой сделки в «Заказ создан» с назначением менеджера ОРК (мягкая граница
+    ASSIGN_FLOOR) — шаг 4 и в счёте (до 29.10.2026 был шагом 1 вне счёта).
 
     Шаг 12 (УПД) — не «сверх нормы» менеджера (решение владельца 27.10.2026, Б): больше 10 р.д.
     от доставки без УПД — waitUtd («ждём УПД от клиента»), over — False. Пункт noUtd очередь
@@ -597,6 +751,12 @@ def hygiene(order: dict, today: dt.date, workdays_fn=None) -> dict:
     счёт «сверх нормы» и сегментов не идут. Срок УПД (шаг 12) идёт от факта доставки:
     отставшая стадия его не портит — у шага 12 исключает только старая доставка.
     Вход в шаг раньше первого года календаря — нижняя граница р.д. от 1 января этого года.
+    «Заказ создан» с назначением менеджера ОРК (мягкая граница ASSIGN_FLOOR) — не «позади
+    фактов» (fact_floor её не знает): шаг 4, «брошенная» меряется на нём от назначения (clock) —
+    назначение и есть последнее движение карточки. Шаг по стадии (в том числе «Заказ направлен»)
+    — застой карточки от последнего движения стадии (stepSince), а не от назначения: срок шага 4
+    (overrun) у направленного заказа идёт от назначения, но карточку, которую двигали 7 р.д.
+    назад, брошенной не назовёшь.
     → {behind, abandoned, old, unknown, exclude, why}."""
     fn = workdays_fn or period_mod.workdays_ru
     base = stage_step(order.get("stage"))
@@ -610,10 +770,14 @@ def hygiene(order: dict, today: dt.date, workdays_fn=None) -> dict:
         why.append("стадия не из таблицы шагов")
     if behind:
         why.append(f"стадия — шаг {base}, по фактам — не ниже {floor}")
-    norm = NORM_WD.get(base) if base else None
+    # шаг карточки — по стадии; при стадии шага 1 и назначении — шаг 4 (step_now)
+    eff = ASSIGN_FLOOR if (base == 1 and now == ASSIGN_FLOOR) else base
+    norm = NORM_WD.get(eff) if eff else None
     if norm is not None and norm <= GATES["abandoned_norm_max"] and not behind:
-        since = (_d(order.get("t0")) if base == 1 else None) or _d(order.get("stepSince")) \
-            or _d(order.get("stageSince"))
+        # мягкая граница — от назначения (clock); шаг по стадии — от последнего движения стадии
+        since = (clock(order, eff)[0] if eff != base else
+                 (_d(order.get("t0")) if base == 1 else None) or _d(order.get("stepSince"))
+                 or _d(order.get("stageSince")))
         wd = fn(since, today) if since else None
         if wd is None and since:
             years = period_mod.workcal_years()
@@ -623,7 +787,7 @@ def hygiene(order: dict, today: dt.date, workdays_fn=None) -> dict:
                 wd = lo if lo is not None and lo > GATES["abandoned_wd"] else None
         if wd is not None and wd > GATES["abandoned_wd"]:
             abandoned = True
-            why.append(f"{wd} р.д. на шаге {base} при норме {norm}")
+            why.append(f"{wd} р.д. на шаге {eff} при норме {norm}")
     df = _d(order.get("delFact"))
     if now == 12 and df and (today - df).days > CLOSE_DAYS:
         old = True
@@ -827,15 +991,31 @@ LOAD_BAND = 0.25                      # загрузка менеджера — 
 YEAR_DAYS = 365                       # сроки S5/S7/S8 и цикла — по завершённым за год
 
 
+def passed_at(o: dict, step: int, reach: dict | None = None) -> dt.date | None:
+    """День (МСК) первого выхода заказа на шаг не ниже `step`: по переходам (reach — {шаг: ISO},
+    без него — o["_reach"]), а на шагах 2–ASSIGN_FLOOR — назначение менеджера ОРК (assign_at),
+    если оно раньше: то же правило, что у конца S1 и начала S2 (segments). Одна дата у ведомости
+    недели (art_required) и полноты карточки «Месяца» (M2)."""
+    r = (o.get("_reach") if reach is None else reach) or {}
+    at = _d(r.get(step) or r.get(str(step)))
+    if 2 <= step <= ASSIGN_FLOOR:
+        a = assign_at(o)
+        if a and (at is None or a < at):
+            return a
+    return at
+
+
 def art_required(o: dict, a: dict, reach: dict | None = None) -> bool:
     """Обязан ли заказ иметь артефакт `a` (ARTIFACTS): заказ прошёл шаг need (по стадии и
     фактам) ПОСЛЕ даты создания поля (дизайн: «артефакт требуется только у заказов, прошедших
     шаг после даты создания поля»), условие выполнено.
 
-    Дата прохождения — первый выход на шаг need по переходам (reach — {шаг: ISO}). Её нет
-    (шаг пройден по фактам, история его не дала) — требуем, только если заказ создан не
-    раньше поля: тогда шаг пройден заведомо после; заказ старше поля или без даты создания —
-    не требуем (неизвестно — не «нет артефакта»). OC — только у импорта: o["import"] is True
+    Дата прохождения — passed_at: первый выход на шаг need по переходам (reach — {шаг: ISO}), а
+    на шагах 2–4 — и назначение менеджера ОРК, если оно раньше (мягкая граница ASSIGN_FLOOR: тот
+    же шаг, что у step_now, и та же дата, что у «Месяца», M2). Её нет (шаг пройден по фактам,
+    история его не дала) — требуем, только если заказ создан не раньше поля: тогда шаг пройден
+    заведомо после; заказ старше поля или без даты создания — не требуем (неизвестно — не «нет
+    артефакта»). OC — только у импорта: o["import"] is True
     (явного поля «импорт/РФ» нет, подписи «Направления поставки» не сверены — зонд v60), до
     сверки не требуется; проформа — при доле первичной оплаты > 0; платёжка поставщику —
     когда оплата была; платёжка клиента — у закрытого успехом."""
@@ -854,7 +1034,7 @@ def art_required(o: dict, a: dict, reach: dict | None = None) -> bool:
     if a["cond"] == "closed" and not o.get("success"):
         return False
     since = dt.date.fromisoformat(a["since"])
-    at = _d((reach or {}).get(a["need"]))
+    at = passed_at(o, a["need"], reach)
     if at is None:
         made = _d(o.get("created"))
         return bool(made and made >= since)

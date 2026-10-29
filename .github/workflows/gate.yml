@@ -60,7 +60,9 @@ jobs:
         # байтов до цены без него нечем. Остальные три workflow ставят его так же
         # — отдельной строкой, а не через requirements.txt, потому что сборке
         # дашборда он не нужен.
-        run: pip install --quiet -r requirements.txt ruff pytest pyyaml psycopg2-binary==2.9.10 pypdf
+        # openpyxl — тестам выгрузки дашборда в Excel (tests/test_xlsx_export.py): файл,
+        # собранный страницей без библиотек, открывается тем, чем его откроет человек.
+        run: pip install --quiet -r requirements.txt ruff pytest pyyaml psycopg2-binary==2.9.10 pypdf openpyxl
 
       - name: Ruff — ошибки кода
         run: ruff check .

@@ -833,7 +833,14 @@ def запись(o: dict, п: Прогон) -> dict:
              "utd": _есть(o.get(З["utdDate"])) or _есть(o.get(З["utdFile"]))}
     stage = names.get(str(o.get("stageId") or ""), "")
     reach, idx = достижения(tr, names)
-    seg = ork.segments(tr, names, t0=t0, facts={"delFact": факты["delFact"], "utdRaw": o.get(З["utdDate"])})
+    # приёмка кончается раньше из двух — стадия или назначение (ork.segments, как у вкладки);
+    # назначение — только у ответственного из отдела ОРК (ork.assign_at, как contracts: отдел не
+    # прочитан — назначения нет, как до 29.10.2026); опоры по отдельности — в «точках» (resp_date,
+    # reach2): их сверка от этого не зависит
+    отв = _uid(o.get("assignedById"))
+    орк_мен = отв if отв and отв in п.орк else ""
+    seg = ork.segments(tr, names, t0=t0, facts={"delFact": факты["delFact"], "utdRaw": o.get(З["utdDate"]),
+                                                "assignAt": _дн(o.get(З["respDate"])) if орк_мен else None})
     шаг_сейчас, с_шага = ork.step_since(tr, names)
     dreach, _ = достижения(дист, п.имена_сделки, "deal")
     задача = п.задачи.get(_uid(o.get(З["taskAssign"]))) or {}
@@ -846,15 +853,20 @@ def запись(o: dict, п: Прогон) -> dict:
         точки[f"reach{k}"] = reach.get(k)
     for k in ("supContract", "supPaid", "invPaid", "confirm", "produced", "shipped", "delivered"):
         точки[f"deal_{k}"] = _вр(сделка.get(Д[k]))
+    # назначение менеджера ОРК и начало приёмки — в шаг и срок, как у вкладки (ork.assign_at:
+    # «Заказ создан» с назначением — шаг 4 от назначения, вопрос владельца 29.10.2026)
     ord_ork = dict(факты, stage=stage, stepSince=с_шага if шаг_сейчас is not None else "",
                    stageSince=(sorted(tr, key=lambda x: str(x[1]))[-1][1] if tr else o.get("movedTime")),
                    t0=t0, prodStart=o.get(З["prodStart"]), prodEnd=o.get(З["prodEnd"]),
-                   shipPlan=o.get(З["shipPlan"]))
+                   shipPlan=o.get(З["shipPlan"]), assignDate=точки["resp_date"], created=создан,
+                   orkMgr=орк_мен, _reach={k: v.isoformat() for k, v in reach.items() if v})
     имена_шагов = [names.get(s, s) for s, _t in sorted(tr, key=lambda x: str(x[1]))]
     return {
         "id": oid, "did": did, "sem": o.get("_sem") or "P", "live": (o.get("_sem") or "P") == "P",
         "создан": создан, "пг": полугодие(создан), "stage": stage,
-        "step": шаг_заказа(stage, факты, (o.get("_sem") or "P") == "P"), "base": ork.stage_step(stage),
+        "step": шаг_заказа(stage, dict(факты, t0=t0, created=создан, assignDate=точки["resp_date"],
+                                       orkMgr=орк_мен),
+                           (o.get("_sem") or "P") == "P"), "base": ork.stage_step(stage),
         "факты": факты,
         "reach": reach, "idx": idx, "seg": seg, "точки": точки, "ork": ord_ork,
         "напр": метка(З["dir"], o.get(З["dir"]), п.подписи.get(З["dir"], {})),

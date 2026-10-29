@@ -166,6 +166,19 @@ def _pack_kaminc(head: dict) -> dict:
     return dict(head, deals=_pack_records(head.get("deals") or []))
 
 
+def _pack_ork_month(om: dict) -> dict:
+    """«Журнал шагов» «Месяца» (строка на заказ и отрезок — сотни одинаковых записей) —
+    упакованным списком, как сорсеры; шаблон разворачивает его тем же _unpack. Остальной
+    массив — как есть."""
+    out = {}
+    for k, v in om.items():
+        j = v.get("journal") if isinstance(v, dict) else None
+        if isinstance(j, dict) and isinstance(j.get("rows"), list):
+            v = dict(v, journal=dict(j, rows=_pack_records(j["rows"])))
+        out[k] = v
+    return out
+
+
 def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company: dict | None = None,
            kam: dict | None = None, eng: dict | None = None, prod: dict | None = None,
            contracts: dict | None = None, reps: dict | None = None, advisor: dict | None = None,
@@ -203,7 +216,8 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
         # показатели менеджеров ОРК поимённо (подвкладка «Месяц» «Реализации», orkview.py):
         # отдельный массив — воркер оставляет его только праву «Реализация: показатели
         # менеджеров ОРК» (решение владельца 26.10.2026, п. 3); в CONTRACTS их нет
-        "__ORKMONTH_JSON__": _json_for_script(ork_month) if ork_month else "null",
+        # «Журнал шагов» — внутри того же массива, под тем же правом (строки упакованы)
+        "__ORKMONTH_JSON__": _json_for_script(_pack_ork_month(ork_month)) if ork_month else "null",
     }
     html = re.sub("|".join(map(re.escape, вставки)), lambda m: вставки[m.group(0)], html)
     gen, nxt = _update_stamps()

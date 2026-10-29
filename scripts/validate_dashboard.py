@@ -288,8 +288,19 @@ def _with_tabs_opened(path: Path) -> Path:
     # направления, а переключателя нет — ошибка. Адрес (portal-ui §3): прежний #contracts/sep
     # на уже открытой странице открывает «Сделки и деньги» направления; уход на «Сорсинг» и
     # возврат возвращают его адрес #contracts/main/sep. В конце — снова «Сорсинг».
+    # Выгрузка в Excel (просьба владельца 29.10.2026): у каждой таблицы каждой вкладки и
+    # подвкладки — кнопка «Excel» (метка data-xl-on и полоса .xlbar перед таблицей или её
+    # обёрткой). Проверка — XLC после каждой открытой подвкладки и по всей странице в конце;
+    # «Месяц» с данными — журнал шагов отрисован, со строками и своей кнопкой.
     inject = ("<script>function kvFail(m){try{console.error(m);var d=document.createElement('div');"
               "d.setAttribute('%s','');d.textContent=m;document.body.appendChild(d)}catch(e){}}"
+              "function XLC(r,w){try{var T=[].slice.call(r.querySelectorAll('table')).filter(function(t){"
+              "return t.dataset.xl!=='off'}),N=T.filter(function(t){return !t.dataset.xlOn}),B=T.filter(function(t){"
+              "var p=t.parentElement,a=p&&/(^|\\s)(twrap|tscroll|pswrap)(\\s|$)/.test(p.className)?p:t,s=a.previousElementSibling;"
+              "return t.dataset.xlOn&&!(s&&s.classList.contains('xlbar'))});"
+              "if(N.length)kvFail('Excel, '+w+': таблиц без кнопки выгрузки '+N.length);"
+              "if(B.length)kvFail('Excel, '+w+': метка есть, кнопки над таблицей нет у '+B.length)}"
+              "catch(e){kvFail('Excel, '+w+': '+e)}}"
               "try{[%s].forEach(function(t){try{window.ensureTab&&window.ensureTab(t)}"
               "catch(e){kvFail('вкладка '+t+': '+e)}})}catch(e){kvFail('ensureTab: '+e)}"
               # «Доход» (kaminc.py) открывается первым разделом «Key-аккаунтов и продуктов»:
@@ -310,7 +321,8 @@ def _with_tabs_opened(path: Path) -> Path:
               "ALL=function(d){[%s].forEach(function(k){var b=SB(k);if(!b){kvFail('Реализация: нет подвкладки '+k);return}"
               "b.click();var p=document.getElementById('ctPanel-'+d);"
               "if(!p||p.hidden||!p.textContent.trim())kvFail('Реализация: подвкладка '+k+' ('+d+') пуста');"
-              "else if(p.textContent.indexOf('%s')>=0)kvFail('Реализация: подвкладка '+k+' ('+d+') не отрисовалась')})};"
+              "else if(p.textContent.indexOf('%s')>=0)kvFail('Реализация: подвкладка '+k+' ('+d+') не отрисовалась');"
+              "else XLC(p,'Реализация, '+k+' ('+d+')')})};"
               "if(CX&&Array.isArray(CX.rows))ALL('main');"
               "var ST=CQ('[role=\"tab\"][data-dir=\"sep\"]');"
               "if(ST){ST.click();ALL('sep');SB('main').click();if(!document.querySelector(CX&&CX.sep?'%s':'%s'))"
@@ -334,6 +346,13 @@ def _with_tabs_opened(path: Path) -> Path:
               "var DX=document.getElementById('drwX');if(DX)DX.click()}"
               "var MS=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');if(MS)MS.click()}}"
               "catch(e){kvFail('Реализация, «Что важно сегодня»: '+e)}"
+              "try{var OM=window.__ORKMONTH__,MO=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"month\"]');"
+              "if(OM&&OM.main&&OM.main.journal&&MO){MO.click();var JB=document.getElementById('orkJb');"
+              "if(!JB)kvFail('Реализация: журнал шагов «Месяца» не отрисовался');"
+              "else if(!JB.rows.length)kvFail('Реализация: журнал шагов без строк — нет даже строки состояния');"
+              "else if(!document.querySelector('#orkJ .xlbar .xlbtn'))kvFail('Реализация: у журнала шагов нет кнопки Excel');"
+              "var MS2=document.querySelector('#tab-contracts [role=\"tab\"][data-sub=\"main\"]');if(MS2)MS2.click()}}"
+              "catch(e){kvFail('Реализация, журнал шагов: '+e)}"
               "try{var TB=function(n){return [].slice.call(document.querySelectorAll('.tab'))"
               ".filter(function(x){return x.dataset.tab===n})[0]},CT=TB('contracts'),SO=TB('sourcing'),"
               "SEL=function(a){var x=document.querySelector('#tab-contracts [role=\"tab\"][data-'+a+'][aria-selected=\"true\"]');"
@@ -344,7 +363,8 @@ def _with_tabs_opened(path: Path) -> Path:
               "kvFail('Реализация: адрес #contracts/sep на открытой странице не открыл «Сделки и деньги» направления');"
               "SO.click();CT.click();if(location.hash!=='#contracts/main/sep')"
               "kvFail('Реализация: при возврате на вкладку потерян её адрес ('+location.hash+')');"
-              "SO.click()}}catch(e){kvFail('Реализация, адрес вкладки: '+e)}</script>"
+              "SO.click()}}catch(e){kvFail('Реализация, адрес вкладки: '+e)}"
+              "XLC(document,'вся страница')</script>"
               % (KV_FAIL, ",".join(f"'{t}'" for t in LAZY_TABS), KAM_QUEUE_BODY,
                  ",".join(f"'{t}'" for t in CT_SUBS), _TAB_FAIL, CT_SEP_BODY, CT_SEP_EMPTY, CT_MAIN_BODY,
                  CT_IMP_ROW))

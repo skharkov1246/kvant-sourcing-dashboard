@@ -898,7 +898,14 @@ def _с_формулами(b: bytes, формулы: dict[str, str]) -> bytes:
             if имя == "xl/worksheets/sheet1.xml":
                 x = data.decode("utf-8")
                 for адрес, f in формулы.items():
-                    x, n = re.subn(rf'(<c r="{адрес}"[^>]*>)', lambda м: м.group(1) + f"<f>{escape(f)}</f>", x, count=1)
+                    # без lxml openpyxl пишет пустую ячейку закрытым тегом <c …/>: формулу — внутрь
+                    # ячейки, а не после неё (иначе в гейте, где lxml нет, формула терялась)
+                    def вписать(м, f=f):
+                        тег = м.group(1)
+                        if тег.endswith("/>"):
+                            return тег[:-2].rstrip() + f"><f>{escape(f)}</f></c>"
+                        return тег + f"<f>{escape(f)}</f>"
+                    x, n = re.subn(rf'(<c r="{адрес}"[^>]*>)', вписать, x, count=1)
                     assert n == 1, адрес
                 data = x.encode("utf-8")
             dst.writestr(имя, data)

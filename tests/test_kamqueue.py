@@ -260,3 +260,46 @@ def test_сделка_без_кама_дни_сигнала_рабочие():
     нет = kq.build(None, life, [_deal("6003", kam="", closed=True)], СЕГОДНЯ)["queue"][0]
     assert нет["code"] == "noKam" and нет["days"] == 20 and нет["inWd"] is True
     assert нет["also"][0]["inWd"] is True
+
+
+def test_заказы_пункта_строками_по_номеру():
+    """Владелец 29.10.2026: «сделка одна — заказы разные 1/2/3 — разные поставщики и сроки». Пункт
+    КАМа по сделке и виду один (разговор с клиентом один), а заказы — строками ords по номеру:
+    номер, поставщик, срок, дни, хозяин заказа. У сделки без КАМа — те же строки в сигнале
+    (also[].ords): номер, поставщик и срок каждого заказа (ревью 29.10.2026)."""
+    def q(n, sup, ref, days, deal="6001", kam="10", who="Глеб (ОСС)"):
+        return {**_q("late", deal, days, kam=kam, who=who), "ordLbl": f"{int(deal) % 1000}/{n}", "ordNo": n,
+                "sup": sup, "ref": ref}
+    life = {"queue": [q(3, "Поставщик В", "срок 09.10.2026", 10), q(1, "Поставщик А", "срок 20.10.2025", 369),
+                      q(2, "Поставщик Б", "срок 30.09.2026", 19, who="Илья (ОРК) (уволен)"),
+                      q(10, "—", "срок 01.10.2026", 18),
+                      q(2, "Поставщик Д", "срок 05.09.2026", 44, deal="6002", kam=""),
+                      q(1, "Поставщик Г", "срок 01.09.2026", 48, deal="6002", kam="")]}
+    Q = kq.build(None, life, [_deal("6001"), _deal("6002", kam="")], СЕГОДНЯ)
+    late = next(x for x in Q["queue"] if x["code"] == "late")
+    assert late["orders"] == 4 and late["days"] == 369
+    assert [(o["lbl"], o["sup"], o["ref"], o["days"]) for o in late["ords"]] == [
+        ("1/1", "Поставщик А", "срок 20.10.2025", 369), ("1/2", "Поставщик Б", "срок 30.09.2026", 19),
+        ("1/3", "Поставщик В", "срок 09.10.2026", 10), ("1/10", "", "срок 01.10.2026", 18)]
+    # хозяин — у каждого заказа свой (у пункта — хозяин самого долгого)
+    assert [o["owner"] for o in late["ords"]] == ["Глеб (ОСС)", "Илья (ОРК)", "Глеб (ОСС)", "Глеб (ОСС)"]
+    assert late["owner"] == "Глеб (ОСС)"
+    нет = next(x for x in Q["queue"] if x["code"] == "noKam")
+    a = нет["also"][0]
+    assert a["orders"] == 2 and "ordLbls" not in a
+    assert [(o["lbl"], o["sup"], o["ref"], o["days"]) for o in a["ords"]] == [
+        ("2/1", "Поставщик Г", "срок 01.09.2026", 48), ("2/2", "Поставщик Д", "срок 05.09.2026", 44)]
+
+
+def test_очередь_кама_три_заказа_на_корпусе():
+    """fixture.ТриЗаказа через настоящие contracts.compute и kamqueue.build: пункт «срок клиента
+    прошёл» сделки 990 — один, заказы 990/1, 990/2, 990/3 — строками со своими поставщиком и сроком."""
+    import contracts
+    ct = fixture.build_contracts(stub=fixture.ТриЗаказа())
+    K = kq.build(fixture.build_presale(), contracts.life_all(ct), ct["rows"], fixture.CT_TODAY,
+                 people=fixture.CT_PEOPLE)
+    late = [x for x in K["queue"] if x.get("seq") == 990 and x["code"] == "late"]
+    assert len(late) == 1 and late[0]["orders"] == 3
+    assert [(o["lbl"], o["sup"], o["ref"]) for o in late[0]["ords"]] == [
+        ("990/1", "Компания 401", "срок 14.10.2025"), ("990/2", "Компания 404", "срок 29.09.2026"),
+        ("990/3", "Компания 407", "срок 09.10.2026")]

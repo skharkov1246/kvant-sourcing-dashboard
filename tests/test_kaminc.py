@@ -512,3 +512,23 @@ def test_пробел_срока_оплаты_один_пункт_у_КАМа():
     A = kaminc.compute(ct, people, today=TODAY, kamq=kamq, calib=CALIB, roster=ROSTER)["head"]["actions"]["501"]
     assert [(x["src"], x["deal"]) for x in A["items"] if x["code"] == "noPayPlan"] == [("kam", "1003")]
     assert A["n"] == len(без)
+
+
+def test_действия_с_номерами_заказов():
+    """Пункт очереди КАМа — один на сделку и вид, а заказов несколько: в действии «Дохода» — их
+    номера (lbls, по порядку очереди КАМа), у «назначить КАМа» — из сигналов also; без номеров
+    поля нет (ревью 29.10.2026)."""
+    ct, people, presale, kamq = corpus()
+    kamq["queue"][0]["ords"] = [{"lbl": "904/1", "sup": "Поставщик А"}, {"lbl": "904/2", "sup": ""}]
+    kamq["queue"].append({"code": "noKam", "sev": 3, "kamId": "", "deal": "1006", "title": "Поставка 1006",
+                          "what": "нет КАМа", "act": "назначить КАМа", "days": 5,
+                          "also": [{"code": "late", "ords": [{"lbl": "906/2"}, {"lbl": "906/1"}]},
+                                   {"code": "unpaid", "ords": [{"lbl": "906/2"}]}]})
+    A = kaminc.compute(ct, people, today=TODAY, presale=presale, kamq=kamq, calib=CALIB,
+                       roster=ROSTER)["head"]["actions"]
+    x = next(x for x in A["502"]["items"] if x["code"] == "unpaid")
+    assert x["lbls"] == ["904/1", "904/2"] and "sup" not in x
+    nk = next(x for x in A[""]["items"] if x["code"] == "noKam")
+    assert nk["lbls"] == ["906/2", "906/1"]
+    plain = next(x for x in run()["head"]["actions"]["502"]["items"] if x["code"] == "unpaid")
+    assert "lbls" not in plain

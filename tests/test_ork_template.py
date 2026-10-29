@@ -40,13 +40,16 @@ const box = {document, window: {__ORKMONTH__: inp.orkMonth, __DEALCTX__: inp.dc 
   location: {hash: ''}, console, JSON, Math, Object, Array, String, Number, Set, Map, RegExp,
   qmark: () => '', openContract() {}};
 vm.createContext(box);
-vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + (inp.dcCode || 'function _dcData(){return null;}') + '\n' + inp.code
-  + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkHow=_orkHow;', box);
+vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\n' + (inp.dcCode || 'function _dcData(){return null;}') + '\n' + inp.code
+  + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkHow=_orkHow;'
+  + ' this._orkJData=_orkJData; this._orkJPick=_orkJPick; this._orkJRow=_orkJRow; this._orkJEmpty=_orkJEmpty;'
+  + ' this._orkJNote=_orkJNote;', box);
 const out = {};
 for (const [k, X] of Object.entries(inp.views)) {
   const el = node();
   box._orkWeek(X, X.ork, el, '');
   out[k] = {week: el.innerHTML + Object.values(byId).map(n => n.innerHTML).join(''),
+            ids: Object.fromEntries(Object.entries(byId).map(([i, n]) => [i, n.innerHTML])),
             month: box._orkMonth(X, X.ork), how: box._orkHow(X, X.ork)};
   for (const id of Object.keys(byId)) delete byId[id];
 }
@@ -67,8 +70,8 @@ def _fn(name: str) -> str:
 
 def _render(views: dict, ork_month, dc: dict | None = None) -> dict:
     code = TPL[TPL.index(START):TPL.index(END)]
-    inp = {"code": code, "esc": _line("const _esc="), "ctN": _line("const _ctN="), "views": views,
-           "orkMonth": ork_month}
+    inp = {"code": code, "esc": _line("const _esc="), "ctN": _line("const _ctN="), "unpack": _fn("_unpack"),
+           "views": views, "orkMonth": ork_month}
     if dc is not None:
         # закрытая часть (право «договоры и деньги»): настоящие _dcData и списки «главного»
         inp["dc"] = dc
@@ -214,3 +217,325 @@ def test_что_важно_сегодня_в_неделе_под_очередь�
     # закрытая часть есть, а оценок с «главным» нет — «Нет данных», не пустая таблица
     empty = _render({"main": ct}, built["ork_month"], dc={**dc, "important": [], "sepImportant": []})["main"]["week"]
     assert "ctImpS" in empty and "Нет данных" in empty[empty.index("ctImpS"):] and 'id="ctImp"' not in empty
+
+
+# ── номера заказов (владелец 29.10.2026: «сделка одна — заказы разные 1/2/3») ──────────────
+@pytest.fixture(scope="module")
+def три():
+    """fixture.ТриЗаказа через настоящий contracts.compute: сделка 990 с тремя заказами у разных
+    поставщиков, 933/3 с назначением в день создания, 991/1 с датой записи раньше создания."""
+    ct = fixture.build_contracts(stub=fixture.ТриЗаказа())
+    ct = json.loads(json.dumps(ct, ensure_ascii=False, default=str))
+    return ct, ct.pop("orkMonth", None)
+
+
+def _rows(html: str) -> list[str]:
+    return [r for r in html.split("</tr>") if "<tr" in r]
+
+
+_KQ_JS = r"""
+const vm = require('node:vm'); const fs = require('node:fs');
+const inp = JSON.parse(fs.readFileSync(0, 'utf8'));
+const nodes = {};
+const mk = () => ({innerHTML: '', textContent: '', value: '', dataset: {}, classList: {toggle() {}},
+  addEventListener() {}, querySelectorAll() { return []; }, closest() { return null; }});
+const el = {querySelector: s => (nodes[s] ||= mk()), querySelectorAll: () => []};
+const box = {window: {}, JSON, String, Math, Object, Array, Number, RegExp, el, K: inp.K};
+vm.createContext(box);
+vm.runInContext(inp.esc + '\n' + inp.code + '\nfunction _kqHasCt(){return false;} function _incMoney(){return null;}'
+  + ' function _fmtE(v){return String(v);}\n_kqWire(el, K, "kq");', box);
+process.stdout.write(JSON.stringify(Object.fromEntries(Object.entries(nodes).map(([k, n]) => [k, n.innerHTML]))));
+"""
+
+
+def _kq_body(K: dict) -> str:
+    """Очередь КАМа (_kqWire) в node:vm на данных K → innerHTML тела таблицы (#kqb)."""
+    inp = {"esc": _line("const _esc="), "code": _line("const _ordNo=") + "\n" + _fn("_kqWire"), "K": K}
+    r = subprocess.run(["node", "-e", _KQ_JS], input=json.dumps(inp, ensure_ascii=False, default=str),
+                       capture_output=True, text=True, timeout=120)
+    assert r.returncode == 0, r.stderr[-2000:]
+    return json.loads(r.stdout)["#kqb"]
+
+
+
+def test_неделя_строки_с_номером_заказа_поставщиком_и_сроком(три):
+    """Очередь «Недели» и зона риска: у каждой строки заказа — «№990/1» (как в Битриксе), поставщик
+    этого заказа и срок, по которому строка считана; у шага — «с дд.мм (…)». Три заказа одной
+    сделки — три разные строки. Поставщика нет в данных страницы — строки без него."""
+    ct, om = три
+    v = copy.deepcopy(ct)
+    v["life"]["queue"] = [x for x in v["life"]["queue"] if x["seq"] in (990, 933, 991)]
+    ids = _render({"main": v}, om)["main"]["ids"]
+    qb, rk = _rows(ids["orkQb"]), _rows(ids["orkRisk"])
+    for lbl, sup, ref in (("990/1", "Компания 401", "срок 14.10.2025"), ("990/2", "Компания 404", "срок 29.09.2026"),
+                          ("990/3", "Компания 407", "срок 09.10.2026")):
+        r = [x for x in qb if f"№{lbl}<" in x and "срок клиента прошёл" in x]
+        assert len(r) == 1 and sup in r[0] and ref in r[0], lbl
+        r = [x for x in rk if f"№{lbl}<" in x]
+        assert len(r) == 1 and sup in r[0], lbl
+    r = [x for x in qb if "№933/3<" in x and "договор с поставщиком дольше 2 р.д." in x]
+    assert len(r) == 1 and "с 14.10 (назначение)" in r[0] and "менеджер ОРК" in r[0]
+    assert not [x for x in qb if "№933/3<" in x and "приёмка дольше" in x]
+    r = [x for x in qb if "№991/1<" in x and "приёмка дольше 1 р.д." in x]
+    assert len(r) == 1 and "с 15.10 (создан заказ)" in r[0]
+    # «Моя приёмка» — та же строка с номером и началом счёта
+    mine = _render({"main": v}, om)["main"]["week"]
+    mine = mine[mine.index('id="orkMine"'):]
+    assert "№991/1" in mine[:mine.index("</tbody>")] and "с 15.10 (создан заказ)" in mine[:mine.index("</tbody>")]
+    # поставщика в данных нет — строка без него, номер и срок остаются
+    for x in v["life"]["queue"]:
+        x["sup"] = ""
+    for x in v["ork"]["week"]["risk"]:
+        x["sup"] = ""
+    ids = _render({"main": v}, om)["main"]["ids"]
+    assert "Компания 40" not in ids["orkQb"] and "Компания 40" not in ids["orkRisk"]
+    assert "№990/2" in ids["orkQb"] and "срок 29.09.2026" in ids["orkQb"]
+
+
+def test_карточка_заказа_номер_и_начало_счёта(три):
+    """Карточка сделки (openContract): три заказа — три строки с номерами 990/1, 990/2, 990/3,
+    поставщиком и сроком клиента; у заказа на шаге с нормой — «с дд.мм (назначение)»."""
+    ct, _om = три
+    a = TPL.index("h+=ords.map(") + len("h+=ords.map(")
+    b = TPL.index(").join('')\n    ||'<div class=\"dimv\">заказов нет'", a)
+    js = (r"""
+const vm = require('node:vm'); const fs = require('node:fs');
+const inp = JSON.parse(fs.readFileSync(0, 'utf8')); const out = {};
+const box = {JSON, String, Math, out, inp};
+vm.createContext(box);
+vm.runInContext(inp.esc + '\n' + inp.helpers + '\nconst _stShort=n=>String(n||"").split(" | ")[0];\n'
+  + 'for (const x of inp.rows) out[x.deal] = (x.orders||[]).map(' + inp.fn + ');', box);
+process.stdout.write(JSON.stringify(out));
+""")
+    helpers = "\n".join(_line(p) for p in ("const _orkD=", "const _orkDm=", "const _orkDy="))
+    rows = [r for r in ct["rows"] if r["deal"] == "6090" or r["seq"] == 933]
+    inp = {"esc": _line("const _esc="), "helpers": helpers, "fn": TPL[a:b], "rows": rows}
+    r = subprocess.run(["node", "-e", js], input=json.dumps(inp, ensure_ascii=False), capture_output=True,
+                       text=True, timeout=120)
+    assert r.returncode == 0, r.stderr[-2000:]
+    out = json.loads(r.stdout)
+    card = out["6090"]
+    assert len(card) == 3
+    for lbl, sup, dl in (("990/1", "Компания 401", "14.10.2025"), ("990/2", "Компания 404", "29.09.2026"),
+                         ("990/3", "Компания 407", "09.10.2026")):
+        hit = [h for h in card if f"{lbl}. Узел" in h]
+        assert len(hit) == 1 and sup in hit[0] and f"дедлайн {dl}" in hit[0], lbl
+    o933 = [h for h in out[next(r["deal"] for r in rows if r["seq"] == 933)] if "933/3." in h]
+    assert len(o933) == 1 and "шаг 4 · 3 / 2 р.д." in o933[0] and "с 14.10 (назначение)" in o933[0]
+
+
+def test_очередь_кама_заказы_строками(три):
+    """Очередь КАМа: пункт сделки 990 «срок клиента прошёл» один (разговор с клиентом один), а
+    заказы — три строки «↳ №990/1 · поставщик · срок · дни» по номеру."""
+    import contracts
+    import kamqueue
+    ct, _om = три
+    K = kamqueue.build(fixture.build_presale(), contracts.life_all(ct), ct["rows"], fixture.CT_TODAY,
+                       people=fixture.CT_PEOPLE)
+    K = json.loads(json.dumps(K, ensure_ascii=False, default=str))
+    K["queue"] = [x for x in K["queue"] if x.get("seq") == 990]
+    body = _kq_body(K)
+    late = [x for x in _rows(body) if "срок клиента прошёл" in x]
+    assert len(late) == 1, "пункт сделки один"
+    assert "хозяин Олег" not in late[0], "хозяин заказа тот же, что у пункта, — не повторяется"
+    lines = [ln for ln in late[0].split('<div class="dep">↳ ') if ln.startswith("<b")]
+    assert len(lines) == 3
+    for ln, (lbl, sup, ref, days) in zip(lines, (("990/1", "Компания 401", "срок 14.10.2025", 370),
+                                                  ("990/2", "Компания 404", "срок 29.09.2026", 20),
+                                                  ("990/3", "Компания 407", "срок 09.10.2026", 10))):
+        assert f"№{lbl}</b>" in ln and sup in ln and ref in ln and f"{days} дн" in ln, ln
+
+
+# ── ревью 29.10.2026: номер чужой сделки, W1, сделка без КАМа, право на поставщика ────────────
+def test_номер_чужой_сделки_и_без_номера(три):
+    """Номер в названии карточки — от другой сделки (карточку скопировали): строка под №990
+    показывает «№990 · 905/2», а не «№905/2»; без номера — «№990 · id …»."""
+    ct, om = три
+    v = copy.deepcopy(ct)
+    q = [x for x in v["life"]["queue"] if x["seq"] == 990 and x["code"] == "late"]
+    q[1]["ordLbl"], q[2]["ordLbl"] = "905/2", "id 99502"
+    v["life"]["queue"] = q
+    qb = _render({"main": v}, om)["main"]["ids"]["orkQb"]
+    assert "№990/1<" in qb and "№990 · 905/2" in qb and "№990 · id 99502" in qb
+    assert "№905/2" not in qb
+
+
+def test_w1_закончено_назначением_из_n(три):
+    """Плитка W1: «закончено назначением» — из того же n, что «в срок за 20 р.д.» (не путается с
+    k); «Заказ создан» с датой назначения не в счёте — по причинам."""
+    ct, om = три
+    v = copy.deepcopy(ct)
+    T1 = v["ork"]["week"]["tiles"]["W1"]
+    T1["recent"] = {**(T1.get("recent") or {}), "state": "show", "k": 1, "n": 5}
+    T1.update(byAssign=2, assignStale=1, assignNoMgr=3)
+    out = _render({"main": v}, om)["main"]["week"]
+    assert "в срок за 20 р.д.: <b>1</b> из 5 · из 5 закончено назначением менеджера ОРК: 2" in out
+    assert "«Заказ создан» с датой назначения не в счёте: раньше начала приёмки 1, ответственный не из ОРК 3" in out
+    T1.update(byAssign=0, assignStale=0, assignNoMgr=0)
+    out = _render({"main": v}, om)["main"]["week"]
+    assert "закончено назначением" not in out and "с датой назначения не в счёте" not in out
+
+
+def test_очередь_кама_без_кама_заказы_строками():
+    """Сделка без КАМа: сигнал «срок клиента прошёл» в пункте «назначить КАМа» — с заказами
+    строками «↳ №902/1 · поставщик · срок · дни», как у пункта с КАМом; хозяин заказа — если он
+    у заказа другой."""
+    import kamqueue
+    today = fixture.CT_TODAY
+
+    def q(n, sup, ref, days, who):
+        return {"code": "late", "deal": "6902", "days": days, "kamId": "", "kam": "", "who": who, "seq": 902,
+                "customer": "Заказчик 1", "title": f"902/{n}. Узел", "dl": "", "ordLbl": f"902/{n}", "ordNo": n,
+                "sup": sup, "ref": ref}
+    life = {"queue": [q(2, "Поставщик Б", "срок 05.09.2026", 44, "Пётр (ОРК)"),
+                      q(1, "Поставщик А", "срок 01.09.2026", 48, "Олег (ОРК)")]}
+    rows = [{"deal": "6902", "seq": 902, "customer": "Заказчик 1", "title": "Сделка 1", "kam": "", "kamId": "",
+             "closed": False, "lost": False, "stageName": "Производство", "stageDays": 3, "orders": []}]
+    K = json.loads(json.dumps(kamqueue.build(None, life, rows, today), ensure_ascii=False, default=str))
+    body = _kq_body(K)
+    r = [x for x in _rows(body) if "назначить КАМа" in x]
+    assert len(r) == 1
+    lines = [ln for ln in r[0].split('<div class="dep">↳ ') if ln.startswith("<b")]
+    assert len(lines) == 2, r[0]
+    assert "№902/1</b> · поставщик Поставщик А · срок 01.09.2026 · 48 дн" in lines[0]
+    assert "хозяин" not in lines[0], "хозяин тот же, что у пункта"
+    assert "№902/2</b> · поставщик Поставщик Б · срок 05.09.2026 · 44 дн · хозяин Пётр (ОРК)" in lines[1]
+
+
+def test_поставщик_только_зрителю_с_правом(три):
+    """Право на поставщика — право на массив (access/acl.js, cutDashboard): имена поставщиков
+    очереди («Неделя», CONTRACTS) и строк заказов очереди КАМа (PEOPLE) доходят только до того,
+    кому массив выдан. PEOPLE и раньше нёс поставщика (сроки ≤ 14 дн., upcoming14): строки заказов
+    круг зрителей не расширяют. Зритель без «Реализации», «Поставщиков» и «КАМов» — ни одного имени."""
+    import contracts
+    import dashboard
+    import kamqueue
+    ct, _om = три
+    K = kamqueue.build(fixture.build_presale(), contracts.life_all(ct), ct["rows"], fixture.CT_TODAY,
+                       people=fixture.CT_PEOPLE)
+    K = json.loads(json.dumps(K, ensure_ascii=False, default=str))
+    assert any(u.get("sup") for u in K.get("upcoming14") or []), "PEOPLE и раньше нёс поставщика"
+    assert any(o.get("sup") for x in K["queue"] for o in x.get("ords") or [])
+    html = dashboard.render({}, {}, contracts=ct, people={"kamQueue": K})
+    js = r"""
+import fs from 'node:fs';
+const {cutDashboard} = await import(process.argv[1]);
+const inp = JSON.parse(fs.readFileSync(0, 'utf8'));
+const out = {};
+for (const [k, tabs] of Object.entries(inp.views)) {
+  const page = cutDashboard(inp.html, tabs, {admin: false, rights: ['suppliers']});
+  const line = p => (page.split('\n').find(l => l.startsWith(`window.__${p}__`)) || '');
+  out[k] = {any: page.includes('Компания 40'), people: line('PEOPLE').includes('Компания 40'),
+            contracts: line('CONTRACTS').includes('Компания 40')};
+}
+process.stdout.write(JSON.stringify(out));
+"""
+    views = {"нет": ["sourcing", "company"], "кам": ["reps"], "реал": ["contracts"]}
+    r = subprocess.run(["node", "--input-type=module", "-e", js, (ROOT / "access" / "acl.js").as_uri()],
+                       input=json.dumps({"html": html, "views": views}, ensure_ascii=False),
+                       capture_output=True, text=True, timeout=120)
+    assert r.returncode == 0, r.stderr[-2000:]
+    out = json.loads(r.stdout)
+    assert out["нет"] == {"any": False, "people": False, "contracts": False}
+    assert out["кам"] == {"any": True, "people": True, "contracts": False}
+    assert out["реал"] == {"any": True, "people": False, "contracts": True}
+
+
+# ── «Журнал шагов» «Месяца» (просьба владельца 29.10.2026) ─────────────────────────────────
+JHARNESS = r"""
+const vm = require('node:vm');
+const fs = require('node:fs');
+const inp = JSON.parse(fs.readFileSync(0, 'utf8'));
+const box = {window: {__ORKMONTH__: inp.orkMonth}, console, JSON, Math, Object, Array, String, Number, Set,
+  Map, RegExp, qmark: () => '', openContract() {}, document: {getElementById: () => null}};
+vm.createContext(box);
+vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\nfunction _dcData(){return null;}\n' + inp.code, box);
+vm.runInContext(`
+const J=_orkJData(window.__ORKMONTH__.main), cust=d=>'Заказчик '+d, out={};
+const F0={seg:'S1',m:'',over:true,all:false};
+const P=_orkJPick(J.rows,F0);
+out.def={n:P.R.length,k:P.k,segs:[...new Set(P.R.map(r=>r.seg))],overs:P.R.map(r=>r.over),
+  html:P.R.map(r=>_orkJRow(r,cust)).join(''),note:_orkJNote(J,F0)};
+const FA={seg:'',m:'',over:false,all:true}, PA=_orkJPick(J.rows,FA);
+out.all={n:PA.R.length,base:PA.base.length,note:_orkJNote(J,FA)};
+const FM={seg:'S1',m:J.months[1],over:true,all:false}, PM=_orkJPick(J.rows,FM);
+out.mon={n:PM.R.length,m:J.months[1]};
+const E={rows:[],segs:J.segs,months:J.months,since:J.since,label:J.label};
+out.empty=_orkJEmpty(E,F0,_orkJPick([],F0));
+const F6={seg:'S6',m:'08.2026',over:true,all:false};
+out.noSeg=_orkJEmpty(J,F6,_orkJPick(J.rows,F6));
+const ok=J.rows.filter(r=>r.measurable&&!(r.over>0)).slice(0,1);
+out.allOk=_orkJEmpty(J,F0,{base:ok,meas:ok,R:[]});
+const hid=J.rows.find(r=>r.ownerHidden); out.hidRow=hid?_orkJRow(hid,cust):'';
+const s1=J.rows.find(r=>r.seg==='S1');
+out.noHead=_orkJRow(Object.assign({},s1,{owner:''}),cust,()=>true);
+out.noCard=_orkJRow(s1,cust,()=>false); out.card=_orkJRow(s1,cust,d=>d===s1.deal);
+this.out=out;`, box);
+process.stdout.write(JSON.stringify(box.out));
+"""
+
+
+def _jrun(ork_month) -> dict:
+    code = TPL[TPL.index(START):TPL.index(END)]
+    inp = {"code": code, "esc": _line("const _esc="), "ctN": _line("const _ctN="), "unpack": _fn("_unpack"),
+           "orkMonth": ork_month}
+    r = subprocess.run(["node", "-e", JHARNESS], input=json.dumps(inp, ensure_ascii=False, default=str),
+                       capture_output=True, text=True, timeout=120)
+    assert r.returncode == 0, r.stderr[-2000:]
+    return json.loads(r.stdout)
+
+
+def test_журнал_шагов_в_месяце_под_правом(built):
+    """«Месяц» с правом — блок «Журнал шагов» с отбором (шаг S1 — по умолчанию, месяц, «только
+    сверх нормы» включено, «показывать неизмеримые» выключено), таблицей из 11 столбцов и
+    пояснением, откуда срок; без права — ни блока, ни строк (весь «Месяц» — «нет доступа»)."""
+    ct = copy.deepcopy(built["contracts"])
+    с = _render({"main": ct}, built["ork_month"])["main"]["month"]
+    assert "Журнал шагов: срок каждого заказа" in с and 'data-xl-name="Журнал шагов"' in с
+    assert '<option value="S1" selected>S1 Приёмка сделки · норма 1 р.д.</option>' in с
+    assert '<input type="checkbox" id="orkJOver" checked>' in с and '<input type="checkbox" id="orkJAll">' in с
+    for m in built["ork_month"]["main"]["journal"]["months"]:
+        assert f'<option value="{m}">{m}</option>' in с
+    for th in ("Сделка", "Заказ", "Шаг", "Начало", "Конец", "Р.д.", "Норма", "Сверх нормы на", "Отметки",
+               "Хозяин", "Месяц"):
+        assert f">{th}</th>" in с, th
+    assert "по датам переходов стадий заказа в Битриксе" in с and "производственному календарю РФ" in с
+    assert "«пачкой»" in с and "срок не дают" in с
+    assert с.index("Своевременность шагов по месяцам") < с.index("Журнал шагов") < с.index("По менеджерам ОРК")
+    без = _render({"main": ct}, {"__kvNoData": True})["main"]["month"]
+    assert "Журнал шагов" not in без and "orkJb" not in без
+    # массив «Месяца» без журнала (сборка старше) — «Нет данных» и откуда придёт
+    om = copy.deepcopy(built["ork_month"])
+    om["main"].pop("journal")
+    нет = _render({"main": ct}, om)["main"]["month"]
+    assert "Нет данных: журнала шагов в сборке нет" in нет and "orkJb" not in нет
+
+
+def test_журнал_отбор_строки_и_пусто(built):
+    """Отбор по умолчанию — случай владельца: приёмка (S1) дольше нормы, только измеримые, по
+    убыванию превышения; строка ведёт в карточку сделки (data-ct). Пустой отбор — «Нет данных» и
+    что не нашлось; все в норме — известный ноль, не «нет данных»."""
+    om = built["ork_month"]
+    rows = om["main"]["journal"]["rows"]
+    s1 = [r for r in rows if r["seg"] == "S1" and r["measurable"] and (r["over"] or 0) > 0]
+    out = _jrun(om)
+    d = out["def"]
+    assert d["n"] == d["k"] == len(s1) > 0 and d["segs"] == ["S1"]
+    assert d["overs"] == sorted(d["overs"], reverse=True)
+    for r in s1:
+        assert f'data-ct="{r["deal"]}"' in d["html"] and f'>{r["over"]}</td>' in d["html"]
+    assert d["html"].count("<tr ") == len(s1) and 'class="dep orkm"' in d["html"]
+    assert d["note"].startswith("Отбор: шаг S1 Приёмка сделки · все месяцы окна · только сверх нормы · без неизмеримых")
+    assert out["all"]["n"] == out["all"]["base"] == len(rows) and "все шаги" in out["all"]["note"]
+    assert out["mon"]["n"] == sum(1 for r in s1 if r["m"] == out["mon"]["m"]) > 0
+    assert out["empty"].startswith("Нет данных: в окне «Месяца» нет законченных отрезков")
+    assert out["noSeg"].startswith("Нет данных: отрезков S6 Подготовка к отгрузке от поставщика, закончившихся в 08.2026, нет")
+    assert out["allOk"].startswith("Сверх нормы — никого: все 1 отрезков")
+    # имя скрыто воротами людей — «скрыто» и причина, а не имя
+    assert "скрыто" in out["hidRow"] and "раскрыл бы человека" in out["hidRow"]
+    # имени руководителя ОРК в справочнике нет — роль один раз, а не «руководитель ОРК руководитель ОРК»
+    nh = out["noHead"]
+    assert nh.count("руководитель ОРК") == 1 and "имени в справочнике нет" in nh
+    # сделки нет в виде — строка не «кликабельна»: ни drill, ни tabindex, ни data-ct
+    assert 'class="drill"' in out["card"] and 'tabindex="0"' in out["card"]
+    assert "drill" not in out["noCard"] and "tabindex" not in out["noCard"] and "data-ct" not in out["noCard"]

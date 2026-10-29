@@ -817,6 +817,47 @@ class Шаг12Направления(ContractsStub):
             self.hist[172].append(("97808", f"DT172_26:{st}", t(300 - 15 * k)))
 
 
+class ТриЗаказа(ContractsStub):
+    """Номера заказов и приёмка по назначению (владелец 29.10.2026). Придумано:
+      • сделка 990 — три живых заказа 990/1, 990/2, 990/3 в производстве у разных поставщиков
+        (401, 404, 407) со своими сроками клиента — 370, 20 и 10 дн. назад: три «срок клиента
+        прошёл»;
+      • заказ 933/3 («Заказ создан» 5 дн., приёмка сверх нормы в базовом корпусе) получает
+        «Дату записи нового ответственного» в день создания: приёмка сделана, шаг 4 от назначения;
+      • сделка 991 — заказ 991/1 «Заказ создан» 4 дн. назад с датой записи на 20 дн. раньше
+        создания (скопирована): не в счёт, приёмка сверх нормы остаётся."""
+
+    def __init__(self):
+        super().__init__()
+        import contracts as ct
+        now = dt.datetime.fromisoformat(CT_NOW)
+        t = lambda a: (now - dt.timedelta(days=a)).isoformat()      # noqa: E731
+        d = lambda a: (CT_TODAY - dt.timedelta(days=a)).isoformat()  # noqa: E731
+        o933 = next(o for o in self.orders if str(o.get("title", "")).startswith("933/3."))
+        o933[ct.ASSIGN_AT] = d(5)
+        for did, seq, title in (("6090", 990, "Поставка трёх узлов"), ("6091", 991, "Приёмка заказа")):
+            self.deals.append({"ID": did, "TITLE": f"{seq}. {title}", "OPPORTUNITY": "60000", "CURRENCY_ID": "EUR",
+                               "COMPANY_ID": "305", "STAGE_ID": "C0:EXECUTING", "STAGE_SEMANTIC_ID": "P",
+                               "CATEGORY_ID": "0", "DATE_CREATE": t(130), "ASSIGNED_BY_ID": "11",
+                               ct.OSS_DEAL: ["21"], ct.KAM_F: "10"})
+            self.hist[2] += [(did, "C0:NEW", t(120)), (did, "C0:EXECUTING", t(60))]
+        for k, (sup, dl_ago) in enumerate((("401", 370), ("404", 20), ("407", 10))):
+            oid = 99500 + k
+            self.orders.append({"id": oid, "title": f"990/{k + 1}. Узел {k + 1}", "companyId": sup,
+                                "parentId2": 6090, "opportunity": 10_000, "currencyId": "EUR",
+                                "stageId": "DT172_26:PREPARATION", "createdTime": t(400), "movedTime": t(50),
+                                ct.OSS_F: "21", ct.DL_CUSTOMER: d(dl_ago), ct.SUP_PAID: 100,
+                                ct.PROD_START: d(390), ct.PROD_END: d(-30), ct.DEL_BUDGET: d(-60),
+                                "assignedById": "31"})
+            self.hist[172] += [(str(oid), "DT172_26:NEW", t(400)), (str(oid), "DT172_26:PREPARATION", t(50))]
+        self.orders.append({"id": 99510, "title": "991/1. Узел", "companyId": "402", "parentId2": 6091,
+                            "opportunity": 5_000, "currencyId": "EUR", "stageId": "DT172_26:NEW",
+                            "createdTime": t(4), "movedTime": t(4), ct.OSS_F: "21", ct.DL_CUSTOMER: d(-90),
+                            ct.PROD_START: d(-5), ct.PROD_END: d(-40), ct.DEL_BUDGET: d(-60),
+                            ct.ASSIGN_AT: d(24), "assignedById": "31"})
+        self.hist[172].append(("99510", "DT172_26:NEW", t(4)))
+
+
 def build_contracts(**kw) -> dict:
     """Синтетика → настоящий contracts.compute → данные вкладки «Реализация». Руководителя
     ОРК (служебный ключ «_orkHead») main.py забирает до записи страницы — здесь так же;

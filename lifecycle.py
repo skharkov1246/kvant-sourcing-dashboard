@@ -22,6 +22,13 @@
 правило с таблицей сделок, ведомостью и W2 (ork.judged: шаг ork.step_now, гигиена, приёмка
 только у сделок «Реализации»). noUtd — «ждём УПД от клиента» (ork.judged.waitUtd, решение
 владельца 27.10.2026, Б): пункт у менеджера ОРК с эскалацией КАМу, но не «сверх нормы».
+
+Пункт заказа несёт его номер, как в портале (ordLbl «900/1», ordNo — ork.order_label), и срок,
+по которому он считан (ref, order_ref: срок клиента, прогноз, план, срок оплаты; у сроков шагов —
+«с 14.10 (назначение)», since); пункты одной сделки — подряд и по номеру заказа (group_sort).
+Владелец 29.10.2026: «сделка одна — заказы разные 1/2/3 — разные поставщики и сроки». Приёмка
+кончается назначением менеджера ОРК, если оно раньше выхода из «Заказ создан» (ork.assign_at):
+такой заказ — шаг 4, пункт s2Over от назначения, а не s1Over.
 """
 from __future__ import annotations
 
@@ -86,6 +93,10 @@ EXC = {
 # обязательные даты размещения (решение владельца 19.10.2026, п. 9)
 PLAN_DATES = (("prodStart", "начало производства"), ("prodEnd", "конец производства"),
               ("delBudget", "доставка клиенту"))
+# начало счёта срока шага (ork.clock) → как его назвать у пункта: по этой подписи день
+# проверяется в Битриксе (создание заказа, история стадий, «Дата записи нового
+# ответственного», «Customer delivery date, actual»)
+SINCE_WORD = {"назначение": "назначение", "вход в шаг": "вход в шаг", "доставка": "доставка"}
 # кто из хозяев сделки уволен — признаки строки сделки contracts.py (справочник людей)
 GONE_ROLES = (("managerGone", "ответственный сделки"), ("ossGone", "ОСС"),
               ("respGone", "ответственный заказа"))
@@ -353,10 +364,67 @@ def _date_of(v) -> dt.date | None:
     return (t.astimezone(period_mod.MSK) if t.tzinfo else t).date()
 
 
+def _dmy(d: dt.date | None) -> str:
+    return d.strftime("%d.%m.%Y") if d else "—"
+
+
+def since_text(since, by: str, o: dict, today: dt.date) -> str:
+    """«с 14.10 (назначение)» — день (МСК), от которого считаны дни срока шага (ork.clock), и чем
+    он дан; год — только если не текущий. Начало приёмки t0 — «создан заказ» или «вход в
+    реализацию» (t0 = позднее из двух). Дня нет — пустая строка."""
+    d = _date_of(since)
+    if d is None:
+        return ""
+    s = d.strftime("%d.%m") if d.year == today.year else d.strftime("%d.%m.%Y")
+    if by == "начало приёмки":
+        word = "создан заказ" if _date_of(o.get("created")) == d else "вход в реализацию"
+    else:
+        word = SINCE_WORD.get(by, by)
+    return f"с {s} ({word})" if word else f"с {s}"
+
+
+def order_ref(code: str, o: dict, today: dt.date, *, fc: dt.date | None = None,
+              ov: dict | None = None) -> str:
+    """Срок заказа, по которому считан пункт (владелец 29.10.2026: «заказы разные — разные
+    поставщики и сроки»): срок клиента, прогноз, план доставки, конец производства по бюджету,
+    срок оплаты, дата доставки; у сроков шагов регламента (ork.TERM_CODE) — «с дд.мм (…)»,
+    день, от которого считаны рабочие дни (ov — ork.judged заказа). Нечего сказать — ""."""
+    dl = o.get("dl")
+    if code in ("late", "risk"):
+        return f"срок {_dmy(dl)}"
+    if code == "forecast":
+        return f"срок {_dmy(dl)}, прогноз {_dmy(fc)}"
+    if code == "planAfterDl":
+        return f"срок {_dmy(dl)}, план {_dmy(o.get('delPlan') or o.get('delBudget'))}"
+    if code == "prodDev":
+        return f"конец пр-ва {_dmy(o.get('prodEnd'))}"
+    if code == "unpaid":
+        f = delivered(o)
+        due = o.get("payPlan") or (f + dt.timedelta(days=PAY_GRACE) if f else None)
+        return f"оплата до {_dmy(due)}"
+    if code == "noPayPlan":
+        return f"доставлено {_dmy(delivered(o))}"
+    if code in ork.TERM_CODE.values() and ov:
+        return since_text(ov.get("since"), ov.get("sinceBy") or "", o, today)
+    return ""
+
+
+def group_sort(queue: list[dict]) -> None:
+    """Порядок очереди: важность → пункты одной сделки подряд (по самому долгому из них) →
+    № реализации → по номеру заказа (владелец 29.10.2026: «сделка одна — заказы 1/2/3»)."""
+    top: dict = {}
+    for q in queue:
+        k = (q["sev"], str(q.get("deal")))
+        top[k] = max(top.get(k, 0), q.get("days") or 0)
+    queue.sort(key=lambda q: (q["sev"], -top[(q["sev"], str(q.get("deal")))], -(q.get("seq") or 0),
+                              str(q.get("deal")), q.get("ordNo") if q.get("ordNo") is not None else 10 ** 6,
+                              str(q.get("ordLbl") or ""), -(q.get("days") or 0), str(q.get("code"))))
+
+
 def _deal_item(code: str, sev: int, what: str, act: str, days, d: dict, own: dict) -> dict:
     """Пункт очереди уровня сделки (без заказа)."""
     return {"code": code, "sev": sev, "what": what, "act": act, "days": days, **own,
-            "inWd": code == "noOrder",
+            "inWd": code == "noOrder", "ordLbl": "", "ordNo": None, "ref": "",
             "kam": (d.get("kam") or "") if d.get("kam") not in (None, "—") else "",
             "kamId": (d.get("kamId") or "") if d.get("kamId") not in (None, "—") else "",
             "deal": d["deal"], "seq": d.get("seq") or 0, "customer": d.get("customer") or "—",
@@ -454,6 +522,11 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
             ph[p]["late"] += any(c == "late" for c, _ in exc)
             ph[p]["risk"] += any(c in ("risk", "forecast") for c, _ in exc)
             ph[p]["over"] += over_norm(o, p)
+        # номер заказа, как его пишет портал («900/1»), — у каждого пункта заказа
+        lbl, no = ((o["lbl"], o.get("ordNo")) if o.get("lbl")
+                   else ork.order_label(o.get("title"), o.get("id")))
+        ov = (ork.judged(o, today, in_cat0=d.get("inCat0", True))
+              if any(c in ork.TERM_CODE.values() for c, _ in exc) else None)
         for code, days in exc:
             counts[code] += 1
             sev, what, act = EXC[code]
@@ -463,6 +536,10 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                           **item(code, o, d),
                           # р.д. — у сроков менеджера по календарю РФ, «без пауз»
                           "inWd": code in ork.TERM_CODE.values(),
+                          # заказ пункта и срок, по которому пункт считан (order_ref): «срок
+                          # 01.09.2026», «с 14.10 (назначение)» — проверяется в Битриксе
+                          "ordLbl": lbl, "ordNo": no, "ref": order_ref(code, o, today, fc=fc, ov=ov),
+                          "since": ((ov or {}).get("since") or "") if code in ork.TERM_CODE.values() else "",
                           "deal": o.get("deal"), "seq": (d or {}).get("seq") or o.get("seq") or 0,
                           "customer": (d or {}).get("customer") or "—", "order": o.get("id"),
                           "title": o.get("title") or "", "sup": o.get("sup") or "—",
@@ -526,7 +603,7 @@ def build(orders: list[dict], deals: list[dict], today: dt.date,
                 # разбор договоров не загружен: «не найден» не проверялось — так и пишем
                 what = "оплачено поставщику, договор с заказчиком не подписан по стадии; разбор договоров не загружен — не проверено"
             queue.append(_deal_item(code, sev, what, act, days, d, item(code, None, d)))
-    queue.sort(key=lambda q: (q["sev"], -(q["days"] or 0), -q["seq"]))
+    group_sort(queue)
 
     # оплата клиента по сделке (доход КАМов и продуктов, kaminc.py): ожидаемая дата и её
     # источник, платёжки клиента файлом — по непроигранным заказам. В страницу не идёт:
