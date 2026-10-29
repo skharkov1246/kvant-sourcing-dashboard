@@ -729,3 +729,121 @@ def test_подстановка_массивов_одним_проходом():
     строка = next(x for x in html.splitlines() if x.startswith("window.__CONTRACTS__"))
     assert "СЕКРЕТ-ВЫДУМКА" not in строка and "__DEALCTX_JSON__" in строка
     assert next(x for x in html.splitlines() if x.startswith("window.__DEALCTX__")).count("СЕКРЕТ-ВЫДУМКА") == 1
+
+
+# ── факты из чатов (решение владельца 25.10.2026) ─────────────────────────────────────
+
+ТЕКСТ_ГЛАВНОГО = "Поставщик сорвал отгрузку 24.10, нужен новый срок"
+
+
+class БазаСФактами(База):
+    def __init__(self, факты=None, **kw):
+        super().__init__(**kw)
+        self._факты = факты or {}
+
+    def факты(self):
+        return self._факты
+
+
+def _строки_фактов(**поправки) -> dict:
+    строки = {
+        "money": [(11, "итог", 1_250_000.0, "RUB", "без_ндс", dt.date(2026, 10, 12), T),
+                  (11, "наше_кп", 1_300_000.0, "RUB", "не_указано", None, T - dt.timedelta(days=3)),
+                  (11, "счёт", 1.0, "RUB", "с_ндс", None, T - dt.timedelta(days=4)),
+                  (11, "оплата", 2.0, "RUB", "с_ндс", None, T - dt.timedelta(days=5))],
+        "contract": [(11, "заказчик", "подписан", "эдо", "3/2026", T)],
+        "src": [(11, "кп_получено", "сорсер", T)],
+        # deal, оценка, проход, вид, важность, строка, уверенность, ключи, дата доказательства,
+        # пунктов в ответе до проверок, была ли сводка сборки
+        "imp": [(11, T, "сутки", "поставщик", "высокая", ТЕКСТ_ГЛАВНОГО, 0.7, ["o1"], T - dt.timedelta(days=2), 2, False),
+                (12, T, "история", None, None, None, None, None, T, 0, True)],
+    }
+    строки.update(поправки)
+    return строки
+
+
+def test_свод_с_фактами_без_цитат_и_номеров_сообщений():
+    база = БазаСФактами(факты=_строки_фактов(), чаты=[_чат(11)])
+    store = Store()
+    журнал: list[str] = []
+    assert rc.publish(база, store, dry=False, ct=ct, печать=журнал.append) == 0
+    свод = json.loads(store.raw.decode("utf-8"))
+    f = свод["facts"]["11"]
+    assert len(f["money"]) == dealctx.CHAT_MONEY_MAX and f["money"][0] == {
+        "amount": 1_250_000.0, "cur": "RUB", "kind": "итог", "vat": "без_ндс", "date": "2026-10-12", "at": T.isoformat()}
+    assert f["contract"] == [{"side": "заказчик", "status": "подписан", "where": "эдо", "spec": "3/2026",
+                              "at": T.isoformat()}]
+    assert f["src"] == [{"signal": "кп_получено", "role": "сорсер", "at": T.isoformat()}]
+    assert f["imp"] == {"at": T.isoformat(), "src": "сутки", "conf": 0.7, "n": 2, "dg": False,
+                        "items": [{"kind": "поставщик", "sev": "высокая", "text": ТЕКСТ_ГЛАВНОГО, "keys": ["o1"],
+                                   "ev": (T - dt.timedelta(days=2)).isoformat()}]}
+    assert свод["facts"]["12"]["imp"]["items"] == [], "пустой последний вызов — «важного нет», а не прежние пункты"
+    assert dealctx.clean(свод)["bad"] == 0 and dealctx.clean(свод)["facts"]["11"]["imp"]["conf"] == 0.7
+    текст = store.raw.decode("utf-8")
+    for слово in ("quote", "msg_id", "evidence"):
+        assert слово not in текст, "цитат и номеров сообщений в ключе нет"
+    assert any("факты из чатов: сделок 2 (с суммой 1, с договором 1, с сорсингом 1, с главным 1, из них высокой "
+               "важности 1); не по форме 0" in s for s in журнал)
+    for s in журнал:
+        for утечка in ("1250000", "1 250 000", ТЕКСТ_ГЛАВНОГО, "3/2026", "кп_получено", "подписан"):
+            assert утечка not in s, ("в журнал — только счётчики", утечка, s)
+
+
+def test_плохой_факт_снимается_оценка_чата_остаётся_шаг_красный():
+    плохие = _строки_фактов(imp=[(11, T, "сутки", "поставщик", "высокая", "x" * 161, 0.7, [], T, 1, False)])
+    база = БазаСФактами(факты=плохие, чаты=[_чат(11)])
+    store = Store()
+    журнал: list[str] = []
+    assert rc.publish(база, store, dry=False, ct=ct, печать=журнал.append) == 1
+    свод = json.loads(store.raw.decode("utf-8"))
+    assert "11" not in свод["facts"] and свод["chats"]["11"]["state"] == "ждёт_нас", "ключ записан, оценка на месте"
+    assert any(s.startswith("::error::факты из чатов: у 1 сделок") for s in журнал)
+    # база без фактов (до схемы v3, подпорка) — свод как раньше, без ошибок
+    assert rc.publish(База(чаты=[_чат(11)]), Store(), dry=False, ct=ct, печать=lambda s: None) == 0
+
+
+def test_факты_на_настоящей_базе(conn):
+    """Факты пишет chat_context.База (как прогон оценки), свод читает виды базы."""
+    import chat_context as cc
+    store = cc.База(__import__("psycopg2").connect(DSN, options=f"-c search_path={СХЕМА}"), только_чтение=False)
+    verdict = {"state": "идёт", "direction": "вперёд", "risk": "низкий", "risk_kinds": [], "blocker": None,
+               "ball_role": "кам", "reply_expected": False, "due": None, "evidence_msg_ids": [12], "confidence": 0.7}
+    строка = {"deal_id": "11", "model": "claude-opus-5-5", "prompt_sha256": "a" * 64, "method_ver": cc.METHOD_VER,
+              "msg_from_id": 10, "msg_to_id": 12, "verdict": verdict, "tokens_in": 1, "tokens_out": 1, "usd": 0.01,
+              "run_id": "chat-ctx-1", "assessed_at": T}
+    трата = {"at": T, "run_id": "chat-ctx-1", "part": 1, "deal_id": "11", "model": "claude-opus-5-5",
+             "outcome": "записано", "defect": None, "api_status": None, "tokens_in": 1, "tokens_out": 1, "usd": 0.01,
+             "estimated": False}
+    def факт(вид, msg, data, **kw):
+        f = {"kind": вид, "pass": "сутки", "msg_id": msg, "msg_at": T, "evidence_msg_ids": [msg], "evidence_keys": [],
+             "evidence_vals": None, "data": data, "quote": "цитата для проверки", "statement": None, "confidence": None}
+        f.update(kw)
+        return f
+    try:
+        store.записать_оценку(строка, {"chat_id": "911", "last_msg_id": 12, "last_human_at": T, "checked_at": T}, трата, [
+            факт("деньги", 10, {"amount": 1_250_000.0, "currency": "RUB", "money_kind": "итог", "side": "продажа",
+                                "vat": "без_ндс", "date": "2026-10-12"}),
+            факт("деньги", 11, {"amount": 9_000.0, "currency": "EUR", "money_kind": "наше_кп", "side": "закупка",
+                                "vat": "без_ндс", "date": None}),
+            факт("договор", 12, {"status": "у_клиента", "side": "заказчик", "where": "почта", "spec_no": None}),
+            факт("сорсинг", 11, {"signal": "отказ", "author_role": "сорсер"}),
+            факт("главное", 12, {"kind": "поставщик", "severity": "средняя"}, statement=ТЕКСТ_ГЛАВНОГО, confidence=0.6,
+                 evidence_keys=["stage"], evidence_vals={"stage": "name=Производство"})])
+    finally:
+        store.conn.close()
+    база = rc.База(DSN, схема=СХЕМА)
+    try:
+        s = Store()
+        assert rc.publish(база, s, dry=False, ct=ct, печать=lambda x: None) == 0
+    finally:
+        база.закрыть()
+    f = json.loads(s.raw)["facts"]["11"]
+    assert f["money"] == [{"amount": 1_250_000.0, "cur": "RUB", "kind": "итог", "vat": "без_ндс", "date": "2026-10-12",
+                           "at": T.isoformat()}], "закупка в свод продажи не идёт"
+    assert f["contract"][0]["where"] == "почта" and f["src"][0] == {"signal": "отказ", "role": "сорсер",
+                                                                     "at": T.isoformat()}
+    assert f["imp"]["items"] == [{"kind": "поставщик", "sev": "средняя", "text": ТЕКСТ_ГЛАВНОГО, "keys": ["stage"],
+                                  "ev": T.isoformat()}], "дата доказательства — дата сообщения пункта"
+    assert f["imp"]["conf"] == 0.6 and f["imp"]["src"] == "сутки"
+    assert f["imp"]["n"] is None and f["imp"]["dg"] is None, "строка без числа пунктов — как до ревью"
+    assert "цитата" not in s.raw.decode("utf-8")

@@ -929,6 +929,7 @@ def run(args) -> int:
     # пресейл — после реализации: чаты сделок читает тот же читатель, остатком бюджета
     _presale()
     _write_metrics()
+    _write_digest(contracts_data, dealctx_data, real_ctx, m.get("presale"))
 
     # Очередь КАМа «что делать сегодня» (kamqueue.py): пресейл с мячом у КАМа, сроки и
     # закрытие реализации, сделки без КАМа. Едет в данных вкладки «КАМ и продукт-оунеры»
@@ -1125,6 +1126,35 @@ def _print_summary(m: dict) -> None:
         agg = s["kp"] + s["refusedCol"] + s["noAnswer"]
         ok = "✓" if chk == agg else f"⚠ closed={chk}≠{agg}"
         print(f"  {s['n']:28}{'' if s.get('act', True) else ' (ушёл)'} темп={s.get('perDay')}/раб.дн c={s['c']:4} closed={s['closed']:3} КП={s['kp']:3} отказ={s['refusedCol']:3} молч={s['noAnswer']:3} ТКП={s['tkpP']:3}% ср.срок={s['avgDays']} {ok}")
+
+
+def _write_digest(contracts_data, dealctx_data, real_ctx, presale) -> None:
+    """Сводка по сделке для модели (решение владельца 25.10.2026, dealdigest.py): файл
+    DEALDIGEST_OUT, который шаг деплоя после выкладки кладёт в закрытый ключ dealdigest:v1.
+    Нет переменной (живая сверка, локальный запуск) — ничего не пишется. В журнал — только
+    счётчики (правило 17); сбой — только класс ошибки: сборка дашборда важнее сводки."""
+    out = os.environ.get("DEALDIGEST_OUT")
+    if not out:
+        return
+    if (contracts_data or {}).get("rows") is None:
+        # «Реализация» не собралась: сводка из одного пресейла заменила бы в ключе полную —
+        # файла нет, и публикация ключ не трогает (dealdigest_kv.publish; ревью 28.10.2026)
+        print("  ⚠ сводка по сделкам не записана: сборка без «Реализации»")
+        return
+    try:
+        import dealdigest
+        dg = dealdigest.build((contracts_data or {}).get("rows"), contracts_mod.life_all(contracts_data),
+                              dealctx_data, presale, period_mod.now(dealctx_mod.MSK), ctx=real_ctx)
+        код = dealdigest.check(dg)
+        if код:
+            print(f"  ⚠ сводка по сделкам не по форме ({код}) — не записана")
+            return
+        dealdigest.write(out, dg)
+        n = dealdigest.counts(dg)
+        print(f"• Сводка по сделкам для оценки чатов: сделок {n['deals']} (с заказами {n['orders']}, "
+              f"с договором {n['contract']}, с экономикой {n['econ']}, пресейла {n['presale']})")
+    except Exception as e:
+        print(f"  ⚠ сводка по сделкам не собрана: {type(e).__name__}")
 
 
 def main() -> int:

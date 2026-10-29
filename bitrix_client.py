@@ -1013,11 +1013,15 @@ def chat_webhook_url() -> str:
 class ЧтениеЧатов:
     """Чтение чатов по очереди вебхуков: первый отказ в доступе — к следующему. Темп
     портала общий (клиенты — with_webhook исходного). по_вебхуку — сколько вызовов
-    ответил каждый; лимит ожидания ставится всем сразу."""
+    ответил каждый; лимит ожидания ставится всем сразу. Вебхук, ответивший по диалогу
+    (DIALOG_ID), запоминается и на следующих страницах того же чата зовётся первым: история
+    листается до шести страниц, и без памяти каждая начиналась бы с отказа владельцу — вдвое
+    больше запросов к порталу (ревью 28.10.2026)."""
 
     def __init__(self, клиенты: list, подписи: list[str]):
         self.клиенты, self.подписи = list(клиенты), list(подписи)
         self.по_вебхуку = [0] * len(self.клиенты)
+        self._чей: dict[str, int] = {}               # диалог → номер ответившего вебхука
 
     @property
     def limit_wait_budget(self):
@@ -1029,14 +1033,21 @@ class ЧтениеЧатов:
             к.limit_wait_budget = v
 
     def call(self, method: str, params: dict | None = None, **kw) -> Any:
-        for i, к in enumerate(self.клиенты):
+        диалог = str((params or {}).get("DIALOG_ID") or "")
+        порядок = list(range(len(self.клиенты)))
+        if диалог in self._чей:
+            порядок.remove(self._чей[диалог])
+            порядок.insert(0, self._чей[диалог])
+        for n, i in enumerate(порядок):
             try:
-                r = к.call(method, params, **kw)
+                r = self.клиенты[i].call(method, params, **kw)
             except Exception as e:                    # noqa: BLE001
-                if i + 1 < len(self.клиенты) and "ACCESS" in str(e).upper():
+                if n + 1 < len(порядок) and "ACCESS" in str(e).upper():
                     continue                          # не участник чата — следующий вебхук
                 raise
             self.по_вебхуку[i] += 1
+            if диалог:
+                self._чей[диалог] = i
             return r
         raise BitrixError(f"{method}: вебхуков чтения чатов нет")
 

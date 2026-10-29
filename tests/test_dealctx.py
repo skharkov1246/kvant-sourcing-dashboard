@@ -564,3 +564,196 @@ def test_хозяин_пунктов_чатов_и_договоров_по_ре�
     life = r["contracts"]["life"]
     week_q = list(life["queue"]) + [q for q in dc["queue"] if not q.get("seg")]
     assert all(q.get("role") for q in week_q)
+
+
+# ── факты из чата и «главное» (решение владельца 25.10.2026) ──────────────────────────
+
+def test_списки_фактов_как_в_прогоне_и_базе():
+    import chat_context as cc
+    assert dealctx.MONEY_KINDS == cc.ВИДЫ_ДЕНЕГ and dealctx.MONEY_VAT == cc.НДС and dealctx.MONEY_CUR == cc.ВАЛЮТЫ
+    assert dealctx.CONTRACT_STATUSES == cc.СТАТУСЫ_ДОГОВОРА and dealctx.CONTRACT_SIDES == cc.СТОРОНЫ_ДОГОВОРА
+    assert dealctx.CONTRACT_WHERE == cc.ГДЕ_ДОГОВОР and dealctx.SIGNALS == cc.СИГНАЛЫ
+    assert dealctx.AUTHOR_ROLES == cc.РОЛИ_АВТОРА and dealctx.IMP_KINDS == cc.ВИДЫ_ГЛАВНОГО
+    assert dealctx.IMP_SEV == cc.ВАЖНОСТИ and dealctx.IMP_SRC == cc.СТАТЬИ and dealctx.DIGEST_KEYS == cc.КЛЮЧИ_СВОДКИ
+    assert dealctx.IMP_TEXT_MAX == cc.ТЕКСТ_ГЛАВНОГО and dealctx.SPEC_RX.pattern == cc.ОБРАЗЕЦ_СПЕЦИФИКАЦИИ
+    for таблица, список in ((dealctx.IMP_LBL, dealctx.IMP_KINDS), (dealctx.IMP_OWNER, dealctx.IMP_KINDS),
+                            (dealctx.MONEY_LBL, dealctx.MONEY_KINDS), (dealctx.VAT_LBL, dealctx.MONEY_VAT),
+                            (dealctx.CONTRACT_SIDE_LBL, dealctx.CONTRACT_SIDES),
+                            (dealctx.CONTRACT_STATUS_LBL, dealctx.CONTRACT_STATUSES),
+                            (dealctx.WHERE_LBL, dealctx.CONTRACT_WHERE), (dealctx.SIGNAL_LBL, dealctx.SIGNALS),
+                            (dealctx.AUTHOR_LBL, dealctx.AUTHOR_ROLES)):
+        assert set(таблица) == set(список), "у каждого значения — подпись"
+    # хозяин «главного» — по регламенту ОРК (ork.ITEM «imp:<вид>») или ответственный сделки;
+    # ОСС пунктов модели не получает (Рег. 1.11)
+    import ork
+    assert all(v == "dealResp" or v in ork.ITEM for v in dealctx.IMP_OWNER.values())
+    assert all("oss" not in (rl, cp) for k, (_s, rl, cp) in ork.ITEM.items() if k.startswith("imp:"))
+    assert {k for k in ork.ITEM if k.startswith("imp:")} == {v for v in dealctx.IMP_OWNER.values() if v != "dealResp"}
+
+
+def test_факты_в_ключе_только_по_форме_оценка_чата_остаётся():
+    raw = fixture.realctx_raw()
+    raw["facts"]["6002"]["money"][0]["cur"] = "RUR"                    # не из списка
+    raw["facts"]["6003"]["imp"]["items"][0]["text"] = "x" * 161        # длиннее предела
+    raw["facts"]["6004"]["imp"]["items"][0]["keys"] = ["o9"]           # ключа сводки такого нет
+    ctx = dealctx.clean(raw)
+    assert ctx["bad"] == 3 and not {"6002", "6003", "6004"} & set(ctx["facts"])
+    assert ctx["chats"]["6002"]["state"] == "ждёт_нас", "оценка чата той же сделки не пропала"
+    assert "6006" in ctx["facts"] and ctx["facts"]["6006"]["imp"]["items"] == []
+    # ключ до 25.10.2026 — без раздела фактов: пусто, не «не по форме»
+    старый = fixture.realctx_raw()
+    del старый["facts"]
+    assert dealctx.clean(старый)["facts"] == {} and dealctx.clean(старый)["bad"] == 0
+
+
+def test_сумма_из_чата_сверяется_только_строго_сравнимая():
+    e = dealctx._econ(_e(rebid=True, kpSale=2_800_000.0))
+    r = {"saleAmt": 3_120_000.0, "saleTax": 520_000.0, "saleCur": "RUB"}      # без НДС — 2 600 000
+    def m(**kw):
+        return {"amount": 2_600_000.0, "cur": "RUB", "kind": "итог", "vat": "без_ндс", "date": None, "at": NOW, **kw}
+    c = dealctx.chat_money_cmp(m(), r, e)
+    assert c["file"] == {"pct": 0.0, "over": False} and c["sum"] == {"pct": 0.0, "over": False}
+    assert dealctx.chat_money_cmp(m(kind="наше_кп"), r, e)["file"]["over"] is False, "КП — с продажей «Нашего КП»"
+    assert dealctx.chat_money_cmp(m(kind="наше_кп", amount=2_800_000.0), r, e)["file"] == {"pct": 0.0, "over": False}
+    assert dealctx.chat_money_cmp(m(cur="EUR", amount=26_000.0), r, e)["file"] == {"pct": 0.0, "over": False}, \
+        "евро — по курсу самого файла"
+    assert dealctx.chat_money_cmp(m(cur="EUR", amount=26_000.0), r, e)["sum"] == {"why": "не сравнить: валюта"}
+    assert dealctx.chat_money_cmp(m(cur="CNY"), r, e)["file"] == {"why": "не сравнить: валюта"}
+    assert dealctx.chat_money_cmp(m(vat="не_указано"), r, e) == {"file": {"why": "не сравнить: НДС не указан"},
+                                                                  "sum": {"why": "не сравнить: НДС не указан"}}
+    assert dealctx.chat_money_cmp(m(vat="с_ндс"), r, e)["sum"] == {"why": "не сравнить: сумма с НДС"}
+    assert dealctx.chat_money_cmp(m(kind="оплата"), r, None)["file"] is None, "файла нет — с файлом не сравнивается"
+    over = dealctx.chat_money_cmp(m(amount=3_000_000.0), r, e)
+    assert over["file"]["over"] and over["sum"]["over"] and over["file"]["pct"] == 15.4
+    assert dealctx.chat_money_cmp(m(), {"saleAmt": None}, e)["sum"] == {"why": "не сравнить: суммы сделки нет"}
+
+
+def test_сумма_из_чата_по_правилу_ндс_как_сверка_с_файлом():
+    """Покупатель из РФ, налога в сделке нет: «Сумма» по правилу 26.10.2026 — с НДС. Чистая
+    сумма чата, равная продаже файла, с «Суммой» не «расходится», а «похоже на сумму с НДС —
+    не пункт», как сверка с файлом в той же карточке, и в счёт factsClosed не идёт (ревью 28.10.2026)."""
+    r = {"deal": "6901", "saleAmt": 1_220_000.0, "saleTax": 0.0, "saleCur": "RUB",
+         "vatRule": "gross", "vatBx": "gross", "vatK": 1.22}
+    e = dealctx._econ(_e(sale=1_000_000.0, saleEur=13_000.0, buyEur=10_000.0))
+    assert e is not None
+    econ = dealctx._econ_cell(e, r)
+    assert econ["vat"] is True and econ["over"] is False, "сверка с файлом: похоже на сумму с НДС"
+    m = {"amount": 1_000_000.0, "cur": "RUB", "kind": "итог", "vat": "без_ндс", "date": None, "at": NOW}
+    c = dealctx.chat_money_cmp(m, r, e)
+    assert c["sum"]["over"] is False and c["sum"]["vat"] is True and c["sum"]["pct"] == 18.1
+    assert c["file"] == {"pct": 0.0, "over": False}
+    cell = dealctx._facts_cell({"money": [m], "contract": [], "src": []}, r, e, TODAY)
+    assert cell["money"][0]["gap"] is False
+    assert cell["money"][0]["sum"] == "с «Суммой» без НДС: похоже на «Сумму» с НДС, 18,1 % — не пункт"
+    # налог указан — он уже вычтен, и такое отношение — настоящее расхождение (econ_verdict)
+    assert dealctx.chat_money_cmp(m, {**r, "saleTax": 1.0}, e)["sum"]["over"] is True
+    # и не около 1,20/1,22 — расходится, как прежде
+    assert dealctx.chat_money_cmp({**m, "amount": 700_000.0}, r, e)["sum"]["over"] is True
+    assert dealctx.chat_money_cmp({**m, "amount": 1_220_000.0}, r, e)["sum"] == {"pct": 0.0, "over": False}
+
+
+def test_главное_в_карточке_и_в_что_важно_сегодня_но_не_в_очереди():
+    r = fixture.build_realization()
+    ct, dc = r["contracts"], r["dealctx"]
+    rows = {x["deal"]: x for x in ct["rows"]}
+    # без фактов вкладка та же: очередь, счётчики, «что делать первым» не меняются
+    raw = fixture.realctx_raw()
+    del raw["facts"]
+    ctx0 = dealctx.clean(raw)
+    ork_head = next(q["who"] for q in dc["queue"] if q["role"] == "orkHead")   # тот же, что у сборки
+    head0, dc0 = dealctx.build(ct["rows"], contracts.life_all(ct), ctx0, NOW, today=TODAY, ork_head=ork_head)
+    assert dc["queue"] == dc0["queue"] and dc["counts"] == dc0["counts"] and dc["sepCounts"] == dc0["sepCounts"]
+    assert {d: x.get("todo") for d, x in dc["deals"].items()} == {d: x.get("todo") for d, x in dc0["deals"].items()}
+    assert all(not q["code"].startswith("imp") for q in dc["queue"])
+    # «Что важно сегодня»: важность, затем свежесть; давняя оценка (12 дн.) и пустой список — не пункты
+    assert [(x["deal"], x["sev"]) for x in dc["important"]] == [("6002", "высокая"), ("6003", "средняя")]
+    assert [x["deal"] for x in dc["sepImportant"]] == ["6101"], "направление — только в своей вкладке"
+    assert not any(rows[x["deal"]]["seg"] for x in dc["important"])
+    первый = dc["important"][0]
+    assert первый["role"] == "КАМ" and первый["who"] == rows["6002"]["kam"], "клиент недоволен — КАМу"
+    assert dc["important"][1]["role"] == "ответственный сделки" and dc["important"][1]["who"] == rows["6003"]["manager"]
+    # срыв срока клиента — менеджер ОРК на шаге сделки, КАМ в копии (регламент ОРК, 26.10.2026)
+    sep0, r6101 = dc["sepImportant"][0], rows["6101"]
+    exp = dealctx._reg("imp", r6101, dealctx._people(r6101, ""), key="imp:срыв_срока_клиента")
+    assert (sep0["role"], sep0["roleKey"], sep0["copyRole"]) == ("менеджер ОРК", "orkMgr", "kam")
+    assert sep0["who"] == exp["who"] and sep0["copy"] == r6101["kam"] and sep0["step"] == dealctx._step_now(r6101)
+    assert sep0["who"] != r6101.get("ossDeal") or not r6101.get("ossDeal"), "ОСС пунктов модели не получает"
+    assert первый["conf"] == 70 and первый["at"] == "19.10.2026" and первый["basis"] == ["stage"]
+    # карточка: давняя оценка — в карточке с пометкой, а не в «сегодня»; спокойная — «важного нет»
+    assert dc["deals"]["6004"]["facts"]["imp"]["fresh"] is False
+    assert dc["deals"]["6006"]["facts"]["imp"]["items"] == []
+    f3 = dc["deals"]["6003"]["facts"]["money"]
+    assert f3[0]["line"].startswith("в чате: 35 000 EUR · без НДС · наше КП")
+    assert f3[0]["file"] == "с файлом: сходится, 0,0 %" and f3[0]["sum"].startswith("с «Суммой» без НДС: расходится")
+    assert f3[1]["file"].endswith("счёт и оплата бывают частью суммы") and not f3[1]["gap"]
+    assert dc["deals"]["6002"]["facts"]["contract"] == ["договор с заказчиком: у клиента, в ЭДО, спецификация №2 (16.10)"]
+    assert dc["deals"]["6002"]["facts"]["src"] == ["КП получено — сорсер, 14.10"]
+    # шапка — только покрытие («есть у N»), суммы не складываются; числа оценок модели (расхождения,
+    # высокая важность) — только в закрытой части (ревью 25.10.2026)
+    assert ct["head"]["ctx"]["facts"] == {"money": 2, "imp": 2}
+    assert ct["sep"]["head"]["ctx"]["facts"] == {"money": 0, "imp": 1}
+    assert dc["factsClosed"] == {"main": {"gap": 1, "impHigh": 1}, "sep": {"gap": 0, "impHigh": 1}}
+    assert "26000" not in json.dumps(ct["head"], ensure_ascii=False)
+    # в общем массиве вкладки (видят все) фактов нет
+    assert "клиент недоволен" not in json.dumps(ct, ensure_ascii=False).lower()
+
+
+def test_свежесть_главного_по_московскому_дню():
+    """Ревью 28.10.2026: метка доказательства в UTC за полчаса до московской полуночи — это уже
+    следующий день по Москве: срок свежести считается от него, а не от дня метки в UTC."""
+    r = fixture.build_realization()
+    row = next(x for x in r["contracts"]["rows"] if x["deal"] == "6002")
+    ppl = dealctx._people(row, "")
+    today = dt.date(2026, 10, 20)
+    поздно = dt.datetime(2026, 10, 12, 22, 30, tzinfo=dt.timezone.utc)      # 13.10 01:30 по Москве
+    x = {"kind": "клиент_недоволен", "sev": "высокая", "text": "Клиент ждёт ответа", "keys": [], "ev": поздно}
+    item = dealctx._imp_item(x, row, today, ppl)
+    assert item["ev"] == "13.10.2026" and item["fresh"] is (dealctx.IMP_MAX_DAYS >= 7)
+    assert dealctx._imp_item({**x, "ev": поздно - dt.timedelta(days=1)}, row, today, ppl)["fresh"] is False
+
+
+def test_главное_старше_недели_не_сегодня(monkeypatch):
+    monkeypatch.setattr(dealctx, "IMP_MAX_DAYS", 0)
+    dc = fixture.build_realization()["dealctx"]
+    assert [x["deal"] for x in dc["important"]] == ["6002"], "оценка вчерашнего дня уже не «сегодня»"
+    monkeypatch.setattr(dealctx, "IMP_TOP", 1)
+    monkeypatch.setattr(dealctx, "IMP_MAX_DAYS", 7)
+    assert len(fixture.build_realization()["dealctx"]["important"]) == 1
+
+
+
+def test_главное_свежесть_по_доказательству_снятые_и_без_сводки():
+    """Ревью 25.10.2026: история, прочитанная сегодня, по сообщениям трёхмесячной давности — не
+    «сегодня»; пункты, снятые проверкой, отличимы от «важного нет»; без сводки — так и сказано."""
+    raw = fixture.realctx_raw()
+    давно = (NOW - dt.timedelta(days=90)).isoformat()
+    raw["facts"]["6002"]["imp"]["items"][0]["ev"] = давно
+    raw["facts"]["6002"]["imp"]["src"] = "история"
+    raw["facts"]["6006"]["imp"].update(n=2, dg=False)
+    raw["facts"]["6003"]["imp"].update(n=1, dg=True)
+    r = fixture.build_realization()
+    ct = r["contracts"]
+    head, dc = dealctx.build(ct["rows"], contracts.life_all(ct), dealctx.clean(raw), NOW, today=TODAY)
+    assert "6002" not in [x["deal"] for x in dc["important"]], "старое доказательство — не «сегодня»"
+    f2 = dc["deals"]["6002"]["facts"]["imp"]
+    assert f2["fresh"] is False and f2["items"][0]["fresh"] is False and f2["items"][0]["ev"].endswith("2026")
+    f6 = dc["deals"]["6006"]["facts"]["imp"]
+    assert f6["items"] == [] and f6["dropped"] == 2 and f6["dg"] is False, "сняты проверкой, а не «важного нет»"
+    assert dc["deals"]["6003"]["facts"]["imp"]["dropped"] == 0 and dc["important"][0]["dg"] is True
+    # число пунктов и признак сводки — только по форме
+    плохой = fixture.realctx_raw()
+    плохой["facts"]["6002"]["imp"]["n"] = "два"
+    плохой["facts"]["6003"]["imp"]["items"][0]["ev"] = "вчера"
+    ctx = dealctx.clean(плохой)
+    assert ctx["bad"] == 2 and not {"6002", "6003"} & set(ctx["facts"])
+
+
+def test_сумма_из_чата_без_валюты_в_карточке_так_и_сказано():
+    raw = fixture.realctx_raw()
+    raw["facts"]["6002"]["money"][0].update(cur="неясно", vat="не_указано")
+    r = fixture.build_realization()
+    ct = r["contracts"]
+    _head, dc = dealctx.build(ct["rows"], contracts.life_all(ct), dealctx.clean(raw), NOW, today=TODAY)
+    m = dc["deals"]["6002"]["facts"]["money"][0]
+    assert "(валюта не указана)" in m["line"] and "НДС не указан" in m["line"] and not m["gap"]
+    assert "не сравнить" in m["sum"]

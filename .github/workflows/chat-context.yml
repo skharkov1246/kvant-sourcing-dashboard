@@ -38,7 +38,22 @@ name: Чат сделки — оценка хода моделью (пилот, 
 #
 # РАСПИСАНИЕ (решение владельца 23.10.2026): каждую ночь в 04:07 UTC (07:07 МСК) —
 # repository_dispatch «chat-context» от Cloudflare-планировщика (scheduler/worker.js).
-# У dispatch нет входов: режим live, бюджет 5, чатов 400, частей 10 (env задания).
+# У dispatch нет входов: режим live, суточный проход, бюджет 5, чатов 400, частей 10.
+#
+# ФАКТЫ И «ГЛАВНОЕ» (решение владельца 25.10.2026, chat-ctx-2): тот же вызов модели
+# выписывает из сообщений суммы, сведения о договоре и сигналы сорсинга и отмечает 0–3
+# пункта «что важно» по всему контексту сделки. Цитата факта — до 200 знаков, без
+# контактов и имён, только в закрытой базе (deal_chat_facts).
+#
+# РАЗОВОЕ ЧТЕНИЕ ИСТОРИИ (решение владельца 25.10.2026: «Да, и прочитать историю разово
+# до $20») — вход pass = history, только вручную: старые сообщения открытых сделок, до
+# 300 на чат, со своей статьёй расхода «история» (20 долларов за всё время, держит база —
+# deal_chat_take_budget), суточный предел 5 долларов она не трогает. Порядок: dry (счёт
+# чатов, страниц, сообщений, оценка на сделку и подписанная экстраполяция на всех) → live
+# limit 10 (проба) → live limit 60, повторять, пока кандидатов не 0 или журнал не скажет
+# «разовый бюджет исчерпан» (выход кодом 0 до чтения портала). Код 1 или сработавший гейт
+# (прогон откачен целиком) — стоп и разбор, не повтор: повтор возьмёт те же сделки и заплатит
+# за них снова (ревью 28.10.2026). Ночной запуск — всегда суточный.
 on:
   repository_dispatch:
     types: [chat-context]
@@ -49,11 +64,16 @@ on:
         type: choice
         options: [dry, live]
         default: dry
+      pass:
+        description: "daily — новые сообщения (суточный предел $5); history — разовое чтение истории (своя статья, $20 за всё время)"
+        type: choice
+        options: [daily, history]
+        default: daily
       budget_usd:
-        description: "Предел расхода на модель за прогон, долларов (0…5; и не больше остатка суток по Москве)"
+        description: "Предел расхода на модель за прогон, долларов (daily 0…5, history 0…20; и не больше остатка статьи)"
         default: "5"
       limit:
-        description: "Сколько чатов сделок прочитать (1…400)"
+        description: "Сколько чатов сделок прочитать (daily 1…400, history 1…60; вне предела прогон не идёт)"
         default: "100"
       parts:
         # Распоряжение владельца 22.09.2026: «всегда дели минимум на 10». Меньше
@@ -78,6 +98,7 @@ jobs:
     env:
       # ночной запуск (dispatch) входов не несёт — его значения здесь
       MODE: ${{ github.event_name == 'repository_dispatch' && 'live' || inputs.mode }}
+      PASS: ${{ github.event_name == 'repository_dispatch' && 'daily' || inputs.pass }}
       BUDGET: ${{ github.event_name == 'repository_dispatch' && '5' || inputs.budget_usd }}
       LIMIT: ${{ github.event_name == 'repository_dispatch' && '400' || inputs.limit }}
       PARTS: ${{ github.event_name == 'repository_dispatch' && '10' || inputs.parts }}
@@ -104,15 +125,25 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$BUDGET" =~ ^[0-9]+([.][0-9]+)?$ ]] || { echo "::error::budget_usd — не число"; exit 1; }
-          awk -v b="$BUDGET" 'BEGIN { exit !(b + 0 <= 5) }' \
-            || { echo "::error::budget_usd больше 5 — предел владельца 5 долларов в сутки"; exit 1; }
+          # имена переменных оболочки — только латиница
+          case "$PASS" in
+            daily)   CAP=5;  CAP_WHAT="5 долларов в сутки"; LMAX=400 ;;
+            history) CAP=20; CAP_WHAT="20 долларов на разовое чтение истории"; LMAX=60 ;;
+            *) echo "::error::pass — daily или history"; exit 1 ;;
+          esac
+          awk -v b="$BUDGET" -v p="$CAP" 'BEGIN { exit !(b + 0 <= p + 0) }' \
+            || { echo "::error::budget_usd больше $CAP — предел владельца $CAP_WHAT"; exit 1; }
           [[ "$LIMIT" =~ ^[0-9]+$ ]] || { echo "::error::limit — не целое"; exit 1; }
+          # предел — как у бюджета: вне 1…LMAX прогон не идёт, а не урезается молча
+          # (ЛИМИТ_МАКС и ЛИМИТ_ИСТОРИИ scripts/chat_context.py; ревью 28.10.2026)
+          [ "$LIMIT" -ge 1 ] && [ "$LIMIT" -le "$LMAX" ] \
+            || { echo "::error::limit вне 1…$LMAX для прохода $PASS"; exit 1; }
           [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
           if [ "$MODE" = live ]; then
             [ -n "${A:-}" ] || { echo "::error::нет секрета ANTHROPIC_API_KEY — оценка моделью невозможна"; exit 1; }
             [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — оценки некуда писать"; exit 1; }
           fi
-          echo "режим $MODE, бюджет $BUDGET, чатов не больше $LIMIT, частей $PARTS"
+          echo "режим $MODE, проход $PASS, бюджет $BUDGET, чатов не больше $LIMIT, частей $PARTS"
 
       # Проверки записи — на своей чистой базе ПЕРЕД рабочей: пропущенная
       # проверка — не пройденная проверка. База в локали UTF-8 (правило 21а).
@@ -139,6 +170,19 @@ jobs:
           fi
           psql "$SUPABASE_DB_URL" -q -v ON_ERROR_STOP=1 -f library/supabase/deal_chat_schema.sql
 
+      # Сводка по сделке (решение владельца 25.10.2026): стадия, шаг регламента, сроки,
+      # заказы, договоры, экономика — без имён; пишет сборка дашборда после деплоя
+      # (deploy.yml → закрытый ключ dealdigest:v1). Читается в файл на раннере; нет ключа
+      # или доступа — модель видит стадию из портала, прошлую оценку и факты. Старше
+      # chat_context.СВОДКА_ЧАСОВ — не используется. В журнал — только счётчики.
+      - name: Сводка по сделкам (KV dealdigest:v1)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python scripts/dealdigest_kv.py --fetch "$RUNNER_TEMP/dealdigest.json" \
+            || echo "::warning::сводка по сделкам не прочитана — модель увидит только стадию"
+
       - name: Оценка
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
@@ -154,7 +198,11 @@ jobs:
           BITRIX_PARALLEL: "1"
           # попытка — в ключе: откат повторного запуска не трогает оценки первой попытки
           RUN_ID: chat-ctx-${{ github.run_id }}-${{ github.run_attempt }}
-        run: python scripts/chat_context.py --mode "$MODE" --budget "$BUDGET" --limit "$LIMIT" --parts "$PARTS"
+          # сводка по сделке (стадия, сроки, заказы, договоры, экономика — без имён) — файл
+          # из закрытого ключа dealdigest:v1 (шаг выше); нет файла — модель видит стадию из
+          # портала, прошлую оценку и факты
+          DEALDIGEST_PATH: ${{ runner.temp }}/dealdigest.json
+        run: python scripts/chat_context.py --mode "$MODE" --pass "$PASS" --budget "$BUDGET" --limit "$LIMIT" --parts "$PARTS"
 
       # Свод по сделкам → закрытый ключ KV realctx:v1 для вкладки «Реализация». И после
       # неудачной оценки: свод читает только непомеченные оценки, а договоры в нём —

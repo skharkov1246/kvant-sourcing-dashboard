@@ -36,11 +36,11 @@ const node = () => ({innerHTML: '', value: '', textContent: '', dataset: {}, cla
   closest() { return node(); }, querySelector() { return null; }, contains() { return false; }});
 const byId = {};
 const document = {getElementById: id => (byId[id] ||= node()), querySelectorAll: () => []};
-const box = {document, window: {__ORKMONTH__: inp.orkMonth, __DEALCTX__: null, scrollTo() {}},
+const box = {document, window: {__ORKMONTH__: inp.orkMonth, __DEALCTX__: inp.dc || null, scrollTo() {}},
   location: {hash: ''}, console, JSON, Math, Object, Array, String, Number, Set, Map, RegExp,
   qmark: () => '', openContract() {}};
 vm.createContext(box);
-vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + 'function _dcData(){return null;}\n' + inp.code
+vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + (inp.dcCode || 'function _dcData(){return null;}') + '\n' + inp.code
   + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkHow=_orkHow;', box);
 const out = {};
 for (const [k, X] of Object.entries(inp.views)) {
@@ -58,10 +58,21 @@ def _line(prefix: str) -> str:
     return next(ln for ln in TPL.splitlines() if ln.startswith(prefix))
 
 
-def _render(views: dict, ork_month) -> dict:
+def _fn(name: str) -> str:
+    """Текст функции шаблона верхнего уровня — до следующей функции или комментария."""
+    a = TPL.index(f"function {name}(")
+    b = min(i for i in (TPL.find("\nfunction ", a + 1), TPL.find("\n//", a + 1)) if i > 0)
+    return TPL[a:b]
+
+
+def _render(views: dict, ork_month, dc: dict | None = None) -> dict:
     code = TPL[TPL.index(START):TPL.index(END)]
     inp = {"code": code, "esc": _line("const _esc="), "ctN": _line("const _ctN="), "views": views,
            "orkMonth": ork_month}
+    if dc is not None:
+        # закрытая часть (право «договоры и деньги»): настоящие _dcData и списки «главного»
+        inp["dc"] = dc
+        inp["dcCode"] = "\n".join(_fn(n) for n in ("_dcData", "_dcImpBasis", "_dcImpList"))
     r = subprocess.run(["node", "-e", HARNESS], input=json.dumps(inp, ensure_ascii=False, default=str),
                        capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr[-2000:]
@@ -173,3 +184,33 @@ def test_ждём_упд_ноль_при_неизвестном_сроке_пр�
     r12.update(now=2, over=0, waitUtd=0, overUnknown=1, notCounted=0)
     _o, c = cell(v)
     assert "ждём УПД от клиента 0" in c, c
+
+
+def test_что_важно_сегодня_в_неделе_под_очередью(built):
+    """Решение владельца 25.10.2026: «Что важно сегодня» — руководителю, закрытой частью. С
+    26.10.2026 очередь «что делать» — в «Неделе»: блок — сразу под ней, строка ведёт в
+    карточку (data-ct), хозяин — по регламенту ОРК; у направления — свой список. Без права
+    («договоры и деньги») блока нет совсем."""
+    ct, dc = built["contracts"], built["dealctx"]
+    assert dc["important"] and dc["sepImportant"]
+    sep = copy.deepcopy(ct["sep"])
+    sep["dir"], sep["seg"] = "sep", "16"          # как renderContracts: вид направления помечен seg
+    out = _render({"main": ct, "sep": sep}, built["ork_month"], dc=dc)
+    week = out["main"]["week"]
+    assert week.index("orkQs") < week.index("ctImpS"), "блок — под очередью"
+    assert week.count('<tbody id="ctImp">') == 1
+    for x in dc["important"]:
+        assert f'data-ct="{x["deal"]}"' in week[week.index("ctImpS"):] and x["text"] in week
+        assert x["role"] in week[week.index("ctImpS"):]
+    assert not any(x["text"] in week for x in dc["sepImportant"]), "пункты направления — не в основном виде"
+    assert all(x["text"] in out["sep"]["week"] for x in dc["sepImportant"])
+    # «в копии» — как в очереди недели (ревью 28.10.2026): у срыва срока направления КАМ в копии
+    с_копией = [x for x in dc["sepImportant"] if x.get("copy")]
+    assert с_копией and all(f"в копии: {x['copy']}" in out["sep"]["week"] for x in с_копией)
+    assert "(КАМ)" in out["sep"]["week"][out["sep"]["week"].index("ctImpS"):]
+    # без закрытой части — ни заголовка, ни строк
+    bare = _render({"main": ct}, built["ork_month"])["main"]["week"]
+    assert "ctImpS" not in bare and "Что важно сегодня" not in bare
+    # закрытая часть есть, а оценок с «главным» нет — «Нет данных», не пустая таблица
+    empty = _render({"main": ct}, built["ork_month"], dc={**dc, "important": [], "sepImportant": []})["main"]["week"]
+    assert "ctImpS" in empty and "Нет данных" in empty[empty.index("ctImpS"):] and 'id="ctImp"' not in empty
