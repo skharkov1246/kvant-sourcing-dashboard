@@ -57,6 +57,13 @@ process.stdout.write(JSON.stringify(out));
 """
 
 
+def _plain(html: str) -> str:
+    """Число со списком заказов за ним — кнопка (решение владельца 29.10.2026): для сверки
+    подписей кнопка снимается, число остаётся."""
+    import re
+    return re.sub(r'<button type="button" class="odn[^"]*"[^>]*>(.*?)</button>', r"\1", html)
+
+
 def _line(prefix: str) -> str:
     return next(ln for ln in TPL.splitlines() if ln.startswith(prefix))
 
@@ -148,7 +155,7 @@ def test_ждём_упд_от_клиента_отдельно_от_сверх_н
     w = ct["ork"]["week"]
     n = w["waitUtd"]["n"]
     assert n > 0 and w["ledger"][11]["no"] == 12 and w["ledger"][11]["waitUtd"] == n
-    out = _render({"main": ct}, built["ork_month"])["main"]["week"]
+    out = _plain(_render({"main": ct}, built["ork_month"])["main"]["week"])
     assert f"ждём УПД от клиента {n}</span>" in out, "ведомость, шаг 12"
     assert "<th class=\"r\">Ждём УПД от клиента</th>" in out, "столбец по менеджерам"
     assert f"ждём УПД от клиента (не в счёте): {n}" in out, "подпись W2"
@@ -170,7 +177,7 @@ def test_ждём_упд_ноль_при_неизвестном_сроке_пр�
     sep["dir"] = "sep"
 
     def cell(view):
-        out = _render({"v": view}, None)["v"]["week"]
+        out = _plain(_render({"v": view}, None)["v"]["week"])
         i = out.index('data-step="12"')
         row = out[i:out.index("</tr>", i)]
         return out, re.findall(r'<td class="r mono[^"]*">(.*?)</td>', row)[1]
