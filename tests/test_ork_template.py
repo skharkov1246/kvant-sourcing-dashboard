@@ -300,23 +300,25 @@ def test_неделя_строки_с_номером_заказа_поставщ
 
 
 def test_карточка_заказа_номер_и_начало_счёта(три):
-    """Карточка сделки (openContract): три заказа — три строки с номерами 990/1, 990/2, 990/3,
-    поставщиком и сроком клиента; у заказа на шаге с нормой — «с дд.мм (назначение)»."""
+    """Карточка сделки (openContract → _ctOrdHtml): три заказа — три блока с номерами 990/1, 990/2,
+    990/3, поставщиком и сроком клиента; у заказа на шаге с нормой — «шаг N · W р.д. при норме M»
+    и «с дд.мм (назначение)»; у каждого — ссылка на заказ в Битриксе (смарт-процесс 172), а
+    «Путь заказа →» — только когда на странице есть _opOpen (R3, 29.10.2026)."""
     ct, _om = три
-    a = TPL.index("h+=ords.map(") + len("h+=ords.map(")
-    b = TPL.index(").join('')\n    ||'<div class=\"dimv\">заказов нет'", a)
     js = (r"""
 const vm = require('node:vm'); const fs = require('node:fs');
 const inp = JSON.parse(fs.readFileSync(0, 'utf8')); const out = {};
-const box = {JSON, String, Math, out, inp};
+const box = {JSON, String, Math, out, inp, encodeURIComponent};
 vm.createContext(box);
-vm.runInContext(inp.esc + '\n' + inp.helpers + '\nconst _stShort=n=>String(n||"").split(" | ")[0];\n'
-  + 'for (const x of inp.rows) out[x.deal] = (x.orders||[]).map(' + inp.fn + ');', box);
+vm.runInContext(inp.esc + '\n' + inp.helpers + '\nconst _stShort=n=>String(n||"").split(" | ")[0];\n' + inp.fn
+  + '\nfor (const x of inp.rows) out[x.deal] = (x.orders||[]).map(o=>_ctOrdHtml(o,x));'
+  + '\nthis._opOpen = function(){};\nout.withPath = _ctOrdHtml(inp.rows[0].orders[0], inp.rows[0]);', box);
 process.stdout.write(JSON.stringify(out));
 """)
-    helpers = "\n".join(_line(p) for p in ("const _orkD=", "const _orkDm=", "const _orkDy="))
+    helpers = "\n".join(_line(p) for p in ("const _orkD=", "const _orkDm=", "const _orkDy=", "const _ctBxOrd=",
+                                           "const _CT_ROLE="))
     rows = [r for r in ct["rows"] if r["deal"] == "6090" or r["seq"] == 933]
-    inp = {"esc": _line("const _esc="), "helpers": helpers, "fn": TPL[a:b], "rows": rows}
+    inp = {"esc": _line("const _esc="), "helpers": helpers, "fn": _fn("_ctOrdHtml"), "rows": rows}
     r = subprocess.run(["node", "-e", js], input=json.dumps(inp, ensure_ascii=False), capture_output=True,
                        text=True, timeout=120)
     assert r.returncode == 0, r.stderr[-2000:]
@@ -325,10 +327,16 @@ process.stdout.write(JSON.stringify(out));
     assert len(card) == 3
     for lbl, sup, dl in (("990/1", "Компания 401", "14.10.2025"), ("990/2", "Компания 404", "29.09.2026"),
                          ("990/3", "Компания 407", "09.10.2026")):
-        hit = [h for h in card if f"{lbl}. Узел" in h]
-        assert len(hit) == 1 and sup in hit[0] and f"дедлайн {dl}" in hit[0], lbl
-    o933 = [h for h in out[next(r["deal"] for r in rows if r["seq"] == 933)] if "933/3." in h]
-    assert len(o933) == 1 and "шаг 4 · 3 / 2 р.д." in o933[0] and "с 14.10 (назначение)" in o933[0]
+        hit = [h for h in card if f'<span class="no">{lbl}</span>. Узел' in h]
+        assert len(hit) == 1 and sup in hit[0] and f"срок клиента {dl}" in hit[0], lbl
+        assert "https://kvantpro.bitrix24.ru/crm/type/172/details/" in hit[0] and "в Битриксе ↗" in hit[0]
+        assert 'target="_blank" rel="noopener"' in hit[0]
+        assert "data-ctop=" not in hit[0], "без _opOpen кнопки пути нет"
+    assert "просрочен на" in next(h for h in card if ">990/1<" in h), "990/1 — срок клиента прошёл"
+    o933 = [h for h in out[next(r["deal"] for r in rows if r["seq"] == 933)] if ">933/3<" in h]
+    assert len(o933) == 1 and "шаг 4 · 3 р.д. при норме 2" in o933[0] and "с 14.10 (назначение)" in o933[0]
+    assert "исполнитель: " in o933[0]
+    assert 'data-ctop="' in out["withPath"] and "Путь заказа →" in out["withPath"]
 
 
 def test_очередь_кама_заказы_строками(три):
