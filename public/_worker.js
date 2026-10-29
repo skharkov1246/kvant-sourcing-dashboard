@@ -2523,11 +2523,11 @@ function portalBar(who, rights, env) {
   const team = String((env && env.CF_ACCESS_TEAM) || CF_TEAM_DEFAULT).replace(/^https?:\/\//, "").replace(/\/+$/, "");
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  return `<div style="display:flex;gap:14px;align-items:center;justify-content:space-between;font:12px/1.4 'IBM Plex Sans',sans-serif;color:#8b97a8;padding:8px 14px 0">` +
-    `<span><a href="/" style="color:#5aa9ff;text-decoration:none">← Портал КВАНТ</a>` +
-    (rights.admin || rights.rights.includes("suppliers") ? ` · <a href="/base" style="color:#5aa9ff;text-decoration:none">Управление поставщиками →</a>` : "") + `</span>` +
-    `<span>${esc(who.email)}${rights.admin ? ' · <a href="/admin" style="color:#5aa9ff;text-decoration:none">доступы</a>' : ""}` +
-    ` · <a href="https://${esc(team)}/cdn-cgi/access/logout" style="color:#5aa9ff;text-decoration:none">выйти</a></span></div>`;
+  return `<div style="display:flex;gap:14px;align-items:center;justify-content:space-between;font:12px/1.4 'IBM Plex Sans',sans-serif;color:var(--mut,#8b97a8);padding:8px 14px 0">` +
+    `<span><a href="/" style="color:var(--b,#5aa9ff);text-decoration:none">← Портал КВАНТ</a>` +
+    (rights.admin || rights.rights.includes("suppliers") ? ` · <a href="/base" style="color:var(--b,#5aa9ff);text-decoration:none">Управление поставщиками →</a>` : "") + `</span>` +
+    `<span>${esc(who.email)}${rights.admin ? ' · <a href="/admin" style="color:var(--b,#5aa9ff);text-decoration:none">доступы</a>' : ""}` +
+    ` · <a href="https://${esc(team)}/cdn-cgi/access/logout" style="color:var(--b,#5aa9ff);text-decoration:none">выйти</a></span></div>`;
 }
 
 // Триггер пересборки через GitHub repository_dispatch, с дебаунсом через Cache API

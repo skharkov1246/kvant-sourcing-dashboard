@@ -27,8 +27,8 @@
     --bg:#ffffff;--panel:#ffffff;--panel2:#f6f8fa;--line:#d0d7de;--line2:#e6eaef;--ctl:#8c959f;
     --ink:#1f2328;--ink2:#24292f;--strong:#0b0d10;--mut:#57606a;--dim:#626a73;
     --a:#a65006;--a2:#92400e;--b:#0b6b85;--b2:#155e75;
-    --ok:#17733a;--ok2:#116329;--warn:#c01f2b;--warn2:#a40e26;--nr:#b42318;--ip:#8c959f;--new:#626a73;--oth:#9aa3ad;
-    --fa:#d97706;--fa2:#fbbf24;--fb2:#4fb8c9;--fok2:#56c288;--okd:#116329;--onA:#1f2328;
+    --ok:#17733a;--ok2:#116329;--warn:#c01f2b;--warn2:#a40e26;--nr:#b42318;--ip:#8c959f;--new:#626a73;--oth:#8c959f;
+    --fa:#d97706;--fa2:#fbbf24;--fb2:#4fb8c9;--fok2:#56c288;--okd:#116329;--onA:#1f2328;--tabon:#d97706;
     --hov:rgba(31,35,40,.04);--scrim:rgba(31,35,40,.32);--shc:rgba(31,35,40,.28);--shd:rgba(31,35,40,.16);
     --glow:none;--minor-op:.9;--soft-op:1;
     --amber:var(--a2);
@@ -40,7 +40,7 @@
     --ink:#e8edf2;--ink2:#cdd6e0;--strong:#fff;--mut:#8b97a6;--dim:#838e9d;
     --a:#f5a524;--a2:#ffcf6b;--b:#3aa6b9;--b2:#6fd0df;
     --ok:#4ec98a;--ok2:#9ae6bd;--warn:#e5634d;--warn2:#f0917f;--nr:#f07368;--ip:#46566a;--new:#33414f;--oth:#566;
-    --fa:#f5a524;--fa2:#ffcf6b;--fb2:#6fd0df;--fok2:#9ae6bd;--okd:#1c7a52;--onA:#0e1116;
+    --fa:#f5a524;--fa2:#ffcf6b;--fb2:#6fd0df;--fok2:#9ae6bd;--okd:#1c7a52;--onA:#0e1116;--tabon:#ffcf6b;
     --hov:rgba(255,255,255,.02);--scrim:rgba(8,11,15,.62);--shc:rgba(0,0,0,.7);--shd:rgba(0,0,0,.45);
     --minor-op:.9;--soft-op:.85;
     --glow:radial-gradient(1100px 420px at 80% -8%,rgba(245,165,36,.07),transparent 60%),radial-gradient(900px 380px at 6% 0%,rgba(58,166,185,.06),transparent 55%);
@@ -52,10 +52,12 @@
   .thtgl:hover{color:var(--ink);border-color:var(--a)}
   .thtgl:focus-visible{outline:2px solid var(--a);outline-offset:2px}
   .thtgl~.tabs{clear:both}
+  @media(max-width:480px){.thtgl{float:none;display:flex;width:max-content;margin:0 0 10px auto}}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   body{padding:clamp(18px,3.5vw,34px) clamp(14px,2.8vw,30px) 60px;max-width:1180px;margin:0 auto;
     background-image:var(--glow);}
+  a{color:var(--b)}
   .mono{font-family:var(--mono)}
   header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
   .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--a);font-weight:600}
@@ -232,6 +234,7 @@
   .ctools{margin:0 0 12px}
   .search{width:100%;max-width:520px;padding:9px 13px;border-radius:9px;border:1px solid var(--ctl);background:var(--panel2);color:var(--ink);font-size:13px;font-family:inherit}
   .search:focus{outline:none;border-color:var(--a)}
+  input::placeholder,textarea::placeholder{color:var(--dim);opacity:1}
   th.sortable{cursor:pointer;user-select:none;transition:color .12s}
   th.sortable:hover{color:var(--a2)}
   th.sortable.on{color:var(--a)}
@@ -348,7 +351,7 @@
   .tabs::-webkit-scrollbar{display:none}
   .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer;white-space:nowrap;flex:none;transition:color .12s,border-color .12s}
   .tab:hover{color:var(--ink);border-color:var(--a)}
-  .tab.act{color:var(--onA);background:var(--fa2);border-color:var(--fa2);font-weight:700}
+  .tab.act{color:var(--onA);background:var(--tabon);border-color:var(--tabon);font-weight:700}
   /* четыре функции управления — крупно; остальное — после «ещё» (решение владельца 19.10.2026) */
   .tabsep{align-self:center;flex:none;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:0 0 0 12px;margin-left:4px;border-left:1px solid var(--line)}
   .tabsep:last-child{display:none}
@@ -360,7 +363,7 @@
 
   /* вкладка «Реализация»: подсветка замедленных, бейджи источника закупки, таймлайн */
   tr.slowrow td{background:color-mix(in srgb,var(--nr) 8%,transparent)}
-  tr.slowrow:hover td{background:color-mix(in srgb,var(--nr) 14%,transparent)}
+  tr.slowrow:hover td{background:color-mix(in srgb,var(--nr) 10%,transparent)}
   .srcb{font-size:9px;padding:1px 5px;border-radius:4px;background:var(--panel2);color:var(--mut);font-family:var(--mono);white-space:nowrap}
   .srcb.econ{color:var(--b2);background:color-mix(in srgb,var(--b) 13%,transparent)}
   .srcb.none{color:var(--warn2);background:color-mix(in srgb,var(--nr) 13%,transparent)}
@@ -1740,7 +1743,7 @@ function renderPulse(C){
   // 1 · распределение созданных
   const fb=(lbl,n,pct,dr,color)=>`<div class="flowbox drill" data-drill="${dr}"><div class="n" style="color:${color}">${n}</div><div class="l">${lbl}</div><div class="dimv" style="font-size:11px">${pct}%</div></div>`;
   h+=`<div class="secttl"><b>1</b> · Что стало с созданными сделками${qmark('c.funnel')}</div><section class="card"><div class="note">Каждая созданная в 2026 сделка — в одном из трёх состояний (создано = ранний + в реализации + проиграно). «В реализации» = есть заказ поставщику (СП-172) или номер реализации в названии — статус «выиграна» в портале почти не ставится, поэтому считать по нему нельзя. Клик — список.</div>`
-    +`<div class="distbar">${f.early?`<i class="drill" data-drill="early" style="width:${f.earlyPct}%;background:var(--b2)" title="ранний ${f.early}"></i>`:''}${f.real?`<i class="drill" data-drill="real" style="width:${f.realPct}%;background:var(--ok)" title="в реализации ${f.real}"></i>`:''}${f.lost?`<i class="drill" data-drill="lost" style="width:${f.lostPct}%;background:var(--nr)" title="проиграно ${f.lost}"></i>`:''}</div>`
+    +`<div class="distbar">${f.early?`<i class="drill" data-drill="early" style="width:${f.earlyPct}%;background:var(--fb2)" title="ранний ${f.early}"></i>`:''}${f.real?`<i class="drill" data-drill="real" style="width:${f.realPct}%;background:var(--ok)" title="в реализации ${f.real}"></i>`:''}${f.lost?`<i class="drill" data-drill="lost" style="width:${f.lostPct}%;background:var(--nr)" title="проиграно ${f.lost}"></i>`:''}</div>`
     +`<div class="flow" style="margin-top:14px">${fb('Создано',f.created,100,'all','var(--ink)')}${fb('Ранний пайплайн',f.early,f.earlyPct,'early','var(--b2)')}${fb('В реализации',f.real,f.realPct,'real','var(--ok)')}${fb('Проиграно',f.lost,f.lostPct,'lost','var(--nr)')}</div>`
     +`<div class="note" style="margin-top:10px">В реализации: продажи <b style="color:var(--ok)">${f.sales}</b> · закупка <b style="color:var(--a)">${f.buy}</b> · маржа <b style="color:var(--ok2)">${f.margin}</b>. Подробнее — вкладки «Реализация» и КАМы/Инжиниринг/Продукт.</div></section>`;
   // 2 · динамика входа + структура
@@ -2088,7 +2091,7 @@ function renderCohorts(C){
   const cohLbl=(C.cohorts&&C.cohorts.label)||C.label;
   const qOf=mm=>`${mm.slice(0,4)}-Q${Math.floor((parseInt(mm.slice(5,7),10)-1)/3)+1}`;
   const seg=(p,col,tip)=>p?`<i style="width:${p}%;background:${col}" title="${tip}"></i>`:'';
-  const barRow=c=>`<div class="cohbar drill" data-q="${c.key}"><div class="cohlbl"><b>${c.label}</b><span class="dimv">${c.created} шт · ${c.createdSum}</span></div><div class="cohbars" style="flex:1"><div class="bl"><span class="blk">шт</span><div class="distbar">${seg(c.earlyPct,'var(--b2)','ранний '+c.early)}${seg(c.conv,'var(--ok)','в реализации '+c.real)}${seg(c.lostPct,'var(--nr)','проиграно '+c.lost)}</div></div><div class="bl"><span class="blk">€</span><div class="distbar">${seg(c.earlyValPct,'var(--b2)','ранний по сумме')}${seg(c.realValPct,'var(--ok)','в реализации по сумме')}${seg(c.lostValPct,'var(--nr)','проиграно по сумме')}</div></div></div><div class="cohconv">${c.conv}%<small>${c.convVal}% €</small></div></div>`;
+  const barRow=c=>`<div class="cohbar drill" data-q="${c.key}"><div class="cohlbl"><b>${c.label}</b><span class="dimv">${c.created} шт · ${c.createdSum}</span></div><div class="cohbars" style="flex:1"><div class="bl"><span class="blk">шт</span><div class="distbar">${seg(c.earlyPct,'var(--fb2)','ранний '+c.early)}${seg(c.conv,'var(--ok)','в реализации '+c.real)}${seg(c.lostPct,'var(--nr)','проиграно '+c.lost)}</div></div><div class="bl"><span class="blk">€</span><div class="distbar">${seg(c.earlyValPct,'var(--fb2)','ранний по сумме')}${seg(c.realValPct,'var(--ok)','в реализации по сумме')}${seg(c.lostValPct,'var(--nr)','проиграно по сумме')}</div></div></div><div class="cohconv">${c.conv}%<small>${c.convVal}% €</small></div></div>`;
   let h=`<header><div class="eyebrow">Квант · когортный анализ</div><h1>Когорты сделок</h1><div class="sub"><span>Период: <b>${cohLbl}</b></span><span class="dimv">Сделки по кварталу/месяцу создания (с 2025) → успехи (реализация). Клик по строке/полосе — список сделок когорты.</span></div></header>`;
   h+=`<div class="secttl"><b>1</b> · По кварталам${qmark('c.cohorts')}</div><section class="card"><div class="note">Две полосы на когорту: <b>шт</b> — по количеству сделок, <b>€</b> — по сумме. Сегменты: <b style="color:var(--b2)">ранний</b> / <b style="color:var(--ok)">в реализации</b> / <b style="color:var(--nr)">проиграно</b>. «Конв. шт» = доля сделок в реализации; <b style="color:var(--a2)">«конв. €»</b> = доля СУММЫ созданных сделок, дошедшая до реализации. Сравните их: конв.€ > конв.шт ⇒ крупные сделки конвертятся лучше мелких (и наоборот).</div>`
     + Q.map(barRow).join('')
