@@ -280,10 +280,10 @@ export function applyAcl(html, tabs, who) {
   }
   // 5) плашка «кто вошёл» + выход
   const bar = `<div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;` +
-    `font:12px/1.4 'IBM Plex Sans',sans-serif;color:#8b97a8;padding:6px 14px 0">` +
+    `font:12px/1.4 'IBM Plex Sans',sans-serif;color:var(--mut,#8b97a8);padding:6px 14px 0">` +
     `<span>${esc(who.email)}${who.admin ? " · админ" : ""} · доступ: ${tabs.length} из ${TAB_IDS.length} вкладок</span>` +
-    (who.admin ? `<a href="/admin" style="color:#5aa9ff;text-decoration:none">админка</a>` : "") +
-    `<a href="/access/logout" style="color:#5aa9ff;text-decoration:none">выйти</a></div>`;
+    (who.admin ? `<a href="/admin" style="color:var(--b,#5aa9ff);text-decoration:none">админка</a>` : "") +
+    `<a href="/access/logout" style="color:var(--b,#5aa9ff);text-decoration:none">выйти</a></div>`;
   html = html.replace('<div class="tabs">', bar + '<div class="tabs">');
   if (tail) html = html.replace("</body>", tail + "</body>");
   return html;
