@@ -111,7 +111,7 @@ def test_каждое_число_недели_открывает_свои_зак
         got = _clicked_rows(pg, rows.nth(i).locator("td").first)
         assert got == P[i]["n"]
         head = pg.locator("#drwSub").inner_text()
-        assert f"{P[i]['n']} заказ" in head and "от всех живых" in head and f"сделок {P[i]['deals']}" in head
+        assert f"{P[i]['n']} заказ" in head and "от всех в работе" in head and f"сделок {P[i]['deals']}" in head
         pg.keyboard.press("Escape")
     assert not errs, errs
 
@@ -135,7 +135,7 @@ def test_плитки_смежники_менеджеры_и_очередь(brow
         if not want:
             continue
         assert _clicked_rows(pg, tr.locator("td").first) == want, r
-        assert "Ждут смежников" in pg.locator("#drwName").inner_text()
+        assert "Ждём:" in pg.locator("#drwName").inner_text()
         assert pg.locator("#drwBody [data-odq]").count() == 1
         pg.keyboard.press("Escape")
         # число «Заказов» — тот же список и тот же переход в очередь, что у строки
@@ -161,7 +161,7 @@ def test_плитки_смежники_менеджеры_и_очередь(brow
     pg.locator("#drwBody [data-odq]").focus()
     pg.keyboard.press("Enter")
     assert pg.locator("#drw.on").count() == 0
-    assert "W2 сверх нормы" in pg.locator("#orkFilt").inner_text()
+    assert "шаги ОРК дольше нормы (W2)" in pg.locator("#orkFilt").inner_text()
     assert not pg.evaluate("document.getElementById('drw').contains(document.activeElement)"), "фокус остался в дровере"
     assert pg.evaluate("document.activeElement.closest('#orkFilt')!==null")
     assert pg.evaluate("document.getElementById('drw').getAttribute('role')") is None
@@ -171,13 +171,13 @@ def test_плитки_смежники_менеджеры_и_очередь(brow
     who = panel.locator("#orkOver tr[data-who]").first
     _clicked_rows(pg, who.locator("td").first)
     pg.locator("#drwBody [data-odq]").click()
-    assert "хозяин, сверх нормы" in pg.locator("#orkFilt").inner_text()
+    assert "отвечает: дольше нормы" in pg.locator("#orkFilt").inner_text()
     _clicked_rows(pg, panel.locator(".actile[data-of='w2']"))
     pg.locator("#drwBody [data-odq]").click()
     filt = pg.locator("#orkFilt").inner_text()
-    assert "человек:" in filt and "хозяин, сверх нормы" not in filt, filt
+    assert "сотрудник:" in filt and "отвечает: дольше нормы" not in filt, filt
     pg.locator("#orkFilt [data-rm='who']").click()
-    assert "W2 сверх нормы" in pg.locator("#orkFilt").inner_text()
+    assert "шаги ОРК дольше нормы (W2)" in pg.locator("#orkFilt").inner_text()
     # сочетание отборов, которое ничего не оставляет, — так и сказано, со «Сбросить»
     pg.locator("#orkFilt [data-rm='code']").click()
     pg.locator("#orkChips .stchip[data-c='dealClose']").click()
@@ -216,7 +216,9 @@ def test_клавиатура_карточка_и_отборы_в_списке(b
     pg.keyboard.press("Shift+Tab")
     assert pg.evaluate("document.getElementById('drw').contains(document.activeElement)")
     # отбор по шагу: строк — сколько на фишке; снять — все
-    chip = pg.locator("#drwBody .statleg [data-odf^='step:']").nth(1)
+    # шаги с числами — в «Разрезах» под таблицей (полосы по убыванию), отбор по клику
+    pg.locator("#drwBody details.odcuts > summary").click()
+    chip = pg.locator("#drwBody .odcuts [data-odf^='step:']").nth(0)
     want = int(chip.locator("b").inner_text())
     chip.click()
     assert pg.locator(ROWS).count() == want
@@ -277,11 +279,14 @@ def test_телефон_390_без_сдвига_вбок(browser, page_url):
     assert pg.evaluate("Math.round(document.getElementById('drw').getBoundingClientRect().width)") == 390
     # строки — карточками: таблица не шире дровера
     assert pg.evaluate("document.querySelector('#odTable').scrollWidth<=document.getElementById('drwBody').clientWidth")
-    # шаги на телефоне — списком выбора (фишки скрыты), отбор им — столько строк, сколько в шаге
+    # телефон: отбор свёрнут (первый экран — «Что делать» и первые заказы); раскрыт — шаг списком
+    # выбора, отбор им — столько строк, сколько в шаге (число — в «Разрезах» под таблицей)
     sel = pg.locator("#drwBody select[data-odsel='step']")
-    assert sel.is_visible() and not pg.locator("#drwBody .odsteps").is_visible()
+    assert not sel.is_visible() and pg.locator("#drwBody details.odtd > summary").is_visible()
+    pg.locator("#drwBody details.odtd > summary").click()
+    assert sel.is_visible()
     v = sel.locator("option").nth(1).get_attribute("value")
-    want = pg.evaluate("v=>[...document.querySelectorAll('#drwBody .odsteps [data-odf]')].find(b=>b.dataset.odf==='step:'+v).querySelector('b').textContent", v)
+    want = pg.evaluate("v=>[...document.querySelectorAll('#drwBody .odcuts [data-odf]')].find(b=>b.dataset.odf==='step:'+v).querySelector('b').textContent", v)
     sel.select_option(v)
     assert pg.locator(ROWS).count() == int(want)
     assert not errs, errs

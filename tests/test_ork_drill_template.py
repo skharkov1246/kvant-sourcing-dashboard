@@ -67,16 +67,17 @@ for (const [k, X] of Object.entries(inp.views)) {
     while ((at = h.indexOf(' data-od="', at)) >= 0) {
       const a = h.lastIndexOf('<', at), b = h.indexOf('>', at), tag = h.slice(a, b + 1);
       at = b;
-      const el = /^<(\w+)/.exec(tag)[1], id = attr(tag, 'data-od'), step = attr(tag, 'data-odstep');
+      const el = /^<(\w+)/.exec(tag)[1], id = attr(tag, 'data-od'), step = attr(tag, 'data-odstep'), otag = attr(tag, 'data-odtag');
       let text = null;
       if (el === 'button') {
         const inner = h.slice(b + 1, h.indexOf('</button>', b));
         const bold = /<b>([^<]*)<\/b>/.exec(inner);
         text = (bold ? bold[1] : inner.replace(/<[^>]+>/g, '')).trim();
       }
-      const M = box._odModel(X, X.ork, {id, F: step != null ? {step} : null});
+      // начальный отбор — как _odBind: шаг, иначе подпись (часть числа: «сорван 19» у W3)
+      const M = box._odModel(X, X.ork, {id, F: step != null ? {step} : otag != null ? {tag: otag} : null});
       const html = M ? box._odHtml(M, Object.assign({}, F0, M.F0 || {})) : '';
-      found.push({sub, el, id, step, cls: attr(tag, 'class'), text,
+      found.push({sub, el, id, step, tag: otag, cls: attr(tag, 'class'), text,
                   items: M ? M.items.length : null, rows: (html.match(/<tr class="drill" data-odk="[^"]*" data-odct=/g) || []).length});
     }
   }
@@ -183,10 +184,10 @@ def test_каждое_число_открывает_ровно_свои_зака
         pulse = (r["contracts"] if view == "main" else r["contracts"]["sep"])["ork"]["week"]["pulse"]["rows"]
         for f in found:
             assert f["items"] is not None, f
-            if f["step"] is None:
+            if f["step"] is None and f.get("tag") is None:
                 assert f["rows"] == f["items"], f          # список без отбора — все строки числа
             if f["id"].startswith("w:") and f["el"] == "button":
-                # кнопка числа «Недели»: строк столько, сколько в числе (с отбором шага — в отборе)
+                # кнопка числа «Недели»: строк столько, сколько в числе (с отбором шага или подписи — в отборе)
                 assert f["rows"] == int(f["text"]), f
             elif f["id"].startswith("w:pulse/") and f["el"] == "tr":
                 assert f["items"] == pulse[int(f["id"].split("/")[1])]["n"], f
@@ -231,7 +232,7 @@ def test_очередь_пуста_из_за_сочетания(run):
 def test_пульс_отрисован_и_ушедший_помечен(run):
     r, out = run
     gone = out["pulseGone"]
-    assert "Пульс ОРК: заказы в работе по людям" in gone and '<span class="gone">ушёл</span>' in gone
+    assert "Пульс ОРК: заказы в работе по людям" in gone and '<span class="gone">уволен — переназначить</span>' in gone
     assert "(уволен)" not in htmlmod.unescape(gone.split("</thead>")[1].split("data-ods")[0]), "подпись без «(уволен)»"
     P = r["contracts"]["ork"]["week"]["pulse"]
     assert gone.count('data-od="w:pulse/') >= len(P["rows"])

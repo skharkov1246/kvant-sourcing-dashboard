@@ -158,7 +158,7 @@ def test_ждём_упд_от_клиента_отдельно_от_сверх_н
     out = _plain(_render({"main": ct}, built["ork_month"])["main"]["week"])
     assert f"ждём УПД от клиента {n}</span>" in out, "ведомость, шаг 12"
     assert "<th class=\"r\">Ждём УПД от клиента</th>" in out, "столбец по менеджерам"
-    assert f"ждём УПД от клиента (не в счёте): {n}" in out, "подпись W2"
+    assert f"Ждём подписанный УПД от клиента: {n} — больше" in out, "подпись W2 («как посчитано»)"
     assert "УПД (12):" not in out and "(эскалация УПД)" not in out
     # итог столбцов: Σ «сверх нормы» = W2, Σ «ждём УПД» = n
     tot = f'<td class="r mono"><b>{w["tiles"]["W2"]["value"]}</b></td><td></td><td class="r mono"><b>{n}</b></td>'
@@ -182,8 +182,8 @@ def test_ждём_упд_ноль_при_неизвестном_сроке_пр�
         row = out[i:out.index("</tr>", i)]
         return out, re.findall(r'<td class="r mono[^"]*">(.*?)</td>', row)[1]
     out, c = cell(sep)
-    assert "ждём УПД от клиента 0" not in c and ">—</span>" in c and "? 1 — срок неизвестен" in c, c
-    assert "срок УПД неизвестен: 1" in out
+    assert "ждём УПД от клиента 0" not in c and ">—</span>" in c and "срок не посчитать: 1" in c, c
+    assert "Срок УПД не посчитать (нет даты доставки или календаря года): 1" in out
     # ручная строка: у шага 12 2 заказа, оба без срока, один «не в счёте» нет — тоже «—»
     v = copy.deepcopy(sep)
     r12 = next(r for r in v["ork"]["week"]["ledger"] if r["no"] == 12)
@@ -282,8 +282,8 @@ def test_неделя_строки_с_номером_заказа_поставщ
         assert len(r) == 1 and sup in r[0], lbl
     r = [x for x in qb if "№933/3<" in x and "договор с поставщиком дольше 2 р.д." in x]
     assert len(r) == 1 and "с 14.10 (назначение)" in r[0] and "менеджер ОРК" in r[0]
-    assert not [x for x in qb if "№933/3<" in x and "приёмка дольше" in x]
-    r = [x for x in qb if "№991/1<" in x and "приёмка дольше 1 р.д." in x]
+    assert not [x for x in qb if "№933/3<" in x and "не приняли в работу" in x]
+    r = [x for x in qb if "№991/1<" in x and "сделку не приняли в работу дольше 1 р.д." in x]
     assert len(r) == 1 and "с 15.10 (создан заказ)" in r[0]
     # «Моя приёмка» — та же строка с номером и началом счёта
     mine = _render({"main": v}, om)["main"]["week"]
@@ -384,11 +384,11 @@ def test_w1_закончено_назначением_из_n(три):
     T1["recent"] = {**(T1.get("recent") or {}), "state": "show", "k": 1, "n": 5}
     T1.update(byAssign=2, assignStale=1, assignNoMgr=3)
     out = _render({"main": v}, om)["main"]["week"]
-    assert "в срок за 20 р.д.: <b>1</b> из 5 · из 5 закончено назначением менеджера ОРК: 2" in out
-    assert "«Заказ создан» с датой назначения не в счёте: раньше начала приёмки 1, ответственный не из ОРК 3" in out
+    assert "Принято за 1 р.д. за последние 20 р.д. (около 4 недель): <b>1</b> из 5. Из 5 приёмку закрыло назначение менеджера ОРК: 2." in out
+    assert "Назначение не засчитано («Заказ создан»): дата раньше начала приёмки — 1, назначен не сотрудник ОРК — 3." in out
     T1.update(byAssign=0, assignStale=0, assignNoMgr=0)
     out = _render({"main": v}, om)["main"]["week"]
-    assert "закончено назначением" not in out and "с датой назначения не в счёте" not in out
+    assert "приёмку закрыло назначение" not in out and "Назначение не засчитано" not in out
 
 
 def test_очередь_кама_без_кама_заказы_строками():

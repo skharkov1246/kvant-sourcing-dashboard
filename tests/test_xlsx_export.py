@@ -343,7 +343,7 @@ def test_очередь_недели_все_строки_а_не_первые_40
     out, r, _m = page_run
     q = out["queue"]
     assert q["shown"] == 40 and q["full"] and q["rows"] > 40
-    assert q["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Что делать") and "(" not in q["file"]
+    assert q["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Очередь дел") and "(" not in q["file"]
     assert len(_rows(q["b64"])) == 1 + q["rows"]
 
 
@@ -353,13 +353,13 @@ def test_число_со_списком_заказов_идёт_в_файл(page
     списка), в файле — то же число, а не пустая ячейка."""
     out, r, _m = page_run
     led = out["ledger"]
-    assert led["head"][:3] == ["Шаг", "Исполнитель", "Сейчас"]
+    assert led["head"][:3] == ["Шаг регламента", "Кто делает", "На шаге"]
     L = r["contracts"]["ork"]["week"]["ledger"]
     rows = _rows(led["b64"])[1:1 + led["rows"]]
-    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Итого сейчас»
+    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Итого на шагах»
     for row, s in zip(rows, L):
         assert str(row[2]).split(" · ")[0] == str(s["now"] or 0), (s["no"], row[2])
-    assert rows[-1][0] == "Итого сейчас" and rows[-1][2] == sum(s["now"] or 0 for s in L)
+    assert rows[-1][0] == "Итого на шагах" and rows[-1][2] == sum(s["now"] or 0 for s in L)
 
 
 def test_список_за_числом_имя_файла_с_подвкладкой_и_направлением(page_run):
@@ -370,9 +370,9 @@ def test_список_за_числом_имя_файла_с_подвкладк�
     out, r, _m = page_run
     a, b = out["odMain"], out["odSep"]
     sep = r["contracts"]["sep"]
-    assert a["file"] == "КВАНТ_Реализация_Неделя руководителя ОРК_Живые заказы вида_2026-10-29.xlsx", a["file"]
+    assert a["file"] == "КВАНТ_Реализация_Неделя руководителя ОРК_Заказы в работе_2026-10-29.xlsx", a["file"]
     name = r["contracts"]["head"]["sep"]["name"]                # название второго направления вкладки
-    assert b["file"] == f"КВАНТ_Реализация_Неделя руководителя ОРК {name}_Живые заказы вида_2026-10-29.xlsx", b["file"]
+    assert b["file"] == f"КВАНТ_Реализация_Неделя руководителя ОРК {name}_Заказы в работе_2026-10-29.xlsx", b["file"]
     for x, v in ((a, r["contracts"]), (b, sep)):
         assert x["rows"] == x["trs"] == x["n"] == v["ork"]["week"]["live"] > 0
         rows = _rows(x["b64"])

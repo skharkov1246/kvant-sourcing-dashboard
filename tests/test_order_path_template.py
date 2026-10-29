@@ -101,7 +101,7 @@ def test_каждый_живой_заказ_путь_из_13_шагов(run):
             assert h.count('<li class="op-s ') == 13, o["id"]
             cur = re.findall(r'<li class="op-s ([^"]*)" aria-current="step"><span class="op-dot" aria-hidden="true">(\d+)</span>', h)
             if o["step"] is None:
-                assert not cur and "не из таблицы шагов" in h
+                assert not cur and "неизвестна регламенту" in h and "сверить стадию заказа в Битриксе" in h
                 continue
             assert len(cur) == 1 and int(cur[0][1]) == o["step"] and "is-cur" in cur[0][0], o["id"]
             assert f"Шаг {o['step']} из 13" in h
@@ -111,7 +111,7 @@ def test_каждый_живой_заказ_путь_из_13_шагов(run):
                 assert f"<b>{o['stepWd']} р.д.</b>" in seg, o["id"]
                 assert f'<b class="op-num">{o["stepWd"]} р.д.</b>' in h
             if o["stepOver"]:
-                assert "сверх нормы на" in h and "op-stuck is-over" in h
+                assert "дольше нормы на" in h and "op-stuck is-over" in h and "Где застрял" in h
             # пройденные шаги пути — с датами входа
             for st, day, _wd in o["path"][:-1]:
                 y, m, dd = day.split("-")
@@ -128,7 +128,9 @@ def test_что_сделать_пункты_очереди_заказа(run):
     for x in q:
         h = out[str(x["order"])]
         todo = unq(_text(h[h.index('id="opTodoH"'):h.index('id="opPathH"') if 'id="opPathH"' in h else len(h)]))
-        assert "→ " + x["act"] in todo, (x["order"], x["code"])
+        # «Рег. 9.2.5» — словами (шаблон, _rzRef): «п. 9.2.5 регламента ОРК»
+        act = re.sub(r"Ан\. §([\d.]*\d)", r"разд. \1 аналитики ОРК", re.sub(r"Рег\. ([\d.]*\d)", r"п. \1 регламента ОРК", x["act"]))
+        assert "→ " + act in todo, (x["order"], x["code"])
     # без пунктов заказа и сделки — действие шага по регламенту
     busy = {str(x["order"]) for x in q}
     busy_d = {str(x["deal"]) for x in allq if not x.get("order")}
@@ -136,7 +138,7 @@ def test_что_сделать_пункты_очереди_заказа(run):
             if o.get("live") and o["step"] and str(o["id"]) not in busy]
     assert some
     for o in some[:5]:
-        assert "Пунктов очереди нет. По регламенту на шаге" in out[str(o["id"])]
+        assert "Отклонений нет. По регламенту на шаге" in out[str(o["id"])]
 
 
 def test_заказы_сделки_и_возврат(run):
