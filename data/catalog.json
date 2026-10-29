@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 319,
-    "total_bytes": 126503009,
+    "total_bytes": 126502185,
     "by_sensitivity": {
       "внутреннее": 197,
       "конфиденциально": 68,
@@ -1712,7 +1712,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 556406,
+      "bytes": 555582,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. С 19.10.2026 в файле только числа по сотрудникам (uid Битрикса); список «ждут ответа» с названиями сделок и LLM-оценки — в KV Cloudflare, ключ chat:v1. До первого прогона после переноса файл ещё прежней схемы.",
       "format": "json",
       "shape": "объект",
@@ -13577,7 +13577,6 @@
         "main.py",
         "orkview.py",
         "period.py",
-        "templates/dashboard_core.html",
         "tests/test_workcal.py"
       ]
     },
