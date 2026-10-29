@@ -25,7 +25,6 @@
 from __future__ import annotations
 
 import datetime as dt
-import re
 from collections import Counter, defaultdict
 
 import lifecycle
@@ -954,17 +953,16 @@ def _how(orders, U, deals, queue, week, month, quarter, today, step) -> dict:
 # закрытой части (DEALCTX: чаты, договоры) в строки не идут — страница добавляет их сама, если
 # право есть.
 # =============================================================================================
-_NO_RX = re.compile(r"\s*(\d{1,5}(?:/\d+)?)\.")
 PULSE_OUT = "ответственный вне ОРК"      # менеджера ОРК нет, ответственный заказа — не из ОРК
 PULSE_NONE = "не назначен"               # ни менеджера ОРК, ни ответственного заказа
 PULSE_ORDER = {"mgr": 0, "out": 1, "none": 2}
 
 
 def order_no(o: dict) -> str:
-    """Номер заказа, как его называет портал: «486/1» — номер в начале названия до точки (как
-    contracts._regno у сделки); номера нет — «#<id СП-172>»."""
-    m = _NO_RX.match(str(o.get("title") or ""))
-    return m.group(1) if m else f"#{o.get('id')}"
+    """Номер заказа, как его называет портал, — тот же, что у пункта очереди (ordLbl), таблиц
+    недели и карточки: ork.order_label («900/1» в начале названия; дата в начале — не номер;
+    номера нет — «id <id СП-172>»). Строка заказа вида уже несёт его (contracts: lbl)."""
+    return o.get("lbl") or ork.order_label(o.get("title"), o.get("id"))[0] or f"id {o.get('id')}"
 
 
 def _nm(v) -> str:
@@ -1367,7 +1365,10 @@ def _month_drill(month: dict, people: list[dict], orders: list[dict], U: list[di
                     if o.get("respOrk") and code != "S1" and mi < 2:
                         pp[(mi, o.get("orkMgr") or "не назначен")]["segs"][code].append((o, s, code))
             for a in ork.ARTIFACTS:
-                at = _d((o.get("_reach") or {}).get(a["need"]))
+                # день прохождения шага — та же дата, что у M2 в _month (ork.passed_at: на шагах
+                # 2–4 и назначение менеджера ОРК, если оно раньше стадии), иначе строк в списке
+                # меньше, чем в числе
+                at = ork.passed_at(o, a["need"])
                 if at and m0 <= at < m1 and ork.art_required(o, a, o.get("_reach")):
                     got = bool((o.get("art") or {}).get(a["key"]))
                     arts.append((o, a, got))

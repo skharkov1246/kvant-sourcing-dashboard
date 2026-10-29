@@ -599,8 +599,8 @@
   .actile[data-od]{cursor:pointer}
   .actile[data-od]:hover{border-color:var(--a)}
   button.stchip{font:inherit;font-size:11px;background:none;min-height:24px}
-  .drw .odrow{display:flex;width:100%;justify-content:space-between;gap:10px;background:none;border:0;border-bottom:1px solid rgba(42,50,61,.5);color:var(--ink);font:inherit;font-size:12.5px;padding:6px 2px;cursor:pointer;text-align:left}
-  .drw .odrow:hover,.drw .odrow.on{background:rgba(245,165,36,.08)}
+  .drw .odrow{display:flex;width:100%;justify-content:space-between;gap:10px;background:none;border:0;border-bottom:1px solid var(--line2);color:var(--ink);font:inherit;font-size:12.5px;padding:6px 2px;cursor:pointer;text-align:left}
+  .drw .odrow:hover,.drw .odrow.on{background:color-mix(in srgb,var(--fa) 8%,transparent)}
   .drw .odrow.on span{color:var(--a2)}
   .drw .odq{margin:2px 0 6px}
   .drw .odback{margin:0 0 10px}
@@ -1083,8 +1083,10 @@ function _xlBuild(o){
 
 // ---- таблица страницы → строки файла: видимый текст ячеек, без кнопок «?», стрелок и значков
 const _XL_BLOCK=new Set(['DIV','P','LI','UL','OL','TABLE','TR','SECTION','H1','H2','H3','H4','DETAILS','SUMMARY','HEADER','FOOTER']);
-// .orkm — дубль столбцов для телефона (тот же текст есть в своих ячейках)
-const _XL_SKIP='.qq,.xlbar,.xlbtn,button,input,select,textarea,svg,script,style,template,[hidden],[aria-hidden="true"],.orkm,.sortbar';
+// .orkm — дубль столбцов для телефона (тот же текст есть в своих ячейках). Число со списком
+// заказов за ним («Реализация») — кнопка .odn: её текст и есть значение ячейки, в файл идёт;
+// прочие кнопки («Сбросить», «Списком заказов», «?») — нет
+const _XL_SKIP='.qq,.xlbar,.xlbtn,button:not(.odn),input,select,textarea,svg,script,style,template,[hidden],[aria-hidden="true"],.orkm,.sortbar';
 // значки-эмодзи (🚩, ⚠, 🔴…) — не текст ячейки: смысл остаётся в словах рядом; ©, ®, ™ — текст
 // (часть названия, их тоже числит Extended_Pictographic)
 const _XL_PIC=/(?![©®™])\p{Extended_Pictographic}\uFE0F?/gu;
@@ -2337,6 +2339,13 @@ function renderReps(R){
   // должен читаться в одном месте. Роли живут здесь же, подменю. «Доход» — первым
   // (решение владельца 25.10.2026), «Как считается» — его правила словами.
   const PP=window.__PEOPLE__;
+  // строки гигиены, за которыми стоит список сделок, — кликабельны: диагноз без
+  // перечня карточек остаётся диагнозом, а работать надо по списку. Отбор — на уровне вкладки:
+  // его читают и отрисовка «Людей» (overview), и обработчик клика в draw() — внутри overview()
+  // клик падал «HYGF is not defined»
+  const HYGF={noRole:d=>!d.kam&&!d.prod&&d.ownLive, onFired:d=>!d.ownLive,
+              withAmt:d=>d.noAmt||d.noComp, alive:d=>d.idle!=null&&d.idle>((PP&&PP.params&&PP.params.dead)||180),
+              future:d=>!d.plan};
   const ROLES=(PP&&PP.roles)?[['role:kam','КАМы'],['role:prod','Продукт-оунеры']]:[];
   // порядок — по дизайну «Дохода»: Доход · КАМы · Продукт-оунеры · Люди (сводка и личные
   // карточки) · Как считается
@@ -2357,11 +2366,6 @@ function renderReps(R){
     const wcol=rr=>{if(!rr.days)return '<td class="num r dimv" title="нет данных скана">—</td>';const n=rr.waitN||0,g=rr.waitGt1d||0; const c=g>0?'var(--nr)':(n>0?'var(--amber)':'var(--mut)'); const sub=g?` <span class="dimv">(${g}>сут)</span>`:''; return `<td class="num r" style="color:${c}" title="макс ${rr.waitMaxDays||0} дн">${n}${sub}</td>`;};
     const acol=rr=>{const d=rr.lastPostDays; if(d==null)return '<td class="num r dimv">—</td>'; const c=d>3?'var(--nr)':(d>1?'var(--amber)':'var(--ok)'); return `<td class="num r" style="color:${c}">${d} дн</td>`;};
     const rows=reps.map(r=>{const k=r.kpis, rr=r.react||{}, as=rr.assessment;return `<tr class="drill" data-r="${r.uid}"><td><div class="who">${_esc(r.label)} <span class="dimv" style="font-weight:400">${_esc(r.role||'')}</span></div><div class="dep">${_esc(r.pos||r.name)}</div>${as?`<div class="dep" style="color:var(--a2)">Opus: вовл ${as.eng} · проф ${as.prof}</div>`:''}</td><td class="num r">${k.created}</td><td class="num r" style="color:var(--ok)">${k.real}</td><td class="num r">${k.conv}%</td><td class="num r"><b>${k.winRate}%</b></td>${rcol(rr)}<td class="num r">${rr.days&&rr.withinSla!=null?rr.withinSla+'%':'<span class="dimv">—</span>'}</td><td class="num r">${rr.days&&rr.handledPct!=null?rr.handledPct+'%':'<span class="dimv">—</span>'}</td>${wcol(rr)}${acol(rr)}</tr>`;}).join('');
-    // строки гигиены, за которыми стоит список сделок, — кликабельны: диагноз без
-    // перечня карточек остаётся диагнозом, а работать надо по списку
-    const HYGF={noRole:d=>!d.kam&&!d.prod&&d.ownLive, onFired:d=>!d.ownLive,
-                withAmt:d=>d.noAmt||d.noComp, alive:d=>d.idle!=null&&d.idle>((PP&&PP.params&&PP.params.dead)||180),
-                future:d=>!d.plan};
     let hyg='';
     if(PP&&PP.hygiene&&PP.hygiene.length){
       const H=PP.hygiene, bad=H.filter(x=>!x.ok).length, pc=x=>x.unit==='%'?'%':'';
@@ -3109,7 +3113,9 @@ function _orkWeek(X,O,el,h){
     document.getElementById('orkQn').textContent=`(${r.length} из ${Q.length})`;
     const shown=F.all?r:r.slice(0,40), QB=document.getElementById('orkQb');
     QB._xlAll=()=>r.map(qrow).join('');               // Excel — весь отбор, не первые 40
-    const qt=QB.closest&&QB.closest('table'); if(qt) qt._xlNote=()=>{const t=(document.getElementById('orkFilt')||{}).textContent||''; return t.replace(/\s*Сбросить отбор\s*$/,'').trim();};
+    // под таблицей в Excel — какой отбор выгружен: из самого отбора, а не из текста фишек (в нём
+    // «×», «Сбросить отбор» и кнопка «Списком заказов»)
+    const qt=QB.closest&&QB.closest('table'); if(qt) qt._xlNote=()=>{const p=[F.codeLbl,F.stepLbl,F.role?'роль: '+(RN[F.role]||F.role):'',F.who?'человек: '+_orkWhoT(F.who)+(F.whoOnly?' — хозяин, сверх нормы и «ждём УПД»':''):''].filter(Boolean); return p.length?'Отбор: '+p.join(' · '):'';};
     QB.innerHTML=shown.map(qrow).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">пусто — по этому отбору всё по регламенту</td></tr>';
     F._r=r;                                 // текущий отбор — «Списком заказов»
     if(!r.length) QB.innerHTML=_orkQEmpty(F);

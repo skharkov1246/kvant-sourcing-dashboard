@@ -254,6 +254,7 @@ try{
   snap(tj,'journalAll');
   document.querySelector('#tab-contracts [role="tab"][data-sub="week"]').click();
   snap(document.getElementById('orkQb').closest('table'),'queue');
+  snap(document.getElementById('orkLed').closest('table'),'ledger');
   document.querySelector('#tab-contracts [role="tab"][data-sub="main"]').click();
   snap(document.getElementById('ctBody').closest('table'),'deals');
 }catch(e){out.err=String(e&&e.stack||e);}
@@ -320,6 +321,21 @@ def test_очередь_недели_все_строки_а_не_первые_40
     assert q["shown"] == 40 and q["full"] and q["rows"] > 40
     assert q["file"].startswith("КВАНТ_Реализация_Неделя руководителя ОРК_Что делать") and "(" not in q["file"]
     assert len(_rows(q["b64"])) == 1 + q["rows"]
+
+
+def test_число_со_списком_заказов_идёт_в_файл(page_run):
+    """Число «Реализации» со списком заказов за ним — кнопка (.odn): в файле оно есть, как на
+    странице. Ведомость 13 шагов: «Сейчас» каждой строки — число живых заказов на шаге (кнопка
+    списка), в файле — то же число, а не пустая ячейка."""
+    out, r, _m = page_run
+    led = out["ledger"]
+    assert led["head"][:3] == ["Шаг", "Исполнитель", "Сейчас"]
+    L = r["contracts"]["ork"]["week"]["ledger"]
+    rows = _rows(led["b64"])[1:1 + led["rows"]]
+    assert led["rows"] == len(L) + 1 and sum(1 for s in L if s["now"]) > 0     # + строка «Итого сейчас»
+    for row, s in zip(rows, L):
+        assert str(row[2]).split(" · ")[0] == str(s["now"] or 0), (s["no"], row[2])
+    assert rows[-1][0] == "Итого сейчас" and rows[-1][2] == sum(s["now"] or 0 for s in L)
 
 
 def test_таблица_сделок_как_на_странице(page_run):

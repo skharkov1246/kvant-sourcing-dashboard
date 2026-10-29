@@ -67,7 +67,8 @@ def test_строки_заказов_та_же_совокупность_что_l
         w = v["ork"]["week"]
         rows = _rows(w)
         assert len(rows) == w["live"] == len({r["k"] for r in rows}), name
-        assert all(re.fullmatch(r"\d{1,5}(/\d+)?|#\d+", r["no"]) for r in rows), name
+        # номер — как у пункта очереди (ork.order_label): «950/1» или «id <id>» без номера
+        assert all(re.fullmatch(r"\d{1,4}/\d{1,3}|id \d+", r["no"]) for r in rows), name
         steps = Counter(r["step"] for r in rows)
         for s in w["ledger"]:
             assert steps.get(s["no"], 0) == s["now"], (name, s["no"])
@@ -245,7 +246,10 @@ def test_pulse_who_правило_хозяина():
     assert orkview.pulse_who({"orkMgr": "", "resp": "В"}, {"orkResp": ""}) == (orkview.PULSE_OUT, "out")
     assert orkview.pulse_who({"orkMgr": "", "resp": "—"}, None) == (orkview.PULSE_NONE, "none")
     assert orkview.order_no({"id": 5, "title": "486/1. Узел"}) == "486/1"
-    assert orkview.order_no({"id": 5, "title": "Узел без номера"}) == "#5"
+    assert orkview.order_no({"id": 5, "title": "Узел без номера"}) == "id 5"
+    # тот же номер, что у пункта очереди: дата в начале названия — не номер заказа
+    assert orkview.order_no({"id": 7, "title": "15/10.2025 Узел"}) == "id 7"
+    assert orkview.order_no({"id": 8, "title": "959/1 Узел", "lbl": "959/1"}) == "959/1"
 
 
 # ── «Квартал» и «Месяц» ──────────────────────────────────────────────────────────────────

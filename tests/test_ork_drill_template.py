@@ -41,7 +41,7 @@ const box = {document, window: {__ORKMONTH__: inp.orkMonth, __CONTRACTS__: inp.c
   location: {hash: ''}, console, JSON, Math, Object, Array, String, Number, Set, Map, RegExp,
   qmark: () => '', openContract() {}};
 vm.createContext(box);
-vm.runInContext(inp.esc + '\n' + inp.ctN + '\nfunction _dcData(){return null;}\n' + inp.code
+vm.runInContext(inp.esc + '\n' + inp.ctN + '\n' + inp.unpack + '\nfunction _dcData(){return null;}\n' + inp.code
   + '\nthis._orkWeek=_orkWeek; this._orkMonth=_orkMonth; this._orkQuarter=_orkQuarter; this._odModel=_odModel;'
   + ' this._odHtml=_odHtml; this._orkQEmpty=_orkQEmpty; this._orkPulse=_orkPulse; this._odSub=_odSub;', box);
 const unesc = s => String(s).replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
@@ -106,6 +106,14 @@ def _line(prefix: str) -> str:
     return next(ln for ln in TPL.splitlines() if ln.startswith(prefix))
 
 
+def _fn(name: str) -> str:
+    """Текст функции шаблона верхнего уровня — до следующей функции или комментария (как
+    test_ork_template): «Журнал шагов» «Месяца» разворачивает упакованный список _unpack."""
+    a = TPL.index(f"function {name}(")
+    b = min(i for i in (TPL.find("\nfunction ", a + 1), TPL.find("\n//", a + 1)) if i > 0)
+    return TPL[a:b]
+
+
 @pytest.fixture(scope="module")
 def run():
     r = json.loads(json.dumps(fixture.build_realization(), ensure_ascii=False, default=str))
@@ -114,7 +122,7 @@ def run():
     sep["ork"] = dict(sep["ork"], quarter=ct["ork"]["quarter"])     # как renderContracts: квартал — общий
     main = dict(ct, rows=[x for x in ct["rows"] if not x.get("seg")], dir="main")
     inp = {"code": TPL[TPL.index(START):TPL.index(END)], "esc": _line("const _esc="), "ctN": _line("const _ctN="),
-           "views": {"main": main, "sep": sep}, "orkMonth": r["ork_month"], "ct": ct}
+           "unpack": _fn("_unpack"), "views": {"main": main, "sep": sep}, "orkMonth": r["ork_month"], "ct": ct}
     p = subprocess.run(["node", "-e", HARNESS], input=json.dumps(inp, ensure_ascii=False), capture_output=True,
                        text=True, timeout=180)
     assert p.returncode == 0, p.stderr[-2000:]
